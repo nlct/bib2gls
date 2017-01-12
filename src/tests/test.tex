@@ -1,0 +1,20 @@
+\documentclass{article}
+
+%\usepackage[colorlinks]{hyperref}
+\usepackage[record,index]{glossaries-extra}
+
+\glsxtrresourcefile[src={test-entries.bib}]{test-entries}
+
+\begin{document}
+\gls{sample}. \gls{bird}. \gls{waterfowl}.
+
+\newpage
+
+\gls{sample}, \gls{bird}.
+
+\newpage
+
+\gls{sample}, \gls{waterfowl}.
+
+\printunsrtglossary[style=index]
+\end{document}

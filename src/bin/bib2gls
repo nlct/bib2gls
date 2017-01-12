@@ -1,0 +1,4 @@
+#!/bin/sh
+
+bindir=`dirname "$0"`
+java -jar "$bindir/../lib/bib2gls.jar" "$@"

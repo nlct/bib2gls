@@ -1,0 +1,13 @@
+\documentclass{article}
+
+\usepackage{fontspec}
+
+\usepackage[record]{glossaries-extra}
+
+\glsxtrresourcefile[src={test-entries.bib}]{test-entries}
+
+\begin{document}
+\gls{sample}.
+
+\printunsrtglossary[style=index]
+\end{document}

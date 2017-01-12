@@ -1,0 +1,37 @@
+% Encoding: UTF-8
+
+@string{samplestr = "SAMPLE STRING"}
+
+@entry{sample,
+  name={sample},
+  description="An example entry " # samplestr
+}
+
+@abbreviation{html,
+  short="html",
+  long={hypertext markup language}
+}
+
+@abbreviation{ssi,
+  short="ssi",
+  long="server-side includes"
+}
+
+@index{duck}
+
+@index{goose,plural="geese"}
+
+@entry{bird,
+  name={bird},
+  description = {feathered animal, such as a~\gls[format=textbf]{duck} or \gls {goose}}
+}
+
+@symbol{pi,
+  name="{}\ensuremath{\pi}"
+}
+
+@entry{waterfowl,
+  name={waterfowl},
+  description={Any bird that lives in or about water, 
+               such as a \glsname{duck} or \glsname{goose}}
+}
