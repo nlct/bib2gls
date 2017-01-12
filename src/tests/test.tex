@@ -1,7 +1,7 @@
 \documentclass{article}
 
-%\usepackage[colorlinks]{hyperref}
-\usepackage[record,index]{glossaries-extra}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,index,style=tree]{glossaries-extra}
 
 \glsxtrresourcefile[sort=en-GB,src={test-entries.bib}]{test-entries}
 
@@ -16,5 +16,5 @@
 
 \gls{sample}, \gls{waterfowl}.
 
-\printunsrtglossary[style=index]
+\printunsrtglossaries
 \end{document}

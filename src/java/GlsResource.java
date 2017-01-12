@@ -196,6 +196,8 @@ public class GlsResource
 
                if (!entries.contains(entry))
                {
+                  bib2gls.info("adding "+entry.getId());
+
                   entries.add(entry);
                }
 
@@ -226,6 +228,7 @@ public class GlsResource
                }
                else
                {
+                  bib2gls.info("adding dependent "+data.getId());
                   entries.add(data);
                }
             }
