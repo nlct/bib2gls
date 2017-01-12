@@ -71,6 +71,15 @@ public class GlsResource
       if (object != null)
       {
          sort = object.toString(parser);
+
+         if (sort.equals("none") || sort.equals("unsrt"))
+         {
+            sort = null;
+         }
+         else if (sort.isEmpty())
+         {
+            sort = "locale";
+         }
       }
 
       object = list.get("charset");
@@ -223,6 +232,13 @@ public class GlsResource
          }
       }
 
+      // sort if required
+
+      if (sort != null)
+      {
+         entries.sort(new Bib2GlsEntryComparator(sort, sortField, records));
+      }
+
       bib2gls.message(bib2gls.getMessage("message.writing", 
        texFile.toString()));
 
@@ -252,7 +268,7 @@ public class GlsResource
 
    private Vector<TeXPath> sources;
 
-   private String type = null, sort = null;
+   private String type = null, sort = null, sortField = "sort";
 
    private Charset bibCharset = null;
 

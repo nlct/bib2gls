@@ -304,6 +304,32 @@ public class Bib2GlsEntry extends BibEntry
       return fieldValues.get("name");
    }
 
+   public String getFallbackField(String field)
+   {
+      if (field.equals("text"))
+      {
+         return fieldValues.get("name");
+      }
+      else if (field.equals("sort"))
+      {
+         return fieldValues.get("name");
+      }
+      else if (field.equals("first"))
+      {
+         return getFallbackField("text");
+      }
+      else if (field.equals("plural"))
+      {
+         return getFallbackField("text")+"s";
+      }
+      else if (field.equals("firstplural"))
+      {
+         return getFallbackField("first")+"s";
+      }
+
+      return null;
+   }
+
    public void checkRequiredFields(TeXParser parser)
    {
       if (getField("name") == null)
