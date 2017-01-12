@@ -354,7 +354,8 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      writer.println(String.format("}{%s}", description));
+      writer.println("}%");
+      writer.println(String.format("{%s}", description));
    }
 
    public Set<String> getFieldSet()
@@ -369,7 +370,7 @@ public class Bib2GlsEntry extends BibEntry
 
    public void addDependency(String label)
    {
-      if (!deps.contains(label))
+      if (!deps.contains(label) && !label.equals(getId()))
       {
          deps.add(label);
       }
@@ -378,6 +379,16 @@ public class Bib2GlsEntry extends BibEntry
    public Iterator<String> getDependencyIterator()
    {
       return deps.iterator();
+   }
+
+   public static boolean inList(String label, Vector<Bib2GlsEntry> list)
+   {
+      for (Bib2GlsEntry entry : list)
+      {
+         if (entry.getId().equals(label)) return true;
+      }
+
+      return false;
    }
 
    public boolean equals(Object other)
@@ -473,7 +484,6 @@ public class Bib2GlsEntry extends BibEntry
 
       if (prev != null && mid.length() > 0)
       {
-System.out.println("count: "+count);
          if (count >= minRange)
          {
             builder.append("\\delimR ");
@@ -485,9 +495,15 @@ System.out.println("count: "+count);
          }
       }
 
-      fieldValues.put("location", builder.toString());
+      if (builder != null)
+      {
+         fieldValues.put("location", builder.toString());
+      }
 
-      fieldValues.put("loclist", listBuilder.toString());
+      if (listBuilder != null)
+      {
+         fieldValues.put("loclist", listBuilder.toString());
+      }
    }
 
    private Vector<GlsRecord> records;

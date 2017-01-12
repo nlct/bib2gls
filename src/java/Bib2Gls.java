@@ -138,6 +138,7 @@ public class Bib2Gls implements TeXApp
       glsresources = new Vector<GlsResource>();
       fields = new Vector<String>();
       fieldMap = new HashMap<String,String>();
+      allEntries = new HashMap<String,Bib2GlsEntry>();
       records = new Vector<GlsRecord>();
 
       texCharset = Charset.defaultCharset();
@@ -260,6 +261,22 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void addEntry(Bib2GlsEntry entry)
+   {
+      String label = entry.getId();
+
+      Bib2GlsEntry val = allEntries.put(label, entry);
+
+      if (val != null)
+      {
+         warning(String.format("Duplicate label: %s", label));
+      }
+   }
+
+   public Bib2GlsEntry getEntry(String label)
+   {
+      return allEntries.get(label);
+   }
    public Charset getTeXCharset()
    {
       return texCharset;
@@ -394,6 +411,14 @@ public class Bib2Gls implements TeXApp
     *  TeXApp method.
     */ 
    public void warning(TeXParser parser, String message)
+   {
+      if (verboseLevel >= 0)
+      {
+         System.err.println(message);
+      }
+   }
+
+   public void warning(String message)
    {
       if (verboseLevel >= 0)
       {
@@ -609,6 +634,7 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsRecord> records;
 
    private HashMap<String,String> fieldMap;
+   private HashMap<String,Bib2GlsEntry> allEntries;
 
    private Charset texCharset;
 }

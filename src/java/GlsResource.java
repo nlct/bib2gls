@@ -59,25 +59,39 @@ public class GlsResource
          }
       }
 
-      TeXObject typeObj = list.get("type");
+      TeXObject object = list.get("type");
 
-      if (typeObj != null)
+      if (object != null)
       {
-         type = typeObj.toString(parser);
+         type = object.toString(parser);
       }
 
-      TeXObject sortObj = list.get("sort");
+      object = list.get("sort");
 
-      if (sortObj != null)
+      if (object != null)
       {
-         sort = sortObj.toString(parser);
+         sort = object.toString(parser);
       }
 
-      TeXObject bibCharsetObj = list.get("charset");
+      object = list.get("charset");
 
-      if (bibCharsetObj != null)
+      if (object != null)
       {
-         bibCharset = Charset.forName(bibCharsetObj.toString(parser));
+         bibCharset = Charset.forName(object.toString(parser));
+      }
+
+      object = list.get("suffixF");
+
+      if (object != null)
+      {
+         suffixF = object.toString(parser);
+      }
+
+      object = list.get("suffixFF");
+
+      if (object != null)
+      {
+         suffixFF = object.toString(parser);
       }
 
    }
@@ -177,6 +191,34 @@ public class GlsResource
                }
 
                entry.addRecord(record);
+            }
+         }
+      }
+
+      // Add dependencies
+
+      for (int i = 0; i < entries.size(); i++)
+      {
+         Bib2GlsEntry entry = entries.get(i);
+
+         for (Iterator<String> it = entry.getDependencyIterator();
+              it.hasNext(); )
+         {
+            String dep = it.next();
+
+            if (!Bib2GlsEntry.inList(dep, entries))
+            {
+               Bib2GlsEntry data = bib2gls.getEntry(dep);
+
+               if (data == null)
+               {
+                  bib2gls.warning(String.format(
+                    "%s: undefined dependent entry: %s", entry.getId(), dep));
+               }
+               else
+               {
+                  entries.add(data);
+               }
             }
          }
       }

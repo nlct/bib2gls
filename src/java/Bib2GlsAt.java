@@ -20,6 +20,8 @@ public class Bib2GlsAt extends At
 
       BibParser bibParser = (BibParser)parser.getListener();
 
+      Bib2Gls bib2gls = (Bib2Gls)bibParser.getTeXApp();
+
       String entryType = entryTypeList.toString(parser).trim().toLowerCase();
 
       BibData data;
@@ -56,6 +58,11 @@ public class Bib2GlsAt extends At
       data.parseContents(parser, (TeXObjectList)contents, eg);
 
       bibParser.addBibData(data);
+
+      if (data instanceof Bib2GlsEntry)
+      {
+         bib2gls.addEntry((Bib2GlsEntry)data);
+      }
    }
 
 }
