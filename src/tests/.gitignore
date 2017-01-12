@@ -1,0 +1,7 @@
+glossaries-extra.sty
+*.out
+*.log
+*.aux
+*.pdf
+*.glstex
+*.swp
