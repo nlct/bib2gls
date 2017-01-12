@@ -1,5 +1,5 @@
 # bib2gls
-Command line application to convert .bib files to glossaries-extra.sty resource file
+Command line application to convert `.bib` files to `glossaries-extra.sty` resource file
 
 Experimental, still in development. Following on
 from [my answer on TeX on
@@ -11,7 +11,8 @@ also still being developed.
 
 # Compile Source Code
 
-Create sub-directory `src/lib`.
+Create sub-directories `src/lib` and
+`src/classes/com/dickimawbooks/bib2gls`
 
 Requires `texparserlib.jar` which can be compiled from
 [texparser](https://github.com/nlct/texparser).
