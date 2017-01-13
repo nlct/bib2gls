@@ -168,6 +168,24 @@ public class GlsResource
                 String.format("Invalid 'see' value: %s", loc));
             }
          }
+         else if (opt.equals("prefix"))
+         {
+            String val = list.get(opt).toString(parser);
+
+            if (val.equals("") || val.isEmpty())
+            {
+               showLocationPrefix = true;
+            }
+            else if (val.equals("false"))
+            {
+               showLocationPrefix = false;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                String.format("Invalid 'prefix' value: %s", val));
+            }
+         }
          else
          {
             throw new IllegalArgumentException(
@@ -424,7 +442,17 @@ public class GlsResource
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
-         writer.println("\\providecommand{\\bibglsseesep}{, }");
+         if (seeLocation != Bib2GlsEntry.NO_SEE)
+         {
+            writer.println("\\providecommand{\\bibglsseesep}{, }");
+         }
+
+         if (showLocationPrefix)
+         {
+            writer.println("\\providecommand{\\bibglsprefix}[1]{%");
+            writer.println("  \\ifcase#1\\or p.: \\else pp.: \\fi");
+            writer.println("}");
+         }
 
          // syntax: {label}{opts}{name}{description}
 
@@ -468,7 +496,7 @@ public class GlsResource
          for (Bib2GlsEntry entry : entries)
          {
             entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF, seeLocation);
+              suffixF, suffixFF, seeLocation, showLocationPrefix);
             entry.writeBibEntry(writer);
 
             writer.println();
@@ -506,5 +534,7 @@ public class GlsResource
    private int collatorDecomposition=Collator.NO_DECOMPOSITION;
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
+
+   private boolean showLocationPrefix = false;
 }
 

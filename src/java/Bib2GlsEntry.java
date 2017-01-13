@@ -469,7 +469,7 @@ public class Bib2GlsEntry extends BibEntry
    }
 
    public void updateLocationList(int minRange, String suffixF,
-     String suffixFF, int seeLocation)
+     String suffixFF, int seeLocation, boolean showLocationPrefix)
    {
       StringBuilder builder = null;
       StringBuilder listBuilder = null;
@@ -477,6 +477,8 @@ public class Bib2GlsEntry extends BibEntry
       GlsRecord prev = null;
       int count = 0;
       StringBuilder mid = new StringBuilder();
+
+      boolean start=true;
 
       if (seeLocation == PRE_SEE && crossRefs != null)
       {
@@ -512,6 +514,17 @@ public class Bib2GlsEntry extends BibEntry
          listBuilder.append("}{}");
       }
 
+      if (showLocationPrefix)
+      {
+         if (builder == null)
+         {
+            builder = new StringBuilder();
+         }
+
+         builder.append(String.format("\\bibglsprefix{%d}",
+           records.size()));
+      }
+
       for (GlsRecord record : records)
       {
          if (listBuilder == null)
@@ -533,7 +546,7 @@ public class Bib2GlsEntry extends BibEntry
             {
                builder = new StringBuilder();
             }
-            else
+            else if (!start)
             {
                builder.append("\\delimN ");
             }
@@ -579,6 +592,8 @@ public class Bib2GlsEntry extends BibEntry
             count = 0;
             prev = null;
          }
+
+         start = false;
       }
 
       if (prev != null && mid.length() > 0)

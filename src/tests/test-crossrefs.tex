@@ -1,6 +1,9 @@
 \documentclass{article}
 
+\usepackage[colorlinks]{hyperref}
 \usepackage[record,symbols]{glossaries-extra}
+
+\newcommand{\bibglsprefix}[1]{\ifcase#1 \or Page: \else Pages\fi}
 
 \glsxtrresourcefile[% bib2gls options
  sort=en-GB,% sort according to en-GB
@@ -11,6 +14,9 @@
                   % ('primary' or 'secondary' or 'tertiary' or
                   % 'identical')
  decomposition=none,% 'none' or 'canonical' or 'full'
+ see=after,% where to put 'see' part in location list
+            % ('omit' or 'before' or 'after')
+ prefix,% prefix location list ('true' or 'false')
  src={entries-terms,entries-abbrv}% bib files
 ]{entries-terms}
 
