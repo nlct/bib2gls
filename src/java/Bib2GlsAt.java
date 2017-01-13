@@ -58,11 +58,6 @@ public class Bib2GlsAt extends At
       data.parseContents(parser, (TeXObjectList)contents, eg);
 
       bibParser.addBibData(data);
-
-      if (data instanceof Bib2GlsEntry)
-      {
-         bib2gls.addEntry((Bib2GlsEntry)data);
-      }
    }
 
 }

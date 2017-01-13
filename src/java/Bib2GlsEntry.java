@@ -394,6 +394,11 @@ public class Bib2GlsEntry extends BibEntry
       return fieldValues.get(field);
    }
 
+   public String getParent()
+   {
+      return fieldValues.get("parent");
+   }
+
    public void addDependency(String label)
    {
       if (!deps.contains(label) && !label.equals(getId()))
@@ -422,6 +427,11 @@ public class Bib2GlsEntry extends BibEntry
       if (other == null || !(other instanceof Bib2GlsEntry)) return false;
 
       return getId().equals(((Bib2GlsEntry)other).getId());
+   }
+
+   public boolean hasRecords()
+   {
+      return records.size() > 0;
    }
 
    public void addRecord(GlsRecord record)

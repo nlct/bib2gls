@@ -138,8 +138,8 @@ public class Bib2Gls implements TeXApp
       glsresources = new Vector<GlsResource>();
       fields = new Vector<String>();
       fieldMap = new HashMap<String,String>();
-      allEntries = new HashMap<String,Bib2GlsEntry>();
       records = new Vector<GlsRecord>();
+      dependencies = new Vector<String>();
 
       texCharset = Charset.defaultCharset();
 
@@ -257,26 +257,33 @@ public class Bib2Gls implements TeXApp
 
       for (GlsResource resource : glsresources)
       {
-         resource.process(parser);
+         // parse all the bib files
+         resource.parse(parser);
       }
-   }
 
-   public void addEntry(Bib2GlsEntry entry)
-   {
-      String label = entry.getId();
+      // the data needs processing in a separate loop in case of
+      // unrecorded cross-references across different bib files.
 
-      Bib2GlsEntry val = allEntries.put(label, entry);
-
-      if (val != null)
+      for (GlsResource resource : glsresources)
       {
-         warning(String.format("Duplicate label: %s", label));
+         resource.processData();
       }
    }
 
-   public Bib2GlsEntry getEntry(String label)
+   public void addDependent(String id)
    {
-      return allEntries.get(label);
+      if (!dependencies.contains(id))
+      {
+         info("added dependent: "+id);
+         dependencies.add(id);
+      }
    }
+
+   public Vector<String> getDependencies()
+   {
+      return dependencies;
+   }
+
    public Charset getTeXCharset()
    {
       return texCharset;
@@ -295,6 +302,19 @@ public class Bib2Gls implements TeXApp
    public Vector<GlsRecord> getRecords()
    {
       return records;
+   }
+
+   public boolean hasRecord(String id)
+   {
+      for (GlsRecord record : records)
+      {
+         if (id.equals(record.getLabel()))
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public void info(String message)
@@ -634,7 +654,7 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsRecord> records;
 
    private HashMap<String,String> fieldMap;
-   private HashMap<String,Bib2GlsEntry> allEntries;
+   private Vector<String> dependencies;
 
    private Charset texCharset;
 }

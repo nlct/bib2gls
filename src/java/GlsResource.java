@@ -105,22 +105,18 @@ public class GlsResource
 
    }
 
-   public void process(TeXParser parser)
+   public void parse(TeXParser parser)
    throws IOException
    {
-      Bib2Gls bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
+      bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
-      Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
+      bibData = new Vector<Bib2GlsEntry>();
 
-      Vector<String> fields = bib2gls.getFields();
       Vector<GlsRecord> records = bib2gls.getRecords();
 
       for (TeXPath src : sources)
       {
          File bibFile = src.getFile();
-
-         bib2gls.message(bib2gls.getMessage("message.reading", 
-          bibFile.toString()));
 
          Charset srcCharset = bibCharset;
 
@@ -184,62 +180,148 @@ public class GlsResource
 
          TeXParser texParser = bibParserListener.parseBibFile(bibFile);
 
+         Vector<BibData> list = bibParserListener.getBibData();
+
+         for (BibData data : list)
+         {
+            if (data instanceof Bib2GlsEntry)
+            {
+               Bib2GlsEntry entry = (Bib2GlsEntry)data;
+
+               // does this entry have any records?
+
+               for (GlsRecord record : records)
+               {
+                  if (record.getLabel().equals(entry.getId()))
+                  {
+                     entry.addRecord(record);
+                  }
+               }
+
+               bibData.add(entry);
+
+               for (Iterator<String> it = entry.getDependencyIterator();
+                    it.hasNext(); )
+               {
+                  String dep = it.next();
+
+                  bib2gls.addDependent(dep);
+               }
+            }
+         }
+      }
+   }
+
+   private void addHierarchy(Bib2GlsEntry childEntry, 
+      Vector<Bib2GlsEntry> entries)
+   {
+      String parentId = childEntry.getParent();
+
+      if (parentId == null) return;
+
+      // has parent already been added to entries?
+
+      for (Bib2GlsEntry entry : entries)
+      {
+         if (entry.getId().equals(parentId))
+         {
+            // already added
+
+            return;
+         }
+      }
+
+      // find parent in bibData
+
+      Bib2GlsEntry parent = getEntry(parentId);
+
+      if (parent != null)
+      {
+         bib2gls.info("Adding parent: "+parentId);
+         addHierarchy(parent, entries);
+         entries.add(parent);
+      }
+   }
+
+   private Bib2GlsEntry getEntry(String label)
+   {
+      for (Bib2GlsEntry entry : bibData)
+      {
+         if (entry.getId().equals(label))
+         {
+            return entry;
+         }
+      }
+
+      return null;
+   }
+
+   public void processData()
+      throws IOException
+   {
+      if (bibData == null)
+      {
+         throw new NullPointerException(
+            "No data (parse must come before processData)");
+      }
+
+      Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
+
+      Vector<String> fields = bib2gls.getFields();
+      Vector<GlsRecord> records = bib2gls.getRecords();
+
+      if (sort == null)
+      {
+         // add all entries that have been recorded in the order of
+         // definition
+
+         for (Bib2GlsEntry entry : bibData)
+         {
+            if (entry.hasRecords())
+            {
+               addHierarchy(entry, entries);
+               entries.add(entry);
+            }
+         }
+      }
+      else
+      {
+         // add all recorded entries in order of records.
+
          for (int i = 0; i < records.size(); i++)
          {
             GlsRecord record = records.get(i);
 
-            BibData data = bibParserListener.getBibEntry(record.getLabel());
+            Bib2GlsEntry entry = getEntry(record.getLabel());
 
-            if (data != null && data instanceof Bib2GlsEntry)
+            if (entry != null && !entries.contains(entry))
             {
-               Bib2GlsEntry entry = (Bib2GlsEntry)data;
-
-               if (!entries.contains(entry))
-               {
-                  bib2gls.info("adding "+entry.getId());
-
-                  entries.add(entry);
-               }
-
-               entry.addRecord(record);
+               addHierarchy(entry, entries);
+               entries.add(entry);
             }
          }
       }
 
-      // Add dependencies
+      // add any dependencies
 
-      for (int i = 0; i < entries.size(); i++)
+      Vector<String> dependencies = bib2gls.getDependencies();
+
+      for (String id : dependencies)
       {
-         Bib2GlsEntry entry = entries.get(i);
+         Bib2GlsEntry dep = getEntry(id);
 
-         for (Iterator<String> it = entry.getDependencyIterator();
-              it.hasNext(); )
+         if (dep != null && !entries.contains(dep))
          {
-            String dep = it.next();
-
-            if (!Bib2GlsEntry.inList(dep, entries))
-            {
-               Bib2GlsEntry data = bib2gls.getEntry(dep);
-
-               if (data == null)
-               {
-                  bib2gls.warning(String.format(
-                    "%s: undefined dependent entry: %s", entry.getId(), dep));
-               }
-               else
-               {
-                  bib2gls.info("adding dependent "+data.getId());
-                  entries.add(data);
-               }
-            }
+            addHierarchy(dep, entries);
+            entries.add(dep);
          }
       }
 
       // sort if required
 
-      if (sort != null)
+      if (sort != null && !sort.equals("use"))
       {
-         entries.sort(new Bib2GlsEntryComparator(sort, sortField, records));
+         entries.sort(new Bib2GlsEntryComparator(sort, sortField));
       }
 
       bib2gls.message(bib2gls.getMessage("message.writing", 
@@ -278,5 +360,9 @@ public class GlsResource
    private int minLocationRange = 3;
 
    private String suffixF, suffixFF;
+
+   private Vector<Bib2GlsEntry> bibData;
+
+   private Bib2Gls bib2gls;
 }
 
