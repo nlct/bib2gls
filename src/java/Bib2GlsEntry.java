@@ -93,7 +93,7 @@ public class Bib2GlsEntry extends BibEntry
    {
       Bib2Gls bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
-      for (int i = 0, n = list.size(); i < n; i++)
+      for (int i = 0; i < list.size(); i++)
       {
          TeXObject object = list.get(i);
 
@@ -101,10 +101,14 @@ public class Bib2GlsEntry extends BibEntry
          {
             String csname = ((TeXCsRef)object).getName().toLowerCase();
 
+            boolean foundgls = false;
+
             try
             {
                if (csname.equals("glssee"))
                {// \glssee[tag]{label}{xr-label-list}
+
+                  foundgls = (i==0);
 
                   TeXObject arg = list.get(++i);
 
@@ -119,7 +123,7 @@ public class Bib2GlsEntry extends BibEntry
 
                      if (code == '[')
                      {// skip optional argument
-                        for (; i < n; i++)
+                        for (; i < list.size(); i++)
                         {
                            arg = list.get(i);
 
@@ -164,6 +168,8 @@ public class Bib2GlsEntry extends BibEntry
                else if (csname.equals("glsxtrp"))
                {// \glsxtrp{field}{label}
 
+                  foundgls = (i==0);
+
                   // skip first argument
                   TeXObject arg = list.get(++i);
 
@@ -188,6 +194,8 @@ public class Bib2GlsEntry extends BibEntry
                }
                else if (isGlsCsOptLabel(bib2gls, csname))
                {
+                  foundgls = (i==0);
+
                   TeXObject arg = list.get(++i);
 
                   while (arg instanceof Ignoreable)
@@ -216,7 +224,7 @@ public class Bib2GlsEntry extends BibEntry
 
                      if (code == '[')
                      {
-                        for (; i < n; i++)
+                        for (; i < list.size(); i++)
                         {
                            arg = list.get(i);
 
@@ -247,6 +255,16 @@ public class Bib2GlsEntry extends BibEntry
             {
                bib2gls.warning(parser, 
                  String.format("Can't detect argument for \\%s", csname));
+            }
+
+            if (foundgls)
+            {
+               // found a problematic command at the start of a
+               // field. Protect the field from first letter
+               // upper casing by inserting an empty group.
+
+               list.add(0, parser.getListener().createGroup());
+               i++;
             }
          }
          else if (object instanceof TeXObjectList)
@@ -451,7 +469,7 @@ public class Bib2GlsEntry extends BibEntry
    }
 
    public void updateLocationList(int minRange, String suffixF,
-     String suffixFF)
+     String suffixFF, int seeLocation)
    {
       StringBuilder builder = null;
       StringBuilder listBuilder = null;
@@ -459,6 +477,40 @@ public class Bib2GlsEntry extends BibEntry
       GlsRecord prev = null;
       int count = 0;
       StringBuilder mid = new StringBuilder();
+
+      if (seeLocation == PRE_SEE && crossRefs != null)
+      {
+         builder = new StringBuilder();
+         builder.append("\\glsxtrusesee{");
+         builder.append(getId());
+         builder.append("}");
+
+         if (records.size() > 0)
+         {
+            builder.append("\\bibglsseesep ");
+         }
+
+         listBuilder = new StringBuilder();
+         listBuilder.append("\\glsseeformat");
+
+         if (crossRefTag != null)
+         {
+            listBuilder.append('[');
+            listBuilder.append(crossRefTag);
+            listBuilder.append(']');
+         }
+
+         listBuilder.append("{");
+
+         for (int i = 0; i < crossRefs.length; i++)
+         {
+            if (i > 0) listBuilder.append(",");
+
+            listBuilder.append(crossRefs[i]);
+         }
+
+         listBuilder.append("}{}");
+      }
 
       for (GlsRecord record : records)
       {
@@ -542,6 +594,52 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      if (seeLocation == POST_SEE && crossRefs != null)
+      {
+         if (builder == null)
+         {
+            builder = new StringBuilder();
+         }
+
+         if (records.size() > 0)
+         {
+            builder.append("\\bibglsseesep ");
+         }
+
+         builder.append("\\glsxtrusesee{");
+         builder.append(getId());
+         builder.append("}");
+
+         if (listBuilder == null)
+         {
+            listBuilder = new StringBuilder();
+         }
+         else
+         {
+            listBuilder.append('|');
+         }
+
+         listBuilder.append("\\glsseeformat");
+
+         if (crossRefTag != null)
+         {
+            listBuilder.append('[');
+            listBuilder.append(crossRefTag);
+            listBuilder.append(']');
+         }
+
+         listBuilder.append("{");
+
+         for (int i = 0; i < crossRefs.length; i++)
+         {
+            if (i > 0) listBuilder.append(",");
+
+            listBuilder.append(crossRefs[i]);
+         }
+
+         listBuilder.append("}{}");
+      }
+
       if (builder != null)
       {
          fieldValues.put("location", builder.toString());
@@ -553,9 +651,51 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
+   public void initCrossRefs(TeXParser parser)
+    throws IOException
+   {
+      BibValueList value = getField("see");
+
+      if (value == null) return;
+
+      TeXObjectList valList = value.expand(parser);
+
+      if (valList instanceof Group)
+      {
+         valList = ((Group)valList).toList();
+      }
+
+      TeXObject opt = valList.popArg(parser, '[', ']');
+
+      if (opt != null)
+      {
+         crossRefTag = opt.toString(parser);
+      }
+
+      CsvList csvList = CsvList.getList(parser, valList);
+
+      int n = csvList.size();
+
+      if (n == 0) return;
+
+      crossRefs = new String[n];
+
+      for (int i = 0; i < n; i++)
+      {
+         crossRefs[i] = csvList.get(i).toString(parser);
+
+         addDependency(crossRefs[i]);
+      }
+   }
+
    private Vector<GlsRecord> records;
 
    private HashMap<String,String> fieldValues;
 
    private Vector<String> deps;
+
+   private String crossRefTag = null;
+   private String[] crossRefs = null;
+
+   public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
 }

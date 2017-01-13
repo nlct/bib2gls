@@ -146,6 +146,28 @@ public class GlsResource
          {
             suffixFF = list.get(opt).toString(parser);
          }
+         else if (opt.equals("see"))
+         {
+            String loc = list.get(opt).toString(parser);
+
+            if (loc.equals("omit"))
+            {
+               seeLocation = Bib2GlsEntry.NO_SEE;
+            }
+            else if (loc.equals("before"))
+            {
+               seeLocation = Bib2GlsEntry.PRE_SEE;
+            }
+            else if (loc.equals("after"))
+            {
+               seeLocation = Bib2GlsEntry.POST_SEE;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                String.format("Invalid 'see' value: %s", loc));
+            }
+         }
          else
          {
             throw new IllegalArgumentException(
@@ -256,6 +278,10 @@ public class GlsResource
                      entry.addRecord(record);
                   }
                }
+
+               // does this entry have a "see" field?
+
+               entry.initCrossRefs(parser);
 
                bibData.add(entry);
 
@@ -398,6 +424,8 @@ public class GlsResource
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
+         writer.println("\\providecommand{\\bibglsseesep}{, }");
+
          // syntax: {label}{opts}{name}{description}
 
          writer.println("\\providecommand{\\bibglsnewentry}[4]{%");
@@ -440,7 +468,7 @@ public class GlsResource
          for (Bib2GlsEntry entry : entries)
          {
             entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF);
+              suffixF, suffixFF, seeLocation);
             entry.writeBibEntry(writer);
 
             writer.println();
@@ -476,5 +504,7 @@ public class GlsResource
    private int collatorStrength=Collator.PRIMARY;
 
    private int collatorDecomposition=Collator.NO_DECOMPOSITION;
+
+   private int seeLocation=Bib2GlsEntry.POST_SEE;
 }
 
