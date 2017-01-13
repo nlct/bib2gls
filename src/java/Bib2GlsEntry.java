@@ -353,9 +353,10 @@ public class Bib2GlsEntry extends BibEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\longnewglossaryentry{%s}{", getId());
+      writer.format("\\bibglsnewentry{%s}%%%n{", getId());
 
       String description = "";
+      String name = "";
       String sep = "";
 
       Set<String> keyset = getFieldSet();
@@ -370,7 +371,11 @@ public class Bib2GlsEntry extends BibEntry
          {
             description = fieldValues.get(field);
          }
-         else
+         else if (field.equals("name"))
+         {
+            name = fieldValues.get(field);
+         }
+         else 
          {
             writer.format("%s", sep);
 
@@ -381,6 +386,7 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       writer.println("}%");
+      writer.println(String.format("{%s}%%", name));
       writer.println(String.format("{%s}", description));
    }
 
@@ -392,6 +398,11 @@ public class Bib2GlsEntry extends BibEntry
    public String getFieldValue(String field)
    {
       return fieldValues.get(field);
+   }
+
+   public String putField(String label, String value)
+   {
+      return fieldValues.put(label, value);
    }
 
    public String getParent()

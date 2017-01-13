@@ -1,16 +1,18 @@
 % Encoding: UTF-8
 
-@symbol{M,
-  name={\ensuremath{\boldsymbol{M}}},
-  description={a \gls{matrix}}
-}
+@preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
 
-@symbol{S,
-  name={\ensuremath{\mathcal{S}}},
-  description={a \gls{set}}
+@symbol{M,
+  name={\ensuremath{\mtx{M}}},
+  description={a \gls{matrix}}
 }
 
 @symbol{v,
   name={\ensuremath{\vec{v}}},
   description={a \gls{vector}}
+}
+
+@symbol{S,
+  name={\ensuremath{\mathcal{S}}},
+  description={a \gls{set}}
 }

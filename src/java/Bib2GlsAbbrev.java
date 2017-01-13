@@ -35,7 +35,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\new%s[", getEntryType());
+      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(), getId());
 
       String sep = "";
       String shortText = "";
@@ -67,7 +67,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
          }
       }
 
-      writer.println(String.format("]{%s}{%s}{%s}",
-        getId(), shortText, longText));
+      writer.println(String.format("}%%%n{%s}%%%n{%s}",
+        shortText, longText));
    }
 }

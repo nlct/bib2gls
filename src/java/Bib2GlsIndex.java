@@ -31,7 +31,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.print("\\newterm[");
+      writer.format("\\bibglsnewterm{%s}%%%n{", getId());
 
       String sep = "";
 
@@ -49,6 +49,6 @@ public class Bib2GlsIndex extends Bib2GlsEntry
          writer.format("%s={%s}", field, getFieldValue(field));
       }
 
-      writer.println(String.format("]{%s}", getId()));
+      writer.println("}");
    }
 }

@@ -30,10 +30,12 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\glsxtrnew%s[", getEntryType());
+      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(),
+        getId());
 
       String sep = "";
       String name = "";
+      String description = "";
 
       Set<String> keyset = getFieldSet();
 
@@ -47,6 +49,10 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
          {
             name = getFieldValue(field);
          }
+         else if (field.equals("description"))
+         {
+            description = getFieldValue(field);
+         }
          else
          {
             writer.format("%s", sep);
@@ -57,6 +63,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
          }
       }
 
-      writer.println(String.format("]{%s}{%s}", getId(), name));
+      writer.println(String.format("}%%%n{%s}%%%n{%s}", name,
+         description));
    }
 }

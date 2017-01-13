@@ -188,6 +188,11 @@ public class GlsResource
             {
                Bib2GlsEntry entry = (Bib2GlsEntry)data;
 
+               if (type != null)
+               {
+                  entry.putField("type", type);
+               }
+
                // does this entry have any records?
 
                for (GlsRecord record : records)
@@ -207,6 +212,11 @@ public class GlsResource
 
                   bib2gls.addDependent(dep);
                }
+            }
+            else if (data instanceof BibPreamble)
+            {
+                preamble = ((BibPreamble)data).getPreamble().expand(texParser)
+                   .toString(texParser);
             }
          }
       }
@@ -333,11 +343,52 @@ public class GlsResource
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
+         // syntax: {label}{opts}{name}{description}
+
+         writer.println("\\providecommand{\\bibglsnewentry}[4]{%");
+         writer.print(" \\longnewglossaryentry{#1}");
+         writer.println("{name={#3},#2}{#4}%");
+         writer.println("}");
+
+         writer.println("\\providecommand{\\bibglsnewsymbol}[4]{%");
+         writer.print(" \\longnewglossaryentry{#1}");
+         writer.println("{name={#3},sort={#1},category={symbol},#2}{#4}%");
+         writer.println("}");
+
+         writer.println("\\providecommand{\\bibglsnewnumber}[4]{%");
+         writer.print(" \\longnewglossaryentry{#1}");
+         writer.println("{name={#3},sort={#1},category={number},#2}{#4}%");
+         writer.println("}");
+
+         // syntax: {label}{opts}
+         writer.println("\\providecommand*{\\bibglsnewterm}[2]{%");
+         writer.println(" \\newglossaryentry{#1}{name={#1},description={},#2}%");
+         writer.println("}");
+
+         // syntax: {label}{opts}{short}{long}
+         writer.println("\\providecommand{\\bibglsnewacronym}[4]{%");
+         writer.println("  \\newacronym[#2]{#1}{#3}{#4}%");
+         writer.println("}");
+
+         writer.println("\\providecommand{\\bibglsnewabbreviation}[4]{%");
+         writer.println("  \\newabbreviation[#2]{#1}{#3}{#4}%");
+         writer.println("}");
+
+         if (preamble != null)
+         {
+            writer.println();
+            writer.println(preamble);
+         }
+
+         writer.println();
+
          for (Bib2GlsEntry entry : entries)
          {
             entry.updateLocationList(minLocationRange,
               suffixF, suffixFF);
             entry.writeBibEntry(writer);
+
+            writer.println();
          }
       }
       finally
@@ -360,6 +411,8 @@ public class GlsResource
    private int minLocationRange = 3;
 
    private String suffixF, suffixFF;
+
+   private String preamble = null;
 
    private Vector<Bib2GlsEntry> bibData;
 
