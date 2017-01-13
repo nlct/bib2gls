@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.text.Collator;
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
@@ -17,18 +18,24 @@ public class GlsResource
    public GlsResource(TeXParser parser, AuxData data)
     throws IOException
    {
+      sources = new Vector<TeXPath>();
+
+      init(parser, data.getArg(0), data.getArg(1));
+   }
+
+   private void init(TeXParser parser, TeXObject opts, TeXObject arg)
+      throws IOException
+   {
       TeXPath texPath = new TeXPath(parser, 
-        data.getArg(1).toString(parser), "glstex");
+        arg.toString(parser), "glstex");
 
       texFile = texPath.getFile();
 
       String filename = texPath.getTeXPath(true);
 
-      KeyValList list = KeyValList.getList(parser, data.getArg(0));
+      KeyValList list = KeyValList.getList(parser, opts);
 
       TeXObject srcList = list.get("src");
-
-      sources = new Vector<TeXPath>();
 
       if (srcList == null)
       {
@@ -79,6 +86,60 @@ public class GlsResource
          else if (sort.isEmpty())
          {
             sort = "locale";
+         }
+      }
+
+      object = list.get("strength"); // collator strength
+
+      if (object != null)
+      {
+         String strength = object.toString(parser);
+
+         if (strength.equals("primary"))
+         {
+            collatorStrength = Collator.PRIMARY;
+         }
+         else if (strength.equals("secondary"))
+         {
+            collatorStrength = Collator.SECONDARY;
+         }
+         else if (strength.equals("tertiary"))
+         {
+            collatorStrength = Collator.TERTIARY;
+         }
+         else if (strength.equals("identical"))
+         {
+            collatorStrength = Collator.IDENTICAL;
+         }
+         else
+         {
+            throw new IllegalArgumentException(
+              String.format("Invalid strength value: %s", strength));
+         }
+      }
+
+      object = list.get("decomposition"); // collator decomposition
+
+      if (object != null)
+      {
+         String decomposition = object.toString(parser);
+
+         if (decomposition.equals("none"))
+         {
+            collatorDecomposition = Collator.NO_DECOMPOSITION;
+         }
+         else if (decomposition.equals("canonical"))
+         {
+            collatorDecomposition = Collator.CANONICAL_DECOMPOSITION;
+         }
+         else if (decomposition.equals("full"))
+         {
+            collatorDecomposition = Collator.FULL_DECOMPOSITION;
+         }
+         else
+         {
+            throw new IllegalArgumentException(
+              String.format("Invalid decomposition value: %s", decomposition));
          }
       }
 
@@ -331,7 +392,8 @@ public class GlsResource
 
       if (sort != null && !sort.equals("use"))
       {
-         entries.sort(new Bib2GlsEntryComparator(sort, sortField));
+         entries.sort(new Bib2GlsEntryComparator(sort, sortField, 
+            collatorStrength, collatorDecomposition));
       }
 
       bib2gls.message(bib2gls.getMessage("message.writing", 
@@ -417,5 +479,9 @@ public class GlsResource
    private Vector<Bib2GlsEntry> bibData;
 
    private Bib2Gls bib2gls;
+
+   private int collatorStrength=Collator.PRIMARY;
+
+   private int collatorDecomposition=Collator.NO_DECOMPOSITION;
 }
 

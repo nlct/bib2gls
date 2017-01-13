@@ -7,7 +7,8 @@ import java.text.Collator;
 
 public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 {
-   public Bib2GlsEntryComparator(String sort, String sortField)
+   public Bib2GlsEntryComparator(String sort, String sortField,
+    int strength, int decomposition)
    {
       this.sortField = sortField;
 
@@ -19,6 +20,9 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       {
          collator = Collator.getInstance(Locale.forLanguageTag(sort));
       }
+
+      collator.setStrength(strength);
+      collator.setDecomposition(decomposition);
    }
 
    public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
