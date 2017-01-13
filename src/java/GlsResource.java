@@ -35,135 +35,128 @@ public class GlsResource
 
       KeyValList list = KeyValList.getList(parser, opts);
 
-      TeXObject srcList = list.get("src");
+      TeXObject srcList = null;
+
+      for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
+      {
+         String opt = it.next();
+
+         if (opt.equals("src"))
+         {
+            srcList = list.get("src");
+
+            if (srcList instanceof TeXObjectList 
+                && ((TeXObjectList)srcList).size() == 1)
+            {
+               srcList = ((TeXObjectList)srcList).popArg(parser);
+            }
+
+            CsvList csvList = CsvList.getList(parser, srcList);
+
+            int n = csvList.size();
+
+            if (n == 0)
+            {
+               sources.add(new TeXPath(parser, filename, "bib"));
+            }
+            else
+            {
+               for (TeXObject obj : csvList)
+               {
+                  sources.add(new TeXPath(parser, obj.toString(parser), "bib"));
+               }
+            }
+         }
+         else if (opt.equals("type"))
+         {
+            type = list.get(opt).toString(parser);
+         }
+         else if (opt.equals("sort"))
+         {
+            sort = list.get(opt).toString(parser);
+
+            if (sort.equals("none") || sort.equals("unsrt"))
+            {
+               sort = null;
+            }
+            else if (sort.isEmpty())
+            {
+               sort = "locale";
+            }
+         }
+         else if (opt.equals("strength"))
+         { // collator strength
+
+            String strength = list.get(opt).toString(parser);
+
+            if (strength.equals("primary"))
+            {
+               collatorStrength = Collator.PRIMARY;
+            }
+            else if (strength.equals("secondary"))
+            {
+               collatorStrength = Collator.SECONDARY;
+            }
+            else if (strength.equals("tertiary"))
+            {
+               collatorStrength = Collator.TERTIARY;
+            }
+            else if (strength.equals("identical"))
+            {
+               collatorStrength = Collator.IDENTICAL;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 String.format("Invalid strength value: %s", strength));
+            }
+         }
+         else if (opt.equals("decomposition"))
+         { // collator decomposition
+
+            String decomposition = list.get(opt).toString(parser);
+
+            if (decomposition.equals("none"))
+            {
+               collatorDecomposition = Collator.NO_DECOMPOSITION;
+            }
+            else if (decomposition.equals("canonical"))
+            {
+               collatorDecomposition = Collator.CANONICAL_DECOMPOSITION;
+            }
+            else if (decomposition.equals("full"))
+            {
+               collatorDecomposition = Collator.FULL_DECOMPOSITION;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 String.format("Invalid decomposition value: %s", decomposition));
+            }
+         }
+         else if (opt.equals("charset"))
+         {
+            bibCharset = Charset.forName(list.get(opt).toString(parser));
+         }
+         else if (opt.equals("suffixF"))
+         {
+            suffixF = list.get(opt).toString(parser);
+         }
+         else if (opt.equals("suffixFF"))
+         {
+            suffixFF = list.get(opt).toString(parser);
+         }
+         else
+         {
+            throw new IllegalArgumentException(
+             String.format("Unknown option: %s", opt));
+         }
+      }
 
       if (srcList == null)
       {
          sources.add(new TeXPath(parser, filename, "bib"));
       }
-      else
-      {
-         if (srcList instanceof TeXObjectList 
-             && ((TeXObjectList)srcList).size() == 1)
-         {
-            srcList = ((TeXObjectList)srcList).popArg(parser);
-         }
-
-         CsvList csvList = CsvList.getList(parser, srcList);
-
-         int n = csvList.size();
-
-         if (n == 0)
-         {
-            sources.add(new TeXPath(parser, filename, "bib"));
-         }
-         else
-         {
-            for (TeXObject obj : csvList)
-            {
-               sources.add(new TeXPath(parser, obj.toString(parser), "bib"));
-            }
-         }
-      }
-
-      TeXObject object = list.get("type");
-
-      if (object != null)
-      {
-         type = object.toString(parser);
-      }
-
-      object = list.get("sort");
-
-      if (object != null)
-      {
-         sort = object.toString(parser);
-
-         if (sort.equals("none") || sort.equals("unsrt"))
-         {
-            sort = null;
-         }
-         else if (sort.isEmpty())
-         {
-            sort = "locale";
-         }
-      }
-
-      object = list.get("strength"); // collator strength
-
-      if (object != null)
-      {
-         String strength = object.toString(parser);
-
-         if (strength.equals("primary"))
-         {
-            collatorStrength = Collator.PRIMARY;
-         }
-         else if (strength.equals("secondary"))
-         {
-            collatorStrength = Collator.SECONDARY;
-         }
-         else if (strength.equals("tertiary"))
-         {
-            collatorStrength = Collator.TERTIARY;
-         }
-         else if (strength.equals("identical"))
-         {
-            collatorStrength = Collator.IDENTICAL;
-         }
-         else
-         {
-            throw new IllegalArgumentException(
-              String.format("Invalid strength value: %s", strength));
-         }
-      }
-
-      object = list.get("decomposition"); // collator decomposition
-
-      if (object != null)
-      {
-         String decomposition = object.toString(parser);
-
-         if (decomposition.equals("none"))
-         {
-            collatorDecomposition = Collator.NO_DECOMPOSITION;
-         }
-         else if (decomposition.equals("canonical"))
-         {
-            collatorDecomposition = Collator.CANONICAL_DECOMPOSITION;
-         }
-         else if (decomposition.equals("full"))
-         {
-            collatorDecomposition = Collator.FULL_DECOMPOSITION;
-         }
-         else
-         {
-            throw new IllegalArgumentException(
-              String.format("Invalid decomposition value: %s", decomposition));
-         }
-      }
-
-      object = list.get("charset");
-
-      if (object != null)
-      {
-         bibCharset = Charset.forName(object.toString(parser));
-      }
-
-      object = list.get("suffixF");
-
-      if (object != null)
-      {
-         suffixF = object.toString(parser);
-      }
-
-      object = list.get("suffixFF");
-
-      if (object != null)
-      {
-         suffixFF = object.toString(parser);
-      }
-
    }
 
    public void parse(TeXParser parser)
