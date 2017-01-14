@@ -34,7 +34,7 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 public class GlsResource
 {
    public GlsResource(TeXParser parser, AuxData data)
-    throws IOException
+    throws IOException,InterruptedException
    {
       sources = new Vector<TeXPath>();
 
@@ -42,7 +42,7 @@ public class GlsResource
    }
 
    private void init(TeXParser parser, TeXObject opts, TeXObject arg)
-      throws IOException
+      throws IOException,InterruptedException
    {
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
@@ -77,13 +77,14 @@ public class GlsResource
 
             if (n == 0)
             {
-               sources.add(new TeXPath(parser, filename, "bib"));
+               sources.add(bib2gls.getBibFilePath(parser, filename));
             }
             else
             {
                for (TeXObject obj : csvList)
                {
-                  sources.add(new TeXPath(parser, obj.toString(parser), "bib"));
+                  sources.add(bib2gls.getBibFilePath(parser, 
+                     obj.toString(parser)));
                }
             }
          }
@@ -219,7 +220,7 @@ public class GlsResource
 
       if (srcList == null)
       {
-         sources.add(new TeXPath(parser, filename, "bib"));
+         sources.add(bib2gls.getBibFilePath(parser, filename));
       }
    }
 

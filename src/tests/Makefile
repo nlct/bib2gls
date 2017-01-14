@@ -14,4 +14,5 @@ clean	:
 	$(RM) *.log
 	$(RM) *.pdf
 	$(RM) *.glstex
+	$(RM) *.glg
 	$(RM) *.out

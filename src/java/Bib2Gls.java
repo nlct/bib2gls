@@ -129,7 +129,8 @@ public class Bib2Gls implements TeXApp
       return texCharset;
    }
 
-   public void process(String[] args) throws IOException,Bib2GlsException
+   public void process(String[] args) 
+     throws IOException,InterruptedException,Bib2GlsException
    {
       initMessages();
 
@@ -380,13 +381,83 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method. TODO: needs implementing to allow bib file to
-    *  be found on TeX's path.
+    *  TeXApp method.
     */ 
    public String kpsewhich(String arg)
      throws IOException,InterruptedException
    {
-      return null;
+      verbose(getMessage("message.running", 
+        String.format("kpsewhich '%s'", arg)));
+
+      Process process =
+        new ProcessBuilder("kpsewhich", arg).start();
+
+      int exitCode = process.waitFor();
+
+      String line = null;
+
+      if (exitCode == 0)
+      {
+         InputStream stream = process.getInputStream();
+
+         if (stream == null)
+         {
+            throw new IOException(String.format(
+             "Unable to open input stream from process: kpsewhich '%s'",
+             arg));
+         }
+
+         BufferedReader reader = null;
+
+         try
+         {
+            reader = new BufferedReader(new InputStreamReader(stream));
+
+            line = reader.readLine();
+         }
+         finally
+         {
+            if (reader != null)
+            {
+               reader.close();
+            }
+         }
+      }
+      else
+      {
+         throw new IOException(getMessage("error.app_failed",
+           String.format("kpsewhich '%s'", arg),  exitCode));
+      }
+
+      return line;
+   }
+
+   public TeXPath getBibFilePath(TeXParser parser, String filename)
+     throws IOException,InterruptedException
+   {
+      // TeXPath will convert from TeX path names (using /)
+      // to OS path names and will try to find the file
+      // using kpsewhich if it doesn't exist.
+
+      TeXPath path = new TeXPath(parser, filename, "bib");
+
+      File bibFile = path.getFile();
+
+      if (!bibFile.exists())
+      {
+         // try finding the file in the aux file's directory
+
+         File dir = auxFile.getParentFile();
+
+         File f = new File(dir, bibFile.getName());
+
+         if (f.exists())
+         {
+            path = new TeXPath(parser, f);
+         }
+      }
+
+      return path;
    }
 
    /*
