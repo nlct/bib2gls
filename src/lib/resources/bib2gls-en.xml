@@ -11,6 +11,7 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="syntax.usage">Usage: {0} [&lt;option&gt;]+ &lt;aux file&gt;</entry>
 <entry key="syntax.info">Helper application for the glossaries-extra package.
 See the manual for further details.</entry>
+<entry key="syntax.use.help">(Use --help or -h for help.)</entry>
 <entry key="syntax.options">Options:</entry>
 <entry key="syntax.version">{0} (or {1})	Display version and exit.</entry>
 <entry key="syntax.help">{0} (or {1})		Display this help message and exit.</entry>
@@ -22,7 +23,16 @@ See the manual for further details.</entry>
 <entry key="syntax.silent">{0}		Only display error messages.</entry>
 <entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
 			Set transcript file name.</entry>
-<entry key="syntax.use.help">(Use --help or -h for help.)</entry>
+<entry key="syntax.mfirstuc">{0} &lt;fields&gt;|all (or {1} &lt;fields&gt;|all)
+			Insert an empty group if fields start with certain problematic commands
+			to protect against case-changing commands like \Gls.
+			The default is to do this for all fields.
+			To do this for only a subset of fields,
+			set &lt;fields&gt; to a comma-separated
+			list of fields (e.g. 'name,short,long').
+			The keyword 'all' indicates all fields.</entry>
+<entry key="syntax.no.mfirstuc">{0}
+			Switch off the auto-insertion of an empty group for all fields.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>

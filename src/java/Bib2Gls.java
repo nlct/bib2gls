@@ -352,6 +352,15 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
+   public boolean mfirstucProtection()
+   {
+      return mfirstucProtect;
+   }
+
+   public String[] mfirstucProtectionFields()
+   {
+      return mfirstucProtectFields;
+   }
    public void logMessage(String message)
    {
       if (logWriter != null)
@@ -684,6 +693,12 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.silent", "--silent"));
       System.out.println(getMessage("syntax.log", "--log-file", "-t"));
 
+      System.out.println(getMessage("syntax.mfirstuc",
+         "--mfirstuc-protection", "-u"));
+
+      System.out.println(getMessage("syntax.no.mfirstuc",
+         "--no-mfirstuc-protection"));
+
       System.exit(0);
    }
 
@@ -822,6 +837,37 @@ public class Bib2Gls implements TeXApp
 
             logName = args[i];
          }
+         else if (args[i].equals("--no-mfirstuc-protection"))
+         {
+            mfirstucProtect = false;
+         }
+         else if (args[i].equals("--mfirstuc-protection")
+               || args[i].equals("-u"))
+         {
+            mfirstucProtect = true;
+
+            i++;
+
+            if (i == args.length)
+            {
+               System.err.println(getMessage("error.missing.value", args[i-1]));
+               System.err.println(getMessage("syntax.use.help"));
+               System.exit(1);
+            }
+
+            if (args[i].equals("all"))
+            {
+               mfirstucProtectFields = null;
+            }
+            else if (args[i].isEmpty())
+            {
+               mfirstucProtect = false;
+            }
+            else
+            {
+               mfirstucProtectFields = args[i].split(" *, *");
+            }
+         }
          else if (args[i].startsWith("-"))
          {
             System.err.println(getMessage(
@@ -933,4 +979,8 @@ public class Bib2Gls implements TeXApp
    private File auxFile;
 
    private PrintWriter logWriter=null;
+
+   private boolean mfirstucProtect = true;
+   private String[] mfirstucProtectFields = null;
+
 }

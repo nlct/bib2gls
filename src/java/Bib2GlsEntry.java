@@ -108,7 +108,8 @@ public class Bib2GlsEntry extends BibEntry
       return false;
    }
 
-   private void checkGlsCs(TeXParser parser, TeXObjectList list)
+   private void checkGlsCs(TeXParser parser, TeXObjectList list, 
+      boolean mfirstucProtect)
     throws IOException
    {
       for (int i = 0; i < list.size(); i++)
@@ -275,7 +276,7 @@ public class Bib2GlsEntry extends BibEntry
                  bib2gls.getMessage("warning.can.find.arg", csname));
             }
 
-            if (foundgls)
+            if (foundgls && mfirstucProtect)
             {
                // found a problematic command at the start of a
                // field. Protect the field from first letter
@@ -289,7 +290,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (object instanceof TeXObjectList)
          {
-            checkGlsCs(parser, (TeXObjectList)object);
+            checkGlsCs(parser, (TeXObjectList)object, false);
          }
       }
    }
@@ -302,6 +303,9 @@ public class Bib2GlsEntry extends BibEntry
 
       Vector<String> fields = bib2gls.getFields();
 
+      boolean mfirstucProtect = bib2gls.mfirstucProtection();
+      String[] protectFields = bib2gls.mfirstucProtectionFields();
+
       for (String field : fields)
       {
          BibValueList value = getField(field);
@@ -310,7 +314,23 @@ public class Bib2GlsEntry extends BibEntry
          {
             TeXObjectList list = value.expand(parser);
 
-            checkGlsCs(parser, list);
+            boolean protect = mfirstucProtect;
+
+            if (protect && protectFields != null)
+            {
+               protect = false;
+
+               for (String pf : protectFields)
+               {
+                  if (pf.equals(field))
+                  {
+                     protect = true;
+                     break;
+                  }
+               }
+            }
+
+            checkGlsCs(parser, list, protect);
 
             fieldValues.put(field, list.toString(parser));
          }
