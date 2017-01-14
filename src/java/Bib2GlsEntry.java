@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2017 Nicola L.C. Talbot
+    www.dickimaw-books.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package com.dickimawbooks.bib2gls;
 
 import java.io.*;
@@ -12,14 +30,16 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class Bib2GlsEntry extends BibEntry
 {
-   public Bib2GlsEntry()
+   public Bib2GlsEntry(Bib2Gls bib2gls)
    {
-      this("entry");
+      this(bib2gls, "entry");
    }
 
-   public Bib2GlsEntry(String entryType)
+   public Bib2GlsEntry(Bib2Gls bib2gls, String entryType)
    {
       super(entryType.toLowerCase());
+      this.bib2gls = bib2gls;
+
       fieldValues = new HashMap<String,String>();
       deps = new Vector<String>();
       records = new Vector<GlsRecord>();
@@ -27,7 +47,7 @@ public class Bib2GlsEntry extends BibEntry
 
    // does the control sequence given by csname have [options]{label}
    // syntax (with a * or + prefix)?
-   private boolean isGlsCsOptLabel(Bib2Gls bib2gls, String csname)
+   private boolean isGlsCsOptLabel(String csname)
    {
       if (csname.equals("gls") || csname.equals("glspl") 
        || csname.equals("acrfull") || csname.equals("acrlong")
@@ -91,8 +111,6 @@ public class Bib2GlsEntry extends BibEntry
    private void checkGlsCs(TeXParser parser, TeXObjectList list)
     throws IOException
    {
-      Bib2Gls bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
-
       for (int i = 0; i < list.size(); i++)
       {
          TeXObject object = list.get(i);
@@ -192,7 +210,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   addDependency(arg.toString(parser));
                }
-               else if (isGlsCsOptLabel(bib2gls, csname))
+               else if (isGlsCsOptLabel(csname))
                {
                   foundgls = (i==0);
 
@@ -254,7 +272,7 @@ public class Bib2GlsEntry extends BibEntry
             catch (ArrayIndexOutOfBoundsException e)
             {
                bib2gls.warning(parser, 
-                 String.format("Can't detect argument for \\%s", csname));
+                 bib2gls.getMessage("warning.can.find.arg", csname));
             }
 
             if (foundgls)
@@ -263,6 +281,8 @@ public class Bib2GlsEntry extends BibEntry
                // field. Protect the field from first letter
                // upper casing by inserting an empty group.
 
+               bib2gls.warning(parser, 
+                 bib2gls.getMessage("warning.uc.protecting", csname));
                list.add(0, parser.getListener().createGroup());
                i++;
             }
@@ -279,8 +299,6 @@ public class Bib2GlsEntry extends BibEntry
      throws IOException
    {
       super.parseContents(parser, contents, endGroupChar);
-
-      Bib2Gls bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
       Vector<String> fields = bib2gls.getFields();
 
@@ -305,7 +323,7 @@ public class Bib2GlsEntry extends BibEntry
          if (sort == null)
          {
             bib2gls.warning(parser, 
-              String.format("can't determine sort value: %s", getId()));
+              bib2gls.getMessage("warning.no.default.sort", getId()));
             fieldValues.put("sort", getId());
          }
          else
@@ -364,8 +382,7 @@ public class Bib2GlsEntry extends BibEntry
    protected void missingFieldWarning(TeXParser parser, String field)
    {
       parser.getListener().getTeXApp().warning(parser, 
-       String.format("entry %s missing required field: %s",
-        getId(), field));
+       bib2gls.getMessage("warning.missing.field", getId(), field));
    }
 
    public void writeBibEntry(PrintWriter writer)
@@ -713,4 +730,6 @@ public class Bib2GlsEntry extends BibEntry
    private String[] crossRefs = null;
 
    public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
+
+   protected Bib2Gls bib2gls;
 }

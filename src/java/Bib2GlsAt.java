@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2017 Nicola L.C. Talbot
+    www.dickimaw-books.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
@@ -28,21 +46,21 @@ public class Bib2GlsAt extends At
 
       if (entryType.equals("entry"))
       {
-         data = new Bib2GlsEntry();
+         data = new Bib2GlsEntry(bib2gls);
       }
       else if (entryType.equals("index"))
       {
-         data = new Bib2GlsIndex();
+         data = new Bib2GlsIndex(bib2gls);
       }
       else if (entryType.equals("acronym")
             || entryType.equals("abbreviation"))
       {
-         data = new Bib2GlsAbbrev(entryType);
+         data = new Bib2GlsAbbrev(bib2gls, entryType);
       }
       else if (entryType.equals("symbol")
             || entryType.equals("number"))
       {
-         data = new Bib2GlsSymbol(entryType);
+         data = new Bib2GlsSymbol(bib2gls, entryType);
       }
       else
       {
@@ -50,8 +68,9 @@ public class Bib2GlsAt extends At
 
          if (data instanceof BibEntry)
          {
-            parser.getListener().getTeXApp().warning(parser,
-               String.format("Ignoring unknown entry type: %s", entryType));
+            bib2gls.warning(parser,
+               bib2gls.getMessage("warning.ignoring.unknown.entry.type", 
+               entryType));
          }
       }
 

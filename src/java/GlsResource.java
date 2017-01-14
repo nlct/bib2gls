@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2017 Nicola L.C. Talbot
+    www.dickimaw-books.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package com.dickimawbooks.bib2gls;
 
 import java.io.*;
@@ -26,6 +44,8 @@ public class GlsResource
    private void init(TeXParser parser, TeXObject opts, TeXObject arg)
       throws IOException
    {
+      bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
+
       TeXPath texPath = new TeXPath(parser, 
         arg.toString(parser), "glstex");
 
@@ -108,7 +128,8 @@ public class GlsResource
             else
             {
                throw new IllegalArgumentException(
-                 String.format("Invalid strength value: %s", strength));
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, strength, "primary, secondary, tertiary, identical"));
             }
          }
          else if (opt.equals("decomposition"))
@@ -131,7 +152,8 @@ public class GlsResource
             else
             {
                throw new IllegalArgumentException(
-                 String.format("Invalid decomposition value: %s", decomposition));
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, decomposition, "none, canonical, full"));
             }
          }
          else if (opt.equals("charset"))
@@ -165,7 +187,8 @@ public class GlsResource
             else
             {
                throw new IllegalArgumentException(
-                String.format("Invalid 'see' value: %s", loc));
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, loc, "omit, before, after"));
             }
          }
          else if (opt.equals("prefix"))
@@ -183,13 +206,14 @@ public class GlsResource
             else
             {
                throw new IllegalArgumentException(
-                String.format("Invalid 'prefix' value: %s", val));
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, "true, false"));
             }
          }
          else
          {
             throw new IllegalArgumentException(
-             String.format("Unknown option: %s", opt));
+             bib2gls.getMessage("error.syntax.unknown_option", opt));
          }
       }
 
@@ -202,8 +226,6 @@ public class GlsResource
    public void parse(TeXParser parser)
    throws IOException
    {
-      bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
-
       bibData = new Vector<Bib2GlsEntry>();
 
       Vector<GlsRecord> records = bib2gls.getRecords();
@@ -226,9 +248,11 @@ public class GlsResource
                reader = new BufferedReader(new FileReader(bibFile));
 
                String line;
+               int lineNum=0;
 
                while ((line = reader.readLine()) != null)
                {
+                  lineNum++;
                   Matcher m = pattern.matcher(line);
 
                   if (m.matches())
@@ -241,8 +265,8 @@ public class GlsResource
                      }
                      catch (Exception e)
                      {
-                        bib2gls.warning(
-                         String.format("Ignoring unknown encoding: %s", 
+                        bib2gls.warning(bibFile, lineNum,
+                         bib2gls.getMessage("warning.ignoring.unknown.encoding", 
                           encoding),
                          e);
                         srcCharset = bibCharset;
@@ -345,7 +369,7 @@ public class GlsResource
 
       if (parent != null)
       {
-         bib2gls.info("Adding parent: "+parentId);
+         bib2gls.verbose(bib2gls.getMessage("message.added.parent", parentId));
          addHierarchy(parent, entries);
          entries.add(parent);
       }
@@ -368,7 +392,7 @@ public class GlsResource
       throws IOException
    {
       if (bibData == null)
-      {
+      {// shouldn't happen
          throw new NullPointerException(
             "No data (parse must come before processData)");
       }

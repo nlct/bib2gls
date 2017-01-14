@@ -1,9 +1,30 @@
+/*
+    Copyright (C) 2017 Nicola L.C. Talbot
+    www.dickimaw-books.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package com.dickimawbooks.bib2gls;
 
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.Properties;
+import java.util.Locale;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.net.URL;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
@@ -12,15 +33,8 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class Bib2Gls implements TeXApp
 {
-   public Bib2Gls(int debug, int verbose) 
+   public Bib2Gls() 
    {
-      debugLevel = debug;
-      verboseLevel = verbose;
-
-      if (verboseLevel >= 0)
-      {
-         version();
-      }
    }
 
    private String texToJavaCharset(String texCharset)
@@ -110,16 +124,22 @@ public class Bib2Gls implements TeXApp
          return "UTF-8";
       }
 
-      if (debugLevel > 0)
-      {
-         System.err.format("Unknown TeX charset: %s%n", texCharset);
-      }
+      debug(getMessage("error.unknown.tex.charset", texCharset));
 
       return texCharset;
    }
 
-   public void process(File auxFile) throws IOException,Bib2GlsException
+   public void process(String[] args) throws IOException,Bib2GlsException
    {
+      initMessages();
+
+      parseArgs(args);
+
+      if (verboseLevel >= 0)
+      {
+         version();
+      }
+
       AuxParser auxParser = new AuxParser(this)
       {
          protected void addPredefined()
@@ -203,17 +223,20 @@ public class Bib2Gls implements TeXApp
 
       if (glsresources.size() == 0)
       {
-         throw new Bib2GlsException("Missing \\glsxtr@resource in aux file.");
+         throw new Bib2GlsException(getMessage("error.missing.aux.cs",
+           "glsxtr@resource"));
       }
 
       if (records.size() == 0)
       {
-         throw new Bib2GlsException("Missing \\glsxtr@record in aux file.");
+         throw new Bib2GlsException(getMessage("error.missing.aux.cs",
+           "glsxtr@record"));
       }
 
       if (fields.size() == 0)
       {
-         warning(parser, "Missing fields in aux file (make sure glossaries-extra.sty version is at least 1.11)");
+         warning(parser, 
+           getMessage("error.missing.aux.new.cs", "glsxtr@fields", "1.11"));
 
          fields.add("name");
          fields.add("sort");
@@ -274,7 +297,7 @@ public class Bib2Gls implements TeXApp
    {
       if (!dependencies.contains(id))
       {
-         info("added dependent: "+id);
+         verbose(getMessage("message.added.dep", id));
          dependencies.add(id);
       }
    }
@@ -317,9 +340,9 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
-   public void info(String message)
+   public void debug(String message)
    {
-      if (verboseLevel > 0)
+      if (debugLevel > 0)
       {
          System.out.println(message);
       }
@@ -343,7 +366,7 @@ public class Bib2Gls implements TeXApp
      throws IOException,InterruptedException
    {
       if (debugLevel > 0)
-      {
+      {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
            epsFile.toString(), pdfFile.toString());
@@ -358,7 +381,7 @@ public class Bib2Gls implements TeXApp
      throws IOException,InterruptedException
    {
       if (debugLevel > 0)
-      {
+      {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
            wmfFile.toString(), epsFile.toString());
@@ -378,40 +401,74 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method. TODO: label needs converting to message
-    *  string.
+    *  TeXApp method. 
     */ 
    public String getMessage(String label)
    {
-      return label;
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
    }
 
    /*
-    *  TeXApp method. TODO: label needs converting to message string
-    *  with given parameter.
+    *  TeXApp method.
     */ 
    public String getMessage(String label, String param)
    {
-      return String.format("%s[%s]", label, param);
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label, param);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
    }
 
    /*
-    *  TeXApp method. TODO: label needs converting to message string
-    *  with given parameters.
+    *  TeXApp method.
     */ 
    public String getMessage(String label, String[] params)
    {
       String msg = label;
 
-      String pre = "[";
-
-      for (int i = 0; i < params.length; i++)
+      try
       {
-         msg += pre + params[i];
-         pre = ",";
+         msg = messages.getMessage(label, (Object[])params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
       }
 
-      msg += "]";
+      return msg;
+   }
+
+   public String getMessage(String label, Object... params)
+   {
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label, params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
 
       return msg;
    }
@@ -427,6 +484,21 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void verbose(String text)
+   {
+      if (verboseLevel > 0)
+      {
+         System.out.println(text);
+      }
+   }
+
+   public static String fileLineMessage(File file, int lineNum,
+     String message)
+   {
+      return String.format("%s:%d: %s", file.toString(), lineNum,
+         message);
+   }
+
    /*
     *  TeXApp method.
     */ 
@@ -434,7 +506,33 @@ public class Bib2Gls implements TeXApp
    {
       if (verboseLevel >= 0)
       {
-         System.err.println(message);
+         int lineNum = parser.getLineNumber();
+         File file = parser.getCurrentFile();
+
+         if (lineNum == -1 || file == null)
+         {
+            warning(message);
+         }
+         else
+         {
+            warning(file, lineNum, message);
+         }
+      }
+   }
+
+   public void warning(File file, int line, String message)
+   {
+      if (verboseLevel >= 0)
+      {
+         warning(fileLineMessage(file, line, message));
+      }
+   }
+
+   public void warning(File file, int line, String message, Exception e)
+   {
+      if (verboseLevel >= 0)
+      {
+         warning(fileLineMessage(file, line, message), e);
       }
    }
 
@@ -518,40 +616,110 @@ public class Bib2Gls implements TeXApp
       return "";
    }
 
-   public static void version()
+   public void version()
    {
-      System.out.format("%s version %s %s%n", NAME, VERSION, DATE);
+      System.out.println(getMessage("about.version", NAME, VERSION, DATE));
    }
 
-   public static void copyright()
+   public void license()
    {
       System.out.println("Copyright 2017 Nicola Talbot");
+      System.out.println(getMessage("about.license"));
    }
 
-   public static void help()
+   public void help()
    {
-      System.out.format("Usage: %s [options] <aux file>%n%n", NAME);
-
-      System.out.println("Helper application for the glossaries-extra package.");
-      System.out.println("See the manual for further details.");
+      System.out.println(getMessage("syntax.usage", NAME));
       System.out.println();
 
-      System.out.println("Options:");
-      System.out.println("--help or -h\tDisplay this help message and exit.");
-      System.out.println("--version or -v\tDisplay version and exit.");
-      System.out.println("--debug [<n>]\tSet the debug mode.");
-      System.out.println("--verbose\tSwitch on verbose mode.");
-      System.out.println("--noverbose\tSwitch off verbose mode (default).");
-      System.out.println("--silent\tOnly display error messages.");
+      System.out.println(getMessage("syntax.info"));
+      System.out.println();
+
+      System.out.println(getMessage("syntax.options"));
+      System.out.println();
+      System.out.println(getMessage("syntax.help", "--help", "h"));
+      System.out.println(getMessage("syntax.version", "--version", "v"));
+      System.out.println(getMessage("syntax.debug", "--debug"));
+      System.out.println(getMessage("syntax.nodebug", "--nodebug"));
+      System.out.println(getMessage("syntax.verbose", "--verbose"));
+      System.out.println(getMessage("syntax.noverbose", "--noverbose"));
+      System.out.println(getMessage("syntax.silent", "--silent"));
 
       System.exit(0);
    }
 
-   public static void main(String[] args)
+   private String getLanguageFileName(String tag)
+   {
+      return String.format("/resources/bib2gls-%s.xml", tag);
+   }
+
+   private void initMessages() throws Bib2GlsException,IOException
+   {
+      Locale locale = Locale.getDefault();
+
+      String lang = locale.toLanguageTag();
+
+      URL url = getClass().getResource(getLanguageFileName(lang));
+
+      if (url == null)
+      {
+         lang = locale.getLanguage();
+
+         url = getClass().getResource(getLanguageFileName(lang));
+
+         if (url == null)
+         {
+            String script = locale.getScript();
+
+            if (script != null)
+            {
+               url = getClass().getResource(
+                getLanguageFileName(String.format("%s-%s", lang, script)));
+
+               if (url == null)
+               {
+                  url = getClass().getResource(getLanguageFileName("en"));
+               }
+            }
+            else
+            {
+               url = getClass().getResource(getLanguageFileName("en"));
+            }
+
+            if (url == null)
+            {
+               throw new Bib2GlsException("Can't find language resource file.");
+            }
+         }
+      }
+
+      InputStream in = null;
+
+      try
+      {
+         in = url.openStream();
+
+         Properties prop = new Properties();
+
+         prop.loadFromXML(in);
+
+         in.close();
+         in = null;
+
+         messages = new Bib2GlsMessages(prop);
+      }
+      finally
+      {
+         if (in != null)
+         {
+            in.close();
+         }
+      }
+   }
+
+   private void parseArgs(String[] args)
    {
       String auxFileName = null;
-      int debug = 0;
-      int verbose = 0;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -559,32 +727,36 @@ public class Bib2Gls implements TeXApp
          {
             if (i == args.length-1 || args[i+1].startsWith("-"))
             {
-               debug = 1;
+               debugLevel = 1;
                continue;
             }
 
             try
             {
-               debug = Integer.parseInt(args[i+1]);
+               debugLevel = Integer.parseInt(args[i+1]);
                i++;
             }
             catch (NumberFormatException e)
             {
                // argument missing
-               debug = 1;
+               debugLevel = 1;
             }
+         }
+         else if (args[i].equals("--nodebug"))
+         {
+            debugLevel = 0;
          }
          else if (args[i].equals("--verbose"))
          {
-            verbose = 1;
+            verboseLevel = 1;
          }
          else if (args[i].equals("--noverbose"))
          {
-            verbose = 0;
+            verboseLevel = 0;
          }
          else if (args[i].equals("--silent"))
          {
-            verbose = -1;
+            verboseLevel = -1;
          }
          else if (args[i].equals("-h") || args[i].equals("--help"))
          {
@@ -593,12 +765,14 @@ public class Bib2Gls implements TeXApp
          else if (args[i].equals("-v") || args[i].equals("--version"))
          {
             version();
-            copyright();
+            license();
             System.exit(0);
          }
          else if (args[i].startsWith("-"))
          {
-            System.err.format("Unknown option: %s%n", args[i]);
+            System.err.println(getMessage(
+              "error.syntax.unknown_option", args[i]));
+            System.err.println(getMessage("syntax.use.help"));
             System.exit(1);
          }
          else if (auxFileName == null)
@@ -607,14 +781,14 @@ public class Bib2Gls implements TeXApp
          }
          else
          {
-            System.err.println("Only one aux file permitted.");
+            System.err.println(getMessage("error.only.one.aux"));
             System.exit(1);
          }
       }
 
       if (auxFileName == null)
       {
-         System.err.println("Missing aux file. Use --help for help.");
+         System.err.println(getMessage("error.no.aux"));
          System.exit(1);
       }
 
@@ -623,19 +797,23 @@ public class Bib2Gls implements TeXApp
          auxFileName = auxFileName+".aux";
       }
 
-      File auxFile = new File(auxFileName);
+      auxFile = new File(auxFileName);
 
       if (!auxFile.exists())
       {
-         System.err.format("No such file: %s", auxFileName);
+         System.err.println(getMessage("error.file.not.found", auxFileName));
          System.exit(0);
       }
 
-      Bib2Gls bib2gls = new Bib2Gls(debug, verbose);
+   }
+
+   public static void main(String[] args)
+   {
+      Bib2Gls bib2gls = new Bib2Gls();
 
       try
       {
-         bib2gls.process(auxFile);
+         bib2gls.process(args);
       }
       catch (Exception e)
       {
@@ -657,4 +835,8 @@ public class Bib2Gls implements TeXApp
    private Vector<String> dependencies;
 
    private Charset texCharset;
+
+   private Bib2GlsMessages messages;
+
+   private File auxFile;
 }
