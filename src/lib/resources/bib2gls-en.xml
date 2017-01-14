@@ -20,14 +20,16 @@ See the manual for further details.</entry>
 <entry key="syntax.noverbose">{0}		Switch off verbose mode. (Default.)
 			Some messages are displayed.</entry>
 <entry key="syntax.silent">{0}		Only display error messages.</entry>
+<entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
+			Set transcript file name.</entry>
 <entry key="syntax.use.help">(Use --help or -h for help.)</entry>
 
-<entry key="message.reading">Reading {0}...</entry>
-<entry key="message.writing">Writing {0}...</entry>
+<entry key="message.reading">Reading {0}</entry>
+<entry key="message.writing">Writing {0}</entry>
 <entry key="message.running">Running {0}</entry>
 <entry key="message.processing">Processing {0}</entry>
-<entry key="message.copying">Copying {0} -> {1}</entry>
-<entry key="message.moving">Moving {0} -> {1}</entry>
+<entry key="message.copying">Copying {0} -&gt; {1}</entry>
+<entry key="message.moving">Moving {0} -&gt; {1}</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
 
@@ -35,19 +37,24 @@ See the manual for further details.</entry>
 <entry key="warning.removing">Removing {0}</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
-<entry key="warning.can.find.arg">Can't detect argument for: \\{0}</entry>
-<entry key="warning.uc.protecting">Inserting empty group in front of \\{0} to protect it from mfirstuc.</entry>
+<entry key="warning.can.find.arg">Can't detect argument for: \{0}</entry>
+<entry key="warning.uc.protecting">Inserting empty group in front of \{0} to protect it from mfirstuc.</entry>
 <entry key="warning.no.default.sort">Can't determine sort value for: {0}</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
 
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
-<entry key="error.missing.aux.cs">Missing \\{0} in aux file.</entry>
-<entry key="error.missing.aux.new.cs">Missing \\{0} in aux file (make sure glossaries-extra.sty is a least {1}).</entry>
+<entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
+<entry key="error.missing.records">No records found in aux file.
+Have you used the glossaries-extra.sty ''record'' option?
+Have you indexed your entries using commands like \gls?</entry>
+<entry key="error.missing.aux.new.cs">Missing \{0} in aux file (make sure glossaries-extra.sty is at least {1}).</entry>
 <entry key="error.only.one.aux">Only one aux file permitted.</entry>
 <entry key="error.no.aux">Missing aux file. Use --help for help.</entry>
 <entry key="error.file.not.found">File not found: {0}</entry>
+<entry key="error.cant.open.log">Can't open log file: {0}</entry>
 <entry key="error.invalid.opt.value">Invalid ''{0}'' value: {1}</entry>
 <entry key="error.invalid.choice.value">Invalid ''{0}'' value: {1} (allowed values: {3})</entry>
+<entry key="error.missing.value">Missing value for: {0}</entry>
 
 <!--
      The following messages are used by various parts of
@@ -100,20 +107,20 @@ See the manual for further details.</entry>
 <entry key="tex.error.double_subscript">Double subscript _{0}_ (replaced with _{0}'{}'_)</entry>
 <entry key="tex.error.double_superscript">Double superscript ^{0}^ (replaced with ^{0}'{}'^)</entry>
 <entry key="tex.error.illegal_align">Illegal alignment {0}</entry>
-<entry key="tex.error.misplaced_omit">Misplaced \\omit</entry>
+<entry key="tex.error.misplaced_omit">Misplaced \omit</entry>
 <entry key="tex.error.improper_alphabetic_constant">Improper alphabetic constant {0}</entry>
 
 <entry key="latex.error.no_alignment">No alignment specifiers found</entry>
 <entry key="latex.error.undefined_counter">No counter ''{0}'' defined</entry>
-<entry key="latex.error.multi_begin_doc">Only one \\\\begin'{document}' permitted</entry>
-<entry key="latex.error.no_begin_doc">No \\begin'{document}' found</entry>
-<entry key="latex.error.multi_cls">Only one \\documentclass permitted</entry>
+<entry key="latex.error.multi_begin_doc">Only one \begin'{document}' permitted</entry>
+<entry key="latex.error.no_begin_doc">No \begin'{document}' found</entry>
+<entry key="latex.error.multi_cls">Only one \documentclass permitted</entry>
 <entry key="latex.error.missing_key">Missing ''{0}'' key</entry>
-<entry key="latex.error.extra_end">Extra \\\\end'{'{0}'}' found</entry>
+<entry key="latex.error.extra_end">Extra \end'{'{0}'}' found</entry>
 <entry key="latex.error.unaccessible">Unaccessible ''{0}''</entry>
 <entry key="latex.error.defined">''{0}'' already defined</entry>
 <entry key="latex.error.illegal_array_arg_char">Illegal character ''{0}'' in array arg</entry>
-<entry key="latex.error.lonely_item">Lonely \\\\item</entry>
+<entry key="latex.error.lonely_item">Lonely \item</entry>
 
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>

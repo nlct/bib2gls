@@ -223,14 +223,14 @@ public class Bib2Gls implements TeXApp
 
       if (glsresources.size() == 0)
       {
-         throw new Bib2GlsException(getMessage("error.missing.aux.cs",
-           "glsxtr@resource"));
+         throw new Bib2GlsException(getMessage(
+           "error.missing.aux.cs.require_cs",
+           "glsxtr@resource", "glsxtrresourcefile"));
       }
 
       if (records.size() == 0)
       {
-         throw new Bib2GlsException(getMessage("error.missing.aux.cs",
-           "glsxtr@record"));
+         throw new Bib2GlsException(getMessage("error.missing.records"));
       }
 
       if (fields.size() == 0)
@@ -291,6 +291,18 @@ public class Bib2Gls implements TeXApp
       {
          resource.processData();
       }
+
+      if (logWriter != null)
+      {
+         try
+         {
+            logWriter.close();
+         }
+         finally
+         {
+            logWriter = null;
+         }
+      }
    }
 
    public void addDependent(String id)
@@ -340,12 +352,22 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
+   public void logMessage(String message)
+   {
+      if (logWriter != null)
+      {
+         logWriter.println(message);
+      }
+   }
+
    public void debug(String message)
    {
       if (debugLevel > 0)
       {
          System.out.println(message);
       }
+
+      logMessage(message);
    }
 
    /*
@@ -394,10 +416,7 @@ public class Bib2Gls implements TeXApp
    public void substituting(TeXParser parser, String original, 
      String replacement)
    {
-      if (verboseLevel > 0)
-      {
-         System.out.println(original+" -> "+replacement);
-      }
+      verbose(getMessage("warning.substituting", original, replacement));
    }
 
    /*
@@ -482,6 +501,8 @@ public class Bib2Gls implements TeXApp
       {
          System.out.println(text);
       }
+
+      logMessage(text);
    }
 
    public void verbose(String text)
@@ -490,6 +511,8 @@ public class Bib2Gls implements TeXApp
       {
          System.out.println(text);
       }
+
+      logMessage(text);
    }
 
    public static String fileLineMessage(File file, int lineNum,
@@ -542,6 +565,8 @@ public class Bib2Gls implements TeXApp
       {
          System.err.println(message);
       }
+
+      logMessage(message);
    }
 
    public void warning(String message, Exception e)
@@ -551,9 +576,16 @@ public class Bib2Gls implements TeXApp
          System.err.println(message);
       }
 
+      logMessage(message);
+
       if (debugLevel > 0)
       {
          e.printStackTrace();
+
+         for (StackTraceElement elem : e.getStackTrace())
+         {
+            logMessage(elem.toString());
+         }
       }
    }
 
@@ -576,11 +608,17 @@ public class Bib2Gls implements TeXApp
          }
 
          System.err.println(msg);
+         logMessage(msg);
       }
 
       if (debugLevel > 0)
       {
          e.printStackTrace();
+
+         for (StackTraceElement elem : e.getStackTrace())
+         {
+            logMessage(elem.toString());
+         }
       }
    }
 
@@ -637,13 +675,14 @@ public class Bib2Gls implements TeXApp
 
       System.out.println(getMessage("syntax.options"));
       System.out.println();
-      System.out.println(getMessage("syntax.help", "--help", "h"));
-      System.out.println(getMessage("syntax.version", "--version", "v"));
+      System.out.println(getMessage("syntax.help", "--help", "-h"));
+      System.out.println(getMessage("syntax.version", "--version", "-v"));
       System.out.println(getMessage("syntax.debug", "--debug"));
       System.out.println(getMessage("syntax.nodebug", "--nodebug"));
       System.out.println(getMessage("syntax.verbose", "--verbose"));
       System.out.println(getMessage("syntax.noverbose", "--noverbose"));
       System.out.println(getMessage("syntax.silent", "--silent"));
+      System.out.println(getMessage("syntax.log", "--log-file", "-t"));
 
       System.exit(0);
    }
@@ -719,7 +758,9 @@ public class Bib2Gls implements TeXApp
 
    private void parseArgs(String[] args)
    {
+      String dirName = null;
       String auxFileName = null;
+      String logName = null;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -768,6 +809,19 @@ public class Bib2Gls implements TeXApp
             license();
             System.exit(0);
          }
+         else if (args[i].equals("-t") || args[i].equals("--log-file"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               System.err.println(getMessage("error.missing.value", args[i-1]));
+               System.err.println(getMessage("syntax.use.help"));
+               System.exit(1);
+            }
+
+            logName = args[i];
+         }
          else if (args[i].startsWith("-"))
          {
             System.err.println(getMessage(
@@ -797,7 +851,18 @@ public class Bib2Gls implements TeXApp
          auxFileName = auxFileName+".aux";
       }
 
-      auxFile = new File(auxFileName);
+      File dir = null;
+
+      if (dirName != null)
+      {
+         dir = new File(dirName);
+         auxFile = new File(dir, auxFileName);
+      }
+      else
+      {
+         auxFile = new File(auxFileName);
+         dir = auxFile.getParentFile();
+      }
 
       if (!auxFile.exists())
       {
@@ -805,6 +870,33 @@ public class Bib2Gls implements TeXApp
          System.exit(0);
       }
 
+      File logFile = null;
+
+      if (logName == null)
+      {
+         String base = auxFile.getName();
+
+         logFile = new File(dir,
+            base.substring(0,base.lastIndexOf("."))+".glg");
+      }
+      else
+      {
+         logFile = new File(logName);
+      }
+
+      try
+      {
+         logWriter = new PrintWriter(new FileWriter(logFile));
+
+         logMessage(getMessage("about.version", NAME, VERSION, DATE));
+      }
+      catch (IOException e)
+      {
+         logWriter = null;
+         System.err.println(getMessage("error.cant.open.log", 
+            logFile.toString()));
+         error(e);
+      }
    }
 
    public static void main(String[] args)
@@ -839,4 +931,6 @@ public class Bib2Gls implements TeXApp
    private Bib2GlsMessages messages;
 
    private File auxFile;
+
+   private PrintWriter logWriter=null;
 }
