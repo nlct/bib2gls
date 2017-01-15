@@ -154,6 +154,72 @@ public class GlsRecord
          return false;
       }
 
+      m1 = ROMAN_LC_PATTERN.matcher(location1);
+      m2 = ROMAN_LC_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         String sep1 = m1.group(2);
+         String sep2 = m2.group(2);
+
+         int loc1 = romanToDecimal(m1.group(3), m1.group(4), m1.group(5),
+                    m1.group(6));
+         int loc2 = romanToDecimal(m2.group(3), m2.group(4), m2.group(5),
+                    m2.group(6));
+
+         if (loc1 == loc2)
+         {
+            return sep1.equals(sep2) ?
+                   consecutive(prefix1, prefix2) :
+                   consecutive(prefix1+sep1, prefix2+sep2);
+         }
+
+         if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
+         {
+            return false;
+         }
+
+         return loc2 == loc1+1;
+      }
+
+      m1 = ROMAN_UC_PATTERN.matcher(location1);
+      m2 = ROMAN_UC_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         String sep1 = m1.group(2);
+         String sep2 = m2.group(2);
+
+         int loc1 = romanToDecimal(m1.group(3).toLowerCase(),
+            m1.group(4).toLowerCase(), 
+            m1.group(5).toLowerCase(),
+            m1.group(6).toLowerCase());
+         int loc2 = romanToDecimal(m2.group(3).toLowerCase(),
+            m2.group(4).toLowerCase(),
+            m2.group(5).toLowerCase(),
+            m2.group(6).toLowerCase());
+
+         if (loc1 == loc2)
+         {
+            return sep1.equals(sep2) ?
+                   consecutive(prefix1, prefix2) :
+                   consecutive(prefix1+sep1, prefix2+sep2);
+         }
+
+         if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
+         {
+            return false;
+         }
+
+         return loc2 == loc1+1;
+      }
+
       m1 = ALPHA_PATTERN.matcher(location1);
       m2 = ALPHA_PATTERN.matcher(location2);
 
@@ -201,6 +267,131 @@ public class GlsRecord
       return false;
    }
 
+   // arguments should already have been checked against the pattern
+   private static int romanToDecimal(String thousands, String hundreds, 
+     String tens, String ones)
+   {
+      int n = 0;
+
+      if (thousands != null && !thousands.isEmpty())
+      {
+         n = 1000*thousands.length();
+      }
+
+      if ("c".equals(hundreds))
+      {
+         n += 100;
+      }
+      else if ("cc".equals(hundreds))
+      {
+         n += 200;
+      }
+      else if ("ccc".equals(hundreds))
+      {
+         n += 300;
+      }
+      else if ("cd".equals(hundreds))
+      {
+         n += 400;
+      }
+      else if ("d".equals(hundreds))
+      {
+         n += 500;
+      }
+      else if ("dc".equals(hundreds))
+      {
+         n += 600;
+      }
+      else if ("dcc".equals(hundreds))
+      {
+         n += 700;
+      }
+      else if ("dccc".equals(hundreds))
+      {
+         n += 800;
+      }
+      else if ("cm".equals(hundreds))
+      {
+         n += 900;
+      }
+
+      if ("x".equals(tens))
+      {
+         n += 10;
+      }
+      else if ("xx".equals(tens))
+      {
+         n += 20;
+      }
+      else if ("xxx".equals(tens))
+      {
+         n += 30;
+      }
+      else if ("xl".equals(tens))
+      {
+         n += 40;
+      }
+      else if ("l".equals(tens))
+      {
+         n += 50;
+      }
+      else if ("lx".equals(tens))
+      {
+         n += 60;
+      }
+      else if ("lxx".equals(tens))
+      {
+         n += 70;
+      }
+      else if ("lxxx".equals(tens))
+      {
+         n += 80;
+      }
+      else if ("xc".equals(tens))
+      {
+         n += 90;
+      }
+
+      if ("i".equals(ones))
+      {
+         n += 1;
+      }
+      else if ("ii".equals(ones))
+      {
+         n += 2;
+      }
+      else if ("iii".equals(ones))
+      {
+         n += 3;
+      }
+      else if ("iv".equals(ones))
+      {
+         n += 4;
+      }
+      else if ("v".equals(ones))
+      {
+         n += 5;
+      }
+      else if ("vi".equals(ones))
+      {
+         n += 6;
+      }
+      else if ("vii".equals(ones))
+      {
+         n += 7;
+      }
+      else if ("viii".equals(ones))
+      {
+         n += 8;
+      }
+      else if ("ix".equals(ones))
+      {
+         n += 9;
+      }
+
+      return n;
+   }
+
    public String toString()
    {
       return String.format(
@@ -212,6 +403,12 @@ public class GlsRecord
 
    private static final Pattern DIGIT_PATTERN
      = Pattern.compile("(.*?)([^0-9]?)([0-9]+)");
+
+   private static final Pattern ROMAN_LC_PATTERN
+     = Pattern.compile("(.*?)(.??)(m*)(c{1,3}|c?d|dc{1,3}|cm)?(x{1,3}|x?l|lx{1,3}|xc)?(i{1,3}|i?v|vi{1,3}|ix)?");
+
+   private static final Pattern ROMAN_UC_PATTERN
+     = Pattern.compile("(.*?)(.??)(M*)(C{1,3}|C?D|DC{1,3}|CM)?(X{1,3}|X?L|LX{1,3}|XC)?(I{1,3}|I?V|VI{1,3}|IX)?");
 
    private static final Pattern ALPHA_PATTERN
      = Pattern.compile("(.*?)(?:([^a-z]?)([a-z]))|(?:([^A-Z]?)([A-Z]))");
