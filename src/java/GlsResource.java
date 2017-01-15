@@ -211,12 +211,73 @@ public class GlsResource
                   opt, val, "true, false"));
             }
          }
+         else if (opt.equals("selection"))
+         {
+            String val = list.get(opt).toString(parser);
+
+            if (val == null || val.isEmpty())
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.missing.value", opt));
+            }
+
+            selectionMode = -1;
+
+            for (int i = 0; i < SELECTION_OPTIONS.length; i++)
+            {
+               if (val.equals(SELECTION_OPTIONS[i]))
+               {
+                  selectionMode = i;
+                  break;
+               }
+            }
+
+            if (selectionMode == -1)
+            {
+               StringBuilder choices = null;
+
+               for (int i = 0; i < SELECTION_OPTIONS.length; i++)
+               {
+                  if (choices == null)
+                  {
+                     choices = new StringBuilder(70);
+                  }
+                  else
+                  {
+                     choices.append(", ");
+                  }
+
+                  choices.append('\'');
+                  choices.append(SELECTION_OPTIONS[i]);
+                  choices.append('\'');
+               }
+
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, choices));
+            }
+         }
          else
          {
             throw new IllegalArgumentException(
              bib2gls.getMessage("error.syntax.unknown_option", opt));
          }
       }
+
+      if (selectionMode == SELECTION_ALL && "use".equals(sort))
+      {
+         bib2gls.warning(
+            bib2gls.getMessage("error.option.clash", "selection=all",
+            "sort=use"));
+
+         sort = null;
+      }
+
+      bib2gls.verbose(bib2gls.getMessage("message.selection.mode", 
+       SELECTION_OPTIONS[selectionMode]));
+
+      bib2gls.verbose(bib2gls.getMessage("message.sort.mode", 
+       sort == null ? "unsrt" : sort));
 
       if (srcList == null)
       {
@@ -328,12 +389,15 @@ public class GlsResource
 
                bibData.add(entry);
 
-               for (Iterator<String> it = entry.getDependencyIterator();
-                    it.hasNext(); )
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS)
                {
-                  String dep = it.next();
+                  for (Iterator<String> it = entry.getDependencyIterator();
+                       it.hasNext(); )
+                  {
+                     String dep = it.next();
 
-                  bib2gls.addDependent(dep);
+                     bib2gls.addDependent(dep);
+                  }
                }
             }
             else if (data instanceof BibPreamble)
@@ -389,7 +453,7 @@ public class GlsResource
       return null;
    }
 
-   public void processData()
+   public int processData()
       throws IOException
    {
       if (bibData == null)
@@ -403,7 +467,16 @@ public class GlsResource
       Vector<String> fields = bib2gls.getFields();
       Vector<GlsRecord> records = bib2gls.getRecords();
 
-      if (sort == null)
+      if (selectionMode == SELECTION_ALL)
+      {
+         // select all entries
+
+         for (Bib2GlsEntry entry : bibData)
+         {
+            entries.add(entry);
+         }
+      }
+      else if (sort == null)
       {
          // add all entries that have been recorded in the order of
          // definition
@@ -412,14 +485,20 @@ public class GlsResource
          {
             if (entry.hasRecords())
             {
-               addHierarchy(entry, entries);
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
+               {
+                  addHierarchy(entry, entries);
+               }
+
                entries.add(entry);
             }
          }
       }
       else
       {
-         // add all recorded entries in order of records.
+         // Add all recorded entries in order of records.
+         // (This means they'll be in the correct order if sort=use)
 
          for (int i = 0; i < records.size(); i++)
          {
@@ -429,7 +508,12 @@ public class GlsResource
 
             if (entry != null && !entries.contains(entry))
             {
-               addHierarchy(entry, entries);
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
+               {
+                  addHierarchy(entry, entries);
+               }
+
                entries.add(entry);
             }
          }
@@ -437,16 +521,19 @@ public class GlsResource
 
       // add any dependencies
 
-      Vector<String> dependencies = bib2gls.getDependencies();
-
-      for (String id : dependencies)
+      if (selectionMode == SELECTION_RECORDED_AND_DEPS)
       {
-         Bib2GlsEntry dep = getEntry(id);
+         Vector<String> dependencies = bib2gls.getDependencies();
 
-         if (dep != null && !entries.contains(dep))
+         for (String id : dependencies)
          {
-            addHierarchy(dep, entries);
-            entries.add(dep);
+            Bib2GlsEntry dep = getEntry(id);
+
+            if (dep != null && !entries.contains(dep))
+            {
+               addHierarchy(dep, entries);
+               entries.add(dep);
+            }
          }
       }
 
@@ -475,7 +562,9 @@ public class GlsResource
          if (showLocationPrefix)
          {
             writer.println("\\providecommand{\\bibglsprefix}[1]{%");
-            writer.println("  \\ifcase#1\\or p.: \\else pp.: \\fi");
+            writer.format("  \\ifcase#1\\or %s: \\else %s: \\fi%n",
+              bib2gls.getMessage("tag.page"),
+              bib2gls.getMessage("tag.pages"));
             writer.println("}");
          }
 
@@ -526,6 +615,10 @@ public class GlsResource
 
             writer.println();
          }
+
+         bib2gls.message(bib2gls.getChoiceMessage("message.written", 0,
+            "entry", 3, entries.size(), texFile.toString()));
+
       }
       finally
       {
@@ -534,6 +627,8 @@ public class GlsResource
             writer.close();
          }
       }
+
+      return entries.size();
    }
 
    private File texFile;
@@ -561,5 +656,15 @@ public class GlsResource
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
    private boolean showLocationPrefix = false;
+
+   public static final int SELECTION_RECORDED_AND_DEPS=0;
+   public static final int SELECTION_RECORDED_NO_DEPS=1;
+   public static final int SELECTION_RECORDED_AND_PARENTS=2;
+   public static final int SELECTION_ALL=3;
+
+   private int selectionMode = SELECTION_RECORDED_AND_DEPS;
+
+   private static final String[] SELECTION_OPTIONS = new String[]
+    {"recorded and deps", "recorded no deps", "recorded and ancestors", "all"};
 }
 

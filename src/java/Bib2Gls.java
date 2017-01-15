@@ -229,11 +229,6 @@ public class Bib2Gls implements TeXApp
            "glsxtr@resource", "glsxtrresourcefile"));
       }
 
-      if (records.size() == 0)
-      {
-         throw new Bib2GlsException(getMessage("error.missing.records"));
-      }
-
       if (fields.size() == 0)
       {
          warning(parser, 
@@ -285,12 +280,25 @@ public class Bib2Gls implements TeXApp
          resource.parse(parser);
       }
 
+      int count = 0;
+
       // the data needs processing in a separate loop in case of
       // unrecorded cross-references across different bib files.
 
       for (GlsResource resource : glsresources)
       {
-         resource.processData();
+         count += resource.processData();
+      }
+
+      if (count == 0 && records.size() == 0)
+      {
+         error(getMessage("error.missing.records"));
+      }
+
+      if (glsresources.size() > 1)
+      {
+         message(getChoiceMessage("message.written.total", 0,
+            "entry", 3, count));
       }
 
       if (logWriter != null)
@@ -572,6 +580,24 @@ public class Bib2Gls implements TeXApp
       return msg;
    }
 
+   public String getChoiceMessage(String label, int argIdx,
+     String choiceLabel, int numChoices, Object... params)
+   {
+      String msg = label;
+
+      try
+      {
+         msg = messages.getChoiceMessage(label, argIdx,
+            choiceLabel, numChoices, params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
+   }
+
    /*
     *  TeXApp method.
     */ 
@@ -700,6 +726,12 @@ public class Bib2Gls implements TeXApp
             logMessage(elem.toString());
          }
       }
+   }
+
+   public void error(String msg)
+   {
+      System.err.println(msg);
+      logMessage(msg);
    }
 
    /*

@@ -22,6 +22,7 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Iterator;
 import java.text.MessageFormat;
+import java.text.ChoiceFormat;
 
 public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
 {
@@ -61,5 +62,43 @@ public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
        }
 
        return msg.format(args);
+    }
+
+    public String getChoiceMessage(String label, int argIdx,
+      String choiceLabel, int numChoices, Object... args)
+    {
+       String[] part = new String[numChoices];
+
+       double[] limits = new double[numChoices];
+
+       for (int i = 0; i < numChoices; i++)
+       {
+          String tag = String.format("message.%d.%s", i, choiceLabel);
+
+          MessageFormat fmt = get(tag);
+
+          if (fmt == null)
+          {
+             throw new IllegalArgumentException(
+              "Invalid message label: "+tag);
+          }
+
+          part[i] = fmt.toPattern();
+          limits[i] = i;
+       }
+
+       MessageFormat fmt = get(label);
+
+       if (fmt == null)
+       {
+          throw new IllegalArgumentException(
+           "Invalid message label: "+label);
+       }
+
+       ChoiceFormat choiceFmt = new ChoiceFormat(limits, part);
+
+       fmt.setFormatByArgumentIndex(argIdx, choiceFmt);
+
+       return fmt.format(args);
     }
 }
