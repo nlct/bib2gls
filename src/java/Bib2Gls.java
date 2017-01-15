@@ -333,6 +333,32 @@ public class Bib2Gls implements TeXApp
       return texCharset;
    }
 
+   public boolean checkAcroShortcuts()
+   {
+      return checkAcroShortcuts;
+   }
+
+   public boolean checkAbbrvShortcuts()
+   {
+      return checkAbbrvShortcuts;
+   }
+
+   // is the given field likely to occur in link text?
+   public boolean checkNestedLinkTextField(String fieldName)
+   {
+      if (nestedLinkCheckFields == null) return false;
+
+      for (int i = 0; i < nestedLinkCheckFields.length; i++)
+      {
+         if (fieldName.equals(nestedLinkCheckFields[i]))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public Vector<String> getFields()
    {
       return fields;
@@ -364,6 +390,11 @@ public class Bib2Gls implements TeXApp
    public boolean mfirstucProtection()
    {
       return mfirstucProtect;
+   }
+
+   public boolean mfirstucMathShiftProtection()
+   {
+      return mfirstucMProtect;
    }
 
    public String[] mfirstucProtectionFields()
@@ -794,13 +825,37 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.verbose", "--verbose"));
       System.out.println(getMessage("syntax.noverbose", "--noverbose"));
       System.out.println(getMessage("syntax.silent", "--silent"));
+
+      System.out.println();
       System.out.println(getMessage("syntax.log", "--log-file", "-t"));
 
+      System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
          "--mfirstuc-protection", "-u"));
 
+      System.out.println();
       System.out.println(getMessage("syntax.no.mfirstuc",
          "--no-mfirstuc-protection"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.math.mfirstuc",
+         "--no-mfirstuc-math-protection"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.math.mfirstuc",
+         "--mfirstuc-math-protection", "--no-mfirstuc-protection"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.check.shortcuts",
+         "--check-shortcuts"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.check.nested",
+         "--nested-link-check"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.nocheck.nested",
+         "--no-nested-link-check", "--nested-link-check"));
 
       System.exit(0);
    }
@@ -971,6 +1026,78 @@ public class Bib2Gls implements TeXApp
                mfirstucProtectFields = args[i].split(" *, *");
             }
          }
+         else if (args[i].equals("--no-mfirstuc-math-protection"))
+         {
+            mfirstucMProtect = false;
+         }
+         else if (args[i].equals("--mfirstuc-math-protection"))
+         {
+            mfirstucMProtect = true;
+         }
+         else if (args[i].equals("--check-shortcuts"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               System.err.println(getMessage("error.missing.value", args[i-1]));
+               System.err.println(getMessage("syntax.use.help"));
+               System.exit(1);
+            }
+
+            if (args[i].equals("acronyms") || args[i].equals("acro"))
+            {
+               checkAcroShortcuts = true;
+            }
+            else if (args[i].equals("abbreviations")
+                  || args[i].equals("abbr"))
+            {
+               checkAbbrvShortcuts = true;
+            }
+            else if (args[i].equals("all")
+                  || args[i].equals("true"))
+            {
+               checkAcroShortcuts = true;
+               checkAbbrvShortcuts = true;
+            }
+            else if (args[i].equals("none")
+                  || args[i].equals("false"))
+            {
+               checkAcroShortcuts = false;
+               checkAbbrvShortcuts = false;
+            }
+            else
+            {
+               System.err.println(getMessage("error.invalid.choice.value", 
+                 args[i-1], args[i]));
+               System.err.println(getMessage("syntax.use.help"));
+               System.exit(1);
+            }
+         }
+         else if (args[i].equals("--nested-link-check"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               System.err.println(getMessage("error.missing.value", args[i-1]));
+               System.err.println(getMessage("syntax.use.help"));
+               System.exit(1);
+            }
+
+            if (args[i].equals("none"))
+            {
+               nestedLinkCheckFields = null;
+            }
+            else
+            {
+               nestedLinkCheckFields = args[i].split(" *, *");
+            }
+         }
+         else if (args[i].equals("--no-nested-link-check"))
+         {
+            nestedLinkCheckFields = null;
+         }
          else if (args[i].startsWith("-"))
          {
             System.err.println(getMessage(
@@ -1084,6 +1211,13 @@ public class Bib2Gls implements TeXApp
    private PrintWriter logWriter=null;
 
    private boolean mfirstucProtect = true;
+   private boolean mfirstucMProtect = true;
    private String[] mfirstucProtectFields = null;
 
+   private boolean checkAcroShortcuts = false;
+   private boolean checkAbbrvShortcuts = false;
+
+   private String[] nestedLinkCheckFields = new String[]
+    {"name", "text", "plural", "first", "firstplural",
+     "long", "longplural", "short", "shortplural", "symbol"};
 }

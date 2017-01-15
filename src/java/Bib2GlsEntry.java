@@ -64,6 +64,22 @@ public class Bib2GlsEntry extends BibEntry
       {
          return true;
       }
+      else if (bib2gls.checkAcroShortcuts() 
+            && (csname.equals("ac") || csname.equals("acs")
+             || csname.equals("acsp") || csname.equals("acl")
+             || csname.equals("aclp") || csname.equals("acf")
+             || csname.equals("acfp")))
+      {
+         return true;
+      }
+      else if (bib2gls.checkAbbrvShortcuts() 
+            && (csname.equals("ab") || csname.equals("abp")
+             || csname.equals("as") || csname.equals("asp")
+             || csname.equals("al") || csname.equals("alp")
+             || csname.equals("af") || csname.equals("afp")))
+      {
+         return true;
+      }
       else if (csname.startsWith("glsxtr"))
       {
          Vector<String> fields = bib2gls.getFields();
@@ -108,8 +124,23 @@ public class Bib2GlsEntry extends BibEntry
       return false;
    }
 
+   // is the given cs name likely to cause a problem for
+   // \makefirstuc? (Just check for common ones.)
+   private boolean isCsProblematic(String csname)
+   {
+      return csname.equals("foreignlanguage")
+           ||csname.equals("textcolor")
+           ||csname.equals("ensuremath")
+           ||csname.equals("cite")
+           ||csname.equals("citep")
+           ||csname.equals("citet")
+           ||csname.equals("autoref")
+           ||csname.equals("cref")
+           ||csname.equals("ref");
+   }
+
    private void checkGlsCs(TeXParser parser, TeXObjectList list, 
-      boolean mfirstucProtect)
+      boolean mfirstucProtect, String fieldName)
     throws IOException
    {
       for (int i = 0; i < list.size(); i++)
@@ -120,14 +151,14 @@ public class Bib2GlsEntry extends BibEntry
          {
             String csname = ((TeXCsRef)object).getName().toLowerCase();
 
-            boolean foundgls = false;
+            boolean found = false;
 
             try
             {
                if (csname.equals("glssee"))
                {// \glssee[tag]{label}{xr-label-list}
 
-                  foundgls = (i==0);
+                  found = (i==0);
 
                   TeXObject arg = list.get(++i);
 
@@ -187,7 +218,7 @@ public class Bib2GlsEntry extends BibEntry
                else if (csname.equals("glsxtrp"))
                {// \glsxtrp{field}{label}
 
-                  foundgls = (i==0);
+                  found = (i==0);
 
                   // skip first argument
                   TeXObject arg = list.get(++i);
@@ -213,7 +244,7 @@ public class Bib2GlsEntry extends BibEntry
                }
                else if (isGlsCsOptLabel(csname))
                {
-                  foundgls = (i==0);
+                  found = (i==0);
 
                   TeXObject arg = list.get(++i);
 
@@ -222,12 +253,17 @@ public class Bib2GlsEntry extends BibEntry
                      arg = list.get(++i);
                   }
 
+                  String prefix = "";
+                  String opt = "";
+
                   if (arg instanceof CharObject)
                   {
                      int code = ((CharObject)arg).getCharCode();
 
                      if (code == '*' || code == '+')
                      {
+                        prefix = arg.toString(parser);
+
                         arg = list.get(++i);
 
                         while (arg instanceof Ignoreable)
@@ -243,14 +279,19 @@ public class Bib2GlsEntry extends BibEntry
 
                      if (code == '[')
                      {
+                        opt = "[";
+
                         for (; i < list.size(); i++)
                         {
                            arg = list.get(i);
+
+                           opt += arg.toString(parser);
 
                            if (arg instanceof CharObject
                               && ((CharObject)arg).getCharCode() == ']')
                            {
                               arg = list.get(++i);
+
                               break;
                            }
                         }
@@ -262,12 +303,42 @@ public class Bib2GlsEntry extends BibEntry
                      }
                   }
 
-                  if (arg instanceof Group)
+                  String label;
+
+                  if (arg instanceof BgChar)
                   {
-                     arg = ((Group)arg).toList();
+                     label = "";
+
+                     while (! ((arg = list.get(++i)) instanceof EgChar))
+                     {
+                        label += arg.toString(parser);
+                     }
+                  }
+                  else if (arg instanceof Group)
+                  {
+                     label = ((Group)arg).toList().toString(parser);
+                  }
+                  else
+                  {
+                     label = arg.toString(parser);
                   }
 
-                  addDependency(arg.toString(parser));
+                  addDependency(label);
+
+                  if (bib2gls.checkNestedLinkTextField(fieldName)
+                   && !csname.equals("glsps") && !csname.equals("glspt"))
+                  {
+                     bib2gls.warning(parser, 
+                       bib2gls.getMessage("warning.potential.nested.link",
+                       getId(), fieldName,
+                       String.format("\\%s%s%s", csname, prefix, opt),
+                       label));
+                  }
+
+               }
+               else if (isCsProblematic(csname))
+               {
+                  found = (i==0);
                }
             }
             catch (ArrayIndexOutOfBoundsException e)
@@ -276,21 +347,33 @@ public class Bib2GlsEntry extends BibEntry
                  bib2gls.getMessage("warning.can.find.arg", csname));
             }
 
-            if (foundgls && mfirstucProtect)
+            if (found && mfirstucProtect)
             {
                // found a problematic command at the start of a
                // field. Protect the field from first letter
                // upper casing by inserting an empty group.
 
                bib2gls.warning(parser, 
-                 bib2gls.getMessage("warning.uc.protecting", csname));
+                 bib2gls.getMessage("warning.uc.protecting",
+                   object.toString(parser)));
                list.add(0, parser.getListener().createGroup());
                i++;
             }
          }
          else if (object instanceof TeXObjectList)
          {
-            checkGlsCs(parser, (TeXObjectList)object, false);
+            if (object instanceof MathGroup && (i==0)
+                && mfirstucProtect
+                && bib2gls.mfirstucMathShiftProtection())
+            {
+               bib2gls.warning(parser, 
+                 bib2gls.getMessage("warning.uc.protecting", 
+                   object.toString(parser)));
+               list.add(0, parser.getListener().createGroup());
+               i++;
+            }
+
+            checkGlsCs(parser, (TeXObjectList)object, false, fieldName);
          }
       }
    }
@@ -330,7 +413,7 @@ public class Bib2GlsEntry extends BibEntry
                }
             }
 
-            checkGlsCs(parser, list, protect);
+            checkGlsCs(parser, list, protect, field);
 
             fieldValues.put(field, list.toString(parser));
          }

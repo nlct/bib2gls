@@ -24,15 +24,51 @@ See the manual for further details.</entry>
 <entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
 			Set transcript file name.</entry>
 <entry key="syntax.mfirstuc">{0} &lt;fields&gt;|all (or {1} &lt;fields&gt;|all)
-			Insert an empty group if fields start with certain problematic commands
-			to protect against case-changing commands like \Gls.
+			Insert an empty group if fields start 
+			with certain problematic commands
+			to protect against case-changing commands
+			like \Gls.
+
 			The default is to do this for all fields.
 			To do this for only a subset of fields,
 			set &lt;fields&gt; to a comma-separated
 			list of fields (e.g. 'name,short,long').
 			The keyword 'all' indicates all fields.</entry>
 <entry key="syntax.no.mfirstuc">{0}
-			Switch off the auto-insertion of an empty group for all fields.</entry>
+			Switch off the auto-insertion of an empty
+			group for all fields.</entry>
+
+<entry key="syntax.no.math.mfirstuc">{0}
+			Switch off the auto-insertion of an empty
+			group for math-shift ($).</entry>
+
+<entry key="syntax.math.mfirstuc">{0}
+			Switch on the auto-insertion of an empty
+			group for math-shift ($).
+			This option will be overriden by 
+			{1}</entry>
+
+
+<entry key="syntax.check.shortcuts">{0} &lt;option&gt;
+			Check for the shortcut commands when 
+			search for dependencies.
+			Permitted values of &lt;option&gt;:
+			''acronyms'' (or ''acro'')
+			''abbreviations'' (or ''abbr'')
+			''all'' (or ''true'')
+			''none'' (or ''false'')</entry>
+<entry key="syntax.check.nested">{0} &lt;list&gt;|"none"
+			Check each field listed in &lt;list&gt;
+			for potentially problematic nested link 
+			text. (Default list: name, text, plural,
+			first, firstplural, short, shortplural,
+			long, longplural, symbol).
+
+			If "none", disable check.</entry>
+<entry key="syntax.nocheck.nested">{0}
+			Don''t check for potentially problematic
+			nested link text. (Equivalent to
+			{1} "none")</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
@@ -60,9 +96,11 @@ See the manual for further details.</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.can.find.arg">Can't detect argument for: \{0}</entry>
-<entry key="warning.uc.protecting">Inserting empty group in front of \{0} to protect it from mfirstuc.</entry>
+<entry key="warning.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="warning.no.default.sort">Can't determine sort value for: {0}</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
+<entry key="warning.potential.nested.link">Entry ''{0}'' has potentially nested link text in field: {1}
+Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry>
 
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
