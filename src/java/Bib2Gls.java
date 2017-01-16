@@ -23,8 +23,12 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.Locale;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.net.URL;
+
+// Requires Java 1.7:
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
@@ -33,8 +37,339 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class Bib2Gls implements TeXApp
 {
-   public Bib2Gls() 
+   public Bib2Gls(int debug)
+     throws IOException,InterruptedException,Bib2GlsException
    {
+      debugLevel = debug;
+
+      initSecuritySettings();
+
+      initMessages();
+   }
+
+   private void initSecuritySettings()
+     throws IOException,InterruptedException,Bib2GlsException
+   {
+      String openin = kpsewhich("--var-value=openin_any");
+      String openout = kpsewhich("--var-value=openout_any");
+
+      int openinAny = (openin == null || openin.isEmpty() ? -1 
+                       : openin.charAt(0));
+      int openoutAny = (openout == null || openout.isEmpty() ? -1 
+                       : openout.charAt(0));
+
+      if (openinAny == 'a' || openinAny == 'p' || openinAny == 'r')
+      {
+         openin_any = (char)openinAny;
+      }
+      else
+      {
+         throw new IllegalArgumentException(
+           "Invalid openin_any value returned by kpsewhich: "+openin);
+      }
+
+      if (openoutAny == 'a' || openoutAny == 'p' || openoutAny == 'r')
+      {
+         openout_any = (char)openoutAny;
+      }
+      else
+      {
+         throw new IllegalArgumentException(
+           "Invalid openout_any value returned by kpsewhich: "+openout);
+      }
+
+      debug(String.format("openin_any=%s%nopenout_any=%s", 
+              openin_any, openout_any));
+
+      try
+      {
+         String texmfoutputPath = kpsewhich("--var-value=TEXMFOUTPUT");
+
+         if (texmfoutputPath != null && !texmfoutputPath.isEmpty())
+         {
+            File f = (new TeXPath(null, texmfoutputPath, false)).getFile();
+
+            if (!f.isDirectory())
+            {
+               // not a directory so ignore it
+
+               System.err.println("TEXMFOUT not a directory: "+texmfoutputPath);
+            }
+
+            texmfoutput = f.toPath();
+         }
+      }
+      catch (IOException e)
+      {// TEXMFOUTPUT not set
+      }
+
+      debug("TEXMFOUTOUT="+(texmfoutput == null ? "" : texmfoutput));
+
+      String cwdPath = System.getProperty("user.dir");
+
+      if (cwdPath == null)
+      {
+         throw new IOException("Can't determine current working directory");
+      }
+
+      File cwdFile = new File(cwdPath);
+
+      if (!cwdFile.isDirectory())
+      {
+         throw new IOException("CWD is not a directory: "+cwdPath);
+      }
+
+      cwd = cwdFile.toPath();
+
+      debug("cwd="+cwd);
+   }
+
+   public void checkReadAccess(TeXPath path)
+     throws IOException
+   {
+      if (!isReadAccessAllowed(path))
+      {
+         throw new IOException(getMessage("error.openin.forbidden",
+           openin_any, path));
+      }
+   }
+
+   public void checkReadAccess(Path path)
+     throws IOException
+   {
+      if (!isReadAccessAllowed(path))
+      {
+         throw new IOException(getMessage("error.openin.forbidden",
+           openin_any, path));
+      }
+   }
+
+   public void checkReadAccess(File file)
+     throws IOException
+   {
+      if (!isReadAccessAllowed(file.toPath()))
+      {
+         throw new IOException(getMessage("error.openin.forbidden",
+           openin_any, file));
+      }
+   }
+
+   public boolean isReadAccessAllowed(TeXPath path)
+   {
+      debug(getMessage("message.checking.read", path));
+
+      if (openin_any == 'a')
+      {
+         return true;
+      }
+
+      if (path.isHidden())
+      {
+         return false;
+      }
+
+      if (openin_any == 'r')
+      {// not a hidden file, so allow read access
+         return true;
+      }
+
+      // paranoid setting on
+
+      if (path.wasFoundByKpsewhich())
+      {
+         // If the file was found by kpsewhich, it must be on TeX's
+         // path, so allow read access.
+
+         return true;
+      }
+
+      Path base = path.getBaseDir();
+      Path relPath = path.getRelativePath();
+
+      Path p = (base == null ? relPath.normalize() : 
+         base.resolve(relPath).normalize());
+
+      if (p.isAbsolute())
+      {
+         if (p.startsWith(cwd))
+         {
+            // on the current working directory path so allow
+
+            return true;
+         }
+
+         if (texmfoutput != null)
+         {
+            return p.startsWith(texmfoutput);
+         }
+
+         return false;
+      }
+
+      // Not absolute path. Is it on the cwd path?
+
+      return p.toAbsolutePath().normalize().startsWith(cwd);
+   }
+
+   public boolean isReadAccessAllowed(File file)
+   {
+      return isReadAccessAllowed(file.toPath());
+   }
+
+   public boolean isReadAccessAllowed(Path path)
+   {
+      debug(getMessage("message.checking.read", path));
+
+      if (openin_any == 'a')
+      {
+         return true;
+      }
+
+      if (isHidden(path))
+      {
+         return false;
+      }
+
+      if (openin_any == 'r')
+      {// not a hidden file, so allow read access
+         return true;
+      }
+
+      // paranoid setting on
+
+      if (path.isAbsolute())
+      {
+         path = path.normalize();
+
+         if (path.startsWith(cwd))
+         {
+            // on the current working directory path so allow
+
+            return true;
+         }
+
+         if (texmfoutput != null)
+         {
+            return path.startsWith(texmfoutput);
+         }
+
+         return false;
+      }
+
+      // Not absolute path. Is it on the cwd path?
+
+      return path.toAbsolutePath().normalize().startsWith(cwd);
+   }
+
+   public void checkWriteAccess(Path path)
+     throws IOException
+   {
+      if (!isWriteAccessAllowed(path))
+      {
+         throw new IOException(getMessage("error.openout.forbidden",
+           openout_any, path));
+      }
+   }
+
+   public void checkWriteAccess(File file)
+     throws IOException
+   {
+      if (!isWriteAccessAllowed(file.toPath()))
+      {
+         throw new IOException(getMessage("error.openout.forbidden",
+           openout_any, file));
+      }
+   }
+
+   public boolean isWriteAccessAllowed(TeXPath path)
+   {
+      return isWriteAccessAllowed(path.getPath());
+   }
+
+   public boolean isWriteAccessAllowed(File file)
+   {
+      return isWriteAccessAllowed(file.toPath());
+   }
+
+   public boolean isWriteAccessAllowed(Path path)
+   {
+      debug(getMessage("message.checking.write", path));
+
+      if (openout_any == 'a')
+      {
+         return true;
+      }
+
+      if (isHidden(path))
+      {
+         return false;
+      }
+
+      if (openout_any == 'r')
+      {// not a hidden file, so allow write access
+         return true;
+      }
+
+      // paranoid setting on
+
+      if (path.isAbsolute())
+      {
+         path = path.normalize();
+
+         if (path.startsWith(cwd))
+         {
+            // on the current working directory path so allow
+
+            return true;
+         }
+
+         if (texmfoutput != null)
+         {
+            return path.startsWith(texmfoutput);
+         }
+
+         return false;
+      }
+
+      // Not absolute path. Is it on the cwd path?
+
+      return path.toAbsolutePath().normalize().startsWith(cwd);
+   }
+
+   public boolean isHidden(Path path)
+   {
+      for (int i = path.getNameCount()-1; i >= 0; i--)
+      {
+         String name = path.getName(i).toString();
+
+         if (name.startsWith(".") && !name.equals(".") && !name.equals(".."))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public File getWritableFile(File file)
+     throws IOException
+   {
+      File dir = file.getParentFile();
+
+      if (dir == null)
+      {
+         dir = cwd.toFile();
+      }
+
+      if (texmfoutput != null && !dir.canWrite())
+      {
+         warning(getMessage("warning.dir.no.write", dir, texmfoutput));
+         file = new File(texmfoutput.toFile(), file.getName());
+      }
+
+      checkWriteAccess(file);
+
+      return file;
    }
 
    private String texToJavaCharset(String texCharset)
@@ -132,8 +467,6 @@ public class Bib2Gls implements TeXApp
    public void process(String[] args) 
      throws IOException,InterruptedException,Bib2GlsException
    {
-      initMessages();
-
       parseArgs(args);
 
       if (verboseLevel >= 0)
@@ -311,6 +644,8 @@ public class Bib2Gls implements TeXApp
          {
             logWriter = null;
          }
+
+         message(getMessage("message.log.file", logFile));
       }
    }
 
@@ -401,6 +736,7 @@ public class Bib2Gls implements TeXApp
    {
       return mfirstucProtectFields;
    }
+
    public void logMessage(String message)
    {
       if (logWriter != null)
@@ -453,6 +789,8 @@ public class Bib2Gls implements TeXApp
             reader = new BufferedReader(new InputStreamReader(stream));
 
             line = reader.readLine();
+
+            verbose(getMessage("message.process.result", line));
          }
          finally
          {
@@ -543,6 +881,8 @@ public class Bib2Gls implements TeXApp
     */ 
    public String getMessage(String label)
    {
+      if (messages == null) return label;
+
       String msg = label;
 
       try
@@ -562,6 +902,11 @@ public class Bib2Gls implements TeXApp
     */ 
    public String getMessage(String label, String param)
    {
+      if (messages == null)
+      {// message system hasn't been initialised
+         return String.format("%s[%s]", label, param);
+      }
+
       String msg = label;
 
       try
@@ -581,6 +926,19 @@ public class Bib2Gls implements TeXApp
     */ 
    public String getMessage(String label, String[] params)
    {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0]);
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0];
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
       String msg = label;
 
       try
@@ -597,6 +955,19 @@ public class Bib2Gls implements TeXApp
 
    public String getMessage(String label, Object... params)
    {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0].toString());
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0].toString();
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
       String msg = label;
 
       try
@@ -614,6 +985,19 @@ public class Bib2Gls implements TeXApp
    public String getChoiceMessage(String label, int argIdx,
      String choiceLabel, int numChoices, Object... params)
    {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0].toString());
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0].toString();
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
       String msg = label;
 
       try
@@ -821,9 +1205,11 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.help", "--help", "-h"));
       System.out.println(getMessage("syntax.version", "--version", "-v"));
       System.out.println(getMessage("syntax.debug", "--debug"));
-      System.out.println(getMessage("syntax.nodebug", "--nodebug"));
+      System.out.println(getMessage("syntax.nodebug", "--no-debug",
+        "--nodebug"));
       System.out.println(getMessage("syntax.verbose", "--verbose"));
-      System.out.println(getMessage("syntax.noverbose", "--noverbose"));
+      System.out.println(getMessage("syntax.noverbose",
+        "--no-verbose", "--noverbose"));
       System.out.println(getMessage("syntax.silent", "--silent"));
 
       System.out.println();
@@ -930,6 +1316,7 @@ public class Bib2Gls implements TeXApp
    }
 
    private void parseArgs(String[] args)
+     throws IOException
    {
       String dirName = null;
       String auxFileName = null;
@@ -956,7 +1343,7 @@ public class Bib2Gls implements TeXApp
                debugLevel = 1;
             }
          }
-         else if (args[i].equals("--nodebug"))
+         else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
          {
             debugLevel = 0;
          }
@@ -964,7 +1351,8 @@ public class Bib2Gls implements TeXApp
          {
             verboseLevel = 1;
          }
-         else if (args[i].equals("--noverbose"))
+         else if (args[i].equals("--no-verbose") 
+           || args[i].equals("--noverbose"))
          {
             verboseLevel = 0;
          }
@@ -1098,6 +1486,19 @@ public class Bib2Gls implements TeXApp
          {
             nestedLinkCheckFields = null;
          }
+         else if (args[i].equals("--dir") || args[i].equals("-d"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               System.err.println(getMessage("error.missing.value", args[i-1]));
+               System.err.println(getMessage("syntax.use.help"));
+               System.exit(1);
+            }
+
+            dirName = args[i];
+         }
          else if (args[i].startsWith("-"))
          {
             System.err.println(getMessage(
@@ -1129,15 +1530,38 @@ public class Bib2Gls implements TeXApp
 
       File dir = null;
 
+      auxFile = new File(auxFileName);
+
       if (dirName != null)
       {
          dir = new File(dirName);
-         auxFile = new File(dir, auxFileName);
+         basePath = dir.toPath();
+
+         if (!dir.exists())
+         {
+            System.err.println(getMessage("error.dir.not.found", dirName));
+            System.exit(1);
+         }
+
+         if (!dir.isDirectory())
+         {
+            System.err.println(getMessage("error.not.dir", dirName));
+            System.exit(1);
+         }
+
+         if (auxFile.getParentFile() == null)
+         {
+            auxFile = new File(dir, auxFileName);
+         }
+         else
+         {
+            auxFile = dir.toPath().resolve(auxFile.toPath()).toFile();
+         }
       }
       else
       {
-         auxFile = new File(auxFileName);
          dir = auxFile.getParentFile();
+         basePath = cwd;
       }
 
       if (!auxFile.exists())
@@ -1146,7 +1570,7 @@ public class Bib2Gls implements TeXApp
          System.exit(0);
       }
 
-      File logFile = null;
+      logFile = null;
 
       if (logName == null)
       {
@@ -1158,7 +1582,18 @@ public class Bib2Gls implements TeXApp
       else
       {
          logFile = new File(logName);
+
+         if (logFile.getParentFile() == null)
+         {
+            logFile = new File(basePath.toFile(), logName);
+         }
+         else
+         {
+            logFile = basePath.resolve(logFile.toPath()).toFile();
+         }
       }
+
+      logFile = getWritableFile(logFile);
 
       try
       {
@@ -1177,15 +1612,68 @@ public class Bib2Gls implements TeXApp
 
    public static void main(String[] args)
    {
-      Bib2Gls bib2gls = new Bib2Gls();
+      Bib2Gls bib2gls = null;
+      int debug = 0;
+
+      // Quickly check for debug mode for debugging messages needed
+      // before parseArgs().
+      //
+      // parseArgs() will perform error checking on the syntax
+      // and allow multiple "--debug" or "--no-debug" to override the
+      // first instance.
+
+      for (int i = 0; i < args.length; i++)
+      {
+         if (args[i].equals("--debug"))
+         {
+            try
+            {
+               if (args[i+1].startsWith("-"))
+               {
+                  debug = 1;
+               }
+               else
+               {
+                  i++;
+                  debug = Integer.parseInt(args[i]);
+               }
+            }
+            catch (Exception e)
+            {
+               debug = 1;
+            }
+
+            break;
+         }
+         else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
+         {
+            break;
+         }
+      }
 
       try
       {
+         bib2gls = new Bib2Gls(debug);
+
          bib2gls.process(args);
       }
       catch (Exception e)
       {
-         bib2gls.error(e);
+         if (bib2gls == null)
+         {
+            System.err.println("Fatal error: "+e.getMessage());
+
+            if (debug > 0)
+            {
+               e.printStackTrace();
+            }
+         }
+         else
+         {
+            bib2gls.error(e);
+         }
+
+         System.exit(1);
       }
    }
 
@@ -1194,6 +1682,16 @@ public class Bib2Gls implements TeXApp
    public static final String DATE = "2017-01-10";
    public int debugLevel = 0;
    public int verboseLevel = 0;
+
+   private char openout_any='p';
+   private char openin_any='p';
+   private Path cwd;
+   private Path texmfoutput = null;
+   private Path basePath;
+
+   private File auxFile;
+   private File logFile;
+   private PrintWriter logWriter=null;
 
    private Vector<GlsResource> glsresources;
    private Vector<String> fields;
@@ -1205,10 +1703,6 @@ public class Bib2Gls implements TeXApp
    private Charset texCharset;
 
    private Bib2GlsMessages messages;
-
-   private File auxFile;
-
-   private PrintWriter logWriter=null;
 
    private boolean mfirstucProtect = true;
    private boolean mfirstucMProtect = true;
