@@ -51,6 +51,8 @@ public class GlsResource
 
       texFile = texPath.getFile();
 
+      bib2gls.checkWriteAccess(texFile);
+
       String filename = texPath.getTeXPath(true);
 
       KeyValList list = KeyValList.getList(parser, opts);

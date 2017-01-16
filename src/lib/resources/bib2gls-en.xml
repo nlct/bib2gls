@@ -15,7 +15,8 @@ See the manual for further details.</entry>
 <entry key="syntax.options">Options:</entry>
 <entry key="syntax.version">{0} (or {1})	Display version and exit.</entry>
 <entry key="syntax.help">{0} (or {1})		Display this help message and exit.</entry>
-<entry key="syntax.debug">{0} [&lt;n&gt;]		Switch on debug mode (optionally with the given level).</entry>
+<entry key="syntax.debug">{0} [&lt;n&gt;]		Switch on debug mode (optionally with the 
+					given level).</entry>
 <entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)</entry>
 <entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)
 					Synonym: {1}</entry>
@@ -26,6 +27,11 @@ See the manual for further details.</entry>
 <entry key="syntax.silent">{0}		Only display error messages.</entry>
 <entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
 			Set transcript file name.</entry>
+<entry key="syntax.dir">{0} &lt;directory&gt; (or {1} &lt;directory&gt;)
+			Files relative to &lt;directory&gt;.
+			(This doesn''t change the current working
+			directory.)</entry>
+
 <entry key="syntax.mfirstuc">{0} &lt;fields&gt;|all (or {1} &lt;fields&gt;|all)
 			Insert an empty group if fields start 
 			with certain problematic commands
@@ -134,6 +140,7 @@ Ignoring {1}
 </entry>
 <entry key="error.openin.forbidden">Read access forbidden by openin_any={0} for file: {1}</entry>
 <entry key="error.openout.forbidden">Write access forbidden by openout_any={0} for file: {1}</entry>
+<entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>
 
 <!--
      The following messages are used by various parts of

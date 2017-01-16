@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Locale;
 import java.io.*;
 import java.net.URL;
+import java.text.MessageFormat;
 
 // Requires Java 1.7:
 import java.nio.charset.Charset;
@@ -40,11 +41,21 @@ public class Bib2Gls implements TeXApp
    public Bib2Gls(int debug)
      throws IOException,InterruptedException,Bib2GlsException
    {
+      if (debug > 0)
+      {
+         version();
+      }
+
       debugLevel = debug;
 
       initSecuritySettings();
 
       initMessages();
+
+      if (verboseLevel >= 0 && debug == 0)
+      {
+         version();
+      }
    }
 
    private void initSecuritySettings()
@@ -372,6 +383,27 @@ public class Bib2Gls implements TeXApp
       return file;
    }
 
+   public Path resolvePath(Path path)
+   {
+      return basePath.resolve(path).normalize();
+   }
+
+   public File resolveFile(String name)
+   {
+      File file = new File(name);
+
+      if (file.getParentFile() == null)
+      {
+         file = new File(basePath.toFile(), name);
+      }
+      else
+      {
+         file = basePath.resolve(file.toPath()).toFile();
+      }
+
+      return file;
+   }
+
    private String texToJavaCharset(String texCharset)
    {
       if (texCharset.equals("ascii"))
@@ -468,11 +500,6 @@ public class Bib2Gls implements TeXApp
      throws IOException,InterruptedException,Bib2GlsException
    {
       parseArgs(args);
-
-      if (verboseLevel >= 0)
-      {
-         version();
-      }
 
       AuxParser auxParser = new AuxParser(this)
       {
@@ -761,7 +788,8 @@ public class Bib2Gls implements TeXApp
    public String kpsewhich(String arg)
      throws IOException,InterruptedException
    {
-      verbose(getMessage("message.running", 
+      debug(getMessageWithFallback("message.running", 
+        "Running {0}",
         String.format("kpsewhich '%s'", arg)));
 
       Process process =
@@ -777,9 +805,10 @@ public class Bib2Gls implements TeXApp
 
          if (stream == null)
          {
-            throw new IOException(String.format(
-             "Unable to open input stream from process: kpsewhich '%s'",
-             arg));
+            throw new IOException(
+             getMessageWithFallback("error.cant.open.process.stream", 
+             "Unable to open input stream from process: {0}",
+             String.format("kpsewhich '%s'", arg)));
          }
 
          BufferedReader reader = null;
@@ -790,7 +819,8 @@ public class Bib2Gls implements TeXApp
 
             line = reader.readLine();
 
-            verbose(getMessage("message.process.result", line));
+            debug(getMessageWithFallback("message.process.result",
+                  "Processed returned: {0}", line));
          }
          finally
          {
@@ -802,8 +832,13 @@ public class Bib2Gls implements TeXApp
       }
       else
       {
-         throw new IOException(getMessage("error.app_failed",
-           String.format("kpsewhich '%s'", arg),  exitCode));
+         String msg = getMessageWithFallback("error.app_failed",
+           "{0} failed with exit code {1}",
+           String.format("kpsewhich '%s'", arg),  exitCode);
+
+         debug(msg);
+
+         throw new IOException(msg);
       }
 
       return line;
@@ -813,24 +848,61 @@ public class Bib2Gls implements TeXApp
      throws IOException,InterruptedException
    {
       // TeXPath will convert from TeX path names (using /)
-      // to OS path names and will try to find the file
-      // using kpsewhich if it doesn't exist.
+      // to OS path names.
 
-      TeXPath path = new TeXPath(parser, filename, "bib");
+      TeXPath path = new TeXPath(parser, filename, "bib", false);
 
       File bibFile = path.getFile();
 
       if (!bibFile.exists())
       {
-         // try finding the file in the aux file's directory
+         debug(getMessage("error.file.not.found", bibFile));
 
-         File dir = auxFile.getParentFile();
+         File f = bibFile;
 
-         File f = new File(dir, bibFile.getName());
+         if (basePath.equals(cwd))
+         {
+            // try finding the file in the aux file's directory
+
+            File dir = auxFile.getParentFile();
+
+            f = new File(dir, bibFile.getName());
+         }
+         else
+         {
+            f = resolvePath(path.getRelativePath()).toFile();
+
+            if (!f.exists())
+            {
+               debug(getMessage("error.file.not.found", f));
+
+               // try finding the file in the aux file's directory
+
+               File dir = auxFile.getParentFile();
+
+               f = new File(dir, bibFile.getName());
+            }
+         }
+
+         if (!f.exists())
+         {
+            // use kpsewhich to find it
+
+            String loc = kpsewhich(bibFile.getName());
+
+            if (loc != null && !loc.isEmpty())
+            {
+               return new TeXPath(parser, loc, "", false);
+            }
+         }
 
          if (f.exists())
          {
             path = new TeXPath(parser, f);
+         }
+         else
+         {
+            debug(getMessage("error.file.not.found", f));
          }
       }
 
@@ -980,6 +1052,29 @@ public class Bib2Gls implements TeXApp
       }
 
       return msg;
+   }
+
+   public String getMessageWithFallback(String label,
+       String fallbackFormat, Object... params)
+   {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         MessageFormat fmt = new MessageFormat(fallbackFormat);
+         return fmt.format(fallbackFormat, params);
+      }
+
+      try
+      {
+         return messages.getMessage(label, params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+
+         MessageFormat fmt = new MessageFormat(fallbackFormat);
+         return fmt.format(fallbackFormat, params);
+      }
    }
 
    public String getChoiceMessage(String label, int argIdx,
@@ -1183,7 +1278,8 @@ public class Bib2Gls implements TeXApp
 
    public void version()
    {
-      System.out.println(getMessage("about.version", NAME, VERSION, DATE));
+      System.out.println(getMessageWithFallback("about.version",
+        "{0} version {1} ({2})", NAME, VERSION, DATE));
    }
 
    public void license()
@@ -1214,6 +1310,7 @@ public class Bib2Gls implements TeXApp
 
       System.out.println();
       System.out.println(getMessage("syntax.log", "--log-file", "-t"));
+      System.out.println(getMessage("syntax.dir", "--dir", "-d"));
 
       System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
@@ -1257,30 +1354,44 @@ public class Bib2Gls implements TeXApp
 
       String lang = locale.toLanguageTag();
 
-      URL url = getClass().getResource(getLanguageFileName(lang));
+      String name = getLanguageFileName(lang);
+
+      URL url = getClass().getResource(name);
 
       if (url == null)
       {
+         debug("Can't find resource file: "+name);
+
          lang = locale.getLanguage();
 
-         url = getClass().getResource(getLanguageFileName(lang));
+         name = getLanguageFileName(lang);
+
+         url = getClass().getResource(name);
 
          if (url == null)
          {
+            debug("Can't find resource file: "+name);
+
             String script = locale.getScript();
 
             if (script != null)
             {
-               url = getClass().getResource(
-                getLanguageFileName(String.format("%s-%s", lang, script)));
+               name = getLanguageFileName(String.format("%s-%s", lang, script));
+
+               url = getClass().getResource(name);
 
                if (url == null)
                {
+                  debug(String.format(
+                    "Can't find resource file: %s%nDefaulting to English",
+                    name));
+
                   url = getClass().getResource(getLanguageFileName("en"));
                }
             }
             else
             {
+               debug("Defaulting to English");
                url = getClass().getResource(getLanguageFileName("en"));
             }
 
@@ -1581,16 +1692,7 @@ public class Bib2Gls implements TeXApp
       }
       else
       {
-         logFile = new File(logName);
-
-         if (logFile.getParentFile() == null)
-         {
-            logFile = new File(basePath.toFile(), logName);
-         }
-         else
-         {
-            logFile = basePath.resolve(logFile.toPath()).toFile();
-         }
+         logFile = resolveFile(logName);
       }
 
       logFile = getWritableFile(logFile);
