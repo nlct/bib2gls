@@ -53,6 +53,11 @@ public class GlsRecord
       return format;
    }
 
+   public void setFormat(String newFormat)
+   {
+      format = newFormat;
+   }
+
    public String getLocation()
    {
       return location;
@@ -89,6 +94,17 @@ public class GlsRecord
            && location.equals(record.location);
    }
 
+   /*
+    * Match all parts except the format.
+    */ 
+   public boolean partialMatch(GlsRecord record)
+   {
+      return label.equals(record.label)
+           && prefix.equals(record.prefix)
+           && counter.equals(record.counter)
+           && location.equals(record.location);
+   }
+
    // does location for this follow location for other record?
    public boolean follows(GlsRecord record)
    {
@@ -110,8 +126,35 @@ public class GlsRecord
          return false;
       }
 
-      Matcher m1 = DIGIT_PATTERN.matcher(location1);
-      Matcher m2 = DIGIT_PATTERN.matcher(location2);
+      Matcher m1 = CS_PATTERN.matcher(location1);
+      Matcher m2 = CS_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         String cs1 = m1.group(2);
+         String cs2 = m2.group(2);
+
+         if (!cs1.equals(cs2))
+         {
+            return false;
+         }
+
+         String loc1 = m1.group(3);
+         String loc2 = m2.group(3);
+
+         if (loc1.equals(loc2))
+         {
+            return consecutive(prefix1, prefix2);
+         }
+
+         return consecutive(loc1, loc2);
+      }
+
+      m1 = DIGIT_PATTERN.matcher(location1);
+      m2 = DIGIT_PATTERN.matcher(location2);
 
       if (m1.matches() && m2.matches())
       {
@@ -157,7 +200,18 @@ public class GlsRecord
       m1 = ROMAN_LC_PATTERN.matcher(location1);
       m2 = ROMAN_LC_PATTERN.matcher(location2);
 
-      if (m1.matches() && m2.matches())
+      if (m1.matches() && m2.matches()
+       && !(   m1.group(3).isEmpty()
+            && m1.group(4) == null
+            && m1.group(5) == null
+            && m1.group(6) == null
+           )
+       && !(   m2.group(3).isEmpty()
+            && m2.group(4) == null
+            && m2.group(5) == null
+            && m2.group(6) == null
+           )
+         )
       {
          String prefix1 = m1.group(1);
          String prefix2 = m2.group(1);
@@ -188,7 +242,18 @@ public class GlsRecord
       m1 = ROMAN_UC_PATTERN.matcher(location1);
       m2 = ROMAN_UC_PATTERN.matcher(location2);
 
-      if (m1.matches() && m2.matches())
+      if (m1.matches() && m2.matches()
+       && !(   m1.group(3).isEmpty()
+            && m1.group(4) == null
+            && m1.group(5) == null
+            && m1.group(6) == null
+           )
+       && !(   m2.group(3).isEmpty()
+            && m2.group(4) == null
+            && m2.group(5) == null
+            && m2.group(6) == null
+           )
+         )
       {
          String prefix1 = m1.group(1);
          String prefix2 = m2.group(1);
@@ -196,14 +261,22 @@ public class GlsRecord
          String sep1 = m1.group(2);
          String sep2 = m2.group(2);
 
+         String hundreds1 = m1.group(4);
+         String tens1 = m1.group(5);
+         String ones1 = m1.group(6);
+
+         String hundreds2 = m2.group(4);
+         String tens2 = m2.group(5);
+         String ones2 = m2.group(6);
+
          int loc1 = romanToDecimal(m1.group(3).toLowerCase(),
-            m1.group(4).toLowerCase(), 
-            m1.group(5).toLowerCase(),
-            m1.group(6).toLowerCase());
+            hundreds1 == null ? null : hundreds1.toLowerCase(), 
+            tens1 == null ? null : tens1.toLowerCase(),
+            ones1 == null ? null : ones1.toLowerCase());
          int loc2 = romanToDecimal(m2.group(3).toLowerCase(),
-            m2.group(4).toLowerCase(),
-            m2.group(5).toLowerCase(),
-            m2.group(6).toLowerCase());
+            hundreds2 == null ? null : hundreds2.toLowerCase(),
+            tens2 == null ? null : tens2.toLowerCase(),
+            ones2 == null ? null : ones2.toLowerCase());
 
          if (loc1 == loc2)
          {
@@ -395,7 +468,7 @@ public class GlsRecord
    public String toString()
    {
       return String.format(
-        "record[label=%s,prefix=%s,counter=%s,format=%s,location=%s]",
+        "{%s}{%s}{%s}{%s}{%s}",
          label, prefix, counter, format, location);
    }
 
@@ -412,4 +485,7 @@ public class GlsRecord
 
    private static final Pattern ALPHA_PATTERN
      = Pattern.compile("(.*?)(?:([^a-z]?)([a-z]))|(?:([^A-Z]?)([A-Z]))");
+
+   private static final Pattern CS_PATTERN
+     = Pattern.compile("(.*?)(?:\\\\protect\\s*)?(\\\\[a-zA-Z@]+)\\s*\\{([0-9a-zA-Z]+)\\}");
 }
