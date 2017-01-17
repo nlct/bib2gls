@@ -550,6 +550,8 @@ public class GlsResource
       bib2gls.message(bib2gls.getMessage("message.writing", 
        texFile.toString()));
 
+      // Already checked openout_any in init method
+
       PrintWriter writer = null;
 
       try

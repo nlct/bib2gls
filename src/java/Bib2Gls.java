@@ -41,21 +41,23 @@ public class Bib2Gls implements TeXApp
    public Bib2Gls(int debug)
      throws IOException,InterruptedException,Bib2GlsException
    {
+      debugLevel = debug;
+
       if (debug > 0)
       {
          version();
       }
 
-      debugLevel = debug;
+      initMessages();
 
       initSecuritySettings();
-
-      initMessages();
 
       if (verboseLevel >= 0 && debug == 0)
       {
          version();
       }
+
+      formatMap = new HashMap<String,String>();
    }
 
    private void initSecuritySettings()
@@ -89,9 +91,6 @@ public class Bib2Gls implements TeXApp
            "Invalid openout_any value returned by kpsewhich: "+openout);
       }
 
-      debug(String.format("openin_any=%s%nopenout_any=%s", 
-              openin_any, openout_any));
-
       try
       {
          String texmfoutputPath = kpsewhich("--var-value=TEXMFOUTPUT");
@@ -114,8 +113,6 @@ public class Bib2Gls implements TeXApp
       {// TEXMFOUTPUT not set
       }
 
-      debug("TEXMFOUTOUT="+(texmfoutput == null ? "" : texmfoutput));
-
       String cwdPath = System.getProperty("user.dir");
 
       if (cwdPath == null)
@@ -131,8 +128,6 @@ public class Bib2Gls implements TeXApp
       }
 
       cwd = cwdFile.toPath();
-
-      debug("cwd="+cwd);
    }
 
    public void checkReadAccess(TeXPath path)
@@ -575,8 +570,80 @@ public class Bib2Gls implements TeXApp
                         data.getArg(3).toString(parser),
                         data.getArg(4).toString(parser));
 
-            if (!records.contains(record))
-            {// skip duplicates
+            // skip duplicates
+
+            boolean found = false;
+
+            for (GlsRecord r : records)
+            {
+               if (r.equals(record))
+               {// exact match, skip
+                  found = true;
+                  break;
+               }
+               else if (r.partialMatch(record))
+               {
+                  // matches everything except the format
+
+                  String fmt1 = record.getFormat();
+                  String fmt2 = r.getFormat();
+
+                  // Any format overrides the default "glsnumberformat"
+
+                  if (fmt1.equals("glsnumberformat"))
+                  {// discard the new record
+
+                     debug(getMessage("warning.discarding.conflicting.record",
+                       fmt1, fmt2, record, r));
+                  }
+                  else if (fmt2.equals("glsnumberformat"))
+                  {// override the existing record
+
+                     debug(getMessage("warning.discarding.conflicting.record",
+                       fmt1, fmt2, r, record));
+
+                     r.setFormat(fmt1);
+                  } 
+                  else
+                  {
+                     String map1 = formatMap.get(fmt1);
+                     String map2 = formatMap.get(fmt2);
+
+                     if (map1 != null && map1.equals(fmt2))
+                     {
+                        // discard the new record
+
+                        debug(getMessage(
+                          "warning.discarding.conflicting.record.using.map",
+                          fmt1, fmt2, record, r));
+                     }
+                     else if (map2 != null && map2.equals(fmt1))
+                     {
+                        // discard the existing record
+
+                        debug(getMessage(
+                          "warning.discarding.conflicting.record.using.map",
+                          fmt2, fmt1, r, record));
+
+                        r.setFormat(fmt1);
+                     }
+                     else
+                     {
+                        // discard the new record with a warning
+
+                        warning(
+                          getMessage("warning.discarding.conflicting.record",
+                          fmt1, fmt2, record, r));
+                     }
+                  }
+
+                  found = true;
+                  break;
+               }
+            }
+
+            if (!found)
+            {
                records.add(record);
             }
          }
@@ -1054,6 +1121,26 @@ public class Bib2Gls implements TeXApp
       return msg;
    }
 
+   public String getMessage(TeXParser parser, String label, Object... params)
+   {
+      if (parser == null)
+      {
+         return getMessage(label, params);
+      }
+
+      int lineNum = parser.getLineNumber();
+      File file = parser.getCurrentFile();
+
+      if (lineNum == -1 || file == null)
+      {
+         return getMessage(label, params);
+      }
+      else
+      {
+         return fileLineMessage(file, lineNum, getMessage(label, params));
+      }
+   }
+
    public String getMessageWithFallback(String label,
        String fallbackFormat, Object... params)
    {
@@ -1340,6 +1427,10 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.nocheck.nested",
          "--no-nested-link-check", "--nested-link-check"));
 
+      System.out.println();
+      System.out.println(getMessage("syntax.format.map",
+         "--map-format", "-m"));
+
       System.exit(0);
    }
 
@@ -1358,19 +1449,30 @@ public class Bib2Gls implements TeXApp
 
       URL url = getClass().getResource(name);
 
+      String jar = "";
+
+      if (debugLevel > 0)
+      {
+         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
+               .toString();
+      }
+
       if (url == null)
       {
-         debug("Can't find resource file: "+name);
+         debug(String.format("Can't find language resource: %s!%s", jar, name));
 
          lang = locale.getLanguage();
 
          name = getLanguageFileName(lang);
 
+         debug("Trying: "+name);
+
          url = getClass().getResource(name);
 
          if (url == null)
          {
-            debug("Can't find resource file: "+name);
+            debug(String.format("Can't find language resource: %s!%s",
+                    jar, name));
 
             String script = locale.getScript();
 
@@ -1378,20 +1480,22 @@ public class Bib2Gls implements TeXApp
             {
                name = getLanguageFileName(String.format("%s-%s", lang, script));
 
+               debug("Trying: "+name);
+
                url = getClass().getResource(name);
 
-               if (url == null)
+               if (url == null && !lang.equals("en"))
                {
                   debug(String.format(
-                    "Can't find resource file: %s%nDefaulting to English",
-                    name));
+                    "Can't find language resource: %s!%s%nDefaulting to 'en'",
+                    jar, name));
 
                   url = getClass().getResource(getLanguageFileName("en"));
                }
             }
-            else
+            else if (!lang.equals("en"))
             {
-               debug("Defaulting to English");
+               debug("Defaulting to 'en'");
                url = getClass().getResource(getLanguageFileName("en"));
             }
 
@@ -1406,6 +1510,8 @@ public class Bib2Gls implements TeXApp
 
       try
       {
+         debug("Reading "+url);
+
          in = url.openStream();
 
          Properties prop = new Properties();
@@ -1427,7 +1533,7 @@ public class Bib2Gls implements TeXApp
    }
 
    private void parseArgs(String[] args)
-     throws IOException
+     throws IOException,Bib2GlsSyntaxException
    {
       String dirName = null;
       String auxFileName = null;
@@ -1487,9 +1593,8 @@ public class Bib2Gls implements TeXApp
 
             if (i == args.length)
             {
-               System.err.println(getMessage("error.missing.value", args[i-1]));
-               System.err.println(getMessage("syntax.use.help"));
-               System.exit(1);
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", args[i-1]));
             }
 
             logName = args[i];
@@ -1507,9 +1612,8 @@ public class Bib2Gls implements TeXApp
 
             if (i == args.length)
             {
-               System.err.println(getMessage("error.missing.value", args[i-1]));
-               System.err.println(getMessage("syntax.use.help"));
-               System.exit(1);
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", args[i-1]));
             }
 
             if (args[i].equals("all"))
@@ -1539,9 +1643,8 @@ public class Bib2Gls implements TeXApp
 
             if (i == args.length)
             {
-               System.err.println(getMessage("error.missing.value", args[i-1]));
-               System.err.println(getMessage("syntax.use.help"));
-               System.exit(1);
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", args[i-1]));
             }
 
             if (args[i].equals("acronyms") || args[i].equals("acro"))
@@ -1567,10 +1670,9 @@ public class Bib2Gls implements TeXApp
             }
             else
             {
-               System.err.println(getMessage("error.invalid.choice.value", 
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.invalid.choice.value", 
                  args[i-1], args[i]));
-               System.err.println(getMessage("syntax.use.help"));
-               System.exit(1);
             }
          }
          else if (args[i].equals("--nested-link-check"))
@@ -1579,9 +1681,8 @@ public class Bib2Gls implements TeXApp
 
             if (i == args.length)
             {
-               System.err.println(getMessage("error.missing.value", args[i-1]));
-               System.err.println(getMessage("syntax.use.help"));
-               System.exit(1);
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.missing.value", args[i-1]));
             }
 
             if (args[i].equals("none"))
@@ -1603,19 +1704,39 @@ public class Bib2Gls implements TeXApp
 
             if (i == args.length)
             {
-               System.err.println(getMessage("error.missing.value", args[i-1]));
-               System.err.println(getMessage("syntax.use.help"));
-               System.exit(1);
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.missing.value", args[i-1]));
             }
 
             dirName = args[i];
          }
+         else if (args[i].equals("--map-format") || args[i].equals("-m"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", args[i-1]));
+            }
+
+            for (String value : args[i].trim().split(" *, *"))
+            {
+               String[] values = args[i].split(" *= *");
+
+               if (values.length != 2)
+               {
+                  throw new Bib2GlsSyntaxException(
+                    getMessage("error.invalid.opt.value", args[i-1], args[i]));
+               }
+
+               formatMap.put(values[0], values[1]);
+            }
+         }
          else if (args[i].startsWith("-"))
          {
-            System.err.println(getMessage(
+            throw new Bib2GlsSyntaxException(getMessage(
               "error.syntax.unknown_option", args[i]));
-            System.err.println(getMessage("syntax.use.help"));
-            System.exit(1);
          }
          else if (auxFileName == null)
          {
@@ -1623,15 +1744,13 @@ public class Bib2Gls implements TeXApp
          }
          else
          {
-            System.err.println(getMessage("error.only.one.aux"));
-            System.exit(1);
+            throw new Bib2GlsSyntaxException(getMessage("error.only.one.aux"));
          }
       }
 
       if (auxFileName == null)
       {
-         System.err.println(getMessage("error.no.aux"));
-         System.exit(1);
+         throw new Bib2GlsSyntaxException(getMessage("error.no.aux"));
       }
 
       if (!auxFileName.endsWith(".aux"))
@@ -1702,6 +1821,12 @@ public class Bib2Gls implements TeXApp
          logWriter = new PrintWriter(new FileWriter(logFile));
 
          logMessage(getMessage("about.version", NAME, VERSION, DATE));
+
+         debug(String.format(
+            "openin_any=%s%nopenout_any=%s%nTEXMFOUTPUT=%s%ncwd=%s", 
+             openin_any, openout_any, 
+             texmfoutput == null ? "" : texmfoutput,
+             cwd));
       }
       catch (IOException e)
       {
@@ -1759,6 +1884,12 @@ public class Bib2Gls implements TeXApp
 
          bib2gls.process(args);
       }
+      catch (Bib2GlsSyntaxException e)
+      {
+         System.err.println(e.getMessage());
+         System.err.println(bib2gls.getMessage("syntax.use.help"));
+         System.exit(1);
+      }
       catch (Exception e)
       {
          if (bib2gls == null)
@@ -1775,7 +1906,7 @@ public class Bib2Gls implements TeXApp
             bib2gls.error(e);
          }
 
-         System.exit(1);
+         System.exit(2);
       }
    }
 
@@ -1801,6 +1932,9 @@ public class Bib2Gls implements TeXApp
 
    private HashMap<String,String> fieldMap;
    private Vector<String> dependencies;
+
+   private HashMap<String,String> formatMap;
+
 
    private Charset texCharset;
 

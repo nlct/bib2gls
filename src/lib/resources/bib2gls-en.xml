@@ -78,6 +78,8 @@ See the manual for further details.</entry>
 			Don''t check for potentially problematic
 			nested link text. (Equivalent to
 			{1} "none")</entry>
+<entry key="syntax.format.map">{0} &lt;key&gt;=&lt;value&gt;[,&lt;key&gt;=&lt;value&gt;]* (or {1}  &lt;key&gt;=&lt;value&gt;[,&lt;key&gt;=&lt;value&gt;]*)
+			Set location format mappings.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
@@ -119,6 +121,13 @@ See the manual for further details.</entry>
 Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry>
 <entry key="warning.dir.no.write">Directory not writable: {0}
 Using TEXMFOUTPUT instead: {1}</entry>
+<entry key="warning.discarding.conflicting.record">Entry location conflict for formats: {0} and {1}
+Discarding: {2}
+Conflicts with: {3}</entry>
+<entry key="warning.discarding.conflicting.record.using.map">Entry location conflict.
+Obeying requested mapping {0} -&gt; {1}
+Discarding: {2}
+Keeping: {3}</entry>
 
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
