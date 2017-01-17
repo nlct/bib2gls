@@ -1,13 +1,28 @@
 \documentclass{article}
 
 \usepackage{fontspec}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,stylemods=mcols,style=mcolindexgroup]{glossaries-extra}
 
-\glsxtrresource{test-utf8}
+\glsxtrresourcefile
+ [selection=all,% select all entries in test-utf8.bib
+  sort=letter-case,      % allowed 'sort' values: 
+                %'unsrt' - don't sort
+                %'use' - order of use (not with selection=all)
+                %'letter-case' - letter order (case-sensitive)
+                %'letter-nocase' - letter order (case-insensitive)
+                %'locale' - OS default locale
+                % or a well-formed IETF language tag
+                % (e.g. 'sv' or 'de-1996')
+ ]
+ {test-utf8}
+
+\renewcommand*{\glstreenamefmt}[1]{#1}
 
 \begin{document}
-\glsaddall
-Test document.
-
 \printunsrtglossaries
+\newpage
+
+Test document.
+\forglsentries{\thisentry}{\gls{\thisentry}. }
+
 \end{document}

@@ -80,6 +80,10 @@ See the manual for further details.</entry>
 			{1} "none")</entry>
 <entry key="syntax.format.map">{0} &lt;key&gt;=&lt;value&gt;[,&lt;key&gt;=&lt;value&gt;]* (or {1}  &lt;key&gt;=&lt;value&gt;[,&lt;key&gt;=&lt;value&gt;]*)
 			Set location format mappings.</entry>
+<entry key="syntax.group">{0} or {1}
+			Add ''group'' field to entries.</entry>
+<entry key="syntax.no.group">{0}
+			Don''t add ''group'' field to entries.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
@@ -105,6 +109,7 @@ See the manual for further details.</entry>
 
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
+<entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -128,6 +133,7 @@ Conflicts with: {3}</entry>
 Obeying requested mapping {0} -&gt; {1}
 Discarding: {2}
 Keeping: {3}</entry>
+<entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
 
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
@@ -150,6 +156,7 @@ Ignoring {1}
 <entry key="error.openin.forbidden">Read access forbidden by openin_any={0} for file: {1}</entry>
 <entry key="error.openout.forbidden">Write access forbidden by openout_any={0} for file: {1}</entry>
 <entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>
+<entry key="error.cyclic.hierarchy">Cyclical hierarchy for entry: {0}</entry>
 
 <!--
      The following messages are used by various parts of

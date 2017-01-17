@@ -788,6 +788,11 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
+   public boolean useGroupField()
+   {
+      return addGroupField;
+   }
+
    public Vector<String> getFields()
    {
       return fields;
@@ -837,6 +842,11 @@ public class Bib2Gls implements TeXApp
       {
          logWriter.println(message);
       }
+   }
+
+   public int getDebugLevel()
+   {
+      return debugLevel;
    }
 
    public void debug(String message)
@@ -1431,6 +1441,14 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.format.map",
          "--map-format", "-m"));
 
+      System.out.println();
+      System.out.println(getMessage("syntax.group",
+         "--group", "-g"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.group",
+         "--no-group"));
+
       System.exit(0);
    }
 
@@ -1546,6 +1564,7 @@ public class Bib2Gls implements TeXApp
             if (i == args.length-1 || args[i+1].startsWith("-"))
             {
                debugLevel = 1;
+               verboseLevel = 1;
                continue;
             }
 
@@ -1559,6 +1578,8 @@ public class Bib2Gls implements TeXApp
                // argument missing
                debugLevel = 1;
             }
+
+            verboseLevel = debugLevel;
          }
          else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
          {
@@ -1732,6 +1753,14 @@ public class Bib2Gls implements TeXApp
 
                formatMap.put(values[0], values[1]);
             }
+         }
+         else if (args[i].equals("--group") || args[i].equals("-g"))
+         {
+            addGroupField = true;
+         }
+         else if (args[i].equals("--no-group"))
+         {
+            addGroupField = false;
          }
          else if (args[i].startsWith("-"))
          {
@@ -1935,6 +1964,7 @@ public class Bib2Gls implements TeXApp
 
    private HashMap<String,String> formatMap;
 
+   private boolean addGroupField = false;
 
    private Charset texCharset;
 

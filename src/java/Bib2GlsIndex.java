@@ -43,7 +43,21 @@ public class Bib2GlsIndex extends Bib2GlsEntry
 
    public String getDefaultSort()
    {
-      return getId();
+      String name = getFieldValue("name");
+
+      return name == null ? getId() : name;
+   }
+
+   public String getFallbackField(String field)
+   {
+      if (field.equals("name"))
+      {
+         return getId();
+      }
+      else
+      {
+         return super.getFallbackField(field);
+      }
    }
 
    public void writeBibEntry(PrintWriter writer)

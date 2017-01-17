@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Vector;
+import java.text.CollationKey;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
@@ -823,11 +824,69 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
+   public void setCollationKey(CollationKey key)
+   {
+      collationKey = key;
+   }
+
+   public CollationKey getCollationKey()
+   {
+      return collationKey;
+   }
+
+   private void addHierarchy(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
+     throws Bib2GlsException
+   {
+      if (hierarchy.contains(entry))
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+            "error.cyclic.hierarchy", entry.getId()));
+      }
+
+      hierarchy.add(0,entry);
+
+      String parentId = entry.getParent();
+
+      if (parentId == null)
+      {
+         return;
+      }
+
+      for (Bib2GlsEntry e : entries)
+      {
+         if (e.getId().equals(parentId))
+         {
+            addHierarchy(e, entries);
+            return;
+         }
+      }
+   }
+
+   public void updateHierarchy(Vector<Bib2GlsEntry> entries)
+     throws Bib2GlsException
+   {
+      hierarchy = new Vector<Bib2GlsEntry>();
+
+      addHierarchy(this, entries);
+   }
+
+   public int getHierarchyCount()
+   {
+      return hierarchy == null ? 0 : hierarchy.size();
+   }
+
+   public Bib2GlsEntry getHierarchyElement(int i)
+   {
+      return hierarchy.get(i);
+   }
+
    private Vector<GlsRecord> records;
 
    private HashMap<String,String> fieldValues;
 
    private Vector<String> deps;
+
+   private Vector<Bib2GlsEntry> hierarchy;
 
    private String crossRefTag = null;
    private String[] crossRefs = null;
@@ -835,4 +894,6 @@ public class Bib2GlsEntry extends BibEntry
    public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
 
    protected Bib2Gls bib2gls;
+
+   private CollationKey collationKey;
 }

@@ -26,28 +26,17 @@ import java.text.CollationKey;
 import java.text.Normalizer;
 import java.util.HashMap;
 
-public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
+public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 {
-   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
+   public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     String sort, String sortField,
-    int strength, int decomposition)
+    boolean ignoreCase)
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
       this.entries = entries;
-
-      if (sort.equals("locale"))
-      {
-         collator = Collator.getInstance();
-      }
-      else
-      {
-         collator = Collator.getInstance(Locale.forLanguageTag(sort));
-      }
-
-      collator.setStrength(strength);
-      collator.setDecomposition(decomposition);
+      this.ignoreCase = ignoreCase;
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -60,7 +49,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       if (sortField.equals("id"))
       {
          value = id;
-         entry.putField("sort", value);
       }
       else
       {
@@ -77,47 +65,27 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
                  id));
             }
-            else
-            {
-               entry.putField("sort", value);
-            }
          }
       }
 
+      entry.putField("sort", 
+         ignoreCase ? value.toLowerCase() : value);
+
       String grp = null;
-
-      byte[] bits = null;
-
-      CollationKey key = collator.getCollationKey(value);
-      entry.setCollationKey(key);
 
       if (bib2gls.useGroupField() && value.length() > 0)
       {
-         bits = key.toByteArray();
-
          int codePoint = value.codePointAt(0);
 
          String str = String.format("%c", codePoint);
 
-         byte bit1 = (bits.length > 0 ? bits[0] : 0);
-         byte bit2 = (bits.length > 1 ? bits[1] : 0);
-
          if (Character.isAlphabetic(codePoint))
          {
-            Character c = (bit1 == 0 ? getGroup(bit2) : null);
-
-            if (c == null)
-            {
-               grp = str.toUpperCase();
-            }
-            else
-            {
-               grp = c.toString();
-            }
+            grp = ignoreCase ?  str.toUpperCase() : str;
 
             entry.putField("group", 
                String.format("\\bibglslettergroup{%s}{%d}{%d}{%s}{%d}", 
-                             grp, bit1, bit2, str, codePoint));
+                             grp, 0, 0, str, codePoint));
          }
          else
          {
@@ -129,32 +97,14 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
       if (bib2gls.getDebugLevel() > 0)
       {
-         StringBuilder keyList = new StringBuilder();
-
-         if (bits == null)
-         {
-            bits = key.toByteArray();
-         }
-
-         for (byte b : bits)
-         {
-            if (keyList.length() > 0)
-            {
-               keyList.append(' ');
-            }
-
-            keyList.append(b);
-         }
-
          if (grp == null)
          {
-            bib2gls.debug(String.format("%s -> '%s' [%s]", 
-              id, value, keyList));
+            bib2gls.debug(String.format("%s -> '%s'", id, value));
          }
          else
          {
-            bib2gls.debug(String.format("%s -> '%s' (%s) [%s]", 
-              id, value, grp, keyList));
+            bib2gls.debug(String.format("%s -> '%s' (%s)", 
+              id, value, grp));
          }
       }
 
@@ -178,7 +128,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
          Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
          Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
 
-         int result = e1.getCollationKey().compareTo(e2.getCollationKey());
+         int result = e1.getFieldValue("sort").compareTo(e2.getFieldValue("sort"));
 
          if (result != 0)
          {
@@ -189,33 +139,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
    }
 
-   public Collator getCollator()
-   {
-      return collator;
-   }
-
    public void sortEntries() throws Bib2GlsException
    {
-      bib2gls.debug(bib2gls.getMessage("message.setting.sort",
-        collator.getStrength(), collator.getDecomposition()));
-
-      if (bib2gls.useGroupField())
-      {
-         groupMap = new HashMap<Byte,Character>();
-
-         for (char c = 'A'; c <= 'Z'; c++)
-         {
-            CollationKey key = collator.getCollationKey(""+c);
-
-            byte[] bits = key.toByteArray();
-
-            if (bits.length >= 2 && bits[0] == 0)
-            {
-               groupMap.put(bits[1], c);
-            }
-         }
-      }
-
       for (Bib2GlsEntry entry : entries)
       {
          entry.updateHierarchy(entries);
@@ -225,20 +150,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private Character getGroup(byte bit)
-   {
-      if (groupMap == null) return null;
-
-      return groupMap.get(bit);
-   }
-
    private String sortField;
-
-   private Collator collator;
 
    private Bib2Gls bib2gls;
 
-   private HashMap<Byte,Character> groupMap = null;
-
    private Vector<Bib2GlsEntry> entries;
+
+   private boolean ignoreCase;
 }

@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.Collator;
+import java.text.CollationKey;
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
@@ -86,17 +87,17 @@ public class GlsResource
                for (TeXObject obj : csvList)
                {
                   sources.add(bib2gls.getBibFilePath(parser, 
-                     obj.toString(parser)));
+                     obj.toString(parser).trim()));
                }
             }
          }
          else if (opt.equals("type"))
          {
-            type = list.get(opt).toString(parser);
+            type = list.get(opt).toString(parser).trim();
          }
          else if (opt.equals("sort"))
          {
-            sort = list.get(opt).toString(parser);
+            sort = list.get(opt).toString(parser).trim();
 
             if (sort.equals("none") || sort.equals("unsrt"))
             {
@@ -110,7 +111,7 @@ public class GlsResource
          else if (opt.equals("strength"))
          { // collator strength
 
-            String strength = list.get(opt).toString(parser);
+            String strength = list.get(opt).toString(parser).trim();
 
             if (strength.equals("primary"))
             {
@@ -138,7 +139,7 @@ public class GlsResource
          else if (opt.equals("decomposition"))
          { // collator decomposition
 
-            String decomposition = list.get(opt).toString(parser);
+            String decomposition = list.get(opt).toString(parser).trim();
 
             if (decomposition.equals("none"))
             {
@@ -161,19 +162,19 @@ public class GlsResource
          }
          else if (opt.equals("charset"))
          {
-            bibCharset = Charset.forName(list.get(opt).toString(parser));
+            bibCharset = Charset.forName(list.get(opt).toString(parser).trim());
          }
          else if (opt.equals("suffixF"))
          {
-            suffixF = list.get(opt).toString(parser);
+            suffixF = list.get(opt).toString(parser).trim();
          }
          else if (opt.equals("suffixFF"))
          {
-            suffixFF = list.get(opt).toString(parser);
+            suffixFF = list.get(opt).toString(parser).trim();
          }
          else if (opt.equals("see"))
          {
-            String loc = list.get(opt).toString(parser);
+            String loc = list.get(opt).toString(parser).trim();
 
             if (loc.equals("omit"))
             {
@@ -196,7 +197,7 @@ public class GlsResource
          }
          else if (opt.equals("prefix"))
          {
-            String val = list.get(opt).toString(parser);
+            String val = list.get(opt).toString(parser).trim();
 
             if (val.equals("") || val.isEmpty())
             {
@@ -215,7 +216,7 @@ public class GlsResource
          }
          else if (opt.equals("selection"))
          {
-            String val = list.get(opt).toString(parser);
+            String val = list.get(opt).toString(parser).trim();
 
             if (val == null || val.isEmpty())
             {
@@ -456,7 +457,7 @@ public class GlsResource
    }
 
    public int processData()
-      throws IOException
+      throws IOException,Bib2GlsException
    {
       if (bibData == null)
       {// shouldn't happen
@@ -541,10 +542,34 @@ public class GlsResource
 
       // sort if required
 
-      if (sort != null && !sort.equals("use"))
+      int entryCount = entries.size();
+
+      if (sort != null && !sort.equals("use") && entryCount > 0)
       {
-         entries.sort(new Bib2GlsEntryComparator(sort, sortField, 
-            collatorStrength, collatorDecomposition));
+         if (sort.equals("letter-case"))
+         {
+            Bib2GlsEntryLetterComparator comparator = 
+               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+                 sort, sortField, false);
+
+            comparator.sortEntries();
+         }
+         else if (sort.equals("letter-nocase"))
+         {
+            Bib2GlsEntryLetterComparator comparator = 
+               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+                 sort, sortField, true);
+
+            comparator.sortEntries();
+         }
+         else
+         {
+            Bib2GlsEntryComparator comparator = 
+               new Bib2GlsEntryComparator(bib2gls, entries, sort, sortField, 
+                  collatorStrength, collatorDecomposition);
+
+            comparator.sortEntries();
+         }
       }
 
       bib2gls.message(bib2gls.getMessage("message.writing", 
@@ -561,6 +586,14 @@ public class GlsResource
          if (seeLocation != Bib2GlsEntry.NO_SEE)
          {
             writer.println("\\providecommand{\\bibglsseesep}{, }");
+            writer.println();
+         }
+
+         if (bib2gls.useGroupField())
+         {
+            writer.println("\\providecommand{\\bibglslettergroup}[5]{#1}");
+            writer.println("\\providecommand{\\bibglsothergroup}[2]{\\glssymbolsgroupname}");
+            writer.println();
          }
 
          if (showLocationPrefix)
@@ -632,14 +665,14 @@ public class GlsResource
          }
       }
 
-      return entries.size();
+      return entryCount;
    }
 
    private File texFile;
 
    private Vector<TeXPath> sources;
 
-   private String type = null, sort = null, sortField = "sort";
+   private String type = null, sort = "locale", sortField = "sort";
 
    private Charset bibCharset = null;
 
@@ -655,7 +688,7 @@ public class GlsResource
 
    private int collatorStrength=Collator.PRIMARY;
 
-   private int collatorDecomposition=Collator.NO_DECOMPOSITION;
+   private int collatorDecomposition=Collator.CANONICAL_DECOMPOSITION;
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
