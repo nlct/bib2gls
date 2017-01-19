@@ -1,9 +1,15 @@
-\documentclass{article}
+\documentclass{report}
+
+\usepackage[T1]{fontenc}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,symbols]{glossaries-extra}
+\usepackage[record,symbols,postdot]{glossaries-extra}
 
-%\newcommand{\bibglsprefix}[1]{\ifcase#1 \or p.: \else pp.: \fi}
+\setabbreviationstyle{long-short-sc}
+
+%\newcommand{\bibglspostprefix}{: }
+\newcommand{\bibglsseesep}{; }
+
 
 % loads \jobname.glstex
 \GlsXtrLoadResources[% bib2gls options
@@ -11,7 +17,12 @@
  type=main,% put all entries into 'main' glossary
  see=after,% where to put 'see' part in location list
             % ('omit' or 'before' or 'after')
- loc-prefix=list,% prefix location list ('true' or 'false' or 'list')
+ %loc-prefix=false,% don't prefix location list (default)
+ %loc-prefix={p.,pp.},% prefix location list
+ %loc-prefix=list,% prefix location list with '\pagelistname: '
+ loc-prefix,% prefix location list with tags taken from
+            % application resource file in
+            % resources/bib2gls-<lang>.xml
  src={entries-terms,entries-abbrv}% bib files
 ]
 
@@ -19,6 +30,7 @@
 % finds entries in entries-symbols.bib
 \glsxtrresourcefile[% bib2gls options
  sort=none,% 'none' or 'use' or 'locale' or specific locale
+ loc-prefix={Location:},% prefix location list
  type=symbols]{entries-symbols}
 
 \begin{document}

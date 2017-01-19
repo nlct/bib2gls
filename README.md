@@ -5,8 +5,9 @@ Experimental, still in development. Following on
 from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).
 
-Requires at least v1.11 (2017-01-19) of
-[glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra).
+Requires at least v1.12 of
+[glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
+which is pending release.
 
 The basic idea is to have a `.bib` file containing all glossary
 definitions in the form:
@@ -203,7 +204,7 @@ For example, to sort by the `category` field using a case-sensitive letter sort:
 If your indexing rules are too complex for `bib2gls`, you can just
 use `bib2gls` to select the entries from the `.bib` file and use
 `xindy` as usual with a custom `xindy` module. Just remember to use
-`record=alsoindex` instead of just `record` and use `makeglossaries`
+`record=alsoindex` instead of just `record` and use `\makeglossaries`
 and `\printglossary`/`\printglossaries` as usual. This has the
 advantage over just using `\loadglsentries` as only those entries
 that have actually been used in the document will be defined. If you

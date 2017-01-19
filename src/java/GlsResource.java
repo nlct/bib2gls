@@ -66,13 +66,7 @@ public class GlsResource
 
          if (opt.equals("src"))
          {
-            srcList = list.get("src");
-
-            if (srcList instanceof TeXObjectList 
-                && ((TeXObjectList)srcList).size() == 1)
-            {
-               srcList = ((TeXObjectList)srcList).popArg(parser);
-            }
+            srcList = list.getValue("src");
 
             CsvList csvList = CsvList.getList(parser, srcList);
 
@@ -93,11 +87,15 @@ public class GlsResource
          }
          else if (opt.equals("type"))
          {
-            type = list.get(opt).toString(parser).trim();
+            type = list.getValue(opt).toString(parser).trim();
+         }
+         else if (opt.equals("category"))
+         {
+            category = list.getValue(opt).toString(parser).trim();
          }
          else if (opt.equals("sort"))
          {
-            sort = list.get(opt).toString(parser).trim();
+            sort = list.getValue(opt).toString(parser).trim();
 
             if (sort.equals("none") || sort.equals("unsrt"))
             {
@@ -110,7 +108,7 @@ public class GlsResource
          }
          else if (opt.equals("sort-field"))
          {
-            sortField = list.get(opt).toString(parser).trim();
+            sortField = list.getValue(opt).toString(parser).trim();
 
             if (!sortField.equals("id") && !bib2gls.isKnownField(sortField))
             {
@@ -121,7 +119,7 @@ public class GlsResource
          else if (opt.equals("strength"))
          { // collator strength
 
-            String strength = list.get(opt).toString(parser).trim();
+            String strength = list.getValue(opt).toString(parser).trim();
 
             if (strength.equals("primary"))
             {
@@ -149,7 +147,7 @@ public class GlsResource
          else if (opt.equals("decomposition"))
          { // collator decomposition
 
-            String decomposition = list.get(opt).toString(parser).trim();
+            String decomposition = list.getValue(opt).toString(parser).trim();
 
             if (decomposition.equals("none"))
             {
@@ -172,19 +170,20 @@ public class GlsResource
          }
          else if (opt.equals("charset"))
          {
-            bibCharset = Charset.forName(list.get(opt).toString(parser).trim());
+            bibCharset = Charset.forName(
+                           list.getValue(opt).toString(parser).trim());
          }
          else if (opt.equals("suffixF"))
          {
-            suffixF = list.get(opt).toString(parser).trim();
+            suffixF = list.getValue(opt).toString(parser).trim();
          }
          else if (opt.equals("suffixFF"))
          {
-            suffixFF = list.get(opt).toString(parser).trim();
+            suffixFF = list.getValue(opt).toString(parser).trim();
          }
          else if (opt.equals("see"))
          {
-            String loc = list.get(opt).toString(parser).trim();
+            String loc = list.getValue(opt).toString(parser).trim();
 
             if (loc.equals("omit"))
             {
@@ -207,32 +206,57 @@ public class GlsResource
          }
          else if (opt.equals("loc-prefix"))
          {
-            String val = list.get(opt).toString(parser).trim();
+            TeXObject prefixList = list.getValue(opt);
 
-            if (val.equals("") || val.isEmpty())
+            CsvList csvList = CsvList.getList(parser, prefixList);
+
+            int n = csvList.size();
+
+            switch (n)
             {
-               locationPrefix = PREFIX_PAGE_CASE;
-            }
-            else if (val.equals("false"))
-            {
-               locationPrefix = PREFIX_NONE;
-            }
-            else if (val.equals("list"))
-            {
-               locationPrefix = PREFIX_PAGE_LIST;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false, list"));
+               case 1:
+
+                  String val = csvList.get(0).toString(parser);
+
+                  if (val.equals("false"))
+                  {
+                     locationPrefix = null;
+                     break;
+                  }
+                  else if (val.equals("list"))
+                  {
+                     locationPrefix = new String[] {"\\pagelistname "};
+                     break;
+                  }
+                  else if (!val.equals("true"))
+                  {
+                     locationPrefix = new String[]{val};
+                     break;
+                  }
+
+               // fall through to n=0 case if val == 'true'
+               case 0:
+
+                  locationPrefix = new String[]{bib2gls.getMessage("tag.page"),
+                    bib2gls.getMessage("tag.pages")};
+
+               break;
+
+               default:
+
+                  locationPrefix = new String[n];
+
+                  for (int i = 0; i < n; i++)
+                  {
+                     locationPrefix[i] = csvList.get(i).toString(parser);
+                  }
             }
          }
          else if (opt.equals("selection"))
          {
-            String val = list.get(opt).toString(parser).trim();
+            String val = list.getValue(opt).toString(parser).trim();
 
-            if (val == null || val.isEmpty())
+            if (val.isEmpty())
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.missing.value", opt));
@@ -388,6 +412,11 @@ public class GlsResource
                if (type != null)
                {
                   entry.putField("type", type);
+               }
+
+               if (category != null)
+               {
+                  entry.putField("category", category);
                }
 
                // does this entry have any records?
@@ -610,36 +639,49 @@ public class GlsResource
             writer.println();
          }
 
-         switch (locationPrefix)
+         if (locationPrefix != null)
          {
-            case PREFIX_PAGE_CASE:
-              writer.println("\\providecommand{\\bibglsprefix}[1]{%");
-              writer.format("  \\ifcase#1\\or %s: \\else %s: \\fi%n",
-                bib2gls.getMessage("tag.page"),
-                bib2gls.getMessage("tag.pages"));
+              writer.println("\\providecommand{\\bibglspostprefix}{\\ }");
+
+              if (type == null)
+              {
+                 writer.println("\\appto\\glossarypreamble{%");
+              }
+              else
+              {
+                 writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
+              }
+
+              writer.println(" \\providecommand{\\bibglsprefix}[1]{%");
+              writer.println("  \\ifcase##1");
+
+              for (int i = 0; i < locationPrefix.length; i++)
+              {
+                 writer.format("  \\%s %s\\bibglspostprefix%n",
+                   (i == locationPrefix.length-1 ? "else" : "or"), 
+                   locationPrefix[i]);
+              }
+
+              writer.println("  \\fi");
+              writer.println(" }");
+
               writer.println("}");
-            break;
-            case PREFIX_PAGE_LIST:
-              writer.println("\\providecommand{\\bibglsprefix}[1]{%");
-              writer.println("  \\ifcase#1\\else \\pagelistname: \\fi");
-              writer.println("}");
-            break;
          }
 
          // syntax: {label}{opts}{name}{description}
 
          writer.println("\\providecommand{\\bibglsnewentry}[4]{%");
-         writer.print(" \\longnewglossaryentry{#1}");
+         writer.print(" \\longnewglossaryentry*{#1}");
          writer.println("{name={#3},#2}{#4}%");
          writer.println("}");
 
          writer.println("\\providecommand{\\bibglsnewsymbol}[4]{%");
-         writer.print(" \\longnewglossaryentry{#1}");
+         writer.print(" \\longnewglossaryentry*{#1}");
          writer.println("{name={#3},sort={#1},category={symbol},#2}{#4}%");
          writer.println("}");
 
          writer.println("\\providecommand{\\bibglsnewnumber}[4]{%");
-         writer.print(" \\longnewglossaryentry{#1}");
+         writer.print(" \\longnewglossaryentry*{#1}");
          writer.println("{name={#3},sort={#1},category={number},#2}{#4}%");
          writer.println("}");
 
@@ -670,7 +712,7 @@ public class GlsResource
             bib2gls.verbose(entry.getId());
 
             entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF, seeLocation, locationPrefix != PREFIX_NONE);
+              suffixF, suffixFF, seeLocation, locationPrefix != null);
 
             entry.writeBibEntry(writer);
 
@@ -696,7 +738,7 @@ public class GlsResource
 
    private Vector<TeXPath> sources;
 
-   private String type = null, sort = "locale", sortField = "sort";
+   private String type=null, category=null, sort = "locale", sortField = "sort";
 
    private Charset bibCharset = null;
 
@@ -716,11 +758,7 @@ public class GlsResource
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
-   private static final int PREFIX_NONE=0;
-   private static final int PREFIX_PAGE_CASE=1;
-   private static final int PREFIX_PAGE_LIST=2;
-
-   private int locationPrefix = PREFIX_NONE;
+   private String[] locationPrefix = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

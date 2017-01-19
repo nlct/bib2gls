@@ -5,6 +5,9 @@ RM=\rm -f
 all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-xe.pdf
 
+../lib/bib2gls.jar:	../java/*.java
+		make -C ..
+
 test.pdf	: test.aux test-entries.glstex
 		pdflatex test
 
