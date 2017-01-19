@@ -711,21 +711,29 @@ public class Bib2Gls implements TeXApp
          fields.add("category");
       }
 
-      for (GlsResource resource : glsresources)
+      for (int i = 0; i < glsresources.size(); i++)
       {
+         currentResource = glsresources.get(i);
+
          // parse all the bib files
-         resource.parse(parser);
+         currentResource.parse(parser);
       }
+
+      currentResource = null;
 
       int count = 0;
 
       // the data needs processing in a separate loop in case of
       // unrecorded cross-references across different bib files.
 
-      for (GlsResource resource : glsresources)
+      for (int i = 0; i < glsresources.size(); i++)
       {
-         count += resource.processData();
+         currentResource = glsresources.get(i);
+
+         count += currentResource.processData();
       }
+
+      currentResource = null;
 
       if (count == 0 && records.size() == 0)
       {
@@ -751,6 +759,11 @@ public class Bib2Gls implements TeXApp
 
          message(getMessage("message.log.file", logFile));
       }
+   }
+
+   public GlsResource getCurrentResource()
+   {
+      return currentResource;
    }
 
    public void addDependent(String id)
@@ -1361,6 +1374,8 @@ public class Bib2Gls implements TeXApp
             logMessage(elem.toString());
          }
       }
+
+      exitCode = 2;
    }
 
    public void error(String msg)
@@ -1957,6 +1972,11 @@ public class Bib2Gls implements TeXApp
          bib2gls = new Bib2Gls(debug);
 
          bib2gls.process(args);
+
+         if (bib2gls.exitCode != 0)
+         {
+            System.exit(bib2gls.exitCode);
+         }
       }
       catch (Bib2GlsSyntaxException e)
       {
@@ -1980,7 +2000,7 @@ public class Bib2Gls implements TeXApp
             bib2gls.error(e);
          }
 
-         System.exit(2);
+         System.exit(3);
       }
    }
 
@@ -2023,6 +2043,10 @@ public class Bib2Gls implements TeXApp
 
    private boolean checkAcroShortcuts = false;
    private boolean checkAbbrvShortcuts = false;
+
+   private GlsResource currentResource = null;
+
+   private int exitCode;
 
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",

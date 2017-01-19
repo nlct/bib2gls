@@ -1,15 +1,22 @@
+@string{ssi={server-side includes}}
+@string{html={hypertext markup language}}
+
 @abbreviation{shtml,
   short="shtml",
-  long="\glsps{ssi} enabled \glsps{html}"
+  long= ssi # " enabled " # html,
+  description={a combination of \gls{html} and \gls{ssi}},
+  see={[\seealsoname]html,ssi}
 }
 
 @abbreviation{html,
-  short="html",
-  long={hypertext markup language}
+  short ="html",
+  long  = html,
+  description={a markup language for creating web pages}
 }
 
 @abbreviation{ssi,
   short="ssi",
-  long="server-side includes"
+  long = ssi,
+  description={a simple interpreted server-side scripting language}
 }
 

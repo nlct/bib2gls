@@ -3,7 +3,7 @@
 \usepackage[T1]{fontenc}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,symbols,postdot]{glossaries-extra}
+\usepackage[record,abbreviations,symbols,postdot]{glossaries-extra}
 
 \setabbreviationstyle{long-short-sc}
 
@@ -23,8 +23,16 @@
  loc-prefix,% prefix location list with tags taken from
             % application resource file in
             % resources/bib2gls-<lang>.xml
- src={entries-terms,entries-abbrv}% bib files
+ src={entries-terms}% bib files
 ]
+
+% loads entries-abbrv.glstex
+% finds entries in entries-abbrv.bib
+\glsxtrresourcefile[% bib2gls options
+ sort=en,% 'none' or 'use' or 'locale' or specific locale
+ %ignore-fields={description,see},% ignore fields listed in this value
+ ignore-fields={description},% ignore fields listed in this value
+ type=abbreviations]{entries-abbrv}
 
 % loads entries-symbols.glstex
 % finds entries in entries-symbols.bib

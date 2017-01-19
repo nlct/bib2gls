@@ -252,6 +252,26 @@ public class GlsResource
                   }
             }
          }
+         else if (opt.equals("ignore-fields"))
+         {
+
+            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+
+            int n = csvList.size();
+
+            if (n == 0)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.missing.value", opt));
+            }
+
+            skipFields = new String[n];
+
+            for (int i = 0; i < n; i++)
+            {
+               skipFields[i] = csvList.get(i).toString(parser);
+            }
+         }
          else if (opt.equals("selection"))
          {
             String val = list.getValue(opt).toString(parser).trim();
@@ -734,9 +754,29 @@ public class GlsResource
       return entryCount;
    }
 
+   public boolean skipField(String field)
+   {
+      if (skipFields == null)
+      {
+         return false;
+      }
+
+      for (int i = 0; i < skipFields.length; i++)
+      {
+         if (skipFields[i].equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
+
+   private String[] skipFields = null;
 
    private String type=null, category=null, sort = "locale", sortField = "sort";
 
