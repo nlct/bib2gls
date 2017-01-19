@@ -195,7 +195,7 @@ public class GlsResource
                   opt, loc, "omit, before, after"));
             }
          }
-         else if (opt.equals("prefix"))
+         else if (opt.equals("loc-prefix"))
          {
             String val = list.get(opt).toString(parser).trim();
 
@@ -205,11 +205,11 @@ public class GlsResource
             }
             else if (val.equals("false"))
             {
-               loocationPrefix = PREFIX_NONE;
+               locationPrefix = PREFIX_NONE;
             }
             else if (val.equals("list"))
             {
-               loocationPrefix = PREFIX_PAGE_LIST;
+               locationPrefix = PREFIX_PAGE_LIST;
             }
             else
             {
@@ -602,14 +602,14 @@ public class GlsResource
 
          switch (locationPrefix)
          {
-            case PREFIX_CASE:
+            case PREFIX_PAGE_CASE:
               writer.println("\\providecommand{\\bibglsprefix}[1]{%");
               writer.format("  \\ifcase#1\\or %s: \\else %s: \\fi%n",
                 bib2gls.getMessage("tag.page"),
                 bib2gls.getMessage("tag.pages"));
               writer.println("}");
             break;
-            case PREFIX_LIST:
+            case PREFIX_PAGE_LIST:
               writer.println("\\providecommand{\\bibglsprefix}[1]{%");
               writer.println("  \\ifcase#1\\else \\pagelistname: \\fi");
               writer.println("}");

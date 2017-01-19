@@ -3,7 +3,7 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,symbols]{glossaries-extra}
 
-\newcommand{\bibglsprefix}[1]{\ifcase#1 \or Page: \else Pages\fi}
+%\newcommand{\bibglsprefix}[1]{\ifcase#1 \or p.: \else pp.: \fi}
 
 % loads \jobname.glstex
 \GlsXtrLoadResources[% bib2gls options
@@ -11,7 +11,7 @@
  type=main,% put all entries into 'main' glossary
  see=after,% where to put 'see' part in location list
             % ('omit' or 'before' or 'after')
- prefix=list,% prefix location list ('true' or 'false' or 'list')
+ loc-prefix=list,% prefix location list ('true' or 'false' or 'list')
  src={entries-terms,entries-abbrv}% bib files
 ]
 
