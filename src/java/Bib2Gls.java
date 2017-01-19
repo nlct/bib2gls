@@ -813,6 +813,24 @@ public class Bib2Gls implements TeXApp
       return fieldMap;
    }
 
+   public boolean isKnownField(String name)
+   {
+      for (String field : fields)
+      {
+         if (field.equals(name))
+         {
+            return true;
+         }
+
+         if (name.equals(fieldMap.get(field)))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public Vector<GlsRecord> getRecords()
    {
       return records;

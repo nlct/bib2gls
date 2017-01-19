@@ -135,7 +135,7 @@ in the `.bib` file, use `selection=all`. For example
 ```latex
 \GlsXtrLoadResources[src={test-entries},selection=all]
 ```
-(You can use `selection=all` with `sort=use`.)
+(You can't use `selection=all` with `sort=use`.)
 
 If you want to add any new glossary fields, make sure you put
 all instances of `\glsaddstoragekey` or `\glsaddkey` before you load
@@ -153,6 +153,10 @@ Then the `note` field will be omitted from the `.glstex` file unless
 a new `note` key is defined before `\glsxtrresourcefile` (or
 `\GlsXtrLoadResources`).
 
+You can, of course, define the keys afterwards if you don't want
+those fields selected, but that rather defeats the purpose of
+defining the keys.
+
 Any cross-references (through the `see` field or through
 commands like `\gls` within the entry's fields) will be picked up by
 `bib2gls` as it parses the `.bib` file and will be automatically
@@ -165,8 +169,16 @@ glossary and the glossary can't be displayed until the entries have
 been selected from the `.bib` file and the `.glstex` file has been loaded 
 by the document.)
 
-The following example assumes `terms-en.bib` contains English terms
-and `terms-de.bib` contains German terms:
+If your entries have a `see` field, you can determine whether you
+want the cross-referenced list to appear before or after the
+location list or whether you want it completely omitted (but still
+add the cross-referenced terms to the list).
+
+If you want to implement different sort methods, just use a separate
+`\glsxtrresourcefile` for each type.
+
+The following example assumes that the file `terms-en.bib` contains English 
+terms and `terms-de.bib` contains German terms:
 ```latex
 \newglossary*{english}{English Terms}
 \newglossary*{german}{German Terms}
@@ -175,9 +187,20 @@ and `terms-de.bib` contains German terms:
 \glsxtrresourcefile[sort=de-1996,type=german]{terms-de}
 ```
 This sorts the English terms according to the English alphabet and
-the German terms according to the new German orthography.
+the German terms according to the new German orthography. The value
+of the `sort` key may be `none` (or `unsrt`), `use` (order of use 
+in the document), `letter-case` (sort by case-sensitive character
+code), `letter-nocase` (case-insensitive letter sort), `locale` (use
+the OS's default language), or a valid IETF language tag.
 
-If you're indexing rules are too complex for `bib2gls`, you can just
+You can change the field to sort by using `sort-field`. This may
+take the value `id` (to sort by the entry label) or the field name.
+For example, to sort by the `category` field using a case-sensitive letter sort:
+```latex
+\glsxtrresourcefile[sort=letter-case,sort-field=category]{test-entries}
+```
+
+If your indexing rules are too complex for `bib2gls`, you can just
 use `bib2gls` to select the entries from the `.bib` file and use
 `xindy` as usual with a custom `xindy` module. Just remember to use
 `record=alsoindex` instead of just `record` and use `makeglossaries`

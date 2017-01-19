@@ -108,6 +108,16 @@ public class GlsResource
                sort = "locale";
             }
          }
+         else if (opt.equals("sort-field"))
+         {
+            sortField = list.get(opt).toString(parser).trim();
+
+            if (!sortField.equals("id") && !bib2gls.isKnownField(sortField))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, sortField));
+            }
+         }
          else if (opt.equals("strength"))
          { // collator strength
 
@@ -215,7 +225,7 @@ public class GlsResource
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false"));
+                  opt, val, "true, false, list"));
             }
          }
          else if (opt.equals("selection"))
