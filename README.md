@@ -5,9 +5,188 @@ Experimental, still in development. Following on
 from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).
 
-Requires at least v1.11 of
-[glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra), which is
-also still being developed.
+Requires at least v1.11 (2017-01-19) of
+[glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra).
+
+The basic idea is to have a `.bib` file containing all glossary
+definitions in the form:
+```bibtex
+@entry{sample,
+  name={sample},
+  description="An example entry"
+}
+
+@abbreviation{html,
+  short="html",
+  long={hypertext markup language}
+}
+
+@index{goose,plural="geese"}
+
+@symbol{pi,
+  name="{}\ensuremath{\pi}"
+}
+
+```
+It may then be possible to manage the entries in a reference
+management system such as JabRef.
+
+The document must load `glossaries-extra` with the `record` option
+and either `\glsxtrresourcefile[`_options_`]{`_base_`}` or
+`\GlsXtrLoadResources[`_options_`]` (which is a shortcut for
+`\glsxtrresourcefile[`_options_`]{\jobname}`). Only one
+`\GlsXtrLoadResources` is permitted but multiple
+`\glsxtrresourcefile` instances are allowed.
+
+If the `.bib` file is called `test-entries.bib`, then here's an
+example document:
+```latex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\glsxtrresourcefile{test-entries}
+
+\begin{document}
+\gls{sample} \gls{goose}.
+
+\printunsrtglossaries
+\end{document}
+```
+The document build process is (assuming the file is called
+`mydoc.tex`):
+```bash
+pdflatex mydoc
+bib2gls mydoc
+pdflatex mydoc
+```
+
+The call to `bib2gls` reads `mydoc.aux` to find out what `.bib` file to load
+and which entries have been used in the document, and then creates the file 
+`test-entries.glstex` which is loaded by `\glsxtrresourcefile` on
+the next `pdflatex` run. Only the entries that have been used in the
+document `sample` and `goose` are selected from the `.bib` file and
+written to the `.glstex` file. You can have different names for the
+`.glstex` file and the `.bib` file. The `.glstex` file name is
+obtained from the mandatory argument of `\glsxtrresourcefile`. The
+`.bib` file is taken from the value of the `src` option. If the
+option is missing, the same base name as the `.glstex` file is
+assumed. For example:
+```latex
+\glsxtrresourcefile[src=test-entries]{\jobname}
+```
+In this case, `bib2gls` parses the file `test-entries.bib` and creates a file 
+called `mydoc.glstex` (since `\jobname` is `mydoc` for the file `mydoc.tex`).
+There's a shortcut command that uses `\jobname` as the mandatory
+argument of `\glsxtrresourcefile`:
+```latex
+\GlsXtrLoadResources[src=test-entries]
+```
+A document may only have one instance of `\GlsXtrLoadResources` but
+any number of `\glsxtrresourcefile`. Just make sure that each
+`\glsxtrresourcefile` has a different mandatory argument.
+
+The entries are sorted before being written to the `.glstex` file,
+which means that they don't need to be sorted by `makeindex` or
+`xindy`. The default method of sorting is alphabetically according to the OS's
+locale. You can override this in the optional argument of
+`\glsxtrresourcefile` (or `\GlsXtrLoadResources`).
+
+For example:
+```latex
+\GlsXtrLoadResources[src=test-entries,sort=none]
+```
+This won't sort the entries whereas the following will sort
+according to use:
+```latex
+\GlsXtrLoadResources[src=test-entries,sort=use]
+```
+
+The value of `src` is a comma-separated list, so you can select over
+multiple `.bib` files. For example:
+```latex
+\GlsXtrLoadResources[src={entries-terms,entries-abbrv}]
+```
+
+You can assign the entries to a particular glossary type, using
+the `type` option. For example:
+```latex
+\documentclass{article}
+
+\usepackage[record,abbreviations,symbols]{glossaries-extra}
+
+\glsxtrresourcefile[type=main,src={entries-terms}]{terms}
+\glsxtrresourcefile[type=abbreviations,src={entries-abbrv}]{abbrvs}
+\glsxtrresourcefile[type=symbols,sort=use,src={entries-symbols}]{syms}
+
+\begin{document}
+\gls{sample} \gls{html} \gls{pi}.
+
+\printunsrtglossaries
+\end{document}
+```
+
+Note that you can't use `\glsadd` all with this method, as the
+entries must be defined in order to iterate over the glossary list.
+On the first instance of `pdflatex` the `.glstex` hasn't been
+created, so no entries have been defined, which means there's
+nothing to iterate over. Instead, if you want to select all entries
+in the `.bib` file, use `selection=all`. For example
+```latex
+\GlsXtrLoadResources[src={test-entries},selection=all]
+```
+(You can use `selection=all` with `sort=use`.)
+
+If you want to add any new glossary fields, make sure you put
+all instances of `\glsaddstoragekey` or `\glsaddkey` before you load
+the resource file, since `bib2gls` will pick up the allowed keys
+from the `.aux` file and will ignore any additional fields in the
+`.bib` file. For example, if the `.bib` file contains the entry:
+```bibtex
+@entry{sample,
+  name={sample},
+  description="An example entry",
+  note={sample note}
+}
+```
+Then the `note` field will be omitted from the `.glstex` file unless
+a new `note` key is defined before `\glsxtrresourcefile` (or
+`\GlsXtrLoadResources`).
+
+Any cross-references (through the `see` field or through
+commands like `\gls` within the entry's fields) will be picked up by
+`bib2gls` as it parses the `.bib` file and will be automatically
+added to the selection list unless overridden by the `selection`
+setting. Note that an extra document build will be required to
+ensure the cross-referenced entries have the correct location list.
+(This is necessary because the location list can't be determined
+until the entry has been referenced when it's displayed in the
+glossary and the glossary can't be displayed until the entries have
+been selected from the `.bib` file and the `.glstex` file has been loaded 
+by the document.)
+
+The following example assumes `terms-en.bib` contains English terms
+and `terms-de.bib` contains German terms:
+```latex
+\newglossary*{english}{English Terms}
+\newglossary*{german}{German Terms}
+
+\glsxtrresourcefile[sort=en,type=english]{terms-en}
+\glsxtrresourcefile[sort=de-1996,type=german]{terms-de}
+```
+This sorts the English terms according to the English alphabet and
+the German terms according to the new German orthography.
+
+If you're indexing rules are too complex for `bib2gls`, you can just
+use `bib2gls` to select the entries from the `.bib` file and use
+`xindy` as usual with a custom `xindy` module. Just remember to use
+`record=alsoindex` instead of just `record` and use `makeglossaries`
+and `\printglossary`/`\printglossaries` as usual. This has the
+advantage over just using `\loadglsentries` as only those entries
+that have actually been used in the document will be defined. If you
+have a file containing, say, 500 entries but you only actually use
+10 in the document, it's a waste of resources to define all 500 of
+them.
 
 # Compile Source Code
 
