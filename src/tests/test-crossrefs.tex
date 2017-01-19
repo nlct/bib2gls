@@ -5,21 +5,18 @@
 
 \newcommand{\bibglsprefix}[1]{\ifcase#1 \or Page: \else Pages\fi}
 
-\glsxtrresourcefile[% bib2gls options
+% loads \jobname.glstex
+\GlsXtrLoadResources[% bib2gls options
  sort=en-GB,% sort according to en-GB
  type=main,% put all entries into 'main' glossary
- % See http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html
- % for next two options
- strength=primary,% collation strength
-                  % ('primary' or 'secondary' or 'tertiary' or
-                  % 'identical')
- decomposition=none,% 'none' or 'canonical' or 'full'
  see=after,% where to put 'see' part in location list
             % ('omit' or 'before' or 'after')
- prefix,% prefix location list ('true' or 'false')
+ prefix=list,% prefix location list ('true' or 'false' or 'list')
  src={entries-terms,entries-abbrv}% bib files
-]{entries-terms}
+]
 
+% loads entries-symbols.glstex
+% finds entries in entries-symbols.bib
 \glsxtrresourcefile[% bib2gls options
  sort=none,% 'none' or 'use' or 'locale' or specific locale
  type=symbols]{entries-symbols}

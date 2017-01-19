@@ -506,6 +506,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@fields", 1);
             addAuxCommand("glsxtr@record", 5);
             addAuxCommand("glsxtr@texencoding", 1);
+            addAuxCommand("glsxtr@shortcutsval", 1);
          }
       };
 
@@ -526,6 +527,15 @@ public class Bib2Gls implements TeXApp
          if (name.equals("glsxtr@resource"))
          {
             glsresources.add(new GlsResource(parser, data));
+         }
+         else if (name.equals("glsxtr@shortcutsval"))
+         {
+            // command line option overrides aux setting
+
+            if (shortcuts == null)
+            {
+               setShortCuts(data.getArg(0).toString(parser));
+            }
          }
          else if (name.equals("glsxtr@texencoding"))
          {
@@ -1550,6 +1560,40 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   private void setShortCuts(String value)
+   {
+      if (value.equals("acro") || value.equals("acronyms"))
+      {
+         shortcuts=value;
+         checkAcroShortcuts = true;
+      }
+      else if (value.equals("abbr")
+            || value.equals("abbreviations"))
+      {
+         shortcuts=value;
+         checkAbbrvShortcuts = true;
+      }
+      else if (value.equals("all")
+            || value.equals("true"))
+      {
+         shortcuts=value;
+         checkAcroShortcuts = true;
+         checkAbbrvShortcuts = true;
+      }
+      else if (value.equals("none")
+            || value.equals("false"))
+      {
+         shortcuts=value;
+         checkAcroShortcuts = false;
+         checkAbbrvShortcuts = false;
+      }
+      else
+      {
+         throw new IllegalArgumentException(
+           "Invalid shortcut value: "+value);
+      }
+   }
+
    private void parseArgs(String[] args)
      throws IOException,Bib2GlsSyntaxException
    {
@@ -1668,32 +1712,15 @@ public class Bib2Gls implements TeXApp
                   getMessage("error.missing.value", args[i-1]));
             }
 
-            if (args[i].equals("acronyms") || args[i].equals("acro"))
+            try
             {
-               checkAcroShortcuts = true;
+               setShortCuts(args[i]);
             }
-            else if (args[i].equals("abbreviations")
-                  || args[i].equals("abbr"))
-            {
-               checkAbbrvShortcuts = true;
-            }
-            else if (args[i].equals("all")
-                  || args[i].equals("true"))
-            {
-               checkAcroShortcuts = true;
-               checkAbbrvShortcuts = true;
-            }
-            else if (args[i].equals("none")
-                  || args[i].equals("false"))
-            {
-               checkAcroShortcuts = false;
-               checkAbbrvShortcuts = false;
-            }
-            else
+            catch (IllegalArgumentException e)
             {
                throw new Bib2GlsSyntaxException(
                  getMessage("error.invalid.choice.value", 
-                 args[i-1], args[i]));
+                 args[i-1], args[i]), e);
             }
          }
          else if (args[i].equals("--nested-link-check"))
@@ -1973,6 +2000,8 @@ public class Bib2Gls implements TeXApp
    private boolean mfirstucProtect = true;
    private boolean mfirstucMProtect = true;
    private String[] mfirstucProtectFields = null;
+
+   private String shortcuts=null;
 
    private boolean checkAcroShortcuts = false;
    private boolean checkAbbrvShortcuts = false;

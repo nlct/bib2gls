@@ -1,0 +1,18 @@
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\newignoredglossary*{ignore}
+
+\glssetcategoryattribute{general}{targeturl}{test.pdf}
+\glssetcategoryattribute{general}{targetname}{\glolinkprefix\glslabel}
+
+\glsxtrresourcefile[sort=unsrt,% sort not required
+ type=ignore,
+ src={test-entries.bib}]{\jobname}
+
+\begin{document}
+\gls{sample}.
+
+\end{document}

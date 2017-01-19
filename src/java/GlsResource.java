@@ -201,11 +201,15 @@ public class GlsResource
 
             if (val.equals("") || val.isEmpty())
             {
-               showLocationPrefix = true;
+               locationPrefix = PREFIX_PAGE_CASE;
             }
             else if (val.equals("false"))
             {
-               showLocationPrefix = false;
+               loocationPrefix = PREFIX_NONE;
+            }
+            else if (val.equals("list"))
+            {
+               loocationPrefix = PREFIX_PAGE_LIST;
             }
             else
             {
@@ -596,13 +600,20 @@ public class GlsResource
             writer.println();
          }
 
-         if (showLocationPrefix)
+         switch (locationPrefix)
          {
-            writer.println("\\providecommand{\\bibglsprefix}[1]{%");
-            writer.format("  \\ifcase#1\\or %s: \\else %s: \\fi%n",
-              bib2gls.getMessage("tag.page"),
-              bib2gls.getMessage("tag.pages"));
-            writer.println("}");
+            case PREFIX_CASE:
+              writer.println("\\providecommand{\\bibglsprefix}[1]{%");
+              writer.format("  \\ifcase#1\\or %s: \\else %s: \\fi%n",
+                bib2gls.getMessage("tag.page"),
+                bib2gls.getMessage("tag.pages"));
+              writer.println("}");
+            break;
+            case PREFIX_LIST:
+              writer.println("\\providecommand{\\bibglsprefix}[1]{%");
+              writer.println("  \\ifcase#1\\else \\pagelistname: \\fi");
+              writer.println("}");
+            break;
          }
 
          // syntax: {label}{opts}{name}{description}
@@ -646,8 +657,11 @@ public class GlsResource
 
          for (Bib2GlsEntry entry : entries)
          {
+            bib2gls.verbose(entry.getId());
+
             entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF, seeLocation, showLocationPrefix);
+              suffixF, suffixFF, seeLocation, locationPrefix != PREFIX_NONE);
+
             entry.writeBibEntry(writer);
 
             writer.println();
@@ -692,7 +706,11 @@ public class GlsResource
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
-   private boolean showLocationPrefix = false;
+   private static final int PREFIX_NONE=0;
+   private static final int PREFIX_PAGE_CASE=1;
+   private static final int PREFIX_PAGE_LIST=2;
+
+   private int locationPrefix = PREFIX_NONE;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;
