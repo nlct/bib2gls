@@ -398,13 +398,11 @@ public class Bib2Gls implements TeXApp
       return basePath.resolve(path).normalize();
    }
 
-   public File resolveFile(String name)
+   public File resolveFile(File file)
    {
-      File file = new File(name);
-
       if (file.getParentFile() == null)
       {
-         file = new File(basePath.toFile(), name);
+         file = new File(basePath.toFile(), file.getName());
       }
       else
       {
@@ -412,6 +410,11 @@ public class Bib2Gls implements TeXApp
       }
 
       return file;
+   }
+
+   public File resolveFile(String name)
+   {
+      return resolveFile(new File(name));
    }
 
    private String texToJavaCharset(String texCharset)
@@ -1785,7 +1788,7 @@ public class Bib2Gls implements TeXApp
                  getMessage("error.missing.value", args[i-1]));
             }
 
-            if (args[i].equals("none"))
+            if (args[i].equals("none") || args[i].isEmpty())
             {
                nestedLinkCheckFields = null;
             }

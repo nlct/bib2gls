@@ -50,7 +50,7 @@ public class GlsResource
       TeXPath texPath = new TeXPath(parser, 
         arg.toString(parser), "glstex");
 
-      texFile = texPath.getFile();
+      texFile = bib2gls.resolveFile(texPath.getFile());
 
       bib2gls.registerTeXFile(texFile);
 
