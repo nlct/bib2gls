@@ -58,6 +58,7 @@ public class Bib2Gls implements TeXApp
       }
 
       formatMap = new HashMap<String,String>();
+      texFiles = new Vector<File>();
    }
 
    private void initSecuritySettings()
@@ -286,6 +287,20 @@ public class Bib2Gls implements TeXApp
            openout_any, file));
       }
    }
+
+   public void registerTeXFile(File file) throws IOException
+   {
+      checkWriteAccess(file);
+
+      if (texFiles.contains(file))
+      {
+         throw new IOException(getMessage("error.duplicate.resource",
+           file));
+      }
+
+      texFiles.add(file);
+   }
+
 
    public boolean isWriteAccessAllowed(TeXPath path)
    {
@@ -1315,6 +1330,9 @@ public class Bib2Gls implements TeXApp
 
    public void warning(String message)
    {
+      message = getMessageWithFallback("warning.title",
+         "Warning: {0}", message);
+
       if (verboseLevel >= 0)
       {
          System.err.println(message);
@@ -1350,7 +1368,7 @@ public class Bib2Gls implements TeXApp
    {
       if (e instanceof TeXSyntaxException)
       {
-         System.err.println(((TeXSyntaxException)e).getMessage(this));
+         error(((TeXSyntaxException)e).getMessage(this));
       }
       else
       {
@@ -1361,8 +1379,7 @@ public class Bib2Gls implements TeXApp
             msg = e.getClass().getSimpleName();
          }
 
-         System.err.println(msg);
-         logMessage(msg);
+         error(msg);
       }
 
       if (debugLevel > 0)
@@ -1380,6 +1397,8 @@ public class Bib2Gls implements TeXApp
 
    public void error(String msg)
    {
+      msg = getMessageWithFallback("error.title", "Error: {0}", msg);
+
       System.err.println(msg);
       logMessage(msg);
    }
@@ -2028,6 +2047,8 @@ public class Bib2Gls implements TeXApp
    private Vector<String> dependencies;
 
    private HashMap<String,String> formatMap;
+
+   private Vector<File> texFiles;
 
    private boolean addGroupField = false;
 

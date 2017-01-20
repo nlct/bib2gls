@@ -114,6 +114,7 @@ See the manual for further details.</entry>
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
 
+<entry key="warning.title">Warning: {0}</entry>
 <entry key="warning.substituting">Substituting {0} with {1}</entry>
 <entry key="warning.removing">Removing {0}</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
@@ -135,6 +136,7 @@ Discarding: {2}
 Keeping: {3}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
 
+<entry key="error.title">Error: {0}</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
 <entry key="error.missing.records">No records found in aux file.
@@ -157,6 +159,7 @@ Ignoring {1}
 <entry key="error.openout.forbidden">Write access forbidden by openout_any={0} for file: {1}</entry>
 <entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>
 <entry key="error.cyclic.hierarchy">Cyclical hierarchy for entry: {0}</entry>
+<entry key="error.duplicate.resource">Duplicate resource: {0}</entry>
 
 <!--
      The following messages are used by various parts of
@@ -164,7 +167,6 @@ Ignoring {1}
      bib2gls which is just using that library to parse the aux and bib files.
  -->
 
-<entry key="error.title">Error</entry>
 <entry key="error.line">Line {0}: {1}.</entry>
 <entry key="error.line_with_code">Line {0}: {1} (error code {2}).</entry>
 <entry key="error.unknown">Unknown error</entry>

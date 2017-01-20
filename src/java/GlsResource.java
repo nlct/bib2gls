@@ -52,7 +52,7 @@ public class GlsResource
 
       texFile = texPath.getFile();
 
-      bib2gls.checkWriteAccess(texFile);
+      bib2gls.registerTeXFile(texFile);
 
       String filename = texPath.getTeXPath(true);
 
