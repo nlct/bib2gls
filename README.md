@@ -7,7 +7,7 @@ StackExchange](http://tex.stackexchange.com/a/343852/19862).
 
 Requires at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
-which is pending release.
+which is pending release, and at least Java 7.
 
 The basic idea is to have a `.bib` file containing all glossary
 definitions in the form:
@@ -156,7 +156,20 @@ a new `note` key is defined before `\glsxtrresourcefile` (or
 
 You can, of course, define the keys afterwards if you don't want
 those fields selected, but that rather defeats the purpose of
-defining the keys.
+defining the keys. You can tell `bib2gls` to ignore particular fields 
+that are present in the `.bib` file using the `ignore-fields` option.
+For example, suppose my `.bib` file contains:
+```bibtex
+@abbreviation{html,
+  short = {html},
+  long  = {hypertext markup language},
+  description={a markup language for creating web pages}
+}
+```
+This is appropriate for abbreviation styles such as `long-short-desc`, but 
+the `description` field interferes with styles like `long-short`. If
+I want to use `long-short`, then I can just use
+`ignore-fields={description}` to skip the `description` field.
 
 Any cross-references (through the `see` field or through
 commands like `\gls` within the entry's fields) will be picked up by
@@ -211,6 +224,31 @@ that have actually been used in the document will be defined. If you
 have a file containing, say, 500 entries but you only actually use
 10 in the document, it's a waste of resources to define all 500 of
 them.
+
+# Installation
+
+The files should be installed as follows:
+
+TEXMF/scripts/bib2gls/bib2gls.sh (Unix-like systems only)
+TEXMF/scripts/bib2gls/bib2gls.jar
+TEXMF/scripts/bib2gls/texparserlib.jar
+TEXMF/scripts/bib2gls/resources/bib2gls-en.xml
+TEXMF/doc/support/bib2gls/README.md
+TEXMF/doc/support/bib2gls/bib2gls.pdf
+TEXMF/doc/support/bib2gls/bib2gls.tex
+
+Unix-like systems add a symbolic link called `bib2gls` somewhere on
+your path that links to the bib2gls.sh bash script.
+
+Windows users may find that their TeX distribution has converted the
+`.jar` file to an executable `bib2gls.exe`. If not, you can create a
+batch script analogous to `bib2gls.sh` called `bib2gls.bat` that
+contains the following:
+```com
+@ECHO OFF
+FOR /F %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts bib2gls.jar') DO SET JARPATH=%%I
+java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
+```
 
 # Compile Source Code
 
