@@ -6,7 +6,7 @@ lib/bib2gls.jar	: java/Manifest.txt classes/com/dickimawbooks/bib2gls/Bib2Gls.cl
 classes/com/dickimawbooks/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bib2gls \
 	java/*.java lib/texparserlib.jar
 	cd java; \
-	javac -d ../classes \
+	javac -target 1.7 -source 1.7 -d ../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../lib/texparserlib.jar *.java
 
