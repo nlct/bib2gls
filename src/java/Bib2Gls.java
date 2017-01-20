@@ -1492,7 +1492,7 @@ public class Bib2Gls implements TeXApp
 
       System.out.println();
       System.out.println(getMessage("syntax.check.shortcuts",
-         "--check-shortcuts"));
+         "--shortcuts"));
 
       System.out.println();
       System.out.println(getMessage("syntax.check.nested",
@@ -1757,7 +1757,7 @@ public class Bib2Gls implements TeXApp
          {
             mfirstucMProtect = true;
          }
-         else if (args[i].equals("--check-shortcuts"))
+         else if (args[i].equals("--shortcuts"))
          {
             i++;
 
