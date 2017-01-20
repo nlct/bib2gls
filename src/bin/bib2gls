@@ -1,4 +1,7 @@
 #!/bin/sh
 
+# This bash script is just for testing the development ../lib/bib2gls.jar
+# file. The file bib2gls.sh will be the script that's distributed.
+
 bindir=`dirname "$0"`
-java -jar "$bindir/../lib/bib2gls.jar" "$@"
+java -Djava.locale.providers=CLDR,JRE -jar "$bindir/../lib/bib2gls.jar" "$@"
