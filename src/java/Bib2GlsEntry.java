@@ -532,7 +532,9 @@ public class Bib2GlsEntry extends BibEntry
 
    public String getDefaultSort()
    {
-      return fieldValues.get("name");
+      String val = fieldValues.get("name");
+
+      return val == null ? fieldValues.get("parent") : val;
    }
 
    public String getFallbackField(String field)
@@ -540,6 +542,10 @@ public class Bib2GlsEntry extends BibEntry
       if (field.equals("text"))
       {
          return fieldValues.get("name");
+      }
+      else if (field.equals("name"))
+      {
+         return fieldValues.get("parent");
       }
       else if (field.equals("sort"))
       {
@@ -563,7 +569,7 @@ public class Bib2GlsEntry extends BibEntry
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("name") == null)
+      if (getField("name") == null && getField("parent") == null)
       {
          missingFieldWarning(parser, "name");
       }
