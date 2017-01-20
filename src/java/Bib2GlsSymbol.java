@@ -27,9 +27,9 @@ import com.dickimawbooks.texparserlib.bib.*;
 
 public class Bib2GlsSymbol extends Bib2GlsEntry
 {
-   public Bib2GlsSymbol(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsSymbol(String prefix, Bib2Gls bib2gls, String entryType)
    {
-      super(bib2gls, entryType);
+      super(prefix, bib2gls, entryType);
    }
 
    public void checkRequiredFields(TeXParser parser)
@@ -42,7 +42,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
 
    public String getDefaultSort()
    {
-      return getId();
+      return getOriginalId();
    }
 
    public void writeBibEntry(PrintWriter writer)

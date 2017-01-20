@@ -25,6 +25,12 @@ import com.dickimawbooks.texparserlib.bib.*;
 
 public class Bib2GlsAt extends At
 {
+   public Bib2GlsAt(String prefix)
+   {
+      super();
+      this.prefix = prefix;
+   }
+
    protected void process(TeXParser parser, TeXObjectList entryTypeList,
      TeXObject contents, TeXObject eg)
      throws IOException
@@ -46,21 +52,21 @@ public class Bib2GlsAt extends At
 
       if (entryType.equals("entry"))
       {
-         data = new Bib2GlsEntry(bib2gls);
+         data = new Bib2GlsEntry(prefix, bib2gls);
       }
       else if (entryType.equals("index"))
       {
-         data = new Bib2GlsIndex(bib2gls);
+         data = new Bib2GlsIndex(prefix, bib2gls);
       }
       else if (entryType.equals("acronym")
             || entryType.equals("abbreviation"))
       {
-         data = new Bib2GlsAbbrev(bib2gls, entryType);
+         data = new Bib2GlsAbbrev(prefix, bib2gls, entryType);
       }
       else if (entryType.equals("symbol")
             || entryType.equals("number"))
       {
-         data = new Bib2GlsSymbol(bib2gls, entryType);
+         data = new Bib2GlsSymbol(prefix, bib2gls, entryType);
       }
       else
       {
@@ -79,4 +85,5 @@ public class Bib2GlsAt extends At
       bibParser.addBibData(data);
    }
 
+   private String prefix = null;
 }

@@ -93,6 +93,15 @@ public class GlsResource
          {
             category = list.getValue(opt).toString(parser).trim();
          }
+         else if (opt.equals("label-prefix"))
+         {
+            labelPrefix = list.getValue(opt).toString(parser).trim();
+
+            if (labelPrefix.isEmpty())
+            {
+               labelPrefix = null;
+            }
+         }
          else if (opt.equals("sort"))
          {
             sort = list.getValue(opt).toString(parser).trim();
@@ -414,7 +423,7 @@ public class GlsResource
          {
             protected void addPredefined()
             {
-               parser.putActiveChar(new Bib2GlsAt());
+               parser.putActiveChar(new Bib2GlsAt(labelPrefix));
             }
 
          };
@@ -441,22 +450,26 @@ public class GlsResource
 
                // does this entry have any records?
 
+               boolean hasRecords = false;
+
                for (GlsRecord record : records)
                {
                   if (record.getLabel().equals(entry.getId()))
                   {
                      entry.addRecord(record);
+
+                     hasRecords = true;
                   }
                }
 
-               // does this entry have a "see" field?
-
-               entry.initCrossRefs(parser);
-
                bibData.add(entry);
 
-               if (selectionMode == SELECTION_RECORDED_AND_DEPS)
+               if (hasRecords && selectionMode == SELECTION_RECORDED_AND_DEPS)
                {
+                  // does this entry have a "see" field?
+
+                  entry.initCrossRefs(parser);
+
                   for (Iterator<String> it = entry.getDependencyIterator();
                        it.hasNext(); )
                   {
@@ -799,6 +812,8 @@ public class GlsResource
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
    private String[] locationPrefix = null;
+
+   private String labelPrefix = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

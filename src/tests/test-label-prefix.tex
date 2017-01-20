@@ -1,0 +1,13 @@
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ label-prefix={gls.},
+ src={test-entries}]
+
+\begin{document}
+\gls{gls.waterfowl}.
+
+\printunsrtglossaries
+\end{document}

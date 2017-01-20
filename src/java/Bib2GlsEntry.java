@@ -31,20 +31,45 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class Bib2GlsEntry extends BibEntry
 {
-   public Bib2GlsEntry(Bib2Gls bib2gls)
+   public Bib2GlsEntry(String prefix, Bib2Gls bib2gls)
    {
-      this(bib2gls, "entry");
+      this(prefix, bib2gls, "entry");
    }
 
-   public Bib2GlsEntry(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsEntry(String prefix, Bib2Gls bib2gls, String entryType)
    {
       super(entryType.toLowerCase());
       this.bib2gls = bib2gls;
+
+      if (prefix != null && prefix.isEmpty())
+      {
+         labelPrefix = null;
+      }
+      else
+      {
+         labelPrefix = prefix;
+      }
 
       fieldValues = new HashMap<String,String>();
       deps = new Vector<String>();
       records = new Vector<GlsRecord>();
    }
+
+   public String getPrefix()
+   {
+      return labelPrefix;
+   }
+
+   public String getId()
+   {
+      return labelPrefix == null ? super.getId() : labelPrefix+super.getId();
+   }
+
+   public String getOriginalId()
+   {
+      return super.getId();
+   }
+
 
    // does the control sequence given by csname have [options]{label}
    // syntax (with a * or + prefix)?
@@ -198,7 +223,16 @@ public class Bib2GlsEntry extends BibEntry
                      arg = ((Group)arg).toList();
                   }
 
-                  addDependency(arg.toString(parser));
+                  String label = arg.toString(parser);
+
+                  if (labelPrefix != null)
+                  {
+                     label = labelPrefix+label;
+
+                     list.set(i, parser.getListener().createGroup(label));
+                  }
+
+                  addDependency(label);
 
                   // get next argument
 
@@ -209,11 +243,39 @@ public class Bib2GlsEntry extends BibEntry
                      arg = list.get(++i);
                   }
 
+                  Group grp = null;
+
+                  if (labelPrefix != null)
+                  {
+                     grp = parser.getListener().createGroup();
+                  }
+
                   CsvList csvlist = CsvList.getList(parser, arg);
 
-                  for (TeXObject obj : csvlist)
+                  for (int j = 0, m = csvlist.size()-1; j <= m; j++)
                   {
-                     addDependency(obj.toString(parser));
+                     TeXObject obj = csvlist.get(j);
+
+                     label = obj.toString(parser);
+
+                     if (labelPrefix != null)
+                     {
+                        label = labelPrefix+label;
+
+                        grp.add(parser.getListener().createString(label));
+
+                        if (j < m)
+                        {
+                           grp.add(parser.getListener().getOther(','));
+                        }
+                     }
+
+                     addDependency(label);
+                  }
+
+                  if (labelPrefix != null)
+                  {
+                     list.set(i, grp);
                   }
                }
                else if (csname.equals("glsxtrp"))
@@ -241,7 +303,15 @@ public class Bib2GlsEntry extends BibEntry
                      arg = ((Group)arg).toList();
                   }
 
-                  addDependency(arg.toString(parser));
+                  String label = arg.toString(parser);
+
+                  if (labelPrefix != null)
+                  {
+                     label = labelPrefix+label;
+                     list.set(i, parser.getListener().createGroup(label));
+                  }
+
+                  addDependency(label);
                }
                else if (isGlsCsOptLabel(csname))
                {
@@ -254,7 +324,7 @@ public class Bib2GlsEntry extends BibEntry
                      arg = list.get(++i);
                   }
 
-                  String prefix = "";
+                  String pre = "";
                   String opt = "";
 
                   if (arg instanceof CharObject)
@@ -263,7 +333,7 @@ public class Bib2GlsEntry extends BibEntry
 
                      if (code == '*' || code == '+')
                      {
-                        prefix = arg.toString(parser);
+                        pre = arg.toString(parser);
 
                         arg = list.get(++i);
 
@@ -306,6 +376,8 @@ public class Bib2GlsEntry extends BibEntry
 
                   String label;
 
+                  int start = i;
+
                   if (arg instanceof BgChar)
                   {
                      label = "";
@@ -324,6 +396,18 @@ public class Bib2GlsEntry extends BibEntry
                      label = arg.toString(parser);
                   }
 
+                  if (labelPrefix != null)
+                  {
+                     label = labelPrefix+label;
+
+                     for ( ; i > start; i--)
+                     {
+                        list.remove(i);
+                     }
+
+                     list.set(i, parser.getListener().createGroup(label));
+                  }
+
                   addDependency(label);
 
                   if (bib2gls.checkNestedLinkTextField(fieldName)
@@ -332,7 +416,7 @@ public class Bib2GlsEntry extends BibEntry
                      bib2gls.warning(parser, 
                        bib2gls.getMessage("warning.potential.nested.link",
                        getId(), fieldName,
-                       String.format("\\%s%s%s", csname, prefix, opt),
+                       String.format("\\%s%s%s", csname, pre, opt),
                        label));
                   }
 
@@ -569,16 +653,6 @@ public class Bib2GlsEntry extends BibEntry
       return deps.iterator();
    }
 
-   public static boolean inList(String label, Vector<Bib2GlsEntry> list)
-   {
-      for (Bib2GlsEntry entry : list)
-      {
-         if (entry.getId().equals(label)) return true;
-      }
-
-      return false;
-   }
-
    public boolean equals(Object other)
    {
       if (other == null || !(other instanceof Bib2GlsEntry)) return false;
@@ -636,7 +710,14 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (i > 0) listBuilder.append(",");
 
-            listBuilder.append(crossRefs[i]);
+            if (labelPrefix == null)
+            {
+               listBuilder.append(crossRefs[i]);
+            }
+            else
+            {
+               listBuilder.append(labelPrefix+crossRefs[i]);
+            }
          }
 
          listBuilder.append("}{}");
@@ -777,7 +858,14 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (i > 0) listBuilder.append(",");
 
-            listBuilder.append(crossRefs[i]);
+            if (labelPrefix == null)
+            {
+               listBuilder.append(crossRefs[i]);
+            }
+            else
+            {
+               listBuilder.append(labelPrefix+crossRefs[i]);
+            }
          }
 
          listBuilder.append("}{}");
@@ -810,6 +898,13 @@ public class Bib2GlsEntry extends BibEntry
 
       TeXObjectList valList = value.expand(parser);
 
+      StringBuilder builder = null;
+
+      if (labelPrefix != null)
+      {
+         builder = new StringBuilder();
+      }
+
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
@@ -820,6 +915,13 @@ public class Bib2GlsEntry extends BibEntry
       if (opt != null)
       {
          crossRefTag = opt.toString(parser);
+
+         if (labelPrefix != null)
+         {
+            builder.append('[');
+            builder.append(crossRefTag);
+            builder.append(']');
+         }
       }
 
       CsvList csvList = CsvList.getList(parser, valList);
@@ -834,7 +936,26 @@ public class Bib2GlsEntry extends BibEntry
       {
          crossRefs[i] = csvList.get(i).toString(parser);
 
-         addDependency(crossRefs[i]);
+         if (labelPrefix == null)
+         {
+            addDependency(crossRefs[i]);
+         }
+         else
+         {
+            String label = labelPrefix+crossRefs[i];
+            addDependency(label);
+            builder.append(label);
+
+            if (i != n-1)
+            {
+               builder.append(',');
+            }
+         }
+      }
+
+      if (builder != null)
+      {
+         fieldValues.put("see", builder.toString());
       }
    }
 
@@ -910,4 +1031,6 @@ public class Bib2GlsEntry extends BibEntry
    protected Bib2Gls bib2gls;
 
    private CollationKey collationKey;
+
+   private String labelPrefix = null;
 }
