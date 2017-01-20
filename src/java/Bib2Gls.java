@@ -38,12 +38,13 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class Bib2Gls implements TeXApp
 {
-   public Bib2Gls(int debug)
+   public Bib2Gls(int debug, int verbose)
      throws IOException,InterruptedException,Bib2GlsException
    {
       debugLevel = debug;
+      verboseLevel = verbose;
 
-      if (debug > 0)
+      if (debug > 0 && verbose > -1)
       {
          version();
       }
@@ -1952,6 +1953,7 @@ public class Bib2Gls implements TeXApp
    {
       Bib2Gls bib2gls = null;
       int debug = 0;
+      int verbose = 0;
 
       // Quickly check for debug mode for debugging messages needed
       // before parseArgs().
@@ -1987,11 +1989,16 @@ public class Bib2Gls implements TeXApp
          {
             break;
          }
+         else if (args[i].equals("--silent"))
+         {
+            verbose = -1;
+            break;
+         }
       }
 
       try
       {
-         bib2gls = new Bib2Gls(debug);
+         bib2gls = new Bib2Gls(debug, verbose);
 
          bib2gls.process(args);
 
