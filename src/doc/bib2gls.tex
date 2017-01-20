@@ -19,6 +19,18 @@
 
 \newcommand{\qt}[1]{``#1''}
 
+\newcommand{\dequals}{%
+ \texorpdfstring
+ {\discretionary{}{}{}\texttt{=}\discretionary{}{}{}}%
+ {=}%
+}
+
+\newcommand{\dcomma}{%
+ \texorpdfstring
+ {\discretionary{}{}{}\texttt{,}\discretionary{}{}{}}%
+ {,}%
+}
+
 \newcommand*{\filefmt}[1]{\texorpdfstring{\nolinkurl{#1}}{#1}}
 \newcommand*{\metafilefmt}[3]{%
   \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
@@ -30,11 +42,12 @@
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
+\newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 
 \newcommand*{\argor}{\texorpdfstring{\protect\textbar}{\string\|}}
 
 \newcommand*{\meta}[1]{%
- \texorpdfstring{$\langle$\normalfont{\emph{#1}}$\rangle$}{#1}%
+ \texorpdfstring{$\langle${\normalfont\emph{#1}}$\rangle$}{#1}%
 }
 
 \newcommand*{\oarg}[1]{[#1]}
@@ -42,7 +55,7 @@
 
 \newcommand*{\marg}[1]{\texorpdfstring
  {\char`\{#1\char`\}}
- {\string\{#1\string\}}}
+ {\{#1\}}}
 
 \newcommand*{\margm}[1]{\marg{\meta{#1}}}
 
@@ -70,6 +83,12 @@
   {#1}%
 }
 
+\newcommand*{\abbrstyle}[1]{%
+  \texorpdfstring
+  {\abbrstylefmt{#1}\index{abbreviation style!#1@\abbrstylefmt{#1}}}%
+  {#1}%
+}
+
 \newcommand*{\cs}[1]{% 
  \texorpdfstring
  {\csfmt{#1}\index{#1@\csfmt{#1}}}
@@ -79,17 +98,19 @@
 \newcommand*{\styopt}[2][]{%
   \texorpdfstring%
   {%
-    \optfmt{#2\ifblank{#1}{}{=#1}}%
+    \optfmt{#2\ifblank{#1}{}{\dequals#1}}%
     \index{package options@\optfmt{#2}}%
     \index{#2@\optfmt{#2}}%
   }%
   {#2\ifblank{#1}{}{=#1}}%
 }
 
-\newcommand*{\csopt}[3][]{%
+\newcommand*{\csopt}[2][]{\gencsopt[#1]{glsxtrresourcefile}{#2}}%
+
+\newcommand*{\gencsopt}[3][]{%
   \texorpdfstring%
   {%
-    \optfmt{#3\ifblank{#1}}{{=#1}}%
+    \optfmt{#3\ifblank{#1}{}{\dequals#1}}%
     \index{#2@\csfmt{#2}!#3@\optfmt{#3}}%
   }%
   {#3\ifblank{#1}{}{=#1}}%
@@ -111,6 +132,15 @@
    \index{#1 entry type@\entryfmt{#1} entry type}%
  }%
  {#1}%
+}
+
+\newcommand*{\atentry}[1]{%
+ \texorpdfstring
+ {\entryfmt{@#1}%
+   \index{entry types!#1@\entryfmt{#1}}%
+   \index{#1 entry type@\entryfmt{#1} entry type}%
+ }%
+ {@#1}%
 }
 
 \newrobustcmd{\longswitch}{\string-{}\string-}
@@ -137,6 +167,9 @@
   {\string-#1}%
 }
 
+\newenvironment{definition}%
+ {\begin{flushleft}\ttfamily\ignorespaces}%
+ {\end{flushleft}}
 
 \title{\appfmt{bib2gls}: a command line application to convert
 \filefmt{.bib} files to a \filefmt{glossaries-extra.sty} resource file}
@@ -164,7 +197,18 @@
 \newcommand*{\labelopt}[1]{%
  {\def\@currentlabelname{\protect\optfmt{#1}}\label{opt.#1}}%
 }
-\newcommand*{\optref}[2][]{\nameref{opt.#2}\ifblank{#1}{}{\optfmt{=#1}}}
+\newcommand*{\optref}[2][]{\nameref{opt.#2}\ifblank{#1}{}{\optfmt{\dequals#1}}}
+
+\newcommand*{\labelatentry}[1]{%
+ {\def\@currentlabelname{\protect\atentry{#1}}\label{at.#1}}%
+}
+\newcommand*{\atentryref}[1]{\nameref{at.#1}}
+
+\newcommand*{\labelcs}[1]{%
+ {\def\@currentlabelname{\protect\cs{#1}}\label{cs.#1}}%
+}
+\newcommand*{\csref}[1]{\nameref{cs.#1}}
+
 \makeatother
 
 \begin{document}
@@ -266,7 +310,7 @@ textual labels (\qt{Page} and \qt{Pages} in English) will be taken
 from the resource file. In the event that the loaded resource file
 doesn't match the document language, you will have to manually set
 the correct translation (in English, this would be
-\optfmt{loc-prefix=\marg{Page,Pages}}).
+\optfmt{loc-prefix\dequals\marg{Page,Pages}}).
 
 Currently only \file{bib2gls-en.xml} exists as my language skills aren't up
 to translating it. Any volunteers who want to provide other language
@@ -592,7 +636,428 @@ The default is \argref{no-group}.
 
 Don't use the \field{group} field. (Default.)
 
-\resetsecnumdepth
 \chapter{\ext{bib} Format}
+\label{sec:bib}
+
+\bibgls\ recognises certain entry types. Any unrecognised types will
+be ignored and a warning will be written to the transcript file.
+
+The standard \atentry{string}\labelatentry{string} and 
+\atentry{preamble}\labelatentry{preamble} types are recognised, so you
+can do, for example:
+\begin{verbatim}
+@string{ssi={server-side includes}}
+@string{html={hypertext markup language}}
+
+@abbreviation{shtml,
+  short="shtml",
+  long= ssi # " enabled " # html,
+  see={ssi,html}
+}
+
+@abbreviation{html,
+  short ="html",
+  long  = html
+}
+
+@abbreviation{ssi,
+  short="ssi",
+  long = ssi
+}
+
+@preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
+
+@entry{matrix,
+  name={matrix},
+  plural={matrices},
+  description={rectangular array of values, denoted $\mtx{M}$}
+}
+\end{verbatim}
+
+The other entry types recognised by \bibgls\ are listed below.
+Each type may have required fields and optional fields. For the
+optional fields, any key recognised by \cs{newglossaryentry} may be
+used as a field. However, note that if you add
+any custom keys using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
+commands must be placed before the first use of
+\cs{glsxtrresourcefile} (or \cs{GlsXtrLoadResources}).
+Any unrecognised fields will be ignored.
+
+This is more convenient than using \cs{loadglsentries}, which
+requires all the keys used in the file to be defined, regardless of
+whether or not you actually need them in the document.
+
+If the \field{sort} field is missing, \bibgls\ will fallback on
+another value, depending on the entry type. You can override the
+field used for sorting with the \optref{sort-field} option.
+
+Other entries can be cross-referenced using the \field{see} field or
+by using commands like \cs{gls} or \cs{glsxtrp} in any of the
+recognised fields.
+
+\section{\atentry{entry}}
+\labelatentry{entry}
+
+Regular terms are defined by the \atentry{entry} field (such as in
+the \texttt{matrix} example above). This requires the
+\field{description} field and either \field{name} or \field{parent}.
+
+For example:
+\begin{verbatim}
+@preamble{"\providecommand{\seealsoname}{see also}
+\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
+
+@entry{matrix,
+  name={matrix},
+  plural={matrices},
+  description={rectangular array of values, denoted \gls{M}},
+  see={[\seealsoname]{vector}}
+}
+
+@entry{M,
+  sort={M},
+  name={\ensuremath{M}},
+  description={a \gls{matrix}}
+}
+
+@entry{vector,
+  name = "vector",
+  description = {column or row of values, denoted \gls{v}},
+  see={[\seealsoname]{matrix}}
+}
+
+@entry{v,
+  sort={v},
+  name={\ensuremath{\vec{v}}},
+  description={a \gls{vector}}
+}
+\end{verbatim}
+
+If the \field{sort} field is omitted, \bibgls\ will sort according
+to the \field{name} field (or the \field{parent} field if
+\field{name} is missing).
+
+Terms defined using \atentry{entry} will be written to the output
+file using the command \csref{bibglsnewentry}.
+
+\section{\atentry{symbol}}
+\labelatentry{symbol}
+
+The \entry{symbol} entry type is much like \entry{entry}, but it's
+designed specifically for symbols, so in the previous example, the
+\texttt{M} and \texttt{v} terms would be better defined using the
+\atentry{symbol} entry type instead.
+
+Again the required fields are again \field{description} and either
+\field{name} or \field{parent}, but in this case if the \field{sort} field
+is omitted, the entry's label is used instead. For example:
+\begin{verbatim}
+@symbol{M,
+  name={\ensuremath{M}},
+  description={a \gls{matrix}}
+}
+
+@symbol{v,
+  name={\ensuremath{\vec{v}}},
+  description={a \gls{vector}}
+}
+\end{verbatim}
+
+Terms defined using \atentry{symbol} will be written to the output
+file using the command \csref{bibglsnewsymbol}.
+
+\section{\atentry{number}}
+\labelatentry{number}
+
+The \entry{number} entry type is like \entry{symbol}, but it's for numbers.
+Terms defined using \atentry{number} will be written to the output
+file using the command \csref{bibglsnewnumber}.
+
+\section{\atentry{term}}
+\labelatentry{term}
+
+The \entry{term} entry type is designed for entries that don't have
+a description. Only the label is required. If \field{name} is
+omitted, it's assumed to be the same as the label. However, this
+means that if the name contains any characters that can't be used in
+the label, you will need the \field{name} field. If the \field{sort}
+field is omitted, \bibgls\ will use the \field{name} field instead,
+if present, otherwise it will use the label.
+
+Example:
+\begin{verbatim}
+@term{duck}
+
+@term{goose,plural={geese}}
+
+@term{facade,name={fa\c{c}ade}}
+\end{verbatim}
+
+Terms defined using \atentry{term} will be written to the output
+file using the command \csref{bibglsnewterm}.
+
+\section{\atentry{abbreviation}}
+\labelatentry{abbreviation}
+
+The \entry{abbreviation} entry type is designed for abbreviations.
+The required fields are \field{short} and \field{long}. If the
+\field{sort} key is missing, \bibgls\ will use the value of the
+\field{short} field.
+
+Note that you must set the abbreviation style before loading the
+resource file to ensure that the abbreviations are defined
+correctly, however \bibgls\ has no knowledge of the abbreviation
+style so it doesn't know if the \field{description} field must be
+included or if the default \field{sort} value isn't simply the value
+of the \field{short} field.
+
+You can instruct \bibgls\ to use a specific field for the sort value
+using \optref{sort-field} and you can also tell \bibgls\ to ignore
+certain fields using the \optref{ignore-fields}, so you can
+include a \field{description} field if sometimes you need it and
+instruct \bibgls\ to ignore it when you don't want it.
+
+For example:
+\begin{verbatim}
+@abbreviation{html,
+  short ="html",
+  long  = {hypertext markup language},
+  description={a markup language for creating web pages}
+}
+\end{verbatim}
+If you want the \abbrstyle{long-noshort-desc} style, then you can put
+the following in your document (where the \ext{bib} file is called
+\filefmt{entries-abbrv.bib}):
+\begin{verbatim}
+\setabbreviationstyle{long-noshort-desc}
+\GlsXtrLoadResources[src={entries-abbrv.bib},sort-field={long}]
+\end{verbatim}
+Whereas, if you want the \abbrstyle{long-short} style, then you can
+instead do:
+\begin{verbatim}
+\setabbreviationstyle{long-short}
+\GlsXtrLoadResources[src={entries-abbrv.bib},ignore-fields={description}]
+\end{verbatim}
+
+Terms defined using \atentry{abbreviation} will be written to the output
+file using the command \csref{bibglsnewabbreviation}.
+
+\section{\atentry{acronym}}
+\labelatentry{acronym}
+
+The \entry{acronym} entry type is like \entry{abbreviation} except that
+the term is written to the output file using the command
+\csref{bibglsnewacronym}.
+
+\chapter{Resource File Options}
+\label{sec:resourceopts}
+
+Make sure that you load \sty{glossaries-extra} with the
+\styopt{record} package option. This ensures that \bibgls\ can pick
+up the required information from the \ext{aux} file. (You may omit
+this option if you use \optref[all]{selection} and you don't require
+the location lists.)
+
+The \ext{glstex} resource files created by \bibgls\ are loaded in
+the document using
+\begin{definition}
+\cs{glsxtrresourcefile}\oargm{options}\margm{filename}
+\end{definition}
+where \meta{filename} is the name of the resource file without the
+\ext{glstex} extension. There's a shortcut command that uses
+\cs{jobname} as the \meta{filename}:
+\begin{definition}
+\cs{GlsXtrLoadResources}\oargm{options}
+\end{definition}
+This is equivalent to
+\begin{definition}
+\cs{glsxtrresourcefile}\oargm{options}\marg{\cs{jobname}}
+\end{definition}
+
+You can have multiple \cs{glsxtrresourcefile} commands within your
+document, but each \meta{filename} must be unique. For this reason, 
+\cs{GlsXtrLoadResources} can only be used once, otherwise \LaTeX\
+would attempt to load \cs{jobname}\ext{glstex} multiple times.
+\bibgls\ checks for non-unique file names.
+
+The optional argument \meta{options} is a comma-separated 
+\meta{key}=\meta{value} list. Allowed options are listed below.
+The option list applies only to that specific
+\meta{filename}\ext{glstex} and are not carried over to the next
+instance of \cs{glsxtrresourcefile}.
+
+If you have multiple \ext{bib} files you can either select them all
+using \optref{src} in a single \cs{glsxtrresourcefile} call, if they
+all require the same settings, or you can load them separately with
+different settings applied.
+
+For example, if the files \filefmt{entries-terms.bib} and
+\filefmt{entries-symbols.bib} have the same settings:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries-terms,entries-symbols}]
+\end{verbatim}
+Alternatively, if they have different settings:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries-terms}]
+\glsxtrresourcefile[sort=use]{entries-symbols}
+\end{verbatim}
+
+\section{\csopt{src}=\margm{list}}
+\labelopt{src}
+
+If the \csopt{src} option is omitted, the \ext{bib} file is assumed
+to be \meta{filename}\ext{bib}. For example:
+\begin{verbatim}
+\glsxtrresourcefile{entries-symbols}
+\end{verbatim}
+Indicates that \bibgls\ needs to read the file
+\filefmt{entries-symbols.bib} and create the file
+\filefmt{entries-symbols.glstex}. If the \ext{bib} file is
+different or if you have multiple \ext{bib} files, you need to use
+the \csopt{src} option.
+
+The value must be a comma-separated list of the required \ext{bib}
+files. These may either be in the current working directory or on
+\TeX's path (in which case \app{kpsewhich} will be used to find them).
+The \ext{bib} extension may be omitted. Remember that if \meta{list}
+contains multiple files it must be grouped to protect the comma
+from the \meta{options} list.
+
+For example
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries-terms,entries-symbols}]
+\end{verbatim}
+indicates that \bibgls\ must read the files
+\filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
+create the file obtained from \cs{jobname}\ext{glstex}.
+
+\section{\csopt{sort}=\meta{value}}
+\labelopt{sort}
+
+The \csopt{sort} key indicates how entries should be sorted. The
+\meta{value} may be one of:
+\begin{itemize}
+\item \texttt{locale}: sort the entries according to the operating
+system's locale (default).
+\item \texttt{none} (or \texttt{unsrt}): don't sort the entries.
+\item \texttt{use}: sort in order of use. (This order is determined
+by the records written to the \ext{aux} file by the \styopt{record}
+package option.)
+\item \texttt{letter-case}: case-sensitive letter sort.
+\item \texttt{letter-nocase}: case-insensitive letter sort.
+\item \meta{lang tag}: sort according to the rules of the locale
+given by the IETF language tag \meta{lang tag}.
+\end{itemize}
+
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[src={english-terms},sort={en}]
+\glsxtrresourcefile[sort={de-1996}]{german-terms}
+\end{verbatim}
+
+\section{\csopt{sort-field}=\margm{label}}
+\labelopt{sort-field}
+
+The \csopt{sort-field} key indicates which field provides the sort
+value. The default is the \field{sort} field. For example
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries-terms},sort-label=category,sort=letter-case]
+\end{verbatim}
+This sorts the entries according to the \field{category} field using
+a case-sensitive letter comparison.
+
+\section{\csopt{ignore-fields}=\margm{list}}
+\labelopt{ignore-fields}
+
+The \csopt{ignore-fields} key indicates that you want \bibgls\ to
+skip the fields listed in supplied the comma-separated \meta{list} of field
+labels. Remember that unrecognised fields will always be skipped.
+
+For example, suppose my \ext{bib} file contains
+\begin{verbatim}
+@abbreviation{html,
+  short ="html",
+  long  = {hypertext markup language},
+  description={a markup language for creating web pages},
+  see={[see also]xml}
+}
+\end{verbatim}
+but I want to use the \abbrstyle{short-long} style and I don't want
+the cross-referenced term, then I can use
+\csopt[\marg{see,description}]{ignore-fields}.
+
+\section{\csopt{type}=\margm{label}}
+\labelopt{type}
+
+The \csopt{type} option indicates that all the entries must have the
+\field{type} field set to \meta{label}.
+
+For example:
+\begin{verbatim}
+\usepackage[record,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries-symbols},type=symbols]
+\end{verbatim}
+
+\section{\csopt{category}=\margm{label}}
+\labelopt{category}
+
+The \csopt{category} option indicates that all the entries must have the
+\field{category} field set to \meta{label}.
+
+\section{\csopt{label-prefix}=\margm{tag}}
+\labelopt{label-prefix}
+
+The \csopt{label-prefix} option prepend \meta{tag} to each
+entry's label. If you use this option, make sure that any
+cross-references are limited to the \ext{bib} files selected by the
+\optref{src} option.
+
+For example, if \filefmt{entries-terms.bib} has entries that
+reference terms in \filefmt{entries-symbols.bib}, then
+\csopt{label-prefix} can only be used if both \ext{bib} files are
+selected with 
+\texttt{\csopt{src}\dequals\marg{entries-terms\dcomma
+entries-symbols}}. They can be selected with separate instances of
+\cs{glsxtrresourcefile} (unless \csopt{label-prefix} is set to the
+same value in both cases).
+
+Remember to use this prefix when you reference the terms in the
+document when you use commands like \cs{gls}.
+
+\section{\csopt{loc-prefix}=\margm{value}}
+\labelopt{loc-prefix}
+
+\section{\csopt{selection}=\meta{value}}
+\labelopt{selection}
+
+\chapter{Provided Commands}
+\label{sec:bibglscs}
+
+When \bibgls\ writes the entries to the output file, instead of
+directly using commands like \cs{newglossaryentry}, it provides
+its own commands defined with \cs{providecommand}. This means that
+you can customize the way the entries are defined by providing your
+own commands before the \ext{glstex} files are loaded.
+
+\section{\cs{bibglsnewentry}}
+\labelcs{bibglsnewentry}
+
+\section{\cs{bibglsnewsymbol}}
+\labelcs{bibglsnewsymbol}
+
+\section{\cs{bibglsnewnumber}}
+\labelcs{bibglsnewnumber}
+
+\section{\cs{bibglsnewterm}}
+\labelcs{bibglsnewterm}
+
+\section{\cs{bibglsnewacronym}}
+\labelcs{bibglsnewacronym}
+
+\section{\cs{bibglsnewabbreviation}}
+\labelcs{bibglsnewabbreviation}
+
+\resetsecnumdepth
 
 \end{document}
