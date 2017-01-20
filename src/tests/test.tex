@@ -7,9 +7,9 @@
  \newglossaryentry{#1}{name={#1},type={index},description={},#2}%
 }
 
-\glsxtrresourcefile[sort=en-GB,% sort according to this locale
+\GlsXtrLoadResources[sort=en-GB,% sort according to this locale
  %selection=all,% select all entries even if they haven't been used
- src={test-entries.bib}]{test-entries}
+ src={test-entries}]
 
 \begin{document}
 \gls{sample}. \gls{bird}. \gls{waterfowl}.
