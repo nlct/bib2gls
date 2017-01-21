@@ -96,7 +96,16 @@ See the manual for further details.</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
+<entry key="message.ignore.fields">Ignoring fields:</entry>
 <entry key="message.sort.mode">Sort mode: {0}</entry>
+<entry key="message.sort.field">Sort field: {0}</entry>
+<entry key="message.label.prefix">Label prefix: {0}</entry>
+<entry key="message.dual.label.prefix">Dual label prefix: {0}</entry>
+<entry key="message.dual.sort.mode">Dual sort mode: {0}</entry>
+<entry key="message.dual.sort.field">Dual sort field: {0}</entry>
+<entry key="message.dual.entry.mappings">Dual entry mappings:</entry>
+<entry key="message.dual.symbol.mappings">Dual symbol mappings:</entry>
+<entry key="message.dual.abbreviation.mappings">Dual abbreviation mappings:</entry>
 <entry key="message.process.result">Processed returned: {0}</entry>
 
 <entry key="message.log.file">Transcript written to {0}.</entry>
@@ -110,6 +119,7 @@ See the manual for further details.</entry>
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>
+<entry key="message.no.fallback">Entry type ''{0}'' has no fallback for field: {1}</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -135,6 +145,8 @@ Obeying requested mapping {0} -&gt; {1}
 Discarding: {2}
 Keeping: {3}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
+<entry key="warning.option.clash">Option clash: {0} and {1}
+Ignoring {1}</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
@@ -152,9 +164,10 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.invalid.opt.value">Invalid ''{0}'' value: {1}</entry>
 <entry key="error.invalid.choice.value">Invalid ''{0}'' value: {1} (allowed values: {2})</entry>
 <entry key="error.missing.value">Missing value for: {0}</entry>
-<entry key="error.option.clash">Option clash: {0} and {1}
-Ignoring {1}
-</entry>
+<entry key="error.option.clash">Option clash: {0} and {1}</entry>
+<entry key="error.invalid.dual.map">Invalid mapping: {0}={1}
+The size of the first list ({2,number}) is not the same as the size of 
+the second list ({3,number}).</entry>
 <entry key="error.openin.forbidden">Read access forbidden by openin_any={0} for file: {1}</entry>
 <entry key="error.openout.forbidden">Write access forbidden by openout_any={0} for file: {1}</entry>
 <entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>

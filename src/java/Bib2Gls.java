@@ -622,14 +622,18 @@ public class Bib2Gls implements TeXApp
                   if (fmt1.equals("glsnumberformat"))
                   {// discard the new record
 
+                     debug();
                      debug(getMessage("warning.discarding.conflicting.record",
                        fmt1, fmt2, record, r));
+                     debug();
                   }
                   else if (fmt2.equals("glsnumberformat"))
                   {// override the existing record
 
+                     debug();
                      debug(getMessage("warning.discarding.conflicting.record",
                        fmt1, fmt2, r, record));
+                     debug();
 
                      r.setFormat(fmt1);
                   } 
@@ -642,17 +646,21 @@ public class Bib2Gls implements TeXApp
                      {
                         // discard the new record
 
+                        debug();
                         debug(getMessage(
                           "warning.discarding.conflicting.record.using.map",
                           fmt1, fmt2, record, r));
+                        debug();
                      }
                      else if (map2 != null && map2.equals(fmt1))
                      {
                         // discard the existing record
 
+                        debug();
                         debug(getMessage(
                           "warning.discarding.conflicting.record.using.map",
                           fmt2, fmt1, r, record));
+                        debug();
 
                         r.setFormat(fmt1);
                      }
@@ -660,9 +668,11 @@ public class Bib2Gls implements TeXApp
                      {
                         // discard the new record with a warning
 
+                        warning();
                         warning(
                           getMessage("warning.discarding.conflicting.record",
                           fmt1, fmt2, record, r));
+                        warning();
                      }
                   }
 
@@ -904,9 +914,22 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void logMessage()
+   {
+      if (logWriter != null)
+      {
+         logWriter.println();
+      }
+   }
+
    public int getDebugLevel()
    {
       return debugLevel;
+   }
+
+   public int getVerboseLevel()
+   {
+      return verboseLevel;
    }
 
    public void debug(String message)
@@ -914,9 +937,17 @@ public class Bib2Gls implements TeXApp
       if (debugLevel > 0)
       {
          System.out.println(message);
+         logMessage(message);
       }
+   }
 
-      logMessage(message);
+   public void debug()
+   {
+      if (debugLevel > 0)
+      {
+         System.out.println();
+         logMessage();
+      }
    }
 
    /*
@@ -1288,6 +1319,16 @@ public class Bib2Gls implements TeXApp
       logMessage(text);
    }
 
+   public void verbose()
+   {
+      if (verboseLevel > 0)
+      {
+         System.out.println();
+      }
+
+      logMessage();
+   }
+
    public static String fileLineMessage(File file, int lineNum,
      String message)
    {
@@ -1343,6 +1384,16 @@ public class Bib2Gls implements TeXApp
       }
 
       logMessage(message);
+   }
+
+   public void warning()
+   {
+      if (verboseLevel >= 0)
+      {
+         System.err.println();
+      }
+
+      logMessage();
    }
 
    public void warning(String message, Exception e)
@@ -2035,7 +2086,8 @@ public class Bib2Gls implements TeXApp
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "1.0";
-   public static final String DATE = "2017-01-10";
+   public static final String DATE = "EXPERIMENTAL";
+   //public static final String DATE = "2017-01-21";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

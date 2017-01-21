@@ -27,9 +27,9 @@ import com.dickimawbooks.texparserlib.bib.*;
 
 public class Bib2GlsAbbrev extends Bib2GlsEntry
 {
-   public Bib2GlsAbbrev(String prefix, Bib2Gls bib2gls, String entryType)
+   public Bib2GlsAbbrev(Bib2Gls bib2gls, String entryType)
    {
-      super(prefix, bib2gls, entryType);
+      super(bib2gls, entryType);
    }
 
    public String getDefaultSort()
@@ -48,6 +48,26 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       {
          missingFieldWarning(parser, "long");
       }
+   }
+
+   public String getFallbackField(String field)
+   {
+      String val = super.getFallbackField(field);
+
+      if (val != null) return val;
+
+      if (field.equals("longplural"))
+      {
+         return getFallbackField("long")
+           +getResource().getPluralSuffix();
+      }
+      else if (field.equals("shortplural"))
+      {
+         return getFallbackField("short")
+           +getResource().getShortPluralSuffix();
+      }
+
+      return null;
    }
 
    public void writeBibEntry(PrintWriter writer)

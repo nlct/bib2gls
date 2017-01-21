@@ -1,0 +1,150 @@
+/*
+    Copyright (C) 2017 Nicola L.C. Talbot
+    www.dickimaw-books.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+package com.dickimawbooks.bib2gls;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.Vector;
+import java.text.CollationKey;
+
+import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.bib.*;
+import com.dickimawbooks.texparserlib.latex.CsvList;
+
+public class Bib2GlsDualEntry extends Bib2GlsEntry
+{
+   public Bib2GlsDualEntry(Bib2Gls bib2gls)
+   {
+      this(bib2gls, "dualentry");
+   }
+
+   public Bib2GlsDualEntry(Bib2Gls bib2gls, String entryType)
+   {
+      super(bib2gls, entryType);
+   }
+
+   public String getFallbackField(String field)
+   {
+      String val = super.getFallbackField(field);
+
+      if (val != null) return val;
+
+      if (field.equals("descriptionplural"))
+      {
+         return getFallbackField("description")
+           +getResource().getDualDescPluralSuffix();
+      }
+      else if (field.equals("symbolplural"))
+      {
+         return getFallbackField("symbol")
+           +getResource().getDualSymbolPluralSuffix();
+      }
+
+      return null;
+   }
+
+   public HashMap<String,String> getMappings()
+   {
+      return getResource().getDualEntryMap();
+   }
+
+   public Bib2GlsEntry createDual()
+   {
+      GlsResource resource = getResource();
+      String dualPrefix = resource.getDualPrefix();
+      String label = getOriginalId();
+
+      String dualLabel = (dualPrefix==null ? label : dualPrefix+label);
+
+      Bib2GlsEntry entry = new Bib2GlsEntry(bib2gls, getEntryType());
+      entry.setId(dualLabel);
+
+      HashMap<String,String> mappings = getMappings();
+
+      for (Iterator<String> it = getKeySet().iterator(); it.hasNext(); )
+      {
+         String key = getKey(it.next());
+
+         String map = mappings.get(key);
+         BibValueList contents = getField(key);
+         String value = getFieldValue(key);
+
+         if (map == null)
+         {
+            entry.putField(key, contents);
+            entry.putField(key, value);
+         }
+         else
+         {
+            entry.putField(map, contents);
+            entry.putField(map, value);
+         }
+      }
+
+      // Has a sort field been supplied without a mapping?
+
+      String dualSortField = resource.getDualSortField();
+
+      if (!dualSortField.equals("sort"))
+      {
+         BibValueList contents = getField("sort");
+         String map = mappings.get("sort");
+
+         if (contents != null && map != null)
+         {
+            String value = getFieldValue("sort");
+
+            entry.putField(map, contents);
+            entry.putField(map, value);
+         }
+      }
+
+      // check for missing fields.
+
+      for (Iterator<String> it = mappings.keySet().iterator(); it.hasNext();)
+      {
+         String key = it.next();
+
+         String map = mappings.get(key);
+
+         if (entry.getFieldValue(map) == null)
+         {
+            String fieldName = getFallbackField(key);
+
+            if (fieldName == null)
+            {
+               bib2gls.verbose(bib2gls.getMessage("message.no.fallback",
+                  getEntryType(), key));
+            }
+            else
+            {
+               BibValueList contents = getField(fieldName);
+               String value = getFieldValue(fieldName);
+
+               entry.putField(map, contents);
+               entry.putField(map, value);
+            }
+         }
+      }
+
+      return entry;
+   }
+}

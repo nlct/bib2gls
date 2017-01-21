@@ -3,7 +3,7 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 RM=\rm -f
 
 all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
-	  test-xe.pdf test-label-prefix.pdf
+	  test-xe.pdf test-label-prefix.pdf test-dual.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -65,6 +65,16 @@ test-label-prefix.glstex	: test-label-prefix.aux $(DEPS) \
 
 test-label-prefix.aux	: test-label-prefix.tex
 		pdflatex test-label-prefix
+
+test-dual.pdf	: test-dual.aux test-dual.glstex
+		pdflatex test-dual
+
+test-dual.glstex	: test-dual.aux $(DEPS) \
+	 			entries-dual.bib
+		$(BIB2GLS) test-dual
+
+test-dual.aux	: test-dual.tex
+		pdflatex test-dual
 
 clean	:
 	$(RM) *.aux

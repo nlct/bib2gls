@@ -31,28 +31,33 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class Bib2GlsEntry extends BibEntry
 {
-   public Bib2GlsEntry(String prefix, Bib2Gls bib2gls)
+   public Bib2GlsEntry(Bib2Gls bib2gls)
    {
-      this(prefix, bib2gls, "entry");
+      this(bib2gls, "entry");
    }
 
-   public Bib2GlsEntry(String prefix, Bib2Gls bib2gls, String entryType)
+   public Bib2GlsEntry(Bib2Gls bib2gls, String entryType)
    {
       super(entryType.toLowerCase());
       this.bib2gls = bib2gls;
 
-      if (prefix != null && prefix.isEmpty())
+      resource = bib2gls.getCurrentResource();
+
+      labelPrefix = resource.getLabelPrefix();
+
+      if ("".equals(labelPrefix))
       {
          labelPrefix = null;
-      }
-      else
-      {
-         labelPrefix = prefix;
       }
 
       fieldValues = new HashMap<String,String>();
       deps = new Vector<String>();
       records = new Vector<GlsRecord>();
+   }
+
+   public GlsResource getResource()
+   {
+      return resource;
    }
 
    public String getPrefix()
@@ -474,11 +479,9 @@ public class Bib2GlsEntry extends BibEntry
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
 
-      GlsResource resource = bib2gls.getCurrentResource();
-
       for (String field : fields)
       {
-         if (resource != null && resource.skipField(field))
+         if (resource.skipField(field))
          {
             continue;
          }
@@ -557,11 +560,18 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("plural"))
       {
-         return getFallbackField("text")+"s";
+         return getFallbackField("text")+resource.getPluralSuffix();
       }
       else if (field.equals("firstplural"))
       {
-         return getFallbackField("first")+"s";
+         String val = fieldValues.get("first");
+
+         if (val == null)
+         {
+            return val+resource.getPluralSuffix();
+         }
+
+         return getFallbackField("plural");
       }
 
       return null;
@@ -891,9 +901,7 @@ public class Bib2GlsEntry extends BibEntry
    public void initCrossRefs(TeXParser parser)
     throws IOException
    {
-      GlsResource resource = bib2gls.getCurrentResource();
-
-      if (resource != null && resource.skipField("see"))
+      if (resource.skipField("see"))
       {
          return;
       }
@@ -1035,6 +1043,8 @@ public class Bib2GlsEntry extends BibEntry
    public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
 
    protected Bib2Gls bib2gls;
+
+   protected GlsResource resource;
 
    private CollationKey collationKey;
 
