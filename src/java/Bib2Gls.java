@@ -941,6 +941,24 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void debug(Throwable e)
+   {
+      if (debugLevel > 0)
+      {
+         String message = e.getMessage();
+
+         if (message == null)
+         {
+            message = e.getClass().getSimpleName();
+         }
+
+         System.out.println(message);
+         logMessage(message);
+
+         e.printStackTrace();
+      }
+   }
+
    public void debug()
    {
       if (debugLevel > 0)

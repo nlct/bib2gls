@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.Vector;
 import java.text.CollationKey;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
@@ -44,11 +46,6 @@ public class Bib2GlsEntry extends BibEntry
       resource = bib2gls.getCurrentResource();
 
       labelPrefix = resource.getLabelPrefix();
-
-      if ("".equals(labelPrefix))
-      {
-         labelPrefix = null;
-      }
 
       fieldValues = new HashMap<String,String>();
       deps = new Vector<String>();
@@ -75,6 +72,57 @@ public class Bib2GlsEntry extends BibEntry
       return super.getId();
    }
 
+   public String processLabel(String label)
+   {
+      if (label.startsWith("dual."))
+      {
+         String prefix = resource.getDualPrefix();
+
+         if (prefix == null)
+         {
+            label = label.substring(5);
+         }
+         else if (!prefix.equals("dual."))
+         {
+            label = String.format("%s%s", prefix, label.substring(5));
+         }
+      }
+      else
+      {
+         Matcher m = EXT_PREFIX_PATTERN.matcher(label);
+
+         if (m.matches())
+         {
+            try
+            {
+               String prefix = resource.getExternalPrefix(
+                  Integer.parseInt(m.group(1)));
+
+               if (prefix == null)
+               {
+                  label = m.group(2);
+               }
+               else
+               {
+                  label = String.format("%s%s", prefix, m.group(2));
+               }
+            }
+            catch (NumberFormatException e)
+            {
+               // shouldn't happen as pattern enforces correct
+               // format
+
+               bib2gls.debug(e);
+            }
+         }
+         else if (labelPrefix != null)
+         {
+            label = String.format("%s%s", labelPrefix, label);
+         }
+      }
+
+      return label;
+   }
 
    // does the control sequence given by csname have [options]{label}
    // syntax (with a * or + prefix)?
@@ -230,9 +278,11 @@ public class Bib2GlsEntry extends BibEntry
 
                   String label = arg.toString(parser);
 
-                  if (labelPrefix != null)
+                  String newLabel = processLabel(label);
+
+                  if (!newLabel.equals(label))
                   {
-                     label = labelPrefix+label;
+                     label = newLabel;
 
                      list.set(i, parser.getListener().createGroup(label));
                   }
@@ -248,12 +298,7 @@ public class Bib2GlsEntry extends BibEntry
                      arg = list.get(++i);
                   }
 
-                  Group grp = null;
-
-                  if (labelPrefix != null)
-                  {
-                     grp = parser.getListener().createGroup();
-                  }
+                  Group grp = parser.getListener().createGroup();
 
                   CsvList csvlist = CsvList.getList(parser, arg);
 
@@ -261,27 +306,19 @@ public class Bib2GlsEntry extends BibEntry
                   {
                      TeXObject obj = csvlist.get(j);
 
-                     label = obj.toString(parser);
+                     label = processLabel(obj.toString(parser));
 
-                     if (labelPrefix != null)
+                     grp.add(parser.getListener().createString(label));
+
+                     if (j < m)
                      {
-                        label = labelPrefix+label;
-
-                        grp.add(parser.getListener().createString(label));
-
-                        if (j < m)
-                        {
-                           grp.add(parser.getListener().getOther(','));
-                        }
+                        grp.add(parser.getListener().getOther(','));
                      }
 
                      addDependency(label);
                   }
 
-                  if (labelPrefix != null)
-                  {
-                     list.set(i, grp);
-                  }
+                  list.set(i, grp);
                }
                else if (csname.equals("glsxtrp"))
                {// \glsxtrp{field}{label}
@@ -309,10 +346,11 @@ public class Bib2GlsEntry extends BibEntry
                   }
 
                   String label = arg.toString(parser);
+                  String newLabel = processLabel(label);
 
-                  if (labelPrefix != null)
+                  if (!label.equals(newLabel))
                   {
-                     label = labelPrefix+label;
+                     label = newLabel;
                      list.set(i, parser.getListener().createGroup(label));
                   }
 
@@ -401,9 +439,11 @@ public class Bib2GlsEntry extends BibEntry
                      label = arg.toString(parser);
                   }
 
-                  if (labelPrefix != null)
+                  String newLabel = processLabel(label);
+
+                  if (!label.equals(newLabel))
                   {
-                     label = labelPrefix+label;
+                     label = newLabel;
 
                      for ( ; i > start; i--)
                      {
@@ -726,14 +766,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (i > 0) listBuilder.append(",");
 
-            if (labelPrefix == null)
-            {
-               listBuilder.append(crossRefs[i]);
-            }
-            else
-            {
-               listBuilder.append(labelPrefix+crossRefs[i]);
-            }
+            listBuilder.append(processLabel(crossRefs[i]));
          }
 
          listBuilder.append("}{}");
@@ -874,14 +907,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (i > 0) listBuilder.append(",");
 
-            if (labelPrefix == null)
-            {
-               listBuilder.append(crossRefs[i]);
-            }
-            else
-            {
-               listBuilder.append(labelPrefix+crossRefs[i]);
-            }
+            listBuilder.append(processLabel(crossRefs[i]));
          }
 
          listBuilder.append("}{}");
@@ -912,12 +938,7 @@ public class Bib2GlsEntry extends BibEntry
 
       TeXObjectList valList = value.expand(parser);
 
-      StringBuilder builder = null;
-
-      if (labelPrefix != null)
-      {
-         builder = new StringBuilder();
-      }
+      StringBuilder builder = new StringBuilder();
 
       if (valList instanceof Group)
       {
@@ -930,12 +951,9 @@ public class Bib2GlsEntry extends BibEntry
       {
          crossRefTag = opt.toString(parser);
 
-         if (labelPrefix != null)
-         {
-            builder.append('[');
-            builder.append(crossRefTag);
-            builder.append(']');
-         }
+         builder.append('[');
+         builder.append(crossRefTag);
+         builder.append(']');
       }
 
       CsvList csvList = CsvList.getList(parser, valList);
@@ -950,27 +968,18 @@ public class Bib2GlsEntry extends BibEntry
       {
          crossRefs[i] = csvList.get(i).toString(parser);
 
-         if (labelPrefix == null)
-         {
-            addDependency(crossRefs[i]);
-         }
-         else
-         {
-            String label = labelPrefix+crossRefs[i];
-            addDependency(label);
-            builder.append(label);
+         String label = processLabel(crossRefs[i]);
 
-            if (i != n-1)
-            {
-               builder.append(',');
-            }
+         addDependency(label);
+         builder.append(label);
+
+         if (i != n-1)
+         {
+            builder.append(',');
          }
       }
 
-      if (builder != null)
-      {
-         fieldValues.put("see", builder.toString());
-      }
+      fieldValues.put("see", builder.toString());
    }
 
    public void setCollationKey(CollationKey key)
@@ -1049,4 +1058,7 @@ public class Bib2GlsEntry extends BibEntry
    private CollationKey collationKey;
 
    private String labelPrefix = null;
+
+   private static final Pattern EXT_PREFIX_PATTERN = Pattern.compile(
+     "ext(\\d+)\\.(.*)");
 }

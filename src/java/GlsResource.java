@@ -78,10 +78,34 @@ public class GlsResource
             }
             else
             {
-               for (TeXObject obj : csvList)
+               for (int i = 0; i < n; i++)
                {
+                  TeXObject obj = csvList.getValue(i);
+
                   sources.add(bib2gls.getBibFilePath(parser, 
                      obj.toString(parser).trim()));
+               }
+            }
+         }
+         else if (opt.equals("ext-prefixes"))
+         {
+            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+
+            int n = csvList.size();
+
+            if (n == 0)
+            {
+               externalPrefixes = null;
+            }
+            else
+            {
+               externalPrefixes = new String[n];
+
+               for (int i = 0; i < n; i++)
+               {
+                  TeXObject obj = csvList.getValue(i);
+
+                  externalPrefixes[i] = obj.toString(parser).trim();
                }
             }
          }
@@ -1187,6 +1211,18 @@ public class GlsResource
       return dualPrefix;
    }
 
+   public String getExternalPrefix(int idx)
+   {
+      if (externalPrefixes == null) return null;
+
+      if (idx >= 1 && idx <= externalPrefixes.length)
+      {
+         return externalPrefixes[idx-1];
+      }
+
+      return null;
+   }
+
    public String getDualSortField()
    {
       return dualSortField;
@@ -1238,6 +1274,8 @@ public class GlsResource
    private Vector<TeXPath> sources;
 
    private String[] skipFields = null;
+
+   private String[] externalPrefixes = null;
 
    private String type=null, category=null, sort = "locale", sortField = "sort";
 
