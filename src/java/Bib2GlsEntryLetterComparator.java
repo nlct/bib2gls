@@ -56,7 +56,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
          if (value == null)
          {
-            value = entry.getFallbackField(sortField);
+            value = entry.getFallbackValue(sortField);
 
             if (value == null)
             {

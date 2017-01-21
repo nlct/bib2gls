@@ -52,6 +52,16 @@ public class Bib2GlsEntry extends BibEntry
       records = new Vector<GlsRecord>();
    }
 
+   public void setDual(Bib2GlsEntry dualEntry)
+   {
+      dual = dualEntry;
+   }
+
+   public Bib2GlsEntry getDual()
+   {
+      return dual;
+   }
+
    public GlsResource getResource()
    {
       return resource;
@@ -580,7 +590,7 @@ public class Bib2GlsEntry extends BibEntry
       return val == null ? fieldValues.get("parent") : val;
    }
 
-   public String getFallbackField(String field)
+   public String getFallbackValue(String field)
    {
       if (field.equals("text"))
       {
@@ -596,22 +606,77 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("first"))
       {
-         return getFallbackField("text");
+         String value = getFieldValue("text");
+
+         if (value != null) return value;
+
+         return getFallbackValue("text");
       }
       else if (field.equals("plural"))
       {
-         return getFallbackField("text")+resource.getPluralSuffix();
+         String value = getFieldValue("text");
+
+         if (value == null)
+         {
+            value = getFallbackValue("text");
+         }
+
+         if (value != null)
+         {
+            String suffix = resource.getPluralSuffix();
+
+            return suffix == null ? value : value+suffix;
+         }
       }
       else if (field.equals("firstplural"))
       {
-         String val = fieldValues.get("first");
+         String value = getFieldValue("first");
 
-         if (val == null)
+         if (value == null)
          {
-            return val+resource.getPluralSuffix();
+             value = fieldValues.get("first");
          }
 
-         return getFallbackField("plural");
+         if (value != null)
+         {
+            String suffix = resource.getPluralSuffix();
+
+            return suffix == null ? value : value+suffix;
+         }
+
+         value = getFieldValue("plural");
+
+         return value == null ? getFallbackValue("plural") : value;
+      }
+
+      return null;
+   }
+
+   public BibValueList getFallbackContents(String field)
+   {
+      if (field.equals("text"))
+      {
+         return getField("name");
+      }
+      else if (field.equals("name"))
+      {
+         return getField("parent");
+      }
+      else if (field.equals("sort"))
+      {
+         return getField("name");
+      }
+      else if (field.equals("first"))
+      {
+         return getFallbackContents("text");
+      }
+      else if (field.equals("plural"))
+      {
+         return getFallbackContents("text");
+      }
+      else if (field.equals("firstplural"))
+      {
+         return getFallbackContents("first");
       }
 
       return null;
@@ -639,7 +704,7 @@ public class Bib2GlsEntry extends BibEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\bibglsnewentry{%s}%%%n{", getId());
+      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(), getId());
 
       String description = "";
       String name = "";
@@ -653,13 +718,17 @@ public class Bib2GlsEntry extends BibEntry
       {
          String field = it.next();
 
+         String value = fieldValues.get(field);
+
+         if (value == null) continue;
+
          if (field.equals("description"))
          {
-            description = fieldValues.get(field);
+            description = value;
          }
          else if (field.equals("name"))
          {
-            name = fieldValues.get(field);
+            name = value;
          }
          else 
          {
@@ -667,7 +736,7 @@ public class Bib2GlsEntry extends BibEntry
 
             sep = String.format(",%n");
 
-            writer.format("%s={%s}", field, fieldValues.get(field));
+            writer.format("%s={%s}", field, value);
          }
       }
 
@@ -688,6 +757,11 @@ public class Bib2GlsEntry extends BibEntry
 
    public String putField(String label, String value)
    {
+      if (value == null)
+      {
+         throw new NullPointerException();
+      }
+
       return fieldValues.put(label, value);
    }
 
@@ -1058,6 +1132,8 @@ public class Bib2GlsEntry extends BibEntry
    private CollationKey collationKey;
 
    private String labelPrefix = null;
+
+   private Bib2GlsEntry dual = null;
 
    private static final Pattern EXT_PREFIX_PATTERN = Pattern.compile(
      "ext(\\d+)\\.(.*)");

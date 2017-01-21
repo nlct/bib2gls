@@ -168,8 +168,9 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}
 The size of the first list ({2,number}) is not the same as the size of 
 the second list ({3,number}).</entry>
-<entry key="error.openin.forbidden">Read access forbidden by openin_any={0} for file: {1}</entry>
-<entry key="error.openout.forbidden">Write access forbidden by openout_any={0} for file: {1}</entry>
+<entry key="error.openin.forbidden">Read access forbidden for file: {0}</entry>
+<entry key="error.openout.forbidden">Write access forbidden for file: {0}</entry>
+<entry key="error.forbidden.ext">Write access forbidden for extension: {0}</entry>
 <entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>
 <entry key="error.cyclic.hierarchy">Cyclical hierarchy for entry: {0}</entry>
 <entry key="error.duplicate.resource">Duplicate resource: {0}</entry>

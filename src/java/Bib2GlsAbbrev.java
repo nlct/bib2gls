@@ -50,21 +50,41 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       }
    }
 
-   public String getFallbackField(String field)
+   public String getFallbackValue(String field)
    {
-      String val = super.getFallbackField(field);
+      String val = super.getFallbackValue(field);
 
       if (val != null) return val;
 
       if (field.equals("longplural"))
       {
-         return getFallbackField("long")
-           +getResource().getPluralSuffix();
+         val = getFieldValue("long");
+
+         if (val == null)
+         {
+            val = getFallbackValue("long");
+
+            if (val == null) return null;
+         }
+
+         String suffix = getResource().getPluralSuffix();
+
+         return suffix == null ? val : val+suffix;
       }
       else if (field.equals("shortplural"))
       {
-         return getFallbackField("short")
-           +getResource().getShortPluralSuffix();
+         val = getFieldValue("short");
+
+         if (val == null)
+         {
+            val = getFallbackValue("short");
+
+            if (val == null) return null;
+         }
+
+         String suffix = getResource().getShortPluralSuffix();
+
+         return suffix == null ? val : val+suffix;
       }
 
       return null;

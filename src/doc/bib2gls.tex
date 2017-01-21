@@ -10,7 +10,14 @@
 \usepackage[colorlinks]{hyperref}
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
-\DTMsavefilemoddate{moddate}{../java/Bib2Gls.java}
+
+\IfFileExists{../java/Bib2Gls.java}
+{
+  \DTMsavefilemoddate{moddate}{../java/Bib2Gls.java}
+}
+{
+  \DTMsavenow{moddate}
+}
 
 \providecommand{\frontmatter}{\clearpage\pagenumbering{roman}}
 \providecommand{\mainmatter}{\clearpage\pagenumbering{arabic}}
@@ -27,7 +34,7 @@
 
 \newcommand{\dcomma}{%
  \texorpdfstring
- {\discretionary{}{}{}\texttt{,}\discretionary{}{}{}}%
+ {\texttt{,}\discretionary{}{}{}}%
  {,}%
 }
 
@@ -43,6 +50,8 @@
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\idprefixfmt}[1]{%
+ \texorpdfstring{\texttt{#1\spacefactor1000 .}}{#1.}}
 
 \newcommand*{\argor}{\texorpdfstring{\protect\textbar}{\string\|}}
 
@@ -87,6 +96,12 @@
   \texorpdfstring
   {\abbrstylefmt{#1}\index{abbreviation style!#1@\abbrstylefmt{#1}}}%
   {#1}%
+}
+
+\newcommand*{\idprefix}[1]{%
+ \texorpdfstring
+ {\idprefixfmt{#1}\index{#1@\idprefixfmt{#1}}}%
+ {#1}%
 }
 
 \newcommand*{\cs}[1]{% 
@@ -641,6 +656,70 @@ Don't use the \field{group} field. (Default.)
 
 \bibgls\ recognises certain entry types. Any unrecognised types will
 be ignored and a warning will be written to the transcript file.
+Entries are defined in the usual \ext{bib} format:
+\begin{alltt}
+@\meta{entry-type}\marg{\meta{id},
+  \meta{field-name-1} = \margm{text},
+  ...
+  \meta{field-name-n} = \margm{text}
+}
+\end{alltt}
+where \meta{entry-type} is the entry type (listed below),
+\meta{field-name-1} are the field names (same as the keys available
+with \cs{newglossaryentry}) and \meta{id} is a unique label. The
+label can't contain any spaces or commas. 
+
+\bibgls\ allows you to insert prefixes to the labels when the data
+is read through the \csopt{label-prefix} option. Remember to use
+these prefixes when you reference the entries in the document, but
+don't include them when you reference them in the \ext{bib} file.
+There are some special prefixes that have a particular meaning to
+\bibgls: \idprefix{dual} and \idprefix{ext\meta{n}} where
+\meta{n} is a positive integer.  In the first case,
+\idprefix{dual} references the dual element of a dual entry (see
+\atentry{dualentry}). This prefix will be replaced by the value of
+the \csopt{dual-prefix} option. The \idprefix{ext\meta{n}} prefix
+is used to reference an entry from a different set of resources
+(loaded by another \cs{glsxtrresourcefile} command). This prefix is
+replaced by the corresponding element of the list supplied by
+\csopt{ext-prefixes}.
+
+Avoid non-ASCII characters in the \meta{id} if your document uses the 
+\sty{inputenc} package.
+You can set the character encoding in the \ext{bib} file using:
+\begin{alltt}
+\% Encoding: \meta{encoding-name}
+\end{alltt}
+where \meta{encoding-name} is the name of the character encoding.
+For example:
+\begin{verbatim}
+% Encoding: UTF-8
+\end{verbatim}
+You can also set the encoding using the \csopt{charset} option, but
+it's more efficient to put the encoding comment at the start of the
+\ext{bib} file (otherwise \bibgls\ has to search the entire file for
+it).
+
+Each entry type may have required fields and optional fields. For the
+optional fields, any key recognised by \cs{newglossaryentry} may be
+used as a field. However, note that if you add
+any custom keys using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
+commands must be placed before the first use of
+\cs{glsxtrresourcefile} (or \cs{GlsXtrLoadResources}).
+Any unrecognised fields will be ignored.
+
+This is more convenient than using \cs{loadglsentries}, which
+requires all the keys used in the file to be defined, regardless of
+whether or not you actually need them in the document.
+
+If an optional field is missing, \bibgls\ will try to fallback on
+another value. The actual fallback value depends in the entry type.
+
+Other entries can be cross-referenced using the \field{see} field or
+by using commands like \cs{gls} or \cs{glsxtrp} in any of the
+recognised fields. These will automatically be selected if the
+\csopt{selection} setting includes dependencies, but you may need to
+rebuild the document to ensure the location lists are correct.
 
 The standard \atentry{string}\labelatentry{string} and 
 \atentry{preamble}\labelatentry{preamble} types are recognised, so you
@@ -673,27 +752,6 @@ can do, for example:
   description={rectangular array of values, denoted $\mtx{M}$}
 }
 \end{verbatim}
-
-The other entry types recognised by \bibgls\ are listed below.
-Each type may have required fields and optional fields. For the
-optional fields, any key recognised by \cs{newglossaryentry} may be
-used as a field. However, note that if you add
-any custom keys using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
-commands must be placed before the first use of
-\cs{glsxtrresourcefile} (or \cs{GlsXtrLoadResources}).
-Any unrecognised fields will be ignored.
-
-This is more convenient than using \cs{loadglsentries}, which
-requires all the keys used in the file to be defined, regardless of
-whether or not you actually need them in the document.
-
-If the \field{sort} field is missing, \bibgls\ will fallback on
-another value, depending on the entry type. You can override the
-field used for sorting with the \optref{sort-field} option.
-
-Other entries can be cross-referenced using the \field{see} field or
-by using commands like \cs{gls} or \cs{glsxtrp} in any of the
-recognised fields.
 
 \section{\atentry{entry}}
 \labelatentry{entry}
@@ -848,6 +906,72 @@ file using the command \csref{bibglsnewabbreviation}.
 The \entry{acronym} entry type is like \entry{abbreviation} except that
 the term is written to the output file using the command
 \csref{bibglsnewacronym}.
+
+\section{\atentry{dualentry}}
+\labelatentry{dualentry}
+
+The \entry{dualentry} entry type is similar to \entry{entry} but
+actually defines two entries: the primary entry and the dual entry.
+The dual entry contains the same information as the primary entry
+but some of the fields are swapped around. The dual entry is given
+the prefix set by the \csopt{dual-prefix} option.
+
+By default, the \field{name} and \field{description} fields and the
+\field{plural} and \field{descriptionplural} fields are swapped.
+
+For example:
+\begin{verbatim}
+@dualentry{child,
+  name={child},
+  plural={children},
+  description={enfant}
+}
+\end{verbatim}
+Is like
+\begin{verbatim}
+@entry{child,
+  name={child},
+  plural={children},
+  description={enfant}
+  descriptionplural={enfants}
+}
+
+@entry{dual.child,
+  description={child},
+  descriptionplural={children},
+  name={enfant}
+  plural={enfants}
+}
+\end{verbatim}
+where \idprefix{dual} is replaced by the value of the
+\csopt{dual-prefix} option. However, instead of defining the entries
+with \csfmt{bibglsnewentry} both the primary and dual entries are
+defined using \csref{bibglsnewdualentry}. The \field{category} 
+and \field{type} fields can be set for the dual entry using the
+\csopt{dual-category} and \csopt{dual-type} options.
+
+If \csopt[combine]{dual-sort} then the dual entries will be sorted
+along with the primary entries, otherwise the \csopt{dual-sort}
+indicates how to sort the dual entries and the dual entries will be
+appended to the end of the \ext{glstex} file. The
+\csopt{dual-sort-field} determines what field to use for the sort
+value if the dual entries should be sorted separately.
+
+For example:
+\begin{verbatim}
+\newglossary*{english}{English}
+\newglossary*{french}{French}
+
+\GlsXtrLoadResources[
+ src           = {entries-dual},% data in entries-dual.bib
+ type          = {english},% put primary entries in glossary 'english'
+ dual-type     = {french},% put dual entries in glossary 'french'
+ category      = {dictionary},% set the primary category to 'dictionary'
+ dual-category = {dictionary},% set the dual category to 'dictionary'
+ sort          = {en},% sort primary entries according to language 'en'
+ dual-sort     = {fr}% sort dual entries according to language 'fr'
+]
+\end{verbatim}
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
@@ -1028,6 +1152,24 @@ document when you use commands like \cs{gls}.
 \section{\csopt{loc-prefix}=\margm{value}}
 \labelopt{loc-prefix}
 
+\section{\csopt{dual-prefix}=\margm{value}}
+\labelopt{dual-prefix}
+
+\section{\csopt{dual-type}=\margm{value}}
+\labelopt{dual-type}
+
+\section{\csopt{dual-category}=\margm{value}}
+\labelopt{dual-category}
+
+\section{\csopt{dual-sort}=\margm{value}}
+\labelopt{dual-sort}
+
+\section{\csopt{dual-sort-field}=\margm{value}}
+\labelopt{dual-sort-field}
+
+\section{\csopt{ext-prefixes}=\margm{list}}
+\labelopt{ext-prefixes}
+
 \section{\csopt{selection}=\meta{value}}
 \labelopt{selection}
 
@@ -1057,6 +1199,9 @@ own commands before the \ext{glstex} files are loaded.
 
 \section{\cs{bibglsnewabbreviation}}
 \labelcs{bibglsnewabbreviation}
+
+\section{\cs{bibglsnewdualentry}}
+\labelcs{bibglsnewdualentry}
 
 \resetsecnumdepth
 

@@ -48,7 +48,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       return name == null ? getOriginalId() : name;
    }
 
-   public String getFallbackField(String field)
+   public String getFallbackValue(String field)
    {
       if (field.equals("name"))
       {
@@ -56,7 +56,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       }
       else
       {
-         return super.getFallbackField(field);
+         return super.getFallbackValue(field);
       }
    }
 

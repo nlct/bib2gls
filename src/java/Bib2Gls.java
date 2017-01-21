@@ -138,7 +138,7 @@ public class Bib2Gls implements TeXApp
       if (!isReadAccessAllowed(path))
       {
          throw new IOException(getMessage("error.openin.forbidden",
-           openin_any, path));
+           path));
       }
    }
 
@@ -148,7 +148,7 @@ public class Bib2Gls implements TeXApp
       if (!isReadAccessAllowed(path))
       {
          throw new IOException(getMessage("error.openin.forbidden",
-           openin_any, path));
+           path));
       }
    }
 
@@ -275,7 +275,7 @@ public class Bib2Gls implements TeXApp
       if (!isWriteAccessAllowed(path))
       {
          throw new IOException(getMessage("error.openout.forbidden",
-           openout_any, path));
+           path));
       }
    }
 
@@ -285,7 +285,7 @@ public class Bib2Gls implements TeXApp
       if (!isWriteAccessAllowed(file.toPath()))
       {
          throw new IOException(getMessage("error.openout.forbidden",
-           openout_any, file));
+           file));
       }
    }
 
@@ -316,6 +316,28 @@ public class Bib2Gls implements TeXApp
    public boolean isWriteAccessAllowed(Path path)
    {
       debug(getMessage("message.checking.write", path));
+
+      // Forbid certain extension to be on the safe side
+
+      String name = path.getName(path.getNameCount()-1).toString().toLowerCase();
+
+      int idx = name.lastIndexOf(".");
+
+      if (idx > -1)
+      {
+         name = name.substring(idx+1);
+
+         if (name.equals("tex") || name.equals("ltx")
+           ||name.equals("sty") || name.equals("cls")
+           ||name.equals("bib") || name.equals("dtx")
+           ||name.equals("ins") || name.equals("def")
+           ||name.equals("ldf"))
+         {
+            debug(getMessageWithFallback("error.forbidden.ext",
+              "Write access forbidden for extension: {0}", name));
+            return false;
+         }
+      }
 
       if (openout_any == 'a')
       {

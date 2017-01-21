@@ -8,16 +8,34 @@
 \newglossary*{english}{English}
 \newglossary*{french}{French}
 
+\newcommand*{\glsxtrpostdescdictionary}{%
+ \glsfieldfetch{\glscurrententrylabel}{desc}{\thisname}%
+ \glsfieldfetch{\glscurrententrylabel}{descplural}{\thisplural}%
+ \edef\defaultplural{\expandonce{\thisname}\noexpand\glspluralsuffix}%
+ \ifx\defaultplural\thisplural
+ \else
+   \edef\defaultplural{\expandonce{\thisname}\glspluralsuffix}%
+   \ifx\defaultplural\thisplural
+   \else
+     \space (pl.\ \thisplural)%
+   \fi
+ \fi
+}
+
 \GlsXtrLoadResources[
  src={entries-dual},% data in entries-dual.bib
- type=english,% primary entries
- dual-type=french,% dual entries
+ type=english,% put primary entries in glossary 'english'
+ dual-type=french,% put dual entries in glossary 'french'
+ category={dictionary},% set the primary category to 'dictionary'
+ dual-category={dictionary},% set the dual category to 'dictionary'
  sort=en,% sort primary entries according to language 'en'
  dual-sort=fr% sort dual entries according to language 'fr'
 ]
 
 \begin{document}
 \gls{cat}, \gls{dog}, \gls{castle}, \gls{child}.
+
+%\gls{dual.cat}, \gls{dual.dog}, \gls{dual.castle}, \gls{dual.child}.
 
 \printunsrtglossaries
 

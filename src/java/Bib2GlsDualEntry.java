@@ -41,21 +41,42 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
-   public String getFallbackField(String field)
+   public String getFallbackValue(String field)
    {
-      String val = super.getFallbackField(field);
+      String val = super.getFallbackValue(field);
 
       if (val != null) return val;
 
       if (field.equals("descriptionplural"))
       {
-         return getFallbackField("description")
-           +getResource().getDualDescPluralSuffix();
+         val = getFieldValue("description");
+
+         if (val == null)
+         {
+            return val;
+         }
+
+         String suffix = getResource().getDualDescPluralSuffix();
+
+         return suffix == null ? val : val+suffix;
       }
       else if (field.equals("symbolplural"))
       {
-         return getFallbackField("symbol")
-           +getResource().getDualSymbolPluralSuffix();
+         val = getFieldValue("symbol");
+
+         if (val == null)
+         {
+            val = getFallbackValue("symbol");
+         }
+
+         if (val == null)
+         {
+            return val;
+         }
+
+         String suffix = getResource().getDualSymbolPluralSuffix();
+
+         return suffix == null ? val : val+suffix;
       }
 
       return null;
@@ -123,23 +144,32 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       {
          String key = it.next();
 
+         String value = getFieldValue(key);
+
+         if (value == null)
+         {
+            value = getFallbackValue(key);
+
+            if (value != null)
+            {
+               putField(key, value);
+            }
+         }
+
          String map = mappings.get(key);
 
          if (entry.getFieldValue(map) == null)
          {
-            String fieldName = getFallbackField(key);
+            value = getFallbackValue(key);
 
-            if (fieldName == null)
+            if (value == null)
             {
                bib2gls.verbose(bib2gls.getMessage("message.no.fallback",
                   getEntryType(), key));
             }
             else
             {
-               BibValueList contents = getField(fieldName);
-               String value = getFieldValue(fieldName);
-
-               entry.putField(map, contents);
+               entry.putField(map, getFallbackContents(key));
                entry.putField(map, value);
             }
          }

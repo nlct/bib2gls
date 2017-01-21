@@ -744,9 +744,19 @@ public class GlsResource
                   entry.putField("category", category);
                }
 
+               Bib2GlsEntry dual = null;
+
+               if (entry instanceof Bib2GlsDualEntry)
+               {
+                  dual = ((Bib2GlsDualEntry)entry).createDual();
+                  entry.setDual(dual);
+                  dual.setDual(entry);
+               }
+
                // does this entry have any records?
 
                boolean hasRecords = false;
+               boolean dualHasRecords = false;
 
                for (GlsRecord record : records)
                {
@@ -756,21 +766,28 @@ public class GlsResource
 
                      hasRecords = true;
                   }
+
+                  if (dual != null)
+                  {
+                     if (record.getLabel().equals(dual.getId()))
+                     {
+                        dual.addRecord(record);
+
+                        dualHasRecords = true;
+                     }
+                  }
                }
 
                if (discard(entry)) continue;
 
                bibData.add(entry);
 
-               if (entry instanceof Bib2GlsDualEntry)
+               if (dual != null)
                {
+                  if (discard(dual)) continue;
+
                   if (dualSort.equals("combine"))
                   {
-                     Bib2GlsEntry dual = 
-                        ((Bib2GlsDualEntry)entry).createDual();
-
-                     if (discard(dual)) continue;
-
                      if (dualCategory != null)
                      {
                         dual.putField("category", dualCategory);
@@ -781,28 +798,54 @@ public class GlsResource
                         dual.putField("type", dualType);
                      }
 
-                     dual.addDependency(entry.getId());
-                     entry.addDependency(dual.getId());
                      bibData.add(dual);
                   }
                   else
                   {
-                     dualData.add(entry);
+                     dualData.add(dual);
                   }
                }
 
-               if (hasRecords && selectionMode == SELECTION_RECORDED_AND_DEPS)
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS)
                {
-                  // does this entry have a "see" field?
-
-                  entry.initCrossRefs(parser);
-
-                  for (Iterator<String> it = entry.getDependencyIterator();
-                       it.hasNext(); )
+                  if (hasRecords)
                   {
-                     String dep = it.next();
+                     // does this entry have a "see" field?
 
-                     bib2gls.addDependent(dep);
+                     entry.initCrossRefs(parser);
+
+                     for (Iterator<String> it = entry.getDependencyIterator();
+                          it.hasNext(); )
+                     {
+                        String dep = it.next();
+
+                        bib2gls.addDependent(dep);
+                     }
+
+                     if (dual != null)
+                     {
+                        bib2gls.addDependent(dual.getId());
+                     }
+                  }
+
+                  if (dualHasRecords)
+                  {
+                     // Does the "see" field need setting?
+
+                     if (dual.getFieldValue("see") == null)
+                     {
+                        dual.initCrossRefs(parser);
+                     }
+
+                     for (Iterator<String> it = dual.getDependencyIterator();
+                          it.hasNext(); )
+                     {
+                        String dep = it.next();
+
+                        bib2gls.addDependent(dep);
+                     }
+
+                     bib2gls.addDependent(entry.getId());
                   }
                }
             }
@@ -1006,8 +1049,7 @@ public class GlsResource
             {
                if (entry instanceof Bib2GlsDualEntry)
                {
-                  Bib2GlsEntry dual = 
-                        ((Bib2GlsDualEntry)entry).createDual();
+                  Bib2GlsEntry dual = entry.getDual();
 
                   if (dualCategory != null)
                   {
@@ -1025,11 +1067,8 @@ public class GlsResource
          }
          else
          {
-            for (Bib2GlsEntry entry : dualData)
+            for (Bib2GlsEntry dual : dualData)
             {
-               Bib2GlsEntry dual = 
-                        ((Bib2GlsDualEntry)entry).createDual();
-
                if (dualCategory != null)
                {
                   dual.putField("category", dualCategory);
@@ -1105,6 +1144,11 @@ public class GlsResource
          // syntax: {label}{opts}{name}{description}
 
          writer.println("\\providecommand{\\bibglsnewentry}[4]{%");
+         writer.print(" \\longnewglossaryentry*{#1}");
+         writer.println("{name={#3},#2}{#4}%");
+         writer.println("}");
+
+         writer.println("\\providecommand{\\bibglsnewdualentry}[4]{%");
          writer.print(" \\longnewglossaryentry*{#1}");
          writer.println("{name={#3},#2}{#4}%");
          writer.println("}");
