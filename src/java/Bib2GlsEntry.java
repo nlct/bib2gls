@@ -885,7 +885,8 @@ public class Bib2GlsEntry extends BibEntry
 
             builder.append(record.getFmtTeXCode());
          }
-         else if (record.follows(prev))
+         else if (minRange < Integer.MAX_VALUE
+                  && record.follows(prev))
          {
             count++;
             prev = record;

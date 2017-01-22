@@ -37,6 +37,21 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
+   // initialise the name field if a label prefix is supplied
+
+   public void parseContents(TeXParser parser,
+    TeXObjectList contents, TeXObject endGroupChar)
+     throws IOException
+   {
+      super.parseContents(parser, contents, endGroupChar);
+
+      if (getResource().getLabelPrefix() != null
+         && getFieldValue("name") == null)
+      {
+         putField("name", getOriginalId());
+      }
+   }
+
    public void checkRequiredFields(TeXParser parser)
    {// no required fields
    }

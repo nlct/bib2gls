@@ -9,23 +9,23 @@
 
 \GlsXtrLoadResources[sort=en-GB,% sort according to this locale
  %selection=all,% select all entries even if they haven't been used
- dual-entry-map={{{name},{description}},{{description},{name}}},
+ label-prefix={gls.},% insert this prefix to all the labels
  src={test-entries}]
 
 \begin{document}
-\gls{sample}. \gls{bird}. \gls{waterfowl}.
+\gls{gls.sample}. \gls{gls.bird}. \gls{gls.waterfowl}.
 
 \newpage
 
-\gls{sample}, \gls{bird}.
+\gls{gls.sample}, \gls{gls.bird}.
 
 \newpage
 
-\gls{sample}, \gls{waterfowl}.
+\gls{gls.sample}, \gls{gls.waterfowl}.
 
 \newpage
 
-Just indexing\glsadd{bird}.
+Just indexing\glsadd{gls.bird}.
 
 \newpage
 

@@ -872,6 +872,14 @@ public class Bib2Gls implements TeXApp
       return fields;
    }
 
+   public void addField(String fieldName)
+   {
+      if (!fields.contains(fieldName))
+      {
+         fields.add(fieldName);
+      }
+   }
+
    public HashMap<String,String> getFieldMap()
    {
       return fieldMap;
@@ -879,6 +887,11 @@ public class Bib2Gls implements TeXApp
 
    public boolean isKnownField(String name)
    {
+      if (fields.isEmpty())
+      {
+         debug("Empty field list when checking for field '"+name+"'");
+      }
+
       for (String field : fields)
       {
          if (field.equals(name))
@@ -1171,7 +1184,9 @@ public class Bib2Gls implements TeXApp
       }
       catch (IllegalArgumentException e)
       {
-         warning("Can't find message for label: "+label, e);
+         warning(String.format(
+           "Error fetching message for label '%s': %s", 
+            label, e.getMessage()), e);
       }
 
       return msg;

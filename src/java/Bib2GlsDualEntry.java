@@ -87,6 +87,16 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return getResource().getDualEntryMap();
    }
 
+   public String getFirstMap()
+   {
+      return getResource().getFirstDualEntryMap();
+   }
+
+   public boolean backLink()
+   {
+      return getResource().backLinkFirstDualEntryMap();
+   }
+
    public Bib2GlsEntry createDual()
    {
       GlsResource resource = getResource();
@@ -99,6 +109,16 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       entry.setId(dualLabel);
 
       HashMap<String,String> mappings = getMappings();
+
+      String firstKey = null;
+      String dualKey = null;
+      String primaryKey = null;
+
+      if (backLink())
+      {
+         firstKey = getFirstMap();
+         dualKey = mappings.get(firstKey);
+      }
 
       for (Iterator<String> it = getKeySet().iterator(); it.hasNext(); )
       {
@@ -158,6 +178,14 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
          String map = mappings.get(key);
 
+         if (firstKey != null && primaryKey == null)
+         {
+            if (map.equals(firstKey))
+            {
+               primaryKey = key;
+            }
+         }
+
          if (entry.getFieldValue(map) == null)
          {
             value = getFallbackValue(key);
@@ -173,6 +201,30 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
                entry.putField(map, value);
             }
          }
+      }
+
+      if (primaryKey != null)
+      {
+         String val = getFieldValue(primaryKey);
+
+         putField(primaryKey, String.format("\\glshyperlink[%s]{%s}",
+           val, entry.getId()));
+      }
+
+      if (dualKey != null)
+      {
+         String val = entry.getFieldValue(dualKey);
+
+         entry.putField(dualKey, String.format("\\glshyperlink[%s]{%s}",
+           val, getId()));
+      }
+
+      String dualField = resource.getDualField();
+
+      if (dualField != null)
+      {
+         entry.putField(dualField, getId());
+         putField(dualField, entry.getId());
       }
 
       return entry;

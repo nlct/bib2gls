@@ -168,6 +168,7 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}
 The size of the first list ({2,number}) is not the same as the size of 
 the second list ({3,number}).</entry>
+<entry key="error.invalid.field">Invalid field ''{0}'' provided by option ''{1}''</entry>
 <entry key="error.openin.forbidden">Read access forbidden for file: {0}</entry>
 <entry key="error.openout.forbidden">Write access forbidden for file: {0}</entry>
 <entry key="error.forbidden.ext">Write access forbidden for extension: {0}</entry>

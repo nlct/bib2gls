@@ -293,6 +293,7 @@ system's file permissions). \bibgls\ uses \app{kpsewhich} to
 determine these values and honours them.
 
 \section{Localisation}
+\label{sec:lang.xml}
 
 The messages produced by \bibgls\ are fetched from a resource file
 called \metafilefmt{bib2gls-}{lang}{.xml}, where \meta{lang} is a
@@ -695,10 +696,13 @@ For example:
 \begin{verbatim}
 % Encoding: UTF-8
 \end{verbatim}
-You can also set the encoding using the \csopt{charset} option, but
-it's more efficient to put the encoding comment at the start of the
-\ext{bib} file (otherwise \bibgls\ has to search the entire file for
-it).
+You can also set the encoding using the \optref{charset} option,
+but it's simpler to include the above comment on the first line of
+the \ext{bib} file. (This comment is also searched for by JabRef
+to determine the encoding, so it works for both applications.) 
+If you don't use either method \bibgls\ will
+have to search the entire \ext{bib} file, which is inefficient and
+you may end up with a mismatched encoding.
 
 Each entry type may have required fields and optional fields. For the
 optional fields, any key recognised by \cs{newglossaryentry} may be
@@ -975,6 +979,7 @@ For example:
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
+\setcounter{secnumdepth}{1}
 
 Make sure that you load \sty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
@@ -1026,7 +1031,26 @@ Alternatively, if they have different settings:
 \glsxtrresourcefile[sort=use]{entries-symbols}
 \end{verbatim}
 
-\section{\csopt{src}=\margm{list}}
+\section{General Options}
+\label{sec:generalopts}
+
+\subsection{\csopt{charset}=\margm{encoding-name}}
+\labelopt{charset}
+
+If the character encoding hasn't been supplied in the \ext{bib} file
+with the encoding comment
+\begin{alltt}
+\% Encoding: \meta{encoding-name}
+\end{alltt}
+then you can supply the correct encoding using
+\csopt[encoding-name]{charset}. In general, it's better to include
+the encoding in the \ext{bib} file where it can also be read by
+JabRef.
+
+\section{Selection Options}
+\label{sec:selectionopts}
+
+\subsection{\csopt{src}=\margm{list}}
 \labelopt{src}
 
 If the \csopt{src} option is omitted, the \ext{bib} file is assumed
@@ -1040,8 +1064,9 @@ Indicates that \bibgls\ needs to read the file
 different or if you have multiple \ext{bib} files, you need to use
 the \csopt{src} option.
 
-The value must be a comma-separated list of the required \ext{bib}
-files. These may either be in the current working directory or on
+The value should be a comma-separated list of the required \ext{bib}
+files. These may either be in the current working directory or in
+the directory given by the \argref{dir} switch or on
 \TeX's path (in which case \app{kpsewhich} will be used to find them).
 The \ext{bib} extension may be omitted. Remember that if \meta{list}
 contains multiple files it must be grouped to protect the comma
@@ -1055,7 +1080,336 @@ indicates that \bibgls\ must read the files
 \filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
 create the file obtained from \cs{jobname}\ext{glstex}.
 
-\section{\csopt{sort}=\meta{value}}
+\subsection{\csopt{selection}=\margm{value}}
+\labelopt{selection}
+
+By default all entries that have records in the \ext{aux} file will
+be selected as well as all their dependent entries. The dependent
+entries that don't have corresponding records on the first \LaTeX\
+run, make need an additional build to ensure their location lists
+are updated.
+
+Remember that on the first \LaTeX\ the \ext{glstex} files don't
+exist. This means that the entries can't be defined. The
+\styopt{record} package option additionally switches on the
+\styfmt[warn]{undefaction} option, which means that you'll only get
+warnings rather than errors when you reference entries in the
+document. This means that you can't use \cs{glsaddall} all with
+\bibgls\ because the glossary lists are empty on the first run
+therefore there's nothing for \cs{glsaddall} to iterate over.
+Instead, if you want to add all defined entries, you need to
+instruct \bibgls\ to do this with the \csopt{selection} option. The
+following values are allowed:
+\begin{itemize}
+\item \optfmt{recorded and deps}: add all recorded entries and
+their dependencies (default).
+\item \optfmt{recorded no deps}: add all recorded entries but not
+their dependencies. The dependencies include those referenced in the
+\field{see} field, \field{parent} entries and those found referenced
+with commands like \cs{gls} in the field values that are parsed by
+\bibgls. With this setting, parents will be omitted unless they've
+been referenced in the document through commands like \cs{gls}.
+\item \optfmt{recorded and ancestors}: this is live the previous
+setting but parents are added even if they haven't been referenced
+in the document. The other dependent entries are omitted if they
+haven't been referenced in the document.
+\item \optfmt{all}: add all entries found in the \ext{bib} files
+supplied in the \csopt{src} option.
+\end{itemize}
+The \meta{value} must be supplied.
+\section{Field and Label Options}
+\label{sec:labelopts}
+
+\subsection{\csopt{ignore-fields}=\margm{list}}
+\labelopt{ignore-fields}
+
+The \csopt{ignore-fields} key indicates that you want \bibgls\ to
+skip the fields listed in supplied the comma-separated \meta{list} of field
+labels. Remember that unrecognised fields will always be skipped.
+
+For example, suppose my \ext{bib} file contains
+\begin{verbatim}
+@abbreviation{html,
+  short ="html",
+  long  = {hypertext markup language},
+  description={a markup language for creating web pages},
+  see={[see also]xml}
+}
+\end{verbatim}
+but I want to use the \abbrstyle{short-long} style and I don't want
+the cross-referenced term, then I can use
+\csopt[\marg{see,description}]{ignore-fields}.
+
+\subsection{\csopt{type}=\margm{label}}
+\labelopt{type}
+
+The \csopt{type} option indicates that all the entries must have the
+\field{type} field set to \meta{label}. This will override any
+\field{type} fields supplied in the \ext{bib} file
+
+For example:
+\begin{verbatim}
+\usepackage[record,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries-symbols},type=symbols]
+\end{verbatim}
+
+\subsection{\csopt{category}=\margm{label}}
+\labelopt{category}
+
+The \csopt{category} option indicates that all the entries must have the
+\field{category} field set to \meta{label}. This will override any
+\field{category} fields supplied in the \ext{bib} file.
+
+\subsection{\csopt{label-prefix}=\margm{tag}}
+\labelopt{label-prefix}
+
+The \csopt{label-prefix} option prepends \meta{tag} to each
+entry's label. This \meta{tag} will also be inserted in front of any
+cross-references, unless they start with \idprefix{dual} or
+\idprefix{ext\meta{n}} (where \meta{n} is an integer).
+
+For example, if the \ext{bib} file contains
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal, such as a \gls{duck} or \gls {goose}}
+}
+
+@entry{waterfowl,
+  name={waterfowl},
+  description={Any \gls{bird} that lives in or about water},
+  see={[see also]{duck,goose}}
+}
+
+@index{duck}
+
+@index{goose,plural="geese"}
+\end{verbatim}
+Then if this \ext{bib} file is loaded with \csopt[gls.]{label-prefix}
+it's as though the entries had been defined as:
+\begin{verbatim}
+@entry{gls.bird,
+  name={bird},
+  description = {feathered animal, such as a \gls{gls.duck} or \gls
+{gls.goose}}
+}
+
+@entry{gls.waterfowl,
+  name={waterfowl},
+  description={Any \gls{gls.bird} that lives in or about water},
+  see={[see also]{gls.duck,gls.goose}}
+}
+
+@index{gls.duck,name={duck}}
+
+@index{gls.goose,name={goose},plural="geese"}
+\end{verbatim}
+
+Remember to use this prefix when you reference the terms in the
+document with commands like \cs{gls}.
+
+\subsection{\csopt{ext-prefixes}=\margm{list}}
+\labelopt{ext-prefixes}
+
+Any cross-references in the \ext{bib} file that start with
+\idprefix{ext\meta{n}} (where \meta{n} is a positive integer) will be 
+substituted with the \meta{n}th tag listed in the comma-separated
+\meta{list}. If there aren't that many items in the list, the
+\idprefix{ext\meta{n}} will simply be removed. The default setting is
+an empty list, which will strip all \idprefix{ext\meta{n}} prefixes.
+
+\section{Location List Options}
+\label{sec:locationopts}
+
+The \styopt{record} package option automatically adds two new keys: 
+\field{loclist} and \field{location}. These two fields are set by
+\bibgls\ from the information supplied in the \ext{aux} file. The
+\field{loclist} has the format of an \sty{etoolbox} internal list
+and includes every location (except for the discarded duplicates).
+Each item in the list is provided in the form
+\begin{alltt}
+\cs{glsseeformat}\oargm{tag}\marg{\meta{label list}}\marg{}
+\end{alltt}
+for cross-references supplied by the \field{see} field and
+\begin{alltt}
+\cs{glsnoidxdisplayloc}\margm{prefix}\margm{counter}\margm{format}\margm{location}
+\end{alltt}
+for locations. You can iterate through the \field{loclist} value
+using one of \sty{etoolbox}'s internal list loops. Remember that you
+can fetch the value of the field using \cs{glsfieldfetch} provided
+by the \sty{glossaries} package.
+
+The \field{location} field is used to store the formatted location
+list. The code for this list is generated by \bibgls\ based on the
+information provided in the \ext{aux} file, the presence of the
+\field{see} field and the various settings described in this
+chapter. When you display the glossary using \cs{printunsrtglossary},
+if the \field{location} field is present it will be displayed
+according to the glossary style (and other factors, such as whether the
+\optfmt{nonumberlist} option has been used, either as a package
+option or supplied in the optional argument of \cs{printunsrtglossary}).
+For more information on adjusting the formatting see the
+\sty{glossaries} and \sty{glossaries-extra} manual.
+
+\subsection{\csopt{min-loc-range}=\margm{value}}
+\labelopt{min-loc-range}
+
+By default, three or more consecutive locations \meta{loc-1},
+\meta{loc-2}, \ldots, \meta{loc-n} are compressed into
+the range \texttt{\meta{loc-1}\cs{delimR} \meta{loc-n}} (where
+\cs{delimR} is provided by the \sty{glossaries} package). Otherwise
+the locations are separated by \cs{delimN} (again provided by
+\sty{glossaries}).
+
+You can change this with the \csopt{min-loc-range} setting where
+\meta{value} is either \optfmt{none} (don't form ranges) or an
+integer greater than one indicating how many consecutive locations should be
+converted into a range.
+
+\bibgls\ determines if one location
+\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2} follows
+another location
+\margm{prefix-1}\margm{counter-1}\margm{format-1}\margm{location-1} 
+according to the following:
+\begin{itemize}
+\item \meta{prefix-1} is not equal to \meta{prefix-2} or
+\meta{counter-1} is not equal to \meta{counter-2} or \meta{format-1}
+is not equal to \meta{format-2}, then the locations aren't
+considered consecutive.
+\item If either \meta{location-1} or \meta{location-2} are empty,
+then the locations aren't considered consecutive.
+\item If both \meta{location-1} and \meta{location-2} match the
+pattern
+\begin{verbatim}
+(.*?)(?:\\protect\s*)?(\\[a-zA-Z@]+)\s*\{([0-9a-zA-Z]+)\}
+\end{verbatim}
+then:
+  \begin{itemize}
+  \item if the control sequence matched by group 2 isn't the same for
+  both locations, the locations aren't considered consecutive;
+  \item if argument of the control sequence (group 3) is the same for
+  both locations, then the test is retried with \meta{location-1}
+set to group 1 of the first pattern match and \meta{location-2}
+set to group 1 of the second pattern match;
+  \item otherwise the test is retried with \meta{location-1} set to
+group 3 of the first pattern match and \meta{location-2} set to
+group 3 of the second pattern match.
+  \end{itemize}
+\item If both \meta{location-1} and \meta{location-2} match the
+pattern
+\begin{verbatim}
+(.*?)([^0-9]?)([0-9]+)
+\end{verbatim}
+then:
+  \begin{itemize}
+  \item if group 3 of both pattern matches are equal the test is
+retried with \meta{location-1} set to the concatenation of the first
+two groups \meta{group-1}\meta{group-2} of the first pattern match 
+and \meta{location-2} set to the concatenation of the first two groups
+\meta{group-1}\meta{group-2} of the second pattern
+match;
+  \item If \meta{group-1} of the first pattern match (of
+\meta{location-1}) doesn't equal
+\meta{group-1} of the second pattern match (of \meta{location-2})
+or \meta{group-2} of the first pattern match (of
+\meta{location-1}) doesn't equal
+\meta{group-2} of the second pattern match (of \meta{location-2})
+then the locations aren't considered consecutive;
+   \item If \meta{group-3} of the second pattern match is one more
+than \meta{group-3} of the first pattern match, then the locations
+are consecutive otherwise they're not consecutive.
+  \end{itemize}
+\item The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
+where \meta{n} is a lower case Roman numeral, which is converted to
+a decimal value and the test is performed in the same way as the 
+above decimal test.
+\item The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
+where \meta{n} is an upper case Roman numeral, which is converted to
+a decimal value and the test is performed
+in the same way as the above decimal test.
+\item The next pattern matches for \meta{prefix}\meta{sep}\meta{c}
+where \meta{c} is either a lower case letter from \texttt{a} to
+\texttt{z} or an upper case letter from \texttt{A} to \texttt{Z}.
+The character is converted to its code point and the test is
+performed in the same way as the decimal pattern above.
+\item If none of the above, the locations aren't considered
+consecutive.
+\end{itemize} 
+
+\subsection{\csopt{suffixF}=\margm{value}}
+\labelopt{suffixF}
+
+If set, a range consisting of two consecutive locations 
+\meta{loc-1} and \meta{loc-2} will be
+displayed in the location list as \meta{loc-1}\meta{value}.
+
+\subsection{\csopt{suffixFF}=\margm{value}}
+\labelopt{suffixFF}
+
+If set, a range consisting of three or more consecutive locations 
+\meta{loc-1} and \meta{loc-2} will be
+displayed in the location list as \meta{loc-1}\meta{value}.
+
+\subsection{\csopt{see}=\margm{value}}
+\labelopt{see}
+
+If an entry has a \field{see} field, this can be placed before or
+after the location list, or completely omitted (but the value will
+still be available in the \field{see} field for use with
+\cs{glsxtrusesee}). This option may take the following values:
+\begin{itemize}
+\item \optfmt{omit}: omit the see reference from the location
+list.
+\item \optfmt{before}: place the see reference before the location
+list.
+\item \optfmt{after}: place the see reference after the location
+list (default).
+\end{itemize}
+The separator between the location list and the see reference is
+provided by \csref{bibglsseesep}. This separator is omitted if the
+location list is empty. The \meta{value} part is required.
+
+\subsection{\csopt{loc-prefix}=\margm{value}}
+\labelopt{loc-prefix}
+
+The \csopt{loc-prefix} setting indicates that the location lists
+should begin with \csref{bibglsprefix}\meta{n}. The \meta{value} may
+be one of the following:
+\begin{itemize}
+\item \optfmt{false}: don't insert \cs{bibglsprefix}\marg{n} at the start
+of the location lists (default).
+\item \optfmt{\margm{prefix-1},\margm{prefix-2},\ldots,\margm{prefix-n}}:
+insert \cs{bibglsprefix}\marg{n} (where \meta{n} is the number of
+locations in the list) at the start of each location list and the
+definition of \cs{bibglsprefix} will be appended to the glossary
+preamble providing an \cs{ifcase} condition:
+\begin{alltt}
+\cs{providecommand}\marg{\cs{bibglsprefix}}[1]\marg{\%
+  \cs{ifcase}\string#1
+  \cs{or} \meta{prefix-1}\csref{bibglspostprefix}
+  \cs{or} \meta{prefix-2}\cs{bibglspostprefix}
+  \ldots
+  \cs{else} \meta{prefix-n}\cs{bibglspostprefix}
+  \cs{fi}
+}
+\end{alltt}
+
+\item \optfmt{list}: equivalent to \csopt[\cs{pagelistname} ]{loc-prefix}.
+\item \optfmt{true}: equivalent to 
+\csopt[\margm{page},\margm{pages}]{loc-prefix}, where \meta{page} and
+\meta{pages} are obtained from the \texttt{tag.page} and
+\texttt{tag.pages} entries in \bibgls's \hyperref[sec:lang.xml]{language file}.
+This setting is only appropriate if the document's language matches the 
+language file.
+\end{itemize}
+
+If \meta{value} is omitted, \optfmt{true} is assumed.
+
+\section{Sorting}
+\label{sec:sortingopts}
+
+\subsection{\csopt{sort}=\margm{value}}
 \labelopt{sort}
 
 The \csopt{sort} key indicates how entries should be sorted. The
@@ -1079,7 +1433,7 @@ For example:
 \glsxtrresourcefile[sort={de-1996}]{german-terms}
 \end{verbatim}
 
-\section{\csopt{sort-field}=\margm{label}}
+\subsection{\csopt{sort-field}=\margm{label}}
 \labelopt{sort-field}
 
 The \csopt{sort-field} key indicates which field provides the sort
@@ -1090,91 +1444,301 @@ value. The default is the \field{sort} field. For example
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
 
-\section{\csopt{ignore-fields}=\margm{list}}
-\labelopt{ignore-fields}
+\section{Dual Entries}
 
-The \csopt{ignore-fields} key indicates that you want \bibgls\ to
-skip the fields listed in supplied the comma-separated \meta{list} of field
-labels. Remember that unrecognised fields will always be skipped.
+\subsection{\csopt{dual-sort}=\margm{value}}
+\labelopt{dual-sort}
 
-For example, suppose my \ext{bib} file contains
-\begin{verbatim}
-@abbreviation{html,
-  short ="html",
-  long  = {hypertext markup language},
-  description={a markup language for creating web pages},
-  see={[see also]xml}
-}
-\end{verbatim}
-but I want to use the \abbrstyle{short-long} style and I don't want
-the cross-referenced term, then I can use
-\csopt[\marg{see,description}]{ignore-fields}.
+This option indicates how to sort the dual entries. The primary
+entries are sorted with the normal entries. If
+\csopt[combine]{dual-sort} then the dual entries will be
+combined with the primary entries and sorted according to the
+\optref{sort} option.
 
-\section{\csopt{type}=\margm{label}}
-\labelopt{type}
-
-The \csopt{type} option indicates that all the entries must have the
-\field{type} field set to \meta{label}.
+If \meta{value} isn't set to \optfmt{combine} then the dual
+entries are sorted separately according to \meta{value} (as per
+\optref{sort}) and the dual entries will be appended at the end of
+the \ext{glstex} file. The field used by the comparator is given by
+\optref{dual-sort-field}.
 
 For example:
 \begin{verbatim}
-\usepackage[record,symbols]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries-symbols},type=symbols]
+\GlsXtrLoadResources[
+ src={entries-dual},
+ sort={en},
+ dual-sort={de-CH-1996}
+]
 \end{verbatim}
+This will sort the primary entries according to \optfmt{en}
+(English) and the secondary entries according to \optfmt{de-CH-1996} 
+(Swiss German new orthography) whereas:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src={entries-dual},
+ sort={en-GB},
+ dual-sort={combine}
+]
+\end{verbatim}
+will combine the dual entries with the primary entries and sort them
+all according to the \optfmt{en-GB} locale.
 
-\section{\csopt{category}=\margm{label}}
-\labelopt{category}
+If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
+\meta{value} is omitted, \optfmt{locale} is assumed.
 
-The \csopt{category} option indicates that all the entries must have the
-\field{category} field set to \meta{label}.
-
-\section{\csopt{label-prefix}=\margm{tag}}
-\labelopt{label-prefix}
-
-The \csopt{label-prefix} option prepend \meta{tag} to each
-entry's label. If you use this option, make sure that any
-cross-references are limited to the \ext{bib} files selected by the
-\optref{src} option.
-
-For example, if \filefmt{entries-terms.bib} has entries that
-reference terms in \filefmt{entries-symbols.bib}, then
-\csopt{label-prefix} can only be used if both \ext{bib} files are
-selected with 
-\texttt{\csopt{src}\dequals\marg{entries-terms\dcomma
-entries-symbols}}. They can be selected with separate instances of
-\cs{glsxtrresourcefile} (unless \csopt{label-prefix} is set to the
-same value in both cases).
-
-Remember to use this prefix when you reference the terms in the
-document when you use commands like \cs{gls}.
-
-\section{\csopt{loc-prefix}=\margm{value}}
-\labelopt{loc-prefix}
-
-\section{\csopt{dual-prefix}=\margm{value}}
-\labelopt{dual-prefix}
-
-\section{\csopt{dual-type}=\margm{value}}
-\labelopt{dual-type}
-
-\section{\csopt{dual-category}=\margm{value}}
-\labelopt{dual-category}
-
-\section{\csopt{dual-sort}=\margm{value}}
-\labelopt{dual-sort}
-
-\section{\csopt{dual-sort-field}=\margm{value}}
+\subsection{\csopt{dual-sort-field}=\margm{value}}
 \labelopt{dual-sort-field}
 
-\section{\csopt{ext-prefixes}=\margm{list}}
-\labelopt{ext-prefixes}
+This option indicates the field to use when sorting dual entries
+(when they haven't been combined with the primary entries). The
+default value is the same as the \optref{sort-field} value.
 
-\section{\csopt{selection}=\meta{value}}
-\labelopt{selection}
+\subsection{\csopt{dual-prefix}=\margm{value}}
+\labelopt{dual-prefix}
+
+This option indicates the prefix to use for the dual entries. The
+default value is \idprefix{dual} (including the terminating period). 
+Any references to dual entries within the \ext{bib} file should use
+the prefix \idprefix{dual} which will be replaced by \meta{value}
+when the \ext{bib} file is parsed.
+
+\subsection{\csopt{dual-type}=\margm{value}}
+\labelopt{dual-type}
+
+This option sets the \field{type} field to \meta{value} for all dual
+entries. (The primary entries obey the \optref{type} option.) This
+will override any value of \field{type} provided in the \ext{bib}
+file (or created through a mapping).
+
+\subsection{\csopt{dual-category}=\margm{value}}
+\labelopt{dual-category}
+
+This option sets the \field{category} field to \meta{value} for all dual
+entries. (The primary entries obey the \optref{category} option.) This
+will override any value of \field{category} provided in the \ext{bib}
+file (or created through a mapping).
+
+\subsection{\csopt{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-entry-map}
+
+This setting governs the behaviour of \atentry{dualentry}
+definitions. The value consists of two comma-separated lists of
+equal length identifying the field mapping used to create the dual
+entry from the primary one.
+
+The default setting is:
+\begin{verbatim}
+dual-entry-map=
+{
+  {name,plural,description,descriptionplural},
+  {description,descriptionplural,name,plural}
+}
+\end{verbatim}
+The dual entry is created by copying the value of the field in the
+first list \meta{list1} to the field in the corresponding place in the second
+list \meta{list2}. Any additional fields are copied over to the same
+field.
+
+For example:
+\begin{verbatim}
+@dualentry{cat,
+  name={cat},
+  description={chat},
+  see={dog}
+}
+\end{verbatim}
+defines two entries. The primary entry is essentially like
+\begin{verbatim}
+@entry{cat,
+  name={cat},
+  plural={cat\glspluralsuffix },
+  description={chat},
+  descriptionplural={chat\glspluralsuffix },
+  see={dog}
+}
+\end{verbatim}
+and the dual entry is essentially like
+\begin{verbatim}
+@entry{dual.cat,
+  description={cat},
+  descriptionplural={cat\glspluralsuffix },
+  name={chat},
+  plural={chat\glspluralsuffix },
+  see={dog}
+}
+\end{verbatim}
+(except they're defined using \cs{bibglsnewdualentry} instead of
+\cs{bibglsnewentry}, and each is considered dependent on the other.)
+
+The \field{see} field isn't listed in \csopt{dual-entry-map} so its
+value is simply copied directly over to the \field{see} field in the
+dual entry. Note that the missing plural fields (\field{plural} and
+\field{descriptionplural}) have been filled in.
+
+In general \bibgls\ doesn't try to supply missing fields, but in the
+dual entry cases it needs to do this for the mapped fields. This is
+because the shuffled fields might have different default values from
+the \sty{glossaries-extra} package's point of view. For example, 
+\cs{longnewglossaryentry} doesn't provide a default for
+\field{descriptionplural} if if hasn't been set.
+
+\subsection{\csopt{dual-abbrv-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-abbrv-map}
+
+This is like \csopt{dual-entry-map} but applies to
+\atentry{dualabbreviation} rather than \atentry{dualentry}. The
+default setting is:
+\begin{verbatim}
+dual-abbrv-map=
+{
+  {short,shortplural,long,longplural,symbol,symbolplural,
+   description,descriptionplural},
+  {symbol,symbolplural,description,descriptionplural,short,shortplural,
+   long,longplural}
+}
+\end{verbatim}
+
+This essentially flips the \field{short} field with the
+\field{symbol} field and the \field{long} field with the
+\field{description} field.
+
+\subsection{\csopt{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-symbol-map}
+
+This is like \csopt{dual-entry-map} but applies to
+\atentry{dualsymbol} rather than \atentry{dualentry}. The
+default setting is:
+\begin{verbatim}
+dual-symbol-map=
+{
+  {name,plural,symbol,symbolplural},
+  {symbol,symbolplural,name,plural}
+}
+\end{verbatim}
+
+This essentially flips the \field{name} field with the
+\field{symbol} field.
+
+\subsection{\csopt{dual-entry-backlink}=\margm{boolean}}
+\labelopt{dual-entry-backlink}
+
+This is a boolean setting.
+When used with \atentry{dualentry}, if \meta{boolean} is
+\optfmt{true}, this will wrap the contents of first mapped field
+with \cs{glshyperlink}. If \meta{boolean} is missing \optfmt{true}
+is assumed.
+
+The field is obtained from the first mapping
+listed in \csopt{dual-entry-map}.
+
+For example, if the document contains:
+\begin{verbatim}
+\GlsXtrLoadResource[dual-entry-backlink,
+dual-entry-map={
+  {name,plural,description,descriptionplural},
+  {description,descriptionplural,name,plural}
+},
+src={entries-dual}]
+\end{verbatim}
+and if the \ext{bib} file contains
+\begin{verbatim}
+@dualentry{child,
+  name={child},
+  plural={children},
+  description={enfant}
+}
+\end{verbatim}
+Then the definition of the primary entry (\texttt{child}) in the
+\ext{glstex} file will have the \field{description} field set to
+\begin{verbatim}
+{\glshyperlink[enfant]{dual.child}}
+\end{verbatim}
+and the dual entry (\texttt{dual.child}) will have the
+\field{description} field set to
+\begin{verbatim}
+{\glshyperlink[child]{child}}
+\end{verbatim}
+
+The reason the \field{description} field is chosen for the modification is
+because the first field listed in the first list in \csopt{dual-entry-map} 
+is the \field{name} field which maps to \field{description} (the
+first field in the second list). This means that the hyperlink for
+the dual entry should be put in the \field{description} field.
+
+For the primary entry, the \field{name} field is looked up in the
+second list from the \csopt{dual-entry-map} setting. This is the
+third item in this second list, so the third item in the first list
+is selected, which also happens to be the \field{description} field,
+so the hyperlink for the primary entry is put in the
+\field{description} field.
+
+\subsection{\csopt{dual-abbrv-backlink}=\margm{value}}
+\labelopt{dual-abbrv-backlink}
+
+This is analogous to \csopt{dual-entry-backlink} but for entries
+defined with \atentry{dualabbreviation} instead of
+\atentry{dualentry}.
+
+\subsection{\csopt{dual-symbol-backlink}=\margm{value}}
+\labelopt{dual-symbol-backlink}
+
+This is analogous to \csopt{dual-entry-backlink} but for entries
+defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
+
+\subsection{\csopt{dual-backlink}=\margm{value}}
+\labelopt{dual-backlink}
+
+Shortcut for \csopt[\margm{value}]{dual-entry-backlink}, 
+\csopt[\margm{value}]{dual-abbrv-backlink}, and
+\csopt[\margm{value}]{dual-symbol-backlink}.
+
+\subsection{\csopt{dual-field}=\margm{value}}
+\labelopt{dual-field}
+
+If this option is used, this will add \cs{glsxtrprovidestoragekey}
+to the start of the \ext{glstex} file providing the key given by
+\meta{value}.  Any entries defined using \atentry{dualentry}
+will be written to the \ext{glstex} file with an extra field called
+\meta{value} that is set to the mirror entry. If \meta{value} is
+omitted \texttt{dual} is assumed.
+
+For example, if the \ext{bib} file contains
+\begin{verbatim}
+@dualentry{child,
+  name={child},
+  plural={children},
+  description={enfant}
+}
+\end{verbatim}
+Then with \csopt[dualid]{dual-field} this will first add the line
+\begin{verbatim}
+\glsxtrprovidestoragekey{dualid}{}{}
+\end{verbatim}
+at the start of the file and will include the line
+\begin{verbatim}
+dualid={dual.child},
+\end{verbatim}
+for the primary entry (\texttt{child}) and the line
+\begin{verbatim}
+dualid={child},
+\end{verbatim}
+for the dual entry (\texttt{dual.child}). It's then possible to
+reference one entry from the other. For example, the post-description 
+hook could contain:
+\begin{verbatim}
+ \ifglshasfield{dualid}{\glscurrententrylabel}
+ {%
+   \space
+   (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
+ }%
+ {}%
+\end{verbatim}
+Note that this new field won't be available for use within the
+\ext{bib} file (unless it was previously defined in the document
+before \cs{glsxtrresourcefile}).
 
 \chapter{Provided Commands}
 \label{sec:bibglscs}
+\setcounter{secnumdepth}{0}
 
 When \bibgls\ writes the entries to the output file, instead of
 directly using commands like \cs{newglossaryentry}, it provides
@@ -1202,6 +1766,88 @@ own commands before the \ext{glstex} files are loaded.
 
 \section{\cs{bibglsnewdualentry}}
 \labelcs{bibglsnewdualentry}
+
+\section{\cs{bibglsseesep}}
+\labelcs{bibglsseesep}
+
+Any entries that provide a \field{see} field (and that field hasn't
+be omitted from the location list with \csopt[omit]{see}) will
+have \cs{bibglsseesep} inserted between the \field{see} part and the
+location list (unless there are no locations, in which case just
+the \field{see} part is displayed without \cs{bibglsseesep}).
+
+This command is provided with:
+\begin{verbatim}
+\providecommand{\bibglsseesep}{, }
+\end{verbatim}
+You can define this before you load the \ext{bib} file:
+\begin{verbatim}
+\newcommand{\bibglsseesep}{; }
+\GlsXtrLoadResources[src={entries}]
+\end{verbatim}
+Or you can redefine it afterwards:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries}]
+\renewcommand{\bibglsseesep}{; }
+\end{verbatim}
+
+\section{\cs{bibglspostprefix}}
+\labelcs{bibglspostprefix}
+
+If the \optref{loc-prefix} option is on, \csref{bibglsprefix} will
+be inserted at the start of location lists. The command \cs{bibglspostprefix}
+is placed after the prefix text. This command is provided with:
+\begin{verbatim}
+\providecommand{\bibglspostprefix}{\ }
+\end{verbatim}
+which puts a space between the prefix text and the location list.
+You can define this before you load the \ext{bib} file:
+\begin{verbatim}
+\newcommand{\bibglspostprefix}{: }
+\GlsXtrLoadResources[src={entries},loc-prefix]
+\end{verbatim}
+Or you can redefine it afterwards:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries},loc-prefix]
+\renewcommand{\bibglspostprefix}{: }
+\end{verbatim}
+
+\section{\cs{bibglsprefix}}
+\labelcs{bibglsprefix}
+
+If the \optref{loc-prefix} option is on, this command will be
+provided. If the glossary type has been provided by \csoptref{type}
+(and \csoptref{dual-type} if there are any dual entries) then the
+definition of \cs{bibglsprefix} will be appended to the glossary
+preamble for the given type (or types if there are dual entries).
+For example, if the document has
+\begin{verbatim}
+\GlsXtrLoadResources[type=main,loc-prefix={p.,pp.},src={entries}]
+\end{verbatim}
+and there are no dual entries, then the following will be added to
+the \ext{glstex} file:
+\begin{verbatim}
+\apptoglossarypreamble[main]{%
+ \providecommand{\bibglsprefix}[1]{%
+  \ifcase##1
+  \or p.\bibglspostprefix
+  \else pp.\bibglspostprefix
+  \fi
+ }
+}
+\end{verbatim}
+However, if the \csopt{type} key is missing, then the following will
+be added instead:
+\begin{verbatim}
+\appto\glossarypreamble{%
+ \providecommand{\bibglsprefix}[1]{%
+  \ifcase#1
+  \or p.\bibglspostprefix
+  \else pp.\bibglspostprefix
+  \fi
+ }
+}
+\end{verbatim}
 
 \resetsecnumdepth
 

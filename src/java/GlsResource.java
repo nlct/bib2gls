@@ -120,8 +120,25 @@ public class GlsResource
                    csvList.toString(parser)));
             }
 
-            CsvList list1 = CsvList.getList(parser, csvList.getValue(0));
-            CsvList list2 = CsvList.getList(parser, csvList.getValue(1));
+            TeXObject obj = csvList.get(0);
+
+            // strip redundant white space and grouping
+
+            if (obj instanceof TeXObjectList)
+            {
+               obj = trimList((TeXObjectList)obj);
+            }
+
+            CsvList list1 = CsvList.getList(parser, obj);
+
+            obj = csvList.get(1);
+
+            if (obj instanceof TeXObjectList)
+            {
+               obj = trimList((TeXObjectList)obj);
+            }
+
+            CsvList list2 = CsvList.getList(parser, obj);
 
             int n = list1.size();
 
@@ -138,7 +155,16 @@ public class GlsResource
             {
                TeXObject obj1 = list1.getValue(i);
                TeXObject obj2 = list2.getValue(i);
-               dualEntryMap.put(obj1.toString(parser), obj2.toString(parser));
+
+               String key = obj1.toString(parser);
+               String map = obj2.toString(parser);
+
+               dualEntryMap.put(key, map);
+
+               if (i == 0)
+               {
+                  dualEntryFirstMap = key;
+               }
             }
          }
          else if (opt.equals("dual-abbrv-map"))
@@ -170,7 +196,16 @@ public class GlsResource
             {
                TeXObject obj1 = list1.getValue(i);
                TeXObject obj2 = list2.getValue(i);
-               dualAbbrvMap.put(obj1.toString(parser), obj2.toString(parser));
+
+               String key = obj1.toString(parser); 
+               String map = obj2.toString(parser); 
+
+               dualAbbrvMap.put(key, map);
+
+               if (i == 0)
+               {
+                  dualAbbrvFirstMap = key;
+               }
             }
          }
          else if (opt.equals("dual-symbol-map"))
@@ -202,7 +237,96 @@ public class GlsResource
             {
                TeXObject obj1 = list1.getValue(i);
                TeXObject obj2 = list2.getValue(i);
-               dualSymbolMap.put(obj1.toString(parser), obj2.toString(parser));
+
+               String key = obj1.toString(parser); 
+               String map = obj2.toString(parser); 
+
+               dualSymbolMap.put(key, map);
+
+               if (i == 0)
+               {
+                  dualSymbolFirstMap = key;
+               }
+            }
+         }
+         else if (opt.equals("dual-backlink"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               backLinkDualEntry = true;
+               backLinkDualAbbrv = true;
+               backLinkDualSymbol = true;
+            }
+            else if (val.equals("false"))
+            {
+               backLinkDualEntry = false;
+               backLinkDualAbbrv = false;
+               backLinkDualSymbol = false;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, "true, false"));
+            }
+         }
+         else if (opt.equals("dual-entry-backlink"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               backLinkDualEntry = true;
+            }
+            else if (val.equals("false"))
+            {
+               backLinkDualEntry = false;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, "true, false"));
+            }
+         }
+         else if (opt.equals("dual-abbrv-backlink"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               backLinkDualAbbrv = true;
+            }
+            else if (val.equals("false"))
+            {
+               backLinkDualAbbrv = false;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, "true, false"));
+            }
+         }
+         else if (opt.equals("dual-symbol-backlink"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               backLinkDualSymbol = true;
+            }
+            else if (val.equals("false"))
+            {
+               backLinkDualSymbol = false;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, "true, false"));
             }
          }
          else if (opt.equals("type"))
@@ -212,6 +336,15 @@ public class GlsResource
          else if (opt.equals("dual-type"))
          {
             dualType = list.getValue(opt).toString(parser).trim();
+         }
+         else if (opt.equals("dual-field"))
+         {
+            dualField = list.getValue(opt).toString(parser).trim();
+
+            if (dualField.isEmpty())
+            {
+               dualField = "dual";
+            }
          }
          else if (opt.equals("category"))
          {
@@ -291,6 +424,33 @@ public class GlsResource
          {
             bibCharset = Charset.forName(
                            list.getValue(opt).toString(parser).trim());
+         }
+         else if (opt.equals("min-loc-range"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            if (val.equals("none"))
+            {
+               minLocationRange = Integer.MAX_VALUE;
+            }
+            else
+            {
+               try
+               {
+                  minLocationRange = Integer.parseInt(val);
+
+                  if (minLocationRange < 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", opt, val));
+                  }
+               }
+               catch (NumberFormatException e)
+               {
+                  throw new IllegalArgumentException(
+                    bib2gls.getMessage("error.invalid.opt.value", opt, val), e);
+               }
+            }
          }
          else if (opt.equals("suffixF"))
          {
@@ -524,19 +684,23 @@ public class GlsResource
          dualEntryMap.put("plural", "descriptionplural");
          dualEntryMap.put("description", "name");
          dualEntryMap.put("descriptionplural", "plural");
+
+         dualEntryFirstMap = "name";
       }
 
       if (dualAbbrvMap == null)
       {
          dualAbbrvMap = new HashMap<String,String>();
-         dualAbbrvMap.put("long", "description");
-         dualAbbrvMap.put("longplural", "descriptionplural");
          dualAbbrvMap.put("short", "symbol");
          dualAbbrvMap.put("shortplural", "symbolplural");
+         dualAbbrvMap.put("long", "description");
+         dualAbbrvMap.put("longplural", "descriptionplural");
          dualAbbrvMap.put("symbol", "short");
          dualAbbrvMap.put("symbolplural", "shortplural");
          dualAbbrvMap.put("description", "long");
          dualAbbrvMap.put("descriptionplural", "longplural");
+
+         dualAbbrvFirstMap = "short";
       }
 
       if (dualSymbolMap == null)
@@ -546,6 +710,8 @@ public class GlsResource
          dualSymbolMap.put("plural", "symbolplural");
          dualSymbolMap.put("symbol", "name");
          dualSymbolMap.put("symbolplural", "plural");
+
+         dualSymbolFirstMap = "name";
       }
 
       if (dualType == null)
@@ -555,7 +721,7 @@ public class GlsResource
 
       if (dualSort == null)
       {
-         dualSort = sort;
+         dualSort = "combine";
       }
       else if (dualSort.equals("none"))
       {
@@ -646,6 +812,30 @@ public class GlsResource
       {
          sources.add(bib2gls.getBibFilePath(parser, filename));
       }
+   }
+
+   private TeXObjectList trimList(TeXObjectList list)
+   {
+      // strip redundant white space and grouping
+
+      while (list.size() > 0 && (list.get(0) instanceof WhiteSpace))
+      {
+         list.remove(0);
+      }
+
+      while (list.size() > 0
+        && (list.lastElement() instanceof WhiteSpace))
+      {
+         list.remove(list.size()-1);
+      }
+
+      if (list.size() == 1
+        && (list.get(0) instanceof Group))
+      {
+         list = ((Group)list.get(0)).toList(); 
+      }
+
+      return list;
    }
 
    public void parse(TeXParser parser)
@@ -1029,6 +1219,17 @@ public class GlsResource
             "No data (parse must come before processData)");
       }
 
+      if (dualField != null)
+      {
+         bib2gls.addField(dualField);
+      }
+
+      // check field mapping keys
+
+      checkFieldMaps(dualEntryMap, "dual-entry-map");
+      checkFieldMaps(dualAbbrvMap, "dual-abbrv-map");
+      checkFieldMaps(dualSymbolMap, "dual-symbol-map");
+
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
       processData(bibData, entries, sort, sortField);
@@ -1099,6 +1300,12 @@ public class GlsResource
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
+         if (dualField != null)
+         {
+            writer.format("\\glsxtrprovidestoragekey{%s}{}{}%n%n",
+               dualField);
+         }
+
          if (seeLocation != Bib2GlsEntry.NO_SEE)
          {
             writer.println("\\providecommand{\\bibglsseesep}{, }");
@@ -1126,7 +1333,14 @@ public class GlsResource
               }
 
               writer.println(" \\providecommand{\\bibglsprefix}[1]{%");
-              writer.println("  \\ifcase##1");
+              if (type == null)
+              {
+                 writer.println("  \\ifcase#1");
+              }
+              else
+              {
+                 writer.println("  \\ifcase##1");
+              }
 
               for (int i = 0; i < locationPrefix.length; i++)
               {
@@ -1297,9 +1511,29 @@ public class GlsResource
       return dualEntryMap;
    }
 
+   public String getFirstDualEntryMap()
+   {
+      return dualEntryFirstMap;
+   }
+
+   public boolean backLinkFirstDualEntryMap()
+   {
+      return backLinkDualEntry;
+   }
+
    public HashMap<String,String> getDualSymbolMap()
    {
       return dualSymbolMap;
+   }
+
+   public String getFirstDualSymbolMap()
+   {
+      return dualSymbolFirstMap;
+   }
+
+   public boolean backLinkFirstDualSymbolMap()
+   {
+      return backLinkDualSymbol;
    }
 
    public HashMap<String,String> getDualAbbrvMap()
@@ -1307,9 +1541,49 @@ public class GlsResource
       return dualAbbrvMap;
    }
 
+   public String getFirstDualAbbrvMap()
+   {
+      return dualAbbrvFirstMap;
+   }
+
+   public boolean backLinkFirstDualAbbrvMap()
+   {
+      return backLinkDualAbbrv;
+   }
+
+   public String getDualField()
+   {
+      return dualField;
+   }
+
+
+   private void checkFieldMaps(HashMap<String,String> mapping, String optName)
+    throws Bib2GlsException
+   {
+      for (Iterator<String> it = mapping.keySet().iterator();
+              it.hasNext(); )
+      {
+         String key = it.next();
+
+         if (!bib2gls.isKnownField(key))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.field", key, optName));
+         }
+
+         key = mapping.get(key);
+
+         if (!bib2gls.isKnownField(key))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.field", key, optName));
+         }
+      }
+   }
+
    // Allow for entries to be filtered out
    public boolean discard(Bib2GlsEntry entry)
-   {
+   {// TODO
       return false;
    }
 
@@ -1330,7 +1604,8 @@ public class GlsResource
 
    private String shortPluralSuffix="\\abbrvpluralsuffix ";
 
-   private String dualSymbolPluralSuffix="s", dualDescPluralSuffix="s";
+   private String dualSymbolPluralSuffix="\\glspluralsuffix ", 
+     dualDescPluralSuffix="\\glspluralsuffix ";
 
    private Charset bibCharset = null;
 
@@ -1356,8 +1631,19 @@ public class GlsResource
 
    private String labelPrefix = null, dualPrefix="dual.";
 
+   private String dualField = null;
+
    private HashMap<String,String> dualEntryMap, dualAbbrvMap,
       dualSymbolMap;
+
+   // HashMap doesn't retain order, so keep track of the first
+   // mapping separately.
+
+   private String dualEntryFirstMap, dualAbbrvFirstMap, dualSymbolFirstMap;
+
+   private boolean backLinkDualEntry=false;
+   private boolean backLinkDualAbbrv=false;
+   private boolean backLinkDualSymbol=false;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

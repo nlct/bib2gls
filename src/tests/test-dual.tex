@@ -3,29 +3,42 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
-\usepackage[record,nomain]{glossaries-extra}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,nomain,postdot]{glossaries-extra}
 
 \newglossary*{english}{English}
 \newglossary*{french}{French}
 
 \newcommand*{\glsxtrpostdescdictionary}{%
- \glsfieldfetch{\glscurrententrylabel}{desc}{\thisname}%
- \glsfieldfetch{\glscurrententrylabel}{descplural}{\thisplural}%
- \edef\defaultplural{\expandonce{\thisname}\noexpand\glspluralsuffix}%
- \ifx\defaultplural\thisplural
- \else
-   \edef\defaultplural{\expandonce{\thisname}\glspluralsuffix}%
-   \ifx\defaultplural\thisplural
-   \else
-     \space (pl.\ \thisplural)%
-   \fi
- \fi
+ \ifglshasfield{descplural}{\glscurrententrylabel}
+ {%
+   \ifthenelse
+   {\equal
+    {\glsentrydesc{\glscurrententrylabel}\glspluralsuffix}
+    {\glsentrydescplural{\glscurrententrylabel}}
+   }
+   {}%
+   {\space (pl.\ \glsentrydescplural{\glscurrententrylabel})}%
+ }%
+ {}%
+% \ifglshasfield{dualid}{\glscurrententrylabel}
+% {%
+%   \space See:
+%     \glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}}%
+% }%
+% {}%
 }
 
 \GlsXtrLoadResources[
  src={entries-dual},% data in entries-dual.bib
  type=english,% put primary entries in glossary 'english'
  dual-type=french,% put dual entries in glossary 'french'
+ %dual-field=dualid,% create a new field called 'dualid'
+% dual-entry-map={% provide field mappings for dual entries
+%  {name,plural,description,descriptionplural},
+%  {description,descriptionplural,name,plural}
+% },
+ dual-entry-backlink,% backlink dual fields
  category={dictionary},% set the primary category to 'dictionary'
  dual-category={dictionary},% set the dual category to 'dictionary'
  sort=en,% sort primary entries according to language 'en'
