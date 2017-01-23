@@ -1140,12 +1140,91 @@ but I want to use the \abbrstyle{short-long} style and I don't want
 the cross-referenced term, then I can use
 \csopt[\marg{see,description}]{ignore-fields}.
 
-\subsection{\csopt{type}=\margm{label}}
+\subsection{\csopt{category}=\margm{value}}
+\labelopt{category}
+
+The selected entries may all have their \field{category} field
+changed before writing their definitions to the \ext{glstex} file.
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: set the
+\field{category} to the entry type used to define it.
+\item \optfmt{same as type}: set the \field{category} to the same
+value as the \field{type} field (if that field has been provided
+either in the \ext{bib} file or through the \optref{type} option).
+\item A category label: the \field{category} is set to \meta{value}.
+\end{itemize}
+This will override any
+\field{category} fields supplied in the \ext{bib} file.
+
+For example, if the \ext{bib} file contains:
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal}
+}
+
+@index{duck}
+
+@index{goose,plural="geese"}
+
+@dualentry{dog,
+  name={dog},
+  description={chien}
+}
+\end{verbatim}
+then if the document contains
+\begin{verbatim}
+\GlsXtrLoadResources[category={same as entry},src={entries}]
+\end{verbatim}
+this will set the \field{category} of the \texttt{bird} field to
+\optfmt{entry} (since it was defined with \cs{entry}), the \field{category} of the \texttt{duck} and
+\texttt{goose} entries to \optfmt{index} (since they were defined
+with \atentry{index}), and the \field{category} of the \texttt{dog}
+entry to \optfmt{dualentry} (since it was
+defined with \atentry{dualentry}). Note that the dual entry
+\texttt{dual.dog} doesn't have the category set, since that's
+governed by \optref{dual-category} instead.
+
+If, instead, the document contains
+\begin{verbatim}
+\GlsXtrLoadResources[category={animals},src={entries}]
+\end{verbatim}
+then the \field{category} of all the primary selected entries will 
+be set to \optfmt{animals}. Again the dual entry \texttt{dual.dog}
+doesn't have the \field{category} set.
+
+Note that the categories may be overridden by the commands,
+such as \csref{bibglsnewindex}, that are used to actually define the
+entries.
+
+For example, if the document contains
+\begin{verbatim}
+\newcommand{\bibglsnewdualentry}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},#2,category={dual}}{#4}%
+}
+
+\GlsXtrLoadResources[category={animals},src={entries}]
+\end{verbatim}
+then both the \texttt{dog} and \texttt{dual.dog} entries will
+have their \field{category} field set to \optfmt{dual} since the
+new definition of \cs{bibglsnewdualentry} has overridden
+the \csopt[animals]{category} option.
+\subsection{\csopt{type}=\margm{value}}
+
 \labelopt{type}
 
-The \csopt{type} option indicates that all the entries must have the
-\field{type} field set to \meta{label}. This will override any
-\field{type} fields supplied in the \ext{bib} file
+The \meta{value} may be \optfmt{same as entry} or a glossary label.
+This is similar to the \optref{category} option except that
+it sets the \field{type} field. As with the \csopt{category} option,
+\csopt[\marg{same as entry}]{value} indicates that the entry
+type should be used. There is no \meta{value} analogous to
+\csopt[\marg{same as type}]{category}.
+
+Make sure that the glossary type has already been defined. 
+
+Note that this setting only changes the \field{type} field for
+primary entries. Use \optref{dual-type} for dual entries.
 
 For example:
 \begin{verbatim}
@@ -1154,12 +1233,22 @@ For example:
 \GlsXtrLoadResources[src={entries-symbols},type=symbols]
 \end{verbatim}
 
-\subsection{\csopt{category}=\margm{label}}
-\labelopt{category}
+Remember that you can use the starred version of \cs{newglossary}
+if you don't want to worry about the extensions needed by
+\app{makeindex} or \app{xindy}. For example:
+\begin{verbatim}
+\usepackage[record,nomain]{glossaries-extra}
 
-The \csopt{category} option indicates that all the entries must have the
-\field{category} field set to \meta{label}. This will override any
-\field{category} fields supplied in the \ext{bib} file.
+\newglossary*{dictionary}{Dictionary}
+
+\GlsXtrLoadResources[src={entries-symbols},type=dictionary]
+\end{verbatim}
+(The \styopt{nomain} option was added to suppress the
+creation of the default \texttt{main} glossary.)
+
+Alternatively you can use \cs{newignoredglossary} if you don't
+want the glossary picked up by \cs{printunsrtglossaries}.
+
 
 \subsection{\csopt{label-prefix}=\margm{tag}}
 \labelopt{label-prefix}
@@ -1504,18 +1593,74 @@ when the \ext{bib} file is parsed.
 \subsection{\csopt{dual-type}=\margm{value}}
 \labelopt{dual-type}
 
-This option sets the \field{type} field to \meta{value} for all dual
+This option sets the \field{type} field for all dual
 entries. (The primary entries obey the \optref{type} option.) This
 will override any value of \field{type} provided in the \ext{bib}
-file (or created through a mapping).
+file (or created through a mapping). The \meta{value} is required.
+
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: sets the
+\field{type} to the entry type. For example, if the entry
+was defined with \atentryref{dualentry}, the \field{type} will be
+set to \optfmt{dualentry}.
+\item \optfmt{same as primary}: sets the \field{type} to the same
+as the corresponding primary entry's \field{type} (which may
+have been set with \optref{type}). If the primary entry doesn't
+have the \field{type} field set, the dual's \field{type} will
+remain unchanged.
+\item \meta{label}: sets the \field{type} field to \meta{label}.
+\end{itemize}
+
+Remember that the glossary with that label must have already 
+been defined.
+
+For example:
+\begin{verbatim}
+\newglossary*{english}{English}
+\newglossary*{french}{French}
+
+\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
+ type=english,
+ dual-type=french]
+\end{verbatim}
+
+Alternatively:
+\begin{verbatim}
+\newglossary*{dictionary}{Dictionary}
+
+\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
+ type=dictionary,
+ dual-type={same as primary}]
+\end{verbatim}
 
 \subsection{\csopt{dual-category}=\margm{value}}
 \labelopt{dual-category}
 
-This option sets the \field{category} field to \meta{value} for all dual
+This option sets the \field{category} field for all dual
 entries. (The primary entries obey the \optref{category} option.) This
 will override any value of \field{category} provided in the \ext{bib}
-file (or created through a mapping).
+file (or created through a mapping). The \meta{value} may be empty.
+
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: sets the
+\field{category} to the entry type. For example, if the entry
+was defined with \atentryref{dualentry}, the \field{category} will be
+set to \optfmt{dualentry}.
+\item \optfmt{same as primary}: sets the \field{category} to the same
+as the corresponding primary entry's \field{category} (which may
+have been set with \optref{category}). If the primary entry doesn't
+have the \field{category} field set, the dual's \field{category} will
+remain unchanged.
+\item \optfmt{same as type}: sets the \field{category} to the same
+as the value of the entry's \field{type} field (which may have been
+set with \optref{dual-type}). If the entry doesn't
+have the \field{type} field set, the \field{category} will
+remain unchanged.
+\item \meta{label}: sets the \field{category} field to \meta{label}.
+\end{itemize}
+
 
 \subsection{\csopt{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-entry-map}

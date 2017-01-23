@@ -332,10 +332,22 @@ public class GlsResource
          else if (opt.equals("type"))
          {
             type = list.getValue(opt).toString(parser).trim();
+
+            if (type.isEmpty())
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.missing.value", opt));
+            }
          }
          else if (opt.equals("dual-type"))
          {
             dualType = list.getValue(opt).toString(parser).trim();
+
+            if (dualType.isEmpty())
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.missing.value", opt));
+            }
          }
          else if (opt.equals("dual-field"))
          {
@@ -714,11 +726,6 @@ public class GlsResource
          dualSymbolFirstMap = "name";
       }
 
-      if (dualType == null)
-      {
-         dualType = type;
-      }
-
       if (dualSort == null)
       {
          dualSort = "combine";
@@ -924,16 +931,6 @@ public class GlsResource
             {
                Bib2GlsEntry entry = (Bib2GlsEntry)data;
 
-               if (type != null)
-               {
-                  entry.putField("type", type);
-               }
-
-               if (category != null)
-               {
-                  entry.putField("category", category);
-               }
-
                Bib2GlsEntry dual = null;
 
                if (entry instanceof Bib2GlsDualEntry)
@@ -942,6 +939,9 @@ public class GlsResource
                   entry.setDual(dual);
                   dual.setDual(entry);
                }
+
+               setType(entry);
+               setCategory(entry);
 
                // does this entry have any records?
 
@@ -978,15 +978,8 @@ public class GlsResource
 
                   if (dualSort.equals("combine"))
                   {
-                     if (dualCategory != null)
-                     {
-                        dual.putField("category", dualCategory);
-                     }
-
-                     if (dualType != null)
-                     {
-                        dual.putField("type", dualType);
-                     }
+                     setDualType(dual);
+                     setDualCategory(dual);
 
                      bibData.add(dual);
                   }
@@ -1252,15 +1245,8 @@ public class GlsResource
                {
                   Bib2GlsEntry dual = entry.getDual();
 
-                  if (dualCategory != null)
-                  {
-                     dual.putField("category", dualCategory);
-                  }
-
-                  if (dualType != null)
-                  {
-                     dual.putField("type", dualType);
-                  }
+                  setDualType(dual);
+                  setDualCategory(dual);
 
                   dualEntries.add(dual);
                }
@@ -1270,15 +1256,8 @@ public class GlsResource
          {
             for (Bib2GlsEntry dual : dualData)
             {
-               if (dualCategory != null)
-               {
-                  dual.putField("category", dualCategory);
-               }
-
-               if (dualType != null)
-               {
-                  dual.putField("type", dualType);
-               }
+               setDualType(dual);
+               setDualCategory(dual);
 
                dualEntries.add(dual);
             }
@@ -1439,6 +1418,102 @@ public class GlsResource
       }
 
       return entryCount;
+   }
+
+   private void setType(Bib2GlsEntry entry)
+   {
+      if (type != null)
+      {
+         if (type.equals("same as entry"))
+         {
+            entry.putField("type", entry.getEntryType());
+         }
+         else
+         {
+            entry.putField("type", type);
+         }
+      }
+   }
+
+   private void setCategory(Bib2GlsEntry entry)
+   {
+      if (category != null)
+      {
+         if (category.equals("same as entry"))
+         {
+            entry.putField("category", entry.getEntryType());
+         }
+         else if (category.equals("same as type"))
+         {
+            String val = entry.getFieldValue("type");
+
+            if (val != null)
+            {
+               entry.putField("category", val);
+            }
+         }
+         else
+         {
+            entry.putField("category", category);
+         }
+      }
+   }
+
+   private void setDualType(Bib2GlsEntry dual)
+   {
+      if (dualType != null)
+      {
+         if (dualType.equals("same as entry"))
+         {
+            dual.putField("type", dual.getEntryType());
+         }
+         else if (dualType.equals("same as primary"))
+         {
+            String val = dual.getDual().getFieldValue("type");
+
+            if (val != null)
+            {
+               dual.putField("type", val);
+            }
+         }
+         else
+         {
+            dual.putField("type", dualType);
+         }
+      }
+   }
+
+   private void setDualCategory(Bib2GlsEntry dual)
+   {
+      if (dualCategory != null)
+      {
+         if (dualCategory.equals("same as entry"))
+         {
+            dual.putField("category", dual.getEntryType());
+         }
+         else if (dualCategory.equals("same as primary"))
+         {
+            String val = dual.getDual().getFieldValue("category");
+
+            if (val != null)
+            {
+               dual.putField("category", val);
+            }
+         }
+         else if (dualCategory.equals("same as type"))
+         {
+            String val = dual.getFieldValue("type");
+
+            if (val != null)
+            {
+               dual.putField("category", val);
+            }
+         }
+         else
+         {
+            dual.putField("category", dualCategory);
+         }
+      }
    }
 
    public boolean skipField(String field)

@@ -21,12 +21,17 @@
    {\space (pl.\ \glsentrydescplural{\glscurrententrylabel})}%
  }%
  {}%
-% \ifglshasfield{dualid}{\glscurrententrylabel}
-% {%
-%   \space See:
-%     \glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}}%
-% }%
-% {}%
+ \glsxtrifkeydefined{dualid}
+ {% dual-field=dualid option will define the key "dualid"
+  % and set that field to the opposite entry label
+   \ifglshasfield{dualid}{\glscurrententrylabel}
+   {%
+     \space See:
+       \glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}}%
+   }%
+   {}%
+ }%
+ {}%
 }
 
 \GlsXtrLoadResources[
@@ -49,6 +54,9 @@
 \gls{cat}, \gls{dog}, \gls{castle}, \gls{child}.
 
 %\gls{dual.cat}, \gls{dual.dog}, \gls{dual.castle}, \gls{dual.child}.
+
+Primary category: \glscategory{cat}.
+Dual category: \glscategory{dual.cat}.
 
 \printunsrtglossaries
 

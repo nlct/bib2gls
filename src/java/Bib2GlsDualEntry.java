@@ -97,6 +97,11 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return getResource().backLinkFirstDualEntryMap();
    }
 
+   protected Bib2GlsEntry createDualEntry()
+   {
+      return new Bib2GlsEntry(bib2gls, getEntryType());
+   }
+
    public Bib2GlsEntry createDual()
    {
       GlsResource resource = getResource();
@@ -105,7 +110,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
       String dualLabel = (dualPrefix==null ? label : dualPrefix+label);
 
-      Bib2GlsEntry entry = new Bib2GlsEntry(bib2gls, getEntryType());
+      Bib2GlsEntry entry = createDualEntry();
       entry.setId(dualLabel);
 
       HashMap<String,String> mappings = getMappings();
