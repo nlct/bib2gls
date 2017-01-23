@@ -668,24 +668,54 @@ public class Bib2Gls implements TeXApp
                      {
                         // discard new record
 
-                        debug();
-                        debug(getMessage(
-                          "warning.discarding.conflicting.record.using.map",
-                          newFmt, newMap, newRecord, existingRecord));
-                        debug();
+                        if (debugLevel > 0)
+                        {
+                           debug();
+                           debug(getMessage(
+                             "warning.discarding.conflicting.record.using.map",
+                             newFmt, newMap, newRecord, existingRecord));
+                           debug();
+                        }
                      }
                      else if (existingMap != null && existingMap.equals(newFmt))
                      {
                         // discard existing record
 
-                        debug();
-                        debug(getMessage(
-                          "warning.discarding.conflicting.record.using.map",
-                          existingFmt, existingMap, 
-                          existingRecord, newRecord));
-                        debug();
+                        if (debugLevel > 0)
+                        {
+                           debug();
+                           debug(getMessage(
+                             "warning.discarding.conflicting.record.using.map",
+                             existingFmt, existingMap, 
+                             existingRecord, newRecord));
+                           debug();
+                        }
 
                         existingRecord.setFormat(newFmt);
+                     }
+                     else if (existingMap != null && newMap != null
+                              && existingMap.equals(newMap))
+                     {
+                        // replace both records with mapping
+
+                        if (debugLevel > 0)
+                        {
+                           debug();
+                           debug(getMessage(
+                             "warning.discarding.conflicting.record.using.map2",
+                             existingFmt, existingMap, 
+                             newFmt, newMap, 
+                             existingRecord, newRecord,
+                             String.format("{%s}{%s}{%s}{%s}{%s}", 
+                              existingRecord.getLabel(),
+                              existingRecord.getPrefix(),
+                              existingRecord.getCounter(),
+                              newMap,
+                              existingRecord.getLocation())));
+                           debug();
+                        }
+
+                        existingRecord.setFormat(newMap);
                      }
                      else
                      {

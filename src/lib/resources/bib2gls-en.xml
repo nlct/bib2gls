@@ -144,6 +144,11 @@ Conflicts with: {3}</entry>
 Obeying requested mapping {0} -&gt; {1}
 Discarding: {2}
 Keeping: {3}</entry>
+<entry key="warning.discarding.conflicting.record.using.map2">Entry location conflict.
+Obeying requested mapping {0} -&gt; {1} and {2} -&gt; {3} 
+Discarding: {4}
+Discarding: {5}
+Replacement: {6}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
 <entry key="warning.option.clash">Option clash: {0} and {1}
 Ignoring {1}</entry>

@@ -660,12 +660,13 @@ or \shortarg{m} \meta{format1}:\meta{format2}}
 \labelarg{map-format}
 
 This sets up the rule of precedence for partial location
-matches (see \sectionref{sec:locationopts}). For example, if
-\texttt{emph} should override \texttt{textbf}, then
-use
+matches (see \sectionref{sec:locationopts}). For example, 
 \begin{verbatim}
-bib2gls --map-format "hyperbf:hypersf" mydoc
+bib2gls --map-format "emph:hyperbf" mydoc
 \end{verbatim}
+This essentially means that if there's a record conflict
+involving \texttt{emph}, try replacing \texttt{emph} with
+\texttt{hyperbf} and see if that resolves the conflict.
 
 If you have multiple mappings, you can either use a single
 \longarg{map-format} with a comma separated list of
@@ -682,17 +683,23 @@ file as:
 \end{verbatim}
 and \bibgls\ is invoked with
 \begin{verbatim}
-bib2gls --map-format "emph:hyperbf,hypersf:hyperbf" mydoc
+bib2gls --map-format "emph:hyperbf,hypersf:hyperit" mydoc
 \end{verbatim}
-Then \bibgls\ will process these records as follows:
+or
+\begin{verbatim}
+bib2gls --map-format emph:hyperbf --map-format hypersf:hyperit mydoc
+\end{verbatim}
+then \bibgls\ will process these records as follows:
 \begin{enumerate}
-\item Accept the first record (with \texttt{emph}).
+\item Accept the first record (\texttt{emph}) since there's
+currently no conflict. (This is the first record for page~3 for the
+entry given by \texttt{gls.sample}.)
 \item The second record (\texttt{hypersf}) conflicts 
 with the existing record (\texttt{emph}). Neither has
 the format \texttt{glsnumberformat} so \bibgls\ consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item The \texttt{hypersf} format is mapped to \texttt{hyperbf},
+\item The \texttt{hypersf} format is mapped to \texttt{hyperit},
 so \bibgls\ checks if the existing record
 has this format. In this case it doesn't (the format is
 \texttt{emph}). So \bibgls\ moves onto the next test:
@@ -702,7 +709,9 @@ so \bibgls\ checks if the new record has this format.
 In this case it doesn't (the format is \texttt{hypersf}).
 
 Since the provided mappings haven't resolved this conflict,
-the new record is discarded with a warning.
+the new record is discarded with a warning. Note that there's 
+no look ahead to the next record. (There may be other 
+records for other entries also used on page~3 interspersed between these records.)
 \end{itemize}
 \item The third record (\texttt{hyperbf}) conflicts 
 with the existing record (\texttt{emph}). Neither has
@@ -715,11 +724,24 @@ so \bibgls\ moves onto the next test:
 \item The existing record's \texttt{emph} format has a mapping
 provided (\texttt{hyperbf}). This matches the new record's format,
 so the new record takes precedence.
+
+This means that the location list ends up with the \texttt{hyperbf}
+location for page~3.
 \end{itemize}
 \end{enumerate}
 
-This means that the location list ends up with the \texttt{hyperbf}
-location.
+If, on the other hand, the mappings are given as
+\begin{verbatim}
+--map-format "emph:hyperit,hypersf:hyperit,hyperbf:hyperit"
+\end{verbatim}
+then all the three conflicting records (\texttt{emph},
+\texttt{hypersf} and \texttt{hyperbf}) will end up being replaced
+by a single record with \texttt{hyperit} as the format.
+
+Multiple conflicts will typically be rare as there's usually little
+reason for more than two or three different location formats within
+the same list. (For example, \texttt{glsnumberformat} as the default
+and \texttt{hyperbf} or \texttt{hyperit} for a primary reference.)
 
 \section{\longarg{group}}
 \labelarg{group}
