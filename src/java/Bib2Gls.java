@@ -615,7 +615,7 @@ public class Bib2Gls implements TeXApp
          }
          else if (name.equals("glsxtr@record"))
          {
-            GlsRecord record = new GlsRecord(data.getArg(0).toString(parser),
+            GlsRecord newRecord = new GlsRecord(data.getArg(0).toString(parser),
                         data.getArg(1).toString(parser),
                         data.getArg(2).toString(parser),
                         data.getArg(3).toString(parser),
@@ -625,75 +625,76 @@ public class Bib2Gls implements TeXApp
 
             boolean found = false;
 
-            for (GlsRecord r : records)
+            for (GlsRecord existingRecord : records)
             {
-               if (r.equals(record))
+               if (existingRecord.equals(newRecord))
                {// exact match, skip
                   found = true;
                   break;
                }
-               else if (r.partialMatch(record))
+               else if (existingRecord.partialMatch(newRecord))
                {
                   // matches everything except the format
 
-                  String fmt1 = record.getFormat();
-                  String fmt2 = r.getFormat();
+                  String newFmt = newRecord.getFormat();
+                  String existingFmt = existingRecord.getFormat();
 
                   // Any format overrides the default "glsnumberformat"
 
-                  if (fmt1.equals("glsnumberformat"))
+                  if (newFmt.equals("glsnumberformat"))
                   {// discard the new record
 
                      debug();
                      debug(getMessage("warning.discarding.conflicting.record",
-                       fmt1, fmt2, record, r));
+                       newFmt, existingFmt, newRecord, existingRecord));
                      debug();
                   }
-                  else if (fmt2.equals("glsnumberformat"))
+                  else if (existingFmt.equals("glsnumberformat"))
                   {// override the existing record
 
                      debug();
                      debug(getMessage("warning.discarding.conflicting.record",
-                       fmt1, fmt2, r, record));
+                       newFmt, existingFmt, existingRecord, newRecord));
                      debug();
 
-                     r.setFormat(fmt1);
+                     existingRecord.setFormat(newFmt);
                   } 
                   else
                   {
-                     String map1 = formatMap.get(fmt1);
-                     String map2 = formatMap.get(fmt2);
+                     String newMap = formatMap.get(newFmt);
+                     String existingMap = formatMap.get(existingFmt);
 
-                     if (map1 != null && map1.equals(fmt2))
+                     if (newMap != null && newMap.equals(existingFmt))
                      {
-                        // discard the new record
+                        // discard new record
 
                         debug();
                         debug(getMessage(
                           "warning.discarding.conflicting.record.using.map",
-                          fmt1, fmt2, record, r));
+                          newFmt, newMap, newRecord, existingRecord));
                         debug();
                      }
-                     else if (map2 != null && map2.equals(fmt1))
+                     else if (existingMap != null && existingMap.equals(newFmt))
                      {
-                        // discard the existing record
+                        // discard existing record
 
                         debug();
                         debug(getMessage(
                           "warning.discarding.conflicting.record.using.map",
-                          fmt2, fmt1, r, record));
+                          existingFmt, existingMap, 
+                          existingRecord, newRecord));
                         debug();
 
-                        r.setFormat(fmt1);
+                        existingRecord.setFormat(newFmt);
                      }
                      else
                      {
-                        // discard the new record with a warning
+                        // no map found. Discard the new record with a warning
 
                         warning();
                         warning(
                           getMessage("warning.discarding.conflicting.record",
-                          fmt1, fmt2, record, r));
+                          newFmt, existingFmt, newRecord, existingRecord));
                         warning();
                      }
                   }
@@ -705,7 +706,7 @@ public class Bib2Gls implements TeXApp
 
             if (!found)
             {
-               records.add(record);
+               records.add(newRecord);
             }
          }
       }
@@ -1930,9 +1931,11 @@ public class Bib2Gls implements TeXApp
                   getMessage("error.missing.value", args[i-1]));
             }
 
-            for (String value : args[i].trim().split(" *, *"))
+            String[] split = args[i].trim().split(" *, *");
+
+            for (String value : split)
             {
-               String[] values = args[i].split(" *= *");
+               String[] values = value.split(" *: *");
 
                if (values.length != 2)
                {

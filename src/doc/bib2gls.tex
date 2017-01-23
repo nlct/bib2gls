@@ -1,13 +1,25 @@
 % arara: pdflatex
+% arara: makeindex: {style: bib2gls.ist}
 % arara: pdflatex
-\documentclass[titlepage=false]{scrreprt}
+\documentclass[titlepage=false,indextotoc]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage{alltt}
 \usepackage{upquote}
 \usepackage{etoolbox}
+\usepackage{filecontents}
+
+\newcommand*{\actual}{=}
+
+\begin{filecontents*}{\jobname.ist}
+actual '='
+\end{filecontents*}
+
+\usepackage{makeidx}
 \usepackage{datetime2}
 \usepackage[colorlinks]{hyperref}
+
+\makeindex
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
 
@@ -24,6 +36,8 @@
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
+\newcommand*{\sectionref}[1]{section~\ref{#1}}
+
 \newcommand{\qt}[1]{``#1''}
 
 \newcommand{\dequals}{%
@@ -38,6 +52,19 @@
  {,}%
 }
 
+\newcommand{\dcolon}{%
+ \texorpdfstring
+ {\texttt{:}\discretionary{}{}{}}%
+ {:}%
+}
+
+% put page break before dash to avoid confusion with a hyphen
+\newcommand{\dhyphen}{%
+ \texorpdfstring
+ {\discretionary{}{}{}\texttt{-}}%
+ {-}%
+}
+
 \newcommand*{\filefmt}[1]{\texorpdfstring{\nolinkurl{#1}}{#1}}
 \newcommand*{\metafilefmt}[3]{%
   \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
@@ -45,68 +72,71 @@
 
 \newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
-\newcommand*{\csfmt}[1]{\texorpdfstring{\texttt{\char`\\#1}}{\string\\#1}}
+\newcommand*{\csfmt}[1]{\texorpdfstring{\texttt{\char`\\ #1}}{\string\\#1}}
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\idprefixfmt}[1]{%
- \texorpdfstring{\texttt{#1\spacefactor1000 .}}{#1.}}
+ \texorpdfstring{\texttt{#1\spacefactor999 .}}{#1.}}
 
 \newcommand*{\argor}{\texorpdfstring{\protect\textbar}{\string\|}}
 
+\newrobustcmd*{\texmeta}[1]{$\langle${\normalfont\emph{#1}}$\rangle$}
+
 \newcommand*{\meta}[1]{%
- \texorpdfstring{$\langle${\normalfont\emph{#1}}$\rangle$}{#1}%
+ \texorpdfstring{\texmeta{#1}}{#1}%
 }
 
 \newcommand*{\oarg}[1]{[#1]}
 \newcommand*{\oargm}[1]{\oarg{\meta{#1}}}
 
 \newcommand*{\marg}[1]{\texorpdfstring
- {\char`\{#1\char`\}}
- {\{#1\}}}
+ {\char`\{#1\char`\} }%
+ {\{#1\}}%
+}
 
 \newcommand*{\margm}[1]{\marg{\meta{#1}}}
 
 \newcommand*{\file}[1]{%
  \texorpdfstring
- {\filefmt{#1}\index{#1@\filefmt{#1}}}%
+ {\filefmt{#1}\index{#1\actual\filefmt{#1}}}%
  {#1}%
 }
 
 \newcommand*{\ext}[1]{%
  \texorpdfstring
- {\filefmt{.#1}\index{file formats!#1@\filefmt{.#1}}}%
+ {\filefmt{.#1}\index{file formats!#1\actual\filefmt{.#1}}}%
  {.#1}%
 }
 
 \newcommand*{\app}[1]{%
  \texorpdfstring
- {\appfmt{#1}\index{#1@\appfmt{#1}}}%
+ {\appfmt{#1}\index{#1\actual\appfmt{#1}}}%
  {#1}%
 }
 
 \newcommand*{\sty}[1]{%
   \texorpdfstring
-  {\styfmt{#1}\index{#1@\styfmt{#1}}}%
+  {\styfmt{#1}\index{#1\actual\styfmt{#1}}}%
   {#1}%
 }
 
 \newcommand*{\abbrstyle}[1]{%
   \texorpdfstring
-  {\abbrstylefmt{#1}\index{abbreviation style!#1@\abbrstylefmt{#1}}}%
+  {\abbrstylefmt{#1}\index{abbreviation style!#1\actual\abbrstylefmt{#1}}}%
   {#1}%
 }
 
 \newcommand*{\idprefix}[1]{%
  \texorpdfstring
- {\idprefixfmt{#1}\index{#1@\idprefixfmt{#1}}}%
+ {\idprefixfmt{#1}\index{label prefixes!#1\actual\protect\idprefixfmt{#1}}}%
  {#1}%
 }
 
 \newcommand*{\cs}[1]{% 
  \texorpdfstring
- {\csfmt{#1}\index{#1@\csfmt{#1}}}
+ {\csfmt{#1}\index{#1\actual\protect\csfmt{#1}}}
  {\string\\#1}%
 }
 
@@ -114,8 +144,8 @@
   \texorpdfstring%
   {%
     \optfmt{#2\ifblank{#1}{}{\dequals#1}}%
-    \index{package options@\optfmt{#2}}%
-    \index{#2@\optfmt{#2}}%
+    \index{package options\actual\protect\optfmt{#2}}%
+    \index{#2\actual\protect\optfmt{#2}}%
   }%
   {#2\ifblank{#1}{}{=#1}}%
 }
@@ -126,7 +156,7 @@
   \texorpdfstring%
   {%
     \optfmt{#3\ifblank{#1}{}{\dequals#1}}%
-    \index{#2@\csfmt{#2}!#3@\optfmt{#3}}%
+    \index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}%
   }%
   {#3\ifblank{#1}{}{=#1}}%
 }
@@ -134,8 +164,8 @@
 \newcommand*{\field}[1]{%
  \texorpdfstring
  {\fieldfmt{#1}%
-   \index{fields!#1@\fieldfmt{#1}}%
-   \index{#1 field@\fieldfmt{#1} field}%
+   \index{fields!#1\actual\protect\fieldfmt{#1}}%
+   \index{#1 field\actual\protect\fieldfmt{#1} field}%
  }%
  {#1}%
 }
@@ -143,8 +173,8 @@
 \newcommand*{\entry}[1]{%
  \texorpdfstring
  {\entryfmt{#1}%
-   \index{entry types!#1@\entryfmt{#1}}%
-   \index{#1 entry type@\entryfmt{#1} entry type}%
+   \index{entry types!#1\actual\protect\entryfmt{#1}}%
+   \index{#1 entry type\actual\protect\entryfmt{#1} entry type (\protect\entryfmt{@#1})}%
  }%
  {#1}%
 }
@@ -152,8 +182,8 @@
 \newcommand*{\atentry}[1]{%
  \texorpdfstring
  {\entryfmt{@#1}%
-   \index{entry types!#1@\entryfmt{#1}}%
-   \index{#1 entry type@\entryfmt{#1} entry type}%
+   \index{entry types!#1\actual\protect\entryfmt{#1}}%
+   \index{#1 entry type\actual\protect\entryfmt{#1} entry type (\protect\entryfmt{@#1})}%
  }%
  {@#1}%
 }
@@ -172,13 +202,13 @@
 
 \newcommand*{\longarg}[1]{%
   \texorpdfstring
-  {\longargfmt{#1}\index{command line options!#1@\longargfmt{#1}}}%
+  {\longargfmt{#1}\index{command line options!#1\actual\protect\longargfmt{#1}}}%
   {\string-\string-#1}%
 }
 
 \newcommand*{\shortarg}[1]{%
   \texorpdfstring
-  {\shortargfmt{#1}\index{command line options!#1@\shortargfmt{#1}}}%
+  {\shortargfmt{#1}\index{command line options!#1\actual\protect\shortargfmt{#1}}}%
   {\string-#1}%
 }
 
@@ -283,6 +313,19 @@ Note that \bibgls\ requires the extension package
 commands. See the \sty{glossaries-extra} user manual for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
+
+If you additionally want to use an indexing application, such
+as \app{xindy}, you need the package option
+\styopt[alsoindex]{record} and use \cs{makeglossaries}
+and \cs{printglossary} (or \cs{printglossaries}) as usual.
+If you don't require an indexing application, just use
+\styopt{record} (or \styopt[only]{record}) and don't use \cs{makeglossaries}. The 
+glossaries can be displayed using \cs{printunsrtglossary}
+(or \cs{printunsrtglossaries}). (The \texttt{unsrt} part
+of the command name indicates that the entries are listed in the
+order of definition from \sty{glossaries-extra}'s point of view.
+\bibgls\ determines this order of definition according to
+the options supplied in \hyperref[sec:resourceopts]{\cs{glsxtrresourcefile}}.)
 
 \section{Security}
 
@@ -612,27 +655,71 @@ You can override the \styopt{shortcuts} setting using
 any of the allowed values for the \styopt{shortcuts} package option), 
 but in general there is little need to use this switch.
 
-\section{\longarg{map-format} \meta{key=val list}}
+\section{\longarg{map-format} \meta{format1}:\meta{format2}
+or \shortarg{m} \meta{format1}:\meta{format2}}
 \labelarg{map-format}
 
-The \styfmt{glossaries} package provides a mapping between field
-tags used in control sequences, such as \cs{glsuseri} or
-\cs{glsdesc}, and the corresponding key used when defining the
-entry, such as \field{user1} or \field{description}. This
-information is written to the auxiliary file so that \bibgls\ can
-find the relevant commands while parsing the field values for
-dependent entries.
-
-If you have defined some extra fields using \cs{glsaddkey}\margm{key} with
-analogous commands in the form \csfmt{gls}\meta{field}, then you can
-provide a new mapping so that \bibgls\ can find any instances of
-\csfmt{gls}\meta{field} when parsing the entries provided in the
-\ext{bib} file.
+This sets up the rule of precedence for partial location
+matches (see \sectionref{sec:locationopts}). For example, if
+\texttt{emph} should override \texttt{textbf}, then
+use
+\begin{verbatim}
+bib2gls --map-format "hyperbf:hypersf" mydoc
+\end{verbatim}
 
 If you have multiple mappings, you can either use a single
 \longarg{map-format} with a comma separated list of
-\meta{key}=\meta{field} values or you can have multiple instances of 
-\longarg{map-format} \meta{key}\texttt{=}\meta{field}.
+\meta{format1}\dcolon\meta{format2} or you can have multiple instances of 
+\longarg{map-format} \meta{format1}\dcolon\meta{format2}.
+
+Note that the mapping tests are applied as the records are
+read. For example, suppose the records are listed in the \ext{aux}
+file as:
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{emph}{3}
+\glsxtr@record{gls.sample}{}{page}{hypersf}{3}
+\glsxtr@record{gls.sample}{}{page}{hyperbf}{3}
+\end{verbatim}
+and \bibgls\ is invoked with
+\begin{verbatim}
+bib2gls --map-format "emph:hyperbf,hypersf:hyperbf" mydoc
+\end{verbatim}
+Then \bibgls\ will process these records as follows:
+\begin{enumerate}
+\item Accept the first record (with \texttt{emph}).
+\item The second record (\texttt{hypersf}) conflicts 
+with the existing record (\texttt{emph}). Neither has
+the format \texttt{glsnumberformat} so \bibgls\ consults
+the mappings provided by \longargfmt{map-format}.
+\begin{itemize}
+\item The \texttt{hypersf} format is mapped to \texttt{hyperbf},
+so \bibgls\ checks if the existing record
+has this format. In this case it doesn't (the format is
+\texttt{emph}). So \bibgls\ moves onto the next test:
+
+\item The \texttt{emph} format is mapped to \texttt{hyperbf},
+so \bibgls\ checks if the new record has this format.
+In this case it doesn't (the format is \texttt{hypersf}).
+
+Since the provided mappings haven't resolved this conflict,
+the new record is discarded with a warning.
+\end{itemize}
+\item The third record (\texttt{hyperbf}) conflicts 
+with the existing record (\texttt{emph}). Neither has
+the format \texttt{glsnumberformat} so \bibgls\ again consults
+the mappings provided by \longargfmt{map-format}.
+\begin{itemize}
+\item  The new record's \texttt{hyperbf} format has no mapping provided,
+so \bibgls\ moves onto the next test:
+
+\item The existing record's \texttt{emph} format has a mapping
+provided (\texttt{hyperbf}). This matches the new record's format,
+so the new record takes precedence.
+\end{itemize}
+\end{enumerate}
+
+This means that the location list ends up with the \texttt{hyperbf}
+location.
 
 \section{\longarg{group}}
 \labelarg{group}
@@ -1117,6 +1204,7 @@ haven't been referenced in the document.
 supplied in the \csopt{src} option.
 \end{itemize}
 The \meta{value} must be supplied.
+
 \section{Field and Label Options}
 \label{sec:labelopts}
 
@@ -1275,13 +1363,13 @@ For example, if the \ext{bib} file contains
 
 @index{goose,plural="geese"}
 \end{verbatim}
-Then if this \ext{bib} file is loaded with \csopt[gls.]{label-prefix}
+Then if this \ext{bib} file is loaded with \csopt[\marg{gls.}]{label-prefix}
 it's as though the entries had been defined as:
 \begin{verbatim}
 @entry{gls.bird,
   name={bird},
-  description = {feathered animal, such as a \gls{gls.duck} or \gls
-{gls.goose}}
+  description = {feathered animal, such as a \gls{gls.duck} or 
+\gls{gls.goose}}
 }
 
 @entry{gls.waterfowl,
@@ -1308,6 +1396,92 @@ substituted with the \meta{n}th tag listed in the comma-separated
 \idprefix{ext\meta{n}} will simply be removed. The default setting is
 an empty list, which will strip all \idprefix{ext\meta{n}} prefixes.
 
+For example, suppose the file \filefmt{entries-terms.bib} contains:
+\begin{verbatim}
+@entry{set,
+  name={set},
+  description={collection of values, denoted \gls{ext1.set}}
+}
+\end{verbatim}
+and the file \filefmt{entries-symbols.bib} contains:
+\begin{verbatim}
+@symbol{set,
+  name={\ensuremath{\mathcal{S}}},
+  description={a \gls{ext1.set}}
+}
+\end{verbatim}
+
+These files both contain an entry with the label \texttt{set}
+but the description includes \verb|\gls{ext1.set}| which is
+referencing the entry from the other file. These
+two files can be loaded without conflict using:
+\begin{verbatim}
+\usepackage[record,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries-terms},
+ label-prefix={gls.},
+ ext-prefixes={sym.}
+]
+
+\glsxtrresourcefile[src={entries-symbols},
+ type=symbols,
+ label-prefix={sym.},
+ ext-prefixes={gls.},
+]
+{\jobname-sym}
+\end{verbatim}
+
+Now the \texttt{set} entry from \filefmt{entries-terms.bib}
+will be defined with the label \texttt{gls.set} and the
+description will be
+\begin{verbatim}
+collection of values, denoted \gls{sym.set}
+\end{verbatim}
+The \texttt{set} entry
+from \filefmt{entries-symbols.bib} will be defined with the label
+\texttt{sym.set} and the description will be 
+\begin{verbatim}
+a \gls{gls.set}
+\end{verbatim}
+
+Note that in this case the \ext{bib} files have to be loaded 
+as two separate resources. They can't be combined into a 
+single \optref{src} list as the labels aren't unique. 
+
+If you want to allow the flexibility to choose between 
+loading them together or separately, you'll have to give them
+unique labels. For example, \filefmt{entries-terms.bib} could
+contain:
+\begin{verbatim}
+@entry{set,
+  name={set},
+  description={collection of values, denoted \gls{ext1.S}}
+}
+\end{verbatim}
+and \filefmt{entries-symbols.bib} could contain:
+\begin{verbatim}
+@symbol{S,
+  name={\ensuremath{\mathcal{S}}},
+  description={a \gls{ext1.set}}
+}
+\end{verbatim}
+Now they can be combined with:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries-terms,entries-symbols}]
+\end{verbatim}
+which will simply strip the \idprefixfmt{ext1} prefix from the
+cross-references. Alternatively:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries-terms,entries-symbols},
+ label-prefix={gls.},
+ ext-prefixes={gls.}
+]
+\end{verbatim}
+which will insert the supplied \optref{label-prefix} at the
+start of the labels in the entry definitions and will replace
+the \idprefix{ext1} prefix with \idprefixfmt{gls} in the
+cross-references.
+
 \section{Location List Options}
 \label{sec:locationopts}
 
@@ -1328,6 +1502,42 @@ for locations. You can iterate through the \field{loclist} value
 using one of \sty{etoolbox}'s internal list loops. Remember that you
 can fetch the value of the field using \cs{glsfieldfetch} provided
 by the \sty{glossaries} package.
+
+Each location is listed in the \ext{aux} file in the form:
+\begin{alltt}
+\cs{glsxtr@record}\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}
+\end{alltt}
+Exactly duplicates are discarded. For example, if \texttt{cat}
+is indexed twice on page 1:
+\begin{verbatim}
+\glsxtr@record{cat}{}{page}{glsnumberformat}{1}
+\glsxtr@record{cat}{}{page}{glsnumberformat}{1}
+\end{verbatim}
+The second record is discarded. Only the first record is added
+to the location list.
+
+Partial duplicates, where all arguments match except for
+\meta{format}, may be discarded, depending on the value
+of \meta{format}. For example, if page~1 of the document
+uses \verb|\gls{cat}| and \verb|\gls[format=hyperbf]{cat}|
+then the \ext{aux} file will contain:
+\begin{verbatim}
+\glsxtr@record{cat}{}{page}{glsnumberformat}{1}
+\glsxtr@record{cat}{}{page}{hyperbf}{1}
+\end{verbatim}
+This is a partial record match. In this case, \bibgls\ 
+makes the following tests:
+\begin{itemize}
+\item If one of the formats is \texttt{glsnumberformat} (as in the
+above example), that format will be skipped. So in the above
+example, the second record will be added to the location list, but
+not the first. (A message will only be written to the transcript if
+the \longarg{debug} switch is used.)
+\item If a mapping has been set with the \longarg{map-format}
+switch that mapping will be checked.
+\item Otherwise the duplicate record will be added to the
+location list with a warning.
+\end{itemize}
 
 The \field{location} field is used to store the formatted location
 list. The code for this list is generated by \bibgls\ based on the
@@ -1463,7 +1673,7 @@ location list is empty. The \meta{value} part is required.
 \labelopt{loc-prefix}
 
 The \csopt{loc-prefix} setting indicates that the location lists
-should begin with \csref{bibglsprefix}\meta{n}. The \meta{value} may
+should begin with \csref{bibglsprefix}\marg{n}. The \meta{value} may
 be one of the following:
 \begin{itemize}
 \item \optfmt{false}: don't insert \cs{bibglsprefix}\marg{n} at the start
@@ -1476,15 +1686,15 @@ preamble providing an \cs{ifcase} condition:
 \begin{alltt}
 \cs{providecommand}\marg{\cs{bibglsprefix}}[1]\marg{\%
   \cs{ifcase}\string#1
-  \cs{or} \meta{prefix-1}\csref{bibglspostprefix}
-  \cs{or} \meta{prefix-2}\cs{bibglspostprefix}
+  \csfmt{or} \meta{prefix-1}\csref{bibglspostprefix}
+  \csfmt{or} \meta{prefix-2}\csfmt{bibglspostprefix}
   \ldots
-  \cs{else} \meta{prefix-n}\cs{bibglspostprefix}
-  \cs{fi}
+  \csfmt{else} \meta{prefix-n}\csfmt{bibglspostprefix}
+  \csfmt{fi}
 }
 \end{alltt}
 
-\item \optfmt{list}: equivalent to \csopt[\cs{pagelistname} ]{loc-prefix}.
+\item \optfmt{list}: equivalent to \csopt[\marg{\cs{pagelistname} }]{loc-prefix}.
 \item \optfmt{true}: equivalent to 
 \csopt[\margm{page},\margm{pages}]{loc-prefix}, where \meta{page} and
 \meta{pages} are obtained from the \texttt{tag.page} and
@@ -1996,4 +2206,5 @@ be added instead:
 
 \resetsecnumdepth
 
+\printindex
 \end{document}
