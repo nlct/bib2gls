@@ -1386,6 +1386,7 @@ public class GlsResource
               suffixF, suffixFF, seeLocation, locationPrefix != null);
 
             entry.writeBibEntry(writer);
+            entry.writeLocList(writer);
 
             writer.println();
          }
@@ -1400,6 +1401,7 @@ public class GlsResource
                  suffixF, suffixFF, seeLocation, locationPrefix != null);
 
                entry.writeBibEntry(writer);
+               entry.writeLocList(writer);
 
                writer.println();
             }

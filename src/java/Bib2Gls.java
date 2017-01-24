@@ -2173,7 +2173,7 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.0";
+   public static final String VERSION = "0.1a";
    public static final String DATE = "EXPERIMENTAL";
    //public static final String DATE = "2017-01-21";
    public int debugLevel = 0;

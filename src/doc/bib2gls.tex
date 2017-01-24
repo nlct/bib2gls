@@ -1516,20 +1516,38 @@ Each item in the list is provided in the form
 \begin{alltt}
 \cs{glsseeformat}\oargm{tag}\marg{\meta{label list}}\marg{}
 \end{alltt}
-for cross-references supplied by the \field{see} field and
+for the cross-reference supplied by the \field{see} field and
 \begin{alltt}
 \cs{glsnoidxdisplayloc}\margm{prefix}\margm{counter}\margm{format}\margm{location}
 \end{alltt}
-for locations. You can iterate through the \field{loclist} value
+for the locations. You can iterate through the \field{loclist} value
 using one of \sty{etoolbox}'s internal list loops. Remember that you
 can fetch the value of the field using \cs{glsfieldfetch} provided
-by the \sty{glossaries} package.
+by the \sty{glossaries} package. The locations are always listed in
+the order in which they were indexed, except for the cross-reference 
+which may be placed at the start or end of the list or omitted
+according to \optref{loc-prefix}.
+
+It's therefore possible to define a custom glossary style where 
+\cs{glossentry} (and \cs{subglossentry}) ignore the final argument
+and instead parse the \field{loclist} field and re-order the
+locations. Remember that you can also use the \sty{glossaries}
+package's \cs{glsnoidxloclist}. For example:
+\begin{verbatim}
+\glsfieldfetch{gls.sample}{loclist}{\loclist}% fetch location list
+\glsnoidxloclist{\loclist}% iterate over locations
+\end{verbatim}
+This uses \cs{glsnoidxloclisthandler} as the list's handler
+macro, which simply displays each location separated by \cs{delimN}.
+(See also
+\href{http://www.dickimaw-books.com/latex/admin/html/foreachtips.shtml}{Iteration
+Tips and Tricks}.)
 
 Each location is listed in the \ext{aux} file in the form:
 \begin{alltt}
 \cs{glsxtr@record}\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}
 \end{alltt}
-Exactly duplicates are discarded. For example, if \texttt{cat}
+Exact duplicates are discarded. For example, if \texttt{cat}
 is indexed twice on page 1:
 \begin{verbatim}
 \glsxtr@record{cat}{}{page}{glsnumberformat}{1}
@@ -1539,7 +1557,7 @@ The second record is discarded. Only the first record is added
 to the location list.
 
 Partial duplicates, where all arguments match except for
-\meta{format}, may be discarded, depending on the value
+\meta{format}, may be discarded depending on the value
 of \meta{format}. For example, if page~1 of the document
 uses \verb|\gls{cat}| and \verb|\gls[format=hyperbf]{cat}|
 then the \ext{aux} file will contain:
@@ -1555,10 +1573,10 @@ above example), that format will be skipped. So in the above
 example, the second record will be added to the location list, but
 not the first. (A message will only be written to the transcript if
 the \longarg{debug} switch is used.)
-\item If a mapping has been set with the \longarg{map-format}
+\item If a mapping has been set with the \argref{map-format}
 switch that mapping will be checked.
-\item Otherwise the duplicate record will be added to the
-location list with a warning.
+\item Otherwise the duplicate record will be discarded with a
+warning.
 \end{itemize}
 
 The \field{location} field is used to store the formatted location
@@ -1589,18 +1607,18 @@ integer greater than one indicating how many consecutive locations should be
 converted into a range.
 
 \bibgls\ determines if one location
-\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2} follows
-another location
+\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2}
+is one unit more than another location
 \margm{prefix-1}\margm{counter-1}\margm{format-1}\margm{location-1} 
 according to the following:
-\begin{itemize}
-\item \meta{prefix-1} is not equal to \meta{prefix-2} or
+\begin{enumerate}
+\item\label{itm:pre} If \meta{prefix-1} is not equal to \meta{prefix-2} or
 \meta{counter-1} is not equal to \meta{counter-2} or \meta{format-1}
 is not equal to \meta{format-2}, then the locations aren't
 considered consecutive.
-\item If either \meta{location-1} or \meta{location-2} are empty,
+\item\label{itm:emptyloc} If either \meta{location-1} or \meta{location-2} are empty,
 then the locations aren't considered consecutive.
-\item If both \meta{location-1} and \meta{location-2} match the
+\item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern
 \begin{verbatim}
 (.*?)(?:\\protect\s*)?(\\[a-zA-Z@]+)\s*\{([0-9a-zA-Z]+)\}
@@ -1609,7 +1627,7 @@ then:
   \begin{itemize}
   \item if the control sequence matched by group 2 isn't the same for
   both locations, the locations aren't considered consecutive;
-  \item if argument of the control sequence (group 3) is the same for
+  \item if the argument of the control sequence (group 3) is the same for
   both locations, then the test is retried with \meta{location-1}
 set to group 1 of the first pattern match and \meta{location-2}
 set to group 1 of the second pattern match;
@@ -1617,19 +1635,30 @@ set to group 1 of the second pattern match;
 group 3 of the first pattern match and \meta{location-2} set to
 group 3 of the second pattern match.
   \end{itemize}
-\item If both \meta{location-1} and \meta{location-2} match the
+\item\label{itm.decmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern
 \begin{verbatim}
 (.*?)([^0-9]?)([0-9]+)
 \end{verbatim}
 then:
-  \begin{itemize}
-  \item if group 3 of both pattern matches are equal the test is
+  \begin{enumerate}
+  \item\label{itm:decgrp3eq} if group 3 of both pattern matches are
+equal then:
+  \begin{enumerate}
+   \item\label{itm:decgrp3nz} if group 3 isn't zero, the locations
+aren't considered consecutive;
+   \item if the separators (group 2) are different the test is
 retried with \meta{location-1} set to the concatenation of the first
 two groups \meta{group-1}\meta{group-2} of the first pattern match 
 and \meta{location-2} set to the concatenation of the first two groups
 \meta{group-1}\meta{group-2} of the second pattern
 match;
+   \item\label{itm:decgrp3eqsepeq} if the separators (group 2) are the same the test is
+retried with \meta{location-1} set to the first
+group \meta{group-1} of the first pattern match 
+and \meta{location-2} set to the first group
+\meta{group-1} of the second pattern match.
+  \end{enumerate}
   \item If \meta{group-1} of the first pattern match (of
 \meta{location-1}) doesn't equal
 \meta{group-1} of the second pattern match (of \meta{location-2})
@@ -1637,26 +1666,106 @@ or \meta{group-2} of the first pattern match (of
 \meta{location-1}) doesn't equal
 \meta{group-2} of the second pattern match (of \meta{location-2})
 then the locations aren't considered consecutive;
-   \item If \meta{group-3} of the second pattern match is one more
+   \item\label{itm:decgrp3} If \meta{group-3} of the second pattern match is one more
 than \meta{group-3} of the first pattern match, then the locations
 are consecutive otherwise they're not consecutive.
-  \end{itemize}
-\item The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
+  \end{enumerate}
+\item\label{itm:rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
 where \meta{n} is a lower case Roman numeral, which is converted to
 a decimal value and the test is performed in the same way as the 
-above decimal test.
-\item The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
+above \hyperref[itm.decmatch]{decimal test}.
+\item\label{itm:Rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
 where \meta{n} is an upper case Roman numeral, which is converted to
 a decimal value and the test is performed
-in the same way as the above decimal test.
-\item The next pattern matches for \meta{prefix}\meta{sep}\meta{c}
+in the same way as the above \hyperref[itm.decmatch]{decimal test}.
+\item\label{itm:alphmatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{c}
 where \meta{c} is either a lower case letter from \texttt{a} to
 \texttt{z} or an upper case letter from \texttt{A} to \texttt{Z}.
 The character is converted to its code point and the test is
-performed in the same way as the decimal pattern above.
-\item If none of the above, the locations aren't considered
+performed in the same way as the \hyperref[itm.decmatch]{decimal pattern} above.
+\item\label{itm:nomatch} If none of the above, the locations aren't considered
 consecutive.
-\end{itemize} 
+\end{enumerate} 
+
+Examples:
+\begin{enumerate}
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{2}
+\end{verbatim}
+These records are consecutive. The prefix, counter and format are
+identical (so the test passes step~\ref{itm:pre}), the locations match
+the \hyperref[itm:decmatch]{decimal pattern} and the test in
+step~\ref{itm:decgrp3} passes.
+
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1}
+\glsxtr@record{gls.sample}{}{page}{textbf}{2}
+\end{verbatim}
+These records aren't consecutive since the formats are different.
+
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{A.i}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{A.ii}
+\end{verbatim}
+These records are consecutive. The prefix, counter and format are
+identical (so it passes step~\ref{itm:pre}). The locations match
+the \hyperref[itm:rommatch]{lower case Roman numeral pattern}, where
+\texttt{A} is considered a prefix and the dot is consider a
+separator. The Roman numerals i and ii are converted to decimal and
+the test is retried with the locations set to 1 and 2, respectively.
+This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
+
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{i.A}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{ii.A}
+\end{verbatim}
+These records aren't consecutive. They match the
+\hyperref[sec:alphmatch]{alpha pattern}. The first location is
+considered to consist of the prefix \texttt{i}, the separator
+\texttt{.} (dot) and the number given by the character code of A. 
+The second location is considered to consist of the prefix
+\texttt{ii}, the separator \texttt{.} (dot) and the number 
+given by the character code of A.
+
+The test fails because the numbers are equal and the prefixes are
+different.
+
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1.0}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{2.0}
+\end{verbatim}
+These records are consecutive. They match the \hyperref[itm:decmatch]{decimal
+pattern}, and then step~\ref{itm:decgrp3eq} followed by
+step~\ref{itm:decgrp3eqsepeq}. The \texttt{.0} part is discarded and
+the test is retried with the first location set to 1 and the second
+location set to 2.
+
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1.1}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{2.1}
+\end{verbatim}
+These records aren't consecutive as the test branches off into
+step~\ref{itm:decgrp3nz}.
+
+\item
+\begin{verbatim}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{\@alph{1}}
+\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{\@alph{2}}
+\end{verbatim}
+These records are consecutive. The locations match the 
+\hyperref[itm.csmatch]{control sequence pattern}. The control
+sequences are the same, so the test is retried with the first
+location set to 1 and the second location set to 2.
+(Note that \cs{glsxtrresourcefile} changes the category code of
+\texttt{@} to allow for internal commands in locations.)
+\end{enumerate}
 
 \subsection{\csopt{suffixF}=\margm{value}}
 \labelopt{suffixF}

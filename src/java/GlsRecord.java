@@ -172,9 +172,16 @@ public class GlsRecord
 
          if (suffix1.equals(suffix2))
          {
-            return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2) :
-                   consecutive(prefix1+sep1, prefix2+sep2);
+            if (suffix1.equals("0"))
+            {
+               return sep1.equals(sep2) ?
+                      consecutive(prefix1, prefix2) :
+                      consecutive(prefix1+sep1, prefix2+sep2);
+            }
+            else
+            {
+               return false;
+            }
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))

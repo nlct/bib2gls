@@ -8,9 +8,10 @@
 \glssetcategoryattribute{general}{targeturl}{test.pdf}
 \glssetcategoryattribute{general}{targetname}{\glolinkprefix\glslabel}
 
-\glsxtrresourcefile[sort=unsrt,% sort not required
- type=ignore,
- src={test-entries.bib}]{\jobname}
+\GlsXtrLoadResources[sort=unsrt,% sort not required
+ type=ignore,% add entries to glossary labelled 'ignore'
+ src={test-entries}% bib file
+]
 
 \begin{document}
 \gls{sample}.

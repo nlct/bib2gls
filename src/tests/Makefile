@@ -1,5 +1,5 @@
 BIB2GLS=../bin/bib2gls --debug --verbose
-DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
+DEPS=../lib/bib2gls.jar
 RM=\rm -f
 
 all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
@@ -9,83 +9,67 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
 
-test.pdf	: test.aux test-entries.glstex
+test.pdf	: test.glstex
 		pdflatex test
 
-test-entries.glstex	: test.aux $(DEPS) test-entries.bib
+test.glstex	: test.tex $(DEPS) test-entries.bib
+		pdflatex test
 		$(BIB2GLS) test
 
-test.aux	: test.tex
-		pdflatex test
-
-test-utf8.pdf	: test-utf8.aux test-utf8.glstex
+test-utf8.pdf	: test-utf8.glstex
 		xelatex test-utf8
 
-test-utf8.glstex	: test-utf8.aux $(DEPS) test-utf8.bib
+test-utf8.glstex	: test-utf8.tex $(DEPS) test-utf8.bib
+		xelatex test-utf8
 		$(BIB2GLS) --group test-utf8
 
-test-utf8.aux	: test-utf8.tex
-		xelatex test-utf8
-
-test-xr.pdf	: test-xr.aux test-xr.glstex test.pdf
+test-xr.pdf	: test-xr.glstex
 		pdflatex test-xr
 
-test-xr.glstex	: test-xr.aux $(DEPS) test-entries.bib
+test-xr.glstex	: test-xr.tex $(DEPS) test-entries.bib
+		pdflatex test-xr
 		$(BIB2GLS) test-xr
 
-test-xr.aux	: test-xr.tex
-		pdflatex test-xr
-
-test-crossrefs.pdf	: test-crossrefs.aux test-crossrefs.glstex
+test-crossrefs.pdf	: test-crossrefs.glstex
 		pdflatex test-crossrefs
 
-test-crossrefs.glstex	: test-crossrefs.aux $(DEPS) \
+test-crossrefs.glstex	: test-crossrefs.tex $(DEPS) \
 			  entries-terms.bib \
 			  entries-abbrv.bib \
 			  entries-symbols.bib
+		pdflatex test-crossrefs
 		$(BIB2GLS) test-crossrefs
 
-test-crossrefs.aux	: test-crossrefs.tex
-		pdflatex test-crossrefs
-
-test-xe.pdf	: test-xe.aux test-xe.glstex
+test-xe.pdf	: test-xe.glstex
 		xelatex test-xe
 
-test-xe.glstex	: test-xe.aux $(DEPS) test-entries.bib
+test-xe.glstex	: test-xe.tex $(DEPS) test-entries.bib
+		xelatex test-xe
 		$(BIB2GLS) test-xe
 
-test-xe.aux	: test-xe.tex
-		xelatex test-xe
-
-test-label-prefix.pdf	: test-label-prefix.aux test-label-prefix.glstex
+test-label-prefix.pdf	: test-label-prefix.glstex
 		pdflatex test-label-prefix
 
-test-label-prefix.glstex	: test-label-prefix.aux $(DEPS) \
+test-label-prefix.glstex	: test-label-prefix.tex $(DEPS) \
 	 			test-entries.bib
+		pdflatex test-label-prefix
 		$(BIB2GLS) test-label-prefix
 
-test-label-prefix.aux	: test-label-prefix.tex
-		pdflatex test-label-prefix
-
-test-dual.pdf	: test-dual.aux test-dual.glstex
+test-dual.pdf	: test-dual.glstex
 		pdflatex test-dual
 
-test-dual.glstex	: test-dual.aux $(DEPS) \
+test-dual.glstex	: test-dual.tex $(DEPS) \
 	 			entries-dual.bib
+		pdflatex test-dual
 		$(BIB2GLS) test-dual
 
-test-dual.aux	: test-dual.tex
-		pdflatex test-dual
-
-test-external-refs.pdf	: test-external-refs.aux test-external-refs.glstex
+test-external-refs.pdf	: test-external-refs.glstex
 		pdflatex test-external-refs
 
-test-external-refs.glstex	: test-external-refs.aux $(DEPS) \
+test-external-refs.glstex	: test-external-refs.tex $(DEPS) \
 	 			entries-terms.bib entries-symbols.bib
-		$(BIB2GLS) test-external-refs
-
-test-external-refs.aux	: test-external-refs.tex
 		pdflatex test-external-refs
+		$(BIB2GLS) test-external-refs
 
 clean	:
 	$(RM) *.aux

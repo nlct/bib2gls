@@ -730,7 +730,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             name = value;
          }
-         else 
+         else
          {
             writer.format("%s", sep);
 
@@ -743,6 +743,18 @@ public class Bib2GlsEntry extends BibEntry
       writer.println("}%");
       writer.println(String.format("{%s}%%", name));
       writer.println(String.format("{%s}", description));
+   }
+
+   public void writeLocList(PrintWriter writer)
+   throws IOException
+   {
+      if (locationList == null) return;
+
+      for (String loc : locationList)
+      {
+         writer.println(String.format("\\glsxtrfieldlistadd{%s}{loclist}{%s}", 
+           getId(), loc));
+      }
    }
 
    public Set<String> getFieldSet()
@@ -804,7 +816,8 @@ public class Bib2GlsEntry extends BibEntry
      String suffixFF, int seeLocation, boolean showLocationPrefix)
    {
       StringBuilder builder = null;
-      StringBuilder listBuilder = null;
+
+      locationList = new Vector<String>();
 
       GlsRecord prev = null;
       int count = 0;
@@ -824,7 +837,7 @@ public class Bib2GlsEntry extends BibEntry
             builder.append("\\bibglsseesep ");
          }
 
-         listBuilder = new StringBuilder();
+         StringBuilder listBuilder = new StringBuilder();
          listBuilder.append("\\glsseeformat");
 
          if (crossRefTag != null)
@@ -844,6 +857,8 @@ public class Bib2GlsEntry extends BibEntry
          }
 
          listBuilder.append("}{}");
+
+         locationList.add(listBuilder.toString());
       }
 
       if (showLocationPrefix)
@@ -859,15 +874,7 @@ public class Bib2GlsEntry extends BibEntry
 
       for (GlsRecord record : records)
       {
-         if (listBuilder == null)
-         {
-            listBuilder = new StringBuilder(record.getListTeXCode());
-         }
-         else
-         {
-            listBuilder.append("|");
-            listBuilder.append(record.getListTeXCode());
-         }
+         locationList.add(record.getListTeXCode());
 
          if (prev == null)
          {
@@ -958,14 +965,7 @@ public class Bib2GlsEntry extends BibEntry
          builder.append(getId());
          builder.append("}");
 
-         if (listBuilder == null)
-         {
-            listBuilder = new StringBuilder();
-         }
-         else
-         {
-            listBuilder.append('|');
-         }
+         StringBuilder listBuilder = new StringBuilder();
 
          listBuilder.append("\\glsseeformat");
 
@@ -986,16 +986,13 @@ public class Bib2GlsEntry extends BibEntry
          }
 
          listBuilder.append("}{}");
+
+         locationList.add(listBuilder.toString());
       }
 
       if (builder != null)
       {
          fieldValues.put("location", builder.toString());
-      }
-
-      if (listBuilder != null)
-      {
-         fieldValues.put("loclist", listBuilder.toString());
       }
    }
 
@@ -1135,6 +1132,8 @@ public class Bib2GlsEntry extends BibEntry
    private String labelPrefix = null;
 
    private Bib2GlsEntry dual = null;
+
+   private Vector<String> locationList = null;
 
    private static final Pattern EXT_PREFIX_PATTERN = Pattern.compile(
      "ext(\\d+)\\.(.*)");
