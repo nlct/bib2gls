@@ -120,6 +120,8 @@ See the manual for further details.</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>
 <entry key="message.no.fallback">Entry type ''{0}'' has no fallback for field: {1}</entry>
+<entry key="message.inconsistent.range">Ignoring inconsistent location format {0}
+with range started by {1}</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -180,6 +182,12 @@ the second list ({3,number}).</entry>
 <entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>
 <entry key="error.cyclic.hierarchy">Cyclical hierarchy for entry: {0}</entry>
 <entry key="error.duplicate.resource">Duplicate resource: {0}</entry>
+<entry key="error.nested.range">Nested location range: {0}
+Outer range started with: {1}</entry>
+<entry key="error.range.missing.start">Unmatched end location range {0}</entry>
+<entry key="error.inconsistent.range">Inconsistent location format {0}
+with range started by {1}</entry>
+<entry key="error.range.missing.end">Unmatched start location range {0}</entry>
 
 <!--
      The following messages are used by various parts of

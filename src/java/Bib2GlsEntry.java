@@ -814,6 +814,7 @@ public class Bib2GlsEntry extends BibEntry
 
    public void updateLocationList(int minRange, String suffixF,
      String suffixFF, int seeLocation, boolean showLocationPrefix, int gap)
+   throws Bib2GlsException
    {
       StringBuilder builder = null;
 
@@ -872,11 +873,85 @@ public class Bib2GlsEntry extends BibEntry
            records.size()));
       }
 
+      GlsRecord rangeStart=null;
+      String rangeFmt = null;
+
       for (GlsRecord record : records)
       {
          locationList.add(record.getListTeXCode());
 
-         if (prev == null)
+         Matcher m = RANGE_PATTERN.matcher(record.getFormat());
+
+         if (m.matches())
+         {
+            char paren = m.group(1).charAt(0);
+
+            count = 0;
+            mid.setLength(0);
+
+            if (paren == '(')
+            {
+               if (rangeStart != null)
+               {
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                    "error.nested.range", record, rangeStart));
+               }
+
+               rangeStart = record;
+               rangeFmt = m.group(2);
+
+               if (builder == null)
+               {
+                  builder = new StringBuilder();
+               }
+               else if (!start)
+               {
+                  builder.append("\\delimN ");
+               }
+
+               builder.append(record.getFmtTeXCode());
+
+            }
+            else
+            {
+               if (rangeStart == null)
+               {
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                    "error.range.missing.start", record));
+               }
+
+               builder.append("\\delimR ");
+               builder.append(record.getFmtTeXCode());
+               rangeStart = null;
+               rangeFmt = null;
+            }
+         }
+         else if (rangeStart != null)
+         {
+             if (!(rangeStart.getPrefix().equals(record.getPrefix())
+               &&  rangeStart.getCounter().equals(record.getCounter())))
+             {
+                throw new Bib2GlsException(bib2gls.getMessage(
+                    "error.inconsistent.range", record, rangeStart));
+             }
+
+             if (!rangeFmt.equals(record.getFormat()))
+             {
+                if (record.getFormat().equals("glsnumberformat")
+                 || rangeFmt.isEmpty())
+                {
+                   bib2gls.verbose(bib2gls.getMessage(
+                      "message.inconsistent.range", record, rangeStart));
+                }
+                else
+                {
+                   throw new Bib2GlsException(bib2gls.getMessage(
+                      "error.inconsistent.range", record, rangeStart));
+                }
+             }
+
+         }
+         else if (prev == null)
          {
             count = 1;
 
@@ -923,7 +998,6 @@ public class Bib2GlsEntry extends BibEntry
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
-            prev = record;
          }
          else
          {
@@ -938,7 +1012,12 @@ public class Bib2GlsEntry extends BibEntry
          start = false;
       }
 
-      if (prev != null && mid.length() > 0)
+      if (rangeStart != null)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.range.missing.end", rangeStart));
+      }
+      else if (prev != null && mid.length() > 0)
       {
          if (count >= minRange)
          {
@@ -1139,4 +1218,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private static final Pattern EXT_PREFIX_PATTERN = Pattern.compile(
      "ext(\\d+)\\.(.*)");
+
+   private static final Pattern RANGE_PATTERN = Pattern.compile(
+     "(\\(|\\))(.*)");
 }

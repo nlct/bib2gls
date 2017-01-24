@@ -77,6 +77,22 @@ public class GlsRecord
             prefix, counter, location);
       }
 
+      char c = format.charAt(0);
+
+      if (c == '(' || c == ')')
+      {
+         if (format.length() == 1)
+         {
+            return String.format("\\setentrycounter[%s]{%s}%s",
+               prefix, counter, location);
+         }
+         else
+         {
+            return String.format("\\setentrycounter[%s]{%s}\\%s{%s}",
+               prefix, counter, format.substring(1), location);
+         }
+      }
+
       return String.format("\\setentrycounter[%s]{%s}\\%s{%s}",
          prefix, counter, format, location);
    }
