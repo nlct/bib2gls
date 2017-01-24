@@ -464,6 +464,26 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("loc-gap"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            try
+            {
+               locGap = Integer.parseInt(val);
+
+               if (locGap < 1)
+               {
+                  throw new IllegalArgumentException(
+                    bib2gls.getMessage("error.invalid.opt.value", opt, val));
+               }
+            }
+            catch (NumberFormatException e)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, val), e);
+            }
+         }
          else if (opt.equals("suffixF"))
          {
             suffixF = list.getValue(opt).toString(parser).trim();
@@ -1383,7 +1403,7 @@ public class GlsResource
             bib2gls.verbose(entry.getId());
 
             entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF, seeLocation, locationPrefix != null);
+              suffixF, suffixFF, seeLocation, locationPrefix != null, locGap);
 
             entry.writeBibEntry(writer);
             entry.writeLocList(writer);
@@ -1398,7 +1418,7 @@ public class GlsResource
                bib2gls.verbose(entry.getId());
 
                entry.updateLocationList(minLocationRange,
-                 suffixF, suffixFF, seeLocation, locationPrefix != null);
+                 suffixF, suffixFF, seeLocation, locationPrefix != null, locGap);
 
                entry.writeBibEntry(writer);
                entry.writeLocList(writer);
@@ -1686,7 +1706,7 @@ public class GlsResource
 
    private Charset bibCharset = null;
 
-   private int minLocationRange = 3;
+   private int minLocationRange = 3, locGap = 1;
 
    private String suffixF, suffixFF;
 

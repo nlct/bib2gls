@@ -106,7 +106,7 @@ public class GlsRecord
    }
 
    // does location for this follow location for other record?
-   public boolean follows(GlsRecord record)
+   public boolean follows(GlsRecord record, int gap)
    {
       if (!prefix.equals(record.prefix)
         ||!counter.equals(record.counter)
@@ -115,11 +115,12 @@ public class GlsRecord
          return false;
       }
 
-      return consecutive(record.location, location);
+      return consecutive(record.location, location, gap);
    }
 
    // is location2 one more than location1?
-   public static boolean consecutive(String location1, String location2)
+   public static boolean consecutive(String location1, String location2,
+     int gap)
    {
       if (location1.isEmpty() || location2.isEmpty())
       {
@@ -147,10 +148,10 @@ public class GlsRecord
 
          if (loc1.equals(loc2))
          {
-            return consecutive(prefix1, prefix2);
+            return consecutive(prefix1, prefix2, gap);
          }
 
-         return consecutive(loc1, loc2);
+         return consecutive(loc1, loc2, gap);
       }
 
       m1 = DIGIT_PATTERN.matcher(location1);
@@ -175,8 +176,8 @@ public class GlsRecord
             if (suffix1.equals("0"))
             {
                return sep1.equals(sep2) ?
-                      consecutive(prefix1, prefix2) :
-                      consecutive(prefix1+sep1, prefix2+sep2);
+                      consecutive(prefix1, prefix2, gap) :
+                      consecutive(prefix1+sep1, prefix2+sep2, gap);
             }
             else
             {
@@ -193,8 +194,9 @@ public class GlsRecord
          {
             int loc1 = Integer.parseInt(suffix1);
             int loc2 = Integer.parseInt(suffix2);
+            int diff = loc2 - loc1;
 
-            return loc2 == loc1+1;
+            return 0 < diff && diff <= gap;
          }
          catch (NumberFormatException e)
          {// shouldn't happen (integer pattern matched)
@@ -234,8 +236,8 @@ public class GlsRecord
          if (loc1 == loc2)
          {
             return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2) :
-                   consecutive(prefix1+sep1, prefix2+sep2);
+                   consecutive(prefix1, prefix2, gap) :
+                   consecutive(prefix1+sep1, prefix2+sep2, gap);
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
@@ -243,7 +245,9 @@ public class GlsRecord
             return false;
          }
 
-         return loc2 == loc1+1;
+         int diff = loc2 - loc1;
+
+         return 0 < diff && diff <= gap ;
       }
 
       m1 = ROMAN_UC_PATTERN.matcher(location1);
@@ -288,8 +292,8 @@ public class GlsRecord
          if (loc1 == loc2)
          {
             return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2) :
-                   consecutive(prefix1+sep1, prefix2+sep2);
+                   consecutive(prefix1, prefix2, gap) :
+                   consecutive(prefix1+sep1, prefix2+sep2, gap);
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
@@ -297,7 +301,9 @@ public class GlsRecord
             return false;
          }
 
-         return loc2 == loc1+1;
+         int diff = loc2 - loc1;
+
+         return 0 < diff && diff <= gap ;
       }
 
       m1 = ALPHA_PATTERN.matcher(location1);
@@ -332,8 +338,8 @@ public class GlsRecord
          if (suffix1.equals(suffix2))
          {
             return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2) :
-                   consecutive(prefix1+sep1, prefix2+sep2);
+                   consecutive(prefix1, prefix2, gap) :
+                   consecutive(prefix1+sep1, prefix2+sep2, gap);
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
@@ -341,7 +347,12 @@ public class GlsRecord
             return false;
          }
 
-         return suffix2.codePointAt(0) == suffix1.codePointAt(0)+1;
+         int loc1 = suffix1.codePointAt(0);
+         int loc2 = suffix2.codePointAt(0);
+
+         int diff = loc2 - loc1;
+
+         return 0 < diff && diff <= gap ;
       }
 
       return false;

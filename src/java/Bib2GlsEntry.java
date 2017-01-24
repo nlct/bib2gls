@@ -813,7 +813,7 @@ public class Bib2GlsEntry extends BibEntry
    }
 
    public void updateLocationList(int minRange, String suffixF,
-     String suffixFF, int seeLocation, boolean showLocationPrefix)
+     String suffixFF, int seeLocation, boolean showLocationPrefix, int gap)
    {
       StringBuilder builder = null;
 
@@ -878,7 +878,6 @@ public class Bib2GlsEntry extends BibEntry
 
          if (prev == null)
          {
-            prev = record;
             count = 1;
 
             if (builder == null)
@@ -893,10 +892,9 @@ public class Bib2GlsEntry extends BibEntry
             builder.append(record.getFmtTeXCode());
          }
          else if (minRange < Integer.MAX_VALUE
-                  && record.follows(prev))
+                  && record.follows(prev, gap))
          {
             count++;
-            prev = record;
 
             mid.append("\\delimN ");
             mid.append(record.getFmtTeXCode());
@@ -904,24 +902,28 @@ public class Bib2GlsEntry extends BibEntry
          else if (count==2 && suffixF != null)
          {
             builder.append(suffixF);
+            builder.append("\\delimN ");
+            builder.append(record.getFmtTeXCode());
             mid.setLength(0);
-            count = 0;
-            prev = null;
+            count = 1;
          }
          else if (count > 2 && suffixFF != null)
          {
             builder.append(suffixFF);
+            builder.append("\\delimN ");
+            builder.append(record.getFmtTeXCode());
             mid.setLength(0);
-            count = 0;
-            prev = null;
+            count = 1;
          }
          else if (count >= minRange)
          {
             builder.append("\\delimR ");
+            builder.append(prev.getFmtTeXCode());
+            builder.append("\\delimN ");
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
-            count = 0;
-            prev = null;
+            count = 1;
+            prev = record;
          }
          else
          {
@@ -929,10 +931,10 @@ public class Bib2GlsEntry extends BibEntry
             builder.append("\\delimN ");
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
-            count = 0;
-            prev = null;
+            count = 1;
          }
 
+         prev = record;
          start = false;
       }
 

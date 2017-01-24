@@ -15,6 +15,7 @@
 actual '='
 \end{filecontents*}
 
+\usepackage{amsmath}
 \usepackage{makeidx}
 \usepackage{datetime2}
 \usepackage[colorlinks]{hyperref}
@@ -1531,8 +1532,8 @@ according to \optref{loc-prefix}.
 It's therefore possible to define a custom glossary style where 
 \cs{glossentry} (and \cs{subglossentry}) ignore the final argument
 and instead parse the \field{loclist} field and re-order the
-locations. Remember that you can also use the \sty{glossaries}
-package's \cs{glsnoidxloclist}. For example:
+locations. Remember that you can also use \cs{glsnoidxloclist}
+provided by \sty{glossaries}. For example:
 \begin{verbatim}
 \glsfieldfetch{gls.sample}{loclist}{\loclist}% fetch location list
 \glsnoidxloclist{\loclist}% iterate over locations
@@ -1666,8 +1667,10 @@ or \meta{group-2} of the first pattern match (of
 \meta{location-1}) doesn't equal
 \meta{group-2} of the second pattern match (of \meta{location-2})
 then the locations aren't considered consecutive;
-   \item\label{itm:decgrp3} If \meta{group-3} of the second pattern match is one more
-than \meta{group-3} of the first pattern match, then the locations
+   \item\label{itm:decgrp3} If $0 < l_2 - l_1 \leq g $
+where $l_2$ is \meta{group 3} of the second pattern match,
+$l_1$ is \meta{group 3} of the first pattern match and
+$g$ is the value of \optfmt{loc-gap} then the locations
 are consecutive otherwise they're not consecutive.
   \end{enumerate}
 \item\label{itm:rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
@@ -1766,6 +1769,45 @@ location set to 1 and the second location set to 2.
 (Note that \cs{glsxtrresourcefile} changes the category code of
 \texttt{@} to allow for internal commands in locations.)
 \end{enumerate}
+
+\subsection{\csopt{loc-gap}=\margm{value}}
+\labelopt{loc-gap}
+
+This setting is used to determine whether two locations are
+considered consecutive.
+The value must be an integer greater than or equal to 1.
+(The default is \optfmt{1}.)
+
+For two locations, \meta{location-1} and \meta{location-2},
+that have numeric values $n_1$ and $n_2$ (and identical prefix,
+counter and format), then the sequence \meta{location-1},
+\meta{location-2} is considered consecutive if
+\[
+0 < n_2 - n_1 \leq \text{\meta{loc-gap}}
+\]
+The default value of 1 means that \meta{location-2} immediately
+follows \meta{location-1} if $n_2 = n_1+1$.
+
+For example, if \meta{location-1} is \qt{B} and \meta{location-2} 
+is \qt{C}, then $n_1 = 66$ and $n_2 = 67$. Since $n_2 = 67 = 66+1=
+n_1+1$ then \meta{location-2} immediately follows \meta{location-1}.
+
+This is used in the range formations within the location lists.
+So, for example, the list \qt{1, 2, 3, 5, 7, 8, 10, 11, 12, 58, 59,
+61} becomes
+\qt{1--3, 5, 7, 8, 10--12, 58, 59, 61}.
+
+The automatically indexing of commands like \cs{gls} means that
+the location lists can become long and ragged. You could
+deal with this by switching off the automatic indexing and
+only explicitly index pertinent use or you can adjust
+the value of \optfmt{loc-gap} so that a range can be formed even
+there are one or two gaps in it.
+
+So with the above set of locations, if \csopt[\marg{2}]{loc-gap} then 
+the list becomes \qt{1--12, 58--61} which now highlights that
+there are two blocks within the document related to that
+term.
 
 \subsection{\csopt{suffixF}=\margm{value}}
 \labelopt{suffixF}
