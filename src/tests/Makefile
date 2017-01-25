@@ -4,7 +4,7 @@ RM=\rm -f
 
 all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-xe.pdf test-label-prefix.pdf test-dual.pdf \
-	  test-external-refs.pdf
+	  test-external-refs.pdf test-hierarchical.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -70,6 +70,14 @@ test-external-refs.glstex	: test-external-refs.tex $(DEPS) \
 	 			entries-terms.bib entries-symbols.bib
 		pdflatex test-external-refs
 		$(BIB2GLS) test-external-refs
+
+test-hierarchical.pdf	: test-hierarchical.glstex
+		pdflatex test-hierarchical
+
+test-hierarchical.glstex	: test-hierarchical.tex $(DEPS) \
+	 			hierarchical.bib
+		pdflatex test-hierarchical
+		$(BIB2GLS) test-hierarchical
 
 clean	:
 	$(RM) *.aux

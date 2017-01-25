@@ -1,0 +1,15 @@
+\documentclass{article}
+
+\usepackage[record,style=index]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={hierarchical},
+ ignore-fields={parent}
+]
+
+\begin{document}
+\gls{bird}, \gls{parrot}, \gls{zebra}, \gls{cabbage},
+\gls{brocolli}, \gls{quartz}, \gls{corundum}.
+
+\printunsrtglossary
+\end{document}

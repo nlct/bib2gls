@@ -529,13 +529,18 @@ public class Bib2GlsEntry extends BibEntry
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
 
+      if (resource.hasSkippedFields())
+      {
+         String[] skip = resource.getSkipFields();
+
+         for (String field : skip)
+         {
+            removeField(field);
+         }
+      }
+
       for (String field : fields)
       {
-         if (resource.skipField(field))
-         {
-            continue;
-         }
-
          BibValueList value = getField(field);
 
          if (value != null)
@@ -775,6 +780,11 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       return fieldValues.put(label, value);
+   }
+
+   public String removeFieldValue(String label)
+   {
+      return fieldValues.remove(label);
    }
 
    public String getParent()
@@ -1080,11 +1090,6 @@ public class Bib2GlsEntry extends BibEntry
    public void initCrossRefs(TeXParser parser)
     throws IOException
    {
-      if (resource.skipField("see"))
-      {
-         return;
-      }
-
       BibValueList value = getField("see");
 
       if (value == null) return;

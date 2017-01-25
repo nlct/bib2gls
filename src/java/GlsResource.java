@@ -87,6 +87,15 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("external"))
+         {// TODO
+         }
+         else if (opt.equals("match"))
+         {// TODO
+         }
+         else if (opt.equals("secondary"))
+         {// TODO
+         }
          else if (opt.equals("ext-prefixes"))
          {
             CsvList csvList = CsvList.getList(parser, list.getValue(opt));
@@ -107,6 +116,25 @@ public class GlsResource
 
                   externalPrefixes[i] = obj.toString(parser).trim();
                }
+            }
+         }
+         else if (opt.equals("flatten"))
+         {
+            String val = list.getValue(opt).toString(parser).trim();
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               flatten = true;
+            }
+            else if (val.equals("false"))
+            {
+               flatten = false;
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.choice.value", 
+                  opt, val, "true, false"));
             }
          }
          else if (opt.equals("dual-entry-map"))
@@ -580,7 +608,14 @@ public class GlsResource
 
             for (int i = 0; i < n; i++)
             {
-               skipFields[i] = csvList.get(i).toString(parser);
+               TeXObject obj = csvList.get(i);
+
+               if (obj instanceof TeXObjectList)
+               {
+                  obj = trimList((TeXObjectList)obj);
+               }
+
+               skipFields[i] = obj.toString(parser);
             }
          }
          else if (opt.equals("selection"))
@@ -1398,12 +1433,16 @@ public class GlsResource
 
          writer.println();
 
-         for (Bib2GlsEntry entry : entries)
+         for (int i = 0, n = entries.size(); i < n; i++)
          {
+            Bib2GlsEntry entry = entries.get(i);
+
             bib2gls.verbose(entry.getId());
 
             entry.updateLocationList(minLocationRange,
               suffixF, suffixFF, seeLocation, locationPrefix != null, locGap);
+
+            checkParent(entry, i, entries);
 
             entry.writeBibEntry(writer);
             entry.writeLocList(writer);
@@ -1413,12 +1452,15 @@ public class GlsResource
 
          if (dualEntries != null)
          {
-            for (Bib2GlsEntry entry : dualEntries)
+            for (int i = 0, n = dualEntries.size(); i < n; i++)
             {
+               Bib2GlsEntry entry = dualEntries.get(i);
+
                bib2gls.verbose(entry.getId());
 
                entry.updateLocationList(minLocationRange,
                  suffixF, suffixFF, seeLocation, locationPrefix != null, locGap);
+               checkParent(entry, i, dualEntries);
 
                entry.writeBibEntry(writer);
                entry.writeLocList(writer);
@@ -1440,6 +1482,47 @@ public class GlsResource
       }
 
       return entryCount;
+   }
+
+   private void checkParent(Bib2GlsEntry entry, int i, 
+      Vector<Bib2GlsEntry> list)
+   {
+      if (flatten)
+      {
+         entry.removeFieldValue("parent");
+         return;
+      }
+
+      String parentId = entry.getParent();
+
+      if (parentId == null || parentId.isEmpty()) return;
+
+      // has parent been added?
+
+      boolean found = false;
+
+      for (int j = i-1; j >= 0; j--)
+      {
+         /*
+           Search backwards.
+           (If entry has a parent it's more likely to be nearby
+            with the default sort.)
+         */
+
+         if (list.get(j).getId().equals(parentId))
+         {
+            return;
+         }
+      }
+
+      bib2gls.warning(bib2gls.getMessage(
+         "warning.parent.missing", parentId, entry.getId()));
+      entry.removeFieldValue("parent");
+   }
+
+   public boolean flattenSort()
+   {
+      return flatten;
    }
 
    private void setType(Bib2GlsEntry entry)
@@ -1536,6 +1619,16 @@ public class GlsResource
             dual.putField("category", dualCategory);
          }
       }
+   }
+
+   public boolean hasSkippedFields()
+   {
+      return skipFields != null && skipFields.length != 0;
+   }
+
+   public String[] getSkipFields()
+   {
+      return skipFields;
    }
 
    public boolean skipField(String field)
@@ -1705,6 +1798,8 @@ public class GlsResource
      dualDescPluralSuffix="\\glspluralsuffix ";
 
    private Charset bibCharset = null;
+
+   private boolean flatten = false;
 
    private int minLocationRange = 3, locGap = 1;
 

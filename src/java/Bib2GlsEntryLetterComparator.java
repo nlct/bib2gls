@@ -113,6 +113,12 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
+      if (bib2gls.getCurrentResource().flattenSort())
+      {
+         return entry1.getFieldValue("sort").compareTo(
+            entry2.getFieldValue("sort"));
+      }
+
       int n1 = entry1.getHierarchyCount();
       int n2 = entry2.getHierarchyCount();
 
@@ -128,7 +134,8 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
          Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
 
-         int result = e1.getFieldValue("sort").compareTo(e2.getFieldValue("sort"));
+         int result = e1.getFieldValue("sort").compareTo(
+            e2.getFieldValue("sort"));
 
          if (result != 0)
          {

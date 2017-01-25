@@ -154,6 +154,7 @@ Replacement: {6}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
 <entry key="warning.option.clash">Option clash: {0} and {1}
 Ignoring {1}</entry>
+<entry key="warning.parent.missing">Parent {0} does not occur before entry {1} so removing relationship.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>

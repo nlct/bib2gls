@@ -163,6 +163,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
    public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
+      if (bib2gls.getCurrentResource().flattenSort())
+      {
+         return entry1.getCollationKey().compareTo(entry2.getCollationKey());
+      }
+
       int n1 = entry1.getHierarchyCount();
       int n2 = entry2.getHierarchyCount();
 

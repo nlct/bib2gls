@@ -1,7 +1,7 @@
 % arara: pdflatex
 % arara: makeindex: {style: bib2gls.ist}
 % arara: pdflatex
-\documentclass[titlepage=false,indextotoc]{scrreprt}
+\documentclass[titlepage=false,index=totoc]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage{alltt}
@@ -152,6 +152,12 @@ actual '='
 }
 
 \newcommand*{\csopt}[2][]{\gencsopt[#1]{glsxtrresourcefile}{#2}}%
+
+\newcommand*{\csoptnv}[1]{%
+ \texorpdfstring
+  {\gencsopt{glsxtrresourcefile}{#1}}%
+  {#1}%
+}%
 
 \newcommand*{\gencsopt}[3][]{%
   \texorpdfstring%
@@ -945,10 +951,10 @@ The \entry{number} entry type is like \entry{symbol}, but it's for numbers.
 Terms defined using \atentry{number} will be written to the output
 file using the command \csref{bibglsnewnumber}.
 
-\section{\atentry{term}}
-\labelatentry{term}
+\section{\atentry{index}}
+\labelatentry{index}
 
-The \entry{term} entry type is designed for entries that don't have
+The \entry{index} entry type is designed for entries that don't have
 a description. Only the label is required. If \field{name} is
 omitted, it's assumed to be the same as the label. However, this
 means that if the name contains any characters that can't be used in
@@ -958,15 +964,15 @@ if present, otherwise it will use the label.
 
 Example:
 \begin{verbatim}
-@term{duck}
+@index{duck}
 
-@term{goose,plural={geese}}
+@index{goose,plural={geese}}
 
-@term{facade,name={fa\c{c}ade}}
+@index{facade,name={fa\c{c}ade}}
 \end{verbatim}
 
-Terms defined using \atentry{term} will be written to the output
-file using the command \csref{bibglsnewterm}.
+Terms defined using \atentry{index} will be written to the output
+file using the command \csref{bibglsnewindex}.
 
 \section{\atentry{abbreviation}}
 \labelatentry{abbreviation}
@@ -1144,7 +1150,7 @@ Alternatively, if they have different settings:
 \section{General Options}
 \label{sec:generalopts}
 
-\subsection{\csopt{charset}=\margm{encoding-name}}
+\subsection{\csoptnv{charset}=\margm{encoding-name}}
 \labelopt{charset}
 
 If the character encoding hasn't been supplied in the \ext{bib} file
@@ -1157,10 +1163,74 @@ then you can supply the correct encoding using
 the encoding in the \ext{bib} file where it can also be read by
 JabRef.
 
+\subsection{\csoptnv{secondary}=\margm{list}}
+\labelopt{secondary}
+
+It may be that you want to display a glossary multiple times
+but with a different order. For example, the first time
+alphabetically and the second time by category.
+
+You can do this with the \csopt{secondary} option. The value
+(which must be supplied) is a comma-separated list where each
+item in the list is in the format 
+\begin{definition}
+\meta{sort}:\meta{field}:\meta{type}
+\end{definition}
+
+This will copy all the selected entries into the glossary
+labelled \meta{type} sorted according to \meta{sort} (as
+\optref{sort}) using \meta{field} as the sort value.
+(If the glossary \meta{type} doesn't exist, it will be
+defined with \cs{provideignoredglossary*}\marg{type}.)
+Note that if the glossary already exists and contains entries,
+the existing entries aren't re-ordered. The new entries are
+simply appended to the list.
+
+For example, suppose the \ext{bib} file contains entries like:
+\begin{verbatim}
+@entry{quartz,
+  name={quartz},
+  description={hard mineral consisting of silica},
+  category={mineral}
+}
+
+@entry{cabbage,
+  name={cabbage},
+  description={vegetable with thick green or purple leaves},
+  category={vegetable}
+}
+
+@entry{waterfowl,
+  name={waterfowl},
+  description={any bird that lives in or about water},
+  category={animal}
+}
+\end{verbatim}
+and the document preamble contains:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries},sort={en-GB},
+  secondary={en-GB:category:topic}
+]
+\end{verbatim}
+This sorts the primary entries according to the default
+\optref{sort-field} and then sorts the entries according
+to the \field{category} field and copies this list to
+the \texttt{topic} glossary (which will be provided if not defined.)
+
+The secondary list can be displayed with the hypertargets switched
+off to prevent duplicates. The cross-references will link to the
+original glossary.
+
+For example:
+\begin{verbatim}
+\printunsrtglossary[title={Summary (alphabetical)}]
+\printunsrtglossary[title={Summary (by topic)},target=false]
+\end{verbatim}
+
 \section{Selection Options}
 \label{sec:selectionopts}
 
-\subsection{\csopt{src}=\margm{list}}
+\subsection{\csoptnv{src}=\margm{list}}
 \labelopt{src}
 
 If the \csopt{src} option is omitted, the \ext{bib} file is assumed
@@ -1190,7 +1260,7 @@ indicates that \bibgls\ must read the files
 \filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
 create the file obtained from \cs{jobname}\ext{glstex}.
 
-\subsection{\csopt{selection}=\margm{value}}
+\subsection{\csoptnv{selection}=\margm{value}}
 \labelopt{selection}
 
 By default all entries that have records in the \ext{aux} file will
@@ -1228,10 +1298,20 @@ supplied in the \csopt{src} option.
 \end{itemize}
 The \meta{value} must be supplied.
 
+\subsection{\csoptnv{external}=\margm{list}}
+\labelopt{external}
+
+Not yet implemented.
+
+\subsection{\csoptnv{match}=\margm{value}}
+\labelopt{match}
+
+Not yet implemented.
+
 \section{Field and Label Options}
 \label{sec:labelopts}
 
-\subsection{\csopt{ignore-fields}=\margm{list}}
+\subsection{\csoptnv{ignore-fields}=\margm{list}}
 \labelopt{ignore-fields}
 
 The \csopt{ignore-fields} key indicates that you want \bibgls\ to
@@ -1251,7 +1331,7 @@ but I want to use the \abbrstyle{short-long} style and I don't want
 the cross-referenced term, then I can use
 \csopt[\marg{see,description}]{ignore-fields}.
 
-\subsection{\csopt{category}=\margm{value}}
+\subsection{\csoptnv{category}=\margm{value}}
 \labelopt{category}
 
 The selected entries may all have their \field{category} field
@@ -1321,7 +1401,7 @@ then both the \texttt{dog} and \texttt{dual.dog} entries will
 have their \field{category} field set to \optfmt{dual} since the
 new definition of \cs{bibglsnewdualentry} has overridden
 the \csopt[animals]{category} option.
-\subsection{\csopt{type}=\margm{value}}
+\subsection{\csoptnv{type}=\margm{value}}
 
 \labelopt{type}
 
@@ -1361,7 +1441,7 @@ Alternatively you can use \cs{newignoredglossary} if you don't
 want the glossary picked up by \cs{printunsrtglossaries}.
 
 
-\subsection{\csopt{label-prefix}=\margm{tag}}
+\subsection{\csoptnv{label-prefix}=\margm{tag}}
 \labelopt{label-prefix}
 
 The \csopt{label-prefix} option prepends \meta{tag} to each
@@ -1409,7 +1489,7 @@ it's as though the entries had been defined as:
 Remember to use this prefix when you reference the terms in the
 document with commands like \cs{gls}.
 
-\subsection{\csopt{ext-prefixes}=\margm{list}}
+\subsection{\csoptnv{ext-prefixes}=\margm{list}}
 \labelopt{ext-prefixes}
 
 Any cross-references in the \ext{bib} file that start with
@@ -1592,7 +1672,7 @@ option or supplied in the optional argument of \cs{printunsrtglossary}).
 For more information on adjusting the formatting see the
 \sty{glossaries} and \sty{glossaries-extra} manual.
 
-\subsection{\csopt{min-loc-range}=\margm{value}}
+\subsection{\csoptnv{min-loc-range}=\margm{value}}
 \labelopt{min-loc-range}
 
 By default, three or more consecutive locations \meta{loc-1},
@@ -1636,7 +1716,7 @@ set to group 1 of the second pattern match;
 group 3 of the first pattern match and \meta{location-2} set to
 group 3 of the second pattern match.
   \end{itemize}
-\item\label{itm.decmatch} If both \meta{location-1} and \meta{location-2} match the
+\item\label{itm:decmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern
 \begin{verbatim}
 (.*?)([^0-9]?)([0-9]+)
@@ -1676,16 +1756,16 @@ are consecutive otherwise they're not consecutive.
 \item\label{itm:rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
 where \meta{n} is a lower case Roman numeral, which is converted to
 a decimal value and the test is performed in the same way as the 
-above \hyperref[itm.decmatch]{decimal test}.
+above \hyperref[itm:decmatch]{decimal test}.
 \item\label{itm:Rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
 where \meta{n} is an upper case Roman numeral, which is converted to
 a decimal value and the test is performed
-in the same way as the above \hyperref[itm.decmatch]{decimal test}.
+in the same way as the above \hyperref[itm:decmatch]{decimal test}.
 \item\label{itm:alphmatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{c}
 where \meta{c} is either a lower case letter from \texttt{a} to
 \texttt{z} or an upper case letter from \texttt{A} to \texttt{Z}.
 The character is converted to its code point and the test is
-performed in the same way as the \hyperref[itm.decmatch]{decimal pattern} above.
+performed in the same way as the \hyperref[itm:decmatch]{decimal pattern} above.
 \item\label{itm:nomatch} If none of the above, the locations aren't considered
 consecutive.
 \end{enumerate} 
@@ -1728,7 +1808,7 @@ This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
 \glsxtr@record{gls.sample}{}{page}{glsnumberformat}{ii.A}
 \end{verbatim}
 These records aren't consecutive. They match the
-\hyperref[sec:alphmatch]{alpha pattern}. The first location is
+\hyperref[itm:alphmatch]{alpha pattern}. The first location is
 considered to consist of the prefix \texttt{i}, the separator
 \texttt{.} (dot) and the number given by the character code of A. 
 The second location is considered to consist of the prefix
@@ -1770,7 +1850,7 @@ location set to 1 and the second location set to 2.
 \texttt{@} to allow for internal commands in locations.)
 \end{enumerate}
 
-\subsection{\csopt{loc-gap}=\margm{value}}
+\subsection{\csoptnv{loc-gap}=\margm{value}}
 \labelopt{loc-gap}
 
 This setting is used to determine whether two locations are
@@ -1809,21 +1889,21 @@ the list becomes \qt{1--12, 58--61} which now highlights that
 there are two blocks within the document related to that
 term.
 
-\subsection{\csopt{suffixF}=\margm{value}}
+\subsection{\csoptnv{suffixF}=\margm{value}}
 \labelopt{suffixF}
 
 If set, a range consisting of two consecutive locations 
 \meta{loc-1} and \meta{loc-2} will be
 displayed in the location list as \meta{loc-1}\meta{value}.
 
-\subsection{\csopt{suffixFF}=\margm{value}}
+\subsection{\csoptnv{suffixFF}=\margm{value}}
 \labelopt{suffixFF}
 
 If set, a range consisting of three or more consecutive locations 
 \meta{loc-1} and \meta{loc-2} will be
 displayed in the location list as \meta{loc-1}\meta{value}.
 
-\subsection{\csopt{see}=\margm{value}}
+\subsection{\csoptnv{see}=\margm{value}}
 \labelopt{see}
 
 If an entry has a \field{see} field, this can be placed before or
@@ -1842,7 +1922,7 @@ The separator between the location list and the see reference is
 provided by \csref{bibglsseesep}. This separator is omitted if the
 location list is empty. The \meta{value} part is required.
 
-\subsection{\csopt{loc-prefix}=\margm{value}}
+\subsection{\csoptnv{loc-prefix}=\margm{value}}
 \labelopt{loc-prefix}
 
 The \csopt{loc-prefix} setting indicates that the location lists
@@ -1881,7 +1961,7 @@ If \meta{value} is omitted, \optfmt{true} is assumed.
 \section{Sorting}
 \label{sec:sortingopts}
 
-\subsection{\csopt{sort}=\margm{value}}
+\subsection{\csoptnv{sort}=\margm{value}}
 \labelopt{sort}
 
 The \csopt{sort} key indicates how entries should be sorted. The
@@ -1905,7 +1985,7 @@ For example:
 \glsxtrresourcefile[sort={de-1996}]{german-terms}
 \end{verbatim}
 
-\subsection{\csopt{sort-field}=\margm{label}}
+\subsection{\csoptnv{sort-field}=\margm{label}}
 \labelopt{sort-field}
 
 The \csopt{sort-field} key indicates which field provides the sort
@@ -1916,9 +1996,24 @@ value. The default is the \field{sort} field. For example
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
 
+\subsection{\csoptnv{flatten-sort}=\margm{value}}
+\labelopt{flatten-sort}
+
+This is a boolean option. The default value is
+\csopt[false]{flatten-sort}. 
+
+If \csopt[true]{flatten-sort}, the sorting will ignore hierarchy.
+The \field{parent} field will be omitted when writing
+the definitions to the \ext{glstex} file, but the parent entries
+will still be considered a dependent ancestor from the 
+\optref{selection} point of view.
+
+Note the difference between this option and using
+\csopt[parent]{ignore-fields} which will remove the dependency.
+
 \section{Dual Entries}
 
-\subsection{\csopt{dual-sort}=\margm{value}}
+\subsection{\csoptnv{dual-sort}=\margm{value}}
 \labelopt{dual-sort}
 
 This option indicates how to sort the dual entries. The primary
@@ -1957,14 +2052,14 @@ all according to the \optfmt{en-GB} locale.
 If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
 \meta{value} is omitted, \optfmt{locale} is assumed.
 
-\subsection{\csopt{dual-sort-field}=\margm{value}}
+\subsection{\csoptnv{dual-sort-field}=\margm{value}}
 \labelopt{dual-sort-field}
 
 This option indicates the field to use when sorting dual entries
 (when they haven't been combined with the primary entries). The
 default value is the same as the \optref{sort-field} value.
 
-\subsection{\csopt{dual-prefix}=\margm{value}}
+\subsection{\csoptnv{dual-prefix}=\margm{value}}
 \labelopt{dual-prefix}
 
 This option indicates the prefix to use for the dual entries. The
@@ -1973,7 +2068,7 @@ Any references to dual entries within the \ext{bib} file should use
 the prefix \idprefix{dual} which will be replaced by \meta{value}
 when the \ext{bib} file is parsed.
 
-\subsection{\csopt{dual-type}=\margm{value}}
+\subsection{\csoptnv{dual-type}=\margm{value}}
 \labelopt{dual-type}
 
 This option sets the \field{type} field for all dual
@@ -2017,7 +2112,7 @@ Alternatively:
  dual-type={same as primary}]
 \end{verbatim}
 
-\subsection{\csopt{dual-category}=\margm{value}}
+\subsection{\csoptnv{dual-category}=\margm{value}}
 \labelopt{dual-category}
 
 This option sets the \field{category} field for all dual
@@ -2045,7 +2140,7 @@ remain unchanged.
 \end{itemize}
 
 
-\subsection{\csopt{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
+\subsection{\csoptnv{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-entry-map}
 
 This setting governs the behaviour of \atentry{dualentry}
@@ -2109,7 +2204,7 @@ the \sty{glossaries-extra} package's point of view. For example,
 \cs{longnewglossaryentry} doesn't provide a default for
 \field{descriptionplural} if if hasn't been set.
 
-\subsection{\csopt{dual-abbrv-map}=\marg{\margm{list1},\margm{list2}}}
+\subsection{\csoptnv{dual-abbrv-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-abbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to
@@ -2129,7 +2224,7 @@ This essentially flips the \field{short} field with the
 \field{symbol} field and the \field{long} field with the
 \field{description} field.
 
-\subsection{\csopt{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
+\subsection{\csoptnv{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-symbol-map}
 
 This is like \csopt{dual-entry-map} but applies to
@@ -2146,7 +2241,7 @@ dual-symbol-map=
 This essentially flips the \field{name} field with the
 \field{symbol} field.
 
-\subsection{\csopt{dual-entry-backlink}=\margm{boolean}}
+\subsection{\csoptnv{dual-entry-backlink}=\margm{boolean}}
 \labelopt{dual-entry-backlink}
 
 This is a boolean setting.
@@ -2199,27 +2294,27 @@ is selected, which also happens to be the \field{description} field,
 so the hyperlink for the primary entry is put in the
 \field{description} field.
 
-\subsection{\csopt{dual-abbrv-backlink}=\margm{value}}
+\subsection{\csoptnv{dual-abbrv-backlink}=\margm{value}}
 \labelopt{dual-abbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualabbreviation} instead of
 \atentry{dualentry}.
 
-\subsection{\csopt{dual-symbol-backlink}=\margm{value}}
+\subsection{\csoptnv{dual-symbol-backlink}=\margm{value}}
 \labelopt{dual-symbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
 
-\subsection{\csopt{dual-backlink}=\margm{value}}
+\subsection{\csoptnv{dual-backlink}=\margm{value}}
 \labelopt{dual-backlink}
 
 Shortcut for \csopt[\margm{value}]{dual-entry-backlink}, 
 \csopt[\margm{value}]{dual-abbrv-backlink}, and
 \csopt[\margm{value}]{dual-symbol-backlink}.
 
-\subsection{\csopt{dual-field}=\margm{value}}
+\subsection{\csoptnv{dual-field}=\margm{value}}
 \labelopt{dual-field}
 
 If this option is used, this will add \cs{glsxtrprovidestoragekey}
@@ -2283,8 +2378,8 @@ own commands before the \ext{glstex} files are loaded.
 \section{\cs{bibglsnewnumber}}
 \labelcs{bibglsnewnumber}
 
-\section{\cs{bibglsnewterm}}
-\labelcs{bibglsnewterm}
+\section{\cs{bibglsnewindex}}
+\labelcs{bibglsnewindex}
 
 \section{\cs{bibglsnewacronym}}
 \labelcs{bibglsnewacronym}

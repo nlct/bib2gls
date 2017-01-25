@@ -1,0 +1,15 @@
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={topics},sort={en-GB},
+ secondary={en-GB:category:bytopic}]
+
+\begin{document}
+
+\gls{quartz}, \gls{corundum}, \gls{cabbage}, \gls{brocolli},
+\gls{parrot}, \gls{waterfowl}.
+
+\printunsrtglossary[title={Summary (Alphabetical)}]
+\printunsrtglossary[title={Summary (by Topic)},type={bytopic},target=false]
+\end{document}
