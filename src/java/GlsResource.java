@@ -21,6 +21,7 @@ package com.dickimawbooks.bib2gls;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.regex.Matcher;
 import java.text.Collator;
 import java.text.CollationKey;
@@ -83,8 +84,75 @@ public class GlsResource
          else if (opt.equals("external"))
          {// TODO
          }
+         else if (opt.equals("match-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
+
+            fieldPatternsAnd = val.equals("and");
+         }
          else if (opt.equals("match"))
-         {// TODO
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+            if (array == null)
+            {
+               fieldPatterns = null;
+            }
+            else
+            {
+               fieldPatterns = new HashMap<String,Pattern>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (split.size() != 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  String val = split.get(1).toString(parser);
+
+                  // Has this field already been added?
+
+                  Pattern p = fieldPatterns.get(field);
+
+                  if (p == null)
+                  {
+                     p = Pattern.compile(val);
+                  }
+                  else
+                  {
+                     p = Pattern.compile(String.format(
+                            "(?:%s)|(?:%s)", p.pattern(), val));
+                  }
+
+                  try
+                  {
+                     fieldPatterns.put(field, p);
+                  }
+                  catch (PatternSyntaxException e)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.pattern", 
+                        field, val, opt), e);
+                  }
+               }
+            }
          }
          else if (opt.equals("secondary"))
          {
@@ -819,6 +887,36 @@ public class GlsResource
       return array;
    }
 
+   private TeXObject[] getTeXObjectArray(TeXParser parser, KeyValList list, 
+     String opt)
+    throws IOException
+   {
+      CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+
+      int n = csvList.size();
+
+      if (n == 0)
+      {
+         return null;
+      }
+
+      TeXObject[] array = new TeXObject[n];
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject obj = csvList.getValue(i);
+
+         if (obj instanceof TeXObjectList)
+         {
+            obj = trimList((TeXObjectList)obj);
+         }
+
+         array[i] = obj;
+      }
+
+      return array;
+   }
+
    private CsvList[] getListArray(TeXParser parser, KeyValList list, 
      String opt)
     throws IOException
@@ -907,6 +1005,27 @@ public class GlsResource
       return map;
    }
 
+   private KeyValList getKeyValList(TeXParser parser, KeyValList list, 
+     String opt)
+    throws IOException
+   {
+      TeXObject val = list.getValue(opt);
+
+      if (val instanceof TeXObjectList)
+      {
+         val = trimList((TeXObjectList)val);
+      }
+
+      KeyValList sublist = KeyValList.getList(parser, val);
+
+      if (sublist == null || sublist.size() == 0)
+      {
+         return null;
+      }
+
+      return sublist;
+   }
+
    private TeXObjectList trimList(TeXObjectList list)
    {
       // strip redundant white space and grouping
@@ -931,9 +1050,79 @@ public class GlsResource
       return list;
    }
 
+   private Vector<TeXObject> splitList(TeXParser parser, char c, 
+      TeXObjectList list)
+    throws IOException
+   {
+      if (list.size() == 0) return null;
+
+      Vector<TeXObject> split = new Vector<TeXObject>();
+
+      TeXObjectList element = new TeXObjectList();
+
+      for (TeXObject obj : list)
+      {
+         if (obj instanceof CharObject && ((CharObject)obj).getCharCode() == c)
+         {
+            element = trimList(element);
+
+            if (element.size() != 0)
+            {
+               split.add(element);
+            }
+
+            element = new TeXObjectList();
+         }
+         else
+         {
+            element.add(obj);
+         }
+      }
+
+      element = trimList(element);
+
+      if (element.size() != 0)
+      {
+         split.add(element);
+      }
+
+      return split;
+   }
+
+   private void stripUnknownFieldPatterns()
+   {
+      Vector<String> fields = new Vector<String>();
+
+      for (Iterator<String> it = fieldPatterns.keySet().iterator();
+           it.hasNext(); )
+      {
+         String field = it.next();
+
+         if (!bib2gls.isKnownField(field))
+         {
+            bib2gls.warning(bib2gls.getMessage("warning.unknown.field.pattern",
+              field));
+
+            fields.add(field);
+         }
+      }
+
+      for (String field : fields)
+      {
+         fieldPatterns.remove(field);
+      }
+
+      if (fieldPatterns.size() == 0)
+      {
+         fieldPatterns = null;
+      }
+   }
+
    public void parse(TeXParser parser)
    throws IOException
    {
+      stripUnknownFieldPatterns();
+
       bibData = new Vector<Bib2GlsEntry>();
       dualData = new Vector<Bib2GlsEntry>();
 
@@ -1054,13 +1243,25 @@ public class GlsResource
                   }
                }
 
-               if (discard(entry)) continue;
+               if (discard(entry))
+               {
+                  bib2gls.verbose(bib2gls.getMessage("message.discarding.entry",
+                     entry.getId()));
+
+                  continue;
+               }
 
                bibData.add(entry);
 
                if (dual != null)
                {
-                  if (discard(dual)) continue;
+                  if (discard(dual))
+                  {
+                     bib2gls.verbose(bib2gls.getMessage("message.discarding.entry",
+                        dual.getId()));
+
+                     continue;
+                  }
 
                   if (dualSort.equals("combine"))
                   {
@@ -1894,8 +2095,62 @@ public class GlsResource
 
    // Allow for entries to be filtered out
    public boolean discard(Bib2GlsEntry entry)
-   {// TODO
-      return false;
+   {
+      if (fieldPatterns == null) return false;
+
+      boolean matches = fieldPatternsAnd;
+
+      for (Iterator<String> it = fieldPatterns.keySet().iterator();
+           it.hasNext(); )
+      {
+         String field = it.next();
+
+         String value = null;
+
+         if (field.equals(PATTERN_FIELD_ID))
+         {
+            value = entry.getId();
+         }
+         else if (field.equals(PATTERN_FIELD_ENTRY_TYPE))
+         {
+            value = entry.getEntryType();
+         }
+         else
+         {
+            value = entry.getFieldValue(field);
+         }
+
+         if (value == null)
+         {
+            value = "";
+         }
+
+         Pattern p = fieldPatterns.get(field);
+
+         Matcher m = p.matcher(value);
+
+         boolean result = m.matches();
+
+         bib2gls.debug(bib2gls.getMessage("message.pattern.info",
+            p.pattern(), field, value, result));
+
+         if (fieldPatternsAnd)
+         {
+            if (!result)
+            {
+               return true;
+            }
+         }
+         else
+         {
+            if (result)
+            {
+               return false;
+            }
+         }
+      }
+
+      return !matches;
    }
 
    private File texFile;
@@ -1931,6 +2186,13 @@ public class GlsResource
    private String suffixF, suffixFF;
 
    private String preamble = null;
+
+   private HashMap<String,Pattern> fieldPatterns = null;
+
+   private boolean fieldPatternsAnd=true;
+
+   private static final String PATTERN_FIELD_ID = "id";
+   private static final String PATTERN_FIELD_ENTRY_TYPE = "entrytype";
 
    private Vector<Bib2GlsEntry> bibData;
 

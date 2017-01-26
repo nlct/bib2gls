@@ -611,6 +611,8 @@ public class Bib2Gls implements TeXApp
                {
                   fieldMap.put(field, map);
                }
+
+               debug("Adding field: "+field+" ("+map+")");
             }
          }
          else if (name.equals("glsxtr@record"))

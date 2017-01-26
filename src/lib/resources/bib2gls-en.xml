@@ -123,6 +123,8 @@ See the manual for further details.</entry>
 <entry key="message.inconsistent.range">Ignoring inconsistent location format {0}
 with range started by {1}</entry>
 <entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
+<entry key="message.discarding.entry">Discarding entry {0}</entry>
+<entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -155,6 +157,7 @@ Replacement: {6}</entry>
 <entry key="warning.option.clash">Option clash: {0} and {1}
 Ignoring {1}</entry>
 <entry key="warning.parent.missing">Parent {0} does not occur before entry {1} so removing relationship.</entry>
+<entry key="warning.unknown.field.pattern">Ignoring pattern for unknown field: {0}</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
@@ -175,6 +178,9 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.invalid.choice.value">Invalid ''{0}'' value: {1} (allowed values: {2})</entry>
 <entry key="error.invalid.opt.list.size">Invalid value for: {0}
 Value must be a list of size {2,number}</entry>
+<entry key="error.invalid.opt.keylist.value">Invalid ''{0}'' value ''{1}'' (within option ''{2}'')</entry>
+<entry key="error.invalid.opt.keylist.key">Invalid key ''{0}'' within option ''{1}''</entry>
+<entry key="error.invalid.opt.keylist.pattern">Invalid pattern ''{1}'' in {0}='{'{1}'}' (within option ''{2}'')</entry>
 <entry key="error.missing.value">Missing value for: {0}</entry>
 <entry key="error.option.clash">Option clash: {0} and {1}</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}

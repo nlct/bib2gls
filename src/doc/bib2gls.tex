@@ -1317,10 +1317,71 @@ The \meta{value} must be supplied.
 
 Not yet implemented.
 
-\subsection{\csoptnv{match}=\margm{value}}
+\subsection{\csoptnv{match}=\margm{key-val list}}
 \labelopt{match}
 
-Not yet implemented.
+It's possible to filter the selection by matching field values.
+If \meta{key-val list} is empty no filtering will be applied, otherwise
+\meta{key-val list} should be a \meta{key}=\meta{regexp} list, where
+\meta{key} is the name of a field or \optfmt{id} for the entry's
+label or \optfmt{entrytype} for the entry's \ext{bib} type (as in
+the part after \verb|@| in the \ext{bib} file not the \field{type}
+field identifying the glossary label).
+
+The \meta{regex} part should be a regular expression conforming
+to
+\href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
+Pattern class}. The pattern is anchored (\texttt{oo.*} matches
+\texttt{oops} but not \texttt{loops}) and \meta{regexp} can't be
+empty. Remember that \TeX\ will expand the option list as
+it writes the information to the \ext{aux} file so take
+care with special characters. For example, to match a literal
+period use \verb|\string\.| not \verb|\.| (backslash dot).
+
+If the field is missing its value it is assumed to be empty for
+the purposes of the pattern match even if it will be assigned a
+non-empty default value when the entry is defined.
+
+If a field is listed multiple times, the pattern for that
+field is concatenated using
+\begin{alltt}
+(?:\meta{pattern-1})|(?:\meta{pattern-2})
+\end{alltt}
+where \meta{pattern-1} is the current pattern for that field
+and \meta{pattern-2} is the new pattern. This means it performs a
+logical OR\@. For the non-duplicate
+fields the logical operator is given by \optref{match-op}.
+
+For example:
+\begin{verbatim}
+match-op={and},
+match={
+  {category=animals},
+  {topic=biology},
+  {category=vegetables}
+}
+\end{verbatim}
+
+This will discard any entries that don't match the condition:
+\field{category} matches \verb"(?:animals)|(?:vegetables)"
+(the \field{category} is either \optfmt{animals} or
+\optfmt{vegetables}) AND \field{topic} is \texttt{biology}.
+A message will be written to the log file for each entry
+that's discarded.
+
+Patterns for unknown fields will be ignored. If the entire
+list consists of patterns for unknown fields it will be
+treated as \csopt[\marg{}]{match}. That is, no filtering will be
+applied.
+
+\subsection{\csoptnv{match-op}=\margm{value}}
+\labelopt{match-op}
+
+If the value of \optref{match} contains more than one 
+\meta{key}=\meta{pattern} element, the \csopt{match-op}
+determines whether to apply a logical AND or a logical OR.
+The \meta{value} may be either \optfmt{and} or \optfmt{or}.
+The default is \csopt[\marg{and}]{match-op}.
 
 \subsection{\csoptnv{flatten}=\margm{value}}
 \labelopt{flatten}
