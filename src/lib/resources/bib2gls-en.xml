@@ -170,7 +170,11 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.not.dir">Not a directory: {0}</entry>
 <entry key="error.cant.open.log">Can't open log file: {0}</entry>
 <entry key="error.invalid.opt.value">Invalid ''{0}'' value: {1}</entry>
+<entry key="error.invalid.opt.int.value">Invalid ''{0}'' value: {1} (number required)</entry>
+<entry key="error.invalid.opt.minint.value">Invalid ''{0}'' value: {1} (can''t be less than {2,number})</entry>
 <entry key="error.invalid.choice.value">Invalid ''{0}'' value: {1} (allowed values: {2})</entry>
+<entry key="error.invalid.opt.list.size">Invalid value for: {0}
+Value must be a list of size {2,number}</entry>
 <entry key="error.missing.value">Missing value for: {0}</entry>
 <entry key="error.option.clash">Option clash: {0} and {1}</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}

@@ -58,7 +58,7 @@ public class GlsResource
 
       KeyValList list = KeyValList.getList(parser, opts);
 
-      TeXObject srcList = null;
+      String[] srcList = null;
 
       for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
       {
@@ -66,24 +66,17 @@ public class GlsResource
 
          if (opt.equals("src"))
          {
-            srcList = list.getValue(opt);
+            srcList = getStringArray(parser, list, opt);
 
-            CsvList csvList = CsvList.getList(parser, srcList);
-
-            int n = csvList.size();
-
-            if (n == 0)
+            if (srcList == null)
             {
                sources.add(bib2gls.getBibFilePath(parser, filename));
             }
             else
             {
-               for (int i = 0; i < n; i++)
+               for (String src : srcList)
                {
-                  TeXObject obj = csvList.getValue(i);
-
-                  sources.add(bib2gls.getBibFilePath(parser, 
-                     obj.toString(parser).trim()));
+                  sources.add(bib2gls.getBibFilePath(parser, src));
                }
             }
          }
@@ -95,14 +88,7 @@ public class GlsResource
          }
          else if (opt.equals("secondary"))
          {
-            TeXObject obj = list.getValue(opt);
-
-            if (obj instanceof TeXObjectList)
-            {
-               obj = trimList((TeXObjectList)obj);
-            }
-
-            String val = obj.toString(parser);
+            String val = getRequired(parser, list, opt);
 
             String[] split = val.split("\\s*:\\s*");
 
@@ -125,349 +111,116 @@ public class GlsResource
          }
          else if (opt.equals("ext-prefixes"))
          {
-            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
-
-            int n = csvList.size();
-
-            if (n == 0)
-            {
-               externalPrefixes = null;
-            }
-            else
-            {
-               externalPrefixes = new String[n];
-
-               for (int i = 0; i < n; i++)
-               {
-                  TeXObject obj = csvList.getValue(i);
-
-                  externalPrefixes[i] = obj.toString(parser).trim();
-               }
-            }
+            externalPrefixes = getStringArray(parser, list, opt);
          }
          else if (opt.equals("flatten"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.isEmpty() || val.equals("true"))
-            {
-               flatten = true;
-            }
-            else if (val.equals("false"))
-            {
-               flatten = false;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false"));
-            }
+            flatten = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("set-widest"))
+         {
+            setWidest = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-entry-map"))
          {
-            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+            String[] keys = new String[1];
 
-            if (csvList.size() != 2)
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   csvList.toString(parser)));
-            }
+            dualEntryMap = getDualMap(parser, list, opt, keys);
 
-            TeXObject obj = csvList.get(0);
-
-            // strip redundant white space and grouping
-
-            if (obj instanceof TeXObjectList)
-            {
-               obj = trimList((TeXObjectList)obj);
-            }
-
-            CsvList list1 = CsvList.getList(parser, obj);
-
-            obj = csvList.get(1);
-
-            if (obj instanceof TeXObjectList)
-            {
-               obj = trimList((TeXObjectList)obj);
-            }
-
-            CsvList list2 = CsvList.getList(parser, obj);
-
-            int n = list1.size();
-
-            if (n != list2.size())
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.dual.map", opt, 
-                   list.get(opt).toString(parser), n, list2.size()));
-            }
-
-            dualEntryMap = new HashMap<String,String>();
-
-            for (int i = 0; i < n; i++)
-            {
-               TeXObject obj1 = list1.getValue(i);
-               TeXObject obj2 = list2.getValue(i);
-
-               String key = obj1.toString(parser);
-               String map = obj2.toString(parser);
-
-               dualEntryMap.put(key, map);
-
-               if (i == 0)
-               {
-                  dualEntryFirstMap = key;
-               }
-            }
+            dualEntryFirstMap = keys[0];
          }
          else if (opt.equals("dual-abbrv-map"))
          {
-            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+            String[] keys = new String[1];
 
-            if (csvList.size() != 2)
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   csvList.toString(parser)));
-            }
+            dualAbbrvMap = getDualMap(parser, list, opt, keys);
 
-            CsvList list1 = CsvList.getList(parser, csvList.getValue(0));
-            CsvList list2 = CsvList.getList(parser, csvList.getValue(1));
-
-            int n = list1.size();
-
-            if (n != list2.size())
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.dual.map", opt, 
-                   list.get(opt).toString(parser), n, list2.size()));
-            }
-
-            dualAbbrvMap = new HashMap<String,String>();
-
-            for (int i = 0; i < n; i++)
-            {
-               TeXObject obj1 = list1.getValue(i);
-               TeXObject obj2 = list2.getValue(i);
-
-               String key = obj1.toString(parser); 
-               String map = obj2.toString(parser); 
-
-               dualAbbrvMap.put(key, map);
-
-               if (i == 0)
-               {
-                  dualAbbrvFirstMap = key;
-               }
-            }
+            dualAbbrvFirstMap = keys[0];
          }
          else if (opt.equals("dual-symbol-map"))
          {
-            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+            String[] keys = new String[1];
 
-            if (csvList.size() != 2)
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   csvList.toString(parser)));
-            }
+            dualSymbolMap = getDualMap(parser, list, opt, keys);
 
-            CsvList list1 = CsvList.getList(parser, csvList.getValue(0));
-            CsvList list2 = CsvList.getList(parser, csvList.getValue(1));
-
-            int n = list1.size();
-
-            if (n != list2.size())
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.dual.map", opt, 
-                   list.get(opt).toString(parser), n, list2.size()));
-            }
-
-            dualSymbolMap = new HashMap<String,String>();
-
-            for (int i = 0; i < n; i++)
-            {
-               TeXObject obj1 = list1.getValue(i);
-               TeXObject obj2 = list2.getValue(i);
-
-               String key = obj1.toString(parser); 
-               String map = obj2.toString(parser); 
-
-               dualSymbolMap.put(key, map);
-
-               if (i == 0)
-               {
-                  dualSymbolFirstMap = key;
-               }
-            }
+            dualSymbolFirstMap = keys[0];
          }
          else if (opt.equals("dual-backlink"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.isEmpty() || val.equals("true"))
+            if (getBoolean(parser, list, opt))
             {
                backLinkDualEntry = true;
                backLinkDualAbbrv = true;
                backLinkDualSymbol = true;
             }
-            else if (val.equals("false"))
+            else
             {
                backLinkDualEntry = false;
                backLinkDualAbbrv = false;
                backLinkDualSymbol = false;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false"));
             }
          }
          else if (opt.equals("dual-entry-backlink"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.isEmpty() || val.equals("true"))
-            {
-               backLinkDualEntry = true;
-            }
-            else if (val.equals("false"))
-            {
-               backLinkDualEntry = false;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false"));
-            }
+            backLinkDualEntry = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-abbrv-backlink"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.isEmpty() || val.equals("true"))
-            {
-               backLinkDualAbbrv = true;
-            }
-            else if (val.equals("false"))
-            {
-               backLinkDualAbbrv = false;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false"));
-            }
+            backLinkDualAbbrv = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-symbol-backlink"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.isEmpty() || val.equals("true"))
-            {
-               backLinkDualSymbol = true;
-            }
-            else if (val.equals("false"))
-            {
-               backLinkDualSymbol = false;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, "true, false"));
-            }
+            backLinkDualSymbol = getBoolean(parser, list, opt);
          }
          else if (opt.equals("type"))
          {
-            type = list.getValue(opt).toString(parser).trim();
-
-            if (type.isEmpty())
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.missing.value", opt));
-            }
+            type = getRequired(parser, list, opt);
          }
          else if (opt.equals("dual-type"))
          {
-            dualType = list.getValue(opt).toString(parser).trim();
-
-            if (dualType.isEmpty())
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.missing.value", opt));
-            }
+            dualType = getRequired(parser, list, opt);
          }
          else if (opt.equals("dual-field"))
          {
-            dualField = list.getValue(opt).toString(parser).trim();
-
-            if (dualField.isEmpty())
-            {
-               dualField = "dual";
-            }
+            dualField = getOptional(parser, "dual", list, opt);
          }
          else if (opt.equals("category"))
          {
-            category = list.getValue(opt).toString(parser).trim();
+            category = getRequired(parser, list, opt);
          }
          else if (opt.equals("dual-category"))
          {
-            dualCategory = list.getValue(opt).toString(parser).trim();
+            dualCategory = getRequired(parser, list, opt);
          }
          else if (opt.equals("label-prefix"))
          {
-            labelPrefix = list.getValue(opt).toString(parser).trim();
-
-            if (labelPrefix.isEmpty())
-            {
-               labelPrefix = null;
-            }
+            labelPrefix = getOptional(parser, list, opt);
          }
          else if (opt.equals("dual-prefix"))
          {
-            dualPrefix = list.getValue(opt).toString(parser).trim();
-
-            if (dualPrefix.isEmpty())
-            {
-               dualPrefix = null;
-            }
+            dualPrefix = getOptional(parser, list, opt);
          }
          else if (opt.equals("sort"))
          {
-            sort = list.getValue(opt).toString(parser).trim();
+            sort = getOptional(parser, "locale", list, opt);
 
             if (sort.equals("none") || sort.equals("unsrt"))
             {
                sort = null;
             }
-            else if (sort.isEmpty())
-            {
-               sort = "locale";
-            }
          }
          else if (opt.equals("dual-sort"))
          {
-            dualSort = list.getValue(opt).toString(parser).trim();
+            dualSort = getOptional(parser, "locale", list, opt);
 
-            if (dualSort.equals("none") || dualSort.equals("unsrt"))
+            if (dualSort.equals("unsrt"))
             {
                dualSort = "none";
-            }
-            else if (dualSort.isEmpty())
-            {
-               dualSort = "locale";
             }
          }
          else if (opt.equals("sort-field"))
          {
-            sortField = list.getValue(opt).toString(parser).trim();
+            sortField = getRequired(parser, list, opt);
 
             if (!sortField.equals("id") && !bib2gls.isKnownField(sortField))
             {
@@ -477,7 +230,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-sort-field"))
          {
-            dualSortField = list.getValue(opt).toString(parser).trim();
+            dualSortField = getRequired(parser, list, opt);
 
             if (!dualSortField.equals("id") 
              && !bib2gls.isKnownField(dualSortField))
@@ -489,171 +242,88 @@ public class GlsResource
          }
          else if (opt.equals("charset"))
          {
-            bibCharset = Charset.forName(
-                           list.getValue(opt).toString(parser).trim());
+            bibCharset = Charset.forName(getRequired(parser, list, opt));
          }
          else if (opt.equals("min-loc-range"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.equals("none"))
-            {
-               minLocationRange = Integer.MAX_VALUE;
-            }
-            else
-            {
-               try
-               {
-                  minLocationRange = Integer.parseInt(val);
-
-                  if (minLocationRange < 2)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.value", opt, val));
-                  }
-               }
-               catch (NumberFormatException e)
-               {
-                  throw new IllegalArgumentException(
-                    bib2gls.getMessage("error.invalid.opt.value", opt, val), e);
-               }
-            }
+            minLocationRange = getRequiredIntGe(parser, 2, 
+               "none", Integer.MAX_VALUE, list, opt);
          }
          else if (opt.equals("loc-gap"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            try
-            {
-               locGap = Integer.parseInt(val);
-
-               if (locGap < 1)
-               {
-                  throw new IllegalArgumentException(
-                    bib2gls.getMessage("error.invalid.opt.value", opt, val));
-               }
-            }
-            catch (NumberFormatException e)
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, val), e);
-            }
+            locGap = getRequiredIntGe(parser, 1, list, opt);
          }
          else if (opt.equals("suffixF"))
          {
-            suffixF = list.getValue(opt).toString(parser).trim();
+            suffixF = getOptional(parser, "", list, opt);
+
+            if (suffixF.equals("none"))
+            {
+               suffixF = null;
+            }
          }
          else if (opt.equals("suffixFF"))
          {
-            suffixFF = list.getValue(opt).toString(parser).trim();
+            suffixFF = getOptional(parser, "", list, opt);
+
+            if (suffixFF.equals("none"))
+            {
+               suffixFF = null;
+            }
          }
          else if (opt.equals("see"))
          {
-            String loc = list.getValue(opt).toString(parser).trim();
+            String val = getChoice(parser, list, opt, "omit", "before", "after");
 
-            if (loc.equals("omit"))
+            if (val.equals("omit"))
             {
                seeLocation = Bib2GlsEntry.NO_SEE;
             }
-            else if (loc.equals("before"))
+            else if (val.equals("before"))
             {
                seeLocation = Bib2GlsEntry.PRE_SEE;
             }
-            else if (loc.equals("after"))
+            else if (val.equals("after"))
             {
                seeLocation = Bib2GlsEntry.POST_SEE;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, loc, "omit, before, after"));
             }
          }
          else if (opt.equals("loc-prefix"))
          {
-            TeXObject prefixList = list.getValue(opt);
+            String[] values = getStringArray(parser, "true", list, opt);
 
-            CsvList csvList = CsvList.getList(parser, prefixList);
-
-            int n = csvList.size();
-
-            switch (n)
+            if (values.length == 1)
             {
-               case 1:
-
-                  String val = csvList.get(0).toString(parser);
-
-                  if (val.equals("false"))
-                  {
-                     locationPrefix = null;
-                     break;
-                  }
-                  else if (val.equals("list"))
-                  {
-                     locationPrefix = new String[] {"\\pagelistname "};
-                     break;
-                  }
-                  else if (!val.equals("true"))
-                  {
-                     locationPrefix = new String[]{val};
-                     break;
-                  }
-
-               // fall through to n=0 case if val == 'true'
-               case 0:
-
+               if (values[0].equals("false"))
+               {
+                  locationPrefix = null;
+               }
+               else if (values[0].equals("list"))
+               {
+                  locationPrefix = new String[] {"\\pagelistname "};
+               }
+               else if (values[0].equals("true"))
+               {
                   locationPrefix = new String[]{bib2gls.getMessage("tag.page"),
                     bib2gls.getMessage("tag.pages")};
-
-               break;
-
-               default:
-
-                  locationPrefix = new String[n];
-
-                  for (int i = 0; i < n; i++)
-                  {
-                     locationPrefix[i] = csvList.get(i).toString(parser);
-                  }
+               }
+               else
+               {
+                  locationPrefix = values;
+               }
+            }
+            else
+            {
+               locationPrefix = values;
             }
          }
          else if (opt.equals("ignore-fields"))
          {
-
-            CsvList csvList = CsvList.getList(parser, list.getValue(opt));
-
-            int n = csvList.size();
-
-            if (n == 0)
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.missing.value", opt));
-            }
-
-            skipFields = new String[n];
-
-            for (int i = 0; i < n; i++)
-            {
-               TeXObject obj = csvList.get(i);
-
-               if (obj instanceof TeXObjectList)
-               {
-                  obj = trimList((TeXObjectList)obj);
-               }
-
-               skipFields[i] = obj.toString(parser);
-            }
+            skipFields = getStringArray(parser, list, opt);
          }
          else if (opt.equals("selection"))
          {
-            String val = list.getValue(opt).toString(parser).trim();
-
-            if (val.isEmpty())
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.missing.value", opt));
-            }
+            String val = getChoice(parser, list, opt, SELECTION_OPTIONS);
 
             selectionMode = -1;
 
@@ -665,82 +335,47 @@ public class GlsResource
                   break;
                }
             }
-
-            if (selectionMode == -1)
-            {
-               StringBuilder choices = null;
-
-               for (int i = 0; i < SELECTION_OPTIONS.length; i++)
-               {
-                  if (choices == null)
-                  {
-                     choices = new StringBuilder(70);
-                  }
-                  else
-                  {
-                     choices.append(", ");
-                  }
-
-                  choices.append('\'');
-                  choices.append(SELECTION_OPTIONS[i]);
-                  choices.append('\'');
-               }
-
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, val, choices));
-            }
          }
          else if (opt.equals("strength"))
          { // collator strength
 
-            String strength = list.getValue(opt).toString(parser).trim();
+            String val = getChoice(parser, list, opt, "primary", "secondary",
+               "tertiary", "identical");
 
-            if (strength.equals("primary"))
+            if (val.equals("primary"))
             {
                collatorStrength = Collator.PRIMARY;
             }
-            else if (strength.equals("secondary"))
+            else if (val.equals("secondary"))
             {
                collatorStrength = Collator.SECONDARY;
             }
-            else if (strength.equals("tertiary"))
+            else if (val.equals("tertiary"))
             {
                collatorStrength = Collator.TERTIARY;
             }
-            else if (strength.equals("identical"))
+            else if (val.equals("identical"))
             {
                collatorStrength = Collator.IDENTICAL;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, strength, "primary, secondary, tertiary, identical"));
             }
          }
          else if (opt.equals("decomposition"))
          { // collator decomposition
 
-            String decomposition = list.getValue(opt).toString(parser).trim();
+            String val = getChoice(parser, list, opt, "none", "canonical",
+              "full");
 
-            if (decomposition.equals("none"))
+            if (val.equals("none"))
             {
                collatorDecomposition = Collator.NO_DECOMPOSITION;
             }
-            else if (decomposition.equals("canonical"))
+            else if (val.equals("canonical"))
             {
                collatorDecomposition = Collator.CANONICAL_DECOMPOSITION;
             }
-            else if (decomposition.equals("full"))
+            else if (val.equals("full"))
             {
                collatorDecomposition = Collator.FULL_DECOMPOSITION;
-            }
-            else
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.choice.value", 
-                  opt, decomposition, "none, canonical, full"));
             }
          }
          else
@@ -901,6 +536,375 @@ public class GlsResource
       {
          sources.add(bib2gls.getBibFilePath(parser, filename));
       }
+   }
+
+   private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
+    throws IOException
+   {
+      String val = list.getValue(opt).toString(parser).trim();
+
+      if (val.isEmpty() || val.equals("true"))
+      {
+         return true;
+      }
+      else if (val.equals("false"))
+      {
+         return false;
+      }
+
+      throw new IllegalArgumentException(
+        bib2gls.getMessage("error.invalid.choice.value", 
+         opt, val, "true, false"));
+   }
+
+   private String getRequired(TeXParser parser, KeyValList list, String opt)
+    throws IOException
+   {
+      TeXObject obj = list.getValue(opt);
+
+      if (obj == null)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.missing.value", opt));
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         obj = trimList((TeXObjectList)obj);
+      }
+
+      String value = obj.toString(parser).trim();
+
+      if (value.isEmpty())
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.missing.value", opt));
+      }
+
+      return value;
+   }
+
+   private String getOptional(TeXParser parser, String defValue, 
+      KeyValList list, String opt)
+    throws IOException
+   {
+      TeXObject obj = list.getValue(opt);
+
+      if (obj == null) return defValue;
+
+      if (obj instanceof TeXObjectList)
+      {
+         obj = trimList((TeXObjectList)obj);
+      }
+
+      String value = obj.toString(parser).trim();
+
+      if (value.isEmpty())
+      {
+         return defValue;
+      }
+
+      return value;
+   }
+
+   private String getOptional(TeXParser parser, KeyValList list, String opt)
+    throws IOException
+   {
+      return getOptional(parser, null, list, opt);
+   }
+
+   private int getRequiredInt(TeXParser parser, KeyValList list, String opt)
+    throws IOException
+   {
+      String value = getRequired(parser, list, opt);
+
+      try
+      {
+         return Integer.parseInt(value);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.int.value", opt, value), e);
+      }
+   }
+
+   private int getOptionalInt(TeXParser parser, int defValue, KeyValList list, 
+     String opt)
+    throws IOException
+   {
+      String value = getOptional(parser, list, opt);
+
+      if (value == null)
+      {
+         return defValue;
+      }
+
+      try
+      {
+         return Integer.parseInt(value);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.int.value", opt, value), e);
+      }
+   }
+
+   private int getRequiredInt(TeXParser parser, String keyword, 
+       int keywordValue, KeyValList list, String opt)
+    throws IOException
+   {
+      String value = getRequired(parser, list, opt);
+
+      if (value.equals(keyword))
+      {
+         return keywordValue;
+      }
+
+      try
+      {
+         return Integer.parseInt(value);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.int.value", opt, value), e);
+      }
+   }
+
+   private int getRequiredIntGe(TeXParser parser, int minValue, KeyValList list,
+      String opt)
+    throws IOException
+   {
+      int val = getRequiredInt(parser, list, opt);
+
+      if (val < minValue)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.minint.value", opt, val, 
+             minValue));
+      }
+
+      return val;
+   }
+
+   private int getRequiredIntGe(TeXParser parser, int minValue, String keyword, 
+      int keywordValue, KeyValList list, String opt)
+    throws IOException
+   {
+      int val = getRequiredInt(parser, keyword, keywordValue, list, opt);
+
+      if (val < minValue)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.minint.value", opt, val, 
+             minValue));
+      }
+
+      return val;
+   }
+
+   private int getOptionalIntGe(TeXParser parser, int minValue, int defValue, 
+     KeyValList list, String opt)
+    throws IOException
+   {
+      int val = getOptionalInt(parser, defValue, list, opt);
+
+      if (val < minValue)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.minint.value", opt, val, 
+             minValue));
+      }
+
+      return val;
+   }
+
+   private String getChoice(TeXParser parser, KeyValList list, String opt, 
+      String... allowValues)
+    throws IOException
+   {
+      return getChoice(parser, null, list, opt, allowValues);
+   }
+
+   private String getChoice(TeXParser parser, String defVal, KeyValList list, 
+      String opt, String... allowValues)
+    throws IOException
+   {
+      String value = getOptional(parser, list, opt);
+
+      if (value == null)
+      {
+         if (defVal == null)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.missing.value", opt));
+         }
+         else
+         {
+            return defVal;
+         }
+      }
+
+      StringBuilder builder = null;
+
+      for (String choice : allowValues)
+      {
+          if (value.equals(choice))
+          {
+             return value;
+          }
+
+          if (builder == null)
+          {
+             builder = new StringBuilder();
+          }
+          else
+          {
+             builder.append(", ");
+          }
+
+          builder.append('\'');
+          builder.append(choice);
+          builder.append('\'');
+      }
+
+      throw new IllegalArgumentException(
+        bib2gls.getMessage("error.invalid.choice.value", 
+         opt, value, builder));
+   }
+
+   private String[] getStringArray(TeXParser parser, String defValue, 
+     KeyValList list, String opt)
+    throws IOException
+   {
+      String[] array = getStringArray(parser, list, opt);
+
+      if (array == null)
+      {
+         return new String[] {defValue};
+      }
+
+      return array;
+   }
+
+   private String[] getStringArray(TeXParser parser, KeyValList list, 
+     String opt)
+    throws IOException
+   {
+      CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+
+      int n = csvList.size();
+
+      if (n == 0)
+      {
+         return null;
+      }
+
+      String[] array = new String[n];
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject obj = csvList.getValue(i);
+
+         if (obj instanceof TeXObjectList)
+         {
+            obj = trimList((TeXObjectList)obj);
+         }
+
+         array[i] = obj.toString(parser).trim();
+      }
+
+      return array;
+   }
+
+   private CsvList[] getListArray(TeXParser parser, KeyValList list, 
+     String opt)
+    throws IOException
+   {
+      CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+
+      int n = csvList.size();
+
+      if (n == 0)
+      {
+         return null;
+      }
+
+      CsvList[] array = new CsvList[n];
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject obj = csvList.getValue(i);
+
+         if (obj instanceof TeXObjectList)
+         {
+            obj = trimList((TeXObjectList)obj);
+         }
+
+         array[i] = CsvList.getList(parser, obj);
+      }
+
+      return array;
+   }
+
+   private HashMap<String,String> getDualMap(TeXParser parser, KeyValList list, 
+     String opt, String[] keys)
+    throws IOException
+   {
+      CsvList[] array = getListArray(parser, list, opt);
+
+      if (array == null)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.missing.value", opt));
+      }
+
+      if (array.length != 2)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.list.size", opt, 2));
+      }
+
+      int n = array[0].size();
+
+      if (n != array[1].size())
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.dual.map", opt, 
+             list.get(opt).toString(parser), n,
+             array[1].size()));
+      }
+
+      HashMap<String,String> map = new HashMap<String,String>();
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject obj1 = array[0].getValue(i);
+         TeXObject obj2 = array[1].getValue(i);
+
+         if (obj1 instanceof TeXObjectList)
+         {
+            obj1 = trimList((TeXObjectList)obj1);
+         }
+
+         if (obj2 instanceof TeXObjectList)
+         {
+            obj2 = trimList((TeXObjectList)obj2);
+         }
+
+         String key = obj1.toString(parser);
+
+         map.put(key, obj2.toString(parser));
+
+         if (i < keys.length)
+         {
+            keys[i] = key;
+         }
+      }
+
+      return map;
    }
 
    private TeXObjectList trimList(TeXObjectList list)
@@ -1917,6 +1921,8 @@ public class GlsResource
    private Charset bibCharset = null;
 
    private boolean flatten = false;
+
+   private boolean setWidest = false;
 
    private String secondaryType=null, secondarySort=null, secondaryField=null;
 
