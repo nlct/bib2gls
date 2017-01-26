@@ -1,16 +1,21 @@
 \documentclass{report}
 
 \usepackage[T1]{fontenc}
-\usepackage[record,symbols,nogroupskip,style=index]{glossaries-extra}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,symbols,nogroupskip,postdot,style=alttree]{glossaries-extra}
 
 \newcommand*{\set}[1]{\mathcal{#1}}
 \newcommand*{\card}[1]{|#1|}
 \newcommand*{\mtx}[1]{\boldsymbol{#1}}
 
+\GlsXtrRecordCounter{chapter}
+
 \GlsXtrLoadResources[
   src={entries-terms},% entries defined in entries-terms.bib
   type=main,% put these entries in the 'main' glossary
   sort={en-GB},% sort according to en-GB locale
+  set-widest,% try to calculate widest name
+  loc-prefix,
   label-prefix={gls.},
   ext-prefixes={not.},% resolve "ext<n>." prefixed cross-references
                       % to the other (entries-symbols) resources
@@ -21,8 +26,10 @@
   src={entries-symbols},% entries defined in entries-terms.bib
   type=symbols,% put these entries in the 'symbols' glossary
   sort={use},% sort according to use
+  set-widest,% try to calculate widest name
   label-prefix={not.},
   ext-prefixes={gls.},
+  loc-prefix,
   secondary={letter-nocase:id:copies},% copy these entries to 'copies' glossary
                        % (Since that doesn't exist, an ignored
                        %  glossary with that label is created.)
@@ -31,7 +38,14 @@
 ]
 {\jobname-sym}% temporary file is called \jobname-sym.glstex
 
-%\glssetwidest[level]{name}
+\newcommand*{\printsummary}{%
+ \printunsrtglossary*[type=copies,nonumberlist,target=false,title=Summary]{%
+    \printunsrtglossaryunitsetup{chapter}%
+    \renewcommand*{\glossarysection}[2][]{\section*{##2}}%
+    \appto\glossarypostamble{\endgraf\noindent\hrulefill
+       \endgraf\medskip\endgraf}%
+ }%
+}
 
 \begin{document}
 \pagenumbering{roman}
@@ -39,6 +53,7 @@
 
 \chapter{Introduction}
 \pagenumbering{arabic}
+\printsummary
 
 \Glspl{gls.set} are denoted by a calligraphic font
 e.g.\ $\gls{not.S}$.
@@ -58,6 +73,7 @@ then
 \]
 
 \chapter{Another Chapter}
+\printsummary
 
 Another mention of the universal \gls{gls.set} $\gls{not.U}$.
 
@@ -68,7 +84,6 @@ A \gls{gls.vector} is denoted $\gls{not.v}$.
 
 \printunsrtglossary[title={Summary of Terms}]
 
-\printunsrtglossary[type=symbols,title={Symbols in Order of Use}]
-
-\printunsrtglossary[type=copies,title={Symbols}]
+\printunsrtglossary[type=symbols,
+ title={Symbols in Order of Use}]
 \end{document}

@@ -27,11 +27,16 @@ import java.text.Collator;
 import java.text.CollationKey;
 import java.nio.charset.Charset;
 
+import java.awt.Font;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.html.L2HConverter;
 
 public class GlsResource
 {
@@ -156,26 +161,37 @@ public class GlsResource
          }
          else if (opt.equals("secondary"))
          {
-            String val = getRequired(parser, list, opt);
+            TeXObject obj = getRequiredObject(parser, list, opt);
 
-            String[] split = val.split("\\s*:\\s*");
-
-            if (split.length == 2)
+            if (!(obj instanceof TeXObjectList))
             {
-               secondaryType = split[1];
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                    obj.toString(parser)));
             }
-            else if (split.length == 3)
+
+            Vector<TeXObject> split = splitList(parser, ':', 
+                     (TeXObjectList)obj);
+
+            int n = split.size();
+
+            if (n == 2)
             {
-               secondaryField = split[1];
-               secondaryType = split[2];
+               secondaryType = split.get(1).toString(parser);
+            }
+            else if (n == 3)
+            {
+               secondaryField = split.get(1).toString(parser);
+               secondaryType = split.get(2).toString(parser);
             }
             else
             {
                throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, val));
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                    obj.toString(parser)));
             }
 
-            secondarySort = split[0];
+            secondarySort = split.get(0).toString(parser);
          }
          else if (opt.equals("ext-prefixes"))
          {
@@ -623,6 +639,32 @@ public class GlsResource
       throw new IllegalArgumentException(
         bib2gls.getMessage("error.invalid.choice.value", 
          opt, val, "true, false"));
+   }
+
+   private TeXObject getRequiredObject(TeXParser parser, KeyValList list, 
+      String opt)
+    throws IOException
+   {
+      TeXObject obj = list.getValue(opt);
+
+      if (obj == null)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.missing.value", opt));
+      }
+
+      if (obj instanceof TeXObjectList)
+      {
+         obj = trimList((TeXObjectList)obj);
+
+         if (((TeXObjectList)obj).size() == 0)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.missing.value", opt));
+         }
+      }
+
+      return obj;
    }
 
    private String getRequired(TeXParser parser, KeyValList list, String opt)
@@ -1091,6 +1133,8 @@ public class GlsResource
 
    private void stripUnknownFieldPatterns()
    {
+      if (fieldPatterns == null) return;
+
       Vector<String> fields = new Vector<String>();
 
       for (Iterator<String> it = fieldPatterns.keySet().iterator();
@@ -1321,8 +1365,8 @@ public class GlsResource
             }
             else if (data instanceof BibPreamble)
             {
-                preamble = ((BibPreamble)data).getPreamble().expand(texParser)
-                   .toString(texParser);
+                preamble = ((BibPreamble)data).getPreamble()
+                              .expand(texParser).toString(texParser);
             }
          }
       }
@@ -1672,6 +1716,29 @@ public class GlsResource
             secondaryList = new Vector<Bib2GlsEntry>(entryCount);
          }
 
+         Vector<String> widestNames = null;
+         Vector<Double> widest = null;
+         Font font = null;
+         FontRenderContext frc = null;
+
+         TeXParser parser = null;
+
+         if (setWidest)
+         {
+            L2HConverter listener = new L2HConverter(bib2gls);
+            listener.setIsInDocEnv(true);
+
+            parser = new TeXParser(listener);
+
+            widestNames = new Vector<String>();
+            widest = new Vector<Double>();
+
+            // Just using the JVM's default serif font as a rough
+            // guide to guess the width.
+            font = new Font("Serif", 0, 12);
+            frc = new FontRenderContext(null, false, false);
+         }
+
          for (int i = 0, n = entries.size(); i < n; i++)
          {
             Bib2GlsEntry entry = entries.get(i);
@@ -1693,6 +1760,11 @@ public class GlsResource
                secondaryList.add(entry);
             }
 
+            if (widestNames != null)
+            {
+               updateWidestName(parser, entry, widestNames, 
+                 widest, font, frc);
+            }
          }
 
          if (dualEntries != null)
@@ -1715,6 +1787,12 @@ public class GlsResource
                if (secondaryList != null)
                {
                   secondaryList.add(entry);
+               }
+
+               if (widestNames != null)
+               {
+                  updateWidestName(parser, entry, widestNames, 
+                    widest, font, frc);
                }
             }
          }
@@ -1791,6 +1869,42 @@ public class GlsResource
             }
          }
 
+         if (widestNames != null)
+         {// TODO check dualType
+            if (type != null)
+            {
+               writer.format("\\apptoglossarypreamble[%s]{", type);
+            }
+
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0, n = widestNames.size(); i < n; i++)
+            {
+               String name = widestNames.get(i);
+
+               if (!name.isEmpty())
+               {
+                  builder.append(String.format(
+                     "\\glssetwidest[%d]{%s}", i, name));
+               }
+            }
+
+            writer.print(builder);
+
+            if (type != null)
+            {
+               writer.println("}");
+            }
+
+            if (secondaryType != null)
+            {
+               writer.format("\\apptoglossarypreamble[%s]{%s}%n",
+                 secondaryType, builder);
+            }
+
+            writer.println();
+         }
+
          bib2gls.message(bib2gls.getChoiceMessage("message.written", 0,
             "entry", 3, entryCount, texFile.toString()));
 
@@ -1804,6 +1918,101 @@ public class GlsResource
       }
 
       return entryCount;
+   }
+
+   private void updateWidestName(TeXParser parser,
+     Bib2GlsEntry entry, Vector<String> widestNames, 
+     Vector<Double> widest, Font font, FontRenderContext frc)
+   {
+      // This is just approximate as fonts, commands etc
+      // will affect the width.
+
+      String name = entry.getFieldValue("name");
+
+      if (name == null || name.isEmpty()) return;
+
+      String orgName = name;
+
+      // In the event that the name field contains any TeX code,
+      // strip out anything that's not 'letter' or 'other'
+
+      try
+      {
+         BibValueList bibValList = entry.getField("name");
+
+         if (bibValList != null)
+         {
+            TeXObjectList contents = bibValList.expand(parser);
+
+            if (contents != null)
+            {
+               StringBuilder builder = new StringBuilder();
+
+               TeXObjectList list = contents.expandfully(parser);
+
+               if (list != null)
+               {
+                  contents = list;
+               }
+
+               for (TeXObject obj : contents)
+               {
+                  if (obj instanceof CharObject)
+                  {
+                     builder.appendCodePoint(((CharObject)obj).getCharCode());
+                  }
+               }
+
+               name = builder.toString();
+            }
+         }
+      }
+      catch (IOException e)
+      {// too complicated, just use the name
+      }
+
+      int level = entry.getHierarchyCount();
+      String maxName = "";
+      double maxWidth = 0;
+
+      if (level > 0)
+      {
+         level--;
+      }
+
+      if (level < widestNames.size())
+      {
+         maxName = widestNames.get(level);
+         maxWidth = widest.get(level).doubleValue();
+      }
+
+      TextLayout layout = new TextLayout(
+        name, font, frc);
+
+      double w = layout.getBounds().getWidth();
+
+      bib2gls.debug(bib2gls.getMessage("message.calc.text.width",
+        name, w));
+
+      if (w > maxWidth)
+      {
+          if (level < widestNames.size())
+          {
+             widestNames.set(level, orgName);
+             widest.set(level, new Double(w));
+          }
+          else
+          {
+             for (int j = widestNames.size(); j < level; j++)
+             {
+                widestNames.add("");
+                widest.add(new Double(0.0));
+             }
+
+             widestNames.add(orgName);
+             widest.add(new Double(w));
+          }
+      }
    }
 
    private void checkParent(Bib2GlsEntry entry, int i, 

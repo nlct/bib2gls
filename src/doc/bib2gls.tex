@@ -1163,6 +1163,24 @@ then you can supply the correct encoding using
 the encoding in the \ext{bib} file where it can also be read by
 JabRef.
 
+\subsection{\csoptnv{set-widest}=\margm{boolean}}
+\labelopt{set-widest}
+
+The \optfmt{alttree} glossary style needs to know the widest
+\field{name} (for each level, if hierarchical). This can
+be set using \cs{glssetwidest} provided by the \sty{glossaries}
+package, but this requires knowing which name is the widest.
+
+The boolean option \csopt[true]{set-widest} will try to calculate
+the widest names for each hierarchical level. Since it doesn't
+know the fonts that will be used in the document or if there
+are any custom commands, this option may not work.
+
+If \optref{type} has been set, the \cs{glssetwidest} command
+will be appended to the glossary preamble for that type, otherwise
+it's simply set in the \ext{glstex} file and may be overridden
+later in the document if required.
+
 \subsection{\csoptnv{secondary}=\margm{list}}
 \labelopt{secondary}
 

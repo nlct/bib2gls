@@ -125,6 +125,7 @@ with range started by {1}</entry>
 <entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="message.discarding.entry">Discarding entry {0}</entry>
 <entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
+<entry key="message.calc.text.width">Calculated width of ''{0}'': {1,number}</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>

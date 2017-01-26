@@ -1,9 +1,10 @@
 \documentclass{article}
 
-\usepackage[record,style=index]{glossaries-extra}
+\usepackage[record,style=alttree]{glossaries-extra}
 
 \GlsXtrLoadResources[
  src={hierarchical},
+ set-widest,% calculate widest entry names (approx)
  %flatten,% keep parent dependency but omit parent from definition
  %ignore-fields={parent}% remove parent field and don't
                         % automatically include in dependency lists
