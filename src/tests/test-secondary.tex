@@ -1,0 +1,73 @@
+\documentclass{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,symbols,nogroupskip,style=index]{glossaries-extra}
+
+\newcommand*{\set}[1]{\mathcal{#1}}
+\newcommand*{\card}[1]{|#1|}
+\newcommand*{\mtx}[1]{\boldsymbol{#1}}
+
+\GlsXtrLoadResources[
+  src={entries-terms},% entries defined in entries-terms.bib
+  type=main,% put these entries in the 'main' glossary
+  sort={en-GB},% sort according to en-GB locale
+  label-prefix={gls.},
+  ext-prefixes={not.},% resolve "ext<n>." prefixed cross-references
+                      % to the other (entries-symbols) resources
+]
+% temporary file is called \jobname.glstex
+
+\glsxtrresourcefile[
+  src={entries-symbols},% entries defined in entries-terms.bib
+  type=symbols,% put these entries in the 'symbols' glossary
+  sort={use},% sort according to use
+  label-prefix={not.},
+  ext-prefixes={gls.},
+  secondary={letter-nocase:id:copies},% copy these entries to 'copies' glossary
+                       % (Since that doesn't exist, an ignored
+                       %  glossary with that label is created.)
+                       % This duplicate list is sorted according
+                       % to the entry label.
+]
+{\jobname-sym}% temporary file is called \jobname-sym.glstex
+
+
+\begin{document}
+\pagenumbering{roman}
+\tableofcontents
+
+\chapter{Introduction}
+\pagenumbering{arabic}
+
+\Glspl{gls.set} are denoted by a calligraphic font
+e.g.\ $\gls{not.S}$.
+
+The universal \gls{gls.set} is denoted $\gls{not.U}$.
+
+The \gls{gls.cardinality} of a \gls{gls.set} $\gls{not.S}$ is denoted
+$\gls{not.card}$.
+
+If
+\[
+ \set{S} = \{1, 6, 9, 10, 12\}
+\]
+then
+\[
+  \card{\set{S}} = 5
+\]
+
+\chapter{Another Chapter}
+
+Another mention of the universal \gls{gls.set} $\gls{not.U}$.
+
+The factorial symbol: $\gls{not.fact}$.
+
+A \gls{gls.matrix} is denoted $\gls{not.M}$.
+A \gls{gls.vector} is denoted $\gls{not.v}$.
+
+\printunsrtglossary[title={Summary of Terms}]
+
+\printunsrtglossary[type=symbols,title={Symbols in Order of Use}]
+
+\printunsrtglossary[type=copies,title={Symbols}]
+\end{document}

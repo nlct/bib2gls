@@ -122,6 +122,7 @@ See the manual for further details.</entry>
 <entry key="message.no.fallback">Entry type ''{0}'' has no fallback for field: {1}</entry>
 <entry key="message.inconsistent.range">Ignoring inconsistent location format {0}
 with range started by {1}</entry>
+<entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -132,7 +133,6 @@ with range started by {1}</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.can.find.arg">Can't detect argument for: \{0}</entry>
-<entry key="warning.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="warning.no.default.sort">Can't determine sort value for: {0}</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
 <entry key="warning.potential.nested.link">Entry ''{0}'' has potentially nested link text in field: {1}

@@ -1415,6 +1415,19 @@ public class Bib2Gls implements TeXApp
       logMessage();
    }
 
+   public void verbose(TeXParser parser, String message)
+   {
+      int lineNum = parser.getLineNumber();
+      File file = parser.getCurrentFile();
+
+      if (lineNum != -1 && file != null)
+      {
+         message = fileLineMessage(file, lineNum, message);
+      }
+
+      verbose(message);
+   }
+
    public static String fileLineMessage(File file, int lineNum,
      String message)
    {

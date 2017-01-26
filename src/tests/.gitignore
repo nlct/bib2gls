@@ -6,3 +6,4 @@ glossaries-extra.sty
 *.glstex
 *.swp
 *.glg
+*.toc

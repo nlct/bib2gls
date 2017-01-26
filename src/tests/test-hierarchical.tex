@@ -4,7 +4,9 @@
 
 \GlsXtrLoadResources[
  src={hierarchical},
- ignore-fields={parent}
+ %flatten,% keep parent dependency but omit parent from definition
+ %ignore-fields={parent}% remove parent field and don't
+                        % automatically include in dependency lists
 ]
 
 \begin{document}

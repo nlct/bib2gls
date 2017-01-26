@@ -94,7 +94,34 @@ public class GlsResource
          {// TODO
          }
          else if (opt.equals("secondary"))
-         {// TODO
+         {
+            TeXObject obj = list.getValue(opt);
+
+            if (obj instanceof TeXObjectList)
+            {
+               obj = trimList((TeXObjectList)obj);
+            }
+
+            String val = obj.toString(parser);
+
+            String[] split = val.split("\\s*:\\s*");
+
+            if (split.length == 2)
+            {
+               secondaryType = split[1];
+            }
+            else if (split.length == 3)
+            {
+               secondaryField = split[1];
+               secondaryType = split[2];
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, val));
+            }
+
+            secondarySort = split[0];
          }
          else if (opt.equals("ext-prefixes"))
          {
@@ -1433,6 +1460,13 @@ public class GlsResource
 
          writer.println();
 
+         Vector<Bib2GlsEntry> secondaryList = null;
+
+         if (secondaryType != null)
+         {
+            secondaryList = new Vector<Bib2GlsEntry>(entryCount);
+         }
+
          for (int i = 0, n = entries.size(); i < n; i++)
          {
             Bib2GlsEntry entry = entries.get(i);
@@ -1448,6 +1482,12 @@ public class GlsResource
             entry.writeLocList(writer);
 
             writer.println();
+
+            if (secondaryList != null)
+            {
+               secondaryList.add(entry);
+            }
+
          }
 
          if (dualEntries != null)
@@ -1466,6 +1506,83 @@ public class GlsResource
                entry.writeLocList(writer);
 
                writer.println();
+
+               if (secondaryList != null)
+               {
+                  secondaryList.add(entry);
+               }
+            }
+         }
+
+         if (secondaryList != null)
+         {
+            writer.format("\\provideignoredglossary*{%s}%n", secondaryType);
+
+            if (secondarySort.equals("none") || secondarySort.equals("unsrt"))
+            {
+               for (Bib2GlsEntry entry : secondaryList)
+               {
+                  writer.format("\\glsxtrcopytoglossary{%s}{%s}",
+                       entry.getId(), secondaryType);
+                  writer.println();
+               }
+            }
+            else if (secondarySort.equals("use"))
+            {
+               Vector<GlsRecord> records = bib2gls.getRecords();
+
+               for (GlsRecord record : records)
+               {
+                  Bib2GlsEntry entry = getEntry(record.getLabel(), 
+                     secondaryList);
+
+                  if (entry != null)
+                  {
+                     writer.format("\\glsxtrcopytoglossary{%s}{%s}",
+                       entry.getId(), secondaryType);
+                     writer.println();
+                  }
+               }
+            }
+            else
+            {
+               if (secondarySort.equals("letter-case"))
+               {
+                  Bib2GlsEntryLetterComparator comparator = 
+                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
+                       secondarySort,
+                       secondaryField == null ? sortField : secondaryField,
+                       false);
+
+                  comparator.sortEntries();
+               }
+               else if (secondarySort.equals("letter-nocase"))
+               {
+                  Bib2GlsEntryLetterComparator comparator = 
+                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
+                       secondarySort,
+                       secondaryField == null ? sortField : secondaryField,
+                       true);
+
+                  comparator.sortEntries();
+               }
+               else
+               {
+                  Bib2GlsEntryComparator comparator = 
+                     new Bib2GlsEntryComparator(bib2gls, secondaryList, 
+                        secondarySort,
+                        secondaryField == null ? sortField : secondaryField,
+                        collatorStrength, collatorDecomposition);
+
+                  comparator.sortEntries();
+               }
+
+               for (Bib2GlsEntry entry : secondaryList)
+               {
+                  writer.format("\\glsxtrcopytoglossary{%s}{%s}",
+                       entry.getId(), secondaryType);
+                  writer.println();
+               }
             }
          }
 
@@ -1800,6 +1917,8 @@ public class GlsResource
    private Charset bibCharset = null;
 
    private boolean flatten = false;
+
+   private String secondaryType=null, secondarySort=null, secondaryField=null;
 
    private int minLocationRange = 3, locGap = 1;
 

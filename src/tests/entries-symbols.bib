@@ -1,6 +1,9 @@
 % Encoding: UTF-8
 
-@preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
+@preamble{
+"\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}"}
 
 @symbol{M,
   name={$\mtx{M}$},
@@ -9,11 +12,32 @@
 }
 
 @symbol{v,
-  name={\ensuremath{\vec{v}}},
+  name={$\vec{v}$},
+  text={\vec{v}},
   description={a \gls{ext1.vector}}
 }
 
 @symbol{S,
-  name={\ensuremath{\mathcal{S}}},
+  name={$\set{S}$},
+  text={\set{S}},
   description={a \gls{ext1.set}}
+}
+
+@symbol{U,
+  name={$\set{U}$},
+  text={\set{U}},
+  description={the universal \gls{ext1.set}}
+}
+
+@symbol{card,
+  name={$\card{S}$},
+  text={\card{S}},
+  description={the \gls{ext1.cardinality} of the \gls{ext1.set}
+  $\set{S}$}
+}
+
+@symbol{fact,
+  name={$!$},
+  text={!},
+  description={factorial}
 }

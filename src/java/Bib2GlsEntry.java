@@ -493,8 +493,8 @@ public class Bib2GlsEntry extends BibEntry
                // field. Protect the field from first letter
                // upper casing by inserting an empty group.
 
-               bib2gls.warning(parser, 
-                 bib2gls.getMessage("warning.uc.protecting",
+               bib2gls.verbose(parser, 
+                 bib2gls.getMessage("message.uc.protecting",
                    object.toString(parser)));
                list.add(0, parser.getListener().createGroup());
                i++;
@@ -506,8 +506,8 @@ public class Bib2GlsEntry extends BibEntry
                 && mfirstucProtect
                 && bib2gls.mfirstucMathShiftProtection())
             {
-               bib2gls.warning(parser, 
-                 bib2gls.getMessage("warning.uc.protecting", 
+               bib2gls.verbose(parser, 
+                 bib2gls.getMessage("message.uc.protecting", 
                    object.toString(parser)));
                list.add(0, parser.getListener().createGroup());
                i++;

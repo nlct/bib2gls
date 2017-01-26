@@ -1176,10 +1176,24 @@ item in the list is in the format
 \begin{definition}
 \meta{sort}:\meta{field}:\meta{type}
 \end{definition}
+or
+\begin{definition}
+\meta{sort}:\meta{type}
+\end{definition}
+If the
+\meta{field} is omitted, the value of \optref{sort-field} is used.
+The value of \meta{sort} is as for \optref{sort}, but note that in this case the sort value \optfmt{unsrt} or
+\optfmt{none} means to use the same ordering as the original
+entries. So with \optref[de-CH-1996]{sort},
+\optref[\marg{none:copies}]{secondary} the \texttt{copies}
+list will be ordered according to \texttt{de-CH-1996} and not
+according to the order in which they were read when the \ext{bib}
+file or files were parsed.
 
-This will copy all the selected entries into the glossary
-labelled \meta{type} sorted according to \meta{sort} (as
-\optref{sort}) using \meta{field} as the sort value.
+This will copy all the selected entries into the glossary labelled
+\meta{type} sorted according to \meta{sort} using \meta{field} as
+the sort value.
+
 (If the glossary \meta{type} doesn't exist, it will be
 defined with \cs{provideignoredglossary*}\marg{type}.)
 Note that if the glossary already exists and contains entries,
@@ -1308,6 +1322,22 @@ Not yet implemented.
 
 Not yet implemented.
 
+\subsection{\csoptnv{flatten}=\margm{value}}
+\labelopt{flatten}
+
+This is a boolean option. The default value is
+\csopt[false]{flatten}. 
+
+If \csopt[true]{flatten}, the sorting will ignore hierarchy and
+the \field{parent} field will be omitted when writing
+the definitions to the \ext{glstex} file, but the parent entries
+will still be considered a dependent ancestor from the 
+\optref{selection} point of view.
+
+Note the difference between this option and using
+\csopt[parent]{ignore-fields} which will remove the dependency
+(unless a dependency is established through another field).
+
 \section{Field and Label Options}
 \label{sec:labelopts}
 
@@ -1330,6 +1360,16 @@ For example, suppose my \ext{bib} file contains
 but I want to use the \abbrstyle{short-long} style and I don't want
 the cross-referenced term, then I can use
 \csopt[\marg{see,description}]{ignore-fields}.
+
+Note that \csopt[parent]{ignore-fields} removes the \field{parent}
+before determining the dependency lists. This means that
+\optref[\marg{recorded and deps}]{selection} and 
+\optref[\marg{recorded and ancestors}]{selection} won't pick up the
+label in the \field{parent} field.
+
+If you want to maintain the dependency and ancestor relationship but
+omit the \field{parent} field when writing the entries to the
+\ext{glstex} file, you instead need to use \optref{flatten}.
 
 \subsection{\csoptnv{category}=\margm{value}}
 \labelopt{category}
@@ -1995,21 +2035,6 @@ value. The default is the \field{sort} field. For example
 \end{verbatim}
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
-
-\subsection{\csoptnv{flatten-sort}=\margm{value}}
-\labelopt{flatten-sort}
-
-This is a boolean option. The default value is
-\csopt[false]{flatten-sort}. 
-
-If \csopt[true]{flatten-sort}, the sorting will ignore hierarchy.
-The \field{parent} field will be omitted when writing
-the definitions to the \ext{glstex} file, but the parent entries
-will still be considered a dependent ancestor from the 
-\optref{selection} point of view.
-
-Note the difference between this option and using
-\csopt[parent]{ignore-fields} which will remove the dependency.
 
 \section{Dual Entries}
 
