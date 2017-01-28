@@ -640,6 +640,11 @@ public class GlsResource
       {
          sources.add(bib2gls.getBibFilePath(parser, filename));
       }
+
+      if (bib2gls.useInterpreter())
+      {
+         initInterpreter();
+      }
    }
 
    private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
@@ -1382,6 +1387,7 @@ public class GlsResource
    }
 
    public void setPreamble(String content, BibValueList list)
+    throws IOException
    {
       if (preamble == null)
       {
@@ -1392,13 +1398,23 @@ public class GlsResource
          preamble += content;
       }
 
-      if (preambleList == null)
+      if (list != null)
       {
-         preambleList = list;
-      }
-      else
-      {
-         preambleList.addAll(list);
+         interpreter.addAll(list.expand(interpreter));
+
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.debug(String.format(
+              "%n%s%n%s%n%n",
+               bib2gls.getMessage("message.parsing.code"),
+               interpreter.toString(interpreter)));
+         }
+
+         while (interpreter.size() > 0)
+         {
+            TeXObject obj = interpreter.pop();
+            obj.process(interpreter);
+         }
       }
    }
 
@@ -2010,6 +2026,42 @@ public class GlsResource
       return entryCount;
    }
 
+   private void initInterpreter()
+   {
+      L2HStringConverter listener = new L2HStringConverter(
+         new Bib2GlsAdapter(bib2gls))
+      {
+         public void writeCodePoint(int codePoint) throws IOException
+         {
+            if (getWriter() == null) return;
+
+            if (codePoint == '&')
+            {
+               getWriter().write("&amp;");
+            }
+            else if (codePoint == '<')
+            {
+               getWriter().write("&le;");
+            }
+            else if (codePoint == '>')
+            {
+               getWriter().write("&ge;");
+            }
+            else
+            {
+               getWriter().write(codePoint);
+            }
+         }
+      };
+
+      listener.setUseMathJax(false);
+      listener.setIsInDocEnv(true);
+
+      interpreter = new TeXParser(listener);
+
+      interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
+   }
+
    /*
     *  Attempts to interpret LaTeX code. This won't work on anything
     *  complicated and assumes custom user commands are provided in
@@ -2018,69 +2070,31 @@ public class GlsResource
     */ 
    public String interpret(String texCode, BibValueList bibVal)
    {
-      if (!bib2gls.useInterpreter()) return texCode;
+      if (interpreter == null) return texCode;
 
       try
       {
-         L2HStringConverter listener = new L2HStringConverter(
-            new Bib2GlsAdapter(bib2gls))
-         {
-            public void writeCodePoint(int codePoint) throws IOException
-            {
-               if (getWriter() == null) return;
-
-               if (codePoint == '&')
-               {
-                  getWriter().write("&amp;");
-               }
-               else if (codePoint == '<')
-               {
-                  getWriter().write("&le;");
-               }
-               else if (codePoint == '>')
-               {
-                  getWriter().write("&ge;");
-               }
-               else
-               {
-                  getWriter().write(codePoint);
-               }
-            }
-         };
-
-         listener.setUseMathJax(false);
-         listener.setIsInDocEnv(true);
-
          StringWriter writer = new StringWriter();
-         listener.setWriter(writer);
+         ((L2HStringConverter)interpreter.getListener()).setWriter(writer);
 
-         TeXParser parser = new TeXParser(listener);
-
-         parser.setCatCode('@', TeXParser.TYPE_LETTER);
-
-         TeXObjectList objList = bibVal.expand(parser);
+         TeXObjectList objList = bibVal.expand(interpreter);
 
          if (objList == null) return texCode;
 
-         if (preambleList != null)
-         {
-            parser.addAll(0, preambleList.expand(parser));
-         }
-
-         parser.addAll(objList);
+         interpreter.addAll(objList);
 
          if (bib2gls.getDebugLevel() > 0)
          {
             bib2gls.debug(String.format(
               "%n%s%n%s%n%n",
                bib2gls.getMessage("message.parsing.code"),
-               parser.toString(parser)));
+               interpreter.toString(interpreter)));
          }
 
-         while (parser.size() > 0)
+         while (interpreter.size() > 0)
          {
-            TeXObject obj = parser.pop();
-            obj.process(parser);
+            TeXObject obj = interpreter.pop();
+            obj.process(interpreter);
          }
 
          String result = writer.toString();
@@ -2525,6 +2539,8 @@ public class GlsResource
 
       return !matches;
    }
+
+   private TeXParser interpreter = null;
 
    private File texFile;
 
