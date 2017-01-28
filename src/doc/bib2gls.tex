@@ -2922,6 +2922,21 @@ own commands before the \ext{glstex} files are loaded.
 \section{\cs{bibglsnewentry}}
 \labelcs{bibglsnewentry}
 
+\begin{definition}
+\cs{bibglsnewentry}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define terms identified with the
+\atfield{entry} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewentry}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
+}
+\end{verbatim}
+This uses the starred form of \cs{longnewglossaryentry} that
+doesn't automatically append \cs{nopostdesc} (which interferes with
+the post-description hooks provided by category attributes).
+
 \section{\cs{bibglsnewsymbol}}
 \labelcs{bibglsnewsymbol}
 
