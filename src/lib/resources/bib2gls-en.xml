@@ -31,6 +31,8 @@ See the manual for further details.</entry>
 			Files relative to &lt;directory&gt;.
 			(This doesn''t change the current working
 			directory.)</entry>
+<entry key="syntax.interpret">{0}		Switch on interpret mode (default).</entry>
+<entry key="syntax.no.interpret">{0}		Switch off interpret mode.</entry>
 
 <entry key="syntax.mfirstuc">{0} &lt;fields&gt;|all (or {1} &lt;fields&gt;|all)
 			Insert an empty group if fields start 
@@ -126,6 +128,7 @@ with range started by {1}</entry>
 <entry key="message.discarding.entry">Discarding entry {0}</entry>
 <entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
 <entry key="message.calc.text.width">Calculated width of ''{0}'': {1,number}</entry>
+<entry key="message.parsing.code">Parsing code block:</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -200,6 +203,20 @@ Outer range started with: {1}</entry>
 <entry key="error.inconsistent.range">Inconsistent location format {0}
 with range started by {1}</entry>
 <entry key="error.range.missing.end">Unmatched start location range {0}</entry>
+<entry key="error.bib.contents.parse">Syntax error parsing @{0}:
+{1}
+</entry>
+<entry key="error.bib.contents.parse.before">Syntax error parsing @{0}:
+{1}
+Error occurred before: {2}
+</entry>
+<entry key="error.bib.contents.parse.data">Syntax error parsing @{0} ({1}):
+{2}
+</entry>
+<entry key="error.bib.contents.parse.data.before">Syntax error parsing @{0} ({1}):
+{2}
+Error occurred before: {3}
+</entry>
 
 <!--
      The following messages are used by various parts of

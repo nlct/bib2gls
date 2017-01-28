@@ -25,9 +25,10 @@ import com.dickimawbooks.texparserlib.bib.*;
 
 public class Bib2GlsAt extends At
 {
-   public Bib2GlsAt()
+   public Bib2GlsAt(GlsResource theResource)
    {
       super();
+      this.resource = theResource;
    }
 
    protected void process(TeXParser parser, TeXObjectList entryTypeList,
@@ -83,8 +84,71 @@ public class Bib2GlsAt extends At
          }
       }
 
-      data.parseContents(parser, (TeXObjectList)contents, eg);
+      try
+      {
+         data.parseContents(parser, (TeXObjectList)contents, eg);
+      }
+      catch (BibTeXSyntaxException e)
+      {
+         String id = null;
+         StringBuilder builder = null;
+
+         if (data instanceof BibEntry)
+         {
+            id = ((BibEntry)data).getId();
+         }
+
+         builder = new StringBuilder();
+
+         for (TeXObject obj : (TeXObjectList)contents)
+         {
+            builder.append(obj.toString(parser));
+
+            if (obj instanceof Group)
+            {
+               break;
+            }
+         }
+
+         if (builder != null && builder.length() > 0)
+         {
+            if (id == null)
+            {
+               throw new IOException(bib2gls.getMessage(
+                  "error.bib.contents.parse.before",
+                  data.getEntryType(), e.getMessage(bib2gls), builder), e);
+            }
+            else
+            {
+               throw new IOException(bib2gls.getMessage(
+                  "error.bib.contents.parse.data.before",
+                  data.getEntryType(), id, e.getMessage(bib2gls), builder), e);
+            }
+         }
+         else if (id != null)
+         {
+            throw new IOException(bib2gls.getMessage(
+               "error.bib.contents.parse.data",
+               data.getEntryType(), id, e.getMessage(bib2gls)), e);
+         }
+         else
+         {
+            throw new IOException(bib2gls.getMessage(
+               "error.bib.contents.parse",
+               data.getEntryType(), e.getMessage(bib2gls)), e);
+         }
+      }
+
+      if (data instanceof BibPreamble)
+      {
+         BibValueList preamble = ((BibPreamble)data).getPreamble();
+         TeXObjectList list = preamble.expand(parser);
+
+         resource.setPreamble(list.toString(parser), preamble);
+      }
 
       bibParser.addBibData(data);
    }
+
+   private GlsResource resource;
 }

@@ -34,7 +34,15 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
    public String getDefaultSort()
    {
-      return getFieldValue("short");
+      String value = getFieldValue("short");
+
+      if (value == null)
+      {// shouldn't happen as the "short" field is required.
+
+         return super.getDefaultSort();
+      }
+
+      return resource.interpret(value, getField("short"));
    }
 
    public void checkRequiredFields(TeXParser parser)

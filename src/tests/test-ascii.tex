@@ -1,6 +1,6 @@
 \documentclass{article}
 
-\usepackage{fontspec}
+\usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,stylemods=mcols,style=mcolindexgroup]{glossaries-extra}
 
@@ -14,7 +14,7 @@
                 %'locale' - OS default locale
                 % or a well-formed IETF language tag
                 % (e.g. 'sv' or 'de-1996')
-  src={test-utf8}% bib file
+  src={test-ascii}% bib file
  ]
 
 \renewcommand*{\glstreenamefmt}[1]{#1}

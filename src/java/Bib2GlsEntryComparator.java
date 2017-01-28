@@ -127,7 +127,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.getVerboseLevel() > 0)
       {
          StringBuilder keyList = new StringBuilder();
 
@@ -148,12 +148,12 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
          if (grp == null)
          {
-            bib2gls.debug(String.format("%s -> '%s' [%s]", 
+            bib2gls.verbose(String.format("%s -> '%s' [%s]", 
               id, value, keyList));
          }
          else
          {
-            bib2gls.debug(String.format("%s -> '%s' (%s) [%s]", 
+            bib2gls.verbose(String.format("%s -> '%s' (%s) [%s]", 
               id, value, grp, keyList));
          }
       }

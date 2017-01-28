@@ -5,7 +5,7 @@ RM=\rm -f
 all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-xe.pdf test-label-prefix.pdf test-dual.pdf \
 	  test-external-refs.pdf test-hierarchical.pdf \
-	  test-match.pdf test-secondary.pdf
+	  test-match.pdf test-secondary.pdf test-ascii.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -94,6 +94,13 @@ test-secondary.glstex	: test-secondary.tex $(DEPS) \
 			entries-symbols.bib entries-terms.bib
 		pdflatex test-secondary
 		$(BIB2GLS) test-secondary
+
+test-ascii.pdf	: test-ascii.glstex
+		xelatex test-ascii
+
+test-ascii.glstex	: test-ascii.tex $(DEPS) test-ascii.bib
+		pdflatex test-ascii
+		$(BIB2GLS) --group test-ascii
 
 clean	:
 	$(RM) *.aux

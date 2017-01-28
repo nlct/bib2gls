@@ -16,6 +16,7 @@ actual '='
 \end{filecontents*}
 
 \usepackage{amsmath}
+\usepackage{accents}
 \usepackage{makeidx}
 \usepackage{datetime2}
 \usepackage[colorlinks]{hyperref}
@@ -32,14 +33,25 @@ actual '='
   \DTMsavenow{moddate}
 }
 
-\providecommand{\frontmatter}{\clearpage\pagenumbering{roman}}
-\providecommand{\mainmatter}{\clearpage\pagenumbering{arabic}}
+\newif\ifmainmatter
+
+\newcommand{\frontmatter}{%
+ \clearpage\pagenumbering{roman}%
+ \mainmatterfalse
+}
+\newcommand{\mainmatter}{%
+ \clearpage\pagenumbering{arabic}%
+ \mainmattertrue
+}
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
-\newcommand*{\sectionref}[1]{section~\ref{#1}}
+\newcommand*{\sectionref}[1]{\hyperref[#1]{section~\ref*{#1}}}
+\newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
 
 \newcommand{\qt}[1]{``#1''}
+
+\newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
 
 \newcommand{\dequals}{%
  \texorpdfstring
@@ -78,6 +90,7 @@ actual '='
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\idprefixfmt}[1]{%
  \texorpdfstring{\texttt{#1\spacefactor999 .}}{#1.}}
 
@@ -144,7 +157,7 @@ actual '='
 \newcommand*{\styopt}[2][]{%
   \texorpdfstring%
   {%
-    \optfmt{#2\ifblank{#1}{}{\dequals#1}}%
+    \optfmt{#2\ifblank{#1}{}{\dequals\marg{#1}}}%
     \index{package options\actual\protect\optfmt{#2}}%
     \index{#2\actual\protect\optfmt{#2}}%
   }%
@@ -155,15 +168,17 @@ actual '='
 
 \newcommand*{\csoptnv}[1]{%
  \texorpdfstring
-  {\gencsopt{glsxtrresourcefile}{#1}}%
+  {\protect\gencsopt{glsxtrresourcefile}{#1}}%
   {#1}%
 }%
 
 \newcommand*{\gencsopt}[3][]{%
   \texorpdfstring%
   {%
-    \optfmt{#3\ifblank{#1}{}{\dequals#1}}%
-    \index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}%
+    \optfmt{#3\ifblank{#1}{}{\dequals\marg{#1}}}%
+    \ifmainmatter
+      \index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}%
+    \fi
   }%
   {#3\ifblank{#1}{}{=#1}}%
 }
@@ -223,10 +238,21 @@ actual '='
  {\begin{flushleft}\ttfamily\ignorespaces}%
  {\end{flushleft}}
 
+% This is a bit fiddly. Need to represent \vec{v} in typewriter
+% font for the interpreter examples. ($\mathtt{\vec{v}}$ doesn't
+% work)
+\newsavebox\varrow
+\sbox\varrow{$\mathtt{\accentset{\to}{v}}$}
+
+\newcommand*{\mtx}[1]{\boldsymbol{#1}}
+\newcommand*{\set}[1]{\mathcal{#1}}
+\newcommand*{\card}[1]{|\set{#1}|}
+\newcommand*{\imaginary}{i}
+
 \title{\appfmt{bib2gls}: a command line application to convert
 \filefmt{.bib} files to a \filefmt{glossaries-extra.sty} resource file}
 \author{Nicola Talbot}
-\date{\DTMusedate{moddate}}
+\date{\DTMusedate{moddate} (Still Under Development)}
 
 \makeatletter
 \begingroup
@@ -249,7 +275,7 @@ actual '='
 \newcommand*{\labelopt}[1]{%
  {\def\@currentlabelname{\protect\optfmt{#1}}\label{opt.#1}}%
 }
-\newcommand*{\optref}[2][]{\nameref{opt.#2}\ifblank{#1}{}{\optfmt{\dequals#1}}}
+\newcommand*{\optref}[2][]{\nameref{opt.#2}\ifblank{#1}{}{\optfmt{\dequals\marg{#1}}}}
 
 \newcommand*{\labelatentry}[1]{%
  {\def\@currentlabelname{\protect\atentry{#1}}\label{at.#1}}%
@@ -287,6 +313,9 @@ example, if a custom \appfmt{xindy} rule is needed.)
 Note that \bibgls\ is a Java application, so it requires the
 Java Runtime Environment (at least JRE~7). Additionally,
 \styfmt{glossaries-extra} must be at least version 1.12.
+This application was developed in response to the question
+\href{http://tex.stackexchange.com/q/342544}{Is there a program for
+managing glossary tags?} on \TeX\ on StackExchange.
 \end{abstract}
 
 \frontmatter
@@ -321,18 +350,71 @@ commands. See the \sty{glossaries-extra} user manual for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
 
+\section{Example Use}
+The glossary entries are stored in a \ext{bib} file. For
+example, the file \filefmt{entries.bib} might contain:
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal}
+}
+
+@abbreviation{html,
+  short="html",
+  long={hypertext markup language}
+}
+
+@symbol{v,
+  name={$\vec{v}$},
+  text={\vec{v}},
+  description={a vector}
+}
+
+@index{goose,plural="geese"}
+\end{verbatim}
+Here's an example document that uses this data:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+]
+
+\begin{document}
+\Gls{bird} and \gls{goose}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+If this document is called \filefmt{myDoc.tex}, the build 
+process is:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{verbatim}
+
+Note that there's no need to called \app{xindy} or \app{makeindex}
+since \bibgls\ automatically sorts and collates the locations
+after selecting the required entries from the \ext{bib} file and
+before writing the temporary file that's input with \cs{GlsXtrLoadResources}
+(or \cs{glsxtrresourcefile}).
+This means the entries are already defined in the correct order,
+and only those entries that have been used in the document are
+defined,
+so \cs{printunsrtglossary} (or \cs{printunsrtglossaries}) may
+be used.  (The \texttt{unsrt} part
+of the command name indicates that all defined entries should be listed in the
+order of definition from \sty{glossaries-extra}'s point of view.)
+
 If you additionally want to use an indexing application, such
 as \app{xindy}, you need the package option
 \styopt[alsoindex]{record} and use \cs{makeglossaries}
 and \cs{printglossary} (or \cs{printglossaries}) as usual.
-If you don't require an indexing application, just use
-\styopt{record} (or \styopt[only]{record}) and don't use \cs{makeglossaries}. The 
-glossaries can be displayed using \cs{printunsrtglossary}
-(or \cs{printunsrtglossaries}). (The \texttt{unsrt} part
-of the command name indicates that the entries are listed in the
-order of definition from \sty{glossaries-extra}'s point of view.
-\bibgls\ determines this order of definition according to
-the options supplied in \hyperref[sec:resourceopts]{\cs{glsxtrresourcefile}}.)
+
 
 \section{Security}
 
@@ -435,6 +517,304 @@ bib2gls --version
 \end{verbatim}
 This should display the version information.
 
+\chapter{\texorpdfstring{\TeX}{TeX}\ Parser Library}
+\label{sec:texparserlib}
+
+The \bibgls\ application requires the \TeX\ Parser Library
+\file{texparserlib.jar}\footnote{\url{https://github.com/nlct/texparser}} which is used to parse the \ext{aux}
+and \ext{bib} files.
+
+With the \argref{interpret} switch on (default), this library is
+also used to interpret the value of the fallback field
+used when the \field{sort} field is missing (when the \optref{sort}
+option is not
+\optfmt{unsrt} or \optfmt{none} or \optfmt{use}). The other case is with
+\optref{set-widest} when determining the width of the \field{name}
+field. The \argref{no-interpret} switch will turn off this
+function, but the library will still be used to parse the \ext{aux}
+and \ext{bib} files. If your \field{name} fields only contain
+simple text with no \TeX\ markup, \bibgls\ will run faster
+with \argref{no-interpret}.
+
+The \file{texparserlib.jar} library is not intended as a full-blown
+\TeX\ engine and there are plenty of situations where it doesn't
+work. In particular, in this case it's being used in a fragmented context without
+knowing the packages used by the document or any custom commands or
+environments provided within the document.
+
+\TeX\ syntax can be quite complicated and in some cases far too
+complicated for simple regular expressions. The library performs
+better than a simple pattern match, and that's the purpose of
+\file{texparserlib.jar} and why it's used by \bibgls. When
+the \argref{debug} mode is on, any warnings or errors triggered by
+the \argref{interpret} mode will be written to the transcript
+prefixed with \texttt{texparserlib:} (the results of the conversions
+will be included in the transcript as informational messages
+prefixed with \texttt{texparserlib:} even with \argref{no-debug}).
+
+For example, suppose the \ext{bib} file includes:
+\begin{verbatim}
+@preamble{
+"\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\providecommand{\imaginary}{i}"}
+
+@symbol{M,
+  name={{}$\mtx{M}$},
+  text={\mtx{M}},
+  description={a matrix}
+}
+
+@symbol{v,
+  name={{}$\vec{v}$},
+  text={\vec{v}},
+  description={a vector}
+}
+
+@symbol{S,
+  name={{}$\set{S}$},
+  text={\set{S}},
+  description={a set}
+}
+
+@symbol{card,
+  name={{}$\card{S}$},
+  text={\card{S}},
+  description={the cardinality of the set $\set{S}$}
+}
+
+@symbol{i,
+  name={{}$\imaginary$},
+  text={\imaginary},
+  description={square root of minus one ($\sqrt{-1}$)}
+}
+\end{verbatim}
+(The empty group at the start of the \field{name} fields
+protects against the possibility that the \catattrfmt{glossname}
+category attribute might be set to \optfmt{firstuc}, which
+automatically converts the first letter of the name to 
+upper case when displaying the glossary.)
+
+None of these entries have a \field{sort} field.
+With \argref{no-interpret} the \atentryref{symbol} entry type
+will fallback on the entry's label when the \field{sort} field
+is missing. With \argref{interpret} the \field{name} field
+will be used as the fallback (or the \field{parent} if 
+\field{name} is missing).
+
+This means that with \argref{no-interpret}, and the default
+\optref[sort]{sort-field}, and with
+\optref[letter-case]{sort}, these entries will be defined in
+the order: \texttt{M}, \texttt{S}, \texttt{card}, \texttt{i}, \texttt{v} (since
+this is the case-sensitive letter order of the labels) whereas
+with \optref[letter-nocase]{sort-field}, the order will be:
+\texttt{card}, \texttt{i}, \texttt{M}, \texttt{S}, \texttt{v} (since this
+is the case-insensitive letter order of the labels).
+
+However, with \argref{interpret} on, the fallback field will
+be taken from the \field{name} which in the above example contains \TeX\ code, so
+\bibgls\ will use \file{texparserlib.jar} to interpret this code.
+The library has several different ways of writing the processed
+code. For simplicity, \bibgls\ uses the library's HTML output and then 
+strips the HTML markup and trims any leading or trailing
+spaces. The library method that writes non-ASCII
+characters using \qtt{\&x\meta{hex};} markup is overridden
+by \bibgls\ to just write the Unicode character, which means
+that the letter-based sorting options will sort according
+to the integer value \meta{hex} rather than the string
+\qtt{\&x\meta{hex};}.
+
+In the case of the \texttt{M} entry in the example above, the 
+code that's passed to the interpreter is:
+\begin{verbatim}
+\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\providecommand{\imaginary}{i}
+{}$\mtx{M}$
+\end{verbatim}
+The transcript (\ext{glg}) file will show the results of the
+conversion:\footnote{The \argref{debug} mode will show additional
+information.}
+\begin{verbatim}
+texparserlib: {}$\mtx{M}$ -> M
+\end{verbatim}
+So the \field{sort} value for this entry is set to \qtt{M}. The font
+change (caused by math-mode and \cs{boldsymbol}) has been 
+ignored. The sort value therefore consists of a single Unicode
+character 0x4D (Latin upper case letter \qtt{M}, decimal value 77).
+
+For the \texttt{v} entry, the code is:
+\begin{verbatim}
+\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\providecommand{\imaginary}{i}
+{}$\vec{v}$
+\end{verbatim}
+The transcript shows:
+\begin{alltt}
+texparserlib: \marg{}\$\csfmt{vec}\marg{v}\$ -> \usebox\varrow
+\end{alltt}
+So the \field{sort} value for this entry is set to \qtt{\usebox\varrow},
+which consists of two Unicode characters 0x76
+(Latin lower case letter \qtt{v}, decimal value 118) and 
+0x20D7 (combining right arrow above, decimal value 8407).
+
+For the \texttt{set} entry, the code is:
+\begin{verbatim}
+\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\providecommand{\imaginary}{i}
+{}$\set{S}$
+\end{verbatim}
+The transcript shows:
+\begin{verbatim}
+texparserlib: {}$\set{S}$ -> S
+\end{verbatim}
+So the \field{sort} value for this entry is set to \qtt{S} (again
+ignoring the font change). This consists of a single Unicode
+character 0x53 (Latin upper case letter \qtt{S}, decimal value~83).
+
+For the \texttt{card} entry, the code is:
+\begin{verbatim}
+\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\providecommand{\imaginary}{i}
+{}$\card{S}$
+\end{verbatim}
+The transcript shows:
+\begin{verbatim}
+texparserlib: {}$\card{S}$ -> |S|
+\end{verbatim}
+So the \field{sort} value for this entry is set to \qtt{|S|}
+(the \textbar\ characters from the definition of \csfmt{card} provided
+by the \atentry{preamble} have been included, but the
+font change has been discarded). In this case the sort value
+consists of three Unicode characters 0x7C (vertical line, decimal
+value 124),
+0x53 (Latin upper case letter \qtt{S}, decimal value 83) and 0x7C again.
+
+For the \texttt{i} entry, the code is:
+\begin{verbatim}
+\providecommand{\mtx}[1]{\boldsymbol{#1}}
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\providecommand{\imaginary}{i}
+{}$\imaginary$
+\end{verbatim}
+The transcript shows:
+\begin{verbatim}
+texparserlib: {}$\imaginary$ -> i
+\end{verbatim}
+So the \field{sort} value for this entry is set to \qtt{i}
+
+This means that in the case of the default \optref[sort]{sort-field} with
+\optref[letter-case]{sort}, these entries will be defined in
+the order: \texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$),
+\texttt{i} ($\imaginary$), \texttt{v} ($\vec{v}$) and
+\texttt{card} ($\card{S}$).
+In this case, the entries have been sorted according to
+the character codes. If you run \bibgls\ with \argref{verbose}
+the decimal character codes will be included in the transcript.
+For this example:
+\begin{alltt}
+i -> 'i' [105]
+card -> '|S|' [124 83 124]
+M -> 'M' [77]
+S -> 'S' [83]
+v -> '\usebox\varrow' [118 8407]
+\end{alltt}
+
+The \argref{group} option (in addition to \argref{verbose}) 
+will place the letter group in 
+parentheses before the character code list:
+\begin{alltt}
+i -> 'i' (i) [105]
+card -> '|S|' [124 83 124]
+M -> 'M' (M) [77]
+S -> 'S' (S) [83]
+v -> '\usebox\varrow' (v) [118 8407]
+\end{alltt}
+(Note that the \texttt{card} entry doesn't have a letter
+group since the vertical bar character isn't considered a 
+letter.)
+
+
+If \optref[letter-nocase]{sort} is used instead, after conversion
+by the interpreter, the sort values will all be converted to
+lower case. The order is now: \texttt{i} ($\imaginary$), 
+\texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$),
+\texttt{v} ($\vec{v}$) and \texttt{card} ($\card{S}$).
+The transcript (with \argref{verbose}) now shows
+\begin{alltt}
+i -> 'i' [105]
+card -> '|s|' [124 115 124]
+M -> 'm' [109]
+S -> 's' [115]
+v -> '\usebox\varrow' [118 8407]
+\end{alltt}
+With \argref{group} (in addition to \argref{verbose}) 
+the letter groups are again included:
+\begin{alltt}
+i -> 'i' (I) [105]
+card -> '|s|' [124 115 124]
+M -> 'm' (M) [109]
+S -> 's' (S) [115]
+v -> '\usebox\varrow' (V) [118 8407]
+\end{alltt}
+Note that the letter groups are upper case not lower case.
+Again the \texttt{card} entry doesn't have an associated
+letter group.
+
+If a locale-based sort is used, the ordering will follow the
+locale's alphabet rules. For example, with \optref[en]{sort}
+(English, no region or variant), the order becomes:
+\texttt{card} ($\card{S}$), \texttt{i} ($\imaginary$), 
+\texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$) and
+\texttt{v} ($\vec{v}$). The transcript (with \argref{verbose}) 
+shows the collation keys instead:
+\begin{alltt}
+i -> 'i' [0 92 0 0 0 0]
+card -> '|S|' [0 66 0 102 0 66 0 0 0 0]
+M -> 'M' [0 96 0 0 0 0]
+S -> 'S' [0 102 0 0 0 0]
+v -> '\usebox\varrow' [0 105 0 0 0 0]
+\end{alltt}
+Again the addition of the \argref{group} switch will show
+the letter groups.\footnote{For more information on collation keys see the
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/CollationKey.html}{CollationKey}
+class in Java's API.}
+
+Suppose I add a new symbol to my \ext{bib} file:
+\begin{verbatim}
+@symbol{angstrom,
+  name={\AA},
+  description={\AA ngstr\"om}
+}
+\end{verbatim}
+and I also use this entry in the document. Then with
+\optref[en]{sort}, the order is: \texttt{card} ($\card{S}$),
+\texttt{angstrom} (\AA), \texttt{i} ($\imaginary$), \texttt{M}
+($\mtx{M}$), \texttt{S} ($\set{S}$), and \texttt{v} ($\vec{v}$).
+The \argref{group} switch shows that the \texttt{angstrom} entry
+(\AA) has been placed in the \qt{A} letter group.
+
+However, if I change the locale to \optref[sv]{sort}, the
+\texttt{angstrom} entry is moved to the end of the list and the
+\argref{group} switch shows that it's been placed in the \qt{\AA}
+letter group.
+
+If you are using Java~8, you can set the
+\texttt{java.locale.providers} property to \texttt{CLDR,JRE} to use
+the Common Locale Data Repository, which has more extensive
+support for locales than the native Java Runtime Environment.
+This isn't available for Java~7, and should be enabled by default
+for the proposed Java~9.
+
 \chapter{Command Line Options}
 \label{sec:switches}
 
@@ -516,7 +896,7 @@ prevent interference.
 \labelarg{dir}
 
 By default \bibgls\ assumes that the output files should be written
-in the current working directory. The input \ext{.bib} files are assumed to be
+in the current working directory. The input \ext{bib} files are assumed to be
 either in the current working directory or on \TeX's path (in which
 case \app{kpsewhich} will be used to find them).
 
@@ -563,6 +943,18 @@ In this case you need to invoke \bibgls\ with the \longarg{dir} or
 \begin{verbatim}
 bib2gls -d tmp mydoc
 \end{verbatim}
+
+\section{\longarg{interpret}}
+\labelarg{interpret}
+
+Switch on the interpreter mode (default). See \sectionref{sec:texparserlib}
+for more details.
+
+\section{\longarg{no-interpret}}
+\labelarg{no-interpret}
+
+Switch off the interpreter mode. See \sectionref{sec:texparserlib}
+for more details.
 
 \section{\longarg{mfirstuc-protection} (or \shortarg{u})}
 \labelarg{mfirstuc-protection}
@@ -620,7 +1012,7 @@ write a warning in the transcript. This setting is on by default.
 
 Switches off the above.
 
-\section{\longarg{nested-link-check} \texttt{none}\argor\meta{list}}
+\section{\longarg{nested-link-check} \meta{list}\argor\texttt{none}}
 \labelarg{nested-link-check}
 
 By default, \bibgls\ will parse certain fields for potential nested links.
@@ -706,12 +1098,12 @@ with the existing record (\texttt{emph}). Neither has
 the format \texttt{glsnumberformat} so \bibgls\ consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item The \texttt{hypersf} format is mapped to \texttt{hyperit},
+\item The \texttt{hypersf} format (from the new record) is mapped to \texttt{hyperit},
 so \bibgls\ checks if the existing record
 has this format. In this case it doesn't (the format is
 \texttt{emph}). So \bibgls\ moves onto the next test:
 
-\item The \texttt{emph} format is mapped to \texttt{hyperbf},
+\item The \texttt{emph} format (from the existing record) is mapped to \texttt{hyperbf},
 so \bibgls\ checks if the new record has this format.
 In this case it doesn't (the format is \texttt{hypersf}).
 
@@ -757,9 +1149,11 @@ The \styopt{record} package option automatically creates a new field
 called \field{group}. If the \longarg{group} switch is used,
 \bibgls\ will try to determine the letter group for each entry and
 add it to the \field{group} field. This value will be picked up by
-\cs{printunsrtglossary} if letter group headings are required. If
+\cs{printunsrtglossary} if letter group headings are required (for
+example with the \optfmt{indexgroup} style). If
 you're not using a glossary style that displays the group headings,
-there's no need to use this switch.
+there's no need to use this switch. Note that this switch
+doesn't automatically select an appropriate glossary style.
 
 The default is \argref{no-group}.
 
@@ -784,7 +1178,10 @@ Entries are defined in the usual \ext{bib} format:
 where \meta{entry-type} is the entry type (listed below),
 \meta{field-name-1} are the field names (same as the keys available
 with \cs{newglossaryentry}) and \meta{id} is a unique label. The
-label can't contain any spaces or commas. 
+label can't contain any spaces or commas. In general it's
+best to stick with alpha-numeric labels.  The field values
+may be delimited by braces \margm{text} or double-quotes
+\texttt{"\meta{text}"}.
 
 \bibgls\ allows you to insert prefixes to the labels when the data
 is read through the \csopt{label-prefix} option. Remember to use
@@ -800,6 +1197,11 @@ is used to reference an entry from a different set of resources
 (loaded by another \cs{glsxtrresourcefile} command). This prefix is
 replaced by the corresponding element of the list supplied by
 \csopt{ext-prefixes}.
+
+In the event that you are using \argref{no-interpret} and
+the \field{sort} value falls back on the label, the original
+label supplied in the \ext{bib} file is used, not the prefixed
+label.
 
 Avoid non-ASCII characters in the \meta{id} if your document uses the 
 \sty{inputenc} package.
@@ -823,17 +1225,19 @@ you may end up with a mismatched encoding.
 Each entry type may have required fields and optional fields. For the
 optional fields, any key recognised by \cs{newglossaryentry} may be
 used as a field. However, note that if you add
-any custom keys using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
+any custom keys in your document using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
 commands must be placed before the first use of
-\cs{glsxtrresourcefile} (or \cs{GlsXtrLoadResources}).
+\cs{glsxtrresourcefile} (or the shortcut \cs{GlsXtrLoadResources}).
 Any unrecognised fields will be ignored.
 
 This is more convenient than using \cs{loadglsentries}, which
 requires all the keys used in the file to be defined, regardless of
 whether or not you actually need them in the document.
 
-If an optional field is missing, \bibgls\ will try to fallback on
-another value. The actual fallback value depends in the entry type.
+If an optional field is missing and \bibgls\ needs to access it for
+some reason (for example, for sorting), \bibgls\ will try to
+fallback on another value. The actual fallback value depends on the
+entry type.
 
 Other entries can be cross-referenced using the \field{see} field or
 by using commands like \cs{gls} or \cs{glsxtrp} in any of the
@@ -926,20 +1330,13 @@ designed specifically for symbols, so in the previous example, the
 \texttt{M} and \texttt{v} terms would be better defined using the
 \atentry{symbol} entry type instead.
 
-Again the required fields are again \field{description} and either
-\field{name} or \field{parent}, but in this case if the \field{sort} field
-is omitted, the entry's label is used instead. For example:
-\begin{verbatim}
-@symbol{M,
-  name={\ensuremath{M}},
-  description={a \gls{matrix}}
-}
-
-@symbol{v,
-  name={\ensuremath{\vec{v}}},
-  description={a \gls{vector}}
-}
-\end{verbatim}
+Again the required fields are \field{description} and either
+\field{name} or \field{parent}. If the \field{sort} field
+is omitted, the default sort is given by the entry label
+when \bibgls\ is invoked with \argref{no-interpret}
+and by the \field{name} or \field{parent} when
+\bibgls\ is invoked with \argref{interpret}. See
+\sectionref{sec:texparserlib} for further details.
 
 Terms defined using \atentry{symbol} will be written to the output
 file using the command \csref{bibglsnewsymbol}.
@@ -1093,6 +1490,22 @@ For example:
 ]
 \end{verbatim}
 
+Note that there's no dual equivalent to \atentry{index}
+since that entry type doesn't have required fields and
+there's nothing obvious to swap with that type that would
+differentiate it from a normal entry.
+
+\section{\atentry{dualsymbol}}
+\labelatentry{dualsymbol}
+
+Not yet implemented.
+
+\section{\atentry{dualabbreviation}}
+\labelatentry{dualabbreviation}
+
+Not yet implemented.
+
+
 \chapter{Resource File Options}
 \label{sec:resourceopts}
 \setcounter{secnumdepth}{1}
@@ -1172,9 +1585,25 @@ be set using \cs{glssetwidest} provided by the \sty{glossaries}
 package, but this requires knowing which name is the widest.
 
 The boolean option \csopt[true]{set-widest} will try to calculate
-the widest names for each hierarchical level. Since it doesn't
-know the fonts that will be used in the document or if there
-are any custom commands, this option may not work.
+the widest names for each hierarchical level. Since it doesn't know
+the fonts that will be used in the document or if there are any
+non-standard commands that aren't provided in the \ext{bib} files
+preamble, this option may not work. The transcript file will 
+include the message
+\begin{alltt}
+Calculated width of '\meta{text}': \meta{number}
+\end{alltt}
+where \meta{text} is \bibgls's interpretation of the contents
+of the \field{name} field and \meta{number} is a rough guide
+to the width of \meta{text} assuming the operating system's
+default serif font. The entry that has the largest \meta{number}
+is the one that will be selected. This will then be implemented
+using:
+\begin{alltt}
+\cs{glssetwidest}\oargm{level}\marg{\cs{glsentryname}\margm{id}}
+\end{alltt}
+where \meta{id} is the entry's label. This leaves \TeX\ to
+compute the width according to the document fonts.
 
 If \optref{type} has been set, the \cs{glssetwidest} command
 will be appended to the glossary preamble for that type, otherwise
@@ -1203,7 +1632,7 @@ If the
 The value of \meta{sort} is as for \optref{sort}, but note that in this case the sort value \optfmt{unsrt} or
 \optfmt{none} means to use the same ordering as the original
 entries. So with \optref[de-CH-1996]{sort},
-\optref[\marg{none:copies}]{secondary} the \texttt{copies}
+\optref[none:copies]{secondary} the \texttt{copies}
 list will be ordered according to \texttt{de-CH-1996} and not
 according to the order in which they were read when the \ext{bib}
 file or files were parsed.
@@ -1304,7 +1733,7 @@ are updated.
 Remember that on the first \LaTeX\ the \ext{glstex} files don't
 exist. This means that the entries can't be defined. The
 \styopt{record} package option additionally switches on the
-\styfmt[warn]{undefaction} option, which means that you'll only get
+\styopt[warn]{undefaction} option, which means that you'll only get
 warnings rather than errors when you reference entries in the
 document. This means that you can't use \cs{glsaddall} all with
 \bibgls\ because the glossary lists are empty on the first run
@@ -1389,7 +1818,7 @@ that's discarded.
 
 Patterns for unknown fields will be ignored. If the entire
 list consists of patterns for unknown fields it will be
-treated as \csopt[\marg{}]{match}. That is, no filtering will be
+treated as \csopt[{}]{match}. That is, no filtering will be
 applied.
 
 \subsection{\csoptnv{match-op}=\margm{value}}
@@ -1399,7 +1828,7 @@ If the value of \optref{match} contains more than one
 \meta{key}=\meta{pattern} element, the \csopt{match-op}
 determines whether to apply a logical AND or a logical OR.
 The \meta{value} may be either \optfmt{and} or \optfmt{or}.
-The default is \csopt[\marg{and}]{match-op}.
+The default is \csopt[and]{match-op}.
 
 \subsection{\csoptnv{flatten}=\margm{value}}
 \labelopt{flatten}
@@ -1438,12 +1867,12 @@ For example, suppose my \ext{bib} file contains
 \end{verbatim}
 but I want to use the \abbrstyle{short-long} style and I don't want
 the cross-referenced term, then I can use
-\csopt[\marg{see,description}]{ignore-fields}.
+\csopt[see,description]{ignore-fields}.
 
 Note that \csopt[parent]{ignore-fields} removes the \field{parent}
 before determining the dependency lists. This means that
-\optref[\marg{recorded and deps}]{selection} and 
-\optref[\marg{recorded and ancestors}]{selection} won't pick up the
+\optref[recorded and deps]{selection} and 
+\optref[recorded and ancestors]{selection} won't pick up the
 label in the \field{parent} field.
 
 If you want to maintain the dependency and ancestor relationship but
@@ -1527,9 +1956,9 @@ the \csopt[animals]{category} option.
 The \meta{value} may be \optfmt{same as entry} or a glossary label.
 This is similar to the \optref{category} option except that
 it sets the \field{type} field. As with the \csopt{category} option,
-\csopt[\marg{same as entry}]{value} indicates that the entry
+\csopt[same as entry]{value} indicates that the entry
 type should be used. There is no \meta{value} analogous to
-\csopt[\marg{same as type}]{category}.
+\csopt[same as type]{category}.
 
 Make sure that the glossary type has already been defined. 
 
@@ -1585,7 +2014,7 @@ For example, if the \ext{bib} file contains
 
 @index{goose,plural="geese"}
 \end{verbatim}
-Then if this \ext{bib} file is loaded with \csopt[\marg{gls.}]{label-prefix}
+Then if this \ext{bib} file is loaded with \csopt[gls.]{label-prefix}
 it's as though the entries had been defined as:
 \begin{verbatim}
 @entry{gls.bird,
@@ -2003,7 +2432,7 @@ only explicitly index pertinent use or you can adjust
 the value of \optfmt{loc-gap} so that a range can be formed even
 there are one or two gaps in it.
 
-So with the above set of locations, if \csopt[\marg{2}]{loc-gap} then 
+So with the above set of locations, if \csopt[2]{loc-gap} then 
 the list becomes \qt{1--12, 58--61} which now highlights that
 there are two blocks within the document related to that
 term.
@@ -2015,11 +2444,11 @@ If set, a range consisting of two consecutive locations
 \meta{loc-1} and \meta{loc-2} will be
 displayed in the location list as \meta{loc-1}\meta{value}.
 
-Note that \csopt[\marg{}]{suffixF} sets the suffix to the
+Note that \csopt[{}]{suffixF} sets the suffix to the
 empty string. To remove the suffix formation use
-\csopt[\marg{none}]{suffixF}.
+\csopt[none]{suffixF}.
 
-The default is \csopt[\marg{none}]{suffixF}.
+The default is \csopt[none]{suffixF}.
 
 \subsection{\csoptnv{suffixFF}=\margm{value}}
 \labelopt{suffixFF}
@@ -2028,11 +2457,11 @@ If set, a range consisting of three or more consecutive locations
 \meta{loc-1} and \meta{loc-2} will be
 displayed in the location list as \meta{loc-1}\meta{value}.
 
-Note that \csopt[\marg{}]{suffixFF} sets the suffix to the
+Note that \csopt[{}]{suffixFF} sets the suffix to the
 empty string. To remove the suffix formation use
-\csopt[\marg{none}]{suffixFF}.
+\csopt[none]{suffixFF}.
 
-The default is \csopt[\marg{none}]{suffixFF}.
+The default is \csopt[none]{suffixFF}.
 
 \subsection{\csoptnv{see}=\margm{value}}
 \labelopt{see}
@@ -2078,9 +2507,9 @@ preamble providing an \cs{ifcase} condition:
 }
 \end{alltt}
 
-\item \optfmt{list}: equivalent to \csopt[\marg{\cs{pagelistname} }]{loc-prefix}.
+\item \optfmt{list}: equivalent to \csopt[\cs{pagelistname} ]{loc-prefix}.
 \item \optfmt{true}: equivalent to 
-\csopt[\margm{page},\margm{pages}]{loc-prefix}, where \meta{page} and
+\csopt[\meta{page},\meta{pages}]{loc-prefix}, where \meta{page} and
 \meta{pages} are obtained from the \texttt{tag.page} and
 \texttt{tag.pages} entries in \bibgls's \hyperref[sec:lang.xml]{language file}.
 This setting is only appropriate if the document's language matches the 
@@ -2088,6 +2517,11 @@ language file.
 \end{itemize}
 
 If \meta{value} is omitted, \optfmt{true} is assumed.
+
+\subsection{\csoptnv{loc-suffix}=\margm{value}}
+\labelopt{loc-suffix}
+
+Not yet implemented.
 
 \section{Sorting}
 \label{sec:sortingopts}
@@ -2426,9 +2860,9 @@ defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
 \subsection{\csoptnv{dual-backlink}=\margm{value}}
 \labelopt{dual-backlink}
 
-Shortcut for \csopt[\margm{value}]{dual-entry-backlink}, 
-\csopt[\margm{value}]{dual-abbrv-backlink}, and
-\csopt[\margm{value}]{dual-symbol-backlink}.
+Shortcut for \csopt[\meta{value}]{dual-entry-backlink}, 
+\csopt[\meta{value}]{dual-abbrv-backlink}, and
+\csopt[\meta{value}]{dual-symbol-backlink}.
 
 \subsection{\csoptnv{dual-field}=\margm{value}}
 \labelopt{dual-field}

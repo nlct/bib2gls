@@ -68,8 +68,12 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      entry.putField("sort", 
-         ignoreCase ? value.toLowerCase() : value);
+      if (ignoreCase)
+      {
+         value = value.toLowerCase();
+      }
+
+      entry.putField("sort", value);
 
       String grp = null;
 
@@ -81,7 +85,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
          if (Character.isAlphabetic(codePoint))
          {
-            grp = ignoreCase ?  str.toUpperCase() : str;
+            grp = (ignoreCase ? str.toUpperCase() : str);
 
             entry.putField("group", 
                String.format("\\bibglslettergroup{%s}{%d}{%d}{%s}{%d}", 
@@ -95,27 +99,84 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.getVerboseLevel() > 0)
       {
+         StringBuilder builder = new StringBuilder();
+
+         for (int i = 0, n = value.length(); i < n; )
+         {
+            int codepoint = value.codePointAt(i);
+            i += Character.charCount(codepoint);
+
+            if (builder.length() == 0)
+            {
+               builder.append(codepoint);
+            }
+            else
+            {
+               builder.append(' ');
+               builder.append(codepoint);
+            }
+         }
+
          if (grp == null)
          {
-            bib2gls.debug(String.format("%s -> '%s'", id, value));
+            bib2gls.verbose(String.format("%s -> '%s' [%s]", id, value,
+             builder));
          }
          else
          {
-            bib2gls.debug(String.format("%s -> '%s' (%s)", 
-              id, value, grp));
+            bib2gls.verbose(String.format("%s -> '%s' (%s) [%s]", 
+              id, value, grp, builder));
          }
       }
 
       return value;
    }
 
+   protected int compare(String str1, String str2)
+   {
+      int n1 = str1.length();
+      int n2 = str2.length();
+
+      int i = 0;
+      int j = 0;
+
+      while (i < n1 && j < n2)
+      {
+         int cp1 = str1.codePointAt(i);
+         int cp2 = str2.codePointAt(j);
+
+         i += Character.charCount(cp1);
+         j += Character.charCount(cp2);
+
+         if (cp1 < cp2)
+         {
+            return -1;
+         }
+         else
+         {
+            return 1;
+         }
+      }
+
+      if (n1 < n2)
+      {
+         return -1;
+      }
+      else if (n2 > n1)
+      {
+         return 1;
+      }
+
+      return 0;
+   }
+
    public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
       if (bib2gls.getCurrentResource().flattenSort())
       {
-         return entry1.getFieldValue("sort").compareTo(
+         return compare(entry1.getFieldValue("sort"), 
             entry2.getFieldValue("sort"));
       }
 
@@ -134,7 +195,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
          Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
 
-         int result = e1.getFieldValue("sort").compareTo(
+         int result = compare(e1.getFieldValue("sort"), 
             e2.getFieldValue("sort"));
 
          if (result != 0)

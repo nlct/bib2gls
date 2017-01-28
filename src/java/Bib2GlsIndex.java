@@ -60,7 +60,12 @@ public class Bib2GlsIndex extends Bib2GlsEntry
    {
       String name = getFieldValue("name");
 
-      return name == null ? getOriginalId() : name;
+      if (name == null)
+      {
+         return getOriginalId();
+      }
+
+      return resource.interpret(name, getField("name"));
    }
 
    public String getFallbackValue(String field)

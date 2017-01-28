@@ -36,7 +36,7 @@ import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
-import com.dickimawbooks.texparserlib.html.L2HConverter;
+import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
 public class GlsResource
 {
@@ -1229,14 +1229,8 @@ public class GlsResource
             }
          }
 
-         BibParser bibParserListener = new BibParser(bib2gls, srcCharset)
-         {
-            protected void addPredefined()
-            {
-               parser.putActiveChar(new Bib2GlsAt());
-            }
-
-         };
+         BibParser bibParserListener = new Bib2GlsBibParser(bib2gls,
+            this, srcCharset);
 
          TeXParser texParser = bibParserListener.parseBibFile(bibFile);
 
@@ -1363,12 +1357,28 @@ public class GlsResource
                   }
                }
             }
-            else if (data instanceof BibPreamble)
-            {
-                preamble = ((BibPreamble)data).getPreamble()
-                              .expand(texParser).toString(texParser);
-            }
          }
+      }
+   }
+
+   public void setPreamble(String content, BibValueList list)
+   {
+      if (preamble == null)
+      {
+         preamble = content;
+      }
+      else
+      {
+         preamble += content;
+      }
+
+      if (preambleList == null)
+      {
+         preambleList = list;
+      }
+      else
+      {
+         preambleList.addAll(list);
       }
    }
 
@@ -1718,18 +1728,13 @@ public class GlsResource
 
          Vector<String> widestNames = null;
          Vector<Double> widest = null;
+         Vector<String> dualWidestNames = null;
+         Vector<Double> dualWidest = null;
          Font font = null;
          FontRenderContext frc = null;
 
-         TeXParser parser = null;
-
          if (setWidest)
          {
-            L2HConverter listener = new L2HConverter(bib2gls);
-            listener.setIsInDocEnv(true);
-
-            parser = new TeXParser(listener);
-
             widestNames = new Vector<String>();
             widest = new Vector<Double>();
 
@@ -1762,13 +1767,26 @@ public class GlsResource
 
             if (widestNames != null)
             {
-               updateWidestName(parser, entry, widestNames, 
-                 widest, font, frc);
+               updateWidestName(entry, widestNames, widest, font, frc);
             }
          }
 
          if (dualEntries != null)
          {
+            if (widestNames != null)
+            {
+               if (dualType != null && !dualType.equals(type))
+               {
+                  dualWidestNames = new Vector<String>();
+                  dualWidest = new Vector<Double>();
+               }
+               else
+               {
+                  dualWidestNames = widestNames;
+                  dualWidest = widest;
+               }
+            }
+
             for (int i = 0, n = dualEntries.size(); i < n; i++)
             {
                Bib2GlsEntry entry = dualEntries.get(i);
@@ -1789,10 +1807,10 @@ public class GlsResource
                   secondaryList.add(entry);
                }
 
-               if (widestNames != null)
+               if (dualWidestNames != null)
                {
-                  updateWidestName(parser, entry, widestNames, 
-                    widest, font, frc);
+                  updateWidestName(entry, dualWidestNames, 
+                    dualWidest, font, frc);
                }
             }
          }
@@ -1870,7 +1888,7 @@ public class GlsResource
          }
 
          if (widestNames != null)
-         {// TODO check dualType
+         {
             if (type != null)
             {
                writer.format("\\apptoglossarypreamble[%s]{", type);
@@ -1903,6 +1921,24 @@ public class GlsResource
             }
 
             writer.println();
+
+            if (dualWidestNames != null && dualWidestNames != widestNames)
+            {
+               writer.format("\\apptoglossarypreamble[%s]{", dualType);
+
+               for (int i = 0, n = dualWidestNames.size(); i < n; i++)
+               {
+                  String name = dualWidestNames.get(i);
+
+                  if (!name.isEmpty())
+                  {
+                     builder.append(String.format(
+                        "\\glssetwidest[%d]{%s}", i, name));
+                  }
+               }
+
+               writer.println("}");
+            }
          }
 
          bib2gls.message(bib2gls.getChoiceMessage("message.written", 0,
@@ -1920,8 +1956,109 @@ public class GlsResource
       return entryCount;
    }
 
-   private void updateWidestName(TeXParser parser,
-     Bib2GlsEntry entry, Vector<String> widestNames, 
+   /*
+    *  Attempts to interpret LaTeX code. This won't work on anything
+    *  complicated and assumes custom user commands are provided in
+    *  the .bib file @preamble{...} 
+    *  Some standard LaTeX commands are recognised.
+    */ 
+   public String interpret(String texCode, BibValueList bibVal)
+   {
+      if (!bib2gls.useInterpreter()) return texCode;
+
+      try
+      {
+         L2HStringConverter listener = new L2HStringConverter(
+            new Bib2GlsAdapter(bib2gls))
+         {
+            public void writeCodePoint(int codePoint) throws IOException
+            {
+               if (getWriter() == null) return;
+
+               if (codePoint == '&')
+               {
+                  getWriter().write("&amp;");
+               }
+               else if (codePoint == '<')
+               {
+                  getWriter().write("&le;");
+               }
+               else if (codePoint == '>')
+               {
+                  getWriter().write("&ge;");
+               }
+               else
+               {
+                  getWriter().write(codePoint);
+               }
+            }
+         };
+
+         listener.setUseMathJax(false);
+         listener.setIsInDocEnv(true);
+
+         StringWriter writer = new StringWriter();
+         listener.setWriter(writer);
+
+         TeXParser parser = new TeXParser(listener);
+
+         parser.setCatCode('@', TeXParser.TYPE_LETTER);
+
+         TeXObjectList objList = bibVal.expand(parser);
+
+         if (objList == null) return texCode;
+
+         if (preambleList != null)
+         {
+            parser.addAll(0, preambleList.expand(parser));
+         }
+
+         parser.addAll(objList);
+
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.debug(String.format(
+              "%n%s%n%s%n%n",
+               bib2gls.getMessage("message.parsing.code"),
+               parser.toString(parser)));
+         }
+
+         while (parser.size() > 0)
+         {
+            TeXObject obj = parser.pop();
+            obj.process(parser);
+         }
+
+         String result = writer.toString();
+
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.debug(String.format("texparserlib:--> %s", 
+              result));
+         }
+
+         // Strip any html markup and trim leading/trailing spaces
+
+         result = result.replaceAll("<[^>]+>", "").trim();
+
+         result = result.replaceAll("\\&le;", "<");
+         result = result.replaceAll("\\&ge;", ">");
+         result = result.replaceAll("\\&amp;", "&");
+
+         bib2gls.logMessage(String.format("texparserlib: %s -> %s", 
+            texCode, result));
+
+         return result;
+      }
+      catch (IOException e)
+      {// too complicated
+
+         return texCode;
+      }
+   }
+
+   private void updateWidestName(Bib2GlsEntry entry, 
+     Vector<String> widestNames, 
      Vector<Double> widest, Font font, FontRenderContext frc)
    {
       // This is just approximate as fonts, commands etc
@@ -1931,45 +2068,12 @@ public class GlsResource
 
       if (name == null || name.isEmpty()) return;
 
-      String orgName = name;
+      // Try to interpret any LaTeX code that may be in the name.
+      // This assumes custom user commands are provided in the
+      // preamble. Won't work on anything complicated and doesn't
+      // take font changes into account.
 
-      // In the event that the name field contains any TeX code,
-      // strip out anything that's not 'letter' or 'other'
-
-      try
-      {
-         BibValueList bibValList = entry.getField("name");
-
-         if (bibValList != null)
-         {
-            TeXObjectList contents = bibValList.expand(parser);
-
-            if (contents != null)
-            {
-               StringBuilder builder = new StringBuilder();
-
-               TeXObjectList list = contents.expandfully(parser);
-
-               if (list != null)
-               {
-                  contents = list;
-               }
-
-               for (TeXObject obj : contents)
-               {
-                  if (obj instanceof CharObject)
-                  {
-                     builder.appendCodePoint(((CharObject)obj).getCharCode());
-                  }
-               }
-
-               name = builder.toString();
-            }
-         }
-      }
-      catch (IOException e)
-      {// too complicated, just use the name
-      }
+      name = interpret(name, entry.getField("name")).trim();
 
       int level = entry.getHierarchyCount();
       String maxName = "";
@@ -1986,19 +2090,24 @@ public class GlsResource
          maxWidth = widest.get(level).doubleValue();
       }
 
-      TextLayout layout = new TextLayout(
-        name, font, frc);
+      double w = 0.0;
 
-      double w = layout.getBounds().getWidth();
+      if (!name.isEmpty())
+      {
+         TextLayout layout = new TextLayout(name, font, frc);
 
-      bib2gls.debug(bib2gls.getMessage("message.calc.text.width",
+         w = layout.getBounds().getWidth();
+      }
+
+      bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width",
         name, w));
 
       if (w > maxWidth)
       {
           if (level < widestNames.size())
           {
-             widestNames.set(level, orgName);
+             widestNames.set(level, 
+                String.format("\\glsentryname{%s}", entry.getId()));
              widest.set(level, new Double(w));
           }
           else
@@ -2009,7 +2118,8 @@ public class GlsResource
                 widest.add(new Double(0.0));
              }
 
-             widestNames.add(orgName);
+             widestNames.add(String.format("\\glsentryname{%s}", 
+                entry.getId()));
              widest.add(new Double(w));
           }
       }
@@ -2395,6 +2505,7 @@ public class GlsResource
    private String suffixF, suffixFF;
 
    private String preamble = null;
+   private BibValueList preambleList = null;
 
    private HashMap<String,Pattern> fieldPatterns = null;
 

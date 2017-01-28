@@ -591,8 +591,15 @@ public class Bib2GlsEntry extends BibEntry
    public String getDefaultSort()
    {
       String val = fieldValues.get("name");
+      BibValueList obj = getField("name");
 
-      return val == null ? fieldValues.get("parent") : val;
+      if (val == null)
+      {
+         val = fieldValues.get("parent");
+         obj = getField("parent");
+      }
+
+      return resource.interpret(val, obj);
    }
 
    public String getFallbackValue(String field)

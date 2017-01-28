@@ -532,6 +532,11 @@ public class Bib2Gls implements TeXApp
       return texCharset;
    }
 
+   public boolean useInterpreter()
+   {
+      return interpret;
+   }
+
    public void process(String[] args) 
      throws IOException,InterruptedException,Bib2GlsException
    {
@@ -1018,6 +1023,29 @@ public class Bib2Gls implements TeXApp
          if (message == null)
          {
             message = e.getClass().getSimpleName();
+         }
+
+         System.out.println(message);
+         logMessage(message);
+
+         e.printStackTrace();
+      }
+   }
+
+   public void debug(String msgPrefix, Throwable e)
+   {
+      if (debugLevel > 0)
+      {
+         String message = e.getMessage();
+
+         if (message == null)
+         {
+            message = e.getClass().getSimpleName();
+         }
+
+         if (msgPrefix != null)
+         {
+            message = msgPrefix+message;
          }
 
          System.out.println(message);
@@ -1628,6 +1656,11 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.dir", "--dir", "-d"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.interpret", "--interpret"));
+      System.out.println(getMessage("syntax.no.interpret", "--no-interpret"));
+      System.out.println();
+
+      System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
          "--mfirstuc-protection", "-u"));
 
@@ -1871,6 +1904,14 @@ public class Bib2Gls implements TeXApp
             }
 
             logName = args[i];
+         }
+         else if (args[i].equals("--interpret"))
+         {
+            interpret = true;
+         }
+         else if (args[i].equals("--no-interpret"))
+         {
+            interpret = false;
          }
          else if (args[i].equals("--no-mfirstuc-protection"))
          {
@@ -2231,6 +2272,8 @@ public class Bib2Gls implements TeXApp
    private boolean checkAbbrvShortcuts = false;
 
    private GlsResource currentResource = null;
+
+   private boolean interpret = true;
 
    private int exitCode;
 

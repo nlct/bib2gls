@@ -42,7 +42,12 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
 
    public String getDefaultSort()
    {
-      return getOriginalId();
+      if (!bib2gls.useInterpreter())
+      {
+         return getOriginalId();
+      }
+
+      return super.getDefaultSort();
    }
 
    public void writeBibEntry(PrintWriter writer)

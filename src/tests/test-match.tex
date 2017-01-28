@@ -1,0 +1,16 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={topics},% topics.bib
+  match={category={animal},category={mineral},note={.*note.*}},
+  selection=all% select all entries that match
+]
+
+\begin{document}
+Test.
+
+\printunsrtglossaries
+\end{document}

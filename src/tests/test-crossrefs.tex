@@ -29,7 +29,8 @@
 % loads entries-abbrv.glstex
 % finds entries in entries-abbrv.bib
 \glsxtrresourcefile[% bib2gls options
- sort=en,% 'none' or 'use' or 'locale' or specific locale
+ sort=en,% 'none' or 'use' or 'locale' or 'letter-case'
+         % or 'letter-nocase' or specific locale
  %ignore-fields={description,see},% ignore fields listed in this value
  ignore-fields={description},% ignore fields listed in this value
  type=abbreviations]{entries-abbrv}
@@ -37,12 +38,17 @@
 % loads entries-symbols.glstex
 % finds entries in entries-symbols.bib
 \glsxtrresourcefile[% bib2gls options
- sort=none,% 'none' or 'use' or 'locale' or specific locale
+ %sort=none,% 'none' or 'use' or 'locale' or 'letter-case'
+            % or 'letter-nocase' or specific locale
+ %sort=letter-nocase,%
+ sort=locale,%
  loc-prefix={Location:},% prefix location list
  type=symbols]{entries-symbols}
 
 \begin{document}
-A \gls{matrix}, a \gls{vector} and a \gls{set}.
+A \gls{matrix}, a \gls{vector} and the \gls{cardinality}
+of a \gls{set}. Complex number: $2\gls{i}+1$.
+\AA ngstr\"om: \gls{angstrom}.
 
 \gls{shtml}.
 
