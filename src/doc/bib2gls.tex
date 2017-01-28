@@ -2926,7 +2926,7 @@ own commands before the \ext{glstex} files are loaded.
 \cs{bibglsnewentry}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atfield{entry} type. The definition provided in the \ext{glstex}
+\atentry{entry} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewentry}[4]{%
@@ -2939,6 +2939,22 @@ the post-description hooks provided by category attributes).
 
 \section{\cs{bibglsnewsymbol}}
 \labelcs{bibglsnewsymbol}
+
+\begin{definition}
+\cs{bibglsnewsymbol}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{symbol} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewsymbol}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}%
+}
+\end{verbatim}
+Note that this sets the \field{sort} field to the label, but this
+may be overridden by the \meta{options} if the \field{sort} field
+was supplied or if \bibgls\ has determined the value whilst sorting
+the entries.
 
 \section{\cs{bibglsnewnumber}}
 \labelcs{bibglsnewnumber}
