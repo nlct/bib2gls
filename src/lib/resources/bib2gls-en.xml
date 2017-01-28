@@ -86,6 +86,8 @@ See the manual for further details.</entry>
 			Add ''group'' field to entries.</entry>
 <entry key="syntax.no.group">{0}
 			Don''t add ''group'' field to entries.</entry>
+<entry key="syntax.tex.encoding">{0} &lt;name&gt;
+			Set the character encoding for the output files.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
@@ -132,6 +134,10 @@ with range started by {1}</entry>
 <entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
 <entry key="message.calc.text.width">Calculated width of ''{0}'': {1,number}</entry>
 <entry key="message.parsing.code">Parsing code block:</entry>
+<entry key="message.unknown.tex.charset">Unable to detect character encoding for TeX file.
+Defaulting to: {0}.
+(Use {1} if this is incorrect.)</entry>
+<entry key="message.tex.charset">TeX character encoding: {0}</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -167,7 +173,8 @@ Ignoring {1}</entry>
 <entry key="warning.unknown.field.pattern">Ignoring pattern for unknown field: {0}</entry>
 
 <entry key="error.title">Error: {0}</entry>
-<entry key="error.unknown.tex.charset">Unknown TeX charset: {0}</entry>
+<entry key="error.unknown.tex.charset">Unknown TeX charset: {0}
+Defaulting to {1}. Use {2} to set another encoding.</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
 <entry key="error.missing.records">No records found in aux file.
 Have you used the glossaries-extra.sty ''record'' option?

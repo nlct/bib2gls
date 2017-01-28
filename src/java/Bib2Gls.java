@@ -443,6 +443,7 @@ public class Bib2Gls implements TeXApp
    }
 
    private String texToJavaCharset(String texCharset)
+    throws Bib2GlsException
    {
       if (texCharset.equals("ascii"))
       {
@@ -529,9 +530,7 @@ public class Bib2Gls implements TeXApp
          return "UTF-8";
       }
 
-      debug(getMessage("error.unknown.tex.charset", texCharset));
-
-      return texCharset;
+      throw new Bib2GlsException(texCharset);
    }
 
    public boolean useInterpreter()
@@ -825,8 +824,6 @@ public class Bib2Gls implements TeXApp
       records = new Vector<GlsRecord>();
       dependencies = new Vector<String>();
 
-      texCharset = Charset.defaultCharset();
-
       Vector<AuxData> auxData = auxParser.getAuxData();
 
       if (interpret)
@@ -851,17 +848,19 @@ public class Bib2Gls implements TeXApp
                setShortCuts(data.getArg(0).toString(parser));
             }
          }
-         else if (name.equals("glsxtr@texencoding"))
+         else if (texCharset == null && name.equals("glsxtr@texencoding"))
          {
              try
              {
                 texCharset = Charset.forName(
                    texToJavaCharset(data.getArg(0).toString(parser)));
              }
-             catch (Exception e)
+             catch (Bib2GlsException e)
              {
-                error(e);
                 texCharset = Charset.defaultCharset();
+
+                warning(getMessage("error.unknown.tex.charset",
+                  e.getMessage(), texCharset, "--tex-encoding"));
              }
          }
          else if (name.equals("glsxtr@fields"))
@@ -1014,6 +1013,18 @@ public class Bib2Gls implements TeXApp
                records.add(newRecord);
             }
          }
+      }
+
+      if (texCharset == null)
+      {
+         texCharset = Charset.defaultCharset();
+
+         logMessage(getMessage("message.unknown.tex.charset", texCharset,
+           "--tex-encoding"));
+      }
+      else
+      {
+         verbose(getMessage("message.tex.charset", texCharset));
       }
 
       if (glsresources.size() == 0)
@@ -1968,6 +1979,10 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.no.group",
          "--no-group"));
 
+      System.out.println();
+      System.out.println(getMessage("syntax.tex.encoding",
+         "--tex-encoding"));
+
       System.exit(0);
    }
 
@@ -2308,6 +2323,18 @@ public class Bib2Gls implements TeXApp
          {
             addGroupField = false;
          }
+         else if (args[i].equals("--tex-encoding"))
+         {
+            i++;
+
+            if (i == args.length)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", args[i-1]));
+            }
+
+            texCharset = Charset.forName(args[i]);
+         }
          else if (args[i].startsWith("-"))
          {
             throw new Bib2GlsSyntaxException(getMessage(
@@ -2526,7 +2553,7 @@ public class Bib2Gls implements TeXApp
 
    private boolean addGroupField = false;
 
-   private Charset texCharset;
+   private Charset texCharset = null;
 
    private Bib2GlsMessages messages;
 

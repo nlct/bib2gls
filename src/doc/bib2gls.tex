@@ -557,9 +557,12 @@ with \argref{no-interpret}.
 
 The \file{texparserlib.jar} library is not intended as a full-blown
 \TeX\ engine and there are plenty of situations where it doesn't
-work. In particular, in this case it's being used in a fragmented context without
-knowing the packages used by the document or any custom commands or
-environments provided within the document.
+work. In particular, in this case it's being used in a fragmented
+context without knowing most of the packages used by the
+document\footnote{\bibgls\ can detect from the log file a small
+number of packages that the parser can support, such as
+\sty{pifonts}, \sty{wasysym} and \sty{amssymb}.}\ or any custom
+commands or environments provided within the document.
 
 \TeX\ syntax can be quite complicated and in some cases far too
 complicated for simple regular expressions. The library performs
@@ -1180,6 +1183,24 @@ The default is \argref{no-group}.
 \labelarg{no-group}
 
 Don't use the \field{group} field. (Default.)
+
+\section{\longarg{tex-encoding} \meta{name}}
+\labelarg{tex-encoding}
+
+\bibgls\ tries to determine the character encoding to use for the
+output files. If the document has loaded the \sty{inputenc} package then
+\bibgls\ can obtain the value of the encoding from the
+\ext{aux} file. This then needs to be converted to a name
+recognised by Java. For example, \texttt{utf8} will be mapped to
+\texttt{UTF-8}. If the \sty{fontspec} package has been loaded,
+\sty{glossaries-extra} will assume the encoding is \texttt{utf8} and
+write that value to the \ext{aux} file.
+
+If neither package has been loaded, \bibgls\ will assume the
+operating system's default encoding. If this is incorrect or if
+\bibgls\ can't work out the appropriate mapping then you can specify
+the correct encoding using \longargfmt{tex-encoding} \meta{name}
+where \meta{name} is the encoding name.
 
 \chapter{\ext{bib} Format}
 \label{sec:bib}
