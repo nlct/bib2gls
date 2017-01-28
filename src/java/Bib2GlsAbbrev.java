@@ -42,7 +42,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
          return super.getDefaultSort();
       }
 
-      return resource.interpret(value, getField("short"));
+      return bib2gls.interpret(value, getField("short"));
    }
 
    public void checkRequiredFields(TeXParser parser)

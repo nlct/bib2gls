@@ -1,0 +1,52 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{pifont}
+\usepackage[record,nomain,stylemods={mcols},style=mcolindex]{glossaries-extra}
+
+\newglossary*{nosort}{Symbols (Unsorted)}
+\newglossary*{byname}{Symbols (Letter Order)}
+\newglossary*{bydesc}{Symbols (Ordered by Description)}
+\newglossary*{byid}{Symbols (Ordered by Label)}
+
+\GlsXtrLoadResources[
+  src={test-pifonts},% test-pifonts.bib
+  sort={unsrt},
+  type={nosort},
+  selection={all}
+]
+
+\glsxtrresourcefile[
+  src={test-pifonts},% test-pifonts.bib
+  sort={letter-case},
+  type={byname},
+  label-prefix={byname.},
+  selection={all}
+]
+{\jobname-byname}
+
+\glsxtrresourcefile[
+  src={test-pifonts},% test-pifonts.bib
+  sort={locale},
+  sort-field={description},
+  type={bydesc},
+  label-prefix={bydesc.},
+  selection={all}
+]
+{\jobname-bydesc}
+
+\glsxtrresourcefile[
+  src={test-pifonts},% test-pifonts.bib
+  sort={letter},
+  sort-field={id},
+  type={byid},
+  label-prefix={byid.},
+  selection={all}
+]
+{\jobname-byid}
+
+\begin{document}
+Test document.
+
+\printunsrtglossaries
+\end{document}

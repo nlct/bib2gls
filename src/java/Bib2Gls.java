@@ -35,6 +35,8 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.html.L2HStringConverter;
+import com.dickimawbooks.texparserlib.bib.BibValueList;
 
 public class Bib2Gls implements TeXApp
 {
@@ -537,10 +539,269 @@ public class Bib2Gls implements TeXApp
       return interpret;
    }
 
+   public Vector<String> getPackages()
+   {
+      return packages;
+   }
+
+   // Search for some packages that texparserlib.jar recognises
+   private void parseLog() throws IOException
+   {
+      String name = auxFile.getName();
+
+      int idx = name.lastIndexOf(".aux");
+
+      if (idx < 1)
+      {
+         debug("Can't determine log file from "+auxFile);
+         return;
+      }
+
+      name = name.substring(0, idx)+".log";
+
+      File logFile = new File(auxFile.getParentFile(), name);
+
+      packages = new Vector<String>();
+
+      BufferedReader in = null;
+
+      boolean amsmath=false;
+      boolean amssymb=false;
+      boolean pifont=false;
+      boolean textcase=false;
+      boolean wasysym=false;
+      boolean lipsum=false;
+      boolean natbib=false;
+
+      int known = 7;
+
+      try
+      {
+         checkReadAccess(logFile);
+
+         in = new BufferedReader(new FileReader(logFile));
+
+         String line = null;
+
+         while ((line = in.readLine()) != null)
+         {
+            if (!amsmath && line.startsWith("Package: amsmath"))
+            {
+               packages.add("amsmath");
+               amsmath = true;
+            }
+            else if (!amssymb && line.startsWith("Package: amssymb"))
+            {
+               packages.add("amssymb");
+               amssymb = true;
+            }
+            else if (!pifont && line.startsWith("Package: pifont"))
+            {
+               packages.add("pifont");
+               pifont = true;
+            }
+            else if (!textcase && line.startsWith("Package: textcase"))
+            {
+               packages.add("textcase");
+               textcase = true;
+            }
+            else if (!wasysym && line.startsWith("Package: wasysym"))
+            {
+               packages.add("wasysym");
+               wasysym = true;
+            }
+            else if (!lipsum && line.startsWith("Package: lipsum"))
+            {
+               packages.add("lipsum");
+               lipsum = true;
+            }
+            else if (!natbib && line.startsWith("Package: natbib"))
+            {
+               packages.add("natbib");
+               natbib = true;
+            }
+
+            if (packages.size() == known)
+            {
+               break;
+            }
+         }
+      }
+      finally
+      {
+         if (in != null)
+         {
+            in.close();
+         }
+      }
+
+      if (debugLevel > 0 && packages.size() > 0)
+      {
+         if (packages.size() == 1)
+         {
+            debug(getMessage("message.1.sty"));
+         }
+         else
+         {
+            debug(getMessage("message.2.sty", packages.size()));
+         }
+
+         for (String sty : packages)
+         {
+            debug(sty);
+         }
+
+         debug();
+      }
+   }
+
+   private void initInterpreter(Vector<AuxData> data)
+     throws IOException
+   {
+      L2HStringConverter listener = new L2HStringConverter(
+         new Bib2GlsAdapter(this), data)
+      {
+         public void writeCodePoint(int codePoint) throws IOException
+         {
+            if (getWriter() == null) return;
+
+            if (codePoint == '&')
+            {
+               getWriter().write("&amp;");
+            }
+            else if (codePoint == '<')
+            {
+               getWriter().write("&le;");
+            }
+            else if (codePoint == '>')
+            {
+               getWriter().write("&ge;");
+            }
+            else
+            {
+               getWriter().write(codePoint);
+            }
+         }
+      };
+
+      listener.setUseMathJax(false);
+      listener.setIsInDocEnv(true);
+
+      interpreter = new TeXParser(listener);
+
+      interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
+
+      Vector<String> packages = getPackages();
+
+      if (packages != null)
+      {
+         for (String sty : packages)
+         {
+            listener.usepackage(null, sty);
+         }
+      }
+   }
+
+   public void processPreamble(BibValueList list)
+     throws IOException
+   {
+      interpreter.addAll(list.expand(interpreter));
+
+      if (getDebugLevel() > 0)
+      {
+         debug(String.format(
+           "%n%s%n%s%n%n",
+            getMessage("message.parsing.code"),
+            interpreter.toString(interpreter)));
+      }
+
+      while (interpreter.size() > 0)
+      {
+         TeXObject obj = interpreter.pop();
+         obj.process(interpreter);
+      }
+   }
+
+   /*
+    *  Attempts to interpret LaTeX code. This won't work on anything
+    *  complicated and assumes custom user commands are provided in
+    *  the .bib file @preamble{...} 
+    *  Some standard LaTeX commands are recognised.
+    */ 
+   public String interpret(String texCode, BibValueList bibVal)
+   {
+      if (interpreter == null) return texCode;
+
+      try
+      {
+         StringWriter writer = new StringWriter();
+         ((L2HStringConverter)interpreter.getListener()).setWriter(writer);
+
+         TeXObjectList objList = bibVal.expand(interpreter);
+
+         if (objList == null) return texCode;
+
+         interpreter.addAll(objList);
+
+         if (getDebugLevel() > 0)
+         {
+            debug(String.format(
+              "%n%s%n%s%n%n",
+               getMessage("message.parsing.code"),
+               interpreter.toString(interpreter)));
+         }
+
+         while (interpreter.size() > 0)
+         {
+            TeXObject obj = interpreter.pop();
+            obj.process(interpreter);
+         }
+
+         String result = writer.toString();
+
+         if (getDebugLevel() > 0)
+         {
+            debug(String.format("texparserlib:--> %s", result));
+         }
+
+         // Strip any html markup and trim leading/trailing spaces
+
+         result = result.replaceAll("<[^>]+>", "").trim();
+
+         result = result.replaceAll("\\&le;", "<");
+         result = result.replaceAll("\\&ge;", ">");
+         result = result.replaceAll("\\&amp;", "&");
+
+         logMessage(String.format("texparserlib: %s -> %s", 
+            texCode, result));
+
+         return result;
+      }
+      catch (IOException e)
+      {// too complicated
+
+         return texCode;
+      }
+   }
+
    public void process(String[] args) 
      throws IOException,InterruptedException,Bib2GlsException
    {
       parseArgs(args);
+
+      if (interpret)
+      {
+         try
+         {
+            parseLog();
+         }
+         catch (IOException e)
+         {
+            // Parsing the log file isn't essential.
+
+            debug(e);
+         }
+      }
 
       AuxParser auxParser = new AuxParser(this)
       {
@@ -566,7 +827,14 @@ public class Bib2Gls implements TeXApp
 
       texCharset = Charset.defaultCharset();
 
-      for (AuxData data : auxParser.getAuxData())
+      Vector<AuxData> auxData = auxParser.getAuxData();
+
+      if (interpret)
+      {
+         initInterpreter(auxData);
+      }
+
+      for (AuxData data : auxData)
       {
          String name = data.getName();
  
@@ -2274,6 +2542,10 @@ public class Bib2Gls implements TeXApp
    private GlsResource currentResource = null;
 
    private boolean interpret = true;
+
+   private Vector<String> packages = null;;
+
+   private TeXParser interpreter = null;
 
    private int exitCode;
 

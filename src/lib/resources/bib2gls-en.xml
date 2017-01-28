@@ -118,6 +118,9 @@ See the manual for further details.</entry>
 <entry key="message.1.entry">1 entry</entry>
 <entry key="message.2.entry">{0,number} entries</entry>
 
+<entry key="message.1.sty">1 recognised package:</entry>
+<entry key="message.2.sty">{0,number} recognised packages:</entry>
+
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>

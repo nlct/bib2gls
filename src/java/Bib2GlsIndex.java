@@ -65,7 +65,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
          return getOriginalId();
       }
 
-      return resource.interpret(name, getField("name"));
+      return bib2gls.interpret(name, getField("name"));
    }
 
    public String getFallbackValue(String field)

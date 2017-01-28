@@ -599,7 +599,7 @@ public class Bib2GlsEntry extends BibEntry
          obj = getField("parent");
       }
 
-      return resource.interpret(val, obj);
+      return bib2gls.interpret(val, obj);
    }
 
    public String getFallbackValue(String field)

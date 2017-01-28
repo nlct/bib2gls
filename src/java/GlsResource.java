@@ -36,7 +36,6 @@ import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
-import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
 public class GlsResource
 {
@@ -51,6 +50,7 @@ public class GlsResource
    private void init(TeXParser parser, TeXObject opts, TeXObject arg)
       throws IOException,InterruptedException
    {
+
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
       TeXPath texPath = new TeXPath(parser, 
@@ -639,11 +639,6 @@ public class GlsResource
       if (srcList == null)
       {
          sources.add(bib2gls.getBibFilePath(parser, filename));
-      }
-
-      if (bib2gls.useInterpreter())
-      {
-         initInterpreter();
       }
    }
 
@@ -1400,21 +1395,7 @@ public class GlsResource
 
       if (list != null)
       {
-         interpreter.addAll(list.expand(interpreter));
-
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.debug(String.format(
-              "%n%s%n%s%n%n",
-               bib2gls.getMessage("message.parsing.code"),
-               interpreter.toString(interpreter)));
-         }
-
-         while (interpreter.size() > 0)
-         {
-            TeXObject obj = interpreter.pop();
-            obj.process(interpreter);
-         }
+         bib2gls.processPreamble(list);
       }
    }
 
@@ -2026,105 +2007,6 @@ public class GlsResource
       return entryCount;
    }
 
-   private void initInterpreter()
-   {
-      L2HStringConverter listener = new L2HStringConverter(
-         new Bib2GlsAdapter(bib2gls))
-      {
-         public void writeCodePoint(int codePoint) throws IOException
-         {
-            if (getWriter() == null) return;
-
-            if (codePoint == '&')
-            {
-               getWriter().write("&amp;");
-            }
-            else if (codePoint == '<')
-            {
-               getWriter().write("&le;");
-            }
-            else if (codePoint == '>')
-            {
-               getWriter().write("&ge;");
-            }
-            else
-            {
-               getWriter().write(codePoint);
-            }
-         }
-      };
-
-      listener.setUseMathJax(false);
-      listener.setIsInDocEnv(true);
-
-      interpreter = new TeXParser(listener);
-
-      interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
-   }
-
-   /*
-    *  Attempts to interpret LaTeX code. This won't work on anything
-    *  complicated and assumes custom user commands are provided in
-    *  the .bib file @preamble{...} 
-    *  Some standard LaTeX commands are recognised.
-    */ 
-   public String interpret(String texCode, BibValueList bibVal)
-   {
-      if (interpreter == null) return texCode;
-
-      try
-      {
-         StringWriter writer = new StringWriter();
-         ((L2HStringConverter)interpreter.getListener()).setWriter(writer);
-
-         TeXObjectList objList = bibVal.expand(interpreter);
-
-         if (objList == null) return texCode;
-
-         interpreter.addAll(objList);
-
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.debug(String.format(
-              "%n%s%n%s%n%n",
-               bib2gls.getMessage("message.parsing.code"),
-               interpreter.toString(interpreter)));
-         }
-
-         while (interpreter.size() > 0)
-         {
-            TeXObject obj = interpreter.pop();
-            obj.process(interpreter);
-         }
-
-         String result = writer.toString();
-
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.debug(String.format("texparserlib:--> %s", 
-              result));
-         }
-
-         // Strip any html markup and trim leading/trailing spaces
-
-         result = result.replaceAll("<[^>]+>", "").trim();
-
-         result = result.replaceAll("\\&le;", "<");
-         result = result.replaceAll("\\&ge;", ">");
-         result = result.replaceAll("\\&amp;", "&");
-
-         bib2gls.logMessage(String.format("texparserlib: %s -> %s", 
-            texCode, result));
-
-         return result;
-      }
-      catch (IOException e)
-      {// too complicated
-
-         return texCode;
-      }
-   }
-
    private void updateWidestName(Bib2GlsEntry entry, 
      Vector<String> widestNames, 
      Vector<Double> widest, Font font, FontRenderContext frc)
@@ -2141,7 +2023,7 @@ public class GlsResource
       // preamble. Won't work on anything complicated and doesn't
       // take font changes into account.
 
-      name = interpret(name, entry.getField("name")).trim();
+      name = bib2gls.interpret(name, entry.getField("name")).trim();
 
       int level = entry.getHierarchyCount();
       String maxName = "";
@@ -2539,8 +2421,6 @@ public class GlsResource
 
       return !matches;
    }
-
-   private TeXParser interpreter = null;
 
    private File texFile;
 
