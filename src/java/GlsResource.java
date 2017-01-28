@@ -1698,7 +1698,7 @@ public class GlsResource
          writer.println("}");
 
          // syntax: {label}{opts}
-         writer.println("\\providecommand*{\\bibglsnewterm}[2]{%");
+         writer.println("\\providecommand*{\\bibglsnewindex}[2]{%");
          writer.println(" \\newglossaryentry{#1}{name={#1},description={},#2}%");
          writer.println("}");
 

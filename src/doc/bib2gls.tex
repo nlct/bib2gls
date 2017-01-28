@@ -2956,11 +2956,48 @@ may be overridden by the \meta{options} if the \field{sort} field
 was supplied or if \bibgls\ has determined the value whilst sorting
 the entries.
 
+This also sets the \field{category} to \optfmt{symbol}, but again this may
+be overridden by \meta{options} if the entry had the \field{category}
+field set in the \ext{bib} file or if the \field{category} was
+overridden with \optref[\meta{value}]{category}.
+
 \section{\cs{bibglsnewnumber}}
 \labelcs{bibglsnewnumber}
 
+\begin{definition}
+\cs{bibglsnewnumber}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{number} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewnumber}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},sort={#1},category={number},#2}{#4}%
+}
+\end{verbatim}
+This is much the same as \cs{bibglsnewsymbol} above but sets the 
+\field{category} to \optfmt{number}. Again the \field{sort} and
+\field{category} keys may be overridden by \meta{options}.
+
 \section{\cs{bibglsnewindex}}
 \labelcs{bibglsnewindex}
+
+\begin{definition}
+\cs{bibglsnewindex}\margm{label}\margm{options}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{index} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand*{\bibglsnewindex}[2]{%
+ \newglossaryentry{#1}{name={#1},description={},#2}%
+}
+\end{verbatim}
+This makes the \field{name} default to the \meta{label} and sets
+an empty \field{description}. These settings may be overridden by
+\meta{options}. Note that the \field{description} doesn't include
+\cs{nopostdec} to allow for the post-description hook used by
+category attributes.
 
 \section{\cs{bibglsnewacronym}}
 \labelcs{bibglsnewacronym}

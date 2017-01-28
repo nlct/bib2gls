@@ -83,7 +83,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\bibglsnewterm{%s}%%%n{", getId());
+      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(), getId());
 
       String sep = "";
 
