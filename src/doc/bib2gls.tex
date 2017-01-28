@@ -15,6 +15,7 @@
 actual '='
 \end{filecontents*}
 
+\usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{accents}
 \usepackage{makeidx}
@@ -234,9 +235,27 @@ actual '='
   {\string-#1}%
 }
 
+\definecolor{defbackground}{rgb}{1,1,0.75}
+\newsavebox\defsbox
+\newlength\defwidth
+
 \newenvironment{definition}%
- {\begin{flushleft}\ttfamily\ignorespaces}%
- {\end{flushleft}}
+{%
+  \setlength{\fboxsep}{4pt}\setlength{\fboxrule}{1.25pt}%
+  \begin{lrbox}{\defsbox}%
+   \setlength\defwidth\linewidth
+   \addtolength\defwidth{-2\fboxrule}%
+   \addtolength\defwidth{-2\fboxsep}%
+   \begin{minipage}{\defwidth}
+   \flushleft\ttfamily\ignorespaces
+}%
+{%
+   \end{minipage}%
+  \end{lrbox}\par\medskip\noindent
+  \fcolorbox{black}{defbackground}{\usebox\defsbox}%
+  \medskip\par\noindent
+  \ignorespacesafterend
+}
 
 % This is a bit fiddly. Need to represent \vec{v} in typewriter
 % font for the interpreter examples. ($\mathtt{\vec{v}}$ doesn't
@@ -2521,7 +2540,27 @@ If \meta{value} is omitted, \optfmt{true} is assumed.
 \subsection{\csoptnv{loc-suffix}=\margm{value}}
 \labelopt{loc-suffix}
 
-Not yet implemented.
+This is similar to \optref{loc-prefix} but there are some subtle
+differences. In this case \meta{value} may either be the keyword 
+\optfmt{false} (in which case the location suffix is omitted)
+or a comma-separated list
+\optfmt{\meta{suffix-0}\dcomma\meta{suffix-1}\dcomma\ldots\dcomma\meta{suffix-n}}
+where \meta{suffix-0} is the suffix to use when the location list
+only has a cross-reference with no locations, \meta{suffix-1} is the suffix to use
+when the location list has one location (optionally with a
+cross-reference), and so on. The final \meta{suffix-n} in the list
+is the suffix when the location list has \meta{n} or more locations
+(optionally with a cross-reference).
+
+This option will append \csref{bibglslocsuffix}\margm{n} to location
+lists that either have a cross-reference or have at least one location.
+Unlike \cs{bibglslocprefix}, this command isn't used when the
+location list is completely empty. Also, unlike
+\cs{bibglslocprefix}, this suffix command doesn't have an equivalent
+to \cs{bibglspostlocprefix}.
+
+If \meta{value} omitted, \csopt[\cs{@}.]{loc-suffix} is assumed.
+The default is \csopt[false]{loc-suffix}.
 
 \section{Sorting}
 \label{sec:sortingopts}
@@ -3077,6 +3116,10 @@ Not yet implemented.
 \section{\cs{bibglsseesep}}
 \labelcs{bibglsseesep}
 
+\begin{definition}
+\cs{bibglsseesep}
+\end{definition}
+
 Any entries that provide a \field{see} field (and that field hasn't
 be omitted from the location list with \csopt[omit]{see}) will
 have \cs{bibglsseesep} inserted between the \field{see} part and the
@@ -3101,6 +3144,10 @@ Or you can redefine it afterwards:
 \section{\cs{bibglspostlocprefix}}
 \labelcs{bibglspostlocprefix}
 
+\begin{definition}
+\cs{bibglspostlocprefix}
+\end{definition}
+
 If the \optref{loc-prefix} option is on, \csref{bibglslocprefix} will
 be inserted at the start of location lists. The command \cs{bibglspostlocprefix}
 is placed after the prefix text. This command is provided with:
@@ -3121,6 +3168,10 @@ Or you can redefine it afterwards:
 
 \section{\cs{bibglslocprefix}}
 \labelcs{bibglslocprefix}
+
+\begin{definition}
+\cs{bibglslocprefix}\margm{n}
+\end{definition}
 
 If the \optref{loc-prefix} option is on, this command will be
 provided. If the glossary type has been provided by \optref{type}
@@ -3155,6 +3206,38 @@ be added instead:
  }
 }
 \end{verbatim}
+
+\section{\cs{bibglslocsuffix}}
+\labelcs{bibglslocsuffix}
+
+\begin{definition}
+\cs{bibglslocsuffix}\margm{n}
+\end{definition}
+
+If the \optref{loc-suffix} option is on, this command will be
+provided. If the glossary type has been provided by \optref{type}
+(and \optref{dual-type} if there are any dual entries) then the
+definition of \cs{bibglslocsuffix} will be appended to the glossary
+preamble for the given type (or types if there are dual entries).
+
+This commands definition depends on the value provided by
+\optref{loc-suffix}. For example, with \csopt[\cs{@}.]{loc-suffix}
+the command is defined as:
+\begin{verbatim}
+\providecommand{\bibglslocsuffix}[1]{\@.}
+\end{verbatim}
+(which ignores the argument).
+
+Whereas with \csopt[\meta{A}\dcomma\meta{B}\dcomma\meta{C}]{loc-suffix}
+the command is defined as:
+\begin{verbatim}
+\providecommand{\bibglslocsuffix}[1]{\ifcase#1 A\or B\else C\fi}
+\end{verbatim}
+
+Note that this is slightly different from \cs{bibglslocprefix} as
+it includes the 0 case, which in this instance means that there were
+no locations but there was a cross-reference. This command isn't
+added when the location list is empty.
 
 \resetsecnumdepth
 

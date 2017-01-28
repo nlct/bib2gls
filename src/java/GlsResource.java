@@ -401,6 +401,26 @@ public class GlsResource
                locationPrefix = values;
             }
          }
+         else if (opt.equals("loc-suffix"))
+         {
+            String[] values = getStringArray(parser, "\\@.", list, opt);
+
+            if (values.length == 1)
+            {
+               if (values[0].equals("false"))
+               {
+                  locationSuffix = null;
+               }
+               else
+               {
+                  locationSuffix = values;
+               }
+            }
+            else
+            {
+               locationSuffix = values;
+            }
+         }
          else if (opt.equals("ignore-fields"))
          {
             skipFields = getStringArray(parser, list, opt);
@@ -1653,14 +1673,7 @@ public class GlsResource
               }
 
               writer.println(" \\providecommand{\\bibglslocprefix}[1]{%");
-              if (type == null)
-              {
-                 writer.println("  \\ifcase#1");
-              }
-              else
-              {
-                 writer.println("  \\ifcase##1");
-              }
+              writer.println("  \\ifcase#1");
 
               for (int i = 0; i < locationPrefix.length; i++)
               {
@@ -1674,6 +1687,42 @@ public class GlsResource
 
               writer.println("}");
          }
+
+         if (locationSuffix != null)
+         {
+            if (type == null)
+            {
+               writer.println("\\appto\\glossarypreamble{%");
+            }
+            else
+            {
+               writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
+            }
+
+            writer.print(" \\providecommand{\\bibglslocsuffix}[1]{");
+
+            if (locationSuffix.length == 1)
+            {
+               writer.print(locationSuffix[0]);
+            }
+            else
+            {
+               writer.format("\\ifcase#1 %s", locationSuffix[0]);
+
+               for (int i = 1; i < locationSuffix.length; i++)
+               {
+                  writer.format("\\%s %s",
+                      (i == locationSuffix.length-1 ? "else" : "or"), 
+                      locationSuffix[i]);
+               }
+
+               writer.print("\\fi");
+            }
+            writer.println("}");
+
+            writer.println("}");
+         }
+
 
          // syntax: {label}{opts}{name}{description}
 
@@ -1751,7 +1800,9 @@ public class GlsResource
             bib2gls.verbose(entry.getId());
 
             entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF, seeLocation, locationPrefix != null, locGap);
+              suffixF, suffixFF, seeLocation, 
+              locationPrefix != null, locationSuffix != null,
+              locGap);
 
             checkParent(entry, i, entries);
 
@@ -1794,7 +1845,10 @@ public class GlsResource
                bib2gls.verbose(entry.getId());
 
                entry.updateLocationList(minLocationRange,
-                 suffixF, suffixFF, seeLocation, locationPrefix != null, locGap);
+                 suffixF, suffixFF, seeLocation, 
+                 locationPrefix != null,
+                 locationSuffix != null,
+                 locGap);
                checkParent(entry, i, dualEntries);
 
                entry.writeBibEntry(writer);
@@ -2527,6 +2581,8 @@ public class GlsResource
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
    private String[] locationPrefix = null;
+
+   private String[] locationSuffix = null;
 
    private String labelPrefix = null, dualPrefix="dual.";
 

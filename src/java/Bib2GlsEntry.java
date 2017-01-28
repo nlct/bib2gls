@@ -830,7 +830,8 @@ public class Bib2GlsEntry extends BibEntry
    }
 
    public void updateLocationList(int minRange, String suffixF,
-     String suffixFF, int seeLocation, boolean showLocationPrefix, int gap)
+     String suffixFF, int seeLocation, boolean showLocationPrefix, 
+     boolean showLocationSuffix, int gap)
    throws Bib2GlsException
    {
       StringBuilder builder = null;
@@ -1090,6 +1091,12 @@ public class Bib2GlsEntry extends BibEntry
 
       if (builder != null)
       {
+         if (showLocationSuffix && (records.size() > 0 || crossRefs != null))
+         {
+            builder.append(String.format("\\bibglslocsuffix{%d}",
+              records.size()));
+         }
+
          fieldValues.put("location", builder.toString());
       }
    }
