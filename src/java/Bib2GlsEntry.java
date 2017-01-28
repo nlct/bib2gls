@@ -886,7 +886,7 @@ public class Bib2GlsEntry extends BibEntry
             builder = new StringBuilder();
          }
 
-         builder.append(String.format("\\bibglsprefix{%d}",
+         builder.append(String.format("\\bibglslocprefix{%d}",
            records.size()));
       }
 

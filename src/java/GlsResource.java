@@ -1641,7 +1641,7 @@ public class GlsResource
 
          if (locationPrefix != null)
          {
-              writer.println("\\providecommand{\\bibglspostprefix}{\\ }");
+              writer.println("\\providecommand{\\bibglspostlocprefix}{\\ }");
 
               if (type == null)
               {
@@ -1652,7 +1652,7 @@ public class GlsResource
                  writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
               }
 
-              writer.println(" \\providecommand{\\bibglsprefix}[1]{%");
+              writer.println(" \\providecommand{\\bibglslocprefix}[1]{%");
               if (type == null)
               {
                  writer.println("  \\ifcase#1");
@@ -1664,7 +1664,7 @@ public class GlsResource
 
               for (int i = 0; i < locationPrefix.length; i++)
               {
-                 writer.format("  \\%s %s\\bibglspostprefix%n",
+                 writer.format("  \\%s %s\\bibglspostlocprefix%n",
                    (i == locationPrefix.length-1 ? "else" : "or"), 
                    locationPrefix[i]);
               }
