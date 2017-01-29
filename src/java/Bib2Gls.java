@@ -1399,7 +1399,7 @@ public class Bib2Gls implements TeXApp
 
          debug(msg);
 
-         throw new IOException(msg);
+         throw new FileNotFoundException(msg);
       }
 
       return line;

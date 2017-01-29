@@ -110,6 +110,13 @@ test-pifonts.glstex	: test-pifonts.tex $(DEPS) test-pifonts.bib
 		pdflatex test-pifonts
 		$(BIB2GLS) test-pifonts
 
+test-multipar.pdf	: test-multipar.glstex
+		pdflatex test-multipar
+
+test-multipar.glstex	: test-multipar.tex $(DEPS) entries-multipar.bib
+		pdflatex test-multipar
+		$(BIB2GLS) test-multipar
+
 clean	:
 	$(RM) *.aux
 	$(RM) *.log

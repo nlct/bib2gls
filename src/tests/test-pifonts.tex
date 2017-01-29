@@ -16,16 +16,15 @@
   selection={all}
 ]
 
-\glsxtrresourcefile[
+\GlsXtrLoadResources[
   src={test-pifonts},% test-pifonts.bib
   sort={letter-case},
   type={byname},
   label-prefix={byname.},
   selection={all}
 ]
-{\jobname-byname}
 
-\glsxtrresourcefile[
+\GlsXtrLoadResources[
   src={test-pifonts},% test-pifonts.bib
   sort={locale},
   sort-field={description},
@@ -33,9 +32,8 @@
   label-prefix={bydesc.},
   selection={all}
 ]
-{\jobname-bydesc}
 
-\glsxtrresourcefile[
+\GlsXtrLoadResources[
   src={test-pifonts},% test-pifonts.bib
   sort={letter},
   sort-field={id},
@@ -43,7 +41,6 @@
   label-prefix={byid.},
   selection={all}
 ]
-{\jobname-byid}
 
 \begin{document}
 Test document.

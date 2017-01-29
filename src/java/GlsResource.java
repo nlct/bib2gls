@@ -40,7 +40,7 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 public class GlsResource
 {
    public GlsResource(TeXParser parser, AuxData data)
-    throws IOException,InterruptedException
+    throws IOException,InterruptedException,Bib2GlsException
    {
       sources = new Vector<TeXPath>();
 
@@ -48,7 +48,8 @@ public class GlsResource
    }
 
    private void init(TeXParser parser, TeXObject opts, TeXObject arg)
-      throws IOException,InterruptedException
+      throws IOException,InterruptedException,
+             Bib2GlsException,IllegalArgumentException
    {
 
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
@@ -638,7 +639,15 @@ public class GlsResource
 
       if (srcList == null)
       {
-         sources.add(bib2gls.getBibFilePath(parser, filename));
+         try
+         {
+            sources.add(bib2gls.getBibFilePath(parser, filename));
+         }
+         catch (FileNotFoundException e)
+         {
+            throw new Bib2GlsException(
+              bib2gls.getMessage("error.missing.src", filename+".bib"), e);
+         }
       }
    }
 

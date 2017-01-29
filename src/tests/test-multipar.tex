@@ -1,0 +1,17 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\setabbreviationstyle{short-long-desc}
+
+\GlsXtrLoadResources[src={entries-multipar}]
+
+\begin{document}
+\gls{loremiii-iv}.
+\gls{loremi-ii}.
+\gls{loremv-vi}.
+
+\printunsrtglossaries
+
+\end{document}

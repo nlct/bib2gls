@@ -183,6 +183,8 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.only.one.aux">Only one aux file permitted.</entry>
 <entry key="error.no.aux">Missing aux file. Use --help for help.</entry>
 <entry key="error.file.not.found">File not found: {0}</entry>
+<entry key="error.missing.src">File not found: {0}
+(Did you forget to use the ''src'' key?)</entry>
 <entry key="error.dir.not.found">Directory not found: {0}</entry>
 <entry key="error.not.dir">Not a directory: {0}</entry>
 <entry key="error.cant.open.log">Can't open log file: {0}</entry>

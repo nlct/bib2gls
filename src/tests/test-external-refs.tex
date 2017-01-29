@@ -13,14 +13,13 @@
  src={entries-terms}% bib files
 ]
 
-\glsxtrresourcefile[% bib2gls options
+\GlsXtrLoadResources[% bib2gls options
  sort=none,% 'none' or 'use' or 'locale' or specific locale
  label-prefix={sym.},% prefix labels
  ext-prefixes={gls.},% prefixes for external labels
  type=symbols,% put all entries into 'symbol' glossary
  src={entries-symbols}% bib file
 ]
-{\jobname-syms}% .glstex file
 
 \begin{document}
 A \gls{gls.matrix} ($\gls{sym.M}$), 

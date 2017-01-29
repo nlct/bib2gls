@@ -29,23 +29,25 @@
 
 % loads entries-abbrv.glstex
 % finds entries in entries-abbrv.bib
-\glsxtrresourcefile[% bib2gls options
+\GlsXtrLoadResources[% bib2gls options
+ src={entries-abbrv},% data in entries-abbrv.bib
  sort=en,% 'none' or 'use' or 'locale' or 'letter-case'
          % or 'letter-nocase' or specific locale
  %ignore-fields={description,see},% ignore fields listed in this value
  ignore-fields={description},% ignore fields listed in this value
- type=abbreviations]{entries-abbrv}
+ type=abbreviations]
 
 % loads entries-symbols.glstex
 % finds entries in entries-symbols.bib
-\glsxtrresourcefile[% bib2gls options
+\GlsXtrLoadResources[% bib2gls options
+ src={entries-symbols},% data in entries-symbols.bib
  %sort=none,% 'none' or 'use' or 'locale' or 'letter-case'
             % or 'letter-nocase' or specific locale
  %sort=letter-nocase,%
  sort=locale,%
  loc-prefix={Location:},% prefix location list
  loc-suffix,% terminate location lists with \@.
- type=symbols]{entries-symbols}
+ type=symbols]
 
 \begin{document}
 A \gls{matrix}, a \gls{vector} and the \gls{cardinality}

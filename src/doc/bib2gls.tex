@@ -1562,21 +1562,37 @@ the document using
 \cs{glsxtrresourcefile}\oargm{options}\margm{filename}
 \end{definition}
 where \meta{filename} is the name of the resource file without the
-\ext{glstex} extension. There's a shortcut command that uses
+\ext{glstex} extension.
+You can have multiple \cs{glsxtrresourcefile} commands within your
+document, but each \meta{filename} must be unique, otherwise \LaTeX\
+would attempt to input the same \ext{glstex} file multiple times.
+\bibgls\ checks for non-unique file names.
+
+There's a shortcut command that uses
 \cs{jobname} as the \meta{filename}:
 \begin{definition}
 \cs{GlsXtrLoadResources}\oargm{options}
 \end{definition}
-This is equivalent to
+The first instance of this command is equivalent to
 \begin{definition}
 \cs{glsxtrresourcefile}\oargm{options}\marg{\cs{jobname}}
 \end{definition}
-
-You can have multiple \cs{glsxtrresourcefile} commands within your
-document, but each \meta{filename} must be unique. For this reason, 
-\cs{GlsXtrLoadResources} can only be used once, otherwise \LaTeX\
-would attempt to load \cs{jobname}\ext{glstex} multiple times.
-\bibgls\ checks for non-unique file names.
+Any additional use of \cs{GlsXtrLoadResources} is equivalent to
+\begin{definition}
+\cs{glsxtrresourcefile}\oargm{options}\marg{\cs{jobname}-\meta{n}}
+\end{definition}
+where \meta{n} is number. For example:
+\begin{verbatim}
+\GlsXtrLoadResources[src=entries-en,sort={en}]
+\GlsXtrLoadResources[src=entries-fr,sort={fr}]
+\GlsXtrLoadResources[src=entries-de,sort={de-1996}]
+\end{verbatim}
+This is equivalent to:
+\begin{verbatim}
+\glsxtrresourcefile[src=entries-en,sort={en}]{\jobname}
+\glsxtrresourcefile[src=entries-fr,sort={fr}]{\jobname-1}
+\glsxtrresourcefile[src=entries-de,sort={de-1996}]{\jobname-2}
+\end{verbatim}
 
 The optional argument \meta{options} is a comma-separated 
 \meta{key}=\meta{value} list. Allowed options are listed below.
@@ -1596,8 +1612,8 @@ For example, if the files \filefmt{entries-terms.bib} and
 \end{verbatim}
 Alternatively, if they have different settings:
 \begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms}]
-\glsxtrresourcefile[sort=use]{entries-symbols}
+\GlsXtrLoadResources[src={entries-terms},type=main]
+\GlsXtrLoadResources[src={entries-symbols},sort=use,type=symbols]
 \end{verbatim}
 
 \section{General Options}
@@ -1615,6 +1631,9 @@ then you can supply the correct encoding using
 \csopt[encoding-name]{charset}. In general, it's better to include
 the encoding in the \ext{bib} file where it can also be read by
 JabRef.
+
+See \argref{tex-encoding} for the encoding used to write the \ext{glstex}
+file.
 
 \subsection{\csoptnv{set-widest}=\margm{boolean}}
 \labelopt{set-widest}
@@ -2114,12 +2133,11 @@ two files can be loaded without conflict using:
  ext-prefixes={sym.}
 ]
 
-\glsxtrresourcefile[src={entries-symbols},
+\GlsXtrLoadResources[src={entries-symbols},
  type=symbols,
  label-prefix={sym.},
- ext-prefixes={gls.},
+ ext-prefixes={gls.}
 ]
-{\jobname-sym}
 \end{verbatim}
 
 Now the \texttt{set} entry from \filefmt{entries-terms.bib}
@@ -2607,7 +2625,7 @@ given by the IETF language tag \meta{lang tag}.
 For example:
 \begin{verbatim}
 \GlsXtrLoadResources[src={english-terms},sort={en}]
-\glsxtrresourcefile[sort={de-1996}]{german-terms}
+\GlsXtrLoadResources[src={german-terms},sort={de-1996}]
 \end{verbatim}
 
 \subsection{\csoptnv{sort-field}=\margm{label}}

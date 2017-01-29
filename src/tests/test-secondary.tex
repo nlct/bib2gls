@@ -22,7 +22,7 @@
 ]
 % temporary file is called \jobname.glstex
 
-\glsxtrresourcefile[
+\GlsXtrLoadResources[
   src={entries-symbols},% entries defined in entries-terms.bib
   type=symbols,% put these entries in the 'symbols' glossary
   sort={use},% sort according to use
@@ -36,7 +36,6 @@
                        % This duplicate list is sorted according
                        % to the entry label.
 ]
-{\jobname-sym}% temporary file is called \jobname-sym.glstex
 
 \newcommand*{\printsummary}{%
  \printunsrtglossary*[type=copies,nonumberlist,target=false,title=Summary]{%
