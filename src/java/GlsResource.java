@@ -287,7 +287,7 @@ public class GlsResource
          }
          else if (opt.equals("sort"))
          {
-            sort = getOptional(parser, "locale", list, opt);
+            sort = getOptional(parser, "doc", list, opt);
 
             if (sort.equals("none") || sort.equals("unsrt"))
             {
@@ -296,7 +296,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-sort"))
          {
-            dualSort = getOptional(parser, "locale", list, opt);
+            dualSort = getOptional(parser, "doc", list, opt);
 
             if (dualSort.equals("unsrt"))
             {
@@ -488,6 +488,16 @@ public class GlsResource
             throw new IllegalArgumentException(
              bib2gls.getMessage("error.syntax.unknown_option", opt));
          }
+      }
+
+      if ("doc".equals(sort))
+      {
+         sort = bib2gls.getDocDefaultLocale();
+      }
+
+      if ("doc".equals(dualSort))
+      {
+         dualSort = bib2gls.getDocDefaultLocale();
       }
 
       if (selectionMode == SELECTION_ALL && "use".equals(sort))

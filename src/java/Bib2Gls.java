@@ -812,6 +812,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@fields", 1);
             addAuxCommand("glsxtr@record", 5);
             addAuxCommand("glsxtr@texencoding", 1);
+            addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
          }
       };
@@ -847,6 +848,10 @@ public class Bib2Gls implements TeXApp
             {
                setShortCuts(data.getArg(0).toString(parser));
             }
+         }
+         else if (name.equals("glsxtr@langtag"))
+         {
+            setDocDefaultLocale(data.getArg(0).toString(parser));
          }
          else if (texCharset == null && name.equals("glsxtr@texencoding"))
          {
@@ -1994,6 +1999,7 @@ public class Bib2Gls implements TeXApp
    private void initMessages() throws Bib2GlsException,IOException
    {
       Locale locale = Locale.getDefault();
+      docLocale = locale.toLanguageTag();
 
       String lang = locale.toLanguageTag();
 
@@ -2116,6 +2122,16 @@ public class Bib2Gls implements TeXApp
          throw new IllegalArgumentException(
            "Invalid shortcut value: "+value);
       }
+   }
+
+   public void setDocDefaultLocale(String languageTag)
+   {
+      docLocale = languageTag;
+   }
+
+   public String getDocDefaultLocale()
+   {
+      return docLocale;
    }
 
    private void parseArgs(String[] args)
@@ -2567,6 +2583,8 @@ public class Bib2Gls implements TeXApp
    private boolean checkAbbrvShortcuts = false;
 
    private GlsResource currentResource = null;
+
+   private String docLocale;
 
    private boolean interpret = true;
 

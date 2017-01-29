@@ -236,7 +236,9 @@ public class Bib2GlsEntry extends BibEntry
       {
          TeXObject object = list.get(i);
 
-         if (object.isPar())
+         if (object.isPar() 
+             || (object instanceof TeXCsRef
+                  && ((TeXCsRef)object).getName().equals("par")))
          {
             // paragraph breaks need to be replaced with \glspar 
 

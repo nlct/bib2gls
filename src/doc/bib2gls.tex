@@ -2611,7 +2611,12 @@ The \csopt{sort} key indicates how entries should be sorted. The
 \meta{value} may be one of:
 \begin{itemize}
 \item \texttt{locale}: sort the entries according to the operating
-system's locale (default).
+system's locale.
+\item \texttt{doc}: sort the entries according to the document
+language. In the case of a multi-lingual document, this will be
+the last language resource file to be loaded through
+\sty{tracklang}'s interface. If no languages have been tracked, this
+option is equivalent to \csopt[locale]{sort}.
 \item \texttt{none} (or \texttt{unsrt}): don't sort the entries.
 \item \texttt{use}: sort in order of use. (This order is determined
 by the records written to the \ext{aux} file by the \styopt{record}
@@ -2621,11 +2626,40 @@ package option.)
 \item \meta{lang tag}: sort according to the rules of the locale
 given by the IETF language tag \meta{lang tag}.
 \end{itemize}
+If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
+\csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
 
+Note that \csopt[locale]{sort} can provide more detail about the
+locale than \csopt[doc]{sort}, depending on how the document
+language has been specified.
+
+For example, with:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[ngerman]{babel}
+\usepackage[record]{glossaries}
+\GlsXtrLoadResources[src={german-terms}]
+\end{verbatim}
+the language tag will be \texttt{de-1996}, which doesn't have an
+associated region. Whereas with
+\begin{verbatim}
+\documentclass[de-DE-1996]{article}
+\usepackage[ngerman]{babel}
+\usepackage[record]{glossaries}
+\GlsXtrLoadResources[src={german-terms}]
+\end{verbatim}
+the language tag will be \texttt{de-DE-1996} because \sty{tracklang}
+has picked up the locale from the document class options. This is
+only likely to cause a difference if a language has different
+sorting rules according to the region or if the language may be
+written in multiple scripts.
+
+A multilingual document will need to have the \csopt{sort} specified
+when loading the resource to ensure the correct language is chosen. 
 For example:
 \begin{verbatim}
-\GlsXtrLoadResources[src={english-terms},sort={en}]
-\GlsXtrLoadResources[src={german-terms},sort={de-1996}]
+\GlsXtrLoadResources[src={english-terms},sort={en-GB}]
+\GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
 \end{verbatim}
 
 \subsection{\csoptnv{sort-field}=\margm{label}}
