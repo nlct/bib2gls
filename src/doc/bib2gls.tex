@@ -544,16 +544,14 @@ The \bibgls\ application requires the \TeX\ Parser Library
 and \ext{bib} files.
 
 With the \argref{interpret} switch on (default), this library is
-also used to interpret the value of the fallback field
-used when the \field{sort} field is missing (when the \optref{sort}
+also used to interpret the value of the sort field when it
+contains a backslash \verb|\| or dollar symbol \verb|$| (and when the \optref{sort}
 option is not
 \optfmt{unsrt} or \optfmt{none} or \optfmt{use}). The other case is with
 \optref{set-widest} when determining the width of the \field{name}
 field. The \argref{no-interpret} switch will turn off this
 function, but the library will still be used to parse the \ext{aux}
-and \ext{bib} files. If your \field{name} fields only contain
-simple text with no \TeX\ markup, \bibgls\ will run faster
-with \argref{no-interpret}.
+and \ext{bib} files.
 
 The \file{texparserlib.jar} library is not intended as a full-blown
 \TeX\ engine and there are plenty of situations where it doesn't
@@ -618,12 +616,12 @@ category attribute might be set to \optfmt{firstuc}, which
 automatically converts the first letter of the name to 
 upper case when displaying the glossary.)
 
-None of these entries have a \field{sort} field.
-With \argref{no-interpret} the \atentryref{symbol} entry type
-will fallback on the entry's label when the \field{sort} field
-is missing. With \argref{interpret} the \field{name} field
-will be used as the fallback (or the \field{parent} if 
-\field{name} is missing).
+None of these entries have a \field{sort} field. With
+\argref{interpret} the fallback
+for this field for the \atentryref{symbol} entry type is
+the \field{name} field (or \field{parent} if \field{name} is
+missing), but with \argref{no-interpret} the fallback is the entry's
+label.
 
 This means that with \argref{no-interpret}, and the default
 \optref[sort]{sort-field}, and with

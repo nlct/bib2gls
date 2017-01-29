@@ -56,18 +56,6 @@ public class Bib2GlsIndex extends Bib2GlsEntry
    {// no required fields
    }
 
-   public String getDefaultSort()
-   {
-      String name = getFieldValue("name");
-
-      if (name == null)
-      {
-         return getOriginalId();
-      }
-
-      return bib2gls.interpret(name, getField("name"));
-   }
-
    public String getFallbackValue(String field)
    {
       if (field.equals("name"))

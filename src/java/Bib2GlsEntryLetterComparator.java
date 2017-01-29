@@ -26,6 +26,8 @@ import java.text.CollationKey;
 import java.text.Normalizer;
 import java.util.HashMap;
 
+import com.dickimawbooks.texparserlib.bib.BibValueList;
+
 public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
@@ -54,17 +56,25 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       {
          value = entry.getFieldValue(sortField);
 
+         BibValueList list = entry.getField(sortField);
+
          if (value == null)
          {
             value = entry.getFallbackValue(sortField);
+            list = entry.getFallbackContents(sortField);
+         }
 
-            if (value == null)
-            {
-               value = id;
+         if (value == null)
+         {
+            value = id;
 
-               bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
-                 id));
-            }
+            bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
+              id));
+         }
+         else if (bib2gls.useInterpreter() && list != null 
+                   && value.matches(".*[\\\\\\$].*"))
+         {  
+            value = bib2gls.interpret(value, list);
          }
       }
 
@@ -93,6 +103,11 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
          else
          {
+            if (str.equals("\\"))
+            {
+               str = "\\char`\\\\";
+            }
+
             entry.putField("group", 
                String.format("\\bibglsothergroup{%s}{%d}", 
                              str, codePoint));

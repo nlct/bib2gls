@@ -577,37 +577,7 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      if (fieldValues.get("sort") == null)
-      {
-         String sort = getDefaultSort();
-
-         if (sort == null)
-         {
-            bib2gls.warning(parser, 
-              bib2gls.getMessage("warning.no.default.sort", getId()));
-            putField("sort", getId());
-         }
-         else
-         {
-            putField("sort", sort);
-         }
-      }
-
       checkRequiredFields(parser);
-   }
-
-   public String getDefaultSort()
-   {
-      String val = fieldValues.get("name");
-      BibValueList obj = getField("name");
-
-      if (val == null)
-      {
-         val = fieldValues.get("parent");
-         obj = getField("parent");
-      }
-
-      return bib2gls.interpret(val, obj);
    }
 
    public String getFallbackValue(String field)
@@ -672,6 +642,28 @@ public class Bib2GlsEntry extends BibEntry
 
          return value == null ? getFallbackValue("plural") : value;
       }
+      else if (field.equals("shortplural"))
+      {
+         String value = getFieldValue("short");
+
+         if (value != null)
+         {
+            String suffix = resource.getShortPluralSuffix();
+
+            return suffix == null ? value : value+suffix;
+         }
+      }
+      else if (field.equals("longplural"))
+      {
+         String value = getFieldValue("long");
+
+         if (value != null)
+         {
+            String suffix = resource.getPluralSuffix();
+
+            return suffix == null ? value : value+suffix;
+         }
+      }
 
       return null;
    }
@@ -688,19 +680,145 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("sort"))
       {
-         return getField("name");
+         BibValueList contents = getField("name");
+
+         return contents == null ? getFallbackContents("name") : contents;
       }
       else if (field.equals("first"))
       {
-         return getFallbackContents("text");
+         BibValueList contents = getField("text");
+
+         return contents == null ? getFallbackContents("text") : contents;
       }
       else if (field.equals("plural"))
       {
-         return getFallbackContents("text");
+         BibValueList contents = getField("text");
+
+         if (contents == null)
+         {
+            contents = getFallbackContents("text");
+         }
+
+         if (contents == null) return null;
+
+         contents = (BibValueList)contents.clone();
+
+         int n = contents.size();
+
+         if (n > 2)
+         {
+            BibValue firstObj = contents.firstElement();
+            BibValue lastObj = contents.lastElement();
+
+            if (firstObj.equals(lastObj)
+             && firstObj instanceof CharObject
+             && ((CharObject)firstObj).getCharCode() == '"')
+            {
+               contents.add(n-1,
+                  new BibUserString(new TeXCsRef("glspluralsuffix")));
+            }
+            else
+            {
+               contents.add(new BibUserString(new TeXCsRef("glspluralsuffix")));
+            }
+         }
+
+         return contents;
       }
       else if (field.equals("firstplural"))
       {
-         return getFallbackContents("first");
+         BibValueList contents = getField("first");
+
+         if (contents == null)
+         {
+            contents = getField("plural");
+
+            return contents == null ? getFallbackContents("plural") : contents;
+         }
+
+         contents = (BibValueList)contents.clone();
+
+         int n = contents.size();
+
+         if (n > 2)
+         {
+            BibValue firstObj = contents.firstElement();
+            BibValue lastObj = contents.lastElement();
+
+            if (firstObj.equals(lastObj)
+             && firstObj instanceof CharObject
+             && ((CharObject)firstObj).getCharCode() == '"')
+            {
+               contents.add(n-1,
+                  new BibUserString(new TeXCsRef("glspluralsuffix")));
+            }
+            else
+            {
+               contents.add(new BibUserString(new TeXCsRef("glspluralsuffix")));
+            }
+         }
+
+         return contents;
+      }
+      else if (field.equals("longplural"))
+      {
+         BibValueList contents = getField("long");
+
+         if (contents == null) return null;
+
+         contents = (BibValueList)contents.clone();
+
+         int n = contents.size();
+
+         if (n > 2)
+         {
+            BibValue firstObj = contents.firstElement();
+            BibValue lastObj = contents.lastElement();
+
+            if (firstObj.equals(lastObj)
+             && firstObj instanceof CharObject
+             && ((CharObject)firstObj).getCharCode() == '"')
+            {
+               contents.add(n-1,
+                  new BibUserString(new TeXCsRef("glspluralsuffix")));
+            }
+            else
+            {
+               contents.add(new BibUserString(new TeXCsRef("glspluralsuffix")));
+            }
+         }
+
+         return contents;
+      }
+      else if (field.equals("shortplural"))
+      {
+         BibValueList contents = getField("short");
+
+         if (contents == null) return null;
+
+         contents = (BibValueList)contents.clone();
+
+         int n = contents.size();
+
+         if (n > 2)
+         {
+            BibValue firstObj = contents.firstElement();
+            BibValue lastObj = contents.lastElement();
+
+            if (firstObj.equals(lastObj)
+             && firstObj instanceof CharObject
+             && ((CharObject)firstObj).getCharCode() == '"')
+            {
+               contents.add(n-1,
+                  new BibUserString(new TeXCsRef("abbrvpluralsuffix")));
+            }
+            else
+            {
+               contents.add(new BibUserString(new TeXCsRef("abbrvpluralsuffix")));
+            }
+         }
+
+         return contents;
       }
 
       return null;

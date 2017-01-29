@@ -26,6 +26,8 @@ import java.text.CollationKey;
 import java.text.Normalizer;
 import java.util.HashMap;
 
+import com.dickimawbooks.texparserlib.bib.BibValueList;
+
 public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
@@ -60,29 +62,34 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       if (sortField.equals("id"))
       {
          value = id;
-         entry.putField("sort", value);
       }
       else
       {
          value = entry.getFieldValue(sortField);
 
+         BibValueList list = entry.getField(sortField);
+
          if (value == null)
          {
             value = entry.getFallbackValue(sortField);
+            list = entry.getFallbackContents(sortField);
+         }
 
-            if (value == null)
-            {
-               value = id;
+         if (value == null)
+         {
+            value = id;
 
-               bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
-                 id));
-            }
-            else
-            {
-               entry.putField("sort", value);
-            }
+            bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
+              id, sortField));
+         }
+         else if (bib2gls.useInterpreter() && list != null
+                   && value.matches(".*[\\\\\\$].*"))
+         {
+            value = bib2gls.interpret(value, list);
          }
       }
+
+      entry.putField("sort", value);
 
       String grp = null;
 
@@ -121,6 +128,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
          }
          else
          {
+            if (str.equals("\\"))
+            {
+               str = "\\char`\\\\";
+            }
+
             entry.putField("group", 
                String.format("\\bibglsothergroup{%s}{%d}", 
                              str, codePoint));

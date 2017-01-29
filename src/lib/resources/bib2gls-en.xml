@@ -136,7 +136,8 @@ with range started by {1}</entry>
 <entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="message.discarding.entry">Discarding entry {0}</entry>
 <entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
-<entry key="message.calc.text.width">Calculated width of ''{0}'': {1,number}</entry>
+<entry key="message.calc.text.width">Calculated width of name field for entry ''{0}''</entry>
+<entry key="message.calc.text.width.result">Calculated width of ''{0}'': {1,number}</entry>
 <entry key="message.parsing.code">Parsing code block:</entry>
 <entry key="message.unknown.tex.charset">Unable to detect character encoding for TeX file.
 Defaulting to: {0}.
@@ -152,7 +153,8 @@ Defaulting to: {0}.
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.can.find.arg">Can't detect argument for: \{0}</entry>
-<entry key="warning.no.default.sort">Can't determine sort value for: {0}</entry>
+<entry key="warning.no.default.sort">Can't determine sort value for: {0}
+(Using sort field ''{1}''.)</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
 <entry key="warning.potential.nested.link">Entry ''{0}'' has potentially nested link text in field: {1}
 Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry>
@@ -180,6 +182,7 @@ Ignoring {1}</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}
 Defaulting to {1}. Use {2} to set another encoding.</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
+<entry key="error.missing.aux.cs.require_cs_or">Missing \{0} in aux file. (Have you used \{1} or \{2}?)</entry>
 <entry key="error.missing.records">No records found in aux file.
 Have you used the glossaries-extra.sty ''record'' option?
 Have you indexed your entries using commands like \gls?</entry>

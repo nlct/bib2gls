@@ -701,6 +701,15 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void provideCommand(String csName, String text)
+   {
+      L2HStringConverter listener = 
+        (L2HStringConverter)interpreter.getListener();
+
+      listener.putControlSequence(new GenericCommand(csName, null, 
+           listener.createString(text)));
+   }
+
    public void processPreamble(BibValueList list)
      throws IOException
    {
@@ -814,6 +823,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@texencoding", 1);
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
+            addAuxCommand("glsxtr@pluralsuffixes", 3);
          }
       };
 
@@ -832,13 +842,21 @@ public class Bib2Gls implements TeXApp
          initInterpreter(auxData);
       }
 
+      Vector<AuxData> resourceData = new Vector<AuxData>();
+
+      String pluralSuffix = "s";
+      String shortPluralSuffix = "s";
+      String acrPluralSuffix = "s";
+
       for (AuxData data : auxData)
       {
          String name = data.getName();
  
          if (name.equals("glsxtr@resource"))
          {
-            glsresources.add(new GlsResource(parser, data));
+            // defer creating resources until all aux data
+            // processed.
+            resourceData.add(data);
          }
          else if (name.equals("glsxtr@shortcutsval"))
          {
@@ -848,6 +866,12 @@ public class Bib2Gls implements TeXApp
             {
                setShortCuts(data.getArg(0).toString(parser));
             }
+         }
+         else if (name.equals("glsxtr@pluralsuffixes"))
+         {
+            pluralSuffix = data.getArg(0).toString(parser);
+            shortPluralSuffix = data.getArg(1).toString(parser);
+            acrPluralSuffix = data.getArg(1).toString(parser);
          }
          else if (name.equals("glsxtr@langtag"))
          {
@@ -1020,6 +1044,10 @@ public class Bib2Gls implements TeXApp
          }
       }
 
+      provideCommand("glspluralsuffix", pluralSuffix);
+      provideCommand("abbrvpluralsuffix", shortPluralSuffix);
+      provideCommand("acrpluralsuffix", acrPluralSuffix);
+
       if (texCharset == null)
       {
          texCharset = Charset.defaultCharset();
@@ -1032,11 +1060,18 @@ public class Bib2Gls implements TeXApp
          verbose(getMessage("message.tex.charset", texCharset));
       }
 
+      for (AuxData data : resourceData)
+      {
+         glsresources.add(new GlsResource(parser, data,
+            pluralSuffix, shortPluralSuffix));
+      }
+
       if (glsresources.size() == 0)
       {
          throw new Bib2GlsException(getMessage(
-           "error.missing.aux.cs.require_cs",
-           "glsxtr@resource", "glsxtrresourcefile"));
+           "error.missing.aux.cs.require_cs_or",
+           "glsxtr@resource", "glsxtrresourcefile", 
+           "GlsXtrLoadResources"));
       }
 
       if (fields.size() == 0)

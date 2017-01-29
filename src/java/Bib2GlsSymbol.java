@@ -40,14 +40,38 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
       }
    }
 
-   public String getDefaultSort()
+   public String getFallbackValue(String field)
    {
-      if (!bib2gls.useInterpreter())
+      if (field.equals("sort"))
       {
-         return getOriginalId();
+         if (bib2gls.useInterpreter())
+         {
+            return getOriginalId();
+         }
+
+         String val = getFieldValue("name");
+
+         return val == null ? getFallbackValue("name") : val;
       }
 
-      return super.getDefaultSort();
+      return super.getFallbackValue(field);
+
+   }
+
+   public BibValueList getFallbackContents(String field)
+   {
+      if (field.equals("sort"))
+      {
+         // This doesn't check for the interpreter since
+         // it's the String value from getFallbackValue
+         // that's checked by the comparator.
+
+         BibValueList val = getField("name");
+
+         return val == null ? getFallbackContents("name") : val;
+      }
+
+      return super.getFallbackContents(field);
    }
 
    public void writeBibEntry(PrintWriter writer)

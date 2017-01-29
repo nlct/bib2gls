@@ -32,19 +32,6 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
-   public String getDefaultSort()
-   {
-      String value = getFieldValue("short");
-
-      if (value == null)
-      {// shouldn't happen as the "short" field is required.
-
-         return super.getDefaultSort();
-      }
-
-      return bib2gls.interpret(value, getField("short"));
-   }
-
    public void checkRequiredFields(TeXParser parser)
    {
       if (getField("short") == null)
@@ -60,7 +47,16 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
    public String getFallbackValue(String field)
    {
-      String val = super.getFallbackValue(field);
+      String val;
+
+      if (field.equals("name"))
+      {
+         val = getFieldValue("short");
+
+         if (val != null) return val;
+      }
+
+      val = super.getFallbackValue(field);
 
       if (val != null) return val;
 
@@ -68,38 +64,28 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       {
          return getFieldValue("short");
       }
-      else if (field.equals("longplural"))
-      {
-         val = getFieldValue("long");
-
-         if (val == null)
-         {
-            val = getFallbackValue("long");
-
-            if (val == null) return null;
-         }
-
-         String suffix = getResource().getPluralSuffix();
-
-         return suffix == null ? val : val+suffix;
-      }
-      else if (field.equals("shortplural"))
-      {
-         val = getFieldValue("short");
-
-         if (val == null)
-         {
-            val = getFallbackValue("short");
-
-            if (val == null) return null;
-         }
-
-         String suffix = getResource().getShortPluralSuffix();
-
-         return suffix == null ? val : val+suffix;
-      }
 
       return null;
+   }
+
+   public BibValueList getFallbackContents(String field)
+   {
+      BibValueList val;
+
+      if (field.equals("sort"))
+      {
+         val = getField("name");
+
+         return val == null ? getFallbackContents("name") : val;
+      }
+      else if (field.equals("name"))
+      {
+         val = getField("short");
+
+         if (val != null) return val;
+      }
+
+      return super.getFallbackContents(field);
    }
 
    public void writeBibEntry(PrintWriter writer)

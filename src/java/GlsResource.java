@@ -39,10 +39,16 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class GlsResource
 {
-   public GlsResource(TeXParser parser, AuxData data)
+   public GlsResource(TeXParser parser, AuxData data, 
+     String pluralSuffix, String abbrvPluralSuffix)
     throws IOException,InterruptedException,Bib2GlsException
    {
       sources = new Vector<TeXPath>();
+
+      this.pluralSuffix = pluralSuffix;
+      this.shortPluralSuffix = abbrvPluralSuffix;
+      this.dualSymbolPluralSuffix = pluralSuffix;
+      this.dualDescPluralSuffix = pluralSuffix;
 
       init(parser, data.getArg(0), data.getArg(1));
    }
@@ -218,9 +224,9 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualAbbrvMap = getDualMap(parser, list, opt, keys);
+            dualAbbrevMap = getDualMap(parser, list, opt, keys);
 
-            dualAbbrvFirstMap = keys[0];
+            dualAbbrevFirstMap = keys[0];
          }
          else if (opt.equals("dual-symbol-map"))
          {
@@ -235,13 +241,13 @@ public class GlsResource
             if (getBoolean(parser, list, opt))
             {
                backLinkDualEntry = true;
-               backLinkDualAbbrv = true;
+               backLinkDualAbbrev = true;
                backLinkDualSymbol = true;
             }
             else
             {
                backLinkDualEntry = false;
-               backLinkDualAbbrv = false;
+               backLinkDualAbbrev = false;
                backLinkDualSymbol = false;
             }
          }
@@ -251,7 +257,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-abbrv-backlink"))
          {
-            backLinkDualAbbrv = getBoolean(parser, list, opt);
+            backLinkDualAbbrev = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-symbol-backlink"))
          {
@@ -532,19 +538,19 @@ public class GlsResource
          dualEntryFirstMap = "name";
       }
 
-      if (dualAbbrvMap == null)
+      if (dualAbbrevMap == null)
       {
-         dualAbbrvMap = new HashMap<String,String>();
-         dualAbbrvMap.put("short", "symbol");
-         dualAbbrvMap.put("shortplural", "symbolplural");
-         dualAbbrvMap.put("long", "description");
-         dualAbbrvMap.put("longplural", "descriptionplural");
-         dualAbbrvMap.put("symbol", "short");
-         dualAbbrvMap.put("symbolplural", "shortplural");
-         dualAbbrvMap.put("description", "long");
-         dualAbbrvMap.put("descriptionplural", "longplural");
+         dualAbbrevMap = new HashMap<String,String>();
+         dualAbbrevMap.put("short", "symbol");
+         dualAbbrevMap.put("shortplural", "symbolplural");
+         dualAbbrevMap.put("long", "description");
+         dualAbbrevMap.put("longplural", "descriptionplural");
+         dualAbbrevMap.put("symbol", "short");
+         dualAbbrevMap.put("symbolplural", "shortplural");
+         dualAbbrevMap.put("description", "long");
+         dualAbbrevMap.put("descriptionplural", "longplural");
 
-         dualAbbrvFirstMap = "short";
+         dualAbbrevFirstMap = "short";
       }
 
       if (dualSymbolMap == null)
@@ -636,12 +642,12 @@ public class GlsResource
          bib2gls.verbose(bib2gls.getMessage(
             "message.dual.abbreviation.mappings")); 
 
-         for (Iterator<String> it = dualAbbrvMap.keySet().iterator(); 
+         for (Iterator<String> it = dualAbbrevMap.keySet().iterator(); 
               it.hasNext(); )
          {
             String key = it.next();
             bib2gls.verbose(String.format("%s -> %s", 
-               key, dualAbbrvMap.get(key)));
+               key, dualAbbrevMap.get(key)));
          }
 
          bib2gls.logMessage();
@@ -1597,7 +1603,7 @@ public class GlsResource
       // check field mapping keys
 
       checkFieldMaps(dualEntryMap, "dual-entry-map");
-      checkFieldMaps(dualAbbrvMap, "dual-abbrv-map");
+      checkFieldMaps(dualAbbrevMap, "dual-abbrv-map");
       checkFieldMaps(dualSymbolMap, "dual-symbol-map");
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
@@ -2042,6 +2048,9 @@ public class GlsResource
       // preamble. Won't work on anything complicated and doesn't
       // take font changes into account.
 
+      bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width",
+        entry.getId()));
+
       name = bib2gls.interpret(name, entry.getField("name")).trim();
 
       int level = entry.getHierarchyCount();
@@ -2068,7 +2077,7 @@ public class GlsResource
          w = layout.getBounds().getWidth();
       }
 
-      bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width",
+      bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width.result",
         name, w));
 
       if (w > maxWidth)
@@ -2336,19 +2345,19 @@ public class GlsResource
       return backLinkDualSymbol;
    }
 
-   public HashMap<String,String> getDualAbbrvMap()
+   public HashMap<String,String> getDualAbbrevMap()
    {
-      return dualAbbrvMap;
+      return dualAbbrevMap;
    }
 
-   public String getFirstDualAbbrvMap()
+   public String getFirstDualAbbrevMap()
    {
-      return dualAbbrvFirstMap;
+      return dualAbbrevFirstMap;
    }
 
-   public boolean backLinkFirstDualAbbrvMap()
+   public boolean backLinkFirstDualAbbrevMap()
    {
-      return backLinkDualAbbrv;
+      return backLinkDualAbbrev;
    }
 
    public String getDualField()
@@ -2503,16 +2512,16 @@ public class GlsResource
 
    private String dualField = null;
 
-   private HashMap<String,String> dualEntryMap, dualAbbrvMap,
+   private HashMap<String,String> dualEntryMap, dualAbbrevMap,
       dualSymbolMap;
 
    // HashMap doesn't retain order, so keep track of the first
    // mapping separately.
 
-   private String dualEntryFirstMap, dualAbbrvFirstMap, dualSymbolFirstMap;
+   private String dualEntryFirstMap, dualAbbrevFirstMap, dualSymbolFirstMap;
 
    private boolean backLinkDualEntry=false;
-   private boolean backLinkDualAbbrv=false;
+   private boolean backLinkDualAbbrev=false;
    private boolean backLinkDualSymbol=false;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
