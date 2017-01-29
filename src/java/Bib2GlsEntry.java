@@ -573,7 +573,7 @@ public class Bib2GlsEntry extends BibEntry
 
             checkGlsCs(parser, list, protect, field);
 
-            fieldValues.put(field, list.toString(parser));
+            putField(field, list.toString(parser));
          }
       }
 
@@ -585,11 +585,11 @@ public class Bib2GlsEntry extends BibEntry
          {
             bib2gls.warning(parser, 
               bib2gls.getMessage("warning.no.default.sort", getId()));
-            fieldValues.put("sort", getId());
+            putField("sort", getId());
          }
          else
          {
-            fieldValues.put("sort", sort);
+            putField("sort", sort);
          }
       }
 
@@ -622,7 +622,11 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("sort"))
       {
-         return fieldValues.get("name");
+         String value = fieldValues.get("name");
+
+         if (value != null) return value;
+
+         return getFallbackValue("name");
       }
       else if (field.equals("first"))
       {
@@ -792,6 +796,11 @@ public class Bib2GlsEntry extends BibEntry
       if (value == null)
       {
          throw new NullPointerException();
+      }
+
+      if (bib2gls.trimFields())
+      {
+         value = value.trim();
       }
 
       return fieldValues.put(label, value);
@@ -1105,7 +1114,7 @@ public class Bib2GlsEntry extends BibEntry
               records.size()));
          }
 
-         fieldValues.put("location", builder.toString());
+         putField("location", builder.toString());
       }
    }
 
@@ -1159,7 +1168,7 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      fieldValues.put("see", builder.toString());
+      putField("see", builder.toString());
    }
 
    public void setCollationKey(CollationKey key)

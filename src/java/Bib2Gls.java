@@ -1985,6 +1985,14 @@ public class Bib2Gls implements TeXApp
          "--no-group"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.trim.fields",
+         "--trim-fields"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.trim.fields",
+         "--no-trim-fields"));
+
+      System.out.println();
       System.out.println(getMessage("syntax.tex.encoding",
          "--tex-encoding"));
 
@@ -2132,6 +2140,16 @@ public class Bib2Gls implements TeXApp
    public String getDocDefaultLocale()
    {
       return docLocale;
+   }
+
+   public void setTrimFields(boolean trimFields)
+   {
+      this.trimFields = trimFields;
+   }
+
+   public boolean trimFields()
+   {
+      return trimFields;
    }
 
    private void parseArgs(String[] args)
@@ -2350,6 +2368,14 @@ public class Bib2Gls implements TeXApp
             }
 
             texCharset = Charset.forName(args[i]);
+         }
+         else if (args[i].equals("--trim-fields"))
+         {
+            trimFields = true;
+         }
+         else if (args[i].equals("--no-trim-fields"))
+         {
+            trimFields = false;
          }
          else if (args[i].startsWith("-"))
          {
@@ -2585,6 +2611,8 @@ public class Bib2Gls implements TeXApp
    private GlsResource currentResource = null;
 
    private String docLocale;
+
+   private boolean trimFields = false;
 
    private boolean interpret = true;
 

@@ -64,7 +64,11 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       if (val != null) return val;
 
-      if (field.equals("longplural"))
+      if (field.equals("sort"))
+      {
+         return getFieldValue("short");
+      }
+      else if (field.equals("longplural"))
       {
          val = getFieldValue("long");
 

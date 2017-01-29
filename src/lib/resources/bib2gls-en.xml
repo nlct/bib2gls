@@ -86,6 +86,10 @@ See the manual for further details.</entry>
 			Add ''group'' field to entries.</entry>
 <entry key="syntax.no.group">{0}
 			Don''t add ''group'' field to entries.</entry>
+<entry key="syntax.trim.fields">{0}
+			Trim leading and trailing spaces from fields.</entry>
+<entry key="syntax.no.trim.fields">{0}
+			Don''t trim leading and trailing spaces from fields (default).</entry>
 <entry key="syntax.tex.encoding">{0} &lt;name&gt;
 			Set the character encoding for the output files.</entry>
 

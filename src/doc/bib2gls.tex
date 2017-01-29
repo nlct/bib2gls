@@ -1202,6 +1202,28 @@ operating system's default encoding. If this is incorrect or if
 the correct encoding using \longargfmt{tex-encoding} \meta{name}
 where \meta{name} is the encoding name.
 
+\section{\longarg{trim-fields}}
+\labelarg{trim-fields}
+
+Trim leading and trailing spaces from field values. For example,
+if the \ext{bib} file contains:
+\begin{verbatim}
+@entry{sample,
+  name = { sample },
+  description = {
+    an example
+  }
+}
+\end{verbatim}
+This will cause spurious spaces. Using \longarg{trim-fields} will
+automatically trim the values before writing the \ext{glstex} file.
+
+\section{\longarg{no-trim-fields}}
+\labelarg{no-trim-fields}
+
+Don't trim any leading or trailing spaces from field values. 
+This is the default setting.
+
 \chapter{\ext{bib} Format}
 \label{sec:bib}
 
@@ -2662,7 +2684,7 @@ For example:
 \GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
 \end{verbatim}
 
-\subsection{\csoptnv{sort-field}=\margm{label}}
+\subsection{\csoptnv{sort-field}=\margm{field}}
 \labelopt{sort-field}
 
 The \csopt{sort-field} key indicates which field provides the sort
@@ -2673,16 +2695,31 @@ value. The default is the \field{sort} field. For example
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
 
+If an entry is missing a value for \meta{field}, then the value of
+the fallback field will be used instead. For example, with the
+default \csopt[sort]{sort-field}, then for an entry defined with
+\atentry{entry}, if the \field{sort} field is missing the fallback
+field will be the \field{name} or the \field{parent} field if the
+\field{name} field is missing. If the entry is instead defined with
+\atentry{abbreviation} (or \atentry{acronym}) then if the
+\field{sort} field is missing, \bibgls\ will start with the same
+fallback as for \atentry{entry} but if neither the \field{name} or
+\field{parent} field is set, it will fallback on the \field{short}
+field.
+
+If no fallback field can be found, the entry's label will be used.
+
 \section{Dual Entries}
 
 \subsection{\csoptnv{dual-sort}=\margm{value}}
 \labelopt{dual-sort}
 
 This option indicates how to sort the dual entries. The primary
-entries are sorted with the normal entries. If
-\csopt[combine]{dual-sort} then the dual entries will be
-combined with the primary entries and sorted according to the
-\optref{sort} option.
+entries are sorted with the normal entries according to
+\optref{sort}, and the dual entries are sorted according to
+\csopt{dual-sort} unless \csopt[combine]{dual-sort} in which case the dual
+entries will be combined with the primary entries and all the
+entries will sorted together according to the \optref{sort} option.
 
 If \meta{value} isn't set to \optfmt{combine} then the dual
 entries are sorted separately according to \meta{value} (as per
@@ -2709,7 +2746,7 @@ This will sort the primary entries according to \optfmt{en}
 ]
 \end{verbatim}
 will combine the dual entries with the primary entries and sort them
-all according to the \optfmt{en-GB} locale.
+all according to the \optfmt{en-GB} locale (British English).
 
 If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
 \meta{value} is omitted, \optfmt{locale} is assumed.
