@@ -1,0 +1,45 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[ngerman,main=english]{babel}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,nomain,style=index]{glossaries-extra}
+
+\newglossary*{english}{English}
+\newglossary*{german}{German}
+
+\setabbreviationstyle{long-postshort-user}
+
+\renewcommand*{\glsxtrpostdescabbreviation}{%
+  \ifglshasfield{dualshort}{\glscurrententrylabel}
+  {%
+    \space(\glscurrentfieldvalue)%
+  }%
+  {}%
+}
+
+\renewcommand*{\glsxtruserfield}{duallong}
+
+\GlsXtrLoadResources[
+ src={entries-dual-abbrv},% entries-dual-abbrv.bib
+ type=english,% put primary entries in glossary 'english'
+ dual-type=german,% put primary entries in glossary 'german'
+ label-prefix={en.},% primary label prefix
+ dual-prefix={de.},% dual label prefix
+ sort=en,% sort primary entries according to language 'en'
+ dual-sort=de-1996,% sort dual entries according to 'de-1996'
+                   % (German new orthography)
+ dual-abbrv-backlink% add links in the glossary to the opposite
+                    %entry
+]
+
+\begin{document}
+
+English: \gls{en.rna}; \gls{en.rna}.
+
+German: \gls{de.rna}; \gls{de.rna}.
+
+\printunsrtglossaries
+\end{document}
