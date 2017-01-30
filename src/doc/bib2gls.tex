@@ -1809,6 +1809,12 @@ parenthetical material until after the link-text:
 If the back-link field has been switched to \field{duallong} then
 the post-description hook is no longer required.
 
+\section{\atentry{dualacronym}}
+\labelatentry{dualacronym}
+
+As \atentry{dualabbreviation} but defines the entries with
+\csref{bibglsnewdualacronym}.
+
 \chapter{Resource File Options}
 \label{sec:resourceopts}
 \setcounter{secnumdepth}{1}
@@ -3624,35 +3630,35 @@ Not yet implemented.
 \cs{bibglsnewdualabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{dualabbreviation} type where the \field{description} field
-is swapped with the \field{long} field. The definition provided in the
+\atentry{dualabbreviation} type where the \field{duallong} field
+is swapped with the \field{long} field and the \field{dualshort}
+field is swapped with the \field{short} field. The definition provided in the
 \ext{glstex} file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualabbreviation}[4]{%
-  \newabbreviation[#2,description={#4}]{#1}{#3}{#4}%
-}
-\end{verbatim}
-Note that this ensures that the \field{description} is set to the
-\field{long} value. If the \field{description} should not be the
-same as the \field{long} field, make sure you change the mapping
-using \optref{dual-abbrv-map} so that the \field{description} and
-\field{long} fields aren't swapped.
-
-\section{\cs{bibglsnewdualabbreviationdesc}}
-\labelcs{bibglsnewdualabbreviationdesc}
-
-\begin{definition}
-\cs{bibglsnewdualabbreviationdesc}\margm{label}\margm{options}\margm{short}\margm{long}
-\end{definition}
-This command is used to define terms identified with the
-\atentry{dualabbreviation} type where the \field{description} field
-is not swapped with the \field{long} field. The definition provided in the
-\ext{glstex} file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualabbreviationdesc}[4]{%
   \newabbreviation[#2]{#1}{#3}{#4}%
 }
 \end{verbatim}
+
+\section{\cs{bibglsnewdualacronym}}
+\labelcs{bibglsnewdualacronym}
+
+\begin{definition}
+\cs{bibglsnewdualacronym}\margm{label}\margm{options}\margm{short}\margm{long}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{dualacronym} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualacronym}[4]{%
+  \newacronym[#2]{#1}{#3}{#4}%
+}
+\end{verbatim}
+This works in much the same way as \cs{bibglsnewdualabbreviation}.
+Remember that with the \sty{glossaries-extra} package \cs{newacronym}
+is redefined to just use \cs{newabbreviation} with the default \field{type}
+set to \cs{acronymtype} and the default \field{category} set to
+\cs{acronym}.
 
 \section{\cs{bibglsseesep}}
 \labelcs{bibglsseesep}
