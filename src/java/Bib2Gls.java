@@ -676,6 +676,12 @@ public class Bib2Gls implements TeXApp
             {
                getWriter().write("&ge;");
             }
+            else if (codePoint > 0xffff)
+            {
+               getWriter().write(String.format("%c%c", 
+                   Character.highSurrogate(codePoint), 
+                   Character.lowSurrogate(codePoint)));
+            }
             else
             {
                getWriter().write(codePoint);
