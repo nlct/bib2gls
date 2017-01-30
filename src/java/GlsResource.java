@@ -176,7 +176,6 @@ public class GlsResource
                      p = Pattern.compile(String.format(
                             "(?:%s)|(?:%s)", p.pattern(), val));
                   }
-
                   try
                   {
                      fieldPatterns.put(field, p);
@@ -1172,6 +1171,11 @@ public class GlsResource
       TeXObjectList list)
     throws IOException
    {
+      while (list.size() == 1 && list.firstElement() instanceof TeXObjectList)
+      {
+         list = (TeXObjectList)list.firstElement();
+      }
+
       if (list.size() == 0) return null;
 
       Vector<TeXObject> split = new Vector<TeXObject>();
@@ -1218,7 +1222,9 @@ public class GlsResource
       {
          String field = it.next();
 
-         if (!bib2gls.isKnownField(field))
+         if (!bib2gls.isKnownField(field) 
+             && !field.equals(PATTERN_FIELD_ID)
+             && !field.equals(PATTERN_FIELD_ENTRY_TYPE))
          {
             bib2gls.warning(bib2gls.getMessage("warning.unknown.field.pattern",
               field));

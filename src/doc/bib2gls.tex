@@ -2016,6 +2016,45 @@ For example:
 \printunsrtglossary[title={Summary (by topic)},target=false]
 \end{verbatim}
 
+The alternative (or if more than two lists are required) is to
+reload the same \ext{bib} file with different label prefixes.
+For example, if the entries are stored in \filefmt{entries.bib}:
+\begin{verbatim}
+\newglossary*{nosort}{Symbols (Unsorted)}
+\newglossary*{byname}{Symbols (Letter Order)}
+\newglossary*{bydesc}{Symbols (Ordered by Description)}
+\newglossary*{byid}{Symbols (Ordered by Label)}
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={unsrt},
+  type={nosort}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={letter-case},
+  type={byname},
+  label-prefix={byname.}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={locale},
+  sort-field={description},
+  type={bydesc},
+  label-prefix={bydesc.}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={letter},
+  sort-field={id},
+  type={byid},
+  label-prefix={byid.}
+]
+\end{verbatim}
+
 \section{Selection Options}
 \label{sec:selectionopts}
 
@@ -3037,14 +3076,34 @@ language. In the case of a multi-lingual document, this will be
 the last language resource file to be loaded through
 \sty{tracklang}'s interface. If no languages have been tracked, this
 option is equivalent to \csopt[locale]{sort}.
+\item \meta{lang tag}: sort according to the rules of the locale
+given by the IETF language tag \meta{lang tag}.
 \item \texttt{none} (or \texttt{unsrt}): don't sort the entries.
 \item \texttt{use}: sort in order of use. (This order is determined
 by the records written to the \ext{aux} file by the \styopt{record}
 package option.)
 \item \texttt{letter-case}: case-sensitive letter sort.
 \item \texttt{letter-nocase}: case-insensitive letter sort.
-\item \meta{lang tag}: sort according to the rules of the locale
-given by the IETF language tag \meta{lang tag}.
+\item \texttt{integer}: integer sort. This is for integer sort
+values. Any value that isn't an integer is treated as 0.
+\item \texttt{integer-reverse}: as above but reverses the order.
+\item \texttt{hex}: hexadecimal integer sort. This is for
+hexadecimal sort values. Any value that isn't a hexadecimal number 
+is treated as 0.
+\item \texttt{hex-reverse}: as above but reverses the order.
+\item \texttt{octal}: octal integer sort. This is for
+octal sort values. Any value that isn't a octal number 
+is treated as 0.
+\item \texttt{octal-reverse}: as above but reverses the order.
+\item \texttt{binary}: binary integer sort. This is for binary sort
+values. Any value that isn't a binary number is treated as 0.
+\item \texttt{binary-reverse}: as above but reverses the order.
+\item \texttt{float}: single-precision sort. This is for
+decimal sort values. Any value that isn't a decimal is treated as 0.0.
+\item \texttt{float-reverse}: as above but reverses the order.
+\item \texttt{double}: double-precision sort. This is for
+decimal sort values. Any value that isn't a decimal is treated as 0.0.
+\item \texttt{float-reverse}: as above but reverses the order.
 \end{itemize}
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.

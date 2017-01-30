@@ -1,9 +1,24 @@
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,symbols,numbers]{glossaries-extra}
 
-\GlsXtrLoadResources[src={test-numbers},sort={double}]
+\GlsXtrLoadResources[src={test-numbers},
+ sort={letter-case},
+ type=symbols,
+ match={{entrytype=symbol}}
+]
+
+\GlsXtrLoadResources[src={test-numbers},
+ sort={double},
+ type=numbers,
+ match={{entrytype=number}}
+]
+
+\GlsXtrLoadResources[src={test-numbers},
+ sort={en},
+ match={{entrytype=entry}}
+]
 
 \begin{document}
 \gls{ten}, \gls{one}, \gls{array}, \gls{tenth}, $\gls{nabla}$,
