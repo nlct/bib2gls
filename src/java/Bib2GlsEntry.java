@@ -1373,6 +1373,16 @@ public class Bib2GlsEntry extends BibEntry
       return hierarchy.get(i);
    }
 
+   public Number getNumericSort()
+   {
+      return numericSort;
+   }
+
+   public void setNumericSort(Number num)
+   {
+      numericSort = num;
+   }
+
    private Vector<GlsRecord> records;
 
    private HashMap<String,String> fieldValues;
@@ -1395,6 +1405,8 @@ public class Bib2GlsEntry extends BibEntry
    private String labelPrefix = null;
 
    private Bib2GlsEntry dual = null;
+
+   private Number numericSort = null;
 
    private Vector<String> locationList = null;
 

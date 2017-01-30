@@ -1,0 +1,14 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-numbers},sort={double}]
+
+\begin{document}
+\gls{ten}, \gls{one}, \gls{array}, \gls{tenth}, $\gls{nabla}$,
+\gls{vector}, $\gls{pi}$, \gls{matrix}, \gls{hundred}, \gls{zero},
+\gls{set}.
+
+\printunsrtglossaries
+\end{document}

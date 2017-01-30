@@ -44,7 +44,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    {
       if (field.equals("sort"))
       {
-         if (bib2gls.useInterpreter())
+         if (!bib2gls.useInterpreter())
          {
             return getOriginalId();
          }

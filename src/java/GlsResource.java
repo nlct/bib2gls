@@ -1605,6 +1605,19 @@ public class GlsResource
 
             comparator.sortEntries();
          }
+         else if (entrySort.startsWith("integer") 
+               || entrySort.startsWith("float")
+               || entrySort.startsWith("double")
+               || entrySort.startsWith("hex")
+               || entrySort.startsWith("octal")
+               || entrySort.startsWith("binary"))
+         {
+            Bib2GlsEntryNumericComparator comparator = 
+               new Bib2GlsEntryNumericComparator(bib2gls, entries, 
+                 entrySort, entrySortField);
+
+            comparator.sortEntries();
+         }
          else
          {
             Bib2GlsEntryComparator comparator = 
@@ -1954,6 +1967,20 @@ public class GlsResource
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
                        true);
+
+                  comparator.sortEntries();
+               }
+               else if (secondarySort.startsWith("integer") 
+                     || secondarySort.startsWith("float")
+                     || secondarySort.startsWith("double")
+                     || secondarySort.startsWith("hex")
+                     || secondarySort.startsWith("octal")
+                     || secondarySort.startsWith("binary"))
+               {
+                  Bib2GlsEntryNumericComparator comparator = 
+                     new Bib2GlsEntryNumericComparator(bib2gls, 
+                       secondaryList, secondarySort,
+                       secondaryField == null ? sortField : secondaryField);
 
                   comparator.sortEntries();
                }

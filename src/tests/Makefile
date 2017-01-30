@@ -7,7 +7,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-external-refs.pdf test-hierarchical.pdf \
 	  test-match.pdf test-secondary.pdf test-ascii.pdf \
 	  test-pifonts.pdf test-dual-abbrv.pdf \
-	  test-dual-abbrv-desc.pdf
+	  test-dual-abbrv-desc.pdf test-numbers.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -131,6 +131,13 @@ test-dual-abbrv-desc.pdf	: test-dual-abbrv-desc.glstex
 test-dual-abbrv-desc.glstex	: test-dual-abbrv-desc.tex $(DEPS) entries-dual-abbrv-desc.bib
 		pdflatex test-dual-abbrv-desc
 		$(BIB2GLS) test-dual-abbrv-desc
+
+test-numbers.pdf	: test-numbers.glstex
+		pdflatex test-numbers
+
+test-numbers.glstex	: test-numbers.tex $(DEPS) test-numbers.bib
+		pdflatex test-numbers
+		$(BIB2GLS) test-numbers
 
 clean	:
 	$(RM) *.aux

@@ -107,7 +107,7 @@ actual '='
 \newcommand*{\oargm}[1]{\oarg{\meta{#1}}}
 
 \newcommand*{\marg}[1]{\texorpdfstring
- {\char`\{#1\char`\} }%
+ {\discretionary{}{}{}\char`\{#1\char`\} }%
  {\{#1\}}%
 }
 
@@ -1970,7 +1970,7 @@ This will copy all the selected entries into the glossary labelled
 the sort value.
 
 (If the glossary \meta{type} doesn't exist, it will be
-defined with \cs{provideignoredglossary*}\marg{type}.)
+defined with \cs{provideignoredglossary*}\margm{type}.)
 Note that if the glossary already exists and contains entries,
 the existing entries aren't re-ordered. The new entries are
 simply appended to the list.
@@ -3630,7 +3630,7 @@ Not yet implemented.
 \cs{bibglsnewdualabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{dualabbreviation} type where the \field{duallong} field
+\atentryref{dualabbreviation} type where the \field{duallong} field
 is swapped with the \field{long} field and the \field{dualshort}
 field is swapped with the \field{short} field. The definition provided in the
 \ext{glstex} file is:
@@ -3647,7 +3647,7 @@ field is swapped with the \field{short} field. The definition provided in the
 \cs{bibglsnewdualacronym}\margm{label}\margm{options}\margm{short}\margm{long}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{dualacronym} type. The definition provided in the \ext{glstex}
+\atentryref{dualacronym} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualacronym}[4]{%
