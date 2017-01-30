@@ -71,7 +71,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(), getId());
+      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String sep = "";
 
@@ -88,6 +88,17 @@ public class Bib2GlsIndex extends Bib2GlsEntry
          sep = String.format(",%n");
          writer.format("%s={%s}", field, getFieldValue(field));
       }
+
+      writer.println("}");
+   }
+
+   public void writeCsDefinition(PrintWriter writer) throws IOException
+   {
+      // syntax: {label}{opts}
+
+      writer.format("\\providecommand{\\%s}[2]{%%%n", getCsName());
+
+      writer.println(" \\newglossaryentry{#1}{name={#1},description={},#2}%");
 
       writer.println("}");
    }

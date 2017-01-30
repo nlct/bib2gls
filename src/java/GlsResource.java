@@ -46,9 +46,7 @@ public class GlsResource
       sources = new Vector<TeXPath>();
 
       this.pluralSuffix = pluralSuffix;
-      this.shortPluralSuffix = abbrvPluralSuffix;
-      this.dualSymbolPluralSuffix = pluralSuffix;
-      this.dualDescPluralSuffix = pluralSuffix;
+      this.dualPluralSuffix = pluralSuffix;
 
       init(parser, data.getArg(0), data.getArg(1));
    }
@@ -95,6 +93,32 @@ public class GlsResource
          }
          else if (opt.equals("external"))
          {// TODO
+         }
+         else if (opt.equals("short-case-change"))
+         {
+            shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc");
+         }
+         else if (opt.equals("dualshort-case-change"))
+         {
+            dualShortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc");
+         }
+         else if (opt.equals("short-plural-suffix"))
+         {
+            shortPluralSuffix = getOptional(parser, "", list, opt);
+
+            if (shortPluralSuffix.equals("use-default"))
+            {
+               shortPluralSuffix = null;
+            }
+         }
+         else if (opt.equals("dual-short-plural-suffix"))
+         {
+            dualShortPluralSuffix = getOptional(parser, "", list, opt);
+
+            if (dualShortPluralSuffix.equals("use-default"))
+            {
+               dualShortPluralSuffix = null;
+            }
          }
          else if (opt.equals("match-op"))
          {
@@ -541,14 +565,14 @@ public class GlsResource
       if (dualAbbrevMap == null)
       {
          dualAbbrevMap = new HashMap<String,String>();
-         dualAbbrevMap.put("short", "symbol");
-         dualAbbrevMap.put("shortplural", "symbolplural");
-         dualAbbrevMap.put("long", "description");
-         dualAbbrevMap.put("longplural", "descriptionplural");
-         dualAbbrevMap.put("symbol", "short");
-         dualAbbrevMap.put("symbolplural", "shortplural");
-         dualAbbrevMap.put("description", "long");
-         dualAbbrevMap.put("descriptionplural", "longplural");
+         dualAbbrevMap.put("short", "dualshort");
+         dualAbbrevMap.put("shortplural", "dualshortplural");
+         dualAbbrevMap.put("long", "duallong");
+         dualAbbrevMap.put("longplural", "duallongplural");
+         dualAbbrevMap.put("dualshort", "short");
+         dualAbbrevMap.put("dualshortplural", "shortplural");
+         dualAbbrevMap.put("duallong", "long");
+         dualAbbrevMap.put("duallongplural", "longplural");
 
          dualAbbrevFirstMap = "short";
       }
@@ -1008,7 +1032,14 @@ public class GlsResource
      String opt)
     throws IOException
    {
-      CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+      TeXObject object = list.getValue(opt);
+
+      if (object instanceof TeXObjectList)
+      {
+         object = trimList((TeXObjectList)object);
+      }
+
+      CsvList csvList = CsvList.getList(parser, object);
 
       int n = csvList.size();
 
@@ -1745,42 +1776,7 @@ public class GlsResource
             writer.println("}");
          }
 
-
-         // syntax: {label}{opts}{name}{description}
-
-         writer.println("\\providecommand{\\bibglsnewentry}[4]{%");
-         writer.print(" \\longnewglossaryentry*{#1}");
-         writer.println("{name={#3},#2}{#4}%");
-         writer.println("}");
-
-         writer.println("\\providecommand{\\bibglsnewdualentry}[4]{%");
-         writer.print(" \\longnewglossaryentry*{#1}");
-         writer.println("{name={#3},#2}{#4}%");
-         writer.println("}");
-
-         writer.println("\\providecommand{\\bibglsnewsymbol}[4]{%");
-         writer.print(" \\longnewglossaryentry*{#1}");
-         writer.println("{name={#3},sort={#1},category={symbol},#2}{#4}%");
-         writer.println("}");
-
-         writer.println("\\providecommand{\\bibglsnewnumber}[4]{%");
-         writer.print(" \\longnewglossaryentry*{#1}");
-         writer.println("{name={#3},sort={#1},category={number},#2}{#4}%");
-         writer.println("}");
-
-         // syntax: {label}{opts}
-         writer.println("\\providecommand*{\\bibglsnewindex}[2]{%");
-         writer.println(" \\newglossaryentry{#1}{name={#1},description={},#2}%");
-         writer.println("}");
-
-         // syntax: {label}{opts}{short}{long}
-         writer.println("\\providecommand{\\bibglsnewacronym}[4]{%");
-         writer.println("  \\newacronym[#2]{#1}{#3}{#4}%");
-         writer.println("}");
-
-         writer.println("\\providecommand{\\bibglsnewabbreviation}[4]{%");
-         writer.println("  \\newabbreviation[#2]{#1}{#3}{#4}%");
-         writer.println("}");
+         Vector<String> provided = new Vector<String>();
 
          if (preamble != null)
          {
@@ -1828,6 +1824,15 @@ public class GlsResource
 
             checkParent(entry, i, entries);
 
+            String csname = entry.getCsName();
+
+            if (!provided.contains(csname))
+            {
+               entry.writeCsDefinition(writer);
+               writer.println();
+               provided.add(csname);
+            }
+
             entry.writeBibEntry(writer);
             entry.writeLocList(writer);
 
@@ -1872,6 +1877,15 @@ public class GlsResource
                  locationSuffix != null,
                  locGap);
                checkParent(entry, i, dualEntries);
+
+               String csname = entry.getCsName();
+
+               if (!provided.contains(csname))
+               {
+                  entry.writeCsDefinition(writer);
+                  writer.println();
+                  provided.add(csname);
+               }
 
                entry.writeBibEntry(writer);
                entry.writeLocList(writer);
@@ -2295,16 +2309,6 @@ public class GlsResource
       return dualSortField;
    }
 
-   public String getDualDescPluralSuffix()
-   {
-      return dualDescPluralSuffix;
-   }
-
-   public String getDualSymbolPluralSuffix()
-   {
-      return dualSymbolPluralSuffix;
-   }
-
    public String getPluralSuffix()
    {
       return pluralSuffix;
@@ -2313,6 +2317,16 @@ public class GlsResource
    public String getShortPluralSuffix()
    {
       return shortPluralSuffix;
+   }
+
+   public String getDualPluralSuffix()
+   {
+      return dualPluralSuffix;
+   }
+
+   public String getDualShortPluralSuffix()
+   {
+      return dualShortPluralSuffix;
    }
 
    public HashMap<String,String> getDualEntryMap()
@@ -2450,6 +2464,66 @@ public class GlsResource
       return !matches;
    }
 
+   public boolean changeShortCase()
+   {
+      return shortCaseChange != null;
+   }
+
+   public boolean changeDualShortCase()
+   {
+      return dualShortCaseChange != null;
+   }
+
+   public BibValueList applyShortCaseChange(TeXParser parser, 
+      BibValueList value)
+   {
+      return applyCaseChange(parser, value, shortCaseChange);
+   }
+
+   public BibValueList applyDualShortCaseChange(TeXParser parser,
+      BibValueList value)
+   {
+      return applyCaseChange(parser, value, dualShortCaseChange);
+   }
+
+   public BibValueList applyCaseChange(TeXParser parser,
+      BibValueList value, String change)
+   {
+      if (change == null) return value;
+
+      TeXObjectList list = (TeXObjectList)value.getContents(true);
+
+      BibValueList bibList = new BibValueList();
+
+      if (change.equals("lc"))
+      {
+         Group grp = parser.getListener().createGroup();
+         grp.addAll(list);
+
+         list = new TeXObjectList();
+         list.add(new TeXCsRef("MakeTextLowercase"));
+         list.add(grp);
+      }
+      else if (change.equals("uc"))
+      {
+         Group grp = parser.getListener().createGroup();
+         grp.addAll(list);
+
+         list = new TeXObjectList();
+         list.add(new TeXCsRef("MakeTextUppercase"));
+         list.add(grp);
+      }
+      else
+      {
+         throw new IllegalArgumentException("Invalid case change option: "
+          +change);
+      }
+
+      bibList.add(new BibUserString(list));
+
+      return bibList;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -2464,11 +2538,10 @@ public class GlsResource
       dualSort = null, dualSortField = "sort";
 
    private String pluralSuffix="\\glspluralsuffix ";
+   private String dualPluralSuffix="\\glspluralsuffix ";
 
-   private String shortPluralSuffix="\\abbrvpluralsuffix ";
-
-   private String dualSymbolPluralSuffix="\\glspluralsuffix ", 
-     dualDescPluralSuffix="\\glspluralsuffix ";
+   private String shortPluralSuffix=null;
+   private String dualShortPluralSuffix=null;
 
    private Charset bibCharset = null;
 
@@ -2523,6 +2596,9 @@ public class GlsResource
    private boolean backLinkDualEntry=false;
    private boolean backLinkDualAbbrev=false;
    private boolean backLinkDualSymbol=false;
+
+   private String shortCaseChange=null;
+   private String dualShortCaseChange=null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

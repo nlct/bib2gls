@@ -74,11 +74,23 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
       return super.getFallbackContents(field);
    }
 
+   public void writeCsDefinition(PrintWriter writer) throws IOException
+   {
+      // syntax: {label}{opts}{name}{description}
+
+      writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
+
+      writer.print(" \\longnewglossaryentry*{#1}");
+      writer.format("{name={#3},sort={#1},category={%s},#2}{#4}", 
+         getEntryType());
+
+      writer.println("}");
+   }
+
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(),
-        getId());
+      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String sep = "";
       String name = "";
@@ -113,4 +125,5 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
       writer.println(String.format("}%%%n{%s}%%%n{%s}", name,
          description));
    }
+
 }

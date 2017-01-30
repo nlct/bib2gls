@@ -823,7 +823,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@texencoding", 1);
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
-            addAuxCommand("glsxtr@pluralsuffixes", 3);
+            addAuxCommand("glsxtr@pluralsuffixes", 4);
          }
       };
 
@@ -847,6 +847,7 @@ public class Bib2Gls implements TeXApp
       String pluralSuffix = "s";
       String shortPluralSuffix = "s";
       String acrPluralSuffix = "s";
+      String defShortPluralSuffix = "s";
 
       for (AuxData data : auxData)
       {
@@ -871,7 +872,8 @@ public class Bib2Gls implements TeXApp
          {
             pluralSuffix = data.getArg(0).toString(parser);
             shortPluralSuffix = data.getArg(1).toString(parser);
-            acrPluralSuffix = data.getArg(1).toString(parser);
+            acrPluralSuffix = data.getArg(2).toString(parser);
+            defShortPluralSuffix = data.getArg(3).toString(parser);
          }
          else if (name.equals("glsxtr@langtag"))
          {
@@ -1047,6 +1049,7 @@ public class Bib2Gls implements TeXApp
       provideCommand("glspluralsuffix", pluralSuffix);
       provideCommand("abbrvpluralsuffix", shortPluralSuffix);
       provideCommand("acrpluralsuffix", acrPluralSuffix);
+      provideCommand("glsxtrabbrvpluralsuffix", defShortPluralSuffix);
 
       if (texCharset == null)
       {
@@ -1118,6 +1121,12 @@ public class Bib2Gls implements TeXApp
          fields.add("see");
          fields.add("category");
       }
+
+      // add the fields needed for dualabbreviation
+      addField("dualshort");
+      addField("dualshortplural");
+      addField("duallong");
+      addField("duallongplural");
 
       for (int i = 0; i < glsresources.size(); i++)
       {

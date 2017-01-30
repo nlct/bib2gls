@@ -178,7 +178,7 @@ actual '='
   {%
     \optfmt{#3\ifblank{#1}{}{\dequals\marg{#1}}}%
     \ifmainmatter
-      \index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}%
+      {\def\dhyphen{-}\index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}}%
     \fi
   }%
   {#3\ifblank{#1}{}{=#1}}%
@@ -225,7 +225,11 @@ actual '='
 
 \newcommand*{\longarg}[1]{%
   \texorpdfstring
-  {\longargfmt{#1}\index{command line options!#1\actual\protect\longargfmt{#1}}}%
+  {\longargfmt{#1}%
+   {\def\dhyphen{-}%
+    \index{command line options!#1\actual\protect\longargfmt{#1}}%
+   }%
+  }%
   {\string-\string-#1}%
 }
 
@@ -1563,8 +1567,247 @@ Not yet implemented.
 \section{\atentry{dualabbreviation}}
 \labelatentry{dualabbreviation}
 
-Not yet implemented.
+The required fields are: \field{short}, \field{long}, 
+\field{dualshort} and \field{duallong}.
+This includes some new fields: \field{dualshort},
+\field{dualshortplural}, \field{duallong} and
+\field{duallongplural}. If these aren't already defined, they
+will be provided in the \ext{glstex} file with
+\begin{alltt}
+\cs{glsxtrprovidestoragekey}\margm{key}\marg{}\marg{}
+\end{alltt}
+This command is defined by the \sty{glossaries-extra} package.
+Note that this use with an empty third argument prevents
+the creation of a field access command (analogous to
+\cs{glsentrytext}). You can fetch the value with
+\cs{glsxtrusefield}.  (See the \sty{glossaries-extra} manual for
+further details.) Remember that the field won't be
+available until the \ext{glstex} file has been created.
 
+Note that \bibgls\ doesn't know what abbreviation styles
+are in used, so if the \field{sort} field is missing
+it will fallback on the \field{short} field. If the abbreviations
+need to be sorted according to the \field{long} field instead,
+use \optref[long]{sort-field}.
+
+The \atentry{dualabbreviation} entry type is similar to 
+\atentry{dualentry}, but by default the
+field mappings are:
+\begin{itemize}
+\item \field{short} $\mapsto$ \field{dualshort}
+\item \field{shortplural} $\mapsto$ \field{dualshortplural}
+\item \field{long} $\mapsto$ \field{duallong}
+\item \field{longplural} $\mapsto$ \field{duallongplural}
+\item \field{dualshort} $\mapsto$ \field{short}
+\item \field{dualshortplural} $\mapsto$ \field{shortplural}
+\item \field{duallong} $\mapsto$ \field{long}
+\item \field{duallongplural} $\mapsto$ \field{longplural}
+\end{itemize}
+Entries provided using \atentry{dualabbreviation} will be defined
+with \csref{bibglsnewdualabbreviation}.
+
+If the \optref{dual-abbrv-backlink} option is on, the default field
+used for the backlinks is the \field{dualshort} field, so you'll need
+to make sure you adapt the glossary style to show that field. The
+simplest way to do this is through the category post description
+hook. For example, if the entries all have the \field{category} set
+to \optfmt{abbreviation}, then this requires redefining
+\cs{glsxtrpostdescabbreviation}.
+
+Here's an example dual abbreviation for a document where English is
+the primary language and German is the secondary language:
+\begin{alltt}
+@dualabbreviation\marg{rna,
+  short=\marg{RNA},
+  dualshort=\marg{RNS},
+  long=\marg{ribonucleic acid},
+  duallong=\marg{Ribonukleins\"aure}
+}
+\end{alltt}
+If the abbreviation is in the file called
+\filefmt{entries-dual-abbrv.bib}, then here's an example document:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[ngerman,main=english]{babel}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,nomain]{glossaries-extra}
+
+\newglossary*{english}{English}
+\newglossary*{german}{German}
+
+\setabbreviationstyle{long-short}
+
+\renewcommand*{\glsxtrpostdescabbreviation}{%
+  \ifglshasfield{dualshort}{\glscurrententrylabel}
+  {%
+    \space(\glscurrentfieldvalue)%
+  }%
+  {}%
+}
+
+\GlsXtrLoadResources[
+ src={entries-dual-abbrv},% entries-dual-abbrv.bib
+ type=english,% put primary entries in glossary 'english'
+ dual-type=german,% put primary entries in glossary 'german'
+ label-prefix={en.},% primary label prefix
+ dual-prefix={de.},% dual label prefix
+ sort=en,% sort primary entries according to language 'en'
+ dual-sort=de-1996,% sort dual entries according to 'de-1996'
+                   % (German new orthography)
+ dual-abbrv-backlink% add links in the glossary to the opposite
+                    %entry
+]
+
+\begin{document}
+
+English: \gls{en.rna}; \gls{en.rna}.
+
+German: \gls{de.rna}; \gls{de.rna}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+If the \optref{label-prefix} is omitted, then only the dual entries
+will have a prefix:
+\begin{verbatim}
+English: \gls{rna}; \gls{rna}.
+
+German: \gls{de.rna}; \gls{de.rna}.
+\end{verbatim}
+Another variation is to use the \optfmt{long-short-user}
+abbreviation style and modify \cs{glsxtruserfield} so that
+the \field{duallong} field is selected for the parenthetical
+material:
+\begin{verbatim}
+\renewcommand*{\glsxtruserfield}{duallong}
+\end{verbatim}
+This means that the first use of the primary entry is displayed as
+\begin{quote}
+ribonucleic acid (RNA, Ribonukleins\"aure)
+\end{quote}
+and the first use of the dual entry is displayed as:
+\begin{quote}
+Ribonukleins\"aure (RNS, ribonucleic acid)
+\end{quote}
+
+Here's an example to be used with the \optfmt{long-short-desc}
+style:
+\begin{alltt}
+@dualabbreviation\marg{rna,
+  short=\marg{RNA},
+  dualshort=\marg{RNS},
+  long=\marg{ribonucleic acid},
+  duallong=\marg{Ribonukleins\"aure}
+  description=\marg{a polymeric molecule},
+  user1=\marg{Ein polymeres Molek\"ul}
+}
+\end{alltt}
+This stores the dual description in the \field{user1} field,
+so this needs a mapping.
+
+The example document is much the same as the previous one, except
+that the \optref{dual-abbrv-map} option is needed to include the 
+mapping between the \field{description} and \field{user1} fields:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[ngerman,main=english]{babel}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,nomain]{glossaries-extra}
+
+\newglossary*{english}{English}
+\newglossary*{german}{German}
+
+\setabbreviationstyle{long-short-desc}
+
+\renewcommand*{\glsxtrpostdescabbreviation}{%
+  \ifglshasfield{dualshort}{\glscurrententrylabel}
+  {%
+    \space(\glscurrentfieldvalue)%
+  }%
+  {}%
+}
+
+\GlsXtrLoadResources[
+ src={entries-dual-abbrv-desc},% entries-dual-abbrv-desc.bib
+ type=english,% put primary entries in glossary 'english'
+ dual-type=german,% put primary entries in glossary 'german'
+ label-prefix={en.},% primary label prefix
+ dual-prefix={de.},% dual label prefix
+ sort=en,% sort primary entries according to language 'en'
+ sort-field={long},% sort by the 'long' field
+ dual-sort=de-1996,% sort dual entries according to 'de-1996'
+                   % (German new orthography)
+ dual-abbrv-backlink,% add links in the glossary to the opposite
+                     % entry
+% dual key mappings:
+ dual-abbrv-map={%
+   {short,shortplural,long,longplural,dualshort,dualshortplural,
+     duallong,duallongplural,description,user1},
+   {dualshort,dualshortplural,duallong,duallongplural,short,shortplural,
+     long,longplural,user1,description}
+ }
+]
+
+\begin{document}
+
+English: \gls{en.rna}; \gls{en.rna}.
+
+German: \gls{de.rna}; \gls{de.rna}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+Note that since this document uses the \optfmt{long-short-desc}
+abbreviation style, the \optref{sort-field} needs to be changed
+to \optfmt{long}, since the fallback if the \field{sort} field is
+missing is the \field{short} field.
+
+If I change the order of the mapping to:
+\begin{verbatim}
+ dual-abbrv-map={%
+   {long,longplural,short,shortplural,dualshort,dualshortplural,
+     duallong,duallongplural,description,user1},
+   {duallong,duallongplural,dualshort,dualshortplural,short,shortplural,
+     long,longplural,user1,description}
+\end{verbatim}
+Then the back-link field will switch to \field{duallong}. The
+post-description hook can be modified to allow for this:
+\begin{verbatim}
+\renewcommand*{\glsxtrpostdescabbreviation}{%
+  \ifglshasfield{duallong}{\glscurrententrylabel}
+  {%
+    \space(\glscurrentfieldvalue)%
+  }%
+  {}%
+}
+\end{verbatim}
+
+An alternative is to use the \optfmt{long-short-user-desc} style
+without the post-description hook:
+\begin{verbatim}
+\setabbreviationstyle{long-short-user-desc}
+
+\renewcommand*{\glsxtruserfield}{duallong}
+\end{verbatim}
+However be careful with this approach as it can cause nested
+hyperlinks. In this case it's better to use the
+\optfmt{long-postshort-user-desc} style which defers the
+parenthetical material until after the link-text:
+\begin{verbatim}
+\setabbreviationstyle{long-postshort-user-desc}
+
+\renewcommand*{\glsxtruserfield}{duallong}
+\end{verbatim}
+If the back-link field has been switched to \field{duallong} then
+the post-description hook is no longer required.
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
@@ -2211,6 +2454,157 @@ start of the labels in the entry definitions and will replace
 the \idprefix{ext1} prefix with \idprefixfmt{gls} in the
 cross-references.
 
+\subsection{\csoptnv{short-case-change}=\margm{value}}
+\labelopt{short-case-change}
+
+The value of the \field{short} field may be automatically converted
+to upper or lower case. This option may take one of the following
+values:
+\begin{itemize}
+\item \optfmt{none}: don't apply any case-changing;
+\item \optfmt{lc}: convert to lower case;
+\item \optfmt{uc}: convert to upper case.
+\end{itemize}
+
+For example, if the \ext{bib} file contains
+\begin{verbatim}
+@abbreviation{html,
+  short ="html",
+  long  = html,
+  description={a markup language for creating web pages}
+}
+\end{verbatim}
+then \csopt[uc]{short-case-change} would convert the value of the
+\field{short} field into
+\begin{verbatim}
+\MakeTextUppercase{html}
+\end{verbatim}
+See \optref{dual-short-case-change} to adjust the \field{dualplural}
+field.
+
+\section{Plurals}
+\label{sec:plurals}
+
+Some languages, such as English, have a general rule that plurals
+are formed from the singular with a suffix appended. This isn't 
+an absolute rule. There are plenty of exceptions (for example,
+geese, children, churches, elves, fairies, sheep). The
+\sty{glossaries} package allows the \field{plural} key to be
+optional when defining entries. In some cases a plural may not make
+any sense (for example, the term is a symbol) and in some cases
+the plural may be identical to the singular.
+
+To make life easier for languages where the majority of plurals can
+simply be formed by appending a suffix to the singular, the
+\sty{glossaries} package sets lets the \field{plural} field default
+to the value of the \field{text} field with \cs{glspluralsuffix}
+appended. This command is defined to be just the letter \qt{s}.
+This means that the majority of terms don't need to have the
+\field{plural} supplied as well, and you only need to use it for the
+exceptions.
+
+For languages that don't have this general rule, the \field{plural}
+field will always need to be supplied, where needed.
+
+There are other plural fields, such as \field{firstplural},
+\field{longplural} and \field{shortplural}. Again, if you are using
+a language that doesn't have a simple suffix rule, you'll have to
+supply the plural forms if you need them (and if a plural makes
+sense in the context).
+
+If these fields are omitted, the \sty{glossaries} package follows
+these rules:
+\begin{itemize}
+\item If \field{firstplural} is missing, then \cs{glspluralsuffix}
+is appended to the \field{first} field, if that field has been
+supplied. If the \field{first} field hasn't been supplied but the
+\field{plural} field has been supplied, then the \field{firstplural}
+field defaults to the \field{plural} field. If the \field{plural}
+field hasn't been supplied, then both the \field{plural} and
+\field{firstplural} fields default to the \field{text} field (or
+\field{name}, if no \field{text} field) with \cs{glspluralsuffix}
+appended.
+
+\item If the \field{longplural} field is missing, then 
+\cs{glspluralsuffix} is appended to the \field{long} field, if the
+\field{long} field has been supplied.
+
+\item If the \field{shortplural} field is missing then, \emph{with
+the base \sty{glossaries} acronym mechanism}, \cs{acrpluralsuffix}
+is appended to the \field{short} field.
+
+\end{itemize}
+
+The last case is different with the \sty{glossaries-extra} extension 
+package. The \field{shortplural} field defaults to the \field{short}
+field with \cs{abbrvpluralsuffix} appended \emph{unless overridden
+by category attributes}. This suffix command is set by the
+abbreviation styles. This means that every time an abbreviation
+style is implemented, \cs{abbrvpluralsuffix} is redefined. Most
+styles simply define this command as:
+\begin{verbatim}
+\renewcommand*{\abbrvpluralsuffix}{\glspluralsuffix}
+\end{verbatim}
+The \qt{sc} styles (such as \optfmt{long-short-sc}) use a different
+definition:
+\begin{verbatim}
+\renewcommand*{\abbrvpluralsuffix}{\protect\glsxtrscsuffix}
+\end{verbatim}
+This allows the suffix to be reverted back to the upright font,
+counter-acting the affect of the small-caps font.
+
+This means that if you want to change or strip the suffix used for
+the plural short form, it's usually not sufficient to redefine
+\cs{abbrvpluralsuffix}, as the change will be undone the next time
+the style is applied. Instead, for a document-wide solution, you
+need to redefine \cs{glsxtrabbrvpluralsuffix}. Alternatively you can
+use the category attributes.
+
+There are two attributes that affect the short plural suffix
+formation. The first is \optfmt{aposplural} which uses the suffix
+\begin{verbatim}
+'\abbrvpluralsuffix
+\end{verbatim}
+That is, an apostrophe followed by \cs{abbrvpluralsuffix} is
+appended. The second attribute is \optfmt{noshortplural} which
+suppresses the suffix and simply sets \field{shortplural} to the
+same as \field{short}.
+
+With \bibgls, if you have some abbreviations where the plural should
+have a suffix and some where the plural shouldn't have a suffix
+(for example, the document has both English and French abbreviations)
+then there are two approaches.
+
+The first approach is to use the category attributes. For example:
+\begin{verbatim}
+\glssetcategoryattribute{french}{noshortplural}
+\end{verbatim}
+Now just make sure all the French abbreviations are have their
+\field{category} field set to \optfmt{french}:
+\begin{verbatim}
+\GlsXtrLoadResources[src={fr-abbrvs},category={french}]
+\end{verbatim} 
+
+The other approach is to use the options listed below.
+
+\subsection{\csoptnv{short-plural-suffix}=\margm{value}}
+\labelopt{short-plural-suffix}
+
+Sets the plural suffix for \field{shortplural} to \meta{value}.  If
+this option is omitted or if
+\csopt[use-default]{short\dhyphen plural-suffix}, then \bibgls\ will leave
+it to \sty{glossaries-extra} to determine the appropriate default.
+If the \meta{value} is omitted or empty, the suffix is set to empty.
+
+\subsection{\csoptnv{dual-short-plural-suffix}=\margm{value}}
+\labelopt{dual-short-plural-suffix}
+
+Sets the plural suffix for the \field{dualshortplural} field to
+\meta{value}.  If this option is omitted or if
+\csopt[use-default]{dual-short-plural-suffix}, then \bibgls\ will leave it to
+\sty{glossaries-extra} to determine the appropriate default.
+If the \meta{value} is omitted or empty, the suffix is set to empty.
+
 \section{Location List Options}
 \label{sec:locationopts}
 
@@ -2836,6 +3230,11 @@ remain unchanged.
 \item \meta{label}: sets the \field{category} field to \meta{label}.
 \end{itemize}
 
+\subsection{\csoptnv{dual-short-case-change}=\margm{value}}
+\labelopt{dual-short-case-change}
+
+As \optref{short-case-change} but applies to the \field{dualshort}
+field instead.
 
 \subsection{\csoptnv{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-entry-map}
@@ -2910,16 +3309,17 @@ default setting is:
 \begin{verbatim}
 dual-abbrv-map=
 {
-  {short,shortplural,long,longplural,symbol,symbolplural,
-   description,descriptionplural},
-  {symbol,symbolplural,description,descriptionplural,short,shortplural,
+  {short,shortplural,long,longplural,dualshort,dualshortplural,
+   duallong,duallongplural},
+  {dualshort,dualshortplural,duallong,duallongplural,short,shortplural,
    long,longplural}
 }
 \end{verbatim}
 
 This essentially flips the \field{short} field with the
-\field{symbol} field and the \field{long} field with the
-\field{description} field.
+\field{dualshort} field and the \field{long} field with the
+\field{duallong} field. See \atentryref{dualabbreviation}
+for further details.
 
 \subsection{\csoptnv{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-symbol-map}
@@ -3064,7 +3464,9 @@ When \bibgls\ writes the entries to the output file, instead of
 directly using commands like \cs{newglossaryentry}, it provides
 its own commands defined with \cs{providecommand}. This means that
 you can customize the way the entries are defined by providing your
-own commands before the \ext{glstex} files are loaded.
+own definitions before the \ext{glstex} files are loaded. Each provided
+command is defined in the \ext{glstex} file immediately before the
+first entry that requires it.
 
 After each entry is defined, if it has any associated locations, the
 locations are added using
@@ -3218,8 +3620,39 @@ Not yet implemented.
 \section{\cs{bibglsnewdualabbreviation}}
 \labelcs{bibglsnewdualabbreviation}
 
-Not yet implemented.
+\begin{definition}
+\cs{bibglsnewdualabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{dualabbreviation} type where the \field{description} field
+is swapped with the \field{long} field. The definition provided in the
+\ext{glstex} file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualabbreviation}[4]{%
+  \newabbreviation[#2,description={#4}]{#1}{#3}{#4}%
+}
+\end{verbatim}
+Note that this ensures that the \field{description} is set to the
+\field{long} value. If the \field{description} should not be the
+same as the \field{long} field, make sure you change the mapping
+using \optref{dual-abbrv-map} so that the \field{description} and
+\field{long} fields aren't swapped.
 
+\section{\cs{bibglsnewdualabbreviationdesc}}
+\labelcs{bibglsnewdualabbreviationdesc}
+
+\begin{definition}
+\cs{bibglsnewdualabbreviationdesc}\margm{label}\margm{options}\margm{short}\margm{long}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{dualabbreviation} type where the \field{description} field
+is not swapped with the \field{long} field. The definition provided in the
+\ext{glstex} file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualabbreviationdesc}[4]{%
+  \newabbreviation[#2]{#1}{#3}{#4}%
+}
+\end{verbatim}
 
 \section{\cs{bibglsseesep}}
 \labelcs{bibglsseesep}

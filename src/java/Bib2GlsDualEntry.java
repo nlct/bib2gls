@@ -56,7 +56,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
             return val;
          }
 
-         String suffix = getResource().getDualDescPluralSuffix();
+         String suffix = getResource().getDualPluralSuffix();
 
          return suffix == null ? val : val+suffix;
       }
@@ -74,7 +74,38 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
             return val;
          }
 
-         String suffix = getResource().getDualSymbolPluralSuffix();
+         String suffix = getResource().getDualPluralSuffix();
+
+         return suffix == null ? val : val+suffix;
+      }
+      else if (field.equals("longplural"))
+      {
+         val = getFieldValue("long");
+
+         if (val == null)
+         {
+            return val;
+         }
+
+         String suffix = getResource().getDualPluralSuffix();
+
+         return suffix == null ? val : val+suffix;
+      }
+      else if (field.equals("shortplural"))
+      {
+         val = getFieldValue("short");
+
+         if (val == null)
+         {
+            val = getFallbackValue("short");
+         }
+
+         if (val == null)
+         {
+            return val;
+         }
+
+         String suffix = getResource().getDualShortPluralSuffix();
 
          return suffix == null ? val : val+suffix;
       }
@@ -99,7 +130,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
    protected Bib2GlsEntry createDualEntry()
    {
-      return new Bib2GlsEntry(bib2gls, getEntryType());
+      return new Bib2GlsDualEntry(bib2gls, getEntryType());
    }
 
    public Bib2GlsEntry createDual()
@@ -108,10 +139,8 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       String dualPrefix = resource.getDualPrefix();
       String label = getOriginalId();
 
-      String dualLabel = (dualPrefix==null ? label : dualPrefix+label);
-
       Bib2GlsEntry entry = createDualEntry();
-      entry.setId(dualLabel);
+      entry.setId(dualPrefix, label);
 
       HashMap<String,String> mappings = getMappings();
 
@@ -178,6 +207,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
             if (value != null)
             {
                putField(key, value);
+               putField(key, getFallbackContents(key));
             }
          }
 

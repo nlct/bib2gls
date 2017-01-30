@@ -82,6 +82,12 @@ public class Bib2GlsEntry extends BibEntry
       return super.getId();
    }
 
+   public void setId(String prefix, String label)
+   {
+      labelPrefix = prefix;
+      setId(label);
+   }
+
    public String processLabel(String label)
    {
       if (label.startsWith("dual."))
@@ -537,6 +543,91 @@ public class Bib2GlsEntry extends BibEntry
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
 
+      if (resource.changeShortCase())
+      {
+         BibValueList value = getField("short");
+
+         if (value != null)
+         {
+            putField("short", 
+               resource.applyShortCaseChange(parser, value));
+         }
+      }
+
+      if (resource.changeDualShortCase())
+      {
+         BibValueList value = getField("dualshort");
+
+         if (value != null)
+         {
+            putField("dualshort", 
+               resource.applyShortCaseChange(parser, value));
+         }
+      }
+
+      String shortPluralSuffix = resource.getShortPluralSuffix();
+      String dualShortPluralSuffix = resource.getDualShortPluralSuffix();
+
+      if (shortPluralSuffix != null)
+      {
+         BibValueList value = getField("shortplural");
+
+         if (value == null)
+         {
+            value = getField("short");
+
+            if (value != null)
+            {
+               TeXObjectList newVal = (TeXObjectList)value.getContents(true);
+
+               BibValueList list = new BibValueList();
+
+               if (newVal != null)
+               {
+                  list.add(new BibUserString(newVal));
+               }
+
+               if (!shortPluralSuffix.isEmpty())
+               {
+                  list.add(new BibUserString(
+                   parser.getListener().createString(shortPluralSuffix)));
+               }
+
+               putField("shortplural", list);
+            }
+         }
+      }
+
+      if (dualShortPluralSuffix != null)
+      {
+         BibValueList value = getField("dualshortplural");
+
+         if (value == null)
+         {
+            value = getField("dualshort");
+
+            if (value != null)
+            {
+               TeXObjectList newVal = (TeXObjectList)value.getContents(true);
+
+               BibValueList list = new BibValueList();
+
+               if (newVal != null)
+               {
+                  list.add(new BibUserString(newVal));
+               }
+
+               if (!shortPluralSuffix.isEmpty())
+               {
+                  list.add(new BibUserString(
+                   parser.getListener().createString(dualShortPluralSuffix)));
+               }
+
+               putField("dualshortplural", list);
+            }
+         }
+      }
+
       if (resource.hasSkippedFields())
       {
          String[] skip = resource.getSkipFields();
@@ -553,7 +644,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (value != null)
          {
-            TeXObjectList list = value.expand(parser);
+            TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
 
             boolean protect = mfirstucProtect;
 
@@ -699,31 +790,7 @@ public class Bib2GlsEntry extends BibEntry
             contents = getFallbackContents("text");
          }
 
-         if (contents == null) return null;
-
-         contents = (BibValueList)contents.clone();
-
-         int n = contents.size();
-
-         if (n > 2)
-         {
-            BibValue firstObj = contents.firstElement();
-            BibValue lastObj = contents.lastElement();
-
-            if (firstObj.equals(lastObj)
-             && firstObj instanceof CharObject
-             && ((CharObject)firstObj).getCharCode() == '"')
-            {
-               contents.add(n-1,
-                  new BibUserString(new TeXCsRef("glspluralsuffix")));
-            }
-            else
-            {
-               contents.add(new BibUserString(new TeXCsRef("glspluralsuffix")));
-            }
-         }
-
-         return contents;
+         return plural(contents, "glspluralsuffix");
       }
       else if (field.equals("firstplural"))
       {
@@ -736,92 +803,37 @@ public class Bib2GlsEntry extends BibEntry
             return contents == null ? getFallbackContents("plural") : contents;
          }
 
-         contents = (BibValueList)contents.clone();
-
-         int n = contents.size();
-
-         if (n > 2)
-         {
-            BibValue firstObj = contents.firstElement();
-            BibValue lastObj = contents.lastElement();
-
-            if (firstObj.equals(lastObj)
-             && firstObj instanceof CharObject
-             && ((CharObject)firstObj).getCharCode() == '"')
-            {
-               contents.add(n-1,
-                  new BibUserString(new TeXCsRef("glspluralsuffix")));
-            }
-            else
-            {
-               contents.add(new BibUserString(new TeXCsRef("glspluralsuffix")));
-            }
-         }
-
-         return contents;
+         return plural(contents, "glspluralsuffix");
       }
       else if (field.equals("longplural"))
       {
-         BibValueList contents = getField("long");
-
-         if (contents == null) return null;
-
-         contents = (BibValueList)contents.clone();
-
-         int n = contents.size();
-
-         if (n > 2)
-         {
-            BibValue firstObj = contents.firstElement();
-            BibValue lastObj = contents.lastElement();
-
-            if (firstObj.equals(lastObj)
-             && firstObj instanceof CharObject
-             && ((CharObject)firstObj).getCharCode() == '"')
-            {
-               contents.add(n-1,
-                  new BibUserString(new TeXCsRef("glspluralsuffix")));
-            }
-            else
-            {
-               contents.add(new BibUserString(new TeXCsRef("glspluralsuffix")));
-            }
-         }
-
-         return contents;
+         return plural(getField("long"), "glspluralsuffix");
       }
       else if (field.equals("shortplural"))
       {
-         BibValueList contents = getField("short");
-
-         if (contents == null) return null;
-
-         contents = (BibValueList)contents.clone();
-
-         int n = contents.size();
-
-         if (n > 2)
-         {
-            BibValue firstObj = contents.firstElement();
-            BibValue lastObj = contents.lastElement();
-
-            if (firstObj.equals(lastObj)
-             && firstObj instanceof CharObject
-             && ((CharObject)firstObj).getCharCode() == '"')
-            {
-               contents.add(n-1,
-                  new BibUserString(new TeXCsRef("abbrvpluralsuffix")));
-            }
-            else
-            {
-               contents.add(new BibUserString(new TeXCsRef("abbrvpluralsuffix")));
-            }
-         }
-
-         return contents;
+         return plural(getField("short"), "abbrvpluralsuffix");
+      }
+      else if (field.equals("duallongplural"))
+      {
+         return plural(getField("duallong"), "glspluralsuffix");
+      }
+      else if (field.equals("dualshortplural"))
+      {
+         return plural(getField("dualshort"), "abbrvpluralsuffix");
       }
 
       return null;
+   }
+
+   protected BibValueList plural(BibValueList contents, String suffixCsName)
+   {
+      if (contents == null) return null;
+
+      contents = (BibValueList)contents.clone();
+
+      contents.add(new BibUserString(new TeXCsRef(suffixCsName)));
+
+      return contents;
    }
 
    public void checkRequiredFields(TeXParser parser)
@@ -843,10 +855,26 @@ public class Bib2GlsEntry extends BibEntry
        bib2gls.getMessage("warning.missing.field", getId(), field));
    }
 
+   public String getCsName()
+   {
+      return String.format("bibglsnew%s", getEntryType());
+   }
+
+   public void writeCsDefinition(PrintWriter writer)
+   throws IOException
+   {
+      // syntax: {label}{opts}{name}{description}
+
+      writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
+      writer.print(" \\longnewglossaryentry*{#1}");
+      writer.println("{name={#3},#2}{#4}%");
+      writer.println("}");
+   }
+
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(), getId());
+      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String description = "";
       String name = "";
@@ -911,7 +939,7 @@ public class Bib2GlsEntry extends BibEntry
 
    public String putField(String label, String value)
    {
-      if (value == null)
+      if (label == null || value == null)
       {
          throw new NullPointerException();
       }

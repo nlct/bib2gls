@@ -88,10 +88,21 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       return super.getFallbackContents(field);
    }
 
+   public void writeCsDefinition(PrintWriter writer) throws IOException
+   {
+      // syntax: {label}{opts}{short}{long}
+
+      writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
+
+      writer.format("  \\new%s[#2]{#1}{#3}{#4}%%%n", getEntryType());
+
+      writer.println("}");
+   }
+
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\bibglsnew%s{%s}%%%n{", getEntryType(), getId());
+      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String sep = "";
       String shortText = "";
@@ -126,4 +137,5 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       writer.println(String.format("}%%%n{%s}%%%n{%s}",
         shortText, longText));
    }
+
 }
