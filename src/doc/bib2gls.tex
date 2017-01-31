@@ -222,8 +222,8 @@ actual '='
 \newcommand*{\entry}[1]{%
  \texorpdfstring
  {\entryfmt{#1}%
-   \index{entry types!#1\actual\protect\entryfmt{#1}}%
-   \index{#1 entry type\actual\protect\entryfmt{#1} entry type (\protect\entryfmt{@#1})}%
+   \index{entry types!#1\actual\protect\entryfmt{@#1}}%
+   \index{#1 entry type\actual\protect\entryfmt{@#1} entry type}%
  }%
  {#1}%
 }
@@ -231,8 +231,8 @@ actual '='
 \newcommand*{\atentry}[1]{%
  \texorpdfstring
  {\entryfmt{@#1}%
-   \index{entry types!#1\actual\protect\entryfmt{#1}}%
-   \index{#1 entry type\actual\protect\entryfmt{#1} entry type (\protect\entryfmt{@#1})}%
+   \index{entry types!#1\actual\protect\entryfmt{@#1}}%
+   \index{#1 entry type\actual\protect\entryfmt{@#1} entry type}%
  }%
  {@#1}%
 }
@@ -1588,7 +1588,65 @@ differentiate it from a normal entry.
 \section{\atentry{dualsymbol}}
 \labelatentry{dualsymbol}
 
-Not yet implemented.
+This is like \atentryref{dualentry} but the default mappings
+swap the \field{name} and \field{symbol} fields (and the
+\field{plural} and \field{symbolplural} fields). The \field{name}
+and \field{symbol} are required.
+
+For example:
+\begin{verbatim}
+@dualsymbol{pi,
+   name={pi},
+   symbol={\ensuremath{\pi}},
+   description={the ratio of the length of the circumference
+    of a circle to its diameter}
+}
+\end{verbatim}
+
+Entries are defined using \csref{bibglsnewdualsymbol}, which by 
+default sets the \field{category} to \optfmt{symbol}.
+
+\section{\atentry{dualnumber}}
+\labelatentry{dualnumber}
+
+This is much the same as \atentryref{dualsymbol} but entries are
+defined using \csref{bibglsnewdualnumber}, which by default sets
+the \field{category} to \optfmt{number}.
+
+The above example could be defined as a number since $\pi$ is a
+constant:
+\begin{verbatim}
+@dualnumber{pi,
+   name={pi},
+   symbol={\ensuremath{\pi}},
+   description={the ratio of the length of the circumference
+    of a circle to its diameter},
+   user1={3.14159}
+}
+\end{verbatim}
+
+This has stored the approximate value in the \field{user1} field.
+The post-description hook could then be adapted to show this.
+\begin{verbatim}
+\renewcommand{\glsxtrpostdescnumber}{%
+  \ifglshasfield{useri}{\glscurrententrylabel}
+  { (approximate value: \glscurrentfieldvalue)}%
+  {}%
+}
+\end{verbatim}
+
+This use of the \field{user1} field means that the dual entries
+could be sorted numerically according to the approximate value:
+\begin{verbatim}
+\usepackage[record,postdot,numbers,style=index]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  dual-type={numbers},
+  dual-sort={double},% decimal sort
+  dual-sort-field={user1}
+]
+\end{verbatim}
 
 \section{\atentry{dualabbreviation}}
 \labelatentry{dualabbreviation}
@@ -3938,7 +3996,30 @@ file is:
 \section{\cs{bibglsnewdualsymbol}}
 \labelcs{bibglsnewdualsymbol}
 
-Not yet implemented.
+\begin{definition}
+\cs{bibglsnewdualsymbol}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{dualsymbol} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualsymbol}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}}
+\end{verbatim}
+
+\section{\cs{bibglsnewdualnumber}}
+\labelcs{bibglsnewdualnumber}
+
+\begin{definition}
+\cs{bibglsnewdualnumber}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define terms identified with the
+\atentry{dualnumber} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualnumber}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}}
+\end{verbatim}
 
 \section{\cs{bibglsnewdualabbreviation}}
 \labelcs{bibglsnewdualabbreviation}

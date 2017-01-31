@@ -1,0 +1,27 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,postdot,symbols,style=index]{glossaries-extra}
+
+\renewcommand{\glsxtrpostdescsymbol}{%
+  \ifglshasfield{useri}{\glscurrententrylabel}
+  { (approximate value: \glscurrentfieldvalue)}%
+  {}%
+}
+
+\GlsXtrLoadResources[
+  src={entries-dual-symbols},
+  dual-type={symbols},
+  dual-symbol-backlink,
+  %dual-sort={letter-case},
+  dual-sort={double},
+  dual-sort-field={user1}
+]
+
+\begin{document}
+\gls{e}, \gls{eulercons}, \gls{pi}, \gls{root2}, \gls{goldenratio}.
+
+\printunsrtglossaries
+
+\end{document}
