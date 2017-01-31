@@ -1,0 +1,16 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ master={test-book},
+ label-prefix={book.}
+]
+
+\begin{document}
+Testing: \gls{book.loremi-ii}, \gls{book.loremiii-iv}, 
+\gls{book.loremv-vi}.
+
+\end{document}

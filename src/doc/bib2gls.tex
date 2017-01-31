@@ -84,6 +84,19 @@ actual '='
   \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
 }
 
+\newcommand*{\primaryresourcefmt}{%
+ \texorpdfstring
+  {\texttt{\char`\\ jobname.glstex}}%
+  {\string\\jobname.glstex}%
+}
+
+\newcommand*{\suppresourcefmt}[1]{%
+ \texorpdfstring
+  {\texttt{\char`\\ jobname-#1.glstex}}%
+  {\string\\jobname-1.glstex}%
+}
+
+
 \newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\csfmt}[1]{\texorpdfstring{\texttt{\char`\\ #1}}{\string\\#1}}
@@ -91,6 +104,7 @@ actual '='
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\idprefixfmt}[1]{%
  \texorpdfstring{\texttt{#1\spacefactor999 .}}{#1.}}
@@ -140,6 +154,18 @@ actual '='
 \newcommand*{\abbrstyle}[1]{%
   \texorpdfstring
   {\abbrstylefmt{#1}\index{abbreviation style!#1\actual\abbrstylefmt{#1}}}%
+  {#1}%
+}
+
+\newcommand*{\glostyle}[1]{%
+  \texorpdfstring
+  {\glostylefmt{#1}\index{glossary style!#1\actual\glostylefmt{#1}}}%
+  {#1}%
+}
+
+\newcommand*{\catattr}[1]{%
+  \texorpdfstring
+  {\catattrfmt{#1}\index{category attributes!#1\actual\catattrfmt{#1}}}%
   {#1}%
 }
 
@@ -481,7 +507,7 @@ textual labels (\qt{Page} and \qt{Pages} in English) will be taken
 from the resource file. In the event that the loaded resource file
 doesn't match the document language, you will have to manually set
 the correct translation (in English, this would be
-\optfmt{loc-prefix\dequals\marg{Page,Pages}}).
+\csopt[Page\dcomma Pages]{loc-prefix}).
 
 Currently only \file{bib2gls-en.xml} exists as my language skills aren't up
 to translating it. Any volunteers who want to provide other language
@@ -615,7 +641,7 @@ For example, suppose the \ext{bib} file includes:
 }
 \end{verbatim}
 (The empty group at the start of the \field{name} fields
-protects against the possibility that the \catattrfmt{glossname}
+protects against the possibility that the \catattr{glossname}
 category attribute might be set to \optfmt{firstuc}, which
 automatically converts the first letter of the name to 
 upper case when displaying the glossary.)
@@ -1174,7 +1200,7 @@ called \field{group}. If the \longarg{group} switch is used,
 \bibgls\ will try to determine the letter group for each entry and
 add it to the \field{group} field. This value will be picked up by
 \cs{printunsrtglossary} if letter group headings are required (for
-example with the \optfmt{indexgroup} style). If
+example with the \abbrstyle{indexgroup} style). If
 you're not using a glossary style that displays the group headings,
 there's no need to use this switch. Note that this switch
 doesn't automatically select an appropriate glossary style.
@@ -1678,7 +1704,7 @@ English: \gls{rna}; \gls{rna}.
 
 German: \gls{de.rna}; \gls{de.rna}.
 \end{verbatim}
-Another variation is to use the \optfmt{long-short-user}
+Another variation is to use the \abbrstyle{long-short-user}
 abbreviation style and modify \cs{glsxtruserfield} so that
 the \field{duallong} field is selected for the parenthetical
 material:
@@ -1694,7 +1720,7 @@ and the first use of the dual entry is displayed as:
 Ribonukleins\"aure (RNS, ribonucleic acid)
 \end{quote}
 
-Here's an example to be used with the \optfmt{long-short-desc}
+Here's an example to be used with the \abbrstyle{long-short-desc}
 style:
 \begin{alltt}
 @dualabbreviation\marg{rna,
@@ -1765,7 +1791,7 @@ German: \gls{de.rna}; \gls{de.rna}.
 \printunsrtglossaries
 \end{document}
 \end{verbatim}
-Note that since this document uses the \optfmt{long-short-desc}
+Note that since this document uses the \abbrstyle{long-short-desc}
 abbreviation style, the \optref{sort-field} needs to be changed
 to \optfmt{long}, since the fallback if the \field{sort} field is
 missing is the \field{short} field.
@@ -1790,7 +1816,7 @@ post-description hook can be modified to allow for this:
 }
 \end{verbatim}
 
-An alternative is to use the \optfmt{long-short-user-desc} style
+An alternative is to use the \abbrstyle{long-short-user-desc} style
 without the post-description hook:
 \begin{verbatim}
 \setabbreviationstyle{long-short-user-desc}
@@ -1799,7 +1825,7 @@ without the post-description hook:
 \end{verbatim}
 However be careful with this approach as it can cause nested
 hyperlinks. In this case it's better to use the
-\optfmt{long-postshort-user-desc} style which defers the
+\abbrstyle{long-postshort-user-desc} style which defers the
 parenthetical material until after the link-text:
 \begin{verbatim}
 \setabbreviationstyle{long-postshort-user-desc}
@@ -1907,7 +1933,7 @@ file.
 \subsection{\csoptnv{set-widest}=\margm{boolean}}
 \labelopt{set-widest}
 
-The \optfmt{alttree} glossary style needs to know the widest
+The \glostyle{alttree} glossary style needs to know the widest
 \field{name} (for each level, if hierarchical). This can
 be set using \cs{glssetwidest} provided by the \sty{glossaries}
 package, but this requires knowing which name is the widest.
@@ -2126,11 +2152,6 @@ supplied in the \csopt{src} option.
 \end{itemize}
 The \meta{value} must be supplied.
 
-\subsection{\csoptnv{external}=\margm{list}}
-\labelopt{external}
-
-Not yet implemented.
-
 \subsection{\csoptnv{match}=\margm{key-val list}}
 \labelopt{match}
 
@@ -2212,6 +2233,243 @@ will still be considered a dependent ancestor from the
 Note the difference between this option and using
 \csopt[parent]{ignore-fields} which will remove the dependency
 (unless a dependency is established through another field).
+
+\section{Master Documents}
+\label{sec:master}
+
+Suppose you have two documents \filefmt{mybook.tex} and
+\filefmt{myarticle.tex} that share a common glossary that's shown
+in \filefmt{mybook.pdf} but not in \filefmt{myarticle.pdf}.
+Furthermore, you'd like to use \sty{hyperref} and be able to click
+on a term in \filefmt{myarticle.pdf} and be taken to the relevant 
+page in \filefmt{mybook.pdf} where the term is listed in the
+glossary.
+
+This can be achieved with the \catattr{targeturl} and
+\catattr{targetname} category attributes. For example, without
+\bibgls\ the file \filefmt{mybook.tex} might look like:
+\begin{verbatim}
+\documentclass{book}
+\usepackage[colorlinks]{hyperref}
+\usepackage{glossaries-extra}
+
+\makeglossaries
+
+\newglossaryentry{sample}{name={sample},description={an example}}
+
+\begin{document}
+\chapter{Example}
+\gls{sample}.
+
+\printglossaries
+\end{document}
+\end{verbatim}
+The other document \filefmt{myarticle.tex} might look like:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[colorlinks]{hyperref}
+\usepackage{glossaries-extra}
+
+\newignoredglossary*{external}
+\glssetcategoryattribute{external}{targeturl}{mybook.pdf}
+\glssetcategoryattribute{external}{targetname}{\glolinkprefix\glslabel}
+
+\newglossaryentry{sample}{type=external,category=external,
+ name={sample},description={an example}}
+
+\begin{document}
+\gls{sample}.
+\end{document}
+\end{verbatim}
+In this case the \optfmt{main} glossary isn't used, but the category 
+attributes allow a mixture of internal and external references, so
+the \optfmt{main} glossary could be used for the internal
+references. (In which case, \csfmt{makeglossaries} and
+\csfmt{printglossaries} would need to be added back to
+\filefmt{myarticle.tex}.)
+
+Note that both documents had to define the common terms. The above
+documents can be rewritten to work with \bibgls. First a \ext{bib}
+file needs to be created:
+\begin{verbatim}
+@entry{sample,
+  name={sample},
+  description={an example}
+}
+\end{verbatim}
+Assuming this file is called \filefmt{myentries.bib}, then
+\filefmt{mybook.tex} can be changed to:
+\begin{verbatim}
+\documentclass{book}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={myentries}]
+
+\begin{document}
+\chapter{Example}
+\gls{sample}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+and \filefmt{myarticle.tex} can be changed to:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\newignoredglossary*{external}
+\glssetcategoryattribute{external}{targeturl}{mybook.pdf}
+\glssetcategoryattribute{external}{targetname}{\glolinkprefix\glslabel}
+
+\GlsXtrLoadResources[
+ src={myentries},
+ sort=none,
+ label-prefix={book.},
+ type=external,
+ category=external]
+
+\begin{document}
+\gls{book.sample}.
+\end{document}
+\end{verbatim}
+Most of the options related to sorting and the glossary format are
+unneeded here since the glossary isn't being displayed. This may be
+sufficient for your needs, but it may be that the book has changed
+various settings that have been written to \filefmt{mybook.glstex}
+but aren't present in the \ext{bib} file (such as
+\optref[uc]{short-case-change}). In this case, you could just remember to copy
+over the settings from \filefmt{mybook.tex} to
+\filefmt{myarticle.tex}, but
+another possibility is to simply make \filefmt{myarticle.tex} input
+\filefmt{mybook.glstex} instead of using \cs{GlsXtrLoadResources}. This
+can work but it's not so convenient to set the label prefix, the
+type and the category.  The \optfmt{master} option allows this, but
+it has limitations (see below), so in complex cases (in particular
+different label prefixes combined with hierarchical entries or cross-references) you'll have to use
+the method shown in the example code above.
+
+\subsection{\csoptnv{master}=\margm{name}}
+\labelopt{master}
+
+This option will disable most of the options that relate to
+parsing and processing data contained in \ext{bib} files
+(since this option doesn't actually read any \ext{bib} files).
+
+The use of \optfmt{master} isn't always suitable. In particular
+if any of the terms cross-reference each other, such as through
+the \field{see} field or the \field{parent} field or
+using commands like \cs{gls} in any of the other fields when
+the labels have been assigned prefixes. In this
+case you will need to use the method described in the example above.
+
+The \meta{name} is the name of the \ext{aux} file for the master
+document without the extension (in this case, \filefmt{mybook}). It
+needs to be relative to the document referencing it or an absolute
+path using forward slashes as the directory divider. Remember that
+if it's a relative path, the PDF files (\filefmt{mybook.pdf} and
+\filefmt{myarticle.pdf}) will also need to be located in the same
+relative position.
+
+When \bibgls\ detects the \csopt{master} option, it won't search for
+entries in any \ext{bib} files (for that particular resource set)
+but will create a \ext{glstex} file that inputs the master
+document's
+\ext{glstex} files, but it will additionally temporarily
+adjust the internal commands used to define entries so that
+the prefix given by \optref{label-prefix}, the glossary type and the
+category type are all automatically inserted. If the \optref{type}
+or \optref{category} options haven't been used, the corresponding
+value will default to \optfmt{master}. The \catattr{targeturl}
+and \catattr{targetname} category attributes will automatically be
+set, and the glossary type will be provided using
+\cs{provideignoredglossary*}\margm{type}.
+
+The above \filefmt{myarticle.tex} can be changed to:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ label-prefix={book.},
+ master={mybook}]
+
+\begin{document}
+\gls{book.sample}.
+\end{document}
+\end{verbatim}
+
+There are some settings from the master document that you 
+still need to repeat in the other document. These include
+the label prefixes set when the master document loaded
+the resource files, and any settings in the master document
+that relate to the master document's entries.
+
+For example, if the master document loaded a resource file
+with \optref[term.]{label-prefix} then you also need this
+prefix when you reference the entries in the dependent document
+in addition to the \optfmt{label-prefix} for the dependent document.
+Suppose \filefmt{mybook.tex} loads the resources using
+\begin{verbatim}
+\GlsXtrLoadResources[src={myentries},label-prefix={term.}]
+\end{verbatim}
+and \filefmt{myarticle.tex} loads the resources using:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ label-prefix={book.},
+ master={mybook}]
+\end{verbatim}
+Then the entries referenced in \filefmt{myarticle.tex} need
+to use the prefix \optfmt{book.term.}\ as in:
+\begin{verbatim}
+This is a \gls{book.term.sample} term.
+\end{verbatim}
+
+Remember that the category labels will need adjusting to reflect the
+change in category label in the dependent document.
+
+For example, if \filefmt{mybook.tex} included:
+\begin{verbatim}
+\setabbreviationstyle{long-short-sc}
+\end{verbatim}
+then \filefmt{myarticle.tex} will need:
+\begin{verbatim}
+\setabbreviationstyle[master]{long-short-sc}
+\end{verbatim}
+(change \optfmt{master} to \meta{value} if you have used
+\optref[\meta{value}]{category}). You can, of course, choose
+a different abbreviation style for the dependent document, 
+but the category in the optional argument needs to be correct.
+
+\subsection{\csoptnv{master-resources}=\margm{list}}
+\labelopt{master-resources}
+
+If the master document has multiple resource files
+then by default all that document's
+\ext{glstex} files will be input. If you don't want them all
+you can use \optfmt{master-resources} to specify
+only those files that should be include. The value \meta{list} is 
+a comma-separated list of names, where each name corresponds
+to the final argument of \cs{glsxtrresourcefile}.
+Remember that \cs{GlsXtrLoadResources} is just a shortcut
+for \cs{glsxtrresourcefile} that bases the name on \cs{jobname}.
+(Note that, as with the argument of \cs{glsxtrresourcefile},
+the \ext{glstex} extension should not be included.) The file
+\primaryresourcefmt\ is considered the primary
+resource file and the files \suppresourcefmt{\meta{n}}
+(starting with \meta{n} equal to 1) are considered the supplementary resource files.
+
+For example, to just select the first and third of the
+supplementary resource files (omitting the primary
+\filefmt{mybook.glstex}):
+\begin{verbatim}
+\GlsXtrLoadResources[
+  master={mybook},
+  master-resources={mybook-1,mybook-3}
+]
+\end{verbatim}
 
 \section{Field and Label Options}
 \label{sec:labelopts}
@@ -2590,7 +2848,7 @@ styles simply define this command as:
 \begin{verbatim}
 \renewcommand*{\abbrvpluralsuffix}{\glspluralsuffix}
 \end{verbatim}
-The \qt{sc} styles (such as \optfmt{long-short-sc}) use a different
+The \qt{sc} styles (such as \abbrstyle{long-short-sc}) use a different
 definition:
 \begin{verbatim}
 \renewcommand*{\abbrvpluralsuffix}{\protect\glsxtrscsuffix}
@@ -2606,12 +2864,12 @@ need to redefine \cs{glsxtrabbrvpluralsuffix}. Alternatively you can
 use the category attributes.
 
 There are two attributes that affect the short plural suffix
-formation. The first is \optfmt{aposplural} which uses the suffix
+formation. The first is \catattr{aposplural} which uses the suffix
 \begin{verbatim}
 '\abbrvpluralsuffix
 \end{verbatim}
 That is, an apostrophe followed by \cs{abbrvpluralsuffix} is
-appended. The second attribute is \optfmt{noshortplural} which
+appended. The second attribute is \catattr{noshortplural} which
 suppresses the suffix and simply sets \field{shortplural} to the
 same as \field{short}.
 

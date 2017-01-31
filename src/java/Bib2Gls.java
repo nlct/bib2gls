@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 // Requires Java 1.7:
 import java.nio.charset.Charset;
@@ -543,10 +545,16 @@ public class Bib2Gls implements TeXApp
       return packages;
    }
 
+   public boolean fontSpecLoaded()
+   {
+      return fontspec;
+   }
+
    // Search for some packages that texparserlib.jar recognises
    private void parseLog() throws IOException
    {
-      String name = auxFile.getName();
+      String auxname = auxFile.getName();
+      String name = auxname;
 
       int idx = name.lastIndexOf(".aux");
 
@@ -556,23 +564,14 @@ public class Bib2Gls implements TeXApp
          return;
       }
 
-      name = name.substring(0, idx)+".log";
+      String basename = name.substring(0, idx);
+      name = basename+".log";
 
       File logFile = new File(auxFile.getParentFile(), name);
 
       packages = new Vector<String>();
 
       BufferedReader in = null;
-
-      boolean amsmath=false;
-      boolean amssymb=false;
-      boolean pifont=false;
-      boolean textcase=false;
-      boolean wasysym=false;
-      boolean lipsum=false;
-      boolean natbib=false;
-
-      int known = 7;
 
       try
       {
@@ -584,43 +583,28 @@ public class Bib2Gls implements TeXApp
 
          while ((line = in.readLine()) != null)
          {
-            if (!amsmath && line.startsWith("Package: amsmath"))
-            {
-               packages.add("amsmath");
-               amsmath = true;
-            }
-            else if (!amssymb && line.startsWith("Package: amssymb"))
-            {
-               packages.add("amssymb");
-               amssymb = true;
-            }
-            else if (!pifont && line.startsWith("Package: pifont"))
-            {
-               packages.add("pifont");
-               pifont = true;
-            }
-            else if (!textcase && line.startsWith("Package: textcase"))
-            {
-               packages.add("textcase");
-               textcase = true;
-            }
-            else if (!wasysym && line.startsWith("Package: wasysym"))
-            {
-               packages.add("wasysym");
-               wasysym = true;
-            }
-            else if (!lipsum && line.startsWith("Package: lipsum"))
-            {
-               packages.add("lipsum");
-               lipsum = true;
-            }
-            else if (!natbib && line.startsWith("Package: natbib"))
-            {
-               packages.add("natbib");
-               natbib = true;
-            }
+            Matcher m =PATTERN_PACKAGE.matcher(line);
 
-            if (packages.size() == known)
+            if (m.matches())
+            {
+               String pkg = m.group(1);
+
+               if (pkg.equals("amsmath")
+                 ||pkg.equals("amssymb")
+                 ||pkg.equals("pifont")
+                 ||pkg.equals("textcase")
+                 ||pkg.equals("wasysym")
+                 ||pkg.equals("lipsum")
+                 ||pkg.equals("natbib"))
+               {
+                  packages.add(pkg);
+               }
+               else if (pkg.equals("fontspec"))
+               {
+                  fontspec = true;
+               }
+            }
+            else if (line.contains(auxname))
             {
                break;
             }
@@ -1153,7 +1137,10 @@ public class Bib2Gls implements TeXApp
       {
          currentResource = glsresources.get(i);
 
-         count += currentResource.processData();
+         // If 'master' option was used, n will be -1
+         int n = currentResource.processData();
+
+         if (n > 0) count += n;
       }
 
       currentResource = null;
@@ -2631,6 +2618,11 @@ public class Bib2Gls implements TeXApp
    private File auxFile;
    private File logFile;
    private PrintWriter logWriter=null;
+
+   public static final Pattern PATTERN_PACKAGE
+      = Pattern.compile("^Package: ([^\\s]+).*");
+
+   private boolean fontspec = false;
 
    private Vector<GlsResource> glsresources;
    private Vector<String> fields;

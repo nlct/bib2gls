@@ -71,6 +71,8 @@ public class GlsResource
 
       String[] srcList = null;
 
+      String master = null;
+
       for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
       {
          String opt = it.next();
@@ -91,16 +93,22 @@ public class GlsResource
                }
             }
          }
-         else if (opt.equals("external"))
-         {// TODO
+         else if (opt.equals("master"))
+         {// link all entries to glossary in external pdf file
+            master = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("master-resources"))
+         {
+            masterSelection = getStringArray(parser, list, opt);
          }
          else if (opt.equals("short-case-change"))
          {
             shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc");
          }
-         else if (opt.equals("dualshort-case-change"))
+         else if (opt.equals("dual-short-case-change"))
          {
-            dualShortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc");
+            dualShortCaseChange = getChoice(parser, list, opt,
+              "none", "lc", "uc");
          }
          else if (opt.equals("short-plural-suffix"))
          {
@@ -519,6 +527,11 @@ public class GlsResource
          }
       }
 
+      if (master != null)
+      {
+         parseMaster(parser, master);
+      }
+
       if ("doc".equals(sort))
       {
          sort = bib2gls.getDocDefaultLocale();
@@ -676,7 +689,7 @@ public class GlsResource
          bib2gls.logMessage();
       }
 
-      if (srcList == null)
+      if (srcList == null && master == null)
       {
          try
          {
@@ -688,6 +701,277 @@ public class GlsResource
               bib2gls.getMessage("error.missing.src", filename+".bib"), e);
          }
       }
+   }
+
+   private void parseMaster(TeXParser parser, String master)
+    throws IOException,Bib2GlsException
+   {
+      // Check for option clashes:
+
+      if (sources.size() > 0)
+      {
+         bib2gls.warning(
+           bib2gls.getMessage("warning.option.clash", "master", "src"));
+
+         sources.clear();
+      }
+
+      if (shortCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "short-case-change"));
+      }
+
+      if (dualShortCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-short-case-change"));
+      }
+
+      if (shortPluralSuffix != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "short-plural-suffix"));
+      }
+
+      if (dualShortPluralSuffix != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-short-plural-suffix"));
+      }
+
+      if (fieldPatterns != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "match"));
+      }
+
+      if (secondaryType != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "secondary"));
+      }
+
+      if (externalPrefixes != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "ext-prefixes"));
+      }
+
+      if (flatten)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "flatten"));
+      }
+
+      if (setWidest)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "set-widest"));
+      }
+
+      if (dualType != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-type"));
+      }
+
+      if (dualField != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-field"));
+      }
+
+      if (dualCategory != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-category"));
+      }
+
+      if (!"dual.".equals(dualPrefix))
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-prefix"));
+      }
+
+      if (dualSort != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-sort"));
+      }
+
+      if (!dualSortField.equals("sort"))
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-sort"));
+      }
+
+      if (!"locale".equals(sort))
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "sort"));
+      }
+
+      if (!sortField.equals("sort"))
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "sort"));
+      }
+
+      if (bibCharset != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "charset"));
+      }
+
+      if (minLocationRange != 3)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "min-loc-range"));
+      }
+
+      if (locGap != 1)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "loc-gap"));
+      }
+
+      if (suffixF != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "suffixF"));
+      }
+
+      if (suffixFF != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "suffixFF"));
+      }
+
+      if (seeLocation != Bib2GlsEntry.POST_SEE)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "see"));
+      }
+
+      if (locationPrefix != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "loc-prefix"));
+      }
+
+      if (locationSuffix != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "loc-suffix"));
+      }
+
+      if (skipFields != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "ignore-fields"));
+      }
+
+      if (selectionMode != SELECTION_RECORDED_AND_DEPS)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "selection"));
+      }
+
+      if (collatorStrength != Collator.PRIMARY)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "strength"));
+      }
+
+      if (collatorDecomposition != Collator.CANONICAL_DECOMPOSITION)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "decomposition"));
+      }
+
+      // Need to find master aux file which should be relative to
+      // the current directory. (Don't use kpsewhich to find it.)
+
+      TeXPath path = new TeXPath(parser, master+".aux", false);
+
+      bib2gls.checkReadAccess(path);
+
+      File auxFile = path.getFile();
+
+      // Has the category been set? If not, set it to 'master'
+
+      if (category == null)
+      {
+         category = "master";
+      }
+     
+      // Has the category been set? If not, set it to 'master'
+
+      if (type == null)
+      {
+         type = "master";
+      }
+
+      // Need to parse aux file to find .bib sources, the value of
+      // \glolinkprefix, the label prefix and the .glstex files.
+
+      AuxParser auxParser = new AuxParser(bib2gls)
+      {
+         protected void addPredefined()
+         {
+            super.addPredefined();
+
+            addAuxCommand("glsxtr@resource", 2);
+            addAuxCommand("glsxtr@linkprefix", 1);
+         }
+      };
+
+      masterPdfPath = new TeXPath(parser, master+".pdf", false);
+
+      TeXParser auxTeXParser = auxParser.parseAuxFile(auxFile);
+
+      Vector<AuxData> auxData = auxParser.getAuxData();
+
+      masterGlsTeXPath = new Vector<TeXPath>();
+
+      for (AuxData data : auxData)
+      {
+         String name = data.getName();
+
+         if (name.equals("glsxtr@resource"))
+         {// Only need the .glstex file name
+
+            String basename = data.getArg(1).toString(auxTeXParser);
+
+            if (masterSelection != null)
+            {
+               boolean found = false;
+
+               for (String str : masterSelection)
+               {
+                  if (str.equals(basename))
+                  {
+                     found = true;
+                     break;
+                  }
+               }
+
+               if (!found) continue;
+            }
+
+            TeXPath glsPath = new TeXPath(parser, basename+".glstex", false);
+
+            bib2gls.checkReadAccess(glsPath);
+
+            masterGlsTeXPath.add(glsPath);
+         }
+         else if (name.equals("glsxtr@linkprefix"))
+         {
+            masterLinkPrefix = data.getArg(0).toString(auxTeXParser);
+         }
+      }
+
    }
 
    private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
@@ -1443,6 +1727,102 @@ public class GlsResource
       }
    }
 
+   public int processData()
+      throws IOException,Bib2GlsException
+   {
+      if (masterGlsTeXPath == null)
+      {
+         return processBibData();
+      }
+      else
+      {
+         processMaster();
+         return -1;
+      }
+   }
+
+   private void processMaster()
+      throws IOException,Bib2GlsException
+   {
+      bib2gls.message(bib2gls.getMessage("message.writing", 
+       texFile.toString()));
+
+      // Already checked openout_any in init method
+
+      PrintWriter writer = null;
+
+      try
+      {
+         writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
+
+         // Save original definition of \@glsxtr@s@longnewglossaryentry
+         // and \glsxtr@newabbreviation
+
+         writer.println(
+           "\\let\\bibglsorgdefglossaryentry\\@glsxtr@s@longnewglossaryentry");
+         writer.println(
+           "\\let\\bibglsorgdefabbreviation\\glsxtr@newabbreviation");
+         writer.println();
+
+         writer.println(
+           "\\renewcommand{\\@glsxtr@s@longnewglossaryentry}[3]{%");
+         writer.format(
+          " \\bibglsorgdefglossaryentry{%s#1}{#2,type={%s},category={%s}}{#3}%%%n",
+          labelPrefix == null ? "" : labelPrefix, type, category);
+         writer.println("}");
+         writer.println();
+
+         writer.println(
+           "\\renewcommand{\\glsxtr@newabbreviation}[4]{%");
+         writer.format(
+          " \\bibglsorgdefabbreviation{#1,type={%s},category={%s}}{%s#2}{#3}{#4}%%%n",
+          type, category, labelPrefix == null ? "" : labelPrefix);
+         writer.println("}");
+         writer.println();
+
+         writer.format("\\provideignoredglossary*{%s}%n", type);
+         writer.format("\\glssetcategoryattribute{%s}{targeturl}{%s}%n", 
+           category, masterPdfPath);
+         writer.format("\\glssetcategoryattribute{%s}{targetname}", 
+           category);
+
+         if (labelPrefix == null)
+         {
+            writer.format("{%s\\glslabel}%n", masterLinkPrefix);
+         }
+         else
+         {
+            writer.format(
+              "{%s\\csname bibglsstrip%sprefix\\expandafter\\endcsname\\glslabel}%n", 
+               masterLinkPrefix, category);
+
+            writer.format("\\csdef{bibglsstrip%sprefix}%s#1{#1}%n", 
+              category, labelPrefix);
+         }
+
+         for (TeXPath path : masterGlsTeXPath)
+         {
+            writer.println();
+            writer.format("\\InputIfFileExists{%s}{}{}%n", path);
+            writer.println();
+         }
+
+         // Restore original definitions
+         writer.println(
+           "\\let\\@glsxtr@s@longnewglossaryentry\\bibglsorgdefglossaryentry");
+
+         writer.println(
+           "\\let\\glsxtr@newabbreviation\\bibglsorgdefabbreviation");
+      }
+      finally
+      {
+         if (writer != null)
+         {
+            writer.close();
+         }
+      }
+   }
+
    public void setPreamble(String content, BibValueList list)
     throws IOException
    {
@@ -1636,7 +2016,7 @@ public class GlsResource
       }
    }
 
-   public int processData()
+   private int processBibData()
       throws IOException,Bib2GlsException
    {
       if (bibData == null)
@@ -2078,6 +2458,7 @@ public class GlsResource
 
       return entryCount;
    }
+
 
    private void updateWidestName(Bib2GlsEntry entry, 
      Vector<String> widestNames, 
@@ -2586,7 +2967,7 @@ public class GlsResource
 
    private int minLocationRange = 3, locGap = 1;
 
-   private String suffixF, suffixFF;
+   private String suffixF=null, suffixFF=null;
 
    private String preamble = null;
    private BibValueList preambleList = null;
@@ -2632,6 +3013,11 @@ public class GlsResource
 
    private String shortCaseChange=null;
    private String dualShortCaseChange=null;
+
+   private String masterLinkPrefix=null;
+   private Vector<TeXPath> masterGlsTeXPath = null;
+   private TeXPath masterPdfPath = null;
+   private String[] masterSelection = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

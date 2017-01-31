@@ -7,7 +7,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-external-refs.pdf test-hierarchical.pdf \
 	  test-match.pdf test-secondary.pdf test-ascii.pdf \
 	  test-pifonts.pdf test-dual-abbrv.pdf \
-	  test-dual-abbrv-desc.pdf test-numbers.pdf
+	  test-dual-abbrv-desc.pdf test-numbers.pdf \
+	  test-book.pdf test-article.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -138,6 +139,18 @@ test-numbers.pdf	: test-numbers.glstex
 test-numbers.glstex	: test-numbers.tex $(DEPS) test-numbers.bib
 		pdflatex test-numbers
 		$(BIB2GLS) test-numbers
+
+test-book.pdf	: test-book.glstex
+		pdflatex test-book
+
+test-book.glstex	: test-book.tex $(DEPS) entries-multipar.bib
+		pdflatex test-book
+		$(BIB2GLS) test-book
+
+test-article.pdf	: test-book.pdf $(DEPS) test-article.tex
+			pdflatex test-article
+			$(BIB2GLS) test-article
+			pdflatex test-article
 
 clean	:
 	$(RM) *.aux

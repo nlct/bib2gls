@@ -112,21 +112,8 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       }
       catch (NumberFormatException e)
       {
-         if (sort.startsWith("double"))
-         {
-            value = "0.0";
-            entry.setNumericSort(new Double(0.0));
-         }
-         if (sort.startsWith("float"))
-         {
-            value = "0.0f";
-            entry.setNumericSort(new Float(0.0f));
-         }
-         else
-         {
-            value = "0";
-            entry.setNumericSort(new Integer(0));
-         }
+         value = "0";
+         entry.setNumericSort(new Integer(0));
       }
 
       entry.putField("sort", value);

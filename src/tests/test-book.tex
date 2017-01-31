@@ -1,0 +1,18 @@
+\documentclass{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[ 
+ src=entries-multipar,% entries-multipar.bib
+]
+
+\begin{document}
+\chapter{Sample}
+
+\gls{loremi-ii}, \gls{loremiii-iv}, \gls{loremv-vi}.
+
+\printunsrtglossaries
+
+\end{document}
