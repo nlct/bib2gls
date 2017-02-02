@@ -106,6 +106,21 @@ public class Bib2GlsAt extends At
          if (data instanceof BibEntry)
          {
             id = ((BibEntry)data).getId();
+
+            if (containsSpecialChars(id))
+            {
+               bib2gls.warning(parser, bib2gls.getMessage(
+                "warning.spchars.id", id));
+            }
+
+            if (!bib2gls.fontSpecLoaded())
+            {
+               if (containsExtendedChars(id))
+               {
+                  bib2gls.warning(parser, bib2gls.getMessage(
+                   "warning.notbasiclatin.id", id));
+               }
+            }
          }
 
          builder = new StringBuilder();
@@ -158,6 +173,44 @@ public class Bib2GlsAt extends At
       }
 
       bibParser.addBibData(data);
+   }
+
+   protected boolean containsSpecialChars(String id)
+   {
+      for (int i = 0, n = id.length(); i < n; )
+      {
+         int codepoint = id.codePointAt(i);
+         i += Character.charCount(codepoint);
+
+         // Unlikely that some of these will occur as it would've
+         // confused the parser before reaching this point.
+
+         if (codepoint == '$' || codepoint == '^' || codepoint == '~'
+           || codepoint == '#' || codepoint == '{' || codepoint == '}'
+           || codepoint == '_' || codepoint == '&' || codepoint == '\\'
+           || codepoint == '%')
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   protected boolean containsExtendedChars(String id)
+   {
+      for (int i = 0, n = id.length(); i < n; )
+      {
+         int codepoint = id.codePointAt(i);
+         i += Character.charCount(codepoint);
+
+         if (codepoint > 0x007F)
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private GlsResource resource;

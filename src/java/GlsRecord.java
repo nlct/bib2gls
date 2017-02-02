@@ -509,7 +509,7 @@ public class GlsRecord
    private String label, prefix, counter, format, location;
 
    private static final Pattern DIGIT_PATTERN
-     = Pattern.compile("(.*?)([^0-9]?)([0-9]+)");
+     = Pattern.compile("(.*?)([^\\p{javaDigit}]?)(\\p{javaDigit}+)");
 
    private static final Pattern ROMAN_LC_PATTERN
      = Pattern.compile("(.*?)(.??)(m*)(c{1,3}|c?d|dc{1,3}|cm)?(x{1,3}|x?l|lx{1,3}|xc)?(i{1,3}|i?v|vi{1,3}|ix)?");
@@ -518,8 +518,8 @@ public class GlsRecord
      = Pattern.compile("(.*?)(.??)(M*)(C{1,3}|C?D|DC{1,3}|CM)?(X{1,3}|X?L|LX{1,3}|XC)?(I{1,3}|I?V|VI{1,3}|IX)?");
 
    private static final Pattern ALPHA_PATTERN
-     = Pattern.compile("(.*?)(?:([^a-z]?)([a-z]))|(?:([^A-Z]?)([A-Z]))");
+     = Pattern.compile("(.*?)(?:([^\\p{javaLowerCase}]?)(\\p{javaUpperCase}))|(?:([^\\p{javaUpperCase}]?)(\\p{javaUpperCase}))");
 
    private static final Pattern CS_PATTERN
-     = Pattern.compile("(.*?)(?:\\\\protect\\s*)?(\\\\[a-zA-Z@]+)\\s*\\{([0-9a-zA-Z]+)\\}");
+     = Pattern.compile("(.*?)(?:\\\\protect\\s*)?(\\\\[\\p{javaAlphabetic}@]+)\\s*\\{([\\p{javaDigit}\\p{javaAlphabetic}]+)\\}");
 }

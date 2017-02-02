@@ -3081,9 +3081,13 @@ considered consecutive.
 \item\label{itm:emptyloc} If either \meta{location-1} or \meta{location-2} are empty,
 then the locations aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
-pattern
+pattern\footnote{The Java class \texttt{\csfmt{p}\marg{javaDigit}}
+used in the regular expression will not only match the Western
+Arabic digits 0,\ldots, 9 but also digits in other scripts.
+Similarly the alphabetic classes will match alphabetic characters
+outside the Basic Latin set.}
 \begin{verbatim}
-(.*?)(?:\\protect\s*)?(\\[a-zA-Z@]+)\s*\{([0-9a-zA-Z]+)\}
+(.*?)(?:\\protect\s*)?(\\[\p{javaAlphabetic}@]+)\s*\{([\p{javaDigit}\p{javaAlphabetic}]+)\}
 \end{verbatim}
 then:
   \begin{itemize}
@@ -3100,7 +3104,7 @@ group 3 of the second pattern match.
 \item\label{itm:decmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern
 \begin{verbatim}
-(.*?)([^0-9]?)([0-9]+)
+(.*?)([^\p{javaDigit}]?)(\p{javaDigit}+)
 \end{verbatim}
 then:
   \begin{enumerate}

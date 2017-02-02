@@ -583,11 +583,11 @@ public class Bib2Gls implements TeXApp
 
          while ((line = in.readLine()) != null)
          {
-            Matcher m =PATTERN_PACKAGE.matcher(line);
+            Matcher m = PATTERN_PACKAGE.matcher(line);
 
             if (m.matches())
             {
-               String pkg = m.group(1);
+               String pkg = m.group(1).toLowerCase();
 
                if (pkg.equals("amsmath")
                  ||pkg.equals("amssymb")
@@ -595,7 +595,15 @@ public class Bib2Gls implements TeXApp
                  ||pkg.equals("textcase")
                  ||pkg.equals("wasysym")
                  ||pkg.equals("lipsum")
-                 ||pkg.equals("natbib"))
+                 ||pkg.equals("natbib")
+                 ||pkg.equals("mhchem")
+                 ||pkg.equals("bpchem")
+                 ||pkg.equals("stix")
+                 ||pkg.equals("textcomp")
+                 ||pkg.equals("mnsymbol")
+                 ||pkg.equals("xspace")
+                 ||pkg.equals("siunitx")
+               )
                {
                   packages.add(pkg);
                }
