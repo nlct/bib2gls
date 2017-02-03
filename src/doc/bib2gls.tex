@@ -4,6 +4,7 @@
 \documentclass[titlepage=false,index=totoc]{scrreprt}
 
 \usepackage[T1]{fontenc}
+\usepackage{tgtermes}
 \usepackage{alltt}
 \usepackage{upquote}
 \usepackage{etoolbox}
@@ -574,14 +575,14 @@ The \bibgls\ application requires the \TeX\ Parser Library
 and \ext{bib} files.
 
 With the \argref{interpret} switch on (default), this library is
-also used to interpret the value of the sort field when it
-contains a backslash \verb|\| or dollar symbol \verb|$| (and when the \optref{sort}
-option is not
-\optfmt{unsrt} or \optfmt{none} or \optfmt{use}). The other case is with
+also used to interpret the value of the sort field when it contains
+a backslash \verb|\| or a dollar symbol \verb|$| or braces \verb|{|
+\verb|}| (and when the \optref{sort} option is not \optfmt{unsrt} or
+\optfmt{none} or \optfmt{use}). The other case is with
 \optref{set-widest} when determining the width of the \field{name}
-field. The \argref{no-interpret} switch will turn off this
-function, but the library will still be used to parse the \ext{aux}
-and \ext{bib} files.
+field. The \argref{no-interpret} switch will turn off this function,
+but the library will still be used to parse the \ext{aux} and
+\ext{bib} files.
 
 The \file{texparserlib.jar} library is not intended as a full-blown
 \TeX\ engine and there are plenty of situations where it doesn't
@@ -1335,9 +1336,12 @@ recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
 rebuild the document to ensure the location lists are correct.
 
-The standard \atentry{string}\labelatentry{string} and 
-\atentry{preamble}\labelatentry{preamble} types are recognised, so you
-can do, for example:
+\section{\atentry{string}}
+\labelatentry{string}
+
+The standard \atentry{string} is available and can be used to define
+variables that may be used in field values.
+For example:
 \begin{verbatim}
 @string{ssi={server-side includes}}
 @string{html={hypertext markup language}}
@@ -1357,7 +1361,15 @@ can do, for example:
   short="ssi",
   long = ssi
 }
+\end{verbatim}
 
+\section{\atentry{preamble}}
+\labelatentry{preamble}
+
+The standard \atentry{preamble} is available and can be used to
+provide command definitions used within field values.
+For example:
+\begin{verbatim}
 @preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
 
 @entry{matrix,
@@ -1366,6 +1378,208 @@ can do, for example:
   description={rectangular array of values, denoted $\mtx{M}$}
 }
 \end{verbatim}
+
+The \TeX\ parser library used by \bibgls\ will parse the contents of
+\atentry{preamble} before trying to interpret the field value used
+as a fallback when \field{sort} is omitted.
+For example:
+\begin{verbatim}
+@preamble{"\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}"}
+
+@symbol{S,
+  name={{}$\set{S}$},
+  text={\set{S}},
+  description={a set}
+}
+@symbol{card,
+  name={{}$\card{S}$},
+  text={\card{S}},
+  description={the cardinality of \gls{S}}
+}
+\end{verbatim}
+Neither entry has the \field{sort} field, so \bibgls\ has to fall
+back on the \field{name} field and, since this contains the special
+characters \verb|\| \verb|$| \verb|{| and \verb|}|, the \TeX\ parser
+library is used to interpret it. The definitions provided by
+\atentry{preamble} allow \bibgls\ to deduce that the \field{sort}
+value of the \texttt{S} entry is just \texttt{S} and the \field{sort}
+value of the \texttt{card} entry is \verb"|S|" (see
+\sectionref{sec:texparserlib}).
+
+What happens if you also need to use these commands in the document?
+The definitions provided in \atentry{preamble} won't be available
+until the \ext{glstex} file has been created, which means the
+commands won't be defined on the first \LaTeX\ run.
+
+There are several approaches:
+\begin{enumerate}
+\item Just define the commands in the document. This means the
+commands are available, but \bibgls\ won't be able to correctly
+interpret the \field{name} fields.
+
+\item Define the commands in both the document and in
+\atentry{preamble}. For example:
+\begin{verbatim}
+\newcommand{\set}[1]{\mathcal{#1}}
+\newcommand{\card}[1]{|\set{#1}|}
+\GlsXtrLoadResources[src={my-data}]
+\end{verbatim}
+Alternatively:
+\begin{verbatim}
+\GlsXtrLoadResources[src={my-data}]
+\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}
+\end{verbatim}
+If the provided definitions match those given in the \ext{bib} file,
+there's no difference. If they don't match then in the first example 
+the document definitions will take precedence (but the interpreter
+will use the \atentry{preamble} definitions) and in the second
+example the \atentry{preamble} definitions will take precedence.
+
+\item Make use of \cs{glsxtrfmt} provided by
+\sty{glossaries-extra}\footnote{Introduced in version 1.12.}\ which
+allows you to store the name of the formatting command in a field.
+The default is the \field{user1} field, but this can be changed to 
+another field by redefining \cs{GlsXtrFmtField}.
+
+The \ext{bib} file can now look like this:
+\begin{verbatim}
+@preamble{"\providecommand{\set}[1]{\mathcal{#1}}
+\providecommand{\card}[1]{|\set{#1}|}"}
+
+@symbol{S,
+  name={{}$\set{S}$},
+  text={\set{S}},
+  user1={set},
+  description={a set}
+}
+@symbol{cardS,
+  name={{}$\card{S}$},
+  text={\card{S}},
+  user1={card},
+  description={the cardinality of \gls{S}}
+}
+\end{verbatim}
+Within the document, you can format \meta{text} using the formatting
+command provided in the \field{user1} field with:
+\begin{definition}
+\cs{glsxtrfmt}\oargm{options}\margm{label}\margm{text}
+\end{definition}
+(which internally uses \cs{glslink}) or
+\begin{definition}
+\cs{glsxtrentryfmt}\margm{label}\margm{text}
+\end{definition}
+which just applies the appropriate formatting command to
+\meta{text}. If the entry given by \meta{label} hasn't been defined,
+then this just does \meta{text} and a warning is issued. (It 
+just does \meta{text} without a warning if the field hasn't been set.)
+The \meta{options} are as for \cs{glslink} but \cs{glslink} will
+actually be using
+\begin{alltt}
+\cs{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\csfmt{}\meta{csname}\margm{text}}
+\end{alltt}
+where the default options \meta{def-options} are given by
+\cs{GlsXtrFmtDefaultOptions}. The default definition of this is
+just \texttt{noindex} which suppresses the automatic indexing or
+recording action. (See the \sty{glossaries-extra} manual
+for further details.)
+
+This means that the document doesn't need to actually provide
+\verb|\set| or \verb|\card| but can instead use
+\begin{alltt}
+\cs{glsxtrfmt}\marg{S}\marg{A}
+\end{alltt}
+or
+\begin{alltt}
+\cs{glsxtrentryfmt}\marg{cardS}\marg{B}
+\end{alltt}
+The first \LaTeX\ run will simply ignore the formatting and produce
+a warning.
+
+Since this is a bit cumbersome to write, you can provide shortcut
+commands. For example:
+\begin{verbatim}
+\GlsXtrLoadResources[src={my-data}]
+\newcommand{\gset}[2][]{\glsxtrfmt[#1]{S}{#2}}
+\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardS}{#2}}
+\end{verbatim}
+Whilst this doesn't seem a great deal different from simply
+providing the definitions of \csfmt{set} and \csfmt{card} in the
+document, this means you don't have to worry about remembering 
+the names of the actual commands provided in the \ext{bib} file
+(just the entry labels) and the use of \cs{glsxtrfmt} will
+automatically produce a hyperlink to the glossary entry if the
+\sty{hyperref} package has been loaded.
+\end{enumerate}
+
+Here's an alternative \ext{bib} that defines entries with a term, a
+description and a symbol:
+\begin{verbatim}
+@preamble{"\providecommand{\setfmt}[1]{\mathcal{#1}}
+\providecommand{\cardfmt}[1]{|\setfmt{#1}|}"}
+
+@entry{set,
+  name={set},
+  symbol={\setfmt{S}},
+  user1={setfmt},
+  description={collection of values}
+}
+@entry{cardinality,
+  name={cardinality},
+  symbol={\cardfmt{S}},
+  user1={cardfmt},
+  description={the number of elements in the \gls{set} $\glssymbol{set}$}
+}
+\end{verbatim}
+I've changed the entry labels and the names of the formatting commands.
+The definitions in the document need to reflect the change in label
+but not the change in the formatting commands:
+\begin{verbatim}
+\newcommand{\gset}[2][]{\glsxtrfmt[#1]{set}{#2}}
+\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardinality}{#2}}
+\end{verbatim}
+
+Here's another approach that allows for a more complicated argument
+for the cardinality. (For example, if the argument is an expression
+involving set unions or intersections.)
+The \ext{bib} file is now:
+\begin{verbatim}
+@preamble{"\providecommand{\setfmt}[1]{\mathcal{#1}}
+\providecommand{\cardfmt}[1]{|#1|}"}
+
+@entry{set,
+  name={set},
+  symbol={\setfmt{S}},
+  user1={setfmt},
+  description={collection of values}
+}
+@entry{cardinality,
+  name={cardinality},
+  symbol={\cardfmt{\setfmt{S}}},
+  user1={cardfmt},
+  description={the number of elements in the \gls{set} $\glssymbol{set}$}
+}
+\end{verbatim}
+This has removed the \csfmt{setfmt} command from the definition of
+\csfmt{cardfmt}. Now the definitions in the document:
+\begin{verbatim}
+\newcommand{\gset}[1]{\glsxtrentryfmt{set}{#1}}
+\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardinality}{#2}}
+\end{verbatim}
+This allows for code such as:
+\begin{verbatim}
+\[ \gcard{\gset{A} \cap \gset{B}} \]
+\end{verbatim}
+which will link back to the \texttt{cardinality} entry in the
+glossary and avoids any hyperlinking with \csfmt{gset}.
+Alternatively to avoid links with \csfmt{gcard} as well:
+\begin{verbatim}
+\newcommand{\gset}[1]{\glsxtrentryfmt{set}{#1}}
+\newcommand{\gcard}[1]{\glsxtrentryfmt{cardinality}{#1}}
+\end{verbatim}
+Now \csfmt{gset} and \csfmt{gcard} are simply formatting commands,
+but their actual definitions are determined in the \ext{bib} file.
 
 \section{\atentry{entry}}
 \labelatentry{entry}
