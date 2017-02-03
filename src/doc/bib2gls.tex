@@ -1348,7 +1348,8 @@ some reason (for example, for sorting), \bibgls\ will try to
 fallback on another value. The actual fallback value depends on the
 entry type.
 
-Other entries can be cross-referenced using the \field{see} field or
+Other entries can be cross-referenced using the \field{see} or
+\field{alias} fields or
 by using commands like \cs{gls} or \cs{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
@@ -3590,6 +3591,15 @@ list (default).
 The separator between the location list and the see reference is
 provided by \csref{bibglsseesep}. This separator is omitted if the
 location list is empty. The \meta{value} part is required.
+
+\subsection{\csoptnv{omit-alias-loc}=\margm{value}}
+\labelopt{omit-alias-loc}
+
+This is a boolean option. If \csopt[true]{omit-alias-loc}
+the location lists for aliased entries will be omitted
+(the cross-reference will be retained). If \meta{value} is omitted,
+\optfmt{true} is assumed. The default setting
+is \csopt[true]{omit-alias-loc}.
 
 \subsection{\csoptnv{loc-prefix}=\margm{value}}
 \labelopt{loc-prefix}

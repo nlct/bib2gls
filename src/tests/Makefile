@@ -8,7 +8,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-match.pdf test-secondary.pdf test-ascii.pdf \
 	  test-pifonts.pdf test-dual-abbrv.pdf \
 	  test-dual-abbrv-desc.pdf test-numbers.pdf \
-	  test-book.pdf test-article.pdf test-dual-symbols.pdf
+	  test-book.pdf test-article.pdf test-dual-symbols.pdf \
+	  test-alias.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -158,6 +159,13 @@ test-dual-symbols.pdf	: test-dual-symbols.glstex
 test-dual-symbols.glstex	: test-dual-symbols.tex $(DEPS) entries-dual-symbols.bib
 		pdflatex test-dual-symbols
 		$(BIB2GLS) test-dual-symbols
+
+test-alias.pdf	: test-alias.glstex
+		pdflatex test-alias
+
+test-alias.glstex	: test-alias.tex $(DEPS) test-alias.bib
+		pdflatex test-alias
+		$(BIB2GLS) test-alias
 
 clean	:
 	$(RM) *.aux

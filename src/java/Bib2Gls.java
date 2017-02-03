@@ -25,8 +25,10 @@ import java.util.Locale;
 import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.Calendar;
 
 // Requires Java 1.7:
 import java.nio.charset.Charset;
@@ -611,6 +613,38 @@ public class Bib2Gls implements TeXApp
                {
                   fontspec = true;
                }
+               else if (pkg.equals("glossaries-extra"))
+               {
+                  try
+                  {
+                     Calendar minVersion = Calendar.getInstance();
+                     minVersion.set(2017, 02, 03);
+
+                     int year = Integer.parseInt(m.group(2));
+                     int mon = Integer.parseInt(m.group(3));
+                     int day = Integer.parseInt(m.group(4));
+
+                     Calendar cal = Calendar.getInstance();
+                     cal.set(year, mon, day);
+
+                     if (cal.compareTo(minVersion) < 0)
+                     {
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+
+                        warning(getMessage("error.sty.too.old", 
+                         "glossaries-extra", df.format(cal.getTime()), 
+                           df.format(minVersion.getTime())));
+                     }
+                  }
+                  catch (Exception e)
+                  {
+                     // something strange has happened
+
+                     warning(getMessage("error.no.sty.version", 
+                       "glossaries-extra"));
+                     debug(e);
+                  }
+               }
             }
             else if (line.contains(auxname))
             {
@@ -697,6 +731,8 @@ public class Bib2Gls implements TeXApp
             listener.usepackage(null, sty);
          }
       }
+
+      listener.putControlSequence(new EnableTagging());
    }
 
    public void provideCommand(String csName, String text)
@@ -2613,7 +2649,7 @@ public class Bib2Gls implements TeXApp
    public static final String NAME = "bib2gls";
    public static final String VERSION = "0.1a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-01-21";
+   //public static final String DATE = "2017-03-03";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -2627,8 +2663,8 @@ public class Bib2Gls implements TeXApp
    private File logFile;
    private PrintWriter logWriter=null;
 
-   public static final Pattern PATTERN_PACKAGE
-      = Pattern.compile("^Package: ([^\\s]+).*");
+   public static final Pattern PATTERN_PACKAGE = Pattern.compile(
+       "Package: ([^\\s]+)(?:\\s+(\\d{4})/(\\d{2})/(\\d{2}))?.*");
 
    private boolean fontspec = false;
 

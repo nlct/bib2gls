@@ -7,9 +7,7 @@ StackExchange](http://tex.stackexchange.com/a/343852/19862).
 
 Requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
-which is *pending release*.
-Version 1.12 of glossaries-extra is still unstable and not
-yet ready for release.
+(2017-02-03).
 
 There's a draft version of the (unfinished) user manual
 in the `unstable` directory, which is provided for those 

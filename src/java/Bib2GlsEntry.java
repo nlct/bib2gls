@@ -1043,44 +1043,104 @@ public class Bib2GlsEntry extends BibEntry
          locationList.add(listBuilder.toString());
       }
 
-      if (showLocationPrefix)
+      boolean hasLocationList = (records.size() > 0 && 
+          (!resource.omitAliasLocations() || getField("alias") == null));
+
+      if (hasLocationList)
       {
-         if (builder == null)
+         if (showLocationPrefix)
          {
-            builder = new StringBuilder();
+            if (builder == null)
+            {
+               builder = new StringBuilder();
+            }
+
+            builder.append(String.format("\\bibglslocprefix{%d}",
+              records.size()));
          }
 
-         builder.append(String.format("\\bibglslocprefix{%d}",
-           records.size()));
-      }
+         GlsRecord rangeStart=null;
+         String rangeFmt = null;
 
-      GlsRecord rangeStart=null;
-      String rangeFmt = null;
-
-      for (GlsRecord record : records)
-      {
-         locationList.add(record.getListTeXCode());
-
-         Matcher m = RANGE_PATTERN.matcher(record.getFormat());
-
-         if (m.matches())
+         for (GlsRecord record : records)
          {
-            char paren = m.group(1).charAt(0);
-
-            count = 0;
-            mid.setLength(0);
-
-            if (paren == '(')
+            locationList.add(record.getListTeXCode());
+   
+            Matcher m = RANGE_PATTERN.matcher(record.getFormat());
+   
+            if (m.matches())
             {
-               if (rangeStart != null)
+               char paren = m.group(1).charAt(0);
+   
+               count = 0;
+               mid.setLength(0);
+   
+               if (paren == '(')
                {
-                  throw new Bib2GlsException(bib2gls.getMessage(
-                    "error.nested.range", record, rangeStart));
+                  if (rangeStart != null)
+                  {
+                     throw new Bib2GlsException(bib2gls.getMessage(
+                       "error.nested.range", record, rangeStart));
+                  }
+   
+                  rangeStart = record;
+                  rangeFmt = m.group(2);
+   
+                  if (builder == null)
+                  {
+                     builder = new StringBuilder();
+                  }
+                  else if (!start)
+                  {
+                     builder.append("\\delimN ");
+                  }
+   
+                  builder.append(record.getFmtTeXCode());
+   
                }
-
-               rangeStart = record;
-               rangeFmt = m.group(2);
-
+               else
+               {
+                  if (rangeStart == null)
+                  {
+                     throw new Bib2GlsException(bib2gls.getMessage(
+                       "error.range.missing.start", record));
+                  }
+   
+                  builder.append("\\delimR ");
+                  builder.append(record.getFmtTeXCode());
+                  rangeStart = null;
+                  rangeFmt = null;
+               }
+            }
+            else if (rangeStart != null)
+            {
+                if (!(rangeStart.getPrefix().equals(record.getPrefix())
+                  &&  rangeStart.getCounter().equals(record.getCounter())))
+                {
+                   throw new Bib2GlsException(bib2gls.getMessage(
+                       "error.inconsistent.range", record, rangeStart));
+                }
+   
+                if (!rangeFmt.equals(record.getFormat()))
+                {
+                   if (record.getFormat().equals("glsnumberformat")
+                    || rangeFmt.isEmpty())
+                   {
+                      bib2gls.verbose(bib2gls.getMessage(
+                         "message.inconsistent.range", record, rangeStart));
+                   }
+                   else
+                   {
+                      throw new Bib2GlsException(bib2gls.getMessage(
+                         "error.inconsistent.range", record, rangeStart));
+                   }
+                }
+   
+            }
+            else if (prev == null)
+            {
+               count = 1;
+   
                if (builder == null)
                {
                   builder = new StringBuilder();
@@ -1089,125 +1149,71 @@ public class Bib2GlsEntry extends BibEntry
                {
                   builder.append("\\delimN ");
                }
-
+   
                builder.append(record.getFmtTeXCode());
-
+            }
+            else if (minRange < Integer.MAX_VALUE
+                     && record.follows(prev, gap))
+            {
+               count++;
+   
+               mid.append("\\delimN ");
+               mid.append(record.getFmtTeXCode());
+            }
+            else if (count==2 && suffixF != null)
+            {
+               builder.append(suffixF);
+               builder.append("\\delimN ");
+               builder.append(record.getFmtTeXCode());
+               mid.setLength(0);
+               count = 1;
+            }
+            else if (count > 2 && suffixFF != null)
+            {
+               builder.append(suffixFF);
+               builder.append("\\delimN ");
+               builder.append(record.getFmtTeXCode());
+               mid.setLength(0);
+               count = 1;
+            }
+            else if (count >= minRange)
+            {
+               builder.append("\\delimR ");
+               builder.append(prev.getFmtTeXCode());
+               builder.append("\\delimN ");
+               builder.append(record.getFmtTeXCode());
+               mid.setLength(0);
+               count = 1;
             }
             else
             {
-               if (rangeStart == null)
-               {
-                  throw new Bib2GlsException(bib2gls.getMessage(
-                    "error.range.missing.start", record));
-               }
-
-               builder.append("\\delimR ");
-               builder.append(record.getFmtTeXCode());
-               rangeStart = null;
-               rangeFmt = null;
-            }
-         }
-         else if (rangeStart != null)
-         {
-             if (!(rangeStart.getPrefix().equals(record.getPrefix())
-               &&  rangeStart.getCounter().equals(record.getCounter())))
-             {
-                throw new Bib2GlsException(bib2gls.getMessage(
-                    "error.inconsistent.range", record, rangeStart));
-             }
-
-             if (!rangeFmt.equals(record.getFormat()))
-             {
-                if (record.getFormat().equals("glsnumberformat")
-                 || rangeFmt.isEmpty())
-                {
-                   bib2gls.verbose(bib2gls.getMessage(
-                      "message.inconsistent.range", record, rangeStart));
-                }
-                else
-                {
-                   throw new Bib2GlsException(bib2gls.getMessage(
-                      "error.inconsistent.range", record, rangeStart));
-                }
-             }
-
-         }
-         else if (prev == null)
-         {
-            count = 1;
-
-            if (builder == null)
-            {
-               builder = new StringBuilder();
-            }
-            else if (!start)
-            {
+               builder.append(mid);
                builder.append("\\delimN ");
+               builder.append(record.getFmtTeXCode());
+               mid.setLength(0);
+               count = 1;
             }
-
-            builder.append(record.getFmtTeXCode());
-         }
-         else if (minRange < Integer.MAX_VALUE
-                  && record.follows(prev, gap))
-         {
-            count++;
-
-            mid.append("\\delimN ");
-            mid.append(record.getFmtTeXCode());
-         }
-         else if (count==2 && suffixF != null)
-         {
-            builder.append(suffixF);
-            builder.append("\\delimN ");
-            builder.append(record.getFmtTeXCode());
-            mid.setLength(0);
-            count = 1;
-         }
-         else if (count > 2 && suffixFF != null)
-         {
-            builder.append(suffixFF);
-            builder.append("\\delimN ");
-            builder.append(record.getFmtTeXCode());
-            mid.setLength(0);
-            count = 1;
-         }
-         else if (count >= minRange)
-         {
-            builder.append("\\delimR ");
-            builder.append(prev.getFmtTeXCode());
-            builder.append("\\delimN ");
-            builder.append(record.getFmtTeXCode());
-            mid.setLength(0);
-            count = 1;
-         }
-         else
-         {
-            builder.append(mid);
-            builder.append("\\delimN ");
-            builder.append(record.getFmtTeXCode());
-            mid.setLength(0);
-            count = 1;
+   
+            prev = record;
+            start = false;
          }
 
-         prev = record;
-         start = false;
-      }
-
-      if (rangeStart != null)
-      {
-         throw new Bib2GlsException(bib2gls.getMessage(
-           "error.range.missing.end", rangeStart));
-      }
-      else if (prev != null && mid.length() > 0)
-      {
-         if (count >= minRange)
+         if (rangeStart != null)
          {
-            builder.append("\\delimR ");
-            builder.append(prev.getFmtTeXCode());
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.range.missing.end", rangeStart));
          }
-         else
+         else if (prev != null && mid.length() > 0)
          {
-            builder.append(mid);
+            if (count >= minRange)
+            {
+               builder.append("\\delimR ");
+               builder.append(prev.getFmtTeXCode());
+            }
+            else
+            {
+               builder.append(mid);
+            }
          }
       }
 
@@ -1218,7 +1224,7 @@ public class Bib2GlsEntry extends BibEntry
             builder = new StringBuilder();
          }
 
-         if (records.size() > 0)
+         if (hasLocationList)
          {
             builder.append("\\bibglsseesep ");
          }
@@ -1267,9 +1273,30 @@ public class Bib2GlsEntry extends BibEntry
    public void initCrossRefs(TeXParser parser)
     throws IOException
    {
-      BibValueList value = getField("see");
+      // Is there an 'alias' field?
+      BibValueList value = getField("alias");
+      String alias = null;
 
-      if (value == null) return;
+      if (value != null)
+      {
+         alias = value.expand(parser).toString(parser);
+         addDependency(processLabel(alias));
+         putField("alias", alias);
+      }
+
+      // Is there a 'see' field?
+      value = getField("see");
+
+      if (value == null)
+      {
+         if (alias != null)
+         {
+            crossRefs = new String[]{alias};
+            putField("see", alias);
+         }
+
+         return;
+      }
 
       TeXObjectList valList = value.expand(parser);
 

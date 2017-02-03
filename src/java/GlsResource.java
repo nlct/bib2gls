@@ -239,6 +239,10 @@ public class GlsResource
          {
             flatten = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("omit-alias-loc"))
+         {
+            omitAliasLocations = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("set-widest"))
          {
             setWidest = getBoolean(parser, list, opt);
@@ -2939,6 +2943,11 @@ public class GlsResource
       return bibList;
    }
 
+   public boolean omitAliasLocations()
+   {
+      return omitAliasLocations;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -2995,6 +3004,8 @@ public class GlsResource
    private String[] locationPrefix = null;
 
    private String[] locationSuffix = null;
+
+   private boolean omitAliasLocations = true;
 
    private String labelPrefix = null, dualPrefix="dual.";
 

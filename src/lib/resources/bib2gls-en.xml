@@ -186,6 +186,9 @@ switch TeX engines).</entry>
 Contains one or more special characters.</entry>
 
 <entry key="error.title">Error: {0}</entry>
+<entry key="error.no.sty.version">Unable to read version date for package {0}</entry>
+<entry key="error.sty.too.old">Package {0} version {1} is too old.
+Minimum version {2} required.</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}
 Defaulting to {1}. Use {2} to set another encoding.</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
