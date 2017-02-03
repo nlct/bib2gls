@@ -93,44 +93,39 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
       String grp = null;
 
-      byte[] bits = null;
-
       CollationKey key = collator.getCollationKey(value);
       entry.setCollationKey(key);
 
       if (bib2gls.useGroupField() && value.length() > 0)
       {
-         bits = key.toByteArray();
-
          int codePoint = value.codePointAt(0);
+         String str;
 
-         String str = String.format("%c", codePoint);
-
-         byte bit1 = (bits.length > 0 ? bits[0] : 0);
-         byte bit2 = (bits.length > 1 ? bits[1] : 0);
-
-         if (Character.isAlphabetic(codePoint))
+         if (codePoint > 0xffff)
          {
-            Character c = (bit1 == 0 ? getGroup(bit2) : null);
-
-            if (c == null)
-            {
-               grp = str.toUpperCase();
-            }
-            else
-            {
-               grp = c.toString();
-            }
-
-            entry.putField("group", 
-               String.format("\\bibglslettergroup{%s}{%d}{%d}{%s}{%d}", 
-                             grp, bit1, bit2, str, codePoint));
+            str = String.format("%c%c",
+              Character.highSurrogate(codePoint),
+              Character.lowSurrogate(codePoint));
          }
          else
          {
-            if (str.equals("\\"))
+            str = String.format("%c", codePoint);
+         }
+
+         if (Character.isAlphabetic(codePoint))
+         {
+            grp = str.toUpperCase();
+
+            entry.putField("group", 
+               String.format("\\bibglslettergroup{%s}{%s}{%d}", 
+                             grp, str, codePoint));
+         }
+         else
+         {
+            if (str.equals("\\") || str.equals("{") ||
+                str.equals("}"))
             {
-               str = "\\char`\\\\";
+               str = "\\char`\\"+str;
             }
 
             entry.putField("group", 
@@ -143,10 +138,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       {
          StringBuilder keyList = new StringBuilder();
 
-         if (bits == null)
-         {
-            bits = key.toByteArray();
-         }
+         byte[] bits = key.toByteArray();
 
          for (byte b : bits)
          {

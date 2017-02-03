@@ -118,6 +118,12 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 
       entry.putField("sort", value);
 
+      if (bib2gls.useGroupField())
+      {
+         entry.putField("group",
+            String.format("\\bibglsnumbergroup{%s}", value));
+      }
+
       if (bib2gls.getVerboseLevel() > 0)
       {
          bib2gls.verbose(String.format("%s -> '%s'", id, value));

@@ -91,21 +91,33 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       {
          int codePoint = value.codePointAt(0);
 
-         String str = String.format("%c", codePoint);
+         String str;
+
+         if (codePoint > 0xffff)
+         {
+            str = String.format("%c%c",
+              Character.highSurrogate(codePoint),
+              Character.lowSurrogate(codePoint));
+         }
+         else
+         {
+            str = String.format("%c", codePoint);
+         }
 
          if (Character.isAlphabetic(codePoint))
          {
             grp = (ignoreCase ? str.toUpperCase() : str);
 
             entry.putField("group", 
-               String.format("\\bibglslettergroup{%s}{%d}{%d}{%s}{%d}", 
-                             grp, 0, 0, str, codePoint));
+               String.format("\\bibglslettergroup{%s}{%s}{%d}", 
+                             grp, str, codePoint));
          }
          else
          {
-            if (str.equals("\\"))
+            if (str.equals("\\") || str.equals("{") ||
+                str.equals("}"))
             {
-               str = "\\char`\\\\";
+               str = "\\char`\\"+str;
             }
 
             entry.putField("group", 

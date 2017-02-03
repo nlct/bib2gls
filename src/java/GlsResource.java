@@ -2106,8 +2106,9 @@ public class GlsResource
 
          if (bib2gls.useGroupField())
          {
-            writer.println("\\providecommand{\\bibglslettergroup}[5]{#1}");
+            writer.println("\\providecommand{\\bibglslettergroup}[3]{#1}");
             writer.println("\\providecommand{\\bibglsothergroup}[2]{\\glssymbolsgroupname}");
+            writer.println("\\providecommand{\\bibglsnumbergroup}[1]{\\glsnumbersgroupname}");
             writer.println();
          }
 
