@@ -1,0 +1,44 @@
+createtests 100 500
+
+time buildmakeindex
+real	0m1.113s
+user	0m1.068s
+sys	0m0.046s
+
+time buildxindy
+real	0m1.680s
+user	0m1.606s
+sys	0m0.073s
+
+time buildtex
+real	0m2.729s
+user	0m2.687s
+sys	0m0.041s
+
+time buildbib
+real	0m1.247s
+user	0m1.934s
+sys	0m0.112s
+
+createtests 100 1000
+
+time buildmakeindex
+real	0m1.784s
+user	0m1.738s
+sys	0m0.047s
+
+time buildxindy
+real	0m2.670s
+user	0m2.600s
+sys	0m0.076s
+
+time buildtex
+real	0m5.311s
+user	0m5.267s
+sys	0m0.051s
+
+time buildbib
+real	0m1.516s
+user	0m2.518s
+sys	0m0.117s
+

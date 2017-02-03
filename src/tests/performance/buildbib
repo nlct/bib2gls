@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+
+pdflatex test-bib
+../../bin/bib2gls test-bib
+pdflatex test-bib

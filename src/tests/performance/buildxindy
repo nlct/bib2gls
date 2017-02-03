@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+
+pdflatex test-xindy
+xindy -L english -I xindy -M test-xindy -t test-xindy.glg -o test-xindy.gls test-xindy.glo
+pdflatex test-xindy

@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w
+
+use strict;
+use String::Random;
+
+my $maxentries = 500;
+my $selection=10;
+
+if ($#ARGV > 0)
+{
+   $selection = $ARGV[0];
+   $maxentries = $ARGV[1];
+}
+elsif ($#ARGV == 0)
+{
+   $maxentries = $ARGV[0];
+}
+
+if ($maxentries < $selection)
+{
+   die "Maximum entries ($maxentries) can't be less than selection number ($selection)\n";
+}
+
+my $refsfile = 'test-refs.tex';
+my $texfile = 'test-entries.tex';
+my $bibfile = 'test-entries.bib';
+
+print "Selection: $selection. Max entries: $maxentries.\n";
+
+my $selectionblock = $maxentries/$selection;
+
+print "Writing references...\n";
+
+open FD, ">$refsfile" or die "Can't open '$refsfile' $!\n";
+
+for (my $idx = 0; $idx < $maxentries; $idx += $selectionblock)
+{
+   my $n = $idx + int(rand($selectionblock))+1;
+
+   print FD "\\gls{test$n}\n";
+}
+
+close FD;
+
+print "Writing entries...\n";
+open TEXFD, ">$texfile" or die "Can't open '$texfile' $!\n";
+open BIBFD, ">$bibfile" or die "Can't open '$bibfile' $!\n";
+
+my $rand = new String::Random;
+
+for (my $idx = 1; $idx <= $maxentries; $idx++)
+{
+   my $n = int(rand(19));
+   my $name = $rand->randregex("[A-Za-z][a-z]{$n}");
+   my $desc = "test $idx";
+   my $label = "test$idx";
+
+   print TEXFD "\\newglossaryentry{$label}{name={$name},description={$desc}}\n";
+   print BIBFD "\@entry{$label,name={$name},description={$desc}}\n";
+}
+
+close TEXFD;
+close BIBFD;
+
+1;

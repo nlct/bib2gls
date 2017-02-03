@@ -1,0 +1,4 @@
+#!/usr/bin/sh
+
+pdflatex test-tex
+pdflatex test-tex

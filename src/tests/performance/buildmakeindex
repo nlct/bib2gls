@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+
+pdflatex test-makeindex
+makeindex -s test-makeindex.ist -t test-makeindex.glg -o test-makeindex.gls test-makeindex.glo
+pdflatex test-makeindex
