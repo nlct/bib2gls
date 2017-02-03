@@ -51,12 +51,27 @@
  loc-suffix,% terminate location lists with \@.
  type=symbols]
 
+\newcommand{\gmtx}[2][]{\glsxtrfmt[#1]{M}{#2}}
+\newcommand{\gvec}[2][]{\glsxtrfmt[#1]{v}{#2}}
+\newcommand{\gset}[2][]{\glsxtrfmt[#1]{S}{#2}}
+\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{card}{#2}}
+
 \begin{document}
 A \gls{matrix}, a \gls{vector} and the \gls{cardinality}
 of a \gls{set}. Complex number: $2\gls{i}+1$.
 \AA ngstr\"om: \gls{angstrom}.
 
 \gls{shtml}.
+
+A \gls{matrix} equation:
+\[
+ \gmtx{A}\gvec{x} = \gvec{y}
+\]
+
+Some \gls{set} stuff:
+\[
+ \gset{A} = \{1, 4, 5, 9\};\ \gcard{A} = 4
+\]
 
 \printunsrtglossaries
 \end{document}
