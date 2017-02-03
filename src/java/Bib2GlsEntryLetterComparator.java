@@ -72,7 +72,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
               id));
          }
          else if (bib2gls.useInterpreter() && list != null 
-                   && value.matches(".*[\\\\\\$].*"))
+                   && value.matches(".*[\\\\\\$\\{\\}].*"))
          {  
             value = bib2gls.interpret(value, list);
          }
