@@ -32,6 +32,14 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
+   public void checkRequiredFields(TeXParser parser)
+   {
+      if (getField("name") == null && getField("parent") == null)
+      {
+         missingFieldWarning(parser, "name");
+      }
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("sort"))
