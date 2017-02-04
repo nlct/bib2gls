@@ -13,6 +13,11 @@ classes/com/dickimawbooks/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bib2
 classes/com/dickimawbooks/bib2gls	:
 	mkdir -p classes/com/dickimawbooks/bib2gls
 
+expl	: lib/bib2gls.jar
+	make -C doc
+	cp -L lib/texparserlib.jar ../unstable/
+	cp lib/bib2gls.jar ../unstable/
+
 clean	:
 	\rm -f classes/com/dickimawbooks/bib2gls/*.class
 
