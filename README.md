@@ -42,7 +42,7 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf`
 
 Unix-like systems add a symbolic link called `bib2gls` somewhere on
-your path that links to the bib2gls.sh bash script.
+your path that links to the `bib2gls.sh` bash script.
 For example:
 ```bash
 cd ~/bin

@@ -1,0 +1,14 @@
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src=constants,% constants.bib
+ sort={double},% decimal sort
+ sort-field={user1}
+]
+
+\begin{document}
+$\gls{pi}$, $\gls{eulercons}$, $\gls{root2}$.
+
+\printunsrtglossaries
+\end{document}

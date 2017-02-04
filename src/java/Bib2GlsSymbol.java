@@ -34,9 +34,23 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("name") == null && getField("parent") == null)
+      BibValueList name = getField("name");
+      BibValueList parent = getField("parent");
+      BibValueList description = getField("description");
+
+      if (name != null || (parent != null && description != null))
+      {
+         return;
+      }
+
+      if (name == null && parent == null)
       {
          missingFieldWarning(parser, "name");
+      }
+
+      if (parent != null && description == null && name == null)
+      {
+         missingFieldWarning(parser, "description");
       }
    }
 

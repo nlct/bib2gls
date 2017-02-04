@@ -1,0 +1,9 @@
+*.aux
+*.log
+*.pdf
+*.glg
+*.ist
+*.xdy
+*.glstex
+*.gls
+*.glo

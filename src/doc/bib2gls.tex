@@ -1654,15 +1654,13 @@ designed specifically for symbols, so in the previous example, the
 \texttt{M} and \texttt{v} terms would be better defined using the
 \atentry{symbol} entry type instead.
 
-The required fields are \field{description} and either
-\field{name} or \field{parent}. If the \field{sort} field
-is omitted, the default sort is given by the entry label
-when \bibgls\ is invoked with \argref{no-interpret}
-and by the \field{name} or \field{parent} when
-\bibgls\ is invoked with \argref{interpret}. See
-\sectionref{sec:texparserlib} for further details.
-Terms defined using \atentry{symbol} will be written to the output
-file using the command \csref{bibglsnewsymbol}.
+The required fields \field{name} or \field{parent}. If the
+\field{sort} field is omitted, the default sort is given by the
+entry label when \bibgls\ is invoked with \argref{no-interpret} and
+by the \field{name} or \field{parent} when \bibgls\ is invoked with
+\argref{interpret}. See \sectionref{sec:texparserlib} for further
+details.  Terms defined using \atentry{symbol} will be written to
+the output file using the command \csref{bibglsnewsymbol}.
 
 \section{\atentry{number}}
 \labelatentry{number}
@@ -1870,7 +1868,7 @@ swap the \field{name} and \field{symbol} fields (and the
 \field{plural} and \field{symbolplural} fields). The \field{name}
 and \field{symbol} are required.
 
-As with \atentry{dualentry}, that the \field{alias} field will never
+As with \atentry{dualentry}, the \field{alias} field will never
 be copied to the dual entry, nor can it be mapped. The alias will
 only apply to the primary entry.
 
