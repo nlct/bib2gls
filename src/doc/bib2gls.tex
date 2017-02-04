@@ -1796,6 +1796,10 @@ The dual entry contains the same information as the primary entry
 but some of the fields are swapped around. The dual entry is given
 the prefix set by the \csopt{dual-prefix} option.
 
+Note that the \field{alias} field will never be copied to the dual
+entry, nor can it be mapped. The alias will only apply to the
+primary entry.
+
 By default, the \field{name} and \field{description} fields and the
 \field{plural} and \field{descriptionplural} fields are swapped.
 
@@ -1865,6 +1869,10 @@ This is like \atentryref{dualentry} but the default mappings
 swap the \field{name} and \field{symbol} fields (and the
 \field{plural} and \field{symbolplural} fields). The \field{name}
 and \field{symbol} are required.
+
+As with \atentry{dualentry}, that the \field{alias} field will never
+be copied to the dual entry, nor can it be mapped. The alias will
+only apply to the primary entry.
 
 For example:
 \begin{verbatim}
@@ -1940,6 +1948,10 @@ the creation of a field access command (analogous to
 \cs{glsxtrusefield}.  (See the \sty{glossaries-extra} manual for
 further details.) Remember that the field won't be
 available until the \ext{glstex} file has been created.
+
+As with \atentry{dualentry}, that the \field{alias} field will never
+be copied to the dual entry, nor can it be mapped. The alias will
+only apply to the primary entry.
 
 Note that \bibgls\ doesn't know what abbreviation styles
 are in used, so if the \field{sort} field is missing
@@ -3592,26 +3604,42 @@ The separator between the location list and the see reference is
 provided by \csref{bibglsseesep}. This separator is omitted if the
 location list is empty. The \meta{value} part is required.
 
-\subsection{\csoptnv{omit-alias-loc}=\margm{value}}
-\labelopt{omit-alias-loc}
+\subsection{\csoptnv{alias-loc}=\margm{value}}
+\labelopt{alias-loc}
 
-This is a boolean option. If \csopt[true]{omit-alias-loc}
-the location lists for aliased entries will be omitted
-(the cross-reference will be retained). If \meta{value} is omitted,
-\optfmt{true} is assumed. The default setting
-is \csopt[true]{omit-alias-loc}.
+If an entry has an \field{alias} field, the location list
+may be retained or omitted or transferred to the target entry.
+The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{keep}: keep the location list;
+\item\optfmt{transfer}: transfer the location list;
+\item\optfmt{omit}: omit the location list.
+\end{itemize}
+The default setting is \csopt[transfer]{alias-loc}.
+In all cases, the target entry will be added to the \field{see}
+field of the entry with the \field{alias} field, unless it
+already has a \field{see} field (in which case the \field{see} value
+is left unchanged).
+
+Note that with \csopt[transfer]{alias-loc}, both the aliased
+entry and the target entry must be in the same resource set.
+(That is, both entries have been selected by the same instance of
+\cs{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version
+1.12, you may need to redefine \cs{glsxtrsetaliasnoindex} to do
+nothing if the location lists aren't showing correctly
+with aliased entries. This will be corrected in version 1.13.
 
 \subsection{\csoptnv{loc-prefix}=\margm{value}}
 \labelopt{loc-prefix}
 
 The \csopt{loc-prefix} setting indicates that the location lists
-should begin with \csref{bibglslocprefix}\marg{n}. The \meta{value} may
+should begin with \csref{bibglslocprefix}\margm{n}. The \meta{value} may
 be one of the following:
 \begin{itemize}
-\item \optfmt{false}: don't insert \cs{bibglslocprefix}\marg{n} at the start
+\item \optfmt{false}: don't insert \cs{bibglslocprefix}\margm{n} at the start
 of the location lists (default).
 \item \optfmt{\margm{prefix-1},\margm{prefix-2},\ldots,\margm{prefix-n}}:
-insert \cs{bibglslocprefix}\marg{n} (where \meta{n} is the number of
+insert \cs{bibglslocprefix}\margm{n} (where \meta{n} is the number of
 locations in the list) at the start of each location list and the
 definition of \cs{bibglslocprefix} will be appended to the glossary
 preamble providing an \cs{ifcase} condition:
@@ -3909,7 +3937,8 @@ field instead.
 This setting governs the behaviour of \atentry{dualentry}
 definitions. The value consists of two comma-separated lists of
 equal length identifying the field mapping used to create the dual
-entry from the primary one.
+entry from the primary one. Note that the \field{alias} field
+can't be mapped.
 
 The default setting is:
 \begin{verbatim}
@@ -3971,7 +4000,8 @@ the \sty{glossaries-extra} package's point of view. For example,
 \labelopt{dual-abbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to
-\atentry{dualabbreviation} rather than \atentry{dualentry}. The
+\atentry{dualabbreviation} rather than \atentry{dualentry}. 
+Note that the \field{alias} field can't be mapped. The
 default setting is:
 \begin{verbatim}
 dual-abbrv-map=
@@ -3992,7 +4022,8 @@ for further details.
 \labelopt{dual-symbol-map}
 
 This is like \csopt{dual-entry-map} but applies to
-\atentry{dualsymbol} rather than \atentry{dualentry}. The
+\atentry{dualsymbol} rather than \atentry{dualentry}. 
+Note that the \field{alias} field can't be mapped. The
 default setting is:
 \begin{verbatim}
 dual-symbol-map=

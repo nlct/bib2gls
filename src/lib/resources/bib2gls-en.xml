@@ -136,13 +136,14 @@ with range started by {1}</entry>
 <entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="message.discarding.entry">Discarding entry {0}</entry>
 <entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
-<entry key="message.calc.text.width">Calculated width of name field for entry ''{0}''</entry>
+<entry key="message.calc.text.width">Calculating width of name field for entry ''{0}''</entry>
 <entry key="message.calc.text.width.result">Calculated width of ''{0}'': {1,number}</entry>
 <entry key="message.parsing.code">Parsing code block:</entry>
 <entry key="message.unknown.tex.charset">Unable to detect character encoding for TeX file.
 Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
+<entry key="message.adding.target.record">Adding record {0} from aliased entry {1}.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -184,8 +185,11 @@ to restrict your labels to the Basic Latin set (or
 switch TeX engines).</entry>
 <entry key="warning.spchars.id">Problematic entry label: {0}
 Contains one or more special characters.</entry>
+<entry key="warning.alias.not.found">Can''t find target {0} for aliased entry {1}.
+Aliased entries must be in the same resource set as their target entries with option {2}={3}.</entry>
 
 <entry key="error.title">Error: {0}</entry>
+<entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
 <entry key="error.no.sty.version">Unable to read version date for package {0}</entry>
 <entry key="error.sty.too.old">Package {0} version {1} is too old.
 Minimum version {2} required.</entry>

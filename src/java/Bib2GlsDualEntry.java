@@ -162,15 +162,18 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
          BibValueList contents = getField(key);
          String value = getFieldValue(key);
 
-         if (map == null)
+         if (contents != null && value != null && !key.equals("alias"))
          {
-            entry.putField(key, contents);
-            entry.putField(key, value);
-         }
-         else
-         {
-            entry.putField(map, contents);
-            entry.putField(map, value);
+            if (map == null)
+            {
+               entry.putField(key, contents);
+               entry.putField(key, value);
+            }
+            else if (!map.equals("alias"))
+            {
+               entry.putField(map, contents);
+               entry.putField(map, value);
+            }
          }
       }
 

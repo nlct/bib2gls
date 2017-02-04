@@ -239,9 +239,23 @@ public class GlsResource
          {
             flatten = getBoolean(parser, list, opt);
          }
-         else if (opt.equals("omit-alias-loc"))
+         else if (opt.equals("alias-loc"))
          {
-            omitAliasLocations = getBoolean(parser, list, opt);
+            String val = getChoice(parser, list, opt, 
+              "omit", "transfer", "keep");
+
+            if (val.equals("omit"))
+            {
+               aliasLocations = ALIAS_LOC_OMIT;
+            }
+            else if (val.equals("transfer"))
+            {
+               aliasLocations = ALIAS_LOC_TRANS;
+            }
+            else
+            {
+               aliasLocations = ALIAS_LOC_KEEP;
+            }
          }
          else if (opt.equals("set-widest"))
          {
@@ -1398,8 +1412,15 @@ public class GlsResource
          }
 
          String key = obj1.toString(parser);
+         String value = obj2.toString(parser);
 
-         map.put(key, obj2.toString(parser));
+         if (key.equals("alias") || value.equals("alias"))
+         {
+            throw new IllegalArgumentException(bib2gls.getMessage(
+               "error.alias.map.forbidden"));
+         }
+
+         map.put(key, value);
 
          if (i < keys.length)
          {
@@ -1606,6 +1627,54 @@ public class GlsResource
 
          Vector<BibData> list = bibParserListener.getBibData();
 
+         if (hasAliases() && aliasLocations == ALIAS_LOC_TRANS)
+         {
+            // Need to transfer records for aliased entries
+
+            for (int i = 0; i < records.size(); i++)
+            {
+               GlsRecord record = records.get(i);
+
+               Bib2GlsEntry entry = getBib2GlsEntry(record.getLabel(), list);
+
+               if (entry == null) continue;
+
+               String alias = entry.getFieldValue("alias");
+
+               if (alias == null)
+               {
+                  entry.addRecord(record);
+               }
+               else
+               {
+                  Bib2GlsEntry target = getBib2GlsEntry(alias, list);
+
+                  if (target == null)
+                  {
+                     bib2gls.warning(bib2gls.getMessage(
+                        "warning.alias.not.found", alias, entry.getOriginalId(),
+                          "alias-loc", "transfer"));
+                  }
+                  else
+                  {
+                     entry.addRecord(record);
+
+                     GlsRecord targetRecord = (GlsRecord)record.clone();
+                     targetRecord.setLabel(alias);
+
+                     if (!records.contains(targetRecord))
+                     {
+                        bib2gls.debug(bib2gls.getMessage(
+                           "message.adding.target.record", targetRecord, 
+                             entry.getOriginalId()));
+                        target.addRecord(targetRecord);
+                        records.add(++i, targetRecord);
+                     }
+                  }
+               }
+            }
+         }
+
          for (int i = 0; i < list.size(); i++)
          {
             BibData data = list.get(i);
@@ -1628,25 +1697,27 @@ public class GlsResource
 
                // does this entry have any records?
 
-               boolean hasRecords = false;
-               boolean dualHasRecords = false;
+               boolean hasRecords = entry.hasRecords();
+               boolean dualHasRecords = (dual != null && dual.hasRecords());
 
-               for (GlsRecord record : records)
+               if (aliasLocations != ALIAS_LOC_TRANS
+                    || entry.getField("alias") == null)
                {
-                  if (record.getLabel().equals(entry.getId()))
+                  for (GlsRecord record : records)
                   {
-                     entry.addRecord(record);
-
-                     hasRecords = true;
-                  }
-
-                  if (dual != null)
-                  {
-                     if (record.getLabel().equals(dual.getId()))
+                     if (record.getLabel().equals(entry.getId()))
                      {
-                        dual.addRecord(record);
+                        entry.addRecord(record);
+                        hasRecords = true;
+                     }
 
-                        dualHasRecords = true;
+                     if (dual != null)
+                     {
+                        if (record.getLabel().equals(dual.getId()))
+                        {
+                           dual.addRecord(record);
+                           dualHasRecords = true;
+                        }
                      }
                   }
                }
@@ -1881,6 +1952,20 @@ public class GlsResource
          if (entry.getId().equals(label))
          {
             return entry;
+         }
+      }
+
+      return null;
+   }
+
+   private Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
+   {
+      for (BibData entry : data)
+      {
+         if (entry instanceof Bib2GlsEntry 
+             && ((Bib2GlsEntry)entry).getId().equals(label))
+         {
+            return (Bib2GlsEntry)entry;
          }
       }
 
@@ -2476,15 +2561,18 @@ public class GlsResource
 
       if (name == null || name.isEmpty()) return;
 
-      // Try to interpret any LaTeX code that may be in the name.
-      // This assumes custom user commands are provided in the
-      // preamble. Won't work on anything complicated and doesn't
-      // take font changes into account.
-
       bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width",
         entry.getId()));
 
-      name = bib2gls.interpret(name, entry.getField("name")).trim();
+      if (name.matches(".*[\\\\\\$\\{\\}].*"))
+      {
+         // Try to interpret any LaTeX code that may be in the name.
+         // This assumes custom user commands are provided in the
+         // preamble. Won't work on anything complicated and doesn't
+         // take font changes into account.
+
+         name = bib2gls.interpret(name, entry.getField("name")).trim();
+      }
 
       int level = entry.getHierarchyCount();
       String maxName = "";
@@ -2943,9 +3031,19 @@ public class GlsResource
       return bibList;
    }
 
-   public boolean omitAliasLocations()
+   public int aliasLocations()
    {
-      return omitAliasLocations;
+      return aliasLocations;
+   }
+
+   public boolean hasAliases()
+   {
+      return aliases;
+   }
+
+   public void setAliases(boolean hasAliases)
+   {
+      aliases = hasAliases;
    }
 
    private File texFile;
@@ -3005,7 +3103,13 @@ public class GlsResource
 
    private String[] locationSuffix = null;
 
-   private boolean omitAliasLocations = true;
+   public static final int ALIAS_LOC_OMIT=0;
+   public static final int ALIAS_LOC_TRANS=1;
+   public static final int ALIAS_LOC_KEEP=2;
+
+   private int aliasLocations = ALIAS_LOC_TRANS;
+
+   private boolean aliases = false;
 
    private String labelPrefix = null, dualPrefix="dual.";
 

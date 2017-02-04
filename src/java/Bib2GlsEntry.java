@@ -939,9 +939,15 @@ public class Bib2GlsEntry extends BibEntry
 
    public String putField(String label, String value)
    {
-      if (label == null || value == null)
+      if (label == null)
       {
-         throw new NullPointerException();
+         throw new NullPointerException("null label not permitted");
+      }
+
+      if (value == null)
+      {
+         throw new NullPointerException(
+          "null value not permitted for field "+label);
       }
 
       if (bib2gls.trimFields())
@@ -989,7 +995,10 @@ public class Bib2GlsEntry extends BibEntry
 
    public void addRecord(GlsRecord record)
    {
-      records.add(record);
+      if (!records.contains(record))
+      {
+         records.add(record);
+      }
    }
 
    public void updateLocationList(int minRange, String suffixF,
@@ -1043,8 +1052,13 @@ public class Bib2GlsEntry extends BibEntry
          locationList.add(listBuilder.toString());
       }
 
-      boolean hasLocationList = (records.size() > 0 && 
-          (!resource.omitAliasLocations() || getField("alias") == null));
+      boolean hasLocationList = hasRecords();
+
+      if (getField("alias") != null 
+           && resource.aliasLocations() != GlsResource.ALIAS_LOC_KEEP)
+      {
+         hasLocationList = false;
+      }
 
       if (hasLocationList)
       {
@@ -1270,8 +1284,7 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   public void initCrossRefs(TeXParser parser)
-    throws IOException
+   public void initAlias(TeXParser parser) throws IOException
    {
       // Is there an 'alias' field?
       BibValueList value = getField("alias");
@@ -1282,19 +1295,26 @@ public class Bib2GlsEntry extends BibEntry
          alias = value.expand(parser).toString(parser);
          addDependency(processLabel(alias));
          putField("alias", alias);
-      }
 
+         resource.setAliases(true);
+
+         // Is there a 'see' field?
+
+         if (getField("see") == null)
+         {
+            putField("see", value);
+         }
+      }
+   }
+
+   public void initCrossRefs(TeXParser parser)
+    throws IOException
+   {
       // Is there a 'see' field?
-      value = getField("see");
+      BibValueList value = getField("see");
 
       if (value == null)
       {
-         if (alias != null)
-         {
-            crossRefs = new String[]{alias};
-            putField("see", alias);
-         }
-
          return;
       }
 

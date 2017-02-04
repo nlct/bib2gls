@@ -171,6 +171,10 @@ public class Bib2GlsAt extends At
 
          resource.setPreamble(list.toString(parser), preamble);
       }
+      else if (data instanceof Bib2GlsEntry)
+      {
+         ((Bib2GlsEntry)data).initAlias(parser);
+      }
 
       bibParser.addBibData(data);
    }

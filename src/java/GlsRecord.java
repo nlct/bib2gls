@@ -33,9 +33,19 @@ public class GlsRecord
       this.location = location;
    }
 
+   public Object clone()
+   {
+      return new GlsRecord(label, prefix, counter, format, location);
+   }
+
    public String getLabel()
    {
       return label;
+   }
+
+   public void setLabel(String newLabel)
+   {
+      label = newLabel;
    }
 
    public String getPrefix()
