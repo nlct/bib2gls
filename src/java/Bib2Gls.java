@@ -737,16 +737,21 @@ public class Bib2Gls implements TeXApp
 
    public void provideCommand(String csName, String text)
    {
-      L2HStringConverter listener = 
-        (L2HStringConverter)interpreter.getListener();
+      if (interpreter != null)
+      {
+         L2HStringConverter listener = 
+           (L2HStringConverter)interpreter.getListener();
 
-      listener.putControlSequence(new GenericCommand(csName, null, 
-           listener.createString(text)));
+         listener.putControlSequence(new GenericCommand(csName, null, 
+              listener.createString(text)));
+      }
    }
 
    public void processPreamble(BibValueList list)
      throws IOException
    {
+      if (interpreter == null) return;
+
       interpreter.addAll(list.expand(interpreter));
 
       if (getDebugLevel() > 0)
