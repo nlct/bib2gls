@@ -21,10 +21,10 @@ Make sure you have at least v1.12 of
 [`glossaries-extra`](http://ctan.org/pkg/glossaries-extra)
 and at least Java 7.
 
- - [bib2gls.jar](https://github.com/nlct/bib2gls/raw/master/unstable/bib2gls.jar)
- - [texparserlib.jar](https://github.com/nlct/bib2gls/raw/master/unstable/texparserlib.jar)
- - [bib2gls.sh](https://github.com/nlct/bib2gls/raw/master/src/bin/bib2gls.sh) (bash users only)
- - [bib2gls-en.xml](https://github.com/nlct/bib2gls/raw/master/src/lib/resources/bib2gls-en.xml)
+ - [`bib2gls.jar`](https://github.com/nlct/bib2gls/raw/master/unstable/bib2gls.jar)
+ - [`texparserlib.jar`](https://github.com/nlct/bib2gls/raw/master/unstable/texparserlib.jar)
+ - [`bib2gls.sh`](https://github.com/nlct/bib2gls/raw/master/src/bin/bib2gls.sh) (bash users only)
+ - [`resources/bib2gls-en.xml`](https://github.com/nlct/bib2gls/raw/master/src/lib/resources/bib2gls-en.xml)
 
 There are some test files available in the
 [`src/tests`](https://github.com/nlct/bib2gls/tree/master/src/tests)
