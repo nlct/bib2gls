@@ -30,6 +30,9 @@ There are some test files available in the
 [`src/tests`](https://github.com/nlct/bib2gls/tree/master/src/tests)
 directory.
 
+Latest experimental release: version 0.3a (2017-02-04).
+Fixed `@comment` parsing and `--no-interpret` switch.
+
 # Installation
 
 The files should be installed as follows where *TEXMF* indicates
