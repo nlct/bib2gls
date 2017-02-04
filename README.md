@@ -32,13 +32,14 @@ directory.
 
 # Installation
 
-The files should be installed as follows:
+The files should be installed as follows where *TEXMF* indicates
+your local or home TEXMF path (for example, `~/texmf/`):
 
- - `TEXMF/scripts/bib2gls/bib2gls.sh` (Unix-like systems only)
- - `TEXMF/scripts/bib2gls/bib2gls.jar`
- - `TEXMF/scripts/bib2gls/texparserlib.jar`
- - `TEXMF/scripts/bib2gls/resources/bib2gls-en.xml`
- - `TEXMF/doc/support/bib2gls/bib2gls.pdf`
+ - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only)
+ - *TEXMF*`/scripts/bib2gls/bib2gls.jar`
+ - *TEXMF*`/scripts/bib2gls/texparserlib.jar`
+ - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml`
+ - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf`
 
 Unix-like systems add a symbolic link called `bib2gls` somewhere on
 your path that links to the bib2gls.sh bash script.
