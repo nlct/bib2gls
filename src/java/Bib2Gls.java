@@ -2238,6 +2238,80 @@ public class Bib2Gls implements TeXApp
       return trimFields;
    }
 
+   private int parseArgVal(String[] args, int i, Object[] argVal)
+   {
+      String[] sp = args[i].split("=", 2);
+
+      argVal[0] = sp[0];
+
+      if (sp.length == 2)
+      {
+         argVal[1] = sp[1];
+         return i;
+      }
+
+      if (i == args.length-1 || args[i+1].startsWith("-"))
+      {
+         argVal[1] = null;
+         return i; 
+      }
+
+      argVal[1] = args[++i];
+
+      return i;
+   }
+
+   private int parseArgInt(String[] args, int i, Object[] argVal)
+   {
+      String[] sp = args[i].split("=", 2);
+
+      argVal[0] = sp[0];
+
+      if (sp.length == 2)
+      {
+         try
+         {
+            argVal[1] = new Integer(sp[1]);
+         }
+         catch (NumberFormatException e)
+         {
+            throw new IllegalArgumentException(getMessage(
+              "error.invalid.opt.int.value", argVal[0], sp[1]), e);
+         }
+
+         return i;
+      }
+
+      if (i == args.length-1 || args[i+1].startsWith("-"))
+      {
+         argVal[1] = null;
+         return i; 
+      }
+
+      try
+      {
+         argVal[1] = new Integer(args[i+1]);
+         i++;
+      }
+      catch (NumberFormatException e)
+      {
+         argVal[1] = null;
+      }
+
+      return i;
+   }
+
+   private boolean isArg(String arg, String shortArg, String longArg)
+   {
+      return arg.equals("-"+shortArg) || arg.equals("--"+longArg) 
+        || arg.startsWith("--"+longArg+"=");
+   }
+
+   private boolean isArg(String arg, String longArg)
+   {
+      return arg.equals("--"+longArg) || arg.startsWith("--"+longArg+"=");
+   }
+
    private void parseArgs(String[] args)
      throws IOException,Bib2GlsSyntaxException
    {
@@ -2245,28 +2319,31 @@ public class Bib2Gls implements TeXApp
       String auxFileName = null;
       String logName = null;
 
+      Object[] argVal = new Object[2];
+
       for (int i = 0; i < args.length; i++)
       {
-         if (args[i].equals("--debug"))
+         if (isArg(args[i], "debug"))
          {
-            if (i == args.length-1 || args[i+1].startsWith("-"))
+            i = parseArgInt(args, i, argVal);
+
+            if (argVal[1] == null)
             {
                debugLevel = 1;
                verboseLevel = 1;
                continue;
             }
 
-            try
+            int level = ((Integer)argVal[1]).intValue();
+
+            if (level < 0)
             {
-               debugLevel = Integer.parseInt(args[i+1]);
-               i++;
-            }
-            catch (NumberFormatException e)
-            {
-               // argument missing
-               debugLevel = 1;
+               throw new IllegalArgumentException(getMessage(
+                 "error.invalid.opt.minint.value", argVal[0],
+                   level, 0));
             }
 
+            debugLevel = level;
             verboseLevel = debugLevel;
          }
          else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
@@ -2296,17 +2373,17 @@ public class Bib2Gls implements TeXApp
             license();
             System.exit(0);
          }
-         else if (args[i].equals("-t") || args[i].equals("--log-file"))
+         else if (isArg(args[i], "t", "log-file"))
          {
-            i++;
+            i = parseArgVal(args, i, argVal);
 
-            if (i == args.length)
+            if (argVal[1] == null)
             {
                throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", args[i-1]));
+                  getMessage("error.missing.value", argVal[0]));
             }
 
-            logName = args[i];
+            logName = (String)argVal[1];
          }
          else if (args[i].equals("--interpret"))
          {
@@ -2320,30 +2397,31 @@ public class Bib2Gls implements TeXApp
          {
             mfirstucProtect = false;
          }
-         else if (args[i].equals("--mfirstuc-protection")
-               || args[i].equals("-u"))
+         else if (isArg(args[i], "u", "mfirstuc-protection"))
          {
+            i = parseArgVal(args, i, argVal);
+
             mfirstucProtect = true;
 
-            i++;
+            String arg = (String)argVal[1];
 
-            if (i == args.length)
+            if (arg == null)
             {
                throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", args[i-1]));
+                  getMessage("error.missing.value", argVal[0]));
             }
 
-            if (args[i].equals("all"))
+            if (arg.equals("all"))
             {
                mfirstucProtectFields = null;
             }
-            else if (args[i].isEmpty())
+            else if (arg.isEmpty())
             {
                mfirstucProtect = false;
             }
             else
             {
-               mfirstucProtectFields = args[i].split(" *, *");
+               mfirstucProtectFields = arg.split(" *, *");
             }
          }
          else if (args[i].equals("--no-mfirstuc-math-protection"))
@@ -2354,73 +2432,79 @@ public class Bib2Gls implements TeXApp
          {
             mfirstucMProtect = true;
          }
-         else if (args[i].equals("--shortcuts"))
+         else if (isArg(args[i], "shortcuts"))
          {
-            i++;
+            i = parseArgVal(args, i, argVal);
 
-            if (i == args.length)
+            String arg = (String)argVal[1];
+
+            if (arg == null)
             {
                throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", args[i-1]));
+                  getMessage("error.missing.value", argVal[0]));
             }
 
             try
             {
-               setShortCuts(args[i]);
+               setShortCuts(arg);
             }
             catch (IllegalArgumentException e)
             {
                throw new Bib2GlsSyntaxException(
                  getMessage("error.invalid.choice.value", 
-                 args[i-1], args[i]), e);
+                 argVal[0], arg), e);
             }
          }
-         else if (args[i].equals("--nested-link-check"))
+         else if (isArg(args[i], "nested-link-check"))
          {
-            i++;
+            i = parseArgVal(args, i, argVal);
 
-            if (i == args.length)
+            String arg = (String)argVal[1];
+
+            if (arg == null)
             {
                throw new Bib2GlsSyntaxException(
-                 getMessage("error.missing.value", args[i-1]));
+                 getMessage("error.missing.value", argVal[0]));
             }
 
-            if (args[i].equals("none") || args[i].isEmpty())
+            if (arg.equals("none") || arg.isEmpty())
             {
                nestedLinkCheckFields = null;
             }
             else
             {
-               nestedLinkCheckFields = args[i].split(" *, *");
+               nestedLinkCheckFields = arg.split(" *, *");
             }
          }
          else if (args[i].equals("--no-nested-link-check"))
          {
             nestedLinkCheckFields = null;
          }
-         else if (args[i].equals("--dir") || args[i].equals("-d"))
+         else if (isArg(args[i], "d", "dir"))
          {
-            i++;
+            i = parseArgVal(args, i, argVal);
 
-            if (i == args.length)
+            if (argVal[1] == null)
             {
                throw new Bib2GlsSyntaxException(
-                 getMessage("error.missing.value", args[i-1]));
+                 getMessage("error.missing.value", argVal[0]));
             }
 
-            dirName = args[i];
+            dirName = (String)argVal[1];
          }
-         else if (args[i].equals("--map-format") || args[i].equals("-m"))
+         else if (isArg(args[i], "m", "map-format"))
          {
-            i++;
+            i = parseArgVal(args, i, argVal);
 
-            if (i == args.length)
+            String arg = (String)argVal[1];
+
+            if (arg == null)
             {
                throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", args[i-1]));
+                  getMessage("error.missing.value", argVal[0]));
             }
 
-            String[] split = args[i].trim().split(" *, *");
+            String[] split = arg.trim().split(" *, *");
 
             for (String value : split)
             {
@@ -2429,7 +2513,7 @@ public class Bib2Gls implements TeXApp
                if (values.length != 2)
                {
                   throw new Bib2GlsSyntaxException(
-                    getMessage("error.invalid.opt.value", args[i-1], args[i]));
+                    getMessage("error.invalid.opt.value", argVal[0], arg));
                }
 
                formatMap.put(values[0], values[1]);
@@ -2443,17 +2527,19 @@ public class Bib2Gls implements TeXApp
          {
             addGroupField = false;
          }
-         else if (args[i].equals("--tex-encoding"))
+         else if (isArg(args[i], "tex-encoding"))
          {
-            i++;
+            i = parseArgVal(args, i, argVal);
 
-            if (i == args.length)
+            String arg = (String)argVal[1];
+
+            if (arg == null)
             {
                throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", args[i-1]));
+                  getMessage("error.missing.value", argVal[0]));
             }
 
-            texCharset = Charset.forName(args[i]);
+            texCharset = Charset.forName(arg);
          }
          else if (args[i].equals("--trim-fields"))
          {
@@ -2652,9 +2738,9 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "0.3a";
+   public static final String VERSION = "0.4a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-02-04";
+   //public static final String DATE = "2017-02-08";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

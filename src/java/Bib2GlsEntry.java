@@ -1348,7 +1348,14 @@ public class Bib2GlsEntry extends BibEntry
 
       for (int i = 0; i < n; i++)
       {
-         crossRefs[i] = csvList.get(i).toString(parser);
+         TeXObject xr = csvList.get(i);
+
+         if (xr instanceof TeXObjectList)
+         {
+            xr = GlsResource.trimList((TeXObjectList)xr);
+         }
+
+         crossRefs[i] = xr.toString(parser);
 
          String label = processLabel(crossRefs[i]);
 

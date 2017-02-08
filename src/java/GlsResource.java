@@ -239,6 +239,10 @@ public class GlsResource
          {
             flatten = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("save-locations"))
+         {
+            saveLocations = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("alias-loc"))
          {
             String val = getChoice(parser, list, opt, 
@@ -1452,7 +1456,7 @@ public class GlsResource
       return sublist;
    }
 
-   private TeXObjectList trimList(TeXObjectList list)
+   public static TeXObjectList trimList(TeXObjectList list)
    {
       // strip redundant white space and grouping
 
@@ -2306,10 +2310,13 @@ public class GlsResource
 
             bib2gls.verbose(entry.getId());
 
-            entry.updateLocationList(minLocationRange,
-              suffixF, suffixFF, seeLocation, 
-              locationPrefix != null, locationSuffix != null,
-              locGap);
+            if (saveLocations)
+            {
+               entry.updateLocationList(minLocationRange,
+                 suffixF, suffixFF, seeLocation, 
+                 locationPrefix != null, locationSuffix != null,
+                 locGap);
+            }
 
             checkParent(entry, i, entries);
 
@@ -2360,11 +2367,15 @@ public class GlsResource
 
                bib2gls.verbose(entry.getId());
 
-               entry.updateLocationList(minLocationRange,
-                 suffixF, suffixFF, seeLocation, 
-                 locationPrefix != null,
-                 locationSuffix != null,
-                 locGap);
+               if (saveLocations)
+               {
+                  entry.updateLocationList(minLocationRange,
+                    suffixF, suffixFF, seeLocation, 
+                    locationPrefix != null,
+                    locationSuffix != null,
+                    locGap);
+               }
+
                checkParent(entry, i, dualEntries);
 
                String csname = entry.getCsName();
@@ -3102,6 +3113,8 @@ public class GlsResource
    private String[] locationPrefix = null;
 
    private String[] locationSuffix = null;
+
+   private boolean saveLocations = true;
 
    public static final int ALIAS_LOC_OMIT=0;
    public static final int ALIAS_LOC_TRANS=1;

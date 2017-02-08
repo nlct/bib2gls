@@ -415,7 +415,9 @@ such as JabRef. The document build process
 can now be analogous to that used with \app{bibtex} (or
 \appfmt{biber}), where only those entries that have been recorded in the
 document (and possibly their dependent entries) will be extracted
-from the \ext{bib} file.
+from the \ext{bib} file. Since \bibgls\ can also sort entries and collate
+location lists, it doubles as an indexing application, which means
+that the \app{makeglossaries} step can be skipped.
 
 Note that \bibgls\ requires the extension package
 \sty{glossaries-extra} and can't be used with just the base
@@ -423,6 +425,21 @@ Note that \bibgls\ requires the extension package
 commands. See the \sty{glossaries-extra} user manual for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
+
+Since the information used by \bibgls\ is
+written to the \ext{aux} file, it's not possible to run \bibgls\
+through \TeX's shell escape while the \ext{aux} file is open for
+write access. (The \ext{aux} file is closed \emph{after} the end
+document hook, so it can't be deferred with \cs{AtEndDocument}.) 
+This means that if you really want to run \bibgls\
+through \cs{write18} it must be done in the preamble with
+\cs{immediate}:
+\begin{verbatim}
+\immediate\write18{bib2gls "\jobname"}
+\end{verbatim}
+As from version 1.14 of \sty{glossaries-extra}, this can be done
+automatically with the \styopt{automake} option if the \ext{aux}
+file exists.
 
 \section{Example Use}
 The glossary entries are stored in a \ext{bib} file. For
@@ -2559,7 +2576,7 @@ determines whether to apply a logical AND or a logical OR.
 The \meta{value} may be either \optfmt{and} or \optfmt{or}.
 The default is \csopt[and]{match-op}.
 
-\subsection{\csoptnv{flatten}=\margm{value}}
+\subsection{\csoptnv{flatten}=\margm{boolean}}
 \labelopt{flatten}
 
 This is a boolean option. The default value is
@@ -3254,8 +3271,9 @@ If the \meta{value} is omitted or empty, the suffix is set to empty.
 
 The \styopt{record} package option automatically adds two new keys: 
 \field{loclist} and \field{location}. These two fields are set by
-\bibgls\ from the information supplied in the \ext{aux} file. The
-\field{loclist} has the format of an \sty{etoolbox} internal list
+\bibgls\ from the information supplied in the \ext{aux} file (unless
+the option \optref[false]{save-locations} is used). The
+\field{loclist} field has the format of an \sty{etoolbox} internal list
 and includes every location (except for the discarded duplicates).
 Each item in the list is provided in the form
 \begin{alltt}
@@ -3266,17 +3284,18 @@ for the cross-reference supplied by the \field{see} field and
 \cs{glsnoidxdisplayloc}\margm{prefix}\margm{counter}\margm{format}\margm{location}
 \end{alltt}
 for the locations. You can iterate through the \field{loclist} value
-using one of \sty{etoolbox}'s internal list loops. Remember that you
-can fetch the value of the field using \cs{glsfieldfetch} provided
-by the \sty{glossaries} package. The locations are always listed in
-the order in which they were indexed, except for the cross-reference 
-which may be placed at the start or end of the list or omitted
-according to \optref{loc-prefix}.
+using one of \sty{etoolbox}'s internal list loops (either
+by first fetching the list using \cs{glsfieldfetch}
+or through \sty{glossaries-extra}'s \cs{glsxtrfielddolistloop}
+or \cs{glsxtrfieldforlistloop} shortcuts).
+The locations are always listed in the order in which they were indexed,
+except for the cross-reference which may be placed at the start or
+end of the list or omitted according to \optref{loc-prefix}.
 
 It's therefore possible to define a custom glossary style where 
-\cs{glossentry} (and \cs{subglossentry}) ignore the final argument
+\cs{glossentry} (and the child form \cs{subglossentry}) ignore the final argument
 and instead parse the \field{loclist} field and re-order the
-locations. Remember that you can also use \cs{glsnoidxloclist}
+locations or process them in some other way. Remember that you can also use \cs{glsnoidxloclist}
 provided by \sty{glossaries}. For example:
 \begin{verbatim}
 \glsfieldfetch{gls.sample}{loclist}{\loclist}% fetch location list
@@ -3335,6 +3354,20 @@ according to the glossary style (and other factors, such as whether the
 option or supplied in the optional argument of \cs{printunsrtglossary}).
 For more information on adjusting the formatting see the
 \sty{glossaries} and \sty{glossaries-extra} manual.
+
+\subsection{\csoptnv{save-locations}=\margm{boolean}}
+\labelopt{save-locations}
+
+By default, the locations will be processed and stored in the
+\field{location} and \field{loclist} fields. However, if you don't
+want the location lists (for example, you are using the
+\styopt{nonumberlist} option or you are using \app{xindy} with a
+custom location rule), then there's no need for \bibgls\ to process
+the locations. To switch this function off, just use
+\csopt[false]{save-locations}. Note that with this setting, if
+you're not additionally using \app{makeindex} or \app{xindy}, then
+the locations won't be available even if you don't have the
+\styopt{nonumberlist} option set.
 
 \subsection{\csoptnv{min-loc-range}=\margm{value}}
 \labelopt{min-loc-range}
@@ -3775,10 +3808,16 @@ For example:
 The \csopt{sort-field} key indicates which field provides the sort
 value. The default is the \field{sort} field. For example
 \begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms},sort-label=category,sort=letter-case]
+\GlsXtrLoadResources[
+ src={entries-terms},% data in entries-terms.bib
+ sort-label=category,% sort by 'category' field
+ sort=letter-case% case-sensitive letter sort
+]
 \end{verbatim}
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
+You may also use \csopt[id]{sort-field} to sort according to
+the label.
 
 If an entry is missing a value for \meta{field}, then the value of
 the fallback field will be used instead. For example, with the
@@ -4087,25 +4126,25 @@ is selected, which also happens to be the \field{description} field,
 so the hyperlink for the primary entry is put in the
 \field{description} field.
 
-\subsection{\csoptnv{dual-abbrv-backlink}=\margm{value}}
+\subsection{\csoptnv{dual-abbrv-backlink}=\margm{boolean}}
 \labelopt{dual-abbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualabbreviation} instead of
 \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-symbol-backlink}=\margm{value}}
+\subsection{\csoptnv{dual-symbol-backlink}=\margm{boolean}}
 \labelopt{dual-symbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-backlink}=\margm{value}}
+\subsection{\csoptnv{dual-backlink}=\margm{boolean}}
 \labelopt{dual-backlink}
 
-Shortcut for \csopt[\meta{value}]{dual-entry-backlink}, 
-\csopt[\meta{value}]{dual-abbrv-backlink}, and
-\csopt[\meta{value}]{dual-symbol-backlink}.
+Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
+\csopt[\meta{boolean}]{dual-abbrv-backlink}, and
+\csopt[\meta{boolean}]{dual-symbol-backlink}.
 
 \subsection{\csoptnv{dual-field}=\margm{value}}
 \labelopt{dual-field}
