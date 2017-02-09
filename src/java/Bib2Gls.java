@@ -1225,6 +1225,11 @@ public class Bib2Gls implements TeXApp
       return currentResource;
    }
 
+   public boolean isDependent(String id)
+   {
+      return dependencies.contains(id);
+   }
+
    public void addDependent(String id)
    {
       if (!dependencies.contains(id))
@@ -2240,7 +2245,16 @@ public class Bib2Gls implements TeXApp
 
    private int parseArgVal(String[] args, int i, Object[] argVal)
    {
-      String[] sp = args[i].split("=", 2);
+      String[] sp; 
+
+      if (args[i].startsWith("--"))
+      {
+         sp = args[i].split("=", 2);
+      }
+      else
+      {
+         sp = new String[]{args[i]};
+      }
 
       argVal[0] = sp[0];
 
@@ -2263,39 +2277,19 @@ public class Bib2Gls implements TeXApp
 
    private int parseArgInt(String[] args, int i, Object[] argVal)
    {
-      String[] sp = args[i].split("=", 2);
+      i = parseArgVal(args, i, argVal);
 
-      argVal[0] = sp[0];
-
-      if (sp.length == 2)
+      if (argVal[1] != null)
       {
          try
          {
-            argVal[1] = new Integer(sp[1]);
+            argVal[1] = new Integer((String)argVal[1]);
          }
          catch (NumberFormatException e)
          {
             throw new IllegalArgumentException(getMessage(
-              "error.invalid.opt.int.value", argVal[0], sp[1]), e);
+              "error.invalid.opt.int.value", argVal[0], argVal[1]), e);
          }
-
-         return i;
-      }
-
-      if (i == args.length-1 || args[i+1].startsWith("-"))
-      {
-         argVal[1] = null;
-         return i; 
-      }
-
-      try
-      {
-         argVal[1] = new Integer(args[i+1]);
-         i++;
-      }
-      catch (NumberFormatException e)
-      {
-         argVal[1] = null;
       }
 
       return i;
@@ -2738,9 +2732,9 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "0.4a";
+   public static final String VERSION = "0.5a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-02-08";
+   //public static final String DATE = "2017-02-09";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

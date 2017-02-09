@@ -981,6 +981,11 @@ public class Bib2GlsEntry extends BibEntry
       return deps.iterator();
    }
 
+   public boolean hasDependencies()
+   {
+      return deps.size() > 0;
+   }
+
    public boolean equals(Object other)
    {
       if (other == null || !(other instanceof Bib2GlsEntry)) return false;

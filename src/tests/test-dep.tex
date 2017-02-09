@@ -1,0 +1,16 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources
+
+\begin{document}
+\gls{sample1}.
+
+\printunsrtglossaries
+
+\end{document}

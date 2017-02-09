@@ -1763,17 +1763,7 @@ public class GlsResource
                {
                   if (hasRecords)
                   {
-                     // does this entry have a "see" field?
-
-                     entry.initCrossRefs(parser);
-
-                     for (Iterator<String> it = entry.getDependencyIterator();
-                          it.hasNext(); )
-                     {
-                        String dep = it.next();
-
-                        bib2gls.addDependent(dep);
-                     }
+                     addDependencies(parser, entry, list);
 
                      if (dual != null)
                      {
@@ -1801,6 +1791,48 @@ public class GlsResource
                      bib2gls.addDependent(entry.getId());
                   }
                }
+            }
+         }
+      }
+   }
+
+   private void addDependencies(TeXParser parser, Bib2GlsEntry entry, 
+     Vector<BibData> list)
+    throws IOException
+   {
+      // does this entry have a "see" field?
+
+      entry.initCrossRefs(parser);
+
+      for (Iterator<String> it = entry.getDependencyIterator();
+           it.hasNext(); )
+      {
+         String dep = it.next();
+
+         // Has the dependency already been added or does it have
+         // any records?  (Don't want to get stuck in an infinite loop!)
+
+         if (bib2gls.isDependent(dep))
+         {
+            continue;
+         }
+
+         bib2gls.addDependent(dep);
+
+         if (bib2gls.hasRecord(dep))
+         {
+            continue;
+         }
+
+         Bib2GlsEntry depEntry = getBib2GlsEntry(dep, list);
+
+         if (depEntry != null)
+         {
+            // Does the dependant entry have dependencies?
+
+            if (depEntry.hasDependencies())
+            {
+               addDependencies(parser, depEntry, list);
             }
          }
       }

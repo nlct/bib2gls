@@ -30,11 +30,16 @@ There are some test files available in the
 [`src/tests`](https://github.com/nlct/bib2gls/tree/master/src/tests)
 directory.
 
-Latest experimental release: version 0.4a (2017-02-08).
-Added `save-locations` option. Fixed --long-arg=value form.
+Latest experimental release: version 0.5a (2017-02-09).
+Added recursive dependency check.
 
-Previous release: version 0.3a (2017-02-04).
-Fixed `@comment` parsing and `--no-interpret` switch.
+Previous releases:
+
+ -  version 0.4a (2017-02-08).
+    Added `save-locations` option. Fixed --long-arg=value form.
+
+ - version 0.3a (2017-02-04).
+   Fixed `@comment` parsing and `--no-interpret` switch.
 
 # Installation
 
