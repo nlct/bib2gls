@@ -10,7 +10,7 @@ Requires at least Java 7 and at least v1.12 of
 (2017-02-03).
 
 There's a [draft version of the user
-manual](http://www.dickimaw-books.com/software/bib2gls/)
+manual](http://www.dickimaw-books.com/software/bib2gls/bib2gls.pdf)
 provided for those 
 interested in more detail.
 
@@ -26,7 +26,7 @@ Make sure you have at least v1.12 of
 and at least Java 7.
 
  - [`bib2gls.jar`](http://www.dickimaw-books.com/software/bib2gls/bib2gls.jar)
- - [`texparserlib.jar`](https://www.dickimaw-books.com/software/bib2gls/texparserlib.jar)
+ - [`texparserlib.jar`](http://www.dickimaw-books.com/software/bib2gls/texparserlib.jar)
  - [`bib2gls.sh`](https://github.com/nlct/bib2gls/raw/master/src/bin/bib2gls.sh) (bash users only)
  - [`resources/bib2gls-en.xml`](https://github.com/nlct/bib2gls/raw/master/src/lib/resources/bib2gls-en.xml)
 
