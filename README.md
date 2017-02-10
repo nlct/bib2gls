@@ -9,9 +9,13 @@ Requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
 (2017-02-03).
 
-There's a draft version of the user manual
-in the `unstable` directory, which is provided for those 
+There's a [draft version of the user
+manual](http://www.dickimaw-books.com/software/bib2gls/)
+provided for those 
 interested in more detail.
+
+I've removed the `unstable` directory. You can instead fetch the
+latest binaries from the [application's home page](http://www.dickimaw-books.com/software/bib2gls/).
 
 # Testing the Experimental Version
 
@@ -21,8 +25,8 @@ Make sure you have at least v1.12 of
 [`glossaries-extra`](http://ctan.org/pkg/glossaries-extra)
 and at least Java 7.
 
- - [`bib2gls.jar`](https://github.com/nlct/bib2gls/raw/master/unstable/bib2gls.jar)
- - [`texparserlib.jar`](https://github.com/nlct/bib2gls/raw/master/unstable/texparserlib.jar)
+ - [`bib2gls.jar`](http://www.dickimaw-books.com/software/bib2gls/bib2gls.jar)
+ - [`texparserlib.jar`](https://www.dickimaw-books.com/software/bib2gls/texparserlib.jar)
  - [`bib2gls.sh`](https://github.com/nlct/bib2gls/raw/master/src/bin/bib2gls.sh) (bash users only)
  - [`resources/bib2gls-en.xml`](https://github.com/nlct/bib2gls/raw/master/src/lib/resources/bib2gls-en.xml)
 
