@@ -1019,6 +1019,9 @@ public class Bib2GlsEntry extends BibEntry
       int count = 0;
       StringBuilder mid = new StringBuilder();
 
+      int[] maxGap = new int[1];
+      maxGap[0] = 0;
+
       boolean start=true;
 
       if (seeLocation == PRE_SEE && crossRefs != null)
@@ -1114,6 +1117,7 @@ public class Bib2GlsEntry extends BibEntry
                      builder.append("\\delimN ");
                   }
    
+                  builder.append("\\bibglsrange{");
                   builder.append(record.getFmtTeXCode());
    
                }
@@ -1127,6 +1131,7 @@ public class Bib2GlsEntry extends BibEntry
    
                   builder.append("\\delimR ");
                   builder.append(record.getFmtTeXCode());
+                  builder.append("}");
                   rangeStart = null;
                   rangeFmt = null;
                }
@@ -1172,7 +1177,7 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(record.getFmtTeXCode());
             }
             else if (minRange < Integer.MAX_VALUE
-                     && record.follows(prev, gap))
+                     && record.follows(prev, gap, maxGap))
             {
                count++;
    
@@ -1186,6 +1191,7 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(record.getFmtTeXCode());
                mid.setLength(0);
                count = 1;
+               maxGap[0] = 0;
             }
             else if (count > 2 && suffixFF != null)
             {
@@ -1194,11 +1200,20 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(record.getFmtTeXCode());
                mid.setLength(0);
                count = 1;
+               maxGap[0] = 0;
             }
             else if (count >= minRange)
             {
                builder.append("\\delimR ");
                builder.append(prev.getFmtTeXCode());
+
+               if (maxGap[0] > 1)
+               {
+                  builder.append("\\bibglspassim ");
+               }
+
+               maxGap[0] = 0;
+
                builder.append("\\delimN ");
                builder.append(record.getFmtTeXCode());
                mid.setLength(0);
@@ -1211,6 +1226,7 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(record.getFmtTeXCode());
                mid.setLength(0);
                count = 1;
+               maxGap[0] = 0;
             }
    
             prev = record;
@@ -1228,6 +1244,11 @@ public class Bib2GlsEntry extends BibEntry
             {
                builder.append("\\delimR ");
                builder.append(prev.getFmtTeXCode());
+
+               if (maxGap[0] > 1)
+               {
+                  builder.append("\\bibglspassim ");
+               }
             }
             else
             {

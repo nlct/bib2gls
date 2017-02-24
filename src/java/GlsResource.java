@@ -2217,6 +2217,9 @@ public class GlsResource
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
+         writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
+         writer.println();
+
          if (dualField != null)
          {
             writer.format("\\glsxtrprovidestoragekey{%s}{}{}%n%n",
@@ -2226,6 +2229,13 @@ public class GlsResource
          if (seeLocation != Bib2GlsEntry.NO_SEE)
          {
             writer.println("\\providecommand{\\bibglsseesep}{, }");
+            writer.println();
+         }
+
+         if (locGap > 1)
+         {
+            writer.format("\\providecommand{\\bibglspassim}{%s}",
+             bib2gls.getMessage("tag.passim"));
             writer.println();
          }
 

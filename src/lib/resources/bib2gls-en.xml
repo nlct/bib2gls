@@ -25,6 +25,8 @@ See the manual for further details.</entry>
 			Some messages are displayed.
 			Synonym: {1}</entry>
 <entry key="syntax.silent">{0}		Only display error messages.</entry>
+<entry key="syntax.locale">{0} &lt;lang&gt; (or {1} &lt;lang&gt;)
+			Use language resource file for &lt;lang&gt;.</entry>
 <entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
 			Set transcript file name.</entry>
 <entry key="syntax.dir">{0} &lt;directory&gt; (or {1} &lt;directory&gt;)
@@ -147,6 +149,7 @@ Defaulting to: {0}.
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
+<entry key="tag.passim"> passim</entry>
 
 <entry key="warning.title">Warning: {0}</entry>
 <entry key="warning.substituting">Substituting {0} with {1}</entry>

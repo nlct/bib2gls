@@ -44,7 +44,7 @@ import com.dickimawbooks.texparserlib.bib.BibValueList;
 
 public class Bib2Gls implements TeXApp
 {
-   public Bib2Gls(int debug, int verbose)
+   public Bib2Gls(int debug, int verbose, String langTag)
      throws IOException,InterruptedException,Bib2GlsException
    {
       debugLevel = debug;
@@ -55,7 +55,7 @@ public class Bib2Gls implements TeXApp
          version();
       }
 
-      initMessages();
+      initMessages(langTag);
 
       initSecuritySettings();
 
@@ -2027,6 +2027,7 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.silent", "--silent"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.locale", "--locale", "-l"));
       System.out.println(getMessage("syntax.log", "--log-file", "-t"));
       System.out.println(getMessage("syntax.dir", "--dir", "-d"));
 
@@ -2095,9 +2096,19 @@ public class Bib2Gls implements TeXApp
       return String.format("/resources/bib2gls-%s.xml", tag);
    }
 
-   private void initMessages() throws Bib2GlsException,IOException
+   private void initMessages(String langTag) throws Bib2GlsException,IOException
    {
-      Locale locale = Locale.getDefault();
+      Locale locale;
+
+      if (langTag == null || "".equals(langTag))
+      {
+         locale = Locale.getDefault();
+      }
+      else
+      {
+         locale = Locale.forLanguageTag(langTag);
+      }
+
       docLocale = locale.toLanguageTag();
 
       String lang = locale.toLanguageTag();
@@ -2133,7 +2144,7 @@ public class Bib2Gls implements TeXApp
 
             String script = locale.getScript();
 
-            if (script != null)
+            if (script != null && !script.isEmpty())
             {
                name = getLanguageFileName(String.format("%s-%s", lang, script));
 
@@ -2243,7 +2254,7 @@ public class Bib2Gls implements TeXApp
       return trimFields;
    }
 
-   private int parseArgVal(String[] args, int i, Object[] argVal)
+   private static int parseArgVal(String[] args, int i, Object[] argVal)
    {
       String[] sp; 
 
@@ -2277,6 +2288,12 @@ public class Bib2Gls implements TeXApp
 
    private int parseArgInt(String[] args, int i, Object[] argVal)
    {
+      return parseArgInt(args, i, argVal, this);
+   }
+
+   private static int parseArgInt(String[] args, int i, Object[] argVal,
+     Bib2Gls bib2gls)
+   {
       i = parseArgVal(args, i, argVal);
 
       if (argVal[1] != null)
@@ -2287,21 +2304,29 @@ public class Bib2Gls implements TeXApp
          }
          catch (NumberFormatException e)
          {
-            throw new IllegalArgumentException(getMessage(
-              "error.invalid.opt.int.value", argVal[0], argVal[1]), e);
+            if (bib2gls == null)
+            {
+               throw new IllegalArgumentException("Invalid integer argument",
+                 e);
+            }
+            else
+            {
+               throw new IllegalArgumentException(bib2gls.getMessage(
+                 "error.invalid.opt.int.value", argVal[0], argVal[1]), e);
+            }
          }
       }
 
       return i;
    }
 
-   private boolean isArg(String arg, String shortArg, String longArg)
+   private static boolean isArg(String arg, String shortArg, String longArg)
    {
       return arg.equals("-"+shortArg) || arg.equals("--"+longArg) 
         || arg.startsWith("--"+longArg+"=");
    }
 
-   private boolean isArg(String arg, String longArg)
+   private static boolean isArg(String arg, String longArg)
    {
       return arg.equals("--"+longArg) || arg.startsWith("--"+longArg+"=");
    }
@@ -2356,6 +2381,19 @@ public class Bib2Gls implements TeXApp
          else if (args[i].equals("--silent"))
          {
             verboseLevel = -1;
+         }
+         else if (isArg(args[i], "l", "locale"))
+         {
+            // already dealt with, but need to increment index and
+            // perform syntax check.
+
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
          }
          else if (args[i].equals("-h") || args[i].equals("--help"))
          {
@@ -2652,51 +2690,60 @@ public class Bib2Gls implements TeXApp
       Bib2Gls bib2gls = null;
       int debug = 0;
       int verbose = 0;
+      String langTag = null;
+      Object[] argVal = new Object[2];
 
-      // Quickly check for debug mode for debugging messages needed
-      // before parseArgs().
-      //
-      // parseArgs() will perform error checking on the syntax
-      // and allow multiple "--debug" or "--no-debug" to override the
-      // first instance.
+      // Quickly check for options that are needed before parseArgs().
 
       for (int i = 0; i < args.length; i++)
       {
-         if (args[i].equals("--debug"))
+         if (isArg(args[i], "debug"))
          {
             try
             {
-               if (args[i+1].startsWith("-"))
+               i = parseArgInt(args, i, argVal, null);
+
+               if (argVal[1] == null)
                {
                   debug = 1;
-               }
+               } 
                else
                {
-                  i++;
-                  debug = Integer.parseInt(args[i]);
+                  debug = ((Integer)argVal[1]).intValue();
                }
             }
             catch (Exception e)
             {
                debug = 1;
             }
-
-            break;
          }
          else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
          {
-            break;
+            debug = 0;
          }
          else if (args[i].equals("--silent"))
          {
             verbose = -1;
-            break;
+         }
+         else if (args[i].equals("--verbose"))
+         {
+            verbose = 1;
+         }
+         else if (args[i].equals("--noverbose"))
+         {
+            verbose = 0;
+         }
+         else if (isArg(args[i], "l", "locale"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            langTag = (String)argVal[1];
          }
       }
 
       try
       {
-         bib2gls = new Bib2Gls(debug, verbose);
+         bib2gls = new Bib2Gls(debug, verbose, langTag);
 
          bib2gls.process(args);
 
@@ -2732,9 +2779,9 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "0.5a";
+   public static final String VERSION = "0.6a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-02-09";
+   //public static final String DATE = "2017-02-24";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

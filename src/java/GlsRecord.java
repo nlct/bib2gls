@@ -93,7 +93,8 @@ public class GlsRecord
       {
          if (format.length() == 1)
          {
-            return String.format("\\setentrycounter[%s]{%s}%s",
+            return String.format(
+               "\\setentrycounter[%s]{%s}\\glsnumberformat{%s}",
                prefix, counter, location);
          }
          else
@@ -132,7 +133,7 @@ public class GlsRecord
    }
 
    // does location for this follow location for other record?
-   public boolean follows(GlsRecord record, int gap)
+   public boolean follows(GlsRecord record, int gap, int[] maxGap)
    {
       if (!prefix.equals(record.prefix)
         ||!counter.equals(record.counter)
@@ -141,12 +142,12 @@ public class GlsRecord
          return false;
       }
 
-      return consecutive(record.location, location, gap);
+      return consecutive(record.location, location, gap, maxGap);
    }
 
    // is location2 one more than location1?
    public static boolean consecutive(String location1, String location2,
-     int gap)
+     int gap, int[] maxGap)
    {
       if (location1.isEmpty() || location2.isEmpty())
       {
@@ -174,10 +175,10 @@ public class GlsRecord
 
          if (loc1.equals(loc2))
          {
-            return consecutive(prefix1, prefix2, gap);
+            return consecutive(prefix1, prefix2, gap, maxGap);
          }
 
-         return consecutive(loc1, loc2, gap);
+         return consecutive(loc1, loc2, gap, maxGap);
       }
 
       m1 = DIGIT_PATTERN.matcher(location1);
@@ -202,8 +203,8 @@ public class GlsRecord
             if (suffix1.equals("0"))
             {
                return sep1.equals(sep2) ?
-                      consecutive(prefix1, prefix2, gap) :
-                      consecutive(prefix1+sep1, prefix2+sep2, gap);
+                      consecutive(prefix1, prefix2, gap, maxGap) :
+                      consecutive(prefix1+sep1, prefix2+sep2, gap, maxGap);
             }
             else
             {
@@ -222,7 +223,17 @@ public class GlsRecord
             int loc2 = Integer.parseInt(suffix2);
             int diff = loc2 - loc1;
 
-            return 0 < diff && diff <= gap;
+            if (0 < diff && diff <= gap)
+            {
+               if (diff > maxGap[0])
+               {
+                  maxGap[0] = diff;
+               }
+
+               return true;
+            }
+
+            return false;
          }
          catch (NumberFormatException e)
          {// shouldn't happen (integer pattern matched)
@@ -262,8 +273,8 @@ public class GlsRecord
          if (loc1 == loc2)
          {
             return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2, gap) :
-                   consecutive(prefix1+sep1, prefix2+sep2, gap);
+                   consecutive(prefix1, prefix2, gap, maxGap) :
+                   consecutive(prefix1+sep1, prefix2+sep2, gap, maxGap);
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
@@ -273,7 +284,17 @@ public class GlsRecord
 
          int diff = loc2 - loc1;
 
-         return 0 < diff && diff <= gap ;
+         if (0 < diff && diff <= gap)
+         {
+            if (diff > maxGap[0])
+            {
+               maxGap[0] = diff;
+            }
+
+            return true;
+         }
+
+         return false;
       }
 
       m1 = ROMAN_UC_PATTERN.matcher(location1);
@@ -318,8 +339,8 @@ public class GlsRecord
          if (loc1 == loc2)
          {
             return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2, gap) :
-                   consecutive(prefix1+sep1, prefix2+sep2, gap);
+                   consecutive(prefix1, prefix2, gap, maxGap) :
+                   consecutive(prefix1+sep1, prefix2+sep2, gap, maxGap);
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
@@ -329,7 +350,17 @@ public class GlsRecord
 
          int diff = loc2 - loc1;
 
-         return 0 < diff && diff <= gap ;
+         if (0 < diff && diff <= gap)
+         {
+            if (diff > maxGap[0])
+            {
+               maxGap[0] = diff;
+            }
+
+            return true;
+         }
+
+         return false;
       }
 
       m1 = ALPHA_PATTERN.matcher(location1);
@@ -364,8 +395,8 @@ public class GlsRecord
          if (suffix1.equals(suffix2))
          {
             return sep1.equals(sep2) ?
-                   consecutive(prefix1, prefix2, gap) :
-                   consecutive(prefix1+sep1, prefix2+sep2, gap);
+                   consecutive(prefix1, prefix2, gap, maxGap) :
+                   consecutive(prefix1+sep1, prefix2+sep2, gap, maxGap);
          }
 
          if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
@@ -378,7 +409,17 @@ public class GlsRecord
 
          int diff = loc2 - loc1;
 
-         return 0 < diff && diff <= gap ;
+         if (0 < diff && diff <= gap)
+         {
+            if (diff > maxGap[0])
+            {
+               maxGap[0] = diff;
+            }
+
+            return true;
+         }
+
+         return false;
       }
 
       return false;

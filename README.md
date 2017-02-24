@@ -34,13 +34,16 @@ There are some test files available in the
 [`src/tests`](https://github.com/nlct/bib2gls/tree/master/src/tests)
 directory.
 
-Latest experimental release: version 0.5a (2017-02-09).
-Added recursive dependency check.
+Latest experimental release: version 0.6a (2017-02-24).
+Added \bibglspassim, \bibglsrange and --locale/-l
 
 Previous releases:
 
- -  version 0.4a (2017-02-08).
-    Added `save-locations` option. Fixed --long-arg=value form.
+ - version 0.5a (2017-02-09).
+   Added recursive dependency check.
+
+ - version 0.4a (2017-02-08).
+   Added `save-locations` option. Fixed --long-arg=value form.
 
  - version 0.3a (2017-02-04).
    Fixed `@comment` parsing and `--no-interpret` switch.
