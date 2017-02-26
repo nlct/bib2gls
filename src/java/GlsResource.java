@@ -395,6 +395,12 @@ public class GlsResource
          }
          else if (opt.equals("loc-gap"))
          {
+            bib2gls.warning(bib2gls.getMessage("warning.deprecated",
+              opt, "max-loc-diff"));
+            locGap = getRequiredIntGe(parser, 1, list, opt);
+         }
+         else if (opt.equals("max-loc-diff"))
+         {
             locGap = getRequiredIntGe(parser, 1, list, opt);
          }
          else if (opt.equals("suffixF"))

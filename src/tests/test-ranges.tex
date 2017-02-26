@@ -7,9 +7,9 @@
 \usepackage[record,style=tree]{glossaries-extra}
 
 \GlsXtrLoadResources[
-  loc-gap=2,% skip gaps in location lists, where the difference
+  max-loc-diff=2,% skip gaps in location lists, where the difference
             % between location numbers is <= 2
-  loc-suffix,% use default location list suffix
+  loc-suffix,% use default location list suffix (\@.)
   src={test-entries}]
 
 \begin{document}

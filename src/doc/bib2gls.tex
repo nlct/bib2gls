@@ -3463,10 +3463,10 @@ or \meta{group-2} of the first pattern match (of
 \meta{location-1}) doesn't equal
 \meta{group-2} of the second pattern match (of \meta{location-2})
 then the locations aren't considered consecutive;
-   \item\label{itm:decgrp3} If $0 < l_2 - l_1 \leq g $
+   \item\label{itm:decgrp3} If $0 < l_2 - l_1 \leq d $
 where $l_2$ is \meta{group 3} of the second pattern match,
 $l_1$ is \meta{group 3} of the first pattern match and
-$g$ is the value of \optfmt{loc-gap} then the locations
+$d$ is the value of \optfmt{max-loc-diff} then the locations
 are consecutive otherwise they're not consecutive.
   \end{enumerate}
 \item\label{itm:rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
@@ -3566,8 +3566,8 @@ location set to 1 and the second location set to 2.
 \texttt{@} to allow for internal commands in locations.)
 \end{enumerate}
 
-\subsection{\csoptnv{loc-gap}=\margm{value}}
-\labelopt{loc-gap}
+\subsection{\csoptnv{max-loc-diff}=\margm{value}}
+\labelopt{max-loc-diff}
 
 This setting is used to determine whether two locations are
 considered consecutive.
@@ -3579,7 +3579,7 @@ that have numeric values $n_1$ and $n_2$ (and identical prefix,
 counter and format), then the sequence \meta{location-1},
 \meta{location-2} is considered consecutive if
 \[
-0 < n_2 - n_1 \leq \text{\meta{loc-gap}}
+0 < n_2 - n_1 \leq \text{\meta{max-loc-diff}}
 \]
 The default value of 1 means that \meta{location-2} immediately
 follows \meta{location-1} if $n_2 = n_1+1$.
@@ -3597,14 +3597,14 @@ The automatically indexing of commands like \cs{gls} means that
 the location lists can become long and ragged. You could
 deal with this by switching off the automatic indexing and
 only explicitly index pertinent use or you can adjust
-the value of \optfmt{loc-gap} so that a range can be formed even
+the value of \optfmt{max-loc-diff} so that a range can be formed even
 there are one or two gaps in it.
 By default, any location ranges that have skipped gaps in this
 manner will be followed by \csref{bibglspassim}. The default
 definition of this command is obtained from the resource file.
 For English, this is \verb*| passim| (space followed by \qt{passim}).
 
-So with the above set of locations, if \csopt[2]{loc-gap} then 
+So with the above set of locations, if \csopt[2]{max-loc-diff} then 
 the list becomes \qt{1--12 passim, 58--61 passim} which now highlights that
 there are two blocks within the document related to that
 term.
@@ -4466,7 +4466,7 @@ Or you can redefine it afterwards:
 \cs{bibglspassim}
 \end{definition}
 
-If \optref{loc-gap} is greater than 1, then any ranges that have
+If \optref{max-loc-diff} is greater than 1, then any ranges that have
 skipped over gaps will be followed by \cs{bibglspassim}. The default
 definition is obtained from the \hyperref[sec:lang.xml]{language resource
 file}. For example, with \file{bib2gls-en.xml} the provided
