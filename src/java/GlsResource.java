@@ -438,6 +438,31 @@ public class GlsResource
                seeLocation = Bib2GlsEntry.POST_SEE;
             }
          }
+         else if (opt.equals("loc-counters"))
+         {
+            String[] values = getStringArray(parser, list, opt);
+
+            if (values == null || values.length == 0)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.missing.value", opt));
+            }
+            else if (values.length == 1)
+            {
+               if (values[0].equals("as-use"))
+               {
+                  counters = null;
+               }
+               else
+               {
+                  counters = values;
+               }
+            }
+            else
+            {
+               counters = values;
+            }
+         }
          else if (opt.equals("loc-prefix"))
          {
             String[] values = getStringArray(parser, "true", list, opt);
@@ -2224,7 +2249,16 @@ public class GlsResource
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
          writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
+         writer.format("\\providecommand{\\bibglspassim}{%s}%n",
+             bib2gls.getMessage("tag.passim"));
          writer.println();
+
+         if (counters != null)
+         {
+            writer.println("\\providecommand{\\bibglslocationgroup}[3]{#3}");
+            writer.println("\\providecommand{\\bibglslocationgroupsep}{\\delimN}");
+            writer.println();
+         }
 
          if (dualField != null)
          {
@@ -2235,13 +2269,6 @@ public class GlsResource
          if (seeLocation != Bib2GlsEntry.NO_SEE)
          {
             writer.println("\\providecommand{\\bibglsseesep}{, }");
-            writer.println();
-         }
-
-         if (locGap > 1)
-         {
-            writer.format("\\providecommand{\\bibglspassim}{%s}",
-             bib2gls.getMessage("tag.passim"));
             writer.println();
          }
 
@@ -3105,6 +3132,11 @@ public class GlsResource
       aliases = hasAliases;
    }
 
+   public String[] getLocationCounters()
+   {
+      return counters;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -3195,6 +3227,8 @@ public class GlsResource
    private Vector<TeXPath> masterGlsTeXPath = null;
    private TeXPath masterPdfPath = null;
    private String[] masterSelection = null;
+
+   private String[] counters=null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

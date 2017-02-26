@@ -3740,6 +3740,90 @@ to \cs{bibglspostlocprefix}.
 If \meta{value} omitted, \csopt[\cs{@}.]{loc-suffix} is assumed.
 The default is \csopt[false]{loc-suffix}.
 
+\subsection{\csoptnv{loc-counters}=\margm{list}}
+\labelopt{loc-counters}
+
+Commands like \cs{gls} allow you to select a different 
+counter to use for the location for that specific instance
+(overriding the default counter for the entry's glossary type).
+This is done with the \glsopt{counter} option. For example,
+consider the following document:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,style=tree]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={entries}% data in entries.bib
+]
+
+\begin{document}
+
+\gls{pi}.
+
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+\newpage
+
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+
+\newpage
+
+\gls{pi}.
+
+\newpage
+
+\gls{pi}.
+
+\newpage
+
+\gls{pi}.
+
+\newpage
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+This results in the location list \qt{1, 1--3, 3--5}. This
+looks a little odd and it may seem as though the range formation
+hasn't worked, but the locations are actually: page~1, equation~1,
+equation~2, equation~3, page~3, page~4 and page~5. Ranges can't
+be formed across different counters.
+
+The \csopt[\meta{list}]{loc-counters} option instructs \bibgls\ 
+to group the locations according to the counters given in
+the comma-separated \meta{list}. If a location has a counter
+that's not listed in \meta{list}, then the location is discarded.
+
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  loc-counters={equation,page},% group locations by counter
+  src={entries}% data in entries.bib
+]
+\end{verbatim}
+This will first list the locations for the \optfmt{equation}
+counter and then the locations for the \optfmt{page} counter.
+Each group of locations is encapsulated within the command
+\csref{bibglslocationgroup}\margm{n}\margm{counter}\margm{locations}.
+The groups are separated by \csref{bibglslocationgroupsep}
+(which defaults to \cs{delimN}).
+
+The \meta{list} value must be non-empty.
+Use \csopt[as-use]{loc-counters} to restore the default behaviour,
+where the locations are listed in the document order of use,
+or \csopt[false]{save-locations} to omit the location lists.
+
 \section{Sorting}
 \label{sec:sortingopts}
 
@@ -4598,6 +4682,90 @@ Note that this is slightly different from \cs{bibglslocprefix} as
 it includes the 0 case, which in this instance means that there were
 no locations but there was a cross-reference. This command isn't
 added when the location list is empty.
+
+\section{\cs{bibglslocationgroup}}
+\labelcs{bibglslocationgroup}
+
+\begin{definition}
+\cs{bibglslocationgroup}\margm{n}\margm{counter}\margm{list}
+\end{definition}
+
+When the \optref{loc-counters} option is used, the locations
+for each entry are grouped together according to the counter
+(in the order specified in the value of \optref{loc-counters}).
+Each group of locations is encapsulated within
+\cs{bibglslocationgroup}, where \meta{n} is the number
+of locations within the group, \meta{counter} is the
+counter name and \meta{list} is the formatted location sub-list.
+By default, this simply does \meta{list}, but may be
+defined (before the resources are loaded) or redefined 
+(after the resources are loaded) as required.
+
+For example:
+\begin{verbatim}
+\newcommand*{\bibglslocationgroup}[3]{%
+  \ifnum#1=1
+   #2:
+  \else
+   #2s:
+  \fi
+  #3%
+}
+
+\GlsXtrLoadResources[
+  loc-counters={equation,page},% group locations by counter
+  src={entries}% data in entries.bib
+]
+\end{verbatim}
+This will prefix each group with the counter name, if there's
+only one location, or the counter name followed by \qt{s},
+if there are multiple locations within the group.
+
+There are various ways to adapt this to translate the counter
+name to a different textual label. For example:
+\begin{verbatim}
+\providecommand{\pagename}{Page}
+\providecommand{\pagesname}{Pages}
+\providecommand{\equationname}{Equation}
+\providecommand{\equationsname}{Equations}
+
+\newcommand*{\bibglslocationgroup}[3]{%
+  \ifnum#1=1
+   \ifcsdef{#2name}{\csuse{#2name}}{#2}:
+  \else
+   \ifcsdef{#2sname}{\csuse{#2sname}}{#2s}:
+  \fi
+  #3%
+}
+\end{verbatim}
+
+\section{\cs{bibglslocationgroupsep}}
+\labelcs{bibglslocationgroupsep}
+
+\begin{definition}
+\cs{bibglslocationgroupsep}
+\end{definition}
+
+When the \optref{loc-counters} option is set, this command
+is used to separate each location sub-group. It may be defined
+before the resources are loaded:
+\begin{verbatim}
+\newcommand*{\bibglslocationgroupsep}{; }
+
+\GlsXtrLoadResources[
+  loc-counters={equation,page},% group locations by counter
+  src={entries}% data in entries.bib
+]
+\end{verbatim}
+or redefined after the resources are loaded:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  loc-counters={equation,page},% group locations by counter
+  src={entries}% data in entries.bib
+]
+
+\renewcommand*{\bibglslocationgroupsep}{; }
+\end{verbatim}
 
 \section{\cs{bibglslettergroup}}
 \labelcs{bibglslettergroup}

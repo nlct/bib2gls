@@ -9,7 +9,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-pifonts.pdf test-dual-abbrv.pdf \
 	  test-dual-abbrv-desc.pdf test-numbers.pdf \
 	  test-book.pdf test-article.pdf test-dual-symbols.pdf \
-	  test-alias.pdf test-dep.pdf test-ranges.pdf
+	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -180,6 +180,13 @@ test-ranges.pdf	: test-ranges.glstex
 test-ranges.glstex	: test-ranges.tex $(DEPS) test-entries.bib
 		pdflatex test-ranges
 		$(BIB2GLS) test-ranges
+
+test-counters.pdf	: test-counters.glstex
+		pdflatex test-counters
+
+test-counters.glstex	: test-counters.tex $(DEPS) test-entries.bib
+		pdflatex test-counters
+		$(BIB2GLS) test-counters
 
 clean	:
 	$(RM) *.aux

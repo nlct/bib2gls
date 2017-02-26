@@ -1,0 +1,64 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,style=tree]{glossaries-extra}
+
+\providecommand{\pagename}{Page}
+\providecommand{\pagesname}{Pages}
+\providecommand{\equationname}{Equation}
+\providecommand{\equationsname}{Equations}
+
+\newcommand*{\bibglslocationgroup}[3]{%
+  \ifnum#1=1
+   \ifcsdef{#2name}{\csuse{#2name}}{#2}:
+  \else
+   \ifcsdef{#2sname}{\csuse{#2sname}}{\ifcsdef{#2name}{\csuse{#2name}}{#2s}}:
+  \fi
+  #3%
+}
+
+\newcommand*{\bibglslocationgroupsep}{; }
+
+\GlsXtrLoadResources[
+  loc-counters={equation,page},% group locations by counter
+  loc-suffix,% add default location suffix
+  src={test-entries}]
+
+\begin{document}
+
+\gls{pi}.
+
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+\newpage
+
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+
+\newpage
+
+\gls{pi}.
+
+\newpage
+
+\gls{pi}.
+
+\newpage
+
+\gls{pi}.
+
+\newpage
+
+\printunsrtglossaries
+\end{document}
