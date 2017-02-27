@@ -10,7 +10,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual-abbrv-desc.pdf test-numbers.pdf \
 	  test-book.pdf test-article.pdf test-dual-symbols.pdf \
 	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf \
-	  test-supp.pdf test-supp-main.pdf
+	  test-supp.pdf test-supp-main.pdf test-random.pdf
 
 ../lib/bib2gls.jar:	../java/*.java
 		make -C ..
@@ -202,6 +202,13 @@ test-supp-main.pdf	: test-supp-main.glstex
 test-supp-main.glstex	: test-supp-main.tex test-supp.pdf $(DEPS) test-entries.bib
 		pdflatex test-supp-main
 		$(BIB2GLS) test-supp-main
+
+test-random.pdf	: test-random.glstex
+		pdflatex test-random
+
+test-random.glstex	: test-random.tex $(DEPS) test-ascii.bib
+		pdflatex test-random
+		$(BIB2GLS) test-random
 
 clean	:
 	$(RM) *.aux

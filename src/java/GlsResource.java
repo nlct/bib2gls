@@ -379,6 +379,22 @@ public class GlsResource
                sort = null;
             }
          }
+         else if (opt.equals("shuffle"))
+         {
+            long seed = getOptionalLong(parser, 0L, list, opt);
+
+            if (seed == 0L)
+            {
+               random = new Random();
+            }
+            else
+            {
+               random = new Random(seed);
+            }
+
+            sort = "random";
+            flatten = true;
+         }
          else if (opt.equals("dual-sort"))
          {
             dualSort = getOptional(parser, "doc", list, opt);
@@ -1322,6 +1338,44 @@ public class GlsResource
       }
 
       return val;
+   }
+
+   private long getRequiredLong(TeXParser parser, KeyValList list, String opt)
+    throws IOException
+   {
+      String value = getRequired(parser, list, opt);
+
+      try
+      {
+         return Long.parseLong(value);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.int.value", opt, value), e);
+      }
+   }
+
+   private long getOptionalLong(TeXParser parser, long defValue, 
+     KeyValList list, String opt)
+    throws IOException
+   {
+      String value = getOptional(parser, list, opt);
+
+      if (value == null)
+      {
+         return defValue;
+      }
+
+      try
+      {
+         return Long.parseLong(value);
+      }
+      catch (NumberFormatException e)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.int.value", opt, value), e);
+      }
    }
 
    private String getChoice(TeXParser parser, KeyValList list, String opt, 
@@ -2308,7 +2362,16 @@ public class GlsResource
 
       if (entrySort != null && !entrySort.equals("use") && entryCount > 0)
       {
-         if (entrySort.equals("letter-case"))
+         if (entrySort.equals("random"))
+         {
+            if (random == null)
+            {
+               random = new Random();
+            }
+
+            Collections.shuffle(entries, random);
+         }
+         else if (entrySort.equals("letter-case"))
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
@@ -3432,6 +3495,8 @@ public class GlsResource
    private String[] masterSelection = null;
 
    private String[] counters=null;
+
+   private Random random=null;
 
    private Vector<GlsRecord> supplementalRecords=null;
    private TeXPath supplementalPdfPath=null;

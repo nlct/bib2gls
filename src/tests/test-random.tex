@@ -1,0 +1,18 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,stylemods=mcols,style=mcolindexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={test-ascii},
+  selection={all},
+  shuffle
+]
+
+\begin{document}
+
+\printunsrtglossaries
+\end{document}

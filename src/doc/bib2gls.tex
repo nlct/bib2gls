@@ -22,8 +22,12 @@ actual '='
 \usepackage{makeidx}
 \usepackage{datetime2}
 \usepackage[colorlinks]{hyperref}
+\usepackage{glossaries-extra}
+\glsdisablehyper
 
 \makeindex
+
+\newabbreviation{IETF}{IETF}{Internet Engineering Task Force}
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
 
@@ -529,7 +533,7 @@ determine these values and honours them.
 
 The messages produced by \bibgls\ are fetched from a resource file
 called \metafilefmt{bib2gls-}{lang}{.xml}, where \meta{lang} is a
-valid IETF language tag.
+valid \gls{IETF} language tag.
 
 The appropriate file is searched for in the following order, where
 \meta{locale} is the operating system's locale or the value supplied
@@ -977,7 +981,7 @@ written to the transcript file, which can be inspected afterwards.
 \labelarg{locale}
 
 Specify the preferred \hyperref[sec:lang.xml]{language resource
-file}, where \meta{lang} is a valid IETF language tag.
+file}, where \meta{lang} is a valid \gls{IETF} language tag.
 There should be an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
 resource file.
 
@@ -1245,14 +1249,15 @@ and \texttt{hyperbf} or \texttt{hyperit} for a primary reference.)
 \labelarg{group}
 
 The \styopt{record} package option automatically creates a new field
-called \field{group}. If the \longarg{group} switch is used,
-\bibgls\ will try to determine the letter group for each entry and
-add it to the \field{group} field. This value will be picked up by
+called \field{group}. If the \longarg{group} switch is used, When
+sorting, \bibgls\ will try to determine the letter group for each
+entry and add it to the \field{group} field.  (Some \optref{sort}
+options ignore this setting.) This value will be picked up by
 \cs{printunsrtglossary} if letter group headings are required (for
-example with the \abbrstyle{indexgroup} style). If
-you're not using a glossary style that displays the group headings,
-there's no need to use this switch. Note that this switch
-doesn't automatically select an appropriate glossary style.
+example with the \abbrstyle{indexgroup} style). If you're not using
+a glossary style that displays the group headings, there's no need
+to use this switch. Note that this switch doesn't automatically
+select an appropriate glossary style.
 
 The default is \argref{no-group}.
 
@@ -4030,49 +4035,65 @@ identifier (as per \optref{category}) or the category label. For example:
 \section{Sorting}
 \label{sec:sortingopts}
 
+Entries are typically sorted (for example, alphabetically
+or in order of use), but the \sty{glossaries-extra} package
+is versatile enough to be used in wider contexts than simple
+terms, symbols or abbreviations. For example, entries could
+contain theorems or problems where the \field{name} supplies
+the title and the \field{description} provides a description
+of the theorem or problem. Another field might then contain
+the proof or solution. Therefore, somewhat unusually for
+an indexing application, \bibgls\ also provides the option
+to shuffle the entries instead of sorting them.
+
 \subsection{\csoptnv{sort}=\margm{value}}
 \labelopt{sort}
 
 The \csopt{sort} key indicates how entries should be sorted. The
 \meta{value} may be one of:
 \begin{itemize}
-\item \texttt{none} (or \texttt{unsrt}): don't sort the entries.
+\item \optfmt{none} (or \optfmt{unsrt}): don't sort the entries.
 (The entries will be in the order they were processed when parsing
 the data.)
-\item \texttt{locale}: sort the entries according to the operating
+\item \optfmt{random}: shuffles rather than sorts the entries.
+This won't work if there are hierarchical entries, so it's best
+to use this option with \optref{flatten}. The seed for the
+random generator can be set using \optref{shuffle} (which
+also automatically sets \csopt[random]{sort} and \csopt{flatten}).
+\item \optfmt{locale}: sort the entries according to the operating
 system's locale.
-\item \texttt{doc}: sort the entries according to the document
+\item \optfmt{doc}: sort the entries according to the document
 language. In the case of a multi-lingual document, this will be
 the last language resource file to be loaded through
 \sty{tracklang}'s interface. If no languages have been tracked, this
 option is equivalent to \csopt[locale]{sort}.
 \item \meta{lang tag}: sort according to the rules of the locale
-given by the IETF language tag \meta{lang tag}.
-\item \texttt{use}: sort in order of use. (This order is determined
+given by the \gls{IETF} language tag \meta{lang tag}.
+\item \optfmt{use}: sort in order of use. (This order is determined
 by the records written to the \ext{aux} file by the \styopt{record}
 package option.)
-\item \texttt{letter-case}: case-sensitive letter sort.
-\item \texttt{letter-nocase}: case-insensitive letter sort.
-\item \texttt{integer}: integer sort. This is for integer sort
+\item \optfmt{letter-case}: case-sensitive letter sort.
+\item \optfmt{letter-nocase}: case-insensitive letter sort.
+\item \optfmt{integer}: integer sort. This is for integer sort
 values. Any value that isn't an integer is treated as 0.
-\item \texttt{integer-reverse}: as above but reverses the order.
-\item \texttt{hex}: hexadecimal integer sort. This is for
+\item \optfmt{integer-reverse}: as above but reverses the order.
+\item \optfmt{hex}: hexadecimal integer sort. This is for
 hexadecimal sort values. Any value that isn't a hexadecimal number 
 is treated as 0.
-\item \texttt{hex-reverse}: as above but reverses the order.
-\item \texttt{octal}: octal integer sort. This is for
+\item \optfmt{hex-reverse}: as above but reverses the order.
+\item \optfmt{octal}: octal integer sort. This is for
 octal sort values. Any value that isn't a octal number 
 is treated as 0.
-\item \texttt{octal-reverse}: as above but reverses the order.
-\item \texttt{binary}: binary integer sort. This is for binary sort
+\item \optfmt{octal-reverse}: as above but reverses the order.
+\item \optfmt{binary}: binary integer sort. This is for binary sort
 values. Any value that isn't a binary number is treated as 0.
-\item \texttt{binary-reverse}: as above but reverses the order.
-\item \texttt{float}: single-precision sort. This is for
+\item \optfmt{binary-reverse}: as above but reverses the order.
+\item \optfmt{float}: single-precision sort. This is for
 decimal sort values. Any value that isn't a decimal is treated as 0.0.
-\item \texttt{float-reverse}: as above but reverses the order.
-\item \texttt{double}: double-precision sort. This is for
+\item \optfmt{float-reverse}: as above but reverses the order.
+\item \optfmt{double}: double-precision sort. This is for
 decimal sort values. Any value that isn't a decimal is treated as 0.0.
-\item \texttt{float-reverse}: as above but reverses the order.
+\item \optfmt{float-reverse}: as above but reverses the order.
 \end{itemize}
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
@@ -4140,6 +4161,13 @@ fallback as for \atentry{entry} but if neither the \field{name} or
 field.
 
 If no fallback field can be found, the entry's label will be used.
+
+\subsection{\csoptnv{shuffle}=\margm{seed}}
+\labelopt{shuffle}
+
+Automatically sets \csopt[random]{sort} and \csopt{flatten}.
+The value \meta{seed} may be omitted. If present, it should
+be an integer used as a seed for the random number generator.
 
 \section{Dual Entries}
 
