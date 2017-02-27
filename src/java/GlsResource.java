@@ -72,6 +72,7 @@ public class GlsResource
       String[] srcList = null;
 
       String master = null;
+      String supplemental = null;
 
       for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
       {
@@ -100,6 +101,31 @@ public class GlsResource
          else if (opt.equals("master-resources"))
          {
             masterSelection = getStringArray(parser, list, opt);
+         }
+         else if (opt.equals("supplemental-locations"))
+         {// fetch supplemental locations from another document
+            supplemental = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("supplemental-category"))
+         {
+            supplementalCategory = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("supplemental-selection"))
+         {
+            supplementalSelection = getStringArray(parser, list, opt);
+
+            if (supplementalSelection == null
+             || supplementalSelection.length == 0)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.missing.value", opt));
+            }
+
+            if (supplementalSelection.length == 1 
+             && supplementalSelection[0].equals("selected"))
+            {
+               supplementalSelection = null;
+            }
          }
          else if (opt.equals("short-case-change"))
          {
@@ -580,6 +606,11 @@ public class GlsResource
          }
       }
 
+      if (supplemental != null)
+      {
+         parseSupplemental(parser, supplemental);
+      }
+
       if (master != null)
       {
          parseMaster(parser, master);
@@ -767,6 +798,12 @@ public class GlsResource
            bib2gls.getMessage("warning.option.clash", "master", "src"));
 
          sources.clear();
+      }
+
+      if (supplementalRecords != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "supplemental-locations"));
       }
 
       if (shortCaseChange != null)
@@ -959,7 +996,7 @@ public class GlsResource
          category = "master";
       }
      
-      // Has the category been set? If not, set it to 'master'
+      // Has the type been set? If not, set it to 'master'
 
       if (type == null)
       {
@@ -1025,6 +1062,57 @@ public class GlsResource
          }
       }
 
+   }
+
+   private void parseSupplemental(TeXParser parser, String basename)
+    throws IOException
+   {
+      // Need to find supplemental aux file which should be relative to
+      // the current directory. (Don't use kpsewhich to find it.)
+
+      TeXPath path = new TeXPath(parser, basename+".aux", false);
+
+      bib2gls.checkReadAccess(path);
+
+      File auxFile = path.getFile();
+
+      // Need to parse aux file to find records.
+
+      AuxParser auxParser = new AuxParser(bib2gls)
+      {
+         protected void addPredefined()
+         {
+            super.addPredefined();
+
+            addAuxCommand("glsxtr@record", 5);
+         }
+      };
+
+      supplementalPdfPath = new TeXPath(parser, basename+".pdf", false);
+
+      TeXParser auxTeXParser = auxParser.parseAuxFile(auxFile);
+
+      Vector<AuxData> auxData = auxParser.getAuxData();
+
+      supplementalRecords = new Vector<GlsRecord>();
+
+      for (AuxData data : auxData)
+      {
+         if (data.getName().equals("glsxtr@record"))
+         {
+            supplementalRecords.add(new GlsRecord(
+              data.getArg(0).toString(auxTeXParser),
+              data.getArg(1).toString(auxTeXParser),
+              data.getArg(2).toString(auxTeXParser),
+              data.getArg(3).toString(auxTeXParser),
+              data.getArg(4).toString(auxTeXParser)));
+         }
+      }
+
+      if (supplementalCategory == null)
+      {
+         supplementalCategory = category;
+      }
    }
 
    private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
@@ -1825,6 +1913,54 @@ public class GlsResource
             }
          }
       }
+
+      addSupplementalRecords();
+   }
+
+   private void addSupplementalRecords()
+   {
+      if (supplementalRecords != null)
+      {
+         for (GlsRecord record : supplementalRecords)
+         {
+            String label = record.getLabel();
+
+            Bib2GlsEntry entry = getEntry(label, bibData);
+
+            if (entry == null && labelPrefix != null
+                && !label.startsWith(labelPrefix))
+            {
+               entry = getEntry(labelPrefix+label, bibData);
+            }
+
+            if (entry == null)
+            {
+               if (dualData == null)
+               {
+                  entry = getEntry(dualPrefix+label, bibData);
+               }
+               else
+               {
+                  entry = getEntry(label, dualData);
+
+                  if (entry == null && !label.startsWith(dualPrefix))
+                  {
+                     entry = getEntry(dualPrefix+label, dualData);
+                  }
+               }
+            }
+
+            if (entry != null)
+            {
+               if (supplementalCategory != null)
+               {
+                  setCategory(entry, supplementalCategory);
+               }
+
+               entry.addSupplementalRecord(record);
+            }
+         }
+      }
    }
 
    private void addDependencies(TeXParser parser, Bib2GlsEntry entry, 
@@ -2097,6 +2233,47 @@ public class GlsResource
                entries.add(entry);
             }
          }
+
+         if (supplementalRecords != null && supplementalSelection != null)
+         {
+            for (GlsRecord record : supplementalRecords)
+            {
+               String label = record.getLabel();
+               Bib2GlsEntry entry = getEntry(label, data);
+
+               if (entry != null && !entries.contains(entry))
+               {
+                  if (supplementalSelection.length == 1
+                  && supplementalSelection[0].equals("all"))
+                  {
+                     if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                       ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
+                     {
+                        addHierarchy(entry, entries, data);
+                     }
+
+                     entries.add(entry);
+                  }
+                  else
+                  {
+                     for (String selLabel : supplementalSelection)
+                     {
+                        if (selLabel.equals(label))
+                        {
+                           if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                             ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
+                           {
+                              addHierarchy(entry, entries, data);
+                           }
+
+                           entries.add(entry);
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+         }
       }
 
       processDepsAndSort(data, entries, entrySort, entrySortField);
@@ -2260,6 +2437,13 @@ public class GlsResource
             writer.println();
          }
 
+         if (supplementalRecords != null)
+         {
+            writer.println("\\providecommand{\\bibglssupplementalsep}{\\delimN}");
+            writer.println("\\providecommand{\\bibglssupplemental}[2]{#2}");
+            writer.println();
+         }
+
          if (dualField != null)
          {
             writer.format("\\glsxtrprovidestoragekey{%s}{}{}%n%n",
@@ -2282,31 +2466,31 @@ public class GlsResource
 
          if (locationPrefix != null)
          {
-              writer.println("\\providecommand{\\bibglspostlocprefix}{\\ }");
+            writer.println("\\providecommand{\\bibglspostlocprefix}{\\ }");
 
-              if (type == null)
-              {
-                 writer.println("\\appto\\glossarypreamble{%");
-              }
-              else
-              {
-                 writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
-              }
+            if (type == null)
+            {
+               writer.println("\\appto\\glossarypreamble{%");
+            }
+            else
+            {
+               writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
+            }
 
-              writer.println(" \\providecommand{\\bibglslocprefix}[1]{%");
-              writer.println("  \\ifcase#1");
+            writer.println(" \\providecommand{\\bibglslocprefix}[1]{%");
+            writer.println("  \\ifcase#1");
 
-              for (int i = 0; i < locationPrefix.length; i++)
-              {
-                 writer.format("  \\%s %s\\bibglspostlocprefix%n",
-                   (i == locationPrefix.length-1 ? "else" : "or"), 
-                   locationPrefix[i]);
-              }
+            for (int i = 0; i < locationPrefix.length; i++)
+            {
+               writer.format("  \\%s %s\\bibglspostlocprefix%n",
+                 (i == locationPrefix.length-1 ? "else" : "or"), 
+                 locationPrefix[i]);
+            }
 
-              writer.println("  \\fi");
-              writer.println(" }");
+            writer.println("  \\fi");
+            writer.println(" }");
 
-              writer.println("}");
+            writer.println("}");
          }
 
          if (locationSuffix != null)
@@ -2348,11 +2532,9 @@ public class GlsResource
 
          if (preamble != null)
          {
-            writer.println();
             writer.println(preamble);
+            writer.println();
          }
-
-         writer.println();
 
          Vector<Bib2GlsEntry> secondaryList = null;
 
@@ -2378,6 +2560,14 @@ public class GlsResource
             font = new Font("Serif", 0, 12);
             frc = new FontRenderContext(null, false, false);
          }
+
+         if (supplementalPdfPath != null && supplementalCategory != null)
+         {
+            writer.format(
+              "\\glssetcategoryattribute{%s}{externallocation}{%s}%n%n", 
+              supplementalCategory, supplementalPdfPath);
+         }
+
 
          for (int i = 0, n = entries.size(); i < n; i++)
          {
@@ -2406,6 +2596,14 @@ public class GlsResource
 
             entry.writeBibEntry(writer);
             entry.writeLocList(writer);
+
+            if (supplementalPdfPath != null 
+                && supplementalCategory == null 
+                && entry.supplementalRecordCount() > 0)
+            {
+               writer.format("\\glssetattribute{%s}{externallocation}{%s}%n", 
+                 entry.getId(), supplementalPdfPath);
+            }
 
             writer.println();
 
@@ -2768,13 +2966,18 @@ public class GlsResource
 
    private void setCategory(Bib2GlsEntry entry)
    {
-      if (category != null)
+      setCategory(entry, category);
+   }
+
+   private void setCategory(Bib2GlsEntry entry, String catLabel)
+   {
+      if (catLabel != null)
       {
-         if (category.equals("same as entry"))
+         if (catLabel.equals("same as entry"))
          {
             entry.putField("category", entry.getEntryType());
          }
-         else if (category.equals("same as type"))
+         else if (catLabel.equals("same as type"))
          {
             String val = entry.getFieldValue("type");
 
@@ -2785,7 +2988,7 @@ public class GlsResource
          }
          else
          {
-            entry.putField("category", category);
+            entry.putField("category", catLabel);
          }
       }
    }
@@ -3230,6 +3433,11 @@ public class GlsResource
 
    private String[] counters=null;
 
+   private Vector<GlsRecord> supplementalRecords=null;
+   private TeXPath supplementalPdfPath=null;
+   private String[] supplementalSelection=null;
+   private String supplementalCategory=null;
+
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;
    public static final int SELECTION_RECORDED_AND_PARENTS=2;
@@ -3239,5 +3447,6 @@ public class GlsResource
 
    private static final String[] SELECTION_OPTIONS = new String[]
     {"recorded and deps", "recorded no deps", "recorded and ancestors", "all"};
+
 }
 

@@ -1,0 +1,25 @@
+% arara: pdflatex
+% arara: makeglossaries
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,counter=section]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-entries}]
+
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\theHsection}{\thepart.\thesection}
+
+\begin{document}
+\part{Sample Part}
+\section{Sample Section}
+\gls{goose}. \gls{sample}.
+
+\part{Another Part}
+\section{Another Section}
+\gls{html}.
+\gls{ssi}.
+
+\printunsrtglossaries
+\end{document}

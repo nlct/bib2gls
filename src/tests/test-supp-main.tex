@@ -1,0 +1,38 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\newcommand{\bibglssupplementalsep}{; }
+
+\GlsXtrLoadResources[
+ src=test-entries,% data in test-entries.bib
+% Requires glossaries-extra.sty v1.14:
+% Entries used in this document that have locations recorded
+% in 'test-supp.tex' can have the 'test-supp' locations
+% appended to their location lists:
+ supplemental-locations=test-supp,
+% set the category label for entries that have supplemental
+% locations:
+ supplemental-category={supplemental},
+% In addition to the entries referenced in this document,
+% also add these listed entries (that were recorded in 'test-supp'
+% and are defined in the same test-entries.bib file)
+ supplemental-selection={html,ssi},
+% Add all entries in the supplemental file that have been
+% defined in test-entries.bib:
+ %supplemental-selection={all}
+]
+
+\begin{document}
+% 'sample' is also referenced in the supplemental document
+\Gls{sample} document.
+% 'duck' isn't referenced in the supplemental document
+\gls{duck}.
+
+\printunsrtglossaries
+
+\end{document}

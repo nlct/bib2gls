@@ -1010,6 +1010,22 @@ public class Bib2GlsEntry extends BibEntry
 
    public int recordCount()
    {
+      int n = 0;
+
+      if (supplementalRecords != null) n = supplementalRecords.size();
+
+      if (records != null) return n + records.size();
+
+      for (String counter : resource.getLocationCounters())
+      {
+         n += recordMap.get(counter).size();
+      }
+
+      return n;
+   }
+
+   public int mainRecordCount()
+   {
       if (records != null) return records.size();
 
       int n = 0;
@@ -1020,6 +1036,11 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       return n;
+   }
+
+   public int supplementalRecordCount()
+   {
+      return supplementalRecords == null ? 0 : supplementalRecords.size();
    }
 
    public boolean hasRecords()
@@ -1044,6 +1065,37 @@ public class Bib2GlsEntry extends BibEntry
          {
             list.add(record);
          }
+      }
+   }
+
+   public void addSupplementalRecord(GlsRecord record)
+   {
+      if (supplementalRecords == null)
+      {
+         supplementalRecords = new Vector<GlsRecord>();
+      }
+
+      record.setLabel(getId());
+      String fmt = record.getFormat();
+
+      if (fmt.startsWith("("))
+      {
+         fmt = "(glsxtrsupphypernumber";
+      }
+      else if (fmt.startsWith(")"))
+      {
+         fmt = ")glsxtrsupphypernumber";
+      }
+      else
+      {
+         fmt = "glsxtrsupphypernumber";
+      }
+
+      record.setFormat(fmt);
+
+      if (!supplementalRecords.contains(record))
+      {
+         supplementalRecords.add(record);
       }
    }
 
@@ -1307,6 +1359,8 @@ public class Bib2GlsEntry extends BibEntry
               numRecords));
          }
 
+         String supplSep = "";
+
          if (records == null)
          {
             String sep = "";
@@ -1332,13 +1386,31 @@ public class Bib2GlsEntry extends BibEntry
                   builder.append("}");
 
                   sep = "\\bibglslocationgroupsep ";
+                  supplSep = "\\bibglssupplementalsep ";
                }
             }
          }
-         else
+         else if (records.size() > 0)
          {
             builder = updateLocationList(minRange, suffixF, suffixFF, gap,
               records, builder);
+            supplSep = "\\bibglssupplementalsep ";
+         }
+
+         if (supplementalRecords != null && supplementalRecords.size() > 0)
+         {
+            if (builder == null)
+            {
+               builder = new StringBuilder();
+            }
+
+            builder.append(String.format("%s\\bibglssupplemental{%d}{", 
+              supplSep, supplementalRecords.size()));
+
+            builder = updateLocationList(minRange, suffixF, suffixFF, gap,
+              supplementalRecords, builder);
+
+            builder.append("}");
          }
       }
 
@@ -1550,6 +1622,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
+   private Vector<GlsRecord> supplementalRecords;
 
    private HashMap<String,String> fieldValues;
 

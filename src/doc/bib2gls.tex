@@ -114,6 +114,7 @@ actual '='
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\counterfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\idprefixfmt}[1]{%
  \texorpdfstring{\texttt{#1\spacefactor999 .}}{#1.}}
 
@@ -177,6 +178,12 @@ actual '='
   {#1}%
 }
 
+\newcommand*{\counter}[1]{%
+  \texorpdfstring
+  {\counterfmt{#1}\index{#1 counter\actual\counterfmt{#1} counter}}%
+  {#1}%
+}
+
 \newcommand*{\idprefix}[1]{%
  \texorpdfstring
  {\idprefixfmt{#1}\index{label prefixes!#1\actual\protect\idprefixfmt{#1}}}%
@@ -201,6 +208,7 @@ actual '='
 
 \newcommand*{\csopt}[2][]{\gencsopt[#1]{glsxtrresourcefile}{#2}}%
 \newcommand*{\glsopt}[2][]{\gencsopt[#1]{gls}{#2}}%
+\newcommand*{\glsaddopt}[2][]{\gencsopt[#1]{glsadd}{#2}}%
 
 \newcommand*{\csoptnv}[1]{%
  \texorpdfstring
@@ -3364,7 +3372,7 @@ information provided in the \ext{aux} file, the presence of the
 chapter. When you display the glossary using \cs{printunsrtglossary},
 if the \field{location} field is present it will be displayed
 according to the glossary style (and other factors, such as whether the
-\optfmt{nonumberlist} option has been used, either as a package
+\styopt{nonumberlist} option has been used, either as a package
 option or supplied in the optional argument of \cs{printunsrtglossary}).
 For more information on adjusting the formatting see the
 \sty{glossaries} and \sty{glossaries-extra} manual.
@@ -3812,17 +3820,212 @@ For example:
   src={entries}% data in entries.bib
 ]
 \end{verbatim}
-This will first list the locations for the \optfmt{equation}
-counter and then the locations for the \optfmt{page} counter.
+This will first list the locations for the \counter{equation}
+counter and then the locations for the \counter{page} counter.
 Each group of locations is encapsulated within the command
 \csref{bibglslocationgroup}\margm{n}\margm{counter}\margm{locations}.
 The groups are separated by \csref{bibglslocationgroupsep}
 (which defaults to \cs{delimN}).
 
-The \meta{list} value must be non-empty.
-Use \csopt[as-use]{loc-counters} to restore the default behaviour,
-where the locations are listed in the document order of use,
-or \csopt[false]{save-locations} to omit the location lists.
+The \meta{list} value must be non-empty.  Use
+\csopt[as-use]{loc-counters} to restore the default behaviour, where
+the locations are listed in the document order of use, or
+\csopt[false]{save-locations} to omit the location lists.  Note that
+you can't form counter groups from
+\hyperref[sec:supplementalopts]{supplemental location lists}.
+
+\section{Supplemental Locations}
+\label{sec:supplementalopts}
+
+\emph{These options require at least version 1.14 of \sty{glossaries-extra}.}
+
+\subsection{\csoptnv{supplemental-locations}=\margm{basename}}
+\labelopt{supplemental-locations}
+
+The \sty{glossaries-extra} package (from v1.14) provides a way of
+manually adding locations in supplemental documents through the use
+of the \glsaddopt{thevalue} option in the optional argument of
+\cs{glsadd}.  Setting values manually is inconvenient and can result
+in errors, so \bibgls\ provides a way of doing this automatically.
+Both the main document and the supplementary document need to use
+the \styopt{record} option. The entries provided in the \csopt{src}
+set must have the same labels as those used in the supplementary
+document. (The simplest way to achieve this is to ensure that both
+documents use the same \ext{bib} files and the same prefixes.)
+
+For example, suppose the file \filefmt{entries.bib} contains:
+\begin{verbatim}
+@entry{sample,
+  name={sample},
+  description="an example entry"
+}
+
+@abbreviation{html,
+  short="html",
+  long={hypertext markup language}
+}
+@abbreviation{ssi,
+  short="ssi",
+  long="server-side includes"
+}
+
+@index{goose,plural="geese"}
+\end{verbatim}
+Now suppose the supplementary document is contained in the file
+\filefmt{suppl.tex}:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,counter=section]{glossaries-extra}
+
+\GlsXtrLoadResources[src=entries]
+
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\theHsection}{\thepart.\thesection}
+
+\begin{document}
+\part{Sample Part}
+\section{Sample Section}
+\gls{goose}. \gls{sample}.
+
+\part{Another Part}
+\section{Another Section}
+\gls{html}.
+\gls{ssi}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+This uses the \counter{section} counter for the locations and has a
+prefix (\verb|\thepart.|) for the section hyperlinks.
+
+Now let's suppose I have another document called \filefmt{main.tex}
+that uses the \texttt{sample} entry, but also needs to include the
+location (S1) from the supplementary document. The manual approached
+offered by \sty{glossaries-extra} is quite cumbersome and requires
+setting the \catattr{externallocation} attribute and using
+\cs{glsadd} with \glsaddopt[S1]{thevalue}, \glsaddopt[I.S1]{theHvalue}
+and \glsaddopt[glsxtrsupphypernumber]{format}.
+
+This can be simplified with \bibgls\ by using the
+\optfmt{supplemental-locations} option. The value should be the base
+name (without the extension) of the supplementary document
+(\optfmt{suppl} in the above example). For example:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ supplemental-locations=suppl,% fetch records from suppl.aux
+ src=entries]
+
+\begin{document}
+\Gls{sample} document.
+
+\printunsrtglossaries
+
+\end{document}
+\end{verbatim}
+The location list for \texttt{sample} will now be \qt{1, S1} (page~1
+from the main document and S1 from the supplementary document). Note
+that the original location format from the supplementary document
+will be replaced by \optfmt{glsxtrsupphypernumber}, which will
+produce an external hyperlink if the main document loads the
+\sty{hyperref} package. (Note that not all PDF viewers can handle
+external hyperlinks, and some that can open the external PDF file may not 
+recognise the destination within that file.)
+
+The supplementary locations lists are encapsulated within
+\cs{bibglssupplemental}.
+
+\subsection{\csoptnv{supplemental-selection}=\margm{value}}
+\labelopt{supplemental-selection}
+
+In the above example, only the \texttt{sample} entry is listed in
+the main document, even though the supplementary document also
+references the \texttt{goose}, \texttt{html} and \texttt{ssi}
+entries. By default, only those entries that are referenced in the
+main document will have supplementary locations added (if found in
+the supplementary document's \ext{aux} file). You can additionally
+include other entries that are referenced in the supplementary
+document but not in the main document using
+\optfmt{supplemental-selection}. The \meta{value} may be one of the
+following:
+\begin{itemize}
+\item \optfmt{all}: add all the entries in the supplementary
+document that have been defined in the \ext{bib} files listed in
+\optref{src} for this resource set in the main document.
+\item \optfmt{selected}: only add supplemental locations for entries
+that have already been selected by this resource set.
+\item \meta{label-1},\ldots,\meta{label-2}: in addition to all those
+entries that have already been selected by this resource set, also
+add the entries identified in the comma-separated list. If a label
+in this list doesn't have a record in the supplementary document's
+\ext{aux} file, it will be ignored.
+\end{itemize}
+Any records in the supplementary \ext{aux} file that aren't defined
+by the current resource set (through the \ext{bib} files listed in
+\optref{src}) will be ignored. Entry aliases aren't taken into
+account when including supplementary locations.
+
+For example:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ supplemental-locations=suppl,
+ supplemental-selection={html,ssi},
+ src=entries]
+
+\begin{document}
+\Gls{sample} document.
+
+\printunsrtglossaries
+
+\end{document}
+\end{verbatim}
+This will additionally add the \texttt{html} and \texttt{ssi} entries
+even though they haven't been used in this document. The
+\texttt{goose} entry used in the supplementary document won't be
+included.
+
+If an entry has both a main location list and a supplementary
+location list (such as the \texttt{sample} entry above), the lists
+will be separated by \csref{bibglssupplementalsep}.
+
+\subsection{\csoptnv{supplemental-category}=\margm{value}}
+\labelopt{supplemental-category}
+
+The \optfmt{category} for entries containing supplemental location
+lists may be set using \optfmt{supplemental\dhyphen category}. If unset,
+\meta{value} defaults to the same as that given by the
+\optref{category} option. The \meta{value} may either be a known
+identifier (as per \optref{category}) or the category label. For example:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ supplemental-locations=suppl,
+ supplemental-selection={html,ssi},
+ supplemental-category={supplemental},
+ src=entries]
+
+\begin{document}
+\Gls{sample} document.
+
+\printunsrtglossaries
+
+\end{document}
+\end{verbatim}
 
 \section{Sorting}
 \label{sec:sortingopts}
@@ -3833,6 +4036,9 @@ or \csopt[false]{save-locations} to omit the location lists.
 The \csopt{sort} key indicates how entries should be sorted. The
 \meta{value} may be one of:
 \begin{itemize}
+\item \texttt{none} (or \texttt{unsrt}): don't sort the entries.
+(The entries will be in the order they were processed when parsing
+the data.)
 \item \texttt{locale}: sort the entries according to the operating
 system's locale.
 \item \texttt{doc}: sort the entries according to the document
@@ -3842,7 +4048,6 @@ the last language resource file to be loaded through
 option is equivalent to \csopt[locale]{sort}.
 \item \meta{lang tag}: sort according to the rules of the locale
 given by the IETF language tag \meta{lang tag}.
-\item \texttt{none} (or \texttt{unsrt}): don't sort the entries.
 \item \texttt{use}: sort in order of use. (This order is determined
 by the records written to the \ext{aux} file by the \styopt{record}
 package option.)
@@ -4847,6 +5052,44 @@ actual number given by the sort value.
 The default definition of this command is:
 \begin{verbatim}
 \providecommand{\bibglsnumbergroup}[1]{\glsnumbersgroupname}
+\end{verbatim}
+
+\section{\cs{bibglssupplemental}}
+\labelcs{bibglssupplemental}
+
+\begin{definition}
+\cs{bibglssupplemental}\margm{n}\margm{list}
+\end{definition}
+
+When the \optref{supplemental-locations} option is used, the locations
+from a supplementary document are encapsulated within the \meta{list}
+part of \cs{bibglssupplemental}. The first argument \meta{n}
+(ignored by default) is the number of supplementary locations.
+
+\section{\cs{bibglssupplementalsep}}
+\labelcs{bibglssupplementalsep}
+
+\begin{definition}
+\cs{bibglssupplementalsep}
+\end{definition}
+
+The separator between the main location list and the supplementary
+location list. By default this is just \cs{delimN}. This may be
+defined before the resources are loaded:
+\begin{verbatim}
+\newcommand{\bibglssupplementalsep}{; }
+
+\GlsXtrLoadResources[
+ supplemental-locations=supplDoc,
+ src={entries}]
+\end{verbatim}
+or redefined after the resources are loaded:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ supplemental-locations=supplDoc,
+ src={entries}]
+
+\renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
 
 \resetsecnumdepth

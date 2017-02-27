@@ -2291,6 +2291,12 @@ public class Bib2Gls implements TeXApp
       return parseArgInt(args, i, argVal, this);
    }
 
+   private int parseArgInt(String[] args, int i, Object[] argVal,
+     int defVal)
+   {
+      return parseArgInt(args, i, argVal, defVal, this);
+   }
+
    private static int parseArgInt(String[] args, int i, Object[] argVal,
      Bib2Gls bib2gls)
    {
@@ -2314,6 +2320,31 @@ public class Bib2Gls implements TeXApp
                throw new IllegalArgumentException(bib2gls.getMessage(
                  "error.invalid.opt.int.value", argVal[0], argVal[1]), e);
             }
+         }
+      }
+
+      return i;
+   }
+
+   private static int parseArgInt(String[] args, int i, Object[] argVal,
+     int defVal, Bib2Gls bib2gls)
+   {
+      i = parseArgVal(args, i, argVal);
+
+      if (argVal[1] == null)
+      {
+         argVal[1] = new Integer(defVal);
+      }
+      else
+      {
+         try
+         {
+            argVal[1] = new Integer((String)argVal[1]);
+         }
+         catch (NumberFormatException e)
+         {
+            argVal[1] = new Integer(defVal);
+            return i-1;
          }
       }
 
@@ -2344,14 +2375,7 @@ public class Bib2Gls implements TeXApp
       {
          if (isArg(args[i], "debug"))
          {
-            i = parseArgInt(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               debugLevel = 1;
-               verboseLevel = 1;
-               continue;
-            }
+            i = parseArgInt(args, i, argVal, 1);
 
             int level = ((Integer)argVal[1]).intValue();
 
@@ -2701,16 +2725,9 @@ public class Bib2Gls implements TeXApp
          {
             try
             {
-               i = parseArgInt(args, i, argVal, null);
+               i = parseArgInt(args, i, argVal, 1, null);
 
-               if (argVal[1] == null)
-               {
-                  debug = 1;
-               } 
-               else
-               {
-                  debug = ((Integer)argVal[1]).intValue();
-               }
+               debug = ((Integer)argVal[1]).intValue();
             }
             catch (Exception e)
             {
@@ -2781,7 +2798,7 @@ public class Bib2Gls implements TeXApp
    public static final String NAME = "bib2gls";
    public static final String VERSION = "0.7a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-02-26";
+   //public static final String DATE = "2017-02-27";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
