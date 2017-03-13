@@ -1260,7 +1260,9 @@ options ignore this setting.) This value will be picked up by
 example with the \abbrstyle{indexgroup} style). If you're not using
 a glossary style that displays the group headings, there's no need
 to use this switch. Note that this switch doesn't automatically
-select an appropriate glossary style.
+select an appropriate glossary style. If this switch is set, 
+you can explicitly set the group field value for all entries using
+the \optref{group} option.
 
 The default is \argref{no-group}.
 
@@ -3163,6 +3165,28 @@ then \csopt[uc]{short-case-change} would convert the value of the
 \end{verbatim}
 See \optref{dual-short-case-change} to adjust the \field{dualplural}
 field.
+
+\subsection{\csoptnv{group}=\margm{value}}
+\labelopt{group}
+
+This option may only be used with the \argref{group} switch.
+This will set the \field{group} field to \meta{value} unless
+\meta{value} is \optfmt{auto}, in which case the value is
+set automatically during the sorting. 
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[sort=integer,group={Constants},
+ src={entries-constants}% data in entries-constants.bib
+]
+\GlsXtrLoadResources[sort=letter-case,group={Variables},
+ src={entries-variables}% data in entries-variables.bib
+]
+\end{verbatim}
+If the \field{type} field hasn't been set in the \ext{bib} files,
+these entries will be added to the same glossary, but will
+be grouped according to each instance of \cs{GlsXtrLoadResources},
+with the provided group label.
+The default behaviour is \csopt[auto]{group}.
 
 \section{Plurals}
 \label{sec:plurals}
