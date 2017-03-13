@@ -146,6 +146,9 @@ Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
 <entry key="message.adding.target.record">Adding record {0} from aliased entry {1}.</entry>
+<entry key="message.normalizing">Normalising {0} to {1}.</entry>
+<entry key="message.norm.distinct">Normalized {0} distinct from {1}.</entry>
+<entry key="message.no.norm">Can''t normalize {0}.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -164,6 +167,8 @@ Defaulting to: {0}.
 Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry>
 <entry key="warning.dir.no.write">Directory not writable: {0}
 Using TEXMFOUTPUT instead: {1}</entry>
+<entry key="warning.conflicting.range.format">Entry location conflict for formats: {0} and {1}
+Replacing {1} with {2}</entry>
 <entry key="warning.discarding.conflicting.record">Entry location conflict for formats: {0} and {1}
 Discarding: {2}
 Conflicts with: {3}</entry>
@@ -179,6 +184,7 @@ Replacement: {6}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
 <entry key="warning.option.clash">Option clash: {0} and {1}
 Ignoring {1}</entry>
+<entry key="warning.group.option.required">Resource option {0} requires application switch {1}</entry>
 <entry key="warning.parent.missing">Parent {0} does not occur before entry {1} so removing relationship.</entry>
 <entry key="warning.unknown.field.pattern">Ignoring pattern for unknown field: {0}</entry>
 <entry key="warning.notbasiclatin.id">Problematic entry label: {0}

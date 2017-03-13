@@ -112,9 +112,62 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             str = String.format("%c", codePoint);
          }
 
-         if (Character.isAlphabetic(codePoint))
+         if (entry.getFieldValue("group") != null)
+         {
+            // don't overwrite
+         }
+         else if (Character.isAlphabetic(codePoint))
          {
             grp = str.toUpperCase();
+
+            // Compare first letter with normalised version
+
+            String norm = Normalizer.normalize(grp, Normalizer.Form.NFC);
+            norm = norm.replaceAll("[^\\p{ASCII}]", "");
+            norm = norm.replaceAll("\\p{M}", "");
+
+            if (norm.isEmpty())
+            {
+               norm = Normalizer.normalize(grp, Normalizer.Form.NFD);
+               norm = norm.replaceAll("[^\\p{ASCII}]", "");
+               norm = norm.replaceAll("\\p{M}", "");
+            }
+
+            if (norm.isEmpty())
+            {
+               if (collator.compare(grp, "AE") == 0
+                 || collator.compare(grp, "A") == 0)
+               {
+                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
+                    grp, "A"));
+                  grp = "A";
+               }
+               else if (collator.compare(grp, "TH") == 0
+                     || collator.compare(grp, "T") == 0)
+               {
+                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
+                    grp, "T"));
+                  grp = "T";
+               }
+               else
+               {
+                  bib2gls.debug(bib2gls.getMessage("message.no.norm", grp));
+               }
+            }
+            else if (collator.compare(grp, norm) == 0)
+            {
+               if (!grp.equals(norm))
+               {
+                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
+                    grp, norm));
+                  grp = norm;
+               }
+            }
+            else
+            {
+               bib2gls.debug(bib2gls.getMessage("message.norm.distinct",
+                 norm, grp));
+            }
 
             entry.putField("group", 
                String.format("\\bibglslettergroup{%s}{%s}{%d}", 

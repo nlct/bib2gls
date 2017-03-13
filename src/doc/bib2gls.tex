@@ -1170,6 +1170,9 @@ This essentially means that if there's a record conflict
 involving \texttt{emph}, try replacing \texttt{emph} with
 \texttt{hyperbf} and see if that resolves the conflict.
 
+Note that if the conflict includes a range formation, the
+range takes precedence.
+
 If you have multiple mappings, you can either use a single
 \longarg{map-format} with a comma separated list of
 \meta{format1}\dcolon\meta{format2} or you can have multiple instances of 
@@ -3350,6 +3353,9 @@ then the \ext{aux} file will contain:
 This is a partial record match. In this case, \bibgls\ 
 makes the following tests:
 \begin{itemize}
+\item if one of the formats includes a range formation, the
+range takes precedence.
+
 \item If one of the formats is \texttt{glsnumberformat} (as in the
 above example), that format will be skipped. So in the above
 example, the second record will be added to the location list, but

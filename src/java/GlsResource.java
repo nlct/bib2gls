@@ -379,6 +379,24 @@ public class GlsResource
                sort = null;
             }
          }
+         else if (opt.equals("group"))
+         {
+            if (bib2gls.useGroupField())
+            {
+               groupField = getOptional(parser, "auto", list, opt);
+
+               if (groupField.equals("auto"))
+               {
+                  groupField = null;
+               }
+            }
+            else
+            {
+               bib2gls.warning(bib2gls.getMessage(
+                 "warning.group.option.required", opt, "--group"));
+               groupField = null;
+            }
+         }
          else if (opt.equals("shuffle"))
          {
             long seed = getOptionalLong(parser, 0L, list, opt);
@@ -3403,6 +3421,11 @@ public class GlsResource
       return counters;
    }
 
+   public String getGroupField()
+   {
+      return groupField;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -3502,6 +3525,8 @@ public class GlsResource
    private TeXPath supplementalPdfPath=null;
    private String[] supplementalSelection=null;
    private String supplementalCategory=null;
+
+   private String groupField = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_NO_DEPS=1;

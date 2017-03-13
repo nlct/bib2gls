@@ -104,7 +104,11 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             str = String.format("%c", codePoint);
          }
 
-         if (Character.isAlphabetic(codePoint))
+         if (entry.getFieldValue("group") != null)
+         {
+            // don't overwrite
+         }
+         else if (Character.isAlphabetic(codePoint))
          {
             grp = (ignoreCase ? str.toUpperCase() : str);
 

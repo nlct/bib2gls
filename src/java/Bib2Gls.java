@@ -922,8 +922,20 @@ public class Bib2Gls implements TeXApp
          {
              try
              {
-                texCharset = Charset.forName(
-                   texToJavaCharset(data.getArg(0).toString(parser)));
+                String val = data.getArg(0).toString(parser).trim();
+
+                if (val.equals("\\inputencodingname"))
+                {
+                   // If the encoding was written as \inputencodingname
+                   // then that command was most probably set to \relax
+                   // for some reason. In which case ignore it.
+
+                   texCharset = Charset.defaultCharset();
+                }
+                else
+                {
+                   texCharset = Charset.forName(texToJavaCharset(val));
+                }
              }
              catch (Bib2GlsException e)
              {
@@ -983,14 +995,99 @@ public class Bib2Gls implements TeXApp
                   String newFmt = newRecord.getFormat();
                   String existingFmt = existingRecord.getFormat();
 
-                  // Any format overrides the default "glsnumberformat"
+                  // Ranges override individual locations
 
-                  if (newFmt.equals("glsnumberformat"))
+                  String newPrefix = "";
+
+                  if (newFmt.startsWith("(") || newFmt.startsWith(")"))
+                  {
+                     newPrefix = newFmt.substring(0, 1);
+
+                     if (newFmt.length() == 1)
+                     {
+                        newFmt = "glsnumberformat";
+                     }
+                     else
+                     {
+                        newFmt = newFmt.substring(1);
+                     }
+                  }
+
+                  String existingPrefix = "";
+
+                  if (existingFmt.startsWith("(") || existingFmt.startsWith(")"))
+                  {
+                     existingPrefix = existingFmt.substring(0, 1);
+
+                     if (existingFmt.length() == 1)
+                     {
+                        existingFmt = "glsnumberformat";
+                     }
+                     else
+                     {
+                        existingFmt = existingFmt.substring(1);
+                     }
+                  }
+
+                  // Any format overrides the default "glsnumberformat"
+                  // unless there's a range formation.
+
+                  if (existingPrefix.equals(")") && newPrefix.equals("("))
+                  {// One range is finishing and a new range is starting
+                   // at the same location.
+
+                     records.add(newRecord);
+                  }
+                  else if (existingPrefix.equals("(") && newPrefix.equals(")"))
+                  {// Start and end of the range occur at the same location.
+                   // A bit weird, but allow it if the format is the
+                   // same.
+
+                     if (existingFmt.equals(newFmt))
+                     {
+                        records.add(newRecord);
+                     }
+                     else
+                     {
+                        // Format isn't the same. Replace the closing
+                        // format with the same as the opening format.
+
+                        warning(getMessage("warning.conflicting.range.format",
+                          existingPrefix+existingFmt, newPrefix+newFmt, 
+                          newPrefix+existingFmt));
+
+                        newRecord.setFormat(newPrefix+existingFmt);
+                        records.add(newRecord);
+                     }
+                  }
+                  else if (newPrefix.isEmpty() && !existingPrefix.isEmpty())
+                  {// discard new record
+                   // (keep the record with the range formation)
+                     debug();
+                     debug(getMessage("warning.discarding.conflicting.record",
+                       newFmt, existingPrefix+existingFmt,
+                       newRecord, existingRecord));
+                     debug();
+                  }
+                  else if (!newPrefix.isEmpty() && existingPrefix.isEmpty())
+                  {// discard existing record
+                   // (keep the record with the range formation)
+
+                     debug();
+                     debug(getMessage("warning.discarding.conflicting.record",
+                       newPrefix+newFmt, existingPrefix+existingFmt,
+                       existingRecord, newRecord));
+                     debug();
+
+                     existingRecord.setFormat(newPrefix+newFmt);
+                  }
+                  else if (newFmt.equals("glsnumberformat"))
                   {// discard the new record
 
                      debug();
                      debug(getMessage("warning.discarding.conflicting.record",
-                       newFmt, existingFmt, newRecord, existingRecord));
+                       newPrefix+newFmt, existingPrefix+existingFmt,
+                       newRecord, existingRecord));
                      debug();
                   }
                   else if (existingFmt.equals("glsnumberformat"))
@@ -998,10 +1095,11 @@ public class Bib2Gls implements TeXApp
 
                      debug();
                      debug(getMessage("warning.discarding.conflicting.record",
-                       newFmt, existingFmt, existingRecord, newRecord));
+                       newPrefix+newFmt, existingPrefix+existingFmt,
+                       existingRecord, newRecord));
                      debug();
 
-                     existingRecord.setFormat(newFmt);
+                     existingRecord.setFormat(newPrefix+newFmt);
                   } 
                   else
                   {
@@ -1017,7 +1115,8 @@ public class Bib2Gls implements TeXApp
                            debug();
                            debug(getMessage(
                              "warning.discarding.conflicting.record.using.map",
-                             newFmt, newMap, newRecord, existingRecord));
+                             newPrefix+newFmt, newPrefix+newMap, 
+                             newRecord, existingRecord));
                            debug();
                         }
                      }
@@ -1030,12 +1129,13 @@ public class Bib2Gls implements TeXApp
                            debug();
                            debug(getMessage(
                              "warning.discarding.conflicting.record.using.map",
-                             existingFmt, existingMap, 
+                             existingFmt, 
+                             existingMap, 
                              existingRecord, newRecord));
                            debug();
                         }
 
-                        existingRecord.setFormat(newFmt);
+                        existingRecord.setFormat(newPrefix+newFmt);
                      }
                      else if (existingMap != null && newMap != null
                               && existingMap.equals(newMap))
@@ -1059,7 +1159,7 @@ public class Bib2Gls implements TeXApp
                            debug();
                         }
 
-                        existingRecord.setFormat(newMap);
+                        existingRecord.setFormat(newPrefix+newMap);
                      }
                      else
                      {
@@ -1068,7 +1168,9 @@ public class Bib2Gls implements TeXApp
                         warning();
                         warning(
                           getMessage("warning.discarding.conflicting.record",
-                          newFmt, existingFmt, newRecord, existingRecord));
+                          newPrefix+newFmt, 
+                          existingPrefix+existingFmt,
+                          newRecord, existingRecord));
                         warning();
                      }
                   }
@@ -2796,9 +2898,9 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "0.7a";
+   public static final String VERSION = "0.8a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-02-27";
+   //public static final String DATE = "2017-03-13";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
