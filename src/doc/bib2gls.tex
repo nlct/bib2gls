@@ -1394,6 +1394,12 @@ by using commands like \cs{gls} or \cs{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
 rebuild the document to ensure the location lists are correct.
+If an entry has the \field{see} field set, any instance of
+\cs{glssee} in the document for that entry will be ignored,
+otherwise the reference from \cs{glssee} will be transferred to the
+\field{see} field (provided you have at least v1.14 of
+\sty{glossaries-extra}). In general, it's best just to use the \field{see}
+field and not use \cs{glssee}.
 
 \section{\atentry{string}}
 \labelatentry{string}
@@ -2518,6 +2524,8 @@ following values are allowed:
 \begin{itemize}
 \item \optfmt{recorded and deps}: add all recorded entries and
 their dependencies (default).
+\item \optfmt{recorded and deps and see}: as above but will also
+add unrecorded entries whose \field{see} field refers to a recorded entry.
 \item \optfmt{recorded no deps}: add all recorded entries but not
 their dependencies. The dependencies include those referenced in the
 \field{see} field, \field{parent} entries and those found referenced
@@ -2533,6 +2541,44 @@ supplied in the \csopt{src} option.
 \end{itemize}
 The \meta{value} must be supplied.
 
+For example, suppose the file \filefmt{entries.bib} contains:
+\begin{verbatim}
+@index{run}
+
+@index{sprint,see={run}}
+
+@index{dash,see={sprint}}
+\end{verbatim}
+If the document only references the \qt{run} entry (for example,
+using \verb|\gls{run}|) then:
+\begin{itemize}
+\item If \csopt[recorded and deps]{selection}, only the \qt{run}
+entry is selected. The \qt{run} entry has a record, so it's
+selected, but it has no dependencies. Neither \qt{sprint} nor 
+\qt{dash} have records, so they're not selected.
+\item If \csopt[recorded and deps and see]{selection}, the \qt{run}
+and \qt{sprint} entries are selected, but not the \qt{dash} entry.
+The \qt{run} entry is selected because it has a record. The
+\qt{sprint} entry doesn't have a record but its \field{see} field
+includes \qt{run}, which does have a record, so \qt{sprint} is also
+selected. The \qt{dash} entry doesn't have a record. Its
+\field{see} field references \qt{sprint}. Although \qt{sprint} has
+been selected, it doesn't have any records, so \qt{dash} isn't
+selected.
+\end{itemize}
+The above is just an example. The circuitous redirection of
+\qt{dash} to \qt{sprint} to \qt{run} is unhelpful to the reader and
+is best avoided. A better method would be:
+\begin{verbatim}
+@index{run}
+
+@index{sprint,see={run}}
+
+@index{dash,see={run}}
+\end{verbatim}
+The \csopt[recorded and deps and see]{selection} in this case will
+select all three entries, and the document won't send the reader on a
+long-winded detour.
 \subsection{\csoptnv{match}=\margm{key-val list}}
 \labelopt{match}
 
@@ -5030,11 +5076,12 @@ or redefined after the resources are loaded:
 \renewcommand*{\bibglslocationgroupsep}{; }
 \end{verbatim}
 
-\section{\cs{bibglslettergroup}}
-\labelcs{bibglslettergroup}
+\section{\cs{bibglsunicodegroup}}
+\labelcs{bibglsunicodegroup}
 
 \begin{definition}
-\cs{bibglslettergroup}\margm{group}\margm{character}\margm{codepoint}
+\cs{bibglsunicodegroup}\margm{group}\margm{character}\margm{group
+codepoint}\marg{character codepoint}
 \end{definition}
 This command is provided if the \argref{group} switch is used. Any
 entries whose sort value indicates that they are in a letter group
@@ -5042,7 +5089,8 @@ entries whose sort value indicates that they are in a letter group
 field to contain this command. The \meta{group} argument indicates
 the letter group and the \meta{character} argument indicates the actual
 initial character of the sort value, which may not be the same as
-\meta{group}. The \meta{codepoint} is the decimal code for
+\meta{group}. The \meta{group codepoint} is the decimal code for
+\meta{group}. The \meta{character codepoint} is the decimal code for
 \meta{character}.
 For example:
 \begin{verbatim}
@@ -5060,7 +5108,7 @@ argument will be 197 (the decimal Unicode value of the letter \AA).
 
 The default definition of this command is:
 \begin{verbatim}
-\providecommand{\bibglslettergroup}[3]{#1}
+\providecommand{\bibglsunicodegroup}[4]{#1}
 \end{verbatim}
 
 \section{\cs{bibglsothergroup}}

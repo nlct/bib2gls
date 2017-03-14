@@ -993,6 +993,35 @@ public class Bib2GlsEntry extends BibEntry
       return fieldValues.get("parent");
    }
 
+   public String[] getCrossRefs()
+   {
+      return crossRefs;
+   }
+
+   public void addCrossRefdBy(Bib2GlsEntry entry)
+   {
+      if (crossRefdBy == null)
+      {
+         crossRefdBy = new Vector<Bib2GlsEntry>();
+      }
+
+      if (!crossRefdBy.contains(entry))
+      {
+         crossRefdBy.add(entry);
+      }
+   }
+
+   public Iterator<Bib2GlsEntry> getCrossRefdByIterator()
+   {
+      return crossRefdBy.iterator();
+   }
+
+
+   public boolean hasDependent(String label)
+   {
+      return deps.contains(label);
+   }
+
    public void addDependency(String label)
    {
       if (!deps.contains(label) && !label.equals(getId()))
@@ -1505,13 +1534,36 @@ public class Bib2GlsEntry extends BibEntry
    {
       // Is there a 'see' field?
       BibValueList value = getField("see");
+      TeXObjectList valList = null;
 
       if (value == null)
-      {
-         return;
+      {// no 'see' field, check for \glssee records
+       // (see field overrides any instances of \glssee)
+
+         GlsSeeRecord record = bib2gls.getSeeRecord(getId());
+
+         if (record == null)
+         {
+            return;
+         }
+
+         TeXObject valObj = record.getValue();
+
+         if (valObj instanceof TeXObjectList)
+         {
+            valList = (TeXObjectList)valObj;
+         }
+         else
+         {
+            valList = new TeXObjectList();
+            valList.add(valObj);
+         }
       }
 
-      TeXObjectList valList = value.expand(parser);
+      if (valList == null)
+      {
+         valList = value.expand(parser);
+      }
 
       StringBuilder builder = new StringBuilder();
 
@@ -1639,6 +1691,8 @@ public class Bib2GlsEntry extends BibEntry
    private Vector<String> deps;
 
    private Vector<Bib2GlsEntry> hierarchy;
+
+   private Vector<Bib2GlsEntry> crossRefdBy;
 
    private String crossRefTag = null;
    private String[] crossRefs = null;

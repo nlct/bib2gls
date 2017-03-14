@@ -859,6 +859,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@resource", 2);
             addAuxCommand("glsxtr@fields", 1);
             addAuxCommand("glsxtr@record", 5);
+            addAuxCommand("glsxtr@recordsee", 2);
             addAuxCommand("glsxtr@texencoding", 1);
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
@@ -872,6 +873,7 @@ public class Bib2Gls implements TeXApp
       fields = new Vector<String>();
       fieldMap = new HashMap<String,String>();
       records = new Vector<GlsRecord>();
+      seeRecords = new Vector<GlsSeeRecord>();
       dependencies = new Vector<String>();
 
       Vector<AuxData> auxData = auxParser.getAuxData();
@@ -968,6 +970,12 @@ public class Bib2Gls implements TeXApp
 
                debug("Adding field: "+field+" ("+map+")");
             }
+         }
+         else if (name.equals("glsxtr@recordsee"))
+         {
+            seeRecords.add(new GlsSeeRecord(
+              data.getArg(0).toString(parser),
+              data.getArg(1)));
          }
          else if (name.equals("glsxtr@record"))
          {
@@ -1421,6 +1429,19 @@ public class Bib2Gls implements TeXApp
       }
 
       return false;
+   }
+
+   public GlsSeeRecord getSeeRecord(String label)
+   {
+      for (GlsSeeRecord record : seeRecords)
+      {
+         if (record.getLabel().equals(label))
+         {
+            return record;
+         }
+      }
+
+      return null;
    }
 
    public Vector<GlsRecord> getRecords()
@@ -2900,7 +2921,7 @@ public class Bib2Gls implements TeXApp
    public static final String NAME = "bib2gls";
    public static final String VERSION = "0.8a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-03-13";
+   //public static final String DATE = "2017-03-14";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -2922,6 +2943,7 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsResource> glsresources;
    private Vector<String> fields;
    private Vector<GlsRecord> records;
+   private Vector<GlsSeeRecord> seeRecords;
 
    private HashMap<String,String> fieldMap;
    private Vector<String> dependencies;

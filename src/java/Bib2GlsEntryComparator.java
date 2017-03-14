@@ -135,15 +135,19 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
             if (norm.isEmpty())
             {
-               if (collator.compare(grp, "AE") == 0
-                 || collator.compare(grp, "A") == 0)
+               if (collator.compare(grp, "AE") == 0)
                {
                   bib2gls.debug(bib2gls.getMessage("message.normalizing",
                     grp, "A"));
                   grp = "A";
                }
-               else if (collator.compare(grp, "TH") == 0
-                     || collator.compare(grp, "T") == 0)
+               else if (collator.compare(grp, "OE") == 0)
+               {
+                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
+                    grp, "O"));
+                  grp = "O";
+               }
+               else if (collator.compare(grp, "TH") == 0)
                {
                   bib2gls.debug(bib2gls.getMessage("message.normalizing",
                     grp, "T"));
@@ -170,8 +174,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             }
 
             entry.putField("group", 
-               String.format("\\bibglslettergroup{%s}{%s}{%d}", 
-                             grp, str, codePoint));
+               String.format("\\bibglsunicodegroup{%s}{%s}{%d}{%d}", 
+                          grp, str, grp.codePointAt(0), codePoint));
          }
          else
          {

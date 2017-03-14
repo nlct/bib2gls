@@ -1758,6 +1758,13 @@ public class GlsResource
 
       Vector<GlsRecord> records = bib2gls.getRecords();
 
+      Vector<Bib2GlsEntry> seeList = null;
+
+      if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+      {
+         seeList = new Vector<Bib2GlsEntry>();
+      }
+
       for (TeXPath src : sources)
       {
          File bibFile = src.getFile();
@@ -1950,7 +1957,8 @@ public class GlsResource
                   }
                }
 
-               if (selectionMode == SELECTION_RECORDED_AND_DEPS)
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
                {
                   if (hasRecords)
                   {
@@ -1981,6 +1989,53 @@ public class GlsResource
 
                      bib2gls.addDependent(entry.getId());
                   }
+               }
+
+               if (!hasRecords && seeList != null)
+               {
+                  // Does the entry have a cross reference list?
+
+                  entry.initCrossRefs(parser);
+                  String[] xrList = entry.getCrossRefs();
+
+                  if (xrList != null)
+                  {
+                     for (String xr : xrList)
+                     {
+                        Bib2GlsEntry xrEntry = getBib2GlsEntry(xr, list);
+
+                        if (xrEntry != null)
+                        {
+                           xrEntry.addCrossRefdBy(entry);
+
+                           if (!seeList.contains(xrEntry))
+                           {
+                              seeList.add(xrEntry);
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      if (seeList != null)
+      {
+         for (Bib2GlsEntry xrEntry : seeList)
+         {
+            if (xrEntry.hasRecords())
+            {
+               // cross-referenced entry has records, so need to 
+               // add the referring entries if they haven't already
+               // been added.
+
+               for (Iterator<Bib2GlsEntry> it=xrEntry.getCrossRefdByIterator();
+                 it.hasNext(); )
+               {
+                  Bib2GlsEntry entry = it.next();
+
+                  bib2gls.addDependent(entry.getId());
                }
             }
          }
@@ -2274,6 +2329,7 @@ public class GlsResource
             if (entry.hasRecords())
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                {
                   addHierarchy(entry, entries, data);
@@ -2297,6 +2353,7 @@ public class GlsResource
             if (entry != null && !entries.contains(entry))
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                {
                   addHierarchy(entry, entries, data);
@@ -2319,6 +2376,7 @@ public class GlsResource
                   && supplementalSelection[0].equals("all"))
                   {
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                      {
                         addHierarchy(entry, entries, data);
@@ -2333,6 +2391,7 @@ public class GlsResource
                         if (selLabel.equals(label))
                         {
                            if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                             ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                              ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                            {
                               addHierarchy(entry, entries, data);
@@ -2358,7 +2417,8 @@ public class GlsResource
    {
       // add any dependencies
 
-      if (selectionMode == SELECTION_RECORDED_AND_DEPS)
+      if (selectionMode == SELECTION_RECORDED_AND_DEPS
+        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
       {
          Vector<String> dependencies = bib2gls.getDependencies();
 
@@ -2539,7 +2599,7 @@ public class GlsResource
 
          if (bib2gls.useGroupField())
          {
-            writer.println("\\providecommand{\\bibglslettergroup}[3]{#1}");
+            writer.println("\\providecommand{\\bibglsunicodegroup}[4]{#1}");
             writer.println("\\providecommand{\\bibglsothergroup}[2]{\\glssymbolsgroupname}");
             writer.println("\\providecommand{\\bibglsnumbergroup}[1]{\\glsnumbersgroupname}");
             writer.println();
@@ -3529,14 +3589,16 @@ public class GlsResource
    private String groupField = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
-   public static final int SELECTION_RECORDED_NO_DEPS=1;
-   public static final int SELECTION_RECORDED_AND_PARENTS=2;
-   public static final int SELECTION_ALL=3;
+   public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE=1;
+   public static final int SELECTION_RECORDED_NO_DEPS=2;
+   public static final int SELECTION_RECORDED_AND_PARENTS=3;
+   public static final int SELECTION_ALL=4;
 
    private int selectionMode = SELECTION_RECORDED_AND_DEPS;
 
    private static final String[] SELECTION_OPTIONS = new String[]
-    {"recorded and deps", "recorded no deps", "recorded and ancestors", "all"};
+    {"recorded and deps", "recorded and deps and see",
+     "recorded no deps", "recorded and ancestors", "all"};
 
 }
 

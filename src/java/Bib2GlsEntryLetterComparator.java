@@ -113,8 +113,8 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             grp = (ignoreCase ? str.toUpperCase() : str);
 
             entry.putField("group", 
-               String.format("\\bibglslettergroup{%s}{%s}{%d}", 
-                             grp, str, codePoint));
+               String.format("\\bibglsunicodegroup{%s}{%s}{%d}{%d}", 
+                             grp, str, grp.codePointAt(0), codePoint));
          }
          else
          {
