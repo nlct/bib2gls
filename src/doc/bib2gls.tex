@@ -2377,6 +2377,8 @@ entries. So with \optref[de-CH-1996]{sort},
 list will be ordered according to \texttt{de-CH-1996} and not
 according to the order in which they were read when the \ext{bib}
 file or files were parsed.
+If \meta{sort} is \optfmt{custom}, then the rule should be
+provided with \optref{secondary-sort-rule}.
 
 This will copy all the selected entries into the glossary labelled
 \meta{type} sorted according to \meta{sort} using \meta{field} as
@@ -2467,6 +2469,11 @@ For example, if the entries are stored in \filefmt{entries.bib}:
   label-prefix={byid.}
 ]
 \end{verbatim}
+
+\subsection{\csoptnv{secondary-sort-rule}=\margm{value}}
+\labelopt{secondary-sort-rule}
+
+As \optref{sort-rule} but for secondary custom sorting.
 
 \section{Selection Options}
 \label{sec:selectionopts}
@@ -4138,6 +4145,8 @@ random generator can be set using \optref{shuffle} (which
 also automatically sets \csopt[random]{sort} and \csopt{flatten}).
 \item \optfmt{locale}: sort the entries according to the operating
 system's locale.
+\item \optfmt{custom}: sort the entries according to the 
+rule provided by \optref{sort-rule}.
 \item \optfmt{doc}: sort the entries according to the document
 language. In the case of a multi-lingual document, this will be
 the last language resource file to be loaded through
@@ -4207,6 +4216,39 @@ For example:
 \GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
 \end{verbatim}
 
+\subsection{\csoptnv{sort-rule}=\margm{value}}
+\labelopt{sort-rule}
+
+If the \optref[custom]{sort} option is used, the sort rule
+must be provided with \optfmt{sort-rule}. In this case
+the collation is performed using Java's
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/RuleBasedCollator.html}{RuleBasedCollator}
+class. Remember that the options will be expanded as they
+are written to the \ext{aux} file, so be careful of
+any special characters that occur in the rule. You can
+use \cs{string}\cs{u}\meta{hex} (where \meta{hex} is a hexadecimal
+code) to represent a Unicode character. For example:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  sort={custom},
+  sort-rule={< a,A < b,B < c,C < ch,Ch,CH < d,D
+   < dd,Dd,DD < e,E < f,F < ff,Ff,FF
+   < g,G < ng,Ng,NG < h,H < ij,Ij,IJ
+   < i,I < j,J < k,K < l,L < ll,Ll,LL < m,M
+   < n,N < o,O < p,P < ph,Ph,PH < q,Q < r,R < rh,Rh,RH
+   < s,S < t,T < th,Th,TH < u,U < v,V < w,W < x,X < y,Y < z,Z
+   < \string\u00E6,\string\u00C6}
+]
+\end{verbatim}
+You can also use \cs{protect} instead of \cs{string}. This will
+cause a space to appear between \cs{u} and the hexadecimal
+value in the \ext{aux} file, but \bibgls\ will accept
+a single space between \cs{u} and \meta{hex} to allow for this.
+However it's safer to just use \cs{string}.
+
+If \optref{sort} is not set to \optfmt{custom}, the
+\optfmt{sort-rule} setting will be ignored.
+
 \subsection{\csoptnv{sort-field}=\margm{field}}
 \labelopt{sort-field}
 
@@ -4262,6 +4304,9 @@ entries are sorted separately according to \meta{value} (as per
 \optref{sort}) and the dual entries will be appended at the end of
 the \ext{glstex} file. The field used by the comparator is given by
 \optref{dual-sort-field}.
+If \csopt[custom]{dual-sort}, then the dual entries according to the 
+rule provided by \optref{dual-sort-rule}.
+
 
 For example:
 \begin{verbatim}
@@ -4293,6 +4338,11 @@ If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
 This option indicates the field to use when sorting dual entries
 (when they haven't been combined with the primary entries). The
 default value is the same as the \optref{sort-field} value.
+
+\subsection{\csoptnv{dual-sort-rule}=\margm{value}}
+\labelopt{dual-sort-rule}
+
+As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
 
 \subsection{\csoptnv{dual-prefix}=\margm{value}}
 \labelopt{dual-prefix}
@@ -5076,12 +5126,11 @@ or redefined after the resources are loaded:
 \renewcommand*{\bibglslocationgroupsep}{; }
 \end{verbatim}
 
-\section{\cs{bibglsunicodegroup}}
-\labelcs{bibglsunicodegroup}
+\section{\cs{bibglslettergroup}}
+\labelcs{bibglslettergroup}
 
 \begin{definition}
-\cs{bibglsunicodegroup}\margm{group}\margm{character}\margm{group
-codepoint}\marg{character codepoint}
+\cs{bibglslettergroup}\margm{group}\margm{character}\margm{id}
 \end{definition}
 This command is provided if the \argref{group} switch is used. Any
 entries whose sort value indicates that they are in a letter group
@@ -5089,9 +5138,11 @@ entries whose sort value indicates that they are in a letter group
 field to contain this command. The \meta{group} argument indicates
 the letter group and the \meta{character} argument indicates the actual
 initial character of the sort value, which may not be the same as
-\meta{group}. The \meta{group codepoint} is the decimal code for
-\meta{group}. The \meta{character codepoint} is the decimal code for
-\meta{character}.
+\meta{group}. The \meta{id} is a numeric identifier for that
+group. (For a rule-based collation, this is obtained from the
+first collation element. For a letter sort, it's
+obtained from the character code.)
+
 For example:
 \begin{verbatim}
 @entry{angstrom,
@@ -5103,13 +5154,17 @@ of a centimetre}
 The \field{sort} value is \qtt{\AA ngstr\"om}. With \optref[en]{sort}
 the \meta{group} part will be \texttt{A} but with \optref[sv]{sort}
 the \meta{group} part will be \texttt{\AA}. In both cases the
-\meta{character} argument will be \texttt{\AA} and the \meta{codepoint}
-argument will be 197 (the decimal Unicode value of the letter \AA).
+\meta{character} argument will be \texttt{\AA}.
 
-The default definition of this command is:
-\begin{verbatim}
-\providecommand{\bibglsunicodegroup}[4]{#1}
-\end{verbatim}
+The \meta{group} argument will typically by title-cased unless
+\optref[tertiary]{strength}. An exception is made to the
+title-casing for the digraph \qt{ij} when the main document language
+is Dutch, in which case \meta{group} will be \qt{IJ} (rather than
+\qt{Ij}).
+
+The default definition of this command depends on the
+existence of \cs{glsxtrsetgrouptitle}, which was introduced
+to \sty{glossaries-extra} v1.14.
 
 \section{\cs{bibglsothergroup}}
 \labelcs{bibglsothergroup}

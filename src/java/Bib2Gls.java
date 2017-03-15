@@ -2832,6 +2832,27 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public static void exit(Bib2Gls bib2gls, int exitCode)
+   {
+      if (bib2gls != null)
+      {
+         // Make sure transcript file is closed
+
+         if (bib2gls.logWriter != null)
+         {
+            bib2gls.logWriter.close();
+            bib2gls.message(bib2gls.getMessageWithFallback(
+              "message.log.file", 
+              "Transcript written to {0}.",
+               bib2gls.logFile));
+
+            bib2gls.logWriter = null;
+         }
+      }
+
+      System.exit(exitCode);
+   }
+
    public static void main(String[] args)
    {
       Bib2Gls bib2gls = null;
@@ -2889,7 +2910,7 @@ public class Bib2Gls implements TeXApp
 
          if (bib2gls.exitCode != 0)
          {
-            System.exit(bib2gls.exitCode);
+            exit(bib2gls, bib2gls.exitCode);
          }
       }
       catch (Bib2GlsSyntaxException e)
@@ -2914,14 +2935,14 @@ public class Bib2Gls implements TeXApp
             bib2gls.error(e);
          }
 
-         System.exit(3);
+         exit(bib2gls, 3);
       }
    }
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "0.8a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-03-14";
+   //public static final String DATE = "2017-03-15";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

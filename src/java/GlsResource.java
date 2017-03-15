@@ -25,6 +25,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.regex.Matcher;
 import java.text.Collator;
 import java.text.CollationKey;
+import java.text.ParseException;
 import java.nio.charset.Charset;
 
 import java.awt.Font;
@@ -73,6 +74,11 @@ public class GlsResource
 
       String master = null;
       String supplemental = null;
+
+      if (bib2gls.useGroupField())
+      {
+         groupTitleMap = new HashMap<Integer,String>();
+      }
 
       for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
       {
@@ -379,6 +385,18 @@ public class GlsResource
                sort = null;
             }
          }
+         else if (opt.equals("sort-rule"))
+         {
+            sortRules = replaceHex(getRequired(parser, list, opt));
+         }
+         else if (opt.equals("dual-sort-rule"))
+         {
+            dualSortRules = replaceHex(getRequired(parser, list, opt));
+         }
+         else if (opt.equals("secondary-sort-rule"))
+         {
+            secondarySortRules = replaceHex(getRequired(parser, list, opt));
+         }
          else if (opt.equals("group"))
          {
             if (bib2gls.useGroupField())
@@ -658,6 +676,30 @@ public class GlsResource
       if ("doc".equals(dualSort))
       {
          dualSort = bib2gls.getDocDefaultLocale();
+      }
+
+      if ("custom".equals(sort) && sortRules == null)
+      {
+         throw new IllegalArgumentException(bib2gls.getMessage(
+          "warning.option.pair.required", "sort=custom", "sort-rules"));
+      }
+
+      if ("custom".equals(dualSort) && dualSortRules == null)
+      {
+         throw new IllegalArgumentException(bib2gls.getMessage(
+          "warning.option.pair.required", "dual-sort=custom", 
+          "dual-sort-rules"));
+      }
+
+      if ("custom".equals(secondarySort) && secondarySortRules == null)
+      {
+         throw new IllegalArgumentException(bib2gls.getMessage(
+          "warning.option.pair.required", 
+          secondaryField == null ?
+          String.format("secondary={%s:%s}", secondarySort, secondaryType) :
+          String.format("secondary={%s:%s:%s}", secondarySort,
+            secondaryField, secondaryType), 
+           "secondary-sort-rules"));
       }
 
       if (selectionMode == SELECTION_ALL && "use".equals(sort))
@@ -1147,6 +1189,34 @@ public class GlsResource
       {
          supplementalCategory = category;
       }
+   }
+
+   private String replaceHex(String original)
+   {
+      // Replace \\u<hex> sequences with the appropriate Unicode
+      // characters.
+
+      Pattern p = Pattern.compile("\\\\u ?([0-9A-Ea-e]+)");
+
+      Matcher m = p.matcher(original);
+
+      StringBuilder builder = new StringBuilder();
+      int idx = 0;
+
+      while (m.find())
+      {
+         String hex = m.group(1);
+
+         builder.append(original.substring(idx, m.start()));
+
+         builder.appendCodePoint(Integer.parseInt(hex, 16));
+
+         idx = m.end();
+      }
+
+      builder.append(original.substring(idx));
+
+      return builder.toString();
    }
 
    private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
@@ -2304,7 +2374,7 @@ public class GlsResource
 
    private void processData(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries,
-      String entrySort, String entrySortField)
+      String entrySort, String entrySortRules, String entrySortField)
       throws Bib2GlsException
    {
       Vector<String> fields = bib2gls.getFields();
@@ -2407,12 +2477,13 @@ public class GlsResource
          }
       }
 
-      processDepsAndSort(data, entries, entrySort, entrySortField);
+      processDepsAndSort(data, entries, entrySort, entrySortRules, 
+        entrySortField);
    }
 
    private void processDepsAndSort(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries,
-      String entrySort, String entrySortField)
+      String entrySort, String entrySortRules, String entrySortField)
       throws Bib2GlsException
    {
       // add any dependencies
@@ -2478,11 +2549,41 @@ public class GlsResource
 
             comparator.sortEntries();
          }
+         else if (entrySort.equals("custom"))
+         {
+            try
+            {
+               Bib2GlsEntryComparator comparator = 
+                  new Bib2GlsEntryComparator(bib2gls, entries, 
+                     entrySortField,
+                     collatorStrength, collatorDecomposition,
+                     entrySortRules);
+
+               comparator.sortEntries();
+            }
+            catch (ParseException e)
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                "error.invalid.sort.rule", 
+                e.getErrorOffset(), entrySortRules), e);
+            }
+         }
          else
          {
+            Locale locale = null;
+
+            if (entrySort.equals("locale"))
+            {
+               locale = Locale.getDefault();
+            }
+            else
+            {
+               locale = Locale.forLanguageTag(entrySort);
+            }
+
             Bib2GlsEntryComparator comparator = 
                new Bib2GlsEntryComparator(bib2gls, entries, 
-                  entrySort, entrySortField, 
+                  locale, entrySortField, 
                   collatorStrength, collatorDecomposition);
 
             comparator.sortEntries();
@@ -2512,7 +2613,7 @@ public class GlsResource
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
-      processData(bibData, entries, sort, sortField);
+      processData(bibData, entries, sort, sortRules, sortField);
 
       Vector<Bib2GlsEntry> dualEntries = null;
 
@@ -2550,7 +2651,8 @@ public class GlsResource
             }
          }
 
-         processDepsAndSort(dualData, dualEntries, dualSort, dualSortField);
+         processDepsAndSort(dualData, dualEntries, dualSort,
+           dualSortRules, dualSortField);
 
          entryCount += dualEntries.size();
       }
@@ -2599,9 +2701,31 @@ public class GlsResource
 
          if (bib2gls.useGroupField())
          {
-            writer.println("\\providecommand{\\bibglsunicodegroup}[4]{#1}");
+            writer.println("\\ifdef\\glsxtrsetgrouptitle");
+            writer.println("{");
+            writer.println("  \\providecommand{\\bibglslettergroup}[3]{#3}");
+            writer.println("  \\providecommand{\\bibglslettergrouptitle}[3]{#1}");
+            writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{%");
+            writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
+            writer.println("}");
+            writer.println("{");
+            writer.println("  \\providecommand{\\bibglslettergroup}[3]{#1}");
+            writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{}");
+            writer.println("}");
+
             writer.println("\\providecommand{\\bibglsothergroup}[2]{\\glssymbolsgroupname}");
             writer.println("\\providecommand{\\bibglsnumbergroup}[1]{\\glsnumbersgroupname}");
+            writer.println();
+
+            for (Iterator<Integer> it = groupTitleMap.keySet().iterator();
+                it.hasNext(); )
+            {
+               Integer key = it.next();
+
+               writer.format("\\bibglssetgrouptitle{%s}%n", 
+                 groupTitleMap.get(key));
+            }
+
             writer.println();
          }
 
@@ -2885,11 +3009,41 @@ public class GlsResource
 
                   comparator.sortEntries();
                }
+               else if (secondarySort.equals("custom"))
+               {
+                  try
+                  {
+                     Bib2GlsEntryComparator comparator = 
+                        new Bib2GlsEntryComparator(bib2gls, secondaryList, 
+                           secondaryField == null ? sortField : secondaryField,
+                           collatorStrength, collatorDecomposition,
+                           secondarySortRules);
+
+                     comparator.sortEntries();
+                  }
+                  catch (ParseException e)
+                  {
+                     throw new Bib2GlsException(bib2gls.getMessage(
+                      "error.invalid.sort.rule", 
+                      e.getErrorOffset(), secondarySortRules), e);
+                  }
+               }
                else
                {
+                  Locale locale = null;
+
+                  if (secondarySort.equals("locale"))
+                  {
+                     locale = Locale.getDefault();
+                  }
+                  else
+                  {
+                     locale = Locale.forLanguageTag(secondarySort);
+                  }
+
                   Bib2GlsEntryComparator comparator = 
                      new Bib2GlsEntryComparator(bib2gls, secondaryList, 
-                        secondarySort,
+                        locale,
                         secondaryField == null ? sortField : secondaryField,
                         collatorStrength, collatorDecomposition);
 
@@ -3486,6 +3640,14 @@ public class GlsResource
       return groupField;
    }
 
+   public void putGroupTitle(int label, String title)
+   {
+      if (groupTitleMap != null)
+      {
+         groupTitleMap.put(new Integer(label), title);
+      }
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -3495,6 +3657,8 @@ public class GlsResource
    private String[] externalPrefixes = null;
 
    private String type=null, category=null, sort = "locale", sortField = "sort";
+
+   private String sortRules=null, secondarySortRules=null, dualSortRules=null;
 
    private String dualType=null, dualCategory=null, 
       dualSort = null, dualSortField = "sort";
@@ -3580,6 +3744,8 @@ public class GlsResource
    private String[] counters=null;
 
    private Random random=null;
+
+   private HashMap<Integer,String> groupTitleMap=null;
 
    private Vector<GlsRecord> supplementalRecords=null;
    private TeXPath supplementalPdfPath=null;

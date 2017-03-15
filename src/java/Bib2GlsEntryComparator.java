@@ -22,6 +22,9 @@ import java.util.Locale;
 import java.util.Vector;
 import java.util.Comparator;
 import java.text.Collator;
+import java.text.RuleBasedCollator;
+import java.text.CollationElementIterator;
+import java.text.ParseException;
 import java.text.CollationKey;
 import java.text.Normalizer;
 import java.util.HashMap;
@@ -32,24 +35,52 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField,
+    Locale locale, String sortField,
     int strength, int decomposition)
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
       this.entries = entries;
 
-      if (sort.equals("locale"))
-      {
-         collator = Collator.getInstance();
-      }
-      else
-      {
-         collator = Collator.getInstance(Locale.forLanguageTag(sort));
-      }
+      isDutch = locale.getLanguage().equals(new Locale("nl").getLanguage());
 
+      collator = Collator.getInstance(locale);
       collator.setStrength(strength);
       collator.setDecomposition(decomposition);
+
+      if (collator instanceof RuleBasedCollator && bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.debug(bib2gls.getMessage("message.collator.rules",
+           ((RuleBasedCollator)collator).getRules()));
+      }
+   }
+
+   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
+    Vector<Bib2GlsEntry> entries, String sortField,
+    int strength, int decomposition, String rules)
+   throws ParseException
+   {
+      this.sortField = sortField;
+      this.bib2gls = bib2gls;
+      this.entries = entries;
+
+      collator = new RuleBasedCollator(rules);
+      collator.setStrength(strength);
+      collator.setDecomposition(decomposition);
+
+      String docLocale = bib2gls.getDocDefaultLocale();
+
+      if (docLocale != null)
+      {
+         Locale locale = Locale.forLanguageTag(docLocale);
+         isDutch = locale.getLanguage().equals(new Locale("nl").getLanguage());
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.debug(bib2gls.getMessage("message.collator.rules",
+           ((RuleBasedCollator)collator).getRules()));
+      }
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -98,96 +129,111 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
       if (bib2gls.useGroupField() && value.length() > 0)
       {
-         int codePoint = value.codePointAt(0);
-         String str;
-
-         if (codePoint > 0xffff)
-         {
-            str = String.format("%c%c",
-              Character.highSurrogate(codePoint),
-              Character.lowSurrogate(codePoint));
-         }
-         else
-         {
-            str = String.format("%c", codePoint);
-         }
-
          if (entry.getFieldValue("group") != null)
          {
             // don't overwrite
          }
-         else if (Character.isAlphabetic(codePoint))
+         else if (collator instanceof RuleBasedCollator)
          {
-            grp = str.toUpperCase();
+            CollationElementIterator it =
+              ((RuleBasedCollator)collator).getCollationElementIterator(value);
 
-            // Compare first letter with normalised version
+            int elem = it.next();
+            String str = value.substring(0, it.getOffset());
+            grp = str;
+            int cp = grp.codePointAt(0);
 
-            String norm = Normalizer.normalize(grp, Normalizer.Form.NFC);
-            norm = norm.replaceAll("[^\\p{ASCII}]", "");
-            norm = norm.replaceAll("\\p{M}", "");
-
-            if (norm.isEmpty())
+            if (collator.getStrength() == Collator.TERTIARY)
             {
-               norm = Normalizer.normalize(grp, Normalizer.Form.NFD);
-               norm = norm.replaceAll("[^\\p{ASCII}]", "");
-               norm = norm.replaceAll("\\p{M}", "");
+               // don't title-case the group
             }
-
-            if (norm.isEmpty())
+            else if (isDutch && grp.toLowerCase().equals("ij"))
             {
-               if (collator.compare(grp, "AE") == 0)
-               {
-                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
-                    grp, "A"));
-                  grp = "A";
-               }
-               else if (collator.compare(grp, "OE") == 0)
-               {
-                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
-                    grp, "O"));
-                  grp = "O";
-               }
-               else if (collator.compare(grp, "TH") == 0)
-               {
-                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
-                    grp, "T"));
-                  grp = "T";
-               }
-               else
-               {
-                  bib2gls.debug(bib2gls.getMessage("message.no.norm", grp));
-               }
-            }
-            else if (collator.compare(grp, norm) == 0)
-            {
-               if (!grp.equals(norm))
-               {
-                  bib2gls.debug(bib2gls.getMessage("message.normalizing",
-                    grp, norm));
-                  grp = norm;
-               }
+               grp = "IJ";
             }
             else
             {
-               bib2gls.debug(bib2gls.getMessage("message.norm.distinct",
-                 norm, grp));
+               if (Character.isAlphabetic(cp))
+               {
+                  int titleCodePoint = Character.toTitleCase(cp);
+
+                  if (titleCodePoint > 0xffff)
+                  {
+                     grp = String.format("%c%c%s",
+                          Character.highSurrogate(titleCodePoint),
+                          Character.lowSurrogate(titleCodePoint),
+                          grp.substring(Character.charCount(cp)).toLowerCase());
+                  }
+                  else
+                  {
+                     grp = String.format("%c%s", titleCodePoint,
+                        grp.substring(Character.charCount(cp)).toLowerCase());
+                  }
+               }
             }
 
-            entry.putField("group", 
-               String.format("\\bibglsunicodegroup{%s}{%s}{%d}{%d}", 
-                          grp, str, grp.codePointAt(0), codePoint));
+            if (Character.isAlphabetic(cp))
+            {
+               String args = String.format("{%s}{%s}{%d}", grp, str, elem);
+
+               entry.putField("group", 
+                 String.format("\\bibglslettergroup%s", args));
+
+               bib2gls.getCurrentResource().putGroupTitle(elem, args);
+            }
+            else
+            {
+               if (str.equals("\\") || str.equals("{") ||
+                str.equals("}"))
+               {
+                  str = "\\char`\\"+str;
+               }
+
+               entry.putField("group", 
+                 String.format("\\bibglsothergroup{%s}{%d}", str, elem));
+            }
          }
          else
          {
-            if (str.equals("\\") || str.equals("{") ||
-                str.equals("}"))
+            int codePoint = value.codePointAt(0);
+
+            String str;
+
+            if (codePoint > 0xffff)
             {
-               str = "\\char`\\"+str;
+               str = String.format("%c%c",
+                 Character.highSurrogate(codePoint),
+                 Character.lowSurrogate(codePoint));
+            }
+            else
+            {
+               str = String.format("%c", codePoint);
             }
 
-            entry.putField("group", 
-               String.format("\\bibglsothergroup{%s}{%d}", 
-                             str, codePoint));
+            if (Character.isAlphabetic(codePoint))
+            {
+               grp = str.toUpperCase();
+               int cp = grp.codePointAt(0);
+
+               String args = String.format("{%s}{%s}{%d}", grp, str, cp);
+
+               entry.putField("group", 
+                 String.format("\\bibglslettergroup%s", args));
+
+               bib2gls.getCurrentResource().putGroupTitle(cp, args);
+            }
+            else
+            {
+               if (str.equals("\\") || str.equals("{") ||
+                str.equals("}"))
+               {
+                  str = "\\char`\\"+str;
+               }
+
+               entry.putField("group", 
+                 String.format("\\bibglsothergroup{%s}{%X}", 
+                               str, codePoint));
+            }
          }
       }
 
@@ -301,6 +347,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    private String sortField;
 
    private Collator collator;
+
+   private boolean isDutch = false;
 
    private Bib2Gls bib2gls;
 

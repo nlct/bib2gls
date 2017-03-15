@@ -1,0 +1,28 @@
+% arara: xelatex
+% arara: bib2gls: {group: on}
+% arara: xelatex
+\documentclass{article}
+
+\usepackage{tracklang}
+\TrackLanguageTag{nl-NL}
+\usepackage{fontspec}
+\usepackage[record]{glossaries-extra}
+\usepackage{glossary-mcols}
+
+\GlsXtrLoadResources[selection={all},
+  sort={custom},
+  sort-rule={< a,A < b,B < c,C < ch,Ch,CH < d,D
+   < dd,Dd,DD < dz,Dz,DZ < e,E < f,F < ff,Ff,FF
+   < g,G < ng,Ng,NG < h,H < ij,Ij,IJ 
+   < i,I < j,J < k,K < l,L < ll,Ll,LL < m,M
+   < n,N < o,O < p,P < ph,Ph,PH < q,Q < r,R < rh,Rh,RH
+   < s,S < t,T < th,Th,TH < u,U < v,V < w,W < x,X < y,Y < z,Z
+   < \protect\u00C6=ae,Ae,\string\u00E6=AE}
+]
+
+\setglossarystyle{mcolindexgroup}
+
+\begin{document}
+
+\printunsrtglossary
+\end{document}

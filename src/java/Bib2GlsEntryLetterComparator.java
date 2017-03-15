@@ -112,9 +112,15 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          {
             grp = (ignoreCase ? str.toUpperCase() : str);
 
+            int cp = grp.codePointAt(0);
+
+            String args = String.format("{%s}{%s}{%d}",
+                 grp, str, cp);
+
             entry.putField("group", 
-               String.format("\\bibglsunicodegroup{%s}{%s}{%d}{%d}", 
-                             grp, str, grp.codePointAt(0), codePoint));
+               String.format("\\bibglslettergroup%s", args));
+
+            bib2gls.getCurrentResource().putGroupTitle(cp, args);
          }
          else
          {
@@ -125,7 +131,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             }
 
             entry.putField("group", 
-               String.format("\\bibglsothergroup{%s}{%d}", 
+               String.format("\\bibglsothergroup{%s}{%X}", 
                              str, codePoint));
          }
       }
