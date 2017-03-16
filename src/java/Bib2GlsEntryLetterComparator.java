@@ -114,13 +114,25 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
             int cp = grp.codePointAt(0);
 
-            String args = String.format("{%s}{%s}{%d}",
-                 grp, str, cp);
+            GlsResource resource = bib2gls.getCurrentResource();
+
+            GroupTitle grpTitle = resource.getGroupTitle(cp);
+            String args;
+
+            if (grpTitle == null)
+            {
+               grpTitle = new GroupTitle(grp, str, cp);
+               resource.putGroupTitle(grpTitle);
+               args = grpTitle.toString();
+            }
+            else
+            {
+               args = String.format("{%s}{%s}{%d}", grpTitle.getTitle(), 
+                 str, cp);
+            }
 
             entry.putField("group", 
                String.format("\\bibglslettergroup%s", args));
-
-            bib2gls.getCurrentResource().putGroupTitle(cp, args);
          }
          else
          {

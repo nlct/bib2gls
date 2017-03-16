@@ -139,9 +139,53 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
               ((RuleBasedCollator)collator).getCollationElementIterator(value);
 
             int elem = it.next();
-            String str = value.substring(0, it.getOffset());
+            int offset = it.getOffset();
+
+            while (offset == 0 && elem != CollationElementIterator.NULLORDER)
+            {
+               elem = it.next();
+               offset = it.getOffset();
+            }
+
+            String str;
+            int cp = 0;
+
+            if (elem == 0)
+            {
+               bib2gls.debug(bib2gls.getMessage("message.no.collation.element",
+                 value));
+
+               if (collator.getStrength() == Collator.PRIMARY)
+               {
+                  str = Normalizer.normalize(value, Normalizer.Form.NFD);
+                  str = str.replaceAll("\\p{M}", "");
+                  it =
+                    ((RuleBasedCollator)collator).getCollationElementIterator(str);
+
+                  elem = it.next();
+                  offset = it.getOffset();
+               }
+               else
+               {
+                  cp = value.codePointAt(0);
+                  offset = Character.charCount(cp);
+                  str = value;
+                  elem = cp;
+               }
+
+               str = str.substring(0, offset);
+            }
+            else
+            {
+               str = value.substring(0, offset);
+            }
+
             grp = str;
-            int cp = grp.codePointAt(0);
+
+            if (!grp.isEmpty())
+            {
+               cp = grp.codePointAt(0);
+            }
 
             if (collator.getStrength() == Collator.TERTIARY)
             {
@@ -150,6 +194,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             else if (isDutch && grp.toLowerCase().equals("ij"))
             {
                grp = "IJ";
+               cp = Character.toTitleCase(cp);
             }
             else
             {
@@ -169,17 +214,42 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                      grp = String.format("%c%s", titleCodePoint,
                         grp.substring(Character.charCount(cp)).toLowerCase());
                   }
+
+                  cp = titleCodePoint;
                }
             }
 
             if (Character.isAlphabetic(cp))
             {
-               String args = String.format("{%s}{%s}{%d}", grp, str, elem);
+               if (collator.getStrength() != Collator.PRIMARY)
+               {
+                  elem = cp;
+               }
+
+               GlsResource resource = bib2gls.getCurrentResource();
+
+               GroupTitle grpTitle = resource.getGroupTitle(elem);
+               String args;
+
+               if (grpTitle == null)
+               {
+                  grpTitle = new GroupTitle(grp, str, elem);
+                  resource.putGroupTitle(grpTitle);
+                  args = grpTitle.toString();
+               }
+               else
+               {
+                  args = String.format("{%s}{%s}{%d}", grp, str, elem);
+
+                  if (grpTitle.getTitle().matches(".*[^\\p{ASCII}].*")
+                      && grp.matches("\\p{ASCII}+"))
+                  {
+                     grpTitle.setTitle(grp);
+                  }
+               }
 
                entry.putField("group", 
                  String.format("\\bibglslettergroup%s", args));
-
-               bib2gls.getCurrentResource().putGroupTitle(elem, args);
             }
             else
             {
@@ -215,12 +285,25 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                grp = str.toUpperCase();
                int cp = grp.codePointAt(0);
 
-               String args = String.format("{%s}{%s}{%d}", grp, str, cp);
+               GlsResource resource = bib2gls.getCurrentResource();
+
+               GroupTitle grpTitle = resource.getGroupTitle(cp);
+               String args;
+
+               if (grpTitle == null)
+               {
+                  grpTitle = new GroupTitle(grp, str, cp);
+                  resource.putGroupTitle(grpTitle);
+                  args = grpTitle.toString();
+               }
+               else
+               {
+                  args = String.format("{%s}{%s}{%d}", grpTitle.getTitle(), 
+                    str, cp);
+               }
 
                entry.putField("group", 
                  String.format("\\bibglslettergroup%s", args));
-
-               bib2gls.getCurrentResource().putGroupTitle(cp, args);
             }
             else
             {

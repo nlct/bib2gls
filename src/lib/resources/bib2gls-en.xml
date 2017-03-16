@@ -150,6 +150,7 @@ Defaulting to: {0}.
 <entry key="message.norm.distinct">Normalized {0} distinct from {1}.</entry>
 <entry key="message.no.norm">Can''t normalize {0}.</entry>
 <entry key="message.collator.rules">Collator rules: {0}.</entry>
+<entry key="message.no.collation.element">No collation element for: {0}.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>

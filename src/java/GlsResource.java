@@ -77,7 +77,7 @@ public class GlsResource
 
       if (bib2gls.useGroupField())
       {
-         groupTitleMap = new HashMap<Integer,String>();
+         groupTitleMap = new HashMap<Integer,GroupTitle>();
       }
 
       for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
@@ -3640,12 +3640,22 @@ public class GlsResource
       return groupField;
    }
 
-   public void putGroupTitle(int label, String title)
+   public void putGroupTitle(GroupTitle grpTitle)
    {
       if (groupTitleMap != null)
       {
-         groupTitleMap.put(new Integer(label), title);
+         groupTitleMap.put(new Integer(grpTitle.getId()), grpTitle);
       }
+   }
+
+   public GroupTitle getGroupTitle(int id)
+   {
+      if (groupTitleMap != null)
+      {
+         return groupTitleMap.get(new Integer(id));
+      }
+
+      return null;
    }
 
    private File texFile;
@@ -3745,7 +3755,7 @@ public class GlsResource
 
    private Random random=null;
 
-   private HashMap<Integer,String> groupTitleMap=null;
+   private HashMap<Integer,GroupTitle> groupTitleMap=null;
 
    private Vector<GlsRecord> supplementalRecords=null;
    private TeXPath supplementalPdfPath=null;
