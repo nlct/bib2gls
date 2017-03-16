@@ -1196,7 +1196,7 @@ public class GlsResource
       // Replace \\u<hex> sequences with the appropriate Unicode
       // characters.
 
-      Pattern p = Pattern.compile("\\\\u ?([0-9A-Ea-e]+)");
+      Pattern p = Pattern.compile("\\\\u ?([0-9A-Fa-f]+)");
 
       Matcher m = p.matcher(original);
 
