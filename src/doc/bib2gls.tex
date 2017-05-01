@@ -522,11 +522,14 @@ and \cs{printglossary} (or the iterative \cs{printglossaries}) as usual.
 
 \section{Security}
 
-\TeX\ distributions come with security settings
+\TeX\ Live come with security settings
 \texttt{openin\_any} and \texttt{openout\_any} that, respectively,
 govern read and write file access (in addition to the operating
 system's file permissions). \bibgls\ uses \app{kpsewhich} to
-determine these values and honours them.
+determine these values and honours them. MikTeX doesn't use these
+settings, so if these values are unset, \bibgls\ will default to
+\texttt{a} (any) for \texttt{openin\_any} and \texttt{p} (paranoid) for
+\texttt{openout\_any}.
 
 \section{Localisation}
 \label{sec:lang.xml}

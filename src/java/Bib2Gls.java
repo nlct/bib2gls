@@ -49,19 +49,22 @@ public class Bib2Gls implements TeXApp
    {
       debugLevel = debug;
       verboseLevel = verbose;
+      shownVersion = false;
 
       if (debug > 0 && verbose > -1)
       {
          version();
+         shownVersion = true;
       }
 
       initMessages(langTag);
 
       initSecuritySettings();
 
-      if (verboseLevel >= 0 && debug == 0)
+      if (verboseLevel >= 0 && !shownVersion)
       {
          version();
+         shownVersion = true;
       }
 
       formatMap = new HashMap<String,String>();
@@ -83,20 +86,32 @@ public class Bib2Gls implements TeXApp
       {
          openin_any = (char)openinAny;
       }
+      else if (openinAny == -1)
+      {
+         // not set, probably MikTeX distribution
+         debug(getMessage("error.missing.value", "openin_any"));
+         openin_any = 'a';
+      }
       else
       {
-         throw new IllegalArgumentException(
-           "Invalid openin_any value returned by kpsewhich: "+openin);
+         warning(getMessage("error.invalid.opt.value", "openin_any", openin));
+         openin_any = 'a';
       }
 
       if (openoutAny == 'a' || openoutAny == 'p' || openoutAny == 'r')
       {
          openout_any = (char)openoutAny;
       }
+      else if (openoutAny == -1)
+      {
+         // not set, probably MikTeX distribution
+         debug(getMessage("error.missing.value", "openout_any"));
+         openout_any = 'p';
+      }
       else
       {
-         throw new IllegalArgumentException(
-           "Invalid openout_any value returned by kpsewhich: "+openout);
+         warning(getMessage("error.invalid.opt.value", "openout_any", openout));
+         openout_any = 'p';
       }
 
       try
@@ -2548,7 +2563,11 @@ public class Bib2Gls implements TeXApp
          }
          else if (args[i].equals("-v") || args[i].equals("--version"))
          {
-            version();
+            if (!shownVersion)
+            {
+               version();
+            }
+
             license();
             System.exit(0);
          }
@@ -2942,12 +2961,12 @@ public class Bib2Gls implements TeXApp
    public static final String NAME = "bib2gls";
    public static final String VERSION = "0.7a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-03-16";
+   //public static final String DATE = "2017-05-01";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
    private char openout_any='p';
-   private char openin_any='p';
+   private char openin_any='a';
    private Path cwd;
    private Path texmfoutput = null;
    private Path basePath;
@@ -3001,6 +3020,8 @@ public class Bib2Gls implements TeXApp
    private TeXParser interpreter = null;
 
    private int exitCode;
+
+   private boolean shownVersion = false;
 
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",
