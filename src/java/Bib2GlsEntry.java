@@ -1155,6 +1155,8 @@ public class Bib2GlsEntry extends BibEntry
       GlsRecord rangeStart=null;
       String rangeFmt = null;
 
+      int startRangeIdx = 0;
+
       for (GlsRecord record : recordList)
       {
          locationList.add(record.getListTeXCode());
@@ -1188,6 +1190,8 @@ public class Bib2GlsEntry extends BibEntry
                   builder.append("\\delimN ");
                }
 
+               startRangeIdx = builder.length();
+
                builder.append("\\bibglsrange{");
                builder.append(record.getFmtTeXCode());
 
@@ -1212,11 +1216,17 @@ public class Bib2GlsEntry extends BibEntry
              if (!(rangeStart.getPrefix().equals(record.getPrefix())
                &&  rangeStart.getCounter().equals(record.getCounter())))
              {
-                throw new Bib2GlsException(bib2gls.getMessage(
+                bib2gls.warning(bib2gls.getMessage(
                     "error.inconsistent.range", record, rangeStart));
-             }
 
-             if (!rangeFmt.equals(record.getFormat()))
+                String content = String.format("\\bibglsinterloper{%s}", 
+                  record.getFmtTeXCode());
+
+                builder.insert(startRangeIdx, content);
+
+                startRangeIdx += content.length();
+             }
+             else if (!rangeFmt.equals(record.getFormat()))
              {
                 if (record.getFormat().equals("glsnumberformat")
                  || rangeFmt.isEmpty())
@@ -1226,9 +1236,16 @@ public class Bib2GlsEntry extends BibEntry
                 }
                 else
                 {
-                   throw new Bib2GlsException(bib2gls.getMessage(
+                   bib2gls.warning(bib2gls.getMessage(
                       "error.inconsistent.range", record, rangeStart));
                 }
+
+                String content = String.format("\\bibglsinterloper{%s}", 
+                  record.getFmtTeXCode());
+
+                builder.insert(startRangeIdx, content);
+
+                startRangeIdx += content.length();
              }
    
          }

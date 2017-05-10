@@ -4939,13 +4939,52 @@ Or you can redefine it afterwards:
 \end{definition}
 
 Explicit ranges formed using \glsopt[(]{format} and
-\glsopt[)]{format} or \glsopt[\meta{csname}(]{format} and
-\glsopt[\meta{csname})]{format} (where \meta{csname} matches and is a
+\glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
+\glsopt[)\meta{csname}]{format} (where \meta{csname} matches and is a
 text-block command without the initial backslash) in the optional
 argument of commands like \cs{gls} or \cs{glsadd} are encapsulated within
 the argument of \cs{bibglsrange}. By default this simply does its
 argument. This command is not used with ranges that are formed by collating
 consecutive locations.
+
+\section{\cs{bibglsinterloper}}
+\labelcs{bibglsinterloper}
+
+\begin{definition}
+\cs{bibglsinterloper}\margm{location}
+\end{definition}
+
+If an explicit range conflicts with a record, a warning will be
+issued and the conflicting record will be shifted to the front
+of the range inside the argument of \cs{bibglsinterloper}.
+The default definition just does \meta{location}\cs{delimN}
+so that it fits neatly into the list.
+
+For example, suppose on page~4 I start a range with
+\begin{verbatim}
+\glsadd[format={(}]{sample}
+\end{verbatim}
+and end it on page~9 with
+\begin{verbatim}
+\glsadd[format={)}]{sample}
+\end{verbatim}
+This forms an explicit range, but let's suppose on page~6 I
+have
+\begin{verbatim}
+\gls[format={hyperbf}]{sample}
+\end{verbatim}
+This record conflicts with the explicit range (which doesn't include
+\texttt{hyperbf} in the format). This causes a warning and
+the conflicting entry will be moved before the start of the
+explicit range resulting in \textbf{6}, 4--9.
+
+Note that implicit ranges can't be formed from interlopers,
+so if \verb|\gls[format={hyperbf}]{sample}| also occurs
+on pages~7 and~8 then the result will be \textbf{6}, \textbf{7},
+\textbf{8}, 4--9. Either remove the explicit range or
+remove the conflicting entries. (Alternatively, redefine
+\cs{bibglsinterloper} to ignore its argument, which will
+discard the conflicting entries.)
 
 \section{\cs{bibglspostlocprefix}}
 \labelcs{bibglspostlocprefix}

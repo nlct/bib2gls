@@ -133,7 +133,7 @@ See the manual for further details.</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>
 <entry key="message.no.fallback">Entry type ''{0}'' has no fallback for field: {1}</entry>
-<entry key="message.inconsistent.range">Ignoring inconsistent location format {0}
+<entry key="message.inconsistent.range">Inconsistent location format {0}
 with range started by {1}</entry>
 <entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="message.discarding.entry">Discarding entry {0}</entry>

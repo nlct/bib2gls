@@ -2669,6 +2669,7 @@ public class GlsResource
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
          writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
+         writer.println("\\providecommand{\\bibglsinterloper}[1]{#1\\delimN }");
          writer.format("\\providecommand{\\bibglspassim}{%s}%n",
              bib2gls.getMessage("tag.passim"));
          writer.println();
