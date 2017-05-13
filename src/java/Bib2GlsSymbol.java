@@ -58,14 +58,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    {
       if (field.equals("sort"))
       {
-         if (!bib2gls.useInterpreter())
-         {
-            return getOriginalId();
-         }
-
-         String val = getFieldValue("name");
-
-         return val == null ? getFallbackValue("name") : val;
+         return getOriginalId();
       }
 
       return super.getFallbackValue(field);
@@ -76,13 +69,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    {
       if (field.equals("sort"))
       {
-         // This doesn't check for the interpreter since
-         // it's the String value from getFallbackValue
-         // that's checked by the comparator.
-
-         BibValueList val = getField("name");
-
-         return val == null ? getFallbackContents("name") : val;
+         return getField("id");
       }
 
       return super.getFallbackContents(field);
