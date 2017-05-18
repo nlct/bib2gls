@@ -1,0 +1,27 @@
+% arara: pdflatex 
+% arara: bib2gls 
+% arara: pdflatex 
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-entries}]
+
+\begin{document}
+\gls{sample}.
+
+\newpage
+
+\glsadd[format={(}]{sample}
+
+\newpage
+
+\gls{sample}
+
+\newpage
+
+\glsadd[format={)}]{sample}
+
+\printunsrtglossaries
+
+\end{document}
