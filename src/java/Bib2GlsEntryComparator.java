@@ -42,8 +42,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       this.bib2gls = bib2gls;
       this.entries = entries;
 
-      isDutch = locale.getLanguage().equals(new Locale("nl").getLanguage());
-
       collator = Collator.getInstance(locale);
       collator.setStrength(strength);
       collator.setDecomposition(decomposition);
@@ -69,12 +67,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       collator.setDecomposition(decomposition);
 
       String docLocale = bib2gls.getDocDefaultLocale();
-
-      if (docLocale != null)
-      {
-         Locale locale = Locale.forLanguageTag(docLocale);
-         isDutch = locale.getLanguage().equals(new Locale("nl").getLanguage());
-      }
 
       if (bib2gls.getDebugLevel() > 0)
       {
@@ -184,31 +176,20 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
                grp = str;
 
-               switch (collator.getStrength())
-               {
-                 case Collator.PRIMARY:
+               int strength = collator.getStrength();
 
-                    String norm = Normalizer.normalize(
+               collator.setStrength(Collator.PRIMARY);
+
+               String norm = Normalizer.normalize(
                       str.toLowerCase(), Normalizer.Form.NFD);
-                    norm = norm.replaceAll("\\p{M}", "");
+               norm = norm.replaceAll("\\p{M}", "");
 
-                    if (collator.compare(str, norm) == 0)
-                    {
-                       grp = norm;
-                    }
-
-                 break;
-                 case Collator.SECONDARY:
-
-                    norm = str.toLowerCase();
-
-                    if (collator.compare(str, norm) == 0)
-                    {
-                       grp = norm;
-                    }
-
-                 break;
+               if (collator.compare(str, norm) == 0)
+               {
+                  grp = norm;
                }
+
+               collator.setStrength(strength);
             }
 
             if (!grp.isEmpty())
@@ -216,11 +197,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                cp = grp.codePointAt(0);
             }
 
-            if (collator.getStrength() == Collator.TERTIARY)
-            {
-               // don't title-case the group
-            }
-            else if (isDutch && grp.equals("ij"))
+            // The Dutch ij digraph should have both letters
+            // converted to upper case. Other digraphs only have the
+            // first letter converted.
+
+            if (grp.equals("ij"))
             {
                grp = "IJ";
                cp = Character.toTitleCase(cp);
@@ -392,17 +373,20 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
       int n = Integer.min(n1, n2);
 
-      if (n1 == n2 && entry1.getId().equals(entry2.getId()))
-      {
-         return 0;
-      }
-
       for (int i = 0; i < n; i++)
       {
          Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
          Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
 
          int result = e1.getCollationKey().compareTo(e2.getCollationKey());
+
+         if (bib2gls.getDebugLevel() > 1)
+         {
+            bib2gls.logAndPrintMessage(String.format("%s %c %s",
+              e1.getFieldValue("sort"),
+              result == 0 ? '=' : (result < 0 ? '<' : '>'),
+              e2.getFieldValue("sort")));
+         }
 
          if (result != 0)
          {
@@ -436,8 +420,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    private String sortField;
 
    private Collator collator;
-
-   private boolean isDutch = false;
 
    private Bib2Gls bib2gls;
 

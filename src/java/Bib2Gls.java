@@ -1508,6 +1508,16 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void logAndPrintMessage(String message)
+   {
+      if (logWriter != null)
+      {
+         logWriter.println(message);
+      }
+
+      System.out.println(message);
+   }
+
    public int getDebugLevel()
    {
       return debugLevel;
@@ -1522,8 +1532,7 @@ public class Bib2Gls implements TeXApp
    {
       if (debugLevel > 0)
       {
-         System.out.println(message);
-         logMessage(message);
+         logAndPrintMessage(message);
       }
    }
 
@@ -1538,8 +1547,7 @@ public class Bib2Gls implements TeXApp
             message = e.getClass().getSimpleName();
          }
 
-         System.out.println(message);
-         logMessage(message);
+         logAndPrintMessage(message);
 
          e.printStackTrace();
       }
@@ -1561,8 +1569,7 @@ public class Bib2Gls implements TeXApp
             message = msgPrefix+message;
          }
 
-         System.out.println(message);
-         logMessage(message);
+         logAndPrintMessage(message);
 
          e.printStackTrace();
       }
