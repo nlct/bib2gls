@@ -203,7 +203,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          {
             return -1;
          }
-         else
+         else if (cp1 > cp2)
          {
             return 1;
          }
