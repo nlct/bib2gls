@@ -1213,6 +1213,8 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (rangeStart != null)
          {
+             String recordFmt = record.getFormat();
+
              if (!(rangeStart.getPrefix().equals(record.getPrefix())
                &&  rangeStart.getCounter().equals(record.getCounter())))
              {
@@ -1226,7 +1228,16 @@ public class Bib2GlsEntry extends BibEntry
 
                 startRangeIdx += content.length();
              }
-             else if (!rangeFmt.equals(record.getFormat()))
+             else if ( ((rangeFmt.isEmpty()
+                         ||rangeFmt.equals("glsnumberformat"))
+                       && (recordFmt.isEmpty()
+                         ||recordFmt.equals("glsnumberformat")))
+                      || rangeFmt.equals(recordFmt))
+             {
+                bib2gls.debug(bib2gls.getMessage("message.merge.range",
+                  record, rangeStart));
+             }
+             else
              {
                 if (record.getFormat().equals("glsnumberformat")
                  || rangeFmt.isEmpty())
