@@ -263,8 +263,8 @@ Error occurred before: {2}
 {2}
 Error occurred before: {3}
 </entry>
-<entry key="error.invalid.sort.rule">Invalid syntax at offset {0} in sort rule:
-{1}</entry>
+<entry key="error.invalid.sort.rule">Invalid syntax in sort rule:
+{0}</entry>
 
 <!--
      The following messages are used by various parts of

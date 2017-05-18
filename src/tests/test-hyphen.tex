@@ -1,0 +1,22 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ sort={sv},
+ %sort={en-GB},
+ selection={all},
+ strength={primary},
+ %strength={secondary},
+ %strength={tertiary},
+ src={test-hyphen}]
+
+\begin{document}
+
+\printunsrtglossary[style={indexgroup}]
+
+\end{document}

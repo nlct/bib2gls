@@ -2564,8 +2564,7 @@ public class GlsResource
             catch (ParseException e)
             {
                throw new Bib2GlsException(bib2gls.getMessage(
-                "error.invalid.sort.rule", 
-                e.getErrorOffset(), entrySortRules), e);
+                "error.invalid.sort.rule", e.getMessage()), e);
             }
          }
          else

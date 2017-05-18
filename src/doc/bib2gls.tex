@@ -655,7 +655,7 @@ and \sty{bpchem}. There's also partial support for \sty{siunitx}'s
 \cs{si} command.}\ or any custom
 commands or environments provided within the document.
 
-\TeX\ syntax can be quite complicated and in some cases far too
+\TeX\ syntax can be quite complicated and, in some cases, far too
 complicated for simple regular expressions. The library performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls. When
@@ -673,31 +673,31 @@ For example, suppose the \ext{bib} file includes:
 \providecommand{\card}[1]{|\set{#1}|}
 \providecommand{\imaginary}{i}"}
 
-@symbol{M,
+@entry{M,
   name={{}$\mtx{M}$},
   text={\mtx{M}},
   description={a matrix}
 }
 
-@symbol{v,
+@entry{v,
   name={{}$\vec{v}$},
   text={\vec{v}},
   description={a vector}
 }
 
-@symbol{S,
+@entry{S,
   name={{}$\set{S}$},
   text={\set{S}},
   description={a set}
 }
 
-@symbol{card,
+@entry{card,
   name={{}$\card{S}$},
   text={\card{S}},
   description={the cardinality of the set $\set{S}$}
 }
 
-@symbol{i,
+@entry{i,
   name={{}$\imaginary$},
   text={\imaginary},
   description={square root of minus one ($\sqrt{-1}$)}
@@ -711,14 +711,10 @@ upper case when displaying the glossary. See also
 \argref{mfirstuc-protection} and
 \argref{mfirstuc-math-protection}.)
 
-None of these entries have a \field{sort} field. With
-\argref{interpret} the fallback
-for this field for the \atentryref{symbol} entry type is
-the \field{name} field (or \field{parent} if \field{name} is
-missing), but with \argref{no-interpret} the fallback is the entry's
-label.
-
-This means that with \argref{no-interpret}, and the default
+None of these entries have a \field{sort} field so the \field{name}
+is used. If the entry type had been \atentryref{symbol} instead,
+the fallback would be the entry's label.
+This means that with \entry{symbol} instead of \entry{entry}, and the default
 \optref[sort]{sort-field}, and with
 \optref[letter-case]{sort}, these entries will be defined in
 the order: \texttt{M}, \texttt{S}, \texttt{card}, \texttt{i}, \texttt{v} (since
@@ -727,7 +723,7 @@ with \optref[letter-nocase]{sort-field}, the order will be:
 \texttt{card}, \texttt{i}, \texttt{M}, \texttt{S}, \texttt{v} (since this
 is the case-insensitive letter order of the labels).
 
-However, with \argref{interpret} on, the fallback field will
+However, with \entry{entry}, the fallback field will
 be taken from the \field{name} which in the above example contains \TeX\ code, so
 \bibgls\ will use \file{texparserlib.jar} to interpret this code.
 The library has several different ways of writing the processed
@@ -816,7 +812,7 @@ The transcript shows:
 \begin{verbatim}
 texparserlib: {}$\imaginary$ -> i
 \end{verbatim}
-So the \field{sort} value for this entry is set to \qtt{i}
+So the \field{sort} value for this entry is set to \qtt{i}.
 
 This means that in the case of the default \optref[sort]{sort-field} with
 \optref[letter-case]{sort}, these entries will be defined in
@@ -1350,10 +1346,9 @@ is used to reference an entry from a different set of resources
 replaced by the corresponding element of the list supplied by
 \optref{ext-prefixes}.
 
-In the event that you are using \argref{no-interpret} and
-the \field{sort} value falls back on the label, the original
-label supplied in the \ext{bib} file is used, not the prefixed
-label.
+In the event that the \field{sort} value falls back on the label,
+the original label supplied in the \ext{bib} file is used, not the
+prefixed label.
 
 Avoid non-ASCII characters in the \meta{id} if your document uses the 
 \sty{inputenc} package.
@@ -1703,12 +1698,13 @@ designed specifically for symbols, so in the previous example, the
 \texttt{M} and \texttt{v} terms would be better defined using the
 \atentry{symbol} entry type instead.
 
-The required fields \field{name} or \field{parent}. If the
+The required fields are \field{name} or \field{parent}. If the
 \field{sort} field is omitted, the default sort is given by the
-entry label when \bibgls\ is invoked with \argref{no-interpret} and
-by the \field{name} or \field{parent} when \bibgls\ is invoked with
-\argref{interpret}. See \sectionref{sec:texparserlib} for further
-details.  Terms defined using \atentry{symbol} will be written to
+entry label. Note that this is different from \entry{entry}
+where the sort defaults to \field{name} or \field{parent}
+if omitted. The \field{description} field is not required.
+
+Terms defined using \atentry{symbol} will be written to
 the output file using the command \csref{bibglsnewsymbol}.
 
 \section{\atentry{number}}

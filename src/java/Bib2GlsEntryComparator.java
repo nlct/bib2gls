@@ -140,9 +140,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
             int elem = it.next();
             int offset = it.getOffset();
+            int start = 0;
 
-            while (offset == 0 && elem != CollationElementIterator.NULLORDER)
+            while (elem == 0)
             {
+               start = offset;
                elem = it.next();
                offset = it.getOffset();
             }
@@ -150,7 +152,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             String str;
             int cp = 0;
 
-            if (elem == 0)
+            if (elem == CollationElementIterator.NULLORDER)
             {
                bib2gls.debug(bib2gls.getMessage("message.no.collation.element",
                  value));
@@ -174,13 +176,40 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                }
 
                str = str.substring(0, offset);
+               grp = str;
             }
             else
             {
-               str = value.substring(0, offset);
-            }
+               str = value.substring(start, offset==0?1:offset);
 
-            grp = str;
+               grp = str;
+
+               switch (collator.getStrength())
+               {
+                 case Collator.PRIMARY:
+
+                    String norm = Normalizer.normalize(
+                      str.toLowerCase(), Normalizer.Form.NFD);
+                    norm = norm.replaceAll("\\p{M}", "");
+
+                    if (collator.compare(str, norm) == 0)
+                    {
+                       grp = norm;
+                    }
+
+                 break;
+                 case Collator.SECONDARY:
+
+                    norm = str.toLowerCase();
+
+                    if (collator.compare(str, norm) == 0)
+                    {
+                       grp = norm;
+                    }
+
+                 break;
+               }
+            }
 
             if (!grp.isEmpty())
             {
@@ -191,7 +220,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             {
                // don't title-case the group
             }
-            else if (isDutch && grp.toLowerCase().equals("ij"))
+            else if (isDutch && grp.equals("ij"))
             {
                grp = "IJ";
                cp = Character.toTitleCase(cp);
@@ -394,23 +423,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       bib2gls.debug(bib2gls.getMessage("message.setting.sort",
         collator.getStrength(), collator.getDecomposition()));
 
-      if (bib2gls.useGroupField())
-      {
-         groupMap = new HashMap<Byte,Character>();
-
-         for (char c = 'A'; c <= 'Z'; c++)
-         {
-            CollationKey key = collator.getCollationKey(""+c);
-
-            byte[] bits = key.toByteArray();
-
-            if (bits.length >= 2 && bits[0] == 0)
-            {
-               groupMap.put(bits[1], c);
-            }
-         }
-      }
-
       for (Bib2GlsEntry entry : entries)
       {
          entry.updateHierarchy(entries);
@@ -420,12 +432,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private Character getGroup(byte bit)
-   {
-      if (groupMap == null) return null;
-
-      return groupMap.get(bit);
-   }
 
    private String sortField;
 
@@ -434,8 +440,6 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    private boolean isDutch = false;
 
    private Bib2Gls bib2gls;
-
-   private HashMap<Byte,Character> groupMap = null;
 
    private Vector<Bib2GlsEntry> entries;
 }
