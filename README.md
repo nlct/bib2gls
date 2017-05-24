@@ -35,26 +35,7 @@ There are some test files available in the
 directory.
 
 Latest experimental release: version 0.7a (2017-05-01).
-Added custom sort rule, 
-added `group`, `loc-counters`, `supplemental-locations`,
-`supplemental-category`, `supplemental-selection` resource options,
-added check for missing `openin_any` and `openout_any` (in case of MikTeX),
-changed inconsistent range errors into warnings,
-added `\bibglsinterloper`.
-
-Previous releases:
-
- - version 0.6a (2017-02-24).
-   Added `\bibglspassim`, `\bibglsrange` and `--locale`/`-l`
-
- - version 0.5a (2017-02-09).
-   Added recursive dependency check.
-
- - version 0.4a (2017-02-08).
-   Added `save-locations` option. Fixed --long-arg=value form.
-
- - version 0.3a (2017-02-04).
-   Fixed `@comment` parsing and `--no-interpret` switch.
+([`CHANGES`](https://github.com/nlct/bib2gls/tree/master/src/doc/CHANGES))
 
 # Installation
 

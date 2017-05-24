@@ -1,0 +1,24 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+%\usepackage[record,abbreviations]{glossaries-extra}
+\usepackage[record]{glossaries-extra}
+
+%\GlsXtrLoadResources[type=main,src={entries-multipar},loc-prefix=false]
+%\GlsXtrLoadResources[type=main,src={topics},loc-prefix]
+%\GlsXtrLoadResources[type=abbreviations,src={test-ascii},loc-prefix={p.,pp.}]
+
+\GlsXtrLoadResources[src={entries-multipar},loc-prefix=false]
+\GlsXtrLoadResources[src={topics},loc-prefix]
+\GlsXtrLoadResources[src={test-ascii},loc-prefix={p.,pp.}]
+
+\begin{document}
+\gls{loremi-ii}. \gls{bird}. \gls{elephant}.
+
+\newpage
+\gls{loremi-ii}. \gls{bird}. \gls{elephant}.
+
+\printunsrtglossaries
+\end{document}

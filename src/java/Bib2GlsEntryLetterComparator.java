@@ -33,12 +33,13 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     String sort, String sortField,
-    boolean ignoreCase)
+    boolean ignoreCase, boolean reverse)
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.ignoreCase = ignoreCase;
+      this.reverse = reverse;
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -201,21 +202,21 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
          if (cp1 < cp2)
          {
-            return -1;
+            return reverse ? 1 : -1;
          }
          else if (cp1 > cp2)
          {
-            return 1;
+            return reverse ? -1 : 1;
          }
       }
 
       if (n1 < n2)
       {
-         return -1;
+         return reverse ? 1 : -1;
       }
       else if (n2 > n1)
       {
-         return 1;
+         return reverse ? -1 : 1;
       }
 
       return 0;
@@ -253,7 +254,17 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
+      if (n1 == n2)
+      {
+         return 0;
+      }
+
+      if (reverse)
+      {
+         return n1 < n2 ? 1 : -1;
+      }
+
+      return n1 < n2 ? -1 : 1;
    }
 
    public void sortEntries() throws Bib2GlsException
@@ -273,5 +284,5 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    private Vector<Bib2GlsEntry> entries;
 
-   private boolean ignoreCase;
+   private boolean ignoreCase, reverse;
 }

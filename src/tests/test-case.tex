@@ -1,0 +1,28 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-case},%
+ sort={en},
+ %sort={hu},
+ decomposition={full},
+ %selection={all},
+ strength={primary}
+ %strength={secondary}
+ %strength={tertiary}
+ %strength={identical}
+]
+
+\begin{document}
+\gls{resumee}, \gls{resume}, \gls{RESUME}, \gls{RESUMEE},
+\gls{aardvark}, \gls{rat}, \gls{rot}, \gls{zoo}.
+
+\gls{cafee}, \gls{cafe}, \gls{CAFE}, \gls{CAFEE}.
+
+\printunsrtglossaries
+\end{document}

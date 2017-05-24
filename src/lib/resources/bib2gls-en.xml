@@ -135,6 +135,8 @@ See the manual for further details.</entry>
 <entry key="message.no.fallback">Entry type ''{0}'' has no fallback for field: {1}</entry>
 <entry key="message.inconsistent.range">Inconsistent location format {0}
 with range started by {1}</entry>
+<entry key="message.merge.range">Merging location {0}
+into explicit range {1}</entry>
 <entry key="message.uc.protecting">Inserting empty group in front of {0} to protect it from mfirstuc.</entry>
 <entry key="message.discarding.entry">Discarding entry {0}</entry>
 <entry key="message.pattern.info">Pattern: {0}. Field: {1}. Value: {2}. Matches: {3}.</entry>
@@ -151,10 +153,11 @@ Defaulting to: {0}.
 <entry key="message.no.norm">Can''t normalize {0}.</entry>
 <entry key="message.collator.rules">Collator rules: {0}.</entry>
 <entry key="message.no.collation.element">No collation element for: {0}.</entry>
+<entry key="message.break.points">Break points: {0}.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
-<entry key="tag.passim"> passim</entry>
+<entry key="tag.passim">passim</entry>
 
 <entry key="warning.title">Warning: {0}</entry>
 <entry key="warning.substituting">Substituting {0} with {1}</entry>

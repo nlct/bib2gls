@@ -194,14 +194,15 @@ public class GlsResource
 
                   String field = split.get(0).toString(parser);
 
-                  if (split.size() != 2)
+                  if (split.size() > 2)
                   {
                      throw new IllegalArgumentException(
                        bib2gls.getMessage("error.invalid.opt.keylist.value", 
                         field, array[i].toString(parser), opt));
                   }
 
-                  String val = split.get(1).toString(parser);
+                  String val = split.size() == 1 ? "" 
+                               : split.get(1).toString(parser);
 
                   // Has this field already been added?
 
@@ -545,6 +546,8 @@ public class GlsResource
          {
             String[] values = getStringArray(parser, "true", list, opt);
 
+            defpagesname=false;
+
             if (values.length == 1)
             {
                if (values[0].equals("false"))
@@ -557,8 +560,9 @@ public class GlsResource
                }
                else if (values[0].equals("true"))
                {
-                  locationPrefix = new String[]{bib2gls.getMessage("tag.page"),
-                    bib2gls.getMessage("tag.pages")};
+                  locationPrefix = new String[]{"\\bibglspagename ",
+                    bib2gls.getMessage("\\bibglspagesname ")};
+                  defpagesname=true;
                }
                else
                {
@@ -608,6 +612,32 @@ public class GlsResource
                   break;
                }
             }
+         }
+         else if (opt.equals("break-at"))
+         {
+            String val = getChoice(parser, list, opt, "none", "word",
+              "character", "sentence");
+
+            if (val.equals("none"))
+            {
+               breakPoint = Bib2GlsEntryComparator.BREAK_NONE;
+            }
+            else if (val.equals("word"))
+            {
+               breakPoint = Bib2GlsEntryComparator.BREAK_WORD;
+            }
+            else if (val.equals("character"))
+            {
+               breakPoint = Bib2GlsEntryComparator.BREAK_CHAR;
+            }
+            else if (val.equals("sentence"))
+            {
+               breakPoint = Bib2GlsEntryComparator.BREAK_SENTENCE;
+            }
+         }
+         else if (opt.equals("break-marker"))
+         {
+            breakPointMarker = getOptional(parser, "", list, opt);
          }
          else if (opt.equals("strength"))
          { // collator strength
@@ -2524,7 +2554,15 @@ public class GlsResource
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, false);
+                 entrySort, entrySortField, false, false);
+
+            comparator.sortEntries();
+         }
+         else if (entrySort.equals("letter-case-reverse"))
+         {
+            Bib2GlsEntryLetterComparator comparator = 
+               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+                 entrySort, entrySortField, false, true);
 
             comparator.sortEntries();
          }
@@ -2532,7 +2570,15 @@ public class GlsResource
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, true);
+                 entrySort, entrySortField, true, false);
+
+            comparator.sortEntries();
+         }
+         else if (entrySort.equals("letter-nocase-reverse"))
+         {
+            Bib2GlsEntryLetterComparator comparator = 
+               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+                 entrySort, entrySortField, true, true);
 
             comparator.sortEntries();
          }
@@ -2557,7 +2603,7 @@ public class GlsResource
                   new Bib2GlsEntryComparator(bib2gls, entries, 
                      entrySortField,
                      collatorStrength, collatorDecomposition,
-                     entrySortRules);
+                     entrySortRules, breakPoint, breakPointMarker);
 
                comparator.sortEntries();
             }
@@ -2583,7 +2629,8 @@ public class GlsResource
             Bib2GlsEntryComparator comparator = 
                new Bib2GlsEntryComparator(bib2gls, entries, 
                   locale, entrySortField, 
-                  collatorStrength, collatorDecomposition);
+                  collatorStrength, collatorDecomposition,
+                  breakPoint, breakPointMarker);
 
             comparator.sortEntries();
          }
@@ -2669,8 +2716,9 @@ public class GlsResource
 
          writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
          writer.println("\\providecommand{\\bibglsinterloper}[1]{#1\\delimN }");
-         writer.format("\\providecommand{\\bibglspassim}{%s}%n",
+         writer.format("\\providecommand{\\bibglspassimname}{%s}%n",
              bib2gls.getMessage("tag.passim"));
+         writer.println("\\providecommand{\\bibglspassim}{ \\bibglspassimname}");
          writer.println();
 
          if (counters != null)
@@ -2733,6 +2781,14 @@ public class GlsResource
          {
             writer.println("\\providecommand{\\bibglspostlocprefix}{\\ }");
 
+            if (defpagesname)
+            {
+               writer.format("\\providecommand{\\bibglspagename}{%s}%n",
+                 bib2gls.getMessage("tag.page"));
+               writer.format("\\providecommand{\\bibglspagesname}{%s}%n",
+                 bib2gls.getMessage("tag.pages"));
+            }
+
             if (type == null)
             {
                writer.println("\\appto\\glossarypreamble{%");
@@ -2753,7 +2809,7 @@ public class GlsResource
             }
 
             writer.println("  \\fi");
-            writer.println(" }");
+            writer.println(" }%");
 
             writer.println("}");
          }
@@ -2788,7 +2844,7 @@ public class GlsResource
 
                writer.print("\\fi");
             }
-            writer.println("}");
+            writer.println("}%");
 
             writer.println("}");
          }
@@ -2981,7 +3037,17 @@ public class GlsResource
                      new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
-                       false);
+                       false, false);
+
+                  comparator.sortEntries();
+               }
+               else if (secondarySort.equals("letter-case-reverse"))
+               {
+                  Bib2GlsEntryLetterComparator comparator = 
+                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
+                       secondarySort,
+                       secondaryField == null ? sortField : secondaryField,
+                       false, true);
 
                   comparator.sortEntries();
                }
@@ -2991,7 +3057,17 @@ public class GlsResource
                      new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
-                       true);
+                       true, false);
+
+                  comparator.sortEntries();
+               }
+               else if (secondarySort.equals("letter-nocase-reverse"))
+               {
+                  Bib2GlsEntryLetterComparator comparator = 
+                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
+                       secondarySort,
+                       secondaryField == null ? sortField : secondaryField,
+                       true, true);
 
                   comparator.sortEntries();
                }
@@ -3017,7 +3093,7 @@ public class GlsResource
                         new Bib2GlsEntryComparator(bib2gls, secondaryList, 
                            secondaryField == null ? sortField : secondaryField,
                            collatorStrength, collatorDecomposition,
-                           secondarySortRules);
+                           secondarySortRules, breakPoint, breakPointMarker);
 
                      comparator.sortEntries();
                   }
@@ -3045,7 +3121,8 @@ public class GlsResource
                      new Bib2GlsEntryComparator(bib2gls, secondaryList, 
                         locale,
                         secondaryField == null ? sortField : secondaryField,
-                        collatorStrength, collatorDecomposition);
+                        collatorStrength, collatorDecomposition,
+                        breakPoint, breakPointMarker);
 
                   comparator.sortEntries();
                }
@@ -3711,6 +3788,9 @@ public class GlsResource
 
    private int collatorDecomposition=Collator.CANONICAL_DECOMPOSITION;
 
+   private int breakPoint = Bib2GlsEntryComparator.BREAK_WORD;
+   private String breakPointMarker = "|";
+
    private int seeLocation=Bib2GlsEntry.POST_SEE;
 
    private String[] locationPrefix = null;
@@ -3718,6 +3798,8 @@ public class GlsResource
    private String[] locationSuffix = null;
 
    private boolean saveLocations = true;
+
+   private boolean defpagesname = false;
 
    public static final int ALIAS_LOC_OMIT=0;
    public static final int ALIAS_LOC_TRANS=1;

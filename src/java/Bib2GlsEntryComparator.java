@@ -27,6 +27,7 @@ import java.text.CollationElementIterator;
 import java.text.ParseException;
 import java.text.CollationKey;
 import java.text.Normalizer;
+import java.text.BreakIterator;
 import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
@@ -37,6 +38,16 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
     Vector<Bib2GlsEntry> entries,
     Locale locale, String sortField,
     int strength, int decomposition)
+   {
+      this(bib2gls, entries, locale, sortField, strength, decomposition,
+        BREAK_WORD, "|");
+   }
+
+   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
+    Vector<Bib2GlsEntry> entries,
+    Locale locale, String sortField,
+    int strength, int decomposition,
+    int breakPoint, String breakMarker)
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
@@ -51,11 +62,23 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
          bib2gls.debug(bib2gls.getMessage("message.collator.rules",
            ((RuleBasedCollator)collator).getRules()));
       }
+
+      setBreakPoint(breakPoint, breakMarker, locale);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, String sortField,
     int strength, int decomposition, String rules)
+   throws ParseException
+   {
+      this(bib2gls, entries, sortField, strength, decomposition, rules,
+        BREAK_WORD, "|");
+   }
+
+   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
+    Vector<Bib2GlsEntry> entries, String sortField,
+    int strength, int decomposition, String rules,
+    int breakPoint, String breakMarker)
    throws ParseException
    {
       this.sortField = sortField;
@@ -66,12 +89,43 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       collator.setStrength(strength);
       collator.setDecomposition(decomposition);
 
-      String docLocale = bib2gls.getDocDefaultLocale();
-
       if (bib2gls.getDebugLevel() > 0)
       {
          bib2gls.debug(bib2gls.getMessage("message.collator.rules",
            ((RuleBasedCollator)collator).getRules()));
+      }
+
+      if (breakPoint != BREAK_NONE)
+      {
+         String docLocale = bib2gls.getDocDefaultLocale();
+
+         setBreakPoint(breakPoint, breakMarker,
+                       Locale.forLanguageTag(docLocale));
+      }
+   }
+
+   private void setBreakPoint(int breakPoint, String breakMarker,
+      Locale locale)
+   {
+      breakPointMarker = breakMarker;
+
+      switch (breakPoint)
+      {
+         case BREAK_NONE:
+            breakIterator = null;
+         break;
+         case BREAK_WORD:
+            breakIterator = BreakIterator.getWordInstance(locale);
+         break;
+         case BREAK_CHAR:
+            breakIterator = BreakIterator.getCharacterInstance(locale);
+         break;
+         case BREAK_SENTENCE:
+            breakIterator = BreakIterator.getSentenceInstance(locale);
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid break identifier: "
+              +breakPoint);
       }
    }
 
@@ -115,6 +169,14 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       entry.putField("sort", value);
 
       String grp = null;
+
+      value = breakPoints(value).toString();
+
+      if (breakIterator != null)
+      {
+         bib2gls.debug(bib2gls.getMessage("message.break.points",
+           value));
+      }
 
       CollationKey key = collator.getCollationKey(value);
       entry.setCollationKey(key);
@@ -416,12 +478,49 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
+   public CharSequence breakPoints(String target)
+   {
+      if (breakIterator == null)
+      {
+         return target;
+      }
+
+      StringBuffer buff = new StringBuffer();
+
+      breakIterator.setText(target);
+
+      int start = breakIterator.first();
+      int end = breakIterator.next();
+
+      while (end != BreakIterator.DONE)
+      {
+          String word = target.substring(start,end);
+
+          if (Character.isLetterOrDigit(word.charAt(0)))
+          {
+             buff.append(word);
+             buff.append(breakPointMarker);
+          }
+
+          start = end;
+          end = breakIterator.next();
+      }
+
+      return buff;
+   }
 
    private String sortField;
 
    private Collator collator;
 
+   private BreakIterator breakIterator;
+
+   private String breakPointMarker="|";
+
    private Bib2Gls bib2gls;
 
    private Vector<Bib2GlsEntry> entries;
+
+   public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
+     BREAK_SENTENCE=3;
 }
