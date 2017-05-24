@@ -3013,14 +3013,14 @@ then both the \texttt{dog} and \texttt{dual.dog} entries will
 have their \field{category} field set to \optfmt{dual} since the
 new definition of \cs{bibglsnewdualentry} has overridden
 the \csopt[animals]{category} option.
-\subsection{\csoptnv{type}=\margm{value}}
 
+\subsection{\csoptnv{type}=\margm{value}}
 \labelopt{type}
 
 The \meta{value} may be \optfmt{same as entry} or a glossary label.
 This is similar to the \optref{category} option except that
 it sets the \field{type} field. As with the \csopt{category} option,
-\csopt[same as entry]{value} indicates that the entry
+\csopt[same as entry]{type} indicates that the entry
 type should be used. There is no \meta{value} analogous to
 \csopt[same as type]{category}.
 
@@ -3801,7 +3801,7 @@ entry and the target entry must be in the same resource set.
 \cs{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version
 1.12, you may need to redefine \cs{glsxtrsetaliasnoindex} to do
 nothing if the location lists aren't showing correctly
-with aliased entries. This will be corrected in version 1.13.
+with aliased entries. (This was corrected in version 1.13.)
 
 \subsection{\csoptnv{loc-prefix}=\margm{value}}
 \labelopt{loc-prefix}
@@ -3830,7 +3830,7 @@ preamble providing an \cs{ifcase} condition:
 
 \item \optfmt{list}: equivalent to \csopt[\cs{pagelistname} ]{loc-prefix}.
 \item \optfmt{true}: equivalent to 
-\csopt[\csref{bibglspagename},\meta{bibglspagesname}]{loc-prefix},
+\csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
 where the definitions of \cs{bibglspagename} and
 \cs{bibglspagesname} are obtained from the \texttt{tag.page} and
 \texttt{tag.pages} entries in \bibgls's \hyperref[sec:lang.xml]{language file}.
@@ -3857,7 +3857,7 @@ This works since the conflicting \csopt[p.,pp.]{loc-prefix} and
 \optref{type} key). The entries fetched from \texttt{entries1.bib}
 won't have a location prefix. The entries fetched from
 \texttt{entries2.bib} will have the location prefix obtained from
-from the language resource file. The entries fetched from
+the language resource file. The entries fetched from
 \texttt{entries3.bib} will have the location prefix \qt{p.}\ or
 \qt{pp.} (Note that using the \csopt{type} option isn't the same as
 setting the \field{type} field for each entry in the \ext{bib}
@@ -3870,11 +3870,10 @@ If the \csopt{type} option isn't used:
 \GlsXtrLoadResources[src={entries3},loc-prefix={p.,pp.}]
 \end{verbatim}
 then \csopt[true]{loc-prefix} takes precedence over
-\csopt[p.,pp.]{loc-prefix}. The entries fetched from
-\texttt{entries1.bib} still won't have a location prefix, but the
-entries fetched from both \texttt{entries2.bib} and
-\texttt{entries3.bib} have the location prefixes obtained from the
-language resource file.
+\csopt[p.,pp.]{loc-prefix} (since it was used first). The entries fetched from
+\texttt{entries1.bib} still won't have a location prefix, but the entries
+fetched from both \texttt{entries2.bib} and \texttt{entries3.bib}
+have the location prefixes obtained from the language resource file.
 
 \subsection{\csoptnv{loc-suffix}=\margm{value}}
 \labelopt{loc-suffix}
@@ -5432,8 +5431,7 @@ the \meta{group} part will be \texttt{\AA}. In both cases the
 \meta{character} argument will be \texttt{\AA}.
 
 The \meta{group} argument will typically by title-cased. An exception is made to the
-title-casing for the digraph \qt{ij} when the main document language
-is Dutch, in which case \meta{group} will be \qt{IJ} (rather than
+title-casing for the digraph \qt{ij} which will be \qt{IJ} (rather than
 \qt{Ij}).
 
 The default definition of this command depends on the
