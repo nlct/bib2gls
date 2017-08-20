@@ -5656,6 +5656,42 @@ or redefined after the resources are loaded:
 \renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
 
+\chapter{Converting Existing .tex to .bib}
+
+If you have already been using the \sty{glossaries} or
+\sty{glossaries-extra} package with a large file containing all your
+definitions using commands like \cs{newglossaryentry}, then you can
+use the supplementary tool \app{convertgls2bib} to convert the definitions
+to \ext{bib} format. The syntax is:
+\begin{alltt}
+convertgls2bib \oargm{options} \meta{tex file} \meta{bib file}
+\end{alltt}
+where \meta{tex file} is the \ext{tex} file and \meta{bib file} is
+the \ext{bib} file. This application is less secure than \bibgls\ as
+it doesn't use \app{kpsewhich} to check \texttt{openin\_any} and 
+\texttt{openout\_any}.
+
+The \meta{options} are:
+\begin{description}
+\item[\longargfmt{texenc} \meta{encoding}] The character encoding of the
+\ext{tex} file.
+\item[\longargfmt{bibenc} \meta{encoding}] The character encoding of the
+\ext{bib} file.
+\item[\longargfmt{help} or \shortargfmt{h}] Display help message and
+quit.
+\item[\longargfmt{version} or \shortargfmt{v}] Display version
+information and quit.
+\end{description}
+
+This application recognises the following commands:
+\cs{newglossaryentry},
+\cs{provideglossaryentry},
+\cs{longnewglossaryentry},
+\cs{longprovideglossaryentry},
+\cs{newterm},
+\cs{newabbreviation},
+\cs{newacronym}.
+
 \resetsecnumdepth
 
 \printindex

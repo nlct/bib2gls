@@ -1,0 +1,2 @@
+Main-Class: com/dickimawbooks/gls2bib/Gls2Bib
+Class-Path: . texparserlib.jar

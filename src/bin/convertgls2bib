@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# This bash script is just for testing the development
+# ../lib/convertgls2bib.jar
+# file. The file convertgls2bib.sh will be the script that's distributed.
+
+bindir=`dirname "$0"`
+java -jar "$bindir/../lib/convertgls2bib.jar" "$@"
