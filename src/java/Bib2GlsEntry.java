@@ -273,8 +273,10 @@ public class Bib2GlsEntry extends BibEntry
 
             try
             {
-               if (csname.equals("glssee"))
+               if (csname.equals("glssee")
+                || csname.equals("glsxtrindexseealso"))
                {// \glssee[tag]{label}{xr-label-list}
+                // or \glsxtrindexseealso{label}{xr-label-list}
 
                   found = (i==0);
 
@@ -998,6 +1000,11 @@ public class Bib2GlsEntry extends BibEntry
       return crossRefs;
    }
 
+   public String[] getAlsoCrossRefs()
+   {
+      return alsocrossRefs;
+   }
+
    public void addCrossRefdBy(Bib2GlsEntry entry)
    {
       if (crossRefdBy == null)
@@ -1053,6 +1060,8 @@ public class Bib2GlsEntry extends BibEntry
 
       if (supplementalRecords != null) n = supplementalRecords.size();
 
+      if (ignoredRecords != null) n = ignoredRecords.size();
+
       if (records != null) return n + records.size();
 
       for (String counter : resource.getLocationCounters())
@@ -1082,6 +1091,11 @@ public class Bib2GlsEntry extends BibEntry
       return supplementalRecords == null ? 0 : supplementalRecords.size();
    }
 
+   public int ignoredRecordCount()
+   {
+      return ignoredRecords == null ? 0 : ignoredRecords.size();
+   }
+
    public boolean hasRecords()
    {
       return recordCount() > 0;
@@ -1089,7 +1103,12 @@ public class Bib2GlsEntry extends BibEntry
 
    public void addRecord(GlsRecord record)
    {
-      if (records != null)
+      if (record.getFormat().equals("glsignore"))
+      {
+         bib2gls.debug(bib2gls.getMessage("message.ignored.record", record));
+         addIgnoredRecord(record);
+      }
+      else if (records != null)
       {
          if (!records.contains(record))
          {
@@ -1135,6 +1154,21 @@ public class Bib2GlsEntry extends BibEntry
       if (!supplementalRecords.contains(record))
       {
          supplementalRecords.add(record);
+      }
+   }
+
+   public void addIgnoredRecord(GlsRecord record)
+   {
+      if (ignoredRecords == null)
+      {
+         ignoredRecords = new Vector<GlsRecord>();
+      }
+
+      record.setLabel(getId());
+
+      if (!ignoredRecords.contains(record))
+      {
+         ignoredRecords.add(record);
       }
    }
 
@@ -1359,7 +1393,8 @@ public class Bib2GlsEntry extends BibEntry
    }
 
    public void updateLocationList(int minRange, String suffixF,
-     String suffixFF, int seeLocation, boolean showLocationPrefix, 
+     String suffixFF, int seeLocation, int seealsoLocation,
+     boolean showLocationPrefix, 
      boolean showLocationSuffix, int gap)
    throws Bib2GlsException
    {
@@ -1401,6 +1436,34 @@ public class Bib2GlsEntry extends BibEntry
          }
 
          listBuilder.append("}{}");
+
+         locationList.add(listBuilder.toString());
+      }
+      else if (seealsoLocation == PRE_SEE && alsocrossRefs != null)
+      {
+         builder = new StringBuilder();
+         builder.append("\\glsxtruseseealso{");
+         builder.append(getId());
+         builder.append("}");
+
+         if (numRecords > 0)
+         {
+            builder.append("\\bibglsseealsosep ");
+         }
+
+         StringBuilder listBuilder = new StringBuilder();
+         listBuilder.append("\\glsxtruseseealsoformat");
+
+         listBuilder.append("{");
+
+         for (int i = 0; i < alsocrossRefs.length; i++)
+         {
+            if (i > 0) listBuilder.append(",");
+
+            listBuilder.append(processLabel(alsocrossRefs[i]));
+         }
+
+         listBuilder.append("}");
 
          locationList.add(listBuilder.toString());
       }
@@ -1521,10 +1584,44 @@ public class Bib2GlsEntry extends BibEntry
 
          locationList.add(listBuilder.toString());
       }
+      else if (seealsoLocation == POST_SEE && alsocrossRefs != null)
+      {
+         if (builder == null)
+         {
+            builder = new StringBuilder();
+         }
+
+         if (hasLocationList)
+         {
+            builder.append("\\bibglsseealsosep ");
+         }
+
+         builder.append("\\glsxtruseseealso{");
+         builder.append(getId());
+         builder.append("}");
+
+         StringBuilder listBuilder = new StringBuilder();
+
+         listBuilder.append("\\glsxtruseseealsoformat");
+
+         listBuilder.append("{");
+
+         for (int i = 0; i < alsocrossRefs.length; i++)
+         {
+            if (i > 0) listBuilder.append(",");
+
+            listBuilder.append(processLabel(alsocrossRefs[i]));
+         }
+
+         listBuilder.append("}");
+
+         locationList.add(listBuilder.toString());
+      }
 
       if (builder != null)
       {
-         if (showLocationSuffix && (numRecords > 0 || crossRefs != null))
+         if (showLocationSuffix && (numRecords > 0 || crossRefs != null
+             || alsocrossRefs != null))
          {
             builder.append(String.format("\\bibglslocsuffix{%d}",
               numRecords));
@@ -1564,9 +1661,19 @@ public class Bib2GlsEntry extends BibEntry
       BibValueList value = getField("see");
       TeXObjectList valList = null;
 
+      BibValueList seeAlsoValue = getField("seealso");
+
       if (value == null)
-      {// no 'see' field, check for \glssee records
-       // (see field overrides any instances of \glssee)
+      {// no 'see' field, is there a 'seealso' field?
+
+         if (seeAlsoValue != null)
+         {
+            initAlsoCrossRefs(parser, seeAlsoValue);
+            return;
+         }
+
+         // no 'seealso' field, so check for \glssee records
+         // (see field overrides any instances of \glssee)
 
          GlsSeeRecord record = bib2gls.getSeeRecord(getId());
 
@@ -1588,6 +1695,12 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      if (seeAlsoValue != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.field.clash",
+           "see", "seealso"));
+      }
+
       if (valList == null)
       {
          valList = value.expand(parser);
@@ -1595,6 +1708,14 @@ public class Bib2GlsEntry extends BibEntry
 
       StringBuilder builder = new StringBuilder();
 
+      initSeeRef(parser, valList, builder);
+
+   }
+
+   private void initSeeRef(TeXParser parser, TeXObjectList valList,
+    StringBuilder builder)
+    throws IOException
+   {
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
@@ -1642,6 +1763,64 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       putField("see", builder.toString());
+   }
+
+   private void initAlsoCrossRefs(TeXParser parser, BibValueList value)
+    throws IOException
+   {
+      StringBuilder builder = new StringBuilder();
+
+      TeXObjectList valList = value.expand(parser);
+
+      if (!bib2gls.isKnownField("seealso"))
+      {// seealso field not supported, so replicate see=[\seealsoname]
+
+         bib2gls.warning(bib2gls.getMessage(
+           "warning.field.unsupported", "seealso", "1.16"));
+
+         crossRefTag = "\\seealsoname ";
+         builder.append("[\\seealsoname]");
+         initSeeRef(parser, valList, builder);
+
+         return;
+      }
+
+      if (valList instanceof Group)
+      {
+         valList = ((Group)valList).toList();
+      }
+
+      CsvList csvList = CsvList.getList(parser, valList);
+
+      int n = csvList.size();
+
+      if (n == 0) return;
+
+      alsocrossRefs = new String[n];
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject xr = csvList.get(i);
+
+         if (xr instanceof TeXObjectList)
+         {
+            xr = GlsResource.trimList((TeXObjectList)xr);
+         }
+
+         alsocrossRefs[i] = xr.toString(parser);
+
+         String label = processLabel(alsocrossRefs[i]);
+
+         addDependency(label);
+         builder.append(label);
+
+         if (i != n-1)
+         {
+            builder.append(',');
+         }
+      }
+
+      putField("seealso", builder.toString());
    }
 
    public void setCollationKey(CollationKey key)
@@ -1713,6 +1892,7 @@ public class Bib2GlsEntry extends BibEntry
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
    private Vector<GlsRecord> supplementalRecords;
+   private Vector<GlsRecord> ignoredRecords;
 
    private HashMap<String,String> fieldValues;
 
@@ -1724,6 +1904,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private String crossRefTag = null;
    private String[] crossRefs = null;
+   private String[] alsocrossRefs = null;
 
    public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
 

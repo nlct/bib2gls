@@ -517,6 +517,23 @@ public class GlsResource
                seeLocation = Bib2GlsEntry.POST_SEE;
             }
          }
+         else if (opt.equals("seealso"))
+         {
+            String val = getChoice(parser, list, opt, "omit", "before", "after");
+
+            if (val.equals("omit"))
+            {
+               seeAlsoLocation = Bib2GlsEntry.NO_SEE;
+            }
+            else if (val.equals("before"))
+            {
+               seeAlsoLocation = Bib2GlsEntry.PRE_SEE;
+            }
+            else if (val.equals("after"))
+            {
+               seeAlsoLocation = Bib2GlsEntry.POST_SEE;
+            }
+         }
          else if (opt.equals("loc-counters"))
          {
             String[] values = getStringArray(parser, list, opt);
@@ -1048,6 +1065,12 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "see"));
+      }
+
+      if (seeAlsoLocation != Bib2GlsEntry.POST_SEE)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "seealso"));
       }
 
       if (locationPrefix != null)
@@ -2072,9 +2095,10 @@ public class GlsResource
 
                   if (dualHasRecords)
                   {
-                     // Does the "see" field need setting?
+                     // Do the "see" or "seealso" fields need setting?
 
-                     if (dual.getFieldValue("see") == null)
+                     if (dual.getFieldValue("see") == null
+                       && dual.getFieldValue("seealso") == null)
                      {
                         dual.initCrossRefs(parser);
                      }
@@ -2096,25 +2120,10 @@ public class GlsResource
                   // Does the entry have a cross reference list?
 
                   entry.initCrossRefs(parser);
-                  String[] xrList = entry.getCrossRefs();
 
-                  if (xrList != null)
-                  {
-                     for (String xr : xrList)
-                     {
-                        Bib2GlsEntry xrEntry = getBib2GlsEntry(xr, list);
+                  addCrossRefs(list, entry, entry.getCrossRefs(), seeList);
 
-                        if (xrEntry != null)
-                        {
-                           xrEntry.addCrossRefdBy(entry);
-
-                           if (!seeList.contains(xrEntry))
-                           {
-                              seeList.add(xrEntry);
-                           }
-                        }
-                     }
-                  }
+                  addCrossRefs(list, entry, entry.getAlsoCrossRefs(), seeList);
                }
             }
          }
@@ -2142,6 +2151,29 @@ public class GlsResource
       }
 
       addSupplementalRecords();
+   }
+
+
+   private void addCrossRefs(Vector<BibData> list,
+      Bib2GlsEntry entry, String[] xrList,
+      Vector<Bib2GlsEntry> seeList)
+   {
+      if (xrList == null) return;
+
+      for (String xr : xrList)
+      {
+         Bib2GlsEntry xrEntry = getBib2GlsEntry(xr, list);
+
+         if (xrEntry != null)
+         {
+            xrEntry.addCrossRefdBy(entry);
+
+            if (!seeList.contains(xrEntry))
+            {
+               seeList.add(xrEntry);
+            }
+         }
+      }
    }
 
    private void addSupplementalRecords()
@@ -2194,7 +2226,7 @@ public class GlsResource
      Vector<BibData> list)
     throws IOException
    {
-      // does this entry have a "see" field?
+      // does this entry have a "see" or "seealso" field?
 
       entry.initCrossRefs(parser);
 
@@ -2747,6 +2779,12 @@ public class GlsResource
             writer.println();
          }
 
+         if (seeAlsoLocation != Bib2GlsEntry.NO_SEE)
+         {
+            writer.println("\\providecommand{\\bibglsseealsosep}{, }");
+            writer.println();
+         }
+
          if (bib2gls.useGroupField())
          {
             writer.println("\\ifdef\\glsxtrsetgrouptitle");
@@ -2899,7 +2937,7 @@ public class GlsResource
             if (saveLocations)
             {
                entry.updateLocationList(minLocationRange,
-                 suffixF, suffixFF, seeLocation, 
+                 suffixF, suffixFF, seeLocation, seeAlsoLocation,
                  locationPrefix != null, locationSuffix != null,
                  locGap);
             }
@@ -2964,7 +3002,7 @@ public class GlsResource
                if (saveLocations)
                {
                   entry.updateLocationList(minLocationRange,
-                    suffixF, suffixFF, seeLocation, 
+                    suffixF, suffixFF, seeLocation, seeAlsoLocation,
                     locationPrefix != null,
                     locationSuffix != null,
                     locGap);
@@ -3792,6 +3830,7 @@ public class GlsResource
    private String breakPointMarker = "|";
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
+   private int seeAlsoLocation=Bib2GlsEntry.POST_SEE;
 
    private String[] locationPrefix = null;
 

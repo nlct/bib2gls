@@ -69,7 +69,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    {
       if (field.equals("sort"))
       {
-         return getField("id");
+         return getIdField();
       }
 
       return super.getFallbackContents(field);

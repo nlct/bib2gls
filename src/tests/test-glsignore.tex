@@ -1,0 +1,57 @@
+% arara: pdflatex
+% arara: bib2gls if found ("log", "Warning: Glossary entry")
+% arara: pdflatex if found ("log", "Warning: Glossary entry")
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{book}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,style=tree]{glossaries-extra}
+
+\GlsXtrLoadResources[sort=en-GB,% sort according to this locale
+ label-prefix={gls.},% insert this prefix to all the labels
+ src={test-entries}]
+
+\begin{document}
+\frontmatter
+
+\chapter{Front Matter Chapter}
+\GlsXtrSetDefaultNumberFormat{glsignore}
+
+\gls{gls.sample}.
+
+\mainmatter
+\chapter{Main Matter Chapter}
+\GlsXtrSetDefaultNumberFormat{glsnumberformat}
+
+\gls{gls.sample}. \gls{gls.bird}. \gls{gls.waterfowl}.
+
+\newpage
+
+\gls[format=glsignore]{gls.sample} (ignore location).
+\gls{gls.sample}.
+
+\newpage
+\gls[format=glsignore]{gls.sample} (ignore location).
+
+\newpage
+
+\gls{gls.sample}, \gls{gls.bird}.
+
+\newpage
+
+\gls{gls.sample}, \gls{gls.waterfowl}.
+
+\newpage
+
+Just indexing\glsadd{gls.bird}.
+
+\backmatter
+\pagenumbering{Roman}
+\chapter{Back Matter Chapter}
+\GlsXtrSetDefaultNumberFormat{glsignore}
+
+\gls{gls.sample}, \gls{gls.waterfowl}.\glsadd{gls.bird}
+
+\printunsrtglossaries
+\end{document}

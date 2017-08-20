@@ -1053,6 +1053,7 @@ public class Bib2Gls implements TeXApp
                   }
 
                   // Any format overrides the default "glsnumberformat"
+                  // (or the ignored format "glsignore")
                   // unless there's a range formation.
 
                   if (existingPrefix.equals(")") && newPrefix.equals("("))
@@ -1104,6 +1105,26 @@ public class Bib2Gls implements TeXApp
 
                      existingRecord.setFormat(newPrefix+newFmt);
                   }
+                  else if (newFmt.equals("glsignore"))
+                  {// discard the new record
+
+                     debug();
+                     debug(getMessage("warning.discarding.conflicting.record",
+                       newPrefix+newFmt, existingPrefix+existingFmt,
+                       newRecord, existingRecord));
+                     debug();
+                  }
+                  else if (existingFmt.equals("glsignore"))
+                  {// override the existing record
+
+                     debug();
+                     debug(getMessage("warning.discarding.conflicting.record",
+                       newPrefix+newFmt, existingPrefix+existingFmt,
+                       existingRecord, newRecord));
+                     debug();
+
+                     existingRecord.setFormat(newPrefix+newFmt);
+                  } 
                   else if (newFmt.equals("glsnumberformat"))
                   {// discard the new record
 
@@ -2966,9 +2987,9 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "0.8a";
+   public static final String VERSION = "0.9a";
    public static final String DATE = "EXPERIMENTAL";
-   //public static final String DATE = "2017-05-24";
+   //public static final String DATE = "2017-08-20";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

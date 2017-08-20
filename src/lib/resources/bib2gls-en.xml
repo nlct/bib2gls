@@ -148,6 +148,7 @@ Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
 <entry key="message.adding.target.record">Adding record {0} from aliased entry {1}.</entry>
+<entry key="message.ignored.record">Ignoring record {0}.</entry>
 <entry key="message.normalizing">Normalising {0} to {1}.</entry>
 <entry key="message.norm.distinct">Normalized {0} distinct from {1}.</entry>
 <entry key="message.no.norm">Can''t normalize {0}.</entry>
@@ -187,6 +188,10 @@ Discarding: {4}
 Discarding: {5}
 Replacement: {6}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
+<entry key="warning.field.clash">Field clash: {0} and {1}
+Ignoring {1}</entry>
+<entry key="warning.field.unsupported">Unsupported field: {0}
+(Update glossaries-extra.sty to at least version {1})</entry>
 <entry key="warning.option.clash">Option clash: {0} and {1}
 Ignoring {1}</entry>
 <entry key="warning.option.pair.required">Resource option {0} requires option {1}</entry>

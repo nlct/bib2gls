@@ -1392,8 +1392,8 @@ some reason (for example, for sorting), \bibgls\ will try to
 fallback on another value. The actual fallback value depends on the
 entry type.
 
-Other entries can be cross-referenced using the \field{see} or
-\field{alias} fields or
+Other entries can be cross-referenced using the \field{see},
+\field{seealso} or \field{alias} fields or
 by using commands like \cs{gls} or \cs{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
@@ -1404,6 +1404,22 @@ otherwise the reference from \cs{glssee} will be transferred to the
 \field{see} field (provided you have at least v1.14 of
 \sty{glossaries-extra}). In general, it's best just to use the \field{see}
 field and not use \cs{glssee}.
+
+The \field{seealso} key was only added to \sty{glossaries-extra}
+v1.16, but this field may be used with \bibgls\ even if you only
+have version 1.14 or 1.15. If the key isn't available,
+\texttt{seealso=\margm{xr-list}} will be treated as
+\texttt{see=\marg{[\cs{seealsoname}]\meta{xr-list}}} (the resource
+option \optref{seealso} won't have an effect).  You can't use both
+\field{see} and \field{seealso} for the same entry with \bibgls.
+Note that the \field{seealso} field doesn't allow for the optional
+\oarg{tag} part. If you need a different tag, either use \field{see}
+or change the definition of \cs{seealsoname} or
+\cs{glsxtruseseealsoformat}.  Note that, unless you are using
+\app{xindy}, \cs{glsxtrindexseealso} just does
+\cs{glssee}[\cs{seealsoname}], and so will be treated as \field{see}
+rather than \field{seealso} by \bibgls. Again, it's better to just
+use the \field{seealso} field directly.
 
 \section{\atentry{string}}
 \labelatentry{string}
@@ -2537,10 +2553,10 @@ following values are allowed:
 \item \optfmt{recorded and deps}: add all recorded entries and
 their dependencies (default).
 \item \optfmt{recorded and deps and see}: as above but will also
-add unrecorded entries whose \field{see} field refers to a recorded entry.
+add unrecorded entries whose \field{see} or \field{seealso} field refers to a recorded entry.
 \item \optfmt{recorded no deps}: add all recorded entries but not
 their dependencies. The dependencies include those referenced in the
-\field{see} field, \field{parent} entries and those found referenced
+\field{see} or \field{seealso} field, \field{parent} entries and those found referenced
 with commands like \cs{gls} in the field values that are parsed by
 \bibgls. With this setting, parents will be omitted unless they've
 been referenced in the document through commands like \cs{gls}.
@@ -2798,7 +2814,7 @@ parsing and processing data contained in \ext{bib} files
 
 The use of \optfmt{master} isn't always suitable. In particular
 if any of the terms cross-reference each other, such as through
-the \field{see} field or the \field{parent} field or
+the \field{see} or \field{seealso} field or the \field{parent} field or
 using commands like \cs{gls} in any of the other fields when
 the labels have been assigned prefixes. In this
 case you will need to use the method described in the example above.
@@ -3376,13 +3392,19 @@ The \styopt{record} package option automatically adds two new keys:
 \field{loclist} and \field{location}. These two fields are set by
 \bibgls\ from the information supplied in the \ext{aux} file (unless
 the option \optref[false]{save-locations} is used). The
-\field{loclist} field has the format of an \sty{etoolbox} internal list
-and includes every location (except for the discarded duplicates).
+\field{loclist} field has the syntax of an \sty{etoolbox} internal list
+and includes every location (except for the discarded duplicates and
+ignored formats).
 Each item in the list is provided in the form
 \begin{alltt}
-\cs{glsseeformat}\oargm{tag}\marg{\meta{label list}}\marg{}
+\cs{glsseeformat}\oargm{tag}\margm{label list}\marg{}
 \end{alltt}
-for the cross-reference supplied by the \field{see} field and
+for the cross-reference supplied by the \field{see} field,
+\begin{alltt}
+\cs{glsxtruseseealsoformat}\margm{label list}
+\end{alltt}
+for the cross-reference supplied by the \field{seealso} field,
+and
 \begin{alltt}
 \cs{glsnoidxdisplayloc}\margm{prefix}\margm{counter}\margm{format}\margm{location}
 \end{alltt}
@@ -3392,9 +3414,84 @@ by first fetching the list using \cs{glsfieldfetch}
 or through \sty{glossaries-extra}'s \cs{glsxtrfielddolistloop}
 or \cs{glsxtrfieldforlistloop} shortcuts).
 
+The \meta{format} is that supplied by the \gencsopt{gls}{format} key when using
+commands like \cs{gls} or \cs{glsadd}. If omitted,
+\gencsopt[glsnumberformat]{gls}{format} is assumed (unless this
+default value is changed with \cs{GlsXtrSetDefaultNumberFormat},
+provided by \sty{glossaries-extra} v1.19+).
+
+Ranges can be explicitly formed using \glsopt[(]{format} and
+\glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
+\glsopt[)\meta{csname}]{format} (where \meta{csname} is the name of 
+a text-block command without the initial backslash) in the optional
+argument of commands like \cs{gls} or \cs{glsadd}. These will always
+form a range, regardless of \optref{min-loc-range}, and will be
+encapsulated by \csref{bibglsrange}. (This command is not used with
+ranges that are formed by collating consecutive locations.)
+
+Explicit ranges don't merge with neighbouring locations, but will
+absorb any single locations within the range that don't conflict.
+(Conflicts will be moved to the start of the explicit range.)
+For example, if \verb|\gls{sample}| is used on page~1,
+\verb|\gls[format=(]{sample}| is used on page~2, 
+\verb|\gls{sample}| is used on page~3, and
+\verb|\gls[format=)]{sample}| is used on page~4, then the location
+list will be 1, 2--4. The entry on page~3 is absorbed into the
+explicit range, but the range can't be expanded to include page~1.
+If the entry on page~3 had a different format to the explicit range,
+for example \verb|\gls[format=textbf]{sample}| then it would cause a
+warning and be moved before the start of the range so that the
+location list would then be 1, \textbf{3}, 2--4. 
+
+The special format \gencsopt[glsignore]{glsadd}{format} is provided
+by the \styfmt{glossaries} package for cases where the location
+should be ignored. (The command \cs{glsignore} simply ignores its
+argument.) This works reasonably well if an entry only has the one
+location, but if the entry happens to be indexed again, it can lead
+to an odd empty gap in the location list with a spurious comma. If
+\bibgls\ encounters a record with this special format, the entry
+will be selected but the record will be discarded.
+
+This means that the location list will be empty if the entry was
+only indexed with \optfmt{glsignore}, but if the entry was also
+indexed with another format then the location list won't include the
+ignored record.  (This format is used by \cs{glsaddallunused} but
+remember that iterative commands like this don't work with \bibgls.
+Instead, just use \optref[all]{selection} to select all entries.)
+
+For example, suppose you only want main matter locations in the
+number list, but you want entries that only appear in the back matter 
+to still appear in the glossary (without a location list), then you could do:
+\begin{verbatim}
+\backmatter
+\GlsXtrSetDefaultNumberFormat{glsignore}
+\end{verbatim}
+(This command requires v1.19 of \sty{glossaries-extra}.) If you also
+want to drop front matter locations as well:
+\begin{verbatim}
+\frontmatter
+\GlsXtrSetDefaultNumberFormat{glsignore}
+...
+\mainmatter
+\GlsXtrSetDefaultNumberFormat{glsnumberformat}
+...
+\backmatter
+\GlsXtrSetDefaultNumberFormat{glsignore}
+\end{verbatim}
+
+Note that explicit range formations aren't discarded, so if
+\optfmt{glsignore} is used in a range
+(for example,
+\texttt{\csfmt{glsadd}[format\dequals(glsignore]\marg{sample}} 
+\ldots\ 
+\texttt{\csfmt{glsadd}[format\dequals)glsignore]\marg{sample}}) 
+then the range will be included in the location list (encapsulated
+with \cs{glsignore}), but this case would be a rather odd use of
+this special format and is not recommended.
+
 The locations are always listed in the order in which they were indexed,
-except for the cross-reference which may be placed at the start or
-end of the list or omitted according to \optref{loc-prefix}.
+(except for the cross-reference which may be placed at the start or
+end of the list or omitted).
 This is different to \app{xindy} and \app{makeindex} where you can
 specify the ordering (such as lower case Roman first, then digits,
 etc), but unlike those applications, \bibgls\ allows any location,
@@ -3443,47 +3540,27 @@ then the \ext{aux} file will contain:
 This is a partial record match. In this case, \bibgls\ 
 makes the following tests:
 \begin{itemize}
-\item if one of the formats includes a range formation, the
+\item If one of the formats includes a range formation, the
 range takes precedence.
 
 \item If one of the formats is \texttt{glsnumberformat} (as in the
-above example), that format will be skipped. So in the above
-example, the second record will be added to the location list, but
-not the first. (A message will only be written to the transcript if
-the \longarg{debug} switch is used.)
+above example) or \texttt{glsignore}, that format will be skipped.
+So in the above example, the second record will be added to the
+location list, but not the first. (A message will only be written to
+the transcript if the \longarg{debug} switch is used.) The default
+\texttt{glsnumberformat} will take precedence over the ignored
+format \texttt{glsignore}.
+
 \item If a mapping has been set with the \argref{map-format}
 switch that mapping will be checked.
 \item Otherwise the duplicate record will be discarded with a
 warning.
 \end{itemize}
 
-Ranges can be explicitly formed using \glsopt[(]{format} and
-\glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
-\glsopt[)\meta{csname}]{format} (where \meta{csname} matches and is
-a text-block command without the initial backslash) in the optional
-argument of commands like \cs{gls} or \cs{glsadd}. These will always
-form a range, regardless of \optref{min-loc-range}, and will be
-encapsulated by \csref{bibglsrange}. (This command is not used with
-ranges that are formed by collating consecutive locations.)
-
-Explicit ranges don't merge with neighbouring locations, but will
-absorb any single locations within the range that don't conflict.
-(Conflicts will be moved to the start of the explicit range.)
-For example, if \verb|\gls{sample}| is used on page~1,
-\verb|\gls[format=(]{sample}| is used on page~2, 
-\verb|\gls{sample}| is used on page~3, and
-\verb|\gls[format=)]{sample}| is used on page~4, then the location
-list will be 1, 2--4. The entry on page~3 is absorbed into the
-explicit range, but the range can't be expanded to include page~1.
-If the entry on page~3 had a different format to the explicit range,
-for example \verb|\gls[format=textbf]{sample}| then it would cause a
-warning and be moved before the start of the range so that the
-location list would then be 1, \textbf{3}, 2--4. 
-
 The \field{location} field is used to store the formatted location
 list. The code for this list is generated by \bibgls\ based on the
 information provided in the \ext{aux} file, the presence of the
-\field{see} field and the various settings described in this
+\field{see} or \field{seealso} field and the various settings described in this
 chapter. When you display the glossary using \cs{printunsrtglossary},
 if the \field{location} field is present it will be displayed
 according to the glossary style (and other factors, such as whether the
@@ -3774,9 +3851,22 @@ list.
 \item \optfmt{after}: place the see reference after the location
 list (default).
 \end{itemize}
-The separator between the location list and the see reference is
+The \meta{value} part is required.
+
+The separator between the location list and the cross-reference is
 provided by \csref{bibglsseesep}. This separator is omitted if the
-location list is empty. The \meta{value} part is required.
+location list is empty. The cross-reference is written to the
+\field{location} field using \cs{glsxtrusesee}\margm{label}.
+
+\subsection{\csoptnv{seealso}=\margm{value}}
+\labelopt{seealso}
+
+This is like \optref{see} but governs the location of the cross-references
+provided by the \field{seealso} field. You need at least v1.16
+of \sty{glossaries-extra} for this option. The values are the
+same as for \optref{see} but the separator is given by
+\csref{bibglsseealsosep}. The cross-reference is written to the
+\field{location} field using \cs{glsxtruseseealso}\margm{label}.
 
 \subsection{\csoptnv{alias-loc}=\margm{value}}
 \labelopt{alias-loc}
@@ -5095,6 +5185,16 @@ Or you can redefine it afterwards:
 \GlsXtrLoadResources[src={entries}]
 \renewcommand{\bibglsseesep}{; }
 \end{verbatim}
+
+\section{\cs{bibglsseealsosep}}
+\labelcs{bibglsseealsosep}
+
+\begin{definition}
+\cs{bibglsseealsosep}
+\end{definition}
+
+This is like \cs{bibglsseesep} but is used with cross-reference
+lists provided with the \field{seealso} field, if supported.
 
 \section{\cs{bibglspassim}}
 \labelcs{bibglspassim}
