@@ -729,7 +729,7 @@ with \optref[letter-nocase]{sort-field}, the order will be:
 \texttt{card}, \texttt{i}, \texttt{M}, \texttt{S}, \texttt{v} (since this
 is the case-insensitive letter order of the labels).
 
-However, with \entry{entry}, the fallback field will
+However, with \atentryref{entry}, the fallback field will
 be taken from the \field{name} which in the above example contains \TeX\ code, so
 \bibgls\ will use \file{texparserlib.jar} to interpret this code.
 The library has several different ways of writing the processed
@@ -4292,19 +4292,26 @@ to shuffle the entries instead of sorting them.
 The \csopt{sort} key indicates how entries should be sorted. The
 \meta{value} may be one of:
 \begin{itemize}
+
 \item \optfmt{none} (or \optfmt{unsrt}): don't sort the entries.
 (The entries will be in the order they were processed when parsing
 the data.)
+
 \item \optfmt{random}: shuffles rather than sorts the entries.
 This won't work if there are hierarchical entries, so it's best
 to use this option with \optref{flatten}. The seed for the
 random generator can be set using \optref{shuffle} (which
 also automatically sets \csopt[random]{sort} and \csopt{flatten}).
+
 \item \meta{lang tag}: sort according to the rules of the locale
-given by the \gls{IETF} language tag \meta{lang tag}.
+given by the \gls{IETF} language tag \meta{lang tag}. (Use with
+\optref{break-at} to determine whether or not to split at word
+boundaries.)
+
 \item \optfmt{locale}: equivalent to 
 \csopt[\meta{lang tag}]{sort} where \meta{lang tag} is obtained
-from the operating system.
+from the operating system (or Java Runtime Environment).
+
 \item \optfmt{doc}: sort the entries according to the document
 language. This is equivalent to \optref[\meta{lang tag}]{sort}
 where \meta{lang tag} is the locale associated with the document
@@ -4313,35 +4320,56 @@ is the locale of the last language resource file to be loaded through
 \sty{tracklang}'s interface. It's best to explicitly set the locale
 for multi-lingual documents to avoid confusion. If no languages have been tracked, this
 option is equivalent to \csopt[locale]{sort}.
+
 \item \optfmt{custom}: sort the entries according to the 
 rule provided by \optref{sort-rule}.
+
 \item \optfmt{use}: sort in order of use. (This order is determined
 by the records written to the \ext{aux} file by the \styopt{record}
 package option.)
-\item \optfmt{letter-case}: case-sensitive letter sort.
-\item \optfmt{letter-case-reverse}: reverse case-sensitive letter sort.
-\item \optfmt{letter-nocase}: case-insensitive letter sort.
-\item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter sort.
+
+\item \optfmt{letter-case}: case-sensitive letter (character code) sort.
+
+\item \optfmt{letter-case-reverse}: reverse case-sensitive letter (character code) sort.
+
+\item \optfmt{letter-nocase}: case-insensitive letter (character code) sort.
+Use \csopt[\meta{lang tag}]{sort} with \csopt[none]{break-at} to
+emulate \app{xindy}'s locale letter ordering.
+
+\item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter (character code) sort.
+
 \item \optfmt{integer}: integer sort. This is for integer sort
 values. Any value that isn't an integer is treated as 0.
+
 \item \optfmt{integer-reverse}: as above but reverses the order.
+
 \item \optfmt{hex}: hexadecimal integer sort. This is for
 hexadecimal sort values. Any value that isn't a hexadecimal number 
 is treated as 0.
+
 \item \optfmt{hex-reverse}: as above but reverses the order.
+
 \item \optfmt{octal}: octal integer sort. This is for
 octal sort values. Any value that isn't a octal number 
 is treated as 0.
+
 \item \optfmt{octal-reverse}: as above but reverses the order.
+
 \item \optfmt{binary}: binary integer sort. This is for binary sort
 values. Any value that isn't a binary number is treated as 0.
+
 \item \optfmt{binary-reverse}: as above but reverses the order.
+
 \item \optfmt{float}: single-precision sort. This is for
 decimal sort values. Any value that isn't a decimal is treated as 0.0.
+
 \item \optfmt{float-reverse}: as above but reverses the order.
+
 \item \optfmt{double}: double-precision sort. This is for
 decimal sort values. Any value that isn't a decimal is treated as 0.0.
+
 \item \optfmt{float-reverse}: as above but reverses the order.
+
 \end{itemize}
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
@@ -4405,9 +4433,10 @@ code) to represent a Unicode character. For example:
 \end{verbatim}
 You can also use \cs{protect} instead of \cs{string}. This will
 cause a space to appear between \cs{u} and the hexadecimal
-value in the \ext{aux} file, but \bibgls\ will accept
-a single space between \cs{u} and \meta{hex} to allow for this.
-However it's safer to just use \cs{string}.
+value in the \ext{aux} file (if \meta{hex} starts with a decimal
+digit), but \bibgls\ will accept a single space between \cs{u} and
+\meta{hex} to allow for this.  However it's safer to just use
+\cs{string} (in case \meta{hex} start with a letter).
 
 If \optref{sort} is not set to \optfmt{custom}, the
 \optfmt{sort-rule} setting will be ignored.
@@ -4420,20 +4449,20 @@ and \csopt[custom]{sort}) typically list punctuation characters
 (such as space) before alphabetical characters. This means that
 the rule-based sort options are naturally in a letter order, similar
 to \app{xindy}'s \texttt{ord/letorder} module. This isn't the same
-as \csopt[letter-nocase]{sort} as the letter ordering is rule-based
+as \csopt[letter-nocase]{sort} as the locale letter ordering is rule-based
 rather than according to the Unicode value.
 
 In order to replicate \app{makeindex} and \app{xindy}'s default word
 order, \bibgls\ splits up the sort value at word boundaries and
 inserts a marker (identified by \optref{break-marker}).
 
-For example, if the sort value is \qt{sea lion} then it actually
+For example, if the sort value is \qt{sea lion} then it's actually
 converted to \verb"sea|lion|" whereas \qt{sea} becomes \verb"sea|"
 and \qt{seal} becomes \verb"seal|". The default marker is \verb"|"
 which is commonly placed in collation rules before digits but 
 after the ignored characters, such as spaces and hyphens.
 
-You can change where the break points are insert with
+You can change where the break points are inserted with
 \csopt[\meta{option}]{break-at} where \meta{option} may be one of:
 \begin{itemize}
 \item \optfmt{word}: break at word boundaries (default).
@@ -4454,11 +4483,13 @@ Use the \argref{debug} switch to show the break points.
 
 The break marker can be changed using
 \csopt[\meta{marker}]{break-marker}, where \meta{marker} is 
-marker to use. For example, \csopt[-]{break-marker} will use a
+the character to use. For example, \csopt[-]{break-marker} will use a
 hyphen. The marker may be empty, which effectively strips the
-inter-word punctuation. For example, with \csopt[{}]{break-marker}, 
-\qt{sea lion} simply becomes \texttt{sealion}. If \meta{marker} is
-omitted, \csopt[{}]{break-marker} is assumed.
+inter-word punctuation. For example, with
+\csopt[\empty]{break-marker}, \qt{Tom, Dick, and Harry} becomes
+\texttt{TomDickandHarry} and \qt{sea lion} simply becomes
+\texttt{sealion}. If \meta{marker} is omitted,
+\csopt[\empty]{break-marker} is assumed.
 
 \subsection{\csoptnv{sort-field}=\margm{field}}
 \labelopt{sort-field}
