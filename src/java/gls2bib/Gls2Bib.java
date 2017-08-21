@@ -29,7 +29,12 @@ package com.dickimawbooks.gls2bib;
  */
 
 import java.util.Vector;
+import java.util.Properties;
+import java.util.Locale;
+import java.text.MessageFormat;
 import java.io.*;
+
+import java.net.URL;
 
 // Requires Java 1.7:
 import java.nio.charset.Charset;
@@ -43,13 +48,22 @@ public class Gls2Bib extends LaTeXParserListener
   implements Writeable
 {
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
-     String outCharset)
+     String outCharset, String spaceSub, String langTag)
+    throws Gls2BibException,IOException
    {
       super(null);
+
+      initMessages(langTag);
 
       this.texFile = new File(texFilename);
       this.bibFile = new File(bibFilename);
       this.bibCharsetName = outCharset;
+      this.spaceSub = spaceSub;
+
+      if (" ".equals(spaceSub))
+      {
+         this.spaceSub = null;
+      }
 
       if (inCharset == null)
       {
@@ -63,9 +77,30 @@ public class Gls2Bib extends LaTeXParserListener
       setWriteable(this);
    }
 
+   public String getSpaceSub()
+   {
+      return spaceSub;
+   }
+
    public TeXApp getTeXApp()
    {
       return texApp;
+   }
+
+   public void debug(String message)
+   {
+      if (debugLevel > 0)
+      {
+         System.out.println(message);
+      }
+   }
+
+   public void debug(Throwable e)
+   {
+      if (debugLevel > 0)
+      {
+         e.printStackTrace();
+      }
    }
 
    protected void addPredefined()
@@ -73,6 +108,8 @@ public class Gls2Bib extends LaTeXParserListener
       super.addPredefined();
 
       parser.putControlSequence(new NewGlossaryEntry(this));
+      parser.putControlSequence(new NewGlossaryEntry(
+        "newentry", this));
       parser.putControlSequence(new NewGlossaryEntry(
        "provideglossaryentry", this, true));
       parser.putControlSequence(new LongNewGlossaryEntry(this));
@@ -82,13 +119,17 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new NewAbbreviation(
         "newacronym", "acronym", this));
       parser.putControlSequence(new NewTerm(this));
+      parser.putControlSequence(new NewNumber(this));
+      parser.putControlSequence(new NewNumber("newnum", this));
+      parser.putControlSequence(new NewSymbol(this));
+      parser.putControlSequence(new NewSymbol("newsym", this));
 
    }
 
    // Ignore unknown control sequences
    public ControlSequence createUndefinedCs(String name)
    {
-      return new Relax();
+      return new Gls2BibUndefined(name);
    }
 
    // No write performed by parser (just gathering information)
@@ -149,9 +190,176 @@ public class Gls2Bib extends LaTeXParserListener
    {
    }
 
-   public void substituting(String original, String replacement)
-     throws IOException
+   /*
+    *  TeXApp method.
+    */ 
+   public void substituting(TeXParser parser, String original, 
+     String replacement)
    {
+      debug(getMessage("warning.substituting", original, replacement));
+   }
+
+   public void substituting(String original, String replacement)
+   {
+      debug(getMessage("warning.substituting", original, replacement));
+   }
+
+   /*
+    *  TeXApp method. 
+    */ 
+   public String getMessage(String label)
+   {
+      if (messages == null) return label;
+
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning(String.format(
+           "Error fetching message for label '%s': %s", 
+            label, e.getMessage()), e);
+      }
+
+      return msg;
+   }
+
+   /*
+    *  TeXApp method.
+    */ 
+   public String getMessage(String label, String param)
+   {
+      if (messages == null)
+      {// message system hasn't been initialised
+         return String.format("%s[%s]", label, param);
+      }
+
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label, param);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
+   }
+
+   /*
+    *  TeXApp method.
+    */ 
+   public String getMessage(String label, String[] params)
+   {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0]);
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0];
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label, (Object[])params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
+   }
+
+   public String getMessage(String label, Object... params)
+   {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0].toString());
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0].toString();
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
+      String msg = label;
+
+      try
+      {
+         msg = messages.getMessage(label, params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
+   }
+
+   public String getMessage(TeXParser parser, String label, Object... params)
+   {
+      if (parser == null)
+      {
+         return getMessage(label, params);
+      }
+
+      int lineNum = parser.getLineNumber();
+      File file = parser.getCurrentFile();
+
+      if (lineNum == -1 || file == null)
+      {
+         return getMessage(label, params);
+      }
+      else
+      {
+         return fileLineMessage(file, lineNum, getMessage(label, params));
+      }
+   }
+
+   public static String fileLineMessage(File file, int lineNum,
+     String message)
+   {
+      return String.format("%s:%d: %s", file.toString(), lineNum,
+         message);
+   }
+
+   public String getMessageWithFallback(String label,
+       String fallbackFormat, Object... params)
+   {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         MessageFormat fmt = new MessageFormat(fallbackFormat);
+         return fmt.format(fallbackFormat, params);
+      }
+
+      try
+      {
+         return messages.getMessage(label, params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+
+         MessageFormat fmt = new MessageFormat(fallbackFormat);
+         return fmt.format(fallbackFormat, params);
+      }
    }
 
    public void endParse(File file)
@@ -167,6 +375,17 @@ public class Gls2Bib extends LaTeXParserListener
    public Charset getCharSet()
    {
       return charset;
+   }
+
+   public void warning(String message)
+   {
+      System.out.println(message);
+   }
+
+   public void warning(String message, Throwable e)
+   {
+      System.out.println(message);
+      debug(e);
    }
 
    // shouldn't be needed here
@@ -251,6 +470,113 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
+   private String getLanguageFileName(String tag)
+   {
+      return String.format("/resources/bib2gls-%s.xml", tag);
+   }
+
+   private void initMessages(String langTag) throws Gls2BibException,IOException
+   {
+      Locale locale;
+
+      if (langTag == null || "".equals(langTag))
+      {
+         locale = Locale.getDefault();
+      }
+      else
+      {
+         locale = Locale.forLanguageTag(langTag);
+      }
+
+      String lang = locale.toLanguageTag();
+
+      String name = getLanguageFileName(lang);
+
+      URL url = getClass().getResource(name);
+
+      String jar = "";
+
+      if (debugLevel > 0)
+      {
+         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
+               .toString();
+      }
+
+      if (url == null)
+      {
+         debug(String.format("Can't find language resource: %s!%s", jar, name));
+
+         lang = locale.getLanguage();
+
+         name = getLanguageFileName(lang);
+
+         debug("Trying: "+name);
+
+         url = getClass().getResource(name);
+
+         if (url == null)
+         {
+            debug(String.format("Can't find language resource: %s!%s",
+                    jar, name));
+
+            String script = locale.getScript();
+
+            if (script != null && !script.isEmpty())
+            {
+               name = getLanguageFileName(String.format("%s-%s", lang, script));
+
+               debug("Trying: "+name);
+
+               url = getClass().getResource(name);
+
+               if (url == null && !lang.equals("en"))
+               {
+                  debug(String.format(
+                    "Can't find language resource: %s!%s%nDefaulting to 'en'",
+                    jar, name));
+
+                  url = getClass().getResource(getLanguageFileName("en"));
+               }
+            }
+            else if (!lang.equals("en"))
+            {
+               debug("Defaulting to 'en'");
+               url = getClass().getResource(getLanguageFileName("en"));
+            }
+
+            if (url == null)
+            {
+               throw new Gls2BibException("Can't find language resource file.");
+            }
+         }
+      }
+
+      InputStream in = null;
+
+      try
+      {
+         debug("Reading "+url);
+
+         in = url.openStream();
+
+         Properties prop = new Properties();
+
+         prop.loadFromXML(in);
+
+         in.close();
+         in = null;
+
+         messages = new Gls2BibMessages(prop);
+      }
+      finally
+      {
+         if (in != null)
+         {
+            in.close();
+         }
+      }
+   }
+
    public static void version()
    {
       System.out.println(String.format("gls2bib v%s (%s)", VERSION, DATE));
@@ -259,7 +585,12 @@ public class Gls2Bib extends LaTeXParserListener
    public static void help()
    {
       System.out.println(
-        "gls2bib [--texenc <encoding>] [--bibenc <encoding>] <tex file> <bib file>");
+        "gls2bib [<options>] <tex file> <bib file>");
+      System.out.println("Options:");
+      System.out.println("--texenc <encoding>\t.tex file encoding");
+      System.out.println("--bibenc <encoding>\t.bib file encoding");
+      System.out.println("--space-sub <value>\tsubstitute spaces in labels with <value>");
+      System.out.println("--locale <lang tag>\tuse language resource file for locale given by <lang tag>");
    }
 
    public static void main(String[] args)
@@ -268,6 +599,8 @@ public class Gls2Bib extends LaTeXParserListener
       String bibFile = null;
       String texCharset = null;
       String bibCharset = null;
+      String spaceSub = null;
+      String langTag = null;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -301,6 +634,26 @@ public class Gls2Bib extends LaTeXParserListener
 
             bibCharset = args[++i];
          }
+         else if (args[i].equals("--space-sub"))
+         {
+            if (i == args.length-1)
+            {
+               System.err.println("Missing <value> after "+args[i]);
+               System.exit(1);
+            }
+
+            spaceSub = args[++i];
+         }
+         else if (args[i].equals("--locale"))
+         {
+            if (i == args.length-1)
+            {
+               System.err.println("Missing <lang tag> after "+args[i]);
+               System.exit(1);
+            }
+
+            langTag = args[++i];
+         }
          else if (texFile == null)
          {
             texFile = args[i];
@@ -331,10 +684,11 @@ public class Gls2Bib extends LaTeXParserListener
           System.exit(1);
       }
 
-      Gls2Bib gls2bib = new Gls2Bib(texFile, bibFile, texCharset, bibCharset);
-
       try
       {
+         Gls2Bib gls2bib = new Gls2Bib(texFile, bibFile, texCharset, bibCharset,
+           spaceSub, langTag);
+
          gls2bib.process();
       }
       catch (IOException e)
@@ -360,4 +714,10 @@ public class Gls2Bib extends LaTeXParserListener
    private Charset charset=null;
 
    private String bibCharsetName=null;
+
+   private String spaceSub = null;
+
+   private Gls2BibMessages messages;
+
+   private int debugLevel = 0;//TODO implement
 }

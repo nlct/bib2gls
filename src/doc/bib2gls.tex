@@ -409,6 +409,12 @@ Java Runtime Environment (at least JRE~7). Additionally,
 This application was developed in response to the question
 \href{http://tex.stackexchange.com/q/342544}{Is there a program for
 managing glossary tags?} on \TeX\ on StackExchange.
+
+If you already have a \ext{tex} file containing lots of 
+entry definitions (\cs{newglossaryentry}, \cs{newacronym}, etc)
+then you can use the supplementary tool \app{convertgls2bib}
+to convert the entries to the \ext{bib} format required by
+\bibgls. See \sectionref{sec:gls2bib} for further details.
 \end{abstract}
 
 \frontmatter
@@ -5655,28 +5661,49 @@ or redefined after the resources are loaded:
 
 \renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
+\resetsecnumdepth
 
-\chapter{Converting Existing .tex to .bib}
+\chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
+\label{sec:gls2bib}
 
 If you have already been using the \sty{glossaries} or
 \sty{glossaries-extra} package with a large file containing all your
 definitions using commands like \cs{newglossaryentry}, then you can
 use the supplementary tool \app{convertgls2bib} to convert the definitions
-to \ext{bib} format. The syntax is:
+to the \ext{bib} format required by \bibgls. The syntax is:
 \begin{alltt}
 convertgls2bib \oargm{options} \meta{tex file} \meta{bib file}
 \end{alltt}
 where \meta{tex file} is the \ext{tex} file and \meta{bib file} is
 the \ext{bib} file. This application is less secure than \bibgls\ as
 it doesn't use \app{kpsewhich} to check \texttt{openin\_any} and 
-\texttt{openout\_any}.
+\texttt{openout\_any}. Take care not to accidentally overwrite
+existing \ext{bib} files as there's no check to determine if
+\meta{bib file} already exists.
 
 The \meta{options} are:
 \begin{description}
 \item[\longargfmt{texenc} \meta{encoding}] The character encoding of the
 \ext{tex} file.
+
 \item[\longargfmt{bibenc} \meta{encoding}] The character encoding of the
 \ext{bib} file.
+
+\item[\longargfmt{space-sub} \meta{replacement}] The \ext{bib}
+format doesn't allow spaces in labels. If your original
+definitions in your \ext{tex} file have spaces, use this option to
+replace spaces in labels. Each space will be substituted with
+\meta{replacement}. The cross-referencing fields, \field{see},
+\field{seealso} and \field{alias}, will also be adjusted, but any
+references using \cs{gls} etc will have to be substituted manually 
+(or use a global search and replace in your text editor).
+If you want to strip the spaces, use an empty string for
+\meta{replacement}. You'll need to delimit this according to your
+operating system. For example:
+\begin{verbatim}
+gls2bib --space-sub '' entries.tex entries.bib
+\end{verbatim}
+
 \item[\longargfmt{help} or \shortargfmt{h}] Display help message and
 quit.
 \item[\longargfmt{version} or \shortargfmt{v}] Display version
@@ -5684,15 +5711,186 @@ information and quit.
 \end{description}
 
 This application recognises the following commands:
-\cs{newglossaryentry},
-\cs{provideglossaryentry},
-\cs{longnewglossaryentry},
-\cs{longprovideglossaryentry},
-\cs{newterm},
-\cs{newabbreviation},
-\cs{newacronym}.
+\begin{itemize}
+\item \cs{newglossaryentry}\margm{label}\margm{key\dequals val list}
 
-\resetsecnumdepth
+This is converted to:
+\begin{alltt}
+\atentryref{entry}{\meta{label},
+ \meta{key=val list}
+}
+\end{alltt}
+
+\cs{newentry} is recognised as a synonym of \cs{newglossaryentry}.
+
+\item \cs{provideglossaryentry}\margm{label}\margm{key\dequals val list}
+
+As above, but only if \meta{label} hasn't already been defined.
+
+\item \cs{longnewglossaryentry}\margm{label}\margm{key\dequals val
+list}\margm{description}
+
+This is converted to:
+\begin{alltt}
+\atentryref{entry}{\meta{label},
+ \meta{key=val list},
+ description = \margm{description}
+}
+\end{alltt}
+
+\item \cs{longprovideglossaryentry}\margm{label}\margm{key\dequals val
+list}\margm{description}
+
+As above, but only if \meta{label} hasn't already been defined.
+
+\item \cs{newterm}\oarg{key\dequals val list}\margm{label}
+
+This is converted to:
+\begin{alltt}
+\atentryref{index}{\meta{label},
+ \meta{key=val list}
+}
+\end{alltt}
+if the optional argument is present, otherwise it's just converted
+to:
+\begin{alltt}
+\atentryref{index}{\meta{label}}
+\end{alltt}
+
+If \longargfmt{space-sub} is used and \meta{label} contains one or
+more spaces, then \field{name} will be set if not included in
+\meta{key\dequals val list}. For example, if \texttt{entries.bib}
+contains
+\begin{verbatim}
+\newterm{sea lion}
+\newterm[seealso={sea lion}]{seal}
+\end{verbatim}
+then
+\begin{verbatim}
+gls2bib --space-sub '-' entries.bib entries.tex
+\end{verbatim}
+will write the terms to \texttt{entries.tex} as
+\begin{verbatim}
+@index{sea-lion,
+  name = {sea lion}
+}
+
+@index{seal,
+  seealso = {sea-lion}
+}
+\end{verbatim}
+whereas just
+\begin{verbatim}
+gls2bib entries.bib entries.tex
+\end{verbatim}
+will write the terms to \texttt{entries.tex} as
+\begin{verbatim}
+@index{sea lion}
+
+@index{seal,
+  seealso = {sea lion}
+}
+\end{verbatim}
+which will cause a problem when the \ext{bib} file is parsed
+by \bibgls\ (and will probably also cause a problem for 
+bibliographic management systems).
+
+\item \cs{newabbreviation}\oarg{key\dequals val
+list}\margm{label}\marg{short}\marg{long}
+
+This is converted to:
+\begin{alltt}
+\atentryref{abbreviation}{\meta{label},
+ short = \margm{short},
+ long = \margm{long},
+ \meta{key=val list}
+}
+\end{alltt}
+if the optional argument is present, otherwise it's converted to:
+\begin{alltt}
+\atentryref{abbreviation}{\meta{label},
+ short = \margm{short},
+ long = \margm{long}
+}
+\end{alltt}
+
+\item \cs{newacronym}\oarg{key\dequals val
+list}\margm{label}\marg{short}\marg{long}
+
+As above but uses \atentryref{acronym} instead.
+
+\item \cs{glsxtrnewsymbol}\oarg{key\dequals val
+list}\margm{label}\marg{symbol}
+
+This is converted to:
+\begin{alltt}
+\atentryref{symbol}{\meta{label},
+ name = \margm{symbol}
+}
+\end{alltt}
+if the optional argument is missing, otherwise it's converted to:
+\begin{alltt}
+\atentryref{symbol}{\meta{label},
+ name = \margm{symbol},
+ \meta{key=val list}
+}
+\end{alltt}
+unless \meta{key\dequals val list} contains the \field{name} field,
+in which case it's converted to:
+\begin{alltt}
+\atentryref{symbol}{\meta{label},
+ \meta{key=val list}
+}
+\end{alltt}
+
+\cs{newsym} is recognised as a synonym for \cs{glsxtrnewsymbol}.
+
+\item \cs{glsxtrnewnumber}\oarg{key\dequals val
+list}\margm{label}
+
+This is converted to:
+\begin{alltt}
+\atentryref{number}{\meta{label},
+ name = \margm{label}
+}
+\end{alltt}
+if the optional argument is missing, otherwise it's converted to:
+\begin{alltt}
+\atentryref{number}{\meta{label},
+ name = \margm{label},
+ \meta{key=val list}
+}
+\end{alltt}
+if \field{name} isn't listed in \meta{key\dequals val list},
+otherwise it's converted to:
+\begin{alltt}
+\atentryref{number}{\meta{label},
+ \meta{key=val list}
+}
+\end{alltt}
+
+\cs{newnum} is recognised as a synonym for \cs{glsxtrnewnumber}.
+
+\end{itemize}
+
+In all cases, if \meta{key\dequals val list} contains
+\begin{alltt}
+see=[\cs{seealsoname}]\margm{label(s)}
+\end{alltt}
+this will be substituted with 
+\begin{alltt}
+seealso=\margm{label(s)}
+\end{alltt}
+For example:
+\begin{verbatim}
+\newterm[see={[\seealsoname]goose}]{duck}
+\end{verbatim}
+will be written as
+\begin{verbatim}
+@index{duck,
+  seealso = {goose}
+}
+\end{verbatim}
 
 \printindex
 \end{document}

@@ -3,4 +3,4 @@ bib2gls.pdf	: bib2gls.tex
 		cp bib2gls.pdf ../../unstable/
 
 clean	:
-	\rm -f bib2gls.{aux,log,pdf}
+	\rm -f bib2gls.{aux,log,toc,ilg,ind,idx,out,pdf}

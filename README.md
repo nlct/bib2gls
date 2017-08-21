@@ -17,6 +17,34 @@ interested in more detail.
 I've removed the `unstable` directory. You can instead fetch the
 latest binaries from the [application's home page](http://www.dickimaw-books.com/software/bib2gls/).
 
+If you already have a `.tex` file containing lots of
+definitions using `\newglossaryentry`,
+`\newacronym` etc, you can convert it to a `.bib`
+file using the supplementary command line application
+`convertgls2bib`. For example, if the original definitions
+are in `entries.tex` then
+```bash
+convertgls2bib entries.tex entries.bib
+```
+will create the file `entries.bib` containing all the definitions
+found in `entries.tex`. Other information in `entries.tex` will be
+ignored, but command definitions will be parsed.
+
+The `.bib` format doesn't support spaces in labels, so if your
+`.tex` file has spaces in labels use `--space-sub` _replacement_
+to substitute the spaces with _replacement_. For example
+```bash
+convertgls2bib --space-sub '-' entries.tex entries.bib
+```
+will replace spaces with hyphens or
+```bash
+convertgls2bib --space-sub '' entries.tex entries.bib
+```
+will strip spaces. The values of the `see`, `seealso` and
+`alias` fields will also be adjusted, but any references using
+`\gls` etc will have to be replaced manually (or use your
+text editor's search and replace function).
+
 # Testing the Experimental Version
 
 If you want to test the experimental version, download the

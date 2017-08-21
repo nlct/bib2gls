@@ -24,24 +24,24 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 
-public class NewTerm extends NewGlossaryEntry
+public class NewSymbol extends NewGlossaryEntry
 {
-   public NewTerm(Gls2Bib gls2bib)
+   public NewSymbol(Gls2Bib gls2bib)
    {
-      super("newterm", "index", gls2bib);
+      super("glsxtrnewsymbol", "symbol", gls2bib);
    }
 
-   public NewTerm(String name, Gls2Bib gls2bib)
+   public NewSymbol(String name, Gls2Bib gls2bib)
    {
-      super(name, "index", gls2bib);
+      super(name, "symbol", gls2bib);
    }
 
-   public NewTerm(String name, String type, Gls2Bib gls2bib)
+   public NewSymbol(String name, String type, Gls2Bib gls2bib)
    {
       super(name, type, gls2bib);
    }
 
-   public NewTerm(String name, String type, Gls2Bib gls2bib,
+   public NewSymbol(String name, String type, Gls2Bib gls2bib,
       boolean provide)
    {
       super(name, type, gls2bib, provide);
@@ -49,38 +49,31 @@ public class NewTerm extends NewGlossaryEntry
 
    public Object clone()
    {
-      return new NewTerm(getName(), getType(), gls2bib, isProvide());
+      return new NewSymbol(getName(), getType(), gls2bib, isProvide());
    }
 
    private void processEntry(TeXParser parser, TeXObject labelArg,
-     TeXObject options)
+     TeXObject symbolArg, TeXObject options)
    throws IOException
    {
       KeyValList fields;
-      String spaceSub = gls2bib.getSpaceSub();
-      String labelStr = labelArg.toString(parser);
 
       if (options == null)
       {
          fields = new KeyValList();
-
-         if (spaceSub != null && labelStr.contains(" "))
-         {
-            fields.put("name", labelArg);
-         }
+         fields.put("name", symbolArg);
       }
       else
       {
          fields = KeyValList.getList(parser, options);
 
-         if (spaceSub != null && labelStr.contains(" ")
-              && fields.get("name") == null)
+         if (fields.get("name") == null)
          {
-            fields.put("name", labelArg);
+            fields.put("name", symbolArg);
          }
       }
 
-      processEntry(parser, labelStr, fields);
+      processEntry(parser, labelArg.toString(parser), fields);
    }
 
    public void process(TeXParser parser) throws IOException
@@ -89,6 +82,7 @@ public class NewTerm extends NewGlossaryEntry
 
       processEntry(parser, 
         parser.popNextArg(), // label
+        parser.popNextArg(), // symbol
         options);
    }
 
@@ -98,6 +92,7 @@ public class NewTerm extends NewGlossaryEntry
 
       processEntry(parser, 
         list.popArg(parser), // label
+        list.popArg(parser), // symbol
         options);
    }
 

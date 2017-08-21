@@ -24,24 +24,24 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 
-public class NewTerm extends NewGlossaryEntry
+public class NewNumber extends NewGlossaryEntry
 {
-   public NewTerm(Gls2Bib gls2bib)
+   public NewNumber(Gls2Bib gls2bib)
    {
-      super("newterm", "index", gls2bib);
+      super("glsxtrnewnumber", "number", gls2bib);
    }
 
-   public NewTerm(String name, Gls2Bib gls2bib)
+   public NewNumber(String name, Gls2Bib gls2bib)
    {
-      super(name, "index", gls2bib);
+      super(name, "number", gls2bib);
    }
 
-   public NewTerm(String name, String type, Gls2Bib gls2bib)
+   public NewNumber(String name, String type, Gls2Bib gls2bib)
    {
       super(name, type, gls2bib);
    }
 
-   public NewTerm(String name, String type, Gls2Bib gls2bib,
+   public NewNumber(String name, String type, Gls2Bib gls2bib,
       boolean provide)
    {
       super(name, type, gls2bib, provide);
@@ -49,7 +49,7 @@ public class NewTerm extends NewGlossaryEntry
 
    public Object clone()
    {
-      return new NewTerm(getName(), getType(), gls2bib, isProvide());
+      return new NewNumber(getName(), getType(), gls2bib, isProvide());
    }
 
    private void processEntry(TeXParser parser, TeXObject labelArg,
@@ -57,30 +57,23 @@ public class NewTerm extends NewGlossaryEntry
    throws IOException
    {
       KeyValList fields;
-      String spaceSub = gls2bib.getSpaceSub();
-      String labelStr = labelArg.toString(parser);
 
       if (options == null)
       {
          fields = new KeyValList();
-
-         if (spaceSub != null && labelStr.contains(" "))
-         {
-            fields.put("name", labelArg);
-         }
+         fields.put("name", labelArg);
       }
       else
       {
          fields = KeyValList.getList(parser, options);
 
-         if (spaceSub != null && labelStr.contains(" ")
-              && fields.get("name") == null)
+         if (fields.get("name") == null)
          {
             fields.put("name", labelArg);
          }
       }
 
-      processEntry(parser, labelStr, fields);
+      processEntry(parser, labelArg.toString(parser), fields);
    }
 
    public void process(TeXParser parser) throws IOException
