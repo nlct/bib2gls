@@ -5845,7 +5845,7 @@ This application recognises the following commands:
 
 This is converted to:
 \begin{alltt}
-\atentryref{entry}{\meta{label},
+\atentryref{entry}\marg{\meta{label},
  \meta{key=val list}
 }
 \end{alltt}
@@ -5861,7 +5861,7 @@ list}\margm{description}
 
 This is converted to:
 \begin{alltt}
-\atentryref{entry}{\meta{label},
+\atentryref{entry}\marg{\meta{label},
  \meta{key=val list},
  description = \margm{description}
 }
@@ -5876,14 +5876,14 @@ As above, but only if \meta{label} hasn't already been defined.
 
 This is converted to:
 \begin{alltt}
-\atentryref{index}{\meta{label},
+\atentryref{index}\marg{\meta{label},
  \meta{key=val list}
 }
 \end{alltt}
 if the optional argument is present, otherwise it's just converted
 to:
 \begin{alltt}
-\atentryref{index}{\meta{label}}
+\atentryref{index}\marg{\meta{label}}
 \end{alltt}
 
 If \longargfmt{space-sub} is used and \meta{label} contains one or
@@ -5929,7 +5929,7 @@ list}\margm{label}\marg{short}\marg{long}
 
 This is converted to:
 \begin{alltt}
-\atentryref{abbreviation}{\meta{label},
+\atentryref{abbreviation}\marg{\meta{label},
  short = \margm{short},
  long = \margm{long},
  \meta{key=val list}
@@ -5937,7 +5937,7 @@ This is converted to:
 \end{alltt}
 if the optional argument is present, otherwise it's converted to:
 \begin{alltt}
-\atentryref{abbreviation}{\meta{label},
+\atentryref{abbreviation}\marg{\meta{label},
  short = \margm{short},
  long = \margm{long}
 }
@@ -5953,13 +5953,13 @@ list}\margm{label}\marg{symbol}
 
 This is converted to:
 \begin{alltt}
-\atentryref{symbol}{\meta{label},
+\atentryref{symbol}\marg{\meta{label},
  name = \margm{symbol}
 }
 \end{alltt}
 if the optional argument is missing, otherwise it's converted to:
 \begin{alltt}
-\atentryref{symbol}{\meta{label},
+\atentryref{symbol}\marg{\meta{label},
  name = \margm{symbol},
  \meta{key=val list}
 }
@@ -5967,7 +5967,7 @@ if the optional argument is missing, otherwise it's converted to:
 unless \meta{key\dequals val list} contains the \field{name} field,
 in which case it's converted to:
 \begin{alltt}
-\atentryref{symbol}{\meta{label},
+\atentryref{symbol}\marg{\meta{label},
  \meta{key=val list}
 }
 \end{alltt}
@@ -5979,13 +5979,13 @@ list}\margm{label}
 
 This is converted to:
 \begin{alltt}
-\atentryref{number}{\meta{label},
+\atentryref{number}\marg{\meta{label},
  name = \margm{label}
 }
 \end{alltt}
 if the optional argument is missing, otherwise it's converted to:
 \begin{alltt}
-\atentryref{number}{\meta{label},
+\atentryref{number}\marg{\meta{label},
  name = \margm{label},
  \meta{key=val list}
 }
@@ -5993,12 +5993,84 @@ if the optional argument is missing, otherwise it's converted to:
 if \field{name} isn't listed in \meta{key\dequals val list},
 otherwise it's converted to:
 \begin{alltt}
-\atentryref{number}{\meta{label},
+\atentryref{number}\marg{\meta{label},
  \meta{key=val list}
 }
 \end{alltt}
 
 \cs{newnum} is recognised as a synonym for \cs{glsxtrnewnumber}.
+
+\item \cs{newdualentry}\oarg{key\dequals val
+list}\margm{label}\margm{short}\margm{long}\margm{description}
+
+This command isn't provided by either \sty{glossaries} or
+\sty{glossaries-extra} but is used in the sample file
+\file{sample-dual.tex} that accompanies the \sty{glossaries}
+package. Since this command seems to be used quite a bit (given the
+number of times it crops up on sites like
+\href{https://tex.stackexchange.com/}{\TeX\ on StackExchange}), 
+\appfmt{convertgls2bib} also supports it unless this command is
+defined using \csfmt{newcommand} or \csfmt{renewcommand} in the 
+input file. In which case the default definition will be overridden.
+
+If the command definition isn't overridden, then it's converted to
+\begin{alltt}
+\atentryref{dualentryabbreviation}\marg{\meta{label},
+  short = \margm{short},
+  long = \margm{long},
+  description = \margm{description},
+  \meta{key=val list}
+}
+\end{alltt}
+if \meta{key=val list} is supplied, otherwise it's converted to:
+\begin{alltt}
+\atentryref{dualentryabbreviation}\marg{\meta{label},
+  short = \margm{short},
+  long = \margm{long},
+  description = \margm{description}
+}
+\end{alltt}
+
+For example, if the original \filefmt{.tex} file contains
+\begin{verbatim}
+\newcommand*{\newdualentry}[5][]{%
+  \newglossaryentry{main-#2}{name={#4},%
+  text={#3\glsadd{#2}},%
+  description={#5},%
+  #1
+  }%
+  \newacronym{#2}{#3\glsadd{main-#2}}{#4}
+}
+
+\newdualentry{svm}% label
+  {SVM}% abbreviation
+  {support vector machine}% long form
+  {Statistical pattern recognition technique}% description
+\end{verbatim}
+then the \filefmt{.bib} file will contain
+\begin{verbatim}
+@entry{main-svm,
+  name = {support vector machine},
+  description = {Statistical pattern recognition technique},
+  text = {SVM\glsadd{svm}}
+}
+
+@acronym{svm,
+  short = {SVM\glsadd{main-svm}},
+  long = {support vector machine}
+}
+\end{verbatim}
+since \cs{newdualentry} was defined with \cs{newcommand}. However,
+if the original file uses \cs{providecommand} or omits the
+definition of \cs{newdualentry}, then the \filefmt{.bib} file will
+contain:
+\begin{verbatim}
+@dualentryabbreviation{svm,
+  short = {SVM},
+  description = {Statistical pattern recognition technique},
+  long = {support vector machine}
+}
+\end{verbatim}
 
 \end{itemize}
 

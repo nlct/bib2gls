@@ -150,6 +150,7 @@ public class Gls2Bib extends LaTeXParserListener
          // allow \newcommand{\newdualentry} to overwrite default
          // definition
 
+         message(getMessage("gls2bib.override.newdualentry"));
          addLaTeXCommand(csName, isShort, numParams, defValue, definition);
          return;
       }
