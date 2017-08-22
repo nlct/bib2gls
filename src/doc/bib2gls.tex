@@ -5848,10 +5848,12 @@ existing \ext{bib} files as there's no check to determine if
 The \meta{options} are:
 \begin{description}
 \item[\longargfmt{texenc} \meta{encoding}] The character encoding of the
-\ext{tex} file.
+\ext{tex} file. If omitted, the operating system's default encoding
+is assumed (or the Java Virtual Machine's).
 
 \item[\longargfmt{bibenc} \meta{encoding}] The character encoding of the
-\ext{bib} file.
+\ext{bib} file. If omitted, the same encoding as the
+\ext{tex} file is assumed.
 
 \item[\longargfmt{space-sub} \meta{replacement}] The \ext{bib}
 format doesn't allow spaces in labels. If your original

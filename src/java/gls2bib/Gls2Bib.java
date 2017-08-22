@@ -77,6 +77,11 @@ public class Gls2Bib extends LaTeXParserListener
          charset = Charset.forName(inCharset);
       }
 
+      if (bibCharsetName == null)
+      {
+         bibCharsetName = charset.name();
+      }
+
       setWriteable(this);
 
       texParser = new TeXParser(this);
@@ -670,6 +675,8 @@ public class Gls2Bib extends LaTeXParserListener
          else
          {
             out = new PrintWriter(bibFile, bibCharsetName);
+
+            out.println("% Encoding: "+bibCharsetName);
          }
 
          for (GlsData entry : data)
