@@ -210,6 +210,12 @@ actual '='
   {#2\ifblank{#1}{}{=#1}}%
 }
 
+\newcommand*{\keyvallist}{%
+ \texorpdfstring
+ {key\dequals value list}%
+ {key=value list}%
+}
+
 \newcommand*{\csopt}[2][]{\gencsopt[#1]{glsxtrresourcefile}{#2}}%
 \newcommand*{\glsopt}[2][]{\gencsopt[#1]{gls}{#2}}%
 \newcommand*{\glsaddopt}[2][]{\gencsopt[#1]{glsadd}{#2}}%
@@ -331,14 +337,16 @@ actual '='
 \newcommand*{\card}[1]{|\set{#1}|}
 \newcommand*{\imaginary}{i}
 
+\newcommand{\addr}[1]{\\\url{#1}}
 \title{\appfmt{bib2gls}: a command line Java application to convert
 \filefmt{.bib} files to \filefmt{glossaries-extra.sty} resource
 files}
-\author{Nicola Talbot}
+\author{Nicola Talbot\addr{http://www.dickimaw-books.com/}}
 \date{\DTMusedate{moddate} (Still Under Development)}
 
 \makeatletter
 \begingroup
+ \renewcommand{\addr}[1]{}
  \let\texorpdfstring\@secondoftwo
  \DTMsetstyle{pdf}
  \protected@edef\x{\endgroup
@@ -410,8 +418,8 @@ This application was developed in response to the question
 \href{http://tex.stackexchange.com/q/342544}{Is there a program for
 managing glossary tags?} on \TeX\ on StackExchange.
 
-If you already have a \ext{tex} file containing lots of 
-entry definitions (\cs{newglossaryentry}, \cs{newacronym}, etc)
+If you already have a \ext{tex} file containing 
+entry definitions using commands like \cs{newglossaryentry}
 then you can use the supplementary tool \app{convertgls2bib}
 to convert the entries to the \ext{bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
@@ -458,13 +466,14 @@ write access. (The \ext{aux} file is closed \emph{after} the end
 document hook, so it can't be deferred with \cs{AtEndDocument}.) 
 This means that if you really want to run \bibgls\
 through \cs{write18} it must be done in the preamble with
-\cs{immediate}:
+\cs{immediate}. For example:
 \begin{verbatim}
-\immediate\write18{bib2gls "\jobname"}
+\immediate\write18{bib2gls \jobname}
 \end{verbatim}
 As from version 1.14 of \sty{glossaries-extra}, this can be done
 automatically with the \styopt{automake} option if the \ext{aux}
-file exists.
+file exists. (Remember that this will require the shell escape to be
+enabled.)
 
 \section{Example Use}
 The glossary entries are stored in a \ext{bib} file. For
@@ -512,12 +521,15 @@ pdflatex myDoc
 bib2gls myDoc
 pdflatex myDoc
 \end{verbatim}
+(This document assumes \appfmt{pdflatex} for simplicity. Replace
+with \appfmt{latex}, \appfmt{xelatex} or \appfmt{lualatex} as
+appropriate.)
 
 Note that there's no need to called \app{xindy} or \app{makeindex}
-since \bibgls\ automatically sorts and collates the locations
+since \bibgls\ automatically sorts the entries and collates the locations
 after selecting the required entries from the \ext{bib} file and
-before writing the temporary file that's input with \cs{GlsXtrLoadResources}
-(or \cs{glsxtrresourcefile}).
+before writing the temporary file that's input with \cs{glsxtrresourcefile}
+(or with the shortcut \cs{GlsXtrLoadResources}).
 This means the entries are already defined in the correct order,
 and only those entries that have been used in the document are
 defined,
@@ -530,7 +542,17 @@ If you additionally want to use an indexing application, such
 as \app{xindy}, you need the package option
 \styopt[alsoindex]{record} and use \cs{makeglossaries}
 and \cs{printglossary} (or the iterative \cs{printglossaries}) as usual.
-
+This requires a more complicated build process:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+makeglossaries myDoc
+pdflatex myDoc
+\end{verbatim}
+(The entries aren't defined until the second \LaTeX\ run, so the
+indexing files required by \app{makeindex} or \app{xindy} can't be
+created until then.)
 
 \section{Security}
 
@@ -596,30 +618,40 @@ Replace \meta{TEXMF} with the path to your local or home TEXMF tree
 Copy the files provided to the following locations:
 \begin{itemize}
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/bib2gls.jar}
+\item \meta{TEXMF}\filefmt{/scripts/bib2gls/convertgls2bib.jar}
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/texparserlib.jar}
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/resources/bib2gls-en.xml}
 \item \meta{TEXMF}\filefmt{/doc/support/bib2gls/bib2gls.pdf}
 \end{itemize}
 
-If you are using a Unix-like system, there's also a bash script
-provided called \file{bib2gls.sh}. Either copy it directly to
-somewhere on your path without the \ext{sh} extension. For
-example:
+If you are using a Unix-like system, there are also bash scripts
+provided called \file{bib2gls.sh} and \file{convertgls2bib.sh}. 
+Either copy then directly to somewhere on your path without the \ext{sh} 
+extension. For example:
 \begin{verbatim}
 cp bib2gls.sh ~/bin/bib2gls
+cp convertgls2bib.sh ~/bin/convertgls2bib
 \end{verbatim}
-or copy the file to
-\meta{TEXMF}\filefmt{/scripts/bib2gls/bib2gls.sh} and create a
-symbolic link to it called just \filefmt{bib2gls} from somewhere on
+or copy the files to
+\meta{TEXMF}\filefmt{/scripts/bib2gls/} and create a
+symbolic link to them called just \filefmt{bib2gls} and
+\filefmt{convertgls2bib} from somewhere on
 your path. For example:
 \begin{verbatim}
 cp bib2gls.sh ~/texmf/scripts/bib2gls/
+cp convertgls2bib.sh ~/texmf/scripts/bib2gls/
 cd ~/bin
 ln -s ~/texmf/scripts/bib2gls/bib2gls.sh bib2gls
+ln -s ~/texmf/scripts/bib2gls/convertgls2bib.sh convertgls2bib
 \end{verbatim}
+The \file{texparserlib.jar} file isn't an application but is a
+library used by both \file{bib2gls.jar} and
+\file{convertgls2bib.jar}. (The library is in a separate 
+\href{https://github.com/nlct/texparser}{GitHub repository}
+as it's also used by some of my other applications.)
 
 Windows users can create a \ext{bat} file that works in a
-similar way to the bash script. To do this, create a file called
+similar way to the bash scripts. To do this, create a file called
 \file{bib2gls.bat} that contains the following:
 \begin{verbatim}
 @ECHO OFF
@@ -628,9 +660,12 @@ bib2gls.jar') DO SET JARPATH=%%I
 java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
 \end{verbatim}
 Save this file to somewhere on your system's path.
+(Similarly for \filefmt{convertgls2bib}.) Note that \TeX\
+distributions for Windows usually convert \ext{jar} files to
+executables.
 
 You may need to refresh \TeX's database to ensure that
-\app{kpsewhich} can find the \ext{jar} file.
+\app{kpsewhich} can find the \ext{jar} files.
 
 To test that the application has been successfully installed, open a
 command prompt or terminal and run the following command:
@@ -656,7 +691,7 @@ field. The \argref{no-interpret} switch will turn off this function,
 but the library will still be used to parse the \ext{aux} and
 \ext{bib} files.
 
-The \file{texparserlib.jar} library is not intended as a full-blown
+The \file{texparserlib.jar} library is not a
 \TeX\ engine and there are plenty of situations where it doesn't
 work. In particular, in this case it's being used in a fragmented
 context without knowing most of the packages used by the
@@ -670,7 +705,8 @@ commands or environments provided within the document.
 \TeX\ syntax can be quite complicated and, in some cases, far too
 complicated for simple regular expressions. The library performs
 better than a simple pattern match, and that's the purpose of
-\file{texparserlib.jar} and why it's used by \bibgls. When
+\file{texparserlib.jar} and why it's used by \bibgls\ (and by
+\appfmt{convertgls2bib}). When
 the \argref{debug} mode is on, any warnings or errors triggered by
 the \argref{interpret} mode will be written to the transcript
 prefixed with \texttt{texparserlib:} (the results of the conversions
@@ -993,8 +1029,8 @@ written to the transcript file, which can be inspected afterwards.
 
 Specify the preferred \hyperref[sec:lang.xml]{language resource
 file}, where \meta{lang} is a valid \gls{IETF} language tag.
-There should be an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
-resource file.
+This option requires an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
+resource file otherwise \bibgls\ will fallback on English.
 
 \section{\longarg{log-file} \meta{filename} (or \shortarg{t}
 \meta{filename})}
@@ -1262,8 +1298,8 @@ and \texttt{hyperbf} or \texttt{hyperit} for a primary reference.)
 \section{\longarg{group}}
 \labelarg{group}
 
-The \styopt{record} package option automatically creates a new field
-called \field{group}. If the \longarg{group} switch is used, When
+The \styfmt{glossaries-extra} \styopt{record} package option automatically creates a new field
+called \field{group}. If the \longarg{group} switch is used then, when
 sorting, \bibgls\ will try to determine the letter group for each
 entry and add it to the \field{group} field.  (Some \optref{sort}
 options ignore this setting.) This value will be picked up by
@@ -1351,7 +1387,7 @@ There are some special prefixes that have a particular meaning to
 \bibgls: \qt{\idprefix{dual}} and \qt{\idprefix{ext\meta{n}}} where
 \meta{n} is a positive integer.  In the first case,
 \idprefix{dual} references the dual element of a dual entry (see
-\atentry{dualentry}). This prefix will be replaced by the value of
+\atentryref{dualentry}). This prefix will be replaced by the value of
 the \csopt{dual-prefix} option. The \idprefix{ext\meta{n}} prefix
 is used to reference an entry from a different set of resources
 (loaded by another \cs{glsxtrresourcefile} command). This prefix is
@@ -2374,7 +2410,7 @@ This is equivalent to:
 \end{verbatim}
 
 The optional argument \meta{options} is a comma-separated 
-\meta{key}=\meta{value} list. Allowed options are listed below.
+\keyvallist. Allowed options are listed below.
 The option list applies only to that specific
 \meta{filename}\ext{glstex} and are not carried over to the next
 instance of \cs{glsxtrresourcefile}.
@@ -2683,12 +2719,12 @@ is best avoided. A better method would be:
 The \csopt[recorded and deps and see]{selection} in this case will
 select all three entries, and the document won't send the reader on a
 long-winded detour.
-\subsection{\csoptnv{match}=\margm{key-val list}}
+\subsection{\csoptnv{match}=\margm{\keyvallist}}
 \labelopt{match}
 
 It's possible to filter the selection by matching field values.
-If \meta{key-val list} is empty no filtering will be applied, otherwise
-\meta{key-val list} should be a \meta{key}=\meta{regexp} list, where
+If \meta{\keyvallist} is empty no filtering will be applied, otherwise
+\meta{\keyvallist} should be a \meta{key}=\meta{regexp} list, where
 \meta{key} is the name of a field or \optfmt{id} for the entry's
 label or \optfmt{entrytype} for the entry's \ext{bib} type (as in
 the part after \verb|@| in the \ext{bib} file not the \field{type}
@@ -5790,7 +5826,6 @@ or redefined after the resources are loaded:
 
 \renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
-\resetsecnumdepth
 
 \chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
 \label{sec:gls2bib}
@@ -5839,45 +5874,99 @@ quit.
 information and quit.
 \end{description}
 
-This application recognises the following commands:
-\begin{itemize}
-\item \cs{newglossaryentry}\margm{label}\margm{key\dequals val list}
+This application recognises the commands listed below. Avoid any
+overly complicated code within the \ext{tex} file. The \TeX\ parser
+library isn't a \TeX\ engine!
+In all cases below, if \meta{\keyvallist} contains
+\begin{alltt}
+see=[\cs{seealsoname}]\margm{label(s)}
+\end{alltt}
+this will be substituted with 
+\begin{alltt}
+seealso=\margm{label(s)}
+\end{alltt}
+For example:
+\begin{verbatim}
+\newterm[see={[\seealsoname]goose}]{duck}
+\end{verbatim}
+will be written as
+\begin{verbatim}
+@index{duck,
+  seealso = {goose}
+}
+\end{verbatim}
+(The \field{seealso} key is provided by \sty{glossaries-extra}
+v1.16+.)
+
+\section{\cs{newglossaryentry}}
+The base \sty{glossaries} package provides:
+\begin{definition}
+\cs{newglossaryentry}\margm{label}\margm{\keyvallist}
+\end{definition}
 
 This is converted to:
 \begin{alltt}
 \atentryref{entry}\marg{\meta{label},
- \meta{key=val list}
+  \meta{\keyvallist}
 }
 \end{alltt}
 
-\cs{newentry} is recognised as a synonym of \cs{newglossaryentry}.
+\cs{newentry} (provided by the \sty{glossaries-extra}
+\styopt{shortcuts} option) is recognised as a synonym of \cs{newglossaryentry}.
 
-\item \cs{provideglossaryentry}\margm{label}\margm{key\dequals val list}
-
-As above, but only if \meta{label} hasn't already been defined.
-
-\item \cs{longnewglossaryentry}\margm{label}\margm{key\dequals val
-list}\margm{description}
+\section{\cs{provideglossaryentry}}
+The base \sty{glossaries} package provides:
+\begin{definition}
+\cs{provideglossaryentry}\margm{label}\margm{\keyvallist}
+\end{definition}
 
 This is converted to:
 \begin{alltt}
 \atentryref{entry}\marg{\meta{label},
- \meta{key=val list},
+  \meta{\keyvallist}
+}
+\end{alltt}
+but only if \meta{label} hasn't already been defined.
+
+\section{\cs{longnewglossaryentry}}
+The base \sty{glossaries} package provides:
+\begin{definition}
+\cs{longnewglossaryentry}\margm{label}\margm{\keyvallist}\margm{description}
+\end{definition}
+
+This is converted to:
+\begin{alltt}
+\atentryref{entry}\marg{\meta{label},
+ \meta{\keyvallist},
  description = \margm{description}
 }
 \end{alltt}
 
-\item \cs{longprovideglossaryentry}\margm{label}\margm{key\dequals val
-list}\margm{description}
+The starred version provided by the \sty{glossaries-extra} package
+is also recognised. The unstarred version strips trailing spaces
+from \meta{description}. (This doesn't add \cs{nopostdesc}, but
+\sty{glossaries-extra} defaults to \styopt{nopostdot}.)
+
+\section{\cs{longprovideglossaryentry}}
+
+The base \sty{glossaries} package provides:
+\begin{definition}
+\cs{longprovideglossaryentry}\margm{label}\margm{\keyvallist}\margm{description}
+\end{definition}
 
 As above, but only if \meta{label} hasn't already been defined.
 
-\item \cs{newterm}\oarg{key\dequals val list}\margm{label}
+\section{\cs{newterm}}
+The base \sty{glossaries} package provides:
+\begin{definition}
+\cs{newterm}\oargm{\keyvallist}\margm{label}
+\end{definition}
+(when the \styopt{index} option is used).
 
 This is converted to:
 \begin{alltt}
 \atentryref{index}\marg{\meta{label},
- \meta{key=val list}
+ \meta{\keyvallist}
 }
 \end{alltt}
 if the optional argument is present, otherwise it's just converted
@@ -5888,7 +5977,7 @@ to:
 
 If \longargfmt{space-sub} is used and \meta{label} contains one or
 more spaces, then \field{name} will be set if not included in
-\meta{key\dequals val list}. For example, if \texttt{entries.bib}
+\meta{\keyvallist}. For example, if \texttt{entries.bib}
 contains
 \begin{verbatim}
 \newterm{sea lion}
@@ -5924,15 +6013,18 @@ which will cause a problem when the \ext{bib} file is parsed
 by \bibgls\ (and will probably also cause a problem for 
 bibliographic management systems).
 
-\item \cs{newabbreviation}\oarg{key\dequals val
-list}\margm{label}\marg{short}\marg{long}
+\section{\cs{newabbreviation}}
+The \sty{glossaries-extra} package provides:
+\begin{definition}
+\cs{newabbreviation}\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}
+\end{definition}
 
 This is converted to:
 \begin{alltt}
 \atentryref{abbreviation}\marg{\meta{label},
  short = \margm{short},
  long = \margm{long},
- \meta{key=val list}
+ \meta{\keyvallist}
 }
 \end{alltt}
 if the optional argument is present, otherwise it's converted to:
@@ -5943,13 +6035,22 @@ if the optional argument is present, otherwise it's converted to:
 }
 \end{alltt}
 
-\item \cs{newacronym}\oarg{key\dequals val
-list}\margm{label}\marg{short}\marg{long}
+\section{\cs{newacronym}}
+The base \sty{glossaries} package provides:
+\begin{definition}
+\cs{newacronym}\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}
+\end{definition}
+(which is redefined by \sty{glossaries-extra} to use
+\cs{newabbreviation}).
 
 As above but uses \atentryref{acronym} instead.
 
-\item \cs{glsxtrnewsymbol}\oarg{key\dequals val
-list}\margm{label}\marg{symbol}
+\section{\cs{glsxtrnewsymbol}}
+The \sty{glossaries-extra} package provides:
+\begin{definition}
+\cs{glsxtrnewsymbol}\oargm{\keyvallist}\margm{label}\margm{symbol}
+\end{definition}
+(when the \styopt{symbols} option is used).
 
 This is converted to:
 \begin{alltt}
@@ -5961,21 +6062,26 @@ if the optional argument is missing, otherwise it's converted to:
 \begin{alltt}
 \atentryref{symbol}\marg{\meta{label},
  name = \margm{symbol},
- \meta{key=val list}
+ \meta{\keyvallist}
 }
 \end{alltt}
-unless \meta{key\dequals val list} contains the \field{name} field,
+unless \meta{\keyvallist} contains the \field{name} field,
 in which case it's converted to:
 \begin{alltt}
 \atentryref{symbol}\marg{\meta{label},
- \meta{key=val list}
+ \meta{\keyvallist}
 }
 \end{alltt}
 
-\cs{newsym} is recognised as a synonym for \cs{glsxtrnewsymbol}.
+\cs{newsym} (provided by the \styopt{shortcuts} option) is recognised 
+as a synonym for \cs{glsxtrnewsymbol}.
 
-\item \cs{glsxtrnewnumber}\oarg{key\dequals val
-list}\margm{label}
+\section{\cs{glsxtrnewnumber}}
+The \sty{glossaries-extra} package provides:
+\begin{definition}
+\cs{glsxtrnewnumber}\oargm{\keyvallist}\margm{label}
+\end{definition}
+(when the \styopt{numbers} option is used).
 
 This is converted to:
 \begin{alltt}
@@ -5987,24 +6093,29 @@ if the optional argument is missing, otherwise it's converted to:
 \begin{alltt}
 \atentryref{number}\marg{\meta{label},
  name = \margm{label},
- \meta{key=val list}
+ \meta{\keyvallist}
 }
 \end{alltt}
-if \field{name} isn't listed in \meta{key\dequals val list},
+if \field{name} isn't listed in \meta{\keyvallist},
 otherwise it's converted to:
 \begin{alltt}
 \atentryref{number}\marg{\meta{label},
- \meta{key=val list}
+ \meta{\keyvallist}
 }
 \end{alltt}
 
-\cs{newnum} is recognised as a synonym for \cs{glsxtrnewnumber}.
+\cs{newnum} (provided by the \styopt{shortcuts} option) is
+recognised as a synonym for \cs{glsxtrnewnumber}.
 
-\item \cs{newdualentry}\oarg{key\dequals val
-list}\margm{label}\margm{short}\margm{long}\margm{description}
+\section{\cs{newdualentry}}
+
+\begin{definition}
+\cs{newdualentry}\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}\margm{description}
+\end{definition}
 
 This command isn't provided by either \sty{glossaries} or
-\sty{glossaries-extra} but is used in the sample file
+\sty{glossaries-extra} but is used as an example in the
+\sty{glossaries} user manual and in the sample file
 \file{sample-dual.tex} that accompanies the \sty{glossaries}
 package. Since this command seems to be used quite a bit (given the
 number of times it crops up on sites like
@@ -6019,10 +6130,10 @@ If the command definition isn't overridden, then it's converted to
   short = \margm{short},
   long = \margm{long},
   description = \margm{description},
-  \meta{key=val list}
+  \meta{\keyvallist}
 }
 \end{alltt}
-if \meta{key=val list} is supplied, otherwise it's converted to:
+if \meta{\keyvallist} is supplied, otherwise it's converted to:
 \begin{alltt}
 \atentryref{dualentryabbreviation}\marg{\meta{label},
   short = \margm{short},
@@ -6072,26 +6183,6 @@ contain:
 }
 \end{verbatim}
 
-\end{itemize}
-
-In all cases, if \meta{key\dequals val list} contains
-\begin{alltt}
-see=[\cs{seealsoname}]\margm{label(s)}
-\end{alltt}
-this will be substituted with 
-\begin{alltt}
-seealso=\margm{label(s)}
-\end{alltt}
-For example:
-\begin{verbatim}
-\newterm[see={[\seealsoname]goose}]{duck}
-\end{verbatim}
-will be written as
-\begin{verbatim}
-@index{duck,
-  seealso = {goose}
-}
-\end{verbatim}
-
+\resetsecnumdepth
 \printindex
 \end{document}

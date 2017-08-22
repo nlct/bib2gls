@@ -1,13 +1,13 @@
 # bib2gls
 Command line application to convert `.bib` files to `glossaries-extra.sty` resource file
 
-Experimental, still in development. Following on
+(Developed as a follow-up
 from [my answer on TeX on
-StackExchange](http://tex.stackexchange.com/a/343852/19862).
+StackExchange](http://tex.stackexchange.com/a/343852/19862).)
 
 Requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
-(2017-02-03).
+(2017-02-03). (Although newer versions are recommended.)
 
 There's a [draft version of the user
 manual](http://www.dickimaw-books.com/software/bib2gls/bib2gls.pdf)
@@ -27,8 +27,10 @@ are in `entries.tex` then
 convertgls2bib entries.tex entries.bib
 ```
 will create the file `entries.bib` containing all the definitions
-found in `entries.tex`. Other information in `entries.tex` will be
-ignored, but command definitions will be parsed.
+found in `entries.tex`. Other information in `entries.tex` should be
+ignored, but command definitions will be parsed. (Avoid any code
+that's overly complicated. The TeX parser library isn't a
+TeX engine!)
 
 The `.bib` format doesn't support spaces in labels, so if your
 `.tex` file has spaces in labels use `--space-sub` _replacement_
@@ -72,6 +74,8 @@ your local or home TEXMF path (for example, `~/texmf/`):
 
  - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only)
  - *TEXMF*`/scripts/bib2gls/bib2gls.jar`
+ - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems only)
+ - *TEXMF*`/scripts/bib2gls/convertgls2bib.jar`
  - *TEXMF*`/scripts/bib2gls/texparserlib.jar`
  - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml`
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf`
@@ -97,7 +101,7 @@ then check that the `resources` sub-directory has been correctly
 copied over.
 
 Windows users may find that their TeX distribution has converted the
-`.jar` file to an executable `bib2gls.exe`. If not, you can create a
+`bib2gls.jar` file to an executable `bib2gls.exe`. If not, you can create a
 batch script analogous to `bib2gls.sh` called `bib2gls.bat` that
 contains the following:
 ```com
@@ -105,11 +109,13 @@ contains the following:
 FOR /F %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts bib2gls.jar') DO SET JARPATH=%%I
 java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
 ```
+(Similarly for `convertgls2bib.jar`.)
 
 # Compile Source Code
 
-Create sub-directories `src/lib` and
-`src/classes/com/dickimawbooks/bib2gls`
+Create sub-directories `src/lib`,
+`src/classes/com/dickimawbooks/bib2gls` and
+`src/classes/com/dickimawbooks/gls2bib`
 
 Requires `texparserlib.jar` which can be compiled from
 [texparser](https://github.com/nlct/texparser).
@@ -119,10 +125,21 @@ Copy `texparserlib.jar` to `src/lib`.
 Compile from `src` using:
 
 ```bash 
-cd java
-javac -d ../classes -cp ../lib/texparserlib.jar *.java
+cd java/bib2gls
+javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
 cd ../classes
-jar cmf ../java/Manifest.txt ../lib/bib2gls.jar com/dickimawbooks/bib2gls/*.class
+jar cmf ../java/bib2gls/Manifest.txt ../lib/bib2gls.jar com/dickimawbooks/bib2gls/*.class
+```
+
+Similarly for `gls2bib`. The actual `.jar` file is called
+`convertgls2bib.jar` to reduce the chances of accidentally
+using the wrong application.
+
+```bash 
+cd java/gls2bib
+javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+cd ../classes
+jar cmf ../java/gls2bib/Manifest.txt ../lib/convertgls2bib.jar com/dickimawbooks/gls2bib/*.class
 ```
 
 No warranty etc.
