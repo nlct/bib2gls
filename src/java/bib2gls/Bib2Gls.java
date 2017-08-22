@@ -2368,7 +2368,8 @@ public class Bib2Gls implements TeXApp
 
    private void setShortCuts(String value)
    {
-      if (value.equals("acro") || value.equals("acronyms"))
+      if (value.equals("acro") || value.equals("acronyms")
+        || value.equals("ac"))
       {
          shortcuts=value;
          checkAcroShortcuts = true;
