@@ -43,15 +43,18 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
+import com.dickimawbooks.texparserlib.latex.NewCommand;
 
 public class Gls2Bib extends LaTeXParserListener
-  implements Writeable
+  implements Writeable,TeXApp
 {
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
-     String outCharset, String spaceSub, String langTag)
+     String outCharset, String spaceSub, String langTag, int debug)
     throws Gls2BibException,IOException
    {
       super(null);
+
+      this.debugLevel = debug;
 
       initMessages(langTag);
 
@@ -75,16 +78,18 @@ public class Gls2Bib extends LaTeXParserListener
       }
 
       setWriteable(this);
+
+      texParser = new TeXParser(this);
+   }
+
+   public TeXApp getTeXApp()
+   {
+      return this;
    }
 
    public String getSpaceSub()
    {
       return spaceSub;
-   }
-
-   public TeXApp getTeXApp()
-   {
-      return texApp;
    }
 
    public void debug(String message)
@@ -123,6 +128,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new NewNumber("newnum", this));
       parser.putControlSequence(new NewSymbol(this));
       parser.putControlSequence(new NewSymbol("newsym", this));
+      parser.putControlSequence(new NewDualEntry(this));
 
    }
 
@@ -130,6 +136,26 @@ public class Gls2Bib extends LaTeXParserListener
    public ControlSequence createUndefinedCs(String name)
    {
       return new Gls2BibUndefined(name);
+   }
+
+   @Override
+   public void newcommand(byte overwrite,
+     String type, String csName, boolean isShort,
+     int numParams, TeXObject defValue, TeXObject definition)
+   throws IOException
+   {
+      if (csName.equals("newdualentry") && 
+          overwrite == NewCommand.OVERWRITE_FORBID)
+      {
+         // allow \newcommand{\newdualentry} to overwrite default
+         // definition
+
+         addLaTeXCommand(csName, isShort, numParams, defValue, definition);
+         return;
+      }
+
+      super.newcommand(overwrite, type, csName, isShort,
+        numParams, defValue, definition);
    }
 
    // No write performed by parser (just gathering information)
@@ -188,6 +214,89 @@ public class Gls2Bib extends LaTeXParserListener
    public void includegraphics(KeyValList options, String imgName)
      throws IOException
    {
+   }
+
+   public boolean isWriteAccessAllowed(File file)
+   {
+      return file.canWrite();
+   }
+
+   public boolean isWriteAccessAllowed(TeXPath path)
+   {
+      return path.getFile().canWrite();
+   }
+
+   public boolean isReadAccessAllowed(File file)
+   {
+      return file.canRead();
+   }
+
+   public boolean isReadAccessAllowed(TeXPath path)
+   {
+      return path.getFile().canRead();
+   }
+
+   /*
+    *  TeXApp method. (Ignore.)
+    */ 
+   
+   public void copyFile(File orgFile, File newFile)
+     throws IOException,InterruptedException
+   {
+      if (debugLevel > 0)
+      {
+         System.err.format(
+           "Ignoring unexpected request to copy files %s -> %s%n",
+           orgFile.toString(), newFile.toString());
+      }
+   }
+
+   public String requestUserInput(String message)
+     throws IOException
+   {
+      if (debugLevel > 0)
+      {
+         System.err.format(
+           "Ignoring unexpected request for user input. Message: %s%n",
+           message);
+      }
+
+      return "";
+   }
+
+   public String kpsewhich(String arg)
+   {
+      return null;
+   }
+
+   /*
+    *  TeXApp method needs defining, but not needed for
+    *  the purposes of this application.
+    */ 
+   public void epstopdf(File epsFile, File pdfFile)
+     throws IOException,InterruptedException
+   {
+      if (debugLevel > 0)
+      {// shouldn't happen
+         System.err.format(
+           "Ignoring unexpected request to convert %s to %s%n",
+           epsFile.toString(), pdfFile.toString());
+      }
+   }
+
+   /*
+    *  TeXApp method needs defining, but not needed for
+    *  the purposes of this application.
+    */ 
+   public void wmftoeps(File wmfFile, File epsFile)
+     throws IOException,InterruptedException
+   {
+      if (debugLevel > 0)
+      {// shouldn't happen
+         System.err.format(
+           "Ignoring unexpected request to convert %s to %s%n",
+           wmfFile.toString(), epsFile.toString());
+      }
    }
 
    /*
@@ -332,13 +441,6 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
-   public static String fileLineMessage(File file, int lineNum,
-     String message)
-   {
-      return String.format("%s:%d: %s", file.toString(), lineNum,
-         message);
-   }
-
    public String getMessageWithFallback(String label,
        String fallbackFormat, Object... params)
    {
@@ -362,6 +464,52 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
+   public String getChoiceMessage(String label, int argIdx,
+     String choiceLabel, int numChoices, Object... params)
+   {
+      if (messages == null)
+      {// message system hasn't been initialised
+
+         String param = (params.length == 0 ? "" : params[0].toString());
+
+         for (int i = 1; i < params.length; i++)
+         {
+            param += ","+params[0].toString();
+         }
+
+         return String.format("%s[%s]", label, param);
+      }
+
+      String msg = label;
+
+      try
+      {
+         msg = messages.getChoiceMessage(label, argIdx,
+            choiceLabel, numChoices, params);
+      }
+      catch (IllegalArgumentException e)
+      {
+         warning("Can't find message for label: "+label, e);
+      }
+
+      return msg;
+   }
+
+   /*
+    *  TeXApp method.
+    */ 
+   public void message(String text)
+   {
+      System.out.println(text);
+   }
+
+   public static String fileLineMessage(File file, int lineNum,
+     String message)
+   {
+      return String.format("%s:%d: %s", file.toString(), lineNum,
+         message);
+   }
+
    public void endParse(File file)
       throws IOException
    {
@@ -377,21 +525,96 @@ public class Gls2Bib extends LaTeXParserListener
       return charset;
    }
 
+   /*
+    *  TeXApp method.
+    */ 
+   public void warning(TeXParser parser, String message)
+   {
+      int lineNum = parser.getLineNumber();
+      File file = parser.getCurrentFile();
+
+      if (lineNum == -1 || file == null)
+      {
+         warning(message);
+      }
+      else
+      {
+         warning(file, lineNum, message);
+      }
+   }
+
+   public void warning(File file, int line, String message)
+   {
+      warning(fileLineMessage(file, line, message));
+   }
+
+   public void warning(File file, int line, String message, Exception e)
+   {
+      warning(fileLineMessage(file, line, message), e);
+   }
+
    public void warning(String message)
    {
-      System.out.println(message);
+      message = getMessageWithFallback("warning.title",
+         "Warning: {0}", message);
+
+      System.err.println(message);
    }
 
-   public void warning(String message, Throwable e)
+   public void warning()
    {
-      System.out.println(message);
-      debug(e);
+      System.err.println();
    }
 
+   public void warning(String message, Exception e)
+   {
+      if (debugLevel > 0)
+      {
+         e.printStackTrace();
+      }
+   }
+
+   /*
+    *  TeXApp method.
+    */ 
+   public void error(Exception e)
+   {
+      if (e instanceof TeXSyntaxException)
+      {
+         error(((TeXSyntaxException)e).getMessage(this));
+      }
+      else
+      {
+         String msg = e.getMessage();
+
+         if (msg == null)
+         {
+            msg = e.getClass().getSimpleName();
+         }
+
+         error(msg);
+      }
+
+      if (debugLevel > 0)
+      {
+         e.printStackTrace();
+      }
+   }
+
+   public void error(String msg)
+   {
+      msg = getMessageWithFallback("error.title", "Error: {0}", msg);
+
+      System.err.println(msg);
+   }
+
+   /*
+    *  TeXApp method.
+    */ 
    // shouldn't be needed here
    public float emToPt(float emValue)
    {
-      getTeXApp().warning(getParser(),
+      warning(getParser(),
          "Can't convert from em to pt, no font information loaded");
 
       return 9.5f*emValue;
@@ -400,7 +623,7 @@ public class Gls2Bib extends LaTeXParserListener
    // shouldn't be needed here
    public float exToPt(float exValue)
    {
-      getTeXApp().warning(getParser(),
+      warning(getParser(),
          "Can't convert from ex to pt, no font information loaded");
 
       return 4.4f*exValue;
@@ -426,15 +649,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void process() throws IOException
    {
-      // Just use generic adapter.
-      // kpsewhich isn't used to find files or to determine
-      // openin_any or openout_any
-
-      texApp = new TeXAppAdapter();
-
       data = new Vector<GlsData>();
-
-      TeXParser parser = new TeXParser(this);
 
       parser.parse(texFile);
 
@@ -601,6 +816,7 @@ public class Gls2Bib extends LaTeXParserListener
       String bibCharset = null;
       String spaceSub = null;
       String langTag = null;
+      int debug = 0;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -654,6 +870,10 @@ public class Gls2Bib extends LaTeXParserListener
 
             langTag = args[++i];
          }
+         else if (args[i].equals("--debug"))
+         {
+            debug = 1;
+         }
          else if (texFile == null)
          {
             texFile = args[i];
@@ -687,7 +907,7 @@ public class Gls2Bib extends LaTeXParserListener
       try
       {
          Gls2Bib gls2bib = new Gls2Bib(texFile, bibFile, texCharset, bibCharset,
-           spaceSub, langTag);
+           spaceSub, langTag, debug);
 
          gls2bib.process();
       }
@@ -706,7 +926,6 @@ public class Gls2Bib extends LaTeXParserListener
    private static final String VERSION="0.9b";
    private static final String DATE="EXPERIMENTAL";
 
-   private TeXApp texApp;
    private Vector<GlsData> data;
 
    private File texFile, bibFile;
@@ -719,5 +938,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    private Gls2BibMessages messages;
 
-   private int debugLevel = 0;//TODO implement
+   private int debugLevel = 0;
+
+   private TeXParser texParser;
 }
