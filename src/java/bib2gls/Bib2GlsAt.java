@@ -72,6 +72,10 @@ public class Bib2GlsAt extends At
       {
          data = new Bib2GlsDualEntry(bib2gls);
       }
+      else if (entryType.equals("dualentryabbreviation"))
+      {
+         data = new Bib2GlsDualEntryAbbrev(bib2gls);
+      }
       else if (entryType.equals("dualabbreviation")
             || entryType.equals("dualacronym"))
       {

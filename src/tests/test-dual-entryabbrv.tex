@@ -1,0 +1,24 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,abbreviations,postdot,style=index]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={entries-dual-entryabbrv},% data in entries-dual-entryabbrv.bib
+ %type=abbreviations,% put primary entries in glossary 'abbreviations'
+ %dual-type=main% put dual entries in glossary 'main'
+]
+
+\begin{document}
+First: \gls{svm}. Next: \gls{svm}.
+
+Reset.\glsreset{svm}
+
+First plural: \glspl{svm}. Next plural: \glspl{svm}.
+
+\printunsrtglossaries
+
+\end{document}

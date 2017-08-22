@@ -314,6 +314,14 @@ public class GlsResource
 
             dualAbbrevFirstMap = keys[0];
          }
+         else if (opt.equals("dual-entryabbrv-map"))
+         {
+            String[] keys = new String[1];
+
+            dualEntryAbbrevMap = getDualMap(parser, list, opt, keys);
+
+            dualEntryAbbrevFirstMap = keys[0];
+         }
          else if (opt.equals("dual-symbol-map"))
          {
             String[] keys = new String[1];
@@ -329,12 +337,14 @@ public class GlsResource
                backLinkDualEntry = true;
                backLinkDualAbbrev = true;
                backLinkDualSymbol = true;
+               backLinkDualEntryAbbrev = true;
             }
             else
             {
                backLinkDualEntry = false;
                backLinkDualAbbrev = false;
                backLinkDualSymbol = false;
+               backLinkDualEntryAbbrev = false;
             }
          }
          else if (opt.equals("dual-entry-backlink"))
@@ -344,6 +354,10 @@ public class GlsResource
          else if (opt.equals("dual-abbrv-backlink"))
          {
             backLinkDualAbbrev = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("dual-entryabbrv-backlink"))
+         {
+            backLinkDualEntryAbbrev = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-symbol-backlink"))
          {
@@ -796,6 +810,15 @@ public class GlsResource
          dualAbbrevFirstMap = "short";
       }
 
+      if (dualEntryAbbrevMap == null)
+      {
+         dualEntryAbbrevMap = new HashMap<String,String>();
+         dualEntryAbbrevMap.put("long", "name");
+         dualEntryAbbrevMap.put("short", "text");
+
+         dualEntryAbbrevFirstMap = "long";
+      }
+
       if (dualSymbolMap == null)
       {
          dualSymbolMap = new HashMap<String,String>();
@@ -891,6 +914,19 @@ public class GlsResource
             String key = it.next();
             bib2gls.verbose(String.format("%s -> %s", 
                key, dualAbbrevMap.get(key)));
+         }
+
+         bib2gls.logMessage();
+
+         bib2gls.verbose(bib2gls.getMessage(
+            "message.dual.entryabbreviation.mappings")); 
+
+         for (Iterator<String> it = dualEntryAbbrevMap.keySet().iterator(); 
+              it.hasNext(); )
+         {
+            String key = it.next();
+            bib2gls.verbose(String.format("%s -> %s", 
+               key, dualEntryAbbrevMap.get(key)));
          }
 
          bib2gls.logMessage();
@@ -2688,6 +2724,7 @@ public class GlsResource
       checkFieldMaps(dualEntryMap, "dual-entry-map");
       checkFieldMaps(dualAbbrevMap, "dual-abbrv-map");
       checkFieldMaps(dualSymbolMap, "dual-symbol-map");
+      checkFieldMaps(dualEntryAbbrevMap, "dual-entryabbrv-map");
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
@@ -3570,14 +3607,29 @@ public class GlsResource
       return dualAbbrevMap;
    }
 
+   public HashMap<String,String> getDualEntryAbbrevMap()
+   {
+      return dualEntryAbbrevMap;
+   }
+
    public String getFirstDualAbbrevMap()
    {
       return dualAbbrevFirstMap;
    }
 
+   public String getFirstDualEntryAbbrevMap()
+   {
+      return dualEntryAbbrevFirstMap;
+   }
+
    public boolean backLinkFirstDualAbbrevMap()
    {
       return backLinkDualAbbrev;
+   }
+
+   public boolean backLinkFirstDualEntryAbbrevMap()
+   {
+      return backLinkDualEntryAbbrev;
    }
 
    public String getDualField()
@@ -3853,16 +3905,18 @@ public class GlsResource
    private String dualField = null;
 
    private HashMap<String,String> dualEntryMap, dualAbbrevMap,
-      dualSymbolMap;
+      dualSymbolMap, dualEntryAbbrevMap;
 
    // HashMap doesn't retain order, so keep track of the first
    // mapping separately.
 
-   private String dualEntryFirstMap, dualAbbrevFirstMap, dualSymbolFirstMap;
+   private String dualEntryFirstMap, dualAbbrevFirstMap, dualSymbolFirstMap,
+     dualEntryAbbrevFirstMap;
 
    private boolean backLinkDualEntry=false;
    private boolean backLinkDualAbbrev=false;
    private boolean backLinkDualSymbol=false;
+   private boolean backLinkDualEntryAbbrev=false;
 
    private String shortCaseChange=null;
    private String dualShortCaseChange=null;

@@ -11,9 +11,9 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-book.pdf test-article.pdf test-dual-symbols.pdf \
 	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf \
 	  test-supp.pdf test-supp-main.pdf test-random.pdf \
-	  test-glsignore.pdf
+	  test-glsignore.pdf test-dual-entryabbrv.pdf
 
-../lib/bib2gls.jar:	../java/*.java
+../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
 
 test.pdf	: test.glstex
@@ -217,6 +217,13 @@ test-glsignore.pdf	: test-glsignore.glstex
 test-glsignore.glstex	: test-glsignore.tex $(DEPS) test-entries.bib
 		pdflatex test-glsignore
 		$(BIB2GLS) test-glsignore
+
+test-dual-entryabbrv.pdf	: test-dual-entryabbrv.glstex
+		pdflatex test-dual-entryabbrv
+
+test-dual-entryabbrv.glstex	: test-dual-entryabbrv.tex $(DEPS) entries-dual-entryabbrv.bib
+		pdflatex test-dual-entryabbrv
+		$(BIB2GLS) test-dual-entryabbrv
 
 clean	:
 	$(RM) *.aux

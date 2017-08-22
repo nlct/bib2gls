@@ -1933,6 +1933,76 @@ since that entry type doesn't have required fields and
 there's nothing obvious to swap with that type that would
 differentiate it from a normal entry.
 
+\section{\atentry{dualentryabbreviation}}
+\labelatentry{dualentryabbreviation}
+
+The \atentry{dualentryabbreviation} entry type is similar to 
+\atentry{dualentry}, but by default the
+field mappings are:
+\begin{itemize}
+\item \field{long} $\mapsto$ \field{name}
+\item \field{short} $\mapsto$ \field{text}
+\end{itemize}
+You may need to add a mapping from \field{shortplural} to
+\field{plural} if the default is inappropriate.
+
+The required fields are: \field{short}, \field{long} and
+\field{description}. This entry type is designed to emulate the
+example \cs{newdualentry} command used in the
+\texttt{sample-dual.tex} file provided with the \sty{glossaries}
+package. The primary entry is an abbreviation with the given
+\field{short} and \field{long} fields (but not the 
+\field{description}) and the secondary entry is a regular entry with
+the \field{name} copied from the \field{long} field.
+
+For example:
+\begin{verbatim}
+@dualentryabbreviation{svm,
+   long = {support vector machine},
+   short = {SVM},
+   description = {statistical pattern recognition technique}
+}
+\end{verbatim}
+is rather like doing
+\begin{verbatim}
+@abbreviation{svm,
+   long = {support vector machine},
+   short = {SVM}
+}
+
+@entry{dual.svm,
+   name = {support vector machine},
+   description = {statistical pattern recognition technique}
+}
+\end{verbatim}
+but \texttt{dual.svm} will automatically be selected if \texttt{svm}
+is indexed in the document. If \texttt{dual.svm} isn't explicitly
+indexed, it won't have a location list.
+
+As with \atentry{dualentry}, the \field{alias} field will never
+be copied to the secondary entry, nor can it be mapped. The alias will
+only apply to the primary entry.
+
+If the \field{sort} field is missing \bibgls\ by default falls back
+on the \field{name} field. If this is missing, this entry type will
+fallback on the \field{short} field.
+
+Entries provided using \atentry{dualentryabbreviation} will be defined
+with
+\begin{alltt}
+\csref{bibglsnewdualentryabbreviation}
+\end{alltt}
+(which uses \cs{newabbreviation}) for the primary entries and with 
+\begin{alltt}
+\csref{bibglsnewdualentryabbreviationsecondary}
+\end{alltt}
+(which uses \cs{longnewglossaryentry}) for the secondary entries.
+If used with the \styopt{abbreviations} package option, this will
+put the primary entry in the \optfmt{abbreviations} glossary and
+the secondary entry in the \optfmt{main} glossary. 
+Use the \optref{type} and \optref{dual-type} options to override
+this.
+
 \section{\atentry{dualsymbol}}
 \labelatentry{dualsymbol}
 
@@ -2020,7 +2090,7 @@ the creation of a field access command (analogous to
 further details.) Remember that the field won't be
 available until the \ext{glstex} file has been created.
 
-As with \atentry{dualentry}, that the \field{alias} field will never
+As with \atentry{dualentry}, the \field{alias} field will never
 be copied to the dual entry, nor can it be mapped. The alias will
 only apply to the primary entry.
 
@@ -4838,6 +4908,23 @@ This essentially flips the \field{short} field with the
 \field{duallong} field. See \atentryref{dualabbreviation}
 for further details.
 
+\subsection{\csoptnv{dual-entryabbrv-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-entryabbrv-map}
+
+This is like \csopt{dual-entry-map} but applies to
+\atentry{dualentryabbreviation} rather than \atentry{dualentry}. 
+Note that the \field{alias} field can't be mapped. The
+default setting is:
+\begin{verbatim}
+dual-entryabbrv-map=
+{
+  {long,short,shortplural},
+  {name,text,plural}
+}
+\end{verbatim}
+See \atentryref{dualentryabbreviation} for further details.
+
+
 \subsection{\csoptnv{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-symbol-map}
 
@@ -4922,10 +5009,18 @@ defined with \atentry{dualabbreviation} instead of
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
 
+\subsection{\csoptnv{dual-entryabbrv-backlink}=\margm{boolean}}
+\labelopt{dual-entryabbrv-backlink}
+
+This is analogous to \csopt{dual-entry-backlink} but for entries
+defined with \atentry{dualentryabbreviation} instead of
+\atentry{dualentry}.
+
 \subsection{\csoptnv{dual-backlink}=\margm{boolean}}
 \labelopt{dual-backlink}
 
 Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
+\csopt[\meta{boolean}]{dual-entryabbrv-backlink}, 
 \csopt[\meta{boolean}]{dual-abbrv-backlink}, and
 \csopt[\meta{boolean}]{dual-symbol-backlink}.
 
@@ -5129,6 +5224,40 @@ file is:
  \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
 }
 \end{verbatim}
+
+\section{\cs{bibglsnewdualentryabbreviation}}
+\labelcs{bibglsnewdualentryabbreviation}
+
+\begin{definition}
+\cs{bibglsnewdualentryabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentry{dualentryabbreviation} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualentryabbreviation}[5]{%
+  \newabbreviation[#2]{#1}{#3}{#4}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{description} argument.
+
+\section{\cs{bibglsnewdualentryabbreviationsecondary}}
+\labelcs{bibglsnewdualentryabbreviationsecondary}
+
+\begin{definition}
+\cs{bibglsnewdualentryabbreviationsecondary}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define secondary terms identified with the
+\atentry{dualentryabbreviation} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualentryabbreviationsecondary}[5]{%
+  \longnewglossaryentry*{#1}{#2}{#5}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{short} and \meta{long}
+arguments (which will typically be empty unless the default mappings
+are changed).
 
 \section{\cs{bibglsnewdualsymbol}}
 \labelcs{bibglsnewdualsymbol}
