@@ -47,24 +47,64 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
    }
 
    private void processEntry(TeXParser parser, TeXObject labelArg,
-     KeyValList fields, TeXObject descriptionArg) throws IOException
+     KeyValList fields, TeXObject descriptionArg, boolean trimDesc)
+     throws IOException
    {
+      if (trimDesc && descriptionArg instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)descriptionArg;
+
+         for (int i = list.size()-1; i >= 0; i--)
+         {
+            if (list.get(i) instanceof WhiteSpace)
+            {
+               list.remove(i);
+            }
+            else if (!(list.get(i) instanceof Ignoreable))
+            {
+               break;
+            }
+         }
+      }
+
       fields.put("description", descriptionArg);
       processEntry(parser, labelArg.toString(parser), fields);
    }
 
    public void process(TeXParser parser) throws IOException
    {
+      TeXObject obj = parser.peekStack();
+
+      boolean isStar = false;
+
+      if (obj != null && (obj instanceof CharObject)
+        && ((CharObject)obj).getCharCode() == '*')
+      {
+         isStar = true;
+         parser.popStack();
+      }
+
       processEntry(parser, parser.popNextArg(), 
         KeyValList.getList(parser, parser.popNextArg()),
-        parser.popNextArg(false));
+        parser.popNextArg(false), isStar);
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
+      TeXObject obj = list.peekStack();
+
+      boolean isStar = false;
+
+      if (obj != null && (obj instanceof CharObject)
+        && ((CharObject)obj).getCharCode() == '*')
+      {
+         isStar = true;
+         list.popStack(parser);
+      }
+
       processEntry(parser, list.popArg(parser), 
         KeyValList.getList(parser, list.popArg(parser)),
-        list.popArg(parser, false));
+        list.popArg(parser, false), isStar);
    }
 
 }
