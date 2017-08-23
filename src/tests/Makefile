@@ -11,7 +11,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-book.pdf test-article.pdf test-dual-symbols.pdf \
 	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf \
 	  test-supp.pdf test-supp-main.pdf test-random.pdf \
-	  test-glsignore.pdf test-dual-entryabbrv.pdf
+	  test-glsignore.pdf test-dual-entryabbrv.pdf \
+	  test-match-entrytype.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -224,6 +225,13 @@ test-dual-entryabbrv.pdf	: test-dual-entryabbrv.glstex
 test-dual-entryabbrv.glstex	: test-dual-entryabbrv.tex $(DEPS) entries-dual-entryabbrv.bib
 		pdflatex test-dual-entryabbrv
 		$(BIB2GLS) test-dual-entryabbrv
+
+test-match-entrytype.pdf	: test-match-entrytype.glstex
+		pdflatex test-match-entrytype
+
+test-match-entrytype.glstex	: test-match-entrytype.tex $(DEPS) entries.bib
+		pdflatex test-match-entrytype
+		$(BIB2GLS) test-match-entrytype
 
 clean	:
 	$(RM) *.aux

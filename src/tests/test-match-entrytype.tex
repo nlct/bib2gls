@@ -1,0 +1,43 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,index,abbreviations,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+  match={entrytype={entry}},% only select @entry
+  type=main% put these entries in the 'main' glossary
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+  match={entrytype={abbreviation}},% only select @abbreviation
+  type=abbreviations% put these entries in the 'abbreviations' glossary
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={letter-case},% case-sensitive letter sort
+  match={entrytype={symbol}},% only select @symbol
+  type=symbols% put these entries in the 'symbols' glossary
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+  match={entrytype={index}},% only select @index
+  type=index% put these entries in the 'index' glossary
+]
+
+\begin{document}
+\Gls{bird} and \gls{goose}.
+Symbol: $\gls{v}$.
+Abbreviation: \gls{html}.
+
+\printunsrtglossaries
+\end{document}
+
