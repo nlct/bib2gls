@@ -198,6 +198,52 @@ public class NewGlossaryEntry extends ControlSequence
 
             object = newVal;
          }
+         else if (field.equals("type"))
+         {
+            // Ignore type=\glsdefaulttype
+
+            if (object instanceof TeXObjectList)
+            {
+               TeXObjectList list = (TeXObjectList)object;
+
+               if (list.peekStack() == null)
+               {
+                  // This shouldn't happen as it suggests type={}
+                  // which is invalid. Ignore this field.
+
+                  continue;
+               }
+
+               // using popArg here to skip any leading ignoreables
+               // (such as comments or ignored spaces)
+
+               TeXObject val = list.popArg(parser);
+
+               if (val instanceof ControlSequence
+                   && ((ControlSequence)val).getName().equals("glsdefaulttype"))
+               {
+                  if (list.peekStack() == null)
+                  {
+                     // ignore this field
+
+                     continue;
+                  }
+
+                  // if we get here, then something follows
+                  // \glsdefaulttype which is a bit odd, but retain
+                  // the field.
+               }
+
+               // value isn't \glsdefaulttype so push it back
+
+               list.push(val);
+            }
+            else if (object instanceof ControlSequence
+              && ((ControlSequence)object).getName().equals("glsdefaulttype"))
+            {
+               continue;
+            }
+         }
 
          if ((object instanceof Group) && !(object instanceof MathGroup))
          {
