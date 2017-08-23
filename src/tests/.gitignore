@@ -1,4 +1,5 @@
 glossaries-extra.sty
+glossaries.sty
 *.out
 *.log
 *.aux

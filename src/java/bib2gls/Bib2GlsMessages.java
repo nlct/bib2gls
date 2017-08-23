@@ -51,6 +51,18 @@ public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
        }
     }
 
+    public String getMessageIfExists(String label, Object... args)
+    {
+       MessageFormat msg = get(label);
+
+       if (msg == null)
+       {
+          return null;
+       }
+
+       return msg.format(args);
+    }
+
     public String getMessage(String label, Object... args)
     {
        MessageFormat msg = get(label);
@@ -63,6 +75,7 @@ public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
 
        return msg.format(args);
     }
+
 
     public String getChoiceMessage(String label, int argIdx,
       String choiceLabel, int numChoices, Object... args)

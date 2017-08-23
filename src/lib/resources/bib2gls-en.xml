@@ -161,6 +161,14 @@ Defaulting to: {0}.
 <entry key="tag.pages">Pages</entry>
 <entry key="tag.passim">passim</entry>
 
+<!--
+     Letter groups usually only have the first character converted to upper case
+     (for example, the digraph 'dz' is converted to 'Dz'). This doesn't apply
+     to the Dutch digraph 'ij', which should be converted to 'IJ'. Other 
+     exceptions may be added as appropriate.
+  -->
+<entry key="grouptitle.case.ij">IJ</entry>
+
 <entry key="warning.title">Warning: {0}</entry>
 <entry key="warning.substituting">Substituting {0} with {1}</entry>
 <entry key="warning.removing">Removing {0}</entry>

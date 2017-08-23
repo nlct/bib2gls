@@ -120,8 +120,12 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 
       if (bib2gls.useGroupField() && entry.getFieldValue("group") == null)
       {
+         GlsResource resource = bib2gls.getCurrentResource();
+         String entryType = resource.getType(entry);
+
          entry.putField("group",
-            String.format("\\bibglsnumbergroup{%s}", value));
+            String.format("\\bibglsnumbergroup{%s}{%s}", value,
+               entryType == null ? "" : entryType));
       }
 
       if (bib2gls.getVerboseLevel() > 0)

@@ -106,7 +106,7 @@ batch script analogous to `bib2gls.sh` called `bib2gls.bat` that
 contains the following:
 ```com
 @ECHO OFF
-FOR /F %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts bib2gls.jar') DO SET JARPATH=%%I
+FOR /F "tokens=*" %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts bib2gls.jar') DO SET JARPATH=%%I
 java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
 ```
 (Similarly for `convertgls2bib.jar`.)

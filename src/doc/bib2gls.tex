@@ -304,6 +304,10 @@ actual '='
   {\string-#1}%
 }
 
+\newcommand*{\keyword}[1]{%
+  \texorpdfstring{\emph{#1}\index{#1}}{#1}%
+}
+
 \definecolor{defbackground}{rgb}{1,1,0.75}
 \newsavebox\defsbox
 \newlength\defwidth
@@ -448,9 +452,10 @@ such as JabRef. The document build process
 can now be analogous to that used with \app{bibtex} (or
 \appfmt{biber}), where only those entries that have been recorded in the
 document (and possibly their dependent entries) will be extracted
-from the \ext{bib} file. Since \bibgls\ can also sort entries and collate
-location lists, it doubles as an indexing application, which means
-that the \app{makeglossaries} step can be skipped.
+from the \ext{bib} file. Since \bibgls\ can also perform
+hierarchical sorting and can collate location lists, it doubles as
+an indexing application, which means that the \app{makeglossaries}
+step can be skipped.
 
 Note that \bibgls\ requires the extension package
 \sty{glossaries-extra} and can't be used with just the base
@@ -505,11 +510,13 @@ Here's an example document that uses this data:
 
 \GlsXtrLoadResources[
   src={entries},% data in entries.bib
-  sort={en-GB},% sort according to 'en-GB' locale
+  sort={en-GB}% sort according to 'en-GB' locale
 ]
 
 \begin{document}
 \Gls{bird} and \gls{goose}.
+Symbol: $\gls{v}$.
+Abbreviation: \gls{html}.
 
 \printunsrtglossaries
 \end{document}
@@ -521,22 +528,65 @@ pdflatex myDoc
 bib2gls myDoc
 pdflatex myDoc
 \end{verbatim}
-(This document assumes \appfmt{pdflatex} for simplicity. Replace
+(This manual assumes \appfmt{pdflatex} for simplicity. Replace
 with \appfmt{latex}, \appfmt{xelatex} or \appfmt{lualatex} as
 appropriate.)
+
+You can have multiple instances of \cs{GlsXtrLoadResources}. For
+example:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,index,abbreviations,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+  match={entrytype={entry}},% only select @entry
+  type={main}% put these entries in the 'main' glossary
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+  match={entrytype={abbreviation}},% only select @abbreviation
+  type={abbreviations}% put these entries in the 'abbreviations' glossary
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={letter-case},% case-sensitive letter sort
+  match={entrytype={symbol}},% only select @symbol
+  type={symbols}% put these entries in the 'symbols' glossary
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+  match={entrytype={index}},% only select @index
+  type={index}% put these entries in the 'index' glossary
+]
+
+\begin{document}
+\Gls{bird} and \gls{goose}.
+Symbol: $\gls{v}$.
+Abbreviation: \gls{html}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
 
 Note that there's no need to called \app{xindy} or \app{makeindex}
 since \bibgls\ automatically sorts the entries and collates the locations
 after selecting the required entries from the \ext{bib} file and
 before writing the temporary file that's input with \cs{glsxtrresourcefile}
-(or with the shortcut \cs{GlsXtrLoadResources}).
-This means the entries are already defined in the correct order,
-and only those entries that have been used in the document are
-defined,
-so \cs{printunsrtglossary} (or \cs{printunsrtglossaries}) may
-be used.  (The \texttt{unsrt} part
-of the command name indicates that all defined entries should be listed in the
-order of definition from \sty{glossaries-extra}'s point of view.)
+(or the more convenient shortcut \cs{GlsXtrLoadResources}).  This
+means the entries are already defined in the correct order, and only
+those entries that have been used in the document are defined, so
+\cs{printunsrtglossary} (or \cs{printunsrtglossaries}) may be used.
+(The \texttt{unsrt} part of the command name indicates that all
+defined entries should be listed in the order of definition from
+\sty{glossaries-extra}'s point of view.)
 
 If you additionally want to use an indexing application, such
 as \app{xindy}, you need the package option
@@ -595,6 +645,9 @@ letter ISO language code. For example, \filefmt{bib2gls-sr.xml}.
 
 If there is no match, \bibgls\ will fallback on the English resource file
 \file{bib2gls-en.xml}.
+(Currently only \file{bib2gls-en.xml} exists as my language skills aren't up
+to translating it. Any volunteers who want to provide other language
+resource files would be much appreciated.)
 
 Note that if you use the \optref[true]{loc-prefix} option, the
 textual labels (\qt{Page} and \qt{Pages} in English) will be taken
@@ -603,10 +656,6 @@ doesn't match the document language, you will have to manually set
 the correct translation (in English, this would be
 \csopt[Page\dcomma Pages]{loc-prefix}). The default definition of
 \csref{bibglspassim} is also obtained from the resource file.
-
-Currently only \file{bib2gls-en.xml} exists as my language skills aren't up
-to translating it. Any volunteers who want to provide other language
-resource files would be much appreciated.
 
 \section{Manual Installation}
 
@@ -618,16 +667,21 @@ Replace \meta{TEXMF} with the path to your local or home TEXMF tree
 Copy the files provided to the following locations:
 \begin{itemize}
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/bib2gls.jar}
+(Java application.)
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/convertgls2bib.jar}
+(Java application.)
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/texparserlib.jar}
+(Java library.)
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/resources/bib2gls-en.xml}
+(English resource file.)
 \item \meta{TEXMF}\filefmt{/doc/support/bib2gls/bib2gls.pdf}
+(This document.)
 \end{itemize}
 
 If you are using a Unix-like system, there are also bash scripts
 provided called \file{bib2gls.sh} and \file{convertgls2bib.sh}. 
 Either copy then directly to somewhere on your path without the \ext{sh} 
-extension. For example:
+extension, for example:
 \begin{verbatim}
 cp bib2gls.sh ~/bin/bib2gls
 cp convertgls2bib.sh ~/bin/convertgls2bib
@@ -636,7 +690,7 @@ or copy the files to
 \meta{TEXMF}\filefmt{/scripts/bib2gls/} and create a
 symbolic link to them called just \filefmt{bib2gls} and
 \filefmt{convertgls2bib} from somewhere on
-your path. For example:
+your path, for example:
 \begin{verbatim}
 cp bib2gls.sh ~/texmf/scripts/bib2gls/
 cp convertgls2bib.sh ~/texmf/scripts/bib2gls/
@@ -646,16 +700,17 @@ ln -s ~/texmf/scripts/bib2gls/convertgls2bib.sh convertgls2bib
 \end{verbatim}
 The \file{texparserlib.jar} file isn't an application but is a
 library used by both \file{bib2gls.jar} and
-\file{convertgls2bib.jar}. (The library is in a separate 
-\href{https://github.com/nlct/texparser}{GitHub repository}
-as it's also used by some of my other applications.)
+\file{convertgls2bib.jar}, and so needs to be in the same class path. 
+(The library is in a separate
+\href{https://github.com/nlct/texparser}{GitHub repository} as it's
+also used by some of my other applications.)
 
 Windows users can create a \ext{bat} file that works in a
 similar way to the bash scripts. To do this, create a file called
 \file{bib2gls.bat} that contains the following:
 \begin{verbatim}
 @ECHO OFF
-FOR /F %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts
+FOR /F "tokens=*" %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts
 bib2gls.jar') DO SET JARPATH=%%I
 java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
 \end{verbatim}
@@ -671,8 +726,9 @@ To test that the application has been successfully installed, open a
 command prompt or terminal and run the following command:
 \begin{verbatim}
 bib2gls --version
+convertgls2bib --version
 \end{verbatim}
-This should display the version information.
+This should display the version information for both applications.
 
 \chapter{\texorpdfstring{\TeX}{TeX}\ Parser Library}
 \label{sec:texparserlib}
@@ -846,7 +902,7 @@ texparserlib: {}$\card{S}$ -> |S|
 \end{verbatim}
 So the \field{sort} value for this entry is set to \qtt{|S|}
 (the \textbar\ characters from the definition of \csfmt{card} provided
-by the \atentry{preamble} have been included, but the
+in \atentry{preamble} have been included, but the
 font change has been discarded). In this case the sort value
 consists of three Unicode characters 0x7C (vertical line, decimal
 value 124),
@@ -893,9 +949,8 @@ v -> '\usebox\varrow' (v) [118 8407]
 group since the vertical bar character isn't considered a 
 letter.)
 
-
-If \optref[letter-nocase]{sort} is used instead, after conversion
-by the interpreter, the sort values will all be converted to
+If \optref[letter-nocase]{sort} is used instead then, after conversion
+by the interpreter, the sort values will all be changed to
 lower case. The order is now: \texttt{i} ($\imaginary$), 
 \texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$),
 \texttt{v} ($\vec{v}$) and \texttt{card} ($\card{S}$).
@@ -1061,6 +1116,8 @@ contains my entry definitions and a document called
 \begin{verbatim}
 \GlsXtrLoadResources[src={test-entries}]
 \end{verbatim}
+(\filefmt{test-entries.bib} is in the same directory as
+\filefmt{mydoc.tex}).
 If I compile this document using
 \begin{verbatim}
 pdflatex -output-directory tmp mydoc
@@ -1072,7 +1129,8 @@ the \ext{aux} file as
 \glsxtr@resource{src={test-entries}}{mydoc}
 \end{verbatim}
 If I run \bibgls\ from the \filefmt{tmp} directory, then it won't
-be able to find the \filefmt{test-entries.bib} file.
+be able to find the \filefmt{test-entries.bib} file (since it's in
+the parent directory).
 
 If I run \bibgls\ from the same directory as \filefmt{mydoc.tex}
 using
@@ -1191,7 +1249,6 @@ Some entries may reference another entry within a field, using
 commands like \cs{gls}, so \bibgls\ parses the fields for these
 commands to determine dependent entries to allow them to be selected
 even if they haven't been used within the document.
-
 The \styopt{shortcuts} package option provided by
 \styfmt{glossaries-extra} defines various synonyms, such as \cs{ac}
 which is equivalent to \cs{gls}. By default the value of the
@@ -1248,7 +1305,7 @@ currently no conflict. (This is the first record for page~3 for the
 entry given by \texttt{gls.sample}.)
 \item The second record (\texttt{hypersf}) conflicts 
 with the existing record (\texttt{emph}). Neither has
-the format \texttt{glsnumberformat} so \bibgls\ consults
+the format \texttt{glsnumberformat} or \texttt{glsignore} so \bibgls\ consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
 \item The \texttt{hypersf} format (from the new record) is mapped to \texttt{hyperit},
@@ -1267,7 +1324,7 @@ records for other entries also used on page~3 interspersed between these records
 \end{itemize}
 \item The third record (\texttt{hyperbf}) conflicts 
 with the existing record (\texttt{emph}). Neither has
-the format \texttt{glsnumberformat} so \bibgls\ again consults
+the format \texttt{glsnumberformat} or \texttt{glsignore} so \bibgls\ again consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
 \item  The new record's \texttt{hyperbf} format has no mapping provided,
@@ -1303,20 +1360,154 @@ called \field{group}. If the \longarg{group} switch is used then, when
 sorting, \bibgls\ will try to determine the letter group for each
 entry and add it to the \field{group} field.  (Some \optref{sort}
 options ignore this setting.) This value will be picked up by
-\cs{printunsrtglossary} if letter group headings are required (for
-example with the \abbrstyle{indexgroup} style). If you're not using
+\cs{printunsrtglossary} if group headings are required (for
+example with the \glostyle{indexgroup} style). If you're not using
 a glossary style that displays the group headings, there's no need
 to use this switch. Note that this switch doesn't automatically
-select an appropriate glossary style. If this switch is set, 
-you can explicitly set the group field value for all entries using
-the \optref{group} option.
+select an appropriate glossary style.
 
-The default is \argref{no-group}.
+There are four basic types of groups:
+\begin{itemize}
+\item \keyword{letter groups} where the group title indicates the
+first letter of all the sort values within that group.
+The group title is set with \csref{bibglslettergroup}.
+
+\item \keyword{non-letter groups} (or \keyword{symbol groups})
+where the first characters of all the sort values within that group
+are non-alphabetical. The group title is set with \csref{bibglsothergroup}.
+
+\item \keyword{number groups} for all entries sorted by a numeric
+comparison (such as \optref[integer]{sort}). 
+The group title is set with \csref{bibglsnumbergroup}.
+
+\item \keyword{custom groups} for all entries that have had the
+group title explicitly set using the \optref[\meta{title}]{group} 
+resource option.
+\end{itemize}
+
+The letter group titles will typically have the first character
+converted to upper case for the rule-based comparisons
+(\optref[custom]{sort} and \optref[\meta{lang-tag}]{sort}). A
+\qt{letter} may not necessarily be a single character (depending on
+the sort rule), but may be composed of multiple characters, such as
+a \keyword{digraph} (two characters) or \keyword{trigraph} (three
+characters).
+
+For example, if the sort rule recognises the digraph \qt{dz} as a
+letter, then it will be converted to \qt{Dz} for the group title. 
+There are some exceptions to this. For example, the Dutch digraph 
+\qt{ij} should be \qt{IJ} rather than \qt{Ij}. This is indicated 
+by the following line in the \hyperref[sec:lang.xml]{language resource file}:
+\begin{verbatim}
+<entry key="grouptitle.case.ij">IJ</entry>
+\end{verbatim}
+If there isn't a \texttt{grouptitle.case.\meta{lc}} key (where 
+\meta{lc} is the lower case version), then only the first character
+will be converted to upper case otherwise the value supplied by the
+resource file is used. This resource key is only checked for
+the locale and custom rule comparisons. If the initial part of
+the sort value isn't recognised as a letter according to the sort rule, 
+then the entry will be in a non-letter group (even if the character
+is alphabetical).
+
+The locale-independent character code comparisons (such as
+\optref[letter-nocase]{sort}) only select the first character of the
+sort value for the group. If the character is
+alphabetical\footnote{according to Java's
+\texttt{Character.isAlphabetic(int)} method} then it will be a
+letter group otherwise it's a non-letter group.  The
+case-insensitive ordering (such as \optref[letter-nocase]{sort})
+will convert the letter group character to upper case. The
+case-sensitive ordering (such as \optref[letter-case]{sort}) won't
+change the case.
+
+Glossary styles with navigational links to groups (such as
+\glostyle{indexhypergroup}) require an extra run for the ordinary
+\csfmt{makeglossaries} and \csfmt{makenoidxglossaries} methods. For
+example, for the document \filefmt{myDoc.tex}:
+\begin{verbatim}
+pdflatex myDoc
+makeglossaries myDoc
+pdflatex myDoc
+pdflatex myDoc
+\end{verbatim}
+On the first \appfmt{pdflatex} call, there's no glossary. On the second
+\appfmt{pdflatex}, there's a glossary but the glossary must be
+processed to find the group information, which is written to the
+\ext{aux} file as
+\begin{alltt}
+\cs{@gls@hypergroup}\margm{type}\margm{group id}
+\end{alltt}
+The third \appfmt{pdflatex} reads this information and is then able
+to create the navigation links.
+
+With \bibgls, if the \optfmt{type} is provided (through the
+\field{type} field or via options such as \optref{type} and
+\optref{dual-type}) then this information can be determined when
+\bibgls\ is ready to write the \ext{glstex} file, which means that
+the extra \LaTeX\ run isn't necessary.
+
+For example:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,abbreviations,style=indexhypergroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries},% data in entries.bib
+  type={main}% put these entries in the 'main' glossary
+]
+
+\GlsXtrLoadResources[src={abbrvs},% data in abbrvs.bib
+  type={abbreviations}% put these entries in the 'abbreviations' glossary
+]
+\end{verbatim}
+Here the \optref{type} is set and \bibgls\ can detect that
+\sty{hyperref} has been loaded, so if the \longargfmt{group} switch
+is used, then the group hyperlinks can be set (using
+\csref{bibglshypergroup}). This means that the build process is
+just:
+\begin{verbatim}
+pdflatex myDoc
+bibtex --group myDoc
+pdflatex myDoc
+\end{verbatim}
+Note that this requires \sty{glossaries} v4.32+. If your version of
+\sty{glossaries} is too old then \bibgls\ can't override
+the default behaviour of \sty{glossary-hypernav}'s
+\cs{glsnavhypertarget}.
+
+If \sty{hyperref} isn't loaded or the \longargfmt{group} switch
+isn't used or the \field{type} isn't set or your version of
+\sty{glossaries} is too old, then the information isn't saved.
+
+For example:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,abbreviations,style=indexhypergroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries}]% data in entries.bib
+
+\GlsXtrLoadResources[src={abbrvs}]% data in abbrvs.bib
+\end{verbatim}
+This requires the build process:
+\begin{verbatim}
+pdflatex myDoc
+bibtex --group myDoc
+pdflatex myDoc
+pdflatex myDoc
+\end{verbatim}
+because the group hyperlink information can't be determined by
+\bibgls, so it's best to always set the \optfmt{type} if you want
+hyper-group styles, and make sure you have an up-to-date version of 
+\sty{glossaries} (and \sty{glossaries-extra}).
 
 \section{\longarg{no-group}}
 \labelarg{no-group}
 
 Don't use the \field{group} field. (Default.)
+The glossary won't have groups even if a group style, such as
+\glostyle{indexgroup}, is used.
 
 \section{\longarg{tex-encoding} \meta{name}}
 \labelarg{tex-encoding}
@@ -1372,12 +1563,12 @@ Entries are defined in the usual \ext{bib} format:
 }
 \end{alltt}
 where \meta{entry-type} is the entry type (listed below),
-\meta{field-name-1} are the field names (same as the keys available
-with \cs{newglossaryentry}) and \meta{id} is a unique label. The
-label can't contain any spaces or commas. In general it's
-best to stick with alpha-numeric labels.  The field values
-may be delimited by braces \margm{text} or double-quotes
-\texttt{"\meta{text}"}.
+\meta{field-name-1}, \ldots, \meta{field-name-n} are the field names
+(same as the keys available with \cs{newglossaryentry}) and
+\meta{id} is a unique label. The label can't contain any spaces or
+commas. In general it's best to stick with alpha-numeric labels.
+The field values may be delimited by braces \margm{text} or
+double-quotes \texttt{"\meta{text}"}.
 
 \bibgls\ allows you to insert prefixes to the labels when the data
 is read through the \optref{label-prefix} option. Remember to use
@@ -1423,9 +1614,9 @@ used as a field. However, note that if you add
 any custom keys in your document using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
 commands must be placed before the first use of
 \cs{glsxtrresourcefile} (or the shortcut \cs{GlsXtrLoadResources}).
-Any unrecognised fields will be ignored.
 
-This is more convenient than using \cs{loadglsentries}, which
+Any unrecognised fields will be ignored.
+This is more convenient than using \cs{input} or \cs{loadglsentries}, which
 requires all the keys used in the file to be defined, regardless of
 whether or not you actually need them in the document.
 
@@ -1455,7 +1646,7 @@ have version 1.14 or 1.15. If the key isn't available,
 option \optref{seealso} won't have an effect).  You can't use both
 \field{see} and \field{seealso} for the same entry with \bibgls.
 Note that the \field{seealso} field doesn't allow for the optional
-\oarg{tag} part. If you need a different tag, either use \field{see}
+\oargm{tag} part. If you need a different tag, either use \field{see}
 or change the definition of \cs{seealsoname} or
 \cs{glsxtruseseealsoformat}.  Note that, unless you are using
 \app{xindy}, \cs{glsxtrindexseealso} just does
@@ -1514,12 +1705,12 @@ For example:
 @preamble{"\providecommand{\set}[1]{\mathcal{#1}}
 \providecommand{\card}[1]{|\set{#1}|}"}
 
-@symbol{S,
+@entry{S,
   name={{}$\set{S}$},
   text={\set{S}},
   description={a set}
 }
-@symbol{card,
+@entry{card,
   name={{}$\card{S}$},
   text={\card{S}},
   description={the cardinality of \gls{S}}
@@ -1713,24 +1904,21 @@ but their actual definitions are determined in the \ext{bib} file.
 \section{\atentry{entry}}
 \labelatentry{entry}
 
-Regular terms are defined by the \atentry{entry} field (such as in
-the \texttt{matrix} example above). This requires the
+Regular terms are defined by the \atentry{entry} field. This requires the
 \field{description} field and either \field{name} or \field{parent}.
 
 For example:
 \begin{verbatim}
-@preamble{"\providecommand{\seealsoname}{see also}
-\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
+@preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
 
 @entry{matrix,
   name={matrix},
   plural={matrices},
   description={rectangular array of values, denoted \gls{M}},
-  see={[\seealsoname]{vector}}
+  seealso={vector}
 }
 
 @entry{M,
-  sort={M},
   name={\ensuremath{M}},
   description={a \gls{matrix}}
 }
@@ -1738,11 +1926,10 @@ For example:
 @entry{vector,
   name = "vector",
   description = {column or row of values, denoted \gls{v}},
-  see={[\seealsoname]{matrix}}
+  seealso={matrix}
 }
 
 @entry{v,
-  sort={v},
   name={\ensuremath{\vec{v}}},
   description={a \gls{vector}}
 }
@@ -1757,18 +1944,26 @@ file using the command \csref{bibglsnewentry}.
 \section{\atentry{symbol}}
 \labelatentry{symbol}
 
-The \entry{symbol} entry type is much like \entry{entry}, but it's
+The \atentry{symbol} entry type is much like \atentry{entry}, but it's
 designed specifically for symbols, so in the previous example, the
 \texttt{M} and \texttt{v} terms would be better defined using the
-\atentry{symbol} entry type instead.
+\atentry{symbol} entry type instead. For example:
+\begin{verbatim}
+@symbol{M,
+  name={\ensuremath{M}},
+  description={a \gls{matrix}}
+}
+\end{verbatim}
 
-The required fields are \field{name} or \field{parent}. If the
-\field{sort} field is omitted, the default sort is given by the
-entry label. Note that this is different from \entry{entry}
-where the sort defaults to \field{name} or \field{parent}
-if omitted. The \field{description} field is not required.
+The required fields are \field{name} or \field{parent}. The
+\field{description} field is required if the \field{name} field is
+missing. If the \field{sort} field is omitted, the default sort is
+given by the entry label. Note that this is different from
+\atentry{entry} where the sort defaults to \field{name} or
+\field{parent} if omitted. (You can use \optref{sort-field} to
+choose a different field.)
 
-Terms defined using \atentry{symbol} will be written to
+Terms that are defined using \atentry{symbol} will be written to
 the output file using the command \csref{bibglsnewsymbol}.
 
 \section{\atentry{number}}
@@ -1803,7 +1998,7 @@ values rather than the symbols:
 \begin{verbatim}
 \GlsXtrLoadResources[
   src={constants},% constants.bib
-  category={number},
+  category={number},% set the category for all selected entries
   sort={double},% numerical double-precision sort
   sort-field={user1}% sort according to 'user1' field
 ]
@@ -1821,7 +2016,7 @@ glossary format to include the \field{user1} field:
 \section{\atentry{index}}
 \labelatentry{index}
 
-The \entry{index} entry type is designed for entries that don't have
+The \atentry{index} entry type is designed for entries that don't have
 a description. Only the label is required. If \field{name} is
 omitted, it's assumed to be the same as the label. However, this
 means that if the name contains any characters that can't be used in
@@ -1835,16 +2030,18 @@ Example:
 
 @index{goose,plural={geese}}
 
+@index{sealion,name={sea lion}}
+
 @index{facade,name={fa\c{c}ade}}
 \end{verbatim}
 
-Terms defined using \atentry{index} will be written to the output
+Terms that are defined using \atentry{index} will be written to the output
 file using the command \csref{bibglsnewindex}.
 
 \section{\atentry{abbreviation}}
 \labelatentry{abbreviation}
 
-The \entry{abbreviation} entry type is designed for abbreviations.
+The \atentry{abbreviation} entry type is designed for abbreviations.
 The required fields are \field{short} and \field{long}. If the
 \field{sort} key is missing, \bibgls\ will use the value of the
 \field{short} field.
@@ -1861,6 +2058,8 @@ using \optref{sort-field} and you can also tell \bibgls\ to ignore
 certain fields using the \optref{ignore-fields}, so you can
 include a \field{description} field if sometimes you need it and
 instruct \bibgls\ to ignore it when you don't want it.
+You can also use \optref{short-case-change} to convert the case of
+the \field{short} field.
 
 For example:
 \begin{verbatim}
@@ -1877,12 +2076,22 @@ the following in your document (where the \ext{bib} file is called
 \setabbreviationstyle{long-noshort-desc}
 \GlsXtrLoadResources[src={entries-abbrv.bib},sort-field={long}]
 \end{verbatim}
-Whereas, if you want the \abbrstyle{long-short} style, then you can
+Whereas, if you want the \abbrstyle{long-short-sc} style, then you can
 instead do:
 \begin{verbatim}
-\setabbreviationstyle{long-short}
+\setabbreviationstyle{long-short-sc}
 \GlsXtrLoadResources[src={entries-abbrv.bib},ignore-fields={description}]
 \end{verbatim}
+or to convert the short value to upper case and use the
+\abbrstyle{long-short-sm} style instead:
+\begin{verbatim}
+\setabbreviationstyle{long-short-sm}
+\GlsXtrLoadResources[src={entries-abbrv.bib},
+ short-case-change={uc},% convert short value to upper case
+ ignore-fields={description}]
+\end{verbatim}
+(If you want an equivalent of \csfmt{newdualentry}, use
+\atentryref{dualentryabbreviation} instead.)
 
 Terms defined using \atentry{abbreviation} will be written to the output
 file using the command \csref{bibglsnewabbreviation}.
@@ -1890,18 +2099,18 @@ file using the command \csref{bibglsnewabbreviation}.
 \section{\atentry{acronym}}
 \labelatentry{acronym}
 
-The \entry{acronym} entry type is like \entry{abbreviation} except that
+The \atentry{acronym} entry type is like \atentry{abbreviation} except that
 the term is written to the output file using the command
 \csref{bibglsnewacronym}.
 
 \section{\atentry{dualentry}}
 \labelatentry{dualentry}
 
-The \entry{dualentry} entry type is similar to \entry{entry} but
+The \atentry{dualentry} entry type is similar to \atentry{entry} but
 actually defines two entries: the primary entry and the dual entry.
 The dual entry contains the same information as the primary entry
 but some of the fields are swapped around. The dual entry is given
-the prefix set by the \csopt{dual-prefix} option.
+the prefix set by the \optref{dual-prefix} option.
 
 Note that the \field{alias} field will never be copied to the dual
 entry, nor can it be mapped. The alias will only apply to the
@@ -1939,13 +2148,13 @@ where \idprefix{dual} is replaced by the value of the
 with \csfmt{bibglsnewentry} both the primary and dual entries are
 defined using \csref{bibglsnewdualentry}. The \field{category} 
 and \field{type} fields can be set for the dual entry using the
-\csopt{dual-category} and \csopt{dual-type} options.
+\optref{dual-category} and \optref{dual-type} options.
 
-If \csopt[combine]{dual-sort} then the dual entries will be sorted
+If \optref[combine]{dual-sort} then the dual entries will be sorted
 along with the primary entries, otherwise the \csopt{dual-sort}
 indicates how to sort the dual entries and the dual entries will be
 appended to the end of the \ext{glstex} file. The
-\csopt{dual-sort-field} determines what field to use for the sort
+\optref{dual-sort-field} determines what field to use for the sort
 value if the dual entries should be sorted separately.
 
 For example:
@@ -2016,12 +2225,16 @@ is indexed in the document. If \texttt{dual.svm} isn't explicitly
 indexed, it won't have a location list.
 
 As with \atentry{dualentry}, the \field{alias} field will never
-be copied to the secondary entry, nor can it be mapped. The alias will
+be copied to the dual entry, nor can it be mapped. The alias will
 only apply to the primary entry.
 
 If the \field{sort} field is missing \bibgls\ by default falls back
-on the \field{name} field. If this is missing, this entry type will
-fallback on the \field{short} field.
+on the \field{name} field. If this is missing, this sort value will
+fallback on the \field{short} field. This means that if \field{name}
+isn't explicitly given in \atentry{dualentryabbreviation}, then the 
+primary entry will be sorted according to \field{short} but the dual
+will be sorted according its \field{name} (which has been copied
+from the primary \field{long}).
 
 Entries provided using \atentry{dualentryabbreviation} will be defined
 with
@@ -2033,11 +2246,11 @@ with
 \csref{bibglsnewdualentryabbreviationsecondary}
 \end{alltt}
 (which uses \cs{longnewglossaryentry}) for the secondary entries.
-If used with the \styopt{abbreviations} package option, this will
-put the primary entry in the \optfmt{abbreviations} glossary and
-the secondary entry in the \optfmt{main} glossary. 
-Use the \optref{type} and \optref{dual-type} options to override
-this.
+This means that if the \styopt{abbreviations}
+package option is used, this will put the primary entry in the
+\optfmt{abbreviations} glossary and the secondary entry in the
+\optfmt{main} glossary.  Use the \optref{type} and
+\optref{dual-type} options to override this.
 
 \section{\atentry{dualsymbol}}
 \labelatentry{dualsymbol}
@@ -5706,18 +5919,19 @@ or redefined after the resources are loaded:
 \labelcs{bibglslettergroup}
 
 \begin{definition}
-\cs{bibglslettergroup}\margm{group}\margm{character}\margm{id}
+\cs{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{type}
 \end{definition}
 This command is provided if the \argref{group} switch is used. Any
 entries whose sort value indicates that they are in a letter group
-(where a non-numerical sort is used) will set the \field{group}
-field to contain this command. The \meta{group} argument indicates
-the letter group and the \meta{character} argument indicates the actual
-initial character of the sort value, which may not be the same as
-\meta{group}. The \meta{id} is a numeric identifier for that
-group. (For a rule-based collation, this is obtained from the
-first collation element. For a letter sort, it's
-obtained from the character code.)
+will set the \field{group} field to contain this command. The
+\meta{title} argument indicates the letter group and the
+\meta{letter} argument indicates the actual initial letter of
+the sort value, which may not be the same as \meta{title}. The
+\meta{id} is a numeric identifier for that group. (For a rule-based
+collation, this is obtained from the first collation element. For a
+letter sort, it's obtained from the character code.) The \meta{type}
+indicates the associated glossary type. This value will be empty if
+unknown.
 
 For example:
 \begin{verbatim}
@@ -5728,13 +5942,16 @@ of a centimetre}
 }
 \end{verbatim}
 The \field{sort} value is \qtt{\AA ngstr\"om}. With \optref[en]{sort}
-the \meta{group} part will be \texttt{A} but with \optref[sv]{sort}
-the \meta{group} part will be \texttt{\AA}. In both cases the
-\meta{character} argument will be \texttt{\AA}.
+the \meta{title} part will be \texttt{A} but with \optref[sv]{sort}
+the \meta{title} part will be \texttt{\AA}. In both cases the
+\meta{letter} argument will be \texttt{\AA}.
 
-The \meta{group} argument will typically by title-cased. An exception is made to the
-title-casing for the digraph \qt{ij} which will be \qt{IJ} (rather than
-\qt{Ij}).
+The \meta{title} argument will typically by title-cased. An
+exception is made to the title-casing if the
+\hyperref[sec:lang.xml]{language resource file} contains the key
+\texttt{grouptitle.case.\meta{lc}} where \meta{lc} is the lower case
+version of \meta{title}. See the \argref{group} switch
+for more details.
 
 The default definition of this command depends on the
 existence of \cs{glsxtrsetgrouptitle}, which was introduced
@@ -5744,7 +5961,7 @@ to \sty{glossaries-extra} v1.14.
 \labelcs{bibglsothergroup}
 
 \begin{definition}
-\cs{bibglsothergroup}\margm{character}\margm{codepoint}
+\cs{bibglsothergroup}\margm{character}\margm{codepoint}\margm{type}
 \end{definition}
 This command is provided if the \argref{group} switch is used. Any
 entries whose sort value indicates that they are not in a letter
@@ -5759,17 +5976,18 @@ group (where a non-numerical sort is used) will set the
 In this case (with the interpreter on) the sort value is \verb"|S|"
 so this will be assigned to the \qt{other} group:
 \begin{verbatim}
-\bibglsothergroup{|}{124}
+\bibglsothergroup{|}{124}{}
 \end{verbatim}
 The \meta{character} is the first character of the sort value and
 \meta{codepoint} is the corresponding decimal Unicode value of that
-character.
+character. (Note that the \meta{type} is empty as the \field{type}
+field is missing and the \optref{type} option hasn't been used.)
 
 The default definition of this command is:
 \begin{verbatim}
-\providecommand{\bibglsothergroup}[2]{\glssymbolsgroupname}
+\providecommand{\bibglsothergroup}[3]{\glssymbolsgroupname}
 \end{verbatim}
-This ignores both arguments but could be redefined to sub-divide the
+This ignores all arguments but could be redefined to sub-divide the
 symbols according to the initial character if there are large blocks
 starting with the same character.
 
@@ -5777,7 +5995,7 @@ starting with the same character.
 \labelcs{bibglsnumbergroup}
 
 \begin{definition}
-\cs{bibglsnumbergroup}\margm{number}
+\cs{bibglsnumbergroup}\margm{number}\margm{type}
 \end{definition}
 The numeric sort options (such as \optref[double]{sort}) don't use
 either of the above commands when setting the \field{group} field.
@@ -5786,8 +6004,20 @@ actual number given by the sort value.
 
 The default definition of this command is:
 \begin{verbatim}
-\providecommand{\bibglsnumbergroup}[1]{\glsnumbersgroupname}
+\providecommand{\bibglsnumbergroup}[2]{\glsnumbersgroupname}
 \end{verbatim}
+
+\section{\cs{bibglshypergroup}}
+\labelcs{bibglshypergroup}
+
+\begin{definition}
+\cs{bibglshypergroup}\margm{type}\margm{group id}
+\end{definition}
+
+If the \ext{log} file indicates that \sty{hyperref} has been loaded
+and the \longarg{group} switch is used, then this command will be
+used to create the navigation information for glossary styles such
+as \glostyle{indexhypergroup}.
 
 \section{\cs{bibglssupplemental}}
 \labelcs{bibglssupplemental}
@@ -5899,6 +6129,16 @@ will be written as
 \end{verbatim}
 (The \field{seealso} key is provided by \sty{glossaries-extra}
 v1.16+.)
+
+Additionally, if \meta{\keyvallist} contains
+\begin{alltt}
+type=\marg{\cs{glsdefaulttype}}
+\end{alltt}
+then this field will be ignored. (This \field{type} value is
+recommended in \meta{\keyvallist} when loading files with
+\cs{loadglsentries}\oargm{type}\margm{file} to allow the optional
+argument to set the \field{type}. With \bibgls\ you can use the
+\optref{type} option instead.)
 
 \section{\cs{newglossaryentry}}
 The base \sty{glossaries} package provides:

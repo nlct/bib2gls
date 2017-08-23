@@ -1,9 +1,10 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: {group: on}
 % arara: pdflatex
 \documentclass{article}
 
-\usepackage[record,index,abbreviations,symbols]{glossaries-extra}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,index,abbreviations,symbols,style=indexhypergroup]{glossaries-extra}
 
 \GlsXtrLoadResources[
   src={entries},% data in entries.bib
@@ -16,12 +17,12 @@
   src={entries},% data in entries.bib
   sort={en-GB},% sort according to 'en-GB' locale
   match={entrytype={abbreviation}},% only select @abbreviation
-  type=abbreviations% put these entries in the 'abbreviations' glossary
+  %type=abbreviations% put these entries in the 'abbreviations' glossary
 ]
 
 \GlsXtrLoadResources[
   src={entries},% data in entries.bib
-  sort={letter-case},% case-sensitive letter sort
+  sort={letter-nocase},% case-insensitive letter sort
   match={entrytype={symbol}},% only select @symbol
   type=symbols% put these entries in the 'symbols' glossary
 ]

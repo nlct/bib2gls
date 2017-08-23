@@ -20,11 +20,13 @@ package com.dickimawbooks.bib2gls;
 
 public class GroupTitle
 {
-   public GroupTitle(String title, String actual, int id)
+   public GroupTitle(String title, String actual, int id,
+     String type)
    {
       this.title = title;
       this.actual = actual;
       this.id = id; 
+      this.type = type;
    }
 
    public String getTitle()
@@ -42,17 +44,34 @@ public class GroupTitle
       return actual;
    }
 
+   public String getType()
+   {
+      return type;
+   }
+
    public int getId()
    {
       return id;
    }
 
-   public String toString()
+   public String getKey()
    {
-      return String.format("{%s}{%s}{%d}", title, actual, id);
+      return getKey(type, id);
    }
 
-   private String title, actual;
+   public static String getKey(String entryType, int groupId)
+   {
+      return entryType == null ? ""+groupId :
+        String.format("%s.%d", entryType, groupId);
+   }
+
+   public String toString()
+   {
+      return String.format("{%s}{%s}{%d}{%s}", title, actual, id,
+       type == null ? "" : type);
+   }
+
+   private String title, actual, type;
 
    private int id;
 }

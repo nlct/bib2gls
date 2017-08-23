@@ -117,19 +117,21 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
             GlsResource resource = bib2gls.getCurrentResource();
 
-            GroupTitle grpTitle = resource.getGroupTitle(cp);
+            GroupTitle grpTitle = resource.getGroupTitle(entry, cp);
             String args;
 
             if (grpTitle == null)
             {
-               grpTitle = new GroupTitle(grp, str, cp);
+               grpTitle = new GroupTitle(grp, str, cp,
+                    resource.getType(entry));
                resource.putGroupTitle(grpTitle);
                args = grpTitle.toString();
             }
             else
             {
-               args = String.format("{%s}{%s}{%d}", grpTitle.getTitle(), 
-                 str, cp);
+               String entryType = resource.getType(entry);
+               args = String.format("{%s}{%s}{%d}{%s}", grpTitle.getTitle(), 
+                 str, cp, entryType == null ? "" : entryType);
             }
 
             entry.putField("group", 
@@ -143,9 +145,13 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
                str = "\\char`\\"+str;
             }
 
+            GlsResource resource = bib2gls.getCurrentResource();
+            String entryType = resource.getType(entry);
+
             entry.putField("group", 
-               String.format("\\bibglsothergroup{%s}{%X}", 
-                             str, codePoint));
+               String.format("\\bibglsothergroup{%s}{%X}{%s}", 
+                             str, codePoint,
+                             entryType == null ? "" : entryType));
          }
       }
 

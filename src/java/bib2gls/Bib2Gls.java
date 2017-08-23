@@ -567,6 +567,21 @@ public class Bib2Gls implements TeXApp
       return fontspec;
    }
 
+   public boolean hyperrefLoaded()
+   {
+      return hyperref;
+   }
+
+   public boolean createHyperGroupsOn()
+   {
+      return createHyperGroups;
+   }
+
+   public void setCreateHyperGroups(boolean flag)
+   {
+      createHyperGroups = flag;
+   }
+
    // Search for some packages that texparserlib.jar recognises
    private void parseLog() throws IOException
    {
@@ -623,6 +638,10 @@ public class Bib2Gls implements TeXApp
                )
                {
                   packages.add(pkg);
+               }
+               else if (pkg.equals("hyperref"))
+               {
+                  hyperref = true;
                }
                else if (pkg.equals("fontspec"))
                {
@@ -1922,6 +1941,13 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public String getMessageIfExists(String label)
+   {
+      if (messages == null) return null;
+
+      return messages.getMessageIfExists(label);
+   }
+
    public String getChoiceMessage(String label, int argIdx,
      String choiceLabel, int numChoices, Object... params)
    {
@@ -3008,6 +3034,8 @@ public class Bib2Gls implements TeXApp
        "Package: ([^\\s]+)(?:\\s+(\\d{4})/(\\d{2})/(\\d{2}))?.*");
 
    private boolean fontspec = false;
+   private boolean hyperref = false;
+   private boolean createHyperGroups = true;
 
    private Vector<GlsResource> glsresources;
    private Vector<String> fields;

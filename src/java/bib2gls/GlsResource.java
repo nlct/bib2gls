@@ -77,7 +77,7 @@ public class GlsResource
 
       if (bib2gls.useGroupField())
       {
-         groupTitleMap = new HashMap<Integer,GroupTitle>();
+         groupTitleMap = new HashMap<String,GroupTitle>();
       }
 
       for (Iterator<String> it = list.keySet().iterator(); it.hasNext(); )
@@ -2826,30 +2826,84 @@ public class GlsResource
          {
             writer.println("\\ifdef\\glsxtrsetgrouptitle");
             writer.println("{");
-            writer.println("  \\providecommand{\\bibglslettergroup}[3]{#3}");
-            writer.println("  \\providecommand{\\bibglslettergrouptitle}[3]{#1}");
+            writer.println("  \\providecommand{\\bibglslettergroup}[4]{#4#3}");
+            writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{#1}");
             writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
             writer.println("}");
             writer.println("{");
-            writer.println("  \\providecommand{\\bibglslettergroup}[3]{#1}");
+            writer.println("  \\providecommand{\\bibglslettergroup}[4]{#1}");
             writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{}");
             writer.println("}");
 
-            writer.println("\\providecommand{\\bibglsothergroup}[2]{\\glssymbolsgroupname}");
-            writer.println("\\providecommand{\\bibglsnumbergroup}[1]{\\glsnumbersgroupname}");
+            writer.println("\\providecommand{\\bibglsothergroup}[3]{\\glssymbolsgroupname}");
+            writer.println("\\providecommand{\\bibglsnumbergroup}[2]{\\glsnumbersgroupname}");
             writer.println();
 
-            for (Iterator<Integer> it = groupTitleMap.keySet().iterator();
+            boolean createHyperGroups = bib2gls.hyperrefLoaded()
+                && bib2gls.createHyperGroupsOn();
+
+            for (Iterator<String> it = groupTitleMap.keySet().iterator();
                 it.hasNext(); )
             {
-               Integer key = it.next();
+               String key = it.next();
 
-               writer.format("\\bibglssetgrouptitle{%s}%n", 
-                 groupTitleMap.get(key));
+               GroupTitle groupTitle = groupTitleMap.get(key);
+
+               if (groupTitle.getType() == null)
+               {
+                  createHyperGroups = false;
+               }
+
+               writer.format("\\bibglssetgrouptitle{%s}%n", groupTitle);
             }
 
             writer.println();
+
+            if (!createHyperGroups)
+            {
+               bib2gls.setCreateHyperGroups(false);
+            }
+
+            if (createHyperGroups)
+            {
+               writer.println("\\ifdef\\@glsnavhypertarget");
+               writer.println("{");
+               writer.println("  \\ifdef\\bibglsorgnavhypertarget");
+               writer.println("  {}");
+               writer.println("  {");
+               writer.println("    \\let\\bibglsorgnavhypertarget\\@glsnavhypertarget");
+               writer.println("  }");
+               writer.println("  \\renewcommand*{\\@glsnavhypertarget}[3]{%");
+               writer.println("    \\@glstarget{\\glsnavhyperlinkname{#1}{#2}}{#3}%");
+               writer.println("  }");
+               writer.println("  \\providecommand{\\bibglshypergroup}{\\@gls@hypergroup}");
+               writer.println("}");
+               writer.println("{");
+               writer.println("  \\providecommand{\\bibglshypergroup}[2]{}");
+               writer.println("}");
+
+               for (Iterator<String> it = groupTitleMap.keySet().iterator();
+                   it.hasNext(); )
+               {
+                  String key = it.next();
+
+                  GroupTitle groupTitle = groupTitleMap.get(key);
+
+                  writer.format("\\bibglshypergroup{%s}{\\bibglslettergroup%s}%n",
+                     groupTitle.getType(), groupTitle);
+               }
+
+               writer.println();
+            }
+            else if (bib2gls.hyperrefLoaded())
+            { 
+               writer.println("\\ifdef\\bibglsorgnavhypertarget");
+               writer.println("{");
+               writer.println("  \\let\\@glsnavhypertarget\\bibglsorgnavhypertarget");
+               writer.println("}");
+               writer.println("{}");
+            }
          }
 
          if (locationPrefix != null)
@@ -3807,19 +3861,31 @@ public class GlsResource
       return groupField;
    }
 
+   public String getType(Bib2GlsEntry entry)
+   {
+      String entryType = entry.getFieldValue("type");
+
+      if (entryType != null)
+      {
+         return entryType;
+      }
+
+      return type;
+   }
+
    public void putGroupTitle(GroupTitle grpTitle)
    {
       if (groupTitleMap != null)
       {
-         groupTitleMap.put(new Integer(grpTitle.getId()), grpTitle);
+         groupTitleMap.put(grpTitle.getKey(), grpTitle);
       }
    }
 
-   public GroupTitle getGroupTitle(int id)
+   public GroupTitle getGroupTitle(Bib2GlsEntry entry, int id)
    {
       if (groupTitleMap != null)
       {
-         return groupTitleMap.get(new Integer(id));
+         return groupTitleMap.get(GroupTitle.getKey(getType(entry), id));
       }
 
       return null;
@@ -3930,7 +3996,7 @@ public class GlsResource
 
    private Random random=null;
 
-   private HashMap<Integer,GroupTitle> groupTitleMap=null;
+   private HashMap<String,GroupTitle> groupTitleMap=null;
 
    private Vector<GlsRecord> supplementalRecords=null;
    private TeXPath supplementalPdfPath=null;

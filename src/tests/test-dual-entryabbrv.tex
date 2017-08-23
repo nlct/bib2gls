@@ -1,15 +1,22 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
 \documentclass{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,abbreviations,postdot,style=index]{glossaries-extra}
+\usepackage[%debug=showtargets,
+  record,% required for bib2gls
+  abbreviations,% create 'abbreviations' glossary
+  postdot,% insert a dot after descriptions
+  style=indexhypergroup]{glossaries-extra}
 
 \GlsXtrLoadResources[
  src={entries-dual-entryabbrv},% data in entries-dual-entryabbrv.bib
- %type=abbreviations,% put primary entries in glossary 'abbreviations'
- %dual-type=main% put dual entries in glossary 'main'
+ type=abbreviations,% put primary entries in glossary 'abbreviations'
+ dual-type=main% put dual entries in glossary 'main'
 ]
 
 \begin{document}

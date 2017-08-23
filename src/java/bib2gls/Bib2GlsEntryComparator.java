@@ -261,11 +261,17 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
             // The Dutch ij digraph should have both letters
             // converted to upper case. Other digraphs only have the
-            // first letter converted.
+            // first letter converted. Rather than hard-coding
+            // for just "ij", allow other exceptions to be provided
+            // in the language resource file. For example
+            // <entry key="grouptitle.case.ij">IJ</entry>
 
-            if (grp.equals("ij"))
+            String grpCase = bib2gls.getMessageIfExists(
+              String.format("grouptitle.case.%s", grp));
+
+            if (grpCase != null)
             {
-               grp = "IJ";
+               grp = grpCase;
                cp = Character.toTitleCase(cp);
             }
             else
@@ -300,18 +306,21 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
                GlsResource resource = bib2gls.getCurrentResource();
 
-               GroupTitle grpTitle = resource.getGroupTitle(elem);
+               GroupTitle grpTitle = resource.getGroupTitle(entry, elem);
                String args;
 
                if (grpTitle == null)
                {
-                  grpTitle = new GroupTitle(grp, str, elem);
+                  grpTitle = new GroupTitle(grp, str, elem,
+                    resource.getType(entry));
                   resource.putGroupTitle(grpTitle);
                   args = grpTitle.toString();
                }
                else
                {
-                  args = String.format("{%s}{%s}{%d}", grp, str, elem);
+                  String entryType = resource.getType(entry);
+                  args = String.format("{%s}{%s}{%d}{%s}", grp, str, elem,
+                    entryType == null ? "" : entryType);
 
                   if (grpTitle.getTitle().matches(".*[^\\p{ASCII}].*")
                       && grp.matches("\\p{ASCII}+"))
@@ -331,8 +340,12 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   str = "\\char`\\"+str;
                }
 
+               GlsResource resource = bib2gls.getCurrentResource();
+               String entryType = resource.getType(entry);
+
                entry.putField("group", 
-                 String.format("\\bibglsothergroup{%s}{%d}", str, elem));
+                 String.format("\\bibglsothergroup{%s}{%d}{%s}", str, elem,
+                    entryType == null ? "" : entryType));
             }
          }
          else
@@ -359,19 +372,21 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
                GlsResource resource = bib2gls.getCurrentResource();
 
-               GroupTitle grpTitle = resource.getGroupTitle(cp);
+               GroupTitle grpTitle = resource.getGroupTitle(entry, cp);
                String args;
 
                if (grpTitle == null)
                {
-                  grpTitle = new GroupTitle(grp, str, cp);
+                  grpTitle = new GroupTitle(grp, str, cp,
+                    resource.getType(entry));
                   resource.putGroupTitle(grpTitle);
                   args = grpTitle.toString();
                }
                else
                {
-                  args = String.format("{%s}{%s}{%d}", grpTitle.getTitle(), 
-                    str, cp);
+                  String entryType = resource.getType(entry);
+                  args = String.format("{%s}{%s}{%d}{%s}", grpTitle.getTitle(), 
+                    str, cp, entryType == null ? "" : entryType);
                }
 
                entry.putField("group", 
@@ -385,9 +400,13 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   str = "\\char`\\"+str;
                }
 
+               GlsResource resource = bib2gls.getCurrentResource();
+               String entryType = resource.getType(entry);
+
                entry.putField("group", 
-                 String.format("\\bibglsothergroup{%s}{%X}", 
-                               str, codePoint));
+                 String.format("\\bibglsothergroup{%s}{%X}{%s}", 
+                               str, codePoint,
+                               entryType == null ? "" : entryType));
             }
          }
       }

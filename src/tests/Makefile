@@ -12,7 +12,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf \
 	  test-supp.pdf test-supp-main.pdf test-random.pdf \
 	  test-glsignore.pdf test-dual-entryabbrv.pdf \
-	  test-match-entrytype.pdf
+	  test-match-entrytype.pdf test-digraphs.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -232,6 +232,13 @@ test-match-entrytype.pdf	: test-match-entrytype.glstex
 test-match-entrytype.glstex	: test-match-entrytype.tex $(DEPS) entries.bib
 		pdflatex test-match-entrytype
 		$(BIB2GLS) test-match-entrytype
+
+test-digraphs.pdf	: test-digraphs.glstex
+		xelatex test-digraphs
+
+test-digraphs.glstex	: test-digraphs.tex $(DEPS) test-digraphs.bib
+		xelatex test-digraphs
+		$(BIB2GLS) test-digraphs
 
 clean	:
 	$(RM) *.aux
