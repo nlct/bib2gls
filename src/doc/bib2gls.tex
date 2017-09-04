@@ -3014,6 +3014,163 @@ Note the difference between this option and using
 \csopt[parent]{ignore-fields} which will remove the dependency
 (unless a dependency is established through another field).
 
+\subsection{\csoptnv{flatten-lonely}=\margm{value}}
+\labelopt{flatten-value}
+
+This may take one of three values: \optfmt{false} (default),
+\optfmt{presort} and \optfmt{postsort}. The value must be supplied. 
+
+If not \optfmt{false}, this option will check for sub-entries that
+have no siblings selected and have a parent with no records. If
+found, the parent entry will be removed. The entry's \field{name}
+and \field{text} fields may be adjusted in the process. The parent
+will either be removed before sorting
+(\csopt[presort]{flatten-lonely}) or after sorting
+(\csopt[postsort]{flatten-lonely}).
+
+For example, suppose the file \filefmt{entries.bib} contains:
+\begin{verbatim}
+@index{birds}
+@index{duck,parent={birds}}
+@index{goose,plural={geese},parent={birds}}
+@index{swan,parent={birds}}
+@index{chicken,parent={birds}}
+
+@index{minerals}
+@index{quartz,parent={minerals}}
+@index{corundum,parent={minerals}}
+@index{amber,parent={minerals}}
+@index{gypsum,parent={minerals}}
+
+@index{aardvark}
+@index{bard}
+@index{buzz}
+\end{verbatim}
+and suppose the document contains:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries.bib}]
+
+\begin{document}
+\gls{duck}.
+\gls{quartz}, \gls{corundum}, \gls{amber}.
+\gls{aardvark}, \gls{bard}, \gls{buzz}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+Although the \texttt{duck} entry has siblings in the
+\filefmt{entries.bib} file, none of them have been recorded
+(indexed) in the document, nor has the parent \texttt{birds} entry.
+
+This document hasn't used \csopt{flatten-lonely}, so the default
+\csopt[false]{flatten-lonely} is assumed. This results in the
+hierarchical structure:
+\begin{description}\setlength\itemsep{0pt}%
+\item[A] \null
+\item[aardvark] 1
+\item[B] \null
+\item[bard] 1
+\item[birds] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[duck] 1
+  \end{description}
+\item[buzz] 1
+\item[M] \null
+\item[minerals] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[amber] 1
+  \item[corundum] 1
+  \item[quartz] 1
+  \end{description}
+\end{description}
+The \texttt{duck} entry looks a little odd, and it would be better
+if its hierarchical structure was removed. In this case, I don't
+want to use the \optref{flatten} option, as I still want to keep the
+mineral hierarchy.
+
+The \csopt[presort]{flatten-lonely} setting will remove the parent from the
+\texttt{duck} entry \emph{before} sorting. Since no \field{text} field has
+been supplied, it will be set to the original \field{name} (which,
+in this case, falls back to the label). The \field{name} field is
+then set to
+\begin{verbatim}
+\bibglsflattenedchildpresort{duck}{birds}
+\end{verbatim}
+which defaults to just \qt{duck}. The \field{parent} field is
+removed and the parent entry (\texttt{birds}) is discarded from the
+selection.
+This means it behaves (roughly) as though \texttt{duck} was defined as
+\begin{verbatim}
+@index{duck,
+  name={\bibglsflattenedchildpresort{duck}{birds}},
+  text={duck}
+}
+\end{verbatim}
+The interpreter recognises \csref{bibglsflattenedchildpresort} and
+determines that the sort value is just \qt{duck}. The entries are
+then sorted and the resulting hierarchy is now:
+\begin{description}\setlength\itemsep{0pt}%
+\item[A] \null
+\item[aardvark] 1
+\item[B] \null
+\item[bard] 1
+\item[buzz] 1
+\item[D] \null
+\item[duck] 1
+\item[M] \null
+\item[minerals] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[amber] 1
+  \item[corundum] 1
+  \item[quartz] 1
+  \end{description}
+\end{description}
+Note that the \qt{duck} entry has now moved to the \qt{D} letter
+group.
+
+If, on the other hand, I use \csopt[postsort]{flatten-lonely}, the
+parent entry (\texttt{birds}) is discarded \emph{after} sorting. The
+\field{text} field for \texttt{duck} is again set to \qt{duck} but
+now the \field{name} field is set to
+\begin{verbatim}
+\bibglsflattenedchildpostsort{birds}{duck}
+\end{verbatim}
+which defaults to \qt{birds, duck}. Since the parent entry is
+discarded after sorting, the \texttt{duck} entry is in the
+same relative location as for \csopt[false]{flatten-lonely}, but
+it's moved up a hierarchical level, so the listing is now:
+\begin{description}\setlength\itemsep{0pt}%
+\item[A] \null
+\item[aardvark] 1
+\item[B] \null
+\item[bard] 1
+\item[birds, duck] 1
+\item[buzz] 1
+\item[M] \null
+\item[minerals] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[amber] 1
+  \item[corundum] 1
+  \item[quartz] 1
+  \end{description}
+\end{description}
+Since the \field{text} field has been set to \texttt{duck},
+\verb|\gls{duck}| still produces just \qt{duck}.
+
+Note that the \field{text} field is only changed if not already set.
+This option may have unpredictable results for abbreviations as the
+\field{name} field is typically set by the abbreviation style.
+Remember that the parent entry is discarded after all relevant
+entries and their dependencies have been selected, so any
+cross-references within the parent entry may end up being selected
+even if they wouldn't be selected if the parent entry didn't exist.
+The parent entry won't be discarded if it contains any records. This
+includes ignored records (identified with \gencsopt[glsignore]{glsadd}{format}).
+
 \section{Master Documents}
 \label{sec:master}
 
@@ -3586,6 +3743,81 @@ these entries will be added to the same glossary, but will
 be grouped according to each instance of \cs{GlsXtrLoadResources},
 with the provided group label.
 The default behaviour is \csopt[auto]{group}.
+
+\subsection{\csoptnv{save-child-count}=\margm{boolean}}
+\labelopt{save-child-count}
+
+This is a boolean option. The default setting is
+\csopt[false]{save-child-count}. 
+If \csopt[true]{save\dhyphen child\dhyphen count},
+each entry will be assigned a field called \texttt{childcount} with
+the value equal to the number of child entries that have been
+selected.
+
+The assignment is done using \cs{GlsXtrSetField} so there's
+no associated key.
+For example, suppose \filefmt{entries.bib} contains:
+\begin{verbatim}
+@index{birds}
+@index{duck,parent={birds}}
+@index{goose,plural={geese},parent={birds}}
+@index{swan,parent={birds}}
+
+@index{minerals}
+@index{quartz,parent={minerals}}
+@index{corundum,parent={minerals}}
+@index{amber,parent={minerals}}
+@index{gypsum,parent={minerals}}
+@index{gold,parent={minerals}}
+\end{verbatim}
+and the document contains:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries},save-child-count]
+
+\begin{document}
+\gls{duck} and \gls{goose}.
+\gls{quartz}, \gls{corundum}, \gls{amber}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+Then the \ext{glstex} file will contain:
+\begin{verbatim}
+\GlsXtrSetField{birds}{childcount}{2}
+\GlsXtrSetField{duck}{childcount}{0}
+\GlsXtrSetField{goose}{childcount}{0}
+\GlsXtrSetField{minerals}{childcount}{3}
+\GlsXtrSetField{amber}{childcount}{0}
+\GlsXtrSetField{corundum}{childcount}{0}
+\GlsXtrSetField{quartz}{childcount}{0}
+\end{verbatim}
+Note that although \texttt{birds} has three children defined in the
+\ext{bib} file, only two have been selected, so the child count is
+set to 2. Similarly the \texttt{minerals} entry has five children
+defined in the \ext{bib} file, but only three have been selected, so
+the child count is 3.
+
+The following uses the post-description hook to show the child count
+in parentheses:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries},category=general,save-child-count]
+
+\renewcommand{\glsxtrpostdescgeneral}{%
+  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
+  { (child count: \glscurrentfieldvalue.)}%
+  {}%
+}
+\end{verbatim}
+(\cs{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
+It's slightly more efficient that \cs{ifglshasfield} provided by
+the base \sty{glossaries} package, and it doesn't complain if the
+entry or field don't exist, but note that \cs{glsxtrifhasfield}
+implicitly scopes its content. Use the starred version to omit the
+grouping.)
 
 \section{Plurals}
 \label{sec:plurals}
@@ -6056,6 +6288,36 @@ or redefined after the resources are loaded:
 
 \renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
+
+\section{\cs{bibglsflattenedchildpresort}}
+\labelcs{bibglsflattenedchildpresort}
+
+\begin{definition}
+\cs{bibglsflattenedchildpresort}\margm{child name}\margm{parent name}
+\end{definition}
+
+Used by the \csopt[presort]{flatten-lonely} option. This defaults
+to just \meta{child name}. If you want to change this, remember that
+you can let the interpreter know by adding the definition to
+\atentry{preamble}. For example:
+\begin{verbatim}
+@preamble{"\providecommand{\bibglsflattenedchildpresort}[2]{#1 (#2)}"}
+\end{verbatim}
+
+\section{\cs{bibglsflattenedchildpostsort}}
+\labelcs{bibglsflattenedchildpostsort}
+
+\begin{definition}
+\cs{bibglsflattenedchildpostsort}\margm{parent name}\margm{child name}
+\end{definition}
+
+Used by the \csopt[postsort]{flatten-lonely} option. This defaults
+to \texttt{\meta{parent name}, \meta{child name}}.
+
+Note that the arguments are in the reverse order to those of the
+previous command. This is done to assist the automated first letter
+upper-casing. If either command is redefined to alter the ordering,
+then this can confuse the case-changing mechanism.
 
 \chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
 \label{sec:gls2bib}

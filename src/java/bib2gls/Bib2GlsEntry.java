@@ -1889,10 +1889,40 @@ public class Bib2GlsEntry extends BibEntry
       numericSort = num;
    }
 
+   public void addChild(Bib2GlsEntry child)
+   {
+      if (children == null)
+      {
+         children = new Vector<Bib2GlsEntry>();
+      }
+
+      if (!children.contains(child))
+      {
+         children.add(child);
+      }
+   }
+
+   public int getChildCount()
+   {
+      return children == null ? 0 : children.size();
+   }
+
+   public Vector<Bib2GlsEntry> getChildren()
+   {
+      return children;
+   }
+
+   public Bib2GlsEntry getChild(int i)
+   {
+      return children.get(i);
+   }
+
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
    private Vector<GlsRecord> supplementalRecords;
    private Vector<GlsRecord> ignoredRecords;
+
+   private Vector<Bib2GlsEntry> children;
 
    private HashMap<String,String> fieldValues;
 

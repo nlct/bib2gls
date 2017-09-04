@@ -68,6 +68,23 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       }
    }
 
+   public BibValueList getFallbackContents(String field)
+   {
+      if (field.equals("name") && bib2gls.useInterpreter())
+      {
+         String name = getOriginalId();
+         BibValueList list = new BibValueList();
+         list.add(new BibUserString(
+            bib2gls.getInterpreterListener().createGroup(name)));
+
+         return list;
+      }
+      else
+      {
+         return super.getFallbackContents(field);
+      }
+   }
+
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {

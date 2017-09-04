@@ -34,6 +34,7 @@ expl	: lib/bib2gls.jar
 	make -C doc
 	cp -L lib/texparserlib.jar ../unstable/
 	cp lib/bib2gls.jar ../unstable/
+	cp lib/convertgls2bib.jar ../unstable/
 
 clean	:
 	\rm -f classes/com/dickimawbooks/bib2gls/*.class

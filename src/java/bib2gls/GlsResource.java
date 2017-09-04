@@ -37,6 +37,7 @@ import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
 public class GlsResource
 {
@@ -272,9 +273,31 @@ public class GlsResource
          {
             flatten = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("flatten-lonely"))
+         {
+            String val = getChoice(parser, list, opt, "false", "presort",
+             "postsort");
+
+            if (val.equals("false"))
+            {
+               flattenLonely = FLATTEN_LONELY_FALSE;
+            }
+            else if (val.equals("presort"))
+            {
+               flattenLonely = FLATTEN_LONELY_PRE_SORT;
+            }
+            else if (val.equals("postsort"))
+            {
+               flattenLonely = FLATTEN_LONELY_POST_SORT;
+            }
+         }
          else if (opt.equals("save-locations"))
          {
             saveLocations = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("save-child-count"))
+         {
+            saveChildCount = getBoolean(parser, list, opt);
          }
          else if (opt.equals("alias-loc"))
          {
@@ -2603,6 +2626,54 @@ public class GlsResource
          }
       }
 
+      if (flattenLonely == FLATTEN_LONELY_PRE_SORT)
+      {
+         // Only add if not defined in the preamble
+
+         L2HStringConverter listener = bib2gls.getInterpreterListener();
+
+         if (listener != null
+         && listener.getParser().getControlSequence("bibglsflattenedchildpresort") == null)
+         {
+            listener.putControlSequence(new FlattenedPreSort());
+         }
+
+
+         checkParents(entries);
+
+         for (int i = entries.size()-1; i >= 0; i--)
+         {
+            Bib2GlsEntry entry = entries.get(i);
+            String parentId = entry.getFieldValue("parent");
+
+            if (parentId != null)
+            {
+               // Since parents must be defined before children,
+               // it's more efficient to search backwards.
+
+               for (int j = i-1; j >= 0; j--)
+               {
+                  Bib2GlsEntry thisEntry = entries.get(j);
+
+                  if (thisEntry.getId().equals(parentId))
+                  {
+                     if (thisEntry.getChildCount() == 1
+                         && thisEntry.recordCount() == 0)
+                     {
+                        if (flattenChild(thisEntry))
+                        {
+                           entries.remove(j);
+                           i--;
+                        }
+                     }
+
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
       // sort if required
 
       int entryCount = entries.size();
@@ -3018,10 +3089,38 @@ public class GlsResource
               supplementalCategory, supplementalPdfPath);
          }
 
+         if (flattenLonely == FLATTEN_LONELY_POST_SORT
+              || (saveChildCount && flattenLonely != FLATTEN_LONELY_PRE_SORT))
+         {// Need to check parents before writing definitions.
+          // This will already have been done if
+          // flatten-lonely=presort
+
+            checkParents(entries);
+         }
+
+         if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+         {
+            writer.format("\\providecommand*{\\%s}[2]{#1, #2}%n",
+              flattenLonelyCsName());
+            writer.println();
+         }
+         else if (flattenLonely == FLATTEN_LONELY_PRE_SORT)
+         {
+            writer.format("\\providecommand*{\\%s}[2]{#1}%n",
+              flattenLonelyCsName());
+            writer.println();
+         }
 
          for (int i = 0, n = entries.size(); i < n; i++)
          {
             Bib2GlsEntry entry = entries.get(i);
+
+            if (flattenLonely == FLATTEN_LONELY_POST_SORT 
+                 && entry.getChildCount() == 1
+                 && entry.recordCount() == 0)
+            {
+               if (flattenChild(entry)) continue;
+            }
 
             bib2gls.verbose(entry.getId());
 
@@ -3033,7 +3132,10 @@ public class GlsResource
                  locGap);
             }
 
-            checkParent(entry, i, entries);
+            if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
+            {
+               checkParent(entry, i, entries);
+            }
 
             String csname = entry.getCsName();
 
@@ -3046,6 +3148,12 @@ public class GlsResource
 
             entry.writeBibEntry(writer);
             entry.writeLocList(writer);
+
+            if (saveChildCount)
+            {
+               writer.format("\\GlsXtrSetField{%s}{childcount}{%d}%n",
+                 entry.getId(), entry.getChildCount());
+            }
 
             if (supplementalPdfPath != null 
                 && supplementalCategory == null 
@@ -3084,9 +3192,23 @@ public class GlsResource
                }
             }
 
+            if (flattenLonely == FLATTEN_LONELY_POST_SORT
+                || (saveChildCount && flattenLonely != FLATTEN_LONELY_PRE_SORT))
+            {// need to check parents before writing definitions
+
+               checkParents(dualEntries);
+            }
+
             for (int i = 0, n = dualEntries.size(); i < n; i++)
             {
                Bib2GlsEntry entry = dualEntries.get(i);
+
+               if (flattenLonely == FLATTEN_LONELY_POST_SORT
+                    && entry.getChildCount() == 1
+                    && entry.recordCount() == 0)
+               {
+                  if (flattenChild(entry)) continue;
+               }
 
                bib2gls.verbose(entry.getId());
 
@@ -3099,7 +3221,10 @@ public class GlsResource
                     locGap);
                }
 
-               checkParent(entry, i, dualEntries);
+               if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
+               {
+                  checkParent(entry, i, dualEntries);
+               }
 
                String csname = entry.getCsName();
 
@@ -3434,8 +3559,15 @@ public class GlsResource
             with the default sort.)
          */
 
-         if (list.get(j).getId().equals(parentId))
+         Bib2GlsEntry thisEntry = list.get(j);
+
+         if (thisEntry.getId().equals(parentId))
          {
+            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount)
+            {
+               thisEntry.addChild(entry);
+            }
+
             return;
          }
       }
@@ -3443,6 +3575,197 @@ public class GlsResource
       bib2gls.warning(bib2gls.getMessage(
          "warning.parent.missing", parentId, entry.getId()));
       entry.removeFieldValue("parent");
+   }
+
+   private void checkParents(Vector<Bib2GlsEntry> entries)
+   {
+      for (int i = 0, n = entries.size(); i < n; i++)
+      {
+         Bib2GlsEntry entry = entries.get(i);
+         checkParent(entry, i, entries);
+      }
+   }
+
+   private String flattenLonelyCsName()
+   {
+      return flattenLonely == FLATTEN_LONELY_PRE_SORT ?
+         "bibglsflattenedchildpresort" : "bibglsflattenedchildpostsort";
+   }
+
+   private boolean flattenChild(Bib2GlsEntry entry)
+   {
+      // Fetch the child
+
+      Bib2GlsEntry child = entry.getChild(0);
+
+      // Don't flatten if child has any children
+
+      if (child.getChildCount() == 0)
+      {
+         // The bib value fields only need to be set for
+         // flatten-lonely=presort as they may be required for the
+         // sort value.
+
+         L2HStringConverter listener = null;
+         BibValueList bibName = null;
+         BibValueList bibParentName = null;
+
+         if (flattenLonely == FLATTEN_LONELY_PRE_SORT)
+         {
+            listener = bib2gls.getInterpreterListener();
+         }
+
+         String name = child.getFieldValue("name");
+
+         if (listener != null)
+         {
+            bibName = child.getField("name");
+         }
+
+         if (name == null)
+         {
+            name = child.getFallbackValue("name");
+
+            if (listener != null && bibName == null)
+            {
+               bibName = child.getFallbackContents("name");
+            }
+         }
+
+         // Does the child have a text field?
+
+         String text = child.getFieldValue("text");
+
+         if (text == null && name != null)
+         {
+            // Use the name field if present.
+
+            child.putField("text", name);
+         }
+
+         String parentName = entry.getFieldValue("name");
+
+         if (listener != null)
+         {
+            bibParentName = entry.getField("name");
+         }
+
+         if (parentName == null)
+         {
+            parentName = entry.getFallbackValue("name");
+
+            if (listener != null)
+            {
+               bibParentName = entry.getFallbackContents("name");
+            }
+         }
+
+         if (name != null)
+         {
+            String csName = flattenLonelyCsName();
+            TeXObjectList object = null;
+            Group nameGroup = null;
+            Group parentNameGroup = null;
+
+            if (listener != null)
+            {
+               object = new TeXObjectList();
+               object.add(new TeXCsRef(csName));
+
+               if (bibName == null)
+               {
+                  nameGroup = listener.createGroup(name);
+               }
+               else
+               {
+                  nameGroup = listener.createGroup();
+                  TeXObject contents = bibName.getContents(true);
+
+                  if (contents instanceof TeXObjectList)
+                  {
+                     nameGroup.addAll((TeXObjectList)contents);
+                  }
+                  else
+                  {
+                     nameGroup.add(contents);
+                  }
+               }
+
+               if (bibParentName == null)
+               {
+                  if (parentName == null)
+                  {
+                     parentNameGroup = listener.createGroup();
+                  }
+                  else
+                  {
+                     parentNameGroup = listener.createGroup(parentName);
+                  }
+               }
+               else
+               {
+                  parentNameGroup = listener.createGroup();
+                  TeXObject contents = bibParentName.getContents(true);
+
+                  if (contents instanceof TeXObjectList)
+                  {
+                     parentNameGroup.addAll((TeXObjectList)contents);
+                  }
+                  else
+                  {
+                     parentNameGroup.add(contents);
+                  }
+               }
+
+               object.add(nameGroup);
+               object.add(parentNameGroup);
+            }
+
+            if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+            {
+               child.putField("name", 
+                 String.format("\\%s{%s}{%s}",
+                  csName, parentName, name));
+            }
+            else
+            {
+               child.putField("name", 
+                 String.format("\\%s{%s}{%s}",
+                  csName, name, parentName));
+
+               if (object != null)
+               {
+                  BibValueList contents = new BibValueList();
+                  contents.add(new BibUserString(object));
+                  child.putField("name", contents);
+               }
+            }
+         }
+
+         // remove parent field
+
+         child.removeFieldValue("parent");
+         child.removeField("parent");
+
+         if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+         {
+            // set the child's group to the parent's group, if
+            // provided.
+
+            String group = entry.getFieldValue("group");
+
+            if (group != null)
+            {
+               child.putField("group", group);
+            }
+         }
+
+         // omit parent
+
+         return true;
+      }
+
+      return false;
    }
 
    public boolean flattenSort()
@@ -3955,6 +4278,14 @@ public class GlsResource
    private String[] locationSuffix = null;
 
    private boolean saveLocations = true;
+
+   public static final int FLATTEN_LONELY_FALSE=0;
+   public static final int FLATTEN_LONELY_PRE_SORT=1;
+   public static final int FLATTEN_LONELY_POST_SORT=2;
+
+   private int flattenLonely = FLATTEN_LONELY_FALSE;
+
+   private boolean saveChildCount = false;
 
    private boolean defpagesname = false;
 

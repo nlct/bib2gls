@@ -557,6 +557,12 @@ public class Bib2Gls implements TeXApp
       return interpret;
    }
 
+   public L2HStringConverter getInterpreterListener()
+   {
+      return interpreter == null ? null :
+       (L2HStringConverter)interpreter.getListener();
+   }
+
    public Vector<String> getPackages()
    {
       return packages;

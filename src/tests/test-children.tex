@@ -1,0 +1,29 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-children},
+  category=general,
+  flatten-lonely=presort,
+  %flatten-lonely=postsort,
+  save-child-count
+]
+
+\renewcommand{\glsxtrpostdescgeneral}{%
+  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
+  { (child count: \glscurrentfieldvalue.)}%
+  {}%
+}
+
+\begin{document}
+\gls{duck}% and \gls{goose}.
+
+\gls{quartz}, \gls{corundum}, \gls{amber}.
+
+\gls{aardvark}, \gls{bard}, \gls{buzz}.
+
+\printunsrtglossaries
+\end{document}

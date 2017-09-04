@@ -1,0 +1,18 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[bib2gls]{testidx-glossaries}
+
+\tstidxmakegloss
+
+\begin{document}
+\testidx
+
+\tstidxprintglossaries
+
+\end{document}

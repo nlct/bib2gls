@@ -12,7 +12,9 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf \
 	  test-supp.pdf test-supp-main.pdf test-random.pdf \
 	  test-glsignore.pdf test-dual-entryabbrv.pdf \
-	  test-match-entrytype.pdf test-digraphs.pdf
+	  test-match-entrytype.pdf test-digraphs.pdf \
+	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
+	  sample-testidx-xindy.pdf test-children.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -240,11 +242,30 @@ test-digraphs.glstex	: test-digraphs.tex $(DEPS) test-digraphs.bib
 		xelatex test-digraphs
 		$(BIB2GLS) test-digraphs
 
+sample-testidx.pdf	: sample-testidx.tex $(DEPS)
+			arara sample-testidx
+
+sample-testidx-alsoindex.pdf	: sample-testidx-alsoindex.tex $(DEPS)
+			arara sample-testidx-alsoindex
+
+sample-testidx-xindy.pdf	: sample-testidx-xindy.tex
+			arara sample-testidx-xindy
+
+test-children.pdf	: test-children.glstex
+		pdflatex test-children
+
+test-children.glstex	: test-children.tex $(DEPS) test-children.bib
+		pdflatex test-children
+		$(BIB2GLS) test-children
+
 clean	:
 	$(RM) *.aux
 	$(RM) *.log
 	$(RM) *.pdf
 	$(RM) *.glstex
 	$(RM) *.glg
+	$(RM) *.glo
+	$(RM) *.gls
+	$(RM) *.xdy
 	$(RM) *.out
 	$(RM) *.toc

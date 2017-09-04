@@ -1,0 +1,24 @@
+% arara: pdflatex
+% arara: makeglossaries
+% arara: pdflatex
+
+% For comparison with sample-testidx and sample-testidx-alsoindex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[xindy,extra]{testidx-glossaries}
+
+\GlsAddXdyAttribute{tstidxencapi}
+\GlsAddXdyAttribute{tstidxencapii}
+\GlsAddXdyAttribute{tstidxencapiii}
+
+\tstidxmakegloss
+
+\begin{document}
+\testidx
+
+\tstidxprintglossaries
+
+\end{document}

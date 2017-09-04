@@ -1,0 +1,38 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+% arara: makeglossaries
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks]{hyperref}
+\PassOptionsToPackage{xindy}{glossaries-extra}
+\usepackage[bib2gls,manual]{testidx-glossaries}
+
+\glossariesextrasetup{record=alsoindex}
+\setupglossaries{sort=standard}
+
+\GlsAddXdyAttribute{tstidxencapi}
+\GlsAddXdyAttribute{tstidxencapii}
+\GlsAddXdyAttribute{tstidxencapiii}
+
+\makeglossaries
+
+% xindy will be used to sort
+% bib2gls is just being used to allow entries to be stored in a bib
+% file
+\GlsXtrLoadResources[ 
+  src={testidx-glossaries-mathsym,testidx-glossaries-markers,
+    testidx-glossaries-numbers,\tstidxbasebibfiles,
+    \tstidxutfbibfiles,testidx-glossaries-nodiglyphs},
+  selection={recorded and deps and see},
+  ignore-fields={description},
+  sort=none,save-locations=false]
+
+\begin{document}
+\testidx
+
+\printglossaries
+\end{document}

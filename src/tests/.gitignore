@@ -8,3 +8,6 @@ glossaries.sty
 *.swp
 *.glg
 *.toc
+*.glo
+*.gls
+*.xdy
