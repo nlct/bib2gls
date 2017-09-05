@@ -35,7 +35,6 @@ import java.awt.font.TextLayout;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
-import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
@@ -4207,7 +4206,7 @@ public class GlsResource
             toLowerCase((TeXObjectList)object);
          }
          else if (object instanceof ControlSequence
-                || ((ControlSequence)object).getName().equals("NoCaseChange"))
+                && ((ControlSequence)object).getName().equals("NoCaseChange"))
          {
             // skip argument
 
@@ -4249,7 +4248,7 @@ public class GlsResource
             toUpperCase((TeXObjectList)object);
          }
          else if (object instanceof ControlSequence
-                || ((ControlSequence)object).getName().equals("NoCaseChange"))
+                && ((ControlSequence)object).getName().equals("NoCaseChange"))
          {
             // skip argument
 
