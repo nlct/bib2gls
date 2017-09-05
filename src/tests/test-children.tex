@@ -9,21 +9,28 @@
   category=general,
   flatten-lonely=presort,
   %flatten-lonely=postsort,
-  save-child-count
+  %flatten-lonely-rule=only unrecorded parents,
+  flatten-lonely-rule=discard unrecorded,
+  %flatten-lonely-rule=no discard,
+  %save-child-count
 ]
 
-\renewcommand{\glsxtrpostdescgeneral}{%
-  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
-  { (child count: \glscurrentfieldvalue.)}%
-  {}%
-}
+%\renewcommand{\glsxtrpostdescgeneral}{%
+%  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
+%  { (child count: \glscurrentfieldvalue.)}%
+%  {}%
+%}
 
 \begin{document}
-\gls{duck}% and \gls{goose}.
+\gls{duck}.
 
 \gls{quartz}, \gls{corundum}, \gls{amber}.
 
 \gls{aardvark}, \gls{bard}, \gls{buzz}.
+
+\gls{vegetable}, \gls{cabbage}.
+
+\gls{subsubitem}.
 
 \printunsrtglossaries
 \end{document}

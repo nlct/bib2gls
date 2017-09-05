@@ -3015,18 +3015,37 @@ Note the difference between this option and using
 (unless a dependency is established through another field).
 
 \subsection{\csoptnv{flatten-lonely}=\margm{value}}
-\labelopt{flatten-value}
+\labelopt{flatten-lonely}
 
 This may take one of three values: \optfmt{false} (default),
 \optfmt{presort} and \optfmt{postsort}. The value must be supplied. 
 
-If not \optfmt{false}, this option will check for sub-entries that
-have no siblings selected and have a parent with no records. If
-found, the parent entry will be removed. The entry's \field{name}
-and \field{text} fields may be adjusted in the process. The parent
-will either be removed before sorting
-(\csopt[presort]{flatten-lonely}) or after sorting
-(\csopt[postsort]{flatten-lonely}).
+Unlike the \optref{flatten} option (describe above) which completely
+removes the hierarchy, the \csopt{flatten-lonely} option can be used
+to selectively alter the hierarchy.  In this case only those entries
+that have a parent but have no siblings are checked. This option
+is affected by the \optref{flatten-lonely-rule} setting. The conditions for
+moving a child up one hierarchical level are as follows:
+\begin{itemize}
+\item The child must have a parent, and
+\item the child can't have any selected siblings, and
+\item if \csopt[only unrecorded parents]{flatten-lonely-rule}
+      then the parent can't have a location list, where the location list
+      includes records and \field{see} or \field{seealso}
+      cross-references (otherwise the parent may have a location
+      list as long as it only has the one child selected).
+\end{itemize}
+If the child is selected for hierarchical adjustment, the parent
+will be removed if:
+\begin{itemize}
+\item The parent has no location list, and
+\item \csopt{flatten-lonely-rule} isn't set to \optfmt{no discard}.
+\end{itemize}
+
+The value of \csopt{flatten-lonely} determines whether the
+adjustment should be made before sorting (\optfmt{presort})
+or after sorting (\optfmt{postsort}). To disable this function
+use \csopt[false]{flatten-lonely}.
 
 For example, suppose the file \filefmt{entries.bib} contains:
 \begin{verbatim}
@@ -3035,6 +3054,9 @@ For example, suppose the file \filefmt{entries.bib} contains:
 @index{goose,plural={geese},parent={birds}}
 @index{swan,parent={birds}}
 @index{chicken,parent={birds}}
+
+@index{vegetable}
+@index{cabbage,parent={vegetable}}
 
 @index{minerals}
 @index{quartz,parent={minerals}}
@@ -3045,6 +3067,10 @@ For example, suppose the file \filefmt{entries.bib} contains:
 @index{aardvark}
 @index{bard}
 @index{buzz}
+
+@index{item}
+@index{subitem,parent={item}}
+@index{subsubitem,parent={subitem}}
 \end{verbatim}
 and suppose the document contains:
 \begin{verbatim}
@@ -3058,6 +3084,8 @@ and suppose the document contains:
 \gls{duck}.
 \gls{quartz}, \gls{corundum}, \gls{amber}.
 \gls{aardvark}, \gls{bard}, \gls{buzz}.
+\gls{vegetable}, \gls{cabbage}.
+\gls{subsubitem}.
 
 \printunsrtglossaries
 \end{document}
@@ -3079,6 +3107,14 @@ hierarchical structure:
   \item[duck] 1
   \end{description}
 \item[buzz] 1
+\item[I] \null
+\item[item] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[subitem] \mbox{}
+    \begin{description}\setlength\itemsep{0pt}%
+    \item[subsubitem] 1
+    \end{description}
+  \end{description}
 \item[M] \null
 \item[minerals] \mbox{}
   \begin{description}\setlength\itemsep{0pt}%
@@ -3086,39 +3122,165 @@ hierarchical structure:
   \item[corundum] 1
   \item[quartz] 1
   \end{description}
+\item[V] \null
+\item[vegetable] 1
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[cabbage] 1
+  \end{description}
 \end{description}
-The \texttt{duck} entry looks a little odd, and it would be better
-if its hierarchical structure was removed. In this case, I don't
-want to use the \optref{flatten} option, as I still want to keep the
-mineral hierarchy.
+(The \qt{1} in the above indicates the page number.)
+There are some entries here that look a little odd: \texttt{duck},
+\texttt{cabbage} and \texttt{subsubitem}. In each case they are a
+lone child entry. It would look better if they could be compressed,
+but I don't want to use the \optref{flatten} option, as I still want
+to keep the mineral hierarchy.
 
-The \csopt[presort]{flatten-lonely} setting will remove the parent from the
-\texttt{duck} entry \emph{before} sorting. Since no \field{text} field has
-been supplied, it will be set to the original \field{name} (which,
-in this case, falls back to the label). The \field{name} field is
-then set to
+If I now add \csopt[postsort]{flatten-lonely}:
 \begin{verbatim}
-\bibglsflattenedchildpresort{duck}{birds}
+\GlsXtrLoadResources[src={entries.bib},flatten-lonely=postsort]
 \end{verbatim}
-which defaults to just \qt{duck}. The \field{parent} field is
-removed and the parent entry (\texttt{birds}) is discarded from the
-selection.
-This means it behaves (roughly) as though \texttt{duck} was defined as
+the hierarchy becomes:
+\begin{description}\setlength\itemsep{0pt}%
+\item[A] \null
+\item[aardvark] 1
+\item[B] \null
+\item[bard] 1
+\item[birds, duck] 1
+\item[buzz] 1
+\item[I] \null
+\item[item, subitem, subsubitem] 1
+\item[M] \null
+\item[minerals] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[amber] 1
+  \item[corundum] 1
+  \item[quartz] 1
+  \end{description}
+\item[V] \null
+\item[vegetable] 1
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[cabbage] 1
+  \end{description}
+\end{description}
+The \field{name} field of the \texttt{duck} entry has been
+set to
 \begin{verbatim}
-@index{duck,
-  name={\bibglsflattenedchildpresort{duck}{birds}},
-  text={duck}
+name={\bibglsflattenedchildpostsort{birds}{duck}}
+\end{verbatim}
+the \field{text} field has been set to
+\begin{verbatim}
+text={duck}
+\end{verbatim}
+the \field{group} field is copied over from the parent entry (\qt{B}),
+and the \field{parent} field has been adjusted, moving \texttt{duck}
+up one hierarchical level.
+Finally, the former parent \texttt{birds} entry has been removed (the default
+\optref[only unrecorded parents]{flatten-lonely-rule} is in effect).
+
+The default definition of \csref{bibglsflattenedchildpostsort}
+formats its arguments so that they are separated by a comma and
+space (\qt{birds, duck}). If the \field{text} field had been set
+in the original \atentryref{index} definition of \text{duck}, it
+wouldn't have been altered. This adjustment ensures that in the
+document \verb|\gls{duck}| still produces \qt{duck} rather than
+\qt{birds, duck}.
+
+The \texttt{subsubitem} entry has also been adjusted. This was done
+in a multi-stage process, starting with sub-items and then moving down
+the hierarchical levels:
+\begin{itemize}
+\item The \texttt{subitem} entry was adjusted, moving it from a
+sub-entry to a top-level entry. The \field{name} field was then
+modified to
+\begin{verbatim}
+name={\bibglsflattenedchildpostsort{item}{subitem}}
+\end{verbatim}
+This now means that the \texttt{subsubitem} entry is now a sub-entry
+(rather than a sub-sub-entry). The \texttt{subitem} entry now has no
+parent, but at this stage the \texttt{subsubitem} entry still has
+\texttt{subitem} as its parent.
+\item The \texttt{subsubitem} entry is then adjusted moving from a
+sub-entry to a top-level entry. The \field{name} field was then
+modified to
+\begin{verbatim}
+name=
+{%
+ \bibglsflattenedchildpostsort
+ {%
+   % name from former parent
+   \bibglsflattenedchildpostsort{item}{subitem}%
+ }%
+ {subsubitem}% original name
 }
 \end{verbatim}
-The interpreter recognises \csref{bibglsflattenedchildpresort} and
-determines that the sort value is just \qt{duck}. The entries are
-then sorted and the resulting hierarchy is now:
+The first argument of \csref{bibglsflattenedchildpostsort} is
+obtained from the \field{name} field of the entry's former parent
+(which is removed from the child's set of ancestors). This field
+value was changed in the previous step, and the change is
+reflected here.
+
+This means that the name for \texttt{subitem} will be displayed as
+\qt{item, subitem} and the name for \texttt{subsubitem} will be
+displayed as \qt{item, subitem, subsubitem}.
+
+\item The parent entries \texttt{item} and \texttt{subitem}
+are removed from the selection as they have no location lists.
+\end{itemize}
+
+Note that the \texttt{cabbage} sub-entry hasn't been adjusted. It
+doesn't have any siblings but its parent entry (\texttt{vegetable})
+has a location list so it can't be discarded.
+If I change the rule:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries.bib},
+ flatten-lonely-rule=discard unrecorded,
+ flatten-lonely=postsort]
+\end{verbatim}
+then this will move the \texttt{cabbage} entry up a level but the
+original parent entry \texttt{vegetable} will remain:
+\begin{description}\setlength\itemsep{0pt}%
+\item[A] \null
+\item[aardvark] 1
+\item[B] \null
+\item[bard] 1
+\item[birds, duck] 1
+\item[buzz] 1
+\item[I] \null
+\item[item, subitem, subsubitem] 1
+\item[M] \null
+\item[minerals] \mbox{}
+  \begin{description}\setlength\itemsep{0pt}%
+  \item[amber] 1
+  \item[corundum] 1
+  \item[quartz] 1
+  \end{description}
+\item[V] \null
+\item[vegetable] 1
+\item[vegetable, cabbage] 1
+\end{description}
+
+Remember that \csopt[postsort]{flatten-lonely} performs the
+adjustment after sorting. This means that the entries are still in
+the same relative location that they were in with the original
+\csopt[false]{flatten-lonely} setting. For example, \texttt{duck}
+remains in the B letter group before \qt{buzz}.
+
+With \csopt[presort]{flatten-lonely} the adjustments are made before
+the sorting is performed. For example, with
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries.bib},
+ flatten-lonely-rule=discard unrecorded,
+ flatten-lonely=presort]
+\end{verbatim}
+the hierarchical order is now:
 \begin{description}\setlength\itemsep{0pt}%
 \item[A] \null
 \item[aardvark] 1
 \item[B] \null
 \item[bard] 1
 \item[buzz] 1
+\item[C] \null
+\item[cabbage] 1
 \item[D] \null
 \item[duck] 1
 \item[M] \null
@@ -3128,48 +3290,65 @@ then sorted and the resulting hierarchy is now:
   \item[corundum] 1
   \item[quartz] 1
   \end{description}
+\item[S] \null
+\item[subsubitem] 1
+\item[V] \null
+\item[vegetable] 1
 \end{description}
-Note that the \qt{duck} entry has now moved to the \qt{D} letter
-group.
-
-If, on the other hand, I use \csopt[postsort]{flatten-lonely}, the
-parent entry (\texttt{birds}) is discarded \emph{after} sorting. The
-\field{text} field for \texttt{duck} is again set to \qt{duck} but
-now the \field{name} field is set to
+This method uses a different format for the modified \field{name}
+field. For example, the \texttt{duck} entry now has:
 \begin{verbatim}
-\bibglsflattenedchildpostsort{birds}{duck}
+name={\bibglsflattenedchildpresort{duck}{birds}}
 \end{verbatim}
-which defaults to \qt{birds, duck}. Since the parent entry is
-discarded after sorting, the \texttt{duck} entry is in the
-same relative location as for \csopt[false]{flatten-lonely}, but
-it's moved up a hierarchical level, so the listing is now:
-\begin{description}\setlength\itemsep{0pt}%
-\item[A] \null
-\item[aardvark] 1
-\item[B] \null
-\item[bard] 1
-\item[birds, duck] 1
-\item[buzz] 1
-\item[M] \null
-\item[minerals] \mbox{}
-  \begin{description}\setlength\itemsep{0pt}%
-  \item[amber] 1
-  \item[corundum] 1
-  \item[quartz] 1
-  \end{description}
-\end{description}
-Since the \field{text} field has been set to \texttt{duck},
-\verb|\gls{duck}| still produces just \qt{duck}.
+The default definition of \csref{bibglsflattenedchildpresort} simply
+does the first argument and ignores the second. The sorting is then
+performed, but the interpreter recognises this command and can
+deduce that the sort value for this entry should be \texttt{duck},
+so \qt{duck} now ends up in the D letter group.
+
+If you provide a definition of \cs{bibglsflattenedchildpresort} in
+the \atentryref{preamble}, it will be picked up by the interpreter.
+For example:
+\begin{verbatim}
+@preamble{"\providecommand{\bibglsflattenedchildpresort}[2]{#1 (#2)}"}
+\end{verbatim}
 
 Note that the \field{text} field is only changed if not already set.
 This option may have unpredictable results for abbreviations as the
-\field{name} field is typically set by the abbreviation style.
-Remember that the parent entry is discarded after all relevant
-entries and their dependencies have been selected, so any
-cross-references within the parent entry may end up being selected
+\field{name} field (and sometimes the \field{text} field) is
+typically set by the abbreviation style.  Remember that
+if the parent entry doesn't have a location list and the rule isn't
+set to \optfmt{no discard} then the parent entry will be discarded
+after all relevant entries and their dependencies have been
+selected, so any cross-references within the parent entry (such as
+\cs{gls} occurring in the description) may end up being selected
 even if they wouldn't be selected if the parent entry didn't exist.
-The parent entry won't be discarded if it contains any records. This
-includes ignored records (identified with \gencsopt[glsignore]{glsadd}{format}).
+
+\subsection{\csoptnv{flatten-lonely-rule}=\margm{value}}
+\labelopt{flatten-lonely-rule}
+
+This option governs the rule used by \csopt{flatten-lonely} to
+determine which sub-entries (that have no siblings) to adjust and 
+which parents to remove. The value may be one of the following:
+\begin{description}
+\item[\optfmt{only unrecorded parents}] Only the sub-entries
+that have a parent without a location list will be selected.
+The parent entry will be removed from the selection.
+This value is the default setting.
+\item[\optfmt{discard unrecorded}] This setting will adjust all
+sub-entries that have no siblings regardless of whether or not the
+parent has a location list.
+Only the parent entries that don't have a location list will be
+removed from the selection.
+\item[\optfmt{no discard}] This setting will adjust all
+sub-entries that have no siblings regardless of whether or not the
+parent has a location list. No entries will be discarded, so parent
+entries that don't have a location list will still appear in the
+glossary.
+\end{description}
+In the above, the location list includes records and
+cross-references obtained from the \field{see} or \field{seealso}
+fields. See \optref{flatten-lonely} for further details.
 
 \section{Master Documents}
 \label{sec:master}
@@ -6296,7 +6475,7 @@ or redefined after the resources are loaded:
 \cs{bibglsflattenedchildpresort}\margm{child name}\margm{parent name}
 \end{definition}
 
-Used by the \csopt[presort]{flatten-lonely} option. This defaults
+Used by the \optref[presort]{flatten-lonely} option. This defaults
 to just \meta{child name}. If you want to change this, remember that
 you can let the interpreter know by adding the definition to
 \atentry{preamble}. For example:
@@ -6311,13 +6490,19 @@ you can let the interpreter know by adding the definition to
 \cs{bibglsflattenedchildpostsort}\margm{parent name}\margm{child name}
 \end{definition}
 
-Used by the \csopt[postsort]{flatten-lonely} option. This defaults
+Used by the \optref[postsort]{flatten-lonely} option. This defaults
 to \texttt{\meta{parent name}, \meta{child name}}.
 
 Note that the arguments are in the reverse order to those of the
 previous command. This is done to assist the automated first letter
 upper-casing. If either command is redefined to alter the ordering,
-then this can confuse the case-changing mechanism.
+then this can confuse the case-changing mechanism, in which case you
+may want to consider switching on the expansion of the \field{name}
+field using:
+\begin{verbatim}
+\glssetexpandfield{name}
+\end{verbatim}
+(before \cs{GlsXtrLoadResources}).
 
 \chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
 \label{sec:gls2bib}

@@ -995,6 +995,12 @@ public class Bib2GlsEntry extends BibEntry
       return fieldValues.get("parent");
    }
 
+   public boolean hasCrossRefs()
+   {
+      return (crossRefs != null && crossRefs.length > 0)
+         || (alsocrossRefs != null && alsocrossRefs.length > 0);
+   }
+
    public String[] getCrossRefs()
    {
       return crossRefs;
@@ -1833,6 +1839,74 @@ public class Bib2GlsEntry extends BibEntry
       return collationKey;
    }
 
+   public static Bib2GlsEntry getEntry(String entryId,
+     Vector<Bib2GlsEntry> entries)
+   {
+      for (Bib2GlsEntry entry : entries)
+      {
+         if (entry.getId().equals(entryId))
+         {
+            return entry;
+         }
+      }
+
+      return null;
+   }
+
+   public int getLevel(Vector<Bib2GlsEntry> entries)
+   {
+      String parentId = getParent();
+
+      if (parentId == null) return 0;
+
+      Bib2GlsEntry parent = getEntry(parentId, entries);
+
+      if (parent != null)
+      {
+         return parent.getLevel(entries)+1;
+      }
+
+      return 0;
+   }
+
+   public void moveUpHierarchy(Vector<Bib2GlsEntry> entries)
+   {
+      String parentId = getParent();
+      String childId = getId();
+
+      if (parentId == null)
+      {
+         return;
+      }
+
+      Bib2GlsEntry parent = getEntry(parentId, entries);
+
+      String grandparentId = null;
+
+      if (parent != null)
+      {
+         parent.removeChild(childId);
+
+         grandparentId = parent.getParent();
+      }
+
+      if (grandparentId == null)
+      {
+         removeField("parent");
+         removeFieldValue("parent");
+         return;
+      }
+
+      Bib2GlsEntry grandparent = getEntry(grandparentId, entries);
+
+      if (grandparent == null) return;
+
+      grandparent.addChild(this);
+
+      putField("parent", parent.getField("parent"));
+      putField("parent", grandparentId);
+   }
+
    private void addHierarchy(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
      throws Bib2GlsException
    {
@@ -1851,13 +1925,11 @@ public class Bib2GlsEntry extends BibEntry
          return;
       }
 
-      for (Bib2GlsEntry e : entries)
+      Bib2GlsEntry parent = getEntry(parentId, entries);
+
+      if (parent != null)
       {
-         if (e.getId().equals(parentId))
-         {
-            addHierarchy(e, entries);
-            return;
-         }
+         addHierarchy(parent, entries);
       }
    }
 
@@ -1915,6 +1987,21 @@ public class Bib2GlsEntry extends BibEntry
    public Bib2GlsEntry getChild(int i)
    {
       return children.get(i);
+   }
+
+   private Bib2GlsEntry removeChild(String id)
+   {
+      if (children == null) return null;
+
+      for (int i = 0; i < children.size(); i++)
+      {
+         if (children.get(i).getId().equals(id))
+         {
+            return children.remove(i);
+         }
+      }
+
+      return null;
    }
 
    private Vector<GlsRecord> records;

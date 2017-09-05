@@ -291,6 +291,24 @@ public class GlsResource
                flattenLonely = FLATTEN_LONELY_POST_SORT;
             }
          }
+         else if (opt.equals("flatten-lonely-rule"))
+         {
+            String val = getChoice(parser, list, opt, "only unrecorded parents",
+              "no discard", "discard unrecorded");
+
+            if (val.equals("only unrecorded parents"))
+            {
+               flattenLonelyRule = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
+            }
+            else if (val.equals("no discard"))
+            {
+               flattenLonelyRule = FLATTEN_LONELY_RULE_NO_DISCARD;
+            }
+            else if (val.equals("discard unrecorded"))
+            {
+               flattenLonelyRule = FLATTEN_LONELY_RULE_DISCARD_UNRECORDED;
+            }
+         }
          else if (opt.equals("save-locations"))
          {
             saveLocations = getBoolean(parser, list, opt);
@@ -2638,40 +2656,7 @@ public class GlsResource
             listener.putControlSequence(new FlattenedPreSort());
          }
 
-
-         checkParents(entries);
-
-         for (int i = entries.size()-1; i >= 0; i--)
-         {
-            Bib2GlsEntry entry = entries.get(i);
-            String parentId = entry.getFieldValue("parent");
-
-            if (parentId != null)
-            {
-               // Since parents must be defined before children,
-               // it's more efficient to search backwards.
-
-               for (int j = i-1; j >= 0; j--)
-               {
-                  Bib2GlsEntry thisEntry = entries.get(j);
-
-                  if (thisEntry.getId().equals(parentId))
-                  {
-                     if (thisEntry.getChildCount() == 1
-                         && thisEntry.recordCount() == 0)
-                     {
-                        if (flattenChild(thisEntry))
-                        {
-                           entries.remove(j);
-                           i--;
-                        }
-                     }
-
-                     break;
-                  }
-               }
-            }
-         }
+         flattenLonelyChildren(entries);
       }
 
       // sort if required
@@ -3095,7 +3080,7 @@ public class GlsResource
           // This will already have been done if
           // flatten-lonely=presort
 
-            checkParents(entries);
+            flattenLonelyChildren(entries);
          }
 
          if (flattenLonely == FLATTEN_LONELY_POST_SORT)
@@ -3114,13 +3099,6 @@ public class GlsResource
          for (int i = 0, n = entries.size(); i < n; i++)
          {
             Bib2GlsEntry entry = entries.get(i);
-
-            if (flattenLonely == FLATTEN_LONELY_POST_SORT 
-                 && entry.getChildCount() == 1
-                 && entry.recordCount() == 0)
-            {
-               if (flattenChild(entry)) continue;
-            }
 
             bib2gls.verbose(entry.getId());
 
@@ -3196,19 +3174,12 @@ public class GlsResource
                 || (saveChildCount && flattenLonely != FLATTEN_LONELY_PRE_SORT))
             {// need to check parents before writing definitions
 
-               checkParents(dualEntries);
+               flattenLonelyChildren(dualEntries);
             }
 
             for (int i = 0, n = dualEntries.size(); i < n; i++)
             {
                Bib2GlsEntry entry = dualEntries.get(i);
-
-               if (flattenLonely == FLATTEN_LONELY_POST_SORT
-                    && entry.getChildCount() == 1
-                    && entry.recordCount() == 0)
-               {
-                  if (flattenChild(entry)) continue;
-               }
 
                bib2gls.verbose(entry.getId());
 
@@ -3549,16 +3520,29 @@ public class GlsResource
 
       // has parent been added?
 
-      boolean found = false;
+      /*
+        Search backwards.
+        (If entry has a parent it's more likely to be nearby
+         with the default sort.)
+      */
 
       for (int j = i-1; j >= 0; j--)
       {
-         /*
-           Search backwards.
-           (If entry has a parent it's more likely to be nearby
-            with the default sort.)
-         */
+         Bib2GlsEntry thisEntry = list.get(j);
 
+         if (thisEntry.getId().equals(parentId))
+         {
+            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount)
+            {
+               thisEntry.addChild(entry);
+            }
+
+            return;
+         }
+      }
+
+      for (int j = list.size()-1; j > i-1; j--)
+      {
          Bib2GlsEntry thisEntry = list.get(j);
 
          if (thisEntry.getId().equals(parentId))
@@ -3577,195 +3561,274 @@ public class GlsResource
       entry.removeFieldValue("parent");
    }
 
-   private void checkParents(Vector<Bib2GlsEntry> entries)
-   {
-      for (int i = 0, n = entries.size(); i < n; i++)
-      {
-         Bib2GlsEntry entry = entries.get(i);
-         checkParent(entry, i, entries);
-      }
-   }
-
    private String flattenLonelyCsName()
    {
       return flattenLonely == FLATTEN_LONELY_PRE_SORT ?
          "bibglsflattenedchildpresort" : "bibglsflattenedchildpostsort";
    }
 
-   private boolean flattenChild(Bib2GlsEntry entry)
+   private void flattenChild(Bib2GlsEntry parent, Bib2GlsEntry child,
+      Vector<Bib2GlsEntry> entries)
    {
-      // Fetch the child
+      // The bib value fields only need to be set for
+      // flatten-lonely=presort as they may be required for the
+      // sort value.
 
-      Bib2GlsEntry child = entry.getChild(0);
+      L2HStringConverter listener = null;
+      BibValueList bibName = null;
+      BibValueList bibParentName = null;
 
-      // Don't flatten if child has any children
-
-      if (child.getChildCount() == 0)
+      if (flattenLonely == FLATTEN_LONELY_PRE_SORT)
       {
-         // The bib value fields only need to be set for
-         // flatten-lonely=presort as they may be required for the
-         // sort value.
+         listener = bib2gls.getInterpreterListener();
+      }
 
-         L2HStringConverter listener = null;
-         BibValueList bibName = null;
-         BibValueList bibParentName = null;
+      String name = child.getFieldValue("name");
 
-         if (flattenLonely == FLATTEN_LONELY_PRE_SORT)
+      if (listener != null)
+      {
+         bibName = child.getField("name");
+      }
+
+      if (name == null)
+      {
+         name = child.getFallbackValue("name");
+
+         if (listener != null && bibName == null)
          {
-            listener = bib2gls.getInterpreterListener();
+            bibName = child.getFallbackContents("name");
          }
+      }
 
-         String name = child.getFieldValue("name");
+      // Does the child have a text field?
+
+      String text = child.getFieldValue("text");
+
+      if (text == null && name != null)
+      {
+         // Use the name field if present.
+
+         child.putField("text", name);
+      }
+
+      String parentName = parent.getFieldValue("name");
+
+      if (listener != null)
+      {
+         bibParentName = parent.getField("name");
+      }
+
+      if (parentName == null)
+      {
+         parentName = parent.getFallbackValue("name");
 
          if (listener != null)
          {
-            bibName = child.getField("name");
+            bibParentName = parent.getFallbackContents("name");
          }
+      }
 
-         if (name == null)
-         {
-            name = child.getFallbackValue("name");
-
-            if (listener != null && bibName == null)
-            {
-               bibName = child.getFallbackContents("name");
-            }
-         }
-
-         // Does the child have a text field?
-
-         String text = child.getFieldValue("text");
-
-         if (text == null && name != null)
-         {
-            // Use the name field if present.
-
-            child.putField("text", name);
-         }
-
-         String parentName = entry.getFieldValue("name");
+      if (name != null)
+      {
+         String csName = flattenLonelyCsName();
+         TeXObjectList object = null;
+         Group nameGroup = null;
+         Group parentNameGroup = null;
 
          if (listener != null)
          {
-            bibParentName = entry.getField("name");
-         }
+            object = new TeXObjectList();
+            object.add(new TeXCsRef(csName));
 
-         if (parentName == null)
-         {
-            parentName = entry.getFallbackValue("name");
-
-            if (listener != null)
+            if (bibName == null)
             {
-               bibParentName = entry.getFallbackContents("name");
-            }
-         }
-
-         if (name != null)
-         {
-            String csName = flattenLonelyCsName();
-            TeXObjectList object = null;
-            Group nameGroup = null;
-            Group parentNameGroup = null;
-
-            if (listener != null)
-            {
-               object = new TeXObjectList();
-               object.add(new TeXCsRef(csName));
-
-               if (bibName == null)
-               {
-                  nameGroup = listener.createGroup(name);
-               }
-               else
-               {
-                  nameGroup = listener.createGroup();
-                  TeXObject contents = bibName.getContents(true);
-
-                  if (contents instanceof TeXObjectList)
-                  {
-                     nameGroup.addAll((TeXObjectList)contents);
-                  }
-                  else
-                  {
-                     nameGroup.add(contents);
-                  }
-               }
-
-               if (bibParentName == null)
-               {
-                  if (parentName == null)
-                  {
-                     parentNameGroup = listener.createGroup();
-                  }
-                  else
-                  {
-                     parentNameGroup = listener.createGroup(parentName);
-                  }
-               }
-               else
-               {
-                  parentNameGroup = listener.createGroup();
-                  TeXObject contents = bibParentName.getContents(true);
-
-                  if (contents instanceof TeXObjectList)
-                  {
-                     parentNameGroup.addAll((TeXObjectList)contents);
-                  }
-                  else
-                  {
-                     parentNameGroup.add(contents);
-                  }
-               }
-
-               object.add(nameGroup);
-               object.add(parentNameGroup);
-            }
-
-            if (flattenLonely == FLATTEN_LONELY_POST_SORT)
-            {
-               child.putField("name", 
-                 String.format("\\%s{%s}{%s}",
-                  csName, parentName, name));
+               nameGroup = listener.createGroup(name);
             }
             else
             {
-               child.putField("name", 
-                 String.format("\\%s{%s}{%s}",
-                  csName, name, parentName));
+               nameGroup = listener.createGroup();
+               TeXObject contents = bibName.getContents(true);
 
-               if (object != null)
+               if (contents instanceof TeXObjectList)
                {
-                  BibValueList contents = new BibValueList();
-                  contents.add(new BibUserString(object));
-                  child.putField("name", contents);
+                  nameGroup.addAll((TeXObjectList)contents);
+               }
+               else
+               {
+                  nameGroup.add(contents);
                }
             }
+
+            if (bibParentName == null)
+            {
+               if (parentName == null)
+               {
+                  parentNameGroup = listener.createGroup();
+               }
+               else
+               {
+                  parentNameGroup = listener.createGroup(parentName);
+               }
+            }
+            else
+            {
+               parentNameGroup = listener.createGroup();
+               TeXObject contents = bibParentName.getContents(true);
+
+               if (contents instanceof TeXObjectList)
+               {
+                  parentNameGroup.addAll((TeXObjectList)contents);
+               }
+               else
+               {
+                  parentNameGroup.add(contents);
+               }
+            }
+
+            object.add(nameGroup);
+            object.add(parentNameGroup);
          }
-
-         // remove parent field
-
-         child.removeFieldValue("parent");
-         child.removeField("parent");
 
          if (flattenLonely == FLATTEN_LONELY_POST_SORT)
          {
-            // set the child's group to the parent's group, if
-            // provided.
+            child.putField("name", 
+              String.format("\\%s{%s}{%s}",
+               csName, parentName, name));
+         }
+         else
+         {
+            child.putField("name", 
+              String.format("\\%s{%s}{%s}",
+               csName, name, parentName));
 
-            String group = entry.getFieldValue("group");
-
-            if (group != null)
+            if (object != null)
             {
-               child.putField("group", group);
+               BibValueList contents = new BibValueList();
+               contents.add(new BibUserString(object));
+               child.putField("name", contents);
             }
          }
-
-         // omit parent
-
-         return true;
       }
 
-      return false;
+      // remove parent field
+
+      child.moveUpHierarchy(entries);
+
+      if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+      {
+         // set the child's group to the parent's group, if
+         // provided.
+
+         String group = parent.getFieldValue("group");
+
+         if (group != null)
+         {
+            child.putField("group", group);
+         }
+      }
+   }
+
+   private void flattenLonelyChildren(Vector<Bib2GlsEntry> entries)
+   {
+      // The entries need to be traversed down the hierarchical
+      // system otherwise moving a grandchild up the hierarchy
+      // before the parent entry has been checked will confuse the
+      // test.
+
+      Hashtable<Integer,Vector<Bib2GlsEntry>> flattenMap 
+      = new Hashtable<Integer,Vector<Bib2GlsEntry>>();
+
+      // Key set needs to be ordered
+      TreeSet<Integer> keys = new TreeSet<Integer>();
+
+      Vector<Bib2GlsEntry> discardList = new Vector<Bib2GlsEntry>();
+
+      // This has to be done first to ensure the parent-child
+      // information is all correct.
+      for (int i = 0, n = entries.size(); i < n; i++)
+      {
+         Bib2GlsEntry entry = entries.get(i);
+         checkParent(entry, i, entries);
+      }
+
+      for (int i = 0, n = entries.size(); i < n; i++)
+      {
+         Bib2GlsEntry parent = entries.get(i);
+
+         /*
+          * Conditions for moving the child up one hierarchical
+          * level:
+          *
+          * - The child should not have any siblings
+          * - If flatten-lonely-rule = 'only unrecorded parents'
+          *    the parent can't have records or cross-references
+          *   Otherwise
+          *    the parent may have records or cross-references 
+          */  
+
+         int childCount = parent.getChildCount();
+
+         if (childCount != 1) continue;
+
+         Bib2GlsEntry child = parent.getChild(0);
+
+         boolean parentHasRecordsOrCrossRefs =
+           parent.recordCount() >0 || parent.hasCrossRefs();
+
+         if ( // flatten-lonely-rule != 'only unrecorded parents':
+               flattenLonelyRule != FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS
+              // or parent doesn't have records or cross-references:
+            || !parentHasRecordsOrCrossRefs)
+         {
+            Integer level = new Integer(child.getLevel(entries));
+
+            Vector<Bib2GlsEntry> list = flattenMap.get(level);
+
+            if (list == null)
+            {
+               list = new Vector<Bib2GlsEntry>();
+               flattenMap.put(level, list);
+               keys.add(level);
+            }
+
+            list.add(child);
+
+            /*
+             *  The parent will only be discarded if
+             *   - parent has no records or cross-references
+             *   - flatten-lonely-rule != 'no discard'
+             */
+
+            if (flattenLonelyRule != FLATTEN_LONELY_RULE_NO_DISCARD
+                 && !parentHasRecordsOrCrossRefs)
+            {
+               discardList.add(parent);
+            }
+         }
+      }
+
+      Iterator<Integer> it = keys.iterator();
+
+      while (it.hasNext())
+      {
+         Integer level = it.next();
+
+         Vector<Bib2GlsEntry> list = flattenMap.get(level);
+
+         for (Bib2GlsEntry child : list)
+         {
+            String parentId = child.getParent();
+
+            Bib2GlsEntry parent = Bib2GlsEntry.getEntry(parentId, entries);
+
+            flattenChild(parent, child, entries);
+         }
+      }
+
+      for (Bib2GlsEntry discard : discardList)
+      {
+         entries.remove(discard);
+      }
    }
 
    public boolean flattenSort()
@@ -4284,6 +4347,13 @@ public class GlsResource
    public static final int FLATTEN_LONELY_POST_SORT=2;
 
    private int flattenLonely = FLATTEN_LONELY_FALSE;
+
+   public static final int FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS=0;
+   public static final int FLATTEN_LONELY_RULE_NO_DISCARD=1;
+   public static final int FLATTEN_LONELY_RULE_DISCARD_UNRECORDED=2;
+
+   private int flattenLonelyRule 
+     = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
 
    private boolean saveChildCount = false;
 
