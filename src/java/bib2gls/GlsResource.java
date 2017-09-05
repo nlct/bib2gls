@@ -35,6 +35,7 @@ import java.awt.font.TextLayout;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
+import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
@@ -136,12 +137,13 @@ public class GlsResource
          }
          else if (opt.equals("short-case-change"))
          {
-            shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc");
+            shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
+              "lc-cs", "uc-cs");
          }
          else if (opt.equals("dual-short-case-change"))
          {
             dualShortCaseChange = getChoice(parser, list, opt,
-              "none", "lc", "uc");
+              "none", "lc", "uc", "lc-cs", "uc-cs");
          }
          else if (opt.equals("short-plural-suffix"))
          {
@@ -4184,6 +4186,90 @@ public class GlsResource
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
 
+   private void toLowerCase(TeXObjectList list)
+   {
+      for (int i = 0, n = list.size(); i < n; i++)
+      {
+         TeXObject object = list.get(i);
+
+         if (object instanceof CharObject)
+         {
+            int codePoint = ((CharObject)object).getCharCode();
+
+            if (Character.isAlphabetic(codePoint))
+            {
+               codePoint = Character.toLowerCase(codePoint);
+               ((CharObject)object).setCharCode(codePoint);
+            }
+         }
+         else if (object instanceof TeXObjectList)
+         {
+            toLowerCase((TeXObjectList)object);
+         }
+         else if (object instanceof ControlSequence
+                || ((ControlSequence)object).getName().equals("NoCaseChange"))
+         {
+            // skip argument
+
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
+
+               i++;
+            }
+         }
+      }
+   }
+
+   private void toUpperCase(TeXObjectList list)
+   {
+      for (int i = 0, n = list.size(); i < n; i++)
+      {
+         TeXObject object = list.get(i);
+
+         if (object instanceof CharObject)
+         {
+            int codePoint = ((CharObject)object).getCharCode();
+
+            if (Character.isAlphabetic(codePoint))
+            {
+               codePoint = Character.toUpperCase(codePoint);
+               ((CharObject)object).setCharCode(codePoint);
+            }
+         }
+         else if (object instanceof TeXObjectList)
+         {
+            toUpperCase((TeXObjectList)object);
+         }
+         else if (object instanceof ControlSequence
+                || ((ControlSequence)object).getName().equals("NoCaseChange"))
+         {
+            // skip argument
+
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
+
+               i++;
+            }
+         }
+      }
+   }
+
    public BibValueList applyCaseChange(TeXParser parser,
       BibValueList value, String change)
    {
@@ -4193,7 +4279,7 @@ public class GlsResource
 
       BibValueList bibList = new BibValueList();
 
-      if (change.equals("lc"))
+      if (change.equals("lc-cs"))
       {
          Group grp = parser.getListener().createGroup();
          grp.addAll(list);
@@ -4202,7 +4288,7 @@ public class GlsResource
          list.add(new TeXCsRef("MakeTextLowercase"));
          list.add(grp);
       }
-      else if (change.equals("uc"))
+      else if (change.equals("uc-cs"))
       {
          Group grp = parser.getListener().createGroup();
          grp.addAll(list);
@@ -4210,6 +4296,14 @@ public class GlsResource
          list = new TeXObjectList();
          list.add(new TeXCsRef("MakeTextUppercase"));
          list.add(grp);
+      }
+      else if (change.equals("lc"))
+      {
+         toLowerCase(list);
+      }
+      else if (change.equals("uc"))
+      {
+         toUpperCase(list);
       }
       else
       {

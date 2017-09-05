@@ -3332,7 +3332,7 @@ determine which sub-entries (that have no siblings) to adjust and
 which parents to remove. The value may be one of the following:
 \begin{description}
 \item[\optfmt{only unrecorded parents}] Only the sub-entries
-that have a parent without a location list will be selected.
+that have a parent without a location list will be altered.
 The parent entry will be removed from the selection.
 This value is the default setting.
 \item[\optfmt{discard unrecorded}] This setting will adjust all
@@ -3880,24 +3880,82 @@ The value of the \field{short} field may be automatically converted
 to upper or lower case. This option may take one of the following
 values:
 \begin{itemize}
-\item \optfmt{none}: don't apply any case-changing;
+\item \optfmt{none}: don't apply any case-changing (default);
 \item \optfmt{lc}: convert to lower case;
-\item \optfmt{uc}: convert to upper case.
+\item \optfmt{uc}: convert to upper case;
+\item \optfmt{lc-cs}: convert to lower case using
+\cs{MakeTextLowercase};
+\item \optfmt{uc-cs}: convert to upper case using
+\cs{MakeTextUppercase}.
 \end{itemize}
 
 For example, if the \ext{bib} file contains
 \begin{verbatim}
 @abbreviation{html,
-  short ="html",
-  long  = html,
-  description={a markup language for creating web pages}
+  short = "html",
+  long  = "hypertext markup language"
 }
 \end{verbatim}
 then \csopt[uc]{short-case-change} would convert the value of the
 \field{short} field into
 \begin{verbatim}
+HTML
+\end{verbatim}
+whereas \csopt[uc-cs]{short-case-change} would convert it to
+\begin{verbatim}
 \MakeTextUppercase{html}
 \end{verbatim}
+In the case of \csopt[uc]{short-case-change} and \csopt[lc]{short-case-change}
+only tokens that are recognised as characters will be converted.
+For example, suppose I have a slightly more eccentric definition:
+\begin{verbatim}
+@abbreviation{html,
+  short = "ht\emph{ml}",
+  long  = "hypertext markup language"
+}
+\end{verbatim}
+then \csopt[uc]{short-case-change} would convert the value of the
+\field{short} field into
+\begin{verbatim}
+HT\emph{ML}
+\end{verbatim}
+Note that \cs{emph} isn't modified as it's recognised as a command.
+There's no attempt at interpreting the contents at this point (but
+the value may later be interpreted during sorting).
+
+For example, suppose an abbreviation is defined using:
+\begin{verbatim}
+short = "z\ae\oe",
+\end{verbatim}
+then with \csopt[uc]{short-case-change}, this would be converted to
+\begin{verbatim}
+Z\ae\oe
+\end{verbatim}
+since the interpreter isn't being used at this stage. If the
+interpreter is later used during sorting, the sort value will be set to 
+\texttt{Z\ae\oe}.
+
+However, with \csopt[uc-cs]{short-case-change}, the \field{short}
+value would be converted to
+\begin{verbatim}
+\MakeTextUppercase{z\ae\oe}
+\end{verbatim}
+If the interpreter is used during sorting, the sort value will be set to 
+\texttt{Z\AE\OE}.
+
+You can use \cs{NoCaseChange}\margm{text} to prevent the given \meta{text}
+from having the case changed. For example, if the \field{short}
+field is defined as
+\begin{verbatim}
+short = {a\NoCaseChange{bc}d}
+\end{verbatim}
+then with  \csopt[uc]{short-case-change}, this would be converted to
+\begin{verbatim}
+A\NoCaseChange{bc}D
+\end{verbatim}
+(This command is provided by \sty{textcase}, which is automatically
+loaded by \sty{glossaries}.)
+
 See \optref{dual-short-case-change} to adjust the \field{dualplural}
 field.
 
