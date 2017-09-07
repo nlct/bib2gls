@@ -2884,7 +2884,7 @@ public class GlsResource
             writer.println("\\ifdef\\glsxtrsetgrouptitle");
             writer.println("{");
             writer.println("  \\providecommand{\\bibglslettergroup}[4]{#4#3}");
-            writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{#1}");
+            writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{\\unexpanded{#1}}");
             writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
             writer.println("}");
