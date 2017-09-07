@@ -78,31 +78,33 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
+      Number number = null;
+
       try
       {
          if (sort.equals("integer") || sort.equals("integer-reverse"))
          {
-            entry.setNumericSort(new Integer(value));
+            number = new Integer(value);
          }
          else if (sort.equals("float") || sort.equals("float-reverse"))
          {
-            entry.setNumericSort(new Float(value));
+            number = new Float(value);
          }
          else if (sort.equals("double") || sort.equals("double-reverse"))
          {
-            entry.setNumericSort(new Double(value));
+            number = new Double(value);
          }
          else if (sort.equals("hex") || sort.equals("hex-reverse"))
          {
-            entry.setNumericSort(new Integer(Integer.parseInt(value,16)));
+            number = new Integer(Integer.parseInt(value,16));
          }
          else if (sort.equals("octal") || sort.equals("octal-reverse"))
          {
-            entry.setNumericSort(new Integer(Integer.parseInt(value,8)));
+            number = new Integer(Integer.parseInt(value,8));
          }
          else if (sort.equals("binary") || sort.equals("binary-reverse"))
          {
-            entry.setNumericSort(new Integer(Integer.parseInt(value,2)));
+            number = new Integer(Integer.parseInt(value,2));
          }
          else
          {
@@ -113,19 +115,34 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       catch (NumberFormatException e)
       {
          value = "0";
-         entry.setNumericSort(new Integer(0));
+         number = new Integer(0);
       }
+
+      entry.setNumericSort(number);
 
       entry.putField("sort", value);
 
       if (bib2gls.useGroupField() && entry.getFieldValue("group") == null)
       {
          GlsResource resource = bib2gls.getCurrentResource();
-         String entryType = resource.getType(entry);
+
+         GroupTitle grpTitle = resource.getGroupTitle(entry, number.intValue());
+         String args;
+
+         if (grpTitle == null)
+         {
+            String entryType = resource.getType(entry);
+            grpTitle = new NumberGroupTitle(number, entryType);
+            resource.putGroupTitle(grpTitle);
+            args = grpTitle.toString();
+         }
+         else
+         {
+            args = grpTitle.format(value);
+         }
 
          entry.putField("group",
-            String.format("\\bibglsnumbergroup{%s}{%s}", value,
-               entryType == null ? "" : entryType));
+            String.format("\\%s%s", grpTitle.getCsLabelName(), args));
       }
 
       if (bib2gls.getVerboseLevel() > 0)

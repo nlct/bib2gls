@@ -65,13 +65,28 @@ public class GroupTitle
         String.format("%s.%d", entryType, groupId);
    }
 
+   public String getCsSetName()
+   {
+      return "bibglssetlettergrouptitle";
+   }
+
+   public String getCsLabelName()
+   {
+      return "bibglslettergroup";
+   }
+
    public String toString()
    {
-      return String.format("{%s}{%s}{%d}{%s}", title, actual, id,
+      return format(actual);
+   }
+
+   public String format(String letter)
+   {
+      return String.format("{%s}{%s}{%d}{%s}", title, letter, id,
        type == null ? "" : type);
    }
 
-   private String title, actual, type;
+   protected String title, actual, type;
 
    private int id;
 }

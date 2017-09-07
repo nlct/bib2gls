@@ -319,8 +319,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                else
                {
                   String entryType = resource.getType(entry);
-                  args = String.format("{%s}{%s}{%d}{%s}", grp, str, elem,
-                    entryType == null ? "" : entryType);
+                  args = grpTitle.format(str);
 
                   if (grpTitle.getTitle().matches(".*[^\\p{ASCII}].*")
                       && grp.matches("\\p{ASCII}+"))
@@ -330,7 +329,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                }
 
                entry.putField("group", 
-                 String.format("\\bibglslettergroup%s", args));
+                 String.format("\\%s%s", grpTitle.getCsLabelName(), args));
             }
             else
             {
@@ -341,11 +340,24 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                }
 
                GlsResource resource = bib2gls.getCurrentResource();
-               String entryType = resource.getType(entry);
+
+               GroupTitle grpTitle = resource.getGroupTitle(entry, elem);
+               String args;
+
+               if (grpTitle == null)
+               {
+                  String entryType = resource.getType(entry);
+                  grpTitle = new OtherGroupTitle(str, elem, entryType);
+                  resource.putGroupTitle(grpTitle);
+                  args = grpTitle.toString();
+               }
+               else
+               {
+                  args = grpTitle.format(str);
+               }
 
                entry.putField("group", 
-                 String.format("\\bibglsothergroup{%s}{%d}{%s}", str, elem,
-                    entryType == null ? "" : entryType));
+                 String.format("\\%s%s", grpTitle.getCsLabelName(), args));
             }
          }
          else

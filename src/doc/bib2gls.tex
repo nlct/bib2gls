@@ -6559,12 +6559,12 @@ This field needs to expand to a simple label, which \csref{bibglslettergroup}
 is designed to do.  Note that non-letter groups are dealt with
 separately (see below).
 
-\subsection{\csfmt{bibglssetgrouptitle}}
-\labelcs{bibglssetgrouptitle}
+\subsection{\csfmt{bibglssetlettergrouptitle}}
+\labelcs{bibglssetlettergrouptitle}
 
 For each group that's detected, \bibgls\ will write the line:
 \begin{definition}
-\cs{bibglssetgrouptitle}\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}
+\cs{bibglssetlettergrouptitle}\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}
 \end{definition}
 in the \ext{glstex} file, which sets the group's title using
 \begin{alltt}
@@ -6573,16 +6573,16 @@ in the \ext{glstex} file, which sets the group's title using
 where the \meta{group label} part matches the corresponding \field{group}
 value.
 
-Note that \cs{bibglssetgrouptitle} only has a single
+Note that \cs{bibglssetlettergrouptitle} only has a single
 argument, but that argument contains the four arguments needed by
 \csref{bibglslettergroup} and \csref{bibglslettergrouptitle}.
 These arguments are as described above.
 
 If \cs{glsxtrsetgrouptitle} has been defined (\sty{glossaries-extra}
-version 1.14 onwards), then \cs{bibglssetgrouptitle} will be
+version 1.14 onwards), then \cs{bibglssetlettergrouptitle} will be
 defined as
 \begin{verbatim}
-\providecommand{\bibglssetgrouptitle}[1]{%
+\providecommand{\bibglssetlettergrouptitle}[1]{%
   \glsxtrsetgrouptitle{\bibglslettergroup#1}{\bibglslettergrouptitle#1}}
 \end{verbatim}
 If an earlier version of \sty{glossaries-extra} is used, then this
@@ -6590,7 +6590,7 @@ function can't be supported and the command will be defined to
 simply ignore its argument. This will fall back on the original
 method of just using \meta{title} as the label.
 
-Since \cs{bibglssetgrouptitle} is used in the \ext{glstex} file to
+Since \cs{bibglssetlettergrouptitle} is used in the \ext{glstex} file to
 set the group titles, the associated commands need to be defined
 before the resource file is loaded if their definitions require
 modification. After the resource file has been loaded, you can
@@ -6598,7 +6598,7 @@ adjust the title of a specific group, but you'll need to check the
 \ext{glstex} file for the appropriate arguments. For example, if the
 \ext{glstex} file contains:
 \begin{alltt}
-\cs{bibglssetgrouptitle}\marg{\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}
+\cs{bibglssetlettergrouptitle}\marg{\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}
 \end{alltt}
 but you actually want the group title to appear as \qt{\AE\ (AE)}
 instead of just \qt{\AE}, then after the resource file has been
@@ -6675,14 +6675,13 @@ and the document contains:
   sort={ja-JP},% locale used to sort primary entries
   dual-sort={en-GB},% locale used to sort secondary entries
   type=japanese,% put the primary entries in the 'japanese' glossary
-  dual-type=english,% put the primary entries in the 'english'
-glossary
+  dual-type=english,% put the primary entries in the 'english' glossary
   dual-prefix={en.}
 ]
 \end{verbatim}
 then CJK characters will appear in the \meta{title} argument of 
-\cs{bibglslettergrouptitle} which causes a problem. This needs
-encapsulating with the \env{CJK} environment, which can be more
+\cs{bibglslettergrouptitle} which causes a problem because they need
+to be encapsulated within the \env{CJK} environment. This can be more
 conveniently done with the user supplied \csfmt{cjkname}, but the CJK
 characters need to be protected from expansion so \cs{unexpanded} is
 also needed. The new definition of \cs{bibglslettergrouptitle} needs
@@ -6699,55 +6698,101 @@ also end up encapsulated. An alternative approach is to use the
 \newcommand{\bibglslettergrouptitle}[4]{%
  \unexpanded{\csuse{#4lettergroup}{#1}}}
 \end{verbatim}
+(\csfmt{csuse} is provided by \sty{etoolbox}, which is automatically
+loaded by the \styfmt{glossaries} package.)
+
+\subsection{\csfmt{bibglssetothergrouptitle}}
+\labelcs{bibglssetothergrouptitle}
+
+The group label and title for non-alphabetic characters (symbols)
+are dealt with in a similar way to the letter groups, but in this
+case the title is set using
+\begin{definition}
+\cs{bibglssetothergrouptitle}\marg{\margm{character}\margm{id}\margm{type}}
+\end{definition}
+This is defined in an analogous manner:
+\begin{verbatim}
+\providecommand{\bibglssetothergrouptitle}[1]{%
+ \glsxtrsetgrouptitle{\bibglsothergroup#1}{\bibglsothergrouptitle#1}}
+\end{verbatim}
+where the group label is obtained using \csref{bibglsothergroup} and
+the group title is obtained from \csref{bibglsothergrouptitle}.
+Note that since non-alphabetic characters don't have upper or lower
+case versions, there are only three arguments. The other difference
+between this and the letter group version is that the \meta{id} is
+given in hexadecimal format (corresponding to the character code).
+
+For example, suppose my \ext{bib} file contains:
+\begin{verbatim}
+@entry{sauthor,
+  name={/Author},
+  description = {author string}
+}
+\end{verbatim}
+If a locale sort is used, the leading slash \texttt{/} will be
+ignored and this entry will belong to the \qt{A} letter group using
+the letter commands described above. If, instead, one of the
+character code sort methods are used, such as
+\optref[letter-case]{sort}, then this entry will be identified as
+belonging to a symbol (or \qt{other}) group and the title will be
+set using:
+\begin{verbatim}
+\bibglssetothergrouptitle{{/}{2F}{}}
+\end{verbatim}
 
 \subsection{\csfmt{bibglsothergroup}}
 \labelcs{bibglsothergroup}
 
 \begin{definition}
-\cs{bibglsothergroup}\margm{character}\margm{codepoint}\margm{type}
+\cs{bibglsothergroup}\margm{character}\margm{id}\margm{type}
 \end{definition}
-Any entries whose \field{sort} value indicates that they are not in a letter
-group (where a non-numerical sort is used) will set the
-\field{group} field to contain this command.  For example:
-\begin{verbatim}
-@symbol{card,
- name={$|\mathcal{S}|$}
- description={the cardinality of the set $\mathcal{S}$}
-}
-\end{verbatim}
-In this case (with the interpreter on) the sort value is \verb"|S|"
-so this will be assigned to the \qt{other} group:
-\begin{verbatim}
-\bibglsothergroup{|}{124}{}
-\end{verbatim}
-The \meta{character} is the first character of the sort value and
-\meta{codepoint} is the corresponding decimal Unicode value of that
-character. (Note that the \meta{type} is empty as the \field{type}
-field is missing and the \optref{type} option hasn't been used.)
+This expands to the group label for symbol groups. This just
+defaults to \texttt{glssymbols} (ignoring all arguments), which
+replicates the label used when \app{makeindex} or \app{xindy}
+generate the glossary files.
 
-The default definition of this command is:
+\subsection{\csfmt{bibglsothergrouptitle}}
+\labelcs{bibglsothergrouptitle}
+
+\begin{definition}
+\cs{bibglsothergrouptitle}\margm{character}\margm{id}\margm{type}
+\end{definition}
+This expands to the group title for symbol groups. This just
+expands to \cs{glssymbolsgroupname} by default.
+
+\subsection{\csfmt{bibglssetnumbergrouptitle}}
+\labelcs{bibglssetnumbergrouptitle}
+
+The numeric sort methods all create number groups instead of letter
+or symbol groups. These behave in an analogous way to the above.
+\begin{definition}
+\cs{bibglssetnumbergrouptitle}\marg{\margm{value}\margm{id}\margm{type}}
+\end{definition}
+In this case \meta{value} is the actual numeric sort value, and
+\meta{id} is a decimal number obtained from converting \meta{value}
+to an integer. This command is defined as
 \begin{verbatim}
-\providecommand{\bibglsothergroup}[3]{\glssymbolsgroupname}
+\providecommand{\bibglssetnumbergrouptitle}[1]{%
+  \glsxtrsetgrouptitle{\bibglsnumbergroup#1}{\bibglsnumbergrouptitle#1}}
 \end{verbatim}
-This ignores all arguments but could be redefined to sub-divide the
-symbols according to the initial character if there are large blocks
-starting with the same character.
 
 \subsection{\csfmt{bibglsnumbergroup}}
 \labelcs{bibglsnumbergroup}
 
+The number group label is obtained from:
 \begin{definition}
-\cs{bibglsnumbergroup}\margm{number}\margm{type}
+\cs{bibglsnumbergroup}\margm{value}\margm{id}\margm{type}
 \end{definition}
-The numeric sort options (such as \optref[double]{sort}) don't use
-either of the above commands when setting the \field{group} field.
-Instead \cs{bibglsnumbergroup} is used where \meta{number} is the
-actual number given by the sort value.
+This just defaults to \texttt{glsnumbers}.
 
-The default definition of this command is:
-\begin{verbatim}
-\providecommand{\bibglsnumbergroup}[2]{\glsnumbersgroupname}
-\end{verbatim}
+\subsection{\csfmt{bibglsnumbergrouptitle}}
+\labelcs{bibglsnumbergrouptitle}
+
+The number group title is obtained from:
+\begin{definition}
+\cs{bibglsnumbergrouptitle}\margm{value}\margm{id}\margm{type}
+\end{definition}
+This just defaults to \cs{glsnumbersgroupname}.
 
 \subsection{\csfmt{bibglshypergroup}}
 \labelcs{bibglshypergroup}

@@ -2885,16 +2885,26 @@ public class GlsResource
             writer.println("{");
             writer.println("  \\providecommand{\\bibglslettergroup}[4]{#4#3}");
             writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{\\unexpanded{#1}}");
-            writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{%");
+            writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
+            writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
+            writer.println("  \\providecommand{\\bibglsothergrouptitle}[3]{\\glssymbolsgroupname}");
+            writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{%");
+            writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergroup#1}{\\bibglsothergrouptitle#1}}");
+            writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
+            writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\glsnumbersgroupname}");
+            writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
+            writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
             writer.println("}");
             writer.println("{");
             writer.println("  \\providecommand{\\bibglslettergroup}[4]{#1}");
-            writer.println("  \\providecommand{\\bibglssetgrouptitle}[1]{}");
+            writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
+            writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
+            writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{}");
+            writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{}");
+            writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{}");
             writer.println("}");
 
-            writer.println("\\providecommand{\\bibglsothergroup}[3]{\\glssymbolsgroupname}");
-            writer.println("\\providecommand{\\bibglsnumbergroup}[2]{\\glsnumbersgroupname}");
             writer.println();
 
             boolean createHyperGroups = bib2gls.hyperrefLoaded()
@@ -2912,7 +2922,8 @@ public class GlsResource
                   createHyperGroups = false;
                }
 
-               writer.format("\\bibglssetgrouptitle{%s}%n", groupTitle);
+               writer.format("\\%s{%s}%n",
+                  groupTitle.getCsSetName(), groupTitle);
             }
 
             writer.println();
@@ -2947,8 +2958,10 @@ public class GlsResource
 
                   GroupTitle groupTitle = groupTitleMap.get(key);
 
-                  writer.format("\\bibglshypergroup{%s}{\\bibglslettergroup%s}%n",
-                     groupTitle.getType(), groupTitle);
+                  writer.format("\\bibglshypergroup{%s}{\\%s%s}%n",
+                     groupTitle.getType(),
+                     groupTitle.getCsLabelName(),
+                     groupTitle);
                }
 
                writer.println();

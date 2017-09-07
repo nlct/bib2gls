@@ -15,7 +15,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-match-entrytype.pdf test-digraphs.pdf \
 	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
-	  test-cjk.pdf
+	  test-cjk.pdf test-other.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -265,6 +265,13 @@ test-cjk.pdf	: test-cjk.glstex
 test-cjk.glstex	: test-cjk.tex $(DEPS) testcjk.bib
 		pdflatex test-cjk
 		$(BIB2GLS) test-cjk
+
+test-other.pdf	: test-other.glstex
+		pdflatex test-other
+
+test-other.glstex	: test-other.tex $(DEPS) test-other.bib
+		pdflatex test-other
+		$(BIB2GLS) test-other
 
 clean	:
 	$(RM) *.aux

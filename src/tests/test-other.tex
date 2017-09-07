@@ -1,0 +1,18 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src=test-other,% bib file
+ selection=all,% select all entries
+ sort=letter-case % case-sensitive letter sort
+ %sort=float
+]
+
+\begin{document}
+
+\printunsrtglossaries
+\end{document}
