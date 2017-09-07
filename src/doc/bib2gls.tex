@@ -55,6 +55,8 @@ actual '='
 \newcommand*{\sectionref}[1]{\hyperref[#1]{section~\ref*{#1}}}
 \newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
 
+\newcommand{\langxml}{\hyperref[sec:lang.xml]{language resource file}}
+
 \newcommand{\qt}[1]{``#1''}
 
 \newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
@@ -112,6 +114,7 @@ actual '='
 \newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\csfmt}[1]{\texorpdfstring{\texttt{\char`\\ #1}}{\string\\#1}}
+\newcommand*{\envfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
@@ -161,6 +164,12 @@ actual '='
 \newcommand*{\sty}[1]{%
   \texorpdfstring
   {\styfmt{#1}\index{#1\actual\styfmt{#1}}}%
+  {#1}%
+}
+
+\newcommand*{\env}[1]{%
+  \texorpdfstring
+  {\envfmt{#1}\index{#1 environment\actual\envfmt{#1} environment}}%
   {#1}%
 }
 
@@ -1082,8 +1091,7 @@ written to the transcript file, which can be inspected afterwards.
 \section{\longarg{locale} \meta{lang} (or \shortarg{l} \meta{lang})}
 \labelarg{locale}
 
-Specify the preferred \hyperref[sec:lang.xml]{language resource
-file}, where \meta{lang} is a valid \gls{IETF} language tag.
+Specify the preferred \langxml, where \meta{lang} is a valid \gls{IETF} language tag.
 This option requires an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
 resource file otherwise \bibgls\ will fallback on English.
 
@@ -1397,7 +1405,7 @@ For example, if the sort rule recognises the digraph \qt{dz} as a
 letter, then it will be converted to \qt{Dz} for the group title. 
 There are some exceptions to this. For example, the Dutch digraph 
 \qt{ij} should be \qt{IJ} rather than \qt{Ij}. This is indicated 
-by the following line in the \hyperref[sec:lang.xml]{language resource file}:
+by the following line in the \langxml:
 \begin{verbatim}
 <entry key="grouptitle.case.ij">IJ</entry>
 \end{verbatim}
@@ -4717,7 +4725,7 @@ preamble providing an \cs{ifcase} condition:
 \csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
 where the definitions of \cs{bibglspagename} and
 \cs{bibglspagesname} are obtained from the \texttt{tag.page} and
-\texttt{tag.pages} entries in \bibgls's \hyperref[sec:lang.xml]{language file}.
+\texttt{tag.pages} entries in \bibgls's \langxml.
 This setting works best if the document's language matches the 
 language file. However, you can redefine these commands within
 the document's language hooks or in the glossary preamble.
@@ -5789,15 +5797,25 @@ before \cs{glsxtrresourcefile}).
 
 \chapter{Provided Commands}
 \label{sec:bibglscs}
-\setcounter{secnumdepth}{0}
 
-When \bibgls\ writes the entries to the output file, instead of
-directly using commands like \cs{newglossaryentry}, it provides
-its own commands defined with \cs{providecommand}. This means that
-you can customize the way the entries are defined by providing your
-own definitions before the \ext{glstex} files are loaded. Each provided
-command is defined in the \ext{glstex} file immediately before the
-first entry that requires it.
+When \bibgls\ creates the \ext{glstex} file, it writes some
+definitions for custom commands in the form \csfmt{bibgls...} which
+may be changed as required. The command definitions all use
+\cs{providecommand} which means that you can define the command with
+\cs{newcommand} before the resource file is loaded.
+
+\section{Entry Definitions}
+\label{sec:newentrydefs}
+
+This section lists the commands (\csfmt{bibglsnew...}) used to
+define entries.  Note that the entry definition commands are
+actually used when \TeX\ inputs the resource file, so redefining
+them after the resource file is loaded won't have an effect on the
+entries defined in that resource file (but will affect entries defined
+in subsequent resource files). Each provided command is defined in
+the \ext{glstex} file immediately before the first entry that
+requires it, so only the commands that are actually needed are
+provided.
 
 After each entry is defined, if it has any associated locations, the
 locations are added using
@@ -5806,14 +5824,15 @@ locations are added using
 \end{alltt}
 This command is provided by \sty{glossaries-extra} (v1.12).
 
-\section{\cs{bibglsnewentry}}
+
+\subsection{\csfmt{bibglsnewentry}}
 \labelcs{bibglsnewentry}
 
 \begin{definition}
 \cs{bibglsnewentry}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{entry} type. The definition provided in the \ext{glstex}
+\atentryref{entry} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewentry}[4]{%
@@ -5824,14 +5843,14 @@ This uses the starred form of \cs{longnewglossaryentry} that
 doesn't automatically append \cs{nopostdesc} (which interferes with
 the post-description hooks provided by category attributes).
 
-\section{\cs{bibglsnewsymbol}}
+\subsection{\csfmt{bibglsnewsymbol}}
 \labelcs{bibglsnewsymbol}
 
 \begin{definition}
 \cs{bibglsnewsymbol}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{symbol} type. The definition provided in the \ext{glstex}
+\atentryref{symbol} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewsymbol}[4]{%
@@ -5848,14 +5867,14 @@ be overridden by \meta{options} if the entry had the \field{category}
 field set in the \ext{bib} file or if the \field{category} was
 overridden with \optref[\meta{value}]{category}.
 
-\section{\cs{bibglsnewnumber}}
+\subsection{\csfmt{bibglsnewnumber}}
 \labelcs{bibglsnewnumber}
 
 \begin{definition}
 \cs{bibglsnewnumber}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{number} type. The definition provided in the \ext{glstex}
+\atentryref{number} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewnumber}[4]{%
@@ -5866,14 +5885,14 @@ This is much the same as \cs{bibglsnewsymbol} above but sets the
 \field{category} to \optfmt{number}. Again the \field{sort} and
 \field{category} keys may be overridden by \meta{options}.
 
-\section{\cs{bibglsnewindex}}
+\subsection{\csfmt{bibglsnewindex}}
 \labelcs{bibglsnewindex}
 
 \begin{definition}
 \cs{bibglsnewindex}\margm{label}\margm{options}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{index} type. The definition provided in the \ext{glstex}
+\atentryref{index} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand*{\bibglsnewindex}[2]{%
@@ -5883,17 +5902,17 @@ file is:
 This makes the \field{name} default to the \meta{label} and sets
 an empty \field{description}. These settings may be overridden by
 \meta{options}. Note that the \field{description} doesn't include
-\cs{nopostdec} to allow for the post-description hook used by
+\cs{nopostdesc} to allow for the post-description hook used by
 category attributes.
 
-\section{\cs{bibglsnewabbreviation}}
+\subsection{\csfmt{bibglsnewabbreviation}}
 \labelcs{bibglsnewabbreviation}
 
 \begin{definition}
 \cs{bibglsnewabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{abbreviation} type. The definition provided in the \ext{glstex}
+\atentryref{abbreviation} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewabbreviation}[4]{%
@@ -5908,14 +5927,14 @@ Similarly the \field{type} will obey \cs{glsxtrabbrvtype} unless
 the value is supplied in the \ext{bib} file or through the
 \optref{type} option.
 
-\section{\cs{bibglsnewacronym}}
+\subsection{\csfmt{bibglsnewacronym}}
 \labelcs{bibglsnewacronym}
 
 \begin{definition}
 \cs{bibglsnewacronym}\margm{label}\margm{options}\margm{short}\margm{long}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{acronym} type. The definition provided in the \ext{glstex}
+\atentryref{acronym} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewacronym}[4]{%
@@ -5928,14 +5947,14 @@ is redefined to just use \cs{newabbreviation} with the default \field{type}
 set to \cs{acronymtype} and the default \field{category} set to
 \cs{acronym}.
 
-\section{\cs{bibglsnewdualentry}}
+\subsection{\csfmt{bibglsnewdualentry}}
 \labelcs{bibglsnewdualentry}
 
 \begin{definition}
 \cs{bibglsnewdualentry}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{dualentry} type. The definition provided in the \ext{glstex}
+\atentryref{dualentry} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualentry}[4]{%
@@ -5943,14 +5962,14 @@ file is:
 }
 \end{verbatim}
 
-\section{\cs{bibglsnewdualentryabbreviation}}
+\subsection{\csfmt{bibglsnewdualentryabbreviation}}
 \labelcs{bibglsnewdualentryabbreviation}
 
 \begin{definition}
 \cs{bibglsnewdualentryabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
 \end{definition}
 This command is used to define primary terms identified with the
-\atentry{dualentryabbreviation} type. The definition provided in the \ext{glstex}
+\atentryref{dualentryabbreviation} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualentryabbreviation}[5]{%
@@ -5959,14 +5978,14 @@ file is:
 \end{verbatim}
 Note that this definition ignores the \meta{description} argument.
 
-\section{\cs{bibglsnewdualentryabbreviationsecondary}}
+\subsection{\csfmt{bibglsnewdualentryabbreviationsecondary}}
 \labelcs{bibglsnewdualentryabbreviationsecondary}
 
 \begin{definition}
 \cs{bibglsnewdualentryabbreviationsecondary}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
 \end{definition}
 This command is used to define secondary terms identified with the
-\atentry{dualentryabbreviation} type. The definition provided in the \ext{glstex}
+\atentryref{dualentryabbreviation} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualentryabbreviationsecondary}[5]{%
@@ -5977,35 +5996,35 @@ Note that this definition ignores the \meta{short} and \meta{long}
 arguments (which will typically be empty unless the default mappings
 are changed).
 
-\section{\cs{bibglsnewdualsymbol}}
+\subsection{\csfmt{bibglsnewdualsymbol}}
 \labelcs{bibglsnewdualsymbol}
 
 \begin{definition}
 \cs{bibglsnewdualsymbol}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{dualsymbol} type. The definition provided in the \ext{glstex}
+\atentryref{dualsymbol} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualsymbol}[4]{%
  \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}}
 \end{verbatim}
 
-\section{\cs{bibglsnewdualnumber}}
+\subsection{\csfmt{bibglsnewdualnumber}}
 \labelcs{bibglsnewdualnumber}
 
 \begin{definition}
 \cs{bibglsnewdualnumber}\margm{label}\margm{options}\margm{name}\margm{description}
 \end{definition}
 This command is used to define terms identified with the
-\atentry{dualnumber} type. The definition provided in the \ext{glstex}
+\atentryref{dualnumber} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualnumber}[4]{%
  \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}}
 \end{verbatim}
 
-\section{\cs{bibglsnewdualabbreviation}}
+\subsection{\csfmt{bibglsnewdualabbreviation}}
 \labelcs{bibglsnewdualabbreviation}
 
 \begin{definition}
@@ -6022,7 +6041,7 @@ field is swapped with the \field{short} field. The definition provided in the
 }
 \end{verbatim}
 
-\section{\cs{bibglsnewdualacronym}}
+\subsection{\csfmt{bibglsnewdualacronym}}
 \labelcs{bibglsnewdualacronym}
 
 \begin{definition}
@@ -6042,7 +6061,15 @@ is redefined to just use \cs{newabbreviation} with the default \field{type}
 set to \cs{acronymtype} and the default \field{category} set to
 \cs{acronym}.
 
-\section{\cs{bibglsseesep}}
+\section{Location Lists and Cross-References}
+\label{sec:loclistdefs}
+
+These commands deal with the way the location lists and cross
+references are formatted. The commands typically aren't used until
+the entry information is displayed in the glossary, so you may
+redefine these commands after the resource file has been loaded.
+
+\subsection{\csfmt{bibglsseesep}}
 \labelcs{bibglsseesep}
 
 \begin{definition}
@@ -6070,7 +6097,7 @@ Or you can redefine it afterwards:
 \renewcommand{\bibglsseesep}{; }
 \end{verbatim}
 
-\section{\cs{bibglsseealsosep}}
+\subsection{\csfmt{bibglsseealsosep}}
 \labelcs{bibglsseealsosep}
 
 \begin{definition}
@@ -6080,7 +6107,7 @@ Or you can redefine it afterwards:
 This is like \cs{bibglsseesep} but is used with cross-reference
 lists provided with the \field{seealso} field, if supported.
 
-\section{\cs{bibglspassim}}
+\subsection{\csfmt{bibglspassim}}
 \labelcs{bibglspassim}
 
 \begin{definition}
@@ -6104,21 +6131,20 @@ Or you can redefine it afterwards:
 \renewcommand{\bibglspassim}{}
 \end{verbatim}
 
-\section{\cs{bibglspassimname}}
+\subsection{\csfmt{bibglspassimname}}
 \labelcs{bibglspassimname}
 
 \begin{definition}
 \cs{bibglspassimname}
 \end{definition}
 
-The default definition is obtained from the \hyperref[sec:lang.xml]{language resource
-file}. For example, with \file{bib2gls-en.xml} the provided
+The default definition is obtained from the \langxml. For example, with \file{bib2gls-en.xml} the provided
 definition is
 \begin{verbatim}
 \providecommand{\bibglspassimname}{passim}
 \end{verbatim}
 
-\section{\cs{bibglsrange}}
+\subsection{\csfmt{bibglsrange}}
 \labelcs{bibglsrange}
 
 \begin{definition}
@@ -6134,7 +6160,7 @@ the argument of \cs{bibglsrange}. By default this simply does its
 argument. This command is not used with ranges that are formed by collating
 consecutive locations.
 
-\section{\cs{bibglsinterloper}}
+\subsection{\csfmt{bibglsinterloper}}
 \labelcs{bibglsinterloper}
 
 \begin{definition}
@@ -6147,7 +6173,7 @@ of the range inside the argument of \cs{bibglsinterloper}.
 The default definition just does \meta{location}\cs{delimN}
 so that it fits neatly into the list.
 
-For example, suppose on page~4 I start a range with
+For example, suppose on page~4 of my document I start a range with
 \begin{verbatim}
 \glsadd[format={(}]{sample}
 \end{verbatim}
@@ -6174,7 +6200,7 @@ remove the conflicting entries. (Alternatively, redefine
 \cs{bibglsinterloper} to ignore its argument, which will
 discard the conflicting entries.)
 
-\section{\cs{bibglspostlocprefix}}
+\subsection{\csfmt{bibglspostlocprefix}}
 \labelcs{bibglspostlocprefix}
 
 \begin{definition}
@@ -6199,7 +6225,7 @@ Or you can redefine it afterwards:
 \renewcommand{\bibglspostlocprefix}{: }
 \end{verbatim}
 
-\section{\cs{bibglslocprefix}}
+\subsection{\csfmt{bibglslocprefix}}
 \labelcs{bibglslocprefix}
 
 \begin{definition}
@@ -6240,7 +6266,7 @@ be added instead:
 }
 \end{verbatim}
 
-\section{\cs{bibglspagename}}
+\subsection{\csfmt{bibglspagename}}
 \labelcs{bibglspagename}
 
 \begin{definition}
@@ -6248,13 +6274,12 @@ be added instead:
 \end{definition}
 
 If \csopt[true]{loc-prefix} is used, then this command is provided
-using the value of \texttt{tag.page} from the \hyperref[sec:lang.xml]{language resource
-file}. For example with \file{bib2gls-en.xml} the definition is:
+using the value of \texttt{tag.page} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
 \begin{verbatim}
 \providecommand{\bibglspagename}{Page}
 \end{verbatim}
 
-\section{\cs{bibglspagesname}}
+\subsection{\csfmt{bibglspagesname}}
 \labelcs{bibglspagesname}
 
 \begin{definition}
@@ -6262,13 +6287,12 @@ file}. For example with \file{bib2gls-en.xml} the definition is:
 \end{definition}
 
 If \csopt[true]{loc-prefix} is used, then this command is provided
-using the value of \texttt{tag.pages} from the \hyperref[sec:lang.xml]{language resource
-file}. For example with \file{bib2gls-en.xml} the definition is:
+using the value of \texttt{tag.pages} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
 \begin{verbatim}
 \providecommand{\bibglspagesname}{Pages}
 \end{verbatim}
 
-\section{\cs{bibglslocsuffix}}
+\subsection{\csfmt{bibglslocsuffix}}
 \labelcs{bibglslocsuffix}
 
 \begin{definition}
@@ -6300,7 +6324,7 @@ it includes the 0 case, which in this instance means that there were
 no locations but there was a cross-reference. This command isn't
 added when the location list is empty.
 
-\section{\cs{bibglslocationgroup}}
+\subsection{\csfmt{bibglslocationgroup}}
 \labelcs{bibglslocationgroup}
 
 \begin{definition}
@@ -6339,7 +6363,7 @@ only one location, or the counter name followed by \qt{s},
 if there are multiple locations within the group.
 
 There are various ways to adapt this to translate the counter
-name to a different textual label. For example:
+name to a different textual label, such as:
 \begin{verbatim}
 \providecommand{\pagename}{Page}
 \providecommand{\pagesname}{Pages}
@@ -6356,7 +6380,7 @@ name to a different textual label. For example:
 }
 \end{verbatim}
 
-\section{\cs{bibglslocationgroupsep}}
+\subsection{\csfmt{bibglslocationgroupsep}}
 \labelcs{bibglslocationgroupsep}
 
 \begin{definition}
@@ -6384,23 +6408,230 @@ or redefined after the resources are loaded:
 \renewcommand*{\bibglslocationgroupsep}{; }
 \end{verbatim}
 
-\section{\cs{bibglslettergroup}}
+\subsection{\csfmt{bibglssupplemental}}
+\labelcs{bibglssupplemental}
+
+\begin{definition}
+\cs{bibglssupplemental}\margm{n}\margm{list}
+\end{definition}
+
+When the \optref{supplemental-locations} option is used, the locations
+from a supplementary document are encapsulated within the \meta{list}
+part of \cs{bibglssupplemental}. The first argument \meta{n}
+(ignored by default) is the number of supplementary locations.
+
+\subsection{\csfmt{bibglssupplementalsep}}
+\labelcs{bibglssupplementalsep}
+
+\begin{definition}
+\cs{bibglssupplementalsep}
+\end{definition}
+
+The separator between the main location list and the supplementary
+location list. By default this is just \cs{delimN}. This may be
+defined before the resources are loaded:
+\begin{verbatim}
+\newcommand{\bibglssupplementalsep}{; }
+
+\GlsXtrLoadResources[
+ supplemental-locations=supplDoc,
+ src={entries}]
+\end{verbatim}
+or redefined after the resources are loaded:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ supplemental-locations=supplDoc,
+ src={entries}]
+
+\renewcommand{\bibglssupplementalsep}{; }
+\end{verbatim}
+
+\section{Letter Groups}
+\label{sec:lettergroupdefs}
+
+The commands listed in this section are provided for use with the
+\argref{group} switch and glossary styles that display the letter
+group title. If these need their definitions altered, they should
+be defined before the resource file is loaded (rather than redefined
+afterwards).
+
+The base \sty{glossaries} package determines group titles through a fairly
+simplistic rule. Both \app{makeindex} and \app{xindy} write the
+line
+\begin{alltt}
+\cs{glsgroupheading}\margm{heading}
+\end{alltt}
+to the associated glossary file at the start of each new letter group.
+For example, the \qt{A} letter group will be written as:
+\begin{verbatim}
+\glsgroupheading{A}
+\end{verbatim}
+This is quite straightforward and the heading title can just be
+\qt{A}. The \qt{Symbols} group is written as
+\begin{verbatim}
+\glsgroupheading{glssymbols}
+\end{verbatim}
+To allow for easy translation, the base \sty{glossaries} package has
+the simple rule: 
+\begin{itemize}
+\item if \csfmt{\meta{heading}groupname} exists use that;
+\item otherwise just use \meta{heading}.
+\end{itemize}
+There's no \csfmt{Agroupname} provided, but \cs{glssymbolsgroupname}
+is provided and is supported by the associated language modules,
+such as \styfmt{glossaries-french}. (Similarly for the \qt{Numbers}
+group.)
+
+The glossary styles that provide hyperlinks to the groups (such as 
+\glostyle{indexhypergroup}) use \meta{heading} to form the target
+name. A problem arises when active characters occur in
+\meta{heading}, which happens with extended characters and
+\sty{inputenc}.
+
+The \sty{glossaries-extra} package (as from version 1.14) provides
+\begin{definition}
+\cs{glsxtrsetgrouptitle}\margm{label}\margm{title}
+\end{definition}
+to set the title for a group with the given label. The internal
+workings of \cs{glsgroupheading} are modified to use a slightly
+altered rule:
+\begin{itemize}
+\item if a title has been set using
+\cs{glsxtrsetgrouptitle}\margm{heading}\margm{title} for the given
+\meta{heading}, use that;
+\item if \csfmt{\meta{heading}groupname} exists, use that;
+\item just use \meta{heading} for the title.
+\end{itemize}
+So if \cs{glsxtrsetgrouptitle} hasn't been used, it falls back on
+the original rule.
+
+The problem is now how to make the indexing application use the
+desired label in the argument of \cs{glsgroupheading} instead of selecting
+the heading based on the first character of each sort value for each
+top-level entry in that group. This can't be done with
+\app{makeindex}, and with \app{xindy} it requires a custom language
+module, which isn't a trivial task.
+
+With \bibgls, a different approach is used. The \ext{glstex} file
+created isn't comparable to the \ext{gls} file created by
+\app{makeindex} or \app{xindy}. There's nowhere for \bibgls\ to
+write the \cs{glsgroupheading} line as it isn't creating the code
+that typesets the glossary list. Instead it's creating the code that
+defines the entries. The actual group heading is inserted by 
+\cs{printunsrtglossary} and it's only able to do this by checking if
+the entry has a \field{group} field and comparing it to the previous
+entry's \field{group} field. 
+
+The collators used by the locale and letter-based rules save the
+following information for each entry based on the first letter of
+the \field{sort} field (if the letter is recognised as alphabetical,
+according to the rule):
+\begin{itemize}
+\item \meta{title} The group's title. This is typically title-cased.
+For example, if the rule recognises the digraph \qt{dz}, then the
+title is \qt{Dz}. Exceptions to this are included in the \langxml.
+If the key \texttt{grouptitle.case.\meta{lc}} exists, where
+\meta{lc} is the lower case version of \meta{title}, then the value
+of that key is used instead. For example, the Dutch digraph \qt{ij}
+should be converted to \qt{IJ}, so \file{bib2gls-en.xml} includes:
+\begin{verbatim}
+<entry key="grouptitle.case.ij">IJ</entry>
+\end{verbatim}
+(See the \argref{group} switch for more details.)
+\item \meta{letter} This is the actual letter at the start of the
+given entry's \field{sort} field, which may be lower case or may
+contain diacritics that don't appear in \meta{title}.
+\item \meta{id} A numeric identifier. This may be the collation key
+or the code point for the given letter, depending on the sort
+method.
+\item \meta{type} The entry's glossary type. If not known, this will
+be empty. (\bibgls\ won't know if you've modified the associated 
+\csfmt{bibglsnew...} command to set the \field{type}. It can only
+know the type if it's in the original \ext{bib} definition or is set
+using resource options such as \optref{type}.)
+\end{itemize}
+
+The \field{group} field is then set using:
+\begin{alltt}
+group=\marg{\cs{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{type}}
+\end{alltt}
+This field needs to expand to a simple label, which \csref{bibglslettergroup}
+is designed to do.  Note that non-letter groups are dealt with
+separately (see below).
+
+\subsection{\csfmt{bibglssetgrouptitle}}
+\labelcs{bibglssetgrouptitle}
+
+For each group that's detected, \bibgls\ will write the line:
+\begin{definition}
+\cs{bibglssetgrouptitle}\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}
+\end{definition}
+in the \ext{glstex} file, which sets the group's title using
+\begin{alltt}
+\cs{glsxtrsetgrouptitle}\margm{group label}\margm{group title}
+\end{alltt}
+where the \meta{group label} part matches the corresponding \field{group}
+value.
+
+Note that \cs{bibglssetgrouptitle} only has a single
+argument, but that argument contains the four arguments needed by
+\csref{bibglslettergroup} and \csref{bibglslettergrouptitle}.
+These arguments are as described above.
+
+If \cs{glsxtrsetgrouptitle} has been defined (\sty{glossaries-extra}
+version 1.14 onwards), then \cs{bibglssetgrouptitle} will be
+defined as
+\begin{verbatim}
+\providecommand{\bibglssetgrouptitle}[1]{%
+  \glsxtrsetgrouptitle{\bibglslettergroup#1}{\bibglslettergrouptitle#1}}
+\end{verbatim}
+If an earlier version of \sty{glossaries-extra} is used, then this
+function can't be supported and the command will be defined to
+simply ignore its argument. This will fall back on the original
+method of just using \meta{title} as the label.
+
+Since \cs{bibglssetgrouptitle} is used in the \ext{glstex} file to
+set the group titles, the associated commands need to be defined
+before the resource file is loaded if their definitions require
+modification. After the resource file has been loaded, you can
+adjust the title of a specific group, but you'll need to check the
+\ext{glstex} file for the appropriate arguments. For example, if the
+\ext{glstex} file contains:
+\begin{alltt}
+\cs{bibglssetgrouptitle}\marg{\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}
+\end{alltt}
+but you actually want the group title to appear as \qt{\AE\ (AE)}
+instead of just \qt{\AE}, then after the resource file has been
+loaded you can do:
+\begin{alltt}
+\cs{glsxtrsetgrouptitle}
+ \marg{\cs{bibglslettergroup}\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}\% label
+ \marg{\AE\ (AE)}\% title
+\end{alltt}
+
+\subsection{\csfmt{bibglslettergroup}}
 \labelcs{bibglslettergroup}
 
 \begin{definition}
 \cs{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{type}
 \end{definition}
-This command is provided if the \argref{group} switch is used. Any
-entries whose sort value indicates that they are in a letter group
-will set the \field{group} field to contain this command. The
-\meta{title} argument indicates the letter group and the
-\meta{letter} argument indicates the actual initial letter of
-the sort value, which may not be the same as \meta{title}. The
-\meta{id} is a numeric identifier for that group. (For a rule-based
-collation, this is obtained from the first collation element. For a
-letter sort, it's obtained from the character code.) The \meta{type}
-indicates the associated glossary type. This value will be empty if
-unknown.
+This command is used to determine the letter group label. The
+default definition is \meta{type}\meta{id}, which ensures that no
+problematic characters occur in the label since \meta{type} can't
+contains special characters and \meta{id} is numeric. The
+\meta{type} is included in case there are multiple glossaries, since
+the hyperlink name must be unique.
+
+\subsection{\csfmt{bibglslettergrouptitle}}
+\labelcs{bibglslettergrouptitle}
+
+\begin{definition}
+\cs{bibglslettergrouptitle}\margm{title}\margm{letter}\margm{id}\margm{type}
+\end{definition}
+This command is used to determine the letter group title.
+The default definition is \cs{unexpanded}\margm{title}, which guards
+against any expansion issues that may arise with characters outside
+the basic Latin set.
 
 For example:
 \begin{verbatim}
@@ -6415,25 +6646,67 @@ the \meta{title} part will be \texttt{A} but with \optref[sv]{sort}
 the \meta{title} part will be \texttt{\AA}. In both cases the
 \meta{letter} argument will be \texttt{\AA}.
 
-The \meta{title} argument will typically by title-cased. An
-exception is made to the title-casing if the
-\hyperref[sec:lang.xml]{language resource file} contains the key
-\texttt{grouptitle.case.\meta{lc}} where \meta{lc} is the lower case
-version of \meta{title}. See the \argref{group} switch
-for more details.
+Take care if you are using a script that needs encapsulating. For
+example, with the \sty{CJKutf8} package the CJK characters need to
+be placed within the \env{CJK} environment, so any letter group
+titles that contain CJK characters will need special attention.
 
-The default definition of this command depends on the
-existence of \cs{glsxtrsetgrouptitle}, which was introduced
-to \sty{glossaries-extra} v1.14.
+For example, suppose the \ext{bib} file contains entries in the
+form:
+\begin{alltt}
+\atentryref{dualentry}\marg{\meta{label},
+  name = \marg{\cs{cjkname}\margm{CJK characters}},
+  description = \margm{English description}
+}
+\end{alltt}
+and the document contains:
+\begin{verbatim}
+\usepackage{CJKutf8}
+\usepackage[record,style=indexgroup,nomain]{glossaries-extra}
 
-\section{\cs{bibglsothergroup}}
+\newglossary*{japanese}{Japanese to English}
+\newglossary*{english}{English to Japanese}
+
+\newrobustcmd{\cjkname}[1]{\begin{CJK}{UTF8}{min}#1\end{CJK}}
+\glsnoexpandfields
+
+\GlsXtrLoadResources[
+  src=testcjk,% bib file
+  sort={ja-JP},% locale used to sort primary entries
+  dual-sort={en-GB},% locale used to sort secondary entries
+  type=japanese,% put the primary entries in the 'japanese' glossary
+  dual-type=english,% put the primary entries in the 'english'
+glossary
+  dual-prefix={en.}
+]
+\end{verbatim}
+then CJK characters will appear in the \meta{title} argument of 
+\cs{bibglslettergrouptitle} which causes a problem. This needs
+encapsulating with the \env{CJK} environment, which can be more
+conveniently done with the user supplied \csfmt{cjkname}, but the CJK
+characters need to be protected from expansion so \cs{unexpanded} is
+also needed. The new definition of \cs{bibglslettergrouptitle} needs
+to be defined before \cs{GlsXtrLoadResources}. For example:
+\begin{verbatim}
+\newcommand{\bibglslettergrouptitle}[4]{\unexpanded{\cjkname{#1}}}
+\end{verbatim}
+There's a slight problem here in that the English letter group titles 
+also end up encapsulated. An alternative approach is to use the
+\meta{type} part to provide different forms. For example:
+\begin{verbatim}
+\newcommand*{\englishlettergroup}[1]{#1}
+\newcommand*{\japaneselettergroup}[1]{\cjkname{#1}}
+\newcommand{\bibglslettergrouptitle}[4]{%
+ \unexpanded{\csuse{#4lettergroup}{#1}}}
+\end{verbatim}
+
+\subsection{\csfmt{bibglsothergroup}}
 \labelcs{bibglsothergroup}
 
 \begin{definition}
 \cs{bibglsothergroup}\margm{character}\margm{codepoint}\margm{type}
 \end{definition}
-This command is provided if the \argref{group} switch is used. Any
-entries whose sort value indicates that they are not in a letter
+Any entries whose \field{sort} value indicates that they are not in a letter
 group (where a non-numerical sort is used) will set the
 \field{group} field to contain this command.  For example:
 \begin{verbatim}
@@ -6460,7 +6733,7 @@ This ignores all arguments but could be redefined to sub-divide the
 symbols according to the initial character if there are large blocks
 starting with the same character.
 
-\section{\cs{bibglsnumbergroup}}
+\subsection{\csfmt{bibglsnumbergroup}}
 \labelcs{bibglsnumbergroup}
 
 \begin{definition}
@@ -6476,7 +6749,7 @@ The default definition of this command is:
 \providecommand{\bibglsnumbergroup}[2]{\glsnumbersgroupname}
 \end{verbatim}
 
-\section{\cs{bibglshypergroup}}
+\subsection{\csfmt{bibglshypergroup}}
 \labelcs{bibglshypergroup}
 
 \begin{definition}
@@ -6488,45 +6761,14 @@ and the \longarg{group} switch is used, then this command will be
 used to create the navigation information for glossary styles such
 as \glostyle{indexhypergroup}.
 
-\section{\cs{bibglssupplemental}}
-\labelcs{bibglssupplemental}
+\section{Flattened Entries}
+\label{sec:flattendefs}
 
-\begin{definition}
-\cs{bibglssupplemental}\margm{n}\margm{list}
-\end{definition}
+These commands relate to the way the \field{name} field is altered
+when flattening lonely child entries with the \optref{flatten-lonely}
+option.
 
-When the \optref{supplemental-locations} option is used, the locations
-from a supplementary document are encapsulated within the \meta{list}
-part of \cs{bibglssupplemental}. The first argument \meta{n}
-(ignored by default) is the number of supplementary locations.
-
-\section{\cs{bibglssupplementalsep}}
-\labelcs{bibglssupplementalsep}
-
-\begin{definition}
-\cs{bibglssupplementalsep}
-\end{definition}
-
-The separator between the main location list and the supplementary
-location list. By default this is just \cs{delimN}. This may be
-defined before the resources are loaded:
-\begin{verbatim}
-\newcommand{\bibglssupplementalsep}{; }
-
-\GlsXtrLoadResources[
- supplemental-locations=supplDoc,
- src={entries}]
-\end{verbatim}
-or redefined after the resources are loaded:
-\begin{verbatim}
-\GlsXtrLoadResources[
- supplemental-locations=supplDoc,
- src={entries}]
-
-\renewcommand{\bibglssupplementalsep}{; }
-\end{verbatim}
-
-\section{\cs{bibglsflattenedchildpresort}}
+\subsection{\csfmt{bibglsflattenedchildpresort}}
 \labelcs{bibglsflattenedchildpresort}
 
 \begin{definition}
@@ -6541,7 +6783,7 @@ you can let the interpreter know by adding the definition to
 @preamble{"\providecommand{\bibglsflattenedchildpresort}[2]{#1 (#2)}"}
 \end{verbatim}
 
-\section{\cs{bibglsflattenedchildpostsort}}
+\subsection{\csfmt{bibglsflattenedchildpostsort}}
 \labelcs{bibglsflattenedchildpostsort}
 
 \begin{definition}
