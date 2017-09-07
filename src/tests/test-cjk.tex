@@ -1,0 +1,36 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{CJKutf8}
+\usepackage[record,style=indexgroup,nomain]{glossaries-extra}
+
+\newglossary*{japanese}{Japanese to English}
+\newglossary*{english}{English to Japanese}
+
+\newrobustcmd{\cjkname}[1]{\begin{CJK}{UTF8}{min}#1\end{CJK}}
+\glsnoexpandfields
+
+\newcommand*{\englishlettergroup}[1]{#1}
+\newcommand*{\japaneselettergroup}[1]{\cjkname{#1}}
+\newcommand{\bibglslettergrouptitle}[4]{%
+ \unexpanded{\csuse{#4lettergroup}{#1}}}
+
+\GlsXtrLoadResources[
+  src=testcjk,% bib file
+  sort={ja-JP},% locale used to sort primary entries
+  dual-sort={en-GB},% locale used to sort secondary entries
+  type=japanese,% put the primary entries in the 'japanese' glossary
+  dual-type=english,% put the primary entries in the 'english' glossary
+  dual-prefix={en.}
+]
+
+\begin{document}
+
+Japanese: \gls{squareroot}
+
+English: \gls{en.squareroot}
+
+\printunsrtglossaries
+\end{document}
