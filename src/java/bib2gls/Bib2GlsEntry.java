@@ -904,7 +904,7 @@ public class Bib2GlsEntry extends BibEntry
       writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String description = "";
-      String name = "";
+      String name = null;
       String sep = "";
 
       Set<String> keyset = getFieldSet();
@@ -935,6 +935,11 @@ public class Bib2GlsEntry extends BibEntry
 
             writer.format("%s={%s}", field, value);
          }
+      }
+
+      if (name == null)
+      {
+         name = getFallbackValue("name");
       }
 
       writer.println("}%");
