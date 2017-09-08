@@ -3101,6 +3101,8 @@ public class GlsResource
             flattenLonelyChildren(entries);
          }
 
+         writer.println("\\providecommand*{\\bibglsflattenedhomograph}[2]{#1}");
+
          if (flattenLonely == FLATTEN_LONELY_POST_SORT)
          {
             writer.format("\\providecommand*{\\%s}[2]{#1, #2}%n",
@@ -3648,7 +3650,10 @@ public class GlsResource
 
       if (name != null)
       {
+         boolean homograph = name.equals(parentName);
+
          String csName = flattenLonelyCsName();
+
          TeXObjectList object = null;
          Group nameGroup = null;
          Group parentNameGroup = null;
@@ -3707,7 +3712,13 @@ public class GlsResource
             object.add(parentNameGroup);
          }
 
-         if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+         if (homograph)
+         {
+            child.putField("name", 
+              String.format("\\bibglsflattenedhomograph{%s}{%s}",
+                 name, parent.getId()));
+         }
+         else if (flattenLonely == FLATTEN_LONELY_POST_SORT)
          {
             child.putField("name", 
               String.format("\\%s{%s}{%s}",

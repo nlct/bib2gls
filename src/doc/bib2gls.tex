@@ -355,7 +355,7 @@ actual '='
 \filefmt{.bib} files to \filefmt{glossaries-extra.sty} resource
 files}
 \author{Nicola Talbot\addr{http://www.dickimaw-books.com/}}
-\date{\DTMusedate{moddate} (Still Under Development)}
+\date{\DTMusedate{moddate}}
 
 \makeatletter
 \begingroup
@@ -406,7 +406,7 @@ files}
 The \bibgls\ command line application can be used to extract
 glossary information stored in a \filefmt{.bib} file and convert it
 into glossary entry definition commands that can be read using
-\styfmt{glossaries-extra}'s \csfmt{glsxtrresourcefile} command. When used
+\styfmt{glossaries-extra}'s \csfmt{GlsXtrLoadResources} command. When used
 in combination with the \optfmt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
@@ -427,9 +427,11 @@ when the reference is known.
 Note that \bibgls\ is a Java application, so it requires the
 Java Runtime Environment (at least JRE~7). Additionally,
 \styfmt{glossaries-extra} must be at least version 1.12.
+(Although the latest version is recommended.)
 This application was developed in response to the question
 \href{http://tex.stackexchange.com/q/342544}{Is there a program for
-managing glossary tags?} on \TeX\ on StackExchange.
+managing glossary tags?} on \TeX\ on StackExchange. The \ext{bib}
+file can be managed in an application such as JabRef.
 
 If you already have a \ext{tex} file containing 
 entry definitions using commands like \cs{newglossaryentry}
@@ -465,6 +467,14 @@ from the \ext{bib} file. Since \bibgls\ can also perform
 hierarchical sorting and can collate location lists, it doubles as
 an indexing application, which means that the \app{makeglossaries}
 step can be skipped.
+
+You can't use \cs{glsaddall} with this method as that command works
+by iterating over all defined entries and calling
+\cs{glsadd}\margm{label}. On the first \LaTeX\ run there are no
+entries defined, so \cs{glsaddall} does nothing. If you want to
+select all entries, just use \optref[all]{selection} instead (which
+has the advantage over \cs{glsaddall} in that it doesn't create a
+redundant location for each entry).
 
 Note that \bibgls\ requires the extension package
 \sty{glossaries-extra} and can't be used with just the base
@@ -589,11 +599,13 @@ Note that there's no need to called \app{xindy} or \app{makeindex}
 since \bibgls\ automatically sorts the entries and collates the locations
 after selecting the required entries from the \ext{bib} file and
 before writing the temporary file that's input with \cs{glsxtrresourcefile}
-(or the more convenient shortcut \cs{GlsXtrLoadResources}).  This
+(or the more convenient shortcut
+\cs{GlsXtrLoadResources}).\footnote{This document will mostly use
+the more convenient \cs{GlsXtrLoadResources}.}  This
 means the entries are already defined in the correct order, and only
-those entries that have been used in the document are defined, so
+those entries that are required in the document are defined, so
 \cs{printunsrtglossary} (or \cs{printunsrtglossaries}) may be used.
-(The \texttt{unsrt} part of the command name indicates that all
+(The \qtt{unsrt} part of the command name indicates that all
 defined entries should be listed in the order of definition from
 \sty{glossaries-extra}'s point of view.)
 
@@ -857,6 +869,7 @@ The interpreter is first passed the code provided with
 \providecommand{\card}[1]{|\set{#1}|}
 \providecommand{\imaginary}{i}
 \end{verbatim}
+(unless \optref[false]{interpret-preamble}).
 This means that the provided commands are now recognised by the
 interpreter when it has to parse the fields later.
 
@@ -916,6 +929,9 @@ font change has been discarded). In this case the sort value
 consists of three Unicode characters 0x7C (vertical line, decimal
 value 124),
 0x53 (Latin upper case letter \qtt{S}, decimal value 83) and 0x7C again.
+If \optref[false]{interpret-preamble} had been used, \csfmt{card}
+wouldn't be recognised and would be discarded leaving just \qtt{S}
+as the sort value.
 
 For the \texttt{i} entry, the code is:
 \begin{verbatim}
@@ -1589,7 +1605,7 @@ There are some special prefixes that have a particular meaning to
 \atentryref{dualentry}). This prefix will be replaced by the value of
 the \csopt{dual-prefix} option. The \idprefix{ext\meta{n}} prefix
 is used to reference an entry from a different set of resources
-(loaded by another \cs{glsxtrresourcefile} command). This prefix is
+(loaded by another \cs{GlsXtrLoadResources} command). This prefix is
 replaced by the corresponding element of the list supplied by
 \optref{ext-prefixes}.
 
@@ -1621,7 +1637,7 @@ optional fields, any key recognised by \cs{newglossaryentry} may be
 used as a field. However, note that if you add
 any custom keys in your document using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
 commands must be placed before the first use of
-\cs{glsxtrresourcefile} (or the shortcut \cs{GlsXtrLoadResources}).
+\cs{GlsXtrLoadResources}.
 
 Any unrecognised fields will be ignored.
 This is more convenient than using \cs{input} or \cs{loadglsentries}, which
@@ -1707,7 +1723,8 @@ For example:
 
 The \TeX\ parser library used by \bibgls\ will parse the contents of
 \atentry{preamble} before trying to interpret the field value used
-as a fallback when \field{sort} is omitted.
+as a fallback when \field{sort} is omitted (unless
+\optref[false]{interpret-preamble} is set in the resource options).
 For example:
 \begin{verbatim}
 @preamble{"\providecommand{\set}[1]{\mathcal{#1}}
@@ -2594,7 +2611,7 @@ the location lists.)
 
 The \ext{glstex} resource files created by \bibgls\ are loaded in
 the document using
-\begin{definition}
+\begin{definition}\labelcs{glsxtrresourcefile}
 \cs{glsxtrresourcefile}\oargm{options}\margm{filename}
 \end{definition}
 where \meta{filename} is the name of the resource file without the
@@ -2629,6 +2646,7 @@ This is equivalent to:
 \glsxtrresourcefile[src=entries-fr,sort={fr}]{\jobname-1}
 \glsxtrresourcefile[src=entries-de,sort={de-1996}]{\jobname-2}
 \end{verbatim}
+In general, it's simplest just to use \cs{GlsXtrLoadResources}.
 
 The optional argument \meta{options} is a comma-separated 
 \keyvallist. Allowed options are listed below.
@@ -2670,6 +2688,16 @@ JabRef.
 
 See \argref{tex-encoding} for the encoding used to write the \ext{glstex}
 file.
+
+\subsection{\csoptnv{interpret-preamble}=\margm{boolean}}
+\labelopt{interpret-preamble}
+
+This is a boolean option that determines whether or not the
+interpreter should parse the contents of \atentryref{preamble}.
+The default is \optfmt{true}. If \optfmt{false}, the preamble
+contents will still be written to the \ext{glstex} file, but any
+commands provided in the preamble won't be recognised if the
+interpreter is needed to determine an entry's sort value.
 
 \subsection{\csoptnv{set-widest}=\margm{boolean}}
 \labelopt{set-widest}
@@ -2835,24 +2863,14 @@ As \optref{sort-rule} but for secondary custom sorting.
 \subsection{\csoptnv{src}=\margm{list}}
 \labelopt{src}
 
-If the \csopt{src} option is omitted, the \ext{bib} file is assumed
-to be \meta{filename}\ext{bib}. For example:
-\begin{verbatim}
-\glsxtrresourcefile{entries-symbols}
-\end{verbatim}
-Indicates that \bibgls\ needs to read the file
-\filefmt{entries-symbols.bib} and create the file
-\filefmt{entries-symbols.glstex}. If the \ext{bib} file is
-different or if you have multiple \ext{bib} files, you need to use
-the \csopt{src} option.
-
-The value should be a comma-separated list of the required \ext{bib}
-files. These may either be in the current working directory or in
-the directory given by the \argref{dir} switch or on
-\TeX's path (in which case \app{kpsewhich} will be used to find them).
-The \ext{bib} extension may be omitted. Remember that if \meta{list}
-contains multiple files it must be grouped to protect the comma
-from the \meta{options} list.
+This identifies the \ext{bib} files containing the entry
+definitions.  The value should be a comma-separated list of the
+required \ext{bib} files. These may either be in the current working
+directory or in the directory given by the \argref{dir} switch or on
+\TeX's path (in which case \app{kpsewhich} will be used to find
+them).  The \ext{bib} extension may be omitted.  Remember that if
+\meta{list} contains multiple files it must be grouped to protect
+the comma from the \meta{options} list.
 
 For example
 \begin{verbatim}
@@ -2860,7 +2878,30 @@ For example
 \end{verbatim}
 indicates that \bibgls\ must read the files
 \filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
-create the file obtained from \cs{jobname}\ext{glstex}.
+create the file given by \cs{jobname}\ext{glstex} on the first
+instance or \cs{jobname}\texttt{-}\meta{n}\ext{glstex} on subsequent
+use.
+
+With \csref{glsxtrresourcefile}\oargm{options}\margm{filename}, if 
+the \csopt{src} option is omitted, 
+the \ext{bib} file is assumed to be \meta{filename}\ext{bib}. For example:
+\begin{verbatim}
+\glsxtrresourcefile{entries-symbols}
+\end{verbatim}
+indicates that \bibgls\ needs to read the file
+\filefmt{entries-symbols.bib}, which contains the entry data, and create the file
+\filefmt{entries-symbols.glstex}. If the \ext{bib} file is
+different or if you have multiple \ext{bib} files, you need to use
+the \csopt{src} option.
+
+\cs{GlsXtrLoadResources} uses \cs{jobname} as the argument of 
+\cs{glsxtrresourcefile} on the first instance, so  
+\begin{verbatim}
+\GlsXtrLoadResources[]
+\end{verbatim}
+will assume \optfmt{src=\cs{jobname}}. Remember that subsequent uses
+of \cs{GlsXtrLoadResources} append a suffix, so in general it's
+best to always supply \csopt{src}.
 
 \subsection{\csoptnv{selection}=\margm{value}}
 \labelopt{selection}
@@ -3273,6 +3314,15 @@ the same relative location that they were in with the original
 \csopt[false]{flatten-lonely} setting. For example, \texttt{duck}
 remains in the B letter group before \qt{buzz}.
 
+If the parent \field{name} is the same as the child's \field{name}
+then the child is considered a homograph and
+the child's name is set to 
+\begin{alltt}
+\csref{bibglsflattenedhomograph}\margm{name}\margm{parent label}
+\end{alltt}
+instead of using \cs{bibglsflattenedchildpostsort}. This defaults to
+just \meta{name}.
+
 With \csopt[presort]{flatten-lonely} the adjustments are made before
 the sorting is performed. For example, with
 \begin{verbatim}
@@ -3313,6 +3363,8 @@ does the first argument and ignores the second. The sorting is then
 performed, but the interpreter recognises this command and can
 deduce that the sort value for this entry should be \texttt{duck},
 so \qt{duck} now ends up in the D letter group.
+(If the child and parent \field{name} fields are identical,
+the name is again considered a homograph.)
 
 If you provide a definition of \cs{bibglsflattenedchildpresort} in
 the \atentryref{preamble}, it will be picked up by the interpreter.
@@ -3576,7 +3628,7 @@ then by default all that document's
 you can use \optfmt{master-resources} to specify
 only those files that should be include. The value \meta{list} is 
 a comma-separated list of names, where each name corresponds
-to the final argument of \cs{glsxtrresourcefile}.
+to the final argument of \csref{glsxtrresourcefile}.
 Remember that \cs{GlsXtrLoadResources} is just a shortcut
 for \cs{glsxtrresourcefile} that bases the name on \cs{jobname}.
 (Note that, as with the argument of \cs{glsxtrresourcefile},
@@ -4565,7 +4617,7 @@ These records are consecutive. The locations match the
 \hyperref[itm.csmatch]{control sequence pattern}. The control
 sequences are the same, so the test is retried with the first
 location set to 1 and the second location set to 2.
-(Note that \cs{glsxtrresourcefile} changes the category code of
+(Note that \csref{glsxtrresourcefile} changes the category code of
 \texttt{@} to allow for internal commands in locations.)
 \end{enumerate}
 
@@ -4690,7 +4742,7 @@ is left unchanged).
 Note that with \csopt[transfer]{alias-loc}, both the aliased
 entry and the target entry must be in the same resource set.
 (That is, both entries have been selected by the same instance of
-\cs{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version
+\csref{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version
 1.12, you may need to redefine \cs{glsxtrsetaliasnoindex} to do
 nothing if the location lists aren't showing correctly
 with aliased entries. (This was corrected in version 1.13.)
@@ -5793,7 +5845,7 @@ hook could contain:
 \end{verbatim}
 Note that this new field won't be available for use within the
 \ext{bib} file (unless it was previously defined in the document
-before \cs{glsxtrresourcefile}).
+before \csref{glsxtrresourcefile}).
 
 \chapter{Provided Commands}
 \label{sec:bibglscs}
@@ -6812,6 +6864,75 @@ as \glostyle{indexhypergroup}.
 These commands relate to the way the \field{name} field is altered
 when flattening lonely child entries with the \optref{flatten-lonely}
 option.
+
+\subsection{\csfmt{bibglsflattenedhomograph}}
+\labelcs{bibglsflattenedhomograph}
+
+\begin{definition}
+\cs{bibglsflattenedhomograph}\margm{name}\margm{parent label}
+\end{definition}
+The default definition simply does \meta{name}.
+
+This command is used if the child and parent name's are identical.
+For example, suppose the \ext{bib} file contains:
+\begin{verbatim}
+@index{glossary}
+
+@entry{glossarycol,
+  parent={glossary},
+  description={collection of glosses}
+}
+
+@entry{glossarylist,
+  parent={glossary},
+  description={list of technical words}
+}
+\end{verbatim}
+The child entries don't have a \field{name} field, so it's assumed
+to be the same as the parent field. Here's an example document where
+both child entries are used:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,subentrycounter,style=treenoname]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries}]
+
+\begin{document}
+\gls{glossarycol} (collection) vs \gls{glossarylist} (list).
+
+\printunsrtglossary
+\end{document}
+\end{verbatim}
+This uses one of the glossary styles designed for homographs and the
+glossary has the structure:
+\begin{flushleft}
+\textbf{glossary}\par
+\quad 1) collection of glosses 1\par
+\quad 2) list of technical words 1
+\end{flushleft}
+If only one child entry is selected, then the result looks a little
+odd. For example:
+\begin{flushleft}
+\textbf{glossary}\par
+\quad 1) collection of glosses 1
+\end{flushleft}
+With the \optref{flatten-lonely} option, the parent is removed and
+the child is moved up a hierarchical level. With 
+\optref[postsort]{flatten-lonely} this would normally adjust the
+name so that it appears as \meta{parent name}, \meta{child name}
+but in this case it would look a little odd for the name to 
+appear as \qt{glossary, glossary} so instead the name is
+set to
+\begin{verbatim}
+\bibglsflattenedhomograph{glossary}{glossary}
+\end{verbatim}
+(where the first argument is the name and the second argument is the
+label of the parent entry, which just happens to be the same in this
+case).
+
+This means that the name simply appears as \qt{glossary}, even if
+the \optref[postsort]{flatten-lonely} option is used.
 
 \subsection{\csfmt{bibglsflattenedchildpresort}}
 \labelcs{bibglsflattenedchildpresort}

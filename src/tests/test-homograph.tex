@@ -1,0 +1,19 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,subentrycounter,style=treenoname]{glossaries-extra}
+
+\GlsXtrLoadResources
+ [
+   src={test-homograph}, % bib file
+   flatten-lonely=postsort
+ ]
+
+\begin{document}
+%\gls{glossarycol} (collection) vs \gls{glossarylist} (list).
+\gls{glossarycol}
+
+\printunsrtglossary
+\end{document}
