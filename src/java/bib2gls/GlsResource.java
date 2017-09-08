@@ -270,6 +270,10 @@ public class GlsResource
          {
             externalPrefixes = getStringArray(parser, list, opt);
          }
+         else if (opt.equals("interpret-preamble"))
+         {
+            interpretPreamble = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("flatten"))
          {
             flatten = getBoolean(parser, list, opt);
@@ -2450,7 +2454,7 @@ public class GlsResource
          preamble += content;
       }
 
-      if (list != null)
+      if (list != null && interpretPreamble)
       {
          bib2gls.processPreamble(list);
       }
@@ -4407,6 +4411,8 @@ public class GlsResource
    private Charset bibCharset = null;
 
    private boolean flatten = false;
+
+   private boolean interpretPreamble = true;
 
    private boolean setWidest = false;
 
