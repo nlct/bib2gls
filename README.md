@@ -5,17 +5,11 @@ Command line application to convert `.bib` files to `glossaries-extra.sty` resou
 from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).)
 
-Requires at least Java 7 and at least v1.12 of
+This application requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
 (2017-02-03). (Although newer versions are recommended.)
-
-There's a [draft version of the user
-manual](http://www.dickimaw-books.com/software/bib2gls/bib2gls.pdf)
-provided for those 
-interested in more detail.
-
-I've removed the `unstable` directory. You can instead fetch the
-latest binaries from the [application's home page](http://www.dickimaw-books.com/software/bib2gls/).
+The main home page is http://www.dickimaw-books.com/software/bib2gls/
+which includes links to binaries.
 
 If you already have a `.tex` file containing lots of
 definitions using `\newglossaryentry`,
@@ -47,26 +41,6 @@ will strip spaces. The values of the `see`, `seealso` and
 `\gls` etc will have to be replaced manually (or use your
 text editor's search and replace function).
 
-# Testing the Experimental Version
-
-If you want to test the experimental version, download the
-files listed below and follow the installation instructions.
-Make sure you have at least v1.12 of 
-[`glossaries-extra`](http://ctan.org/pkg/glossaries-extra)
-and at least Java 7.
-
- - [`bib2gls.jar`](http://www.dickimaw-books.com/software/bib2gls/bib2gls.jar)
- - [`texparserlib.jar`](http://www.dickimaw-books.com/software/bib2gls/texparserlib.jar)
- - [`bib2gls.sh`](https://github.com/nlct/bib2gls/raw/master/src/bin/bib2gls.sh) (bash users only)
- - [`resources/bib2gls-en.xml`](https://github.com/nlct/bib2gls/raw/master/src/lib/resources/bib2gls-en.xml)
-
-There are some test files available in the
-[`src/tests`](https://github.com/nlct/bib2gls/tree/master/src/tests)
-directory.
-
-Latest experimental release: version 0.7a (2017-05-01).
-([`CHANGES`](https://github.com/nlct/bib2gls/tree/master/src/doc/CHANGES))
-
 # Installation
 
 The files should be installed as follows where *TEXMF* indicates
@@ -80,7 +54,7 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml`
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf`
 
-Unix-like systems add a symbolic link called `bib2gls` somewhere on
+For Unix-like systems, add a symbolic link called `bib2gls` somewhere on
 your path that links to the `bib2gls.sh` bash script.
 For example:
 ```bash
@@ -142,4 +116,8 @@ cd ../classes
 jar cmf ../java/gls2bib/Manifest.txt ../lib/convertgls2bib.jar com/dickimawbooks/gls2bib/*.class
 ```
 
-No warranty etc.
+License GPLv3+: GNU GPL version 3 or later
+http://gnu.org/licenses/gpl.html
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+

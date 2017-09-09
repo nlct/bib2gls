@@ -107,14 +107,14 @@ appropriate.)
 The files should be installed as follows where *TEXMF* indicates
 your local or home TEXMF path (for example, `~/texmf/`):
 
- - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only.)
  - *TEXMF*`/scripts/bib2gls/bib2gls.jar` (Java application.)
- - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems
-   only.)
  - *TEXMF*`/scripts/bib2gls/convertgls2bib.jar` (Java application.)
  - *TEXMF*`/scripts/bib2gls/texparserlib.jar` (Java library.)
  - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml` (English
    resource file.)
+ - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only.)
+ - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems
+   only.)
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf` (User manual.)
 
 Note that `texparserlib.jar` isn't an application. It's
@@ -131,9 +131,82 @@ convertgls2bib --version
 ```
 These should display the version details.
 
+#Licence
+
+License GPLv3+: GNU GPL version 3 or later
+http://gnu.org/licenses/gpl.html
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+#Source Code
+
+#User Manual
+
+The documentation `bib2gls.pdf` is compiled using:
+
+```bash
+pdflatex bib2gls
+makeindex -s bib2gls.ist bib2gls
+pdflatex bib2gls
+```
+
+#JAR Files
+
+Create the following directories:
+
+`lib`
+`lib/resources`
+`java`
+`classes/com/dickimawbooks/bib2gls`
+`classes/com/dickimawbooks/gls2bib`
+`classes/com/dickimawbooks/texparserlib`
+
+Unpack the zip files:
+
+```bash
+unzip -d java bib2gls-src.zip
+unzip -d java gls2bib-src.zip
+unzip -d java texparserlib-src.zip
+```
+
+Copy the `.xml` language file to `lib/resources/`
+
+Compile `texparserlib.jar`:
+
+```bash
+cd java/lib 
+javac -d ../../classes
+-Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
+cd ../../classes 
+jar cf ../lib/texparserlib.jar 
+com/dickimawbooks/texparserlib/*.class \
+com/dickimawbooks/texparserlib/*/*.class \
+com/dickimawbooks/texparserlib/*/*/*.class 
+```
+
+Compile `bib2gls.jar`:
+
+```bash
+cd java/bib2gls
+javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+cd ../classes
+jar cmf ../java/bib2gls/Manifest.txt ../lib/bib2gls.jar
+com/dickimawbooks/bib2gls/*.class
+```
+
+Compile `convertgls2bib.jar`:
+
+```bash
+cd java/gls2bib
+javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+cd ../classes
+jar cmf ../java/gls2bib/Manifest.txt ../lib/convertgls2bib.jar
+com/dickimawbooks/gls2bib/*.class
+```
+
 GitHub:
 
   - https://github.com/nlct/bib2gls
   - https://github.com/nlct/texparserlib
 
-Author's Home Page: www.dickimaw-books.com
+Home Page: http://www.dickimaw-books.com/software/bib2gls

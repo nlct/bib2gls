@@ -9,8 +9,10 @@ bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib
 	cp ../src/lib/bib2gls.jar bib2gls
 	cp ../src/lib/convertgls2bib.jar bib2gls
 	cp -L ../src/lib/texparserlib.jar bib2gls
-	cp ../scr/doc/bib2gls.tex bib2gls/src
-	cp ../scr/doc/bib2gls.pdf bib2gls
+	cp ../src/doc/bib2gls.tex bib2gls/src
+	cp ../src/doc/bib2gls.pdf bib2gls
+	cp ../src/lib/resources/*.xml bib2gls
+	cp README.md CHANGES bib2gls
 	cd ../src/java/; \
 	zip -r bib2gls-src.zip bib2gls; \
 	mv bib2gls-src.zip ../../ctan/bib2gls/src ; \
@@ -19,3 +21,4 @@ bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib
 	cd $(TEXPARSERDIR)/src/java ; \
 	zip -r texparser-src.zip lib/ ; \
 	mv texparser-src.zip $(BIB2GLSDIR)/ctan/bib2gls/src/
+	zip --exclude="*.swp" -r bib2gls.zip bib2gls
