@@ -2489,7 +2489,19 @@ public class GlsResource
       }
    }
 
-   private Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
+   public Bib2GlsEntry getEntry(String label)
+   {
+      Bib2GlsEntry entry = getEntry(label, bibData);
+
+      if (entry != null)
+      {
+         return entry;
+      }
+
+      return getEntry(label, dualData);
+   }
+
+   public static Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
    {
       for (Bib2GlsEntry entry : data)
       {
@@ -2502,7 +2514,7 @@ public class GlsResource
       return null;
    }
 
-   private Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
+   public static Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
    {
       for (BibData entry : data)
       {
@@ -2655,10 +2667,19 @@ public class GlsResource
 
          L2HStringConverter listener = bib2gls.getInterpreterListener();
 
-         if (listener != null
-         && listener.getParser().getControlSequence("bibglsflattenedchildpresort") == null)
+         if (listener != null)
          {
-            listener.putControlSequence(new FlattenedPreSort());
+            TeXParser parser = listener.getParser();
+
+            if (parser.getControlSequence("bibglsflattenedchildpresort")==null)
+            {
+               listener.putControlSequence(new FlattenedPreSort());
+            }
+
+            if (parser.getControlSequence("bibglsflattenedhomograph")==null)
+            {
+               listener.putControlSequence(new FlattenedHomograph());
+            }
          }
 
          flattenLonelyChildren(entries);
@@ -3652,7 +3673,8 @@ public class GlsResource
       {
          boolean homograph = name.equals(parentName);
 
-         String csName = flattenLonelyCsName();
+         String csName = homograph ? "bibglsflattenedhomograph" 
+            : flattenLonelyCsName();
 
          TeXObjectList object = null;
          Group nameGroup = null;
@@ -3669,17 +3691,7 @@ public class GlsResource
             }
             else
             {
-               nameGroup = listener.createGroup();
-               TeXObject contents = bibName.getContents(true);
-
-               if (contents instanceof TeXObjectList)
-               {
-                  nameGroup.addAll((TeXObjectList)contents);
-               }
-               else
-               {
-                  nameGroup.add(contents);
-               }
+               nameGroup = getContents(bibName, listener);
             }
 
             if (bibParentName == null)
@@ -3695,30 +3707,22 @@ public class GlsResource
             }
             else
             {
-               parentNameGroup = listener.createGroup();
-               TeXObject contents = bibParentName.getContents(true);
-
-               if (contents instanceof TeXObjectList)
-               {
-                  parentNameGroup.addAll((TeXObjectList)contents);
-               }
-               else
-               {
-                  parentNameGroup.add(contents);
-               }
+               parentNameGroup = getContents(bibParentName, listener);
             }
 
-            object.add(nameGroup);
-            object.add(parentNameGroup);
+            if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+            {
+               object.add(parentNameGroup);
+               object.add(nameGroup);
+            }
+            else
+            {
+               object.add(nameGroup);
+               object.add(parentNameGroup);
+            }
          }
 
-         if (homograph)
-         {
-            child.putField("name", 
-              String.format("\\bibglsflattenedhomograph{%s}{%s}",
-                 name, parent.getId()));
-         }
-         else if (flattenLonely == FLATTEN_LONELY_POST_SORT)
+         if (flattenLonely == FLATTEN_LONELY_POST_SORT)
          {
             child.putField("name", 
               String.format("\\%s{%s}{%s}",
@@ -3754,6 +3758,39 @@ public class GlsResource
          {
             child.putField("group", group);
          }
+      }
+   }
+
+
+   private Group getContents(BibValueList bibValue, L2HStringConverter listener)
+   {
+      TeXObject contents = bibValue.getContents(true);
+
+      if (contents instanceof TeXObjectList
+       && !(contents instanceof MathGroup)
+       && (((TeXObjectList)contents).size() == 1)
+       && (((TeXObjectList)contents).firstElement() instanceof Group))
+      {
+         TeXObjectList list = (TeXObjectList)contents;
+
+         Group grp = (Group)list.firstElement();
+
+         if (!(grp instanceof MathGroup))
+         {
+            return grp;
+         }
+         else
+         {
+            grp = listener.createGroup();
+            grp.add(list);
+            return grp;
+         }
+      }
+      else
+      {
+         Group grp = listener.createGroup();
+         grp.add(contents);
+         return grp;
       }
    }
 

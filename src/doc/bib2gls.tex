@@ -5,6 +5,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{tgtermes}
+\usepackage[x11names]{xcolor}
 \usepackage{alltt}
 \usepackage{upquote}
 \usepackage{etoolbox}
@@ -21,7 +22,7 @@ actual '='
 \usepackage{accents}
 \usepackage{makeidx}
 \usepackage{datetime2}
-\usepackage[colorlinks]{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{glossaries-extra}
 \glsdisablehyper
 
@@ -116,8 +117,10 @@ actual '='
 \newcommand*{\csfmt}[1]{\texorpdfstring{\texttt{\char`\\ #1}}{\string\\#1}}
 \newcommand*{\envfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
-\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
-\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
+\newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{DarkSeaGreen4}{\optfmt{#1}}}{#1}}
+\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{DarkOrchid4}{\optfmt{#1}}}{#1}}
+\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{DarkSlateGray4}#1}}{#1}}
+\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{SteelBlue4}#1}}{#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
@@ -212,7 +215,7 @@ actual '='
 \newcommand*{\styopt}[2][]{%
   \texorpdfstring%
   {%
-    \optfmt{#2\ifblank{#1}{}{\dequals\marg{#1}}}%
+    \styoptfmt{#2\ifblank{#1}{}{\dequals\marg{#1}}}%
     \index{package options\actual\protect\optfmt{#2}}%
     \index{#2\actual\protect\optfmt{#2}}%
   }%
@@ -238,7 +241,7 @@ actual '='
 \newcommand*{\gencsopt}[3][]{%
   \texorpdfstring%
   {%
-    \optfmt{#3\ifblank{#1}{}{\dequals\marg{#1}}}%
+    \csoptfmt{#3\ifblank{#1}{}{\dequals\marg{#1}}}%
     \ifmainmatter
       {\def\dhyphen{-}\index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}}%
     \fi
@@ -378,12 +381,12 @@ files}
 
 \newcommand*{\labelopt}[1]{%
  {\def\dhyphen{\string\dhyphen\space}%
-  \protected@edef\@currentlabelname{\protect\optfmt{#1}}%
+  \protected@edef\@currentlabelname{\protect\csoptfmt{#1}}%
   \def\dhyphen{-}\label{opt.#1}}%
 }
 \newrobustcmd*{\optref}[2][]{%
  \nameref{opt.#2}%
- \ifblank{#1}{}{\optfmt{\dequals\marg{#1}}}}
+ \ifblank{#1}{}{\csoptfmt{\dequals\marg{#1}}}}
 
 \newcommand*{\labelatentry}[1]{%
  {\def\@currentlabelname{\protect\atentry{#1}}\label{at.#1}}%
@@ -407,7 +410,7 @@ The \bibgls\ command line application can be used to extract
 glossary information stored in a \filefmt{.bib} file and convert it
 into glossary entry definition commands that can be read using
 \styfmt{glossaries-extra}'s \csfmt{GlsXtrLoadResources} command. When used
-in combination with the \optfmt{record} package option, \bibgls\
+in combination with the \styopt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
 required by not defining unnecessary commands.
@@ -1959,10 +1962,11 @@ For example:
   description={a \gls{vector}}
 }
 \end{verbatim}
+If the \field{name} field is omitted, the parent's \field{name} is used.
 
 If the \field{sort} field is omitted, \bibgls\ will sort according
-to the \field{name} field (or the \field{parent} field if
-\field{name} is missing).
+to the \field{name} field.
+
 Terms defined using \atentry{entry} will be written to the output
 file using the command \csref{bibglsnewentry}.
 
@@ -2622,18 +2626,18 @@ would attempt to input the same \ext{glstex} file multiple times.
 \bibgls\ checks for non-unique file names.
 
 There's a shortcut command that uses
-\cs{jobname} as the \meta{filename}:
+\cs{jobname} in the \meta{filename}:
 \begin{definition}
 \cs{GlsXtrLoadResources}\oargm{options}
 \end{definition}
 The first instance of this command is equivalent to
-\begin{definition}
+\begin{alltt}
 \cs{glsxtrresourcefile}\oargm{options}\marg{\cs{jobname}}
-\end{definition}
+\end{alltt}
 Any additional use of \cs{GlsXtrLoadResources} is equivalent to
-\begin{definition}
+\begin{alltt}
 \cs{glsxtrresourcefile}\oargm{options}\marg{\cs{jobname}-\meta{n}}
-\end{definition}
+\end{alltt}
 where \meta{n} is number. For example:
 \begin{verbatim}
 \GlsXtrLoadResources[src=entries-en,sort={en}]
@@ -2648,16 +2652,19 @@ This is equivalent to:
 \end{verbatim}
 In general, it's simplest just to use \cs{GlsXtrLoadResources}.
 
-The optional argument \meta{options} is a comma-separated 
-\keyvallist. Allowed options are listed below.
+The optional argument \meta{options} is a comma-separated \keyvallist. 
+Allowed options are listed below.
 The option list applies only to that specific
 \meta{filename}\ext{glstex} and are not carried over to the next
-instance of \cs{glsxtrresourcefile}.
+instance of \cs{glsxtrresourcefile}. The \sty{glossaries-extra}
+package doesn't parse the options, but just writes the information to the
+\ext{aux} file. This means that any invalid options will be reported
+by \bibgls\ not by \sty{glossaries-extra}.
 
 If you have multiple \ext{bib} files you can either select them all
-using \optref{src} in a single \cs{glsxtrresourcefile} call, if they
-all require the same settings, or you can load them separately with
-different settings applied.
+using \optref[\meta{bib list}]{src} in a single
+\cs{glsxtrresourcefile} call, if they all require the same settings,
+or you can load them separately with different settings applied.
 
 For example, if the files \filefmt{entries-terms.bib} and
 \filefmt{entries-symbols.bib} have the same settings:
@@ -2669,6 +2676,134 @@ Alternatively, if they have different settings:
 \GlsXtrLoadResources[src={entries-terms},type=main]
 \GlsXtrLoadResources[src={entries-symbols},sort=use,type=symbols]
 \end{verbatim}
+
+Note that the sorting is applied to each resource call independently
+of other resources. This means that if you have multiple instances
+of \cs{glsxtrresourcefile} but only one glossary type, the glossary
+will effectively contain blocks of sorted entries. For example, if
+\filefmt{file1.bib} contains:
+\begin{verbatim}
+@index{duck}
+@index{zebra}
+@index{aardvark}
+\end{verbatim}
+and \filefmt{file2.bib} contains:
+\begin{verbatim}
+@index{caterpillar}
+@index{bee}
+@index{wombat}
+\end{verbatim}
+then
+\begin{verbatim}
+\GlsXtrLoadResources[src={file1,file2}]
+\end{verbatim}
+will result in the list: aardvark, bee, caterpillar, duck, wombat,
+zebra. These six entries are all defined when
+\csfmt{jobname}\filefmt{.glstex} is read.
+Whereas
+\begin{verbatim}
+\GlsXtrLoadResources[src={file1}]
+\GlsXtrLoadResources[src={file2}]
+\end{verbatim}
+will result in the list: aardvark, duck, zebra, bee, caterpillar,
+wombat. The first three (aardvark, duck, zebra) are defined when 
+\csfmt{jobname}\filefmt{.glstex} is read. The second three (bee,
+caterpillar, wombat) are defined when \csfmt{jobname}\filefmt{-1.glstex}
+is read. Since \cs{printunsrtglossary} simply iterates over all
+defined entries, this is the ordering used.
+
+Note \bibgls\ allows \ext{bib} files that don't provide any entries.
+This can be used to provide commands in \atentryref{preamble}.
+For example, suppose I have \filefmt{defs.bib} that just contains
+\begin{verbatim}
+@preamble{"\providecommand{\strong}[1]{\textbf{\color{red}#1}}
+\providecommand{\test}[2]{#2 (#1)}"}
+\end{verbatim}
+This provides two commands: \csfmt{strong} (which sets the font
+weight and colour) and \csfmt{test} (which just displays its second
+argument followed by the first in parentheses).
+
+Suppose I also have \filefmt{entries.bib} that contains:
+\begin{verbatim}
+@index{example,
+  name={\strong{\test{stuff}{example}}}
+}
+@index{sample}
+@index{test}
+@index{foo}
+@index{bar}
+\end{verbatim}
+This contains an entry that requires the commands provided in
+\filefmt{defs.bib}, so to ensure those commands are defined, I can
+do:
+\begin{verbatim}
+\GlsXtrLoadResources[src={defs,entries}]
+\end{verbatim}
+Unfortunately this results in the sort value for \texttt{example} being
+set to \texttt{redexample (stuff)} because the interpreter has
+detected the provided commands and expanded 
+\begin{verbatim}
+\strong{\test{stuff}{example}}
+\end{verbatim}
+to
+\begin{verbatim}
+\textbf{\color{red}example (stuff)}
+\end{verbatim}
+It discards font changes, so \csfmt{textbf} is ignored, but it doesn't 
+recognise \cs{color} and so doesn't know that the first argument is
+just the colour specifier and therefore doesn't discard it.
+This means that \qt{\textbf{\color{red}example (stuff)}} is placed
+between \qt{foo} and \qt{sample} instead of between \qt{bar} and
+\qt{foo}.
+
+I can prevent the interpreter from parsing \atentryref{preamble}:
+\begin{verbatim}
+\GlsXtrLoadResources[src={defs,entries},interpret-preamble=false]
+\end{verbatim}
+Now when the sort value for \texttt{example} is obtained from
+\begin{verbatim}
+\strong{\test{stuff}{example}}
+\end{verbatim}
+no expansion occurs (since \csfmt{strong} and \csfmt{test} are
+unrecognised) so the sort value ends up as
+\begin{verbatim}
+stuffexample
+\end{verbatim}
+which places \qt{\textbf{\color{red}example (stuff)}} between 
+\qt{sample} and \qt{test}, which is again incorrect.
+
+The best thing to do in this situation is to split the provided
+commands into two \ext{bib} files: one that should be interpreted
+and one that shouldn't.
+
+For example, \filefmt{defs-nointerpret.bib}:
+\begin{verbatim}
+@preamble{"\providecommand{\strong}[1]{\textbf{\color{red}#1}}"}
+\end{verbatim}
+and \filefmt{defs-interpret.bib}:
+\begin{verbatim}
+@preamble{"\providecommand{\test}[2]{#2 (#1)}"}
+\end{verbatim}
+Now the first one can be loaded with \optref[false]{interpret-preamble}:
+\begin{verbatim}
+\GlsXtrLoadResources[src={defs-nointerpret},interpret-preamble=false]
+\end{verbatim}
+This creates a \ext{glstex} file that provides \csfmt{strong} but
+doesn't define any entries. The other file \filefmt{defs-interpret.bib} can
+then be loaded with the default \optref[true]{interpret-preamble}:
+\begin{verbatim}
+\GlsXtrLoadResources[src={defs-interpret,entries}]
+\end{verbatim}
+The provided commands are remembered by the interpreter, so you can
+also do:
+\begin{verbatim}
+\GlsXtrLoadResources[src={defs-interpret}]
+\GlsXtrLoadResources[src={entries}]
+\end{verbatim}
+The \emph{contents} of \atentryref{preamble} are only written to the
+associated \ext{glstex} file, but the definitions contained within
+the \atentry{preamble} are retained by the interpreter for subsequent
+resource sets.
 
 \section{General Options}
 \label{sec:generalopts}
@@ -2684,7 +2819,7 @@ with the encoding comment
 then you can supply the correct encoding using
 \csopt[encoding-name]{charset}. In general, it's better to include
 the encoding in the \ext{bib} file where it can also be read by
-JabRef.
+a \ext{bib} managing systems, such as JabRef.
 
 See \argref{tex-encoding} for the encoding used to write the \ext{glstex}
 file.
@@ -2753,7 +2888,7 @@ or
 If the
 \meta{field} is omitted, the value of \optref{sort-field} is used.
 The value of \meta{sort} is as for \optref{sort}, but note that in this case the sort value \optfmt{unsrt} or
-\optfmt{none} means to use the same ordering as the original
+\optfmt{none} means to use the same ordering as the primary
 entries. So with \optref[de-CH-1996]{sort},
 \optref[none:copies]{secondary} the \texttt{copies}
 list will be ordered according to \texttt{de-CH-1996} and not
@@ -2909,17 +3044,17 @@ best to always supply \csopt{src}.
 By default all entries that have records in the \ext{aux} file will
 be selected as well as all their dependent entries. The dependent
 entries that don't have corresponding records on the first \LaTeX\
-run, make need an additional build to ensure their location lists
+run, may need an additional build to ensure their location lists
 are updated.
 
-Remember that on the first \LaTeX\ the \ext{glstex} files don't
+Remember that on the first \LaTeX\ run the \ext{glstex} files don't
 exist. This means that the entries can't be defined. The
 \styopt{record} package option additionally switches on the
 \styopt[warn]{undefaction} option, which means that you'll only get
 warnings rather than errors when you reference entries in the
-document. This means that you can't use \cs{glsaddall} all with
-\bibgls\ because the glossary lists are empty on the first run
-therefore there's nothing for \cs{glsaddall} to iterate over.
+document. This means that you can't use \cs{glsaddall} with
+\bibgls\ because the glossary lists are empty on the first run, so
+there's nothing for \cs{glsaddall} to iterate over.
 Instead, if you want to add all defined entries, you need to
 instruct \bibgls\ to do this with the \csopt{selection} option. The
 following values are allowed:
@@ -2934,7 +3069,7 @@ their dependencies. The dependencies include those referenced in the
 with commands like \cs{gls} in the field values that are parsed by
 \bibgls. With this setting, parents will be omitted unless they've
 been referenced in the document through commands like \cs{gls}.
-\item \optfmt{recorded and ancestors}: this is live the previous
+\item \optfmt{recorded and ancestors}: this is like the previous
 setting but parents are added even if they haven't been referenced
 in the document. The other dependent entries are omitted if they
 haven't been referenced in the document.
@@ -3015,7 +3150,6 @@ where \meta{pattern-1} is the current pattern for that field
 and \meta{pattern-2} is the new pattern. This means it performs a
 logical OR\@. For the non-duplicate
 fields the logical operator is given by \optref{match-op}.
-
 For example:
 \begin{verbatim}
 match-op={and},
@@ -3025,17 +3159,24 @@ match={
   {category=vegetables}
 }
 \end{verbatim}
+This will keep all the selected entries that satisfy:
+\begin{itemize}
+\item \field{category} matches \verb"(?:animals)|(?:vegetables)"
 
-This will discard any entries that don't match the condition:
-\field{category} matches \verb"(?:animals)|(?:vegetables)"
 (the \field{category} is either \optfmt{animals} or
-\optfmt{vegetables}) AND \field{topic} is \texttt{biology}.
+\optfmt{vegetables})
+
+\item[AND]
+
+\item \field{topic} is \texttt{biology}.
+\end{itemize}
+and will discard any entries that don't satisfy this condition.
 A message will be written to the log file for each entry
 that's discarded.
 
 Patterns for unknown fields will be ignored. If the entire
 list consists of patterns for unknown fields it will be
-treated as \csopt[{}]{match}. That is, no filtering will be
+treated as \csopt[\empty]{match}. That is, no filtering will be
 applied.
 
 \subsection{\csoptnv{match-op}=\margm{value}}
@@ -3052,7 +3193,6 @@ The default is \csopt[and]{match-op}.
 
 This is a boolean option. The default value is
 \csopt[false]{flatten}. 
-
 If \csopt[true]{flatten}, the sorting will ignore hierarchy and
 the \field{parent} field will be omitted when writing
 the definitions to the \ext{glstex} file, but the parent entries
@@ -3069,7 +3209,7 @@ Note the difference between this option and using
 This may take one of three values: \optfmt{false} (default),
 \optfmt{presort} and \optfmt{postsort}. The value must be supplied. 
 
-Unlike the \optref{flatten} option (describe above) which completely
+Unlike the \optref{flatten} option, which completely
 removes the hierarchy, the \csopt{flatten-lonely} option can be used
 to selectively alter the hierarchy.  In this case only those entries
 that have a parent but have no siblings are checked. This option
@@ -3081,7 +3221,7 @@ moving a child up one hierarchical level are as follows:
 \item if \csopt[only unrecorded parents]{flatten-lonely-rule}
       then the parent can't have a location list, where the location list
       includes records and \field{see} or \field{seealso}
-      cross-references (otherwise the parent may have a location
+      cross-references (for the other rules the parent may have a location
       list as long as it only has the one child selected).
 \end{itemize}
 If the child is selected for hierarchical adjustment, the parent
@@ -3233,6 +3373,8 @@ in the original \atentryref{index} definition of \text{duck}, it
 wouldn't have been altered. This adjustment ensures that in the
 document \verb|\gls{duck}| still produces \qt{duck} rather than
 \qt{birds, duck}.
+(If the child and parent \field{name} fields are identical,
+the terms are considered homographs. See below for further details.)
 
 The \texttt{subsubitem} entry has also been adjusted. This was done
 in a multi-stage process, starting with sub-items and then moving down
@@ -3314,17 +3456,8 @@ the same relative location that they were in with the original
 \csopt[false]{flatten-lonely} setting. For example, \texttt{duck}
 remains in the B letter group before \qt{buzz}.
 
-If the parent \field{name} is the same as the child's \field{name}
-then the child is considered a homograph and
-the child's name is set to 
-\begin{alltt}
-\csref{bibglsflattenedhomograph}\margm{name}\margm{parent label}
-\end{alltt}
-instead of using \cs{bibglsflattenedchildpostsort}. This defaults to
-just \meta{name}.
-
 With \csopt[presort]{flatten-lonely} the adjustments are made before
-the sorting is performed. For example, with
+the sorting is performed. For example, using:
 \begin{verbatim}
 \GlsXtrLoadResources[src={entries.bib},
  flatten-lonely-rule=discard unrecorded,
@@ -3363,8 +3496,6 @@ does the first argument and ignores the second. The sorting is then
 performed, but the interpreter recognises this command and can
 deduce that the sort value for this entry should be \texttt{duck},
 so \qt{duck} now ends up in the D letter group.
-(If the child and parent \field{name} fields are identical,
-the name is again considered a homograph.)
 
 If you provide a definition of \cs{bibglsflattenedchildpresort} in
 the \atentryref{preamble}, it will be picked up by the interpreter.
@@ -3383,6 +3514,17 @@ after all relevant entries and their dependencies have been
 selected, so any cross-references within the parent entry (such as
 \cs{gls} occurring in the description) may end up being selected
 even if they wouldn't be selected if the parent entry didn't exist.
+
+With both \optfmt{presort} and \optfmt{postsort},
+if the parent \field{name} is the same as the child's \field{name}
+then the child is considered a homograph and
+the child's name is set to 
+\begin{alltt}
+\csref{bibglsflattenedhomograph}\margm{name}\margm{parent label}
+\end{alltt}
+instead of the corresponding \csfmt{bibglsflattenedchild...sort}. 
+This defaults to just \meta{name}.
+
 
 \subsection{\csoptnv{flatten-lonely-rule}=\margm{value}}
 \labelopt{flatten-lonely-rule}
@@ -3502,12 +3644,11 @@ and \filefmt{myarticle.tex} can be changed to:
 \GlsXtrLoadResources[
  src={myentries},
  sort=none,
- label-prefix={book.},
  type=external,
  category=external]
 
 \begin{document}
-\gls{book.sample}.
+\gls{sample}.
 \end{document}
 \end{verbatim}
 Most of the options related to sorting and the glossary format are
@@ -3626,7 +3767,7 @@ If the master document has multiple resource files
 then by default all that document's
 \ext{glstex} files will be input. If you don't want them all
 you can use \optfmt{master-resources} to specify
-only those files that should be include. The value \meta{list} is 
+only those files that should be included. The value \meta{list} is 
 a comma-separated list of names, where each name corresponds
 to the final argument of \csref{glsxtrresourcefile}.
 Remember that \cs{GlsXtrLoadResources} is just a shortcut
@@ -3654,7 +3795,7 @@ supplementary resource files (omitting the primary
 \labelopt{ignore-fields}
 
 The \csopt{ignore-fields} key indicates that you want \bibgls\ to
-skip the fields listed in supplied the comma-separated \meta{list} of field
+skip the fields listed in the supplied comma-separated \meta{list} of field
 labels. Remember that unrecognised fields will always be skipped.
 
 For example, suppose my \ext{bib} file contains
@@ -3663,12 +3804,12 @@ For example, suppose my \ext{bib} file contains
   short ="html",
   long  = {hypertext markup language},
   description={a markup language for creating web pages},
-  see={[see also]xml}
+  seealso={xml}
 }
 \end{verbatim}
 but I want to use the \abbrstyle{short-long} style and I don't want
 the cross-referenced term, then I can use
-\csopt[see,description]{ignore-fields}.
+\csopt[seealso,description]{ignore-fields}.
 
 Note that \csopt[parent]{ignore-fields} removes the \field{parent}
 before determining the dependency lists. This means that
@@ -3678,7 +3819,7 @@ label in the \field{parent} field.
 
 If you want to maintain the dependency and ancestor relationship but
 omit the \field{parent} field when writing the entries to the
-\ext{glstex} file, you instead need to use \optref{flatten}.
+\ext{glstex} file, you need to use \optref{flatten} instead.
 
 \subsection{\csoptnv{category}=\margm{value}}
 \labelopt{category}
@@ -3688,11 +3829,13 @@ changed before writing their definitions to the \ext{glstex} file.
 The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: set the
-\field{category} to the entry type used to define it.
+\field{category} to the \ext{bib} entry type used to define it
+(without the leading \texttt{@});
 \item \optfmt{same as type}: set the \field{category} to the same
 value as the \field{type} field (if that field has been provided
-either in the \ext{bib} file or through the \optref{type} option).
-\item A category label: the \field{category} is set to \meta{value}.
+either in the \ext{bib} file or through the \optref{type} option);
+\item \meta{label}: the \field{category} is set to
+\meta{label} (which mustn't contain any special characters).
 \end{itemize}
 This will override any
 \field{category} fields supplied in the \ext{bib} file.
@@ -4671,7 +4814,7 @@ If set, a range consisting of two consecutive locations
 \meta{loc-1} and \meta{loc-2} will be
 displayed in the location list as \meta{loc-1}\meta{value}.
 
-Note that \csopt[{}]{suffixF} sets the suffix to the
+Note that \csopt[\empty]{suffixF} sets the suffix to the
 empty string. To remove the suffix formation use
 \csopt[none]{suffixF}.
 
@@ -4684,7 +4827,7 @@ If set, a range consisting of three or more consecutive locations
 \meta{loc-1} and \meta{loc-2} will be
 displayed in the location list as \meta{loc-1}\meta{value}.
 
-Note that \csopt[{}]{suffixFF} sets the suffix to the
+Note that \csopt[\empty]{suffixFF} sets the suffix to the
 empty string. To remove the suffix formation use
 \csopt[none]{suffixFF}.
 
@@ -6932,7 +7075,12 @@ label of the parent entry, which just happens to be the same in this
 case).
 
 This means that the name simply appears as \qt{glossary}, even if
-the \optref[postsort]{flatten-lonely} option is used.
+the \optref[postsort]{flatten-lonely} option is used. Note that if
+the parent entry is removed, the parent label won't be of much use.
+You can test for existence using \cs{ifglsentryexists} (provided by
+the \sty{glossaries} package) in case you want to vary the way the
+name is displayed according to whether or not the parent is still
+present.
 
 \subsection{\csfmt{bibglsflattenedchildpresort}}
 \labelcs{bibglsflattenedchildpresort}

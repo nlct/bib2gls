@@ -197,6 +197,7 @@ Discarding: {4}
 Discarding: {5}
 Replacement: {6}</entry>
 <entry key="warning.cant.find.parent">Parent ''{0}'' not found for entry {1}</entry>
+<entry key="warning.cant.find.parent.name">Can''t determine parent name for entry {0}</entry>
 <entry key="warning.field.clash">Field clash: {0} and {1}
 Ignoring {1}</entry>
 <entry key="warning.field.unsupported">Unsupported field: {0}

@@ -1,0 +1,17 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{color}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={no-interpret-preamble},
+ interpret-preamble=false]
+
+\GlsXtrLoadResources[src={strong},selection=all]
+
+\begin{document}
+
+\printunsrtglossaries
+\end{document}

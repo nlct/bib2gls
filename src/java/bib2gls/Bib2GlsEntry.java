@@ -665,9 +665,16 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      boolean nameFound = false;
+
       for (String field : fields)
       {
          BibValueList value = getField(field);
+
+         if (field.equals("name"))
+         {
+            nameFound = true;
+         }
 
          if (value != null)
          {
@@ -706,7 +713,21 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("name"))
       {
-         return fieldValues.get("parent");
+         // get the parent 
+
+         String parentid = fieldValues.get("parent");
+
+         if (parentid == null) return null;
+
+         Bib2GlsEntry parent = resource.getEntry(parentid);
+
+         if (parent == null) return null;
+
+         String value = parent.getFieldValue("name");
+
+         if (value != null) return value;
+
+         return parent.getFallbackValue("name");
       }
       else if (field.equals("sort"))
       {
@@ -794,7 +815,21 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("name"))
       {
-         return getField("parent");
+         // get the parent 
+
+         String parentid = fieldValues.get("parent");
+
+         if (parentid == null) return null;
+
+         Bib2GlsEntry parent = resource.getEntry(parentid);
+
+         if (parent == null) return null;
+
+         BibValueList value = parent.getField("name");
+
+         if (value != null) return value;
+
+         return parent.getFallbackContents("name");
       }
       else if (field.equals("sort"))
       {
