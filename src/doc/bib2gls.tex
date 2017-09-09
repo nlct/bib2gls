@@ -130,7 +130,7 @@ actual '='
 
 \newcommand*{\argor}{\texorpdfstring{\protect\textbar}{\string\|}}
 
-\newrobustcmd*{\texmeta}[1]{$\langle${\normalfont\emph{#1}}$\rangle$}
+\newrobustcmd*{\texmeta}[1]{{\normalfont\normalcolor$\langle$\emph{#1}$\rangle$}}
 
 \newcommand*{\meta}[1]{%
  \texorpdfstring{\texmeta{#1}}{#1}%
@@ -216,8 +216,8 @@ actual '='
   \texorpdfstring%
   {%
     \styoptfmt{#2\ifblank{#1}{}{\dequals\marg{#1}}}%
-    \index{package options\actual\protect\optfmt{#2}}%
-    \index{#2\actual\protect\optfmt{#2}}%
+    \index{package options!#2\actual\protect\styoptfmt{#2}}%
+    \index{#2\actual\protect\styoptfmt{#2}}%
   }%
   {#2\ifblank{#1}{}{=#1}}%
 }
@@ -238,12 +238,14 @@ actual '='
   {#1}%
 }%
 
+\newcommand*{\csopteqval}[1]{\csoptfmt{=\margm{#1}}}
+
 \newcommand*{\gencsopt}[3][]{%
   \texorpdfstring%
   {%
     \csoptfmt{#3\ifblank{#1}{}{\dequals\marg{#1}}}%
     \ifmainmatter
-      {\def\dhyphen{-}\index{#2\actual\protect\csfmt{#2}!#3\actual\protect\optfmt{#3}}}%
+      {\def\dhyphen{-}\index{#2\actual\protect\csfmt{#2}!#3\actual\protect\csoptfmt{#3}}}%
     \fi
   }%
   {#3\ifblank{#1}{}{=#1}}%
@@ -398,6 +400,12 @@ files}
 }
 \newcommand*{\csref}[1]{\nameref{cs.#1}}
 
+\newcounter{phantom}
+\newcommand*{\plabel}[2][]{\refstepcounter{phantom}%
+ {\def\@currentlabelname{#1}\label{#2}}%
+}
+\newcommand{\plabelcs}[1]{\plabel[\protect\cs{#1}]{cs.#1}}
+
 \makeatother
 
 \begin{document}
@@ -438,7 +446,7 @@ file can be managed in an application such as JabRef.
 
 If you already have a \ext{tex} file containing 
 entry definitions using commands like \cs{newglossaryentry}
-then you can use the supplementary tool \app{convertgls2bib}
+then you can use the supplementary tool \appfmt{convertgls2bib}
 to convert the entries to the \ext{bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
 \end{abstract}
@@ -1962,13 +1970,13 @@ For example:
   description={a \gls{vector}}
 }
 \end{verbatim}
-If the \field{name} field is omitted, the parent's \field{name} is used.
-
-If the \field{sort} field is omitted, \bibgls\ will sort according
-to the \field{name} field.
+If the \field{name} field is omitted it will be set from the
+parent's \field{name}. If the \field{sort} field is missing the
+default is obtained from the \field{name} field.
+(This can be overridden with \optref{sort-field}.)
 
 Terms defined using \atentry{entry} will be written to the output
-file using the command \csref{bibglsnewentry}.
+(\ext{glstex}) file using the command \csref{bibglsnewentry}.
 
 \section{\atentry{symbol}}
 \labelatentry{symbol}
@@ -1988,9 +1996,7 @@ The required fields are \field{name} or \field{parent}. The
 \field{description} field is required if the \field{name} field is
 missing. If the \field{sort} field is omitted, the default sort is
 given by the entry label. Note that this is different from
-\atentry{entry} where the sort defaults to \field{name} or
-\field{parent} if omitted. (You can use \optref{sort-field} to
-choose a different field.)
+\atentry{entry} where the sort defaults to \field{name} if omitted.
 
 Terms that are defined using \atentry{symbol} will be written to
 the output file using the command \csref{bibglsnewsymbol}.
@@ -2045,13 +2051,15 @@ glossary format to include the \field{user1} field:
 \section{\atentry{index}}
 \labelatentry{index}
 
-The \atentry{index} entry type is designed for entries that don't have
-a description. Only the label is required. If \field{name} is
-omitted, it's assumed to be the same as the label. However, this
-means that if the name contains any characters that can't be used in
-the label, you will need the \field{name} field. If the \field{sort}
-field is omitted, \bibgls\ will use the \field{name} field instead,
-if present, otherwise it will use the label.
+The \atentry{index} entry type is designed for entries that don't
+have a description. Only the label is required. If \field{name} is
+omitted, it's assumed to be the same as the label, even if
+\field{parent} is present. (Note this is different to the fallback
+behaviour of \atentry{entry}, which fetches the name from the parent
+entry.) However, this means that if the name contains any characters
+that can't be used in the label, you will need the \field{name}
+field. If the \field{sort} field is missing the
+default is obtained from the \field{name} field.
 
 Example:
 \begin{verbatim}
@@ -2074,6 +2082,8 @@ The \atentry{abbreviation} entry type is designed for abbreviations.
 The required fields are \field{short} and \field{long}. If the
 \field{sort} key is missing, \bibgls\ will use the value of the
 \field{short} field.
+You can also use \optref{short-case-change} to convert the case of
+the \field{short} field.
 
 Note that you must set the abbreviation style before loading the
 resource file to ensure that the abbreviations are defined
@@ -2082,13 +2092,12 @@ style so it doesn't know if the \field{description} field must be
 included or if the default \field{sort} value isn't simply the value
 of the \field{short} field.
 
-You can instruct \bibgls\ to use a specific field for the sort value
-using \optref{sort-field} and you can also tell \bibgls\ to ignore
-certain fields using the \optref{ignore-fields}, so you can
-include a \field{description} field if sometimes you need it and
-instruct \bibgls\ to ignore it when you don't want it.
-You can also use \optref{short-case-change} to convert the case of
-the \field{short} field.
+You can instruct \bibgls\ to sort by the \field{long} field instead
+using \optref[long]{sort-field}. You can also tell \bibgls\ to
+ignore certain fields using \optref{ignore-fields}, so you can
+include a \field{description} field in the \ext{bib} file if
+you sometimes need it, and then instruct \bibgls\ to ignore it when
+you don't want it.
 
 For example:
 \begin{verbatim}
@@ -2222,9 +2231,8 @@ You may need to add a mapping from \field{shortplural} to
 
 The required fields are: \field{short}, \field{long} and
 \field{description}. This entry type is designed to emulate the
-example \cs{newdualentry} command used in the
-\texttt{sample-dual.tex} file provided with the \sty{glossaries}
-package. The primary entry is an abbreviation with the given
+example \cs{newdualentry} command given in the \sty{glossaries}
+user manual. The primary entry is an abbreviation with the given
 \field{short} and \field{long} fields (but not the 
 \field{description}) and the secondary entry is a regular entry with
 the \field{name} copied from the \field{long} field.
@@ -2391,14 +2399,16 @@ field mappings are:
 \item \field{duallong} $\mapsto$ \field{long}
 \item \field{duallongplural} $\mapsto$ \field{longplural}
 \end{itemize}
-Entries provided using \atentry{dualabbreviation} will be defined
-with \csref{bibglsnewdualabbreviation}.
+Terms that are defined using \atentry{dualabbreviation} will be
+written to the output file using \csref{bibglsnewdualabbreviation}.
 
 If the \optref{dual-abbrv-backlink} option is on, the default field
 used for the backlinks is the \field{dualshort} field, so you'll need
 to make sure you adapt the glossary style to show that field. The
 simplest way to do this is through the category post description
-hook. For example, if the entries all have the \field{category} set
+hook.
+
+For example, if the entries all have the \field{category} set
 to \optfmt{abbreviation}, then this requires redefining
 \cs{glsxtrpostdescabbreviation}.
 
@@ -2467,7 +2477,7 @@ English: \gls{rna}; \gls{rna}.
 German: \gls{de.rna}; \gls{de.rna}.
 \end{verbatim}
 Another variation is to use the \abbrstyle{long-short-user}
-abbreviation style and modify \cs{glsxtruserfield} so that
+abbreviation style and modify the associated \cs{glsxtruserfield} so that
 the \field{duallong} field is selected for the parenthetical
 material:
 \begin{verbatim}
@@ -2496,8 +2506,7 @@ style:
 \end{alltt}
 This stores the dual description in the \field{user1} field,
 so this needs a mapping.
-
-The example document is much the same as the previous one, except
+The new example document is much the same as the previous one, except
 that the \optref{dual-abbrv-map} option is needed to include the 
 mapping between the \field{description} and \field{user1} fields:
 \begin{verbatim}
@@ -2615,7 +2624,7 @@ the location lists.)
 
 The \ext{glstex} resource files created by \bibgls\ are loaded in
 the document using
-\begin{definition}\labelcs{glsxtrresourcefile}
+\begin{definition}\plabelcs{glsxtrresourcefile}
 \cs{glsxtrresourcefile}\oargm{options}\margm{filename}
 \end{definition}
 where \meta{filename} is the name of the resource file without the
@@ -2712,6 +2721,7 @@ caterpillar, wombat) are defined when \csfmt{jobname}\filefmt{-1.glstex}
 is read. Since \cs{printunsrtglossary} simply iterates over all
 defined entries, this is the ordering used.
 
+\plabelcs{strong}%
 Note \bibgls\ allows \ext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentryref{preamble}.
 For example, suppose I have \filefmt{defs.bib} that just contains
@@ -2766,15 +2776,13 @@ Now when the sort value for \texttt{example} is obtained from
 \end{verbatim}
 no expansion occurs (since \csfmt{strong} and \csfmt{test} are
 unrecognised) so the sort value ends up as
-\begin{verbatim}
-stuffexample
-\end{verbatim}
+\texttt{stuffexample}
 which places \qt{\textbf{\color{red}example (stuff)}} between 
 \qt{sample} and \qt{test}, which is again incorrect.
 
 The best thing to do in this situation is to split the provided
-commands into two \ext{bib} files: one that should be interpreted
-and one that shouldn't.
+commands into two \ext{bib} files: one that shouldn't be interpreted
+and one that should.
 
 For example, \filefmt{defs-nointerpret.bib}:
 \begin{verbatim}
@@ -2808,7 +2816,7 @@ resource sets.
 \section{General Options}
 \label{sec:generalopts}
 
-\subsection{\csoptnv{charset}=\margm{encoding-name}}
+\subsection{\csoptnv{charset}\csopteqval{encoding-name}}
 \labelopt{charset}
 
 If the character encoding hasn't been supplied in the \ext{bib} file
@@ -2824,7 +2832,7 @@ a \ext{bib} managing systems, such as JabRef.
 See \argref{tex-encoding} for the encoding used to write the \ext{glstex}
 file.
 
-\subsection{\csoptnv{interpret-preamble}=\margm{boolean}}
+\subsection{\csoptnv{interpret-preamble}\csopteqval{boolean}}
 \labelopt{interpret-preamble}
 
 This is a boolean option that determines whether or not the
@@ -2834,7 +2842,7 @@ contents will still be written to the \ext{glstex} file, but any
 commands provided in the preamble won't be recognised if the
 interpreter is needed to determine an entry's sort value.
 
-\subsection{\csoptnv{set-widest}=\margm{boolean}}
+\subsection{\csoptnv{set-widest}\csopteqval{boolean}}
 \labelopt{set-widest}
 
 The \glostyle{alttree} glossary style needs to know the widest
@@ -2868,7 +2876,7 @@ will be appended to the glossary preamble for that type, otherwise
 it's simply set in the \ext{glstex} file and may be overridden
 later in the document if required.
 
-\subsection{\csoptnv{secondary}=\margm{list}}
+\subsection{\csoptnv{secondary}\csopteqval{list}}
 \labelopt{secondary}
 
 It may be that you want to display a glossary multiple times
@@ -2987,7 +2995,7 @@ For example, if the entries are stored in \filefmt{entries.bib}:
 ]
 \end{verbatim}
 
-\subsection{\csoptnv{secondary-sort-rule}=\margm{value}}
+\subsection{\csoptnv{secondary-sort-rule}\csopteqval{value}}
 \labelopt{secondary-sort-rule}
 
 As \optref{sort-rule} but for secondary custom sorting.
@@ -2995,7 +3003,7 @@ As \optref{sort-rule} but for secondary custom sorting.
 \section{Selection Options}
 \label{sec:selectionopts}
 
-\subsection{\csoptnv{src}=\margm{list}}
+\subsection{\csoptnv{src}\csopteqval{list}}
 \labelopt{src}
 
 This identifies the \ext{bib} files containing the entry
@@ -3038,7 +3046,7 @@ will assume \optfmt{src=\cs{jobname}}. Remember that subsequent uses
 of \cs{GlsXtrLoadResources} append a suffix, so in general it's
 best to always supply \csopt{src}.
 
-\subsection{\csoptnv{selection}=\margm{value}}
+\subsection{\csoptnv{selection}\csopteqval{value}}
 \labelopt{selection}
 
 By default all entries that have records in the \ext{aux} file will
@@ -3116,7 +3124,7 @@ is best avoided. A better method would be:
 The \csopt[recorded and deps and see]{selection} in this case will
 select all three entries, and the document won't send the reader on a
 long-winded detour.
-\subsection{\csoptnv{match}=\margm{\keyvallist}}
+\subsection{\csoptnv{match}\csopteqval{\keyvallist}}
 \labelopt{match}
 
 It's possible to filter the selection by matching field values.
@@ -3179,7 +3187,7 @@ list consists of patterns for unknown fields it will be
 treated as \csopt[\empty]{match}. That is, no filtering will be
 applied.
 
-\subsection{\csoptnv{match-op}=\margm{value}}
+\subsection{\csoptnv{match-op}\csopteqval{value}}
 \labelopt{match-op}
 
 If the value of \optref{match} contains more than one 
@@ -3188,7 +3196,7 @@ determines whether to apply a logical AND or a logical OR.
 The \meta{value} may be either \optfmt{and} or \optfmt{or}.
 The default is \csopt[and]{match-op}.
 
-\subsection{\csoptnv{flatten}=\margm{boolean}}
+\subsection{\csoptnv{flatten}\csopteqval{boolean}}
 \labelopt{flatten}
 
 This is a boolean option. The default value is
@@ -3203,7 +3211,7 @@ Note the difference between this option and using
 \csopt[parent]{ignore-fields} which will remove the dependency
 (unless a dependency is established through another field).
 
-\subsection{\csoptnv{flatten-lonely}=\margm{value}}
+\subsection{\csoptnv{flatten-lonely}\csopteqval{value}}
 \labelopt{flatten-lonely}
 
 This may take one of three values: \optfmt{false} (default),
@@ -3526,7 +3534,7 @@ instead of the corresponding \csfmt{bibglsflattenedchild...sort}.
 This defaults to just \meta{name}.
 
 
-\subsection{\csoptnv{flatten-lonely-rule}=\margm{value}}
+\subsection{\csoptnv{flatten-lonely-rule}\csopteqval{value}}
 \labelopt{flatten-lonely-rule}
 
 This option governs the rule used by \csopt{flatten-lonely} to
@@ -3667,7 +3675,7 @@ it has limitations (see below), so in complex cases (in particular
 different label prefixes combined with hierarchical entries or cross-references) you'll have to use
 the method shown in the example code above.
 
-\subsection{\csoptnv{master}=\margm{name}}
+\subsection{\csoptnv{master}\csopteqval{name}}
 \labelopt{master}
 
 This option will disable most of the options that relate to
@@ -3760,7 +3768,7 @@ then \filefmt{myarticle.tex} will need:
 a different abbreviation style for the dependent document, 
 but the category in the optional argument needs to be correct.
 
-\subsection{\csoptnv{master-resources}=\margm{list}}
+\subsection{\csoptnv{master-resources}\csopteqval{list}}
 \labelopt{master-resources}
 
 If the master document has multiple resource files
@@ -3791,7 +3799,7 @@ supplementary resource files (omitting the primary
 \section{Field and Label Options}
 \label{sec:labelopts}
 
-\subsection{\csoptnv{ignore-fields}=\margm{list}}
+\subsection{\csoptnv{ignore-fields}\csopteqval{list}}
 \labelopt{ignore-fields}
 
 The \csopt{ignore-fields} key indicates that you want \bibgls\ to
@@ -3821,7 +3829,7 @@ If you want to maintain the dependency and ancestor relationship but
 omit the \field{parent} field when writing the entries to the
 \ext{glstex} file, you need to use \optref{flatten} instead.
 
-\subsection{\csoptnv{category}=\margm{value}}
+\subsection{\csoptnv{category}\csopteqval{value}}
 \labelopt{category}
 
 The selected entries may all have their \field{category} field
@@ -3894,7 +3902,7 @@ have their \field{category} field set to \optfmt{dual} since the
 new definition of \cs{bibglsnewdualentry} has overridden
 the \csopt[animals]{category} option.
 
-\subsection{\csoptnv{type}=\margm{value}}
+\subsection{\csoptnv{type}\csopteqval{value}}
 \labelopt{type}
 
 The \meta{value} may be \optfmt{same as entry} or a glossary label.
@@ -3933,7 +3941,7 @@ Alternatively you can use \cs{newignoredglossary} if you don't
 want the glossary picked up by \cs{printunsrtglossaries}.
 
 
-\subsection{\csoptnv{label-prefix}=\margm{tag}}
+\subsection{\csoptnv{label-prefix}\csopteqval{tag}}
 \labelopt{label\dhyphen prefix}
 
 The \csopt{label-prefix} option prepends \meta{tag} to each
@@ -3981,7 +3989,7 @@ it's as though the entries had been defined as:
 Remember to use this prefix when you reference the terms in the
 document with commands like \cs{gls}.
 
-\subsection{\csoptnv{ext-prefixes}=\margm{list}}
+\subsection{\csoptnv{ext-prefixes}\csopteqval{list}}
 \labelopt{ext-prefixes}
 
 Any cross-references in the \ext{bib} file that start with
@@ -4076,7 +4084,7 @@ start of the labels in the entry definitions and will replace
 the \idprefix{ext1} prefix with \idprefixfmt{gls} in the
 cross-references.
 
-\subsection{\csoptnv{short-case-change}=\margm{value}}
+\subsection{\csoptnv{short-case-change}\csopteqval{value}}
 \labelopt{short-case-change}
 
 The value of the \field{short} field may be automatically converted
@@ -4118,7 +4126,7 @@ For example, suppose I have a slightly more eccentric definition:
 }
 \end{verbatim}
 then \csopt[uc]{short-case-change} would convert the value of the
-\field{short} field into
+\field{short} field into:
 \begin{verbatim}
 HT\emph{ML}
 \end{verbatim}
@@ -4159,10 +4167,23 @@ A\NoCaseChange{bc}D
 (This command is provided by \sty{textcase}, which is automatically
 loaded by \sty{glossaries}.)
 
+If you have a command that takes a label or identifier as an argument then it's
+best to hide the label in a custom command. For example, if the
+\field{short} field in the \ext{bib} definition is defined as:
+\begin{verbatim}
+  short = "ht\textcolor{red}{ml}",
+\end{verbatim}
+then with \csopt[uc]{short-case-change} this would end up as:
+\begin{verbatim}
+HT\textcolor{RED}{ML}
+\end{verbatim}
+which is incorrect. Instead, provide a command that hides the label
+(such as the \csfmt{strong} example described on page~\pageref{cs.strong}).
+
 See \optref{dual-short-case-change} to adjust the \field{dualplural}
 field.
 
-\subsection{\csoptnv{group}=\margm{value}}
+\subsection{\csoptnv{group}\csopteqval{value}}
 \labelopt{group}
 
 This option may only be used with the \argref{group} switch.
@@ -4184,7 +4205,7 @@ be grouped according to each instance of \cs{GlsXtrLoadResources},
 with the provided group label.
 The default behaviour is \csopt[auto]{group}.
 
-\subsection{\csoptnv{save-child-count}=\margm{boolean}}
+\subsection{\csoptnv{save-child-count}\csopteqval{boolean}}
 \labelopt{save-child-count}
 
 This is a boolean option. The default setting is
@@ -4265,23 +4286,25 @@ grouping.)
 Some languages, such as English, have a general rule that plurals
 are formed from the singular with a suffix appended. This isn't 
 an absolute rule. There are plenty of exceptions (for example,
-geese, children, churches, elves, fairies, sheep). The
-\sty{glossaries} package allows the \field{plural} key to be
-optional when defining entries. In some cases a plural may not make
-any sense (for example, the term is a symbol) and in some cases
-the plural may be identical to the singular.
+geese, children, churches, elves, fairies, sheep, mice), so a
+simplistic approach of just doing \texttt{\cs{gls}\margm{label}[s]}
+will sometimes produce inappropriate results, so the \sty{glossaries}
+package provides a \field{plural} key with the corresponding command
+\cs{glspl}.
 
-To make life easier for languages where the majority of plurals can
+In some cases a plural may not make any sense (for example, if the
+term is a verb or symbol), so the \field{plural} key is optional, but to
+make life easier for languages where the majority of plurals can
 simply be formed by appending a suffix to the singular, the
-\sty{glossaries} package sets lets the \field{plural} field default
+\sty{glossaries} package lets the \field{plural} field default
 to the value of the \field{text} field with \cs{glspluralsuffix}
 appended. This command is defined to be just the letter \qt{s}.
-This means that the majority of terms don't need to have the
+This means that the majority of terms in such languages don't need to have the
 \field{plural} supplied as well, and you only need to use it for the
 exceptions.
 
 For languages that don't have this general rule, the \field{plural}
-field will always need to be supplied, where needed.
+field will always need to be supplied for nouns.
 
 There are other plural fields, such as \field{firstplural},
 \field{longplural} and \field{shortplural}. Again, if you are using
@@ -4320,8 +4343,9 @@ abbreviation styles. This means that every time an abbreviation
 style is implemented, \cs{abbrvpluralsuffix} is redefined. Most
 styles simply define this command as:
 \begin{verbatim}
-\renewcommand*{\abbrvpluralsuffix}{\glspluralsuffix}
+\renewcommand*{\abbrvpluralsuffix}{\glsxtrabbrvpluralsuffix}
 \end{verbatim}
+where \cs{glsxtrabbrvpluralsuffix} expands to \cs{glspluralsuffix}.
 The \qt{sc} styles (such as \abbrstyle{long-short-sc}) use a different
 definition:
 \begin{verbatim}
@@ -4364,19 +4388,19 @@ Now just make sure all the French abbreviations are have their
 
 The other approach is to use the options listed below.
 
-\subsection{\csoptnv{short-plural-suffix}=\margm{value}}
+\subsection{\csoptnv{short-plural-suffix}\csopteqval{value}}
 \labelopt{short-plural-suffix}
 
-Sets the plural suffix for \field{shortplural} to \meta{value}.  If
+Sets the plural suffix for the default \field{shortplural} to \meta{value}.  If
 this option is omitted or if
 \csopt[use-default]{short\dhyphen plural-suffix}, then \bibgls\ will leave
 it to \sty{glossaries-extra} to determine the appropriate default.
 If the \meta{value} is omitted or empty, the suffix is set to empty.
 
-\subsection{\csoptnv{dual-short-plural-suffix}=\margm{value}}
+\subsection{\csoptnv{dual-short-plural-suffix}\csopteqval{value}}
 \labelopt{dual-short-plural-suffix}
 
-Sets the plural suffix for the \field{dualshortplural} field to
+Sets the plural suffix for the default \field{dualshortplural} field to
 \meta{value}.  If this option is omitted or if
 \csopt[use-default]{dual-short-plural-suffix}, then \bibgls\ will leave it to
 \sty{glossaries-extra} to determine the appropriate default.
@@ -4411,13 +4435,15 @@ by first fetching the list using \cs{glsfieldfetch}
 or through \sty{glossaries-extra}'s \cs{glsxtrfielddolistloop}
 or \cs{glsxtrfieldforlistloop} shortcuts).
 
-The \meta{format} is that supplied by the \gencsopt{gls}{format} key when using
-commands like \cs{gls} or \cs{glsadd}. If omitted,
+The \meta{format} is that supplied by the \gencsopt{gls}{format} key
+when using commands like \cs{gls} or \cs{glsadd} (the encapsulator or encap in
+\appfmt{makeindex} parlance). If omitted,
 \gencsopt[glsnumberformat]{gls}{format} is assumed (unless this
 default value is changed with \cs{GlsXtrSetDefaultNumberFormat},
 provided by \sty{glossaries-extra} v1.19+).
 
-Ranges can be explicitly formed using \glsopt[(]{format} and
+Ranges can be explicitly formed using the parenthetical encap
+syntax \glsopt[(]{format} and
 \glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
 \glsopt[)\meta{csname}]{format} (where \meta{csname} is the name of 
 a text-block command without the initial backslash) in the optional
@@ -4477,11 +4503,12 @@ want to drop front matter locations as well:
 \end{verbatim}
 
 Note that explicit range formations aren't discarded, so if
-\optfmt{glsignore} is used in a range
-(for example,
-\texttt{\csfmt{glsadd}[format\dequals(glsignore]\marg{sample}} 
-\ldots\ 
-\texttt{\csfmt{glsadd}[format\dequals)glsignore]\marg{sample}}) 
+\optfmt{glsignore} is used in a range, such as
+\begin{verbatim}
+\glsadd[format=(glsignore]{sample}
+... 
+\glsadd[format=)glsignore]{sample} 
+\end{verbatim}
 then the range will be included in the location list (encapsulated
 with \cs{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
@@ -4522,7 +4549,7 @@ is indexed twice on page 1:
 \glsxtr@record{cat}{}{page}{glsnumberformat}{1}
 \glsxtr@record{cat}{}{page}{glsnumberformat}{1}
 \end{verbatim}
-The second record is discarded. Only the first record is added
+then the second record is discarded. Only the first record is added
 to the location list.
 
 Partial duplicates, where all arguments match except for
@@ -4564,9 +4591,9 @@ according to the glossary style (and other factors, such as whether the
 \styopt{nonumberlist} option has been used, either as a package
 option or supplied in the optional argument of \cs{printunsrtglossary}).
 For more information on adjusting the formatting see the
-\sty{glossaries} and \sty{glossaries-extra} manual.
+\sty{glossaries} and \sty{glossaries-extra} user manuals.
 
-\subsection{\csoptnv{save-locations}=\margm{boolean}}
+\subsection{\csoptnv{save-locations}\csopteqval{boolean}}
 \labelopt{save-locations}
 
 By default, the locations will be processed and stored in the
@@ -4580,7 +4607,7 @@ you're not additionally using \app{makeindex} or \app{xindy}, then
 the locations won't be available even if you don't have the
 \styopt{nonumberlist} option set.
 
-\subsection{\csoptnv{min-loc-range}=\margm{value}}
+\subsection{\csoptnv{min-loc-range}\csopteqval{value}}
 \labelopt{min-loc-range}
 
 By default, three or more consecutive locations \meta{loc-1},
@@ -4764,7 +4791,7 @@ location set to 1 and the second location set to 2.
 \texttt{@} to allow for internal commands in locations.)
 \end{enumerate}
 
-\subsection{\csoptnv{max-loc-diff}=\margm{value}}
+\subsection{\csoptnv{max-loc-diff}\csopteqval{value}}
 \labelopt{max-loc-diff}
 
 This setting is used to determine whether two locations are
@@ -4807,7 +4834,7 @@ the list becomes \qt{1--12 passim, 58--61 passim} which now highlights that
 there are two blocks within the document related to that
 term.
 
-\subsection{\csoptnv{suffixF}=\margm{value}}
+\subsection{\csoptnv{suffixF}\csopteqval{value}}
 \labelopt{suffixF}
 
 If set, a range consisting of two consecutive locations 
@@ -4820,7 +4847,7 @@ empty string. To remove the suffix formation use
 
 The default is \csopt[none]{suffixF}.
 
-\subsection{\csoptnv{suffixFF}=\margm{value}}
+\subsection{\csoptnv{suffixFF}\csopteqval{value}}
 \labelopt{suffixFF}
 
 If set, a range consisting of three or more consecutive locations 
@@ -4833,7 +4860,7 @@ empty string. To remove the suffix formation use
 
 The default is \csopt[none]{suffixFF}.
 
-\subsection{\csoptnv{see}=\margm{value}}
+\subsection{\csoptnv{see}\csopteqval{value}}
 \labelopt{see}
 
 If an entry has a \field{see} field, this can be placed before or
@@ -4855,7 +4882,7 @@ provided by \csref{bibglsseesep}. This separator is omitted if the
 location list is empty. The cross-reference is written to the
 \field{location} field using \cs{glsxtrusesee}\margm{label}.
 
-\subsection{\csoptnv{seealso}=\margm{value}}
+\subsection{\csoptnv{seealso}\csopteqval{value}}
 \labelopt{seealso}
 
 This is like \optref{see} but governs the location of the cross-references
@@ -4865,7 +4892,7 @@ same as for \optref{see} but the separator is given by
 \csref{bibglsseealsosep}. The cross-reference is written to the
 \field{location} field using \cs{glsxtruseseealso}\margm{label}.
 
-\subsection{\csoptnv{alias-loc}=\margm{value}}
+\subsection{\csoptnv{alias-loc}\csopteqval{value}}
 \labelopt{alias-loc}
 
 If an entry has an \field{alias} field, the location list
@@ -4890,7 +4917,7 @@ entry and the target entry must be in the same resource set.
 nothing if the location lists aren't showing correctly
 with aliased entries. (This was corrected in version 1.13.)
 
-\subsection{\csoptnv{loc-prefix}=\margm{value}}
+\subsection{\csoptnv{loc-prefix}\csopteqval{value}}
 \labelopt{loc-prefix}
 
 The \csopt{loc-prefix} setting indicates that the location lists
@@ -4962,7 +4989,7 @@ then \csopt[true]{loc-prefix} takes precedence over
 fetched from both \texttt{entries2.bib} and \texttt{entries3.bib}
 have the location prefixes obtained from the language resource file.
 
-\subsection{\csoptnv{loc-suffix}=\margm{value}}
+\subsection{\csoptnv{loc-suffix}\csopteqval{value}}
 \labelopt{loc-suffix}
 
 This is similar to \optref{loc-prefix} but there are some subtle
@@ -4990,7 +5017,7 @@ The default is \csopt[false]{loc-suffix}.
 As with \optref{loc-prefix}, take care not to mix different values
 of \csopt{loc-suffix} for entries in the same glossary type.
 
-\subsection{\csoptnv{loc-counters}=\margm{list}}
+\subsection{\csoptnv{loc-counters}\csopteqval{list}}
 \labelopt{loc-counters}
 
 Commands like \cs{gls} allow you to select a different 
@@ -5081,7 +5108,7 @@ you can't form counter groups from
 
 \emph{These options require at least version 1.14 of \sty{glossaries-extra}.}
 
-\subsection{\csoptnv{supplemental-locations}=\margm{basename}}
+\subsection{\csoptnv{supplemental-locations}\csopteqval{basename}}
 \labelopt{supplemental-locations}
 
 The \sty{glossaries-extra} package (from v1.14) provides a way of
@@ -5183,7 +5210,7 @@ recognise the destination within that file.)
 The supplementary locations lists are encapsulated within
 \cs{bibglssupplemental}.
 
-\subsection{\csoptnv{supplemental-selection}=\margm{value}}
+\subsection{\csoptnv{supplemental-selection}\csopteqval{value}}
 \labelopt{supplemental-selection}
 
 In the above example, only the \texttt{sample} entry is listed in
@@ -5241,7 +5268,7 @@ If an entry has both a main location list and a supplementary
 location list (such as the \texttt{sample} entry above), the lists
 will be separated by \csref{bibglssupplementalsep}.
 
-\subsection{\csoptnv{supplemental-category}=\margm{value}}
+\subsection{\csoptnv{supplemental-category}\csopteqval{value}}
 \labelopt{supplemental-category}
 
 The \optfmt{category} for entries containing supplemental location
@@ -5283,7 +5310,7 @@ the proof or solution. Therefore, somewhat unusually for
 an indexing application, \bibgls\ also provides the option
 to shuffle the entries instead of sorting them.
 
-\subsection{\csoptnv{sort}=\margm{value}}
+\subsection{\csoptnv{sort}\csopteqval{value}}
 \labelopt{sort}
 
 The \csopt{sort} key indicates how entries should be sorted. The
@@ -5404,7 +5431,7 @@ For example:
 \GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
 \end{verbatim}
 
-\subsection{\csoptnv{sort-rule}=\margm{value}}
+\subsection{\csoptnv{sort-rule}\csopteqval{value}}
 \labelopt{sort-rule}
 
 If the \optref[custom]{sort} option is used, the sort rule
@@ -5438,7 +5465,7 @@ digit), but \bibgls\ will accept a single space between \cs{u} and
 If \optref{sort} is not set to \optfmt{custom}, the
 \optfmt{sort-rule} setting will be ignored.
 
-\subsection{\csoptnv{break-at}=\margm{option}}
+\subsection{\csoptnv{break-at}\csopteqval{option}}
 \labelopt{break-at}
 
 The rule-based sort options (\csopt[\meta{lang tag}]{sort}
@@ -5475,7 +5502,7 @@ This option is ignored when used with the non-locale \csopt{sort} options.
 Use the \argref{debug} switch to show the break points.
 (This will also show the collation rule.)
 
-\subsection{\csoptnv{break-marker}=\margm{marker}}
+\subsection{\csoptnv{break-marker}\csopteqval{marker}}
 \labelopt{break-marker}
 
 The break marker can be changed using
@@ -5488,7 +5515,7 @@ inter-word punctuation. For example, with
 \texttt{sealion}. If \meta{marker} is omitted,
 \csopt[\empty]{break-marker} is assumed.
 
-\subsection{\csoptnv{sort-field}=\margm{field}}
+\subsection{\csoptnv{sort-field}\csopteqval{field}}
 \labelopt{sort-field}
 
 The \csopt{sort-field} key indicates which field provides the sort
@@ -5519,14 +5546,14 @@ field.
 
 If no fallback field can be found, the entry's label will be used.
 
-\subsection{\csoptnv{shuffle}=\margm{seed}}
+\subsection{\csoptnv{shuffle}\csopteqval{seed}}
 \labelopt{shuffle}
 
 Automatically sets \csopt[random]{sort} and \csopt{flatten}.
 The value \meta{seed} may be omitted. If present, it should
 be an integer used as a seed for the random number generator.
 
-\subsection{\csoptnv{strength}=\margm{value}}
+\subsection{\csoptnv{strength}\csopteqval{value}}
 \labelopt{strength}
 
 The collation strength used by \csopt[\meta{locale}]{sort} can be set
@@ -5585,7 +5612,7 @@ If the strength is changed to \optfmt{tertiary} or
 
 This option is ignored by non-locale sorts (such as letter or numeric).
 
-\subsection{\csoptnv{decomposition}=\margm{value}}
+\subsection{\csoptnv{decomposition}\csopteqval{value}}
 \labelopt{decomposition}
 
 The collation decomposition used by \csopt[\meta{locale}]{sort} can be set
@@ -5601,7 +5628,7 @@ This option is ignored by non-locale sorts (such as letter or numeric).
 
 \section{Dual Entries}
 
-\subsection{\csoptnv{dual-sort}=\margm{value}}
+\subsection{\csoptnv{dual-sort}\csopteqval{value}}
 \labelopt{dual-sort}
 
 This option indicates how to sort the dual entries. The primary
@@ -5644,19 +5671,19 @@ all according to the \optfmt{en-GB} locale (British English).
 If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
 \meta{value} is omitted, \optfmt{locale} is assumed.
 
-\subsection{\csoptnv{dual-sort-field}=\margm{value}}
+\subsection{\csoptnv{dual-sort-field}\csopteqval{value}}
 \labelopt{dual-sort-field}
 
 This option indicates the field to use when sorting dual entries
 (when they haven't been combined with the primary entries). The
 default value is the same as the \optref{sort-field} value.
 
-\subsection{\csoptnv{dual-sort-rule}=\margm{value}}
+\subsection{\csoptnv{dual-sort-rule}\csopteqval{value}}
 \labelopt{dual-sort-rule}
 
 As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
 
-\subsection{\csoptnv{dual-prefix}=\margm{value}}
+\subsection{\csoptnv{dual-prefix}\csopteqval{value}}
 \labelopt{dual-prefix}
 
 This option indicates the prefix to use for the dual entries. The
@@ -5665,7 +5692,7 @@ Any references to dual entries within the \ext{bib} file should use
 the prefix \idprefix{dual} which will be replaced by \meta{value}
 when the \ext{bib} file is parsed.
 
-\subsection{\csoptnv{dual-type}=\margm{value}}
+\subsection{\csoptnv{dual-type}\csopteqval{value}}
 \labelopt{dual-type}
 
 This option sets the \field{type} field for all dual
@@ -5709,7 +5736,7 @@ Alternatively:
  dual-type={same as primary}]
 \end{verbatim}
 
-\subsection{\csoptnv{dual-category}=\margm{value}}
+\subsection{\csoptnv{dual-category}\csopteqval{value}}
 \labelopt{dual-category}
 
 This option sets the \field{category} field for all dual
@@ -5736,7 +5763,7 @@ remain unchanged.
 \item \meta{label}: sets the \field{category} field to \meta{label}.
 \end{itemize}
 
-\subsection{\csoptnv{dual-short-case-change}=\margm{value}}
+\subsection{\csoptnv{dual-short-case-change}\csopteqval{value}}
 \labelopt{dual-short-case-change}
 
 As \optref{short-case-change} but applies to the \field{dualshort}
@@ -5864,7 +5891,7 @@ dual-symbol-map=
 This essentially flips the \field{name} field with the
 \field{symbol} field.
 
-\subsection{\csoptnv{dual-entry-backlink}=\margm{boolean}}
+\subsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
 \labelopt{dual-entry-backlink}
 
 This is a boolean setting.
@@ -5917,27 +5944,27 @@ is selected, which also happens to be the \field{description} field,
 so the hyperlink for the primary entry is put in the
 \field{description} field.
 
-\subsection{\csoptnv{dual-abbrv-backlink}=\margm{boolean}}
+\subsection{\csoptnv{dual-abbrv-backlink}\csopteqval{boolean}}
 \labelopt{dual-abbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualabbreviation} instead of
 \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-symbol-backlink}=\margm{boolean}}
+\subsection{\csoptnv{dual-symbol-backlink}\csopteqval{boolean}}
 \labelopt{dual-symbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-entryabbrv-backlink}=\margm{boolean}}
+\subsection{\csoptnv{dual-entryabbrv-backlink}\csopteqval{boolean}}
 \labelopt{dual-entryabbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualentryabbreviation} instead of
 \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-backlink}=\margm{boolean}}
+\subsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
 \labelopt{dual-backlink}
 
 Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
@@ -5945,7 +5972,7 @@ Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink},
 \csopt[\meta{boolean}]{dual-abbrv-backlink}, and
 \csopt[\meta{boolean}]{dual-symbol-backlink}.
 
-\subsection{\csoptnv{dual-field}=\margm{value}}
+\subsection{\csoptnv{dual-field}\csopteqval{value}}
 \labelopt{dual-field}
 
 If this option is used, this will add \cs{glsxtrprovidestoragekey}
@@ -6718,7 +6745,7 @@ the entry has a \field{group} field and comparing it to the previous
 entry's \field{group} field. 
 
 The collators used by the locale and letter-based rules save the
-following information for each entry based on the first letter of
+following information for each entry based on the first significant letter of
 the \field{sort} field (if the letter is recognised as alphabetical,
 according to the rule):
 \begin{itemize}
@@ -7019,21 +7046,21 @@ The default definition simply does \meta{name}.
 This command is used if the child and parent name's are identical.
 For example, suppose the \ext{bib} file contains:
 \begin{verbatim}
-@index{glossary}
+@index{super.glossary, name={glossary}}
 
 @entry{glossarycol,
-  parent={glossary},
+  parent={super.glossary},
   description={collection of glosses}
 }
 
 @entry{glossarylist,
-  parent={glossary},
+  parent={super.glossary},
   description={list of technical words}
 }
 \end{verbatim}
-The child entries don't have a \field{name} field, so it's assumed
-to be the same as the parent field. Here's an example document where
-both child entries are used:
+The child entries don't have a \field{name} field, so the value is assumed
+to be the same as the parent's \field{name} field. Here's an example 
+document where both child entries are used:
 \begin{verbatim}
 \documentclass{article}
 
@@ -7068,11 +7095,10 @@ but in this case it would look a little odd for the name to
 appear as \qt{glossary, glossary} so instead the name is
 set to
 \begin{verbatim}
-\bibglsflattenedhomograph{glossary}{glossary}
+\bibglsflattenedhomograph{glossary}{super.glossary}
 \end{verbatim}
-(where the first argument is the name and the second argument is the
-label of the parent entry, which just happens to be the same in this
-case).
+(where the first argument is the original name and the second argument is the
+label of the parent entry).
 
 This means that the name simply appears as \qt{glossary}, even if
 the \optref[postsort]{flatten-lonely} option is used. Note that if
