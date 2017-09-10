@@ -8,8 +8,8 @@ StackExchange](http://tex.stackexchange.com/a/343852/19862).)
 This application requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
 (2017-02-03). (Although newer versions are recommended.)
-The main home page is http://www.dickimaw-books.com/software/bib2gls/
-which includes links to binaries.
+The main home page is [`dickimaw-books.com/software/bib2gls`](http://www.dickimaw-books.com/software/bib2gls/).
+The latest stable version is on [CTAN](https://ctan.org/pkg/bib2gls).
 
 If you already have a `.tex` file containing lots of
 definitions using `\newglossaryentry`,
