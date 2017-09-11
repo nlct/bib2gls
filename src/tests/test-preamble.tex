@@ -1,10 +1,13 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: {group: on}
 % arara: pdflatex
 \documentclass{article}
 
 \usepackage{color}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\renewcommand{\glstreenamefmt}[1]{#1}
+\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
 
 \GlsXtrLoadResources[src={no-interpret-preamble},
  interpret-preamble=false]

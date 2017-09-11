@@ -3,17 +3,22 @@
 % arara: pdflatex
 \documentclass{article}
 
-\usepackage[record,style=indexgroup]{glossaries-extra}
+\usepackage[record,stylemods={mcols},style=mcolindexgroup]{glossaries-extra}
 
 \GlsXtrLoadResources[src={test-children},
-  category=general,
+  %category=general,
   %flatten-lonely=presort,
   flatten-lonely=postsort,
   %flatten-lonely-rule=only unrecorded parents,
-  %flatten-lonely-rule=discard unrecorded,
+  flatten-lonely-rule=discard unrecorded,
   %flatten-lonely-rule=no discard,
   %save-child-count
 ]
+
+
+% adjust indexgroup style:
+\renewcommand{\glstreenamefmt}[1]{#1}
+\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
 
 %\renewcommand{\glsxtrpostdescgeneral}{%
 %  \glsxtrifhasfield{childcount}{\glscurrententrylabel}

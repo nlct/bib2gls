@@ -1,8 +1,15 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
 \documentclass{report}
 
 \usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,symbols,nogroupskip,postdot,style=alttree]{glossaries-extra}
+\usepackage[record,
+ %debug=showtargets,
+ symbols,nogroupskip,postdot,style=alttree]{glossaries-extra}
+
+\renewcommand*{\glsshowtarget}[1]{\mbox{[\texttt{\small #1}]}}
 
 \newcommand*{\set}[1]{\mathcal{#1}}
 \newcommand*{\card}[1]{|#1|}
@@ -37,10 +44,16 @@
                        % to the entry label.
 ]
 
+\let\orgglossentrydesc\glossentrydesc
+\newcommand*{\summarydesc}[1]{%
+  {\def\glolinkprefix{glo:}\orgglossentrydesc{#1}}%
+}
+
 \newcommand*{\printsummary}{%
  \printunsrtglossary*[type=copies,nonumberlist,target=false,title=Summary]{%
     \printunsrtglossaryunitsetup{chapter}%
     \renewcommand*{\glossarysection}[2][]{\section*{##2}}%
+    \appto\glossarypreamble{\let\glossentrydesc\summarydesc}%
     \appto\glossarypostamble{\endgraf\noindent\hrulefill
        \endgraf\medskip\endgraf}%
  }%

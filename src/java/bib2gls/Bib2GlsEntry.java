@@ -571,6 +571,17 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      if (resource.changeDescriptionCase())
+      {
+         BibValueList value = getField("description");
+
+         if (value != null)
+         {
+            putField("description", 
+               resource.applyDescriptionCaseChange(parser, value));
+         }
+      }
+
       if (resource.changeDualShortCase())
       {
          BibValueList value = getField("dualshort");
@@ -665,16 +676,9 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      boolean nameFound = false;
-
       for (String field : fields)
       {
          BibValueList value = getField(field);
-
-         if (field.equals("name"))
-         {
-            nameFound = true;
-         }
 
          if (value != null)
          {
@@ -703,6 +707,33 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       checkRequiredFields(parser);
+
+      // the name can't have its case changed until it's been
+      // checked and been assigned a fallback if not present.
+
+      if (resource.changeNameCase())
+      {
+         BibValueList value = getField("name");
+
+         if (value != null)
+         {
+            BibValueList textValue = getField("text");
+
+            if (textValue == null)
+            {
+               putField("text", value);
+               putField("text", value.expand(parser).toString(parser));
+            }
+
+            value = resource.applyNameCaseChange(parser, value);
+
+            TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
+
+            putField("name", value);
+            putField("name", list.toString(parser));
+         }
+      }
+
    }
 
    public String getFallbackValue(String field)

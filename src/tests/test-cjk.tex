@@ -13,9 +13,16 @@
 \glsnoexpandfields
 
 \newcommand*{\englishlettergroup}[1]{#1}
-\newcommand*{\japaneselettergroup}[1]{\cjkname{#1}}
+\newcommand*{\japaneselettergroup}{\cjklettergroup}
+\newcommand*{\cjklettergroup}[1]{\cjkname{#1}}
+
 \newcommand{\bibglslettergrouptitle}[4]{%
- \unexpanded{\csuse{#4lettergroup}{#1}}}
+ \unexpanded{%
+   \ifcsdef{#4lettergroup}%
+   {\csuse{#4lettergroup}{#1}}%
+   {\cjklettergroup{#1}}%
+ }%
+}
 
 \GlsXtrLoadResources[
   src=testcjk,% bib file

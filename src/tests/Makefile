@@ -15,7 +15,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-match-entrytype.pdf test-digraphs.pdf \
 	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
-	  test-cjk.pdf test-other.pdf test-homograph.pdf
+	  test-cjk.pdf test-other.pdf test-homograph.pdf \
+	  test-abbrv.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -279,6 +280,13 @@ test-homograph.pdf	: test-homograph.glstex
 test-homograph.glstex	: test-homograph.tex $(DEPS) test-homograph.bib
 		pdflatex test-homograph
 		$(BIB2GLS) test-homograph
+
+test-abbrv.pdf	: test-abbrv.glstex
+		pdflatex test-abbrv
+
+test-abbrv.glstex	: test-abbrv.tex $(DEPS) entries-abbrv.bib
+		pdflatex test-abbrv
+		$(BIB2GLS) test-abbrv
 
 clean	:
 	$(RM) *.aux

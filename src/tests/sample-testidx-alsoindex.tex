@@ -20,9 +20,14 @@
 
 \makeglossaries
 
-% xindy will be used to sort
+% xindy will be used to sort.
 % bib2gls is just being used to allow entries to be stored in a bib
 % file
+% This document will result in pdfTeX warnings for entries
+% cs.footnote and index because their sort values are identical 
+% to the sort values of the footnote and cs.index entries.
+% (xindy merges entries with identical sort values.)
+
 \GlsXtrLoadResources[ 
   src={testidx-glossaries-mathsym,testidx-glossaries-markers,
     testidx-glossaries-numbers,\tstidxbasebibfiles,

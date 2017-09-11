@@ -4092,12 +4092,34 @@ to upper or lower case. This option may take one of the following
 values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
-\item \optfmt{lc}: convert to lower case;
-\item \optfmt{uc}: convert to upper case;
+\item \optfmt{lc}: convert to lower case (ignoring 
+\texttt{\$\meta{maths}\$}, \cs{ensuremath}\margm{maths} 
+and \cs{si}\margm{text});
+\item \optfmt{uc}: convert to upper case (ignoring 
+\texttt{\$\meta{maths}\$}, \cs{ensuremath}\margm{maths} 
+and \cs{si}\margm{text});
 \item \optfmt{lc-cs}: convert to lower case using
 \cs{MakeTextLowercase};
 \item \optfmt{uc-cs}: convert to upper case using
-\cs{MakeTextUppercase}.
+\cs{MakeTextUppercase};
+\item \optfmt{firstuc-cs}: convert to first letter upper case using
+\cs{makefirstuc};
+\item \optfmt{firstuc}: convert the first alphabetical letter (or
+group) to upper case. This uses the following rules:
+\begin{enumerate}
+\item if \texttt{\$\meta{maths}\$} then stop (no case change);
+\item if \cs{NoCaseChange}\margm{text} or
+\cs{ensuremath}\margm{maths} or \cs{si}\margm{text} then skip;
+\item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
+\meta{text} and stop;
+\item if \csfmt{}\meta{csname} isn't followed by a group and it's
+not \cs{protect}, then stop (no case change applied);
+\item if \margm{text} (a group) then convert the entire contents of
+\meta{text} to upper case and stop;
+\item if \meta{character} is an alphabetic character then change it
+to its title case and stop;
+\item otherwise skip.
+\end{enumerate}
 \end{itemize}
 
 For example, if the \ext{bib} file contains
@@ -4180,8 +4202,80 @@ HT\textcolor{RED}{ML}
 which is incorrect. Instead, provide a command that hides the label
 (such as the \csfmt{strong} example described on page~\pageref{cs.strong}).
 
+The first letter upper casing \csopt[firstuc]{short-case-change}
+is slightly more complicated. The simplest case is where
+the field only contains alphabetical characters. For example,
+suppose the \field{short} field is defined as:
+\begin{verbatim}
+short={html}
+\end{verbatim}
+then with \csopt[firstuc]{short-case-change} this would end up as
+\texttt{Html} whereas 
+\begin{verbatim}
+short={{ht}ml}
+\end{verbatim}
+would end up as \texttt{HTml} since it detects the grouping. 
+(You'll need to do this for the Dutch digraph \qt{ij}.)
+Note that \cs{NoCaseChange} is skipped, and the case change is
+applied to the material following its argument. For example,
+suppose the \field{short} field is defined as:
+\begin{verbatim}
+short={\NoCaseChange{h}tml}
+\end{verbatim}
+then the result is
+\begin{verbatim}
+\NoCaseChange{h}Tml
+\end{verbatim}
+whereas with
+\begin{verbatim}
+short={{}html}
+\end{verbatim}
+then the result is just \texttt{html}. If a command is followed by 
+a group then the case change is applied to the group (unless the
+command is \cs{NoCaseChange}, \cs{ensuremath} or \cs{si}). For
+example,
+suppose the \field{short} field is defined as:
+\begin{verbatim}
+short={\emph{ht}ml}
+\end{verbatim}
+then the result is
+\begin{verbatim}
+\emph{Ht}ml
+\end{verbatim}
+If a command isn't followed by a group (and it's not \cs{protect})
+then no change occurs. For example, 
+suppose the \field{short} field is defined as:
+\begin{verbatim}
+short={\ae html}
+\end{verbatim}
+then the result is
+\begin{verbatim}
+\ae html
+\end{verbatim}
+whereas with
+\begin{verbatim}
+short={\protect html}
+\end{verbatim}
+the result is
+\begin{verbatim}
+\protect Html
+\end{verbatim}
+
 See \optref{dual-short-case-change} to adjust the \field{dualplural}
 field.
+
+\subsection{\csoptnv{name-case-change}\csopteqval{value}}
+\labelopt{name-case-change}
+
+As \optref{short-case-change} but is applied to the \field{name}
+field. If the \field{text} field hasn't been set, the \field{name}
+value is first copied to the \field{text} field.
+
+\subsection{\csoptnv{description-case-change}\csopteqval{value}}
+\labelopt{description-case-change}
+
+As \optref{short-case-change} but is applied to the
+\field{description} field.
 
 \subsection{\csoptnv{group}\csopteqval{value}}
 \labelopt{group}

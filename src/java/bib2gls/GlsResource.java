@@ -134,15 +134,25 @@ public class GlsResource
                supplementalSelection = null;
             }
          }
+         else if (opt.equals("name-case-change"))
+         {
+            nameCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
+         }
+         else if (opt.equals("description-case-change"))
+         {
+            descCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
+         }
          else if (opt.equals("short-case-change"))
          {
             shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs");
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
          }
          else if (opt.equals("dual-short-case-change"))
          {
             dualShortCaseChange = getChoice(parser, list, opt,
-              "none", "lc", "uc", "lc-cs", "uc-cs");
+              "none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
          }
          else if (opt.equals("short-plural-suffix"))
          {
@@ -1009,6 +1019,18 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "supplemental-locations"));
+      }
+
+      if (nameCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "name-case-change"));
+      }
+
+      if (descCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "description-case-change"));
       }
 
       if (shortCaseChange != null)
@@ -4228,6 +4250,16 @@ public class GlsResource
       return !matches;
    }
 
+   public boolean changeNameCase()
+   {
+      return nameCaseChange != null;
+   }
+
+   public boolean changeDescriptionCase()
+   {
+      return descCaseChange != null;
+   }
+
    public boolean changeShortCase()
    {
       return shortCaseChange != null;
@@ -4238,14 +4270,30 @@ public class GlsResource
       return dualShortCaseChange != null;
    }
 
+   public BibValueList applyNameCaseChange(TeXParser parser, 
+      BibValueList value)
+    throws IOException
+   {
+      return applyCaseChange(parser, value, nameCaseChange);
+   }
+
+   public BibValueList applyDescriptionCaseChange(TeXParser parser, 
+      BibValueList value)
+    throws IOException
+   {
+      return applyCaseChange(parser, value, descCaseChange);
+   }
+
    public BibValueList applyShortCaseChange(TeXParser parser, 
       BibValueList value)
+    throws IOException
    {
       return applyCaseChange(parser, value, shortCaseChange);
    }
 
    public BibValueList applyDualShortCaseChange(TeXParser parser,
       BibValueList value)
+    throws IOException
    {
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
@@ -4270,23 +4318,28 @@ public class GlsResource
          {
             toLowerCase((TeXObjectList)object);
          }
-         else if (object instanceof ControlSequence
-                && ((ControlSequence)object).getName().equals("NoCaseChange"))
+         else if (object instanceof ControlSequence)
          {
-            // skip argument
+            String csname = ((ControlSequence)object).getName();
 
-            i++;
-
-            while (i < n)
+            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
+                 || csname.equals("si"))
             {
-               object = list.get(i);
-
-               if (!(object instanceof Ignoreable))
-               {
-                  break;
-               }
+               // skip argument
 
                i++;
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
             }
          }
       }
@@ -4308,14 +4361,76 @@ public class GlsResource
                ((CharObject)object).setCharCode(codePoint);
             }
          }
+         else if (object instanceof MathGroup)
+         {// skip
+            continue;
+         }
          else if (object instanceof TeXObjectList)
          {
             toUpperCase((TeXObjectList)object);
          }
-         else if (object instanceof ControlSequence
-                && ((ControlSequence)object).getName().equals("NoCaseChange"))
+         else if (object instanceof ControlSequence)
          {
-            // skip argument
+            String csname = ((ControlSequence)object).getName();
+
+            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
+                 || csname.equals("si"))
+            {
+               // skip argument
+
+               i++;
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+            }
+         }
+      }
+   }
+
+   private void toSentenceCase(TeXObjectList list)
+   {
+      for (int i = 0, n = list.size(); i < n; i++)
+      {
+         TeXObject object = list.get(i);
+
+         if (object instanceof CharObject)
+         {
+            int codePoint = ((CharObject)object).getCharCode();
+
+            if (Character.isAlphabetic(codePoint))
+            {
+               codePoint = Character.toTitleCase(codePoint);
+               ((CharObject)object).setCharCode(codePoint);
+
+               return;
+            }
+         }
+         else if (object instanceof MathGroup)
+         {
+            return;
+         }
+         else if (object instanceof Group)
+         {
+            // upper case group contents
+
+            toUpperCase((TeXObjectList)object);
+
+            return;
+         }
+         else if (object instanceof ControlSequence)
+         {
+            String csname = ((ControlSequence)object).getName();
+
+            if (csname.equals("protect")) continue;
 
             i++;
 
@@ -4330,16 +4445,35 @@ public class GlsResource
 
                i++;
             }
+
+            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
+                || csname.equals("si") )
+            {
+               continue;
+            }
+
+            // if a group follows the command, title case the group
+            // otherwise finish.
+
+            if (object instanceof Group && !(object instanceof MathGroup))
+            {
+               // title case argument
+
+               toSentenceCase((TeXObjectList)object);
+            }
+
+            return;
          }
       }
    }
 
    public BibValueList applyCaseChange(TeXParser parser,
       BibValueList value, String change)
+    throws IOException
    {
       if (change == null) return value;
 
-      TeXObjectList list = (TeXObjectList)value.getContents(true);
+     TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
 
       BibValueList bibList = new BibValueList();
 
@@ -4361,6 +4495,15 @@ public class GlsResource
          list.add(new TeXCsRef("MakeTextUppercase"));
          list.add(grp);
       }
+      else if (change.equals("firstuc-cs"))
+      {
+         Group grp = parser.getListener().createGroup();
+         grp.addAll(list);
+
+         list = new TeXObjectList();
+         list.add(new TeXCsRef("makefirstuc"));
+         list.add(grp);
+      }
       else if (change.equals("lc"))
       {
          toLowerCase(list);
@@ -4368,6 +4511,10 @@ public class GlsResource
       else if (change.equals("uc"))
       {
          toUpperCase(list);
+      }
+      else if (change.equals("firstuc"))
+      {
+         toSentenceCase(list);
       }
       else
       {
@@ -4547,6 +4694,8 @@ public class GlsResource
 
    private String shortCaseChange=null;
    private String dualShortCaseChange=null;
+   private String nameCaseChange=null;
+   private String descCaseChange=null;
 
    private String masterLinkPrefix=null;
    private Vector<TeXPath> masterGlsTeXPath = null;

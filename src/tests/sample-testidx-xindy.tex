@@ -3,6 +3,11 @@
 % arara: pdflatex
 
 % For comparison with sample-testidx and sample-testidx-alsoindex
+%
+% This document will result in pdfTeX warnings for entries
+% cs.footnote and index because their sort values are identical 
+% to the sort values of the footnote and cs.index entries.
+% (xindy merges entries with identical sort values.)
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
