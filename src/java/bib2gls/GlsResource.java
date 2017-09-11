@@ -638,7 +638,7 @@ public class GlsResource
                else if (values[0].equals("true"))
                {
                   locationPrefix = new String[]{"\\bibglspagename ",
-                    bib2gls.getMessage("\\bibglspagesname ")};
+                    "\\bibglspagesname "};
                   defpagesname=true;
                }
                else
