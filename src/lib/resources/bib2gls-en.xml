@@ -64,11 +64,11 @@ See the manual for further details.</entry>
 
 <entry key="syntax.check.shortcuts">{0} &lt;option&gt;
 			Check for the shortcut commands when 
-			search for dependencies.
+			searching for dependencies.
 			Permitted values of &lt;option&gt;:
-			''acronyms'' (or ''acro'')
-			''abbreviations'' (or ''abbr'')
-			''all'' (or ''true'')
+			''ac'', ''acronyms'' (or ''acro''),
+			''abbreviations'' (or ''abbr''),
+			''all'' (or ''true''),
 			''none'' (or ''false'')</entry>
 <entry key="syntax.check.nested">{0} &lt;list&gt;|"none"
 			Check each field listed in &lt;list&gt;
