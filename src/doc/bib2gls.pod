@@ -1,0 +1,174 @@
+=head1 SYNOPSIS
+
+B<bib2gls> [I<option>]+ I<auxfile>
+
+=head1 DESCRIPTION
+
+B<bib2gls> is designed to work with the B<glossaries-extra> LaTeX
+package. (The B<record> package option is required.) The application
+performs two functions in one: (1) selects entries from .bib files
+according to information found in the I<auxfile> (similar to
+B<bibtex>); (2) hierarchically sorts entries and collates location
+lists (similar to B<makeindex> and B<xindy>). The .aux extension may
+be omitted from I<auxfile>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help> or B<-h>
+
+Display help message and exit.
+
+=item B<--version> or B<-v>
+
+Display version information and exit.
+
+=item B<--debug> [I<level>]
+
+Switch on the debug mode (optionally at the given I<level>, which
+should be a non-negative integer). If I<level> is B<0> then the
+debug mode is switched off.
+
+=item B<--no-debug> (or B<--nodebug>)
+
+Switch off debug mode. (Equivalent to B<--debug> B<0>)
+
+=item B<--verbose>
+
+Switch on verbose mode.
+
+=item B<--no-verbose>
+
+Switch off verbose mode. (Some messages will still be written to
+STDOUT.)
+
+=item B<--silent>
+
+Only display error messages. All other messages are just written to
+the transcript file.
+
+=item B<--locale> I<lang> (or B<-l> I<lang>)
+
+Use language resource file for I<lang> (which should be an IETF
+locale tag). 
+
+=item B<--log-file> I<file> (or B<-t> <file>)
+
+Set the transcript file.
+
+=item B<--dir> I<directory> (or B<-d> <directory>)
+
+Files are relative to I<directory>. (This doesn't change the current
+working directory.)
+
+=item B<--interpret>
+
+Use the TeX parser library to interpret known (La)TeX commands.
+
+=item B<--no-interpret>
+
+Don't try interpreting (La)TeX commands.
+
+=item B<--mfirstuc-protection> I<fields>|B<all> (or B<-u> I<fields>|B<all>)
+
+Insert an empty group if fields start with certain problematic
+commands to protect against case-changing commands like \Gls.
+
+The default is to do this for all fields.  To do this for only a
+subset of fields, set I<fields> to a comma-separated list of fields
+(e.g. B<name,short,long>).  The keyword B<all> indicates all fields.
+
+=item B<--no-mfirstuc-protection>
+
+Switch off the auto-insertion of an empty group for all fields.
+
+=item B<--mfirstuc-math-protection>
+
+Switch on the auto-insertion of an empty group for math-shift ($).
+This option will be overridden by B<--no-mfirstuc-protection>.
+
+=item B<--no-mfirstuc-math-protection>
+
+Switch off the auto-insertion of an empty group for math-shirt ($).
+
+=item B<--shortcuts> I<option>
+
+Check for the shortcut commands when searching for dependencies.
+Permitted values of I<option>: B<acronyms> (or B<acro>), B<ac>,
+B<abbreviations> (or B<abbr>), B<all> (or B<true>), B<none> (or
+B<false>). This overrides the setting given in I<auxfile>.
+
+=item B<--nested-link-check> I<list>|B<none>
+
+Check each field listed in I<list> for potentially problematic
+nested link text. (Default list: name, text, plural, first,
+firstplural, short, shortplural, long, longplural, symbol).
+
+If B<none>, disable check.
+
+=item B<--no-nested-link-check>
+
+Don't check for potentially problematic nested link text.
+(Equivalent to B<--nested-link-check> B<none>)
+
+=item B<--map-format> I<key>B<=>I<value>[B<,>I<key>B<=>I<value>]* (or 
+B<-m> I<key>B<=>I<value>[B<,>I<key>B<=>I<value>]*)
+
+Set location format mappings.
+
+=item B<--group> or B<-g>
+
+Add 'group' field to entries.
+
+=item B<--no-group>
+
+Don't add 'group' field to entries.
+
+=item B<--trim-fields>
+
+Trim leading and trailing spaces from fields.
+
+=item B<--no-trim-fields>
+
+Don't trim leading and trailing spaces from fields (default).
+
+=item B<--tex-encoding> I<name>
+
+Set the character encoding for the output files. This overrides the
+setting given in I<auxfile>.
+
+=back
+
+=head1 REQUIRES
+
+Java 7 and a TeX distribution.
+
+=head1 LICENSE
+
+License GPLv3+: GNU GPL version 3 or later
+<http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+=head1 RECOMMENDED READING
+
+The bib2gls manual:
+
+        texdoc bib2gls
+
+The glossaries-extra manual:
+
+        texdoc glossaries-extra
+
+The glossaries manual:
+
+        texdoc glossaries
+
+=head1 AUTHOR
+
+Nicola L. C. Talbot,
+L<http://www.dickimaw-books.com/>
+
+=cut
+

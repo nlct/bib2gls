@@ -11,6 +11,8 @@ bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib
 	cp -L ../src/lib/texparserlib.jar bib2gls
 	cp ../src/doc/bib2gls.tex bib2gls/src
 	cp ../src/doc/bib2gls.pdf bib2gls
+	cp ../src/doc/bib2gls.pod bib2gls/src
+	cp ../src/doc/bib2gls.1 bib2gls
 	cp ../src/lib/resources/*.xml bib2gls
 	cp README.md CHANGES bib2gls
 	cd ../src/java/; \
