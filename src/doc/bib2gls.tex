@@ -15,6 +15,9 @@
 
 \begin{filecontents*}{\jobname.ist}
 actual '='
+headings_flag 1
+heading_prefix "\\indexheading{"
+heading_suffix "}\n"
 \end{filecontents*}
 
 \usepackage{xcolor}
@@ -53,6 +56,9 @@ actual '='
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
+\newcommand{\indexheading}[1]{%
+ \item \pdfbookmark[1]{#1}{index.#1}\textbf{#1}\nopagebreak}
+
 \newcommand*{\sectionref}[1]{\hyperref[#1]{section~\ref*{#1}}}
 \newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
 
@@ -61,6 +67,8 @@ actual '='
 \newcommand{\qt}[1]{``#1''}
 
 \newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
+
+\newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
 
 \newcommand{\dequals}{%
  \texorpdfstring
@@ -151,6 +159,8 @@ actual '='
  {\filefmt{#1}\index{#1\actual\filefmt{#1}}}%
  {#1}%
 }
+
+\newcommand{\texmfcnf}[1]{\texttt{#1}\index{#1\actual\texttt{#1}}}
 
 \newcommand*{\ext}[1]{%
  \texorpdfstring
@@ -253,11 +263,21 @@ actual '='
 
 \newcommand*{\field}[1]{%
  \texorpdfstring
- {\fieldfmt{#1}%
-   \index{fields!#1\actual\protect\fieldfmt{#1}}%
-   \index{#1 field\actual\protect\fieldfmt{#1} field}%
+ {\hyperlink{field.#1}{\fieldfmt{#1}}%
+  \fieldindex{#1}%
  }%
  {#1}%
+}
+
+\newcommand*{\fieldindex}[1]{%
+ \index{fields!#1\actual\protect\fieldfmt{#1}}%
+ \index{#1 field\actual\protect\fieldfmt{#1} field}%
+}
+
+\newcommand*{\fielddef}[1]{%
+ \raisebox{\ht\strutbox}{\hypertarget{field.#1}{}}%
+ \fieldfmt{#1}%
+ \fieldindex{#1}%
 }
 
 \newcommand*{\entry}[1]{%
@@ -441,13 +461,13 @@ Java Runtime Environment (at least JRE~7). Additionally,
 (Although the latest version is recommended.)
 This application was developed in response to the question
 \href{http://tex.stackexchange.com/q/342544}{Is there a program for
-managing glossary tags?} on \TeX\ on StackExchange. The \ext{bib}
+managing glossary tags?} on \TeX\ on StackExchange. The \filefmt{.bib}
 file can be managed in an application such as JabRef.
 
-If you already have a \ext{tex} file containing 
+If you already have a \filefmt{.tex} file containing 
 entry definitions using commands like \cs{newglossaryentry}
 then you can use the supplementary tool \appfmt{convertgls2bib}
-to convert the entries to the \ext{bib} format required by
+to convert the entries to the \filefmt{.bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
 \end{abstract}
 
@@ -639,13 +659,13 @@ created until then.)
 \section{Security}
 
 \TeX\ Live come with security settings
-\texttt{openin\_any} and \texttt{openout\_any} that, respectively,
+\texmfcnf{openin\_any} and \texmfcnf{openout\_any} that, respectively,
 govern read and write file access (in addition to the operating
 system's file permissions). \bibgls\ uses \app{kpsewhich} to
 determine these values and honours them. MikTeX doesn't use these
 settings, so if these values are unset, \bibgls\ will default to
-\texttt{a} (any) for \texttt{openin\_any} and \texttt{p} (paranoid) for
-\texttt{openout\_any}.
+\code{a} (any) for \texmfcnf{openin\_any} and \code{p} (paranoid) for
+\texmfcnf{openout\_any}.
 
 \section{Localisation}
 \label{sec:lang.xml}
@@ -659,15 +679,15 @@ The appropriate file is searched for in the following order, where
 by the \argref{locale} switch:
 \begin{enumerate}
 \item \meta{lang} exactly matches \meta{locale}.
-For example, my locale is \texttt{en-GB}, so \bibgls\ will first search
+For example, my locale is \code{en-GB}, so \bibgls\ will first search
 for \filefmt{bib2gls-en-GB.xml}. This file doesn't exist, so it will
 try again.
 
 \item If \meta{locale} has an associated script, the
 next try is with \meta{lang} set to \meta{lang
-code}\texttt{-}\meta{script} where \meta{lang code} is the two
+code}\code{-}\meta{script} where \meta{lang code} is the two
 letter ISO language code and \meta{script} is the script code.
-For example, if \meta{locale} is \texttt{sr-RS-Latn}
+For example, if \meta{locale} is \code{sr-RS-Latn}
 then \bibgls\ will search for \filefmt{bib2gls-sr-Latn.xml} if
 \filefmt{bib2gls-sr-RS-Latn.xml} doesn't exist.
 
@@ -797,9 +817,9 @@ better than a simple pattern match, and that's the purpose of
 \appfmt{convertgls2bib}). When
 the \argref{debug} mode is on, any warnings or errors triggered by
 the \argref{interpret} mode will be written to the transcript
-prefixed with \texttt{texparserlib:} (the results of the conversions
+prefixed with \code{texparserlib:} (the results of the conversions
 will be included in the transcript as informational messages
-prefixed with \texttt{texparserlib:} even with \argref{no-debug}).
+prefixed with \code{texparserlib:} even with \argref{no-debug}).
 
 For example, suppose the \ext{bib} file includes:
 \begin{verbatim}
@@ -853,10 +873,10 @@ the fallback would be the entry's label.
 This means that with \entry{symbol} instead of \entry{entry}, and the default
 \optref[sort]{sort-field}, and with
 \optref[letter-case]{sort}, these entries will be defined in
-the order: \texttt{M}, \texttt{S}, \texttt{card}, \texttt{i}, \texttt{v} (since
+the order: \code{M}, \code{S}, \code{card}, \code{i}, \code{v} (since
 this is the case-sensitive letter order of the labels) whereas
 with \optref[letter-nocase]{sort-field}, the order will be:
-\texttt{card}, \texttt{i}, \texttt{M}, \texttt{S}, \texttt{v} (since this
+\code{card}, \code{i}, \code{M}, \code{S}, \code{v} (since this
 is the case-insensitive letter order of the labels).
 
 However, with \atentryref{entry}, the fallback field will
@@ -884,7 +904,7 @@ The interpreter is first passed the code provided with
 This means that the provided commands are now recognised by the
 interpreter when it has to parse the fields later.
 
-In the case of the \texttt{M} entry in the example above, the 
+In the case of the \code{M} entry in the example above, the 
 code that's passed to the interpreter is:
 \begin{verbatim}
 {}$\mtx{M}$
@@ -900,7 +920,7 @@ change (caused by math-mode and \cs{boldsymbol}) has been
 ignored. The sort value therefore consists of a single Unicode
 character 0x4D (Latin upper case letter \qtt{M}, decimal value 77).
 
-For the \texttt{v} entry, the code is:
+For the \code{v} entry, the code is:
 \begin{verbatim}
 {}$\vec{v}$
 \end{verbatim}
@@ -913,7 +933,7 @@ which consists of two Unicode characters 0x76
 (Latin lower case letter \qtt{v}, decimal value 118) and 
 0x20D7 (combining right arrow above, decimal value 8407).
 
-For the \texttt{set} entry, the code is:
+For the \code{set} entry, the code is:
 \begin{verbatim}
 {}$\set{S}$
 \end{verbatim}
@@ -925,7 +945,7 @@ So the \field{sort} value for this entry is set to \qtt{S} (again
 ignoring the font change). This consists of a single Unicode
 character 0x53 (Latin upper case letter \qtt{S}, decimal value~83).
 
-For the \texttt{card} entry, the code is:
+For the \code{card} entry, the code is:
 \begin{verbatim}
 {}$\card{S}$
 \end{verbatim}
@@ -944,7 +964,7 @@ If \optref[false]{interpret-preamble} had been used, \csfmt{card}
 wouldn't be recognised and would be discarded leaving just \qtt{S}
 as the sort value.
 
-For the \texttt{i} entry, the code is:
+For the \code{i} entry, the code is:
 \begin{verbatim}
 {}$\imaginary$
 \end{verbatim}
@@ -956,9 +976,9 @@ So the \field{sort} value for this entry is set to \qtt{i}.
 
 This means that in the case of the default \optref[sort]{sort-field} with
 \optref[letter-case]{sort}, these entries will be defined in
-the order: \texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$),
-\texttt{i} ($\imaginary$), \texttt{v} ($\vec{v}$) and
-\texttt{card} ($\card{S}$).
+the order: \code{M} ($\mtx{M}$), \code{S} ($\set{S}$),
+\code{i} ($\imaginary$), \code{v} ($\vec{v}$) and
+\code{card} ($\card{S}$).
 In this case, the entries have been sorted according to
 the character codes. If you run \bibgls\ with \argref{verbose}
 the decimal character codes will be included in the transcript.
@@ -981,15 +1001,15 @@ M -> 'M' (M) [77]
 S -> 'S' (S) [83]
 v -> '\usebox\varrow' (v) [118 8407]
 \end{alltt}
-(Note that the \texttt{card} entry doesn't have a letter
+(Note that the \code{card} entry doesn't have a letter
 group since the vertical bar character isn't considered a 
 letter.)
 
 If \optref[letter-nocase]{sort} is used instead then, after conversion
 by the interpreter, the sort values will all be changed to
-lower case. The order is now: \texttt{i} ($\imaginary$), 
-\texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$),
-\texttt{v} ($\vec{v}$) and \texttt{card} ($\card{S}$).
+lower case. The order is now: \code{i} ($\imaginary$), 
+\code{M} ($\mtx{M}$), \code{S} ($\set{S}$),
+\code{v} ($\vec{v}$) and \code{card} ($\card{S}$).
 The transcript (with \argref{verbose}) now shows
 \begin{alltt}
 i -> 'i' [105]
@@ -1008,15 +1028,15 @@ S -> 's' (S) [115]
 v -> '\usebox\varrow' (V) [118 8407]
 \end{alltt}
 Note that the letter groups are upper case not lower case.
-Again the \texttt{card} entry doesn't have an associated
+Again the \code{card} entry doesn't have an associated
 letter group.
 
 If a locale-based sort is used, the ordering will follow the
 locale's alphabet rules. For example, with \optref[en]{sort}
 (English, no region or variant), the order becomes:
-\texttt{card} ($\card{S}$), \texttt{i} ($\imaginary$), 
-\texttt{M} ($\mtx{M}$), \texttt{S} ($\set{S}$) and
-\texttt{v} ($\vec{v}$). The transcript (with \argref{verbose}) 
+\code{card} ($\card{S}$), \code{i} ($\imaginary$), 
+\code{M} ($\mtx{M}$), \code{S} ($\set{S}$) and
+\code{v} ($\vec{v}$). The transcript (with \argref{verbose}) 
 shows the collation keys instead:
 \begin{alltt}
 i -> 'i' [0 92 0 0 0 0]
@@ -1038,19 +1058,19 @@ Suppose I add a new symbol to my \ext{bib} file:
 }
 \end{verbatim}
 and I also use this entry in the document. Then with
-\optref[en]{sort}, the order is: \texttt{card} ($\card{S}$),
-\texttt{angstrom} (\AA), \texttt{i} ($\imaginary$), \texttt{M}
-($\mtx{M}$), \texttt{S} ($\set{S}$), and \texttt{v} ($\vec{v}$).
-The \argref{group} switch shows that the \texttt{angstrom} entry
+\optref[en]{sort}, the order is: \code{card} ($\card{S}$),
+\code{angstrom} (\AA), \code{i} ($\imaginary$), \code{M}
+($\mtx{M}$), \code{S} ($\set{S}$), and \code{v} ($\vec{v}$).
+The \argref{group} switch shows that the \code{angstrom} entry
 (\AA) has been placed in the \qt{A} letter group.
 
 However, if I change the locale to \optref[sv]{sort}, the
-\texttt{angstrom} entry is moved to the end of the list and the
+\code{angstrom} entry is moved to the end of the list and the
 \argref{group} switch shows that it's been placed in the \qt{\AA}
 letter group.
 
 If you are using Java~8, you can set the
-\texttt{java.locale.providers} property to \texttt{CLDR,JRE} to use
+\code{java.locale.providers} property to \code{CLDR,JRE} to use
 the Common Locale Data Repository, which has more extensive
 support for locales than the native Java Runtime Environment.
 This isn't available for Java~7, and should be enabled by default
@@ -1255,7 +1275,7 @@ write a warning in the transcript. This setting is on by default.
 
 Switches off the above.
 
-\section{\longarg{nested-link-check} \meta{list}\argor\texttt{none}}
+\section{\longarg{nested-link-check} \meta{list}\argor\code{none}}
 \labelarg{nested-link-check}
 
 By default, \bibgls\ will parse certain fields for potential nested links.
@@ -1306,8 +1326,8 @@ matches (see \sectionref{sec:locationopts}). For example,
 bib2gls --map-format "emph:hyperbf" mydoc
 \end{verbatim}
 This essentially means that if there's a record conflict
-involving \texttt{emph}, try replacing \texttt{emph} with
-\texttt{hyperbf} and see if that resolves the conflict.
+involving \code{emph}, try replacing \code{emph} with
+\code{hyperbf} and see if that resolves the conflict.
 
 Note that if the conflict includes a range formation, the
 range takes precedence.
@@ -1335,41 +1355,41 @@ bib2gls --map-format emph:hyperbf --map-format hypersf:hyperit mydoc
 \end{verbatim}
 then \bibgls\ will process these records as follows:
 \begin{enumerate}
-\item Accept the first record (\texttt{emph}) since there's
+\item Accept the first record (\code{emph}) since there's
 currently no conflict. (This is the first record for page~3 for the
-entry given by \texttt{gls.sample}.)
-\item The second record (\texttt{hypersf}) conflicts 
-with the existing record (\texttt{emph}). Neither has
-the format \texttt{glsnumberformat} or \texttt{glsignore} so \bibgls\ consults
+entry given by \code{gls.sample}.)
+\item The second record (\code{hypersf}) conflicts 
+with the existing record (\code{emph}). Neither has
+the format \code{glsnumberformat} or \code{glsignore} so \bibgls\ consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item The \texttt{hypersf} format (from the new record) is mapped to \texttt{hyperit},
+\item The \code{hypersf} format (from the new record) is mapped to \code{hyperit},
 so \bibgls\ checks if the existing record
 has this format. In this case it doesn't (the format is
-\texttt{emph}). So \bibgls\ moves onto the next test:
+\code{emph}). So \bibgls\ moves onto the next test:
 
-\item The \texttt{emph} format (from the existing record) is mapped to \texttt{hyperbf},
+\item The \code{emph} format (from the existing record) is mapped to \code{hyperbf},
 so \bibgls\ checks if the new record has this format.
-In this case it doesn't (the format is \texttt{hypersf}).
+In this case it doesn't (the format is \code{hypersf}).
 
 Since the provided mappings haven't resolved this conflict,
 the new record is discarded with a warning. Note that there's 
 no look ahead to the next record. (There may be other 
 records for other entries also used on page~3 interspersed between these records.)
 \end{itemize}
-\item The third record (\texttt{hyperbf}) conflicts 
-with the existing record (\texttt{emph}). Neither has
-the format \texttt{glsnumberformat} or \texttt{glsignore} so \bibgls\ again consults
+\item The third record (\code{hyperbf}) conflicts 
+with the existing record (\code{emph}). Neither has
+the format \code{glsnumberformat} or \code{glsignore} so \bibgls\ again consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item  The new record's \texttt{hyperbf} format has no mapping provided,
+\item  The new record's \code{hyperbf} format has no mapping provided,
 so \bibgls\ moves onto the next test:
 
-\item The existing record's \texttt{emph} format has a mapping
-provided (\texttt{hyperbf}). This matches the new record's format,
+\item The existing record's \code{emph} format has a mapping
+provided (\code{hyperbf}). This matches the new record's format,
 so the new record takes precedence.
 
-This means that the location list ends up with the \texttt{hyperbf}
+This means that the location list ends up with the \code{hyperbf}
 location for page~3.
 \end{itemize}
 \end{enumerate}
@@ -1378,14 +1398,14 @@ If, on the other hand, the mappings are given as
 \begin{verbatim}
 --map-format "emph:hyperit,hypersf:hyperit,hyperbf:hyperit"
 \end{verbatim}
-then all the three conflicting records (\texttt{emph},
-\texttt{hypersf} and \texttt{hyperbf}) will end up being replaced
-by a single record with \texttt{hyperit} as the format.
+then all the three conflicting records (\code{emph},
+\code{hypersf} and \code{hyperbf}) will end up being replaced
+by a single record with \code{hyperit} as the format.
 
 Multiple conflicts will typically be rare as there's usually little
 reason for more than two or three different location formats within
-the same list. (For example, \texttt{glsnumberformat} as the default
-and \texttt{hyperbf} or \texttt{hyperit} for a primary reference.)
+the same list. (For example, \code{glsnumberformat} as the default
+and \code{hyperbf} or \code{hyperit} for a primary reference.)
 
 \section{\longarg{group}}
 \labelarg{group}
@@ -1406,6 +1426,7 @@ There are four basic types of groups:
 \item \keyword{letter groups} where the group title indicates the
 first letter of all the sort values within that group.
 The group title is set with \csref{bibglslettergroup}.
+If the sort value is empty then no group is assigned to that entry.
 
 \item \keyword{non-letter groups} (or \keyword{symbol groups})
 where the first characters of all the sort values within that group
@@ -1436,7 +1457,7 @@ by the following line in the \langxml:
 \begin{verbatim}
 <entry key="grouptitle.case.ij">IJ</entry>
 \end{verbatim}
-If there isn't a \texttt{grouptitle.case.\meta{lc}} key (where 
+If there isn't a \code{grouptitle.case.\meta{lc}} key (where 
 \meta{lc} is the lower case version), then only the first character
 will be converted to upper case otherwise the value supplied by the
 resource file is used. This resource key is only checked for
@@ -1449,7 +1470,7 @@ The locale-independent character code comparisons (such as
 \optref[letter-nocase]{sort}) only select the first character of the
 sort value for the group. If the character is
 alphabetical\footnote{according to Java's
-\texttt{Character.isAlphabetic(int)} method} then it will be a
+\code{Character.isAlphabetic(int)} method} then it will be a
 letter group otherwise it's a non-letter group.  The
 case-insensitive ordering (such as \optref[letter-nocase]{sort})
 will convert the letter group character to upper case. The
@@ -1551,9 +1572,9 @@ The glossary won't have groups even if a group style, such as
 output files. If the document has loaded the \sty{inputenc} package then
 \bibgls\ can obtain the value of the encoding from the
 \ext{aux} file. This then needs to be converted to a name
-recognised by Java. For example, \texttt{utf8} will be mapped to
-\texttt{UTF-8}. If the \sty{fontspec} package has been loaded,
-\sty{glossaries-extra} will assume the encoding is \texttt{utf8} and
+recognised by Java. For example, \code{utf8} will be mapped to
+\code{UTF-8}. If the \sty{fontspec} package has been loaded,
+\sty{glossaries-extra} will assume the encoding is \code{utf8} and
 write that value to the \ext{aux} file.
 
 If neither package has been loaded, \bibgls\ will assume the
@@ -1603,7 +1624,7 @@ where \meta{entry-type} is the entry type (listed below),
 \meta{id} is a unique label. The label can't contain any spaces or
 commas. In general it's best to stick with alpha-numeric labels.
 The field values may be delimited by braces \margm{text} or
-double-quotes \texttt{"\meta{text}"}.
+double-quotes \code{"\meta{text}"}.
 
 \bibgls\ allows you to insert prefixes to the labels when the data
 is read through the \optref{label-prefix} option. Remember to use
@@ -1648,7 +1669,14 @@ optional fields, any key recognised by \cs{newglossaryentry} may be
 used as a field. However, note that if you add
 any custom keys in your document using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
 commands must be placed before the first use of
-\cs{GlsXtrLoadResources}.
+\cs{GlsXtrLoadResources}. Predefined fields for use in \ext{bib}
+files are listed in Tables~\ref{tab:fields},
+\ref{tab:bib2glsfields}, \ref{tab:prefixfields}
+and~\ref{tab:accsuppfields}.  Fields that may be set by \bibgls\ are
+listed in Table~\ref{tab:internalfields}. These typically shouldn't
+be set in the \ext{bib} file and in some cases don't have a
+designated key, in which case they won't be recognised if they're
+present in the \ext{bib} file.
 
 Any unrecognised fields will be ignored.
 This is more convenient than using \cs{input} or \cs{loadglsentries}, which
@@ -1676,8 +1704,8 @@ field and not use \cs{glssee}.
 The \field{seealso} key was only added to \sty{glossaries-extra}
 v1.16, but this field may be used with \bibgls\ even if you only
 have version 1.14 or 1.15. If the key isn't available,
-\texttt{seealso=\margm{xr-list}} will be treated as
-\texttt{see=\marg{[\cs{seealsoname}]\meta{xr-list}}} (the resource
+\code{seealso=\margm{xr-list}} will be treated as
+\code{see=\marg{[\cs{seealsoname}]\meta{xr-list}}} (the resource
 option \optref{seealso} won't have an effect).  You can't use both
 \field{see} and \field{seealso} for the same entry with \bibgls.
 Note that the \field{seealso} field doesn't allow for the optional
@@ -1688,6 +1716,117 @@ or change the definition of \cs{seealsoname} or
 \cs{glssee}[\cs{seealsoname}], and so will be treated as \field{see}
 rather than \field{seealso} by \bibgls. Again, it's better to just
 use the \field{seealso} field directly.
+
+\begin{table}[hbtp]
+\caption{Fields Provided by \styfmt{glossaries-extra}}\label{tab:fields}
+\medskip
+\centering
+\begin{tabular}{ll}
+\bfseries Field & \bfseries Description\\
+\fielddef{alias} & This entry is a
+synonym of the entry whose label is given by this field.\\
+\fielddef{category} & This entry's category.\\
+\fielddef{description} & The description displayed in the glossary.\\
+\fielddef{descriptionplural} & The plural form of the description.\\
+\fielddef{first} & The text to display on first use of \cs{gls}\\
+\fielddef{firstplural} & The text to display on first use of \cs{glspl}\\
+\fielddef{long} & The long form of an abbreviation.\\
+\fielddef{longplural} & The plural long form of an abbreviation.\\
+\fielddef{name} & The name displayed in the glossary.\\
+\fielddef{parent} & The parent entry's label.\\
+\fielddef{plural} & The text to display on subsequent use of \cs{glspl}\\
+\fielddef{see} & General purpose cross-reference.\\
+\fielddef{seealso} & Cross-reference related entries.\\
+\fielddef{short} & The short form of an abbreviation.\\
+\fielddef{shortplural} & The plural short form of an abbreviation.\\
+\fielddef{symbol} & The associated symbol.\\
+\fielddef{symbolplural} & The plural form of the associated symbol.\\
+\fielddef{text} &  The text to display on subsequent use of \cs{gls}\\
+\fielddef{user1} & A general purpose user field.\\
+\fielddef{user2} & A general purpose user field.\\
+\fielddef{user3} & A general purpose user field.\\
+\fielddef{user4} & A general purpose user field.\\
+\fielddef{user5} & A general purpose user field.\\
+\fielddef{user6} & A general purpose user field.
+\end{tabular}
+\end{table}
+
+\begin{table}[hbtp]
+\caption{Fields Provided by \bibgls}\label{tab:bib2glsfields}
+\medskip
+\centering
+\begin{tabular}{ll}
+\bfseries Field & \bfseries Description\\
+\fielddef{duallong} & The long form of a dual abbreviation.\\
+\fielddef{duallongplural} & The plural long form of a dual abbreviation.\\
+\fielddef{dualshort} & The short form of a dual abbreviation.\\
+\fielddef{dualshortplural} & The plural short form of a dual abbreviation.
+\end{tabular}
+\end{table}
+
+\begin{table}[hbtp]
+\caption{Fields Provided by \styfmt{glossaries-prefix}}\label{tab:prefixfields}
+\medskip
+\centering
+\begin{tabular}{ll}
+\bfseries Field & \bfseries Description\\
+\fielddef{prefix} & The prefix associated with the \field{text}
+field.\\
+\fielddef{prefixfirst} & The prefix associated with the \field{first}
+field.\\
+\fielddef{prefixfirstplural} & The prefix associated with the
+\field{firstplural} field.\\
+\fielddef{prefixplural} & The prefix associated with the
+\field{plural} field.
+\end{tabular}
+\end{table}
+
+\begin{table}[hbtp]
+\caption{Fields Provided by \styfmt{glossaries-accsupp}}
+\label{tab:accsuppfields}
+\medskip
+\centering
+\begin{tabular}{ll}
+\bfseries Field & \bfseries Description\\
+\fielddef{access} & The replacement text for the \field{name} field.\\
+\fielddef{descriptionaccess} & The replacement text for the
+\field{description} field.\\
+\fielddef{descriptionpluralaccess} & The replacement text for the
+\field{descriptionplural} field.\\
+\fielddef{firstaccess} & The replacement text for the \field{first} field.\\
+\fielddef{firstpluralaccess} & The replacement text for the
+\field{firstplural} field.\\
+\fielddef{longaccess} & The replacement text for the \field{long} field.\\
+\fielddef{longpluralaccess} & The replacement text for the
+\field{longplural} field.\\
+\fielddef{pluralaccess} & The replacement text for the \field{plural} field.\\
+\fielddef{shortaccess} & The replacement text for the \field{short} field.\\
+\fielddef{shortpluralaccess} & The replacement text for the
+\field{shortplural} field.\\
+\fielddef{symbolaccess} & The replacement text for the \field{symbol} field.\\
+\fielddef{symbolpluralaccess} & The replacement text for the
+\field{symbolplural} field.\\
+\fielddef{textaccess} & The replacement text for the \field{text} field.
+\end{tabular}
+\end{table}
+
+\begin{table}[hbtp]
+\caption{Internal Fields}\label{tab:internalfields}
+\centering
+\medskip
+\begin{tabular}{ll}
+\bfseries Field & \bfseries Description\\
+\fielddef{childcount} & Stores the number of children this entry has
+had selected.\\
+\fielddef{counter} & The default counter used for indexing.\\
+\fielddef{group} & The letter group determined by the comparator
+(or assigned by the \optref{group} option).\\
+\fielddef{location} & The typeset location list. \\
+\fielddef{loclist} & The internal list of locations.\\
+\fielddef{sort} & The sort value obtained by the comparator.\\
+\fielddef{type} & The glossary this entry belongs to.
+\end{tabular}
+\end{table}
 
 \section{\atentry{string}}
 \labelatentry{string}
@@ -1757,8 +1896,8 @@ back on the \field{name} field and, since this contains the special
 characters \verb|\| \verb|$| \verb|{| and \verb|}|, the \TeX\ parser
 library is used to interpret it. The definitions provided by
 \atentry{preamble} allow \bibgls\ to deduce that the \field{sort}
-value of the \texttt{S} entry is just \texttt{S} and the \field{sort}
-value of the \texttt{card} entry is \verb"|S|" (see
+value of the \code{S} entry is just \code{S} and the \field{sort}
+value of the \code{card} entry is \verb"|S|" (see
 \sectionref{sec:texparserlib}).
 
 What happens if you also need to use these commands in the document?
@@ -1835,7 +1974,7 @@ actually be using
 \end{alltt}
 where the default options \meta{def-options} are given by
 \cs{GlsXtrFmtDefaultOptions}. The default definition of this is
-just \texttt{noindex} which suppresses the automatic indexing or
+just \code{noindex} which suppresses the automatic indexing or
 recording action. (See the \sty{glossaries-extra} manual
 for further details.)
 
@@ -1927,7 +2066,7 @@ This allows for code such as:
 \begin{verbatim}
 \[ \gcard{\gset{A} \cap \gset{B}} \]
 \end{verbatim}
-which will link back to the \texttt{cardinality} entry in the
+which will link back to the \code{cardinality} entry in the
 glossary and avoids any hyperlinking with \csfmt{gset}.
 Alternatively to avoid links with \csfmt{gcard} as well:
 \begin{verbatim}
@@ -1983,7 +2122,7 @@ Terms defined using \atentry{entry} will be written to the output
 
 The \atentry{symbol} entry type is much like \atentry{entry}, but it's
 designed specifically for symbols, so in the previous example, the
-\texttt{M} and \texttt{v} terms would be better defined using the
+\code{M} and \code{v} terms would be better defined using the
 \atentry{symbol} entry type instead. For example:
 \begin{verbatim}
 @symbol{M,
@@ -2257,8 +2396,8 @@ is rather like doing
    description = {statistical pattern recognition technique}
 }
 \end{verbatim}
-but \texttt{dual.svm} will automatically be selected if \texttt{svm}
-is indexed in the document. If \texttt{dual.svm} isn't explicitly
+but \code{dual.svm} will automatically be selected if \code{svm}
+is indexed in the document. If \code{dual.svm} isn't explicitly
 indexed, it won't have a location list.
 
 As with \atentry{dualentry}, the \field{alias} field will never
@@ -2749,8 +2888,8 @@ do:
 \begin{verbatim}
 \GlsXtrLoadResources[src={defs,entries}]
 \end{verbatim}
-Unfortunately this results in the sort value for \texttt{example} being
-set to \texttt{redexample (stuff)} because the interpreter has
+Unfortunately this results in the sort value for \code{example} being
+set to \code{redexample (stuff)} because the interpreter has
 detected the provided commands and expanded 
 \begin{verbatim}
 \strong{\test{stuff}{example}}
@@ -2770,13 +2909,13 @@ I can prevent the interpreter from parsing \atentryref{preamble}:
 \begin{verbatim}
 \GlsXtrLoadResources[src={defs,entries},interpret-preamble=false]
 \end{verbatim}
-Now when the sort value for \texttt{example} is obtained from
+Now when the sort value for \code{example} is obtained from
 \begin{verbatim}
 \strong{\test{stuff}{example}}
 \end{verbatim}
 no expansion occurs (since \csfmt{strong} and \csfmt{test} are
 unrecognised) so the sort value ends up as
-\texttt{stuffexample}
+\code{stuffexample}
 which places \qt{\textbf{\color{red}example (stuff)}} between 
 \qt{sample} and \qt{test}, which is again incorrect.
 
@@ -2898,8 +3037,8 @@ If the
 The value of \meta{sort} is as for \optref{sort}, but note that in this case the sort value \optfmt{unsrt} or
 \optfmt{none} means to use the same ordering as the primary
 entries. So with \optref[de-CH-1996]{sort},
-\optref[none:copies]{secondary} the \texttt{copies}
-list will be ordered according to \texttt{de-CH-1996} and not
+\optref[none:copies]{secondary} the \code{copies}
+list will be ordered according to \code{de-CH-1996} and not
 according to the order in which they were read when the \ext{bib}
 file or files were parsed.
 If \meta{sort} is \optfmt{custom}, then the rule should be
@@ -2944,7 +3083,7 @@ and the document preamble contains:
 This sorts the primary entries according to the default
 \optref{sort-field} and then sorts the entries according
 to the \field{category} field and copies this list to
-the \texttt{topic} glossary (which will be provided if not defined.)
+the \code{topic} glossary (which will be provided if not defined.)
 
 The secondary list can be displayed with the hypertargets switched
 off to prevent duplicates. The cross-references will link to the
@@ -3022,7 +3161,7 @@ For example
 indicates that \bibgls\ must read the files
 \filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
 create the file given by \cs{jobname}\ext{glstex} on the first
-instance or \cs{jobname}\texttt{-}\meta{n}\ext{glstex} on subsequent
+instance or \cs{jobname}\code{-}\meta{n}\ext{glstex} on subsequent
 use.
 
 With \csref{glsxtrresourcefile}\oargm{options}\margm{filename}, if 
@@ -3138,8 +3277,8 @@ field identifying the glossary label).
 The \meta{regex} part should be a regular expression conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
-Pattern class}. The pattern is anchored (\texttt{oo.*} matches
-\texttt{oops} but not \texttt{loops}) and \meta{regexp} can't be
+Pattern class}. The pattern is anchored (\code{oo.*} matches
+\code{oops} but not \code{loops}) and \meta{regexp} can't be
 empty. Remember that \TeX\ will expand the option list as
 it writes the information to the \ext{aux} file so take
 care with special characters. For example, to match a literal
@@ -3176,7 +3315,7 @@ This will keep all the selected entries that satisfy:
 
 \item[AND]
 
-\item \field{topic} is \texttt{biology}.
+\item \fieldfmt{topic} (custom key provided by user) is \code{biology}.
 \end{itemize}
 and will discard any entries that don't satisfy this condition.
 A message will be written to the log file for each entry
@@ -3185,7 +3324,9 @@ that's discarded.
 Patterns for unknown fields will be ignored. If the entire
 list consists of patterns for unknown fields it will be
 treated as \csopt[\empty]{match}. That is, no filtering will be
-applied.
+applied. In the above example, the custom \fieldfmt{topic} key must
+be provided before the first \cs{GlsXtrLoadResources} with
+\cs{glsaddkey} or \cs{glsaddstoragekey}.
 
 \subsection{\csoptnv{match-op}\csopteqval{value}}
 \labelopt{match-op}
@@ -3287,9 +3428,9 @@ and suppose the document contains:
 \printunsrtglossaries
 \end{document}
 \end{verbatim}
-Although the \texttt{duck} entry has siblings in the
+Although the \code{duck} entry has siblings in the
 \filefmt{entries.bib} file, none of them have been recorded
-(indexed) in the document, nor has the parent \texttt{birds} entry.
+(indexed) in the document, nor has the parent \code{birds} entry.
 
 This document hasn't used \csopt{flatten-lonely}, so the default
 \csopt[false]{flatten-lonely} is assumed. This results in the
@@ -3326,8 +3467,8 @@ hierarchical structure:
   \end{description}
 \end{description}
 (The \qt{1} in the above indicates the page number.)
-There are some entries here that look a little odd: \texttt{duck},
-\texttt{cabbage} and \texttt{subsubitem}. In each case they are a
+There are some entries here that look a little odd: \code{duck},
+\code{cabbage} and \code{subsubitem}. In each case they are a
 lone child entry. It would look better if they could be compressed,
 but I don't want to use the \optref{flatten} option, as I still want
 to keep the mineral hierarchy.
@@ -3359,7 +3500,7 @@ the hierarchy becomes:
   \item[cabbage] 1
   \end{description}
 \end{description}
-The \field{name} field of the \texttt{duck} entry has been
+The \field{name} field of the \code{duck} entry has been
 set to
 \begin{verbatim}
 name={\bibglsflattenedchildpostsort{birds}{duck}}
@@ -3369,9 +3510,9 @@ the \field{text} field has been set to
 text={duck}
 \end{verbatim}
 the \field{group} field is copied over from the parent entry (\qt{B}),
-and the \field{parent} field has been adjusted, moving \texttt{duck}
+and the \field{parent} field has been adjusted, moving \code{duck}
 up one hierarchical level.
-Finally, the former parent \texttt{birds} entry has been removed (the default
+Finally, the former parent \code{birds} entry has been removed (the default
 \optref[only unrecorded parents]{flatten-lonely-rule} is in effect).
 
 The default definition of \csref{bibglsflattenedchildpostsort}
@@ -3384,21 +3525,21 @@ document \verb|\gls{duck}| still produces \qt{duck} rather than
 (If the child and parent \field{name} fields are identical,
 the terms are considered homographs. See below for further details.)
 
-The \texttt{subsubitem} entry has also been adjusted. This was done
+The \code{subsubitem} entry has also been adjusted. This was done
 in a multi-stage process, starting with sub-items and then moving down
 the hierarchical levels:
 \begin{itemize}
-\item The \texttt{subitem} entry was adjusted, moving it from a
+\item The \code{subitem} entry was adjusted, moving it from a
 sub-entry to a top-level entry. The \field{name} field was then
 modified to
 \begin{verbatim}
 name={\bibglsflattenedchildpostsort{item}{subitem}}
 \end{verbatim}
-This now means that the \texttt{subsubitem} entry is now a sub-entry
-(rather than a sub-sub-entry). The \texttt{subitem} entry now has no
-parent, but at this stage the \texttt{subsubitem} entry still has
-\texttt{subitem} as its parent.
-\item The \texttt{subsubitem} entry is then adjusted moving from a
+This now means that the \code{subsubitem} entry is now a sub-entry
+(rather than a sub-sub-entry). The \code{subitem} entry now has no
+parent, but at this stage the \code{subsubitem} entry still has
+\code{subitem} as its parent.
+\item The \code{subsubitem} entry is then adjusted moving from a
 sub-entry to a top-level entry. The \field{name} field was then
 modified to
 \begin{verbatim}
@@ -3418,16 +3559,16 @@ obtained from the \field{name} field of the entry's former parent
 value was changed in the previous step, and the change is
 reflected here.
 
-This means that the name for \texttt{subitem} will be displayed as
-\qt{item, subitem} and the name for \texttt{subsubitem} will be
+This means that the name for \code{subitem} will be displayed as
+\qt{item, subitem} and the name for \code{subsubitem} will be
 displayed as \qt{item, subitem, subsubitem}.
 
-\item The parent entries \texttt{item} and \texttt{subitem}
+\item The parent entries \code{item} and \code{subitem}
 are removed from the selection as they have no location lists.
 \end{itemize}
 
-Note that the \texttt{cabbage} sub-entry hasn't been adjusted. It
-doesn't have any siblings but its parent entry (\texttt{vegetable})
+Note that the \code{cabbage} sub-entry hasn't been adjusted. It
+doesn't have any siblings but its parent entry (\code{vegetable})
 has a location list so it can't be discarded.
 If I change the rule:
 \begin{verbatim}
@@ -3435,8 +3576,8 @@ If I change the rule:
  flatten-lonely-rule=discard unrecorded,
  flatten-lonely=postsort]
 \end{verbatim}
-then this will move the \texttt{cabbage} entry up a level but the
-original parent entry \texttt{vegetable} will remain:
+then this will move the \code{cabbage} entry up a level but the
+original parent entry \code{vegetable} will remain:
 \begin{description}\setlength\itemsep{0pt}%
 \item[A] \null
 \item[aardvark] 1
@@ -3461,7 +3602,7 @@ original parent entry \texttt{vegetable} will remain:
 Remember that \csopt[postsort]{flatten-lonely} performs the
 adjustment after sorting. This means that the entries are still in
 the same relative location that they were in with the original
-\csopt[false]{flatten-lonely} setting. For example, \texttt{duck}
+\csopt[false]{flatten-lonely} setting. For example, \code{duck}
 remains in the B letter group before \qt{buzz}.
 
 With \csopt[presort]{flatten-lonely} the adjustments are made before
@@ -3495,14 +3636,14 @@ the hierarchical order is now:
 \item[vegetable] 1
 \end{description}
 This method uses a different format for the modified \field{name}
-field. For example, the \texttt{duck} entry now has:
+field. For example, the \code{duck} entry now has:
 \begin{verbatim}
 name={\bibglsflattenedchildpresort{duck}{birds}}
 \end{verbatim}
 The default definition of \csref{bibglsflattenedchildpresort} simply
 does the first argument and ignores the second. The sorting is then
 performed, but the interpreter recognises this command and can
-deduce that the sort value for this entry should be \texttt{duck},
+deduce that the sort value for this entry should be \code{duck},
 so \qt{duck} now ends up in the D letter group.
 
 If you provide a definition of \cs{bibglsflattenedchildpresort} in
@@ -3838,7 +3979,7 @@ The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: set the
 \field{category} to the \ext{bib} entry type used to define it
-(without the leading \texttt{@});
+(without the leading \code{@});
 \item \optfmt{same as type}: set the \field{category} to the same
 value as the \field{type} field (if that field has been provided
 either in the \ext{bib} file or through the \optref{type} option);
@@ -3868,13 +4009,13 @@ then if the document contains
 \begin{verbatim}
 \GlsXtrLoadResources[category={same as entry},src={entries}]
 \end{verbatim}
-this will set the \field{category} of the \texttt{bird} field to
-\optfmt{entry} (since it was defined with \cs{entry}), the \field{category} of the \texttt{duck} and
-\texttt{goose} entries to \optfmt{index} (since they were defined
-with \atentry{index}), and the \field{category} of the \texttt{dog}
+this will set the \field{category} of the \code{bird} field to
+\optfmt{entry} (since it was defined with \cs{entry}), the \field{category} of the \code{duck} and
+\code{goose} entries to \optfmt{index} (since they were defined
+with \atentry{index}), and the \field{category} of the \code{dog}
 entry to \optfmt{dualentry} (since it was
 defined with \atentry{dualentry}). Note that the dual entry
-\texttt{dual.dog} doesn't have the category set, since that's
+\code{dual.dog} doesn't have the category set, since that's
 governed by \optref{dual-category} instead.
 
 If, instead, the document contains
@@ -3882,7 +4023,7 @@ If, instead, the document contains
 \GlsXtrLoadResources[category={animals},src={entries}]
 \end{verbatim}
 then the \field{category} of all the primary selected entries will 
-be set to \optfmt{animals}. Again the dual entry \texttt{dual.dog}
+be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
 doesn't have the \field{category} set.
 
 Note that the categories may be overridden by the commands,
@@ -3897,7 +4038,7 @@ For example, if the document contains
 
 \GlsXtrLoadResources[category={animals},src={entries}]
 \end{verbatim}
-then both the \texttt{dog} and \texttt{dual.dog} entries will
+then both the \code{dog} and \code{dual.dog} entries will
 have their \field{category} field set to \optfmt{dual} since the
 new definition of \cs{bibglsnewdualentry} has overridden
 the \csopt[animals]{category} option.
@@ -3935,7 +4076,7 @@ if you don't want to worry about the extensions needed by
 \GlsXtrLoadResources[src={entries-symbols},type=dictionary]
 \end{verbatim}
 (The \styopt{nomain} option was added to suppress the
-creation of the default \texttt{main} glossary.)
+creation of the default \code{main} glossary.)
 
 Alternatively you can use \cs{newignoredglossary} if you don't
 want the glossary picked up by \cs{printunsrtglossaries}.
@@ -4014,7 +4155,7 @@ and the file \filefmt{entries-symbols.bib} contains:
 }
 \end{verbatim}
 
-These files both contain an entry with the label \texttt{set}
+These files both contain an entry with the label \code{set}
 but the description includes \verb|\gls{ext1.set}| which is
 referencing the entry from the other file. These
 two files can be loaded without conflict using:
@@ -4033,15 +4174,15 @@ two files can be loaded without conflict using:
 ]
 \end{verbatim}
 
-Now the \texttt{set} entry from \filefmt{entries-terms.bib}
-will be defined with the label \texttt{gls.set} and the
+Now the \code{set} entry from \filefmt{entries-terms.bib}
+will be defined with the label \code{gls.set} and the
 description will be
 \begin{verbatim}
 collection of values, denoted \gls{sym.set}
 \end{verbatim}
-The \texttt{set} entry
+The \code{set} entry
 from \filefmt{entries-symbols.bib} will be defined with the label
-\texttt{sym.set} and the description will be 
+\code{sym.set} and the description will be 
 \begin{verbatim}
 a \gls{gls.set}
 \end{verbatim}
@@ -4093,10 +4234,10 @@ values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
 \item \optfmt{lc}: convert to lower case (ignoring 
-\texttt{\$\meta{maths}\$}, \cs{ensuremath}\margm{maths} 
+\code{\$\meta{maths}\$}, \cs{ensuremath}\margm{maths} 
 and \cs{si}\margm{text});
 \item \optfmt{uc}: convert to upper case (ignoring 
-\texttt{\$\meta{maths}\$}, \cs{ensuremath}\margm{maths} 
+\code{\$\meta{maths}\$}, \cs{ensuremath}\margm{maths} 
 and \cs{si}\margm{text});
 \item \optfmt{lc-cs}: convert to lower case using
 \cs{MakeTextLowercase};
@@ -4107,18 +4248,18 @@ and \cs{si}\margm{text});
 \item \optfmt{firstuc}: convert the first alphabetical letter (or
 group) to upper case. This uses the following rules:
 \begin{enumerate}
-\item if \texttt{\$\meta{maths}\$} then stop (no case change);
+\item if \code{\$\meta{maths}\$} then stop (no case change);
 \item if \cs{NoCaseChange}\margm{text} or
-\cs{ensuremath}\margm{maths} or \cs{si}\margm{text} then skip;
+\cs{ensuremath}\margm{maths} or \cs{si}\margm{text} or \cs{protect} then skip;
 \item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
 \meta{text} and stop;
-\item if \csfmt{}\meta{csname} isn't followed by a group and it's
-not \cs{protect}, then stop (no case change applied);
+\item if \csfmt{}\meta{csname} isn't followed by a group (and it's
+not \cs{protect}), then stop (no case change applied);
 \item if \margm{text} (a group) then convert the entire contents of
 \meta{text} to upper case and stop;
 \item if \meta{character} is an alphabetic character then change it
 to its title case and stop;
-\item otherwise skip.
+\item otherwise skip and move on to the next token.
 \end{enumerate}
 \end{itemize}
 
@@ -4166,7 +4307,7 @@ Z\ae\oe
 \end{verbatim}
 since the interpreter isn't being used at this stage. If the
 interpreter is later used during sorting, the sort value will be set to 
-\texttt{Z\ae\oe}.
+\code{Z\ae\oe}.
 
 However, with \csopt[uc-cs]{short-case-change}, the \field{short}
 value would be converted to
@@ -4174,7 +4315,7 @@ value would be converted to
 \MakeTextUppercase{z\ae\oe}
 \end{verbatim}
 If the interpreter is used during sorting, the sort value will be set to 
-\texttt{Z\AE\OE}.
+\code{Z\AE\OE}.
 
 You can use \cs{NoCaseChange}\margm{text} to prevent the given \meta{text}
 from having the case changed. For example, if the \field{short}
@@ -4210,11 +4351,11 @@ suppose the \field{short} field is defined as:
 short={html}
 \end{verbatim}
 then with \csopt[firstuc]{short-case-change} this would end up as
-\texttt{Html} whereas 
+\code{Html} whereas 
 \begin{verbatim}
 short={{ht}ml}
 \end{verbatim}
-would end up as \texttt{HTml} since it detects the grouping. 
+would end up as \code{HTml} since it detects the grouping. 
 (You'll need to do this for the Dutch digraph \qt{ij}.)
 Note that \cs{NoCaseChange} is skipped, and the case change is
 applied to the material following its argument. For example,
@@ -4230,7 +4371,7 @@ whereas with
 \begin{verbatim}
 short={{}html}
 \end{verbatim}
-then the result is just \texttt{html}. If a command is followed by 
+then the result is just \code{html}. If a command is followed by 
 a group then the case change is applied to the group (unless the
 command is \cs{NoCaseChange}, \cs{ensuremath} or \cs{si}). For
 example,
@@ -4305,7 +4446,7 @@ The default behaviour is \csopt[auto]{group}.
 This is a boolean option. The default setting is
 \csopt[false]{save-child-count}. 
 If \csopt[true]{save\dhyphen child\dhyphen count},
-each entry will be assigned a field called \texttt{childcount} with
+each entry will be assigned a field called \field{childcount} with
 the value equal to the number of child entries that have been
 selected.
 
@@ -4350,9 +4491,9 @@ Then the \ext{glstex} file will contain:
 \GlsXtrSetField{corundum}{childcount}{0}
 \GlsXtrSetField{quartz}{childcount}{0}
 \end{verbatim}
-Note that although \texttt{birds} has three children defined in the
+Note that although \code{birds} has three children defined in the
 \ext{bib} file, only two have been selected, so the child count is
-set to 2. Similarly the \texttt{minerals} entry has five children
+set to 2. Similarly the \code{minerals} entry has five children
 defined in the \ext{bib} file, but only three have been selected, so
 the child count is 3.
 
@@ -4381,7 +4522,7 @@ Some languages, such as English, have a general rule that plurals
 are formed from the singular with a suffix appended. This isn't 
 an absolute rule. There are plenty of exceptions (for example,
 geese, children, churches, elves, fairies, sheep, mice), so a
-simplistic approach of just doing \texttt{\cs{gls}\margm{label}[s]}
+simplistic approach of just doing \code{\cs{gls}\margm{label}[s]}
 will sometimes produce inappropriate results, so the \sty{glossaries}
 package provides a \field{plural} key with the corresponding command
 \cs{glspl}.
@@ -4637,7 +4778,7 @@ Each location is listed in the \ext{aux} file in the form:
 \begin{alltt}
 \cs{glsxtr@record}\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}
 \end{alltt}
-Exact duplicates are discarded. For example, if \texttt{cat}
+Exact duplicates are discarded. For example, if \code{cat}
 is indexed twice on page 1:
 \begin{verbatim}
 \glsxtr@record{cat}{}{page}{glsnumberformat}{1}
@@ -4661,13 +4802,13 @@ makes the following tests:
 \item If one of the formats includes a range formation, the
 range takes precedence.
 
-\item If one of the formats is \texttt{glsnumberformat} (as in the
-above example) or \texttt{glsignore}, that format will be skipped.
+\item If one of the formats is \code{glsnumberformat} (as in the
+above example) or \code{glsignore}, that format will be skipped.
 So in the above example, the second record will be added to the
 location list, but not the first. (A message will only be written to
 the transcript if the \longarg{debug} switch is used.) The default
-\texttt{glsnumberformat} will take precedence over the ignored
-format \texttt{glsignore}.
+\code{glsnumberformat} will take precedence over the ignored
+format \code{glsignore}.
 
 \item If a mapping has been set with the \argref{map-format}
 switch that mapping will be checked.
@@ -4706,7 +4847,7 @@ the locations won't be available even if you don't have the
 
 By default, three or more consecutive locations \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
-the range \texttt{\meta{loc-1}\cs{delimR} \meta{loc-n}} (where
+the range \code{\meta{loc-1}\cs{delimR} \meta{loc-n}} (where
 \cs{delimR} is provided by the \sty{glossaries} package). Otherwise
 the locations are separated by \cs{delimN} (again provided by
 \sty{glossaries}). As mentioned above, these aren't merged with
@@ -4730,7 +4871,7 @@ considered consecutive.
 \item\label{itm:emptyloc} If either \meta{location-1} or \meta{location-2} are empty,
 then the locations aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
-pattern (line break for clarity only)\footnote{The Java class \texttt{\csfmt{p}\marg{javaDigit}}
+pattern (line break for clarity only)\footnote{The Java class \code{\csfmt{p}\marg{javaDigit}}
 used in the regular expression will not only match the Western
 Arabic digits 0,\ldots, 9 but also digits in other scripts.
 Similarly the alphabetic classes will match alphabetic characters
@@ -4797,8 +4938,8 @@ where \meta{n} is an upper case Roman numeral, which is converted to
 a decimal value and the test is performed
 in the same way as the above \hyperref[itm:decmatch]{decimal test}.
 \item\label{itm:alphmatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{c}
-where \meta{c} is either a lower case letter from \texttt{a} to
-\texttt{z} or an upper case letter from \texttt{A} to \texttt{Z}.
+where \meta{c} is either a lower case letter from \code{a} to
+\code{z} or an upper case letter from \code{A} to \code{Z}.
 The character is converted to its code point and the test is
 performed in the same way as the \hyperref[itm:decmatch]{decimal pattern} above.
 \item\label{itm:nomatch} If none of the above, the locations aren't considered
@@ -4832,7 +4973,7 @@ These records aren't consecutive since the formats are different.
 These records are consecutive. The prefix, counter and format are
 identical (so it passes step~\ref{itm:pre}). The locations match
 the \hyperref[itm:rommatch]{lower case Roman numeral pattern}, where
-\texttt{A} is considered a prefix and the dot is consider a
+\code{A} is considered a prefix and the dot is consider a
 separator. The Roman numerals i and ii are converted to decimal and
 the test is retried with the locations set to 1 and 2, respectively.
 This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
@@ -4844,10 +4985,10 @@ This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
 \end{verbatim}
 These records aren't consecutive. They match the
 \hyperref[itm:alphmatch]{alpha pattern}. The first location is
-considered to consist of the prefix \texttt{i}, the separator
-\texttt{.} (dot) and the number given by the character code of A. 
+considered to consist of the prefix \code{i}, the separator
+\code{.} (dot) and the number given by the character code of A. 
 The second location is considered to consist of the prefix
-\texttt{ii}, the separator \texttt{.} (dot) and the number 
+\code{ii}, the separator \code{.} (dot) and the number 
 given by the character code of A.
 
 The test fails because the numbers are equal and the prefixes are
@@ -4860,7 +5001,7 @@ different.
 \end{verbatim}
 These records are consecutive. They match the \hyperref[itm:decmatch]{decimal
 pattern}, and then step~\ref{itm:decgrp3eq} followed by
-step~\ref{itm:decgrp3eqsepeq}. The \texttt{.0} part is discarded and
+step~\ref{itm:decgrp3eqsepeq}. The \code{.0} part is discarded and
 the test is retried with the first location set to 1 and the second
 location set to 2.
 
@@ -4882,7 +5023,7 @@ These records are consecutive. The locations match the
 sequences are the same, so the test is retried with the first
 location set to 1 and the second location set to 2.
 (Note that \csref{glsxtrresourcefile} changes the category code of
-\texttt{@} to allow for internal commands in locations.)
+\code{@} to allow for internal commands in locations.)
 \end{enumerate}
 
 \subsection{\csoptnv{max-loc-diff}\csopteqval{value}}
@@ -5040,8 +5181,8 @@ preamble providing an \cs{ifcase} condition:
 \item \optfmt{true}: equivalent to 
 \csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
 where the definitions of \cs{bibglspagename} and
-\cs{bibglspagesname} are obtained from the \texttt{tag.page} and
-\texttt{tag.pages} entries in \bibgls's \langxml.
+\cs{bibglspagesname} are obtained from the \code{tag.page} and
+\code{tag.pages} entries in \bibgls's \langxml.
 This setting works best if the document's language matches the 
 language file. However, you can redefine these commands within
 the document's language hooks or in the glossary preamble.
@@ -5062,11 +5203,11 @@ For example:
 \end{verbatim}
 This works since the conflicting \csopt[p.,pp.]{loc-prefix} and
 \csopt[true]{loc-prefix} are in different glossaries (assigned through the
-\optref{type} key). The entries fetched from \texttt{entries1.bib}
+\optref{type} key). The entries fetched from \filefmt{entries1.bib}
 won't have a location prefix. The entries fetched from
-\texttt{entries2.bib} will have the location prefix obtained from
+\filefmt{entries2.bib} will have the location prefix obtained from
 the language resource file. The entries fetched from
-\texttt{entries3.bib} will have the location prefix \qt{p.}\ or
+\filefmt{entries3.bib} will have the location prefix \qt{p.}\ or
 \qt{pp.} (Note that using the \csopt{type} option isn't the same as
 setting the \field{type} field for each entry in the \ext{bib}
 file.)
@@ -5079,8 +5220,8 @@ If the \csopt{type} option isn't used:
 \end{verbatim}
 then \csopt[true]{loc-prefix} takes precedence over
 \csopt[p.,pp.]{loc-prefix} (since it was used first). The entries fetched from
-\texttt{entries1.bib} still won't have a location prefix, but the entries
-fetched from both \texttt{entries2.bib} and \texttt{entries3.bib}
+\filefmt{entries1.bib} still won't have a location prefix, but the entries
+fetched from both \filefmt{entries2.bib} and \filefmt{entries3.bib}
 have the location prefixes obtained from the language resource file.
 
 \subsection{\csoptnv{loc-suffix}\csopteqval{value}}
@@ -5264,7 +5405,7 @@ This uses the \counter{section} counter for the locations and has a
 prefix (\verb|\thepart.|) for the section hyperlinks.
 
 Now let's suppose I have another document called \filefmt{main.tex}
-that uses the \texttt{sample} entry, but also needs to include the
+that uses the \code{sample} entry, but also needs to include the
 location (S1) from the supplementary document. The manual approached
 offered by \sty{glossaries-extra} is quite cumbersome and requires
 setting the \catattr{externallocation} attribute and using
@@ -5292,7 +5433,7 @@ name (without the extension) of the supplementary document
 
 \end{document}
 \end{verbatim}
-The location list for \texttt{sample} will now be \qt{1, S1} (page~1
+The location list for \code{sample} will now be \qt{1, S1} (page~1
 from the main document and S1 from the supplementary document). Note
 that the original location format from the supplementary document
 will be replaced by \optfmt{glsxtrsupphypernumber}, which will
@@ -5307,9 +5448,9 @@ The supplementary locations lists are encapsulated within
 \subsection{\csoptnv{supplemental-selection}\csopteqval{value}}
 \labelopt{supplemental-selection}
 
-In the above example, only the \texttt{sample} entry is listed in
+In the above example, only the \code{sample} entry is listed in
 the main document, even though the supplementary document also
-references the \texttt{goose}, \texttt{html} and \texttt{ssi}
+references the \code{goose}, \code{html} and \code{ssi}
 entries. By default, only those entries that are referenced in the
 main document will have supplementary locations added (if found in
 the supplementary document's \ext{aux} file). You can additionally
@@ -5353,13 +5494,13 @@ For example:
 
 \end{document}
 \end{verbatim}
-This will additionally add the \texttt{html} and \texttt{ssi} entries
+This will additionally add the \code{html} and \code{ssi} entries
 even though they haven't been used in this document. The
-\texttt{goose} entry used in the supplementary document won't be
+\code{goose} entry used in the supplementary document won't be
 included.
 
 If an entry has both a main location list and a supplementary
-location list (such as the \texttt{sample} entry above), the lists
+location list (such as the \code{sample} entry above), the lists
 will be separated by \csref{bibglssupplementalsep}.
 
 \subsection{\csoptnv{supplemental-category}\csopteqval{value}}
@@ -5503,7 +5644,7 @@ For example, with:
 \usepackage[record]{glossaries}
 \GlsXtrLoadResources[src={german-terms}]
 \end{verbatim}
-the language tag will be \texttt{de-1996}, which doesn't have an
+the language tag will be \code{de-1996}, which doesn't have an
 associated region. Whereas with
 \begin{verbatim}
 \documentclass[de-DE-1996]{article}
@@ -5511,7 +5652,7 @@ associated region. Whereas with
 \usepackage[record]{glossaries}
 \GlsXtrLoadResources[src={german-terms}]
 \end{verbatim}
-the language tag will be \texttt{de-DE-1996} because \sty{tracklang}
+the language tag will be \code{de-DE-1996} because \sty{tracklang}
 has picked up the locale from the document class options. This is
 only likely to cause a difference if a language has different
 sorting rules according to the region or if the language may be
@@ -5566,7 +5707,7 @@ The rule-based sort options (\csopt[\meta{lang tag}]{sort}
 and \csopt[custom]{sort}) typically list punctuation characters
 (such as space) before alphabetical characters. This means that
 the rule-based sort options are naturally in a letter order, similar
-to \app{xindy}'s \texttt{ord/letorder} module. This isn't the same
+to \app{xindy}'s \code{ord/letorder} module. This isn't the same
 as \csopt[letter-nocase]{sort} as the locale letter ordering is rule-based
 rather than according to the Unicode value.
 
@@ -5605,8 +5746,8 @@ the character to use. For example, \csopt[-]{break-marker} will use a
 hyphen. The marker may be empty, which effectively strips the
 inter-word punctuation. For example, with
 \csopt[\empty]{break-marker}, \qt{Tom, Dick, and Harry} becomes
-\texttt{TomDickandHarry} and \qt{sea lion} simply becomes
-\texttt{sealion}. If \meta{marker} is omitted,
+\code{TomDickandHarry} and \qt{sea lion} simply becomes
+\code{sealion}. If \meta{marker} is omitted,
 \csopt[\empty]{break-marker} is assumed.
 
 \subsection{\csoptnv{sort-field}\csopteqval{field}}
@@ -5655,7 +5796,7 @@ to the following values: \optfmt{primary} (default),
 \optfmt{secondary}, \optfmt{tertiary} or \optfmt{identical}. These
 indicate the difference between two characters, but the exact
 assignment is locale dependent. See the documentation for Java's
-\href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\texttt{Collator}
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\code{Collator}
 class} for further details.
 
 For example, suppose the file \filefmt{entries.bib} contained:
@@ -5716,7 +5857,7 @@ characters are handled. The fastest mode is \optfmt{none} but is
 only appropriate for languages without accents. The slowest mode is
 \optfmt{full} but is the most complete for languages with non-ASCII
 characters. See the documentation for Java's
-\href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\texttt{Collator}
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\code{Collator}
 class} for further details.
 This option is ignored by non-locale sorts (such as letter or numeric).
 
@@ -6014,12 +6155,12 @@ and if the \ext{bib} file contains
   description={enfant}
 }
 \end{verbatim}
-Then the definition of the primary entry (\texttt{child}) in the
+Then the definition of the primary entry (\code{child}) in the
 \ext{glstex} file will have the \field{description} field set to
 \begin{verbatim}
 {\glshyperlink[enfant]{dual.child}}
 \end{verbatim}
-and the dual entry (\texttt{dual.child}) will have the
+and the dual entry (\code{dual.child}) will have the
 \field{description} field set to
 \begin{verbatim}
 {\glshyperlink[child]{child}}
@@ -6074,7 +6215,7 @@ to the start of the \ext{glstex} file providing the key given by
 \meta{value}.  Any entries defined using \atentry{dualentry}
 will be written to the \ext{glstex} file with an extra field called
 \meta{value} that is set to the mirror entry. If \meta{value} is
-omitted \texttt{dual} is assumed.
+omitted \code{dual} is assumed.
 
 For example, if the \ext{bib} file contains
 \begin{verbatim}
@@ -6092,11 +6233,11 @@ at the start of the file and will include the line
 \begin{verbatim}
 dualid={dual.child},
 \end{verbatim}
-for the primary entry (\texttt{child}) and the line
+for the primary entry (\code{child}) and the line
 \begin{verbatim}
 dualid={child},
 \end{verbatim}
-for the dual entry (\texttt{dual.child}). It's then possible to
+for the dual entry (\code{dual.child}). It's then possible to
 reference one entry from the other. For example, the post-description 
 hook could contain:
 \begin{verbatim}
@@ -6503,7 +6644,7 @@ have
 \gls[format={hyperbf}]{sample}
 \end{verbatim}
 This record conflicts with the explicit range (which doesn't include
-\texttt{hyperbf} in the format). This causes a warning and
+\code{hyperbf} in the format). This causes a warning and
 the conflicting entry will be moved before the start of the
 explicit range resulting in \textbf{6}, 4--9.
 
@@ -6590,7 +6731,7 @@ be added instead:
 \end{definition}
 
 If \csopt[true]{loc-prefix} is used, then this command is provided
-using the value of \texttt{tag.page} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
+using the value of \code{tag.page} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
 \begin{verbatim}
 \providecommand{\bibglspagename}{Page}
 \end{verbatim}
@@ -6603,7 +6744,7 @@ using the value of \texttt{tag.page} from the \langxml. For example with \file{b
 \end{definition}
 
 If \csopt[true]{loc-prefix} is used, then this command is provided
-using the value of \texttt{tag.pages} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
+using the value of \code{tag.pages} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
 \begin{verbatim}
 \providecommand{\bibglspagesname}{Pages}
 \end{verbatim}
@@ -6846,7 +6987,7 @@ according to the rule):
 \item \meta{title} The group's title. This is typically title-cased.
 For example, if the rule recognises the digraph \qt{dz}, then the
 title is \qt{Dz}. Exceptions to this are included in the \langxml.
-If the key \texttt{grouptitle.case.\meta{lc}} exists, where
+If the key \code{grouptitle.case.\meta{lc}} exists, where
 \meta{lc} is the lower case version of \meta{title}, then the value
 of that key is used instead. For example, the Dutch digraph \qt{ij}
 should be converted to \qt{IJ}, so \file{bib2gls-en.xml} includes:
@@ -6958,9 +7099,9 @@ of a centimetre}
 }
 \end{verbatim}
 The \field{sort} value is \qtt{\AA ngstr\"om}. With \optref[en]{sort}
-the \meta{title} part will be \texttt{A} but with \optref[sv]{sort}
-the \meta{title} part will be \texttt{\AA}. In both cases the
-\meta{letter} argument will be \texttt{\AA}.
+the \meta{title} part will be \code{A} but with \optref[sv]{sort}
+the \meta{title} part will be \code{\AA}. In both cases the
+\meta{letter} argument will be \code{\AA}.
 
 Take care if you are using a script that needs encapsulating. For
 example, with the \sty{CJKutf8} package the CJK characters need to
@@ -7045,7 +7186,7 @@ For example, suppose my \ext{bib} file contains:
   description = {author string}
 }
 \end{verbatim}
-If a locale sort is used, the leading slash \texttt{/} will be
+If a locale sort is used, the leading slash \code{/} will be
 ignored and this entry will belong to the \qt{A} letter group using
 the letter commands described above. If, instead, one of the
 character code sort methods are used, such as
@@ -7063,7 +7204,7 @@ set using:
 \cs{bibglsothergroup}\margm{character}\margm{id}\margm{type}
 \end{definition}
 This expands to the group label for symbol groups. This just
-defaults to \texttt{glssymbols} (ignoring all arguments), which
+defaults to \code{glssymbols} (ignoring all arguments), which
 replicates the label used when \app{makeindex} or \app{xindy}
 generate the glossary files.
 
@@ -7099,7 +7240,7 @@ The number group label is obtained from:
 \begin{definition}
 \cs{bibglsnumbergroup}\margm{value}\margm{id}\margm{type}
 \end{definition}
-This just defaults to \texttt{glsnumbers}.
+This just defaults to \code{glsnumbers}.
 
 \subsection{\csfmt{bibglsnumbergrouptitle}}
 \labelcs{bibglsnumbergrouptitle}
@@ -7225,7 +7366,7 @@ you can let the interpreter know by adding the definition to
 \end{definition}
 
 Used by the \optref[postsort]{flatten-lonely} option. This defaults
-to \texttt{\meta{parent name}, \meta{child name}}.
+to \code{\meta{parent name}, \meta{child name}}.
 
 Note that the arguments are in the reverse order to those of the
 previous command. This is done to assist the automated first letter
@@ -7251,8 +7392,8 @@ convertgls2bib \oargm{options} \meta{tex file} \meta{bib file}
 \end{alltt}
 where \meta{tex file} is the \ext{tex} file and \meta{bib file} is
 the \ext{bib} file. This application is less secure than \bibgls\ as
-it doesn't use \app{kpsewhich} to check \texttt{openin\_any} and 
-\texttt{openout\_any}. Take care not to accidentally overwrite
+it doesn't use \app{kpsewhich} to check \texmfcnf{openin\_any} and 
+\texmfcnf{openout\_any}. Take care not to accidentally overwrite
 existing \ext{bib} files as there's no check to determine if
 \meta{bib file} already exists.
 
@@ -7400,7 +7541,7 @@ to:
 
 If \longargfmt{space-sub} is used and \meta{label} contains one or
 more spaces, then \field{name} will be set if not included in
-\meta{\keyvallist}. For example, if \texttt{entries.bib}
+\meta{\keyvallist}. For example, if \filefmt{entries.bib}
 contains
 \begin{verbatim}
 \newterm{sea lion}
@@ -7410,7 +7551,7 @@ then
 \begin{verbatim}
 gls2bib --space-sub '-' entries.bib entries.tex
 \end{verbatim}
-will write the terms to \texttt{entries.tex} as
+will write the terms to \filefmt{entries.tex} as
 \begin{verbatim}
 @index{sea-lion,
   name = {sea lion}
@@ -7424,7 +7565,7 @@ whereas just
 \begin{verbatim}
 gls2bib entries.bib entries.tex
 \end{verbatim}
-will write the terms to \texttt{entries.tex} as
+will write the terms to \filefmt{entries.tex} as
 \begin{verbatim}
 @index{sea lion}
 
