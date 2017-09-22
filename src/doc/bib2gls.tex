@@ -474,6 +474,7 @@ to convert the entries to the \filefmt{.bib} format required by
 \frontmatter
 
 \tableofcontents
+\listoftables
 
 \mainmatter
 \chapter{Introduction}
@@ -1619,27 +1620,26 @@ Entries are defined in the usual \ext{bib} format:
 }
 \end{alltt}
 where \meta{entry-type} is the entry type (listed below),
-\meta{field-name-1}, \ldots, \meta{field-name-n} are the field names
-(same as the keys available with \cs{newglossaryentry}) and
+\meta{field-name-1}, \ldots, \meta{field-name-n} are the field names and
 \meta{id} is a unique label. The label can't contain any spaces or
 commas. In general it's best to stick with alpha-numeric labels.
 The field values may be delimited by braces \margm{text} or
 double-quotes \code{"\meta{text}"}.
 
-\bibgls\ allows you to insert prefixes to the labels when the data
-is read through the \optref{label-prefix} option. Remember to use
-these prefixes when you reference the entries in the document, but
-don't include them when you reference them in the \ext{bib} file.
-There are some special prefixes that have a particular meaning to
-\bibgls: \qt{\idprefix{dual}} and \qt{\idprefix{ext\meta{n}}} where
-\meta{n} is a positive integer.  In the first case,
-\idprefix{dual} references the dual element of a dual entry (see
-\atentryref{dualentry}). This prefix will be replaced by the value of
-the \csopt{dual-prefix} option. The \idprefix{ext\meta{n}} prefix
-is used to reference an entry from a different set of resources
-(loaded by another \cs{GlsXtrLoadResources} command). This prefix is
-replaced by the corresponding element of the list supplied by
-\optref{ext-prefixes}.
+The \optref{label-prefix} option can be used to instruct \bibgls\ to
+insert prefixes to the labels (\meta{id}) when the data is read.
+Remember to use these prefixes when you reference the entries in the
+document, but don't include them when you reference them in the
+\ext{bib} file.  There are some special prefixes that have a
+particular meaning to \bibgls: \qt{\idprefix{dual}} and
+\qt{\idprefix{ext\meta{n}}} where \meta{n} is a positive integer.
+In the first case, \idprefix{dual} references the dual element of a
+dual entry (see \atentryref{dualentry}). This prefix will be
+replaced by the value of the \csopt{dual-prefix} option. The
+\idprefix{ext\meta{n}} prefix is used to reference an entry from a
+different set of resources (loaded by another
+\cs{GlsXtrLoadResources} command). This prefix is replaced by the
+corresponding element of the list supplied by \optref{ext-prefixes}.
 
 In the event that the \field{sort} value falls back on the label,
 the original label supplied in the \ext{bib} file is used, not the
@@ -1664,24 +1664,42 @@ If you don't use either method \bibgls\ will
 have to search the entire \ext{bib} file, which is inefficient and
 you may end up with a mismatched encoding.
 
-Each entry type may have required fields and optional fields. For the
-optional fields, any key recognised by \cs{newglossaryentry} may be
-used as a field. However, note that if you add
-any custom keys in your document using \cs{glsaddkey} or \cs{glsaddstoragekey}, those
-commands must be placed before the first use of
-\cs{GlsXtrLoadResources}. Predefined fields for use in \ext{bib}
-files are listed in Tables~\ref{tab:fields},
-\ref{tab:bib2glsfields}, \ref{tab:prefixfields}
-and~\ref{tab:accsuppfields}.  Fields that may be set by \bibgls\ are
-listed in Table~\ref{tab:internalfields}. These typically shouldn't
-be set in the \ext{bib} file and in some cases don't have a
-designated key, in which case they won't be recognised if they're
-present in the \ext{bib} file.
+\section{Fields}
+\label{sec:fields}
 
-Any unrecognised fields will be ignored.
-This is more convenient than using \cs{input} or \cs{loadglsentries}, which
-requires all the keys used in the file to be defined, regardless of
-whether or not you actually need them in the document.
+Each entry type may have required fields, optional fields and
+ignored fields. These are set using a \keyvallist\ within
+\code{@\meta{entry-type}\marg{\meta{id},\meta{fields}}} in the
+\ext{bib} file. Most keys recognised by
+\cs{newglossaryentry} may be used as a field.
+
+Predefined fields for use in \ext{bib} files are listed in
+Tables~\ref{tab:fields}, \ref{tab:bib2glsfields},
+\ref{tab:prefixfields} and~\ref{tab:accsuppfields}.  If you add any
+custom keys in your document using \cs{glsaddkey} or
+\cs{glsaddstoragekey}, those commands must be placed before the
+first use of \cs{GlsXtrLoadResources} to ensure that \bibgls\
+recognises them as a field name. 
+
+Fields that may be set by \bibgls\ when it creates the \ext{glstex}
+files are listed in Table~\ref{tab:internalfields}. These typically
+shouldn't be set in the \ext{bib} file (although you may need
+\field{sort} for cases where \bibgls\ doesn't recognise any of the
+commands in the \field{name} field). Some of these fields can be set
+for a particular document using a resource option, such as
+\optref{type} or \optref{category}.
+
+There are also some fields that are set and used by 
+\styfmt{glossaries} or \styfmt{glossaries-extra} listed in
+Table~\ref{tab:baseinternalfields} that are unrecognised by \bibgls.
+In most cases these fields don't have a designated key and are only
+intended for internal use by the \styfmt{glossaries} or
+\styfmt{glossaries-extra} package.
+
+Any unrecognised fields will be ignored by \bibgls. This is more convenient
+than using \cs{input} or \cs{loadglsentries}, which requires all the
+keys used in the file to be defined, regardless of whether or not
+you actually need them in the document.
 
 If an optional field is missing and \bibgls\ needs to access it for
 some reason (for example, for sorting), \bibgls\ will try to
@@ -1725,23 +1743,29 @@ use the \field{seealso} field directly.
 \bfseries Field & \bfseries Description\\
 \fielddef{alias} & This entry is a
 synonym of the entry whose label is given by this field.\\
-\fielddef{category} & This entry's category.\\
+\fielddef{category} & This entry's category label.\\
 \fielddef{description} & The description displayed in the glossary.\\
 \fielddef{descriptionplural} & The plural form of the description.\\
-\fielddef{first} & The text to display on first use of \cs{gls}\\
-\fielddef{firstplural} & The text to display on first use of \cs{glspl}\\
+\fielddef{first} & The text to display on first use of
+\cs{gls}\margm{label}.\\
+\fielddef{firstplural} & The text to display on first use of 
+\cs{glspl}\margm{label}.\\
 \fielddef{long} & The long form of an abbreviation.\\
 \fielddef{longplural} & The plural long form of an abbreviation.\\
 \fielddef{name} & The name displayed in the glossary.\\
 \fielddef{parent} & The parent entry's label.\\
-\fielddef{plural} & The text to display on subsequent use of \cs{glspl}\\
-\fielddef{see} & General purpose cross-reference.\\
-\fielddef{seealso} & Cross-reference related entries.\\
+\fielddef{plural} & The text to display on subsequent use of
+\cs{glspl}\margm{label}.\\
+\fielddef{see} & General purpose cross-reference
+(syntax: \code{see=\marg{\oargm{tag}\meta{xr-list}}}).\\
+\fielddef{seealso} & Cross-reference related entries
+(syntax: \code{seealso=\margm{xr-list}}).\\
 \fielddef{short} & The short form of an abbreviation.\\
 \fielddef{shortplural} & The plural short form of an abbreviation.\\
 \fielddef{symbol} & The associated symbol.\\
 \fielddef{symbolplural} & The plural form of the associated symbol.\\
-\fielddef{text} &  The text to display on subsequent use of \cs{gls}\\
+\fielddef{text} &  The text to display on subsequent use of
+\cs{gls}\margm{label}.\\
 \fielddef{user1} & A general purpose user field.\\
 \fielddef{user2} & A general purpose user field.\\
 \fielddef{user3} & A general purpose user field.\\
@@ -1765,7 +1789,7 @@ synonym of the entry whose label is given by this field.\\
 \end{table}
 
 \begin{table}[hbtp]
-\caption{Fields Provided by \styfmt{glossaries-prefix}}\label{tab:prefixfields}
+\caption[Fields Provided by \styfmt{glossaries-prefix}]{Fields Provided by \sty{glossaries-prefix}}\label{tab:prefixfields}
 \medskip
 \centering
 \begin{tabular}{ll}
@@ -1782,10 +1806,10 @@ field.\\
 \end{table}
 
 \begin{table}[hbtp]
-\caption{Fields Provided by \styfmt{glossaries-accsupp}}
+\caption[Fields Provided by \styfmt{glossaries-accsupp}]{Fields Provided by \sty{glossaries-accsupp}}
 \label{tab:accsuppfields}
 \medskip
-\centering
+{\centering
 \begin{tabular}{ll}
 \bfseries Field & \bfseries Description\\
 \fielddef{access} & The replacement text for the \field{name} field.\\
@@ -1808,25 +1832,82 @@ field.\\
 \field{symbolplural} field.\\
 \fielddef{textaccess} & The replacement text for the \field{text} field.
 \end{tabular}
+\par}
+\medskip
+Don't load \sty{glossaries-accsupp} directly (with \cs{usepackage}) when using
+\styfmt{glossaries-extra}. Load using the \styopt{accsupp} package
+option instead.
+\begin{verbatim}
+\usepackage[record,accsupp]{glossaries-extra}
+\end{verbatim}
 \end{table}
 
 \begin{table}[hbtp]
-\caption{Internal Fields}\label{tab:internalfields}
+\caption[Fields Set by \bibgls]{Fields Sometimes Set by \bibgls\ in the \ext{glstex} File}
+\label{tab:internalfields}
 \centering
 \medskip
 \begin{tabular}{ll}
 \bfseries Field & \bfseries Description\\
 \fielddef{childcount} & Stores the number of children this entry has
 had selected.\\
-\fielddef{counter} & The default counter used for indexing.\\
+\fielddef{counter} & The default counter used for indexing (assigned by
+the \optref{counter} option).\\
 \fielddef{group} & The letter group determined by the comparator
 (or assigned by the \optref{group} option).\\
 \fielddef{location} & The typeset location list. \\
 \fielddef{loclist} & The internal list of locations.\\
 \fielddef{sort} & The sort value obtained by the comparator.\\
-\fielddef{type} & The glossary this entry belongs to.
+\fielddef{type} & The glossary this entry belongs to (assigned by
+the \optref{type} option).
 \end{tabular}
 \end{table}
+
+\begin{table}[hbtp]
+\caption{Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}
+(don't use with \bibgls)}\label{tab:baseinternalfields}
+\centering
+\medskip
+\begin{tabular}{ll}
+\bfseries Field & \bfseries Description\\
+\fieldfmt{currcount} & Used with entry counting to store the current
+total\\
+\fieldfmt{currunit@}\meta{value} & Used with unit entry counting
+(\styfmt{glossaries-extra}).\\
+\fieldfmt{desc} & Corresponds to \fieldfmt{description} key.\\
+\fieldfmt{descplural} & Corresponds to \fieldfmt{descriptionplural} key.\\
+\fieldfmt{firstpl} & Corresponds to \fieldfmt{firstplural} key.\\
+\fieldfmt{flag} & Boolean that determines if an entry has been
+used.\\
+\fieldfmt{index} & The main part of the indexing code
+(\appfmt{makeindex} or \appfmt{xindy}).\\
+\fieldfmt{level} & Hierarchical level.\\
+\fieldfmt{longpl} & Corresponds to \fieldfmt{longplural} key.\\
+\fieldfmt{nonumberlist} & Used to suppress the location list for a
+specific entry.\\
+\fieldfmt{prevcount} & Used with entry counting to store the 
+total from the previous run.\\
+\fieldfmt{prevunit@}\meta{value} & Used with unit entry counting
+(\styfmt{glossaries-extra}).\\
+\fieldfmt{prevunitmax} & Used with unit entry counting
+(\styfmt{glossaries-extra}).\\
+\fieldfmt{prevunittotal} & Used with unit entry counting
+(\styfmt{glossaries-extra}).\\
+\fieldfmt{shortpl} & Corresponds to \fieldfmt{shortplural} key.\\
+\fieldfmt{sortvalue} & Original \fieldfmt{sort} value (before sanitizing and
+escaping special characters).\\
+\fieldfmt{unitlist} & Used with unit entry counting
+(\styfmt{glossaries-extra}).\\
+\fieldfmt{useri} & Corresponds to \fieldfmt{user1} key.\\
+\fieldfmt{userii} & Corresponds to \fieldfmt{user2} key.\\
+\fieldfmt{useriii} & Corresponds to \fieldfmt{user3} key.\\
+\fieldfmt{useriv} & Corresponds to \fieldfmt{user4} key.\\
+\fieldfmt{userv} & Corresponds to \fieldfmt{user5} key.\\
+\fieldfmt{uservi} & Corresponds to \fieldfmt{user6} key.
+\end{tabular}
+\end{table}
+
+\clearpage
 
 \section{\atentry{string}}
 \labelatentry{string}
@@ -4081,6 +4162,20 @@ creation of the default \code{main} glossary.)
 Alternatively you can use \cs{newignoredglossary} if you don't
 want the glossary picked up by \cs{printunsrtglossaries}.
 
+\subsection{\csoptnv{counter}\csopteqval{value}}
+\labelopt{counter}
+
+The \csopt{counter} option assigns the default counter to use
+for the selected entries. (This can be overridden with the
+\gencsopt{gls}{counter} key when using commands like \csfmt{gls}.)
+The value must be the name of a counter. Since \bibgls\ doesn't know
+which counters are defined within the document, there's no check to
+determine if the value is valid (except for ensuring that
+\meta{value} is non-empty).
+
+Note that this will require an extra \LaTeX\ and \bibgls\ call since
+the counter can't be used for the indexing until the entry has been
+defined.
 
 \subsection{\csoptnv{label-prefix}\csopteqval{tag}}
 \labelopt{label\dhyphen prefix}
@@ -5997,6 +6092,14 @@ have the \field{type} field set, the \field{category} will
 remain unchanged.
 \item \meta{label}: sets the \field{category} field to \meta{label}.
 \end{itemize}
+
+\subsection{\csoptnv{dual-counter}\csopteqval{value}}
+\labelopt{dual-counter}
+
+As \optref{counter} but for the dual entries. In this case
+\meta{value} may be the name of the counter or 
+\optfmt{same as primary} which uses the counter for the primary
+entry.
 
 \subsection{\csoptnv{dual-short-case-change}\csopteqval{value}}
 \labelopt{dual-short-case-change}

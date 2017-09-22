@@ -6,5 +6,6 @@
 *.ind
 *.ilg
 *.ist
+*.lot
 bib2gls.pdf
 bib2gls.1

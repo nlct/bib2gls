@@ -439,6 +439,14 @@ public class GlsResource
          {
             dualCategory = getRequired(parser, list, opt);
          }
+         else if (opt.equals("counter"))
+         {
+            counter = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("dual-counter"))
+         {
+            dualCounter = getRequired(parser, list, opt);
+         }
          else if (opt.equals("label-prefix"))
          {
             labelPrefix = getOptional(parser, list, opt);
@@ -2123,6 +2131,7 @@ public class GlsResource
 
                setType(entry);
                setCategory(entry);
+               setCounter(entry);
 
                // does this entry have any records?
 
@@ -2175,6 +2184,7 @@ public class GlsResource
                   {
                      setDualType(dual);
                      setDualCategory(dual);
+                     setDualCounter(dual);
 
                      bibData.add(dual);
                   }
@@ -2854,6 +2864,7 @@ public class GlsResource
 
                   setDualType(dual);
                   setDualCategory(dual);
+                  setDualCounter(dual);
 
                   dualEntries.add(dual);
                }
@@ -2865,6 +2876,7 @@ public class GlsResource
             {
                setDualType(dual);
                setDualCategory(dual);
+               setDualCounter(dual);
 
                dualEntries.add(dual);
             }
@@ -3968,6 +3980,34 @@ public class GlsResource
       }
    }
 
+   private void setCounter(Bib2GlsEntry entry)
+   {
+      if (counter != null)
+      {
+         entry.putField("counter", counter);
+      }
+   }
+
+   private void setDualCounter(Bib2GlsEntry dual)
+   {
+      if (dualCounter != null)
+      {
+         if (dualCounter.equals("same as primary"))
+         {
+            String val = dual.getDual().getFieldValue("counter");
+
+            if (val != null)
+            {
+               dual.putField("counter", val);
+            }
+         }
+         else
+         {
+            dual.putField("counter", dualCounter);
+         }
+      }
+   }
+
    private void setDualType(Bib2GlsEntry dual)
    {
       if (dualType != null)
@@ -4590,12 +4630,15 @@ public class GlsResource
 
    private String[] externalPrefixes = null;
 
-   private String type=null, category=null, sort = "locale", sortField = "sort";
+   private String type=null, category=null, counter=null;
+
+   private String sort = "locale", sortField = "sort";
 
    private String sortRules=null, secondarySortRules=null, dualSortRules=null;
 
-   private String dualType=null, dualCategory=null, 
-      dualSort = null, dualSortField = "sort";
+   private String dualType=null, dualCategory=null, dualCounter=null;
+
+   private String dualSort = null, dualSortField = "sort";
 
    private String pluralSuffix="\\glspluralsuffix ";
    private String dualPluralSuffix="\\glspluralsuffix ";

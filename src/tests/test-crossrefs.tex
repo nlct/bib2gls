@@ -50,9 +50,9 @@
  src={entries-symbols},% data in entries-symbols.bib
  %sort=none,% 'none' or 'use' or 'locale' or 'letter-case'
             % or 'letter-nocase' or specific locale
- %sort=letter-nocase,%
- sort=locale,%
- %sort-field=name,% use name field as the sort value
+ sort=letter-nocase,%
+ %sort=locale,%
+ sort-field=name,% use name field as the sort value
  %interpret-preamble=false,% don't interpret @preamble
  loc-prefix={Location:},% prefix location list
  loc-suffix,% terminate location lists with \@.
@@ -79,6 +79,7 @@ Some \gls{set} stuff:
 \[
  \gset{A} = \{1, 4, 5, 9\};\ \gcard{A} = 4
 \]
+Empty set: $\gls{emptyset}$.
 
 \printunsrtglossaries
 \end{document}
