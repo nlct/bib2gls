@@ -3344,6 +3344,7 @@ is best avoided. A better method would be:
 The \csopt[recorded and deps and see]{selection} in this case will
 select all three entries, and the document won't send the reader on a
 long-winded detour.
+
 \subsection{\csoptnv{match}\csopteqval{\keyvallist}}
 \labelopt{match}
 
@@ -3367,7 +3368,9 @@ period use \verb|\string\.| not \verb|\.| (backslash dot).
 
 If the field is missing its value it is assumed to be empty for
 the purposes of the pattern match even if it will be assigned a
-non-empty default value when the entry is defined.
+non-empty default value when the entry is defined. If the field is
+unrecognised by \bibgls\ any reference to it in \meta{\keyvallist} will
+be ignored.
 
 If a field is listed multiple times, the pattern for that
 field is concatenated using
@@ -3417,6 +3420,17 @@ If the value of \optref{match} contains more than one
 determines whether to apply a logical AND or a logical OR.
 The \meta{value} may be either \optfmt{and} or \optfmt{or}.
 The default is \csopt[and]{match-op}.
+
+\subsection{\csoptnv{not-match}\csopteqval{\keyvallist}}
+\labelopt{not-match}
+
+This has the same syntax as \optref{match}.
+If \optref[\meta{\keyvallist}]{match} would cause an entry to be
+selected then \optref[\meta{\keyvallist}]{not-match} would cause
+that entry to be ignored. If \meta{keyvallist} is missing, the
+filtering is removed.  If you have both \optref{match} and
+\csopt{not-match} in the same resource set, the last one listed
+takes precedence.
 
 \subsection{\csoptnv{flatten}\csopteqval{boolean}}
 \labelopt{flatten}

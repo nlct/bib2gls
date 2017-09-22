@@ -181,6 +181,72 @@ public class GlsResource
          else if (opt.equals("match"))
          {
             TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            notMatch = false;
+
+            if (array == null)
+            {
+               fieldPatterns = null;
+            }
+            else
+            {
+               fieldPatterns = new HashMap<String,Pattern>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (split.size() > 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  String val = split.size() == 1 ? "" 
+                               : split.get(1).toString(parser);
+
+                  // Has this field already been added?
+
+                  Pattern p = fieldPatterns.get(field);
+
+                  if (p == null)
+                  {
+                     p = Pattern.compile(val);
+                  }
+                  else
+                  {
+                     p = Pattern.compile(String.format(
+                            "(?:%s)|(?:%s)", p.pattern(), val));
+                  }
+                  try
+                  {
+                     fieldPatterns.put(field, p);
+                  }
+                  catch (PatternSyntaxException e)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.pattern", 
+                        field, val, opt), e);
+                  }
+               }
+            }
+         }
+         else if (opt.equals("not-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            notMatch = true;
 
             if (array == null)
             {
@@ -4235,6 +4301,13 @@ public class GlsResource
    {
       if (fieldPatterns == null) return false;
 
+      boolean discard = notMatch(entry);
+
+      return notMatch ? !discard : discard;
+   }
+
+   private boolean notMatch(Bib2GlsEntry entry)
+   {
       boolean matches = fieldPatternsAnd;
 
       for (Iterator<String> it = fieldPatterns.keySet().iterator();
@@ -4664,6 +4737,8 @@ public class GlsResource
    private BibValueList preambleList = null;
 
    private HashMap<String,Pattern> fieldPatterns = null;
+
+   private boolean notMatch=false;
 
    private boolean fieldPatternsAnd=true;
 

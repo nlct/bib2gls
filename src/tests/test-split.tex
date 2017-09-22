@@ -1,0 +1,23 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+    \documentclass{article}
+    
+    \usepackage{color}
+    \usepackage[record,style=indexgroup]{glossaries-extra}
+    
+    \GlsXtrLoadResources[src={testfile1},
+     group={Group 1},
+     selection=all]
+    \GlsXtrLoadResources[src={testfile2},
+     sort={letter-nocase-reverse},
+     group={Group 2},
+     selection=all]
+    
+    % adjust indexgroup style:
+    \renewcommand{\glstreenamefmt}[1]{#1}
+    \renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
+
+    \begin{document}
+    \printunsrtglossaries
+    \end{document}

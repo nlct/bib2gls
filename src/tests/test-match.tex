@@ -1,13 +1,41 @@
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,nogroupskip]{glossaries-extra}
+
+\glsaddstoragekey{note}{}{\glsentrynote}
+
+\newglossary*{glossary2}{Glossary 2 (matched)}
+\newglossary*{glossary3}{Glossary 3 (not matched)}
 
 \GlsXtrLoadResources[
   src={topics},% topics.bib
+  label-prefix={all.},%
+  selection=all% select all entries that match
+]
+
+\GlsXtrLoadResources[
+  src={topics},% topics.bib
+  type=glossary2,
+  match-op={or},
   match={category={animal},category={mineral},note={.*note.*}},
   selection=all% select all entries that match
 ]
+
+\GlsXtrLoadResources[
+  src={topics},% topics.bib
+  type=glossary3,
+  match-op={or},
+  not-match={category={animal},category={mineral},note={.*note.*}},
+  selection=all% select all entries that match
+]
+
+\renewcommand{\glsxtrpostdescription}{%
+ \glsxtrifhasfield{note}{\glscurrententrylabel}%
+ { (\glscurrentfieldvalue)}%
+ {}%
+ . Category: \glscategory{\glscurrententrylabel}.
+}
 
 \begin{document}
 Test.
