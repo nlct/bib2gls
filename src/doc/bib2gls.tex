@@ -176,7 +176,7 @@ heading_suffix "}\n"
 
 \newcommand*{\sty}[1]{%
   \texorpdfstring
-  {\styfmt{#1}\index{#1\actual\styfmt{#1}}}%
+  {\styfmt{#1}\index{#1 package\actual\styfmt{#1} package}}%
   {#1}%
 }
 
@@ -438,7 +438,7 @@ The \bibgls\ command line application can be used to extract
 glossary information stored in a \filefmt{.bib} file and convert it
 into glossary entry definition commands that can be read using
 \styfmt{glossaries-extra}'s \csfmt{GlsXtrLoadResources} command. When used
-in combination with the \styopt{record} package option, \bibgls\
+in combination with the \styoptfmt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
 required by not defining unnecessary commands.
@@ -465,7 +465,7 @@ managing glossary tags?} on \TeX\ on StackExchange. The \filefmt{.bib}
 file can be managed in an application such as JabRef.
 
 If you already have a \filefmt{.tex} file containing 
-entry definitions using commands like \cs{newglossaryentry}
+entry definitions using commands like \csfmt{newglossaryentry}
 then you can use the supplementary tool \appfmt{convertgls2bib}
 to convert the entries to the \filefmt{.bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
@@ -511,7 +511,7 @@ redundant location for each entry).
 Note that \bibgls\ requires the extension package
 \sty{glossaries-extra} and can't be used with just the base
 \sty{glossaries} package, since it requires some of the extension
-commands. See the \sty{glossaries-extra} user manual for information
+commands. See the \styfmt{glossaries-extra} user manual for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
 
@@ -526,7 +526,7 @@ through \cs{write18} it must be done in the preamble with
 \begin{verbatim}
 \immediate\write18{bib2gls \jobname}
 \end{verbatim}
-As from version 1.14 of \sty{glossaries-extra}, this can be done
+As from version 1.14 of \styfmt{glossaries-extra}, this can be done
 automatically with the \styopt{automake} option if the \ext{aux}
 file exists. (Remember that this will require the shell escape to be
 enabled.)
@@ -639,7 +639,7 @@ those entries that are required in the document are defined, so
 \cs{printunsrtglossary} (or \cs{printunsrtglossaries}) may be used.
 (The \qtt{unsrt} part of the command name indicates that all
 defined entries should be listed in the order of definition from
-\sty{glossaries-extra}'s point of view.)
+\styfmt{glossaries-extra}'s point of view.)
 
 If you additionally want to use an indexing application, such
 as \app{xindy}, you need the package option
@@ -1557,7 +1557,7 @@ pdflatex myDoc
 because the group hyperlink information can't be determined by
 \bibgls, so it's best to always set the \optfmt{type} if you want
 hyper-group styles, and make sure you have an up-to-date version of 
-\sty{glossaries} (and \sty{glossaries-extra}).
+\styfmt{glossaries} (and \styfmt{glossaries-extra}).
 
 \section{\longarg{no-group}}
 \labelarg{no-group}
@@ -1575,7 +1575,7 @@ output files. If the document has loaded the \sty{inputenc} package then
 \ext{aux} file. This then needs to be converted to a name
 recognised by Java. For example, \code{utf8} will be mapped to
 \code{UTF-8}. If the \sty{fontspec} package has been loaded,
-\sty{glossaries-extra} will assume the encoding is \code{utf8} and
+\styfmt{glossaries-extra} will assume the encoding is \code{utf8} and
 write that value to the \ext{aux} file.
 
 If neither package has been loaded, \bibgls\ will assume the
@@ -2012,7 +2012,7 @@ will use the \atentry{preamble} definitions) and in the second
 example the \atentry{preamble} definitions will take precedence.
 
 \item Make use of \cs{glsxtrfmt} provided by
-\sty{glossaries-extra}\footnote{Introduced in version 1.12.}\ which
+\styfmt{glossaries-extra}\footnote{Introduced in version 1.12.}\ which
 allows you to store the name of the formatting command in a field.
 The default is the \field{user1} field, but this can be changed to 
 another field by redefining \cs{GlsXtrFmtField}.
@@ -2588,11 +2588,11 @@ will be provided in the \ext{glstex} file with
 \begin{alltt}
 \cs{glsxtrprovidestoragekey}\margm{key}\marg{}\marg{}
 \end{alltt}
-This command is defined by the \sty{glossaries-extra} package.
+This command is defined by the \styfmt{glossaries-extra} package.
 Note that this use with an empty third argument prevents
 the creation of a field access command (analogous to
 \cs{glsentrytext}). You can fetch the value with
-\cs{glsxtrusefield}.  (See the \sty{glossaries-extra} manual for
+\cs{glsxtrusefield}.  (See the \styfmt{glossaries-extra} manual for
 further details.) Remember that the field won't be
 available until the \ext{glstex} file has been created.
 
@@ -3067,7 +3067,7 @@ interpreter is needed to determine an entry's sort value.
 
 The \glostyle{alttree} glossary style needs to know the widest
 \field{name} (for each level, if hierarchical). This can
-be set using \cs{glssetwidest} provided by the \sty{glossaries}
+be set using \cs{glssetwidest} provided by the \styfmt{glossaries}
 package, but this requires knowing which name is the widest.
 
 The boolean option \csopt[true]{set-widest} will try to calculate
@@ -4436,7 +4436,7 @@ then with  \csopt[uc]{short-case-change}, this would be converted to
 A\NoCaseChange{bc}D
 \end{verbatim}
 (This command is provided by \sty{textcase}, which is automatically
-loaded by \sty{glossaries}.)
+loaded by \styfmt{glossaries}.)
 
 If you have a command that takes a label or identifier as an argument then it's
 best to hide the label in a custom command. For example, if the
@@ -4510,7 +4510,7 @@ the result is
 \protect Html
 \end{verbatim}
 
-See \optref{dual-short-case-change} to adjust the \field{dualplural}
+See \optref{dual-short-case-change} to adjust the \field{dualshort}
 field.
 
 \subsection{\csoptnv{name-case-change}\csopteqval{value}}
@@ -4618,7 +4618,7 @@ in parentheses:
 \end{verbatim}
 (\cs{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
 It's slightly more efficient that \cs{ifglshasfield} provided by
-the base \sty{glossaries} package, and it doesn't complain if the
+the base \styfmt{glossaries} package, and it doesn't complain if the
 entry or field don't exist, but note that \cs{glsxtrifhasfield}
 implicitly scopes its content. Use the starred version to omit the
 grouping.)
@@ -4631,7 +4631,7 @@ are formed from the singular with a suffix appended. This isn't
 an absolute rule. There are plenty of exceptions (for example,
 geese, children, churches, elves, fairies, sheep, mice), so a
 simplistic approach of just doing \code{\cs{gls}\margm{label}[s]}
-will sometimes produce inappropriate results, so the \sty{glossaries}
+will sometimes produce inappropriate results, so the \styfmt{glossaries}
 package provides a \field{plural} key with the corresponding command
 \cs{glspl}.
 
@@ -4639,7 +4639,7 @@ In some cases a plural may not make any sense (for example, if the
 term is a verb or symbol), so the \field{plural} key is optional, but to
 make life easier for languages where the majority of plurals can
 simply be formed by appending a suffix to the singular, the
-\sty{glossaries} package lets the \field{plural} field default
+\styfmt{glossaries} package lets the \field{plural} field default
 to the value of the \field{text} field with \cs{glspluralsuffix}
 appended. This command is defined to be just the letter \qt{s}.
 This means that the majority of terms in such languages don't need to have the
@@ -4655,7 +4655,7 @@ a language that doesn't have a simple suffix rule, you'll have to
 supply the plural forms if you need them (and if a plural makes
 sense in the context).
 
-If these fields are omitted, the \sty{glossaries} package follows
+If these fields are omitted, the \styfmt{glossaries} package follows
 these rules:
 \begin{itemize}
 \item If \field{firstplural} is missing, then \cs{glspluralsuffix}
@@ -4673,7 +4673,7 @@ appended.
 \field{long} field has been supplied.
 
 \item If the \field{shortplural} field is missing then, \emph{with
-the base \sty{glossaries} acronym mechanism}, \cs{acrpluralsuffix}
+the base \styfmt{glossaries} acronym mechanism}, \cs{acrpluralsuffix}
 is appended to the \field{short} field.
 
 \end{itemize}
@@ -4737,7 +4737,7 @@ The other approach is to use the options listed below.
 Sets the plural suffix for the default \field{shortplural} to \meta{value}.  If
 this option is omitted or if
 \csopt[use-default]{short\dhyphen plural-suffix}, then \bibgls\ will leave
-it to \sty{glossaries-extra} to determine the appropriate default.
+it to \styfmt{glossaries-extra} to determine the appropriate default.
 If the \meta{value} is omitted or empty, the suffix is set to empty.
 
 \subsection{\csoptnv{dual-short-plural-suffix}\csopteqval{value}}
@@ -4746,7 +4746,7 @@ If the \meta{value} is omitted or empty, the suffix is set to empty.
 Sets the plural suffix for the default \field{dualshortplural} field to
 \meta{value}.  If this option is omitted or if
 \csopt[use-default]{dual-short-plural-suffix}, then \bibgls\ will leave it to
-\sty{glossaries-extra} to determine the appropriate default.
+\styfmt{glossaries-extra} to determine the appropriate default.
 If the \meta{value} is omitted or empty, the suffix is set to empty.
 
 \section{Location List Options}
@@ -4775,7 +4775,7 @@ and
 for the locations. You can iterate through the \field{loclist} value
 using one of \sty{etoolbox}'s internal list loops (either
 by first fetching the list using \cs{glsfieldfetch}
-or through \sty{glossaries-extra}'s \cs{glsxtrfielddolistloop}
+or through \styfmt{glossaries-extra}'s \cs{glsxtrfielddolistloop}
 or \cs{glsxtrfieldforlistloop} shortcuts).
 
 The \meta{format} is that supplied by the \gencsopt{gls}{format} key
@@ -4871,7 +4871,7 @@ It's possible to define a custom glossary style where
 final argument (which will be the \field{location} field)
 and instead parse the \field{loclist} field and re-order the
 locations or process them in some other way. Remember that you can also use \cs{glsnoidxloclist}
-provided by \sty{glossaries}. For example:
+provided by \styfmt{glossaries}. For example:
 \begin{verbatim}
 \glsfieldfetch{gls.sample}{loclist}{\loclist}% fetch location list
 \glsnoidxloclist{\loclist}% iterate over locations
@@ -4934,7 +4934,7 @@ according to the glossary style (and other factors, such as whether the
 \styopt{nonumberlist} option has been used, either as a package
 option or supplied in the optional argument of \cs{printunsrtglossary}).
 For more information on adjusting the formatting see the
-\sty{glossaries} and \sty{glossaries-extra} user manuals.
+\styfmt{glossaries} and \styfmt{glossaries-extra} user manuals.
 
 \subsection{\csoptnv{save-locations}\csopteqval{boolean}}
 \labelopt{save-locations}
@@ -4956,9 +4956,9 @@ the locations won't be available even if you don't have the
 By default, three or more consecutive locations \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
 the range \code{\meta{loc-1}\cs{delimR} \meta{loc-n}} (where
-\cs{delimR} is provided by the \sty{glossaries} package). Otherwise
+\cs{delimR} is provided by the \styfmt{glossaries} package). Otherwise
 the locations are separated by \cs{delimN} (again provided by
-\sty{glossaries}). As mentioned above, these aren't merged with
+\styfmt{glossaries}). As mentioned above, these aren't merged with
 explicit range formations.
 
 You can change this with the \csopt{min-loc-range} setting where
@@ -5515,7 +5515,7 @@ prefix (\verb|\thepart.|) for the section hyperlinks.
 Now let's suppose I have another document called \filefmt{main.tex}
 that uses the \code{sample} entry, but also needs to include the
 location (S1) from the supplementary document. The manual approached
-offered by \sty{glossaries-extra} is quite cumbersome and requires
+offered by \styfmt{glossaries-extra} is quite cumbersome and requires
 setting the \catattr{externallocation} attribute and using
 \cs{glsadd} with \glsaddopt[S1]{thevalue}, \glsaddopt[I.S1]{theHvalue}
 and \glsaddopt[glsxtrsupphypernumber]{format}.
@@ -5643,7 +5643,7 @@ identifier (as per \optref{category}) or the category label. For example:
 \label{sec:sortingopts}
 
 Entries are typically sorted (for example, alphabetically
-or in order of use), but the \sty{glossaries-extra} package
+or in order of use), but the \styfmt{glossaries-extra} package
 is versatile enough to be used in wider contexts than simple
 terms, symbols or abbreviations. For example, entries could
 contain theorems or problems where the \field{name} supplies
@@ -6181,7 +6181,7 @@ dual entry. Note that the missing plural fields (\field{plural} and
 In general \bibgls\ doesn't try to supply missing fields, but in the
 dual entry cases it needs to do this for the mapped fields. This is
 because the shuffled fields might have different default values from
-the \sty{glossaries-extra} package's point of view. For example, 
+the \styfmt{glossaries-extra} package's point of view. For example, 
 \cs{longnewglossaryentry} doesn't provide a default for
 \field{descriptionplural} if if hasn't been set.
 
@@ -6515,7 +6515,7 @@ file is:
 }
 \end{verbatim}
 This works in much the same way as \cs{bibglsnewabbreviation}.
-Remember that with the \sty{glossaries-extra} package \cs{newacronym}
+Remember that with the \styfmt{glossaries-extra} package \cs{newacronym}
 is redefined to just use \cs{newabbreviation} with the default \field{type}
 set to \cs{acronymtype} and the default \field{category} set to
 \cs{acronym}.
@@ -6629,7 +6629,7 @@ file is:
 }
 \end{verbatim}
 This works in much the same way as \cs{bibglsnewdualabbreviation}.
-Remember that with the \sty{glossaries-extra} package \cs{newacronym}
+Remember that with the \styfmt{glossaries-extra} package \cs{newacronym}
 is redefined to just use \cs{newabbreviation} with the default \field{type}
 set to \cs{acronymtype} and the default \field{category} set to
 \cs{acronym}.
@@ -7455,7 +7455,7 @@ This means that the name simply appears as \qt{glossary}, even if
 the \optref[postsort]{flatten-lonely} option is used. Note that if
 the parent entry is removed, the parent label won't be of much use.
 You can test for existence using \cs{ifglsentryexists} (provided by
-the \sty{glossaries} package) in case you want to vary the way the
+the \styfmt{glossaries} package) in case you want to vary the way the
 name is displayed according to whether or not the parent is still
 present.
 
@@ -7498,8 +7498,8 @@ field using:
 \chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
 \label{sec:gls2bib}
 
-If you have already been using the \sty{glossaries} or
-\sty{glossaries-extra} package with a large file containing all your
+If you have already been using the \styfmt{glossaries} or
+\styfmt{glossaries-extra} package with a large file containing all your
 definitions using commands like \cs{newglossaryentry}, then you can
 use the supplementary tool \app{convertgls2bib} to convert the definitions
 to the \ext{bib} format required by \bibgls. The syntax is:
@@ -7579,7 +7579,7 @@ argument to set the \field{type}. With \bibgls\ you can use the
 \optref{type} option instead.)
 
 \section{\cs{newglossaryentry}}
-The base \sty{glossaries} package provides:
+The base \styfmt{glossaries} package provides:
 \begin{definition}
 \cs{newglossaryentry}\margm{label}\margm{\keyvallist}
 \end{definition}
@@ -7591,11 +7591,11 @@ This is converted to:
 }
 \end{alltt}
 
-\cs{newentry} (provided by the \sty{glossaries-extra}
+\cs{newentry} (provided by the \styfmt{glossaries-extra}
 \styopt{shortcuts} option) is recognised as a synonym of \cs{newglossaryentry}.
 
 \section{\cs{provideglossaryentry}}
-The base \sty{glossaries} package provides:
+The base \styfmt{glossaries} package provides:
 \begin{definition}
 \cs{provideglossaryentry}\margm{label}\margm{\keyvallist}
 \end{definition}
@@ -7609,7 +7609,7 @@ This is converted to:
 but only if \meta{label} hasn't already been defined.
 
 \section{\cs{longnewglossaryentry}}
-The base \sty{glossaries} package provides:
+The base \styfmt{glossaries} package provides:
 \begin{definition}
 \cs{longnewglossaryentry}\margm{label}\margm{\keyvallist}\margm{description}
 \end{definition}
@@ -7622,14 +7622,14 @@ This is converted to:
 }
 \end{alltt}
 
-The starred version provided by the \sty{glossaries-extra} package
+The starred version provided by the \styfmt{glossaries-extra} package
 is also recognised. The unstarred version strips trailing spaces
 from \meta{description}. (This doesn't add \cs{nopostdesc}, but
-\sty{glossaries-extra} defaults to \styopt{nopostdot}.)
+\styfmt{glossaries-extra} defaults to \styopt{nopostdot}.)
 
 \section{\cs{longprovideglossaryentry}}
 
-The base \sty{glossaries} package provides:
+The base \styfmt{glossaries} package provides:
 \begin{definition}
 \cs{longprovideglossaryentry}\margm{label}\margm{\keyvallist}\margm{description}
 \end{definition}
@@ -7637,7 +7637,7 @@ The base \sty{glossaries} package provides:
 As above, but only if \meta{label} hasn't already been defined.
 
 \section{\cs{newterm}}
-The base \sty{glossaries} package provides:
+The base \styfmt{glossaries} package provides:
 \begin{definition}
 \cs{newterm}\oargm{\keyvallist}\margm{label}
 \end{definition}
@@ -7694,7 +7694,7 @@ by \bibgls\ (and will probably also cause a problem for
 bibliographic management systems).
 
 \section{\cs{newabbreviation}}
-The \sty{glossaries-extra} package provides:
+The \styfmt{glossaries-extra} package provides:
 \begin{definition}
 \cs{newabbreviation}\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}
 \end{definition}
@@ -7716,17 +7716,17 @@ if the optional argument is present, otherwise it's converted to:
 \end{alltt}
 
 \section{\cs{newacronym}}
-The base \sty{glossaries} package provides:
+The base \styfmt{glossaries} package provides:
 \begin{definition}
 \cs{newacronym}\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}
 \end{definition}
-(which is redefined by \sty{glossaries-extra} to use
+(which is redefined by \styfmt{glossaries-extra} to use
 \cs{newabbreviation}).
 
 As above but uses \atentryref{acronym} instead.
 
 \section{\cs{glsxtrnewsymbol}}
-The \sty{glossaries-extra} package provides:
+The \styfmt{glossaries-extra} package provides:
 \begin{definition}
 \cs{glsxtrnewsymbol}\oargm{\keyvallist}\margm{label}\margm{symbol}
 \end{definition}
@@ -7757,7 +7757,7 @@ in which case it's converted to:
 as a synonym for \cs{glsxtrnewsymbol}.
 
 \section{\cs{glsxtrnewnumber}}
-The \sty{glossaries-extra} package provides:
+The \styfmt{glossaries-extra} package provides:
 \begin{definition}
 \cs{glsxtrnewnumber}\oargm{\keyvallist}\margm{label}
 \end{definition}
@@ -7793,8 +7793,8 @@ recognised as a synonym for \cs{glsxtrnewnumber}.
 \cs{newdualentry}\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}\margm{description}
 \end{definition}
 
-This command isn't provided by either \sty{glossaries} or
-\sty{glossaries-extra} but is used as an example in the
+This command isn't provided by either \styfmt{glossaries} or
+\styfmt{glossaries-extra} but is used as an example in the
 \sty{glossaries} user manual and in the sample file
 \file{sample-dual.tex} that accompanies the \sty{glossaries}
 package. Since this command seems to be used quite a bit (given the

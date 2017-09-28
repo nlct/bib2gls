@@ -133,7 +133,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
          {
             String entryType = resource.getType(entry);
             grpTitle = new NumberGroupTitle(number, entryType);
-            resource.putGroupTitle(grpTitle);
+            resource.putGroupTitle(grpTitle, entry);
             args = grpTitle.toString();
          }
          else

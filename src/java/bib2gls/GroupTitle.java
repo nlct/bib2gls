@@ -86,7 +86,19 @@ public class GroupTitle
        type == null ? "" : type);
    }
 
+   public void mark()
+   {
+      done = true;
+   }
+
+   public boolean isDone()
+   {
+      return done;
+   }
+
    protected String title, actual, type;
 
    private int id;
+
+   private boolean done=false;
 }

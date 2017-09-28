@@ -1,4 +1,4 @@
-#bib2gls
+# bib2gls
 
 Command line application to convert `.bib` files to
 `glossaries-extra.sty` resource files.
@@ -7,14 +7,14 @@ Author: Nicola Talbot (http://www.dickimaw-books.com/)
 
 Application Home Page: http://www.dickimaw-books.com/software/bib2gls
 
-#Licence
+# Licence
 
 License GPLv3+: GNU GPL version 3 or later
 http://gnu.org/licenses/gpl.html
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 
-#Summary
+# Summary
 
 This application may be used to extract glossary information
 stored in a `.bib` file and convert it into glossary entry
@@ -115,7 +115,7 @@ pdflatex myDoc
 (Replace `pdflatex` with `latex`, `xelatex` or `lualatex` as
 appropriate.)
 
-#Installation
+# Installation
 
 The files should be installed as follows where *TEXMF* indicates
 your local or home TEXMF path (for example, `~/texmf/`):
@@ -144,7 +144,7 @@ convertgls2bib --version
 ```
 These should display the version details.
 
-#Source Code
+# Source Code
 
 Instructions for compiling the manual and jar files are listed
 below. The source is also available on GitHub, but that may be for
@@ -154,7 +154,7 @@ a newer experimental version.
   - https://github.com/nlct/texparserlib
 
 
-##User Manual (bib2gls.pdf)
+## User Manual (bib2gls.pdf)
 
 ```bash
 pdflatex bib2gls
@@ -162,7 +162,7 @@ makeindex -s bib2gls.ist bib2gls
 pdflatex bib2gls
 ```
 
-##JAR Files
+## JAR Files
 
 Create the following directories:
 

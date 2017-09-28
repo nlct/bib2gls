@@ -16,7 +16,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
 	  test-cjk.pdf test-other.pdf test-homograph.pdf \
-	  test-abbrv.pdf
+	  test-abbrv.pdf test-hypergroups.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -287,6 +287,13 @@ test-abbrv.pdf	: test-abbrv.glstex
 test-abbrv.glstex	: test-abbrv.tex $(DEPS) entries-abbrv.bib
 		pdflatex test-abbrv
 		$(BIB2GLS) test-abbrv
+
+test-hypergroups.pdf	: test-hypergroups.glstex
+		pdflatex test-hypergroups
+
+test-hypergroups.glstex	: test-hypergroups.tex $(DEPS)
+		pdflatex test-hypergroups
+		$(BIB2GLS) test-hypergroups
 
 clean	:
 	$(RM) *.aux

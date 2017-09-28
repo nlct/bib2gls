@@ -124,7 +124,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             {
                grpTitle = new GroupTitle(grp, str, cp,
                     resource.getType(entry));
-               resource.putGroupTitle(grpTitle);
+               resource.putGroupTitle(grpTitle, entry);
                args = grpTitle.toString();
             }
             else
@@ -153,7 +153,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             {
                String entryType = resource.getType(entry);
                grpTitle = new OtherGroupTitle(str, codePoint, entryType);
-               resource.putGroupTitle(grpTitle);
+               resource.putGroupTitle(grpTitle, entry);
                args = grpTitle.toString();
             }
             else

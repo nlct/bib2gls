@@ -3004,6 +3004,8 @@ public class GlsResource
             writer.println();
          }
 
+         boolean createHyperGroups = false;
+
          if (bib2gls.useGroupField())
          {
             writer.println("\\ifdef\\glsxtrsetgrouptitle");
@@ -3032,7 +3034,7 @@ public class GlsResource
 
             writer.println();
 
-            boolean createHyperGroups = bib2gls.hyperrefLoaded()
+            createHyperGroups = bib2gls.hyperrefLoaded()
                 && bib2gls.createHyperGroupsOn();
 
             for (Iterator<String> it = groupTitleMap.keySet().iterator();
@@ -3076,20 +3078,6 @@ public class GlsResource
                writer.println("  \\providecommand{\\bibglshypergroup}[2]{}");
                writer.println("}");
 
-               for (Iterator<String> it = groupTitleMap.keySet().iterator();
-                   it.hasNext(); )
-               {
-                  String key = it.next();
-
-                  GroupTitle groupTitle = groupTitleMap.get(key);
-
-                  writer.format("\\bibglshypergroup{%s}{\\%s%s}%n",
-                     groupTitle.getType(),
-                     groupTitle.getCsLabelName(),
-                     groupTitle);
-               }
-
-               writer.println();
             }
             else if (bib2gls.hyperrefLoaded())
             { 
@@ -3256,6 +3244,11 @@ public class GlsResource
                checkParent(entry, i, entries);
             }
 
+            if (createHyperGroups)
+            {
+               writeHyperGroupDef(entry, writer);
+            }
+
             String csname = entry.getCsName();
 
             if (!provided.contains(csname))
@@ -3336,6 +3329,11 @@ public class GlsResource
                if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
                {
                   checkParent(entry, i, dualEntries);
+               }
+
+               if (createHyperGroups)
+               {
+                  writeHyperGroupDef(entry, writer);
                }
 
                String csname = entry.getCsName();
@@ -4677,11 +4675,46 @@ public class GlsResource
       return type;
    }
 
-   public void putGroupTitle(GroupTitle grpTitle)
+   private void writeHyperGroupDef(Bib2GlsEntry entry, PrintWriter writer)
+     throws IOException
+   {
+      String key = entry.getGroupId();
+
+      if (key == null)
+      {
+         bib2gls.debug("No group ID for entry "+entry.getId());
+         return;
+      }
+
+      GroupTitle groupTitle = groupTitleMap.get(key);
+
+      if (groupTitle == null)
+      {
+         bib2gls.debug("No group found for "+key);
+         return;
+      }
+
+      if (!groupTitle.isDone())
+      {
+         writer.format("\\bibglshypergroup{%s}{\\%s%s}%n",
+            groupTitle.getType(),
+            groupTitle.getCsLabelName(),
+            groupTitle);
+
+         groupTitle.mark();
+
+         writer.println();
+      }
+   }
+
+   public void putGroupTitle(GroupTitle grpTitle, Bib2GlsEntry entry)
    {
       if (groupTitleMap != null)
       {
-         groupTitleMap.put(grpTitle.getKey(), grpTitle);
+         String key = grpTitle.getKey();
+         entry.setGroupId(key);
+
+         groupTitleMap.put(key, grpTitle);
       }
    }
 

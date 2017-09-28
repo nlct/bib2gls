@@ -1910,6 +1910,16 @@ public class Bib2GlsEntry extends BibEntry
       return collationKey;
    }
 
+   public void setGroupId(String id)
+   {
+      groupId = id;
+   }
+
+   public String getGroupId()
+   {
+      return groupId;
+   }
+
    public static Bib2GlsEntry getEntry(String entryId,
      Vector<Bib2GlsEntry> entries)
    {
@@ -2101,6 +2111,8 @@ public class Bib2GlsEntry extends BibEntry
    protected GlsResource resource;
 
    private CollationKey collationKey;
+
+   private String groupId=null;
 
    private String labelPrefix = null;
 
