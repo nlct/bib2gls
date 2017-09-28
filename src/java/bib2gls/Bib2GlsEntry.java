@@ -1066,6 +1066,11 @@ public class Bib2GlsEntry extends BibEntry
       return fieldValues.get("parent");
    }
 
+   public boolean hasParent()
+   {
+      return getParent() != null;
+   }
+
    public boolean hasCrossRefs()
    {
       return (crossRefs != null && crossRefs.length > 0)

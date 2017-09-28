@@ -88,7 +88,8 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
       String grp = null;
 
-      if (bib2gls.useGroupField() && value.length() > 0)
+      if (bib2gls.useGroupField() && value.length() > 0
+           && !entry.hasParent())
       {
          int codePoint = value.codePointAt(0);
 

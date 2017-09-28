@@ -4712,6 +4712,7 @@ public class GlsResource
       if (groupTitleMap != null)
       {
          String key = grpTitle.getKey();
+
          entry.setGroupId(key);
 
          groupTitleMap.put(key, grpTitle);

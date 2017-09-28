@@ -181,7 +181,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       CollationKey key = collator.getCollationKey(value);
       entry.setCollationKey(key);
 
-      if (bib2gls.useGroupField() && value.length() > 0)
+      if (bib2gls.useGroupField() && value.length() > 0
+           && !entry.hasParent())
       {
          if (entry.getFieldValue("group") != null)
          {
