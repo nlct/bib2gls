@@ -460,8 +460,8 @@ Java Runtime Environment (at least JRE~7). Additionally,
 \styfmt{glossaries-extra} must be at least version 1.12.
 (Although the latest version is recommended.)
 This application was developed in response to the question
-\href{http://tex.stackexchange.com/q/342544}{Is there a program for
-managing glossary tags?} on \TeX\ on StackExchange. The \filefmt{.bib}
+\qt{\href{http://tex.stackexchange.com/q/342544}{Is there a program for
+managing glossary tags?}} on \TeX\ on StackExchange. The \filefmt{.bib}
 file can be managed in an application such as JabRef.
 
 If you already have a \filefmt{.tex} file containing 
@@ -3096,16 +3096,20 @@ will be appended to the glossary preamble for that type, otherwise
 it's simply set in the \ext{glstex} file and may be overridden
 later in the document if required.
 
-\subsection{\csoptnv{secondary}\csopteqval{list}}
+\subsection{\csoptnv{secondary}\csopteqval{value}}
 \labelopt{secondary}
 
-It may be that you want to display a glossary multiple times
-but with a different order. For example, the first time
-alphabetically and the second time by category.
+It may be that you want to display a glossary twice but with a
+different order. For example, the first time alphabetically and the
+second time by category.  One way to do this is to have two
+\cs{GlsXtrLoadResources} that both load the same \ext{bib} file with
+different \optref{label-prefix} and \optref{sort} settings, but this
+is only possible with \optref[all]{selection} or by ensuring you
+reference each entry with both label prefixes.
 
-You can do this with the \csopt{secondary} option. The value
-(which must be supplied) is a comma-separated list where each
-item in the list is in the format 
+A simpler method is to use a single \cs{GlsXtrLoadResources}
+with the \csopt{secondary} option. The value
+(which must be supplied) should be in the format 
 \begin{definition}
 \meta{sort}:\meta{field}:\meta{type}
 \end{definition}
@@ -3113,17 +3117,16 @@ or
 \begin{definition}
 \meta{sort}:\meta{type}
 \end{definition}
-If the
-\meta{field} is omitted, the value of \optref{sort-field} is used.
-The value of \meta{sort} is as for \optref{sort}, but note that in this case the sort value \optfmt{unsrt} or
-\optfmt{none} means to use the same ordering as the primary
-entries. So with \optref[de-CH-1996]{sort},
-\optref[none:copies]{secondary} the \code{copies}
-list will be ordered according to \code{de-CH-1996} and not
-according to the order in which they were read when the \ext{bib}
-file or files were parsed.
-If \meta{sort} is \optfmt{custom}, then the rule should be
-provided with \optref{secondary-sort-rule}.
+If the \meta{field} is omitted, the value of \optref{sort-field} is
+used.  The value of \meta{sort} is as for \optref{sort}, but note
+that in this case the sort value \optfmt{unsrt} or \optfmt{none}
+means to use the same ordering as the primary entries. So with
+\optref[de-CH-1996]{sort}, \optref[none:copies]{secondary} the
+\code{copies} list will be ordered according to \code{de-CH-1996}
+and not according to the order in which they were read when the
+\ext{bib} file or files were parsed.  If \meta{sort} is
+\optfmt{custom}, then the rule should be provided with
+\optref{secondary-sort-rule}.
 
 This will copy all the selected entries into the glossary labelled
 \meta{type} sorted according to \meta{sort} using \meta{field} as
@@ -5857,6 +5860,31 @@ inter-word punctuation. For example, with
 \code{TomDickandHarry} and \qt{sea lion} simply becomes
 \code{sealion}. If \meta{marker} is omitted,
 \csopt[\empty]{break-marker} is assumed.
+
+\subsection{\csoptnv{sort-suffix}\csopteqval{value}}
+\labelopt{sort-suffix}
+
+\bibgls\ allows duplicate sort values, but this can cause a problem
+for hierarchical entries where parent entries with duplicate sort
+fields are clumped together and their children follow. To prevent
+this from happening \csopt[non-unique]{sort-suffix} will append a
+suffix to the duplicate sort values (within the same hierarchical
+level).
+
+If you don't have any child entries or if all your sort values are
+unique, then you can use \csopt[none]{sort-suffix} to suppress this
+action, which can slightly improve the run time.
+
+This option only affects the locale, custom and letter sort rules.
+The default setting is \csopt[non-unique]{sort-suffix}.
+
+\subsection{\csoptnv{sort-suffix-marker}\csopteqval{value}}
+\labelopt{sort-suffix-marker}
+
+If a suffix is appended to the sort value (see above) then it will
+be separated by the suffix marker, which can be set with
+\csopt[\meta{value}]{sort-suffix-marker} where \meta{value} is the
+marker. By default the marker is empty.
 
 \subsection{\csoptnv{sort-field}\csopteqval{field}}
 \labelopt{sort-field}

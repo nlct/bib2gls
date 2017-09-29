@@ -84,27 +84,27 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       {
          if (sort.equals("integer") || sort.equals("integer-reverse"))
          {
-            number = new Integer(value);
+            number = Integer.valueOf(value);
          }
          else if (sort.equals("float") || sort.equals("float-reverse"))
          {
-            number = new Float(value);
+            number = Float.valueOf(value);
          }
          else if (sort.equals("double") || sort.equals("double-reverse"))
          {
-            number = new Double(value);
+            number = Double.valueOf(value);
          }
          else if (sort.equals("hex") || sort.equals("hex-reverse"))
          {
-            number = new Integer(Integer.parseInt(value,16));
+            number = Integer.valueOf(value, 16);
          }
          else if (sort.equals("octal") || sort.equals("octal-reverse"))
          {
-            number = new Integer(Integer.parseInt(value,8));
+            number = Integer.valueOf(value, 8);
          }
          else if (sort.equals("binary") || sort.equals("binary-reverse"))
          {
-            number = new Integer(Integer.parseInt(value,2));
+            number = Integer.valueOf(value, 2);
          }
          else
          {
@@ -115,7 +115,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       catch (NumberFormatException e)
       {
          value = "0";
-         number = new Integer(0);
+         number = Integer.valueOf(0);
       }
 
       entry.setNumericSort(number);

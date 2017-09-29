@@ -521,6 +521,23 @@ public class GlsResource
          {
             dualPrefix = getOptional(parser, list, opt);
          }
+         else if (opt.equals("sort-suffix"))
+         {
+            String val = getChoice(parser, list, opt, "none", "non-unique");
+
+            if (val.equals("none"))
+            {
+               sortSuffixOption = SORT_SUFFIX_NONE;
+            }
+            else if (val.equals("non-unique"))
+            {
+               sortSuffixOption = SORT_SUFFIX_NON_UNIQUE;
+            }
+         }
+         else if (opt.equals("sort-suffix-marker"))
+         {
+            sortSuffixMarker = replaceHex(getOptional(parser, "", list, opt));
+         }
          else if (opt.equals("sort"))
          {
             sort = getOptional(parser, "doc", list, opt);
@@ -2802,7 +2819,8 @@ public class GlsResource
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, false, false);
+                 entrySort, entrySortField, false, false, 
+                 sortSuffixOption, sortSuffixMarker);
 
             comparator.sortEntries();
          }
@@ -2810,7 +2828,8 @@ public class GlsResource
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, false, true);
+                 entrySort, entrySortField, false, true,
+                 sortSuffixOption, sortSuffixMarker);
 
             comparator.sortEntries();
          }
@@ -2818,7 +2837,8 @@ public class GlsResource
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, true, false);
+                 entrySort, entrySortField, true, false,
+                 sortSuffixOption, sortSuffixMarker);
 
             comparator.sortEntries();
          }
@@ -2826,7 +2846,8 @@ public class GlsResource
          {
             Bib2GlsEntryLetterComparator comparator = 
                new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, true, true);
+                 entrySort, entrySortField, true, true,
+                 sortSuffixOption, sortSuffixMarker);
 
             comparator.sortEntries();
          }
@@ -2851,7 +2872,8 @@ public class GlsResource
                   new Bib2GlsEntryComparator(bib2gls, entries, 
                      entrySortField,
                      collatorStrength, collatorDecomposition,
-                     entrySortRules, breakPoint, breakPointMarker);
+                     entrySortRules, breakPoint, breakPointMarker,
+                     sortSuffixOption, sortSuffixMarker);
 
                comparator.sortEntries();
             }
@@ -2878,7 +2900,8 @@ public class GlsResource
                new Bib2GlsEntryComparator(bib2gls, entries, 
                   locale, entrySortField, 
                   collatorStrength, collatorDecomposition,
-                  breakPoint, breakPointMarker);
+                  breakPoint, breakPointMarker,
+                  sortSuffixOption, sortSuffixMarker);
 
             comparator.sortEntries();
          }
@@ -3401,7 +3424,7 @@ public class GlsResource
                      new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
-                       false, false);
+                       false, false, sortSuffixOption, sortSuffixMarker);
 
                   comparator.sortEntries();
                }
@@ -3411,7 +3434,7 @@ public class GlsResource
                      new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
-                       false, true);
+                       false, true, sortSuffixOption, sortSuffixMarker);
 
                   comparator.sortEntries();
                }
@@ -3421,7 +3444,7 @@ public class GlsResource
                      new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
-                       true, false);
+                       true, false, sortSuffixOption, sortSuffixMarker);
 
                   comparator.sortEntries();
                }
@@ -3431,7 +3454,7 @@ public class GlsResource
                      new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
                        secondarySort,
                        secondaryField == null ? sortField : secondaryField,
-                       true, true);
+                       true, true, sortSuffixOption, sortSuffixMarker);
 
                   comparator.sortEntries();
                }
@@ -3457,7 +3480,8 @@ public class GlsResource
                         new Bib2GlsEntryComparator(bib2gls, secondaryList, 
                            secondaryField == null ? sortField : secondaryField,
                            collatorStrength, collatorDecomposition,
-                           secondarySortRules, breakPoint, breakPointMarker);
+                           secondarySortRules, breakPoint, breakPointMarker,
+                           sortSuffixOption, sortSuffixMarker);
 
                      comparator.sortEntries();
                   }
@@ -3486,7 +3510,8 @@ public class GlsResource
                         locale,
                         secondaryField == null ? sortField : secondaryField,
                         collatorStrength, collatorDecomposition,
-                        breakPoint, breakPointMarker);
+                        breakPoint, breakPointMarker,
+                        sortSuffixOption, sortSuffixMarker);
 
                   comparator.sortEntries();
                }
@@ -4738,6 +4763,13 @@ public class GlsResource
    private String[] externalPrefixes = null;
 
    private String type=null, category=null, counter=null;
+
+   public static final int SORT_SUFFIX_NONE=0;
+   public static final int SORT_SUFFIX_NON_UNIQUE=1;
+
+   private int sortSuffixOption=SORT_SUFFIX_NON_UNIQUE;
+
+   private String sortSuffixMarker = "";
 
    private String sort = "locale", sortField = "sort";
 

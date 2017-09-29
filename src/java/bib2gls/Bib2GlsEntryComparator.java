@@ -37,21 +37,25 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     Locale locale, String sortField,
-    int strength, int decomposition)
+    int strength, int decomposition,
+    int sortSuffixOption, String sortSuffixMarker)
    {
       this(bib2gls, entries, locale, sortField, strength, decomposition,
-        BREAK_WORD, "|");
+        BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     Locale locale, String sortField,
     int strength, int decomposition,
-    int breakPoint, String breakMarker)
+    int breakPoint, String breakMarker,
+    int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
       this.entries = entries;
+      this.sortSuffixMarker = sortSuffixMarker;
+      this.sortSuffixOption = sortSuffixOption;
 
       collator = Collator.getInstance(locale);
       collator.setStrength(strength);
@@ -68,22 +72,26 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, String sortField,
-    int strength, int decomposition, String rules)
+    int strength, int decomposition, String rules,
+    int sortSuffixOption, String sortSuffixMarker)
    throws ParseException
    {
       this(bib2gls, entries, sortField, strength, decomposition, rules,
-        BREAK_WORD, "|");
+        BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, String sortField,
     int strength, int decomposition, String rules,
-    int breakPoint, String breakMarker)
+    int breakPoint, String breakMarker,
+    int sortSuffixOption, String sortSuffixMarker)
    throws ParseException
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
       this.entries = entries;
+      this.sortSuffixMarker = sortSuffixMarker;
+      this.sortSuffixOption = sortSuffixOption;
 
       collator = new RuleBasedCollator(rules);
       collator.setStrength(strength);
@@ -163,6 +171,16 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {
             value = bib2gls.interpret(value, list);
+         }
+
+         if (sortSuffixOption != GlsResource.SORT_SUFFIX_NONE)
+         {
+            String suff = sortSuffix(value, entry);
+
+            if (suff != null)
+            {
+               value += sortSuffixMarker + suff;
+            }
          }
       }
 
@@ -512,10 +530,39 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return collator;
    }
 
+   private String sortSuffix(String sort, Bib2GlsEntry entry)
+   {
+      if (sortCount == null) return null;
+
+      String parentId = entry.getParent();
+
+      String key = (parentId == null ? sort
+                    : String.format("%s.%s", parentId, sort));
+
+      Integer num = sortCount.get(key);
+
+      if (num == null)
+      {
+         sortCount.put(key, Integer.valueOf(0));
+         return null;
+      }
+
+      num = Integer.valueOf(num.intValue()+1);
+
+      sortCount.put(key, num);
+
+      return num.toString();
+   }
+
    public void sortEntries() throws Bib2GlsException
    {
       bib2gls.debug(bib2gls.getMessage("message.setting.sort",
         collator.getStrength(), collator.getDecomposition()));
+
+      if (sortSuffixOption == GlsResource.SORT_SUFFIX_NON_UNIQUE)
+      {
+         sortCount =  new HashMap<String,Integer>();
+      }
 
       for (Bib2GlsEntry entry : entries)
       {
@@ -564,6 +611,12 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    private BreakIterator breakIterator;
 
    private String breakPointMarker="|";
+
+   private String sortSuffixMarker;
+
+   private int sortSuffixOption;
+
+   private HashMap<String,Integer> sortCount;
 
    private Bib2Gls bib2gls;
 

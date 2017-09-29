@@ -7,9 +7,15 @@ v1.1 (pending):
      - name-case-change
      - description-case-change
      - not-match
+     - sort-suffix
+     - sort-suffix-marker
 
    * Case-changing options now also accept the values
      firstuc and firstuc-cs
+
+   * fixed bug in hierarchical entries with label prefixes.
+
+   * texparserlib: added extra core maths commands.
 
 v1.0 (2017-09-09):
 

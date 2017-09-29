@@ -33,13 +33,16 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     String sort, String sortField,
-    boolean ignoreCase, boolean reverse)
+    boolean ignoreCase, boolean reverse,
+    int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.ignoreCase = ignoreCase;
       this.reverse = reverse;
+      this.sortSuffixMarker = sortSuffixMarker;
+      this.sortSuffixOption = sortSuffixOption;
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -76,6 +79,16 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {  
             value = bib2gls.interpret(value, list);
+         }
+
+         if (sortSuffixOption != GlsResource.SORT_SUFFIX_NONE)
+         {
+            String suff = sortSuffix(value, entry);
+
+            if (suff != null)
+            {
+               value += sortSuffixMarker + suff;
+            }
          }
       }
 
@@ -303,8 +316,37 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       return n1 < n2 ? -1 : 1;
    }
 
+   private String sortSuffix(String sort, Bib2GlsEntry entry)
+   {
+      if (sortCount == null) return null;
+
+      String parentId = entry.getParent();
+
+      String key = (parentId == null ? sort 
+                    : String.format("%s.%s", parentId, sort));
+
+      Integer num = sortCount.get(key);
+
+      if (num == null)
+      {
+         sortCount.put(key, Integer.valueOf(0));
+         return null;
+      }
+
+      num = Integer.valueOf(num.intValue()+1);
+
+      sortCount.put(key, num);
+
+      return num.toString();
+   }
+
    public void sortEntries() throws Bib2GlsException
    {
+      if (sortSuffixOption == GlsResource.SORT_SUFFIX_NON_UNIQUE)
+      {
+         sortCount = new HashMap<String,Integer>();
+      }
+
       for (Bib2GlsEntry entry : entries)
       {
          entry.updateHierarchy(entries);
@@ -321,4 +363,11 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
    private Vector<Bib2GlsEntry> entries;
 
    private boolean ignoreCase, reverse;
+
+   private String sortSuffixMarker;
+
+   private int sortSuffixOption;
+
+   private HashMap<String,Integer> sortCount;
+
 }
