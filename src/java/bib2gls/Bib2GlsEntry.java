@@ -682,27 +682,35 @@ public class Bib2GlsEntry extends BibEntry
 
          if (value != null)
          {
-            TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
-
-            boolean protect = mfirstucProtect;
-
-            if (protect && protectFields != null)
+            if (field.equals("parent"))
             {
-               protect = false;
+               putField(field,
+                 processLabel(value.expand(parser).toString(parser)));
+            }
+            else
+            {
+               TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
 
-               for (String pf : protectFields)
+               boolean protect = mfirstucProtect;
+
+               if (protect && protectFields != null)
                {
-                  if (pf.equals(field))
+                  protect = false;
+
+                  for (String pf : protectFields)
                   {
-                     protect = true;
-                     break;
+                     if (pf.equals(field))
+                     {
+                        protect = true;
+                        break;
+                     }
                   }
                }
+
+               checkGlsCs(parser, list, protect, field);
+
+               putField(field, list.toString(parser));
             }
-
-            checkGlsCs(parser, list, protect, field);
-
-            putField(field, list.toString(parser));
          }
       }
 
@@ -2013,9 +2021,14 @@ public class Bib2GlsEntry extends BibEntry
 
       Bib2GlsEntry parent = getEntry(parentId, entries);
 
-      if (parent != null)
+      if (parent == null)
       {
-         addHierarchy(parent, entries);
+         bib2gls.warning(bib2gls.getMessage(
+           "warning.cant.find.parent", parentId, entry.getId()));
+      }
+      else
+      {
+        addHierarchy(parent, entries);
       }
    }
 

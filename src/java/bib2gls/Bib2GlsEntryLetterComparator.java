@@ -248,6 +248,24 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             entry2.getFieldValue("sort"));
       }
 
+      if (entry1.getId().equals(entry2.getParent()))
+      {
+         // entry1 is the parent of entry2
+         // so entry1 must come before (be less than) entry2
+         // (even with a reverse sort)
+
+         return -1;
+      }
+
+      if (entry2.getId().equals(entry1.getParent()))
+      {
+         // entry2 is the parent of entry1
+         // so entry1 must come after (be greater than) entry2
+         // (even with a reverse sort)
+
+         return 1;
+      }
+
       int n1 = entry1.getHierarchyCount();
       int n2 = entry2.getHierarchyCount();
 
