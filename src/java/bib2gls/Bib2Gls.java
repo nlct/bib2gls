@@ -1014,8 +1014,7 @@ public class Bib2Gls implements TeXApp
          else if (name.equals("glsxtr@recordsee"))
          {
             seeRecords.add(new GlsSeeRecord(
-              data.getArg(0).toString(parser),
-              data.getArg(1)));
+              data.getArg(0), data.getArg(1), parser));
          }
          else if (name.equals("glsxtr@record"))
          {
@@ -1510,9 +1509,27 @@ public class Bib2Gls implements TeXApp
       return records;
    }
 
+   public Vector<GlsSeeRecord> getSeeRecords()
+   {
+      return seeRecords;
+   }
+
    public boolean hasRecord(String id)
    {
       for (GlsRecord record : records)
+      {
+         if (id.equals(record.getLabel()))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public boolean hasSeeRecord(String id)
+   {
+      for (GlsSeeRecord record : seeRecords)
       {
          if (id.equals(record.getLabel()))
          {
@@ -3021,7 +3038,7 @@ public class Bib2Gls implements TeXApp
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "1.1 (EXPERIMENTAL)";
-   public static final String DATE = "2017-09-29";
+   public static final String DATE = "2017-10-01";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

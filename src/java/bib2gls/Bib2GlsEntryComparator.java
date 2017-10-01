@@ -179,7 +179,12 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
             if (suff != null)
             {
-               value += sortSuffixMarker + suff;
+               suff = sortSuffixMarker + suff;
+
+               bib2gls.verbose(bib2gls.getMessage("message.sort_suffix",
+                 suff, value, id));
+
+               value += suff;
             }
          }
       }
@@ -536,8 +541,28 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
       String parentId = entry.getParent();
 
+      /*
+       Non-unique sort keys aren't a problem across different 
+       hierarchical levels. The biggest problem occurs when two
+       or more siblings have the same sort value and one or more 
+       of the siblings has child entries, as this can cause all
+       the children to be clumped together after the last of the 
+       sibling set.
+
+       The sortCount hash map keeps track of all the sort values 
+       used for a particular level. The simplest method is to use 
+       the sort value as the key for top-level (parentless) entries 
+       and use a combination of the parent label and the sort value 
+       for sub-entries. To avoid the odd possibility of a top-level
+       sort value coincidentally matching a sub-entry's parent id
+       and sort value combination, the key to the hash map
+       use a control code as a separator for sub-entries since there 
+       shouldn't be control codes in the label.
+       (0x1F is the unit separator control code.)
+      */
+
       String key = (parentId == null ? sort
-                    : String.format("%s.%s", parentId, sort));
+                    : String.format("%s\u001f%s", parentId, sort));
 
       Integer num = sortCount.get(key);
 
@@ -546,6 +571,9 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
          sortCount.put(key, Integer.valueOf(0));
          return null;
       }
+
+      bib2gls.verbose(bib2gls.getMessage("message.non_unique_sort",
+        sort, entry.getOriginalId()));
 
       num = Integer.valueOf(num.intValue()+1);
 

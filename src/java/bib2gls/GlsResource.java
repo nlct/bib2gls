@@ -2075,6 +2075,7 @@ public class GlsResource
       dualData = new Vector<Bib2GlsEntry>();
 
       Vector<GlsRecord> records = bib2gls.getRecords();
+      Vector<GlsSeeRecord> seeRecords = bib2gls.getSeeRecords();
 
       Vector<Bib2GlsEntry> seeList = null;
 
@@ -2225,6 +2226,26 @@ public class GlsResource
                     || entry.getField("alias") == null)
                {
                   for (GlsRecord record : records)
+                  {
+                     if (record.getLabel().equals(entry.getId()))
+                     {
+                        entry.addRecord(record);
+                        hasRecords = true;
+                     }
+
+                     if (dual != null)
+                     {
+                        if (record.getLabel().equals(dual.getId()))
+                        {
+                           dual.addRecord(record);
+                           dualHasRecords = true;
+                        }
+                     }
+                  }
+
+                  // any 'see' records?
+
+                  for (GlsSeeRecord record : seeRecords)
                   {
                      if (record.getLabel().equals(entry.getId()))
                      {
@@ -2650,6 +2671,7 @@ public class GlsResource
    {
       Vector<String> fields = bib2gls.getFields();
       Vector<GlsRecord> records = bib2gls.getRecords();
+      Vector<GlsSeeRecord> seeRecords = bib2gls.getSeeRecords();
 
       if (selectionMode == SELECTION_ALL)
       {
@@ -2688,6 +2710,25 @@ public class GlsResource
          for (int i = 0; i < records.size(); i++)
          {
             GlsRecord record = records.get(i);
+
+            Bib2GlsEntry entry = getEntry(record.getLabel(), data);
+
+            if (entry != null && !entries.contains(entry))
+            {
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
+               {
+                  addHierarchy(entry, entries, data);
+               }
+
+               entries.add(entry);
+            }
+         }
+
+         for (int i = 0; i < seeRecords.size(); i++)
+         {
+            GlsSeeRecord record = seeRecords.get(i);
 
             Bib2GlsEntry entry = getEntry(record.getLabel(), data);
 

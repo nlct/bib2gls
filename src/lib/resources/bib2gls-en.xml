@@ -133,6 +133,8 @@ See the manual for further details.</entry>
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>
+<entry key="message.non_unique_sort">Sort value ''{0}'' (entry ''{1}'') not unique for the entry''s hierarchical level.</entry>
+<entry key="message.sort_suffix">Appending suffix ''{0}'' to the sort value ''{1}'' for entry ''{2}''.</entry>
 <entry key="message.no.fallback">Entry type ''{0}'' has no fallback for field: {1}</entry>
 <entry key="message.inconsistent.range">Inconsistent location format {0}
 with range started by {1}</entry>
@@ -332,7 +334,7 @@ converted to @dualentryabbreviation.)</entry>
 <entry key="tex.error.dimen_expected">Dimension expected</entry>
 <entry key="tex.error.missing_unit">Missing unit</entry>
 <entry key="tex.error.expected">Expected {0}</entry>
-<entry key="tex.error.undefined">Undefined command {0}</entry>
+<entry key="tex.error.undefined">Undefined command \{0}</entry>
 <entry key="tex.error.undefined_char">Undefined active character ''{0}''</entry>
 <entry key="tex.error.cs_expected">Control sequence expected (found ''{0}'')</entry>
 <entry key="tex.error.number_expected">Number expected (found ''{0}'')</entry>

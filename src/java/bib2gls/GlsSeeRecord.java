@@ -21,19 +21,55 @@ package com.dickimawbooks.bib2gls;
 import java.io.IOException;
 import java.util.Vector;
 
-import com.dickimawbooks.texparserlib.TeXObject;
+import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.CsvList;
 
 public class GlsSeeRecord
 {
-   public GlsSeeRecord(String label, TeXObject value)
+   public GlsSeeRecord(TeXObject labelObj, TeXObject value, TeXParser parser)
+    throws IOException
    {
-      if (label == null || value == null)
+      if (labelObj == null || value == null)
       {
          throw new NullPointerException();
       }
 
-      this.label = label;
-      this.value = value;
+      this.label = labelObj.toString(parser);
+
+      init(value, parser);
+   }
+
+   private void init(TeXObject value, TeXParser parser)
+    throws IOException
+   {
+      if (!(value instanceof TeXObjectList))
+      {
+         xrLabels = new String[1];
+
+         xrLabels[0] = value.toString(parser);
+
+         return;
+      }
+
+      TeXObjectList list = (TeXObjectList)value;
+
+      TeXObject obj = list.popArg(parser, '[', ']');
+
+      if (obj != null)
+      {
+         tag = obj.toString(parser);
+      }
+
+      CsvList csvList = CsvList.getList(parser, list);
+
+      int n = csvList.size();
+
+      xrLabels = new String[n];
+
+      for (int i = 0; i < n; i++)
+      {
+         xrLabels[i] = csvList.getValue(i).toString(parser);
+      }
    }
 
    public String getLabel()
@@ -41,11 +77,23 @@ public class GlsSeeRecord
       return label;
    }
 
-   public TeXObject getValue()
+   public String getTag()
    {
-      return value;
+      return tag;
+   }
+
+   public String[] getXrLabels()
+   {
+      return xrLabels;
+   }
+
+   public String toString()
+   {
+      return String.format("CrossRef[label=%s,tag=%s,n=%d]",
+       label, tag, xrLabels.length);
    }
 
    private String label;
-   private TeXObject value;
+   private String tag=null;
+   private String[] xrLabels;
 }

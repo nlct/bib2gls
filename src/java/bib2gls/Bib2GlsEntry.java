@@ -1191,6 +1191,85 @@ public class Bib2GlsEntry extends BibEntry
       return recordCount() > 0;
    }
 
+   public void addRecord(GlsSeeRecord record)
+   {
+      // add as an ignored record
+
+      addIgnoredRecord(new GlsRecord(record.getLabel(),
+       "", "page", "glsignore", ""));
+
+      StringBuilder builder = new StringBuilder();
+
+      if (crossRefTag == null)
+      {
+         crossRefTag = record.getTag();
+      }
+
+      if (crossRefTag != null)
+      {
+         builder.append(String.format("[%s]", crossRefTag));
+      }
+
+      if (crossRefs == null)
+      {
+         crossRefs = record.getXrLabels();
+
+         for (int i = 0; i < crossRefs.length; i++)
+         {
+            addDependency(crossRefs[i]);
+
+            if (i > 0)
+            {
+               builder.append(',');
+            }
+
+            builder.append(crossRefs[i]);
+         }
+      }
+      else
+      {
+         String[] orgRefs = crossRefs;
+         String[] newRefs = record.getXrLabels();
+
+         crossRefs = new String[orgRefs.length+newRefs.length];
+
+         char sep = 0;
+
+         for (int i = 0; i < orgRefs.length; i++)
+         {
+            if (sep == 0)
+            {
+               sep = ',';
+            }
+            else
+            {
+               builder.append(sep);
+            }
+
+            crossRefs[i] = orgRefs[i];
+            builder.append(orgRefs[i]);
+         }
+
+         for (int i = 0; i < newRefs.length; i++)
+         {
+            if (sep == 0)
+            {
+               sep = ',';
+            }
+            else
+            {
+               builder.append(sep);
+            }
+
+            crossRefs[orgRefs.length+i] = newRefs[i];
+            addDependency(newRefs[i]);
+            builder.append(newRefs[i]);
+         }
+      }
+
+      putField("see", builder.toString());
+   }
+
    public void addRecord(GlsRecord record)
    {
       if (record.getFormat().equals("glsignore"))
@@ -1492,7 +1571,7 @@ public class Bib2GlsEntry extends BibEntry
 
       locationList = new Vector<String>();
 
-      int numRecords = recordCount();
+      int numRecords = mainRecordCount()+supplementalRecordCount();
 
       if (seeLocation == PRE_SEE && crossRefs != null)
       {
@@ -1749,7 +1828,6 @@ public class Bib2GlsEntry extends BibEntry
    {
       // Is there a 'see' field?
       BibValueList value = getField("see");
-      TeXObjectList valList = null;
 
       BibValueList seeAlsoValue = getField("seealso");
 
@@ -1762,27 +1840,8 @@ public class Bib2GlsEntry extends BibEntry
             return;
          }
 
-         // no 'seealso' field, so check for \glssee records
-         // (see field overrides any instances of \glssee)
-
-         GlsSeeRecord record = bib2gls.getSeeRecord(getId());
-
-         if (record == null)
-         {
-            return;
-         }
-
-         TeXObject valObj = record.getValue();
-
-         if (valObj instanceof TeXObjectList)
-         {
-            valList = (TeXObjectList)valObj;
-         }
-         else
-         {
-            valList = new TeXObjectList();
-            valList.add(valObj);
-         }
+         // check for \glssee moved
+         // now added with addRecord(GlsSeeRecord)
       }
 
       if (seeAlsoValue != null)
@@ -1791,10 +1850,12 @@ public class Bib2GlsEntry extends BibEntry
            "see", "seealso"));
       }
 
-      if (valList == null)
-      {
-         valList = value.expand(parser);
+      if (value == null)
+      {// not found
+         return;
       }
+
+      TeXObjectList valList = value.expand(parser);
 
       StringBuilder builder = new StringBuilder();
 

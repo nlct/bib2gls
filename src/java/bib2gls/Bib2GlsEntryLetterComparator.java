@@ -87,7 +87,12 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
             if (suff != null)
             {
-               value += sortSuffixMarker + suff;
+               suff = sortSuffixMarker + suff;
+
+               bib2gls.verbose(bib2gls.getMessage("message.sort_suffix",
+                 suff, value, id));
+
+               value += suff;
             }
          }
       }
@@ -322,8 +327,10 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
       String parentId = entry.getParent();
 
-      String key = (parentId == null ? sort 
-                    : String.format("%s.%s", parentId, sort));
+      // (see comments for Bib2GlsEntryComparator.sortSuffix)
+
+      String key = (parentId == null ? sort
+                    : String.format("%s\u001f%s", parentId, sort));
 
       Integer num = sortCount.get(key);
 
@@ -332,6 +339,9 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          sortCount.put(key, Integer.valueOf(0));
          return null;
       }
+
+      bib2gls.verbose(bib2gls.getMessage("message.non_unique_sort",
+        sort, entry.getOriginalId()));
 
       num = Integer.valueOf(num.intValue()+1);
 

@@ -1,0 +1,20 @@
+@preamble{"\providecommand*{\application}[1]{\texttt{#1}}
+\providecommand{\command}[1]{\texttt{\char92 #1}}"}
+
+@index{cs.item,name={\command{item}}}
+@index{cs.subitem,parent={cs.item},name={\command{subitem}}}
+
+@index{item}
+@index{subitem,parent={item}}
+@index{subsubitem,parent={subitem}}
+
+@entry{cs.makeglossaries,
+  name={\command{makeglossaries}},
+  description={opens glossary files}
+}
+
+@entry{ap.makeglossaries,
+  name={\application{makeglossaries}},
+  description={Perl script (must be used with \gls{cs.makeglossaries})}
+}
+

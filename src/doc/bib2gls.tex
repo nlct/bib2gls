@@ -5869,14 +5869,265 @@ for hierarchical entries where parent entries with duplicate sort
 fields are clumped together and their children follow. To prevent
 this from happening \csopt[non-unique]{sort-suffix} will append a
 suffix to the duplicate sort values (within the same hierarchical
-level).
+level). Note that only the duplicates are given suffixes. The first
+sort value to be encountered isn't given a suffix.
 
+The default setting is \csopt[non-unique]{sort-suffix}.
 If you don't have any child entries or if all your sort values are
 unique, then you can use \csopt[none]{sort-suffix} to suppress this
 action, which can slightly improve the run time.
 
 This option only affects the locale, custom and letter sort rules.
-The default setting is \csopt[non-unique]{sort-suffix}.
+For the other types of rules (that actually perform some form of
+comparison) then you need to guard against duplicates if you have
+hierarchical entries.
+
+If you use \longarg{verbose}, then \bibgls\ will write information
+in the transcript when it appends a suffix to the sort value.  The
+message:
+\begin{alltt}
+Sort value '\meta{sort}' (entry '\meta{id}') not unique for the entry's
+hierarchical level.
+\end{alltt}
+indicates that an entry with the given \meta{sort} value has already
+been found within the same hierarchical level as the currently
+processed entry (whose label is given by \meta{id}). The same
+hierarchical level in this context means that either both entries
+don't have a parent or both entries have the same parent. (That is,
+the entries are considered siblings.)
+
+This message will then be followed by
+\begin{alltt}
+Appending suffix '\meta{suffix}' to the sort value '\meta{sort}' 
+for entry '\meta{id}'.
+\end{alltt}
+which indicates that the entry (identified by the label \meta{id})
+has been assigned the sort value given by \meta{sort}\meta{suffix}.
+If any break markers are applied, this is done after the suffix has
+been appended.
+
+For example, suppose I want to write about \appfmt{makeglossaries}
+(the application) and \csfmt{makeglossaries} (the command). I might
+decide to define semantic commands:
+\begin{verbatim}
+\newcommand*{\application}[1]{\texttt{#1}}
+\newcommand*{\command}[1]{\texttt{\char92 #1}}
+\end{verbatim}
+In my \ext{bib} file I might have:
+\begin{verbatim}
+@entry{cs.makeglossaries,
+  name={\command{makeglossaries}},
+  description={opens glossary files}
+}
+
+@entry{ap.makeglossaries,
+  name={\application{makeglossaries}},
+  description={Perl script}
+}
+\end{verbatim}
+If \bibgls\ is provided with the definitions of \csfmt{application}
+and \csfmt{command} (through \atentryref{preamble}) then it will
+determine that the sort value for \code{cs.makeglossaries} is
+\verb|\makeglossaries| and the sort value for
+\code{ap.makeglossaries} is just \code{makeglossaries}. These are 
+two distinct sort values from \bibgls's point of view although the
+sort rule may consider them identical if the rule ignores the
+\verb|\| character (such as the locale sort methods).
+
+If \bibgls\ isn't provided with these custom definitions, then it
+will ignore them and both entries will end up with the sort value
+\code{makeglossaries}. The second instance will be recognised as a
+duplicate and the sort value will be converted to
+\code{makeglossaries1} (where the automated suffix is \code{1} and
+the suffix marker, see below, is the empty string). With, say,
+\optref[.]{sort-suffix-marker} then the sort value would become
+\code{makeglossaries.1}.
+
+For comparison, consider the following document:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[style=indexgroup]{glossaries}
+
+\makeglossaries
+
+\newcommand*{\application}[1]{\texttt{#1}}
+\newcommand*{\command}[1]{\texttt{\char92 #1}}
+
+\newglossaryentry{cs.makeglossaries}{%
+  name={\command{makeglossaries}},
+  description={opens glossary files}}
+
+\newglossaryentry{ap.makeglossaries}{%
+  name={\application{makeglossaries}},
+  description={Perl script}}
+
+\begin{document}
+
+\gls{cs.makeglossaries} and \gls{ap.makeglossaries}.
+
+\printglossaries
+\end{document}
+\end{verbatim}
+
+This uses \app{makeindex}, which puts both entries in the
+\qt{Symbols} group (since they both start with \verb|\| from the
+start of \verb|\command| and \verb|\application|, respectively).
+The ordering is \appfmt{makeglossaries}, \csfmt{makeglossaries}
+because \qt{a} (second character of \csfmt{application}) comes
+before \qt{c} (second character of \csfmt{command}).
+
+The switch to \app{xindy} just involves adding the \styoptfmt{xindy}
+package option:
+\begin{verbatim}
+\usepackage[xindy,style=indexgroup]{glossaries}
+\end{verbatim}
+This results in a glossary that only contains one entry,
+\csfmt{makeglossaries}, because \app{xindy} merges entries with
+duplicate sort values and the sort values end up as duplicates
+because \app{xindy} discards the control sequences. Although
+\bibgls\ also ignores unknown control sequences, it doesn't perform
+this merger. 
+
+If I add 
+\begin{verbatim}
+@preamble{"\providecommand*{\application}[1]{\texttt{#1}}
+\providecommand{\command}[1]{\texttt{\char92 #1}}"}
+\end{verbatim}
+to the earlier \ext{bib} file (called, say, \filefmt{entries.bib})
+then the document can be altered to use \bibgls:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources{src=entries.bib}
+
+\begin{document}
+
+\gls{cs.makeglossaries} and \gls{ap.makeglossaries}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+This uses the default \optref[locale]{sort} which considers \verb|\|
+an ignored character, so both \csfmt{makeglossaries} and
+\appfmt{makeglossaries} are listed in the \qt{M} letter group, even
+though the interpreter has determined that the sort value for
+\code{cs.makeglossaries} is \verb|\makeglossaries|. Note that in
+this case \bibgls\ doesn't detect duplicate sort values since it
+only uses a simple string comparison to detect duplicates rather
+than using the collator.
+
+If I use a letter-based sort rule instead, for example
+\optref[letter-nocase]{sort}, then \csfmt{makeglossaries} will be
+listed in the \qt{Symbols} letter group since the leading \verb|\|
+from the sort value \csfmt{makeglossaries} isn't ignored with this
+rule.
+
+Now let's suppose I prevent \bibgls\ from interpreting the preamble
+using \optref[false]{interpret-preamble}:
+\begin{verbatim}
+\GlsXtrLoadResources{src=entries.bib,interpret-preamble=false}
+\end{verbatim}
+This means that the custom commands won't be recognised and will
+therefore be ignored, so both entries will have their sort values reduced to 
+\code{makeglosssaries}.
+
+The first entry to be processed is \code{cs.makeglossaries} because
+it's the first to be selected. This is assigned the sort value
+\code{makeglossaries}. (Note that, unless you use
+\optref[unsrt]{sort}, the initial selection order is based on the record
+order. In this example, \code{cs.makeglossaries} has the first
+record in the \ext{aux} file.)
+
+The next entry to be processed is \code{ap.makeglossaries}. This
+also ends up with the sort value \code{makeglossaries} so \bibgls\
+converts this to \code{makeglossaries1} and (with verbose mode on)
+the following messages are written to the transcript:
+\begin{verbatim}
+Sort value 'makeglossaries' (entry 'ap.makeglossaries') not unique
+for the entry's hierarchical level.
+Appending suffix '1' to the sort value 'makeglossaries' for entry
+'ap.makeglossaries'.
+\end{verbatim}
+Both entries are listed in the \qt{M} letter group in the order
+\csfmt{makeglossaries}, \appfmt{makeglossaries}.
+
+If the records are reversed:
+\begin{verbatim}
+\gls{ap.makeglossaries} and \gls{cs.makeglossaries}.
+\end{verbatim}
+then the sort value for \code{cs.makeglossaries} is now considered
+the duplicate and the order is reversed: \appfmt{makeglossaries},
+\csfmt{makeglossaries}.
+
+Suppose now I modify the \ext{bib} file so that
+\code{ap.makeglossaries} is defined as:
+\begin{verbatim}
+@entry{ap.makeglossaries,
+  name={\application{makeglossaries}},
+  description={Perl script (must be used with \gls{cs.makeglossaries})}
+}
+\end{verbatim}
+and suppose the document only contains an explicit reference to
+\code{ap.makeglossaries}:
+\begin{verbatim}
+\begin{document}
+\gls{ap.makeglossaries}
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+Now \code{ap.makeglossaries} is the first entry to be selected
+because entries with records are always selected before any
+(unrecorded) dependencies. In this case \code{cs.makeglossaries} is
+only selected because it's required by \code{ap.makeglossaries}. Now
+\code{ap.makeglossaries} is the first to have its sort value
+assigned, and it's \code{cs.makeglossaries} that has the duplicate.
+This means that the ordering in the glossary is now:
+\appfmt{makeglossaries}, \csfmt{makeglossaries}.
+
+An oddity occurs if the glossary is moved to the start of the
+document:
+\begin{verbatim}
+\begin{document}
+\printunsrtglossaries
+\gls{ap.makeglossaries}
+\end{document}
+\end{verbatim}
+In this case, the first document build
+\begin{verbatim}
+pdflatex myDoc
+bibgls --group --verbose myDoc
+pdflatex myDoc
+\end{verbatim}
+leads to the ordering described above: 
+\appfmt{makeglossaries}, \csfmt{makeglossaries}.
+However, the next document build has a new record for
+\code{cs.makeglossaries} occurring in the glossary (within the
+description of \code{ap.makeglossaries}) which means it's now the
+first entry to be selected so the ordering switches to:
+\csfmt{makeglossaries}, \appfmt{makeglossaries}.
+
+Remember that you can temporarily switch off the indexing by locally
+setting
+\begin{verbatim}
+\GlsXtrSetDefaultGlsOpts{noindex}
+\end{verbatim}
+(requires at least version 1.21 of \sty{glossaries-extra}).
+Since the glossary preamble is scoped, you can simply do
+\begin{verbatim}
+\appto\glossarypreamble{\GlsXtrSetDefaultGlsOpts{noindex}}
+\end{verbatim}
+to switch off the indexing within the glossary (or use
+\cs{apptoglossarypreamble}). Note that this is
+different to using
+\begin{verbatim}
+\GlsXtrSetDefaultNumberFormat{glsignore}
+\end{verbatim}
+which creates an ignored record. Even though the record is ignored
+(and so won't show in the location list) the record still influences
+the selection order.
 
 \subsection{\csoptnv{sort-suffix-marker}\csopteqval{value}}
 \labelopt{sort-suffix-marker}

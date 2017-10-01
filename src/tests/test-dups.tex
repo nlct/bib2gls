@@ -1,0 +1,31 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\newcommand*{\application}[1]{\texttt{#1}}
+\newcommand*{\command}[1]{\texttt{\char92 #1}}
+
+\GlsXtrLoadResources[
+ src=test-dups,
+ %sort=letter-nocase,
+ interpret-preamble=false
+]
+
+\appto\glossarypreamble{\GlsXtrSetDefaultGlsOpts{noindex}}
+
+\begin{document}
+\printunsrtglossaries
+
+\section{Sample}
+
+\gls{ap.makeglossaries}.
+%\gls{cs.makeglossaries} and \gls{ap.makeglossaries}.
+%\gls{ap.makeglossaries} and \gls{cs.makeglossaries}.
+
+\gls{cs.subitem} and \gls{subitem}.
+
+%\printunsrtglossaries
+\end{document}

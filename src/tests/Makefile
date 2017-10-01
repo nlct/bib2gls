@@ -16,7 +16,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
 	  test-cjk.pdf test-other.pdf test-homograph.pdf \
-	  test-abbrv.pdf test-hypergroups.pdf
+	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -294,6 +294,13 @@ test-hypergroups.pdf	: test-hypergroups.glstex
 test-hypergroups.glstex	: test-hypergroups.tex $(DEPS)
 		pdflatex test-hypergroups
 		$(BIB2GLS) test-hypergroups
+
+test-dups.pdf	: test-dups.glstex
+		pdflatex test-dups
+
+test-dups.glstex	: test-dups.tex test-dups.bib $(DEPS)
+		pdflatex test-dups
+		$(BIB2GLS) test-dups
 
 clean	:
 	$(RM) *.aux
