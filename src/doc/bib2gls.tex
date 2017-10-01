@@ -5719,51 +5719,53 @@ Use \csopt[\meta{lang tag}]{sort} with \csopt[none]{break-at} to
 emulate \app{xindy}'s locale letter ordering.
 
 \item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter (character code) sort.
-
+\end{itemize}
+The following use numeric comparisons. The sort value is expected to
+be a numeric value. If it can't be parsed then it's treated as 0.
+\begin{itemize}
 \item \optfmt{integer}: integer sort. This is for integer sort
-values. Any value that isn't an integer is treated as 0.
+values.
 
 \item \optfmt{integer-reverse}: as above but reverses the order.
 
 \item \optfmt{hex}: hexadecimal integer sort. This is for
-hexadecimal sort values. Any value that isn't a hexadecimal number 
-is treated as 0.
+hexadecimal sort values.
 
 \item \optfmt{hex-reverse}: as above but reverses the order.
 
 \item \optfmt{octal}: octal integer sort. This is for
-octal sort values. Any value that isn't a octal number 
-is treated as 0.
+octal sort values.
 
 \item \optfmt{octal-reverse}: as above but reverses the order.
 
 \item \optfmt{binary}: binary integer sort. This is for binary sort
-values. Any value that isn't a binary number is treated as 0.
+values.
 
 \item \optfmt{binary-reverse}: as above but reverses the order.
 
 \item \optfmt{float}: single-precision sort. This is for
-decimal sort values. Any value that isn't a decimal is treated as 0.0.
+decimal sort values.
 
 \item \optfmt{float-reverse}: as above but reverses the order.
 
 \item \optfmt{double}: double-precision sort. This is for
-decimal sort values. Any value that isn't a decimal is treated as 0.0.
+decimal sort values.
 
 \item \optfmt{float-reverse}: as above but reverses the order.
-
-\item \optfmt{date}: sort dates (see below). Use \optref{date-sort-format}
+\end{itemize}
+The following values are for dates and times. Use \optref{date-sort-format}
 and \optref{date-sort-locale} to specify the date format and locale.
+See below for further details.
+\begin{itemize}
+\item \optfmt{date}: sort dates.
 
 \item \optfmt{date-reverse}: as above but reverses the order.
 
-\item \optfmt{datetime}: sort date and time information. Use \optref{date-sort-format}
-and \optref{date-sort-locale} to specify the date-time format and locale.
+\item \optfmt{datetime}: sort date and time information.
 
 \item \optfmt{datetime-reverse}: as above but reverses the order.
 
-\item \optfmt{time}: sort times. Use \optref{date-sort-format}
-and \optref{date-sort-locale} to specify the time format and locale.
+\item \optfmt{time}: sort times.
 
 \item \optfmt{time-reverse}: as above but reverses the order.
 
@@ -5773,9 +5775,7 @@ If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 
 Note that \csopt[locale]{sort} can provide more detail about the
 locale than \csopt[doc]{sort}, depending on how the document
-language has been specified.
-
-For example, with:
+language has been specified.  For example, with:
 \begin{verbatim}
 \documentclass{article}
 \usepackage[ngerman]{babel}
@@ -5812,9 +5812,9 @@ case you can use one of the date/time sort options (such as
 \csopt[date]{sort} or \csopt[date-reverse]{sort}). The locale
 is assumed to be your default locale (as given by the Java Virtual
 Machine) but if you are using a different locale this can
-be set with \optref{sort-date-locale}. The pattern is assumed
+be set with \optref{date-sort-locale}. The pattern is assumed
 to be the default for that locale but you can change this with
-\optref{sort-date-format}.
+\optref{date-sort-format}.
 
 The locale and pattern information is used by \bibgls\ to
 parse the field. The \field{sort} field is then set to the ISO
