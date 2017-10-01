@@ -1228,15 +1228,19 @@ public class Bib2GlsEntry extends BibEntry
       }
       else
       {
-         String[] orgRefs = crossRefs;
-         String[] newRefs = record.getXrLabels();
+         Vector<String> list = new Vector<String>();
 
-         crossRefs = new String[orgRefs.length+newRefs.length];
+         String[] newRefs = record.getXrLabels();
 
          char sep = 0;
 
-         for (int i = 0; i < orgRefs.length; i++)
+         for (int i = 0; i < crossRefs.length; i++)
          {
+            if (list.contains(crossRefs[i]))
+            {
+               continue;
+            }
+
             if (sep == 0)
             {
                sep = ',';
@@ -1246,12 +1250,17 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(sep);
             }
 
-            crossRefs[i] = orgRefs[i];
-            builder.append(orgRefs[i]);
+            list.add(crossRefs[i]);
+            builder.append(crossRefs[i]);
          }
 
          for (int i = 0; i < newRefs.length; i++)
          {
+            if (list.contains(newRefs[i]))
+            {
+               continue;
+            }
+
             if (sep == 0)
             {
                sep = ',';
@@ -1261,10 +1270,14 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(sep);
             }
 
-            crossRefs[orgRefs.length+i] = newRefs[i];
+            list.add(newRefs[i]);
             addDependency(newRefs[i]);
             builder.append(newRefs[i]);
          }
+
+         crossRefs = new String[list.size()];
+
+         list.toArray(crossRefs);
       }
 
       putField("see", builder.toString());
