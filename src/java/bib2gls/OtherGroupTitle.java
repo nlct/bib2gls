@@ -20,7 +20,7 @@ package com.dickimawbooks.bib2gls;
 
 public class OtherGroupTitle extends GroupTitle
 {
-   public OtherGroupTitle(String letter, int id, String type)
+   public OtherGroupTitle(String letter, long id, String type)
    {
       super(letter, letter, id, type);
    }

@@ -1711,13 +1711,14 @@ Other entries can be cross-referenced using the \field{see},
 by using commands like \cs{gls} or \cs{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
-rebuild the document to ensure the location lists are correct.
-If an entry has the \field{see} field set, any instance of
-\cs{glssee} in the document for that entry will be ignored,
-otherwise the reference from \cs{glssee} will be transferred to the
+rebuild the document to ensure the location lists are correct.  Use
+of the \cs{glssee} command will create an ignored location and the
+\field{see} field will be set to the relevant information.  If an
+entry has the \field{see} field already set, any instance of
+\cs{glssee} in the document for that entry will be appended to the
 \field{see} field (provided you have at least v1.14 of
-\sty{glossaries-extra}). In general, it's best just to use the \field{see}
-field and not use \cs{glssee}.
+\sty{glossaries-extra}). In general, it's best just to use the
+\field{see} field and not use \cs{glssee}.
 
 The \field{seealso} key was only added to \sty{glossaries-extra}
 v1.16, but this field may be used with \bibgls\ even if you only
@@ -3222,6 +3223,16 @@ For example, if the entries are stored in \filefmt{entries.bib}:
 \labelopt{secondary-sort-rule}
 
 As \optref{sort-rule} but for secondary custom sorting.
+
+\subsection{\csoptnv{secondary-date-sort-format}\csopteqval{value}}
+\labelopt{secondary-date-sort-format}
+
+As \optref{date-sort-format} but for secondary date-time sorting.
+
+\subsection{\csoptnv{secondary-date-sort-locale}\csopteqval{value}}
+\labelopt{secondary-date-sort-locale}
+
+As \optref{date-sort-locale} but for secondary date-time sorting.
 
 \section{Selection Options}
 \label{sec:selectionopts}
@@ -5694,9 +5705,10 @@ option is equivalent to \csopt[locale]{sort}.
 \item \optfmt{custom}: sort the entries according to the 
 rule provided by \optref{sort-rule}.
 
-\item \optfmt{use}: sort in order of use. (This order is determined
+\item \optfmt{use}: sort in order of use. This order is determined
 by the records written to the \ext{aux} file by the \styopt{record}
-package option.)
+package option. Dependencies and cross-references (including those
+identified with \cs{glssee}) come after entries with records.
 
 \item \optfmt{letter-case}: case-sensitive letter (character code) sort.
 
@@ -5740,6 +5752,21 @@ decimal sort values. Any value that isn't a decimal is treated as 0.0.
 
 \item \optfmt{float-reverse}: as above but reverses the order.
 
+\item \optfmt{date}: sort dates (see below). Use \optref{date-sort-format}
+and \optref{date-sort-locale} to specify the date format and locale.
+
+\item \optfmt{date-reverse}: as above but reverses the order.
+
+\item \optfmt{datetime}: sort date and time information. Use \optref{date-sort-format}
+and \optref{date-sort-locale} to specify the date-time format and locale.
+
+\item \optfmt{datetime-reverse}: as above but reverses the order.
+
+\item \optfmt{time}: sort times. Use \optref{date-sort-format}
+and \optref{date-sort-locale} to specify the time format and locale.
+
+\item \optfmt{time-reverse}: as above but reverses the order.
+
 \end{itemize}
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
@@ -5777,6 +5804,80 @@ For example:
 \GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
 \end{verbatim}
 
+If the field you want to sort by contains a date then the
+simplest way to sort is to ensure the date is in ISO format
+and then just use a letter sort. However it may be that
+the date is in the format particular to your locale. In which
+case you can use one of the date/time sort options (such as
+\csopt[date]{sort} or \csopt[date-reverse]{sort}). The locale
+is assumed to be your default locale (as given by the Java Virtual
+Machine) but if you are using a different locale this can
+be set with \optref{sort-date-locale}. The pattern is assumed
+to be the default for that locale but you can change this with
+\optref{sort-date-format}.
+
+The locale and pattern information is used by \bibgls\ to
+parse the field. The \field{sort} field is then set to the ISO
+format, but the sort comparator actually uses an integer
+representation of the date rather than performing a letter sort.
+This means that if you need the more convenient ISO format in your
+document you can fetch it from the \field{sort} field.
+
+If the field value can't be parsed then \bibgls\ will issue a
+warning and assume the current date (or time).
+
+For example, suppose my \ext{bib} file contains
+\begin{verbatim}
+@entry{20160110,
+  name={10 Jan 2017},
+  description={an interesting journal entry}
+}
+\end{verbatim}
+The \field{name} field uses an abbreviated UK date format.
+If all my other entries also use this format in the \field{name}
+then I can sort them chronologically:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=entries,% data in entries.bib
+  sort=date,
+  date-sort-locale={en-GB},
+  date-sort-format={medium}
+]
+\end{verbatim}
+(The medium format is actually the default for this locale,
+and the locale matches my system locale, so I could omit
+both \optref{date-sort-locale} and \optref{date-sort-format}.)
+
+The \field{sort} field is then set to the ISO form 2017-01-10,
+which makes it much easier to compare. In general, it doesn't
+make much sense to have hierarchical entries that need to 
+be sorted by date, but it is possible as long as each level
+uses the same date format.
+
+If \longarg{verbose} mode is on, the transcript will show
+the label, sort value and numeric value for each entry.
+In this case, the information is:
+\begin{verbatim}
+20170110 -> '2017-01-10' [1484006400000]
+\end{verbatim}
+The first value is the label (\code{20170110}), the second
+value is the ISO date assigned to the \field{sort} field
+(\code{2017-01-10}) and the number in square brackets 
+is the actual numeric value used by the comparator.
+This value is the number of milliseconds since 1st~January, 1970.
+
+If I change the format to \optref[short]{date-sort-format},
+then the date can't be parsed correctly and \bibgls\ will 
+issue the following warning:
+\begin{verbatim}
+Warning: Can't parse sort value '10 Jan 2017' for '20170110'
+(pattern: 'dd/MM/yyyy')
+\end{verbatim}
+This shows the field value that \bibgls\ is trying to
+parse (\code{10 Jan 2017}) for the entry identified by
+the given label (\code{20170110}). The pattern \bibgls\ 
+expects is also given (\code{dd/MM/yyyy}).
+
 \subsection{\csoptnv{sort-rule}\csopteqval{value}}
 \labelopt{sort-rule}
 
@@ -5810,6 +5911,35 @@ digit), but \bibgls\ will accept a single space between \cs{u} and
 
 If \optref{sort} is not set to \optfmt{custom}, the
 \optfmt{sort-rule} setting will be ignored.
+
+\subsection{\csoptnv{date-sort-locale}\csopteqval{value}}
+\labelopt{date-sort-locale}
+
+If you use a date/time sort method, then you can
+set the locale used by Java's date-time parser. If omitted,
+the locale is obtained from the Java Virtual Machine, which
+will usually be your operating system's locale.
+
+The value may be \optfmt{doc} (use the document's locale)
+or a valid language tag identifying the locale.
+
+\subsection{\csoptnv{date-sort-format}\csopteqval{value}}
+\labelopt{date-sort-format}
+
+If you use a date/time sort method, then you can set the format
+used by Java's date-time parser. If omitted, the default is assumed.
+The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{default}: use the locale's default format.
+\item\optfmt{short}: use the locale's short format.
+\item\optfmt{medium}: use the locale's medium format.
+\item\optfmt{long}: use the locale's long format.
+\item\optfmt{full}: use the locale's full format.
+\item\meta{pattern}: provide a custom pattern.
+This should match the specifications for Java's
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
+class.
+\end{itemize}
 
 \subsection{\csoptnv{break-at}\csopteqval{option}}
 \labelopt{break-at}
@@ -6304,6 +6434,18 @@ default value is the same as the \optref{sort-field} value.
 \labelopt{dual-sort-rule}
 
 As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
+
+\subsection{\csoptnv{dual-date-sort-locale}\csopteqval{value}}
+\labelopt{dual-date-sort-locale}
+
+As \optref{date-sort-locale} but for dual entries that
+use a date/time sort.
+
+\subsection{\csoptnv{dual-date-sort-format}\csopteqval{value}}
+\labelopt{dual-date-sort-format}
+
+As \optref{date-sort-format} but for dual entries that
+use a date/time sort.
 
 \subsection{\csoptnv{dual-prefix}\csopteqval{value}}
 \labelopt{dual-prefix}
@@ -7645,6 +7787,75 @@ The number group title is obtained from:
 \cs{bibglsnumbergrouptitle}\margm{value}\margm{id}\margm{type}
 \end{definition}
 This just defaults to \cs{glsnumbersgroupname}.
+
+\subsection{\csfmt{bibglsdatetimegroup}}
+\labelcs{bibglsdatetimegroup}
+
+\begin{definition}
+\cs{bibglsdatetimegroup}\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group id}\margm{type}
+\end{definition}
+
+This command is used for group labels with date-time sorting (for example,
+\optref[datetime]{sort}). This has ten arguments, which means a
+little trickery is needed to deal with the tenth argument.
+The default definition is
+\begin{verbatim}
+\providecommand{\bibglsdatetimegroup}[9]{#1#2\@firstofone}
+\end{verbatim}
+This forms the group label from the year, month and \meta{type}.
+
+\subsection{\csfmt{bibglsdatetimegrouptitle}}
+\labelcs{bibglsdatetimegrouptitle}
+
+\begin{definition}
+\cs{bibglsdatetimegrouptitle}\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group id}\margm{type}
+\end{definition}
+
+This command is used for group titles with date-time sorting.
+The default definition is
+\begin{verbatim}
+\providecommand{\bibglsdatetimegrouptitle}[9]{#1-#2\@gobble}
+\end{verbatim}
+This sets the title to the numeric \code{\meta{YYYY}-\meta{MM}}
+but may be redefined as appropriate.
+
+\subsection{\csfmt{bibglsdategroup}}
+\labelcs{bibglsdategroup}
+
+\begin{definition}
+\cs{bibglsdategroup}\margm{YYYY}\margm{MM}\margm{DD}\margm{title}\margm{group id}\margm{type}
+\end{definition}
+
+This command is used for group labels with date sorting (for
+example, with \optref[date]{sort}).
+
+\subsection{\csfmt{bibglsdategrouptitle}}
+\labelcs{bibglsdategrouptitle}
+
+\begin{definition}
+\cs{bibglsdategrouptitle}\margm{YYYY}\margm{MM}\margm{DD}\margm{title}\margm{group id}\margm{type}
+\end{definition}
+
+This command is used for group titles with date sorting.
+
+\subsection{\csfmt{bibglstimegroup}}
+\labelcs{bibglstimegroup}
+
+\begin{definition}
+\cs{bibglstimegroup}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group id}\margm{type}
+\end{definition}
+
+This command is used for group labels with time sorting (for example,
+\optref[time]{sort}).
+
+\subsection{\csfmt{bibglstimegrouptitle}}
+\labelcs{bibglstimegrouptitle}
+
+\begin{definition}
+\cs{bibglstimegrouptitle}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group id}\margm{type}
+\end{definition}
+
+This command is used for group titles with time sorting.
 
 \subsection{\csfmt{bibglshypergroup}}
 \labelcs{bibglshypergroup}

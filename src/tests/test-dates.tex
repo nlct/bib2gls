@@ -1,0 +1,19 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ sort={date},
+ sort-field={symbol},
+ %sort-field={user1},
+ %sort-field={user3},
+ %date-sort-locale={en-US},
+ %date-sort-format={short},
+ selection=all]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

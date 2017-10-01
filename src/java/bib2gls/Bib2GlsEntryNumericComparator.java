@@ -114,6 +114,9 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       }
       catch (NumberFormatException e)
       {
+         bib2gls.warning(bib2gls.getMessage("warning.cant.parse.sort",
+             value, id));
+
          value = "0";
          number = Integer.valueOf(0);
       }
@@ -172,6 +175,12 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       {
          return reverse ? ((Double)num2).compareTo((Double)num1) 
           : ((Double)num1).compareTo((Double)num2);
+      }
+
+      if (num1 instanceof Long && num2 instanceof Long)
+      {
+         return reverse ? ((Long)num2).compareTo((Long)num1) 
+          : ((Long)num1).compareTo((Long)num2);
       }
 
       double n1;

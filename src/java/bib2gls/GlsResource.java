@@ -559,6 +559,30 @@ public class GlsResource
          {
             secondarySortRules = replaceHex(getRequired(parser, list, opt));
          }
+         else if (opt.equals("date-sort-format"))
+         {
+            dateSortFormat = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("dual-date-sort-format"))
+         {
+            dualDateSortFormat = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("secondary-date-sort-format"))
+         {
+            secondaryDateSortFormat = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("date-sort-locale"))
+         {
+            dateSortLocale = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("dual-date-sort-locale"))
+         {
+            dualDateSortLocale = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("secondary-date-sort-locale"))
+         {
+            secondaryDateSortLocale = getRequired(parser, list, opt);
+         }
          else if (opt.equals("group"))
          {
             if (bib2gls.useGroupField())
@@ -884,6 +908,16 @@ public class GlsResource
       if ("doc".equals(dualSort))
       {
          dualSort = bib2gls.getDocDefaultLocale();
+      }
+
+      if ("doc".equals(dateSortLocale))
+      {
+         dateSortLocale = bib2gls.getDocDefaultLocale();
+      }
+
+      if ("doc".equals(dualDateSortLocale))
+      {
+         dualDateSortLocale = bib2gls.getDocDefaultLocale();
       }
 
       if ("custom".equals(sort) && sortRules == null)
@@ -2666,7 +2700,8 @@ public class GlsResource
 
    private void processData(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries,
-      String entrySort, String entrySortRules, String entrySortField)
+      String entrySort, String entrySortRules, String entrySortField,
+      String entryDateSortLocale, String entryDateSortFormat)
       throws Bib2GlsException
    {
       Vector<String> fields = bib2gls.getFields();
@@ -2790,12 +2825,13 @@ public class GlsResource
       }
 
       processDepsAndSort(data, entries, entrySort, entrySortRules, 
-        entrySortField);
+        entrySortField, entryDateSortLocale, entryDateSortFormat);
    }
 
    private void processDepsAndSort(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries,
-      String entrySort, String entrySortRules, String entrySortField)
+      String entrySort, String entrySortRules, String entrySortField,
+      String entryDateSortLocale, String entryDateSortFormat)
       throws Bib2GlsException
    {
       // add any dependencies
@@ -2847,105 +2883,8 @@ public class GlsResource
 
       if (entrySort != null && !entrySort.equals("use") && entryCount > 0)
       {
-         if (entrySort.equals("random"))
-         {
-            if (random == null)
-            {
-               random = new Random();
-            }
-
-            Collections.shuffle(entries, random);
-         }
-         else if (entrySort.equals("letter-case"))
-         {
-            Bib2GlsEntryLetterComparator comparator = 
-               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, false, false, 
-                 sortSuffixOption, sortSuffixMarker);
-
-            comparator.sortEntries();
-         }
-         else if (entrySort.equals("letter-case-reverse"))
-         {
-            Bib2GlsEntryLetterComparator comparator = 
-               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, false, true,
-                 sortSuffixOption, sortSuffixMarker);
-
-            comparator.sortEntries();
-         }
-         else if (entrySort.equals("letter-nocase"))
-         {
-            Bib2GlsEntryLetterComparator comparator = 
-               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, true, false,
-                 sortSuffixOption, sortSuffixMarker);
-
-            comparator.sortEntries();
-         }
-         else if (entrySort.equals("letter-nocase-reverse"))
-         {
-            Bib2GlsEntryLetterComparator comparator = 
-               new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-                 entrySort, entrySortField, true, true,
-                 sortSuffixOption, sortSuffixMarker);
-
-            comparator.sortEntries();
-         }
-         else if (entrySort.startsWith("integer") 
-               || entrySort.startsWith("float")
-               || entrySort.startsWith("double")
-               || entrySort.startsWith("hex")
-               || entrySort.startsWith("octal")
-               || entrySort.startsWith("binary"))
-         {
-            Bib2GlsEntryNumericComparator comparator = 
-               new Bib2GlsEntryNumericComparator(bib2gls, entries, 
-                 entrySort, entrySortField);
-
-            comparator.sortEntries();
-         }
-         else if (entrySort.equals("custom"))
-         {
-            try
-            {
-               Bib2GlsEntryComparator comparator = 
-                  new Bib2GlsEntryComparator(bib2gls, entries, 
-                     entrySortField,
-                     collatorStrength, collatorDecomposition,
-                     entrySortRules, breakPoint, breakPointMarker,
-                     sortSuffixOption, sortSuffixMarker);
-
-               comparator.sortEntries();
-            }
-            catch (ParseException e)
-            {
-               throw new Bib2GlsException(bib2gls.getMessage(
-                "error.invalid.sort.rule", e.getMessage()), e);
-            }
-         }
-         else
-         {
-            Locale locale = null;
-
-            if (entrySort.equals("locale"))
-            {
-               locale = Locale.getDefault();
-            }
-            else
-            {
-               locale = Locale.forLanguageTag(entrySort);
-            }
-
-            Bib2GlsEntryComparator comparator = 
-               new Bib2GlsEntryComparator(bib2gls, entries, 
-                  locale, entrySortField, 
-                  collatorStrength, collatorDecomposition,
-                  breakPoint, breakPointMarker,
-                  sortSuffixOption, sortSuffixMarker);
-
-            comparator.sortEntries();
-         }
+         sortData(entries, entrySort, entrySortField, entrySortRules,
+                  entryDateSortLocale, entryDateSortFormat);
       }
    }
 
@@ -2972,7 +2911,8 @@ public class GlsResource
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
-      processData(bibData, entries, sort, sortRules, sortField);
+      processData(bibData, entries, sort, sortRules, sortField,
+         dateSortLocale, dateSortFormat);
 
       Vector<Bib2GlsEntry> dualEntries = null;
 
@@ -3013,7 +2953,8 @@ public class GlsResource
          }
 
          processDepsAndSort(dualData, dualEntries, dualSort,
-           dualSortRules, dualSortField);
+           dualSortRules, dualSortField,
+           dualDateSortLocale, dualDateSortFormat);
 
          entryCount += dualEntries.size();
       }
@@ -3074,26 +3015,103 @@ public class GlsResource
          {
             writer.println("\\ifdef\\glsxtrsetgrouptitle");
             writer.println("{");
+
+            // letter groups:
+
             writer.println("  \\providecommand{\\bibglslettergroup}[4]{#4#3}");
             writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{\\unexpanded{#1}}");
             writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
+
+            // other groups:
+
             writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
             writer.println("  \\providecommand{\\bibglsothergrouptitle}[3]{\\glssymbolsgroupname}");
             writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergroup#1}{\\bibglsothergrouptitle#1}}");
+
+            // number groups
+
             writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
             writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\glsnumbersgroupname}");
             writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
+
+            boolean requiresDateTime = sort.startsWith("datetime") 
+               || (dualSort != null && dualSort.startsWith("datetime"))
+               || (secondarySort != null && secondarySort.startsWith("datetime"));
+
+            boolean requiresDate = sort.equals("date") || sort.equals("date-reverse")
+               || (dualSort != null 
+                    && (dualSort.equals("date") || dualSort.equals("date-reverse")))
+               || (secondarySort != null 
+                     && (secondarySort.equals("date") 
+                         || secondarySort.equals("date-reverse")));
+
+            boolean requiresTime = sort.startsWith("time") 
+               || (dualSort != null && dualSort.startsWith("time"))
+               || (secondarySort != null && secondarySort.startsWith("time"));
+
+            // date-time groups
+
+            if (requiresDateTime)
+            {
+               writer.println("  \\providecommand{\\bibglsdatetimegroup}[9]{#1#2\\@firstofone}");
+               writer.println("  \\providecommand{\\bibglsdatetimegrouptitle}[9]{#1-#2\\@gobble}");
+               writer.println("  \\providecommand{\\bibglssetdatetimegrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsdatetimegroup#1}{\\bibglsdatetimegrouptitle#1}}");
+            }
+
+            // date groups
+
+            if (requiresDate)
+            {
+               writer.println("  \\providecommand{\\bibglsdategroup}[6]{#1#2#6}");
+               writer.println("  \\providecommand{\\bibglsdategrouptitle}[6]{#1-#2}");
+               writer.println("  \\providecommand{\\bibglssetdategrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsdategroup#1}{\\bibglsdategrouptitle#1}}");
+            }
+
+            // time groups
+
+            if (requiresTime)
+            {
+               writer.println("  \\providecommand{\\bibglstimegroup}[7]{#1#2#7}");
+               writer.println("  \\providecommand{\\bibglstimegrouptitle}[7]{#1}");
+               writer.println("  \\providecommand{\\bibglssettimegrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglstimegroup#1}{\\bibglstimegrouptitle#1}}");
+            }
+
+
             writer.println("}");
             writer.println("{");
+
+            // old version of glossaries-extra.sty:
+
             writer.println("  \\providecommand{\\bibglslettergroup}[4]{#1}");
             writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
             writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
+            if (requiresDateTime)
+            {
+               writer.println("  \\providecommand{\\bibglsdatetimegroup}[9]{#1-#2\\@gobble}");
+            }
+
+            if (requiresDate)
+            {
+               writer.println("  \\providecommand{\\bibglsdategroup}[6]{#1-#2}");
+            }
+
+            if (requiresTime)
+            {
+               writer.println("  \\providecommand{\\bibglstimegroup}[6]{#1-#2}");
+            }
+
             writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{}");
             writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{}");
             writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{}");
+            writer.println("  \\providecommand{\\bibglssetdatetimegrouptitle}[1]{}");
+            writer.println("  \\providecommand{\\bibglssetdategrouptitle}[1]{}");
+            writer.println("  \\providecommand{\\bibglssettimegrouptitle}[1]{}");
             writer.println("}");
 
             writer.println();
@@ -3459,103 +3477,10 @@ public class GlsResource
             }
             else
             {
-               if (secondarySort.equals("letter-case"))
-               {
-                  Bib2GlsEntryLetterComparator comparator = 
-                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
-                       secondarySort,
+               sortData(secondaryList, secondarySort, 
                        secondaryField == null ? sortField : secondaryField,
-                       false, false, sortSuffixOption, sortSuffixMarker);
-
-                  comparator.sortEntries();
-               }
-               else if (secondarySort.equals("letter-case-reverse"))
-               {
-                  Bib2GlsEntryLetterComparator comparator = 
-                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
-                       secondarySort,
-                       secondaryField == null ? sortField : secondaryField,
-                       false, true, sortSuffixOption, sortSuffixMarker);
-
-                  comparator.sortEntries();
-               }
-               else if (secondarySort.equals("letter-nocase"))
-               {
-                  Bib2GlsEntryLetterComparator comparator = 
-                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
-                       secondarySort,
-                       secondaryField == null ? sortField : secondaryField,
-                       true, false, sortSuffixOption, sortSuffixMarker);
-
-                  comparator.sortEntries();
-               }
-               else if (secondarySort.equals("letter-nocase-reverse"))
-               {
-                  Bib2GlsEntryLetterComparator comparator = 
-                     new Bib2GlsEntryLetterComparator(bib2gls, secondaryList, 
-                       secondarySort,
-                       secondaryField == null ? sortField : secondaryField,
-                       true, true, sortSuffixOption, sortSuffixMarker);
-
-                  comparator.sortEntries();
-               }
-               else if (secondarySort.startsWith("integer") 
-                     || secondarySort.startsWith("float")
-                     || secondarySort.startsWith("double")
-                     || secondarySort.startsWith("hex")
-                     || secondarySort.startsWith("octal")
-                     || secondarySort.startsWith("binary"))
-               {
-                  Bib2GlsEntryNumericComparator comparator = 
-                     new Bib2GlsEntryNumericComparator(bib2gls, 
-                       secondaryList, secondarySort,
-                       secondaryField == null ? sortField : secondaryField);
-
-                  comparator.sortEntries();
-               }
-               else if (secondarySort.equals("custom"))
-               {
-                  try
-                  {
-                     Bib2GlsEntryComparator comparator = 
-                        new Bib2GlsEntryComparator(bib2gls, secondaryList, 
-                           secondaryField == null ? sortField : secondaryField,
-                           collatorStrength, collatorDecomposition,
-                           secondarySortRules, breakPoint, breakPointMarker,
-                           sortSuffixOption, sortSuffixMarker);
-
-                     comparator.sortEntries();
-                  }
-                  catch (ParseException e)
-                  {
-                     throw new Bib2GlsException(bib2gls.getMessage(
-                      "error.invalid.sort.rule", 
-                      e.getErrorOffset(), secondarySortRules), e);
-                  }
-               }
-               else
-               {
-                  Locale locale = null;
-
-                  if (secondarySort.equals("locale"))
-                  {
-                     locale = Locale.getDefault();
-                  }
-                  else
-                  {
-                     locale = Locale.forLanguageTag(secondarySort);
-                  }
-
-                  Bib2GlsEntryComparator comparator = 
-                     new Bib2GlsEntryComparator(bib2gls, secondaryList, 
-                        locale,
-                        secondaryField == null ? sortField : secondaryField,
-                        collatorStrength, collatorDecomposition,
-                        breakPoint, breakPointMarker,
-                        sortSuffixOption, sortSuffixMarker);
-
-                  comparator.sortEntries();
-               }
+                       secondarySortRules, secondaryDateSortLocale,
+                       secondaryDateSortFormat);
 
                for (Bib2GlsEntry entry : secondaryList)
                {
@@ -3635,6 +3560,191 @@ public class GlsResource
       return entryCount;
    }
 
+   private void sortData(Vector<Bib2GlsEntry> entries, String entrySort,
+     String entrySortField, String entrySortRules,
+     String entryDateSortLocale, String entryDateSortFormat)
+    throws Bib2GlsException
+   {
+      if (entrySort.equals("random"))
+      {
+         if (random == null)
+         {
+            random = new Random();
+         }
+
+         Collections.shuffle(entries, random);
+      }
+      else if (entrySort.equals("letter-case"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, false, false, 
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letter-case-reverse"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, false, true,
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letter-nocase"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, true, false,
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letter-nocase-reverse"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, true, true,
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.startsWith("integer") 
+            || entrySort.startsWith("float")
+            || entrySort.startsWith("double")
+            || entrySort.startsWith("hex")
+            || entrySort.startsWith("octal")
+            || entrySort.startsWith("binary"))
+      {
+         Bib2GlsEntryNumericComparator comparator = 
+            new Bib2GlsEntryNumericComparator(bib2gls, entries, 
+              entrySort, entrySortField);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("date"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, locale, 
+               entryDateSortFormat, true, false, false);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("date-reverse"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, locale, 
+               entryDateSortFormat, true, false, true);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("datetime"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, locale, 
+               entryDateSortFormat, true, true, false);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("datetime-reverse"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, locale, 
+               entryDateSortFormat, true, true, true);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("custom"))
+      {
+         try
+         {
+            Bib2GlsEntryComparator comparator = 
+               new Bib2GlsEntryComparator(bib2gls, entries, 
+                  entrySortField,
+                  collatorStrength, collatorDecomposition,
+                  entrySortRules, breakPoint, breakPointMarker,
+                  sortSuffixOption, sortSuffixMarker);
+
+            comparator.sortEntries();
+         }
+         catch (ParseException e)
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+             "error.invalid.sort.rule", e.getMessage()), e);
+         }
+      }
+      else
+      {
+         Locale locale = null;
+
+         if (entrySort.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entrySort);
+         }
+
+         Bib2GlsEntryComparator comparator = 
+            new Bib2GlsEntryComparator(bib2gls, entries, 
+               locale, entrySortField, 
+               collatorStrength, collatorDecomposition,
+               breakPoint, breakPointMarker,
+               sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+   }
 
    private void updateWidestName(Bib2GlsEntry entry, 
      Vector<String> widestNames, 
@@ -4785,7 +4895,7 @@ public class GlsResource
       }
    }
 
-   public GroupTitle getGroupTitle(Bib2GlsEntry entry, int id)
+   public GroupTitle getGroupTitle(Bib2GlsEntry entry, long id)
    {
       if (groupTitleMap != null)
       {
@@ -4815,6 +4925,11 @@ public class GlsResource
    private String sort = "locale", sortField = "sort";
 
    private String sortRules=null, secondarySortRules=null, dualSortRules=null;
+
+   private String dateSortFormat = null, dualDateSortFormat = null, secondaryDateSortFormat = null;
+
+   private String dateSortLocale = "locale", dualDateSortLocale = "locale",
+    secondaryDateSortLocale = "locale";
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 

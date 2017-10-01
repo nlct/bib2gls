@@ -22,7 +22,7 @@ public class NumberGroupTitle extends OtherGroupTitle
 {
    public NumberGroupTitle(Number number, String type)
    {
-      super(number.toString(), number.intValue(), type);
+      super(number.toString(), number.longValue(), type);
    }
 
    public String getCsSetName()
