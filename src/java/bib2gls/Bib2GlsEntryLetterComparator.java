@@ -32,11 +32,12 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField,
+    String sort, String sortField, String groupField,
     boolean ignoreCase, boolean reverse,
     int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
+      this.groupField = groupField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.ignoreCase = ignoreCase;
@@ -124,7 +125,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             str = String.format("%c", codePoint);
          }
 
-         if (entry.getFieldValue("group") != null)
+         if (entry.getFieldValue(groupField) != null)
          {
             // don't overwrite
          }
@@ -152,7 +153,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
                args = grpTitle.format(str);
             }
 
-            entry.putField("group", 
+            entry.putField(groupField, 
                String.format("\\%s%s", grpTitle.getCsLabelName(), args));
          }
          else
@@ -180,7 +181,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
                args = grpTitle.format(str);
             }
 
-            entry.putField("group", 
+            entry.putField(groupField, 
                String.format("\\%s%s", grpTitle.getCsLabelName(), args)); 
          }
       }
@@ -366,7 +367,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private String sortField;
+   private String sortField, groupField;
 
    private Bib2Gls bib2gls;
 

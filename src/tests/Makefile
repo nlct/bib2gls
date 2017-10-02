@@ -16,7 +16,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
 	  test-cjk.pdf test-other.pdf test-homograph.pdf \
-	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf
+	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf \
+	  test-dates.pdf test-people.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -301,6 +302,20 @@ test-dups.pdf	: test-dups.glstex
 test-dups.glstex	: test-dups.tex test-dups.bib $(DEPS)
 		pdflatex test-dups
 		$(BIB2GLS) test-dups
+
+test-dates.pdf	: test-dates.glstex
+		pdflatex test-dates
+
+test-dates.glstex	: test-dates.tex test-dates.bib $(DEPS)
+		pdflatex test-dates
+		$(BIB2GLS) test-dates
+
+test-people.pdf	: test-people.glstex
+		pdflatex test-people
+
+test-people.glstex	: test-people.tex people.bib $(DEPS)
+		pdflatex test-people
+		$(BIB2GLS) test-people
 
 clean	:
 	$(RM) *.aux

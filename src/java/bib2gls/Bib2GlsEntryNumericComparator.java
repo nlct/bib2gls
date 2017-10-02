@@ -32,9 +32,10 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryNumericComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField)
+    String sort, String sortField, String groupField)
    {
       this.sortField = sortField;
+      this.groupField = groupField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.reverse = sort.endsWith("-reverse");
@@ -125,7 +126,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 
       entry.putField("sort", value);
 
-      if (bib2gls.useGroupField() && entry.getFieldValue("group") == null
+      if (bib2gls.useGroupField() && entry.getFieldValue(groupField) == null
            && !entry.hasParent())
       {
          GlsResource resource = bib2gls.getCurrentResource();
@@ -145,7 +146,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
             args = grpTitle.format(value);
          }
 
-         entry.putField("group",
+         entry.putField(groupField,
             String.format("\\%s%s", grpTitle.getCsLabelName(), args));
       }
 
@@ -265,7 +266,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private String sortField, sort;
+   private String sortField, groupField, sort;
 
    private Bib2Gls bib2gls;
 

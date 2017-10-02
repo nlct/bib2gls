@@ -70,6 +70,8 @@ heading_suffix "}\n"
 
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
 
+\newcommand{\era}[1]{\texorpdfstring{\textsc{\MakeLowercase{#1}}}{#1}}
+
 \newcommand{\dequals}{%
  \texorpdfstring
  {\discretionary{}{}{}\texttt{=}\discretionary{}{}{}}%
@@ -1858,6 +1860,8 @@ the \optref{counter} option).\\
 (or assigned by the \optref{group} option).\\
 \fielddef{location} & The typeset location list. \\
 \fielddef{loclist} & The internal list of locations.\\
+\fielddef{secondarygroup} & The letter group determined by the
+comparator used with the secondary sort.\\
 \fielddef{sort} & The sort value obtained by the comparator.\\
 \fielddef{type} & The glossary this entry belongs to (assigned by
 the \optref{type} option).
@@ -3131,7 +3135,20 @@ and not according to the order in which they were read when the
 
 This will copy all the selected entries into the glossary labelled
 \meta{type} sorted according to \meta{sort} using \meta{field} as
-the sort value.
+the sort value. Note that this just \emph{copies the entry's label}
+to the second glossary list rather than creating a duplicate entry. 
+This means that all the fields will be identical. If you want groups
+in your glossary, the information for the secondary glossary will
+be in the internal \field{secondarygroup} field. The \field{group}
+field will contain the letter groups for the primary glossary.
+
+In order to switch fields in \cs{printunsrtglossary}, you need at
+least v1.21 of \sty{glossaries-extra} which provides
+\cs{glsxtrgroupfield} to keep track of the appropriate field label.
+If this command is defined, the preamble will be adjusted to locally
+change the field to \field{secondarygroup}. With older versions, the
+group information in the secondary glossary will be the same as for
+the primary glossary.
 
 (If the glossary \meta{type} doesn't exist, it will be
 defined with \cs{provideignoredglossary*}\margm{type}.)
@@ -5804,6 +5821,43 @@ For example:
 \GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
 \end{verbatim}
 
+Remember that you can have \atentryref{preamble} definitions that
+can be hidden from \bibgls's interpreter. For example,
+\filefmt{no-interpret-preamble.bib} might contain:
+\begin{verbatim}
+@preamble{"\providecommand{\sortop}[2]{#1 #2}"}
+\end{verbatim}
+which is loaded using
+\begin{verbatim}
+\GlsXtrLoadResources[src={no-interpret-preamble},
+ interpret-preamble=false]
+\end{verbatim}
+This provides the command \csfmt{sortop} for use in the document.
+Another file, say, \filefmt{interpret-preamble.bib} may provide
+a definition for \bibgls:
+\begin{verbatim}
+@preamble{"\providecommand{\sortop}[2]{#2, #1}"}
+\end{verbatim}
+which can be identified with:
+\begin{verbatim}
+\GlsXtrLoadResources[src={interpret-preamble}]
+\end{verbatim}
+This definition swaps the two arguments around for the sorting, but
+doesn't affect the document since \LaTeX\ has already defined
+\csfmt{sortop} from the first resource set.
+
+For example:
+\begin{verbatim}
+@entry{caesar,
+  name={\sortop{Gaius Julius}{Caesar}},
+  first={Julius Caesar},
+  text={Caesar},
+  description={Roman politician and general}
+}
+\end{verbatim}
+If \bibgls\ only recognises the second definition of \csfmt{sortop} then
+the sort value becomes \code{Caesar, Gaius Julius}.
+
 If the field you want to sort by contains a date then the
 simplest way to sort is to ensure the date is in ISO format
 and then just use a letter sort. However it may be that
@@ -5814,17 +5868,35 @@ is assumed to be your default locale (as given by the Java Virtual
 Machine) but if you are using a different locale this can
 be set with \optref{date-sort-locale}. The pattern is assumed
 to be the default for that locale but you can change this with
-\optref{date-sort-format}.
+\optref{date-sort-format}. If you provide your
+own custom pattern you must make sure that it matches the selected
+\optfmt{sort} option.
 
-The locale and pattern information is used by \bibgls\ to
-parse the field. The \field{sort} field is then set to the ISO
-format, but the sort comparator actually uses an integer
-representation of the date rather than performing a letter sort.
-This means that if you need the more convenient ISO format in your
-document you can fetch it from the \field{sort} field.
+The locale and pattern information is used by \bibgls\ to parse the
+field.  If the field value can't be parsed then \bibgls\ will issue
+a warning and assume the current date (or time).
 
-If the field value can't be parsed then \bibgls\ will issue a
-warning and assume the current date (or time).
+The actual sort value that's used by the comparator is numeric.  In
+the case of the time-based \csopt[datetime]{sort} and
+\csopt[time]{sort} (or their \optfmt{-reverse} versions), this value
+is the number of milliseconds since 1st~January, 1970. In the case
+of \csopt[date]{sort} (or \csopt[date-reverse]{sort}), this value is
+obtained from $a(y\times10000 + m\times100 + d)$ where $y$ is the
+year, $m$ is the month number, $d$ is the day of month number, and
+$a$ is an integer representation of the era ($-1$ for \era{BC}).
+
+Unlike the numeric sort methods (such as \csopt[integer]{sort})
+the date-time sort methods set the \field{sort} field to a value
+that can be more easily parsed within the document and that should
+mostly achieve the same ordering if a letter comparator were to be used
+with it (except for \era{BC} dates, where the order needs to be
+reversed). This has the by-product of providing a field that
+you can access within the document that can be more easily parsed by
+\LaTeX.
+
+In general, it doesn't make much sense to have hierarchical entries
+that need to be sorted by date, but it is possible as long as each
+level uses the same date format.
 
 For example, suppose my \ext{bib} file contains
 \begin{verbatim}
@@ -5848,23 +5920,19 @@ then I can sort them chronologically:
 and the locale matches my system locale, so I could omit
 both \optref{date-sort-locale} and \optref{date-sort-format}.)
 
-The \field{sort} field is then set to the ISO form 2017-01-10,
-which makes it much easier to compare. In general, it doesn't
-make much sense to have hierarchical entries that need to 
-be sorted by date, but it is possible as long as each level
-uses the same date format.
-
 If \longarg{verbose} mode is on, the transcript will show
 the label, sort value and numeric value for each entry.
 In this case, the information is:
 \begin{verbatim}
-20170110 -> '2017-01-10' [1484006400000]
+20170110 -> '+1 2017-01-10' [20170110]
 \end{verbatim}
 The first value is the label (\code{20170110}), the second
-value is the ISO date assigned to the \field{sort} field
-(\code{2017-01-10}) and the number in square brackets 
-is the actual numeric value used by the comparator.
-This value is the number of milliseconds since 1st~January, 1970.
+value is assigned to the \field{sort} field
+(\code{+1 2017-01-10}) and the number in square brackets 
+is the actual numeric value used by the comparator. The signed
+number at the start of the sort field \code{+1} is the numeric
+representation of the era as used for the $a$ variable in the
+computation of the numeric value (as described earlier).
 
 If I change the format to \optref[short]{date-sort-format},
 then the date can't be parsed correctly and \bibgls\ will 
@@ -5940,6 +6008,91 @@ This should match the specifications for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
 class.
 \end{itemize}
+
+With the custom setting, if the pattern only contains date (but not
+time) information, then it must be used with \optref[date]{sort}
+or \optref[date-reverse]{sort}. If the pattern only contains time
+(but not date) information, then it must be used with
+\optref[time]{sort} or \optref[time-reverse]{sort}. If the pattern
+contains both date and time information, then it must be used with
+\optref[datetime]{sort} or \optref[datetime-reverse]{sort}.
+
+For example, suppose each entry provides information about a person
+and the \field{user1} field is used to store their date of birth:
+\begin{verbatim}
+@entry{caesar,
+  name={Gaius Julius Caesar},
+  first={Julius Caesar},
+  text={Caesar},
+  description={Roman politician and general},
+  user1={13 July 100 BC}
+}
+
+@entry{wellington,
+  name={Arthur Wellesley, 1st Duke of Wellington},
+  first={Arthur Wellesley (Duke of Wellington)},
+  text={Wellington},
+  description={Anglo-Irish soldier and statesman},
+  user1={1 May 1769 AD}
+}
+\end{verbatim}
+Then the entries can be sorted by date of birth using:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src={entries}, % data in entries.bib
+  sort-field={user1},
+  sort={date},
+  date-sort-format={d MMM y G}
+]
+\end{verbatim}
+
+The \code{G} (era) date pattern specifier expects a string, such as
+\qt{AD}. It will match lower case forms, such as \qt{ad}, so if you
+have \verb|\textsc{ad}| the interpreter will convert this to
+\code{ad} (stripping the text-block command). However, in general
+it's best to supply a semantic command that ensures that the
+interpreted result matches the required format.
+
+For example, if \csfmt{era} is provided with:
+\begin{verbatim}
+@preamble{"\providecommand{\era}[1]{\textsc{\MakeLowercase{#1}}}"}
+\end{verbatim}
+If the definition is hidden from the interpreter
+(\optref[false]{interpret-preamble}) and the field
+value contains \verb|\era{AD}| then the custom command will simply be stripped
+leaving \code{AD} which can be matched by \code{G}. 
+
+If the definition is picked up by the interpreter then the field
+value will contain \code{ad} (from \cs{MakeLowercase}) but this can
+be matched by \code{G}, so it isn't a problem.
+However, if the definition of \csfmt{era} is changed so that the era label
+supplied in the argument is converted to something that doesn't
+match \code{G} then the definition should be hidden from the
+interpreter.
+
+Here's a complete document that changes the group fields to use
+the year and era:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\newcommand{\bibglsdategroup}[7]{#1#4#7}
+\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
+
+\GlsXtrLoadResources[
+  src={entries},
+  sort-field={user1},
+  sort={date},
+  date-sort-format={d MMM y G},
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+(The use of \csfmt{number} strips the leading zero from the year.)
 
 \subsection{\csoptnv{break-at}\csopteqval{option}}
 \labelopt{break-at}
@@ -7800,9 +7953,9 @@ This command is used for group labels with date-time sorting (for example,
 little trickery is needed to deal with the tenth argument.
 The default definition is
 \begin{verbatim}
-\providecommand{\bibglsdatetimegroup}[9]{#1#2\@firstofone}
+\providecommand{\bibglsdatetimegroup}[9]{#1#2#3\@firstofone}
 \end{verbatim}
-This forms the group label from the year, month and \meta{type}.
+This forms the group label from the year, month, day and \meta{type}.
 
 \subsection{\csfmt{bibglsdatetimegrouptitle}}
 \labelcs{bibglsdatetimegrouptitle}
@@ -7814,29 +7967,41 @@ This forms the group label from the year, month and \meta{type}.
 This command is used for group titles with date-time sorting.
 The default definition is
 \begin{verbatim}
-\providecommand{\bibglsdatetimegrouptitle}[9]{#1-#2\@gobble}
+\providecommand{\bibglsdatetimegrouptitle}[9]{#1-#2-#3\@gobble}
 \end{verbatim}
-This sets the title to the numeric \code{\meta{YYYY}-\meta{MM}}
+This sets the title to the numeric
+\code{\meta{YYYY}-\meta{MM}-\meta{DD}}
 but may be redefined as appropriate.
 
 \subsection{\csfmt{bibglsdategroup}}
 \labelcs{bibglsdategroup}
 
 \begin{definition}
-\cs{bibglsdategroup}\margm{YYYY}\margm{MM}\margm{DD}\margm{title}\margm{group id}\margm{type}
+\cs{bibglsdategroup}\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group id}\margm{type}
 \end{definition}
 
 This command is used for group labels with date sorting (for
-example, with \optref[date]{sort}).
+example, with \optref[date]{sort}). The default definition is
+\begin{verbatim}
+\providecommand{\bibglsdategroup}[7]{#1#2#4#7}
+\end{verbatim}
+This forms the group label from the year, month, era and type.
+In this case, the era is a textual representation not the numeric
+value used in calculating the sort value.
 
 \subsection{\csfmt{bibglsdategrouptitle}}
 \labelcs{bibglsdategrouptitle}
 
 \begin{definition}
-\cs{bibglsdategrouptitle}\margm{YYYY}\margm{MM}\margm{DD}\margm{title}\margm{group id}\margm{type}
+\cs{bibglsdategrouptitle}\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group id}\margm{type}
 \end{definition}
-
 This command is used for group titles with date sorting.
+The default definition is
+\begin{verbatim}
+\providecommand{\bibglsdategrouptitle}[7]{#1-#2}
+\end{verbatim}
+This just sets the title to the numeric year-month form 
+\code{\meta{YYYY}-\meta{MM}}.
 
 \subsection{\csfmt{bibglstimegroup}}
 \labelcs{bibglstimegroup}

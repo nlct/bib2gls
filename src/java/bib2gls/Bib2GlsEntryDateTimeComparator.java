@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.Vector;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -32,11 +34,12 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryDateTimeComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField,
+    String sort, String sortField, String groupField,
     Locale locale, String format,
     boolean date, boolean time, boolean reverse)
    {
       this.sortField = sortField;
+      this.groupField = groupField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.reverse = reverse;
@@ -45,15 +48,17 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
       if (date && time)
       {
-         isoDateFormat = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ");
+         sortDateFormat = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ");
       }
       else if (date)
       {
-         isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+         sortDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+         calendar = (locale == null ? Calendar.getInstance() :
+                    Calendar.getInstance(locale));
       }
       else if (time)
       {
-         isoDateFormat = new SimpleDateFormat("HH:mm:ssZ");
+         sortDateFormat = new SimpleDateFormat("HH:mm:ssZ");
       }
 
       init(locale, format, date, time);
@@ -167,7 +172,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
          if (value == null)
          {
-            value = id;
+            value = "";
 
             bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
               id));
@@ -202,9 +207,33 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      Long num = Long.valueOf(dateValue.getTime());
+      Long num;
 
-      value = isoDateFormat.format(dateValue);
+      value = sortDateFormat.format(dateValue);
+
+      if (calendar == null)
+      {
+         num = Long.valueOf(dateValue.getTime());
+      }
+      else
+      {
+         calendar.setTime(dateValue);
+
+         int era = calendar.get(Calendar.ERA);
+
+         if (era == 0)
+         {
+            era = -1;
+         }
+
+         num = Long.valueOf((calendar.get(Calendar.YEAR)*10000L
+              + calendar.get(Calendar.MONTH)*100L
+              + calendar.get(Calendar.DAY_OF_MONTH))
+              * era);
+
+         value = String.format("%+d %s", era, value);
+      }
+
 
       entry.putField("sort", value);
       entry.setNumericSort(num);
@@ -214,7 +243,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
       {
-         if (entry.getFieldValue("group") == null)
+         if (entry.getFieldValue(groupField) == null)
          {
             GlsResource resource = bib2gls.getCurrentResource();
 
@@ -238,7 +267,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
                args = grpTitle.format(dateFormat.format(dateValue));
             }
 
-            entry.putField("group", 
+            entry.putField(groupField, 
                String.format("\\%s%s", grpTitle.getCsLabelName(), args)); 
          }
       }
@@ -328,7 +357,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private String sortField;
+   private String sortField, groupField;
 
    private Bib2Gls bib2gls;
 
@@ -336,5 +365,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
    private boolean reverse, hasDate, hasTime;
 
-   private DateFormat dateFormat, isoDateFormat;
+   private DateFormat dateFormat, sortDateFormat;
+
+   private Calendar calendar=null;
 }

@@ -36,22 +36,24 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    Locale locale, String sortField,
+    Locale locale, String sortField, String groupField,
     int strength, int decomposition,
     int sortSuffixOption, String sortSuffixMarker)
    {
-      this(bib2gls, entries, locale, sortField, strength, decomposition,
+      this(bib2gls, entries, locale, sortField, groupField, 
+       strength, decomposition,
         BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    Locale locale, String sortField,
+    Locale locale, String sortField, String groupField,
     int strength, int decomposition,
     int breakPoint, String breakMarker,
     int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
+      this.groupField = groupField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.sortSuffixMarker = sortSuffixMarker;
@@ -71,23 +73,25 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries, String sortField,
+    Vector<Bib2GlsEntry> entries, String sortField, String groupField,
     int strength, int decomposition, String rules,
     int sortSuffixOption, String sortSuffixMarker)
    throws ParseException
    {
-      this(bib2gls, entries, sortField, strength, decomposition, rules,
+      this(bib2gls, entries, sortField, groupField, 
+        strength, decomposition, rules,
         BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries, String sortField,
+    Vector<Bib2GlsEntry> entries, String sortField, String groupField,
     int strength, int decomposition, String rules,
     int breakPoint, String breakMarker,
     int sortSuffixOption, String sortSuffixMarker)
    throws ParseException
    {
       this.sortField = sortField;
+      this.groupField = groupField;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.sortSuffixMarker = sortSuffixMarker;
@@ -207,7 +211,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
       {
-         if (entry.getFieldValue("group") != null)
+         if (entry.getFieldValue(groupField) != null)
          {
             // don't overwrite
          }
@@ -352,7 +356,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   }
                }
 
-               entry.putField("group", 
+               entry.putField(groupField, 
                  String.format("\\%s%s", grpTitle.getCsLabelName(), args));
             }
             else
@@ -380,7 +384,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   args = grpTitle.format(str);
                }
 
-               entry.putField("group", 
+               entry.putField(groupField, 
                  String.format("\\%s%s", grpTitle.getCsLabelName(), args));
             }
          }
@@ -425,7 +429,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                     str, cp, entryType == null ? "" : entryType);
                }
 
-               entry.putField("group", 
+               entry.putField(groupField, 
                  String.format("\\bibglslettergroup%s", args));
             }
             else
@@ -439,7 +443,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                GlsResource resource = bib2gls.getCurrentResource();
                String entryType = resource.getType(entry);
 
-               entry.putField("group", 
+               entry.putField(groupField, 
                  String.format("\\bibglsothergroup{%s}{%X}{%s}", 
                                str, codePoint,
                                entryType == null ? "" : entryType));
@@ -632,7 +636,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return buff;
    }
 
-   private String sortField;
+   private String sortField, groupField;
 
    private Collator collator;
 

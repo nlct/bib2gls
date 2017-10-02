@@ -37,7 +37,7 @@ public class DateTimeGroupTitle extends GroupTitle
       }
       else if (showDate)
       {
-         format = new SimpleDateFormat("{yyyy}{MM}{dd}");
+         format = new SimpleDateFormat("{yyyy}{MM}{dd}{G}");
          csname = "dategroup";
       }
       else

@@ -1,0 +1,57 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+%\usepackage[en-GB]{datetime2}
+\usepackage[record,nomain,style=indexgroup]{glossaries-extra}
+
+\newcommand{\bibglsdategroup}[7]{#1#4#7}
+\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
+
+\newglossary*{byname}{People (by name)}
+\newglossary*{bybirth}{People (by birth)}
+
+\GlsXtrLoadResources[src={no-interpret-preamble},
+ interpret-preamble=false]
+
+\GlsXtrLoadResources[
+  src={people},
+  category={person},
+  type={bybirth},
+  sort-field={user1},
+  sort={date},
+  secondary={locale:name:byname},
+  %sort={locale},
+  %sort-field={name},
+  %secondary={date:user1:bybirth},
+  date-sort-format={d MMM y G},
+  selection=all
+]
+
+\newcommand*{\glsxtrpostdescperson}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}
+ {% born
+   \space(%
+     %\expandafter\DTMdate\expandafter{\glscurrentfieldvalue}%
+     \glscurrentfieldvalue
+     \,--\,%
+     \ifglshasfield{user2}{\glscurrententrylabel}
+     {% died
+        %\expandafter\DTMdate\expandafter{\glscurrentfieldvalue}%
+        \glscurrentfieldvalue
+     }%
+     {}%
+   )%
+ }%
+ {}%
+}
+
+
+\begin{document}
+\printunsrtglossaries
+%\printunsrtglossary[type=bybirth]
+%{\renewcommand{\glsxtrgroupfield}{secondarygroup}%
+%\printunsrtglossary[type=byname]
+%}
+\end{document}
