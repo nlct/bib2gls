@@ -1,7 +1,7 @@
 all	: bib2gls.pdf bib2gls.1
 
 bib2gls.pdf	: bib2gls.tex
-		arara bib2gls
+		arara --verbose bib2gls
 		cp bib2gls.pdf ../../unstable/
 
 bib2gls.1	: bib2gls.pod

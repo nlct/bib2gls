@@ -9,11 +9,22 @@ v1.1 (pending):
      - not-match
      - sort-suffix
      - sort-suffix-marker
+     - date-sort-format
+     - date-sort-locale
+     - dual-date-sort-format
+     - dual-date-sort-locale
+     - secondary-date-sort-format
+     - secondary-date-sort-locale
 
    * Case-changing options now also accept the values
      firstuc and firstuc-cs
 
+   * New sort options: date, date-reverse, time, time-reverse,
+     datetime, datetime-reverse (and associated options).
+
    * fixed bug in hierarchical entries with label prefixes.
+
+   * fixed bugs in secondary sorting.
 
    * texparserlib: added extra core maths commands.
 

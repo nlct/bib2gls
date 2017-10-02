@@ -3604,6 +3604,14 @@ public class GlsResource
             entry.getId(), secondaryGroup);
       }
 
+      String secondarySort = entry.getFieldValue("sort");
+
+      if (secondarySort != null)
+      {
+         writer.format("\\GlsXtrSetField{%s}{secondarysort}{%s}%n",
+            entry.getId(), secondarySort);
+      }
+
       writer.println();
    }
 
