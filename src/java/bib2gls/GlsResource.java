@@ -2701,7 +2701,7 @@ public class GlsResource
    private void processData(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries,
       String entrySort, String entrySortRules, String entrySortField,
-      String entryGroupField,
+      String entryGroupField, String entryType,
       String entryDateSortLocale, String entryDateSortFormat)
       throws Bib2GlsException
    {
@@ -2826,14 +2826,14 @@ public class GlsResource
       }
 
       processDepsAndSort(data, entries, entrySort, entrySortRules, 
-        entrySortField, entryGroupField, entryDateSortLocale, 
+        entrySortField, entryGroupField, entryType, entryDateSortLocale, 
         entryDateSortFormat);
    }
 
    private void processDepsAndSort(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries,
       String entrySort, String entrySortRules, String entrySortField,
-      String entryGroupField,
+      String entryGroupField, String entryType,
       String entryDateSortLocale, String entryDateSortFormat)
       throws Bib2GlsException
    {
@@ -2887,7 +2887,8 @@ public class GlsResource
       if (entrySort != null && !entrySort.equals("use") && entryCount > 0)
       {
          sortData(entries, entrySort, entrySortField, entryGroupField, 
-                  entrySortRules, entryDateSortLocale, entryDateSortFormat);
+                  entryType, entrySortRules, entryDateSortLocale,
+                  entryDateSortFormat);
       }
    }
 
@@ -2915,7 +2916,7 @@ public class GlsResource
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
       processData(bibData, entries, sort, sortRules, sortField, "group",
-         dateSortLocale, dateSortFormat);
+         type, dateSortLocale, dateSortFormat);
 
       Vector<Bib2GlsEntry> dualEntries = null;
 
@@ -2956,7 +2957,7 @@ public class GlsResource
          }
 
          processDepsAndSort(dualData, dualEntries, dualSort,
-           dualSortRules, dualSortField, "group",
+           dualSortRules, dualSortField, "group", dualType,
            dualDateSortLocale, dualDateSortFormat);
 
          entryCount += dualEntries.size();
@@ -3121,26 +3122,7 @@ public class GlsResource
 
             writer.println();
 
-            createHyperGroups = bib2gls.hyperrefLoaded()
-                && bib2gls.createHyperGroupsOn();
-
-            for (Iterator<String> it = groupTitleMap.keySet().iterator();
-                it.hasNext(); )
-            {
-               String key = it.next();
-
-               GroupTitle groupTitle = groupTitleMap.get(key);
-
-               if (groupTitle.getType() == null)
-               {
-                  createHyperGroups = false;
-               }
-
-               writer.format("\\%s{%s}%n",
-                  groupTitle.getCsSetName(), groupTitle);
-            }
-
-            writer.println();
+            createHyperGroups = writeGroupDefs(writer);
 
             if (!createHyperGroups)
             {
@@ -3444,6 +3426,12 @@ public class GlsResource
          {
             writer.format("\\provideignoredglossary*{%s}%n", secondaryType);
 
+            writer.println("\\ifdef\\glsxtrgroupfield{%");
+            writer.format("  \\apptoglossarypreamble[%s]{",
+               secondaryType);
+            writer.println("\\renewcommand{\\glsxtrgroupfield}{secondarygroup}}%");
+            writer.println("}{}");
+
             if (secondarySort.equals("none") || secondarySort.equals("unsrt"))
             {
                for (Bib2GlsEntry entry : secondaryList)
@@ -3468,11 +3456,21 @@ public class GlsResource
             }
             else
             {
+               if (bib2gls.useGroupField())
+               {
+                  groupTitleMap = new HashMap<String,GroupTitle>();
+               }
+
                sortData(secondaryList, secondarySort, 
                        secondaryField == null ? sortField : secondaryField,
-                       "secondarygroup",
+                       "secondarygroup", secondaryType,
                        secondarySortRules, secondaryDateSortLocale,
                        secondaryDateSortFormat);
+
+               if (bib2gls.useGroupField())
+               {
+                  writeGroupDefs(writer);
+               }
 
                for (Bib2GlsEntry entry : secondaryList)
                {
@@ -3565,6 +3563,33 @@ public class GlsResource
       writer.println();
    }
 
+   private boolean writeGroupDefs(PrintWriter writer)
+     throws IOException
+   {
+      boolean allowHyper = bib2gls.hyperrefLoaded()
+                && bib2gls.createHyperGroupsOn();
+
+      for (Iterator<String> it = groupTitleMap.keySet().iterator();
+          it.hasNext(); )
+      {
+         String key = it.next();
+
+         GroupTitle groupTitle = groupTitleMap.get(key);
+
+         if (groupTitle.getType() == null)
+         {
+            allowHyper = false;
+         }
+
+         writer.format("\\%s{%s}%n",
+            groupTitle.getCsSetName(), groupTitle);
+      }
+
+      writer.println();
+
+      return allowHyper;
+   }
+
    private void writeCopyToGlossary(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException
    {
@@ -3579,18 +3604,13 @@ public class GlsResource
             entry.getId(), secondaryGroup);
       }
 
-      writer.println("\\ifdef\\glsxtrgroupfield{%");
-      writer.format("  \\apptoglossarypreamble[%s]{",
-         secondaryType);
-      writer.println("\\renewcommand{\\glsxtrgroupfield}{secondarygroup}}%");
-      writer.println("}{}");
-
       writer.println();
    }
 
    private void sortData(Vector<Bib2GlsEntry> entries, String entrySort,
-     String entrySortField, String entryGroupField, String entrySortRules,
-     String entryDateSortLocale, String entryDateSortFormat)
+     String entrySortField, String entryGroupField, String entryType,
+     String entrySortRules, String entryDateSortLocale,
+     String entryDateSortFormat)
     throws Bib2GlsException
    {
       if (entrySort.equals("random"))
@@ -3606,7 +3626,8 @@ public class GlsResource
       {
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, false, false, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, false, false, 
               sortSuffixOption, sortSuffixMarker);
 
          comparator.sortEntries();
@@ -3615,7 +3636,8 @@ public class GlsResource
       {
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, false, true,
+              entrySort, entrySortField, entryGroupField,
+              entryType, false, true,
               sortSuffixOption, sortSuffixMarker);
 
          comparator.sortEntries();
@@ -3624,7 +3646,8 @@ public class GlsResource
       {
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, true, false,
+              entrySort, entrySortField, entryGroupField,
+              entryType, true, false,
               sortSuffixOption, sortSuffixMarker);
 
          comparator.sortEntries();
@@ -3633,7 +3656,8 @@ public class GlsResource
       {
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, true, true,
+              entrySort, entrySortField, entryGroupField,
+              entryType, true, true,
               sortSuffixOption, sortSuffixMarker);
 
          comparator.sortEntries();
@@ -3647,7 +3671,7 @@ public class GlsResource
       {
          Bib2GlsEntryNumericComparator comparator = 
             new Bib2GlsEntryNumericComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField);
+              entrySort, entrySortField, entryGroupField, entryType);
 
          comparator.sortEntries();
       }
@@ -3666,8 +3690,9 @@ public class GlsResource
 
          Bib2GlsEntryDateTimeComparator comparator = 
             new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, locale, 
-               entryDateSortFormat, true, false, false);
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat,
+              true, false, false);
 
          comparator.sortEntries();
       }
@@ -3686,8 +3711,9 @@ public class GlsResource
 
          Bib2GlsEntryDateTimeComparator comparator = 
             new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, locale, 
-               entryDateSortFormat, true, false, true);
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat,
+              true, false, true);
 
          comparator.sortEntries();
       }
@@ -3706,8 +3732,9 @@ public class GlsResource
 
          Bib2GlsEntryDateTimeComparator comparator = 
             new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, locale, 
-               entryDateSortFormat, true, true, false);
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat, 
+              true, true, false);
 
          comparator.sortEntries();
       }
@@ -3726,8 +3753,9 @@ public class GlsResource
 
          Bib2GlsEntryDateTimeComparator comparator = 
             new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, locale, 
-               entryDateSortFormat, true, true, true);
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat,
+              true, true, true);
 
          comparator.sortEntries();
       }
@@ -3737,7 +3765,7 @@ public class GlsResource
          {
             Bib2GlsEntryComparator comparator = 
                new Bib2GlsEntryComparator(bib2gls, entries, 
-                  entrySortField, entryGroupField,
+                  entrySortField, entryGroupField, entryType,
                   collatorStrength, collatorDecomposition,
                   entrySortRules, breakPoint, breakPointMarker,
                   sortSuffixOption, sortSuffixMarker);
@@ -3765,7 +3793,7 @@ public class GlsResource
 
          Bib2GlsEntryComparator comparator = 
             new Bib2GlsEntryComparator(bib2gls, entries, 
-               locale, entrySortField, entryGroupField, 
+               locale, entrySortField, entryGroupField, entryType,
                collatorStrength, collatorDecomposition,
                breakPoint, breakPointMarker,
                sortSuffixOption, sortSuffixMarker);
@@ -4923,11 +4951,11 @@ public class GlsResource
       }
    }
 
-   public GroupTitle getGroupTitle(Bib2GlsEntry entry, long id)
+   public GroupTitle getGroupTitle(String entryType, long id)
    {
       if (groupTitleMap != null)
       {
-         return groupTitleMap.get(GroupTitle.getKey(getType(entry), id));
+         return groupTitleMap.get(GroupTitle.getKey(entryType, id));
       }
 
       return null;

@@ -36,24 +36,25 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    Locale locale, String sortField, String groupField,
+    Locale locale, String sortField, String groupField, String entryType,
     int strength, int decomposition,
     int sortSuffixOption, String sortSuffixMarker)
    {
-      this(bib2gls, entries, locale, sortField, groupField, 
+      this(bib2gls, entries, locale, sortField, groupField, entryType, 
        strength, decomposition,
         BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    Locale locale, String sortField, String groupField,
+    Locale locale, String sortField, String groupField, String entryType,
     int strength, int decomposition,
     int breakPoint, String breakMarker,
     int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
       this.groupField = groupField;
+      this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.sortSuffixMarker = sortSuffixMarker;
@@ -74,17 +75,19 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, String sortField, String groupField,
+    String entryType,
     int strength, int decomposition, String rules,
     int sortSuffixOption, String sortSuffixMarker)
    throws ParseException
    {
-      this(bib2gls, entries, sortField, groupField, 
+      this(bib2gls, entries, sortField, groupField, entryType,
         strength, decomposition, rules,
         BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
    }
 
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, String sortField, String groupField,
+    String entryType,
     int strength, int decomposition, String rules,
     int breakPoint, String breakMarker,
     int sortSuffixOption, String sortSuffixMarker)
@@ -92,6 +95,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    {
       this.sortField = sortField;
       this.groupField = groupField;
+      this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.sortSuffixMarker = sortSuffixMarker;
@@ -207,6 +211,20 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
       CollationKey key = collator.getCollationKey(value);
       entry.setCollationKey(key);
+
+      GlsResource resource = bib2gls.getCurrentResource();
+
+      String type = entryType;
+
+      if (type == null)
+      {
+         type = resource.getType(entry);
+
+         if (type == null)
+         {
+            type = "";
+         }
+      }
 
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
@@ -332,21 +350,17 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   elem = cp;
                }
 
-               GlsResource resource = bib2gls.getCurrentResource();
-
-               GroupTitle grpTitle = resource.getGroupTitle(entry, elem);
+               GroupTitle grpTitle = resource.getGroupTitle(type, elem);
                String args;
 
                if (grpTitle == null)
                {
-                  grpTitle = new GroupTitle(grp, str, elem,
-                    resource.getType(entry));
+                  grpTitle = new GroupTitle(grp, str, elem, type);
                   resource.putGroupTitle(grpTitle, entry);
                   args = grpTitle.toString();
                }
                else
                {
-                  String entryType = resource.getType(entry);
                   args = grpTitle.format(str);
 
                   if (grpTitle.getTitle().matches(".*[^\\p{ASCII}].*")
@@ -367,15 +381,12 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   str = "\\char`\\"+str;
                }
 
-               GlsResource resource = bib2gls.getCurrentResource();
-
-               GroupTitle grpTitle = resource.getGroupTitle(entry, elem);
+               GroupTitle grpTitle = resource.getGroupTitle(type, elem);
                String args;
 
                if (grpTitle == null)
                {
-                  String entryType = resource.getType(entry);
-                  grpTitle = new OtherGroupTitle(str, elem, entryType);
+                  grpTitle = new OtherGroupTitle(str, elem, type);
                   resource.putGroupTitle(grpTitle, entry);
                   args = grpTitle.toString();
                }
@@ -410,9 +421,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                grp = str.toUpperCase();
                int cp = grp.codePointAt(0);
 
-               GlsResource resource = bib2gls.getCurrentResource();
-
-               GroupTitle grpTitle = resource.getGroupTitle(entry, cp);
+               GroupTitle grpTitle = resource.getGroupTitle(type, cp);
                String args;
 
                if (grpTitle == null)
@@ -424,9 +433,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                }
                else
                {
-                  String entryType = resource.getType(entry);
                   args = String.format("{%s}{%s}{%d}{%s}", grpTitle.getTitle(), 
-                    str, cp, entryType == null ? "" : entryType);
+                    str, cp, type);
                }
 
                entry.putField(groupField, 
@@ -440,13 +448,9 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
                   str = "\\char`\\"+str;
                }
 
-               GlsResource resource = bib2gls.getCurrentResource();
-               String entryType = resource.getType(entry);
-
                entry.putField(groupField, 
                  String.format("\\bibglsothergroup{%s}{%X}{%s}", 
-                               str, codePoint,
-                               entryType == null ? "" : entryType));
+                               str, codePoint, type));
             }
          }
       }
@@ -636,7 +640,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return buff;
    }
 
-   private String sortField, groupField;
+   private String sortField, groupField, entryType;
 
    private Collator collator;
 

@@ -66,7 +66,7 @@ public class GroupTitle
 
    public static String getKey(String entryType, long groupId)
    {
-      return entryType == null ? ""+groupId :
+      return entryType == null || entryType.isEmpty() ? ""+groupId :
         String.format("%s.%d", entryType, groupId);
    }
 

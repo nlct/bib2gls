@@ -3,14 +3,12 @@
 % arara: pdflatex
 \documentclass{article}
 
-%\usepackage[en-GB]{datetime2}
-\usepackage[record,nomain,style=indexgroup]{glossaries-extra}
+\usepackage[record,style=indexgroup]{glossaries-extra}
 
 \newcommand{\bibglsdategroup}[7]{#1#4#7}
 \newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
 
-\newglossary*{byname}{People (by name)}
-\newglossary*{bybirth}{People (by birth)}
+\newglossary*{copies}{People (copies)}
 
 \GlsXtrLoadResources[src={no-interpret-preamble},
  interpret-preamble=false]
@@ -18,13 +16,10 @@
 \GlsXtrLoadResources[
   src={people},
   category={person},
-  type={bybirth},
+  type={main},
   sort-field={user1},
   sort={date},
-  secondary={locale:name:byname},
-  %sort={locale},
-  %sort-field={name},
-  %secondary={date:user1:bybirth},
+  secondary={en:name:copies},
   date-sort-format={d MMM y G},
   selection=all
 ]
@@ -32,13 +27,9 @@
 \newcommand*{\glsxtrpostdescperson}{%
  \ifglshasfield{user1}{\glscurrententrylabel}
  {% born
-   \space(%
-     %\expandafter\DTMdate\expandafter{\glscurrentfieldvalue}%
-     \glscurrentfieldvalue
-     \,--\,%
+   \space(\glscurrentfieldvalue\,--\,%
      \ifglshasfield{user2}{\glscurrententrylabel}
      {% died
-        %\expandafter\DTMdate\expandafter{\glscurrentfieldvalue}%
         \glscurrentfieldvalue
      }%
      {}%
@@ -50,8 +41,4 @@
 
 \begin{document}
 \printunsrtglossaries
-%\printunsrtglossary[type=bybirth]
-%{\renewcommand{\glsxtrgroupfield}{secondarygroup}%
-%\printunsrtglossary[type=byname]
-%}
 \end{document}

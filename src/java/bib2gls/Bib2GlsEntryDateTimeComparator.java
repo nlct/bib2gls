@@ -34,7 +34,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryDateTimeComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField,
+    String sort, String sortField, String groupField, String entryType,
     Locale locale, String format,
     boolean date, boolean time, boolean reverse)
    {
@@ -240,24 +240,34 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
       String grp = null;
 
+      String type = entryType;
+
+      GlsResource resource = bib2gls.getCurrentResource();
+
+      if (type == null)
+      {
+         type = resource.getType(entry);
+
+         if (type == null)
+         {
+            type = "";
+         }
+      }
+
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
       {
          if (entry.getFieldValue(groupField) == null)
          {
-            GlsResource resource = bib2gls.getCurrentResource();
-
             long groupId = num.longValue();
 
-            GroupTitle grpTitle = resource.getGroupTitle(entry, groupId);
+            GroupTitle grpTitle = resource.getGroupTitle(type, groupId);
             String args;
 
             if (grpTitle == null)
             {
-               String entryType = resource.getType(entry);
-
                grpTitle = new DateTimeGroupTitle(dateFormat, dateValue, 
-                 entryType, hasDate, hasTime);
+                 type, hasDate, hasTime);
 
                resource.putGroupTitle(grpTitle, entry);
                args = grpTitle.toString();
@@ -357,7 +367,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private String sortField, groupField;
+   private String sortField, groupField, entryType;
 
    private Bib2Gls bib2gls;
 

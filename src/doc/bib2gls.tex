@@ -3123,7 +3123,13 @@ or
 \meta{sort}:\meta{type}
 \end{definition}
 If the \meta{field} is omitted, the value of \optref{sort-field} is
-used.  The value of \meta{sort} is as for \optref{sort}, but note
+used. Remember that when the primary entries are sorted, the
+\field{sort} field will be set, which means that the fallback field
+(such as \field{name}) won't be used in the secondary sort. In
+general it's best to supply the field unless one type is sorted and the
+other isn't.
+
+The value of \meta{sort} is as for \optref{sort}, but note
 that in this case the sort value \optfmt{unsrt} or \optfmt{none}
 means to use the same ordering as the primary entries. So with
 \optref[de-CH-1996]{sort}, \optref[none:copies]{secondary} the
@@ -3138,17 +3144,18 @@ This will copy all the selected entries into the glossary labelled
 the sort value. Note that this just \emph{copies the entry's label}
 to the second glossary list rather than creating a duplicate entry. 
 This means that all the fields will be identical. If you want groups
-in your glossary, the information for the secondary glossary will
-be in the internal \field{secondarygroup} field. The \field{group}
-field will contain the letter groups for the primary glossary.
+in your glossary, the group information for the secondary glossary will
+be stored in the internal \field{secondarygroup} field. The \field{group}
+field will contain the group for the primary glossary.
 
 In order to switch fields in \cs{printunsrtglossary}, you need at
 least v1.21 of \sty{glossaries-extra} which provides
 \cs{glsxtrgroupfield} to keep track of the appropriate field label.
-If this command is defined, the preamble will be adjusted to locally
-change the field to \field{secondarygroup}. With older versions, the
-group information in the secondary glossary will be the same as for
-the primary glossary.
+If this command is defined, the preamble for the secondary glossary 
+will be adjusted to locally change the field to
+\field{secondarygroup}. With older versions, the group information
+in the secondary glossary will be the same as for the primary
+glossary.
 
 (If the glossary \meta{type} doesn't exist, it will be
 defined with \cs{provideignoredglossary*}\margm{type}.)

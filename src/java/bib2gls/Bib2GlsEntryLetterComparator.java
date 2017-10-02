@@ -32,12 +32,13 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField,
+    String sort, String sortField, String groupField, String entryType,
     boolean ignoreCase, boolean reverse,
     int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
       this.groupField = groupField;
+      this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.ignoreCase = ignoreCase;
@@ -107,6 +108,20 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
       String grp = null;
 
+      GlsResource resource = bib2gls.getCurrentResource();
+
+      String type = entryType;
+
+      if (type == null)
+      {
+         type = resource.getType(entry);
+
+         if (type == null)
+         {
+            type = "";
+         }
+      }
+
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
       {
@@ -135,21 +150,17 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
             int cp = grp.codePointAt(0);
 
-            GlsResource resource = bib2gls.getCurrentResource();
-
-            GroupTitle grpTitle = resource.getGroupTitle(entry, cp);
+            GroupTitle grpTitle = resource.getGroupTitle(type, cp);
             String args;
 
             if (grpTitle == null)
             {
-               grpTitle = new GroupTitle(grp, str, cp,
-                    resource.getType(entry));
+               grpTitle = new GroupTitle(grp, str, cp, type);
                resource.putGroupTitle(grpTitle, entry);
                args = grpTitle.toString();
             }
             else
             {
-               String entryType = resource.getType(entry);
                args = grpTitle.format(str);
             }
 
@@ -164,15 +175,12 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
                str = "\\char`\\"+str;
             }
 
-            GlsResource resource = bib2gls.getCurrentResource();
-
-            GroupTitle grpTitle = resource.getGroupTitle(entry, codePoint);
+            GroupTitle grpTitle = resource.getGroupTitle(entryType, codePoint);
             String args;
 
             if (grpTitle == null)
             {
-               String entryType = resource.getType(entry);
-               grpTitle = new OtherGroupTitle(str, codePoint, entryType);
+               grpTitle = new OtherGroupTitle(str, codePoint, type);
                resource.putGroupTitle(grpTitle, entry);
                args = grpTitle.toString();
             }
@@ -367,7 +375,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       entries.sort(this);
    }
 
-   private String sortField, groupField;
+   private String sortField, groupField, entryType;
 
    private Bib2Gls bib2gls;
 
