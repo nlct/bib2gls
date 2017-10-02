@@ -48,6 +48,8 @@ public class Bib2GlsAt extends At
 
       String entryType = entryTypeList.toString(parser).trim().toLowerCase();
 
+      entryType = resource.mapEntryType(entryType);
+
       BibData data;
 
       if (entryType.equals("entry"))

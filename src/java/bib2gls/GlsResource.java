@@ -134,6 +134,48 @@ public class GlsResource
                supplementalSelection = null;
             }
          }
+         else if (opt.equals("entry-type-aliases"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+            if (array == null)
+            {
+               entryTypeAliases = null;
+            }
+            else
+            {
+               entryTypeAliases = new HashMap<String,String>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (split.size() > 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  String val = split.size() == 1 ? "" 
+                               : split.get(1).toString(parser);
+
+                  entryTypeAliases.put(field, val);
+               }
+            }
+         }
          else if (opt.equals("name-case-change"))
          {
             nameCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
@@ -4969,9 +5011,23 @@ public class GlsResource
       return null;
    }
 
+   public String mapEntryType(String entryType)
+   {
+      if (entryTypeAliases == null)
+      {
+         return entryType;
+      }
+
+      String val = entryTypeAliases.get(entryType);
+
+      return val == null ? entryType : val;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
+
+   private HashMap<String,String> entryTypeAliases = null;
 
    private String[] skipFields = null;
 
@@ -4990,7 +5046,8 @@ public class GlsResource
 
    private String sortRules=null, secondarySortRules=null, dualSortRules=null;
 
-   private String dateSortFormat = null, dualDateSortFormat = null, secondaryDateSortFormat = null;
+   private String dateSortFormat = null, dualDateSortFormat = null,
+     secondaryDateSortFormat = null;
 
    private String dateSortLocale = "locale", dualDateSortLocale = "locale",
     secondaryDateSortLocale = "locale";

@@ -1,0 +1,16 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,abbreviations]{glossaries-extra}
+
+\GlsXtrLoadResources[src=entries-abbrv,
+  entry-type-aliases={abbreviation=dualentryabbreviation}
+]
+
+\begin{document}
+\gls{shtml}.
+
+\printunsrtglossaries
+\end{document}

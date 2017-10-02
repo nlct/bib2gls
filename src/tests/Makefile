@@ -17,7 +17,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
 	  test-cjk.pdf test-other.pdf test-homograph.pdf \
 	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf \
-	  test-dates.pdf test-people.pdf
+	  test-dates.pdf test-people.pdf test-entrytypemap.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -316,6 +316,13 @@ test-people.pdf	: test-people.glstex
 test-people.glstex	: test-people.tex people.bib $(DEPS)
 		pdflatex test-people
 		$(BIB2GLS) test-people
+
+test-entrytypemap.pdf	: test-entrytypemap.glstex
+		pdflatex test-entrytypemap
+
+test-entrytypemap.glstex	: test-entrytypemap.tex entries-abbrv.bib $(DEPS)
+		pdflatex test-entrytypemap
+		$(BIB2GLS) test-entrytypemap
 
 clean	:
 	$(RM) *.aux

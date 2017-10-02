@@ -15,6 +15,7 @@ v1.1 (pending):
      - dual-date-sort-locale
      - secondary-date-sort-format
      - secondary-date-sort-locale
+     - entry-type-aliases
 
    * Case-changing options now also accept the values
      firstuc and firstuc-cs

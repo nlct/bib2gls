@@ -3105,6 +3105,91 @@ will be appended to the glossary preamble for that type, otherwise
 it's simply set in the \ext{glstex} file and may be overridden
 later in the document if required.
 
+\subsection{\csoptnv{entry-type-aliases}\csopteqval{\keyvallist}}
+\labelopt{entry-type-aliases}
+
+In the \ext{bib} file, the data is identified by 
+\code{@\meta{entry-type}}, such as \code{@abbreviation}.
+It may be that you want to replace all instances of
+\code{@\meta{entry-type}} with a different 
+type of entry. For example, suppose my \ext{bib} file
+contains abbreviations defined in the form:
+\begin{verbatim}
+@abbreviation{html,
+  short ={html},
+  long  = {hypertext markup language},
+  description={a markup language for creating web pages}
+}
+\end{verbatim}
+but suppose in one of my documents I actually want all these
+abbreviations defined with \atentryref{dualentryabbreviation}
+instead of \atentryref{abbreviation}. Instead of editing
+the \ext{bib} file I can just supply a mapping:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=entries,% data in entries.bib
+  entry-type-aliases={abbreviation=dualentryabbreviation}
+]
+\end{verbatim}
+This makes all instances of \code{@abbreviation}
+behave as \code{@dualentryabbreviation}. You can have more than
+one mapping. For example:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=entries,% data in entries.bib
+  entry-type-aliases={
+    % @abbreviation -> @dualentryabbreviation:
+    abbreviation=dualentryabbreviation,
+    % @entry -> @index:
+    entry=index
+  }
+]
+\end{verbatim}
+This option isn't cumulative.  Multiple instances of
+\csopt{entry-type-aliases} override previous instances.
+If \meta{\keyvallist} is empty there will be no mappings.
+
+Here's another example entry in a \ext{bib} file:
+\begin{verbatim}
+@foo{html,
+   name={HTML},
+   short={HTML},
+   long={hypertext markup language},
+   description={hypertext markup language}
+}
+\end{verbatim}
+Ordinarily this entry would be ignored since \code{@foo}
+isn't recognised, but it can be mapped like this:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=entries,% data in entries.bib
+  ignore-fields={short,long},
+  entry-type-aliases={foo=entry}
+]
+\end{verbatim}
+This treats the entry as though it had been defined as:
+\begin{verbatim}
+@entry{html,
+   name={HTML},
+   description={hypertext markup language}
+}
+\end{verbatim}
+whereas
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=entries,% data in entries.bib
+  ignore-fields={name,description},
+  entry-type-aliases={foo=abbreviation}
+]
+\end{verbatim}
+treats the entry as though it had been defined as:
+\begin{verbatim}
+@abbreviation{html,
+   short={HTML},
+   long={hypertext markup language}
+}
+\end{verbatim}
+
 \subsection{\csoptnv{secondary}\csopteqval{value}}
 \labelopt{secondary}
 
@@ -3131,7 +3216,8 @@ used. Remember that when the primary entries are sorted, the
 \field{sort} field will be set, which means that the fallback field
 (such as \field{name}) won't be used in the secondary sort. In
 general it's best to supply the field unless one type is sorted and the
-other isn't.
+other isn't. (The actual sort value obtained by the secondary sort
+will be saved in the \field{secondarysort} field in case you require it.)
 
 The value of \meta{sort} is as for \optref{sort}, but note
 that in this case the sort value \optfmt{unsrt} or \optfmt{none}
