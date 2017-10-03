@@ -3,14 +3,20 @@
 % arara: pdflatex
 \documentclass{article}
 
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
 \usepackage[record,abbreviations]{glossaries-extra}
 
+\setabbreviationstyle{long-short-sc}
+
 \GlsXtrLoadResources[src=entries-abbrv,
+  label-prefix={primary.},
   entry-type-aliases={abbreviation=dualentryabbreviation}
 ]
 
 \begin{document}
-\gls{shtml}.
+%\gls{dual.shtml}.
+\gls{primary.shtml}.
 
 \printunsrtglossaries
 \end{document}

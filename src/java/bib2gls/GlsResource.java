@@ -2282,11 +2282,23 @@ public class GlsResource
 
                Bib2GlsEntry dual = null;
 
+               String primaryId = entry.getId();
+               String dualId = null;
+
                if (entry instanceof Bib2GlsDualEntry)
                {
                   dual = ((Bib2GlsDualEntry)entry).createDual();
                   entry.setDual(dual);
                   dual.setDual(entry);
+                  dualId = dual.getId();
+
+                  // is there a cross-reference list?
+
+                  if (dual.getField("see") != null 
+                      || dual.getField("seealso") != null)
+                  {
+                     dual.initCrossRefs(parser);
+                  }
                }
 
                setType(entry);
@@ -2303,7 +2315,7 @@ public class GlsResource
                {
                   for (GlsRecord record : records)
                   {
-                     if (record.getLabel().equals(entry.getId()))
+                     if (record.getLabel().equals(primaryId))
                      {
                         entry.addRecord(record);
                         hasRecords = true;
@@ -2311,7 +2323,7 @@ public class GlsResource
 
                      if (dual != null)
                      {
-                        if (record.getLabel().equals(dual.getId()))
+                        if (record.getLabel().equals(dualId))
                         {
                            dual.addRecord(record);
                            dualHasRecords = true;
@@ -2323,7 +2335,7 @@ public class GlsResource
 
                   for (GlsSeeRecord record : seeRecords)
                   {
-                     if (record.getLabel().equals(entry.getId()))
+                     if (record.getLabel().equals(primaryId))
                      {
                         entry.addRecord(record);
                         hasRecords = true;
@@ -2331,7 +2343,7 @@ public class GlsResource
 
                      if (dual != null)
                      {
-                        if (record.getLabel().equals(dual.getId()))
+                        if (record.getLabel().equals(dualId))
                         {
                            dual.addRecord(record);
                            dualHasRecords = true;
@@ -2355,7 +2367,7 @@ public class GlsResource
                   if (discard(dual))
                   {
                      bib2gls.verbose(bib2gls.getMessage("message.discarding.entry",
-                        dual.getId()));
+                        dualId));
 
                      continue;
                   }
@@ -2383,7 +2395,30 @@ public class GlsResource
 
                      if (dual != null)
                      {
-                        bib2gls.addDependent(dual.getId());
+                        if (!bib2gls.isDependent(dualId))
+                        {
+                           bib2gls.addDependent(dualId);
+
+                           // If the primary entry has dependants
+                           // need to find out if they are dual
+                           // entries, in which case their dual's need
+                           // adding.
+
+                           for (Iterator<String> it=entry.getDependencyIterator();
+                                it.hasNext(); )
+                           {
+                              String dep = it.next();
+
+                              Bib2GlsEntry depEntry = getBib2GlsEntry(dep, list);
+
+                              if (depEntry != null 
+                                   && depEntry instanceof Bib2GlsDualEntry)
+                              {
+                                 bib2gls.addDependent(
+                                   dualPrefix+depEntry.getOriginalId());
+                              }
+                           }
+                        }
                      }
                   }
 
@@ -2405,7 +2440,29 @@ public class GlsResource
                         bib2gls.addDependent(dep);
                      }
 
-                     bib2gls.addDependent(entry.getId());
+                     if (!bib2gls.isDependent(primaryId))
+                     {
+                        bib2gls.addDependent(primaryId);
+
+                        entry.initCrossRefs(parser);
+
+                        for (Iterator<String> it=entry.getDependencyIterator();
+                             it.hasNext(); )
+                        {
+                           String dep = it.next();
+
+                           bib2gls.addDependent(dep);
+
+                           Bib2GlsEntry depEntry = getBib2GlsEntry(dep, list);
+
+                           if (depEntry != null 
+                                && depEntry instanceof Bib2GlsDualEntry)
+                           {
+                              bib2gls.addDependent(
+                                dualPrefix+depEntry.getOriginalId());
+                           }
+                        }
+                     }
                   }
                }
 
@@ -2741,10 +2798,7 @@ public class GlsResource
    }
 
    private void processData(Vector<Bib2GlsEntry> data, 
-      Vector<Bib2GlsEntry> entries,
-      String entrySort, String entrySortRules, String entrySortField,
-      String entryGroupField, String entryType,
-      String entryDateSortLocale, String entryDateSortFormat)
+      Vector<Bib2GlsEntry> entries, String entrySort)
       throws Bib2GlsException
    {
       Vector<String> fields = bib2gls.getFields();
@@ -2867,16 +2921,11 @@ public class GlsResource
          }
       }
 
-      processDepsAndSort(data, entries, entrySort, entrySortRules, 
-        entrySortField, entryGroupField, entryType, entryDateSortLocale, 
-        entryDateSortFormat);
+      processDeps(data, entries);
    }
 
-   private void processDepsAndSort(Vector<Bib2GlsEntry> data, 
-      Vector<Bib2GlsEntry> entries,
-      String entrySort, String entrySortRules, String entrySortField,
-      String entryGroupField, String entryType,
-      String entryDateSortLocale, String entryDateSortFormat)
+   private void processDeps(Vector<Bib2GlsEntry> data, 
+      Vector<Bib2GlsEntry> entries)
       throws Bib2GlsException
    {
       // add any dependencies
@@ -2922,15 +2971,214 @@ public class GlsResource
          flattenLonelyChildren(entries);
       }
 
-      // sort if required
+   }
 
-      int entryCount = entries.size();
-
-      if (entrySort != null && !entrySort.equals("use") && entryCount > 0)
+   private void sortDataIfRequired(Vector<Bib2GlsEntry> entries,
+     String entrySort, String entrySortField, String entryGroupField,
+     String entryType, String entrySortRules, String entryDateSortLocale,
+     String entryDateSortFormat)
+    throws Bib2GlsException
+   {
+      if (entrySort != null && !entrySort.equals("use") && entries.size() > 0)
       {
          sortData(entries, entrySort, entrySortField, entryGroupField, 
                   entryType, entrySortRules, entryDateSortLocale,
                   entryDateSortFormat);
+      }
+   }
+
+   private void sortData(Vector<Bib2GlsEntry> entries, String entrySort,
+     String entrySortField, String entryGroupField, String entryType,
+     String entrySortRules, String entryDateSortLocale,
+     String entryDateSortFormat)
+    throws Bib2GlsException
+   {
+      if (entrySort.equals("random"))
+      {
+         if (random == null)
+         {
+            random = new Random();
+         }
+
+         Collections.shuffle(entries, random);
+      }
+      else if (entrySort.equals("letter-case"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, false, false, 
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letter-case-reverse"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, false, true,
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letter-nocase"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, true, false,
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letter-nocase-reverse"))
+      {
+         Bib2GlsEntryLetterComparator comparator = 
+            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, true, true,
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.startsWith("integer") 
+            || entrySort.startsWith("float")
+            || entrySort.startsWith("double")
+            || entrySort.startsWith("hex")
+            || entrySort.startsWith("octal")
+            || entrySort.startsWith("binary"))
+      {
+         Bib2GlsEntryNumericComparator comparator = 
+            new Bib2GlsEntryNumericComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField, entryType);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("date"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat,
+              true, false, false);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("date-reverse"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat,
+              true, false, true);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("datetime"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat, 
+              true, true, false);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("datetime-reverse"))
+      {
+         Locale locale = null;
+
+         if (entryDateSortLocale.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entryDateSortLocale);
+         }
+
+         Bib2GlsEntryDateTimeComparator comparator = 
+            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, locale, entryDateSortFormat,
+              true, true, true);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("custom"))
+      {
+         try
+         {
+            Bib2GlsEntryComparator comparator = 
+               new Bib2GlsEntryComparator(bib2gls, entries, 
+                  entrySortField, entryGroupField, entryType,
+                  collatorStrength, collatorDecomposition,
+                  entrySortRules, breakPoint, breakPointMarker,
+                  sortSuffixOption, sortSuffixMarker);
+
+            comparator.sortEntries();
+         }
+         catch (ParseException e)
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+             "error.invalid.sort.rule", e.getMessage()), e);
+         }
+      }
+      else
+      {
+         Locale locale = null;
+
+         if (entrySort.equals("locale"))
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = Locale.forLanguageTag(entrySort);
+         }
+
+         Bib2GlsEntryComparator comparator = 
+            new Bib2GlsEntryComparator(bib2gls, entries, 
+               locale, entrySortField, entryGroupField, entryType,
+               collatorStrength, collatorDecomposition,
+               breakPoint, breakPointMarker,
+               sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
       }
    }
 
@@ -2957,8 +3205,7 @@ public class GlsResource
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
-      processData(bibData, entries, sort, sortRules, sortField, "group",
-         type, dateSortLocale, dateSortFormat);
+      processData(bibData, entries, sort);
 
       Vector<Bib2GlsEntry> dualEntries = null;
 
@@ -2998,11 +3245,19 @@ public class GlsResource
             }
          }
 
-         processDepsAndSort(dualData, dualEntries, dualSort,
-           dualSortRules, dualSortField, "group", dualType,
-           dualDateSortLocale, dualDateSortFormat);
+         processDeps(dualData, dualEntries);
 
          entryCount += dualEntries.size();
+      }
+
+      sortDataIfRequired(entries, sort, sortField, "group",
+         type, sortRules, dateSortLocale, dateSortFormat);
+
+      if (dualEntries != null)
+      {
+         sortDataIfRequired(dualEntries, dualSort, dualSortField, 
+            "group", dualType, dualSortRules, 
+            dualDateSortLocale, dualDateSortFormat);
       }
 
       bib2gls.message(bib2gls.getMessage("message.writing", 
@@ -3655,201 +3910,6 @@ public class GlsResource
       }
 
       writer.println();
-   }
-
-   private void sortData(Vector<Bib2GlsEntry> entries, String entrySort,
-     String entrySortField, String entryGroupField, String entryType,
-     String entrySortRules, String entryDateSortLocale,
-     String entryDateSortFormat)
-    throws Bib2GlsException
-   {
-      if (entrySort.equals("random"))
-      {
-         if (random == null)
-         {
-            random = new Random();
-         }
-
-         Collections.shuffle(entries, random);
-      }
-      else if (entrySort.equals("letter-case"))
-      {
-         Bib2GlsEntryLetterComparator comparator = 
-            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, false, false, 
-              sortSuffixOption, sortSuffixMarker);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("letter-case-reverse"))
-      {
-         Bib2GlsEntryLetterComparator comparator = 
-            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, false, true,
-              sortSuffixOption, sortSuffixMarker);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("letter-nocase"))
-      {
-         Bib2GlsEntryLetterComparator comparator = 
-            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, true, false,
-              sortSuffixOption, sortSuffixMarker);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("letter-nocase-reverse"))
-      {
-         Bib2GlsEntryLetterComparator comparator = 
-            new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, true, true,
-              sortSuffixOption, sortSuffixMarker);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.startsWith("integer") 
-            || entrySort.startsWith("float")
-            || entrySort.startsWith("double")
-            || entrySort.startsWith("hex")
-            || entrySort.startsWith("octal")
-            || entrySort.startsWith("binary"))
-      {
-         Bib2GlsEntryNumericComparator comparator = 
-            new Bib2GlsEntryNumericComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField, entryType);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("date"))
-      {
-         Locale locale = null;
-
-         if (entryDateSortLocale.equals("locale"))
-         {
-            locale = Locale.getDefault();
-         }
-         else
-         {
-            locale = Locale.forLanguageTag(entryDateSortLocale);
-         }
-
-         Bib2GlsEntryDateTimeComparator comparator = 
-            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, locale, entryDateSortFormat,
-              true, false, false);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("date-reverse"))
-      {
-         Locale locale = null;
-
-         if (entryDateSortLocale.equals("locale"))
-         {
-            locale = Locale.getDefault();
-         }
-         else
-         {
-            locale = Locale.forLanguageTag(entryDateSortLocale);
-         }
-
-         Bib2GlsEntryDateTimeComparator comparator = 
-            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, locale, entryDateSortFormat,
-              true, false, true);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("datetime"))
-      {
-         Locale locale = null;
-
-         if (entryDateSortLocale.equals("locale"))
-         {
-            locale = Locale.getDefault();
-         }
-         else
-         {
-            locale = Locale.forLanguageTag(entryDateSortLocale);
-         }
-
-         Bib2GlsEntryDateTimeComparator comparator = 
-            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, locale, entryDateSortFormat, 
-              true, true, false);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("datetime-reverse"))
-      {
-         Locale locale = null;
-
-         if (entryDateSortLocale.equals("locale"))
-         {
-            locale = Locale.getDefault();
-         }
-         else
-         {
-            locale = Locale.forLanguageTag(entryDateSortLocale);
-         }
-
-         Bib2GlsEntryDateTimeComparator comparator = 
-            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              entrySort, entrySortField, entryGroupField,
-              entryType, locale, entryDateSortFormat,
-              true, true, true);
-
-         comparator.sortEntries();
-      }
-      else if (entrySort.equals("custom"))
-      {
-         try
-         {
-            Bib2GlsEntryComparator comparator = 
-               new Bib2GlsEntryComparator(bib2gls, entries, 
-                  entrySortField, entryGroupField, entryType,
-                  collatorStrength, collatorDecomposition,
-                  entrySortRules, breakPoint, breakPointMarker,
-                  sortSuffixOption, sortSuffixMarker);
-
-            comparator.sortEntries();
-         }
-         catch (ParseException e)
-         {
-            throw new Bib2GlsException(bib2gls.getMessage(
-             "error.invalid.sort.rule", e.getMessage()), e);
-         }
-      }
-      else
-      {
-         Locale locale = null;
-
-         if (entrySort.equals("locale"))
-         {
-            locale = Locale.getDefault();
-         }
-         else
-         {
-            locale = Locale.forLanguageTag(entrySort);
-         }
-
-         Bib2GlsEntryComparator comparator = 
-            new Bib2GlsEntryComparator(bib2gls, entries, 
-               locale, entrySortField, entryGroupField, entryType,
-               collatorStrength, collatorDecomposition,
-               breakPoint, breakPointMarker,
-               sortSuffixOption, sortSuffixMarker);
-
-         comparator.sortEntries();
-      }
    }
 
    private void updateWidestName(Bib2GlsEntry entry, 
