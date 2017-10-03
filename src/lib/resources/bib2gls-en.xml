@@ -117,6 +117,7 @@ See the manual for further details.</entry>
 <entry key="message.dual.symbol.mappings">Dual symbol mappings:</entry>
 <entry key="message.dual.abbreviation.mappings">Dual abbreviation mappings:</entry>
 <entry key="message.dual.entryabbreviation.mappings">Dual entry-abbreviation mappings:</entry>
+<entry key="message.dual.indexentry.mappings">Dual index-entry mappings:</entry>
 <entry key="message.process.result">Processed returned: {0}</entry>
 
 <entry key="message.log.file">Transcript written to {0}.</entry>

@@ -1785,6 +1785,7 @@ synonym of the entry whose label is given by this field.\\
 \centering
 \begin{tabular}{ll}
 \bfseries Field & \bfseries Description\\
+\fielddef{dualdescription} & The description for the dual entry.\\
 \fielddef{duallong} & The long form of a dual abbreviation.\\
 \fielddef{duallongplural} & The plural long form of a dual abbreviation.\\
 \fielddef{dualshort} & The short form of a dual abbreviation.\\
@@ -2440,10 +2441,71 @@ For example:
 ]
 \end{verbatim}
 
-Note that there's no dual equivalent to \atentry{index}
-since that entry type doesn't have required fields and
-there's nothing obvious to swap with that type that would
-differentiate it from a normal entry.
+\section{\atentry{dualindexentry}}
+\labelatentry{dualindexentry}
+
+There's only one required field: \field{dualdescription}. This is a
+field provided by \bibgls. The primary entry behaves like
+\atentryref{index} and the dual entry behaves like \atentryref{entry}
+(where the \field{description} is obtained from
+\field{dualdescription}).
+
+This is the most convenient way of having an entry that's also
+automatically indexed. For example, suppose the file
+\filefmt{terms.bib} contains:
+\begin{verbatim}
+@index{duck}
+@index{zebra}
+@index{aardvark}
+\end{verbatim}
+and suppose the file \filefmt{entries.bib} contains:
+\begin{verbatim}
+@dualindexentry{array,
+  dualdescription={ordered list of values}
+}
+
+@dualindexentry{vector,
+  name={vector},
+  dualdescription={column or row of values}
+}
+
+@dualindexentry{set,
+  dualdescription={collection of values}
+}
+
+@dualindexentry{matrix,
+  plural={matrices},
+  dualdescription={rectangular array of values}
+}
+\end{verbatim}
+These entries can be used in an example document that has an 
+index and a glossary:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,index,stylemods=mcols]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={entries-dual-index-entry,testfile1},
+ type=index,
+ label-prefix={idx.},
+ dual-prefix={gls.},
+ combine-dual-locations={primary},
+ dual-type=main
+]
+
+\begin{document}
+\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
+
+\gls{idx.duck}, \gls{idx.aardvark}, \gls{idx.zebra}.
+
+\printunsrtglossary
+
+\renewcommand{\glstreenamefmt}[1]{#1}
+\printunsrtglossary[type=index,style=mcolindexgroup]
+\end{document}
+\end{verbatim}
 
 \section{\atentry{dualentryabbreviation}}
 \labelatentry{dualentryabbreviation}
@@ -6786,6 +6848,103 @@ As \optref{counter} but for the dual entries. In this case
 \optfmt{same as primary} which uses the counter for the primary
 entry.
 
+\subsection{\csoptnv{combine-dual-locations}\csopteqval{value}}
+\labelopt{combine-dual-locations}
+
+You can merge the location lists for each primary entry
+with that of the corresponding dual entry. This setting
+allows you to specify this and determine whether both primary and
+dual entries should have the combined location list or 
+whether only the primary or the dual should be assigned the
+combined list.
+
+The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{false} This is the default setting. The location lists
+aren't combined.
+\item\optfmt{both} Both the primary and dual are given the combined
+location list.
+\item\optfmt{dual} Only the dual is given the combined location
+list. The primary's location list is emptied.
+\item\optfmt{primary} Only the primary is given the combined
+location list. The dual's location list is emptied.
+\end{itemize}
+
+For example, suppose the file \filefmt{entries.bib} contains:
+\begin{verbatim}
+@dualindexentry{array,
+  dualdescription={ordered list of values}
+}
+
+@dualindexentry{vector,
+  name={vector},
+  dualdescription={column or row of values}
+}
+
+@dualindexentry{set,
+  dualdescription={collection of values}
+}
+
+@dualindexentry{matrix,
+  plural={matrices},
+  dualdescription={rectangular array of values}
+}
+\end{verbatim}
+and the document contains:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,index,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={entries},
+ type=index,
+ label-prefix={idx.},
+ dual-prefix={gls.},
+ dual-type=main
+]
+
+\begin{document}
+\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
+
+\newpage
+\gls{gls.array}, \gls{idx.vector}, \gls{idx.set}, \gls{gls.matrix}.
+
+\newpage
+\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+In this case, the primary entries are placed in the \code{index}
+glossary type and are assigned the prefix \idprefixfmt{idx} but only
+two of the primary entries have been used in the document (both on
+page~2).
+
+The dual entries are assigned the prefix \idprefixfmt{gls} and are
+placed in the \code{main} glossary. The \code{gls.array} 
+and \code{gls.matrix} entries have been indexed on pages~1, 2 and~3.
+The \code{gls.vector} and \code{gls.set} entries have been indexed
+on pages~1 and~3.
+
+With the default setting, some of the locations are in the
+\code{main} glossary (corresponding to \verb|\gls{gls.array}|,
+\verb|\gls{gls.vector}|, \verb|\gls{gls.set}| and
+\verb|\gls{gls.matrix}|) and some of the locations are in the
+\code{index} glossary (corresponding to \verb|\gls{idx.vector}|
+and \verb|\gls{idx.set}|).
+
+If the option \csopt[primary]{combine-dual-locations} is added to
+the resource set, then all the locations are moved to the
+\code{index} glossary. The entries in the \code{main} glossary no
+longer have locations. This is actually preferable for this type
+of document and it's best not to reference the primary (index)
+entries as the hyperlink created by \cs{gls} will point to the
+index, but these entries don't have descriptions, so it's less
+useful than referencing the dual (main) entries as then the
+hyperlink can point to the definition in the \code{main} glossary.
+
 \subsection{\csoptnv{dual-short-case-change}\csopteqval{value}}
 \labelopt{dual-short-case-change}
 
@@ -6795,7 +6954,7 @@ field instead.
 \subsection{\csoptnv{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-entry-map}
 
-This setting governs the behaviour of \atentry{dualentry}
+This setting governs the behaviour of \atentryref{dualentry}
 definitions. The value consists of two comma-separated lists of
 equal length identifying the field mapping used to create the dual
 entry from the primary one. Note that the \field{alias} field
@@ -6861,7 +7020,7 @@ the \styfmt{glossaries-extra} package's point of view. For example,
 \labelopt{dual-abbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to
-\atentry{dualabbreviation} rather than \atentry{dualentry}. 
+\atentryref{dualabbreviation} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
 \begin{verbatim}
@@ -6883,7 +7042,7 @@ for further details.
 \labelopt{dual-entryabbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to
-\atentry{dualentryabbreviation} rather than \atentry{dualentry}. 
+\atentryref{dualentryabbreviation} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
 \begin{verbatim}
@@ -6900,7 +7059,7 @@ See \atentryref{dualentryabbreviation} for further details.
 \labelopt{dual-symbol-map}
 
 This is like \csopt{dual-entry-map} but applies to
-\atentry{dualsymbol} rather than \atentry{dualentry}. 
+\atentryref{dualsymbol} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
 \begin{verbatim}
@@ -6914,11 +7073,17 @@ dual-symbol-map=
 This essentially flips the \field{name} field with the
 \field{symbol} field.
 
+\subsection{\csoptnv{dual-indexentry-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-indexentry-map}
+
+This is like \csopt{dual-entry-map} but applies to
+\atentryref{dualindexentry} rather than \atentry{dualentry}. 
+
 \subsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
 \labelopt{dual-entry-backlink}
 
 This is a boolean setting.
-When used with \atentry{dualentry}, if \meta{boolean} is
+When used with \atentryref{dualentry}, if \meta{boolean} is
 \optfmt{true}, this will wrap the contents of first mapped field
 with \cs{glshyperlink}. If \meta{boolean} is missing \optfmt{true}
 is assumed.
@@ -6971,20 +7136,27 @@ so the hyperlink for the primary entry is put in the
 \labelopt{dual-abbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
-defined with \atentry{dualabbreviation} instead of
+defined with \atentryref{dualabbreviation} instead of
 \atentry{dualentry}.
 
 \subsection{\csoptnv{dual-symbol-backlink}\csopteqval{boolean}}
 \labelopt{dual-symbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
-defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
+defined with \atentryref{dualsymbol} instead of \atentry{dualentry}.
 
 \subsection{\csoptnv{dual-entryabbrv-backlink}\csopteqval{boolean}}
 \labelopt{dual-entryabbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
-defined with \atentry{dualentryabbreviation} instead of
+defined with \atentryref{dualentryabbreviation} instead of
+\atentry{dualentry}.
+
+\subsection{\csoptnv{dual-indexentry-backlink}\csopteqval{boolean}}
+\labelopt{dual-indexentry-backlink}
+
+This is analogous to \csopt{dual-entry-backlink} but for entries
+defined with \atentryref{dualindexentry} instead of
 \atentry{dualentry}.
 
 \subsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
@@ -6992,8 +7164,9 @@ defined with \atentry{dualentryabbreviation} instead of
 
 Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
 \csopt[\meta{boolean}]{dual-entryabbrv-backlink}, 
-\csopt[\meta{boolean}]{dual-abbrv-backlink}, and
-\csopt[\meta{boolean}]{dual-symbol-backlink}.
+\csopt[\meta{boolean}]{dual-abbrv-backlink},
+\csopt[\meta{boolean}]{dual-symbol-backlink}, and
+\csopt[\meta{boolean}]{dual-indexentry-backlink}.
 
 \subsection{\csoptnv{dual-field}\csopteqval{value}}
 \labelopt{dual-field}

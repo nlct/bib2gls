@@ -1,0 +1,34 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,index,stylemods=mcols]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={entries-dual-index-entry,testfile1},
+ type=index,
+ label-prefix={idx.},
+ dual-prefix={gls.},
+ combine-dual-locations={primary},
+ dual-type=main
+]
+
+\begin{document}
+\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
+
+\gls{idx.duck}, \gls{idx.aardvark}, \gls{idx.zebra}.
+
+\newpage
+\gls{gls.array}, \gls{idx.vector}, \gls{idx.set}, \gls{gls.matrix}.
+
+\newpage
+\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
+
+\printunsrtglossary
+
+\renewcommand{\glstreenamefmt}[1]{#1}
+\printunsrtglossary[type=index,style=mcolindexgroup]
+
+\end{document}

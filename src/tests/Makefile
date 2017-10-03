@@ -17,7 +17,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-testidx-xindy.pdf test-children.pdf \
 	  test-cjk.pdf test-other.pdf test-homograph.pdf \
 	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf \
-	  test-dates.pdf test-people.pdf test-entrytypemap.pdf
+	  test-dates.pdf test-people.pdf test-entrytypemap.pdf \
+	  test-dualindexentry.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -323,6 +324,13 @@ test-entrytypemap.pdf	: test-entrytypemap.glstex
 test-entrytypemap.glstex	: test-entrytypemap.tex entries-abbrv.bib $(DEPS)
 		pdflatex test-entrytypemap
 		$(BIB2GLS) test-entrytypemap
+
+test-dualindexentry.pdf	: test-dualindexentry.glstex
+		pdflatex test-dualindexentry
+
+test-dualindexentry.glstex	: test-dualindexentry.tex entries-dual-index-entry.bib $(DEPS)
+		pdflatex test-dualindexentry
+		$(BIB2GLS) test-dualindexentry
 
 clean	:
 	$(RM) *.aux

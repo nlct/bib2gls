@@ -1337,6 +1337,9 @@ public class Bib2Gls implements TeXApp
       addField("duallong");
       addField("duallongplural");
 
+      // add the fields needed for dualindexentry
+      addField("dualdescription");
+
       for (int i = 0; i < glsresources.size(); i++)
       {
          currentResource = glsresources.get(i);

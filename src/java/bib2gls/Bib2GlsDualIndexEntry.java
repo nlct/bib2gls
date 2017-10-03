@@ -29,58 +29,43 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
+public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
 {
-   public Bib2GlsDualAbbrev(Bib2Gls bib2gls)
+   public Bib2GlsDualIndexEntry(Bib2Gls bib2gls)
    {
-      this(bib2gls, "dualabbreviation");
+      this(bib2gls, "dualindexentry");
    }
 
-   public Bib2GlsDualAbbrev(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsDualIndexEntry(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
    }
 
    public HashMap<String,String> getMappings()
    {
-      return getResource().getDualAbbrevMap();
+      return getResource().getDualIndexEntryMap();
    }
 
    public String getFirstMap()
    {
-      return getResource().getFirstDualAbbrevMap();
+      return getResource().getFirstDualIndexEntryMap();
    }
 
    public boolean backLink()
    {
-      return getResource().backLinkFirstDualAbbrevMap();
+      return getResource().backLinkFirstDualIndexEntryMap();
    }
 
    protected Bib2GlsDualEntry createDualEntry()
    {
-      return new Bib2GlsDualAbbrev(bib2gls, getEntryType());
+      return new Bib2GlsDualIndexEntry(bib2gls, getEntryType()+"secondary");
    }
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("short") == null)
+      if (getField("dualdescription") == null)
       {
-         missingFieldWarning(parser, "short");
-      }
-
-      if (getField("long") == null)
-      {
-         missingFieldWarning(parser, "long");
-      }
-
-      if (getField("dualshort") == null)
-      {
-         missingFieldWarning(parser, "dualshort");
-      }
-
-      if (getField("duallong") == null)
-      {
-         missingFieldWarning(parser, "duallong");
+         missingFieldWarning(parser, "dualdescription");
       }
    }
 
@@ -90,41 +75,27 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
 
       if (field.equals("name"))
       {
-         val = getFieldValue("short");
-
-         if (val != null) return val;
+         return getOriginalId();
       }
 
-      val = super.getFallbackValue(field);
-
-      if (val != null) return val;
-
-      if (field.equals("sort"))
-      {
-         return getFieldValue("short");
-      }
-
-      return null;
+      return super.getFallbackValue(field);
    }
 
    public BibValueList getFallbackContents(String field)
    {
-      BibValueList val;
-
-      if (field.equals("sort"))
+      if (field.equals("name") && bib2gls.useInterpreter())
       {
-         val = getField("name");
+         String name = getOriginalId();
+         BibValueList list = new BibValueList();
+         list.add(new BibUserString(
+            bib2gls.getInterpreterListener().createGroup(name)));
 
-         return val == null ? getFallbackContents("name") : val;
+         return list;
       }
-      else if (field.equals("name"))
+      else
       {
-         val = getField("short");
-
-         if (val != null) return val;
+         return super.getFallbackContents(field);
       }
-
-      return super.getFallbackContents(field);
    }
 
    public void writeBibEntry(PrintWriter writer)
@@ -133,8 +104,8 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
       writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String sep = "";
-      String shortText = "";
-      String longText = "";
+      String descStr = "";
+      String nameStr = null;
 
       Set<String> keyset = getFieldSet();
 
@@ -144,15 +115,15 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
       {
          String field = it.next();
 
-         if (field.equals("short"))
+         if (field.equals("description"))
          {
-            shortText = getFieldValue(field);
+            descStr = getFieldValue(field);
          }
-         else if (field.equals("long"))
+         else if (field.equals("name"))
          {
-            longText = getFieldValue(field);
+            nameStr = getFieldValue(field);
          }
-         else
+         else if (!field.equals("dualdescription"))
          {
             writer.format("%s", sep);
 
@@ -162,29 +133,21 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
          }
       }
 
-      writer.println(String.format("}%%%n{%s}%%%n{%s}",
-        shortText, longText));
+      if (nameStr == null)
+      {
+         nameStr = getFallbackValue("name");
+      }
+
+      writer.println(String.format("}%%%n{%s}%n{%s}", nameStr, descStr));
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
-      // syntax: {label}{opts}{short}{long}
-
-      writer.println("\\glsxtrprovidestoragekey{dualshort}{}{}");
-      writer.println("\\glsxtrprovidestoragekey{dualshortplural}{}{}");
-      writer.println("\\glsxtrprovidestoragekey{duallong}{}{}");
-      writer.println("\\glsxtrprovidestoragekey{duallongplural}{}{}");
+      // syntax: {label}{opts}{name}{description}
 
       writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
 
-      String newcs = getEntryType();
-
-      if (newcs.startsWith("dual"))
-      {
-         newcs = newcs.substring(4);
-      }
-
-      writer.format("  \\new%s[#2]{#1}{#3}{#4}%%%n", newcs);
+      writer.println("  \\longnewglossaryentry*{#1}{name={#3},#2}{#4}%");
 
       writer.println("}");
    }

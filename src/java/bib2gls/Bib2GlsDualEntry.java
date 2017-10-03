@@ -41,6 +41,11 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
+   public boolean isPrimary()
+   {
+      return isprimary;
+   }
+
    public String getFallbackValue(String field)
    {
       String val = super.getFallbackValue(field);
@@ -128,7 +133,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return getResource().backLinkFirstDualEntryMap();
    }
 
-   protected Bib2GlsEntry createDualEntry()
+   protected Bib2GlsDualEntry createDualEntry()
    {
       return new Bib2GlsDualEntry(bib2gls, getEntryType());
    }
@@ -139,8 +144,9 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       String dualPrefix = resource.getDualPrefix();
       String label = getOriginalId();
 
-      Bib2GlsEntry entry = createDualEntry();
+      Bib2GlsDualEntry entry = createDualEntry();
       entry.setId(dualPrefix, label);
+      entry.isprimary=false;
 
       HashMap<String,String> mappings = getMappings();
 
@@ -267,4 +273,6 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
       return entry;
    }
+
+   private boolean isprimary=true;
 }

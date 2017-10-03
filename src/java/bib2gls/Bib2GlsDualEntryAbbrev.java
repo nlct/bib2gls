@@ -56,7 +56,7 @@ public class Bib2GlsDualEntryAbbrev extends Bib2GlsDualEntry
       return getResource().backLinkFirstDualEntryAbbrevMap();
    }
 
-   protected Bib2GlsEntry createDualEntry()
+   protected Bib2GlsDualEntry createDualEntry()
    {
       return new Bib2GlsDualEntryAbbrev(bib2gls, getEntryType()+"secondary");
    }

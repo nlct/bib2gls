@@ -1144,6 +1144,27 @@ public class Bib2GlsEntry extends BibEntry
       return getId().equals(((Bib2GlsEntry)other).getId());
    }
 
+   public Vector<GlsRecord> getRecords()
+   {
+      if (records == null)
+      {
+         Vector<GlsRecord> list = new Vector<GlsRecord>();
+
+         Iterator<String> it = recordMap.keySet().iterator();
+
+         while (it.hasNext())
+         {
+            String key = it.next();
+
+            list.addAll(recordMap.get(key));
+         }
+
+         return list;
+      }
+
+      return records;
+   }
+
    public int recordCount()
    {
       int n = 0;
@@ -1305,6 +1326,27 @@ public class Bib2GlsEntry extends BibEntry
          {
             list.add(record);
          }
+      }
+   }
+
+   public void clearRecords()
+   {
+      if (records == null)
+      {
+         Iterator<String> it = recordMap.keySet().iterator();
+
+         while (it.hasNext())
+         {
+            String key = it.next();
+
+            Vector<GlsRecord> list = recordMap.get(key);
+
+            list.clear();
+         }
+      }
+      else
+      {
+         records.clear();
       }
    }
 

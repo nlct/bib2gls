@@ -436,6 +436,28 @@ public class GlsResource
          {
             saveLocations = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("combine-dual-locations"))
+         {
+            String val = getChoice(parser, list, opt,
+              "false", "both", "dual", "primary");
+
+            if (val.equals("false"))
+            {
+               combineDualLocations = COMBINE_DUAL_LOCATIONS_OFF;
+            }
+            else if (val.equals("both"))
+            {
+               combineDualLocations = COMBINE_DUAL_LOCATIONS_BOTH;
+            }
+            else if (val.equals("dual"))
+            {
+               combineDualLocations = COMBINE_DUAL_LOCATIONS_DUAL;
+            }
+            else if (val.equals("primary"))
+            {
+               combineDualLocations = COMBINE_DUAL_LOCATIONS_PRIMARY;
+            }
+         }
          else if (opt.equals("save-child-count"))
          {
             saveChildCount = getBoolean(parser, list, opt);
@@ -486,6 +508,14 @@ public class GlsResource
 
             dualEntryAbbrevFirstMap = keys[0];
          }
+         else if (opt.equals("dual-indexentry-map"))
+         {
+            String[] keys = new String[1];
+
+            dualIndexEntryMap = getDualMap(parser, list, opt, keys);
+
+            dualIndexEntryFirstMap = keys[0];
+         }
          else if (opt.equals("dual-symbol-map"))
          {
             String[] keys = new String[1];
@@ -502,6 +532,7 @@ public class GlsResource
                backLinkDualAbbrev = true;
                backLinkDualSymbol = true;
                backLinkDualEntryAbbrev = true;
+               backLinkDualIndexEntry = true;
             }
             else
             {
@@ -509,6 +540,7 @@ public class GlsResource
                backLinkDualAbbrev = false;
                backLinkDualSymbol = false;
                backLinkDualEntryAbbrev = false;
+               backLinkDualIndexEntry = false;
             }
          }
          else if (opt.equals("dual-entry-backlink"))
@@ -522,6 +554,10 @@ public class GlsResource
          else if (opt.equals("dual-entryabbrv-backlink"))
          {
             backLinkDualEntryAbbrev = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("dual-indexentry-backlink"))
+         {
+            backLinkDualIndexEntry = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-symbol-backlink"))
          {
@@ -1053,6 +1089,14 @@ public class GlsResource
          dualSymbolFirstMap = "name";
       }
 
+      if (dualIndexEntryMap == null)
+      {
+         dualIndexEntryMap = new HashMap<String,String>();
+         dualIndexEntryMap.put("dualdescription", "description");
+
+         dualIndexEntryFirstMap = "dualdescription";
+      }
+
       if (dualSort == null)
       {
          dualSort = "combine";
@@ -1150,6 +1194,17 @@ public class GlsResource
             String key = it.next();
             bib2gls.verbose(String.format("%s -> %s", 
                key, dualEntryAbbrevMap.get(key)));
+         }
+
+         bib2gls.verbose(bib2gls.getMessage(
+            "message.dual.indexentry.mappings")); 
+
+         for (Iterator<String> it = dualIndexEntryMap.keySet().iterator(); 
+              it.hasNext(); )
+         {
+            String key = it.next();
+            bib2gls.verbose(String.format("%s -> %s", 
+               key, dualIndexEntryMap.get(key)));
          }
 
          bib2gls.logMessage();
@@ -2319,6 +2374,13 @@ public class GlsResource
                      {
                         entry.addRecord(record);
                         hasRecords = true;
+
+                        if (dual != null &&
+                          combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
+                        {
+                           dual.addRecord(record.copy(dualId));
+                           dualHasRecords = true;
+                        }
                      }
 
                      if (dual != null)
@@ -2327,6 +2389,13 @@ public class GlsResource
                         {
                            dual.addRecord(record);
                            dualHasRecords = true;
+
+
+                           if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
+                           {
+                              entry.addRecord(record.copy(primaryId));
+                              hasRecords = true;
+                           }
                         }
                      }
                   }
@@ -3202,6 +3271,7 @@ public class GlsResource
       checkFieldMaps(dualAbbrevMap, "dual-abbrv-map");
       checkFieldMaps(dualSymbolMap, "dual-symbol-map");
       checkFieldMaps(dualEntryAbbrevMap, "dual-entryabbrv-map");
+      checkFieldMaps(dualIndexEntryMap, "dual-indexentry-map");
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
@@ -3599,10 +3669,30 @@ public class GlsResource
 
             if (saveLocations)
             {
-               entry.updateLocationList(minLocationRange,
-                 suffixF, suffixFF, seeLocation, seeAlsoLocation,
-                 locationPrefix != null, locationSuffix != null,
-                 locGap);
+               if (entry instanceof Bib2GlsDualEntry
+                 && !(combineDualLocations == COMBINE_DUAL_LOCATIONS_OFF
+                   ||combineDualLocations == COMBINE_DUAL_LOCATIONS_BOTH))
+               {
+                  boolean isPrimary = ((Bib2GlsDualEntry)entry).isPrimary();
+
+                  if ((combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY 
+                        && isPrimary)
+                    ||(combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL 
+                        && !isPrimary))
+                  {
+                     entry.updateLocationList(minLocationRange,
+                       suffixF, suffixFF, seeLocation, seeAlsoLocation,
+                       locationPrefix != null, locationSuffix != null,
+                       locGap);
+                  }
+               }
+               else
+               {
+                  entry.updateLocationList(minLocationRange,
+                    suffixF, suffixFF, seeLocation, seeAlsoLocation,
+                    locationPrefix != null, locationSuffix != null,
+                    locGap);
+               }
             }
 
             if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
@@ -3676,7 +3766,8 @@ public class GlsResource
 
                bib2gls.verbose(entry.getId());
 
-               if (saveLocations)
+               if (saveLocations
+                && combineDualLocations != COMBINE_DUAL_LOCATIONS_PRIMARY)
                {
                   entry.updateLocationList(minLocationRange,
                     suffixF, suffixFF, seeLocation, seeAlsoLocation,
@@ -4586,6 +4677,11 @@ public class GlsResource
       return dualEntryAbbrevMap;
    }
 
+   public HashMap<String,String> getDualIndexEntryMap()
+   {
+      return dualIndexEntryMap;
+   }
+
    public String getFirstDualAbbrevMap()
    {
       return dualAbbrevFirstMap;
@@ -4596,6 +4692,11 @@ public class GlsResource
       return dualEntryAbbrevFirstMap;
    }
 
+   public String getFirstDualIndexEntryMap()
+   {
+      return dualIndexEntryFirstMap;
+   }
+
    public boolean backLinkFirstDualAbbrevMap()
    {
       return backLinkDualAbbrev;
@@ -4604,6 +4705,11 @@ public class GlsResource
    public boolean backLinkFirstDualEntryAbbrevMap()
    {
       return backLinkDualEntryAbbrev;
+   }
+
+   public boolean backLinkFirstDualIndexEntryMap()
+   {
+      return backLinkDualIndexEntry;
    }
 
    public String getDualField()
@@ -5083,6 +5189,16 @@ public class GlsResource
       return val == null ? entryType : val;
    }
 
+   public boolean isCombineDualLocationsOn()
+   {
+      return combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF;
+   }
+
+   public int getCombineDualLocations()
+   {
+      return combineDualLocations;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -5170,6 +5286,13 @@ public class GlsResource
 
    private boolean saveLocations = true;
 
+   public static final int COMBINE_DUAL_LOCATIONS_OFF=0;
+   public static final int COMBINE_DUAL_LOCATIONS_BOTH=1;
+   public static final int COMBINE_DUAL_LOCATIONS_PRIMARY=2;
+   public static final int COMBINE_DUAL_LOCATIONS_DUAL=3;
+
+   private int combineDualLocations = COMBINE_DUAL_LOCATIONS_OFF;
+
    public static final int FLATTEN_LONELY_FALSE=0;
    public static final int FLATTEN_LONELY_PRE_SORT=1;
    public static final int FLATTEN_LONELY_POST_SORT=2;
@@ -5200,18 +5323,19 @@ public class GlsResource
    private String dualField = null;
 
    private HashMap<String,String> dualEntryMap, dualAbbrevMap,
-      dualSymbolMap, dualEntryAbbrevMap;
+      dualSymbolMap, dualEntryAbbrevMap, dualIndexEntryMap;
 
    // HashMap doesn't retain order, so keep track of the first
    // mapping separately.
 
    private String dualEntryFirstMap, dualAbbrevFirstMap, dualSymbolFirstMap,
-     dualEntryAbbrevFirstMap;
+     dualEntryAbbrevFirstMap, dualIndexEntryFirstMap;
 
    private boolean backLinkDualEntry=false;
    private boolean backLinkDualAbbrev=false;
    private boolean backLinkDualSymbol=false;
    private boolean backLinkDualEntryAbbrev=false;
+   private boolean backLinkDualIndexEntry=false;
 
    private String shortCaseChange=null;
    private String dualShortCaseChange=null;

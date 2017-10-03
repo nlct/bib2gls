@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.Vector;
+import java.util.Iterator;
 
 public class GlsRecord
 {
@@ -31,6 +33,11 @@ public class GlsRecord
       this.counter = counter;
       this.format = format;
       this.location = location;
+   }
+
+   public GlsRecord copy(String newLabel)
+   {
+      return new GlsRecord(newLabel, prefix, counter, format, location);
    }
 
    public Object clone()
@@ -425,6 +432,238 @@ public class GlsRecord
       return false;
    }
 
+   // is location1 < location2?
+   public static boolean lessThan(String location1, String location2)
+   {
+      if (location1.isEmpty() || location2.isEmpty())
+      {
+         return false;
+      }
+
+      Matcher m1 = CS_PATTERN.matcher(location1);
+      Matcher m2 = CS_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         String cs1 = m1.group(2);
+         String cs2 = m2.group(2);
+
+         if (!cs1.equals(cs2))
+         {
+            return false;
+         }
+
+         String loc1 = m1.group(3);
+         String loc2 = m2.group(3);
+
+         if (loc1.equals(loc2))
+         {
+            return lessThan(prefix1, prefix2);
+         }
+
+         return lessThan(loc1, loc2);
+      }
+
+      m1 = DIGIT_PATTERN.matcher(location1);
+      m2 = DIGIT_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         if (prefix1 == null) prefix1 = "";
+         if (prefix2 == null) prefix2 = "";
+
+         String sep1 = m1.group(2);
+         String sep2 = m2.group(2);
+
+         String suffix1 = m1.group(3);
+         String suffix2 = m2.group(3);
+
+         if (suffix1.equals(suffix2))
+         {
+            if (suffix1.equals("0"))
+            {
+               return sep1.equals(sep2) ?
+                      lessThan(prefix1, prefix2) :
+                      lessThan(prefix1+sep1, prefix2+sep2);
+            }
+            else
+            {
+               return false;
+            }
+         }
+
+         if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
+         {
+            return false;
+         }
+
+         try
+         {
+            int loc1 = Integer.parseInt(suffix1);
+            int loc2 = Integer.parseInt(suffix2);
+
+            return loc1 < loc2;
+         }
+         catch (NumberFormatException e)
+         {// shouldn't happen (integer pattern matched)
+            e.printStackTrace();
+         }
+
+         return false;
+      }
+
+      m1 = ROMAN_LC_PATTERN.matcher(location1);
+      m2 = ROMAN_LC_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches()
+       && !(   m1.group(3).isEmpty()
+            && m1.group(4) == null
+            && m1.group(5) == null
+            && m1.group(6) == null
+           )
+       && !(   m2.group(3).isEmpty()
+            && m2.group(4) == null
+            && m2.group(5) == null
+            && m2.group(6) == null
+           )
+         )
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         String sep1 = m1.group(2);
+         String sep2 = m2.group(2);
+
+         int loc1 = romanToDecimal(m1.group(3), m1.group(4), m1.group(5),
+                    m1.group(6));
+         int loc2 = romanToDecimal(m2.group(3), m2.group(4), m2.group(5),
+                    m2.group(6));
+
+         if (loc1 == loc2)
+         {
+            return sep1.equals(sep2) ?
+                   lessThan(prefix1, prefix2) :
+                   lessThan(prefix1+sep1, prefix2+sep2);
+         }
+
+         if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
+         {
+            return false;
+         }
+
+         return loc1 < loc2;
+      }
+
+      m1 = ROMAN_UC_PATTERN.matcher(location1);
+      m2 = ROMAN_UC_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches()
+       && !(   m1.group(3).isEmpty()
+            && m1.group(4) == null
+            && m1.group(5) == null
+            && m1.group(6) == null
+           )
+       && !(   m2.group(3).isEmpty()
+            && m2.group(4) == null
+            && m2.group(5) == null
+            && m2.group(6) == null
+           )
+         )
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         String sep1 = m1.group(2);
+         String sep2 = m2.group(2);
+
+         String hundreds1 = m1.group(4);
+         String tens1 = m1.group(5);
+         String ones1 = m1.group(6);
+
+         String hundreds2 = m2.group(4);
+         String tens2 = m2.group(5);
+         String ones2 = m2.group(6);
+
+         int loc1 = romanToDecimal(m1.group(3).toLowerCase(),
+            hundreds1 == null ? null : hundreds1.toLowerCase(), 
+            tens1 == null ? null : tens1.toLowerCase(),
+            ones1 == null ? null : ones1.toLowerCase());
+         int loc2 = romanToDecimal(m2.group(3).toLowerCase(),
+            hundreds2 == null ? null : hundreds2.toLowerCase(),
+            tens2 == null ? null : tens2.toLowerCase(),
+            ones2 == null ? null : ones2.toLowerCase());
+
+         if (loc1 == loc2)
+         {
+            return sep1.equals(sep2) ?
+                   lessThan(prefix1, prefix2) :
+                   lessThan(prefix1+sep1, prefix2+sep2);
+         }
+
+         if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
+         {
+            return false;
+         }
+
+         return loc1 < loc2;
+      }
+
+      m1 = ALPHA_PATTERN.matcher(location1);
+      m2 = ALPHA_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String prefix1 = m1.group(1);
+         String prefix2 = m2.group(1);
+
+         if (prefix1 == null) prefix1 = "";
+         if (prefix2 == null) prefix2 = "";
+
+         String sep1 = m1.group(2);
+         String sep2 = m2.group(2);
+
+         String suffix1 = m1.group(3);
+         String suffix2 = m2.group(3);
+
+         if (suffix1 == null)
+         {
+            sep1 = m1.group(4);
+            suffix1 = m1.group(5);
+         }
+
+         if (suffix2 == null)
+         {
+            sep2 = m2.group(4);
+            suffix2 = m2.group(5);
+         }
+
+         if (suffix1.equals(suffix2))
+         {
+            return sep1.equals(sep2) ?
+                   lessThan(prefix1, prefix2) :
+                   lessThan(prefix1+sep1, prefix2+sep2);
+         }
+
+         if (!prefix1.equals(prefix2) || !sep1.equals(sep2))
+         {
+            return false;
+         }
+
+         int loc1 = suffix1.codePointAt(0);
+         int loc2 = suffix2.codePointAt(0);
+
+         return loc1 < loc2;
+      }
+
+      return false;
+   }
+
    // arguments should already have been checked against the pattern
    private static int romanToDecimal(String thousands, String hundreds, 
      String tens, String ones)
@@ -548,6 +787,64 @@ public class GlsRecord
       }
 
       return n;
+   }
+
+   public static Vector<GlsRecord> merge(Vector<GlsRecord> list1,
+      Vector<GlsRecord> list2)
+   {
+      Vector<GlsRecord> list = new Vector<GlsRecord>(
+        list1.size(), list2.size());
+
+      int idx1 = 0;
+      int idx2 = 0;
+      int n1 = list1.size();
+      int n2 = list2.size();
+
+      for (; idx1 < n1 && idx2 < n2; idx1++)
+      {
+         GlsRecord r1 = list1.get(idx1);
+         GlsRecord r2 = list2.get(idx2);
+
+         if (r1.equals(r2))
+         {
+            list.add(r1);
+            idx2++;
+         }
+         else if (!r1.getCounter().equals(r2.getCounter())
+           || !r1.getPrefix().equals(r2.getPrefix()))
+         {
+            list.add(r1);
+         }
+         else
+         {
+            while (lessThan(r2.location, r1.location))
+            {
+               list.add(r2);
+               idx2++;
+
+               if (idx2 >= n2)
+               {
+                  break;
+               }
+
+               r2 = list2.get(idx2);
+            }
+
+            list.add(r1);
+         }
+      }
+
+      for (; idx1 < n1; idx1++)
+      {
+         list.add(list1.get(idx1));
+      }
+
+      for (; idx2 < n2; idx2++)
+      {
+         list.add(list2.get(idx2));
+      }
+
+      return list;
    }
 
    public String toString()

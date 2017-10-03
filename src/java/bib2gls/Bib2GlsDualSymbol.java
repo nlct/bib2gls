@@ -54,7 +54,7 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
       return getResource().backLinkFirstDualSymbolMap();
    }
 
-   protected Bib2GlsEntry createDualEntry()
+   protected Bib2GlsDualEntry createDualEntry()
    {
       return new Bib2GlsDualSymbol(bib2gls, getEntryType());
    }
