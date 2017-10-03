@@ -115,7 +115,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
 
       writer.format("\\providecommand{\\%s}[2]{%%%n", getCsName());
 
-      writer.println(" \\newglossaryentry{#1}{name={#1},description={},#2}%");
+      writer.println(" \\newglossaryentry{#1}{name={#1},category={index},description={},#2}%");
 
       writer.println("}");
    }

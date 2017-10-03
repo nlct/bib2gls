@@ -1786,7 +1786,8 @@ synonym of the entry whose label is given by this field.\\
 \begin{tabular}{l>{\raggedright}p{.75\textwidth}}
 \bfseries Field & \bfseries Description\tabularnewline
 \fielddef{dualdescription} & The description for the dual entry
-mapped by \atentryref{dualindexentry}.\tabularnewline
+mapped by \atentryref{dualindexentry} and
+\atentryref{dualindexsymbol}.\tabularnewline
 \fielddef{duallong} & The long form of a dual
 abbreviation mapped by \atentryref{dualabbreviation}.\tabularnewline
 \fielddef{duallongplural} & The plural long form of a dual
@@ -2453,7 +2454,11 @@ There's only one required field: \field{dualdescription}. This is a
 field provided by \bibgls. The primary entry behaves like
 \atentryref{index} and the dual entry behaves like \atentryref{entry}
 (where the \field{description} is obtained from
-\field{dualdescription}). If no \field{name} is given, the dual
+\field{dualdescription}).  The default field mapping is:
+\begin{itemize}
+\item \field{dualdescription} $\mapsto$ \field{description}
+\end{itemize}
+If no \field{name} is given, the dual
 entry is assigned the (unprefixed) entry label. For example:
 \begin{verbatim}
 @dualindexentry{array,
@@ -2472,6 +2477,10 @@ This is effectively like
 but they are linked so that if one entry is used the other is
 automatically selected (if the \optref{selection} setting includes
 dependencies).
+
+The primary entries are defined using \csref{bibglsnewdualindexentry}
+and the dual entries are defined using
+\csref{bibglsnewdualindexentrysecondary}.
 
 This is the most convenient way of having an entry that's also
 automatically indexed. For example, suppose the file
@@ -2510,7 +2519,7 @@ index and a glossary:
 \usepackage[record,index,stylemods=mcols]{glossaries-extra}
 
 \GlsXtrLoadResources[
- src={entries-dual-index-entry,testfile1},
+ src={terms,entries},
  type=index,
  label-prefix={idx.},
  dual-prefix={gls.},
@@ -2532,11 +2541,165 @@ index and a glossary:
 \end{document}
 \end{verbatim}
 
+\section{\atentry{dualindexsymbol}}
+\labelatentry{dualindexsymbol}
+
+The \atentry{dualindexsymbol} entry type is similar to 
+\atentryref{dualindexentry}, but by default the
+field mappings are:
+\begin{itemize}
+\item \field{name} $\mapsto$ \field{symbol}
+\item \field{symbol} $\mapsto$ \field{name}
+\item \field{dualdescription} $\mapsto$ \field{description}
+\end{itemize}
+The required fields are: \field{symbol} and \field{dualdescription}.
+If the \field{name} field is omitted, the dual entry is assigned a
+name from the primary's (unprefixed) label.
+
+The primary entries are defined using
+\csref{bibglsnewdualindexsymbol}
+and the dual entries are defined using
+\csref{bibglsnewdualindexsymbolsecondary}.
+For example:
+\begin{verbatim}
+@dualindexsymbol{pi,
+  symbol={\ensuremath{\pi}},
+  dualdescription={ratio of a circle's circumference to its diameter}
+}
+\end{verbatim}
+is like
+\begin{verbatim}
+@index{pi,symbol={\ensuremath{\pi}}}
+
+@symbol{dual.pi,
+  name={\ensuremath{\pi}},
+  symbol={pi},
+  description={ratio of a circle's circumference to its diameter}
+}
+\end{verbatim}
+but the terms are dependent on each other.
+
+For example, suppose I have a file called \filefmt{symbols.bib} that
+contains:
+\begin{verbatim}
+@dualindexsymbol{pi,
+  symbol={\ensuremath{\pi}},
+  dualdescription={ratio of a circle's circumference to its diameter}
+}
+
+@dualindexsymbol{e,
+  name={Euler's number},
+  symbol={\ensuremath{e}},
+  dualdescription={base of the natural logarithm}
+}
+\end{verbatim}
+Then the previous example document can be modified to have an index,
+a glossary and a list of symbols:
+\begin{verbatim}
+\documentclass{report}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,symbols,index,stylemods=mcols]{glossaries-extra}
+
+\newcommand{\bibglsnewdualindexsymbolsecondary}[5]{%
+  \longnewglossaryentry*{#1}{name={#3},category=symbol,%
+    symbol={#4},#2,type={symbols}}{#5}%
+}
+
+\newcommand{\indexprimary}[1]{\glsadd[format=hyperbf]{idx.#1}}
+
+\renewcommand{\glsxtrpostdescsymbol}{%
+  \indexprimary{\glscurrententrylabel}%
+}
+
+\renewcommand{\glsxtrpostdescgeneral}{%
+  \indexprimary{\glscurrententrylabel}%
+}
+
+\GlsXtrLoadResources[
+ src={entries,terms,symbols},
+ type=index,
+ set-widest,
+ label-prefix={idx.},
+ dual-prefix={},
+ combine-dual-locations={primary},
+ dual-sort={letter-case},
+ dual-type=main
+]
+
+\newcommand{\idx}[2][]{\gls[hyper=false,#1]{idx.#2}}
+\newcommand{\Idx}[2][]{\Gls[hyper=false,#1]{idx.#2}}
+\newcommand{\idxpl}[2][]{\glspl[hyper=false,#1]{idx.#2}}
+\newcommand{\Idxpl}[2][]{\Glspl[hyper=false,#1]{idx.#2}}
+
+\begin{document}
+\gls{array}, \gls{vector}, \gls{set}, \glspl{matrix}.
+
+\idx{duck}, \idx{aardvark}, \idx{zebra}.
+
+\gls{e} and \gls{pi}.
+
+\newpage
+\gls{array}, \idx{vector}, \idx{set}, \gls{matrix}.
+
+\newpage
+\gls{array}, \gls{vector}, \gls{set}, \gls{matrix}.
+
+
+\renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
+\printunsrtglossary[type=main,nogroupskip,style=alttree]
+
+\renewcommand{\glstreenamefmt}[1]{#1}
+\printunsrtglossary[type=symbols,nogroupskip,style=index]
+
+\renewcommand{\glstreenamefmt}[1]{#1}
+\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
+\printunsrtglossary[type=index,style=mcolindexgroup]
+
+\end{document}
+\end{verbatim}
+Here I've provided some convenient commands for referencing the
+primary (index) terms (\csfmt{idx}, \csfmt{idxpl}, \csfmt{Idx}
+and \csfmt{Idxpl}). This means I don't need to worry about the
+label prefix and it also switches off the hyperlinks (since it's not
+particularly informative to link to the index).
+
+I've also redefined \csref{bibglsnewdualindexsymbolsecondary} to put
+the dual entries created with \atentry{dualindexsymbol} into
+the \code{symbols} glossary (which is created with the
+\styopt{symbols} package option), so it overrides the
+\csopt[main]{dual-type} setting.
+
+This command also sets the \field{category}
+to \code{symbol}, so I can redefine the post-description hook
+for symbols (\cs{glsxtrpostdescsymbol}) to automatically index 
+the symbol definition. Similarly for the \code{general}
+post-description hook \cs{glsxtrpostdescgeneral}. 
+
+Since the post-description hook isn't done until the glossary has
+been created, this requires a slightly longer build process. If the
+document file is called \filefmt{myDoc.tex}, then the complete
+document build is:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls -g myDoc
+pdflatex myDoc
+bib2gls -g myDoc
+pdflatex myDoc
+\end{verbatim}
+After this, you can switch back to just:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls -g myDoc
+pdflatex myDoc
+\end{verbatim}
+until you reference a new entry.
+
 \section{\atentry{dualentryabbreviation}}
 \labelatentry{dualentryabbreviation}
 
 The \atentry{dualentryabbreviation} entry type is similar to 
-\atentry{dualentry}, but by default the
+\atentryref{dualentry}, but by default the
 field mappings are:
 \begin{itemize}
 \item \field{long} $\mapsto$ \field{name}
@@ -7111,6 +7274,12 @@ This essentially flips the \field{name} field with the
 This is like \csopt{dual-entry-map} but applies to
 \atentryref{dualindexentry} rather than \atentry{dualentry}. 
 
+\subsection{\csoptnv{dual-indexsymbol-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-indexsymbol-map}
+
+This is like \csopt{dual-entry-map} but applies to
+\atentryref{dualindexsymbol} rather than \atentry{dualentry}. 
+
 \subsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
 \labelopt{dual-entry-backlink}
 
@@ -7191,14 +7360,22 @@ This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualindexentry} instead of
 \atentry{dualentry}.
 
+\subsection{\csoptnv{dual-indexsymbol-backlink}\csopteqval{boolean}}
+\labelopt{dual-indexsymbol-backlink}
+
+This is analogous to \csopt{dual-entry-backlink} but for entries
+defined with \atentryref{dualindexsymbol} instead of
+\atentry{dualentry}.
+
 \subsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
 \labelopt{dual-backlink}
 
 Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
 \csopt[\meta{boolean}]{dual-entryabbrv-backlink}, 
 \csopt[\meta{boolean}]{dual-abbrv-backlink},
-\csopt[\meta{boolean}]{dual-symbol-backlink}, and
-\csopt[\meta{boolean}]{dual-indexentry-backlink}.
+\csopt[\meta{boolean}]{dual-symbol-backlink},
+\csopt[\meta{boolean}]{dual-indexentry-backlink}, and
+\csopt[\meta{boolean}]{dual-indexsymbol-backlink}.
 
 \subsection{\csoptnv{dual-field}\csopteqval{value}}
 \labelopt{dual-field}
@@ -7346,11 +7523,12 @@ This command is used to define terms identified with the
 file is:
 \begin{verbatim}
 \providecommand*{\bibglsnewindex}[2]{%
- \newglossaryentry{#1}{name={#1},description={},#2}%
+ \newglossaryentry{#1}{name={#1},category={index},description={},#2}%
 }
 \end{verbatim}
-This makes the \field{name} default to the \meta{label} and sets
-an empty \field{description}. These settings may be overridden by
+This makes the \field{name} default to the \meta{label}, assigns the
+the \field{category} to \code{index} and sets an empty
+\field{description}. These settings may be overridden by
 \meta{options}. Note that the \field{description} doesn't include
 \cs{nopostdesc} to allow for the post-description hook used by
 category attributes.
@@ -7423,7 +7601,7 @@ This command is used to define primary terms identified with the
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualindexentry}[4]{%
-  \longnewglossaryentry*{#1}{name={#3},#2}{}%
+  \longnewglossaryentry*{#1}{name={#3},category={index},#2}{}%
 }
 \end{verbatim}
 Note that this definition ignores the \meta{description} argument.
@@ -7454,7 +7632,7 @@ This command is used to define primary terms identified with the
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualindexsymbol}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{}%
+  \longnewglossaryentry*{#1}{name={#3},category={index},symbol={#4},#2}{}%
 }
 \end{verbatim}
 Note that this definition ignores the \meta{description} argument.
@@ -7470,7 +7648,7 @@ This command is used to define secondary terms identified with the
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualindexsymbolsecondary}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{#5}%
+  \longnewglossaryentry*{#1}{name={#3},category={symbol},symbol={#4},#2}{#5}%
 }
 \end{verbatim}
 

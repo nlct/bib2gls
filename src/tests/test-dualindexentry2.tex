@@ -1,13 +1,25 @@
 % arara: pdflatex
 % arara: bib2gls: {group: on}
 % arara: pdflatex
-\documentclass{article}
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{report}
 
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,symbols,index,stylemods=mcols]{glossaries-extra}
 
 \newcommand{\bibglsnewdualindexsymbolsecondary}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},symbol={#4},#2,type={symbols}}{#5}%
+  \longnewglossaryentry*{#1}{name={#3},category=symbol,symbol={#4},#2,type={symbols}}{#5}%
+}
+
+\newcommand{\indexprimary}[1]{\glsadd[format=hyperbf]{idx.#1}}
+
+\renewcommand{\glsxtrpostdescsymbol}{%
+  \indexprimary{\glscurrententrylabel}%
+}
+
+\renewcommand{\glsxtrpostdescgeneral}{%
+  \indexprimary{\glscurrententrylabel}%
 }
 
 \GlsXtrLoadResources[
@@ -43,6 +55,7 @@
 \renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
 \printunsrtglossary[type=main,nogroupskip,style=alttree]
 
+\renewcommand{\glstreenamefmt}[1]{#1}
 \printunsrtglossary[type=symbols,nogroupskip,style=index]
 
 \renewcommand{\glstreenamefmt}[1]{#1}

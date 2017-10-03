@@ -149,7 +149,7 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
 
       if (isPrimary())
       {
-         writer.println("  \\longnewglossaryentry*{#1}{name={#3},#2}{}%");
+         writer.println("  \\longnewglossaryentry*{#1}{name={#3},category={index},#2}{}%");
       }
       else
       {

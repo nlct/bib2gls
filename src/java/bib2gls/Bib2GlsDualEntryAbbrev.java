@@ -157,13 +157,13 @@ public class Bib2GlsDualEntryAbbrev extends Bib2GlsDualEntry
 
       writer.format("\\providecommand{\\%s}[5]{%%%n", getCsName());
 
-      if (getEntryType().endsWith("secondary"))
+      if (isPrimary())
       {
-         writer.println("  \\longnewglossaryentry*{#1}{#2}{#5}%");
+         writer.println("  \\newabbreviation[#2]{#1}{#3}{#4}%");
       }
       else
       {
-         writer.println("  \\newabbreviation[#2]{#1}{#3}{#4}%");
+         writer.println("  \\longnewglossaryentry*{#1}{#2}{#5}%");
       }
 
       writer.println("}");

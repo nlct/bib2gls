@@ -160,11 +160,11 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
       if (isPrimary())
       {
-         writer.println("  \\longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{}%");
+         writer.println("  \\longnewglossaryentry*{#1}{name={#3},category={index},symbol={#4},#2}{}%");
       }
       else
       {
-         writer.println("  \\longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{#5}%");
+         writer.println("  \\longnewglossaryentry*{#1}{name={#3},category={symbol},symbol={#4},#2}{#5}%");
       }
 
       writer.println("}");
