@@ -18,6 +18,8 @@ v1.1 (pending):
      - entry-type-aliases
      - combine-dual-locations
 
+   * New entry types: @dualindexentry, @dualindexsymbol
+
    * Case-changing options now also accept the values
      firstuc and firstuc-cs
 

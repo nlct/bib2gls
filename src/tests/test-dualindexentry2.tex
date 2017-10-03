@@ -1,0 +1,52 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,symbols,index,stylemods=mcols]{glossaries-extra}
+
+\newcommand{\bibglsnewdualindexsymbolsecondary}[5]{%
+  \longnewglossaryentry*{#1}{name={#3},symbol={#4},#2,type={symbols}}{#5}%
+}
+
+\GlsXtrLoadResources[
+ src={entries-dual-index-entry,testfile1,entries-dual-index-symbol},
+ type=index,
+ set-widest,
+ label-prefix={idx.},
+ dual-prefix={},
+ combine-dual-locations={primary},
+ dual-sort={letter-case},
+ dual-type=main
+]
+
+\newcommand{\idx}[2][]{\gls[hyper=false,#1]{idx.#2}}
+\newcommand{\Idx}[2][]{\Gls[hyper=false,#1]{idx.#2}}
+\newcommand{\idxpl}[2][]{\glspl[hyper=false,#1]{idx.#2}}
+\newcommand{\Idxpl}[2][]{\Glspl[hyper=false,#1]{idx.#2}}
+
+\begin{document}
+\gls{array}, \gls{vector}, \gls{set}, \glspl{matrix}.
+
+\idx{duck}, \idx{aardvark}, \idx{zebra}.
+
+\gls{e} and \gls{pi}.
+
+\newpage
+\gls{array}, \idx{vector}, \idx{set}, \gls{matrix}.
+
+\newpage
+\gls{array}, \gls{vector}, \gls{set}, \gls{matrix}.
+
+
+\renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
+\printunsrtglossary[type=main,nogroupskip,style=alttree]
+
+\printunsrtglossary[type=symbols,nogroupskip,style=index]
+
+\renewcommand{\glstreenamefmt}[1]{#1}
+\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
+\printunsrtglossary[type=index,style=mcolindexgroup]
+
+\end{document}

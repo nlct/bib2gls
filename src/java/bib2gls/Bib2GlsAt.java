@@ -82,6 +82,10 @@ public class Bib2GlsAt extends At
       {
          data = new Bib2GlsDualIndexEntry(bib2gls);
       }
+      else if (entryType.equals("dualindexsymbol"))
+      {
+         data = new Bib2GlsDualIndexSymbol(bib2gls);
+      }
       else if (entryType.equals("dualabbreviation")
             || entryType.equals("dualacronym"))
       {

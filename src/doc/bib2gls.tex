@@ -1783,13 +1783,18 @@ synonym of the entry whose label is given by this field.\\
 \caption{Fields Provided by \bibgls}\label{tab:bib2glsfields}
 \medskip
 \centering
-\begin{tabular}{ll}
-\bfseries Field & \bfseries Description\\
-\fielddef{dualdescription} & The description for the dual entry.\\
-\fielddef{duallong} & The long form of a dual abbreviation.\\
-\fielddef{duallongplural} & The plural long form of a dual abbreviation.\\
-\fielddef{dualshort} & The short form of a dual abbreviation.\\
-\fielddef{dualshortplural} & The plural short form of a dual abbreviation.
+\begin{tabular}{l>{\raggedright}p{.75\textwidth}}
+\bfseries Field & \bfseries Description\tabularnewline
+\fielddef{dualdescription} & The description for the dual entry
+mapped by \atentryref{dualindexentry}.\tabularnewline
+\fielddef{duallong} & The long form of a dual
+abbreviation mapped by \atentryref{dualabbreviation}.\tabularnewline
+\fielddef{duallongplural} & The plural long form of a dual
+abbreviation mapped by \atentryref{dualabbreviation}.\tabularnewline
+\fielddef{dualshort} & The short form of a dual
+abbreviation mapped by \atentryref{dualabbreviation}.\tabularnewline
+\fielddef{dualshortplural} & The plural short form of a dual abbreviation 
+mapped by \atentryref{dualabbreviation}.
 \end{tabular}
 \end{table}
 
@@ -2448,7 +2453,25 @@ There's only one required field: \field{dualdescription}. This is a
 field provided by \bibgls. The primary entry behaves like
 \atentryref{index} and the dual entry behaves like \atentryref{entry}
 (where the \field{description} is obtained from
-\field{dualdescription}).
+\field{dualdescription}). If no \field{name} is given, the dual
+entry is assigned the (unprefixed) entry label. For example:
+\begin{verbatim}
+@dualindexentry{array,
+  dualdescription={ordered list of values}
+}
+\end{verbatim}
+This is effectively like
+\begin{verbatim}
+@index{array}
+
+@entry{dual.array,
+  name={array},
+  description={ordered list of values}
+}
+\end{verbatim}
+but they are linked so that if one entry is used the other is
+automatically selected (if the \optref{selection} setting includes
+dependencies).
 
 This is the most convenient way of having an entry that's also
 automatically indexed. For example, suppose the file
@@ -2500,9 +2523,11 @@ index and a glossary:
 
 \gls{idx.duck}, \gls{idx.aardvark}, \gls{idx.zebra}.
 
-\printunsrtglossary
+\renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
+\printunsrtglossary[type=main,style=index,nogroupskip]
 
 \renewcommand{\glstreenamefmt}[1]{#1}
+\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
 \printunsrtglossary[type=index,style=mcolindexgroup]
 \end{document}
 \end{verbatim}
@@ -3165,7 +3190,14 @@ compute the width according to the document fonts.
 If \optref{type} has been set, the \cs{glssetwidest} command
 will be appended to the glossary preamble for that type, otherwise
 it's simply set in the \ext{glstex} file and may be overridden
-later in the document if required.
+later in the document if required. (Similarly if \optref{dual-type}
+and \optref{secondary} have been used.)
+
+Note that if you don't set a separate sort for dual entries with
+\optref{dual-sort} then the widest entry name will be determined
+across all the primary and dual entries together. Additionally, if
+you have multiple resource sets, they may override previously
+calculated widest names.
 
 \subsection{\csoptnv{entry-type-aliases}\csopteqval{\keyvallist}}
 \labelopt{entry-type-aliases}
@@ -7379,6 +7411,69 @@ file is:
  \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
 }
 \end{verbatim}
+
+\subsection{\csfmt{bibglsnewdualindexentry}}
+\labelcs{bibglsnewdualindexentry}
+
+\begin{definition}
+\cs{bibglsnewdualindexentry}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentryref{dualindexentry} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexentry}[4]{%
+  \longnewglossaryentry*{#1}{name={#3},#2}{}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{description} argument.
+
+\subsection{\csfmt{bibglsnewdualindexentrysecondary}}
+\labelcs{bibglsnewdualindexentrysecondary}
+
+\begin{definition}
+\cs{bibglsnewdualindexentrysecondary}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define secondary terms identified with the
+\atentryref{dualindexentry} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexentrysecondary}[4]{%
+  \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
+}
+\end{verbatim}
+
+\subsection{\csfmt{bibglsnewdualindexsymbol}}
+\labelcs{bibglsnewdualindexsymbol}
+
+\begin{definition}
+\cs{bibglsnewdualindexsymbol}\margm{label}\margm{options}\margm{name}\marg{symbol}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentryref{dualindexsymbol} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexsymbol}[5]{%
+  \longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{description} argument.
+
+\subsection{\csfmt{bibglsnewdualindexsymbolsecondary}}
+\labelcs{bibglsnewdualindexsymbolsecondary}
+
+\begin{definition}
+\cs{bibglsnewdualindexsymbolsecondary}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define secondary terms identified with the
+\atentryref{dualindexsymbol} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexsymbolsecondary}[5]{%
+  \longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{#5}%
+}
+\end{verbatim}
+
 
 \subsection{\csfmt{bibglsnewdualentryabbreviation}}
 \labelcs{bibglsnewdualentryabbreviation}

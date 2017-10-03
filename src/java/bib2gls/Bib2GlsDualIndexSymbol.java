@@ -29,36 +29,36 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
+public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 {
-   public Bib2GlsDualIndexEntry(Bib2Gls bib2gls)
+   public Bib2GlsDualIndexSymbol(Bib2Gls bib2gls)
    {
-      this(bib2gls, "dualindexentry");
+      this(bib2gls, "dualindexsymbol");
    }
 
-   public Bib2GlsDualIndexEntry(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsDualIndexSymbol(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
    }
 
    public HashMap<String,String> getMappings()
    {
-      return getResource().getDualIndexEntryMap();
+      return getResource().getDualIndexSymbolMap();
    }
 
    public String getFirstMap()
    {
-      return getResource().getFirstDualIndexEntryMap();
+      return getResource().getFirstDualIndexSymbolMap();
    }
 
    public boolean backLink()
    {
-      return getResource().backLinkFirstDualIndexEntryMap();
+      return getResource().backLinkFirstDualIndexSymbolMap();
    }
 
    protected Bib2GlsDualEntry createDualEntry()
    {
-      return new Bib2GlsDualIndexEntry(bib2gls, getEntryType()+"secondary");
+      return new Bib2GlsDualIndexSymbol(bib2gls, getEntryType()+"secondary");
    }
 
    public void checkRequiredFields(TeXParser parser)
@@ -66,6 +66,11 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
       if (getField("dualdescription") == null)
       {
          missingFieldWarning(parser, "dualdescription");
+      }
+
+      if (getField("symbol") == null)
+      {
+         missingFieldWarning(parser, "symbol");
       }
    }
 
@@ -106,6 +111,7 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
       String sep = "";
       String descStr = "";
       String nameStr = null;
+      String symbolStr = "";
 
       Set<String> keyset = getFieldSet();
 
@@ -123,6 +129,10 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
          {
             nameStr = getFieldValue(field);
          }
+         else if (field.equals("symbol"))
+         {
+            symbolStr = getFieldValue(field);
+         }
          else
          {
             writer.format("%s", sep);
@@ -138,22 +148,23 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
          nameStr = getFallbackValue("name");
       }
 
-      writer.println(String.format("}%%%n{%s}%n{%s}", nameStr, descStr));
+      writer.println(String.format("}%%%n{%s}{%s}%n{%s}", 
+        nameStr, symbolStr, descStr));
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
-      // syntax: {label}{opts}{name}{description}
+      // syntax: {label}{opts}{name}{symbol}{description}
 
-      writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
+      writer.format("\\providecommand{\\%s}[5]{%%%n", getCsName());
 
       if (isPrimary())
       {
-         writer.println("  \\longnewglossaryentry*{#1}{name={#3},#2}{}%");
+         writer.println("  \\longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{}%");
       }
       else
       {
-         writer.println("  \\longnewglossaryentry*{#1}{name={#3},#2}{#4}%");
+         writer.println("  \\longnewglossaryentry*{#1}{name={#3},symbol={#4},#2}{#5}%");
       }
 
       writer.println("}");

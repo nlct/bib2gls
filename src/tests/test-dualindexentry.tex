@@ -16,7 +16,7 @@
 ]
 
 \begin{document}
-\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
+\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \glspl{gls.matrix}.
 
 \gls{idx.duck}, \gls{idx.aardvark}, \gls{idx.zebra}.
 
@@ -26,7 +26,9 @@
 \newpage
 \gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
 
-\printunsrtglossary
+
+\renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
+\printunsrtglossary[type=main,style=index]
 
 \renewcommand{\glstreenamefmt}[1]{#1}
 \printunsrtglossary[type=index,style=mcolindexgroup]
