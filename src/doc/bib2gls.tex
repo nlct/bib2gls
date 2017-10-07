@@ -1785,9 +1785,6 @@ synonym of the entry whose label is given by this field.\\
 \centering
 \begin{tabular}{l>{\raggedright}p{.75\textwidth}}
 \bfseries Field & \bfseries Description\tabularnewline
-\fielddef{dualdescription} & The description for the dual entry
-mapped by \atentryref{dualindexentry} and
-\atentryref{dualindexsymbol}.\tabularnewline
 \fielddef{duallong} & The long form of a dual
 abbreviation mapped by \atentryref{dualabbreviation}.\tabularnewline
 \fielddef{duallongplural} & The plural long form of a dual
@@ -2450,19 +2447,20 @@ For example:
 \section{\atentry{dualindexentry}}
 \labelatentry{dualindexentry}
 
-There's only one required field: \field{dualdescription}. This is a
-field provided by \bibgls. The primary entry behaves like
-\atentryref{index} and the dual entry behaves like \atentryref{entry}
-(where the \field{description} is obtained from
-\field{dualdescription}).  The default field mapping is:
+There's only one required field: \field{description}.  The primary
+entry behaves like \atentryref{index} and the dual entry behaves
+like \atentryref{entry}.  The default field mapping is:
 \begin{itemize}
-\item \field{dualdescription} $\mapsto$ \field{description}
+\item \field{name} $\mapsto$ \field{name}
 \end{itemize}
-If no \field{name} is given, the dual
-entry is assigned the (unprefixed) entry label. For example:
+This doesn't actually perform any swapping of fields, but it
+provides the field used for backlinks.
+
+If no \field{name} is given, the dual entry is assigned the
+(unprefixed) entry label. For example:
 \begin{verbatim}
 @dualindexentry{array,
-  dualdescription={ordered list of values}
+  description={ordered list of values}
 }
 \end{verbatim}
 This is effectively like
@@ -2493,21 +2491,21 @@ automatically indexed. For example, suppose the file
 and suppose the file \filefmt{entries.bib} contains:
 \begin{verbatim}
 @dualindexentry{array,
-  dualdescription={ordered list of values}
+  description={ordered list of values}
 }
 
 @dualindexentry{vector,
   name={vector},
-  dualdescription={column or row of values}
+  description={column or row of values}
 }
 
 @dualindexentry{set,
-  dualdescription={collection of values}
+  description={collection of values}
 }
 
 @dualindexentry{matrix,
   plural={matrices},
-  dualdescription={rectangular array of values}
+  description={rectangular array of values}
 }
 \end{verbatim}
 These entries can be used in an example document that has an 
@@ -2550,11 +2548,10 @@ field mappings are:
 \begin{itemize}
 \item \field{name} $\mapsto$ \field{symbol}
 \item \field{symbol} $\mapsto$ \field{name}
-\item \field{dualdescription} $\mapsto$ \field{description}
 \end{itemize}
-The required fields are: \field{symbol} and \field{dualdescription}.
+The required fields are: \field{symbol} and \field{description}.
 If the \field{name} field is omitted, the dual entry is assigned a
-name from the primary's (unprefixed) label.
+symbol from the primary's (unprefixed) label.
 
 The primary entries are defined using
 \csref{bibglsnewdualindexsymbol}
@@ -2564,7 +2561,7 @@ For example:
 \begin{verbatim}
 @dualindexsymbol{pi,
   symbol={\ensuremath{\pi}},
-  dualdescription={ratio of a circle's circumference to its diameter}
+  description={ratio of a circle's circumference to its diameter}
 }
 \end{verbatim}
 is like
@@ -2584,13 +2581,13 @@ contains:
 \begin{verbatim}
 @dualindexsymbol{pi,
   symbol={\ensuremath{\pi}},
-  dualdescription={ratio of a circle's circumference to its diameter}
+  description={ratio of a circle's circumference to its diameter}
 }
 
 @dualindexsymbol{e,
   name={Euler's number},
   symbol={\ensuremath{e}},
-  dualdescription={base of the natural logarithm}
+  description={base of the natural logarithm}
 }
 \end{verbatim}
 Then the previous example document can be modified to have an index,
@@ -7068,21 +7065,21 @@ location list. The dual's location list is emptied.
 For example, suppose the file \filefmt{entries.bib} contains:
 \begin{verbatim}
 @dualindexentry{array,
-  dualdescription={ordered list of values}
+  description={ordered list of values}
 }
 
 @dualindexentry{vector,
   name={vector},
-  dualdescription={column or row of values}
+  description={column or row of values}
 }
 
 @dualindexentry{set,
-  dualdescription={collection of values}
+  description={collection of values}
 }
 
 @dualindexentry{matrix,
   plural={matrices},
-  dualdescription={rectangular array of values}
+  description={rectangular array of values}
 }
 \end{verbatim}
 and the document contains:

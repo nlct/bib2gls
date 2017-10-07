@@ -63,9 +63,9 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("dualdescription") == null)
+      if (getField("description") == null)
       {
-         missingFieldWarning(parser, "dualdescription");
+         missingFieldWarning(parser, "description");
       }
 
       if (getField("symbol") == null)
@@ -121,7 +121,7 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
       {
          String field = it.next();
 
-         if (field.equals("description") || field.equals("dualdescription"))
+         if (field.equals("description"))
          {
             descStr = getFieldValue(field);
          }

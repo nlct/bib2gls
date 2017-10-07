@@ -1106,9 +1106,9 @@ public class GlsResource
       if (dualIndexEntryMap == null)
       {
          dualIndexEntryMap = new HashMap<String,String>();
-         dualIndexEntryMap.put("dualdescription", "description");
+         dualIndexEntryMap.put("name", "name");
 
-         dualIndexEntryFirstMap = "dualdescription";
+         dualIndexEntryFirstMap = "name";
       }
 
       if (dualIndexSymbolMap == null)
@@ -1116,7 +1116,6 @@ public class GlsResource
          dualIndexSymbolMap = new HashMap<String,String>();
          dualIndexSymbolMap.put("symbol", "name");
          dualIndexSymbolMap.put("name", "symbol");
-         dualIndexSymbolMap.put("dualdescription", "description");
 
          dualIndexSymbolFirstMap = "symbol";
       }
