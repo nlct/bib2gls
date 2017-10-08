@@ -29,36 +29,36 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
+public class Bib2GlsDualAbbrevEntry extends Bib2GlsDualEntry
 {
-   public Bib2GlsDualIndexAbbrev(Bib2Gls bib2gls)
+   public Bib2GlsDualAbbrevEntry(Bib2Gls bib2gls)
    {
-      this(bib2gls, "dualindexabbreviation");
+      this(bib2gls, "dualabbreviationentry");
    }
 
-   public Bib2GlsDualIndexAbbrev(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsDualAbbrevEntry(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
    }
 
    public HashMap<String,String> getMappings()
    {
-      return getResource().getDualIndexAbbrevMap();
+      return getResource().getDualAbbrevEntryMap();
    }
 
    public String getFirstMap()
    {
-      return getResource().getFirstDualIndexAbbrevMap();
+      return getResource().getFirstDualAbbrevEntryMap();
    }
 
    public boolean backLink()
    {
-      return getResource().backLinkFirstDualIndexAbbrevMap();
+      return getResource().backLinkFirstDualAbbrevEntryMap();
    }
 
    protected Bib2GlsDualEntry createDualEntry()
    {
-      return new Bib2GlsDualIndexAbbrev(bib2gls, getEntryType()+"secondary");
+      return new Bib2GlsDualAbbrevEntry(bib2gls, getEntryType()+"secondary");
    }
 
    public void checkRequiredFields(TeXParser parser)
@@ -72,6 +72,11 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       {
          missingFieldWarning(parser, "long");
       }
+
+      if (getField("description") == null)
+      {
+         missingFieldWarning(parser, "description");
+      }
    }
 
    public String getFallbackValue(String field)
@@ -82,7 +87,7 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       {
          val = getFieldValue("short");
 
-         return val == null ? getFallbackValue("short") : val;
+         if (val != null) return val;
       }
 
       return super.getFallbackValue(field);
@@ -96,7 +101,7 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       {
          val = getField("short");
 
-         return val == null ? getFallbackContents("short") : val;
+         if (val != null) return val;
       }
 
       return super.getFallbackContents(field);
@@ -105,22 +110,12 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\%s", getCsName());
-
-      writer.format("{%s}", getId());
-
-      if (isPrimary())
-      {
-         writer.format("{%s}", getDual().getId());
-      }
-
-      writer.format("%%%n{");
+      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String sep = "";
-      String descStr = "";
-      String nameStr = null;
       String shortStr = "";
       String longStr = "";
+      String descStr = "";
 
       Set<String> keyset = getFieldSet();
 
@@ -130,21 +125,17 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       {
          String field = it.next();
 
-         if (field.equals("description"))
-         {
-            descStr = getFieldValue(field);
-         }
-         else if (field.equals("name"))
-         {
-            nameStr = getFieldValue(field);
-         }
-         else if (field.equals("short"))
+         if (field.equals("short"))
          {
             shortStr = getFieldValue(field);
          }
          else if (field.equals("long"))
          {
             longStr = getFieldValue(field);
+         }
+         else if (field.equals("description"))
+         {
+            descStr = getFieldValue(field);
          }
          else
          {
@@ -156,44 +147,23 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
          }
       }
 
-      if (nameStr == null)
-      {
-         nameStr = getFallbackValue("name");
-      }
-
-      writer.println(String.format("}%%%n{%s}{%s}{%s}%n{%s}", 
-        nameStr, shortStr, longStr, descStr));
+      writer.println(String.format("}%%%n{%s}{%s}%%%n{%s}",
+        shortStr, longStr, descStr));
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
+      // syntax: {label}{opts}{short}{long}{description}
+
+      writer.format("\\providecommand{\\%s}[5]{%%%n", getCsName());
+
       if (isPrimary())
       {
-         writer.println("\\ifdef\\glsuseabbrvfont");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}{\\glsuseabbrvfont}");
-         writer.println("}%");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}[2]{{\\glssetabbrvfmt{#2}\\glsabbrvfont{#1}}}");
-         writer.println("}%");
-
-         // syntax: {label}{duallabel}{opts}{name}{short}{long}{description}
-
-         writer.format("\\providecommand{\\%s}[7]{%%%n", getCsName());
-
-         writer.println("  \\longnewglossaryentry*{#1}{%");
-         writer.println("      name={\\protect\\bibglsuseabbrvfont{#4}{\\glscategory{#2}}},%");
-         writer.println("      category={index},#3}{}%");
+         writer.println("  \\newabbreviation[#2]{#1}{#3}{#4}%");
       }
       else
       {
-         // syntax: {label}{opts}{name}{short}{long}{description}
-
-         writer.format("\\providecommand{\\%s}[6]{%%%n", getCsName());
-
-         writer.println("  \\ifstrempty{#6}%");
-         writer.println("  {\\newabbreviation[#2]{#1}{#4}{#5}}%");
-         writer.println("  {\\newabbreviation[#2,description={#6}]{#1}{#4}{#5}}%");
+         writer.println("  \\longnewglossaryentry*{#1}{#2}{#5}%");
       }
 
       writer.println("}");

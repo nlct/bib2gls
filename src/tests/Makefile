@@ -18,7 +18,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-cjk.pdf test-other.pdf test-homograph.pdf \
 	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf \
 	  test-dates.pdf test-people.pdf test-entrytypemap.pdf \
-	  test-dualindexentry.pdf test-dualindexentry2.pdf
+	  test-dualindexentry.pdf test-dualindexentry2.pdf \
+	  test-dual-mix.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -338,6 +339,13 @@ test-dualindexentry2.pdf	: test-dualindexentry2.glstex
 test-dualindexentry2.glstex	: test-dualindexentry2.tex entries-dual-index-entry.bib $(DEPS)
 		pdflatex test-dualindexentry2
 		$(BIB2GLS) test-dualindexentry2
+
+test-dual-mix.pdf	: test-dual-mix.glstex
+		pdflatex test-dual-mix
+
+test-dual-mix.glstex	: test-dual-mix.tex test-dual-mix2.bib $(DEPS)
+		pdflatex test-dual-mix
+		$(BIB2GLS) test-dual-mix
 
 clean	:
 	$(RM) *.aux

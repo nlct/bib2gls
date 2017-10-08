@@ -2397,7 +2397,7 @@ or to convert the short value to upper case and use the
  ignore-fields={description}]
 \end{verbatim}
 (If you want an equivalent of \csfmt{newdualentry}, use
-\atentryref{dualentryabbreviation} instead.)
+\atentryref{dualabbreviationentry} instead.)
 
 Terms defined using \atentry{abbreviation} will be written to the output
 file using the command \csref{bibglsnewabbreviation}.
@@ -2413,23 +2413,43 @@ the term is written to the output file using the command
 \label{sec:dualentry}
 
 The entry types described in this section create two separate (but
-related) \styfmt{glossaries-extra} entry definitions per \bibgls\
+related) \styfmt{glossaries-extra} entry definitions per \ext{bib}
 entry. The first of these entries is considered the
 \keyword{primary} entry, and the second is the \keyword{dual} entry
 (also referred to as the \keyword{secondary} entry, but is not
-related to the \optref{secondary} option).
+related to the \optref{secondary} option). The naming scheme is
+\code{@dual}\meta{entry-type} where both the primary and dual are
+considered to have the same type of entry (such as
+\atentryref{dualsymbol} where both the primary and dual are
+functionally like \atentryref{symbol}) or
+\code{@dual}\meta{primary}\meta{dual} where the primary
+is functionally like \code{@}\meta{primary} and the dual is
+functionally like \code{@}\meta{dual}.
+
 For example
 \begin{verbatim}
-@dualentryabbreviation{svm,
+@dualabbreviationentry{svm,
   short = {SVM},
   long = {support vector machine},
   description = {statistical pattern recognition technique}
 }
 \end{verbatim}
-is analogous to
+is like
+\begin{verbatim}
+@abbreviation{svm,
+  short = {SVM},
+  long = {support vector machine},
+}
+@entry{dual.svm,
+  text = {SVM},
+  name = {support vector machine},
+  description = {statistical pattern recognition technique}
+}
+\end{verbatim}
+and is analogous to
 \begin{verbatim}
 \newabbreviation{svm}{SVM}{support vector machine}
-\newglossaryentry{dual.svm}{name={support vector machine},
+\newglossaryentry{dual.svm}{name={support vector machine},text={SVM},
  description={statistical pattern recognition technique}}
 \end{verbatim}
 but both entries are considered dependent on each other. This means
@@ -2439,7 +2459,8 @@ setting includes dependencies.
 
 The creation of the dual entry involves mapping or copying fields
 from the primary entry. Each dual entry type has a set of mappings.
-Any fields that aren't listed in the mappings are simply copied,
+If a field in the set of mappings is missing, its fallback value is
+used.  Any fields that aren't listed in the mappings are simply copied,
 except for the \field{alias} field, which will never be copied to
 the dual entry, nor can it be mapped. The alias will only apply to
 the primary entry.  The dual entry is given the label
@@ -2453,6 +2474,248 @@ indicates how to sort the dual entries and the dual entries will be
 appended to the end of the \ext{glstex} file. The
 \optref{dual-sort-field} determines what field to use for the sort
 value if the dual entries should be sorted separately.
+
+Take care if you have a mixture of entry types (such as 
+\atentryref{dualindexentry}, \atentryref{dualindexsymbol} 
+and \atentryref{index}) and you're not
+using the default \optref[combine]{dual-sort}. Remember that the
+primary entries are all sorted together along with the single
+entries types described in \sectionref{sec:dualentry} (but they may
+be assigned to different glossary types), and then the dual entries
+are sorted together (but may be assigned to different glossary
+types). This may result in an odd ordering if some of the primaries
+and some of the duals are assigned to the same glossary. For
+example, don't mix \atentryref{dualindexabbreviation} (duals are
+abbreviations) with \atentryref{dualabbreviationentry} (primaries
+are abbreviations) when you aren't using \optref[combine]{dual-sort}
+(unless you have two different glossaries for the primary vs dual
+abbreviations).
+
+Remember that \bibgls\ is designed to take advantage of
+\styfmt{glossaries-extra}'s \cs{printunsrtglossary}, which simply
+iterates over all defined entries in the order in which they were defined
+(or, more precisely, the order of the internal list of entry labels
+associated with that glossary). The aim of \bibgls\ is to write the
+entry definitions to the \ext{glstex} file so that the internal list
+of labels is in the appropriate order.
+
+For example, suppose the file \filefmt{entries.bib} contains:
+\begin{verbatim}
+@index{aardvark}
+@index{mouse}
+@index{zebra}
+@dualindexabbreviation{xml,
+ short={XML},
+ long={extensible markup language}
+}
+@dualabbreviationentry{ssi,
+  short={SSI},
+  long={server-side includes},
+  description={directives placed in \gls{html} pages
+   evaluated by the server}
+}
+@dualindexabbreviation{html,
+ short={HTML},
+ long={hypertext markup language}
+}
+@dualabbreviationentry{css,
+ short={CSS},
+ long={cascading stylesheets},
+ description={a language that describes the style of an
+  \gls{html} document}
+}
+\end{verbatim}
+This contains a mixture of entry types, including
+\atentryref{dualindexabbreviation} (where the dual is the
+abbreviation) and \atentryref{dualabbreviationentry} (where the
+primary is the abbreviation).
+
+Now consider the following document:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,abbreviations]{glossaries-extra}
+
+\GlsXtrLoadResources[selection=all,src=entries]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+This uses the default \optref[combine]{sort}, so all the entries are
+sorted together, resulting in the order: 
+\code{aardvark},
+\code{dual.css},
+\code{css},
+\code{html},
+\code{dual.html},
+\code{mouse},
+\code{dual.ssi},
+\code{ssi},
+\code{xml},
+\code{dual.xml},
+\code{zebra}.
+
+The \LaTeX\ code written to the \ext{glstex} file is essentially
+(but not exactly):
+\begin{verbatim}
+% from @index{aardvark}:
+\newglossaryentry{aardvark}{name={aardvark},description={}}
+
+% dual of @dualabbreviationentry{css,...}:
+\newglossaryentry{dual.css}{name={cascading stylesheets},text={CSS},
+ description={a language that describes the style of an
+  \glsxtrshort{html} document}}
+
+% primary of @dualabbreviationentry{css,...}:
+\newabbreviation{css}{CSS}{cascading stylesheets}
+
+% primary of @dualindexabbreviation{html,...}:
+\newglossaryentry{html}{name={HTML},description={}}
+
+% dual of @dualindexabbreviation{html,...}:
+\newabbreviation{dual.html}{HTML}{hypertext markup language}
+
+% from @index{mouse}:
+\newglossaryentry{mouse}{name={mouse},description={}}
+
+% dual of @dualabbreviationentry{ssi,...}:
+\newglossaryentry{dual.ssi}{name={server-side includes},text={SSI},
+ description={directives placed in \glsxtrshort{html} pages
+ evaluated by the server}}
+
+% primary of @dualabbreviationentry{ssi,...}:
+\newabbreviation{ssi}{SSI}{server-side includes}
+
+% primary of @dualindexabbreviation{xml,...}:
+\newglossaryentry{xml}{name={XML},description={}}
+
+% dual of @dualindexabbreviation{xml,...}:
+\newabbreviation{dual.xml}{XML}{extensible markup language}
+
+% from @index{zebra}:
+\newglossaryentry{zebra}{name={zebra},description={}}
+\end{verbatim}
+Since the document uses the \styopt{abbreviations} package option,
+\cs{newabbreviation} automatically assigns the abbreviation 
+to the \code{abbreviations} glossary (created through that package
+option). This means that the \code{main} (default) glossary
+contains the entries (in order): 
+\code{aardvark} (aardvark), \code{dual.css} (cascading stylesheets), 
+\code{html} (HTML), \code{mouse} (mouse), 
+\code{dual.ssi} (server-side includes), 
+\code{xml} (XML), \code{zebra} (zebra).
+The \code{abbreviations} glossary contains:
+\code{css} (CSS), \code{dual.html} (HTML), \code{ssi} (SSI), 
+\code{dual.xml} (XML).
+
+Since all the entries were combined and sorted together, the
+resulting glossaries are both ordered alphabetically, but note that
+you need to take care when referencing the abbreviations if you want
+to make use of the abbreviation style: \verb|\gls{css}| and
+\verb|\gls{ssi}| for the primary abbreviations created with
+\atentryref{dualabbreviationentry} and \verb|\gls{dual.html}|
+and \verb|\gls{dual.xml}| for the dual abbreviations created with
+\atentryref{dualindexabbreviation}.
+
+If the document is changed so that the dual entries are now
+sorted and written after all the primary entries have been dealt
+with:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src=entries,
+ dual-sort={letter-nocase},
+ selection=all
+]
+\end{verbatim}
+then \bibgls\ first orders the primaries:
+\code{aardvark} (aardvark),
+\code{css} (CSS),
+\code{html} (HTML),
+\code{mouse} (mouse),
+\code{ssi} (SSI),
+\code{xml} (XML),
+\code{zebra} (zebra) and writes them to the \ext{glstex} file
+(functionally like):
+\begin{verbatim}
+% from @index{aardvark}:
+\newglossaryentry{aardvark}{name={aardvark},description={}}
+
+% primary of @dualabbreviationentry{css,...}:
+\newabbreviation{css}{CSS}{cascading stylesheets}
+
+% primary of @dualindexabbreviation{html,...}:
+\newglossaryentry{html}{name={HTML},description={}}
+
+% from @index{mouse}:
+\newglossaryentry{mouse}{name={mouse},description={}}
+
+% primary of @dualabbreviationentry{ssi,...}:
+\newabbreviation{ssi}{SSI}{server-side includes}
+
+% primary of @dualindexabbreviation{xml,...}:
+\newglossaryentry{xml}{name={XML},description={}}
+
+% from @index{zebra}:
+\newglossaryentry{zebra}{name={zebra},description={}}
+\end{verbatim}
+Then \bibgls\ orders the duals:
+\code{dual.css} (cascading stylesheets),
+\code{dual.html} (HTML),
+\code{dual.ssi} (server-side includes),
+\code{dual.xml} (XML)
+and writes them to the \ext{glstex} file
+(functionally like):
+\begin{verbatim}
+% dual of @dualabbreviationentry{css,...}:
+\newglossaryentry{dual.css}{name={cascading stylesheets},text={CSS},
+ description={a language that describes the style of an
+  \glsxtrshort{html} document}}
+
+% dual of @dualindexabbreviation{html,...}:
+\newabbreviation{dual.html}{HTML}{hypertext markup language}
+
+% dual of @dualabbreviationentry{ssi,...}:
+\newglossaryentry{dual.ssi}{name={server-side includes},text={SSI},
+ description={directives placed in \glsxtrshort{html} pages
+ evaluated by the server}}
+
+% dual of @dualindexabbreviation{xml,...}:
+\newabbreviation{dual.xml}{XML}{extensible markup language}
+\end{verbatim}
+When the \ext{glstex} file is input (during the next \LaTeX\ run) 
+the entries are defined in the order:
+\begin{enumerate}
+\item \code{aardvark} (assigned to \code{main}),
+\item \code{css} (assigned to \code{abbreviations}),
+\item \code{html} (assigned to \code{main}),
+\item \code{mouse} (assigned to \code{main}),
+\item \code{ssi} (assigned to \code{abbreviations}),
+\item \code{xml} (assigned to \code{main}),
+\item \code{zebra} (assigned to \code{main}),
+\item \code{dual.css} (assigned to \code{main}),
+\item \code{dual.html} (assigned to \code{abbreviations}),
+\item \code{dual.ssi} (assigned to \code{main}),
+\item \code{dual.xml} (assigned to \code{abbreviations})
+\end{enumerate}
+This means that the \code{main} glossary's internal list is in the
+order: \code{aardvark} (aardvark), \code{html} (HTML), \code{mouse}
+(mouse), \code{xml} (XML), \code{zebra} (zebra), 
+\code{dual.css} (cascading stylesheets), 
+\code{dual.ssi} (server-side includes), and the
+\code{abbreviations} glossary's internal list is in the order:
+\code{css} (CSS), \code{ssi} (SSI), \code{dual.html} (HTML), 
+\code{dual.xml} (XML).
+
+The lists are no longer in alphabetical order as they have a mixture
+of primary and dual entries that were separated before sorting.
+
+The above is a fairly contrived example as it wouldn't make sense
+in a real document to have glossary terms (that include a
+description) mixed with index terms (that don't include a
+description). A better solution would be to use 
+\atentryref{tertiaryindexabbreviationentry} instead of
+\atentryref{dualabbreviationentry}.
 
 \subsection{\atentry{dualentry}}
 \labelatentry{dualentry}
@@ -2816,10 +3079,10 @@ and the dual entries are defined using
 \csref{bibglsnewdualindexnumbersecondary},
 which by default sets the \field{category} to \optfmt{number}.
 
-\subsection{\atentry{dualentryabbreviation}}
-\labelatentry{dualentryabbreviation}
+\subsection{\atentry{dualabbreviationentry}}
+\labelatentry{dualabbreviationentry}
 
-The \atentry{dualentryabbreviation} entry type is similar to 
+The \atentry{dualabbreviationentry} entry type is similar to 
 \atentryref{dualentry}, but by default the
 field mappings are:
 \begin{itemize}
@@ -2829,6 +3092,10 @@ field mappings are:
 \end{itemize}
 You may need to add a mapping from \field{shortplural} to
 \field{plural} if the default is inappropriate.
+(In \bibgls\ version 1.0 this entry type was originally called
+\atentryref{dualentryabbreviation}. In version 1.1, it was renamed
+\atentry{dualabbreviationentry} which makes for a more consistent naming scheme
+\code{@dual}\meta{primary}\meta{dual}.)
 
 The required fields are: \field{short}, \field{long} and
 \field{description}. This entry type is designed to emulate the
@@ -2840,7 +3107,7 @@ the \field{name} copied from the \field{long} field.
 
 For example:
 \begin{verbatim}
-@dualentryabbreviation{svm,
+@dualabbreviationentry{svm,
    long = {support vector machine},
    short = {SVM},
    description = {statistical pattern recognition technique}
@@ -2865,19 +3132,19 @@ indexed, it won't have a location list.
 If the \field{sort} field is missing \bibgls\ by default falls back
 on the \field{name} field. If this is missing, this sort value will
 fallback on the \field{short} field. This means that if \field{name}
-isn't explicitly given in \atentry{dualentryabbreviation}, then the 
+isn't explicitly given in \atentry{dualabbreviationentry}, then the 
 primary entry will be sorted according to \field{short} but the dual
 will be sorted according its \field{name} (which has been copied
 from the primary \field{long}).
 
-Entries provided using \atentry{dualentryabbreviation} will be defined
+Entries provided using \atentry{dualabbreviationentry} will be defined
 with
 \begin{alltt}
-\csref{bibglsnewdualentryabbreviation}
+\csref{bibglsnewdualabbreviationentry}
 \end{alltt}
 (which uses \cs{newabbreviation}) for the primary entries and with 
 \begin{alltt}
-\csref{bibglsnewdualentryabbreviationsecondary}
+\csref{bibglsnewdualabbreviationentrysecondary}
 \end{alltt}
 (which uses \cs{longnewglossaryentry}) for the secondary entries.
 This means that if the \styopt{abbreviations}
@@ -2885,6 +3152,15 @@ package option is used, this will put the primary entry in the
 \optfmt{abbreviations} glossary and the secondary entry in the
 \optfmt{main} glossary.  Use the \optref{type} and
 \optref{dual-type} options to override this.
+
+\subsection{\atentry{dualentryabbreviation}}
+\labelatentry{dualentryabbreviation}
+
+This entry type is deprecated as from version 1.1. It's functionally
+equivalent to \atentryref{dualabbreviationentry}, 
+but the primary is defined using
+\csref{bibglsnewdualentryabbreviation} and the dual is defined
+using \csref{bibglsnewdualentryabbreviationsecondary}.
 
 \subsection{\atentry{dualsymbol}}
 \labelatentry{dualsymbol}
@@ -3204,6 +3480,55 @@ the post-description hook is no longer required.
 As \atentry{dualabbreviation} but defines the entries with
 \csref{bibglsnewdualacronym}.
 
+\section{Tertiary Entry Types}
+\label{sec:tertiaryentry}
+
+A tertiary entry type is essentially a dual entry that creates three
+separate (but related) \styfmt{glossaries-extra} entry definitions per 
+\ext{bib} entry. As with dual entries, the first and second of these
+are the primary and secondary. The third of these is the
+\keyword{tertiary} which is effectively an appendage of the
+secondary, and is defined by the same associated
+\csfmt{bibglsnew\ldots secondary} command that defines the secondary
+entry. Therefore the secondary and tertiary are both considered the
+dual and are treated as a single entry for the purposes of sorting
+and collating.
+
+The tertiary entry will never have any locations. Any records found
+will be assigned to the secondary (and may then be moved to the
+primary with \optref[primary]{combine-dual-locations}). The tertiary
+will always have the same order as the secondary and will have the same
+\field{group} value. You can set the \field{type} for the tertiary
+with \optref{tertiary-type} and the \field{category} with
+\optref{tertiary-category}. The label prefix defaults to
+\idprefix{tertiary} and can be changed with \optref{tertiary-prefix}.
+
+\subsection{\atentry{tertiaryindexabbreviationentry}}
+\labelatentry{tertiaryindexabbreviationentry}
+
+The \atentry{tertiaryindexabbreviationentry} entry type is
+very similar to \atentryref{dualindexabbreviation} but creates a
+tertiary entry as well. The mappings are shared by both entry types.
+
+\begin{verbatim}
+@tertiaryindexabbreviationentry{html,
+  short={HTML},
+  long = {hypertext markup language},
+  description={a markup language for creating web pages}
+}
+\end{verbatim}
+is analogous to
+\begin{verbatim}
+\newglossaryentry{html,name={HTML},description={}}
+
+\newabbreviation{dual.html}{HTML}{hypertext markup language}
+
+\newglossaryentry{tertiary.html, 
+  name={hypertext markup language},
+  description={a markup language for creating web pages}
+}
+\end{verbatim}
+
 \chapter{Resource File Options}
 \label{sec:resourceopts}
 
@@ -3491,24 +3816,24 @@ contains abbreviations defined in the form:
 }
 \end{verbatim}
 but suppose in one of my documents I actually want all these
-abbreviations defined with \atentryref{dualentryabbreviation}
+abbreviations defined with \atentryref{dualabbreviationentry}
 instead of \atentryref{abbreviation}. Instead of editing
 the \ext{bib} file I can just supply a mapping:
 \begin{verbatim}
 \GlsXtrLoadResources[
   src=entries,% data in entries.bib
-  entry-type-aliases={abbreviation=dualentryabbreviation}
+  entry-type-aliases={abbreviation=dualabbreviationentry}
 ]
 \end{verbatim}
 This makes all instances of \code{@abbreviation}
-behave as \code{@dualentryabbreviation}. You can have more than
+behave as \code{@dualabbreviationentry}. You can have more than
 one mapping. For example:
 \begin{verbatim}
 \GlsXtrLoadResources[
   src=entries,% data in entries.bib
   entry-type-aliases={
-    % @abbreviation -> @dualentryabbreviation:
-    abbreviation=dualentryabbreviation,
+    % @abbreviation -> @dualabbreviationentry:
+    abbreviation=dualabbreviationentry,
     % @entry -> @index:
     entry=index
   }
@@ -7345,21 +7670,21 @@ This essentially flips the \field{short} field with the
 \field{duallong} field. See \atentryref{dualabbreviation}
 for further details.
 
-\subsection{\csoptnv{dual-entryabbrv-map}=\marg{\margm{list1},\margm{list2}}}
-\labelopt{dual-entryabbrv-map}
+\subsection{\csoptnv{dual-abbrventry-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-abbrventry-map}
 
 This is like \csopt{dual-entry-map} but applies to
-\atentryref{dualentryabbreviation} rather than \atentry{dualentry}. 
+\atentryref{dualabbreviationentry} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
 \begin{verbatim}
-dual-entryabbrv-map=
+dual-abbrventry-map=
 {
   {long,short,shortplural},
   {name,text,plural}
 }
 \end{verbatim}
-See \atentryref{dualentryabbreviation} for further details.
+See \atentryref{dualabbreviationentry} for further details.
 
 
 \subsection{\csoptnv{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
@@ -7391,6 +7716,13 @@ This is like \csopt{dual-entry-map} but applies to
 
 This is like \csopt{dual-entry-map} but applies to both
 \atentryref{dualindexsymbol} and \atentryref{dualindexnumber}. 
+
+\subsection{\csoptnv{dual-indexabbrv-map}=\marg{\margm{list1},\margm{list2}}}
+\labelopt{dual-indexabbrv-map}
+
+This is like \csopt{dual-entry-map} but applies to both
+\atentryref{dualindexabbreviation} and
+\atentryref{tertiaryindexabbreviationentry}. 
 
 \subsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
 \labelopt{dual-entry-backlink}
@@ -7458,11 +7790,11 @@ defined with \atentryref{dualabbreviation} instead of
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualsymbol} instead of \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-entryabbrv-backlink}\csopteqval{boolean}}
-\labelopt{dual-entryabbrv-backlink}
+\subsection{\csoptnv{dual-abbrventry-backlink}\csopteqval{boolean}}
+\labelopt{dual-abbrventry-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
-defined with \atentryref{dualentryabbreviation} instead of
+defined with \atentryref{dualabbreviationentry} instead of
 \atentry{dualentry}.
 
 \subsection{\csoptnv{dual-indexentry-backlink}\csopteqval{boolean}}
@@ -7479,15 +7811,23 @@ This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualindexsymbol} and
 \atentryref{dualindexnumber}.
 
+\subsection{\csoptnv{dual-indexabbrv-backlink}\csopteqval{boolean}}
+\labelopt{dual-indexabbrv-backlink}
+
+This is analogous to \csopt{dual-entry-backlink} but for entries
+defined with \atentryref{dualindexabbreviation} and
+\atentryref{tertiaryindexabbreviationentry}.
+
 \subsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
 \labelopt{dual-backlink}
 
 Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
-\csopt[\meta{boolean}]{dual-entryabbrv-backlink}, 
+\csopt[\meta{boolean}]{dual-abbrventry-backlink}, 
 \csopt[\meta{boolean}]{dual-abbrv-backlink},
 \csopt[\meta{boolean}]{dual-symbol-backlink},
-\csopt[\meta{boolean}]{dual-indexentry-backlink}, and
-\csopt[\meta{boolean}]{dual-indexsymbol-backlink}.
+\csopt[\meta{boolean}]{dual-indexentry-backlink},
+\csopt[\meta{boolean}]{dual-indexsymbol-backlink}, and
+\csopt[\meta{boolean}]{dual-indexabbrv-backlink}.
 
 \subsection{\csoptnv{dual-field}\csopteqval{value}}
 \labelopt{dual-field}
@@ -7533,6 +7873,28 @@ hook could contain:
 Note that this new field won't be available for use within the
 \ext{bib} file (unless it was previously defined in the document
 before \csref{glsxtrresourcefile}).
+
+\section{Tertiary Entries}
+
+\subsection{\csoptnv{tertiary-prefix}\csopteqval{value}}
+\labelopt{tertiary-prefix}
+
+This option indicates the prefix to use for the tertiary entries. The
+default value is \idprefix{tertiary} (including the terminating period). 
+
+\subsection{\csoptnv{tertiary-type}\csopteqval{value}}
+\labelopt{tertiary-type}
+
+This option indicates that the tertiary entries should have
+their \field{type} field set to \meta{value}. If \meta{value} is
+empty the \field{type} is left unchanged.
+
+\subsection{\csoptnv{tertiary-category}\csopteqval{value}}
+\labelopt{tertiary-category}
+
+This option indicates that the tertiary entries should have
+their \field{category} field set to \meta{value}. If \meta{value} is
+empty the \field{category} is left unchanged.
 
 \chapter{Provided Commands}
 \label{sec:bibglscs}
@@ -7799,15 +8161,15 @@ file is:
 \labelcs{bibglsnewdualindexabbreviation}
 
 \begin{definition}
-\cs{bibglsnewdualindexabbreviation}\margm{dual-label}\margm{label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}
+\cs{bibglsnewdualindexabbreviation}\margm{label}\margm{dual-label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}
 \end{definition}
 This command is used to define primary terms identified with the
 \atentryref{dualindexabbreviation} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualindexabbreviation}[7]{%
-  \longnewglossaryentry*{#2}{%
-    name={\protect\bibglsuseabbrvfont{#4}{\glscategory{#1}}},%
+  \longnewglossaryentry*{#1}{%
+    name={\protect\bibglsuseabbrvfont{#4}{\glscategory{#2}}},%
     category={index},#3}{}%
 \end{verbatim}
 In this case \meta{dual-label} is the dual entry's label, which is used 
@@ -7821,8 +8183,11 @@ Note that the \field{name} uses \plabelcs{bibglsuseabbrvfont}
 \begin{definition}
 \cs{bibglsuseabbrvfont}\margm{text}\margm{category}
 \end{definition}
-to format the name. This ensures that it uses the same font as the
-short form for the dual abbreviation.
+to format the name, which ensures that it uses the same font as the
+short form for the dual abbreviation. This will use
+\cs{glsuseabbrvfont} (provided by \sty{glossaries-extra} version
+1.21) if it's defined otherwise it will be defined to replicate that
+command.
 
 \subsection{\csfmt{bibglsnewdualindexabbreviationsecondary}}
 \labelcs{bibglsnewdualindexabbreviationsecondary}
@@ -7844,6 +8209,40 @@ The definition provided in the
 This ensures that a missing or empty \field{description} doesn't
 interfere with the abbreviation style.
 
+\subsection{\csfmt{bibglsnewdualabbreviationentry}}
+\labelcs{bibglsnewdualabbreviationentry}
+
+\begin{definition}
+\cs{bibglsnewdualabbreviationentry}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentryref{dualabbreviationentry} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualabbreviationentry}[5]{%
+  \newabbreviation[#2]{#1}{#3}{#4}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{description} argument.
+
+\subsection{\csfmt{bibglsnewdualabbreviationentrysecondary}}
+\labelcs{bibglsnewdualabbreviationentrysecondary}
+
+\begin{definition}
+\cs{bibglsnewdualabbreviationentrysecondary}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define secondary terms identified with the
+\atentryref{dualabbreviationentry} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualabbreviationentrysecondary}[5]{%
+  \longnewglossaryentry*{#1}{#2}{#5}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{short} and \meta{long}
+arguments (which will typically be empty unless the default mappings
+are changed).
+
 \subsection{\csfmt{bibglsnewdualentryabbreviation}}
 \labelcs{bibglsnewdualentryabbreviation}
 
@@ -7851,6 +8250,7 @@ interfere with the abbreviation style.
 \cs{bibglsnewdualentryabbreviation}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
 \end{definition}
 This command is used to define primary terms identified with the
+(now deprecated)
 \atentryref{dualentryabbreviation} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
@@ -7867,6 +8267,7 @@ Note that this definition ignores the \meta{description} argument.
 \cs{bibglsnewdualentryabbreviationsecondary}\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}
 \end{definition}
 This command is used to define secondary terms identified with the
+(now deprecated)
 \atentryref{dualentryabbreviation} type. The definition provided in the \ext{glstex}
 file is:
 \begin{verbatim}
@@ -7942,6 +8343,53 @@ Remember that with the \styfmt{glossaries-extra} package \cs{newacronym}
 is redefined to just use \cs{newabbreviation} with the default \field{type}
 set to \cs{acronymtype} and the default \field{category} set to
 \cs{acronym}.
+
+\subsection{\csfmt{bibglsnewtertiaryindexabbreviationentry}}
+\labelcs{bibglsnewtertiaryindexabbreviationentry}
+
+\begin{definition}
+\cs{bibglsnewtertiaryindexabbreviationentry}\margm{label}\margm{dual-label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentryref{tertiaryindexabbreviationentry} type. It's essentially
+the same as \csref{bibglsnewdualindexabbrevation}.
+The definition provided in the \ext{glstex} file is:
+\begin{verbatim}
+\providecommand{\bibglsnewtertiaryindexabbreviationentry}[7]{%
+  \longnewglossaryentry*{#1}{%
+      name={\protect\bibglsuseabbrvfont{#4}{\glscategory{#2}}},%
+      category={index},#3}{}%
+}
+\end{verbatim}
+
+\begin{definition}
+\cs{bibglsnewtertiaryindexabbreviationentrysecondary}\margm{label}\margm{tertiary-label}\margm{options}\margm{tertiary
+opts}\margm{name}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define secondary and tertiary terms identified with the
+\atentryref{tertiaryindexabbreviationentry} type. The secondary
+term is an abbreviation and the tertiary term is a regular entry.
+The definition written to the \ext{glstex} file is:
+\begin{verbatim}
+\providecommand{\bibglsnewtertiaryindexabbreviationentrysecondary}[8]{%
+  \newabbreviation[#3]{#1}{#6}{#7}%
+  \longnewglossaryentry*{#2}%
+  {name={\protect\bibglsuselongfont{#7}{\glscategory{#1}}},#4}%
+  {#8}%
+}
+\end{verbatim}
+The \meta{label} is the label for the secondary (abbreviation) entry
+and \meta{tertiary-label} is the label for the tertiary (regular)
+entry.
+Note that the \field{name} uses \plabelcs{bibglsuselongfont}
+\begin{definition}
+\cs{bibglsuselongfont}\margm{text}\margm{category}
+\end{definition}
+to format the name, which ensures that it uses the same font as the
+long form for the dual abbreviation. This will use
+\cs{glsuselongfont} (provided by \sty{glossaries-extra} version
+1.21) if it's defined otherwise it will be defined to replicate that
+command.
 
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}
@@ -9196,7 +9644,7 @@ input file. In which case the default definition will be overridden.
 
 If the command definition isn't overridden, then it's converted to
 \begin{alltt}
-\atentryref{dualentryabbreviation}\marg{\meta{label},
+\atentryref{dualabbreviationentry}\marg{\meta{label},
   short = \margm{short},
   long = \margm{long},
   description = \margm{description},
@@ -9205,7 +9653,7 @@ If the command definition isn't overridden, then it's converted to
 \end{alltt}
 if \meta{\keyvallist} is supplied, otherwise it's converted to:
 \begin{alltt}
-\atentryref{dualentryabbreviation}\marg{\meta{label},
+\atentryref{dualabbreviationentry}\marg{\meta{label},
   short = \margm{short},
   long = \margm{long},
   description = \margm{description}
@@ -9246,7 +9694,7 @@ if the original file uses \cs{providecommand} or omits the
 definition of \cs{newdualentry}, then the \filefmt{.bib} file will
 contain:
 \begin{verbatim}
-@dualentryabbreviation{svm,
+@dualabbreviationentry{svm,
   short = {SVM},
   description = {Statistical pattern recognition technique},
   long = {support vector machine}

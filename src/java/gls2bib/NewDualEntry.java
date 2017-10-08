@@ -28,12 +28,12 @@ public class NewDualEntry extends NewGlossaryEntry
 {
    public NewDualEntry(Gls2Bib gls2bib)
    {
-      super("newdualentry", "dualentryabbreviation", gls2bib);
+      super("newdualentry", "dualabbreviationentry", gls2bib);
    }
 
    public NewDualEntry(String name, Gls2Bib gls2bib)
    {
-      super(name, "dualentryabbreviation", gls2bib);
+      super(name, "dualabbreviationentry", gls2bib);
    }
 
    public NewDualEntry(String name, String type, Gls2Bib gls2bib)

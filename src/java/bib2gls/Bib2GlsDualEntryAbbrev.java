@@ -29,7 +29,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsDualEntryAbbrev extends Bib2GlsDualEntry
+public class Bib2GlsDualEntryAbbrev extends Bib2GlsDualAbbrevEntry
 {
    public Bib2GlsDualEntryAbbrev(Bib2Gls bib2gls)
    {
@@ -39,133 +39,9 @@ public class Bib2GlsDualEntryAbbrev extends Bib2GlsDualEntry
    public Bib2GlsDualEntryAbbrev(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
+
+      bib2gls.warning(bib2gls.getMessage("warning.deprecated.type",
+       entryType, "dualabbreviationentry"));
    }
 
-   public HashMap<String,String> getMappings()
-   {
-      return getResource().getDualEntryAbbrevMap();
-   }
-
-   public String getFirstMap()
-   {
-      return getResource().getFirstDualEntryAbbrevMap();
-   }
-
-   public boolean backLink()
-   {
-      return getResource().backLinkFirstDualEntryAbbrevMap();
-   }
-
-   protected Bib2GlsDualEntry createDualEntry()
-   {
-      return new Bib2GlsDualEntryAbbrev(bib2gls, getEntryType()+"secondary");
-   }
-
-   public void checkRequiredFields(TeXParser parser)
-   {
-      if (getField("short") == null)
-      {
-         missingFieldWarning(parser, "short");
-      }
-
-      if (getField("long") == null)
-      {
-         missingFieldWarning(parser, "long");
-      }
-
-      if (getField("description") == null)
-      {
-         missingFieldWarning(parser, "description");
-      }
-   }
-
-   public String getFallbackValue(String field)
-   {
-      String val;
-
-      if (field.equals("name"))
-      {
-         val = getFieldValue("short");
-
-         if (val != null) return val;
-      }
-
-      return super.getFallbackValue(field);
-   }
-
-   public BibValueList getFallbackContents(String field)
-   {
-      BibValueList val;
-
-      if (field.equals("name"))
-      {
-         val = getField("short");
-
-         if (val != null) return val;
-      }
-
-      return super.getFallbackContents(field);
-   }
-
-   public void writeBibEntry(PrintWriter writer)
-   throws IOException
-   {
-      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
-
-      String sep = "";
-      String shortStr = "";
-      String longStr = "";
-      String descStr = "";
-
-      Set<String> keyset = getFieldSet();
-
-      Iterator<String> it = keyset.iterator();
-
-      while (it.hasNext())
-      {
-         String field = it.next();
-
-         if (field.equals("short"))
-         {
-            shortStr = getFieldValue(field);
-         }
-         else if (field.equals("long"))
-         {
-            longStr = getFieldValue(field);
-         }
-         else if (field.equals("description"))
-         {
-            descStr = getFieldValue(field);
-         }
-         else
-         {
-            writer.format("%s", sep);
-
-            sep = String.format(",%n");
-
-            writer.format("%s={%s}", field, getFieldValue(field));
-         }
-      }
-
-      writer.println(String.format("}%%%n{%s}{%s}%%%n{%s}",
-        shortStr, longStr, descStr));
-   }
-
-   public void writeCsDefinition(PrintWriter writer) throws IOException
-   {
-      // syntax: {label}{opts}{short}{long}{description}
-
-      writer.format("\\providecommand{\\%s}[5]{%%%n", getCsName());
-
-      if (isPrimary())
-      {
-         writer.println("  \\newabbreviation[#2]{#1}{#3}{#4}%");
-      }
-      else
-      {
-         writer.println("  \\longnewglossaryentry*{#1}{#2}{#5}%");
-      }
-
-      writer.println("}");
-   }
 }

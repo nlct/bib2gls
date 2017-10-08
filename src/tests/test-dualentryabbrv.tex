@@ -1,37 +1,37 @@
 % arara: pdflatex
 % arara: bib2gls: {group: on}
 % arara: pdflatex
-    \documentclass{article} 
+\documentclass{article} 
 
-    \usepackage[T1]{fontenc}
-    \usepackage[colorlinks]{hyperref}
-    \usepackage[record,abbreviations,style=indexgroup]{glossaries-extra}
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,abbreviations,style=indexgroup]{glossaries-extra}
     
-    \setabbreviationstyle{long-short-sc}
-    \GlsXtrLoadResources[src={entries-dualentryabbrv},
-      dual-backlink,
-      dual-field]
+\setabbreviationstyle{long-short-sc}
+\GlsXtrLoadResources[src={entries-dualentryabbrv},
+  dual-backlink,
+  dual-field]
 
-    \renewcommand*{\glsxtrpostdescabbreviation}{%
-        \ifglshasfield{dualid}{\glscurrententrylabel}
-        {%
-        \space
-        (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
-        }%
-      {no dualid}%
-    }
+\renewcommand*{\glsxtrpostdescabbreviation}{%
+    \ifglshasfield{dualid}{\glscurrententrylabel}
+    {%
+    \space
+    (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
+    }%
+  {no dualid}%
+}
 
-    \renewcommand*{\glsxtrpostdescgeneral}{%
-        \ifglshasfield{dualid}{\glscurrententrylabel}
-        {%
-        \space
-        (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
-        }%
-      {no dualid}%
-    }
+\renewcommand*{\glsxtrpostdescgeneral}{%
+    \ifglshasfield{dualid}{\glscurrententrylabel}
+    {%
+    \space
+    (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
+    }%
+  {no dualid}%
+}
 
-    \begin{document}
-    First use: \gls{shtml}. Next use: \gls{shtml}.
+\begin{document}
+First use: \gls{shtml}. Next use: \gls{shtml}.
 
-    \printunsrtglossaries
-    \end{document}
+\printunsrtglossaries
+\end{document}

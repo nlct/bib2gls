@@ -1,0 +1,49 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,abbreviations,index,stylemods={mcols},style=indexgroup]{glossaries-extra}
+
+\glssetcategoryattribute{index}{glossnamefont}{textmd}
+\setabbreviationstyle{long-em-short-em}
+
+\GlsXtrLoadResources[
+ %entry-type-aliases={dualabbreviationentry=tertiaryindexentryabbreviation},
+ src={test-dual-mix2},
+ dual-sort={letter-nocase},
+ combine-dual-locations=primary,
+ tertiary-type={main},
+ type=index,
+ selection=all
+]
+
+%\csshow{glolist@main}
+%\csshow{glolist@index}
+%\csshow{glolist@abbreviations}
+
+\begin{document}
+\chapter{Primary}
+
+Standard: \gls{aardvark}, \gls{zebra}, \gls{mouse}.
+
+Primary: \gls{antelope}, \gls{zander}, \gls{xml}, \gls{ssi},
+\gls{html}, \gls{css}.
+
+\chapter{Secondary}
+
+Secondary: \gls{dual.antelope}, \gls{dual.zander}, \gls{dual.xml},
+\gls{dual.ssi}, \gls{dual.html}, \gls{dual.css}.
+
+Next use: \gls{dual.xml},
+\gls{dual.ssi}, \gls{dual.html}, \gls{dual.css}.
+
+\chapter{Tertiary}
+
+Tertiary: \gls{tertiary.ssi}, \gls{tertiary.css}.
+
+\printunsrtglossary
+\printunsrtglossary[type=abbreviations]
+\printunsrtglossary[type=index,style=mcolindexgroup]
+\end{document}

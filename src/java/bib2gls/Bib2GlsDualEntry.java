@@ -46,6 +46,11 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return isprimary;
    }
 
+   public boolean hasTertiary()
+   {
+      return false;
+   }
+
    public String getFallbackValue(String field)
    {
       String val = super.getFallbackValue(field);

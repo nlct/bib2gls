@@ -502,11 +502,22 @@ public class GlsResource
          }
          else if (opt.equals("dual-entryabbrv-map"))
          {
+            bib2gls.warning(bib2gls.getMessage(
+              "warning.deprecated.option", opt, "dual-abbrventry-map"));
+
             String[] keys = new String[1];
 
-            dualEntryAbbrevMap = getDualMap(parser, list, opt, keys);
+            dualAbbrevEntryMap = getDualMap(parser, list, opt, keys);
 
-            dualEntryAbbrevFirstMap = keys[0];
+            dualAbbrevEntryFirstMap = keys[0];
+         }
+         else if (opt.equals("dual-abbrventry-map"))
+         {
+            String[] keys = new String[1];
+
+            dualAbbrevEntryMap = getDualMap(parser, list, opt, keys);
+
+            dualAbbrevEntryFirstMap = keys[0];
          }
          else if (opt.equals("dual-indexentry-map"))
          {
@@ -547,7 +558,7 @@ public class GlsResource
                backLinkDualEntry = true;
                backLinkDualAbbrev = true;
                backLinkDualSymbol = true;
-               backLinkDualEntryAbbrev = true;
+               backLinkDualAbbrevEntry = true;
                backLinkDualIndexEntry = true;
                backLinkDualIndexSymbol = true;
                backLinkDualIndexAbbrev = true;
@@ -557,7 +568,7 @@ public class GlsResource
                backLinkDualEntry = false;
                backLinkDualAbbrev = false;
                backLinkDualSymbol = false;
-               backLinkDualEntryAbbrev = false;
+               backLinkDualAbbrevEntry = false;
                backLinkDualIndexEntry = false;
                backLinkDualIndexSymbol = false;
                backLinkDualIndexAbbrev = false;
@@ -573,7 +584,13 @@ public class GlsResource
          }
          else if (opt.equals("dual-entryabbrv-backlink"))
          {
-            backLinkDualEntryAbbrev = getBoolean(parser, list, opt);
+            bib2gls.warning(bib2gls.getMessage("warning.deprecated.option", opt,
+              "dual-abbrventry-backlink"));
+            backLinkDualAbbrevEntry = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("dual-abbrventry-backlink"))
+         {
+            backLinkDualAbbrevEntry = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-indexentry-backlink"))
          {
@@ -626,6 +643,18 @@ public class GlsResource
          else if (opt.equals("dual-prefix"))
          {
             dualPrefix = getOptional(parser, list, opt);
+         }
+         else if (opt.equals("tertiary-prefix"))
+         {
+            tertiaryPrefix = getOptional(parser, list, opt);
+         }
+         else if (opt.equals("tertiary-category"))
+         {
+            tertiaryCategory = getOptional(parser, list, opt);
+         }
+         else if (opt.equals("tertiary-type"))
+         {
+            tertiaryType = getOptional(parser, list, opt);
          }
          else if (opt.equals("sort-suffix"))
          {
@@ -1071,6 +1100,30 @@ public class GlsResource
                dualPrefix == null ? "" : dualPrefix)));
       }
 
+      if ((labelPrefix == null && tertiaryPrefix == null)
+        ||(labelPrefix != null && tertiaryPrefix != null
+           && labelPrefix.equals(tertiaryPrefix)))
+      {
+         throw new IllegalArgumentException(
+            bib2gls.getMessage("error.option.clash",
+            String.format("label-prefix={%s}", 
+               labelPrefix == null ? "" : labelPrefix),
+            String.format("tertiary-prefix={%s}", 
+               tertiaryPrefix == null ? "" : tertiaryPrefix)));
+      }
+
+      if ((dualPrefix == null && tertiaryPrefix == null)
+        ||(dualPrefix != null && tertiaryPrefix != null
+           && dualPrefix.equals(tertiaryPrefix)))
+      {
+         throw new IllegalArgumentException(
+            bib2gls.getMessage("error.option.clash",
+            String.format("dual-prefix={%s}", 
+               dualPrefix == null ? "" : dualPrefix),
+            String.format("tertiary-prefix={%s}", 
+               tertiaryPrefix == null ? "" : tertiaryPrefix)));
+      }
+
       if (dualEntryMap == null)
       {
          dualEntryMap = new HashMap<String,String>();
@@ -1097,14 +1150,14 @@ public class GlsResource
          dualAbbrevFirstMap = "short";
       }
 
-      if (dualEntryAbbrevMap == null)
+      if (dualAbbrevEntryMap == null)
       {
-         dualEntryAbbrevMap = new HashMap<String,String>();
-         dualEntryAbbrevMap.put("long", "name");
-         dualEntryAbbrevMap.put("longplural", "plural");
-         dualEntryAbbrevMap.put("short", "text");
+         dualAbbrevEntryMap = new HashMap<String,String>();
+         dualAbbrevEntryMap.put("long", "name");
+         dualAbbrevEntryMap.put("longplural", "plural");
+         dualAbbrevEntryMap.put("short", "text");
 
-         dualEntryAbbrevFirstMap = "long";
+         dualAbbrevEntryFirstMap = "long";
       }
 
       if (dualSymbolMap == null)
@@ -1189,6 +1242,9 @@ public class GlsResource
          bib2gls.verbose(bib2gls.getMessage("message.dual.label.prefix", 
             dualPrefix == null ? "" : dualPrefix));
 
+         bib2gls.verbose(bib2gls.getMessage("message.tertiary.label.prefix", 
+            tertiaryPrefix == null ? "" : tertiaryPrefix));
+
          bib2gls.verbose(bib2gls.getMessage("message.dual.sort.mode", 
             dualSort == null ? "none" : dualSort));
 
@@ -1234,14 +1290,14 @@ public class GlsResource
          bib2gls.logMessage();
 
          bib2gls.verbose(bib2gls.getMessage(
-            "message.dual.entryabbreviation.mappings")); 
+            "message.dual.abbreviationentry.mappings")); 
 
-         for (Iterator<String> it = dualEntryAbbrevMap.keySet().iterator(); 
+         for (Iterator<String> it = dualAbbrevEntryMap.keySet().iterator(); 
               it.hasNext(); )
          {
             String key = it.next();
             bib2gls.verbose(String.format("%s -> %s", 
-               key, dualEntryAbbrevMap.get(key)));
+               key, dualAbbrevEntryMap.get(key)));
          }
 
          bib2gls.logMessage();
@@ -1407,6 +1463,12 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "dual-prefix"));
+      }
+
+      if (!"tertiary.".equals(tertiaryPrefix))
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "tertiary-prefix"));
       }
 
       if (dualSort != null)
@@ -2415,6 +2477,7 @@ public class GlsResource
 
                String primaryId = entry.getId();
                String dualId = null;
+               String tertiaryId = null;
 
                if (entry instanceof Bib2GlsDualEntry)
                {
@@ -2422,6 +2485,13 @@ public class GlsResource
                   entry.setDual(dual);
                   dual.setDual(entry);
                   dualId = dual.getId();
+
+                  if (((Bib2GlsDualEntry)entry).hasTertiary())
+                  {
+                     tertiaryId = (tertiaryPrefix == null ?
+                        entry.getOriginalId():
+                        tertiaryPrefix+entry.getOriginalId());
+                  }
 
                   // is there a cross-reference list?
 
@@ -2471,6 +2541,21 @@ public class GlsResource
                            {
                               entry.addRecord(record.copy(primaryId));
                               hasRecords = true;
+                           }
+                        }
+
+                        if (tertiaryId != null)
+                        {
+                           if (record.getLabel().equals(tertiaryId))
+                           {
+                              dual.addRecord(record.copy(dualId));
+                              dualHasRecords = true;
+
+                              if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
+                              {
+                                 entry.addRecord(record.copy(primaryId));
+                                 hasRecords = true;
+                              }
                            }
                         }
                      }
@@ -3346,7 +3431,7 @@ public class GlsResource
       checkFieldMaps(dualEntryMap, "dual-entry-map");
       checkFieldMaps(dualAbbrevMap, "dual-abbrv-map");
       checkFieldMaps(dualSymbolMap, "dual-symbol-map");
-      checkFieldMaps(dualEntryAbbrevMap, "dual-entryabbrv-map");
+      checkFieldMaps(dualAbbrevEntryMap, "dual-abbrventry-map");
       checkFieldMaps(dualIndexEntryMap, "dual-indexentry-map");
       checkFieldMaps(dualIndexSymbolMap, "dual-indexsymbol-map");
       checkFieldMaps(dualIndexAbbrevMap, "dual-indexabbrv-map");
@@ -4692,6 +4777,21 @@ public class GlsResource
       return dualPrefix;
    }
 
+   public String getTertiaryType()
+   {
+      return tertiaryType;
+   }
+
+   public String getTertiaryPrefix()
+   {
+      return tertiaryPrefix;
+   }
+
+   public String getTertiaryCategory()
+   {
+      return tertiaryCategory;
+   }
+
    public String getExternalPrefix(int idx)
    {
       if (externalPrefixes == null) return null;
@@ -4764,9 +4864,9 @@ public class GlsResource
       return dualAbbrevMap;
    }
 
-   public HashMap<String,String> getDualEntryAbbrevMap()
+   public HashMap<String,String> getDualAbbrevEntryMap()
    {
-      return dualEntryAbbrevMap;
+      return dualAbbrevEntryMap;
    }
 
    public HashMap<String,String> getDualIndexEntryMap()
@@ -4789,9 +4889,9 @@ public class GlsResource
       return dualAbbrevFirstMap;
    }
 
-   public String getFirstDualEntryAbbrevMap()
+   public String getFirstDualAbbrevEntryMap()
    {
-      return dualEntryAbbrevFirstMap;
+      return dualAbbrevEntryFirstMap;
    }
 
    public String getFirstDualIndexEntryMap()
@@ -4814,9 +4914,9 @@ public class GlsResource
       return backLinkDualAbbrev;
    }
 
-   public boolean backLinkFirstDualEntryAbbrevMap()
+   public boolean backLinkFirstDualAbbrevEntryMap()
    {
-      return backLinkDualEntryAbbrev;
+      return backLinkDualAbbrevEntry;
    }
 
    public boolean backLinkFirstDualIndexEntryMap()
@@ -5451,23 +5551,26 @@ public class GlsResource
 
    private String labelPrefix = null, dualPrefix="dual.";
 
+   private String tertiaryType=null, tertiaryCategory=null,
+     tertiaryPrefix="tertiary.";
+
    private String dualField = null;
 
    private HashMap<String,String> dualEntryMap, dualAbbrevMap,
-      dualSymbolMap, dualEntryAbbrevMap, dualIndexEntryMap,
+      dualSymbolMap, dualAbbrevEntryMap, dualIndexEntryMap,
       dualIndexSymbolMap, dualIndexAbbrevMap;
 
    // HashMap doesn't retain order, so keep track of the first
    // mapping separately.
 
    private String dualEntryFirstMap, dualAbbrevFirstMap, dualSymbolFirstMap,
-     dualEntryAbbrevFirstMap, dualIndexEntryFirstMap, dualIndexSymbolFirstMap,
+     dualAbbrevEntryFirstMap, dualIndexEntryFirstMap, dualIndexSymbolFirstMap,
      dualIndexAbbrevFirstMap;
 
    private boolean backLinkDualEntry=false;
    private boolean backLinkDualAbbrev=false;
    private boolean backLinkDualSymbol=false;
-   private boolean backLinkDualEntryAbbrev=false;
+   private boolean backLinkDualAbbrevEntry=false;
    private boolean backLinkDualIndexEntry=false;
    private boolean backLinkDualIndexSymbol=false;
    private boolean backLinkDualIndexAbbrev=false;
