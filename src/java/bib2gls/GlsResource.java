@@ -524,6 +524,14 @@ public class GlsResource
 
             dualIndexSymbolFirstMap = keys[0];
          }
+         else if (opt.equals("dual-indexabbrv-map"))
+         {
+            String[] keys = new String[1];
+
+            dualIndexAbbrevMap = getDualMap(parser, list, opt, keys);
+
+            dualIndexAbbrevFirstMap = keys[0];
+         }
          else if (opt.equals("dual-symbol-map"))
          {
             String[] keys = new String[1];
@@ -542,6 +550,7 @@ public class GlsResource
                backLinkDualEntryAbbrev = true;
                backLinkDualIndexEntry = true;
                backLinkDualIndexSymbol = true;
+               backLinkDualIndexAbbrev = true;
             }
             else
             {
@@ -551,6 +560,7 @@ public class GlsResource
                backLinkDualEntryAbbrev = false;
                backLinkDualIndexEntry = false;
                backLinkDualIndexSymbol = false;
+               backLinkDualIndexAbbrev = false;
             }
          }
          else if (opt.equals("dual-entry-backlink"))
@@ -572,6 +582,10 @@ public class GlsResource
          else if (opt.equals("dual-indexsymbol-backlink"))
          {
             backLinkDualIndexSymbol = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("dual-indexabbrv-backlink"))
+         {
+            backLinkDualIndexAbbrev = getBoolean(parser, list, opt);
          }
          else if (opt.equals("dual-symbol-backlink"))
          {
@@ -1087,6 +1101,7 @@ public class GlsResource
       {
          dualEntryAbbrevMap = new HashMap<String,String>();
          dualEntryAbbrevMap.put("long", "name");
+         dualEntryAbbrevMap.put("longplural", "plural");
          dualEntryAbbrevMap.put("short", "text");
 
          dualEntryAbbrevFirstMap = "long";
@@ -1116,8 +1131,18 @@ public class GlsResource
          dualIndexSymbolMap = new HashMap<String,String>();
          dualIndexSymbolMap.put("symbol", "name");
          dualIndexSymbolMap.put("name", "symbol");
+         dualIndexSymbolMap.put("symbolplural", "plural");
+         dualIndexSymbolMap.put("plural", "symbolplural");
 
          dualIndexSymbolFirstMap = "symbol";
+      }
+
+      if (dualIndexAbbrevMap == null)
+      {
+         dualIndexAbbrevMap = new HashMap<String,String>();
+         dualIndexAbbrevMap.put("name", "name");
+
+         dualIndexAbbrevFirstMap = "name";
       }
 
       if (dualSort == null)
@@ -1243,6 +1268,19 @@ public class GlsResource
             String key = it.next();
             bib2gls.verbose(String.format("%s -> %s", 
                key, dualIndexSymbolMap.get(key)));
+         }
+
+         bib2gls.logMessage();
+
+         bib2gls.verbose(bib2gls.getMessage(
+            "message.dual.indexabbrv.mappings")); 
+
+         for (Iterator<String> it = dualIndexAbbrevMap.keySet().iterator(); 
+              it.hasNext(); )
+         {
+            String key = it.next();
+            bib2gls.verbose(String.format("%s -> %s", 
+               key, dualIndexAbbrevMap.get(key)));
          }
 
          bib2gls.logMessage();
@@ -3311,6 +3349,7 @@ public class GlsResource
       checkFieldMaps(dualEntryAbbrevMap, "dual-entryabbrv-map");
       checkFieldMaps(dualIndexEntryMap, "dual-indexentry-map");
       checkFieldMaps(dualIndexSymbolMap, "dual-indexsymbol-map");
+      checkFieldMaps(dualIndexAbbrevMap, "dual-indexabbrv-map");
 
       Vector<Bib2GlsEntry> entries = new Vector<Bib2GlsEntry>();
 
@@ -4740,6 +4779,11 @@ public class GlsResource
       return dualIndexSymbolMap;
    }
 
+   public HashMap<String,String> getDualIndexAbbrevMap()
+   {
+      return dualIndexAbbrevMap;
+   }
+
    public String getFirstDualAbbrevMap()
    {
       return dualAbbrevFirstMap;
@@ -4758,6 +4802,11 @@ public class GlsResource
    public String getFirstDualIndexSymbolMap()
    {
       return dualIndexSymbolFirstMap;
+   }
+
+   public String getFirstDualIndexAbbrevMap()
+   {
+      return dualIndexAbbrevFirstMap;
    }
 
    public boolean backLinkFirstDualAbbrevMap()
@@ -4780,11 +4829,15 @@ public class GlsResource
       return backLinkDualIndexSymbol;
    }
 
+   public boolean backLinkFirstDualIndexAbbrevMap()
+   {
+      return backLinkDualIndexAbbrev;
+   }
+
    public String getDualField()
    {
       return dualField;
    }
-
 
    private void checkFieldMaps(HashMap<String,String> mapping, String optName)
     throws Bib2GlsException
@@ -5267,6 +5320,16 @@ public class GlsResource
       return combineDualLocations;
    }
 
+   public String getCategory()
+   {
+      return category;
+   }
+
+   public String getDualCategory()
+   {
+      return dualCategory;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -5392,13 +5455,14 @@ public class GlsResource
 
    private HashMap<String,String> dualEntryMap, dualAbbrevMap,
       dualSymbolMap, dualEntryAbbrevMap, dualIndexEntryMap,
-      dualIndexSymbolMap;
+      dualIndexSymbolMap, dualIndexAbbrevMap;
 
    // HashMap doesn't retain order, so keep track of the first
    // mapping separately.
 
    private String dualEntryFirstMap, dualAbbrevFirstMap, dualSymbolFirstMap,
-     dualEntryAbbrevFirstMap, dualIndexEntryFirstMap, dualIndexSymbolFirstMap;
+     dualEntryAbbrevFirstMap, dualIndexEntryFirstMap, dualIndexSymbolFirstMap,
+     dualIndexAbbrevFirstMap;
 
    private boolean backLinkDualEntry=false;
    private boolean backLinkDualAbbrev=false;
@@ -5406,6 +5470,7 @@ public class GlsResource
    private boolean backLinkDualEntryAbbrev=false;
    private boolean backLinkDualIndexEntry=false;
    private boolean backLinkDualIndexSymbol=false;
+   private boolean backLinkDualIndexAbbrev=false;
 
    private String shortCaseChange=null;
    private String dualShortCaseChange=null;

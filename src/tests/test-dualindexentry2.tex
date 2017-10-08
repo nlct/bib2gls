@@ -6,10 +6,16 @@
 \documentclass{report}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,symbols,index,stylemods=mcols]{glossaries-extra}
+\usepackage[record,symbols,abbreviations,index,stylemods={mcols}]{glossaries-extra}
 
 \newcommand{\bibglsnewdualindexsymbolsecondary}[5]{%
   \longnewglossaryentry*{#1}{name={#3},category=symbol,symbol={#4},#2,type={symbols}}{#5}%
+}
+
+\newcommand{\bibglsnewdualindexabbreviationsecondary}[7]{%
+  \ifstrempty{#6}%
+  {\newabbreviation[#2,type=abbreviations]{#1}{#4}{#5}}%
+  {\newabbreviation[#2,type=abbreviations,description={#6}]{#1}{#4}{#5}}%
 }
 
 \newcommand{\indexprimary}[1]{\glsadd[format=hyperbf]{idx.#1}}
@@ -22,8 +28,26 @@
   \indexprimary{\glscurrententrylabel}%
 }
 
+\renewcommand{\glsxtrpostdescabbreviation}{%
+  \indexprimary{\glscurrententrylabel}%
+}
+
+\newcommand{\glsxtrpostdescbacteria}{%
+  \indexprimary{\glscurrententrylabel}%
+}
+
+\setabbreviationstyle{long-short-sc}
+\setabbreviationstyle[bacteria]{long-only-short-only}
+
+\renewcommand*{\glslongonlyfont}{\emph}
+\renewcommand*{\glsabbrvonlyfont}{\emph}
+
 \GlsXtrLoadResources[
- src={entries-dual-index-entry,testfile1,entries-dual-index-symbol},
+ src={entries-dual-index-entry,%
+      testfile1,entries-dual-index-symbol,%
+      entries-dual-index-abbreviation,%
+      bacteria},
+ category=index,
  type=index,
  set-widest,
  label-prefix={idx.},
@@ -45,18 +69,27 @@
 
 \gls{e} and \gls{pi}.
 
+\gls{ssi} and \gls{html}.
+
+\gls{cbot} and \gls{putida}.
+
 \newpage
 \gls{array}, \idx{vector}, \idx{set}, \gls{matrix}.
+
+\gls{cbot} and \gls{putida}.
 
 \newpage
 \gls{array}, \gls{vector}, \gls{set}, \gls{matrix}.
 
+\gls{ssi} and \gls{html}.
 
 \renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
 \printunsrtglossary[type=main,nogroupskip,style=alttree]
 
 \renewcommand{\glstreenamefmt}[1]{#1}
 \printunsrtglossary[type=symbols,nogroupskip,style=index]
+
+\printunsrtglossary[type=abbreviations,nogroupskip,style=index]
 
 \renewcommand{\glstreenamefmt}[1]{#1}
 \renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}

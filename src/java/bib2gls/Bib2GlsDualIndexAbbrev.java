@@ -29,55 +29,48 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
+public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
 {
-   public Bib2GlsDualIndexSymbol(Bib2Gls bib2gls)
+   public Bib2GlsDualIndexAbbrev(Bib2Gls bib2gls)
    {
-      this(bib2gls, "dualindexsymbol", "symbol");
+      this(bib2gls, "dualindexabbreviation");
    }
 
-   public Bib2GlsDualIndexSymbol(Bib2Gls bib2gls, String entryType)
-   {
-      this(bib2gls, entryType, "symbol");
-   }
-
-   public Bib2GlsDualIndexSymbol(Bib2Gls bib2gls, String entryType,
-      String defaultCategory)
+   public Bib2GlsDualIndexAbbrev(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
-      category = defaultCategory;
    }
 
    public HashMap<String,String> getMappings()
    {
-      return getResource().getDualIndexSymbolMap();
+      return getResource().getDualIndexAbbrevMap();
    }
 
    public String getFirstMap()
    {
-      return getResource().getFirstDualIndexSymbolMap();
+      return getResource().getFirstDualIndexAbbrevMap();
    }
 
    public boolean backLink()
    {
-      return getResource().backLinkFirstDualIndexSymbolMap();
+      return getResource().backLinkFirstDualIndexAbbrevMap();
    }
 
    protected Bib2GlsDualEntry createDualEntry()
    {
-      return new Bib2GlsDualIndexSymbol(bib2gls, getEntryType()+"secondary");
+      return new Bib2GlsDualIndexAbbrev(bib2gls, getEntryType()+"secondary");
    }
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("description") == null)
+      if (getField("short") == null)
       {
-         missingFieldWarning(parser, "description");
+         missingFieldWarning(parser, "short");
       }
 
-      if (getField("symbol") == null)
+      if (getField("long") == null)
       {
-         missingFieldWarning(parser, "symbol");
+         missingFieldWarning(parser, "long");
       }
    }
 
@@ -87,7 +80,9 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
       if (field.equals("name"))
       {
-         return getOriginalId();
+         val = getFieldValue("short");
+
+         return val == null ? getFallbackValue("short") : val;
       }
 
       return super.getFallbackValue(field);
@@ -95,30 +90,35 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
    public BibValueList getFallbackContents(String field)
    {
-      if (field.equals("name") && bib2gls.useInterpreter())
-      {
-         String name = getOriginalId();
-         BibValueList list = new BibValueList();
-         list.add(new BibUserString(
-            bib2gls.getInterpreterListener().createGroup(name)));
+      BibValueList val;
 
-         return list;
-      }
-      else
+      if (field.equals("name"))
       {
-         return super.getFallbackContents(field);
+         val = getField("short");
+
+         return val == null ? getFallbackContents("short") : val;
       }
+
+      return super.getFallbackContents(field);
    }
 
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
-      writer.format("\\%s{%s}%%%n{", getCsName(), getId());
+      writer.format("\\%s", getCsName());
+
+      if (isPrimary())
+      {
+         writer.format("{%s}", getDual().getId());
+      }
+
+      writer.format("{%s}%%%n{", getId());
 
       String sep = "";
       String descStr = "";
       String nameStr = null;
-      String symbolStr = "";
+      String shortStr = "";
+      String longStr = "";
 
       Set<String> keyset = getFieldSet();
 
@@ -136,9 +136,13 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
          {
             nameStr = getFieldValue(field);
          }
-         else if (field.equals("symbol"))
+         else if (field.equals("short"))
          {
-            symbolStr = getFieldValue(field);
+            shortStr = getFieldValue(field);
+         }
+         else if (field.equals("long"))
+         {
+            longStr = getFieldValue(field);
          }
          else
          {
@@ -155,31 +159,35 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
          nameStr = getFallbackValue("name");
       }
 
-      writer.println(String.format("}%%%n{%s}{%s}%n{%s}", 
-        nameStr, symbolStr, descStr));
+      writer.println(String.format("}%%%n{%s}{%s}{%s}%n{%s}", 
+        nameStr, shortStr, longStr, descStr));
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
-      // syntax: {label}{opts}{name}{symbol}{description}
-
-      writer.format("\\providecommand{\\%s}[5]{%%%n", getCsName());
-
-      writer.println("  \\longnewglossaryentry*{#1}{name={#3},");
-
       if (isPrimary())
       {
-         writer.println("category={index}");
+         writer.println("\\providecommand*{\\bibglsuseabbrvfont}[2]{{\\glssetabbrvfmt{#2}\\glsabbrvfont{#1}}}");
+
+         // syntax: {duallabel}{label}{opts}{name}{short}{long}{description}
+
+         writer.format("\\providecommand{\\%s}[7]{%%%n", getCsName());
+
+         writer.println("  \\longnewglossaryentry*{#2}{%");
+         writer.println("      name={\\protect\\bibglsuseabbrvfont{#4}{\\glscategory{#1}}},%");
+         writer.println("      category={index},#3}{}%");
       }
       else
       {
-         writer.format("category={%s}", category);
-      }
+         // syntax: {label}{opts}{name}{short}{long}{description}
 
-      writer.println("symbol={#4},#2}{#5}%");
+         writer.format("\\providecommand{\\%s}[6]{%%%n", getCsName());
+
+         writer.println("  \\ifstrempty{#6}%");
+         writer.println("  {\\newabbreviation[#2]{#1}{#4}{#5}}%");
+         writer.println("  {\\newabbreviation[#2,description={#6}]{#1}{#4}{#5}}%");
+      }
 
       writer.println("}");
    }
-
-   private String category;
 }

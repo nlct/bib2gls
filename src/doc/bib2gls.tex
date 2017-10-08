@@ -1611,6 +1611,7 @@ This is the default setting.
 
 \chapter{\ext{bib} Format}
 \label{sec:bib}
+\setcounter{secnumdepth}{1}
 
 \bibgls\ recognises certain entry types. Any unrecognised types will
 be ignored and a warning will be written to the transcript file.
@@ -1877,8 +1878,8 @@ the \optref{type} option).
 \end{table}
 
 \begin{table}[hbtp]
-\caption{Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}
-(don't use with \bibgls)}\label{tab:baseinternalfields}
+\caption[Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}]{Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}
+(don't use in \ext{bib} files)}\label{tab:baseinternalfields}
 \centering
 \medskip
 \begin{tabular}{ll}
@@ -1922,7 +1923,10 @@ escaping special characters).\\
 
 \clearpage
 
-\section{\atentry{string}}
+\section{Standard Entry Types}
+\label{sec:standardentry}
+
+\subsection{\atentry{string}}
 \labelatentry{string}
 
 The standard \atentry{string} is available and can be used to define
@@ -1949,7 +1953,7 @@ For example:
 }
 \end{verbatim}
 
-\section{\atentry{preamble}}
+\subsection{\atentry{preamble}}
 \labelatentry{preamble}
 
 The standard \atentry{preamble} is available and can be used to
@@ -2170,7 +2174,38 @@ Alternatively to avoid links with \csfmt{gcard} as well:
 Now \csfmt{gset} and \csfmt{gcard} are simply formatting commands,
 but their actual definitions are determined in the \ext{bib} file.
 
-\section{\atentry{entry}}
+\section{Single Entry Types}
+\label{sec:singleentry}
+
+The entry types described in this section create a single glossary
+definition per entry (from \styfmt{glossaries-extra}'s point of view). 
+For example
+\begin{verbatim}
+@entry{matrix,
+  name={matrix},
+  plural={matrices},
+  description={rectangular array of values}
+}
+\end{verbatim}
+is analogous to
+\begin{verbatim}
+\newglossaryentry{matrix}% label
+{% fields
+  name={matrix},
+  plural={matrices},
+  description={rectangular array of values}
+}
+\end{verbatim}
+The \optref{secondary} option allows the creation of a fake glossary
+with the entry labels in its internal list in a different order.
+This means that the same data can be displayed in two separate lists
+without duplicating the resources required by each glossary entry.
+
+\Sectionref{sec:dualentry} describes \bibgls\ entry types
+that create two separate (but related) \styfmt{glossaries-extra}
+definitions per \ext{bib} entry.
+
+\subsection{\atentry{entry}}
 \labelatentry{entry}
 
 Regular terms are defined by the \atentry{entry} field. This requires the
@@ -2211,7 +2246,7 @@ default is obtained from the \field{name} field.
 Terms defined using \atentry{entry} will be written to the output
 (\ext{glstex}) file using the command \csref{bibglsnewentry}.
 
-\section{\atentry{symbol}}
+\subsection{\atentry{symbol}}
 \labelatentry{symbol}
 
 The \atentry{symbol} entry type is much like \atentry{entry}, but it's
@@ -2234,7 +2269,7 @@ given by the entry label. Note that this is different from
 Terms that are defined using \atentry{symbol} will be written to
 the output file using the command \csref{bibglsnewsymbol}.
 
-\section{\atentry{number}}
+\subsection{\atentry{number}}
 \labelatentry{number}
 
 The \atentry{number} entry type is like \atentry{symbol}, but it's for
@@ -2281,7 +2316,7 @@ glossary format to include the \field{user1} field:
 }
 \end{verbatim}
 
-\section{\atentry{index}}
+\subsection{\atentry{index}}
 \labelatentry{index}
 
 The \atentry{index} entry type is designed for entries that don't
@@ -2308,7 +2343,7 @@ Example:
 Terms that are defined using \atentry{index} will be written to the output
 file using the command \csref{bibglsnewindex}.
 
-\section{\atentry{abbreviation}}
+\subsection{\atentry{abbreviation}}
 \labelatentry{abbreviation}
 
 The \atentry{abbreviation} entry type is designed for abbreviations.
@@ -2367,28 +2402,73 @@ or to convert the short value to upper case and use the
 Terms defined using \atentry{abbreviation} will be written to the output
 file using the command \csref{bibglsnewabbreviation}.
 
-\section{\atentry{acronym}}
+\subsection{\atentry{acronym}}
 \labelatentry{acronym}
 
 The \atentry{acronym} entry type is like \atentry{abbreviation} except that
 the term is written to the output file using the command
 \csref{bibglsnewacronym}.
 
-\section{\atentry{dualentry}}
+\section{Dual Entry Types}
+\label{sec:dualentry}
+
+The entry types described in this section create two separate (but
+related) \styfmt{glossaries-extra} entry definitions per \bibgls\
+entry. The first of these entries is considered the
+\keyword{primary} entry, and the second is the \keyword{dual} entry
+(also referred to as the \keyword{secondary} entry, but is not
+related to the \optref{secondary} option).
+For example
+\begin{verbatim}
+@dualentryabbreviation{svm,
+  short = {SVM},
+  long = {support vector machine},
+  description = {statistical pattern recognition technique}
+}
+\end{verbatim}
+is analogous to
+\begin{verbatim}
+\newabbreviation{svm}{SVM}{support vector machine}
+\newglossaryentry{dual.svm}{name={support vector machine},
+ description={statistical pattern recognition technique}}
+\end{verbatim}
+but both entries are considered dependent on each other. This means
+that if you only reference the primary entry (using \cs{gls} etc)
+then the dual entry will still be selected if the \optref{selection}
+setting includes dependencies.
+
+The creation of the dual entry involves mapping or copying fields
+from the primary entry. Each dual entry type has a set of mappings.
+Any fields that aren't listed in the mappings are simply copied,
+except for the \field{alias} field, which will never be copied to
+the dual entry, nor can it be mapped. The alias will only apply to
+the primary entry.  The dual entry is given the label
+\meta{prefix}\meta{id} where \meta{prefix} is set by the
+\optref{dual-prefix} option and \meta{id} is the label supplied in
+the \ext{bib} file.
+
+If \optref[combine]{dual-sort} then the dual entries will be sorted
+along with the primary entries, otherwise the \csopt{dual-sort}
+indicates how to sort the dual entries and the dual entries will be
+appended to the end of the \ext{glstex} file. The
+\optref{dual-sort-field} determines what field to use for the sort
+value if the dual entries should be sorted separately.
+
+\subsection{\atentry{dualentry}}
 \labelatentry{dualentry}
 
-The \atentry{dualentry} entry type is similar to \atentry{entry} but
-actually defines two entries: the primary entry and the dual entry.
+The \atentry{dualentry} entry type is similar to \atentryref{entry} but
+actually defines two entries.
 The dual entry contains the same information as the primary entry
-but some of the fields are swapped around. The dual entry is given
-the prefix set by the \optref{dual-prefix} option.
-
-Note that the \field{alias} field will never be copied to the dual
-entry, nor can it be mapped. The alias will only apply to the
-primary entry.
-
-By default, the \field{name} and \field{description} fields and the
-\field{plural} and \field{descriptionplural} fields are swapped.
+but some of the fields are swapped around.
+The default mappings are:
+\begin{itemize}
+\item \field{name} $\mapsto$ \field{description}
+\item \field{plural} $\mapsto$ \field{descriptionplural}
+\item \field{description} $\mapsto$ \field{name}
+\item \field{descriptionplural} $\mapsto$ \field{plural}
+\end{itemize}
+The required fields are as for \atentryref{entry}.
 
 For example:
 \begin{verbatim}
@@ -2421,13 +2501,6 @@ defined using \csref{bibglsnewdualentry}. The \field{category}
 and \field{type} fields can be set for the dual entry using the
 \optref{dual-category} and \optref{dual-type} options.
 
-If \optref[combine]{dual-sort} then the dual entries will be sorted
-along with the primary entries, otherwise the \csopt{dual-sort}
-indicates how to sort the dual entries and the dual entries will be
-appended to the end of the \ext{glstex} file. The
-\optref{dual-sort-field} determines what field to use for the sort
-value if the dual entries should be sorted separately.
-
 For example:
 \begin{verbatim}
 \newglossary*{english}{English}
@@ -2444,7 +2517,7 @@ For example:
 ]
 \end{verbatim}
 
-\section{\atentry{dualindexentry}}
+\subsection{\atentry{dualindexentry}}
 \labelatentry{dualindexentry}
 
 There's only one required field: \field{description}.  The primary
@@ -2454,7 +2527,12 @@ like \atentryref{entry}.  The default field mapping is:
 \item \field{name} $\mapsto$ \field{name}
 \end{itemize}
 This doesn't actually perform any swapping of fields, but it
-provides the field used for backlinks.
+provides the field used for backlinks (if
+\optref{dual-indexentry-backlink} is set). The reason that the primary
+(rather than the dual) is like \atentryref{index} is to allow the
+primaries to merge with any \atentryref{index} entries found in the
+resource set, since glossary entries with descriptions are likely to 
+be a subset of all indexed entries.
 
 If no \field{name} is given, the dual entry is assigned the
 (unprefixed) entry label. For example:
@@ -2472,12 +2550,11 @@ This is effectively like
   description={ordered list of values}
 }
 \end{verbatim}
-but they are linked so that if one entry is used the other is
-automatically selected (if the \optref{selection} setting includes
-dependencies).
-
-The primary entries are defined using \csref{bibglsnewdualindexentry}
-and the dual entries are defined using
+The primary entries are defined using
+\csref{bibglsnewdualindexentry},
+which by default sets the \field{category} to \optfmt{index}
+(although this may be overridden, for example, by the \optref{category} option).
+The dual entries are defined with
 \csref{bibglsnewdualindexentrysecondary}.
 
 This is the most convenient way of having an entry that's also
@@ -2538,25 +2615,69 @@ index and a glossary:
 \printunsrtglossary[type=index,style=mcolindexgroup]
 \end{document}
 \end{verbatim}
+This uses \optref{combine-dual-locations} to combine the locations
+for the primary and dual entries so that they only appear in the
+index.
 
-\section{\atentry{dualindexsymbol}}
+\subsection{\atentry{dualindexabbreviation}}
+\labelatentry{dualindexabbreviation}
+
+The \atentry{dualindexabbreviation} entry type is similar to 
+\atentryref{dualindexentry} and again, by default, the
+field mapping is:
+\begin{itemize}
+\item \field{name} $\mapsto$ \field{name}
+\end{itemize}
+However in this case the required fields are \field{short} and
+\field{long}. The \field{name} for the primary entry defaults to
+\field{short} if omitted.
+
+For example:
+\begin{verbatim}
+@dualindexabbreviation{html,
+  short={html},
+  long = {hypertext markup language}
+}
+\end{verbatim}
+is like
+\begin{verbatim}
+@index{html}
+
+@abbreviation{dual.html,
+  short={html},
+  long = {hypertext markup language}
+}
+\end{verbatim}
+The primary term is defined using
+\csref{bibglsnewdualindexabbreviation}, which encapsulates the
+\field{name} in \csref{bibglsuseabbrvfont} to match the font used by
+the dual abbreviation. It also
+by default sets the \field{category} to \optfmt{index} (although
+this again may be overridden).
+The dual term is defined using
+\csref{bibglsnewdualindexabbreviationsecondary}.
+
+\subsection{\atentry{dualindexsymbol}}
 \labelatentry{dualindexsymbol}
 
 The \atentry{dualindexsymbol} entry type is similar to 
 \atentryref{dualindexentry}, but by default the
 field mappings are:
 \begin{itemize}
-\item \field{name} $\mapsto$ \field{symbol}
 \item \field{symbol} $\mapsto$ \field{name}
+\item \field{name} $\mapsto$ \field{symbol}
+\item \field{symbolplural} $\mapsto$ \field{plural}
+\item \field{plural} $\mapsto$ \field{symbolplural}
 \end{itemize}
 The required fields are: \field{symbol} and \field{description}.
 If the \field{name} field is omitted, the dual entry is assigned a
-symbol from the primary's (unprefixed) label.
-
+symbol from the original (unprefixed) label.
 The primary entries are defined using
-\csref{bibglsnewdualindexsymbol}
+\csref{bibglsnewdualindexsymbol},
+which by default sets the \field{category} to \optfmt{index},
 and the dual entries are defined using
-\csref{bibglsnewdualindexsymbolsecondary}.
+\csref{bibglsnewdualindexsymbolsecondary},
+which by default sets the \field{category} to \optfmt{symbol}.
 For example:
 \begin{verbatim}
 @dualindexsymbol{pi,
@@ -2574,7 +2695,6 @@ is like
   description={ratio of a circle's circumference to its diameter}
 }
 \end{verbatim}
-but the terms are dependent on each other.
 
 For example, suppose I have a file called \filefmt{symbols.bib} that
 contains:
@@ -2684,15 +2804,19 @@ pdflatex myDoc
 bib2gls -g myDoc
 pdflatex myDoc
 \end{verbatim}
-After this, you can switch back to just:
-\begin{verbatim}
-pdflatex myDoc
-bib2gls -g myDoc
-pdflatex myDoc
-\end{verbatim}
-until you reference a new entry.
 
-\section{\atentry{dualentryabbreviation}}
+\subsection{\atentry{dualindexnumber}}
+\labelatentry{dualindexnumber}
+
+The \atentry{dualindexnumber} entry type is almost identical to
+\atentry{dualindexsymbol}, but the primary entries are defined using
+\csref{bibglsnewdualindexnumber},
+which by default sets the \field{category} to \optfmt{index},
+and the dual entries are defined using
+\csref{bibglsnewdualindexnumbersecondary},
+which by default sets the \field{category} to \optfmt{number}.
+
+\subsection{\atentry{dualentryabbreviation}}
 \labelatentry{dualentryabbreviation}
 
 The \atentry{dualentryabbreviation} entry type is similar to 
@@ -2700,6 +2824,7 @@ The \atentry{dualentryabbreviation} entry type is similar to
 field mappings are:
 \begin{itemize}
 \item \field{long} $\mapsto$ \field{name}
+\item \field{longplural} $\mapsto$ \field{plural}
 \item \field{short} $\mapsto$ \field{text}
 \end{itemize}
 You may need to add a mapping from \field{shortplural} to
@@ -2737,10 +2862,6 @@ but \code{dual.svm} will automatically be selected if \code{svm}
 is indexed in the document. If \code{dual.svm} isn't explicitly
 indexed, it won't have a location list.
 
-As with \atentry{dualentry}, the \field{alias} field will never
-be copied to the dual entry, nor can it be mapped. The alias will
-only apply to the primary entry.
-
 If the \field{sort} field is missing \bibgls\ by default falls back
 on the \field{name} field. If this is missing, this sort value will
 fallback on the \field{short} field. This means that if \field{name}
@@ -2765,18 +2886,17 @@ package option is used, this will put the primary entry in the
 \optfmt{main} glossary.  Use the \optref{type} and
 \optref{dual-type} options to override this.
 
-\section{\atentry{dualsymbol}}
+\subsection{\atentry{dualsymbol}}
 \labelatentry{dualsymbol}
 
-This is like \atentryref{dualentry} but the default mappings
-swap the \field{name} and \field{symbol} fields (and the
-\field{plural} and \field{symbolplural} fields). The \field{name}
-and \field{symbol} are required.
-
-As with \atentry{dualentry}, the \field{alias} field will never
-be copied to the dual entry, nor can it be mapped. The alias will
-only apply to the primary entry.
-
+This is like \atentryref{dualentry} but the default mappings are:
+\begin{itemize}
+\item \field{name} $\mapsto$ \field{symbol}
+\item \field{plural} $\mapsto$ \field{symbolplural}
+\item \field{symbol} $\mapsto$ \field{name}
+\item \field{symbolplural} $\mapsto$ \field{plural}
+\end{itemize}
+The \field{name} and \field{symbol} fields are required.
 For example:
 \begin{verbatim}
 @dualsymbol{pi,
@@ -2790,10 +2910,10 @@ For example:
 Entries are defined using \csref{bibglsnewdualsymbol}, which by 
 default sets the \field{category} to \optfmt{symbol}.
 
-\section{\atentry{dualnumber}}
+\subsection{\atentry{dualnumber}}
 \labelatentry{dualnumber}
 
-This is much the same as \atentryref{dualsymbol} but entries are
+This is almost identical to \atentryref{dualsymbol} but entries are
 defined using \csref{bibglsnewdualnumber}, which by default sets
 the \field{category} to \optfmt{number}.
 
@@ -2832,9 +2952,22 @@ could be sorted numerically according to the approximate value:
 ]
 \end{verbatim}
 
-\section{\atentry{dualabbreviation}}
+\subsection{\atentry{dualabbreviation}}
 \labelatentry{dualabbreviation}
 
+The \atentry{dualabbreviation} entry type is similar to 
+\atentry{dualentry}, but by default the
+field mappings are:
+\begin{itemize}
+\item \field{short} $\mapsto$ \field{dualshort}
+\item \field{shortplural} $\mapsto$ \field{dualshortplural}
+\item \field{long} $\mapsto$ \field{duallong}
+\item \field{longplural} $\mapsto$ \field{duallongplural}
+\item \field{dualshort} $\mapsto$ \field{short}
+\item \field{dualshortplural} $\mapsto$ \field{shortplural}
+\item \field{duallong} $\mapsto$ \field{long}
+\item \field{duallongplural} $\mapsto$ \field{longplural}
+\end{itemize}
 The required fields are: \field{short}, \field{long}, 
 \field{dualshort} and \field{duallong}.
 This includes some new fields: \field{dualshort},
@@ -2852,29 +2985,12 @@ the creation of a field access command (analogous to
 further details.) Remember that the field won't be
 available until the \ext{glstex} file has been created.
 
-As with \atentry{dualentry}, the \field{alias} field will never
-be copied to the dual entry, nor can it be mapped. The alias will
-only apply to the primary entry.
-
 Note that \bibgls\ doesn't know what abbreviation styles
 are in used, so if the \field{sort} field is missing
 it will fallback on the \field{short} field. If the abbreviations
 need to be sorted according to the \field{long} field instead,
 use \optref[long]{sort-field}.
 
-The \atentry{dualabbreviation} entry type is similar to 
-\atentry{dualentry}, but by default the
-field mappings are:
-\begin{itemize}
-\item \field{short} $\mapsto$ \field{dualshort}
-\item \field{shortplural} $\mapsto$ \field{dualshortplural}
-\item \field{long} $\mapsto$ \field{duallong}
-\item \field{longplural} $\mapsto$ \field{duallongplural}
-\item \field{dualshort} $\mapsto$ \field{short}
-\item \field{dualshortplural} $\mapsto$ \field{shortplural}
-\item \field{duallong} $\mapsto$ \field{long}
-\item \field{duallongplural} $\mapsto$ \field{longplural}
-\end{itemize}
 Terms that are defined using \atentry{dualabbreviation} will be
 written to the output file using \csref{bibglsnewdualabbreviation}.
 
@@ -3082,7 +3198,7 @@ parenthetical material until after the link-text:
 If the back-link field has been switched to \field{duallong} then
 the post-description hook is no longer required.
 
-\section{\atentry{dualacronym}}
+\subsection{\atentry{dualacronym}}
 \labelatentry{dualacronym}
 
 As \atentry{dualabbreviation} but defines the entries with
@@ -3090,9 +3206,8 @@ As \atentry{dualabbreviation} but defines the entries with
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
-\setcounter{secnumdepth}{1}
 
-Make sure that you load \sty{glossaries-extra} with the
+Make sure that you use \sty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
 up the required information from the \ext{aux} file. (You may omit
 this option if you use \optref[all]{selection} and you don't require
@@ -7274,8 +7389,8 @@ This is like \csopt{dual-entry-map} but applies to
 \subsection{\csoptnv{dual-indexsymbol-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-indexsymbol-map}
 
-This is like \csopt{dual-entry-map} but applies to
-\atentryref{dualindexsymbol} rather than \atentry{dualentry}. 
+This is like \csopt{dual-entry-map} but applies to both
+\atentryref{dualindexsymbol} and \atentryref{dualindexnumber}. 
 
 \subsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
 \labelopt{dual-entry-backlink}
@@ -7361,8 +7476,8 @@ defined with \atentryref{dualindexentry} instead of
 \labelopt{dual-indexsymbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
-defined with \atentryref{dualindexsymbol} instead of
-\atentry{dualentry}.
+defined with \atentryref{dualindexsymbol} and
+\atentryref{dualindexnumber}.
 
 \subsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
 \labelopt{dual-backlink}
@@ -7649,6 +7764,85 @@ file is:
 }
 \end{verbatim}
 
+\subsection{\csfmt{bibglsnewdualindexnumber}}
+\labelcs{bibglsnewdualindexnumber}
+
+\begin{definition}
+\cs{bibglsnewdualindexnumber}\margm{label}\margm{options}\margm{name}\marg{symbol}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentryref{dualindexnumber} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexnumber}[5]{%
+  \longnewglossaryentry*{#1}{name={#3},category={index},symbol={#4},#2}{}%
+}
+\end{verbatim}
+Note that this definition ignores the \meta{description} argument.
+
+\subsection{\csfmt{bibglsnewdualindexnumbersecondary}}
+\labelcs{bibglsnewdualindexnumbersecondary}
+
+\begin{definition}
+\cs{bibglsnewdualindexnumbersecondary}\margm{label}\margm{options}\margm{name}\margm{description}
+\end{definition}
+This command is used to define secondary terms identified with the
+\atentryref{dualindexnumber} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexnumbersecondary}[5]{%
+  \longnewglossaryentry*{#1}{name={#3},category={number},symbol={#4},#2}{#5}%
+}
+\end{verbatim}
+
+\subsection{\csfmt{bibglsnewdualindexabbreviation}}
+\labelcs{bibglsnewdualindexabbreviation}
+
+\begin{definition}
+\cs{bibglsnewdualindexabbreviation}\margm{dual-label}\margm{label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define primary terms identified with the
+\atentryref{dualindexabbreviation} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexabbreviation}[7]{%
+  \longnewglossaryentry*{#2}{%
+    name={\protect\bibglsuseabbrvfont{#4}{\glscategory{#1}}},%
+    category={index},#3}{}%
+\end{verbatim}
+In this case \meta{dual-label} is the dual entry's label, which is used 
+to fetch the category label in \csref{bibglsuseabbrvfont}. (The
+\field{category} field for the dual isn't used as a custom
+definition of
+\csref{bibglsnewdualindexabbreviationsecondary} may override the
+value known to \bibgls.)
+
+Note that the \field{name} uses \plabelcs{bibglsuseabbrvfont}
+\begin{definition}
+\cs{bibglsuseabbrvfont}\margm{text}\margm{category}
+\end{definition}
+to format the name. This ensures that it uses the same font as the
+short form for the dual abbreviation.
+
+\subsection{\csfmt{bibglsnewdualindexabbreviationsecondary}}
+\labelcs{bibglsnewdualindexabbreviationsecondary}
+
+\begin{definition}
+\cs{bibglsnewdualindexabbreviationsecondary}\margm{label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}
+\end{definition}
+This command is used to define secondary terms identified with the
+\atentryref{dualindexabbreviation} entry type.
+The definition provided in the
+\ext{glstex} file is:
+\begin{verbatim}
+\providecommand{\bibglsnewdualindexabbreviationsecondary}[6]{%
+  \ifstrempty{#6}%
+  {\newabbreviation[#2]{#1}{#4}{#5}}%
+  {\newabbreviation[#2,description={#6}]{#1}{#4}{#5}}%
+}
+\end{verbatim}
+This ensures that a missing or empty \field{description} doesn't
+interfere with the abbreviation style.
 
 \subsection{\csfmt{bibglsnewdualentryabbreviation}}
 \labelcs{bibglsnewdualentryabbreviation}
