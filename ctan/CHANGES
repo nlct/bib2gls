@@ -16,10 +16,18 @@ v1.1 (pending):
      - secondary-date-sort-format
      - secondary-date-sort-locale
      - entry-type-aliases
+     - tertiary-prefix
+     - tertiary-type
+     - tertiary-category
      - combine-dual-locations
 
+   * Added 'same as base' as a keyword value of 'category',
+     'type', 'dual-category', 'dual-type', and
+     'supplemental-category' resource options.
+
    * New entry types: @dualindexentry, @dualindexsymbol,
-     @dualindexnumber, @dualindexabbreviation
+     @dualindexnumber, @dualindexabbreviation,
+     @tertiaryindexabbreviationentry
 
    * Case-changing options now also accept the values
      firstuc and firstuc-cs

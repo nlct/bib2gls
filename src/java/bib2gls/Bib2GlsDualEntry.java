@@ -151,6 +151,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
       Bib2GlsDualEntry entry = createDualEntry();
       entry.setId(dualPrefix, label);
+      entry.setBase(getBase());
       entry.isprimary=false;
 
       HashMap<String,String> mappings = getMappings();

@@ -2492,12 +2492,12 @@ are abbreviations) when you aren't using \optref[combine]{dual-sort}
 abbreviations).
 
 Remember that \bibgls\ is designed to take advantage of
-\styfmt{glossaries-extra}'s \cs{printunsrtglossary}, which simply
-iterates over all defined entries in the order in which they were defined
-(or, more precisely, the order of the internal list of entry labels
-associated with that glossary). The aim of \bibgls\ is to write the
-entry definitions to the \ext{glstex} file so that the internal list
-of labels is in the appropriate order.
+\cs{printunsrtglossary}, which simply iterates over all defined
+entries in the order in which they were defined (or, more precisely,
+the order of the internal list of entry labels associated with that
+glossary). The aim of \bibgls\ is to write the entry definitions to
+the \ext{glstex} file so that the internal list of labels is in the
+appropriate order.
 
 For example, suppose the file \filefmt{entries.bib} contains:
 \begin{verbatim}
@@ -2601,22 +2601,36 @@ Since the document uses the \styopt{abbreviations} package option,
 to the \code{abbreviations} glossary (created through that package
 option). This means that the \code{main} (default) glossary
 contains the entries (in order): 
-\code{aardvark} (aardvark), \code{dual.css} (cascading stylesheets), 
-\code{html} (HTML), \code{mouse} (mouse), 
-\code{dual.ssi} (server-side includes), 
-\code{xml} (XML), \code{zebra} (zebra).
+\begin{itemize}
+\item \code{aardvark} (name: aardvark),
+\item \code{dual.css} (name: cascading stylesheets), 
+\item \code{html} (name: HTML),
+\item \code{mouse} (name: mouse), 
+\item \code{dual.ssi} (name: server-side includes), 
+\item \code{xml} (name: XML),
+\item \code{zebra} (name: zebra).
+\end{itemize}
 The \code{abbreviations} glossary contains:
-\code{css} (CSS), \code{dual.html} (HTML), \code{ssi} (SSI), 
-\code{dual.xml} (XML).
+\begin{itemize}
+\item \code{css} (short: CSS), 
+\item \code{dual.html} (short: HTML),
+\item \code{ssi} (short: SSI), 
+\item \code{dual.xml} (short: XML).
+\end{itemize}
 
 Since all the entries were combined and sorted together, the
-resulting glossaries are both ordered alphabetically, but note that
-you need to take care when referencing the abbreviations if you want
-to make use of the abbreviation style: \verb|\gls{css}| and
-\verb|\gls{ssi}| for the primary abbreviations created with
-\atentryref{dualabbreviationentry} and \verb|\gls{dual.html}|
-and \verb|\gls{dual.xml}| for the dual abbreviations created with
-\atentryref{dualindexabbreviation}.
+resulting glossaries are both ordered alphabetically (using
+\field{short} for the abbreviations and \field{name} for the rest),
+but note that you need to take care when referencing the
+abbreviations if you want to make use of the abbreviation style. You
+need \verb|\gls{css}| and \verb|\gls{ssi}| for the primary
+abbreviations created with \atentryref{dualabbreviationentry} and
+\verb|\gls{dual.html}| and \verb|\gls{dual.xml}| for the dual
+abbreviations created with \atentryref{dualindexabbreviation}. Also
+the \field{name} of the primary\slash dual alternative of the
+abbreviations is also inconsistent (short form for \code{html} and
+\code{xml} and long form for \code{dual.css} and \code{dual.ssi}), 
+as different field mappings are used.
 
 If the document is changed so that the dual entries are now
 sorted and written after all the primary entries have been dealt
@@ -2629,13 +2643,16 @@ with:
 ]
 \end{verbatim}
 then \bibgls\ first orders the primaries:
-\code{aardvark} (aardvark),
-\code{css} (CSS),
-\code{html} (HTML),
-\code{mouse} (mouse),
-\code{ssi} (SSI),
-\code{xml} (XML),
-\code{zebra} (zebra) and writes them to the \ext{glstex} file
+\begin{itemize}
+\item \code{aardvark} (name: aardvark),
+\item \code{css} (short: CSS),
+\item \code{html} (name: HTML),
+\item \code{mouse} (name: mouse),
+\item \code{ssi} (short: SSI),
+\item \code{xml} (name: XML),
+\item \code{zebra} (name: zebra)
+\end{itemize}
+and writes them to the \ext{glstex} file
 (functionally like):
 \begin{verbatim}
 % from @index{aardvark}:
@@ -2660,10 +2677,12 @@ then \bibgls\ first orders the primaries:
 \newglossaryentry{zebra}{name={zebra},description={}}
 \end{verbatim}
 Then \bibgls\ orders the duals:
-\code{dual.css} (cascading stylesheets),
-\code{dual.html} (HTML),
-\code{dual.ssi} (server-side includes),
-\code{dual.xml} (XML)
+\begin{itemize}
+\item \code{dual.css} (name: cascading stylesheets),
+\item \code{dual.html} (short: HTML),
+\item \code{dual.ssi} (name: server-side includes),
+\item \code{dual.xml} (short: XML)
+\end{itemize}
 and writes them to the \ext{glstex} file
 (functionally like):
 \begin{verbatim}
@@ -2686,34 +2705,44 @@ and writes them to the \ext{glstex} file
 When the \ext{glstex} file is input (during the next \LaTeX\ run) 
 the entries are defined in the order:
 \begin{enumerate}
-\item \code{aardvark} (assigned to \code{main}),
-\item \code{css} (assigned to \code{abbreviations}),
-\item \code{html} (assigned to \code{main}),
-\item \code{mouse} (assigned to \code{main}),
-\item \code{ssi} (assigned to \code{abbreviations}),
-\item \code{xml} (assigned to \code{main}),
-\item \code{zebra} (assigned to \code{main}),
-\item \code{dual.css} (assigned to \code{main}),
-\item \code{dual.html} (assigned to \code{abbreviations}),
-\item \code{dual.ssi} (assigned to \code{main}),
-\item \code{dual.xml} (assigned to \code{abbreviations})
+\item \code{aardvark} (type: \code{main}),
+\item \code{css} (type: \code{abbreviations}),
+\item \code{html} (type: \code{main}),
+\item \code{mouse} (type: \code{main}),
+\item \code{ssi} (type: \code{abbreviations}),
+\item \code{xml} (type: \code{main}),
+\item \code{zebra} (type: \code{main}),
+\item \code{dual.css} (type: \code{main}),
+\item \code{dual.html} (type: \code{abbreviations}),
+\item \code{dual.ssi} (type: \code{main}),
+\item \code{dual.xml} (type: \code{abbreviations}).
 \end{enumerate}
 This means that the \code{main} glossary's internal list is in the
-order: \code{aardvark} (aardvark), \code{html} (HTML), \code{mouse}
-(mouse), \code{xml} (XML), \code{zebra} (zebra), 
-\code{dual.css} (cascading stylesheets), 
-\code{dual.ssi} (server-side includes), and the
-\code{abbreviations} glossary's internal list is in the order:
-\code{css} (CSS), \code{ssi} (SSI), \code{dual.html} (HTML), 
-\code{dual.xml} (XML).
-
+order:
+\begin{itemize}
+\item \code{aardvark} (aardvark),
+\item \code{html} (HTML),
+\item \code{mouse} (mouse),
+\item \code{xml} (XML),
+\item \code{zebra} (zebra), 
+\item \code{dual.css} (cascading stylesheets), 
+\item \code{dual.ssi} (server-side includes)
+\end{itemize}
+and the \code{abbreviations} glossary's internal list is in the order:
+\begin{itemize}
+\item \code{css} (CSS),
+\item \code{ssi} (SSI),
+\item \code{dual.html} (HTML), 
+\item \code{dual.xml} (XML).
+\end{itemize}
 The lists are no longer in alphabetical order as they have a mixture
 of primary and dual entries that were separated before sorting.
 
 The above is a fairly contrived example as it wouldn't make sense
 in a real document to have glossary terms (that include a
 description) mixed with index terms (that don't include a
-description). A better solution would be to use 
+description). 
+A better solution would be to use 
 \atentryref{tertiaryindexabbreviationentry} instead of
 \atentryref{dualabbreviationentry}.
 
@@ -3156,11 +3185,9 @@ package option is used, this will put the primary entry in the
 \subsection{\atentry{dualentryabbreviation}}
 \labelatentry{dualentryabbreviation}
 
-This entry type is deprecated as from version 1.1. It's functionally
-equivalent to \atentryref{dualabbreviationentry}, 
-but the primary is defined using
-\csref{bibglsnewdualentryabbreviation} and the dual is defined
-using \csref{bibglsnewdualentryabbreviationsecondary}.
+This entry type is deprecated as from \bibgls\ version 1.1. It's functionally
+equivalent to \atentryref{dualabbreviationentry} but its name
+doesn't fit the general dual entry naming scheme.
 
 \subsection{\atentry{dualsymbol}}
 \labelatentry{dualsymbol}
@@ -3506,10 +3533,11 @@ with \optref{tertiary-type} and the \field{category} with
 \subsection{\atentry{tertiaryindexabbreviationentry}}
 \labelatentry{tertiaryindexabbreviationentry}
 
-The \atentry{tertiaryindexabbreviationentry} entry type is
-very similar to \atentryref{dualindexabbreviation} but creates a
-tertiary entry as well. The mappings are shared by both entry types.
-
+This entry type is very similar to
+\atentryref{dualindexabbreviation} but creates a tertiary entry as
+well.  The required fields are: \field{short} and \field{long} (as for
+\atentryref{dualindexabbreviation}) and also \field{description}.  The
+mappings are shared by both entry types.  For example:
 \begin{verbatim}
 @tertiaryindexabbreviationentry{html,
   short={HTML},
@@ -3528,15 +3556,48 @@ is analogous to
   description={a markup language for creating web pages}
 }
 \end{verbatim}
+The last two are actually defined using one command:
+\begin{verbatim}
+\bibglsnewtertiaryindexabbreviationentrysecondary
+  {dual.html}% secondary label
+  {tertiary.html}% tertiary label
+  {...}% secondary fields
+  {...}% tertiary fields
+  {HTML}% primary name
+  {HTML}% short
+  {hypertext markup language}% long
+  {a markup language for creating web pages}% description
+\end{verbatim}
+The \csref{bibglsnewtertiaryindexabbreviationentrysecondary} command
+is provided in the \ext{glstex} file as:
+\begin{verbatim}
+\providecommand{\bibglsnewtertiaryindexabbreviationentrysecondary}[8]{%
+  \newabbreviation[#3]{#1}{#6}{#7}%
+  \longnewglossaryentry*{#2}%
+  {name={\protect\bibglsuselongfont{#7}{\glscategory{#1}}},#4}%
+  {#8}%
+}
+\end{verbatim}
+which defines the secondary as an abbreviation using
+\csfmt{newabbreviation} and the tertiary as a regular entry using
+\csfmt{longnewglossaryentry}. This means that the tertiary entry is
+always defined immediately after the corresponding secondary entry.
+The primary may be defined earlier or later in the file depending on the
+way the entries are sorted and on the \optref{dual-sort} setting.
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
 
 Make sure that you use \sty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
-up the required information from the \ext{aux} file. (You may omit
-this option if you use \optref[all]{selection} and you don't require
-the location lists.)
+up the required information from the \ext{aux} file. It also
+switches on the \styopt{sort=none} package option (if you have a new
+enough version of the base \sty{glossaries} package), which means
+that there's no attempt to assign or process the \field{sort} key if
+it's omitted from \cs{newglossaryentry} (or similar commands). The
+\field{sort} key will be provided by \bibgls\ for informational
+purposes, but there's no need for \LaTeX\ to write it to any
+external files.
 
 The \ext{glstex} resource files created by \bibgls\ are loaded in
 the document using
@@ -3552,7 +3613,7 @@ would attempt to input the same \ext{glstex} file multiple times.
 
 There's a shortcut command that uses
 \cs{jobname} in the \meta{filename}:
-\begin{definition}
+\begin{definition}\plabelcs{GlsXtrLoadResources}
 \cs{GlsXtrLoadResources}\oargm{options}
 \end{definition}
 The first instance of this command is equivalent to
@@ -4897,9 +4958,15 @@ The \meta{value} may be:
 \item \optfmt{same as entry}: set the
 \field{category} to the \ext{bib} entry type used to define it
 (without the leading \code{@});
+
+\item \optfmt{same as base}: set the \field{category}
+to the base name of the \ext{bib} file (without the extension) 
+that provided the entry definition (new to v1.1);
+
 \item \optfmt{same as type}: set the \field{category} to the same
 value as the \field{type} field (if that field has been provided
 either in the \ext{bib} file or through the \optref{type} option);
+
 \item \meta{label}: the \field{category} is set to
 \meta{label} (which mustn't contain any special characters).
 \end{itemize}
@@ -4963,12 +5030,14 @@ the \csopt[animals]{category} option.
 \subsection{\csoptnv{type}\csopteqval{value}}
 \labelopt{type}
 
-The \meta{value} may be \optfmt{same as entry} or a glossary label.
-This is similar to the \optref{category} option except that
-it sets the \field{type} field. As with the \csopt{category} option,
-\csopt[same as entry]{type} indicates that the entry
-type should be used. There is no \meta{value} analogous to
-\csopt[same as type]{category}.
+The \meta{value} may be \optfmt{same as entry}, \optfmt{same as
+base} (from v1.1) or a glossary label.  This is similar to the
+\optref{category} option except that it sets the \field{type} field.
+As with the \csopt{category} option, \csopt[same as entry]{type}
+indicates that the entry type should be used and \csopt[same as
+base]{type} indicates the base name of the \ext{bib} file (without
+the extension) that provided the entry definition. There is no
+\meta{value} analogous to \csopt[same as type]{category}.
 
 Make sure that the glossary type has already been defined. 
 
@@ -7411,15 +7480,21 @@ file (or created through a mapping). The \meta{value} is required.
 
 The \meta{value} may be:
 \begin{itemize}
-\item \optfmt{same as entry}: sets the
-\field{type} to the entry type. For example, if the entry
-was defined with \atentryref{dualentry}, the \field{type} will be
-set to \optfmt{dualentry}.
-\item \optfmt{same as primary}: sets the \field{type} to the same
-as the corresponding primary entry's \field{type} (which may
-have been set with \optref{type}). If the primary entry doesn't
-have the \field{type} field set, the dual's \field{type} will
-remain unchanged.
+\item \optfmt{same as entry}: sets the \field{type} to the entry
+type. For example, if the entry was defined with
+\atentryref{dualentry}, the \field{type} will be set to
+\optfmt{dualentry}.
+
+\item \optfmt{same as base}: sets the \field{type} to the base name
+of the \ext{bib} file (without the extension) that provided the
+entry definition (new to v1.1);
+
+\item \optfmt{same as primary}: sets the \field{type} to the same as
+the corresponding primary entry's \field{type} (which may have been
+set with \optref{type}). If the primary entry doesn't have the
+\field{type} field set, the dual's \field{type} will remain
+unchanged.
+
 \item \meta{label}: sets the \field{type} field to \meta{label}.
 \end{itemize}
 
@@ -7455,20 +7530,26 @@ file (or created through a mapping). The \meta{value} may be empty.
 
 The \meta{value} may be:
 \begin{itemize}
-\item \optfmt{same as entry}: sets the
-\field{category} to the entry type. For example, if the entry
-was defined with \atentryref{dualentry}, the \field{category} will be
-set to \optfmt{dualentry}.
-\item \optfmt{same as primary}: sets the \field{category} to the same
-as the corresponding primary entry's \field{category} (which may
-have been set with \optref{category}). If the primary entry doesn't
-have the \field{category} field set, the dual's \field{category} will
-remain unchanged.
+\item \optfmt{same as entry}: sets the \field{category} to the entry
+type. For example, if the entry was defined with
+\atentryref{dualentry}, the \field{category} will be set to
+\optfmt{dualentry}.
+
+\item \optfmt{same as base}: sets the \field{category} to the base
+name of the \ext{bib} file (without the extension) that provided the
+entry definition (new to v1.1);
+
+\item \optfmt{same as primary}: sets the \field{category} to the
+same as the corresponding primary entry's \field{category} (which
+may have been set with \optref{category}). If the primary entry
+doesn't have the \field{category} field set, the dual's
+\field{category} will remain unchanged.
+
 \item \optfmt{same as type}: sets the \field{category} to the same
 as the value of the entry's \field{type} field (which may have been
-set with \optref{dual-type}). If the entry doesn't
-have the \field{type} field set, the \field{category} will
-remain unchanged.
+set with \optref{dual-type}). If the entry doesn't have the
+\field{type} field set, the \field{category} will remain unchanged.
+
 \item \meta{label}: sets the \field{category} field to \meta{label}.
 \end{itemize}
 
@@ -8362,9 +8443,12 @@ The definition provided in the \ext{glstex} file is:
 }
 \end{verbatim}
 
+\subsection{\csfmt{bibglsnewtertiaryindexabbreviationentrysecondary}}
+\labelcs{bibglsnewtertiaryindexabbreviationentrysecondary}
+
 \begin{definition}
 \cs{bibglsnewtertiaryindexabbreviationentrysecondary}\margm{label}\margm{tertiary-label}\margm{options}\margm{tertiary
-opts}\margm{name}\margm{short}\margm{long}\margm{description}
+opts}\margm{primary name}\margm{short}\margm{long}\margm{description}
 \end{definition}
 This command is used to define secondary and tertiary terms identified with the
 \atentryref{tertiaryindexabbreviationentry} type. The secondary
@@ -8380,8 +8464,11 @@ The definition written to the \ext{glstex} file is:
 \end{verbatim}
 The \meta{label} is the label for the secondary (abbreviation) entry
 and \meta{tertiary-label} is the label for the tertiary (regular)
-entry.
-Note that the \field{name} uses \plabelcs{bibglsuselongfont}
+entry. The fifth argument (\meta{primary name}) isn't used but is
+provided if required for a custom redefinition.
+The \field{name} field for the tertiary is obtained from 
+the \meta{long} argument encapsulated by
+\plabelcs{bibglsuselongfont}
 \begin{definition}
 \cs{bibglsuselongfont}\margm{text}\margm{category}
 \end{definition}

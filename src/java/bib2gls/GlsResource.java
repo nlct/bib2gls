@@ -2357,6 +2357,10 @@ public class GlsResource
       {
          File bibFile = src.getFile();
 
+         String base = bibFile.getName();
+
+         base = base.substring(0, base.length()-4);
+
          Charset srcCharset = bibCharset;
 
          if (srcCharset == null)
@@ -2472,6 +2476,7 @@ public class GlsResource
             if (data instanceof Bib2GlsEntry)
             {
                Bib2GlsEntry entry = (Bib2GlsEntry)data;
+               entry.setBase(base);
 
                Bib2GlsEntry dual = null;
 
@@ -4618,6 +4623,10 @@ public class GlsResource
          {
             entry.putField("type", entry.getEntryType());
          }
+         else if (type.equals("same as base"))
+         {
+            entry.putField("type", entry.getBase());
+         }
          else
          {
             entry.putField("type", type);
@@ -4637,6 +4646,10 @@ public class GlsResource
          if (catLabel.equals("same as entry"))
          {
             entry.putField("category", entry.getEntryType());
+         }
+         else if (catLabel.equals("same as base"))
+         {
+            entry.putField("category", entry.getBase());
          }
          else if (catLabel.equals("same as type"))
          {
@@ -4690,6 +4703,10 @@ public class GlsResource
          {
             dual.putField("type", dual.getEntryType());
          }
+         else if (dualType.equals("same as base"))
+         {
+            dual.putField("type", dual.getBase());
+         }
          else if (dualType.equals("same as primary"))
          {
             String val = dual.getDual().getFieldValue("type");
@@ -4713,6 +4730,10 @@ public class GlsResource
          if (dualCategory.equals("same as entry"))
          {
             dual.putField("category", dual.getEntryType());
+         }
+         else if (dualCategory.equals("same as base"))
+         {
+            dual.putField("category", dual.getBase());
          }
          else if (dualCategory.equals("same as primary"))
          {

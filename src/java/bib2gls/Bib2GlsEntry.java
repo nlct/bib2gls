@@ -67,6 +67,16 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
+   public String getBase()
+   {
+      return base;
+   }
+
+   public void setBase(String base)
+   {
+      this.base = base;
+   }
+
    public void setDual(Bib2GlsEntry dualEntry)
    {
       dual = dualEntry;
@@ -2223,6 +2233,8 @@ public class Bib2GlsEntry extends BibEntry
    private HashMap<String,Vector<GlsRecord>> recordMap;
    private Vector<GlsRecord> supplementalRecords;
    private Vector<GlsRecord> ignoredRecords;
+
+   private String base="";
 
    private Vector<Bib2GlsEntry> children;
 
