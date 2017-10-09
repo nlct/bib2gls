@@ -21,12 +21,14 @@ package com.dickimawbooks.bib2gls;
 import java.util.Vector;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
-public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
+public class Bib2GlsEntryLetterNumberComparator implements Comparator<Bib2GlsEntry>
 {
-   public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
+   public Bib2GlsEntryLetterNumberComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     String sort, String sortField, String groupField, String entryType,
     boolean ignoreCase, boolean reverse,
@@ -235,19 +237,93 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
       while (i < n1 && j < n2)
       {
-         int cp1 = str1.codePointAt(i);
-         int cp2 = str2.codePointAt(j);
+         Matcher m = PATTERN_NUMBER.matcher(str1.substring(i));
 
-         i += Character.charCount(cp1);
-         j += Character.charCount(cp2);
+         Integer num1 = null;
+         Integer num2 = null;
 
-         if (cp1 < cp2)
+         if (m.matches())
          {
-            return reverse ? 1 : -1;
+            try
+            {
+               num1 = Bib2Gls.parseInt(m.group(1));
+
+               i += m.end(1);
+            }
+            catch (NumberFormatException e)
+            {// won't happen since pattern match ensures correct format
+            }
          }
-         else if (cp1 > cp2)
+
+         m = PATTERN_NUMBER.matcher(str2.substring(j));
+
+         if (m.matches())
          {
-            return reverse ? -1 : 1;
+            try
+            {
+               num2 = Bib2Gls.parseInt(m.group(1));
+
+               j += m.end(1);
+            }
+            catch (NumberFormatException e)
+            {// won't happen since pattern match ensures correct format
+            }
+         }
+
+         if (num1 != null || num2 != null)
+         {
+            if (num1 == null)
+            {
+               // numbers come before lower case
+               // (case-insensitive sort converts to lower case)
+
+               int cp1 = str1.codePointAt(i);
+               i += Character.charCount(cp1);
+
+               if (Character.isLowerCase(cp1))
+               {
+                  return reverse ? -1 : 1;
+               }
+               else
+               {
+                  return reverse ? 1 : -1;
+               }
+            }
+            else if (num2 == null)
+            {
+               int cp2 = str2.codePointAt(j);
+               j += Character.charCount(cp2);
+
+               if (Character.isLowerCase(cp2))
+               {
+                  return reverse ? 1 : -1;
+               }
+               else
+               {
+                  return reverse ? -1 : 1;
+               }
+            }
+            else
+            {
+               return reverse ? num2.compareTo(num1) : num1.compareTo(num2);
+            }
+         }
+         else
+         {
+            int cp1 = str1.codePointAt(i);
+            int cp2 = str2.codePointAt(j);
+
+            i += Character.charCount(cp1);
+            j += Character.charCount(cp2);
+
+            if (cp1 < cp2)
+            {
+               return reverse ? 1 : -1;
+            }
+            else if (cp1 > cp2)
+            {
+               return reverse ? -1 : 1;
+            }
          }
       }
 
@@ -385,4 +461,9 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    private HashMap<String,Integer> sortCount;
 
+   private static final Pattern PATTERN_NUMBER 
+     = Pattern.compile(String.format(
+        "([+-]?\\p{javaDigit}+|%s|%s).*",
+           Bib2Gls.SUBSCRIPT_INT_PATTERN,
+           Bib2Gls.SUPERSCRIPT_INT_PATTERN));
 }

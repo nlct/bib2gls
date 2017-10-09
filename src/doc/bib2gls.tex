@@ -6548,8 +6548,9 @@ to shuffle the entries instead of sorting them.
 \subsection{\csoptnv{sort}\csopteqval{value}}
 \labelopt{sort}
 
-The \csopt{sort} key indicates how entries should be sorted. The
-\meta{value} may be one of:
+The \csopt{sort} key indicates how entries should be sorted. Allowed
+values are listed below.
+The first set of possible values don't actually perform any sorting.
 \begin{itemize}
 
 \item \optfmt{none} (or \optfmt{unsrt}): don't sort the entries.
@@ -6562,14 +6563,25 @@ to use this option with \optref{flatten}. The seed for the
 random generator can be set using \optref{shuffle} (which
 also automatically sets \csopt[random]{sort} and \csopt{flatten}).
 
+\item \optfmt{use}: order of use. This order is determined
+by the records written to the \ext{aux} file by the \styopt{record}
+package option. Dependencies and cross-references (including those
+identified with \cs{glssee}) come after entries with records.
+
+\end{itemize}
+
+This next set of possible \optfmt{sort} values use rule-based comparators, which
+usually ignore most punctuation and may ignore modifiers (such as
+accents). Use with \optref{break-at} to determine whether or not to split at word
+boundaries.
+\begin{itemize}
 \item \meta{lang tag}: sort according to the rules of the locale
-given by the \gls{IETF} language tag \meta{lang tag}. (Use with
-\optref{break-at} to determine whether or not to split at word
-boundaries.)
+given by the \gls{IETF} language tag \meta{lang tag}.
 
 \item \optfmt{locale}: equivalent to 
 \csopt[\meta{lang tag}]{sort} where \meta{lang tag} is obtained
-from the operating system (or Java Runtime Environment).
+from the Java Runtime Environment (which usually matches the
+operating system's locale).
 
 \item \optfmt{doc}: sort the entries according to the document
 language. This is equivalent to \optref[\meta{lang tag}]{sort}
@@ -6582,24 +6594,84 @@ option is equivalent to \csopt[locale]{sort}.
 
 \item \optfmt{custom}: sort the entries according to the 
 rule provided by \optref{sort-rule}.
+\end{itemize}
 
-\item \optfmt{use}: sort in order of use. This order is determined
-by the records written to the \ext{aux} file by the \styopt{record}
-package option. Dependencies and cross-references (including those
-identified with \cs{glssee}) come after entries with records.
-
-\item \optfmt{letter-case}: case-sensitive letter (character code) sort.
-
-\item \optfmt{letter-case-reverse}: reverse case-sensitive letter (character code) sort.
-
-\item \optfmt{letter-nocase}: case-insensitive letter (character code) sort.
+The following use letter case comparators. These simply compare the
+character codes. The case-insensitive options first convert the
+\field{sort} field to lower case before performing the sort.
+Punctuation isn't ignored.
 Use \csopt[\meta{lang tag}]{sort} with \csopt[none]{break-at} to
 emulate \app{xindy}'s locale letter ordering.
+\begin{itemize}
+\item \optfmt{letter-case}: case-sensitive letter sort.
 
-\item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter (character code) sort.
+\item \optfmt{letter-case-reverse}: reverse case-sensitive letter sort.
+
+\item \optfmt{letter-nocase}: case-insensitive letter sort.
+
+\item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter sort.
 \end{itemize}
+
+The following use a letter-integer hybrid. They behave much like the
+above letter sort methods, but if an integer number pattern is detected in
+the string then the sub-string containing the number will be compared.
+This only detects base 10 integers (unlike the numeric methods
+such as \optfmt{sort=hexadecimal} or \optfmt{sort=float}) but in
+addition to recognising all the digits in the Unicode \qt{Number,
+Decimal Digit} category it also recognises the subscript and
+superscript digits, such as \textsuperscript{1} (0x00B9)
+and \textsuperscript{2} (0x00B2).
+
+For example, if the first string is \code{abc12foo} and the second
+string is \code{abc6bar} then the sort method performs a letter
+comparison on the first three letters (\code{abc}). At this point
+there's no difference detected, so the comparator moves onto the
+next character, \code{1} for the first string and \code{6} for the
+second string. At this point the letter comparators above would
+consider \code{1} less than \code{6} since the character \code{1}
+(0x0031) comes before the character \code{6} (0x0036), but with the
+letter-number comparators, these are both recognised as digits and
+it reads in the following digits (if present). For the first case,
+this is the sub-string \code{12} and, for the second case, \code{6}.
+These are both compared according to their integer representation $6
+< 12$, so \code{abc6bar} is considered less than \code{abc12foo}.
+
+Signed integers are also recognised, so \code{abc-12foo} is less
+than \code{abc+6bar}, which is again different from the result
+obtained with a straight letter comparator where \code{+} (0x002B)
+comes before \code{-} (0x002D). The sign must be followed by at
+least one digit for it to be recognised as a number otherwise it's
+treated as a punctuation character.
+
+In the situation where only one sub-string is numeric, for example
+comparing \code{abcXYfoo} and \code{abc6bar}, then the comparator
+considers numbers to come before lower case letters. The
+case-insensitive comparators always convert the \field{sort} value
+to lower case before sorting, so with a case-insensitive sort
+\code{abcXYfoo} would first be converted to \code{abcxyfoo}, which
+means that \code{abc6bar} comes before it. With the case-sensitive
+sort, \code{abc6bar} comes after \code{abcXYfoo}.
+
+\begin{itemize}
+\item \optfmt{letternumber-case}: case-sensitive
+letter-number (character code) sort.
+
+\item \optfmt{letternumber-case-reverse}: reverse case-sensitive
+letter-number (character code) sort.
+
+\item \optfmt{letternumber-nocase}: case-insensitive
+letter-number (character code) sort.
+
+\item \optfmt{letternumber-nocase-reverse}: reverse case-insensitive
+letter-number (character code) sort.
+\end{itemize}
+
 The following use numeric comparisons. The sort value is expected to
 be a numeric value. If it can't be parsed then it's treated as 0.
+These all recognise the digits in the Unicode \qt{Number,
+Decimal Digit} category but, unlike the hybrid letter-number
+comparators, they don't recognise the superscript or subscript
+digits.
 \begin{itemize}
 \item \optfmt{integer}: integer sort. This is for integer sort
 values.

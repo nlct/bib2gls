@@ -3277,6 +3277,46 @@ public class GlsResource
 
          comparator.sortEntries();
       }
+      else if (entrySort.equals("letternumber-case"))
+      {
+         Bib2GlsEntryLetterNumberComparator comparator = 
+            new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, false, false, 
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letternumber-case-reverse"))
+      {
+         Bib2GlsEntryLetterNumberComparator comparator = 
+            new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, false, true, 
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letternumber-nocase"))
+      {
+         Bib2GlsEntryLetterNumberComparator comparator = 
+            new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, true, false, 
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
+      else if (entrySort.equals("letternumber-nocase-reverse"))
+      {
+         Bib2GlsEntryLetterNumberComparator comparator = 
+            new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
+              entrySort, entrySortField, entryGroupField,
+              entryType, true, true, 
+              sortSuffixOption, sortSuffixMarker);
+
+         comparator.sortEntries();
+      }
       else if (entrySort.startsWith("integer") 
             || entrySort.startsWith("float")
             || entrySort.startsWith("double")

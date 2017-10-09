@@ -2055,6 +2055,106 @@ public class Bib2Gls implements TeXApp
          message);
    }
 
+   public static Integer parseInt(String str)
+     throws NumberFormatException
+   {
+      try
+      {
+         return Integer.valueOf(str);
+      }
+      catch (NumberFormatException e)
+      {
+         StringBuilder builder = new StringBuilder();
+
+         for (int i = 0; i < str.length(); )
+         {
+            int cp = str.codePointAt(i);
+            i += Character.charCount(cp);
+
+            switch (cp)
+            {
+               case SUPERSCRIPT_ZERO:
+               case SUBSCRIPT_ZERO:
+
+                 builder.append('0');
+
+               break;
+               case SUPERSCRIPT_ONE:
+               case SUBSCRIPT_ONE:
+
+                 builder.append('1');
+
+               break;
+               case SUPERSCRIPT_TWO:
+               case SUBSCRIPT_TWO:
+
+                 builder.append('2');
+
+               break;
+               case SUPERSCRIPT_THREE:
+               case SUBSCRIPT_THREE:
+
+                 builder.append('3');
+
+               break;
+               case SUPERSCRIPT_FOUR:
+               case SUBSCRIPT_FOUR:
+
+                 builder.append('4');
+
+               break;
+               case SUPERSCRIPT_FIVE:
+               case SUBSCRIPT_FIVE:
+
+                 builder.append('5');
+
+               break;
+               case SUPERSCRIPT_SIX:
+               case SUBSCRIPT_SIX:
+
+                 builder.append('6');
+
+               break;
+               case SUPERSCRIPT_SEVEN:
+               case SUBSCRIPT_SEVEN:
+
+                 builder.append('7');
+
+               break;
+               case SUPERSCRIPT_EIGHT:
+               case SUBSCRIPT_EIGHT:
+
+                 builder.append('8');
+
+               break;
+               case SUPERSCRIPT_NINE:
+               case SUBSCRIPT_NINE:
+
+                 builder.append('9');
+
+               break;
+               case SUPERSCRIPT_PLUS:
+               case SUBSCRIPT_PLUS:
+
+                 builder.append('+');
+
+               break;
+               case SUPERSCRIPT_MINUS:
+               case SUBSCRIPT_MINUS:
+
+                 builder.append('-');
+
+               break;
+               default:
+
+                 builder.appendCodePoint(cp);
+            }
+         }
+
+         return Integer.valueOf(builder.toString());
+      }
+   }
+
    /*
     *  TeXApp method.
     */ 
@@ -3105,4 +3205,44 @@ public class Bib2Gls implements TeXApp
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",
      "long", "longplural", "short", "shortplural", "symbol"};
+
+   public static final int SUPERSCRIPT_ZERO=0x2070;
+   public static final int SUPERSCRIPT_ONE=0x00B9;
+   public static final int SUPERSCRIPT_TWO=0x00B2;
+   public static final int SUPERSCRIPT_THREE=0x00B3;
+   public static final int SUPERSCRIPT_FOUR=0x2074;
+   public static final int SUPERSCRIPT_FIVE=0x2075;
+   public static final int SUPERSCRIPT_SIX=0x2076;
+   public static final int SUPERSCRIPT_SEVEN=0x2077;
+   public static final int SUPERSCRIPT_EIGHT=0x2078;
+   public static final int SUPERSCRIPT_NINE=0x2079;
+   public static final int SUPERSCRIPT_PLUS=0x207A;
+   public static final int SUPERSCRIPT_MINUS=0x207B;
+
+   public static final int SUBSCRIPT_ZERO=0x2080;
+   public static final int SUBSCRIPT_ONE=0x2081;
+   public static final int SUBSCRIPT_TWO=0x2082;
+   public static final int SUBSCRIPT_THREE=0x2083;
+   public static final int SUBSCRIPT_FOUR=0x2084;
+   public static final int SUBSCRIPT_FIVE=0x2085;
+   public static final int SUBSCRIPT_SIX=0x2086;
+   public static final int SUBSCRIPT_SEVEN=0x2087;
+   public static final int SUBSCRIPT_EIGHT=0x2088;
+   public static final int SUBSCRIPT_NINE=0x2089;
+   public static final int SUBSCRIPT_PLUS=0x208A;
+   public static final int SUBSCRIPT_MINUS=0x208B;
+
+   public static final String SUBSCRIPT_INT_PATTERN =
+     String.format("[%c%c]?[%c%c%c%c%c%c%c%c%c%c]+",
+           SUBSCRIPT_PLUS, SUBSCRIPT_MINUS, SUBSCRIPT_ZERO,
+           SUBSCRIPT_ONE, SUBSCRIPT_TWO, SUBSCRIPT_THREE, 
+           SUBSCRIPT_FOUR, SUBSCRIPT_FIVE, SUBSCRIPT_SIX, 
+           SUBSCRIPT_SEVEN, SUBSCRIPT_EIGHT, SUBSCRIPT_NINE);
+
+   public static final String SUPERSCRIPT_INT_PATTERN =
+     String.format("[%c%c]?[%c%c%c%c%c%c%c%c%c%c]+",
+           SUPERSCRIPT_PLUS, SUPERSCRIPT_MINUS, SUPERSCRIPT_ZERO,
+           SUPERSCRIPT_ONE, SUPERSCRIPT_TWO, SUPERSCRIPT_THREE, 
+           SUPERSCRIPT_FOUR, SUPERSCRIPT_FIVE, SUPERSCRIPT_SIX, 
+           SUPERSCRIPT_SEVEN, SUPERSCRIPT_EIGHT, SUPERSCRIPT_NINE);
 }

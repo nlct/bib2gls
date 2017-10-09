@@ -1,0 +1,11 @@
+*.out
+*.log
+*.aux
+*.pdf
+*.glstex
+*.swp
+*.glg
+*.toc
+*.glo
+*.gls
+*.xdy

@@ -32,7 +32,9 @@ v1.1 (pending):
    * Case-changing options now also accept the values
      firstuc and firstuc-cs
 
-   * New sort options: date, date-reverse, time, time-reverse,
+   * New sort options: letternumber-case, letternumber-case-reverse,
+     letternumber-nocase, letternumber-nocase-reverse, 
+     date, date-reverse, time, time-reverse,
      datetime, datetime-reverse (and associated options).
 
    * fixed bug in hierarchical entries with label prefixes.
