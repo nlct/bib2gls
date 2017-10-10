@@ -49,12 +49,13 @@ public class Gls2Bib extends LaTeXParserListener
   implements Writeable,TeXApp
 {
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
-     String outCharset, String spaceSub, String langTag, int debug)
+     String outCharset, String spaceSub, String langTag, boolean ignoreSort, int debug)
     throws Gls2BibException,IOException
    {
       super(null);
 
       this.debugLevel = debug;
+      this.ignoreSortField = ignoreSort;
 
       initMessages(langTag);
 
@@ -90,6 +91,11 @@ public class Gls2Bib extends LaTeXParserListener
    public TeXApp getTeXApp()
    {
       return this;
+   }
+
+   public boolean ignoreSort()
+   {
+      return ignoreSortField;
    }
 
    public String getSpaceSub()
@@ -810,8 +816,13 @@ public class Gls2Bib extends LaTeXParserListener
       System.out.println(
         "convertgls2bib [<options>] <tex file> <bib file>");
       System.out.println("Options:");
+
+      System.out.println("--version (or -v)\tDisplay version information");
+      System.out.println("--help (or -h)\t\tDisplay help");
       System.out.println("--texenc <encoding>\t.tex file encoding");
       System.out.println("--bibenc <encoding>\t.bib file encoding");
+      System.out.println("--ignore-sort\t\tignore sort field (default)");
+      System.out.println("--no-ignore-sort\tdon't ignore sort field");
       System.out.println("--space-sub <value>\tsubstitute spaces in labels with <value>");
       System.out.println("--locale <lang tag>\tuse language resource file for locale given by <lang tag>");
    }
@@ -824,6 +835,7 @@ public class Gls2Bib extends LaTeXParserListener
       String bibCharset = null;
       String spaceSub = null;
       String langTag = null;
+      boolean ignoreSort = true;
       int debug = 0;
 
       for (int i = 0; i < args.length; i++)
@@ -878,9 +890,23 @@ public class Gls2Bib extends LaTeXParserListener
 
             langTag = args[++i];
          }
+         else if (args[i].equals("--ignore-sort"))
+         {
+            ignoreSort = true;
+         }
+         else if (args[i].equals("--no-ignore-sort"))
+         {
+            ignoreSort = false;
+         }
          else if (args[i].equals("--debug"))
          {
             debug = 1;
+         }
+         else if (args[i].startsWith("-"))
+         {
+            System.err.println("Unknown option: "+args[i]);
+            System.err.println("Use --help for help.");
+            System.exit(1);
          }
          else if (texFile == null)
          {
@@ -893,7 +919,7 @@ public class Gls2Bib extends LaTeXParserListener
          else
          {
             System.err.println("Too many arguments");
-            help();
+            System.err.println("Use --help for help.");
             System.exit(1);
          }
       }
@@ -915,7 +941,7 @@ public class Gls2Bib extends LaTeXParserListener
       try
       {
          Gls2Bib gls2bib = new Gls2Bib(texFile, bibFile, texCharset, bibCharset,
-           spaceSub, langTag, debug);
+           spaceSub, langTag, ignoreSort, debug);
 
          gls2bib.process();
       }
@@ -932,7 +958,7 @@ public class Gls2Bib extends LaTeXParserListener
    }
 
    public static final String VERSION = "1.1";
-   public static final String DATE = "2017-10-08";
+   public static final String DATE = "2017-10-10";
 
    private Vector<GlsData> data;
 
@@ -943,6 +969,8 @@ public class Gls2Bib extends LaTeXParserListener
    private String bibCharsetName=null;
 
    private String spaceSub = null;
+
+   private boolean ignoreSortField=true;
 
    private Gls2BibMessages messages;
 

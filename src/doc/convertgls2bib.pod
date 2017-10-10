@@ -1,0 +1,82 @@
+=head1 SYNOPSIS
+
+B<convertgls2bib> [I<option>]+ I<auxfile>
+
+=head1 DESCRIPTION
+
+Converts a B<.tex> file containing glossary definitions using
+commands like B<\newglossaryentry> and B<\newacronym> to 
+a B<.bib> file in the format required for B<bib2gls>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help> or B<-h>
+
+Display help message and exit.
+
+=item B<--version> or B<-v>
+
+Display version information and exit.
+
+=item B<--texenc> I<name>
+
+Set the character encoding to I<name> for the input B<.tex> files.
+
+=item B<--bibenc> I<name>
+
+Set the character encoding to I<name> for the output B<.bib> files.
+
+=item B<--ignore-sort>
+
+Ignore the B<sort> field (default).
+
+=item B<--no-ignore-sort>
+
+Don't ignore the B<sort> field.
+
+=item B<--space-sub> I<value>
+
+Substitute spaces in labels with I<value>.
+
+=item B<--locale> I<lang tag>
+
+Use the language resource files associated with the given language
+tag I<lang tag>. If there isn't an appropriate file, the B<en>
+(English) file will be used.
+
+=back
+
+=head1 REQUIRES
+
+Java 7 and a TeX distribution.
+
+=head1 LICENSE
+
+License GPLv3+: GNU GPL version 3 or later
+<http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+=head1 RECOMMENDED READING
+
+The bib2gls manual:
+
+        texdoc bib2gls
+
+The glossaries-extra manual:
+
+        texdoc glossaries-extra
+
+The glossaries manual:
+
+        texdoc glossaries
+
+=head1 AUTHOR
+
+Nicola L. C. Talbot,
+L<http://www.dickimaw-books.com/>
+
+=cut
+

@@ -244,6 +244,10 @@ public class NewGlossaryEntry extends ControlSequence
                continue;
             }
          }
+         else if (gls2bib.ignoreSort() && field.equals("sort"))
+         {
+            continue;
+         }
 
          if ((object instanceof Group) && !(object instanceof MathGroup))
          {

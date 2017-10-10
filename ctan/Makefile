@@ -4,6 +4,7 @@ BIB2GLSDIR=$(HOME)/programming/java/bib2gls
 bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib.jar ../src/bin/bib2gls.sh ../src/bin/convertgls2bib.sh ../src/doc/bib2gls.pdf
 	mkdir -p bib2gls
 	mkdir -p bib2gls/src
+	mkdir -p bib2gls/examples
 	cp ../src/bin/bib2gls.sh bib2gls
 	cp ../src/bin/convertgls2bib.sh bib2gls
 	cp ../src/lib/bib2gls.jar bib2gls
@@ -11,9 +12,10 @@ bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib
 	cp -L ../src/lib/texparserlib.jar bib2gls
 	cp ../src/doc/bib2gls.tex bib2gls/src
 	cp ../src/doc/bib2gls.pdf bib2gls
-	cp ../src/doc/bib2gls.pod bib2gls/src
-	cp ../src/doc/bib2gls.1 bib2gls
+	cp ../src/doc/*.pod bib2gls/src
+	cp ../src/doc/*.1 bib2gls
 	cp ../src/lib/resources/*.xml bib2gls
+	cp ../src/examples/*.{tex,bib,pdf} bib2gls/examples
 	cp README.md CHANGES bib2gls
 	cd ../src/java/; \
 	zip -r bib2gls-src.zip bib2gls; \

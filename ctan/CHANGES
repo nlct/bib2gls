@@ -45,6 +45,8 @@ v1.1 (pending):
 
    * texparserlib: added extra core maths commands.
 
+   * convertgls2bib: new switches --ignore-sort and --no-ignore-sort.
+
 v1.0 (2017-09-09):
 
    * initial release
