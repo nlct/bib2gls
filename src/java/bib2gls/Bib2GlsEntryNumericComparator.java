@@ -21,10 +21,10 @@ package com.dickimawbooks.bib2gls;
 import java.util.Locale;
 import java.util.Vector;
 import java.util.Comparator;
-import java.text.Collator;
-import java.text.CollationKey;
-import java.text.Normalizer;
-import java.util.HashMap;
+import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
@@ -32,7 +32,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryNumericComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField, String entryType)
+    String sort, String sortField, String groupField, String entryType, Locale locale, String numberPattern)
    {
       this.sortField = sortField;
       this.groupField = groupField;
@@ -41,6 +41,55 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       this.entries = entries;
       this.reverse = sort.endsWith("-reverse");
       this.sort = sort;
+
+      if (sort.startsWith("numeric"))
+      {
+         if (locale == null)
+         {
+            numberFormat = NumberFormat.getNumberInstance();
+         }
+         else
+         {
+            numberFormat = NumberFormat.getNumberInstance(locale);
+         }
+      }
+      else if (sort.startsWith("currency"))
+      {
+         if (locale == null)
+         {
+            numberFormat = NumberFormat.getCurrencyInstance();
+         }
+         else
+         {
+            numberFormat = NumberFormat.getCurrencyInstance(locale);
+         }
+      }
+      else if (sort.startsWith("percent"))
+      {
+         if (locale == null)
+         {
+            numberFormat = NumberFormat.getPercentInstance();
+         }
+         else
+         {
+            numberFormat = NumberFormat.getPercentInstance(locale);
+         }
+      }
+      else if (sort.startsWith("numberformat"))
+      {
+         DecimalFormatSymbols syms;
+
+         if (locale == null)
+         {
+            syms = DecimalFormatSymbols.getInstance();
+         }
+         else
+         {
+            syms = DecimalFormatSymbols.getInstance(locale);
+         }
+
+         numberFormat = new DecimalFormat(numberPattern, syms);
+      }
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -84,7 +133,11 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 
       try
       {
-         if (sort.equals("integer") || sort.equals("integer-reverse"))
+         if (numberFormat != null)
+         {
+            number = numberFormat.parse(value);
+         }
+         else if (sort.equals("integer") || sort.equals("integer-reverse"))
          {
             number = Integer.valueOf(value);
          }
@@ -114,7 +167,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
               "Unrecognised numeric sort option: "+sort);
          }
       }
-      catch (NumberFormatException e)
+      catch (NumberFormatException | ParseException e)
       {
          bib2gls.warning(bib2gls.getMessage("warning.cant.parse.sort",
              value, id));
@@ -279,6 +332,8 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
    }
 
    private String sortField, groupField, sort, entryType;
+
+   private NumberFormat numberFormat;
 
    private Bib2Gls bib2gls;
 

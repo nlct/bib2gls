@@ -25,6 +25,7 @@ heading_suffix "}\n"
 \usepackage{amsmath}
 \usepackage{accents}
 \usepackage{makeidx}
+\usepackage{tikz}
 \usepackage{datetime2}
 \usepackage[hidelinks]{hyperref}
 \usepackage{glossaries-extra}
@@ -62,8 +63,13 @@ heading_suffix "}\n"
 
 \newcommand*{\sectionref}[1]{\hyperref[#1]{section~\ref*{#1}}}
 \newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
+\newcommand*{\figureref}[1]{\hyperref[#1]{figure~\ref*{#1}}}
+\newcommand*{\Figureref}[1]{\hyperref[#1]{Figure~\ref*{#1}}}
 
 \newcommand{\langxml}{\hyperref[sec:lang.xml]{language resource file}}
+
+\newcommand{\hexsb}[1]{\textsubscript{\scriptsize\rmfamily#1}}
+\newcommand{\subfigfmt}[1]{(\emph{#1})}
 
 \newcommand{\qt}[1]{``#1''}
 
@@ -1370,7 +1376,7 @@ the mappings provided by \longargfmt{map-format}.
 \item The \code{hypersf} format (from the new record) is mapped to \code{hyperit},
 so \bibgls\ checks if the existing record
 has this format. In this case it doesn't (the format is
-\code{emph}). So \bibgls\ moves onto the next test:
+\code{emph}). So \bibgls\ moves on to the next test:
 
 \item The \code{emph} format (from the existing record) is mapped to \code{hyperbf},
 so \bibgls\ checks if the new record has this format.
@@ -1387,7 +1393,7 @@ the format \code{glsnumberformat} or \code{glsignore} so \bibgls\ again consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
 \item  The new record's \code{hyperbf} format has no mapping provided,
-so \bibgls\ moves onto the next test:
+so \bibgls\ moves on to the next test:
 
 \item The existing record's \code{emph} format has a mapping
 provided (\code{hyperbf}). This matches the new record's format,
@@ -4094,6 +4100,23 @@ For example, if the entries are stored in \filefmt{entries.bib}:
 
 As \optref{sort-rule} but for secondary custom sorting.
 
+\subsection{\csoptnv{secondary-letter-number-rule}\csopteqval{value}}
+\labelopt{secondary-letter-number-rule}
+
+As \optref{letter-number-rule} but for secondary letter-number sorting.
+
+\subsection{\csoptnv{secondary-numeric-locale}\csopteqval{value}}
+\labelopt{secondary-numeric-locale}
+
+As \optref{numeric-locale} but for secondary
+locale-sensitive numeric sorting.
+
+\subsection{\csoptnv{secondary-numeric-sort-pattern}\csopteqval{value}}
+\labelopt{secondary-numeric-sort-pattern}
+
+As \optref{numeric-sort-pattern} but for secondary
+locale-sensitive numeric sorting.
+
 \subsection{\csoptnv{secondary-date-sort-format}\csopteqval{value}}
 \labelopt{secondary-date-sort-format}
 
@@ -6622,86 +6645,177 @@ Decimal Digit} category it also recognises the subscript and
 superscript digits, such as \textsuperscript{1} (0x00B9)
 and \textsuperscript{2} (0x00B2).
 
-For example, if the first string is \code{abc12foo} and the second
-string is \code{abc6bar} then the sort method performs a letter
-comparison on the first three letters (\code{abc}). At this point
-there's no difference detected, so the comparator moves onto the
-next character, \code{1} for the first string and \code{6} for the
-second string. At this point the letter comparators above would
-consider \code{1} less than \code{6} since the character \code{1}
-(0x0031) comes before the character \code{6} (0x0036), but with the
-letter-number comparators, these are both recognised as digits and
-it reads in the following digits (if present). For the first case,
-this is the sub-string \code{12} and, for the second case, \code{6}.
-These are both compared according to their integer representation $6
-< 12$, so \code{abc6bar} is considered less than \code{abc12foo}.
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[every node/.style={minimum size=9mm}]
+\matrix[font={\Large\ttfamily}]
+{
+  \node[draw]{a\hexsb{61}}; & \node{$=$}; & \node[draw]{a\hexsb{61}}; &[20mm]
+  \node[draw]{a\hexsb{61}}; & \node{$=$}; & \node[draw]{a\hexsb{61}};
+  \\
+  \node[draw]{b\hexsb{62}}; & \node{$=$}; & \node[draw]{b\hexsb{62}}; &
+  \node[draw]{b\hexsb{62}}; & \node{$=$}; & \node[draw]{b\hexsb{62}};
+  \\
+  \node[draw]{c\hexsb{63}}; & \node{$=$}; & \node[draw]{c\hexsb{63}}; &
+  \node[draw]{c\hexsb{63}}; & \node{$=$}; & \node[draw]{c\hexsb{63}};
+  \\
+  \node[draw,ultra thick]{1\hexsb{31}}; & \node{$<$}; &
+  \node[draw,ultra thick]{6\hexsb{36}}; &
+  \node (n1) {1}; & \node{$>$}; & \node[draw,ultra thick]{6};
+  \\
+  \node[draw]{2\hexsb{32}}; &  & \node[draw]{b\hexsb{62}}; &
+  \node (n2) {2}; &  & \node[draw]{b\hexsb{62}};
+  \\
+  \node[draw]{f\hexsb{66}}; &  & \node[draw]{a\hexsb{61}}; &
+  \node[draw]{f\hexsb{66}}; &  & \node[draw]{a\hexsb{61}};
+  \\
+  \node[draw]{o\hexsb{6f}}; &  & \node[draw]{r\hexsb{72}}; &
+  \node[draw]{o\hexsb{6f}}; &  & \node[draw]{r\hexsb{72}};
+  \\
+  \node[draw]{o\hexsb{6f}}; &  & &
+  \node[draw]{o\hexsb{6f}}; &  & 
+  \\[10pt]
+   & \node[font=\rmfamily]{\subfigfmt{a}};  & &
+   & \node[font=\rmfamily]{\subfigfmt{b}};  & 
+  \\
+};
+\draw[ultra thick] (n1.north east) rectangle (n2.south west);
+\end{tikzpicture}
+
+\caption[Regular letter comparison vs letter-number
+comparison]{Regular letter comparison vs letter-number comparison.
+Comparing the strings \code{abc12foo} and \code{abc6bar}:
+\subfigfmt{a} \optfmt{letter-case}; \subfigfmt{b}
+\optfmt{letternumber-case}.}
+\label{fig:letternumber}
+\end{figure}
+
+For example, suppose the first string is \code{abc12foo}
+and the second string is \code{abc6bar}.
+\Figureref{fig:letternumber}\subfigfmt{a} shows the regular letter
+comparison using \csopt[letter-case]{sort}, where the subscript
+indicates the hexadecimal character code. The first three characters
+from each string are identical (\code{abc}). At this point there's
+no difference detected, so the comparator moves on to the next
+character, \code{1\hexsb{31}} for the first string and
+\code{6\hexsb{36}} for the second string. Since 0x31 is less than 
+0x36, the first string (\code{abc12foo}) is considered less than the second
+(\code{abc6bar}).
+
+With the letter-number comparison using
+\csopt[letternumber-case]{sort}, the comparator starts in much the
+same way. The first three characters from each string are still
+identical, so the comparator moves on to the next character of each
+string. These are now both recognised as digits, so the comparator
+looks ahead and reads in any following digits (if present).  For the
+first case, this is the sub-string \code{12} and, for the second
+case, \code{6} (\figureref{fig:letternumber}\subfigfmt{b}).  These
+are both compared according to their integer representation $12 >
+6$, so \code{abc12bar} is considered greater than \code{abc6foo}
+(that is, \code{abc12bar} comes after \code{abc6foo}).  The same
+result occurs for other numbering systems,  for example if the
+Basic Latin digits 1, 2 and 6 are replaced with the corresponding
+Devanagari digits. (But note that the non-digit character comparisons will
+still be based on their Unicode values not according to a particular
+locale. This type of sort method is intended primarily for symbolic values,
+such as chemical formulae, rather than for words or phrases.)
 
 Signed integers are also recognised, so \code{abc-12foo} is less
 than \code{abc+6bar}, which is again different from the result
-obtained with a straight letter comparator where \code{+} (0x002B)
-comes before \code{-} (0x002D). The sign must be followed by at
+obtained with a straight letter comparator where \code{+} (0x2B)
+comes before \code{-} (0x2D). The sign must be followed by at
 least one digit for it to be recognised as a number otherwise it's
 treated as a punctuation character.
 
-In the situation where only one sub-string is numeric, for example
-comparing \code{abcXYfoo} and \code{abc6bar}, then the comparator
+In the situation where only one sub-string is numeric, the
+\optref{letter-number-rule} (for primary entries) is used to
+determine the result. Dual and \optref{secondary} sorting
+are governed by the corresponding \optref{dual-letter-number-rule}, and 
+\optref{secondary-letter-number-rule}.
+
+For example, if comparing \code{abcXYfoo} and \code{abc6bar} with
+\csopt[letternumber-case]{sort} or \csopt[letternumber-nocase]{sort}, 
+then the default \optref[before lower]{letter-number-rule} setting
 considers numbers to come before lower case letters. The
 case-insensitive comparators always convert the \field{sort} value
-to lower case before sorting, so with a case-insensitive sort
-\code{abcXYfoo} would first be converted to \code{abcxyfoo}, which
-means that \code{abc6bar} comes before it. With the case-sensitive
-sort, \code{abc6bar} comes after \code{abcXYfoo}.
+to lower case before sorting, so with a case-insensitive 
+\csopt[letternumber-nocase]{sort} \code{abcXYfoo} would first be
+converted to \code{abcxyfoo}, which means that \code{abc6bar} comes
+before it. With the case-sensitive \csopt[letternumber-case]{sort}, 
+\code{abc6bar} comes after \code{abcXYfoo}. 
 
 \begin{itemize}
 \item \optfmt{letternumber-case}: case-sensitive
-letter-number (character code) sort.
+letter-number sort.
 
 \item \optfmt{letternumber-case-reverse}: reverse case-sensitive
-letter-number (character code) sort.
+letter-number sort.
 
 \item \optfmt{letternumber-nocase}: case-insensitive
-letter-number (character code) sort.
+letter-number sort.
 
 \item \optfmt{letternumber-nocase-reverse}: reverse case-insensitive
-letter-number (character code) sort.
+letter-number sort.
 \end{itemize}
 
 The following use numeric comparisons. The sort value is expected to
 be a numeric value. If it can't be parsed then it's treated as 0.
 These all recognise the digits in the Unicode \qt{Number,
 Decimal Digit} category but, unlike the hybrid letter-number
-comparators, they don't recognise the superscript or subscript
+comparators above, they don't recognise the superscript or subscript
 digits.
 \begin{itemize}
-\item \optfmt{integer}: integer sort. This is for integer sort
+\item \optfmt{integer}: integer sort. This is for non-locale integer sort
 values.
 
 \item \optfmt{integer-reverse}: as above but reverses the order.
 
-\item \optfmt{hex}: hexadecimal integer sort. This is for
+\item \optfmt{hex}: hexadecimal integer sort. This is for non-locale
 hexadecimal sort values.
 
 \item \optfmt{hex-reverse}: as above but reverses the order.
 
-\item \optfmt{octal}: octal integer sort. This is for
+\item \optfmt{octal}: octal integer sort. This is for non-locale
 octal sort values.
 
 \item \optfmt{octal-reverse}: as above but reverses the order.
 
-\item \optfmt{binary}: binary integer sort. This is for binary sort
+\item \optfmt{binary}: binary integer sort. This is for non-locale binary sort
 values.
 
 \item \optfmt{binary-reverse}: as above but reverses the order.
 
-\item \optfmt{float}: single-precision sort. This is for
+\item \optfmt{float}: single-precision sort. This is for non-locale
 decimal sort values.
 
 \item \optfmt{float-reverse}: as above but reverses the order.
 
-\item \optfmt{double}: double-precision sort. This is for
+\item \optfmt{double}: double-precision sort. This is for non-locale
 decimal sort values.
 
 \item \optfmt{float-reverse}: as above but reverses the order.
+
+\item \optfmt{numeric}: locale-sensitive numeric sort. Use
+\optref{numeric-locale} to set the locale.
+
+\item \optfmt{numeric-reverse}: as above but reverses the order.
+
+\item \optfmt{currency}: locale-sensitive currency sort. Use
+\optref{numeric-locale} to set the locale.
+
+\item \optfmt{currency-reverse}: as above but reverses the order.
+
+\item \optfmt{percent}: locale-sensitive percent sort. Use
+\optref{numeric-locale} to set the locale.
+
+\item \optfmt{percent-reverse}: as above but reverses the order.
+
+\item \optfmt{numberformat}: locale-sensitive custom numeric sort. Use
+\optref{numeric-locale} to set the locale and
+\optref{numeric-sort-pattern} to set the number pattern.
+
+\item \optfmt{numberformat-reverse}: as above but reverses the order.
+
 \end{itemize}
 The following values are for dates and times. Use \optref{date-sort-format}
 and \optref{date-sort-locale} to specify the date format and locale.
@@ -6913,6 +7027,75 @@ digit), but \bibgls\ will accept a single space between \cs{u} and
 If \optref{sort} is not set to \optfmt{custom}, the
 \optfmt{sort-rule} setting will be ignored.
 
+\subsection{\csoptnv{letter-number-rule}\csopteqval{value}}
+\labelopt{letter-number-rule}
+
+If you use one of the letter-number sort methods (such as
+\optref[letternumber-case]{sort}), then you can determine the
+comparison between a number and non-number. The \meta{value} may be
+one of:
+\begin{itemize}
+\item\optfmt{before lower}: numbers are considered less than lower
+case characters (default), which means that numbers are also considered greater
+than all other characters including upper case and punctuation;
+\item\optfmt{before upper}: numbers are considered less than upper
+case characters, which means that numbers are also considered greater
+than all other characters including lower case and punctuation;
+\item\optfmt{before letter}: numbers are considered less than any
+letter (regardless of case), which means that numbers are also
+considered greater than all non-letter characters;
+\item\optfmt{after letter}: numbers are considered greater than any
+letter (regardless of case), which means that numbers are also
+considered less than all non-letter characters;
+\item\optfmt{first}: numbers are considered less than all
+characters;
+\item\optfmt{last}: numbers are considered greater than all
+characters.
+\end{itemize}
+Remember that the case-insensitive letter-number sort methods always
+first convert the \field{sort} field to lower case, which means that
+if you use one of them then there won't be any upper case
+characters.
+
+Use \optref{dual-letter-number-rule} for \optref{dual-sort} and
+\optref{secondary-letter-number-rule} for \optref{secondary}.
+
+\subsection{\csoptnv{numeric-sort-pattern}\csopteqval{value}}
+\labelopt{numeric-sort-pattern}
+
+If you use \optref[numberformat]{sort} or
+\optref[numberformat-reverse]{sort}, you need to 
+specify the format pattern with this option where
+\meta{value} is a pattern recognised by Java's
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html}{\code{java.text.DecimalFormat}}
+class. You can use \cs{u}\meta{hex} to indicate Unicode characters
+by their hexadecimal code. (Remember to use \cs{string} to
+protect it from expansion when the options are written to
+the \ext{aux} file.)
+
+For dual or \optref{secondary} numeric sorting, use
+\optref{dual-numeric-sort-pattern} and
+\optref{secondary-numeric-sort-pattern},
+respectively.
+
+\subsection{\csoptnv{numeric-locale}\csopteqval{value}}
+\labelopt{numeric-locale}
+
+If you use any of the locale-sensitive numeric sort methods,
+such as \optref[numeric]{sort}, use this option to set
+the locale. The value may be:
+\begin{itemize}
+\item\optfmt{locale}: use Java's default locale (which is usually
+the operating system's locale);
+\item\optfmt{doc}: use the document's locale or, if not set, assume
+\csopt[locale]{numeric-locale};
+\item\meta{lang-tag}: set to the locale identified by the given
+a valid language tag \meta{lang-tag}.
+\end{itemize}
+For dual or \optref{secondary} numeric sorting, use
+\optref{dual-numeric-locale} and \optref{secondary-numeric-locale},
+respectively.
+
 \subsection{\csoptnv{date-sort-locale}\csopteqval{value}}
 \labelopt{date-sort-locale}
 
@@ -6921,8 +7104,8 @@ set the locale used by Java's date-time parser. If omitted,
 the locale is obtained from the Java Virtual Machine, which
 will usually be your operating system's locale.
 
-The value may be \optfmt{doc} (use the document's locale)
-or a valid language tag identifying the locale.
+The value may be \optfmt{locale}, \optfmt{doc} (use the document's
+locale) or a valid language tag identifying the locale (as above).
 
 \subsection{\csoptnv{date-sort-format}\csopteqval{value}}
 \labelopt{date-sort-format}
@@ -7520,6 +7703,24 @@ default value is the same as the \optref{sort-field} value.
 \labelopt{dual-sort-rule}
 
 As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
+
+\subsection{\csoptnv{dual-letter-number-rule}\csopteqval{value}}
+\labelopt{dual-letter-number-rule}
+
+As \optref{letter-number-rule} but for dual entries that use a
+letter-number sort.
+
+\subsection{\csoptnv{dual-numeric-locale}\csopteqval{value}}
+\labelopt{dual-numeric-locale}
+
+As \optref{numeric-locale} but for dual entries that use a
+locale-sensitive numeric sort.
+
+\subsection{\csoptnv{dual-numeric-sort-pattern}\csopteqval{value}}
+\labelopt{dual-numeric-sort-pattern}
+
+As \optref{numeric-sort-pattern} but for dual entries that use a
+locale-sensitive numeric sort.
 
 \subsection{\csoptnv{dual-date-sort-locale}\csopteqval{value}}
 \labelopt{dual-date-sort-locale}

@@ -34,8 +34,10 @@ v1.1 (pending):
 
    * New sort options: letternumber-case, letternumber-case-reverse,
      letternumber-nocase, letternumber-nocase-reverse, 
+     numeric, numeric-reverse, currency, currency-reverse, 
+     percent, percent-reverse, numberformat, numberformat-reverse,
      date, date-reverse, time, time-reverse,
-     datetime, datetime-reverse (and associated options).
+     datetime, datetime-reverse (and associated resource options).
 
    * fixed bug in hierarchical entries with label prefixes.
 

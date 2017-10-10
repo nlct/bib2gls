@@ -2060,6 +2060,11 @@ public class Bib2Gls implements TeXApp
    {
       try
       {
+         if (str.codePointAt(0) == MINUS)
+         {
+            return Integer.valueOf("-"+str.substring(1));
+         }
+
          return Integer.valueOf(str);
       }
       catch (NumberFormatException e)
@@ -3232,6 +3237,8 @@ public class Bib2Gls implements TeXApp
    public static final int SUBSCRIPT_PLUS=0x208A;
    public static final int SUBSCRIPT_MINUS=0x208B;
 
+   public static final int MINUS=0x2212;
+
    public static final String SUBSCRIPT_INT_PATTERN =
      String.format("[%c%c]?[%c%c%c%c%c%c%c%c%c%c]+",
            SUBSCRIPT_PLUS, SUBSCRIPT_MINUS, SUBSCRIPT_ZERO,
@@ -3245,4 +3252,11 @@ public class Bib2Gls implements TeXApp
            SUPERSCRIPT_ONE, SUPERSCRIPT_TWO, SUPERSCRIPT_THREE, 
            SUPERSCRIPT_FOUR, SUPERSCRIPT_FIVE, SUPERSCRIPT_SIX, 
            SUPERSCRIPT_SEVEN, SUPERSCRIPT_EIGHT, SUPERSCRIPT_NINE);
+
+   public static final Pattern INT_PATTERN
+     = Pattern.compile(String.format(
+        "([+-%c]?\\p{javaDigit}+|%s|%s).*",
+           MINUS,
+           SUBSCRIPT_INT_PATTERN,
+           SUPERSCRIPT_INT_PATTERN));
 }

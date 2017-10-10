@@ -1,8 +1,11 @@
+BIB2GLS=../bin/bib2gls --debug --verbose --group
+DEPS=../lib/bib2gls.jar
+
 all	: sample-chemical.pdf
 
-sample-chemical.pdf	: sample-chemical.tex chemicalformula.bib
+sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
-	bib2gls sample-chemical
+	$(BIB2GLS) sample-chemical
 	pdflatex sample-chemical
 
 clean	:
