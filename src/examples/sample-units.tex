@@ -1,0 +1,41 @@
+\documentclass{article}
+
+\usepackage[record,stylemods=longbooktabs]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={units},% data in units.bib
+  selection=all% select all entries
+]
+
+% define custom glossary style
+\newglossarystyle{units}% style name
+{% base it on long3col-booktabs
+  \setglossarystyle{long3col-booktabs}%
+  \renewcommand*{\glossaryheader}{%
+    \toprule 
+    \bfseries Name &
+    \bfseries Measurement &
+    \bfseries Symbol
+    \tabularnewline\midrule\endhead
+    \bottomrule\endfoot}%
+% main entries:
+  \renewcommand{\glossentry}[2]{%
+    \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
+    \glossentrydesc{##1}\glspostdescription &
+    \glossentrysymbol{##1}\tabularnewline
+  }%
+% no sub-entries, but define for completeness:
+  \renewcommand{\subglossentry}[3]{%
+     \glssubentryitem{##2}%
+     \glstarget{##2}{\glossentryname{##2}}&
+     \glossentrydesc{##2}\glspostdescription &
+     \glossentrysymbol{##2}\tabularnewline
+  }%
+}
+
+\begin{document}
+
+\printunsrtglossary[title={SI Units of Measurement},
+ style={units}]
+
+\end{document}
