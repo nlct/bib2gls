@@ -29,7 +29,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     String sort, String sortField, String groupField, String entryType,
-    boolean ignoreCase, boolean reverse,
+    int caseStyle, boolean reverse,
     int sortSuffixOption, String sortSuffixMarker)
    {
       this.sortField = sortField;
@@ -37,10 +37,22 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.ignoreCase = ignoreCase;
       this.reverse = reverse;
       this.sortSuffixMarker = sortSuffixMarker;
       this.sortSuffixOption = sortSuffixOption;
+
+      switch (caseStyle)
+      {
+         case CASE:
+         case TOLOWER:
+         case UPPERLOWER:
+         case LOWERUPPER:
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid caseStyle");
+      }
+
+      this.caseStyle = caseStyle;
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -95,7 +107,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      if (ignoreCase)
+      if (caseStyle == TOLOWER)
       {
          value = value.toLowerCase();
       }
@@ -142,9 +154,14 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
          else if (Character.isAlphabetic(codePoint))
          {
-            grp = (ignoreCase ? str.toUpperCase() : str);
+            grp = (caseStyle == CASE ? str : str.toUpperCase());
 
             int cp = grp.codePointAt(0);
+
+            if (caseStyle == UPPERLOWER || caseStyle == LOWERUPPER)
+            {
+               cp = Character.toLowerCase(cp);
+            }
 
             GroupTitle grpTitle = resource.getGroupTitle(type, cp);
             String args;
@@ -225,6 +242,102 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       return value;
    }
 
+   protected int compare(int cp1, int cp2)
+   {
+      if (caseStyle == UPPERLOWER)
+      {
+         int lcp1 = Character.toLowerCase(cp1);
+         int lcp2 = Character.toLowerCase(cp2);
+
+         if (lcp1 == lcp2)
+         {
+            if (cp1 == cp2)
+            {
+               return 0;
+            }
+            else if (Character.isUpperCase(cp1))
+            {
+               return reverse ? 1 : -1;
+            }
+            else if (Character.isUpperCase(cp2))
+            {
+               return reverse ? -1 : 1;
+            }
+            else
+            {// punctuation
+
+               if (cp1 < cp2)
+               {
+                  return reverse ? 1 : -1;
+               }
+               else
+               {
+                  return reverse ? -1 : 1;
+               }
+            }
+         }
+         else if (lcp1 < lcp2)
+         {
+            return reverse ? 1 : -1;
+         }
+         else if (lcp1 > lcp2)
+         {
+            return reverse ? -1 : 1;
+         }
+      }
+      else if (caseStyle == LOWERUPPER)
+      {
+         int ucp1 = Character.toLowerCase(cp1);
+         int ucp2 = Character.toLowerCase(cp2);
+
+         if (ucp1 == ucp2)
+         {
+            if (cp1 == cp2)
+            {
+               return 0;
+            }
+            else if (Character.isLowerCase(cp1))
+            {
+               return reverse ? 1 : -1;
+            }
+            else if (Character.isLowerCase(cp2))
+            {
+               return reverse ? -1 : 1;
+            }
+            else
+            {// punctuation
+
+               if (cp1 < cp2)
+               {
+                  return reverse ? 1 : -1;
+               }
+               else
+               {
+                  return reverse ? -1 : 1;
+               }
+            }
+         }
+         else if (ucp1 < ucp2)
+         {
+            return reverse ? 1 : -1;
+         }
+         else if (ucp1 > ucp2)
+         {
+            return reverse ? -1 : 1;
+         }
+      }
+      else if (cp1 < cp2)
+      {
+         return reverse ? 1 : -1;
+      }
+      else if (cp1 > cp2)
+      {
+         return reverse ? -1 : 1;
+      }
+
+      return 0;
+   }
+
    protected int compare(String str1, String str2)
    {
       int n1 = str1.length();
@@ -241,13 +354,11 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          i += Character.charCount(cp1);
          j += Character.charCount(cp2);
 
-         if (cp1 < cp2)
+         int result = compare(cp1, cp2);
+
+         if (result != 0)
          {
-            return reverse ? 1 : -1;
-         }
-         else if (cp1 > cp2)
-         {
-            return reverse ? -1 : 1;
+            return result;
          }
       }
 
@@ -377,7 +488,9 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    private Vector<Bib2GlsEntry> entries;
 
-   private boolean ignoreCase, reverse;
+   protected boolean reverse;
+
+   private int caseStyle;
 
    private String sortSuffixMarker;
 
@@ -385,4 +498,8 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    private HashMap<String,Integer> sortCount;
 
+   public static final int CASE=0;
+   public static final int TOLOWER=1;
+   public static final int UPPERLOWER=2;
+   public static final int LOWERUPPER=3;
 }

@@ -1,11 +1,22 @@
 \documentclass{article}
 
+\usepackage{siunitx}
 \usepackage[record,stylemods=longbooktabs]{glossaries-extra}
 
+\newglossary*{units}{Units of Measurement (by SI unit)}
+
 \GlsXtrLoadResources[
-  src={units},% data in units.bib
-  selection=all% select all entries
+  src={units,derviedunits},% data in units.bib and derivedunits.bib
+  sort-field={name},% sort by name field
+  selection=all,% select all entries
+  type=main,% put primary entries in main glossary
+  entry-type-aliases={symbol=dualsymbol},% make @symbol act like @dualsymbol
+  set-widest,% needed for alttree style
+  dual-sort={letternumber-upperlower},
+  dual-type={units}
 ]
+
+\setlength{\glsdescwidth}{.4\hsize}
 
 % define custom glossary style
 \newglossarystyle{units}% style name
@@ -37,5 +48,7 @@
 
 \printunsrtglossary[title={SI Units of Measurement},
  style={units}]
+
+\printunsrtglossary[type=units,style=alttree]
 
 \end{document}

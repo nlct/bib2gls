@@ -114,9 +114,24 @@ public class SortSettings
       return sortMethod != null && sortMethod.endsWith("-reverse");
    }
 
-   public boolean isNoCase()
+   public int caseStyle()
    {
-      return sortMethod != null && sortMethod.contains("-nocase");
+      if (sortMethod.contains("-nocase"))
+      {
+         return Bib2GlsEntryLetterComparator.TOLOWER;
+      }
+
+      if (sortMethod.contains("-upperlower"))
+      {
+         return Bib2GlsEntryLetterComparator.UPPERLOWER;
+      }
+
+      if (sortMethod.contains("-lowerupper"))
+      {
+         return Bib2GlsEntryLetterComparator.LOWERUPPER;
+      }
+
+      return Bib2GlsEntryLetterComparator.CASE;
    }
 
    public boolean isRandom()

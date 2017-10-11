@@ -32,8 +32,12 @@ v1.1 (pending):
    * Case-changing options now also accept the values
      firstuc and firstuc-cs
 
-   * New sort options: letternumber-case, letternumber-case-reverse,
+   * New sort options: letter-upperlower, letter-upperlower-reverse,
+     letter-lowerupper, letter-lowerupper-reverse, 
+     letternumber-case, letternumber-case-reverse,
      letternumber-nocase, letternumber-nocase-reverse, 
+     letternumber-lowerupper, letternumber-lowerupper-reverse, 
+     letternumber-upperlower, letternumber-upperlower-reverse, 
      numeric, numeric-reverse, currency, currency-reverse, 
      percent, percent-reverse, numberformat, numberformat-reverse,
      date, date-reverse, time, time-reverse,
@@ -42,6 +46,9 @@ v1.1 (pending):
    * fixed bug in hierarchical entries with label prefixes.
 
    * fixed bugs in secondary sorting.
+
+   * new switches: --packages (-p), --expand-fields, 
+     --no-expand-fields
 
    * texparserlib: added extra core maths commands.
 

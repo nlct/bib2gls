@@ -2968,6 +2968,11 @@ public class GlsResource
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
 
+         if (bib2gls.suppressFieldExpansion())
+         {
+            writer.println("\\glsnoexpandfields");
+         }
+
          // Save original definition of \@glsxtr@s@longnewglossaryentry
          // and \glsxtr@newabbreviation
 
@@ -3334,7 +3339,7 @@ public class GlsResource
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
               settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.isNoCase(), settings.isReverse(), 
+              entryType, settings.caseStyle(), settings.isReverse(), 
               sortSuffixOption, sortSuffixMarker);
 
          comparator.sortEntries();
@@ -3344,7 +3349,7 @@ public class GlsResource
          Bib2GlsEntryLetterNumberComparator comparator = 
             new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
               settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.isNoCase(), settings.isReverse(),
+              entryType, settings.caseStyle(), settings.isReverse(),
               settings.getLetterNumberRule(),
               sortSuffixOption, sortSuffixMarker);
 
@@ -3510,6 +3515,11 @@ public class GlsResource
       try
       {
          writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
+
+         if (bib2gls.suppressFieldExpansion())
+         {
+            writer.println("\\glsnoexpandfields");
+         }
 
          writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
          writer.println("\\providecommand{\\bibglsinterloper}[1]{#1\\delimN }");
@@ -4043,12 +4053,39 @@ public class GlsResource
 
          if (widestNames != null)
          {
-            if (type != null)
+            String command;
+
+            writer.println("\\providecommand*{\\bibglssetwidest}[2]{%");
+            writer.println("  \\glssetwidest[#1]{#2}");
+            writer.println("}");
+
+            writer.println("\\providecommand*{\\bibglssetwidestfortype}[3]{%");
+            writer.println("  \\apptoglossarypreamble[#1]{\\glssetwidest[#2]{#3}}%");
+            writer.println("}");
+
+
+            if (type == null)
             {
-               writer.format("\\apptoglossarypreamble[%s]{", type);
+               command = "\\bibglssetwidest";
+            }
+            else
+            {
+               command = String.format("\\bibglssetwidestfortype{%s}", type);
             }
 
-            StringBuilder builder = new StringBuilder();
+            String dualCommand = null;
+
+            if (setWidestDualType && dualType != null)
+            {
+               dualCommand = String.format("\\bibglssetwidestfortype{%s}", dualType);
+            }
+
+            String secondaryCommand = null;
+
+            if (secondaryType != null)
+            {
+               secondaryCommand = String.format("\\bibglssetwidestfortype{%s}", secondaryType);
+            }
 
             for (int i = 0, n = widestNames.size(); i < n; i++)
             {
@@ -4056,35 +4093,26 @@ public class GlsResource
 
                if (!name.isEmpty())
                {
-                  builder.append(String.format(
-                     "\\glssetwidest[%d]{%s}", i, name));
+                  writer.format(String.format("%s{%d}{%s}%n", command, i, name));
+
+
+                  if (dualCommand != null)
+                  {
+                     writer.format(String.format("%s{%d}{%s}%n", dualCommand, i, name));
+                  }
+
+                  if (secondaryCommand != null)
+                  {
+                     writer.format(String.format("%s{%d}{%s}%n", secondaryCommand, i, name));
+                  }
                }
-            }
-
-            writer.print(builder);
-
-            if (type != null)
-            {
-               writer.println("}");
-            }
-
-            if (setWidestDualType && dualType != null)
-            {
-               writer.format("\\apptoglossarypreamble[%s]{%s}%n",
-                 dualType, builder);
-            }
-
-            if (secondaryType != null)
-            {
-               writer.format("\\apptoglossarypreamble[%s]{%s}%n",
-                 secondaryType, builder);
             }
 
             writer.println();
 
             if (dualWidestNames != null && dualWidestNames != widestNames)
             {
-               writer.format("\\apptoglossarypreamble[%s]{", dualType);
+               dualCommand = String.format("\\bibglssetwidestfortype{%s}", dualType);
 
                for (int i = 0, n = dualWidestNames.size(); i < n; i++)
                {
@@ -4092,12 +4120,9 @@ public class GlsResource
 
                   if (!name.isEmpty())
                   {
-                     builder.append(String.format(
-                        "\\glssetwidest[%d]{%s}", i, name));
+                     writer.format(String.format("%s{%d}{%s}%n", dualCommand, i, name));
                   }
                }
-
-               writer.println("}");
             }
          }
 
@@ -5370,7 +5395,8 @@ public class GlsResource
 
       if (key == null)
       {
-         bib2gls.debug("No group ID for entry "+entry.getId());
+         bib2gls.debug("writeHyperGroupDef: No group ID for entry "
+            +entry.getId());
          return;
       }
 
@@ -5378,7 +5404,7 @@ public class GlsResource
 
       if (groupTitle == null)
       {
-         bib2gls.debug("No group found for "+key);
+         bib2gls.debug("writeHyperGroupDef: No group found for "+key);
          return;
       }
 

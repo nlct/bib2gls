@@ -69,6 +69,9 @@ public class Bib2Gls implements TeXApp
 
       formatMap = new HashMap<String,String>();
       texFiles = new Vector<File>();
+
+      packages = new Vector<String>();
+
    }
 
    private void initSecuritySettings()
@@ -552,6 +555,11 @@ public class Bib2Gls implements TeXApp
       throw new Bib2GlsException(texCharset);
    }
 
+   public boolean suppressFieldExpansion()
+   {
+      return !expandFields;
+   }
+
    public boolean useInterpreter()
    {
       return interpret;
@@ -606,8 +614,6 @@ public class Bib2Gls implements TeXApp
       name = basename+".log";
 
       File logFile = new File(auxFile.getParentFile(), name);
-
-      packages = new Vector<String>();
 
       BufferedReader in = null;
 
@@ -2766,6 +2772,31 @@ public class Bib2Gls implements TeXApp
 
             logName = (String)argVal[1];
          }
+         else if (isArg(args[i], "p", "packages"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            String[] styList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+
+            for (String sty : styList)
+            {
+               packages.add(sty);
+            }
+         }
+         else if (args[i].equals("--expand-fields"))
+         {
+            expandFields = true;
+         }
+         else if (args[i].equals("--no-expand-fields"))
+         {
+            expandFields = false;
+         }
          else if (args[i].equals("--interpret"))
          {
             interpret = true;
@@ -3143,7 +3174,7 @@ public class Bib2Gls implements TeXApp
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "1.1 (EXPERIMENTAL)";
-   public static final String DATE = "2017-10-09";
+   public static final String DATE = "2017-10-11";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -3196,6 +3227,8 @@ public class Bib2Gls implements TeXApp
    private String docLocale;
 
    private boolean trimFields = false;
+
+   private boolean expandFields = false;
 
    private boolean interpret = true;
 

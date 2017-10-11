@@ -70,6 +70,14 @@ Use the TeX parser library to interpret known (La)TeX commands.
 
 Don't try interpreting (La)TeX commands.
 
+=item B<--packages> I<list>
+
+Instruct the TeX parser library to pretend the packages listed 
+in I<list> have been used by the document. Note that there's only a
+limited number of packages supported by the TeX parser library.
+This option has a cumulative action so B<--packages wasysym,pifont>
+is the same as B<--packages wasysym --packages pifont>.
+
 =item B<--mfirstuc-protection> I<fields>|B<all> (or B<-u> I<fields>|B<all>)
 
 Insert an empty group if fields start with certain problematic

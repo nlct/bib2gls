@@ -1,7 +1,7 @@
 % arara: pdflatex
 % arara: makeindex: {style: bib2gls.ist}
 % arara: pdflatex
-\documentclass[titlepage=false,index=totoc,12pt]{scrreprt}
+\documentclass[titlepage=false,index=totoc,12pt,captions=tableheading]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage{tgtermes}
@@ -65,6 +65,8 @@ heading_suffix "}\n"
 \newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
 \newcommand*{\figureref}[1]{\hyperref[#1]{figure~\ref*{#1}}}
 \newcommand*{\Figureref}[1]{\hyperref[#1]{Figure~\ref*{#1}}}
+\newcommand*{\tableref}[1]{\hyperref[#1]{table~\ref*{#1}}}
+\newcommand*{\Tableref}[1]{\hyperref[#1]{Table~\ref*{#1}}}
 
 \newcommand{\langxml}{\hyperref[sec:lang.xml]{language resource file}}
 
@@ -1229,6 +1231,21 @@ for more details.
 Switch off the interpreter mode. See \sectionref{sec:texparserlib}
 for more details.
 
+\section{\longarg{packages} \meta{list} (or \shortarg{p} \meta{list})}
+\labelarg{packages}
+
+Instruct the interpreter to pretend the packages listed 
+in \meta{list} have been used by the document.
+This option has a cumulative action so \code{\longarg{packages}
+"wasysym,pifont"} is the same as \code{\longarg{packages} wasysym 
+\longarg{packages} pifont}.
+
+Note that there's only a limited number of packages supported by the
+\TeX\ parser library. This option is provided for cases where you're
+using a command from a package that the interpreter doesn't support
+but it happens to have the same name and meaning as a command from
+a package that the interpreter does support.
+
 \section{\longarg{mfirstuc-protection} (or \shortarg{u})}
 \labelarg{mfirstuc-protection}
 
@@ -1592,6 +1609,32 @@ operating system's default encoding. If this is incorrect or if
 \bibgls\ can't work out the appropriate mapping then you can specify
 the correct encoding using \longargfmt{tex-encoding} \meta{name}
 where \meta{name} is the encoding name.
+
+\section{\longarg{no-expand-fields}}
+\labelarg{no-expand-fields}
+
+By default, \cs{newglossaryentry} expands field values
+(except for \field{name}, \field{symbol} and \field{description}).
+This is useful if constructing field values programmatically
+(for example in a loop) but can cause a problem if certain fragile
+commands are included in the field. 
+
+The switch \longarg{no-expand-fields} makes \bibgls\ write
+\cs{glsnoexpandfields} to the \ext{glstex} file, which
+switches off the expansion.  Since \bibgls\ is simply
+fetching the data from \ext{bib} files, it's unlikely 
+that this automatic expansion is required and since it can
+also be problematic this option is on by default. You can
+switch it off with \longarg{expand-fields}.
+
+\section{\longarg{expand-fields}}
+\labelarg{expand-fields}
+
+Don't write \cs{glsnoexpandfields} to the \ext{glstex} file,
+allowing fields to expand when the entries are defined.
+Remember that this doesn't include the \field{name}, \field{symbol}
+or \field{description} fields, which need to have their
+expansion switched on with \cs{glssetexpandfield}\margm{field}.
 
 \section{\longarg{trim-fields}}
 \labelarg{trim-fields}
@@ -3860,6 +3903,11 @@ it's simply set in the \ext{glstex} file and may be overridden
 later in the document if required. (Similarly if \optref{dual-type}
 and \optref{secondary} have been used.)
 
+Rather than directly using \cs{glssetwidest}, \bibgls\ provides
+\csref{bibglssetwidest} (where the type isn't known) and 
+\cs{bibglssetwidestfortype} (where \cs{glssetwidest} needs to be
+appended to the glossary preamble).
+
 Note that if you don't set a separate sort for dual entries with
 \optref{dual-sort} then the widest entry name will be determined
 across all the primary and dual entries together. Additionally, if
@@ -3950,182 +3998,6 @@ treats the entry as though it had been defined as:
    long={hypertext markup language}
 }
 \end{verbatim}
-
-\subsection{\csoptnv{secondary}\csopteqval{value}}
-\labelopt{secondary}
-
-It may be that you want to display a glossary twice but with a
-different order. For example, the first time alphabetically and the
-second time by category.  One way to do this is to have two
-\cs{GlsXtrLoadResources} that both load the same \ext{bib} file with
-different \optref{label-prefix} and \optref{sort} settings, but this
-is only possible with \optref[all]{selection} or by ensuring you
-reference each entry with both label prefixes.
-
-A simpler method is to use a single \cs{GlsXtrLoadResources}
-with the \csopt{secondary} option. The value
-(which must be supplied) should be in the format 
-\begin{definition}
-\meta{sort}:\meta{field}:\meta{type}
-\end{definition}
-or
-\begin{definition}
-\meta{sort}:\meta{type}
-\end{definition}
-If the \meta{field} is omitted, the value of \optref{sort-field} is
-used. Remember that when the primary entries are sorted, the
-\field{sort} field will be set, which means that the fallback field
-(such as \field{name}) won't be used in the secondary sort. In
-general it's best to supply the field unless one type is sorted and the
-other isn't. (The actual sort value obtained by the secondary sort
-will be saved in the \field{secondarysort} field in case you require it.)
-
-The value of \meta{sort} is as for \optref{sort}, but note
-that in this case the sort value \optfmt{unsrt} or \optfmt{none}
-means to use the same ordering as the primary entries. For
-example, with \optref[de-CH-1996]{sort},
-\optref[none:copies]{secondary} the \code{copies} list will be
-ordered according to \code{de-CH-1996} and not according to the
-order in which they were read when the \ext{bib} file or files were
-parsed.  If \meta{sort} is \optfmt{custom}, then the rule should be
-provided with \optref{secondary-sort-rule}.
-
-This option will copy all the selected entries into the glossary labelled
-\meta{type} sorted according to \meta{sort} (using \meta{field} as
-the sort value). Note that this \emph{just copies the entry's label}
-to the second glossary list rather than creating a duplicate entry,
-which saves resources but it means that all the fields will be
-identical. If you want groups in your glossary, the group
-information for the secondary glossary will be stored in the
-internal \field{secondarygroup} field. The \field{group} field will
-contain the group for the primary glossary.
-
-In order to switch fields in \cs{printunsrtglossary}, you need at
-least v1.21 of \sty{glossaries-extra} which provides
-\cs{glsxtrgroupfield} to keep track of the appropriate field label.
-If this command is defined, the preamble for the secondary glossary 
-will be adjusted to locally change the field to
-\field{secondarygroup}. With older versions, the group information
-in the secondary glossary will be the same as for the primary
-glossary.
-
-(If the glossary \meta{type} doesn't exist, it will be
-defined with \cs{provideignoredglossary*}\margm{type}.)
-Note that if the glossary already exists and contains entries,
-the existing entries aren't re-ordered. The new entries are
-simply appended to the list.
-
-For example, suppose the \ext{bib} file contains entries like:
-\begin{verbatim}
-@entry{quartz,
-  name={quartz},
-  description={hard mineral consisting of silica},
-  category={mineral}
-}
-
-@entry{cabbage,
-  name={cabbage},
-  description={vegetable with thick green or purple leaves},
-  category={vegetable}
-}
-
-@entry{waterfowl,
-  name={waterfowl},
-  description={any bird that lives in or about water},
-  category={animal}
-}
-\end{verbatim}
-and the document preamble contains:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries},sort={en-GB},
-  secondary={en-GB:category:topic}
-]
-\end{verbatim}
-This sorts the primary entries according to the default
-\optref{sort-field} and then sorts the entries according
-to the \field{category} field and copies this list to
-the \code{topic} glossary (which will be provided if not defined.)
-
-The secondary list can be displayed with the hypertargets switched
-off to prevent duplicates. The cross-references will link to the
-original glossary.
-
-For example:
-\begin{verbatim}
-\printunsrtglossary[title={Summary (alphabetical)}]
-\printunsrtglossary[title={Summary (by topic)},target=false]
-\end{verbatim}
-
-The alternative (or if more than two lists are required) is to
-reload the same \ext{bib} file with different label prefixes.
-For example, if the entries are stored in \filefmt{entries.bib}:
-\begin{verbatim}
-\newglossary*{nosort}{Symbols (Unsorted)}
-\newglossary*{byname}{Symbols (Letter Order)}
-\newglossary*{bydesc}{Symbols (Ordered by Description)}
-\newglossary*{byid}{Symbols (Ordered by Label)}
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={unsrt},
-  type={nosort}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={letter-case},
-  type={byname},
-  label-prefix={byname.}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={locale},
-  sort-field={description},
-  type={bydesc},
-  label-prefix={bydesc.}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={letter},
-  sort-field={id},
-  type={byid},
-  label-prefix={byid.}
-]
-\end{verbatim}
-
-\subsection{\csoptnv{secondary-sort-rule}\csopteqval{value}}
-\labelopt{secondary-sort-rule}
-
-As \optref{sort-rule} but for secondary custom sorting.
-
-\subsection{\csoptnv{secondary-letter-number-rule}\csopteqval{value}}
-\labelopt{secondary-letter-number-rule}
-
-As \optref{letter-number-rule} but for secondary letter-number sorting.
-
-\subsection{\csoptnv{secondary-numeric-locale}\csopteqval{value}}
-\labelopt{secondary-numeric-locale}
-
-As \optref{numeric-locale} but for secondary
-locale-sensitive numeric sorting.
-
-\subsection{\csoptnv{secondary-numeric-sort-pattern}\csopteqval{value}}
-\labelopt{secondary-numeric-sort-pattern}
-
-As \optref{numeric-sort-pattern} but for secondary
-locale-sensitive numeric sorting.
-
-\subsection{\csoptnv{secondary-date-sort-format}\csopteqval{value}}
-\labelopt{secondary-date-sort-format}
-
-As \optref{date-sort-format} but for secondary date-time sorting.
-
-\subsection{\csoptnv{secondary-date-sort-locale}\csopteqval{value}}
-\labelopt{secondary-date-sort-locale}
-
-As \optref{date-sort-locale} but for secondary date-time sorting.
 
 \section{Selection Options}
 \label{sec:selectionopts}
@@ -6571,9 +6443,166 @@ to shuffle the entries instead of sorting them.
 \subsection{\csoptnv{sort}\csopteqval{value}}
 \labelopt{sort}
 
-The \csopt{sort} key indicates how entries should be sorted. Allowed
-values are listed below.
-The first set of possible values don't actually perform any sorting.
+The \csopt{sort} key indicates how entries should be sorted.
+If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
+\csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
+
+Remember that you can have \atentryref{preamble} definitions that
+can be hidden from \bibgls's interpreter. For example,
+\filefmt{no-interpret-preamble.bib} might contain:
+\begin{verbatim}
+@preamble{"\providecommand{\sortop}[2]{#1 #2}"}
+\end{verbatim}
+which is loaded using
+\begin{verbatim}
+\GlsXtrLoadResources[src={no-interpret-preamble},
+ interpret-preamble=false]
+\end{verbatim}
+This provides the command \csfmt{sortop} for use in the document.
+Another file, say, \filefmt{interpret-preamble.bib} may provide
+a definition for \bibgls:
+\begin{verbatim}
+@preamble{"\providecommand{\sortop}[2]{#2, #1}"}
+\end{verbatim}
+which can be identified with:
+\begin{verbatim}
+\GlsXtrLoadResources[src={interpret-preamble}]
+\end{verbatim}
+This definition swaps the two arguments around for the sorting, but
+doesn't affect the document since \LaTeX\ has already defined
+\csfmt{sortop} from the first resource set.
+
+For example:
+\begin{verbatim}
+@entry{caesar,
+  name={\sortop{Gaius Julius}{Caesar}},
+  first={Julius Caesar},
+  text={Caesar},
+  description={Roman politician and general}
+}
+\end{verbatim}
+If \bibgls\ only recognises the second definition of \csfmt{sortop} then
+the sort value becomes \code{Caesar, Gaius Julius}.
+
+\begin{table}[p]
+\caption{Summary of Available Sort Options: No Actual Sorting}
+\label{tab:sortoptionsnosort}
+\centering
+\begin{tabular}{ll}
+\optfmt{none} or \optfmt{unsrt} & don't sort\tabularnewline
+\optfmt{random} & shuffle entries\tabularnewline
+\optfmt{use} & order of use
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\caption{Summary of Available Sort Options: Rule-Based Collation}
+\label{tab:sortoptionsrule}
+\centering
+\begin{tabular}{ll}
+\meta{lang tag} & sort according to this language tag\tabularnewline
+\optfmt{doc} & sort according to the document
+language\tabularnewline
+\optfmt{locale} & sort according to the default
+locale\tabularnewline
+\optfmt{custom} & sort according to \optref[\meta{custom rule}]{sort-rule}
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\caption{Summary of Available Sort Options: Letter (Unicode Order)}
+\label{tab:sortoptionsletter}
+\centering
+\begin{tabular}{ll}
+\optfmt{letter-case} & case-sensitive letter sort\tabularnewline
+\optfmt{letter-case-reverse} & reverse case-sensitive letter
+sort\tabularnewline
+\optfmt{letter-nocase} & case-insensitive letter sort\tabularnewline
+\optfmt{letter-nocase-reverse} & reverse case-insensitive letter
+sort\tabularnewline
+\optfmt{letter-upperlower} & upper-lower letter sort\tabularnewline
+\optfmt{letter-upperlower-reverse} & reverse upper-lower letter
+sort\tabularnewline
+\optfmt{letter-lowerupper} & lower-upper letter sort\tabularnewline
+\optfmt{letter-lowerupper-reverse} & reverse lower-upper letter sort
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\caption{Summary of Available Sort Options: Letter-Number}
+\label{tab:sortoptionsletternumber}
+\centering
+\begin{tabular}{ll}
+\optfmt{letternumber-case} & case-sensitive letter-number
+sort\tabularnewline
+\optfmt{letternumber-case-reverse} & reverse case-sensitive
+letter-number sort\tabularnewline
+\optfmt{letternumber-nocase} & case-insensitive letter-number
+sort\tabularnewline
+\optfmt{letternumber-nocase-reverse} & reverse case-insensitive
+letter-number sort\tabularnewline
+\optfmt{letternumber-upperlower} & upper-lower letter-number
+sort\tabularnewline
+\optfmt{letternumber-upperlower-reverse} & reverse upper-lower
+letter-number sort\tabularnewline
+\optfmt{letternumber-lowerupper} & lower-upper letter-number
+sort\tabularnewline
+\optfmt{letternumber-lowerupper-reverse} & reverse lower-upper letter-number sort
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\caption{Summary of Available Sort Options: Numerical}
+\label{tab:sortoptionsnumerical}
+\centering
+\begin{tabular}{ll}
+\optfmt{integer} & integer sort\tabularnewline
+\optfmt{integer-reverse} & reverse integer sort\tabularnewline
+\optfmt{hex} & hexadecimal sort\tabularnewline
+\optfmt{hex-reverse} & reverse hexadecimal sort\tabularnewline
+\optfmt{octal} & octal sort\tabularnewline
+\optfmt{octal-reverse} & reverse octal sort\tabularnewline
+\optfmt{binary} & binary sort\tabularnewline
+\optfmt{binary-reverse} & reverse binary sort\tabularnewline
+\optfmt{float} & float sort\tabularnewline
+\optfmt{float-reverse} & reverse float sort\tabularnewline
+\optfmt{double} & double sort\tabularnewline
+\optfmt{double-reverse} & reverse double sort\tabularnewline
+\optfmt{numeric} & locale-sensitive numeric sort\tabularnewline
+\optfmt{numeric-reverse} & reverse locale-sensitive numeric
+sort\tabularnewline
+\optfmt{currency} & locale-sensitive currency sort\tabularnewline
+\optfmt{currency-reverse} & reverse locale-sensitive currency
+sort\tabularnewline
+\optfmt{percent} & locale-sensitive percent sort\tabularnewline
+\optfmt{percent-reverse} & reverse locale-sensitive percent
+sort\tabularnewline
+\optfmt{numberformat} & locale-sensitive custom numeric
+sort\tabularnewline
+\optfmt{numberformat-reverse} & reverse locale-sensitive custom numeric sort
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\caption{Summary of Available Sort Options: Date-Time}
+\label{tab:sortoptionsdatetime}
+\centering
+\begin{tabular}{ll}
+\optfmt{date} & locale-sensitive date sort\tabularnewline
+\optfmt{date-reverse} & reverse locale-sensitive date
+sort\tabularnewline
+\optfmt{datetime} & locale-sensitive date-time sort\tabularnewline
+\optfmt{datetime-reverse} & reverse locale-sensitive date-time
+sort\tabularnewline
+\optfmt{time} & locale-sensitive time sort\tabularnewline
+\optfmt{time-reverse} & reverse locale-sensitive time sort
+\end{tabular}
+\end{table}
+
+\subsubsection{No Sort}
+
+The sort methods listed in \tableref{tab:sortoptionsnosort} 
+don't actually perform any sorting.
 \begin{itemize}
 
 \item \optfmt{none} (or \optfmt{unsrt}): don't sort the entries.
@@ -6593,10 +6622,44 @@ identified with \cs{glssee}) come after entries with records.
 
 \end{itemize}
 
-This next set of possible \optfmt{sort} values use rule-based comparators, which
-usually ignore most punctuation and may ignore modifiers (such as
-accents). Use with \optref{break-at} to determine whether or not to split at word
-boundaries.
+\subsubsection{Rule-Based Collation}
+
+The sort methods listed in \tableref{tab:sortoptionsrule} use
+rule-based comparators, which usually ignore most punctuation and
+may ignore modifiers (such as accents). Use with \optref{break-at}
+to determine whether or not to split at word boundaries.
+
+Note that \csopt[locale]{sort} can provide more detail about the
+locale than \csopt[doc]{sort}, depending on how the document
+language has been specified.  For example, with:
+\begin{verbatim}
+\documentclass{article}
+\usepackage[ngerman]{babel}
+\usepackage[record]{glossaries}
+\GlsXtrLoadResources[src={german-terms}]
+\end{verbatim}
+the language tag will be \code{de-1996}, which doesn't have an
+associated region. Whereas with
+\begin{verbatim}
+\documentclass[de-DE-1996]{article}
+\usepackage[ngerman]{babel}
+\usepackage[record]{glossaries}
+\GlsXtrLoadResources[src={german-terms}]
+\end{verbatim}
+the language tag will be \code{de-DE-1996} because \sty{tracklang}
+has picked up the locale from the document class options. This is
+only likely to cause a difference if a language has different
+sorting rules according to the region or if the language may be
+written in multiple scripts.
+
+A multilingual document will need to have the \csopt{sort} specified
+when loading the resource to ensure the correct language is chosen. 
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[src={english-terms},sort={en-GB}]
+\GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
+\end{verbatim}
+
 \begin{itemize}
 \item \meta{lang tag}: sort according to the rules of the locale
 given by the \gls{IETF} language tag \meta{lang tag}.
@@ -6619,23 +6682,67 @@ option is equivalent to \csopt[locale]{sort}.
 rule provided by \optref{sort-rule}.
 \end{itemize}
 
-The following use letter case comparators. These simply compare the
-character codes. The case-insensitive options first convert the
+\subsubsection{Letter Case (Unicode Order)}
+
+The sort methods listed in \tableref{tab:sortoptionsletter} 
+use letter case comparators. These simply compare the
+character codes. The \optfmt{-nocase} options first convert the
 \field{sort} field to lower case before performing the sort.
 Punctuation isn't ignored.
 Use \csopt[\meta{lang tag}]{sort} with \csopt[none]{break-at} to
 emulate \app{xindy}'s locale letter ordering.
 \begin{itemize}
-\item \optfmt{letter-case}: case-sensitive letter sort.
+\item \optfmt{letter-case}: case-sensitive letter sort. Upper case
+and lower case are in separate letter groups. For example, the list
+\code{antelope}, \code{bee}, \code{Africa}, \code{aardvark} and \code{Brazil} 
+will be ordered \code{Africa} (letter group \qt{A}), \code{Brazil}
+(letter group \qt{B}), \code{aardvark} (letter group \qt{a}),
+\code{antelope} (letter group \qt{a}), \code{bee} (letter group \qt{b}).
 
 \item \optfmt{letter-case-reverse}: reverse case-sensitive letter sort.
 
-\item \optfmt{letter-nocase}: case-insensitive letter sort.
+\item \optfmt{letter-nocase}: case-insensitive letter sort. (All
+upper case characters will have first been converted to lower case.)
+For example, the list
+\code{antelope}, \code{bee}, \code{Africa}, \code{aardvark} and \code{Brazil}
+will be ordered: \code{aardvark} (letter group \qt{A}), \code{Africa}
+(letter group \qt{A}), \code{antelope} (letter group \qt{A}), 
+\code{bee} (letter group \qt{B}),
+\code{Brazil} (letter group \qt{B}).
 
 \item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter sort.
+
+\item \optfmt{letter-upperlower}: each character pair is first
+compared according to their lower case values. If these are equal,
+then they are compared according to case. This puts upper and lower
+case in the same letter group but the upper case comes first.
+For example, the list
+\code{antelope}, \code{bee}, \code{Africa}, \code{aardvark} and \code{Brazil}
+would be ordered
+\code{Africa} (letter group \qt{A}), \code{aardvark} (letter group
+\qt{A}), \code{antelope} (letter group \qt{A}), \code{Brazil}
+(letter group \qt{B}), \code{bee} (letter group \qt{B}).
+
+\item \optfmt{letter-upperlower-reverse}: reverse upper-lower letter sort.
+
+\item \optfmt{letter-lowerupper}: each character pair is first
+compared according to their lower case values. If these are equal,
+then they are compared according to case. This puts upper and lower
+case in the same letter group but the lower case comes first.
+For example, the list
+\code{antelope}, \code{bee}, \code{Africa}, \code{aardvark} and \code{Brazil}
+would be ordered
+\code{aardvark} (letter group \qt{A}), \code{antelope} (letter group \qt{A}),
+ \code{Africa} (letter group \qt{A}), \code{bee} (letter group
+\qt{B}), \code{Brazil} (letter group \qt{B}).
+
+\item \optfmt{letter-lowerupper-reverse}: reverse lower-upper letter sort.
 \end{itemize}
 
-The following use a letter-integer hybrid. They behave much like the
+\subsubsection{Letter-Number}
+
+The sort methods listed in \tableref{tab:sortoptionsletternumber} 
+use a letter-integer hybrid. They behave much like the
 above letter sort methods, but if an integer number pattern is detected in
 the string then the sub-string containing the number will be compared.
 This only detects base 10 integers (unlike the numeric methods
@@ -6705,20 +6812,23 @@ character, \code{1\hexsb{31}} for the first string and
 With the letter-number comparison using
 \csopt[letternumber-case]{sort}, the comparator starts in much the
 same way. The first three characters from each string are still
-identical, so the comparator moves on to the next character of each
-string. These are now both recognised as digits, so the comparator
+identical, so the comparator moves on to the next character,
+\code{1} for the first string and \code{6} for the second. 
+These are now both recognised as digits, so the comparator
 looks ahead and reads in any following digits (if present).  For the
 first case, this is the sub-string \code{12} and, for the second
 case, \code{6} (\figureref{fig:letternumber}\subfigfmt{b}).  These
 are both compared according to their integer representation $12 >
 6$, so \code{abc12bar} is considered greater than \code{abc6foo}
-(that is, \code{abc12bar} comes after \code{abc6foo}).  The same
-result occurs for other numbering systems,  for example if the
-Basic Latin digits 1, 2 and 6 are replaced with the corresponding
-Devanagari digits. (But note that the non-digit character comparisons will
-still be based on their Unicode values not according to a particular
-locale. This type of sort method is intended primarily for symbolic values,
-such as chemical formulae, rather than for words or phrases.)
+(that is, \code{abc12bar} comes after \code{abc6foo}). 
+
+The same result occurs for other numbering systems, for example if
+the Basic Latin digits 1, 2 and 6 are replaced with the
+corresponding Devanagari digits. (But note that the non-digit
+character comparisons will still be based on their Unicode values
+not according to a particular locale. This type of sort method is
+intended primarily for symbolic values, such as chemical formulae,
+rather than for words or phrases.)
 
 Signed integers are also recognised, so \code{abc-12foo} is less
 than \code{abc+6bar}, which is again different from the result
@@ -6728,22 +6838,22 @@ least one digit for it to be recognised as a number otherwise it's
 treated as a punctuation character.
 
 In the situation where only one sub-string is numeric, the
-\optref{letter-number-rule} (for primary entries) is used to
-determine the result. Dual and \optref{secondary} sorting
-are governed by the corresponding \optref{dual-letter-number-rule}, and 
-\optref{secondary-letter-number-rule}.
+\optref{letter-number-rule} is used to determine the result. 
+(The \optref{dual-sort} and \optref{secondary} options are governed
+by the corresponding \optref{dual-letter-number-rule}, and
+\optref{secondary-letter-number-rule}.)
 
-For example, if comparing \code{abcXYfoo} and \code{abc6bar} with
-\csopt[letternumber-case]{sort} or \csopt[letternumber-nocase]{sort}, 
-then the default \optref[before lower]{letter-number-rule} setting
-considers numbers to come before lower case letters. The
-case-insensitive comparators always convert the \field{sort} value
-to lower case before sorting, so with a case-insensitive 
-\csopt[letternumber-nocase]{sort} \code{abcXYfoo} would first be
-converted to \code{abcxyfoo}, which means that \code{abc6bar} comes
-before it. With the case-sensitive \csopt[letternumber-case]{sort}, 
-\code{abc6bar} comes after \code{abcXYfoo}. 
+The default setting is \optref[before lower]{letter-number-rule} so,
+for example, if comparing \code{abcXYfoo} and \code{abc6bar} then
+with the case-sensitive or the upper-lower or the lower-upper sorts,
+\code{abc6bar} comes after \code{abcXYfoo} (since \code{X} isn't
+lower case).  Whereas with the case-insensitive 
+\csopt[letternumber-nocase]{sort} \code{abcXYfoo}
+would first be converted to \code{abcxyfoo}, which means that
+\code{abc6bar} comes before it.
 
+Where two non-numbers are compared, these methods behave like their
+\optfmt{letter-}\emph{modifier} counterparts.
 \begin{itemize}
 \item \optfmt{letternumber-case}: case-sensitive
 letter-number sort.
@@ -6756,10 +6866,27 @@ letter-number sort.
 
 \item \optfmt{letternumber-nocase-reverse}: reverse case-insensitive
 letter-number sort.
+
+\item \optfmt{letternumber-upperlower}: upper-lower
+letter-number sort.
+
+\item \optfmt{letternumber-upperlower-reverse}: reverse upper-lower
+letter-number sort.
+
+\item \optfmt{letternumber-lowerupper}: lower-upper
+letter-number sort.
+
+\item \optfmt{letternumber-lowerupper-reverse}: reverse lower-upper
+letter-number sort.
+
 \end{itemize}
 
-The following use numeric comparisons. The sort value is expected to
-be a numeric value. If it can't be parsed then it's treated as 0.
+\subsubsection{Numerical}
+
+The sort methods listed in \tableref{tab:sortoptionsnumerical} 
+use numeric comparisons. The sort value is expected to
+be a numeric value. If it can't be parsed then it's treated as 0
+(and a warning will be written to the transcript).
 These all recognise the digits in the Unicode \qt{Number,
 Decimal Digit} category but, unlike the hybrid letter-number
 comparators above, they don't recognise the superscript or subscript
@@ -6817,9 +6944,17 @@ decimal sort values.
 \item \optfmt{numberformat-reverse}: as above but reverses the order.
 
 \end{itemize}
-The following values are for dates and times. Use \optref{date-sort-format}
+
+In general, it doesn't make much sense to have hierarchical entries
+that need to be sorted by a number, but it is possible as long as each
+level uses the same type of numbering.
+
+
+\subsection{Date-Time}
+
+The sort methods listed in \tableref{tab:sortoptionsdatetime} 
+are for dates and times.  Use \optref{date-sort-format}
 and \optref{date-sort-locale} to specify the date format and locale.
-See below for further details.
 \begin{itemize}
 \item \optfmt{date}: sort dates.
 
@@ -6834,81 +6969,12 @@ See below for further details.
 \item \optfmt{time-reverse}: as above but reverses the order.
 
 \end{itemize}
-If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
-\csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
-
-Note that \csopt[locale]{sort} can provide more detail about the
-locale than \csopt[doc]{sort}, depending on how the document
-language has been specified.  For example, with:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[ngerman]{babel}
-\usepackage[record]{glossaries}
-\GlsXtrLoadResources[src={german-terms}]
-\end{verbatim}
-the language tag will be \code{de-1996}, which doesn't have an
-associated region. Whereas with
-\begin{verbatim}
-\documentclass[de-DE-1996]{article}
-\usepackage[ngerman]{babel}
-\usepackage[record]{glossaries}
-\GlsXtrLoadResources[src={german-terms}]
-\end{verbatim}
-the language tag will be \code{de-DE-1996} because \sty{tracklang}
-has picked up the locale from the document class options. This is
-only likely to cause a difference if a language has different
-sorting rules according to the region or if the language may be
-written in multiple scripts.
-
-A multilingual document will need to have the \csopt{sort} specified
-when loading the resource to ensure the correct language is chosen. 
-For example:
-\begin{verbatim}
-\GlsXtrLoadResources[src={english-terms},sort={en-GB}]
-\GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
-\end{verbatim}
-
-Remember that you can have \atentryref{preamble} definitions that
-can be hidden from \bibgls's interpreter. For example,
-\filefmt{no-interpret-preamble.bib} might contain:
-\begin{verbatim}
-@preamble{"\providecommand{\sortop}[2]{#1 #2}"}
-\end{verbatim}
-which is loaded using
-\begin{verbatim}
-\GlsXtrLoadResources[src={no-interpret-preamble},
- interpret-preamble=false]
-\end{verbatim}
-This provides the command \csfmt{sortop} for use in the document.
-Another file, say, \filefmt{interpret-preamble.bib} may provide
-a definition for \bibgls:
-\begin{verbatim}
-@preamble{"\providecommand{\sortop}[2]{#2, #1}"}
-\end{verbatim}
-which can be identified with:
-\begin{verbatim}
-\GlsXtrLoadResources[src={interpret-preamble}]
-\end{verbatim}
-This definition swaps the two arguments around for the sorting, but
-doesn't affect the document since \LaTeX\ has already defined
-\csfmt{sortop} from the first resource set.
-
-For example:
-\begin{verbatim}
-@entry{caesar,
-  name={\sortop{Gaius Julius}{Caesar}},
-  first={Julius Caesar},
-  text={Caesar},
-  description={Roman politician and general}
-}
-\end{verbatim}
-If \bibgls\ only recognises the second definition of \csfmt{sortop} then
-the sort value becomes \code{Caesar, Gaius Julius}.
 
 If the field you want to sort by contains a date then the
 simplest way to sort is to ensure the date is in ISO format
 and then just use a letter sort. However it may be that
-the date is in the format particular to your locale. In which
+the date is in the format particular to your locale or you have a
+mix of \era{AD} and \era{BC}. In which
 case you can use one of the date/time sort options (such as
 \csopt[date]{sort} or \csopt[date-reverse]{sort}). The locale
 is assumed to be your default locale (as given by the Java Virtual
@@ -6930,7 +6996,8 @@ is the number of milliseconds since 1st~January, 1970. In the case
 of \csopt[date]{sort} (or \csopt[date-reverse]{sort}), this value is
 obtained from $a(y\times10000 + m\times100 + d)$ where $y$ is the
 year, $m$ is the month number, $d$ is the day of month number, and
-$a$ is an integer representation of the era ($-1$ for \era{BC}).
+$a$ is an integer representation of the era ($-1$ for \era{BC} and
+$+1$ for \era{AD}).
 
 Unlike the numeric sort methods (such as \csopt[integer]{sort})
 the date-time sort methods set the \field{sort} field to a value
@@ -6947,7 +7014,7 @@ level uses the same date format.
 
 For example, suppose my \ext{bib} file contains
 \begin{verbatim}
-@entry{20160110,
+@entry{journalentry,
   name={10 Jan 2017},
   description={an interesting journal entry}
 }
@@ -6971,9 +7038,9 @@ If \longarg{verbose} mode is on, the transcript will show
 the label, sort value and numeric value for each entry.
 In this case, the information is:
 \begin{verbatim}
-20170110 -> '+1 2017-01-10' [20170110]
+journalentry -> '+1 2017-01-10' [20170110]
 \end{verbatim}
-The first value is the label (\code{20170110}), the second
+The first value is the label (\code{journalentry}), the second
 value is assigned to the \field{sort} field
 (\code{+1 2017-01-10}) and the number in square brackets 
 is the actual numeric value used by the comparator. The signed
@@ -6985,12 +7052,12 @@ If I change the format to \optref[short]{date-sort-format},
 then the date can't be parsed correctly and \bibgls\ will 
 issue the following warning:
 \begin{verbatim}
-Warning: Can't parse sort value '10 Jan 2017' for '20170110'
+Warning: Can't parse sort value '10 Jan 2017' for 'journalentry'
 (pattern: 'dd/MM/yyyy')
 \end{verbatim}
-This shows the field value that \bibgls\ is trying to
+This shows the value that \bibgls\ is trying to
 parse (\code{10 Jan 2017}) for the entry identified by
-the given label (\code{20170110}). The pattern \bibgls\ 
+the given label (\code{journalentry}). The pattern \bibgls\ 
 expects is also given (\code{dd/MM/yyyy}).
 
 \subsection{\csoptnv{sort-rule}\csopteqval{value}}
@@ -7063,7 +7130,7 @@ Use \optref{dual-letter-number-rule} for \optref{dual-sort} and
 \subsection{\csoptnv{numeric-sort-pattern}\csopteqval{value}}
 \labelopt{numeric-sort-pattern}
 
-If you use \optref[numberformat]{sort} or
+If you use the custom \optref[numberformat]{sort} or
 \optref[numberformat-reverse]{sort}, you need to 
 specify the format pattern with this option where
 \meta{value} is a pattern recognised by Java's
@@ -7072,11 +7139,9 @@ class. You can use \cs{u}\meta{hex} to indicate Unicode characters
 by their hexadecimal code. (Remember to use \cs{string} to
 protect it from expansion when the options are written to
 the \ext{aux} file.)
-
-For dual or \optref{secondary} numeric sorting, use
-\optref{dual-numeric-sort-pattern} and
-\optref{secondary-numeric-sort-pattern},
-respectively.
+Use \optref{dual-numeric-sort-pattern} for 
+\optref{dual-sort} and \optref{secondary-numeric-sort-pattern} 
+for \optref{secondary}.
 
 \subsection{\csoptnv{numeric-locale}\csopteqval{value}}
 \labelopt{numeric-locale}
@@ -7092,9 +7157,9 @@ the operating system's locale);
 \item\meta{lang-tag}: set to the locale identified by the given
 a valid language tag \meta{lang-tag}.
 \end{itemize}
-For dual or \optref{secondary} numeric sorting, use
-\optref{dual-numeric-locale} and \optref{secondary-numeric-locale},
-respectively.
+Use \optref{dual-numeric-locale} for 
+\optref{dual-sort} and \optref{secondary-numeric-locale} 
+for \optref{secondary}.
 
 \subsection{\csoptnv{date-sort-locale}\csopteqval{value}}
 \labelopt{date-sort-locale}
@@ -7647,7 +7712,187 @@ characters. See the documentation for Java's
 class} for further details.
 This option is ignored by non-locale sorts (such as letter or numeric).
 
+\section{Secondary Glossary}
+\label{sec:secondaryopts}
+
+\subsection{\csoptnv{secondary}\csopteqval{value}}
+\labelopt{secondary}
+
+It may be that you want to display a glossary twice but with a
+different order. For example, the first time alphabetically and the
+second time by category.  One way to do this is to have two
+\cs{GlsXtrLoadResources} that both load the same \ext{bib} file with
+different \optref{label-prefix} and \optref{sort} settings, but this
+is only possible with \optref[all]{selection} or by ensuring you
+reference each entry with both label prefixes.
+
+A simpler method is to use a single \cs{GlsXtrLoadResources}
+with the \csopt{secondary} option. The value
+(which must be supplied) should be in the format 
+\begin{definition}
+\meta{sort}:\meta{field}:\meta{type}
+\end{definition}
+or
+\begin{definition}
+\meta{sort}:\meta{type}
+\end{definition}
+If the \meta{field} is omitted, the value of \optref{sort-field} is
+used. Remember that when the primary entries are sorted, the
+\field{sort} field will be set, which means that the fallback field
+(such as \field{name}) won't be used in the secondary sort. In
+general it's best to supply the field unless one type is sorted and the
+other isn't. (The actual sort value obtained by the secondary sort
+will be saved in the \field{secondarysort} field in case you require it.)
+
+The value of \meta{sort} is as for \optref{sort}, but note
+that in this case the sort value \optfmt{unsrt} or \optfmt{none}
+means to use the same ordering as the primary entries. For
+example, with \optref[de-CH-1996]{sort},
+\optref[none:copies]{secondary} the \code{copies} list will be
+ordered according to \code{de-CH-1996} and not according to the
+order in which they were read when the \ext{bib} file or files were
+parsed.  If \meta{sort} is \optfmt{custom}, then the rule should be
+provided with \optref{secondary-sort-rule}.
+
+This option will copy all the selected entries into the glossary labelled
+\meta{type} sorted according to \meta{sort} (using \meta{field} as
+the sort value). Note that this \emph{just copies the entry's label}
+to the second glossary list rather than creating a duplicate entry,
+which saves resources but it means that all the fields will be
+identical. If you want groups in your glossary, the group
+information for the secondary glossary will be stored in the
+internal \field{secondarygroup} field. The \field{group} field will
+contain the group for the primary glossary.
+
+In order to switch fields in \cs{printunsrtglossary}, you need at
+least v1.21 of \sty{glossaries-extra} which provides
+\cs{glsxtrgroupfield} to keep track of the appropriate field label.
+If this command is defined, the preamble for the secondary glossary 
+will be adjusted to locally change the field to
+\field{secondarygroup}. With older versions, the group information
+in the secondary glossary will be the same as for the primary
+glossary.
+
+(If the glossary \meta{type} doesn't exist, it will be
+defined with \cs{provideignoredglossary*}\margm{type}.)
+Note that if the glossary already exists and contains entries,
+the existing entries aren't re-ordered. The new entries are
+simply appended to the list.
+
+For example, suppose the \ext{bib} file contains entries like:
+\begin{verbatim}
+@entry{quartz,
+  name={quartz},
+  description={hard mineral consisting of silica},
+  category={mineral}
+}
+
+@entry{cabbage,
+  name={cabbage},
+  description={vegetable with thick green or purple leaves},
+  category={vegetable}
+}
+
+@entry{waterfowl,
+  name={waterfowl},
+  description={any bird that lives in or about water},
+  category={animal}
+}
+\end{verbatim}
+and the document preamble contains:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries},sort={en-GB},
+  secondary={en-GB:category:topic}
+]
+\end{verbatim}
+This sorts the primary entries according to the default
+\optref{sort-field} and then sorts the entries according
+to the \field{category} field and copies this list to
+the \code{topic} glossary (which will be provided if not defined.)
+
+The secondary list can be displayed with the hypertargets switched
+off to prevent duplicates. The cross-references will link to the
+original glossary.
+
+For example:
+\begin{verbatim}
+\printunsrtglossary[title={Summary (alphabetical)}]
+\printunsrtglossary[title={Summary (by topic)},target=false]
+\end{verbatim}
+
+The alternative (or if more than two lists are required) is to
+reload the same \ext{bib} file with different label prefixes.
+For example, if the entries are stored in \filefmt{entries.bib}:
+\begin{verbatim}
+\newglossary*{nosort}{Symbols (Unsorted)}
+\newglossary*{byname}{Symbols (Letter Order)}
+\newglossary*{bydesc}{Symbols (Ordered by Description)}
+\newglossary*{byid}{Symbols (Ordered by Label)}
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={unsrt},
+  type={nosort}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={letter-case},
+  type={byname},
+  label-prefix={byname.}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={locale},
+  sort-field={description},
+  type={bydesc},
+  label-prefix={bydesc.}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% entries.bib
+  sort={letter},
+  sort-field={id},
+  type={byid},
+  label-prefix={byid.}
+]
+\end{verbatim}
+
+\subsection{\csoptnv{secondary-sort-rule}\csopteqval{value}}
+\labelopt{secondary-sort-rule}
+
+As \optref{sort-rule} but for secondary custom sorting.
+
+\subsection{\csoptnv{secondary-letter-number-rule}\csopteqval{value}}
+\labelopt{secondary-letter-number-rule}
+
+As \optref{letter-number-rule} but for secondary letter-number sorting.
+
+\subsection{\csoptnv{secondary-numeric-locale}\csopteqval{value}}
+\labelopt{secondary-numeric-locale}
+
+As \optref{numeric-locale} but for secondary
+locale-sensitive numeric sorting.
+
+\subsection{\csoptnv{secondary-numeric-sort-pattern}\csopteqval{value}}
+\labelopt{secondary-numeric-sort-pattern}
+
+As \optref{numeric-sort-pattern} but for secondary
+locale-sensitive numeric sorting.
+
+\subsection{\csoptnv{secondary-date-sort-format}\csopteqval{value}}
+\labelopt{secondary-date-sort-format}
+
+As \optref{date-sort-format} but for secondary date-time sorting.
+
+\subsection{\csoptnv{secondary-date-sort-locale}\csopteqval{value}}
+\labelopt{secondary-date-sort-locale}
+
+As \optref{date-sort-locale} but for secondary date-time sorting.
+
 \section{Dual Entries}
+\label{sec:dualopts}
 
 \subsection{\csoptnv{dual-sort}\csopteqval{value}}
 \labelopt{dual-sort}
@@ -9692,6 +9937,39 @@ field using:
 \glssetexpandfield{name}
 \end{verbatim}
 (before \cs{GlsXtrLoadResources}).
+
+\section{Other}
+
+\subsection{\csfmt{bibglssetwidest}}
+\labelcs{bibglssetwidest}
+
+\begin{definition}
+\cs{bibglssetwidest}\margm{level}\margm{name}
+\end{definition}
+
+This is used by \optref{set-widest} to set the widest name for the
+given hierarchical level where the glossary type can't be determined.
+This is defined as:
+\begin{verbatim}
+\providecommand*{\bibglssetwidest}[2]{\glssetwidest[#1]{#2}}
+\end{verbatim}
+
+\subsection{\csfmt{bibglssetwidestfortype}}
+\labelcs{bibglssetwidestfortype}
+
+\begin{definition}
+\cs{bibglssetwidestfortype}\margm{type}\margm{level}\margm{name}
+\end{definition}
+
+This is used by \optref{set-widest} to set the widest name for the
+given hierarchical level where the glossary type is known. This
+is defined as:
+\begin{verbatim}
+\providecommand*{\bibglssetwidestfortype}[3]{%
+  \apptoglossarypreamble[#1]{\glssetwidest[#2]{#3}}%
+}
+\end{verbatim}
+
 
 \chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
 \label{sec:gls2bib}
