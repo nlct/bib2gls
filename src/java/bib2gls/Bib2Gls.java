@@ -2061,6 +2061,51 @@ public class Bib2Gls implements TeXApp
          message);
    }
 
+   public static boolean isScriptDigit(int cp)
+   {
+      return isSubscriptDigit(cp) || isSuperscriptDigit(cp);
+   }
+
+   public static boolean isSubscriptDigit(int cp)
+   {
+      switch (cp)
+      {
+         case SUBSCRIPT_ZERO:
+         case SUBSCRIPT_ONE:
+         case SUBSCRIPT_TWO:
+         case SUBSCRIPT_THREE:
+         case SUBSCRIPT_FOUR:
+         case SUBSCRIPT_FIVE:
+         case SUBSCRIPT_SIX:
+         case SUBSCRIPT_SEVEN:
+         case SUBSCRIPT_EIGHT:
+         case SUBSCRIPT_NINE:
+            return true;
+      }
+
+      return false;
+   }
+
+   public static boolean isSuperscriptDigit(int cp)
+   {
+      switch (cp)
+      {
+         case SUPERSCRIPT_ZERO:
+         case SUPERSCRIPT_ONE:
+         case SUPERSCRIPT_TWO:
+         case SUPERSCRIPT_THREE:
+         case SUPERSCRIPT_FOUR:
+         case SUPERSCRIPT_FIVE:
+         case SUPERSCRIPT_SIX:
+         case SUPERSCRIPT_SEVEN:
+         case SUPERSCRIPT_EIGHT:
+         case SUPERSCRIPT_NINE:
+            return true;
+      }
+
+      return false;
+   }
+
    public static Integer parseInt(String str)
      throws NumberFormatException
    {

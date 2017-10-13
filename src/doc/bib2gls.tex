@@ -6838,10 +6838,15 @@ least one digit for it to be recognised as a number otherwise it's
 treated as a punctuation character.
 
 In the situation where only one sub-string is numeric, the
-\optref{letter-number-rule} is used to determine the result. 
-(The \optref{dual-sort} and \optref{secondary} options are governed
-by the corresponding \optref{dual-letter-number-rule}, and
-\optref{secondary-letter-number-rule}.)
+\optref{letter-number-rule} is used to determine the result if the
+non-numeric character is considered a letter otherwise
+the \optref{letter-number-punc-rule} is used. If both
+are letters, then the comparison is as for the
+\optfmt{letter-}\emph{modifier} counterpart.
+(for example, \optfmt{letternumber-case} will behave like
+\optfmt{letter-case}) otherwise if one is a letter and the other
+isn't a letter and isn't a number then the 
+\optref{letter-number-punc-rule} is used.
 
 The default setting is \optref[before lower]{letter-number-rule} so,
 for example, if comparing \code{abcXYfoo} and \code{abc6bar} then
@@ -6852,8 +6857,6 @@ lower case).  Whereas with the case-insensitive
 would first be converted to \code{abcxyfoo}, which means that
 \code{abc6bar} comes before it.
 
-Where two non-numbers are compared, these methods behave like their
-\optfmt{letter-}\emph{modifier} counterparts.
 \begin{itemize}
 \item \optfmt{letternumber-case}: case-sensitive
 letter-number sort.
@@ -7097,23 +7100,24 @@ If \optref{sort} is not set to \optfmt{custom}, the
 \subsection{\csoptnv{letter-number-rule}\csopteqval{value}}
 \labelopt{letter-number-rule}
 
+This option automatically implements
+\optref[\meta{value}]{dual-letter-number-rule}
+and
+\optref[\meta{value}]{secondary-letter-number-rule}.
+
 If you use one of the letter-number sort methods (such as
 \optref[letternumber-case]{sort}), then you can determine the
-comparison between a number and non-number. The \meta{value} may be
+comparison between a number and letter. The \meta{value} may be
 one of:
 \begin{itemize}
 \item\optfmt{before lower}: numbers are considered less than lower
-case characters (default), which means that numbers are also considered greater
-than all other characters including upper case and punctuation;
+case characters (default);
 \item\optfmt{before upper}: numbers are considered less than upper
-case characters, which means that numbers are also considered greater
-than all other characters including lower case and punctuation;
+case characters;
 \item\optfmt{before letter}: numbers are considered less than any
-letter (regardless of case), which means that numbers are also
-considered greater than all non-letter characters;
+letter (regardless of case);
 \item\optfmt{after letter}: numbers are considered greater than any
-letter (regardless of case), which means that numbers are also
-considered less than all non-letter characters;
+letter (regardless of case);
 \item\optfmt{first}: numbers are considered less than all
 characters;
 \item\optfmt{last}: numbers are considered greater than all
@@ -7124,8 +7128,72 @@ first convert the \field{sort} field to lower case, which means that
 if you use one of them then there won't be any upper case
 characters.
 
-Use \optref{dual-letter-number-rule} for \optref{dual-sort} and
-\optref{secondary-letter-number-rule} for \optref{secondary}.
+Use \optref{letter-number-punc-rule} to determine the relative
+position of white space and punctuation.
+
+\subsection{\csoptnv{letter-number-punc-rule}\csopteqval{value}}
+\labelopt{letter-number-punc-rule}
+
+This option automatically implements
+\optref[\meta{value}]{dual-letter-number-punc-rule}
+and
+\optref[\meta{value}]{secondary-letter-number-punc-rule}.
+
+If you use one of the letter-number sort methods (such as
+\optref[letternumber-case]{sort}), then you can determine the
+order of white space and punctuation. In this context, punctuation
+means any character that's not considered a letter, a number
+or white space. This means that characters such as combining marks
+are considered punctuation.
+
+The \meta{value} may be one of the following:
+\begin{itemize}
+\item\optfmt{punc-space-first}: punctuation comes first, followed by
+white space (then letters and optionally numbers according to the letter-number
+rule);
+\item\optfmt{punc-space-last}: punctuation followed by white space
+come last (after letters and optionally numbers according to the letter-number
+rule);
+\item\optfmt{space-punc-first}: white space comes first, followed by
+punctuation (then letters and optionally numbers according to the letter-number
+rule);
+\item\optfmt{space-punc-last}: white space followed by punctuation
+come last (after letters and optionally numbers according to the letter-number
+rule); 
+\item\optfmt{space-first-punc-last}: white space comes first
+(followed by letters and optionally numbers according to the letter-number
+rule) and punctuation comes last; 
+\item\optfmt{punc-first-space-last}: punctuation comes first
+(followed by letters and optionally numbers according to the letter-number
+rule) and white space comes last;
+\item\optfmt{punc-first-space-zero}: punctuation comes first
+(although numbers may come before)
+and white space is replaced by the digit~\code{0} (0x30);
+\item\optfmt{punc-last-space-zero}: punctuation comes last
+(although numbers may come after)
+and white space is replaced by the digit~\code{0} (0x30).
+\item\optfmt{punc-first-space-zero-match-next}: punctuation comes first
+(although numbers may come before)
+and white space is replaced by zero;
+\item\optfmt{punc-last-space-zero-match-next}: punctuation comes last
+(although numbers may come after)
+and white space is replaced by zero.
+\end{itemize}
+For the \optfmt{space-zero-match-next} settings, the sort value will
+have all spaces replaced with a digit that represents zero. If the
+space isn't followed by a digit, the basic Latin \code{0} (0x30)
+will be used, otherwise \bibgls\ will try to match the zero with the
+following digit group. For example, if the space is followed by
+\textsuperscript{1} (0xB9) the space will be replaced by
+\textsuperscript{0} (0x2070),  resulting in the sub-string
+\code{\textsuperscript{01}} (0xB9 0x2070). If just the \optfmt{space-zero}
+(without the \optfmt{-match-next}) is used then the space will just
+be replaced with \code{0} resulting in the sub-string
+\code{0\textsuperscript{1}} (0x30 0x2070).
+
+Note that \optref[first]{letter-number-rule} and
+\optref[last]{letter-number-rule} overrides this option when
+comparing a number with white space or punctuation.
 
 \subsection{\csoptnv{numeric-sort-pattern}\csopteqval{value}}
 \labelopt{numeric-sort-pattern}
@@ -7278,6 +7346,11 @@ the year and era:
 \subsection{\csoptnv{break-at}\csopteqval{option}}
 \labelopt{break-at}
 
+This option automatically implements
+\optref[\meta{option}]{dual-break-at} and
+\optref[\meta{option}]{secondary-break-at}.
+
+
 The rule-based sort options (\csopt[\meta{lang tag}]{sort}
 and \csopt[custom]{sort}) typically list punctuation characters
 (such as space) before alphabetical characters. This means that
@@ -7314,6 +7387,11 @@ Use the \argref{debug} switch to show the break points.
 
 \subsection{\csoptnv{break-marker}\csopteqval{marker}}
 \labelopt{break-marker}
+
+This option automatically implements
+\optref[\meta{marker}]{dual-break-marker} and
+\optref[\meta{marker}]{secondary-break-marker}.
+
 
 The break marker can be changed using
 \csopt[\meta{marker}]{break-marker}, where \meta{marker} is 
@@ -7642,6 +7720,10 @@ be an integer used as a seed for the random number generator.
 \subsection{\csoptnv{strength}\csopteqval{value}}
 \labelopt{strength}
 
+This option automatically implements
+\optref[\meta{value}]{dual-strength} and
+\optref[\meta{value}]{secondary-strength}.
+
 The collation strength used by \csopt[\meta{locale}]{sort} can be set
 to the following values: \optfmt{primary} (default),
 \optfmt{secondary}, \optfmt{tertiary} or \optfmt{identical}. These
@@ -7700,6 +7782,10 @@ This option is ignored by non-locale sorts (such as letter or numeric).
 
 \subsection{\csoptnv{decomposition}\csopteqval{value}}
 \labelopt{decomposition}
+
+This option automatically implements
+\optref[\meta{value}]{dual-decomposition} and
+\optref[\meta{value}]{secondary-decomposition}.
 
 The collation decomposition used by \csopt[\meta{locale}]{sort} can be set
 to the following values: \optfmt{canonical} (default),
@@ -7869,6 +7955,11 @@ As \optref{sort-rule} but for secondary custom sorting.
 
 As \optref{letter-number-rule} but for secondary letter-number sorting.
 
+\subsection{\csoptnv{secondary-letter-number-punc-rule}\csopteqval{value}}
+\labelopt{secondary-letter-number-punc-rule}
+
+As \optref{letter-number-punc-rule} but for secondary letter-number sorting.
+
 \subsection{\csoptnv{secondary-numeric-locale}\csopteqval{value}}
 \labelopt{secondary-numeric-locale}
 
@@ -7890,6 +7981,26 @@ As \optref{date-sort-format} but for secondary date-time sorting.
 \labelopt{secondary-date-sort-locale}
 
 As \optref{date-sort-locale} but for secondary date-time sorting.
+
+\subsection{\csoptnv{secondary-break-at}\csopteqval{value}}
+\labelopt{secondary-break-at}
+
+As \optref{break-at} but for secondary entries.
+
+\subsection{\csoptnv{secondary-break-marker}\csopteqval{value}}
+\labelopt{secondary-break-marker}
+
+As \optref{break-marker} but for secondary entries.
+
+\subsection{\csoptnv{secondary-strength}\csopteqval{value}}
+\labelopt{secondary-strength}
+
+As \optref{strength} but for secondary entries.
+
+\subsection{\csoptnv{secondary-decomposition}\csopteqval{value}}
+\labelopt{secondary-decomposition}
+
+As \optref{decomposition} but for secondary entries.
 
 \section{Dual Entries}
 \label{sec:dualopts}
@@ -7955,6 +8066,12 @@ As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
 As \optref{letter-number-rule} but for dual entries that use a
 letter-number sort.
 
+\subsection{\csoptnv{dual-letter-number-punc-rule}\csopteqval{value}}
+\labelopt{dual-letter-number-punc-rule}
+
+As \optref{letter-number-punc-rule} but for dual entries that use a
+letter-number sort.
+
 \subsection{\csoptnv{dual-numeric-locale}\csopteqval{value}}
 \labelopt{dual-numeric-locale}
 
@@ -7978,6 +8095,26 @@ use a date/time sort.
 
 As \optref{date-sort-format} but for dual entries that
 use a date/time sort.
+
+\subsection{\csoptnv{dual-break-at}\csopteqval{value}}
+\labelopt{dual-break-at}
+
+As \optref{break-at} but for dual entries.
+
+\subsection{\csoptnv{dual-break-marker}\csopteqval{value}}
+\labelopt{dual-break-marker}
+
+As \optref{break-marker} but for dual entries.
+
+\subsection{\csoptnv{dual-strength}\csopteqval{value}}
+\labelopt{dual-strength}
+
+As \optref{strength} but for dual entries.
+
+\subsection{\csoptnv{dual-decomposition}\csopteqval{value}}
+\labelopt{dual-decomposition}
+
+As \optref{decomposition} but for dual entries.
 
 \subsection{\csoptnv{dual-prefix}\csopteqval{value}}
 \labelopt{dual-prefix}

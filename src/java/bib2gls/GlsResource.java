@@ -662,16 +662,55 @@ public class GlsResource
 
             if (val.equals("none"))
             {
-               sortSuffixOption = SORT_SUFFIX_NONE;
+               sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NONE);
             }
             else if (val.equals("non-unique"))
             {
-               sortSuffixOption = SORT_SUFFIX_NON_UNIQUE;
+               sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
+            }
+
+            dualSortSettings.setSuffixOption(sortSettings.getSuffixOption());
+            secondarySortSettings.setSuffixOption(sortSettings.getSuffixOption());
+         }
+         else if (opt.equals("dual-sort-suffix"))
+         {
+            String val = getChoice(parser, list, opt, "none", "non-unique");
+
+            if (val.equals("none"))
+            {
+               dualSortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NONE);
+            }
+            else if (val.equals("non-unique"))
+            {
+               dualSortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
+            }
+         }
+         else if (opt.equals("secondary-sort-suffix"))
+         {
+            String val = getChoice(parser, list, opt, "none", "non-unique");
+
+            if (val.equals("none"))
+            {
+               secondarySortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NONE);
+            }
+            else if (val.equals("non-unique"))
+            {
+               secondarySortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
          }
          else if (opt.equals("sort-suffix-marker"))
          {
-            sortSuffixMarker = replaceHex(getOptional(parser, "", list, opt));
+            sortSettings.setSuffixMarker(replaceHex(getOptional(parser, "", list, opt)));
+            dualSortSettings.setSuffixMarker(sortSettings.getSuffixMarker());
+            secondarySortSettings.setSuffixMarker(sortSettings.getSuffixMarker());
+         }
+         else if (opt.equals("dual-sort-suffix-marker"))
+         {
+            dualSortSettings.setSuffixMarker(replaceHex(getOptional(parser, "", list, opt)));
+         }
+         else if (opt.equals("secondary-sort-suffix-marker"))
+         {
+            secondarySortSettings.setSuffixMarker(replaceHex(getOptional(parser, "", list, opt)));
          }
          else if (opt.equals("sort"))
          {
@@ -726,6 +765,11 @@ public class GlsResource
          {
             sortSettings.setLetterNumberRule(
               getLetterNumberRule(parser, list, opt));
+
+            dualSortSettings.setLetterNumberRule(
+              sortSettings.getLetterNumberRule());
+            secondarySortSettings.setLetterNumberRule(
+              sortSettings.getLetterNumberRule());
          }
          else if (opt.equals("dual-letter-number-rule"))
          {
@@ -736,6 +780,26 @@ public class GlsResource
          {
             secondarySortSettings.setLetterNumberRule(
               getLetterNumberRule(parser, list, opt));
+         }
+         else if (opt.equals("letter-number-punc-rule"))
+         {
+            sortSettings.setLetterNumberPuncRule(
+              getLetterNumberPuncRule(parser, list, opt));
+
+            dualSortSettings.setLetterNumberPuncRule(
+              sortSettings.getLetterNumberPuncRule());
+            secondarySortSettings.setLetterNumberPuncRule(
+              sortSettings.getLetterNumberPuncRule());
+         }
+         else if (opt.equals("dual-letter-number-punc-rule"))
+         {
+            dualSortSettings.setLetterNumberPuncRule(
+              getLetterNumberPuncRule(parser, list, opt));
+         }
+         else if (opt.equals("secondary-letter-number-punc-rule"))
+         {
+            secondarySortSettings.setLetterNumberPuncRule(
+              getLetterNumberPuncRule(parser, list, opt));
          }
          else if (opt.equals("date-sort-format"))
          {
@@ -999,24 +1063,81 @@ public class GlsResource
 
             if (val.equals("none"))
             {
-               breakPoint = Bib2GlsEntryComparator.BREAK_NONE;
+               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_NONE);
             }
             else if (val.equals("word"))
             {
-               breakPoint = Bib2GlsEntryComparator.BREAK_WORD;
+               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_WORD);
             }
             else if (val.equals("character"))
             {
-               breakPoint = Bib2GlsEntryComparator.BREAK_CHAR;
+               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_CHAR);
             }
             else if (val.equals("sentence"))
             {
-               breakPoint = Bib2GlsEntryComparator.BREAK_SENTENCE;
+               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_SENTENCE);
+            }
+
+            dualSortSettings.setBreakPoint(sortSettings.getBreakPoint());
+            secondarySortSettings.setBreakPoint(sortSettings.getBreakPoint());
+         }
+         else if (opt.equals("dual-break-at"))
+         {
+            String val = getChoice(parser, list, opt, "none", "word",
+              "character", "sentence");
+
+            if (val.equals("none"))
+            {
+               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_NONE);
+            }
+            else if (val.equals("word"))
+            {
+               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_WORD);
+            }
+            else if (val.equals("character"))
+            {
+               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_CHAR);
+            }
+            else if (val.equals("sentence"))
+            {
+               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_SENTENCE);
+            }
+         }
+         else if (opt.equals("secondary-break-at"))
+         {
+            String val = getChoice(parser, list, opt, "none", "word",
+              "character", "sentence");
+
+            if (val.equals("none"))
+            {
+               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_NONE);
+            }
+            else if (val.equals("word"))
+            {
+               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_WORD);
+            }
+            else if (val.equals("character"))
+            {
+               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_CHAR);
+            }
+            else if (val.equals("sentence"))
+            {
+               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_SENTENCE);
             }
          }
          else if (opt.equals("break-marker"))
          {
-            breakPointMarker = getOptional(parser, "", list, opt);
+            sortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
+            dualSortSettings.setBreakPointMarker(sortSettings.getBreakPointMarker());
+            secondarySortSettings.setBreakPointMarker(sortSettings.getBreakPointMarker());
+         }
+         else if (opt.equals("dual-break-marker"))
+         {
+            dualSortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
+         }
+         else if (opt.equals("secondary-break-marker"))
+         {
+            secondarySortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
          }
          else if (opt.equals("strength"))
          { // collator strength
@@ -1026,19 +1147,68 @@ public class GlsResource
 
             if (val.equals("primary"))
             {
-               collatorStrength = Collator.PRIMARY;
+               sortSettings.setCollatorStrength(Collator.PRIMARY);
             }
             else if (val.equals("secondary"))
             {
-               collatorStrength = Collator.SECONDARY;
+               sortSettings.setCollatorStrength(Collator.SECONDARY);
             }
             else if (val.equals("tertiary"))
             {
-               collatorStrength = Collator.TERTIARY;
+               sortSettings.setCollatorStrength(Collator.TERTIARY);
             }
             else if (val.equals("identical"))
             {
-               collatorStrength = Collator.IDENTICAL;
+               sortSettings.setCollatorStrength(Collator.IDENTICAL);
+            }
+
+            dualSortSettings.setCollatorStrength(sortSettings.getCollatorStrength());
+            secondarySortSettings.setCollatorStrength(sortSettings.getCollatorStrength());
+         }
+         else if (opt.equals("dual-strength"))
+         { // dual collator strength
+
+            String val = getChoice(parser, list, opt, "primary", "secondary",
+               "tertiary", "identical");
+
+            if (val.equals("primary"))
+            {
+               dualSortSettings.setCollatorStrength(Collator.PRIMARY);
+            }
+            else if (val.equals("secondary"))
+            {
+               dualSortSettings.setCollatorStrength(Collator.SECONDARY);
+            }
+            else if (val.equals("tertiary"))
+            {
+               dualSortSettings.setCollatorStrength(Collator.TERTIARY);
+            }
+            else if (val.equals("identical"))
+            {
+               dualSortSettings.setCollatorStrength(Collator.IDENTICAL);
+            }
+         }
+         else if (opt.equals("secondary-strength"))
+         { // secondary collator strength
+
+            String val = getChoice(parser, list, opt, "primary", "secondary",
+               "tertiary", "identical");
+
+            if (val.equals("primary"))
+            {
+               secondarySortSettings.setCollatorStrength(Collator.PRIMARY);
+            }
+            else if (val.equals("secondary"))
+            {
+               secondarySortSettings.setCollatorStrength(Collator.SECONDARY);
+            }
+            else if (val.equals("tertiary"))
+            {
+               secondarySortSettings.setCollatorStrength(Collator.TERTIARY);
+            }
+            else if (val.equals("identical"))
+            {
+               secondarySortSettings.setCollatorStrength(Collator.IDENTICAL);
             }
          }
          else if (opt.equals("decomposition"))
@@ -1049,15 +1219,58 @@ public class GlsResource
 
             if (val.equals("none"))
             {
-               collatorDecomposition = Collator.NO_DECOMPOSITION;
+               sortSettings.setCollatorDecomposition(Collator.NO_DECOMPOSITION);
             }
             else if (val.equals("canonical"))
             {
-               collatorDecomposition = Collator.CANONICAL_DECOMPOSITION;
+               sortSettings.setCollatorDecomposition(Collator.CANONICAL_DECOMPOSITION);
             }
             else if (val.equals("full"))
             {
-               collatorDecomposition = Collator.FULL_DECOMPOSITION;
+               sortSettings.setCollatorDecomposition(Collator.FULL_DECOMPOSITION);
+            }
+
+            dualSortSettings.setCollatorDecomposition(
+              sortSettings.getCollatorDecomposition());
+            secondarySortSettings.setCollatorDecomposition(
+              sortSettings.getCollatorDecomposition());
+         }
+         else if (opt.equals("dual-decomposition"))
+         { // dual collator decomposition
+
+            String val = getChoice(parser, list, opt, "none", "canonical",
+              "full");
+
+            if (val.equals("none"))
+            {
+               dualSortSettings.setCollatorDecomposition(Collator.NO_DECOMPOSITION);
+            }
+            else if (val.equals("canonical"))
+            {
+               dualSortSettings.setCollatorDecomposition(Collator.CANONICAL_DECOMPOSITION);
+            }
+            else if (val.equals("full"))
+            {
+               dualSortSettings.setCollatorDecomposition(Collator.FULL_DECOMPOSITION);
+            }
+         }
+         else if (opt.equals("secondary-decomposition"))
+         { // secondary collator decomposition
+
+            String val = getChoice(parser, list, opt, "none", "canonical",
+              "full");
+
+            if (val.equals("none"))
+            {
+               secondarySortSettings.setCollatorDecomposition(Collator.NO_DECOMPOSITION);
+            }
+            else if (val.equals("canonical"))
+            {
+               secondarySortSettings.setCollatorDecomposition(Collator.CANONICAL_DECOMPOSITION);
+            }
+            else if (val.equals("full"))
+            {
+               secondarySortSettings.setCollatorDecomposition(Collator.FULL_DECOMPOSITION);
             }
          }
          else
@@ -1613,13 +1826,13 @@ public class GlsResource
            "selection"));
       }
 
-      if (collatorStrength != Collator.PRIMARY)
+      if (sortSettings.getCollatorStrength() != Collator.PRIMARY)
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "strength"));
       }
 
-      if (collatorDecomposition != Collator.CANONICAL_DECOMPOSITION)
+      if (sortSettings.getCollatorDecomposition() != Collator.CANONICAL_DECOMPOSITION)
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "decomposition"));
@@ -2313,15 +2526,62 @@ public class GlsResource
       {
          return Bib2GlsEntryLetterNumberComparator.NUMBER_FIRST;
       }
-      else if (val.equals("last"))
+      else// if (val.equals("last"))
       {
          return Bib2GlsEntryLetterNumberComparator.NUMBER_LAST;
       }
+   }
 
-      //won't happen but keep compiler happy
+   private int getLetterNumberPuncRule(TeXParser parser, KeyValList list,
+     String opt)
+   throws IOException
+   {
+      String val = getChoice(parser, list, opt, "punc-space-first", 
+        "punc-space-last", "space-punc-first", "space-punc-last",
+        "space-first-punc-last", "punc-first-space-last",
+        "punc-first-space-zero", "punc-last-space-zero",
+        "punc-first-space-zero-match-next", "punc-last-space-zero-match-next");
 
-      throw new IllegalArgumentException("Illegal letter number rule: "
-        +val);
+      if (val.equals("punc-space-first"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_SPACE_FIRST;
+      }
+      else if (val.equals("punc-space-last"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_SPACE_LAST;
+      }
+      else if (val.equals("space-punc-first"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.SPACE_PUNCTUATION_FIRST;
+      }
+      else if (val.equals("space-punc-last"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.SPACE_PUNCTUATION_LAST;
+      }
+      else if (val.equals("space-first-punc-last"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.SPACE_FIRST_PUNCTUATION_LAST;
+      }
+      else if (val.equals("punc-first-space-last"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_FIRST_SPACE_LAST;
+      }
+      else if (val.equals("punc-first-space-zero"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_FIRST_SPACE_ZERO;
+      }
+      else if (val.equals("punc-last-space-zero"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_LAST_SPACE_ZERO;
+      }
+      else if (val.equals("punc-first-space-zero-match-next"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT;
+      }
+      else // if (val.equals("punc-last-space-zero-match-next"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT;
+      }
    }
 
    public static TeXObjectList trimList(TeXObjectList list)
@@ -3338,9 +3598,7 @@ public class GlsResource
       {
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.caseStyle(), settings.isReverse(), 
-              sortSuffixOption, sortSuffixMarker);
+              settings, sortField, entryGroupField, entryType);
 
          comparator.sortEntries();
       }
@@ -3348,10 +3606,7 @@ public class GlsResource
       {
          Bib2GlsEntryLetterNumberComparator comparator = 
             new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
-              settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.caseStyle(), settings.isReverse(),
-              settings.getLetterNumberRule(),
-              sortSuffixOption, sortSuffixMarker);
+              settings, sortField, entryGroupField, entryType);
 
          comparator.sortEntries();
       }
@@ -3359,51 +3614,25 @@ public class GlsResource
       {
          Bib2GlsEntryNumericComparator comparator = 
             new Bib2GlsEntryNumericComparator(bib2gls, entries, 
-              settings.getMethod(), sortField, entryGroupField, entryType,
-              settings.getNumberLocale(), settings.getNumberFormat());
+              settings, sortField, entryGroupField, entryType);
 
          comparator.sortEntries();
       }
-      else if (settings.isDateSort())
+      else if (settings.isDateOrTimeSort())
       {
          Bib2GlsEntryDateTimeComparator comparator = 
             new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.getDateLocale(), settings.getDateFormat(),
-              true, false, settings.isReverse());
+              settings, sortField, entryGroupField, entryType);
 
          comparator.sortEntries();
       }
-      else if (settings.isTimeSort())
-      {
-         Bib2GlsEntryDateTimeComparator comparator = 
-            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.getDateLocale(), settings.getDateFormat(),
-              false, true, settings.isReverse());
-
-         comparator.sortEntries();
-      }
-      else if (settings.isDateTimeSort())
-      {
-         Bib2GlsEntryDateTimeComparator comparator = 
-            new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              settings.getMethod(), sortField, entryGroupField,
-              entryType, settings.getDateLocale(), settings.getDateFormat(), 
-              true, true, settings.isReverse());
-
-         comparator.sortEntries();
-      }
-      else if (settings.isCustom())
+      else
       {
          try
          {
             Bib2GlsEntryComparator comparator = 
-               new Bib2GlsEntryComparator(bib2gls, entries, 
-                  sortField, entryGroupField, entryType,
-                  collatorStrength, collatorDecomposition,
-                  settings.getCollationRule(), breakPoint, breakPointMarker,
-                  sortSuffixOption, sortSuffixMarker);
+               new Bib2GlsEntryComparator(bib2gls, entries, settings,
+                  sortField, entryGroupField, entryType);
 
             comparator.sortEntries();
          }
@@ -3412,18 +3641,6 @@ public class GlsResource
             throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.sort.rule", e.getMessage()), e);
          }
-      }
-      else
-      {
-         Bib2GlsEntryComparator comparator = 
-            new Bib2GlsEntryComparator(bib2gls, entries, 
-               settings.getLocale(), sortField, 
-               entryGroupField, entryType,
-               collatorStrength, collatorDecomposition,
-               breakPoint, breakPointMarker,
-               sortSuffixOption, sortSuffixMarker);
-
-         comparator.sortEntries();
       }
    }
 
@@ -5487,13 +5704,6 @@ public class GlsResource
 
    private String type=null, category=null, counter=null;
 
-   public static final int SORT_SUFFIX_NONE=0;
-   public static final int SORT_SUFFIX_NON_UNIQUE=1;
-
-   private int sortSuffixOption=SORT_SUFFIX_NON_UNIQUE;
-
-   private String sortSuffixMarker = "";
-
    private SortSettings sortSettings = new SortSettings("locale");
    private SortSettings dualSortSettings = new SortSettings();
    private SortSettings secondarySortSettings = new SortSettings();
@@ -5537,13 +5747,6 @@ public class GlsResource
    private Vector<Bib2GlsEntry> dualData;
 
    private Bib2Gls bib2gls;
-
-   private int collatorStrength=Collator.PRIMARY;
-
-   private int collatorDecomposition=Collator.CANONICAL_DECOMPOSITION;
-
-   private int breakPoint = Bib2GlsEntryComparator.BREAK_WORD;
-   private String breakPointMarker = "|";
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
    private int seeAlsoLocation=Bib2GlsEntry.POST_SEE;

@@ -31,16 +31,17 @@ import com.dickimawbooks.texparserlib.bib.BibValueList;
 public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryNumericComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField, String entryType, Locale locale, String numberPattern)
+    Vector<Bib2GlsEntry> entries, SortSettings settings,
+    String sortField, String groupField, String entryType)
    {
       this.sortField = sortField;
       this.groupField = groupField;
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.reverse = sort.endsWith("-reverse");
-      this.sort = sort;
+      this.reverse = settings.isReverse();
+      this.sort = settings.getMethod();
+      Locale locale = settings.getNumberLocale();
 
       if (sort.startsWith("numeric"))
       {
@@ -88,7 +89,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
             syms = DecimalFormatSymbols.getInstance(locale);
          }
 
-         numberFormat = new DecimalFormat(numberPattern, syms);
+         numberFormat = new DecimalFormat(settings.getNumberFormat(), syms);
       }
    }
 

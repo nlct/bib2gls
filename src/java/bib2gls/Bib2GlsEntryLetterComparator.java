@@ -27,19 +27,19 @@ import com.dickimawbooks.texparserlib.bib.BibValueList;
 public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField, String entryType,
-    int caseStyle, boolean reverse,
-    int sortSuffixOption, String sortSuffixMarker)
+    Vector<Bib2GlsEntry> entries, SortSettings settings,
+    String sortField, String groupField, String entryType)
    {
       this.sortField = sortField;
       this.groupField = groupField;
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.reverse = reverse;
-      this.sortSuffixMarker = sortSuffixMarker;
-      this.sortSuffixOption = sortSuffixOption;
+      this.reverse = settings.isReverse();
+      this.sortSuffixMarker = settings.getSuffixMarker();
+      this.sortSuffixOption = settings.getSuffixOption();
+
+      this.caseStyle = settings.caseStyle();
 
       switch (caseStyle)
       {
@@ -53,6 +53,16 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       }
 
       this.caseStyle = caseStyle;
+   }
+
+   protected String adjustSort(String sortStr)
+   {
+      if (caseStyle == TOLOWER)
+      {
+         return sortStr.toLowerCase();
+      }
+
+      return sortStr;
    }
 
    private String updateSortValue(Bib2GlsEntry entry, 
@@ -91,7 +101,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             value = bib2gls.interpret(value, list);
          }
 
-         if (sortSuffixOption != GlsResource.SORT_SUFFIX_NONE)
+         if (sortSuffixOption != SortSettings.SORT_SUFFIX_NONE)
          {
             String suff = sortSuffix(value, entry);
 
@@ -107,10 +117,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      if (caseStyle == TOLOWER)
-      {
-         value = value.toLowerCase();
-      }
+      value = adjustSort(value);
 
       entry.putField("sort", value);
 
@@ -468,7 +475,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    public void sortEntries() throws Bib2GlsException
    {
-      if (sortSuffixOption == GlsResource.SORT_SUFFIX_NON_UNIQUE)
+      if (sortSuffixOption == SortSettings.SORT_SUFFIX_NON_UNIQUE)
       {
          sortCount = new HashMap<String,Integer>();
       }
@@ -484,7 +491,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    private String sortField, groupField, entryType;
 
-   private Bib2Gls bib2gls;
+   protected Bib2Gls bib2gls;
 
    private Vector<Bib2GlsEntry> entries;
 

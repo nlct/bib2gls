@@ -19,6 +19,7 @@
 package com.dickimawbooks.bib2gls;
 
 import java.util.Locale;
+import java.text.Collator;
 
 public class SortSettings
 {
@@ -206,6 +207,16 @@ public class SortSettings
       return letterNumberRule;
    }
 
+   public void setLetterNumberPuncRule(int rule)
+   {
+      letterNumberPuncRule = rule;
+   }
+
+   public int getLetterNumberPuncRule()
+   {
+      return letterNumberPuncRule;
+   }
+
    public void setDateFormat(String format)
    {
       dateFormat = format;
@@ -338,6 +349,67 @@ public class SortSettings
       }
    }
 
+   public void setCollatorStrength(int strength)
+   {
+      collatorStrength = strength;
+   }
+
+   public int getCollatorStrength()
+   {
+      return collatorStrength;
+   }
+
+   public void setCollatorDecomposition(int decomposition)
+   {
+      collatorDecomposition = decomposition; 
+   }
+
+   public int getCollatorDecomposition()
+   {
+      return collatorDecomposition;
+   }
+
+   public void setBreakPoint(int type)
+   {
+      breakPoint = type;
+   }
+
+   public int getBreakPoint()
+   {
+      return breakPoint;
+   }
+
+   public void setBreakPointMarker(String marker)
+   {
+      breakPointMarker = marker;
+   }
+
+   public String getBreakPointMarker()
+   {
+      return breakPointMarker;
+   }
+
+
+   public void setSuffixOption(int option)
+   {
+      sortSuffixOption=option;
+   }
+
+   public int getSuffixOption()
+   {
+      return sortSuffixOption;
+   }
+
+   public void setSuffixMarker(String marker)
+   {
+      sortSuffixMarker = marker;
+   }
+
+   public String getSuffixMarker()
+   {
+      return sortSuffixMarker;
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -345,6 +417,22 @@ public class SortSettings
    private String dateFormat=null;
    private String numberLocale="locale";
    private String numberFormat=null;
+
    private int letterNumberRule
      = Bib2GlsEntryLetterNumberComparator.NUMBER_BEFORE_LOWER;
+   private int letterNumberPuncRule
+     = Bib2GlsEntryLetterNumberComparator.PUNCTUATION_SPACE_FIRST;
+
+   private int collatorStrength=Collator.PRIMARY;
+   private int collatorDecomposition=Collator.CANONICAL_DECOMPOSITION;
+   private int breakPoint = Bib2GlsEntryComparator.BREAK_WORD;
+   private String breakPointMarker = "|";
+
+   private int sortSuffixOption=SORT_SUFFIX_NON_UNIQUE;
+
+   private String sortSuffixMarker = "";
+
+   public static final int SORT_SUFFIX_NONE=0;
+   public static final int SORT_SUFFIX_NON_UNIQUE=1;
+
 }

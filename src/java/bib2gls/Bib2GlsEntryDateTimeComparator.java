@@ -33,38 +33,47 @@ import com.dickimawbooks.texparserlib.bib.BibValueList;
 public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryDateTimeComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField, String entryType,
-    Locale locale, String format,
-    boolean date, boolean time, boolean reverse)
+    Vector<Bib2GlsEntry> entries, SortSettings settings,
+    String sortField, String groupField, String entryType)
    {
       this.sortField = sortField;
       this.groupField = groupField;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.reverse = reverse;
-      this.hasDate = date;
-      this.hasTime = time;
+      reverse = settings.isReverse();
 
-      if (date && time)
+      String format = settings.getDateFormat();
+      Locale locale = settings.getDateLocale();
+
+      if (settings.isDateTimeSort())
       {
+         hasDate = true;
+         hasTime = true;
+
          sortDateFormat = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ");
       }
-      else if (date)
+      else if (settings.isDateSort())
       {
+         hasDate = true;
+         hasTime = false;
+
          sortDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
          calendar = (locale == null ? Calendar.getInstance() :
                     Calendar.getInstance(locale));
       }
-      else if (time)
+      else
       {
+         hasDate = false;
+         hasTime = true;
+
          sortDateFormat = new SimpleDateFormat("HH:mm:ssZ");
       }
 
-      init(locale, format, date, time);
+      init(locale, format);
    }
 
-   private void init(Locale locale, String format, boolean date, boolean time)
+   private void init(Locale locale, String format)
    {
       int type = DateFormat.DEFAULT;
 
@@ -96,7 +105,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
       if (format == null)
       {
-         if (date && time)
+         if (hasDate && hasTime)
          {
             if (locale == null)
             {
@@ -107,7 +116,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
                dateFormat = DateFormat.getDateTimeInstance(type, type, locale);
             }
          }
-         else if (date)
+         else if (hasDate)
          {
             if (locale == null)
             {
@@ -118,7 +127,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
                dateFormat = DateFormat.getDateInstance(type, locale);
             }
          }
-         else if (time)
+         else if (hasTime)
          {
             if (locale == null)
             {

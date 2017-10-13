@@ -36,87 +36,48 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    Locale locale, String sortField, String groupField, String entryType,
-    int strength, int decomposition,
-    int sortSuffixOption, String sortSuffixMarker)
-   {
-      this(bib2gls, entries, locale, sortField, groupField, entryType, 
-       strength, decomposition,
-        BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
-   }
-
-   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries,
-    Locale locale, String sortField, String groupField, String entryType,
-    int strength, int decomposition,
-    int breakPoint, String breakMarker,
-    int sortSuffixOption, String sortSuffixMarker)
+    SortSettings settings, String sortField, String groupField, String entryType)
+   throws ParseException
    {
       this.sortField = sortField;
       this.groupField = groupField;
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.sortSuffixMarker = sortSuffixMarker;
-      this.sortSuffixOption = sortSuffixOption;
+      this.sortSuffixMarker = settings.getSuffixMarker();
+      this.sortSuffixOption = settings.getSuffixOption();
 
-      collator = Collator.getInstance(locale);
-      collator.setStrength(strength);
-      collator.setDecomposition(decomposition);
+      int breakPoint = settings.getBreakPoint();
+      String breakMarker = settings.getBreakPointMarker();
+
+      if (settings.isCustom())
+      {
+         collator = new RuleBasedCollator(settings.getCollationRule());
+
+         if (breakPoint != BREAK_NONE)
+         {
+            String docLocale = bib2gls.getDocDefaultLocale();
+   
+            setBreakPoint(breakPoint, breakMarker,
+                          Locale.forLanguageTag(docLocale));
+         }
+      }
+      else
+      {
+         Locale locale = settings.getLocale();
+
+         collator = Collator.getInstance(locale);
+
+         setBreakPoint(breakPoint, breakMarker, locale);
+      }
+
+      collator.setStrength(settings.getCollatorStrength());
+      collator.setDecomposition(settings.getCollatorDecomposition());
 
       if (collator instanceof RuleBasedCollator && bib2gls.getDebugLevel() > 0)
       {
          bib2gls.debug(bib2gls.getMessage("message.collator.rules",
            ((RuleBasedCollator)collator).getRules()));
-      }
-
-      setBreakPoint(breakPoint, breakMarker, locale);
-   }
-
-   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries, String sortField, String groupField,
-    String entryType,
-    int strength, int decomposition, String rules,
-    int sortSuffixOption, String sortSuffixMarker)
-   throws ParseException
-   {
-      this(bib2gls, entries, sortField, groupField, entryType,
-        strength, decomposition, rules,
-        BREAK_WORD, "|", sortSuffixOption, sortSuffixMarker);
-   }
-
-   public Bib2GlsEntryComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries, String sortField, String groupField,
-    String entryType,
-    int strength, int decomposition, String rules,
-    int breakPoint, String breakMarker,
-    int sortSuffixOption, String sortSuffixMarker)
-   throws ParseException
-   {
-      this.sortField = sortField;
-      this.groupField = groupField;
-      this.entryType = entryType;
-      this.bib2gls = bib2gls;
-      this.entries = entries;
-      this.sortSuffixMarker = sortSuffixMarker;
-      this.sortSuffixOption = sortSuffixOption;
-
-      collator = new RuleBasedCollator(rules);
-      collator.setStrength(strength);
-      collator.setDecomposition(decomposition);
-
-      if (bib2gls.getDebugLevel() > 0)
-      {
-         bib2gls.debug(bib2gls.getMessage("message.collator.rules",
-           ((RuleBasedCollator)collator).getRules()));
-      }
-
-      if (breakPoint != BREAK_NONE)
-      {
-         String docLocale = bib2gls.getDocDefaultLocale();
-
-         setBreakPoint(breakPoint, breakMarker,
-                       Locale.forLanguageTag(docLocale));
       }
    }
 
@@ -181,7 +142,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             value = bib2gls.interpret(value, list);
          }
 
-         if (sortSuffixOption != GlsResource.SORT_SUFFIX_NONE)
+         if (sortSuffixOption != SortSettings.SORT_SUFFIX_NONE)
          {
             String suff = sortSuffix(value, entry);
 
@@ -595,7 +556,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       bib2gls.debug(bib2gls.getMessage("message.setting.sort",
         collator.getStrength(), collator.getDecomposition()));
 
-      if (sortSuffixOption == GlsResource.SORT_SUFFIX_NON_UNIQUE)
+      if (sortSuffixOption == SortSettings.SORT_SUFFIX_NON_UNIQUE)
       {
          sortCount =  new HashMap<String,Integer>();
       }

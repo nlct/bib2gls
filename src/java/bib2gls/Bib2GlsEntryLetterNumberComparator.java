@@ -30,13 +30,12 @@ public class Bib2GlsEntryLetterNumberComparator
   extends Bib2GlsEntryLetterComparator
 {
    public Bib2GlsEntryLetterNumberComparator(Bib2Gls bib2gls,
-    Vector<Bib2GlsEntry> entries,
-    String sort, String sortField, String groupField, String entryType,
-    int caseStyle, boolean reverse, int numberPosition,
-    int sortSuffixOption, String sortSuffixMarker)
+    Vector<Bib2GlsEntry> entries, SortSettings settings,
+    String sortField, String groupField, String entryType)
    {
-      super(bib2gls, entries, sort, sortField, groupField, entryType, 
-      caseStyle, reverse, sortSuffixOption, sortSuffixMarker);
+      super(bib2gls, entries, settings, sortField, groupField, entryType);
+
+      numberPosition = settings.getLetterNumberRule();
 
       switch (numberPosition)
       {
@@ -46,15 +45,242 @@ public class Bib2GlsEntryLetterNumberComparator
          case NUMBER_AFTER_LETTER:
          case NUMBER_FIRST:
          case NUMBER_LAST:
-           this.numberPosition = numberPosition;
          break;
          default:
            throw new IllegalArgumentException(
             "Invalid number option: "+numberPosition);
       }
+
+      puncPosition = settings.getLetterNumberPuncRule();
+
+      switch (puncPosition)
+      {
+         case PUNCTUATION_SPACE_FIRST:
+         case PUNCTUATION_SPACE_LAST:
+         case SPACE_PUNCTUATION_FIRST:
+         case SPACE_PUNCTUATION_LAST:
+         case SPACE_FIRST_PUNCTUATION_LAST:
+         case PUNCTUATION_FIRST_SPACE_LAST:
+         case PUNCTUATION_FIRST_SPACE_ZERO:
+         case PUNCTUATION_LAST_SPACE_ZERO:
+         break;
+         default:
+           throw new IllegalArgumentException(
+            "Invalid punctuation option: "+puncPosition);
+      }
+   }
+
+   @Override
+   protected String adjustSort(String sortStr)
+   {
+      if (puncPosition == PUNCTUATION_FIRST_SPACE_ZERO
+       || puncPosition == PUNCTUATION_LAST_SPACE_ZERO
+       || puncPosition == PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT
+       || puncPosition == PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT)
+      {
+         int n = sortStr.length();
+
+         if (n == 0) return sortStr;
+
+         boolean matchNext = (
+            puncPosition == PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT
+         || puncPosition == PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT);
+
+         StringBuilder builder = new StringBuilder(n);
+
+         for (int i = 0; i < n; )
+         {
+            int cp = sortStr.codePointAt(i);
+            i += Character.charCount(cp);
+
+            if (Character.isWhitespace(cp))
+            {// Is this followed by a digit?
+
+               int nextCp = (i < n ? sortStr.codePointAt(i) : 0);
+               cp = '0';
+
+               if (nextCp <= 0x7F || !matchNext)
+               {// Basic Latin character or don't match next.
+                // Don't need to do anything.
+               }
+               else if (Character.isDigit(nextCp))
+               {// Try to match digit group.
+                // This assumes the code points for the digits are 
+                // consecutive starting from zero.
+
+                  try
+                  {
+                     // This should set val to the zero digit for this
+                     // group.
+
+                     int val = nextCp
+                             - Integer.valueOf(String.format("%c", nextCp));
+
+                     // Check (if val isn't zero, fallback on Latin
+                     // digit 0)
+
+                     if (Integer.valueOf(String.format("%c", val)) == 0)
+                     {
+                        cp = val;
+                     }
+                  }
+                  catch (NumberFormatException e)
+                  {// shouldn't happen
+
+                     bib2gls.debug(e);
+                  }
+               }
+               else if (Bib2Gls.isSubscriptDigit(nextCp))
+               {
+                  cp = Bib2Gls.SUBSCRIPT_ZERO;
+               }
+               else if (Bib2Gls.isSuperscriptDigit(nextCp))
+               {
+                  cp = Bib2Gls.SUPERSCRIPT_ZERO;
+               }
+            }
+
+            builder.appendCodePoint(cp);
+         }
+
+         return builder.toString();
+      }
+      else
+      {
+         return super.adjustSort(sortStr);
+      }
+   }
+
+   @Override
+   protected int compare(int cp1, int cp2)
+   {
+      if (Character.isLetter(cp1) && Character.isLetter(cp2))
+      {
+         // both are letters
+
+         return super.compare(cp1, cp2);
+      }
+
+      boolean isSpace1 = Character.isWhitespace(cp1);
+      boolean isSpace2 = Character.isWhitespace(cp2);
+
+      if (isSpace1 == isSpace2)
+      {
+         // either both white space or both aren't
+
+         if (cp1 < cp2)
+         {
+            return reverse ? 1 : -1;
+         }
+         else if (cp1 > cp2)
+         {
+            return reverse ? -1 : 1;
+         }
+         else
+         {
+            return 0;
+         }
+      }
+
+      if (isSpace1)
+      {
+         // cp1 is white space, cp2 isn't
+
+         switch (puncPosition)
+         {
+            case PUNCTUATION_SPACE_FIRST:
+            case PUNCTUATION_SPACE_LAST:
+            case PUNCTUATION_FIRST_SPACE_LAST:
+
+               return reverse ? 1 : -1;
+
+            case SPACE_PUNCTUATION_FIRST:
+            case SPACE_PUNCTUATION_LAST:
+            case SPACE_FIRST_PUNCTUATION_LAST:
+
+               return reverse ? -1 : 1;
+
+            default:
+            // shouldn't happen but keep compiler happy
+
+              throw new IllegalArgumentException(
+                "Invalid letter-number-punc setting: "+puncPosition);
+         }
+      }
+
+      // cp2 is white space, cp1 isn't
+
+      switch (puncPosition)
+      {
+         case PUNCTUATION_SPACE_FIRST:
+         case PUNCTUATION_SPACE_LAST:
+         case PUNCTUATION_FIRST_SPACE_LAST:
+
+            return reverse ? -1 : 1;
+
+         case SPACE_PUNCTUATION_FIRST:
+         case SPACE_PUNCTUATION_LAST:
+         case SPACE_FIRST_PUNCTUATION_LAST:
+
+            return reverse ? 1 : -1;
+
+         default:
+         // shouldn't happen but keep compiler happy
+
+           throw new IllegalArgumentException(
+             "Invalid letter-number-punc setting: "+puncPosition);
+      }
    }
 
    private int compareNumberChar(int cp)
+   {
+      if (numberPosition == NUMBER_FIRST)
+      {
+         return -1;
+      }
+      else if (numberPosition == NUMBER_LAST)
+      {
+         return 1;
+      }
+      else if (Character.isLetter(cp))
+      {
+         return compareNumberLetter(cp);
+      }
+      else
+      {
+         switch (puncPosition)
+         {
+            case PUNCTUATION_SPACE_FIRST:
+            case SPACE_PUNCTUATION_FIRST:
+            case PUNCTUATION_FIRST_SPACE_ZERO:
+
+               return 1;
+
+            case PUNCTUATION_SPACE_LAST:
+            case SPACE_PUNCTUATION_LAST:
+            case PUNCTUATION_LAST_SPACE_ZERO:
+
+               return -1;
+
+            case SPACE_FIRST_PUNCTUATION_LAST:
+
+               return Character.isWhitespace(cp) ? 1 : -1;
+
+            case PUNCTUATION_FIRST_SPACE_LAST:
+
+               return Character.isWhitespace(cp) ? -1 : 1;
+
+            default:
+            // shouldn't happen but keep compiler happy
+
+              throw new IllegalArgumentException(
+                "Invalid letter-number-punc setting: "+puncPosition);
+         }
+      }
+
+   }
+
+   private int compareNumberLetter(int cp)
    {
       int result = 0;
 
@@ -90,6 +316,11 @@ public class Bib2GlsEntryLetterNumberComparator
             result = 1;
 
          break;
+            default:
+            // shouldn't happen but keep compiler happy
+
+              throw new IllegalArgumentException(
+                "Invalid letter-number setting: "+numberPosition);
       }
 
       return reverse ? -result : result;
@@ -198,5 +429,16 @@ public class Bib2GlsEntryLetterNumberComparator
    public static final int NUMBER_FIRST=4;
    public static final int NUMBER_LAST=5;
 
-   private int numberPosition;
+   public static final int PUNCTUATION_SPACE_FIRST=0;
+   public static final int PUNCTUATION_SPACE_LAST=1;
+   public static final int SPACE_PUNCTUATION_FIRST=2;
+   public static final int SPACE_PUNCTUATION_LAST=3;
+   public static final int SPACE_FIRST_PUNCTUATION_LAST=4;
+   public static final int PUNCTUATION_FIRST_SPACE_LAST=5;
+   public static final int PUNCTUATION_FIRST_SPACE_ZERO=6;
+   public static final int PUNCTUATION_LAST_SPACE_ZERO=7;
+   public static final int PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT=8;
+   public static final int PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT=9;
+
+   private int numberPosition, puncPosition;
 }
