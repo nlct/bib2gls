@@ -44,8 +44,10 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.sortSuffixMarker = settings.getSuffixMarker();
-      this.sortSuffixOption = settings.getSuffixOption();
+
+      sortSuffixMarker = settings.getSuffixMarker();
+      sortSuffixOption = settings.getSuffixOption();
+      reverse = settings.isReverse();
 
       int breakPoint = settings.getBreakPoint();
       String breakMarker = settings.getBreakPointMarker();
@@ -451,7 +453,10 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    {
       if (bib2gls.getCurrentResource().flattenSort())
       {
-         return entry1.getCollationKey().compareTo(entry2.getCollationKey());
+         int result = entry1.getCollationKey().compareTo(
+                        entry2.getCollationKey());
+
+         return reverse ? -result : result;
       }
 
       if (entry1.getId().equals(entry2.getParent()))
@@ -482,6 +487,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
          int result = e1.getCollationKey().compareTo(e2.getCollationKey());
 
+         if (reverse)
+         {
+            result = -result;
+         }
+
          if (bib2gls.getDebugLevel() > 1)
          {
             bib2gls.logAndPrintMessage(String.format("%s %c %s",
@@ -495,6 +505,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
             return result;
          }
       }
+
+      // hierarchy needs preserving
 
       return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
    }
@@ -612,6 +624,8 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
    private String sortSuffixMarker;
 
    private int sortSuffixOption;
+
+   private boolean reverse = false;
 
    private HashMap<String,Integer> sortCount;
 

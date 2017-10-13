@@ -375,6 +375,8 @@ heading_suffix "}\n"
   \ignorespacesafterend
 }
 
+\setcounter{tocdepth}{4}
+
 % This is a bit fiddly. Need to represent \vec{v} in typewriter
 % font for the interpreter examples. ($\mathtt{\vec{v}}$ doesn't
 % work)
@@ -6446,6 +6448,8 @@ to shuffle the entries instead of sorting them.
 The \csopt{sort} key indicates how entries should be sorted.
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
+Note that reverse sorts maintain hierarchy, so sub-entries will
+still be listed after the parent entry.
 
 Remember that you can have \atentryref{preamble} definitions that
 can be hidden from \bibgls's interpreter. For example,
@@ -6501,11 +6505,18 @@ the sort value becomes \code{Caesar, Gaius Julius}.
 \centering
 \begin{tabular}{ll}
 \meta{lang tag} & sort according to this language tag\tabularnewline
+\meta{lang tag}\optfmt{-reverse} & reverse sort according to this language tag\tabularnewline
 \optfmt{doc} & sort according to the document
+language\tabularnewline
+\optfmt{doc-reverse} & reverse sort according to the document
 language\tabularnewline
 \optfmt{locale} & sort according to the default
 locale\tabularnewline
-\optfmt{custom} & sort according to \optref[\meta{custom rule}]{sort-rule}
+\optfmt{locale-reverse} & reverse sort according to the default
+locale\tabularnewline
+\optfmt{custom} & sort according to \optref[\meta{custom
+rule}]{sort-rule}\tabularnewline
+\optfmt{custom-reverse} & reverse sort according to \optref[\meta{custom rule}]{sort-rule}
 \end{tabular}
 \end{table}
 
@@ -6664,10 +6675,17 @@ For example:
 \item \meta{lang tag}: sort according to the rules of the locale
 given by the \gls{IETF} language tag \meta{lang tag}.
 
+\item \meta{lang tag}\optfmt{-reverse}: reverse sort according to the rules of the locale
+given by the \gls{IETF} language tag \meta{lang tag}.
+
 \item \optfmt{locale}: equivalent to 
 \csopt[\meta{lang tag}]{sort} where \meta{lang tag} is obtained
 from the Java Runtime Environment (which usually matches the
 operating system's locale).
+
+\item \optfmt{locale-reverse}: equivalent to 
+\csopt[\meta{lang tag}-reverse]{sort} where \meta{lang tag} is obtained
+from the Java Runtime Environment.
 
 \item \optfmt{doc}: sort the entries according to the document
 language. This is equivalent to \optref[\meta{lang tag}]{sort}
@@ -6678,7 +6696,12 @@ is the locale of the last language resource file to be loaded through
 for multi-lingual documents to avoid confusion. If no languages have been tracked, this
 option is equivalent to \csopt[locale]{sort}.
 
+\item \optfmt{doc-reverse}: as \optfmt{doc} but in reverse order.
+
 \item \optfmt{custom}: sort the entries according to the 
+rule provided by \optref{sort-rule}.
+
+\item \optfmt{custom-reverse}: reverse sort the entries according to the 
 rule provided by \optref{sort-rule}.
 \end{itemize}
 
@@ -6952,8 +6975,7 @@ In general, it doesn't make much sense to have hierarchical entries
 that need to be sorted by a number, but it is possible as long as each
 level uses the same type of numbering.
 
-
-\subsection{Date-Time}
+\subsubsection{Date-Time}
 
 The sort methods listed in \tableref{tab:sortoptionsdatetime} 
 are for dates and times.  Use \optref{date-sort-format}
@@ -7063,6 +7085,44 @@ parse (\code{10 Jan 2017}) for the entry identified by
 the given label (\code{journalentry}). The pattern \bibgls\ 
 expects is also given (\code{dd/MM/yyyy}).
 
+\subsection{\csoptnv{shuffle}\csopteqval{seed}}
+\labelopt{shuffle}
+
+Automatically sets \csopt[random]{sort} and \csopt{flatten}.
+The value \meta{seed} may be omitted. If present, it should
+be an integer used as a seed for the random number generator.
+
+\subsection{\csoptnv{sort-field}\csopteqval{field}}
+\labelopt{sort-field}
+
+The \csopt{sort-field} key indicates which field provides the sort
+value. The default is the \field{sort} field. For example
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src={entries-terms},% data in entries-terms.bib
+ sort-label=category,% sort by 'category' field
+ sort=letter-case% case-sensitive letter sort
+]
+\end{verbatim}
+This sorts the entries according to the \field{category} field using
+a case-sensitive letter comparison.
+You may also use \csopt[id]{sort-field} to sort according to
+the label.
+
+If an entry is missing a value for \meta{field}, then the value of
+the fallback field will be used instead. For example, with the
+default \csopt[sort]{sort-field}, then for an entry defined with
+\atentry{entry}, if the \field{sort} field is missing the fallback
+field will be the \field{name} or the \field{parent} field if the
+\field{name} field is missing. If the entry is instead defined with
+\atentry{abbreviation} (or \atentry{acronym}) then if the
+\field{sort} field is missing, \bibgls\ will start with the same
+fallback as for \atentry{entry} but if neither the \field{name} or
+\field{parent} field is set, it will fallback on the \field{short}
+field.
+
+If no fallback field can be found, the entry's label will be used.
+
 \subsection{\csoptnv{sort-rule}\csopteqval{value}}
 \labelopt{sort-rule}
 
@@ -7096,252 +7156,6 @@ digit), but \bibgls\ will accept a single space between \cs{u} and
 
 If \optref{sort} is not set to \optfmt{custom}, the
 \optfmt{sort-rule} setting will be ignored.
-
-\subsection{\csoptnv{letter-number-rule}\csopteqval{value}}
-\labelopt{letter-number-rule}
-
-This option automatically implements
-\optref[\meta{value}]{dual-letter-number-rule}
-and
-\optref[\meta{value}]{secondary-letter-number-rule}.
-
-If you use one of the letter-number sort methods (such as
-\optref[letternumber-case]{sort}), then you can determine the
-comparison between a number and letter. The \meta{value} may be
-one of:
-\begin{itemize}
-\item\optfmt{before lower}: numbers are considered less than lower
-case characters (default);
-\item\optfmt{before upper}: numbers are considered less than upper
-case characters;
-\item\optfmt{before letter}: numbers are considered less than any
-letter (regardless of case);
-\item\optfmt{after letter}: numbers are considered greater than any
-letter (regardless of case);
-\item\optfmt{first}: numbers are considered less than all
-characters;
-\item\optfmt{last}: numbers are considered greater than all
-characters.
-\end{itemize}
-Remember that the case-insensitive letter-number sort methods always
-first convert the \field{sort} field to lower case, which means that
-if you use one of them then there won't be any upper case
-characters.
-
-Use \optref{letter-number-punc-rule} to determine the relative
-position of white space and punctuation.
-
-\subsection{\csoptnv{letter-number-punc-rule}\csopteqval{value}}
-\labelopt{letter-number-punc-rule}
-
-This option automatically implements
-\optref[\meta{value}]{dual-letter-number-punc-rule}
-and
-\optref[\meta{value}]{secondary-letter-number-punc-rule}.
-
-If you use one of the letter-number sort methods (such as
-\optref[letternumber-case]{sort}), then you can determine the
-order of white space and punctuation. In this context, punctuation
-means any character that's not considered a letter, a number
-or white space. This means that characters such as combining marks
-are considered punctuation.
-
-The \meta{value} may be one of the following:
-\begin{itemize}
-\item\optfmt{punc-space-first}: punctuation comes first, followed by
-white space (then letters and optionally numbers according to the letter-number
-rule);
-\item\optfmt{punc-space-last}: punctuation followed by white space
-come last (after letters and optionally numbers according to the letter-number
-rule);
-\item\optfmt{space-punc-first}: white space comes first, followed by
-punctuation (then letters and optionally numbers according to the letter-number
-rule);
-\item\optfmt{space-punc-last}: white space followed by punctuation
-come last (after letters and optionally numbers according to the letter-number
-rule); 
-\item\optfmt{space-first-punc-last}: white space comes first
-(followed by letters and optionally numbers according to the letter-number
-rule) and punctuation comes last; 
-\item\optfmt{punc-first-space-last}: punctuation comes first
-(followed by letters and optionally numbers according to the letter-number
-rule) and white space comes last;
-\item\optfmt{punc-first-space-zero}: punctuation comes first
-(although numbers may come before)
-and white space is replaced by the digit~\code{0} (0x30);
-\item\optfmt{punc-last-space-zero}: punctuation comes last
-(although numbers may come after)
-and white space is replaced by the digit~\code{0} (0x30).
-\item\optfmt{punc-first-space-zero-match-next}: punctuation comes first
-(although numbers may come before)
-and white space is replaced by zero;
-\item\optfmt{punc-last-space-zero-match-next}: punctuation comes last
-(although numbers may come after)
-and white space is replaced by zero.
-\end{itemize}
-For the \optfmt{space-zero-match-next} settings, the sort value will
-have all spaces replaced with a digit that represents zero. If the
-space isn't followed by a digit, the basic Latin \code{0} (0x30)
-will be used, otherwise \bibgls\ will try to match the zero with the
-following digit group. For example, if the space is followed by
-\textsuperscript{1} (0xB9) the space will be replaced by
-\textsuperscript{0} (0x2070),  resulting in the sub-string
-\code{\textsuperscript{01}} (0xB9 0x2070). If just the \optfmt{space-zero}
-(without the \optfmt{-match-next}) is used then the space will just
-be replaced with \code{0} resulting in the sub-string
-\code{0\textsuperscript{1}} (0x30 0x2070).
-
-Note that \optref[first]{letter-number-rule} and
-\optref[last]{letter-number-rule} overrides this option when
-comparing a number with white space or punctuation.
-
-\subsection{\csoptnv{numeric-sort-pattern}\csopteqval{value}}
-\labelopt{numeric-sort-pattern}
-
-If you use the custom \optref[numberformat]{sort} or
-\optref[numberformat-reverse]{sort}, you need to 
-specify the format pattern with this option where
-\meta{value} is a pattern recognised by Java's
-\href{http://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html}{\code{java.text.DecimalFormat}}
-class. You can use \cs{u}\meta{hex} to indicate Unicode characters
-by their hexadecimal code. (Remember to use \cs{string} to
-protect it from expansion when the options are written to
-the \ext{aux} file.)
-Use \optref{dual-numeric-sort-pattern} for 
-\optref{dual-sort} and \optref{secondary-numeric-sort-pattern} 
-for \optref{secondary}.
-
-\subsection{\csoptnv{numeric-locale}\csopteqval{value}}
-\labelopt{numeric-locale}
-
-If you use any of the locale-sensitive numeric sort methods,
-such as \optref[numeric]{sort}, use this option to set
-the locale. The value may be:
-\begin{itemize}
-\item\optfmt{locale}: use Java's default locale (which is usually
-the operating system's locale);
-\item\optfmt{doc}: use the document's locale or, if not set, assume
-\csopt[locale]{numeric-locale};
-\item\meta{lang-tag}: set to the locale identified by the given
-a valid language tag \meta{lang-tag}.
-\end{itemize}
-Use \optref{dual-numeric-locale} for 
-\optref{dual-sort} and \optref{secondary-numeric-locale} 
-for \optref{secondary}.
-
-\subsection{\csoptnv{date-sort-locale}\csopteqval{value}}
-\labelopt{date-sort-locale}
-
-If you use a date/time sort method, then you can
-set the locale used by Java's date-time parser. If omitted,
-the locale is obtained from the Java Virtual Machine, which
-will usually be your operating system's locale.
-
-The value may be \optfmt{locale}, \optfmt{doc} (use the document's
-locale) or a valid language tag identifying the locale (as above).
-
-\subsection{\csoptnv{date-sort-format}\csopteqval{value}}
-\labelopt{date-sort-format}
-
-If you use a date/time sort method, then you can set the format
-used by Java's date-time parser. If omitted, the default is assumed.
-The \meta{value} may be one of:
-\begin{itemize}
-\item\optfmt{default}: use the locale's default format.
-\item\optfmt{short}: use the locale's short format.
-\item\optfmt{medium}: use the locale's medium format.
-\item\optfmt{long}: use the locale's long format.
-\item\optfmt{full}: use the locale's full format.
-\item\meta{pattern}: provide a custom pattern.
-This should match the specifications for Java's
-\href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
-class.
-\end{itemize}
-
-With the custom setting, if the pattern only contains date (but not
-time) information, then it must be used with \optref[date]{sort}
-or \optref[date-reverse]{sort}. If the pattern only contains time
-(but not date) information, then it must be used with
-\optref[time]{sort} or \optref[time-reverse]{sort}. If the pattern
-contains both date and time information, then it must be used with
-\optref[datetime]{sort} or \optref[datetime-reverse]{sort}.
-
-For example, suppose each entry provides information about a person
-and the \field{user1} field is used to store their date of birth:
-\begin{verbatim}
-@entry{caesar,
-  name={Gaius Julius Caesar},
-  first={Julius Caesar},
-  text={Caesar},
-  description={Roman politician and general},
-  user1={13 July 100 BC}
-}
-
-@entry{wellington,
-  name={Arthur Wellesley, 1st Duke of Wellington},
-  first={Arthur Wellesley (Duke of Wellington)},
-  text={Wellington},
-  description={Anglo-Irish soldier and statesman},
-  user1={1 May 1769 AD}
-}
-\end{verbatim}
-Then the entries can be sorted by date of birth using:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src={entries}, % data in entries.bib
-  sort-field={user1},
-  sort={date},
-  date-sort-format={d MMM y G}
-]
-\end{verbatim}
-
-The \code{G} (era) date pattern specifier expects a string, such as
-\qt{AD}. It will match lower case forms, such as \qt{ad}, so if you
-have \verb|\textsc{ad}| the interpreter will convert this to
-\code{ad} (stripping the text-block command). However, in general
-it's best to supply a semantic command that ensures that the
-interpreted result matches the required format.
-
-For example, if \csfmt{era} is provided with:
-\begin{verbatim}
-@preamble{"\providecommand{\era}[1]{\textsc{\MakeLowercase{#1}}}"}
-\end{verbatim}
-If the definition is hidden from the interpreter
-(\optref[false]{interpret-preamble}) and the field
-value contains \verb|\era{AD}| then the custom command will simply be stripped
-leaving \code{AD} which can be matched by \code{G}. 
-
-If the definition is picked up by the interpreter then the field
-value will contain \code{ad} (from \cs{MakeLowercase}) but this can
-be matched by \code{G}, so it isn't a problem.
-However, if the definition of \csfmt{era} is changed so that the era label
-supplied in the argument is converted to something that doesn't
-match \code{G} then the definition should be hidden from the
-interpreter.
-
-Here's a complete document that changes the group fields to use
-the year and era:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,style=indexgroup]{glossaries-extra}
-
-\newcommand{\bibglsdategroup}[7]{#1#4#7}
-\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
-
-\GlsXtrLoadResources[
-  src={entries},
-  sort-field={user1},
-  sort={date},
-  date-sort-format={d MMM y G},
-  selection=all
-]
-
-\begin{document}
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
-(The use of \csfmt{number} strips the leading zero from the year.)
 
 \subsection{\csoptnv{break-at}\csopteqval{option}}
 \labelopt{break-at}
@@ -7405,6 +7219,10 @@ inter-word punctuation. For example, with
 
 \subsection{\csoptnv{sort-suffix}\csopteqval{value}}
 \labelopt{sort-suffix}
+
+This option automatically implements
+\optref[\meta{value}]{dual-sort-suffix} and
+\optref[\meta{value}]{secondary-sort-suffix}.
 
 \bibgls\ allows duplicate sort values, but this can cause a problem
 for hierarchical entries where parent entries with duplicate sort
@@ -7674,48 +7492,15 @@ the selection order.
 \subsection{\csoptnv{sort-suffix-marker}\csopteqval{value}}
 \labelopt{sort-suffix-marker}
 
+This option automatically implements
+\optref[\meta{value}]{dual-sort-suffix-marker} and
+\optref[\meta{value}]{secondary-sort-suffix-marker}.
+
+
 If a suffix is appended to the sort value (see above) then it will
 be separated by the suffix marker, which can be set with
 \csopt[\meta{value}]{sort-suffix-marker} where \meta{value} is the
 marker. By default the marker is empty.
-
-\subsection{\csoptnv{sort-field}\csopteqval{field}}
-\labelopt{sort-field}
-
-The \csopt{sort-field} key indicates which field provides the sort
-value. The default is the \field{sort} field. For example
-\begin{verbatim}
-\GlsXtrLoadResources[
- src={entries-terms},% data in entries-terms.bib
- sort-label=category,% sort by 'category' field
- sort=letter-case% case-sensitive letter sort
-]
-\end{verbatim}
-This sorts the entries according to the \field{category} field using
-a case-sensitive letter comparison.
-You may also use \csopt[id]{sort-field} to sort according to
-the label.
-
-If an entry is missing a value for \meta{field}, then the value of
-the fallback field will be used instead. For example, with the
-default \csopt[sort]{sort-field}, then for an entry defined with
-\atentry{entry}, if the \field{sort} field is missing the fallback
-field will be the \field{name} or the \field{parent} field if the
-\field{name} field is missing. If the entry is instead defined with
-\atentry{abbreviation} (or \atentry{acronym}) then if the
-\field{sort} field is missing, \bibgls\ will start with the same
-fallback as for \atentry{entry} but if neither the \field{name} or
-\field{parent} field is set, it will fallback on the \field{short}
-field.
-
-If no fallback field can be found, the entry's label will be used.
-
-\subsection{\csoptnv{shuffle}\csopteqval{seed}}
-\labelopt{shuffle}
-
-Automatically sets \csopt[random]{sort} and \csopt{flatten}.
-The value \meta{seed} may be omitted. If present, it should
-be an integer used as a seed for the random number generator.
 
 \subsection{\csoptnv{strength}\csopteqval{value}}
 \labelopt{strength}
@@ -7797,6 +7582,252 @@ characters. See the documentation for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\code{Collator}
 class} for further details.
 This option is ignored by non-locale sorts (such as letter or numeric).
+
+\subsection{\csoptnv{letter-number-rule}\csopteqval{value}}
+\labelopt{letter-number-rule}
+
+This option automatically implements
+\optref[\meta{value}]{dual-letter-number-rule}
+and
+\optref[\meta{value}]{secondary-letter-number-rule}.
+
+If you use one of the letter-number sort methods (such as
+\optref[letternumber-case]{sort}), then you can determine the
+comparison between a number and letter. The \meta{value} may be
+one of:
+\begin{itemize}
+\item\optfmt{before lower}: numbers are considered less than lower
+case characters (default);
+\item\optfmt{before upper}: numbers are considered less than upper
+case characters;
+\item\optfmt{before letter}: numbers are considered less than any
+letter (regardless of case);
+\item\optfmt{after letter}: numbers are considered greater than any
+letter (regardless of case);
+\item\optfmt{first}: numbers are considered less than all
+characters;
+\item\optfmt{last}: numbers are considered greater than all
+characters.
+\end{itemize}
+Remember that the case-insensitive letter-number sort methods always
+first convert the \field{sort} field to lower case, which means that
+if you use one of them then there won't be any upper case
+characters.
+
+Use \optref{letter-number-punc-rule} to determine the relative
+position of white space and punctuation.
+
+\subsection{\csoptnv{letter-number-punc-rule}\csopteqval{value}}
+\labelopt{letter-number-punc-rule}
+
+This option automatically implements
+\optref[\meta{value}]{dual-letter-number-punc-rule}
+and
+\optref[\meta{value}]{secondary-letter-number-punc-rule}.
+
+If you use one of the letter-number sort methods (such as
+\optref[letternumber-case]{sort}), then you can determine the
+order of white space and punctuation. In this context, punctuation
+means any character that's not considered a letter, a number
+or white space. This means that characters such as combining marks
+are considered punctuation.
+
+The \meta{value} may be one of the following:
+\begin{itemize}
+\item\optfmt{punc-space-first}: punctuation comes first, followed by
+white space (then letters and optionally numbers according to the letter-number
+rule);
+\item\optfmt{punc-space-last}: punctuation followed by white space
+come last (after letters and optionally numbers according to the letter-number
+rule);
+\item\optfmt{space-punc-first}: white space comes first, followed by
+punctuation (then letters and optionally numbers according to the letter-number
+rule);
+\item\optfmt{space-punc-last}: white space followed by punctuation
+come last (after letters and optionally numbers according to the letter-number
+rule); 
+\item\optfmt{space-first-punc-last}: white space comes first
+(followed by letters and optionally numbers according to the letter-number
+rule) and punctuation comes last; 
+\item\optfmt{punc-first-space-last}: punctuation comes first
+(followed by letters and optionally numbers according to the letter-number
+rule) and white space comes last;
+\item\optfmt{punc-first-space-zero}: punctuation comes first
+(although numbers may come before)
+and white space is replaced by the digit~\code{0} (0x30);
+\item\optfmt{punc-last-space-zero}: punctuation comes last
+(although numbers may come after)
+and white space is replaced by the digit~\code{0} (0x30).
+\item\optfmt{punc-first-space-zero-match-next}: punctuation comes first
+(although numbers may come before)
+and white space is replaced by zero;
+\item\optfmt{punc-last-space-zero-match-next}: punctuation comes last
+(although numbers may come after)
+and white space is replaced by zero.
+\end{itemize}
+For the \optfmt{space-zero-match-next} settings, the sort value will
+have all spaces replaced with a digit that represents zero. If the
+space isn't followed by a digit, the basic Latin \code{0} (0x30)
+will be used, otherwise \bibgls\ will try to match the zero with the
+following digit group. For example, if the space is followed by
+\textsuperscript{1} (0xB9) the space will be replaced by
+\textsuperscript{0} (0x2070),  resulting in the sub-string
+\code{\textsuperscript{01}} (0xB9 0x2070). If just the \optfmt{space-zero}
+(without the \optfmt{-match-next}) is used then the space will just
+be replaced with \code{0} resulting in the sub-string
+\code{0\textsuperscript{1}} (0x30 0x2070).
+
+Note that \optref[first]{letter-number-rule} and
+\optref[last]{letter-number-rule} overrides this option when
+comparing a number with white space or punctuation.
+
+\subsection{\csoptnv{numeric-sort-pattern}\csopteqval{value}}
+\labelopt{numeric-sort-pattern}
+
+If you use the custom \optref[numberformat]{sort} or
+\optref[numberformat-reverse]{sort}, you need to 
+specify the format pattern with this option where
+\meta{value} is a pattern recognised by Java's
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html}{\code{java.text.DecimalFormat}}
+class. You can use \cs{u}\meta{hex} to indicate Unicode characters
+by their hexadecimal code. (Remember to use \cs{string} to
+protect it from expansion when the options are written to
+the \ext{aux} file.)
+Use \optref{dual-numeric-sort-pattern} for 
+\optref{dual-sort} and \optref{secondary-numeric-sort-pattern} 
+for \optref{secondary}.
+
+\subsection{\csoptnv{numeric-locale}\csopteqval{value}}
+\labelopt{numeric-locale}
+
+If you use any of the locale-sensitive numeric sort methods,
+such as \optref[numeric]{sort}, use this option to set
+the locale. The value may be:
+\begin{itemize}
+\item\optfmt{locale}: use Java's default locale (which is usually
+the operating system's locale);
+\item\optfmt{doc}: use the document's locale or, if not set, assume
+\csopt[locale]{numeric-locale};
+\item\meta{lang-tag}: set to the locale identified by the given
+a valid language tag \meta{lang-tag}.
+\end{itemize}
+Use \optref{dual-numeric-locale} for 
+\optref{dual-sort} and \optref{secondary-numeric-locale} 
+for \optref{secondary}.
+
+\subsection{\csoptnv{date-sort-locale}\csopteqval{value}}
+\labelopt{date-sort-locale}
+
+If you use a date/time sort method, then you can
+set the locale used by Java's date-time parser. If omitted,
+the locale is obtained from the Java Virtual Machine, which
+will usually be your operating system's locale.
+
+The value may be \optfmt{locale}, \optfmt{doc} (use the document's
+locale) or a valid language tag identifying the locale (as above).
+
+\subsection{\csoptnv{date-sort-format}\csopteqval{value}}
+\labelopt{date-sort-format}
+
+If you use a date/time sort method, then you can set the format
+used by Java's date-time parser. If omitted, the default is assumed.
+The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{default}: use the locale's default format.
+\item\optfmt{short}: use the locale's short format.
+\item\optfmt{medium}: use the locale's medium format.
+\item\optfmt{long}: use the locale's long format.
+\item\optfmt{full}: use the locale's full format.
+\item\meta{pattern}: provide a custom pattern.
+This should match the specifications for Java's
+\href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
+class.
+\end{itemize}
+
+With the custom setting, if the pattern only contains date (but not
+time) information, then it must be used with \optref[date]{sort}
+or \optref[date-reverse]{sort}. If the pattern only contains time
+(but not date) information, then it must be used with
+\optref[time]{sort} or \optref[time-reverse]{sort}. If the pattern
+contains both date and time information, then it must be used with
+\optref[datetime]{sort} or \optref[datetime-reverse]{sort}.
+
+For example, suppose each entry provides information about a person
+and the \field{user1} field is used to store their date of birth:
+\begin{verbatim}
+@entry{caesar,
+  name={Gaius Julius Caesar},
+  first={Julius Caesar},
+  text={Caesar},
+  description={Roman politician and general},
+  user1={13 July 100 BC}
+}
+
+@entry{wellington,
+  name={Arthur Wellesley, 1st Duke of Wellington},
+  first={Arthur Wellesley (Duke of Wellington)},
+  text={Wellington},
+  description={Anglo-Irish soldier and statesman},
+  user1={1 May 1769 AD}
+}
+\end{verbatim}
+Then the entries can be sorted by date of birth using:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src={entries}, % data in entries.bib
+  sort-field={user1},
+  sort={date},
+  date-sort-format={d MMM y G}
+]
+\end{verbatim}
+
+The \code{G} (era) date pattern specifier expects a string, such as
+\qt{AD}. It will match lower case forms, such as \qt{ad}, so if you
+have \verb|\textsc{ad}| the interpreter will convert this to
+\code{ad} (stripping the text-block command). However, in general
+it's best to supply a semantic command that ensures that the
+interpreted result matches the required format.
+
+For example, if \csfmt{era} is provided with:
+\begin{verbatim}
+@preamble{"\providecommand{\era}[1]{\textsc{\MakeLowercase{#1}}}"}
+\end{verbatim}
+If the definition is hidden from the interpreter
+(\optref[false]{interpret-preamble}) and the field
+value contains \verb|\era{AD}| then the custom command will simply be stripped
+leaving \code{AD} which can be matched by \code{G}. 
+
+If the definition is picked up by the interpreter then the field
+value will contain \code{ad} (from \cs{MakeLowercase}) but this can
+be matched by \code{G}, so it isn't a problem.
+However, if the definition of \csfmt{era} is changed so that the era label
+supplied in the argument is converted to something that doesn't
+match \code{G} then the definition should be hidden from the
+interpreter.
+
+Here's a complete document that changes the group fields to use
+the year and era:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\newcommand{\bibglsdategroup}[7]{#1#4#7}
+\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
+
+\GlsXtrLoadResources[
+  src={entries},
+  sort-field={user1},
+  sort={date},
+  date-sort-format={d MMM y G},
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+(The use of \csfmt{number} strips the leading zero from the year.)
 
 \section{Secondary Glossary}
 \label{sec:secondaryopts}
@@ -7950,38 +7981,6 @@ For example, if the entries are stored in \filefmt{entries.bib}:
 
 As \optref{sort-rule} but for secondary custom sorting.
 
-\subsection{\csoptnv{secondary-letter-number-rule}\csopteqval{value}}
-\labelopt{secondary-letter-number-rule}
-
-As \optref{letter-number-rule} but for secondary letter-number sorting.
-
-\subsection{\csoptnv{secondary-letter-number-punc-rule}\csopteqval{value}}
-\labelopt{secondary-letter-number-punc-rule}
-
-As \optref{letter-number-punc-rule} but for secondary letter-number sorting.
-
-\subsection{\csoptnv{secondary-numeric-locale}\csopteqval{value}}
-\labelopt{secondary-numeric-locale}
-
-As \optref{numeric-locale} but for secondary
-locale-sensitive numeric sorting.
-
-\subsection{\csoptnv{secondary-numeric-sort-pattern}\csopteqval{value}}
-\labelopt{secondary-numeric-sort-pattern}
-
-As \optref{numeric-sort-pattern} but for secondary
-locale-sensitive numeric sorting.
-
-\subsection{\csoptnv{secondary-date-sort-format}\csopteqval{value}}
-\labelopt{secondary-date-sort-format}
-
-As \optref{date-sort-format} but for secondary date-time sorting.
-
-\subsection{\csoptnv{secondary-date-sort-locale}\csopteqval{value}}
-\labelopt{secondary-date-sort-locale}
-
-As \optref{date-sort-locale} but for secondary date-time sorting.
-
 \subsection{\csoptnv{secondary-break-at}\csopteqval{value}}
 \labelopt{secondary-break-at}
 
@@ -7991,6 +7990,16 @@ As \optref{break-at} but for secondary entries.
 \labelopt{secondary-break-marker}
 
 As \optref{break-marker} but for secondary entries.
+
+\subsection{\csoptnv{secondary-sort-suffix}\csopteqval{value}}
+\labelopt{secondary-sort-suffix}
+
+As \optref{sort-suffix} but for secondary entries.
+
+\subsection{\csoptnv{secondary-sort-suffix-marker}\csopteqval{value}}
+\labelopt{secondary-sort-suffix-marker}
+
+As \optref{sort-suffix-marker} but for secondary entries.
 
 \subsection{\csoptnv{secondary-strength}\csopteqval{value}}
 \labelopt{secondary-strength}
@@ -8002,121 +8011,45 @@ As \optref{strength} but for secondary entries.
 
 As \optref{decomposition} but for secondary entries.
 
+\subsection{\csoptnv{secondary-letter-number-rule}\csopteqval{value}}
+\labelopt{secondary-letter-number-rule}
+
+As \optref{letter-number-rule} but for secondary letter-number sorting.
+
+\subsection{\csoptnv{secondary-letter-number-punc-rule}\csopteqval{value}}
+\labelopt{secondary-letter-number-punc-rule}
+
+As \optref{letter-number-punc-rule} but for secondary letter-number sorting.
+
+\subsection{\csoptnv{secondary-numeric-sort-pattern}\csopteqval{value}}
+\labelopt{secondary-numeric-sort-pattern}
+
+As \optref{numeric-sort-pattern} but for secondary
+locale-sensitive numeric sorting.
+
+\subsection{\csoptnv{secondary-numeric-locale}\csopteqval{value}}
+\labelopt{secondary-numeric-locale}
+
+As \optref{numeric-locale} but for secondary
+locale-sensitive numeric sorting.
+
+\subsection{\csoptnv{secondary-date-sort-locale}\csopteqval{value}}
+\labelopt{secondary-date-sort-locale}
+
+As \optref{date-sort-locale} but for secondary date-time sorting.
+
+\subsection{\csoptnv{secondary-date-sort-format}\csopteqval{value}}
+\labelopt{secondary-date-sort-format}
+
+As \optref{date-sort-format} but for secondary date-time sorting.
+
 \section{Dual Entries}
 \label{sec:dualopts}
 
-\subsection{\csoptnv{dual-sort}\csopteqval{value}}
-\labelopt{dual-sort}
+\subsection{General Dual Settings}
+\label{sec:dualoptsgeneral}
 
-This option indicates how to sort the dual entries. The primary
-entries are sorted with the normal entries according to
-\optref{sort}, and the dual entries are sorted according to
-\csopt{dual-sort} unless \csopt[combine]{dual-sort} in which case the dual
-entries will be combined with the primary entries and all the
-entries will sorted together according to the \optref{sort} option.
-
-If \meta{value} isn't set to \optfmt{combine} then the dual
-entries are sorted separately according to \meta{value} (as per
-\optref{sort}) and the dual entries will be appended at the end of
-the \ext{glstex} file. The field used by the comparator is given by
-\optref{dual-sort-field}.
-If \csopt[custom]{dual-sort}, then the dual entries according to the 
-rule provided by \optref{dual-sort-rule}.
-
-
-For example:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src={entries-dual},
- sort={en},
- dual-sort={de-CH-1996}
-]
-\end{verbatim}
-This will sort the primary entries according to \optfmt{en}
-(English) and the secondary entries according to \optfmt{de-CH-1996} 
-(Swiss German new orthography) whereas:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src={entries-dual},
- sort={en-GB},
- dual-sort={combine}
-]
-\end{verbatim}
-will combine the dual entries with the primary entries and sort them
-all according to the \optfmt{en-GB} locale (British English).
-
-If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
-\meta{value} is omitted, \optfmt{locale} is assumed.
-
-\subsection{\csoptnv{dual-sort-field}\csopteqval{value}}
-\labelopt{dual-sort-field}
-
-This option indicates the field to use when sorting dual entries
-(when they haven't been combined with the primary entries). The
-default value is the same as the \optref{sort-field} value.
-
-\subsection{\csoptnv{dual-sort-rule}\csopteqval{value}}
-\labelopt{dual-sort-rule}
-
-As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
-
-\subsection{\csoptnv{dual-letter-number-rule}\csopteqval{value}}
-\labelopt{dual-letter-number-rule}
-
-As \optref{letter-number-rule} but for dual entries that use a
-letter-number sort.
-
-\subsection{\csoptnv{dual-letter-number-punc-rule}\csopteqval{value}}
-\labelopt{dual-letter-number-punc-rule}
-
-As \optref{letter-number-punc-rule} but for dual entries that use a
-letter-number sort.
-
-\subsection{\csoptnv{dual-numeric-locale}\csopteqval{value}}
-\labelopt{dual-numeric-locale}
-
-As \optref{numeric-locale} but for dual entries that use a
-locale-sensitive numeric sort.
-
-\subsection{\csoptnv{dual-numeric-sort-pattern}\csopteqval{value}}
-\labelopt{dual-numeric-sort-pattern}
-
-As \optref{numeric-sort-pattern} but for dual entries that use a
-locale-sensitive numeric sort.
-
-\subsection{\csoptnv{dual-date-sort-locale}\csopteqval{value}}
-\labelopt{dual-date-sort-locale}
-
-As \optref{date-sort-locale} but for dual entries that
-use a date/time sort.
-
-\subsection{\csoptnv{dual-date-sort-format}\csopteqval{value}}
-\labelopt{dual-date-sort-format}
-
-As \optref{date-sort-format} but for dual entries that
-use a date/time sort.
-
-\subsection{\csoptnv{dual-break-at}\csopteqval{value}}
-\labelopt{dual-break-at}
-
-As \optref{break-at} but for dual entries.
-
-\subsection{\csoptnv{dual-break-marker}\csopteqval{value}}
-\labelopt{dual-break-marker}
-
-As \optref{break-marker} but for dual entries.
-
-\subsection{\csoptnv{dual-strength}\csopteqval{value}}
-\labelopt{dual-strength}
-
-As \optref{strength} but for dual entries.
-
-\subsection{\csoptnv{dual-decomposition}\csopteqval{value}}
-\labelopt{dual-decomposition}
-
-As \optref{decomposition} but for dual entries.
-
-\subsection{\csoptnv{dual-prefix}\csopteqval{value}}
+\subsubsection{\csoptnv{dual-prefix}\csopteqval{value}}
 \labelopt{dual-prefix}
 
 This option indicates the prefix to use for the dual entries. The
@@ -8125,98 +8058,7 @@ Any references to dual entries within the \ext{bib} file should use
 the prefix \idprefix{dual} which will be replaced by \meta{value}
 when the \ext{bib} file is parsed.
 
-\subsection{\csoptnv{dual-type}\csopteqval{value}}
-\labelopt{dual-type}
-
-This option sets the \field{type} field for all dual
-entries. (The primary entries obey the \optref{type} option.) This
-will override any value of \field{type} provided in the \ext{bib}
-file (or created through a mapping). The \meta{value} is required.
-
-The \meta{value} may be:
-\begin{itemize}
-\item \optfmt{same as entry}: sets the \field{type} to the entry
-type. For example, if the entry was defined with
-\atentryref{dualentry}, the \field{type} will be set to
-\optfmt{dualentry}.
-
-\item \optfmt{same as base}: sets the \field{type} to the base name
-of the \ext{bib} file (without the extension) that provided the
-entry definition (new to v1.1);
-
-\item \optfmt{same as primary}: sets the \field{type} to the same as
-the corresponding primary entry's \field{type} (which may have been
-set with \optref{type}). If the primary entry doesn't have the
-\field{type} field set, the dual's \field{type} will remain
-unchanged.
-
-\item \meta{label}: sets the \field{type} field to \meta{label}.
-\end{itemize}
-
-Remember that the glossary with that label must have already 
-been defined.
-
-For example:
-\begin{verbatim}
-\newglossary*{english}{English}
-\newglossary*{french}{French}
-
-\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
- type=english,
- dual-type=french]
-\end{verbatim}
-
-Alternatively:
-\begin{verbatim}
-\newglossary*{dictionary}{Dictionary}
-
-\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
- type=dictionary,
- dual-type={same as primary}]
-\end{verbatim}
-
-\subsection{\csoptnv{dual-category}\csopteqval{value}}
-\labelopt{dual-category}
-
-This option sets the \field{category} field for all dual
-entries. (The primary entries obey the \optref{category} option.) This
-will override any value of \field{category} provided in the \ext{bib}
-file (or created through a mapping). The \meta{value} may be empty.
-
-The \meta{value} may be:
-\begin{itemize}
-\item \optfmt{same as entry}: sets the \field{category} to the entry
-type. For example, if the entry was defined with
-\atentryref{dualentry}, the \field{category} will be set to
-\optfmt{dualentry}.
-
-\item \optfmt{same as base}: sets the \field{category} to the base
-name of the \ext{bib} file (without the extension) that provided the
-entry definition (new to v1.1);
-
-\item \optfmt{same as primary}: sets the \field{category} to the
-same as the corresponding primary entry's \field{category} (which
-may have been set with \optref{category}). If the primary entry
-doesn't have the \field{category} field set, the dual's
-\field{category} will remain unchanged.
-
-\item \optfmt{same as type}: sets the \field{category} to the same
-as the value of the entry's \field{type} field (which may have been
-set with \optref{dual-type}). If the entry doesn't have the
-\field{type} field set, the \field{category} will remain unchanged.
-
-\item \meta{label}: sets the \field{category} field to \meta{label}.
-\end{itemize}
-
-\subsection{\csoptnv{dual-counter}\csopteqval{value}}
-\labelopt{dual-counter}
-
-As \optref{counter} but for the dual entries. In this case
-\meta{value} may be the name of the counter or 
-\optfmt{same as primary} which uses the counter for the primary
-entry.
-
-\subsection{\csoptnv{combine-dual-locations}\csopteqval{value}}
+\subsubsection{\csoptnv{combine-dual-locations}\csopteqval{value}}
 \labelopt{combine-dual-locations}
 
 You can merge the location lists for each primary entry
@@ -8313,13 +8155,280 @@ index, but these entries don't have descriptions, so it's less
 useful than referencing the dual (main) entries as then the
 hyperlink can point to the definition in the \code{main} glossary.
 
-\subsection{\csoptnv{dual-short-case-change}\csopteqval{value}}
+
+\subsection{Dual Fields}
+\label{sec:dualoptsfields}
+
+\subsubsection{\csoptnv{dual-type}\csopteqval{value}}
+\labelopt{dual-type}
+
+This option sets the \field{type} field for all dual
+entries. (The primary entries obey the \optref{type} option.) This
+will override any value of \field{type} provided in the \ext{bib}
+file (or created through a mapping). The \meta{value} is required.
+
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: sets the \field{type} to the entry
+type. For example, if the entry was defined with
+\atentryref{dualentry}, the \field{type} will be set to
+\optfmt{dualentry}.
+
+\item \optfmt{same as base}: sets the \field{type} to the base name
+of the \ext{bib} file (without the extension) that provided the
+entry definition (new to v1.1);
+
+\item \optfmt{same as primary}: sets the \field{type} to the same as
+the corresponding primary entry's \field{type} (which may have been
+set with \optref{type}). If the primary entry doesn't have the
+\field{type} field set, the dual's \field{type} will remain
+unchanged.
+
+\item \meta{label}: sets the \field{type} field to \meta{label}.
+\end{itemize}
+
+Remember that the glossary with that label must have already 
+been defined.
+
+For example:
+\begin{verbatim}
+\newglossary*{english}{English}
+\newglossary*{french}{French}
+
+\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
+ type=english,
+ dual-type=french]
+\end{verbatim}
+
+Alternatively:
+\begin{verbatim}
+\newglossary*{dictionary}{Dictionary}
+
+\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
+ type=dictionary,
+ dual-type={same as primary}]
+\end{verbatim}
+
+\subsubsection{\csoptnv{dual-category}\csopteqval{value}}
+\labelopt{dual-category}
+
+This option sets the \field{category} field for all dual
+entries. (The primary entries obey the \optref{category} option.) This
+will override any value of \field{category} provided in the \ext{bib}
+file (or created through a mapping). The \meta{value} may be empty.
+
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: sets the \field{category} to the entry
+type. For example, if the entry was defined with
+\atentryref{dualentry}, the \field{category} will be set to
+\optfmt{dualentry}.
+
+\item \optfmt{same as base}: sets the \field{category} to the base
+name of the \ext{bib} file (without the extension) that provided the
+entry definition (new to v1.1);
+
+\item \optfmt{same as primary}: sets the \field{category} to the
+same as the corresponding primary entry's \field{category} (which
+may have been set with \optref{category}). If the primary entry
+doesn't have the \field{category} field set, the dual's
+\field{category} will remain unchanged.
+
+\item \optfmt{same as type}: sets the \field{category} to the same
+as the value of the entry's \field{type} field (which may have been
+set with \optref{dual-type}). If the entry doesn't have the
+\field{type} field set, the \field{category} will remain unchanged.
+
+\item \meta{label}: sets the \field{category} field to \meta{label}.
+\end{itemize}
+
+\subsubsection{\csoptnv{dual-counter}\csopteqval{value}}
+\labelopt{dual-counter}
+
+As \optref{counter} but for the dual entries. In this case
+\meta{value} may be the name of the counter or 
+\optfmt{same as primary} which uses the counter for the primary
+entry.
+
+\subsubsection{\csoptnv{dual-short-case-change}\csopteqval{value}}
 \labelopt{dual-short-case-change}
 
 As \optref{short-case-change} but applies to the \field{dualshort}
 field instead.
 
-\subsection{\csoptnv{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-field}\csopteqval{value}}
+\labelopt{dual-field}
+
+If this option is used, this will add \cs{glsxtrprovidestoragekey}
+to the start of the \ext{glstex} file providing the key given by
+\meta{value}.  Any entries defined using \atentry{dualentry}
+will be written to the \ext{glstex} file with an extra field called
+\meta{value} that is set to the mirror entry. If \meta{value} is
+omitted \code{dual} is assumed.
+
+For example, if the \ext{bib} file contains
+\begin{verbatim}
+@dualentry{child,
+  name={child},
+  plural={children},
+  description={enfant}
+}
+\end{verbatim}
+Then with \csopt[dualid]{dual-field} this will first add the line
+\begin{verbatim}
+\glsxtrprovidestoragekey{dualid}{}{}
+\end{verbatim}
+at the start of the file and will include the line
+\begin{verbatim}
+dualid={dual.child},
+\end{verbatim}
+for the primary entry (\code{child}) and the line
+\begin{verbatim}
+dualid={child},
+\end{verbatim}
+for the dual entry (\code{dual.child}). It's then possible to
+reference one entry from the other. For example, the post-description 
+hook could contain:
+\begin{verbatim}
+ \ifglshasfield{dualid}{\glscurrententrylabel}
+ {%
+   \space
+   (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
+ }%
+ {}%
+\end{verbatim}
+Note that this new field won't be available for use within the
+\ext{bib} file (unless it was previously defined in the document
+before \csref{glsxtrresourcefile}).
+
+\subsection{Dual Sorting}
+\label{sec:dualoptssort}
+
+\subsubsection{\csoptnv{dual-sort}\csopteqval{value}}
+\labelopt{dual-sort}
+
+This option indicates how to sort the dual entries. The primary
+entries are sorted with the normal entries according to
+\optref{sort}, and the dual entries are sorted according to
+\csopt{dual-sort} unless \csopt[combine]{dual-sort} in which case the dual
+entries will be combined with the primary entries and all the
+entries will sorted together according to the \optref{sort} option.
+
+If \meta{value} isn't set to \optfmt{combine} then the dual
+entries are sorted separately according to \meta{value} (as per
+\optref{sort}) and the dual entries will be appended at the end of
+the \ext{glstex} file. The field used by the comparator is given by
+\optref{dual-sort-field}.
+If \csopt[custom]{dual-sort}, then the dual entries according to the 
+rule provided by \optref{dual-sort-rule}.
+
+
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src={entries-dual},
+ sort={en},
+ dual-sort={de-CH-1996}
+]
+\end{verbatim}
+This will sort the primary entries according to \optfmt{en}
+(English) and the secondary entries according to \optfmt{de-CH-1996} 
+(Swiss German new orthography) whereas:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src={entries-dual},
+ sort={en-GB},
+ dual-sort={combine}
+]
+\end{verbatim}
+will combine the dual entries with the primary entries and sort them
+all according to the \optfmt{en-GB} locale (British English).
+
+If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
+\meta{value} is omitted, \optfmt{locale} is assumed.
+
+\subsubsection{\csoptnv{dual-sort-field}\csopteqval{value}}
+\labelopt{dual-sort-field}
+
+This option indicates the field to use when sorting dual entries
+(when they haven't been combined with the primary entries). The
+default value is the same as the \optref{sort-field} value.
+
+\subsubsection{\csoptnv{dual-sort-rule}\csopteqval{value}}
+\labelopt{dual-sort-rule}
+
+As \optref{sort-rule} but for \csopt[custom]{dual-sort}.
+
+\subsubsection{\csoptnv{dual-break-at}\csopteqval{value}}
+\labelopt{dual-break-at}
+
+As \optref{break-at} but for dual entries.
+
+\subsubsection{\csoptnv{dual-break-marker}\csopteqval{value}}
+\labelopt{dual-break-marker}
+
+As \optref{break-marker} but for dual entries.
+
+\subsubsection{\csoptnv{dual-sort-suffix}\csopteqval{value}}
+\labelopt{dual-sort-suffix}
+
+As \optref{sort-suffix} but for dual entries.
+
+\subsubsection{\csoptnv{dual-sort-suffix-marker}\csopteqval{value}}
+\labelopt{dual-sort-suffix-marker}
+
+As \optref{sort-suffix-marker} but for dual entries.
+
+\subsubsection{\csoptnv{dual-strength}\csopteqval{value}}
+\labelopt{dual-strength}
+
+As \optref{strength} but for dual entries.
+
+\subsubsection{\csoptnv{dual-decomposition}\csopteqval{value}}
+\labelopt{dual-decomposition}
+
+As \optref{decomposition} but for dual entries.
+
+\subsubsection{\csoptnv{dual-letter-number-rule}\csopteqval{value}}
+\labelopt{dual-letter-number-rule}
+
+As \optref{letter-number-rule} but for dual entries that use a
+letter-number sort.
+
+\subsubsection{\csoptnv{dual-letter-number-punc-rule}\csopteqval{value}}
+\labelopt{dual-letter-number-punc-rule}
+
+As \optref{letter-number-punc-rule} but for dual entries that use a
+letter-number sort.
+
+\subsubsection{\csoptnv{dual-numeric-sort-pattern}\csopteqval{value}}
+\labelopt{dual-numeric-sort-pattern}
+
+As \optref{numeric-sort-pattern} but for dual entries that use a
+locale-sensitive numeric sort.
+
+\subsubsection{\csoptnv{dual-numeric-locale}\csopteqval{value}}
+\labelopt{dual-numeric-locale}
+
+As \optref{numeric-locale} but for dual entries that use a
+locale-sensitive numeric sort.
+
+\subsubsection{\csoptnv{dual-date-sort-locale}\csopteqval{value}}
+\labelopt{dual-date-sort-locale}
+
+As \optref{date-sort-locale} but for dual entries that
+use a date/time sort.
+
+\subsubsection{\csoptnv{dual-date-sort-format}\csopteqval{value}}
+\labelopt{dual-date-sort-format}
+
+As \optref{date-sort-format} but for dual entries that
+use a date/time sort.
+
+\subsection{Dual Mappings}
+\label{sec:dualoptsmap}
+
+\subsubsection{\csoptnv{dual-entry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-entry-map}
 
 This setting governs the behaviour of \atentryref{dualentry}
@@ -8384,7 +8493,7 @@ the \styfmt{glossaries-extra} package's point of view. For example,
 \cs{longnewglossaryentry} doesn't provide a default for
 \field{descriptionplural} if if hasn't been set.
 
-\subsection{\csoptnv{dual-abbrv-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-abbrv-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-abbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to
@@ -8406,7 +8515,7 @@ This essentially flips the \field{short} field with the
 \field{duallong} field. See \atentryref{dualabbreviation}
 for further details.
 
-\subsection{\csoptnv{dual-abbrventry-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-abbrventry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-abbrventry-map}
 
 This is like \csopt{dual-entry-map} but applies to
@@ -8423,7 +8532,7 @@ dual-abbrventry-map=
 See \atentryref{dualabbreviationentry} for further details.
 
 
-\subsection{\csoptnv{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-symbol-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-symbol-map}
 
 This is like \csopt{dual-entry-map} but applies to
@@ -8441,26 +8550,29 @@ dual-symbol-map=
 This essentially flips the \field{name} field with the
 \field{symbol} field.
 
-\subsection{\csoptnv{dual-indexentry-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-indexentry-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-indexentry-map}
 
 This is like \csopt{dual-entry-map} but applies to
 \atentryref{dualindexentry} rather than \atentry{dualentry}. 
 
-\subsection{\csoptnv{dual-indexsymbol-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-indexsymbol-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-indexsymbol-map}
 
 This is like \csopt{dual-entry-map} but applies to both
 \atentryref{dualindexsymbol} and \atentryref{dualindexnumber}. 
 
-\subsection{\csoptnv{dual-indexabbrv-map}=\marg{\margm{list1},\margm{list2}}}
+\subsubsection{\csoptnv{dual-indexabbrv-map}=\marg{\margm{list1},\margm{list2}}}
 \labelopt{dual-indexabbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to both
 \atentryref{dualindexabbreviation} and
 \atentryref{tertiaryindexabbreviationentry}. 
 
-\subsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
+\subsection{Dual Back-Links}
+\label{sec:dualoptsbacklinks}
+
+\subsubsection{\csoptnv{dual-entry-backlink}\csopteqval{boolean}}
 \labelopt{dual-entry-backlink}
 
 This is a boolean setting.
@@ -8513,48 +8625,48 @@ is selected, which also happens to be the \field{description} field,
 so the hyperlink for the primary entry is put in the
 \field{description} field.
 
-\subsection{\csoptnv{dual-abbrv-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-abbrv-backlink}\csopteqval{boolean}}
 \labelopt{dual-abbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualabbreviation} instead of
 \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-symbol-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-symbol-backlink}\csopteqval{boolean}}
 \labelopt{dual-symbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualsymbol} instead of \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-abbrventry-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-abbrventry-backlink}\csopteqval{boolean}}
 \labelopt{dual-abbrventry-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualabbreviationentry} instead of
 \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-indexentry-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-indexentry-backlink}\csopteqval{boolean}}
 \labelopt{dual-indexentry-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualindexentry} instead of
 \atentry{dualentry}.
 
-\subsection{\csoptnv{dual-indexsymbol-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-indexsymbol-backlink}\csopteqval{boolean}}
 \labelopt{dual-indexsymbol-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualindexsymbol} and
 \atentryref{dualindexnumber}.
 
-\subsection{\csoptnv{dual-indexabbrv-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-indexabbrv-backlink}\csopteqval{boolean}}
 \labelopt{dual-indexabbrv-backlink}
 
 This is analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentryref{dualindexabbreviation} and
 \atentryref{tertiaryindexabbreviationentry}.
 
-\subsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
+\subsubsection{\csoptnv{dual-backlink}\csopteqval{boolean}}
 \labelopt{dual-backlink}
 
 Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink}, 
@@ -8564,51 +8676,6 @@ Shortcut for \csopt[\meta{boolean}]{dual-entry-backlink},
 \csopt[\meta{boolean}]{dual-indexentry-backlink},
 \csopt[\meta{boolean}]{dual-indexsymbol-backlink}, and
 \csopt[\meta{boolean}]{dual-indexabbrv-backlink}.
-
-\subsection{\csoptnv{dual-field}\csopteqval{value}}
-\labelopt{dual-field}
-
-If this option is used, this will add \cs{glsxtrprovidestoragekey}
-to the start of the \ext{glstex} file providing the key given by
-\meta{value}.  Any entries defined using \atentry{dualentry}
-will be written to the \ext{glstex} file with an extra field called
-\meta{value} that is set to the mirror entry. If \meta{value} is
-omitted \code{dual} is assumed.
-
-For example, if the \ext{bib} file contains
-\begin{verbatim}
-@dualentry{child,
-  name={child},
-  plural={children},
-  description={enfant}
-}
-\end{verbatim}
-Then with \csopt[dualid]{dual-field} this will first add the line
-\begin{verbatim}
-\glsxtrprovidestoragekey{dualid}{}{}
-\end{verbatim}
-at the start of the file and will include the line
-\begin{verbatim}
-dualid={dual.child},
-\end{verbatim}
-for the primary entry (\code{child}) and the line
-\begin{verbatim}
-dualid={child},
-\end{verbatim}
-for the dual entry (\code{dual.child}). It's then possible to
-reference one entry from the other. For example, the post-description 
-hook could contain:
-\begin{verbatim}
- \ifglshasfield{dualid}{\glscurrententrylabel}
- {%
-   \space
-   (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
- }%
- {}%
-\end{verbatim}
-Note that this new field won't be available for use within the
-\ext{bib} file (unless it was previously defined in the document
-before \csref{glsxtrresourcefile}).
 
 \section{Tertiary Entries}
 

@@ -19,6 +19,8 @@
 package com.dickimawbooks.bib2gls;
 
 import java.util.Locale;
+import java.util.IllformedLocaleException;
+import java.util.MissingResourceException;
 import java.text.Collator;
 
 public class SortSettings
@@ -31,6 +33,87 @@ public class SortSettings
    public SortSettings(String method)
    {
       setMethod(method);
+   }
+
+   public static boolean isValidSortMethod(String method)
+   {
+      if (method == null || "unsrt".equals(method) || "none".equals(method)
+         || "random".equals(method) || "combine".equals(method))
+
+      {
+         return true;
+      }
+
+      if (method.endsWith("-reverse"))
+      {
+         method = method.substring(0, method.lastIndexOf("-reverse"));
+      }
+
+      if (method.equals("doc")
+       || method.equals("locale")
+       || method.equals("custom"))
+      {
+         return true;
+      }
+
+      if (method.equals("letter-case")
+       || method.equals("letter-nocase")
+       || method.equals("letter-lowerupper")
+       || method.equals("letter-upperlower"))
+      {
+         return true;
+      }
+
+      if (method.equals("letternumber-case")
+       || method.equals("letternumber-nocase")
+       || method.equals("letternumber-lowerupper")
+       || method.equals("letternumber-upperlower"))
+      {
+         return true;
+      }
+
+      if (method.equals("integer")
+       || method.equals("hex")
+       || method.equals("octal")
+       || method.equals("binary")
+       || method.equals("float")
+       || method.equals("double")
+       || method.equals("numeric")
+       || method.equals("currency")
+       || method.equals("percent")
+       || method.equals("numberformat"))
+      {
+         return true;
+      }
+
+      if (method.equals("date")
+       || method.equals("datetime")
+       || method.equals("time"))
+      {
+         return true;
+      }
+
+      // is method a valid language tag?
+
+      try
+      {
+         Locale loc = new Locale.Builder().setLanguageTag(method).build();
+
+         try
+         {
+            String lang = loc.getISO3Language();
+         }
+         catch (MissingResourceException e)
+         {
+            return false;
+         }
+      }
+      catch (IllformedLocaleException e)
+      {
+         return false;
+      }
+
+      return true;
    }
 
    public boolean requiresSorting()
@@ -142,7 +225,7 @@ public class SortSettings
 
    public boolean isCustom()
    {
-      return "custom".equals(sortMethod);
+      return "custom".equals(sortMethod) || "custom-reverse".equals(sortMethod);
    }
 
    public boolean hasCustomRule()
@@ -162,6 +245,11 @@ public class SortSettings
 
    public void setMethod(String method)
    {
+      if (!isValidSortMethod(method))
+      {
+         throw new IllegalArgumentException("Invalid sort method:" +method);
+      }
+
       if ("unsrt".equals(method))
       {
          sortMethod = "none";
@@ -239,13 +327,22 @@ public class SortSettings
 
    public Locale getLocale()
    {
-      if (sortMethod.equals("locale"))
+      if (sortMethod.equals("locale") || sortMethod.equals("locale-reverse"))
       {
          return Locale.getDefault();
       }
       else
       {
-         return Locale.forLanguageTag(sortMethod);
+         String method = sortMethod;
+
+         int idx = method.lastIndexOf("-reverse");
+
+         if (idx > -1)
+         {
+            method = method.substring(0, idx);
+         }
+
+         return Locale.forLanguageTag(method);
       }
    }
 
@@ -283,6 +380,10 @@ public class SortSettings
       if ("doc".equals(sortMethod))
       {
          sortMethod = locale;
+      }
+      else if ("doc-reverse".equals(sortMethod))
+      {
+         sortMethod = locale+"-reverse";
       }
 
       if ("doc".equals(dateLocale))

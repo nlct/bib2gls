@@ -260,6 +260,7 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.dir.not.found">Directory not found: {0}</entry>
 <entry key="error.not.dir">Not a directory: {0}</entry>
 <entry key="error.cant.open.log">Can't open log file: {0}</entry>
+<entry key="error.invalid.sort.value">Invalid sort method ''{0}'' given in option: {1}</entry>
 <entry key="error.invalid.opt.value">Invalid ''{0}'' value: {1}</entry>
 <entry key="error.invalid.opt.int.value">Invalid ''{0}'' value: {1} (number required)</entry>
 <entry key="error.invalid.opt.minint.value">Invalid ''{0}'' value: {1} (can''t be less than {2,number})</entry>

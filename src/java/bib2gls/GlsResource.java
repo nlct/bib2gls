@@ -382,7 +382,18 @@ public class GlsResource
                     obj.toString(parser)));
             }
 
-            secondarySortSettings.setMethod(split.get(0).toString(parser));
+            String method = split.get(0).toString(parser);
+
+            try
+            {
+               secondarySortSettings.setMethod(method);
+            }
+            catch (IllegalArgumentException e)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.sort.value", method, opt),
+                 e);
+            }
          }
          else if (opt.equals("ext-prefixes"))
          {
@@ -714,7 +725,18 @@ public class GlsResource
          }
          else if (opt.equals("sort"))
          {
-            sortSettings.setMethod(getOptional(parser, "doc", list, opt));
+            String method = getOptional(parser, "doc", list, opt);
+
+            try
+            {
+               sortSettings.setMethod(method);
+            }
+            catch (IllegalArgumentException e)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.sort.value", method, opt),
+                 e);
+            }
          }
          else if (opt.equals("sort-rule"))
          {
@@ -862,7 +884,18 @@ public class GlsResource
          }
          else if (opt.equals("dual-sort"))
          {
-            dualSortSettings.setMethod(getOptional(parser, "doc", list, opt));
+            String method = getOptional(parser, "doc", list, opt);
+
+            try
+            {
+               dualSortSettings.setMethod(method);
+            }
+            catch (IllegalArgumentException e)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.sort.value", method, opt),
+                 e);
+            }
          }
          else if (opt.equals("sort-field"))
          {
