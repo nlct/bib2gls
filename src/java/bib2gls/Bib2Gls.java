@@ -821,7 +821,7 @@ public class Bib2Gls implements TeXApp
     *  the .bib file @preamble{...} 
     *  Some standard LaTeX commands are recognised.
     */ 
-   public String interpret(String texCode, BibValueList bibVal)
+   public String interpret(String texCode, BibValueList bibVal, boolean trim)
    {
       if (interpreter == null) return texCode;
 
@@ -857,13 +857,20 @@ public class Bib2Gls implements TeXApp
             debug(String.format("texparserlib:--> %s", result));
          }
 
-         // Strip any html markup and trim leading/trailing spaces
+         // Strip any html markup
 
-         result = result.replaceAll("<[^>]+>", "").trim();
+         result = result.replaceAll("<[^>]+>", "");
 
          result = result.replaceAll("\\&le;", "<");
          result = result.replaceAll("\\&ge;", ">");
          result = result.replaceAll("\\&amp;", "&");
+
+         // trim leading/trailing spaces if required
+
+         if (trim)
+         {
+            result = result.trim();
+         }
 
          logMessage(String.format("texparserlib: %s -> %s", 
             texCode, result));

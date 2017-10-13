@@ -19,7 +19,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf \
 	  test-dates.pdf test-people.pdf test-entrytypemap.pdf \
 	  test-dualindexentry.pdf test-dualindexentry2.pdf \
-	  test-dual-mix.pdf
+	  test-dual-mix.pdf test-letternumber.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -346,6 +346,13 @@ test-dual-mix.pdf	: test-dual-mix.glstex
 test-dual-mix.glstex	: test-dual-mix.tex test-dual-mix2.bib $(DEPS)
 		pdflatex test-dual-mix
 		$(BIB2GLS) test-dual-mix
+
+test-letternumber.pdf	: test-letternumber.glstex
+		xelatex test-letternumber
+
+test-letternumber.glstex	: test-letternumber.tex test-letternumber.bib $(DEPS)
+		xelatex test-letternumber
+		$(BIB2GLS) test-letternumber
 
 clean	:
 	$(RM) *.aux

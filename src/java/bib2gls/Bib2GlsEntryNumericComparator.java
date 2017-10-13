@@ -39,8 +39,11 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.reverse = settings.isReverse();
-      this.sort = settings.getMethod();
+
+      sort = settings.getMethod();
+      reverse = settings.isReverse();
+      trim = settings.isTrimOn();
+
       Locale locale = settings.getNumberLocale();
 
       if (sort.startsWith("numeric"))
@@ -126,7 +129,7 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
          else if (bib2gls.useInterpreter() && list != null 
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {  
-            value = bib2gls.interpret(value, list);
+            value = bib2gls.interpret(value, list, trim);
          }
       }
 
@@ -340,5 +343,5 @@ public class Bib2GlsEntryNumericComparator implements Comparator<Bib2GlsEntry>
 
    private Vector<Bib2GlsEntry> entries;
 
-   private boolean reverse;
+   private boolean reverse, trim;
 }

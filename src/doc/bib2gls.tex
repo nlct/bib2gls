@@ -7123,6 +7123,16 @@ field.
 
 If no fallback field can be found, the entry's label will be used.
 
+\subsection{\csoptnv{trim-sort}\csopteqval{boolean}}
+\labelopt{trim-sort}
+
+If the interpreter is used to determine the sort value, this setting
+determines whether or not the interpreter should trim leading and
+trailing spaces. The default setting is \csopt[true]{trim-sort}.
+
+This option automatically sets \optref[\meta{value}]{dual-trim-sort}
+and \optref[\meta{value}]{secondary-trim-sort}.
+
 \subsection{\csoptnv{sort-rule}\csopteqval{value}}
 \labelopt{sort-rule}
 
@@ -7596,18 +7606,21 @@ If you use one of the letter-number sort methods (such as
 comparison between a number and letter. The \meta{value} may be
 one of:
 \begin{itemize}
-\item\optfmt{before lower}: numbers are considered less than lower
-case characters (default);
-\item\optfmt{before upper}: numbers are considered less than upper
-case characters;
 \item\optfmt{before letter}: numbers are considered less than any
-letter (regardless of case);
+letter.
 \item\optfmt{after letter}: numbers are considered greater than any
-letter (regardless of case);
+letter.
+\item\optfmt{between}: (default) numbers come between letter cases.
+With the \optfmt{-case} or \optfmt{-upperlower} sort options,
+this will put numbers after upper case and before lower case.
+With the \optfmt{-lowerupper} sort option, this will put numbers
+after lower case and before upper case. This setting doesn't make
+much sense with the \optfmt{-nocase} option but, if used, this will put
+numbers before letters.
 \item\optfmt{first}: numbers are considered less than all
-characters;
+characters (including punctuation and spaces).
 \item\optfmt{last}: numbers are considered greater than all
-characters.
+characters (including punctuation and spaces).
 \end{itemize}
 Remember that the case-insensitive letter-number sort methods always
 first convert the \field{sort} field to lower case, which means that
@@ -7672,10 +7685,25 @@ will be used, otherwise \bibgls\ will try to match the zero with the
 following digit group. For example, if the space is followed by
 \textsuperscript{1} (0xB9) the space will be replaced by
 \textsuperscript{0} (0x2070),  resulting in the sub-string
-\code{\textsuperscript{01}} (0xB9 0x2070). If just the \optfmt{space-zero}
+\code{\textsuperscript{01}} (0xB9 0x2070). 
+
+If just the \optfmt{space-zero}
 (without the \optfmt{-match-next}) is used then the space will just
 be replaced with \code{0} resulting in the sub-string
-\code{0\textsuperscript{1}} (0x30 0x2070).
+\code{0\textsuperscript{1}} (0x30 0x2070). In this case, the
+\code{0} will be distinct from \textsuperscript{1}. However, for 
+other numbering systems the \code{0} will be treated as a leading
+zero. For example, if the space is followed by the Devanagari digit
+one (0x0967) then the sub-string will be 0x30 0x0967 but here the
+mixture is allowed to form a number (with a leading zero) as both
+characters belong to the Unicode category \qt{Number, Decimal
+Digit}.
+
+This means that the \optfmt{-match-next} settings are only really
+needed if the sort string contains the superscript or subscript
+digits that don't belong to the \qt{Number, Decimal Digit} category.
+The plain \optfmt{space-zero} alternatives are more efficient as
+they just perform a simple substitution.
 
 Note that \optref[first]{letter-number-rule} and
 \optref[last]{letter-number-rule} overrides this option when
@@ -7975,6 +8003,11 @@ For example, if the entries are stored in \filefmt{entries.bib}:
   label-prefix={byid.}
 ]
 \end{verbatim}
+
+\subsection{\csoptnv{secondary-trim-sort}\csopteqval{boolean}}
+\labelopt{secondary-trim-sort}
+
+As \optref{trim-sort} but for secondary sorting.
 
 \subsection{\csoptnv{secondary-sort-rule}\csopteqval{value}}
 \labelopt{secondary-sort-rule}
@@ -8353,6 +8386,11 @@ If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
 This option indicates the field to use when sorting dual entries
 (when they haven't been combined with the primary entries). The
 default value is the same as the \optref{sort-field} value.
+
+\subsection{\csoptnv{dual-trim-sort}\csopteqval{boolean}}
+\labelopt{dual-trim-sort}
+
+As \optref{trim-sort} but for dual sorting.
 
 \subsubsection{\csoptnv{dual-sort-rule}\csopteqval{value}}
 \labelopt{dual-sort-rule}

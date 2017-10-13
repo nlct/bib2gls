@@ -1,0 +1,41 @@
+% arara: xelatex
+% arara: bib2gls
+% arara: xelatex
+\documentclass{article}
+
+\usepackage{fontspec}
+\setmainfont{FreeSerif}
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\renewcommand{\glsnamefont}[1]{\textmd{#1}}
+
+%\newcommand{\abc}{}
+
+\GlsXtrLoadResources[ 
+ %interpret-preamble=false,
+ trim-sort=false,
+ %letter-number-rule={before letter},
+ %letter-number-rule={after letter},
+ letter-number-rule={between},
+ %letter-number-rule={first},
+ %letter-number-rule={last},
+ letter-number-punc-rule={punc-space-first},
+ %letter-number-punc-rule={punc-space-last},
+ %letter-number-punc-rule={space-punc-first},
+ %letter-number-punc-rule={space-punc-last},
+ %letter-number-punc-rule={space-first-punc-last},
+ %letter-number-punc-rule={punc-first-space-last},
+ %letter-number-punc-rule={punc-last-space-zero},
+ %letter-number-punc-rule={punc-last-space-zero-match-next},
+ %letter-number-punc-rule={punc-first-space-zero},
+ %letter-number-punc-rule={punc-first-space-zero-match-next},
+ %sort={letternumber-case},
+ %sort={letternumber-nocase},
+ %sort={letternumber-upperlower},
+ sort={letternumber-lowerupper},
+ selection=all
+]
+
+\begin{document}
+\printunsrtglossary
+\end{document}

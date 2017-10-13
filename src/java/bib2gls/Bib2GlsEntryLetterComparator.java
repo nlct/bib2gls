@@ -35,9 +35,11 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
-      this.reverse = settings.isReverse();
-      this.sortSuffixMarker = settings.getSuffixMarker();
-      this.sortSuffixOption = settings.getSuffixOption();
+
+      reverse = settings.isReverse();
+      sortSuffixMarker = settings.getSuffixMarker();
+      sortSuffixOption = settings.getSuffixOption();
+      trim = settings.isTrimOn();
 
       this.caseStyle = settings.caseStyle();
 
@@ -98,7 +100,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          else if (bib2gls.useInterpreter() && list != null 
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {  
-            value = bib2gls.interpret(value, list);
+            value = bib2gls.interpret(value, list, trim);
          }
 
          if (sortSuffixOption != SortSettings.SORT_SUFFIX_NONE)
@@ -495,9 +497,9 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
 
    private Vector<Bib2GlsEntry> entries;
 
-   protected boolean reverse;
+   protected boolean reverse, trim;
 
-   private int caseStyle;
+   protected int caseStyle;
 
    private String sortSuffixMarker;
 

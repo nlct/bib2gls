@@ -511,6 +511,16 @@ public class SortSettings
       return sortSuffixMarker;
    }
 
+   public void setTrim(boolean value)
+   {
+      trim = value;
+   }
+
+   public boolean isTrimOn()
+   {
+      return trim;
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -520,7 +530,7 @@ public class SortSettings
    private String numberFormat=null;
 
    private int letterNumberRule
-     = Bib2GlsEntryLetterNumberComparator.NUMBER_BEFORE_LOWER;
+     = Bib2GlsEntryLetterNumberComparator.NUMBER_BETWEEN;
    private int letterNumberPuncRule
      = Bib2GlsEntryLetterNumberComparator.PUNCTUATION_SPACE_FIRST;
 
@@ -532,6 +542,8 @@ public class SortSettings
    private int sortSuffixOption=SORT_SUFFIX_NON_UNIQUE;
 
    private String sortSuffixMarker = "";
+
+   private boolean trim=true;
 
    public static final int SORT_SUFFIX_NONE=0;
    public static final int SORT_SUFFIX_NON_UNIQUE=1;

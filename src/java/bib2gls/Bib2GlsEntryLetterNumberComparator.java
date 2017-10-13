@@ -39,10 +39,9 @@ public class Bib2GlsEntryLetterNumberComparator
 
       switch (numberPosition)
       {
-         case NUMBER_BEFORE_UPPER:
-         case NUMBER_BEFORE_LOWER:
          case NUMBER_BEFORE_LETTER:
          case NUMBER_AFTER_LETTER:
+         case NUMBER_BETWEEN:
          case NUMBER_FIRST:
          case NUMBER_LAST:
          break;
@@ -63,6 +62,8 @@ public class Bib2GlsEntryLetterNumberComparator
          case PUNCTUATION_FIRST_SPACE_LAST:
          case PUNCTUATION_FIRST_SPACE_ZERO:
          case PUNCTUATION_LAST_SPACE_ZERO:
+         case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
+         case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
          break;
          default:
            throw new IllegalArgumentException(
@@ -143,18 +144,19 @@ public class Bib2GlsEntryLetterNumberComparator
             builder.appendCodePoint(cp);
          }
 
-         return builder.toString();
+         sortStr = builder.toString();
       }
-      else
-      {
-         return super.adjustSort(sortStr);
-      }
+
+      return super.adjustSort(sortStr);
    }
 
    @Override
    protected int compare(int cp1, int cp2)
    {
-      if (Character.isLetter(cp1) && Character.isLetter(cp2))
+      boolean isLetter1 = Character.isLetter(cp1);
+      boolean isLetter2 = Character.isLetter(cp2);
+
+      if (isLetter1 && isLetter2)
       {
          // both are letters
 
@@ -164,9 +166,12 @@ public class Bib2GlsEntryLetterNumberComparator
       boolean isSpace1 = Character.isWhitespace(cp1);
       boolean isSpace2 = Character.isWhitespace(cp2);
 
-      if (isSpace1 == isSpace2)
+      boolean isPunc1 = !isSpace1 && !isLetter1;
+      boolean isPunc2 = !isSpace2 && !isLetter2;
+
+      if ((isSpace1 && isSpace2) || (isPunc1 && isPunc2))
       {
-         // either both white space or both aren't
+         // either both are white space or both are punctuation
 
          if (cp1 < cp2)
          {
@@ -182,22 +187,68 @@ public class Bib2GlsEntryLetterNumberComparator
          }
       }
 
-      if (isSpace1)
+      if (isSpace1 && isPunc2)
       {
-         // cp1 is white space, cp2 isn't
+         // cp1 is white space, cp2 is punctuation
 
          switch (puncPosition)
          {
             case PUNCTUATION_SPACE_FIRST:
             case PUNCTUATION_SPACE_LAST:
             case PUNCTUATION_FIRST_SPACE_LAST:
+            // these two shouldn't happen as there won't be any
+            // spaces
+            case PUNCTUATION_FIRST_SPACE_ZERO:
+            case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
 
+               // punctuation before space
+               return reverse ? -1 : 1;
+
+            case SPACE_PUNCTUATION_FIRST:
+            case SPACE_PUNCTUATION_LAST:
+            case SPACE_FIRST_PUNCTUATION_LAST:
+            // these two shouldn't happen as there won't be any
+            // spaces
+            case PUNCTUATION_LAST_SPACE_ZERO:
+            case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
+
+               // space before punctuation
+               return reverse ? 1 : -1;
+
+            default:
+            // shouldn't happen but keep compiler happy
+
+              throw new IllegalArgumentException(
+                "Invalid letter-number-punc setting: "+puncPosition);
+         }
+      }
+
+      if (isPunc1 && isSpace2)
+      {
+         // cp1 is punctuation and cp2 is white space
+
+         switch (puncPosition)
+         {
+            case PUNCTUATION_SPACE_FIRST:
+            case PUNCTUATION_SPACE_LAST:
+            case PUNCTUATION_FIRST_SPACE_LAST:
+            // these two shouldn't happen as there won't be any
+            // spaces
+            case PUNCTUATION_FIRST_SPACE_ZERO:
+            case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
+
+               // punctuation before space
                return reverse ? 1 : -1;
 
             case SPACE_PUNCTUATION_FIRST:
             case SPACE_PUNCTUATION_LAST:
             case SPACE_FIRST_PUNCTUATION_LAST:
+            // these two shouldn't happen as there won't be any
+            // spaces
+            case PUNCTUATION_LAST_SPACE_ZERO:
+            case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
 
+               // space before punctuation
                return reverse ? -1 : 1;
 
             default:
@@ -208,21 +259,128 @@ public class Bib2GlsEntryLetterNumberComparator
          }
       }
 
-      // cp2 is white space, cp1 isn't
+      // one of the characters is a letter
+
+      if (isLetter1)
+      {// cp1 is a letter
+
+         switch (puncPosition)
+         {
+            case PUNCTUATION_SPACE_FIRST:
+            case SPACE_PUNCTUATION_FIRST:
+
+               // punctuation/space come before letters
+               return reverse ? -1 : 1;
+
+            case PUNCTUATION_SPACE_LAST:
+            case SPACE_PUNCTUATION_LAST:
+
+               // punctuation/space come after letters
+               return reverse ? 1 : -1;
+
+            case PUNCTUATION_FIRST_SPACE_LAST:
+
+               // order: punctuation, letter, space
+
+               if (isPunc2)
+               {
+                  return reverse ? -1 : 1;
+               }
+               else
+               {// cp2 is space
+                  return reverse ? 1 : -1;
+               }
+
+            case PUNCTUATION_FIRST_SPACE_ZERO:
+            case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
+
+               // order: punctuation, letter, no space
+
+               return reverse ? -1 : 1;
+
+            case SPACE_FIRST_PUNCTUATION_LAST:
+
+               // order: space, letter, punctuation
+
+               if (isSpace2)
+               {
+                  return reverse ? -1 : 1;
+               }
+               else
+               {// cp2 is space
+                  return reverse ? 1 : -1;
+               }
+
+            case PUNCTUATION_LAST_SPACE_ZERO:
+            case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
+
+               // order: letter, punctuation, no space
+
+               return reverse ? 1 : -1;
+
+            default:
+            // shouldn't happen but keep compiler happy
+
+              throw new IllegalArgumentException(
+                "Invalid letter-number-punc setting: "+puncPosition);
+         }
+      }
+
+      // cp2 must be a letter
 
       switch (puncPosition)
       {
          case PUNCTUATION_SPACE_FIRST:
-         case PUNCTUATION_SPACE_LAST:
-         case PUNCTUATION_FIRST_SPACE_LAST:
+         case SPACE_PUNCTUATION_FIRST:
 
+            // punctuation/space come before letters
+            return reverse ? 1 : -1;
+
+         case PUNCTUATION_SPACE_LAST:
+         case SPACE_PUNCTUATION_LAST:
+
+            // punctuation/space come after letters
             return reverse ? -1 : 1;
 
-         case SPACE_PUNCTUATION_FIRST:
-         case SPACE_PUNCTUATION_LAST:
-         case SPACE_FIRST_PUNCTUATION_LAST:
+         case PUNCTUATION_FIRST_SPACE_LAST:
+
+            // order: punctuation, letter, space
+
+            if (isPunc1)
+            {
+               return reverse ? 1 : -1;
+            }
+            else
+            {// cp2 is space
+               return reverse ? -1 : 1;
+            }
+
+         case PUNCTUATION_FIRST_SPACE_ZERO:
+         case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
+
+            // order: punctuation, letter (no space)
 
             return reverse ? 1 : -1;
+
+         case SPACE_FIRST_PUNCTUATION_LAST:
+
+            // order: space, letter, punctuation
+
+            if (isSpace1)
+            {
+               return reverse ? 1 : -1;
+            }
+            else
+            {
+               return reverse ? -1 : 1;
+            }
+
+         case PUNCTUATION_LAST_SPACE_ZERO:
+         case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
+
+            // order: letter, punctuation (no spaces)
+
+            return reverse ? -1 : 1;
 
          default:
          // shouldn't happen but keep compiler happy
@@ -253,12 +411,14 @@ public class Bib2GlsEntryLetterNumberComparator
             case PUNCTUATION_SPACE_FIRST:
             case SPACE_PUNCTUATION_FIRST:
             case PUNCTUATION_FIRST_SPACE_ZERO:
+            case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
 
                return 1;
 
             case PUNCTUATION_SPACE_LAST:
             case SPACE_PUNCTUATION_LAST:
             case PUNCTUATION_LAST_SPACE_ZERO:
+            case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
 
                return -1;
 
@@ -286,16 +446,6 @@ public class Bib2GlsEntryLetterNumberComparator
 
       switch (numberPosition)
       {
-         case NUMBER_BEFORE_LOWER:
-
-            result = Character.isLowerCase(cp) ? -1 : 1;
-
-         break;
-         case NUMBER_BEFORE_UPPER:
-
-            result = Character.isUpperCase(cp) ? -1 : 1;
-
-         break;
          case NUMBER_BEFORE_LETTER:
 
             result = Character.isLetter(cp) ? -1 : 1;
@@ -305,6 +455,36 @@ public class Bib2GlsEntryLetterNumberComparator
 
             result = Character.isLetter(cp) ? 1 : -1;
 
+         break;
+         case NUMBER_BETWEEN:
+
+            // this depends on the case style
+
+            switch (caseStyle)
+            {
+               case CASE:
+               case UPPERLOWER:
+                 // Since Unicode usually lists upper case before
+                 // lower these two cases can be considered the same.
+                 // order: upper, number, lower
+               case TOLOWER:
+                  // no upper case so order is: number, lower
+
+                 result = Character.isLowerCase(cp) ? -1 : 1;
+
+               break;
+               case LOWERUPPER:
+                  // order: lower, number, upper
+
+                 result = Character.isLowerCase(cp) ? 1 : -1;
+
+               break;
+               default:
+                  // shouldn't happen
+
+                 throw new IllegalArgumentException(
+                   "Invalid case setting: "+caseStyle);
+            }
          break;
          case NUMBER_FIRST:
 
@@ -316,11 +496,11 @@ public class Bib2GlsEntryLetterNumberComparator
             result = 1;
 
          break;
-            default:
-            // shouldn't happen but keep compiler happy
+         default:
+            // shouldn't happen
 
-              throw new IllegalArgumentException(
-                "Invalid letter-number setting: "+numberPosition);
+           throw new IllegalArgumentException(
+             "Invalid letter-number setting: "+numberPosition);
       }
 
       return reverse ? -result : result;
@@ -422,12 +602,11 @@ public class Bib2GlsEntryLetterNumberComparator
       return 0;
    }
 
-   public static final int NUMBER_BEFORE_LOWER=0;
-   public static final int NUMBER_BEFORE_UPPER=1;
-   public static final int NUMBER_BEFORE_LETTER=2;
-   public static final int NUMBER_AFTER_LETTER=3;
-   public static final int NUMBER_FIRST=4;
-   public static final int NUMBER_LAST=5;
+   public static final int NUMBER_BEFORE_LETTER=0;
+   public static final int NUMBER_AFTER_LETTER=1;
+   public static final int NUMBER_BETWEEN=2;
+   public static final int NUMBER_FIRST=3;
+   public static final int NUMBER_LAST=4;
 
    public static final int PUNCTUATION_SPACE_FIRST=0;
    public static final int PUNCTUATION_SPACE_LAST=1;

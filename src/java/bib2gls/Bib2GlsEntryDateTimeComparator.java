@@ -41,6 +41,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
       this.bib2gls = bib2gls;
       this.entries = entries;
       reverse = settings.isReverse();
+      trim = settings.isTrimOn();
 
       String format = settings.getDateFormat();
       Locale locale = settings.getDateLocale();
@@ -189,7 +190,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
          else if (bib2gls.useInterpreter() && list != null 
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {  
-            value = bib2gls.interpret(value, list);
+            value = bib2gls.interpret(value, list, trim);
          }
       }
 
@@ -382,7 +383,7 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
    private Vector<Bib2GlsEntry> entries;
 
-   private boolean reverse, hasDate, hasTime;
+   private boolean reverse, hasDate, hasTime, trim;
 
    private DateFormat dateFormat, sortDateFormat;
 

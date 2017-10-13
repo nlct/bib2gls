@@ -783,6 +783,20 @@ public class GlsResource
             secondarySortSettings.setNumberFormat(
               replaceHex(getRequired(parser, list, opt)));
          }
+         else if (opt.equals("trim-sort"))
+         {
+            sortSettings.setTrim(getBoolean(parser, list, opt));
+            dualSortSettings.setTrim(sortSettings.isTrimOn());
+            secondarySortSettings.setTrim(sortSettings.isTrimOn());
+         }
+         else if (opt.equals("dual-trim-sort"))
+         {
+            dualSortSettings.setTrim(getBoolean(parser, list, opt));
+         }
+         else if (opt.equals("secondary-trim-sort"))
+         {
+            secondarySortSettings.setTrim(getBoolean(parser, list, opt));
+         }
          else if (opt.equals("letter-number-rule"))
          {
             sortSettings.setLetterNumberRule(
@@ -2536,24 +2550,20 @@ public class GlsResource
      String opt)
    throws IOException
    {
-      String val = getChoice(parser, list, opt, "before lower", 
-        "before upper", "before letter", "after letter", "first", "last");
+      String val = getChoice(parser, list, opt, "before letter",
+        "after letter", "between", "first", "last");
 
-      if (val.equals("before lower"))
-      {
-         return Bib2GlsEntryLetterNumberComparator.NUMBER_BEFORE_LOWER;
-      }
-      else if (val.equals("before upper"))
-      {
-         return Bib2GlsEntryLetterNumberComparator.NUMBER_BEFORE_UPPER;
-      }
-      else if (val.equals("before letter"))
+      if (val.equals("before letter"))
       {
          return Bib2GlsEntryLetterNumberComparator.NUMBER_BEFORE_LETTER;
       }
       else if (val.equals("after letter"))
       {
          return Bib2GlsEntryLetterNumberComparator.NUMBER_AFTER_LETTER;
+      }
+      else if (val.equals("between"))
+      {
+         return Bib2GlsEntryLetterNumberComparator.NUMBER_BETWEEN;
       }
       else if (val.equals("first"))
       {
@@ -4479,7 +4489,7 @@ public class GlsResource
          // preamble. Won't work on anything complicated and doesn't
          // take font changes into account.
 
-         name = bib2gls.interpret(name, entry.getField("name")).trim();
+         name = bib2gls.interpret(name, entry.getField("name"), true);
       }
 
       int level = entry.getHierarchyCount();

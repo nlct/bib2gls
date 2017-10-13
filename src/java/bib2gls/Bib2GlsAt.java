@@ -137,6 +137,12 @@ public class Bib2GlsAt extends At
          {
             id = ((BibEntry)data).getId();
 
+            if (id == null)
+            {
+               throw new IOException(bib2gls.getMessage(
+                 "error.invalid.id", e.getMessage(bib2gls)), e);
+            }
+
             if (containsSpecialChars(id))
             {
                bib2gls.warning(parser, bib2gls.getMessage(

@@ -48,6 +48,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       sortSuffixMarker = settings.getSuffixMarker();
       sortSuffixOption = settings.getSuffixOption();
       reverse = settings.isReverse();
+      trim = settings.isTrimOn();
 
       int breakPoint = settings.getBreakPoint();
       String breakMarker = settings.getBreakPointMarker();
@@ -141,7 +142,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
          else if (bib2gls.useInterpreter() && list != null
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {
-            value = bib2gls.interpret(value, list);
+            value = bib2gls.interpret(value, list, trim);
          }
 
          if (sortSuffixOption != SortSettings.SORT_SUFFIX_NONE)
@@ -625,7 +626,7 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
 
    private int sortSuffixOption;
 
-   private boolean reverse = false;
+   private boolean reverse = false, trim;
 
    private HashMap<String,Integer> sortCount;
 
