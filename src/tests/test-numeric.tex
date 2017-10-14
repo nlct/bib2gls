@@ -1,0 +1,18 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[record,style=index]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  match={category={number}},
+  sort={numeric},
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossary
+\end{document}
