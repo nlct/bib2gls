@@ -22,6 +22,8 @@ import java.util.Vector;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Locale;
+import java.util.Set;
+import java.util.Iterator;
 import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -68,6 +70,12 @@ public class Bib2Gls implements TeXApp
       }
 
       formatMap = new HashMap<String,String>();
+
+      if (saveRecordCount)
+      {
+         recordCount = new HashMap<GlsRecord,Integer>();
+      }
+
       texFiles = new Vector<File>();
 
       packages = new Vector<String>();
@@ -827,12 +835,17 @@ public class Bib2Gls implements TeXApp
 
       try
       {
+         L2HStringConverter listener = 
+            (L2HStringConverter)interpreter.getListener();
+
          StringWriter writer = new StringWriter();
-         ((L2HStringConverter)interpreter.getListener()).setWriter(writer);
+         listener.setWriter(writer);
 
          TeXObjectList objList = bibVal.expand(interpreter);
 
          if (objList == null) return texCode;
+
+         objList = (TeXObjectList)objList.clone();
 
          interpreter.addAll(objList);
 
@@ -879,6 +892,12 @@ public class Bib2Gls implements TeXApp
       }
       catch (IOException e)
       {// too complicated
+
+         if (getDebugLevel() > 0)
+         {
+            debug("texparserlib: ");
+            debug(e);
+         }
 
          return texCode;
       }
@@ -1036,6 +1055,8 @@ public class Bib2Gls implements TeXApp
                         data.getArg(2).toString(parser),
                         data.getArg(3).toString(parser),
                         data.getArg(4).toString(parser));
+
+            incRecordCount(newRecord);
 
             // skip duplicates
 
@@ -1553,6 +1574,154 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
+   public GlsRecord getRecordCountKey(GlsRecord record)
+   {
+      if (recordCount == null) return null;
+
+      Set<GlsRecord> keys = recordCount.keySet();
+
+      for (Iterator<GlsRecord> it = keys.iterator(); it.hasNext(); )
+      {
+         GlsRecord key = it.next();
+
+         boolean match = key.getLabel().equals(record.getLabel())
+          && key.getCounter().equals(record.getCounter());
+
+         if (saveRecordCountUnit)
+         {
+            match = match && key.getLocation().equals(record.getLocation());
+         }
+
+         if (match)
+         {
+            return key;
+         }
+      }
+
+      return null;
+   }
+
+   public boolean isRecordCountSet()
+   {
+      return recordCount != null;
+   }
+
+   public Set<GlsRecord> getRecordCountKeySet()
+   {
+      return recordCount == null ? null : recordCount.keySet();
+   }
+
+   public Integer getRecordCount(GlsRecord key)
+   {
+      return recordCount == null ? null : recordCount.get(key);
+   }
+
+   public void writeRecordCount(String entryLabel, PrintWriter writer)
+    throws IOException
+   {
+      Set<GlsRecord> keys = getRecordCountKeySet();
+
+      if (keys == null) return;
+
+      int total = 0;
+
+      for (Iterator<GlsRecord> it = keys.iterator(); it.hasNext(); )
+      {
+         GlsRecord record = it.next();
+
+         if (record.getLabel().equals(entryLabel))
+         {
+            Integer count = getRecordCount(record);
+            total += count;
+
+            writer.format("\\bibglssetrecordcount{%s}{%s}{%d}%n",
+              entryLabel, record.getCounter(), count);
+
+            if (saveRecordCountUnit)
+            {
+               writer.format("\\bibglssetlocationrecordcount{%s}{%s}{%s}{%d}%n",
+                 entryLabel, record.getCounter(), record.getLocation(), count);
+            }
+         }
+      }
+
+      writer.format("\\bibglssettotalrecordcount{%s}{%d}%n",
+         entryLabel, total);
+   }
+
+   public void writeCommonCommands(PrintWriter writer)
+    throws IOException
+   {
+      if (commonCommandsDone)
+      {
+         return;
+      }
+
+      writer.println("\\providecommand{\\bibglsusesee}[1]{\\glsxtrusesee{#1}}");
+      writer.println("\\providecommand{\\bibglsuseseealso}[1]{\\glsxtruseseealso{#1}}");
+      writer.println("\\providecommand{\\bibglsdelimN}{\\delimN}");
+      writer.println("\\providecommand{\\bibglslastDelimN}{,~}");
+      writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
+      writer.println("\\providecommand{\\bibglsinterloper}[1]{#1\\delimN }");
+      writer.format("\\providecommand{\\bibglspassimname}{%s}%n",
+        getMessage("tag.passim"));
+      writer.println("\\providecommand{\\bibglspassim}{ \\bibglspassimname}");
+      writer.println();
+
+      if (recordCount != null)
+      {
+         writer.println("\\ifdef\\glsxtrenablerecordcount %glossaries-extra.sty v1.21+");
+         writer.println("{\\glsxtrenablerecordcount}");
+         writer.println("{");
+         writer.println(" \\PackageWarning{bib2gls}{You need at least v1.21 of glossaries-extra with --record-count or --record-count-unit}");
+         writer.println("}");
+         writer.println();
+
+         writer.println("\\providecommand*{\\bibglssetrecordcount}[3]{%");
+         writer.println("   \\GlsXtrSetField{#1}{recordcount.#2}{#3}%");
+         writer.println("}");
+
+         writer.println("\\providecommand*{\\bibglssettotalrecordcount}[2]{%");
+         writer.println("   \\GlsXtrSetField{#1}{recordcount}{#2}%");
+         writer.println("}");
+
+         if (saveRecordCountUnit)
+         {
+            writer.println("\\ifdef\\glsxtrdetoklocation");
+            writer.println("{% glossaries-extra v1.21+");
+            writer.println("  \\providecommand*{\\bibglssetlocationrecordcount}[4]{%");
+            writer.println("     \\GlsXtrSetField{#1}{recordcount.#2.\\glsxtrdetoklocation{#3}}{#4}%");
+            writer.println("  }");
+            writer.println("}");
+            writer.println("{");
+            writer.println("  \\providecommand*{\\bibglssetlocationrecordcount}[4]{%");
+            writer.println("     \\GlsXtrSetField{#1}{recordcount.#2.#3}{#4}%");
+            writer.println("  }");
+            writer.println("}");
+
+         }
+      }
+
+      commonCommandsDone = true;
+   }
+
+   public void incRecordCount(GlsRecord record)
+   {
+      if (recordCount == null) return;
+
+      GlsRecord key = getRecordCountKey(record);
+
+      if (key == null)
+      {
+         recordCount.put(record, Integer.valueOf(1));
+      }
+      else
+      {
+         Integer val = recordCount.get(key);
+         recordCount.put(key, Integer.valueOf(val+1));
+      }
+   }
+
    public boolean mfirstucProtection()
    {
       return mfirstucProtect;
@@ -1626,6 +1795,11 @@ public class Bib2Gls implements TeXApp
          logAndPrintMessage(message);
 
          e.printStackTrace();
+
+         if (logWriter != null)
+         {
+            e.printStackTrace(logWriter);
+         }
       }
    }
 
@@ -2455,6 +2629,22 @@ public class Bib2Gls implements TeXApp
          "--no-group"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.record.count",
+         "--record-count", "-c"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.record.count",
+         "--no-record-count", "--no-record-count-unit"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.record.count.unit",
+         "--record-count-unit", "-n", "--record-count"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.record.count.unit",
+         "--no-record-count-unit"));
+
+      System.out.println();
       System.out.println(getMessage("syntax.trim.fields",
          "--trim-fields"));
 
@@ -2991,6 +3181,24 @@ public class Bib2Gls implements TeXApp
          {
             addGroupField = false;
          }
+         else if (args[i].equals("--record-count") || args[i].equals("-c"))
+         {
+            saveRecordCount = true;
+         }
+         else if (args[i].equals("--no-record-count"))
+         {
+            saveRecordCount = false;
+            saveRecordCountUnit = false;
+         }
+         else if (args[i].equals("--record-count-unit") || args[i].equals("-n"))
+         {
+            saveRecordCountUnit = true;
+            saveRecordCount = true;
+         }
+         else if (args[i].equals("--no-record-count-unit"))
+         {
+            saveRecordCountUnit = false;
+         }
          else if (isArg(args[i], "tex-encoding"))
          {
             i = parseArgVal(args, i, argVal);
@@ -3257,9 +3465,12 @@ public class Bib2Gls implements TeXApp
 
    private HashMap<String,String> formatMap;
 
+   private HashMap<GlsRecord,Integer> recordCount=null;
+
    private Vector<File> texFiles;
 
-   private boolean addGroupField = false;
+   private boolean addGroupField = false, saveRecordCount=false,
+     saveRecordCountUnit=false, commonCommandsDone=false;
 
    private Charset texCharset = null;
 

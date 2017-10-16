@@ -88,6 +88,16 @@ See the manual for further details.</entry>
 			Add ''group'' field to entries.</entry>
 <entry key="syntax.no.group">{0}
 			Don''t add ''group'' field to entries.</entry>
+<entry key="syntax.record.count">{0} or {1}
+			Add record count fields to entries.</entry>
+<entry key="syntax.no.record.count">{0}
+			Don''t add record count fields to entries.
+			(Automatically implements {2})</entry>
+<entry key="syntax.record.count.unit">{0} or {1}
+			Add unit record count fields to entries.
+			(Automatically implements {2})</entry>
+<entry key="syntax.no.record.count.unit">{0}
+			Don''t add unit record count fields to entries.</entry>
 <entry key="syntax.trim.fields">{0}
 			Trim leading and trailing spaces from fields.</entry>
 <entry key="syntax.no.trim.fields">{0}

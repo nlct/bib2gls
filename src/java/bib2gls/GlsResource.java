@@ -741,47 +741,47 @@ public class GlsResource
          else if (opt.equals("sort-rule"))
          {
             sortSettings.setCollationRule(
-              replaceHex(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
          else if (opt.equals("dual-sort-rule"))
          {
             dualSortSettings.setCollationRule(
-              replaceHex(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
          else if (opt.equals("secondary-sort-rule"))
          {
             secondarySortSettings.setCollationRule(
-              replaceHex(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
          else if (opt.equals("numeric-locale"))
          {
             sortSettings.setNumberLocale(
-              replaceHex(getRequired(parser, list, opt)));
+              getRequired(parser, list, opt));
          }
          else if (opt.equals("dual-numeric-locale"))
          {
             dualSortSettings.setNumberLocale(
-              replaceHex(getRequired(parser, list, opt)));
+              getRequired(parser, list, opt));
          }
          else if (opt.equals("secondary-numeric-locale"))
          {
             secondarySortSettings.setNumberLocale(
-              replaceHex(getRequired(parser, list, opt)));
+              getRequired(parser, list, opt));
          }
          else if (opt.equals("numeric-sort-pattern"))
          {
             sortSettings.setNumberFormat(
-              replaceHex(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
          else if (opt.equals("dual-numeric-sort-pattern"))
          {
             dualSortSettings.setNumberFormat(
-              replaceHex(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
          else if (opt.equals("secondary-numeric-sort-pattern"))
          {
             secondarySortSettings.setNumberFormat(
-              replaceHex(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
          else if (opt.equals("trim-sort"))
          {
@@ -839,15 +839,18 @@ public class GlsResource
          }
          else if (opt.equals("date-sort-format"))
          {
-            sortSettings.setDateFormat(getRequired(parser, list, opt));
+            sortSettings.setDateFormat(replaceHexAndSpecial(
+               getRequired(parser, list, opt)));
          }
          else if (opt.equals("dual-date-sort-format"))
          {
-            dualSortSettings.setDateFormat(getRequired(parser, list, opt));
+            dualSortSettings.setDateFormat(replaceHexAndSpecial(
+               getRequired(parser, list, opt)));
          }
          else if (opt.equals("secondary-date-sort-format"))
          {
-            secondarySortSettings.setDateFormat(getRequired(parser, list, opt));
+            secondarySortSettings.setDateFormat(replaceHexAndSpecial(
+               getRequired(parser, list, opt)));
          }
          else if (opt.equals("date-sort-locale"))
          {
@@ -1043,6 +1046,10 @@ public class GlsResource
                if (values[0].equals("false"))
                {
                   locationPrefix = null;
+               }
+               else if (values[0].equals("comma"))
+               {
+                  locationPrefix = new String[]{", "};
                }
                else if (values[0].equals("list"))
                {
@@ -2018,6 +2025,38 @@ public class GlsResource
       {
          supplementalCategory = category;
       }
+   }
+
+   private String replaceHexAndSpecial(String original)
+   {
+      return replaceHex(replaceEscapeSpecialChar(original));
+   }
+
+   private String replaceEscapeSpecialChar(String original)
+   {
+      // Replace all \#, \%, \_, \&, \{, \}
+
+      Pattern p = Pattern.compile("\\\\([#%_\\&\\{\\}])");
+
+      Matcher m = p.matcher(original);
+
+      StringBuilder builder = new StringBuilder();
+      int idx = 0;
+
+      while (m.find())
+      {
+         String grp = m.group(1);
+
+         builder.append(original.substring(idx, m.start()));
+
+         builder.append(grp);
+
+         idx = m.end();
+      }
+
+      builder.append(original.substring(idx));
+
+      return builder.toString();
    }
 
    private String replaceHex(String original)
@@ -3781,12 +3820,7 @@ public class GlsResource
             writer.println("\\glsnoexpandfields");
          }
 
-         writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
-         writer.println("\\providecommand{\\bibglsinterloper}[1]{#1\\delimN }");
-         writer.format("\\providecommand{\\bibglspassimname}{%s}%n",
-             bib2gls.getMessage("tag.passim"));
-         writer.println("\\providecommand{\\bibglspassim}{ \\bibglspassimname}");
-         writer.println();
+         bib2gls.writeCommonCommands(writer);
 
          if (counters != null)
          {
@@ -4411,6 +4445,11 @@ public class GlsResource
       {
          writer.format("\\GlsXtrSetField{%s}{childcount}{%d}%n",
            entry.getId(), entry.getChildCount());
+      }
+
+      if (bib2gls.isRecordCountSet())
+      {
+         bib2gls.writeRecordCount(entry.getId(), writer);
       }
 
       writer.println();

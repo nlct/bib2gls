@@ -70,11 +70,6 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("description") == null)
-      {
-         missingFieldWarning(parser, "description");
-      }
-
       if (getField("symbol") == null)
       {
          missingFieldWarning(parser, "symbol");

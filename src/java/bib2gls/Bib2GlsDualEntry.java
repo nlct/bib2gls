@@ -176,6 +176,8 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
          if (contents != null && value != null && !key.equals("alias"))
          {
+            contents = (BibValueList)contents.clone();
+
             if (map == null)
             {
                entry.putField(key, contents);
@@ -200,6 +202,8 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
          if (contents != null && map != null)
          {
+            contents = (BibValueList)contents.clone();
+
             String value = getFieldValue("sort");
 
             entry.putField(map, contents);
@@ -218,11 +222,16 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
          if (value == null)
          {
             value = getFallbackValue(key);
+            BibValueList contents = getFallbackContents(key);
 
             if (value != null)
             {
                putField(key, value);
-               putField(key, getFallbackContents(key));
+
+               if (contents != null)
+               {
+                  putField(key, (BibValueList)contents.clone());
+               }
             }
          }
 
@@ -247,7 +256,13 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
             }
             else
             {
-               entry.putField(map, getFallbackContents(key));
+               BibValueList contents = getFallbackContents(key);
+
+               if (contents != null)
+               {
+                  entry.putField(map, (BibValueList)contents.clone());
+               }
+
                entry.putField(map, value);
             }
          }

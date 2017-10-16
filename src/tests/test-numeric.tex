@@ -1,15 +1,35 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: {group: on}
 % arara: pdflatex
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[record,style=index]{glossaries-extra}
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+%\GlsXtrLoadResources[
+%  match={category={number}},
+%  %sort={numeric},
+%  sort={numeric-reverse},
+%  group={Numeric},
+%  selection=all
+%]
 
 \GlsXtrLoadResources[
+  src={test-numeric},
+  match={category={currency}},
+  %sort={currency},
+  sort={currency-reverse},
+  group={Currency},
+  selection=all
+]
+
+\GlsXtrLoadResources[
+  src={test-numeric},
   match={category={number}},
-  sort={numeric},
+  sort={numberformat},
+  numeric-sort-pattern={\#,\#\#\#.\#\#},
+  group={Pattern},
   selection=all
 ]
 

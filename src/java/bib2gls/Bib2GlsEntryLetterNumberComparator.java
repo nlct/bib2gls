@@ -448,12 +448,12 @@ public class Bib2GlsEntryLetterNumberComparator
       {
          case NUMBER_BEFORE_LETTER:
 
-            result = Character.isLetter(cp) ? -1 : 1;
+            result = -1;
 
          break;
          case NUMBER_AFTER_LETTER:
 
-            result = Character.isLetter(cp) ? 1 : -1;
+            result = 1;
 
          break;
          case NUMBER_BETWEEN:
@@ -467,6 +467,11 @@ public class Bib2GlsEntryLetterNumberComparator
                  // Since Unicode usually lists upper case before
                  // lower these two cases can be considered the same.
                  // order: upper, number, lower
+
+                 result = Character.isUpperCase(cp)
+                        || Character.isTitleCase(cp) ? 1 : -1;
+
+               break;
                case TOLOWER:
                   // no upper case so order is: number, lower
 
@@ -503,7 +508,7 @@ public class Bib2GlsEntryLetterNumberComparator
              "Invalid letter-number setting: "+numberPosition);
       }
 
-      return reverse ? -result : result;
+      return result;
    }
 
    protected int compare(String str1, String str2)
@@ -551,26 +556,24 @@ public class Bib2GlsEntryLetterNumberComparator
 
          if (num1 != null || num2 != null)
          {
+            int result;
+
             if (num1 == null)
             {
-               int result = compareNumberChar(str1.codePointAt(i));
-
-               return reverse ? result : -result;
+               result = -compareNumberChar(str1.codePointAt(i));
             }
             else if (num2 == null)
             {
-               int result = compareNumberChar(str2.codePointAt(j));
-
-               return reverse ? -result : result;
+               result = compareNumberChar(str2.codePointAt(j));
             }
             else
             {
-               int result=reverse? num2.compareTo(num1) : num1.compareTo(num2);
+               result = num1.compareTo(num2);
+            }
 
-               if (result != 0)
-               {
-                  return result;
-               }
+            if (result != 0)
+            {
+               return reverse ? -result : result;
             }
          }
          else
@@ -590,16 +593,9 @@ public class Bib2GlsEntryLetterNumberComparator
          }
       }
 
-      if (n1 < n2)
-      {
-         return reverse ? 1 : -1;
-      }
-      else if (n2 > n1)
-      {
-         return reverse ? -1 : 1;
-      }
+      int result = (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
 
-      return 0;
+      return reverse ? -result : result;
    }
 
    public static final int NUMBER_BEFORE_LETTER=0;

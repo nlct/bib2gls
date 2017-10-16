@@ -133,6 +133,24 @@ Add 'group' field to entries.
 
 Don't add 'group' field to entries.
 
+=item B<--record-count> or B<-c>
+
+Add record count fields to entries.
+
+=item B<--no-record-count>
+
+Don't add record count field to entries.
+This option automatically implements B<--no-record-count-unit>.
+
+=item B<--record-count-unit> or B<-n>
+
+Add unit record count fields to entries.
+This option automatically implements B<--record-count>.
+
+=item B<--no-record-count-unit>
+
+Don't add unit record count field to entries.
+
 =item B<--trim-fields>
 
 Trim leading and trailing spaces from fields.

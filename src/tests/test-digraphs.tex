@@ -6,8 +6,10 @@
 \usepackage{tracklang}
 \TrackLanguageTag{nl-NL}
 \usepackage{fontspec}
-\usepackage[record]{glossaries-extra}
+\usepackage[record]{glossaries-extra}% v1.21
 \usepackage{glossary-mcols}
+
+\renewcommand*{\glsxtrresourceinit}{\let\u\glshex}
 
 \GlsXtrLoadResources[selection={all},
   sort={custom},
@@ -17,12 +19,15 @@
    < i,I < j,J < k,K < l,L < ll,Ll,LL < m,M
    < n,N < o,O < p,P < ph,Ph,PH < q,Q < r,R < rh,Rh,RH
    < s,S < t,T < th,Th,TH < u,U < v,V < w,W < x,X < y,Y < z,Z
-   < \protect\u00C6=ae,Ae,\string\u00E6=AE}
+   %< \protect\u00C6=ae,Ae,\string\u00E6=AE
+   < \u00C6=ae,Ae,\u00E6=AE
+   }
 ]
 
 \setglossarystyle{mcolindexgroup}
 
 \begin{document}
+check: \u{a}
 
 \printunsrtglossary
 \end{document}

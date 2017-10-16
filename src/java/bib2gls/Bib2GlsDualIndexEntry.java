@@ -63,10 +63,6 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
 
    public void checkRequiredFields(TeXParser parser)
    {
-      if (getField("description") == null)
-      {
-         missingFieldWarning(parser, "description");
-      }
    }
 
    public String getFallbackValue(String field)

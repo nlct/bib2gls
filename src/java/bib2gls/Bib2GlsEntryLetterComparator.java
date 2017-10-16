@@ -296,10 +296,10 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       }
       else if (caseStyle == LOWERUPPER)
       {
-         int ucp1 = Character.toLowerCase(cp1);
-         int ucp2 = Character.toLowerCase(cp2);
+         int lcp1 = Character.toLowerCase(cp1);
+         int lcp2 = Character.toLowerCase(cp2);
 
-         if (ucp1 == ucp2)
+         if (lcp1 == lcp2)
          {
             if (cp1 == cp2)
             {
@@ -326,11 +326,11 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
                }
             }
          }
-         else if (ucp1 < ucp2)
+         else if (lcp1 < lcp2)
          {
             return reverse ? 1 : -1;
          }
-         else if (ucp1 > ucp2)
+         else if (lcp1 > lcp2)
          {
             return reverse ? -1 : 1;
          }
@@ -371,16 +371,9 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      if (n1 < n2)
-      {
-         return reverse ? 1 : -1;
-      }
-      else if (n2 > n1)
-      {
-         return reverse ? -1 : 1;
-      }
+      int result = (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
 
-      return 0;
+      return reverse ? -result : result;
    }
 
    public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)

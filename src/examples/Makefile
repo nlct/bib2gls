@@ -1,5 +1,5 @@
 BIB2GLS=../bin/bib2gls --debug --verbose --group
-DEPS=../lib/bib2gls.jar
+DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
 all	: sample-chemical.pdf sample-units.pdf
 

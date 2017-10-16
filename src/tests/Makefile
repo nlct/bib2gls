@@ -1,5 +1,5 @@
 BIB2GLS=../bin/bib2gls --debug --verbose --group
-DEPS=../lib/bib2gls.jar
+DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 RM=\rm -f
 
 all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
@@ -19,7 +19,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-abbrv.pdf test-hypergroups.pdf test-dups.pdf \
 	  test-dates.pdf test-people.pdf test-entrytypemap.pdf \
 	  test-dualindexentry.pdf test-dualindexentry2.pdf \
-	  test-dual-mix.pdf test-letternumber.pdf
+	  test-dual-mix.pdf test-letternumber.pdf \
+	  test-numeric.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -353,6 +354,13 @@ test-letternumber.pdf	: test-letternumber.glstex
 test-letternumber.glstex	: test-letternumber.tex test-letternumber.bib $(DEPS)
 		xelatex test-letternumber
 		$(BIB2GLS) test-letternumber
+
+test-numeric.pdf	: test-numeric.glstex
+		pdflatex test-numeric
+
+test-numeric.glstex	: test-numeric.tex test-numeric.bib $(DEPS)
+		pdflatex test-numeric
+		$(BIB2GLS) test-numeric
 
 clean	:
 	$(RM) *.aux

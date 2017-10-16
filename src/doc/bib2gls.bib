@@ -1,0 +1,3780 @@
+% Encoding: UTF-8
+
+@preamble{"\providecommand{\dhyphen}{-}"}
+
+@abbreviation{IETF,
+ short = {IETF},
+ long = {Internet Engineering Task Force}
+}
+
+@abbreviation{JVM,
+ short = {JVM},
+ long = {Java Virtual Machine}
+}
+
+@abbreviation{JRE,
+ short = {JRE},
+ long = {Java Runtime Environment}
+}
+
+@dualindexentry{bibglsnewentry,
+  name={\csfmt{bibglsnewentry}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentryfmt{entry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewsymbol,
+  name={\csfmt{bibglsnewsymbol}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentryfmt{symbol}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewnumber,
+  name={\csfmt{bibglsnewnumber}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentryfmt{number}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewindex,
+  name={\csfmt{bibglsnewindex}},
+  user1={\margm{label}\margm{options}},
+  description={defines terms provided with \atentryfmt{index}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewabbreviation,
+  name={\csfmt{bibglsnewabbreviation}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms provided with \atentryfmt{abbreviation}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewacronym,
+  name={\csfmt{bibglsnewacronym}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms provided with \atentryfmt{acronym}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualentry,
+  name={\csfmt{bib\-gls\-new\-dual\-entry}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentryfmt{dualentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexentry,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-entry}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines primary terms provided with \atentryfmt{dualindexentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexentrysecondary,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-entry\-secondary}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines secondary terms provided with \atentryfmt{dualindexentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexsymbol,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-symbol}},
+  user1={\margm{label}\margm{options}\margm{name}\marg{symbol}\margm{description}},
+  description={defines primary terms provided with
+\atentryfmt{dualindexsymbol}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexsymbolsecondary,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-symbol\-secondary}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines secondary terms provided with
+\atentryfmt{dualindexsymbol}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexnumber,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-number}},
+  user1={\margm{label}\margm{options}\margm{name}\marg{symbol}\margm{description}},
+  description={defines primary terms provided with
+\atentryfmt{dualindexnumber}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexnumbersecondary,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-number\-secondary}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines secondary terms provided with
+\atentryfmt{dualindexnumber}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexabbreviation,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-abbre\-via\-tion}},
+  user1={\margm{label}\margm{dual-label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}},
+  description={defines primary terms provided with
+\atentryfmt{dualindexabbreviation}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualindexabbreviationsecondary,
+  name={\csfmt{bib\-gls\-new\-dual\-index\-abbre\-via\-tion\-sec\-ond\-ary}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}},
+  description={defines secondary terms provided with
+\atentryfmt{dualindexabbreviation}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualabbreviationentry,
+  name={\csfmt{bib\-gls\-new\-dual\-abbre\-via\-tion\-entry}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}},
+  description={defines primary terms provided with
+\atentryfmt{dualabbreviationentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualabbreviationentrysecondary,
+  name={\csfmt{bib\-gls\-new\-dual\-abbre\-via\-tion\-entry\-sec\-ond\-ary}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}},
+  description={defines secondary terms provided with
+\atentryfmt{dualabbreviationentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualentryabbreviation,
+  name={\csfmt{bib\-gls\-new\-dual\-entry\-abbre\-via\-tion}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}},
+  description={defines primary terms provided with (deprecated)
+\atentryfmt{dualentryabbreviation}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualentryabbreviationsecondary,
+  name={\csfmt{bib\-gls\-new\-dual\-entry\-abbre\-via\-tion\-sec\-ond\-ary}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}},
+  description={defines secondary terms provided with (deprecated)
+\atentryfmt{dualentryabbreviation}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualsymbol,
+  name={\csfmt{bib\-gls\-new\-dual\-symbol}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentryfmt{dualsymbol}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualnumber,
+  name={\csfmt{bib\-gls\-new\-dual\-number}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentryfmt{dualnumber}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualabbreviation,
+  name={\csfmt{bib\-gls\-new\-dual\-abbre\-via\-tion}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms provided with
+\atentryfmt{dualabbreviation}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewdualacronym,
+  name={\csfmt{bib\-gls\-new\-dual\-acronym}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms provided with \atentryfmt{dualacronym}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewtertiaryindexabbreviationentry,
+  name={\csfmt{bib\-gls\-new\-tert\-iary\-index\-abbre\-via\-tion\-entry}},
+  user1={\margm{label}\margm{dual-label}\margm{options}\margm{name}\margm{short}\margm{long}\margm{description}},
+  description={defines primary terms provided with
+\atentryfmt{tertiaryindexabbreviationentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewtertiaryindexabbreviationentrysecondary,
+  name={\csfmt{bib\-gls\-new\-tert\-iary\-index\-abbre\-via\-tion\-entry\-sec\-ond\-ary}},
+  user1={\margm{label}\margm{tertiary-label}\margm{options}\margm{tertiary
+opts}\margm{primary name}\margm{short}\margm{long}\margm{description}},
+  description={defines secondary and tertiary terms provided with
+\atentryfmt{tertiaryindexabbreviationentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsuselongfont,
+  name={\csfmt{bibglsuselongfont}},
+  user1={\margm{text}\margm{category}},
+  description={ensures that the given text is formatted according to
+    the given category's long format},
+  category={command}
+}
+
+@index{glsuselongfont,
+  name={\csfmt{glsuselongfont}},
+  user1={\margm{text}\margm{category}},
+  description={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@dualindexentry{bibglsuseabbrvfont,
+  name={\csfmt{bibglsuseabbrvfont}},
+  user1={\margm{text}\margm{category}},
+  description={ensures that the given text is formatted according to
+    the given category's short format},
+  category={command}
+}
+
+@index{glsuseabbrvfont,
+  name={\csfmt{glsuseabbrvfont}},
+  user1={\margm{text}\margm{category}},
+  description={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@dualindexentry{bibglsseesep,
+  name={\csfmt{bibglsseesep}},
+  user1={},
+  description={separator between \fieldfmt{see} cross-references and location list},
+  category={command}
+}
+
+@dualindexentry{bibglsseealsosep,
+  name={\csfmt{bibglsseealsosep}},
+  user1={},
+  description={separator between \fieldfmt{seealso} cross-references and location list},
+  category={command}
+}
+
+@dualindexentry{bibglspassim,
+  name={\csfmt{bibglspassim}},
+  user1={},
+  description={passim range suffix},
+  category={command}
+}
+
+@dualindexentry{bibglspassimname,
+  name={\csfmt{bibglspassimname}},
+  user1={},
+  description={name used by passim range suffix},
+  category={command}
+}
+
+@dualindexentry{bibglsusesee,
+  name={\csfmt{bibglsusesee}},
+  user1={\margm{label}},
+  description={display cross-reference list for given entry},
+  category={command}
+}
+
+@dualindexentry{bibglsuseseealso,
+  name={\csfmt{bibglsuseseealso}},
+  user1={\margm{label}},
+  description={display cross-reference list for given entry},
+  category={command}
+}
+
+@dualindexentry{bibglsdelimN,
+  name={\csfmt{bibglsdelimN}},
+  user1={},
+  description={delimit individual locations (except last)},
+  seealso={bibglslastDelimN},
+  category={command}
+}
+
+@dualindexentry{bibglslastDelimN,
+  name={\csfmt{bibglslastDelimN}},
+  user1={},
+  description={delimit last location},
+  seealso={bibglsdelimN},
+  category={command}
+}
+
+@dualindexentry{bibglsrange,
+  name={\csfmt{bibglsrange}},
+  user1={\marg{\meta{start}\gls{delimR} \meta{end}}},
+  description={Explicit range format},
+  category={command}
+}
+
+@dualindexentry{bibglsinterloper,
+  name={\csfmt{bibglsinterloper}},
+  user1={\margm{location}},
+  description={interloper location format},
+  category={command}
+}
+
+@dualindexentry{bibglspostlocprefix,
+  name={\csfmt{bibglspostlocprefix}},
+  user1={},
+  description={location list post prefix},
+  category={command}
+}
+
+@dualindexentry{bibglslocprefix,
+  name={\csfmt{bibglslocprefix}},
+  user1={\margm{n}},
+  description={location list prefix},
+  category={command}
+}
+
+@dualindexentry{bibglspagename,
+  name={\csfmt{bibglspagename}},
+  user1={},
+  description={name used for single page},
+  category={command}
+}
+
+@dualindexentry{bibglspagesname,
+  name={\csfmt{bibglspagesname}},
+  user1={},
+  description={name used for multiple pages},
+  category={command}
+}
+
+@dualindexentry{bibglslocsuffix,
+  name={\csfmt{bibglslocsuffix}},
+  user1={\margm{n}},
+  description={location list suffix},
+  category={command}
+}
+
+@dualindexentry{bibglslocationgroup,
+  name={\csfmt{bibglslocationgroup}},
+  user1={\margm{n}\margm{counter}\margm{list}},
+  description={location group encapsulator},
+  category={command}
+}
+
+@dualindexentry{bibglslocationgroupsep,
+  name={\csfmt{bibglslocationgroupsep}},
+  user1={},
+  description={location group separator},
+  category={command}
+}
+
+@dualindexentry{bibglssupplemental,
+  name={\csfmt{bibglssupplemental}},
+  user1={\margm{n}\margm{list}},
+  description={supplemental list encapsulator},
+  category={command}
+}
+
+@dualindexentry{bibglssupplementalsep,
+  name={\csfmt{bibglssupplementalsep}},
+  user1={},
+  description={separator between main and supplementary locations},
+  category={command}
+}
+
+@dualindexentry{glsgroupheading,
+  name={\csfmt{glsgroupheading}},
+  user1={\margm{heading}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{bibglssetlettergrouptitle,
+  name={\csfmt{bibglssetlettergrouptitle}},
+  user1={\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}},
+  description={sets the letter group title},
+  category={command}
+}
+
+@dualindexentry{glsxtrsetgrouptitle,
+  name={\csfmt{glsxtrsetgrouptitle}},
+  user1={\margm{group label}\margm{group title}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@dualindexentry{bibglslettergroup,
+  name={\csfmt{bibglslettergroup}},
+  user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
+  description={expands to the letter group label},
+  category={command}
+}
+
+@dualindexentry{bibglslettergrouptitle,
+  name={\csfmt{bibglslettergrouptitle}},
+  user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
+  description={expands to the letter group title},
+  category={command}
+}
+
+@dualindexentry{bibglssetothergrouptitle,
+  name={\csfmt{bibglssetothergrouptitle}},
+  user1={\marg{\margm{character}\margm{id}\margm{type}}},
+  description={sets the non-letter group title},
+  category={command}
+}
+
+@dualindexentry{bibglsothergroup,
+  name={\csfmt{bibglsothergroup}},
+  user1={\margm{character}\margm{id}\margm{type}},
+  description={expands to the non-letter group label},
+  category={command}
+}
+
+@dualindexentry{bibglsothergrouptitle,
+  name={\csfmt{bibglsothergrouptitle}},
+  user1={\margm{character}\margm{id}\margm{type}},
+  description={expands to the non-letter group title},
+  category={command}
+}
+
+@dualindexentry{bibglssetnumbergrouptitle,
+  name={\csfmt{bibglssetnumbergrouptitle}},
+  user1={\marg{\margm{value}\margm{id}\margm{type}}},
+  description={sets the number group title},
+  category={command}
+}
+
+@dualindexentry{bibglsnumbergroup,
+  name={\csfmt{bibglsnumbergroup}},
+  user1={\margm{value}\margm{id}\margm{type}},
+  description={expands to the number group label},
+  category={command}
+}
+
+@dualindexentry{bibglsnumbergrouptitle,
+  name={\csfmt{bibglsnumbergrouptitle}},
+  user1={\margm{value}\margm{id}\margm{type}},
+  description={expands to the number group title},
+  category={command}
+}
+
+@dualindexentry{bibglsdatetimegroup,
+  name={\csfmt{bibglsdatetimegroup}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
+  description={expands to the date-time group label},
+  category={command}
+}
+
+@dualindexentry{bibglsdatetimegrouptitle,
+  name={\csfmt{bibglsdatetimegrouptitle}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
+  description={expands to the date-time group title},
+  category={command}
+}
+
+@dualindexentry{bibglsdategroup,
+  name={\csfmt{bibglsdategroup}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}},
+  description={expands to the date group label},
+  category={command}
+}
+
+@dualindexentry{bibglsdategrouptitle,
+  name={\csfmt{bibglsdategrouptitle}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}},
+  description={expands to the date group title},
+  category={command}
+}
+
+@dualindexentry{bibglstimegroup,
+  name={\csfmt{bibglstimegroup}},
+  user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
+  description={expands to the time group label},
+  category={command}
+}
+
+@dualindexentry{bibglstimegrouptitle,
+  name={\csfmt{bibglstimegrouptitle}},
+  user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
+  description={expands to the time group title},
+  category={command}
+}
+
+@dualindexentry{bibglshypergroup,
+  name={\csfmt{bibglshypergroup}},
+  user1={\margm{type}\margm{group\dhyphen id}},
+  description={creates group navigation information},
+  category={command}
+}
+
+@dualindexentry{bibglsflattenedhomograph,
+  name={\csfmt{bibglsflattenedhomograph}},
+  user1={\margm{name}\margm{parent label}},
+  description={expands to the flattened entry's new name},
+  category={command}
+}
+
+@dualindexentry{bibglsflattenedchildpresort,
+  name={\csfmt{bibglsflattenedchildpresort}},
+  user1={\margm{child name}\margm{parent name}},
+  description={expands to the pre-sort flattened child entry's new name},
+  category={command}
+}
+
+@dualindexentry{bibglsflattenedchildpostsort,
+  name={\csfmt{bibglsflattenedchildpostsort}},
+  user1={\margm{parent name}\margm{child name}},
+  description={expands to the post-sort flattened child entry's new
+name},
+  category={command}
+}
+
+@dualindexentry{bibglssetwidest,
+  name={\csfmt{bibglssetwidest}},
+  user1={\margm{level}\margm{name}},
+  description={sets the widest name},
+  category={command}
+}
+
+@dualindexentry{bibglssetwidestfortype,
+  name={\csfmt{bibglssetwidestfortype}},
+  user1={\margm{type}\margm{level}\margm{name}},
+  description={sets the widest name for the given glossary type},
+  category={command}
+}
+
+@dualindexentry{newglossaryentry,
+  name={\csfmt{newglossaryentry}},
+  user1={\margm{label}\margm{\keyvallist}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{longnewglossaryentry,
+  name={\csfmt{longnewglossaryentry}},
+  user1={\margm{label}\margm{\keyvallist}\margm{description}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{provideglossaryentry,
+  name={\csfmt{provideglossaryentry}},
+  user1={\margm{label}\margm{\keyvallist}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{longprovideglossaryentry,
+  name={\csfmt{longprovideglossaryentry}},
+  user1={\margm{label}\margm{\keyvallist}\margm{description}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{newterm,
+  name={\csfmt{newterm}},
+  user1={\oargm{\keyvallist}\margm{label}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{newabbreviation,
+  name={\csfmt{newabbreviation}},
+  user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@dualindexentry{newacronym,
+  name={\csfmt{newacronym}},
+  user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glsxtrnewsymbol,
+  name={\csfmt{gls\-xtr\-new\-symbol}},
+  user1={\oargm{\keyvallist}\margm{label}\margm{symbol}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@dualindexentry{glsxtrnewnumber,
+  name={\csfmt{gls\-xtr\-new\-number}},
+  user1={\oargm{\keyvallist}\margm{label}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@dualindexentry{newdualentry,
+  name={\csfmt{newdualentry}},
+  user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}\margm{description}},
+  description={example given in \styfmt{glossaries} user manual},
+  category={command}
+}
+
+@dualindexentry{@gls@hypergroup,
+  name={\csfmt{@gls@hypergroup}},
+  user1={\margm{type}\margm{group id}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glssetexpandfield,
+  name={\csfmt{glssetexpandfield}},
+  user1={\margm{field}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glsxtrfmt,
+  name={\csfmt{glsxtrfmt}},
+  user1={\oargm{options}\margm{label}\margm{text}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@dualindexentry{glsxtrentryfmt,
+  name={\csfmt{glsxtrentryfmt}},
+  user1={\margm{label}\margm{text}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@dualindexentry{glsxtrresourcefile,
+  name={\csfmt{gls\-xtr\-resource\-file}},
+  user1={\oargm{options}\margm{filename}},
+  description={provided by \styfmt{glossaries-extra}},
+  seealso={resourceoptions,GlsXtrLoadResources},
+  category={command}
+}
+
+@index{resourceoptions,
+  name={resource options},
+  text={resource option}
+}
+
+@dualindexentry{opt.charset,
+   name={\csoptfmt{charset}},
+   user1={\meta{encoding-name}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.interpret-preamble,
+   name={\csoptfmt{interpret\dhyphen preamble}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.set-widest,
+   name={\csoptfmt{set\dhyphen widest}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.entry-type-aliases,
+   name={\csoptfmt{entry\dhyphen type\dhyphen aliases}},
+   user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.src,
+   name={\csoptfmt{loc\dhyphen prefix}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.selection,
+   name={\csoptfmt{selection}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.match,
+   name={\csoptfmt{match}},
+   user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.match-op,
+   name={\csoptfmt{match\dhyphen op}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.not-match,
+   name={\csoptfmt{not\dhyphen match}},
+   user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.flatten,
+   name={\csoptfmt{flatten}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.flatten-lonely,
+   name={\csoptfmt{flatten\dhyphen lonely}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.flatten-lonely-rule,
+   name={\csoptfmt{flatten\dhyphen lonely\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.master,
+   name={\csoptfmt{master}},
+   user1={\meta{name}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.master-resources,
+   name={\csoptfmt{master\dhyphen resources}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.ignore-fields,
+   name={\csoptfmt{ignore\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.category,
+   name={\csoptfmt{category}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.type,
+   name={\csoptfmt{type}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.counter,
+   name={\csoptfmt{counter}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.label-prefix,
+   name={\csoptfmt{loc\dhyphen prefix}},
+   user1={\meta{tag}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.ext-prefixes,
+   name={\csoptfmt{ext\dhyphen prefixes}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.short-case-change,
+   name={\csoptfmt{short\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.name-case-change,
+   name={\csoptfmt{name\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.description-case-change,
+   name={\csoptfmt{description\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.group,
+   name={\csoptfmt{group}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.save-child-count,
+   name={\csoptfmt{save\dhyphen child\dhyphen count}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.short-plural-suffix,
+   name={\csoptfmt{short\dhyphen plural\dhyphen suffix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-short-plural-suffix,
+   name={\csoptfmt{dual\dhyphen short\dhyphen plural\dhyphen suffix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.save-locations,
+   name={\csoptfmt{save\dhyphen locations}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.min-loc-range,
+   name={\csoptfmt{min\dhyphen loc\dhyphen range}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.max-loc-diff,
+   name={\csoptfmt{max\dhyphen loc\dhyphen diff}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.suffixF,
+   name={\csoptfmt{suffixF}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.suffixFF,
+   name={\csoptfmt{suffixFF}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.see,
+   name={\csoptfmt{see}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.seealso,
+   name={\csoptfmt{seealso}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.alias-loc,
+   name={\csoptfmt{alias\dhyphen loc}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.loc-prefix,
+   name={\csoptfmt{loc\dhyphen prefix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.loc-suffix,
+   name={\csoptfmt{loc\dhyphen suffix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.loc-counters,
+   name={\csoptfmt{loc\dhyphen counters}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.supplemental-locations,
+   name={\csoptfmt{supplemental\dhyphen locations}},
+   user1={\meta{basename}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.supplemental-selection,
+   name={\csoptfmt{supplemental\dhyphen selection}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.supplemental-category,
+   name={\csoptfmt{supplemental\dhyphen category}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.sort,
+   name={\csoptfmt{sort}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.shuffle,
+   name={\csoptfmt{shuffle}},
+   user1={\meta{seed}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.sort-field,
+   name={\csoptfmt{sort\dhyphen field}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.trim-sort,
+   name={\csoptfmt{trim\dhyphen sort}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.sort-rule,
+   name={\csoptfmt{sort\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.break-at,
+   name={\csoptfmt{break\dhyphen at}},
+   user1={\meta{option}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.break-marker,
+   name={\csoptfmt{break\dhyphen marker}},
+   user1={\meta{marker}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.sort-suffix,
+   name={\csoptfmt{sort\dhyphen suffix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.sort-suffix-marker,
+   name={\csoptfmt{sort\dhyphen suffix\dhyphen marker}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.strength,
+   name={\csoptfmt{strength}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.decomposition,
+   name={\csoptfmt{decomposition}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.letter-number-rule,
+   name={\csoptfmt{letter\dhyphen number\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.letter-number-punc-rule,
+   name={\csoptfmt{letter\dhyphen number\dhyphen punc\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.numeric-sort-pattern,
+   name={\csoptfmt{numeric\dhyphen sort\dhyphen pattern}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.numeric-locale,
+   name={\csoptfmt{numeric\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-sort-locale,
+   name={\csoptfmt{date\dhyphen sort\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-sort-format,
+   name={\csoptfmt{date\dhyphen sort\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary,
+   name={\csoptfmt{secondary}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-trim-sort,
+   name={\csoptfmt{secondary\dhyphen trim\dhyphen sort}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-sort-rule,
+   name={\csoptfmt{secondary\dhyphen sort\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-break-at,
+   name={\csoptfmt{secondary\dhyphen break\dhyphen at}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-break-marker,
+   name={\csoptfmt{secondary\dhyphen break\dhyphen marker}},
+   user1={\meta{marker}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-sort-suffix,
+   name={\csoptfmt{secondary\dhyphen sort\dhyphen suffix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-sort-suffix-marker,
+   name={\csoptfmt{secondary\dhyphen sort\dhyphen suffix\dhyphen
+marker}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-strength,
+   name={\csoptfmt{secondary\dhyphen strength}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-decomposition,
+   name={\csoptfmt{secondary\dhyphen decomposition}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-letter-number-rule,
+   name={\csoptfmt{secondary\dhyphen letter\dhyphen number\dhyphen
+rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-letter-number-punc-rule,
+   name={\csoptfmt{secondary\dhyphen letter\dhyphen number\dhyphen
+punc\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-numeric-sort-pattern,
+   name={\csoptfmt{secondary\dhyphen numeric\dhyphen sort\dhyphen
+pattern}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-numeric-locale,
+   name={\csoptfmt{secondary\dhyphen numeric\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-date-sort-locale,
+   name={\csoptfmt{secondary\dhyphen date\dhyphen sort\dhyphen
+locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-date-sort-format,
+   name={\csoptfmt{secondary\dhyphen date\dhyphen sort\dhyphen
+format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-prefix,
+   name={\csoptfmt{dual\dhyphen prefix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.combine-dual-locations,
+   name={\csoptfmt{combine\dhyphen dual\dhyphen locations}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-type,
+   name={\csoptfmt{dual\dhyphen type}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-category,
+   name={\csoptfmt{dual\dhyphen category}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-counter,
+   name={\csoptfmt{dual\dhyphen counter}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-short-case-change,
+   name={\csoptfmt{dual\dhyphen short\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-field,
+   name={\csoptfmt{dual\dhyphen field}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-sort,
+   name={\csoptfmt{dual\dhyphen sort}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-sort-field,
+   name={\csoptfmt{dual\dhyphen sort\dhyphen field}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-trim-sort,
+   name={\csoptfmt{dual\dhyphen trim\dhyphen sort}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-sort-rule,
+   name={\csoptfmt{dual\dhyphen sort\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-break-at,
+   name={\csoptfmt{dual\dhyphen break\dhyphen at}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-break-marker,
+   name={\csoptfmt{dual\dhyphen break\dhyphen marker}},
+   user1={\meta{marker}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-sort-suffix,
+   name={\csoptfmt{dual\dhyphen sort\dhyphen suffix}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-sort-suffix-marker,
+   name={\csoptfmt{dual\dhyphen sort\dhyphen suffix\dhyphen marker}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-strength,
+   name={\csoptfmt{dual\dhyphen strength}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-decomposition,
+   name={\csoptfmt{dual\dhyphen decomposition}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-letter-number-rule,
+   name={\csoptfmt{dual\dhyphen letter\dhyphen number\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-letter-number-punc-rule,
+   name={\csoptfmt{dual\dhyphen letter\dhyphen number\dhyphen punc\dhyphen rule}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-numeric-sort-pattern,
+   name={\csoptfmt{dual\dhyphen numeric\dhyphen sort\dhyphen
+pattern}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-numeric-locale,
+   name={\csoptfmt{dual\dhyphen numeric\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-date-sort-locale,
+   name={\csoptfmt{dual\dhyphen date\dhyphen sort\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-date-sort-format,
+   name={\csoptfmt{dual\dhyphen date\dhyphen sort\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-entry-map,
+   name={\csoptfmt{dual\dhyphen entry\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-abbrv-map,
+   name={\csoptfmt{dual\dhyphen abbrv\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-abbrventry-map,
+   name={\csoptfmt{dual\dhyphen abbrventry\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-symbol-map,
+   name={\csoptfmt{dual\dhyphen symbol\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-indexentry-map,
+   name={\csoptfmt{dual\dhyphen indexentry\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-indexsymbol-map,
+   name={\csoptfmt{dual\dhyphen indexsymbol\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-indexabbrv-map,
+   name={\csoptfmt{dual\dhyphen indexabbrv\dhyphen map}},
+   user1={\marg{\margm{list1},\margm{list2}}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-entry-backlink,
+   name={\csoptfmt{dual\dhyphen entry\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-abbrv-backlink,
+   name={\csoptfmt{dual\dhyphen abbrv\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-entryabbrv-backlink,
+   name={\csoptfmt{dual\dhyphen entryabbrv\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-abbrventry-backlink,
+   name={\csoptfmt{dual\dhyphen abbrventry\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-symbol-backlink,
+   name={\csoptfmt{dual\dhyphen symbol\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-indexentry-backlink,
+   name={\csoptfmt{dual\dhyphen indexentry\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-indexsymbol-backlink,
+   name={\csoptfmt{dual\dhyphen indexsymbol\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-indexabbrv-backlink,
+   name={\csoptfmt{dual\dhyphen indexabbrv\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-backlink,
+   name={\csoptfmt{dual\dhyphen backlink}},
+   user1={\marg{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.tertiary-prefix,
+   name={\csoptfmt{tertiary\dhyphen prefix}},
+   user1={\marg{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.tertiary-type,
+   name={\csoptfmt{tertiary\dhyphen type}},
+   user1={\marg{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.tertiary-category,
+   name={\csoptfmt{tertiary\dhyphen type}},
+   user1={\marg{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{GlsXtrLoadResources,
+  name={\csfmt{Gls\-Xtr\-Load\-Resources}},
+  user1={\oargm{options}},
+  description={provided by \styfmt{glossaries-extra}},
+  seealso={resourceoptions,glsxtrresourcefile},
+  category={command}
+}
+
+@dualindexentry{glsxtrnewglslike,
+  name={\csfmt{glsxtrnewglslike}},
+  user1={\oargm{options}\margm{prefix}\margm{gls-like
+cs}\margm{glspl-like cs}\margm{Gls-like
+cs}\margm{Glspl-like cs}},
+  description={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@dualindexentry{glsnoidxdisplayloc,
+  name={\csfmt{glsnoidxdisplayloc}},
+  user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glsxtr@record,
+  name={\csfmt{glsxtr@record}},
+  user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glsxtrfieldlistadd,
+  name={\csfmt{glsxtrfieldlistadd}},
+  user1={\margm{label}\marg{loclist}\margm{record}},
+  description={provided by \styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
+@dualindexentry{strong,
+  name={\csfmt{strong}},
+  user1={\margm{text}},
+  description={example command},
+  category={command}
+}
+
+@index{fileformats,
+  name={file formats},
+  text={file format}
+}
+
+@index{tex,
+  name={\extfmt{tex}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{bib,
+  name={\extfmt{bib}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{aux,
+  name={\extfmt{aux}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{sh,
+  name={\extfmt{sh}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{bat,
+  name={\extfmt{bat}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{jar,
+  name={\extfmt{jar}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{glg,
+  name={\extfmt{glg}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{log,
+  name={\extfmt{log}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{glstex,
+  name={\extfmt{glstex}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{applications,
+  name={applications},
+  text={applications}
+}
+
+@index{bibtex,
+  name={\appfmt{bibtex}},
+  category={application},
+  parent={applications}
+}
+
+@index{biber,
+  name={\appfmt{biber}},
+  category={application},
+  parent={applications}
+}
+
+@index{makeindex,
+  name={\appfmt{makeindex}},
+  category={application},
+  parent={applications}
+}
+
+@index{xindy,
+  name={\appfmt{xindy}},
+  category={application},
+  parent={applications}
+}
+
+@index{makeglossaries,
+  name={\appfmt{makeglossaries}},
+  category={application},
+  parent={applications}
+}
+
+@index{kpsewhich,
+  name={\appfmt{kpsewhich}},
+  category={application},
+  parent={applications}
+}
+
+@index{convertgls2bib,
+  name={\appfmt{convert\-gls2bib}},
+  category={application},
+  parent={applications}
+}
+
+@index{packages,
+   name={packages},
+   text={package}
+}
+
+@index{glossaries,
+  name={\styfmt{glossaries}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossaries-extra,
+  name={\styfmt{glossaries-extra}},
+  category={package},
+  parent={packages}
+}
+
+@index{pifonts,
+  name={\styfmt{pifonts}},
+  category={package},
+  parent={packages}
+}
+
+@index{wasysym,
+  name={\styfmt{wasysym}},
+  category={package},
+  parent={packages}
+}
+
+@index{amssymb,
+  name={\styfmt{amssymb}},
+  category={package},
+  parent={packages}
+}
+
+@index{stix,
+  name={\styfmt{stix}},
+  category={package},
+  parent={packages}
+}
+
+@index{mhchem,
+  name={\styfmt{mhchem}},
+  category={package},
+  parent={packages}
+}
+
+@index{bpchem,
+  name={\styfmt{bpchem}},
+  category={package},
+  parent={packages}
+}
+
+@index{siunitx,
+  name={\styfmt{siunitx}},
+  category={package},
+  parent={packages}
+}
+
+@index{mfirstuc,
+  name={\styfmt{mfirstuc}},
+  category={package},
+  parent={packages}
+}
+
+@index{hyperref,
+  name={\styfmt{hyperref}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossary-hypernav,
+  name={\styfmt{glossary-hypernav}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossaries-prefix,
+  name={\styfmt{glossaries-prefix}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossaries-accsupp,
+  name={\styfmt{glossaries-accsupp}},
+  category={package},
+  parent={packages}
+}
+
+@index{inputenc,
+  name={\styfmt{inputenc}},
+  category={package},
+  parent={packages}
+}
+
+@index{fontenc,
+  name={\styfmt{fontenc}},
+  category={package},
+  parent={packages}
+}
+
+@index{fontspec,
+  name={\styfmt{fontspec}},
+  category={package},
+  parent={packages}
+}
+
+@index{textcase,
+  name={\styfmt{textcase}},
+  category={package},
+  parent={packages}
+}
+
+@index{etoolbox,
+  name={\styfmt{etoolbox}},
+  category={package},
+  parent={packages}
+}
+
+@index{tracklang,
+  name={\styfmt{tracklang}},
+  category={package},
+  parent={packages}
+}
+
+@index{CJKutf8,
+  name={\styfmt{CJKutf8}},
+  category={package},
+  parent={packages}
+}
+
+@index{CJK,
+  name={\envfmt{CJK}},
+  category={environment}
+}
+
+@index{abbreviationstyles,
+  name={abbreviation styles},
+  text={abbreviation style}
+}
+
+@index{long-noshort-desc,
+  name={\abbrstylefmt{long-noshort-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-short-sc,
+  name={\abbrstylefmt{long-short-sc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-short-sm,
+  name={\abbrstylefmt{long-short-sm}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-short-user,
+  name={\abbrstylefmt{long-short-user}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-short-desc,
+  name={\abbrstylefmt{long-short-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-short-user-desc,
+  name={\abbrstylefmt{long-short-user-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-postshort-user-desc,
+  name={\abbrstylefmt{long-postshort-user-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{short-long,
+  name={\abbrstylefmt{short-long}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{glossarystyles,
+  name={glossary styles},
+  text={glossary style}
+}
+
+@index{indexgroup,
+  name={\glostylefmt{indexgroup}},
+  category={glossarystyle},
+  parent={glossarystyles}
+}
+
+@index{indexhypergroup,
+  name={\glostylefmt{indexhypergroup}},
+  category={glossarystyle},
+  parent={glossarystyles}
+}
+
+@index{alttree,
+  name={\glostylefmt{alttree}},
+  category={glossarystyle},
+  parent={glossarystyles}
+}
+
+@index{categoryattributes,
+  name={category attributes},
+  text={category attribute}
+}
+
+@index{glossname,
+  name={\catattrfmt{glossname}},
+  category={categoryattribute},
+  parent={categoryattributes}
+}
+
+@index{aposplural,
+  name={\catattrfmt{aposplural}},
+  category={categoryattribute},
+  parent={categoryattributes}
+}
+
+@index{noshortplural,
+  name={\catattrfmt{noshortplural}},
+  category={categoryattribute},
+  parent={categoryattributes}
+}
+
+@index{targeturl,
+  name={\catattrfmt{targeturl}},
+  category={categoryattribute},
+  parent={categoryattributes}
+}
+
+@index{targetname,
+  name={\catattrfmt{targetname}},
+  category={categoryattribute},
+  parent={categoryattributes}
+}
+
+@index{externallocation,
+  name={\catattrfmt{externallocation}},
+  category={categoryattribute},
+  parent={categoryattributes}
+}
+
+@index{equation,
+  name={\counterfmt{equation}},
+  category={counter}
+}
+
+@index{page,
+  name={\counterfmt{page}},
+  category={counter}
+}
+
+@index{section,
+  name={\counterfmt{section}},
+  category={counter}
+}
+
+@index{labelprefixes,
+  name={label prefixes},
+  text={label prefix},
+  plural={label prefixes}
+}
+
+@index{idprefix.dual,
+  name={\idprefixfmt{dual}},
+  category={idprefix},
+  parent={labelprefixes}
+}
+
+@index{idprefix.tertiary,
+  name={\idprefixfmt{tertiary}},
+  category={idprefix},
+  parent={labelprefixes}
+}
+
+@index{idprefix.extn,
+  name={\idprefixfmt{ext\meta{n}}},
+  category={idprefix},
+  parent={labelprefixes}
+}
+
+@index{packageoptions,
+  name={package options},
+  text={package option}
+}
+
+@index{styopt.record,
+  name={\styoptfmt{record}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.automake,
+  name={\styoptfmt{automake}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.shortcuts,
+  name={\styoptfmt{shortcuts}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.accsupp,
+  name={\styoptfmt{accsupp}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.abbreviations,
+  name={\styoptfmt{abbreviations}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.symbols,
+  name={\styoptfmt{symbols}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.numbers,
+  name={\styoptfmt{numbers}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.sort,
+  name={\styoptfmt{sort}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.undefaction,
+  name={\styoptfmt{undefaction}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nomain,
+  name={\styoptfmt{nomain}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nonumberlist,
+  name={\styoptfmt{nonumberlist}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.xindy,
+  name={\styoptfmt{xindy}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nopostdot,
+  name={\styoptfmt{nopostdot}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.index,
+  name={\styoptfmt{index}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{fields,
+  name={fields},
+  text={field}
+}
+
+@dualindexentry{field.alias,
+  name={\fieldfmt{alias}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.category,
+  name={\fieldfmt{category}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.description,
+  name={\fieldfmt{description}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.descriptionplural,
+  name={\fieldfmt{descriptionplural}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.first,
+  name={\fieldfmt{first}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.firstplural,
+  name={\fieldfmt{firstplural}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.long,
+  name={\fieldfmt{long}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.longplural,
+  name={\fieldfmt{longplural}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.name,
+  name={\fieldfmt{name}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.parent,
+  name={\fieldfmt{parent}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.plural,
+  name={\fieldfmt{plural}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.see,
+  name={\fieldfmt{see}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.seealso,
+  name={\fieldfmt{seealso}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.short,
+  name={\fieldfmt{short}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.shortplural,
+  name={\fieldfmt{shortplural}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.symbol,
+  name={\fieldfmt{symbol}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.symbolplural,
+  name={\fieldfmt{symbolplural}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.text,
+  name={\fieldfmt{text}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.user1,
+  name={\fieldfmt{user1}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.user2,
+  name={\fieldfmt{user2}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.user3,
+  name={\fieldfmt{user3}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.user4,
+  name={\fieldfmt{user4}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.user5,
+  name={\fieldfmt{user5}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.user6,
+  name={\fieldfmt{user6}},
+  description={provided by \styfmt{glossaries}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.duallong,
+  name={\fieldfmt{duallong}},
+  description={provided by \appfmt{bib2gls}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.duallongplural,
+  name={\fieldfmt{duallongplural}},
+  description={provided by \appfmt{bib2gls}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.dualshort,
+  name={\fieldfmt{dualshort}},
+  description={provided by \appfmt{bib2gls}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.dualshortplural,
+  name={\fieldfmt{dualshortplural}},
+  description={provided by \appfmt{bib2gls}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.prefix,
+  name={\fieldfmt{prefix}},
+  description={provided by \styfmt{glossaries-prefix}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.prefixfirst,
+  name={\fieldfmt{prefixfirst}},
+  description={provided by \styfmt{glossaries-prefix}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.prefixfirstplural,
+  name={\fieldfmt{prefixfirstplural}},
+  description={provided by \styfmt{glossaries-prefix}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.prefixplural,
+  name={\fieldfmt{prefixplural}},
+  description={provided by \styfmt{glossaries-prefix}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.access,
+  name={\fieldfmt{access}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.descriptionaccess,
+  name={\fieldfmt{descriptionaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.descriptionpluralaccess,
+  name={\fieldfmt{descriptionpluralaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.firstaccess,
+  name={\fieldfmt{firstaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.firstpluralaccess,
+  name={\fieldfmt{firstpluralaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.longaccess,
+  name={\fieldfmt{longaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.longpluralaccess,
+  name={\fieldfmt{longpluralaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.pluralaccess,
+  name={\fieldfmt{pluralaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.shortaccess,
+  name={\fieldfmt{shortaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.shortpluralaccess,
+  name={\fieldfmt{shortpluralaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.symbolaccess,
+  name={\fieldfmt{symbolaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.symbolpluralaccess,
+  name={\fieldfmt{symbolpluralaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@dualindexentry{field.textaccess,
+  name={\fieldfmt{textaccess}},
+  description={provided by \styfmt{glossaries-accsupp}},
+  category={field},
+  parent={fields}
+}
+
+@index{internalfields,
+  name={fields, internal},
+  text={internal fields}
+}
+
+@dualindexentry{field.childcount,
+  name={\fieldfmt{childcount}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.counter,
+  name={\fieldfmt{counter}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.group,
+  name={\fieldfmt{group}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.location,
+  name={\fieldfmt{location}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.loclist,
+  name={\fieldfmt{loclist}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.secondarygroup,
+  name={\fieldfmt{secondarygroup}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.secondarysort,
+  name={\fieldfmt{secondarysort}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.sort,
+  name={\fieldfmt{sort}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.type,
+  name={\fieldfmt{type}},
+  description={internal field set by \appfmt{bib2gls}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.currcount,
+  name={\fieldfmt{currcount}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.currcountunit,
+  name={\fieldfmt{currcount@}\meta{value}},
+  description={internal field set by \styfmt{glossaries-extra}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.desc,
+  name={\fieldfmt{desc}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.descplural,
+  name={\fieldfmt{descplural}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.firstpl,
+  name={\fieldfmt{firstpl}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.flag,
+  name={\fieldfmt{flag}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.index,
+  name={\fieldfmt{index}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.level,
+  name={\fieldfmt{level}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.longpl,
+  name={\fieldfmt{longpl}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.nonumberlist,
+  name={\fieldfmt{nonumberlist}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.prevcount,
+  name={\fieldfmt{prevcount}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.prevcountunit,
+  name={\fieldfmt{prevcount@}\meta{value}},
+  description={internal field set by \styfmt{glossaries-extra}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.prevunitmax,
+  name={\fieldfmt{prevunitmax}},
+  description={internal field set by \styfmt{glossaries-extra}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.prevunittotal,
+  name={\fieldfmt{prevunittotal}},
+  description={internal field set by \styfmt{glossaries-extra}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.shortpl,
+  name={\fieldfmt{shortpl}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.sortvalue,
+  name={\fieldfmt{sortvalue}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.unitlist,
+  name={\fieldfmt{unitlist}},
+  description={internal field set by \styfmt{glossaries-extra}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.useri,
+  name={\fieldfmt{useri}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.userii,
+  name={\fieldfmt{userii}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.useriii,
+  name={\fieldfmt{useriii}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.useriv,
+  name={\fieldfmt{useriv}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.userv,
+  name={\fieldfmt{userv}},
+  description={internal field set by \styfmt{glossaries}},
+  category={field},
+  parent={internalfields}
+}
+
+@dualindexentry{field.uservi,
+  name={\fieldfmt{uservi}},
+  description={internal field set by \styfmt{glossaries}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@index{entrytypes,
+  name={entry types},
+  text={entry type}
+}
+
+@dualindexentry{entry.string,
+  name={\atentryfmt{string}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.preamble,
+  name={\atentryfmt{preamble}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.entry,
+  name={\atentryfmt{entry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.symbol,
+  name={\atentryfmt{symbol}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.number,
+  name={\atentryfmt{number}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.index,
+  name={\atentryfmt{index}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.abbreviation,
+  name={\atentryfmt{abbreviation}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.acronym,
+  name={\atentryfmt{acronym}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualentry,
+  name={\atentryfmt{dualentry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualindexentry,
+  name={\atentryfmt{dualindexentry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualindexabbreviation,
+  name={\atentryfmt{dualindexabbreviation}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualindexsymbol,
+  name={\atentryfmt{dualindexsymbol}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualindexnumber,
+  name={\atentryfmt{dualindexnumber}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualabbreviationentry,
+  name={\atentryfmt{dualabbreviationentry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualentryabbreviation,
+  name={\atentryfmt{dualentryabbreviation}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualsymbol,
+  name={\atentryfmt{dualsymbol}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualnumber,
+  name={\atentryfmt{dualnumber}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualabbreviation,
+  name={\atentryfmt{dualabbreviation}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.dualacronym,
+  name={\atentryfmt{dualacronym}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.tertiaryindexabbreviationentry,
+  name={\atentryfmt{tertiaryindexabbreviationentry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@index{switches,
+  name={switches},
+  text={switch},
+  plural={switches},
+  see={commandlineoptions}
+}
+
+@index{commandlineoptions,
+  name={command line options},
+  text={command line option}
+}
+
+@dualindexentry{switch.help,
+  name={\longargfmt{help}},
+  symbol={\shortargfmt{h}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.version,
+  name={\longargfmt{version}},
+  symbol={\shortargfmt{v}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.debug,
+  name={\longargfmt{debug}},
+  user1={\oargm{n}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-debug,
+  name={\longargfmt{no\dhyphen debug}},
+  symbol={\longargfmt{nodebug}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.verbose,
+  name={\longargfmt{verbose}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-verbose,
+  name={\longargfmt{no\dhyphen verbose}},
+  symbol={\longargfmt{noverbose}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.silent,
+  name={\longargfmt{silent}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.locale,
+  name={\longargfmt{locale}},
+  symbol={\shortargfmt{l}},
+  user1={\meta{lang}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.log-file,
+  name={\longargfmt{log\dhyphen file}},
+  symbol={\shortargfmt{t}},
+  user1={\meta{filename}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.dir,
+  name={\longargfmt{dir}},
+  symbol={\shortargfmt{d}},
+  user1={\meta{dirname}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.interpret,
+  name={\longargfmt{interpret}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-interpret,
+  name={\longargfmt{no\dhyphen interpret}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.packages,
+  name={\longargfmt{packages}},
+  symbol={\shortargfmt{p}},
+  user1={\meta{list}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.mfirstuc-protection,
+  name={\longargfmt{mfirstuc\dhyphen protection}},
+  symbol={\shortargfmt{u}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-mfirstuc-protection,
+  name={\longargfmt{no\dhyphen mfirstuc\dhyphen protection}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.mfirstuc-math-protection,
+  name={\longargfmt{mfirstuc\dhyphen math\dhyphen protection}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-mfirstuc-math-protection,
+  name={\longargfmt{no\dhyphen mfirstuc\dhyphen math\dhyphen protection}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.nested-link-check,
+  name={\longargfmt{nested\dhyphen link\dhyphen check}},
+  user1={\meta{list}\argor\code{none}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-nested-link-check,
+  name={\longargfmt{no\dhyphen nested\dhyphen link\dhyphen check}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.shortcuts,
+  name={\longargfmt{shortcuts}},
+  user1={\meta{value}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.map-format,
+  name={\longargfmt{map\dhyphen format}},
+  symbol={\shortargfmt{m}},
+  user1={\meta{format1}:\meta{format2}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.group,
+  name={\longargfmt{group}},
+  symbol={\shortargfmt{g}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-group,
+  name={\longargfmt{no\dhyphen group}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.tex-encoding,
+  name={\longargfmt{tex\dhyphen encoding}},
+  user1={\meta{name}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-expand-fields,
+  name={\longargfmt{no\dhyphen expand\dhyphen fields}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.expand-fields,
+  name={\longargfmt{expand\dhyphen fields}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.trim-fields,
+  name={\longargfmt{trim\dhyphen fields}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-trim-fields,
+  name={\longargfmt{no\dhyphen trim\dhyphen fields}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@index{lettergroup,
+  name={letter group}
+}
+
+@index{nonlettergroup,
+  name={non-letter group}
+}
+
+@index{symbolgroup,
+  name={symbol group},
+  alias={nonlettergroup}
+}
+
+@index{numbergroup,
+  name={number group}
+}
+
+@index{customgroup,
+  name={custom group}
+}
+
+@index{digraph}
+
+@index{trigraph}
+
+@index{primary}
+
+@index{dual}
+
+@index{secondary,
+ seealso={dual}}
+
+@index{tertiary}
+
+@index{unicodecategories,
+  name={Unicode categories},
+  text={Unicode category},
+  plural={Unicode categories}
+}
+
+@index{numberdecimaldigit,
+  name={\unicodecategoryfmt{Number, Decimal Digit}},
+  parent={unicodecategories}
+}
+
+@index{separatorspace,
+  name={\unicodecategoryfmt{Separator, Space}},
+  parent={unicodecategories}
+}
+
+@index{letteruppercase,
+  name={\unicodecategoryfmt{Letter, Uppercase}},
+  parent={unicodecategories}
+}
+
+@index{letterlowercase,
+  name={\unicodecategoryfmt{Letter, Lowercase}},
+  parent={unicodecategories}
+}
+
+@index{lettertitlecase,
+  name={\unicodecategoryfmt{Letter, Titlecase}},
+  parent={unicodecategories}
+}
+
+@index{lettermodifier,
+  name={\unicodecategoryfmt{Letter, Modifier}},
+  parent={unicodecategories}
+}
+
+@index{letterother,
+  name={\unicodecategoryfmt{Letter, Other}},
+  parent={unicodecategories}
+}
+
+@index{texmfcnf.openinany,
+  name={\texmfcnffmt{openin\_any}}
+}
+
+@index{texmfcnf.openoutany,
+  name={\texmfcnffmt{openout\_any}}
+}
+
+@index{file.bib2gls-en.xml,
+  name={\filefmt{bib2gls-en.xml}}
+}
+
+@index{file.bib2gls.sh,
+  name={\filefmt{bib2gls.sh}}
+}
+
+@index{file.convertgls2bib.sh,
+  name={\filefmt{convert\-gls2bib.sh}}
+}
+
+@index{file.texparserlib.jar,
+  name={\filefmt{texparserlib.jar}}
+}
+
+@index{file.bib2gls.jar,
+  name={\filefmt{bib2gls.jar}}
+}
+
+@index{file.convertgls2bib.jar,
+  name={\filefmt{convert\-gls2bib.jar}}
+}
+
+@index{file.bib2gls.bat,
+  name={\filefmt{bib2gls.bat}}
+}
+
+@index{file.sample-dual.tex,
+  name={\filefmt{sample-dual.tex}}
+}
+
+@index{glshyperlink,
+  name={\csfmt{glshyperlink}},
+  user1={\oargm{link text}\margm{label}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrfielddolistloop,
+  name={\csfmt{glsxtrfielddolistloop}},
+  user1={\margm{label}\margm{field}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrfieldforlistloop,
+  name={\csfmt{glsxtrfieldforlistloop}},
+  user1={\margm{label}\margm{field}\margm{handler}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsfieldfetch,
+  name={\csfmt{glsfieldfetch}},
+  user1={\margm{label}\margm{field}\margm{cs}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsseeformat,
+  name={\csfmt{glsseeformat}},
+  user1={\margm{tag}\margm{labels}\margm{location}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtruseseealsoformat,
+  name={\csfmt{glsxtruseseealsoformat}},
+  user1={\margm{tag}\margm{labels}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentrytext,
+  name={\csfmt{glsentrytext}},
+  user1={\margm{label}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryname,
+  name={\csfmt{glsentryname}},
+  user1={\margm{label}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glspluralsuffix,
+  name={\csfmt{glspluralsuffix}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{acrpluralsuffix,
+  name={\csfmt{acrpluralsuffix}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{abbrvpluralsuffix,
+  name={\csfmt{abbrvpluralsuffix}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  seealso={glsxtrabbrvpluralsuffix},
+  category={command}
+}
+
+@index{glsxtrabbrvpluralsuffix,
+  name={\csfmt{glsxtrabbrvpluralsuffix}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrusefield,
+  name={\csfmt{glsxtrusefield}},
+  user1={\margm{entry label}\margm{field label}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{GlsXtrSetField,
+  name={\csfmt{GlsXtrSetField}},
+  user1={\margm{entry label}\margm{field label}\margm{text}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrifhasfield,
+  name={\csfmt{glsxtrifhasfield}},
+  user1={\margm{entry label}\margm{field label}\margm{true}\margm{false}},
+  description={provided by \styfmt{glossaries-extra} v1.19+},
+  category={command}
+}
+
+@index{ifglshasfield,
+  name={\csfmt{ifglshasfield}},
+  user1={\margm{entry label}\margm{field label}\margm{true}\margm{false}},
+  description={provided by \styfmt{glossaries}},
+  seealso={glsxtrifhasfield},
+  category={command}
+}
+
+@index{glsaddkey,
+  name={\csfmt{glsaddkey}},
+  user1={\margm{key}\margm{default value}\margm{no link cs}\margm{no link ucfirst cs}\margm{link cs}\margm{link ucfirst cs}\margm{link allcaps cs}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrprovidestoragekey,
+  name={\csfmt{glsxtrprovidestoragekey}},
+  user1={\margm{key}\margm{default value}\margm{no link cs}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsaddstoragekey,
+  name={\csfmt{glsaddstoragekey}},
+  user1={\margm{key}\margm{default value}\margm{no link cs}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsnavhypertarget,
+  name={\csfmt{glsnavhypertarget}},
+  user1={\margm{label}\margm{text}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsnoexpandfields,
+  name={\csfmt{glsnoexpandfields}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{newentry,
+  name={\csfmt{newentry}},
+  user1={\margm{label}\margm{\keyvallist}},
+  description={provided by \styfmt{glossaries-extra}'s shortcuts},
+  category={command}
+}
+
+@index{newsym,
+  name={\csfmt{newsym}},
+  user1={\margm{label}\margm{\keyvallist}\margm{symbol}},
+  description={provided by \styfmt{glossaries-extra}'s shortcuts},
+  category={command}
+}
+
+@index{newnum,
+  name={\csfmt{newnum}},
+  user1={\margm{label}\margm{\keyvallist}},
+  description={provided by \styfmt{glossaries-extra}'s shortcuts},
+  category={command}
+}
+
+@index{acronymtype,
+  name={\csfmt{acronymtype}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrabbrvtype,
+  name={\csfmt{glsxtrabbrvtype}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{nopostdesc,
+  name={\csfmt{nopostdesc}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{loadglsentries,
+  name={\csfmt{loadglsentries}},
+  user1={\oargm{type}\margm{file}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{newglossary,
+  name={\csfmt{newglossary}},
+  user1={\oargm{type}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{newglossary*,
+  name={\csfmt{newglossary*}},
+  user1={\oargm{type}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{newignoredglossary,
+  name={\csfmt{new\-ignored\-glossary}},
+  user1={\oargm{type}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{provideignoredglossary,
+  name={\csfmt{provide\-ignored\-glossary}},
+  user1={\oargm{type}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{provideignoredglossary*,
+  name={\csfmt{provide\-ignored\-glossary*}},
+  user1={\oargm{type}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{delimN,
+  name={\csfmt{delimN}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{delimR,
+  name={\csfmt{delimR}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsnoidxloclist,
+  name={\csfmt{glsnoidxloclist}},
+  user1={\margm{location list cs}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsnoidxloclisthandler,
+  name={\csfmt{glsnoidxloclisthandler}},
+  user1={\margm{location}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossentry,
+  name={\csfmt{glossentry}},
+  user1={\margm{label}\oargm{location list}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{subglossentry,
+  name={\csfmt{subglossentry}},
+  user1={\margm{level}\margm{label}\oargm{location list}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsaddall,
+  name={\csfmt{glsaddall}},
+  user1={\oargm{options}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsaddallunused,
+  name={\csfmt{glsaddallunused}},
+  user1={\oargm{list}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsadd,
+  name={\csfmt{glsadd}},
+  user1={\oargm{options}\margm{label}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsadd.thevalue,
+  name={\csoptfmt{thevalue}},
+  category={commandoption},
+  parent={glsadd}
+}
+
+@index{glsadd.theHvalue,
+  name={\csoptfmt{theHvalue}},
+  category={commandoption},
+  parent={glsadd}
+}
+
+@index{glsadd.format,
+  name={\csoptfmt{format}},
+  category={commandoption},
+  parent={glsadd}
+}
+
+@index{GlsXtrSetDefaultNumberFormat,
+  name={\csfmt{Gls\-Xtr\-Set\-Default\-Number\-Format}},
+  user1={\marg{format}},
+  description={provided by \styfmt{glossaries-extra} v1.19+},
+  category={command}
+}
+
+@index{glsignore,
+  name={\csfmt{glsignore}},
+  user1={\marg{format}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{at,
+  name={\csfmt{@}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{ensuremath,
+  name={\csfmt{ensuremath}},
+  user1={\margm{maths}},
+  description={kernel command},
+  category={command}
+}
+
+@index{write18,
+  name={\csfmt{write18}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{immediate,
+  name={\csfmt{immediate}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{AtEndDocument,
+  name={\csfmt{AtEndDocument}},
+  user1={\margm{code}},
+  description={kernel command},
+  category={command}
+}
+
+@index{unexpanded,
+  name={\csfmt{unexpanded}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{input,
+  name={\csfmt{input}},
+  user1={\margm{file}},
+  description={kernel command},
+  category={command}
+}
+
+@index{jobname,
+  name={\csfmt{jobname}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{protect,
+  name={\csfmt{protect}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{ifcase,
+  name={\csfmt{ifcase}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{renewcommand,
+  name={\csfmt{renewcommand}},
+  user1={\margm{cs}\oargm{n}\orgm{def}\margm{code}},
+  description={kernel command},
+  category={command}
+}
+
+@index{newcommand,
+  name={\csfmt{newcommand}},
+  user1={\margm{cs}\oargm{n}\orgm{def}\margm{code}},
+  description={kernel command},
+  category={command}
+}
+
+@index{providecommand,
+  name={\csfmt{providecommand}},
+  user1={\margm{cs}\oargm{n}\orgm{def}\margm{code}},
+  description={kernel command},
+  category={command}
+}
+
+@index{boldsymbol,
+  name={\csfmt{boldsymbol}},
+  user1={\margm{symbol}},
+  description={provided by \styfmt{amsmath}},
+  category={command}
+}
+
+@index{ifglsentryexists,
+  name={\csfmt{ifglsentryexists}},
+  user1={\margm{label}\margm{true}\margm{false}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsdefaulttype,
+  name={\csfmt{gls\-default\-type}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glssymbolsgroupname,
+  name={\csfmt{gls\-symbols\-group\-name}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsnumbersgroupname,
+  name={\csfmt{gls\-numbers\-group\-name}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{printunsrtglossary,
+  name={\csfmt{print\-unsrt\-glossary}},
+  user1={\oargm{options}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{printunsrtglossaries,
+  name={\csfmt{print\-unsrt\-glossaries}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{cs.makeglossaries,
+  name={\csfmt{makeglossaries}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{printglossary,
+  name={\csfmt{printglossary}},
+  user1={\oargm{options}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{printglossaries,
+  name={\csfmt{printglossaries}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{makefirstuc,
+  name={\csfmt{makefirstuc}},
+  user1={\margm{text}},
+  description={provided by \styfmt{mfirstuc}},
+  category={command}
+}
+
+@index{ac,
+  name={\csfmt{ac}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={provided by \styfmt{glossaries} shortcuts},
+  category={command}
+}
+
+@index{glsxtrp,
+  name={\csfmt{glsxtrp}},
+  user1={\margm{field}\margm{label}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{GlsXtrFmtField,
+  name={\csfmt{GlsXtrFmtField}},
+  user1={\margm{field}\margm{label}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrusesee,
+  name={\csfmt{glsxtrusesee}},
+  user1={\margm{label}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtruseseealso,
+  name={\csfmt{glsxtruseseealso}},
+  user1={\margm{label}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrsetaliasnoindex,
+  name={\csfmt{glsxtrsetaliasnoindex}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtruseseealsoformat,
+  name={\csfmt{glsxtruseseealsoformat}},
+  user1={\margm{xr list}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrindexseealso,
+  name={\csfmt{glsxtrindexseealso}},
+  user1={\margm{label}\margm{xr list}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glssee,
+  name={\csfmt{glssee}},
+  user1={\oargm{tag}\margm{label}\margm{xr label list}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glshex,
+  name={\csfmt{glshex}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{glsxtrresourceinit,
+  name={\csfmt{glsxtrresourceinit}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{glsxtrgroupfield,
+  name={\csfmt{glsxtrgroupfield}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{apptoglossarypreamble,
+  name={\csfmt{apptoglossarypreamble}},
+  user1={\oargm{type}\margm{code}},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsbackslash,
+  name={\csfmt{glsbackslash}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsquote,
+  name={\csfmt{glsquote}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glstildechar,
+  name={\csfmt{glstildechar}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{pagelistname,
+  name={\csfmt{pagelistname}},
+  user1={},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{seealsoname,
+  name={\csfmt{seealsoname}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra} or language
+packages},
+  category={command}
+}
+
+@index{glsxtruserfield,
+  name={\csfmt{glsxtruserfield}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrpostdescabbreviation,
+  name={\csfmt{glsxtrpostdescabbreviation}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrpostdescsymbol,
+  name={\csfmt{glsxtrpostdescsymbol}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrpostdescgeneral,
+  name={\csfmt{glsxtrpostdescgeneral}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{GlsXtrFmtDefaultOptions,
+  name={\csfmt{GlsXtrFmtDefaultOptions}},
+  user1={},
+  description={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glslink,
+  name={\csfmt{glslink}},
+  user1={\oargm{options}\margm{label}\oargm{text}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{gls,
+  name={\csfmt{gls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{gls.format,
+  name={\csoptfmt{format}},
+  category={commandoption},
+  parent={gls}
+}
+
+@index{gls.counter,
+  name={\csoptfmt{counter}},
+  category={commandoption},
+  parent={gls}
+}
+
+@index{glspl,
+  name={\csfmt{glspl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{Gls,
+  name={\csfmt{Gls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glspl,
+  name={\csfmt{Glspl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glssetwidest,
+  name={\csfmt{glssetwidest}},
+  user1={\oargm{level}\margm{text}},
+  description={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{si,
+  name={\csfmt{si}},
+  user1={},
+  description={provided by \styfmt{siunitx}},
+  category={command}
+}
+
+@index{MakeTextLowercase,
+  name={\csfmt{MakeTextLowercase}},
+  user1={\margm{text}},
+  description={provided by \styfmt{textcase}},
+  category={command}
+}
+
+@index{MakeTextUppercase,
+  name={\csfmt{MakeTextUppercase}},
+  user1={\margm{text}},
+  description={provided by \styfmt{textcase}},
+  category={command}
+}
+
+@index{NoCaseChange,
+  name={\csfmt{NoCaseChange}},
+  user1={\margm{text}},
+  description={provided by \styfmt{textcase}},
+  category={command}
+}
+
+@index{cs.string,
+  name={\csfmt{string}},
+  user1={},
+  description={kernel command},
+  category={command}
+}
+
+@index{u,
+  name={\csfmt{u}},
+  user1={\margm{character}},
+  description={kernel command},
+  category={command}
+}
+
+@index{textsuperscript,
+  name={\csfmt{textsuperscript}},
+  user1={\margm{text}},
+  description={kernel command},
+  category={command}
+}
+
+@index{textsubscript,
+  name={\csfmt{textsubscript}},
+  user1={\margm{text}},
+  description={kernel command},
+  category={command}
+}
+
+@index{MakeLowercase,
+  name={\csfmt{MakeLowercase}},
+  user1={\margm{text}},
+  description={kernel command},
+  category={command}
+}
+
+@index{cjkname,
+  name={\csfmt{cjkname}},
+  user1={\margm{CJK characters}},
+  description={provided by \styfmt{CJKutf8}},
+  category={command}
+}
+

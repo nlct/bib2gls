@@ -1425,8 +1425,11 @@ public class Bib2GlsEntry extends BibEntry
 
       int startRangeIdx = 0;
 
-      for (GlsRecord record : recordList)
+      for (int i = 0, n = recordList.size(); i < n; i++)
       {
+         GlsRecord record = recordList.get(i);
+         String delimN = (i == n-1 ? "\\bibglslastDelimN " : "\\bibglsdelimN ");
+
          locationList.add(record.getListTeXCode());
    
          Matcher m = RANGE_PATTERN.matcher(record.getFormat());
@@ -1455,7 +1458,7 @@ public class Bib2GlsEntry extends BibEntry
                }
                else if (!start)
                {
-                  builder.append("\\delimN ");
+                  builder.append(delimN);
                }
 
                startRangeIdx = builder.length();
@@ -1538,7 +1541,7 @@ public class Bib2GlsEntry extends BibEntry
             }
             else if (!start)
             {
-               builder.append("\\delimN ");
+               builder.append(delimN);
             }
 
             builder.append(record.getFmtTeXCode());
@@ -1548,13 +1551,13 @@ public class Bib2GlsEntry extends BibEntry
          {
             count++;
 
-            mid.append("\\delimN ");
+            mid.append(delimN);
             mid.append(record.getFmtTeXCode());
          }
          else if (count==2 && suffixF != null)
          {
             builder.append(suffixF);
-            builder.append("\\delimN ");
+            builder.append(delimN);
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
@@ -1563,7 +1566,7 @@ public class Bib2GlsEntry extends BibEntry
          else if (count > 2 && suffixFF != null)
          {
             builder.append(suffixFF);
-            builder.append("\\delimN ");
+            builder.append(delimN);
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
@@ -1581,7 +1584,7 @@ public class Bib2GlsEntry extends BibEntry
 
             maxGap[0] = 0;
 
-            builder.append("\\delimN ");
+            builder.append(delimN);
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
@@ -1589,7 +1592,7 @@ public class Bib2GlsEntry extends BibEntry
          else
          {
             builder.append(mid);
-            builder.append("\\delimN ");
+            builder.append(delimN);
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
@@ -1641,7 +1644,7 @@ public class Bib2GlsEntry extends BibEntry
       if (seeLocation == PRE_SEE && crossRefs != null)
       {
          builder = new StringBuilder();
-         builder.append("\\glsxtrusesee{");
+         builder.append("\\bibglsusesee{");
          builder.append(getId());
          builder.append("}");
 
@@ -1676,7 +1679,7 @@ public class Bib2GlsEntry extends BibEntry
       else if (seealsoLocation == PRE_SEE && alsocrossRefs != null)
       {
          builder = new StringBuilder();
-         builder.append("\\glsxtruseseealso{");
+         builder.append("\\bibglsuseseealso{");
          builder.append(getId());
          builder.append("}");
 
@@ -1790,7 +1793,7 @@ public class Bib2GlsEntry extends BibEntry
             builder.append("\\bibglsseesep ");
          }
 
-         builder.append("\\glsxtrusesee{");
+         builder.append("\\bibglsusesee{");
          builder.append(getId());
          builder.append("}");
 
@@ -1830,7 +1833,7 @@ public class Bib2GlsEntry extends BibEntry
             builder.append("\\bibglsseealsosep ");
          }
 
-         builder.append("\\glsxtruseseealso{");
+         builder.append("\\bibglsuseseealso{");
          builder.append(getId());
          builder.append("}");
 
@@ -1874,7 +1877,8 @@ public class Bib2GlsEntry extends BibEntry
       if (value != null)
       {
          alias = value.expand(parser).toString(parser);
-         addDependency(processLabel(alias));
+         alias = processLabel(alias);
+         addDependency(alias);
          putField("alias", alias);
 
          resource.setAliases(true);
@@ -1884,6 +1888,7 @@ public class Bib2GlsEntry extends BibEntry
          if (getField("see") == null)
          {
             putField("see", value);
+            putField("see", alias);
          }
       }
    }
