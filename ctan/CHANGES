@@ -20,6 +20,8 @@ v1.1 (pending):
      - tertiary-type
      - tertiary-category
      - combine-dual-locations
+     - abbreviation-sort-fallback
+     - abbreviation-name-fallback
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

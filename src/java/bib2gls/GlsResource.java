@@ -939,6 +939,26 @@ public class GlsResource
 
             dualSortSettings.setSortField(field);
          }
+         else if (opt.equals("abbreviation-sort-fallback"))
+         {
+            abbrevDefaultSortField = getRequired(parser, list, opt);
+
+            if (!bib2gls.isKnownField(abbrevDefaultSortField))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, abbrevDefaultSortField));
+            }
+         }
+         else if (opt.equals("abbreviation-name-fallback"))
+         {
+            abbrevDefaultNameField = getRequired(parser, list, opt);
+
+            if (!bib2gls.isKnownField(abbrevDefaultNameField))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, abbrevDefaultNameField));
+            }
+         }
          else if (opt.equals("charset"))
          {
             bibCharset = Charset.forName(getRequired(parser, list, opt));
@@ -5774,6 +5794,16 @@ public class GlsResource
       return dualCategory;
    }
 
+   public String getAbbrevDefaultSortField()
+   {
+      return abbrevDefaultSortField;
+   }
+
+   public String getAbbrevDefaultNameField()
+   {
+      return abbrevDefaultNameField;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -5789,6 +5819,9 @@ public class GlsResource
    private SortSettings sortSettings = new SortSettings("locale");
    private SortSettings dualSortSettings = new SortSettings();
    private SortSettings secondarySortSettings = new SortSettings();
+
+   private String abbrevDefaultSortField = "short";
+   private String abbrevDefaultNameField = "short";
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 

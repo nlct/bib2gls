@@ -54,9 +54,13 @@
 \newcommand{\bibglsseealsosep}{\subitem}
 \newcommand{\bibglsusesee}[1]{, \glsxtrusesee{#1}}
 
+\newcommand{\glsxtrpostnameabbreviation}{%
+ \space(\glsentrylong{\glscurrententrylabel})%
+}
+
 \GlsXtrLoadResources[
   label-prefix={idx.},
-  sort={letter-upperlower},
+  sort={letter-nocase},
   type={index},
   loc-prefix={comma},
   %max-loc-diff=3,
@@ -300,7 +304,7 @@
 \newcommand*{\csref}[1]{\gls{#1}}
 
 \newcommand{\optsection}[2][\subsection]{%
- \glsxtrifhasfield*{opt.#2}{useri}%
+ \glsxtrifhasfield*{useri}{opt.#2}%
  {%
    #1[\texorpdfstring
        {\glsxtrheadname{opt.#2}\csoptfmt{=\glscurrentfieldvalue}}%
@@ -353,12 +357,12 @@
 \newcommand{\argsection}[2][\section]{%
  \def\switcharg{}%
  \def\switchalt{}%
- \glsxtrifhasfield{switch.#2}{useri}%
+ \glsxtrifhasfield{useri}{switch.#2}%
  {%
    \edef\switcharg{ \expandonce\glscurrentfieldvalue}%
  }%
  {}%
- \glsxtrifhasfield{switch.#2}{symbol}%
+ \glsxtrifhasfield{symbol}{switch.#2}%
  {%
    \edef\switchalt{ (or \expandonce\glscurrentfieldvalue\noexpand\switcharg)}%
  }%
@@ -2370,10 +2374,14 @@ file using the command \csref{bibglsnewindex}.
 
 The \atentry{abbreviation} entry type is designed for abbreviations.
 The required fields are \field{short} and \field{long}. If the
-\field{sort} key is missing, \bibgls\ will use the value of the
-\field{short} field.
+\field{sort} key is missing, \bibgls\ will use the field given by
+\csopt{abbreviation-sort-fallback}, which defaults to the \field{short} field.
 You can also use \csopt{short-case-change} to convert the case of
 the \field{short} field.
+
+If you use \csopt[name]{sort-field}, then the fallback for the
+\field{name} field is always the \field{short} field, regardless of
+the \csopt{abbreviation-sort-fallback} setting.
 
 Note that you must set the abbreviation style before loading the
 resource file to ensure that the abbreviations are defined
@@ -2383,7 +2391,7 @@ included or if the default \field{sort} value isn't simply the value
 of the \field{short} field.
 
 You can instruct \bibgls\ to sort by the \field{long} field instead
-using \csopt[long]{sort-field}. You can also tell \bibgls\ to
+using \csopt[long]{abbreviation-sort-fallback}. You can also tell \bibgls\ to
 ignore certain fields using \csopt{ignore-fields}, so you can
 include a \field{description} field in the \ext{bib} file if
 you sometimes need it, and then instruct \bibgls\ to ignore it when
@@ -2402,7 +2410,8 @@ the following in your document (where the \ext{bib} file is called
 \filefmt{entries-abbrv.bib}):
 \begin{verbatim}
 \setabbreviationstyle{long-noshort-desc}
-\GlsXtrLoadResources[src={entries-abbrv.bib},sort-field={long}]
+\GlsXtrLoadResources[src={entries-abbrv.bib},
+ abbreviation-sort-fallback={long}]
 \end{verbatim}
 Whereas, if you want the \abbrstyle{long-short-sc} style, then you can
 instead do:
@@ -2940,7 +2949,9 @@ field mapping is:
 \end{itemize}
 However in this case the required fields are \field{short} and
 \field{long}. The \field{name} for the primary entry defaults to
-\field{short} if omitted.
+\field{short} if omitted. The fallback for the \field{sort} field is
+given by \csopt{abbreviation-sort-fallback}, which defaults to the
+\field{short} field.
 
 For example:
 \begin{verbatim}
@@ -3157,6 +3168,9 @@ user manual. The primary entry is an abbreviation with the given
 \field{short} and \field{long} fields (but not the 
 \field{description}) and the secondary entry is a regular entry with
 the \field{name} copied from the \field{long} field.
+The fallback for the \field{sort} is given by
+\csopt{abbreviation-sort-fallback}, which defaults to the
+\field{short} field.
 
 For example:
 \begin{verbatim}
@@ -3312,7 +3326,7 @@ Note that \bibgls\ doesn't know what abbreviation styles
 are in used, so if the \field{sort} field is missing
 it will fallback on the \field{short} field. If the abbreviations
 need to be sorted according to the \field{long} field instead,
-use \csopt[long]{sort-field}.
+use \csopt[long]{abbreviation-sort-fallback}.
 
 Terms that are defined using \atentry{dualabbreviation} will be
 written to the output file using \csref{bibglsnewdualabbreviation}.
@@ -3454,7 +3468,7 @@ mapping between the \field{description} and \field{user1} fields:
  label-prefix={en.},% primary label prefix
  dual-prefix={de.},% dual label prefix
  sort=en,% sort primary entries according to language 'en'
- sort-field={long},% sort by the 'long' field
+ abbreviation-sort-fallback={long},% fallback on 'long' field
  dual-sort=de-1996,% sort dual entries according to 'de-1996'
                    % (German new orthography)
  dual-abbrv-backlink,% add links in the glossary to the opposite
@@ -3478,9 +3492,8 @@ German: \gls{de.rna}; \gls{de.rna}.
 \end{document}
 \end{verbatim}
 Note that since this document uses the \abbrstyle{long-short-desc}
-abbreviation style, the \csopt{sort-field} needs to be changed
-to \optfmt{long}, since the fallback if the \field{sort} field is
-missing is the \field{short} field.
+abbreviation style, the \csopt{abbreviation-sort-fallback} needs to be changed
+to \optfmt{long}.
 
 If I change the order of the mapping to:
 \begin{verbatim}
@@ -4767,6 +4780,31 @@ supplementary resource files (omitting the primary
 
 \section{Field and Label Options}
 \label{sec:labelopts}
+
+\optsection{abbreviation-sort-fallback}
+
+The entry types that define abbreviations (such as
+\atentry{abbreviation} and \atentry{acronym}) will, by default,
+fallback on the \field{short} field if the \field{sort} field is
+missing (assuming \csopt[sort]{sort-field}). If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example,
+\csopt[long]{abbreviation-sort-fallback}. Note that if you use
+\csopt[name]{sort-field}, then the fallback field will be given by
+\csopt{abbreviation-name-fallback} if the \field{name} field is
+omitted. The \meta{field} value must be a known field label.
+
+\optsection{abbreviation-name-fallback}
+
+The entry types that define abbreviations (such as
+\atentry{abbreviation} and \atentry{acronym}) will, by default,
+fallback on the \field{short} field if the \field{name} field is
+missing and it's required for some reason (for example, with
+\csopt[name]{sort-field}).  If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example,
+\csopt[long]{abbreviation-name-fallback}.
+The \meta{field} value must be a known field label.
 
 \optsection{ignore-fields}
 
@@ -7205,12 +7243,14 @@ the fallback field will be used instead. For example, with the
 default \csopt[sort]{sort-field}, then for an entry defined with
 \atentry{entry}, if the \field{sort} field is missing the fallback
 field will be the \field{name} or the \field{parent} field if the
-\field{name} field is missing. If the entry is instead defined with
-\atentry{abbreviation} (or \atentry{acronym}) then if the
-\field{sort} field is missing, \bibgls\ will start with the same
-fallback as for \atentry{entry} but if neither the \field{name} or
-\field{parent} field is set, it will fallback on the \field{short}
-field. The \atentry{symbol} and \atentry{number} entry types
+\field{name} field is missing.
+
+If the entry is instead defined with \atentry{abbreviation} (or
+\atentry{acronym}) then if the \field{sort} field is missing,
+\bibgls\ will fallback on the field given by
+\field{abbreviation-sort-fallback}.
+
+The \atentry{symbol} and \atentry{number} entry types
 fallback on the label (not the \field{name}) if the \field{sort} is missing.
 
 If no fallback field can be found, the entry's label will be used.

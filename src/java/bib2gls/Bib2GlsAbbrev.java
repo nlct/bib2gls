@@ -49,23 +49,22 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
    {
       String val;
 
-      if (field.equals("name"))
-      {
-         val = getFieldValue("short");
-
-         if (val != null) return val;
-      }
-
-      val = super.getFallbackValue(field);
-
-      if (val != null) return val;
-
       if (field.equals("sort"))
       {
-         return getFieldValue("short");
+         String fallbackField = resource.getAbbrevDefaultSortField();
+         val = getFieldValue(fallbackField);
+
+         return val == null ? getFallbackValue(fallbackField) : val;
+      }
+      else if (field.equals("name"))
+      {
+         String fallbackField = resource.getAbbrevDefaultNameField();
+         val = getFieldValue(fallbackField);
+
+         return val == null ? getFallbackValue(fallbackField) : val;
       }
 
-      return null;
+      return super.getFallbackValue(field);
    }
 
    public BibValueList getFallbackContents(String field)
@@ -74,15 +73,17 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       if (field.equals("sort"))
       {
-         val = getField("name");
+         String fallbackField = resource.getAbbrevDefaultSortField();
+         val = getField(fallbackField);
 
-         return val == null ? getFallbackContents("name") : val;
+         return val == null ? getFallbackContents(fallbackField) : val;
       }
       else if (field.equals("name"))
       {
-         val = getField("short");
+         String fallbackField = resource.getAbbrevDefaultNameField();
+         val = getField(fallbackField);
 
-         if (val != null) return val;
+         return val == null ? getFallbackContents(fallbackField) : val;
       }
 
       return super.getFallbackContents(field);
