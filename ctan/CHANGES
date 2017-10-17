@@ -22,6 +22,7 @@ v1.1 (pending):
      - combine-dual-locations
      - abbreviation-sort-fallback
      - abbreviation-name-fallback
+     - match-action
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

@@ -63,6 +63,8 @@
   sort={letter-nocase},
   type={index},
   loc-prefix={comma},
+  match-action={and},
+  match={{category}={.*field}},
   %max-loc-diff=3,
   dual-prefix={},
   dual-type={main},
@@ -158,7 +160,7 @@
 
 \newcommand{\stringu}{\idx{cs.string}\idx{u}}
 
-\newcommand*{\filefmt}[1]{\texorpdfstring{\nolinkurl{#1}}{#1}}
+\newcommand*{\filefmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\metafilefmt}[3]{%
   \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
 }
@@ -172,7 +174,7 @@
 \newcommand*{\suppresourcefmt}[1]{%
  \texorpdfstring
   {\texttt{\char`\\ jobname-#1.glstex}}%
-  {\string\\jobname-1.glstex}%
+  {\string\\jobname-#1.glstex}%
 }
 
 
@@ -343,6 +345,46 @@
  \glsxtrglossentry{field.#1}{}%
 }
 
+\newglossarystyle{fieldstyle}{%
+  \renewenvironment{theglossary}%
+   {%
+     \setlength{\glsdescwidth}{\dimexpr\linewidth-\maxnamewidth-4\tabcolsep}%
+     \begin{tabular}{l>{\raggedright}p{\glsdescwidth}}%
+   }%
+   {\end{tabular}}%
+  \renewcommand*{\glossaryheader}{%
+    \bfseries Field & \bfseries Description\tabularnewline}%
+  \renewcommand*{\glsgroupheading}[1]{}%
+  \renewcommand{\glossentry}[2]{%
+    \glsadd[format=primary]{##1}%
+    \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
+    \glossentrydesc{##1}\tabularnewline
+  }%
+  \renewcommand{\subglossentry}[3]{\glossentry{##2}{##3}}%
+  \renewcommand*{\glsgroupskip}{}%
+}
+
+\newcommand*{\fieldhook}[1]{%
+  \edef\currentcategory{\glscategory{#1}}%
+  \glsxtriflabelinlist{\currentcategory}{\fieldcategories}%
+  {%
+     \settowidth{\dimen0}{\glsentryname{#1}}%
+     \ifdim\dimen0>\maxnamewidth \setlength{\maxnamewidth}{\dimen0}\fi
+  }%
+  {\printunsrtglossaryskipentry}%
+}
+
+\newlength\maxnamewidth
+
+\newcommand*{\printfields}[1]{%
+ \printunsrtglossary*[style=fieldstyle]{%
+   \renewcommand*\glossarysection[2][]{}%
+   \setlength{\maxnamewidth}{0pt}%
+   \def\fieldcategories{#1}%
+   \let\printunsrtglossaryentryprocesshook\fieldhook
+ }%
+}
+
 \newcommand{\entrysection}[2][\subsection]{%
  #1[\texorpdfstring{\glsxtrheadname{entry.#2}}{\glsentryname{entry.#2}}]
    {\glsadd[format=primary]{entry.#2}\glsxtrglossentry{entry.#2}}%
@@ -376,7 +418,7 @@
 
 \newcommand*{\longargfmt}[1]{%
  \texorpdfstring{\texttt{\longswitch #1}}%
- {\string\055\string\055#1}%
+ {\string-\string-#1}%
 }
 
 \newcommand*{\shortargfmt}[1]{%
@@ -1646,6 +1688,76 @@ automatically trim the values before writing the \ext{glstex} file.
 Don't trim any leading or trailing spaces from field values. 
 This is the default setting.
 
+\argsection{record-count}
+
+Switch on record counting. This will ensure that when each entry
+is written to the \ext{glstex} file, \gls{bib2gls} will additionally
+set the following fields
+\begin{itemize}
+\item \field{recordcount}: set to the total
+number of records found for the entry;
+\item \field{recordcount.counter}: set to the total
+number of records found for the entry for the given counter.
+\end{itemize}
+These fields can then be used with the \idx{rgls}-like
+commands provided by \sty{glossaries-extra} v1.21+.
+The default behaviour of \idx{rgls}\margm{label}\oarg{insert} is to check
+the \field{recordcount} field against the \catattr{recordcount}
+attribute value. This attribute can be set with
+\nosecdef{GlsXtrSetRecordCountAttribute}
+where \meta{category list} is a comma-separated list
+of category labels and \meta{value} is a positive integer.
+If the value of the \field{recordcount} field is greater than
+\meta{value} then \idx{rgls} behaves like \idx{gls}, otherwise
+it does \idx{rglsformat}\marg{label}\marg{insert} instead.
+If the use of \idx{rglsformat} is triggered in this way,
+then \idx{rgls} writes a record to the \ext{aux} file
+with the \glsopt{format} set to \idx{glstriggerrecordformat}.
+This ensures that the record count is correct on the next run,
+but the record isn't added to the location list as
+\bibgls\ recognises it as a special ignored location.
+Note that the entry will still appear in the usual glossary unless
+you assign it to a different one with \csopt{trigger-type}.
+
+If the \catattr{recordcount} attribute hasn't been set
+\idx{rgls} behaves like \idx{gls}. (That is, \idx{rgls}
+uses the same internal command used by \idx{gls}.) You can use
+\idx{glsxtrenablerecordcount} to redefine \idx{gls}
+to \idx{rgls}, so that you can continue to use \idx{gls}
+without having to switch command name.
+
+For example:
+\begin{verbatim}
+\newignoredglossary{ignored}
+
+\GlsXtrLoadResources[
+ src=abbrevs,% entries defined in abbrevs.bib
+ trigger-type=ignored,
+ category=abbreviation
+]
+
+\glsxtrenablerecordcount
+\GlsXtrSetRecordCountAttribute{abbreviation}{1}
+\end{verbatim}
+See the \sty{glossaries-extra} user manual for further details.
+
+\argsection{no-record-count}
+
+Switch off record counting. (Default.)
+
+\argsection{record-count-unit}
+
+Automatically implements \gls{record-count} and additionally
+sets the \field{recordcount.counter.location} fields.
+These fields can then be used with the \idx{rgls}-like
+commands provided by \sty{glossaries-extra} v1.21+.
+
+\argsection{no-record-count-unit}
+
+Switches off unit record counting. (Default.)
+Note that you need \gls{no-record-count} to completely
+switch off record counting.
+
 \chapter{\ext{bib} Format}
 \label{sec:bib}
 \setcounter{secnumdepth}{1}
@@ -1781,74 +1893,21 @@ use the \field{seealso} field directly.
 \caption{Fields Provided by \styfmt{glossaries-extra}}\label{tab:fields}
 \medskip
 \centering
-\begin{tabular}{ll}
-\bfseries Field & \bfseries Description\\
-\fielddef{alias} & This entry is a
-synonym of the entry whose label is given by this field.\\
-\fielddef{category} & This entry's category label.\\
-\fielddef{description} & The description displayed in the glossary.\\
-\fielddef{descriptionplural} & The plural form of the description.\\
-\fielddef{first} & The text to display on first use of
-\idx{gls}\margm{label}.\\
-\fielddef{firstplural} & The text to display on first use of 
-\idx{glspl}\margm{label}.\\
-\fielddef{long} & The long form of an abbreviation.\\
-\fielddef{longplural} & The plural long form of an abbreviation.\\
-\fielddef{name} & The name displayed in the glossary.\\
-\fielddef{parent} & The parent entry's label.\\
-\fielddef{plural} & The text to display on subsequent use of
-\idx{glspl}\margm{label}.\\
-\fielddef{see} & General purpose cross-reference
-(syntax: \code{see=\marg{\oargm{tag}\meta{xr-list}}}).\\
-\fielddef{seealso} & Cross-reference related entries
-(syntax: \code{seealso=\margm{xr-list}}).\\
-\fielddef{short} & The short form of an abbreviation.\\
-\fielddef{shortplural} & The plural short form of an abbreviation.\\
-\fielddef{symbol} & The associated symbol.\\
-\fielddef{symbolplural} & The plural form of the associated symbol.\\
-\fielddef{text} &  The text to display on subsequent use of
-\idx{gls}\margm{label}.\\
-\fielddef{user1} & A general purpose user field.\\
-\fielddef{user2} & A general purpose user field.\\
-\fielddef{user3} & A general purpose user field.\\
-\fielddef{user4} & A general purpose user field.\\
-\fielddef{user5} & A general purpose user field.\\
-\fielddef{user6} & A general purpose user field.
-\end{tabular}
+\printfields{basefield,extrafield}%
 \end{table}
 
 \begin{table}[hbtp]
 \caption{Fields Provided by \bibgls}\label{tab:bib2glsfields}
 \medskip
 \centering
-\begin{tabular}{l>{\raggedright}p{.75\textwidth}}
-\bfseries Field & \bfseries Description\tabularnewline
-\fielddef{duallong} & The long form of a dual
-abbreviation mapped by \atentry{dualabbreviation}.\tabularnewline
-\fielddef{duallongplural} & The plural long form of a dual
-abbreviation mapped by \atentry{dualabbreviation}.\tabularnewline
-\fielddef{dualshort} & The short form of a dual
-abbreviation mapped by \atentry{dualabbreviation}.\tabularnewline
-\fielddef{dualshortplural} & The plural short form of a dual abbreviation 
-mapped by \atentry{dualabbreviation}.
-\end{tabular}
+\printfields{bib2glsfield}%
 \end{table}
 
 \begin{table}[hbtp]
 \caption[Fields Provided by \styfmt{glossaries-prefix}]{Fields Provided by \sty{glossaries-prefix}}\label{tab:prefixfields}
 \medskip
 \centering
-\begin{tabular}{ll}
-\bfseries Field & \bfseries Description\\
-\fielddef{prefix} & The prefix associated with the \field{text}
-field.\\
-\fielddef{prefixfirst} & The prefix associated with the \field{first}
-field.\\
-\fielddef{prefixfirstplural} & The prefix associated with the
-\field{firstplural} field.\\
-\fielddef{prefixplural} & The prefix associated with the
-\field{plural} field.
-\end{tabular}
+\printfields{prefixfield}%
 \end{table}
 
 \begin{table}[hbtp]
@@ -1856,28 +1915,7 @@ field.\\
 \label{tab:accsuppfields}
 \medskip
 {\centering
-\begin{tabular}{ll}
-\bfseries Field & \bfseries Description\\
-\fielddef{access} & The replacement text for the \field{name} field.\\
-\fielddef{descriptionaccess} & The replacement text for the
-\field{description} field.\\
-\fielddef{descriptionpluralaccess} & The replacement text for the
-\field{descriptionplural} field.\\
-\fielddef{firstaccess} & The replacement text for the \field{first} field.\\
-\fielddef{firstpluralaccess} & The replacement text for the
-\field{firstplural} field.\\
-\fielddef{longaccess} & The replacement text for the \field{long} field.\\
-\fielddef{longpluralaccess} & The replacement text for the
-\field{longplural} field.\\
-\fielddef{pluralaccess} & The replacement text for the \field{plural} field.\\
-\fielddef{shortaccess} & The replacement text for the \field{short} field.\\
-\fielddef{shortpluralaccess} & The replacement text for the
-\field{shortplural} field.\\
-\fielddef{symbolaccess} & The replacement text for the \field{symbol} field.\\
-\fielddef{symbolpluralaccess} & The replacement text for the
-\field{symbolplural} field.\\
-\fielddef{textaccess} & The replacement text for the \field{text} field.
-\end{tabular}
+\printfields{accessfield}%
 \par}
 \medskip
 Don't load \sty{glossaries-accsupp} directly (with \csfmt{usepackage}) when using
@@ -1903,6 +1941,12 @@ the \csopt{counter} option).\tabularnewline
 (or assigned by the \csopt{group} option).\tabularnewline
 \fielddef{location} & The typeset location list. \tabularnewline
 \fielddef{loclist} & The internal list of locations.\tabularnewline
+\fielddef{recordcount} & Used with record counting to store the 
+total record count.\tabularnewline
+\fielddef{recordcount.counter} & Used with record counting to store the 
+total number of records for a given counter.\tabularnewline
+\fielddef{recordcount.counter.location} & Used with record counting to store the 
+total number of records for a given location.\tabularnewline
 \fielddef{secondarygroup} & The letter group determined by the
 comparator used with the \csopt{secondary} sort.\tabularnewline
 \fielddef{secondarysort} & The sort value determined by the
@@ -4182,6 +4226,28 @@ that entry to be ignored. If \meta{\keyvallist} is missing, the
 filtering is removed.  If you have both \csopt{match} and
 \csopt{not-match} in the same resource set, the last one listed
 takes precedence.
+
+\optsection{match-action}
+
+The default behaviour with \csopt{match} or \csopt{not-match}
+is to filter the selection. This may be changed to append to the
+selection instead. The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{filter}: (default) filter selection;
+\item\optfmt{and}: append any matches (with \csopt{match}) or
+non-matches (with \csopt{not-match}) to the selection.
+\end{itemize}
+For example, if I want to select all record entries and their
+dependencies, but I also want to make sure that any entries with
+the category set to \code{important} are always selected regardless
+of whether or not they have any records:
+\begin{verbatim}
+\GlsXtrLoadResource[
+  src=entries,% data in entries.bib
+  match-action={and},
+  match={category=important}
+]
+\end{verbatim}
 
 \optsection{flatten}
 

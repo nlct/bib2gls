@@ -71,11 +71,6 @@ public class Bib2Gls implements TeXApp
 
       formatMap = new HashMap<String,String>();
 
-      if (saveRecordCount)
-      {
-         recordCount = new HashMap<GlsRecord,Integer>();
-      }
-
       texFiles = new Vector<File>();
 
       packages = new Vector<String>();
@@ -908,6 +903,11 @@ public class Bib2Gls implements TeXApp
    {
       parseArgs(args);
 
+      if (saveRecordCount)
+      {
+         recordCount = new HashMap<GlsRecord,Integer>();
+      }
+
       if (interpret)
       {
          try
@@ -1111,7 +1111,8 @@ public class Bib2Gls implements TeXApp
                   }
 
                   // Any format overrides the default "glsnumberformat"
-                  // (or the ignored format "glsignore")
+                  // (or the ignored formats "glsignore"
+                  //  and "glstriggerrecordformat")
                   // unless there's a range formation.
 
                   if (existingPrefix.equals(")") && newPrefix.equals("("))
@@ -1163,7 +1164,7 @@ public class Bib2Gls implements TeXApp
 
                      existingRecord.setFormat(newPrefix+newFmt);
                   }
-                  else if (newFmt.equals("glsignore"))
+                  else if (isIgnoredFormat(newFmt))
                   {// discard the new record
 
                      debug();
@@ -1172,7 +1173,7 @@ public class Bib2Gls implements TeXApp
                        newRecord, existingRecord));
                      debug();
                   }
-                  else if (existingFmt.equals("glsignore"))
+                  else if (isIgnoredFormat(existingFmt))
                   {// override the existing record
 
                      debug();
@@ -1422,6 +1423,11 @@ public class Bib2Gls implements TeXApp
 
          message(getMessage("message.log.file", logFile));
       }
+   }
+
+   private boolean isIgnoredFormat(String fmt)
+   {
+      return fmt.equals("glsignore") || fmt.equals("glstriggerrecordformat");
    }
 
    public GlsResource getCurrentResource()

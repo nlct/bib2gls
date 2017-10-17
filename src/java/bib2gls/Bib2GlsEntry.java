@@ -1314,10 +1314,21 @@ public class Bib2GlsEntry extends BibEntry
       putField("see", builder.toString());
    }
 
+   public boolean hasTriggerRecord()
+   {
+      return triggerRecordFound;
+   }
+
    public void addRecord(GlsRecord record)
    {
       if (record.getFormat().equals("glsignore"))
       {
+         bib2gls.debug(bib2gls.getMessage("message.ignored.record", record));
+         addIgnoredRecord(record);
+      }
+      else if (record.getFormat().equals("glstriggerrecordformat"))
+      {
+         triggerRecordFound = true;
          bib2gls.debug(bib2gls.getMessage("message.ignored.record", record));
          addIgnoredRecord(record);
       }
@@ -2270,6 +2281,8 @@ public class Bib2GlsEntry extends BibEntry
    private Bib2GlsEntry dual = null;
 
    private Number numericSort = null;
+
+   private boolean triggerRecordFound=false;
 
    private Vector<String> locationList = null;
 

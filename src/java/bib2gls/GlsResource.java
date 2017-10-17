@@ -214,6 +214,19 @@ public class GlsResource
                dualShortPluralSuffix = null;
             }
          }
+         else if (opt.equals("match-action"))
+         {
+            String val = getChoice(parser, list, opt, "filter", "and");
+
+            if (val.equals("filter"))
+            {
+               matchAction = MATCH_ACTION_FILTER;
+            }
+            else
+            {
+               matchAction = MATCH_ACTION_AND;
+            }
+         }
          else if (opt.equals("match-op"))
          {
             String val = getChoice(parser, list, opt, "and", "or");
@@ -626,6 +639,10 @@ public class GlsResource
          else if (opt.equals("dual-type"))
          {
             dualType = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("trigger-type"))
+         {
+            triggerType = getRequired(parser, list, opt);
          }
          else if (opt.equals("dual-field"))
          {
@@ -2959,10 +2976,6 @@ public class GlsResource
                   }
                }
 
-               setType(entry);
-               setCategory(entry);
-               setCounter(entry);
-
                // does this entry have any records?
 
                boolean hasRecords = entry.hasRecords();
@@ -3038,6 +3051,10 @@ public class GlsResource
                      }
                   }
                }
+
+               setType(entry);
+               setCategory(entry);
+               setCounter(entry);
 
                if (discard(entry))
                {
@@ -3506,14 +3523,16 @@ public class GlsResource
             entries.add(entry);
          }
       }
-      else if (entrySort == null)
+      else if (entrySort == null || matchAction == MATCH_ACTION_AND)
       {
          // add all entries that have been recorded in the order of
          // definition
 
          for (Bib2GlsEntry entry : data)
          {
-            if (entry.hasRecords())
+            if (entry.hasRecords() ||
+                (matchAction == MATCH_ACTION_AND && fieldPatterns != null
+                 && !notMatch(entry)))
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
@@ -4959,7 +4978,11 @@ public class GlsResource
 
    private void setType(Bib2GlsEntry entry)
    {
-      if (type != null)
+      if (triggerType != null && entry.hasTriggerRecord())
+      {
+         entry.putField("type", triggerType);
+      }
+      else if (type != null)
       {
          if (type.equals("same as entry"))
          {
@@ -5039,7 +5062,11 @@ public class GlsResource
 
    private void setDualType(Bib2GlsEntry dual)
    {
-      if (dualType != null)
+      if (triggerType != null && dual.hasTriggerRecord())
+      {
+         dual.putField("type", triggerType);
+      }
+      else if (dualType != null)
       {
          if (dualType.equals("same as entry"))
          {
@@ -5329,7 +5356,10 @@ public class GlsResource
    // Allow for entries to be filtered out
    public boolean discard(Bib2GlsEntry entry)
    {
-      if (fieldPatterns == null) return false;
+      if (fieldPatterns == null || matchAction != MATCH_ACTION_FILTER)
+      {
+         return false;
+      }
 
       boolean discard = notMatch(entry);
 
@@ -5825,6 +5855,8 @@ public class GlsResource
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 
+   private String triggerType=null;
+
    private String pluralSuffix="\\glspluralsuffix ";
    private String dualPluralSuffix="\\glspluralsuffix ";
 
@@ -5853,6 +5885,11 @@ public class GlsResource
    private boolean notMatch=false;
 
    private boolean fieldPatternsAnd=true;
+
+   private final int MATCH_ACTION_FILTER = 0; 
+   private final int MATCH_ACTION_AND = 1; 
+
+   private int matchAction = MATCH_ACTION_FILTER;
 
    private static final String PATTERN_FIELD_ID = "id";
    private static final String PATTERN_FIELD_ENTRY_TYPE = "entrytype";
