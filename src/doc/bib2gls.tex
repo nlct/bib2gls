@@ -2,6 +2,8 @@
 % arara: xelatex if missing("toc")
 % arara: bib2gls: {group: on}
 % arara: xelatex
+% arara: bib2gls: {group: on}
+% arara: xelatex
 % arara: xelatex if found ("log", "Rerun")
 \documentclass[titlepage=false,index=totoc,12pt,captions=tableheading]{scrreprt}
 
@@ -22,6 +24,7 @@
 \usepackage{upquote}
 \usepackage{etoolbox}
 
+\usepackage{hologo}
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{accents}
@@ -42,7 +45,9 @@
 \renewcommand{\glsentrycounterlabel}{}
 \renewcommand\glstreeitem{\par\hangindent10pt}
 \renewcommand\glstreesubitem{\par\hangindent30pt\hspace*{15pt}}
-\renewcommand*{\glsxtrbookindexprelocation}{}
+\renewcommand*{\glsxtrbookindexprelocation}[1]{}
+
+\glsaddstoragekey{note}{}{\entrynote}
 
 % put break before dash to avoid confusion with a hyphen
 \newcommand{\dhyphen}{%
@@ -51,19 +56,25 @@
  {-}%
 }
 
-\newcommand{\bibglsseealsosep}{\subitem}
+\newcommand{\bibglsseealsosep}{\glstreesubitem}
 \newcommand{\bibglsusesee}[1]{, \glsxtrusesee{#1}}
+
+\renewcommand*{\glsseesep}{, \glstreesubitem\qquad}
+\renewcommand*{\glsseelastsep}{\glstreesubitem\qquad\andname\space}
 
 \newcommand{\glsxtrpostnameabbreviation}{%
  \space(\glsentrylong{\glscurrententrylabel})%
 }
 
+\newcommand{\glsxtrpostnameenvironment}{\space environment}
+
 \GlsXtrLoadResources[
   label-prefix={idx.},
   sort={letter-nocase},
   type={index},
+  dual-field={dualid},
   loc-prefix={comma},
-  match-action={and},
+  match-action={add},
   match={{category}={.*field}},
   %max-loc-diff=3,
   dual-prefix={},
@@ -99,6 +110,11 @@
 }
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
+
+\newcommand*{\eTeX}{\hologo{eTeX}}
+\newcommand*{\XeLaTeX}{\hologo{XeLaTeX}}
+\newcommand*{\LuaLaTeX}{\hologo{LuaLaTeX}}
+\newcommand*{\pdfLaTeX}{\hologo{pdfLaTeX}}
 
 \newcommand*{\sectionref}[1]{\hyperref[#1]{section~\ref*{#1}}}
 \newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
@@ -220,15 +236,19 @@
 
 \newcommand{\texmfcnffmt}[1]{\texttt{#1}}
 
-\newcommand{\texmfcnf}[1]{\idx{texmfcnf.#1}}
+\glsxtrnewgls{idx.texmfcnf.}{\texmfcnf}
 
 \newcommand*{\extfmt}[1]{\filefmt{.#1}}%
 
-\newcommand*{\ext}[1]{%
- \texorpdfstring{\idx{#1}}{.#1}%
+\glsxtrnewgls[format=glsignore]{idx.}{\ext}
+
+\newcommand*{\iext}[1]{%
+ \glsxtrtitleorpdforheading{\idx{#1}}{.#1}{\extfmt{#1}}%
 }
 
-\newcommand*{\sty}[1]{%
+\glsxtrnewgls[format=glsignore]{idx.}{\sty}
+
+\newcommand*{\isty}[1]{%
   \texorpdfstring{\idx{#1}}{#1}%
 }
 
@@ -303,7 +323,11 @@
   \end{flushleft}\ignorespaces
 }
 
-\newcommand*{\csref}[1]{\gls{#1}}
+\newcommand*{\csref}{\gls}
+
+\newcommand*{\cs}[1]{%
+  \glsdohyperlink{\glolinkprefix cs.idx.#1}{\glsentryname{idx.#1}}}
+\newcommand*{\ics}[2][]{\glsadd[#1]{idx.#2}\cs{#2}}
 
 \newcommand{\optsection}[2][\subsection]{%
  \glsxtrifhasfield*{useri}{opt.#2}%
@@ -383,6 +407,58 @@
    \def\fieldcategories{#1}%
    \let\printunsrtglossaryentryprocesshook\fieldhook
  }%
+}
+
+\newcommand*{\summaryfmt}[1]{\hyperit{#1}}
+
+\newglossarystyle{commandsummary}%
+{%
+  \setglossarystyle{index}%
+  \renewcommand*{\glossaryheader}{\raggedright}%
+  \renewcommand*{\glsgroupheading}[1]{%
+    \glsxtrgetgrouptitle{##1}{\thisgrptitle}%
+    \glsxtrbookindexbookmark{\thisgrptitle}{summary.##1}%
+    \glsxtrbookindexformatheader{\thisgrptitle}%
+    \nopagebreak\indexspace\nopagebreak\csuse{@afterheading}%
+  }%
+  \renewcommand*{\glossentry}[2]{%
+   \item
+   \glsxtrifhasfield{dualid}{##1}%
+   {%
+     \glshyperlink{\glscurrentfieldvalue}%
+     \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
+     \nopagebreak\par\hspace{10pt}%
+     \Glossentrydesc{\glscurrentfieldvalue}%
+   }%
+   {%
+     \glstarget{cs.##1}{\strut}\gls[format=summaryfmt,hyper=false]{##1}%
+     \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
+     \nopagebreak\par\hspace{10pt}%
+     \Glossentrydesc{##1}%
+   }%
+   \glsxtrifhasfield{note}{##1}%
+   {\space(\glscurrentfieldvalue)}%
+   {}%
+   .%
+   \par\medskip
+  }%
+}
+
+\newcommand*{\commandsummaryhook}[1]{%
+  \edef\currentcategory{\glscategory{#1}}%
+  \ifdefstring{\currentcategory}{command}%
+  {}%
+  {\printunsrtglossaryskipentry}%
+}
+
+\newcommand*{\printcommandsummary}{%
+  \printunsrtglossary*[type=index,
+    style=commandsummary,
+    title={Command Summary}
+  ]%
+  {%
+   \let\printunsrtglossaryentryprocesshook\commandsummaryhook
+  }%
 }
 
 \newcommand{\entrysection}[2][\subsection]{%
@@ -476,7 +552,7 @@
 \newcommand*{\imaginary}{i}
 
 \newcommand{\addr}[1]{\\\url{#1}}
-\title{\appfmt{bib2gls}: a command line Java application to convert
+\title{\bibgls: a command line Java application to convert
 \filefmt{.bib} files to \filefmt{glossaries-extra.sty} resource
 files}
 \author{Nicola Talbot\addr{http://www.dickimaw-books.com/}}
@@ -511,7 +587,7 @@ files}
 The \bibgls\ command line application can be used to extract
 glossary information stored in a \ext{bib} file and convert it
 into glossary entry definition commands that can be read using
-\styfmt{glossaries-extra}'s \idx{GlsXtrLoadResources} command. When used
+\styfmt{glossaries-extra}'s \ics{GlsXtrLoadResources} command. When used
 in combination with the \styoptfmt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
@@ -538,10 +614,10 @@ This application was developed in response to the question
 managing glossary tags?}} on \TeX\ on StackExchange. The \ext{bib}
 file can be managed in an application such as JabRef.
 
-If you already have a \filefmt{.tex} file containing 
+If you already have a \ext{tex} file containing 
 entry definitions using commands like \gls{newglossaryentry}
 then you can use the supplementary tool \idx{convertgls2bib}
-to convert the entries to the \filefmt{.bib} format required by
+to convert the entries to the \ext{bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
 \end{abstract}
 
@@ -555,16 +631,16 @@ to convert the entries to the \filefmt{.bib} format required by
 
 If you have extensively used the \styfmt{glossaries} or
 \styfmt{glossaries-extra} package, you may have found yourself
-creating a large \ext{tex} file containing many definitions that
+creating a large \iext{tex} file containing many definitions that
 you frequently use in documents. This file can then simply be
-loaded using \idx{input} or \idx{loadglsentries}, but a large file
+loaded using \ics{input} or \ics{loadglsentries}, but a large file
 like this can be difficult to maintain and if the document only
 actually uses a small proportion of those entries, the document
 build is unnecessarily slow due to the time and resources taken on
 defining the unwanted entries.
 
 The aim of \bibgls\ is to allow the entries to be stored in a
-\ext{bib} file, which can be maintained using a reference system
+\iext{bib} file, which can be maintained using a reference system
 such as JabRef. The document build process
 can now be analogous to that used with \idx{bibtex} (or
 \appfmt{biber}), where only those entries that have been recorded in the
@@ -574,29 +650,29 @@ hierarchical sorting and can collate location lists, it doubles as
 an indexing application, which means that the \idx{makeglossaries}
 step can be skipped.
 
-You can't use \idx{glsaddall} with this method as that command works
+You can't use \ics{glsaddall} with this method as that command works
 by iterating over all defined entries and calling
-\idx{glsadd}\margm{label}. On the first \LaTeX\ run there are no
-entries defined, so \idx{glsaddall} does nothing. If you want to
+\ics{glsadd}\margm{label}. On the first \LaTeX\ run there are no
+entries defined, so \ics{glsaddall} does nothing. If you want to
 select all entries, just use \csopt[all]{selection} instead (which
-has the advantage over \idx{glsaddall} in that it doesn't create a
+has the advantage over \ics{glsaddall} in that it doesn't create a
 redundant location for each entry).
 
 Note that \bibgls\ requires the extension package
-\sty{glossaries-extra} and can't be used with just the base
-\sty{glossaries} package, since it requires some of the extension
+\isty{glossaries-extra} and can't be used with just the base
+\isty{glossaries} package, since it requires some of the extension
 commands. See the \styfmt{glossaries-extra} user manual for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
 
 Since the information used by \bibgls\ is
-written to the \ext{aux} file, it's not possible to run \bibgls\
+written to the \iext{aux} file, it's not possible to run \bibgls\
 through \TeX's shell escape while the \ext{aux} file is open for
 write access. (The \ext{aux} file is closed \emph{after} the end
-document hook, so it can't be deferred with \idx{AtEndDocument}.) 
+document hook, so it can't be deferred with \ics{AtEndDocument}.) 
 This means that if you really want to run \bibgls\
-through \idx{write18} it must be done in the preamble with
-\idx{immediate}. For example:
+through \ics{write18} it must be done in the preamble with
+\ics{immediate}. For example:
 \begin{verbatim}
 \immediate\write18{bib2gls \jobname}
 \end{verbatim}
@@ -710,15 +786,15 @@ before writing the temporary file that's input with \gls{glsxtrresourcefile}
 the more convenient \gls{GlsXtrLoadResources}.}  This
 means the entries are already defined in the correct order, and only
 those entries that are required in the document are defined, so
-\idx{printunsrtglossary} (or \idx{printunsrtglossaries}) may be used.
+\ics{printunsrtglossary} (or \ics{printunsrtglossaries}) may be used.
 (The \qtt{unsrt} part of the command name indicates that all
 defined entries should be listed in the order of definition from
 \styfmt{glossaries-extra}'s point of view.)
 
 If you additionally want to use an indexing application, such
 as \idx{xindy}, you need the package option
-\styopt[alsoindex]{record} and use \idx{cs.makeglossaries}
-and \idx{printglossary} (or the iterative \idx{printglossaries}) as usual.
+\styopt[alsoindex]{record} and use \ics{cs.makeglossaries}
+and \ics{printglossary} (or the iterative \ics{printglossaries}) as usual.
 This requires a more complicated build process:
 \begin{verbatim}
 pdflatex myDoc
@@ -807,7 +883,7 @@ Copy the files provided to the following locations:
 
 If you are using a Unix-like system, there are also bash scripts
 provided called \file{bib2gls.sh} and \file{convertgls2bib.sh}. 
-Either copy then directly to somewhere on your path without the \ext{sh} 
+Either copy then directly to somewhere on your path without the \iext{sh} 
 extension, for example:
 \begin{verbatim}
 cp bib2gls.sh ~/bin/bib2gls
@@ -832,7 +908,7 @@ library used by both \file{bib2gls.jar} and
 \href{https://github.com/nlct/texparser}{GitHub repository} as it's
 also used by some of my other applications.)
 
-Windows users can create a \ext{bat} file that works in a
+Windows users can create a \iext{bat} file that works in a
 similar way to the bash scripts. To do this, create a file called
 \file{bib2gls.bat} that contains the following:
 \begin{verbatim}
@@ -843,11 +919,11 @@ java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
 \end{verbatim}
 Save this file to somewhere on your system's path.
 (Similarly for \filefmt{convertgls2bib}.) Note that \TeX\
-distributions for Windows usually convert \ext{jar} files to
+distributions for Windows usually convert \iext{jar} files to
 executables.
 
 You may need to refresh \TeX's database to ensure that
-\idx{kpsewhich} can find the \ext{jar} files.
+\idx{kpsewhich} can find the \iext{jar} files.
 
 To test that the application has been successfully installed, open a
 command prompt or terminal and run the following command:
@@ -861,8 +937,8 @@ This should display the version information for both applications.
 \label{sec:texparserlib}
 
 The \bibgls\ application requires the \TeX\ Parser Library
-\file{texparserlib.jar}\footnote{\url{https://github.com/nlct/texparser}} which is used to parse the \ext{aux}
-and \ext{bib} files.
+\file{texparserlib.jar}\footnote{\url{https://github.com/nlct/texparser}}
+which is used to parse the \iext{aux} and \iext{bib} files.
 
 With the \longarg{interpret} switch on (default), this library is
 also used to interpret the sort value when it contains
@@ -880,9 +956,9 @@ work. In particular, in this case it's being used in a fragmented
 context without knowing most of the packages used by the
 document\footnote{\bibgls\ can detect from the log file a small
 number of packages that the parser can support, such as
-\sty{pifonts}, \sty{wasysym}, \sty{amssymb}, \sty{stix}, \sty{mhchem}
-and \sty{bpchem}. There's also partial support for \sty{siunitx}'s
-\idx{si} command.}\ or any custom
+\isty{pifonts}, \isty{wasysym}, \isty{amssymb}, \isty{stix}, \isty{mhchem}
+and \isty{bpchem}. There's also partial support for \isty{siunitx}'s
+\ics{si} command.}\ or any custom
 commands or environments provided within the document.
 
 \TeX\ syntax can be quite complicated and, in some cases, far too
@@ -984,14 +1060,14 @@ code that's passed to the interpreter is:
 \begin{verbatim}
 {}$\mtx{M}$
 \end{verbatim}
-The transcript (\ext{glg}) file will show the results of the
+The transcript (\iext{glg}) file will show the results of the
 conversion:\footnote{The \longarg{debug} mode will show additional
 information.}
 \begin{verbatim}
 texparserlib: {}$\mtx{M}$ -> M
 \end{verbatim}
 So the \field{sort} value for this entry is set to \qtt{M}. The font
-change (caused by math-mode and \idx{boldsymbol}) has been 
+change (caused by math-mode and \ics{boldsymbol}) has been 
 ignored. The sort value therefore consists of a single Unicode
 character 0x4D (Latin upper case letter \qtt{M}, decimal value 77).
 
@@ -1212,7 +1288,7 @@ resource file otherwise \bibgls\ will fallback on English.
 \argsection{log-file}
 
 Sets the name of the transcript file. By default, the name is the
-same as the \ext{aux} file but with a \ext{glg} extension. Note that
+same as the \iext{aux} file but with a \iext{glg} extension. Note that
 if you use \bibgls\ in combination with \idx{xindy} or
 \idx{makeindex}, you will need to change the transcript file name to
 prevent interference.
@@ -1220,11 +1296,11 @@ prevent interference.
 \argsection{dir}
 
 By default \bibgls\ assumes that the output files should be written
-in the current working directory. The input \ext{bib} files are assumed to be
+in the current working directory. The input \iext{bib} files are assumed to be
 either in the current working directory or on \TeX's path (in which
 case \idx{kpsewhich} will be used to find them).
 
-If your \ext{aux} file isn't in the current working directory (for
+If your \iext{aux} file isn't in the current working directory (for
 example, you have run \TeX\ with \shortargfmt{output-directory})
 then you need to take care how you invoke \bibgls.
 
@@ -1257,12 +1333,12 @@ bib2gls tmp/mydoc
 \end{verbatim}
 then the \ext{aux} file is found and the transcript file is
 \filefmt{tmp/mydoc.glg} (since the default is the same as the
-\ext{aux} file but with the extension changed to \ext{glg}) but the
+\ext{aux} file but with the extension changed to \iext{glg}) but the
 output file \filefmt{mydoc.glstex} will be written to the current
 directory.
 
 This works fine from \TeX's point of view as it can find the
-\ext{glstex} file, but it may be that you'd rather the \ext{glstex}
+\iext{glstex} file, but it may be that you'd rather the \ext{glstex}
 file was tidied away into the \filefmt{tmp} directory along with all
 the other files.  In this case you need to invoke \bibgls\ with the
 \longargorshort{dir} option:
@@ -1296,8 +1372,8 @@ a package that the interpreter does support.
 
 \argsection{mfirstuc-protection}
 
-Commands like \idx{Gls} use \idx{makefirstuc} provided by the
-\sty{mfirstuc} package. This command has limitations and one of the
+Commands like \ics{Gls} use \ics{makefirstuc} provided by the
+\isty{mfirstuc} package. This command has limitations and one of the
 things that can break it is the use of a referencing command 
 at the start of its argument. The \sty{glossaries-extra} package has
 more detail about the problem in the \qt{Nested Links} section of
@@ -1326,7 +1402,7 @@ warning will be written to the transcript.
 
 \argsection{no-mfirstuc-protection}
 
-Switches off the \sty{mfirstuc} protection mechanism described
+Switches off the \isty{mfirstuc} protection mechanism described
 above.
 
 \argsection{mfirstuc-math-protection}
@@ -1369,14 +1445,14 @@ Equivalent to \longarg{nested-link-check} \optfmt{none}.
 \argsection{shortcuts}
 
 Some entries may reference another entry within a field, using
-commands like \idx{gls}, so \bibgls\ parses the fields for these
+commands like \ics{gls}, so \bibgls\ parses the fields for these
 commands to determine dependent entries to allow them to be selected
 even if they haven't been used within the document.
 The \styopt{shortcuts} package option provided by
-\styfmt{glossaries-extra} defines various synonyms, such as \idx{ac}
-which is equivalent to \idx{gls}. By default the value of the
+\styfmt{glossaries-extra} defines various synonyms, such as \ics{ac}
+which is equivalent to \ics{gls}. By default the value of the
 \styopt{shortcuts} option will be picked up by \bibgls\ when parsing the
-\ext{aux} file. This then allows \bibgls\ to additionally search for
+\iext{aux} file. This then allows \bibgls\ to additionally search for
 those shortcut commands while parsing the fields.
 
 You can override the \styopt{shortcuts} setting using
@@ -1480,7 +1556,7 @@ called \field{group}. If the \longarg{group} switch is used then, when
 sorting, \bibgls\ will try to determine the letter group for each
 entry and add it to the \field{group} field.  (Some \csopt{sort}
 options ignore this setting.) This value will be picked up by
-\idx{printunsrtglossary} if group headings are required (for
+\ics{printunsrtglossary} if group headings are required (for
 example with the \glostyle{indexgroup} style). If you're not using
 a glossary style that displays the group headings, there's no need
 to use this switch. Note that this switch doesn't automatically
@@ -1554,7 +1630,7 @@ pdflatex myDoc
 On the first \appfmt{pdflatex} call, there's no glossary. On the second
 \appfmt{pdflatex}, there's a glossary but the glossary must be
 processed to find the group information, which is written to the
-\ext{aux} file as
+\iext{aux} file as
 \nosecformatdef{@gls@hypergroup}
 The third \appfmt{pdflatex} reads this information and is then able
 to create the navigation links.
@@ -1562,7 +1638,7 @@ to create the navigation links.
 With \bibgls, if the \optfmt{type} is provided (through the
 \field{type} field or via options such as \csopt{type} and
 \csopt{dual-type}) then this information can be determined when
-\bibgls\ is ready to write the \ext{glstex} file, which means that
+\bibgls\ is ready to write the \iext{glstex} file, which means that
 the extra \LaTeX\ run isn't necessary.
 
 For example:
@@ -1580,7 +1656,7 @@ For example:
 ]
 \end{verbatim}
 Here the \csopt{type} is set and \bibgls\ can detect that
-\sty{hyperref} has been loaded, so if the \longargfmt{group} switch
+\isty{hyperref} has been loaded, so if the \longargfmt{group} switch
 is used, then the group hyperlinks can be set (using
 \csref{bibglshypergroup}). This means that the build process is
 just:
@@ -1589,12 +1665,12 @@ pdflatex myDoc
 bibtex --group myDoc
 pdflatex myDoc
 \end{verbatim}
-Note that this requires \sty{glossaries} v4.32+. If your version of
+Note that this requires \isty{glossaries} v4.32+. If your version of
 \sty{glossaries} is too old then \bibgls\ can't override
-the default behaviour of \sty{glossary-hypernav}'s
-\idx{glsnavhypertarget}.
+the default behaviour of \isty{glossary-hypernav}'s
+\ics{glsnavhypertarget}.
 
-If \sty{hyperref} isn't loaded or the \longargfmt{group} switch
+If \isty{hyperref} isn't loaded or the \longargfmt{group} switch
 isn't used or the \field{type} isn't set or your version of
 \sty{glossaries} is too old, then the information isn't saved.
 
@@ -1629,11 +1705,11 @@ The glossary won't have groups even if a group style, such as
 \argsection{tex-encoding}
 
 \bibgls\ tries to determine the character encoding to use for the
-output files. If the document has loaded the \sty{inputenc} package then
+output files. If the document has loaded the \isty{inputenc} package then
 \bibgls\ can obtain the value of the encoding from the
-\ext{aux} file. This then needs to be converted to a name
+\iext{aux} file. This then needs to be converted to a name
 recognised by Java. For example, \code{utf8} will be mapped to
-\code{UTF-8}. If the \sty{fontspec} package has been loaded,
+\code{UTF-8}. If the \isty{fontspec} package has been loaded,
 \styfmt{glossaries-extra} will assume the encoding is \code{utf8} and
 write that value to the \ext{aux} file.
 
@@ -1652,16 +1728,16 @@ This is useful if constructing field values programmatically
 commands are included in the field. 
 
 The switch \longarg{no-expand-fields} makes \bibgls\ write
-\idx{glsnoexpandfields} to the \ext{glstex} file, which
+\ics{glsnoexpandfields} to the \iext{glstex} file, which
 switches off the expansion.  Since \bibgls\ is simply
-fetching the data from \ext{bib} files, it's unlikely 
+fetching the data from \iext{bib} files, it's unlikely 
 that this automatic expansion is required and since it can
 also be problematic this option is on by default. You can
 switch it off with \longarg{expand-fields}.
 
 \argsection{expand-fields}
 
-Don't write \idx{glsnoexpandfields} to the \ext{glstex} file,
+Don't write \ics{glsnoexpandfields} to the \iext{glstex} file,
 allowing fields to expand when the entries are defined.
 Remember that this doesn't include the \field{name}, \field{symbol}
 or \field{description} fields, which need to have their
@@ -1681,7 +1757,7 @@ if the \ext{bib} file contains:
 }
 \end{verbatim}
 This will cause spurious spaces. Using \longarg{trim-fields} will
-automatically trim the values before writing the \ext{glstex} file.
+automatically trim the values before writing the \iext{glstex} file.
 
 \argsection{no-trim-fields}
 
@@ -1691,7 +1767,7 @@ This is the default setting.
 \argsection{record-count}
 
 Switch on record counting. This will ensure that when each entry
-is written to the \ext{glstex} file, \gls{bib2gls} will additionally
+is written to the \iext{glstex} file, \bibgls\ will additionally
 set the following fields
 \begin{itemize}
 \item \field{recordcount}: set to the total
@@ -1699,20 +1775,20 @@ number of records found for the entry;
 \item \field{recordcount.counter}: set to the total
 number of records found for the entry for the given counter.
 \end{itemize}
-These fields can then be used with the \idx{rgls}-like
+These fields can then be used with the \ics{rgls}-like
 commands provided by \sty{glossaries-extra} v1.21+.
-The default behaviour of \idx{rgls}\margm{label}\oarg{insert} is to check
+The default behaviour of \ics{rgls}\margm{label}\oarg{insert} is to check
 the \field{recordcount} field against the \catattr{recordcount}
 attribute value. This attribute can be set with
 \nosecdef{GlsXtrSetRecordCountAttribute}
 where \meta{category list} is a comma-separated list
 of category labels and \meta{value} is a positive integer.
 If the value of the \field{recordcount} field is greater than
-\meta{value} then \idx{rgls} behaves like \idx{gls}, otherwise
-it does \idx{rglsformat}\marg{label}\marg{insert} instead.
-If the use of \idx{rglsformat} is triggered in this way,
-then \idx{rgls} writes a record to the \ext{aux} file
-with the \glsopt{format} set to \idx{glstriggerrecordformat}.
+\meta{value} then \ics{rgls} behaves like \ics{gls}, otherwise
+it does \ics{rglsformat}\marg{label}\marg{insert} instead.
+If the use of \ics{rglsformat} is triggered in this way,
+then \ics{rgls} writes a record to the \iext{aux} file
+with the \glsopt{format} set to \ics{glstriggerrecordformat}.
 This ensures that the record count is correct on the next run,
 but the record isn't added to the location list as
 \bibgls\ recognises it as a special ignored location.
@@ -1720,22 +1796,19 @@ Note that the entry will still appear in the usual glossary unless
 you assign it to a different one with \csopt{trigger-type}.
 
 If the \catattr{recordcount} attribute hasn't been set
-\idx{rgls} behaves like \idx{gls}. (That is, \idx{rgls}
-uses the same internal command used by \idx{gls}.) You can use
-\idx{glsxtrenablerecordcount} to redefine \idx{gls}
-to \idx{rgls}, so that you can continue to use \idx{gls}
+\ics{rgls} behaves like \ics{gls}. (That is, \ics{rgls}
+uses the same internal command used by \ics{gls}.) You can use
+\ics{glsxtrenablerecordcount} to redefine \ics{gls}
+to \ics{rgls}, so that you can continue to use \ics{gls}
 without having to switch command name.
 
 For example:
 \begin{verbatim}
-\newignoredglossary{ignored}
-
 \GlsXtrLoadResources[
  src=abbrevs,% entries defined in abbrevs.bib
  trigger-type=ignored,
  category=abbreviation
 ]
-
 \glsxtrenablerecordcount
 \GlsXtrSetRecordCountAttribute{abbreviation}{1}
 \end{verbatim}
@@ -1747,18 +1820,18 @@ Switch off record counting. (Default.)
 
 \argsection{record-count-unit}
 
-Automatically implements \gls{record-count} and additionally
+Automatically implements \longarg{record-count} and additionally
 sets the \field{recordcount.counter.location} fields.
-These fields can then be used with the \idx{rgls}-like
-commands provided by \sty{glossaries-extra} v1.21+.
+These fields can then be used with the \ics{rgls}-like
+commands.
 
 \argsection{no-record-count-unit}
 
 Switches off unit record counting. (Default.)
-Note that you need \gls{no-record-count} to completely
+Note that you need \longarg{no-record-count} to completely
 switch off record counting.
 
-\chapter{\ext{bib} Format}
+\chapter{\iext{bib} Format}
 \label{sec:bib}
 \setcounter{secnumdepth}{1}
 
@@ -1799,8 +1872,8 @@ the original label supplied in the \ext{bib} file is used, not the
 prefixed label.
 
 Avoid non-ASCII characters in the \meta{id} if your document uses the 
-\sty{inputenc} package.
-You can set the character encoding in the \ext{bib} file using:
+\isty{inputenc} package.
+You can set the character \idx{encoding} in the \ext{bib} file using:
 \begin{alltt}
 \% Encoding: \meta{encoding-name}
 \end{alltt}
@@ -1829,12 +1902,12 @@ ignored fields. These are set using a \keyvallist\ within
 Predefined fields for use in \ext{bib} files are listed in
 Tables~\ref{tab:fields}, \ref{tab:bib2glsfields},
 \ref{tab:prefixfields} and~\ref{tab:accsuppfields}.  If you add any
-custom keys in your document using \idx{glsaddkey} or
-\idx{glsaddstoragekey}, those commands must be placed before the
+custom keys in your document using \ics{glsaddkey} or
+\ics{glsaddstoragekey}, those commands must be placed before the
 first use of \gls{GlsXtrLoadResources} to ensure that \bibgls\
 recognises them as a field name. 
 
-Fields that may be set by \bibgls\ when it creates the \ext{glstex}
+Fields that may be set by \bibgls\ when it creates the \iext{glstex}
 files are listed in Table~\ref{tab:internalfields}. These typically
 shouldn't be set in the \ext{bib} file (although you may need
 \field{sort} for cases where \bibgls\ doesn't recognise any of the
@@ -1850,7 +1923,7 @@ intended for internal use by the \styfmt{glossaries} or
 \styfmt{glossaries-extra} package.
 
 Any unrecognised fields will be ignored by \bibgls. This is more convenient
-than using \idx{input} or \idx{loadglsentries}, which requires all the
+than using \ics{input} or \ics{loadglsentries}, which requires all the
 keys used in the file to be defined, regardless of whether or not
 you actually need them in the document.
 
@@ -1861,64 +1934,62 @@ entry type.
 
 Other entries can be cross-referenced using the \field{see},
 \field{seealso} or \field{alias} fields or
-by using commands like \idx{gls} or \idx{glsxtrp} in any of the
+by using commands like \ics{gls} or \ics{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
 rebuild the document to ensure the location lists are correct.  Use
-of the \idx{glssee} command will create an ignored location and the
+of the \ics{glssee} command will create an ignored location and the
 \field{see} field will be set to the relevant information.  If an
 entry has the \field{see} field already set, any instance of
-\idx{glssee} in the document for that entry will be appended to the
+\ics{glssee} in the document for that entry will be appended to the
 \field{see} field (provided you have at least v1.14 of
 \sty{glossaries-extra}). In general, it's best just to use the
-\field{see} field and not use \idx{glssee}.
+\field{see} field and not use \ics{glssee}.
 
 The \field{seealso} key was only added to \sty{glossaries-extra}
 v1.16, but this field may be used with \bibgls\ even if you only
 have version 1.14 or 1.15. If the key isn't available,
 \code{seealso=\margm{xr-list}} will be treated as
-\code{see=\marg{[\idx{seealsoname}]\meta{xr-list}}} (the resource
+\code{see=\marg{[\ics{seealsoname}]\meta{xr-list}}} (the resource
 option \csopt{seealso} won't have an effect).  You can't use both
 \field{see} and \field{seealso} for the same entry with \bibgls.
 Note that the \field{seealso} field doesn't allow for the optional
 \oargm{tag} part. If you need a different tag, either use \field{see}
-or change the definition of \idx{seealsoname} or
-\idx{glsxtruseseealsoformat}.  Note that, unless you are using
-\idx{xindy}, \idx{glsxtrindexseealso} just does
-\idx{glssee}\oarg{\idx{seealsoname}}, and so will be treated as \field{see}
+or change the definition of \ics{seealsoname} or
+\ics{glsxtruseseealsoformat}.  Note that, unless you are using
+\idx{xindy}, \ics{glsxtrindexseealso} just does
+\ics{glssee}\oarg{\ics{seealsoname}}, and so will be treated as \field{see}
 rather than \field{seealso} by \bibgls. Again, it's better to just
 use the \field{seealso} field directly.
 
 \begin{table}[hbtp]
 \caption{Fields Provided by \styfmt{glossaries-extra}}\label{tab:fields}
-\medskip
 \centering
 \printfields{basefield,extrafield}%
 \end{table}
 
 \begin{table}[hbtp]
 \caption{Fields Provided by \bibgls}\label{tab:bib2glsfields}
-\medskip
 \centering
 \printfields{bib2glsfield}%
 \end{table}
 
 \begin{table}[hbtp]
-\caption[Fields Provided by \styfmt{glossaries-prefix}]{Fields Provided by \sty{glossaries-prefix}}\label{tab:prefixfields}
-\medskip
+\caption[Fields Provided by \styfmt{glossaries-prefix}]{Fields
+Provided by \isty{glossaries-prefix}}\label{tab:prefixfields}
 \centering
 \printfields{prefixfield}%
 \end{table}
 
 \begin{table}[hbtp]
-\caption[Fields Provided by \styfmt{glossaries-accsupp}]{Fields Provided by \sty{glossaries-accsupp}}
+\caption[Fields Provided by \styfmt{glossaries-accsupp}]{Fields
+Provided by \isty{glossaries-accsupp}}
 \label{tab:accsuppfields}
-\medskip
 {\centering
 \printfields{accessfield}%
 \par}
 \medskip
-Don't load \sty{glossaries-accsupp} directly (with \csfmt{usepackage}) when using
+Don't load \isty{glossaries-accsupp} directly (with \csfmt{usepackage}) when using
 \styfmt{glossaries-extra}. Load using the \styopt{accsupp} package
 option instead.
 \begin{verbatim}
@@ -1927,79 +1998,18 @@ option instead.
 \end{table}
 
 \begin{table}[hbtp]
-\caption[Fields Set by \bibgls]{Fields Sometimes Set by \bibgls\ in the \ext{glstex} File}
+\caption[Fields Set by \bibgls]{Fields Sometimes Set by \bibgls\ in
+the \iext{glstex} File}
 \label{tab:internalfields}
 \centering
-\medskip
-\begin{tabular}{l>{\raggedright}p{.75\linewidth}}
-\bfseries Field & \bfseries Description\tabularnewline
-\fielddef{childcount} & Stores the number of children this entry has
-had selected.\tabularnewline
-\fielddef{counter} & The default counter used for indexing (assigned by
-the \csopt{counter} option).\tabularnewline
-\fielddef{group} & The letter group determined by the comparator
-(or assigned by the \csopt{group} option).\tabularnewline
-\fielddef{location} & The typeset location list. \tabularnewline
-\fielddef{loclist} & The internal list of locations.\tabularnewline
-\fielddef{recordcount} & Used with record counting to store the 
-total record count.\tabularnewline
-\fielddef{recordcount.counter} & Used with record counting to store the 
-total number of records for a given counter.\tabularnewline
-\fielddef{recordcount.counter.location} & Used with record counting to store the 
-total number of records for a given location.\tabularnewline
-\fielddef{secondarygroup} & The letter group determined by the
-comparator used with the \csopt{secondary} sort.\tabularnewline
-\fielddef{secondarysort} & The sort value determined by the
-comparator used with the \csopt{secondary} sort.\tabularnewline
-\fielddef{sort} & The sort value obtained by the
-comparator.\tabularnewline
-\fielddef{type} & The glossary this entry belongs to (assigned by
-the \csopt{type} option).
-\end{tabular}
+\printfields{internalfield}%
 \end{table}
 
 \begin{table}[hbtp]
 \caption[Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}]{Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}
 (don't use in \ext{bib} files)}\label{tab:baseinternalfields}
 \centering
-\medskip
-\begin{tabular}{ll}
-\bfseries Field & \bfseries Description\\
-\fielddef{currcount} & Used with entry counting to store the current
-total\\
-\fielddef{currcountunit} & Used with unit entry counting
-(\styfmt{glossaries-extra}).\\
-\fielddef{desc} & Corresponds to \fieldfmt{description} key.\\
-\fielddef{descplural} & Corresponds to \fieldfmt{descriptionplural} key.\\
-\fielddef{firstpl} & Corresponds to \fieldfmt{firstplural} key.\\
-\fielddef{flag} & Boolean that determines if an entry has been
-used.\\
-\fielddef{index} & The main part of the indexing code
-(\idx!{makeindex} or \idx!{xindy}).\\
-\fielddef{level} & Hierarchical level.\\
-\fielddef{longpl} & Corresponds to \fieldfmt{longplural} key.\\
-\fielddef{nonumberlist} & Used to suppress the location list for a
-specific entry.\\
-\fielddef{prevcount} & Used with entry counting to store the 
-total from the previous run.\\
-\fielddef{prevcountunit} & Used with unit entry counting
-(\styfmt{glossaries-extra}).\\
-\fielddef{prevunitmax} & Used with unit entry counting
-(\styfmt{glossaries-extra}).\\
-\fielddef{prevunittotal} & Used with unit entry counting
-(\styfmt{glossaries-extra}).\\
-\fielddef{shortpl} & Corresponds to \fieldfmt{shortplural} key.\\
-\fielddef{sortvalue} & Original \fieldfmt{sort} value (before sanitizing and
-escaping special characters).\\
-\fielddef{unitlist} & Used with unit entry counting
-(\styfmt{glossaries-extra}).\\
-\fielddef{useri} & Corresponds to \fieldfmt{user1} key.\\
-\fielddef{userii} & Corresponds to \fieldfmt{user2} key.\\
-\fielddef{useriii} & Corresponds to \fieldfmt{user3} key.\\
-\fielddef{useriv} & Corresponds to \fieldfmt{user4} key.\\
-\fielddef{userv} & Corresponds to \fieldfmt{user5} key.\\
-\fielddef{uservi} & Corresponds to \fieldfmt{user6} key.
-\end{tabular}
+\printfields{baseinternalfield}%
 \end{table}
 
 \clearpage
@@ -2079,7 +2089,7 @@ value of the \code{card} entry is \verb"|S|" (see
 
 What happens if you also need to use these commands in the document?
 The definitions provided in \atentry{preamble} won't be available
-until the \ext{glstex} file has been created, which means the
+until the \iext{glstex} file has been created, which means the
 commands won't be defined on the first \LaTeX\ run.
 
 There are several approaches:
@@ -2111,7 +2121,7 @@ example the \atentry{preamble} definitions will take precedence.
 \styfmt{glossaries-extra}\footnote{Introduced in version 1.12.}\ which
 allows you to store the name of the formatting command in a field.
 The default is the \field{user1} field, but this can be changed to 
-another field by redefining \idx{GlsXtrFmtField}.
+another field by redefining \ics{GlsXtrFmtField}.
 
 The \ext{bib} file can now look like this:
 \begin{verbatim}
@@ -2134,19 +2144,19 @@ The \ext{bib} file can now look like this:
 Within the document, you can format \meta{text} using the formatting
 command provided in the \field{user1} field with:
 \nosecformatdef{glsxtrfmt}
-(which internally uses \idx{glslink}) or
+(which internally uses \ics{glslink}) or
 \nosecformatdef{glsxtrentryfmt}
 which just applies the appropriate formatting command to
 \meta{text}. If the entry given by \meta{label} hasn't been defined,
 then this just does \meta{text} and a warning is issued. (It 
 just does \meta{text} without a warning if the field hasn't been set.)
-The \meta{options} are as for \idx{glslink} but \idx{glslink} will
+The \meta{options} are as for \ics{glslink} but \ics{glslink} will
 actually be using
 \begin{alltt}
-\idx{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\csfmt{}\meta{csname}\margm{text}}
+\ics{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\csfmt{}\meta{csname}\margm{text}}
 \end{alltt}
 where the default options \meta{def-options} are given by
-\idx{GlsXtrFmtDefaultOptions}. The default definition of this is
+\ics{GlsXtrFmtDefaultOptions}. The default definition of this is
 just \code{noindex} which suppresses the automatic indexing or
 recording action. (See the \sty{glossaries-extra} manual
 for further details.)
@@ -2178,7 +2188,7 @@ document, this means you don't have to worry about remembering
 the names of the actual commands provided in the \ext{bib} file
 (just the entry labels) and the use of \gls{glsxtrfmt} will
 automatically produce a hyperlink to the glossary entry if the
-\sty{hyperref} package has been loaded.
+\isty{hyperref} package has been loaded.
 \end{enumerate}
 
 Here's an alternative \ext{bib} that defines entries with a term, a
@@ -2527,7 +2537,7 @@ and is analogous to
  description={statistical pattern recognition technique}}
 \end{verbatim}
 but both entries are considered dependent on each other. This means
-that if you only reference the primary entry (using \idx{gls} etc)
+that if you only reference the primary entry (using \ics{gls} etc)
 then the dual entry will still be selected if the \csopt{selection}
 setting includes dependencies.
 
@@ -2566,7 +2576,7 @@ are abbreviations) when you aren't using \csopt[combine]{dual-sort}
 abbreviations).
 
 Remember that \bibgls\ is designed to take advantage of
-\idx{printunsrtglossary}, which simply iterates over all defined
+\ics{printunsrtglossary}, which simply iterates over all defined
 entries in the order in which they were defined (or, more precisely,
 the order of the internal list of entry labels associated with that
 glossary). The aim of \bibgls\ is to write the entry definitions to
@@ -2630,7 +2640,7 @@ sorted together, resulting in the order:
 \code{dual.xml},
 \code{zebra}.
 
-The \LaTeX\ code written to the \ext{glstex} file is essentially
+The \LaTeX\ code written to the \iext{glstex} file is essentially
 (but not exactly):
 \begin{verbatim}
 % from @index{aardvark}:
@@ -3149,9 +3159,9 @@ essentially does
 \newcommand{\idxpl}[2][]{\glspl[hyper=false,#1]{idx.#2}}
 \newcommand{\Idxpl}[2][]{\Glspl[hyper=false,#1]{idx.#2}}
 \end{verbatim}
-but the new commands will also recognise the \idx{gls} modifiers, so
+but the new commands will also recognise the \ics{gls} modifiers, so
 \verb|\idx+| will behave like \verb|\gls+| which wouldn't be
-possible if \csfmt{idx} was defined using \idx{newcommand} in the
+possible if \csfmt{idx} was defined using \ics{newcommand} in the
 above manner.
 
 I've also redefined \csref{bibglsnewdualindexsymbolsecondary} to put
@@ -3162,9 +3172,9 @@ the \code{symbols} glossary (which is created with the
 
 This command also sets the \field{category}
 to \code{symbol}, so I can redefine the post-description hook
-for symbols (\idx{glsxtrpostdescsymbol}) to automatically index 
+for symbols (\ics{glsxtrpostdescsymbol}) to automatically index 
 the symbol definition. Similarly for the \code{general}
-post-description hook \idx{glsxtrpostdescgeneral}. 
+post-description hook \ics{glsxtrpostdescgeneral}. 
 
 Since the post-description hook isn't done until the glossary has
 been created, this requires a slightly longer build process. If the
@@ -3354,15 +3364,15 @@ The required fields are: \field{short}, \field{long},
 This includes some new fields: \field{dualshort},
 \field{dualshortplural}, \field{duallong} and
 \field{duallongplural}. If these aren't already defined, they
-will be provided in the \ext{glstex} file with
+will be provided in the \iext{glstex} file with
 \begin{alltt}
-\idx{glsxtrprovidestoragekey}\margm{key}\marg{}\marg{}
+\ics{glsxtrprovidestoragekey}\margm{key}\marg{}\marg{}
 \end{alltt}
 This command is defined by the \styfmt{glossaries-extra} package.
 Note that this use with an empty third argument prevents
 the creation of a field access command (analogous to
-\idx{glsentrytext}). You can fetch the value with
-\idx{glsxtrusefield}.  (See the \styfmt{glossaries-extra} manual for
+\ics{glsentrytext}). You can fetch the value with
+\ics{glsxtrusefield}.  (See the \styfmt{glossaries-extra} manual for
 further details.) Remember that the field won't be
 available until the \ext{glstex} file has been created.
 
@@ -3383,7 +3393,7 @@ hook.
 
 For example, if the entries all have the \field{category} set
 to \optfmt{abbreviation}, then this requires redefining
-\idx{glsxtrpostdescabbreviation}.
+\ics{glsxtrpostdescabbreviation}.
 
 Here's an example dual abbreviation for a document where English is
 the primary language and German is the secondary language:
@@ -3450,7 +3460,7 @@ English: \gls{rna}; \gls{rna}.
 German: \gls{de.rna}; \gls{de.rna}.
 \end{verbatim}
 Another variation is to use the \abbrstyle{long-short-user}
-abbreviation style and modify the associated \idx{glsxtruserfield} so that
+abbreviation style and modify the associated \ics{glsxtruserfield} so that
 the \field{duallong} field is selected for the parenthetical
 material:
 \begin{verbatim}
@@ -3644,7 +3654,7 @@ The last two are actually defined using one command:
   {a markup language for creating web pages}% description
 \end{verbatim}
 The \csref{bibglsnewtertiaryindexabbreviationentrysecondary}
-command is provided in the \ext{glstex} file as:
+command is provided in the \iext{glstex} file as:
 \begin{verbatim}
 \providecommand{\bibglsnewtertiaryindexabbreviationentrysecondary}[8]{%
   \newabbreviation[#3]{#1}{#6}{#7}%
@@ -3663,18 +3673,18 @@ way the entries are sorted and on the \csopt{dual-sort} setting.
 \chapter{Resource File Options}
 \label{sec:resourceopts}
 
-Make sure that you use \sty{glossaries-extra} with the
+Make sure that you use \isty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
-up the required information from the \ext{aux} file. It also
+up the required information from the \iext{aux} file. It also
 switches on the \styopt[none]{sort} package option (if you have a new
-enough version of the base \sty{glossaries} package), which means
+enough version of the base \isty{glossaries} package), which means
 that there's no attempt to assign or process the \field{sort} key if
 it's omitted from \gls{newglossaryentry} (or similar commands). The
 \field{sort} key will be provided by \bibgls\ for informational
 purposes, but there's no need for \LaTeX\ to write it to any
 external files.
 
-The \ext{glstex} resource files created by \bibgls\ are loaded in
+The \iext{glstex} resource files created by \bibgls\ are loaded in
 the document using
 \nosecformatdef{glsxtrresourcefile}
 where \meta{filename} is the name of the resource file without the
@@ -3685,15 +3695,15 @@ would attempt to input the same \ext{glstex} file multiple times.
 \bibgls\ checks for non-unique file names.
 
 There's a shortcut command that uses
-\idx{jobname} in the \meta{filename}:
+\ics{jobname} in the \meta{filename}:
 \nosecformatdef{GlsXtrLoadResources}
 The first instance of this command is equivalent to
 \begin{alltt}
-\gls{glsxtrresourcefile}\oargm{options}\marg{\idx{jobname}}
+\gls{glsxtrresourcefile}\oargm{options}\marg{\ics{jobname}}
 \end{alltt}
 Any additional use of \gls{GlsXtrLoadResources} is equivalent to
 \begin{alltt}
-\gls{glsxtrresourcefile}\oargm{options}\marg{\idx{jobname}-\meta{n}}
+\gls{glsxtrresourcefile}\oargm{options}\marg{\ics{jobname}-\meta{n}}
 \end{alltt}
 where \meta{n} is number. For example:
 \begin{verbatim}
@@ -3766,10 +3776,10 @@ will result in the list: aardvark, duck, zebra, bee, caterpillar,
 wombat. The first three (aardvark, duck, zebra) are defined when 
 \csfmt{jobname}\filefmt{.glstex} is read. The second three (bee,
 caterpillar, wombat) are defined when \csfmt{jobname}\filefmt{-1.glstex}
-is read. Since \idx{printunsrtglossary} simply iterates over all
+is read. Since \ics{printunsrtglossary} simply iterates over all
 defined entries, this is the ordering used.
 
-Note \bibgls\ allows \ext{bib} files that don't provide any entries.
+Note \bibgls\ allows \iext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentry{preamble}.
 For example, suppose I have \filefmt{defs.bib} that just contains
 \begin{verbatim}
@@ -3833,7 +3843,7 @@ which places \qt{\textbf{\color{red}example (stuff)}} between
 \qt{sample} and \qt{test}, which is again incorrect.
 
 The best thing to do in this situation is to split the provided
-commands into two \ext{bib} files: one that shouldn't be interpreted
+commands into two \iext{bib} files: one that shouldn't be interpreted
 and one that should.
 
 For example, \filefmt{defs-nointerpret.bib}:
@@ -3848,7 +3858,7 @@ Now the first one can be loaded with \csopt[false]{interpret-preamble}:
 \begin{verbatim}
 \GlsXtrLoadResources[src={defs-nointerpret},interpret-preamble=false]
 \end{verbatim}
-This creates a \ext{glstex} file that provides \csfmt{strong} but
+This creates a \iext{glstex} file that provides \csfmt{strong} but
 doesn't define any entries. The other file \filefmt{defs-interpret.bib} can
 then be loaded with the default \csopt[true]{interpret-preamble}:
 \begin{verbatim}
@@ -3861,7 +3871,7 @@ also do:
 \GlsXtrLoadResources[src={entries}]
 \end{verbatim}
 The \emph{contents} of \atentry{preamble} are only written to the
-associated \ext{glstex} file, but the definitions contained within
+associated \iext{glstex} file, but the definitions contained within
 the \atentry{preamble} are retained by the interpreter for subsequent
 resource sets.
 
@@ -3870,7 +3880,7 @@ resource sets.
 
 \optsection{charset}
 
-If the character encoding hasn't been supplied in the \ext{bib} file
+If the character \idx{encoding} hasn't been supplied in the \iext{bib} file
 with the encoding comment
 \begin{alltt}
 \% Encoding: \meta{encoding-name}
@@ -3888,7 +3898,7 @@ file.
 This is a boolean option that determines whether or not the
 interpreter should parse the contents of \atentry{preamble}.
 The default is \optfmt{true}. If \optfmt{false}, the preamble
-contents will still be written to the \ext{glstex} file, but any
+contents will still be written to the \iext{glstex} file, but any
 commands provided in the preamble won't be recognised if the
 interpreter is needed to determine an entry's sort value.
 
@@ -3896,15 +3906,27 @@ interpreter is needed to determine an entry's sort value.
 
 The \glostyle{alttree} glossary style needs to know the widest
 \field{name} (for each level, if hierarchical). This can
-be set using \idx{glssetwidest} provided by the \styfmt{glossaries}
+be set using \ics{glssetwidest} provided by the \styfmt{glossaries}
 package, but this requires knowing which name is the widest.
 
 The boolean option \csopt[true]{set-widest} will try to calculate
 the widest names for each hierarchical level. Since it doesn't know
 the fonts that will be used in the document or if there are any
 non-standard commands that aren't provided in the \ext{bib} files
-preamble, this option may not work. The transcript file will 
-include the message
+preamble, this option may not work. For example, if one entry has
+the \field{name} defined as
+\begin{verbatim}
+name={some {\Huge huge} text}
+\end{verbatim}
+and another entry has the \field{name} defined as
+\begin{verbatim}
+name={some {\small small} text}
+\end{verbatim}
+then \bibgls\ will determine that the second name is the widest
+although the first will actually be wider when it's rendered in the
+document. 
+
+When using this option, the transcript file will include the message
 \begin{alltt}
 Calculated width of '\meta{text}': \meta{number}
 \end{alltt}
@@ -3915,20 +3937,20 @@ default serif font. The entry that has the largest \meta{number}
 is the one that will be selected. This will then be implemented
 using:
 \begin{alltt}
-\idx{glssetwidest}\oargm{level}\marg{\idx{glsentryname}\margm{id}}
+\ics{glssetwidest}\oargm{level}\marg{\ics{glsentryname}\margm{id}}
 \end{alltt}
 where \meta{id} is the entry's label. This leaves \TeX\ to
 compute the width according to the document fonts.
 
-If \csopt{type} has been set, the \idx{glssetwidest} command
+If \csopt{type} has been set, the \ics{glssetwidest} command
 will be appended to the glossary preamble for that type, otherwise
 it's simply set in the \ext{glstex} file and may be overridden
 later in the document if required. (Similarly if \csopt{dual-type}
 and \csopt{secondary} have been used.)
 
-Rather than directly using \idx{glssetwidest}, \bibgls\ provides
+Rather than directly using \ics{glssetwidest}, \bibgls\ provides
 \csref{bibglssetwidest} (where the type isn't known) and 
-\gls{bibglssetwidestfortype} (where \idx{glssetwidest} needs to be
+\gls{bibglssetwidestfortype} (where \ics{glssetwidest} needs to be
 appended to the glossary preamble).
 
 Note that if you don't set a separate sort for dual entries with
@@ -4026,7 +4048,7 @@ treats the entry as though it had been defined as:
 
 \optsection{src}
 
-This identifies the \ext{bib} files containing the entry
+This identifies the \iext{bib} files containing the entry
 definitions.  The value should be a comma-separated list of the
 required \ext{bib} files. These may either be in the current working
 directory or in the directory given by the \longarg{dir} switch or on
@@ -4041,8 +4063,8 @@ For example
 \end{verbatim}
 indicates that \bibgls\ must read the files
 \filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
-create the file given by \idx{jobname}\ext{glstex} on the first
-instance or \idx{jobname}\code{-}\meta{n}\ext{glstex} on subsequent
+create the file given by \ics{jobname}\iext{glstex} on the first
+instance or \ics{jobname}\code{-}\meta{n}\ext{glstex} on subsequent
 use.
 
 With \csref{glsxtrresourcefile}\oargm{options}\margm{filename}, if 
@@ -4057,31 +4079,31 @@ indicates that \bibgls\ needs to read the file
 different or if you have multiple \ext{bib} files, you need to use
 the \csopt{src} option.
 
-\gls{GlsXtrLoadResources} uses \idx{jobname} as the argument of 
+\gls{GlsXtrLoadResources} uses \ics{jobname} as the argument of 
 \gls{glsxtrresourcefile} on the first instance, so  
 \begin{verbatim}
 \GlsXtrLoadResources[]
 \end{verbatim}
-will assume \optfmt{src=\idx{jobname}}. Remember that subsequent uses
+will assume \optfmt{src=\ics{jobname}}. Remember that subsequent uses
 of \gls{GlsXtrLoadResources} append a suffix, so in general it's
 best to always supply \csopt{src}.
 
 \optsection{selection}
 
-By default all entries that have records in the \ext{aux} file will
+By default all entries that have records in the \iext{aux} file will
 be selected as well as all their dependent entries. The dependent
 entries that don't have corresponding records on the first \LaTeX\
 run, may need an additional build to ensure their location lists
 are updated.
 
-Remember that on the first \LaTeX\ run the \ext{glstex} files don't
+Remember that on the first \LaTeX\ run the \iext{glstex} files don't
 exist. This means that the entries can't be defined. The
 \styopt{record} package option additionally switches on the
 \styopt[warn]{undefaction} option, which means that you'll only get
 warnings rather than errors when you reference entries in the
-document. This means that you can't use \idx{glsaddall} with
+document. This means that you can't use \ics{glsaddall} with
 \bibgls\ because the glossary lists are empty on the first run, so
-there's nothing for \idx{glsaddall} to iterate over.
+there's nothing for \ics{glsaddall} to iterate over.
 Instead, if you want to add all defined entries, you need to
 instruct \bibgls\ to do this with the \csopt{selection} option. The
 following values are allowed:
@@ -4093,9 +4115,9 @@ add unrecorded entries whose \field{see} or \field{seealso} field refers to a re
 \item \optfmt{recorded no deps}: add all recorded entries but not
 their dependencies. The dependencies include those referenced in the
 \field{see} or \field{seealso} field, \field{parent} entries and those found referenced
-with commands like \idx{gls} in the field values that are parsed by
+with commands like \ics{gls} in the field values that are parsed by
 \bibgls. With this setting, parents will be omitted unless they've
-been referenced in the document through commands like \idx{gls}.
+been referenced in the document through commands like \ics{gls}.
 \item \optfmt{recorded and ancestors}: this is like the previous
 setting but parents are added even if they haven't been referenced
 in the document. The other dependent entries are omitted if they
@@ -4208,7 +4230,7 @@ list consists of patterns for unknown fields it will be
 treated as \csopt[\empty]{match}. That is, no filtering will be
 applied. In the above example, the custom \fieldfmt{topic} key must
 be provided before the first \gls{GlsXtrLoadResources} with
-\idx{glsaddkey} or \idx{glsaddstoragekey}.
+\ics{glsaddkey} or \ics{glsaddstoragekey}.
 
 \optsection{match-op}
 
@@ -4234,8 +4256,9 @@ is to filter the selection. This may be changed to append to the
 selection instead. The \meta{value} may be one of:
 \begin{itemize}
 \item\optfmt{filter}: (default) filter selection;
-\item\optfmt{and}: append any matches (with \csopt{match}) or
+\item\optfmt{add}: append any matches (with \csopt{match}) or
 non-matches (with \csopt{not-match}) to the selection.
+This setting can't be used with \csopt[use]{sort}.
 \end{itemize}
 For example, if I want to select all record entries and their
 dependencies, but I also want to make sure that any entries with
@@ -4244,7 +4267,7 @@ of whether or not they have any records:
 \begin{verbatim}
 \GlsXtrLoadResource[
   src=entries,% data in entries.bib
-  match-action={and},
+  match-action={add},
   match={category=important}
 ]
 \end{verbatim}
@@ -4571,7 +4594,7 @@ if the parent entry doesn't have a location list and the rule isn't
 set to \optfmt{no discard} then the parent entry will be discarded
 after all relevant entries and their dependencies have been
 selected, so any cross-references within the parent entry (such as
-\idx{gls} occurring in the description) may end up being selected
+\ics{gls} occurring in the description) may end up being selected
 even if they wouldn't be selected if the parent entry didn't exist.
 
 With both \optfmt{presort} and \optfmt{postsort},
@@ -4616,7 +4639,7 @@ fields. See \csopt{flatten-lonely} for further details.
 Suppose you have two documents \filefmt{mybook.tex} and
 \filefmt{myarticle.tex} that share a common glossary that's shown
 in \filefmt{mybook.pdf} but not in \filefmt{myarticle.pdf}.
-Furthermore, you'd like to use \sty{hyperref} and be able to click
+Furthermore, you'd like to use \isty{hyperref} and be able to click
 on a term in \filefmt{myarticle.pdf} and be taken to the relevant 
 page in \filefmt{mybook.pdf} where the term is listed in the
 glossary.
@@ -4713,7 +4736,7 @@ Most of the options related to sorting and the glossary format are
 unneeded here since the glossary isn't being displayed. This may be
 sufficient for your needs, but it may be that the book has changed
 various settings that have been written to \filefmt{mybook.glstex}
-but aren't present in the \ext{bib} file (such as
+but aren't present in the \iext{bib} file (such as
 \csopt[uc]{short-case-change}). In this case, you could just remember to copy
 over the settings from \filefmt{mybook.tex} to
 \filefmt{myarticle.tex}, but
@@ -4728,17 +4751,17 @@ the method shown in the example code above.
 \optsection{master}
 
 This option will disable most of the options that relate to
-parsing and processing data contained in \ext{bib} files
+parsing and processing data contained in \iext{bib} files
 (since this option doesn't actually read any \ext{bib} files).
 
 The use of \optfmt{master} isn't always suitable. In particular
 if any of the terms cross-reference each other, such as through
 the \field{see} or \field{seealso} field or the \field{parent} field or
-using commands like \idx{gls} in any of the other fields when
+using commands like \ics{gls} in any of the other fields when
 the labels have been assigned prefixes. In this
 case you will need to use the method described in the example above.
 
-The \meta{name} is the name of the \ext{aux} file for the master
+The \meta{name} is the name of the \iext{aux} file for the master
 document without the extension (in this case, \filefmt{mybook}). It
 needs to be relative to the document referencing it or an absolute
 path using forward slashes as the directory divider. Remember that
@@ -4748,7 +4771,7 @@ relative position.
 
 When \bibgls\ detects the \csopt{master} option, it won't search for
 entries in any \ext{bib} files (for that particular resource set)
-but will create a \ext{glstex} file that inputs the master
+but will create a \iext{glstex} file that inputs the master
 document's
 \ext{glstex} files, but it will additionally temporarily
 adjust the internal commands used to define entries so that
@@ -4758,7 +4781,7 @@ or \csopt{category} options haven't been used, the corresponding
 value will default to \optfmt{master}. The \catattr{targeturl}
 and \catattr{targetname} category attributes will automatically be
 set, and the glossary type will be provided using
-\idx{provideignoredglossary*}\margm{type}.
+\ics{provideignoredglossary*}\margm{type}.
 
 The above \filefmt{myarticle.tex} can be changed to:
 \begin{verbatim}
@@ -4821,13 +4844,13 @@ but the category in the optional argument needs to be correct.
 
 If the master document has multiple resource files
 then by default all that document's
-\ext{glstex} files will be input. If you don't want them all
+\iext{glstex} files will be input. If you don't want them all
 you can use \optfmt{master-resources} to specify
 only those files that should be included. The value \meta{list} is 
 a comma-separated list of names, where each name corresponds
 to the final argument of \csref{glsxtrresourcefile}.
 Remember that \gls{GlsXtrLoadResources} is just a shortcut
-for \gls{glsxtrresourcefile} that bases the name on \idx{jobname}.
+for \gls{glsxtrresourcefile} that bases the name on \ics{jobname}.
 (Note that, as with the argument of \gls{glsxtrresourcefile},
 the \ext{glstex} extension should not be included.) The file
 \primaryresourcefmt\ is considered the primary
@@ -5002,7 +5025,7 @@ For example:
 \GlsXtrLoadResources[src={entries-symbols},type=symbols]
 \end{verbatim}
 
-Remember that you can use \idx{newglossary*}
+Remember that you can use \ics{newglossary*}
 if you don't want to worry about the extensions needed by
 \idx!{makeindex} or \idx!{xindy}. For example:
 \begin{verbatim}
@@ -5015,8 +5038,27 @@ if you don't want to worry about the extensions needed by
 (The \styopt{nomain} option was added to suppress the
 creation of the default \code{main} glossary.)
 
-Alternatively you can use \idx{newignoredglossary} if you don't
-want the glossary picked up by \idx{printunsrtglossaries}.
+Alternatively you can use \ics{newignoredglossary} if you don't
+want the glossary picked up by \ics{printunsrtglossaries}.
+
+\optsection{trigger-type}
+
+The record counting commands, such as \ics{rgls}, use the special
+format \ics{glstriggerrecordformat}, which \bibgls\ also treats
+as an ignored location. This means the entry will still be
+identified as having a record for selection purposes, which is
+necessary for the entry to be defined for use in the document, but
+in order to prevent it from appearing in the glossary you need to
+transfer the entry with \csopt[\meta{type}]{trigger-type}.
+This will override the \csopt{type}, \csopt{dual-type},
+\csopt{tertiary-type} and the type specification in
+\csopt{secondary}.
+
+The provided value \meta{type} must be a glossary label (not one of
+the keywords allowed by \csopt{type}).
+You can define the glossary before loading the resource, but
+it's not required as \bibgls\ will write
+\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file.
 
 \optsection{counter}
 
@@ -5077,11 +5119,11 @@ it's as though the entries had been defined as:
 \end{verbatim}
 
 Remember to use this prefix when you reference the terms in the
-document with commands like \idx{gls}.
+document with commands like \ics{gls}.
 
 \optsection{ext-prefixes}
 
-Any cross-references in the \ext{bib} file that start with
+Any cross-references in the \iext{bib} file that start with
 \idprefix{extn} (where \meta{n} is a positive integer) will be 
 substituted with the \meta{n}th tag listed in the comma-separated
 \meta{list}. If there aren't that many items in the list, the
@@ -5181,27 +5223,27 @@ values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
 \item \optfmt{lc}: convert to lower case (ignoring 
-\code{\$\meta{maths}\$}, \idx{ensuremath}\margm{maths} 
-and \idx{si}\margm{text});
+\code{\$\meta{maths}\$}, \ics{ensuremath}\margm{maths} 
+and \ics{si}\margm{text});
 \item \optfmt{uc}: convert to upper case (ignoring 
-\code{\$\meta{maths}\$}, \idx{ensuremath}\margm{maths} 
-and \idx{si}\margm{text});
+\code{\$\meta{maths}\$}, \ics{ensuremath}\margm{maths} 
+and \ics{si}\margm{text});
 \item \optfmt{lc-cs}: convert to lower case using
-\idx{MakeTextLowercase};
+\ics{MakeTextLowercase};
 \item \optfmt{uc-cs}: convert to upper case using
-\idx{MakeTextUppercase};
+\ics{MakeTextUppercase};
 \item \optfmt{firstuc-cs}: convert to first letter upper case using
-\idx{makefirstuc};
+\ics{makefirstuc};
 \item \optfmt{firstuc}: convert the first alphabetical letter (or
 group) to upper case. This uses the following rules:
 \begin{enumerate}
 \item if \code{\$\meta{maths}\$} then stop (no case change);
-\item if \idx{NoCaseChange}\margm{text} or
-\idx{ensuremath}\margm{maths} or \idx{si}\margm{text} or \idx{protect} then skip;
+\item if \ics{NoCaseChange}\margm{text} or
+\ics{ensuremath}\margm{maths} or \ics{si}\margm{text} or \ics{protect} then skip;
 \item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
 \meta{text} and stop;
 \item if \csfmt{}\meta{csname} isn't followed by a group (and it's
-not \idx{protect}), then stop (no case change applied);
+not \ics{protect}), then stop (no case change applied);
 \item if \margm{text} (a group) then convert the entire contents of
 \meta{text} to upper case and stop;
 \item if \meta{character} is an alphabetic character then change it
@@ -5264,7 +5306,7 @@ value would be converted to
 If the interpreter is used during sorting, the sort value will be set to 
 \code{Z\AE\OE}.
 
-You can use \idx{NoCaseChange}\margm{text} to prevent the given \meta{text}
+You can use \ics{NoCaseChange}\margm{text} to prevent the given \meta{text}
 from having the case changed. For example, if the \field{short}
 field is defined as
 \begin{verbatim}
@@ -5274,7 +5316,7 @@ then with  \csopt[uc]{short-case-change}, this would be converted to
 \begin{verbatim}
 A\NoCaseChange{bc}D
 \end{verbatim}
-(This command is provided by \sty{textcase}, which is automatically
+(This command is provided by \isty{textcase}, which is automatically
 loaded by \styfmt{glossaries}.)
 
 If you have a command that takes a label or identifier as an argument then it's
@@ -5304,7 +5346,7 @@ short={{ht}ml}
 \end{verbatim}
 would end up as \code{HTml} since it detects the grouping. 
 (You'll need to do this for the Dutch digraph \qt{ij}.)
-Note that \idx{NoCaseChange} is skipped, and the case change is
+Note that \ics{NoCaseChange} is skipped, and the case change is
 applied to the material following its argument. For example,
 suppose the \field{short} field is defined as:
 \begin{verbatim}
@@ -5320,7 +5362,7 @@ short={{}html}
 \end{verbatim}
 then the result is just \code{html}. If a command is followed by 
 a group then the case change is applied to the group (unless the
-command is \idx{NoCaseChange}, \idx{ensuremath} or \idx{si}). For
+command is \ics{NoCaseChange}, \ics{ensuremath} or \ics{si}). For
 example,
 suppose the \field{short} field is defined as:
 \begin{verbatim}
@@ -5330,7 +5372,7 @@ then the result is
 \begin{verbatim}
 \emph{Ht}ml
 \end{verbatim}
-If a command isn't followed by a group (and it's not \idx{protect})
+If a command isn't followed by a group (and it's not \ics{protect})
 then no change occurs. For example, 
 suppose the \field{short} field is defined as:
 \begin{verbatim}
@@ -5393,7 +5435,7 @@ each entry will be assigned a field called \field{childcount} with
 the value equal to the number of child entries that have been
 selected.
 
-The assignment is done using \idx{GlsXtrSetField} so there's
+The assignment is done using \ics{GlsXtrSetField} so there's
 no associated key.
 For example, suppose \filefmt{entries.bib} contains:
 \begin{verbatim}
@@ -5451,10 +5493,10 @@ in parentheses:
   {}%
 }
 \end{verbatim}
-(\idx{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
-It's slightly more efficient that \idx{ifglshasfield} provided by
+(\ics{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
+It's slightly more efficient that \ics{ifglshasfield} provided by
 the base \styfmt{glossaries} package, and it doesn't complain if the
-entry or field don't exist, but note that \idx{glsxtrifhasfield}
+entry or field don't exist, but note that \ics{glsxtrifhasfield}
 implicitly scopes its content. Use the starred version to omit the
 grouping.)
 
@@ -5465,17 +5507,17 @@ Some languages, such as English, have a general rule that plurals
 are formed from the singular with a suffix appended. This isn't 
 an absolute rule. There are plenty of exceptions (for example,
 geese, children, churches, elves, fairies, sheep, mice), so a
-simplistic approach of just doing \code{\idx{gls}\margm{label}[s]}
+simplistic approach of just doing \code{\ics{gls}\margm{label}[s]}
 will sometimes produce inappropriate results, so the \styfmt{glossaries}
 package provides a \field{plural} key with the corresponding command
-\idx{glspl}.
+\ics{glspl}.
 
 In some cases a plural may not make any sense (for example, if the
 term is a verb or symbol), so the \field{plural} key is optional, but to
 make life easier for languages where the majority of plurals can
 simply be formed by appending a suffix to the singular, the
 \styfmt{glossaries} package lets the \field{plural} field default
-to the value of the \field{text} field with \idx{glspluralsuffix}
+to the value of the \field{text} field with \ics{glspluralsuffix}
 appended. This command is defined to be just the letter \qt{s}.
 This means that the majority of terms in such languages don't need to have the
 \field{plural} supplied as well, and you only need to use it for the
@@ -5493,37 +5535,37 @@ sense in the context).
 If these fields are omitted, the \styfmt{glossaries} package follows
 these rules:
 \begin{itemize}
-\item If \field{firstplural} is missing, then \idx{glspluralsuffix}
+\item If \field{firstplural} is missing, then \ics{glspluralsuffix}
 is appended to the \field{first} field, if that field has been
 supplied. If the \field{first} field hasn't been supplied but the
 \field{plural} field has been supplied, then the \field{firstplural}
 field defaults to the \field{plural} field. If the \field{plural}
 field hasn't been supplied, then both the \field{plural} and
 \field{firstplural} fields default to the \field{text} field (or
-\field{name}, if no \field{text} field) with \idx{glspluralsuffix}
+\field{name}, if no \field{text} field) with \ics{glspluralsuffix}
 appended.
 
 \item If the \field{longplural} field is missing, then 
-\idx{glspluralsuffix} is appended to the \field{long} field, if the
+\ics{glspluralsuffix} is appended to the \field{long} field, if the
 \field{long} field has been supplied.
 
 \item If the \field{shortplural} field is missing then, \emph{with
-the base \styfmt{glossaries} acronym mechanism}, \idx{acrpluralsuffix}
+the base \styfmt{glossaries} acronym mechanism}, \ics{acrpluralsuffix}
 is appended to the \field{short} field.
 
 \end{itemize}
 
-The last case is different with the \sty{glossaries-extra} extension 
+The last case is different with the \isty{glossaries-extra} extension 
 package. The \field{shortplural} field defaults to the \field{short}
-field with \idx{abbrvpluralsuffix} appended \emph{unless overridden
+field with \ics{abbrvpluralsuffix} appended \emph{unless overridden
 by category attributes}. This suffix command is set by the
 abbreviation styles. This means that every time an abbreviation
-style is implemented, \idx{abbrvpluralsuffix} is redefined. Most
+style is implemented, \ics{abbrvpluralsuffix} is redefined. Most
 styles simply define this command as:
 \begin{verbatim}
 \renewcommand*{\abbrvpluralsuffix}{\glsxtrabbrvpluralsuffix}
 \end{verbatim}
-where \idx{glsxtrabbrvpluralsuffix} expands to \idx{glspluralsuffix}.
+where \ics{glsxtrabbrvpluralsuffix} expands to \ics{glspluralsuffix}.
 The \qt{sc} styles (such as \abbrstyle{long-short-sc}) use a different
 definition:
 \begin{verbatim}
@@ -5534,9 +5576,9 @@ counter-acting the affect of the small-caps font.
 
 This means that if you want to change or strip the suffix used for
 the plural short form, it's usually not sufficient to redefine
-\idx{abbrvpluralsuffix}, as the change will be undone the next time
+\ics{abbrvpluralsuffix}, as the change will be undone the next time
 the style is applied. Instead, for a document-wide solution, you
-need to redefine \idx{glsxtrabbrvpluralsuffix}. Alternatively you can
+need to redefine \ics{glsxtrabbrvpluralsuffix}. Alternatively you can
 use the category attributes.
 
 There are two attributes that affect the short plural suffix
@@ -5544,7 +5586,7 @@ formation. The first is \catattr{aposplural} which uses the suffix
 \begin{verbatim}
 '\abbrvpluralsuffix
 \end{verbatim}
-That is, an apostrophe followed by \idx{abbrvpluralsuffix} is
+That is, an apostrophe followed by \ics{abbrvpluralsuffix} is
 appended. The second attribute is \catattr{noshortplural} which
 suppresses the suffix and simply sets \field{shortplural} to the
 same as \field{short}.
@@ -5587,41 +5629,40 @@ If the \meta{value} is omitted or empty, the suffix is set to empty.
 
 The \styopt{record} package option automatically adds two new keys: 
 \field{loclist} and \field{location}. These two fields are set by
-\bibgls\ from the information supplied in the \ext{aux} file (unless
+\bibgls\ from the information supplied in the \iext{aux} file (unless
 the option \csopt[false]{save-locations} is used). The
-\field{loclist} field has the syntax of an \sty{etoolbox} internal list
+\field{loclist} field has the syntax of an \isty{etoolbox} internal list
 and includes every location (except for the discarded duplicates and
 ignored formats).
 Each item in the list is provided in the form
 \begin{alltt}
-\idx{glsseeformat}\oargm{tag}\margm{label list}\marg{}
+\ics{glsseeformat}\oargm{tag}\margm{label list}\marg{}
 \end{alltt}
 for the cross-reference supplied by the \field{see} field,
 \begin{alltt}
-\idx{glsxtruseseealsoformat}\margm{label list}
+\ics{glsxtruseseealsoformat}\margm{label list}
 \end{alltt}
 for the cross-reference supplied by the \field{seealso} field,
 and
 \nosecdef{glsnoidxdisplayloc}
 for the locations. You can iterate through the \field{loclist} value
 using one of \sty{etoolbox}'s internal list loops (either
-by first fetching the list using \idx{glsfieldfetch}
-or through \styfmt{glossaries-extra}'s \idx{glsxtrfielddolistloop}
-or \idx{glsxtrfieldforlistloop} shortcuts).
+by first fetching the list using \ics{glsfieldfetch}
+or through \styfmt{glossaries-extra}'s \ics{glsxtrfielddolistloop}
+or \ics{glsxtrfieldforlistloop} shortcuts).
 
 The \meta{format} is that supplied by the \glsopt{format} key
-when using commands like \idx{gls} or \idx{glsadd} (the encapsulator or encap in
+when using commands like \ics{gls} or \ics{glsadd} (the encapsulator or encap in
 \idx!{makeindex} parlance). If omitted, the default
 \glsopt[glsnumberformat]{format} is assumed (unless this
-default value is changed with \idx{GlsXtrSetDefaultNumberFormat},
-provided by \sty{glossaries-extra} v1.19+).
+default value is changed with \ics{GlsXtrSetDefaultNumberFormat}.
 
 Ranges can be explicitly formed using the parenthetical encap
 syntax \glsopt[(]{format} and
 \glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
 \glsopt[)\meta{csname}]{format} (where \meta{csname} is the name of 
 a text-block command without the initial backslash) in the optional
-argument of commands like \idx{gls} or \idx{glsadd}. These will always
+argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be
 encapsulated by \csref{bibglsrange}. (This command is not used with
 ranges that are formed by collating consecutive locations.)
@@ -5642,7 +5683,7 @@ location list would then be 1, \textbf{3}, 2--4.
 
 The special format \glsaddopt[glsignore]{format} is provided
 by the \styfmt{glossaries} package for cases where the location
-should be ignored. (The command \idx{glsignore} simply ignores its
+should be ignored. (The command \ics{glsignore} simply ignores its
 argument.) This works reasonably well if an entry only has the one
 location, but if the entry happens to be indexed again, it can lead
 to an odd empty gap in the location list with a spurious comma. If
@@ -5652,7 +5693,7 @@ will be selected but the record will be discarded.
 This means that the location list will be empty if the entry was
 only indexed with \optfmt{glsignore}, but if the entry was also
 indexed with another format then the location list won't include the
-ignored record.  (This format is used by \idx{glsaddallunused} but
+ignored record.  (This format is used by \ics{glsaddallunused} but
 remember that iterative commands like this don't work with \bibgls.
 Instead, just use \csopt[all]{selection} to select all entries.)
 
@@ -5684,8 +5725,12 @@ Note that explicit range formations aren't discarded, so if
 \glsadd[format=)glsignore]{sample} 
 \end{verbatim}
 then the range will be included in the location list (encapsulated
-with \idx{glsignore}), but this case would be a rather odd use of
+with \ics{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
+
+The record counting commands, such as \ics{rgls}, use the special
+format \ics{glstriggerrecordformat}, which \bibgls\ also treats
+as an ignored location.
 
 The locations are always listed in the order in which they were indexed,
 (except for the cross-reference which may be placed at the start or
@@ -5698,23 +5743,23 @@ although it may not be able to work out an integer representation.
 to remember to add the appropriate code to the custom module.)
 
 It's possible to define a custom glossary style where 
-\idx{glossentry} (and the child form \idx{subglossentry}) ignore the
+\ics{glossentry} (and the child form \ics{subglossentry}) ignore the
 final argument (which will be the \field{location} field)
 and instead parse the \field{loclist} field and re-order the
 locations or process them in some other way. Remember that you can
-also use \idx{glsnoidxloclist}
+also use \ics{glsnoidxloclist}
 provided by \styfmt{glossaries}. For example:
 \begin{verbatim}
 \glsfieldfetch{gls.sample}{loclist}{\loclist}% fetch location list
 \glsnoidxloclist{\loclist}% iterate over locations
 \end{verbatim}
-This uses \idx{glsnoidxloclisthandler} as the list's handler
-macro, which simply displays each location separated by \idx{delimN}.
+This uses \ics{glsnoidxloclisthandler} as the list's handler
+macro, which simply displays each location separated by \ics{delimN}.
 (See also
 \href{http://www.dickimaw-books.com/latex/admin/html/foreachtips.shtml}{Iteration
 Tips and Tricks}.)
 
-Each location is listed in the \ext{aux} file in the form:
+Each location is listed in the \iext{aux} file in the form:
 \nosecdef{glsxtr@record}
 Exact duplicates are discarded. For example, if \code{cat}
 is indexed twice on page 1:
@@ -5756,13 +5801,13 @@ warning.
 
 The \field{location} field is used to store the formatted location
 list. The code for this list is generated by \bibgls\ based on the
-information provided in the \ext{aux} file, the presence of the
+information provided in the \iext{aux} file, the presence of the
 \field{see} or \field{seealso} field and the various settings described in this
-chapter. When you display the glossary using \idx{printunsrtglossary},
+chapter. When you display the glossary using \ics{printunsrtglossary},
 if the \field{location} field is present it will be displayed
 according to the glossary style (and other factors, such as whether the
 \styopt{nonumberlist} option has been used, either as a package
-option or supplied in the optional argument of \idx{printunsrtglossary}).
+option or supplied in the optional argument of \ics{printunsrtglossary}).
 For more information on adjusting the formatting see the
 \styfmt{glossaries} and \styfmt{glossaries-extra} user manuals.
 
@@ -5783,11 +5828,9 @@ the locations won't be available even if you don't have the
 
 By default, three or more consecutive locations \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
-the range \code{\meta{loc-1}\idx{delimR} \meta{loc-n}} (where
-\idx{delimR} is provided by the \styfmt{glossaries} package). Otherwise
-the locations are separated by \idx{delimN} (again provided by
-\styfmt{glossaries}). As mentioned above, these aren't merged with
-explicit range formations.
+the range \code{\meta{loc-1}\ics{delimR} \meta{loc-n}}. Otherwise
+the locations are separated by \csref{bibglsdelimN}. As mentioned
+above, these aren't merged with explicit range formations.
 
 You can change this with the \csopt{min-loc-range} setting where
 \meta{value} is either \optfmt{none} (don't form ranges) or an
@@ -5988,7 +6031,7 @@ So, for example, the list \qt{1, 2, 3, 5, 7, 8, 10, 11, 12, 58, 59,
 61} becomes
 \qt{1--3, 5, 7, 8, 10--12, 58, 59, 61}.
 
-The automatically indexing of commands like \idx{gls} means that
+The automatically indexing of commands like \ics{gls} means that
 the location lists can become long and ragged. You could
 deal with this by switching off the automatic indexing and
 only explicitly index pertinent use or you can adjust
@@ -6033,7 +6076,7 @@ The default is \csopt[none]{suffixFF}.
 If an entry has a \field{see} field, this can be placed before or
 after the location list, or completely omitted (but the value will
 still be available in the \field{see} field for use with
-\idx{glsxtrusesee}). This option may take the following values:
+\ics{glsxtrusesee}). This option may take the following values:
 \begin{itemize}
 \item \optfmt{omit}: omit the see reference from the location
 list.
@@ -6078,7 +6121,7 @@ Note that with \csopt[transfer]{alias-loc}, both the aliased
 entry and the target entry must be in the same resource set.
 (That is, both entries have been selected by the same instance of
 \csref{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version
-1.12, you may need to redefine \idx{glsxtrsetaliasnoindex} to do
+1.12, you may need to redefine \ics{glsxtrsetaliasnoindex} to do
 nothing if the location lists aren't showing correctly
 with aliased entries. (This was corrected in version 1.13.)
 
@@ -6094,10 +6137,10 @@ of the location lists (default).
 insert \gls{bibglslocprefix}\margm{n} (where \meta{n} is the number of
 locations in the list) at the start of each location list and the
 definition of \gls{bibglslocprefix} will be appended to the glossary
-preamble providing an \idx{ifcase} condition:
+preamble providing an \ics{ifcase} condition:
 \begin{alltt}
 \csfmt{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\%
-  \idx{ifcase}\string#1
+  \ics{ifcase}\string#1
   \csfmt{or} \meta{prefix-1}\csref{bibglspostlocprefix}
   \csfmt{or} \meta{prefix-2}\csfmt{bibglspostlocprefix}
   \ldots
@@ -6109,7 +6152,7 @@ preamble providing an \idx{ifcase} condition:
 \item \optfmt{comma}: 
 essentially equivalent to \csopt[\marg{,~}]{loc-prefix} but
 avoids confusion with the list format. 
-\item \optfmt{list}: equivalent to \csopt[\idx{pagelistname} ]{loc-prefix}.
+\item \optfmt{list}: equivalent to \csopt[\ics{pagelistname} ]{loc-prefix}.
 \item \optfmt{true}: equivalent to 
 \csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
 where the definitions of \gls{bibglspagename} and
@@ -6177,7 +6220,7 @@ location list is completely empty. Also, unlike
 \gls{bibglslocprefix}, this suffix command doesn't have an equivalent
 to \gls{bibglspostlocprefix}.
 
-If \meta{value} omitted, \csopt[\idx{at}.]{loc-suffix} is assumed.
+If \meta{value} omitted, \csopt[\ics{at}.]{loc-suffix} is assumed.
 The default is \csopt[false]{loc-suffix}.
 
 As with \csopt{loc-prefix}, take care not to mix different values
@@ -6185,7 +6228,7 @@ of \csopt{loc-suffix} for entries in the same glossary type.
 
 \optsection{loc-counters}
 
-Commands like \idx{gls} allow you to select a different 
+Commands like \ics{gls} allow you to select a different 
 counter to use for the location for that specific instance
 (overriding the default counter for the entry's glossary type).
 This is done with the \glsopt{counter} option. For example,
@@ -6258,8 +6301,7 @@ This will first list the locations for the \counter{equation}
 counter and then the locations for the \counter{page} counter.
 Each group of locations is encapsulated within the command
 \csref{bibglslocationgroup}\margm{n}\margm{counter}\margm{locations}.
-The groups are separated by \csref{bibglslocationgroupsep}
-(which defaults to \idx{delimN}).
+The groups are separated by \csref{bibglslocationgroupsep}.
 
 The \meta{list} value must be non-empty.  Use
 \csopt[as-use]{loc-counters} to restore the default behaviour, where
@@ -6271,14 +6313,14 @@ you can't form counter groups from
 \section{Supplemental Locations}
 \label{sec:supplementalopts}
 
-\emph{These options require at least version 1.14 of \sty{glossaries-extra}.}
+\emph{These options require at least version 1.14 of \isty{glossaries-extra}.}
 
 \optsection{supplemental-locations}
 
 The \sty{glossaries-extra} package (from v1.14) provides a way of
 manually adding locations in supplemental documents through the use
 of the \glsaddopt{thevalue} option in the optional argument of
-\idx{glsadd}.  Setting values manually is inconvenient and can result
+\ics{glsadd}.  Setting values manually is inconvenient and can result
 in errors, so \bibgls\ provides a way of doing this automatically.
 Both the main document and the supplementary document need to use
 the \styopt{record} option. The entries provided in the \csopt{src}
@@ -6338,7 +6380,7 @@ that uses the \code{sample} entry, but also needs to include the
 location (S1) from the supplementary document. The manual approached
 offered by \styfmt{glossaries-extra} is quite cumbersome and requires
 setting the \catattr{externallocation} attribute and using
-\idx{glsadd} with \glsaddopt[S1]{thevalue}, \glsaddopt[I.S1]{theHvalue}
+\ics{glsadd} with \glsaddopt[S1]{thevalue}, \glsaddopt[I.S1]{theHvalue}
 and \glsaddopt[glsxtrsupphypernumber]{format}.
 
 This can be simplified with \bibgls\ by using the
@@ -6367,7 +6409,7 @@ from the main document and S1 from the supplementary document). Note
 that the original location format from the supplementary document
 will be replaced by \optfmt{glsxtrsupphypernumber}, which will
 produce an external hyperlink if the main document loads the
-\sty{hyperref} package. (Note that not all PDF viewers can handle
+\isty{hyperref} package. (Note that not all PDF viewers can handle
 external hyperlinks, and some that can open the external PDF file may not 
 recognise the destination within that file.)
 
@@ -6381,7 +6423,7 @@ the main document, even though the supplementary document also
 references the \code{goose}, \code{html} and \code{ssi}
 entries. By default, only those entries that are referenced in the
 main document will have supplementary locations added (if found in
-the supplementary document's \ext{aux} file). You can additionally
+the supplementary document's \iext{aux} file). You can additionally
 include other entries that are referenced in the supplementary
 document but not in the main document using
 \optfmt{supplemental-selection}. The \meta{value} may be one of the
@@ -6497,7 +6539,7 @@ which is loaded using
 \end{verbatim}
 This provides the command \csfmt{sortop} for internal use in the
 document. (Remember it won't be defined on the first \LaTeX\ run
-before the \ext{glstex} file has been created.)
+before the \iext{glstex} file has been created.)
 
 Another file, say, \filefmt{interpret-preamble.bib} may provide
 a definition for \bibgls:
@@ -6665,9 +6707,9 @@ random generator can be set using \csopt{shuffle} (which
 also automatically sets \csopt[random]{sort} and \csopt{flatten}).
 
 \item \optfmt{use}: order of use. This order is determined
-by the records written to the \ext{aux} file by the \styopt{record}
+by the records written to the \iext{aux} file by the \styopt{record}
 package option. Dependencies and cross-references (including those
-identified with \idx{glssee}) come after entries with records.
+identified with \ics{glssee}) come after entries with records.
 
 \end{itemize}
 
@@ -6696,7 +6738,7 @@ associated region. Whereas with
 \usepackage[record]{glossaries}
 \GlsXtrLoadResources[src={german-terms}]
 \end{verbatim}
-the language tag will be \code{de-DE-1996} because \sty{tracklang}
+the language tag will be \code{de-DE-1996} because \isty{tracklang}
 has picked up the locale from the document class options. This is
 only likely to cause a difference if a language has different
 sorting rules according to the region or if the language may be
@@ -6731,7 +6773,7 @@ language. This is equivalent to \csopt[\meta{lang tag}]{sort}
 where \meta{lang tag} is the locale associated with the document
 language. In the case of a multi-lingual document, \meta{lang tag}
 is the locale of the last language resource file to be loaded through
-\sty{tracklang}'s interface. It's best to explicitly set the locale
+\isty{tracklang}'s interface. It's best to explicitly set the locale
 for multi-lingual documents to avoid confusion. If no languages have been tracked, this
 option is equivalent to \csopt[locale]{sort}.
 
@@ -7314,7 +7356,7 @@ field will be the \field{name} or the \field{parent} field if the
 If the entry is instead defined with \atentry{abbreviation} (or
 \atentry{acronym}) then if the \field{sort} field is missing,
 \bibgls\ will fallback on the field given by
-\field{abbreviation-sort-fallback}.
+\csopt{abbreviation-sort-fallback}.
 
 The \atentry{symbol} and \atentry{number} entry types
 fallback on the label (not the \field{name}) if the \field{sort} is missing.
@@ -7337,7 +7379,7 @@ must be provided with \optfmt{sort-rule}. In this case
 the collation is performed using Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/RuleBasedCollator.html}{RuleBasedCollator}
 class. Remember that the options will be expanded as they
-are written to the \ext{aux} file, so be careful of
+are written to the \iext{aux} file, so be careful of
 any special characters that occur in the rule. For the 
 special characters \verb|#| \verb|%| \verb|_| \verb|&| \verb|{|
 and \verb|}| you can use \verb|\#|, \verb|\%|, \verb|\_|, \verb|\&|,
@@ -7345,7 +7387,7 @@ and \verb|}| you can use \verb|\#|, \verb|\%|, \verb|\_|, \verb|\&|,
 and \verb|\}|. These will be written to the \ext{aux} file
 with the leading backslash, but \bibgls\ will remove it for this
 resource option. Remember that the \styfmt{glossaries} package provides
-\idx{glsbackslash}, \idx{glsquote} and \idx{glstildechar} which can be
+\ics{glsbackslash}, \ics{glsquote} and \ics{glstildechar} which can be
 used to produce a literal backslash (\verb|\|), double-quote
 (\verb|"|) and tilde (\verb|~|).
 
@@ -7364,13 +7406,13 @@ code) to represent a Unicode character. For example:
    < \string\u00E6,\string\u00C6}
 ]
 \end{verbatim}
-It's best to use \idx{cs.string} rather than \idx{protect} to avoid
+It's best to use \ics{cs.string} rather than \ics{protect} to avoid
 unwanted spaces interfering with \meta{hex}. Note that
-\sty{glossaries-extra} v1.21 provides \idx{glshex}
+\sty{glossaries-extra} v1.21+ provides \ics{glshex}
 which just does \stringu\ so you can do
 \verb|\glshex 00E6| instead of \verb|\string\u00E6|.
 This is only one character different, but you can redefine
-\idx{glsxtrresourceinit} to locally set \idx{u} to \idx{glshex} while
+\ics{glsxtrresourceinit} to locally set \ics{u} to \ics{glshex} while
 the protected write is performed. For example:
 \begin{verbatim}
 \renewcommand*{\glsxtrresourceinit}{\let\u\glshex}
@@ -7692,23 +7734,22 @@ first entry to be selected so the ordering switches to:
 
 Remember that you can temporarily switch off the indexing by locally
 setting
-\begin{verbatim}
-\GlsXtrSetDefaultGlsOpts{noindex}
-\end{verbatim}
-(requires at least version 1.21 of \sty{glossaries-extra}).
+\begin{alltt}
+\ics{GlsXtrSetDefaultGlsOpts}\marg{noindex}
+\end{alltt}
 Since the glossary preamble is scoped, you can simply do
 \begin{verbatim}
 \appto\glossarypreamble{\GlsXtrSetDefaultGlsOpts{noindex}}
 \end{verbatim}
 to switch off the indexing within the glossary (or use
-\idx{apptoglossarypreamble}). Note that this is
+\ics{apptoglossarypreamble}). Note that this is
 different to using
-\begin{verbatim}
-\GlsXtrSetDefaultNumberFormat{glsignore}
-\end{verbatim}
+\begin{alltt}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\end{alltt}
 which creates an ignored record. Even though the record is ignored
 (and so won't show in the location list) the record still influences
-the selection order.
+the selection order and the record count.
 
 \optsection{sort-suffix-marker}
 
@@ -7716,14 +7757,13 @@ This automatically implements the dual and secondary settings
 \csopt[\meta{value}]{dual-sort-suffix-marker} and
 \csopt[\meta{value}]{secondary-sort-suffix-marker}.
 
-
 If a suffix is appended to the sort value (see above) then it will
 be separated by the suffix marker, which can be set with
 \csopt[\meta{value}]{sort-suffix-marker} where \meta{value} is the
 marker. By default the marker is empty. You can use \stringu\meta{hex}
 to indicate Unicode characters outside the ASCII range.
 If, for some reason, you want to use a special character, such as
-\verb|#|, you will need to precede it with \idx{cs.string} (for example
+\verb|#|, you will need to precede it with \ics{cs.string} (for example
 \verb|\string#|). If you use \verb|\#| it will be treated as a
 literal string containing a backslash followed by a hash character.
 
@@ -7922,8 +7962,8 @@ The plain \optfmt{space-zero} alternatives are more efficient as
 they just perform a simple substitution.
 
 The \TeX\ parser library used by \bibgls\ recognises the standard
-\LaTeX\ text-mode commands \idx{textsuperscript}\margm{text} and 
-\idx{textsubscript}\margm{text}
+\LaTeX\ text-mode commands \ics{textsuperscript}\margm{text} and 
+\ics{textsubscript}\margm{text}
 and will use the Unicode superscript or subscript characters if they cover every
 character in \meta{text}, otherwise HTML markup is used, but that's
 then stripped by \bibgls. This means that
@@ -8069,7 +8109,7 @@ value contains \verb|\era{AD}| then the custom command will simply be stripped
 leaving \code{AD} which can be matched by \code{G}. 
 
 If the definition is picked up by the interpreter then the field
-value will contain \code{ad} (from \idx{MakeLowercase}) but this can
+value will contain \code{ad} (from \ics{MakeLowercase}) but this can
 be matched by \code{G}, so it isn't a problem.
 However, if the definition of \csfmt{era} is changed so that the era label
 supplied in the argument is converted to something that doesn't
@@ -8151,9 +8191,9 @@ information for the secondary glossary will be stored in the
 internal \field{secondarygroup} field. The \field{group} field will
 contain the group for the primary glossary.
 
-In order to switch fields in \idx{printunsrtglossary}, you need at
+In order to switch fields in \ics{printunsrtglossary}, you need at
 least v1.21 of \sty{glossaries-extra} which provides
-\idx{glsxtrgroupfield} to keep track of the appropriate field label.
+\ics{glsxtrgroupfield} to keep track of the appropriate field label.
 If this command is defined, the preamble for the secondary glossary 
 will be adjusted to locally change the field to
 \field{secondarygroup}. With older versions, the group information
@@ -8161,7 +8201,7 @@ in the secondary glossary will be the same as for the primary
 glossary.
 
 (If the glossary \meta{type} doesn't exist, it will be
-defined with \idx{provideignoredglossary*}\margm{type}.)
+defined with \ics{provideignoredglossary*}\margm{type}.)
 Note that if the glossary already exists and contains entries,
 the existing entries aren't re-ordered. The new entries are
 simply appended to the list.
@@ -8409,7 +8449,7 @@ the resource set, then all the locations are moved to the
 \code{index} glossary. The entries in the \code{main} glossary no
 longer have locations. This is actually preferable for this type
 of document and it's best not to reference the primary (index)
-entries as the hyperlink created by \idx{gls} will point to the
+entries as the hyperlink created by \ics{gls} will point to the
 index, but these entries don't have descriptions, so it's less
 useful than referencing the dual (main) entries as then the
 hyperlink can point to the definition in the \code{main} glossary.
@@ -8513,8 +8553,8 @@ field instead.
 
 \optsection[\subsubsection]{dual-field}
 
-If this option is used, this will add \idx{glsxtrprovidestoragekey}
-to the start of the \ext{glstex} file providing the key given by
+If this option is used, this will add \ics{glsxtrprovidestoragekey}
+to the start of the \iext{glstex} file providing the key given by
 \meta{value}.  Any entries defined using \atentry{dualentry}
 will be written to the \ext{glstex} file with an extra field called
 \meta{value} that is set to the mirror entry. If \meta{value} is
@@ -8552,7 +8592,7 @@ hook could contain:
  {}%
 \end{verbatim}
 Note that this new field won't be available for use within the
-\ext{bib} file (unless it was previously defined in the document
+\iext{bib} file (unless it was previously defined in the document
 before \csref{glsxtrresourcefile}).
 
 \subsection{Dual Sorting}
@@ -8570,7 +8610,7 @@ entries will sorted together according to the \csopt{sort} option.
 If \meta{value} isn't set to \optfmt{combine} then the dual
 entries are sorted separately according to \meta{value} (as per
 \csopt{sort}) and the dual entries will be appended at the end of
-the \ext{glstex} file. The field used by the comparator is given by
+the \iext{glstex} file. The field used by the comparator is given by
 \csopt{dual-sort-field}.
 If \csopt[custom]{dual-sort}, then the dual entries according to the 
 rule provided by \csopt{dual-sort-rule}.
@@ -8813,7 +8853,7 @@ This is like \csopt{dual-entry-map} but applies to both the dual
 This is a boolean setting.
 When used with \atentry{dualentry}, if \meta{boolean} is
 \optfmt{true}, this will wrap the contents of first mapped field
-with \idx{glshyperlink}. If \meta{boolean} is missing \optfmt{true}
+with \ics{glshyperlink}. If \meta{boolean} is missing \optfmt{true}
 is assumed.
 
 The field is obtained from the first mapping
@@ -8936,11 +8976,11 @@ empty the \field{category} is left unchanged.
 \chapter{Provided Commands}
 \label{sec:bibglscs}
 
-When \bibgls\ creates the \ext{glstex} file, it writes some
+When \bibgls\ creates the \iext{glstex} file, it writes some
 definitions for custom commands in the form \csfmt{bibgls...} which
 may be changed as required. The command definitions all use
-\idx{providecommand} which means that you can define the command with
-\idx{newcommand} before the resource file is loaded.
+\ics{providecommand} which means that you can define the command with
+\ics{newcommand} before the resource file is loaded.
 
 \section{Entry Definitions}
 \label{sec:newentrydefs}
@@ -8971,7 +9011,7 @@ file is:
 }
 \end{verbatim}
 This uses the starred form of \gls{longnewglossaryentry} that
-doesn't automatically append \idx{nopostdesc} (which interferes with
+doesn't automatically append \ics{nopostdesc} (which interferes with
 the post-description hooks provided by category attributes).
 
 \cssection{bibglsnewsymbol}
@@ -9027,7 +9067,7 @@ the \field{category} to \code{index} and sets an empty
 \meta{options}.
 
 Note that the \field{description} doesn't include
-\idx{nopostdesc} to allow for the post-description hook used by
+\ics{nopostdesc} to allow for the post-description hook used by
 category attributes.
 
 \cssection{bibglsnewabbreviation}
@@ -9045,7 +9085,7 @@ Since this uses \gls{newabbreviation}, it obeys the
 abbreviation style for its given \field{category} (which may have
 been set in \meta{options}, either from the \field{category} field
 in the \ext{bib} file or through the \csopt{category} option).
-Similarly the \field{type} will obey \idx{glsxtrabbrvtype} unless 
+Similarly the \field{type} will obey \ics{glsxtrabbrvtype} unless 
 the value is supplied in the \ext{bib} file or through the
 \csopt{type} option.
 
@@ -9063,7 +9103,7 @@ file is:
 This works in much the same way as \gls{bibglsnewabbreviation}.
 Remember that with the \styfmt{glossaries-extra} package \gls{newacronym}
 is redefined to just use \gls{newabbreviation} with the default \field{type}
-set to \idx{acronymtype} and the default \field{category} set to
+set to \ics{acronymtype} and the default \field{category} set to
 \code{acronym}.
 
 \cssection{bibglsnewdualentry}
@@ -9178,7 +9218,7 @@ Note that the \field{name} uses
 \nosecformatdef{bibglsuseabbrvfont}
 to format the name, which ensures that it uses the same font as the
 short form for the dual abbreviation. This will use
-\idx{glsuseabbrvfont} if it's defined otherwise it will be defined
+\ics{glsuseabbrvfont} if it's defined otherwise it will be defined
 to replicate that command.
 
 \cssection{bibglsnewdualindexabbreviationsecondary}
@@ -9306,7 +9346,7 @@ file is:
 This works in much the same way as \gls{bibglsnewdualabbreviation}.
 Remember that with the \styfmt{glossaries-extra} package \gls{newacronym}
 is redefined to just use \gls{newabbreviation} with the default \field{type}
-set to \idx{acronymtype} and the default \field{category} set to
+set to \ics{acronymtype} and the default \field{category} set to
 \code{acronym}.
 
 \cssection{bibglsnewtertiaryindexabbreviationentry}
@@ -9348,9 +9388,8 @@ the \meta{long} argument encapsulated by
 \nosecformatdef{bibglsuselongfont}
 to format the name, which ensures that it uses the same font as the
 long form for the dual abbreviation. This will use
-\idx{glsuselongfont} (provided by \sty{glossaries-extra} version
-1.21) if it's defined otherwise it will be defined to replicate that
-command.
+\ics{glsuselongfont} if it's defined otherwise it will be defined to
+replicate that command.
 
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}
@@ -9395,20 +9434,20 @@ lists provided with the \field{seealso} field, if supported.
 \formatdef{bibglsusesee}
 Displays the formatted cross-reference list stored in the
 \field{see} field for the given entry. This just defaults to 
-\idx{glsxtrusesee}\margm{label}.
+\ics{glsxtrusesee}\margm{label}.
 
 \cssection{bibglsuseseealso}
 
 \formatdef{bibglsuseseealso}
 Displays the formatted cross-reference list stored in the
 \field{seealso} field for the given entry. This just defaults to 
-\idx{glsxtruseseealso}\margm{label}.
+\ics{glsxtruseseealso}\margm{label}.
 
 \cssection{bibglsdelimN}
 
 \formatdef{bibglsdelimN}
 Separator between individual locations, except for the last.
-This defaults to \idx{delimN}.
+This defaults to \ics{delimN}.
 
 \cssection{bibglslastDelimN}
 
@@ -9452,7 +9491,7 @@ Explicit ranges formed using \glsopt[(]{format} and
 \glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
 \glsopt[)\meta{csname}]{format} (where \meta{csname} matches and is a
 text-block command without the initial backslash) in the optional
-argument of commands like \idx{gls} or \idx{glsadd} are encapsulated within
+argument of commands like \ics{gls} or \ics{glsadd} are encapsulated within
 the argument of \gls{bibglsrange}. By default this simply does its
 argument. This command is not used with ranges that are formed by collating
 consecutive locations.
@@ -9463,7 +9502,7 @@ consecutive locations.
 If an explicit range conflicts with a record, a warning will be
 issued and the conflicting record will be shifted to the front
 of the range inside the argument of \gls{bibglsinterloper}.
-The default definition just does \meta{location}\idx{delimN}
+The default definition just does \meta{location}\csref{bibglsdelimN}
 so that it fits neatly into the list.
 
 For example, suppose on page~4 of my document I start a range with
@@ -9579,7 +9618,7 @@ definition of \gls{bibglslocsuffix} will be appended to the glossary
 preamble for the given type (or types if there are dual entries).
 
 This commands definition depends on the value provided by
-\csopt{loc-suffix}. For example, with \csopt[\idx{at}.]{loc-suffix}
+\csopt{loc-suffix}. For example, with \csopt[\ics{at}.]{loc-suffix}
 the command is defined as:
 \begin{verbatim}
 \providecommand{\bibglslocsuffix}[1]{\@.}
@@ -9685,7 +9724,7 @@ part of \gls{bibglssupplemental}. The first argument \meta{n}
 
 \formatdef{bibglssupplementalsep}
 The separator between the main location list and the supplementary
-location list. By default this is just \idx{delimN}. This may be
+location list. By default this is just \csref{bibglsdelimN}. This may be
 defined before the resources are loaded:
 \begin{verbatim}
 \newcommand{\bibglssupplementalsep}{; }
@@ -9712,7 +9751,7 @@ group title. If these need their definitions altered, they should
 be defined before the resource file is loaded (rather than redefined
 afterwards).
 
-The base \sty{glossaries} package determines group titles through a fairly
+The base \isty{glossaries} package determines group titles through a fairly
 simplistic rule. Both \idx!{makeindex} and \idx!{xindy} write the
 line
 \nosecformatdef{glsgroupheading}
@@ -9732,7 +9771,7 @@ the simple rule:
 \item if \csfmt{\meta{heading}groupname} exists use that;
 \item otherwise just use \meta{heading}.
 \end{itemize}
-There's no \csfmt{Agroupname} provided, but \idx{glssymbolsgroupname}
+There's no \csfmt{Agroupname} provided, but \ics{glssymbolsgroupname}
 is provided and is supported by the associated language modules,
 such as \styfmt{glossaries-french}. (Similarly for the \qt{Numbers}
 group.)
@@ -9741,7 +9780,7 @@ The glossary styles that provide hyperlinks to the groups (such as
 \glostyle{indexhypergroup}) use \meta{heading} to form the target
 name. A problem arises when active characters occur in
 \meta{heading}, which happens with extended characters and
-\sty{inputenc}.
+\isty{inputenc}.
 
 The \sty{glossaries-extra} package (as from version 1.14) provides
 \nosecformatdef{glsxtrsetgrouptitle}
@@ -9765,13 +9804,13 @@ top-level entry in that group. This can't be done with
 \idx{makeindex}, and with \idx{xindy} it requires a custom language
 module, which isn't a trivial task.
 
-With \bibgls, a different approach is used. The \ext{glstex} file
-created isn't comparable to the \ext{gls} file created by
+With \bibgls, a different approach is used. The \iext{glstex} file
+created isn't comparable to the \iext{gls} file created by
 \idx{makeindex} or \idx{xindy}. There's nowhere for \bibgls\ to
 write the \gls{glsgroupheading} line as it isn't creating the code
 that typesets the glossary list. Instead it's creating the code that
 defines the entries. The actual group heading is inserted by 
-\idx{printunsrtglossary} and it's only able to do this by checking if
+\ics{printunsrtglossary} and it's only able to do this by checking if
 the entry has a \field{group} field and comparing it to the previous
 entry's \field{group} field. 
 
@@ -9871,7 +9910,7 @@ the hyperlink name must be unique.
 
 \formatdef{bibglslettergrouptitle}
 This command is used to determine the letter group title.
-The default definition is \idx{unexpanded}\margm{title}, which guards
+The default definition is \ics{unexpanded}\margm{title}, which guards
 against any expansion issues that may arise with characters outside
 the basic Latin set.
 
@@ -9889,7 +9928,7 @@ the \meta{title} part will be \code{\AA}. In both cases the
 \meta{letter} argument will be \code{\AA}.
 
 Take care if you are using a script that needs encapsulating. For
-example, with the \sty{CJKutf8} package the CJK characters need to
+example, with the \isty{CJKutf8} package the CJK characters need to
 be placed within the \env{CJK} environment, so any letter group
 titles that contain CJK characters will need special attention.
 
@@ -9897,7 +9936,7 @@ For example, suppose the \ext{bib} file contains entries in the
 form:
 \begin{alltt}
 \atentry{dualentry}\marg{\meta{label},
-  name = \marg{\idx{cjkname}\margm{CJK characters}},
+  name = \marg{\ics{cjkname}\margm{CJK characters}},
   description = \margm{English description}
 }
 \end{alltt}
@@ -9925,7 +9964,7 @@ then CJK characters will appear in the \meta{title} argument of
 \gls{bibglslettergrouptitle} which causes a problem because they need
 to be encapsulated within the \env{CJK} environment. This can be more
 conveniently done with the user supplied \csfmt{cjkname}, but the CJK
-characters need to be protected from expansion so \idx{unexpanded} is
+characters need to be protected from expansion so \ics{unexpanded} is
 also needed. The new definition of \gls{bibglslettergrouptitle} needs
 to be defined before \gls{GlsXtrLoadResources}. For example:
 \begin{verbatim}
@@ -9991,7 +10030,7 @@ generate the glossary files.
 
 \formatdef{bibglsothergrouptitle}
 This expands to the group title for symbol groups. This just
-expands to \idx{glssymbolsgroupname} by default.
+expands to \ics{glssymbolsgroupname} by default.
 
 \cssection{bibglssetnumbergrouptitle}
 
@@ -10017,7 +10056,7 @@ This just defaults to \code{glsnumbers}.
 
 The number group title is obtained from:
 \formatdef{bibglsnumbergrouptitle}
-This just defaults to \idx{glsnumbersgroupname}.
+This just defaults to \ics{glsnumbersgroupname}.
 
 \cssection{bibglsdatetimegroup}
 
@@ -10087,7 +10126,7 @@ This command is used for group titles with \optfmt{time} (no date) sorting
 
 \formatdef{bibglshypergroup}
 
-If the \ext{log} file indicates that \sty{hyperref} has been loaded
+If the \iext{log} file indicates that \isty{hyperref} has been loaded
 and the \longarg{group} switch is used, then this command will be
 used to create the navigation information for glossary styles such
 as \glostyle{indexhypergroup}.
@@ -10164,7 +10203,7 @@ label of the parent entry).
 This means that the name simply appears as \qt{glossary}, even if
 the \csopt[postsort]{flatten-lonely} option is used. Note that if
 the parent entry is removed, the parent label won't be of much use.
-You can test for existence using \idx{ifglsentryexists} in case you
+You can test for existence using \ics{ifglsentryexists} in case you
 want to vary the way the name is displayed according to whether or
 not the parent is still present.
 
@@ -10223,7 +10262,7 @@ is defined as:
 \end{verbatim}
 
 
-\chapter{Converting Existing \filefmt{.tex} to \filefmt{.bib}}
+\chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}
 
 If you have already been using the \styfmt{glossaries} or
@@ -10257,7 +10296,7 @@ definitions in your \ext{tex} file have spaces, use this option to
 replace spaces in labels. Each space will be substituted with
 \meta{replacement}. The cross-referencing fields, \field{see},
 \field{seealso} and \field{alias}, will also be adjusted, but any
-references using \idx{gls} etc will have to be substituted manually 
+references using \ics{gls} etc will have to be substituted manually 
 (or use a global search and replace in your text editor).
 If you want to strip the spaces, use an empty string for
 \meta{replacement}. You'll need to delimit this according to your
@@ -10283,7 +10322,7 @@ overly complicated code within the \ext{tex} file. The \TeX\ parser
 library isn't a \TeX\ engine!
 In all cases below, if \meta{\keyvallist} contains
 \begin{alltt}
-see=[\idx{seealsoname}]\margm{label(s)}
+see=[\ics{seealsoname}]\margm{label(s)}
 \end{alltt}
 this will be substituted with 
 \begin{alltt}
@@ -10304,11 +10343,11 @@ v1.16+.)
 
 Additionally, if \meta{\keyvallist} contains
 \begin{alltt}
-type=\marg{\idx{glsdefaulttype}}
+type=\marg{\ics{glsdefaulttype}}
 \end{alltt}
 then this field will be ignored. (This \field{type} value is
 recommended in \meta{\keyvallist} when loading files with
-\idx{loadglsentries}\oargm{type}\margm{file} to allow the optional
+\ics{loadglsentries}\oargm{type}\margm{file} to allow the optional
 argument to set the \field{type}. With \bibgls\ you can use the
 \csopt{type} option instead.)
 
@@ -10323,8 +10362,7 @@ This is converted to:
 }
 \end{alltt}
 
-\idx{newentry} (provided by the \styfmt{glossaries-extra}
-\styopt{shortcuts} option) is recognised as a synonym of \gls{newglossaryentry}.
+\ics{newentry} is recognised as a synonym of \gls{newglossaryentry}.
 
 \cssection[\section]{provideglossaryentry}
 The base \styfmt{glossaries} package provides:
@@ -10350,7 +10388,7 @@ This is converted to:
 
 The starred version provided by the \styfmt{glossaries-extra} package
 is also recognised. The unstarred version strips trailing spaces
-from \meta{description}. (This doesn't add \idx{nopostdesc}, but
+from \meta{description}. (This doesn't add \ics{nopostdesc}, but
 \styfmt{glossaries-extra} defaults to \styopt{nopostdot}.)
 
 \cssection[\section]{longprovideglossaryentry}
@@ -10467,8 +10505,7 @@ in which case it's converted to:
 }
 \end{alltt}
 
-\idx{newsym} (provided by the \styopt{shortcuts} option) is recognised 
-as a synonym for \gls{glsxtrnewsymbol}.
+\ics{newsym} is recognised as a synonym for \gls{glsxtrnewsymbol}.
 
 \cssection[\section]{glsxtrnewnumber}
 
@@ -10496,8 +10533,7 @@ otherwise it's converted to:
 }
 \end{alltt}
 
-\idx{newnum} (provided by the \styopt{shortcuts} option) is
-recognised as a synonym for \gls{glsxtrnewnumber}.
+\ics{newnum} is recognised as a synonym for \gls{glsxtrnewnumber}.
 
 \cssection[\section]{newdualentry}
 
@@ -10510,7 +10546,7 @@ package. Since this command seems to be used quite a bit (given the
 number of times it crops up on sites like
 \href{https://tex.stackexchange.com/}{\TeX\ on StackExchange}), 
 \idx{convertgls2bib} also supports it unless this command is
-defined using \idx{newcommand} or \idx{renewcommand} in the 
+defined using \ics{newcommand} or \ics{renewcommand} in the 
 input file. In which case the default definition will be overridden.
 
 If the command definition isn't overridden, then it's converted to
@@ -10531,7 +10567,7 @@ if \meta{\keyvallist} is supplied, otherwise it's converted to:
 }
 \end{alltt}
 
-For example, if the original \filefmt{.tex} file contains
+For example, if the original \ext{tex} file contains
 \begin{verbatim}
 \newcommand*{\newdualentry}[5][]{%
   \newglossaryentry{main-#2}{name={#4},%
@@ -10547,7 +10583,7 @@ For example, if the original \filefmt{.tex} file contains
   {support vector machine}% long form
   {Statistical pattern recognition technique}% description
 \end{verbatim}
-then the \filefmt{.bib} file will contain
+then the \ext{bib} file will contain
 \begin{verbatim}
 @entry{main-svm,
   name = {support vector machine},
@@ -10560,9 +10596,9 @@ then the \filefmt{.bib} file will contain
   long = {support vector machine}
 }
 \end{verbatim}
-since \gls{newdualentry} was defined with \idx{newcommand}. However,
-if the original file uses \idx{providecommand} or omits the
-definition of \gls{newdualentry}, then the \filefmt{.bib} file will
+since \gls{newdualentry} was defined with \ics{newcommand}. However,
+if the original file uses \ics{providecommand} or omits the
+definition of \gls{newdualentry}, then the \ext{bib} file will
 contain:
 \begin{verbatim}
 @dualabbreviationentry{svm,
@@ -10573,5 +10609,7 @@ contain:
 \end{verbatim}
 
 \resetsecnumdepth
+\printcommandsummary
+
 \printunsrtglossary[type=index]
 \end{document}
