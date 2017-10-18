@@ -216,7 +216,7 @@ public class GlsResource
          }
          else if (opt.equals("match-action"))
          {
-            String val = getChoice(parser, list, opt, "filter", "and");
+            String val = getChoice(parser, list, opt, "filter", "add");
 
             if (val.equals("filter"))
             {
@@ -224,7 +224,7 @@ public class GlsResource
             }
             else
             {
-               matchAction = MATCH_ACTION_AND;
+               matchAction = MATCH_ACTION_ADD;
             }
          }
          else if (opt.equals("match-op"))
@@ -1448,6 +1448,16 @@ public class GlsResource
       {
          bib2gls.warning(
             bib2gls.getMessage("warning.option.clash", "selection=all",
+            "sort=use"));
+
+         sortSettings.setMethod(null);
+      }
+      else if (matchAction == MATCH_ACTION_ADD
+                && sortSettings.isOrderOfRecords())
+      {
+         bib2gls.warning(
+            bib2gls.getMessage("warning.option.clash", 
+            "match-action=add",
             "sort=use"));
 
          sortSettings.setMethod(null);
@@ -3523,7 +3533,7 @@ public class GlsResource
             entries.add(entry);
          }
       }
-      else if (entrySort == null || matchAction == MATCH_ACTION_AND)
+      else if (entrySort == null || matchAction == MATCH_ACTION_ADD)
       {
          // add all entries that have been recorded in the order of
          // definition
@@ -3531,7 +3541,7 @@ public class GlsResource
          for (Bib2GlsEntry entry : data)
          {
             if (entry.hasRecords() ||
-                (matchAction == MATCH_ACTION_AND && fieldPatterns != null
+                (matchAction == MATCH_ACTION_ADD && fieldPatterns != null
                  && !notMatch(entry)))
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
@@ -3861,16 +3871,21 @@ public class GlsResource
 
          bib2gls.writeCommonCommands(writer);
 
+         if (triggerType != null)
+         {
+            writer.format("\\provideignoredglossary*{%s}%n", triggerType);
+         }
+
          if (counters != null)
          {
             writer.println("\\providecommand{\\bibglslocationgroup}[3]{#3}");
-            writer.println("\\providecommand{\\bibglslocationgroupsep}{\\delimN}");
+            writer.println("\\providecommand{\\bibglslocationgroupsep}{\\bibglsdelimN}");
             writer.println();
          }
 
          if (supplementalRecords != null)
          {
-            writer.println("\\providecommand{\\bibglssupplementalsep}{\\delimN}");
+            writer.println("\\providecommand{\\bibglssupplementalsep}{\\bibglsdelimN}");
             writer.println("\\providecommand{\\bibglssupplemental}[2]{#2}");
             writer.println();
          }
@@ -5887,7 +5902,7 @@ public class GlsResource
    private boolean fieldPatternsAnd=true;
 
    private final int MATCH_ACTION_FILTER = 0; 
-   private final int MATCH_ACTION_AND = 1; 
+   private final int MATCH_ACTION_ADD = 1; 
 
    private int matchAction = MATCH_ACTION_FILTER;
 
