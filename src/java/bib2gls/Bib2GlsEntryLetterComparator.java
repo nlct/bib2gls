@@ -24,22 +24,14 @@ import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
-public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
+public class Bib2GlsEntryLetterComparator extends SortComparator
 {
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
     String sortField, String groupField, String entryType)
    {
-      this.sortField = sortField;
-      this.groupField = groupField;
-      this.entryType = entryType;
-      this.bib2gls = bib2gls;
-      this.entries = entries;
-
-      reverse = settings.isReverse();
-      sortSuffixMarker = settings.getSuffixMarker();
-      sortSuffixOption = settings.getSuffixOption();
-      trim = settings.isTrimOn();
+      super(bib2gls, entries, settings, sortField, groupField,
+        entryType);
 
       this.caseStyle = settings.caseStyle();
 
@@ -57,7 +49,7 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       this.caseStyle = caseStyle;
    }
 
-   protected String adjustSort(String sortStr)
+   protected String adjustSort(Bib2GlsEntry entry, String sortStr)
    {
       if (caseStyle == TOLOWER)
       {
@@ -67,77 +59,18 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
       return sortStr;
    }
 
-   private String updateSortValue(Bib2GlsEntry entry, 
+   protected String updateSortValue(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> entries)
    {
+      String value = super.updateSortValue(entry, entries);
+
       String id = entry.getId();
-
-      String value = null;
-
-      if (sortField.equals("id"))
-      {
-         value = id;
-      }
-      else
-      {
-         value = entry.getFieldValue(sortField);
-
-         BibValueList list = entry.getField(sortField);
-
-         if (value == null)
-         {
-            value = entry.getFallbackValue(sortField);
-            list = entry.getFallbackContents(sortField);
-         }
-
-         if (value == null)
-         {
-            value = id;
-
-            bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
-              id));
-         }
-         else if (bib2gls.useInterpreter() && list != null 
-                   && value.matches(".*[\\\\\\$\\{\\}].*"))
-         {  
-            value = bib2gls.interpret(value, list, trim);
-         }
-
-         if (sortSuffixOption != SortSettings.SORT_SUFFIX_NONE)
-         {
-            String suff = sortSuffix(value, entry);
-
-            if (suff != null)
-            {
-               suff = sortSuffixMarker + suff;
-
-               bib2gls.verbose(bib2gls.getMessage("message.sort_suffix",
-                 suff, value, id));
-
-               value += suff;
-            }
-         }
-      }
-
-      value = adjustSort(value);
-
-      entry.putField("sort", value);
 
       String grp = null;
 
       GlsResource resource = bib2gls.getCurrentResource();
 
-      String type = entryType;
-
-      if (type == null)
-      {
-         type = resource.getType(entry);
-
-         if (type == null)
-         {
-            type = "";
-         }
-      }
+      String type = getType(entry);
 
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
@@ -266,32 +199,32 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             }
             else if (Character.isUpperCase(cp1))
             {
-               return reverse ? 1 : -1;
+               return -1;
             }
             else if (Character.isUpperCase(cp2))
             {
-               return reverse ? -1 : 1;
+               return 1;
             }
             else
             {// punctuation
 
                if (cp1 < cp2)
                {
-                  return reverse ? 1 : -1;
+                  return -1;
                }
                else
                {
-                  return reverse ? -1 : 1;
+                  return 1;
                }
             }
          }
          else if (lcp1 < lcp2)
          {
-            return reverse ? 1 : -1;
+            return -1;
          }
          else if (lcp1 > lcp2)
          {
-            return reverse ? -1 : 1;
+            return 1;
          }
       }
       else if (caseStyle == LOWERUPPER)
@@ -307,41 +240,41 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
             }
             else if (Character.isLowerCase(cp1))
             {
-               return reverse ? 1 : -1;
+               return -1;
             }
             else if (Character.isLowerCase(cp2))
             {
-               return reverse ? -1 : 1;
+               return 1;
             }
             else
             {// punctuation
 
                if (cp1 < cp2)
                {
-                  return reverse ? 1 : -1;
+                  return -1;
                }
                else
                {
-                  return reverse ? -1 : 1;
+                  return 1;
                }
             }
          }
          else if (lcp1 < lcp2)
          {
-            return reverse ? 1 : -1;
+            return -1;
          }
          else if (lcp1 > lcp2)
          {
-            return reverse ? -1 : 1;
+            return 1;
          }
       }
       else if (cp1 < cp2)
       {
-         return reverse ? 1 : -1;
+         return -1;
       }
       else if (cp1 > cp2)
       {
-         return reverse ? -1 : 1;
+         return 1;
       }
 
       return 0;
@@ -371,134 +304,17 @@ public class Bib2GlsEntryLetterComparator implements Comparator<Bib2GlsEntry>
          }
       }
 
-      int result = (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
-
-      return reverse ? -result : result;
+      return n1 == n2 ? 0 : (n1 < n2 ? -1 : 1);
    }
 
-   public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
+   protected int compareElements(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
-      if (bib2gls.getCurrentResource().flattenSort())
-      {
-         return compare(entry1.getFieldValue("sort"), 
+      return compare(entry1.getFieldValue("sort"), 
             entry2.getFieldValue("sort"));
-      }
-
-      if (entry1.getId().equals(entry2.getParent()))
-      {
-         // entry1 is the parent of entry2
-         // so entry1 must come before (be less than) entry2
-         // (even with a reverse sort)
-
-         return -1;
-      }
-
-      if (entry2.getId().equals(entry1.getParent()))
-      {
-         // entry2 is the parent of entry1
-         // so entry1 must come after (be greater than) entry2
-         // (even with a reverse sort)
-
-         return 1;
-      }
-
-      int n1 = entry1.getHierarchyCount();
-      int n2 = entry2.getHierarchyCount();
-
-      int n = Integer.min(n1, n2);
-
-      if (n1 == n2 && entry1.getId().equals(entry2.getId()))
-      {
-         return 0;
-      }
-
-      for (int i = 0; i < n; i++)
-      {
-         Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
-         Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
-
-         int result = compare(e1.getFieldValue("sort"), 
-            e2.getFieldValue("sort"));
-
-         if (result != 0)
-         {
-            return result;
-         }
-      }
-
-      if (n1 == n2)
-      {
-         return 0;
-      }
-
-      if (reverse)
-      {
-         return n1 < n2 ? 1 : -1;
-      }
-
-      return n1 < n2 ? -1 : 1;
    }
 
-   private String sortSuffix(String sort, Bib2GlsEntry entry)
-   {
-      if (sortCount == null) return null;
-
-      String parentId = entry.getParent();
-
-      // (see comments for Bib2GlsEntryComparator.sortSuffix)
-
-      String key = (parentId == null ? sort
-                    : String.format("%s\u001f%s", parentId, sort));
-
-      Integer num = sortCount.get(key);
-
-      if (num == null)
-      {
-         sortCount.put(key, Integer.valueOf(0));
-         return null;
-      }
-
-      bib2gls.verbose(bib2gls.getMessage("message.non_unique_sort",
-        sort, entry.getOriginalId()));
-
-      num = Integer.valueOf(num.intValue()+1);
-
-      sortCount.put(key, num);
-
-      return num.toString();
-   }
-
-   public void sortEntries() throws Bib2GlsException
-   {
-      if (sortSuffixOption == SortSettings.SORT_SUFFIX_NON_UNIQUE)
-      {
-         sortCount = new HashMap<String,Integer>();
-      }
-
-      for (Bib2GlsEntry entry : entries)
-      {
-         entry.updateHierarchy(entries);
-         updateSortValue(entry, entries);
-      }
-
-      entries.sort(this);
-   }
-
-   private String sortField, groupField, entryType;
-
-   protected Bib2Gls bib2gls;
-
-   private Vector<Bib2GlsEntry> entries;
-
-   protected boolean reverse, trim;
 
    protected int caseStyle;
-
-   private String sortSuffixMarker;
-
-   private int sortSuffixOption;
-
-   private HashMap<String,Integer> sortCount;
 
    public static final int CASE=0;
    public static final int TOLOWER=1;

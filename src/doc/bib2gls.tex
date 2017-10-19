@@ -7512,19 +7512,32 @@ inter-word punctuation. For example, with
 This option automatically implements the dual and secondary settings
 \csopt[\meta{value}]{dual-sort-suffix} and
 \csopt[\meta{value}]{secondary-sort-suffix}.
+The value may be one of:
+\begin{itemize}
+\item\optfmt{none}: don't append a suffix to any \field{sort} value;
+\item\optfmt{non-unique}: append a numeric suffix to non-unique
+  \field{sort} values;
+\item\optfmt{category}: append the entry's category (if set) to
+  the \field{sort} field.
+\end{itemize}
 
 \bibgls\ allows duplicate sort values, but this can cause a problem
 for hierarchical entries where parent entries with duplicate sort
 fields are clumped together and their children follow. To prevent
 this from happening \csopt[non-unique]{sort-suffix} will append a
 suffix to the duplicate sort values (within the same hierarchical
-level). Note that only the duplicates are given suffixes. The first
-sort value to be encountered isn't given a suffix.
+level). Note that only the duplicates are given suffixes with this
+setting. The first sort value to be encountered isn't given a suffix.
 
 The default setting is \csopt[non-unique]{sort-suffix}.
 If you don't have any child entries or if all your sort values are
 unique, then you can use \csopt[none]{sort-suffix} to suppress this
 action, which can slightly improve the run time.
+
+The \csopt[category]{sort-suffix} setting will only append a suffix
+if the entry's \field{category} field is set, but (if set) it will
+apply the suffix to all \field{sort} values, even those that are
+unique.
 
 This option only affects the alphabetic
 (\tableref{tab:sortoptionsrule}), letter
@@ -7569,11 +7582,13 @@ In my \ext{bib} file I might have:
 \begin{verbatim}
 @entry{cs.makeglossaries,
   name={\command{makeglossaries}},
+  category={command},
   description={opens glossary files}
 }
 
 @entry{ap.makeglossaries,
   name={\application{makeglossaries}},
+  category={application},
   description={Perl script}
 }
 \end{verbatim}
@@ -7719,6 +7734,7 @@ Suppose now I modify the \ext{bib} file so that
 \begin{verbatim}
 @entry{ap.makeglossaries,
   name={\application{makeglossaries}},
+  category={application},
   description={Perl script (must be used with \gls{cs.makeglossaries})}
 }
 \end{verbatim}
@@ -7760,6 +7776,8 @@ However, the next document build has a new record for
 description of \code{ap.makeglossaries}) which means it's now the
 first entry to be selected so the ordering switches to:
 \csfmt{makeglossaries}, \appfmt{makeglossaries}.
+In this type of situation you might be better off with the
+\csopt[category]{sort-suffix} option instead.
 
 Remember that you can temporarily switch off the indexing by locally
 setting

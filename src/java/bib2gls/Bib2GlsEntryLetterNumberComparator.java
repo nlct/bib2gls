@@ -72,7 +72,7 @@ public class Bib2GlsEntryLetterNumberComparator
    }
 
    @Override
-   protected String adjustSort(String sortStr)
+   protected String adjustSort(Bib2GlsEntry entry, String sortStr)
    {
       if (puncPosition == PUNCTUATION_FIRST_SPACE_ZERO
        || puncPosition == PUNCTUATION_LAST_SPACE_ZERO
@@ -147,7 +147,7 @@ public class Bib2GlsEntryLetterNumberComparator
          sortStr = builder.toString();
       }
 
-      return super.adjustSort(sortStr);
+      return super.adjustSort(entry, sortStr);
    }
 
    @Override
@@ -175,11 +175,11 @@ public class Bib2GlsEntryLetterNumberComparator
 
          if (cp1 < cp2)
          {
-            return reverse ? 1 : -1;
+            return -1;
          }
          else if (cp1 > cp2)
          {
-            return reverse ? -1 : 1;
+            return 1;
          }
          else
          {
@@ -202,7 +202,7 @@ public class Bib2GlsEntryLetterNumberComparator
             case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
 
                // punctuation before space
-               return reverse ? -1 : 1;
+               return 1;
 
             case SPACE_PUNCTUATION_FIRST:
             case SPACE_PUNCTUATION_LAST:
@@ -213,7 +213,7 @@ public class Bib2GlsEntryLetterNumberComparator
             case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
 
                // space before punctuation
-               return reverse ? 1 : -1;
+               return -1;
 
             default:
             // shouldn't happen but keep compiler happy
@@ -238,7 +238,7 @@ public class Bib2GlsEntryLetterNumberComparator
             case PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT:
 
                // punctuation before space
-               return reverse ? 1 : -1;
+               return -1;
 
             case SPACE_PUNCTUATION_FIRST:
             case SPACE_PUNCTUATION_LAST:
@@ -249,7 +249,7 @@ public class Bib2GlsEntryLetterNumberComparator
             case PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT:
 
                // space before punctuation
-               return reverse ? -1 : 1;
+               return 1;
 
             default:
             // shouldn't happen but keep compiler happy
@@ -270,13 +270,13 @@ public class Bib2GlsEntryLetterNumberComparator
             case SPACE_PUNCTUATION_FIRST:
 
                // punctuation/space come before letters
-               return reverse ? -1 : 1;
+               return 1;
 
             case PUNCTUATION_SPACE_LAST:
             case SPACE_PUNCTUATION_LAST:
 
                // punctuation/space come after letters
-               return reverse ? 1 : -1;
+               return -1;
 
             case PUNCTUATION_FIRST_SPACE_LAST:
 
@@ -284,11 +284,11 @@ public class Bib2GlsEntryLetterNumberComparator
 
                if (isPunc2)
                {
-                  return reverse ? -1 : 1;
+                  return 1;
                }
                else
                {// cp2 is space
-                  return reverse ? 1 : -1;
+                  return -1;
                }
 
             case PUNCTUATION_FIRST_SPACE_ZERO:
@@ -296,7 +296,7 @@ public class Bib2GlsEntryLetterNumberComparator
 
                // order: punctuation, letter, no space
 
-               return reverse ? -1 : 1;
+               return 1;
 
             case SPACE_FIRST_PUNCTUATION_LAST:
 
@@ -304,11 +304,11 @@ public class Bib2GlsEntryLetterNumberComparator
 
                if (isSpace2)
                {
-                  return reverse ? -1 : 1;
+                  return 1;
                }
                else
                {// cp2 is space
-                  return reverse ? 1 : -1;
+                  return -1;
                }
 
             case PUNCTUATION_LAST_SPACE_ZERO:
@@ -316,7 +316,7 @@ public class Bib2GlsEntryLetterNumberComparator
 
                // order: letter, punctuation, no space
 
-               return reverse ? 1 : -1;
+               return -1;
 
             default:
             // shouldn't happen but keep compiler happy
@@ -334,13 +334,13 @@ public class Bib2GlsEntryLetterNumberComparator
          case SPACE_PUNCTUATION_FIRST:
 
             // punctuation/space come before letters
-            return reverse ? 1 : -1;
+            return -1;
 
          case PUNCTUATION_SPACE_LAST:
          case SPACE_PUNCTUATION_LAST:
 
             // punctuation/space come after letters
-            return reverse ? -1 : 1;
+            return 1;
 
          case PUNCTUATION_FIRST_SPACE_LAST:
 
@@ -348,11 +348,11 @@ public class Bib2GlsEntryLetterNumberComparator
 
             if (isPunc1)
             {
-               return reverse ? 1 : -1;
+               return -1;
             }
             else
             {// cp2 is space
-               return reverse ? -1 : 1;
+               return 1;
             }
 
          case PUNCTUATION_FIRST_SPACE_ZERO:
@@ -360,7 +360,7 @@ public class Bib2GlsEntryLetterNumberComparator
 
             // order: punctuation, letter (no space)
 
-            return reverse ? 1 : -1;
+            return -1;
 
          case SPACE_FIRST_PUNCTUATION_LAST:
 
@@ -368,11 +368,11 @@ public class Bib2GlsEntryLetterNumberComparator
 
             if (isSpace1)
             {
-               return reverse ? 1 : -1;
+               return -1;
             }
             else
             {
-               return reverse ? -1 : 1;
+               return 1;
             }
 
          case PUNCTUATION_LAST_SPACE_ZERO:
@@ -380,7 +380,7 @@ public class Bib2GlsEntryLetterNumberComparator
 
             // order: letter, punctuation (no spaces)
 
-            return reverse ? -1 : 1;
+            return 1;
 
          default:
          // shouldn't happen but keep compiler happy
@@ -511,6 +511,7 @@ public class Bib2GlsEntryLetterNumberComparator
       return result;
    }
 
+   @Override
    protected int compare(String str1, String str2)
    {
       int n1 = str1.length();
@@ -573,7 +574,7 @@ public class Bib2GlsEntryLetterNumberComparator
 
             if (result != 0)
             {
-               return reverse ? -result : result;
+               return result;
             }
          }
          else
@@ -593,9 +594,7 @@ public class Bib2GlsEntryLetterNumberComparator
          }
       }
 
-      int result = (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
-
-      return reverse ? -result : result;
+      return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
    }
 
    public static final int NUMBER_BEFORE_LETTER=0;

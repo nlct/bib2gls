@@ -32,23 +32,15 @@ import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
-public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
+public class Bib2GlsEntryComparator extends SortComparator
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
     SortSettings settings, String sortField, String groupField, String entryType)
    throws ParseException
    {
-      this.sortField = sortField;
-      this.groupField = groupField;
-      this.entryType = entryType;
-      this.bib2gls = bib2gls;
-      this.entries = entries;
-
-      sortSuffixMarker = settings.getSuffixMarker();
-      sortSuffixOption = settings.getSuffixOption();
-      reverse = settings.isReverse();
-      trim = settings.isTrimOn();
+      super(bib2gls, entries, settings, sortField, groupField,
+        entryType);
 
       int breakPoint = settings.getBreakPoint();
       String breakMarker = settings.getBreakPointMarker();
@@ -109,59 +101,14 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       }
    }
 
-   private String updateSortValue(Bib2GlsEntry entry, 
+   protected String updateSortValue(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> entries)
    {
-      String id = entry.getId();
-
-      String value = null;
-
-      if (sortField.equals("id"))
-      {
-         value = id;
-      }
-      else
-      {
-         value = entry.getFieldValue(sortField);
-
-         BibValueList list = entry.getField(sortField);
-
-         if (value == null)
-         {
-            value = entry.getFallbackValue(sortField);
-            list = entry.getFallbackContents(sortField);
-         }
-
-         if (value == null)
-         {
-            value = id;
-
-            bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
-              id, sortField));
-         }
-         else if (bib2gls.useInterpreter() && list != null
-                   && value.matches(".*[\\\\\\$\\{\\}].*"))
-         {
-            value = bib2gls.interpret(value, list, trim);
-         }
-
-         if (sortSuffixOption != SortSettings.SORT_SUFFIX_NONE)
-         {
-            String suff = sortSuffix(value, entry);
-
-            if (suff != null)
-            {
-               suff = sortSuffixMarker + suff;
-
-               bib2gls.verbose(bib2gls.getMessage("message.sort_suffix",
-                 suff, value, id));
-
-               value += suff;
-            }
-         }
-      }
+      String value = super.updateSortValue(entry, entries);
 
       entry.putField("sort", value);
+
+      String id = entry.getId();
 
       String grp = null;
 
@@ -450,66 +397,10 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return value;
    }
 
-   public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
+   public int compareElements(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
-      if (bib2gls.getCurrentResource().flattenSort())
-      {
-         int result = entry1.getCollationKey().compareTo(
-                        entry2.getCollationKey());
-
-         return reverse ? -result : result;
-      }
-
-      if (entry1.getId().equals(entry2.getParent()))
-      {
-         // entry1 is the parent of entry2
-         // so entry1 must come before (be less than) entry2
-
-         return -1;
-      }
-
-      if (entry2.getId().equals(entry1.getParent()))
-      {
-         // entry2 is the parent of entry1
-         // so entry1 must come after (be greater than) entry2
-
-         return 1;
-      }
-
-      int n1 = entry1.getHierarchyCount();
-      int n2 = entry2.getHierarchyCount();
-
-      int n = Integer.min(n1, n2);
-
-      for (int i = 0; i < n; i++)
-      {
-         Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
-         Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
-
-         int result = e1.getCollationKey().compareTo(e2.getCollationKey());
-
-         if (reverse)
-         {
-            result = -result;
-         }
-
-         if (bib2gls.getDebugLevel() > 1)
-         {
-            bib2gls.logAndPrintMessage(String.format("%s %c %s",
-              e1.getFieldValue("sort"),
-              result == 0 ? '=' : (result < 0 ? '<' : '>'),
-              e2.getFieldValue("sort")));
-         }
-
-         if (result != 0)
-         {
-            return result;
-         }
-      }
-
-      // hierarchy needs preserving
-
-      return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
+       return entry1.getCollationKey().compareTo(
+                entry2.getCollationKey());
    }
 
    public Collator getCollator()
@@ -517,70 +408,12 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return collator;
    }
 
-   private String sortSuffix(String sort, Bib2GlsEntry entry)
-   {
-      if (sortCount == null) return null;
-
-      String parentId = entry.getParent();
-
-      /*
-       Non-unique sort keys aren't a problem across different 
-       hierarchical levels. The biggest problem occurs when two
-       or more siblings have the same sort value and one or more 
-       of the siblings has child entries, as this can cause all
-       the children to be clumped together after the last of the 
-       sibling set.
-
-       The sortCount hash map keeps track of all the sort values 
-       used for a particular level. The simplest method is to use 
-       the sort value as the key for top-level (parentless) entries 
-       and use a combination of the parent label and the sort value 
-       for sub-entries. To avoid the odd possibility of a top-level
-       sort value coincidentally matching a sub-entry's parent id
-       and sort value combination, the key to the hash map
-       use a control code as a separator for sub-entries since there 
-       shouldn't be control codes in the label.
-       (0x1F is the unit separator control code.)
-      */
-
-      String key = (parentId == null ? sort
-                    : String.format("%s\u001f%s", parentId, sort));
-
-      Integer num = sortCount.get(key);
-
-      if (num == null)
-      {
-         sortCount.put(key, Integer.valueOf(0));
-         return null;
-      }
-
-      bib2gls.verbose(bib2gls.getMessage("message.non_unique_sort",
-        sort, entry.getOriginalId()));
-
-      num = Integer.valueOf(num.intValue()+1);
-
-      sortCount.put(key, num);
-
-      return num.toString();
-   }
-
    public void sortEntries() throws Bib2GlsException
    {
       bib2gls.debug(bib2gls.getMessage("message.setting.sort",
         collator.getStrength(), collator.getDecomposition()));
 
-      if (sortSuffixOption == SortSettings.SORT_SUFFIX_NON_UNIQUE)
-      {
-         sortCount =  new HashMap<String,Integer>();
-      }
-
-      for (Bib2GlsEntry entry : entries)
-      {
-         entry.updateHierarchy(entries);
-         updateSortValue(entry, entries);
-      }
-
-      entries.sort(this);
+      super.sortEntries();
    }
 
    public CharSequence breakPoints(String target)
@@ -614,25 +447,11 @@ public class Bib2GlsEntryComparator implements Comparator<Bib2GlsEntry>
       return buff;
    }
 
-   private String sortField, groupField, entryType;
-
    private Collator collator;
 
    private BreakIterator breakIterator;
 
    private String breakPointMarker="|";
-
-   private String sortSuffixMarker;
-
-   private int sortSuffixOption;
-
-   private boolean reverse = false, trim;
-
-   private HashMap<String,Integer> sortCount;
-
-   private Bib2Gls bib2gls;
-
-   private Vector<Bib2GlsEntry> entries;
 
    public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
      BREAK_SENTENCE=3;

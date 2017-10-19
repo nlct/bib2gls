@@ -265,6 +265,18 @@ public class SortSettings
       return sortMethod;
    }
 
+   public String getUnderlyingMethod()
+   {
+      if (sortMethod == null) return null;
+
+      if (sortMethod.endsWith("-reverse"))
+      {
+         return sortMethod.substring(0, sortMethod.length()-8);
+      }
+
+      return sortMethod;
+   }
+
    public void setSortField(String field)
    {
       sortField = field;
@@ -547,5 +559,6 @@ public class SortSettings
 
    public static final int SORT_SUFFIX_NONE=0;
    public static final int SORT_SUFFIX_NON_UNIQUE=1;
+   public static final int SORT_SUFFIX_CATEGORY=2;
 
 }

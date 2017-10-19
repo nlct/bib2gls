@@ -30,18 +30,16 @@ import java.text.ParseException;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
-public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
+public class Bib2GlsEntryDateTimeComparator extends SortComparator
 {
    public Bib2GlsEntryDateTimeComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
     String sortField, String groupField, String entryType)
    {
-      this.sortField = sortField;
-      this.groupField = groupField;
-      this.bib2gls = bib2gls;
-      this.entries = entries;
-      reverse = settings.isReverse();
-      trim = settings.isTrimOn();
+      super(bib2gls, entries, settings, sortField, groupField,
+        entryType);
+
+      sortSuffixOption = settings.SORT_SUFFIX_NONE;
 
       String format = settings.getDateFormat();
       Locale locale = settings.getDateLocale();
@@ -158,41 +156,9 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
       }
    }
 
-   private String updateSortValue(Bib2GlsEntry entry, 
-      Vector<Bib2GlsEntry> entries)
+   protected String adjustSort(Bib2GlsEntry entry, String value)
    {
       String id = entry.getId();
-
-      String value = null;
-
-      if (sortField.equals("id"))
-      {
-         value = id;
-      }
-      else
-      {
-         value = entry.getFieldValue(sortField);
-         BibValueList list = entry.getField(sortField);
-
-         if (value == null)
-         {
-            value = entry.getFallbackValue(sortField);
-            list = entry.getFallbackContents(sortField);
-         }
-
-         if (value == null)
-         {
-            value = "";
-
-            bib2gls.debug(bib2gls.getMessage("warning.no.default.sort",
-              id));
-         }
-         else if (bib2gls.useInterpreter() && list != null 
-                   && value.matches(".*[\\\\\\$\\{\\}].*"))
-         {  
-            value = bib2gls.interpret(value, list, trim);
-         }
-      }
 
       Date dateValue;
 
@@ -244,25 +210,25 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
          value = String.format("%+d %s", era, value);
       }
 
-
-      entry.putField("sort", value);
       entry.setNumericSort(num);
+      entry.setSortObject(dateValue);
+
+      return value;
+   }
+
+   protected String updateSortValue(Bib2GlsEntry entry, 
+      Vector<Bib2GlsEntry> entries)
+   {
+      String value = super.updateSortValue(entry, entries);
+
+      Number num = entry.getNumericSort();
+      Date dateValue = (Date)entry.getSortObject();
 
       String grp = null;
 
-      String type = entryType;
+      String type = getType(entry);
 
       GlsResource resource = bib2gls.getCurrentResource();
-
-      if (type == null)
-      {
-         type = resource.getType(entry);
-
-         if (type == null)
-         {
-            type = "";
-         }
-      }
 
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())
@@ -294,6 +260,8 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
       if (bib2gls.getVerboseLevel() > 0)
       {
+         String id = entry.getId();
+
          if (grp == null)
          {
             bib2gls.verbose(String.format("%s -> '%s' [%d]", id, value, num));
@@ -310,80 +278,17 @@ public class Bib2GlsEntryDateTimeComparator implements Comparator<Bib2GlsEntry>
 
    protected int compare(Number num1, Number num2)
    {
-      return reverse ? ((Long)num2).compareTo((Long)num1) 
-          : ((Long)num1).compareTo((Long)num2);
+      return ((Long)num1).compareTo((Long)num2);
    }
 
-   public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
+   protected int compareElements(Bib2GlsEntry entry1,
+     Bib2GlsEntry entry2)
    {
-      if (bib2gls.getCurrentResource().flattenSort())
-      {
-         return compare(entry1.getNumericSort(), 
-            entry2.getNumericSort());
-      }
-
-      if (entry1.getId().equals(entry2.getParent()))
-      {
-         // entry1 is the parent of entry2
-         // so entry1 must come before (be less than) entry2
-         // (even with a reverse sort)
-
-         return -1;
-      }
-
-      if (entry2.getId().equals(entry1.getParent()))
-      {
-         // entry2 is the parent of entry1
-         // so entry1 must come after (be greater than) entry2
-         // (even with a reverse sort)
-
-         return 1;
-      }
-
-      int n1 = entry1.getHierarchyCount();
-      int n2 = entry2.getHierarchyCount();
-
-      int n = Integer.min(n1, n2);
-
-      if (n1 == n2 && entry1.getId().equals(entry2.getId()))
-      {
-         return 0;
-      }
-
-      for (int i = 0; i < n; i++)
-      {
-         Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
-         Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
-
-         int result = compare(e1.getNumericSort(), e2.getNumericSort());
-
-         if (result != 0)
-         {
-            return result;
-         }
-      }
-
-      return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
+      return compare(entry1.getNumericSort(), entry2.getNumericSort());
    }
 
-   public void sortEntries() throws Bib2GlsException
-   {
-      for (Bib2GlsEntry entry : entries)
-      {
-         entry.updateHierarchy(entries);
-         updateSortValue(entry, entries);
-      }
 
-      entries.sort(this);
-   }
-
-   private String sortField, groupField, entryType;
-
-   private Bib2Gls bib2gls;
-
-   private Vector<Bib2GlsEntry> entries;
-
-   private boolean reverse, hasDate, hasTime, trim;
+   private boolean hasDate, hasTime;
 
    private DateFormat dateFormat, sortDateFormat;
 

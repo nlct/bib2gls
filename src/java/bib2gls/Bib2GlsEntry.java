@@ -2202,6 +2202,16 @@ public class Bib2GlsEntry extends BibEntry
       numericSort = num;
    }
 
+   public Object getSortObject()
+   {
+      return sortObject;
+   }
+
+   public void setSortObject(Object obj)
+   {
+      sortObject = obj;
+   }
+
    public void addChild(Bib2GlsEntry child)
    {
       if (children == null)
@@ -2281,6 +2291,8 @@ public class Bib2GlsEntry extends BibEntry
    private Bib2GlsEntry dual = null;
 
    private Number numericSort = null;
+
+   private Object sortObject = null;
 
    private boolean triggerRecordFound=false;
 

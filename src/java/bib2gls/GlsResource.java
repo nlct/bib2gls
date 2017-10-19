@@ -690,7 +690,8 @@ public class GlsResource
          }
          else if (opt.equals("sort-suffix"))
          {
-            String val = getChoice(parser, list, opt, "none", "non-unique");
+            String val = getChoice(parser, list, opt, "none", "non-unique",
+              "category");
 
             if (val.equals("none"))
             {
@@ -700,13 +701,18 @@ public class GlsResource
             {
                sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
+            else if (val.equals("category"))
+            {
+               sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_CATEGORY);
+            }
 
             dualSortSettings.setSuffixOption(sortSettings.getSuffixOption());
             secondarySortSettings.setSuffixOption(sortSettings.getSuffixOption());
          }
          else if (opt.equals("dual-sort-suffix"))
          {
-            String val = getChoice(parser, list, opt, "none", "non-unique");
+            String val = getChoice(parser, list, opt, "none", "non-unique",
+              "category");
 
             if (val.equals("none"))
             {
@@ -714,35 +720,52 @@ public class GlsResource
             }
             else if (val.equals("non-unique"))
             {
-               dualSortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
+               dualSortSettings.setSuffixOption(
+                 SortSettings.SORT_SUFFIX_NON_UNIQUE);
+            }
+            else if (val.equals("category"))
+            {
+               dualSortSettings.setSuffixOption(
+                 SortSettings.SORT_SUFFIX_CATEGORY);
             }
          }
          else if (opt.equals("secondary-sort-suffix"))
          {
-            String val = getChoice(parser, list, opt, "none", "non-unique");
+            String val = getChoice(parser, list, opt, "none", "non-unique",
+               "category");
 
             if (val.equals("none"))
             {
-               secondarySortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NONE);
+               secondarySortSettings.setSuffixOption(
+                 SortSettings.SORT_SUFFIX_NONE);
             }
             else if (val.equals("non-unique"))
             {
-               secondarySortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
+               secondarySortSettings.setSuffixOption(
+                 SortSettings.SORT_SUFFIX_NON_UNIQUE);
+            }
+            else if (val.equals("category"))
+            {
+               secondarySortSettings.setSuffixOption(
+                 SortSettings.SORT_SUFFIX_CATEGORY);
             }
          }
          else if (opt.equals("sort-suffix-marker"))
          {
-            sortSettings.setSuffixMarker(replaceHex(getOptional(parser, "", list, opt)));
+            sortSettings.setSuffixMarker(
+               replaceHex(getOptional(parser, "", list, opt)));
             dualSortSettings.setSuffixMarker(sortSettings.getSuffixMarker());
             secondarySortSettings.setSuffixMarker(sortSettings.getSuffixMarker());
          }
          else if (opt.equals("dual-sort-suffix-marker"))
          {
-            dualSortSettings.setSuffixMarker(replaceHex(getOptional(parser, "", list, opt)));
+            dualSortSettings.setSuffixMarker(
+               replaceHex(getOptional(parser, "", list, opt)));
          }
          else if (opt.equals("secondary-sort-suffix-marker"))
          {
-            secondarySortSettings.setSuffixMarker(replaceHex(getOptional(parser, "", list, opt)));
+            secondarySortSettings.setSuffixMarker(
+               replaceHex(getOptional(parser, "", list, opt)));
          }
          else if (opt.equals("sort"))
          {
