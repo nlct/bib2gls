@@ -5494,7 +5494,7 @@ public class GlsResource
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
 
-   private void toLowerCase(TeXObjectList list)
+   public static void toLowerCase(TeXObjectList list)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -5541,7 +5541,7 @@ public class GlsResource
       }
    }
 
-   private void toUpperCase(TeXObjectList list)
+   public static void toUpperCase(TeXObjectList list)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -5592,7 +5592,7 @@ public class GlsResource
       }
    }
 
-   private void toSentenceCase(TeXObjectList list)
+   public static void toSentenceCase(TeXObjectList list)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {

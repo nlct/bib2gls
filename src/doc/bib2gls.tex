@@ -68,6 +68,9 @@
 
 \newcommand{\glsxtrpostnameenvironment}{\space environment}
 
+\newcommand*{\bibglsothergroup}[3]{#3.#2}
+\newcommand*{\bibglsothergrouptitle}[3]{#1}
+
 \GlsXtrLoadResources[
   label-prefix={idx.},
   save-loclist=false,
@@ -8876,23 +8879,22 @@ This is like \csopt{dual-entry-map} but applies to both the dual
 
 \optsection[\subsubsection]{dual-entry-backlink}
 
-This is a boolean setting.
-When used with \atentry{dualentry}, if \meta{boolean} is
-\optfmt{true}, this will wrap the contents of first mapped field
-with \ics{glshyperlink}. If \meta{boolean} is missing \optfmt{true}
+This is a boolean setting. If \meta{boolean} is missing \optfmt{true}
 is assumed.
 
-The field is obtained from the first mapping
-listed in \csopt{dual-entry-map}.
+When used with \atentry{dualentry}, if \meta{boolean} is
+\optfmt{true}, this will wrap the contents of the first mapped field
+with \gls{bibglshyperlink}.  The field is obtained from the first
+mapping listed in \csopt{dual-entry-map}.
 
 For example, if the document contains:
 \begin{verbatim}
 \GlsXtrLoadResource[dual-entry-backlink,
-dual-entry-map={
-  {name,plural,description,descriptionplural},
-  {description,descriptionplural,name,plural}
-},
-src={entries-dual}]
+  dual-entry-map={
+    {name,plural,description,descriptionplural},
+    {description,descriptionplural,name,plural}
+  },
+  src={entries-dual}]
 \end{verbatim}
 and if the \ext{bib} file contains
 \begin{verbatim}
@@ -8903,20 +8905,24 @@ and if the \ext{bib} file contains
 }
 \end{verbatim}
 Then the definition of the primary entry (\code{child}) in the
-\ext{glstex} file will have the \field{description} field set to
+\ext{glstex} file will set the \field{description} field to
 \begin{verbatim}
-{\glshyperlink[enfant]{dual.child}}
+\bibglshyperlink{enfant}{dual.child}
 \end{verbatim}
 and the dual entry (\code{dual.child}) will have the
 \field{description} field set to
 \begin{verbatim}
-{\glshyperlink[child]{child}}
+\bibglshyperlink{child}{child}
 \end{verbatim}
+This use of the wrapper \gls{bibglshyperlink} (rather than explicitly
+using \ics{glshyperlink}) and inserting the actual field value
+(rather than using commands like \cs{glsentryname}) allows it 
+to work with \ics{makefirstuc} if the field requires a case-change.
 
 The reason the \field{description} field is chosen for the modification is
-because the first field listed in the first list in \csopt{dual-entry-map} 
+because the first field listed in \meta{list1} of \csopt{dual-entry-map} 
 is the \field{name} field which maps to \field{description} (the
-first field in the second list). This means that the hyperlink for
+first field in the second list \meta{list2}). This means that the hyperlink for
 the dual entry should be put in the \field{description} field.
 
 For the primary entry, the \field{name} field is looked up in the
@@ -9774,8 +9780,9 @@ or redefined after the resources are loaded:
 The commands listed in this section are provided for use with the
 \longarg{group} switch and glossary styles that display the letter
 group title. If these need their definitions altered, they should
-be defined before the resource file is loaded (rather than redefined
-afterwards).
+be defined before the resource file is loaded if field expansion
+is on (\longarg{expand-fields}) otherwise they may be redefined
+afterwards.
 
 The base \isty{glossaries} package determines group titles through a fairly
 simplistic rule. Both \idx!{makeindex} and \idx!{xindy} write the
@@ -10265,6 +10272,15 @@ field using:
 
 \section{Other}
 
+\cssection{bibglshyperlink}
+
+\formatdef{bibglshyperlink}
+Used by the \hyperref[sec:dualoptsbacklinks]{back link options},
+this just defaults to 
+\begin{alltt}
+\ics{glshyperlink}\oargm{text}\margm{label}
+\end{alltt}
+
 \cssection{bibglssetwidest}
 
 \formatdef{bibglssetwidest}
@@ -10635,7 +10651,7 @@ contain:
 \end{verbatim}
 
 \resetsecnumdepth
-\printcommandsummary
 
+\printcommandsummary
 \printunsrtglossary[type=index]
 \end{document}

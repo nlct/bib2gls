@@ -41,6 +41,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
@@ -782,6 +783,86 @@ public class Bib2Gls implements TeXApp
       }
 
       listener.putControlSequence(new EnableTagging());
+      listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
+      listener.putControlSequence(new GlsHyperLink(this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryname", "name", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentrytext", "text", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryshort", "short", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentrylong", "long", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryfirst", "first", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentrysymbol", "symbol", this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryuseri", "user1", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryuserii", "user2", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryuseriii", "user3", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryuseriv", "user4", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryuserv", "user5", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryuservi", "user6", this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryplural", "plural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryfirstplural", "firstplural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentryshortpl", "shortplural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentrylongpl", "longplural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsentrysymbolplural", "symbolplural", this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryname", "name", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentrytext", "text", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryshort", "short", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentrylong", "long", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryfirst", "first", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentrysymbol", "symbol", GlsEntryFieldValue.CASE_SENTENCE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryuseri", "user1", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryuserii", "user2", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryuseriii", "user3", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryuseriv", "user4", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryuserv", "user5", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryuservi", "user6", GlsEntryFieldValue.CASE_SENTENCE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryplural", "plural", GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryfirstplural", "firstplural", 
+         GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentryshortpl", "shortplural", 
+         GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentrylongpl", "longplural", 
+         GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsentrysymbolplural", "symbolplural", 
+         GlsEntryFieldValue.CASE_SENTENCE, this));
    }
 
    public void provideCommand(String csName, String text)
@@ -1672,6 +1753,7 @@ public class Bib2Gls implements TeXApp
       writer.format("\\providecommand{\\bibglspassimname}{%s}%n",
         getMessage("tag.passim"));
       writer.println("\\providecommand{\\bibglspassim}{ \\bibglspassimname}");
+      writer.println("\\providecommand*{\\bibglshyperlink}[2]{\\glshyperlink[#1]{#2}}");
       writer.println();
 
       if (recordCount != null)

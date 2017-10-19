@@ -272,7 +272,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       {
          String val = getFieldValue(primaryKey);
 
-         putField(primaryKey, String.format("\\glshyperlink[%s]{%s}",
+         putField(primaryKey, String.format("\\bibglshyperlink{%s}{%s}",
            val, entry.getId()));
       }
 
@@ -280,7 +280,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       {
          String val = entry.getFieldValue(dualKey);
 
-         entry.putField(dualKey, String.format("\\glshyperlink[%s]{%s}",
+         entry.putField(dualKey, String.format("\\bibglshyperlink{%s}{%s}",
            val, getId()));
       }
 

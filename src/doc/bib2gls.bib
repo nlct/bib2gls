@@ -84,7 +84,7 @@
 
 @dualindexentry{bibglsnewdualindexsymbol,
   name={\csfmt{bib\-gls\-new\-dual\-index\-symbol}},
-  user1={\margm{label}\margm{options}\margm{name}\marg{symbol}\margm{description}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{symbol}\margm{description}},
   description={defines primary terms provided with
 \gls[noindex]{dual.entry.dualindexsymbol}},
   category={command}
@@ -100,7 +100,7 @@
 
 @dualindexentry{bibglsnewdualindexnumber,
   name={\csfmt{bib\-gls\-new\-dual\-index\-number}},
-  user1={\margm{label}\margm{options}\margm{name}\marg{symbol}\margm{description}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{symbol}\margm{description}},
   description={defines primary terms provided with
 \gls[noindex]{dual.entry.dualindexnumber}},
   category={command}
@@ -348,6 +348,14 @@ opts}\margm{primary name}\margm{short}\margm{long}\margm{description}},
   name={\csfmt{bibglslocsuffix}},
   user1={\margm{n}},
   description={location list suffix},
+  category={command}
+}
+
+@dualindexentry{bibglshyperlink,
+  name={\csfmt{bib\-gls\-hyper\-link}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with a hyperlink to the entry
+   given by \meta{label}, if supported},
   category={command}
 }
 
@@ -1444,84 +1452,84 @@ pattern}},
 
 @dualindexentry{opt.dual-entry-backlink,
    name={\csoptfmt{dual\dhyphen entry\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-abbrv-backlink,
    name={\csoptfmt{dual\dhyphen abbrv\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-entryabbrv-backlink,
    name={\csoptfmt{dual\dhyphen entryabbrv\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-abbrventry-backlink,
    name={\csoptfmt{dual\dhyphen abbrventry\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-symbol-backlink,
    name={\csoptfmt{dual\dhyphen symbol\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-indexentry-backlink,
    name={\csoptfmt{dual\dhyphen indexentry\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-indexsymbol-backlink,
    name={\csoptfmt{dual\dhyphen indexsymbol\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-indexabbrv-backlink,
    name={\csoptfmt{dual\dhyphen indexabbrv\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.dual-backlink,
    name={\csoptfmt{dual\dhyphen backlink}},
-   user1={\marg{boolean}},
+   user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.tertiary-prefix,
    name={\csoptfmt{tertiary\dhyphen prefix}},
-   user1={\marg{value}},
+   user1={\margm{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.tertiary-type,
    name={\csoptfmt{tertiary\dhyphen type}},
-   user1={\marg{value}},
+   user1={\margm{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
 
 @dualindexentry{opt.tertiary-category,
    name={\csoptfmt{tertiary\dhyphen category}},
-   user1={\marg{value}},
+   user1={\margm{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -1566,7 +1574,7 @@ cs}\margm{Glspl-like cs}},
 
 @dualindexentry{glsxtrfieldlistadd,
   name={\csfmt{glsxtrfieldlistadd}},
-  user1={\margm{label}\marg{field}\margm{item}},
+  user1={\margm{label}\margm{field}\margm{item}},
   description={adds the given item to the given field that contains
    an \styfmt{etoolbox} internal list},
   note={provided by \styfmt{glossaries-extra} v1.12+},
