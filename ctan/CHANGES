@@ -23,6 +23,7 @@ v1.1 (pending):
      - abbreviation-sort-fallback
      - abbreviation-name-fallback
      - match-action
+     - save-loclist
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

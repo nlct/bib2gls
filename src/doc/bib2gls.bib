@@ -882,9 +882,16 @@ name},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.save-loclist,
+   name={\csoptfmt{save\dhyphen loclist}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.min-loc-range,
    name={\csoptfmt{min\dhyphen loc\dhyphen range}},
-   user1={\meta{boolean}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -2511,7 +2518,7 @@ field.},
 }
 
 @dualindexentry{field.recordcount.counter,
-  name={\fieldfmt{recordcount.\meta{counter}}},
+  name={\fieldfmt{recordcount.\discretionary{}{}{}\meta{counter}}},
   description={Used with record counting to store the
    total number of records for a given counter.},
   note={internal field set by \appfmt{bib2gls}},
@@ -2520,7 +2527,7 @@ field.},
 }
 
 @dualindexentry{field.recordcount.counter.location,
-  name={\fieldfmt{recordcount.\meta{counter}.\meta{location}}},
+  name={\fieldfmt{recordcount.\discretionary{}{}{}\meta{counter}.\discretionary{}{}{}\meta{location}}},
   description={Used with record counting to store the
    total number of records for a given location.},
   note={internal field set by \appfmt{bib2gls}},
@@ -2808,73 +2815,73 @@ field.},
 }
 
 @dualindexentry{entry.dualentry,
-  name={\atentryfmt{dualentry}},
+  name={\atentryfmt{dual\-entry}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualindexentry,
-  name={\atentryfmt{dualindexentry}},
+  name={\atentryfmt{dual\-index\-entry}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualindexabbreviation,
-  name={\atentryfmt{dualindexabbreviation}},
+  name={\atentryfmt{dual\-index\-abbre\-via\-tion}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualindexsymbol,
-  name={\atentryfmt{dualindexsymbol}},
+  name={\atentryfmt{dual\-index\-symbol}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualindexnumber,
-  name={\atentryfmt{dualindexnumber}},
+  name={\atentryfmt{dual\-index\-number}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualabbreviationentry,
-  name={\atentryfmt{dualabbreviationentry}},
+  name={\atentryfmt{dual\-abbre\-via\-tion\-entry}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualentryabbreviation,
-  name={\atentryfmt{dualentryabbreviation}},
+  name={\atentryfmt{dual\-entry\-abbre\-via\-tion}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualsymbol,
-  name={\atentryfmt{dualsymbol}},
+  name={\atentryfmt{dual\-symbol}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualnumber,
-  name={\atentryfmt{dualnumber}},
+  name={\atentryfmt{dual\-number}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualabbreviation,
-  name={\atentryfmt{dualabbreviation}},
+  name={\atentryfmt{dual\-abbre\-via\-tion}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.dualacronym,
-  name={\atentryfmt{dualacronym}},
+  name={\atentryfmt{dual\-acronym}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @dualindexentry{entry.tertiaryindexabbreviationentry,
-  name={\atentryfmt{tertiaryindexabbreviationentry}},
+  name={\atentryfmt{tert\-iary\-index\-abbre\-via\-tion\-entry}},
   category={entrytype},
   parent={entrytypes}
 }
@@ -3401,7 +3408,11 @@ field.},
 @index{glsxtrprovidestoragekey,
   name={\csfmt{glsxtrprovidestoragekey}},
   user1={\margm{key}\margm{default value}\margm{no link cs}},
-  note={provided by \styfmt{glossaries-extra}},
+  description={adds a new key, if not already defined, for use in \cs{newglossaryentry}
+   and an associated command
+   to access it where (unlike \cs{glsaddstoragekey})
+   the \meta{no link cs} part may be empty if unrequired},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
 
@@ -3638,6 +3649,30 @@ field.},
   parent={glsadd}
 }
 
+@index{frontmatter,
+  name={\csfmt{front\-matter}},
+  user1={},
+  description={switches to front matter},
+  note={provided by book-like classes},
+  category={command}
+}
+
+@index{mainmatter,
+  name={\csfmt{main\-matter}},
+  user1={},
+  description={switches to main matter},
+  note={provided by book-like classes},
+  category={command}
+}
+
+@index{backmatter,
+  name={\csfmt{back\-matter}},
+  user1={},
+  description={switches to back matter},
+  note={provided by book-like classes},
+  category={command}
+}
+
 @index{GlsXtrSetDefaultNumberFormat,
   name={\csfmt{Gls\-Xtr\-Set\-Default\-Number\-Format}},
   user1={\margm{format}},
@@ -3652,6 +3687,51 @@ field.},
   user1={\margm{options}},
   description={set the default options for commands like \cs{gls}},
   note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsnumberformat,
+  name={\csfmt{gls\-number\-format}},
+  user1={\margm{text}},
+  description={default location format},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{hypersf,
+  name={\csfmt{hypersf}},
+  user1={\margm{text}},
+  description={a location format that uses the sans-serif 
+   font that also has a hyperlink (if enabled)},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{hyperit,
+  name={\csfmt{hyperit}},
+  user1={\margm{text}},
+  description={a location format that uses the italic 
+   font that also has a hyperlink (if enabled)},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{hyperbf,
+  name={\csfmt{hyperbf}},
+  user1={\margm{text}},
+  description={a location format that uses the bold 
+   font that also has a hyperlink (if enabled)},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{emph,
+  name={\csfmt{emph}},
+  user1={\margm{text}},
+  description={emphasizes the given text (italic or slanted
+   if the surrounding font is upright, otherwise upright font is 
+   used)},
+  note={kernel command},
   category={command}
 }
 
@@ -3670,7 +3750,7 @@ field.},
   description={does nothing but when used as a location format
    \bibgls\ recognises it as an ignored location indexed by
    commands like \cs{rgls}},
-  note={provided by \styfmt{glossaries}},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
   category={command}
 }
 
@@ -4089,7 +4169,7 @@ packages},
   category={command}
 }
 
-@index{rgls,
+@dualindexentry{rgls,
   name={\csfmt{rgls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={like \cs{gls} but checks for the record
@@ -4098,7 +4178,7 @@ packages},
   category={command}
 }
 
-@index{rglsformat,
+@dualindexentry{rglsformat,
   name={\csfmt{rglsformat}},
   user1={\margm{label}\oargm{insert}},
   description={used by \cs{rgls} if the record count

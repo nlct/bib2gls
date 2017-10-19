@@ -1,6 +1,6 @@
 % arara: xelatex
-% arara: xelatex if missing("toc")
 % arara: bib2gls: {group: on}
+% arara: xelatex if missing("toc")
 % arara: xelatex
 % arara: bib2gls: {group: on}
 % arara: xelatex
@@ -47,7 +47,7 @@
 \renewcommand\glstreesubitem{\par\hangindent30pt\hspace*{15pt}}
 \renewcommand*{\glsxtrbookindexprelocation}[1]{}
 
-\glsaddstoragekey{note}{}{\entrynote}
+\glsxtrprovidestoragekey{note}{}{}
 
 % put break before dash to avoid confusion with a hyphen
 \newcommand{\dhyphen}{%
@@ -70,6 +70,7 @@
 
 \GlsXtrLoadResources[
   label-prefix={idx.},
+  save-loclist=false,
   sort={letter-nocase},
   type={index},
   dual-field={dualid},
@@ -167,8 +168,6 @@
  {\texttt{\char`\\ #1}}%
  {\string\\#1}%
 }
-
-\newcommand{\primary}[1]{\hyperbf{#1}}
 
 % Provide commands that work like \gls[#1]{idx.#2}[#3]
 
@@ -305,20 +304,20 @@
 
 \newcommand{\formatdef}[1]{%
   \begin{definition}%
-  \gls[format=primary,hyper=false]{#1}\glsentryuseri{#1}%
+  \gls[hyper=false]{#1}\glsentryuseri{#1}%
   \end{definition}\ignorespaces
 }
 
 \newcommand{\nosecformatdef}[1]{%
   \begin{definition}
-   \glsadd[format=primary]{#1}\glsxtrglossentry{#1}%
+   \glsadd{#1}\glsxtrglossentry{#1}%
    \glsentryuseri{#1}%
   \end{definition}\ignorespaces
 }
 
 \newcommand{\nosecdef}[1]{%
   \begin{flushleft}\ttfamily
-   \glsadd[format=primary]{#1}\glsxtrglossentry{#1}%
+   \glsadd{#1}\glsxtrglossentry{#1}%
    \glsentryuseri{#1}%
   \end{flushleft}\ignorespaces
 }
@@ -327,7 +326,15 @@
 
 \newcommand*{\cs}[1]{%
   \glsdohyperlink{\glolinkprefix cs.idx.#1}{\glsentryname{idx.#1}}}
+
 \newcommand*{\ics}[2][]{\glsadd[#1]{idx.#2}\cs{#2}}
+
+\newcommand*{\encap}[2][]{\glsadd[#1]{idx.#2}%
+ {%
+   \let\csfmt\code
+   \glsdohyperlink{\glolinkprefix cs.idx.#2}{\glsentryname{idx.#2}}%
+ }%
+}
 
 \newcommand{\optsection}[2][\subsection]{%
  \glsxtrifhasfield*{useri}{opt.#2}%
@@ -335,13 +342,13 @@
    #1[\texorpdfstring
        {\glsxtrheadname{opt.#2}\csoptfmt{=\glscurrentfieldvalue}}%
        {\glsentryname{opt.#2}=\glscurrentfieldvalue}]
-     {\glsadd[format=primary]{opt.#2}\glsxtrglossentry{opt.#2}%
+     {\glsadd{opt.#2}\glsxtrglossentry{opt.#2}%
        \csoptfmt{=\glscurrentfieldvalue}% 
      }%
  }%
  {%
    #1[\texorpdfstring{\glsxtrheadname{opt.#2}}{\glsentryname{opt.#2}}]
-     {\glsadd[format=primary]{opt.#2}\glsxtrglossentry{opt.#2}}%
+     {\glsadd{opt.#2}\glsxtrglossentry{opt.#2}}%
  }%
 }
 
@@ -365,7 +372,7 @@
 }
 
 \newcommand*{\fielddef}[1]{%
- \glsadd[format=primary]{field.#1}%
+ \glsadd{field.#1}%
  \glsxtrglossentry{field.#1}{}%
 }
 
@@ -380,7 +387,7 @@
     \bfseries Field & \bfseries Description\tabularnewline}%
   \renewcommand*{\glsgroupheading}[1]{}%
   \renewcommand{\glossentry}[2]{%
-    \glsadd[format=primary]{##1}%
+    \glsadd{##1}%
     \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
     \glossentrydesc{##1}\tabularnewline
   }%
@@ -409,7 +416,17 @@
  }%
 }
 
-\newcommand*{\summaryfmt}[1]{\hyperit{#1}}
+\renewcommand*{\glsxtrbookindexname}[1]{% 
+ \glsxtrifhasfield{dualid}{#1}%
+ {%
+   \glshyperlink[\glossentryname{#1}]{\glscurrentfieldvalue}%
+ }
+ {%
+   \GlsXtrIfFieldEqStr{category}{#1}{command}%
+   {\glsdohyperlink{\glolinkprefix cs.#1}{\glossentryname{#1}}}%
+   {\glossentryname{#1}}%
+ }%
+}
 
 \newglossarystyle{commandsummary}%
 {%
@@ -431,7 +448,7 @@
      \Glossentrydesc{\glscurrentfieldvalue}%
    }%
    {%
-     \glstarget{cs.##1}{\strut}\gls[format=summaryfmt,hyper=false]{##1}%
+     \glstarget{cs.##1}{\strut}\gls[hyper=false]{##1}%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
      \nopagebreak\par\hspace{10pt}%
      \Glossentrydesc{##1}%
@@ -463,7 +480,7 @@
 
 \newcommand{\entrysection}[2][\subsection]{%
  #1[\texorpdfstring{\glsxtrheadname{entry.#2}}{\glsentryname{entry.#2}}]
-   {\glsadd[format=primary]{entry.#2}\glsxtrglossentry{entry.#2}}%
+   {\glsadd{entry.#2}\glsxtrglossentry{entry.#2}}%
 }
 
 \newcommand*{\atentry}[2][]{%
@@ -486,7 +503,7 @@
  }%
  {}%
  #1[\texorpdfstring{\glsxtrheadname{switch.#2}}{\glsentryname{switch.#2}}\switcharg\switchalt]
-   {\glsadd[format=primary]{switch.#2}%
+   {\glsadd{switch.#2}%
     \glsxtrglossentry{switch.#2}\switcharg\switchalt}%
 }
 
@@ -1468,8 +1485,8 @@ matches (see \sectionref{sec:locationopts}). For example,
 bib2gls --map-format "emph:hyperbf" mydoc
 \end{verbatim}
 This essentially means that if there's a record conflict
-involving \code{emph}, try replacing \code{emph} with
-\code{hyperbf} and see if that resolves the conflict.
+involving \encap{emph}, try replacing \encap{emph} with
+\encap{hyperbf} and see if that resolves the conflict.
 
 Note that if the conflict includes a range formation, the
 range takes precedence.
@@ -1497,41 +1514,43 @@ bib2gls --map-format emph:hyperbf --map-format hypersf:hyperit mydoc
 \end{verbatim}
 then \bibgls\ will process these records as follows:
 \begin{enumerate}
-\item Accept the first record (\code{emph}) since there's
+\item Accept the first record (\encap{emph}) since there's
 currently no conflict. (This is the first record for page~3 for the
 entry given by \code{gls.sample}.)
-\item The second record (\code{hypersf}) conflicts 
-with the existing record (\code{emph}). Neither has
-the format \code{glsnumberformat} or \code{glsignore} so \bibgls\ consults
+\item The second record (\encap{hypersf}) conflicts 
+with the existing record (\encap{emph}). Neither has
+the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item The \code{hypersf} format (from the new record) is mapped to \code{hyperit},
+\item The \encap{hypersf} format (from the new record) is mapped to
+\encap{hyperit},
 so \bibgls\ checks if the existing record
 has this format. In this case it doesn't (the format is
 \code{emph}). So \bibgls\ moves on to the next test:
 
-\item The \code{emph} format (from the existing record) is mapped to \code{hyperbf},
+\item The \encap{emph} format (from the existing record) is mapped
+to \encap{hyperbf},
 so \bibgls\ checks if the new record has this format.
-In this case it doesn't (the format is \code{hypersf}).
+In this case it doesn't (the format is \encap{hypersf}).
 
 Since the provided mappings haven't resolved this conflict,
 the new record is discarded with a warning. Note that there's 
 no look ahead to the next record. (There may be other 
 records for other entries also used on page~3 interspersed between these records.)
 \end{itemize}
-\item The third record (\code{hyperbf}) conflicts 
-with the existing record (\code{emph}). Neither has
-the format \code{glsnumberformat} or \code{glsignore} so \bibgls\ again consults
+\item The third record (\encap{hyperbf}) conflicts 
+with the existing record (\encap{emph}). Neither has
+the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ again consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item  The new record's \code{hyperbf} format has no mapping provided,
+\item  The new record's \encap{hyperbf} format has no mapping provided,
 so \bibgls\ moves on to the next test:
 
-\item The existing record's \code{emph} format has a mapping
-provided (\code{hyperbf}). This matches the new record's format,
+\item The existing record's \encap{emph} format has a mapping
+provided (\encap{hyperbf}). This matches the new record's format,
 so the new record takes precedence.
 
-This means that the location list ends up with the \code{hyperbf}
+This means that the location list ends up with the \encap{hyperbf}
 location for page~3.
 \end{itemize}
 \end{enumerate}
@@ -1540,14 +1559,14 @@ If, on the other hand, the mappings are given as
 \begin{verbatim}
 --map-format "emph:hyperit,hypersf:hyperit,hyperbf:hyperit"
 \end{verbatim}
-then all the three conflicting records (\code{emph},
-\code{hypersf} and \code{hyperbf}) will end up being replaced
-by a single record with \code{hyperit} as the format.
+then all the three conflicting records (\encap{emph},
+\encap{hypersf} and \encap{hyperbf}) will end up being replaced
+by a single record with \encap{hyperit} as the format.
 
 Multiple conflicts will typically be rare as there's usually little
 reason for more than two or three different location formats within
-the same list. (For example, \code{glsnumberformat} as the default
-and \code{hyperbf} or \code{hyperit} for a primary reference.)
+the same list. (For example, \encap{glsnumberformat} as the default
+and \encap{hyperbf} or \encap{hyperit} for a primary reference.)
 
 \argsection{group}
 
@@ -1631,7 +1650,7 @@ On the first \appfmt{pdflatex} call, there's no glossary. On the second
 \appfmt{pdflatex}, there's a glossary but the glossary must be
 processed to find the group information, which is written to the
 \iext{aux} file as
-\nosecformatdef{@gls@hypergroup}
+\nosecdef{@gls@hypergroup}
 The third \appfmt{pdflatex} reads this information and is then able
 to create the navigation links.
 
@@ -1721,7 +1740,7 @@ where \meta{name} is the encoding name.
 
 \argsection{no-expand-fields}
 
-By default, \gls{newglossaryentry} expands field values
+By default, \gls{newglossaryentry} and similar commands expand field values
 (except for \field{name}, \field{symbol} and \field{description}).
 This is useful if constructing field values programmatically
 (for example in a loop) but can cause a problem if certain fragile
@@ -1742,7 +1761,9 @@ allowing fields to expand when the entries are defined.
 Remember that this doesn't include the \field{name}, \field{symbol}
 or \field{description} fields, which need to have their
 expansion switched on with
-\nosecformatdef{glssetexpandfield}\margm{field}
+\nosecdef{glssetexpandfield}
+before the entries are defined (that is, before using
+\gls!{GlsXtrLoadResources}).
 
 \argsection{trim-fields}
 
@@ -1775,20 +1796,22 @@ number of records found for the entry;
 \item \field{recordcount.counter}: set to the total
 number of records found for the entry for the given counter.
 \end{itemize}
-These fields can then be used with the \ics{rgls}-like
-commands provided by \sty{glossaries-extra} v1.21+.
-The default behaviour of \ics{rgls}\margm{label}\oarg{insert} is to check
-the \field{recordcount} field against the \catattr{recordcount}
+These fields can then be used with the \ics{rgls}-like commands.
+The default behaviour of
+\nosecdef{rgls}
+is to check the \field{recordcount} field against the \catattr{recordcount}
 attribute value. This attribute can be set with
 \nosecdef{GlsXtrSetRecordCountAttribute}
 where \meta{category list} is a comma-separated list
 of category labels and \meta{value} is a positive integer.
 If the value of the \field{recordcount} field is greater than
 \meta{value} then \ics{rgls} behaves like \ics{gls}, otherwise
-it does \ics{rglsformat}\marg{label}\marg{insert} instead.
+it does
+\nosecdef{rglsformat}
+instead.
 If the use of \ics{rglsformat} is triggered in this way,
 then \ics{rgls} writes a record to the \iext{aux} file
-with the \glsopt{format} set to \ics{glstriggerrecordformat}.
+with the \glsopt{format} set to \encap{glstriggerrecordformat}.
 This ensures that the record count is correct on the next run,
 but the record isn't added to the location list as
 \bibgls\ recognises it as a special ignored location.
@@ -3149,10 +3172,10 @@ a glossary and a list of symbols:
 Here I've provided some convenient commands for referencing the
 primary (index) terms (\csfmt{idx}, \csfmt{idxpl}, \csfmt{Idx}
 and \csfmt{Idxpl}). This means I don't need to worry about the
-label prefix and it also switches off the hyperlinks. This uses
-\nosecdef{glsxtrnewglslike}
-which was introduced to \sty{glossaries-extra} v1.21. It
-essentially does
+label prefix and it also switches off the hyperlinks. These custom
+commands are defined using
+\nosecformatdef{glsxtrnewglslike}
+which, in this case, essentially does
 \begin{verbatim}
 \newcommand{\idx}[2][]{\gls[hyper=false,#1]{idx.#2}}
 \newcommand{\Idx}[2][]{\Gls[hyper=false,#1]{idx.#2}}
@@ -3368,12 +3391,10 @@ will be provided in the \iext{glstex} file with
 \begin{alltt}
 \ics{glsxtrprovidestoragekey}\margm{key}\marg{}\marg{}
 \end{alltt}
-This command is defined by the \styfmt{glossaries-extra} package.
 Note that this use with an empty third argument prevents
 the creation of a field access command (analogous to
-\ics{glsentrytext}). You can fetch the value with
-\ics{glsxtrusefield}.  (See the \styfmt{glossaries-extra} manual for
-further details.) Remember that the field won't be
+\ics{glsentrytext}). The value can be accessed with
+\ics{glsxtrusefield} instead. Remember that the field won't be
 available until the \ext{glstex} file has been created.
 
 Note that \bibgls\ doesn't know what abbreviation styles
@@ -4624,7 +4645,7 @@ parent has a location list.
 Only the parent entries that don't have a location list will be
 removed from the selection.
 \item[\optfmt{no discard}] This setting will adjust all
-sub-entries that have no siblings regardless of whether or not the
+sub-entries that don't have siblings regardless of whether or not the
 parent has a location list. No entries will be discarded, so parent
 entries that don't have a location list will still appear in the
 glossary.
@@ -4843,7 +4864,7 @@ but the category in the optional argument needs to be correct.
 \optsection{master-resources}
 
 If the master document has multiple resource files
-then by default all that document's
+then by default all the master document's
 \iext{glstex} files will be input. If you don't want them all
 you can use \optfmt{master-resources} to specify
 only those files that should be included. The value \meta{list} is 
@@ -4852,7 +4873,7 @@ to the final argument of \csref{glsxtrresourcefile}.
 Remember that \gls{GlsXtrLoadResources} is just a shortcut
 for \gls{glsxtrresourcefile} that bases the name on \ics{jobname}.
 (Note that, as with the argument of \gls{glsxtrresourcefile},
-the \ext{glstex} extension should not be included.) The file
+the \ext{glstex} extension should not be included in \meta{list}.) The file
 \primaryresourcefmt\ is considered the primary
 resource file and the files \suppresourcefmt{\meta{n}}
 (starting with \meta{n} equal to 1) are considered the supplementary resource files.
@@ -5146,7 +5167,7 @@ and the file \filefmt{entries-symbols.bib} contains:
 \end{verbatim}
 
 These files both contain an entry with the label \code{set}
-but the description includes \verb|\gls{ext1.set}| which is
+but the \field{description} field includes \verb|\gls{ext1.set}| which is
 referencing the entry from the other file. These
 two files can be loaded without conflict using:
 \begin{verbatim}
@@ -5691,34 +5712,34 @@ to an odd empty gap in the location list with a spurious comma. If
 will be selected but the record will be discarded.
 
 This means that the location list will be empty if the entry was
-only indexed with \optfmt{glsignore}, but if the entry was also
+only indexed with the special ignored format, but if the entry was also
 indexed with another format then the location list won't include the
-ignored record.  (This format is used by \ics{glsaddallunused} but
+ignored records. (This format is used by \ics{glsaddallunused} but
 remember that iterative commands like this don't work with \bibgls.
-Instead, just use \csopt[all]{selection} to select all entries.)
+Instead, just use \csopt[all]{selection} to select all entries.
+Those that don't have records won't have a location list.)
 
 For example, suppose you only want main matter locations in the
 number list, but you want entries that only appear in the back matter 
 to still appear in the glossary (without a location list), then you could do:
-\begin{verbatim}
-\backmatter
-\GlsXtrSetDefaultNumberFormat{glsignore}
-\end{verbatim}
-(This command requires v1.19 of \sty{glossaries-extra}.) If you also
-want to drop front matter locations as well:
-\begin{verbatim}
-\frontmatter
-\GlsXtrSetDefaultNumberFormat{glsignore}
-...
-\mainmatter
-\GlsXtrSetDefaultNumberFormat{glsnumberformat}
-...
-\backmatter
-\GlsXtrSetDefaultNumberFormat{glsignore}
-\end{verbatim}
+\begin{alltt}
+\ics{backmatter}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\end{alltt}
+If you also want to drop front matter locations as well:
+\begin{alltt}
+\ics{frontmatter}
+\cs{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\ldots
+\ics{mainmatter}
+\cs{GlsXtrSetDefaultNumberFormat}\marg{glsnumberformat}
+\ldots
+\cs{backmatter}
+\cs{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\end{alltt}
 
 Note that explicit range formations aren't discarded, so if
-\optfmt{glsignore} is used in a range, such as
+\encap{glsignore} is used in a range, such as
 \begin{verbatim}
 \glsadd[format=(glsignore]{sample}
 ... 
@@ -5729,8 +5750,8 @@ with \ics{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
 
 The record counting commands, such as \ics{rgls}, use the special
-format \ics{glstriggerrecordformat}, which \bibgls\ also treats
-as an ignored location.
+format \encap{glstriggerrecordformat}, which \bibgls\ also treats
+as an ignored location and the same rules as for \encap{glsignore} apply.
 
 The locations are always listed in the order in which they were indexed,
 (except for the cross-reference which may be placed at the start or
@@ -5785,13 +5806,13 @@ makes the following tests:
 \item If one of the formats includes a range formation, the
 range takes precedence.
 
-\item If one of the formats is \code{glsnumberformat} (as in the
-above example) or \code{glsignore}, that format will be skipped.
+\item If one of the formats is \encap{glsnumberformat} (as in the
+above example) or \encap{glsignore}, that format will be skipped.
 So in the above example, the second record will be added to the
 location list, but not the first. (A message will only be written to
 the transcript if the \longarg{debug} switch is used.) The default
-\code{glsnumberformat} will take precedence over the ignored
-format \code{glsignore}.
+\encap{glsnumberformat} will take precedence over the ignored
+format \encap{glsignore}.
 
 \item If a mapping has been set with the \longarg{map-format}
 switch that mapping will be checked.
@@ -5824,6 +5845,12 @@ you're not additionally using \idx{makeindex} or \idx{xindy}, then
 the locations won't be available even if you don't have the
 \styopt{nonumberlist} option set.
 
+\optsection{save-loclist}
+
+If you want the \field{location} field but don't need
+\field{loclist}, you can use \csopt[false]{save-loclist}.
+This can help to save resources and build time.
+
 \optsection{min-loc-range}
 
 By default, three or more consecutive locations \meta{loc-1},
@@ -5851,10 +5878,8 @@ considered consecutive.
 then the locations aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern (line break for clarity only)\footnote{The Java class \code{\csfmt{p}\marg{javaDigit}}
-used in the regular expression will not only match the Western
-Arabic digits 0,\ldots, 9 but also digits in other scripts.
-Similarly the alphabetic classes will match alphabetic characters
-outside the Basic Latin set.}
+used in the regular expression will match any digits in the 
+Unicode \idx{numberdecimaldigit} category not just the digits in the Basic Latin set.}
 \begin{verbatim}
 (.*?)(?:\\protect\s*)?(\\[\p{javaAlphabetic}@]+)\s*\{([\p{javaDigit}
 \p{javaAlphabetic}]+)\}
@@ -6475,8 +6500,8 @@ will be separated by \csref{bibglssupplementalsep}.
 
 \optsection{supplemental-category}
 
-The \optfmt{category} for entries containing supplemental location
-lists may be set using \optfmt{supplemental-category}. If unset,
+The \field{category} field for entries containing supplemental location
+lists may be set using this option. If unset,
 \meta{value} defaults to the same as that given by the
 \csopt{category} option. The \meta{value} may either be a known
 identifier (as per \csopt{category}) or the category label. For example:
@@ -6520,8 +6545,9 @@ The \csopt{sort} key indicates how entries should be sorted.
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
 The reverse sort methods reverse the algorithm used by the
-comparators. This means that the \optfmt{\meta{method}-reverse}
-methods may not produce a list that's the exact reverse of the
+comparators. This means that 
+\optfmt{\meta{method}\dhyphen reverse}
+may not produce a list that's the exact reverse of the
 underlying non-reversed \meta{method}. The reverse sorts maintain
 hierarchy, so sub-entries will still be listed after the parent
 entry.

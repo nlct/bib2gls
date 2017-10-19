@@ -460,6 +460,10 @@ public class GlsResource
          {
             saveLocations = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("save-loclist"))
+         {
+            saveLocList = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("combine-dual-locations"))
          {
             String val = getChoice(parser, list, opt,
@@ -4493,7 +4497,11 @@ public class GlsResource
      throws IOException
    {
       entry.writeBibEntry(writer);
-      entry.writeLocList(writer);
+
+      if (saveLocList)
+      {
+         entry.writeLocList(writer);
+      }
 
       if (saveChildCount)
       {
@@ -5923,6 +5931,7 @@ public class GlsResource
    private String[] locationSuffix = null;
 
    private boolean saveLocations = true;
+   private boolean saveLocList = true;
 
    public static final int COMBINE_DUAL_LOCATIONS_OFF=0;
    public static final int COMBINE_DUAL_LOCATIONS_BOTH=1;
