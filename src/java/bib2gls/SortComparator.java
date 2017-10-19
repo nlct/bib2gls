@@ -35,12 +35,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       this.entryType = entryType;
       this.bib2gls = bib2gls;
       this.entries = entries;
+      this.settings = settings;
 
-      sortSuffixMarker = settings.getSuffixMarker();
-      sortSuffixOption = settings.getSuffixOption();
+   }
 
-      reverse = settings.isReverse();
-      trim = settings.isTrimOn();
+   protected boolean useSortSuffix()
+   {
+      return (settings.getSuffixOption() != SortSettings.SORT_SUFFIX_NONE);
    }
 
    protected String getType(Bib2GlsEntry entry)
@@ -100,10 +101,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          else if (bib2gls.useInterpreter() && list != null
                    && value.matches(".*[\\\\\\$\\{\\}].*"))
          {
-            value = bib2gls.interpret(value, list, trim);
+            value = bib2gls.interpret(value, list, settings.isTrimOn());
          }
 
-         value = applySuffix(entry, value);
+         if (useSortSuffix())
+         {
+            value = applySuffix(entry, value);
+         }
       }
 
       value = adjustSort(entry, value);
@@ -115,7 +119,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
    protected String applySuffix(Bib2GlsEntry entry, String value)
    {
-      switch (sortSuffixOption)
+      switch (settings.getSuffixOption())
       {
          case SortSettings.SORT_SUFFIX_CATEGORY:
 
@@ -123,7 +127,16 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
            if (category != null)
            {
-              value += sortSuffixMarker + category;
+              String suff = settings.getSuffixMarker() + category;
+
+              if (bib2gls.getVerboseLevel() > 0)
+              {
+                  bib2gls.logMessage(
+                    bib2gls.getMessage("message.sort_suffix",
+                       suff, value, entry.getId()));
+              }
+
+              value += suff;
            }
 
          break;
@@ -133,10 +146,14 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
             if (suff != null)
             {
-               suff = sortSuffixMarker + suff;
+               suff = settings.getSuffixMarker() + suff;
 
-               bib2gls.verbose(bib2gls.getMessage("message.sort_suffix",
-                 suff, value, entry.getId()));
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                   bib2gls.logMessage(
+                      bib2gls.getMessage("message.sort_suffix",
+                       suff, value, entry.getId()));
+               }
 
                value += suff;
             }
@@ -145,78 +162,6 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       return value;
    }
-
-   protected abstract int compareElements(Bib2GlsEntry entry1, 
-     Bib2GlsEntry entry2);
-
-   public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
-   {
-      if (bib2gls.getCurrentResource().flattenSort())
-      {
-         int result = compareElements(entry1, entry2);
-
-         return reverse ? -result : result;
-      }
-
-      if (entry1.getId().equals(entry2.getParent()))
-      {
-         // entry1 is the parent of entry2
-         // so entry1 must come before (be less than) entry2
-         // (even with a reverse sort)
-
-         return -1;
-      }
-
-      if (entry2.getId().equals(entry1.getParent()))
-      {
-         // entry2 is the parent of entry1
-         // so entry1 must come after (be greater than) entry2
-         // (even with a reverse sort)
-
-         return 1;
-      }
-
-      if (entry1.equals(entry2))
-      {
-         return 0;
-      }
-
-      int n1 = entry1.getHierarchyCount();
-      int n2 = entry2.getHierarchyCount();
-
-      int n = Integer.min(n1, n2);
-
-      for (int i = 0; i < n; i++)
-      {
-         Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
-         Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
-
-         int result = compareElements(e1, e2);
-
-         if (reverse)
-         {
-            result = -result;
-         }
-
-         if (bib2gls.getDebugLevel() > 1)
-         {
-            bib2gls.logAndPrintMessage(String.format("%s %c %s",
-              e1.getFieldValue("sort"),
-              result == 0 ? '=' : (result < 0 ? '<' : '>'),
-              e2.getFieldValue("sort")));
-         }
-
-         if (result != 0)
-         {
-            return result;
-         }
-      }
-
-      // hierarchy needs preserving
-
-      return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
-   }
-
 
    protected String sortSuffix(String sort, Bib2GlsEntry entry)
    {
@@ -256,6 +201,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       if (num == null)
       {
          sortCount.put(key, Integer.valueOf(0));
+
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.logMessage(String.format("%s: %s -> 0",
+              entry.getId(), key));
+         }
+
          return null;
       }
 
@@ -266,12 +218,137 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       sortCount.put(key, num);
 
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logMessage(String.format("%s: %s -> %d",
+           entry.getId(), key, num));
+      }
+
       return num.toString();
+   }
+
+   protected abstract int compareElements(Bib2GlsEntry entry1, 
+     Bib2GlsEntry entry2);
+
+   private int getIdenticalSortFallback(Bib2GlsEntry entry1, 
+     Bib2GlsEntry entry2)
+   {
+      switch (settings.getIdenticalSortAction())
+      {
+         case SortSettings.IDENTICAL_SORT_USE_ID:
+
+            return entry1.getId().compareTo(entry2.getId());
+
+         case SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID:
+
+            return entry1.getOriginalId().compareTo(
+               entry2.getOriginalId());
+
+         case SortSettings.IDENTICAL_SORT_USE_CATEGORY:
+
+            String category1 = entry1.getFieldValue("category");
+
+            if (category1 == null)
+            {
+               category1 = "";
+            }
+
+            String category2 = entry2.getFieldValue("category");
+
+            if (category2 == null)
+            {
+               category2 = "";
+            }
+
+            return category1.compareTo(category2);
+      }
+
+      return 0;
+   }
+
+   public int compare(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
+   {
+      boolean reverse = settings.isReverse();
+
+      if (bib2gls.getCurrentResource().flattenSort())
+      {
+         int result = compareElements(entry1, entry2);
+
+         if (result == 0)
+         {
+            result = getIdenticalSortFallback(entry1, entry2);
+         }
+
+         return reverse ? -result : result;
+      }
+
+      if (entry1.getId().equals(entry2.getParent()))
+      {
+         // entry1 is the parent of entry2
+         // so entry1 must come before (be less than) entry2
+         // (even with a reverse sort)
+
+         return -1;
+      }
+
+      if (entry2.getId().equals(entry1.getParent()))
+      {
+         // entry2 is the parent of entry1
+         // so entry1 must come after (be greater than) entry2
+         // (even with a reverse sort)
+
+         return 1;
+      }
+
+      if (entry1.equals(entry2))
+      {
+         return 0;
+      }
+
+      int n1 = entry1.getHierarchyCount();
+      int n2 = entry2.getHierarchyCount();
+
+      int n = Integer.min(n1, n2);
+
+      for (int i = 0; i < n; i++)
+      {
+         Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
+         Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
+
+         int result = compareElements(e1, e2);
+
+         if (result == 0)
+         {
+            result = getIdenticalSortFallback(entry1, entry2);
+         }
+
+         if (reverse)
+         {
+            result = -result;
+         }
+
+         if (bib2gls.getDebugLevel() > 1)
+         {
+            bib2gls.logAndPrintMessage(String.format("%s %c %s",
+              e1.getFieldValue("sort"),
+              result == 0 ? '=' : (result < 0 ? '<' : '>'),
+              e2.getFieldValue("sort")));
+         }
+
+         if (result != 0)
+         {
+            return result;
+         }
+      }
+
+      // hierarchy needs preserving
+
+      return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
    }
 
    public void sortEntries() throws Bib2GlsException
    {
-      if (sortSuffixOption == SortSettings.SORT_SUFFIX_NON_UNIQUE)
+      if (settings.getSuffixOption() == SortSettings.SORT_SUFFIX_NON_UNIQUE)
       {
          sortCount = new HashMap<String,Integer>();
       }
@@ -287,15 +364,11 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
    protected String sortField, groupField, entryType;
 
-   protected boolean reverse = false, trim;
-
    private HashMap<String,Integer> sortCount;
 
    protected Bib2Gls bib2gls;
 
    protected Vector<Bib2GlsEntry> entries;
 
-   protected String sortSuffixMarker;
-
-   protected int sortSuffixOption;
+   protected SortSettings settings;
 }

@@ -92,6 +92,11 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
       }
    }
 
+   protected boolean useSortSuffix()
+   {
+      return false;
+   }
+
    protected String adjustSort(Bib2GlsEntry entry, String value)
    {
       String id = entry.getId();

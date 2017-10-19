@@ -39,8 +39,6 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
       super(bib2gls, entries, settings, sortField, groupField,
         entryType);
 
-      sortSuffixOption = settings.SORT_SUFFIX_NONE;
-
       String format = settings.getDateFormat();
       Locale locale = settings.getDateLocale();
 
@@ -70,6 +68,11 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
       }
 
       init(locale, format);
+   }
+
+   protected boolean useSortSuffix()
+   {
+      return false;
    }
 
    private void init(Locale locale, String format)

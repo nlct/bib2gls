@@ -767,6 +767,89 @@ public class GlsResource
             secondarySortSettings.setSuffixMarker(
                replaceHex(getOptional(parser, "", list, opt)));
          }
+         else if (opt.equals("identical-sort-action"))
+         {
+            String val = getChoice(parser, list, opt, "none", "id",
+              "category", "original id");
+
+            if (val.equals("none"))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_NO_ACTION);
+            }
+            else if (val.equals("id"))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_ID);
+            }
+            else if (val.equals("category"))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_CATEGORY);
+            }
+            else if (val.equals("id"))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+
+            dualSortSettings.setIdenticalSortAction(
+               sortSettings.getIdenticalSortAction());
+            secondarySortSettings.setIdenticalSortAction(
+               sortSettings.getIdenticalSortAction());
+         }
+         else if (opt.equals("dual-identical-sort-action"))
+         {
+            String val = getChoice(parser, list, opt, "none", "id",
+              "category", "original id");
+
+            if (val.equals("none"))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_NO_ACTION);
+            }
+            else if (val.equals("id"))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_ID);
+            }
+            else if (val.equals("category"))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_CATEGORY);
+            }
+            else if (val.equals("original id"))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+         }
+         else if (opt.equals("secondary-identical-sort-action"))
+         {
+            String val = getChoice(parser, list, opt, "none", "id",
+              "category", "original id");
+
+            if (val.equals("none"))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_NO_ACTION);
+            }
+            else if (val.equals("id"))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_ID);
+            }
+            else if (val.equals("category"))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_CATEGORY);
+            }
+            else if (val.equals("original id"))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+         }
          else if (opt.equals("sort"))
          {
             String method = getOptional(parser, "doc", list, opt);
@@ -3156,7 +3239,9 @@ public class GlsResource
                                    && depEntry instanceof Bib2GlsDualEntry)
                               {
                                  bib2gls.addDependent(
-                                   dualPrefix+depEntry.getOriginalId());
+                                   String.format("%s%s", 
+                                   dualPrefix == null ? "" : dualPrefix, 
+                                   depEntry.getOriginalId()));
                               }
                            }
                         }
@@ -3200,7 +3285,9 @@ public class GlsResource
                                 && depEntry instanceof Bib2GlsDualEntry)
                            {
                               bib2gls.addDependent(
-                                dualPrefix+depEntry.getOriginalId());
+                                String.format("%s%s", 
+                                dualPrefix==null?"":dualPrefix,
+                                depEntry.getOriginalId()));
                            }
                         }
                      }
@@ -3722,12 +3809,12 @@ public class GlsResource
    }
 
    private void sortDataIfRequired(Vector<Bib2GlsEntry> entries,
-     SortSettings settings, String entryGroupField, String entryType)
+     SortSettings settings, String entryGroupField)
     throws Bib2GlsException
    {
       if (settings.requiresSorting() && entries.size() > 0)
       {
-         sortData(entries, settings, entryGroupField, entryType);
+         sortData(entries, settings, entryGroupField, null);
       }
    }
 
@@ -3873,11 +3960,11 @@ public class GlsResource
          entryCount += dualEntries.size();
       }
 
-      sortDataIfRequired(entries, sortSettings, "group", type);
+      sortDataIfRequired(entries, sortSettings, "group");
 
       if (dualEntries != null)
       {
-         sortDataIfRequired(dualEntries, dualSortSettings, "group", dualType);
+         sortDataIfRequired(dualEntries, dualSortSettings, "group");
       }
 
       bib2gls.message(bib2gls.getMessage("message.writing", 
@@ -5778,6 +5865,11 @@ public class GlsResource
       if (entryType != null)
       {
          return entryType;
+      }
+
+      if (entry instanceof Bib2GlsDualEntry)
+      {
+         return ((Bib2GlsDualEntry)entry).isPrimary() ? type : dualType;
       }
 
       return type;

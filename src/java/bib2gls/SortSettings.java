@@ -533,6 +533,27 @@ public class SortSettings
       return trim;
    }
 
+   public int getIdenticalSortAction()
+   {
+      return identicalSortAction;
+   }
+
+   public void setIdenticalSortAction(int action)
+   {
+      switch (action)
+      {
+         case IDENTICAL_SORT_NO_ACTION:
+         case IDENTICAL_SORT_USE_ID:
+         case IDENTICAL_SORT_USE_CATEGORY:
+         case IDENTICAL_SORT_USE_ORIGINAL_ID:
+           identicalSortAction = action;
+         break;
+         default:
+           throw new IllegalArgumentException(
+              "Invalid identical sort action: "+action);
+      }
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -551,7 +572,7 @@ public class SortSettings
    private int breakPoint = Bib2GlsEntryComparator.BREAK_WORD;
    private String breakPointMarker = "|";
 
-   private int sortSuffixOption=SORT_SUFFIX_NON_UNIQUE;
+   private int sortSuffixOption=SORT_SUFFIX_NONE;
 
    private String sortSuffixMarker = "";
 
@@ -561,4 +582,10 @@ public class SortSettings
    public static final int SORT_SUFFIX_NON_UNIQUE=1;
    public static final int SORT_SUFFIX_CATEGORY=2;
 
+   public static final int IDENTICAL_SORT_NO_ACTION=0;
+   public static final int IDENTICAL_SORT_USE_ID=1;
+   public static final int IDENTICAL_SORT_USE_CATEGORY=2;
+   public static final int IDENTICAL_SORT_USE_ORIGINAL_ID=3;
+
+   private int identicalSortAction = IDENTICAL_SORT_USE_ID;
 }

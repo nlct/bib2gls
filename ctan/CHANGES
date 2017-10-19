@@ -7,6 +7,9 @@ v1.1 (pending):
      - name-case-change
      - description-case-change
      - not-match
+     - identical-sort-action
+     - dual-identical-sort-action
+     - secondary-identical-sort-action
      - sort-suffix
      - sort-suffix-marker
      - date-sort-format

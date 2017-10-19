@@ -7507,6 +7507,39 @@ inter-word punctuation. For example, with
 \code{sealion}. If \meta{marker} is omitted,
 \csopt[\empty]{break-marker} is assumed.
 
+\optsection{identical-sort-action}
+
+This option automatically implements the dual and secondary settings
+\csopt[\meta{value}]{dual-identical-sort-action} and
+\csopt[\meta{value}]{secondary-identical-sort-action}.
+
+This option determines what the comparator should do if
+two entries at the same hierarchical level are considered
+equal.  The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{none}: don't take any further action if sort values are
+identical;
+\item\optfmt{id}: if sort values are identical, compare
+the entry labels;
+\item\optfmt{original id}: if sort values are identical, compare the
+original unprefixed entry labels (as given in the \ext{bib} file);
+\item\optfmt{category}: if sort values are identical, compare
+the category fields.
+\end{itemize}
+The default setting is \csopt[id]{identical-sort-action}.
+
+\bibgls\ allows duplicate sort values, but this can cause a problem
+for hierarchical entries where parent entries with duplicate sort
+fields are clumped together and their children follow. To prevent
+this from happening, the \csopt[id]{identical-sort-action}
+setting will fallback on comparing the labels.
+Since all labels must be unique, this means the comparisons
+are all either strictly higher or strictly lower (except when
+comparing identical entries).
+
+This action occurs after any suffixes have been appended through
+\csopt{sort-suffix}.
+
 \optsection{sort-suffix}
 
 This option automatically implements the dual and secondary settings
@@ -7520,32 +7553,30 @@ The value may be one of:
 \item\optfmt{category}: append the entry's category (if set) to
   the \field{sort} field.
 \end{itemize}
-
-\bibgls\ allows duplicate sort values, but this can cause a problem
-for hierarchical entries where parent entries with duplicate sort
-fields are clumped together and their children follow. To prevent
-this from happening \csopt[non-unique]{sort-suffix} will append a
-suffix to the duplicate sort values (within the same hierarchical
-level). Note that only the duplicates are given suffixes with this
-setting. The first sort value to be encountered isn't given a suffix.
-
-The default setting is \csopt[non-unique]{sort-suffix}.
-If you don't have any child entries or if all your sort values are
-unique, then you can use \csopt[none]{sort-suffix} to suppress this
-action, which can slightly improve the run time.
-
-The \csopt[category]{sort-suffix} setting will only append a suffix
-if the entry's \field{category} field is set, but (if set) it will
-apply the suffix to all \field{sort} values, even those that are
-unique.
+The default setting is \csopt[none]{sort-suffix}.
 
 This option only affects the alphabetic
 (\tableref{tab:sortoptionsrule}), letter
 (\tableref{tab:sortoptionsletter}) and letter-number
 (\tableref{tab:sortoptionsletternumber}) sort rules.  For the other
 types of sort methods (not including the no-sort options listed in
-\tableref{tab:sortoptionsnosort}) you need to guard against
-duplicates if you have hierarchical entries.
+\tableref{tab:sortoptionsnosort}) you'll need to use
+\csopt[id]{identical-sort-action} to prevent problems occurring with
+duplicate sort values.
+
+If \csopt{identical-sort-action} isn't set to \optfmt{id},
+then there may be duplicate sort values. To prevent
+problems occurring with the hierarchy, this option may be
+used to append a suffix to sort values.
+
+In the case of \csopt[non-unique]{sort-suffix}, this will only append a
+suffix to the duplicate sort values (within the same hierarchical
+level). The first sort value to be encountered isn't given a suffix.
+
+The \csopt[category]{sort-suffix} setting will only append a suffix
+if the entry's \field{category} field is set, but (if set) it will
+apply the suffix to all \field{sort} values, even those that are
+unique.
 
 If you use \longarg{verbose}, then \bibgls\ will write information
 in the transcript when it appends a suffix to the sort value.  The
@@ -7599,7 +7630,8 @@ determine that the sort value for \code{cs.makeglossaries} is
 \code{ap.makeglossaries} is just \code{makeglossaries}. These are 
 two distinct sort values from \bibgls's point of view although the
 sort rule may consider them identical if the rule ignores the
-\verb|\| character (such as the locale sort methods).
+\verb|\| character (such as the locale sort methods), in which case,
+\bibgls\ will then act according to \csopt{identical-sort-action}.
 
 If \bibgls\ isn't provided with these custom definitions, then it
 will ignore them and both entries will end up with the sort value
@@ -7668,7 +7700,10 @@ then the document can be altered to use \bibgls:
 
 \usepackage[record,style=indexgroup]{glossaries-extra}
 
-\GlsXtrLoadResources{src=entries.bib}
+\GlsXtrLoadResources{src=entries.bib,
+  sort-suffix=non-unique,
+  identical-sort-action=none
+}
 
 \begin{document}
 
@@ -7777,7 +7812,7 @@ description of \code{ap.makeglossaries}) which means it's now the
 first entry to be selected so the ordering switches to:
 \csfmt{makeglossaries}, \appfmt{makeglossaries}.
 In this type of situation you might be better off with the
-\csopt[category]{sort-suffix} option instead.
+\csopt[id]{identical-sort-action} option instead.
 
 Remember that you can temporarily switch off the indexing by locally
 setting
@@ -8349,6 +8384,10 @@ As \csopt{break-at} but for secondary entries.
 
 As \csopt{break-marker} but for secondary entries.
 
+\optsection{secondary-identical-sort-action}
+
+As \csopt{identical-sort-action} but for secondary entries.
+
 \optsection{secondary-sort-suffix}
 
 As \csopt{sort-suffix} but for secondary entries.
@@ -8708,6 +8747,10 @@ As \csopt{break-at} but for dual entries.
 \optsection[\subsubsection]{dual-break-marker}
 
 As \csopt{break-marker} but for dual entries.
+
+\optsection[\subsubsection]{dual-identical-sort-action}
+
+As \csopt{identical-sort-action} but for dual entries.
 
 \optsection[\subsubsection]{dual-sort-suffix}
 
