@@ -8,7 +8,7 @@ sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	$(BIB2GLS) sample-chemical
 	pdflatex sample-chemical
 
-sample-units.pdf	: $(DEPS) sample-units.tex units.bib derviedunits.bib
+sample-units.pdf	: $(DEPS) sample-units.tex baseunits.bib derivedunits.bib
 	pdflatex sample-units
 	$(BIB2GLS) sample-units
 	pdflatex sample-units

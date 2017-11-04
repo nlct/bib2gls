@@ -4,17 +4,32 @@
 \usepackage[record,stylemods=longbooktabs]{glossaries-extra}
 
 \newglossary*{units}{Units of Measurement (by SI unit)}
+\newglossary*{units2}{Units of Measurement (by category)}
 
 \GlsXtrLoadResources[
-  src={units,derviedunits},% data in units.bib and derivedunits.bib
+  % data in baseunits.bib and derivedunits.bib:
+  src={baseunits,derivedunits},
+  category={same as base},% set category field to base name
   sort-field={name},% sort by name field
   selection=all,% select all entries
   type=main,% put primary entries in main glossary
-  entry-type-aliases={symbol=dualsymbol},% make @symbol act like @dualsymbol
+  % make @symbol act like @dualsymbol:
+  entry-type-aliases={symbol=dualsymbol},
   set-widest,% needed for alttree style
   dual-sort={letternumber-upperlower},
   %dual-letter-number-punc-rule={punc-first-space-zero},
   dual-type={units}
+]
+
+\GlsXtrLoadResources[
+  src={baseunits,derivedunits},
+  selection={all},
+  category={same as base},
+  sort-field={category},
+  identical-sort-action={name},
+  sort={letter-case},
+  type=units2,
+  action=copy
 ]
 
 \setlength{\glsdescwidth}{.4\hsize}
@@ -51,5 +66,8 @@
  style={units}]
 
 \printunsrtglossary[type=units,style=alttree]
+
+\printunsrtglossary*[type=units2,style=indexgroup]
+ {\renewcommand{\glsxtrgroupfield}{category}}
 
 \end{document}
