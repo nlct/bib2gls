@@ -248,6 +248,11 @@ Contains one or more special characters.</entry>
 <entry key="warning.alias.not.found">Can''t find target {0} for aliased entry {1}.
 Aliased entries must be in the same resource set as their target entries with option {2}={3}.</entry>
 <entry key="warning.deprecated">''{0}'' deprecated. Use ''{1}'' instead.</entry>
+<entry key="warning.identical">Identical sort values for ''{0}'' and ''{1}''</entry>
+<entry key="warning.identical.id">Falling back on ID</entry>
+<entry key="warning.identical.original_id">Falling back on original ID</entry>
+<entry key="warning.identical.none">No fallback</entry>
+<entry key="warning.identical.field">Falling back on ''{0}'' field (comparing ''{1}'' and ''{2}'')</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>

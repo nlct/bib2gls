@@ -505,7 +505,17 @@ public class SortSettings
 
    public void setSuffixOption(int option)
    {
-      sortSuffixOption=option;
+      switch (option)
+      {
+         case SORT_SUFFIX_NONE:
+         case SORT_SUFFIX_NON_UNIQUE:
+         case SORT_SUFFIX_FIELD:
+            sortSuffixOption=option;
+         break;
+         default:
+           throw new IllegalArgumentException(
+              "Invalid identical sort suffix option: "+option);
+      }
    }
 
    public int getSuffixOption()
@@ -521,6 +531,16 @@ public class SortSettings
    public String getSuffixMarker()
    {
       return sortSuffixMarker;
+   }
+
+   public void setSuffixField(String field)
+   {
+      sortSuffixField = field;
+   }
+
+   public String getSuffixField()
+   {
+      return sortSuffixField;
    }
 
    public void setTrim(boolean value)
@@ -544,7 +564,7 @@ public class SortSettings
       {
          case IDENTICAL_SORT_NO_ACTION:
          case IDENTICAL_SORT_USE_ID:
-         case IDENTICAL_SORT_USE_CATEGORY:
+         case IDENTICAL_SORT_USE_FIELD:
          case IDENTICAL_SORT_USE_ORIGINAL_ID:
            identicalSortAction = action;
          break;
@@ -552,6 +572,16 @@ public class SortSettings
            throw new IllegalArgumentException(
               "Invalid identical sort action: "+action);
       }
+   }
+
+   public void setIdenticalSortField(String field)
+   {
+      identicalSortField = field;
+   }
+
+   public String getIdenticalSortField()
+   {
+      return identicalSortField;
    }
 
    private String sortMethod=null;
@@ -576,16 +606,20 @@ public class SortSettings
 
    private String sortSuffixMarker = "";
 
+   private String sortSuffixField = null;
+
    private boolean trim=true;
 
    public static final int SORT_SUFFIX_NONE=0;
    public static final int SORT_SUFFIX_NON_UNIQUE=1;
-   public static final int SORT_SUFFIX_CATEGORY=2;
+   public static final int SORT_SUFFIX_FIELD=2;
 
    public static final int IDENTICAL_SORT_NO_ACTION=0;
    public static final int IDENTICAL_SORT_USE_ID=1;
-   public static final int IDENTICAL_SORT_USE_CATEGORY=2;
+   public static final int IDENTICAL_SORT_USE_FIELD=2;
    public static final int IDENTICAL_SORT_USE_ORIGINAL_ID=3;
 
-   private int identicalSortAction = IDENTICAL_SORT_USE_ID;
+   private int identicalSortAction = IDENTICAL_SORT_USE_ORIGINAL_ID;
+
+   private String identicalSortField = null;
 }

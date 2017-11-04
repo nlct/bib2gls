@@ -121,13 +121,26 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    {
       switch (settings.getSuffixOption())
       {
-         case SortSettings.SORT_SUFFIX_CATEGORY:
+         case SortSettings.SORT_SUFFIX_FIELD:
 
-           String category = entry.getFieldValue("category");
+           String field = settings.getSuffixField();
+           String fieldValue = entry.getFieldValue(field);
 
-           if (category != null)
+           if (fieldValue != null)
            {
-              String suff = settings.getSuffixMarker() + category;
+              if (bib2gls.useInterpreter()
+                   && fieldValue.matches(".*[\\\\\\$\\{\\}].*"))
+              {
+                 BibValueList list = entry.getField(field);
+
+                 if (list != null)
+                 {
+                    fieldValue = bib2gls.interpret(fieldValue,
+                      list, settings.isTrimOn());
+                 }
+              }
+
+              String suff = settings.getSuffixMarker() + fieldValue;
 
               if (bib2gls.getVerboseLevel() > 0)
               {
@@ -233,35 +246,49 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    private int getIdenticalSortFallback(Bib2GlsEntry entry1, 
      Bib2GlsEntry entry2)
    {
+      bib2gls.debug(bib2gls.getMessage("warning.identical",
+        entry1.getId(), entry2.getId()));
+
       switch (settings.getIdenticalSortAction())
       {
          case SortSettings.IDENTICAL_SORT_USE_ID:
+
+            bib2gls.debug(bib2gls.getMessage("warning.identical.id"));
 
             return entry1.getId().compareTo(entry2.getId());
 
          case SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID:
 
+            bib2gls.debug(bib2gls.getMessage("warning.identical.original_id"));
+
             return entry1.getOriginalId().compareTo(
                entry2.getOriginalId());
 
-         case SortSettings.IDENTICAL_SORT_USE_CATEGORY:
+         case SortSettings.IDENTICAL_SORT_USE_FIELD:
 
-            String category1 = entry1.getFieldValue("category");
+            String field = settings.getIdenticalSortField();
 
-            if (category1 == null)
+            String value1 = entry1.getFieldValue(field);
+
+            if (value1 == null)
             {
-               category1 = "";
+               value1 = "";
             }
 
-            String category2 = entry2.getFieldValue("category");
+            String value2 = entry2.getFieldValue(field);
 
-            if (category2 == null)
+            if (value2 == null)
             {
-               category2 = "";
+               value2 = "";
             }
 
-            return category1.compareTo(category2);
+            bib2gls.debug(bib2gls.getMessage("warning.identical.field", 
+              field, value1, value2));
+
+            return value1.compareTo(value2);
       }
+
+      bib2gls.debug(bib2gls.getMessage("warning.identical.none"));
 
       return 0;
    }

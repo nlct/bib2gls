@@ -723,8 +723,7 @@ public class GlsResource
          }
          else if (opt.equals("sort-suffix"))
          {
-            String val = getChoice(parser, list, opt, "none", "non-unique",
-              "category");
+            String val = getRequired(parser, list, opt);
 
             if (val.equals("none"))
             {
@@ -734,18 +733,26 @@ public class GlsResource
             {
                sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
-            else if (val.equals("category"))
+            else if (bib2gls.isKnownField(val))
             {
-               sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_CATEGORY);
+               sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_FIELD);
+               sortSettings.setSuffixField(val);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                  bib2gls.getMessage("error.invalid.opt.value", opt, val));
             }
 
             dualSortSettings.setSuffixOption(sortSettings.getSuffixOption());
+            dualSortSettings.setSuffixField(sortSettings.getSuffixField());
+
             secondarySortSettings.setSuffixOption(sortSettings.getSuffixOption());
+            secondarySortSettings.setSuffixField(sortSettings.getSuffixField());
          }
          else if (opt.equals("dual-sort-suffix"))
          {
-            String val = getChoice(parser, list, opt, "none", "non-unique",
-              "category");
+            String val = getRequired(parser, list, opt);
 
             if (val.equals("none"))
             {
@@ -756,16 +763,20 @@ public class GlsResource
                dualSortSettings.setSuffixOption(
                  SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
-            else if (val.equals("category"))
+            else if (bib2gls.isKnownField(val))
             {
-               dualSortSettings.setSuffixOption(
-                 SortSettings.SORT_SUFFIX_CATEGORY);
+               dualSortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_FIELD);
+               dualSortSettings.setSuffixField(val);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                  bib2gls.getMessage("error.invalid.opt.value", opt, val));
             }
          }
          else if (opt.equals("secondary-sort-suffix"))
          {
-            String val = getChoice(parser, list, opt, "none", "non-unique",
-               "category");
+            String val = getRequired(parser, list, opt);
 
             if (val.equals("none"))
             {
@@ -777,10 +788,15 @@ public class GlsResource
                secondarySortSettings.setSuffixOption(
                  SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
-            else if (val.equals("category"))
+            else if (bib2gls.isKnownField(val))
             {
-               secondarySortSettings.setSuffixOption(
-                 SortSettings.SORT_SUFFIX_CATEGORY);
+               secondarySortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_FIELD);
+               secondarySortSettings.setSuffixField(val);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                  bib2gls.getMessage("error.invalid.opt.value", opt, val));
             }
          }
          else if (opt.equals("sort-suffix-marker"))
@@ -802,8 +818,7 @@ public class GlsResource
          }
          else if (opt.equals("identical-sort-action"))
          {
-            String val = getChoice(parser, list, opt, "none", "id",
-              "category", "original id");
+            String val = getRequired(parser, list, opt);
 
             if (val.equals("none"))
             {
@@ -815,26 +830,36 @@ public class GlsResource
                sortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ID);
             }
-            else if (val.equals("category"))
-            {
-               sortSettings.setIdenticalSortAction(
-                  SortSettings.IDENTICAL_SORT_USE_CATEGORY);
-            }
-            else if (val.equals("id"))
+            else if (val.equals("original id"))
             {
                sortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+            else if (bib2gls.isKnownField(val))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_FIELD);
+               sortSettings.setIdenticalSortField(val);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                  bib2gls.getMessage("error.invalid.opt.value", opt, val));
             }
 
             dualSortSettings.setIdenticalSortAction(
                sortSettings.getIdenticalSortAction());
+            dualSortSettings.setIdenticalSortField(
+               sortSettings.getIdenticalSortField());
+
             secondarySortSettings.setIdenticalSortAction(
                sortSettings.getIdenticalSortAction());
+            secondarySortSettings.setIdenticalSortField(
+               sortSettings.getIdenticalSortField());
          }
          else if (opt.equals("dual-identical-sort-action"))
          {
-            String val = getChoice(parser, list, opt, "none", "id",
-              "category", "original id");
+            String val = getRequired(parser, list, opt);
 
             if (val.equals("none"))
             {
@@ -846,21 +871,26 @@ public class GlsResource
                dualSortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ID);
             }
-            else if (val.equals("category"))
-            {
-               dualSortSettings.setIdenticalSortAction(
-                  SortSettings.IDENTICAL_SORT_USE_CATEGORY);
-            }
             else if (val.equals("original id"))
             {
                dualSortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+            else if (bib2gls.isKnownField(val))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_FIELD);
+               dualSortSettings.setIdenticalSortField(val);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                  bib2gls.getMessage("error.invalid.opt.value", opt, val));
             }
          }
          else if (opt.equals("secondary-identical-sort-action"))
          {
-            String val = getChoice(parser, list, opt, "none", "id",
-              "category", "original id");
+            String val = getRequired(parser, list, opt);
 
             if (val.equals("none"))
             {
@@ -872,15 +902,21 @@ public class GlsResource
                secondarySortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ID);
             }
-            else if (val.equals("category"))
-            {
-               secondarySortSettings.setIdenticalSortAction(
-                  SortSettings.IDENTICAL_SORT_USE_CATEGORY);
-            }
             else if (val.equals("original id"))
             {
                secondarySortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+            else if (bib2gls.isKnownField(val))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_FIELD);
+               secondarySortSettings.setIdenticalSortField(val);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                  bib2gls.getMessage("error.invalid.opt.value", opt, val));
             }
          }
          else if (opt.equals("sort"))

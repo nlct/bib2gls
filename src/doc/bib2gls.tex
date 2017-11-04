@@ -7685,10 +7685,17 @@ identical;
 the entry labels;
 \item\optfmt{original id}: if sort values are identical, compare the
 original unprefixed entry labels (as given in the \ext{bib} file);
-\item\optfmt{category}: if sort values are identical, compare
-the category fields.
+\item\meta{field}: if sort values are identical, compare
+the values from the given \meta{field} (without using the
+interpreter).
 \end{itemize}
-The default setting is \csopt[id]{identical-sort-action}.
+In each case (other than \csopt[none]{identical-sort-action}) a
+simple string comparison is used. If \meta{value} isn't a recognised
+keyword or valid field an error will occur.
+The default setting is \csopt[original id]{identical-sort-action}.
+If you want to use a field that's not a simple label (such as the
+\field{category} field) you may find it better to use
+\csopt{sort-suffix} for locale-sensitive sorts.
 
 \bibgls\ allows duplicate sort values, but this can cause a problem
 for hierarchical entries where parent entries with duplicate sort
@@ -7712,8 +7719,13 @@ The value may be one of:
 \item\optfmt{none}: don't append a suffix to any \field{sort} value;
 \item\optfmt{non-unique}: append a numeric suffix to non-unique
   \field{sort} values;
-\item\optfmt{category}: append the entry's category (if set) to
-  the \field{sort} field.
+\item\meta{field}: append the value of the given field (if set) to
+  the \field{sort} field. The given field must be defined (has an
+  associated key for use in \cs{newglossaryentry}) but may be unset.
+  If the interpreter is on, the field contents will be interpreted.
+  If the field is just a label (such as the \field{category} field)
+  you may find it simpler to use
+  \csopt[\meta{field}]{identical-sort-action} instead.
 \end{itemize}
 The default setting is \csopt[none]{sort-suffix}.
 
@@ -7723,22 +7735,16 @@ This option only affects the alphabetic
 (\tableref{tab:sortoptionsletternumber}) sort rules.  For the other
 types of sort methods (not including the no-sort options listed in
 \tableref{tab:sortoptionsnosort}) you'll need to use
-\csopt[id]{identical-sort-action} to prevent problems occurring with
+\csopt{identical-sort-action} to prevent problems occurring with
 duplicate sort values.
-
-If \csopt{identical-sort-action} isn't set to \optfmt{id},
-then there may be duplicate sort values. To prevent
-problems occurring with the hierarchy, this option may be
-used to append a suffix to sort values.
 
 In the case of \csopt[non-unique]{sort-suffix}, this will only append a
 suffix to the duplicate sort values (within the same hierarchical
 level). The first sort value to be encountered isn't given a suffix.
 
-The \csopt[category]{sort-suffix} setting will only append a suffix
-if the entry's \field{category} field is set, but (if set) it will
-apply the suffix to all \field{sort} values, even those that are
-unique.
+The \csopt[\meta{field}]{sort-suffix} setting will only append a suffix
+if that field is set, but (if set) it will apply the suffix to all
+\field{sort} values, even those that are unique.
 
 If you use \longarg{verbose}, then \bibgls\ will write information
 in the transcript when it appends a suffix to the sort value.  The

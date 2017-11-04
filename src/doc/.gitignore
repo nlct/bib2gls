@@ -11,4 +11,6 @@
 *.glstex
 *.1
 *.sty
+*.bbl
+*.blg
 bib2gls.pdf
