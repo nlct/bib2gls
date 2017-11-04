@@ -1,11 +1,13 @@
 % arara: xelatex
+% arara: bibtex
 % arara: bib2gls: {group: on}
 % arara: xelatex if missing("toc")
 % arara: xelatex
 % arara: bib2gls: {group: on}
 % arara: xelatex
 % arara: xelatex if found ("log", "Rerun")
-\documentclass[titlepage=false,index=totoc,12pt,captions=tableheading]{scrreprt}
+\documentclass[titlepage=false,index=totoc,bibliography=totoc,
+ fontsize=12pt,captions=tableheading]{scrreprt}
 
 % Need support for extended characters
 % and need a mono font that supports hyphenation
@@ -631,7 +633,7 @@ Note that \bibgls\ is a Java application, and requires Java~7
 (Although again the latest version is recommended.)
 This application was developed in response to the question
 \qt{\href{http://tex.stackexchange.com/q/342544}{Is there a program for
-managing glossary tags?}} on \TeX\ on StackExchange. The \ext{bib}
+managing glossary tags?}} on \TeX\ on StackExchange~\cite{tex.sx}. The \ext{bib}
 file can be managed in an application such as JabRef.
 
 If you already have a \ext{tex} file containing 
@@ -649,8 +651,9 @@ to convert the entries to the \ext{bib} format required by
 \mainmatter
 \chapter{Introduction}
 
-If you have extensively used the \styfmt{glossaries} or
-\styfmt{glossaries-extra} package, you may have found yourself
+If you have extensively used the \styfmt{glossaries}~\cite{glossaries} or
+\styfmt{glossaries-extra}~\cite{glossaries-extra} package, 
+you may have found yourself
 creating a large \iext{tex} file containing many definitions that
 you frequently use in documents. This file can then simply be
 loaded using \ics{input} or \ics{loadglsentries}, but a large file
@@ -681,7 +684,8 @@ redundant location for each entry).
 Note that \bibgls\ requires the extension package
 \isty{glossaries-extra} and can't be used with just the base
 \isty{glossaries} package, since it requires some of the extension
-commands. See the \styfmt{glossaries-extra} user manual for information
+commands. See the \styfmt{glossaries-extra} user
+manual~\cite{glossaries-extra} for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
 
@@ -925,7 +929,8 @@ The \file{texparserlib.jar} file isn't an application but is a
 library used by both \file{bib2gls.jar} and
 \file{convertgls2bib.jar}, and so needs to be in the same class path. 
 (The library is in a separate
-\href{https://github.com/nlct/texparser}{GitHub repository} as it's
+\href{https://github.com/nlct/texparser}{GitHub
+repository}~\cite{texparser} as it's
 also used by some of my other applications.)
 
 Windows users can create a \iext{bat} file that works in a
@@ -1219,7 +1224,7 @@ v -> '\usebox\varrow' [0 105 0 0 0 0]
 Again the addition of the \longarg{group} switch will show
 the letter groups.\footnote{For more information on collation keys see the
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/CollationKey.html}{CollationKey}
-class in Java's API.}
+class in Java's API~\cite{collationkey}.}
 
 Suppose I add a new symbol to my \ext{bib} file:
 \begin{verbatim}
@@ -1446,7 +1451,7 @@ Switches off the above.
 
 By default, \bibgls\ will parse certain fields for potential nested links.
 (See the section \qt{Nested Links} in the \sty{glossaries-extra}
-user manual.)
+user manual~\cite{glossaries-extra}.)
 
 The default set of fields to check are: \field{name}, \field{text},
 \field{plural}, \field{first}, \field{firstplural}, \field{long},
@@ -1838,7 +1843,8 @@ For example:
 \glsxtrenablerecordcount
 \GlsXtrSetRecordCountAttribute{abbreviation}{1}
 \end{verbatim}
-See the \sty{glossaries-extra} user manual for further details.
+See the \sty{glossaries-extra} user manual~\cite{glossaries-extra} 
+for further details.
 
 \argsection{no-record-count}
 
@@ -2143,8 +2149,7 @@ the document definitions will take precedence (but the interpreter
 will use the \atentry{preamble} definitions) and in the second
 example the \atentry{preamble} definitions will take precedence.
 
-\item Make use of \gls{glsxtrfmt} provided by
-\styfmt{glossaries-extra}\footnote{Introduced in version 1.12.}\ which
+\item Make use of \gls{glsxtrfmt} provided by \styfmt{glossaries-extra} which
 allows you to store the name of the formatting command in a field.
 The default is the \field{user1} field, but this can be changed to 
 another field by redefining \ics{GlsXtrFmtField}.
@@ -2184,8 +2189,8 @@ actually be using
 where the default options \meta{def-options} are given by
 \ics{GlsXtrFmtDefaultOptions}. The default definition of this is
 just \code{noindex} which suppresses the automatic indexing or
-recording action. (See the \sty{glossaries-extra} manual
-for further details.)
+recording action. (See the \sty{glossaries-extra}
+manual~\cite{glossaries-extra} for further details.)
 
 This means that the document doesn't need to actually provide
 \verb|\set| or \verb|\card| but can instead use, for example,
@@ -3244,7 +3249,7 @@ You may need to add a mapping from \field{shortplural} to
 The required fields are: \field{short}, \field{long} and
 \field{description}. This entry type is designed to emulate the
 example \gls{newdualentry} command given in the \sty{glossaries}
-user manual. The primary entry is an abbreviation with the given
+user manual~\cite{glossaries}. The primary entry is an abbreviation with the given
 \field{short} and \field{long} fields (but not the 
 \field{description}) and the secondary entry is a regular entry with
 the \field{name} copied from the \field{long} field.
@@ -4067,6 +4072,127 @@ treats the entry as though it had been defined as:
 }
 \end{verbatim}
 
+\optsection{action}
+
+This governs how the entries are written in the \iext{glstex} file.
+The \meta{value} may be one of: 
+\begin{itemize}
+\item\code{define}: define the entries;
+\item\code{copy}: copy the entries;
+\item\code{define or copy}: copy existing entries and define
+non-existing entries.
+\end{itemize}
+The default setting is \csopt[define]{action}, which writes the entry
+definition to the \ext{glstex} file using one of the commands
+described in \sectionref{sec:newentrydefs}. Since the \styopt{record}
+package option automatically switches on the \styopt[warn]{undefaction} 
+option, any attempt at defining an entry that's already been defined
+will generate a warning rather than an error. The duplicate
+definition will be ignored. (The warnings can be found in the
+\ext{log} file since they are warnings produce by
+\sty{glossaries-extra} not by \bibgls.)
+
+For example, if you try:
+\begin{verbatim}
+\newglossary*{copies}{Copies}
+\GlsXtrLoadResources[src={entries}]
+\GlsXtrLoadResources[sort=use,type=copies,src={entries}]
+\end{verbatim}
+you'll find that the \code{copies} glossary is empty and there will
+be warnings in the \ext{log} file when the second resource file is
+loaded.
+
+There are various ways of having the same entries in multiple
+glossaries. The simplest method is to use \csopt{secondary}, but
+another method is to use \csopt[copy]{action} which simply writes
+\nosecformatdef{glsxtrcopytoglossary}
+instead of using one of the commands listed in
+\sectionref{sec:newentrydefs}. This copies the entries rather than
+defining them, which means the entries must already have been
+defined. The \meta{type} is determined as follows:
+\begin{itemize}
+\item if the entry has the \field{type} field set, that's used;
+\item if the entry is a tertiary and \csopt{tertiary-type} is set, that's
+used;
+\item if the entry is a dual and \csopt{dual-type} is set, that's
+used;
+\item otherwise the value of the \csopt{type} option is used.
+\end{itemize}
+If you're not sure whether the entries may already be defined, you
+can use \csopt[define or copy]{action} which will use
+\ics{ifglsentryexists} in the resource file to determine whether to
+define or copy the entry.
+
+Options that set or modify fields, such as \csopt{category},
+\csopt{group}, \csopt{save-locations}, \csopt{flatten} or
+\csopt{name-case-change}, will be ignored if entries are copied.
+However the \csopt{copy-action-group-field} may be used to copy
+the \field{group} field (which may have been locally set by the 
+\csopt{sort} method) to another field. This ensures that the
+original \field{group} value from the entry definition in an earlier
+resource set won't be overwritten (unless you set
+\csopt[group]{copy-action-group-field}).
+
+Remember that \gls{glsxtrcopytoglossary} simply copies the entry's
+label to the glossary's internal list. The only checks that \bibgls\
+performs if \csopt{action} is not \code{define} is to ensure that
+the \csopt{master} or \csopt{secondary} options have not been used,
+since they're incompatible, and that the \csopt{type} option is set,
+since it's required as a fallback for any entries that don't have
+the \field{type} field set. (There are too many options that alter
+field values to check them all and some may be used to alter the
+sorting.) The purpose of the copy action is simply to provide a
+duplicate list in a different order.
+
+Remember that if you are using \sty{hyperref}, you need to use
+\code{target=false} in the optional argument of
+\ics{printunsrtglossary} for the glossary containing the copies to
+prevent duplicate hypertargets. Commands like \cs{gls} will link to
+the original entries. For example, in the preamble:
+\begin{verbatim}
+\newignoredglossary{copies}
+
+\GlsXtrLoadResources[src={entries}]
+
+\GlsXtrLoadResources[
+ sort=use,
+ action={copy},
+ type=copies,
+ src={entries}]
+\end{verbatim}
+and later in the document:
+\begin{verbatim}
+\printunsrtglossary[title={Glossary (Alphabetical)},style=indexgroup]
+\printunsrtglossary[type=copies,title={Glossary (Order of Use)},
+ style=index,nogroupskip,
+ target=false]
+\end{verbatim}
+Note also the need to use \code{nogroupskip} and a non-group style
+for the duplicates since the \field{group} field will have been
+assigned in the first resource set if \bibgls\ was invoked with 
+\longarg{group}. The grouping is appropriate for alphabetical
+ordering but not for order of use.
+
+If you want different grouping for the duplicates, you can specify
+the field name to use in which to store the group information using
+\csopt{copy-action-group-field}. Unlike \csopt{secondary}, you
+will need to redefine \ics{glsxtrgroupfield} to the relevant field
+before you display the glossary. The simplest way to do this is with
+the starred form of \cs{printunsrtglossary}.
+For example, if \csopt[dupgroup]{copy-action-group-field} is added to
+the options for the second resource set:
+\begin{alltt}
+\ics{printunsrtglossary*}\oarg{type=copies,title={Duplicates},style=indexgroup}
+ \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
+\end{alltt}
+This just does:
+\begin{verbatim}
+\begingroup
+ \renewcommand{\glsxtrgroupfield}{dupgroup}%
+ \printunsrtglossary[type=copies,title={Duplicates},style=indexgroup]
+\endgroup
+\end{verbatim}
+
 \section{Selection Options}
 \label{sec:selectionopts}
 
@@ -4203,7 +4329,7 @@ field identifying the glossary label).
 The \meta{regex} part should be a regular expression conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
-Pattern class}. The pattern is anchored (\code{oo.*} matches
+Pattern class}~\cite{pattern}. The pattern is anchored (\code{oo.*} matches
 \code{oops} but not \code{loops}) and \meta{regexp} can't be
 empty. Remember that \TeX\ will expand the option list as
 it writes the information to the \ext{aux} file so take
@@ -4777,6 +4903,8 @@ the method shown in the example code above.
 This option will disable most of the options that relate to
 parsing and processing data contained in \iext{bib} files
 (since this option doesn't actually read any \ext{bib} files).
+It also can't be used with \csopt[copy]{action} or \csopt[define
+or copy]{action}.
 
 The use of \optfmt{master} isn't always suitable. In particular
 if any of the terms cross-reference each other, such as through
@@ -5450,6 +5578,40 @@ be grouped according to each instance of \gls{GlsXtrLoadResources},
 with the provided group label.
 The default behaviour is \csopt[auto]{group}.
 
+\optsection{copy-action-group-field}
+
+This option may only be used when invoking \bibgls\ with the
+\longarg{group} (or \shortargfmt{g}) switch. If an
+entry is copied, you can use this option to identify a field in which to save
+the letter group information 
+where \meta{value} is the name of the field. This just uses
+\cs{GlsXtrSetField}. You will need to redefine
+\ics{glsxtrgroupfield} to \meta{value} before displaying the glossary.
+For example, if \csopt[dupgroup]{copy-action-group-field},
+\csopt[copy]{action} and \csopt[copies]{type} are set in
+the resource options and \code{copies} identifies a custom
+glossary:
+\begin{alltt}
+\ics{printunsrtglossary*}\oarg{type=copies,style=indexgroup}
+ \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
+\end{alltt}
+
+This option is ignored for entries that are defined
+(with \csopt[define]{action} or \csopt[define or copy]{action}) rather than
+copied. This option is not used by \csopt{secondary} which will
+always save the group information in the \field{secondarygroup}
+field.
+
+Note that you may do \csopt[group]{copy-action-group-field} which
+will override the \field{group} field from the original definition.
+This may be useful if you don't use grouping in the primary
+glossary. That is, you use \code{nogroupskip} and a non-group
+style. For example:
+\begin{verbatim}
+\printunsrtglossary[nogroupskip,style=index]
+\printunsrtglossary[type=copies,style=indexgroup]
+\end{verbatim}
+
 \optsection{save-child-count}
 
 This is a boolean option. The default setting is
@@ -5781,7 +5943,7 @@ This uses \ics{glsnoidxloclisthandler} as the list's handler
 macro, which simply displays each location separated by \ics{delimN}.
 (See also
 \href{http://www.dickimaw-books.com/latex/admin/html/foreachtips.shtml}{Iteration
-Tips and Tricks}.)
+Tips and Tricks}~\cite{iterationtips}.)
 
 Each location is listed in the \iext{aux} file in the form:
 \nosecdef{glsxtr@record}
@@ -5833,7 +5995,8 @@ according to the glossary style (and other factors, such as whether the
 \styopt{nonumberlist} option has been used, either as a package
 option or supplied in the optional argument of \ics{printunsrtglossary}).
 For more information on adjusting the formatting see the
-\styfmt{glossaries} and \styfmt{glossaries-extra} user manuals.
+\styfmt{glossaries}~\cite{glossaries} and 
+\styfmt{glossaries-extra}~\cite{glossaries-extra} user manuals.
 
 \optsection{save-locations}
 
@@ -7407,7 +7570,7 @@ If the \csopt[custom]{sort} option is used, the sort rule
 must be provided with \optfmt{sort-rule}. In this case
 the collation is performed using Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/RuleBasedCollator.html}{RuleBasedCollator}
-class. Remember that the options will be expanded as they
+class~\cite{rulebasedcollator}. Remember that the options will be expanded as they
 are written to the \iext{aux} file, so be careful of
 any special characters that occur in the rule. For the 
 special characters \verb|#| \verb|%| \verb|_| \verb|&| \verb|{|
@@ -7416,9 +7579,8 @@ and \verb|}| you can use \verb|\#|, \verb|\%|, \verb|\_|, \verb|\&|,
 and \verb|\}|. These will be written to the \ext{aux} file
 with the leading backslash, but \bibgls\ will remove it for this
 resource option. Remember that the \styfmt{glossaries} package provides
-\ics{glsbackslash}, \ics{glsquote} and \ics{glstildechar} which can be
-used to produce a literal backslash (\verb|\|), double-quote
-(\verb|"|) and tilde (\verb|~|).
+\ics{glsbackslash} and \ics{glstildechar} which can be
+used to produce a literal backslash (\verb|\|) and tilde (\verb|~|).
 
 You can also
 use \stringu\meta{hex} (where \meta{hex} is a hexadecimal
@@ -7862,7 +8024,7 @@ to the following values: \optfmt{primary} (default),
 indicate the difference between two characters, but the exact
 assignment is locale dependent. See the documentation for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\code{Collator}
-class} for further details.
+class}~\cite{collator} for further details.
 
 For example, suppose the file \filefmt{entries.bib} contains:
 \begin{verbatim}
@@ -7927,7 +8089,7 @@ only appropriate for languages without accents. The slowest mode is
 \optfmt{full} but is the most complete for languages with non-ASCII
 characters. See the documentation for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\code{Collator}
-class} for further details.
+class}~\cite{collator} for further details.
 This option is ignored by non-alphabet sorts (such as letter or numeric).
 
 \optsection{letter-number-rule}
@@ -8075,7 +8237,7 @@ If you use the custom \csopt[numberformat]{sort} or
 specify the format pattern with this option where
 \meta{value} is a pattern recognised by Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html}{\code{java.text.DecimalFormat}}
-class. You can use \stringu\meta{hex} to indicate Unicode characters
+class~\cite{decimalformat}. You can use \stringu\meta{hex} to indicate Unicode characters
 by their hexadecimal code. You can also use \verb|\#|, \verb|\%|,
 \verb|\_|, \verb|\&|, \verb|\{| and \verb|\}| to indicate \verb|#|, \verb|%|,
 \verb|_|, \verb|&|, \verb|{| and \verb|}|. 
@@ -8131,7 +8293,7 @@ The \meta{value} may be one of:
 \item\meta{pattern}: provide a custom pattern.
 This should match the specifications for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
-class. You may use \stringu\meta{hex} to indicate Unicode characters
+class~\cite{simpledateformat}. You may use \stringu\meta{hex} to indicate Unicode characters
 or \verb|\#| \verb|\%| \verb|\_| \verb|\&| \verb|\{| and
 \verb|\}| to indicate \verb|#| \verb|%| \verb|_| \verb|&| \verb|{| and
 \verb|}|.
@@ -8225,6 +8387,11 @@ the year and era:
 \section{Secondary Glossary}
 \label{sec:secondaryopts}
 
+The secondary glossary may only be used with \csopt[define]{action}
+(within the same resource set) since it's incompatible with the copy actions.
+You may use \csopt{secondary} in the first resource set and a copy
+action in a subsequent resource set.
+
 \optsection{secondary}
 
 It may be that you want to display a glossary twice but with a
@@ -8233,7 +8400,9 @@ second time by category.  One way to do this is to have two
 \gls{GlsXtrLoadResources} that both load the same \ext{bib} file with
 different \csopt{label-prefix} and \csopt{sort} settings, but this
 is only possible with \csopt[all]{selection} or by ensuring you
-reference each entry with both label prefixes.
+reference each entry with both label prefixes. Another method is
+to use \csopt[copy]{action} but this requires a second resource
+command with the same selection criteria.
 
 A simpler method is to use a single \gls{GlsXtrLoadResources}
 with the \csopt{secondary} option. The value
@@ -10643,7 +10812,7 @@ otherwise it's converted to:
 \formatdef{newdualentry}
 This command isn't provided by either \styfmt{glossaries} or
 \styfmt{glossaries-extra} but is used as an example in the
-\sty{glossaries} user manual and in the sample file
+\sty{glossaries} user manual~\cite{glossaries} and in the sample file
 \file{sample-dual.tex} that accompanies the \sty{glossaries}
 package. Since this command seems to be used quite a bit (given the
 number of times it crops up on sites like
@@ -10714,5 +10883,9 @@ contain:
 \resetsecnumdepth
 
 \printcommandsummary
+
+\bibliographystyle{plain}
+\bibliography{bib2gls-cite}
+
 \printunsrtglossary[type=index]
 \end{document}

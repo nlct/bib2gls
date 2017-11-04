@@ -76,6 +76,8 @@ public class GlsResource
       String master = null;
       String supplemental = null;
 
+      String writeActionSetting = "define";
+
       if (bib2gls.useGroupField())
       {
          groupTitleMap = new HashMap<String,GroupTitle>();
@@ -212,6 +214,37 @@ public class GlsResource
             if (dualShortPluralSuffix.equals("use-default"))
             {
                dualShortPluralSuffix = null;
+            }
+         }
+         else if (opt.equals("action"))
+         {
+            writeActionSetting = getChoice(parser, list, opt,
+              "define", "define or copy", "copy");
+
+            if (writeActionSetting.equals("define"))
+            {
+               writeAction = WRITE_ACTION_DEFINE;
+            }
+            else if (writeActionSetting.equals("define or copy"))
+            {
+               writeAction = WRITE_ACTION_DEFINE_OR_COPY;
+            }
+            else
+            {
+               writeAction = WRITE_ACTION_COPY;
+            }
+         }
+         else if (opt.equals("copy-action-group-field"))
+         {
+            if (bib2gls.useGroupField())
+            {
+               copyActionGroupField = getRequired(parser, list, opt);
+            }
+            else
+            {
+               bib2gls.warning(bib2gls.getMessage(
+                 "warning.group.option.required", opt, "--group"));
+               copyActionGroupField = null;
             }
          }
          else if (opt.equals("match-action"))
@@ -1552,6 +1585,30 @@ public class GlsResource
             secondarySortSettings.getMethod(),
             secondarySortSettings.getSortField(), secondaryType), 
            "secondary-sort-number-pattern"));
+      }
+
+      if (writeAction != WRITE_ACTION_DEFINE)
+      {
+         if (type == null)
+         {
+            throw new IllegalArgumentException(bib2gls.getMessage(
+             "warning.option.pair.required", 
+             "action="+writeActionSetting, "type"));
+         }
+
+         if (secondaryType != null)
+         {
+            throw new IllegalArgumentException(bib2gls.getMessage(
+             "error.option.clash", 
+             "action="+writeActionSetting, "secondary"));
+         }
+
+         if (master != null)
+         {
+            throw new IllegalArgumentException(bib2gls.getMessage(
+             "error.option.clash", 
+             "action="+writeActionSetting, "master"));
+         }
       }
 
       if (selectionMode == SELECTION_ALL && sortSettings.isOrderOfRecords())
@@ -3476,6 +3533,8 @@ public class GlsResource
             writer.println("\\glsnoexpandfields");
          }
 
+         bib2gls.writeCommonCommands(writer);
+
          // Save original definition of \@glsxtr@s@longnewglossaryentry
          // and \glsxtr@newabbreviation
 
@@ -4603,7 +4662,7 @@ public class GlsResource
       return entryCount;
    }
 
-   private void writeBibEntry(PrintWriter writer, Bib2GlsEntry entry)
+   private void writeBibEntryDef(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException
    {
       entry.writeBibEntry(writer);
@@ -4622,6 +4681,86 @@ public class GlsResource
       if (bib2gls.isRecordCountSet())
       {
          bib2gls.writeRecordCount(entry.getId(), writer);
+      }
+   }
+
+   private void writeBibEntryCopy(PrintWriter writer, Bib2GlsEntry entry)
+     throws IOException
+   {
+      String entryType = getType(entry);
+
+      if (entryType == null)
+      {
+         // dual entry without dual-type set
+
+         entryType = type;
+      }
+
+      writer.format("\\glsxtrcopytoglossary{%s}{%s}%n",
+        entry.getId(), entryType);
+
+      if (copyActionGroupField != null)
+      {
+         String value = entry.getFieldValue("group");
+
+         if (value != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+             entry.getId(), copyActionGroupField, value);
+         }
+      }
+
+      if (entry instanceof Bib2GlsDualEntry && 
+           ((Bib2GlsDualEntry)entry).hasTertiary())
+      {
+         if (tertiaryType != null)
+         {
+            entryType = tertiaryType;
+         }
+
+         String id = entry.getOriginalId();
+
+         if (tertiaryPrefix != null)
+         {
+            id = tertiaryPrefix+id;
+         }
+
+         writer.format("\\glsxtrcopytoglossary{%s}{%s}%n",
+           id, entryType);
+
+         if (copyActionGroupField != null)
+         {
+            String value = entry.getFieldValue("group");
+
+            if (value != null)
+            {
+               writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+                id, copyActionGroupField, value);
+            }
+         }
+
+      }
+   }
+
+   private void writeBibEntry(PrintWriter writer, Bib2GlsEntry entry)
+     throws IOException
+   {
+      switch (writeAction)
+      {
+         case WRITE_ACTION_DEFINE:
+           writeBibEntryDef(writer, entry);
+         break;
+         case WRITE_ACTION_COPY:
+           writeBibEntryCopy(writer, entry);
+         break;
+         case WRITE_ACTION_DEFINE_OR_COPY:
+
+           writer.format("\\ifglsentryexists{%s}{%n", entry.getId());
+           writeBibEntryCopy(writer, entry);
+           writer.println("}");
+           writer.println("{");
+           writeBibEntryDef(writer, entry);
+           writer.println("}");
       }
 
       writer.println();
@@ -6024,10 +6163,18 @@ public class GlsResource
 
    private boolean fieldPatternsAnd=true;
 
-   private final int MATCH_ACTION_FILTER = 0; 
-   private final int MATCH_ACTION_ADD = 1; 
+   private final byte MATCH_ACTION_FILTER = 0; 
+   private final byte MATCH_ACTION_ADD = 1; 
 
-   private int matchAction = MATCH_ACTION_FILTER;
+   private byte matchAction = MATCH_ACTION_FILTER;
+
+   private final byte WRITE_ACTION_DEFINE=0;
+   private final byte WRITE_ACTION_COPY=1;
+   private final byte WRITE_ACTION_DEFINE_OR_COPY=2;
+
+   private byte writeAction = WRITE_ACTION_DEFINE;
+
+   private String copyActionGroupField = null;
 
    private static final String PATTERN_FIELD_ID = "id";
    private static final String PATTERN_FIELD_ENTRY_TYPE = "entrytype";

@@ -201,8 +201,7 @@
 
 @dualindexentry{bibglsnewtertiaryindexabbreviationentrysecondary,
   name={\csfmt{bib\-gls\-new\-tert\-iary\-index\-abbre\-via\-tion\-entry\-sec\-ond\-ary}},
-  user1={\margm{label}\margm{tertiary-label}\margm{options}\margm{tertiary
-opts}\margm{primary name}\margm{short}\margm{long}\margm{description}},
+  user1={\margm{label}\margm{tertiary-label}\margm{options}\margm{tertiary-opts}\margm{primary-name}\margm{short}\margm{long}\margm{description}},
   description={defines secondary and tertiary terms provided with
 \gls[noindex]{dual.entry.tertiaryindexabbreviationentry}},
   category={command}
@@ -711,6 +710,20 @@ name},
 @dualindexentry{opt.entry-type-aliases,
    name={\csoptfmt{entry\dhyphen type\dhyphen aliases}},
    user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.action,
+   name={\csoptfmt{action}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.copy-action-group-field,
+   name={\csoptfmt{copy\dhyphen action\dhyphen group\dhyphen field}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -1561,6 +1574,15 @@ pattern}},
   description={a shortcut command that uses \gls[noindex]{glsxtrresourcefile}},
   note={provided by \styfmt{glossaries-extra}},
   seealso={resourceoptions,glsxtrresourcefile},
+  category={command}
+}
+
+@dualindexentry{glsxtrcopytoglossary,
+  name={\csfmt{glsxtrcopytoglossary}},
+  user1={\margm{label}\margm{type}},
+  description={copies the entry given by \meta{label} to the
+glossary given by \meta{type}},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
 
@@ -3397,7 +3419,7 @@ field.},
 }
 
 @index{GlsXtrSetField,
-  name={\csfmt{GlsXtrSetField}},
+  name={\csfmt{Gls\-Xtr\-Set\-Field}},
   user1={\margm{entry label}\margm{field label}\margm{value}},
   description={assigns the given \meta{value} to the field
    identified by \meta{field label} for the
@@ -3862,7 +3884,7 @@ usual delay},
   name={\csfmt{ifcase}},
   user1={\meta{number}},
   description={case conditional},
-  note={primitive},
+  note={\TeX\ primitive},
   category={command}
 }
 
@@ -3937,6 +3959,16 @@ usual delay},
   description={display the glossary by iterating over all entries 
    associated with that glossary in the order in which they were
    defined},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{printunsrtglossary*,
+  name={\csfmt{print\-unsrt\-glossary*}},
+  user1={\oargm{options}\margm{code}},
+  description={as \cs{printunsrtglossary} but performs
+  \meta{code} first (scoped to localise any assignments within
+  \meta{code})},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -4108,9 +4140,9 @@ glossary},
 
 @index{glsquote,
   name={\csfmt{glsquote}},
-  user1={},
-  description={expands to a literal straight double-quote
-   \texttt{\glsquote} character},
+  user1={\margm{text}},
+  description={encapsulates \meta{text} with literal straight
+   double-quotes \texttt{\glsquote{\meta{text}}}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }

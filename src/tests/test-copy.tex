@@ -1,0 +1,52 @@
+% arara: pdflatex
+% arara: bib2gls if found ("log", "Warning: Glossary entry")
+% arara: pdflatex if found ("log", "Warning: Glossary entry")
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,stylemods={tree}]{glossaries-extra}
+
+\newignoredglossary{copies}
+
+\GlsXtrLoadResources[
+ sort=en-GB,% sort according to this locale
+ src={test-entries}]
+
+\GlsXtrLoadResources[
+ sort=use,
+ action=copy,
+ type=copies,
+ src={test-entries}]
+
+\begin{document}
+
+\gls{sample}. \gls{bird}. \gls{waterfowl}.
+
+\newpage
+
+\gls{sample}, \gls{bird}.
+
+\newpage
+
+\gls{sample}, \gls{waterfowl}.
+\gls[format=hyperbf]{sample}
+
+\newpage
+
+Just indexing\glsadd{bird}.
+
+\newpage
+
+\printunsrtglossary[
+ title={Sort en-GB},
+ style=indexgroup,
+]
+
+\printunsrtglossary[type=copies,title={Sort Use},
+ target=false,
+ style=index,
+ nogroupskip,
+]
+\end{document}
