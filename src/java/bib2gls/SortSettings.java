@@ -619,7 +619,7 @@ public class SortSettings
    public static final int IDENTICAL_SORT_USE_FIELD=2;
    public static final int IDENTICAL_SORT_USE_ORIGINAL_ID=3;
 
-   private int identicalSortAction = IDENTICAL_SORT_USE_ORIGINAL_ID;
+   private int identicalSortAction = IDENTICAL_SORT_USE_ID;
 
    private String identicalSortField = null;
 }

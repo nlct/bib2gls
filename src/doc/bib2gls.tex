@@ -7692,7 +7692,7 @@ interpreter).
 In each case (other than \csopt[none]{identical-sort-action}) a
 simple string comparison is used. If \meta{value} isn't a recognised
 keyword or valid field an error will occur.
-The default setting is \csopt[original id]{identical-sort-action}.
+The default setting is \csopt[id]{identical-sort-action}.
 If you want to use a field that's not a simple label (such as the
 \field{category} field) you may find it better to use
 \csopt{sort-suffix} for locale-sensitive sorts.
@@ -7701,10 +7701,9 @@ If you want to use a field that's not a simple label (such as the
 for hierarchical entries where parent entries with duplicate sort
 fields are clumped together and their children follow. To prevent
 this from happening, the \csopt[id]{identical-sort-action}
-setting will fallback on comparing the labels.
-Since all labels must be unique, this means the comparisons
-are all either strictly higher or strictly lower (except when
-comparing identical entries).
+setting will fallback on comparing the labels.  Since all labels
+must be unique, this means comparisons between two different entries
+are all either strictly higher or strictly lower.
 
 This action occurs after any suffixes have been appended through
 \csopt{sort-suffix}.
@@ -7721,7 +7720,7 @@ The value may be one of:
   \field{sort} values;
 \item\meta{field}: append the value of the given field (if set) to
   the \field{sort} field. The given field must be defined (has an
-  associated key for use in \cs{newglossaryentry}) but may be unset.
+  associated key for use in \gls{newglossaryentry}) but may be unset.
   If the interpreter is on, the field contents will be interpreted.
   If the field is just a label (such as the \field{category} field)
   you may find it simpler to use
