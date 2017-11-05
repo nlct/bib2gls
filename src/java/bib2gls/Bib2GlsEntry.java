@@ -693,6 +693,30 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      if (resource.hasFieldCopies())
+      {
+         for (Iterator<String> it=resource.getFieldCopiesIterator();
+              it.hasNext();)
+         {
+            String field = it.next();
+
+            BibValueList val = getField(field);
+
+            if (val != null)
+            {
+               Vector<String> dupList = resource.getFieldCopy(field);
+
+               for (String dup : dupList)
+               {
+                  if (getField(dup) == null)
+                  {
+                     putField(dup, (BibValueList)val.clone());
+                  }
+               }
+            }
+         }
+      }
+
       if (bib2gls.useGroupField())
       {
          String groupVal = resource.getGroupField();

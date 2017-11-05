@@ -179,6 +179,10 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("replicate-fields"))
+         {
+            fieldCopies = getHashMapVector(parser, list, opt);
+         }
          else if (opt.equals("name-case-change"))
          {
             nameCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
@@ -2849,9 +2853,6 @@ public class GlsResource
 
       HashMap<String,String> map = new HashMap<String,String>();
 
-
-      map = new HashMap<String,String>();
-
       for (int i = 0; i < array.length; i++)
       {
          if (!(array[i] instanceof TeXObjectList))
@@ -2879,6 +2880,67 @@ public class GlsResource
                       : split.get(1).toString(parser);
 
          map.put(field, val);
+      }
+
+      return map;
+   }
+
+   private HashMap<String,Vector<String>> getHashMapVector(TeXParser parser, 
+      KeyValList list, String opt)
+    throws IOException
+   {
+      TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+      if (array == null)
+      {
+         return null;
+      }
+
+      HashMap<String,Vector<String>> map 
+        = new HashMap<String,Vector<String>>();
+
+      for (int i = 0; i < array.length; i++)
+      {
+         if (!(array[i] instanceof TeXObjectList))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.value", 
+               opt, list.get(opt).toString(parser)));
+         }
+
+         Vector<TeXObject> split = splitList(parser, '=', 
+            (TeXObjectList)array[i]);
+
+         if (split == null || split.size() == 0) continue;
+
+         String field = split.get(0).toString(parser);
+
+         if (split.size() != 2)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.keylist.value", 
+               field, array[i].toString(parser), opt));
+         }
+
+         CsvList csvList = CsvList.getList(parser, split.get(1));
+
+         int n = csvList.size();
+
+         Vector<String> valList = new Vector<String>(n);
+
+         for (int j = 0; j < n; j++)
+         {
+            TeXObject obj = csvList.getValue(i);
+
+            if (obj instanceof TeXObjectList)
+            {
+               obj = trimList((TeXObjectList)obj);
+            }
+
+            valList.add(obj.toString(parser).trim());
+         }
+
+         map.put(field, valList);
       }
 
       return map;
@@ -6181,6 +6243,21 @@ public class GlsResource
       return fieldAliases.get(fieldName);
    }
 
+   public boolean hasFieldCopies()
+   {
+      return fieldCopies != null;
+   }
+
+   public Iterator<String> getFieldCopiesIterator()
+   {
+      return fieldCopies.keySet().iterator();
+   }
+
+   public Vector<String> getFieldCopy(String fieldName)
+   {
+      return fieldCopies.get(fieldName);
+   }
+
    public boolean isCombineDualLocationsOn()
    {
       return combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF;
@@ -6218,6 +6295,8 @@ public class GlsResource
    private HashMap<String,String> entryTypeAliases = null;
 
    private HashMap<String,String> fieldAliases = null;
+
+   private HashMap<String,Vector<String>> fieldCopies = null;
 
    private String[] skipFields = null;
 

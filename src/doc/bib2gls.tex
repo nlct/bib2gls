@@ -5087,6 +5087,9 @@ and \meta{field2} can't be the same nor can you have both
 \meta{field1}\dequals\meta{field2} and
 \meta{field2}\dequals\meta{field3}.) If you want to swap
 fields you need to use one of the dual entry types instead.
+Field aliases are performed before \csopt{ignore-fields},
+so if \meta{field1} is listed in \csopt{ignore-fields} it won't
+be ignored (unless \meta{field2} is in \csopt{ignore-fields}).
 
 For example, suppose \filefmt{people.bib} contains:
 \begin{verbatim}
@@ -5108,6 +5111,89 @@ keys:
 \GlsXtrLoadResources[
   src=people,% data in people.bib
   field-aliases={born=user1,died=user2,othername=user3}
+]
+\end{verbatim}
+
+\optsection{replicate-fields}
+
+The value of one field can be copied to other fields using
+this option where each \meta{key}\dequals\meta{value} pair
+is in the form
+\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}
+where all values are field names. This copies the contents
+of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
+only if the target field isn't already set. This action is
+performed after \csopt{ignore-fields}.
+
+For example, suppose \filefmt{people.bib} contains:
+\begin{verbatim}
+@entry{alexander,
+  name={Alexander III of Macedon (Alexander the Great)},
+  text={Alexander},
+  description={Ancient Greek king of Macedon}
+}
+\end{verbatim}
+Since the \field{first} field hasn't been supplied, it
+will default to the value of the \field{text} field, but
+perhaps for one of my documents I'd like the \field{first}
+field to be the same as the \field{name} field. Rather than
+editing the \ext{bib} file, I can just do:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name=first}
+]
+\end{verbatim}
+This copies the contents of the \field{name} field into the
+\field{first} field. If you have more than one field
+in the list take care to brace the lists to avoid confusion.
+For example, if for some reason I want to copy the value
+of the \field{name} field to both \field{first} and
+\field{firstplural} and copy the value of the \field{text}
+field to the \field{plural} field, then this requires braces
+for the inner list:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name={first,firstplural},text=plural}
+]
+\end{verbatim}
+
+If my \filefmt{people.bib} file instead contained:
+\begin{verbatim}
+@entry{alexander,
+  name={Alexander III of Macedon (Alexander the Great)},
+  first={Alexander the Great},
+  text={Alexander},
+  description={Ancient Greek king of Macedon}
+}
+\end{verbatim}
+then
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name=first}
+]
+\end{verbatim}
+won't alter the \field{first} field since \csopt{replicate-fields}
+never overrides values. However, since \csopt{replicate-fields}
+is always performed after \csopt{ignore-fields} it's possible to
+ignore the \field{first} field which means that the \field{name}
+value can then be copied into it:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  ignore-fields={first},
+  replicate-fields={name=first}
+]
+\end{verbatim}
+Note that the ordering within the resource options doesn't
+make a difference. The same result occurs with:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name=first},
+  ignore-fields={first}
 ]
 \end{verbatim}
 

@@ -1,7 +1,7 @@
 \documentclass{article}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,stylemods,style=indexgroup]{glossaries-extra}
+\usepackage[record,stylemods,style=altlistgroup]{glossaries-extra}
 
 \newglossary*{bybirth}{People (Ordered by Birth)}
 
@@ -16,9 +16,20 @@
 \GlsXtrLoadResources[
   src=people,% data in people.bib
   category={people},
+  replicate-fields={name={first}},
   field-aliases={born=user1,died=user2,othername=user3},
   secondary={date:user1:bybirth}
 ]
+
+\newcommand*{\glsxtrpostlinkpeople}{%
+ \glsxtrifwasfirstuse
+ {%
+   \ifglshasfield{user3}{\glslabel}%
+   {\space(\glscurrentfieldvalue)}%
+   {}%
+ }%
+ {}%
+}
 
 \newcommand*{\glsxtrpostnamepeople}{%
  \ifglshasfield{user3}{\glscurrententrylabel}%

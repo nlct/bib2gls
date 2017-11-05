@@ -30,6 +30,7 @@ v1.1 (pending):
      - action
      - copy-action-group-field
      - field-aliases
+     - replicate-fields
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and
