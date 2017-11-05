@@ -60,7 +60,8 @@ v1.1 (pending):
 
    * new switches: --packages (-p), --expand-fields, 
      --no-expand-fields, --record-count (-c), --no-record-count,
-     --record-count-unit (-n), --no-record-count-unit
+     --record-count-unit (-n), --no-record-count-unit,
+     --no-break-space, --break-space
 
    * texparserlib: added extra core maths commands.
 

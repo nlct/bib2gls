@@ -29,7 +29,7 @@ public class Bib2GlsBibParser extends BibParser
    public Bib2GlsBibParser(Bib2Gls bib2gls, GlsResource resource, Charset bibCharset)
     throws IOException
    {
-      super(bib2gls, bibCharset);
+      super(bib2gls, bibCharset, false);
 
       this.resource = resource;
    }
@@ -37,6 +37,7 @@ public class Bib2GlsBibParser extends BibParser
    protected void addPredefined()
    {
       parser.putActiveChar(new Bib2GlsAt(resource));
+      parser.putActiveChar(new Bib2GlsNbsp(resource.useNonBreakSpace()));
    }
 
 

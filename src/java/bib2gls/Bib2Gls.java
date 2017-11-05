@@ -564,6 +564,11 @@ public class Bib2Gls implements TeXApp
       return !expandFields;
    }
 
+   public boolean useNonBreakSpace()
+   {
+      return useNonBreakSpace;
+   }
+
    public boolean useInterpreter()
    {
       return interpret;
@@ -2677,6 +2682,11 @@ public class Bib2Gls implements TeXApp
       System.out.println();
 
       System.out.println();
+      System.out.println(getMessage("syntax.break.space", "--break-space"));
+      System.out.println(getMessage("syntax.no.break.space", "--no-break-space"));
+      System.out.println();
+
+      System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
          "--mfirstuc-protection", "-u"));
 
@@ -3135,6 +3145,14 @@ public class Bib2Gls implements TeXApp
          {
             interpret = false;
          }
+         else if (args[i].equals("--break-space"))
+         {
+            useNonBreakSpace = false;
+         }
+         else if (args[i].equals("--no-break-space"))
+         {
+            useNonBreakSpace = true;
+         }
          else if (args[i].equals("--no-mfirstuc-protection"))
          {
             mfirstucProtect = false;
@@ -3586,6 +3604,8 @@ public class Bib2Gls implements TeXApp
    private Vector<String> packages = null;
 
    private TeXParser interpreter = null;
+
+   private boolean useNonBreakSpace = true;
 
    private int exitCode;
 

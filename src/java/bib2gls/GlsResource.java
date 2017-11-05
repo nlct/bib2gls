@@ -4906,7 +4906,20 @@ public class GlsResource
            writeBibEntryCopy(writer, entry);
            writer.println("}");
            writer.println("{");
+
            writeBibEntryDef(writer, entry);
+
+           if (copyActionGroupField != null)
+           {
+              String value = entry.getFieldValue("group");
+
+              if (value != null)
+              {
+                 writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+                  entry.getId(), copyActionGroupField, value);
+              }
+           }
+
            writer.println("}");
       }
 
@@ -6286,6 +6299,11 @@ public class GlsResource
    public String getAbbrevDefaultNameField()
    {
       return abbrevDefaultNameField;
+   }
+
+   public boolean useNonBreakSpace()
+   {
+      return bib2gls.useNonBreakSpace();
    }
 
    private File texFile;

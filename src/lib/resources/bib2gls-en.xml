@@ -35,6 +35,8 @@ See the manual for further details.</entry>
 			directory.)</entry>
 <entry key="syntax.interpret">{0}		Switch on interpret mode (default).</entry>
 <entry key="syntax.no.interpret">{0}		Switch off interpret mode.</entry>
+<entry key="syntax.break.space">{0}		Interpret tilde character as normal space.</entry>
+<entry key="syntax.no.break.space">{0}		Interpret tilde character as a non-breaking space (default).</entry>
 
 <entry key="syntax.mfirstuc">{0} &lt;fields&gt;|all (or {1} &lt;fields&gt;|all)
 			Insert an empty group if fields start 

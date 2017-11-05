@@ -1,12 +1,18 @@
-\documentclass{article}
+\documentclass{report}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,stylemods,style=altlistgroup]{glossaries-extra}
+\usepackage[record,% using bib2gls
+ index,% create index glossary
+ postdot,% dot after descriptions
+ stylemods={list,bookindex},% load glossary-bookindex.sty and fix styles
+ style=altlistgroup]{glossaries-extra}
 
 \newglossary*{bybirth}{People (Ordered by Birth)}
 
 \newcommand{\bibglsdategroup}[7]{#1#4#7}
 \newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
+
+\newcommand*{\swapsortop}[2]{#2, #1}
 
 \GlsXtrLoadResources[
   src=no-interpret-preamble,
@@ -15,10 +21,20 @@
 
 \GlsXtrLoadResources[
   src=people,% data in people.bib
+  match={entrytype=entry},
   category={people},
   replicate-fields={name={first}},
   field-aliases={born=user1,died=user2,othername=user3},
   secondary={date:user1:bybirth}
+]
+
+\GlsXtrLoadResources[
+  src={people},
+  type=index,
+  category=people,
+  action={define or copy},
+  copy-action-group-field={indexgroup},
+  selection={recorded and deps and see}
 ]
 
 \newcommand*{\glsxtrpostlinkpeople}{%
@@ -52,17 +68,26 @@
 }
 
 \begin{document}
+\chapter{Sample}
 \section{First Use}
 
-\gls{caesar}, \gls{wellington}, \gls{bonaparte}, \gls{redbaron}
+\gls{caesar}, \gls{wellesley}, \gls{bonaparte}, \gls{vonrichthofen}
 and \gls{alexander}.
 
 \section{Next Use}
 
-\gls{caesar}, \gls{wellington}, \gls{bonaparte}, \gls{redbaron}
+\gls{caesar}, \gls{wellesley}, \gls{bonaparte}, \gls{vonrichthofen}
 and \gls{alexander}.
 
-\printunsrtglossary[title={People (Alphabetical)}]
+\printunsrtglossary[title={People (Alphabetical)},nonumberlist]
 
-\printunsrtglossary[type=bybirth,target=false]
+\printunsrtglossary[type=bybirth,target=false,nonumberlist]
+
+\printunsrtglossary*
+ [type=index,style=bookindex,nopostdot]
+ {%
+   \let\sortop\swapsortop
+   \renewcommand{\glsxtrgroupfield}{indexgroup}%
+   \renewcommand*{\glolinkprefix}{idx:}%
+ }
 \end{document}

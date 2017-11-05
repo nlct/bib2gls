@@ -22,6 +22,7 @@
 
 \usepackage[x11names]{xcolor}
 \usepackage{alltt}
+\usepackage{verbatim}
 \usepackage{array}
 \usepackage{upquote}
 \usepackage{etoolbox}
@@ -37,6 +38,7 @@
    record,% use bib2gls
    index,% create index glossary
    entrycounter,% enable entry counting
+   subentrycounter,% enable entry counting
    %debug=showtargets,% debugging information
    stylemods=bookindex,% adjust predefined styles and load glossary-bookindex.sty
    style=bookindex
@@ -45,6 +47,7 @@
 
 \renewcommand*{\glsshowtarget}[1]{\texttt{\small [#1]}}
 \renewcommand{\glsentrycounterlabel}{}
+\renewcommand{\glssubentrycounterlabel}{}
 \renewcommand\glstreeitem{\par\hangindent10pt}
 \renewcommand\glstreesubitem{\par\hangindent30pt\hspace*{15pt}}
 \renewcommand*{\glsxtrbookindexprelocation}[1]{}
@@ -355,6 +358,13 @@
    #1[\texorpdfstring{\glsxtrheadname{opt.#2}}{\glsentryname{opt.#2}}]
      {\glsadd{opt.#2}\glsxtrglossentry{opt.#2}}%
  }%
+}
+
+\glsxtrnewgls{file.}{\exfile}
+
+\newcommand{\filesection}[2][\section]{%
+ #1[\texorpdfstring{\glsxtrheadname{file.#2}}{\glsentryname{file.#2}}]
+   {\glsadd{file.#2}\glsxtrglossentry{file.#2}}%
 }
 
 \newcommand*{\csopt}[2][]{\gencsopt{#1}{opt}{#2}}%
@@ -829,7 +839,8 @@ pdflatex myDoc
 \end{verbatim}
 (The entries aren't defined until the second \LaTeX\ run, so the
 indexing files required by \idx!{makeindex} or \idx!{xindy} can't be
-created until then.)
+created until then.) There are more examples provided in
+\sectionref{sec:examples}.
 
 \section{Security}
 
@@ -966,14 +977,21 @@ The \bibgls\ application requires the \TeX\ Parser Library
 which is used to parse the \iext{aux} and \iext{bib} files.
 
 With the \longarg{interpret} switch on (default), this library is
-also used to interpret the sort value when it contains
-a backslash \verb|\| or a dollar symbol \verb|$| or braces \verb|{|
-\verb|}| (and when the \csopt{sort} option is not \optfmt{unsrt} or
-\optfmt{none} or \optfmt{use}). The other case is with
-\csopt{set-widest} when determining the width of the \field{name}
-field. The \longarg{no-interpret} switch will turn off this function,
-but the library will still be used to parse the \ext{aux} and
-\ext{bib} files.
+also used to interpret the sort value when it contains a backslash
+\verb|\| or a tilde \verb|~| or a dollar symbol \verb|$| or braces
+\verb|{| \verb|}| (and when the \csopt{sort} option is not
+\optfmt{unsrt} or \optfmt{none} or \optfmt{use}).\footnote{The other
+special characters are omitted from the check: the comment symbol
+\code{\%} is best avoided in field values, the subscript and
+superscript characters \code{\_} and \code{\textasciicircum} should
+either be encapsulated by \code{\$} or by \cs{ensuremath}, which
+will be picked up by the check for \code{\$} or
+\code{\glsbackslash}, and the other special characters would
+indicate something too complex for the interpreter to handle.} The
+other case is with \csopt{set-widest} when determining the width of
+the \field{name} field. The \longarg{no-interpret} switch will turn
+off this function, but the library will still be used to parse the
+\ext{aux} and \ext{bib} files.
 
 The \file{texparserlib.jar} library is not a
 \TeX\ engine and there are plenty of situations where it doesn't
@@ -1380,6 +1398,16 @@ for more details.
 
 Switch off the interpreter mode. See \sectionref{sec:texparserlib}
 for more details.
+
+\argsection{no-break-space}
+
+The interpreter treats a tilde character \verb|~| as a non-breakable
+space (default).
+
+\argsection{break-space}
+
+The interpreter treats a tilde character \verb|~| as a normal
+space.
 
 \argsection{packages}
 
@@ -5702,8 +5730,9 @@ The default behaviour is \csopt[auto]{group}.
 \optsection{copy-action-group-field}
 
 This option may only be used when invoking \bibgls\ with the
-\longarg{group} (or \shortargfmt{g}) switch. If an
-entry is copied, you can use this option to identify a field in which to save
+\longarg{group} (or \shortargfmt{g}) switch. If an action
+other than the default \csopt[define]{action} is set,
+this option can be used to identify a field in which to save
 the letter group information 
 where \meta{value} is the name of the field. This just uses
 \cs{GlsXtrSetField}. You will need to redefine
@@ -5717,11 +5746,12 @@ glossary:
  \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
 \end{alltt}
 
-This option is ignored for entries that are defined
-(with \csopt[define]{action} or \csopt[define or copy]{action}) rather than
-copied. This option is not used by \csopt{secondary} which will
+This option is ignored when used with \csopt[define]{action}.
+This option is not used by \csopt{secondary} which will
 always save the group information in the \field{secondarygroup}
-field.
+field. When used with \csopt[define or copy]{action}, entries
+that are defined will have both \field{group} and
+the field given by \csopt{copy-action-group-field} set.
 
 Note that you may do \csopt[group]{copy-action-group-field} which
 will override the \field{group} field from the original definition.
@@ -6841,7 +6871,7 @@ entry.
 
 Remember that you can have \atentry{preamble} definitions that
 can be hidden from \bibgls's interpreter. For example,
-\filefmt{no-interpret-preamble.bib} might contain:
+\exfile{no-interpret-preamble.bib} might contain:
 \begin{verbatim}
 @preamble{"\providecommand{\sortop}[2]{#1 #2}"}
 \end{verbatim}
@@ -6850,9 +6880,11 @@ which is loaded using
 \GlsXtrLoadResources[src={no-interpret-preamble},
  interpret-preamble=false]
 \end{verbatim}
-This provides the command \csfmt{sortop} for internal use in the
-document. (Remember it won't be defined on the first \LaTeX\ run
-before the \iext{glstex} file has been created.)
+This provides a custom command 
+\nosecdef{sortop}
+for internal use in the document. (Remember it won't be defined on
+the first \LaTeX\ run before the \iext{glstex} file has been
+created and so is only used within entry fields.)
 
 Another file, say, \filefmt{interpret-preamble.bib} may provide
 a definition for \bibgls:
@@ -11006,8 +11038,86 @@ contain:
 }
 \end{verbatim}
 
-\resetsecnumdepth
+\chapter{Examples}
+\label{sec:examples}
+\setcounter{secnumdepth}{0}
 
+The example files described here can be found in the
+\filefmt{examples} sub-directory. The \ext{bib} files are listed
+first and then sample files that use the \ext{bib} data.
+
+\filesection{no-interpret-preamble.bib}
+
+The \exfile{no-interpret-preamble.bib} file contains a command
+definition (\gls{sortop}) that's required by the document 
+but needs to be hidden
+from \bibgls's interpreter. This doesn't contain any entry
+definitions and must be loaded first with
+\csopt[false]{interpret-preamble}. (See the \csopt{sort} option on
+page~\glsxtrpageref{opt.sort} for further details.)
+
+\verbatiminput{../examples/no-interpret-preamble.bib}
+
+There's no encoding line here as it's a trivial ASCII file.
+
+\filesection{people.bib}
+
+The \exfile{people.bib} file contains details about people. This
+starts with a definition of \gls{sortop} in \atentry{preamble} that
+can be picked up by the interpreter. This swaps the order of the
+arguments (and inserts a comma) which allows \bibgls\ to sort by
+surname. Remember that if \exfile{no-interpret-preamble.bib} is loaded
+first, that definition will be the one in use in the document.
+
+The information for each person is supplied in an \atentry{entry}
+type. There are some non-standard fields: \fieldfmt{born},
+\fieldfmt{died} and \fieldfmt{othername}. These fields will be ignored
+unless keys are provided (using \cs{glsaddkey} or
+\cs{glsaddstoragekey}) or the fields are aliased (using
+\csopt{field-aliases}). The \fieldfmt{born} and \fieldfmt{died}
+fields have dates that are \emph{almost} in the default \code{en-GB} locale
+format, but they include a tilde \verb|~| to prevent awkward line
+breaks. By default \bibgls's interpreter converts \verb|~| to the non-breaking
+space character 0xA0 which isn't recognised by the date format.
+This can easily be fixed with the \longarg{break-space} switch which
+will interpret \verb|~| as a normal breakable space (0x20), so 
+with that switch \csopt[date]{sort} or \csopt[date-reverse]{sort}
+can be used on either of those fields.
+
+One entry (\code{caesar}) has a \field{first} field. In that case
+the \field{first} field is slightly different from the \field{name}
+field (\qt{Gaius} is omitted). The other entries don't have a
+\field{first} field. They can simply have the \field{name} copied to
+\field{first} with the \csopt{replicate-fields} option.
+
+There's one name with a \qt{von} part. In this case the \field{name}
+field is set to
+\begin{verbatim}
+\sortop{Manfred}{von Richthofen}
+\end{verbatim}
+which will come under the \qt{V} letter group. If you prefer that
+this should come under \qt{R} instead, then you need to move the
+\qt{von} part into the first argument:
+\begin{verbatim}
+\sortop{Manfred von}{Richthofen}
+\end{verbatim}
+Alternatively, you could provide a similar command with three
+arguments for names with a \qt{von} part to allow for greater
+flexibility.
+
+There are also some synonyms provided with \atentry{index} entry
+types that have the \field{alias} field to redirect to the main
+entry. These don't include a \field{description} or any of the other
+fields as that would be redundant. All the information can be found
+in the main entry.
+
+Although the file only contains ASCII characters, it starts with 
+an encoding line to prevent \bibgls\ from searching the entire file
+for it.
+
+\verbatiminput{../examples/people.bib}
+
+\resetsecnumdepth
 \printcommandsummary
 
 \bibliographystyle{plain}

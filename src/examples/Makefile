@@ -16,7 +16,7 @@ sample-units.pdf	: $(DEPS) sample-units.tex baseunits.bib derivedunits.bib
 
 sample-people.pdf	: $(DEPS) sample-people.tex people.bib
 	pdflatex sample-people
-	$(BIB2GLS) sample-people
+	$(BIB2GLS) sample-people --break-space
 	pdflatex sample-people
 	pdflatex sample-people
 

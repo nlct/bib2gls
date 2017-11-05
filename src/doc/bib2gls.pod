@@ -70,6 +70,14 @@ Use the TeX parser library to interpret known (La)TeX commands.
 
 Don't try interpreting (La)TeX commands.
 
+=item B<--break-space>
+
+Interpret tilde character as a normal space.
+
+=item B<--no-break-space>
+
+Interpret tilde as a non-breaking space (default).
+
 =item B<--packages> I<list>
 
 Instruct the TeX parser library to pretend the packages listed 
