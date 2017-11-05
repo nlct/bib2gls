@@ -29,6 +29,7 @@ v1.1 (pending):
      - save-loclist
      - action
      - copy-action-group-field
+     - field-aliases
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

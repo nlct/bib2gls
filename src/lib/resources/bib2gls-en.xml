@@ -321,6 +321,8 @@ Error occurred before: {3}
 </entry>
 <entry key="error.invalid.sort.rule">Invalid syntax in sort rule:
 {0}</entry>
+<entry key="error.field.alias.trail">''field-aliases'' can''t contain both ''{0}={1}'' and ''{2}={0}'' (trails not permitted)</entry>
+<entry key="error.field.alias.identity">''field-aliases'' can''t contain identity mapping ''{0}={0}''</entry>
 
 <!--
     The following messages are used by convertgls2bib

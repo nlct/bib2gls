@@ -138,43 +138,44 @@ public class GlsResource
          }
          else if (opt.equals("entry-type-aliases"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            entryTypeAliases = getHashMap(parser, list, opt);
+         }
+         else if (opt.equals("field-aliases"))
+         {
+            fieldAliases = getHashMap(parser, list, opt);
 
-            if (array == null)
+            if (fieldAliases != null)
             {
-               entryTypeAliases = null;
-            }
-            else
-            {
-               entryTypeAliases = new HashMap<String,String>();
+               Set<String> keys = fieldAliases.keySet();
 
-               for (int i = 0; i < array.length; i++)
+               for (Iterator<String> it1 = keys.iterator(); it1.hasNext();)
                {
-                  if (!(array[i] instanceof TeXObjectList))
+                  String key = it1.next();
+
+                  Set<String> keys2 = fieldAliases.keySet();
+
+                  for (Iterator<String> it2=keys2.iterator(); it2.hasNext();)
                   {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.value", 
-                        opt, list.get(opt).toString(parser)));
+                     String key2 = it2.next();
+
+                     String value = fieldAliases.get(key2);
+
+                     if (value.equals(key))
+                     {
+                        if (key.equals(key2))
+                        {
+                           throw new IllegalArgumentException(
+                             bib2gls.getMessage("error.field.alias.identity",
+                               key));
+                        }
+                        else
+                        {
+                           throw new IllegalArgumentException(
+                             bib2gls.getMessage("error.field.alias.trail",
+                               key, fieldAliases.get(key), key2));
+                        }
+                     }
                   }
-
-                  Vector<TeXObject> split = splitList(parser, '=', 
-                     (TeXObjectList)array[i]);
-
-                  if (split == null || split.size() == 0) continue;
-
-                  String field = split.get(0).toString(parser);
-
-                  if (split.size() > 2)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
-                        field, array[i].toString(parser), opt));
-                  }
-
-                  String val = split.size() == 1 ? "" 
-                               : split.get(1).toString(parser);
-
-                  entryTypeAliases.put(field, val);
                }
             }
          }
@@ -2833,6 +2834,54 @@ public class GlsResource
       }
 
       return sublist;
+   }
+
+   private HashMap<String,String> getHashMap(TeXParser parser, 
+      KeyValList list, String opt)
+    throws IOException
+   {
+      TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+      if (array == null)
+      {
+         return null;
+      }
+
+      HashMap<String,String> map = new HashMap<String,String>();
+
+
+      map = new HashMap<String,String>();
+
+      for (int i = 0; i < array.length; i++)
+      {
+         if (!(array[i] instanceof TeXObjectList))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.value", 
+               opt, list.get(opt).toString(parser)));
+         }
+
+         Vector<TeXObject> split = splitList(parser, '=', 
+            (TeXObjectList)array[i]);
+
+         if (split == null || split.size() == 0) continue;
+
+         String field = split.get(0).toString(parser);
+
+         if (split.size() > 2)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.keylist.value", 
+               field, array[i].toString(parser), opt));
+         }
+
+         String val = split.size() == 1 ? "" 
+                      : split.get(1).toString(parser);
+
+         map.put(field, val);
+      }
+
+      return map;
    }
 
    private int getLetterNumberRule(TeXParser parser, KeyValList list,
@@ -6117,6 +6166,21 @@ public class GlsResource
       return val == null ? entryType : val;
    }
 
+   public boolean hasFieldAliases()
+   {
+      return fieldAliases != null;
+   }
+
+   public Iterator<String> getFieldAliasesIterator()
+   {
+      return fieldAliases.keySet().iterator();
+   }
+
+   public String getFieldAlias(String fieldName)
+   {
+      return fieldAliases.get(fieldName);
+   }
+
    public boolean isCombineDualLocationsOn()
    {
       return combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF;
@@ -6152,6 +6216,8 @@ public class GlsResource
    private Vector<TeXPath> sources;
 
    private HashMap<String,String> entryTypeAliases = null;
+
+   private HashMap<String,String> fieldAliases = null;
 
    private String[] skipFields = null;
 

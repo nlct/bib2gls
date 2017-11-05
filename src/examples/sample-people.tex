@@ -1,0 +1,57 @@
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,stylemods,style=indexgroup]{glossaries-extra}
+
+\newglossary*{bybirth}{People (Ordered by Birth)}
+
+\newcommand{\bibglsdategroup}[7]{#1#4#7}
+\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
+
+\GlsXtrLoadResources[
+  src=no-interpret-preamble,
+  interpret-preamble=false
+]
+
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  category={people},
+  field-aliases={born=user1,died=user2,othername=user3},
+  secondary={date:user1:bybirth}
+]
+
+\newcommand*{\glsxtrpostnamepeople}{%
+ \ifglshasfield{user3}{\glscurrententrylabel}%
+ {\space(\glscurrentfieldvalue)}%
+ {}%
+}
+
+\newcommand*{\glsxtrpostdescpeople}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}
+ {% born
+   \space(\glscurrentfieldvalue\,--\,%
+     \ifglshasfield{user2}{\glscurrententrylabel}
+     {% died
+        \glscurrentfieldvalue
+     }%
+     {}%
+   )%
+ }%
+ {}%
+}
+
+\begin{document}
+\section{First Use}
+
+\gls{caesar}, \gls{wellington}, \gls{bonaparte}, \gls{redbaron}
+and \gls{alexander}.
+
+\section{Next Use}
+
+\gls{caesar}, \gls{wellington}, \gls{bonaparte}, \gls{redbaron}
+and \gls{alexander}.
+
+\printunsrtglossary[title={People (Alphabetical)}]
+
+\printunsrtglossary[type=bybirth,target=false]
+\end{document}

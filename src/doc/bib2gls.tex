@@ -5076,6 +5076,41 @@ If you want to maintain the dependency and ancestor relationship but
 omit the \field{parent} field when writing the entries to the
 \ext{glstex} file, you need to use \csopt{flatten} instead.
 
+\optsection{field-aliases}
+
+You can instruct \bibgls\ to treat one field as though it
+was another using this option. The value should be a comma-separated
+list of \meta{field1}\dequals\meta{field2} pairs, where
+\meta{field1} and \meta{field2} are field names. Identical
+mappings and trails aren't permitted. (That is, \meta{field1}
+and \meta{field2} can't be the same nor can you have both
+\meta{field1}\dequals\meta{field2} and
+\meta{field2}\dequals\meta{field3}.) If you want to swap
+fields you need to use one of the dual entry types instead.
+
+For example, suppose \filefmt{people.bib} contains:
+\begin{verbatim}
+@entry{alexander,
+  name={Alexander III of Macedon},
+  description={Ancient Greek king of Macedon},
+  born={20 July 356 BC},
+  died={10 June 323 BC},
+  othername={Alexander the Great}
+}
+\end{verbatim}
+This contains three non-standard fields: \fieldfmt{born},
+\fieldfmt{died} and \fieldfmt{othername}. I could define
+these fields using \ics{glsaddkey}, but another possibility
+is to map these onto the user keys \field{user1}, \field{user2}
+and \field{user3}, which saves the overhead of providing new 
+keys:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  field-aliases={born=user1,died=user2,othername=user3}
+]
+\end{verbatim}
+
 \optsection{category}
 
 The selected entries may all have their \field{category} field

@@ -565,6 +565,23 @@ public class Bib2GlsEntry extends BibEntry
    {
       super.parseContents(parser, contents, endGroupChar);
 
+      if (resource.hasFieldAliases())
+      {
+         for (Iterator<String> it = resource.getFieldAliasesIterator();
+              it.hasNext(); )
+         {
+            String field = it.next();
+            String map = resource.getFieldAlias(field);
+
+            BibValueList val = removeField(field);
+
+            if (val != null)
+            {
+               putField(map, val);
+            }
+         }
+      }
+
       Vector<String> fields = bib2gls.getFields();
 
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
