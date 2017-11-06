@@ -842,6 +842,72 @@ indexing files required by \idx!{makeindex} or \idx!{xindy} can't be
 created until then.) There are more examples provided in
 \sectionref{sec:examples}.
 
+\section{Defining a New Glossary}
+\label{sec:newglossary}
+
+Some of the examples in this manual use \ics{newglossary*} to define
+a new glossary type and some use \ics{newignoredglossary} or
+\ics{newignoredglossary*}. Why define an \idx{ignoredglossary}?
+
+The base \styfmt{glossaries} package was originally designed to work
+with \idx!{makeindex}. Support for \idx!{xindy} was later added, but
+both require three files per glossary type: the transcript file
+(created by the indexing application), the file written by \LaTeX\
+(and input by the indexing application) and the file input by
+\LaTeX\ (and written by the indexing application). So when a new glossary
+is defined with \ics{newglossary}, this not only defines internal
+control sequences that store the list of entry labels associated
+with that glossary, the title and the entry format but also has to
+define internal control sequences that store the three file
+extensions. The starred form \cs{newglossary*} is just a shortcut
+that forms the extensions from the glossary label. For the purposes
+of \bibgls, this is simpler than the unstarred version since the
+extensions are now irrelevant as they are only applicable to
+\idx!{makeindex} and \idx!{xindy}. (Unless, of course, you are using
+a hybrid method with \styopt[alsoindex]{record}.)
+
+Since some users wanted the ability to define entries that were
+common enough to not be worth including in any glossary lists, the
+concept of an \idx{ignoredglossary} was introduced, defined with
+\cs{newignoredglossary}. This only requires an internal control
+sequence to store the list of entry labels associated with that
+glossary\footnote{All entries must be assigned to a glossary. If you
+don't use the \field{type} field the default is used.}\ and the
+associated internal command that governs the way that
+commands like \cs{gls} are displayed for that glossary type. 
+Since this type of glossary has no associated files, it can't be
+used with \cs{printglossary} and therefore isn't included in the
+list of glossary labels that's iterated over by commands like
+\cs{printglossaries}. Since there's no glossary list (and therefore
+no targets), \cs{newignoredglossary} additionally disables hyperlinks for that
+glossary type, but it doesn't disable indexing.  The indexing macro
+is still called, but because there's no associated file to write to,
+it has no effect. With \bibgls, the indexing is written to the
+\ext{aux} file and so does have an effect.
+
+Although \idxpl{ignoredglossary} can't be used with
+\cs{printglossary}, they can be used with \cs{printunsrtglossary},
+which is designed to work without any indexing, but you need to
+explicitly set the title in the optional argument. They still can't
+be used in \cs{printunsrtglossaries}, since they're not included in
+the list that this command iterates over.
+
+So \cs{newignoredglossary} is useful with \bibgls\ if you're happy
+to use \cs{printunsrtglossary} as it reduces the overall number of
+internal control sequences. Since there is now the possibility of
+targets (created within \cs{printunsrtglossary}), it's useful to
+have an \idx{ignoredglossary} that doesn't suppress the hyperlinks.
+The \styfmt{glossaries-extra} package provides a starred form
+\ics{newignoredglossary*} that doesn't suppress the hyperlinks.
+
+Some resource options, such as \csopt{master}, \csopt{secondary} and
+\csopt{trigger-type}, need to ensure that a
+required glossary is defined. In this case, \bibgls\ uses
+\ics{provideignoredglossary*} in the \iext{glstex} file. If you
+haven't already defined that glossary in the document with \cs{newglossary*},
+you'll need to set the title in the optional argument of
+\cs{printunsrtglossary}.
+
 \section{Security}
 
 \TeX\ Live come with security settings
@@ -1273,7 +1339,6 @@ for the proposed Java~9.
 \chapter{Command Line Options}
 \label{sec:switches}
 
-\edef\resetsecnumdepth{\noexpand\setcounter{secnumdepth}{\arabic{secnumdepth}}}
 \setcounter{secnumdepth}{0}
 
 The syntax of \bibgls\ is:
@@ -5314,8 +5379,6 @@ base]{type} indicates the base name of the \ext{bib} file (without
 the extension) that provided the entry definition. There is no
 \meta{value} analogous to \csopt[same as type]{category}.
 
-Make sure that the glossary type has already been defined. 
-
 Note that this setting only changes the \field{type} field for
 primary entries. Use \csopt{dual-type} for dual entries.
 
@@ -5326,9 +5389,11 @@ For example:
 \GlsXtrLoadResources[src={entries-symbols},type=symbols]
 \end{verbatim}
 
-Remember that you can use \ics{newglossary*}
-if you don't want to worry about the extensions needed by
-\idx!{makeindex} or \idx!{xindy}. For example:
+Make sure that the glossary type has already been defined
+(see \sectionref{sec:newglossary}). In the above, the
+\styopt{symbols} option defines the \code{symbols} glossary.
+If you want to use a custom glossary, you need to provide it. For
+example:
 \begin{verbatim}
 \usepackage[record,nomain]{glossaries-extra}
 
@@ -5338,9 +5403,6 @@ if you don't want to worry about the extensions needed by
 \end{verbatim}
 (The \styopt{nomain} option was added to suppress the
 creation of the default \code{main} glossary.)
-
-Alternatively you can use \ics{newignoredglossary} if you don't
-want the glossary picked up by \ics{printunsrtglossaries}.
 
 \optsection{trigger-type}
 
@@ -5359,7 +5421,8 @@ The provided value \meta{type} must be a glossary label (not one of
 the keywords allowed by \csopt{type}).
 You can define the glossary before loading the resource, but
 it's not required as \bibgls\ will write
-\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file.
+\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file
+(see \sectionref{sec:newglossary}).
 
 \optsection{counter}
 
@@ -8899,7 +8962,7 @@ unchanged.
 \end{itemize}
 
 Remember that the glossary with that label must have already 
-been defined.
+been defined (see \sectionref{sec:newglossary}).
 
 For example:
 \begin{verbatim}
@@ -11117,7 +11180,6 @@ for it.
 
 \verbatiminput{../examples/people.bib}
 
-\resetsecnumdepth
 \printcommandsummary
 
 \bibliographystyle{plain}
