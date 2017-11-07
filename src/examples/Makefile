@@ -2,7 +2,8 @@ BIB2GLS=../bin/bib2gls --debug --verbose --group
 DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
-	sample-units3.pdf sample-people.pdf sample-bacteria.pdf
+	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
+	sample-media.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -25,7 +26,8 @@ sample-units3.pdf	: $(DEPS) sample-units3.tex baseunits.bib derivedunits.bib
 	pdflatex sample-units3
 	pdflatex sample-units3
 
-sample-people.pdf	: $(DEPS) sample-people.tex people.bib
+sample-people.pdf	: $(DEPS) sample-people.tex people.bib \
+	no-interpret-preamble.bib interpret-preamble.bib
 	pdflatex sample-people
 	$(BIB2GLS) sample-people --break-space
 	pdflatex sample-people
@@ -34,6 +36,12 @@ sample-bacteria.pdf	: $(DEPS) sample-bacteria.tex bacteria.bib
 	pdflatex sample-bacteria
 	$(BIB2GLS) sample-bacteria
 	pdflatex sample-bacteria
+
+sample-media.pdf	: $(DEPS) sample-media.tex \
+	books.bib films.bib no-interpret-preamble.bib interpret-preamble.bib
+	pdflatex sample-media
+	$(BIB2GLS) sample-media
+	pdflatex sample-media
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

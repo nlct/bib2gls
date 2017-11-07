@@ -183,6 +183,27 @@ public class GlsResource
          {
             fieldCopies = getHashMapVector(parser, list, opt);
          }
+         else if (opt.equals("strip-trailing-nopost"))
+         {
+            stripTrailingNoPost = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("post-description-dot"))
+         {
+            String val = getChoice(parser, list, opt, "none", "all", "check");
+
+            if (val.equals("none"))
+            {
+               postDescDot = POST_DESC_DOT_NONE;
+            }
+            else if (val.equals("all"))
+            {
+               postDescDot = POST_DESC_DOT_ALL;
+            }
+            else //if (val.equals("check"))
+            {
+               postDescDot = POST_DESC_DOT_CHECK;
+            }
+         }
          else if (opt.equals("name-case-change"))
          {
             nameCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
@@ -5855,6 +5876,16 @@ public class GlsResource
       return !matches;
    }
 
+   public byte getPostDescDot()
+   {
+      return postDescDot;
+   }
+
+   public boolean isStripTrailingNoPostOn()
+   {
+      return stripTrailingNoPost;
+   }
+
    public boolean changeNameCase()
    {
       return nameCaseChange != null;
@@ -6456,6 +6487,14 @@ public class GlsResource
    private String dualShortCaseChange=null;
    private String nameCaseChange=null;
    private String descCaseChange=null;
+
+   public static final byte POST_DESC_DOT_NONE=0;
+   public static final byte POST_DESC_DOT_ALL=1;
+   public static final byte POST_DESC_DOT_CHECK=2;
+
+   private byte postDescDot = POST_DESC_DOT_NONE; 
+
+   private boolean stripTrailingNoPost = false;
 
    private String masterLinkPrefix=null;
    private Vector<TeXPath> masterGlsTeXPath = null;

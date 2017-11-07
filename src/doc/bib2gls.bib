@@ -743,7 +743,7 @@ name},
 }
 
 @dualindexentry{opt.src,
-   name={\csoptfmt{loc\dhyphen prefix}},
+   name={\csoptfmt{src}},
    user1={\meta{list}},
    category={resourceoption},
    parent={resourceoptions}
@@ -848,7 +848,7 @@ name},
 }
 
 @dualindexentry{opt.label-prefix,
-   name={\csoptfmt{loc\dhyphen prefix}},
+   name={\csoptfmt{label\dhyphen prefix}},
    user1={\meta{tag}},
    category={resourceoption},
    parent={resourceoptions}
@@ -877,6 +877,20 @@ name},
 
 @dualindexentry{opt.description-case-change,
    name={\csoptfmt{description\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.post-description-dot,
+   name={\csoptfmt{post\dhyphen description\dhyphen dot}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.strip-trailing-nopost,
+   name={\csoptfmt{strip\dhyphen trailing\dhyphen nopost}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -2159,6 +2173,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{externallocation,
   name={\catattrfmt{externallocation}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{discardperiod,
+  name={\catattrfmt{discardperiod}},
   category={categoryattribute},
   parent={categoryattribute}
 }
@@ -3489,6 +3509,21 @@ field.},
   parent={unicodecategories}
 }
 
+@index{punctuationclose,
+  name={\unicodecategoryfmt{Punctuation, Close}},
+  parent={unicodecategories}
+}
+
+@index{punctuationfinalquote,
+  name={\unicodecategoryfmt{Punctuation, Final quote}},
+  parent={unicodecategories}
+}
+
+@index{punctuationother,
+  name={\unicodecategoryfmt{Punctuation, Other}},
+  parent={unicodecategories}
+}
+
 @index{texmfcnf.openinany,
   name={\texmfcnffmt{openin\_any}}
 }
@@ -3533,6 +3568,10 @@ field.},
   name={\filefmt{no\dhyphen interpret\dhyphen preamble.bib}}
 }
 
+@dualindexentry{file.interpret-preamble.bib,
+  name={\filefmt{interpret\dhyphen preamble.bib}}
+}
+
 @dualindexentry{file.people.bib,
   name={\filefmt{people.bib}}
 }
@@ -3575,6 +3614,18 @@ field.},
 
 @dualindexentry{file.sample-units3.tex,
   name={\filefmt{sample-units3.tex}}
+}
+
+@dualindexentry{file.books.bib,
+  name={\filefmt{books.bib}}
+}
+
+@dualindexentry{file.films.bib,
+  name={\filefmt{films.bib}}
+}
+
+@dualindexentry{file.sample-media.tex,
+  name={\filefmt{sample\dhyphen media.tex}}
 }
 
 @index{glshyperlink,
@@ -3842,10 +3893,19 @@ label of the current entry},
 }
 
 @index{nopostdesc,
-  name={\csfmt{nopostdesc}},
+  name={\csfmt{no\-post\-desc}},
   user1={},
   description={suppresses the post-description hook},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{nopostpunc,
+  name={\csfmt{no\-post\-punc}},
+  user1={},
+  description={suppresses the post-description punctuation
+   without suppressing the post-description hook},
+  note={provided by \styfmt{glossaries-extra} v1.22+},
   category={command}
 }
 

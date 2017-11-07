@@ -1,0 +1,51 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[11pt]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,% using bib2gls
+ nostyles,
+ stylemods={list},% load glossary-list.sty and fix styles
+ style=altlistgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src=no-interpret-preamble,
+  interpret-preamble=false
+]
+
+\GlsXtrLoadResources[
+  src={interpret-preamble,books,films},
+  post-description-dot={check},
+  field-aliases={identifier=category,year=user1},
+  identical-sort-action={category},
+  save-locations=false,
+  selection=all
+]
+
+\newcommand*{\bookfont}[1]{\emph{#1}}
+\newcommand*{\filmfont}[1]{\textsf{\em #1}}
+
+\glssetcategoryattribute{book}{textformat}{bookfont}
+\glssetcategoryattribute{book}{glossnamefont}{bookfont}
+
+\glssetcategoryattribute{film}{textformat}{filmfont}
+\glssetcategoryattribute{film}{glossnamefont}{filmfont}
+
+\newcommand*{\glsxtrpostnamebook}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}%
+ {\space(published \glscurrentfieldvalue)}%
+ {}%
+}
+
+\newcommand*{\glsxtrpostnamefilm}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}%
+ {\space(released \glscurrentfieldvalue)}%
+ {}%
+}
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

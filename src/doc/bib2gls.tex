@@ -5798,6 +5798,81 @@ value is first copied to the \field{text} field.
 As \csopt{short-case-change} but is applied to the
 \field{description} field.
 
+\optsection{post-description-dot}
+
+The \styopt{postdot} package option (or \styopt[false]{nopostdot}) 
+can be used to append a full stop to the end of all the
+descriptions. This can be awkward if some of the descriptions
+end with punctuation characters. This resource option can be
+used instead. The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{none}: don't append a full stop (default);
+\item\optfmt{all}: append a full stop to all \field{description}
+  fields in this resource set;
+\item\optfmt{check}: selectively append a full stop (see below).
+\end{itemize}
+Note that if you have dual entries and you use this option to
+append a full stop, then it will be copied over to the mapped field.
+This is different to the \styopt{postdot} option which doesn't
+add the dot to the field but incorporates it in the post-description
+hook.
+
+The \csopt[check]{post-description-dot} setting determines whether
+to append the dot as follows:
+\begin{itemize}
+\item If the \field{description} field ends with
+\ics{nopostdesc} or \ics{nopostpunc}, then a dot isn't appended.
+\item If the \field{description} field doesn't end with a regular
+(ungrouped letter or other) character, then a dot is appended.
+(For example, if the description ends with a control sequence
+or an end group token.)
+\item If the \field{description} field ends with a character 
+that belongs to the Unicode category \idx{punctuationclose}
+or \idx{punctuationfinalquote} then the token preceding
+that character is checked.
+\item If the \field{description} field doesn't end with
+a character that belongs to the Unicode category
+\idx{punctuationother} then the dot is added.
+\end{itemize}
+Note that the interpreter isn't used during the check.
+If the \field{description} ends with a command then a dot will be
+appended (unless it's \cs{nopostpunc} or \cs{nopostdesc}) even if
+that command expands in such a way that it ends with a terminating
+punctuation character.
+
+\optsection{strip-trailing-nopost}
+
+This option is always performed before \cs{post-description-dot}
+when adjusting the \field{description} field. The default
+setting is \csopt[false]{strip-trailing-nopost}. If 
+\optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{nopostpunc}
+found in the \field{description} field will be removed.
+Note that the command (possibly followed by ignored space) must be
+at the very end of the description for it to be removed. A
+description should not contain both commands.
+
+For example, \cs{nopostdesc} will be stripped from:
+\begin{verbatim}
+description={sample\nopostdesc}
+\end{verbatim}
+since it's at the end. It will also be stripped from
+\begin{verbatim}
+description={sample\nopostdesc }
+\end{verbatim}
+since the trailing space is ignored as it follows a control
+word. It won't be stripped from
+\begin{verbatim}
+description={sample\nopostdesc{} }
+\end{verbatim}
+because the final space is now significant, but even without the
+space it still won't be stripped as the field ends with
+an empty group not with \cs{nopostdesc}. It also won't be
+stripped from
+\begin{verbatim}
+description={sample{\nopostdesc}}
+\end{verbatim}
+because the grouping hides it.
+
 \optsection{group}
 
 This option may only be used with the \longarg{group} switch.
@@ -11156,7 +11231,9 @@ the glossary). These commands are much like the \gls{sortop} command
 described on \glsxtrpageref{sortop} and need to be hidden 
 from \bibgls's interpreter. This file doesn't contain any entry
 definitions and must be loaded first with
-\csopt[false]{interpret-preamble}.
+\csopt[false]{interpret-preamble}. The
+\exfile{interpret-preamble.bib} file can then be loaded to provide
+alternative definitions for \bibgls's interpreter.
 
 The first command is
 \nosecdef{sortname}
@@ -11183,6 +11260,14 @@ for it. (That's not so much of an issue with a short file, but may
 cause an unnecessary delay for much longer files.)
 
 \lstinputlisting[firstline=5]{../examples/no-interpret-preamble.bib}
+
+\filesection{interpret-preamble.bib}
+
+This provides definitions of \gls{sortname}, \gls{sortvonname} and
+\gls{sortart} in \atentry{preamble} that can be picked up by the interpreter
+and used during sorting.
+
+\lstinputlisting[firstline=5]{../examples/interpret-preamble.bib}
 
 \filesection{chemicalformula.bib}
 
@@ -11260,13 +11345,15 @@ aliased with \csopt{field-aliases}.
 
 \filesection{people.bib}
 
-The \exfile{people.bib} file contains details about people. This
-starts with a definition of \gls{sortname} and \gls{sortvonname} 
-in \atentry{preamble} that can be picked up by the interpreter. This
-swaps the order of the arguments which allows \bibgls\ to sort by
-surname. Remember that if \exfile{no-interpret-preamble.bib} is
+The \exfile{people.bib} file contains details about people. 
+The \field{name} fields contain custom commands provided in
+\exfile{no-interpret-preamble.bib} and
+\exfile{interpret-preamble.bib}.
+Remember that if \exfile{no-interpret-preamble.bib} is
 loaded first, the definitions provided in that file will be the one
-in use in the document.
+in use in the document. The \exfile{interpret-preamble.bib} file
+then needs to be loaded to provide the definitions for \bibgls's
+interpreter.
 
 The information for each person is supplied in an \atentry{entry}
 type. There are some non-standard fields: \fieldfmt{born},
@@ -11319,6 +11406,113 @@ Except for the aliases, the entries have a custom field
 \cs{glsaddstoragekey} or if it's aliased with \csopt{field-aliases}.
 
 \lstinputlisting[firstline=5]{../examples/people.bib}
+
+\filesection{books.bib}
+
+The \exfile{books.bib} file contains details about books.
+As above, the entries use custom commands provided in
+\exfile{no-interpret-preamble.bib} and
+\exfile{interpret-preamble.bib}.
+The entries all have a custom field \fieldfmt{identifier} set to 
+\code{book} and other custom fields \fieldfmt{author} and
+\fieldfmt{year}.
+These will be ignored by \bibgls\ unless they're
+defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if they're
+aliased with \csopt{field-aliases}.
+(Remember that \bibgls\ isn't \appfmt{bibtex} and doesn't recognise
+\appfmt{bibtex}'s fields or name syntax.)
+
+There are other ways in which this data could be specified. For
+example, the \field{description} field could contain a brief summary
+(or \qt{log line}). Use this as a starting point if you need data
+like this and adapt it to a format appropriate for your
+requirements.
+
+\lstinputlisting[firstline=5]{../examples/books.bib}
+
+\filesection{films.bib}
+
+The \exfile{films.bib} file contains details about films.
+As above, the entries use custom commands provided in
+\exfile{no-interpret-preamble.bib} and
+\exfile{interpret-preamble.bib}.
+The entries all have a custom field \fieldfmt{identifier} set to 
+\code{film} and other custom fields \fieldfmt{director} and
+\fieldfmt{year}. These will be ignored by \bibgls\ unless they're
+defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if they're
+aliased with \csopt{field-aliases}.
+
+This example file references entries defined in \exfile{books.bib}
+through the use of the special 
+\glsdisp{idx.idprefix.extn}{\idprefixfmt{ext1}} prefix.
+To avoid a label conflict \exfile{films.bib} prefixes all labels
+with \idprefixfmt{film} rather than relying on \csopt{label-prefix}.
+This ensures that both \exfile{books.bib} and \exfile{films.bib}
+can be loaded in the same resource set (otherwise they'd have to be
+loaded in separate resource sets with different prefixes).
+
+As with all the example files, there are other ways in which
+to specify the data, depending on your requirements. For example,
+you could have a \fieldfmt{cast} field with a comma-separated list
+of actor names. Similarly for the \fieldfmt{director} field. Some of
+the films actually had more than one director but only one is listed
+per film in this sample file for simplicity. The book on which the film is based
+could be contained in a cross-reference field or a custom
+\fieldfmt{basedon} field.
+
+The book \qt{Do Androids Dream of Electric Sheep?}\ referenced at the end 
+of the \qt{Blade Runner} film's \field{description} ends with 
+a question mark. (Similarly for \qt{Why Didn't They Ask Evans?}) 
+If the \field{description} field is simply set as:
+\begin{verbatim}
+description={a film starring Harrison Ford, Rutger Hauer
+ and Sean Young loosely based on the novel
+ \gls{ext1.doandroidsdreamofelectricsheep}},
+\end{verbatim}
+then the \styopt{postdot} package option will produce an odd
+result as the inserted full stop immediately follows the question
+mark. This is an awkward situation. One possibility is to explicitly 
+put the full stop at the end of the \field{description} field for all the 
+other entries and omit it for the problematic entries. 
+
+Another option is to put \ics{nopostdesc} in the 
+problematic entries. For example:
+\begin{verbatim}
+description={a film starring Harrison Ford, Rutger Hauer
+ and Sean Young loosely based on the novel
+ \gls{ext1.doandroidsdreamofelectricsheep}\nopostdesc},
+\end{verbatim}
+Be careful with this as it will completely suppress the
+\idx{postdescriptionhook}.
+A third possibility is to use \ics{nopostpunc} instead:
+\begin{verbatim}
+description={a film starring Harrison Ford, Rutger Hauer
+ and Sean Young loosely based on the novel
+ \gls{ext1.doandroidsdreamofelectricsheep}\nopostpunc},
+\end{verbatim}
+(This was only introduced to \styfmt{glossaries-extra} v1.22.)
+This doesn't interfere with the \idx{postdescriptionhook} but if a hook
+is provided the problem will likely go away (unless the hook also
+ends with a punctuation character).
+
+An alternative approach is to use
+\csopt[check]{post-description-dot}. Unfortunately in this case 
+the question mark is hidden inside the \cs{gls} command.
+This could be fixed by using a different category for entries
+with names that end with sentence-terminating punctuation. Then the
+\catattr{discardperiod} attribute can be set for that category. When
+combined with \csopt{post-description-dot} this would allow
+the \idx{postlinkhook} to look ahead and discard the dot.
+
+Since the \csopt{strip-trailing-nopost} option can be used
+to strip \cs{nopostdesc} and \cs{nopostpunc} from the end
+of the \field{description} field, the simplest option is
+to put one of those commands at the end of the field 
+and strip it when it's not needed. I've used \cs{nopostdesc} as it's
+the older of the two commands and it will have to be stripped anyway
+if the \idx{postdescriptionhook} is used.
+
+\lstinputlisting[firstline=5]{../examples/films.bib}
 
 \filesection{sample-chemical.tex}
 
@@ -11415,7 +11609,9 @@ the \field{category} to \code{bacteria} then I can do:
 the initial backslash.)
 
 I'd like to use the \glostyle{bookindex} style, which is
-provided by the \sty{glossary-bookindex} package. This isn't loaded
+provided by the \sty{glossary-bookindex} 
+package.\footnote{\styfmt{glossary-bookindex}
+is distributed with \styfmt{glossaries-extra} v1.21+.} This isn't loaded
 automatically, but it can be loaded through the
 \styopt{stylemods} package option:
 \begin{verbatim}
@@ -11656,15 +11852,115 @@ The two pages of the document are shown in
 \label{fig:sample-units3.pdf}
 \end{figure}
 
+\filesection{sample-media.tex}
+
+This example uses the sample files \exfile{books.bib},
+\exfile{films.bib}, \exfile{no-interpret-preamble.bib} and
+\exfile{interpret-preamble.bib}.  The aim is to produce a combined
+list of books and films in a single glossary. The films are based on
+some of the books so some of the entries have the same name. The
+default setting for identical sort values is
+\csopt[id]{identical-sort-action}, which means that the ordering for
+the duplicate names is based on the entry labels. This can lead to
+the odd effect of sometimes having the film listed first
+(\code{film.thebigsleep} comes before \code{film.thebigsleep}) and
+sometimes having the book listed first (\code{brightonrock} comes
+before \code{film.brightonrock}).
+
+Once possible solution would be to also assign prefixes for the book
+labels but \csopt{label-prefix} is applied to all primary entries
+for the given resource set and can't be applied selectively, so this
+would require editing the \exfile{books.bib} file.
+
+A more consistent approach would be to fallback on the category.
+This means that the \field{category} field needs to be set. There
+are two simple ways to achieve this: use \csopt[same as base]{category}
+(which sets the \field{category} to \code{books} for entries in 
+\exfile{books.bib} and to \code{films} for entries in
+\exfile{films.bib}) or alias the custom \fieldfmt{identifier} format to
+\field{category}. I've chosen the later method and also provided
+an alias for the custom \fieldfmt{year} field:
+\begin{verbatim}
+field-aliases={identifier=category,year=user1},
+identical-sort-action={category},
+\end{verbatim}
+This ensures that books always come before films with the same
+title. An oddity is the film \qt{Whisky Galore!}\ which is one
+character different from the book \qt{Whisky Galore} but the default
+locale collator ignores punctuation so the two titles are considered
+identical. If a letter comparison was used instead, they would no
+longer be considered identical, but in this case the film would
+still be placed after the book since the film title is longer.
+
+Since I've set the \field{category} I can provide semantic
+formatting commands (as for \exfile{sample-bacteria.tex}):
+\begin{verbatim}
+\newcommand*{\bookfont}[1]{\emph{#1}}
+\newcommand*{\filmfont}[1]{\textsf{\em #1}}
+\glssetcategoryattribute{book}{textformat}{bookfont}
+\glssetcategoryattribute{book}{glossnamefont}{bookfont}
+\glssetcategoryattribute{film}{textformat}{filmfont}
+\glssetcategoryattribute{film}{glossnamefont}{filmfont}
+\end{verbatim}
+I've given films a slightly different format to make them easier to
+distinguish from books of the same name.
+
+Both \exfile{books.bib} and \exfile{films.bib} had the custom
+\fieldfmt{year} field, indicating the year of first publication
+or release, which I've assigned to the \field{user1} field. 
+I can define \idxpl{postnamehook} for each category
+to append the year in brackets after the name is displayed in the
+glossary:
+\begin{verbatim}
+\newcommand*{\glsxtrpostnamebook}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}%
+ {\space(published \glscurrentfieldvalue)}%
+ {}%
+}
+
+\newcommand*{\glsxtrpostnamefilm}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}%
+ {\space(released \glscurrentfieldvalue)}%
+ {}%
+}
+\end{verbatim}
+
+I haven't referenced any of the entries in the main body of the
+document, so I've used \csopt[all]{selection} to select all entries.
+This means that there are no number lists on the first document
+build (\LaTeX+\bibgls+\LaTeX) but the next build would show locations for 
+the books that have been referenced by the film entries. Since this
+looks a bit odd, I've added \csopt[false]{save-locations} to
+prevent \bibgls\ from saving the locations.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-media
+bib2gls --group sample-media
+pdflatex sample-media
+\end{verbatim}
+The four pages of the document are shown in
+\figureref{fig:sample-media.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-media.tex}
+
+\begin{figure}[p]
+\centering
+\pdftwocol{../examples/sample-media.pdf}{4}
+\caption{\filefmt{sample-media.pdf}}
+\label{fig:sample-media.pdf}
+\end{figure}
+
 \filesection{sample-people.tex}
 
-This example uses the \exfile{no-interpret-preamble.bib} and
-\exfile{people.bib} files. The aim here is to have a list of people
-ordered alphabetically by surname with a brief description, 
-the same list ordered by date of birth and an index of all the
-people without their details and with a number list indicating where
-the people were mentioned in the document. The first two lists
-shouldn't include aliases but the index should.
+This example uses the files \exfile{people.bib},
+ \exfile{no-interpret-preamble.bib} and \exfile{interpret-preamble.bib}. The
+aim here is to have a list of people ordered alphabetically by
+surname with a brief description, the same list ordered by date of
+birth and an index of all the people without their details and with
+a number list indicating where the people were mentioned in the
+document. The first two lists shouldn't include aliases but the
+index should.
 
 Since this is just an example document all the \cs{gls} commands
 only occur on page~1, which means that each number list is just
@@ -11812,8 +12108,7 @@ package patches this style to discourage page breaks occurring after
 group headings, so I've also used the \styopt{stylemods} 
 option to automatically load that package. I'd like to use the
 \glostyle{bookindex} style for the index, which is provided by 
-\sty{glossary-bookindex},\footnote{\styfmt{glossary-bookindex}
-is distributed with \styfmt{glossaries-extra} v1.21+} so I need:
+\sty{glossary-bookindex}, so I need:
 \begin{verbatim}
 stylemods={list,bookindex}
 \end{verbatim}

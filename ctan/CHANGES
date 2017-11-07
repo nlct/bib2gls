@@ -31,6 +31,8 @@ v1.1 (pending):
      - copy-action-group-field
      - field-aliases
      - replicate-fields
+     - post-description-dot
+     - strip-trailing-nopost
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and
