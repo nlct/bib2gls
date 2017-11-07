@@ -1,0 +1,57 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[12pt]{report}
+
+\usepackage{siunitx}
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+% load glossary-tree.sty and glossary-longbooktabs.sty and patch:
+ stylemods={tree,longbooktabs},
+ style=alttree]{glossaries-extra}
+
+\newglossary*{units}{Units of Measurement (by SI unit)}
+
+\GlsXtrLoadResources[
+  % data in baseunits.bib and derivedunits.bib:
+  src={baseunits,derivedunits},
+  sort-field={name},% sort by name field
+  selection=all,% select all entries
+  % make @entry act like @dualsymbol:
+  entry-type-aliases={entry=dualsymbol},
+  set-widest,% needed for alttree style
+  dual-sort={letternumber-upperlower},
+  type=main,% put primary entries in 'main' glossary
+  dual-type={units}% put dual entries in 'units' glossary
+]
+
+\setlength{\glsdescwidth}{.4\hsize}
+
+% define custom glossary style
+\newglossarystyle{units}% style name
+{% base it on long3col-booktabs
+  \setglossarystyle{long3col-booktabs}%
+  \renewcommand*{\glossaryheader}{%
+    \toprule 
+    \bfseries Name &
+    \bfseries Measurement &
+    \bfseries Symbol
+    \tabularnewline\midrule\endhead
+    \bottomrule\endfoot}%
+% main entries:
+  \renewcommand{\glossentry}[2]{%
+    \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
+    \glossentrydesc{##1}\glspostdescription &
+    \glossentrysymbol{##1}\tabularnewline
+  }%
+}
+
+\begin{document}
+
+\printunsrtglossary[title={SI Units of Measurement},
+ style={units}]
+
+\printunsrtglossary[type=units]
+
+\end{document}

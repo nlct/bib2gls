@@ -7,10 +7,12 @@
 *.ilg
 *.ist
 *.lot
+*.lof
 *.glg
 *.glstex
 *.1
 *.sty
 *.bbl
 *.blg
+arara.xml
 bib2gls.pdf

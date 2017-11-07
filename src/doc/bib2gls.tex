@@ -1,8 +1,8 @@
 % arara: xelatex
 % arara: bibtex
-% arara: bib2gls: {group: on}
+% arara: bib2gls: {group: on} if missing("glstex") || changed("bib")
 % arara: xelatex if missing("toc")
-% arara: xelatex
+% arara: xelatex if changed("glstex")
 % arara: bib2gls: {group: on}
 % arara: xelatex
 % arara: xelatex if found ("log", "Rerun")
@@ -12,7 +12,6 @@
 % Need support for extended characters
 % and need a mono font that supports hyphenation
 \usepackage[no-math]{fontspec}
-%\setmainfont{DejaVu Serif Condensed}
 \setmainfont{Linux Libertine O}
 
 \newfontface\devangari{FreeSerif}
@@ -22,7 +21,6 @@
 
 \usepackage[x11names]{xcolor}
 \usepackage{alltt}
-\usepackage{verbatim}
 \usepackage{array}
 \usepackage{upquote}
 \usepackage{etoolbox}
@@ -33,6 +31,7 @@
 \usepackage{accents}
 \usepackage{tikz}
 \usepackage{datetime2}
+\usepackage{listings}
 \usepackage[hidelinks]{hyperref}
 \usepackage[% v1.21+
    record,% use bib2gls
@@ -263,7 +262,7 @@
 }
 
 \newcommand*{\env}[1]{%
-  \texorpdfstring{\idx{#1}}{#1}%
+  \texorpdfstring{\idx{env.#1}}{#1}%
 }
 
 \newcommand{\glsxtrpostdescenvironment}{environment}
@@ -281,7 +280,7 @@
 }
 
 \newcommand*{\counter}[1]{%
-  \texorpdfstring{\idx{#1}}{#1}%
+  \texorpdfstring{\idx{ctr.#1}}{#1}%
 }
 
 \newcommand{\glsxtrpostdesccounter}{counter}
@@ -11134,6 +11133,8 @@ contain:
 \chapter{Examples}
 \label{sec:examples}
 \setcounter{secnumdepth}{0}
+\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
+ commentstyle={\color{gray}}}
 
 The example files described here can be found in the
 \filefmt{examples} sub-directory. The \ext{bib} files are listed
@@ -11176,7 +11177,45 @@ it's semantically different and allows for adjustments for one type
 of entry (such as a person's name) without affecting the other (such as a
 book or film title).
 
-\verbatiminput{../examples/no-interpret-preamble.bib}
+Although the file only contains ASCII characters, it starts with 
+an encoding line to prevent \bibgls\ from searching the entire file
+for it. (That's not so much of an issue with a short file, but may
+cause an unnecessary delay for much longer files.)
+
+\lstinputlisting[firstline=5]{../examples/no-interpret-preamble.bib}
+
+\filesection{chemicalformula.bib}
+
+The \exfile{chemicalformula.bib} file contains chemical formulae.
+Each \field{name} field uses \ics{ce} provided by \sty{mhchem}
+so the document will need to load that package. Since all resource
+files must be loaded in the preamble, it's possible to ensure that
+the package is loaded using:
+\begin{verbatim}
+@preamble{"\usepackage{mhchem}"}
+\end{verbatim}
+However, it's best just to load it in the document otherwise it
+won't be available before the \ext{glstex} file has been loaded.
+Also, \sty{glossaries} (and therefore \sty{glossaries-extra}) must be
+loaded after \sty{hyperref}, which usually needs to be loaded last
+so most packages should be loaded before \sty{glossaries-extra}.
+Instead, I've just put a comment in the \ext{bib} file as a
+reminder.
+
+All entries are defined using the \atentry{entry}. With this entry
+type, if the \field{sort} field is omitted \bibgls\ will fallback on
+the \field{name}. This will require the use of the interpreter as
+the names all contain a command but \bibgls\ recognises the
+\sty{mhchem} package and has a limited ability to interpret \cs{ce}.
+If \atentry{entry} is changed to \atentry{symbol} the fallback for
+the \field{sort} will be the entry's label.
+
+The entries all have a custom field \fieldfmt{identifier} set to 
+\code{chemical}. This will be ignored by \bibgls\ unless it's
+defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
+aliased with \csopt{field-aliases}.
+
+\lstinputlisting[firstline=5]{../examples/chemicalformula.bib}
 
 \filesection{bacteria.bib}
 
@@ -11184,7 +11223,40 @@ The \exfile{bacteria.bib} file contains bacteria abbreviations.
 These all use the \atentry{abbreviation} entry type with a
 \field{short} and \field{long} field.
 
-\verbatiminput{../examples/bacteria.bib}
+The entries all have a custom field \fieldfmt{identifier} set to 
+\code{bacteria}. This will be ignored by \bibgls\ unless it's
+defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
+aliased with \csopt{field-aliases}.
+
+\lstinputlisting[firstline=5]{../examples/bacteria.bib}
+
+\filesection{baseunits.bib}
+
+The \exfile{baseunits.bib} file contains base SI units. The entries
+are all defined using \atentry{entry} with a \field{name},
+\field{symbol} and \field{description} field. The \field{symbol}
+fields all use \ics{si} provided by the \sty{siunitx} package, so
+that package must be loaded in the document. This is one of the
+small number of packages recognised by \bibgls, so it's possible to
+sort according to the symbol if required.
+
+The entries all have a custom field \fieldfmt{identifier} set to 
+\code{baseunit}. This will be ignored by \bibgls\ unless it's
+defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
+aliased with \csopt{field-aliases}.
+
+\lstinputlisting[firstline=5]{../examples/baseunits.bib}
+
+\filesection{derivedunits.bib}
+
+The \exfile{derivedunits.bib} file is much like \exfile{baseunits.bib}
+but contains derived units.
+The entries all have a custom field \fieldfmt{identifier} set to 
+\code{derivedunit}. This will be ignored by \bibgls\ unless it's
+defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
+aliased with \csopt{field-aliases}.
+
+\lstinputlisting[firstline=5]{../examples/derivedunits.bib}
 
 \filesection{people.bib}
 
@@ -11241,11 +11313,69 @@ entry. These don't include a \field{description} or any of the other
 fields as that would be redundant. All the information can be found
 in the main entry.
 
-Although the file only contains ASCII characters, it starts with 
-an encoding line to prevent \bibgls\ from searching the entire file
-for it.
+Except for the aliases, the entries have a custom field
+\fieldfmt{identifier} set to \code{person}. This will be ignored by
+\bibgls\ unless it's defined using \cs{glsaddkey} or
+\cs{glsaddstoragekey} or if it's aliased with \csopt{field-aliases}.
 
-\verbatiminput{../examples/people.bib}
+\lstinputlisting[firstline=5]{../examples/people.bib}
+
+\filesection{sample-chemical.tex}
+
+This example just uses the \exfile{chemicalformula.bib} file. The aim here
+is to have a list of chemical formulae referenced in the document
+but not have a number list. I could use the \styopt{nonumberlist}
+package option to suppress the number list display, but it's more
+efficient to instruct \bibgls\ to not save the number list with the
+\csopt[false]{save-locations} resource option.
+
+Since the \field{name} field contains chemical formulae rather than
+words, it makes more sense to use one of the letter sort methods
+rather than a locale collator. In this case the names contain
+mixtures of letters and numbers, so one of the letter-number sort
+methods (listed in \tableref{tab:sortoptionsletternumber}) would be
+appropriate.
+
+I want to use the \glostyle{alttreegroup} style (provided by
+\sty{glossary-tree}). Since I don't require the other style
+packages, I've used \styopt{nostyles} to suppress the automatic
+loading and \styopt[tree]{stylemods} to both load
+\sty{glossary-tree} and patch it. The \glostyle{alttreegroup} style
+needs to know the widest name, so I've use \csopt{set-widest} for
+convenience. The default behaviour of the tree styles is to 
+format the name in bold. This is done through the command
+\ics{glstreenamefmt} which is defined as:
+\begin{verbatim}
+\newcommand*{\glstreenamefmt}[1]{\textbf{#1}}
+\end{verbatim}
+The group headings use \ics{glstreegroupheaderfmt} which defaults to
+\cs{glstreenamefmt}. Since I want to keep bold headings, I need to
+redefine this as well:
+\begin{verbatim}
+\renewcommand*{\glstreenamefmt}[1]{#1}
+\renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}
+\end{verbatim}
+(For a more compact layout, you could use \glostyle{mcolalttreegroup}
+instead.)
+
+The complete code is listed below.  The document build is:
+\begin{verbatim}
+pdflatex sample-chemical
+bib2gls --group sample-chemical
+pdflatex sample-chemical
+\end{verbatim}
+This simple example only references entries on the first page so all
+entries just have~1 in the number list. The complete document is
+shown in \figureref{fig:sample-chemical.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-chemical.tex}
+
+\begin{figure}[p]
+\centering
+\frame{\includegraphics[height=.9\textheight]{../examples/sample-chemical.pdf}}
+\caption{\filefmt{sample-chemical.pdf}}
+\label{fig:sample-chemical.pdf}
+\end{figure}
 
 \filesection{sample-bacteria.tex}
 
@@ -11342,18 +11472,188 @@ field). In this case it would be better to fallback on the
 \begin{verbatim}
 abbreviation-sort-fallback=long
 \end{verbatim}
-The complete code is listed below. This simple example only
-references entries on the first page so all entries just have~1
-in the number list. The complete document is shown in
-\figureref{fig:sample-bacteria.pdf}.
+The complete code is listed below.  The document build is:
+\begin{verbatim}
+pdflatex sample-bacteria
+bib2gls --group sample-bacteria
+pdflatex sample-bacteria
+\end{verbatim}
+This simple example only references entries on the first page so all
+entries just have~1 in the number list. The complete document is
+shown in \figureref{fig:sample-bacteria.pdf}.
 
-\verbatiminput{../examples/sample-bacteria.tex}
+\lstinputlisting[firstline=5]{../examples/sample-bacteria.tex}
 
 \begin{figure}[p]
 \centering
 \frame{\includegraphics[height=.9\textheight]{../examples/sample-bacteria.pdf}}
 \caption{\filefmt{sample-bacteria.pdf}}
 \label{fig:sample-bacteria.pdf}
+\end{figure}
+
+\filesection{sample-units1.tex}
+
+This example uses the \exfile{baseunits.bib} and
+\exfile{derivedunits.bib} files. The aim here is to have a glossary
+in two blocks: base units and derived units. This can be achieved by
+first loading \exfile{baseunits.bib} with \csopt{group} set to the
+desired group title (\qt{Base Units} in this case) and then load
+\exfile{derivedunits.bib} with the \csopt{group} set to the desired
+title (\qt{Derived Units} in this case). Since there's no
+\csopt{type} set, all entries end up in the main glossary, but since
+there are two resource commands the glossary ends up with sorted blocks.
+
+The document doesn't include any indexing commands, such as \cs{gls}, so
+I've use \csopt{selection} to select all entries in the \ext{bib}
+files. There won't be any number lists since there are no records.
+I need a glossary style that shows the \field{symbol} field so I've
+used \glostyle{mcolindexgroup}. Again I've suppressed the automatic
+loading of the default styles with \styopt{nostyles} and used
+\styopt[mcols]{stylemods} to load \sty{glossary-mcols} and patch the
+styles. Note that although I've used \styopt{nostyles}, the
+\sty{glossary-tree} style is loaded as it's required by
+\sty{glossary-mcols}.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-units1
+bib2gls --group sample-units1
+pdflatex sample-units1
+\end{verbatim}
+The complete document is shown in \figureref{fig:sample-units1.pdf}.
+
+\begin{figure}[p]
+\centering
+\frame{\includegraphics[height=.9\textheight]{../examples/sample-units1.pdf}}
+\caption{\filefmt{sample-units1.pdf}}
+\label{fig:sample-units1.pdf}
+\end{figure}
+
+\filesection{sample-units2.tex}
+
+This example is provided for comparison with
+\exfile{sample-units1.tex}. Instead of having a single glossary with
+sorted blocks this example has two glossaries. I've used the
+\styopt{section} package option to use \ics{section*} for the
+glossary titles. This overrides the default \ics{chapter*} which is
+used with book or report type of classes. I've also used the
+\styopt{nomain} option to suppress the creation of the main glossary
+as I want to define my own glossary types instead.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-units2
+bib2gls --group sample-units2
+pdflatex sample-units2
+\end{verbatim}
+The complete document is shown in \figureref{fig:sample-units2.pdf}.
+
+\begin{figure}[p]
+\centering
+\frame{\includegraphics[height=.9\textheight]{../examples/sample-units2.pdf}}
+\caption{\filefmt{sample-units2.pdf}}
+\label{fig:sample-units2.pdf}
+\end{figure}
+
+\filesection{sample-units3.tex}
+
+This is another example that uses the \exfile{baseunits.bib} and
+\exfile{derivedunits.bib} files. This time I want two glossaries
+containing all the units (base and derived) where the first glossary
+is ordered by name and the second is ordered by symbol. This can be
+done with a single resource command that instructs \bibgls\ to make
+\atentry{entry} behave like \atentry{dualsymbol}. This causes the
+\field{name} and \field{symbol} fields to be swapped in the dual
+list. The fallback for the \field{sort} field is now the entry label
+so I need \csopt[name]{sort-field} to ensure that the sorting is
+by the \field{name} field instead.
+
+The primary entries can still be sorted according to the default
+locale collator, but the dual entries need a sort method that's
+better suited to symbols. Fortunately, \bibgls\ has some (very
+limited) support for \sty{siunitx} and is able to interpret
+the \ics{si} commands in the sample \ext{bib} files. Since 
+SI units are a mix of letters and numbers I've used one of the
+letter-number methods listed in
+\tableref{tab:sortoptionsletternumber}.
+
+I've decided to define a custom style for the first glossary. Since
+it's based on the \glostyle{long3col-booktabs} style I need to 
+load \sty{glossary-longbooktabs}, which can conveniently be done with
+the \styopt{stylemods} option. This uses \env{longtable} (provided
+by \sty{longtable}, which is automatically loaded) which means
+an extra \LaTeX\ call is required in the build process to ensure the
+column widths are correct. Again I'm using \styopt{nostyles} to
+suppress the automatic loading of the default styles, however
+\sty{glossary-tree} will be loaded as it's listed in the value of
+\styopt{stylemods} and \sty{glossary-long} will be loaded as it's
+required by \sty{glossary-longbooktabs}. I can't use my custom style
+in the \styopt{style} package option as it hasn't been defined at
+that point. The default \glostyle{list} style is now unavailable
+since \styopt{nostyles} has prevented it from being defined, so 
+I've used \styopt[alttree]{style} to ensure there's a valid default
+style.
+
+Since my custom style is based on one of the long styles, I need to
+set the length register \ics{glsdescwidth} to adjust the width of
+the description column:
+\begin{verbatim}
+\setlength{\glsdescwidth}{.4\hsize}
+\end{verbatim}
+The \glostyle{long3col-booktabs} style sets up a three column
+\env{longtable} so I just need to adjust the table header (to rename
+the column headers) and the way each row is formatted:
+\begin{verbatim}
+\newglossarystyle{units}% style name
+{% base it on long3col-booktabs
+  \setglossarystyle{long3col-booktabs}%
+  \renewcommand*{\glossaryheader}{%
+    \toprule
+    \bfseries Name &
+    \bfseries Measurement &
+    \bfseries Symbol
+    \tabularnewline\midrule\endhead
+    \bottomrule\endfoot}%
+% main entries:
+  \renewcommand{\glossentry}[2]{%
+    \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
+    \glossentrydesc{##1}\glspostdescription &
+    \glossentrysymbol{##1}\tabularnewline
+  }%
+}
+\end{verbatim}
+There are no sub-entries in this document so I haven't bothered to
+redefine \ics{subglossentry}. (The tabular styles aren't appropriate
+for hierarchical glossaries.) This puts the symbol into the third
+column (rather than the location list, which is ignored).
+
+I also need to make sure I've defined a glossary for the dual
+entries:
+\begin{verbatim}
+\newglossary*{units}{Units of Measurement (by SI unit)}
+\end{verbatim}
+and specify the glossary types for the primary and dual entries
+with \csopt{type} and \csopt{dual-type}:
+\begin{verbatim}
+type=main,dual-type=units
+\end{verbatim}
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-units3
+bib2gls --group sample-units3
+pdflatex sample-units3
+pdflatex sample-units3
+\end{verbatim}
+The two pages of the document are shown in
+\figureref{fig:sample-units3.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-units3.tex}
+
+\begin{figure}[p]
+\centering
+\pdftwocol{../examples/sample-units3.pdf}{2}
+\caption{\filefmt{sample-units3.pdf}}
+\label{fig:sample-units3.pdf}
 \end{figure}
 
 \filesection{sample-people.tex}
@@ -11615,10 +11915,15 @@ index comes right at the end:
    \renewcommand*{\glolinkprefix}{idx:}%
  }
 \end{verbatim}
-The complete document code is listed below. The four pages of the
-document are shown in \figureref{fig:sample-people.pdf}.
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-people
+bib2gls --group --break-space sample-people
+pdflatex sample-people
+\end{verbatim}
+The four pages of the document are shown in \figureref{fig:sample-people.pdf}.
 
-\verbatiminput{../examples/sample-people.tex}
+\lstinputlisting[firstline=5]{../examples/sample-people.tex}
 
 \begin{figure}[p]
 \centering

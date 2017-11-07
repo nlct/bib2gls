@@ -1,0 +1,29 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass{report}
+
+\usepackage{siunitx}
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ stylemods={mcols},% load glossary-mcols.sty and patch
+ style=mcolindexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={baseunits},
+  selection={all},
+  group={Base Units}
+]
+
+\GlsXtrLoadResources[
+  src={derivedunits},
+  selection={all},
+  group={Derived Units}
+]
+
+\begin{document}
+
+\printunsrtglossaries
+
+\end{document}
