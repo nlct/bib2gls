@@ -1,0 +1,43 @@
+\documentclass[12pt]{article}
+
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ stylemods={bookindex},% load glossary-bookindex.sty and patch styles
+ style=bookindex]{glossaries-extra}
+
+\setabbreviationstyle[bacteria]{long-only-short-only}
+
+\GlsXtrLoadResources[
+ src=bacteria,% data in bacteria.bib
+ category=bacteria,
+ abbreviation-sort-fallback=long
+]
+
+\newcommand{\bacteriafont}[1]{\emph{#1}}
+
+\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+
+\renewcommand*{\glsxtrbookindexname}[1]{%
+ \glsifcategory{#1}{bacteria}
+ {\glossentrynameother{#1}{long}}%
+ {\glossentryname{#1}}%
+}
+
+\begin{document}
+\section{First Use}
+
+\gls{cbotulinum}, \gls{pputida}, \gls{cperfringens},
+\gls{bsubtilis}, \gls{ctetani}, \gls{pcomposti},
+\gls{pfimeticola}, \gls{cburnetii}, \gls{raustralis},
+\gls{rrickettsii}.
+
+\section{Next Use}
+
+\gls{cbotulinum}, \gls{pputida}, \gls{cperfringens},
+\gls{bsubtilis}, \gls{ctetani}, \gls{pcomposti},
+\gls{pfimeticola}, \gls{cburnetii}, \gls{raustralis},
+\gls{rrickettsii}.
+
+\printunsrtglossary[title={Bacteria}]
+\end{document}

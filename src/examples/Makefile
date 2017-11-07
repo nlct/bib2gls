@@ -1,7 +1,8 @@
 BIB2GLS=../bin/bib2gls --debug --verbose --group
 DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
-all	: sample-chemical.pdf sample-units.pdf sample-people.pdf
+all	: sample-chemical.pdf sample-units.pdf sample-people.pdf \
+	sample-bacteria.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -19,6 +20,11 @@ sample-people.pdf	: $(DEPS) sample-people.tex people.bib
 	$(BIB2GLS) sample-people --break-space
 	pdflatex sample-people
 	pdflatex sample-people
+
+sample-bacteria.pdf	: $(DEPS) sample-bacteria.tex bacteria.bib
+	pdflatex sample-bacteria
+	$(BIB2GLS) sample-bacteria
+	pdflatex sample-bacteria
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

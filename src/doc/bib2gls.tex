@@ -72,6 +72,7 @@
 }
 
 \newcommand{\glsxtrpostnameenvironment}{\space environment}
+\newcommand{\glsxtrpostnamecounter}{\space counter}
 
 \newcommand*{\bibglsothergroup}[3]{#3.#2}
 \newcommand*{\bibglsothergrouptitle}[3]{#1}
@@ -117,6 +118,8 @@
  \GlsXtrSetDefaultNumberFormat{glsnumberformat}%
  \mainmattertrue
 }
+
+\pagestyle{headings}
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
@@ -270,7 +273,7 @@
 }
 
 \newcommand*{\glostyle}[1]{%
-  \texorpdfstring{\idx{#1}}{#1}%
+  \texorpdfstring{\idx{glostyle.#1}}{#1}%
 }
 
 \newcommand*{\catattr}[1]{%
@@ -572,6 +575,27 @@
 
 \setcounter{tocdepth}{4}
 
+\newlength\imagewidth
+\newcommand*{\pdftwocol}[2]{%
+  \renewcommand{\tabcolsep}{2pt}%
+  \setlength{\imagewidth}{\dimexpr.5\textwidth-\tabcolsep}%
+  \def\tabcontents{\begin{tabular}{@{}cc@{}}}%
+  \count0=0\relax
+  \loop
+  \advance\count0 by 1\relax
+  \eappto\tabcontents{\noexpand\frame{%
+   \noexpand\includegraphics[page=\the\count0,width=\noexpand\imagewidth]{#1}}}%
+  \ifodd\count0
+    \appto\tabcontents{&}%
+  \else
+    \appto\tabcontents{\\}%
+  \fi
+  \ifnum\count0<#2
+  \repeat
+  \appto\tabcontents{\end{tabular}}%
+  \tabcontents
+}
+
 % This is a bit fiddly. Need to represent \vec{v} in typewriter
 % font for the interpreter examples. ($\mathtt{\vec{v}}$ doesn't
 % work)
@@ -657,6 +681,7 @@ to convert the entries to the \ext{bib} format required by
 
 \tableofcontents
 \listoftables
+\listoffigures
 
 \mainmatter
 \chapter{Introduction}
@@ -11113,6 +11138,12 @@ contain:
 The example files described here can be found in the
 \filefmt{examples} sub-directory. The \ext{bib} files are listed
 first and then sample files that use the \ext{bib} data.
+Make sure you have the latest versions of \styfmt{glossaries},
+\styfmt{glossaries-extra} and \bibgls\ if you want to try these out.
+If you get any undefined control sequence or undefined style errors
+then you need to update your \TeX\ distribution.
+Use the \longarg{group} switch when invoking \bibgls\ for all these
+examples if you want the glossaries divided into groups.
 
 \filesection{no-interpret-preamble.bib}
 
@@ -11146,6 +11177,14 @@ of entry (such as a person's name) without affecting the other (such as a
 book or film title).
 
 \verbatiminput{../examples/no-interpret-preamble.bib}
+
+\filesection{bacteria.bib}
+
+The \exfile{bacteria.bib} file contains bacteria abbreviations.
+These all use the \atentry{abbreviation} entry type with a
+\field{short} and \field{long} field.
+
+\verbatiminput{../examples/bacteria.bib}
 
 \filesection{people.bib}
 
@@ -11207,6 +11246,115 @@ an encoding line to prevent \bibgls\ from searching the entire file
 for it.
 
 \verbatiminput{../examples/people.bib}
+
+\filesection{sample-bacteria.tex}
+
+This example just uses the \exfile{bacteria.bib} file. The aim here
+is to have a simple list of the bacteria referenced in the document.
+Bacteria names are often shown in the long form on first use
+(without the short form) and then the short form on subsequent use.
+This can easily be done with the \abbrstyle{long-only-short-only}
+style. Bacteria are usually typeset in italic. It's best to create a
+semantic command for this:
+\begin{verbatim}
+\newcommand{\bacteriafont}[1]{\emph{#1}}
+\end{verbatim}
+There are two methods to apply this to the bacteria entries. The
+first is to redefine the formatting commands used by the
+\abbrstyle{long-only-short-only} style:
+\begin{verbatim}
+\renewcommand*{\glsabbrvonlyfont}[1]{\bacteriafont{#1}}
+\renewcommand*{\glslongonlyfont}[1]{\bacteriafont{#1}}
+\end{verbatim}
+This is fine if I don't intend to use this style for other types of
+abbreviations. However, I may decide to extend the document at a
+later date to include other abbreviations that need
+\abbrstyle{long-only-short-only} but shouldn't be emphasized.
+This can be done through the use of \idxpl{categoryattribute}.
+The font used for the \field{name} in the glossary is governed by
+the \catattr{glossnamefont} attribute and the font used by commands like
+\cs{gls} in the document is governed by the \catattr{textformat}
+attribute (\styfmt{glossaries-extra} v1.21+). So if I set
+the \field{category} to \code{bacteria} then I can do:
+\begin{verbatim}
+\setabbreviationstyle[bacteria]{long-only-short-only}
+\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+\end{verbatim}
+(Note that the attribute value is the control sequence name without
+the initial backslash.)
+
+I'd like to use the \glostyle{bookindex} style, which is
+provided by the \sty{glossary-bookindex} package. This isn't loaded
+automatically, but it can be loaded through the
+\styopt{stylemods} package option:
+\begin{verbatim}
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default style packages
+ stylemods={bookindex},% load glossary-bookindex.sty and patch styles
+ style=mcolindexgroup]{glossaries-extra}
+\end{verbatim}
+I've used the \styopt{nostyles} package option to suppress loading
+the default style packages, since I'm not using them. If you inspect
+the \ext{log} file, you may notice that \sty{glossary-tree} is still
+loaded. This is because it's required by \sty{glossary-bookindex}
+as the \glostyle{bookindex} style is based on the \glostyle{index}
+style provided by \sty{glossary-tree}.
+
+The \glostyle{bookindex} style doesn't show the \field{description}
+field and, since the \abbrstyle{long-only-short-only} style sets
+the \field{name} to the short form by default, only the short form
+will show in the glossary. I'd rather it was just the long form.
+This could simply be done using \csopt{replicate-fields} to copy the
+\field{long} field to the \field{name} field:
+\begin{verbatim}
+replicate-fields={long=name}
+\end{verbatim}
+Again, I want to consider the possibility of adding other types of
+abbreviations and this might not be appropriate for them. Another
+approach is to redefine \ics{glsxtrbookindexname} which is used by
+the \glostyle{bookindex} style to display the name. This takes the
+entry's label as the argument. The default definition is:
+\begin{verbatim}
+\newcommand*{\glsxtrbookindexname}[1]{\glossentryname{#1}}
+\end{verbatim}
+This can be changed to test for the entry's category:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexname}[1]{%
+ \glsifcategory{#1}{bacteria}
+ {\glossentrynameother{#1}{long}}%
+ {\glossentryname{#1}}%
+}
+\end{verbatim}
+Note that I've used \ics{glossentrynameother} here rather than
+\ics{glsentrylong}. This ensures that it follows the same formatting
+as \ics{glossentryname} (so it will use \ics{glsnamefont} or the
+\catattr{glossnamefont} attribute, the \catattr{glossname}
+attribute, and the \idx{postnamehook}, if set). In this case it
+picks up the \catattr{glossnamefont} attribute, which is used
+instead of \cs{glsnamefont}.
+
+If the \field{sort} field is missing for abbreviation styles, the
+fallback value is the \field{short} field (not the \field{name}
+field). In this case it would be better to fallback on the
+\field{long} field instead, which can be done with the
+\csopt{abbreviation-sort-fallback} option:
+\begin{verbatim}
+abbreviation-sort-fallback=long
+\end{verbatim}
+The complete code is listed below. This simple example only
+references entries on the first page so all entries just have~1
+in the number list. The complete document is shown in
+\figureref{fig:sample-bacteria.pdf}.
+
+\verbatiminput{../examples/sample-bacteria.tex}
+
+\begin{figure}[p]
+\centering
+\frame{\includegraphics[height=.9\textheight]{../examples/sample-bacteria.pdf}}
+\caption{\filefmt{sample-bacteria.pdf}}
+\label{fig:sample-bacteria.pdf}
+\end{figure}
 
 \filesection{sample-people.tex}
 
@@ -11403,8 +11551,8 @@ in which to save the group information using
 \begin{verbatim}
 copy-action-group-field={indexgroup}
 \end{verbatim}
-I need to remember to redefine \ics{glsxtrgroupfield} before
-displaying the index to this field:
+I need to remember to redefine \ics{glsxtrgroupfield} to this value before
+displaying the index:
 \begin{verbatim}
 \renewcommand{\glsxtrgroupfield}{indexgroup}
 \end{verbatim}
@@ -11442,8 +11590,8 @@ The first two glossaries shouldn't have number lists:
 \end{verbatim}
 I'd like to use \sty{hyperref} but I have to switch off the
 hypertargets for the second glossary otherwise I'll end up with
-duplicate targets. All references using \cs{gls} etc will link
-to the first glossary.
+duplicate targets. This is done with \code{target=false}. 
+All references using \cs{gls} etc will link to the first glossary.
 
 I could also do this for the index but the cross-references in the
 aliased entries will link to the first glossary rather than the
@@ -11474,12 +11622,7 @@ document are shown in \figureref{fig:sample-people.pdf}.
 
 \begin{figure}[p]
 \centering
-\begin{tabular}{@{}cc@{}}
-\frame{\includegraphics[page=1,width=.45\textwidth]{../examples/sample-people.pdf}}&
-\frame{\includegraphics[page=2,width=.45\textwidth]{../examples/sample-people.pdf}}\\
-\frame{\includegraphics[page=3,width=.45\textwidth]{../examples/sample-people.pdf}}&
-\frame{\includegraphics[page=4,width=.45\textwidth]{../examples/sample-people.pdf}}
-\end{tabular}
+\pdftwocol{../examples/sample-people.pdf}{4}
 \caption{\filefmt{sample-people.pdf}}
 \label{fig:sample-people.pdf}
 \end{figure}

@@ -1880,6 +1880,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{glossary-tree,
+  name={\styfmt{glossary\dhyphen tree}},
+  category={package},
+  parent={packages}
+}
+
 @index{glossary-bookindex,
   name={\styfmt{glossary\dhyphen bookindex}},
   category={package},
@@ -1986,42 +1992,54 @@ cs}\margm{Glspl-like cs}},
   parent={abbreviationstyles}
 }
 
-@index{glossarystyles,
+@index{long-only-short-only,
+  name={\abbrstylefmt{long-only-short-only}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{glossarystyle,
   name={glossary styles},
   text={glossary style}
 }
 
-@index{indexgroup,
+@index{glostyle.indexgroup,
   name={\glostylefmt{indexgroup}},
   category={glossarystyle},
-  parent={glossarystyles}
+  parent={glossarystyle}
 }
 
-@index{indexhypergroup,
+@index{glostyle.indexhypergroup,
   name={\glostylefmt{indexhypergroup}},
   category={glossarystyle},
-  parent={glossarystyles}
+  parent={glossarystyle}
 }
 
-@index{alttree,
+@index{glostyle.alttree,
   name={\glostylefmt{alttree}},
   category={glossarystyle},
-  parent={glossarystyles}
+  parent={glossarystyle}
 }
 
-@index{altlistgroup,
+@index{glostyle.altlistgroup,
   name={\glostylefmt{altlistgroup}},
   category={glossarystyle},
-  parent={glossarystyles}
+  parent={glossarystyle}
 }
 
-@index{bookindex,
+@index{glostyle.index,
+  name={\glostylefmt{index}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@index{glostyle.bookindex,
   name={\glostylefmt{bookindex}},
   category={glossarystyle},
-  parent={glossarystyles}
+  parent={glossarystyle}
 }
 
-@index{categoryattributes,
+@index{categoryattribute,
   name={category attributes},
   text={category attribute}
 }
@@ -2029,43 +2047,55 @@ cs}\margm{Glspl-like cs}},
 @index{recordcount,
   name={\catattrfmt{recordcount}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
 }
 
 @index{glossname,
   name={\catattrfmt{glossname}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
+}
+
+@index{glossnamefont,
+  name={\catattrfmt{glossnamefont}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{textformat,
+  name={\catattrfmt{textformat}},
+  category={categoryattribute},
+  parent={categoryattribute}
 }
 
 @index{aposplural,
   name={\catattrfmt{aposplural}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
 }
 
 @index{noshortplural,
   name={\catattrfmt{noshortplural}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
 }
 
 @index{targeturl,
   name={\catattrfmt{targeturl}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
 }
 
 @index{targetname,
   name={\catattrfmt{targetname}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
 }
 
 @index{externallocation,
   name={\catattrfmt{externallocation}},
   category={categoryattribute},
-  parent={categoryattributes}
+  parent={categoryattribute}
 }
 
 @index{equation,
@@ -2198,6 +2228,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{styopt.index,
   name={\styoptfmt{index}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nostyles,
+  name={\styoptfmt{nostyles}},
   category={packageoption},
   parent={packageoptions}
 }
@@ -3427,6 +3463,15 @@ field.},
 @dualindexentry{file.sample-people.tex,
   name={\filefmt{sample\dhyphen people.tex}}
 }
+
+@dualindexentry{file.bacteria.bib,
+  name={\filefmt{bacteria.bib}}
+}
+
+@dualindexentry{file.sample-bacteria.tex,
+  name={\filefmt{sample\dhyphen bacteria.tex}}
+}
+
 @index{glshyperlink,
   name={\csfmt{glshyperlink}},
   user1={\oargm{link text}\margm{label}},
@@ -4497,11 +4542,56 @@ packages},
 }
 
 @index{glssetwidest,
-  name={\csfmt{glssetwidest}},
+  name={\csfmt{gls\-set\-widest}},
   user1={\oargm{level}\margm{text}},
   description={used with the \glostyle{alttree} style to set the
    widest entry name for the given level},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrbookindexname,
+  name={\csfmt{glsxtr\-book\-index\-name}},
+  user1={\margm{label}},
+  description={used with the \glostyle{bookindex} style to
+   format the entry's name},
+  note={provided by \styfmt{glossary-bookindex}},
+  category={command}
+}
+
+@index{glsentrylong,
+  name={\csfmt{gls\-entry\-long}},
+  user1={\margm{label}},
+  description={displays the long form without any formatting or
+indexing},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossentryname,
+  name={\csfmt{gloss\-entry\-name}},
+  user1={\margm{label}},
+  description={used by glossary styles to display the name},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsnamefont,
+  name={\csfmt{gls\-name\-font}},
+  user1={\margm{text}},
+  description={used by \cs{glossentryname} to format the name},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossentrynameother,
+  name={\csfmt{gloss\-entry\-name\-other}},
+  user1={\margm{label}\margm{field}},
+  description={acts like \ics{glossentryname} (obeys 
+   \catattr{glossname} and \catattr{glossnamefont}
+   or \cs{glsnamefont} and the post-name hook) but uses
+   the given \meta{field} instead of the \field{name} field},
+  note={provided by \styfmt{glossaries-extra} v1.22+},
   category={command}
 }
 
