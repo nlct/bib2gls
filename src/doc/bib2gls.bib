@@ -1652,6 +1652,27 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@dualindexentry{sortname,
+  name={\csfmt{sortname}},
+  user1={\margm{first name(s)}\margm{surname}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{sortvonname,
+  name={\csfmt{sortvonname}},
+  user1={\margm{first name(s)}\margm{von}\margm{surname}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{sortart,
+  name={\csfmt{sortart}},
+  user1={\margm{article}\margm{text}},
+  description={example command},
+  category={command}
+}
+
 @index{fileformats,
   name={file formats},
   text={file format}
@@ -1830,19 +1851,37 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{glossary-hypernav,
-  name={\styfmt{glossary-hypernav}},
+  name={\styfmt{glossary\dhyphen hypernav}},
   category={package},
   parent={packages}
 }
 
 @index{glossaries-prefix,
-  name={\styfmt{glossaries-prefix}},
+  name={\styfmt{glossaries\dhyphen prefix}},
   category={package},
   parent={packages}
 }
 
 @index{glossaries-accsupp,
-  name={\styfmt{glossaries-accsupp}},
+  name={\styfmt{glossaries\dhyphen accsupp}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossaries-extra-stylemods,
+  name={\styfmt{glossaries\dhyphen extra\dhyphen stylemods}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossary-list,
+  name={\styfmt{glossary\dhyphen list}},
+  category={package},
+  parent={packages}
+}
+
+@index{glossary-bookindex,
+  name={\styfmt{glossary\dhyphen bookindex}},
   category={package},
   parent={packages}
 }
@@ -1966,6 +2005,18 @@ cs}\margm{Glspl-like cs}},
 
 @index{alttree,
   name={\glostylefmt{alttree}},
+  category={glossarystyle},
+  parent={glossarystyles}
+}
+
+@index{altlistgroup,
+  name={\glostylefmt{altlistgroup}},
+  category={glossarystyle},
+  parent={glossarystyles}
+}
+
+@index{bookindex,
+  name={\glostylefmt{bookindex}},
   category={glossarystyle},
   parent={glossarystyles}
 }
@@ -2139,8 +2190,20 @@ cs}\margm{Glspl-like cs}},
   parent={packageoptions}
 }
 
+@index{styopt.postdot,
+  name={\styoptfmt{postdot}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
 @index{styopt.index,
   name={\styoptfmt{index}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.stylemods,
+  name={\styoptfmt{stylemods}},
   category={packageoption},
   parent={packageoptions}
 }
@@ -3245,6 +3308,18 @@ field.},
   plural={ignored glossaries}
 }
 
+@index{postlinkhook,
+  name={post-link hook}
+}
+
+@index{postnamehook,
+  name={post-name hook}
+}
+
+@index{postdescriptionhook,
+  name={post-description hook}
+}
+
 @index{encoding}
 
 @index{digraph}
@@ -3349,6 +3424,9 @@ field.},
   name={\filefmt{people.bib}}
 }
 
+@dualindexentry{file.sample-people.tex,
+  name={\filefmt{sample\dhyphen people.tex}}
+}
 @index{glshyperlink,
   name={\csfmt{glshyperlink}},
   user1={\oargm{link text}\margm{label}},
@@ -3454,6 +3532,34 @@ field.},
   description={the default suffix used to construct the plural for
    the short form of abbreviations},
   note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrifwasfirstuse,
+  name={\csfmt{glsxtr\-if\-was\-first\-use}},
+  user1={\margm{true}\margm{false}},
+  description={only for use in the post-link hooks this
+  tests if the entry just referenced was used for the first time},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glslabel,
+  name={\csfmt{glslabel}},
+  user1={},
+  description={only for use in the post-link hooks this
+  expands to the label of the entry that was last referenced},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glscurrententrylabel,
+  name={\csfmt{glscurrententrylabel}},
+  user1={},
+  description={only for use in the glossary, such as in the style or
+in the post-name or post-description hooks, this expands to the
+label of the current entry},
+  note={provided by \styfmt{glossaries}},
   category={command}
 }
 
@@ -4179,6 +4285,14 @@ option},
   category={command}
 }
 
+@index{glolinkprefix,
+  name={\csfmt{glo\-link\-prefix}},
+  user1={},
+  description={target name prefix used in entry hyperlinks},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{apptoglossarypreamble,
   name={\csfmt{apptoglossarypreamble}},
   user1={\oargm{type}\margm{code}},
@@ -4429,6 +4543,14 @@ packages},
   user1={\meta{token}},
   description={if \meta{token} is a control sequence it expands
    to the escape character followed by the control sequence name},
+  note={{}\TeX\ primitive},
+  category={command}
+}
+
+@index{let,
+  name={\csfmt{let}},
+  user1={\meta{token1}\meta{token2}},
+  description={assigns \meta{token1} to \meta{token2}},
   note={{}\TeX\ primitive},
   category={command}
 }

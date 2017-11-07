@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass[12pt]{report}
 
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,% using bib2gls
@@ -12,7 +12,8 @@
 \newcommand{\bibglsdategroup}[7]{#1#4#7}
 \newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
 
-\newcommand*{\swapsortop}[2]{#2, #1}
+\newcommand*{\swaptwo}[2]{#2, #1}
+\newcommand*{\swapthree}[3]{#2 #3, #1}
 
 \GlsXtrLoadResources[
   src=no-interpret-preamble,
@@ -20,7 +21,7 @@
 ]
 
 \GlsXtrLoadResources[
-  src=people,% data in people.bib
+  src=people,
   match={entrytype=entry},
   category={people},
   replicate-fields={name={first}},
@@ -86,7 +87,9 @@ and \gls{alexander}.
 \printunsrtglossary*
  [type=index,style=bookindex,nopostdot]
  {%
-   \let\sortop\swapsortop
+   \let\sortname\swaptwo
+   \let\sortart\swaptwo
+   \let\sortvonname\swapthree
    \renewcommand{\glsxtrgroupfield}{indexgroup}%
    \renewcommand*{\glolinkprefix}{idx:}%
  }

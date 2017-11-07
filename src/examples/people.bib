@@ -1,9 +1,11 @@
 % Encoding: UTF-8
 
-@preamble{"\providecommand{\sortop}[2]{#2, #1}"}
+@preamble{"\providecommand{\sortname}[2]{#2, #1}
+\providecommand{\sortvonname}[3]{#2 #3, #1}
+\providecommand{\sortart}[2]{#2, #1}"}
 
 @entry{caesar,
-  name={\sortop{Gaius Julius}{Caesar}},
+  name={\sortname{Gaius Julius}{Caesar}},
   first={Julius Caesar},
   text={Caesar},
   description={Roman politician and general},
@@ -12,7 +14,7 @@
 }
 
 @entry{wellesley,
-  name={\sortop{Arthur}{Wellesley}},
+  name={\sortname{Arthur}{Wellesley}},
   text={Wellington},
   description={Anglo-Irish soldier and statesman},
   born={1~May 1769 AD},
@@ -26,7 +28,7 @@
 }
 
 @entry{bonaparte,
-  name={\sortop{Napoleon}{Bonaparte}},
+  name={\sortname{Napoleon}{Bonaparte}},
   text={Bonaparte},
   description={French military and political leader},
   born={15~July 1769 AD},
@@ -48,7 +50,7 @@
 }
 
 @entry{vonrichthofen,
-  name={\sortop{Manfred}{von Richthofen}},
+  name={\sortvonname{Manfred}{von}{Richthofen}},
   text={von Richthofen},
   description={Prussian ace fighter pilot in the German Air Force 
     during World War~I},
@@ -58,6 +60,6 @@
 }
 
 @index{redbaron,
-  name={\sortop{The}{Red Baron}},
+  name={\sortart{The}{Red Baron}},
   alias={vonrichthofen}
 }

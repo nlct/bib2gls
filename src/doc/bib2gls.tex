@@ -888,9 +888,10 @@ it has no effect. With \bibgls, the indexing is written to the
 Although \idxpl{ignoredglossary} can't be used with
 \cs{printglossary}, they can be used with \cs{printunsrtglossary},
 which is designed to work without any indexing, but you need to
-explicitly set the title in the optional argument. They still can't
-be used in \cs{printunsrtglossaries}, since they're not included in
-the list that this command iterates over.
+explicitly set the title in the optional argument to override the
+default. The \idxpl{ignoredglossary} still can't be used in
+\cs{printunsrtglossaries}, since they're not included in the list
+that this command iterates over.
 
 So \cs{newignoredglossary} is useful with \bibgls\ if you're happy
 to use \cs{printunsrtglossary} as it reduces the overall number of
@@ -906,7 +907,11 @@ required glossary is defined. In this case, \bibgls\ uses
 \ics{provideignoredglossary*} in the \iext{glstex} file. If you
 haven't already defined that glossary in the document with \cs{newglossary*},
 you'll need to set the title in the optional argument of
-\cs{printunsrtglossary}.
+\cs{printunsrtglossary} if you don't want the default. The glossary
+won't be defined on the first run (if the definition is only
+provided in the \ext{glstex} file) but \cs{printunsrtglossary} will
+just give a warning if the type is undefined so it won't interrupt
+the document build.
 
 \section{Security}
 
@@ -11111,26 +11116,46 @@ first and then sample files that use the \ext{bib} data.
 
 \filesection{no-interpret-preamble.bib}
 
-The \exfile{no-interpret-preamble.bib} file contains a command
-definition (\gls{sortop}) that's required by the document 
-but needs to be hidden
-from \bibgls's interpreter. This doesn't contain any entry
+The \exfile{no-interpret-preamble.bib} file contains command
+definitions used in some of the \field{name} fields. Although these
+commands aren't used explicitly in the document, they need to be
+defined when the names are displayed in the document (typically in
+the glossary). These commands are much like the \gls{sortop} command 
+described on \glsxtrpageref{sortop} and need to be hidden 
+from \bibgls's interpreter. This file doesn't contain any entry
 definitions and must be loaded first with
-\csopt[false]{interpret-preamble}. (See the \csopt{sort} option on
-page~\glsxtrpageref{opt.sort} for further details.)
+\csopt[false]{interpret-preamble}.
+
+The first command is
+\nosecdef{sortname}
+This is used in the \field{name} fields for entries containing
+information about a person. The aim here is for \bibgls\ to sort
+according to \meta{surname}, \meta{first name(s)} but for the
+glossary to display \meta{first name(s)} \meta{surname}. For names
+with a \qt{von} part, there's another command:
+\nosecdef{sortvonname}
+which has a similar purpose.
+
+The third command is
+\nosecdef{sortart}
+This is the same as \gls{sortname} but is designed for titles,
+phrases or sentences that start with an article (such as \qt{a} or
+\qt{the}). Although it's functionally the same as \gls{sortname},
+it's semantically different and allows for adjustments for one type
+of entry (such as a person's name) without affecting the other (such as a
+book or film title).
 
 \verbatiminput{../examples/no-interpret-preamble.bib}
-
-There's no encoding line here as it's a trivial ASCII file.
 
 \filesection{people.bib}
 
 The \exfile{people.bib} file contains details about people. This
-starts with a definition of \gls{sortop} in \atentry{preamble} that
-can be picked up by the interpreter. This swaps the order of the
-arguments (and inserts a comma) which allows \bibgls\ to sort by
-surname. Remember that if \exfile{no-interpret-preamble.bib} is loaded
-first, that definition will be the one in use in the document.
+starts with a definition of \gls{sortname} and \gls{sortvonname} 
+in \atentry{preamble} that can be picked up by the interpreter. This
+swaps the order of the arguments which allows \bibgls\ to sort by
+surname. Remember that if \exfile{no-interpret-preamble.bib} is
+loaded first, the definitions provided in that file will be the one
+in use in the document.
 
 The information for each person is supplied in an \atentry{entry}
 type. There are some non-standard fields: \fieldfmt{born},
@@ -11151,22 +11176,25 @@ One entry (\code{caesar}) has a \field{first} field. In that case
 the \field{first} field is slightly different from the \field{name}
 field (\qt{Gaius} is omitted). The other entries don't have a
 \field{first} field. They can simply have the \field{name} copied to
-\field{first} with the \csopt{replicate-fields} option.
+\field{first} with the \csopt{replicate-fields} option (so that the
+full name is shown on first use) or the \field{first} field can be
+ignored with \csopt{ignore-fields} (so all entries will use the
+\field{text} field on first use).
 
 There's one name with a \qt{von} part. In this case the \field{name}
 field is set to
 \begin{verbatim}
-\sortop{Manfred}{von Richthofen}
+\sortvonname{Manfred}{von}{Richthofen}
 \end{verbatim}
-which will come under the \qt{V} letter group. If you prefer that
-this should come under \qt{R} instead, then you need to move the
-\qt{von} part into the first argument:
+which will come under the \qt{V} letter group since \gls{sortvonname}
+is defined as \meta{von} \meta{surname}, \meta{first name(s)}
+
+If you prefer that this name should come under \qt{R} instead, then
+you need to adjust the definition of \gls{sortvonname}:
 \begin{verbatim}
-\sortop{Manfred von}{Richthofen}
+@preamble{"\providecommand{\sortname}[2]{#2, #1}
+\providecommand{\sortvonname}[3]{#3, #1 #2}"}
 \end{verbatim}
-Alternatively, you could provide a similar command with three
-arguments for names with a \qt{von} part to allow for greater
-flexibility.
 
 There are also some synonyms provided with \atentry{index} entry
 types that have the \field{alias} field to redirect to the main
@@ -11179,6 +11207,282 @@ an encoding line to prevent \bibgls\ from searching the entire file
 for it.
 
 \verbatiminput{../examples/people.bib}
+
+\filesection{sample-people.tex}
+
+This example uses the \exfile{no-interpret-preamble.bib} and
+\exfile{people.bib} files. The aim here is to have a list of people
+ordered alphabetically by surname with a brief description, 
+the same list ordered by date of birth and an index of all the
+people without their details and with a number list indicating where
+the people were mentioned in the document. The first two lists
+shouldn't include aliases but the index should.
+
+Since this is just an example document all the \cs{gls} commands
+only occur on page~1, which means that each number list is just
+\qt{1}. A real document would have the references scattered about.
+The aliases haven't actually been referenced anywhere in the
+document.
+
+The \fieldfmt{born}, \fieldfmt{died} and \fieldfmt{othername} fields will be
+ignored by default since they don't correspond to recognised keys,
+so the keys either need to be defined or the fields need to be
+mapped to existing keys. In this case I've decided to map them to
+the \field{user1}, \field{user2} and \field{user3} fields using
+\csopt{field-aliases}:
+\begin{verbatim}
+field-aliases={born=user1,died=user2,othername=user3}
+\end{verbatim}
+Although the aliases haven't been referenced in the document, I've
+taken into account the possibility that they might later be added.
+To prevent them from showing in the first two lists I've filtered
+them out. This is easy to do since the aliases are all defined using
+\atentry{index} whereas the remaining (non-aliased) entries are
+defined using \atentry{entry} so \csopt{match} can be used to only
+select entries defined with \atentry{entry}: 
+\begin{verbatim}
+match={entrytype=entry}
+\end{verbatim}
+
+I'd like the first use of \ics{gls} to display the full name, except
+for the entry that has the \field{first} field set. The remaining
+entries only have \field{text} set to a shortened version of the
+name so they need to have the \field{name} field copied to the
+\field{first} field using \csopt{replicate-fields}:
+\begin{verbatim}
+replicate-fields={name={first}}
+\end{verbatim}
+
+I'd like the first use to show the other name in parentheses where
+provided. The simplest way to achieve this is by defining the
+\idx{postlinkhook} \csfmt{glsxtrpostlink\meta{category}}. If the
+\field{category} field isn't specified it will default to
+\code{general} (for entries defined with \atentry{entry}), so I
+could just redefine \csfmt{glsxtrpostlinkgeneral} but to allow for
+the possibility of extending the document to incorporate other types
+of entries I decided to set the \field{category} to \code{people}
+through the use of the \csopt{category} option:
+\begin{verbatim}
+category={people}
+\end{verbatim}
+
+This means that I now need to define a command called
+\csfmt{glsxtrpostlinkpeople} that will be used after instances of
+\cs{gls} etc where the entry has the \field{category} set to
+\code{people}. This first tests if that was the first use of the
+entry with \ics{glsxtrifwasfirstuse} and then tests if the
+\field{user3} field is set. If so, it does a space followed by that
+field's value in parentheses. The entry's label can be obtained from
+\ics{glslabel}:
+\begin{verbatim}
+\newcommand*{\glsxtrpostlinkpeople}{%
+ \glsxtrifwasfirstuse
+ {%
+   \ifglshasfield{user3}{\glslabel}%
+   {\space(\glscurrentfieldvalue)}%
+   {}%
+ }%
+ {}%
+}
+\end{verbatim}
+
+I'd also like to do something similar after the name when the entry
+is displayed in the glossary. This means defining the \idx{postnamehook}
+\csfmt{glsxtrpostname\meta{category}}, in this case
+\csfmt{glsxtrpostnamepeople}. The entry's label is referenced
+with \ics{glscurrententrylabel}:
+\begin{verbatim}
+\newcommand*{\glsxtrpostnamepeople}{%
+ \ifglshasfield{user3}{\glscurrententrylabel}%
+ {\space(\glscurrentfieldvalue)}%
+ {}%
+}
+\end{verbatim}
+(A different command is used since \cs{gls} may occur in the
+description, which would interfere with the current entry label if
+they shared the same command to reference the label.)
+
+The \idx{postdescriptionhook} can be used to appended the birth and
+death dates. Although all the entries in \exfile{people.bib} have a 
+\fieldfmt{died} field, I've added a check for the corresponding
+\field{user3} field in case new entries are added for people who are
+still alive:
+\begin{verbatim}
+\newcommand*{\glsxtrpostdescpeople}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}
+ {% born
+   \space(\glscurrentfieldvalue\,--\,%
+     \ifglshasfield{user2}{\glscurrententrylabel}
+     {% died
+        \glscurrentfieldvalue
+     }%
+     {}%
+   )%
+ }%
+ {}%
+}
+\end{verbatim}
+
+The first list is quite straight-forward and can be created with:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,
+  match={entrytype=entry},
+  category={people},
+  replicate-fields={name={first}},
+  field-aliases={born=user1,died=user2,othername=user3}
+]
+\end{verbatim}
+I have used the \csopt{sort} option and there's no document language, 
+so \bibgls\ will sort according to my locale. The custom
+commands \gls{sortname} and \gls{sortvonname} ensure that the
+entries are all sorted alphabetically according to the surnames.
+
+The second list can easily be created by adding the \csopt{secondary}
+option:
+\begin{verbatim}
+secondary={date:user1:bybirth}
+\end{verbatim}
+This sorts according to the \field{user1} field (which was
+originally the \fieldfmt{birth} field). I've changed the 
+date group headings by redefining \gls{bibglsdategroup} and
+\gls{bibglsdategrouptitle}, which means that the grouping in the
+\code{bybirth} glossary will be in the form \meta{year} \meta{era}:
+\begin{verbatim}
+\newcommand{\bibglsdategroup}[7]{#1#4#7}
+\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
+\end{verbatim}
+I've also defined the \code{bybirth} glossary and supplied a title:
+\begin{verbatim}
+\newglossary*{bybirth}{People (Ordered by Birth)}
+\end{verbatim}
+
+The first two glossaries have entries with fairly long names (especially those
+with the \idx{postnamehook}), so the best style is the
+\glostyle{altlistgroup}. The \sty{glossaries-extra-stylemods}
+package patches this style to discourage page breaks occurring after
+group headings, so I've also used the \styopt{stylemods} 
+option to automatically load that package. I'd like to use the
+\glostyle{bookindex} style for the index, which is provided by 
+\sty{glossary-bookindex},\footnote{\styfmt{glossary-bookindex}
+is distributed with \styfmt{glossaries-extra} v1.21+} so I need:
+\begin{verbatim}
+stylemods={list,bookindex}
+\end{verbatim}
+This ensures that \sty{glossary-list} and \sty{glossary-bookindex}
+are loaded and patches the list styles.
+
+The first two glossaries would look better with a terminating full
+stop, so I've used the \styopt{postdot} package option. This can
+locally be switched off for the index with \code{nopostdot}.
+The index glossary type can be defined with the \styopt{index}
+package option. I've set the default style to \glostyle{altlistgroup}
+but this can locally be changed to \glostyle{bookindex} when I
+display the index. The \styopt{record} option is needed to use
+\bibgls, so the \styfmt{glossaries-extra} package is loaded with:
+\begin{verbatim}
+\usepackage[record,% using bib2gls
+ index,% create index glossary
+ postdot,% dot after descriptions
+ stylemods={list,bookindex},% load glossary-bookindex.sty and fix styles
+ style=altlistgroup]{glossaries-extra}
+\end{verbatim}
+
+The index needs to include all the entries that have already been
+defined but also needs to include the aliased entries. This means
+that existing entries simply need their label copied to the
+\code{index} glossary but the other entries need to be defined
+so this requires setting the \csopt{action} option:
+\begin{verbatim}
+action={define or copy}
+\end{verbatim}
+I would also like to have groups in the index (which the
+\glostyle{bookindex} style supports) so I need to specify a field
+in which to save the group information using
+\csopt{copy-action-group-field}:
+\begin{verbatim}
+copy-action-group-field={indexgroup}
+\end{verbatim}
+I need to remember to redefine \ics{glsxtrgroupfield} before
+displaying the index to this field:
+\begin{verbatim}
+\renewcommand{\glsxtrgroupfield}{indexgroup}
+\end{verbatim}
+
+The aliased entries won't be selected by default since they haven't
+been used in the document, so I need to change the selection
+criteria with \csopt{selection}:
+\begin{verbatim}
+selection={recorded and deps and see}
+\end{verbatim}
+
+In the index, I'd like the surnames first. This can be done by
+redefining the custom commands used in the \field{name} fields.
+There's a slight complication here. These commands aren't defined on
+the first \LaTeX\ run as their definitions are written to the
+\ext{glstex} file by \bibgls, so I can't use \cs{renewcommand}.
+instead I've provided some custom commands:
+\begin{verbatim}
+\newcommand*{\swaptwo}[2]{#2, #1}
+\newcommand*{\swapthree}[3]{#2 #3, #1}
+\end{verbatim}
+Now I just need to make an assignment using \ics{let}:
+\begin{verbatim}
+\let\sortname\swaptwo
+\let\sortart\swaptwo
+\let\sortvonname\swapthree
+\end{verbatim}
+This doesn't perform any check to determine if the commands are
+already defined so there won't be a problem on the first run.
+
+The first two glossaries shouldn't have number lists:
+\begin{verbatim}
+\printunsrtglossary[title={People (Alphabetical)},nonumberlist]
+\printunsrtglossary[type=bybirth,target=false,nonumberlist]
+\end{verbatim}
+I'd like to use \sty{hyperref} but I have to switch off the
+hypertargets for the second glossary otherwise I'll end up with
+duplicate targets. All references using \cs{gls} etc will link
+to the first glossary.
+
+I could also do this for the index but the cross-references in the
+aliased entries will link to the first glossary rather than the
+relevant entry in the index. The simplest way to fix this is to
+redefine \ics{glolinkprefix} to provide a different target:
+\begin{verbatim}
+\renewcommand*{\glolinkprefix}{idx:}
+\end{verbatim}
+These redefinitions need to be done before the index. I've decided
+to use the starred \ics{printunsrtglossary*} to localise these
+changes, although that's not needed for this document since the
+index comes right at the end:
+\begin{verbatim}
+\printunsrtglossary*
+ [type=index,style=bookindex,nopostdot]
+ {%
+   \let\sortname\swaptwo
+   \let\sortart\swaptwo
+   \let\sortvonname\swapthree
+   \renewcommand{\glsxtrgroupfield}{indexgroup}%
+   \renewcommand*{\glolinkprefix}{idx:}%
+ }
+\end{verbatim}
+The complete document code is listed below. The four pages of the
+document are shown in \figureref{fig:sample-people.pdf}.
+
+\verbatiminput{../examples/sample-people.tex}
+
+\begin{figure}[p]
+\centering
+\begin{tabular}{@{}cc@{}}
+\frame{\includegraphics[page=1,width=.45\textwidth]{../examples/sample-people.pdf}}&
+\frame{\includegraphics[page=2,width=.45\textwidth]{../examples/sample-people.pdf}}\\
+\frame{\includegraphics[page=3,width=.45\textwidth]{../examples/sample-people.pdf}}&
+\frame{\includegraphics[page=4,width=.45\textwidth]{../examples/sample-people.pdf}}
+\end{tabular}
+\caption{\filefmt{sample-people.pdf}}
+\label{fig:sample-people.pdf}
+\end{figure}
 
 \printcommandsummary
 
