@@ -122,6 +122,7 @@
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
+\newcommand*{\BibTeX}{\hologo{BibTeX}}
 \newcommand*{\eTeX}{\hologo{eTeX}}
 \newcommand*{\XeLaTeX}{\hologo{XeLaTeX}}
 \newcommand*{\LuaLaTeX}{\hologo{LuaLaTeX}}
@@ -5366,6 +5367,114 @@ make a difference. The same result occurs with:
 ]
 \end{verbatim}
 
+\optsection{bibtex-contributor-fields}
+
+This option indicates that the listed fields all use \BibTeX's name
+syntax (as used in \BibTeX's \code{author} and \code{editor} fields).
+The values of these fields will be converted into the form:
+\begin{alltt}
+\gls{bibglscontributorlist}\margm{contributor list}\margm{n}
+\end{alltt}
+where \meta{n} is the number of names in the list and
+\meta{contributor-list} is a comma-separated list of names in the
+form:
+\begin{alltt}
+\gls{bibglscontributor}\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}
+\end{alltt}
+
+The \gls{bibglscontributorlist} commands is initially defined in 
+\bibgls's interpreter to just do the first argument and ignore the
+second. This means that if you're sorting on this field, the \qt{and}
+part between the final names doesn't appear in the sort value.
+The actual definition of \gls{bibglscontributorlist} provided in the 
+\ext{glstex} file depends on whether or not \ics{DTLformatlist} is defined.
+(Note that \styfmt{glossaries} automatically loads \sty{datatool-base}
+so this command will be defined if you have at least v2.28 of
+\sty{datatool-base}.)
+
+For example, if the \field{name} field is specified as:
+\begin{verbatim}
+name={John Smith and Jane Doe and Dickie von Duck}
+\end{verbatim}
+then \csopt[name]{bibtex-contributor-fields} will convert the
+\field{name} field value to 
+\begin{verbatim}
+\bibglscontributorlist{%
+ \bibglscontributor{John}{}{Smith}{},%
+ \bibglscontributor{Jane}{}{Doe}{},%
+ \bibglscontributor{Dickie}{von}{Duck}{}}{3}
+\end{verbatim}
+With \csopt[von]{contributor-order} the sort value obtained from
+this field will be:
+\begin{verbatim}
+Smith, John,Doe, Jane,von Duck, Dickie
+\end{verbatim}
+With one of the locale sort methods and with the default
+\csopt[word]{break-at}, this will end up as:
+\begin{verbatim}
+Smith|John|Doe|Jane|von|Duck|Dickie
+\end{verbatim}
+
+\optsection{contributor-order}
+
+The \gls{bibglscontributor} command is defined in
+\bibgls's interpreter and its definition is dependent on this
+setting. The \meta{value} may be one of (where the parts in square 
+brackets are omitted if that argument is empty):
+\begin{itemize}
+\item \optfmt{surname}: \gls{bibglscontributor} expands to
+\meta{surname}\oarg{, \meta{suffix}}\oarg{, \meta{forenames}}\oarg{,
+\meta{von-part}};
+\item \optfmt{von}: \gls{bibglscontributor} expands to
+\oarg{\meta{von-part} }\meta{surname}\oarg{, \meta{suffix}}\oarg{, \meta{forenames}};
+\item \optfmt{forenames}: \gls{bibglscontributor} expands to
+\oarg{\meta{forenames} }\oarg{\meta{von-part} }\meta{surname}\oarg{,
+\meta{suffix}}.
+\end{itemize}
+The default value is \optfmt{von}. Note that if you have multiple
+resource sets, this option governs the way \bibgls's version of
+\gls{bibglscontributor} behaves. The actual definition is written to
+the \ext{glstex} using \cs{providecommand}, which means that \LaTeX\
+will only pick up the first definition.
+
+For example:
+\begin{verbatim}
+\newcommand*{\bibglscontributor}[4]{%
+  #1\ifstrempty{#2}{}{ #2} #3\ifstrempty{#4}{}{, #4}%
+}
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  bibtex-contributor-fields={name}
+]
+\end{verbatim}
+This will display the names in the glossary with the forenames
+first, but \bibgls\ will sort according to surname.
+
+An alternative approach, if you need an initial resource set
+such as with the \exfile{no-interpret-preamble.bib} file:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src={no-interpret-preamble},
+  interpret-preamble=false,
+  bibtex-contributor-fields={name},
+  contributor-order={forenames}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  bibtex-contributor-fields={name}
+]
+\end{verbatim}
+Note the need to use \csopt[name]{bibtex-contributor-fields}
+in the first resource set even though there are no entries in 
+the \ext{bib} file. This is because the definition of
+\gls{bibglscontributor} is only written to the \ext{glstex} file if
+\csopt{bibtex-contributor-fields} has been set to a non-empty list.
+The second resource set will use the default 
+\csopt[von]{bibtex-contributor-fields} setting when obtaining the
+sort value.
+
 \optsection{category}
 
 The selected entries may all have their \field{category} field
@@ -5861,8 +5970,11 @@ used instead. The \meta{value} may be one of:
 Note that if you have dual entries and you use this option to
 append a full stop, then it will be copied over to the mapped field.
 This is different to the \styopt{postdot} option which doesn't
-add the dot to the field but incorporates it in the post-description
-hook.
+add the dot to the field but incorporates it in the 
+\idx{postdescriptionhook}. This means that a dot inserted with
+\csopt{post-description-dot} will come before the
+\idx{postdescriptionhook} whereas with \styopt{postdot} the
+punctuation comes after any category-specific hook.
 
 The \csopt[check]{post-description-dot} setting determines whether
 to append the dot as follows:
@@ -10905,6 +11017,46 @@ is defined as:
 }
 \end{verbatim}
 
+\cssection{bibglscontributorlist}
+
+\formatdef{bibglscontributorlist}
+This is used when \csopt{bibtex-contributor-fields} is set. The
+definition depends on whether or not \ics{DTLformatlist} has been
+defined:
+\begin{verbatim}
+\ifdef\DTLformatlist
+{% datatool v2.28+
+ \providecommand*{\bibglscontributorlist}[2]{\DTLformatlist{#1}}
+}
+{% datatool v2.27 or earlier
+ \providecommand*{\bibglscontributorlist}[2]{%
+  \def\bibgls@sep{}%
+  \@for\bibgls@item:=#1\do{\bibgls@sep\bibgls@item\def\bibgls@sep{, }}%
+ }
+}
+\end{verbatim}
+The second argument allows you to provide definitions like:
+\begin{verbatim}
+\newcommand*{\bibglscontributorlist}[2]{%
+ \ifcase#2
+ \or
+  name:
+ \else
+  names:
+ \fi
+ \DTLformatlist{#1}%
+}
+\end{verbatim}
+
+\cssection{bibglscontributor}
+
+\formatdef{bibglscontributor}
+This is used when \csopt{bibtex-contributor-fields} is set. The
+definition depends on \csopt{contributor-order}. Note that if you have multiple
+resource sets, that option governs the way \bibgls's version of
+\gls{bibglscontributor} behaves. The definition is written to the
+\ext{glstex} using \cs{providecommand}, so \LaTeX\ will only pick up
+the first definition.
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}
@@ -11263,6 +11415,8 @@ The example files described here can be found in the
 first and then sample files that use the \ext{bib} data.
 Make sure you have the latest versions of \styfmt{glossaries},
 \styfmt{glossaries-extra} and \bibgls\ if you want to try these out.
+(The \exfile{sample-media.tex} file requires at least \styfmt{datatool}
+v2.28.)
 If you get any undefined control sequence or undefined style errors
 then you need to update your \TeX\ distribution.
 Use the \longarg{group} switch when invoking \bibgls\ for all these
@@ -11312,6 +11466,12 @@ book or film title).
 The fourth command is
 \nosecdef{sortmediacreator}
 which again is functionally the same as \gls{sortname}.
+
+The names could be specified using \BibTeX's
+syntax instead with \csopt{bibtex-contributor-fields} to convert it,
+but the aim here is to show a variety of ways to use \bibgls. For an
+example of \csopt{bibtex-contributor-fields}, see the way the 
+\fieldfmt{cast} field in \exfile{films.bib} is dealt with.
 
 Although the file only contains ASCII characters, it starts with 
 an encoding line to prevent \bibgls\ from searching the entire file
@@ -11481,6 +11641,9 @@ you need to adjust the definition of \gls{sortvonname}:
 @preamble{"\providecommand{\sortname}[2]{#2, #1}
 \providecommand{\sortvonname}[3]{#3, #1 #2}"}
 \end{verbatim}
+An alternative approach would be to format the names using
+\BibTeX's contributor syntax and use
+\csopt[name]{bibtex-contributor-fields} to convert them.
 
 There are also some synonyms provided with \atentry{index} entry
 types that have the \field{alias} field to redirect to the main
@@ -11508,12 +11671,11 @@ The entries all have a custom field \fieldfmt{identifier} set to
 These will be ignored by \bibgls\ unless they're
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if they're
 aliased with \csopt{field-aliases}.
-(Remember that \bibgls\ isn't \appfmt{bibtex} and doesn't recognise
-\appfmt{bibtex}'s fields or name syntax.)
 
 There are other ways in which this data could be specified. For
 example, the \field{description} field could contain a brief summary
-(or \qt{log line}).
+(or \qt{log line}). The \field{author} field could use \BibTeX's
+syntax instead with \csopt{bibtex-contributor-fields} to convert it.
 
 \lstinputlisting[firstline=5]{../examples/books.bib}
 
@@ -11524,7 +11686,7 @@ As above, the entries use custom commands provided in
 \exfile{no-interpret-preamble.bib} and
 \exfile{interpret-preamble.bib}.
 The entries all have a custom field \fieldfmt{identifier} set to 
-\code{film} and other custom fields \fieldfmt{director} and
+\code{film} and other custom fields \fieldfmt{cast}, \fieldfmt{director} and
 \fieldfmt{year}. These will be ignored by \bibgls\ unless they're
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if they're
 aliased with \csopt{field-aliases}.
@@ -11540,10 +11702,12 @@ loaded in separate resource sets with different prefixes).
 
 As with all the example files, there are other ways in which
 to specify the data, depending on your requirements. For example,
-you could have a \fieldfmt{cast} field with a comma-separated list
-of actor names. Similarly for the \fieldfmt{director} field. Some of
+the \fieldfmt{director} field could use \BibTeX's contributor syntax
+(as the \field{cast} field does). Some of
 the films actually had more than one director but only one is listed
-per film in this sample file for simplicity. The book on which the film is based
+per film in this sample file for simplicity. Similarly, the
+\field{cast} field only contains the principle actors rather than the
+complete list. The book on which the film is based
 could be contained in a cross-reference field or a custom
 \fieldfmt{basedon} field.
 
@@ -11579,17 +11743,13 @@ description={a film starring Harrison Ford, Rutger Hauer
 \end{verbatim}
 (This was only introduced to \styfmt{glossaries-extra} v1.22.)
 This doesn't interfere with the \idx{postdescriptionhook} but if a hook
-is provided the problem will likely go away (unless the hook also
-ends with a punctuation character).
+is provided the post punctuation may then be required.
 
 An alternative approach is to use
 \csopt[check]{post-description-dot}. Unfortunately in this case 
-the question mark is hidden inside the \cs{gls} command.
-This could be fixed by using a different category for entries
-with names that end with sentence-terminating punctuation. Then the
-\catattr{discardperiod} attribute can be set for that category. When
-combined with \csopt{post-description-dot} this would allow
-the \idx{postlinkhook} to look ahead and discard the dot.
+the question mark is hidden inside the \cs{gls} command.  However
+this method would put the punctuation before the
+\idx{postdescriptionhook}.
 
 Since \csopt{strip-trailing-nopost} can be used
 to strip \cs{nopostdesc} and \cs{glsxtrnopostpunc} from the end
@@ -11955,7 +12115,7 @@ sometimes having the book listed first (\code{brightonrock} comes
 before \code{film.brightonrock}).
 
 Once possible solution would be to also assign prefixes for the book
-labels but \csopt{label-prefix} is applied to all primary entries
+labels, but \csopt{label-prefix} is applied to all primary entries
 for the given resource set and can't be applied selectively, so this
 would require editing the \exfile{books.bib} file.
 
@@ -11966,17 +12126,18 @@ are two simple ways to achieve this: use \csopt[same as base]{category}
 \exfile{books.bib} and to \code{films} for entries in
 \exfile{films.bib}) or alias the custom \fieldfmt{identifier} format to
 \field{category}. I've chosen the later method and also provided
-an alias for the custom \fieldfmt{year} field:
+aliases for the custom \fieldfmt{year} and \fieldfmt{cast} fields:
 \begin{verbatim}
-field-aliases={identifier=category,year=user1},
+field-aliases={identifier=category,year=user1,cast=user2},
 identical-sort-action={category},
 \end{verbatim}
 This ensures that books always come before films with the same
 title. An oddity is the film \qt{Whisky Galore!}\ which is one
 character different from the book \qt{Whisky Galore} but the default
 locale collator ignores punctuation so the two titles are considered
-identical. If a letter comparison was used instead, they would no
-longer be considered identical, but in this case the film would
+identical by the collator (but not by \csopt[non-unique]{sort-suffix}).
+If a letter comparison was used instead, they would no longer be 
+considered identical, but in this case the film would
 still be placed after the book since the film title is longer.
 
 Since I've set the \field{category} I can provide semantic
@@ -12011,6 +12172,46 @@ glossary:
  {}%
 }
 \end{verbatim}
+
+I've assigned the \fieldfmt{cast} field to the \field{user2} field,
+and since this field uses \BibTeX's contributor markup I need to 
+convert this to a form that's easier to customize:
+\begin{verbatim}
+bibtex-contributor-fields={user2}
+\end{verbatim}
+I'm not sorting by this field and it would look better in the
+document to list the forenames before the surname so I've also done:
+\begin{verbatim}
+contributor-order={forenames}
+\end{verbatim}
+Since I have \sty{datatool-base} v2.28+ installed, the list will be
+formatted using \ics{DTLformatlist}. If I want an Oxford comma, I need 
+to redefine \ics{DTLlistformatoxford} in the document:
+\begin{verbatim}
+\renewcommand*{\DTLlistformatoxford}{,}
+\end{verbatim}
+If I want to change \qt{\&} to \qt{and} I also need to redefine
+\ics{DTLlistformatlastsep}:
+\begin{verbatim}
+\renewcommand*{\DTLlistformatlastsep}{ and }
+\end{verbatim}
+If \ics{DTLformatlist} isn't defined (\sty{datatool-base} v2.27 or
+earlier), the cast list will look a little odd as it uses a comma
+separator between all elements of this list, including the final
+pair (so there's no final \& or \qt{and}).
+
+I've provided a \idx{postdescriptionhook} to append the cast list:
+\begin{verbatim}
+\newcommand*{\glsxtrpostdescfilm}{%
+ \ifglshasfield{user2}{\glscurrententrylabel}%
+ {\ featuring \glscurrentfieldvalue}%
+ {}%
+}
+\end{verbatim}
+This means that I need to strip \ics{nopostdesc} from the
+\field{description} fields with \csopt{strip-trailing-nopost},
+and I've used the \styopt{postdot} package option to append a full
+stop.
 
 I haven't referenced any of the entries in the main body of the
 document, so I've used \csopt[all]{selection} to select all entries.

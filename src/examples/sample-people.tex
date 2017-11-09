@@ -8,7 +8,8 @@
 \usepackage[record,% using bib2gls
  index,% create index glossary
  postdot,% dot after descriptions
- stylemods={list,bookindex},% load glossary-bookindex.sty and fix styles
+% load glossary-bookindex.sty and glossary-list.sty and patch:
+ stylemods={list,bookindex},
  style=altlistgroup]{glossaries-extra}
 
 \newglossary*{bybirth}{People (Ordered by Birth)}
@@ -76,13 +77,13 @@
 \chapter{Sample}
 \section{First Use}
 
-\gls{caesar}, \gls{wellesley}, \gls{bonaparte}, \gls{vonrichthofen}
-and \gls{alexander}.
+\gls{caesar}, \gls{wellesley}, \gls{bonaparte}, 
+\gls{vonrichthofen} and \gls{alexander}.
 
 \section{Next Use}
 
-\gls{caesar}, \gls{wellesley}, \gls{bonaparte}, \gls{vonrichthofen}
-and \gls{alexander}.
+\gls{caesar}, \gls{wellesley}, \gls{bonaparte}, 
+\gls{vonrichthofen} and \gls{alexander}.
 
 \printunsrtglossary[title={People (Alphabetical)},nonumberlist]
 

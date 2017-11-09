@@ -106,8 +106,6 @@ public class Bib2GlsEntryComparator extends SortComparator
    {
       String value = super.updateSortValue(entry, entries);
 
-      entry.putField("sort", value);
-
       String id = entry.getId();
 
       String grp = null;
@@ -119,6 +117,8 @@ public class Bib2GlsEntryComparator extends SortComparator
          bib2gls.debug(bib2gls.getMessage("message.break.points",
            value));
       }
+
+      entry.putField(sortStorageField, value);
 
       CollationKey key = collator.getCollationKey(value);
       entry.setCollationKey(key);

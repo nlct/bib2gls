@@ -112,7 +112,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       value = adjustSort(entry, value);
 
-      entry.putField("sort", value);
+      entry.putField(sortStorageField, value);
 
       return value;
    }
@@ -357,9 +357,9 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          if (bib2gls.getDebugLevel() > 1)
          {
             bib2gls.logAndPrintMessage(String.format("%s %c %s",
-              e1.getFieldValue("sort"),
+              e1.getFieldValue(sortStorageField),
               result == 0 ? '=' : (result < 0 ? '<' : '>'),
-              e2.getFieldValue("sort")));
+              e2.getFieldValue(sortStorageField)));
          }
 
          if (result != 0)
@@ -388,6 +388,8 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       entries.sort(this);
    }
+
+   protected String sortStorageField = "sort";
 
    protected String sortField, groupField, entryType;
 

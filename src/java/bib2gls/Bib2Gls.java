@@ -792,8 +792,10 @@ public class Bib2Gls implements TeXApp
         NewCommand.OVERWRITE_ALLOW));
 
       listener.putControlSequence(new EnableTagging());
+      listener.putControlSequence(new AtFirstOfTwo("bibglscontributorlist"));
       listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
       listener.putControlSequence(new GlsHyperLink(this));
+      listener.putControlSequence(new BibGlsContributor(this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
         "glsentryname", "name", this));
@@ -3544,7 +3546,7 @@ public class Bib2Gls implements TeXApp
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "1.1 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-08";
+   public static final String DATE = "2017-11-09";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

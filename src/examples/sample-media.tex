@@ -8,6 +8,7 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,% using bib2gls
  nostyles,% don't load default styles
+ postdot,% append a dot after descriptions
  stylemods={list},% load glossary-list.sty and fix styles
  style=altlistgroup]{glossaries-extra}
 
@@ -18,12 +19,18 @@
 
 \GlsXtrLoadResources[
   src={interpret-preamble,books,films},
-  post-description-dot={check},
-  field-aliases={identifier=category,year=user1},
+  field-aliases={identifier=category,year=user1,cast=user2},
+  strip-trailing-nopost,
+  bibtex-contributor-fields={user2},
+  contributor-order={forenames},
   identical-sort-action={category},
   save-locations=false,
   selection=all
 ]
+
+% requires datatool-base.sty v2.28+:
+\renewcommand*{\DTLlistformatoxford}{,}
+\renewcommand*{\DTLlistformatlastsep}{ and }
 
 \newcommand*{\bookfont}[1]{\emph{#1}}
 \newcommand*{\filmfont}[1]{\textsf{\em #1}}
@@ -42,7 +49,13 @@
 
 \newcommand*{\glsxtrpostnamefilm}{%
  \ifglshasfield{user1}{\glscurrententrylabel}%
- {\space(released \glscurrentfieldvalue)}%
+ {\space (released \glscurrentfieldvalue)}%
+ {}%
+}
+
+\newcommand*{\glsxtrpostdescfilm}{%
+ \ifglshasfield{user2}{\glscurrententrylabel}%
+ {\ featuring \glscurrentfieldvalue}%
  {}%
 }
 

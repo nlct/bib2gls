@@ -34,6 +34,8 @@ v1.1 (pending):
      - post-description-dot
      - strip-trailing-nopost
      - write-preamble
+     - bibtex-contributor-fields
+     - contributor-order
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

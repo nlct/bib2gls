@@ -1341,6 +1341,28 @@ public class GlsResource
          {
             skipFields = getStringArray(parser, list, opt);
          }
+         else if (opt.equals("bibtex-contributor-fields"))
+         {
+            bibtexAuthorList = getStringArray(parser, list, opt);
+         }
+         else if (opt.equals("contributor-order"))
+         {
+            String val = getChoice(parser, list, opt, 
+              "surname", "von", "forenames");
+
+            if (val.equals("surname"))
+            {
+               contributorOrder = CONTRIBUTOR_ORDER_SURNAME;
+            }
+            else if (val.equals("von"))
+            {
+               contributorOrder = CONTRIBUTOR_ORDER_VON;
+            }
+            else if (val.equals("forenames"))
+            {
+               contributorOrder = CONTRIBUTOR_ORDER_FORENAMES;
+            }
+         }
          else if (opt.equals("selection"))
          {
             String val = getChoice(parser, list, opt, SELECTION_OPTIONS);
@@ -4221,6 +4243,43 @@ public class GlsResource
             writer.format("\\provideignoredglossary*{%s}%n", triggerType);
          }
 
+         if (bibtexAuthorList != null)
+         {
+            writer.println("\\ifdef\\DTLformatlist");
+            writer.println("{% datatool v2.28+");
+            writer.print(" \\providecommand*{\\bibglscontributorlist}[2]");
+            writer.println("{\\DTLformatlist{#1}}");
+            writer.println("}");
+            writer.println("{% datatool v2.27 or earlier");
+            writer.println(" \\providecommand*{\\bibglscontributorlist}[2]{%");
+            writer.println("  \\def\\bibgls@sep{}%");
+            writer.print("  \\@for\\bibgls@item:=#1\\do{");
+            writer.println("\\bibgls@sep\\bibgls@item\\def\\bibgls@sep{, }}%");
+            writer.println(" }");
+            writer.println("}");
+            writer.println("\\providecommand*{\\bibglscontributor}[4]{%");
+
+            switch (contributorOrder)
+            {
+               case CONTRIBUTOR_ORDER_SURNAME:
+                 writer.print("  #3\\ifstrempty{#4}{}{, #4}");
+                 writer.print("\\ifstrempty{#1}{}{, #1}");
+                 writer.println("\\ifstrempty{#2}{}{, #2}%");
+               break;
+               case CONTRIBUTOR_ORDER_VON:
+                 writer.print("  \\ifstrempty{#2}{}{#2 }#3");
+                 writer.print("\\ifstrempty{#4}{}{, #4}");
+                 writer.println("\\ifstrempty{#1}{}{, #1}%");
+               break;
+               case CONTRIBUTOR_ORDER_FORENAMES:
+                 writer.print("  #1\\ifstrempty{#2}{}{ #2} #3");
+                 writer.println("\\ifstrempty{#4}{}{, #4}%");
+               break;
+            }
+
+            writer.println("}");
+         }
+
          if (counters != null)
          {
             writer.println("\\providecommand{\\bibglslocationgroup}[3]{#3}");
@@ -5614,6 +5673,29 @@ public class GlsResource
       return false;
    }
 
+   public byte getContributorOrder()
+   {
+      return contributorOrder;
+   }
+
+   public boolean isBibTeXAuthorField(String field)
+   {
+      if (bibtexAuthorList == null)
+      {
+         return false;
+      }
+
+      for (String f : bibtexAuthorList)
+      {
+         if (f.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public String getLabelPrefix()
    {
       return labelPrefix;
@@ -6363,6 +6445,8 @@ public class GlsResource
 
    private String[] skipFields = null;
 
+   private String[] bibtexAuthorList = null;
+
    private String[] externalPrefixes = null;
 
    private String type=null, category=null, counter=null;
@@ -6542,5 +6626,10 @@ public class GlsResource
     {"recorded and deps", "recorded and deps and see",
      "recorded no deps", "recorded and ancestors", "all"};
 
+   public static final byte CONTRIBUTOR_ORDER_SURNAME=0;
+   public static final byte CONTRIBUTOR_ORDER_VON=1;
+   public static final byte CONTRIBUTOR_ORDER_FORENAMES=2;
+
+   private byte contributorOrder=CONTRIBUTOR_ORDER_VON;
 }
 

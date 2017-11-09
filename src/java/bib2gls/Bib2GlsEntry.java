@@ -733,6 +733,11 @@ public class Bib2GlsEntry extends BibEntry
 
          if (value != null)
          {
+            if (resource.isBibTeXAuthorField(field))
+            {
+               value = convertBibTeXAuthorField(parser, field, value);
+            }
+
             if (field.equals("parent"))
             {
                String strVal = value.expand(parser).toString(parser);
@@ -878,6 +883,87 @@ public class Bib2GlsEntry extends BibEntry
             putField("name", list.toString(parser));
          }
       }
+   }
+
+   protected BibValueList convertBibTeXAuthorField(TeXParser parser,
+     String field, BibValueList value)
+   throws IOException
+   {
+      Vector<Contributor> contributors = parseContributors(parser, 
+        value);
+
+      int n = contributors.size();
+
+      value = new BibValueList();
+
+      TeXParserListener listener = parser.getListener();
+
+      Group grp = listener.createGroup();
+      BibUserString contents = new BibUserString(grp);
+      value.add(contents);
+
+      grp.add(new TeXCsRef("bibglscontributorlist"));
+
+      Group subgrp = listener.createGroup();
+
+      grp.add(subgrp);
+
+      for (int i = 0; i < n; i++)
+      {
+         if (i > 0)
+         {
+            subgrp.add(listener.getOther(','));
+         }
+
+         Contributor contributor = contributors.get(i);
+
+         String forenames = contributor.getForenames();
+         String von = contributor.getVonPart();
+         String surname = contributor.getSurname();
+         String suffix = contributor.getSuffix();
+
+         subgrp.add(new TeXCsRef("bibglscontributor"));
+
+         if (forenames == null)
+         {
+            subgrp.add(listener.createGroup());
+         }
+         else
+         {
+            subgrp.add(listener.createGroup(forenames.trim()));
+         }
+
+         if (von == null)
+         {
+            subgrp.add(listener.createGroup());
+         }
+         else
+         {
+            subgrp.add(listener.createGroup(von.trim()));
+         }
+
+         if (surname == null)
+         {
+            subgrp.add(listener.createGroup());
+         }
+         else
+         {
+            subgrp.add(listener.createGroup(surname.trim()));
+         }
+
+         if (suffix == null)
+         {
+            subgrp.add(listener.createGroup());
+         }
+         else
+         {
+            subgrp.add(listener.createGroup(suffix.trim()));
+         }
+      }
+
+      grp.add(listener.createGroup(String.format("%d", n)));
+
+      return value;
    }
 
    public String getFallbackValue(String field)

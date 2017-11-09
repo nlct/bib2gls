@@ -551,6 +551,22 @@ name},
   category={command}
 }
 
+@dualindexentry{bibglscontributorlist,
+  name={\csfmt{bibglscontributorlist}},
+  user1={\margm{list}\margm{number}},
+  description={used to markup a list of names from a field 
+   that was converted from \BibTeX's contributor syntax},
+  category={command}
+}
+
+@dualindexentry{bibglscontributor,
+  name={\csfmt{bibglscontributor}},
+  user1={\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}},
+  description={used to markup a contributor's name that was converted from
+   \BibTeX's contributor syntax},
+  category={command}
+}
+
 @dualindexentry{newglossaryentry,
   name={\csfmt{newglossaryentry}},
   user1={\margm{label}\margm{\keyvallist}},
@@ -829,6 +845,20 @@ name},
 @dualindexentry{opt.ignore-fields,
    name={\csoptfmt{ignore\dhyphen fields}},
    user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.bibtex-contributor-fields,
+   name={\csoptfmt{bibtex\dhyphen contributor\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.contributor-order,
+   name={\csoptfmt{contributor\dhyphen order}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -1964,6 +1994,18 @@ cs}\margm{Glspl-like cs}},
 
 @index{datetime2,
   name={\styfmt{datetime2}},
+  category={package},
+  parent={packages}
+}
+
+@index{datatool-base,
+  name={\styfmt{datatool\dhyphen base}},
+  category={package},
+  parent={packages}
+}
+
+@index{datatool,
+  name={\styfmt{datatool}},
   category={package},
   parent={packages}
 }
@@ -4857,11 +4899,46 @@ indexing},
 }
 
 @index{DTMdisplaydate,
-  name={\csfmt{DTMdisplaydate}},
+  name={\csfmt{DTM\-display\-date}},
   user1={\margm{year}\margm{month}\margm{day}\margm{dow}},
   description={formats the given date where all arguments are
     numeric},
   note={provided by \styfmt{datetime2}},
+  category={command}
+}
+
+@index{DTLformatlist,
+  name={\csfmt{DTL\-format\-list}},
+  user1={\margm{list}},
+  description={formats a comma-separated list},
+  note={provided by \styfmt{datatool-base}},
+  category={command}
+}
+
+@index{DTLlistformatsep,
+  name={\csfmt{DTL\-list\-format\-sep}},
+  user1={},
+  description={used by \cs{DTLformatlist} to separate items in the
+list, except for the last pair},
+  note={provided by \styfmt{datatool-base}},
+  category={command}
+}
+
+@index{DTLlistformatlastsep,
+  name={\csfmt{DTL\-list\-format\-last\-sep}},
+  user1={},
+  description={used by \cs{DTLformatlist} to separate the last two items in the
+list},
+  note={provided by \styfmt{datatool-base}},
+  category={command}
+}
+
+@index{DTLlistformatoxford,
+  name={\csfmt{DTL\-list\-format\-oxford}},
+  user1={},
+  description={insert before \cs{DTLformatlistlastsep} if the list
+has three or more items},
+  note={provided by \styfmt{datatool-base}},
   category={command}
 }
 

@@ -309,8 +309,8 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
 
    protected int compareElements(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
-      return compare(entry1.getFieldValue("sort"), 
-            entry2.getFieldValue("sort"));
+      return compare(entry1.getFieldValue(sortStorageField), 
+            entry2.getFieldValue(sortStorageField));
    }
 
 
