@@ -738,7 +738,7 @@ public class Bib2GlsEntry extends BibEntry
                String strVal = value.expand(parser).toString(parser);
 
                if (bib2gls.useInterpreter() 
-                    && strVal.matches(".*[\\\\\\{\\}].*"))
+                    && strVal.matches("(?s).*[\\\\\\{\\}].*"))
                {
                   // no point checking for other special characters
                   // as they won't expand to a simple alphanumeric string
@@ -878,7 +878,6 @@ public class Bib2GlsEntry extends BibEntry
             putField("name", list.toString(parser));
          }
       }
-
    }
 
    public String getFallbackValue(String field)
@@ -2016,7 +2015,7 @@ public class Bib2GlsEntry extends BibEntry
       {
          alias = value.expand(parser).toString(parser);
 
-         if (bib2gls.useInterpreter() && alias.matches(".*[\\\\\\{\\}].*"))
+         if (bib2gls.useInterpreter() && alias.matches("(?s).*[\\\\\\{\\}].*"))
          {
             alias = bib2gls.interpret(alias, value, true);
          }

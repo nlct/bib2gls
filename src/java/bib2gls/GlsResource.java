@@ -5017,7 +5017,7 @@ public class GlsResource
       bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width",
         entry.getId()));
 
-      if (name.matches(".*[\\\\\\$\\{\\}].*"))
+      if (name.matches("(?s).*[\\\\\\$\\{\\}].*"))
       {
          // Try to interpret any LaTeX code that may be in the name.
          // This assumes custom user commands are provided in the

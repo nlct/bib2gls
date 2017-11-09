@@ -99,7 +99,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
               id, sortField));
          }
          else if (bib2gls.useInterpreter() && list != null
-                   && value.matches(".*[\\\\\\$\\{\\}\\~].*"))
+                   && value.matches("(?s).*[\\\\\\$\\{\\}\\~].*"))
          {
             value = bib2gls.interpret(value, list, settings.isTrimOn());
          }
