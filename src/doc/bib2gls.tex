@@ -1082,11 +1082,33 @@ superscript characters \code{\_} and \code{\textasciicircum} should
 either be encapsulated by \code{\$} or by \cs{ensuremath}, which
 will be picked up by the check for \code{\$} or
 \code{\glsbackslash}, and the other special characters would
-indicate something too complex for the interpreter to handle.} The
-other case is with \csopt{set-widest} when determining the width of
-the \field{name} field. The \longarg{no-interpret} switch will turn
-off this function, but the library will still be used to parse the
-\ext{aux} and \ext{bib} files.
+indicate something too complex for the interpreter to handle.}
+
+The other cases that the interpreter is used for are:
+\begin{itemize}
+\item when \csopt{set-widest} is used to determine the width of
+the \field{name} field;
+\item if the \field{parent} or \field{alias} field contain
+\verb|\| or \verb|{| or \verb|}| the interpreter is used 
+since these fields must be just a label referencing another entry
+(other special characters aren't checked as they won't expand
+characters allowed in a label).
+\end{itemize}
+
+The \longarg{no-interpret} switch will turn off the interpreter, but
+the library will still be used to parse the \ext{aux} and \ext{bib}
+files. Note that the \field{see} and \field{seealso} fields
+don't use the interpreter, but \bibgls\ will try to fully
+expand the \field{seealso} field using the parser library
+(since it should only contain a comma-separated list of labels).
+The parser has a different concept of expansion to \LaTeX\
+and will expand some things that aren't expanded by \LaTeX\
+(such as \cs{MakeUppercase}) and won't expand other commands
+that would be expanded by \LaTeX\ (such as commands defined
+in terms of complicated internals).
+The \field{see} field may legitimately contain \LaTeX\ code
+in the optional tag part (such as \cs{seealsoname}) so it's not
+expanded or interpreted.
 
 The \file{texparserlib.jar} library is not a
 \TeX\ engine and there are plenty of situations where it doesn't
@@ -1098,6 +1120,13 @@ number of packages that the parser can support, such as
 and \isty{bpchem}. There's also partial support for \isty{siunitx}'s
 \ics{si} command.}\ or any custom
 commands or environments provided within the document.
+
+Since the parser doesn't have a full set of commands available
+within the \LaTeX\ document, when it encounters \ics{renewcommand} it
+won't check if the command is undefined. If the command isn't
+defined, it will simply behave like \cs{newcommand}. Whereas
+with \ics{providecommand} the parser will only define the command
+if it's unrecognised.
 
 \TeX\ syntax can be quite complicated and, in some cases, far too
 complicated for simple regular expressions. The library performs
@@ -3833,7 +3862,7 @@ that there's no attempt to assign or process the \field{sort} key if
 it's omitted from \gls{newglossaryentry} (or similar commands). The
 \field{sort} key will be provided by \bibgls\ for informational
 purposes, but there's no need for \LaTeX\ to write it to any
-external files.
+external files (unless you use \styopt[alsoindex]{record}).
 
 The \iext{glstex} resource files created by \bibgls\ are loaded in
 the document using
@@ -3870,14 +3899,16 @@ This is equivalent to:
 \end{verbatim}
 In general, it's simplest just to use \gls{GlsXtrLoadResources}.
 
-The optional argument \meta{options} is a comma-separated \keyvallist. 
-Allowed options are listed below.
-The option list applies only to that specific
-\meta{filename}\ext{glstex} and are not carried over to the next
-instance of \gls{glsxtrresourcefile}. The \sty{glossaries-extra}
-package doesn't parse the options, but just writes the information to the
-\ext{aux} file. This means that any invalid options will be reported
-by \bibgls\ not by \sty{glossaries-extra}.
+The optional argument \meta{options} is a comma-separated
+\keyvallist.  Allowed options are listed below.  The option list
+applies only to that specific \meta{filename}\ext{glstex} and are
+not carried over to the next instance of \gls{glsxtrresourcefile}.
+Only the definitions provided in \atentry{preamble} (if the
+interpreter is on) are carried over to the next resource set.  The
+\sty{glossaries-extra} package doesn't parse the options, but just
+writes the information to the \ext{aux} file. This means that any
+invalid options will be reported by \bibgls\ not by
+\sty{glossaries-extra}.
 
 If you have multiple \ext{bib} files you can either select them all
 using \csopt[\meta{bib list}]{src} in a single
@@ -3929,6 +3960,12 @@ wombat. The first three (aardvark, duck, zebra) are defined when
 caterpillar, wombat) are defined when \csfmt{jobname}\filefmt{-1.glstex}
 is read. Since \ics{printunsrtglossary} simply iterates over all
 defined entries, this is the ordering used.
+
+Abbreviation styles must be set (using \ics{setabbreviationstyle})
+before the resource command that selects the abbreviations from the
+appropriate \ext{bib} file, since the entries are defined (through
+\gls{newabbreviation} or \cs{newacronym}) when
+\gls{glsxtrresourcefile} inputs the \ext{glstex} file.
 
 Note \bibgls\ allows \iext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentry{preamble}.
@@ -4052,6 +4089,16 @@ The default is \optfmt{true}. If \optfmt{false}, the preamble
 contents will still be written to the \iext{glstex} file, but any
 commands provided in the preamble won't be recognised if the
 interpreter is needed to determine an entry's sort value.
+
+\optsection{write-preamble}
+
+This is a boolean option that determines whether or not the
+preamble should be written to the \ext{glstex} file. The default
+is \optfmt{true}. Note that the preamble will
+still be parsed if \csopt[true]{interpret-preamble} even if
+\csopt[false]{write-preamble}. This means it's possible to 
+provide \bibgls\ command definitions in \atentry{preamble}
+that don't get seen by \LaTeX.
 
 \optsection{set-widest}
 
@@ -5821,7 +5868,7 @@ The \csopt[check]{post-description-dot} setting determines whether
 to append the dot as follows:
 \begin{itemize}
 \item If the \field{description} field ends with
-\ics{nopostdesc} or \ics{nopostpunc}, then a dot isn't appended.
+\ics{nopostdesc} or \ics{glsxtrnopostpunc}, then a dot isn't appended.
 \item If the \field{description} field doesn't end with a regular
 (ungrouped letter or other) character, then a dot is appended.
 (For example, if the description ends with a control sequence
@@ -5836,7 +5883,7 @@ a character that belongs to the Unicode category
 \end{itemize}
 Note that the interpreter isn't used during the check.
 If the \field{description} ends with a command then a dot will be
-appended (unless it's \cs{nopostpunc} or \cs{nopostdesc}) even if
+appended (unless it's \cs{glsxtrnopostpunc} or \cs{nopostdesc}) even if
 that command expands in such a way that it ends with a terminating
 punctuation character.
 
@@ -5845,7 +5892,7 @@ punctuation character.
 This option is always performed before \cs{post-description-dot}
 when adjusting the \field{description} field. The default
 setting is \csopt[false]{strip-trailing-nopost}. If 
-\optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{nopostpunc}
+\optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{glsxtrnopostpunc}
 found in the \field{description} field will be removed.
 Note that the command (possibly followed by ignored space) must be
 at the very end of the description for it to be removed. A
@@ -11220,6 +11267,15 @@ If you get any undefined control sequence or undefined style errors
 then you need to update your \TeX\ distribution.
 Use the \longarg{group} switch when invoking \bibgls\ for all these
 examples if you want the glossaries divided into groups.
+The set of system calls for the document build in the examples below
+may require an extra \LaTeX\ run to ensure the PDF bookmarks are
+up-to-date when \sty{hyperref} is used.
+
+These files are just examples of how to use \bibgls. There are other
+ways of defining similar entries and sometimes alternatives are
+suggested. Use the code here as a starting point if you need data
+like this and adapt it to a format appropriate for your
+requirements.
 
 \filesection{no-interpret-preamble.bib}
 
@@ -11232,8 +11288,9 @@ described on \glsxtrpageref{sortop} and need to be hidden
 from \bibgls's interpreter. This file doesn't contain any entry
 definitions and must be loaded first with
 \csopt[false]{interpret-preamble}. The
-\exfile{interpret-preamble.bib} file can then be loaded to provide
-alternative definitions for \bibgls's interpreter.
+\exfile{interpret-preamble.bib} or \exfile{interpret-preamble2.bib} 
+file can then be loaded to provide alternative definitions for
+\bibgls's interpreter.
 
 The first command is
 \nosecdef{sortname}
@@ -11244,7 +11301,6 @@ glossary to display \meta{first name(s)} \meta{surname}. For names
 with a \qt{von} part, there's another command:
 \nosecdef{sortvonname}
 which has a similar purpose.
-
 The third command is
 \nosecdef{sortart}
 This is the same as \gls{sortname} but is designed for titles,
@@ -11253,6 +11309,9 @@ phrases or sentences that start with an article (such as \qt{a} or
 it's semantically different and allows for adjustments for one type
 of entry (such as a person's name) without affecting the other (such as a
 book or film title).
+The fourth command is
+\nosecdef{sortmediacreator}
+which again is functionally the same as \gls{sortname}.
 
 Although the file only contains ASCII characters, it starts with 
 an encoding line to prevent \bibgls\ from searching the entire file
@@ -11263,11 +11322,20 @@ cause an unnecessary delay for much longer files.)
 
 \filesection{interpret-preamble.bib}
 
-This provides definitions of \gls{sortname}, \gls{sortvonname} and
-\gls{sortart} in \atentry{preamble} that can be picked up by the interpreter
-and used during sorting.
+This provides definitions of \gls{sortname}, \gls{sortvonname},
+\gls{sortart} and \gls{sortmediacreator} in \atentry{preamble} 
+that can be picked up by the interpreter and used during sorting.
 
 \lstinputlisting[firstline=5]{../examples/interpret-preamble.bib}
+
+\filesection{interpret-preamble2.bib}
+
+An alternative to \exfile{interpret-preamble.bib} with a different
+definition of \cs{sortmediacreator}. This uses \cs{renewcommand}
+instead of \cs{providecommand} so \csopt[false]{write-preamble}
+is required to prevent \LaTeX\ from picking up the definitions.
+
+\lstinputlisting[firstline=5]{../examples/interpret-preamble2.bib}
 
 \filesection{chemicalformula.bib}
 
@@ -11287,7 +11355,7 @@ so most packages should be loaded before \sty{glossaries-extra}.
 Instead, I've just put a comment in the \ext{bib} file as a
 reminder.
 
-All entries are defined using the \atentry{entry}. With this entry
+All entries are defined using \atentry{entry}. With this entry
 type, if the \field{sort} field is omitted \bibgls\ will fallback on
 the \field{name}. This will require the use of the interpreter as
 the names all contain a command but \bibgls\ recognises the
@@ -11370,9 +11438,29 @@ will interpret \verb|~| as a normal breakable space (0x20), so
 with that switch \csopt[date]{sort} or \csopt[date-reverse]{sort}
 can be used on either of those fields.
 
-One entry (\code{caesar}) has a \field{first} field. In that case
-the \field{first} field is slightly different from the \field{name}
-field (\qt{Gaius} is omitted). The other entries don't have a
+An alternative approach would be to provide a command that can be
+modified in the document to adjust the date style. For example, the
+\fieldfmt{born} field could be specified as:
+\begin{verbatim}
+born={\formatdate{13}{7}{100}{BC}}
+\end{verbatim}
+The definition provided for the document could then be, for example:
+\begin{verbatim}
+\providecommand{\formatdate}[4]{\DTMdisplaydate{#3}{#2}{#1}{-1} #4}
+\end{verbatim}
+(where \ics{DTMdisplaydate} is provided by the \sty{datetime2}
+package) and a definition could be provided for \bibgls's
+interpreter, for example:
+\begin{verbatim}
+\providecommand{\formatdate}[4]{#1/#2/#3 #4}
+\end{verbatim}
+This would need the date format set.  For example,
+\csopt[d/M/y G]{date-sort-format}.
+
+Some of the entries, such as \code{caesar}, have a \field{first}
+field. In those cases the \field{first} field is slightly different
+from the \field{name} field (for example, \qt{Gaius} is omitted in
+\code{caesar}'s \field{first} field). The other entries don't have a
 \field{first} field. They can simply have the \field{name} copied to
 \field{first} with the \csopt{replicate-fields} option (so that the
 full name is shown on first use) or the \field{first} field can be
@@ -11412,7 +11500,8 @@ Except for the aliases, the entries have a custom field
 The \exfile{books.bib} file contains details about books.
 As above, the entries use custom commands provided in
 \exfile{no-interpret-preamble.bib} and
-\exfile{interpret-preamble.bib}.
+\exfile{interpret-preamble.bib} or
+\exfile{interpret-preamble2.bib}.
 The entries all have a custom field \fieldfmt{identifier} set to 
 \code{book} and other custom fields \fieldfmt{author} and
 \fieldfmt{year}.
@@ -11424,9 +11513,7 @@ aliased with \csopt{field-aliases}.
 
 There are other ways in which this data could be specified. For
 example, the \field{description} field could contain a brief summary
-(or \qt{log line}). Use this as a starting point if you need data
-like this and adapt it to a format appropriate for your
-requirements.
+(or \qt{log line}).
 
 \lstinputlisting[firstline=5]{../examples/books.bib}
 
@@ -11484,11 +11571,11 @@ description={a film starring Harrison Ford, Rutger Hauer
 \end{verbatim}
 Be careful with this as it will completely suppress the
 \idx{postdescriptionhook}.
-A third possibility is to use \ics{nopostpunc} instead:
+A third possibility is to use \ics{glsxtrnopostpunc} instead:
 \begin{verbatim}
 description={a film starring Harrison Ford, Rutger Hauer
  and Sean Young loosely based on the novel
- \gls{ext1.doandroidsdreamofelectricsheep}\nopostpunc},
+ \gls{ext1.doandroidsdreamofelectricsheep}\glsxtrnopostpunc},
 \end{verbatim}
 (This was only introduced to \styfmt{glossaries-extra} v1.22.)
 This doesn't interfere with the \idx{postdescriptionhook} but if a hook
@@ -11504,8 +11591,8 @@ with names that end with sentence-terminating punctuation. Then the
 combined with \csopt{post-description-dot} this would allow
 the \idx{postlinkhook} to look ahead and discard the dot.
 
-Since the \csopt{strip-trailing-nopost} option can be used
-to strip \cs{nopostdesc} and \cs{nopostpunc} from the end
+Since \csopt{strip-trailing-nopost} can be used
+to strip \cs{nopostdesc} and \cs{glsxtrnopostpunc} from the end
 of the \field{description} field, the simplest option is
 to put one of those commands at the end of the field 
 and strip it when it's not needed. I've used \cs{nopostdesc} as it's
@@ -11699,8 +11786,8 @@ title (\qt{Derived Units} in this case). Since there's no
 \csopt{type} set, all entries end up in the main glossary, but since
 there are two resource commands the glossary ends up with sorted blocks.
 
-The document doesn't include any indexing commands, such as \cs{gls}, so
-I've use \csopt{selection} to select all entries in the \ext{bib}
+The document doesn't include any commands like \cs{gls}, so
+I've use \csopt[all]{selection} to select all entries in the \ext{bib}
 files. There won't be any number lists since there are no records.
 I need a glossary style that shows the \field{symbol} field so I've
 used \glostyle{mcolindexgroup}. Again I've suppressed the automatic
@@ -11863,7 +11950,7 @@ default setting for identical sort values is
 \csopt[id]{identical-sort-action}, which means that the ordering for
 the duplicate names is based on the entry labels. This can lead to
 the odd effect of sometimes having the film listed first
-(\code{film.thebigsleep} comes before \code{film.thebigsleep}) and
+(\code{film.thebigsleep} comes before \code{thebigsleep}) and
 sometimes having the book listed first (\code{brightonrock} comes
 before \code{film.brightonrock}).
 
@@ -11960,7 +12047,9 @@ surname with a brief description, the same list ordered by date of
 birth and an index of all the people without their details and with
 a number list indicating where the people were mentioned in the
 document. The first two lists shouldn't include aliases but the
-index should.
+index should. Not all the entries defined in \exfile{people.bib}
+are included in the document. Those that aren't either explicitly
+referenced or aliased are filtered by the \csopt{selection} criteria.
 
 Since this is just an example document all the \cs{gls} commands
 only occur on page~1, which means that each number list is just
@@ -12047,9 +12136,9 @@ description, which would interfere with the current entry label if
 they shared the same command to reference the label.)
 
 The \idx{postdescriptionhook} can be used to appended the birth and
-death dates. Although all the entries in \exfile{people.bib} have a 
+death dates. Although all the entries that have been selected from \exfile{people.bib} have a 
 \fieldfmt{died} field, I've added a check for the corresponding
-\field{user3} field in case new entries are added for people who are
+\field{user3} field in case new references are added for people who are
 still alive:
 \begin{verbatim}
 \newcommand*{\glsxtrpostdescpeople}{%
@@ -12225,6 +12314,93 @@ The four pages of the document are shown in \figureref{fig:sample-people.pdf}.
 \pdftwocol{../examples/sample-people.pdf}{4}
 \caption{\filefmt{sample-people.pdf}}
 \label{fig:sample-people.pdf}
+\end{figure}
+
+\filesection{sample-authors.tex}
+
+This example uses the files \exfile{people.bib},
+\exfile{books.bib}, \exfile{no-interpret-preamble.bib} and 
+\exfile{interpret-preamble2.bib}. The aim is to reference the books
+in \exfile{books.bib} and have them listed by author. This means
+finding a way of assigning each book entry a \field{parent} field that
+contains the label identifying the relevant author in \exfile{people.bib}.
+
+To recap, each author is defined in \exfile{people.bib} in the form:
+\begin{verbatim}
+@entry{dickens,
+  name={\sortname{Charles}{Dickens}},
+  text={Dickens},
+  description={English writer and social critic},
+  born={7~February 1812 AD},
+  died={9~June 1870 AD},
+  identifier={person}
+}
+\end{verbatim}
+and each book is defined in \exfile{books.bib} in the form:
+\begin{verbatim}
+@entry{bleakhouse,
+  name={Bleak House},
+  description={novel by Charles Dickens},
+  identifier={book},
+  author={\sortmediacreator{Charles}{Dickens}},
+  year={1852}
+}
+\end{verbatim}
+There's a field here (the custom \fieldfmt{author} field) that contains
+the author's name, and this can be aliased to the \field{parent}
+field with \csopt{field-aliases}:
+\begin{verbatim}
+field-aliases={author=parent}
+\end{verbatim}
+but the author's label in the \exfile{people.bib}
+file is just the lower case surname.
+
+Remember from \sectionref{sec:texparserlib} that the interpreter
+will be used on the \field{parent} field if the value contains
+\verb|\| or \verb|{| or \verb|}|. This means that with this field
+alias, \bibgls\ will attempt to interpret the field contents. So all
+that's needed is to ensure that \bibgls\ is given a definition of
+\gls{sortmediacreator} that ignores the first argument and converts
+the second argument to lower case. This definition is available in
+\exfile{interpret-preamble2.bib} but, since this file uses
+\cs{renewcommand} rather than \cs{providecommand},
+\csopt[false]{write-preamble} is required to prevent \LaTeX\ from
+picking up this definition.
+
+As with the \exfile{sample-people.tex} example, I need to copy
+the \field{name} field to the \field{first} field if that field is
+missing using \csopt{replicate-fields}:
+\begin{verbatim}
+replicate-fields={name={first}}
+\end{verbatim}
+and I also want to provide a semantic command to format the book
+title, so the field aliases also need to convert the custom
+\fieldfmt{identifier} field to \field{category}:
+\begin{verbatim}
+field-aliases={identifier=category,author=parent}
+\end{verbatim}
+so that the document can set the \catattr{textformat} and
+\catattr{glossnamefont} attributes:
+\begin{verbatim}
+\newcommand*{\bookfont}[1]{\emph{#1}}
+\glssetcategoryattribute{book}{textformat}{bookfont}
+\glssetcategoryattribute{book}{glossnamefont}{bookfont}
+\end{verbatim}
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-authors
+bib2gls --group sample-authors
+pdflatex sample-authors
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-authors.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-authors.tex}
+
+\begin{figure}[p]
+\centering
+\frame{\includegraphics[height=.9\textheight]{../examples/sample-authors.pdf}}
+\caption{\filefmt{sample-authors.pdf}}
+\label{fig:sample-authors.pdf}
 \end{figure}
 
 \printcommandsummary

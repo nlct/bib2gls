@@ -42,6 +42,7 @@ import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
+import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
@@ -786,6 +787,9 @@ public class Bib2Gls implements TeXApp
             listener.usepackage(null, sty);
          }
       }
+
+      listener.putControlSequence(new NewCommand("renewcommand",
+        NewCommand.OVERWRITE_ALLOW));
 
       listener.putControlSequence(new EnableTagging());
       listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
@@ -3540,7 +3544,7 @@ public class Bib2Gls implements TeXApp
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "1.1 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-07";
+   public static final String DATE = "2017-11-08";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

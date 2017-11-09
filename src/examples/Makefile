@@ -3,7 +3,7 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
-	sample-media.pdf
+	sample-media.pdf sample-authors.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -42,6 +42,13 @@ sample-media.pdf	: $(DEPS) sample-media.tex \
 	pdflatex sample-media
 	$(BIB2GLS) sample-media
 	pdflatex sample-media
+
+sample-authors.pdf	: $(DEPS) sample-authors.tex \
+	books.bib people.bib no-interpret-preamble.bib interpret-preamble2.bib
+	pdflatex sample-authors
+	$(BIB2GLS) sample-authors
+	pdflatex sample-authors
+	pdflatex sample-authors
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

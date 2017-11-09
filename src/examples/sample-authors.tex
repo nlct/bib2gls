@@ -1,0 +1,43 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[12pt]{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,% using bib2gls
+nostyles,% don't load default styles
+stylemods={bookindex},% load glossary-bookindex and patch styles
+style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src=no-interpret-preamble,
+  interpret-preamble=false
+]
+
+\GlsXtrLoadResources[
+  src={interpret-preamble2,people,books},
+  write-preamble=false,
+  field-aliases={identifier=category,author=parent},
+  replicate-fields={name={first}}
+]
+
+\newcommand*{\bookfont}[1]{\emph{#1}}
+\glssetcategoryattribute{book}{textformat}{bookfont}
+\glssetcategoryattribute{book}{glossnamefont}{bookfont}
+
+\begin{document}
+\section{Sample}
+
+\gls{ataleoftwocities}, \gls{bleakhouse}, \gls{thebigsleep},
+\gls{thelonggoodbye}, \gls{redharvest},
+\gls{murderontheorientexpress}, \gls{whydidnttheyaskevans},
+\gls{icecoldinalex}, \gls{thehobbit}, \gls{thelordoftherings}
+\gls{thewonderfulwizardofoz}, \gls{whiskygalore},
+\gls{whereeaglesdare}, \gls{icestationzebra}, \gls{ubik},
+\gls{doandroidsdreamofelectricsheep}, \gls{thetroublewithharry},
+\gls{brightonrock}.
+
+\printunsrtglossary[title={Author and Book List}]
+
+\end{document}

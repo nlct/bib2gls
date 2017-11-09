@@ -700,6 +700,13 @@ name},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.write-preamble,
+   name={\csoptfmt{write\dhyphen preamble}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.set-widest,
    name={\csoptfmt{set\dhyphen widest}},
    user1={\meta{boolean}},
@@ -1687,6 +1694,13 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@dualindexentry{sortmediacreator,
+  name={\csfmt{sort\-media\-creator}},
+  user1={\margm{first name(s)}\margm{surname}},
+  description={example command},
+  category={command}
+}
+
 @index{fileformats,
   name={file formats},
   text={file format}
@@ -1944,6 +1958,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{textcase,
   name={\styfmt{textcase}},
+  category={package},
+  parent={packages}
+}
+
+@index{datetime2,
+  name={\styfmt{datetime2}},
   category={package},
   parent={packages}
 }
@@ -3572,12 +3592,20 @@ field.},
   name={\filefmt{interpret\dhyphen preamble.bib}}
 }
 
+@dualindexentry{file.interpret-preamble2.bib,
+  name={\filefmt{interpret\dhyphen preamble2.bib}}
+}
+
 @dualindexentry{file.people.bib,
   name={\filefmt{people.bib}}
 }
 
 @dualindexentry{file.sample-people.tex,
   name={\filefmt{sample\dhyphen people.tex}}
+}
+
+@dualindexentry{file.sample-authors.tex,
+  name={\filefmt{sample\dhyphen authors.tex}}
 }
 
 @dualindexentry{file.bacteria.bib,
@@ -3900,8 +3928,8 @@ label of the current entry},
   category={command}
 }
 
-@index{nopostpunc,
-  name={\csfmt{no\-post\-punc}},
+@index{glsxtrnopostpunc,
+  name={\csfmt{glsxtr\-no\-post\-punc}},
   user1={},
   description={suppresses the post-description punctuation
    without suppressing the post-description hook},
@@ -4500,6 +4528,16 @@ option},
   category={command}
 }
 
+@index{setabbreviationstyle,
+  name={\csfmt{setabbreviationstyle}},
+  user1={\oargm{category}\margm{style-name}},
+  description={sets the abbreviation style to \meta{style-name} for the
+given \meta{category}, must be used before the abbreviation is
+defined},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @index{glshex,
   name={\csfmt{glshex}},
   user1={},
@@ -4815,6 +4853,15 @@ indexing},
    or \cs{glsnamefont} and the post-name hook) but uses
    the given \meta{field} instead of the \field{name} field},
   note={provided by \styfmt{glossaries-extra} v1.22+},
+  category={command}
+}
+
+@index{DTMdisplaydate,
+  name={\csfmt{DTMdisplaydate}},
+  user1={\margm{year}\margm{month}\margm{day}\margm{dow}},
+  description={formats the given date where all arguments are
+    numeric},
+  note={provided by \styfmt{datetime2}},
   category={command}
 }
 

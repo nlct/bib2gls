@@ -735,8 +735,18 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (field.equals("parent"))
             {
-               putField(field,
-                 processLabel(value.expand(parser).toString(parser)));
+               String strVal = value.expand(parser).toString(parser);
+
+               if (bib2gls.useInterpreter() 
+                    && strVal.matches(".*[\\\\\\{\\}].*"))
+               {
+                  // no point checking for other special characters
+                  // as they won't expand to a simple alphanumeric string
+
+                  strVal = bib2gls.interpret(strVal, value, true);
+               }
+
+               putField(field, processLabel(strVal));
             }
             else
             {
@@ -781,7 +791,7 @@ public class Bib2GlsEntry extends BibEntry
                               String name = ((ControlSequence)obj).getName();
 
                               if (name.equals("nopostdesc")
-                               || name.equals("nopostpunc"))
+                               || name.equals("glsxtrnopostpunc"))
                               {
                                  list.remove(i);
                               }
@@ -823,7 +833,7 @@ public class Bib2GlsEntry extends BibEntry
                           }
                           else if (obj instanceof ControlSequence
                           && (((ControlSequence)obj).getName().equals("nopostdesc")
-                            || ((ControlSequence)obj).getName().equals("nopostpunc")))
+                            || ((ControlSequence)obj).getName().equals("glsxtrnopostpunc")))
                           {
                              break;
                           }
@@ -2005,6 +2015,12 @@ public class Bib2GlsEntry extends BibEntry
       if (value != null)
       {
          alias = value.expand(parser).toString(parser);
+
+         if (bib2gls.useInterpreter() && alias.matches(".*[\\\\\\{\\}].*"))
+         {
+            alias = bib2gls.interpret(alias, value, true);
+         }
+
          alias = processLabel(alias);
          addDependency(alias);
          putField("alias", alias);
@@ -2137,6 +2153,13 @@ public class Bib2GlsEntry extends BibEntry
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
+      }
+
+      TeXObjectList expanded = valList.expandfully(parser);
+
+      if (expanded != null)
+      {
+         valList = expanded;
       }
 
       CsvList csvList = CsvList.getList(parser, valList);

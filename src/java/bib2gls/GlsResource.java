@@ -475,6 +475,10 @@ public class GlsResource
          {
             interpretPreamble = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("write-preamble"))
+         {
+            savePreamble = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("flatten"))
          {
             flatten = getBoolean(parser, list, opt);
@@ -4465,7 +4469,7 @@ public class GlsResource
 
          Vector<String> provided = new Vector<String>();
 
-         if (preamble != null)
+         if (preamble != null && savePreamble)
          {
             writer.println(preamble);
             writer.println();
@@ -6337,6 +6341,16 @@ public class GlsResource
       return bib2gls.useNonBreakSpace();
    }
 
+   public boolean useInterpreter()
+   {
+      return bib2gls.useInterpreter();
+   }
+
+   public String interpret(String texCode, BibValueList bibVal, boolean trim)
+   {
+      return bib2gls.interpret(texCode, bibVal, trim);
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -6386,6 +6400,8 @@ public class GlsResource
 
    private String preamble = null;
    private BibValueList preambleList = null;
+
+   private boolean savePreamble = true;
 
    private HashMap<String,Pattern> fieldPatterns = null;
 

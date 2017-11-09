@@ -6,9 +6,11 @@
 
 \usepackage[record,% use bib2gls
  nostyles,% don't load default styles
- stylemods={bookindex},% load glossary-bookindex.sty and patch styles
+% load glossary-bookindex.sty and patch styles:
+ stylemods={bookindex},
  style=bookindex]{glossaries-extra}
 
+% abbreviation style must be set before \GlsXtrLoadResources
 \setabbreviationstyle[bacteria]{long-only-short-only}
 
 \GlsXtrLoadResources[

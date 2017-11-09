@@ -1,7 +1,8 @@
 all	: bib2gls.pdf bib2gls.1 convertgls2bib.1
 
 bib2gls.pdf	: bib2gls.tex bib2gls.bib bib2gls-cite.bib\
-		   ../lib/bib2gls.jar ../lib/texparserlib.jar
+		   ../lib/bib2gls.jar ../lib/texparserlib.jar \
+		   ../examples/*.tex ../examples/*.bib
 		arara --verbose bib2gls
 		cp bib2gls.pdf ../../unstable/
 
