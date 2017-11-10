@@ -20,7 +20,6 @@
 \GlsXtrLoadResources[
   src={interpret-preamble,books,films},
   field-aliases={identifier=category,year=user1,cast=user2},
-  strip-trailing-nopost,
   bibtex-contributor-fields={user2},
   contributor-order={forenames},
   identical-sort-action={category},
@@ -30,7 +29,7 @@
 
 % requires datatool-base.sty v2.28+:
 \renewcommand*{\DTLlistformatoxford}{,}
-\renewcommand*{\DTLlistformatlastsep}{ and }
+\renewcommand*{\DTLandname}{and}
 
 \newcommand*{\bookfont}[1]{\emph{#1}}
 \newcommand*{\filmfont}[1]{\textsf{\em #1}}
@@ -55,7 +54,10 @@
 
 \newcommand*{\glsxtrpostdescfilm}{%
  \ifglshasfield{user2}{\glscurrententrylabel}%
- {\ featuring \glscurrentfieldvalue}%
+ {%
+   \glsxtrrestorepostpunc % requires glossaries-extra v1.23+
+   \ featuring \glscurrentfieldvalue
+ }%
  {}%
 }
 

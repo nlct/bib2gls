@@ -33,6 +33,7 @@
 \usepackage{datetime2}
 \usepackage{listings}
 \usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
 \usepackage[% v1.21+
    record,% use bib2gls
    index,% create index glossary
@@ -127,13 +128,6 @@
 \newcommand*{\XeLaTeX}{\hologo{XeLaTeX}}
 \newcommand*{\LuaLaTeX}{\hologo{LuaLaTeX}}
 \newcommand*{\pdfLaTeX}{\hologo{pdfLaTeX}}
-
-\newcommand*{\sectionref}[1]{\hyperref[#1]{section~\ref*{#1}}}
-\newcommand*{\Sectionref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
-\newcommand*{\figureref}[1]{\hyperref[#1]{figure~\ref*{#1}}}
-\newcommand*{\Figureref}[1]{\hyperref[#1]{Figure~\ref*{#1}}}
-\newcommand*{\tableref}[1]{\hyperref[#1]{table~\ref*{#1}}}
-\newcommand*{\Tableref}[1]{\hyperref[#1]{Table~\ref*{#1}}}
 
 \newcommand{\langxml}{\hyperref[sec:lang.xml]{language resource file}}
 
@@ -389,6 +383,12 @@
  {#1}%
 }
 
+\newcommand*{\fielddisp}[2]{%
+ \texorpdfstring
+ {\glsdisp{field.#1}{\fieldfmt{#2}}}%
+ {#2}%
+}
+
 \newcommand*{\fielddef}[1]{%
  \glsadd{field.#1}%
  \glsxtrglossentry{field.#1}{}%
@@ -574,6 +574,20 @@
 }
 
 \setcounter{tocdepth}{4}
+
+\newcommand*{\sectionref}[1]{\cref{#1}}
+\newcommand*{\Sectionref}[1]{\Cref{#1}}
+\newcommand*{\figureref}[1]{\hyperlink{#1-top}{figure~\ref*{#1}}}
+\newcommand*{\Figureref}[1]{\hyperlink{#1-top}{Figure~\ref*{#1}}}
+\newcommand*{\tableref}[1]{\cref{#1}}
+\newcommand*{\Tableref}[1]{\Cref{#1}}
+
+\newcommand{\figcontents}[3]{%
+  \hypertarget{#3-top}{}%
+  \centering
+  #1\par
+  #2\label{#3}%
+}
 
 \newlength\imagewidth
 \newcommand*{\pdftwocol}[2]{%
@@ -6025,12 +6039,89 @@ description={sample\nopostdesc{} }
 \end{verbatim}
 because the final space is now significant, but even without the
 space it still won't be stripped as the field ends with
-an empty group not with \cs{nopostdesc}. It also won't be
+an empty group not with \cs{nopostdesc}. Similarly it won't be
 stripped from
 \begin{verbatim}
-description={sample{\nopostdesc}}
+description={sample\nopostdesc\relax}
 \end{verbatim}
-because the grouping hides it.
+because again it's not at the end.
+
+\optsection{check-end-punctuation}
+
+This options checks the end of all the fields given in \meta{list} for
+end of sentence punctuation. This is determined as follows, for each
+\meta{field} in the comma-separated \meta{list}:
+\begin{itemize}
+\item if the last character is of type \idx{punctuationclose}
+or \idx{punctuationfinalquote}, check the character that comes
+before it;
+\item if the character is of type \idx{punctuationother}, then check
+if it's listed in the entry given by \code{sentence.terminators} 
+in \bibgls's \langxml.
+\end{itemize}
+If a sentence terminator is found, an internal field is created
+called \field{fieldendpunc} that contains the punctuation
+character.
+
+The default \code{sentence.terminators} is defined in \file{bib2gls-en.xml}
+as:
+\begin{verbatim}
+<entry key="sentence.terminators">.?!</entry>
+\end{verbatim}
+Any character that isn't of type \idx{punctuationother} won't
+match.
+
+For example, the sample \exfile{books.bib} file contains:
+\begin{verbatim}
+@entry{whydidnttheyaskevans,
+  name={Why Didn't They Ask Evans?},
+  description={novel by Agatha Christie},
+  identifier={book},
+  author={\sortmediacreator{Agatha}{Christie}},
+  year={1934}
+}
+\end{verbatim}
+With \csopt[name]{check-end-punctuation}, this entry will be
+assigned an internal field called 
+\fielddisp{fieldendpunc}{namendpunc} set to \code{?}\
+as that's included in \code{sentence.terminators} and is found
+at the end of the \field{name} field:
+\begin{verbatim}
+\GlsXtrSetField{whydidnttheyaskevans}{nameendpunc}{?}
+\end{verbatim}
+(Note that \csopt[first,text]{check-end-punctuation} won't match
+as there's no \field{first} or \field{text} field supplied.)
+
+If you have a field that ends with an abbreviation followed by a
+full stop, this will be considered an end of sentence terminator, but
+the main purpose of this option is to provide a way to deal with
+cases like
+\begin{verbatim}
+Agatha Christie wrote \gls{whydidnttheyaskevans}.
+\end{verbatim}
+where the end of sentence punctuation following \cs{gls} needs to be
+discarded. This is needed regardless of whether or not
+the link text ends with an abbreviation or is a complete sentence.
+
+It's then possible to hook into the \idx{postlinkhook} \qt{discard
+period} check. By default this just checks the category attributes
+that govern whether or not to discard a following period, but
+(with \styfmt{glossaries-extra} v1.23+) it's possible to provide
+an additional check by redefining
+\nosecdef{glsxtrifcustomdiscardperiod}
+This should expand to \meta{true} if the check should be performed
+otherwise it should expand to \meta{false}. You can reference the
+label using \cs{glslabel}. For example:
+\begin{verbatim}
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+}
+\end{verbatim}
+This uses \ics{GlsXtrIfFieldUndef} rather than
+\ics{glsxtrifhasfield*} since there's no need to access the field's
+value. (The unstarred form \ics{glsxtrifhasfield} can't be used
+as it introduces implicit scoping, which would interfere with the
+punctuation lookahead.)
 
 \optsection{group}
 
@@ -7529,48 +7620,52 @@ superscript digits, such as \textsuperscript{1} (0x00B9)
 and \textsuperscript{2} (0x00B2).
 
 \begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[every node/.style={minimum size=9mm}]
+\figcontents
+{%
+\begin{tikzpicture}[every node/.style={minimum size=9mm},
+ ampersand replacement=\&]
 \matrix[font={\Large\ttfamily}]
 {
-  \node[draw]{a\hexsb{61}}; & \node{$=$}; & \node[draw]{a\hexsb{61}}; &[20mm]
-  \node[draw]{a\hexsb{61}}; & \node{$=$}; & \node[draw]{a\hexsb{61}};
+  \node[draw]{a\hexsb{61}}; \& \node{$=$}; \& \node[draw]{a\hexsb{61}}; \&[20mm]
+  \node[draw]{a\hexsb{61}}; \& \node{$=$}; \& \node[draw]{a\hexsb{61}};
   \\
-  \node[draw]{b\hexsb{62}}; & \node{$=$}; & \node[draw]{b\hexsb{62}}; &
-  \node[draw]{b\hexsb{62}}; & \node{$=$}; & \node[draw]{b\hexsb{62}};
+  \node[draw]{b\hexsb{62}}; \& \node{$=$}; \& \node[draw]{b\hexsb{62}}; \&
+  \node[draw]{b\hexsb{62}}; \& \node{$=$}; \& \node[draw]{b\hexsb{62}};
   \\
-  \node[draw]{c\hexsb{63}}; & \node{$=$}; & \node[draw]{c\hexsb{63}}; &
-  \node[draw]{c\hexsb{63}}; & \node{$=$}; & \node[draw]{c\hexsb{63}};
+  \node[draw]{c\hexsb{63}}; \& \node{$=$}; \& \node[draw]{c\hexsb{63}}; \&
+  \node[draw]{c\hexsb{63}}; \& \node{$=$}; \& \node[draw]{c\hexsb{63}};
   \\
-  \node[draw,ultra thick]{1\hexsb{31}}; & \node{$<$}; &
-  \node[draw,ultra thick]{6\hexsb{36}}; &
-  \node (n1) {1}; & \node{$>$}; & \node[draw,ultra thick]{6};
+  \node[draw,ultra thick]{1\hexsb{31}}; \& \node{$<$}; \&
+  \node[draw,ultra thick]{6\hexsb{36}}; \&
+  \node (n1) {1}; \& \node{$>$}; \& \node[draw,ultra thick]{6};
   \\
-  \node[draw]{2\hexsb{32}}; &  & \node[draw]{b\hexsb{62}}; &
-  \node (n2) {2}; &  & \node[draw]{b\hexsb{62}};
+  \node[draw]{2\hexsb{32}}; \&  \& \node[draw]{b\hexsb{62}}; \&
+  \node (n2) {2}; \&  \& \node[draw]{b\hexsb{62}};
   \\
-  \node[draw]{f\hexsb{66}}; &  & \node[draw]{a\hexsb{61}}; &
-  \node[draw]{f\hexsb{66}}; &  & \node[draw]{a\hexsb{61}};
+  \node[draw]{f\hexsb{66}}; \&  \& \node[draw]{a\hexsb{61}}; \&
+  \node[draw]{f\hexsb{66}}; \&  \& \node[draw]{a\hexsb{61}};
   \\
-  \node[draw]{o\hexsb{6f}}; &  & \node[draw]{r\hexsb{72}}; &
-  \node[draw]{o\hexsb{6f}}; &  & \node[draw]{r\hexsb{72}};
+  \node[draw]{o\hexsb{6f}}; \&  \& \node[draw]{r\hexsb{72}}; \&
+  \node[draw]{o\hexsb{6f}}; \&  \& \node[draw]{r\hexsb{72}};
   \\
-  \node[draw]{o\hexsb{6f}}; &  & &
-  \node[draw]{o\hexsb{6f}}; &  & 
+  \node[draw]{o\hexsb{6f}}; \&  \& \&
+  \node[draw]{o\hexsb{6f}}; \&  \& 
   \\[10pt]
-   & \node[font=\rmfamily]{\subfigfmt{a}};  & &
-   & \node[font=\rmfamily]{\subfigfmt{b}};  & 
+   \& \node[font=\rmfamily]{\subfigfmt{a}};  \& \&
+   \& \node[font=\rmfamily]{\subfigfmt{b}};  \& 
   \\
 };
 \draw[ultra thick] (n1.north east) rectangle (n2.south west);
-\end{tikzpicture}
-
-\caption[Regular letter comparison vs letter-number
-comparison]{Regular letter comparison vs letter-number comparison.
-Comparing the strings \code{abc12foo} and \code{abc6bar}:
-\subfigfmt{a} \optfmt{letter-case}; \subfigfmt{b}
-\optfmt{letternumber-case}.}
-\label{fig:letternumber}
+\end{tikzpicture}%
+}
+{%
+ \caption[Regular letter comparison vs letter-number
+ comparison]{Regular letter comparison vs letter-number comparison.
+ Comparing the strings \code{abc12foo} and \code{abc6bar}:
+ \subfigfmt{a} \optfmt{letter-case}; \subfigfmt{b}
+ \optfmt{letternumber-case}.}%
+}
+{fig:letternumber}
 \end{figure}
 
 For example, suppose the first string is \code{abc12foo}
@@ -11478,6 +11573,7 @@ an encoding line to prevent \bibgls\ from searching the entire file
 for it. (That's not so much of an issue with a short file, but may
 cause an unnecessary delay for much longer files.)
 
+The contents of \filefmt{no-interpret-preamble.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/no-interpret-preamble.bib}
 
 \filesection{interpret-preamble.bib}
@@ -11486,6 +11582,7 @@ This provides definitions of \gls{sortname}, \gls{sortvonname},
 \gls{sortart} and \gls{sortmediacreator} in \atentry{preamble} 
 that can be picked up by the interpreter and used during sorting.
 
+The contents of \filefmt{interpret-preamble.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/interpret-preamble.bib}
 
 \filesection{interpret-preamble2.bib}
@@ -11495,6 +11592,7 @@ definition of \cs{sortmediacreator}. This uses \cs{renewcommand}
 instead of \cs{providecommand} so \csopt[false]{write-preamble}
 is required to prevent \LaTeX\ from picking up the definitions.
 
+The contents of \filefmt{interpret-preamble2.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/interpret-preamble2.bib}
 
 \filesection{chemicalformula.bib}
@@ -11528,6 +11626,7 @@ The entries all have a custom field \fieldfmt{identifier} set to
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
 aliased with \csopt{field-aliases}.
 
+The contents of \filefmt{chemicalformula.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/chemicalformula.bib}
 
 \filesection{bacteria.bib}
@@ -11541,6 +11640,7 @@ The entries all have a custom field \fieldfmt{identifier} set to
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
 aliased with \csopt{field-aliases}.
 
+The contents of \filefmt{bacteria.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/bacteria.bib}
 
 \filesection{baseunits.bib}
@@ -11558,6 +11658,7 @@ The entries all have a custom field \fieldfmt{identifier} set to
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
 aliased with \csopt{field-aliases}.
 
+The contents of \filefmt{baseunits.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/baseunits.bib}
 
 \filesection{derivedunits.bib}
@@ -11569,6 +11670,7 @@ The entries all have a custom field \fieldfmt{identifier} set to
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
 aliased with \csopt{field-aliases}.
 
+The contents of \filefmt{derivedunits.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/derivedunits.bib}
 
 \filesection{people.bib}
@@ -11656,6 +11758,7 @@ Except for the aliases, the entries have a custom field
 \bibgls\ unless it's defined using \cs{glsaddkey} or
 \cs{glsaddstoragekey} or if it's aliased with \csopt{field-aliases}.
 
+The contents of \filefmt{people.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/people.bib}
 
 \filesection{books.bib}
@@ -11677,6 +11780,7 @@ example, the \field{description} field could contain a brief summary
 (or \qt{log line}). The \field{author} field could use \BibTeX's
 syntax instead with \csopt{bibtex-contributor-fields} to convert it.
 
+The contents of \filefmt{books.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/books.bib}
 
 \filesection{films.bib}
@@ -11698,15 +11802,21 @@ To avoid a label conflict \exfile{films.bib} prefixes all labels
 with \idprefixfmt{film} rather than relying on \csopt{label-prefix}.
 This ensures that both \exfile{books.bib} and \exfile{films.bib}
 can be loaded in the same resource set (otherwise they'd have to be
-loaded in separate resource sets with different prefixes).
+loaded in separate resource sets with different prefixes). Remember
+that you can use \ics{glsxtrnewgls}. For example:
+\begin{verbatim}
+\glsxtrnewgls{film.}{\film}
+\end{verbatim}
+This means you can do, for example, just \verb|\film{bladerunner}|
+if you want to reference a film without worrying about the prefix.
 
 As with all the example files, there are other ways in which
 to specify the data, depending on your requirements. For example,
 the \fieldfmt{director} field could use \BibTeX's contributor syntax
-(as the \field{cast} field does). Some of
+(as the \fieldfmt{cast} field does). Some of
 the films actually had more than one director but only one is listed
 per film in this sample file for simplicity. Similarly, the
-\field{cast} field only contains the principle actors rather than the
+\fieldfmt{cast} field only contains the principle actors rather than the
 complete list. The book on which the film is based
 could be contained in a cross-reference field or a custom
 \fieldfmt{basedon} field.
@@ -11724,7 +11834,9 @@ then the \styopt{postdot} package option will produce an odd
 result as the inserted full stop immediately follows the question
 mark. This is an awkward situation. One possibility is to explicitly 
 put the full stop at the end of the \field{description} field for all the 
-other entries and omit it for the problematic entries. 
+other entries and omit it for the problematic entries, but this
+interferes with the possibility of a category-dependent
+\idx{postdescriptionhook}. 
 
 Another option is to put \ics{nopostdesc} in the 
 problematic entries. For example:
@@ -11741,24 +11853,23 @@ description={a film starring Harrison Ford, Rutger Hauer
  and Sean Young loosely based on the novel
  \gls{ext1.doandroidsdreamofelectricsheep}\glsxtrnopostpunc},
 \end{verbatim}
-(This was only introduced to \styfmt{glossaries-extra} v1.22.)
 This doesn't interfere with the \idx{postdescriptionhook} but if a hook
-is provided the post punctuation may then be required.
+is provided the post-punctuation may then be required. In both of
+the above two cases, \csopt{strip-trailing-nopost} could be used
+to remove the suppression commands from the \field{description}
+fields if a hook is defined. However this doesn't deal with hooks
+that only conditionally append text.
 
-An alternative approach is to use
-\csopt[check]{post-description-dot}. Unfortunately in this case 
-the question mark is hidden inside the \cs{gls} command.  However
-this method would put the punctuation before the
-\idx{postdescriptionhook}.
+The best solution is with \styfmt{glossaries-extra} v1.23+ which
+provides \ics{glsxtrrestorepostpunc} for use in the category
+\idxpl{postdescriptionhook} that counter-acts \cs{glsxtrnopostpunc}.
+This can be placed inside a conditional, as used in
+\exfile{sample-media.tex}, and does nothing if \cs{glsxtrnopostpunc}
+doesn't occur in the \field{description} field. (Note that 
+\cs{glsxtrrestorepostpunc} can't be used to counter-act
+\cs{nopostdesc}, since that completely suppresses the hook.)
 
-Since \csopt{strip-trailing-nopost} can be used
-to strip \cs{nopostdesc} and \cs{glsxtrnopostpunc} from the end
-of the \field{description} field, the simplest option is
-to put one of those commands at the end of the field 
-and strip it when it's not needed. I've used \cs{nopostdesc} as it's
-the older of the two commands and it will have to be stripped anyway
-if the \idx{postdescriptionhook} is used.
-
+The contents of \filefmt{films.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/films.bib}
 
 \filesection{sample-chemical.tex}
@@ -11812,10 +11923,12 @@ shown in \figureref{fig:sample-chemical.pdf}.
 \lstinputlisting[firstline=5]{../examples/sample-chemical.tex}
 
 \begin{figure}[p]
-\centering
-\frame{\includegraphics[height=.9\textheight]{../examples/sample-chemical.pdf}}
-\caption{\filefmt{sample-chemical.pdf}}
-\label{fig:sample-chemical.pdf}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-chemical.pdf}}%
+}
+{\caption{\filefmt{sample-chemical.pdf}}}
+{fig:sample-chemical.pdf}
 \end{figure}
 
 \filesection{sample-bacteria.tex}
@@ -11928,10 +12041,12 @@ shown in \figureref{fig:sample-bacteria.pdf}.
 \lstinputlisting[firstline=5]{../examples/sample-bacteria.tex}
 
 \begin{figure}[p]
-\centering
-\frame{\includegraphics[height=.9\textheight]{../examples/sample-bacteria.pdf}}
-\caption{\filefmt{sample-bacteria.pdf}}
-\label{fig:sample-bacteria.pdf}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-bacteria.pdf}}%
+}
+{\caption{\filefmt{sample-bacteria.pdf}}}
+{fig:sample-bacteria.pdf}
 \end{figure}
 
 \filesection{sample-units1.tex}
@@ -11966,10 +12081,12 @@ pdflatex sample-units1
 The complete document is shown in \figureref{fig:sample-units1.pdf}.
 
 \begin{figure}[p]
-\centering
-\frame{\includegraphics[height=.9\textheight]{../examples/sample-units1.pdf}}
-\caption{\filefmt{sample-units1.pdf}}
-\label{fig:sample-units1.pdf}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-units1.pdf}}%
+}
+{\caption{\filefmt{sample-units1.pdf}}}
+{fig:sample-units1.pdf}
 \end{figure}
 
 \filesection{sample-units2.tex}
@@ -11992,10 +12109,12 @@ pdflatex sample-units2
 The complete document is shown in \figureref{fig:sample-units2.pdf}.
 
 \begin{figure}[p]
-\centering
-\frame{\includegraphics[height=.9\textheight]{../examples/sample-units2.pdf}}
-\caption{\filefmt{sample-units2.pdf}}
-\label{fig:sample-units2.pdf}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-units2.pdf}}%
+}
+{\caption{\filefmt{sample-units2.pdf}}}
+{fig:sample-units2.pdf}
 \end{figure}
 
 \filesection{sample-units3.tex}
@@ -12093,10 +12212,10 @@ The two pages of the document are shown in
 \lstinputlisting[firstline=5]{../examples/sample-units3.tex}
 
 \begin{figure}[p]
-\centering
-\pdftwocol{../examples/sample-units3.pdf}{2}
-\caption{\filefmt{sample-units3.pdf}}
-\label{fig:sample-units3.pdf}
+\figcontents
+{\pdftwocol{../examples/sample-units3.pdf}{2}}
+{\caption{\filefmt{sample-units3.pdf}}}
+{fig:sample-units3.pdf}
 \end{figure}
 
 \filesection{sample-media.tex}
@@ -12114,7 +12233,7 @@ the odd effect of sometimes having the film listed first
 sometimes having the book listed first (\code{brightonrock} comes
 before \code{film.brightonrock}).
 
-Once possible solution would be to also assign prefixes for the book
+One possible solution would be to also assign prefixes for the book
 labels, but \csopt{label-prefix} is applied to all primary entries
 for the given resource set and can't be applied selectively, so this
 would require editing the \exfile{books.bib} file.
@@ -12129,7 +12248,7 @@ are two simple ways to achieve this: use \csopt[same as base]{category}
 aliases for the custom \fieldfmt{year} and \fieldfmt{cast} fields:
 \begin{verbatim}
 field-aliases={identifier=category,year=user1,cast=user2},
-identical-sort-action={category},
+identical-sort-action={category}
 \end{verbatim}
 This ensures that books always come before films with the same
 title. An oddity is the film \qt{Whisky Galore!}\ which is one
@@ -12191,27 +12310,33 @@ to redefine \ics{DTLlistformatoxford} in the document:
 \renewcommand*{\DTLlistformatoxford}{,}
 \end{verbatim}
 If I want to change \qt{\&} to \qt{and} I also need to redefine
-\ics{DTLlistformatlastsep}:
+\ics{DTLandname}:
 \begin{verbatim}
-\renewcommand*{\DTLlistformatlastsep}{ and }
+\renewcommand*{\DTLandname}{and}
 \end{verbatim}
 If \ics{DTLformatlist} isn't defined (\sty{datatool-base} v2.27 or
 earlier), the cast list will look a little odd as it uses a comma
 separator between all elements of this list, including the final
 pair (so there's no final \& or \qt{and}).
 
-I've provided a \idx{postdescriptionhook} to append the cast list:
+I've provided a \idx{postdescriptionhook}
+\ics{glsxtrpostdesccategory} to append the cast list:
 \begin{verbatim}
 \newcommand*{\glsxtrpostdescfilm}{%
  \ifglshasfield{user2}{\glscurrententrylabel}%
- {\ featuring \glscurrentfieldvalue}%
+ {%
+   \glsxtrrestorepostpunc % requires glossaries-extra v1.23+
+   \ featuring \glscurrentfieldvalue
+ }%
  {}%
 }
 \end{verbatim}
-This means that I need to strip \ics{nopostdesc} from the
-\field{description} fields with \csopt{strip-trailing-nopost},
-and I've used the \styopt{postdot} package option to append a full
-stop.
+This uses \ics{glsxtrrestorepostpunc} to restore the
+post-description punctuation if it was suppressed with
+\ics{glsxtrnopostpunc}. This means that if I decide not to include
+the \field{user2} field then the post-description punctuation will
+be revert back to being suppressed for entries containing
+\cs{glsxtrnopostpunc} in the \field{description} field.
 
 I haven't referenced any of the entries in the main body of the
 document, so I've used \csopt[all]{selection} to select all entries.
@@ -12233,10 +12358,10 @@ The four pages of the document are shown in
 \lstinputlisting[firstline=5]{../examples/sample-media.tex}
 
 \begin{figure}[p]
-\centering
-\pdftwocol{../examples/sample-media.pdf}{4}
-\caption{\filefmt{sample-media.pdf}}
-\label{fig:sample-media.pdf}
+\figcontents
+{\pdftwocol{../examples/sample-media.pdf}{4}}
+{\caption{\filefmt{sample-media.pdf}}}
+{fig:sample-media.pdf}
 \end{figure}
 
 \filesection{sample-people.tex}
@@ -12245,8 +12370,8 @@ This example uses the files \exfile{people.bib},
  \exfile{no-interpret-preamble.bib} and \exfile{interpret-preamble.bib}. The
 aim here is to have a list of people ordered alphabetically by
 surname with a brief description, the same list ordered by date of
-birth and an index of all the people without their details and with
-a number list indicating where the people were mentioned in the
+birth and an index of all the people without their details but with
+a number list indicating where that person was mentioned in the
 document. The first two lists shouldn't include aliases but the
 index should. Not all the entries defined in \exfile{people.bib}
 are included in the document. Those that aren't either explicitly
@@ -12289,10 +12414,10 @@ replicate-fields={name={first}}
 
 I'd like the first use to show the other name in parentheses where
 provided. The simplest way to achieve this is by defining the
-\idx{postlinkhook} \csfmt{glsxtrpostlink\meta{category}}. If the
+\idx{postlinkhook} \ics{glsxtrpostlinkcategory}. If the
 \field{category} field isn't specified it will default to
 \code{general} (for entries defined with \atentry{entry}), so I
-could just redefine \csfmt{glsxtrpostlinkgeneral} but to allow for
+could just define \csfmt{glsxtrpostlinkgeneral} but to allow for
 the possibility of extending the document to incorporate other types
 of entries I decided to set the \field{category} to \code{people}
 through the use of the \csopt{category} option:
@@ -12322,7 +12447,7 @@ field's value in parentheses. The entry's label can be obtained from
 
 I'd also like to do something similar after the name when the entry
 is displayed in the glossary. This means defining the \idx{postnamehook}
-\csfmt{glsxtrpostname\meta{category}}, in this case
+\ics{glsxtrpostnamecategory}, in this case
 \csfmt{glsxtrpostnamepeople}. The entry's label is referenced
 with \ics{glscurrententrylabel}:
 \begin{verbatim}
@@ -12336,7 +12461,7 @@ with \ics{glscurrententrylabel}:
 description, which would interfere with the current entry label if
 they shared the same command to reference the label.)
 
-The \idx{postdescriptionhook} can be used to appended the birth and
+The \idx{postdescriptionhook} can be used to append the birth and
 death dates. Although all the entries that have been selected from \exfile{people.bib} have a 
 \fieldfmt{died} field, I've added a check for the corresponding
 \field{user3} field in case new references are added for people who are
@@ -12406,8 +12531,9 @@ This ensures that \sty{glossary-list} and \sty{glossary-bookindex}
 are loaded and patches the list styles.
 
 The first two glossaries would look better with a terminating full
-stop, so I've used the \styopt{postdot} package option. This can
-locally be switched off for the index with \code{nopostdot}.
+stop, so I've used the \styopt{postdot} package option. 
+(The \glostyle{bookindex} style doesn't use the \field{description}
+field and therefore doesn't use the \idx{postdescriptionhook}.)
 The index glossary type can be defined with the \styopt{index}
 package option. I've set the default style to \glostyle{altlistgroup}
 but this can locally be changed to \glostyle{bookindex} when I
@@ -12417,7 +12543,8 @@ display the index. The \styopt{record} option is needed to use
 \usepackage[record,% using bib2gls
  index,% create index glossary
  postdot,% dot after descriptions
- stylemods={list,bookindex},% load glossary-bookindex.sty and fix styles
+% load glossary-list.sty and glossary-bookindex.sty and patch:
+ stylemods={list,bookindex},
  style=altlistgroup]{glossaries-extra}
 \end{verbatim}
 
@@ -12491,7 +12618,7 @@ changes, although that's not needed for this document since the
 index comes right at the end:
 \begin{verbatim}
 \printunsrtglossary*
- [type=index,style=bookindex,nopostdot]
+ [type=index,style=bookindex]
  {%
    \let\sortname\swaptwo
    \let\sortart\swaptwo
@@ -12511,10 +12638,10 @@ The four pages of the document are shown in \figureref{fig:sample-people.pdf}.
 \lstinputlisting[firstline=5]{../examples/sample-people.tex}
 
 \begin{figure}[p]
-\centering
-\pdftwocol{../examples/sample-people.pdf}{4}
-\caption{\filefmt{sample-people.pdf}}
-\label{fig:sample-people.pdf}
+\figcontents
+{\pdftwocol{../examples/sample-people.pdf}{4}}
+{\caption{\filefmt{sample-people.pdf}}}
+{fig:sample-people.pdf}
 \end{figure}
 
 \filesection{sample-authors.tex}
@@ -12587,6 +12714,36 @@ so that the document can set the \catattr{textformat} and
 \glssetcategoryattribute{book}{textformat}{bookfont}
 \glssetcategoryattribute{book}{glossnamefont}{bookfont}
 \end{verbatim}
+As with \exfile{sample-media.tex}, the terminating question mark at
+the end of some of the \field{name} fields can cause an awkward
+situation if \cs{gls} is used at the end of a sentence. This can be
+dealt with by getting \bibgls\ to make a note of the fields that
+end with sentence-terminating punctuation through the use of
+the \csopt{check-end-punctuation} option. In this example, the
+\field{name}, \field{text} and \field{first} fields are the same for
+all the books, so it's sufficient just to check the \field{name}
+field:
+\begin{verbatim}
+check-end-punctuation={name}
+\end{verbatim}
+With \sty{glossaries-extra} v1.23+ it's easy to hook into the
+\idx{postlinkhook} to check if 
+\fielddisp{fieldendpunc}{namendpunc} exists:
+\begin{verbatim}
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+}
+\end{verbatim}
+This will now cause the full stops following
+\begin{verbatim}
+\gls{whydidnttheyaskevans}.
+\end{verbatim}
+and
+\begin{verbatim}
+\gls{doandroidsdreamofelectricsheep}.
+\end{verbatim}
+to be discarded.
+
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-authors
@@ -12598,10 +12755,12 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 \lstinputlisting[firstline=5]{../examples/sample-authors.tex}
 
 \begin{figure}[p]
-\centering
-\frame{\includegraphics[height=.9\textheight]{../examples/sample-authors.pdf}}
-\caption{\filefmt{sample-authors.pdf}}
-\label{fig:sample-authors.pdf}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-authors.pdf}}%
+}
+{\caption{\filefmt{sample-authors.pdf}}}
+{fig:sample-authors.pdf}
 \end{figure}
 
 \printcommandsummary

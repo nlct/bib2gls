@@ -1341,6 +1341,10 @@ public class GlsResource
          {
             skipFields = getStringArray(parser, list, opt);
          }
+         else if (opt.equals("check-end-punctuation"))
+         {
+            checkEndPunc = getStringArray(parser, list, opt);
+         }
          else if (opt.equals("bibtex-contributor-fields"))
          {
             bibtexAuthorList = getStringArray(parser, list, opt);
@@ -4909,6 +4913,22 @@ public class GlsResource
            entry.getId(), entry.getChildCount());
       }
 
+      if (checkEndPunc != null)
+      {
+         for (String f : checkEndPunc)
+         {
+            String field  = f+"endpunc";
+
+            String val = entry.getFieldValue(field);
+
+            if (val != null)
+            {
+               writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+                 entry.getId(), field, val);
+            }
+         }
+      }
+
       if (bib2gls.isRecordCountSet())
       {
          bib2gls.writeRecordCount(entry.getId(), writer);
@@ -5972,6 +5992,23 @@ public class GlsResource
       return stripTrailingNoPost;
    }
 
+   public boolean isCheckEndPuncOn()
+   {
+      return checkEndPunc != null;
+   }
+
+   public boolean isCheckEndPuncOn(String field)
+   {
+      if (checkEndPunc == null) return false;
+
+      for (String f : checkEndPunc)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
    public boolean changeNameCase()
    {
       return nameCaseChange != null;
@@ -6448,6 +6485,8 @@ public class GlsResource
    private String[] bibtexAuthorList = null;
 
    private String[] externalPrefixes = null;
+
+   private String[] checkEndPunc = null;
 
    private String type=null, category=null, counter=null;
 

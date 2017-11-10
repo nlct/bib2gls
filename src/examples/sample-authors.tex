@@ -19,6 +19,7 @@ style=bookindex]{glossaries-extra}
   src={interpret-preamble2,people,books},
   write-preamble=false,
   field-aliases={identifier=category,author=parent},
+  check-end-punctuation={name},
   replicate-fields={name={first}}
 ]
 
@@ -26,16 +27,21 @@ style=bookindex]{glossaries-extra}
 \glssetcategoryattribute{book}{textformat}{bookfont}
 \glssetcategoryattribute{book}{glossnamefont}{bookfont}
 
+% requires glossaries-extra v1.23
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+}
+
 \begin{document}
 \section{Sample}
 
-\gls{ataleoftwocities}, \gls{bleakhouse}, \gls{thebigsleep},
-\gls{thelonggoodbye}, \gls{redharvest},
-\gls{murderontheorientexpress}, \gls{whydidnttheyaskevans},
-\gls{icecoldinalex}, \gls{thehobbit}, \gls{thelordoftherings}
-\gls{thewonderfulwizardofoz}, \gls{whiskygalore},
-\gls{whereeaglesdare}, \gls{icestationzebra}, \gls{ubik},
-\gls{doandroidsdreamofelectricsheep}, \gls{thetroublewithharry},
+\gls{ataleoftwocities}. \gls{bleakhouse}. \gls{thebigsleep}.
+\gls{thelonggoodbye}. \gls{redharvest}.
+\gls{murderontheorientexpress}. \gls{whydidnttheyaskevans}.
+\gls{icecoldinalex}. \gls{thehobbit}. \gls{thelordoftherings}.
+\gls{thewonderfulwizardofoz}. \gls{whiskygalore}.
+\gls{whereeaglesdare}. \gls{icestationzebra}. \gls{ubik}.
+\gls{doandroidsdreamofelectricsheep}. \gls{thetroublewithharry}.
 \gls{brightonrock}.
 
 \printunsrtglossary[title={Author and Book List}]

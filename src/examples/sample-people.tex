@@ -8,7 +8,7 @@
 \usepackage[record,% using bib2gls
  index,% create index glossary
  postdot,% dot after descriptions
-% load glossary-bookindex.sty and glossary-list.sty and patch:
+% load glossary-list.sty and glossary-bookindex.sty and patch:
  stylemods={list,bookindex},
  style=altlistgroup]{glossaries-extra}
 
@@ -90,7 +90,7 @@
 \printunsrtglossary[type=bybirth,target=false,nonumberlist]
 
 \printunsrtglossary*
- [type=index,style=bookindex,nopostdot]
+ [type=index,style=bookindex]
  {%
    \let\sortname\swaptwo
    \let\sortart\swaptwo

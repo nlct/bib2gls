@@ -187,6 +187,12 @@ Defaulting to: {0}.
 <entry key="tag.pages">Pages</entry>
 <entry key="tag.passim">passim</entry>
 
+<!-- Sentence terminators for use with check-end-punctuation.
+     Only characters that have the Unicode category
+     "Punctuation, Other" are checked.
+     -->
+<entry key="sentence.terminators">.?!</entry>
+
 <!--
      Letter groups usually only have the first character converted to upper case
      (for example, the digraph 'dz' is converted to 'Dz'). This doesn't apply

@@ -851,6 +851,16 @@ public class Bib2GlsEntry extends BibEntry
                   }
                }
 
+               if (resource.isCheckEndPuncOn(field))
+               {
+                  CharObject endPunc = getEndPunc(list);
+
+                  if (endPunc != null)
+                  {
+                     putField(field+"endpunc", endPunc.toString(parser));
+                  }
+               }
+
                putField(field, list.toString(parser));
             }
          }
@@ -964,6 +974,68 @@ public class Bib2GlsEntry extends BibEntry
       grp.add(listener.createGroup(String.format("%d", n)));
 
       return value;
+   }
+
+   protected boolean isSentenceTerminator(int codePoint)
+   {
+      String list = bib2gls.getMessage("sentence.terminators");
+
+      for (int i = 0; i < list.length(); )
+      {
+         int cp = list.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (cp == codePoint)
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   protected CharObject getEndPunc(TeXObjectList list)
+   {
+      int n = list.size();
+
+      for (int i = n-1; i >= 0; i--)
+      {
+         TeXObject obj = list.get(i);
+
+         if (obj instanceof CharObject)
+         {
+            CharObject charObj = (CharObject)obj;
+
+            int codePoint = charObj.getCharCode();
+            int charType = Character.getType(codePoint);
+
+            if (charType == Character.OTHER_PUNCTUATION)
+            {
+               if (isSentenceTerminator(codePoint))
+               {
+                  return charObj;
+               }
+
+               return null;
+            }
+
+            if (charType != Character.FINAL_QUOTE_PUNCTUATION
+                 && charType != Character.END_PUNCTUATION)
+            {
+               return null;
+            }
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            return getEndPunc((TeXObjectList)obj);
+         }
+         else if (!(obj instanceof Ignoreable))
+         {
+            return null;
+         }
+      }
+
+      return null;
    }
 
    public String getFallbackValue(String field)
@@ -1223,7 +1295,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             name = value;
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

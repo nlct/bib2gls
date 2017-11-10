@@ -926,9 +926,9 @@ name},
    parent={resourceoptions}
 }
 
-@dualindexentry{opt.strip-trailing-nopost,
-   name={\csoptfmt{strip\dhyphen trailing\dhyphen nopost}},
-   user1={\meta{value}},
+@dualindexentry{opt.check-end-punctuation,
+   name={\csoptfmt{check\dhyphen end\dhyphen punctuation}},
+   user1={\meta{list}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -1643,7 +1643,7 @@ pattern}},
 }
 
 @dualindexentry{glsxtrcopytoglossary,
-  name={\csfmt{glsxtrcopytoglossary}},
+  name={\csfmt{gls\-xtr\-copy\-to\-glossary}},
   user1={\margm{label}\margm{type}},
   description={copies the entry given by \meta{label} to the
 glossary given by \meta{type}},
@@ -1652,7 +1652,7 @@ glossary given by \meta{type}},
 }
 
 @dualindexentry{glsxtrnewglslike,
-  name={\csfmt{glsxtrnewglslike}},
+  name={\csfmt{gls\-xtr\-new\-gls\-like}},
   user1={\oargm{options}\margm{prefix}\margm{gls-like
 cs}\margm{glspl-like cs}\margm{Gls-like
 cs}\margm{Glspl-like cs}},
@@ -1662,8 +1662,17 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@dualindexentry{glsxtrnewgls,
+  name={\csfmt{gls\-xtr\-new\-gls}},
+  user1={\oargm{options}\margm{prefix}\margm{cs}},
+  description={defines the command \meta{cs} to behave like 
+  \cs{gls} with the given label prefix},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
 @dualindexentry{glsnoidxdisplayloc,
-  name={\csfmt{glsnoidxdisplayloc}},
+  name={\csfmt{gls\-no\-idx\-display\-loc}},
   user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}},
   description={handler used to display the number list stored in 
    the \gls[noindex]{dual.field.loclist} field},
@@ -1681,7 +1690,7 @@ cs}\margm{Glspl-like cs}},
 }
 
 @dualindexentry{glsxtrfieldlistadd,
-  name={\csfmt{glsxtrfieldlistadd}},
+  name={\csfmt{gls\-xtr\-field\-list\-add}},
   user1={\margm{label}\margm{field}\margm{item}},
   description={adds the given item to the given field that contains
    an \styfmt{etoolbox} internal list},
@@ -1711,7 +1720,7 @@ cs}\margm{Glspl-like cs}},
 }
 
 @dualindexentry{sortvonname,
-  name={\csfmt{sortvonname}},
+  name={\csfmt{sort\-von\-name}},
   user1={\margm{first name(s)}\margm{von}\margm{surname}},
   description={example command},
   category={command}
@@ -2900,6 +2909,15 @@ field.},
   parent={internalfields}
 }
 
+@dualindexentry{field.fieldendpunc,
+  name={\meta{field}\fieldfmt{endpunc}},
+  description={Used with the \gls{dual.opt.check-end-punctuation}
+  option.},
+  note={internal field set by \appfmt{bibgls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
 @dualindexentry{field.currcount,
   name={\fieldfmt{currcount}},
   description={Used with entry counting to store the current total.},
@@ -3699,7 +3717,7 @@ field.},
 }
 
 @index{glshyperlink,
-  name={\csfmt{glshyperlink}},
+  name={\csfmt{gls\-hyper\-link}},
   user1={\oargm{link text}\margm{label}},
   description={creates a hyperlink to the entry information in the
    glossary},
@@ -3708,7 +3726,7 @@ field.},
 }
 
 @index{glsxtrfielddolistloop,
-  name={\csfmt{glsxtrfielddolistloop}},
+  name={\csfmt{gls\-xtr\-field\-do\-list\-loop}},
   user1={\margm{label}\margm{field}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list},
@@ -3717,7 +3735,7 @@ field.},
 }
 
 @index{glsxtrfieldforlistloop,
-  name={\csfmt{glsxtrfieldforlistloop}},
+  name={\csfmt{gls\-xtr\-field\-for\-list\-loop}},
   user1={\margm{label}\margm{field}\margm{handler}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list, using the given handler},
@@ -3726,7 +3744,7 @@ field.},
 }
 
 @index{glsfieldfetch,
-  name={\csfmt{glsfieldfetch}},
+  name={\csfmt{gls\-field\-fetch}},
   user1={\margm{label}\margm{field}\margm{cs}},
   description={fetches the value of the given field for the given
    label and stores it in the command \meta{cs}},
@@ -3735,7 +3753,7 @@ field.},
 }
 
 @index{glsseeformat,
-  name={\csfmt{glsseeformat}},
+  name={\csfmt{gls\-see\-format}},
   user1={\margm{tag}\margm{labels}\margm{location (ignored)}},
   description={formats the entries identified in the comma separated
    list of labels as a set of cross-references},
@@ -3744,7 +3762,7 @@ field.},
 }
 
 @index{glsxtruseseeformat,
-  name={\csfmt{glsxtruseseeformat}},
+  name={\csfmt{gls\-xtr\-use\-see\-format}},
   user1={\margm{tag}\margm{labels}},
   description={formats the entries identified in the comma separated
    list of labels as a set of cross-references},
@@ -3753,7 +3771,7 @@ field.},
 }
 
 @index{glsentrytext,
-  name={\csfmt{glsentrytext}},
+  name={\csfmt{gls\-entry\-text}},
   user1={\margm{label}},
   description={expands to the value of the
     \gls[noindex]{dual.field.text} field},
@@ -3762,7 +3780,7 @@ field.},
 }
 
 @index{glsentryname,
-  name={\csfmt{glsentryname}},
+  name={\csfmt{gls\-entry\-name}},
   user1={\margm{label}},
   description={expands to the value of the
     \gls[noindex]{dual.field.name} field},
@@ -3771,7 +3789,7 @@ field.},
 }
 
 @index{glspluralsuffix,
-  name={\csfmt{glspluralsuffix}},
+  name={\csfmt{gls\-plural\-suffix}},
   user1={},
   description={the suffix used to construct the default plural},
   note={provided by \styfmt{glossaries}},
@@ -3779,7 +3797,7 @@ field.},
 }
 
 @index{acrpluralsuffix,
-  name={\csfmt{acrpluralsuffix}},
+  name={\csfmt{acr\-plural\-suffix}},
   user1={},
   description={the suffix used to construct the default plural for
    the short form of acronyms},
@@ -3788,7 +3806,7 @@ field.},
 }
 
 @index{abbrvpluralsuffix,
-  name={\csfmt{abbrvpluralsuffix}},
+  name={\csfmt{abbrv\-plural\-suffix}},
   user1={},
   description={the style sensitive suffix used to construct the 
    default plural for the short form of abbreviations},
@@ -3798,7 +3816,7 @@ field.},
 }
 
 @index{glsxtrabbrvpluralsuffix,
-  name={\csfmt{glsxtrabbrvpluralsuffix}},
+  name={\csfmt{gls\-xtr\-abbrv\-plural\-suffix}},
   user1={},
   description={the default suffix used to construct the plural for
    the short form of abbreviations},
@@ -3825,7 +3843,7 @@ field.},
 }
 
 @index{glscurrententrylabel,
-  name={\csfmt{glscurrententrylabel}},
+  name={\csfmt{gls\-current\-entry\-label}},
   user1={},
   description={only for use in the glossary, such as in the style or
 in the post-name or post-description hooks, this expands to the
@@ -3835,7 +3853,7 @@ label of the current entry},
 }
 
 @index{glsxtrusefield,
-  name={\csfmt{glsxtrusefield}},
+  name={\csfmt{gls\-xtr\-use\-field}},
   user1={\margm{entry label}\margm{field label}},
   description={expands to the value of the given field for the given
    entry},
@@ -3854,26 +3872,58 @@ label of the current entry},
 }
 
 @index{glsxtrifhasfield,
-  name={\csfmt{glsxtrifhasfield}},
-  user1={\margm{entry label}\margm{field label}\margm{true}\margm{false}},
+  name={\csfmt{gls\-xtr\-if\-has\-field}},
+  user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry has the given field set
-   without testing if the entry exists},
+   without testing if the entry exists and adds implicit scoping
+   to \meta{true} and \meta{false}},
   note={provided by \styfmt{glossaries-extra} v1.19+},
+  seealso={GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@index{glsxtrifhasfield*,
+  name={\csfmt{gls\-xtr\-if\-has\-field*}},
+  user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry has the given field set
+   without testing if the entry exists and without introducing
+   an implicit scope},
+  note={provided by \styfmt{glossaries-extra} v1.19+},
+  seealso={GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@index{GlsXtrIfFieldUndef,
+  name={\csfmt{Gls\-Xtr\-If\-Field\-Undef}},
+  user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given field isn't defined for the given
+   entry, which may also not exist},
+  note={provided by \styfmt{glossaries-extra} v1.23+},
   category={command}
 }
 
 @index{ifglshasfield,
-  name={\csfmt{ifglshasfield}},
-  user1={\margm{entry label}\margm{field label}\margm{true}\margm{false}},
+  name={\csfmt{if\-gls\-has\-field}},
+  user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    given field set},
   note={provided by \styfmt{glossaries}},
-  seealso={glsxtrifhasfield},
+  seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@dualindexentry{glsxtrifcustomdiscardperiod,
+  name={\csfmt{gls\-xtr\-if\-custom\-discard\-period}},
+  user1={\margm{true}\margm{false}},
+  description={should expand to \meta{true} if the post-link hook
+   should check for a following full stop (in addition to attribute
+   checks) otherwise should expand to \meta{false}},
+  note={provided by \styfmt{glossaries-extra} v1.23+},
   category={command}
 }
 
 @index{glsaddkey,
-  name={\csfmt{glsaddkey}},
+  name={\csfmt{gls\-add\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}\margm{no link ucfirst cs}\margm{link cs}\margm{link ucfirst cs}\margm{link allcaps cs}},
   description={adds a new key for use in \cs{newglossaryentry}
    and associated commands to access it},
@@ -3882,7 +3932,7 @@ label of the current entry},
 }
 
 @index{glsxtrprovidestoragekey,
-  name={\csfmt{glsxtrprovidestoragekey}},
+  name={\csfmt{gls\-xtr\-provide\-storage\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}},
   description={adds a new key, if not already defined, for use in \cs{newglossaryentry}
    and an associated command
@@ -3893,7 +3943,7 @@ label of the current entry},
 }
 
 @index{glsaddstoragekey,
-  name={\csfmt{glsaddstoragekey}},
+  name={\csfmt{gls\-add\-storage\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}},
   description={adds a new key for internal use that can be set in 
     \cs{newglossaryentry}},
@@ -3902,7 +3952,7 @@ label of the current entry},
 }
 
 @index{glsnavhypertarget,
-  name={\csfmt{glsnavhypertarget}},
+  name={\csfmt{gls\-nav\-hyper\-target}},
   user1={\oargm{type}\margm{label}\margm{text}},
   description={creates a hyper target for the group given by
     \meta{label} for the given glossary type and displays the text},
@@ -3911,7 +3961,7 @@ label of the current entry},
 }
 
 @index{glsnoexpandfields,
-  name={\csfmt{glsnoexpandfields}},
+  name={\csfmt{gls\-noexpand\-fields}},
   user1={},
   description={don't expand fields when an entry is defined},
   note={provided by \styfmt{glossaries}},
@@ -3945,7 +3995,7 @@ label of the current entry},
 }
 
 @index{acronymtype,
-  name={\csfmt{acronymtype}},
+  name={\csfmt{acronym\-type}},
   user1={},
   description={expands to the default glossary type when using
    \cs{newacronym}},
@@ -3954,7 +4004,7 @@ label of the current entry},
 }
 
 @index{glsxtrabbrvtype,
-  name={\csfmt{glsxtrabbrvtype}},
+  name={\csfmt{gls\-xtr\-abbrv\-type}},
   user1={},
   description={expands to the default glossary type when using
    \cs{newabbreviation}},
@@ -3971,7 +4021,7 @@ label of the current entry},
 }
 
 @index{glsxtrnopostpunc,
-  name={\csfmt{glsxtr\-no\-post\-punc}},
+  name={\csfmt{gls\-xtr\-no\-post\-punc}},
   user1={},
   description={suppresses the post-description punctuation
    without suppressing the post-description hook},
@@ -3979,8 +4029,18 @@ label of the current entry},
   category={command}
 }
 
+@index{glsxtrrestorepostpunc,
+  name={\csfmt{gls\-xtr\-restore\-post\-punc}},
+  user1={},
+  description={used within post-description category hooks, 
+   this restores the post-description punctuation
+   if it's been suppressed with \cs{glsxtrnopostpunc}},
+  note={provided by \styfmt{glossaries-extra} v1.23+},
+  category={command}
+}
+
 @index{loadglsentries,
-  name={\csfmt{loadglsentries}},
+  name={\csfmt{load\-gls\-entries}},
   user1={\oargm{type}\margm{file}},
   description={locally redefines \cs{glsdefaulttype}
     to \meta{type} and inputs \meta{file}},
@@ -4065,7 +4125,7 @@ label of the current entry},
 }
 
 @index{glsnoidxloclist,
-  name={\csfmt{glsnoidxloclist}},
+  name={\csfmt{gls\-noidx\-loc\-list}},
   user1={\margm{location list cs}},
   description={iterates over the given internal location list using
    the \cs{glsnoidxloclisthandler} handler},
@@ -4616,7 +4676,7 @@ defined},
 }
 
 @index{apptoglossarypreamble,
-  name={\csfmt{apptoglossarypreamble}},
+  name={\csfmt{app\-to\-glossary\-preamble}},
   user1={\oargm{type}\margm{code}},
   description={appends \meta{code} to the preamble for the given
 glossary},
@@ -4669,7 +4729,7 @@ packages},
 }
 
 @index{glsxtruserfield,
-  name={\csfmt{glsxtruserfield}},
+  name={\csfmt{gls\-xtr\-user\-field}},
   user1={},
   description={used by the parenthetical abbreviation styles, this
    expands to the label of the field used to store the parenthetical
@@ -4679,7 +4739,7 @@ packages},
 }
 
 @index{glsxtrpostdescabbreviation,
-  name={\csfmt{glsxtrpostdescabbreviation}},
+  name={\csfmt{gls\-xtr\-post\-desc\-abbreviation}},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
@@ -4689,7 +4749,7 @@ packages},
 }
 
 @index{glsxtrpostdescsymbol,
-  name={\csfmt{glsxtrpostdescsymbol}},
+  name={\csfmt{gls\-xtr\-post\-desc\-symbol}},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
@@ -4699,7 +4759,7 @@ packages},
 }
 
 @index{glsxtrpostdescgeneral,
-  name={\csfmt{glsxtrpostdescgeneral}},
+  name={\csfmt{gls\-xtr\-post\-desc\-general}},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
@@ -4708,8 +4768,42 @@ packages},
   category={command}
 }
 
+@index{glsxtrpostdesccategory,
+  name={\csfmt{gls\-xtr\-post\-desc\-\meta{category}}},
+  user1={},
+  description={hook used after the description is displayed in the
+   glossary for entries that have the
+   \gls[noindex]{dual.field.category} set to \meta{category}},
+  note={common category hooks such as 
+   \cs{glsxtrpostdescgeneral} are provided by
+\styfmt{glossaries-extra}, custom categories need the hook defined},
+  category={command}
+}
+
+@index{glsxtrpostnamecategory,
+  name={\csfmt{gls\-xtr\-post\-name\-\meta{category}}},
+  user1={},
+  description={hook used after the name is displayed in the
+   glossary for entries that have the
+   \gls[noindex]{dual.field.category} set to \meta{category}},
+  note={user needs to define hook for use with
+   \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrpostlinkcategory,
+  name={\csfmt{gls\-xtr\-post\-link\-\meta{category}}},
+  user1={},
+  description={hook used after commands like \cs{gls} 
+   for entries that have the
+   \gls[noindex]{dual.field.category} set to \meta{category}},
+  note={user needs to define hook for use with
+   \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @index{GlsXtrFmtDefaultOptions,
-  name={\csfmt{GlsXtrFmtDefaultOptions}},
+  name={\csfmt{Gls\-Xtr\-Fmt\-Default\-Options}},
   user1={},
   description={the default options used by \cs{glsxtrfmt}},
   note={provided by \styfmt{glossaries-extra}},
@@ -4938,6 +5032,14 @@ list},
   user1={},
   description={insert before \cs{DTLformatlistlastsep} if the list
 has three or more items},
+  note={provided by \styfmt{datatool-base}},
+  category={command}
+}
+
+@index{DTLandname,
+  name={\csfmt{DTL\-and\-name}},
+  user1={},
+  description={used in the definition of \cs{DTLformatlistlastsep}},
   note={provided by \styfmt{datatool-base}},
   category={command}
 }

@@ -36,6 +36,7 @@ v1.1 (pending):
      - write-preamble
      - bibtex-contributor-fields
      - contributor-order
+     - check-end-punctuation
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and
