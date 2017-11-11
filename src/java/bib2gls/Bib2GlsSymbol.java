@@ -113,7 +113,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
          {
             description = getFieldValue(field);
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

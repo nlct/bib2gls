@@ -121,7 +121,7 @@ public class Bib2GlsTertiaryIndexAbbrevEntry extends Bib2GlsDualIndexAbbrev
          {
             longStr = getFieldValue(field);
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

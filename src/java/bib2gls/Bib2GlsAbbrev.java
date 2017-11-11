@@ -125,7 +125,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
          {
             longText = getFieldValue(field);
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

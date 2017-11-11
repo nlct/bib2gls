@@ -4811,12 +4811,24 @@ public class GlsResource
          {
             String command;
 
-            writer.println("\\providecommand*{\\bibglssetwidest}[2]{%");
-            writer.println("  \\glssetwidest[#1]{#2}");
+            writer.println("\\ifdef\\glsupdatewidest");
+            writer.println("{");
+            writer.println("  \\providecommand*{\\bibglssetwidest}[2]{%");
+            writer.println("    \\glsupdatewidest[#1]{#2}%");
+            writer.println("  }");
+            writer.println("  \\providecommand*{\\bibglssetwidestfortype}[3]{%");
+            writer.print("    \\apptoglossarypreamble[#1]");
+            writer.println("{\\glsupdatewidest[#2]{#3}}%");
+            writer.println("  }");
             writer.println("}");
-
-            writer.println("\\providecommand*{\\bibglssetwidestfortype}[3]{%");
-            writer.println("  \\apptoglossarypreamble[#1]{\\glssetwidest[#2]{#3}}%");
+            writer.println("{");
+            writer.println("  \\providecommand*{\\bibglssetwidest}[2]{%");
+            writer.println("    \\glssetwidest[#1]{#2}%");
+            writer.println("  }");
+            writer.println("  \\providecommand*{\\bibglssetwidestfortype}[3]{%");
+            writer.print("    \\apptoglossarypreamble[#1]");
+            writer.println("{\\glssetwidest[#2]{#3}}%");
+            writer.println("  }");
             writer.println("}");
 
 

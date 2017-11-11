@@ -135,7 +135,7 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
          {
             symbolStr = getFieldValue(field);
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

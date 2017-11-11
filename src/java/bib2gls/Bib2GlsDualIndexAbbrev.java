@@ -163,7 +163,7 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
          {
             longStr = getFieldValue(field);
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

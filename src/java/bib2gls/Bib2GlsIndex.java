@@ -100,10 +100,12 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       {
          String field = it.next();
 
-         writer.format("%s", sep);
-
-         sep = String.format(",%n");
-         writer.format("%s={%s}", field, getFieldValue(field));
+         if (bib2gls.isKnownField(field))
+         {
+            writer.format("%s", sep);
+            sep = String.format(",%n");
+            writer.format("%s={%s}", field, getFieldValue(field));
+         }
       }
 
       writer.println("}");

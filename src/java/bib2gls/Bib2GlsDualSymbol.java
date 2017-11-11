@@ -116,7 +116,7 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
          {
             description = getFieldValue(field);
          }
-         else
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
 

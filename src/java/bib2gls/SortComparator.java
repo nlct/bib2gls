@@ -114,6 +114,28 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       entry.putField(sortStorageField, value);
 
+      if (settings.getIdenticalSortAction() 
+         == SortSettings.IDENTICAL_SORT_USE_FIELD)
+      {
+         String field = settings.getIdenticalSortField();
+
+         String fallbackValue = entry.getFieldValue(field);
+         BibValueList list = entry.getField(field);
+
+         if (fallbackValue == null)
+         {
+            fallbackValue = "";
+         }
+         else if (bib2gls.useInterpreter() && list != null
+                   && fallbackValue.matches("(?s).*[\\\\\\$\\{\\}\\~].*"))
+         {
+            fallbackValue = bib2gls.interpret(fallbackValue, list, 
+               settings.isTrimOn());
+         }
+
+         entry.putField(sortFallbackField, fallbackValue);
+      }
+
       return value;
    }
 
@@ -266,24 +288,15 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
          case SortSettings.IDENTICAL_SORT_USE_FIELD:
 
-            String field = settings.getIdenticalSortField();
+            String value1 = entry1.getFieldValue(sortFallbackField);
 
-            String value1 = entry1.getFieldValue(field);
+            String value2 = entry2.getFieldValue(sortFallbackField);
 
-            if (value1 == null)
+            if (bib2gls.getDebugLevel() > 0)
             {
-               value1 = "";
+               bib2gls.logMessage(bib2gls.getMessage("warning.identical.field", 
+                 settings.getIdenticalSortField(), value1, value2));
             }
-
-            String value2 = entry2.getFieldValue(field);
-
-            if (value2 == null)
-            {
-               value2 = "";
-            }
-
-            bib2gls.debug(bib2gls.getMessage("warning.identical.field", 
-              field, value1, value2));
 
             return value1.compareTo(value2);
       }
@@ -390,6 +403,8 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    }
 
    protected String sortStorageField = "sort";
+
+   protected String sortFallbackField = "sortfallback";
 
    protected String sortField, groupField, entryType;
 
