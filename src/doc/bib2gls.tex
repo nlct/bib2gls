@@ -4120,7 +4120,9 @@ that don't get seen by \LaTeX.
 The \glostyle{alttree} glossary style needs to know the widest
 \field{name} (for each level, if hierarchical). This can
 be set using \ics{glssetwidest} provided by the \styfmt{glossaries}
-package, but this requires knowing which name is the widest.
+package (or similar commands like \ics{glsupdatewidest} provided by
+\styfmt{glossaries-extra-stylemods}), but this requires knowing which
+name is the widest.
 
 The boolean option \csopt[true]{set-widest} will try to calculate
 the widest names for each hierarchical level. Since it doesn't know
@@ -4148,29 +4150,18 @@ of the \field{name} field and \meta{number} is a rough guide
 to the width of \meta{text} assuming the operating system's
 default serif font. The entry that has the largest \meta{number}
 is the one that will be selected. This will then be implemented
-using:
-\begin{alltt}
-\ics{glssetwidest}\oargm{level}\marg{\ics{glsentryname}\margm{id}}
-\end{alltt}
-where \meta{id} is the entry's label. This leaves \TeX\ to
+using \gls{bibglssetwidest} if the \field{type} is unknown
+or \gls{bibglssetwidestfortype}.  This leaves \TeX\ to
 compute the width according to the document fonts.
-
-If \csopt{type} has been set, the \ics{glssetwidest} command
-will be appended to the glossary preamble for that type, otherwise
-it's simply set in the \ext{glstex} file and may be overridden
-later in the document if required. (Similarly if \csopt{dual-type}
-and \csopt{secondary} have been used.)
-
-Rather than directly using \ics{glssetwidest}, \bibgls\ provides
-\csref{bibglssetwidest} (where the type isn't known) and 
-\gls{bibglssetwidestfortype} (where \ics{glssetwidest} needs to be
-appended to the glossary preamble).
 
 Note that if you don't set a separate sort for dual entries with
 \csopt{dual-sort} then the widest entry name will be determined
 across all the primary and dual entries together. Additionally, if
 you have multiple resource sets, they may override previously
 calculated widest names.
+In general, if you have more than one glossary it's best to
+set the \field{type} using options like \csopt{type} and
+\csopt{dual-type}.
 
 \optsection{entry-type-aliases}
 
@@ -8260,16 +8251,15 @@ the entry labels;
 \item\optfmt{original id}: if sort values are identical, compare the
 original unprefixed entry labels (as given in the \ext{bib} file);
 \item\meta{field}: if sort values are identical, compare
-the values from the given \meta{field} (without using the
-interpreter).
+the values from the given \meta{field}.
 \end{itemize}
 In each case (other than \csopt[none]{identical-sort-action}) a
-simple string comparison is used. If \meta{value} isn't a recognised
-keyword or valid field an error will occur.
-The default setting is \csopt[id]{identical-sort-action}.
-If you want to use a field that's not a simple label (such as the
-\field{category} field) you may find it better to use
-\csopt{sort-suffix} for locale-sensitive sorts.
+simple case-sensitive string comparison is used. If \meta{value}
+isn't a recognised keyword or valid field an error will occur.  The
+default setting is \csopt[id]{identical-sort-action}.  If you're
+using one of the sort rules listed in \tableref{tab:sortoptionsrule}
+and you also want a locale-sensitive sort used on the fallback, then
+you need to use \csopt{sort-suffix} instead.
 
 \bibgls\ allows duplicate sort values, but this can cause a problem
 for hierarchical entries where parent entries with duplicate sort
@@ -11097,8 +11087,17 @@ This is used by \csopt{set-widest} to set the widest name for the
 given hierarchical level where the glossary type can't be determined.
 This is defined as:
 \begin{verbatim}
+\providecommand*{\bibglssetwidest}[2]{\glsupdatewidest[#1]{#2}}
+\end{verbatim}
+if \ics{glsupdatewidest} is defined, otherwise it will be
+defined to use
+\ics{glssetwidest}:
+\begin{verbatim}
 \providecommand*{\bibglssetwidest}[2]{\glssetwidest[#1]{#2}}
 \end{verbatim}
+Since this isn't scoped, this will affect other glossaries.
+In general, if you have more than one glossary it's best to
+set the \field{type} using options like \csopt{type}.
 
 \cssection{bibglssetwidestfortype}
 
@@ -11108,9 +11107,18 @@ given hierarchical level where the glossary type is known. This
 is defined as:
 \begin{verbatim}
 \providecommand*{\bibglssetwidestfortype}[3]{%
+  \apptoglossarypreamble[#1]{\glsupdatewidest[#2]{#3}}%
+}
+\end{verbatim}
+if \ics{glsupdatewidest} is defined, otherwise it will be
+defined to use \ics{glssetwidest}:
+\begin{verbatim}
+\providecommand*{\bibglssetwidestfortype}[3]{%
   \apptoglossarypreamble[#1]{\glssetwidest[#2]{#3}}%
 }
 \end{verbatim}
+Since the glossary preamble is scoped, this won't affect other
+glossaries.
 
 \cssection{bibglscontributorlist}
 
@@ -11777,7 +11785,7 @@ aliased with \csopt{field-aliases}.
 
 There are other ways in which this data could be specified. For
 example, the \field{description} field could contain a brief summary
-(or \qt{log line}). The \field{author} field could use \BibTeX's
+(or \qt{log line}). The \fieldfmt{author} field could use \BibTeX's
 syntax instead with \csopt{bibtex-contributor-fields} to convert it.
 
 The contents of \filefmt{books.bib} are as follows:
@@ -11871,6 +11879,94 @@ doesn't occur in the \field{description} field. (Note that
 
 The contents of \filefmt{films.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/films.bib}
+
+\filesection{mathgreek.bib}
+
+The \exfile{mathgreek.bib} file contains Greek letters for use in
+maths mode. These are all defined use \atentry{symbol}, which means
+that by default the \field{sort} field will be obtained from the
+label not from the \field{name} field. However, if you want to sort
+by the \field{name} field (for example, with \csopt[name]{sort-field})
+the \TeX\ parser library recognises all the mathematical Greek letter commands 
+provided in the \LaTeX\ kernel. Additionally it recognises
+\ics{omicron} which isn't provided by \LaTeX\ (the symbol can be
+reproduced with a lower case Latin \qt{o}).
+
+The \ext{bib} file could just use \code{o}:
+\begin{verbatim}
+@symbol{omicron,
+  name={\ensuremath{o}},
+  description={omicron},
+  identifier={mathgreek}
+}
+\end{verbatim}
+but this means that if \bibgls\ sorts according to the \field{name}
+field using a letter sort, this entry will come before all the other
+Greek letters since the character \qt{o} has Unicode value \hex{6F}
+whereas, for example, mathematical italic small alpha ($\alpha$)
+has Unicode value \hex{1D6FC}. This means that for sorting purposes
+it's better to use \ics{omicron}:
+\begin{verbatim}
+@symbol{omicron,
+  name={\ensuremath{\omicron}},
+  description={omicron},
+  identifier={mathgreek}
+}
+\end{verbatim}
+but \LaTeX\ needs a definition for this, so it's provided in the
+\atentry{preamble}:
+\begin{verbatim}
+@preamble{"\providecommand{\omicron}{o}"}
+\end{verbatim}
+The \TeX\ parser library similarly provides the missing upper case
+Greek letters, and these can be dealt with in the same way.
+
+The contents of \filefmt{mathgreek.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/mathgreek.bib}
+
+\filesection{bigmathsymbols.bib}
+
+The \exfile{bigmathsymbols.bib} file contains mathematical symbols
+that have a large version in display mode. As with
+\exfile{mathgreek.bib} the entries are defined using
+\atentry{symbol}. This example file requires the \sty{stix} package
+as not all of the commands are provided by the \LaTeX\ kernel. 
+This file also has a preamble:
+\begin{verbatim}
+@preamble{"\providecommand{\bigoperatornamefmt}[1]{%
+ $\displaystyle#1\textstyle#1$}
+\providecommand{\nary}[1]{$#1$-ary}"}
+\end{verbatim}
+The first command \ics{bigoperatornamefmt} is used in the
+\field{name} field to display both the in-line and display versions
+of the symbol. The \TeX\ parser library only has a limited ability
+to interpret this as not all the symbols have Unicode in-line and large
+versions. In some cases, such as the integral symbol $\int$ only has
+a small version. However, the interpreter works well enough to guess
+at the widest name if \csopt{set-widest} is used. There's no
+advantage in sorting according to the \field{name} field here, as
+the Unicode symbols are scattered about different blocks. Better
+approaches are to sort according to document use (\cs[use]{sort})
+or sort according to the \field{description} field.
+
+The other custom command is \ics{nary} to provide semantic markup
+for \qt{$n$-ary}. This could be defined without an argument:
+\begin{verbatim}
+\providecommand{\nary}{$n$-ary}
+\end{verbatim}
+but providing an argument will allow \verb|\nary{n}| to work
+with first letter uppercasing in the event that the
+\field{description} field has a case-change applied (otherwise
+it would end up as \qt{$N$-ARY}).
+
+As with the other sample \ext{bib} files, each entry is given a
+custom \fieldfmt{identifier} field, which by default will be
+ignored. In this case, \fieldfmt{identifier} is either set to 
+\code{naryoperator} (for $n$-ary operators) or \code{integral}
+for integrals.
+
+The contents of \filefmt{bigmathsymbols.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/bigmathsymbols.bib}
 
 \filesection{sample-chemical.tex}
 
@@ -12754,6 +12850,8 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-authors.tex}
 
+\lstinputlisting[firstline=5]{../examples/sample-authors.tex}
+
 \begin{figure}[p]
 \figcontents
 {%
@@ -12761,6 +12859,73 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 }
 {\caption{\filefmt{sample-authors.pdf}}}
 {fig:sample-authors.pdf}
+\end{figure}
+
+\filesection{sample-maths.tex}
+
+This example uses the files \exfile{bigmathsymbols.bib}
+and \exfile{mathgreek.bib}. The \sty{stix} package is required for
+some of the commands used in \exfile{bigmathsymbols.bib}, so that
+must be loaded in the document.
+
+I decided to use the \glostyle{mcolalttree} style for this document,
+which means that the \sty{glossary-mcols} package is required and
+the styles need patching, which can be done with 
+the \styopt{stylemods} package option:
+\begin{verbatim}
+\usepackage[record,% using bib2gls
+ nostyles,% don't load default styles
+ postdot,% append a dot after descriptions
+ stylemods={mcols},% load glossary-mcols.sty and patch
+ style=mcolalttree]{glossaries-extra}
+\end{verbatim}
+Since I'm not using a group-based style I don't need the
+\longarg{group} switch. I'm also not referencing any of the entries
+in the document as I'm just generating a complete list of all the
+defined symbols. This means I need to tell \bibgls\ to select all
+entries and don't bother saving the \field{location} field:
+\begin{verbatim}
+save-locations=false,
+selection=all
+\end{verbatim}
+Since I'm using a style that's based on \glostyle{alttree} I need to
+find the widest \field{name}, which can be done with
+\csopt{set-widest}.
+
+I've used \csopt{field-aliases} to convert the custom
+\fieldfmt{identifier} field to \field{category}, which means I can
+also sort by that field:
+\begin{verbatim}
+sort-field={category},
+field-aliases={identifier=category}
+\end{verbatim}
+Since this will cause identical sort values, I need to provide a
+fallback. Here I've decided to fallback on the \field{description}
+field:
+\begin{verbatim}
+identical-sort-action={description}
+\end{verbatim}
+This means that entries will be order by \field{category} and 
+then \field{description}, which naturally creates blocks of symbol
+types in the glossary.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-maths
+bib2gls sample-maths
+pdflatex sample-maths
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-maths.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-maths.tex}
+
+\begin{figure}[p]
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-maths.pdf}}%
+}
+{\caption{\filefmt{sample-maths.pdf}}}
+{fig:sample-maths.pdf}
 \end{figure}
 
 \printcommandsummary

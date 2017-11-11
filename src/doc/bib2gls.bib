@@ -926,6 +926,13 @@ name},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.strip-trailing-nopost,
+   name={\csoptfmt{strip\dhyphen trailing\dhyphen nopost}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.check-end-punctuation,
    name={\csoptfmt{check\dhyphen end\dhyphen punctuation}},
    user1={\meta{list}},
@@ -1698,6 +1705,27 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{omicron,
+  name={\csfmt{omicron}},
+  user1={},
+  description={custom command},
+  category={command}
+}
+
+@index{bigoperatornamefmt,
+  name={\csfmt{bigoperatornamefmt}},
+  user1={\margm{text}},
+  description={custom command},
+  category={command}
+}
+
+@index{nary,
+  name={\csfmt{nary}},
+  user1={\margm{text}},
+  description={custom command},
+  category={command}
+}
+
 @dualindexentry{strong,
   name={\csfmt{strong}},
   user1={\margm{text}},
@@ -2143,6 +2171,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{glostyle.alttreegroup,
   name={\glostylefmt{alttreegroup}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@index{glostyle.mcolalttree,
+  name={\glostylefmt{mcolalttree}},
   category={glossarystyle},
   parent={glossarystyle}
 }
@@ -3716,6 +3750,18 @@ field.},
   name={\filefmt{sample\dhyphen media.tex}}
 }
 
+@dualindexentry{file.bigmathsymbols.bib,
+  name={\filefmt{bigmathsymbols.bib}}
+}
+
+@dualindexentry{file.mathgreek.bib,
+  name={\filefmt{mathgreek.bib}}
+}
+
+@dualindexentry{file.sample-maths.tex,
+  name={\filefmt{sample\dhyphen maths.tex}}
+}
+
 @index{glshyperlink,
   name={\csfmt{gls\-hyper\-link}},
   user1={\oargm{link text}\margm{label}},
@@ -4918,6 +4964,17 @@ packages},
   description={used with the \glostyle{alttree} style to set the
    widest entry name for the given level},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsupdatewidest,
+  name={\csfmt{gls\-update\-widest}},
+  user1={\oargm{level}\margm{text}},
+  description={as \cs{glssetwidest} but only sets if \meta{text} is
+wider than the current value},
+  note={provided by \styfmt{glossaries-extra-stylemods} version
+1.23+},
+  seealso={glssetwidest},
   category={command}
 }
 

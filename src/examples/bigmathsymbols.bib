@@ -1,0 +1,145 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+% Encoding: UTF-8
+
+% requires stix.sty
+
+@preamble{"\providecommand{\bigoperatornamefmt}[1]{%
+ $\displaystyle#1\textstyle#1$}
+\providecommand{\nary}[1]{$#1$-ary}"}
+
+@symbol{bigsqcap,
+  name={\bigoperatornamefmt{\bigsqcap}},
+  text={\bigsqcap},
+  description={\nary{n} square intersection operator},
+  identifier={naryoperator}
+}
+
+@symbol{bigsqcup,
+  name={\bigoperatornamefmt{\bigsqcup}},
+  text={\bigsqcup},
+  description={\nary{n} square union operator},
+  identifier={naryoperator}
+}
+
+@symbol{sum,
+  name={\bigoperatornamefmt{\sum}},
+  text={\sum},
+  description={\nary{n} summation},
+  identifier={naryoperator}
+}
+
+@symbol{prod,
+  name={\bigoperatornamefmt{\prod}},
+  text={\prod},
+  description={\nary{n} product},
+  identifier={naryoperator}
+}
+
+@symbol{coprod,
+  name={\bigoperatornamefmt{\coprod}},
+  text={\coprod},
+  description={\nary{n} coproduct},
+  identifier={naryoperator}
+}
+
+@symbol{bigcap,
+  name={\bigoperatornamefmt{\bigcap}},
+  text={\bigcap},
+  description={\nary{n} intersection},
+  identifier={naryoperator}
+}
+
+@symbol{bigcup,
+  name={\bigoperatornamefmt{\bigcup}},
+  text={\bigcup},
+  description={\nary{n} union},
+  identifier={naryoperator}
+}
+
+@symbol{bigodot,
+  name={\bigoperatornamefmt{\bigodot}},
+  text={\bigodot},
+  description={\nary{n} circled dot operator},
+  identifier={naryoperator}
+}
+
+@symbol{bigoplus,
+  name={\bigoperatornamefmt{\bigoplus}},
+  text={\bigoplus},
+  description={\nary{n} circled plus operator},
+  identifier={naryoperator}
+}
+
+@symbol{bigotimes,
+  name={\bigoperatornamefmt{\bigotimes}},
+  text={\bigotimes},
+  description={\nary{n} circled times operator},
+  identifier={naryoperator}
+}
+
+@symbol{biguplus,
+  name={\bigoperatornamefmt{\biguplus}},
+  text={\biguplus},
+  description={\nary{n} union operator with plus},
+  identifier={naryoperator}
+}
+
+@symbol{bigvee,
+  name={\bigoperatornamefmt{\bigvee}},
+  text={\bigvee},
+  description={\nary{n} logical or},
+  identifier={naryoperator}
+}
+
+@symbol{bigwedge,
+  name={\bigoperatornamefmt{\bigwedge}},
+  text={\bigwedge},
+  description={\nary{n} logical and},
+  identifier={naryoperator}
+}
+
+@symbol{int,
+  name={\bigoperatornamefmt{\int}},
+  text={\int},
+  description={integral},
+  identifier={integral}
+}
+
+@symbol{iint,
+  name={\bigoperatornamefmt{\iint}},
+  text={\iint},
+  description={double integral},
+  identifier={integral}
+}
+
+@symbol{iiint,
+  name={\bigoperatornamefmt{\iiint}},
+  text={\iiint},
+  description={triple integral},
+  identifier={integral}
+}
+
+@symbol{oint,
+  name={\bigoperatornamefmt{\oint}},
+  text={\oint},
+  description={contour integral},
+  identifier={integral}
+}
+
+@symbol{oiint,
+  name={\bigoperatornamefmt{\oiint}},
+  text={\oiint},
+  description={surface integral},
+  identifier={integral}
+}
+
+@symbol{oiiint,
+  name={\bigoperatornamefmt{\oiiint}},
+  text={\oiiint},
+  description={volume integral},
+  identifier={integral}
+}
+

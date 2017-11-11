@@ -3,7 +3,7 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
-	sample-media.pdf sample-authors.pdf
+	sample-media.pdf sample-authors.pdf sample-maths.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -49,6 +49,13 @@ sample-authors.pdf	: $(DEPS) sample-authors.tex \
 	$(BIB2GLS) sample-authors
 	pdflatex sample-authors
 	pdflatex sample-authors
+
+sample-maths.pdf	: $(DEPS) sample-maths.tex \
+	bigmathsymbols.bib mathgreek.bib
+	pdflatex sample-maths
+	$(BIB2GLS) sample-maths
+	pdflatex sample-maths
+	pdflatex sample-maths
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}
