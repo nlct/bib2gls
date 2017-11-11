@@ -1103,9 +1103,10 @@ The other cases that the interpreter is used for are:
 \begin{itemize}
 \item when \csopt{set-widest} is used to determine the width of
 the \field{name} field;
-\item if the \field{parent} or \field{alias} field contain
+\item if the \field{parent}, \field{category}, \field{type} 
+or \field{alias} fields contain
 \verb|\| or \verb|{| or \verb|}| the interpreter is used 
-since these fields must be just a label referencing another entry
+since these fields must be just a label
 (other special characters aren't checked as they won't expand
 characters allowed in a label).
 \end{itemize}
@@ -6002,18 +6003,20 @@ Note that the interpreter isn't used during the check.
 If the \field{description} ends with a command then a dot will be
 appended (unless it's \cs{glsxtrnopostpunc} or \cs{nopostdesc}) even if
 that command expands in such a way that it ends with a terminating
-punctuation character.
+punctuation character. This option only applies to the
+\field{description} field.
 
 \optsection{strip-trailing-nopost}
 
-This option is always performed before \cs{post-description-dot}
+This option is always performed before \csopt{post-description-dot}
 when adjusting the \field{description} field. The default
 setting is \csopt[false]{strip-trailing-nopost}. If 
 \optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{glsxtrnopostpunc}
 found in the \field{description} field will be removed.
 Note that the command (possibly followed by ignored space) must be
 at the very end of the description for it to be removed. A
-description should not contain both commands.
+description should not contain both commands. This option
+only applies to the \field{description} field.
 
 For example, \cs{nopostdesc} will be stripped from:
 \begin{verbatim}
@@ -6052,7 +6055,9 @@ in \bibgls's \langxml.
 \end{itemize}
 If a sentence terminator is found, an internal field is created
 called \field{fieldendpunc} that contains the punctuation
-character.
+character. Fields whose values must be labels (such as
+\field{parent}, \field{category} and \field{type}) aren't checked,
+even if they're included in \meta{list}.
 
 The default \code{sentence.terminators} is defined in \file{bib2gls-en.xml}
 as:

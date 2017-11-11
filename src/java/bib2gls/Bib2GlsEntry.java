@@ -738,8 +738,14 @@ public class Bib2GlsEntry extends BibEntry
                value = convertBibTeXAuthorField(parser, field, value);
             }
 
-            if (field.equals("parent"))
+            if (field.equals("parent") || field.equals("category")
+               || field.equals("type") || field.equals("group")
+               || field.equals("group") || field.equals("seealso") 
+               || field.equals("alias"))
             {
+               // fields that should only expand to a simple label
+               // (cross-referencing fields processed elsewhere)
+
                String strVal = value.expand(parser).toString(parser);
 
                if (bib2gls.useInterpreter() 
@@ -751,9 +757,16 @@ public class Bib2GlsEntry extends BibEntry
                   strVal = bib2gls.interpret(strVal, value, true);
                }
 
-               putField(field, processLabel(strVal));
+               if (field.equals("parent"))
+               {
+                  putField(field, processLabel(strVal));
+               }
+               else
+               {
+                  putField(field, strVal);
+               }
             }
-            else
+            else if (bib2gls.isKnownField(field))
             {
                TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
 
