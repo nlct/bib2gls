@@ -38,6 +38,14 @@
 \newcommand*{\setmembership}[2]{\glsxtrfmt*{setmembership}{{#1}{#2}}}
 \newcommand*{\setcard}[2][]{\glsxtrfmt*[#1]{setcard}{#2}}
 \newcommand*{\nlsetcard}[1]{\glsxtrentryfmt{setcard}{#1}}
+\newcommand*{\transpose}[2][]{\glsxtrfmt*[#1]{transpose}{#2}}
+\newcommand*{\nltranspose}[1]{\glsxtrentryfmt{transpose}{#1}}
+\newcommand*{\inv}[2][]{\glsxtrfmt*[#1]{inverse}{#2}}
+\newcommand*{\nlinv}[1]{\glsxtrentryfmt{inverse}{#1}}
+\newcommand*{\Vtr}[2][]{\glsxtrfmt[#1]{vector}{#2}}
+\newcommand*{\nlVtr}[1]{\glsxtrentryfmt{vector}{#1}}
+\newcommand*{\Mtx}[2][]{\glsxtrfmt[#1]{matrix}{#2}}
+\newcommand*{\nlMtx}[1]{\glsxtrentryfmt{matrix}{#1}}
 
 \begin{document}
 \section{Sets}
@@ -71,6 +79,16 @@ by a set of entities with a set of axioms. For example:
 \gls{realnumbers} &= \setmembership{x}{x\text{ is a real number}}
 \end{align*}
 
+\section{Vectors and Matrices}
+
+A matrix (denoted \gls{matrix}) is a rectangular array of values.
+A vector (denoted \gls{vector}) is a column or row of values (that
+is a one-dimensional matrix).
+\[
+  \gls{identitymatrix}\Vtr{x} = \Vtr{x},\quad
+  \Mtx{A}\inv{\nlMtx{A}} = \gls{identitymatrix},\quad
+  \inv{\nlVtr{x}}\gls{1vec} = \gls{sum}[_i] x_i
+\]
 
 \printunsrtglossaries
 \end{document}

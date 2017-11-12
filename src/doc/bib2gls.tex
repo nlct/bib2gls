@@ -11587,10 +11587,9 @@ The third command is
 \nosecdef{sortart}
 This is the same as \gls{sortname} but is designed for titles,
 phrases or sentences that start with an article (such as \qt{a} or
-\qt{the}). Although it's functionally the same as \gls{sortname},
-it's semantically different and allows for adjustments for one type
-of entry (such as a person's name) without affecting the other (such as a
-book or film title).
+\qt{the}). Although it has the same definition as \gls{sortname}
+in this file, in the interpreted files the article part is omitted
+to completely ignore them in the sorting.
 The fourth command is
 \nosecdef{sortmediacreator}
 which again is functionally the same as \gls{sortname}.
@@ -11614,6 +11613,11 @@ The contents of \filefmt{no-interpret-preamble.bib} are as follows:
 This provides definitions of \gls{sortname}, \gls{sortvonname},
 \gls{sortart} and \gls{sortmediacreator} in \atentry{preamble} 
 that can be picked up by the interpreter and used during sorting.
+Note that in this case \gls{sortart} is defined to ignore the
+article to completely ignore it from sorting. If you happen to have 
+\qt{a \meta{something}} and \qt{the \meta{something}} where the 
+\meta{something}s are identical, you may want to append the article
+to disambiguate them.
 
 The contents of \filefmt{interpret-preamble.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/interpret-preamble.bib}
@@ -12047,6 +12051,10 @@ which is used to format the set membership criteria,
 which is used to format the cardinality of a set,
 \nosecdef{numspacefmt}
 which is used to format \meta{symbol} as a number space,
+\nosecdef{transposefmt}
+which is used to format matrix and vector transposes,
+\nosecdef{invfmt}
+which is used to format inverses,
 \nosecdef{vecfmt}
 which is used to format \meta{symbol} as a vector and
 \nosecdef{mtxfmt}
@@ -12088,8 +12096,7 @@ with \csref{glsxtrfmt} (as in the example above).
 
 In both cases there's a custom \fieldfmt{identifier} field that
 reflects the type of object: \code{numberspace} for number spaces,
-\code{set} for sets, \code{vector} for vectors and \code{matrix} for
-matrices.
+\code{set} for sets, \code{matrix} for matrices or vectors.
 
 Be careful with the set cardinality example. Remember that nested
 links cause problems and the \sty{glossaries-extra} manual advises
@@ -12104,6 +12111,49 @@ also needed.
 
 The contents of \filefmt{mathsobjects.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/mathsobjects.bib}
+
+\filesection{miscsymbols.bib}
+
+The \exfile{miscsymbols.bib} file contains text symbols provided
+by the \isty{marvosym} and \isty{ifsym} packages. The \sty{ifsym}
+package needs to be loaded with the \styoptfmt{weather} option
+to provide the weather commands. Unfortunately both packages define
+\csfmt{Sun} and \csfmt{Lightning}, which causes a conflict. See
+\exfile{sample-textsymbols.tex} for a workaround. Alternatively,
+you can load \sty{ifsym} without the \styoptfmt{weather} option
+and use the internal definition of \sty{ifsym}'s \csfmt{Sun}
+and \csfmt{Lightning} commands:
+\begin{verbatim}
+@symbol{sun,
+  name={\textweathersymbol{16}},
+  description={sunny},
+  identifier={weather}
+}
+
+@symbol{lightning,
+  name={\textweathersymbol{26}},
+  description={thunderstorm},
+  identifier={weather}
+}
+\end{verbatim}
+This removes the conflict, and \csfmt{Sun} and \csfmt{Lightning}
+are as defined by \sty{marvosym}.
+
+There are three types of symbols defined: media controls, information
+and weather. They have the custom \fieldfmt{identifier}
+field set to \code{mediacontrol}, \code{information} and
+\code{weather}, respectively.
+
+Neither of these packages are recognised by \bibgls, which means
+that \csopt{set-widest} won't work with this data nor is it suitable
+for sorting according to the \field{name} field. Instead, either
+sort by label (which is the default for \atentry{symbol}) or
+by the \field{description}. If you want to use one of the \glostyle{alttree}
+styles you'll need to use \ics{glsFindWidestTopLevelName} to
+determine the widest name.
+
+The contents of \filefmt{miscsymbols.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/miscsymbols.bib}
 
 \filesection{sample-chemical.tex}
 
@@ -13093,13 +13143,11 @@ The resulting document is shown in \figureref{fig:sample-msymbols.pdf}.
 
 \filesection{sample-maths.tex}
 
-This example uses 
-\exfile{mathsrelations.bib}, \exfile{binaryoperators.bib},
-\exfile{unaryoperators.bib} and \exfile{mathsobjects.bib}.
-
-This file has a fairly similar preamble to \exfile{sample-msymbols},
-but \exfile{no-interpret-preamble} is now needed to provide
-the \csref{sortart} command for use in the document:
+This example uses \exfile{bigmathsymbols.bib} and \exfile{mathsobjects.bib}.
+It has a fairly similar preamble to \exfile{sample-msymbols.tex},
+but \exfile{no-interpret-preamble.bib} and
+\exfile{interpret-preamble.bib} are now needed to provide
+the \csref{sortart} command:
 \begin{verbatim}
 \GlsXtrLoadResources[
    src={no-interpret-preamble},
@@ -13115,30 +13163,25 @@ defaults to that field. If I decided to use a different field I also
 need to remember to redefine \ics{GlsXtrFmtField} to match.
 
 In this document I only want to select entries that have been
-indexed, so I've omitted the \csref{selection} option, however
+indexed, so I've omitted the \csref{selection} option I used in the
+\exfile{sample-msymbols.tex} example, however
 I still don't want any number lists so I still have
 \csopt[false]{save-locations}.
 
-To make it easier to use \csref{glsxtrfmt}, I've provided some
-semantic commands. These actually use the starred form
-\csref{glsxtrfmt*} to make use of the optional argument, but
-remember that this requires \sty{glossaries-extra} version 1.23+.
-I want \csref{glsxtrfmt} to index which means I need to redefine
-\ics{GlsXtrFmtDefaultOptions} so that it doesn't use \code{noindex}:
+I want \csref{glsxtrfmt} to index (which it doesn't by default) so
+that means I need to redefine \ics{GlsXtrFmtDefaultOptions} 
+to prevent it from using \code{noindex}:
 \begin{verbatim}
 \renewcommand{\GlsXtrFmtDefaultOptions}{}
 \end{verbatim}
 I've provided some convenient wrapper commands that use
-\csref{glsxtrfmt*} or the non-linking \csref{glsxtrentryfmt}:
+\csref{glsxtrfmt*} or the non-linking \csref{glsxtrentryfmt} that
+are in the form:
 \begin{verbatim}
 \newcommand{\set}[2][]{\glsxtrfmt*[#1]{set}{#2}}
 \newcommand{\nlset}[1]{\glsxtrentryfmt{set}{#1}}
-\newcommand*{\setcontents}[2][]{\glsxtrfmt*[#1]{setcontents}{#2}}
-\newcommand*{\setmembership}[2]{\glsxtrfmt*{setmembership}{{#1}{#2}}}
-\newcommand*{\setcard}[2][]{\glsxtrfmt*[#1]{setcard}{#2}}
-\newcommand*{\nlsetcard}[1]{\glsxtrentryfmt{setcard}{#1}}
 \end{verbatim}
-The use of this starred form allows:
+The use of the starred form allows:
 \begin{verbatim}
 \[\set{A} = \gls{bigcup}[_{i=1}^n] \set{B}[_i] \]
 \end{verbatim}
@@ -13177,6 +13220,74 @@ The resulting document is shown in \figureref{fig:sample-maths.pdf}.
 }
 {\caption{\filefmt{sample-maths.pdf}}}
 {fig:sample-maths.pdf}
+\end{figure}
+
+\filesection{sample-textsymbols.tex}
+
+This example uses \exfile{miscsymbols.bib}. This requires both
+\isty{marvosym} and (with the \styoptfmt{weather} option)
+\isty{ifsym}. Unfortunately both define the commands \csfmt{Sun}
+and \csfmt{Lightning}, so these commands need to be undefined after
+the first package is loaded and before the second.
+Since I want the definitions provide by \sty{ifsym} I have to first
+load \sty{marvosym}, then undefine the conflicting commands and then
+load \sty{ifsym}:
+\begin{verbatim}
+\usepackage{etoolbox}
+\usepackage{marvosym}
+\undef\Sun
+\undef\Lightning
+\usepackage[weather]{ifsym}
+\end{verbatim}
+The \sty{etoolbox} package is also loaded as it provides
+\ics{undef}.
+
+The document uses the \glostyle{alttreegroup} style where the groups
+are obtained from the \field{category}, which again I obtain from
+the custom \fieldfmt{identifier} field using:
+\begin{verbatim}
+field-aliases={identifier=category},
+replicate-fields={category=group}
+\end{verbatim}
+The \field{group} field is just a label and an appropriate title needs to be
+supplied for each group label:
+\begin{verbatim}
+\glsxtrsetgrouptitle{information}{Information}
+\glsxtrsetgrouptitle{mediacontrol}{Media Controls}
+\glsxtrsetgrouptitle{weather}{Weather Symbols}
+\end{verbatim}
+This also requires sorting first by \field{category} and then
+fallback on another field. The most appropriate here is the
+\field{description} field:
+\begin{verbatim}
+sort-field={category},
+identical-sort-action={description}
+\end{verbatim}
+
+Unfortunately, since \bibgls\ doesn't recognise \sty{ifsym} or
+\sty{marvosym}, there's no point using \csopt{set-widest}. Instead I
+have to go back to using the non-\bibgls\ method:
+\begin{alltt}
+\ics{glsFindWidestTopLevelName}
+\end{alltt}
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-textsymbols
+bib2gls --group sample-textsymbols
+pdflatex sample-textsymbols
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-textsymbols.tex}
+
+\begin{figure}[p]
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-textsymbols.pdf}}%
+}
+{\caption{\filefmt{sample-textsymbols.pdf}}}
+{fig:sample-textsymbols.pdf}
 \end{figure}
 
 \printcommandsummary

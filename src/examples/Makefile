@@ -4,7 +4,7 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
-	sample-maths.pdf
+	sample-maths.pdf sample-textsymbols.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -60,11 +60,17 @@ sample-msymbols.pdf	: $(DEPS) sample-msymbols.tex \
 	pdflatex sample-msymbols
 
 sample-maths.pdf	: $(DEPS) sample-maths.tex \
-	bigmathsymbols.bib mathsrelations.bib \
-	binaryoperators.bib unaryoperators.bib mathsobjects.bib
+	no-interpret-preamble.bib interpret-preamble.bib \
+	bigmathsymbols.bib mathsobjects.bib
 	pdflatex sample-maths
 	$(BIB2GLS) sample-maths
 	pdflatex sample-maths
+
+sample-textsymbols.pdf	: $(DEPS) sample-textsymbols.tex \
+	miscsymbols.bib
+	pdflatex sample-textsymbols
+	$(BIB2GLS) sample-textsymbols
+	pdflatex sample-textsymbols
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

@@ -10,8 +10,10 @@
 \providecommand{\setcontentsfmt}[1]{\{#1\}}
 \providecommand{\setmembershipfmt}[2]{\setcontentsfmt{#1: #2}}
 \providecommand{\setmembershiponeargfmt}[1]{\setmembershipfmt#1}
-\providecommand{\setcardfmt}[1]{|#1|}
+\providecommand{\setcardfmt}[1]{\lvert#1\rvert}
 \providecommand{\numspacefmt}[1]{\mathbb{#1}}
+\providecommand{\transposefmt}[1]{#1^T}
+\providecommand{\invfmt}[1]{#1^{-1}}
 \providecommand{\vecfmt}[1]{\boldsymbol{#1}}
 \providecommand{\mtxfmt}[1]{\boldsymbol{#1}}"}
 
@@ -48,20 +50,6 @@
   description={\sortart{a}{number space}},
   format={numspacefmt},
   identifier={numberspace}
-}
-
-@symbol{vector,
-  name={\ensuremath{\vecfmt{v}}},
-  description={\sortart{a}{vector}},
-  format={vecfmt},
-  identifier={vector}
-}
-
-@symbol{matrix,
-  name={\ensuremath{\mtxfmt{M}}},
-  description={\sortart{a}{matrix}},
-  format={mtxfmt},
-  identifier={matrix}
 }
 
 @symbol{naturalnumbers,
@@ -118,16 +106,44 @@
   identifier={set}
 }
 
+@symbol{transpose,
+  name={\ensuremath{\transposefmt{\vecfmt{x}}}},
+  description={\sortart{the}{transpose of $\vecfmt{x}$}},
+  format={transposefmt},
+  identifier={matrix}
+}
+
+@symbol{inverse,
+  name={\ensuremath{\invfmt{\mtxfmt{M}}}},
+  description={\sortart{the}{inverse of $\mtxfmt{M}$}},
+  format={invfmt},
+  identifier={matrix}
+}
+
+@symbol{vector,
+  name={\ensuremath{\vecfmt{v}}},
+  description={\sortart{a}{vector}},
+  format={vecfmt},
+  identifier={matrix}
+}
+
+@symbol{matrix,
+  name={\ensuremath{\mtxfmt{M}}},
+  description={\sortart{a}{matrix}},
+  format={mtxfmt},
+  identifier={matrix}
+}
+
 @symbol{0vec,
   name={\ensuremath{\vecfmt{0}}},
   description={\sortart{the}{vector of 0s}},
-  identifier={vector}
+  identifier={matrix}
 }
 
 @symbol{1vec,
   name={\ensuremath{\vecfmt{1}}},
   description={\sortart{the}{vector of 1s}},
-  identifier={vector}
+  identifier={matrix}
 }
 
 @symbol{identitymatrix,

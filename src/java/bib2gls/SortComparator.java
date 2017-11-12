@@ -292,13 +292,15 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
             String value2 = entry2.getFieldValue(sortFallbackField);
 
+            int result = value1.compareTo(value2);
+
             if (bib2gls.getDebugLevel() > 0)
             {
                bib2gls.logMessage(bib2gls.getMessage("warning.identical.field", 
-                 settings.getIdenticalSortField(), value1, value2));
+                 settings.getIdenticalSortField(), value1, value2, result));
             }
 
-            return value1.compareTo(value2);
+            return result;
       }
 
       bib2gls.debug(bib2gls.getMessage("warning.identical.none"));
