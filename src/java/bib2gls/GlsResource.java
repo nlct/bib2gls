@@ -1172,7 +1172,19 @@ public class GlsResource
             if (!bib2gls.isKnownField(abbrevDefaultSortField))
             {
                throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, abbrevDefaultSortField));
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                   abbrevDefaultSortField));
+            }
+         }
+         else if (opt.equals("symbol-sort-fallback"))
+         {
+            symbolDefaultSortField = getRequired(parser, list, opt);
+
+            if (!bib2gls.isKnownField(symbolDefaultSortField))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                   symbolDefaultSortField));
             }
          }
          else if (opt.equals("abbreviation-name-fallback"))
@@ -6462,6 +6474,11 @@ public class GlsResource
       return abbrevDefaultSortField;
    }
 
+   public String getSymbolDefaultSortField()
+   {
+      return symbolDefaultSortField;
+   }
+
    public String getAbbrevDefaultNameField()
    {
       return abbrevDefaultNameField;
@@ -6505,6 +6522,8 @@ public class GlsResource
    private SortSettings sortSettings = new SortSettings("locale");
    private SortSettings dualSortSettings = new SortSettings();
    private SortSettings secondarySortSettings = new SortSettings();
+
+   private String symbolDefaultSortField = "id";
 
    private String abbrevDefaultSortField = "short";
    private String abbrevDefaultNameField = "short";

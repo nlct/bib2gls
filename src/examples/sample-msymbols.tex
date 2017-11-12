@@ -1,0 +1,30 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{stix}
+
+\usepackage[record,% using bib2gls
+ nostyles,% don't load default styles
+ postdot,% append a dot after descriptions
+ stylemods={mcols},% load glossary-mcols.sty and patch
+ style=mcolalttree]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={bigmathsymbols,mathgreek,
+   mathsrelations,binaryoperators,unaryoperators},
+  sort-field={category},
+  identical-sort-action={description},
+  field-aliases={identifier=category},
+  replicate-fields={category=group},
+  set-widest,
+  save-locations=false,
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

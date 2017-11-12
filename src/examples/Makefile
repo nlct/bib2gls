@@ -3,7 +3,8 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
-	sample-media.pdf sample-authors.pdf sample-maths.pdf
+	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
+	sample-maths.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -50,11 +51,19 @@ sample-authors.pdf	: $(DEPS) sample-authors.tex \
 	pdflatex sample-authors
 	pdflatex sample-authors
 
+sample-msymbols.pdf	: $(DEPS) sample-msymbols.tex \
+	bigmathsymbols.bib mathgreek.bib mathsrelations.bib \
+	binaryoperators.bib unaryoperators.bib
+	pdflatex sample-msymbols
+	$(BIB2GLS) sample-msymbols
+	pdflatex sample-msymbols
+	pdflatex sample-msymbols
+
 sample-maths.pdf	: $(DEPS) sample-maths.tex \
-	bigmathsymbols.bib mathgreek.bib
+	bigmathsymbols.bib mathsrelations.bib \
+	binaryoperators.bib unaryoperators.bib mathsobjects.bib
 	pdflatex sample-maths
 	$(BIB2GLS) sample-maths
-	pdflatex sample-maths
 	pdflatex sample-maths
 
 clean	:

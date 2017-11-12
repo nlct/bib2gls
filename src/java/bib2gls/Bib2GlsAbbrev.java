@@ -51,17 +51,24 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       if (field.equals("sort"))
       {
-         String fallbackField = resource.getAbbrevDefaultSortField();
-         val = getFieldValue(fallbackField);
+         field = resource.getAbbrevDefaultSortField();
+         val = getFieldValue(field);
 
-         return val == null ? getFallbackValue(fallbackField) : val;
+         if (val != null)
+         {
+            return val;
+         }
       }
-      else if (field.equals("name"))
-      {
-         String fallbackField = resource.getAbbrevDefaultNameField();
-         val = getFieldValue(fallbackField);
 
-         return val == null ? getFallbackValue(fallbackField) : val;
+      if (field.equals("name"))
+      {
+         field = resource.getAbbrevDefaultNameField();
+         val = getFieldValue(field);
+
+         if (val != null)
+         {
+            return val;
+         }
       }
 
       return super.getFallbackValue(field);

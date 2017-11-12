@@ -330,7 +330,9 @@
 \newcommand*{\csref}{\gls}
 
 \newcommand*{\cs}[1]{%
-  \glsdohyperlink{\glolinkprefix cs.idx.#1}{\glsentryname{idx.#1}}}
+  \glsdoifexists{idx.#1}%
+  {\glsdohyperlink{\glolinkprefix cs.idx.#1}{\glsentryname{idx.#1}}}%
+}
 
 \newcommand*{\ics}[2][]{\glsadd[#1]{idx.#2}\cs{#2}}
 
@@ -2345,19 +2347,27 @@ command provided in the \field{user1} field with:
 (which internally uses \ics{glslink}) or
 \nosecformatdef{glsxtrentryfmt}
 which just applies the appropriate formatting command to
-\meta{text}. If the entry given by \meta{label} hasn't been defined,
-then this just does \meta{text} and a warning is issued. (It 
-just does \meta{text} without a warning if the field hasn't been set.)
+\meta{text}. Version 1.23+ of \sty{glossaries-extra} also provides a
+starred form of the linking command:
+\nosecformatdef{glsxtrfmt*}
+which inserts additional material inside the link text but outside
+the formatting command.
+
+If the entry given by \meta{label} hasn't been defined,
+then \csref{glsxtrfmt} just does \meta{text} (followed by \meta{insert} for
+the starred version) and a warning is issued. (There's no warning 
+if the entry is defined but the field hasn't been set.)
 The \meta{options} are as for \ics{glslink} but \ics{glslink} will
 actually be using
 \begin{alltt}
-\ics{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\csfmt{}\meta{csname}\margm{text}}
+\ics{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\csfmt{}\meta{csname}\margm{text}\meta{insert}}
 \end{alltt}
 where the default options \meta{def-options} are given by
 \ics{GlsXtrFmtDefaultOptions}. The default definition of this is
 just \code{noindex} which suppresses the automatic indexing or
 recording action. (See the \sty{glossaries-extra}
-manual~\cite{glossaries-extra} for further details.)
+manual~\cite{glossaries-extra} for further details.) The
+\meta{insert} part is omitted for the unstarred form.
 
 This means that the document doesn't need to actually provide
 \verb|\set| or \verb|\card| but can instead use, for example,
@@ -2544,7 +2554,8 @@ designed specifically for symbols, so in the previous example, the
 The required fields are \field{name} or \field{parent}. The
 \field{description} field is required if the \field{name} field is
 missing. If the \field{sort} field is omitted, the default sort is
-given by the entry label. Note that this is different from
+given by the entry label (unless overridden by
+\csopt{symbol-sort-fallback}). Note that this is different from
 \atentry{entry} where the sort defaults to \field{name} if omitted.
 
 Terms that are defined using \atentry{symbol} will be written to
@@ -5197,19 +5208,6 @@ supplementary resource files (omitting the primary
 
 \section{Field and Label Options}
 \label{sec:labelopts}
-
-\optsection{abbreviation-sort-fallback}
-
-The entry types that define abbreviations (such as
-\atentry{abbreviation} and \atentry{acronym}) will, by default,
-fallback on the \field{short} field if the \field{sort} field is
-missing (assuming \csopt[sort]{sort-field}). If you prefer to
-fallback on a different field, then you can use this option to
-specify the field. For example,
-\csopt[long]{abbreviation-sort-fallback}. Note that if you use
-\csopt[name]{sort-field}, then the fallback field will be given by
-\csopt{abbreviation-name-fallback} if the \field{name} field is
-omitted. The \meta{field} value must be a known field label.
 
 \optsection{abbreviation-name-fallback}
 
@@ -8124,6 +8122,28 @@ The \atentry{symbol} and \atentry{number} entry types
 fallback on the label (not the \field{name}) if the \field{sort} is missing.
 
 If no fallback field can be found, the entry's label will be used.
+
+\optsection{abbreviation-sort-fallback}
+
+The entry types that define abbreviations (such as
+\atentry{abbreviation} and \atentry{acronym}) will, by default,
+fallback on the \field{short} field if the \field{sort} field is
+missing (assuming \csopt[sort]{sort-field}). If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example,
+\csopt[long]{abbreviation-sort-fallback}. Note that if you use
+\csopt[name]{sort-field}, then the fallback field will be given by
+\csopt{abbreviation-name-fallback} if the \field{name} field is
+omitted. The \meta{field} value must be a known field label.
+
+\optsection{symbol-sort-fallback}
+
+The \atentry{symbol} and \atentry{number} entry types will, by default,
+fallback on the label if the \field{sort} field is
+missing (assuming the default \csopt[sort]{sort-field}). If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example, \csopt[name]{symbol-sort-fallback}.
+The \meta{field} value must be a known field label.
 
 \optsection{trim-sort}
 
@@ -11661,7 +11681,7 @@ The contents of \filefmt{bacteria.bib} are as follows:
 The \exfile{baseunits.bib} file contains base SI units. The entries
 are all defined using \atentry{entry} with a \field{name},
 \field{symbol} and \field{description} field. The \field{symbol}
-fields all use \ics{si} provided by the \sty{siunitx} package, so
+fields all use \ics{si} provided by the \isty{siunitx} package, so
 that package must be loaded in the document. This is one of the
 small number of packages recognised by \bibgls, so it's possible to
 sort according to the symbol if required.
@@ -11723,7 +11743,7 @@ The definition provided for the document could then be, for example:
 \begin{verbatim}
 \providecommand{\formatdate}[4]{\DTMdisplaydate{#3}{#2}{#1}{-1} #4}
 \end{verbatim}
-(where \ics{DTMdisplaydate} is provided by the \sty{datetime2}
+(where \ics{DTMdisplaydate} is provided by the \isty{datetime2}
 package) and a definition could be provided for \bibgls's
 interpreter, for example:
 \begin{verbatim}
@@ -11934,7 +11954,7 @@ The contents of \filefmt{mathgreek.bib} are as follows:
 The \exfile{bigmathsymbols.bib} file contains mathematical symbols
 that have a large version in display mode. As with
 \exfile{mathgreek.bib} the entries are defined using
-\atentry{symbol}. This example file requires the \sty{stix} package
+\atentry{symbol}. This example file requires the \isty{stix} package
 as not all of the commands are provided by the \LaTeX\ kernel. 
 This file also has a preamble:
 \begin{verbatim}
@@ -11947,12 +11967,14 @@ The first command \ics{bigoperatornamefmt} is used in the
 of the symbol. The \TeX\ parser library only has a limited ability
 to interpret this as not all the symbols have Unicode in-line and large
 versions. In some cases, such as the integral symbol $\int$ only has
-a small version. However, the interpreter works well enough to guess
+a small version. (A large version would require construction from
+\hex{2320}, \hex{23AE} and \hex{2321}, which is too complicated in
+this context.) However, the interpreter works well enough to guess
 at the widest name if \csopt{set-widest} is used. There's no
 advantage in sorting according to the \field{name} field here, as
 the Unicode symbols are scattered about different blocks. Better
-approaches are to sort according to document use (\cs[use]{sort})
-or sort according to the \field{description} field.
+approaches are to sort according to document use (\csopt[use]{sort})
+or to sort according to the \field{description} field.
 
 The other custom command is \ics{nary} to provide semantic markup
 for \qt{$n$-ary}. This could be defined without an argument:
@@ -11972,6 +11994,116 @@ for integrals.
 
 The contents of \filefmt{bigmathsymbols.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/bigmathsymbols.bib}
+
+\filesection{mathsrelations.bib}
+
+The \exfile{mathsrelations.bib} file contains mathematical
+relational symbols. These use the maths shift character \verb|$| in
+the \field{name} field and just the symbol in the \field{text}
+field. This just illustrates an alternative way of defining symbols.
+Since \ics{ensuremath} isn't used, commands \cs{gls} must be
+explicitly placed in maths mode. For example, \verb|$\gls{leq}$|
+rather than simply \verb|\gls{leq}|. The custom \fieldfmt{identifier}
+field is set to \code{relation}.
+
+The contents of \filefmt{mathsrelations.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/mathsrelations.bib}
+
+\filesection{binaryoperators.bib}
+
+The \exfile{binaryoperators.bib} file contains mathematical binary
+operators. The format is much like the above
+\exfile{mathsrelations.bib} file. The custom \fieldfmt{identifier}
+field is set to \code{binaryoperator}.
+
+The contents of \filefmt{binaryoperators.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/binaryoperators.bib}
+
+\filesection{unaryoperators.bib}
+
+The \exfile{unaryoperators.bib} file contains mathematical unary
+operators. This again uses \atentry{symbol} to define the symbols,
+but in this case \ics{ensuremath} is used in the \field{name}
+field and there's no \field{text} field. I've also used \ics{mathord}
+to ensure the symbol is treated as a unary (rather than binary)
+operator, except for the \ics{forall} entry which is already defined as an
+ordinary maths symbol.
+
+The contents of \filefmt{unaryoperators.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/unaryoperators.bib}
+
+\filesection{mathsobjects.bib}
+
+The \exfile{mathsobjects.bib} file contains entries related to 
+mathematical objects (sets, spaces, vectors and matrices). This
+provides some custom formatting commands in the preamble:
+\nosecdef{setfmt}
+which is used to format \meta{symbol} as a set,
+\nosecdef{setcontentsfmt}
+which is used to format the set contents,
+\nosecdef{setmembershipfmt}
+which is used to format the set membership criteria,
+\nosecdef{setcardfmt}
+which is used to format the cardinality of a set,
+\nosecdef{numspacefmt}
+which is used to format \meta{symbol} as a number space,
+\nosecdef{vecfmt}
+which is used to format \meta{symbol} as a vector and
+\nosecdef{mtxfmt}
+which is used to format \meta{symbol} as a matrix.
+These commands are intended for use with \ics{glsxtrfmt},
+but \csref{setmembershipfmt} causes a problem as it has two
+arguments and \ics{glsxtrfmt} requires the control sequence to 
+have exactly one argument. This means employing a little trick.
+A command with just one argument is provided:
+\nosecdef{setmembershipineargfmt}
+that requires the actual two arguments to be supplied inside
+\verb|#1|. The outer grouping is removed and the two-argument
+\csref{setmembershipfmt} command is applied:
+\begin{verbatim}
+\providecommand{\setmembershiponeargfmt}[1]{\setmembershipfmt#1}
+\end{verbatim}
+This means that the entry needs to be referenced in the document
+using:
+\begin{alltt}
+\csref{glsxtrfmt}\marg{setmembership}\marg{\margm{variable(s)}\margm{condition}}
+\end{alltt}
+The simplest thing to do here is to provide a wrapper command in the
+document, for example:
+\begin{verbatim}
+\newcommand*{\setmembership}[2]{\glsxtrfmt{setmembership}{{#1}{#2}}}
+\end{verbatim}
+Now this can be used as
+\begin{alltt}
+\csfmt{setmembership}\margm{variable(s)}\margm{condition}
+\end{alltt}
+
+There are essentially two types of entry defined in this file: 
+entries that demonstrate the formatting for the objects
+and entries that represent specific objects. In the first case
+there's a custom \fieldfmt{format} field
+that's set to the control sequence name of the relevant semantic
+command. If this field is defined or aliased then it can be used
+with \csref{glsxtrfmt} (as in the example above).
+
+In both cases there's a custom \fieldfmt{identifier} field that
+reflects the type of object: \code{numberspace} for number spaces,
+\code{set} for sets, \code{vector} for vectors and \code{matrix} for
+matrices.
+
+Be careful with the set cardinality example. Remember that nested
+links cause problems and the \sty{glossaries-extra} manual advises
+against using commands like \cs{gls} or \csref{glsxtrfmt} within
+link text and that includes within the \meta{text} argument of 
+\csref{glsxtrfmt}. See \exfile{sample-maths.tex} for suggested
+usage.
+
+Some of the \field{description} fields use \csref{sortart}, so
+\exfile{no-interpret-preamble} and \exfile{interpret-preamble} are
+also needed.
+
+The contents of \filefmt{mathsobjects.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/mathsobjects.bib}
 
 \filesection{sample-chemical.tex}
 
@@ -12234,7 +12366,7 @@ by the \field{name} field instead.
 The primary entries can still be sorted according to the default
 locale collator, but the dual entries need a sort method that's
 better suited to symbols. Fortunately, \bibgls\ has some (very
-limited) support for \sty{siunitx} and is able to interpret
+limited) support for \isty{siunitx} and is able to interpret
 the \ics{si} commands in the sample \ext{bib} files. Since 
 SI units are a mix of letters and numbers I've used one of the
 letter-number methods listed in
@@ -12866,14 +12998,15 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 {fig:sample-authors.pdf}
 \end{figure}
 
-\filesection{sample-maths.tex}
+\filesection{sample-msymbols.tex}
 
-This example uses the files \exfile{bigmathsymbols.bib}
-and \exfile{mathgreek.bib}. The \sty{stix} package is required for
-some of the commands used in \exfile{bigmathsymbols.bib}, so that
-must be loaded in the document.
+This example uses \exfile{bigmathsymbols.bib},
+\exfile{mathsrelations.bib}, \exfile{binaryoperators.bib},
+\exfile{unaryoperators.bib} and \exfile{mathgreek.bib}. The \isty{stix}
+package is required for some of the commands used in
+\exfile{bigmathsymbols.bib}, so that must be loaded in the document.
 
-I decided to use the \glostyle{mcolalttree} style for this document,
+I'm using the \glostyle{mcolalttree} style for this document,
 which means that the \sty{glossary-mcols} package is required and
 the styles need patching, which can be done with 
 the \styopt{stylemods} package option:
@@ -12884,11 +13017,16 @@ the \styopt{stylemods} package option:
  stylemods={mcols},% load glossary-mcols.sty and patch
  style=mcolalttree]{glossaries-extra}
 \end{verbatim}
-Since I'm not using a group-based style I don't need the
-\longarg{group} switch. I'm also not referencing any of the entries
-in the document as I'm just generating a complete list of all the
-defined symbols. This means I need to tell \bibgls\ to select all
-entries and don't bother saving the \field{location} field:
+I'm not using a group-based style which suggests that I don't need the
+\longarg{group} switch. However, although I don't want group titles,
+I still want a slight gap between logical groups, which means that I
+still need this switch. If I added the \styopt{nogroupskip} package
+option, then I can omit \longarg{group}.
+
+I'm not referencing any of the entries in the document as I'm just
+generating a complete list of all the defined symbols. This means I
+need to tell \bibgls\ to select all entries and don't bother saving
+the \field{location} field:
 \begin{verbatim}
 save-locations=false,
 selection=all
@@ -12914,10 +13052,118 @@ This means that entries will be order by \field{category} and
 then \field{description}, which naturally creates blocks of symbol
 types in the glossary.
 
+Remember that I want a small vertical gap between each logical
+block. These needs the \field{group} field which, with the default
+locale sort, is obtained from the first letter of the sort value.
+In this case the sort value is obtained from the \field{category}
+field, and as each category happens to start with a different
+letter, this means I get the desired effect. However, in the event
+that I add more entries with a new category that happens to start
+with the same letter as an existing category, it's better to provide
+a more future-proof method, so I've set the \field{group} field to 
+fetch its value from the \field{category} field:
+\begin{verbatim}
+replicate-fields={category=group}
+\end{verbatim}
+(Since the \csopt{field-aliases} option is always performed before
+\csopt{replicate-fields}, the \field{category} field will already
+have been set and is available for replicating.) This means that the
+\field{group} label is the same as the \field{category} label rather
+than just the first letter. (For a quick check, change the glossary
+style to \glostyle{mcolalttreegroup} to display the group titles.)
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-msymbols
+bib2gls --group sample-msymbols
+pdflatex sample-msymbols
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-msymbols.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-msymbols.tex}
+
+\begin{figure}[p]
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-msymbols.pdf}}%
+}
+{\caption{\filefmt{sample-msymbols.pdf}}}
+{fig:sample-msymbols.pdf}
+\end{figure}
+
+\filesection{sample-maths.tex}
+
+This example uses 
+\exfile{mathsrelations.bib}, \exfile{binaryoperators.bib},
+\exfile{unaryoperators.bib} and \exfile{mathsobjects.bib}.
+
+This file has a fairly similar preamble to \exfile{sample-msymbols},
+but \exfile{no-interpret-preamble} is now needed to provide
+the \csref{sortart} command for use in the document:
+\begin{verbatim}
+\GlsXtrLoadResources[
+   src={no-interpret-preamble},
+   interpret-preamble=false
+]
+\end{verbatim}
+There's also an extra custom field to alias:
+\begin{verbatim}
+field-aliases={identifier=category,format=user1}
+\end{verbatim}
+I've aliased \fieldfmt{format} to \field{user1} since \csref{glsxtrfmt}
+defaults to that field. If I decided to use a different field I also
+need to remember to redefine \ics{GlsXtrFmtField} to match.
+
+In this document I only want to select entries that have been
+indexed, so I've omitted the \csref{selection} option, however
+I still don't want any number lists so I still have
+\csopt[false]{save-locations}.
+
+To make it easier to use \csref{glsxtrfmt}, I've provided some
+semantic commands. These actually use the starred form
+\csref{glsxtrfmt*} to make use of the optional argument, but
+remember that this requires \sty{glossaries-extra} version 1.23+.
+I want \csref{glsxtrfmt} to index which means I need to redefine
+\ics{GlsXtrFmtDefaultOptions} so that it doesn't use \code{noindex}:
+\begin{verbatim}
+\renewcommand{\GlsXtrFmtDefaultOptions}{}
+\end{verbatim}
+I've provided some convenient wrapper commands that use
+\csref{glsxtrfmt*} or the non-linking \csref{glsxtrentryfmt}:
+\begin{verbatim}
+\newcommand{\set}[2][]{\glsxtrfmt*[#1]{set}{#2}}
+\newcommand{\nlset}[1]{\glsxtrentryfmt{set}{#1}}
+\newcommand*{\setcontents}[2][]{\glsxtrfmt*[#1]{setcontents}{#2}}
+\newcommand*{\setmembership}[2]{\glsxtrfmt*{setmembership}{{#1}{#2}}}
+\newcommand*{\setcard}[2][]{\glsxtrfmt*[#1]{setcard}{#2}}
+\newcommand*{\nlsetcard}[1]{\glsxtrentryfmt{setcard}{#1}}
+\end{verbatim}
+The use of this starred form allows:
+\begin{verbatim}
+\[\set{A} = \gls{bigcup}[_{i=1}^n] \set{B}[_i] \]
+\end{verbatim}
+which produces:
+\[ \mathcal{A} = \bigcup_{i=1}^n \mathcal{B}_i \]
+Note the difference if the optional arguments aren't used:
+\begin{verbatim}
+\[\set{A} = \gls{bigcup}_{i=1}^n \set{B}_i \]
+\end{verbatim}
+This produces:
+\[ \mathcal{A} = \bigcup{}_{i=1}^n \mathcal{B}{}_i \]
+
+Be careful with the set cardinality example. You might be tempted to
+nest \csfmt{set} within the argument of \csfmt{setcard} but this
+results in nested hyperlinks. These are unpredictable and there's no
+consistent handling of them between different PDF viewers. It can
+also be confusing to the reader. If $|\mathcal{B}_1\cup\mathcal{B}_2|$
+shows up as what appears to be a single hyperlink, where would the 
+reader expect the target? This is the reason for providing the
+non-linking commands like \csfmt{nlset} and \csfmt{nlsetcard}.
+
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-maths
-bib2gls sample-maths
+bib2gls --group sample-maths
 pdflatex sample-maths
 \end{verbatim}
 The resulting document is shown in \figureref{fig:sample-maths.pdf}.

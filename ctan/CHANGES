@@ -25,6 +25,7 @@ v1.1 (pending):
      - combine-dual-locations
      - abbreviation-sort-fallback
      - abbreviation-name-fallback
+     - symbol-sort-fallback
      - match-action
      - save-loclist
      - action

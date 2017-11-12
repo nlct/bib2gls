@@ -1,0 +1,138 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+% Encoding: UTF-8
+
+% requires amssymb.sty
+
+@preamble{"\providecommand{\setfmt}[1]{\mathcal{#1}}
+\providecommand{\setcontentsfmt}[1]{\{#1\}}
+\providecommand{\setmembershipfmt}[2]{\setcontentsfmt{#1: #2}}
+\providecommand{\setmembershiponeargfmt}[1]{\setmembershipfmt#1}
+\providecommand{\setcardfmt}[1]{|#1|}
+\providecommand{\numspacefmt}[1]{\mathbb{#1}}
+\providecommand{\vecfmt}[1]{\boldsymbol{#1}}
+\providecommand{\mtxfmt}[1]{\boldsymbol{#1}}"}
+
+@symbol{set,
+  name={\ensuremath{\setfmt{S}}},
+  description={\sortart{a}{set}},
+  format={setfmt},
+  identifier={set}
+}
+
+@symbol{setcontents,
+  name={\ensuremath{\setcontentsfmt{\ldots}}},
+  description={set contents},
+  format={setcontentsfmt},
+  identifier={set}
+}
+
+@symbol{setmembership,
+  name={\ensuremath{\setmembershipfmt{\vecfmt{x}}{\ldots}}},
+  description={set membership},
+  format={setmembershiponeargfmt},
+  identifier={set}
+}
+
+@symbol{setcard,
+  name={\ensuremath{\setcardfmt{\setfmt{S}}}},
+  description={\sortart{the}{cardinality of $\setfmt{S}$}},
+  format={setcardfmt},
+  identifier={set}
+}
+
+@symbol{numberspace,
+  name={\ensuremath{\numspacefmt{S}}},
+  description={\sortart{a}{number space}},
+  format={numspacefmt},
+  identifier={numberspace}
+}
+
+@symbol{vector,
+  name={\ensuremath{\vecfmt{v}}},
+  description={\sortart{a}{vector}},
+  format={vecfmt},
+  identifier={vector}
+}
+
+@symbol{matrix,
+  name={\ensuremath{\mtxfmt{M}}},
+  description={\sortart{a}{matrix}},
+  format={mtxfmt},
+  identifier={matrix}
+}
+
+@symbol{naturalnumbers,
+  name={\ensuremath{\numspacefmt{N}}},
+  description={\sortart{the}{set of natural numbers}},
+  identifier={numberspace}
+}
+
+@symbol{integernumbers,
+  name={\ensuremath{\numspacefmt{Z}}},
+  description={\sortart{the}{set of integers}},
+  identifier={numberspace}
+}
+
+@symbol{rationalnumbers,
+  name={\ensuremath{\numspacefmt{Q}}},
+  description={\sortart{the}{set of rational numbers}},
+  identifier={numberspace}
+}
+
+@symbol{algebraicnumbers,
+  name={\ensuremath{\numspacefmt{A}}},
+  description={\sortart{the}{set of algebraic numbers}},
+  identifier={numberspace}
+}
+
+@symbol{realnumbers,
+  name={\ensuremath{\numspacefmt{R}}},
+  description={\sortart{the}{set of real numbers}},
+  identifier={numberspace}
+}
+
+@symbol{imaginarynumbers,
+  name={\ensuremath{\numspacefmt{I}}},
+  description={\sortart{the}{set of imaginary numbers}},
+  identifier={numberspace}
+}
+
+@symbol{complexnumbers,
+  name={\ensuremath{\numspacefmt{C}}},
+  description={\sortart{the}{set of complex numbers}},
+  identifier={numberspace}
+}
+
+@symbol{emptyset,
+  name={\ensuremath{\emptyset}},
+  description={\sortart{the}{empty set}},
+  identifier={set}
+}
+
+@symbol{universalset,
+  name={\ensuremath{\setfmt{U}}},
+  description={\sortart{the}{universal set}},
+  identifier={set}
+}
+
+@symbol{0vec,
+  name={\ensuremath{\vecfmt{0}}},
+  description={\sortart{the}{vector of 0s}},
+  identifier={vector}
+}
+
+@symbol{1vec,
+  name={\ensuremath{\vecfmt{1}}},
+  description={\sortart{the}{vector of 1s}},
+  identifier={vector}
+}
+
+@symbol{identitymatrix,
+  name={\ensuremath{\mtxfmt{I}}},
+  description={\sortart{the}{identity matrix}},
+  identifier={matrix}
+}
+

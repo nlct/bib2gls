@@ -58,11 +58,22 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    {
       if (field.equals("sort"))
       {
-         return getOriginalId();
+         field = resource.getSymbolDefaultSortField();
+
+         if (field.equals("id"))
+         {
+            return getOriginalId();
+         }
+
+         String val = getFieldValue(field);
+
+         if (val != null)
+         {
+            return val;
+         }
       }
 
       return super.getFallbackValue(field);
-
    }
 
    public BibValueList getFallbackContents(String field)

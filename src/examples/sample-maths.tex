@@ -2,11 +2,12 @@
 % in the bib2gls user manual for a more detailed description
 % of this file.
 
-\documentclass[11pt]{article}
+\documentclass{article}
 
 \usepackage[T1]{fontenc}
-\usepackage{stix}
+\usepackage{amssymb}
 
+\usepackage[colorlinks]{hyperref}
 \usepackage[record,% using bib2gls
  nostyles,% don't load default styles
  postdot,% append a dot after descriptions
@@ -14,15 +15,62 @@
  style=mcolalttree]{glossaries-extra}
 
 \GlsXtrLoadResources[
-  src={bigmathsymbols,mathgreek},
-  sort-field={category},
-  identical-sort-action={description},
-  field-aliases={identifier=category},
-  set-widest,
-  save-locations=false,
-  selection=all
+   src={no-interpret-preamble},
+   interpret-preamble=false
 ]
 
+\GlsXtrLoadResources[
+  src={interpret-preamble,bigmathsymbols,mathsobjects},
+  sort-field={category},
+  identical-sort-action={description},
+  field-aliases={identifier=category,format=user1},
+  replicate-fields={category=group},
+  set-widest,
+  save-locations=false
+]
+
+\renewcommand{\GlsXtrFmtDefaultOptions}{}
+
+% requires glossaries-extra.sty v1.23+
+\newcommand{\set}[2][]{\glsxtrfmt*[#1]{set}{#2}}
+\newcommand{\nlset}[1]{\glsxtrentryfmt{set}{#1}}
+\newcommand*{\setcontents}[2][]{\glsxtrfmt*[#1]{setcontents}{#2}}
+\newcommand*{\setmembership}[2]{\glsxtrfmt*{setmembership}{{#1}{#2}}}
+\newcommand*{\setcard}[2][]{\glsxtrfmt*[#1]{setcard}{#2}}
+\newcommand*{\nlsetcard}[1]{\glsxtrentryfmt{setcard}{#1}}
+
 \begin{document}
+\section{Sets}
+The universal set ($\gls{universalset}$) contains everything.
+The empty set ($\gls{emptyset}$) contains nothing.
+Some assignments:
+\[
+ \set{B}[_1] = \setcontents{1, 3, 5, 7},\quad
+ \set{B}[_2] = \setcontents{2, 4, 6, 8},\quad
+ \set{B}[_3] = \setcontents{9, 10}
+\]
+Define:
+\[\set{A} = \gls{bigcup}[_{i=1}^3] \set{B}[_i] 
+= \setcontents{1, \ldots, 10} \]
+The cardinality of a set \gls{set} is denoted \gls{setcard}
+and is the number of elements in the set.
+\[
+ \setcard{\nlset{B}_1} = 4,\quad
+ \setcard{\nlset{B}_2} = 4,\quad
+ \setcard{\nlset{B}_3} = 2,\quad
+ \setcard{\nlset{B}_1\cup\nlset{B}_2} = 8,\quad
+ \nlsetcard{\gls{emptyset}} = 0
+\]
+
+\section{Spaces}
+A number space (denoted $\gls{numberspace}$) is characterised
+by a set of entities with a set of axioms. For example:
+\begin{align*}
+\gls{naturalnumbers} &= \setmembership{x}{x\text{ is positive integer}}\\
+\gls{integernumbers} &= \setmembership{x}{x\text{ is an integer}}\\
+\gls{realnumbers} &= \setmembership{x}{x\text{ is a real number}}
+\end{align*}
+
+
 \printunsrtglossaries
 \end{document}

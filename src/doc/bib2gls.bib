@@ -678,6 +678,15 @@ name},
   category={command}
 }
 
+@dualindexentry{glsxtrfmt*,
+  name={\csfmt{glsxtrfmt*}},
+  user1={\oargm{options}\margm{label}\margm{text}\oargm{insert}},
+  description={like \cs{glsxtrfmt} but inserts extra
+   material into the link text but outside of the formatting command},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @dualindexentry{glsxtrentryfmt,
   name={\csfmt{glsxtrentryfmt}},
   user1={\margm{label}\margm{text}},
@@ -1089,6 +1098,13 @@ name},
 
 @dualindexentry{opt.sort-field,
    name={\csoptfmt{sort\dhyphen field}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.symbol-sort-fallback,
+   name={\csoptfmt{symbol\dhyphen sort\dhyphen fallback}},
    user1={\meta{field}},
    category={resourceoption},
    parent={resourceoptions}
@@ -1663,9 +1679,10 @@ glossary given by \meta{type}},
   user1={\oargm{options}\margm{prefix}\margm{gls-like
 cs}\margm{glspl-like cs}\margm{Gls-like
 cs}\margm{Glspl-like cs}},
-  description={defines commands to behave like \cs{gls}, \cs{glspl},
-   \cs{Gls} and \cs{Glspl} with the given label prefix},
+  description={defines commands to behave like \ics{gls}, \ics{glspl},
+   \ics{Gls} and \ics{Glspl} with the given label prefix},
   note={provided by \styfmt{glossaries-extra} v1.21+},
+  seealso={gls,glspl,Gls,Glspl},
   category={command}
 }
 
@@ -1673,8 +1690,9 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{gls\-xtr\-new\-gls}},
   user1={\oargm{options}\margm{prefix}\margm{cs}},
   description={defines the command \meta{cs} to behave like 
-  \cs{gls} with the given label prefix},
+  \ics{gls} with the given label prefix},
   note={provided by \styfmt{glossaries-extra} v1.21+},
+  seealso={gls},
   category={command}
 }
 
@@ -1764,6 +1782,62 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{sortmediacreator,
   name={\csfmt{sort\-media\-creator}},
   user1={\margm{first name(s)}\margm{surname}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{setfmt,
+  name={\csfmt{setfmt}},
+  user1={\margm{symbol}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{setcontentsfmt,
+  name={\csfmt{setcontentsfmt}},
+  user1={\margm{contents}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{setmembershipfmt,
+  name={\csfmt{setmembershipfmt}},
+  user1={\margm{variable(s)}\margm{condition}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{setmembershiponeargfmt,
+  name={\csfmt{setmembershiponeargfmt}},
+  user1={\marg{\margm{variable(s)}\margm{condition}}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{setcardfmt,
+  name={\csfmt{setcardfmt}},
+  user1={\margm{maths}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{numspacefmt,
+  name={\csfmt{numspacefmt}},
+  user1={\margm{symbol}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{vecfmt,
+  name={\csfmt{vecfmt}},
+  user1={\margm{symbol}},
+  description={example command},
+  category={command}
+}
+
+@dualindexentry{mtxfmt,
+  name={\csfmt{mtxfmt}},
+  user1={\margm{symbol}},
   description={example command},
   category={command}
 }
@@ -2394,6 +2468,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{styopt.nonumberlist,
   name={\styoptfmt{nonumberlist}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nogroupskip,
+  name={\styoptfmt{nogroupskip}},
   category={packageoption},
   parent={packageoptions}
 }
@@ -3758,6 +3838,18 @@ field.},
   name={\filefmt{mathgreek.bib}}
 }
 
+@dualindexentry{file.mathsrelations.bib,
+  name={\filefmt{mathsrelations.bib}}
+}
+
+@dualindexentry{file.binaryoperators.bib,
+  name={\filefmt{binaryoperators.bib}}
+}
+
+@dualindexentry{file.unaryoperators.bib,
+  name={\filefmt{unaryoperators.bib}}
+}
+
 @dualindexentry{file.sample-maths.tex,
   name={\filefmt{sample\dhyphen maths.tex}}
 }
@@ -4147,7 +4239,7 @@ label of the current entry},
 @index{provideignoredglossary*,
   name={\csfmt{provide\-ignored\-glossary*}},
   user1={\margm{type}},
-  description={as \cs{provideignoredglossary} but doesn't
+  description={as \ics{provideignoredglossary} but doesn't
     suppress hyperlinks},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
@@ -4365,11 +4457,55 @@ label of the current entry},
   category={command}
 }
 
+@index{forall,
+  name={\csfmt{forall}},
+  user1={},
+  description={for all symbol ($\forall$)},
+  note={kernel command},
+  category={command}
+}
+
 @index{ensuremath,
   name={\csfmt{ensuremath}},
   user1={\margm{maths}},
   description={ensures the argument is in math mode},
   note={kernel command},
+  category={command}
+}
+
+@index{mathord,
+  name={\csfmt{mathord}},
+  user1={\margm{maths}},
+  description={assigns the character or sub-formula in the 
+   argument to class 0, ordinary},
+  note={\TeX\ primitive},
+  category={command}
+}
+
+@index{mathop,
+  name={\csfmt{mathop}},
+  user1={\margm{maths}},
+  description={assigns the character or sub-formula in the 
+   argument to class 1, large operator},
+  note={\TeX\ primitive},
+  category={command}
+}
+
+@index{mathpunct,
+  name={\csfmt{mathpunct}},
+  user1={\margm{maths}},
+  description={assigns the character or sub-formula in the 
+   argument to class 6, punctuation},
+  note={\TeX\ primitive},
+  category={command}
+}
+
+@index{mathrel,
+  name={\csfmt{mathrel}},
+  user1={\margm{maths}},
+  description={assigns the character or sub-formula in the 
+   argument to class 3, relation},
+  note={\TeX\ primitive},
   category={command}
 }
 
@@ -5069,35 +5205,39 @@ indexing},
 @index{DTLlistformatsep,
   name={\csfmt{DTL\-list\-format\-sep}},
   user1={},
-  description={used by \cs{DTLformatlist} to separate items in the
+  description={used by \ics{DTLformatlist} to separate items in the
 list, except for the last pair},
   note={provided by \styfmt{datatool-base}},
+  seealso={DTLformatlist},
   category={command}
 }
 
 @index{DTLlistformatlastsep,
   name={\csfmt{DTL\-list\-format\-last\-sep}},
   user1={},
-  description={used by \cs{DTLformatlist} to separate the last two items in the
+  description={used by \ics{DTLformatlist} to separate the last two items in the
 list},
   note={provided by \styfmt{datatool-base}},
+  seealso={DTLformatlist},
   category={command}
 }
 
 @index{DTLlistformatoxford,
   name={\csfmt{DTL\-list\-format\-oxford}},
   user1={},
-  description={insert before \cs{DTLformatlistlastsep} if the list
+  description={insert before \ics{DTLlistformatlastsep} if the list
 has three or more items},
   note={provided by \styfmt{datatool-base}},
+  seealso={DTLformatlist},
   category={command}
 }
 
 @index{DTLandname,
   name={\csfmt{DTL\-and\-name}},
   user1={},
-  description={used in the definition of \cs{DTLformatlistlastsep}},
+  description={used in the definition of \ics{DTLlistformatlastsep}},
   note={provided by \styfmt{datatool-base}},
+  seealso={DTLformatlist},
   category={command}
 }
 
