@@ -1316,6 +1316,11 @@ public class Bib2GlsEntry extends BibEntry
 
             writer.format("%s={%s}", field, value);
          }
+         else if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.logMessage(
+               bib2gls.getMessage("warning.ignoring.unknown.field", field));
+         }
       }
 
       if (name == null)

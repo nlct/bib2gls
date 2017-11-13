@@ -17,6 +17,11 @@
  long = {Java Runtime Environment}
 }
 
+@abbreviation{TUG,
+ short = {TUG},
+ long = {{}\TeX\ Users Group}
+}
+
 @dualindexentry{bibglsnewentry,
   name={\csfmt{bibglsnewentry}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
@@ -1835,6 +1840,13 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@dualindexentry{invfmt,
+  name={\csfmt{invfmt}},
+  user1={\margm{maths}},
+  description={example command},
+  category={command}
+}
+
 @dualindexentry{vecfmt,
   name={\csfmt{vecfmt}},
   user1={\margm{symbol}},
@@ -2098,6 +2110,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{polyglossia,
+  name={\styfmt{polyglossia}},
+  category={package},
+  parent={packages}
+}
+
 @index{fontspec,
   name={\styfmt{fontspec}},
   category={package},
@@ -2144,6 +2162,24 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{undef}},
   user1={\meta{cs}},
   description={undefines the control sequence \meta{cs}},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{xifinlist,
+  name={\csfmt{xifinlist}},
+  user1={\margm{element}\margm{list cs}\margm{true}\margm{false}},
+  description={tests if \meta{element} is in the list stored
+   in the control sequence \meta{list cs}},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{listxadd,
+  name={\csfmt{listxadd}},
+  user1={\margm{list cs}\margm{element}},
+  description={globally adds (expanded) \meta{element} to the list stored
+   in the control sequence \meta{list cs}},
   note={provided by \styfmt{etoolbox}},
   category={command}
 }
@@ -3689,6 +3725,16 @@ field.},
 
 @index{tertiary}
 
+@index{non-ASCII}
+
+@index{full-stop,
+  name={full stop}
+}
+
+@index{period,
+  alias={full-stop}
+}
+
 @index{unicodecategories,
   name={Unicode categories},
   text={Unicode category},
@@ -3895,6 +3941,14 @@ field.},
 
 @dualindexentry{file.sample-textsymbols.tex,
   name={\filefmt{sample\dhyphen textsymbols.tex}}
+}
+
+@dualindexentry{file.usergroups.bib,
+  name={\filefmt{usergroups.bib}}
+}
+
+@dualindexentry{file.sample-usergroups.tex,
+  name={\filefmt{sample\dhyphen usergroups.tex}}
 }
 
 @index{glshyperlink,
@@ -4963,6 +5017,15 @@ packages},
   category={command}
 }
 
+@index{glsxtruserparen,
+  name={\csfmt{gls\-xtr\-user\-paren}},
+  user1={},
+  description={used by the parenthetical abbreviation styles
+   to format the parenthetical material},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @index{glsxtrpostdescabbreviation,
   name={\csfmt{gls\-xtr\-post\-desc\-abbreviation}},
   user1={},
@@ -5246,6 +5309,72 @@ indexing},
   category={command}
 }
 
+@index{forglsentries,
+  name={\csfmt{for\-gls\-entries}},
+  user1={\oargm{glossary-list}\margm{cs}\margm{body}},
+  description={iterates over all entries defined in the listed
+   glossaries and perform \meta{body} where you can use the
+   control sequence \meta{cs} to reference the current label},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrforcsvfield,
+  name={\csfmt{gls\-xtr\-for\-csv\-field}},
+  user1={\margm{label}\margm{field}\margm{handler}},
+  description={iterates over the comma-separated list
+   in the given \meta{field} for the entry identified
+   by \meta{label} and performs \meta{handler}\margm{element}
+   on each element of the list, where \meta{handler} is
+   a control sequence which takes a single argument},
+  note={provided by \styfmt{glossaries-extra} version 1.24+},
+  seealso={glsxtrendfor},
+  category={command}
+}
+
+@index{glsxtrendfor,
+  name={\csfmt{gls\-xtr\-end\-for}},
+  user1={},
+  description={may be used within the handler macro
+   of \cs{glsxtrforcsvfield} to prematurely break the loop},
+  note={provided by \styfmt{glossaries-extra} version 1.24+},
+  seealso={glsxtrforcsvfield},
+  category={command}
+}
+
+@index{TrackLocale,
+  name={\csfmt{Track\-Locale}},
+  user1={\margm{language tag}},
+  description={tracks the given language tag},
+  note={provided by \styfmt{tracklang} version 1.3+},
+  category={command}
+}
+
+@index{glstextformat,
+  name={\csfmt{glstextformat}},
+  user1={\margm{text}},
+  description={used by commands like \cs{gls} to format the link-text},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{TrackLangLastTrackedDialect,
+  name={\csfmt{Track\-Lang\-Last\-Tracked\-Dialect}},
+  user1={},
+  description={set by commands like \cs{TrackLocale}},
+  note={provided by \styfmt{tracklang}},
+  category={command}
+}
+
+@index{TrackedLanguageFromDialect,
+  name={\csfmt{Tracked\-Language\-From\-Dialect}},
+  user1={\margm{dialect}},
+  description={expands to the root language associated with the
+given (\styfmt{tracklang}) dialect label},
+  note={provided by \styfmt{tracklang}},
+  category={command}
+}
+
 @index{DTMdisplaydate,
   name={\csfmt{DTM\-display\-date}},
   user1={\margm{year}\margm{month}\margm{day}\margm{dow}},
@@ -5340,6 +5469,14 @@ has three or more items},
   description={prevents \cs{MakeTextUppercase} and
    \cs{MakeTextLowercase} from converting \meta{text}},
   note={provided by \styfmt{textcase}},
+  category={command}
+}
+
+@index{MakeUppercase,
+  name={\csfmt{MakeUppercase}},
+  user1={\margm{text}},
+  description={converts \meta{text} to upper case},
+  note={kernel command},
   category={command}
 }
 

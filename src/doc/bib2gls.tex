@@ -14,6 +14,7 @@
 \usepackage[no-math]{fontspec}
 \setmainfont{Linux Libertine O}
 
+\newfontface\greekmono{FreeMono}[Scale=MatchLowercase]
 \newfontface\devangari{FreeSerif}
 \newcommand{\devone}{{\devangari\char"0967}}
 \newcommand{\devtwo}{{\devangari\char"0968}}
@@ -1221,7 +1222,7 @@ be taken from the \field{name} which in the above example contains \TeX\ code, s
 The library has several different ways of writing the processed
 code. For simplicity, \bibgls\ uses the library's HTML output and then 
 strips the HTML markup and trims any leading or trailing
-spaces. The library method that writes non-ASCII
+spaces. The library method that writes \idx{non-ASCII}
 characters using \qtt{\&x\meta{hex};} markup is overridden
 by \bibgls\ to just write the Unicode character, which means
 that the letter-based sorting options will sort according
@@ -2072,7 +2073,7 @@ In the event that the \field{sort} value falls back on the label,
 the original label supplied in the \ext{bib} file is used, not the
 prefixed label.
 
-Avoid non-ASCII characters in the \meta{id} if your document uses the 
+Avoid \idx{non-ASCII} characters in the \meta{id} if your document uses the 
 \isty{inputenc} package.
 You can set the character \idx{encoding} in the \ext{bib} file using:
 \begin{alltt}
@@ -5961,18 +5962,18 @@ As \csopt{short-case-change} but is applied to the
 \optsection{post-description-dot}
 
 The \styopt{postdot} package option (or \styopt[false]{nopostdot}) 
-can be used to append a full stop to the end of all the
+can be used to append a \idx{full-stop} to the end of all the
 descriptions. This can be awkward if some of the descriptions
 end with punctuation characters. This resource option can be
 used instead. The \meta{value} may be one of:
 \begin{itemize}
-\item\optfmt{none}: don't append a full stop (default);
-\item\optfmt{all}: append a full stop to all \field{description}
+\item\optfmt{none}: don't append a \idx{full-stop} (default);
+\item\optfmt{all}: append a \idx{full-stop} to all \field{description}
   fields in this resource set;
-\item\optfmt{check}: selectively append a full stop (see below).
+\item\optfmt{check}: selectively append a \idx{full-stop} (see below).
 \end{itemize}
 Note that if you have dual entries and you use this option to
-append a full stop, then it will be copied over to the mapped field.
+append a \idx{full-stop}, then it will be copied over to the mapped field.
 This is different to the \styopt{postdot} option which doesn't
 add the dot to the field but incorporates it in the 
 \idx{postdescriptionhook}. This means that a dot inserted with
@@ -6087,7 +6088,7 @@ at the end of the \field{name} field:
 as there's no \field{first} or \field{text} field supplied.)
 
 If you have a field that ends with an abbreviation followed by a
-full stop, this will be considered an end of sentence terminator, but
+\idx{full-stop}, this will be considered an end of sentence terminator, but
 the main purpose of this option is to provide a way to deal with
 cases like
 \begin{verbatim}
@@ -8680,7 +8681,7 @@ to the following values: \optfmt{canonical} (default),
 \optfmt{full} or \optfmt{none}. This determines how Unicode composed
 characters are handled. The fastest mode is \optfmt{none} but is
 only appropriate for languages without accents. The slowest mode is
-\optfmt{full} but is the most complete for languages with non-ASCII
+\optfmt{full} but is the most complete for languages with \idx{non-ASCII}
 characters. See the documentation for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/Collator.html}{\code{Collator}
 class}~\cite{collator} for further details.
@@ -11868,9 +11869,9 @@ description={a film starring Harrison Ford, Rutger Hauer
  \gls{ext1.doandroidsdreamofelectricsheep}},
 \end{verbatim}
 then the \styopt{postdot} package option will produce an odd
-result as the inserted full stop immediately follows the question
+result as the inserted \idx{full-stop} immediately follows the question
 mark. This is an awkward situation. One possibility is to explicitly 
-put the full stop at the end of the \field{description} field for all the 
+put the \idx{full-stop} at the end of the \field{description} field for all the 
 other entries and omit it for the problematic entries, but this
 interferes with the possibility of a category-dependent
 \idx{postdescriptionhook}. 
@@ -12064,7 +12065,7 @@ but \csref{setmembershipfmt} causes a problem as it has two
 arguments and \ics{glsxtrfmt} requires the control sequence to 
 have exactly one argument. This means employing a little trick.
 A command with just one argument is provided:
-\nosecdef{setmembershipineargfmt}
+\nosecdef{setmembershiponeargfmt}
 that requires the actual two arguments to be supplied inside
 \verb|#1|. The outer grouping is removed and the two-argument
 \csref{setmembershipfmt} command is applied:
@@ -12106,8 +12107,8 @@ link text and that includes within the \meta{text} argument of
 usage.
 
 Some of the \field{description} fields use \csref{sortart}, so
-\exfile{no-interpret-preamble} and \exfile{interpret-preamble} are
-also needed.
+\exfile{no-interpret-preamble.bib} and
+\exfile{interpret-preamble.bib} are also needed.
 
 The contents of \filefmt{mathsobjects.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/mathsobjects.bib}
@@ -12154,6 +12155,244 @@ determine the widest name.
 
 The contents of \filefmt{miscsymbols.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/miscsymbols.bib}
+
+\filesection{usergroups.bib}
+
+The \exfile{usergroups.bib} file requires either \XeLaTeX\ or
+\LuaLaTeX\ as some of the entry labels use \idx{non-ASCII} characters.
+This file has a mixture of \atentry{abbreviation} and
+\atentry{index} entries. It also uses \atentry{string} for
+convenience and provides a custom command \csfmt{dash} in 
+\atentry{preamble}. Each entry is the name of a \TeX\ user group:
+the international \idx{TUG} and all the local groups.
+Most of them have an abbreviated name, so they're defined with
+\atentry{abbreviation}. There are a few without an abbreviation, so
+they're defined with \atentry{index} instead. There's one alias.
+(The information was obtained from \idx{TUG}['s] 
+\href{http://tug.org/usergroups.html}{user groups
+page}~\cite{tugusergroups}.)
+
+As with the other examples, there are some custom fields which will
+be ignored if they aren't defined or aliased: \fieldfmt{identifier}
+(set to \code{texusergroup}), \fieldfmt{language} (a comma-separated
+list of language tags) and \fieldfmt{translation} (provides a
+translation if the user group name isn't in English). 
+
+Not all entries have a \fieldfmt{translation} field. It it's
+omitted, then the user group name is in English, otherwise it's
+in the first language listed in the \fieldfmt{language} field.
+Most of the language tags are just the ISO 639-1 language code, but
+a few of them include the ISO 3166-1 region code as well.
+
+The contents of \filefmt{usergroups.bib} are as follows:
+\begin{lstlisting}[escapechar=|]
+% Encoding: UTF-8
+
+% Requires XeLaTeX/LuaLaTeX for non-ASCII labels
+
+@string{tug={\TeX\ Users Group}}
+
+@preamble{"\providecommand{\dash}{\,---\,}"}
+
+@abbreviation{TUG,
+  short={TUG},
+  long=tug,
+  language={en},
+  identifier={texusergroup}
+}
+
+@abbreviation{bgTeX,
+  short={bgTeX},
+  long={Bulgarian \LaTeX\ Users Group},
+  language={bg},
+  identifier={texusergroup}
+}
+
+@abbreviation{latex-br,
+  short={latex-br},
+  long={Grupo de Usuários},
+  language={pt-BR},
+  identifier={texusergroup},
+  translation={Brazilian }#tug
+}
+
+@abbreviation{CTeX,
+  short={CTeX},
+  long={Chinese \TeX\ Society},
+  identifier={texusergroup},
+  language={zh}
+}
+
+@abbreviation{CSTUG,
+  short={CSTUG},
+  long={|Československé sdružení uživatelů TeXu|, z.~s.},
+  language={cs},
+  identifier={texusergroup},
+  translation={Czech Republic }#tug
+}
+
+@abbreviation{DANTE,
+  short={DANTE e.V.},
+  long={Deutschsprachige Anwendervereinigung \TeX\ e.V.},
+  language={de},
+  identifier={texusergroup},
+  translation={German Speaking }#tug
+}
+
+@abbreviation{DKTUG,
+  short={DK-TUG},
+  long={Danish }#tug,
+  language={da},
+  identifier={texusergroup}
+}
+
+@index{EUG,
+  name={Estonian User Group},
+  language={et},
+  identifier={texusergroup}
+}
+
+@abbreviation{CervanTeX,
+  short={CervanTeX},
+  long={Grupo de Usuarios de \TeX\ Hispanohablantes},
+  language={es},
+  identifier={texusergroup},
+  translation={Spanish Speaking }#tug
+}
+
+@abbreviation{TirantloTeX,
+  short={Tirant lo \TeX},
+  long={Catalan }#tug,
+  language={ca},
+  identifier={texusergroup}
+}
+
+@abbreviation{GUTenberg,
+  short={GUTenberg},
+  long={Groupe francophone des utilisateurs de \TeX},
+  language={fr},
+  identifier={texusergroup},
+  translation={French Speaking }#tug
+}
+
+@abbreviation{UKTUG,
+  short={UK-TUG},
+  long={UK }#tug,
+  language={en-GB},
+  identifier={texusergroup}
+}
+
+@abbreviation{|\greekmono ɛϕτ|,
+  short={|\greekmono ɛϕτ|},
+  long={|\greekmono Σύλλογος Ελλήνων Φίλων του| \TeX},
+  language={el},
+  identifier={texusergroup},
+  translation={Greek \TeX\ Friends}
+}
+
+@abbreviation{MaTeX,
+  short={MaTeX},
+  long={Magyar \TeX\ Egyesület},
+  language={hu},
+  identifier={texusergroup},
+  translation={Hungarian }#tug
+}
+
+@abbreviation{ITALIC,
+  short={ITALIC},
+  long={Irish \TeX\ and \LaTeX\ In-print Community},
+  language={en-GB,en-IE},
+  identifier={texusergroup}
+}
+
+@abbreviation{ÍsTeX,
+  short={ÍsTeX},
+  long={Vefur íslenskra \TeX\ notenda},
+  language={is},
+  identifier={texusergroup},
+  translation={Icelandic }#tug
+}
+
+@abbreviation{GuIT,
+  short={GuIT},
+  long={Gruppo Utilizzatori Italiani di \TeX},
+  language={it},
+  identifier={texusergroup},
+  translation={Italian }#tug
+}
+
+@abbreviation{KTS,
+  short={KTS},
+  identifier={texusergroup},
+  long={Korean \TeX\ Society},
+  language={ko}
+}
+
+@index{KTUG,
+  alias={KTS},
+  identifier={texusergroup}
+}
+
+@index{LTVG,
+  name={Lietuvos \TeX'o |Vartotojų Grupė|},
+  language={lt},
+  identifier={texusergroup},
+  translation={Lithuanian }#tug
+}
+
+@index{mxTeX,
+  name={\TeX\ México},
+  language={es-MX},
+  identifier={texusergroup},
+  translation={Mexican }#tug
+}
+
+@abbreviation{NTG,
+  short={NTG},
+  long={Nederlandstalige \TeX\ Gebruikersgroep},
+  language={nl},
+  identifier={texusergroup},
+  translation={Netherlands }#tug
+}
+
+@index{NTUG,
+  name={Nordic \TeX\ Users Group},
+  language={da,et,fi,fo,is,nb,nn,sv},
+  identifier={texusergroup}
+}
+
+@abbreviation{GUST,
+  short={GUST},
+  long={Polska Grupa |Użytkowników| Systemu \TeX},
+  language={pl},
+  identifier={texusergroup},
+  translation={Polish }#tug
+}
+
+@abbreviation{GUTpt,
+  short={GUTpt},
+  long={Grupo de Utilizadores de \TeX},
+  language={pt},
+  identifier={texusergroup},
+  translation={Portuguese }#tug
+}
+
+@abbreviation{VietTUG,
+  short={VietTUG},
+  long={Vietnamese }#tug,
+  language={vi},
+  identifier={texusergroup}
+}
+
+@abbreviation{LUGSA,
+  short={LUGSA},
+  long={\LaTeX\ User Group\dash South Africa},
+  language={en-ZA},
+  identifier={texusergroup}
+}
+
+
+\end{lstlisting}
 
 \filesection{sample-chemical.tex}
 
@@ -12813,8 +13052,8 @@ stylemods={list,bookindex}
 This ensures that \sty{glossary-list} and \sty{glossary-bookindex}
 are loaded and patches the list styles.
 
-The first two glossaries would look better with a terminating full
-stop, so I've used the \styopt{postdot} package option. 
+The first two glossaries would look better with a terminating 
+\idx{full-stop}, so I've used the \styopt{postdot} package option. 
 (The \glostyle{bookindex} style doesn't use the \field{description}
 field and therefore doesn't use the \idx{postdescriptionhook}.)
 The index glossary type can be defined with the \styopt{index}
@@ -13163,7 +13402,7 @@ defaults to that field. If I decided to use a different field I also
 need to remember to redefine \ics{GlsXtrFmtField} to match.
 
 In this document I only want to select entries that have been
-indexed, so I've omitted the \csref{selection} option I used in the
+indexed, so I've omitted the \csopt{selection} option I used in the
 \exfile{sample-msymbols.tex} example, however
 I still don't want any number lists so I still have
 \csopt[false]{save-locations}.
@@ -13258,10 +13497,14 @@ supplied for each group label:
 \end{verbatim}
 This also requires sorting first by \field{category} and then
 fallback on another field. The most appropriate here is the
-\field{description} field:
+\field{description} field, but instead of using
+\csopt{identical-sort-action}, I'm using \csopt{sort-suffix},
+which works better with the default locale sort when the fallback
+field consists of words or phrases.
 \begin{verbatim}
 sort-field={category},
-identical-sort-action={description}
+sort-suffix={description},
+sort-suffix-marker={|}
 \end{verbatim}
 
 Unfortunately, since \bibgls\ doesn't recognise \sty{ifsym} or
@@ -13288,6 +13531,275 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 }
 {\caption{\filefmt{sample-textsymbols.pdf}}}
 {fig:sample-textsymbols.pdf}
+\end{figure}
+
+\filesection{sample-usergroups.tex}
+
+This example uses \exfile{usergroups.bib}. This requires \XeLaTeX\
+or \LuaLaTeX\ as the \ext{bib} file includes \idx{non-ASCII} labels.
+The entries include fields in different languages, the main one
+being English. If an entry has a non-English \field{name} or
+\field{long} field, it also includes the custom field
+\fieldfmt{translation} that provides an (approximate) translation.
+If this field is present, the language is given by the first element
+of the custom \fieldfmt{language} field.
+
+In this case, I'm providing keys for the custom
+\fieldfmt{language} and \fieldfmt{translation} fields, and for a bit
+of variety from the other examples, I'm ignoring the custom
+\fieldfmt{identifier} field. The custom keys are provided with
+\ics{glsaddstoragekey}:
+\begin{verbatim}
+\glsaddstoragekey{language}{}{\glsentrylanguage}
+\glsaddstoragekey{translation}{}{\glsentrytranslation}
+\end{verbatim}
+The \ext{bib} file includes abbreviations. Remember that the
+abbreviation style must be set before the resource file is loaded:
+\begin{verbatim}
+\setabbreviationstyle[tug]{long-short-user}
+\end{verbatim}
+For this example, I'm explicitly setting the \field{category} field
+to \code{tug} using the \csopt{category} option:
+\begin{verbatim}
+category=tug
+\end{verbatim}
+Some of the fields end with a \idx{full-stop}. This isn't a problem with
+the \field{long} field as the first use follows the long form with
+the short form in parentheses, but it will be a problem on
+subsequent use if the \field{short} field ends with a \idx{full-stop}.
+This means I need to check for end-of-sentence punctuation
+for the \field{short} field. It's also a good idea to do this for
+the \field{name} field for the non-abbreviations.
+\begin{verbatim}
+check-end-punctuation={name,short}
+\end{verbatim}
+It's now possible to discard a \idx{full-stop} that follows
+\ics{gls}:
+\begin{verbatim}
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \ifglshasshort{\glslabel}%
+ {%
+   \glsxtrifwasfirstuse{}%
+   {%
+     \GlsXtrIfFieldUndef{shortendpunc}{\glslabel}{#2}{#1}%
+   }%
+ }%
+ {%
+   \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+ }%
+}
+\end{verbatim}
+This first tests if the entry that's just been referenced has a
+\field{short} field. If it has, then the next test is to check if
+that was the first use for that entry. If it was, nothing is done.
+If it wasn't, then \cs{GlsXtrIfFieldUndef} is used to determine
+if \fielddisp{fieldendpunc}{shortendpunc} has been set. If it has
+been set then the period discard function is performed. If the
+entry doesn't have a \field{short} field, then the
+\fielddisp{fieldendpunc}{nameendpunc} field needs checking instead.
+
+Since the document requires \XeLaTeX\ or \LuaLaTeX\ and has some
+\idx{non-ASCII} characters, it needs \sty{fontspec} and an
+appropriate font. In this case I've chosen \qt{Linux Libertine O}.
+If you don't have it installed, you'll need to change it.
+\begin{verbatim}
+\usepackage{fontspec}
+\setmainfont{Linux Libertine O}
+\end{verbatim}
+Since it's a multilingual document I also need \sty{polyglossia}
+with the main language set to \code{english}:
+\begin{verbatim}
+\usepackage{polyglossia}
+\setmainlanguage[variant=uk]{english}
+\end{verbatim}
+Now comes the difficult bit. The document needs to determine what
+other languages need to be loaded. The \sty{tracklang} package
+provides a convenient interface when dealing with language tags.
+This is automatically loaded by \styfmt{glossaries} but I've loaded
+it here explicitly as a reminder:
+\begin{verbatim}
+\usepackage{tracklang}
+\end{verbatim}
+Once the resource file has been loaded, I need to iterate over all
+the defined entries and check if the \fieldfmt{translation} field
+has been set. If it has, then the first language tag in the
+\fieldfmt{language} field will supply the language, but this needs
+to be converted from the \idx{IETF} language tag to a language name
+recognised by \sty{polyglossia}.
+
+Iterating over all entries can be done with \ics{forglsentries}
+but remember that no entries will be defined before \bibgls\ has
+been run, so this does nothing on the first \LaTeX\ run.
+\begin{verbatim}
+\forglsentries{\thislabel}{%
+  \glsxtrifhasfield{translation}{\thislabel}%
+  {%
+    % requires glossaries-extra v1.24
+    \glsxtrforcsvfield{\thislabel}{language}{\addfirstlang}%
+  }%
+  {}%
+}
+\end{verbatim}
+Within the outer (\cs{forglsentries}) loop, there's a check
+for the \fieldfmt{translation} field using \ics{glsxtrifhasfield}.
+If it's present, then the first element of the \fieldfmt{language}
+field is required. The simplest way to get this is to use
+\ics{glsxtrforcsvfield} which iterates over all elements of the
+given field (\fieldfmt{language} in this case) and break out of the
+loop (with \ics{glsxtrendfor}) once the language has been found.
+
+The handler function (\csfmt{addfirstlang}) is defined so that it
+adds the given language tag as a tracked language using
+\ics{TrackLocale}. This command sets
+\ics{TrackLangLastTrackedDialect} to the associated
+(\sty{tracklang}) dialect label for convenience. This dialect label
+can then be converted to the root language label using
+\ics{TrackedLanguageFromDialect}. If this language is supported
+by \sty{polyglossia}, then there should be a file called
+\metafilefmt{gloss}{language}{.ldf}.
+
+Some of the entries use the same language, so it's necessary to
+check if the language has already been defined before loading it.
+There's also a problem in that the language file should not be
+loaded in a scoped context, but both \ics{glsxtrforcsvfield}
+and the unstarred \ics{glsxtrifhasfield} add implicit grouping.
+To solve both problems, an internal \sty{etoolbox} list is 
+defined:
+\begin{verbatim}
+\newcommand{\langlist}{}%
+\end{verbatim}
+and \ics{xifinlist} is used to first check if the language label is
+already in the list before adding it. Since this part of the code is
+scoped, the global \ics{listxadd} is used to add the language label
+to the list.
+
+Next the \field{useri} field is set to \code{text}\meta{language}
+which is the name of the control sequence used with
+\sty{polyglossia} to switch languages. This means that
+\ics{glsxtrentryfmt}\margm{text} can be used to format \meta{text}
+in the relevant language. Finally, \ics{glsxtrendfor} is used to
+break out of the loop.
+\begin{verbatim}
+\newcommand*{\addfirstlang}[1]{%
+  \TrackLocale{#1}%
+  \edef\thislanguage{%
+    \TrackedLanguageFromDialect\TrackLangLastTrackedDialect}%
+  \IfFileExists{gloss-\thislanguage.ldf}%
+  {%
+    \xifinlist{\thislanguage}{\langlist}{}%
+    {\listxadd{\langlist}{\thislanguage}}%
+    \xGlsXtrSetField{\thislabel}{useri}{text\thislanguage}%
+    \glsxtrendfor
+  }%
+  {}%
+}
+\end{verbatim}
+Once the \ics{forglsentries} loop has found the appropriate
+languages, it's now necessary to iterator over the internal list
+\csfmt{langlist} and set the language:
+\begin{verbatim}
+\forlistloop{\setotherlanguage}{\langlist}
+\end{verbatim}
+The \abbrstyle{long-short-user} style now needs to be adjusted
+to ensure that it picks up the appropriate language change.
+By default this style checks the \field{useri} field, so this needs
+to be changed to \fieldfmt{translation} by redefining
+\ics{glsxtruserfield}:
+\begin{verbatim}
+\renewcommand*{\glsxtruserfield}{translation}
+\end{verbatim}
+The command that governs the format of the parenthetical material
+(\ics{glsxtruserparen}) also needs adjusting. I've changed the
+space before the parenthesis to \verb*|\ | because some of the
+long fields end with a \idx{full-stop} and this corrects the
+spacing. The \fieldfmt{translation} field is in English, 
+so this needs to be encapsulated with \csfmt{textenglish}
+in case the surrounding text is in a different language.
+\begin{verbatim}
+\renewcommand*{\glsxtruserparen}[2]{%
+  \
+  \glsxtrparen{#1%
+  \ifglshasfield{\glsxtruserfield}{#2}{,
+   \textenglish{\glscurrentfieldvalue}}{}}%
+}
+\end{verbatim}
+Next I've defined a convenient command for use in the \catattr{textformat}
+attributes for the custom \code{tug} category:
+\begin{verbatim}
+\newcommand*{\tugtextformat}[1]{%
+  \glsxtrentryfmt{\glslabel}{#1}%
+}
+\end{verbatim}
+This uses \ics{glsxtrentryfmt} to encapsulate the given text
+in the appropriate language command (if provided). When this is set
+as the \catattr{textformat} attribute, it will be used instead of
+\ics{glstextformat}, which means that the entry label can be
+referenced with \cs{glslabel}.
+
+There's a similar command for use in the \catattr{glossnamefont}
+attribute. This is used in the glossary, so the label is referenced
+with \cs{glscurrententrylabel}:
+\begin{verbatim}
+\newcommand*{\tugnameformat}[1]{%
+  \glsxtrentryfmt{\glscurrententrylabel}{#1}%
+}
+\end{verbatim}
+The attributes can now be set to the relevant control sequence name:
+\begin{verbatim}
+\glssetcategoryattribute{tug}{textformat}{tugtextformat}
+\glssetcategoryattribute{tug}{glossnamefont}{tugnameformat}
+\end{verbatim}
+
+This document uses the \glostyle{bookindex} style. This is set in
+the package options:
+\begin{verbatim}
+\usepackage[record,
+ nostyles,
+ stylemods={bookindex},
+ style={bookindex}
+]{glossaries-extra}
+\end{verbatim}
+This style ignores the \field{description} field, so I've provided
+a \idx{postnamehook} to append it in parentheses (with the
+translation, if provided):
+\begin{verbatim}
+\newcommand{\glsxtrpostnametug}{%
+  \ifglshasdesc{\glscurrententrylabel}%
+  {\ (\glossentrydesc{\glscurrententrylabel}%
+     \glsxtrifhasfield{translation}{\glscurrententrylabel}%
+     {, \textenglish{\glscurrentfieldvalue}}%
+     {}%
+  )}%
+  {%
+   \glsxtrifhasfield{translation}{\glscurrententrylabel}%
+   {\ (\textenglish{\glscurrentfieldvalue})}%
+   {}%
+  }%
+}
+\end{verbatim}
+Remember that this hook is included within the \field{name} font
+(provided by the \catattr{glossnamefont} attribute in this case)
+so \csfmt{textenglish} is again used to switch the language to
+English for the translation.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+xelatex sample-usergroups
+bib2gls --group sample-usergroups
+xelatex sample-usergroups
+xelatex sample-usergroups
+\end{verbatim}
+The two pages of the document are shown in
+\figureref{fig:sample-usergroups.pdf}. Since the entries have all
+been referenced on page~1, the location lists are all simply~\qt{1}.
+
+\lstinputlisting[firstline=5]{../examples/sample-usergroups.tex}
+
+\begin{figure}[p]
+\figcontents
+{\pdftwocol{../examples/sample-usergroups.pdf}{2}}
+{\caption{\filefmt{sample-usergroups.pdf}}}
+{fig:sample-usergroups.pdf}
 \end{figure}
 
 \printcommandsummary

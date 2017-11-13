@@ -1,0 +1,128 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass{scrreprt}
+
+\usepackage{fontspec}
+\setmainfont{Linux Libertine O}
+
+\usepackage{polyglossia}
+\setmainlanguage[variant=uk]{english}
+\usepackage{tracklang}
+\usepackage{etoolbox}
+
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ stylemods={bookindex},
+ style={bookindex}
+]{glossaries-extra}
+
+\glsaddstoragekey{language}{}{\glsentrylanguage}
+\glsaddstoragekey{translation}{}{\glsentrytranslation}
+
+\setabbreviationstyle[tug]{long-short-user}
+
+\GlsXtrLoadResources[
+  src={usergroups}, % data in usergroups.bib
+  check-end-punctuation={name,short},
+  category=tug
+]
+
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \ifglshasshort{\glslabel}%
+ {%
+   \glsxtrifwasfirstuse{}%
+   {%
+     \GlsXtrIfFieldUndef{shortendpunc}{\glslabel}{#2}{#1}%
+   }%
+ }%
+ {%
+   \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+ }%
+}
+
+\newcommand{\langlist}{}%
+
+\newcommand*{\addfirstlang}[1]{%
+  \TrackLocale{#1}%
+  \edef\thislanguage{%
+    \TrackedLanguageFromDialect\TrackLangLastTrackedDialect}%
+  \IfFileExists{gloss-\thislanguage.ldf}%
+  {%
+    \xifinlist{\thislanguage}{\langlist}{}%
+    {\listxadd{\langlist}{\thislanguage}}%
+    \xGlsXtrSetField{\thislabel}{useri}{text\thislanguage}%
+    \glsxtrendfor
+  }%
+  {}%
+}
+
+\forglsentries{\thislabel}{%
+  \glsxtrifhasfield{translation}{\thislabel}%
+  {%
+    % requires glossaries-extra v1.24
+    \glsxtrforcsvfield{\thislabel}{language}{\addfirstlang}%
+  }%
+  {}%
+}
+
+\forlistloop{\setotherlanguage}{\langlist}
+
+\renewcommand*{\glsxtruserfield}{translation}
+
+\renewcommand*{\glsxtruserparen}[2]{%
+  \  
+  \glsxtrparen{#1%
+  \ifglshasfield{\glsxtruserfield}{#2}{,
+   \textenglish{\glscurrentfieldvalue}}{}}%
+}
+
+\newcommand*{\tugtextformat}[1]{%
+  \glsxtrentryfmt{\glslabel}{#1}%
+}
+
+\newcommand*{\tugnameformat}[1]{%
+  \glsxtrentryfmt{\glscurrententrylabel}{#1}%
+}
+
+\glssetcategoryattribute{tug}{textformat}{tugtextformat}
+\glssetcategoryattribute{tug}{glossnamefont}{tugnameformat}
+
+\newcommand{\glsxtrpostnametug}{%
+  \ifglshasdesc{\glscurrententrylabel}%
+  {\ (\glossentrydesc{\glscurrententrylabel}%
+     \glsxtrifhasfield{translation}{\glscurrententrylabel}%
+     {, \textenglish{\glscurrentfieldvalue}}%
+     {}%
+  )}%
+  {%
+   \glsxtrifhasfield{translation}{\glscurrententrylabel}%
+   {\ (\textenglish{\glscurrentfieldvalue})}%
+   {}%
+  }%
+}
+
+\begin{document}
+\chapter{Sample}
+\section{First Use}
+\gls{TUG}. \gls{bgTeX}. \gls{latex-br}. \gls{CTeX}.
+\gls{CSTUG}. \gls{DANTE}. \gls{DKTUG}. \gls{EUG}.
+\gls{CervanTeX}. \gls{TirantloTeX}. \gls{GUTenberg}.
+\gls{UKTUG}. \gls{ɛϕτ}. \gls{MaTeX}. \gls{ITALIC}.
+\gls{ÍsTeX}. \gls{GuIT}. \gls{KTS}. \gls{LTVG}.
+\gls{mxTeX}. \gls{NTG}. \gls{NTUG}. \gls{GUST}. \gls{GUTpt}.
+\gls{VietTUG}. \gls{LUGSA}.
+
+\section{Next Use}
+
+\gls{TUG}. \gls{bgTeX}. \gls{latex-br}. \gls{CTeX}.
+\gls{CSTUG}. \gls{DANTE}. \gls{DKTUG}. \gls{EUG}.
+\gls{CervanTeX}. \gls{TirantloTeX}. \gls{GUTenberg}.
+\gls{UKTUG}. \gls{ɛϕτ}. \gls{MaTeX}. \gls{ITALIC}.
+\gls{ÍsTeX}. \gls{GuIT}. \gls{KTS}. \gls{LTVG}.
+\gls{mxTeX}. \gls{NTG}. \gls{NTUG}. \gls{GUST}. \gls{GUTpt}.
+\gls{VietTUG}. \gls{LUGSA}.
+
+\printunsrtglossaries
+\end{document}
