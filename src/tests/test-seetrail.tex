@@ -1,0 +1,27 @@
+\documentclass{report}
+
+\usepackage[record,postdot]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={test-seetrail},% data in test-seetrail.bib
+  save-locations=false% don't save locations
+]
+
+\renewcommand*{\glsxtrpostdescgeneral}{%
+ \ifglshasfield{see}{\glscurrententrylabel}
+ {, \glsxtrusesee{\glscurrententrylabel}}%
+ {%
+   \ifglshasfield{seealso}{\glscurrententrylabel}
+   {, \glsxtruseseealso{\glscurrententrylabel}}%
+   {}%
+ }%
+}
+
+\begin{document}
+\chapter{Sample}
+
+A \gls{sample4}.
+
+\printunsrtglossaries
+\end{document}
+

@@ -3700,12 +3700,9 @@ public class GlsResource
 
          if (depEntry != null)
          {
-            // Does the dependant entry have dependencies?
+            // add any dependencies
 
-            if (depEntry.hasDependencies())
-            {
-               addDependencies(parser, depEntry, list);
-            }
+            addDependencies(parser, depEntry, list);
          }
       }
    }
