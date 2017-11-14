@@ -1747,6 +1747,72 @@ public class Bib2Gls implements TeXApp
          entryLabel, total);
    }
 
+   public static String replaceSpecialChars(String value)
+   {
+      StringBuilder builder = new StringBuilder();
+      boolean cs = false;
+
+      for (int i = 0; i < value.length(); )
+      {
+         int cp = value.codePointAt(i);
+         i += Character.charCount(cp);
+
+         switch (cp)
+         {
+            case '\\':
+               builder.append("\\glsbackslash ");
+               cs = true;
+            break;
+            case '%':
+               builder.append("\\glspercentchar ");
+               cs = true;
+            break;
+            case '{':
+               builder.append("\\glsopenbrace ");
+               cs = true;
+            break;
+            case '}':
+               builder.append("\\glsclosebrace ");
+               cs = true;
+            break;
+            case '~':
+               builder.append("\\glstildechar ");
+               cs = true;
+            break;
+            case '#':
+               builder.append(String.format("\\bibglshashchar ", cp));
+               cs = true;
+            break;
+            case '_':
+               builder.append(String.format("\\bibglsunderscorechar ", cp));
+               cs = true;
+            break;
+            case '$':
+               builder.append(String.format("\\bibglsdollarchar ", cp));
+               cs = true;
+            break;
+            case '&':
+               builder.append(String.format("\\bibglsampersandchar ", cp));
+               cs = true;
+            break;
+            case '^':
+               builder.append(String.format("\\bibglscircumchar ", cp));
+               cs = true;
+            break;
+            default:
+               if (cs && Character.isWhitespace(cp))
+               {
+                  builder.append("\\space");
+               }
+               cs = false;
+
+               builder.appendCodePoint(cp);
+         }
+      }
+
+      return builder.toString();
+   }
+
    public void writeCommonCommands(PrintWriter writer)
     throws IOException
    {
@@ -1755,6 +1821,11 @@ public class Bib2Gls implements TeXApp
          return;
       }
 
+      writer.println("\\providecommand{\\bibglshashchar}{\\expandafter\\@gobble\\string\\#}");
+      writer.println("\\providecommand{\\bibglscircumchar}{\\expandafter\\@gobble\\string\\^}");
+      writer.println("\\providecommand{\\bibglsdollarchar}{\\expandafter\\@gobble\\string\\$}");
+      writer.println("\\providecommand{\\bibglsampersandchar}{\\expandafter\\@gobble\\string\\&}");
+      writer.println("\\providecommand{\\bibglsunderscorechar}{\\expandafter\\@gobble\\string\\_}");
       writer.println("\\providecommand{\\bibglsusesee}[1]{\\glsxtrusesee{#1}}");
       writer.println("\\providecommand{\\bibglsuseseealso}[1]{\\glsxtruseseealso{#1}}");
       writer.println("\\providecommand{\\bibglsdelimN}{\\delimN}");
@@ -3545,8 +3616,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.2 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-11";
+   public static final String VERSION = "1.1.20171114 (EXPERIMENTAL)";
+   public static final String DATE = "2017-11-14";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

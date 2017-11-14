@@ -4,7 +4,8 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
-	sample-maths.pdf sample-textsymbols.pdf sample-usergroups.pdf
+	sample-maths.pdf sample-textsymbols.pdf sample-usergroups.pdf \
+	sample-languages.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -77,6 +78,12 @@ sample-usergroups.pdf	: $(DEPS) sample-usergroups.tex \
 	xelatex sample-usergroups
 	$(BIB2GLS) sample-usergroups
 	xelatex sample-usergroups
+
+sample-languages.pdf	: $(DEPS) sample-languages.tex \
+	markuplanguages.bib
+	pdflatex sample-languages
+	$(BIB2GLS) sample-languages
+	pdflatex sample-languages
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

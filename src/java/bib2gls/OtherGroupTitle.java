@@ -37,7 +37,8 @@ public class OtherGroupTitle extends GroupTitle
 
    public String format(String other)
    {
-      return String.format("{%s}{%X}{%s}", other, getId(),
-       type == null ? "" : type);
+      return String.format("{%s}{%X}{%s}", 
+       Bib2Gls.replaceSpecialChars(other), 
+       getId(), type == null ? "" : type);
    }
 }

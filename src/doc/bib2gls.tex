@@ -75,9 +75,6 @@
 \newcommand{\glsxtrpostnameenvironment}{\space environment}
 \newcommand{\glsxtrpostnamecounter}{\space counter}
 
-\newcommand*{\bibglsothergroup}[3]{#3.#2}
-\newcommand*{\bibglsothergrouptitle}[3]{#1}
-
 \GlsXtrLoadResources[
   label-prefix={idx.},
   save-loclist=false,
@@ -496,6 +493,7 @@
   ]%
   {%
    \let\printunsrtglossaryentryprocesshook\commandsummaryhook
+   \glsxtrlocalsetgrouptitle{glssymbols}{@}%
   }%
 }
 
@@ -1091,15 +1089,16 @@ which is used to parse the \iext{aux} and \iext{bib} files.
 
 With the \longarg{interpret} switch on (default), this library is
 also used to interpret the sort value when it contains a backslash
-\verb|\| or a tilde \verb|~| or a dollar symbol \verb|$| or braces
-\verb|{| \verb|}| (and when the \csopt{sort} option is not
+\idx{escchar} or a tilde \idx{nbspchar} or a dollar symbol 
+\idx{mshiftchar} or braces \idx{bgroupchar} \idx{egroupchar}
+(and when the \csopt{sort} option is not
 \optfmt{unsrt} or \optfmt{none} or \optfmt{use}).\footnote{The other
 special characters are omitted from the check: the comment symbol
-\code{\%} is best avoided in field values, the subscript and
-superscript characters \code{\_} and \code{\textasciicircum} should
-either be encapsulated by \code{\$} or by \cs{ensuremath}, which
-will be picked up by the check for \code{\$} or
-\code{\glsbackslash}, and the other special characters would
+\idx{commentchar} is best avoided in field values, the subscript and
+superscript characters \idx{sbchar} and \idx{spchar} should
+either be encapsulated by \idx{mshiftchar} or by \cs{ensuremath}, which
+will be picked up by the check for \idx{mshiftchar} or
+\idx{escchar}, and the other special characters would
 indicate something too complex for the interpreter to handle.}
 
 The other cases that the interpreter is used for are:
@@ -1107,8 +1106,8 @@ The other cases that the interpreter is used for are:
 \item when \csopt{set-widest} is used to determine the width of
 the \field{name} field;
 \item if the \field{parent}, \field{category}, \field{type} 
-or \field{alias} fields contain
-\verb|\| or \verb|{| or \verb|}| the interpreter is used 
+or \field{alias} fields contain \idx{escchar}
+or \idx{bgroupchar} or \idx{egroupchar} the interpreter is used 
 since these fields must be just a label
 (other special characters aren't checked as they won't expand
 characters allowed in a label).
@@ -1122,7 +1121,7 @@ expand the \field{seealso} field using the parser library
 (since it should only contain a comma-separated list of labels).
 The parser has a different concept of expansion to \LaTeX\
 and will expand some things that aren't expanded by \LaTeX\
-(such as \cs{MakeUppercase}) and won't expand other commands
+(such as \ics{MakeUppercase}) and won't expand other commands
 that would be expanded by \LaTeX\ (such as commands defined
 in terms of complicated internals).
 The \field{see} field may legitimately contain \LaTeX\ code
@@ -1543,12 +1542,12 @@ for more details.
 
 \argsection{no-break-space}
 
-The interpreter treats a tilde character \verb|~| as a non-breakable
+The interpreter treats a tilde character \idx{nbspchar} as a non-breakable
 space (default).
 
 \argsection{break-space}
 
-The interpreter treats a tilde character \verb|~| as a normal
+The interpreter treats a tilde character \idx{nbspchar} as a normal
 space.
 
 \argsection{packages}
@@ -1604,7 +1603,7 @@ above.
 
 This works in the same way as \longarg{mfirstuc-protection} but
 guards against fields starting with inline maths
-(\verb|$|\ldots\verb|$|). For example, if the \field{name} field
+(\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the \field{name} field
 starts with \verb|$x$| and the glossary style automatically tries to
 convert the first letter of the name to upper case, then this will
 cause a problem.
@@ -2073,11 +2072,15 @@ In the event that the \field{sort} value falls back on the label,
 the original label supplied in the \ext{bib} file is used, not the
 prefixed label.
 
+\section{Encoding}
+\label{sec:bibencoding}
+
 Avoid \idx{non-ASCII} characters in the \meta{id} if your document uses the 
-\isty{inputenc} package.
+\isty{inputenc} package. (This isn't a problem for \XeLaTeX\ or
+\LuaLaTeX, but you still need to avoid special characters.)
 You can set the character \idx{encoding} in the \ext{bib} file using:
 \begin{alltt}
-\% Encoding: \meta{encoding-name}
+\idx{commentchar} Encoding: \meta{encoding-name}
 \end{alltt}
 where \meta{encoding-name} is the name of the character encoding.
 For example:
@@ -2091,6 +2094,14 @@ to determine the encoding, so it works for both applications.)
 If you don't use either method \bibgls\ will
 have to search the entire \ext{bib} file, which is inefficient and
 you may end up with a mismatched encoding.
+
+\section{Comments}
+\label{sec:bibcomments}
+
+You may have comments within the \ext{bib} file provided they are
+outside of entry definitions. The most common type of comment is the
+encoding comment, described above.
+Avoid using comments within field values.
 
 \section{Fields}
 \label{sec:fields}
@@ -2121,13 +2132,17 @@ There are also some fields that are set and used by
 \styfmt{glossaries} or \styfmt{glossaries-extra} listed in
 Table~\ref{tab:baseinternalfields} that are unrecognised by \bibgls.
 In most cases these fields don't have a designated key and are only
-intended for internal use by the \styfmt{glossaries} or
-\styfmt{glossaries-extra} package.
+intended for internal use by \bibgls\ or by the \styfmt{glossaries} or
+\styfmt{glossaries-extra} package. Note that the value of the \field{sort} field
+written to the \ext{bib} file doesn't always exactly match the sort
+value used by \bibgls\ (which is stored in \field{bib2gls@sort}).
+Any special characters found in sort value are always substituted
+before writing the \ext{bib} file to avoid syntax errors.
 
-Any unrecognised fields will be ignored by \bibgls. This is more convenient
-than using \ics{input} or \ics{loadglsentries}, which requires all the
-keys used in the file to be defined, regardless of whether or not
-you actually need them in the document.
+Any unrecognised fields will be ignored by \bibgls. This is more
+convenient than using \ics{input} or \ics{loadglsentries}, which
+requires all the keys used in the file to be defined, regardless of
+whether or not you actually need them in the document.
 
 If an optional field is missing and \bibgls\ needs to access it for
 some reason (for example, for sorting), \bibgls\ will try to
@@ -2208,7 +2223,9 @@ the \iext{glstex} File}
 \end{table}
 
 \begin{table}[hbtp]
-\caption[Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}]{Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra}
+\caption[Internal Fields Set by \styfmt{glossaries} or
+\styfmt{glossaries-extra} or \bibgls]{Internal Fields Set by
+\styfmt{glossaries} or \styfmt{glossaries-extra} or \bibgls\
 (don't use in \ext{bib} files)}\label{tab:baseinternalfields}
 \centering
 \printfields{baseinternalfield}%
@@ -2222,7 +2239,9 @@ the \iext{glstex} File}
 \entrysection{string}
 
 The standard \atentry{string} is available and can be used to define
-variables that may be used in field values.
+variables that may be used in field values. Don't include braces or
+double-quote delimiters when referencing a variable. You can use
+\idx{stringconcat} to concatenate strings.
 For example:
 \begin{verbatim}
 @string{ssi={server-side includes}}
@@ -2230,20 +2249,24 @@ For example:
 
 @abbreviation{shtml,
   short="shtml",
-  long= ssi # " enabled " # html,
+  long=ssi # " enabled " # html,
   see={ssi,html}
 }
 
 @abbreviation{html,
-  short ="html",
-  long  = html
+  short="html",
+  long=html
 }
 
 @abbreviation{ssi,
   short="ssi",
-  long = ssi
+  long=ssi
 }
 \end{verbatim}
+Note the difference between \code{="ssi"} (a field value delimited by
+double-quotes), the undelimited \code{=ssi} (a reference to the
+variable), the grouped \code{=\marg{ssi,html}} (a field value
+delimited by braces) and \code{ssi} the entry label.
 
 \entrysection{preamble}
 
@@ -2282,12 +2305,12 @@ For example:
 \end{verbatim}
 Neither entry has the \field{sort} field, so \bibgls\ has to fall
 back on the \field{name} field and, since this contains the special
-characters \verb|\| \verb|$| \verb|{| and \verb|}|, the \TeX\ parser
-library is used to interpret it. The definitions provided by
-\atentry{preamble} allow \bibgls\ to deduce that the \field{sort}
-value of the \code{S} entry is just \code{S} and the \field{sort}
-value of the \code{card} entry is \verb"|S|" (see
-\sectionref{sec:texparserlib}).
+characters \idx{escchar} \idx{mshiftchar} \idx{bgroupchar}
+\idx{egroupchar}, the \TeX\ parser library is used to interpret it.
+The definitions provided by \atentry{preamble} allow \bibgls\ to
+deduce that the \field{sort} value of the \code{S} entry is just
+\code{S} and the \field{sort} value of the \code{card} entry is
+\verb"|S|" (see \sectionref{sec:texparserlib}).
 
 What happens if you also need to use these commands in the document?
 The definitions provided in \atentry{preamble} won't be available
@@ -4099,7 +4122,7 @@ resource sets.
 If the character \idx{encoding} hasn't been supplied in the \iext{bib} file
 with the encoding comment
 \begin{alltt}
-\% Encoding: \meta{encoding-name}
+\idx{commentchar} Encoding: \meta{encoding-name}
 \end{alltt}
 then you can supply the correct encoding using
 \csopt[encoding-name]{charset}. In general, it's better to include
@@ -4517,12 +4540,13 @@ field identifying the glossary label).
 The \meta{regex} part should be a regular expression conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
-Pattern class}~\cite{pattern}. The pattern is anchored (\code{oo.*} matches
+Pattern class}~\cite{pattern}. The pattern is anchored 
+(\code{oo\idx{matchanydot}\idx{zeroormore}} matches
 \code{oops} but not \code{loops}) and \meta{regexp} can't be
 empty. Remember that \TeX\ will expand the option list as
 it writes the information to the \ext{aux} file so take
 care with special characters. For example, to match a literal
-period use \verb|\string\.| not \verb|\.| (backslash dot).
+period use \cs{cs.string}\ics{cs.period} not \ics{cs.period} (backslash dot).
 
 If the field is missing its value it is assumed to be empty for
 the purposes of the pattern match even if it will be assigned a
@@ -4670,7 +4694,7 @@ For example, suppose the file \filefmt{entries.bib} contains:
 @index{minerals}
 @index{quartz,parent={minerals}}
 @index{corundum,parent={minerals}}
-@index{amber,parent={minerals}}
+@index{amethyst,parent={minerals}}
 @index{gypsum,parent={minerals}}
 
 @index{aardvark}
@@ -4691,7 +4715,7 @@ and suppose the document contains:
 
 \begin{document}
 \gls{duck}.
-\gls{quartz}, \gls{corundum}, \gls{amber}.
+\gls{quartz}, \gls{corundum}, \gls{amethyst}.
 \gls{aardvark}, \gls{bard}, \gls{buzz}.
 \gls{vegetable}, \gls{cabbage}.
 \gls{subsubitem}.
@@ -4727,7 +4751,7 @@ hierarchical structure:
 \item[M] \null
 \item[minerals] \mbox{}
   \begin{description}\setlength\itemsep{0pt}%
-  \item[amber] 1
+  \item[amethyst] 1
   \item[corundum] 1
   \item[quartz] 1
   \end{description}
@@ -4761,7 +4785,7 @@ the hierarchy becomes:
 \item[M] \null
 \item[minerals] \mbox{}
   \begin{description}\setlength\itemsep{0pt}%
-  \item[amber] 1
+  \item[amethyst] 1
   \item[corundum] 1
   \item[quartz] 1
   \end{description}
@@ -4861,7 +4885,7 @@ original parent entry \code{vegetable} will remain:
 \item[M] \null
 \item[minerals] \mbox{}
   \begin{description}\setlength\itemsep{0pt}%
-  \item[amber] 1
+  \item[amethyst] 1
   \item[corundum] 1
   \item[quartz] 1
   \end{description}
@@ -4897,7 +4921,7 @@ the hierarchical order is now:
 \item[M] \null
 \item[minerals] \mbox{}
   \begin{description}\setlength\itemsep{0pt}%
-  \item[amber] 1
+  \item[amethyst] 1
   \item[corundum] 1
   \item[quartz] 1
   \end{description}
@@ -5777,10 +5801,10 @@ values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
 \item \optfmt{lc}: convert to lower case (ignoring 
-\code{\$\meta{maths}\$}, \ics{ensuremath}\margm{maths} 
+\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \ics{ensuremath}\margm{maths} 
 and \ics{si}\margm{text});
 \item \optfmt{uc}: convert to upper case (ignoring 
-\code{\$\meta{maths}\$}, \ics{ensuremath}\margm{maths} 
+\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \ics{ensuremath}\margm{maths} 
 and \ics{si}\margm{text});
 \item \optfmt{lc-cs}: convert to lower case using
 \ics{MakeTextLowercase};
@@ -5791,7 +5815,7 @@ and \ics{si}\margm{text});
 \item \optfmt{firstuc}: convert the first alphabetical letter (or
 group) to upper case. This uses the following rules:
 \begin{enumerate}
-\item if \code{\$\meta{maths}\$} then stop (no case change);
+\item if \idx{mshiftchar}\meta{maths}\idx{mshiftchar} then stop (no case change);
 \item if \ics{NoCaseChange}\margm{text} or
 \ics{ensuremath}\margm{maths} or \ics{si}\margm{text} or \ics{protect} then skip;
 \item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
@@ -5961,11 +5985,11 @@ As \csopt{short-case-change} but is applied to the
 
 \optsection{post-description-dot}
 
-The \styopt{postdot} package option (or \styopt[false]{nopostdot}) 
-can be used to append a \idx{full-stop} to the end of all the
-descriptions. This can be awkward if some of the descriptions
-end with punctuation characters. This resource option can be
-used instead. The \meta{value} may be one of:
+The \styopt{postdot} package option (or \styopt[false]{nopostdot})
+can be used to append a \idx{full-stop} (\idx{periodchar})\ to the
+end of all the descriptions. This can be awkward if some of the
+descriptions end with punctuation characters. This resource option
+can be used instead. The \meta{value} may be one of:
 \begin{itemize}
 \item\optfmt{none}: don't append a \idx{full-stop} (default);
 \item\optfmt{all}: append a \idx{full-stop} to all \field{description}
@@ -6116,7 +6140,12 @@ This uses \ics{GlsXtrIfFieldUndef} rather than
 \ics{glsxtrifhasfield*} since there's no need to access the field's
 value. (The unstarred form \ics{glsxtrifhasfield} can't be used
 as it introduces implicit scoping, which would interfere with the
-punctuation lookahead.)
+punctuation lookahead.) The other difference between
+\ics{GlsXtrIfFieldUndef} and the other \csfmt{\ldots hasfield} tests
+is the case where the field is set to an empty value. In this case
+the field is defined (so \ics{GlsXtrIfFieldUndef} does the
+\meta{false} argument) but it's considered unset (so commands like
+\ics{ifglshasfield} do the \meta{false} argument).
 
 \optsection{group}
 
@@ -6196,7 +6225,7 @@ For example, suppose \filefmt{entries.bib} contains:
 @index{minerals}
 @index{quartz,parent={minerals}}
 @index{corundum,parent={minerals}}
-@index{amber,parent={minerals}}
+@index{amethyst,parent={minerals}}
 @index{gypsum,parent={minerals}}
 @index{gold,parent={minerals}}
 \end{verbatim}
@@ -6210,7 +6239,7 @@ and the document contains:
 
 \begin{document}
 \gls{duck} and \gls{goose}.
-\gls{quartz}, \gls{corundum}, \gls{amber}.
+\gls{quartz}, \gls{corundum}, \gls{amethyst}.
 
 \printunsrtglossaries
 \end{document}
@@ -6221,7 +6250,7 @@ Then the \ext{glstex} file will contain:
 \GlsXtrSetField{duck}{childcount}{0}
 \GlsXtrSetField{goose}{childcount}{0}
 \GlsXtrSetField{minerals}{childcount}{3}
-\GlsXtrSetField{amber}{childcount}{0}
+\GlsXtrSetField{amethyst}{childcount}{0}
 \GlsXtrSetField{corundum}{childcount}{0}
 \GlsXtrSetField{quartz}{childcount}{0}
 \end{verbatim}
@@ -6719,9 +6748,9 @@ This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
 These records aren't consecutive. They match the
 \hyperref[itm:alphmatch]{alpha pattern}. The first location is
 considered to consist of the prefix \code{i}, the separator
-\code{.} (dot) and the number given by the character code of A. 
+\code{.}\ (dot) and the number given by the character code of A. 
 The second location is considered to consist of the prefix
-\code{ii}, the separator \code{.} (dot) and the number 
+\code{ii}, the separator \code{.}\ (dot) and the number 
 given by the character code of A.
 
 The test fails because the numbers are equal and the prefixes are
@@ -6974,8 +7003,8 @@ location list is completely empty. Also, unlike
 \gls{bibglslocprefix}, this suffix command doesn't have an equivalent
 to \gls{bibglspostlocprefix}.
 
-If \meta{value} omitted, \csopt[\ics{at}.]{loc-suffix} is assumed.
-The default is \csopt[false]{loc-suffix}.
+If \meta{value} omitted, \csopt[\ics{at}\idx{periodchar}]{loc-suffix} 
+is assumed.  The default is \csopt[false]{loc-suffix}.
 
 As with \csopt{loc-prefix}, take care not to mix different values
 of \csopt{loc-suffix} for entries in the same glossary type.
@@ -8157,21 +8186,22 @@ and \csopt[\meta{boolean}]{secondary-trim-sort}.
 
 \optsection{sort-rule}
 
-If the \csopt[custom]{sort} option is used, the sort rule
-must be provided with \optfmt{sort-rule}. In this case
-the collation is performed using Java's
+If the \csopt[custom]{sort} option is used, the sort rule must be
+provided with \optfmt{sort-rule}. In this case the collation is
+performed using Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/RuleBasedCollator.html}{RuleBasedCollator}
-class~\cite{rulebasedcollator}. Remember that the options will be expanded as they
-are written to the \iext{aux} file, so be careful of
-any special characters that occur in the rule. For the 
-special characters \verb|#| \verb|%| \verb|_| \verb|&| \verb|{|
-and \verb|}| you can use \verb|\#|, \verb|\%|, \verb|\_|, \verb|\&|,
-\verb|\{|
-and \verb|\}|. These will be written to the \ext{aux} file
+class~\cite{rulebasedcollator}. Remember that the options will be
+expanded as they are written to the \iext{aux} file, so be careful
+of any special characters that occur in the rule. For the special
+characters \idx{param} \idx{commentchar} \idx{sbchar} \idx{colsep}
+\idx{bgroupchar} and \idx{egroupchar} you can use \ics{cs.hash},
+\ics{cs.percent}, \ics{cs.underscore}, \ics{cs.amp}, \ics{cs.openbrace}
+and \ics{cs.closebrace}. These will be written to the \ext{aux} file
 with the leading backslash, but \bibgls\ will remove it for this
-resource option. Remember that the \styfmt{glossaries} package provides
-\ics{glsbackslash} and \ics{glstildechar} which can be
-used to produce a literal backslash (\verb|\|) and tilde (\verb|~|).
+resource option. Remember that the \styfmt{glossaries} package
+provides \ics{glsbackslash} and \ics{glstildechar} which can be used
+to produce a literal backslash (\idx{backslashchar}) and tilde
+(\idx{tildechar}).
 
 You can also
 use \stringu\meta{hex} (where \meta{hex} is a hexadecimal
@@ -8602,8 +8632,8 @@ be separated by the suffix marker, which can be set with
 marker. By default the marker is empty. You can use \stringu\meta{hex}
 to indicate Unicode characters outside the ASCII range.
 If, for some reason, you want to use a special character, such as
-\verb|#|, you will need to precede it with \ics{cs.string} (for example
-\verb|\string#|). If you use \verb|\#| it will be treated as a
+\idx{param}, you will need to precede it with \ics{cs.string} (for example
+\verb|\string#|). If you use \ics{cs.hash} it will be treated as a
 literal string containing a backslash followed by a hash character.
 
 \optsection{strength}
@@ -8832,10 +8862,12 @@ If you use the custom \csopt[numberformat]{sort} or
 specify the format pattern with this option where
 \meta{value} is a pattern recognised by Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html}{\code{java.text.DecimalFormat}}
-class~\cite{decimalformat}. You can use \stringu\meta{hex} to indicate Unicode characters
-by their hexadecimal code. You can also use \verb|\#|, \verb|\%|,
-\verb|\_|, \verb|\&|, \verb|\{| and \verb|\}| to indicate \verb|#|, \verb|%|,
-\verb|_|, \verb|&|, \verb|{| and \verb|}|. 
+class~\cite{decimalformat}. You can use \stringu\meta{hex} to
+indicate Unicode characters by their hexadecimal code. You can also
+use \ics{cs.hash}, \ics{cs.percent}, \ics{cs.underscore}, \ics{cs.amp},
+\ics{cs.openbrace} and \ics{cs.closebrace} to indicate
+\idx{hashchar}, \idx{percentchar}, \idx{underscorechar},
+\idx{ampchar}, \idx{openbracechar} and \idx{closebracechar}. 
 
 Where the dual or secondary sort uses \optfmt{numberformat}
 or \optfmt{numberformat-reverse}, use \csopt{dual-numeric-sort-pattern} for 
@@ -8889,9 +8921,10 @@ The \meta{value} may be one of:
 This should match the specifications for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
 class~\cite{simpledateformat}. You may use \stringu\meta{hex} to indicate Unicode characters
-or \verb|\#| \verb|\%| \verb|\_| \verb|\&| \verb|\{| and
-\verb|\}| to indicate \verb|#| \verb|%| \verb|_| \verb|&| \verb|{| and
-\verb|}|.
+or \ics{cs.hash}, \ics{cs.percent}, \ics{underscore}, \ics{cs.amp},
+\ics{cs.openbrace} and \ics{cs.closebrace} to indicate
+\idx{hashchar}, \idx{percentchar}, \idx{underscorechar},
+\idx{ampchar}, \idx{openbracechar} and \idx{closebracechar}.
 \end{itemize}
 
 With the custom setting, if the pattern only contains date (but not
@@ -9741,7 +9774,7 @@ and the dual entry (\code{dual.child}) will have the
 \end{verbatim}
 This use of the wrapper \gls{bibglshyperlink} (rather than explicitly
 using \ics{glshyperlink}) and inserting the actual field value
-(rather than using commands like \cs{glsentryname}) allows it 
+(rather than using commands like \ics{glsentryname}) allows it 
 to work with \ics{makefirstuc} if the field requires a case-change.
 
 The reason the \field{description} field is chosen for the modification is
@@ -10475,7 +10508,8 @@ definition of \gls{bibglslocsuffix} will be appended to the glossary
 preamble for the given type (or types if there are dual entries).
 
 This commands definition depends on the value provided by
-\csopt{loc-suffix}. For example, with \csopt[\ics{at}.]{loc-suffix}
+\csopt{loc-suffix}. For example, with 
+\csopt[\ics{at}\idx{periodchar}]{loc-suffix}
 the command is defined as:
 \begin{verbatim}
 \providecommand{\bibglslocsuffix}[1]{\@.}
@@ -11186,6 +11220,31 @@ resource sets, that option governs the way \bibgls's version of
 \gls{bibglscontributor} behaves. The definition is written to the
 \ext{glstex} using \cs{providecommand}, so \LaTeX\ will only pick up
 the first definition.
+
+\cssection{bibglshashchar}
+
+\formatdef{bibglshashchar}
+Expands to a literal hash character (\idx{hashchar}).
+
+\cssection{bibglsunderscorechar}
+
+\formatdef{bibglsunderscorechar}
+Expands to a literal underscore character (\idx{underscorechar}).
+
+\cssection{bibglsdollarchar}
+
+\formatdef{bibglsdollarchar}
+Expands to a literal dollar character (\idx{dollarchar}).
+
+\cssection{bibglsampersandchar}
+
+\formatdef{bibglsampersandchar}
+Expands to a literal ampersand character (\idx{ampchar}).
+
+\cssection{bibglscircumchar}
+
+\formatdef{bibglscircumchar}
+Expands to a literal circumflex character (\idx{circumchar}).
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}
@@ -12003,13 +12062,13 @@ The contents of \filefmt{bigmathsymbols.bib} are as follows:
 \filesection{mathsrelations.bib}
 
 The \exfile{mathsrelations.bib} file contains mathematical
-relational symbols. These use the maths shift character \verb|$| in
-the \field{name} field and just the symbol in the \field{text}
-field. This just illustrates an alternative way of defining symbols.
-Since \ics{ensuremath} isn't used, commands \cs{gls} must be
-explicitly placed in maths mode. For example, \verb|$\gls{leq}$|
-rather than simply \verb|\gls{leq}|. The custom \fieldfmt{identifier}
-field is set to \code{relation}.
+relational symbols. These use the maths shift character
+\idx{mshiftchar} in the \field{name} field and just the symbol in
+the \field{text} field. This just illustrates an alternative way of
+defining symbols.  Since \ics{ensuremath} isn't used, commands
+\cs{gls} must be explicitly placed in maths mode. For example,
+\verb|$\gls{leq}$| rather than simply \verb|\gls{leq}|. The custom
+\fieldfmt{identifier} field is set to \code{relation}.
 
 The contents of \filefmt{mathsrelations.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/mathsrelations.bib}
@@ -12155,6 +12214,41 @@ determine the widest name.
 
 The contents of \filefmt{miscsymbols.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/miscsymbols.bib}
+
+\filesection{markuplanguages.bib}
+
+The \exfile{markuplanguages.bib} file includes a mixture of 
+\atentry{entry} and \atentry{abbreviation} definitions. A~custom
+command is provided in \atentry{preamble} to tag the letters
+in the \field{long} field that are used to form the abbreviation.
+This simply does its argument and is provided in case it's not set
+up in the document. If you do want to enable tagging using
+\ics{GlsXtrEnableInitialTagging}, remember that this command must be
+used before the abbreviations are defined, which means before
+the resource file is input with \cs{GlsXtrLoadResources}.
+Similarly, the abbreviation style must be set before the
+abbreviations are defined.
+
+For convenience \atentry{string} is also used to define a \ext{bib}
+variable, which may be appended to fields using the \ext{bib}
+concatenation character \idx{stringconcat}. As with the other sample
+\ext{bib} files, there's a custom field \fieldfmt{identifier}
+which will be ignored unless defined or aliased.
+
+Note that I've used \ics{glshyperlink} rather than \ics{gls} in the
+\field{description} fields. This prevents the referenced entry from
+being indexed, but \bibgls\ will pick up the cross-reference and
+(with the default \csopt{selection}) will added the dependent
+entries. This means that the dependent entries will be included but
+won't have a number list if they haven't been referenced in the
+document.
+
+The empty braces at the start some of the fields are there to
+protect against first letter uppercasing, where it might cause a
+problem.
+
+The contents of \filefmt{markuplanguages.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/markuplanguages.bib}
 
 \filesection{usergroups.bib}
 
@@ -13533,6 +13627,113 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 {fig:sample-textsymbols.pdf}
 \end{figure}
 
+\filesection{sample-languages.tex}
+
+This example uses \exfile{markuplanguages.bib}. Since the file
+includes abbreviations, any commands that must be used before
+abbreviations are defined need to go before
+\ics{GlsXtrLoadResources}. This includes the abbreviation style, 
+which I've set to \abbrstyle{long-short-desc}:
+\begin{verbatim}
+\setabbreviationstyle[markuplanguage]{long-short-desc}
+\end{verbatim}
+This style sets the \field{name} field using
+\ics{glsxtrlongshortdescname}, which defaults to the long form
+followed by the short form in parenthesis. I decided to switch this
+round so that the short form is shown first, which conveniently
+matches the default \csopt{abbreviation-sort-fallback}.
+\begin{verbatim}
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+}
+\end{verbatim}
+This redefinition must be done before the abbreviations are defined
+as it's expanded when the \field{name} field is set. (Note the need
+to protect commands that shouldn't be expanded.) If I decide not to change
+the \field{name} format in this way, I would then need to use
+\csopt[long]{abbreviation-sort-fallback}.
+
+I also decided to make use of the custom command \csfmt{abbrvtag}
+that marks up the letters in the \field{long} field used to obtain
+the abbreviation. As with the abbreviation style, this must be
+done before the abbreviations are defined:
+\begin{verbatim}
+\GlsXtrEnableInitialTagging{markuplanguage}{\abbrvtag}
+\end{verbatim}
+If you accidentally place it after \cs{GlsXtrLoadResources}, you'll
+encounter an error on the second \LaTeX\ run (but not the first).
+This is because \ics{GlsXtrEnableInitialTagging} requires that the
+supplied command (\csfmt{abbrvtag} in this case) be undefined. On
+the first \LaTeX\ it's undefined, but on the second it picks up
+the \atentry{preamble} definition, which is now in the resource file.
+
+The tagging format is governed by \ics{glsxtrtagfont} which
+underlines its argument by default. I've redefined it to also
+convert the letter to uppercase:
+\begin{verbatim}
+\renewcommand*{\glsxtrtagfont}[1]{\underline{\MakeTextUppercase{#1}}}
+\end{verbatim}
+Note that in the \code{mathml} case, the first tag consists of more
+than one letter:
+\begin{verbatim}
+long={\abbrvtag{m\NoCaseChange{ath}}ematical }#markuplang
+\end{verbatim}
+Here \ics{NoCaseChange} is used to prevent \ics{MakeTextUppercase}
+from applying the case change.
+
+The default \csopt{selection} criteria includes entries that have
+been indexed and any cross-references. The cross-references that
+haven't been index won't have a number list (since they're
+referenced with the non-indexing \ics{glshyperlink}). I've provided
+a \idx{postdescriptionhook} that inserts a \idx{full-stop} after the
+\field{description} if there's no location otherwise it inserts a
+comma:
+\begin{verbatim}
+\newcommand{\glsxtrpostdescmarkuplanguage}{%
+  \glsxtrifhasfield{location}{\glscurrententrylabel}%
+  {,}%
+  {.}%
+}
+\end{verbatim}
+I've used \csopt{loc-suffix} to append a \idx{full-stop} after the
+location lists. This doesn't affect the entries that haven't been
+indexed.
+
+I decided to convert the first letter of the \field{name} field to
+uppercase. Since the \field{name} is implicitly set for
+abbreviations based on the style, I've decided to implement this
+through the \catattr{glossname} attribute rather than using
+\csopt{name-case-change}:
+\begin{verbatim}
+\glssetcategoryattribute{markuplanguage}{glossname}{firstuc}
+\end{verbatim}
+If this line causes an error when the glossary is displayed that goes 
+away if it's commented out, make sure you have at least version 2.06
+of \sty{mfirstuc}. For most of the entries, this doesn't make a
+difference as they already start with a capital. It's only the 
+\code{markdown} entry that's actually affected.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-languages
+bib2gls --group sample-languages
+pdflatex sample-languages
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-languages.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-languages.tex}
+
+\begin{figure}[p]
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-languages.pdf}}%
+}
+{\caption{\filefmt{sample-languages.pdf}}}
+{fig:sample-languages.pdf}
+\end{figure}
+
+
 \filesection{sample-usergroups.tex}
 
 This example uses \exfile{usergroups.bib}. This requires \XeLaTeX\
@@ -13710,7 +13911,7 @@ to be changed to \fieldfmt{translation} by redefining
 \end{verbatim}
 The command that governs the format of the parenthetical material
 (\ics{glsxtruserparen}) also needs adjusting. I've changed the
-space before the parenthesis to \verb*|\ | because some of the
+space before the parenthesis to \ics{cs.space} because some of the
 long fields end with a \idx{full-stop} and this corrects the
 spacing. The \fieldfmt{translation} field is in English, 
 so this needs to be encapsulated with \csfmt{textenglish}
@@ -13793,7 +13994,133 @@ The two pages of the document are shown in
 \figureref{fig:sample-usergroups.pdf}. Since the entries have all
 been referenced on page~1, the location lists are all simply~\qt{1}.
 
-\lstinputlisting[firstline=5]{../examples/sample-usergroups.tex}
+%\lstinputlisting[firstline=5]{../examples/sample-usergroups.tex}
+\begin{lstlisting}[escapechar=|]
+\documentclass{scrreprt}
+
+\usepackage{fontspec}
+\setmainfont{Linux Libertine O}
+
+\usepackage{polyglossia}
+\setmainlanguage[variant=uk]{english}
+\usepackage{tracklang}
+\usepackage{etoolbox}
+
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ stylemods={bookindex},
+ style={bookindex}
+]{glossaries-extra}
+
+\glsaddstoragekey{language}{}{\glsentrylanguage}
+\glsaddstoragekey{translation}{}{\glsentrytranslation}
+
+\setabbreviationstyle[tug]{long-short-user}
+
+\GlsXtrLoadResources[
+  src={usergroups}, % data in usergroups.bib
+  check-end-punctuation={name,short},
+  category=tug
+]
+
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \ifglshasshort{\glslabel}%
+ {%
+   \glsxtrifwasfirstuse{}%
+   {%
+     \GlsXtrIfFieldUndef{shortendpunc}{\glslabel}{#2}{#1}%
+   }%
+ }%
+ {%
+   \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+ }%
+}
+
+\newcommand{\langlist}{}%
+
+\newcommand*{\addfirstlang}[1]{%
+  \TrackLocale{#1}%
+  \edef\thislanguage{%
+    \TrackedLanguageFromDialect\TrackLangLastTrackedDialect}%
+  \IfFileExists{gloss-\thislanguage.ldf}%
+  {%
+    \xifinlist{\thislanguage}{\langlist}{}%
+    {\listxadd{\langlist}{\thislanguage}}%
+    \xGlsXtrSetField{\thislabel}{useri}{text\thislanguage}%
+    \glsxtrendfor
+  }%
+  {}%
+}
+
+\forglsentries{\thislabel}{%
+  \glsxtrifhasfield{translation}{\thislabel}%
+  {%
+    % requires glossaries-extra v1.24
+    \glsxtrforcsvfield{\thislabel}{language}{\addfirstlang}%
+  }%
+  {}%
+}
+
+\forlistloop{\setotherlanguage}{\langlist}
+
+\renewcommand*{\glsxtruserfield}{translation}
+
+\renewcommand*{\glsxtruserparen}[2]{%
+  \  
+  \glsxtrparen{#1%
+  \ifglshasfield{\glsxtruserfield}{#2}{,
+   \textenglish{\glscurrentfieldvalue}}{}}%
+}
+
+\newcommand*{\tugtextformat}[1]{%
+  \glsxtrentryfmt{\glslabel}{#1}%
+}
+
+\newcommand*{\tugnameformat}[1]{%
+  \glsxtrentryfmt{\glscurrententrylabel}{#1}%
+}
+
+\glssetcategoryattribute{tug}{textformat}{tugtextformat}
+\glssetcategoryattribute{tug}{glossnamefont}{tugnameformat}
+
+\newcommand{\glsxtrpostnametug}{%
+  \ifglshasdesc{\glscurrententrylabel}%
+  {\ (\glossentrydesc{\glscurrententrylabel}%
+     \glsxtrifhasfield{translation}{\glscurrententrylabel}%
+     {, \textenglish{\glscurrentfieldvalue}}%
+     {}%
+  )}%
+  {%
+   \glsxtrifhasfield{translation}{\glscurrententrylabel}%
+   {\ (\textenglish{\glscurrentfieldvalue})}%
+   {}%
+  }%
+}
+
+\begin{document}
+\chapter{Sample}
+\section{First Use}
+\gls{TUG}. \gls{bgTeX}. \gls{latex-br}. \gls{CTeX}.
+\gls{CSTUG}. \gls{DANTE}. \gls{DKTUG}. \gls{EUG}.
+\gls{CervanTeX}. \gls{TirantloTeX}. \gls{GUTenberg}.
+\gls{UKTUG}. \gls{|\greekmono ɛϕτ|}. \gls{MaTeX}. \gls{ITALIC}.
+\gls{ÍsTeX}. \gls{GuIT}. \gls{KTS}. \gls{LTVG}.
+\gls{mxTeX}. \gls{NTG}. \gls{NTUG}. \gls{GUST}. \gls{GUTpt}.
+\gls{VietTUG}. \gls{LUGSA}.
+
+\section{Next Use}
+
+\gls{TUG}. \gls{bgTeX}. \gls{latex-br}. \gls{CTeX}.
+\gls{CSTUG}. \gls{DANTE}. \gls{DKTUG}. \gls{EUG}.
+\gls{CervanTeX}. \gls{TirantloTeX}. \gls{GUTenberg}.
+\gls{UKTUG}. \gls{|\greekmono ɛϕτ|}. \gls{MaTeX}. \gls{ITALIC}.
+\gls{ÍsTeX}. \gls{GuIT}. \gls{KTS}. \gls{LTVG}.
+\gls{mxTeX}. \gls{NTG}. \gls{NTUG}. \gls{GUST}. \gls{GUTpt}.
+\gls{VietTUG}. \gls{LUGSA}.
+
+\printunsrtglossaries
+\end{document}
+\end{lstlisting}
 
 \begin{figure}[p]
 \figcontents

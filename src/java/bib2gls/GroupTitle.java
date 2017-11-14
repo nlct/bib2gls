@@ -87,7 +87,8 @@ public class GroupTitle
 
    public String format(String letter)
    {
-      return String.format("{%s}{%s}{%d}{%s}", title, letter, id,
+      return String.format("{%s}{%s}{%d}{%s}", title, 
+       Bib2Gls.replaceSpecialChars(letter), id,
        type == null ? "" : type);
    }
 

@@ -388,6 +388,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       return (n1 == n2 ? 0 : (n1 < n2 ? -1 : 1));
    }
 
+   protected void setActualSortField(Bib2GlsEntry entry)
+   {
+      String value = entry.getFieldValue(sortStorageField);
+
+      entry.putField("sort", Bib2Gls.replaceSpecialChars(value));
+   }
+
    public void sortEntries() throws Bib2GlsException
    {
       if (settings.getSuffixOption() == SortSettings.SORT_SUFFIX_NON_UNIQUE)
@@ -399,12 +406,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       {
          entry.updateHierarchy(entries);
          updateSortValue(entry, entries);
+         setActualSortField(entry);
       }
 
       entries.sort(this);
    }
 
-   protected String sortStorageField = "sort";
+   protected String sortStorageField = "bib2gls@sort";
 
    protected String sortFallbackField = "sortfallback";
 
