@@ -584,6 +584,36 @@ public class SortSettings
       return identicalSortField;
    }
 
+   public void setNumberPad(int pad)
+   {
+      numberPad = pad;
+   }
+
+   public int getNumberPad()
+   {
+      return numberPad;
+   }
+
+   public void setPadPlus(String marker)
+   {
+      padPlus = marker;
+   }
+
+   public String getPadPlus()
+   {
+      return padPlus;
+   }
+
+   public void setPadMinus(String marker)
+   {
+      padMinus = marker;
+   }
+
+   public String getPadMinus()
+   {
+      return padMinus;
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -622,4 +652,9 @@ public class SortSettings
    private int identicalSortAction = IDENTICAL_SORT_USE_ID;
 
    private String identicalSortField = null;
+
+   private int numberPad=0;
+
+   private String padMinus = "<";
+   private String padPlus = ">";
 }

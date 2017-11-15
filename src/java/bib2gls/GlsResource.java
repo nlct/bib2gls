@@ -979,6 +979,57 @@ public class GlsResource
             secondarySortSettings.setCollationRule(
               replaceHexAndSpecial(getRequired(parser, list, opt)));
          }
+         else if (opt.equals("sort-number-pad"))
+         {
+            sortSettings.setNumberPad(
+               getRequiredInt(parser, list, opt));
+            dualSortSettings.setNumberPad(sortSettings.getNumberPad());
+            secondarySortSettings.setNumberPad(sortSettings.getNumberPad());
+         }
+         else if (opt.equals("dual-sort-number-pad"))
+         {
+            dualSortSettings.setNumberPad(
+               getRequiredInt(parser, list, opt));
+         }
+         else if (opt.equals("secondary-sort-number-pad"))
+         {
+            secondarySortSettings.setNumberPad(
+               getRequiredInt(parser, list, opt));
+         }
+         else if (opt.equals("sort-pad-plus"))
+         {
+            sortSettings.setPadPlus(
+               replaceHex(getOptional(parser, "", list, opt)));
+            dualSortSettings.setPadPlus(sortSettings.getPadPlus());
+            secondarySortSettings.setPadPlus(sortSettings.getPadPlus());
+         }
+         else if (opt.equals("dual-sort-pad-plus"))
+         {
+            dualSortSettings.setPadPlus(
+               replaceHex(getOptional(parser, "", list, opt)));
+         }
+         else if (opt.equals("secondary-sort-pad-plus"))
+         {
+            secondarySortSettings.setPadPlus(
+               replaceHex(getOptional(parser, "", list, opt)));
+         }
+         else if (opt.equals("sort-pad-minus"))
+         {
+            sortSettings.setPadMinus(
+               replaceHex(getOptional(parser, "", list, opt)));
+            dualSortSettings.setPadMinus(sortSettings.getPadMinus());
+            secondarySortSettings.setPadMinus(sortSettings.getPadMinus());
+         }
+         else if (opt.equals("dual-sort-pad-minus"))
+         {
+            dualSortSettings.setPadMinus(
+               replaceHex(getOptional(parser, "", list, opt)));
+         }
+         else if (opt.equals("secondary-sort-pad-minus"))
+         {
+            secondarySortSettings.setPadMinus(
+               replaceHex(getOptional(parser, "", list, opt)));
+         }
          else if (opt.equals("numeric-locale"))
          {
             sortSettings.setNumberLocale(
@@ -4841,7 +4892,9 @@ public class GlsResource
             writer.println("}");
 
 
-            if (type == null)
+            if (type == null || "same as entry".equals(type)
+                 || "same as base".equals(type)
+                 || "same as category".equals(type))
             {
                command = "\\bibglssetwidest";
             }
@@ -4852,9 +4905,19 @@ public class GlsResource
 
             String dualCommand = null;
 
-            if (setWidestDualType && dualType != null)
+            if (setWidestDualType)
             {
-               dualCommand = String.format("\\bibglssetwidestfortype{%s}", dualType);
+               if (dualType == null
+                 || "same as entry".equals(dualType)
+                 || "same as base".equals(dualType)
+                 || "same as category".equals(dualType))
+               {
+                  dualCommand = "\\bibglssetwidest";
+               }
+               else
+               {
+                  dualCommand = String.format("\\bibglssetwidestfortype{%s}", dualType);
+               }
             }
 
             String secondaryCommand = null;
@@ -5549,6 +5612,15 @@ public class GlsResource
          {
             entry.putField("type", entry.getBase());
          }
+         else if (type.equals("same as category"))
+         {
+            String val = entry.getFieldValue("category");
+
+            if (val != null)
+            {
+               entry.putField("type", val);
+            }
+         }
          else
          {
             entry.putField("type", type);
@@ -5632,6 +5704,15 @@ public class GlsResource
          else if (dualType.equals("same as base"))
          {
             dual.putField("type", dual.getBase());
+         }
+         else if (dualType.equals("same as category"))
+         {
+            String val = dual.getFieldValue("category");
+
+            if (val != null)
+            {
+               dual.putField("type", val);
+            }
          }
          else if (dualType.equals("same as primary"))
          {

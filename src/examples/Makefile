@@ -5,7 +5,7 @@ all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
 	sample-maths.pdf sample-textsymbols.pdf sample-usergroups.pdf \
-	sample-languages.pdf
+	sample-languages.pdf sample-multi.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -84,6 +84,12 @@ sample-languages.pdf	: $(DEPS) sample-languages.tex \
 	pdflatex sample-languages
 	$(BIB2GLS) sample-languages
 	pdflatex sample-languages
+
+sample-multi.pdf	: $(DEPS) sample-multi.tex \
+	bacteria.bib markuplanguages.bib minerals.bib
+	pdflatex sample-multi
+	$(BIB2GLS) sample-multi
+	pdflatex sample-multi
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

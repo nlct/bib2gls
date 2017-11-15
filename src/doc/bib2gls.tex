@@ -138,6 +138,9 @@
 \newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
 
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
+\newenvironment{codeenv}
+ {\begin{flushleft}\ttfamily\obeyspaces\obeylines}
+ {\end{flushleft}\ignorespacesafterend}
 
 \newcommand{\era}[1]{\texorpdfstring{\textsc{\MakeLowercase{#1}}}{#1}}
 
@@ -3236,9 +3239,10 @@ field mapping is:
 \end{itemize}
 However in this case the required fields are \field{short} and
 \field{long}. The \field{name} for the primary entry defaults to
-\field{short} if omitted. The fallback for the \field{sort} field is
-given by \csopt{abbreviation-sort-fallback}, which defaults to the
-\field{short} field.
+\field{short} if omitted. (This may be changed with the
+\csopt{abbreviation-name-fallback} option) The fallback for the
+\field{sort} field is given by \csopt{abbreviation-sort-fallback},
+which defaults to the \field{short} field.
 
 For example:
 \begin{verbatim}
@@ -5584,15 +5588,19 @@ the \csopt[animals]{category} option.
 
 \optsection{type}
 
-The \meta{value} may be \optfmt{same as entry}, \optfmt{same as
-base} (from v1.1) or a glossary label.  This is similar to the
-\csopt{category} option except that it sets the \field{type} field.
-As with the \csopt{category} option, \csopt[same as entry]{type}
-indicates that the entry type should be used and \csopt[same as
-base]{type} indicates the base name of the \ext{bib} file (without
-the extension) that provided the entry definition. There is no
-\meta{value} analogous to \csopt[same as type]{category}.
-
+The \meta{value} may be one of:
+\begin{itemize}
+ \item \optfmt{same as entry} set the \field{type} field
+  to the entry type (without the initial \code{@}); 
+ \optfmt{same as base} set the \field{type} field
+  to the base name of the corresponding \ext{bib} file
+  (without the extension);
+ \item \optfmt{same as category} set the \field{type} field
+   to the same value as the \field{category} field
+   (\field{type} unchanged if \field{category} not set);
+ \item\meta{label} sets the \field{type} field to the glossary 
+   identified by \meta{label}.
+\end{itemize}
 Note that this setting only changes the \field{type} field for
 primary entries. Use \csopt{dual-type} for dual entries.
 
@@ -5657,7 +5665,9 @@ defined.
 The \csopt{label-prefix} option prepends \meta{tag} to each
 entry's label. This \meta{tag} will also be inserted in front of any
 cross-references, unless they start with \idprefix{dual} or
-\idprefix{extn} (where \meta{n} is an integer).
+\idprefix{extn} (where \meta{n} is an integer). Use
+\csopt{dual-prefix} to change the dual label prefixes and
+\csopt{ext-prefixes} to change the external label prefixes.
 
 For example, if the \ext{bib} file contains
 \begin{verbatim}
@@ -7643,6 +7653,11 @@ category it also recognises the subscript and
 superscript digits, such as \textsuperscript{1} (0x00B9)
 and \textsuperscript{2} (0x00B2).
 
+As with the letter sort methods, letters are compared using a
+character code comparison not by a locale alphabet. The closest
+locale-sensitive equivalent is to use \csopt{sort-number-pad} with a
+locale sort method.
+
 \begin{figure}[htbp]
 \figcontents
 {%
@@ -8279,7 +8294,6 @@ This option automatically implements the dual and secondary settings
 \csopt[\meta{marker}]{dual-break-marker} and
 \csopt[\meta{marker}]{secondary-break-marker}.
 
-
 The break marker can be changed using
 \csopt[\meta{marker}]{break-marker}, where \meta{marker} is 
 the character to use. For example, \csopt[-]{break-marker} will use a
@@ -8289,6 +8303,44 @@ inter-word punctuation. For example, with
 \code{TomDickandHarry} and \qt{sea lion} simply becomes
 \code{sealion}. If \meta{marker} is omitted,
 \csopt[\empty]{break-marker} is assumed.
+
+\optsection{sort-number-pad}
+
+This option automatically implements the dual and secondary settings
+\csopt[\meta{number}]{dual-sort-number-pad},
+\csopt[\meta{number}]{secondary-sort-number-pad}.
+
+If \meta{number} is greater than 1, any integer sub-strings found
+in the sort value will be zero-padded up to this value. Since the
+\code{-} character is often ignored by rule-based sort methods, 
+any signs found will be replaced with the markers given by
+\csopt{sort-pad-plus} and \csopt{sort-pad-minus}, which should be
+chosen to ensure that negative numbers are ordered before positive
+numbers (if this is desired). An unsigned number will have the
+\csopt{sort-pad-plus} marker inserted before it. The default value
+is \csopt[0]{sort-number-pad}, which doesn't implement any padding.
+
+\optsection{sort-pad-plus}
+
+This option automatically implements the dual and secondary settings
+\csopt[\meta{marker}]{dual-sort-pad-plus},
+\csopt[\meta{marker}]{secondary-sort-pad-plus}.
+
+This option only has an effect when used with 
+\csopt[\meta{number}]{sort-number-pad} where \meta{number} is
+greater than 1. Positive numbers will have their sign replaced with 
+\meta{marker}. The default setting is \csopt[>]{sort-pad-plus}.
+
+\optsection{sort-pad-minus}
+
+This option automatically implements the dual and secondary settings
+\csopt[\meta{marker}]{dual-sort-pad-minus},
+\csopt[\meta{marker}]{secondary-sort-pad-minus}.
+
+This option only has an effect when used with 
+\csopt[\meta{number}]{sort-number-pad} where \meta{number} is
+greater than 1. Negative numbers will have their sign replaced with 
+\meta{marker}. The default setting is \csopt[<]{sort-pad-plus}.
 
 \optsection{identical-sort-action}
 
@@ -9181,6 +9233,18 @@ As \csopt{break-at} but for secondary entries.
 
 As \csopt{break-marker} but for secondary entries.
 
+\optsection[\subsubsection]{secondary-sort-number-pad}
+
+As \csopt{sort-number-pad} but for secondary entries.
+
+\optsection[\subsubsection]{secondary-sort-pad-plus}
+
+As \csopt{sort-pad-plus} but for secondary entries.
+
+\optsection[\subsubsection]{secondary-sort-pad-minus}
+
+As \csopt{sort-pad-minus} but for secondary entries.
+
 \optsection{secondary-identical-sort-action}
 
 As \csopt{identical-sort-action} but for secondary entries.
@@ -9545,6 +9609,18 @@ As \csopt{break-at} but for dual entries.
 
 As \csopt{break-marker} but for dual entries.
 
+\optsection[\subsubsection]{dual-sort-number-pad}
+
+As \csopt{sort-number-pad} but for dual entries.
+
+\optsection[\subsubsection]{dual-sort-pad-plus}
+
+As \csopt{sort-pad-plus} but for dual entries.
+
+\optsection[\subsubsection]{dual-sort-pad-minus}
+
+As \csopt{sort-pad-minus} but for dual entries.
+
 \optsection[\subsubsection]{dual-identical-sort-action}
 
 As \csopt{identical-sort-action} but for dual entries.
@@ -9855,13 +9931,17 @@ default value is \idprefix{tertiary} (including the terminating period).
 
 This option indicates that the tertiary entries should have
 their \field{type} field set to \meta{value}. If \meta{value} is
-empty the \field{type} is left unchanged.
+empty the \field{type} is left unchanged. Unlike 
+the \csopt{type} and \csopt{dual-type} options, there are no
+recognised keywords.
 
 \optsection{tertiary-category}
 
 This option indicates that the tertiary entries should have
 their \field{category} field set to \meta{value}. If \meta{value} is
-empty the \field{category} is left unchanged.
+empty the \field{category} is left unchanged. Unlike 
+the \csopt{category} and \csopt{dual-category} options, there are no
+recognised keywords.
 
 \chapter{Provided Commands}
 \label{sec:bibglscs}
@@ -11710,9 +11790,11 @@ so most packages should be loaded before \sty{glossaries-extra}.
 Instead, I've just put a comment in the \ext{bib} file as a
 reminder.
 
-All entries are defined using \atentry{entry}. With this entry
+All entries are defined using \atentry{symbol}. With this entry
 type, if the \field{sort} field is omitted \bibgls\ will fallback on
-the \field{name}. This will require the use of the interpreter as
+the label by default. It can be changed to fallback on the
+\field{name} field instead using \csopt[name]{symbol-sort-fallback}. 
+This will require the use of the interpreter as
 the names all contain a command but \bibgls\ recognises the
 \sty{mhchem} package and has a limited ability to interpret \cs{ce}.
 If \atentry{entry} is changed to \atentry{symbol} the fallback for
@@ -12225,7 +12307,7 @@ This simply does its argument and is provided in case it's not set
 up in the document. If you do want to enable tagging using
 \ics{GlsXtrEnableInitialTagging}, remember that this command must be
 used before the abbreviations are defined, which means before
-the resource file is input with \cs{GlsXtrLoadResources}.
+the resource file is input with \gls{GlsXtrLoadResources}.
 Similarly, the abbreviation style must be set before the
 abbreviations are defined.
 
@@ -12488,15 +12570,61 @@ The contents of \filefmt{usergroups.bib} are as follows:
 
 \end{lstlisting}
 
+\filesection{animals.bib}
+
+The \exfile{animals.bib} file contains entries defined using
+\atentry{entry}. As with the above example \ext{bib} files, there's
+a custom \fieldfmt{identifier} field that will be ignored unless
+defined or aliased.
+
+The contents of \filefmt{animals.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/animals.bib}
+
+\filesection{minerals.bib}
+
+The \exfile{minerals.bib} file contains entries defined using
+\atentry{entry}. As with the above example \ext{bib} files, there's
+a custom \fieldfmt{identifier} field that will be ignored unless
+defined or aliased.
+
+The contents of \filefmt{minerals.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/minerals.bib}
+
+\filesection{vegetables.bib}
+
+The \exfile{vegetables.bib} file contains entries defined using
+\atentry{entry} and an entry defined with \atentry{index} with just
+the \field{alias} field. As with the above example \ext{bib} files, there's
+a custom \fieldfmt{identifier} field that will be ignored unless
+defined or aliased.
+
+The contents of \filefmt{vegetables.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/vegetables.bib}
+
+\filesection{terms.bib}
+
+The \exfile{terms.bib} file contains entries defined using
+\atentry{index}. Unlike the above sample \ext{bib} files, there
+are no custom fields here.
+
+The contents of \filefmt{terms.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/terms.bib}
+
 \filesection{sample-chemical.tex}
 
 This example just uses the \exfile{chemicalformula.bib} file. The aim here
 is to have a list of chemical formulae referenced in the document
 but not have a number list. I could use the \styopt{nonumberlist}
 package option to suppress the number list display, but it's more
-efficient to instruct \bibgls\ to not save the number list with the
-\csopt[false]{save-locations} resource option.
-
+efficient to instruct \bibgls\ to not save the number list with:
+\begin{codeenv}
+\csopt[false]{save-locations}
+\end{codeenv}
+The entries are all defined using \atentry{symbol} but I've decided
+to fallback on the \field{name} field for sorting:
+\begin{codeenv}
+\csopt[name]{symbol-sort-fallback}
+\end{codeenv}
 Since the \field{name} field contains chemical formulae rather than
 words, it makes more sense to use one of the letter sort methods
 rather than a locale collator. In this case the names contain
@@ -13099,15 +13227,15 @@ still alive:
 \end{verbatim}
 
 The first list is quite straight-forward and can be created with:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,
-  match={entrytype=entry},
-  category={people},
-  replicate-fields={name={first}},
-  field-aliases={born=user1,died=user2,othername=user3}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls!{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},
+  \csopt[entrytype=entry]{match},
+  \csopt[people]{category},
+  \csopt[name=\marg{first}]{replicate-fields},
+  \csopt[born=user1,died=user2,othername=user3]{field-aliases}
+}
+\end{codeenv}
 I have used the \csopt{sort} option and there's no document language, 
 so \bibgls\ will sort according to my locale. The custom
 commands \gls{sortname} and \gls{sortvonname} ensure that the
@@ -13115,9 +13243,9 @@ entries are all sorted alphabetically according to the surnames.
 
 The second list can easily be created by adding the \csopt{secondary}
 option:
-\begin{verbatim}
-secondary={date:user1:bybirth}
-\end{verbatim}
+\begin{codeenv}
+\csopt[date:user1:bybirth]{secondary}
+\end{codeenv}
 This sorts according to the \field{user1} field (which was
 originally the \fieldfmt{birth} field). I've changed the 
 date group headings by redefining \gls{bibglsdategroup} and
@@ -13140,9 +13268,9 @@ group headings, so I've also used the \styopt{stylemods}
 option to automatically load that package. I'd like to use the
 \glostyle{bookindex} style for the index, which is provided by 
 \sty{glossary-bookindex}, so I need:
-\begin{verbatim}
-stylemods={list,bookindex}
-\end{verbatim}
+\begin{codeenv}
+\csopt[list,bookindex]{stylemods}
+\end{codeenv}
 This ensures that \sty{glossary-list} and \sty{glossary-bookindex}
 are loaded and patches the list styles.
 
@@ -13169,16 +13297,16 @@ defined but also needs to include the aliased entries. This means
 that existing entries simply need their label copied to the
 \code{index} glossary but the other entries need to be defined
 so this requires setting the \csopt{action} option:
-\begin{verbatim}
-action={define or copy}
-\end{verbatim}
+\begin{codeenv}
+\csopt[define or copy]{action}
+\end{codeenv}
 I would also like to have groups in the index (which the
 \glostyle{bookindex} style supports) so I need to specify a field
 in which to save the group information using
 \csopt{copy-action-group-field}:
-\begin{verbatim}
-copy-action-group-field={indexgroup}
-\end{verbatim}
+\begin{codeenv}
+\csopt[indexgroup]{copy-action-group-field}
+\end{codeenv}
 I need to remember to redefine \ics{glsxtrgroupfield} to this value before
 displaying the index:
 \begin{verbatim}
@@ -13188,9 +13316,9 @@ displaying the index:
 The aliased entries won't be selected by default since they haven't
 been used in the document, so I need to change the selection
 criteria with \csopt{selection}:
-\begin{verbatim}
-selection={recorded and deps and see}
-\end{verbatim}
+\begin{codeenv}
+\csopt[recorded and deps and see]{selection}
+\end{codeenv}
 
 In the index, I'd like the surnames first. This can be done by
 redefining the custom commands used in the \field{name} fields.
@@ -13293,9 +13421,9 @@ and each book is defined in \exfile{books.bib} in the form:
 There's a field here (the custom \fieldfmt{author} field) that contains
 the author's name, and this can be aliased to the \field{parent}
 field with \csopt{field-aliases}:
-\begin{verbatim}
-field-aliases={author=parent}
-\end{verbatim}
+\begin{codeenv}
+\csopt[author=parent]{field-aliases}
+\end{codeenv}
 but the author's label in the \exfile{people.bib}
 file is just the lower case surname.
 
@@ -13314,15 +13442,15 @@ picking up this definition.
 As with the \exfile{sample-people.tex} example, I need to copy
 the \field{name} field to the \field{first} field if that field is
 missing using \csopt{replicate-fields}:
-\begin{verbatim}
-replicate-fields={name={first}}
-\end{verbatim}
+\begin{codeenv}
+\csopt[{name=\marg{first}}]{replicate-fields}
+\end{codeenv}
 and I also want to provide a semantic command to format the book
 title, so the field aliases also need to convert the custom
 \fieldfmt{identifier} field to \field{category}:
-\begin{verbatim}
-field-aliases={identifier=category,author=parent}
-\end{verbatim}
+\begin{codeenv}
+\csopt[identifier=category,author=parent]{field-aliases}
+\end{codeenv}
 so that the document can set the \catattr{textformat} and
 \catattr{glossnamefont} attributes:
 \begin{verbatim}
@@ -13339,9 +13467,9 @@ the \csopt{check-end-punctuation} option. In this example, the
 \field{name}, \field{text} and \field{first} fields are the same for
 all the books, so it's sufficient just to check the \field{name}
 field:
-\begin{verbatim}
-check-end-punctuation={name}
-\end{verbatim}
+\begin{codeenv}
+\csopt[name]{check-end-punctuation}
+\end{codeenv}
 With \sty{glossaries-extra} v1.23+ it's easy to hook into the
 \idx{postlinkhook} to check if 
 \fielddisp{fieldendpunc}{namendpunc} exists:
@@ -13410,10 +13538,10 @@ I'm not referencing any of the entries in the document as I'm just
 generating a complete list of all the defined symbols. This means I
 need to tell \bibgls\ to select all entries and don't bother saving
 the \field{location} field:
-\begin{verbatim}
-save-locations=false,
-selection=all
-\end{verbatim}
+\begin{codeenv}
+\csopt[false]{save-locations},
+\csopt[all]{selection}
+\end{codeenv}
 Since I'm using a style that's based on \glostyle{alttree} I need to
 find the widest \field{name}, which can be done with
 \csopt{set-widest}.
@@ -13421,16 +13549,16 @@ find the widest \field{name}, which can be done with
 I've used \csopt{field-aliases} to convert the custom
 \fieldfmt{identifier} field to \field{category}, which means I can
 also sort by that field:
-\begin{verbatim}
-sort-field={category},
-field-aliases={identifier=category}
-\end{verbatim}
+\begin{codeenv}
+\csopt[category]{sort-field},
+\csopt[identifier=category]{field-aliases}
+\end{codeenv}
 Since this will cause identical sort values, I need to provide a
 fallback. Here I've decided to fallback on the \field{description}
 field:
-\begin{verbatim}
-identical-sort-action={description}
-\end{verbatim}
+\begin{codeenv}
+\csopt[description]{identical-sort-action}
+\end{codeenv}
 This means that entries will be order by \field{category} and 
 then \field{description}, which naturally creates blocks of symbol
 types in the glossary.
@@ -13445,9 +13573,9 @@ that I add more entries with a new category that happens to start
 with the same letter as an existing category, it's better to provide
 a more future-proof method, so I've set the \field{group} field to 
 fetch its value from the \field{category} field:
-\begin{verbatim}
-replicate-fields={category=group}
-\end{verbatim}
+\begin{codeenv}
+\csopt[category=group]{replicate-fields}
+\end{codeenv}
 (Since the \csopt{field-aliases} option is always performed before
 \csopt{replicate-fields}, the \field{category} field will already
 have been set and is available for replicating.) This means that the
@@ -13481,16 +13609,16 @@ It has a fairly similar preamble to \exfile{sample-msymbols.tex},
 but \exfile{no-interpret-preamble.bib} and
 \exfile{interpret-preamble.bib} are now needed to provide
 the \csref{sortart} command:
-\begin{verbatim}
-\GlsXtrLoadResources[
-   src={no-interpret-preamble},
-   interpret-preamble=false
-]
-\end{verbatim}
+\begin{codeenv}
+\gls!{GlsXtrLoadResources}\oarg{
+  \csopt[no-interpret-preamble]{src},
+  \csopt[false]{interpret-preamble}
+}
+\end{codeenv}
 There's also an extra custom field to alias:
-\begin{verbatim}
-field-aliases={identifier=category,format=user1}
-\end{verbatim}
+\begin{codeenv}
+\csopt[identifier=category,format=user1]{field-aliases}
+\end{codeenv}
 I've aliased \fieldfmt{format} to \field{user1} since \csref{glsxtrfmt}
 defaults to that field. If I decided to use a different field I also
 need to remember to redefine \ics{GlsXtrFmtField} to match.
@@ -13578,10 +13706,10 @@ The \sty{etoolbox} package is also loaded as it provides
 The document uses the \glostyle{alttreegroup} style where the groups
 are obtained from the \field{category}, which again I obtain from
 the custom \fieldfmt{identifier} field using:
-\begin{verbatim}
-field-aliases={identifier=category},
-replicate-fields={category=group}
-\end{verbatim}
+\begin{codeenv}
+\csopt[identifier=category]{field-aliases},
+\csopt[category=group]{replicate-fields}
+\end{codeenv}
 The \field{group} field is just a label and an appropriate title needs to be
 supplied for each group label:
 \begin{verbatim}
@@ -13595,11 +13723,11 @@ fallback on another field. The most appropriate here is the
 \csopt{identical-sort-action}, I'm using \csopt{sort-suffix},
 which works better with the default locale sort when the fallback
 field consists of words or phrases.
-\begin{verbatim}
-sort-field={category},
-sort-suffix={description},
-sort-suffix-marker={|}
-\end{verbatim}
+\begin{codeenv}
+\csopt[category]{sort-field},
+\csopt[description]{sort-suffix},
+\csopt[|]{sort-suffix-marker}
+\end{codeenv}
 
 Unfortunately, since \bibgls\ doesn't recognise \sty{ifsym} or
 \sty{marvosym}, there's no point using \csopt{set-widest}. Instead I
@@ -13658,10 +13786,10 @@ I also decided to make use of the custom command \csfmt{abbrvtag}
 that marks up the letters in the \field{long} field used to obtain
 the abbreviation. As with the abbreviation style, this must be
 done before the abbreviations are defined:
-\begin{verbatim}
-\GlsXtrEnableInitialTagging{markuplanguage}{\abbrvtag}
-\end{verbatim}
-If you accidentally place it after \cs{GlsXtrLoadResources}, you'll
+\begin{codeenv}
+\cs{GlsXtrEnableInitialTagging}\marg{markuplanguage}\marg{\csfmt{abbrvtag}}
+\end{codeenv}
+If you accidentally place it after \gls{GlsXtrLoadResources}, you'll
 encounter an error on the second \LaTeX\ run (but not the first).
 This is because \ics{GlsXtrEnableInitialTagging} requires that the
 supplied command (\csfmt{abbrvtag} in this case) be undefined. On
@@ -13760,10 +13888,10 @@ abbreviation style must be set before the resource file is loaded:
 \setabbreviationstyle[tug]{long-short-user}
 \end{verbatim}
 For this example, I'm explicitly setting the \field{category} field
-to \code{tug} using the \csopt{category} option:
-\begin{verbatim}
-category=tug
-\end{verbatim}
+to \code{tug}:
+\begin{codeenv}
+\csopt[tug]{category}
+\end{codeenv}
 Some of the fields end with a \idx{full-stop}. This isn't a problem with
 the \field{long} field as the first use follows the long form with
 the short form in parentheses, but it will be a problem on
@@ -14128,6 +14256,187 @@ been referenced on page~1, the location lists are all simply~\qt{1}.
 {\caption{\filefmt{sample-usergroups.pdf}}}
 {fig:sample-usergroups.pdf}
 \end{figure}
+
+\filesection{sample-multi.tex}
+
+This example uses \exfile{bacteria.bib},
+\exfile{markuplanguages.bib}, \exfile{minerals.bib}.
+Since there's one or more UTF-8 character, the document requires
+UTF-8 support:
+\begin{verbatim}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\end{verbatim}
+
+The aim of this example document is to have a separate glossary
+(without number lists) for each type of data: bacteria, and also an
+index listing all referenced entries with number lists as well as
+aliased entries that haven't explicitly been used but the
+cross-reference term as been indexed. This requires
+\csopt[recorded and deps and see]{selection} to ensure the aliased
+entries are selected.
+
+Since I don't need the default \code{main} glossary (I'm providing
+my own custom glossaries) I've used the \styopt{nomain} option to
+suppress its automatic creation, but I do want the \code{index}
+glossary so I've used the \styopt{index} package option. The
+remaining glossaries need defining:
+\begin{verbatim}
+\newglossary*{bacteria}{Bacteria}
+\newglossary*{markuplanguage}{Markup Languages}
+\newglossary*{mineral}{Minerals}
+\end{verbatim}
+As with \exfile{sample-bacteria.tex} and \exfile{sample-languages.tex}
+I need to set the abbreviation styles before the abbreviations are
+defined:
+\begin{verbatim}
+\setabbreviationstyle[bacteria]{long-only-short-only}
+\setabbreviationstyle[markuplanguage]{long-short-desc}
+\end{verbatim}
+Unlike the \exfile{sample-languages.tex} example, I'm not interested
+in tagging the initials in this case, but I still want to change the
+way the \field{name} field is set with the
+\abbrstyle{long-short-desc} abbreviation style:
+\begin{verbatim}
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+}
+\end{verbatim}
+Remember that this also needs to be set before the abbreviations are
+defined. The \catattr{textformat} and \catattr{glossnamefont}
+attributes may be set after definition:
+\begin{verbatim}
+\newcommand{\bacteriafont}[1]{\emph{#1}}
+\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+\end{verbatim}
+The \code{markuplanguage} glossary contains descriptions and some
+long names, so it's better suited to the \glostyle{altlist} style,
+in which case the descriptions would look better if they started
+with a capital letter:
+\begin{verbatim}
+\glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
+\end{verbatim}
+Remember that the \glostyle{altlist} style uses the
+\env{description} environment, which is governed by the document
+class (and may be modified by list-related packages). In this case,
+one of the KOMA-Script classes is used, so the list items are
+typeset in sans-serif.
+
+There are various ways of dealing with the duplicated data in the
+index, such as using the \csopt{secondary} option or having a
+separate resource set with a copy \csopt{action}. In this case, I've
+decided to use a dual entry system. Since the entries aren't defined
+using any dual types, I've used \csopt{entry-type-aliases} to
+make \bibgls\ treat them as though they were:
+\begin{codeenv}
+\csopt[{
+  \marg{abbreviation=dualindexabbreviation},
+  \marg{entry=dualindexentry}
+ }]{entry-type-aliases}
+\end{codeenv}
+Note that I haven't aliased the \atentry{index} types as I only want
+these in the index and not replicated in a separate glossary.
+
+By default, the \atentry{dualindexabbreviation} entry type falls back on the
+\field{short} field if the \field{name} is omitted. In this case I
+want it to fall back on the \field{long} field instead.
+\begin{codeenv}
+\csopt[long]{abbreviation-name-fallback}
+\end{codeenv}
+Remember that the sort fallback is still \field{short} (but can be
+changed with \csopt{abbreviation-sort-fallback}).
+
+All the \atentryfmt{dualindex\meta{type}} entry types provide a primary
+entry that behaves like \atentry{index}. The secondary behaves like
+\atentryfmt{\meta{type}}. This means that the primaries are
+conveniently gather together with all the unaliased \atentry{index}
+entries, so the primary entry type needs to be set to \code{index}:
+\begin{codeenv}
+\csopt[index]{type}
+\end{codeenv}
+The dual entry type depends on the entry's category. Since I've
+defined my custom glossaries with a label that matches the
+custom \field{identifier} field, I can both alias this custom field
+to the \field{category} field and also set \csopt{dual-type} so that
+it matches the category:
+\begin{codeenv}
+\csopt[identifier=category]{field-aliases},
+\csopt[same as category]{dual-type}
+\end{codeenv}
+The primary entries (in the \code{index} glossary) need to be sorted
+alphabetically, and since the document is in English I'm sorting
+according to that language (identified by the language code
+\code{en}), but I also want to make sure that all the primary
+entries are sorted by the \field{name} field to avoid discrepancies
+in the fallback value for the \field{sort} field:
+\begin{codeenv}
+\csopt[en]{sort},
+\csopt[name]{sort-field}
+\end{codeenv}
+With \csopt[long]{abbreviation-name-fallback} now set, 
+this means that \emph{Coxiella burnetii} comes after
+\emph{Clostridium tetani} in the index.
+
+I'd like to sort the dual entries according to a letter-number rule,
+as for \exfile{sample-chemical.tex} and \exfile{sample-units3.tex},
+but this would order \qt{b\'ilinite} after \qt{biotite} in the
+\code{minerals} glossary, so instead I'm also using the English sort
+rule for the duals, but with the numbers padded:
+\begin{codeenv}
+\csopt[en]{dual-sort},
+\csopt[2]{dual-sort-number-pad}
+\end{codeenv}
+The default \csopt[sort]{dual-sort-field} is unchanged, which means
+that with the default \csopt[short]{abbreviation-sort-fallback}, 
+\emph{C.\ burnetii} is between \emph{C.\ botulinum} and \emph{C.\
+perfringens} rather than after \emph{C.\ tetani}.
+
+The document loads \sty{hyperref} which means that all the \cs{gls}
+references will create hyperlinks. Since the primaries are in the
+index, the default prefixes mean that, for example, 
+\verb|\gls{svg}| links to the \qt{scalable vector graphics} item in
+the index rather than to the abbreviation \qt{SVG} in the
+\code{markuplanguage} glossary. There are two alternatives: change
+\verb|\gls{svg}| to \verb|\gls{dual.svg}| or change the default
+prefixes, which is the more convenient approach as is the one used
+here:
+\begin{codeenv}
+\csopt[idx.]{label-prefix},
+\csopt[\empty]{dual-prefix}
+\end{codeenv}
+Now \verb|\gls{svg}| refers to the dual abbreviation \qt{SVG} and
+\verb|\gls{idx.svg}| refers to the primary entry \qt{scalable vector
+graphics}. Unfortunately this means that the records created with
+\verb|\gls{svg}| now refer to the dual abbreviation and will end up
+being displayed in the glossary instead of the index. This can be
+fixed with:
+\begin{codeenv}
+\csopt[primary]{combine-dual-locations}
+\end{codeenv}
+Which transfers the dual entry locations to the corresponding
+primary.
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-multi
+bib2gls --group sample-multi
+pdflatex sample-multi
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-multi.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-multi.tex}
+
+\begin{figure}[p]
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-multi.pdf}}%
+}
+{\caption{\filefmt{sample-multi.pdf}}}
+{fig:sample-multi.pdf}
+\end{figure}
+
 
 \printcommandsummary
 

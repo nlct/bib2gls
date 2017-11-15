@@ -38,6 +38,15 @@ v1.1 (pending):
      - bibtex-contributor-fields
      - contributor-order
      - check-end-punctuation
+     - sort-number-pad
+     - dual-sort-number-pad
+     - secondary-sort-number-pad
+     - sort-pad-plus
+     - dual-sort-pad-plus
+     - secondary-sort-pad-plus
+     - sort-pad-minus
+     - dual-sort-pad-minus
+     - secondary-sort-pad-minus
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

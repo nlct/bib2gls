@@ -957,8 +957,8 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
-   public static final String VERSION = "1.1";
-   public static final String DATE = "2017-10-10";
+   public static final String VERSION = "1.0.20171115";
+   public static final String DATE = "2017-11-15";
 
    private Vector<GlsData> data;
 

@@ -1,0 +1,67 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+% Encoding: UTF-8
+
+@preamble{"\providecommand{\abbrvtag}[1]{#1}"}
+@string{markuplang="\abbrvtag{m}arkup \abbrvtag{l}anguage"}
+
+@entry{TeX,
+  name={{}\TeX},
+  description={a format for describing complex type and page layout
+    often used for mathematics, technical, and academic publications},
+  identifier={markuplanguage}
+}
+
+@entry{LaTeX,
+  name={{}\LaTeX},
+  description={a format of \glshyperlink{TeX} designed to separate
+   content from style},
+  identifier={markuplanguage}
+}
+
+@entry{markdown,
+  name={markdown},
+  description={a lightweight markup language with plain text
+    formatting syntax},
+  identifier={markuplanguage}
+}
+
+@abbreviation{xml,
+  short={XML},
+  long={e\abbrvtag{x}tensible }#markuplang,
+  description={a markup language that defines a set of rules for
+    encoding documents},
+  identifier={markuplanguage}
+}
+
+@abbreviation{html,
+  short={HTML},
+  long={\abbrvtag{h}yper\abbrvtag{t}ext }#markuplang,
+  description={the standard markup language for creating web pages},
+  identifier={markuplanguage}
+}
+
+@abbreviation{mathml,
+  short={MathML},
+  long={\abbrvtag{m\NoCaseChange{ath}}ematical }#markuplang,
+  description={the standard markup language for creating web pages},
+  identifier={markuplanguage}
+}
+
+@abbreviation{xhtml,
+  short={XHTML},
+  long={e\abbrvtag{x}tensible \abbrvtag{h}yper\abbrvtag{t}ext }
+    # markuplang,
+  description={{}\glshyperlink{xml} version of \glshyperlink{html}},
+  identifier={markuplanguage}
+}
+
+@abbreviation{svg,
+  short={SVG},
+  long={\abbrvtag{s}calable \abbrvtag{v}ector \abbrvtag{g}raphics},
+  description={{}\glshyperlink{xml}-based vector image format},
+  identifier={markuplanguage}
+}
+

@@ -733,6 +733,13 @@ public class Bib2GlsEntry extends BibEntry
 
          if (value != null)
          {
+            // expand any variables
+
+            TeXObjectList list = value.expand(parser);
+            BibUserString bibVal = new BibUserString(list);
+            value.clear();
+            value.add(bibVal);
+
             if (resource.isBibTeXAuthorField(field))
             {
                value = convertBibTeXAuthorField(parser, field, value);
@@ -768,8 +775,6 @@ public class Bib2GlsEntry extends BibEntry
             }
             else if (bib2gls.isKnownField(field))
             {
-               TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
-
                boolean protect = mfirstucProtect;
 
                if (protect && protectFields != null)

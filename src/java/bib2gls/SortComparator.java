@@ -68,6 +68,241 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       return sortStr;
    }
 
+   protected String padNumbers(Bib2GlsEntry entry, String sortStr, int pad)
+   {
+      StringBuilder builder = new StringBuilder();
+      boolean sign=false;
+
+      for (int i = 0, strLength = sortStr.length(); i < strLength; )
+      {
+         int cp = sortStr.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (i < strLength)
+         {
+            if (cp == '+')
+            {
+               int nextCp = sortStr.codePointAt(i);
+   
+               if (Character.isDigit(nextCp))
+               {
+                  builder.append(settings.getPadPlus());
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+   
+               sign=true;
+            }
+            else if (cp == bib2gls.SUBSCRIPT_PLUS)
+            {
+               int nextCp = sortStr.codePointAt(i);
+   
+               if (bib2gls.isSubscriptDigit(nextCp))
+               {
+                  builder.append(settings.getPadPlus());
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+   
+               sign=true;
+            }
+            else if (cp == bib2gls.SUPERSCRIPT_PLUS)
+            {
+               int nextCp = sortStr.codePointAt(i);
+   
+               if (bib2gls.isSuperscriptDigit(nextCp))
+               {
+                  builder.append(settings.getPadPlus());
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+   
+               sign=true;
+            }
+            else if (cp == '-' || cp == bib2gls.MINUS)
+            {
+               int nextCp = sortStr.codePointAt(i);
+   
+               if (Character.isDigit(nextCp))
+               {
+                  builder.append(settings.getPadMinus());
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+   
+               sign=true;
+            }
+            else if (cp == bib2gls.SUBSCRIPT_MINUS)
+            {
+               int nextCp = sortStr.codePointAt(i);
+   
+               if (bib2gls.isSubscriptDigit(nextCp))
+               {
+                  builder.append(settings.getPadMinus());
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+            }
+            else if (cp == bib2gls.SUPERSCRIPT_MINUS)
+            {
+               int nextCp = sortStr.codePointAt(i);
+   
+               if (bib2gls.isSuperscriptDigit(nextCp))
+               {
+                  builder.append(settings.getPadMinus());
+               }
+               else
+               {
+                  builder.appendCodePoint(cp);
+               }
+   
+               sign=true;
+            }
+         }
+         else if (Character.isDigit(cp))
+         {
+            if (!sign)
+            {
+               builder.append(settings.getPadPlus());
+            }
+
+            int zeroChar = '0';
+
+            try
+            {
+               zeroChar = cp-Integer.parseInt(String.format("%c", cp));
+            }
+            catch (NumberFormatException e)
+            {//shouldn't happen
+               bib2gls.debug(e);
+            }
+
+            StringBuilder subStr = new StringBuilder();
+            subStr.appendCodePoint(cp);
+            int n = 1;
+
+            if (i < strLength)
+            {
+               cp = sortStr.codePointAt(i);
+
+               while (Character.isDigit(cp))
+               {
+                  n++;
+                  i += Character.charCount(cp);
+
+                  if (i >= strLength) break;
+
+                  subStr.appendCodePoint(cp);
+                  cp = sortStr.codePointAt(i);
+               }
+            }
+
+            for ( ; n < pad; n++)
+            {
+               builder.appendCodePoint(zeroChar);
+            }
+
+            builder.append(subStr);
+
+            sign=false;
+         }
+         else if (bib2gls.isSubscriptDigit(cp))
+         {
+            if (!sign)
+            {
+               builder.append(settings.getPadPlus());
+            }
+
+            int zeroChar = bib2gls.SUBSCRIPT_ZERO;
+
+            StringBuilder subStr = new StringBuilder();
+            subStr.appendCodePoint(cp);
+            int n = 1;
+
+            if (i < strLength)
+            {
+               cp = sortStr.codePointAt(i);
+
+               while (bib2gls.isSubscriptDigit(cp))
+               {
+                  n++;
+                  i += Character.charCount(cp);
+
+                  if (i >= strLength) break;
+
+                  subStr.appendCodePoint(cp);
+                  cp = sortStr.codePointAt(i);
+               }
+            }
+
+            for ( ; n < pad; n++)
+            {
+               builder.appendCodePoint(zeroChar);
+            }
+
+            builder.append(subStr);
+
+            sign=false;
+         }
+         else if (bib2gls.isSuperscriptDigit(cp))
+         {
+            if (!sign)
+            {
+               builder.append(settings.getPadPlus());
+            }
+
+            int zeroChar = bib2gls.SUPERSCRIPT_ZERO;
+
+            StringBuilder subStr = new StringBuilder();
+            subStr.appendCodePoint(cp);
+            int n = 1;
+
+            if (i < strLength)
+            {
+               cp = sortStr.codePointAt(i);
+
+               while (bib2gls.isSuperscriptDigit(cp))
+               {
+                  n++;
+                  i += Character.charCount(cp);
+
+                  if (i >= strLength) break;
+
+                  subStr.appendCodePoint(cp);
+                  cp = sortStr.codePointAt(i);
+               }
+            }
+
+            for ( ; n < pad; n++)
+            {
+               builder.appendCodePoint(zeroChar);
+            }
+
+            builder.append(subStr);
+
+            sign=false;
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
+
+            sign=false;
+         }
+      }
+
+      return builder.toString();
+   }
+
    protected String updateSortValue(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> entries)
    {
@@ -108,6 +343,11 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          {
             value = applySuffix(entry, value);
          }
+      }
+
+      if (settings.getNumberPad() > 1)
+      {
+         value = padNumbers(entry, value, settings.getNumberPad());
       }
 
       value = adjustSort(entry, value);

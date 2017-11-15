@@ -1,0 +1,108 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass{scrreprt}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[version=4]{mhchem}
+\usepackage[colorlinks]{hyperref}
+
+\usepackage[record,% use bib2gls
+ section,% use \section* for glossary headings
+ postdot,% insert dot after descriptions in glossaries
+ nomain,% don't create 'main' glossary
+ index,% create 'index' glossary
+ nostyles,% don't load default styles
+% load and patch required style packages:
+ stylemods={list,mcols,tree,bookindex},
+ style=tree]{glossaries-extra}
+
+\newglossary*{bacteria}{Bacteria}
+\newglossary*{markuplanguage}{Markup Languages}
+\newglossary*{mineral}{Minerals}
+\newglossary*{chemical}{Chemicals}
+
+% abbreviation styles must be set before \GlsXtrLoadResources:
+\setabbreviationstyle[bacteria]{long-only-short-only}
+\setabbreviationstyle[markuplanguage]{long-short-desc}
+
+% style-dependent name format must be set before \GlsXtrLoadResources:
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+}
+
+\GlsXtrLoadResources[
+ src={bacteria,markuplanguages,minerals,chemicalformula},
+ selection={recorded and deps and see},
+ set-widest,
+ type=index,
+ label-prefix={idx.},
+ dual-prefix={},
+ combine-dual-locations={primary},
+ sort={en},
+ sort-field={name},
+ dual-type={same as category},
+ dual-sort={en},
+ dual-sort-number-pad={2},
+ entry-type-aliases={
+  {abbreviation=dualindexabbreviation},
+  {entry=dualindexentry},
+  {symbol=dualindexsymbol}
+ },
+ abbreviation-name-fallback={long},
+ field-aliases={identifier=category}
+]
+
+\newcommand{\bacteriafont}[1]{\emph{#1}}
+\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+
+\glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
+
+\begin{document}
+\chapter{Sample}
+\section{Bacteria}
+\subsection{First Use}
+\gls{cbotulinum}, \gls{pputida}, \gls{cperfringens},
+\gls{bsubtilis}, \gls{ctetani}, \gls{pcomposti},
+\gls{pfimeticola}, \gls{cburnetii}, \gls{raustralis},
+\gls{rrickettsii}.
+
+\subsection{Next Use}
+\gls{cbotulinum}, \gls{pputida}, \gls{cperfringens},
+\gls{bsubtilis}, \gls{ctetani}, \gls{pcomposti},
+\gls{pfimeticola}, \gls{cburnetii}, \gls{raustralis},
+\gls{rrickettsii}.
+
+\section{Markup Languages}
+\subsection{First Use}
+\gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
+
+\subsection{Next Use}
+\gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
+
+\section{Minerals}
+\Gls{beryl}, \gls{amethyst}, \gls{chalcedony}, \gls{aquamarine},
+\gls{aragonite}, \gls{calcite}, \gls{bilinite}, \gls{cyanotrichite},
+\gls{biotite}.
+
+\section{Chemicals}
+\gls{Al2SO43}, \gls{H2O}, \gls{C6H12O6},
+\gls{CH3CH2OH}, \gls{CH2O}, \gls{OF2}, \gls{O2F2}, \gls{SO42-},
+\gls{H3O+}, \gls{OH-}, \gls{O2}, \gls{AlF3}, \gls{O},
+\gls{Al2CoO4}, \gls{As4S4}, \gls{C10H10O4}, \gls{C5H4NCOOH},
+\gls{C8H10N4O2}, \gls{SO2}, \gls{S2O72-}, \gls{SbBr3},
+\gls{Sc2O3}, \gls{Zr3PO44}, \gls{ZnF2}.
+
+\chapter*{Glossaries}
+\printunsrtglossary[type=bacteria,style=mcoltree]
+\printunsrtglossary[type=markuplanguage,style=altlist]
+\printunsrtglossary[type=mineral]
+\printunsrtglossary[type=chemical,style=mcolalttreegroup]
+
+\setupglossaries{section=chapter}
+\printunsrtglossary[type=index,style=bookindex]
+\end{document}}

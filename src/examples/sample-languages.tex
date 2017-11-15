@@ -1,0 +1,53 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[fontsize=12pt]{scrartcl}
+
+\usepackage[T1]{fontenc}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+% load glossary-tree.sty and patch styles:
+ stylemods={tree},
+ style=treegroup]{glossaries-extra}
+
+% abbreviation style must be set before \GlsXtrLoadResources
+\setabbreviationstyle[markuplanguage]{long-short-desc}
+
+\GlsXtrEnableInitialTagging{markuplanguage}{\abbrvtag}
+
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+}
+
+\GlsXtrLoadResources[
+ src=markuplanguages,% data in markuplanguages.bib
+ loc-suffix,
+ category=markuplanguage
+]
+
+\newcommand{\glsxtrpostdescmarkuplanguage}{%
+  \glsxtrifhasfield{location}{\glscurrententrylabel}%
+  {,}%
+  {.}%
+}
+
+\glssetcategoryattribute{markuplanguage}{glossname}{firstuc}
+
+\renewcommand*{\glsxtrtagfont}[1]{\underline{\MakeTextUppercase{#1}}}
+
+\begin{document}
+
+\section{First Use}
+
+\gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
+
+\section{Next Use}
+
+\gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
+
+\printunsrtglossary
+\end{document}
