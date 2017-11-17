@@ -115,6 +115,11 @@ public class Bib2GlsEntry extends BibEntry
 
    public String processLabel(String label)
    {
+      return processLabel(label, false);
+   }
+
+   public String processLabel(String label, boolean isCs)
+   {
       if (label.startsWith("dual."))
       {
          String prefix = resource.getDualPrefix();
@@ -124,6 +129,19 @@ public class Bib2GlsEntry extends BibEntry
             label = label.substring(5);
          }
          else if (!prefix.equals("dual."))
+         {
+            label = String.format("%s%s", prefix, label.substring(5));
+         }
+      }
+      else if (label.startsWith("tertiary."))
+      {
+         String prefix = resource.getTertiaryPrefix();
+
+         if (prefix == null)
+         {
+            label = label.substring(9);
+         }
+         else if (!prefix.equals("tertiary."))
          {
             label = String.format("%s%s", prefix, label.substring(5));
          }
@@ -154,6 +172,16 @@ public class Bib2GlsEntry extends BibEntry
                // format
 
                bib2gls.debug(e);
+            }
+         }
+         else if (isCs)
+         {
+            String csLabelPrefix = resource.getCsLabelPrefix();
+
+            if (csLabelPrefix != null)
+            {
+               label = String.format("%s%s", 
+                  resource.getCsLabelPrefix(), label);
             }
          }
          else if (labelPrefix != null)
@@ -329,7 +357,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   String label = arg.toString(parser);
 
-                  String newLabel = processLabel(label);
+                  String newLabel = processLabel(label, true);
 
                   if (!newLabel.equals(label))
                   {
@@ -364,7 +392,7 @@ public class Bib2GlsEntry extends BibEntry
                   {
                      TeXObject obj = csvlist.get(j);
 
-                     label = processLabel(obj.toString(parser));
+                     label = processLabel(obj.toString(parser), true);
 
                      grp.add(parser.getListener().createString(label));
 
@@ -411,7 +439,7 @@ public class Bib2GlsEntry extends BibEntry
                   }
 
                   String label = arg.toString(parser);
-                  String newLabel = processLabel(label);
+                  String newLabel = processLabel(label, true);
 
                   if (!label.equals(newLabel))
                   {
@@ -511,7 +539,7 @@ public class Bib2GlsEntry extends BibEntry
                      label = arg.toString(parser);
                   }
 
-                  String newLabel = processLabel(label);
+                  String newLabel = processLabel(label, true);
 
                   if (!label.equals(newLabel))
                   {

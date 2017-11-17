@@ -5735,6 +5735,62 @@ it's as though the entries had been defined as:
 Remember to use this prefix when you reference the terms in the
 document with commands like \ics{gls}.
 
+\optsection{cs-label-prefix}
+
+If you have commands such as \ics{gls}\margm{label} or
+\ics{glstext}\marg{label} in field
+values (in situations where nested link text won't cause a problem)
+the \meta{label} will be converted as follows:
+\begin{itemize}
+\item if \meta{label} starts with \idprefix{dual} then
+\idprefix{dual} will be replaced by the \csopt{dual-prefix} value;
+\item if \meta{label} starts with \idprefix{tertiary} then
+\idprefix{tertiary} will be replaced by the \csopt{tertiary-prefix} value;
+\item if \meta{label} starts with \idprefix{extn} then
+\idxprefix{extn} will be replaced by the corresponding
+\csopt{ext-prefixes} setting;
+\item if \meta{label} doesn't start with one of the above recognised
+prefixes then, if \csopt{cs-label-prefix} has been used the supplied
+value will be inserted otherwise the \csopt{label-prefix} setting
+will be inserted.
+\end{itemize}
+For example, given
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal, such as a \gls{duck} or \gls{goose}}
+}
+\end{verbatim}
+then if \csopt[idx.]{label-prefix} is set but \csopt{cs-label-prefix}
+isn't included in the resource option list this will convert the
+\field{description} field to:
+\begin{verbatim}
+description = {feathered animal, such as a \gls{idx.duck} or
+\gls{idx.goose}}
+\end{verbatim}
+However with \csopt[gls.]{cs-label-prefix} the \field{description}
+field will be converted to
+\begin{verbatim}
+description = {feathered animal, such as a \gls{gls.duck} or
+\gls{gls.goose}}
+\end{verbatim}
+regardless of the \csopt{label-prefix} setting. Whereas if the
+original entry definition is
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal, such as a \gls{dual.duck} or
+\gls{dual.goose}}
+}
+\end{verbatim}
+then \idprefix{dual} will be replaced by the value of the
+\csopt{dual-prefix} option regardless of the \csopt{cs-label-prefix}
+setting.
+
+The \csopt{cs-label-prefix} setting doesn't affect labels in the
+fields that have an entry label or label list as the value
+(\field{parent}, \field{alias}, \field{see} and \field{seealso}).
+
 \optsection{ext-prefixes}
 
 Any cross-references in the \iext{bib} file that start with
@@ -14371,8 +14427,10 @@ languages, vegetables, minerals, animals, chemical formula) and also an
 index listing all referenced entries with number lists as well as
 aliased entries that haven't explicitly been used but the
 cross-reference term as been indexed. This requires
-\csopt[recorded and deps and see]{selection} to ensure the aliased
-entries are selected.
+\begin{codeenv}
+\csopt[recorded and deps and see]{selection}
+\end{codeenv}
+to ensure the aliased entries are selected.
 
 Since I don't need the default \code{main} glossary (I'm providing
 my own custom glossaries) I've used the \styopt{nomain} option to
@@ -14582,6 +14640,20 @@ fixed with:
 \end{codeenv}
 Which transfers the dual entry locations to the corresponding
 primary.
+
+The other problem is the cross-references in the \field{description}
+fields. Since the labels don't start with \idprefix{dual} \bibgls\
+will assume the refer to the primary entries, which means that
+\idprefixfmt{idx} (the value of \csopt{label-prefix}) will be
+inserted. This means that they'll link to the index rather than the
+glossary entry. It also means that the cross-references where the
+dual is an abbreviation won't behave like an abbreviation as the
+reference is to the primary (non-abbreviation) entry. This can be
+fixed by setting \csopt{cs-label-prefix} to the same value as
+\csopt{dual-prefix}:
+\begin{codeenv}
+\csopt[\empty]{cs-label-prefix}
+\end{codeenv}
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}

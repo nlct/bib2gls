@@ -47,6 +47,7 @@ v1.1 (pending):
      - sort-pad-minus
      - dual-sort-pad-minus
      - secondary-sort-pad-minus
+     - cs-label-prefix
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

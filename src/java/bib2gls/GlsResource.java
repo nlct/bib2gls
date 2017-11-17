@@ -800,6 +800,15 @@ public class GlsResource
          {
             tertiaryType = getOptional(parser, list, opt);
          }
+         else if (opt.equals("cs-label-prefix"))
+         {
+            csLabelPrefix = getOptional(parser, list, opt);
+
+            if (csLabelPrefix == null)
+            {
+               csLabelPrefix = "";
+            }
+         }
          else if (opt.equals("sort-suffix"))
          {
             String val = getRequired(parser, list, opt);
@@ -1716,6 +1725,11 @@ public class GlsResource
             throw new IllegalArgumentException(
              bib2gls.getMessage("error.syntax.unknown_option", opt));
          }
+      }
+
+      if (csLabelPrefix == null)
+      {
+         csLabelPrefix = labelPrefix;
       }
 
       if (supplemental != null)
@@ -6033,6 +6047,11 @@ public class GlsResource
       return null;
    }
 
+   public String getCsLabelPrefix()
+   {
+      return csLabelPrefix;
+   }
+
    public String getDualSortField()
    {
       return dualSortSettings.getSortField();
@@ -7022,6 +7041,8 @@ public class GlsResource
 
    private String tertiaryType=null, tertiaryCategory=null,
      tertiaryPrefix="tertiary.";
+
+   private String csLabelPrefix = null;
 
    private String dualField = null;
 
