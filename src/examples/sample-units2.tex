@@ -10,7 +10,7 @@
  section,% use \section* for glossary headings
  nostyles,% don't load default styles
  stylemods={mcols},% load glossary-mcols.sty and patch
- style=mcolindexgroup]{glossaries-extra}
+ style=mcolindex]{glossaries-extra}
 
 \newglossary*{baseunits}{Base Units}
 \newglossary*{derivedunits}{Derived Units}
@@ -18,17 +18,20 @@
 \GlsXtrLoadResources[
   src={baseunits},
   type=baseunits,
+  symbol-sort-fallback=name,
   selection={all}
 ]
 
 \GlsXtrLoadResources[
   src={derivedunits},
   type=derivedunits,
+  symbol-sort-fallback=name,
   selection={all}
 ]
 
 \begin{document}
 \chapter*{Glossaries}
 
-\printunsrtglossaries
+\printunsrtglossary[type=baseunits,nogroupskip]
+\printunsrtglossary[type=derivedunits,style=indexgroup]
 \end{document}

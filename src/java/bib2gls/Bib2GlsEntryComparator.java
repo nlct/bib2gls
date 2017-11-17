@@ -125,16 +125,11 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       GlsResource resource = bib2gls.getCurrentResource();
 
-      String type = entryType;
+      String type = resource.getType(entry, entryType);
 
       if (type == null)
       {
-         type = resource.getType(entry);
-
-         if (type == null)
-         {
-            type = "";
-         }
+         type = "";
       }
 
       if (bib2gls.useGroupField() && value.length() > 0

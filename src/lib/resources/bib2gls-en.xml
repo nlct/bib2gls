@@ -115,6 +115,10 @@ See the manual for further details.</entry>
 <entry key="message.processing">Processing {0}</entry>
 <entry key="message.copying">Copying {0} -&gt; {1}</entry>
 <entry key="message.moving">Moving {0} -&gt; {1}</entry>
+<entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
+<entry key="message.crossref.by">Entry {0} cross-referenced by {1}</entry>
+<entry key="message.checking.crossrefs">Checking cross-references for: {0}</entry>
+<entry key="message.dual.dep">Dual found: {0} (primary {1})</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
@@ -182,6 +186,9 @@ Defaulting to: {0}.
 <entry key="message.collator.rules">Collator rules: {0}.</entry>
 <entry key="message.no.collation.element">No collation element for: {0}.</entry>
 <entry key="message.break.points">Break points: {0}.</entry>
+<entry key="message.field.alias.check">Checking field aliases for {0}.</entry>
+<entry key="message.clearing.entry.aliases">Clearing entry type aliases.</entry>
+<entry key="message.setting.entry.aliases">Setting entry type aliases.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -262,6 +269,8 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.identical.original_id">Falling back on original ID</entry>
 <entry key="warning.identical.none">No fallback</entry>
 <entry key="warning.identical.field">Falling back on ''{0}'' field (''{1}'' &lt;=&gt; ''{2}'' = {3})</entry>
+<entry key="warning.unknown.widest.fortype">Can''t determine widest level {0} entry for glossary type ''{1}''. Using fallback method.</entry>
+<entry key="warning.unknown.widest">Can''t determine widest level {0} entry for unknown glossary type. Using fallback method.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
@@ -302,6 +311,7 @@ Value must be a list of size {2,number}</entry>
 The size of the first list ({2,number}) is not the same as the size of 
 the second list ({3,number}).</entry>
 <entry key="error.invalid.field">Invalid field ''{0}'' provided by option ''{1}''</entry>
+<entry key="error.invalid.entry.type">Invalid entry type ''{0}'' provided in option ''{1}''</entry>
 <entry key="error.openin.forbidden">Read access forbidden for file: {0}</entry>
 <entry key="error.openout.forbidden">Write access forbidden for file: {0}</entry>
 <entry key="error.forbidden.ext">Write access forbidden for extension: {0}</entry>
@@ -332,6 +342,7 @@ Error occurred before: {3}
 {0}</entry>
 <entry key="error.field.alias.trail">''field-aliases'' can''t contain both ''{0}={1}'' and ''{2}={0}'' (trails not permitted)</entry>
 <entry key="error.field.alias.identity">''field-aliases'' can''t contain identity mapping ''{0}={0}''</entry>
+<entry key="error.cyclic.sameas.type.category">Cyclic reference category='{'same as type'}' and type='{'same as category'}'</entry>
 
 <!--
     The following messages are used by convertgls2bib

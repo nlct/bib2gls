@@ -15,9 +15,25 @@
  see={sample2}
 }
 
+@entry{sampleparent,
+  name={sample parent},
+  description={an example}
+}
+
 @entry{sample4,
  name={sample 4},
+ parent={sampleparent},
  description={an example},
  seealso={sample2,sample3}
 }
 
+@entry{sample5,
+ name={sample 5},
+ description={an example},
+ see={sample4}
+}
+
+@index{aliassample,
+ name={alias sample},
+ alias={sample4}
+}

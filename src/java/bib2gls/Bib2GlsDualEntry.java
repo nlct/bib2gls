@@ -180,6 +180,11 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
             if (map == null)
             {
+               if (key.equals("parent"))
+               {
+                  value = resource.flipLabel(value);
+               }
+
                entry.putField(key, contents);
                entry.putField(key, value);
             }

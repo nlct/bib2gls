@@ -46,18 +46,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
    protected String getType(Bib2GlsEntry entry)
    {
-      String type = entryType;
+      GlsResource resource = bib2gls.getCurrentResource();
+
+      String type = resource.getType(entry, entryType);
 
       if (type == null)
       {
-         GlsResource resource = bib2gls.getCurrentResource();
-
-         type = resource.getType(entry);
-
-         if (type == null)
-         {
-            type = "";
-         }
+         type = "";
       }
 
       return type;
@@ -78,96 +73,93 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          int cp = sortStr.codePointAt(i);
          i += Character.charCount(cp);
 
-         if (i < strLength)
+         if (cp == '+')
          {
-            if (cp == '+')
+            int nextCp = (i < strLength ? sortStr.codePointAt(i) : -1);
+   
+            if (Character.isDigit(nextCp))
             {
-               int nextCp = sortStr.codePointAt(i);
-   
-               if (Character.isDigit(nextCp))
-               {
-                  builder.append(settings.getPadPlus());
-               }
-               else
-               {
-                  builder.appendCodePoint(cp);
-               }
-   
-               sign=true;
+               builder.append(settings.getPadPlus());
             }
-            else if (cp == bib2gls.SUBSCRIPT_PLUS)
+            else
             {
-               int nextCp = sortStr.codePointAt(i);
-   
-               if (bib2gls.isSubscriptDigit(nextCp))
-               {
-                  builder.append(settings.getPadPlus());
-               }
-               else
-               {
-                  builder.appendCodePoint(cp);
-               }
-   
-               sign=true;
+               builder.appendCodePoint(cp);
             }
-            else if (cp == bib2gls.SUPERSCRIPT_PLUS)
+  
+            sign=true;
+         }
+         else if (cp == bib2gls.SUBSCRIPT_PLUS)
+         {
+            int nextCp = (i < strLength ? sortStr.codePointAt(i) : -1);
+ 
+            if (bib2gls.isSubscriptDigit(nextCp))
             {
-               int nextCp = sortStr.codePointAt(i);
-   
-               if (bib2gls.isSuperscriptDigit(nextCp))
-               {
-                  builder.append(settings.getPadPlus());
-               }
-               else
-               {
-                  builder.appendCodePoint(cp);
-               }
-   
-               sign=true;
+               builder.append(settings.getPadPlus());
             }
-            else if (cp == '-' || cp == bib2gls.MINUS)
+            else
             {
-               int nextCp = sortStr.codePointAt(i);
-   
-               if (Character.isDigit(nextCp))
-               {
-                  builder.append(settings.getPadMinus());
-               }
-               else
-               {
-                  builder.appendCodePoint(cp);
-               }
-   
-               sign=true;
+               builder.appendCodePoint(cp);
             }
-            else if (cp == bib2gls.SUBSCRIPT_MINUS)
+
+            sign=true;
+         }
+         else if (cp == bib2gls.SUPERSCRIPT_PLUS)
+         {
+            int nextCp = (i < strLength ? sortStr.codePointAt(i) : -1);
+   
+            if (bib2gls.isSuperscriptDigit(nextCp))
             {
-               int nextCp = sortStr.codePointAt(i);
-   
-               if (bib2gls.isSubscriptDigit(nextCp))
-               {
-                  builder.append(settings.getPadMinus());
-               }
-               else
-               {
-                  builder.appendCodePoint(cp);
-               }
+               builder.append(settings.getPadPlus());
             }
-            else if (cp == bib2gls.SUPERSCRIPT_MINUS)
+            else
             {
-               int nextCp = sortStr.codePointAt(i);
-   
-               if (bib2gls.isSuperscriptDigit(nextCp))
-               {
-                  builder.append(settings.getPadMinus());
-               }
-               else
-               {
-                  builder.appendCodePoint(cp);
-               }
-   
-               sign=true;
+               builder.appendCodePoint(cp);
             }
+   
+            sign=true;
+         }
+         else if (cp == '-' || cp == bib2gls.MINUS)
+         {
+            int nextCp = (i < strLength ? sortStr.codePointAt(i) : -1);
+   
+            if (Character.isDigit(nextCp))
+            {
+               builder.append(settings.getPadMinus());
+            }
+            else
+            {
+               builder.appendCodePoint(cp);
+            }
+
+            sign=true;
+         }
+         else if (cp == bib2gls.SUBSCRIPT_MINUS)
+         {
+            int nextCp = (i < strLength ? sortStr.codePointAt(i) : -1);
+   
+            if (bib2gls.isSubscriptDigit(nextCp))
+            {
+               builder.append(settings.getPadMinus());
+            }
+            else
+            {
+               builder.appendCodePoint(cp);
+            }
+         }
+         else if (cp == bib2gls.SUPERSCRIPT_MINUS)
+         {
+            int nextCp = (i < strLength ? sortStr.codePointAt(i) : -1);
+   
+            if (bib2gls.isSuperscriptDigit(nextCp))
+            {
+               builder.append(settings.getPadMinus());
+            }
+            else
+            {
+               builder.appendCodePoint(cp);
+            }
+   
+            sign=true;
          }
          else if (Character.isDigit(cp))
          {

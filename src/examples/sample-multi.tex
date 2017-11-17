@@ -16,13 +16,15 @@
  index,% create 'index' glossary
  nostyles,% don't load default styles
 % load and patch required style packages:
- stylemods={list,mcols,tree,bookindex},
- style=tree]{glossaries-extra}
+ stylemods={list,mcols,tree,bookindex}
+]{glossaries-extra}
 
 \newglossary*{bacteria}{Bacteria}
 \newglossary*{markuplanguage}{Markup Languages}
+\newglossary*{vegetable}{Vegetables}
 \newglossary*{mineral}{Minerals}
-\newglossary*{chemical}{Chemicals}
+\newglossary*{animal}{Animals}
+\newglossary*{chemical}{Chemical Formula}
 
 % abbreviation styles must be set before \GlsXtrLoadResources:
 \setabbreviationstyle[bacteria]{long-only-short-only}
@@ -35,8 +37,9 @@
 }
 
 \GlsXtrLoadResources[
- src={bacteria,markuplanguages,minerals,chemicalformula},
- selection={recorded and deps and see},
+ src={bacteria,markuplanguages,vegetables,minerals,
+  animals,chemicalformula},
+ %selection={recorded and deps and see},
  set-widest,
  type=index,
  label-prefix={idx.},
@@ -47,13 +50,19 @@
  dual-type={same as category},
  dual-sort={en},
  dual-sort-number-pad={2},
+ dual-break-at=none,
  entry-type-aliases={
-  {abbreviation=dualindexabbreviation},
-  {entry=dualindexentry},
-  {symbol=dualindexsymbol}
+  abbreviation=dualindexabbreviation,
+  entry=dualindexentry,
+  symbol=dualindexsymbol
  },
  abbreviation-name-fallback={long},
- field-aliases={identifier=category}
+ symbol-sort-fallback={name},
+ field-aliases={
+   identifier=category,
+   formula=symbol,
+   chemicalname=name
+ },
 ]
 
 \newcommand{\bacteriafont}[1]{\emph{#1}}
@@ -84,10 +93,17 @@
 \subsection{Next Use}
 \gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
 
+\section{Vegetables}
+\gls{cabbage}, \gls{brussels-sprout}, \gls{artichoke}, 
+\gls{cauliflower}, \gls{courgette}, \gls{spinach}.
+
 \section{Minerals}
 \Gls{beryl}, \gls{amethyst}, \gls{chalcedony}, \gls{aquamarine},
 \gls{aragonite}, \gls{calcite}, \gls{bilinite}, \gls{cyanotrichite},
-\gls{biotite}.
+\gls{biotite}, \gls{dolomite}, \gls{quetzalcoatlite}, \gls{vulcanite}.
+
+\section{Animals}
+\Gls{duck}, \gls{parrot}, \gls{hedgehog}.
 
 \section{Chemicals}
 \gls{Al2SO43}, \gls{H2O}, \gls{C6H12O6},
@@ -100,8 +116,17 @@
 \chapter*{Glossaries}
 \printunsrtglossary[type=bacteria,style=mcoltree]
 \printunsrtglossary[type=markuplanguage,style=altlist]
-\printunsrtglossary[type=mineral]
-\printunsrtglossary[type=chemical,style=mcolalttreegroup]
+\printunsrtglossary[type=vegetable,style=tree,nogroupskip]
+\printunsrtglossary[type=mineral,style=treegroup]
+\printunsrtglossary[type=animal,style=tree,nogroupskip]
+\printunsrtglossary*[type=chemical,style=mcolalttreegroup]
+{%
+  \renewcommand\glsxtralttreeSymbolDescLocation[2]{%
+   \glossentrysymbol{#1}\glspostdescription\glsxtrAltTreePar
+  }%
+  \renewcommand*{\glstreenamefmt}[1]{#1}%
+  \renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
+}
 
 \setupglossaries{section=chapter}
 \printunsrtglossary[type=index,style=bookindex]

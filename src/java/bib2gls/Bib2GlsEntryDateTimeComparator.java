@@ -229,9 +229,14 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
 
       String grp = null;
 
-      String type = getType(entry);
-
       GlsResource resource = bib2gls.getCurrentResource();
+
+      String type = resource.getType(entry, entryType);
+
+      if (type == null)
+      {
+         type = "";
+      }
 
       if (bib2gls.useGroupField() && value.length() > 0
            && !entry.hasParent())

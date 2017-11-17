@@ -1038,7 +1038,6 @@ public class Bib2Gls implements TeXApp
       fieldMap = new HashMap<String,String>();
       records = new Vector<GlsRecord>();
       seeRecords = new Vector<GlsSeeRecord>();
-      dependencies = new Vector<String>();
 
       Vector<AuxData> auxData = auxParser.getAuxData();
 
@@ -1525,25 +1524,6 @@ public class Bib2Gls implements TeXApp
    public GlsResource getCurrentResource()
    {
       return currentResource;
-   }
-
-   public boolean isDependent(String id)
-   {
-      return dependencies.contains(id);
-   }
-
-   public void addDependent(String id)
-   {
-      if (!dependencies.contains(id))
-      {
-         verbose(getMessage("message.added.dep", id));
-         dependencies.add(id);
-      }
-   }
-
-   public Vector<String> getDependencies()
-   {
-      return dependencies;
    }
 
    public Charset getTeXCharset()
@@ -3644,7 +3624,6 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsSeeRecord> seeRecords;
 
    private HashMap<String,String> fieldMap;
-   private Vector<String> dependencies;
 
    private HashMap<String,String> formatMap;
 

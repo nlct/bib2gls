@@ -1,10 +1,18 @@
 \documentclass{report}
 
-\usepackage[record,postdot]{glossaries-extra}
+\usepackage[record,postdot,
+ stylemods={bookindex},
+ index
+]{glossaries-extra}
 
 \GlsXtrLoadResources[
   src={test-seetrail},% data in test-seetrail.bib
-  save-locations=false% don't save locations
+  entry-type-aliases={entry=dualindexentry},
+  type=index,
+  selection={recorded and deps and see},
+  %selection={recorded and ancestors},
+  %selection={recorded no deps},
+  %ignore-fields={parent},
 ]
 
 \renewcommand*{\glsxtrpostdescgeneral}{%
@@ -13,7 +21,12 @@
  {%
    \ifglshasfield{seealso}{\glscurrententrylabel}
    {, \glsxtruseseealso{\glscurrententrylabel}}%
-   {}%
+   {%
+     \ifglshasfield{alias}{\glscurrententrylabel}
+     {, \glsxtrusesee{\glscurrententrylabel}}%
+     {%
+     }%
+   }%
  }%
 }
 
@@ -22,6 +35,7 @@
 
 A \gls{sample4}.
 
-\printunsrtglossaries
+\printunsrtglossary[style=tree,nonumberlist]
+\printunsrtglossary[type=index,style=bookindex]
 \end{document}
 

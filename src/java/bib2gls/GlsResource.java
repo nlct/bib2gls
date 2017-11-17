@@ -69,6 +69,7 @@ public class GlsResource
 
       String filename = texPath.getTeXPath(true);
 
+      dependencies = new Vector<String>();
       KeyValList list = KeyValList.getList(parser, opts);
 
       String[] srcList = null;
@@ -139,6 +140,54 @@ public class GlsResource
          else if (opt.equals("entry-type-aliases"))
          {
             entryTypeAliases = getHashMap(parser, list, opt);
+
+            if (entryTypeAliases == null)
+            {
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                     "message.clearing.entry.aliases"));
+               }
+            }
+            else
+            {
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                     "message.setting.entry.aliases"));
+               }
+
+               for (Iterator<String> aliasIt 
+                      = entryTypeAliases.keySet().iterator(); 
+                    aliasIt.hasNext();)
+               {
+                  String key = aliasIt.next();
+                  String val = entryTypeAliases.get(key);
+
+                  if (key.matches(".*\\W.*"))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.entry.type",key,opt));
+                  }
+
+                  if (val.isEmpty())
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.missing.value", key));
+                  }
+
+                  if (val.matches(".*\\W.*"))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.entry.type",val,opt));
+                  }
+
+                  if (bib2gls.getVerboseLevel() > 0)
+                  {
+                     bib2gls.logMessage(String.format("@%s=>@%s.", key, val));
+                  }
+               }
+            }
          }
          else if (opt.equals("field-aliases"))
          {
@@ -2805,7 +2854,14 @@ public class GlsResource
      String opt)
     throws IOException
    {
-      CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+      TeXObject obj = list.getValue(opt);
+
+      if (obj instanceof TeXObjectList)
+      {
+         obj = trimList((TeXObjectList)obj);
+      }
+
+      CsvList csvList = CsvList.getList(parser, obj);
 
       int n = csvList.size();
 
@@ -2818,7 +2874,7 @@ public class GlsResource
 
       for (int i = 0; i < n; i++)
       {
-         TeXObject obj = csvList.getValue(i);
+         obj = csvList.getValue(i);
 
          if (obj instanceof TeXObjectList)
          {
@@ -2958,42 +3014,35 @@ public class GlsResource
       KeyValList list, String opt)
     throws IOException
    {
-      TeXObject[] array = getTeXObjectArray(parser, list, opt);
+      TeXObject object = list.getValue(opt);
 
-      if (array == null)
+      if (object instanceof TeXObjectList)
+      {
+         object = trimList((TeXObjectList)object);
+      }
+
+      KeyValList keyList = KeyValList.getList(parser, object);
+
+      int n = keyList.size();
+
+      if (n == 0)
       {
          return null;
       }
 
-      HashMap<String,String> map = new HashMap<String,String>();
+      HashMap<String,String> map = new HashMap<String,String>(n);
 
-      for (int i = 0; i < array.length; i++)
+      for (Iterator<String> it = keyList.keySet().iterator(); it.hasNext(); )
       {
-         if (!(array[i] instanceof TeXObjectList))
-         {
-            throw new IllegalArgumentException(
-              bib2gls.getMessage("error.invalid.opt.value", 
-               opt, list.get(opt).toString(parser)));
-         }
+         String field = it.next();
 
-         Vector<TeXObject> split = splitList(parser, '=', 
-            (TeXObjectList)array[i]);
+         object = keyList.get(field);
 
-         if (split == null || split.size() == 0) continue;
+         String value = (object == null ? "" : object.toString(parser).trim());
 
-         String field = split.get(0).toString(parser);
+         field = field.trim();
 
-         if (split.size() > 2)
-         {
-            throw new IllegalArgumentException(
-              bib2gls.getMessage("error.invalid.opt.keylist.value", 
-               field, array[i].toString(parser), opt));
-         }
-
-         String val = split.size() == 1 ? "" 
-                      : split.get(1).toString(parser);
-
-         map.put(field, val);
+         map.put(field, value);
       }
 
       return map;
@@ -3260,6 +3309,8 @@ public class GlsResource
          seeList = new Vector<Bib2GlsEntry>();
       }
 
+      boolean combine = "combine".equals(dualSortSettings.getMethod());
+
       for (TeXPath src : sources)
       {
          File bibFile = src.getFile();
@@ -3397,15 +3448,18 @@ public class GlsResource
                   entry.setDual(dual);
                   dual.setDual(entry);
                   dualId = dual.getId();
+                  hasDuals = true;
 
                   if (((Bib2GlsDualEntry)entry).hasTertiary())
                   {
                      tertiaryId = (tertiaryPrefix == null ?
                         entry.getOriginalId():
                         tertiaryPrefix+entry.getOriginalId());
+                     hasTertiaries = true;
                   }
 
                   // is there a cross-reference list?
+                  // dual entries can't have an alias
 
                   if (dual.getField("see") != null 
                       || dual.getField("seealso") != null)
@@ -3514,114 +3568,80 @@ public class GlsResource
                      continue;
                   }
 
-                  if ("combine".equals(dualSortSettings.getMethod()))
+                  if (combine)
                   {
                      setDualType(dual);
                      setDualCategory(dual);
                      setDualCounter(dual);
 
                      bibData.add(dual);
+
+                     entry.addDependency(dualId);
+                     dual.addDependency(primaryId);
                   }
                   else
                   {
                      dualData.add(dual);
                   }
-               }
 
-               if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
-               {
-                  if (hasRecords)
+                  if (bib2gls.getVerboseLevel() > 0)
                   {
-                     addDependencies(parser, entry, list);
-
-                     if (dual != null)
-                     {
-                        if (!bib2gls.isDependent(dualId))
-                        {
-                           bib2gls.addDependent(dualId);
-
-                           // If the primary entry has dependants
-                           // need to find out if they are dual
-                           // entries, in which case their dual's need
-                           // adding.
-
-                           for (Iterator<String> it=entry.getDependencyIterator();
-                                it.hasNext(); )
-                           {
-                              String dep = it.next();
-
-                              Bib2GlsEntry depEntry = getBib2GlsEntry(dep, list);
-
-                              if (depEntry != null 
-                                   && depEntry instanceof Bib2GlsDualEntry)
-                              {
-                                 bib2gls.addDependent(
-                                   String.format("%s%s", 
-                                   dualPrefix == null ? "" : dualPrefix, 
-                                   depEntry.getOriginalId()));
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if (dualHasRecords)
-                  {
-                     // Do the "see" or "seealso" fields need setting?
-
-                     if (dual.getFieldValue("see") == null
-                       && dual.getFieldValue("seealso") == null)
-                     {
-                        dual.initCrossRefs(parser);
-                     }
-
-                     for (Iterator<String> it = dual.getDependencyIterator();
-                          it.hasNext(); )
-                     {
-                        String dep = it.next();
-
-                        bib2gls.addDependent(dep);
-                     }
-
-                     if (!bib2gls.isDependent(primaryId))
-                     {
-                        bib2gls.addDependent(primaryId);
-
-                        entry.initCrossRefs(parser);
-
-                        for (Iterator<String> it=entry.getDependencyIterator();
-                             it.hasNext(); )
-                        {
-                           String dep = it.next();
-
-                           bib2gls.addDependent(dep);
-
-                           Bib2GlsEntry depEntry = getBib2GlsEntry(dep, list);
-
-                           if (depEntry != null 
-                                && depEntry instanceof Bib2GlsDualEntry)
-                           {
-                              bib2gls.addDependent(
-                                String.format("%s%s", 
-                                dualPrefix==null?"":dualPrefix,
-                                depEntry.getOriginalId()));
-                           }
-                        }
-                     }
+                     bib2gls.logMessage(bib2gls.getMessage(
+                       "message.dual.dep", dualId, primaryId));
                   }
                }
 
-               if (!hasRecords && seeList != null)
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE ||
+                    selectionMode == SELECTION_RECORDED_AND_DEPS)
                {
-                  // Does the entry have a cross reference list?
+                  // does this entry have a "see" or "seealso" field?
+
+                  if (bib2gls.getVerboseLevel() > 0)
+                  {
+                     bib2gls.logMessage(bib2gls.getMessage(
+                        "message.checking.crossrefs", primaryId));
+                  }
 
                   entry.initCrossRefs(parser);
 
-                  addCrossRefs(list, entry, entry.getCrossRefs(), seeList);
+                  if (dual != null)
+                  {
+                     if (bib2gls.getVerboseLevel() > 0)
+                     {
+                        bib2gls.logMessage(bib2gls.getMessage(
+                           "message.checking.crossrefs", dualId));
+                     }
 
-                  addCrossRefs(list, entry, entry.getAlsoCrossRefs(), seeList);
+                     dual.initCrossRefs(parser);
+                  }
+
+                  if (seeList != null)
+                  {
+                     addCrossRefs(list, entry, entry.getCrossRefs(),
+                        bibData, seeList);
+                     addCrossRefs(list, entry, entry.getAlsoCrossRefs(), 
+                        bibData, seeList);
+
+                     if (dual != null)
+                     {
+                        if (combine)
+                        {
+                           addCrossRefs(list, dual, dual.getCrossRefs(), 
+                              bibData, seeList);
+                           addCrossRefs(list, dual, dual.getAlsoCrossRefs(), 
+                              bibData, seeList);
+                        }
+                        else
+                        {
+                           addCrossRefs(list, dual, dual.getCrossRefs(), 
+                              dualData, seeList);
+                           addCrossRefs(list, dual, dual.getAlsoCrossRefs(), 
+                              dualData, seeList);
+                        }
+                     }
+                  }
                }
+
             }
          }
       }
@@ -3630,19 +3650,18 @@ public class GlsResource
       {
          for (Bib2GlsEntry xrEntry : seeList)
          {
-            if (xrEntry.hasRecords())
+            for (Iterator<Bib2GlsEntry> it=xrEntry.getCrossRefdByIterator();
+              it.hasNext(); )
             {
-               // cross-referenced entry has records, so need to 
-               // add the referring entries if they haven't already
-               // been added.
+               Bib2GlsEntry entry = it.next();
 
-               for (Iterator<Bib2GlsEntry> it=xrEntry.getCrossRefdByIterator();
-                 it.hasNext(); )
+               if (bib2gls.getVerboseLevel() > 0)
                {
-                  Bib2GlsEntry entry = it.next();
-
-                  bib2gls.addDependent(entry.getId());
+                  bib2gls.logMessage(bib2gls.getMessage(
+                    "message.crossref.by", entry.getId(), xrEntry.getId()));
                }
+
+               xrEntry.addDependency(entry.getId());
             }
          }
       }
@@ -3650,16 +3669,15 @@ public class GlsResource
       addSupplementalRecords();
    }
 
-
    private void addCrossRefs(Vector<BibData> list,
-      Bib2GlsEntry entry, String[] xrList,
+      Bib2GlsEntry entry, String[] xrList, Vector<Bib2GlsEntry> entries,
       Vector<Bib2GlsEntry> seeList)
    {
       if (xrList == null) return;
 
       for (String xr : xrList)
       {
-         Bib2GlsEntry xrEntry = getBib2GlsEntry(xr, list);
+         Bib2GlsEntry xrEntry = getEntry(xr, entries);
 
          if (xrEntry != null)
          {
@@ -3719,14 +3737,9 @@ public class GlsResource
       }
    }
 
-   private void addDependencies(TeXParser parser, Bib2GlsEntry entry, 
-     Vector<BibData> list)
-    throws IOException
+   private void addDependencies(Bib2GlsEntry entry, 
+     Vector<Bib2GlsEntry> entries)
    {
-      // does this entry have a "see" or "seealso" field?
-
-      entry.initCrossRefs(parser);
-
       for (Iterator<String> it = entry.getDependencyIterator();
            it.hasNext(); )
       {
@@ -3735,27 +3748,46 @@ public class GlsResource
          // Has the dependency already been added or does it have
          // any records?  (Don't want to get stuck in an infinite loop!)
 
-         if (bib2gls.isDependent(dep))
+         if (isDependent(dep))
          {
             continue;
          }
 
-         bib2gls.addDependent(dep);
+         addDependent(dep);
 
          if (bib2gls.hasRecord(dep))
          {
             continue;
          }
 
-         Bib2GlsEntry depEntry = getBib2GlsEntry(dep, list);
+         Bib2GlsEntry depEntry = getEntry(dep, entries);
 
          if (depEntry != null)
          {
             // add any dependencies
 
-            addDependencies(parser, depEntry, list);
+            addDependencies(depEntry, entries);
          }
       }
+   }
+
+   public boolean isDependent(String id)
+   {
+      return dependencies.contains(id);
+   }
+
+   public void addDependent(String id)
+   {
+      if (!dependencies.contains(id))
+      {
+         bib2gls.verbose(bib2gls.getMessage("message.added.dep", id));
+         dependencies.add(id);
+      }
+   }
+
+   public Vector<String> getDependencies()
+   {
+      return dependencies;
    }
 
    public int processData()
@@ -3908,6 +3940,68 @@ public class GlsResource
       }
    }
 
+   public String flipLabel(String label)
+   {
+      if (labelPrefix == null)
+      {
+         if (label.startsWith(dualPrefix))
+         {
+            return label.substring(dualPrefix.length());
+         }
+         else if (hasTertiaries && label.startsWith(tertiaryPrefix))
+         {
+            return label.substring(tertiaryPrefix.length());
+         }
+         else
+         {
+            return dualPrefix+label;
+         }
+      }
+
+      if (dualPrefix == null)
+      {
+         if (label.startsWith(labelPrefix))
+         {
+            return label.substring(labelPrefix.length());
+         }
+         else if (hasTertiaries && label.startsWith(tertiaryPrefix))
+         {
+            return label.substring(tertiaryPrefix.length());
+         }
+         else
+         {
+            return labelPrefix+label;
+         }
+      }
+
+      if (label.startsWith(labelPrefix))
+      {
+         return dualPrefix+label.substring(labelPrefix.length());
+      }
+
+      if (label.startsWith(dualPrefix))
+      {
+         return labelPrefix+label.substring(dualPrefix.length());
+      }
+
+      if (hasTertiaries)
+      {
+         if (tertiaryPrefix != null && label.startsWith(tertiaryPrefix))
+         {
+            if (dualPrefix != null)
+            {
+               return dualPrefix+label.substring(tertiaryPrefix.length());
+            }
+            else
+            {
+               return label.substring(tertiaryPrefix.length());
+            }
+         }
+      }
+
+      return null;
+   }
+
    public Bib2GlsEntry getEntry(String label)
    {
       Bib2GlsEntry entry = getEntry(label, bibData);
@@ -3933,7 +4027,7 @@ public class GlsResource
       return null;
    }
 
-   public static Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
+   public Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
    {
       for (BibData entry : data)
       {
@@ -3973,7 +4067,11 @@ public class GlsResource
          {
             if (entry.hasRecords() ||
                 (matchAction == MATCH_ACTION_ADD && fieldPatterns != null
-                 && !notMatch(entry)))
+                 && !notMatch(entry))
+               || (entry.getDual() != null && 
+                    (entry.getDual().hasRecords() ||
+                       matchAction == MATCH_ACTION_ADD && fieldPatterns != null
+                       && !notMatch(entry.getDual()))))
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
@@ -3983,6 +4081,12 @@ public class GlsResource
                }
 
                entries.add(entry);
+
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+               {
+                  addDependencies(entry, data);
+               }
             }
          }
       }
@@ -3997,6 +4101,16 @@ public class GlsResource
 
             Bib2GlsEntry entry = getEntry(record.getLabel(), data);
 
+            if (entry == null && hasDuals)
+            {
+               String label = flipLabel(record.getLabel());
+
+               if (label != null)
+               {
+                  entry = getEntry(label, data);
+               }
+            }
+
             if (entry != null && !entries.contains(entry))
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
@@ -4007,6 +4121,12 @@ public class GlsResource
                }
 
                entries.add(entry);
+
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+               {
+                  addDependencies(entry, data);
+               }
             }
          }
 
@@ -4016,6 +4136,16 @@ public class GlsResource
 
             Bib2GlsEntry entry = getEntry(record.getLabel(), data);
 
+            if (entry == null && hasDuals)
+            {
+               String label = flipLabel(record.getLabel());
+
+               if (label != null)
+               {
+                  entry = getEntry(label, data);
+               }
+            }
+
             if (entry != null && !entries.contains(entry))
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
@@ -4026,6 +4156,12 @@ public class GlsResource
                }
 
                entries.add(entry);
+
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+               {
+                  addDependencies(entry, data);
+               }
             }
          }
 
@@ -4049,6 +4185,12 @@ public class GlsResource
                      }
 
                      entries.add(entry);
+
+                     if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                     {
+                        addDependencies(entry, data);
+                     }
                   }
                   else
                   {
@@ -4064,6 +4206,13 @@ public class GlsResource
                            }
 
                            entries.add(entry);
+
+                           if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                             ||selectionMode
+                                  == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                           {
+                              addDependencies(entry, data);
+                           }
                            break;
                         }
                      }
@@ -4085,11 +4234,19 @@ public class GlsResource
       if (selectionMode == SELECTION_RECORDED_AND_DEPS
         ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
       {
-         Vector<String> dependencies = bib2gls.getDependencies();
-
          for (String id : dependencies)
          {
             Bib2GlsEntry dep = getEntry(id, data);
+
+            if (dep == null && hasDuals)
+            {
+               String label = flipLabel(id);
+
+               if (label != null)
+               {
+                  dep = getEntry(label, data);
+               }
+            }
 
             if (dep != null && !entries.contains(dep))
             {
@@ -4605,18 +4762,11 @@ public class GlsResource
             secondaryList = new Vector<Bib2GlsEntry>(entryCount);
          }
 
-         Vector<String> widestNames = null;
-         Vector<Double> widest = null;
-         Vector<String> dualWidestNames = null;
-         Vector<Double> dualWidest = null;
          Font font = null;
          FontRenderContext frc = null;
 
          if (setWidest)
          {
-            widestNames = new Vector<String>();
-            widest = new Vector<Double>();
-
             // Just using the JVM's default serif font as a rough
             // guide to guess the width.
             font = new Font("Serif", 0, 12);
@@ -4654,18 +4804,15 @@ public class GlsResource
             writer.println();
          }
 
-         boolean setWidestDualType = false;
-
          for (int i = 0, n = entries.size(); i < n; i++)
          {
             Bib2GlsEntry entry = entries.get(i);
 
             bib2gls.verbose(entry.getId());
 
-            if (setWidest && !setWidestDualType
-                && entry instanceof Bib2GlsDualEntry)
+            if (setWidest)
             {
-               setWidestDualType = true;
+               updateWidestName(entry, font, frc);
             }
 
             if (saveLocations)
@@ -4731,29 +4878,10 @@ public class GlsResource
             {
                secondaryList.add(entry);
             }
-
-            if (widestNames != null)
-            {
-               updateWidestName(entry, widestNames, widest, font, frc);
-            }
          }
 
          if (dualEntries != null)
          {
-            if (widestNames != null)
-            {
-               if (dualType != null && !dualType.equals(type))
-               {
-                  dualWidestNames = new Vector<String>();
-                  dualWidest = new Vector<Double>();
-               }
-               else
-               {
-                  dualWidestNames = widestNames;
-                  dualWidest = widest;
-               }
-            }
-
             if (flattenLonely == FLATTEN_LONELY_POST_SORT
                 || (saveChildCount && flattenLonely != FLATTEN_LONELY_PRE_SORT))
             {// need to check parents before writing definitions
@@ -4766,6 +4894,18 @@ public class GlsResource
                Bib2GlsEntry entry = dualEntries.get(i);
 
                bib2gls.verbose(entry.getId());
+
+               if (setWidest)
+               {
+                  updateWidestName(entry, dualType, font, frc);
+
+                  if (entry instanceof Bib2GlsDualEntry
+                       && ((Bib2GlsDualEntry)entry).hasTertiary()
+                       && tertiaryType != null)
+                  {
+                     updateWidestName(entry, tertiaryType, font, frc);
+                  }
+               }
 
                if (saveLocations
                 && combineDualLocations != COMBINE_DUAL_LOCATIONS_PRIMARY)
@@ -4802,12 +4942,6 @@ public class GlsResource
                {
                   secondaryList.add(entry);
                }
-
-               if (dualWidestNames != null)
-               {
-                  updateWidestName(entry, dualWidestNames, 
-                    dualWidest, font, frc);
-               }
             }
          }
 
@@ -4826,6 +4960,11 @@ public class GlsResource
                for (Bib2GlsEntry entry : secondaryList)
                {
                   writeCopyToGlossary(writer, entry);
+
+                  if (setWidest)
+                  {
+                     updateWidestName(entry, secondaryType, font, frc);
+                  }
                }
             }
             else if (secondarySortSettings.isOrderOfRecords())
@@ -4840,6 +4979,11 @@ public class GlsResource
                   if (entry != null)
                   {
                      writeCopyToGlossary(writer, entry);
+
+                     if (setWidest)
+                     {
+                        updateWidestName(entry, secondaryType, font, frc);
+                     }
                   }
                }
             }
@@ -4863,14 +5007,17 @@ public class GlsResource
                for (Bib2GlsEntry entry : secondaryList)
                {
                   writeCopyToGlossary(writer, entry);
+
+                  if (setWidest)
+                  {
+                     updateWidestName(entry, secondaryType, font, frc);
+                  }
                }
             }
          }
 
-         if (widestNames != null)
+         if (setWidest)
          {
-            String command;
-
             writer.println("\\ifdef\\glsupdatewidest");
             writer.println("{");
             writer.println("  \\providecommand*{\\bibglssetwidest}[2]{%");
@@ -4891,79 +5038,32 @@ public class GlsResource
             writer.println("  }");
             writer.println("}");
 
+            writer.println("\\providecommand*{\\bibglssetwidestfallback}[1]{%");
+            writer.println("  \\glsFindWidestLevelTwo[#1]%");
+            writer.println("}");
 
-            if (type == null || "same as entry".equals(type)
-                 || "same as base".equals(type)
-                 || "same as category".equals(type))
-            {
-               command = "\\bibglssetwidest";
-            }
-            else
-            {
-               command = String.format("\\bibglssetwidestfortype{%s}", type);
-            }
+            writer.print("\\providecommand*");
+            writer.println("{\\bibglssetwidesttoplevelfallback}[1]{%");
+            writer.println("  \\glsFindWidestTopLevelName[#1]%");
+            writer.println("}");
 
-            String dualCommand = null;
+            writer.print("\\providecommand*");
+            writer.println("{\\bibglssetwidestfortypefallback}[1]{%");
+            writer.print("  \\apptoglossarypreamble[#1]");
+            writer.println("{\\bibglssetwidestfallback{#1}}%");
+            writer.println("}");
 
-            if (setWidestDualType)
-            {
-               if (dualType == null
-                 || "same as entry".equals(dualType)
-                 || "same as base".equals(dualType)
-                 || "same as category".equals(dualType))
-               {
-                  dualCommand = "\\bibglssetwidest";
-               }
-               else
-               {
-                  dualCommand = String.format("\\bibglssetwidestfortype{%s}", dualType);
-               }
-            }
+            writer.print("\\providecommand*");
+            writer.println("{\\bibglssetwidesttoplevelfortypefallback}[1]{%");
+            writer.print("  \\apptoglossarypreamble[#1]");
+            writer.println("{\\bibglssetwidesttoplevelfallback{#1}}%");
+            writer.println("}");
+         }
 
-            String secondaryCommand = null;
-
-            if (secondaryType != null)
-            {
-               secondaryCommand = String.format("\\bibglssetwidestfortype{%s}", secondaryType);
-            }
-
-            for (int i = 0, n = widestNames.size(); i < n; i++)
-            {
-               String name = widestNames.get(i);
-
-               if (!name.isEmpty())
-               {
-                  writer.format(String.format("%s{%d}{%s}%n", command, i, name));
-
-
-                  if (dualCommand != null)
-                  {
-                     writer.format(String.format("%s{%d}{%s}%n", dualCommand, i, name));
-                  }
-
-                  if (secondaryCommand != null)
-                  {
-                     writer.format(String.format("%s{%d}{%s}%n", secondaryCommand, i, name));
-                  }
-               }
-            }
-
+         if (setWidest)
+         {
+            writeWidestNames(writer, font, frc);
             writer.println();
-
-            if (dualWidestNames != null && dualWidestNames != widestNames)
-            {
-               dualCommand = String.format("\\bibglssetwidestfortype{%s}", dualType);
-
-               for (int i = 0, n = dualWidestNames.size(); i < n; i++)
-               {
-                  String name = dualWidestNames.get(i);
-
-                  if (!name.isEmpty())
-                  {
-                     writer.format(String.format("%s{%d}{%s}%n", dualCommand, i, name));
-                  }
-               }
-            }
          }
 
          bib2gls.message(bib2gls.getChoiceMessage("message.written", 0,
@@ -5166,10 +5266,137 @@ public class GlsResource
       writer.println();
    }
 
-   private void updateWidestName(Bib2GlsEntry entry, 
-     Vector<String> widestNames, 
-     Vector<Double> widest, Font font, FontRenderContext frc)
+   private void writeWidestNames(PrintWriter writer, 
+     Font font, FontRenderContext frc)
+    throws IOException
    {
+      if (widestNameNoType != null)
+      {
+         int maxDepth = 0;
+         boolean fallbackRequired=false;
+
+         StringBuilder builder = new StringBuilder();
+
+         for (Iterator<Integer> levelIt = widestNameNoType.getKeyIterator(); 
+                 levelIt.hasNext(); )
+         {
+            Integer levelKey = levelIt.next();
+
+            if (levelKey > maxDepth)
+            {
+               maxDepth = levelKey;
+            }
+   
+            WidestName value = widestNameNoType.get(levelKey);
+
+            if (value.getName().isEmpty())
+            {
+               bib2gls.verbose(bib2gls.getMessage("warning.unknown.widest"));
+
+               fallbackRequired = true;
+            }
+            else
+            {
+               builder.append("\\bibglssetwidest");
+               builder.append(String.format("{%d}{\\glsentryname{%s}}%n",
+                  levelKey, value.getLabel()));
+            }
+         }
+
+         if (fallbackRequired)
+         {
+            if (maxDepth == 0)
+            {
+               writer.println("\\bibglssetwidesttoplevelfallback{\\@glo@types}");
+            }
+            else
+            {
+               writer.format("\\bibglssetwidestfallback{\\@glo@types}");
+            }
+         }
+
+         writer.println(builder);
+      }
+
+      if (widestNames != null)
+      {
+         for (Iterator<String> typeIt = widestNames.keySet().iterator();
+              typeIt.hasNext(); )
+         {
+            String entryType = typeIt.next();
+
+            WidestNameHierarchy hierarchy = widestNames.get(entryType);
+   
+            int maxDepth = 0;
+            boolean fallbackRequired=false;
+
+            StringBuilder builder = new StringBuilder();
+
+            for (Iterator<Integer> levelIt = hierarchy.getKeyIterator(); 
+                 levelIt.hasNext(); )
+            {
+               Integer levelKey = levelIt.next();
+
+               if (levelKey > maxDepth)
+               {
+                  maxDepth = levelKey;
+               }
+   
+               WidestName value = hierarchy.get(levelKey);
+   
+               if (value.getName().isEmpty())
+               {
+                  bib2gls.verbose(bib2gls.getMessage(
+                    "warning.unknown.widest.fortype", levelKey, entryType));
+   
+                  fallbackRequired = true;
+               }
+               else
+               {
+                  builder.append("\\bibglssetwidestfortype");
+                  builder.append(String.format("{%s}{%d}{\\glsentryname{%s}}%n",
+                     entryType, levelKey, value.getLabel()));
+               }
+            }
+
+            if (fallbackRequired)
+            {
+               if (maxDepth == 0)
+               {
+                  writer.format("\\bibglssetwidesttoplevelfortypefallback{%s}%n",
+                    entryType);
+               }
+               else
+               {
+                  writer.format("\\bibglssetwidestfortypefallback{%s}%n",
+                    entryType);
+               }
+            }
+
+            writer.println(builder);
+         }
+      }
+
+   }
+
+   private void updateWidestName(Bib2GlsEntry entry, 
+     Font font, FontRenderContext frc)
+   {
+      updateWidestName(entry, null, font, frc);
+   }
+
+   private void updateWidestName(Bib2GlsEntry entry, String entryType,
+     Font font, FontRenderContext frc)
+   {
+      if (entryType == null)
+      {
+         entryType = getType(entry);
+      }
+      else
+      {
+         entryType = getType(entry, entryType, false);
+      }
+
       // This is just approximate as fonts, commands etc
       // will affect the width.
 
@@ -5190,21 +5417,6 @@ public class GlsResource
          name = bib2gls.interpret(name, entry.getField("name"), true);
       }
 
-      int level = entry.getHierarchyCount();
-      String maxName = "";
-      double maxWidth = 0;
-
-      if (level > 0)
-      {
-         level--;
-      }
-
-      if (level < widestNames.size())
-      {
-         maxName = widestNames.get(level);
-         maxWidth = widest.get(level).doubleValue();
-      }
-
       double w = 0.0;
 
       if (!name.isEmpty())
@@ -5217,27 +5429,33 @@ public class GlsResource
       bib2gls.logMessage(bib2gls.getMessage("message.calc.text.width.result",
         name, w));
 
-      if (w > maxWidth)
+      if (entryType == null)
       {
-          if (level < widestNames.size())
-          {
-             widestNames.set(level, 
-                String.format("\\glsentryname{%s}", entry.getId()));
-             widest.set(level, new Double(w));
-          }
-          else
-          {
-             for (int j = widestNames.size(); j < level; j++)
-             {
-                widestNames.add("");
-                widest.add(new Double(0.0));
-             }
+         if (widestNameNoType == null)
+         {
+            widestNameNoType = new WidestNameHierarchy();
+         }
 
-             widestNames.add(String.format("\\glsentryname{%s}", 
-                entry.getId()));
-             widest.add(new Double(w));
-          }
+         widestNameNoType.update(entry, name, w);
       }
+      else
+      {
+         if (widestNames == null)
+         {
+            widestNames = new HashMap<String,WidestNameHierarchy>();
+         }
+
+         WidestNameHierarchy hierarchy = widestNames.get(entryType);
+
+         if (hierarchy == null)
+         {
+            hierarchy = new WidestNameHierarchy();
+            widestNames.put(entryType, hierarchy);
+         }
+
+         hierarchy.update(entry, name, w);
+      }
+
    }
 
    private void checkParent(Bib2GlsEntry entry, int i, 
@@ -5604,27 +5822,7 @@ public class GlsResource
       }
       else if (type != null)
       {
-         if (type.equals("same as entry"))
-         {
-            entry.putField("type", entry.getEntryType());
-         }
-         else if (type.equals("same as base"))
-         {
-            entry.putField("type", entry.getBase());
-         }
-         else if (type.equals("same as category"))
-         {
-            String val = entry.getFieldValue("category");
-
-            if (val != null)
-            {
-               entry.putField("type", val);
-            }
-         }
-         else
-         {
-            entry.putField("type", type);
-         }
+         entry.putField("type", getType(entry, type, false));
       }
    }
 
@@ -5637,27 +5835,7 @@ public class GlsResource
    {
       if (catLabel != null)
       {
-         if (catLabel.equals("same as entry"))
-         {
-            entry.putField("category", entry.getEntryType());
-         }
-         else if (catLabel.equals("same as base"))
-         {
-            entry.putField("category", entry.getBase());
-         }
-         else if (catLabel.equals("same as type"))
-         {
-            String val = entry.getFieldValue("type");
-
-            if (val != null)
-            {
-               entry.putField("category", val);
-            }
-         }
-         else
-         {
-            entry.putField("category", catLabel);
-         }
+         entry.putField("category", getCategory(entry, catLabel, false));
       }
    }
 
@@ -6415,19 +6593,148 @@ public class GlsResource
 
    public String getType(Bib2GlsEntry entry)
    {
-      String entryType = entry.getFieldValue("type");
+      String value = entry.getFieldValue("type");
 
-      if (entryType != null)
+      if (value != null)
       {
-         return entryType;
+         return value;
       }
 
-      if (entry instanceof Bib2GlsDualEntry)
+      value = type;
+
+      if (entry instanceof Bib2GlsDualEntry
+          && !(((Bib2GlsDualEntry)entry).isPrimary()))
       {
-         return ((Bib2GlsDualEntry)entry).isPrimary() ? type : dualType;
+         value = dualType;
       }
 
-      return type;
+      return getType(entry, value, false);
+   }
+
+   public String getType(Bib2GlsEntry entry, String fallback)
+   {
+      return getType(entry, fallback, true);
+   }
+
+   public String getType(Bib2GlsEntry entry, String fallback, 
+      boolean checkField)
+   {
+      String value = null;
+
+      if (checkField)
+      {
+         value = entry.getFieldValue("type");
+
+         if (value != null)
+         {
+            return value;
+         }
+      }
+
+      value = fallback;
+
+      if (value == null)
+      {
+         return null;
+      }
+
+      if (value.equals("same as category"))
+      {
+         value = entry.getFieldValue("category");
+
+         if ("same as type".equals(value))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.cyclic.sameas.type.category"));
+         }
+
+         return getType(entry, null);
+      }
+
+      if (value.equals("same as entry"))
+      {
+         return entry.getEntryType();
+      }
+
+      if (value.equals("same as base"))
+      {
+         return entry.getBase();
+      }
+
+      return value;
+   }
+
+   public String getCategory(Bib2GlsEntry entry)
+   {
+      String value = entry.getFieldValue("category");
+
+      if (value != null)
+      {
+         return value;
+      }
+
+      value = category;
+
+      if (entry instanceof Bib2GlsDualEntry
+          && !(((Bib2GlsDualEntry)entry).isPrimary()))
+      {
+         value = dualCategory;
+      }
+
+      return getCategory(entry, value, false);
+   }
+
+   public String getCategory(Bib2GlsEntry entry, String fallback)
+   {
+      return getCategory(entry, fallback, true);
+   }
+
+   public String getCategory(Bib2GlsEntry entry, String fallback,
+     boolean checkField)
+   {
+      String value = null;
+
+      if (checkField)
+      {
+         value = entry.getFieldValue("category");
+
+         if (value != null)
+         {
+            return value;
+         }
+      }
+
+      value = fallback;
+
+      if (value == null)
+      {
+         return null;
+      }
+
+      if (value.equals("same as type"))
+      {
+         value = entry.getFieldValue("type");
+
+         if ("same as category".equals(value))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.cyclic.sameas.type.category"));
+         }
+
+         return getType(entry, null);
+      }
+
+      if (value.equals("same as entry"))
+      {
+         return entry.getEntryType();
+      }
+
+      if (value.equals("same as base"))
+      {
+         return entry.getBase();
+      }
+
+      return value;
    }
 
    private void writeHyperGroupDef(Bib2GlsEntry entry, PrintWriter writer)
@@ -6624,6 +6931,10 @@ public class GlsResource
 
    private boolean setWidest = false;
 
+   private WidestNameHierarchy widestNameNoType = null;
+
+   private HashMap<String,WidestNameHierarchy> widestNames = null;
+
    private String secondaryType=null, secondaryField=null;
 
    private int minLocationRange = 3, locGap = 1;
@@ -6660,6 +6971,8 @@ public class GlsResource
    private Vector<Bib2GlsEntry> bibData;
 
    private Vector<Bib2GlsEntry> dualData;
+
+   private boolean hasDuals = false, hasTertiaries = false;
 
    private Bib2Gls bib2gls;
 
@@ -6779,5 +7092,7 @@ public class GlsResource
    public static final byte CONTRIBUTOR_ORDER_FORENAMES=2;
 
    private byte contributorOrder=CONTRIBUTOR_ORDER_VON;
+
+   private Vector<String> dependencies;
 }
 

@@ -338,6 +338,13 @@ public class Bib2GlsEntry extends BibEntry
                      list.set(i, parser.getListener().createGroup(label));
                   }
 
+                  if (bib2gls.getVerboseLevel() > 0)
+                  {
+                     bib2gls.logMessage(bib2gls.getMessage(
+                        "message.crossref.found", getId(),
+                        object.toString(parser), label));
+                  }
+
                   addDependency(label);
 
                   // get next argument
@@ -364,6 +371,13 @@ public class Bib2GlsEntry extends BibEntry
                      if (j < m)
                      {
                         grp.add(parser.getListener().getOther(','));
+                     }
+
+                     if (bib2gls.getVerboseLevel() > 0)
+                     {
+                        bib2gls.logMessage(bib2gls.getMessage(
+                           "message.crossref.found", getId(),
+                           object.toString(parser), label));
                      }
 
                      addDependency(label);
@@ -403,6 +417,13 @@ public class Bib2GlsEntry extends BibEntry
                   {
                      label = newLabel;
                      list.set(i, parser.getListener().createGroup(label));
+                  }
+
+                  if (bib2gls.getVerboseLevel() > 0)
+                  {
+                     bib2gls.logMessage(bib2gls.getMessage(
+                        "message.crossref.found", getId(),
+                        object.toString(parser), label));
                   }
 
                   addDependency(label);
@@ -504,6 +525,13 @@ public class Bib2GlsEntry extends BibEntry
                      list.set(i, parser.getListener().createGroup(label));
                   }
 
+                  if (bib2gls.getVerboseLevel() > 0)
+                  {
+                     bib2gls.logMessage(bib2gls.getMessage(
+                        "message.crossref.found", getId(),
+                        object.toString(parser), label));
+                  }
+
                   addDependency(label);
 
                   if (bib2gls.checkNestedLinkTextField(fieldName)
@@ -567,6 +595,12 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.hasFieldAliases())
       {
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage("message.field.alias.check",
+              getOriginalId()));
+         }
+
          for (Iterator<String> it = resource.getFieldAliasesIterator();
               it.hasNext(); )
          {
@@ -577,7 +611,18 @@ public class Bib2GlsEntry extends BibEntry
 
             if (val != null)
             {
+               TeXObjectList list = val.expand(parser);
+               BibUserString bibVal = new BibUserString(list);
+               val.clear();
+               val.add(bibVal);
+
                putField(map, val);
+
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(field+"=>"
+                    +map+"={"+list.toString(parser)+"}");
+               }
             }
          }
       }
@@ -736,9 +781,14 @@ public class Bib2GlsEntry extends BibEntry
             // expand any variables
 
             TeXObjectList list = value.expand(parser);
-            BibUserString bibVal = new BibUserString(list);
-            value.clear();
-            value.add(bibVal);
+
+            if (value.size() > 1 
+               || !(value.firstElement() instanceof BibUserString))
+            {
+               BibUserString bibVal = new BibUserString(list);
+               value.clear();
+               value.add(bibVal);
+            }
 
             if (resource.isBibTeXAuthorField(field))
             {
@@ -753,7 +803,7 @@ public class Bib2GlsEntry extends BibEntry
                // fields that should only expand to a simple label
                // (cross-referencing fields processed elsewhere)
 
-               String strVal = value.expand(parser).toString(parser);
+               String strVal = list.toString(parser);
 
                if (bib2gls.useInterpreter() 
                     && strVal.matches("(?s).*[\\\\\\{\\}].*"))
@@ -1554,6 +1604,13 @@ public class Bib2GlsEntry extends BibEntry
 
          for (int i = 0; i < crossRefs.length; i++)
          {
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.crossref.found", getId(),
+                  "\\glssee", crossRefs[i]));
+            }
+
             addDependency(crossRefs[i]);
 
             if (i > 0)
@@ -1609,6 +1666,14 @@ public class Bib2GlsEntry extends BibEntry
             }
 
             list.add(newRefs[i]);
+
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.crossref.found", getId(),
+                  "\\glssee", newRefs[i]));
+            }
+
             addDependency(newRefs[i]);
             builder.append(newRefs[i]);
          }
@@ -2202,6 +2267,14 @@ public class Bib2GlsEntry extends BibEntry
          }
 
          alias = processLabel(alias);
+
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.crossref.found", getId(),
+               "alias", alias));
+         }
+
          addDependency(alias);
          putField("alias", alias);
 
@@ -2220,6 +2293,8 @@ public class Bib2GlsEntry extends BibEntry
    public void initCrossRefs(TeXParser parser)
     throws IOException
    {
+      initAlias(parser);
+
       // Is there a 'see' field?
       BibValueList value = getField("see");
 
@@ -2298,6 +2373,12 @@ public class Bib2GlsEntry extends BibEntry
 
          String label = processLabel(crossRefs[i]);
 
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.crossref.found", getId(), "see", label));
+         }
+
          addDependency(label);
          builder.append(label);
 
@@ -2362,6 +2443,12 @@ public class Bib2GlsEntry extends BibEntry
          alsocrossRefs[i] = xr.toString(parser);
 
          String label = processLabel(alsocrossRefs[i]);
+
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.crossref.found", getId(), "seealso", label));
+         }
 
          addDependency(label);
          builder.append(label);

@@ -160,15 +160,15 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
       writer.format("\\providecommand{\\%s}[5]{%%%n", getCsName());
 
-      writer.println("  \\longnewglossaryentry*{#1}{name={#3},");
+      writer.print("  \\longnewglossaryentry*{#1}{name={#3},");
 
       if (isPrimary())
       {
-         writer.println("category={index}");
+         writer.println("category={index},");
       }
       else
       {
-         writer.format("category={%s}", category);
+         writer.format("category={%s},", category);
       }
 
       writer.println("symbol={#4},#2}{#5}%");

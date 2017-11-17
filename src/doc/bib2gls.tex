@@ -4158,18 +4158,21 @@ that don't get seen by \LaTeX.
 \optsection{set-widest}
 
 The \glostyle{alttree} glossary style needs to know the widest
-\field{name} (for each level, if hierarchical). This can
-be set using \ics{glssetwidest} provided by the \styfmt{glossaries}
+\field{name} (for each level, if hierarchical). This can be set
+using \ics{glssetwidest} provided by the \styfmt{glossary-tree}
 package (or similar commands like \ics{glsupdatewidest} provided by
-\styfmt{glossaries-extra-stylemods}), but this requires knowing which
-name is the widest.
+\styfmt{glossaries-extra-stylemods}), but this requires knowing
+which name is the widest. Alternative one of the iterative commands
+such as \ics{glsFindWidestTopLevelName} can be used, which slows the
+document build as it has to iterate over all defined entries.
 
 The boolean option \csopt[true]{set-widest} will try to calculate
-the widest names for each hierarchical level. Since it doesn't know
-the fonts that will be used in the document or if there are any
-non-standard commands that aren't provided in the \ext{bib} files
-preamble, this option may not work. For example, if one entry has
-the \field{name} defined as
+the widest names for each hierarchical level to help remove the need
+to determine the correct value within the document. 
+Since \bibgls\ doesn't know the fonts that will be used
+in the document or if there are any non-standard commands that
+aren't provided in the \ext{bib} files preamble, \emph{this option may not
+work}. For example, if one entry has the \field{name} defined as
 \begin{verbatim}
 name={some {\Huge huge} text}
 \end{verbatim}
@@ -4185,23 +4188,46 @@ When using this option, the transcript file will include the message
 \begin{alltt}
 Calculated width of '\meta{text}': \meta{number}
 \end{alltt}
-where \meta{text} is \bibgls's interpretation of the contents
-of the \field{name} field and \meta{number} is a rough guide
-to the width of \meta{text} assuming the operating system's
-default serif font. The entry that has the largest \meta{number}
-is the one that will be selected. This will then be implemented
-using \gls{bibglssetwidest} if the \field{type} is unknown
-or \gls{bibglssetwidestfortype}.  This leaves \TeX\ to
-compute the width according to the document fonts.
+where \meta{text} is \bibgls's interpretation of the contents of the
+\field{name} field and \meta{number} is a rough guide to the width
+of \meta{text} assuming the operating system's default serif font.
+The entry that has the largest \meta{number} is the one that will be
+selected. This will then be implemented as follows:
+\begin{itemize}
+\item If the \field{type} is unknown then:
+  \begin{itemize}
+   \item if the interpreter resolves all \field{name} fields to the
+    empty string (that is the \field{name} fields all consist of
+    unknown commands) then
+    \begin{itemize}
+     \item if there are child entries \gls{bibglssetwidestfallback}
+     is used,
+     \item otherwise \gls{bibglssetwidesttoplevelfallback} is used;
+    \end{itemize}
+   \item otherwise \gls{bibglssetwidest} is used.
+  \end{itemize}
+\item If the \field{type} is known then:
+  \begin{itemize}
+   \item if the interpret resolves all \field{name} fields for that
+    type to the empty string (that is the \field{name} fields all consist of
+     unknown commands) then
+    \begin{itemize}
+     \item if there are child entries \gls{bibglssetwidestfortypefallback}
+     is used,
+     \item otherwise 
+      \gls{bibglssetwidesttoplevelfortypefallback} is used;
+    \end{itemize}
+   \item otherwise \gls{bibglssetwidestfortype} is used.
+  \end{itemize}
+\end{itemize}
+This leaves \TeX\ to compute the width according to the document
+fonts. If \bibgls\ can't correctly determine the widest entry then
+you will need to use one of the commands provided by
+\sty{glossary-tree} or \sty{glossaries-extra-stylemods} to set it.
 
-Note that if you don't set a separate sort for dual entries with
-\csopt{dual-sort} then the widest entry name will be determined
-across all the primary and dual entries together. Additionally, if
-you have multiple resource sets, they may override previously
-calculated widest names.
 In general, if you have more than one glossary it's best to
 set the \field{type} using options like \csopt{type} and
-\csopt{dual-type}.
+\csopt{dual-type} if you use \csopt{set-widest}.
 
 \optsection{entry-type-aliases}
 
@@ -4571,9 +4597,9 @@ For example:
 \begin{verbatim}
 match-op={and},
 match={
-  {category=animals},
-  {topic=biology},
-  {category=vegetables}
+  category=animals,
+  topic=biology,
+  category=vegetables
 }
 \end{verbatim}
 This will keep all the selected entries that satisfy:
@@ -7039,36 +7065,28 @@ consider the following document:
 \begin{document}
 
 \gls{pi}.
-
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
 \begin{equation}
 \gls[counter=equation]{pi}
 \end{equation}
 
+\newpage
 \begin{equation}
 \gls[counter=equation]{pi}
 \end{equation}
 
 \newpage
-
-\begin{equation}
-\gls[counter=equation]{pi}
-\end{equation}
-
-
-\newpage
-
 \gls{pi}.
 
 \newpage
-
 \gls{pi}.
 
 \newpage
-
 \gls{pi}.
 
 \newpage
-
 \printunsrtglossaries
 \end{document}
 \end{verbatim}
@@ -8320,6 +8338,10 @@ numbers (if this is desired). An unsigned number will have the
 \csopt{sort-pad-plus} marker inserted before it. The default value
 is \csopt[0]{sort-number-pad}, which doesn't implement any padding.
 
+If you use this with a locale sort method, it's best to also set
+\csopt[none]{break-at}, as the default word boundary break points
+will likely be confused by a mix of alphanumerics.
+
 \optsection{sort-pad-plus}
 
 This option automatically implements the dual and secondary settings
@@ -9233,15 +9255,15 @@ As \csopt{break-at} but for secondary entries.
 
 As \csopt{break-marker} but for secondary entries.
 
-\optsection[\subsubsection]{secondary-sort-number-pad}
+\optsection{secondary-sort-number-pad}
 
 As \csopt{sort-number-pad} but for secondary entries.
 
-\optsection[\subsubsection]{secondary-sort-pad-plus}
+\optsection{secondary-sort-pad-plus}
 
 As \csopt{sort-pad-plus} but for secondary entries.
 
-\optsection[\subsubsection]{secondary-sort-pad-minus}
+\optsection{secondary-sort-pad-minus}
 
 As \csopt{sort-pad-minus} but for secondary entries.
 
@@ -11260,6 +11282,48 @@ defined to use \ics{glssetwidest}:
 Since the glossary preamble is scoped, this won't affect other
 glossaries.
 
+\cssection{bibglssetwidestfallback}
+
+\formatdef{bibglssetwidestfallback}
+This is used by \csopt{set-widest} instead of \gls{bibglssetwidest}
+when all \field{name} fields end up as an empty string when
+interpreted by \bibgls. This typically means that all the
+\field{name} fields contain unknown commands. This fallback command
+will use \ics{glsFindWidestLevelTwo}, which sets the widest name for
+the top-level and first two sub-levels.
+
+\cssection{bibglssetwidestfortypefallback}
+
+\formatdef{bibglssetwidestfortypefallback}
+This is used by \csopt{set-widest} instead of
+\gls{bibglssetwidestfortype}
+when all \field{name} fields end up as an empty string when
+interpreted by \bibgls. This typically means that all the
+\field{name} fields contain unknown commands. This fallback command
+will append \gls{bibglssetwidestfallback} to the glossary preamble
+for the given type.
+
+\cssection{bibglssetwidesttoplevelfallback}
+
+\formatdef{bibglssetwidesttoplevelfallback}
+This is used by \csopt{set-widest} instead of \gls{bibglssetwidest}
+when all \field{name} fields end up as an empty string when
+interpreted by \bibgls. This typically means that all the
+\field{name} fields contain unknown commands. This fallback command
+will use \ics{glsFindWidestTopLevelName}, which sets the widest name for
+the top-level.
+
+\cssection{bibglssetwidesttoplevelfortypefallback}
+
+\formatdef{bibglssetwidesttoplevelfortypefallback}
+This is used by \csopt{set-widest} instead of
+\gls{bibglssetwidestfortype}
+when all \field{name} fields end up as an empty string when
+interpreted by \bibgls. This typically means that all the
+\field{name} fields contain unknown commands. This fallback command
+will append \gls{bibglssetwidesttoplevelfallback} to the glossary
+preamble of the given type.
+
 \cssection{bibglscontributorlist}
 
 \formatdef{bibglscontributorlist}
@@ -11775,7 +11839,7 @@ The contents of \filefmt{interpret-preamble2.bib} are as follows:
 \filesection{chemicalformula.bib}
 
 The \exfile{chemicalformula.bib} file contains chemical formulae.
-Each \field{name} field uses \ics{ce} provided by \sty{mhchem}
+Each entry has a field that uses \ics{ce} provided by \sty{mhchem}
 so the document will need to load that package. Since all resource
 files must be loaded in the preamble, it's possible to ensure that
 the package is loaded using:
@@ -11800,10 +11864,20 @@ the names all contain a command but \bibgls\ recognises the
 If \atentry{entry} is changed to \atentry{symbol} the fallback for
 the \field{sort} will be the entry's label.
 
-The entries all have a custom field \fieldfmt{identifier} set to 
-\code{chemical}. This will be ignored by \bibgls\ unless it's
-defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
-aliased with \csopt{field-aliases}.
+All entries only contain custom fields, which will all be ignored by
+\bibgls\ unless defined or aliased: \fieldfmt{identifier} set to
+\code{chemical} for all entries, \fieldfmt{formula} set to the
+chemical formula, and \fieldfmt{chemicalname} set to the chemical
+name. This allows the flexibility of determining whether the
+\field{name} or \field{symbol} field should contain the chemical
+formula on a per-resource basis. For example:
+\begin{codeenv}
+\csopt[formula=name,chemicalname=description]{field-aliases}
+\end{codeenv}
+or
+\begin{codeenv}
+\csopt[chemicalname=name,formula=symbol]{field-aliases}
+\end{codeenv}
 
 The contents of \filefmt{chemicalformula.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/chemicalformula.bib}
@@ -11825,12 +11899,15 @@ The contents of \filefmt{bacteria.bib} are as follows:
 \filesection{baseunits.bib}
 
 The \exfile{baseunits.bib} file contains base SI units. The entries
-are all defined using \atentry{entry} with a \field{name},
+are all defined using \atentry{symbol} with a \field{name},
 \field{symbol} and \field{description} field. The \field{symbol}
 fields all use \ics{si} provided by the \isty{siunitx} package, so
 that package must be loaded in the document. This is one of the
 small number of packages recognised by \bibgls, so it's possible to
-sort according to the symbol if required.
+sort according to the symbol if required. Remember that
+\atentry{symbol} entry types use the label as the fallback field for
+\field{sort}. In this case the labels all happen to match the
+\field{name}.
 
 The entries all have a custom field \fieldfmt{identifier} set to 
 \code{baseunit}. This will be ignored by \bibgls\ unless it's
@@ -12287,12 +12364,14 @@ field set to \code{mediacontrol}, \code{information} and
 \code{weather}, respectively.
 
 Neither of these packages are recognised by \bibgls, which means
-that \csopt{set-widest} won't work with this data nor is it suitable
-for sorting according to the \field{name} field. Instead, either
-sort by label (which is the default for \atentry{symbol}) or
-by the \field{description}. If you want to use one of the \glostyle{alttree}
-styles you'll need to use \ics{glsFindWidestTopLevelName} to
-determine the widest name.
+that \csopt{set-widest} won't be able to determine the widest name
+nor is this data suitable for sorting according to the \field{name}
+field. Instead, either sort by label (which is the default for
+\atentry{symbol}) or by the \field{description}. If you want to use
+one of the \glostyle{alttree} styles you can still use
+\csopt{set-widest}, but it will have to use the fallback command.
+Alternatively, you can omit \csopt{set-widest} and explicitly use
+\cs{glsFindWidestTopLevelName}.
 
 The contents of \filefmt{miscsymbols.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/miscsymbols.bib}
@@ -12316,14 +12395,6 @@ variable, which may be appended to fields using the \ext{bib}
 concatenation character \idx{stringconcat}. As with the other sample
 \ext{bib} files, there's a custom field \fieldfmt{identifier}
 which will be ignored unless defined or aliased.
-
-Note that I've used \ics{glshyperlink} rather than \ics{gls} in the
-\field{description} fields. This prevents the referenced entry from
-being indexed, but \bibgls\ will pick up the cross-reference and
-(with the default \csopt{selection}) will added the dependent
-entries. This means that the dependent entries will be included but
-won't have a number list if they haven't been referenced in the
-document.
 
 The empty braces at the start some of the fields are there to
 protect against first letter uppercasing, where it might cause a
@@ -12620,6 +12691,12 @@ efficient to instruct \bibgls\ to not save the number list with:
 \begin{codeenv}
 \csopt[false]{save-locations}
 \end{codeenv}
+This \ext{bib} file only has custom fields, so these need to be
+aliased. In this case I want the formula in the \field{name} field
+and the chemical name in the \field{description} field:
+\begin{codeenv}
+\csopt[formula=name,chemicalname=description]{field-aliases}
+\end{codeenv}
 The entries are all defined using \atentry{symbol} but I've decided
 to fallback on the \field{name} field for sorting:
 \begin{codeenv}
@@ -12814,7 +12891,12 @@ loading of the default styles with \styopt{nostyles} and used
 \styopt[mcols]{stylemods} to load \sty{glossary-mcols} and patch the
 styles. Note that although I've used \styopt{nostyles}, the
 \sty{glossary-tree} style is loaded as it's required by
-\sty{glossary-mcols}.
+\sty{glossary-mcols}. The entries are defined using
+\atentry{symbol}, which uses the label as the default sort fallback,
+so I've changed the fallback:
+\begin{codeenv}
+\csopt[name]{symbol-sort-fallback}
+\end{codeenv}
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -12868,11 +12950,14 @@ This is another example that uses the \exfile{baseunits.bib} and
 containing all the units (base and derived) where the first glossary
 is ordered by name and the second is ordered by symbol. This can be
 done with a single resource command that instructs \bibgls\ to make
-\atentry{entry} behave like \atentry{dualsymbol}. This causes the
-\field{name} and \field{symbol} fields to be swapped in the dual
-list. The fallback for the \field{sort} field is now the entry label
-so I need \csopt[name]{sort-field} to ensure that the sorting is
-by the \field{name} field instead.
+\atentry{symbol} behave like \atentry{dualsymbol}:
+\begin{codeenv}
+\csopt[symbol=dualsymbol]{entry-type-aliases}
+\end{codeenv}
+This causes the \field{name} and \field{symbol} fields to be swapped
+in the dual list. Remember that fallback for the \field{sort} field is the
+label for the symbol entry types so I need \csopt[name]{sort-field}
+to ensure that the sorting is by the \field{name} field instead.
 
 The primary entries can still be sorted according to the default
 locale collator, but the dual entries need a sort method that's
@@ -13543,8 +13628,7 @@ the \field{location} field:
 \csopt[all]{selection}
 \end{codeenv}
 Since I'm using a style that's based on \glostyle{alttree} I need to
-find the widest \field{name}, which can be done with
-\csopt{set-widest}.
+find the widest \field{name}, which can be done with \csopt{set-widest}.
 
 I've used \csopt{field-aliases} to convert the custom
 \fieldfmt{identifier} field to \field{category}, which means I can
@@ -13728,13 +13812,15 @@ field consists of words or phrases.
 \csopt[description]{sort-suffix},
 \csopt[|]{sort-suffix-marker}
 \end{codeenv}
-
-Unfortunately, since \bibgls\ doesn't recognise \sty{ifsym} or
-\sty{marvosym}, there's no point using \csopt{set-widest}. Instead I
-have to go back to using the non-\bibgls\ method:
-\begin{alltt}
-\ics{glsFindWidestTopLevelName}
-\end{alltt}
+Since I'm using one of the \glostyle{alttree} styles, I need to set
+the widest name:
+\begin{codeenv}
+\csopt{set-widest}
+\end{codeenv}
+In this case, \bibgls\ won't be able to determine the widest name
+since it doesn't recognise any of the commands, so it will have to
+use the fallback command, which will use one of the commands
+provided by the \sty{glossaries-extra-stylemods} package.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -13811,9 +13897,19 @@ Here \ics{NoCaseChange} is used to prevent \ics{MakeTextUppercase}
 from applying the case change.
 
 The default \csopt{selection} criteria includes entries that have
-been indexed and any cross-references. The cross-references that
-haven't been index won't have a number list (since they're
-referenced with the non-indexing \ics{glshyperlink}). I've provided
+been indexed and any cross-references. Some of the
+\field{description} fields include \ics{glsxtrshort}, which \bibgls\ picks
+up and the referenced entry is included in the dependency list.
+However, I don't want any indexing
+performed by commands occurring in the glossary. This can be dealt
+with in one of two ways: either switch the format to \code{glsignore}
+or suppress the indexing by changing the default options with
+\ics{GlsXtrSetDefaultGlsOpts}. In this case I decided to turn the
+records into ignored records:
+\begin{codeenv}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\end{codeenv}
+This means that some of the entries won't have location lists, so I've provided
 a \idx{postdescriptionhook} that inserts a \idx{full-stop} after the
 \field{description} if there's no location otherwise it inserts a
 comma:
@@ -14260,7 +14356,8 @@ been referenced on page~1, the location lists are all simply~\qt{1}.
 \filesection{sample-multi.tex}
 
 This example uses \exfile{bacteria.bib},
-\exfile{markuplanguages.bib}, \exfile{minerals.bib}.
+\exfile{markuplanguages.bib}, \exfile{vegetables.bib}, \exfile{minerals.bib},
+\exfile{animals.bib}, \exfile{chemicalformula.bib}.
 Since there's one or more UTF-8 character, the document requires
 UTF-8 support:
 \begin{verbatim}
@@ -14269,7 +14366,8 @@ UTF-8 support:
 \end{verbatim}
 
 The aim of this example document is to have a separate glossary
-(without number lists) for each type of data: bacteria, and also an
+(without number lists) for each type of data (bacteria, markup
+languages, vegetables, minerals, animals, chemical formula) and also an
 index listing all referenced entries with number lists as well as
 aliased entries that haven't explicitly been used but the
 cross-reference term as been indexed. This requires
@@ -14279,12 +14377,34 @@ entries are selected.
 Since I don't need the default \code{main} glossary (I'm providing
 my own custom glossaries) I've used the \styopt{nomain} option to
 suppress its automatic creation, but I do want the \code{index}
-glossary so I've used the \styopt{index} package option. The
-remaining glossaries need defining:
+glossary so I've used the \styopt{index} package option. As with the
+other examples, I've used \styopt{nostyles} to suppress the creation
+of the default styles and used \styopt{stylemods} to load the
+particular style packages that I need and use
+\sty{glossaries-extra-stylemods} to patch them. The index needs to
+be in an unnumbered chapter, which is the default for book-like
+styles, but I want the other glossaries in unnumbered sections so
+I've used the \styopt{section} option. I just need to remember to
+switch this before displaying the index:
+\begin{verbatim}
+\usepackage[record,% use bib2gls
+ section,% use \section* for glossary headings
+ postdot,% insert dot after descriptions in glossaries
+ nomain,% don't create 'main' glossary
+ index,% create 'index' glossary
+ nostyles,% don't load default styles
+% load and patch required style packages:
+ stylemods={list,mcols,tree,bookindex}
+]{glossaries-extra}
+\end{verbatim}
+The remaining glossaries need defining:
 \begin{verbatim}
 \newglossary*{bacteria}{Bacteria}
 \newglossary*{markuplanguage}{Markup Languages}
+\newglossary*{vegetable}{Vegetables}
 \newglossary*{mineral}{Minerals}
+\newglossary*{animal}{Animals}
+\newglossary*{chemical}{Chemical Formula}
 \end{verbatim}
 As with \exfile{sample-bacteria.tex} and \exfile{sample-languages.tex}
 I need to set the abbreviation styles before the abbreviations are
@@ -14331,10 +14451,11 @@ decided to use a dual entry system. Since the entries aren't defined
 using any dual types, I've used \csopt{entry-type-aliases} to
 make \bibgls\ treat them as though they were:
 \begin{codeenv}
-\csopt[{
-  \marg{abbreviation=dualindexabbreviation},
-  \marg{entry=dualindexentry}
- }]{entry-type-aliases}
+\csopt[
+  abbreviation=dualindexabbreviation,
+  entry=dualindexentry,
+  symbol=dualindexsymbol
+ ]{entry-type-aliases}
 \end{codeenv}
 Note that I haven't aliased the \atentry{index} types as I only want
 these in the index and not replicated in a separate glossary.
@@ -14345,8 +14466,46 @@ want it to fall back on the \field{long} field instead.
 \begin{codeenv}
 \csopt[long]{abbreviation-name-fallback}
 \end{codeenv}
-Remember that the sort fallback is still \field{short} (but can be
-changed with \csopt{abbreviation-sort-fallback}).
+Remember that the sort fallback for abbreviations is still \field{short} (but can be
+changed with \csopt{abbreviation-sort-fallback}), but I've changed
+the sort fallback for symbols:
+\begin{codeenv}
+\csopt[name]{symbol-sort-fallback}
+\end{codeenv}
+I also need to alias the custom fields (especially for those in the
+\exfile{chemicalformula.bib} file):
+\begin{codeenv}
+\csopt[
+  identifier=category,
+  formula=symbol,
+  chemicalname=name
+]{field-aliases}
+\end{codeenv}
+There's a slight problem here. This ensures that the entries defined
+in \exfile{chemicalformula.bib} have a \field{name} and
+\field{symbol} field, which are swapped round for the dual
+(according to the default \csopt{dual-indexsymbol-map}) but these
+entries don't have a \field{description} field. Since I'd like to
+use the \glostyle{mcolalttreegroup} style, this will end up with
+the odd appearance of the formula (stored in the \field{name} field for the
+dual) followed by the chemical name (stored in the \field{symbol}
+field for the dual) in parenthesis. This is default \meta{name}
+(\meta{symbol}) \meta{description} format for the style. I've fixed
+this by locally redefining \ics{glsxtralttreeSymbolDescLocation} for
+just that glossary:
+\begin{verbatim}
+\printunsrtglossary*[type=chemical,style=mcolalttreegroup]
+{%
+  \renewcommand\glsxtralttreeSymbolDescLocation[2]{%
+   \glossentrysymbol{#1}\glspostdescription\glsxtrAltTreePar
+  }%
+  \renewcommand*{\glstreenamefmt}[1]{#1}%
+  \renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
+}
+\end{verbatim}
+I've also redefined \cs{glstreenamefmt} to prevent the names
+appearing in bold, which means I also need to redefine
+\cs{glstreegroupheaderfmt} to keep the headers bold.
 
 All the \atentryfmt{dualindex\meta{type}} entry types provide a primary
 entry that behaves like \atentry{index}. The secondary behaves like
@@ -14377,7 +14536,12 @@ in the fallback value for the \field{sort} field:
 \end{codeenv}
 With \csopt[long]{abbreviation-name-fallback} now set, 
 this means that \emph{Coxiella burnetii} comes after
-\emph{Clostridium tetani} in the index.
+\emph{Clostridium tetani} in the index. I haven't changed the sort
+field for the dual entries, so in that case the
+\csopt{abbreviation-sort-fallback} and \csopt{symbol-sort-fallback}
+settings will be used with the duals.  This means that
+\emph{C.\ burnetii} is between \emph{C.\ botulinum} and \emph{C.\
+perfringens} rather than after \emph{C.\ tetani}.
 
 I'd like to sort the dual entries according to a letter-number rule,
 as for \exfile{sample-chemical.tex} and \exfile{sample-units3.tex},
@@ -14386,12 +14550,13 @@ but this would order \qt{b\'ilinite} after \qt{biotite} in the
 rule for the duals, but with the numbers padded:
 \begin{codeenv}
 \csopt[en]{dual-sort},
-\csopt[2]{dual-sort-number-pad}
+\csopt[2]{dual-sort-number-pad},
+\csopt[none]{dual-break-at}
 \end{codeenv}
-The default \csopt[sort]{dual-sort-field} is unchanged, which means
-that with the default \csopt[short]{abbreviation-sort-fallback}, 
-\emph{C.\ burnetii} is between \emph{C.\ botulinum} and \emph{C.\
-perfringens} rather than after \emph{C.\ tetani}.
+This method doesn't work as well as the method used in
+\exfile{sample-chemical.tex} as I can't separate the capitals,
+digits and lower case characters in the way that can be achieved with the
+letter-number methods.
 
 The document loads \sty{hyperref} which means that all the \cs{gls}
 references will create hyperlinks. Since the primaries are in the

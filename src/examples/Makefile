@@ -86,7 +86,8 @@ sample-languages.pdf	: $(DEPS) sample-languages.tex \
 	pdflatex sample-languages
 
 sample-multi.pdf	: $(DEPS) sample-multi.tex \
-	bacteria.bib markuplanguages.bib minerals.bib
+	bacteria.bib markuplanguages.bib minerals.bib \
+	vegetables.bib animals.bib chemicalformula.bib
 	pdflatex sample-multi
 	$(BIB2GLS) sample-multi
 	pdflatex sample-multi

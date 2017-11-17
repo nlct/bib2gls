@@ -564,6 +564,41 @@ name},
   category={command}
 }
 
+@dualindexentry{bibglssetwidesttoplevelfallback,
+  name={\csfmt{bib\-gls\-set\-widest\-top\-level\-fallback}},
+  user1={\margm{glossary list}},
+  description={fallback used instead of \gls{bibglssetwidest}
+   in the event that \bibgls\ can't determine the widest name
+   where there are only top level entries},
+  category={command}
+}
+
+@dualindexentry{bibglssetwidestfallback,
+  name={\csfmt{bib\-gls\-set\-widest\-fallback}},
+  user1={\margm{glossary list}},
+  description={fallback used instead of \gls{bibglssetwidest}
+   in the event that \bibgls\ can't determine the widest name},
+  category={command}
+}
+
+@dualindexentry{bibglssetwidestfortypefallback,
+  name={\csfmt{bib\-gls\-set\-widest\-for\-type\-fallback}},
+  user1={\margm{type}},
+  description={fallback used instead of \gls{bibglssetwidestfortype}
+   in the event that \bibgls\ can't determine the widest name},
+  category={command}
+}
+
+@dualindexentry{bibglssetwidesttoplevelfortypefallback,
+  name={\csfmt{bib\-gls\-set\-widest\-top\-level\-for\-type\-fallback}},
+  user1={\margm{type}},
+  description={fallback used instead of \gls{bibglssetwidestfortype}
+   in the event that \bibgls\ can't determine the widest name
+   where there are only top-level entries},
+  category={command}
+}
+
+
 @dualindexentry{bibglscontributorlist,
   name={\csfmt{bib\-gls\-contributor\-list}},
   user1={\margm{list}\margm{number}},
@@ -5589,6 +5624,16 @@ glossaries},
   category={command}
 }
 
+@index{glsFindWidestLevelTwo,
+  name={\csfmt{gls\-Find\-Widest\-Level\-Two}},
+  user1={\oargm{glossary list}},
+  description={finds the widest name in the given glossaries
+   for the top level and first two sub-levels},
+  note={provided by \styfmt{glossaries-extra-stylemods}},
+  seealso={glsfindwidesttoplevelname},
+  category={command}
+}
+
 @index{glsxtrbookindexname,
   name={\csfmt{glsxtr\-book\-index\-name}},
   user1={\margm{label}},
@@ -5624,6 +5669,16 @@ the width of the description column},
    \styfmt{glossary-super}},
   category={command}
 }
+
+@index{glsxtralttreeSymbolDescLocation,
+  name={\csfmt{glsxtralttreeSymbolDescLocation}},
+  user1={\margm{label}\margm{location list}},
+  description={used by the \glostyle{alttree} styles to format the
+symbol, description and location},
+  note={provided by \styfmt{glossaries-extra-stylemods}},
+  category={command}
+}
+
 @index{glsentrylong,
   name={\csfmt{gls\-entry\-long}},
   user1={\margm{label}},
