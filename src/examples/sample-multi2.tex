@@ -1,0 +1,184 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass{scrreprt}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[version=4]{mhchem}
+\usepackage{siunitx}
+\usepackage[colorlinks]{hyperref}
+
+\usepackage[record,% use bib2gls
+ section,% use \section* for glossary headings
+ postdot,% insert dot after descriptions in glossaries
+ nomain,% don't create 'main' glossary
+ index,% create 'index' glossary
+ nostyles,% don't load default styles
+% load and patch required style packages:
+ stylemods={list,mcols,tree,bookindex}
+]{glossaries-extra}
+
+\newglossary*{bacteria}{Bacteria}
+\newglossary*{markuplanguage}{Markup Languages}
+\newglossary*{vegetable}{Vegetables}
+\newglossary*{mineral}{Minerals}
+\newglossary*{animal}{Animals}
+\newglossary*{chemical}{Chemical Formula}
+\newglossary*{baseunit}{SI Units}
+\newglossary*{derivedunit}{Derived Units}
+
+% abbreviation styles must be set before \GlsXtrLoadResources:
+\setabbreviationstyle[bacteria]{long-only-short-only}
+\setabbreviationstyle[markuplanguage]{long-short-desc}
+
+% style-dependent name format must be set
+% before \GlsXtrLoadResources:
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+}
+
+\GlsXtrLoadResources[
+ src={bacteria,markuplanguages,vegetables,minerals,
+  animals},
+ selection={recorded and deps},
+ field-aliases={
+   identifier=category,
+ },
+ type={same as category},
+ set-widest,
+ abbreviation-name-fallback={long},
+ save-locations=false
+]
+
+\GlsXtrLoadResources[
+ src={chemicalformula,baseunits,derivedunits},
+ selection={recorded and deps},
+ field-aliases={
+   identifier=category,
+   formula=name,
+   chemicalname=description
+ },
+ type={same as category},
+ set-widest,
+ sort={letternumber-upperlower},
+ symbol-sort-fallback={name},
+ save-locations=false
+]
+
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glslongfont{\the\glslongtok}\space
+  \glsxtrparen{\glsabbrvfont{\the\glsshorttok}}%
+}
+
+\GlsXtrLoadResources[
+ src={terms,bacteria,markuplanguages,vegetables,minerals,
+  animals,chemicalformula,baseunits,derivedunits},
+ selection={recorded and deps and see},
+ field-aliases={
+   identifier=category,
+   formula=symbol,
+   chemicalname=name
+ },
+ label-prefix={idx.},
+ record-label-prefix={idx.},
+ type=index,
+ abbreviation-sort-fallback={long},
+ symbol-sort-fallback={name},
+]
+
+\newcommand{\bacteriafont}[1]{\emph{#1}}
+\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
+
+\glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
+
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}%
+  {%
+    \glsifcategory{#1}{chemical}%
+    {, \glossentrysymbol{#1}}%
+    {\space(\glossentrynameother{#1}{symbol})}%
+  }%
+  {}%
+}
+
+\glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
+
+\begin{document}
+\chapter{Sample}
+\section{Bacteria}
+This section is about \idxpl{bacteria}.
+\subsection{First Use}
+\gls{cbotulinum}, \gls{pputida}, \gls{cperfringens},
+\gls{bsubtilis}, \gls{ctetani}, \gls{pcomposti},
+\gls{pfimeticola}, \gls{cburnetii}, \gls{raustralis},
+\gls{rrickettsii}.
+
+\subsection{Next Use}
+\gls{cbotulinum}, \gls{pputida}, \gls{cperfringens},
+\gls{bsubtilis}, \gls{ctetani}, \gls{pcomposti},
+\gls{pfimeticola}, \gls{cburnetii}, \gls{raustralis},
+\gls{rrickettsii}.
+
+\section{Markup Languages}
+This section is about \idxpl{markuplanguage}.
+\subsection{First Use}
+\gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
+
+\subsection{Next Use}
+\gls{LaTeX}, \gls{markdown}, \gls{xhtml}, \gls{mathml}, \gls{svg}.
+
+\section{Vegetables}
+This section is about \idxpl{vegetable}.
+\gls{cabbage}, \gls{brussels-sprout}, \gls{artichoke}, 
+\gls{cauliflower}, \gls{courgette}, \gls{spinach}.
+
+\section{Minerals}
+This section is about \idxpl{mineral}.
+\Gls{beryl}, \gls{amethyst}, \gls{chalcedony}, \gls{aquamarine},
+\gls{aragonite}, \gls{calcite}, \gls{bilinite}, 
+\gls{cyanotrichite}, \gls{biotite}, \gls{dolomite}, 
+\gls{quetzalcoatlite}, \gls{vulcanite}.
+
+\section{Animals}
+This section is about \idxpl{animal}.
+\Gls{duck}, \gls{parrot}, \gls{hedgehog}, \gls{sealion}.
+
+\section{Chemicals}
+This section is about \idxpl{chemical}.
+\gls{Al2SO43}, \gls{H2O}, \gls{C6H12O6},
+\gls{CH3CH2OH}, \gls{CH2O}, \gls{OF2}, \gls{O2F2}, \gls{SO42-},
+\gls{H3O+}, \gls{OH-}, \gls{O2}, \gls{AlF3}, \gls{O},
+\gls{Al2CoO4}, \gls{As4S4}, \gls{C10H10O4}, \gls{C5H4NCOOH},
+\gls{C8H10N4O2}, \gls{SO2}, \gls{S2O72-}, \gls{SbBr3},
+\gls{Sc2O3}, \gls{Zr3PO44}, \gls{ZnF2}.
+
+\section{SI Units}
+\Idxpl{baseunit}: \gls{ampere}, \gls{kilogram}, \gls{metre}, 
+\gls{second}, \gls{kelvin}, \gls{mole}, \gls{candela}.
+\Idxpl{derivedunit}: \gls{area}, \gls{volume}, \gls{velocity},
+\gls{acceleration}, \gls{density}, \gls{luminance},
+\gls{specificvolume}, \gls{concentration}, \gls{wavenumber}.
+
+\chapter*{Glossaries}
+\printunsrtglossary[type=bacteria,style=mcoltree]
+\printunsrtglossary[type=markuplanguage,style=altlist]
+\printunsrtglossary[type=vegetable,style=tree,nogroupskip]
+\printunsrtglossary[type=mineral,style=treegroup]
+\printunsrtglossary[type=animal,style=tree]
+\printunsrtglossary*[type=chemical,style=mcolalttreegroup]
+{%
+  \renewcommand*{\glstreenamefmt}[1]{#1}%
+  \renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
+}
+\printunsrtglossary[type=baseunit,style=alttree]
+\printunsrtglossary[type=derivedunit,style=alttree]
+
+\setupglossaries{section=chapter}
+\printunsrtglossary[type=index,style=bookindex]
+\end{document}}

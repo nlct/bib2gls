@@ -809,6 +809,10 @@ public class GlsResource
                csLabelPrefix = "";
             }
          }
+         else if (opt.equals("record-label-prefix"))
+         {
+            recordLabelPrefix = getOptional(parser, list, opt);
+         }
          else if (opt.equals("sort-suffix"))
          {
             String val = getRequired(parser, list, opt);
@@ -3397,7 +3401,8 @@ public class GlsResource
             {
                GlsRecord record = records.get(i);
 
-               Bib2GlsEntry entry = getBib2GlsEntry(record.getLabel(), list);
+               Bib2GlsEntry entry = getBib2GlsEntry(getRecordLabel(record), 
+                  list);
 
                if (entry == null) continue;
 
@@ -3488,7 +3493,9 @@ public class GlsResource
                {
                   for (GlsRecord record : records)
                   {
-                     if (record.getLabel().equals(primaryId))
+                     String recordLabel = getRecordLabel(record);
+
+                     if (recordLabel.equals(primaryId))
                      {
                         entry.addRecord(record);
                         hasRecords = true;
@@ -3503,7 +3510,7 @@ public class GlsResource
 
                      if (dual != null)
                      {
-                        if (record.getLabel().equals(dualId))
+                        if (recordLabel.equals(dualId))
                         {
                            dual.addRecord(record);
                            dualHasRecords = true;
@@ -3537,7 +3544,9 @@ public class GlsResource
 
                   for (GlsSeeRecord record : seeRecords)
                   {
-                     if (record.getLabel().equals(primaryId))
+                     String recordLabel = getRecordLabel(record);
+
+                     if (recordLabel.equals(primaryId))
                      {
                         entry.addRecord(record);
                         hasRecords = true;
@@ -3545,7 +3554,7 @@ public class GlsResource
 
                      if (dual != null)
                      {
-                        if (record.getLabel().equals(dualId))
+                        if (recordLabel.equals(dualId))
                         {
                            dual.addRecord(record);
                            dualHasRecords = true;
@@ -3717,7 +3726,7 @@ public class GlsResource
       {
          for (GlsRecord record : supplementalRecords)
          {
-            String label = record.getLabel();
+            String label = getRecordLabel(record);
 
             Bib2GlsEntry entry = getEntry(label, bibData);
 
@@ -4061,6 +4070,28 @@ public class GlsResource
       return null;
    }
 
+   public String getRecordLabel(GlsRecord record)
+   {
+      String label = record.getLabel();
+
+      if (recordLabelPrefix == null || label.startsWith(recordLabelPrefix))
+      {
+         return label;
+      }
+
+      return recordLabelPrefix+label;
+   }
+
+   public String getRecordLabel(GlsSeeRecord record)
+   {
+      if (recordLabelPrefix == null)
+      {
+         return record.getLabel();
+      }
+
+      return recordLabelPrefix+record.getLabel();
+   }
+
    private void processData(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries, String entrySort)
       throws Bib2GlsException
@@ -4119,11 +4150,13 @@ public class GlsResource
          {
             GlsRecord record = records.get(i);
 
-            Bib2GlsEntry entry = getEntry(record.getLabel(), data);
+            String recordLabel = getRecordLabel(record);
+
+            Bib2GlsEntry entry = getEntry(recordLabel, data);
 
             if (entry == null && hasDuals)
             {
-               String label = flipLabel(record.getLabel());
+               String label = flipLabel(recordLabel);
 
                if (label != null)
                {
@@ -4154,11 +4187,13 @@ public class GlsResource
          {
             GlsSeeRecord record = seeRecords.get(i);
 
-            Bib2GlsEntry entry = getEntry(record.getLabel(), data);
+            String recordLabel = getRecordLabel(record);
+
+            Bib2GlsEntry entry = getEntry(recordLabel, data);
 
             if (entry == null && hasDuals)
             {
-               String label = flipLabel(record.getLabel());
+               String label = flipLabel(recordLabel);
 
                if (label != null)
                {
@@ -4189,7 +4224,8 @@ public class GlsResource
          {
             for (GlsRecord record : supplementalRecords)
             {
-               String label = record.getLabel();
+               String label = getRecordLabel(record);
+
                Bib2GlsEntry entry = getEntry(label, data);
 
                if (entry != null && !entries.contains(entry))
@@ -4993,7 +5029,7 @@ public class GlsResource
 
                for (GlsRecord record : records)
                {
-                  Bib2GlsEntry entry = getEntry(record.getLabel(), 
+                  Bib2GlsEntry entry = getEntry(getRecordLabel(record), 
                      secondaryList);
 
                   if (entry != null)
@@ -5842,7 +5878,12 @@ public class GlsResource
       }
       else if (type != null)
       {
-         entry.putField("type", getType(entry, type, false));
+         String entryType = getType(entry, type, false);
+
+         if (entryType != null)
+         {
+            entry.putField("type", entryType);
+         }
       }
    }
 
@@ -5855,7 +5896,12 @@ public class GlsResource
    {
       if (catLabel != null)
       {
-         entry.putField("category", getCategory(entry, catLabel, false));
+         String entryCategory = getCategory(entry, catLabel, false);
+
+         if (entryCategory != null)
+         {
+            entry.putField("category", entryCategory);
+         }
       }
    }
 
@@ -5895,35 +5941,11 @@ public class GlsResource
       }
       else if (dualType != null)
       {
-         if (dualType.equals("same as entry"))
-         {
-            dual.putField("type", dual.getEntryType());
-         }
-         else if (dualType.equals("same as base"))
-         {
-            dual.putField("type", dual.getBase());
-         }
-         else if (dualType.equals("same as category"))
-         {
-            String val = dual.getFieldValue("category");
+         String entryType = getType(dual, dualType, false);
 
-            if (val != null)
-            {
-               dual.putField("type", val);
-            }
-         }
-         else if (dualType.equals("same as primary"))
+         if (entryType != null)
          {
-            String val = dual.getDual().getFieldValue("type");
-
-            if (val != null)
-            {
-               dual.putField("type", val);
-            }
-         }
-         else
-         {
-            dual.putField("type", dualType);
+            dual.putField("type", entryType);
          }
       }
    }
@@ -5932,35 +5954,11 @@ public class GlsResource
    {
       if (dualCategory != null)
       {
-         if (dualCategory.equals("same as entry"))
-         {
-            dual.putField("category", dual.getEntryType());
-         }
-         else if (dualCategory.equals("same as base"))
-         {
-            dual.putField("category", dual.getBase());
-         }
-         else if (dualCategory.equals("same as primary"))
-         {
-            String val = dual.getDual().getFieldValue("category");
+         String entryCategory = getCategory(dual, dualCategory, false);
 
-            if (val != null)
-            {
-               dual.putField("category", val);
-            }
-         }
-         else if (dualCategory.equals("same as type"))
+         if (entryCategory != null)
          {
-            String val = dual.getFieldValue("type");
-
-            if (val != null)
-            {
-               dual.putField("category", val);
-            }
-         }
-         else
-         {
-            dual.putField("category", dualCategory);
+            dual.putField("category", entryCategory);
          }
       }
    }
@@ -6665,7 +6663,15 @@ public class GlsResource
 
       if (value.equals("same as category"))
       {
-         value = entry.getFieldValue("category");
+         if (entry instanceof Bib2GlsDualEntry  
+              && !((Bib2GlsDualEntry)entry).isPrimary())
+         {
+            value = dualCategory;
+         }
+         else
+         {
+            value = category;
+         }
 
          if ("same as type".equals(value))
          {
@@ -6673,7 +6679,7 @@ public class GlsResource
               bib2gls.getMessage("error.cyclic.sameas.type.category"));
          }
 
-         return getType(entry, null);
+         return getCategory(entry, value);
       }
 
       if (value.equals("same as entry"))
@@ -6684,6 +6690,18 @@ public class GlsResource
       if (value.equals("same as base"))
       {
          return entry.getBase();
+      }
+
+      if (value.equals("same as primary") 
+          && (entry instanceof Bib2GlsDualEntry)
+          && !((Bib2GlsDualEntry)entry).isPrimary())
+      {
+         Bib2GlsEntry dual = entry.getDual();
+
+         if (dual != null)
+         {
+            return getType(dual, fallback);
+         }
       }
 
       return value;
@@ -6738,7 +6756,15 @@ public class GlsResource
 
       if (value.equals("same as type"))
       {
-         value = entry.getFieldValue("type");
+         if (entry instanceof Bib2GlsDualEntry  
+              && !((Bib2GlsDualEntry)entry).isPrimary())
+         {
+            value = dualType;
+         }
+         else
+         {
+            value = type;
+         }
 
          if ("same as category".equals(value))
          {
@@ -6746,7 +6772,7 @@ public class GlsResource
               bib2gls.getMessage("error.cyclic.sameas.type.category"));
          }
 
-         return getType(entry, null);
+         return getType(entry, value);
       }
 
       if (value.equals("same as entry"))
@@ -6757,6 +6783,18 @@ public class GlsResource
       if (value.equals("same as base"))
       {
          return entry.getBase();
+      }
+
+      if (value.equals("same as primary") 
+          && (entry instanceof Bib2GlsDualEntry)
+          && !((Bib2GlsDualEntry)entry).isPrimary())
+      {
+         Bib2GlsEntry dual = entry.getDual();
+
+         if (dual != null)
+         {
+            return getCategory(dual, fallback);
+         }
       }
 
       return value;
@@ -7048,7 +7086,7 @@ public class GlsResource
    private String tertiaryType=null, tertiaryCategory=null,
      tertiaryPrefix="tertiary.";
 
-   private String csLabelPrefix = null;
+   private String csLabelPrefix = null, recordLabelPrefix = null;
 
    private String dualField = null;
 

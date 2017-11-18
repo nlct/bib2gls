@@ -1,0 +1,29 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,index]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src=test-entries,
+ type=main,
+ save-locations=false
+]
+
+\GlsXtrLoadResources[
+ src=test-entries,
+ label-prefix={idx.},
+ record-label-prefix={idx.},
+ type=index
+]
+
+\begin{document}
+\Gls{bird} and \gls{waterfowl}.
+\Gls{idx.duck} and \gls{idx.goose}.
+
+\printunsrtglossary[type=main]
+\printunsrtglossary[type=index]
+\end{document}

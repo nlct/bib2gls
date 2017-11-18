@@ -5740,6 +5740,27 @@ it's as though the entries had been defined as:
 Remember to use this prefix when you reference the terms in the
 document with commands like \ics{gls}.
 
+\optsection{record-label-prefix}
+
+If set, this option will cause \bibgls\ to pretend that each record
+label starts with \meta{tag}, if it doesn't already. For example, suppose
+the records in the \ext{aux} file are:
+\begin{verbatim}
+\glsxtr@record{bird}{}{page}{glsnumberformat}{1}
+\glsxtr@record{waterfowl}{}{page}{glsnumberformat}{1}
+\glsxtr@record{idx.duck}{}{page}{glsnumberformat}{1}
+\glsxtr@record{idx.goose}{}{page}{glsnumberformat}{1}
+\end{verbatim}
+The use of \csopt[idx.]{record-label-prefix} makes \bibgls\ act as 
+though the records were given as:
+\begin{verbatim}
+\glsxtr@record{idx.bird}{}{page}{glsnumberformat}{1}
+\glsxtr@record{idx.waterfowl}{}{page}{glsnumberformat}{1}
+\glsxtr@record{idx.duck}{}{page}{glsnumberformat}{1}
+\glsxtr@record{idx.goose}{}{page}{glsnumberformat}{1}
+\end{verbatim}
+
+
 \optsection{cs-label-prefix}
 
 If you have commands such as \ics{gls}\margm{label} or

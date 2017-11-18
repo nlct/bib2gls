@@ -20,7 +20,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dates.pdf test-people.pdf test-entrytypemap.pdf \
 	  test-dualindexentry.pdf test-dualindexentry2.pdf \
 	  test-dual-mix.pdf test-letternumber.pdf \
-	  test-numeric.pdf test-copy.pdf test-seetrail.pdf
+	  test-numeric.pdf test-copy.pdf test-seetrail.pdf \
+	  test-record-prefix.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -375,6 +376,13 @@ test-seetrail.pdf	: test-seetrail.glstex
 test-seetrail.glstex	: test-seetrail.tex test-seetrail.bib $(DEPS)
 		pdflatex test-seetrail
 		$(BIB2GLS) test-seetrail
+
+test-record-prefix.pdf	: test-record-prefix.glstex
+		pdflatex test-record-prefix
+
+test-record-prefix.glstex	: test-record-prefix.tex test-entries.bib $(DEPS)
+		pdflatex test-record-prefix
+		$(BIB2GLS) test-record-prefix
 
 clean	:
 	$(RM) *.aux
