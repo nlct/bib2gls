@@ -209,6 +209,14 @@ public class Bib2GlsAt extends At
       }
       else if (data instanceof Bib2GlsEntry)
       {
+         String id = ((Bib2GlsEntry)data).getId();
+
+         if (bibParser.getBibEntry(id) != null)
+         {
+            throw new BibTeXSyntaxException(parser,
+              BibTeXSyntaxException.ERROR_REPEATED_ENTRY, id);
+         } 
+
          ((Bib2GlsEntry)data).initAlias(parser);
       }
 
