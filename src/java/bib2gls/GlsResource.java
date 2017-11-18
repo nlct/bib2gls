@@ -3631,27 +3631,16 @@ public class GlsResource
 
                   if (seeList != null)
                   {
-                     addCrossRefs(list, entry, entry.getCrossRefs(),
-                        bibData, seeList);
-                     addCrossRefs(list, entry, entry.getAlsoCrossRefs(), 
-                        bibData, seeList);
-
-                     if (dual != null)
+                     if (entry.hasCrossRefs() 
+                         || entry.getField("alias") != null)
                      {
-                        if (combine)
-                        {
-                           addCrossRefs(list, dual, dual.getCrossRefs(), 
-                              bibData, seeList);
-                           addCrossRefs(list, dual, dual.getAlsoCrossRefs(), 
-                              bibData, seeList);
-                        }
-                        else
-                        {
-                           addCrossRefs(list, dual, dual.getCrossRefs(), 
-                              dualData, seeList);
-                           addCrossRefs(list, dual, dual.getAlsoCrossRefs(), 
-                              dualData, seeList);
-                        }
+                        seeList.add(entry);
+                     }
+
+                     if (dual != null && (dual.hasCrossRefs() 
+                         || dual.getField("alias") != null))
+                     {
+                        seeList.add(dual);
                      }
                   }
                }
@@ -3662,20 +3651,17 @@ public class GlsResource
 
       if (seeList != null)
       {
-         for (Bib2GlsEntry xrEntry : seeList)
+         for (Bib2GlsEntry entry : seeList)
          {
-            for (Iterator<Bib2GlsEntry> it=xrEntry.getCrossRefdByIterator();
-              it.hasNext(); )
+            addCrossRefs(entry, entry.getCrossRefs());
+
+            addCrossRefs(entry, entry.getAlsoCrossRefs());
+
+            String alias = entry.getFieldValue("alias");
+
+            if (alias != null)
             {
-               Bib2GlsEntry entry = it.next();
-
-               if (bib2gls.getVerboseLevel() > 0)
-               {
-                  bib2gls.logMessage(bib2gls.getMessage(
-                    "message.crossref.by", entry.getId(), xrEntry.getId()));
-               }
-
-               xrEntry.addDependency(entry.getId());
+               addCrossRefs(entry, alias);
             }
          }
       }
@@ -3683,24 +3669,48 @@ public class GlsResource
       addSupplementalRecords();
    }
 
-   private void addCrossRefs(Vector<BibData> list,
-      Bib2GlsEntry entry, String[] xrList, Vector<Bib2GlsEntry> entries,
-      Vector<Bib2GlsEntry> seeList)
+   private void addCrossRefs(Bib2GlsEntry entry, String... xrList)
    {
       if (xrList == null) return;
 
       for (String xr : xrList)
       {
-         Bib2GlsEntry xrEntry = getEntry(xr, entries);
+         Bib2GlsEntry xrEntry = null;
+
+         if (dualData.isEmpty())
+         {
+            xrEntry = getEntry(xr, bibData);
+         }
+         else if (entry instanceof Bib2GlsDualEntry
+                   && !((Bib2GlsDualEntry)entry).isPrimary())
+         {
+            xrEntry = getEntry(xr, dualData);
+
+            if (xrEntry == null)
+            {
+               xrEntry = getEntry(xr, bibData);
+            }
+         }
+         else
+         {
+            xrEntry = getEntry(xr, bibData);
+
+            if (xrEntry == null)
+            {
+               xrEntry = getEntry(xr, dualData);
+            }
+         }
 
          if (xrEntry != null)
          {
-            xrEntry.addCrossRefdBy(entry);
-
-            if (!seeList.contains(xrEntry))
+            if (bib2gls.getVerboseLevel() > 0)
             {
-               seeList.add(xrEntry);
+               bib2gls.logMessage(bib2gls.getMessage(
+                 "message.crossref.by", xrEntry.getId(), entry.getId()));
             }
+
+            xrEntry.addDependency(entry.getId());
+            xrEntry.addCrossRefdBy(entry);
          }
       }
    }

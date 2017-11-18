@@ -72,6 +72,11 @@
 
 \glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
 
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}{\space(\glossentrysymbol{#1})}{}%
+}
+
 \begin{document}
 \chapter{Sample}
 \section{Bacteria}
