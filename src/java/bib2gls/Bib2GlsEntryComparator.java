@@ -80,13 +80,18 @@ public class Bib2GlsEntryComparator extends SortComparator
       Locale locale)
    {
       breakPointMarker = breakMarker;
+      this.breakPoint = breakPoint;
 
       switch (breakPoint)
       {
          case BREAK_NONE:
+         case BREAK_UPPER_NOTLOWER:
+         case BREAK_UPPER_UPPER:
             breakIterator = null;
          break;
          case BREAK_WORD:
+         case BREAK_UPPER_NOTLOWER_WORD:
+         case BREAK_UPPER_UPPER_WORD:
             breakIterator = BreakIterator.getWordInstance(locale);
          break;
          case BREAK_CHAR:
@@ -112,7 +117,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       value = breakPoints(value).toString();
 
-      if (breakIterator != null)
+      if (breakPoint != BREAK_NONE)
       {
          bib2gls.debug(bib2gls.getMessage("message.break.points",
            value));
@@ -411,8 +416,70 @@ public class Bib2GlsEntryComparator extends SortComparator
       super.sortEntries();
    }
 
+   protected CharSequence breakUpperNotLower(String target)
+   {
+      StringBuffer buff = new StringBuffer();
+
+      for (int i = 0, n = target.length(); i < n; )
+      {
+         int codePoint = target.codePointAt(i);
+         i += Character.charCount(codePoint);
+
+         buff.appendCodePoint(codePoint);
+
+         if (Character.isUpperCase(codePoint))
+         {
+            int nextCodePoint = (i < n ? target.codePointAt(i) : -1);
+
+            if (!Character.isLowerCase(nextCodePoint))
+            {
+               buff.append(breakPointMarker);
+            }
+         }
+      }
+
+      return buff;
+   }
+
+   protected CharSequence breakUpperUpper(String target)
+   {
+      StringBuffer buff = new StringBuffer();
+
+      for (int i = 0, n = target.length(); i < n; )
+      {
+         int codePoint = target.codePointAt(i);
+         i += Character.charCount(codePoint);
+
+         buff.appendCodePoint(codePoint);
+
+         if (Character.isUpperCase(codePoint))
+         {
+            int nextCodePoint = (i < n ? target.codePointAt(i) : -1);
+
+            if (Character.isUpperCase(nextCodePoint))
+            {
+               buff.append(breakPointMarker);
+            }
+         }
+      }
+
+      return buff;
+   }
+
    public CharSequence breakPoints(String target)
    {
+      switch (breakPoint)
+      {
+         case BREAK_UPPER_NOTLOWER:
+         case BREAK_UPPER_NOTLOWER_WORD:
+            target = breakUpperNotLower(target).toString();
+         break;
+         case BREAK_UPPER_UPPER:
+         case BREAK_UPPER_UPPER_WORD:
+            target = breakUpperUpper(target).toString();
+         break;
+      }
+
       if (breakIterator == null)
       {
          return target;
@@ -429,7 +496,9 @@ public class Bib2GlsEntryComparator extends SortComparator
       {
           String word = target.substring(start,end);
 
-          if (Character.isLetterOrDigit(word.charAt(0)))
+          int codePoint = word.codePointAt(0);
+
+          if (Character.isLetterOrDigit(codePoint))
           {
              buff.append(word);
              buff.append(breakPointMarker);
@@ -444,10 +513,13 @@ public class Bib2GlsEntryComparator extends SortComparator
 
    private Collator collator;
 
-   private BreakIterator breakIterator;
+   private BreakIterator breakIterator=null;
 
    private String breakPointMarker="|";
 
+   private int breakPoint;
+
    public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
-     BREAK_SENTENCE=3;
+     BREAK_SENTENCE=3, BREAK_UPPER_NOTLOWER=4, BREAK_UPPER_UPPER=5,
+     BREAK_UPPER_NOTLOWER_WORD=6, BREAK_UPPER_UPPER_WORD=7;
 }

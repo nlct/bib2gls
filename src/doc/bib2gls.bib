@@ -1760,6 +1760,13 @@ pattern}},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.secondary-sort-number-pad,
+   name={\csoptfmt{secondary\dhyphen sort\dhyphen number\dhyphen pad}},
+   user1={\meta{number}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.sort-pad-plus,
    name={\csoptfmt{sort\dhyphen pad\dhyphen plus}},
    user1={\meta{marker}},
@@ -5500,6 +5507,58 @@ packages},
   category={command}
 }
 
+@index{glsxtrshort,
+  name={\csfmt{glsxtrshort}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{short} field (using the
+   appropriate abbreviation style) 
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrlong,
+  name={\csfmt{glsxtrlong}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{long} field (using the
+   appropriate abbreviation style) 
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glstext,
+  name={\csfmt{glstext}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{text} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsname,
+  name={\csfmt{glsname}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{name} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsfirst,
+  name={\csfmt{glsfirst}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{first} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @dualindexentry{rgls,
   name={\csfmt{rgls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
@@ -5719,6 +5778,22 @@ indexing},
    or \cs{glsnamefont} and the post-name hook) but uses
    the given \meta{field} instead of the \field{name} field},
   note={provided by \styfmt{glossaries-extra} v1.22+},
+  category={command}
+}
+
+@index{glossentrydesc,
+  name={\csfmt{gloss\-entry\-desc}},
+  user1={\margm{label}},
+  description={used by glossary styles to display the description},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossentrysymbol,
+  name={\csfmt{gloss\-entry\-symbol}},
+  user1={\margm{label}},
+  description={used by glossary styles to display the symbol},
+  note={provided by \styfmt{glossaries}},
   category={command}
 }
 

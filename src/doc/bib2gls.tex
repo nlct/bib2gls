@@ -594,21 +594,21 @@
 }
 
 \newlength\imagewidth
-\newcommand*{\pdftwocol}[2]{%
+\newcommand*{\pdftwocol}[3][1]{%
   \renewcommand{\tabcolsep}{2pt}%
   \setlength{\imagewidth}{\dimexpr.5\textwidth-\tabcolsep}%
   \def\tabcontents{\begin{tabular}{@{}cc@{}}}%
-  \count0=0\relax
+  \count0=\numexpr#1-1\relax
   \loop
   \advance\count0 by 1\relax
   \eappto\tabcontents{\noexpand\frame{%
-   \noexpand\includegraphics[page=\the\count0,width=\noexpand\imagewidth]{#1}}}%
+   \noexpand\includegraphics[page=\the\count0,width=\noexpand\imagewidth]{#2}}}%
   \ifodd\count0
     \appto\tabcontents{&}%
   \else
     \appto\tabcontents{\\}%
   \fi
-  \ifnum\count0<#2
+  \ifnum\count0<#3
   \repeat
   \appto\tabcontents{\end{tabular}}%
   \tabcontents
@@ -3262,8 +3262,13 @@ is like
 \end{verbatim}
 The primary term is defined using
 \csref{bibglsnewdualindexabbreviation}, which encapsulates the
-\field{name} in \csref{bibglsuseabbrvfont} to match the font used by
-the dual abbreviation. It also
+\field{name} to match the font used by
+the dual abbreviation. The encapsulation command depends
+on the \csopt{abbreviation-name-fallback} value. If it's
+the \field{short} field then \gls{bibglsuseabbrvfont} is
+used, otherwise \gls{bibglsuselongfont} is used.
+
+The primary definition also
 by default sets the \field{category} to \optfmt{index} (although
 this again may be overridden).
 The dual term is defined using
@@ -5747,7 +5752,7 @@ the \meta{label} will be converted as follows:
 \item if \meta{label} starts with \idprefix{tertiary} then
 \idprefix{tertiary} will be replaced by the \csopt{tertiary-prefix} value;
 \item if \meta{label} starts with \idprefix{extn} then
-\idxprefix{extn} will be replaced by the corresponding
+\idprefix{extn} will be replaced by the corresponding
 \csopt{ext-prefixes} setting;
 \item if \meta{label} doesn't start with one of the above recognised
 prefixes then, if \csopt{cs-label-prefix} has been used the supplied
@@ -8350,10 +8355,27 @@ You can change the construction of the break points with
 \csopt[\meta{option}]{break-at} where \meta{option} may be one of:
 \begin{itemize}
 \item \optfmt{word}: break at word boundaries (default).
+Note that what constitutes a word varies
+according to the locale but usually anything that's not alphanumeric 
+will designate a word-boundary. The characters between words are
+discarded.
 For example, the sort value \qt{Tom, Dick, and Harry} becomes 
-\verb"Tom|Dick|and|Harry".
+\verb"Tom|Dick|and|Harry", which has discarded the comma and space
+characters.
 \item \optfmt{character}: break after each character.
 \item \optfmt{sentence}: break after each sentence.
+\item \optfmt{upper-notlower}: break after any upper case character
+that's not followed by a lower case character. For example, 
+\qt{MathML} becomes \verb"MathM|L|" and \qt{W3C} becomes
+\verb"W|3C|".
+\item \optfmt{upper-upper}: break after any upper case character
+that's followed by an upper case character.
+\item \optfmt{upper-notlower-word}: first applies break-points
+according to \optfmt{upper-notlower} and then according to
+\optfmt{word}.
+\item \optfmt{upper-upper-word}: first applies break-points
+according to \optfmt{upper-upper} and then according to
+\optfmt{word}.
 \item \optfmt{none}: don't create break points. Use this option to
 emulate \idx{makeindex} or \idx{xindy}'s letter ordering.
 \end{itemize}
@@ -9051,7 +9073,7 @@ The \meta{value} may be one of:
 This should match the specifications for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
 class~\cite{simpledateformat}. You may use \stringu\meta{hex} to indicate Unicode characters
-or \ics{cs.hash}, \ics{cs.percent}, \ics{underscore}, \ics{cs.amp},
+or \ics{cs.hash}, \ics{cs.percent}, \ics{cs.underscore}, \ics{cs.amp},
 \ics{cs.openbrace} and \ics{cs.closebrace} to indicate
 \idx{hashchar}, \idx{percentchar}, \idx{underscorechar},
 \idx{ampchar}, \idx{openbracechar} and \idx{closebracechar}.
@@ -10247,8 +10269,8 @@ file is:
 
 \formatdef{bibglsnewdualindexabbreviation}
 This command is used to define primary terms identified with the
-\atentry{dualindexabbreviation} type. The definition provided in the \ext{glstex}
-file is:
+\atentry{dualindexabbreviation} type. The default definition provided in 
+the \ext{glstex} file is:
 \begin{verbatim}
 \providecommand{\bibglsnewdualindexabbreviation}[7]{%
   \longnewglossaryentry*{#1}{%
@@ -10256,18 +10278,23 @@ file is:
     category={index},#3}{}%
 \end{verbatim}
 In this case \meta{dual-label} is the dual entry's label, which is used 
-to fetch the category label in \csref{bibglsuseabbrvfont}. (The
+to fetch the category label in \gls{bibglsuseabbrvfont}. (The
 \field{category} field for the dual isn't used as a custom
 definition of
 \csref{bibglsnewdualindexabbreviationsecondary} may override the
 value known to \bibgls.)
 
-Note that the \field{name} uses
+Note that (as shown above) with the default 
+\csopt[short]{abbreviation-name-fallback} the \field{name} uses
 \nosecformatdef{bibglsuseabbrvfont}
 to format the name, which ensures that it uses the same font as the
 short form for the dual abbreviation. This will use
 \ics{glsuseabbrvfont} if it's defined otherwise it will be defined
-to replicate that command.
+to replicate that command. If \csopt{abbreviation-name-fallback} is
+set to some other field then the \field{name} uses
+\nosecformatdef{bibglsuselongfont}
+instead, which ensures that it uses the same font as the
+long form for the dual abbreviation.
 
 \cssection{bibglsnewdualindexabbreviationsecondary}
 
@@ -10432,8 +10459,7 @@ and \meta{tertiary-label} is the label for the tertiary (regular)
 entry. The fifth argument (\meta{primary name}) isn't used but is
 provided if required for a custom redefinition.
 The \field{name} field for the tertiary is obtained from 
-the \meta{long} argument encapsulated by
-\nosecformatdef{bibglsuselongfont}
+the \meta{long} argument encapsulated by \gls{bibglsuselongfont}
 to format the name, which ensures that it uses the same font as the
 long form for the dual abbreviation. This will use
 \ics{glsuselongfont} if it's defined otherwise it will be defined to
@@ -14413,7 +14439,8 @@ been referenced on page~1, the location lists are all simply~\qt{1}.
 
 This example uses \exfile{bacteria.bib},
 \exfile{markuplanguages.bib}, \exfile{vegetables.bib}, \exfile{minerals.bib},
-\exfile{animals.bib}, \exfile{chemicalformula.bib}.
+\exfile{animals.bib}, \exfile{chemicalformula.bib},
+\exfile{baseunits.bib} and \exfile{derivedunits.bib}.
 Since there's one or more UTF-8 character, the document requires
 UTF-8 support:
 \begin{verbatim}
@@ -14423,7 +14450,8 @@ UTF-8 support:
 
 The aim of this example document is to have a separate glossary
 (without number lists) for each type of data (bacteria, markup
-languages, vegetables, minerals, animals, chemical formula) and also an
+languages, vegetables, minerals, animals, chemical formula, base
+units and derived units) and also an
 index listing all referenced entries with number lists as well as
 aliased entries that haven't explicitly been used but the
 cross-reference term as been indexed. This requires
@@ -14463,6 +14491,8 @@ The remaining glossaries need defining:
 \newglossary*{mineral}{Minerals}
 \newglossary*{animal}{Animals}
 \newglossary*{chemical}{Chemical Formula}
+\newglossary*{baseunit}{SI Units}
+\newglossary*{derivedunit}{Derived Units}
 \end{verbatim}
 As with \exfile{sample-bacteria.tex} and \exfile{sample-languages.tex}
 I need to set the abbreviation styles before the abbreviations are
@@ -14517,6 +14547,33 @@ make \bibgls\ treat them as though they were:
 \end{codeenv}
 Note that I haven't aliased the \atentry{index} types as I only want
 these in the index and not replicated in a separate glossary.
+
+The primary entries for the \atentry{dualindexabbreviation} type
+ignore the short form. It would be useful to store it. This could be
+done by copying the \field{short} field with
+\csopt{replicate-fields}. For example,
+\csopt[short=symbol]{replicate-fields}. However, this will cause the
+\field{symbol} field to be set for both the primary and dual
+entries, which will cause an unwanted duplication if the dual
+entries are displayed using a glossary style that shows the
+\field{symbol} field. Another field (such as \field{user1}) could be
+used instead or \gls{bibglsnewdualindexabbreviation} could be
+defined before \ics{GlsXtrLoadResources}:
+\begin{verbatim}
+\newcommand{\bibglsnewdualindexabbreviation}[7]{%
+ \longnewglossaryentry*{#1}{%
+  name={\protect\bibglsuselongfont{#4}{\glscategory{#2}}},%
+  symbol={\protect\bibglsuseabbrvfont{#5}{\glscategory{#2}}},%
+  category={index},#3}{}%
+}
+\end{verbatim}
+However, this will affect all \atentry{dualindexabbreviation} entry
+types, but it's not necessary for the bacteria abbreviations.
+Instead it's simpler to just keep a record of the dual label so that
+the short form can be obtained from the dual entry:
+\begin{codeenv}
+\csopt{dual-field}
+\end{codeenv}
 
 By default, the \atentry{dualindexabbreviation} entry type falls back on the
 \field{short} field if the \field{name} is omitted. In this case I
@@ -14575,7 +14632,7 @@ entries, so the primary entry type needs to be set to \code{index}:
 \end{codeenv}
 The dual entry type depends on the entry's category. Since I've
 defined my custom glossaries with a label that matches the
-custom \field{identifier} field, I can both alias this custom field
+custom \fieldfmt{identifier} field, I can both alias this custom field
 to the \field{category} field and also set \csopt{dual-type} so that
 it matches the category:
 \begin{codeenv}
@@ -14601,20 +14658,35 @@ settings will be used with the duals.  This means that
 \emph{C.\ burnetii} is between \emph{C.\ botulinum} and \emph{C.\
 perfringens} rather than after \emph{C.\ tetani}.
 
-I'd like to sort the dual entries according to a letter-number rule,
-as for \exfile{sample-chemical.tex} and \exfile{sample-units3.tex},
+I'd like to sort the dual entries according to a letter-number rule
+(as for the above \exfile{sample-chemical.tex} and \exfile{sample-units3.tex}
+examples)
 but this would order \qt{b\'ilinite} after \qt{biotite} in the
 \code{minerals} glossary, so instead I'm also using the English sort
 rule for the duals, but with the numbers padded:
 \begin{codeenv}
 \csopt[en]{dual-sort},
 \csopt[2]{dual-sort-number-pad},
-\csopt[none]{dual-break-at}
 \end{codeenv}
 This method doesn't work as well as the method used in
-\exfile{sample-chemical.tex} as I can't separate the capitals,
+\exfile{sample-chemical.tex} as it doesn't separate the capitals,
 digits and lower case characters in the way that can be achieved with the
-letter-number methods.
+letter-number methods. An improvement can be made by changing the
+break-points. I could use \csopt[upper-upper]{dual-break-at} but
+this would put \qt{seal} before \qt{sea lion} in the \code{animal}
+glossary, so instead I've used:
+\begin{codeenv}
+\csopt[upper-upper-word]{dual-break-at}
+\end{codeenv}
+This now puts \qt{sea lion} before \qt{seal}. Unfortunately the word
+break points will cause a break at the markers used to indicate
+positive and negative numbers that are inserted with
+\csopt{dual-sort-number-pad}, so these need to be changed to
+something that won't cause them to be discarded:
+\begin{codeenv}
+\csopt[0]{dual-sort-pad-minus},
+\csopt[1]{dual-sort-pad-plus}
+\end{codeenv}
 
 The document loads \sty{hyperref} which means that all the \cs{gls}
 references will create hyperlinks. Since the primaries are in the
@@ -14654,6 +14726,77 @@ fixed by setting \csopt{cs-label-prefix} to the same value as
 \begin{codeenv}
 \csopt[\empty]{cs-label-prefix}
 \end{codeenv}
+The index is displayed using the \glostyle{bookindex} style. This
+doesn't show the description or symbol by default, but it would be
+useful to include the symbol in parentheses after the name. This can
+be done by redefining \ics{glsxtrbookindexname}:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}{\space(\glossentrysymbol{#1})}{}%
+}
+\end{verbatim}
+However the chemical forumlae look a little odd in parentheses
+(especially those that contain parenthetical parts) but this can be
+fixed by adding a category check:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}%
+  {%
+    \glsifcategory{#1}{chemical}%
+    {, \glossentrysymbol{#1}}%
+    {\space(\glossentrysymbol{#1})}%
+  }%
+  {}%
+}
+\end{verbatim}
+Unfortunately \ics{glossentrysymbol} doesn't pick up the
+\catattr{glossnamefont} attribute, so if the short form of the
+abbreviations is saved in the \field{symbol} field, using one of the
+methods discussed above, then the custom \csfmt{bacteriafont} won't
+be applied. A simple solution is to use \ics{glossentrynameother}
+instead:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}%
+  {%
+    \glsifcategory{#1}{chemical}%
+    {, \glossentrysymbol{#1}}%
+    {\space(\glossentrynameother{#1}{symbol})}%
+  }%
+  {}%
+}
+\end{verbatim}
+However, since I decided not to store the short form in the
+\field{symbol} field and just saved the dual entry label instead, I
+need to lookup the short form from the dual entry:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}%
+  {%
+    \glsifcategory{#1}{chemical}%
+    {, \glossentrysymbol{#1}}%
+    {\space(\glossentrynameother{#1}{symbol})}%
+  }%
+  {%
+    \glsifcategory{#1}{markuplanguage}%
+    {%
+      \glsxtrifhasfield{short}{\glsxtrusefield{#1}{dual}}%
+      {\space(\glscurrentfieldvalue)}%
+      {}%
+    }%
+    {}%
+  }%
+}
+\end{verbatim}
+Not all of the markup languages are abbreviations so this uses
+\ics{glsxtrifhasfield} to check if the \field{short} field is set.
+The dual entry's label is easily obtained because \csopt{dual-field}
+has provided the \fieldfmt{dual} internal field and set it to the
+corresponding label.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -14661,17 +14804,23 @@ pdflatex sample-multi
 bib2gls --group sample-multi
 pdflatex sample-multi
 \end{verbatim}
-The resulting document is shown in \figureref{fig:sample-multi.pdf}.
+The resulting document is shown in \figureref{fig:sample-multi.pdf}
+and \figureref{fig:sample-multi.pdf2}.
 
 \lstinputlisting[firstline=5]{../examples/sample-multi.tex}
 
 \begin{figure}[p]
 \figcontents
-{%
- \frame{\includegraphics[height=.9\textheight]{../examples/sample-multi.pdf}}%
-}
-{\caption{\filefmt{sample-multi.pdf}}}
+{\pdftwocol{../examples/sample-multi.pdf}{4}}
+{\caption{\filefmt{sample-multi.pdf} (pages~1 to~4)}}
 {fig:sample-multi.pdf}
+\end{figure}
+
+\begin{figure}[p]
+\figcontents
+{\pdftwocol[5]{../examples/sample-multi.pdf}{8}}
+{\caption{\filefmt{sample-multi.pdf} (pages~5 to 8)}}
+{fig:sample-multi.pdf2}
 \end{figure}
 
 

@@ -7,6 +7,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[version=4]{mhchem}
+\usepackage{siunitx}
 \usepackage[colorlinks]{hyperref}
 
 \usepackage[record,% use bib2gls
@@ -25,12 +26,15 @@
 \newglossary*{mineral}{Minerals}
 \newglossary*{animal}{Animals}
 \newglossary*{chemical}{Chemical Formula}
+\newglossary*{baseunit}{SI Units}
+\newglossary*{derivedunit}{Derived Units}
 
 % abbreviation styles must be set before \GlsXtrLoadResources:
 \setabbreviationstyle[bacteria]{long-only-short-only}
 \setabbreviationstyle[markuplanguage]{long-short-desc}
 
-% style-dependent name format must be set before \GlsXtrLoadResources:
+% style-dependent name format must be set
+% before \GlsXtrLoadResources:
 \renewcommand*{\glsxtrlongshortdescname}{%
   \protect\protect\glsabbrvfont{\the\glsshorttok}\space
   \glsxtrparen{\glslongfont{\the\glslongtok}}%
@@ -38,7 +42,7 @@
 
 \GlsXtrLoadResources[
  src={bacteria,markuplanguages,vegetables,minerals,
-  animals,chemicalformula},
+  animals,chemicalformula,baseunits,derivedunits},
  selection={recorded and deps and see},
  set-widest,
  type=index,
@@ -46,12 +50,15 @@
  dual-prefix={},
  cs-label-prefix={},
  combine-dual-locations={primary},
+ dual-field,
  sort={en},
  sort-field={name},
  dual-type={same as category},
  dual-sort={en},
  dual-sort-number-pad={2},
- dual-break-at=none,
+ dual-sort-pad-plus={1},
+ dual-sort-pad-minus={0},
+ dual-break-at=upper-upper-word,
  entry-type-aliases={
   abbreviation=dualindexabbreviation,
   entry=dualindexentry,
@@ -74,7 +81,21 @@
 
 \renewcommand*{\glsxtrbookindexname}[1]{%
   \glossentryname{#1}%
-  \ifglshassymbol{#1}{\space(\glossentrysymbol{#1})}{}%
+  \ifglshassymbol{#1}%
+  {%
+    \glsifcategory{#1}{chemical}%
+    {, \glossentrysymbol{#1}}%
+    {\space(\glossentrynameother{#1}{symbol})}%
+  }%
+  {%
+    \glsifcategory{#1}{markuplanguage}%
+    {%
+      \glsxtrifhasfield{short}{\glsxtrusefield{#1}{dual}}%
+      {\space(\glscurrentfieldvalue)}%
+      {}%
+    }%
+    {}%
+  }%
 }
 
 \begin{document}
@@ -105,11 +126,12 @@
 
 \section{Minerals}
 \Gls{beryl}, \gls{amethyst}, \gls{chalcedony}, \gls{aquamarine},
-\gls{aragonite}, \gls{calcite}, \gls{bilinite}, \gls{cyanotrichite},
-\gls{biotite}, \gls{dolomite}, \gls{quetzalcoatlite}, \gls{vulcanite}.
+\gls{aragonite}, \gls{calcite}, \gls{bilinite}, 
+\gls{cyanotrichite}, \gls{biotite}, \gls{dolomite}, 
+\gls{quetzalcoatlite}, \gls{vulcanite}.
 
 \section{Animals}
-\Gls{duck}, \gls{parrot}, \gls{hedgehog}.
+\Gls{duck}, \gls{parrot}, \gls{hedgehog}, \gls{sealion}.
 
 \section{Chemicals}
 \gls{Al2SO43}, \gls{H2O}, \gls{C6H12O6},
@@ -119,12 +141,19 @@
 \gls{C8H10N4O2}, \gls{SO2}, \gls{S2O72-}, \gls{SbBr3},
 \gls{Sc2O3}, \gls{Zr3PO44}, \gls{ZnF2}.
 
+\section{SI Units}
+Base: \gls{ampere}, \gls{kilogram}, \gls{metre}, \gls{second},
+\gls{kelvin}, \gls{mole}, \gls{candela}.
+Derived: \gls{area}, \gls{volume}, \gls{velocity},
+\gls{acceleration}, \gls{density}, \gls{luminance},
+\gls{specificvolume}, \gls{concentration}, \gls{wavenumber}.
+
 \chapter*{Glossaries}
 \printunsrtglossary[type=bacteria,style=mcoltree]
 \printunsrtglossary[type=markuplanguage,style=altlist]
 \printunsrtglossary[type=vegetable,style=tree,nogroupskip]
 \printunsrtglossary[type=mineral,style=treegroup]
-\printunsrtglossary[type=animal,style=tree,nogroupskip]
+\printunsrtglossary[type=animal,style=tree]
 \printunsrtglossary*[type=chemical,style=mcolalttreegroup]
 {%
   \renewcommand\glsxtralttreeSymbolDescLocation[2]{%
@@ -133,6 +162,8 @@
   \renewcommand*{\glstreenamefmt}[1]{#1}%
   \renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
 }
+\printunsrtglossary[type=baseunit,style=alttree]
+\printunsrtglossary[type=derivedunit,style=alttree]
 
 \setupglossaries{section=chapter}
 \printunsrtglossary[type=index,style=bookindex]

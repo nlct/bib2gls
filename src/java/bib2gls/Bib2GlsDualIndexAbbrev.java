@@ -194,12 +194,31 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
          writer.println("  \\providecommand*{\\bibglsuseabbrvfont}[2]{{\\glssetabbrvfmt{#2}\\glsabbrvfont{#1}}}");
          writer.println("}%");
 
+         writer.println("\\ifdef\\glsuselongfont");
+         writer.println("{%");
+         writer.println("  \\providecommand*{\\bibglsuselongfont}{\\glsuselongfont}");
+         writer.println("}%");
+         writer.println("{%");
+         writer.println("  \\providecommand*{\\bibglsuselongfont}[2]{{\\glssetabbrvfmt{#2}\\glslongfont{#1}}}");
+         writer.println("}%");
+
          // syntax: {label}{duallabel}{opts}{name}{short}{long}{description}
 
          writer.format("\\providecommand{\\%s}[7]{%%%n", getCsName());
 
          writer.println("  \\longnewglossaryentry*{#1}{%");
-         writer.println("      name={\\protect\\bibglsuseabbrvfont{#4}{\\glscategory{#2}}},%");
+         writer.print("      name={\\protect");
+
+         if (resource.getAbbrevDefaultNameField().equals("short"))
+         {
+            writer.print("\\bibglsuseabbrvfont");
+         }
+         else
+         {
+            writer.print("\\bibglsuselongfont");
+         }
+
+         writer.println("{#4}{\\glscategory{#2}}},%");
          writer.println("      category={index},#3}{}%");
       }
       else

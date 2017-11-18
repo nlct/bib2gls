@@ -1505,72 +1505,17 @@ public class GlsResource
          }
          else if (opt.equals("break-at"))
          {
-            String val = getChoice(parser, list, opt, "none", "word",
-              "character", "sentence");
-
-            if (val.equals("none"))
-            {
-               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_NONE);
-            }
-            else if (val.equals("word"))
-            {
-               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_WORD);
-            }
-            else if (val.equals("character"))
-            {
-               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_CHAR);
-            }
-            else if (val.equals("sentence"))
-            {
-               sortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_SENTENCE);
-            }
-
+            sortSettings.setBreakPoint(getBreakAt(parser, list, opt));
             dualSortSettings.setBreakPoint(sortSettings.getBreakPoint());
             secondarySortSettings.setBreakPoint(sortSettings.getBreakPoint());
          }
          else if (opt.equals("dual-break-at"))
          {
-            String val = getChoice(parser, list, opt, "none", "word",
-              "character", "sentence");
-
-            if (val.equals("none"))
-            {
-               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_NONE);
-            }
-            else if (val.equals("word"))
-            {
-               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_WORD);
-            }
-            else if (val.equals("character"))
-            {
-               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_CHAR);
-            }
-            else if (val.equals("sentence"))
-            {
-               dualSortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_SENTENCE);
-            }
+            dualSortSettings.setBreakPoint(getBreakAt(parser, list, opt));
          }
          else if (opt.equals("secondary-break-at"))
          {
-            String val = getChoice(parser, list, opt, "none", "word",
-              "character", "sentence");
-
-            if (val.equals("none"))
-            {
-               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_NONE);
-            }
-            else if (val.equals("word"))
-            {
-               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_WORD);
-            }
-            else if (val.equals("character"))
-            {
-               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_CHAR);
-            }
-            else if (val.equals("sentence"))
-            {
-               secondarySortSettings.setBreakPoint(Bib2GlsEntryComparator.BREAK_SENTENCE);
-            }
+            secondarySortSettings.setBreakPoint(getBreakAt(parser, list, opt));
          }
          else if (opt.equals("break-marker"))
          {
@@ -3146,10 +3091,13 @@ public class GlsResource
       {
          return Bib2GlsEntryLetterNumberComparator.NUMBER_FIRST;
       }
-      else// if (val.equals("last"))
+      else if (val.equals("last"))
       {
          return Bib2GlsEntryLetterNumberComparator.NUMBER_LAST;
       }
+
+      // shouldn't happen
+      throw new IllegalArgumentException("Invalid letter number rule");
    }
 
    private int getLetterNumberPuncRule(TeXParser parser, KeyValList list,
@@ -3198,10 +3146,58 @@ public class GlsResource
       {
          return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_FIRST_SPACE_ZERO_MATCH_NEXT;
       }
-      else // if (val.equals("punc-last-space-zero-match-next"))
+      else if (val.equals("punc-last-space-zero-match-next"))
       {
          return Bib2GlsEntryLetterNumberComparator.PUNCTUATION_LAST_SPACE_ZERO_MATCH_NEXT;
       }
+
+      // shouldn't happen
+      throw new IllegalArgumentException("Invalid letter number punc rule");
+   }
+
+   private int getBreakAt(TeXParser parser, KeyValList list,
+     String opt)
+   throws IOException
+   {
+      String val = getChoice(parser, list, opt, "none", "word",
+        "character", "sentence", "upper-notlower", "upper-upper", 
+        "upper-notlower-word", "upper-upper-word");
+
+      if (val.equals("none"))
+      {
+         return Bib2GlsEntryComparator.BREAK_NONE;
+      }
+      else if (val.equals("word"))
+      {
+         return Bib2GlsEntryComparator.BREAK_WORD;
+      }
+      else if (val.equals("character"))
+      {
+         return Bib2GlsEntryComparator.BREAK_CHAR;
+      }
+      else if (val.equals("sentence"))
+      {
+         return Bib2GlsEntryComparator.BREAK_SENTENCE;
+      }
+      else if (val.equals("upper-notlower"))
+      {
+         return Bib2GlsEntryComparator.BREAK_UPPER_NOTLOWER;
+      }
+      else if (val.equals("upper-upper"))
+      {
+         return Bib2GlsEntryComparator.BREAK_UPPER_UPPER;
+      }
+      else if (val.equals("upper-notlower-word"))
+      {
+         return Bib2GlsEntryComparator.BREAK_UPPER_NOTLOWER_WORD;
+      }
+      else if (val.equals("upper-upper-word"))
+      {
+         return Bib2GlsEntryComparator.BREAK_UPPER_UPPER_WORD;
+      }
+
+      // shouldn't happen
+      throw new IllegalArgumentException("Invalid break at setting: "+val);
    }
 
    public static TeXObjectList trimList(TeXObjectList list)
