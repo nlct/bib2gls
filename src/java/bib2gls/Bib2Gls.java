@@ -1463,24 +1463,23 @@ public class Bib2Gls implements TeXApp
       addField("duallong");
       addField("duallongplural");
 
-      for (int i = 0; i < glsresources.size(); i++)
-      {
-         currentResource = glsresources.get(i);
-
-         // parse all the bib files
-         currentResource.parse(parser);
-      }
-
-      currentResource = null;
+      /*
+       * v1.0 and below had separate loops for parsing and
+       * processing to allow for cross-references across
+       * different resource sets, but this causes all kinds
+       * of complications, with changes in prefixes etc and
+       * redefining commands in preambles, so v1.1 no longer
+       * allows cross-references across different resource sets. 
+       */ 
 
       int count = 0;
 
-      // the data needs processing in a separate loop in case of
-      // unrecorded cross-references across different bib files.
-
       for (int i = 0; i < glsresources.size(); i++)
       {
          currentResource = glsresources.get(i);
+
+         // parse all the bib files for this resource set
+         currentResource.parse(parser);
 
          // If 'master' option was used, n will be -1
          int n = currentResource.processData();
@@ -3596,8 +3595,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.0.20171118 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-18";
+   public static final String VERSION = "1.0.20171119 (EXPERIMENTAL)";
+   public static final String DATE = "2017-11-19";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
