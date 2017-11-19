@@ -655,6 +655,18 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      String idField = resource.getSaveOriginalIdField();
+
+      if (idField != null && bib2gls.isKnownField(idField))
+      {
+         BibUserString bibVal = new BibUserString(
+            parser.getListener().createString(getOriginalId()));
+         BibValueList val = new BibValueList();
+         val.add(bibVal);
+         putField(idField, val);
+         putField(idField, getOriginalId());
+      }
+
       Vector<String> fields = bib2gls.getFields();
 
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
@@ -804,7 +816,7 @@ public class Bib2GlsEntry extends BibEntry
       {
          BibValueList value = getField(field);
 
-         if (value != null)
+         if (value != null && !field.equals(idField))
          {
             // expand any variables
 

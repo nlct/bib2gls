@@ -69,13 +69,17 @@
  field-aliases={
    identifier=category,
    formula=symbol,
-   chemicalname=name
+   chemicalname=name,
+   unitname=name,
+   unitsymbol=symbol,
+   measurement=description
  },
 ]
 
 \newcommand{\bacteriafont}[1]{\emph{#1}}
 \glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
 \glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
 
 \glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
 

@@ -57,7 +57,6 @@ public class GlsResource
       throws IOException,InterruptedException,
              Bib2GlsException,IllegalArgumentException
    {
-
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
       TeXPath texPath = new TeXPath(parser, 
@@ -812,6 +811,19 @@ public class GlsResource
          else if (opt.equals("record-label-prefix"))
          {
             recordLabelPrefix = getOptional(parser, list, opt);
+         }
+         else if (opt.equals("save-original-id"))
+         {
+            saveOriginalId = getOptional(parser, list, opt);
+
+            if (saveOriginalId == null || saveOriginalId.isEmpty())
+            {
+               saveOriginalId = "originalid";
+            }
+            else if (saveOriginalId.equals("false"))
+            {
+               saveOriginalId = null;
+            }
          }
          else if (opt.equals("sort-suffix"))
          {
@@ -1675,6 +1687,9 @@ public class GlsResource
              bib2gls.getMessage("error.syntax.unknown_option", opt));
          }
       }
+
+      bib2gls.verbose(bib2gls.getMessage("message.initialising.resource",
+        texFile.getName()));
 
       if (csLabelPrefix == null)
       {
@@ -3308,6 +3323,9 @@ public class GlsResource
    public void parse(TeXParser parser)
    throws IOException
    {
+      bib2gls.verbose(bib2gls.getMessage("message.parsing.resource",
+        texFile.getName()));
+
       stripUnknownFieldPatterns();
 
       bibData = new Vector<Bib2GlsEntry>();
@@ -3824,10 +3842,16 @@ public class GlsResource
    {
       if (masterGlsTeXPath == null)
       {
+         bib2gls.verbose(bib2gls.getMessage("message.processing.resource",
+           texFile));
+
          return processBibData();
       }
       else
       {
+         bib2gls.verbose(bib2gls.getMessage("message.processing.resource",
+           masterGlsTeXPath));
+
          processMaster();
          return -1;
       }
@@ -4447,6 +4471,12 @@ public class GlsResource
 
       processData(bibData, entries, sortSettings.getMethod());
 
+      if (bib2gls.getVerboseLevel() > 0)
+      {
+         bib2gls.logMessage(bib2gls.getChoiceMessage("message.selected", 0,
+            "entry", 3, entries.size()));
+      }
+
       Vector<Bib2GlsEntry> dualEntries = null;
 
       int entryCount = entries.size();
@@ -4488,6 +4518,12 @@ public class GlsResource
          processDeps(dualData, dualEntries);
 
          entryCount += dualEntries.size();
+
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getChoiceMessage(
+               "message.dual.selected", 0, "entry", 3, dualEntries.size()));
+         }
       }
 
       sortDataIfRequired(entries, sortSettings, "group");
@@ -5141,6 +5177,12 @@ public class GlsResource
      throws IOException
    {
       entry.writeBibEntry(writer);
+
+      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId))
+      {
+         writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+           entry.getId(), saveOriginalId, entry.getOriginalId());
+      }
 
       if (saveLocList)
       {
@@ -6867,6 +6909,11 @@ public class GlsResource
       return val == null ? entryType : val;
    }
 
+   public String getSaveOriginalIdField()
+   {
+      return saveOriginalId;
+   }
+
    public boolean hasFieldAliases()
    {
       return fieldAliases != null;
@@ -7139,6 +7186,8 @@ public class GlsResource
    private String supplementalCategory=null;
 
    private String groupField = null;
+
+   private String saveOriginalId = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE=1;

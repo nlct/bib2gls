@@ -75,6 +75,8 @@
 \newcommand{\glsxtrpostnameenvironment}{\space environment}
 \newcommand{\glsxtrpostnamecounter}{\space counter}
 
+\setabbreviationstyle[common]{short-nolong}
+
 \GlsXtrLoadResources[
   label-prefix={idx.},
   save-loclist=false,
@@ -84,7 +86,6 @@
   loc-prefix={comma},
   match-action={add},
   match={{category}={.*field}},
-  %max-loc-diff=3,
   dual-prefix={},
   dual-type={main},
   combine-dual-locations={primary}
@@ -6396,6 +6397,18 @@ entry or field don't exist, but note that \ics{glsxtrifhasfield}
 implicitly scopes its content. Use the starred version to omit the
 grouping.)
 
+\optsection{save-original-id}
+
+The \meta{value} may be either the keyword \code{false} or
+the name of an internal field in which to store the entry's original
+label (as given in the \ext{bib} file). The default setting is
+\csopt[false]{save-original-id}. If \meta{value} is omitted,
+\csopt[originalid]{save-original-id} is assumed.
+
+If \meta{value} is a known field, it will be set after the field
+aliases, otherwise it will simply be added to the \ext{glstex} file
+using \ics{GlsXtrSetField} after the entry definition. 
+
 \section{Plurals}
 \label{sec:plurals}
 
@@ -12001,18 +12014,20 @@ The contents of \filefmt{bacteria.bib} are as follows:
 
 \filesection{baseunits.bib}
 
-The \exfile{baseunits.bib} file contains base SI units. The entries
-are all defined using \atentry{symbol} with a \field{name},
-\field{symbol} and \field{description} field. The \field{symbol}
-fields all use \ics{si} provided by the \isty{siunitx} package, so
-that package must be loaded in the document. This is one of the
-small number of packages recognised by \bibgls, so it's possible to
-sort according to the symbol if required. Remember that
-\atentry{symbol} entry types use the label as the fallback field for
-\field{sort}. In this case the labels all happen to match the
-\field{name}.
+The \exfile{baseunits.bib} file contains base \glspl{SIunit}. The entries
+are all defined using \atentry{symbol} but have custom fields
+\fieldfmt{unitname}, \fieldfmt{unitsymbol} and \field{measurement},
+one of which must be aliased or copied to \field{name}. The others
+may be aliased or copied to \field{symbol} and \field{description}
+as required. The \field{unitsymbol} fields all use \ics{si} provided
+by the \isty{siunitx} package, so that package must be loaded in the
+document. This is one of the small number of packages recognised by
+\bibgls, so it's possible to sort according to the symbol if
+required. Remember that \atentry{symbol} entry types use the label
+as the fallback field for \field{sort}. In this case the labels all
+happen to match the \field{name}.
 
-The entries all have a custom field \fieldfmt{identifier} set to 
+The entries also all have a custom field \fieldfmt{identifier} set to 
 \code{baseunit}. This will be ignored by \bibgls\ unless it's
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
 aliased with \csopt{field-aliases}.
@@ -13000,6 +13015,14 @@ so I've changed the fallback:
 \begin{codeenv}
 \csopt[name]{symbol-sort-fallback}
 \end{codeenv}
+The custom fields need to be aliased:
+\begin{codeenv}
+\csopt[
+  unitname=name,
+  unitsymbol=symbol,
+  measurement=description
+]{field-aliases}
+\end{codeenv}
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -13028,6 +13051,15 @@ glossary titles. This overrides the default \ics{chapter*} which is
 used with book or report type of classes. I've also used the
 \styopt{nomain} option to suppress the creation of the main glossary
 as I want to define my own glossary types instead.
+
+As before the custom fields need to be aliased:
+\begin{codeenv}
+\csopt[
+  unitname=name,
+  unitsymbol=symbol,
+  measurement=description
+]{field-aliases}
+\end{codeenv}
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -13067,9 +13099,18 @@ locale collator, but the dual entries need a sort method that's
 better suited to symbols. Fortunately, \bibgls\ has some (very
 limited) support for \isty{siunitx} and is able to interpret
 the \ics{si} commands in the sample \ext{bib} files. Since 
-SI units are a mix of letters and numbers I've used one of the
+\glspl{SIunit} are a mix of letters and numbers I've used one of the
 letter-number methods listed in
 \tableref{tab:sortoptionsletternumber}.
+
+As before the custom fields need to be aliased:
+\begin{codeenv}
+\csopt[
+  unitname=name,
+  unitsymbol=symbol,
+  measurement=description
+]{field-aliases}
+\end{codeenv}
 
 I've decided to define a custom style for the first glossary. Since
 it's based on the \glostyle{long3col-booktabs} style I need to 
@@ -14456,7 +14497,7 @@ been referenced on page~1, the location lists are all simply~\qt{1}.
 {fig:sample-usergroups.pdf}
 \end{figure}
 
-\filesection{sample-multi.tex}
+\filesection{sample-multi1.tex}
 
 This example uses \exfile{bacteria.bib},
 \exfile{markuplanguages.bib}, \exfile{vegetables.bib}, \exfile{minerals.bib},
@@ -14540,6 +14581,12 @@ attributes may be set after definition:
 \glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
 \glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
 \end{verbatim}
+The description font also needs to be set since this will contain
+the long form:
+\begin{verbatim}
+\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
+\end{verbatim}
+
 The \code{markuplanguage} glossary contains descriptions and some
 long names, so it's better suited to the \glostyle{altlist} style,
 in which case the descriptions would look better if they started
@@ -14609,12 +14656,16 @@ the sort fallback for symbols:
 \csopt[name]{symbol-sort-fallback}
 \end{codeenv}
 I also need to alias the custom fields (especially for those in the
-\exfile{chemicalformula.bib} file):
+\exfile{chemicalformula.bib}, \exfile{baseunits.bib} and
+\exfile{derivedunits} files):
 \begin{codeenv}
 \csopt[
   identifier=category,
   formula=symbol,
-  chemicalname=name
+  chemicalname=name,
+  unitname=name,
+  unitsymbol=symbol,
+  measurement=description
 ]{field-aliases}
 \end{codeenv}
 There's a slight problem here. This ensures that the entries defined
@@ -14821,29 +14872,205 @@ corresponding label.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
-pdflatex sample-multi
-bib2gls --group sample-multi
-pdflatex sample-multi
+pdflatex sample-multi1
+bib2gls --group sample-multi1
+pdflatex sample-multi1
 \end{verbatim}
-The resulting document is shown in \figureref{fig:sample-multi.pdf}
-and \figureref{fig:sample-multi.pdf2}.
+The resulting document is shown in \figureref{fig:sample-multi1.pdf}
+and \figureref{fig:sample-multi1.pdf2}.
 
-\lstinputlisting[firstline=5]{../examples/sample-multi.tex}
+\lstinputlisting[firstline=5]{../examples/sample-multi1.tex}
 
 \begin{figure}[p]
 \figcontents
-{\pdftwocol{../examples/sample-multi.pdf}{4}}
-{\caption{\filefmt{sample-multi.pdf} (pages~1 to~4)}}
-{fig:sample-multi.pdf}
+{\pdftwocol{../examples/sample-multi1.pdf}{4}}
+{\caption{\filefmt{sample-multi1.pdf} (pages~1 to~4)}}
+{fig:sample-multi1.pdf}
 \end{figure}
 
 \begin{figure}[p]
 \figcontents
-{\pdftwocol[5]{../examples/sample-multi.pdf}{8}}
-{\caption{\filefmt{sample-multi.pdf} (pages~5 to 8)}}
-{fig:sample-multi.pdf2}
+{\pdftwocol[5]{../examples/sample-multi1.pdf}{8}}
+{\caption{\filefmt{sample-multi1.pdf} (pages~5 to 8)}}
+{fig:sample-multi1.pdf2}
 \end{figure}
 
+\filesection{sample-multi2.tex}
+
+This example is an alternative approach to
+\exfile{sample-multi1.tex}. Instead of using dual entry types to
+define entries that appear in both a glossary and the index, this
+example makes use of \csopt{record-label-prefix} to reselect the
+recorded entries for the index. This allows the entries that have
+natural word ordering to use a locale sort method while and the
+entries that are symbolic can use one of the letter-number sort
+methods.
+
+This document uses some additional \ext{bib} files as it has some
+extra glossaries, which all need to be defined:
+\begin{verbatim}
+\newglossary*{bacteria}{Bacteria}
+\newglossary*{markuplanguage}{Markup Languages}
+\newglossary*{vegetable}{Vegetables}
+\newglossary*{mineral}{Minerals}
+\newglossary*{animal}{Animals}
+\newglossary*{chemical}{Chemical Formula}
+\newglossary*{baseunit}{SI Units}
+\newglossary*{derivedunit}{Derived Units}
+\newglossary*{film}{Films}
+\newglossary*{book}{Books}
+\newglossary*{person}{People}
+\end{verbatim}
+Since this document requires \exfile{people.bib}, \exfile{books.bib}
+and \exfile{films.bib} it also requires
+\exfile{no-interpret-preamble.bib} and either
+\exfile{interpret-preamble.bib} or \exfile{interpret-preamble2.bib}
+to ensure the custom commands are provided.
+
+The first resource set to be loaded simply reads
+\exfile{no-interpret-preamble.bib} with the preamble interpreter
+switched off:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[no-interpret-preamble]{src},
+  \csopt[false]{interpret-preamble}
+}
+\end{codeenv}
+This ensures that \LaTeX\ can pick up the provided commands and
+prevents them from being added to the interpreter. The
+\exfile{people.bib} file is the next to be loaded with
+\exfile{interpret-preamble.bib}. This is loaded separately from the
+other resources as this needs the \field{name} field to be copied to
+\field{first} (if not already set), as in the
+\exfile{sample-people.tex} file. By having a separate resource set,
+this setting doesn't affect the other entries:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[interpret-preamble,people]{src},
+ \csopt[
+   identifier=category,
+   born=user1,
+   died=user2,
+   othername=user3
+ ]{field-aliases},
+ \csopt[name=\marg{first}]{replicate-fields},
+ \csopt[person]{type},
+ \csopt[false]{save-locations}
+}
+\end{codeenv}
+Note that unlike \exfile{sample-people.tex} which had
+\csopt[people]{category}, this obtains the \field{category} field
+from the custom \fieldfmt{identifier} field, which in this case 
+has the value \code{person}. This means that the category hooks from
+\exfile{sample-people.tex} need to be renamed to reflect the
+different category label:
+\begin{verbatim}
+\newcommand*{\glsxtrpostlinkperson}{%
+ \glsxtrifwasfirstuse
+ {%
+   \ifglshasfield{user3}{\glslabel}%
+   {\space(\glscurrentfieldvalue)}%
+   {}%
+ }%
+ {}%
+}
+
+\newcommand*{\glsxtrpostnameperson}{%
+ \ifglshasfield{user3}{\glscurrententrylabel}%
+ {\space(\glscurrentfieldvalue)}%
+ {}%
+}
+
+\newcommand*{\glsxtrpostdescperson}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}
+ {% born
+   \space(\glscurrentfieldvalue\,--\,%
+     \ifglshasfield{user2}{\glscurrententrylabel}
+     {% died
+        \glscurrentfieldvalue
+     }%
+     {}%
+   )%
+ }%
+ {}%
+}
+\end{verbatim}
+The other \ext{bib} files that require locale sorting can now be
+loaded, but remember that the abbreviation style settings must be
+set first since this resource set includes abbreviations:
+\begin{verbatim}
+\setabbreviationstyle[bacteria]{long-only-short-only}
+\setabbreviationstyle[markuplanguage]{long-short-desc}
+
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+}
+\end{verbatim}
+Now the resource set can be loaded:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[bacteria,markuplanguages,vegetables,
+  minerals,animals,books,films]{src},
+ \csopt[identifier=category]{field-aliases},
+ \csopt[same as category]{type},
+ \csopt[false]{save-locations}
+}
+\end{codeenv}
+The semantic markup command and attributes are as for
+\exfile{sample-multi1.tex}:
+\begin{verbatim}
+\newcommand{\bacteriafont}[1]{\emph{#1}}
+\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
+\glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
+\end{verbatim}
+Next come the entries with symbolic names, which require a
+letter-number sort:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[chemicalformula,baseunits,derivedunits]{src},
+ \csopt[
+   identifier=category,
+   formula=name,
+   chemicalname=description,
+   unitname=symbol,
+   unitsymbol=name,
+   measurement=description,
+ ]{field-aliases},
+ \csopt[same as category]{type},
+ \csopt{set-widest},
+ \csopt[letternumber-upperlower]{sort},
+ \csopt[name]{symbol-sort-fallback},
+ \csopt[false]{save-locations}
+}
+\end{codeenv}
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-multi2
+bib2gls --group sample-multi2
+pdflatex sample-multi2
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-multi2.pdf}
+and \figureref{fig:sample-multi2.pdf2}.
+
+\lstinputlisting[firstline=5]{../examples/sample-multi2.tex}
+
+\begin{figure}[p]
+\figcontents
+{\pdftwocol{../examples/sample-multi2.pdf}{4}}
+{\caption{\filefmt{sample-multi2.pdf} (pages~1 to~4)}}
+{fig:sample-multi2.pdf}
+\end{figure}
+
+\begin{figure}[p]
+\figcontents
+{\pdftwocol[5]{../examples/sample-multi2.pdf}{8}}
+{\caption{\filefmt{sample-multi2.pdf} (pages~5 to 8)}}
+{fig:sample-multi2.pdf2}
+\end{figure}
 
 \printcommandsummary
 

@@ -27,43 +27,89 @@
 \newglossary*{animal}{Animals}
 \newglossary*{chemical}{Chemical Formula}
 \newglossary*{baseunit}{SI Units}
-\newglossary*{derivedunit}{Derived Units}
+\newglossary*{measurement}{Measurements}
+\newglossary*{film}{Films}
+\newglossary*{book}{Books}
+\newglossary*{person}{People}
 
-% abbreviation styles must be set before \GlsXtrLoadResources:
+\GlsXtrLoadResources[
+  src={no-interpret-preamble},
+  interpret-preamble=false
+]
+
+\GlsXtrLoadResources[
+ src={interpret-preamble,people},
+ field-aliases={
+   identifier=category,
+   born=user1,
+   died=user2,
+   othername=user3
+ },
+ replicate-fields={name={first}},
+ type=person,
+ save-locations=false
+]
+
+% Abbreviation styles must be set before the resource set
+% that defines the abbreviations:
 \setabbreviationstyle[bacteria]{long-only-short-only}
 \setabbreviationstyle[markuplanguage]{long-short-desc}
 
-% style-dependent name format must be set
-% before \GlsXtrLoadResources:
+% And also the style-dependent name format:
 \renewcommand*{\glsxtrlongshortdescname}{%
   \protect\protect\glsabbrvfont{\the\glsshorttok}\space
   \glsxtrparen{\glslongfont{\the\glslongtok}}%
 }
 
 \GlsXtrLoadResources[
- src={bacteria,markuplanguages,vegetables,minerals,
-  animals},
- selection={recorded and deps},
- field-aliases={
-   identifier=category,
- },
+ src={bacteria,markuplanguages,vegetables,
+  minerals,animals,books,films},
+ field-aliases={identifier=category},
  type={same as category},
- set-widest,
- abbreviation-name-fallback={long},
  save-locations=false
 ]
 
 \GlsXtrLoadResources[
- src={chemicalformula,baseunits,derivedunits},
- selection={recorded and deps},
+ src={chemicalformula},
  field-aliases={
    identifier=category,
    formula=name,
-   chemicalname=description
+   chemicalname=description,
+   unitname=description,
+   unitsymbol=name
  },
  type={same as category},
  set-widest,
  sort={letternumber-upperlower},
+ symbol-sort-fallback={name},
+ save-locations=false
+]
+
+\GlsXtrLoadResources[
+ src={baseunits,derivedunits},
+ field-aliases={
+   unitname=description,
+   unitsymbol=symbol,
+   measurement=name
+ },
+ category={measurement},
+ type={measurement},
+ set-widest,
+ symbol-sort-fallback={name},
+ save-locations=false
+]
+
+\GlsXtrLoadResources[
+ src={baseunits},
+ field-aliases={
+   unitname=description,
+   unitsymbol=name
+ },
+ category={baseunit},
+ type={baseunit},
+ label-prefix={baseunit.},
+ record-label-prefix={baseunit.},
+ set-widest,
  symbol-sort-fallback={name},
  save-locations=false
 ]
@@ -75,12 +121,15 @@
 
 \GlsXtrLoadResources[
  src={terms,bacteria,markuplanguages,vegetables,minerals,
-  animals,chemicalformula,baseunits,derivedunits},
+  animals,chemicalformula,baseunits,derivedunits,people,
+  films,books},
  selection={recorded and deps and see},
  field-aliases={
    identifier=category,
    formula=symbol,
-   chemicalname=name
+   chemicalname=name,
+   unitname=name,
+   unitsymbol=symbol
  },
  label-prefix={idx.},
  record-label-prefix={idx.},
@@ -96,6 +145,37 @@
 
 \glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
 
+\newcommand*{\glsxtrpostlinkperson}{%
+ \glsxtrifwasfirstuse
+ {%
+   \ifglshasfield{user3}{\glslabel}%
+   {\space(\glscurrentfieldvalue)}%
+   {}%
+ }%
+ {}%
+}
+
+\newcommand*{\glsxtrpostnameperson}{%
+ \ifglshasfield{user3}{\glscurrententrylabel}%
+ {\space(\glscurrentfieldvalue)}%
+ {}%
+}
+
+\newcommand*{\glsxtrpostdescperson}{%
+ \ifglshasfield{user1}{\glscurrententrylabel}
+ {% born
+   \space(\glscurrentfieldvalue\,--\,%
+     \ifglshasfield{user2}{\glscurrententrylabel}
+     {% died
+        \glscurrentfieldvalue
+     }%
+     {}%
+   )%
+ }%
+ {}%
+}
+
+
 \renewcommand*{\glsxtrbookindexname}[1]{%
   \glossentryname{#1}%
   \ifglshassymbol{#1}%
@@ -107,6 +187,10 @@
   {}%
 }
 
+\newcommand{\unit}{\glssymbol}
+\newcommand{\measurement}{\gls}
+\glsxtrnewgls{baseunit.}{\baseunit}
+\glsxtrnewgls{film.}{\film}
 \glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
 
 \begin{document}
@@ -147,7 +231,9 @@ This section is about \idxpl{mineral}.
 
 \section{Animals}
 This section is about \idxpl{animal}.
-\Gls{duck}, \gls{parrot}, \gls{hedgehog}, \gls{sealion}.
+\Gls{duck}, \gls{parrot}, \gls{hedgehog}, \gls{sealion}, 
+\gls{zander}, \gls{swan}, \gls{aardvark}, \gls{zebra}, 
+\gls{armadillo}.
 
 \section{Chemicals}
 This section is about \idxpl{chemical}.
@@ -159,25 +245,48 @@ This section is about \idxpl{chemical}.
 \gls{Sc2O3}, \gls{Zr3PO44}, \gls{ZnF2}.
 
 \section{SI Units}
-\Idxpl{baseunit}: \gls{ampere}, \gls{kilogram}, \gls{metre}, 
-\gls{second}, \gls{kelvin}, \gls{mole}, \gls{candela}.
-\Idxpl{derivedunit}: \gls{area}, \gls{volume}, \gls{velocity},
-\gls{acceleration}, \gls{density}, \gls{luminance},
-\gls{specificvolume}, \gls{concentration}, \gls{wavenumber}.
+\Idxpl{baseunit}: \unit{ampere} (measures \measurement{ampere}), 
+\unit{kilogram} (measures \measurement{kilogram}), \unit{metre}, 
+\unit{second}, \unit{kelvin}, \unit{mole}, \unit{candela}.
+\Idxpl{derivedunit}: \unit{area}, \unit{volume},
+\unit{velocity},
+\unit{acceleration}, \unit{density}, \unit{luminance},
+\unit{specificvolume}, \unit{concentration}, \unit{wavenumber}.
+
+\section{Books and Films}
+\Idxpl{book}: \gls{ataleoftwocities} (by \gls{dickens}),
+\gls{thebigsleep} (by \gls{chandler}, \idx{film} adaptation:
+\film{thebigsleep}), \gls{icecoldinalex} (by
+\gls{landon}, \idx{film} adaptation: \film{icecoldinalex}),
+\gls{whydidnttheyaskevans} (by \gls{christie}, 
+\idx{film} adaptation: \film{whydidnttheyaskevans}),
+\gls{doandroidsdreamofelectricsheep} (by \gls{dick},
+inspired the \idx{film} \film{bladerunner}).
 
 \chapter*{Glossaries}
 \printunsrtglossary[type=bacteria,style=mcoltree]
 \printunsrtglossary[type=markuplanguage,style=altlist]
 \printunsrtglossary[type=vegetable,style=tree,nogroupskip]
 \printunsrtglossary[type=mineral,style=treegroup]
-\printunsrtglossary[type=animal,style=tree]
+\printunsrtglossary[type=animal,style=tree,nogroupskip]
+\printunsrtglossary[type=person,style=tree,nogroupskip]
+\printunsrtglossary[type=book,style=tree,nogroupskip]
+\printunsrtglossary[type=film,style=tree,nogroupskip]
 \printunsrtglossary*[type=chemical,style=mcolalttreegroup]
 {%
   \renewcommand*{\glstreenamefmt}[1]{#1}%
   \renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
 }
-\printunsrtglossary[type=baseunit,style=alttree]
-\printunsrtglossary[type=derivedunit,style=alttree]
+\printunsrtglossary*[type=measurement,style=alttree,nogroupskip]
+{%
+  \renewcommand{\glsxtralttreeSymbolDescLocation}[2]{%
+    \glossentrydesc{#1}%
+    \ifglshassymbol{#1}{\space(\glossentrysymbol{#1})}{}%
+    \glspostdescription\glstreeprelocation
+    \glsxtrAltTreePar
+  }%
+}
+\printunsrtglossary[type=baseunit,style=alttree,nogroupskip]
 
 \setupglossaries{section=chapter}
 \printunsrtglossary[type=index,style=bookindex]

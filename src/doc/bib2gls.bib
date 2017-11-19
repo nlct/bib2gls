@@ -22,6 +22,13 @@
  long = {{}\TeX\ Users Group}
 }
 
+@abbreviation{SIunit,
+ short = {SI unit},
+ long = {International System of Units},
+ longplural = {International System of Units},
+ category={common}
+}
+
 @dualindexentry{bibglsnewentry,
   name={\csfmt{bib\-gls\-new\-entry}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
@@ -1000,6 +1007,13 @@ name},
 @dualindexentry{opt.ext-prefixes,
    name={\csoptfmt{ext\dhyphen prefixes}},
    user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.save-original-id,
+   name={\csoptfmt{save\dhyphen original\dhyphen id}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -4323,8 +4337,12 @@ field.},
   name={\filefmt{terms.bib}}
 }
 
-@dualindexentry{file.sample-multi.tex,
-  name={\filefmt{sample\dhyphen multi.tex}}
+@dualindexentry{file.sample-multi1.tex,
+  name={\filefmt{sample\dhyphen multi1.tex}}
+}
+
+@dualindexentry{file.sample-multi2.tex,
+  name={\filefmt{sample\dhyphen multi2.tex}}
 }
 
 @index{glshyperlink,

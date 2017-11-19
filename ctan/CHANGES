@@ -49,6 +49,7 @@ v1.1 (pending):
      - secondary-sort-pad-minus
      - cs-label-prefix
      - record-label-prefix
+     - save-original-id
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and
