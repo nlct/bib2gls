@@ -530,6 +530,10 @@ public class GlsResource
          {
             interpretLabelFields = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("strip-missing-parents"))
+         {
+            stripMissingParents = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("write-preamble"))
          {
             savePreamble = getBoolean(parser, list, opt);
@@ -3401,7 +3405,7 @@ public class GlsResource
    }
 
    public void processBibList(TeXParser parser)
-   throws IOException
+   throws IOException,Bib2GlsException
    {
       bib2gls.verboseMessage("message.processing.resource",
         texFile.getName());
@@ -3517,6 +3521,7 @@ public class GlsResource
                {
                   dual.initCrossRefs(parser);
                }
+
             }
 
             // does this entry have any records?
@@ -4356,6 +4361,13 @@ public class GlsResource
                {
                   if (!entries.contains(entry))
                   {
+                     if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                       ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
+                     {
+                        addHierarchy(entry, entries, data);
+                     }
+
                      entries.add(entry);
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
@@ -7072,11 +7084,18 @@ public class GlsResource
                || !isInterpretLabelFieldsEnabled();
    }
 
+   public boolean isStripMissingParentsEnabled()
+   {
+      return stripMissingParents;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
 
    private boolean interpretLabelFields = false;
+
+   private boolean stripMissingParents = false;
 
    private HashMap<String,String> entryTypeAliases = null;
 

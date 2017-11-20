@@ -1043,6 +1043,14 @@ The mode can only be enabled if the following criteria is satisfied:
 Note that if you don't use either \csopt[recorded and
 deps]{selection} or \csopt[recorded and deps and see]{selection}
 then the dependencies aren't picked up for that \idx{resourceset}.
+Trails don't work with \idxpl{crossresourceref}. For example, if
+entry $A$ has been indexed and depends on entry $B$ that hasn't been
+indexed, then $B$ can be picked up from a different
+\idx{resourceset}, but if $A$ and $B$ are in the same
+\idx{resourceset} and $B$ is dependent on $C$ which is in a
+different \idx{resourceset} then $C$ won't be picked up if it hasn't
+been indexed because $B$ hasn't been indexed and is in a different
+\idx{resourceset}.
 
 If the \idx{crossresourceref} mode is enabled then stage~3 and
 stage~4 are processed in separate loops, otherwise they are
@@ -5374,6 +5382,30 @@ The default setting is \csopt[false]{interpret-label-fields}.
 Note that if this setting is on, cross-resource references aren't
 permitted. This setting has no effect if the interpreter has been
 disabled.
+
+\optsection{strip-missing-parents}
+
+The \sty{glossaries} package requires that all child entries must be
+defined after the parent entry. An error occurs otherwise, so
+\bibgls\ will omit the \field{parent} field if it can't be found in
+the given \idx{resourceset}. However, when the default
+\csopt[false]{strip-missing-parents} is on, this only occurs
+while writing the definitions in the \ext{glstex} file.
+Sorting is performed hierarchically and the \field{group} is set
+accordingly for the top-level entries, which means that an entry
+with a \field{parent} field will be treated by the sort method
+as a child entry. This can lead to a strange result, which \bibgls\
+warns about:
+\begin{alltt}
+Parent '\meta{parent id}' not found for entry \meta{child-id}
+\end{alltt}
+
+This is the default behaviour as it may simply be a result of a
+typing mistake in the \field{parent} field. If you actually want
+missing parents to be stripped before sorting (but after the
+selection process) then use \csopt[true]{strip-missing-parents}. If
+you want all parents stripped then use \csopt{flatten} or
+\csopt[parent]{ignore-fields} instead.
 
 \optsection{abbreviation-name-fallback}
 

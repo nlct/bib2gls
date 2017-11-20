@@ -2436,12 +2436,16 @@ public class Bib2GlsEntry extends BibEntry
      String strValue)
     throws IOException
    {
-      if (strValue == null || strValue.isEmpty())
+      if (strValue == null || strValue.isEmpty() 
+           || !bib2gls.isKnownField("seealso"))
       {
          initAlsoCrossRefs(parser, value);
       }
       else
       {
+         StringBuilder builder = new StringBuilder();
+         String sep = "";
+
          alsocrossRefs = strValue.trim().split("\\s*,\\s*");
 
          for (String label : alsocrossRefs)
@@ -2455,7 +2459,13 @@ public class Bib2GlsEntry extends BibEntry
             }
    
             addDependency(label);
+
+            builder.append(sep);
+            builder.append(label);
+            sep = ",";
          }
+
+         putField("seealso", builder.toString());
       }
    }
 
@@ -2482,13 +2492,6 @@ public class Bib2GlsEntry extends BibEntry
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
-      }
-
-      TeXObjectList expanded = valList.expandfully(parser);
-
-      if (expanded != null)
-      {
-         valList = expanded;
       }
 
       CsvList csvList = CsvList.getList(parser, valList);
@@ -2640,12 +2643,20 @@ public class Bib2GlsEntry extends BibEntry
 
       if (parent == null)
       {
-         bib2gls.warning(bib2gls.getMessage(
-           "warning.cant.find.parent", parentId, entry.getId()));
+         if (resource.isStripMissingParentsEnabled())
+         {
+            entry.removeField("parent");
+            entry.fieldValues.remove("parent");
+         }
+         else
+         {
+            bib2gls.warningMessage(
+              "warning.cant.find.parent", parentId, entry.getId());
+         }
       }
       else
       {
-        addHierarchy(parent, entries);
+         addHierarchy(parent, entries);
       }
    }
 
