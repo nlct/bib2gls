@@ -60,7 +60,7 @@ public class GlsResource
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
       TeXPath texPath = new TeXPath(parser, 
-        arg.toString(parser), "glstex");
+        arg.toString(parser), "glstex", false);
 
       texFile = bib2gls.resolveFile(texPath.getFile());
 

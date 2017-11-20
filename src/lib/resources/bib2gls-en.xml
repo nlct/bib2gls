@@ -225,9 +225,9 @@ Defaulting to: {0}.
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.ignoring.unknown.field">Ignoring unknown field: {0}</entry>
-<entry key="warning.can.find.arg">Can't detect argument for: \{0}</entry>
-<entry key="warning.no.default.sort">Can't determine sort value for: {0}
-(Using sort field ''{1}''.)</entry>
+<entry key="warning.can.find.arg">Can''t detect argument for: \{0}</entry>
+<entry key="warning.no.default.sort">Can''t determine sort value for: {0}
+(Using sort field ''{1}''. Entry type: {2})</entry>
 <entry key="warning.cant.parse.sort">Can''t parse sort value ''{0}'' for: {1}
 </entry>
 <entry key="warning.cant.parse.pattern.sort">Can''t parse sort value ''{0}'' for ''{1}'' (pattern: ''{2}'')

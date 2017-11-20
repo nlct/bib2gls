@@ -26,6 +26,7 @@ import java.util.Vector;
 import java.text.CollationKey;
 
 import com.dickimawbooks.texparserlib.TeXParser;
+import com.dickimawbooks.texparserlib.bib.BibValueList;
 
 public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
 {
@@ -70,6 +71,51 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
       {
          missingFieldWarning(parser, "symbol");
       }
+   }
+
+   public String getFallbackValue(String field)
+   {
+      if (field.equals("sort"))
+      {
+         field = resource.getSymbolDefaultSortField();
+
+         if (field.equals("id"))
+         {
+            return getOriginalId();
+         }
+
+         String val = getFieldValue(field);
+
+         if (val != null)
+         {
+            return val;
+         }
+      }
+
+      return super.getFallbackValue(field);
+   }
+
+   public BibValueList getFallbackContents(String field)
+   {
+      if (field.equals("sort"))
+      {
+         String fallbackField = resource.getSymbolDefaultSortField();
+
+         if (fallbackField.equals("id"))
+         {
+            return getIdField();
+         }
+
+         BibValueList val = getField(fallbackField);
+
+         return val == null ? getFallbackContents(fallbackField) : val;
+      }
+      else if (field.equals("name"))
+      {
+         return getIdField();
+      }
+
+      return super.getFallbackContents(field);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

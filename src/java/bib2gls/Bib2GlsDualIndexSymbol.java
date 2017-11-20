@@ -80,7 +80,21 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
    {
       String val;
 
-      if (field.equals("name"))
+      if (field.equals("sort"))
+      {
+         String fallbackField = isPrimary() ?
+           "name" : resource.getSymbolDefaultSortField();
+
+         if (fallbackField.equals("id"))
+         {
+            return getOriginalId();
+         }
+
+         val = getFieldValue(fallbackField);
+
+         return val == null ? getFallbackValue(fallbackField) : val;
+      }
+      else if (field.equals("name"))
       {
          return getOriginalId();
       }
@@ -90,19 +104,26 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
    public BibValueList getFallbackContents(String field)
    {
-      if (field.equals("name") && bib2gls.useInterpreter())
+      if (field.equals("sort"))
       {
-         String name = getOriginalId();
-         BibValueList list = new BibValueList();
-         list.add(new BibUserString(
-            bib2gls.getInterpreterListener().createGroup(name)));
+         String fallbackField = isPrimary() ?
+           "name" : resource.getSymbolDefaultSortField();
 
-         return list;
+         if (fallbackField.equals("id"))
+         {
+            return getIdField();
+         }
+
+         BibValueList val = getField(fallbackField);
+
+         return val == null ? getFallbackContents(fallbackField) : val;
       }
-      else
+      else if (field.equals("name") && bib2gls.useInterpreter())
       {
-         return super.getFallbackContents(field);
+         return getIdField();
       }
+
+      return super.getFallbackContents(field);
    }
 
    public void writeBibEntry(PrintWriter writer)

@@ -80,7 +80,19 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
    {
       if (field.equals("sort"))
       {
-         return getIdField();
+         field = resource.getSymbolDefaultSortField();
+
+         if (field.equals("id"))
+         {
+            return getIdField();
+         }
+
+         BibValueList val = getField(field);
+
+         if (val != null)
+         {
+            return val;
+         }
       }
 
       return super.getFallbackContents(field);
