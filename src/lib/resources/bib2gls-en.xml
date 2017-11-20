@@ -162,8 +162,13 @@ See the manual for further details.</entry>
 <entry key="message.2.sty">{0,number} recognised packages:</entry>
 
 <entry key="message.initialising.resource">Initialising resource {0}.</entry>
-<entry key="message.parsing.resource">Parsing resource {0}.</entry>
+<entry key="message.parsing.resource.bib">Parsing bib files for resource {0}.</entry>
 <entry key="message.processing.resource">Processing resource {0}.</entry>
+<entry key="message.processing.master">Processing master {0}.</entry>
+<entry key="message.selecting.entries">Selecting entries for resource {0}.</entry>
+<entry key="message.cross-resource.dep.allowed">Cross-resource references allowed.</entry>
+<entry key="message.cross-resource.dep.notallowed">Cross-resource references disabled.</entry>
+<entry key="message.cross-resource.notallowed">Cross-resource references can''t be supported for resource set {0}.</entry>
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>

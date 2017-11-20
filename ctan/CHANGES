@@ -50,6 +50,7 @@ v1.1 (pending):
      - cs-label-prefix
      - record-label-prefix
      - save-original-id
+     - interpret-label-fields
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

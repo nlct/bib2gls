@@ -19,6 +19,7 @@
 package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
+import java.io.File;
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
@@ -32,6 +33,35 @@ public class Bib2GlsBibParser extends BibParser
       super(bib2gls, bibCharset, false);
 
       this.resource = resource;
+
+      init();
+   }
+
+   private void init()
+   {
+      bibParser = new TeXParser(this);
+
+      int atcode = bibParser.getCatCode('@');
+      int hashcode = bibParser.getCatCode('#');
+      int tildecode = TeXParser.TYPE_ACTIVE;
+
+      if (maketildeother)
+      {
+         tildecode = bibParser.getCatCode('~');
+      }
+
+      bibParser.setCatCode('@', TeXParser.TYPE_ACTIVE);
+      bibParser.setCatCode('#', TeXParser.TYPE_OTHER);
+
+      if (maketildeother)
+      {
+         parser.setCatCode('~', TeXParser.TYPE_OTHER);
+      }
+   }
+
+   public TeXParser getParser()
+   {
+      return bibParser;
    }
 
    protected void addPredefined()
@@ -40,6 +70,36 @@ public class Bib2GlsBibParser extends BibParser
       parser.putActiveChar(new Bib2GlsNbsp(resource.useNonBreakSpace()));
    }
 
+   public void parse(File file)
+      throws IOException
+   {
+      parser.parse(file);
+   }
+
+   public void beginParse(File file)
+      throws IOException
+   {
+      super.beginParse(file);
+      currentFile = file;
+   }
+
+   public String getBase()
+   {
+      if (currentFile == null) return null;
+
+      String base = currentFile.getName();
+
+      int idx = base.lastIndexOf(".bib");
+
+      if (idx == -1)
+      {
+         idx = base.toLowerCase().lastIndexOf(".bib");
+      }
+
+      return idx < 0 ? base.substring(0, idx+1) : base;
+   }
 
    private GlsResource resource;
+   private TeXParser bibParser;
+   private File currentFile=null;
 }

@@ -615,11 +615,12 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   public void parseContents(TeXParser parser,
-    TeXObjectList contents, TeXObject endGroupChar)
+   public void parseFields(TeXParser parser)
      throws IOException
    {
-      super.parseContents(parser, contents, endGroupChar);
+      if (fieldsParsed) return;
+
+      fieldsParsed = true;
 
       if (resource.hasFieldAliases())
       {
@@ -837,15 +838,14 @@ public class Bib2GlsEntry extends BibEntry
 
             if (field.equals("parent") || field.equals("category")
                || field.equals("type") || field.equals("group")
-               || field.equals("group") || field.equals("seealso") 
-               || field.equals("alias"))
+               || field.equals("seealso") || field.equals("alias"))
             {
                // fields that should only expand to a simple label
                // (cross-referencing fields processed elsewhere)
 
                String strVal = list.toString(parser);
 
-               if (bib2gls.useInterpreter() 
+               if (resource.isInterpretLabelFieldsEnabled() 
                     && strVal.matches("(?s).*[\\\\\\{\\}].*"))
                {
                   // no point checking for other special characters
@@ -1001,6 +1001,8 @@ public class Bib2GlsEntry extends BibEntry
             putField("name", list.toString(parser));
          }
       }
+
+      initAlias(parser);
    }
 
    protected BibValueList convertBibTeXAuthorField(TeXParser parser,
@@ -2293,19 +2295,19 @@ public class Bib2GlsEntry extends BibEntry
 
    public void initAlias(TeXParser parser) throws IOException
    {
-      // Is there an 'alias' field?
+      String alias = getFieldValue("alias");
       BibValueList value = getField("alias");
-      String alias = null;
 
-      if (value != null)
+      if (alias == null)
       {
-         alias = value.expand(parser).toString(parser);
-
-         if (bib2gls.useInterpreter() && alias.matches("(?s).*[\\\\\\{\\}].*"))
+         if (value != null)
          {
-            alias = bib2gls.interpret(alias, value, true);
+            alias = value.expand(parser).toString(parser);
          }
+      }
 
+      if (alias != null)
+      {
          alias = processLabel(alias);
 
          if (bib2gls.getVerboseLevel() > 0)
@@ -2345,7 +2347,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (seeAlsoValue != null)
          {
-            initAlsoCrossRefs(parser, seeAlsoValue);
+            initAlsoCrossRefs(parser, seeAlsoValue, getFieldValue("seealso"));
             return;
          }
 
@@ -2369,7 +2371,6 @@ public class Bib2GlsEntry extends BibEntry
       StringBuilder builder = new StringBuilder();
 
       initSeeRef(parser, valList, builder);
-
    }
 
    private void initSeeRef(TeXParser parser, TeXObjectList valList,
@@ -2429,6 +2430,33 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       putField("see", builder.toString());
+   }
+
+   private void initAlsoCrossRefs(TeXParser parser, BibValueList value, 
+     String strValue)
+    throws IOException
+   {
+      if (strValue == null || strValue.isEmpty())
+      {
+         initAlsoCrossRefs(parser, value);
+      }
+      else
+      {
+         alsocrossRefs = strValue.trim().split("\\s*,\\s*");
+
+         for (String label : alsocrossRefs)
+         {
+            label = processLabel(label);
+   
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.crossref.found", getId(), "seealso", label));
+            }
+   
+            addDependency(label);
+         }
+      }
    }
 
    private void initAlsoCrossRefs(TeXParser parser, BibValueList value)
@@ -2740,6 +2768,8 @@ public class Bib2GlsEntry extends BibEntry
    private Number numericSort = null;
 
    private Object sortObject = null;
+
+   private boolean fieldsParsed = false;
 
    private boolean triggerRecordFound=false;
 

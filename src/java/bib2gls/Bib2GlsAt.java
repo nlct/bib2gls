@@ -42,7 +42,7 @@ public class Bib2GlsAt extends At
            new String[] {"{", "("});
       }
 
-      BibParser bibParser = (BibParser)parser.getListener();
+      Bib2GlsBibParser bibParser = (Bib2GlsBibParser)parser.getListener();
 
       Bib2Gls bib2gls = (Bib2Gls)bibParser.getTeXApp();
 
@@ -217,7 +217,7 @@ public class Bib2GlsAt extends At
               BibTeXSyntaxException.ERROR_REPEATED_ENTRY, id);
          } 
 
-         ((Bib2GlsEntry)data).initAlias(parser);
+         ((Bib2GlsEntry)data).setBase(bibParser.getBase());
       }
 
       bibParser.addBibData(data);

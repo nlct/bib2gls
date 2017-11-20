@@ -97,12 +97,12 @@ public class Bib2Gls implements TeXApp
       else if (openinAny == -1)
       {
          // not set, probably MikTeX distribution
-         debug(getMessage("error.missing.value", "openin_any"));
+         debugMessage("error.missing.value", "openin_any");
          openin_any = 'a';
       }
       else
       {
-         warning(getMessage("error.invalid.opt.value", "openin_any", openin));
+         warningMessage("error.invalid.opt.value", "openin_any", openin);
          openin_any = 'a';
       }
 
@@ -113,12 +113,12 @@ public class Bib2Gls implements TeXApp
       else if (openoutAny == -1)
       {
          // not set, probably MikTeX distribution
-         debug(getMessage("error.missing.value", "openout_any"));
+         debugMessage("error.missing.value", "openout_any");
          openout_any = 'p';
       }
       else
       {
-         warning(getMessage("error.invalid.opt.value", "openout_any", openout));
+         warningMessage("error.invalid.opt.value", "openout_any", openout);
          openout_any = 'p';
       }
 
@@ -193,7 +193,7 @@ public class Bib2Gls implements TeXApp
 
    public boolean isReadAccessAllowed(TeXPath path)
    {
-      debug(getMessage("message.checking.read", path));
+      debugMessage("message.checking.read", path);
 
       if (openin_any == 'a')
       {
@@ -255,7 +255,7 @@ public class Bib2Gls implements TeXApp
 
    public boolean isReadAccessAllowed(Path path)
    {
-      debug(getMessage("message.checking.read", path));
+      debugMessage("message.checking.read", path);
 
       if (openin_any == 'a')
       {
@@ -344,7 +344,7 @@ public class Bib2Gls implements TeXApp
 
    public boolean isWriteAccessAllowed(Path path)
    {
-      debug(getMessage("message.checking.write", path));
+      debugMessage("message.checking.write", path);
 
       // Forbid certain extension to be on the safe side
 
@@ -362,8 +362,13 @@ public class Bib2Gls implements TeXApp
            ||name.equals("ins") || name.equals("def")
            ||name.equals("ldf"))
          {
-            debug(getMessageWithFallback("error.forbidden.ext",
-              "Write access forbidden for extension: {0}", name));
+            if (debugLevel > 0)
+            {
+               logAndPrintMessage(getMessageWithFallback(
+               "error.forbidden.ext",
+               "Write access forbidden for extension: {0}", name));
+            }
+
             return false;
          }
       }
@@ -436,7 +441,7 @@ public class Bib2Gls implements TeXApp
 
       if (texmfoutput != null && !dir.canWrite())
       {
-         warning(getMessage("warning.dir.no.write", dir, texmfoutput));
+         warningMessage("warning.dir.no.write", dir, texmfoutput);
          file = new File(texmfoutput.toFile(), file.getName());
       }
 
@@ -687,17 +692,17 @@ public class Bib2Gls implements TeXApp
                      {
                         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 
-                        warning(getMessage("error.sty.too.old", 
+                        warningMessage("error.sty.too.old", 
                          "glossaries-extra", df.format(cal.getTime()), 
-                           df.format(minVersion.getTime())));
+                           df.format(minVersion.getTime()));
                      }
                   }
                   catch (Exception e)
                   {
                      // something strange has happened
 
-                     warning(getMessage("error.no.sty.version", 
-                       "glossaries-extra"));
+                     warningMessage("error.no.sty.version", 
+                       "glossaries-extra");
                      debug(e);
                   }
                }
@@ -720,11 +725,11 @@ public class Bib2Gls implements TeXApp
       {
          if (packages.size() == 1)
          {
-            debug(getMessage("message.1.sty"));
+            debugMessage("message.1.sty");
          }
          else
          {
-            debug(getMessage("message.2.sty", packages.size()));
+            debugMessage("message.2.sty", packages.size());
          }
 
          for (String sty : packages)
@@ -897,7 +902,7 @@ public class Bib2Gls implements TeXApp
 
       if (getDebugLevel() > 0)
       {
-         debug(String.format(
+         logAndPrintMessage(String.format(
            "%n%s%n%s%n%n",
             getMessage("message.parsing.code"),
             interpreter.toString(interpreter)));
@@ -938,7 +943,7 @@ public class Bib2Gls implements TeXApp
 
          if (getDebugLevel() > 0)
          {
-            debug(String.format(
+            logAndPrintMessage(String.format(
               "%n%s%n%s%n%n",
                getMessage("message.parsing.code"),
                interpreter.toString(interpreter)));
@@ -954,7 +959,7 @@ public class Bib2Gls implements TeXApp
 
          if (getDebugLevel() > 0)
          {
-            debug(String.format("texparserlib:--> %s", result));
+            logAndPrintMessage(String.format("texparserlib:--> %s", result));
          }
 
          // Strip any html markup
@@ -1106,8 +1111,8 @@ public class Bib2Gls implements TeXApp
              {
                 texCharset = Charset.defaultCharset();
 
-                warning(getMessage("error.unknown.tex.charset",
-                  e.getMessage(), texCharset, "--tex-encoding"));
+                warningMessage("error.unknown.tex.charset",
+                  e.getMessage(), texCharset, "--tex-encoding");
              }
          }
          else if (name.equals("glsxtr@fields"))
@@ -1131,7 +1136,10 @@ public class Bib2Gls implements TeXApp
                   fieldMap.put(field, map);
                }
 
-               debug("Adding field: "+field+" ("+map+")");
+               if (debugLevel > 0)
+               {
+                  logAndPrintMessage("Adding field: "+field+" ("+map+")");
+               }
             }
          }
          else if (name.equals("glsxtr@recordsee"))
@@ -1226,9 +1234,9 @@ public class Bib2Gls implements TeXApp
                         // Format isn't the same. Replace the closing
                         // format with the same as the opening format.
 
-                        warning(getMessage("warning.conflicting.range.format",
+                        warningMessage("warning.conflicting.range.format",
                           existingPrefix+existingFmt, newPrefix+newFmt, 
-                          newPrefix+existingFmt));
+                          newPrefix+existingFmt);
 
                         newRecord.setFormat(newPrefix+existingFmt);
                         records.add(newRecord);
@@ -1237,61 +1245,86 @@ public class Bib2Gls implements TeXApp
                   else if (newPrefix.isEmpty() && !existingPrefix.isEmpty())
                   {// discard new record
                    // (keep the record with the range formation)
-                     debug();
-                     debug(getMessage("warning.discarding.conflicting.record",
-                       newFmt, existingPrefix+existingFmt,
-                       newRecord, existingRecord));
-                     debug();
+
+                     if (debugLevel > 0)
+                     {
+                        logAndPrintMessage();
+                        logAndPrintMessage(getMessage(
+                         "warning.discarding.conflicting.record",
+                         newFmt, existingPrefix+existingFmt,
+                         newRecord, existingRecord));
+                        logAndPrintMessage();
+                     }
                   }
                   else if (!newPrefix.isEmpty() && existingPrefix.isEmpty())
                   {// discard existing record
                    // (keep the record with the range formation)
 
-                     debug();
-                     debug(getMessage("warning.discarding.conflicting.record",
-                       newPrefix+newFmt, existingPrefix+existingFmt,
-                       existingRecord, newRecord));
-                     debug();
+                     if (debugLevel > 0)
+                     {
+                        logAndPrintMessage();
+                        logAndPrintMessage(getMessage(
+                          "warning.discarding.conflicting.record",
+                          newPrefix+newFmt, existingPrefix+existingFmt,
+                          existingRecord, newRecord));
+                        logAndPrintMessage();
+                     }
 
                      existingRecord.setFormat(newPrefix+newFmt);
                   }
                   else if (isIgnoredFormat(newFmt))
                   {// discard the new record
 
-                     debug();
-                     debug(getMessage("warning.discarding.conflicting.record",
-                       newPrefix+newFmt, existingPrefix+existingFmt,
-                       newRecord, existingRecord));
-                     debug();
+                     if (debugLevel > 0)
+                     {
+                        logAndPrintMessage();
+                        logAndPrintMessage(getMessage(
+                         "warning.discarding.conflicting.record",
+                         newPrefix+newFmt, existingPrefix+existingFmt,
+                         newRecord, existingRecord));
+                        logAndPrintMessage();
+                     }
                   }
                   else if (isIgnoredFormat(existingFmt))
                   {// override the existing record
 
-                     debug();
-                     debug(getMessage("warning.discarding.conflicting.record",
-                       newPrefix+newFmt, existingPrefix+existingFmt,
-                       existingRecord, newRecord));
-                     debug();
+                     if (debugLevel > 0)
+                     {
+                        logAndPrintMessage();
+                        logAndPrintMessage(getMessage(
+                          "warning.discarding.conflicting.record",
+                          newPrefix+newFmt, existingPrefix+existingFmt,
+                          existingRecord, newRecord));
+                        logAndPrintMessage();
+                     }
 
                      existingRecord.setFormat(newPrefix+newFmt);
                   } 
                   else if (newFmt.equals("glsnumberformat"))
                   {// discard the new record
 
-                     debug();
-                     debug(getMessage("warning.discarding.conflicting.record",
-                       newPrefix+newFmt, existingPrefix+existingFmt,
-                       newRecord, existingRecord));
-                     debug();
+                     if (debugLevel > 0)
+                     {
+                        logAndPrintMessage();
+                        logAndPrintMessage(getMessage(
+                          "warning.discarding.conflicting.record",
+                          newPrefix+newFmt, existingPrefix+existingFmt,
+                          newRecord, existingRecord));
+                        logAndPrintMessage();
+                     }
                   }
                   else if (existingFmt.equals("glsnumberformat"))
                   {// override the existing record
 
-                     debug();
-                     debug(getMessage("warning.discarding.conflicting.record",
-                       newPrefix+newFmt, existingPrefix+existingFmt,
-                       existingRecord, newRecord));
-                     debug();
+                     if (debugLevel > 0)
+                     {
+                         logAndPrintMessage();
+                         logAndPrintMessage(getMessage(
+                           "warning.discarding.conflicting.record",
+                           newPrefix+newFmt, existingPrefix+existingFmt,
+                           existingRecord, newRecord));
+                         logAndPrintMessage();
+                     }
 
                      existingRecord.setFormat(newPrefix+newFmt);
                   } 
@@ -1306,12 +1339,12 @@ public class Bib2Gls implements TeXApp
 
                         if (debugLevel > 0)
                         {
-                           debug();
-                           debug(getMessage(
+                           logAndPrintMessage();
+                           logAndPrintMessage(getMessage(
                              "warning.discarding.conflicting.record.using.map",
                              newPrefix+newFmt, newPrefix+newMap, 
                              newRecord, existingRecord));
-                           debug();
+                           logAndPrintMessage();
                         }
                      }
                      else if (existingMap != null && existingMap.equals(newFmt))
@@ -1320,13 +1353,13 @@ public class Bib2Gls implements TeXApp
 
                         if (debugLevel > 0)
                         {
-                           debug();
-                           debug(getMessage(
+                           logAndPrintMessage();
+                           logAndPrintMessage(getMessage(
                              "warning.discarding.conflicting.record.using.map",
                              existingFmt, 
                              existingMap, 
                              existingRecord, newRecord));
-                           debug();
+                           logAndPrintMessage();
                         }
 
                         existingRecord.setFormat(newPrefix+newFmt);
@@ -1338,8 +1371,8 @@ public class Bib2Gls implements TeXApp
 
                         if (debugLevel > 0)
                         {
-                           debug();
-                           debug(getMessage(
+                           logAndPrintMessage();
+                           logAndPrintMessage(getMessage(
                              "warning.discarding.conflicting.record.using.map2",
                              existingFmt, existingMap, 
                              newFmt, newMap, 
@@ -1350,7 +1383,7 @@ public class Bib2Gls implements TeXApp
                               existingRecord.getCounter(),
                               newMap,
                               existingRecord.getLocation())));
-                           debug();
+                           logAndPrintMessage();
                         }
 
                         existingRecord.setFormat(newPrefix+newMap);
@@ -1395,7 +1428,7 @@ public class Bib2Gls implements TeXApp
       }
       else
       {
-         verbose(getMessage("message.tex.charset", texCharset));
+         verboseMessage("message.tex.charset", texCharset);
       }
 
       for (AuxData data : resourceData)
@@ -1464,27 +1497,103 @@ public class Bib2Gls implements TeXApp
       addField("duallongplural");
 
       /*
-       * v1.0 and below had separate loops for parsing and
-       * processing to allow for cross-references across
+       * Need to allow for cross-references across
        * different resource sets, but this causes all kinds
        * of complications, with changes in prefixes etc and
-       * redefining commands in preambles, so v1.1 no longer
-       * allows cross-references across different resource sets. 
+       * redefining commands in preambles, so this can only
+       * be implemented in certain situations. 
+       *
+       * Each resource set is processed in stages:
+       * 1. Initialisation (performed by constructor).
+       * 2. Parsing .bib files.
+       * 3. Processing entries (field conversions, creation of
+       * duals etc, finding dependencies).
+       * 4. Selection, sorting and writing .glstex files.
+       *
+       * Stage 3 may require the interpreter if
+       * interpret-label-fields is set. This means that the preamble
+       * for that resource must be parsed at the start of stage 3.
+       * If different resources have different preambles, any
+       * commands provided may override commands in earlier
+       * preambles. This means that any resource set that has
+       * a preamble must have stage 4 immediately follow stage 3.
+       * In order to support cross-resource references, stage 3
+       * must be performed in a separate loop to stage 4.
+       * Therefore cross-resource references can't be supported
+       * if any of the resources have a preamble or allow
+       * label fields (such as category or alias) to be interpreted.
        */ 
 
       int count = 0;
+
+      boolean allowsCrossResourceRefs = true;
 
       for (int i = 0; i < glsresources.size(); i++)
       {
          currentResource = glsresources.get(i);
 
-         // parse all the bib files for this resource set
-         currentResource.parse(parser);
+         // Stage 2: parse all the bib files for this resource 
+         currentResource.parseBibFiles(parser);
 
-         // If 'master' option was used, n will be -1
-         int n = currentResource.processData();
+         if (allowsCrossResourceRefs && 
+              !currentResource.allowsCrossResourceRefs())
+         {
+            debugMessage("message.cross-resource.notallowed", 
+              currentResource);
+            allowsCrossResourceRefs = false;
+         }
+      }
 
-         if (n > 0) count += n;
+      if (allowsCrossResourceRefs)
+      {
+         verboseMessage("message.cross-resource.dep.allowed");
+
+         dependencies = new Vector<String>();
+
+         for (int i = 0; i < glsresources.size(); i++)
+         {
+            currentResource = glsresources.get(i);
+
+            // Stage 3: interpret preamble, process entry fields,
+            // establish dependencies
+
+            currentResource.processBibList(parser);
+         }
+
+         for (int i = 0; i < glsresources.size(); i++)
+         {
+            currentResource = glsresources.get(i);
+
+            // Stage 4: select required entries, sort and write .glstex
+            // files
+
+            // If 'master' option was used, n will be -1
+            int n = currentResource.processData();
+
+            if (n > 0) count += n;
+         }
+      }
+      else
+      {
+         verboseMessage("message.cross-resource.dep.notallowed");
+
+         for (int i = 0; i < glsresources.size(); i++)
+         {
+            currentResource = glsresources.get(i);
+
+            // Stage 3: interpret preamble, process entry fields,
+            // establish dependencies
+
+            currentResource.processBibList(parser);
+
+            // Stage 4: select required entries, sort and write .glstex
+            // files
+
+            // If 'master' option was used, n will be -1
+            int n = currentResource.processData();
+
+            if (n > 0) count += n;
+         }
       }
 
       currentResource = null;
@@ -1513,6 +1622,37 @@ public class Bib2Gls implements TeXApp
 
          message(getMessage("message.log.file", logFile));
       }
+   }
+
+   public void registerDependencies(Bib2GlsEntry entry)
+   {
+      if (dependencies == null || !entry.hasDependencies()) return;
+
+      for (Iterator<String> it = entry.getDependencyIterator();
+           it.hasNext();)
+      {
+         String dep = it.next();
+
+         if (!dependencies.contains(dep))
+         {
+            dependencies.add(dep);
+         }
+      }
+   }
+
+   public boolean isDependent(String id)
+   {
+      return dependencies == null ? false : dependencies.contains(id);
+   }
+
+   public boolean hasCrossResourceDependencies()
+   {
+      return dependencies != null;
+   }
+
+   public Iterator<String> getDependencyIterator()
+   {
+      return dependencies == null ? null : dependencies.iterator();
    }
 
    private boolean isIgnoredFormat(String fmt)
@@ -1912,6 +2052,16 @@ public class Bib2Gls implements TeXApp
       System.out.println(message);
    }
 
+   public void logAndPrintMessage()
+   {
+      if (logWriter != null)
+      {
+         logWriter.println();
+      }
+
+      System.out.println();
+   }
+
    public int getDebugLevel()
    {
       return debugLevel;
@@ -1920,6 +2070,14 @@ public class Bib2Gls implements TeXApp
    public int getVerboseLevel()
    {
       return verboseLevel;
+   }
+
+   public void debugMessage(String key, Object... params)
+   {
+      if (debugLevel > 0)
+      {
+         logAndPrintMessage(getMessage(key, params));
+      }
    }
 
    public void debug(String message)
@@ -2146,7 +2304,7 @@ public class Bib2Gls implements TeXApp
    public void substituting(TeXParser parser, String original, 
      String replacement)
    {
-      verbose(getMessage("warning.substituting", original, replacement));
+      verboseMessage("warning.substituting", original, replacement);
    }
 
    /*
@@ -2349,6 +2507,11 @@ public class Bib2Gls implements TeXApp
       }
 
       logMessage(text);
+   }
+
+   public void verboseMessage(String key, Object... params)
+   {
+      verbose(getMessage(key, params));
    }
 
    public void verbose(String text)
@@ -2589,6 +2752,11 @@ public class Bib2Gls implements TeXApp
       }
 
       logMessage(message);
+   }
+
+   public void warningMessage(String key, Object... params)
+   {
+      warning(getMessage(key, params));
    }
 
    public void warning()
@@ -3472,11 +3640,14 @@ public class Bib2Gls implements TeXApp
 
          logMessage(getMessage("about.version", NAME, VERSION, DATE));
 
-         debug(String.format(
-            "openin_any=%s%nopenout_any=%s%nTEXMFOUTPUT=%s%ncwd=%s", 
-             openin_any, openout_any, 
-             texmfoutput == null ? "" : texmfoutput,
-             cwd));
+         if (getDebugLevel() > 0)
+         {
+            logAndPrintMessage(String.format(
+               "openin_any=%s%nopenout_any=%s%nTEXMFOUTPUT=%s%ncwd=%s", 
+                openin_any, openout_any, 
+                texmfoutput == null ? "" : texmfoutput,
+                cwd));
+         }
       }
       catch (IOException e)
       {
@@ -3595,8 +3766,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.0.20171119 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-19";
+   public static final String VERSION = "1.0.20171120 (EXPERIMENTAL)";
+   public static final String DATE = "2017-11-20";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -3661,6 +3832,8 @@ public class Bib2Gls implements TeXApp
    private TeXParser interpreter = null;
 
    private boolean useNonBreakSpace = true;
+
+   private Vector<String> dependencies = null;
 
    private int exitCode;
 

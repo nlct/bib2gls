@@ -707,14 +707,13 @@ to convert the entries to the \ext{bib} format required by
 
 If you have extensively used the \styfmt{glossaries}~\cite{glossaries} or
 \styfmt{glossaries-extra}~\cite{glossaries-extra} package, 
-you may have found yourself
-creating a large \iext{tex} file containing many definitions that
-you frequently use in documents. This file can then simply be
-loaded using \ics{input} or \ics{loadglsentries}, but a large file
-like this can be difficult to maintain and if the document only
-actually uses a small proportion of those entries, the document
-build is unnecessarily slow due to the time and resources taken on
-defining the unwanted entries.
+you may have found yourself creating a large \iext{tex} file
+containing many definitions that you frequently use in documents.
+This file can then simply be loaded using \ics{input} or
+\ics{loadglsentries}, but a large file like this can be difficult to
+maintain and if the document only actually uses a small proportion
+of those entries, the document build is unnecessarily slow due to
+the time and resources taken on defining the unwanted entries.
 
 The aim of \bibgls\ is to allow the entries to be stored in a
 \iext{bib} file, which can be maintained using a reference system
@@ -957,6 +956,98 @@ provided in the \ext{glstex} file) but \cs{printunsrtglossary} will
 just give a warning if the type is undefined so it won't interrupt
 the document build.
 
+\section{Resource Sets}
+\label{sec:resourcesets}
+
+Each instance of \gls{glsxtrresourcefile} or
+\gls{GlsXtrLoadResources} represents a \idx{resourceset}. Each
+\idx{resourceset} has one or more associated \iext{bib} files
+that provides the data for that set. Command line switches
+(\sectionref{sec:switches}) are applied to all \idxpl{resourceset}.
+Resource options (\sectionref{sec:resourceopts}) are only applied to
+that specific \idx{resourceset}. Each \idx{resourceset} is processed
+in stages:
+\begin{description}
+
+\item[Stage 1 (Initialisation)] Occurs after the \ext{aux} file has
+been parsed, this stage parses the resource option list and ensures
+options are valid and don't cause a conflict. The transcript will
+show the message
+\begin{alltt}
+Initialising resource \meta{resource-name}
+\end{alltt}
+at this point.
+
+\item[Stage 2 (Parsing)] All the \iext{bib} files associated with
+the \idx{resourceset} are parsed. Preamble information (provided by
+\atentry{preamble} is saved but is not interpreted at this stage).
+The transcript will show the message
+\begin{alltt}
+Parsing bib files for resource \meta{resource-name}
+\end{alltt}
+at this point.
+
+\item[Stage 3 (Processing Entries)] For each entry that was found in the
+corresponding set of \ext{bib} files: required field assignments are made
+(for example, \csopt{field-aliases} and \csopt{replicate-fields}),
+any fields that may only represent labels are interpreted (if
+\csopt{interpret-label-fields} is set), dependencies checked (if
+\csopt[recorded and deps]{selection} or \csopt[recorded and deps and
+see]{selection}) and the dual version (if appropriate) is created.
+Any entries that should be discarded are filtered from the list.
+The transcript will show the message
+\begin{alltt}
+Processing resource \meta{resource-name}
+\end{alltt}
+at this point.
+
+\item[Stage 4 (Selection, Sorting, Writing)] Entries are selected
+from the list according to the \csopt{selection} setting, sorting is
+performed (if required) and the \iext{glstex} file is written.
+The transcript will show the message
+\begin{alltt}
+Selecting entries for resource \meta{resource-name}
+\end{alltt}
+or (if \csopt{master})
+\begin{alltt}
+Processing master \meta{resource-name}
+\end{alltt}
+at this point.
+
+\end{description}
+
+A \idx{crossresourceref} is a reference from an entry provided in one
+\idx{resourceset} to an entry in another \idx{resourceset}. Since
+the contents of each \idx{resourceset}['s] preamble must be
+processed before fields can be interpreted and one
+\idx{resourceset}['s] preamble may contain definitions that override
+another, \idxpl{crossresourceref} can't be supported if fields
+containing cross-referencing information need to be interpreted.
+
+The \idx{crossresourceref} mode determines whether or not \bibgls\
+can support \idxpl{crossresourceref}. If enabled, the message
+\begin{verbatim}
+Cross-resource references allowed.
+\end{verbatim}
+will be written to the transcript otherwise the message is
+\begin{verbatim}
+Cross-resource references disabled.
+\end{verbatim}
+The mode can only be enabled if the following criteria is satisfied:
+\begin{itemize}
+\item the interpreter is off, or
+\item every \idx{resourceset} either doesn't have a preamble or has
+\csopt[false]{interpret-preamble} or
+\csopt[false]{interpret-label-fields} set.
+\end{itemize}
+Note that if you don't use either \csopt[recorded and
+deps]{selection} or \csopt[recorded and deps and see]{selection}
+then the dependencies aren't picked up for that \idx{resourceset}.
+
+If the \idx{crossresourceref} mode is enabled then stage~3 and
+stage~4 are processed in separate loops, otherwise they are
+processed in the same loop.
+
 \section{Security}
 
 \TeX\ Live come with security settings
@@ -1109,28 +1200,26 @@ The other cases that the interpreter is used for are:
 \begin{itemize}
 \item when \csopt{set-widest} is used to determine the width of
 the \field{name} field;
-\item if the \field{parent}, \field{category}, \field{type} 
-or \field{alias} fields contain \idx{escchar}
+\item if \csopt[true]{interpret-label-fields} and the
+\field{parent}, \field{category}, \field{type}, \field{group},
+\field{seealso} or \field{alias} fields contain \idx{escchar}
 or \idx{bgroupchar} or \idx{egroupchar} the interpreter is used 
 since these fields must be just a label
-(other special characters aren't checked as they won't expand
+(other special characters aren't checked as they won't expand to
 characters allowed in a label).
 \end{itemize}
 
 The \longarg{no-interpret} switch will turn off the interpreter, but
 the library will still be used to parse the \ext{aux} and \ext{bib}
-files. Note that the \field{see} and \field{seealso} fields
-don't use the interpreter, but \bibgls\ will try to fully
-expand the \field{seealso} field using the parser library
-(since it should only contain a comma-separated list of labels).
+files. Note that the \field{see} field don't use the interpreter as
+it may legitimately contain \LaTeX\ code in the optional tag part
+(such as \cs{seealsoname}).
+
 The parser has a different concept of expansion to \LaTeX\
 and will expand some things that aren't expanded by \LaTeX\
 (such as \ics{MakeUppercase}) and won't expand other commands
 that would be expanded by \LaTeX\ (such as commands defined
 in terms of complicated internals).
-The \field{see} field may legitimately contain \LaTeX\ code
-in the optional tag part (such as \cs{seealsoname}) so it's not
-expanded or interpreted.
 
 The \file{texparserlib.jar} library is not a
 \TeX\ engine and there are plenty of situations where it doesn't
@@ -1219,18 +1308,17 @@ with \csopt[letter-nocase]{sort-field}, the order will be:
 \code{card}, \code{i}, \code{M}, \code{S}, \code{v} (since this
 is the case-insensitive letter order of the labels).
 
-However, with \atentry{entry}, the fallback field will
-be taken from the \field{name} which in the above example contains \TeX\ code, so
+However, with \atentry{entry}, the fallback field will be taken from
+the \field{name} which in the above example contains \TeX\ code, so
 \bibgls\ will use \file{texparserlib.jar} to interpret this code.
 The library has several different ways of writing the processed
-code. For simplicity, \bibgls\ uses the library's HTML output and then 
-strips the HTML markup and trims any leading or trailing
-spaces. The library method that writes \idx{non-ASCII}
-characters using \qtt{\&x\meta{hex};} markup is overridden
-by \bibgls\ to just write the Unicode character, which means
-that the letter-based sorting options will sort according
-to the integer value \meta{hex} rather than the string
-\qtt{\&x\meta{hex};}.
+code. For simplicity, \bibgls\ uses the library's HTML output and
+then strips the HTML markup and trims any leading or trailing
+spaces. The library method that writes \idx{non-ASCII} characters
+using \qtt{\&x\meta{hex};} markup is overridden by \bibgls\ to just
+write the Unicode character, which means that the letter-based
+sorting options will sort according to the integer value \meta{hex}
+rather than the string \qtt{\&x\meta{hex};}.
 
 The interpreter is first passed the code provided with
 \atentry{preamble}:
@@ -2070,7 +2158,9 @@ replaced by the value of the \csopt{dual-prefix} option. The
 \idprefix{extn} prefix is used to reference an entry from a
 different set of resources (loaded by another
 \gls{GlsXtrLoadResources} command). This prefix is replaced by the
-corresponding element of the list supplied by \csopt{ext-prefixes}.
+corresponding element of the list supplied by \csopt{ext-prefixes},
+but this is only supported if the \idx{crossresourceref} mode is enabled
+(see \sectionref{sec:resourcesets}).
 
 In the event that the \field{sort} value falls back on the label,
 the original label supplied in the \ext{bib} file is used, not the
@@ -2083,9 +2173,9 @@ Avoid \idx{non-ASCII} characters in the \meta{id} if your document uses the
 \isty{inputenc} package. (This isn't a problem for \XeLaTeX\ or
 \LuaLaTeX, but you still need to avoid special characters.)
 You can set the character \idx{encoding} in the \ext{bib} file using:
-\begin{alltt}
+\begin{codeenv}
 \idx{commentchar} Encoding: \meta{encoding-name}
-\end{alltt}
+\end{codeenv}
 where \meta{encoding-name} is the name of the character encoding.
 For example:
 \begin{verbatim}
@@ -4151,6 +4241,10 @@ contents will still be written to the \iext{glstex} file, but any
 commands provided in the preamble won't be recognised if the
 interpreter is needed to determine an entry's sort value.
 
+A related option is \csopt{interpret-label-fields} which governs
+whether or not fields that must only contain a label should be
+interpreted.
+
 \optsection{write-preamble}
 
 This is a boolean option that determines whether or not the
@@ -5270,6 +5364,17 @@ supplementary resource files (omitting the primary
 \section{Field and Label Options}
 \label{sec:labelopts}
 
+\optsection{interpret-label-fields}
+
+This is a boolean option that determines whether or not the fields
+that may only contain labels should have their values interpreted
+(\field{parent}, \field{category}, \field{type}, \field{group},
+\field{seealso} and \field{alias}).
+The default setting is \csopt[false]{interpret-label-fields}.
+Note that if this setting is on, cross-resource references aren't
+permitted. This setting has no effect if the interpreter has been
+disabled.
+
 \optsection{abbreviation-name-fallback}
 
 The entry types that define abbreviations (such as
@@ -5775,7 +5880,8 @@ the \meta{label} will be converted as follows:
 \idprefix{tertiary} will be replaced by the \csopt{tertiary-prefix} value;
 \item if \meta{label} starts with \idprefix{extn} then
 \idprefix{extn} will be replaced by the corresponding
-\csopt{ext-prefixes} setting;
+\csopt{ext-prefixes} setting (if \idx{crossresourceref} mode is
+enabled, see \sectionref{sec:resourcesets});
 \item if \meta{label} doesn't start with one of the above recognised
 prefixes then, if \csopt{cs-label-prefix} has been used the supplied
 value will be inserted otherwise the \csopt{label-prefix} setting
@@ -5826,6 +5932,8 @@ substituted with the \meta{n}th tag listed in the comma-separated
 \meta{list}. If there aren't that many items in the list, the
 \idprefix{extn} will simply be removed. The default setting is
 an empty list, which will strip all \idprefix{extn} prefixes.
+Remember that \idx{crossresourceref} mode needs to be enabled for
+this option to work (see \sectionref{sec:resourcesets}).
 
 For example, suppose the file \filefmt{entries-terms.bib} contains:
 \begin{verbatim}
@@ -13658,11 +13766,13 @@ file is just the lower case surname.
 
 Remember from \sectionref{sec:texparserlib} that the interpreter
 will be used on the \field{parent} field if the value contains
-\verb|\| or \verb|{| or \verb|}|. This means that with this field
-alias, \bibgls\ will attempt to interpret the field contents. So all
-that's needed is to ensure that \bibgls\ is given a definition of
-\gls{sortmediacreator} that ignores the first argument and converts
-the second argument to lower case. This definition is available in
+\verb|\| or \verb|{| or \verb|}| and
+\csopt[true]{interpret-field-labels}.  This means that with this
+field alias and the interpreter on, \bibgls\ will attempt to
+interpret the field contents. So all that's needed is to ensure that
+\bibgls\ is given a definition of \gls{sortmediacreator} that
+ignores the first argument and converts the second argument to lower
+case. This definition is available in
 \exfile{interpret-preamble2.bib} but, since this file uses
 \cs{renewcommand} rather than \cs{providecommand},
 \csopt[false]{write-preamble} is required to prevent \LaTeX\ from
