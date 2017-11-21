@@ -238,6 +238,10 @@ public class GlsResource
          {
             stripTrailingNoPost = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("copy-alias-to-see"))
+         {
+            copyAliasToSee = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("post-description-dot"))
          {
             String val = getChoice(parser, list, opt, "none", "all", "check");
@@ -472,6 +476,10 @@ public class GlsResource
                   }
                }
             }
+         }
+         else if (opt.equals("limit"))
+         {
+            limit = getRequiredIntGe(parser, 0, list, opt);
          }
          else if (opt.equals("secondary"))
          {
@@ -1775,6 +1783,13 @@ public class GlsResource
             secondarySortSettings.getMethod(),
             secondarySortSettings.getSortField(), secondaryType), 
            "secondary-sort-number-pattern"));
+      }
+
+      if (limit > 0 && master != null)
+      {
+         throw new IllegalArgumentException(bib2gls.getMessage(
+          "error.option.clash", 
+          "limit="+limit, "master"));
       }
 
       if (writeAction != WRITE_ACTION_DEFINE)
@@ -3422,6 +3437,7 @@ public class GlsResource
       Vector<GlsSeeRecord> seeRecords = bib2gls.getSeeRecords();
 
       Vector<Bib2GlsEntry> seeList = null;
+      Vector<Bib2GlsEntry> aliasList = null;
 
       if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
       {
@@ -3429,58 +3445,6 @@ public class GlsResource
       }
 
       boolean combine = "combine".equals(dualSortSettings.getMethod());
-
-      if (hasAliases() && aliasLocations == ALIAS_LOC_TRANS)
-      {
-         // Need to transfer records for aliased entries
-
-         for (int i = 0; i < records.size(); i++)
-         {
-            GlsRecord record = records.get(i);
-
-            Bib2GlsEntry entry = getBib2GlsEntry(getRecordLabel(record), 
-               list);
-
-            if (entry == null) continue;
-
-            entry.parseFields(bibParser);
-
-            String alias = entry.getFieldValue("alias");
-
-            if (alias == null)
-            {
-               entry.addRecord(record);
-            }
-            else
-            {
-               Bib2GlsEntry target = getBib2GlsEntry(alias, list);
-
-               if (target == null)
-               {
-                  bib2gls.warning(bib2gls.getMessage(
-                     "warning.alias.not.found", alias, entry.getOriginalId(),
-                       "alias-loc", "transfer"));
-               }
-               else
-               {
-                  target.parseFields(bibParser);
-                  entry.addRecord(record);
-
-                  GlsRecord targetRecord = (GlsRecord)record.clone();
-                  targetRecord.setLabel(alias);
-
-                  if (!records.contains(targetRecord))
-                  {
-                     bib2gls.debug(bib2gls.getMessage(
-                        "message.adding.target.record", targetRecord, 
-                          entry.getOriginalId()));
-                     target.addRecord(targetRecord);
-                     records.add(++i, targetRecord);
-                  }
-               }
-            }
-         }
-      }
 
       for (int i = 0; i < list.size(); i++)
       {
@@ -3529,33 +3493,44 @@ public class GlsResource
             boolean hasRecords = entry.hasRecords();
             boolean dualHasRecords = (dual != null && dual.hasRecords());
 
-            if (aliasLocations != ALIAS_LOC_TRANS
-                 || entry.getField("alias") == null)
+            for (GlsRecord record : records)
             {
-               for (GlsRecord record : records)
+               String recordLabel = getRecordLabel(record);
+
+               if (recordLabel.equals(primaryId))
                {
-                  String recordLabel = getRecordLabel(record);
+                  entry.addRecord(record);
+                  hasRecords = true;
 
-                  if (recordLabel.equals(primaryId))
+                  if (dual != null &&
+                    combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
                   {
-                     entry.addRecord(record);
-                     hasRecords = true;
+                     dual.addRecord(record.copy(dualId));
+                     dualHasRecords = true;
+                  }
+               }
 
-                     if (dual != null &&
-                       combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
+               if (dual != null)
+               {
+                  if (recordLabel.equals(dualId))
+                  {
+                     dual.addRecord(record);
+                     dualHasRecords = true;
+
+
+                     if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
                      {
-                        dual.addRecord(record.copy(dualId));
-                        dualHasRecords = true;
+                        entry.addRecord(record.copy(primaryId));
+                        hasRecords = true;
                      }
                   }
 
-                  if (dual != null)
+                  if (tertiaryId != null)
                   {
-                     if (recordLabel.equals(dualId))
+                     if (record.getLabel().equals(tertiaryId))
                      {
-                        dual.addRecord(record);
+                        dual.addRecord(record.copy(dualId));
                         dualHasRecords = true;
-
 
                         if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
                         {
@@ -3563,43 +3538,28 @@ public class GlsResource
                            hasRecords = true;
                         }
                      }
-
-                     if (tertiaryId != null)
-                     {
-                        if (record.getLabel().equals(tertiaryId))
-                        {
-                           dual.addRecord(record.copy(dualId));
-                           dualHasRecords = true;
-
-                           if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
-                           {
-                              entry.addRecord(record.copy(primaryId));
-                              hasRecords = true;
-                           }
-                        }
-                     }
                   }
                }
+            }
 
-               // any 'see' records?
+            // any 'see' records?
 
-               for (GlsSeeRecord record : seeRecords)
+            for (GlsSeeRecord record : seeRecords)
+            {
+               String recordLabel = getRecordLabel(record);
+
+               if (recordLabel.equals(primaryId))
                {
-                  String recordLabel = getRecordLabel(record);
+                  entry.addRecord(record);
+                  hasRecords = true;
+               }
 
-                  if (recordLabel.equals(primaryId))
+               if (dual != null)
+               {
+                  if (recordLabel.equals(dualId))
                   {
-                     entry.addRecord(record);
-                     hasRecords = true;
-                  }
-
-                  if (dual != null)
-                  {
-                     if (recordLabel.equals(dualId))
-                     {
-                        dual.addRecord(record);
-                        dualHasRecords = true;
-                     }
+                     dual.addRecord(record);
+                     dualHasRecords = true;
                   }
                }
             }
@@ -3648,6 +3608,17 @@ public class GlsResource
                   bib2gls.logMessage(bib2gls.getMessage(
                     "message.dual.dep", dualId, primaryId));
                }
+            }
+
+            if (aliasLocations == ALIAS_LOC_TRANS 
+                  && entry.getField("alias") != null)
+            {
+               if (aliasList == null)
+               {
+                  aliasList = new Vector<Bib2GlsEntry>();
+               }
+
+               aliasList.add(entry);
             }
 
             if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE ||
@@ -3701,6 +3672,37 @@ public class GlsResource
                      bib2gls.registerDependencies(dual);
                   }
                }
+            }
+         }
+      }
+
+      // Now that all entries have been defined and had their fields
+      // initialised, it's possible to search for aliases.
+
+      if (aliasList != null)
+      {
+         // Need to transfer records for aliased entries
+
+         for (Bib2GlsEntry entry : aliasList)
+         {
+            String alias = entry.getFieldValue("alias");
+
+            Bib2GlsEntry target = getEntry(alias, bibData);
+
+            if (target == null && dualData != null)
+            {
+               target = getEntry(alias, dualData);
+            }
+
+            if (target == null)
+            {
+               bib2gls.warningMessage("warning.alias.not.found",
+                 alias, entry.getId(), "alias-loc", "transfer");
+            }
+            else
+            {
+               target.addDependency(entry.getId());
+               target.copyRecordsFrom(entry);
             }
          }
       }
@@ -4550,6 +4552,12 @@ public class GlsResource
 
       processData(bibData, entries, sortSettings.getMethod());
 
+      if (limit > 0 && entries.size() > limit)
+      {
+         bib2gls.verboseMessage("message.truncated", limit);
+         entries.setSize(limit);
+      }
+
       if (bib2gls.getVerboseLevel() > 0)
       {
          bib2gls.logMessage(bib2gls.getChoiceMessage("message.selected", 0,
@@ -4597,6 +4605,12 @@ public class GlsResource
          processDeps(dualData, dualEntries);
 
          entryCount += dualEntries.size();
+
+         if (limit > 0 && dualEntries.size() > limit)
+         {
+            bib2gls.verboseMessage("message.truncated", limit);
+            dualEntries.setSize(limit);
+         }
 
          if (bib2gls.getVerboseLevel() > 0)
          {
@@ -7089,6 +7103,11 @@ public class GlsResource
       return stripMissingParents;
    }
 
+   public boolean isCopyAliasToSeeEnabled()
+   {
+      return copyAliasToSee;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -7307,6 +7326,10 @@ public class GlsResource
    private byte contributorOrder=CONTRIBUTOR_ORDER_VON;
 
    private Vector<String> dependencies;
+
+   private int limit=0;
+
+   private boolean copyAliasToSee = false;
 
    private Bib2GlsBibParser bibParserListener = null;
 }

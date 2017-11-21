@@ -28,21 +28,38 @@ public class GlsRecord
    public GlsRecord(String label, String prefix, String counter,
       String format, String location)
    {
+      this(label, prefix, counter, format, location, globalIndex++);
+   }
+
+   protected GlsRecord(String label, String prefix, String counter,
+      String format, String location, long index)
+   {
       this.label = label;
       this.prefix = prefix;
       this.counter = counter;
       this.format = format;
       this.location = location;
+      this.index = index;
    }
 
    public GlsRecord copy(String newLabel)
    {
-      return new GlsRecord(newLabel, prefix, counter, format, location);
+      return new GlsRecord(newLabel, prefix, counter, format, location, index);
    }
 
    public Object clone()
    {
-      return new GlsRecord(label, prefix, counter, format, location);
+      return new GlsRecord(label, prefix, counter, format, location, index);
+   }
+
+   public int compareTo(GlsRecord record)
+   {
+      if (index == record.index)
+      {
+         return 0;
+      }
+
+      return index < record.index ? -1 : 1;
    }
 
    public String getLabel()
@@ -855,6 +872,10 @@ public class GlsRecord
    }
 
    private String label, prefix, counter, format, location;
+
+   private long index=0;
+
+   private static long globalIndex=0L;
 
    private static final Pattern DIGIT_PATTERN
      = Pattern.compile("(.*?)([^\\p{javaDigit}]?)(\\p{javaDigit}+)");

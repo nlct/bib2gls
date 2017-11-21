@@ -52,6 +52,8 @@ v1.1 (pending):
      - save-original-id
      - interpret-label-fields
      - strip-missing-parents
+     - limit
+     - copy-alias-to-see
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

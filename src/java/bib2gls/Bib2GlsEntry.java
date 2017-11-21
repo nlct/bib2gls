@@ -670,6 +670,16 @@ public class Bib2GlsEntry extends BibEntry
 
       Vector<String> fields = bib2gls.getFields();
 
+      if (resource.hasSkippedFields())
+      {
+         String[] skip = resource.getSkipFields();
+
+         for (String field : skip)
+         {
+            removeField(field);
+         }
+      }
+
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
 
@@ -679,6 +689,8 @@ public class Bib2GlsEntry extends BibEntry
 
          if (value != null)
          {
+            TeXObjectList list = value.expand(parser);
+
             putField("short", 
                resource.applyShortCaseChange(parser, value));
          }
@@ -766,16 +778,6 @@ public class Bib2GlsEntry extends BibEntry
 
                putField("dualshortplural", list);
             }
-         }
-      }
-
-      if (resource.hasSkippedFields())
-      {
-         String[] skip = resource.getSkipFields();
-
-         for (String field : skip)
-         {
-            removeField(field);
          }
       }
 
@@ -1001,8 +1003,6 @@ public class Bib2GlsEntry extends BibEntry
             putField("name", list.toString(parser));
          }
       }
-
-      initAlias(parser);
    }
 
    protected BibValueList convertBibTeXAuthorField(TeXParser parser,
@@ -1413,10 +1413,9 @@ public class Bib2GlsEntry extends BibEntry
 
             writer.format("%s={%s}", field, value);
          }
-         else if (bib2gls.getDebugLevel() > 0)
+         else
          {
-            bib2gls.logMessage(
-               bib2gls.getMessage("warning.ignoring.unknown.field", field));
+            bib2gls.debugMessage("warning.ignoring.unknown.field", field);
          }
       }
 
@@ -1488,10 +1487,21 @@ public class Bib2GlsEntry extends BibEntry
       return getParent() != null;
    }
 
+   public String getAlias()
+   {
+      return getFieldValue("alias");
+   }
+
+   public boolean hasAlias()
+   {
+      return getAlias() != null;
+   }
+
    public boolean hasCrossRefs()
    {
       return (crossRefs != null && crossRefs.length > 0)
-         || (alsocrossRefs != null && alsocrossRefs.length > 0);
+         || (alsocrossRefs != null && alsocrossRefs.length > 0)
+         || hasAlias();
    }
 
    public String[] getCrossRefs()
@@ -1737,28 +1747,37 @@ public class Bib2GlsEntry extends BibEntry
    {
       if (record.getFormat().equals("glsignore"))
       {
-         bib2gls.debug(bib2gls.getMessage("message.ignored.record", record));
+         bib2gls.debugMessage("message.ignored.record", record);
          addIgnoredRecord(record);
       }
       else if (record.getFormat().equals("glstriggerrecordformat"))
       {
          triggerRecordFound = true;
-         bib2gls.debug(bib2gls.getMessage("message.ignored.record", record));
+         bib2gls.debugMessage("message.ignored.record", record);
          addIgnoredRecord(record);
       }
       else if (records != null)
       {
          if (!records.contains(record))
          {
+            bib2gls.debugMessage("message.adding.record", record,
+             getId());
+
+            record.setLabel(getId());
             records.add(record);
          }
       }
       else
       {
-         Vector<GlsRecord> list = recordMap.get(record.getCounter());
+         String counter = record.getCounter();
+         Vector<GlsRecord> list = recordMap.get(counter);
 
          if (list != null && !list.contains(record))
          {
+            bib2gls.debugMessage("message.adding.counter.record", record,
+             getId(), counter);
+
+            record.setLabel(getId());
             list.add(record);
          }
       }
@@ -1766,6 +1785,8 @@ public class Bib2GlsEntry extends BibEntry
 
    public void clearRecords()
    {
+      bib2gls.debugMessage("message.clearing.records", getId());
+
       if (records == null)
       {
          Iterator<String> it = recordMap.keySet().iterator();
@@ -1812,6 +1833,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (!supplementalRecords.contains(record))
       {
+         bib2gls.debugMessage("message.adding.supplemental.record", getId());
          supplementalRecords.add(record);
       }
    }
@@ -1828,6 +1850,102 @@ public class Bib2GlsEntry extends BibEntry
       if (!ignoredRecords.contains(record))
       {
          ignoredRecords.add(record);
+      }
+   }
+
+   public static void insertRecord(GlsRecord record, Vector<GlsRecord> list)
+   {
+      for (int i = 0, n = list.size(); i < n; i++)
+      {
+         GlsRecord r = list.get(i);
+
+         if (r.equals(record))
+         {
+            return;
+         }
+
+         int result = record.compareTo(r);
+
+         if (result <= 0)
+         {
+            list.add(i, record);
+            return;
+         }
+      }
+
+      list.add(record);
+   }
+
+   public void copyRecordsFrom(Bib2GlsEntry entry)
+   {
+      if (entry.records != null)
+      {
+         for (GlsRecord record : entry.records)
+         {
+            bib2gls.debugMessage(
+               "message.copying.record", record,
+                 entry.getId(), getId());
+
+            if (record.getFormat().equals("glsignore")
+              || record.getFormat().equals("glstriggerrecordformat"))
+            {
+               addIgnoredRecord(record.copy(getId()));
+            }
+            else
+            {
+               insertRecord(record.copy(getId()), records);
+            }
+         }
+      }
+      else if (entry.recordMap != null)
+      {
+         for (Iterator<String> it = entry.recordMap.keySet().iterator();
+              it.hasNext(); )
+         {
+            String counter = it.next();
+
+            Vector<GlsRecord> list = entry.recordMap.get(counter);
+
+            if (list != null)
+            {
+               Vector<GlsRecord> thisList = recordMap.get(counter);
+
+               if (thisList == null)
+               {
+                  thisList = new Vector<GlsRecord>();
+                  recordMap.put(counter, thisList);
+               }
+
+               for (GlsRecord record : list)
+               {
+                  bib2gls.debugMessage(
+                     "message.copying.record", record,
+                       entry.getId(), getId());
+
+                  if (record.getFormat().equals("glsignore")
+                    || record.getFormat().equals("glstriggerrecordformat"))
+                  {
+                     addIgnoredRecord(record.copy(getId()));
+                  }
+                  else
+                  {
+                     insertRecord(record.copy(getId()), thisList);
+                  }
+               }
+            }
+         }
+      }
+
+      if (entry.supplementalRecords != null)
+      {
+         for (GlsRecord record : entry.supplementalRecords)
+         {
+            bib2gls.debugMessage(
+               "message.copying.record", record,
+                 entry.getId(), getId());
+
+            addSupplementalRecord(record.copy(getId()));
+         }
       }
    }
 
@@ -1914,8 +2032,8 @@ public class Bib2GlsEntry extends BibEntry
              if (!(rangeStart.getPrefix().equals(record.getPrefix())
                &&  rangeStart.getCounter().equals(record.getCounter())))
              {
-                bib2gls.warning(bib2gls.getMessage(
-                    "error.inconsistent.range", record, rangeStart));
+                bib2gls.warningMessage(
+                    "error.inconsistent.range", record, rangeStart);
 
                 String content = String.format("\\bibglsinterloper{%s}", 
                   record.getFmtTeXCode());
@@ -1930,21 +2048,21 @@ public class Bib2GlsEntry extends BibEntry
                          ||recordFmt.equals("glsnumberformat")))
                       || rangeFmt.equals(recordFmt))
              {
-                bib2gls.debug(bib2gls.getMessage("message.merge.range",
-                  record, rangeStart));
+                bib2gls.debugMessage("message.merge.range",
+                  record, rangeStart);
              }
              else
              {
                 if (record.getFormat().equals("glsnumberformat")
                  || rangeFmt.isEmpty())
                 {
-                   bib2gls.verbose(bib2gls.getMessage(
-                      "message.inconsistent.range", record, rangeStart));
+                   bib2gls.verboseMessage(
+                      "message.inconsistent.range", record, rangeStart);
                 }
                 else
                 {
-                   bib2gls.warning(bib2gls.getMessage(
-                      "error.inconsistent.range", record, rangeStart));
+                   bib2gls.warningMessage(
+                      "error.inconsistent.range", record, rangeStart);
                 }
 
                 String content = String.format("\\bibglsinterloper{%s}", 
@@ -2066,7 +2184,30 @@ public class Bib2GlsEntry extends BibEntry
 
       int numRecords = mainRecordCount()+supplementalRecordCount();
 
-      if (seeLocation == PRE_SEE && crossRefs != null)
+      String alias = getAlias();
+
+      if (seeLocation == PRE_SEE && alias != null)
+      {
+         builder = new StringBuilder();
+         builder.append("\\bibglsusealias{");
+         builder.append(getId());
+         builder.append("}");
+
+         if (numRecords > 0)
+         {
+            builder.append("\\bibglsaliassep ");
+         }
+
+         StringBuilder listBuilder = new StringBuilder();
+         listBuilder.append("\\glsseeformat");
+
+         listBuilder.append("{");
+         listBuilder.append(alias);
+         listBuilder.append("}{}");
+
+         locationList.add(listBuilder.toString());
+      }
+      else if (seeLocation == PRE_SEE && crossRefs != null)
       {
          builder = new StringBuilder();
          builder.append("\\bibglsusesee{");
@@ -2132,7 +2273,7 @@ public class Bib2GlsEntry extends BibEntry
 
       boolean hasLocationList = (numRecords > 0);
 
-      if (getField("alias") != null 
+      if (alias != null 
            && resource.aliasLocations() != GlsResource.ALIAS_LOC_KEEP)
       {
          hasLocationList = false;
@@ -2206,7 +2347,33 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      if (seeLocation == POST_SEE && crossRefs != null)
+      if (seeLocation == POST_SEE && alias != null)
+      {
+         if (builder == null)
+         {
+            builder = new StringBuilder();
+         }
+
+         if (hasLocationList)
+         {
+            builder.append("\\bibglsaliassep ");
+         }
+
+         builder.append("\\bibglsusealias{");
+         builder.append(getId());
+         builder.append("}");
+
+         StringBuilder listBuilder = new StringBuilder();
+
+         listBuilder.append("\\glsseeformat");
+
+         listBuilder.append("{");
+         listBuilder.append(alias);
+         listBuilder.append("}{}");
+
+         locationList.add(listBuilder.toString());
+      }
+      else if (seeLocation == POST_SEE && crossRefs != null)
       {
          if (builder == null)
          {
@@ -2322,12 +2489,15 @@ public class Bib2GlsEntry extends BibEntry
 
          resource.setAliases(true);
 
-         // Is there a 'see' field?
-
-         if (getField("see") == null)
+         if (resource.isCopyAliasToSeeEnabled())
          {
-            putField("see", value);
-            putField("see", alias);
+            // Is there a 'see' field?
+
+            if (getField("see") == null)
+            {
+               putField("see", value);
+               putField("see", alias);
+            }
          }
       }
    }
@@ -2357,8 +2527,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (seeAlsoValue != null)
       {
-         bib2gls.warning(bib2gls.getMessage("warning.field.clash",
-           "see", "seealso"));
+         bib2gls.warningMessage("warning.field.clash", "see", "seealso");
       }
 
       if (value == null)
@@ -2479,8 +2648,8 @@ public class Bib2GlsEntry extends BibEntry
       if (!bib2gls.isKnownField("seealso"))
       {// seealso field not supported, so replicate see=[\seealsoname]
 
-         bib2gls.warning(bib2gls.getMessage(
-           "warning.field.unsupported", "seealso", "1.16"));
+         bib2gls.warningMessage(
+           "warning.field.unsupported", "seealso", "1.16");
 
          crossRefTag = "\\seealsoname ";
          builder.append("[\\seealsoname]");
@@ -2645,6 +2814,8 @@ public class Bib2GlsEntry extends BibEntry
       {
          if (resource.isStripMissingParentsEnabled())
          {
+            bib2gls.verboseMessage(
+              "message.removing.missing.parent", parentId, entry.getId());
             entry.removeField("parent");
             entry.fieldValues.remove("parent");
          }

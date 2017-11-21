@@ -46,13 +46,6 @@
  ]
  {glossaries-extra}
 
-\renewcommand*{\glsshowtarget}[1]{\texttt{\small [#1]}}
-\renewcommand{\glsentrycounterlabel}{}
-\renewcommand{\glssubentrycounterlabel}{}
-\renewcommand\glstreeitem{\par\hangindent10pt}
-\renewcommand\glstreesubitem{\par\hangindent30pt\hspace*{15pt}}
-\renewcommand*{\glsxtrbookindexprelocation}[1]{}
-
 \glsxtrprovidestoragekey{note}{}{}
 
 % put break before dash to avoid confusion with a hyphen
@@ -62,8 +55,23 @@
  {-}%
 }
 
+% Redefine \- (used in entry names) so that hyphenation in command names, 
+% switches options etc uses a serif hyphen to reduce confusion with an 
+% actual hyphen in the code.
+\renewrobustcmd{\-}{%
+ \discretionary
+ {{\rmfamily\char\ifnum\hyphenchar\font<0
+  \defaulthyphenchar\else\hyphenchar\font\fi
+ }}%
+ {}{}%
+}
+
+\renewcommand{\glsentrycounterlabel}{}
+\renewcommand{\glssubentrycounterlabel}{}
+\renewcommand\glstreeitem{\par\hangindent10pt}
+\renewcommand\glstreesubitem{\par\hangindent30pt\hspace*{15pt}}
+
 \newcommand{\bibglsseealsosep}{\glstreesubitem}
-\newcommand{\bibglsusesee}[1]{, \glsxtrusesee{#1}}
 
 \renewcommand*{\glsseesep}{, \glstreesubitem\qquad}
 \renewcommand*{\glsseelastsep}{\glstreesubitem\qquad\andname\space}
@@ -80,15 +88,16 @@
 \GlsXtrLoadResources[
   label-prefix={idx.},
   save-loclist=false,
-  sort={letter-nocase},
+  sort={letternumber-nocase},
   type={index},
   dual-field={dualid},
-  loc-prefix={comma},
   match-action={add},
   match={{category}={.*field}},
   dual-prefix={},
   dual-type={main},
-  combine-dual-locations={primary}
+  combine-dual-locations={primary},
+  selection={recorded and deps and see},
+  strip-missing-parents
 ]
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
@@ -168,6 +177,7 @@
   \def\dcolon{:}%
   \def\dcomma{,}%
   \def\dequals{,}%
+  \let\-\empty
 }
 
 \newcommand*{\csfmt}[1]{%
@@ -221,7 +231,7 @@
 \newrobustcmd*{\texmeta}[1]{{\normalfont\normalcolor$\langle$\emph{#1}$\rangle$}}
 
 \newcommand*{\meta}[1]{%
- \texorpdfstring{\texmeta{#1}}{#1}%
+ \texorpdfstring{\ifmmode\text{\texmeta{#1}}\else\texmeta{#1}\fi}{#1}%
 }
 
 \newcommand*{\oarg}[1]{\discretionary{}{}{}[#1]}
@@ -597,7 +607,7 @@
 \newlength\imagewidth
 \newcommand*{\pdftwocol}[3][1]{%
   \renewcommand{\tabcolsep}{2pt}%
-  \setlength{\imagewidth}{\dimexpr.5\textwidth-\tabcolsep}%
+  \setlength{\imagewidth}{\dimexpr.5\linewidth-2\tabcolsep}%
   \def\tabcontents{\begin{tabular}{@{}cc@{}}}%
   \count0=\numexpr#1-1\relax
   \loop
@@ -960,7 +970,7 @@ the document build.
 \label{sec:resourcesets}
 
 Each instance of \gls{glsxtrresourcefile} or
-\gls{GlsXtrLoadResources} represents a \idx{resourceset}. Each
+\gls{GlsXtrLoadResources} in the document represents a \idx{resourceset}. Each
 \idx{resourceset} has one or more associated \iext{bib} files
 that provides the data for that set. Command line switches
 (\sectionref{sec:switches}) are applied to all \idxpl{resourceset}.
@@ -979,31 +989,79 @@ Initialising resource \meta{resource-name}
 at this point.
 
 \item[Stage 2 (Parsing)] All the \iext{bib} files associated with
-the \idx{resourceset} are parsed. Preamble information (provided by
-\atentry{preamble} is saved but is not interpreted at this stage).
+the \idx{resourceset} are parsed. Entry aliases (identified by
+\csopt{entry-type-aliases}) are performed. Preamble information (provided by
+\atentry{preamble}) is saved but is not interpreted at this stage.
 The transcript will show the message
 \begin{alltt}
 Parsing bib files for resource \meta{resource-name}
 \end{alltt}
 at this point.
 
-\item[Stage 3 (Processing Entries)] For each entry that was found in the
-corresponding set of \ext{bib} files: required field assignments are made
-(for example, \csopt{field-aliases} and \csopt{replicate-fields}),
-any fields that may only represent labels are interpreted (if
-\csopt{interpret-label-fields} is set), dependencies checked (if
-\csopt[recorded and deps]{selection} or \csopt[recorded and deps and
-see]{selection}) and the dual version (if appropriate) is created.
-Any entries that should be discarded are filtered from the list.
+\item[Stage 3 (Processing Entries)] 
 The transcript will show the message
 \begin{alltt}
 Processing resource \meta{resource-name}
 \end{alltt}
 at this point.
+For each entry that was found in
+the corresponding set of \ext{bib} files: 
+\begin{itemize}
+\item Records are transferred to aliases if required (\csopt{alias-loc}).
+\item Field checks and modifications are performed:
+  \begin{itemize}
+  \item field aliases are performed (\csopt{field-aliases}); 
+  \item ignored fields (identified by \csopt{ignore-fields}) are
+  removed;
+  \item case-changes (for example, \csopt{short-case-change}) are
+  performed, except for the \field{name} field;
+  \item suffixes are appended if required (for example, with
+  \csopt{short-plural-suffix});
+  \item field replications are made (\csopt{replicate-fields});
+  \item the \field{group} field is assigned if \csopt{group} is set;
+  \item any variables (identified by \atentry{string}) are expanded
+  (if not already done in any of the previous steps);
+  \item any fields that have been identified by
+  \csopt{bibtex-contributor-fields} are converted;
+  \item any fields whose value must be a label are interpreted
+  if \csopt{interpret-label-fields} is set;
+  \item the \field{parent} field is adjusted according to the label prefix 
+  settings (\csopt{label-prefix} etc);
+  \item \ics{makefirstuc} protection is applied according to 
+  \longarg{mfirstuc-protection} and \longarg{mfirstuc-math-protection};
+  \item fields are parsed for commands like \cs{gls} or
+  \cs{glshyperlink} and also checked for nested links if
+  \longarg{nested-link-check} is set;
+  \item the \field{description} field is adjusted according to
+  \csopt{strip-trailing-nopost};
+  \item end punctuation is checked according to
+  \csopt{check-end-punctuation};
+  \item required fields are checked for existence;
+  \item \field{name} case-change is performed if
+  \csopt{name-case-change} is set.
+  \end{itemize}
+\item The dual version (if appropriate) is created.
+\item Records are added to the entry's location list (or transferred
+to the dual\slash primary according to \csopt{combine-dual-locations}).
+\item The \field{type}, \field{category} and \field{counter} fields
+are set according to \csopt{type}, \csopt{dual-type},
+\csopt{category}, \csopt{dual-category}, \csopt{counter} and
+\csopt{dual-counter}.
+\item Filtering is applied (according to options like \csopt{match}
+but not \csopt{selection} or \csopt{limit}).
+\item Dependencies are registered (if
+\csopt[recorded and deps]{selection} or \csopt[recorded and deps and
+see]{selection}). 
+\end{itemize}
+If \csopt[recorded and deps and see]{selection} then any recorded
+entries that have been cross-referenced by an unrecorded entry, will
+register a dependency with the unrecorded entry. Finally,
+supplemental records are added to entries.
 
 \item[Stage 4 (Selection, Sorting, Writing)] Entries are selected
 from the list according to the \csopt{selection} setting, sorting is
-performed (if required) and the \iext{glstex} file is written.
+performed (if required), truncation is applied (if \csopt{limit} is
+set) and the \iext{glstex} file is written.
 The transcript will show the message
 \begin{alltt}
 Selecting entries for resource \meta{resource-name}
@@ -1015,6 +1073,20 @@ Processing master \meta{resource-name}
 at this point.
 
 \end{description}
+
+Parent entries must always be in the same \idx{resourceset} as their
+child entries. (They may be defined in different \ext{bib} files as
+long as all those \ext{bib} files are listed in the same \csopt{src}.) 
+Other forms of dependencies may be in a
+different \idx{resourceset} under certain circumstances. These types
+of dependencies are instances of commands such as \cs{gls} being
+found (for example, in the \field{description} field), or the
+cross-reference fields (\field{see}, \field{seealso} or
+\field{alias}) in recorded entries that reference unrecorded
+entries. The \qt{cross-referenced by} dependencies enabled with
+\csopt[recorded and deps and see]{selection} (where an unrecorded
+entry references a recorded entry through the cross-reference
+fields) aren't supported across \idxpl{resourceset}.
 
 A \idx{crossresourceref} is a reference from an entry provided in one
 \idx{resourceset} to an entry in another \idx{resourceset}. Since
@@ -1033,23 +1105,26 @@ will be written to the transcript otherwise the message is
 \begin{verbatim}
 Cross-resource references disabled.
 \end{verbatim}
-The mode can only be enabled if the following criteria is satisfied:
+The mode can only be enabled if the following condition is satisfied:
 \begin{itemize}
-\item the interpreter is off, or
-\item every \idx{resourceset} either doesn't have a preamble or has
+\item the interpreter is off (\longarg{no-interpret}), or
+\item every \idx{resourceset} either doesn't have a preamble
+(provided by \atentry{preamble} in the associated \ext{bib} files) or has
 \csopt[false]{interpret-preamble} or
 \csopt[false]{interpret-label-fields} set.
 \end{itemize}
 Note that if you don't use either \csopt[recorded and
 deps]{selection} or \csopt[recorded and deps and see]{selection}
-then the dependencies aren't picked up for that \idx{resourceset}.
+then the dependencies aren't picked up for that \idx{resourceset}
+(and so can't be cross-referenced from another \idx{resourceset}).
+
 Trails don't work with \idxpl{crossresourceref}. For example, if
-entry $A$ has been indexed and depends on entry $B$ that hasn't been
-indexed, then $B$ can be picked up from a different
+entry $A$ has been recorded and depends on entry $B$ that hasn't been
+recorded, then $B$ can be picked up from a different
 \idx{resourceset}, but if $A$ and $B$ are in the same
 \idx{resourceset} and $B$ is dependent on $C$ which is in a
 different \idx{resourceset} then $C$ won't be picked up if it hasn't
-been indexed because $B$ hasn't been indexed and is in a different
+been recorded because $B$ hasn't been recorded and is in a different
 \idx{resourceset}.
 
 If the \idx{crossresourceref} mode is enabled then stage~3 and
@@ -1219,13 +1294,13 @@ characters allowed in a label).
 
 The \longarg{no-interpret} switch will turn off the interpreter, but
 the library will still be used to parse the \ext{aux} and \ext{bib}
-files. Note that the \field{see} field don't use the interpreter as
+files. Note that the \field{see} field doesn't use the interpreter as
 it may legitimately contain \LaTeX\ code in the optional tag part
 (such as \cs{seealsoname}).
 
 The parser has a different concept of expansion to \LaTeX\
 and will expand some things that aren't expanded by \LaTeX\
-(such as \ics{MakeUppercase}) and won't expand other commands
+(such as \ics{MakeUppercase} and \ics{char}) and won't expand other commands
 that would be expanded by \LaTeX\ (such as commands defined
 in terms of complicated internals).
 
@@ -4030,8 +4105,10 @@ where \meta{filename} is the name of the resource file without the
 \ext{glstex} extension.
 You can have multiple \gls{glsxtrresourcefile} commands within your
 document, but each \meta{filename} must be unique, otherwise \LaTeX\
-would attempt to input the same \ext{glstex} file multiple times.
-\bibgls\ checks for non-unique file names.
+would attempt to input the same \ext{glstex} file multiple times
+(\bibgls\ checks for non-unique file names). The associated data for each
+resource file is called the \idx{resourceset} (see
+\sectionref{sec:resourcesets}).
 
 There's a shortcut command that uses
 \ics{jobname} in the \meta{filename}:
@@ -4063,11 +4140,13 @@ The optional argument \meta{options} is a comma-separated
 applies only to that specific \meta{filename}\ext{glstex} and are
 not carried over to the next instance of \gls{glsxtrresourcefile}.
 Only the definitions provided in \atentry{preamble} (if the
-interpreter is on) are carried over to the next resource set.  The
-\sty{glossaries-extra} package doesn't parse the options, but just
-writes the information to the \ext{aux} file. This means that any
-invalid options will be reported by \bibgls\ not by
-\sty{glossaries-extra}.
+interpreter is on and \csopt[true]{interpret-preamble}) are carried
+over to the next resource set and, possibly,
+\idxpl{crossresourceref} if permitted (see
+\sectionref{sec:resourcesets}).  The \sty{glossaries-extra} package
+doesn't parse the options, but just writes the information to the
+\ext{aux} file. This means that any invalid options will be reported
+by \bibgls\ not by \sty{glossaries-extra}.
 
 If you have multiple \ext{bib} files you can either select them all
 using \csopt[\meta{bib list}]{src} in a single
@@ -4085,8 +4164,8 @@ Alternatively, if they have different settings:
 \GlsXtrLoadResources[src={entries-symbols},sort=use,type=symbols]
 \end{verbatim}
 
-Note that the sorting is applied to each resource call independently
-of other resources. This means that if you have multiple instances
+Note that the sorting is applied to each \idx{resourceset} independently
+of other \idxpl{resourceset}. This means that if you have multiple instances
 of \gls{glsxtrresourcefile} but only one glossary type, the glossary
 will effectively contain blocks of sorted entries. For example, if
 \filefmt{file1.bib} contains:
@@ -4124,7 +4203,9 @@ Abbreviation styles must be set (using \ics{setabbreviationstyle})
 before the resource command that selects the abbreviations from the
 appropriate \ext{bib} file, since the entries are defined (through
 \gls{newabbreviation} or \cs{newacronym}) when
-\gls{glsxtrresourcefile} inputs the \ext{glstex} file.
+\gls{glsxtrresourcefile} inputs the \ext{glstex} file. (Similarly for any
+associated abbreviation style commands that must be set before
+abbreviations are defined, such as \cs{glsxtrlongshortdescname}.)
 
 Note \bibgls\ allows \iext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentry{preamble}.
@@ -4220,7 +4301,7 @@ also do:
 The \emph{contents} of \atentry{preamble} are only written to the
 associated \iext{glstex} file, but the definitions contained within
 the \atentry{preamble} are retained by the interpreter for subsequent
-resource sets.
+\idxpl{resourceset}.
 
 \section{General Options}
 \label{sec:generalopts}
@@ -4772,10 +4853,31 @@ of whether or not they have any records:
 ]
 \end{verbatim}
 
+\optsection{limit}
+
+If \meta{number} is greater than 0 then this will truncate the
+list of selected entries after sorting to \meta{number} (if the list
+size is greater than that value). The transcript will show the
+message:
+\begin{alltt}
+Truncating according to limit=\meta{number}
+\end{alltt}
+When used with \csopt{shuffle}, this provides a means of randomly
+selecting at most \meta{number} entries. The default setting is
+\csopt[0]{limit} (no truncation). A negative value of \meta{number} is not
+permitted.
+
+If you have any dual entries, then the truncation will be applied to
+the combined list of primary and duals if \csopt[combine]{dual-sort}
+otherwise each list will be truncated separately by \meta{number},
+which results in a maximum of $2 \times \meta{number}$. Remember
+that tertiary entries are created when dual entries are defined in
+the \ext{glstex} file, so this will increase the total number of
+entries.
+
 \optsection{flatten}
 
-This is a boolean option. The default value is
-\csopt[false]{flatten}. 
+This is a boolean option. The default value is \csopt[false]{flatten}. 
 If \csopt[true]{flatten}, the sorting will ignore hierarchy and
 the \field{parent} field will be omitted when writing
 the definitions to the \ext{glstex} file, but the parent entries
@@ -5389,13 +5491,15 @@ The \sty{glossaries} package requires that all child entries must be
 defined after the parent entry. An error occurs otherwise, so
 \bibgls\ will omit the \field{parent} field if it can't be found in
 the given \idx{resourceset}. However, when the default
-\csopt[false]{strip-missing-parents} is on, this only occurs
-while writing the definitions in the \ext{glstex} file.
-Sorting is performed hierarchically and the \field{group} is set
-accordingly for the top-level entries, which means that an entry
-with a \field{parent} field will be treated by the sort method
-as a child entry. This can lead to a strange result, which \bibgls\
-warns about:
+\csopt[false]{strip-missing-parents} is on, this omission only occurs
+while writing the definitions in the \ext{glstex} file (after
+selection and sorting).
+
+Sorting is performed hierarchically and the \field{group} field is set
+accordingly for the top-level entries (but not for child entries),
+which means that an entry with a \field{parent} field will be
+treated by the sort method as a child entry. This can lead to a
+strange result, which \bibgls\ warns about:
 \begin{alltt}
 Parent '\meta{parent id}' not found for entry \meta{child-id}
 \end{alltt}
@@ -6548,6 +6652,11 @@ label (as given in the \ext{bib} file). The default setting is
 If \meta{value} is a known field, it will be set after the field
 aliases, otherwise it will simply be added to the \ext{glstex} file
 using \ics{GlsXtrSetField} after the entry definition. 
+
+\optsection{copy-alias-to-see}
+
+If set, the value of the \field{alias} field is copied to
+the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
 
 \section{Plurals}
 \label{sec:plurals}
@@ -10867,7 +10976,7 @@ preamble for the given type (or types if there are dual entries).
 
 This commands definition depends on the value provided by
 \csopt{loc-suffix}. For example, with 
-\csopt[\ics{at}\idx{periodchar}]{loc-suffix}
+\csopt[\ics{at}{\idx{periodchar}}]{loc-suffix}
 the command is defined as:
 \begin{verbatim}
 \providecommand{\bibglslocsuffix}[1]{\@.}
@@ -11995,7 +12104,7 @@ contain:
 \chapter{Examples}
 \label{sec:examples}
 \setcounter{secnumdepth}{0}
-\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
+\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily\small},
  commentstyle={\color{gray}}}
 
 The example files described here can be found in the
@@ -12154,12 +12263,12 @@ The contents of \filefmt{bacteria.bib} are as follows:
 
 \filesection{baseunits.bib}
 
-The \exfile{baseunits.bib} file contains base \glspl{SIunit}. The entries
+The \exfile{baseunits.bib} file contains base \idxpl{SIunit}. The entries
 are all defined using \atentry{symbol} but have custom fields
-\fieldfmt{unitname}, \fieldfmt{unitsymbol} and \field{measurement},
+\fieldfmt{unitname}, \fieldfmt{unitsymbol} and \fieldfmt{measurement},
 one of which must be aliased or copied to \field{name}. The others
 may be aliased or copied to \field{symbol} and \field{description}
-as required. The \field{unitsymbol} fields all use \ics{si} provided
+as required. The \fieldfmt{unitsymbol} fields all use \ics{si} provided
 by the \isty{siunitx} package, so that package must be loaded in the
 document. This is one of the small number of packages recognised by
 \bibgls, so it's possible to sort according to the symbol if
@@ -13239,7 +13348,7 @@ locale collator, but the dual entries need a sort method that's
 better suited to symbols. Fortunately, \bibgls\ has some (very
 limited) support for \isty{siunitx} and is able to interpret
 the \ics{si} commands in the sample \ext{bib} files. Since 
-\glspl{SIunit} are a mix of letters and numbers I've used one of the
+\idxpl{SIunit} are a mix of letters and numbers I've used one of the
 letter-number methods listed in
 \tableref{tab:sortoptionsletternumber}.
 
@@ -13638,7 +13747,7 @@ option to automatically load that package. I'd like to use the
 \glostyle{bookindex} style for the index, which is provided by 
 \sty{glossary-bookindex}, so I need:
 \begin{codeenv}
-\csopt[list,bookindex]{stylemods}
+\styopt[list,bookindex]{stylemods}
 \end{codeenv}
 This ensures that \sty{glossary-list} and \sty{glossary-bookindex}
 are loaded and patches the list styles.
@@ -13799,7 +13908,7 @@ file is just the lower case surname.
 Remember from \sectionref{sec:texparserlib} that the interpreter
 will be used on the \field{parent} field if the value contains
 \verb|\| or \verb|{| or \verb|}| and
-\csopt[true]{interpret-field-labels}.  This means that with this
+\csopt[true]{interpret-labels-field}.  This means that with this
 field alias and the interpreter on, \bibgls\ will attempt to
 interpret the field contents. So all that's needed is to ensure that
 \bibgls\ is given a definition of \gls{sortmediacreator} that
@@ -14799,7 +14908,7 @@ the sort fallback for symbols:
 \end{codeenv}
 I also need to alias the custom fields (especially for those in the
 \exfile{chemicalformula.bib}, \exfile{baseunits.bib} and
-\exfile{derivedunits} files):
+\exfile{derivedunits.bib} files):
 \begin{codeenv}
 \csopt[
   identifier=category,
@@ -15064,10 +15173,12 @@ extra glossaries, which all need to be defined:
 \newglossary*{person}{People}
 \end{verbatim}
 Since this document requires \exfile{people.bib}, \exfile{books.bib}
-and \exfile{films.bib} it also requires
-\exfile{no-interpret-preamble.bib} and either
-\exfile{interpret-preamble.bib} or \exfile{interpret-preamble2.bib}
-to ensure the custom commands are provided.
+and \exfile{films.bib} it also requires the \ext{bib} files that
+supply the definitions of the custom commands
+(\exfile{no-interpret-preamble.bib} and either
+\exfile{interpret-preamble.bib} or \exfile{interpret-preamble2.bib})
+to ensure the custom commands are provided both for the document and
+for \bibgls's interpreter.
 
 The first resource set to be loaded simply reads
 \exfile{no-interpret-preamble.bib} with the preamble interpreter

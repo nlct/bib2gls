@@ -14,4 +14,4 @@ convertgls2bib.1	: convertgls2bib.pod
 		pod2man -c convertgls2bib convertgls2bib.pod convertgls2bib.1
 
 clean	:
-	\rm -f bib2gls*.{aux,log,toc,lot,ilg,ind,idx,out,pdf,1,glstex,glg,blg,bbl}
+	\rm -f bib2gls*.{aux,log,toc,lot,lof,ilg,ind,idx,out,pdf,1,glstex,glg,blg,bbl}

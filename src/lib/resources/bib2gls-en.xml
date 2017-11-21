@@ -146,6 +146,7 @@ See the manual for further details.</entry>
 <entry key="message.dual.indexsymbol.mappings">Dual index-symbol mappings:</entry>
 <entry key="message.dual.indexabbrv.mappings">Dual index-abbreviation mappings:</entry>
 <entry key="message.process.result">Processed returned: {0}</entry>
+<entry key="message.truncated">Truncating according to limit={0}.</entry>
 
 <entry key="message.log.file">Transcript written to {0}.</entry>
 <entry key="message.written">{0} written to {1}.</entry>
@@ -189,8 +190,12 @@ into explicit range {1}</entry>
 Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
-<entry key="message.adding.target.record">Adding record {0} from aliased entry {1}.</entry>
+<entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>
+<entry key="message.adding.supplemental.record">Adding supplemental record {0} to entry {1}''s record list.</entry>
+<entry key="message.adding.counter.record">Adding record {0} to entry {1}''s {2} record list.</entry>
+<entry key="message.copying.record">Copying record {0} from entry {1} to entry {2}.</entry>
 <entry key="message.ignored.record">Ignoring record {0}.</entry>
+<entry key="message.clearing.records">Clearing entry {0}''s record list.</entry>
 <entry key="message.normalizing">Normalising {0} to {1}.</entry>
 <entry key="message.norm.distinct">Normalized {0} distinct from {1}.</entry>
 <entry key="message.no.norm">Can''t normalize {0}.</entry>
@@ -200,6 +205,7 @@ Defaulting to: {0}.
 <entry key="message.field.alias.check">Checking field aliases for {0}.</entry>
 <entry key="message.clearing.entry.aliases">Clearing entry type aliases.</entry>
 <entry key="message.setting.entry.aliases">Setting entry type aliases.</entry>
+<entry key="message.removing.missing.parent">Stripping missing parent ''{0}'' from entry {1}</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>

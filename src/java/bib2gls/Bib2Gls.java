@@ -879,6 +879,13 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentrysymbolplural", "symbolplural", 
          GlsEntryFieldValue.CASE_SENTENCE, this));
+      listener.putControlSequence(listener.createSymbol("bibglshashchar", '#'));
+      listener.putControlSequence(listener.createSymbol("bibglsunderscorechar", '_'));
+      listener.putControlSequence(listener.createSymbol("bibglsdollarchar", '$'));
+      listener.putControlSequence(listener.createSymbol("bibglsampersandchar", '&'));
+      listener.putControlSequence(listener.createSymbol("bibglscircumchar", '^'));
+      listener.putControlSequence(listener.createSymbol("glsbackslash", '\\'));
+      listener.putControlSequence(listener.createSymbol("glstildechar", '~'));
    }
 
    public void provideCommand(String csName, String text)
@@ -1633,10 +1640,16 @@ public class Bib2Gls implements TeXApp
       {
          String dep = it.next();
 
-         if (!dependencies.contains(dep))
-         {
-            dependencies.add(dep);
-         }
+         addDependent(dep);
+      }
+   }
+
+   public void addDependent(String id)
+   {
+      if (!dependencies.contains(id))
+      {
+         verboseMessage("message.added.dep", id);
+         dependencies.add(id);
       }
    }
 
@@ -1946,6 +1959,12 @@ public class Bib2Gls implements TeXApp
       writer.println("\\providecommand{\\bibglsampersandchar}{\\expandafter\\@gobble\\string\\&}");
       writer.println("\\providecommand{\\bibglsunderscorechar}{\\expandafter\\@gobble\\string\\_}");
       writer.println("\\providecommand{\\bibglsusesee}[1]{\\glsxtrusesee{#1}}");
+      writer.println("\\providecommand{\\bibglsusealias}[1]{%");
+      writer.println(" \\glsxtrifhasfield{alias}{#1}%");
+      writer.println(" {\\expandafter\\glsseeformat\\expandafter{\\glscurrentfieldvalue}{}}%");
+      writer.println(" {}%");
+      writer.println("}");
+      writer.println("\\providecommand{\\bibglsaliassep}[1]{\\bibglsseesep}");
       writer.println("\\providecommand{\\bibglsuseseealso}[1]{\\glsxtruseseealso{#1}}");
       writer.println("\\providecommand{\\bibglsdelimN}{\\delimN}");
       writer.println("\\providecommand{\\bibglslastDelimN}{,~}");
@@ -3766,8 +3785,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.0.20171120 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-20";
+   public static final String VERSION = "1.0.20171121 (EXPERIMENTAL)";
+   public static final String DATE = "2017-11-21";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

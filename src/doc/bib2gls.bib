@@ -261,6 +261,13 @@
   category={command}
 }
 
+@dualindexentry{bibglsaliassep,
+  name={\csfmt{bib\-gls\-alias\-sep}},
+  user1={},
+  description={separator between \gls[noindex]{dual.field.alias} 
+   cross-reference and location list},
+  category={command}
+}
 @dualindexentry{bibglsseealsosep,
   name={\csfmt{bib\-gls\-see\-also\-sep}},
   user1={},
@@ -290,6 +297,12 @@
   category={command}
 }
 
+@dualindexentry{bibglsusealias,
+  name={\csfmt{bib\-gls\-use\-alias}},
+  user1={\margm{label}},
+  description={display cross-reference list for given entry},
+  category={command}
+}
 @dualindexentry{bibglsuseseealso,
   name={\csfmt{bib\-gls\-use\-see\-also}},
   user1={\margm{label}},
@@ -829,6 +842,13 @@ name},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.copy-alias-to-see,
+   name={\csoptfmt{copy\dhyphen alias\dhyphen to\dhyphen see}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.write-preamble,
    name={\csoptfmt{write\dhyphen preamble}},
    user1={\meta{boolean}},
@@ -916,6 +936,13 @@ name},
 @dualindexentry{opt.not-match,
    name={\csoptfmt{not\dhyphen match}},
    user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.limit,
+   name={\csoptfmt{limit}},
+   user1={\meta{number}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -1870,7 +1897,7 @@ cs}\margm{Glspl-like cs}},
   description={defines commands to behave like \ics{gls}, \ics{glspl},
    \ics{Gls} and \ics{Glspl} with the given label prefix},
   note={provided by \styfmt{glossaries-extra} v1.21+},
-  seealso={gls,glspl,Gls,Glspl},
+  seealso={glsxtrnewgls},
   category={command}
 }
 
@@ -5217,7 +5244,7 @@ usual delay},
 }
 
 @index{printunsrtglossary,
-  name={\csfmt{print\-unsrt\-glossary}},
+  name={\csfmt{print\-unsrt\-glos\-sary}},
   user1={\oargm{options}},
   description={display the glossary by iterating over all entries 
    associated with that glossary in the order in which they were
@@ -5227,7 +5254,7 @@ usual delay},
 }
 
 @index{printunsrtglossary*,
-  name={\csfmt{print\-unsrt\-glossary*}},
+  name={\csfmt{print\-unsrt\-glos\-sary*}},
   user1={\oargm{options}\margm{code}},
   description={as \cs{printunsrtglossary} but performs
   \meta{code} first (scoped to localise any assignments within
@@ -5237,7 +5264,7 @@ usual delay},
 }
 
 @index{printunsrtglossaries,
-  name={\csfmt{print\-unsrt\-glossaries}},
+  name={\csfmt{print\-unsrt\-glos\-saries}},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printunsrtglossary} for each one},
@@ -5255,7 +5282,7 @@ usual delay},
 }
 
 @index{printglossary,
-  name={\csfmt{print\-glossary}},
+  name={\csfmt{print\-glos\-sary}},
   user1={\oargm{options}},
   description={inputs file created by \gls{makeindex} or \gls{xindy}},
   note={provided by \styfmt{glossaries}},
@@ -5263,7 +5290,7 @@ usual delay},
 }
 
 @index{printglossaries,
-  name={\csfmt{print\-glossaries}},
+  name={\csfmt{print\-glos\-saries}},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printglossary} for each one},
@@ -6012,6 +6039,14 @@ has three or more items},
   user1={\margm{text}},
   description={converts \meta{text} to upper case},
   note={kernel command},
+  category={command}
+}
+
+@index{char,
+  name={\csfmt{char}},
+  user1={\meta{number}},
+  description={accesses the character identified by \meta{number}},
+  note={{}\TeX\ primitive},
   category={command}
 }
 
