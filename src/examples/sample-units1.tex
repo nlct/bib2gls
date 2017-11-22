@@ -2,7 +2,7 @@
 % in the bib2gls user manual for a more detailed description
 % of this file.
 
-\documentclass{report}
+\documentclass[a4paper]{report}
 
 \usepackage{siunitx}
 \usepackage[record,% use bib2gls
@@ -19,7 +19,7 @@
   },
   symbol-sort-fallback=name,
   selection={all},
-  group={Base Units}
+  group={baseunits}
 ]
 
 \GlsXtrLoadResources[
@@ -31,8 +31,11 @@
   },
   symbol-sort-fallback=name,
   selection={all},
-  group={Derived Units}
+  group={derivedunits}
 ]
+
+\glsxtrsetgrouptitle{baseunits}{Base Units}
+\glsxtrsetgrouptitle{derivedunits}{Derived Units}
 
 \begin{document}
 

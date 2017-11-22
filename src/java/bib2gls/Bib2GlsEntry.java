@@ -837,7 +837,9 @@ public class Bib2GlsEntry extends BibEntry
 
             if (resource.isBibTeXAuthorField(field))
             {
-               value = convertBibTeXAuthorField(parser, field, value);
+               list = convertBibTeXAuthorField(parser, field, value);
+               value.clear();
+               value.add(new BibUserString(list));
             }
 
             if (field.equals("parent") || field.equals("category")
@@ -1030,7 +1032,7 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   protected BibValueList convertBibTeXAuthorField(TeXParser parser,
+   protected TeXObjectList convertBibTeXAuthorField(TeXParser parser,
      String field, BibValueList value)
    throws IOException
    {
@@ -1039,19 +1041,15 @@ public class Bib2GlsEntry extends BibEntry
 
       int n = contributors.size();
 
-      value = new BibValueList();
-
       TeXParserListener listener = parser.getListener();
 
-      Group grp = listener.createGroup();
-      BibUserString contents = new BibUserString(grp);
-      value.add(contents);
+      TeXObjectList list = new TeXObjectList();
 
-      grp.add(new TeXCsRef("bibglscontributorlist"));
+      list.add(new TeXCsRef("bibglscontributorlist"));
 
       Group subgrp = listener.createGroup();
 
-      grp.add(subgrp);
+      list.add(subgrp);
 
       for (int i = 0; i < n; i++)
       {
@@ -1106,9 +1104,9 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      grp.add(listener.createGroup(String.format("%d", n)));
+      list.add(listener.createGroup(String.format("%d", n)));
 
-      return value;
+      return list;
    }
 
    protected boolean isSentenceTerminator(int codePoint)

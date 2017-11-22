@@ -2,7 +2,7 @@
 % in the bib2gls user manual for a more detailed description
 % of this file.
 
-\documentclass[12pt]{report}
+\documentclass[12pt,a4paper]{report}
 
 \usepackage{siunitx}
 \usepackage[record,% use bib2gls
@@ -21,9 +21,9 @@
    unitsymbol=symbol,
    measurement=description
   },
-  sort-field={name},% sort by name field
+  symbol-sort-fallback={name},
   selection=all,% select all entries
-  % make @entry act like @dualsymbol:
+  % make @symbol act like @dualsymbol:
   entry-type-aliases={symbol=dualsymbol},
   set-widest,% needed for alttree style
   dual-sort={letternumber-upperlower},

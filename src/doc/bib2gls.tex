@@ -147,11 +147,6 @@
 
 \newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
 
-\newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
-\newenvironment{codeenv}
- {\begin{flushleft}\ttfamily\obeyspaces\obeylines}
- {\end{flushleft}\ignorespacesafterend}
-
 \newcommand{\era}[1]{\texorpdfstring{\textsc{\MakeLowercase{#1}}}{#1}}
 
 \newcommand{\dequals}{%
@@ -644,6 +639,13 @@ files}
 \date{\DTMusedate{moddate}}
 
 \makeatletter
+\renewcommand{\fps@figure}{htbp}
+
+\newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
+\newenvironment{codeenv}
+ {\begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces}
+ {\end{flushleft}\ignorespacesafterend}
+
 \begingroup
  \renewcommand{\addr}[1]{}
  \let\texorpdfstring\@secondoftwo
@@ -8029,7 +8031,7 @@ character code comparison not by a locale alphabet. The closest
 locale-sensitive equivalent is to use \csopt{sort-number-pad} with a
 locale sort method.
 
-\begin{figure}[htbp]
+\begin{figure}
 \figcontents
 {%
 \begin{tikzpicture}[every node/.style={minimum size=9mm},
@@ -13074,8 +13076,8 @@ efficient to instruct \bibgls\ to not save the number list with:
 \begin{codeenv}
 \csopt[false]{save-locations}
 \end{codeenv}
-This \ext{bib} file only has custom fields, so these need to be
-aliased. In this case I want the formula in the \field{name} field
+The \exfile{chemicalformula.bib} file only has custom fields, so these 
+need to be aliased. In this case I want the formula in the \field{name} field
 and the chemical name in the \field{description} field:
 \begin{codeenv}
 \csopt[formula=name,chemicalname=description]{field-aliases}
@@ -13120,13 +13122,11 @@ pdflatex sample-chemical
 bib2gls --group sample-chemical
 pdflatex sample-chemical
 \end{verbatim}
-This simple example only references entries on the first page so all
-entries just have~1 in the number list. The complete document is
-shown in \figureref{fig:sample-chemical.pdf}.
+The complete document is shown in \figureref{fig:sample-chemical.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-chemical.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-chemical.pdf}}%
@@ -13160,7 +13160,9 @@ later date to include other abbreviations that need
 \abbrstyle{long-only-short-only} but shouldn't be emphasized.
 This can be done through the use of \idxpl{categoryattribute}.
 The font used for the \field{name} in the glossary is governed by
-the \catattr{glossnamefont} attribute and the font used by commands like
+the \catattr{glossnamefont} attribute, the font used for the
+\field{description} in the glossary is governed by the
+\catattr{glossdescfont} attribute and the font used by commands like
 \cs{gls} in the document is governed by the \catattr{textformat}
 attribute (\styfmt{glossaries-extra} v1.21+). So if I set
 the \field{category} to \code{bacteria} then I can do:
@@ -13168,6 +13170,10 @@ the \field{category} to \code{bacteria} then I can do:
 \setabbreviationstyle[bacteria]{long-only-short-only}
 \glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
 \glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
+\end{verbatim}
+and (if the \field{description} field is displayed in the glossary):
+\begin{verbatim}
+\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
 \end{verbatim}
 (Note that the attribute value is the control sequence name without
 the initial backslash.)
@@ -13192,7 +13198,8 @@ as the \glostyle{bookindex} style is based on the \glostyle{index}
 style provided by \sty{glossary-tree}.
 
 The \glostyle{bookindex} style doesn't show the \field{description}
-field and, since the \abbrstyle{long-only-short-only} style sets
+field (which means I don't need the \catattr{glossdescfont}
+attribute) and, since the \abbrstyle{long-only-short-only} style sets
 the \field{name} to the short form by default, only the short form
 will show in the glossary. I'd rather it was just the long form.
 This could simply be done using \csopt{replicate-fields} to copy the
@@ -13201,7 +13208,9 @@ This could simply be done using \csopt{replicate-fields} to copy the
 replicate-fields={long=name}
 \end{verbatim}
 Again, I want to consider the possibility of adding other types of
-abbreviations and this might not be appropriate for them. Another
+abbreviations and this might not be appropriate for them (for
+example, I might want some abbreviations with the long form followed
+by the short form in parentheses). Another
 approach is to redefine \ics{glsxtrbookindexname} which is used by
 the \glostyle{bookindex} style to display the name. This takes the
 entry's label as the argument. The default definition is:
@@ -13232,6 +13241,10 @@ field). In this case it would be better to fallback on the
 \begin{verbatim}
 abbreviation-sort-fallback=long
 \end{verbatim}
+If I do add other types of abbreviations, they will all be sorted
+according to the \field{long} form, but at least this way I can have
+some \meta{long} (\meta{short}) names as well.
+
 The complete code is listed below.  The document build is:
 \begin{verbatim}
 pdflatex sample-bacteria
@@ -13244,7 +13257,7 @@ shown in \figureref{fig:sample-bacteria.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-bacteria.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-bacteria.pdf}}%
@@ -13261,9 +13274,28 @@ in two blocks: base units and derived units. This can be achieved by
 first loading \exfile{baseunits.bib} with \csopt{group} set to the
 desired group title (\qt{Base Units} in this case) and then load
 \exfile{derivedunits.bib} with the \csopt{group} set to the desired
-title (\qt{Derived Units} in this case). Since there's no
-\csopt{type} set, all entries end up in the main glossary, but since
-there are two resource commands the glossary ends up with sorted blocks.
+title (\qt{Derived Units} in this case). Remember that the
+\field{group} field needs to be used as a label. If the group title
+contains any problematic characters or commands, then it's better to
+use labels:
+\begin{codeenv}
+\csopt[baseunits]{group}
+\end{codeenv}
+for the first \idx{resourceset} and
+\begin{codeenv}
+\csopt[derivedunits]{group}
+\end{codeenv}
+for the second, and then set the group titles:
+\begin{codeenv}
+\gls{glsxtrsetgrouptitle}\marg{baseunits}\marg{Base Units}
+\gls{glsxtrsetgrouptitle}\marg{derivedunits}\marg{Derived Units}
+\end{codeenv}
+I've used this method to make it easier to adapt to other languages
+that may need extended characters in the group titles.
+
+Since there's no \csopt{type} set, all entries end up in the main
+glossary, but since there are two resource commands the glossary
+ends up with sorted blocks.
 
 The document doesn't include any commands like \cs{gls}, so
 I've use \csopt[all]{selection} to select all entries in the \ext{bib}
@@ -13280,7 +13312,7 @@ so I've changed the fallback:
 \begin{codeenv}
 \csopt[name]{symbol-sort-fallback}
 \end{codeenv}
-The custom fields need to be aliased:
+As with the previous example, the custom fields need to be aliased:
 \begin{codeenv}
 \csopt[
   unitname=name,
@@ -13297,7 +13329,9 @@ pdflatex sample-units1
 \end{verbatim}
 The complete document is shown in \figureref{fig:sample-units1.pdf}.
 
-\begin{figure}[p]
+\lstinputlisting[firstline=5]{../examples/sample-units1.tex}
+
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-units1.pdf}}%
@@ -13310,8 +13344,12 @@ The complete document is shown in \figureref{fig:sample-units1.pdf}.
 
 This example is provided for comparison with
 \exfile{sample-units1.tex}. Instead of having a single glossary with
-sorted blocks this example has two glossaries. I've used the
-\styopt{section} package option to use \ics{section*} for the
+sorted blocks this example has two glossaries:
+\begin{codeenv}
+\ics{newglossary*}\marg{baseunits}\marg{Base Units}
+\cs{newglossary*}\marg{derivedunits}\marg{Derived Units}
+\end{codeenv}
+I've used the \styopt{section} package option to use \ics{section*} for the
 glossary titles. This overrides the default \ics{chapter*} which is
 used with book or report type of classes. I've also used the
 \styopt{nomain} option to suppress the creation of the main glossary
@@ -13334,7 +13372,9 @@ pdflatex sample-units2
 \end{verbatim}
 The complete document is shown in \figureref{fig:sample-units2.pdf}.
 
-\begin{figure}[p]
+\lstinputlisting[firstline=5]{../examples/sample-units2.tex}
+
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-units2.pdf}}%
@@ -13346,18 +13386,28 @@ The complete document is shown in \figureref{fig:sample-units2.pdf}.
 \filesection{sample-units3.tex}
 
 This is another example that uses the \exfile{baseunits.bib} and
-\exfile{derivedunits.bib} files. This time I want two glossaries
-containing all the units (base and derived) where the first glossary
-is ordered by name and the second is ordered by symbol. This can be
-done with a single resource command that instructs \bibgls\ to make
-\atentry{symbol} behave like \atentry{dualsymbol}:
+\exfile{derivedunits.bib} files. As before the custom fields need to be aliased:
+\begin{codeenv}
+\csopt[
+  unitname=name,
+  unitsymbol=symbol,
+  measurement=description
+]{field-aliases}
+\end{codeenv}
+This time I want two glossaries containing all the units (base and
+derived) where the first glossary is ordered by name and the second
+is ordered by symbol. This can be done with a single resource
+command that instructs \bibgls\ to make \atentry{symbol} behave like
+\atentry{dualsymbol}:
 \begin{codeenv}
 \csopt[symbol=dualsymbol]{entry-type-aliases}
 \end{codeenv}
 This causes the \field{name} and \field{symbol} fields to be swapped
-in the dual list. Remember that fallback for the \field{sort} field is the
-label for the symbol entry types so I need \csopt[name]{sort-field}
-to ensure that the sorting is by the \field{name} field instead.
+in the dual list. Remember that the fallback for the \field{sort} field is the
+label for the symbol entry types so I need \csopt[name]{symbol-sort-fallback}
+to fallback on \field{name} field instead. (Alternative, I could
+just sort by the \field{name} field instead using
+\csopt[name]{sort-field}.)
 
 The primary entries can still be sorted according to the default
 locale collator, but the dual entries need a sort method that's
@@ -13367,15 +13417,6 @@ the \ics{si} commands in the sample \ext{bib} files. Since
 \idxpl{SIunit} are a mix of letters and numbers I've used one of the
 letter-number methods listed in
 \tableref{tab:sortoptionsletternumber}.
-
-As before the custom fields need to be aliased:
-\begin{codeenv}
-\csopt[
-  unitname=name,
-  unitsymbol=symbol,
-  measurement=description
-]{field-aliases}
-\end{codeenv}
 
 I've decided to define a custom style for the first glossary. Since
 it's based on the \glostyle{long3col-booktabs} style I need to 
@@ -13429,14 +13470,14 @@ column (rather than the location list, which is ignored).
 
 I also need to make sure I've defined a glossary for the dual
 entries:
-\begin{verbatim}
-\newglossary*{units}{Units of Measurement (by SI unit)}
-\end{verbatim}
-and specify the glossary types for the primary and dual entries
-with \csopt{type} and \csopt{dual-type}:
-\begin{verbatim}
-type=main,dual-type=units
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{units}\marg{Units of Measurement (by SI unit)}
+\end{codeenv}
+and specify the glossary types for the primary and dual entries:
+\begin{codeenv}
+\csopt[main]{type},
+\csopt[units]{dual-type}
+\end{codeenv}
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-units3
@@ -13449,7 +13490,7 @@ The two pages of the document are shown in
 
 \lstinputlisting[firstline=5]{../examples/sample-units3.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol{../examples/sample-units3.pdf}{2}}
 {\caption{\filefmt{sample-units3.pdf}}}
@@ -13481,13 +13522,13 @@ This means that the \field{category} field needs to be set. There
 are two simple ways to achieve this: use \csopt[same as base]{category}
 (which sets the \field{category} to \code{books} for entries in 
 \exfile{books.bib} and to \code{films} for entries in
-\exfile{films.bib}) or alias the custom \fieldfmt{identifier} format to
+\exfile{films.bib}) or alias the custom \fieldfmt{identifier} field to
 \field{category}. I've chosen the later method and also provided
 aliases for the custom \fieldfmt{year} and \fieldfmt{cast} fields:
-\begin{verbatim}
-field-aliases={identifier=category,year=user1,cast=user2},
-identical-sort-action={category}
-\end{verbatim}
+\begin{codeenv}
+\csopt[identifier=category,year=user1,cast=user2]{field-aliases},
+\csopt[category]{identical-sort-action}
+\end{codeenv}
 This ensures that books always come before films with the same
 title. An oddity is the film \qt{Whisky Galore!}\ which is one
 character different from the book \qt{Whisky Galore} but the default
@@ -13595,7 +13636,7 @@ The four pages of the document are shown in
 
 \lstinputlisting[firstline=5]{../examples/sample-media.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol{../examples/sample-media.pdf}{4}}
 {\caption{\filefmt{sample-media.pdf}}}
@@ -13875,7 +13916,7 @@ The four pages of the document are shown in \figureref{fig:sample-people.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-people.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol{../examples/sample-people.pdf}{4}}
 {\caption{\filefmt{sample-people.pdf}}}
@@ -13996,7 +14037,7 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-authors.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-authors.pdf}}%
@@ -14088,7 +14129,7 @@ The resulting document is shown in \figureref{fig:sample-msymbols.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-msymbols.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-msymbols.pdf}}%
@@ -14169,7 +14210,7 @@ The resulting document is shown in \figureref{fig:sample-maths.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-maths.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-maths.pdf}}%
@@ -14243,7 +14284,7 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-textsymbols.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-textsymbols.pdf}}%
@@ -14359,7 +14400,7 @@ The resulting document is shown in \figureref{fig:sample-languages.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-languages.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {%
  \frame{\includegraphics[height=.9\textheight]{../examples/sample-languages.pdf}}%
@@ -14757,7 +14798,7 @@ been referenced on page~1, the location lists are all simply~\qt{1}.
 \end{document}
 \end{lstlisting}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol{../examples/sample-usergroups.pdf}{2}}
 {\caption{\filefmt{sample-usergroups.pdf}}}
@@ -15148,14 +15189,14 @@ and \figureref{fig:sample-multi1.pdf2}.
 
 \lstinputlisting[firstline=5]{../examples/sample-multi1.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol{../examples/sample-multi1.pdf}{4}}
 {\caption{\filefmt{sample-multi1.pdf} (pages~1 to~4)}}
 {fig:sample-multi1.pdf}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol[5]{../examples/sample-multi1.pdf}{8}}
 {\caption{\filefmt{sample-multi1.pdf} (pages~5 to 8)}}
@@ -15327,14 +15368,14 @@ and \figureref{fig:sample-multi2.pdf2}.
 
 \lstinputlisting[firstline=5]{../examples/sample-multi2.tex}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol{../examples/sample-multi2.pdf}{4}}
 {\caption{\filefmt{sample-multi2.pdf} (pages~1 to~4)}}
 {fig:sample-multi2.pdf}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}
 \figcontents
 {\pdftwocol[5]{../examples/sample-multi2.pdf}{8}}
 {\caption{\filefmt{sample-multi2.pdf} (pages~5 to 8)}}
