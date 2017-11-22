@@ -1054,6 +1054,9 @@ but not \csopt{selection} or \csopt{limit}).
 \item Dependencies are registered (if
 \csopt[recorded and deps]{selection} or \csopt[recorded and deps and
 see]{selection}). 
+\item Any fields that have been identified by
+\csopt{date-time-fields}, \csopt{date-fields} or \csopt{time-fields}
+are converted.
 \end{itemize}
 If \csopt[recorded and deps and see]{selection} then any recorded
 entries that have been cross-referenced by an unrecorded entry, will
@@ -5792,6 +5795,96 @@ The second resource set will use the default
 \csopt[von]{bibtex-contributor-fields} setting when obtaining the
 sort value.
 
+\optsection{date-time-fields}
+
+This option indicates that the listed fields all contain 
+date and time information. Primary entries will have these fields
+parsed according to \csopt{date-time-field-format} and
+\csopt{date-time-field-locale} and dual entries will have these
+fields parsed according to \csopt{dual-date-time-field-format} and
+\csopt{dual-date-time-field-locale}. If the field value is missing
+or doesn't match the given pattern it remains unchanged, otherwise
+it's converted into the form
+\nosecdef{bibglsdatetime}
+where \meta{original} is the value of the field before conversion.
+If the interpreter is on, the value will be interpreted before
+being parsed if it contains \idx{escchar}, \idx{mshiftchar},
+\idx{bgroupchar}, \idx{egroupchar} or \idx{nbspchar}. (Remember that
+\idx{nbspchar} is converted to the non-breaking space character
+\hex{A0} unless \longarg{break-space} is used.)
+
+\optsection{date-fields}
+
+As \csopt{date-time-fields} but for fields that only contain date
+(not time) information. If parsed correctly, the field is converted
+to
+\nosecdef{bibglsdate}
+The fields are parsed according to
+\csopt{date-field-format} and
+\csopt{date-field-locale} for primary entries and according to
+\csopt{dual-date-field-format} and
+\csopt{dual-date-field-locale} for dual entries.
+
+\optsection{time-fields}
+
+As \csopt{date-time-fields} but for fields that only contain time
+(not date) information. If parsed correctly, the field is converted
+to
+\nosecdef{bibglstime}
+The fields are parsed according to
+\csopt{time-field-format} and
+\csopt{time-field-locale} for primary entries and according to
+\csopt{time-date-field-format} and
+\csopt{time-date-field-locale} for dual entries.
+
+\optsection{date-time-field-format}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-time-field-format}.
+The value is the format pattern used when parsing fields identified
+by \csopt{date-time-fields}. The \meta{value} is as for
+\csopt{date-sort-format}.
+
+\optsection{date-field-format}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-field-format}.
+The value is the format pattern used when parsing fields identified
+by \csopt{date-fields}. The \meta{value} is as for
+\csopt{date-sort-format}.
+
+\optsection{time-field-format}
+
+This option also sets
+\csopt[\meta{value}]{dual-time-field-format}.
+The value is the format pattern used when parsing fields identified
+by \csopt{time-fields}. The \meta{value} is as for
+\csopt{date-sort-format}.
+
+\optsection{date-time-field-locale}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-time-field-locale}.
+The value is the locale used when parsing fields identified
+by \csopt{date-time-fields}. The \meta{value} is as for
+\csopt{date-sort-locale}.
+
+\optsection{date-field-locale}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-field-locale}.
+The value is the locale used when parsing fields identified
+by \csopt{date-fields}. The \meta{value} is as for
+\csopt{date-sort-locale}.
+
+\optsection{time-field-locale}
+
+This option also sets
+\csopt[\meta{value}]{dual-time-field-locale}.
+The value is the locale used when parsing fields identified
+by \csopt{time-fields}. The \meta{value} is as for
+\csopt{date-sort-locale}.
+
 \optsection{category}
 
 The selected entries may all have their \field{category} field
@@ -9935,6 +10028,30 @@ hook could contain:
 Note that this new field won't be available for use within the
 \iext{bib} file (unless it was previously defined in the document
 before \csref{glsxtrresourcefile}).
+
+\optsection[\subsubsection]{dual-date-time-field-format}
+
+As \csopt{date-time-field-format} but is used for dual entries.
+
+\optsection[\subsubsection]{dual-date-field-format}
+
+As \csopt{date-field-format} but is used for dual entries.
+
+\optsection[\subsubsection]{dual-time-field-format}
+
+As \csopt{time-field-format} but is used for dual entries.
+
+\optsection[\subsubsection]{dual-date-time-field-locale}
+
+As \csopt{date-time-field-locale} but is used for dual entries.
+
+\optsection[\subsubsection]{dual-date-field-locale}
+
+As \csopt{date-field-locale} but is used for dual entries.
+
+\optsection[\subsubsection]{dual-time-field-locale}
+
+As \csopt{time-field-locale} but is used for dual entries.
 
 \subsection{Dual Sorting}
 \label{sec:dualoptssort}
@@ -15247,13 +15364,15 @@ switched off:
 }
 \end{codeenv}
 This ensures that \LaTeX\ can pick up the provided commands and
-prevents them from being added to the interpreter. The
-\exfile{people.bib} file is the next to be loaded with
+prevents them from being added to the interpreter.
+
+The \exfile{people.bib} file is the next to be loaded with
 \exfile{interpret-preamble.bib}. This is loaded separately from the
 other resources as this needs the \field{name} field to be copied to
 \field{first} (if not already set), as in the
 \exfile{sample-people.tex} file. By having a separate resource set,
-this setting doesn't affect the other entries:
+this setting doesn't affect the other entries. I've also converted
+the date fields so that I can customise the format in the document.
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
  \csopt[interpret-preamble,people]{src},
@@ -15266,10 +15385,27 @@ this setting doesn't affect the other entries:
  \csopt[name=\marg{first}]{replicate-fields},
  \csopt[person]{type},
  \csopt[false]{save-locations}
+ \csopt[user1,user2]{date-fields},
+ \csopt[d MMM y G]{date-field-format}
 }
 \end{codeenv}
+As with the \exfile{sample-people.tex} document, I need to use the
+\longarg{break-space} switch to convert the \idx{nbspchar} to a
+normal breakable space so that it matches the given format. I've
+loaded the \sty{datetime2} package:\footnote{The
+\styoptfmt{en-GB} option to \sty{datetime2} also requires that
+\styfmt{datetime2-english} must be installed.}
+\begin{verbatim}
+\usepackage[en-GB]{datetime2}
+\end{verbatim}
+so that I can use \ics{DTMdisplaydate} to adjust the formatting:
+\begin{verbatim}
+\newcommand*{\bibglsdate}[7]{\DTMdisplaydate{#1}{#2}{#3}{#4}}
+\end{verbatim}
+This needs to go before the \idx{resourceset} is loaded.
+
 Note that unlike \exfile{sample-people.tex} which had
-\csopt[people]{category}, this obtains the \field{category} field
+\csopt[people]{category}, this document obtains the \field{category} field
 from the custom \fieldfmt{identifier} field, which in this case 
 has the value \code{person}. This means that the category hooks from
 \exfile{sample-people.tex} need to be renamed to reflect the

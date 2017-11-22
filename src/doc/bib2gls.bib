@@ -635,6 +635,35 @@ name},
   category={command}
 }
 
+@dualindexentry{bibglsdate,
+  name={\csfmt{bib\-gls\-date}},
+  user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\marg{original}},
+  description={used to markup a date converted from a field value},
+  category={command}
+}
+
+@dualindexentry{bibglsdatetime,
+  name={\csfmt{bib\-gls\-date\-time}},
+  user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\marg{original}},
+  description={used to markup a date-time instance converted from a field value},
+  category={command}
+}
+
+@dualindexentry{bibglsdatetimeremainder,
+  name={\csfmt{bib\-gls\-date\-time\-remainder}},
+  user1={\margm{millisec}\margm{dst}\margm{zone}\marg{original}},
+  description={used internally to pick up the final four arguments of
+   \gls{bibglsdatetime}},
+  category={command}
+}
+
+@dualindexentry{bibglstime,
+  name={\csfmt{bib\-gls\-time}},
+  user1={\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\marg{original}},
+  description={used to markup a time converted from a field value},
+  category={command}
+}
+
 @dualindexentry{bibglshashchar,
   name={\csfmt{bib\-gls\-hash\-char}},
   user1={},
@@ -992,6 +1021,113 @@ name},
 @dualindexentry{opt.ignore-fields,
    name={\csoptfmt{ignore\dhyphen fields}},
    user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-time-fields,
+   name={\csoptfmt{date\dhyphen time\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-fields,
+   name={\csoptfmt{date\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.time-fields,
+   name={\csoptfmt{time\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-time-field-format,
+   name={\csoptfmt{date\dhyphen time\dhyphen field\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-date-time-field-format,
+   name={\csoptfmt{dual\dhyphen date\dhyphen time\dhyphen field\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-field-format,
+   name={\csoptfmt{date\dhyphen field\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-date-field-format,
+   name={\csoptfmt{dual\dhyphen date\dhyphen field\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.time-field-format,
+   name={\csoptfmt{time\dhyphen field\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-time-field-format,
+   name={\csoptfmt{dual\dhyphen time\dhyphen field\dhyphen format}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-time-field-locale,
+   name={\csoptfmt{date\dhyphen time\dhyphen field\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-date-time-field-locale,
+   name={\csoptfmt{dual\dhyphen date\dhyphen time\dhyphen
+field\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.date-field-locale,
+   name={\csoptfmt{date\dhyphen field\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-time-field-locale,
+   name={\csoptfmt{dual\dhyphen time\dhyphen
+field\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.time-field-locale,
+   name={\csoptfmt{time\dhyphen field\dhyphen locale}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-time-field-locale,
+   name={\csoptfmt{date\dhyphen time\dhyphen field\dhyphen locale}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }

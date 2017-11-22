@@ -8,6 +8,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[version=4]{mhchem}
 \usepackage{siunitx}
+\usepackage[en-GB]{datetime2}
 \usepackage[colorlinks]{hyperref}
 
 \usepackage[record,% use bib2gls
@@ -32,6 +33,8 @@
 \newglossary*{book}{Books}
 \newglossary*{person}{People}
 
+\newcommand*{\bibglsdate}[7]{\DTMdisplaydate{#1}{#2}{#3}{#4}}
+
 \GlsXtrLoadResources[
   src={no-interpret-preamble},
   interpret-preamble=false
@@ -47,7 +50,9 @@
  },
  replicate-fields={name={first}},
  type=person,
- save-locations=false
+ save-locations=false,
+ date-fields={user1,user2},
+ date-field-format={d MMM y G}
 ]
 
 % Abbreviation styles must be set before the resource set

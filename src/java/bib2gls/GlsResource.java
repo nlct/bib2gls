@@ -1505,6 +1505,72 @@ public class GlsResource
          {
             checkEndPunc = getStringArray(parser, list, opt);
          }
+         else if (opt.equals("date-time-fields"))
+         {
+            dateTimeList = getStringArray(parser, list, opt);
+         }
+         else if (opt.equals("date-fields"))
+         {
+            dateList = getStringArray(parser, list, opt);
+         }
+         else if (opt.equals("time-fields"))
+         {
+            timeList = getStringArray(parser, list, opt);
+         }
+         else if (opt.equals("date-time-field-format"))
+         {
+            dateTimeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dualDateTimeListFormat = dateTimeListFormat;
+         }
+         else if (opt.equals("dual-date-time-field-format"))
+         {
+            dualDateTimeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+         }
+         else if (opt.equals("date-field-format"))
+         {
+            dateListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dualDateListFormat = dateListFormat;
+         }
+         else if (opt.equals("dual-date-field-format"))
+         {
+            dualDateListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+         }
+         else if (opt.equals("time-field-format"))
+         {
+            timeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dualTimeListFormat = timeListFormat;
+         }
+         else if (opt.equals("dual-time-field-format"))
+         {
+            dualTimeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+         }
+         else if (opt.equals("date-time-field-locale"))
+         {
+            dateTimeListLocale = getLocale(parser, list, opt);
+            dualDateTimeListLocale = dateTimeListLocale;
+         }
+         else if (opt.equals("dual-date-time-field-locale"))
+         {
+            dualDateTimeListLocale = getLocale(parser, list, opt);
+         }
+         else if (opt.equals("date-field-locale"))
+         {
+            dateListLocale = getLocale(parser, list, opt);
+            dualDateListLocale = dateListLocale;
+         }
+         else if (opt.equals("dual-date-field-locale"))
+         {
+            dualDateListLocale = getLocale(parser, list, opt);
+         }
+         else if (opt.equals("time-field-locale"))
+         {
+            timeListLocale = getLocale(parser, list, opt);
+            dualTimeListLocale = timeListLocale;
+         }
+         else if (opt.equals("dual-time-field-locale"))
+         {
+            dualTimeListLocale = getLocale(parser, list, opt);
+         }
          else if (opt.equals("bibtex-contributor-fields"))
          {
             bibtexAuthorList = getStringArray(parser, list, opt);
@@ -2807,6 +2873,25 @@ public class GlsResource
          opt, value, builder));
    }
 
+   private Locale getLocale(TeXParser parser, KeyValList list, String opt)
+    throws IOException
+   {
+      String value = getOptional(parser, list, opt);
+
+      if (value == null || "locale".equals(value))
+      {
+         return null;
+      }
+      else if ("doc".equals(value))
+      {
+         return Locale.forLanguageTag(bib2gls.getDocDefaultLocale());
+      }
+      else
+      {
+         return Locale.forLanguageTag(value);
+      }
+   }
+
    private String[] getStringArray(TeXParser parser, String defValue, 
      KeyValList list, String opt)
     throws IOException
@@ -2825,7 +2910,14 @@ public class GlsResource
      String opt)
     throws IOException
    {
-      CsvList csvList = CsvList.getList(parser, list.getValue(opt));
+      TeXObject object = list.getValue(opt);
+
+      if (object instanceof TeXObjectList)
+      {
+         object = trimList((TeXObjectList)object);
+      }
+
+      CsvList csvList = CsvList.getList(parser, object);
 
       int n = csvList.size();
 
@@ -3677,6 +3769,61 @@ public class GlsResource
                   }
                }
             }
+
+            if (dateTimeList != null)
+            {
+               for (String field : dateTimeList)
+               {
+                  entry.convertFieldToDateTime(bibParser, field,
+                    dateTimeListFormat, dateTimeListLocale,
+                    true, true);
+
+                  if (dual != null)
+                  {
+                     entry.convertFieldToDateTime(bibParser, field,
+                       dualDateTimeListFormat,
+                       dualDateTimeListLocale,
+                       true, true);
+                  }
+               }
+            }
+
+            if (dateList != null)
+            {
+               for (String field : dateList)
+               {
+                  entry.convertFieldToDateTime(bibParser, field,
+                    dateListFormat, dateListLocale,
+                    true, false);
+
+                  if (dual != null)
+                  {
+                     entry.convertFieldToDateTime(bibParser, field,
+                       dualDateListFormat,
+                       dualDateListLocale,
+                       true, false);
+                  }
+               }
+            }
+
+            if (timeList != null)
+            {
+               for (String field : timeList)
+               {
+                  entry.convertFieldToDateTime(bibParser, field,
+                    timeListFormat, timeListLocale,
+                    false, true);
+
+                  if (dual != null)
+                  {
+                     entry.convertFieldToDateTime(bibParser, field,
+                       dualTimeListFormat,
+                       dualTimeListLocale,
+                       false, true);
+                  }
+               }
+            }
+
          }
       }
 
@@ -4694,6 +4841,26 @@ public class GlsResource
             }
 
             writer.println("}");
+         }
+
+         if (dateTimeList != null)
+         {
+            writer.print("\\providecommand{\\bibglsdatetime}[9]");
+            writer.println("{\\bibglsdatetimeremainder}");
+            writer.format("\\providecommand{\\bibglsdatetimeremainder}[4]{#4}");
+            writer.println();
+         }
+
+         if (dateList != null)
+         {
+            writer.println("\\providecommand{\\bibglsdate}[7]{#7}");
+            writer.println();
+         }
+
+         if (timeList != null)
+         {
+            writer.println("\\providecommand{\\bibglstime}[7]{#7}");
+            writer.println();
          }
 
          if (counters != null)
@@ -7142,6 +7309,26 @@ public class GlsResource
    private String[] skipFields = null;
 
    private String[] bibtexAuthorList = null;
+
+   private String[] dateTimeList = null;
+   private String[] dateList = null;
+   private String[] timeList = null;
+
+   private String dateTimeListFormat = "default";
+   private String dateListFormat = "default";
+   private String timeListFormat = "default";
+
+   private String dualDateTimeListFormat = "default";
+   private String dualDateListFormat = "default";
+   private String dualTimeListFormat = "default";
+
+   private Locale dateTimeListLocale = null;
+   private Locale dateListLocale = null;
+   private Locale timeListLocale = null;
+
+   private Locale dualDateTimeListLocale = null;
+   private Locale dualDateListLocale = null;
+   private Locale dualTimeListLocale = null;
 
    private String[] externalPrefixes = null;
 

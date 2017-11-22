@@ -23,9 +23,15 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Vector;
-import java.text.CollationKey;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.Calendar;
+import java.util.Date;
+import java.text.CollationKey;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
@@ -1030,6 +1036,210 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
       }
+   }
+
+   public void convertFieldToDateTime(TeXParser parser,
+     String field, String dateFormat,
+     Locale dateLocale, boolean hasDate, boolean hasTime)
+   throws IOException
+   {
+      String id = getId();
+
+      bib2gls.debugMessage("message.datetime.field.check",
+        id, field, hasDate, hasTime);
+
+      BibValueList valueList = getField(field);
+
+      if (valueList == null)
+      {
+         bib2gls.debugMessage("message.field.notset", field, id);
+         return;
+      }
+
+      String valueStr = getFieldValue(field);
+
+      TeXObjectList originalList = (TeXObjectList)valueList.expand(parser).clone();
+      String originalValue = valueStr;
+
+      if (bib2gls.useInterpreter() && 
+           valueStr.matches("(?s).*[\\\\\\$\\{\\}\\~].*"))
+      {
+         valueStr = bib2gls.interpret(valueStr, valueList, true);
+      }
+
+      DateFormat format = SortSettings.getDateFormat(
+        dateLocale, dateFormat, hasDate, hasTime);
+
+      Date dateValue;
+
+      try
+      {
+         dateValue = format.parse(valueStr);
+      }
+      catch (ParseException excp)
+      {
+         if (format instanceof SimpleDateFormat)
+         {
+            bib2gls.warningMessage(
+                "warning.cant.parse.datetime.pattern",
+                field, id, ((SimpleDateFormat)format).toPattern());
+         }
+         else
+         {
+            bib2gls.warningMessage("warning.cant.parse.datetime.pattern",
+                field, id, dateFormat);
+         }
+
+         bib2gls.debug(excp);
+
+         return;
+      }
+
+      Calendar calendar;
+
+      if (dateLocale == null)
+      {
+         calendar = Calendar.getInstance();
+      }
+      else
+      {
+         calendar = Calendar.getInstance(dateLocale);
+      }
+
+      calendar.setTime(dateValue);
+
+      TeXObjectList list = new TeXObjectList();
+      TeXParserListener listener = parser.getListener();
+      Group grp;
+
+      StringBuilder builder = new StringBuilder();
+
+      if (hasDate)
+      {
+         if (hasTime)
+         {
+            list.add(new TeXCsRef("bibglsdatetime"));
+            builder.append("\\bibglsdatetime");
+         }
+         else
+         {
+            list.add(new TeXCsRef("bibglsdate"));
+            builder.append("\\bibglsdate");
+         }
+
+         int year = calendar.get(Calendar.YEAR);
+         int month = calendar.get(Calendar.MONTH)+1;
+         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+         int era = calendar.get(Calendar.ERA);
+
+         // Ensure compatibility with pgfcalendar and datetime2
+         switch (dayOfWeek)
+         {
+            case Calendar.MONDAY:
+              dayOfWeek = 0;
+            break;
+            case Calendar.TUESDAY:
+              dayOfWeek = 1;
+            break;
+            case Calendar.WEDNESDAY:
+              dayOfWeek = 2;
+            break;
+            case Calendar.THURSDAY:
+              dayOfWeek = 3;
+            break;
+            case Calendar.FRIDAY:
+              dayOfWeek = 4;
+            break;
+            case Calendar.SATURDAY:
+              dayOfWeek = 5;
+            break;
+            case Calendar.SUNDAY:
+              dayOfWeek = 6;
+            break;
+         }
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(year));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(month));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(dayOfMonth));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(dayOfWeek));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(dayOfYear));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(era));
+
+         builder.append(String.format("{%d}{%d}{%d}{%d}{%d}{%d}",
+           year, month, dayOfMonth, dayOfWeek, dayOfYear, era));
+      }
+      else
+      {
+         list.add(new TeXCsRef("bibglstime"));
+         builder.append("\\bibglstime");
+      }
+
+      if (hasTime)
+      {
+         int hour = calendar.get(Calendar.HOUR_OF_DAY);
+         int minute = calendar.get(Calendar.MINUTE);
+         int second = calendar.get(Calendar.SECOND);
+         int millisec = calendar.get(Calendar.MILLISECOND);
+         int dst = calendar.get(Calendar.DST_OFFSET);
+         int zoneOffset = calendar.get(Calendar.ZONE_OFFSET);
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(hour));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(minute));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(second));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(millisec));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(dst));
+
+         grp = listener.createGroup();
+         list.add(grp);
+         grp.add(new UserNumber(zoneOffset));
+
+         builder.append(String.format("{%d}{%d}{%d}{%d}{%d}{%d}",
+           hour, minute, second, millisec, dst, zoneOffset));
+      }
+
+      grp = listener.createGroup();
+      grp.addAll(originalList);
+
+      builder.append(String.format("{%s}", originalValue));
+
+      valueList.clear();
+      valueList.add(new BibUserString(list));
+
+      putField(field, valueList);
+      putField(field, builder.toString());
    }
 
    protected TeXObjectList convertBibTeXAuthorField(TeXParser parser,

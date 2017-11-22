@@ -67,96 +67,12 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
          sortDateFormat = new SimpleDateFormat("HH:mm:ssZ");
       }
 
-      init(locale, format);
+      dateFormat = SortSettings.getDateFormat(locale, format, hasDate, hasTime);
    }
 
    protected boolean useSortSuffix()
    {
       return false;
-   }
-
-   private void init(Locale locale, String format)
-   {
-      int type = DateFormat.DEFAULT;
-
-      if (format == null || "default".equals(format))
-      {
-         type = DateFormat.DEFAULT;
-         format = null;
-      }
-      else if (format.equals("full"))
-      {
-         type = DateFormat.FULL;
-         format = null;
-      }
-      else if (format.equals("long"))
-      {
-         type = DateFormat.LONG;
-         format = null;
-      }
-      else if (format.equals("medium"))
-      {
-         type = DateFormat.MEDIUM;
-         format = null;
-      }
-      else if (format.equals("short"))
-      {
-         type = DateFormat.SHORT;
-         format = null;
-      }
-
-      if (format == null)
-      {
-         if (hasDate && hasTime)
-         {
-            if (locale == null)
-            {
-               dateFormat = DateFormat.getDateTimeInstance(type, type);
-            }
-            else
-            {
-               dateFormat = DateFormat.getDateTimeInstance(type, type, locale);
-            }
-         }
-         else if (hasDate)
-         {
-            if (locale == null)
-            {
-               dateFormat = DateFormat.getDateInstance(type);
-            }
-            else
-            {
-               dateFormat = DateFormat.getDateInstance(type, locale);
-            }
-         }
-         else if (hasTime)
-         {
-            if (locale == null)
-            {
-               dateFormat = DateFormat.getTimeInstance(type);
-            }
-            else
-            {
-               dateFormat = DateFormat.getTimeInstance(type, locale);
-            }
-         }
-         else
-         {
-             throw new IllegalArgumentException(
-                "Can't have both date=false and time=false");
-         }
-      }
-      else
-      {
-         if (locale == null)
-         {
-            dateFormat = new SimpleDateFormat(format);
-         }
-         else
-         {
-            dateFormat = new SimpleDateFormat(format, locale);
-         }
-      }
    }
 
    protected String adjustSort(Bib2GlsEntry entry, String value)
@@ -175,14 +91,14 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
 
          if (dateFormat instanceof SimpleDateFormat)
          {
-            bib2gls.warning(bib2gls.getMessage(
+            bib2gls.warningMessage(
                 "warning.cant.parse.pattern.sort",
-                value, id, ((SimpleDateFormat)dateFormat).toPattern()));
+                value, id, ((SimpleDateFormat)dateFormat).toPattern());
          }
          else
          {
-            bib2gls.warning(bib2gls.getMessage("warning.cant.parse.sort",
-                value, id));
+            bib2gls.warningMessage("warning.cant.parse.sort",
+                value, id);
          }
       }
 

@@ -98,7 +98,7 @@ sample-multi2.pdf	: $(DEPS) sample-multi2.tex \
 	vegetables.bib animals.bib chemicalformula.bib \
 	baseunits.bib derivedunits.bib terms.bib
 	pdflatex sample-multi2
-	$(BIB2GLS) sample-multi2
+	$(BIB2GLS) --break-space sample-multi2
 	pdflatex sample-multi2
 
 clean	:

@@ -811,6 +811,11 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
       listener.putControlSequence(new GlsHyperLink(this));
       listener.putControlSequence(new BibGlsContributor(this));
+      listener.putControlSequence(new BibGlsDateTime());
+      listener.putControlSequence(
+         new BibGlsDateTime("bibglsdate", true, false));
+      listener.putControlSequence(
+         new BibGlsDateTime("bibglstime", false, true));
 
       listener.putControlSequence(new GlsEntryFieldValue(
         "glsentryname", "name", this));

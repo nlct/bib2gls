@@ -55,6 +55,21 @@ v1.1 (pending):
      - limit
      - copy-alias-to-see
      - replicate-override
+     - date-time-fields
+     - date-fields
+     - time-fields
+     - date-time-field-format
+     - date-field-format
+     - time-field-format
+     - dual-date-time-field-format
+     - dual-date-field-format
+     - dual-time-field-format
+     - date-time-field-locale
+     - date-field-locale
+     - time-field-locale
+     - dual-date-time-field-locale
+     - dual-date-field-locale
+     - dual-time-field-locale
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

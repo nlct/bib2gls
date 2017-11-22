@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.IllformedLocaleException;
 import java.util.MissingResourceException;
 import java.text.Collator;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 public class SortSettings
 {
@@ -335,6 +337,94 @@ public class SortSettings
    public String getDateLocaleSetting()
    {
       return dateLocale;
+   }
+
+   public static DateFormat getDateFormat(Locale locale, String format, boolean hasDate, boolean hasTime)
+   {
+      DateFormat dateFormat;
+
+      int type = DateFormat.DEFAULT;
+
+      if (format == null || "default".equals(format))
+      {
+         type = DateFormat.DEFAULT;
+         format = null;
+      }
+      else if (format.equals("full"))
+      {
+         type = DateFormat.FULL;
+         format = null;
+      }
+      else if (format.equals("long"))
+      {
+         type = DateFormat.LONG;
+         format = null;
+      }
+      else if (format.equals("medium"))
+      {
+         type = DateFormat.MEDIUM;
+         format = null;
+      }
+      else if (format.equals("short"))
+      {
+         type = DateFormat.SHORT;
+         format = null;
+      }
+
+      if (format == null)
+      {
+         if (hasDate && hasTime)
+         {
+            if (locale == null)
+            {
+               dateFormat = DateFormat.getDateTimeInstance(type, type);
+            }
+            else
+            {
+               dateFormat = DateFormat.getDateTimeInstance(type, type, locale);
+            }
+         }
+         else if (hasDate)
+         {
+            if (locale == null)
+            {
+               dateFormat = DateFormat.getDateInstance(type);
+            }
+            else
+            {
+               dateFormat = DateFormat.getDateInstance(type, locale);
+            }
+         }
+         else if (hasTime)
+         {
+            if (locale == null)
+            {
+               dateFormat = DateFormat.getTimeInstance(type);
+            }
+            else
+            {
+               dateFormat = DateFormat.getTimeInstance(type, locale);
+            }
+         }
+         else
+         {
+             throw new IllegalArgumentException(
+                "Can't have both date=false and time=false");
+         }
+      }
+      else
+      {
+         if (locale == null)
+         {
+            dateFormat = new SimpleDateFormat(format);
+         }
+         else
+         {
+            dateFormat = new SimpleDateFormat(format, locale);
+         }
+      }
+
+      return dateFormat;
    }
 
    public Locale getLocale()

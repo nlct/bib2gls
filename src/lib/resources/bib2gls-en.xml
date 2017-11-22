@@ -122,6 +122,8 @@ See the manual for further details.</entry>
 <entry key="message.added.alias.dep">Adding alias {0} as dependency for {1}</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
+<entry key="message.datetime.field.check">Checking entry {0} field {1} for date/time data (date:{2}, time:{3}).</entry>
+<entry key="message.field.notset">Field {0} not set for entry {1}</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
 <entry key="message.ignore.fields">Ignoring fields:</entry>
 <entry key="message.sort.mode">Sort mode: {0}</entry>
@@ -239,6 +241,7 @@ Defaulting to: {0}.
 </entry>
 <entry key="warning.cant.parse.pattern.sort">Can''t parse sort value ''{0}'' for ''{1}'' (pattern: ''{2}'')
 </entry>
+<entry key="warning.cant.parse.datetime.pattern">Can''t parse {0} value ''{1}'' (pattern: ''{2}'')</entry>
 <entry key="warning.deprecated.type">Entry type ''{0}'' deprecated. Use ''{1}'' instead.</entry>
 <entry key="warning.deprecated.option">Option ''{0}'' deprecated. Use ''{1}'' instead.</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
