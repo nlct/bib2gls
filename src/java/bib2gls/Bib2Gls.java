@@ -51,6 +51,16 @@ public class Bib2Gls implements TeXApp
    public Bib2Gls(int debug, int verbose, String langTag)
      throws IOException,InterruptedException,Bib2GlsException
    {
+      try
+      {
+         pending = new StringWriter();
+         pendingWriter = new PrintWriter(pending);
+      }
+      catch (Throwable e)
+      {
+         pendingWriter = null;
+      }
+
       debugLevel = debug;
       verboseLevel = verbose;
       shownVersion = false;
@@ -2056,6 +2066,10 @@ public class Bib2Gls implements TeXApp
       {
          logWriter.println(message);
       }
+      else if (pendingWriter != null)
+      {
+         pendingWriter.println(message);
+      }
    }
 
    public void logMessage()
@@ -2064,25 +2078,21 @@ public class Bib2Gls implements TeXApp
       {
          logWriter.println();
       }
+      else if (pendingWriter != null)
+      {
+         pendingWriter.println();
+      }
    }
 
    public void logAndPrintMessage(String message)
    {
-      if (logWriter != null)
-      {
-         logWriter.println(message);
-      }
-
+      logMessage(message);
       System.out.println(message);
    }
 
    public void logAndPrintMessage()
    {
-      if (logWriter != null)
-      {
-         logWriter.println();
-      }
-
+      logMessage();
       System.out.println();
    }
 
@@ -2131,6 +2141,10 @@ public class Bib2Gls implements TeXApp
          {
             e.printStackTrace(logWriter);
          }
+         else if (pendingWriter != null)
+         {
+            e.printStackTrace(pendingWriter);
+         }
       }
    }
 
@@ -2153,6 +2167,15 @@ public class Bib2Gls implements TeXApp
          logAndPrintMessage(message);
 
          e.printStackTrace();
+
+         if (logWriter != null)
+         {
+            e.printStackTrace(logWriter);
+         }
+         else if (pendingWriter != null)
+         {
+            e.printStackTrace(pendingWriter);
+         }
       }
    }
 
@@ -2175,10 +2198,19 @@ public class Bib2Gls implements TeXApp
         "Running {0}",
         String.format("kpsewhich '%s'", arg)));
 
-      Process process =
-        new ProcessBuilder("kpsewhich", arg).start();
+      Process process = null;
+      int exitCode = -1;
 
-      int exitCode = process.waitFor();
+      try
+      {
+         process = new ProcessBuilder("kpsewhich", arg).start();
+         exitCode = process.waitFor();
+      }
+      catch (Exception e)
+      {
+         debug(e);
+         return null;
+      }
 
       String line = null;
 
@@ -2213,15 +2245,11 @@ public class Bib2Gls implements TeXApp
             }
          }
       }
-      else
+      else if (debugLevel > 0)
       {
-         String msg = getMessageWithFallback("error.app_failed",
+         logAndPrintMessage(getMessageWithFallback("error.app_failed",
            "{0} failed with exit code {1}",
-           String.format("kpsewhich '%s'", arg),  exitCode);
-
-         debug(msg);
-
-         throw new FileNotFoundException(msg);
+           String.format("kpsewhich '%s'", arg),  exitCode));
       }
 
       return line;
@@ -3661,17 +3689,6 @@ public class Bib2Gls implements TeXApp
       try
       {
          logWriter = new PrintWriter(new FileWriter(logFile));
-
-         logMessage(getMessage("about.version", NAME, VERSION, DATE));
-
-         if (getDebugLevel() > 0)
-         {
-            logAndPrintMessage(String.format(
-               "openin_any=%s%nopenout_any=%s%nTEXMFOUTPUT=%s%ncwd=%s", 
-                openin_any, openout_any, 
-                texmfoutput == null ? "" : texmfoutput,
-                cwd));
-         }
       }
       catch (IOException e)
       {
@@ -3679,6 +3696,26 @@ public class Bib2Gls implements TeXApp
          System.err.println(getMessage("error.cant.open.log", 
             logFile.toString()));
          error(e);
+      }
+
+      logMessage(getMessage("about.version", NAME, VERSION, DATE));
+
+      if (logWriter != null)
+      {
+         logWriter.print(pending.toString());
+      }
+
+      pendingWriter.close();
+      pendingWriter = null;
+      pending = null;
+
+      if (getDebugLevel() > 0)
+      {
+         logAndPrintMessage(String.format(
+            "openin_any=%s%nopenout_any=%s%nTEXMFOUTPUT=%s%ncwd=%s", 
+             openin_any, openout_any, 
+             texmfoutput == null ? "" : texmfoutput,
+             cwd));
       }
    }
 
@@ -3804,6 +3841,8 @@ public class Bib2Gls implements TeXApp
    private File auxFile;
    private File logFile;
    private PrintWriter logWriter=null;
+   private StringWriter pending = null;
+   private PrintWriter pendingWriter = null;
 
    public static final Pattern PATTERN_PACKAGE = Pattern.compile(
        "Package: ([^\\s]+)(?:\\s+(\\d{4})/(\\d{2})/(\\d{2}))?.*");
