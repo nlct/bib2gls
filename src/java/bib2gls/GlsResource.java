@@ -234,6 +234,10 @@ public class GlsResource
          {
             fieldCopies = getHashMapVector(parser, list, opt);
          }
+         else if (opt.equals("replicate-override"))
+         {
+            replicateOverride = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("strip-trailing-nopost"))
          {
             stripTrailingNoPost = getBoolean(parser, list, opt);
@@ -3701,7 +3705,13 @@ public class GlsResource
             }
             else
             {
-               target.addDependency(entry.getId());
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+               {
+                  bib2gls.debugMessage("message.added.alias.dep", entry.getId(),
+                    target.getId());
+                  target.addDependency(entry.getId());
+               }
+
                target.copyRecordsFrom(entry);
             }
          }
@@ -7022,6 +7032,11 @@ public class GlsResource
       return fieldAliases.get(fieldName);
    }
 
+   public boolean isReplicateOverrideOn()
+   {
+      return replicateOverride;
+   }
+
    public boolean hasFieldCopies()
    {
       return fieldCopies != null;
@@ -7121,6 +7136,8 @@ public class GlsResource
    private HashMap<String,String> fieldAliases = null;
 
    private HashMap<String,Vector<String>> fieldCopies = null;
+
+   private boolean replicateOverride=false;
 
    private String[] skipFields = null;
 

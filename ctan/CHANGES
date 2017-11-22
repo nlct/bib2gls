@@ -54,6 +54,7 @@ v1.1 (pending):
      - strip-missing-parents
      - limit
      - copy-alias-to-see
+     - replicate-override
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

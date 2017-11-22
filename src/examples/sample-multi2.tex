@@ -135,13 +135,27 @@
  record-label-prefix={idx.},
  type=index,
  abbreviation-sort-fallback={long},
+ replicate-override,
+ replicate-fields={first=name},
  symbol-sort-fallback={name},
+ sort-suffix={category}
 ]
+
+\newcommand*{\swaptwo}[2]{#2, #1}
+\newcommand*{\swapthree}[3]{#2 #3, #1}
 
 \newcommand{\bacteriafont}[1]{\emph{#1}}
 \glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
 \glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
 \glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
+
+\newcommand{\bookfont}[1]{\emph{#1}}
+\glssetcategoryattribute{book}{textformat}{bookfont}
+\glssetcategoryattribute{book}{glossnamefont}{bookfont}
+
+\newcommand{\filmfont}[1]{\emph{#1}}
+\glssetcategoryattribute{film}{textformat}{filmfont}
+\glssetcategoryattribute{film}{glossnamefont}{filmfont}
 
 \glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
 
@@ -175,7 +189,6 @@
  {}%
 }
 
-
 \renewcommand*{\glsxtrbookindexname}[1]{%
   \glossentryname{#1}%
   \ifglshassymbol{#1}%
@@ -184,7 +197,11 @@
     {, \glossentrysymbol{#1}}%
     {\space(\glossentrynameother{#1}{symbol})}%
   }%
-  {}%
+  {%
+    \glsifcategory{#1}{film}%
+    { (film)}%
+    {}%
+  }%
 }
 
 \newcommand{\unit}{\glssymbol}
@@ -288,6 +305,10 @@ inspired the \idx{film} \film{bladerunner}).
 }
 \printunsrtglossary[type=baseunit,style=alttree,nogroupskip]
 
-\setupglossaries{section=chapter}
-\printunsrtglossary[type=index,style=bookindex]
+\printunsrtglossary*[type=index,style=bookindex]
+{%
+  \setupglossaries{section=chapter}%
+  \let\sortname\swaptwo
+  \let\sortvonname\swapthree
+}
 \end{document}}

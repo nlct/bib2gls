@@ -783,6 +783,8 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.hasFieldCopies())
       {
+         boolean override = resource.isReplicateOverrideOn();
+
          for (Iterator<String> it=resource.getFieldCopiesIterator();
               it.hasNext();)
          {
@@ -796,7 +798,7 @@ public class Bib2GlsEntry extends BibEntry
 
                for (String dup : dupList)
                {
-                  if (getField(dup) == null)
+                  if (getField(dup) == null || override)
                   {
                      putField(dup, (BibValueList)val.clone());
                   }
@@ -1001,6 +1003,29 @@ public class Bib2GlsEntry extends BibEntry
 
             putField("name", value);
             putField("name", list.toString(parser));
+         }
+      }
+
+      if (resource.isCopyAliasToSeeEnabled())
+      {
+         BibValueList value = getField("alias");
+
+         if (value != null)
+         {
+            BibValueList seeValue = getField("see");
+
+            // Is there a 'see' field?
+
+            if (seeValue == null)
+            {
+               putField("see", value);
+            }
+            else
+            {
+               TeXObjectList list = seeValue.expand(parser);
+               list.add(parser.getListener().getOther(','));
+               list.addAll(value.expand(parser));
+            }
          }
       }
    }
@@ -1413,7 +1438,8 @@ public class Bib2GlsEntry extends BibEntry
 
             writer.format("%s={%s}", field, value);
          }
-         else
+         else if (bib2gls.getDebugLevel() > 0 && 
+            !bib2gls.isInternalField(field))
          {
             bib2gls.debugMessage("warning.ignoring.unknown.field", field);
          }
@@ -1763,7 +1789,6 @@ public class Bib2GlsEntry extends BibEntry
             bib2gls.debugMessage("message.adding.record", record,
              getId());
 
-            record.setLabel(getId());
             records.add(record);
          }
       }
@@ -1777,7 +1802,6 @@ public class Bib2GlsEntry extends BibEntry
             bib2gls.debugMessage("message.adding.counter.record", record,
              getId(), counter);
 
-            record.setLabel(getId());
             list.add(record);
          }
       }
@@ -1813,7 +1837,6 @@ public class Bib2GlsEntry extends BibEntry
          supplementalRecords = new Vector<GlsRecord>();
       }
 
-      record.setLabel(getId());
       String fmt = record.getFormat();
 
       if (fmt.startsWith("("))
@@ -1844,8 +1867,6 @@ public class Bib2GlsEntry extends BibEntry
       {
          ignoredRecords = new Vector<GlsRecord>();
       }
-
-      record.setLabel(getId());
 
       if (!ignoredRecords.contains(record))
       {
@@ -2488,17 +2509,6 @@ public class Bib2GlsEntry extends BibEntry
          putField("alias", alias);
 
          resource.setAliases(true);
-
-         if (resource.isCopyAliasToSeeEnabled())
-         {
-            // Is there a 'see' field?
-
-            if (getField("see") == null)
-            {
-               putField("see", value);
-               putField("see", alias);
-            }
-         }
       }
    }
 

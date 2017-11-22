@@ -5598,8 +5598,10 @@ is in the form
 \meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}
 where all values are field names. This copies the contents
 of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
-only if the target field isn't already set. This action is
-performed after \csopt{ignore-fields}.
+(only if the target field isn't already set with
+\csopt[false]{replicate-override}). This action is
+performed after \csopt{ignore-fields} (see
+\sectionref{sec:resourcesets}).
 
 For example, suppose \filefmt{people.bib} contains:
 \begin{verbatim}
@@ -5672,6 +5674,13 @@ make a difference. The same result occurs with:
   ignore-fields={first}
 ]
 \end{verbatim}
+
+\optsection{replicate-override}
+
+This is a boolean option. The default setting is
+\csopt[false]{replicate-override}. If \optfmt{true},
+\csopt{replicate-fields} will override the existing value if the
+target field is already set.
 
 \optsection{bibtex-contributor-fields}
 
@@ -12350,7 +12359,14 @@ from the \field{name} field (for example, \qt{Gaius} is omitted in
 \field{first} with the \csopt{replicate-fields} option (so that the
 full name is shown on first use) or the \field{first} field can be
 ignored with \csopt{ignore-fields} (so all entries will use the
-\field{text} field on first use).
+\field{text} field on first use). The \csopt{replicate-override}
+option can be used to force the \field{name} field to be copied to
+the \field{first} field, even if the \field{first} field is already
+set. Alternatively, with \csopt[true]{replicate-override} and
+\csopt[first=name]{replicate-fields}, the \field{first} field be
+copied to the \field{name} field. For consistency, the \field{first}
+fields use the same custom commands as used in the \field{name}
+field.
 
 There's one name with a \qt{von} part. In this case the \field{name}
 field is set to

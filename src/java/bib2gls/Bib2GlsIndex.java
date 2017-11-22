@@ -106,6 +106,11 @@ public class Bib2GlsIndex extends Bib2GlsEntry
             sep = String.format(",%n");
             writer.format("%s={%s}", field, getFieldValue(field));
          }
+         else if (bib2gls.getDebugLevel() > 0 && 
+            !bib2gls.isInternalField(field))
+         {
+            bib2gls.debugMessage("warning.ignoring.unknown.field", field);
+         }
       }
 
       writer.println("}");

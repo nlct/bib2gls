@@ -1732,6 +1732,11 @@ public class Bib2Gls implements TeXApp
       return fieldMap;
    }
 
+   public boolean isInternalField(String name)
+   {
+      return name.startsWith("bib2gls@");
+   }
+
    public boolean isKnownField(String name)
    {
       if (fields.isEmpty())

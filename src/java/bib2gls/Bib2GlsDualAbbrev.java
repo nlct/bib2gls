@@ -161,6 +161,11 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
 
             writer.format("%s={%s}", field, getFieldValue(field));
          }
+         else if (bib2gls.getDebugLevel() > 0 && 
+            !bib2gls.isInternalField(field))
+         {
+            bib2gls.debugMessage("warning.ignoring.unknown.field", field);
+         }
       }
 
       writer.println(String.format("}%%%n{%s}%%%n{%s}",
