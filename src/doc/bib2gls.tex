@@ -4628,6 +4628,7 @@ This just does:
 \endgroup
 \end{verbatim}
 
+
 \section{Selection Options}
 \label{sec:selectionopts}
 
@@ -6085,6 +6086,29 @@ it's as though the entries had been defined as:
 
 Remember to use this prefix when you reference the terms in the
 document with commands like \ics{gls}.
+
+\optsection{duplicate-label-suffix}
+
+The \sty{glossaries} package doesn't permit entries with duplicate
+labels (even if they're in different glossaries). If you
+have multiple \idxpl{resourceset} and an entry that's selected
+in one \idx{resourceset} is also selected in another, by
+default, \bibgls\ will issue a warning, but it will still write the
+entry definition to the \ext{glstex} file, which means you'll also
+get a warning from \sty{glossaries-extra} and the duplicate
+definition will be ignored, but associated internal fields
+set with commands like \cs{GlsXtrSetField} may still be set.
+
+If you actually want the duplicate, you need to specify a
+suffix with \csopt{duplicate-label-suffix}. This suffix is only
+set just before writing the entry definition to the \ext{glstex}
+file, so it doesn't affect selection criteria. The actual 
+suffix is formed from \meta{value}\meta{n} where \meta{n} is
+an integer that's incremented in the event of multiple duplicates.
+For example, \csopt[.copy]{duplicate-label-suffix} will 
+change the label to \meta{id}\code{.copy1} for the first duplicate of
+the entry whose label is \meta{id}, 
+\meta{id}\code{.copy2} for the second duplicate, etc.
 
 \optsection{record-label-prefix}
 
@@ -9799,6 +9823,13 @@ Any references to dual entries within the \ext{bib} file should use
 the prefix \idprefix{dual} which will be replaced by \meta{value}
 when the \ext{bib} file is parsed.
 
+\optsection[\subsubsection]{primary-dual-dependency}
+
+This is a boolean setting that determines whether or not primary and
+dual entries should be considered mutual dependencies. The default value is
+\csopt[true]{primary-dual-dependency}, which means that if a primary
+has records then the dual is added as a dependency and vice versa.
+
 \optsection[\subsubsection]{combine-dual-locations}
 
 You can merge the location lists for each primary entry
@@ -12259,16 +12290,15 @@ The example files described here can be found in the
 \filefmt{examples} sub-directory. The \ext{bib} files are listed
 first and then sample files that use the \ext{bib} data.
 Make sure you have the latest versions of \styfmt{glossaries},
-\styfmt{glossaries-extra} and \bibgls\ if you want to try these out.
-(The \exfile{sample-media.tex} file requires at least \styfmt{datatool}
-v2.28.)
-If you get any undefined control sequence or undefined style errors
-then you need to update your \TeX\ distribution.
-Use the \longarg{group} switch when invoking \bibgls\ for all these
-examples if you want the glossaries divided into groups.
-The set of system calls for the document build in the examples below
-may require an extra \LaTeX\ run to ensure the PDF bookmarks are
-up-to-date when \sty{hyperref} is used.
+\styfmt{mfirstuc}, \styfmt{glossaries-extra} and \bibgls\ if you
+want to try these out.  (The \exfile{sample-media.tex} file requires
+at least \styfmt{datatool} v2.28.) If you get any undefined control
+sequence or undefined style errors then you need to update your
+\TeX\ distribution.  Use the \longarg{group} switch when invoking
+\bibgls\ for all these examples if you want the glossaries divided
+into groups.  The set of system calls for the document build in the
+examples below may require an extra \LaTeX\ run to ensure the PDF
+bookmarks are up-to-date when \sty{hyperref} is used.
 
 These files are just examples of how to use \bibgls. There are other
 ways of defining similar entries and sometimes alternatives are
@@ -15591,8 +15621,8 @@ prefix to prevent duplicate labels:
  ]{field-aliases},
  \csopt[baseunit]{category},
  \csopt[baseunit]{type},
- \csopt[baseunit.]{label-prefix},
- \csopt[baseunit.]{record-label-prefix},
+ \csopt[rep.]{label-prefix},
+ \csopt[rep.]{record-label-prefix},
  \csopt{set-widest},
  \csopt[name]{symbol-sort-fallback},
  \csopt[false]{save-locations}
@@ -15705,7 +15735,7 @@ entries without worrying about the prefixes:
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{unit}}\marg{\ics{glssymbol}}
 \cs{newcommand}\marg{\csfmt{measurement}}\marg{\cs{gls}}
-\ics{glsxtrnewgls}\marg{baseunit.}\marg{\csfmt{baseunit}}
+\ics{glsxtrnewgls}\marg{rep.}\marg{\csfmt{baseunit}}
 \cs{glsxtrnewgls}\marg{film.}\marg{\csfmt{film}}
 \cs{glsxtrnewglslike}\marg{idx.}\marg{\csfmt{idx}}{\csfmt{idxpl}}{\csfmt{Idx}}{\csfmt{Idxpl}}
 \end{codeenv}

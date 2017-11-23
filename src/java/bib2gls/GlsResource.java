@@ -238,6 +238,10 @@ public class GlsResource
          {
             replicateOverride = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("primary-dual-dependency"))
+         {
+            dualPrimaryDependency = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("strip-trailing-nopost"))
          {
             stripTrailingNoPost = getBoolean(parser, list, opt);
@@ -834,6 +838,10 @@ public class GlsResource
          else if (opt.equals("record-label-prefix"))
          {
             recordLabelPrefix = getOptional(parser, list, opt);
+         }
+         else if (opt.equals("duplicate-label-suffix"))
+         {
+            dupLabelSuffix = getOptional(parser, list, opt);
          }
          else if (opt.equals("save-original-id"))
          {
@@ -3719,13 +3727,16 @@ public class GlsResource
                   setDualCounter(dual);
 
                   bibData.add(dual);
-
-                  entry.addDependency(dualId);
-                  dual.addDependency(primaryId);
                }
                else
                {
                   dualData.add(dual);
+               }
+
+               if (dualPrimaryDependency)
+               {
+                  entry.addDependency(dualId);
+                  dual.addDependency(primaryId);
                }
 
                if (bib2gls.getVerboseLevel() > 0)
@@ -4263,26 +4274,40 @@ public class GlsResource
 
       if (label.startsWith(labelPrefix))
       {
-         return dualPrefix+label.substring(labelPrefix.length());
+         String substr = label.substring(labelPrefix.length());
+
+         if (substr.startsWith(dualPrefix))
+         {
+            return substr;
+         }
+
+         return dualPrefix+substr;
       }
 
       if (label.startsWith(dualPrefix))
       {
-         return labelPrefix+label.substring(dualPrefix.length());
+         String substr = label.substring(dualPrefix.length());
+
+         if (substr.startsWith(labelPrefix))
+         {
+            return substr;
+         }
+
+         return labelPrefix+substr;
       }
 
       if (hasTertiaries)
       {
          if (tertiaryPrefix != null && label.startsWith(tertiaryPrefix))
          {
-            if (dualPrefix != null)
+            String substr = label.substring(tertiaryPrefix.length());
+
+            if (substr.startsWith(dualPrefix)||substr.startsWith(labelPrefix))
             {
-               return dualPrefix+label.substring(tertiaryPrefix.length());
+               return substr;
             }
-            else
-            {
-               return label.substring(tertiaryPrefix.length());
-            }
+
+            return dualPrefix+substr;
          }
       }
 
@@ -4362,6 +4387,8 @@ public class GlsResource
       {
          // select all entries
 
+         bib2gls.debugMessage("message.selecting.all");
+
          for (Bib2GlsEntry entry : data)
          {
             entries.add(entry);
@@ -4374,15 +4401,44 @@ public class GlsResource
 
          for (Bib2GlsEntry entry : data)
          {
-            if (entry.hasRecords() ||
-                bib2gls.isDependent(entry.getId()) ||
+            boolean hasRecords = entry.hasRecords();
+            Bib2GlsEntry dual = entry.getDual();
+            boolean dualHasRecords = (dual != null && dual.hasRecords()
+              && dualPrimaryDependency);
+            boolean recordedOrDependent = hasRecords
+              || bib2gls.isDependent(entry.getId());
+
+            if (recordedOrDependent ||
                 (matchAction == MATCH_ACTION_ADD && fieldPatterns != null
                  && !notMatch(entry))
-               || (entry.getDual() != null && 
-                    (entry.getDual().hasRecords() ||
+               || (dual != null && 
+                    (dualHasRecords ||
                        matchAction == MATCH_ACTION_ADD && fieldPatterns != null
-                       && !notMatch(entry.getDual()))))
+                       && !notMatch(dual))))
             {
+               if (bib2gls.getDebugLevel() > 0)
+               {
+                  if (hasRecords)
+                  {
+                     bib2gls.debugMessage("message.selecting.entry.records",
+                      entry);
+                  }
+                  else if (recordedOrDependent)
+                  {
+                     bib2gls.debugMessage("message.selecting.entry.dep",
+                      entry);
+                  }
+                  else if (dualHasRecords)
+                  {
+                     bib2gls.debugMessage("message.selecting.entry.dualrecords",
+                      entry, dual);
+                  }
+                  else
+                  {
+                     bib2gls.debugMessage("message.selecting.entry", entry);
+                  }
+               }
+
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
@@ -4425,6 +4481,9 @@ public class GlsResource
 
             if (entry != null && !entries.contains(entry))
             {
+                bib2gls.debugMessage("message.selecting.entry.record.match",
+                  entry.getId(), recordLabel);
+
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
@@ -4462,6 +4521,9 @@ public class GlsResource
 
             if (entry != null && !entries.contains(entry))
             {
+                bib2gls.debugMessage("message.selecting.entry.seerecord.match",
+                  entry.getId(), recordLabel);
+
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
@@ -4492,6 +4554,10 @@ public class GlsResource
                   if (supplementalSelection.length == 1
                   && supplementalSelection[0].equals("all"))
                   {
+                      bib2gls.debugMessage(
+                        "message.selecting.entry.suprecord.match",
+                        entry.getId(), label);
+
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
@@ -4513,6 +4579,10 @@ public class GlsResource
                      {
                         if (selLabel.equals(label))
                         {
+                           bib2gls.debugMessage(
+                              "message.selecting.entry.suprecord.match",
+                              entry.getId(), label);
+
                            if (selectionMode == SELECTION_RECORDED_AND_DEPS
                              ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                              ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
@@ -4549,6 +4619,9 @@ public class GlsResource
                {
                   if (!entries.contains(entry))
                   {
+                     bib2gls.debugMessage(
+                       "message.selecting.entry.crossresource.dep", entry);
+
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
@@ -5471,12 +5544,43 @@ public class GlsResource
    private void writeBibEntryDef(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException
    {
+      String id = entry.getId();
+
+      if (bib2gls.isEntrySelected(id))
+      {
+         if (dupLabelSuffix == null)
+         {
+            bib2gls.warningMessage("warning.entry.already.defined",
+             id, toString());
+         }
+         else
+         {
+            int i = 1;
+
+            String suffix = dupLabelSuffix+i;
+
+            while (bib2gls.isEntrySelected(id+suffix))
+            {
+               i++;
+               suffix = dupLabelSuffix+i;
+            }
+
+            entry.setSuffix(suffix);
+            id = entry.getId();
+            bib2gls.selectedEntry(id);
+         }
+      }
+      else
+      {
+         bib2gls.selectedEntry(id);
+      }
+
       entry.writeBibEntry(writer);
 
       if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId))
       {
          writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
-           entry.getId(), saveOriginalId, entry.getOriginalId());
+           id, saveOriginalId, entry.getOriginalId());
       }
 
       if (saveLocList)
@@ -5487,7 +5591,7 @@ public class GlsResource
       if (saveChildCount)
       {
          writer.format("\\GlsXtrSetField{%s}{childcount}{%d}%n",
-           entry.getId(), entry.getChildCount());
+           id, entry.getChildCount());
       }
 
       if (checkEndPunc != null)
@@ -5501,14 +5605,14 @@ public class GlsResource
             if (val != null)
             {
                writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
-                 entry.getId(), field, val);
+                 id, field, val);
             }
          }
       }
 
       if (bib2gls.isRecordCountSet())
       {
-         bib2gls.writeRecordCount(entry.getId(), writer);
+         bib2gls.writeRecordCount(id, writer);
       }
    }
 
@@ -7528,6 +7632,8 @@ public class GlsResource
 
    private String csLabelPrefix = null, recordLabelPrefix = null;
 
+   private String dupLabelSuffix = null;
+
    private String dualField = null;
 
    private HashMap<String,String> dualEntryMap, dualAbbrevMap,
@@ -7601,6 +7707,8 @@ public class GlsResource
    private byte contributorOrder=CONTRIBUTOR_ORDER_VON;
 
    private Vector<String> dependencies;
+
+   private boolean dualPrimaryDependency=true;
 
    private int limit=0;
 

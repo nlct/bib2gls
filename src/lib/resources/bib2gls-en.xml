@@ -122,6 +122,15 @@ See the manual for further details.</entry>
 <entry key="message.added.alias.dep">Adding alias {0} as dependency for {1}</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
+<entry key="message.selecting.all">Selecting all entries.</entry>
+<entry key="message.selecting.entry.records">Selecting entry {0} (has one or more records).</entry>
+<entry key="message.selecting.entry.record.match">Selecting entry {0} (matches record {1}).</entry>
+<entry key="message.selecting.entry.seerecord.match">Selecting entry {0} (matches cross-reference record {1}).</entry>
+<entry key="message.selecting.entry.suprecord.match">Selecting entry {0} (matches supplemental record {1}).</entry>
+<entry key="message.selecting.entry.crossresource.dep">Selecting entry {0} (cross-resource dependency).</entry>
+<entry key="message.selecting.entry.dualrecords">Selecting entry {0} (dual {1} has one or more records).</entry>
+<entry key="message.selecting.entry.dep">Selecting entry {0} (is dependency).</entry>
+<entry key="message.selecting.entry">Selecting entry {0}.</entry>
 <entry key="message.datetime.field.check">Checking entry {0} field {1} for date/time data (date:{2}, time:{3}).</entry>
 <entry key="message.field.notset">Field {0} not set for entry {1}</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
@@ -234,6 +243,7 @@ Defaulting to: {0}.
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.ignoring.unknown.field">Ignoring unknown field: {0}</entry>
+<entry key="warning.entry.already.defined">Entry {0} is being defined in {1} but it has already been defined in a previous .glstex file.</entry>
 <entry key="warning.can.find.arg">Can''t detect argument for: \{0}</entry>
 <entry key="warning.no.default.sort">Can''t determine sort value for: {0}
 (Using sort field ''{1}''. Entry type: {2})</entry>

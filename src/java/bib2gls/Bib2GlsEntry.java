@@ -103,9 +103,36 @@ public class Bib2GlsEntry extends BibEntry
       return labelPrefix;
    }
 
+   public String getSuffix()
+   {
+      return labelSuffix;
+   }
+
+   public void setSuffix(String suffix)
+   {
+      labelSuffix = suffix;
+   }
+
    public String getId()
    {
-      return labelPrefix == null ? super.getId() : labelPrefix+super.getId();
+      String id = super.getId();
+
+      if (labelPrefix == null && labelSuffix == null)
+      {
+         return id;
+      }
+
+      if (labelPrefix == null)
+      {
+         return id+labelSuffix;
+      }
+
+      if (labelSuffix == null)
+      {
+         return labelPrefix+id;
+      }
+
+      return labelPrefix+id+labelSuffix;
    }
 
    public String getOriginalId()
@@ -3134,6 +3161,11 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
+   public String toString()
+   {
+      return getId();
+   }
+
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
    private Vector<GlsRecord> supplementalRecords;
@@ -3165,7 +3197,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private String groupId=null;
 
-   private String labelPrefix = null;
+   private String labelPrefix = null, labelSuffix;
 
    private Bib2GlsEntry dual = null;
 

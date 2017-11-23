@@ -1065,6 +1065,7 @@ public class Bib2Gls implements TeXApp
       fieldMap = new HashMap<String,String>();
       records = new Vector<GlsRecord>();
       seeRecords = new Vector<GlsSeeRecord>();
+      selectedEntries = new Vector<String>();
 
       Vector<AuxData> auxData = auxParser.getAuxData();
 
@@ -1773,6 +1774,16 @@ public class Bib2Gls implements TeXApp
       }
 
       return false;
+   }
+
+   public void selectedEntry(String label)
+   {
+      selectedEntries.add(label);
+   }
+
+   public boolean isEntrySelected(String label)
+   {
+      return selectedEntries.contains(label);
    }
 
    public GlsSeeRecord getSeeRecord(String label)
@@ -3859,6 +3870,7 @@ public class Bib2Gls implements TeXApp
    private Vector<String> fields;
    private Vector<GlsRecord> records;
    private Vector<GlsSeeRecord> seeRecords;
+   private Vector<String> selectedEntries;
 
    private HashMap<String,String> fieldMap;
 
