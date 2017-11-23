@@ -1416,6 +1416,23 @@ public class GlsResource
                seeAlsoLocation = Bib2GlsEntry.POST_SEE;
             }
          }
+         else if (opt.equals("alias"))
+         {
+            String val = getChoice(parser, list, opt, "omit", "before", "after");
+
+            if (val.equals("omit"))
+            {
+               aliasLocation = Bib2GlsEntry.NO_SEE;
+            }
+            else if (val.equals("before"))
+            {
+               aliasLocation = Bib2GlsEntry.PRE_SEE;
+            }
+            else if (val.equals("after"))
+            {
+               aliasLocation = Bib2GlsEntry.POST_SEE;
+            }
+         }
          else if (opt.equals("loc-counters"))
          {
             String[] values = getStringArray(parser, list, opt);
@@ -2339,6 +2356,12 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "seealso"));
+      }
+
+      if (aliasLocation != Bib2GlsEntry.POST_SEE)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "alias"));
       }
 
       if (locationPrefix != null)
@@ -4895,6 +4918,12 @@ public class GlsResource
             writer.println();
          }
 
+         if (aliasLocation != Bib2GlsEntry.NO_SEE)
+         {
+            writer.println("\\providecommand{\\bibglsaliassep}{, }");
+            writer.println();
+         }
+
          boolean createHyperGroups = false;
 
          if (bib2gls.useGroupField())
@@ -5190,18 +5219,12 @@ public class GlsResource
                     ||(combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL 
                         && !isPrimary))
                   {
-                     entry.updateLocationList(minLocationRange,
-                       suffixF, suffixFF, seeLocation, seeAlsoLocation,
-                       locationPrefix != null, locationSuffix != null,
-                       locGap);
+                     entry.updateLocationList();
                   }
                }
                else
                {
-                  entry.updateLocationList(minLocationRange,
-                    suffixF, suffixFF, seeLocation, seeAlsoLocation,
-                    locationPrefix != null, locationSuffix != null,
-                    locGap);
+                  entry.updateLocationList();
                }
             }
 
@@ -5272,11 +5295,7 @@ public class GlsResource
                if (saveLocations
                 && combineDualLocations != COMBINE_DUAL_LOCATIONS_PRIMARY)
                {
-                  entry.updateLocationList(minLocationRange,
-                    suffixF, suffixFF, seeLocation, seeAlsoLocation,
-                    locationPrefix != null,
-                    locationSuffix != null,
-                    locGap);
+                  entry.updateLocationList();
                }
 
                if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
@@ -7290,6 +7309,51 @@ public class GlsResource
       return copyAliasToSee;
    }
 
+   public int getMinLocationRange()
+   {
+      return minLocationRange;
+   }
+
+   public String getSuffixF()
+   {
+      return suffixF;
+   }
+
+   public String getSuffixFF()
+   {
+      return suffixFF;
+   }
+
+   public int getSeeLocation()
+   {
+      return seeLocation;
+   }
+
+   public int getSeeAlsoLocation()
+   {
+      return seeAlsoLocation;
+   }
+
+   public int getAliasLocation()
+   {
+      return aliasLocation;
+   }
+
+   public boolean showLocationPrefix()
+   {
+      return locationPrefix != null;
+   }
+
+   public boolean showLocationSuffix()
+   {
+      return locationSuffix != null;
+   }
+
+   public int getLocationGap()
+   {
+      return locGap;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -7410,6 +7474,7 @@ public class GlsResource
 
    private int seeLocation=Bib2GlsEntry.POST_SEE;
    private int seeAlsoLocation=Bib2GlsEntry.POST_SEE;
+   private int aliasLocation=Bib2GlsEntry.POST_SEE;
 
    private String[] locationPrefix = null;
 

@@ -8,6 +8,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage[version=4]{mhchem}
 \usepackage{siunitx}
+\usepackage{etoolbox}
+\usepackage{marvosym}
+% package conflict, need to undefine conflicting commands
+\undef\Sun
+\undef\Lightning
+\usepackage[weather]{ifsym}
+
 \usepackage[en-GB]{datetime2}
 \usepackage[colorlinks]{hyperref}
 
@@ -32,6 +39,9 @@
 \newglossary*{film}{Films}
 \newglossary*{book}{Books}
 \newglossary*{person}{People}
+\newglossary*{mediacontrol}{Media Control Symbols}
+\newglossary*{information}{Information Symbols}
+\newglossary*{weather}{Weather Symbols}
 
 \newcommand*{\bibglsdate}[7]{\DTMdisplaydate{#1}{#2}{#3}{#4}}
 
@@ -80,12 +90,10 @@
    identifier=category,
    formula=name,
    chemicalname=description,
-   unitname=description,
-   unitsymbol=name
  },
- type={same as category},
+ type={chemical},
  set-widest,
- sort={letternumber-upperlower},
+ sort={letternumber-case},
  symbol-sort-fallback={name},
  save-locations=false
 ]
@@ -119,22 +127,42 @@
  save-locations=false
 ]
 
+\GlsXtrLoadResources[
+ src={miscsymbols},
+ field-aliases={
+   identifier=category,
+   icon=name,
+   icondescription=description
+ },
+ type={same as category},
+ symbol-sort-fallback={description},
+ save-locations=false,
+ set-widest
+]
+
 \renewcommand*{\glsxtrlongshortdescname}{%
   \protect\protect\glslongfont{\the\glslongtok}\space
   \glsxtrparen{\glsabbrvfont{\the\glsshorttok}}%
 }
 
+% requires glossaries-extra v1.25:
+\renewcommand*{\glsxtronlyname}{%
+  \protect\glsabbrvonlyfont{\the\glslongtok}%
+}
+
 \GlsXtrLoadResources[
  src={terms,bacteria,markuplanguages,vegetables,minerals,
   animals,chemicalformula,baseunits,derivedunits,people,
-  films,books},
+  films,books,miscsymbols},
  selection={recorded and deps and see},
  field-aliases={
    identifier=category,
    formula=symbol,
    chemicalname=name,
    unitname=name,
-   unitsymbol=symbol
+   unitsymbol=symbol,
+   icon=symbol,
+   icondescription=name
  },
  label-prefix={idx.},
  record-label-prefix={idx.},
@@ -209,6 +237,11 @@
   }%
 }
 
+% requires glossaries-extra v1.25+:
+\renewcommand*{\glsextrapostnamehook}[1]{%
+  \glsadd[format=hyperbf]{#1}%
+}
+
 \newcommand{\unit}{\glssymbol}
 \newcommand{\measurement}{\gls}
 \glsxtrnewgls{baseunit.}{\baseunit}
@@ -254,8 +287,7 @@ This section is about \idxpl{mineral}.
 \section{Animals}
 This section is about \idxpl{animal}.
 \Gls{duck}, \gls{parrot}, \gls{hedgehog}, \gls{sealion}, 
-\gls{zander}, \gls{swan}, \gls{aardvark}, \gls{zebra}, 
-\gls{armadillo}.
+\gls{zander}, \gls{aardvark}, \gls{zebra}.
 
 \section{Chemicals}
 This section is about \idxpl{chemical}.
@@ -283,9 +315,24 @@ This section is about \idxpl{chemical}.
 \gls{whydidnttheyaskevans} (by \gls{christie}, 
 \idx{film} adaptation: \film{whydidnttheyaskevans}),
 \gls{doandroidsdreamofelectricsheep} (by \gls{dick},
-inspired the \idx{film} \film{bladerunner}).
+inspired the \idx{film} \film{bladerunner}),
+\gls{thehobbit} (by \gls{tolkien}, \idx{film} adaptation (in three
+parts): 
+\gls{film.anunexpectedjourney}, \gls{film.desolationofsmaug}
+and \gls{film.thebattleoffivearmies}).
 
-\chapter*{Glossaries}
+\section{Miscellaneous Symbols}
+
+\Idxpl{mediacontrol}: \gls{forward}, \gls{forwardtoindex},
+\gls{rewindtoindex}, \gls{rewind}.
+
+\Idx{information}: \gls{bicycle}, \gls{coffeecup}, \gls{info},
+\gls{gentsroom}, \gls{ladiesroom}, \gls{wheelchair}, \gls{football}.
+
+\Idx{weather}: \gls{cloud}, \gls{fog}, \gls{hail}, \gls{sun},
+\gls{lightning}.
+
+\chapter{Glossaries}
 \printunsrtglossary[type=bacteria,style=mcoltree]
 \printunsrtglossary[type=markuplanguage,style=altlist]
 \printunsrtglossary[type=vegetable,style=tree,nogroupskip]
@@ -308,12 +355,17 @@ inspired the \idx{film} \film{bladerunner}).
     \glsxtrAltTreePar
   }%
 }
+
 \printunsrtglossary[type=baseunit,style=alttree,nogroupskip]
+\printunsrtglossary[type=mediacontrol,style=alttree,nogroupskip]
+\printunsrtglossary[type=weather,style=alttree,nogroupskip]
+\printunsrtglossary[type=information,style=alttree,nogroupskip]
 
 \printunsrtglossary*[type=index,style=bookindex]
 {%
   \setupglossaries{section=chapter}%
   \let\sortname\swaptwo
   \let\sortvonname\swapthree
+  \renewcommand*{\glsextrapostnamehook}[1]{}%
 }
 \end{document}}

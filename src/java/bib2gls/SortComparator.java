@@ -646,7 +646,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
    protected String sortStorageField = "bib2gls@sort";
 
-   protected String sortFallbackField = "sortfallback";
+   protected String sortFallbackField = "bib2gls@sortfallback";
 
    protected String sortField, groupField, entryType;
 

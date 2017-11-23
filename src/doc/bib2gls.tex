@@ -5834,8 +5834,8 @@ to
 The fields are parsed according to
 \csopt{time-field-format} and
 \csopt{time-field-locale} for primary entries and according to
-\csopt{time-date-field-format} and
-\csopt{time-date-field-locale} for dual entries.
+\csopt{dual-time-field-format} and
+\csopt{dual-time-field-locale} for dual entries.
 
 \optsection{date-time-field-format}
 
@@ -7367,6 +7367,13 @@ of \sty{glossaries-extra} for this option. The values are the
 same as for \csopt{see} but the separator is given by
 \csref{bibglsseealsosep}. The cross-reference is written to the
 \field{location} field using \gls{bibglsuseseealso}\margm{label}.
+
+\optsection{alias}
+
+This is like \csopt{alias} but governs the location of the cross-references
+provided by the \field{alias} field. The separator is given by
+\csref{bibglsaliassep}. The cross-reference is written to the
+\field{location} field using \gls{bibglsusealias}\margm{label}.
 
 \optsection{alias-loc}
 
@@ -10914,6 +10921,12 @@ Or you can redefine it afterwards:
 This is like \gls{bibglsseesep} but is used with cross-reference
 lists provided with the \field{seealso} field, if supported.
 
+\cssection{bibglsaliassep}
+
+\formatdef{bibglsaliassep}
+This is like \gls{bibglsseesep} but is used with cross-reference
+lists provided with the \field{alias} field.
+
 \cssection{bibglsusesee}
 
 \formatdef{bibglsusesee}
@@ -10927,6 +10940,13 @@ Displays the formatted cross-reference list stored in the
 Displays the formatted cross-reference list stored in the
 \field{seealso} field for the given entry. This just defaults to 
 \ics{glsxtruseseealso}\margm{label}.
+
+\cssection{bibglsusealias}
+
+\formatdef{bibglsusealias}
+Displays the formatted cross-reference stored in the
+\field{alias} field for the given entry. This is defined to use
+\ics{glsseeformat}.
 
 \cssection{bibglsdelimN}
 
@@ -12846,13 +12866,13 @@ and use the internal definition of \sty{ifsym}'s \csfmt{Sun}
 and \csfmt{Lightning} commands:
 \begin{verbatim}
 @symbol{sun,
-  name={\textweathersymbol{16}},
+  icon={\textweathersymbol{16}},
   description={sunny},
   identifier={weather}
 }
 
 @symbol{lightning,
-  name={\textweathersymbol{26}},
+  icon={\textweathersymbol{26}},
   description={thunderstorm},
   identifier={weather}
 }
@@ -12863,7 +12883,9 @@ are as defined by \sty{marvosym}.
 There are three types of symbols defined: media controls, information
 and weather. They have the custom \fieldfmt{identifier}
 field set to \code{mediacontrol}, \code{information} and
-\code{weather}, respectively.
+\code{weather}, respectively. There are two other custom fields: 
+\fieldfmt{icon} and \fieldfmt{icondescription}. These will need to
+be aliased to \field{name} and \field{description}.
 
 Neither of these packages are recognised by \bibgls, which means
 that \csopt{set-widest} won't be able to determine the widest name
@@ -14082,7 +14104,7 @@ file is just the lower case surname.
 Remember from \sectionref{sec:texparserlib} that the interpreter
 will be used on the \field{parent} field if the value contains
 \verb|\| or \verb|{| or \verb|}| and
-\csopt[true]{interpret-labels-field}.  This means that with this
+\csopt[true]{interpret-label-fields}.  This means that with this
 field alias and the interpreter on, \bibgls\ will attempt to
 interpret the field contents. So all that's needed is to ensure that
 \bibgls\ is given a definition of \gls{sortmediacreator} that
@@ -14356,11 +14378,17 @@ load \sty{ifsym}:
 The \sty{etoolbox} package is also loaded as it provides
 \ics{undef}.
 
+Since none of the entries have a \field{name} or \field{description}
+field, the custom fields \fieldfmt{icon} and
+\fieldfmt{icondescription} need to be aliased to them.
 The document uses the \glostyle{alttreegroup} style where the groups
 are obtained from the \field{category}, which again I obtain from
 the custom \fieldfmt{identifier} field using:
 \begin{codeenv}
-\csopt[identifier=category]{field-aliases},
+\csopt[
+ identifier=category,
+ icon=name,
+ icondescription=description]{field-aliases},
 \csopt[category=group]{replicate-fields}
 \end{codeenv}
 The \field{group} field is just a label and an appropriate title needs to be
@@ -15327,7 +15355,7 @@ This example is an alternative approach to
 define entries that appear in both a glossary and the index, this
 example makes use of \csopt{record-label-prefix} to reselect the
 recorded entries for the index. This allows the entries that have
-natural word ordering to use a locale sort method while and the
+natural word ordering to use a locale sort method while the
 entries that are symbolic can use one of the letter-number sort
 methods.
 
@@ -15341,13 +15369,26 @@ extra glossaries, which all need to be defined:
 \newglossary*{animal}{Animals}
 \newglossary*{chemical}{Chemical Formula}
 \newglossary*{baseunit}{SI Units}
-\newglossary*{derivedunit}{Derived Units}
+\newglossary*{measurement}{Measurements}
 \newglossary*{film}{Films}
 \newglossary*{book}{Books}
 \newglossary*{person}{People}
+\newglossary*{mediacontrol}{Media Control Symbols}
+\newglossary*{information}{Information Symbols}
+\newglossary*{weather}{Weather Symbols}
 \end{verbatim}
+Note that this is a total of 15 (including the \code{index})
+glossaries. With the \ics{makeglossaries} method, this would require
+16 write registers (including the write register used to create the
+indexing style file), and a total of $15\times3 + 1 = 46$ associated
+files. (This doesn't include the standard \ext{aux} file and the
+\ext{out} file created by \sty{hyperref}.) With \bibgls, no
+additional write registers are required and the number of associated
+\bibgls\ files is equal to the number of resource commands plus the
+transcript file ($8+1=9$).
+
 Since this document requires \exfile{people.bib}, \exfile{books.bib}
-and \exfile{films.bib} it also requires the \ext{bib} files that
+and \exfile{films.bib} it also requires the files that
 supply the definitions of the custom commands
 (\exfile{no-interpret-preamble.bib} and either
 \exfile{interpret-preamble.bib} or \exfile{interpret-preamble2.bib})
@@ -15402,7 +15443,9 @@ so that I can use \ics{DTMdisplaydate} to adjust the formatting:
 \begin{verbatim}
 \newcommand*{\bibglsdate}[7]{\DTMdisplaydate{#1}{#2}{#3}{#4}}
 \end{verbatim}
-This needs to go before the \idx{resourceset} is loaded.
+This needs to go before the \idx{resourceset} is loaded. Note that
+the \styoptfmt{en-GB} option identifies the document locale as
+\code{en-GB} (since there are no language packages loaded).
 
 Note that unlike \exfile{sample-people.tex} which had
 \csopt[people]{category}, this document obtains the \field{category} field
@@ -15472,35 +15515,227 @@ The semantic markup command and attributes are as for
 \glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
 \glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
 \end{verbatim}
-Next come the entries with symbolic names, which require a
-letter-number sort:
+Similarly for the books:
+\begin{verbatim}
+\newcommand{\bookfont}[1]{\emph{#1}}
+\glssetcategoryattribute{book}{textformat}{bookfont}
+\glssetcategoryattribute{book}{glossnamefont}{bookfont}
+\end{verbatim}
+(as for \exfile{sample-media.tex}) and for films:
+\begin{verbatim}
+\newcommand{\filmfont}[1]{\emph{#1}}
+\glssetcategoryattribute{film}{textformat}{filmfont}
+\glssetcategoryattribute{film}{glossnamefont}{filmfont}
+\end{verbatim}
+
+Next come the chemical formulae:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
- \csopt[chemicalformula,baseunits,derivedunits]{src},
+ \csopt[chemicalformula]{src},
  \csopt[
    identifier=category,
    formula=name,
    chemicalname=description,
-   unitname=symbol,
-   unitsymbol=name,
-   measurement=description,
  ]{field-aliases},
- \csopt[same as category]{type},
+ \csopt[chemical]{type},
  \csopt{set-widest},
- \csopt[letternumber-upperlower]{sort},
+ \csopt[letternumber-case]{sort},
  \csopt[name]{symbol-sort-fallback},
  \csopt[false]{save-locations}
 }
 \end{codeenv}
+and the \idxpl{SIunit}, which are now combined into a single
+glossary:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ src={baseunits,derivedunits},
+ field-aliases={
+   unitname=description,
+   unitsymbol=symbol,
+   measurement=name
+ },
+ category={measurement},
+ type={measurement},
+ set-widest,
+ symbol-sort-fallback={name},
+ save-locations=false
+}
+\end{codeenv}
+Here the \field{name} field is obtained from the custom
+\fieldfmt{measurement} field. Since this contains a word, the
+default locale sort is appropriate. I've locally redefined
+\ics{glsxtralttreeSymbolDescLocation} to place the symbol in
+parentheses after the description:
+\begin{verbatim}
+\printunsrtglossary*[type=measurement,style=alttree,nogroupskip]
+{%
+  \renewcommand{\glsxtralttreeSymbolDescLocation}[2]{%
+    \glossentrydesc{#1}%
+    \ifglshassymbol{#1}{\space(\glossentrysymbol{#1})}{}%
+    \glspostdescription\glstreeprelocation
+    \glsxtrAltTreePar
+  }%
+}
+\end{verbatim}
+
+The base units are replicated in the \code{baseunit} glossary, this
+time with the \field{name} field obtained from the custom
+\fieldfmt{unitsymbol} field. This means that I need to set a label
+prefix to prevent duplicate labels:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[baseunits]{src},
+ \csopt[
+   unitname=description,
+   unitsymbol=name
+ ]{field-aliases},
+ \csopt[baseunit]{category},
+ \csopt[baseunit]{type},
+ \csopt[baseunit.]{label-prefix},
+ \csopt[baseunit.]{record-label-prefix},
+ \csopt{set-widest},
+ \csopt[name]{symbol-sort-fallback},
+ \csopt[false]{save-locations}
+}
+\end{codeenv}
+Finally, all recorded and cross-referenced terms are needed for the
+index, but first \ics{glsxtrlongshortdescname} needs to be changed
+so that the abbreviations using the \abbrstyle{long-short-desc}
+style (that is, the abbreviations with the \field{category} set to 
+\code{markuplanguage}) have the \field{name} field set to
+\meta{long} (\meta{short}):
+\begin{verbatim}
+\renewcommand*{\glsxtrlongshortdescname}{%
+  \protect\protect\glslongfont{\the\glslongtok}\space
+  \glsxtrparen{\glsabbrvfont{\the\glsshorttok}}%
+}
+\end{verbatim}
+The \abbrstyle{long-only-short-only} style has a similar command,
+but it was only introduced to \sty{glossaries-extra} version 1.25:
+\begin{verbatim}
+\renewcommand*{\glsxtronlyname}{%
+  \protect\glsabbrvonlyfont{\the\glslongtok}%
+}
+\end{verbatim}
+
+The abbreviations all need to be sorted according to the long form:
+\begin{codeenv}
+\csopt[long]{abbreviation-sort-fallback}
+\end{codeenv}
+The symbols need to fallback on the \field{name} field:
+\begin{codeenv}
+\csopt[name]{symbol-sort-fallback}
+\end{codeenv}
+The custom fields again need to be aliased:
+\begin{codeenv}
+\csopt[
+   identifier=category,
+   formula=symbol,
+   chemicalname=name,
+   unitname=name,
+   unitsymbol=symbol
+ ]{field-aliases}
+\end{codeenv}
+All \ext{bib} files used in the previous \idxpl{resourceset} are needed:
+\begin{codeenv}
+\csopt[terms,bacteria,markuplanguages,vegetables,minerals,
+  animals,chemicalformula,baseunits,derivedunits,people,
+  films,books]{src}
+\end{codeenv}
+but this time I also want to select entries that haven't been
+recorded but have a cross-reference to a recorded entry:
+\begin{codeenv}
+\csopt{selection}[recorded and deps and see]
+\end{codeenv}
+Again it's necessary to provide label prefixes to avoid conflict:
+\begin{codeenv}
+\csopt[idx.]{label-prefix},
+\csopt[idx.]{record-label-prefix}
+\end{codeenv}
+To deal with the identical book and film titles, I'm again using the
+\field{category} to resolve identical sort values:
+\begin{codeenv}
+\csopt[category]{identical-sort-action}
+\end{codeenv}
+These entries should all be in the index:
+\begin{codeenv}
+\csopt[index]{type}
+\end{codeenv}
+For the people who have a \field{first} field, I've decided that
+this would be more appropriate for the index as it's more compact,
+so here I've done the reverse to earlier and copied the
+\field{first} field (if supplied) into the \field{name} field, but
+since the \field{name} field is already provided the override 
+setting needs to be on:
+\begin{codeenv}
+\csopt{replicate-override},
+\csopt[first=name]{replicate-fields}
+\end{codeenv}
+As with \exfile{sample-people.tex} I've provided some custom
+commands to make it easier to locally redefined \cs{sortname} and
+\cs{sortvonname}:
+\begin{verbatim}
+\newcommand*{\swaptwo}[2]{#2, #1}
+\newcommand*{\swapthree}[3]{#2 #3, #1}
+\end{verbatim}
+I've redefined \ics{glsxtrbookindexname} in a similar manner to
+\exfile{sample-multi1.tex} but it has some modifications:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexname}[1]{%
+  \glossentryname{#1}%
+  \ifglshassymbol{#1}%
+  {%
+    \glsifcategory{#1}{chemical}%
+    {, \glossentrysymbol{#1}}%
+    {\space(\glossentrynameother{#1}{symbol})}%
+  }%
+  {%
+    \glsifcategory{#1}{film}%
+    { (film)}%
+    {}%
+  }%
+}
+\end{verbatim}
+This appends \qt{ (film)} to film names. I've chosen this method
+rather than using the \idx{postnamehook} as I only want this in the
+index and not in the list of people.
+
+I've also provided some custom commands to make it easier to reference
+entries without worrying about the prefixes:
+\begin{codeenv}
+\cs{newcommand}\marg{\csfmt{unit}}\marg{\ics{glssymbol}}
+\cs{newcommand}\marg{\csfmt{measurement}}\marg{\cs{gls}}
+\ics{glsxtrnewgls}\marg{baseunit.}\marg{\csfmt{baseunit}}
+\cs{glsxtrnewgls}\marg{film.}\marg{\csfmt{film}}
+\cs{glsxtrnewglslike}\marg{idx.}\marg{\csfmt{idx}}{\csfmt{idxpl}}{\csfmt{Idx}}{\csfmt{Idxpl}}
+\end{codeenv}
+So a term that only appears in the index is referenced with
+\csfmt{idx} (or \csfmt{idxpl}, \csfmt{Idx}, \csfmt{Idxpl}).
+
+It would be useful to include the page where the entries are defined
+in their corresponding lists. This can be done by redefining the
+general purpose non-category post-name hook
+\ics{glsextrapostnamehook}:
+\begin{verbatim}
+\newcommand*{\glsextrapostnamehook}[1]{%
+  \glsadd[format=hyperbf]{#1}%
+}
+\end{verbatim}
+This needs resetting before the index, since it's redundant to
+record an entry in the index. This will require an extra
+\bibgls+\LaTeX\ system call as this code can't be performed until
+the glossaries have been created.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-multi2
-bib2gls --group sample-multi2
+bib2gls --group --break-space sample-multi2
+pdflatex sample-multi2
+bib2gls --group --break-space sample-multi2
 pdflatex sample-multi2
 \end{verbatim}
 The resulting document is shown in \figureref{fig:sample-multi2.pdf}
-and \figureref{fig:sample-multi2.pdf2}.
+\figureref{fig:sample-multi2.pdf2} and \figureref{fig:sample-multi2.pdf3}.
 
 \lstinputlisting[firstline=5]{../examples/sample-multi2.tex}
 
@@ -15516,6 +15751,13 @@ and \figureref{fig:sample-multi2.pdf2}.
 {\pdftwocol[5]{../examples/sample-multi2.pdf}{8}}
 {\caption{\filefmt{sample-multi2.pdf} (pages~5 to 8)}}
 {fig:sample-multi2.pdf2}
+\end{figure}
+
+\begin{figure}
+\figcontents
+{\pdftwocol[9]{../examples/sample-multi2.pdf}{10}}
+{\caption{\filefmt{sample-multi2.pdf} (pages~9 and 10)}}
+{fig:sample-multi2.pdf3}
 \end{figure}
 
 \printcommandsummary

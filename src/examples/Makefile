@@ -100,6 +100,8 @@ sample-multi2.pdf	: $(DEPS) sample-multi2.tex \
 	pdflatex sample-multi2
 	$(BIB2GLS) --break-space sample-multi2
 	pdflatex sample-multi2
+	$(BIB2GLS) --break-space sample-multi2
+	pdflatex sample-multi2
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

@@ -1110,9 +1110,8 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
-@dualindexentry{opt.dual-time-field-locale,
-   name={\csoptfmt{dual\dhyphen time\dhyphen
-field\dhyphen locale}},
+@dualindexentry{opt.dual-date-field-locale,
+   name={\csoptfmt{dual\dhyphen date\dhyphen field\dhyphen locale}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -1323,6 +1322,13 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.seealso,
    name={\csoptfmt{seealso}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.alias,
+   name={\csoptfmt{alias}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -2233,6 +2239,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{aux,
   name={\extfmt{aux}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{out,
+  name={\extfmt{out}},
   category={fileformat},
   parent={fileformats}
 }
@@ -3837,6 +3849,14 @@ field.},
   parent={internalfields}
 }
 
+@dualindexentry{field.bib2gls@sortfallback,
+  name={\fieldfmt{bib2gls@sortfallback}},
+  description={Used by \bibgls\ to store the sort fallback value.},
+  note={internal field set by \bibgls},
+  category={baseinternalfield},
+  parent={internalfields}
+}
+
 @index{entrytypes,
   name={entry types},
   text={entry type}
@@ -4597,6 +4617,15 @@ field.},
   category={command}
 }
 
+@index{glsextrapostnamehook,
+  name={\csfmt{gls\-extra\-post\-name\-hook}},
+  user1={\margm{label}},
+  description={additional category-independent code for the
+post-name hook},
+  note={provided by \styfmt{glossaries-extra} version 1.25+},
+  category={command}
+}
+
 @index{glsentrytext,
   name={\csfmt{gls\-entry\-text}},
   user1={\margm{label}},
@@ -4752,10 +4781,37 @@ label of the current entry},
 }
 
 @index{glsxtrlongshortdescname,
-  name={\csfmt{glsxtrlongshortdescname}},
+  name={\csfmt{gls\-xtr\-long\-short\-desc\-name}},
+  user1={},
+  description={governs the way the \field{name} field is set
+   by the \abbrstyle{long-short-desc} abbreviation styles},
+  note={provided by \styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@index{glsxtrlongshortname,
+  name={\csfmt{gls\-xtr\-long\-short\-name}},
   user1={},
   description={governs the way the \field{name} field is set
    by the \abbrstyle{long-short} abbreviation styles},
+  note={provided by \styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@index{glsxtronlyname,
+  name={\csfmt{gls\-xtr\-only\-name}},
+  user1={},
+  description={governs the way the \field{name} field is set
+   by the \abbrstyle{long-only-short-only} abbreviation styles},
+  note={provided by \styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@index{glsxtronlydescname,
+  name={\csfmt{gls\-xtr\-only\-desc\-name}},
+  user1={},
+  description={governs the way the \field{name} field is set
+   by the \abbrstyle{long-only-short-only} abbreviation styles},
   note={provided by \styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -5782,6 +5838,16 @@ packages},
   category={command}
 }
 
+@index{glssymbol,
+  name={\csfmt{glssymbol}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{symbol} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @dualindexentry{rgls,
   name={\csfmt{rgls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
@@ -5960,7 +6026,7 @@ the width of the description column},
 }
 
 @index{glsxtralttreeSymbolDescLocation,
-  name={\csfmt{glsxtralttreeSymbolDescLocation}},
+  name={\csfmt{gls\-xtr\-alt\-tree\-Symbol\-Desc\-Location}},
   user1={\margm{label}\margm{location list}},
   description={used by the \glostyle{alttree} styles to format the
 symbol, description and location},

@@ -2401,12 +2401,19 @@ public class Bib2GlsEntry extends BibEntry
       return builder;
    }
 
-   public void updateLocationList(int minRange, String suffixF,
-     String suffixFF, int seeLocation, int seealsoLocation,
-     boolean showLocationPrefix, 
-     boolean showLocationSuffix, int gap)
+   public void updateLocationList()
    throws Bib2GlsException
    {
+      int minRange = resource.getMinLocationRange();
+      String suffixF = resource.getSuffixF();
+      String suffixFF = resource.getSuffixFF();
+      int seeLocation = resource.getSeeLocation();
+      int seealsoLocation = resource.getSeeAlsoLocation();
+      int aliasLocation = resource.getAliasLocation();
+      boolean showLocationPrefix = resource.showLocationPrefix();
+      boolean showLocationSuffix = resource.showLocationSuffix();
+      int gap = resource.getLocationGap();
+
       StringBuilder builder = null;
 
       locationList = new Vector<String>();
@@ -2415,7 +2422,7 @@ public class Bib2GlsEntry extends BibEntry
 
       String alias = getAlias();
 
-      if (seeLocation == PRE_SEE && alias != null)
+      if (aliasLocation == PRE_SEE && alias != null)
       {
          builder = new StringBuilder();
          builder.append("\\bibglsusealias{");
@@ -2576,7 +2583,7 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      if (seeLocation == POST_SEE && alias != null)
+      if (aliasLocation == POST_SEE && alias != null)
       {
          if (builder == null)
          {

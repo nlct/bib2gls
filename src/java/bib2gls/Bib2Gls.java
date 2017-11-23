@@ -1984,7 +1984,6 @@ public class Bib2Gls implements TeXApp
       writer.println(" {\\expandafter\\glsseeformat\\expandafter{\\glscurrentfieldvalue}{}}%");
       writer.println(" {}%");
       writer.println("}");
-      writer.println("\\providecommand{\\bibglsaliassep}[1]{\\bibglsseesep}");
       writer.println("\\providecommand{\\bibglsuseseealso}[1]{\\glsxtruseseealso{#1}}");
       writer.println("\\providecommand{\\bibglsdelimN}{\\delimN}");
       writer.println("\\providecommand{\\bibglslastDelimN}{,~}");
