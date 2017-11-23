@@ -32,16 +32,16 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       if (getField("short") == null)
       {
-         missingFieldWarning(parser, "short");
+         missingFieldWarning("short");
       }
 
       if (getField("long") == null)
       {
-         missingFieldWarning(parser, "long");
+         missingFieldWarning("long");
       }
    }
 

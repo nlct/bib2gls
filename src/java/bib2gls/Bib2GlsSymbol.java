@@ -32,7 +32,7 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
       super(bib2gls, entryType);
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       BibValueList name = getField("name");
       BibValueList parent = getField("parent");
@@ -45,12 +45,12 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
 
       if (name == null && parent == null)
       {
-         missingFieldWarning(parser, "name");
+         missingFieldWarning("name");
       }
 
       if (parent != null && description == null && name == null)
       {
-         missingFieldWarning(parser, "description");
+         missingFieldWarning("description");
       }
    }
 

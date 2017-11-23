@@ -986,8 +986,6 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      checkRequiredFields(parser);
-
       // the name can't have its case changed until it's been
       // checked and been assigned a fallback if not present.
 
@@ -1574,23 +1572,22 @@ public class Bib2GlsEntry extends BibEntry
       return contents;
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       if (getField("name") == null && getField("parent") == null)
       {
-         missingFieldWarning(parser, "name");
+         missingFieldWarning("name");
       }
 
       if (getField("description") == null)
       {
-         missingFieldWarning(parser, "description");
+         missingFieldWarning("description");
       }
    }
 
-   protected void missingFieldWarning(TeXParser parser, String field)
+   protected void missingFieldWarning(String field)
    {
-      parser.getListener().getTeXApp().warning(parser, 
-       bib2gls.getMessage("warning.missing.field", getId(), field));
+      bib2gls.warningMessage("warning.missing.field", getId(), field);
    }
 
    public String getCsName()

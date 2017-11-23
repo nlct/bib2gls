@@ -61,26 +61,26 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
       return new Bib2GlsDualAbbrev(bib2gls, getEntryType());
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       if (getField("short") == null)
       {
-         missingFieldWarning(parser, "short");
+         missingFieldWarning("short");
       }
 
       if (getField("long") == null)
       {
-         missingFieldWarning(parser, "long");
+         missingFieldWarning("long");
       }
 
       if (getField("dualshort") == null)
       {
-         missingFieldWarning(parser, "dualshort");
+         missingFieldWarning("dualshort");
       }
 
       if (getField("duallong") == null)
       {
-         missingFieldWarning(parser, "duallong");
+         missingFieldWarning("duallong");
       }
    }
 

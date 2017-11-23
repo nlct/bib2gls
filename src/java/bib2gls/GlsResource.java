@@ -3695,6 +3695,12 @@ public class GlsResource
                continue;
             }
 
+            // Only check required fields after filtering
+            // (no need to worry about missing fields if the entry
+            // is discarded).
+
+            entry.checkRequiredFields();
+
             bibData.add(entry);
 
             if (dual != null)

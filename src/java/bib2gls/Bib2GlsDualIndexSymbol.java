@@ -68,11 +68,11 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
       return new Bib2GlsDualIndexSymbol(bib2gls, getEntryType()+"secondary");
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       if (getField("symbol") == null)
       {
-         missingFieldWarning(parser, "symbol");
+         missingFieldWarning("symbol");
       }
    }
 

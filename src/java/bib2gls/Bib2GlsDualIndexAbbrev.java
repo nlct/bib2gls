@@ -61,16 +61,16 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       return new Bib2GlsDualIndexAbbrev(bib2gls, getEntryType()+"secondary");
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       if (getField("short") == null)
       {
-         missingFieldWarning(parser, "short");
+         missingFieldWarning("short");
       }
 
       if (getField("long") == null)
       {
-         missingFieldWarning(parser, "long");
+         missingFieldWarning("long");
       }
    }
 

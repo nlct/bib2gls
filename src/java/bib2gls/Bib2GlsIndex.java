@@ -52,7 +52,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       }
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {// no required fields
    }
 

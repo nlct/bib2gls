@@ -48,13 +48,13 @@ public class Bib2GlsTertiaryIndexAbbrevEntry extends Bib2GlsDualIndexAbbrev
         getEntryType()+"secondary");
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
-      super.checkRequiredFields(parser);
+      super.checkRequiredFields();
 
       if (getField("description") == null)
       {
-         missingFieldWarning(parser, "description");
+         missingFieldWarning("description");
       }
    }
 

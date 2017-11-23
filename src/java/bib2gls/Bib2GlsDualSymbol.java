@@ -60,16 +60,16 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
       return new Bib2GlsDualSymbol(bib2gls, getEntryType());
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
       if (getField("name") == null)
       {
-         missingFieldWarning(parser, "name");
+         missingFieldWarning("name");
       }
 
       if (getField("symbol") == null)
       {
-         missingFieldWarning(parser, "symbol");
+         missingFieldWarning("symbol");
       }
    }
 

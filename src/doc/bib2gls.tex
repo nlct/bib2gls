@@ -1038,7 +1038,6 @@ the corresponding set of \ext{bib} files:
   \csopt{strip-trailing-nopost};
   \item end punctuation is checked according to
   \csopt{check-end-punctuation};
-  \item required fields are checked for existence;
   \item \field{name} case-change is performed if
   \csopt{name-case-change} is set.
   \end{itemize}
@@ -1051,6 +1050,7 @@ are set according to \csopt{type}, \csopt{dual-type},
 \csopt{dual-counter}.
 \item Filtering is applied (according to options like \csopt{match}
 but not \csopt{selection} or \csopt{limit}).
+\item Required fields are checked for existence.
 \item Dependencies are registered (if
 \csopt[recorded and deps]{selection} or \csopt[recorded and deps and
 see]{selection}). 
@@ -15734,7 +15734,7 @@ pdflatex sample-multi2
 bib2gls --group --break-space sample-multi2
 pdflatex sample-multi2
 \end{verbatim}
-The resulting document is shown in \figureref{fig:sample-multi2.pdf}
+The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 \figureref{fig:sample-multi2.pdf2} and \figureref{fig:sample-multi2.pdf3}.
 
 \lstinputlisting[firstline=5]{../examples/sample-multi2.tex}

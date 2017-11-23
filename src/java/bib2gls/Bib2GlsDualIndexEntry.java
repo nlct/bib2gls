@@ -61,7 +61,7 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
       return new Bib2GlsDualIndexEntry(bib2gls, getEntryType()+"secondary");
    }
 
-   public void checkRequiredFields(TeXParser parser)
+   public void checkRequiredFields()
    {
    }
 
