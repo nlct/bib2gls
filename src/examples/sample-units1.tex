@@ -12,6 +12,8 @@
 
 \GlsXtrLoadResources[
   src={baseunits},
+  % make @unit act like @symbol:
+  entry-type-aliases={unit=symbol},
   field-aliases={
    unitname=name,
    unitsymbol=symbol,
@@ -24,6 +26,8 @@
 
 \GlsXtrLoadResources[
   src={derivedunits},
+  % make @measurement act like @symbol:
+  entry-type-aliases={measurement=symbol},
   field-aliases={
    unitname=name,
    unitsymbol=symbol,

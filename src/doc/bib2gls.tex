@@ -4758,9 +4758,11 @@ It's possible to filter the selection by matching field values.
 If \meta{\keyvallist} is empty no filtering will be applied, otherwise
 \meta{\keyvallist} should be a \meta{key}=\meta{regexp} list, where
 \meta{key} is the name of a field or \optfmt{id} for the entry's
-label or \optfmt{entrytype} for the entry's \ext{bib} type (as in
-the part after \verb|@| in the \ext{bib} file not the \field{type}
-field identifying the glossary label).
+label or \optfmt{entrytype} for the entry type (as in
+the part after \verb|@| identifying the entry not the \field{type}
+field identifying the glossary label). If you've used
+\csopt{entry-type-aliases}, this refers to the target entry type not
+the original entry type specified in the \ext{bib} file.
 
 The \meta{regex} part should be a regular expression conforming
 to
@@ -5910,6 +5912,10 @@ either in the \ext{bib} file or through the \csopt{type} option);
 This will override any
 \field{category} fields supplied in the \ext{bib} file.
 
+Note that if you've used \csopt{entry-type-aliases}, \optfmt{same as
+entry} refers to the target entry type not the original entry type
+provided in the \ext{bib} file.
+
 For example, if the \ext{bib} file contains:
 \begin{verbatim}
 @entry{bird,
@@ -5979,6 +5985,11 @@ The \meta{value} may be one of:
  \item\meta{label} sets the \field{type} field to the glossary 
    identified by \meta{label}.
 \end{itemize}
+If you've used \csopt{entry-type-aliases}, \optfmt{same as
+entry} refers to the target entry type not the original entry type
+provided in the \ext{bib} file.
+
+
 Note that this setting only changes the \field{type} field for
 primary entries. Use \csopt{dual-type} for dual entries.
 
@@ -6102,7 +6113,8 @@ set with commands like \cs{GlsXtrSetField} may still be set.
 If you actually want the duplicate, you need to specify a
 suffix with \csopt{duplicate-label-suffix}. This suffix is only
 set just before writing the entry definition to the \ext{glstex}
-file, so it doesn't affect selection criteria. The actual 
+file, so it doesn't affect selection criteria nor can label
+substitutions be performed in any cross-references. The actual 
 suffix is formed from \meta{value}\meta{n} where \meta{n} is
 an integer that's incremented in the event of multiple duplicates.
 For example, \csopt[.copy]{duplicate-label-suffix} will 
@@ -9943,6 +9955,9 @@ The \meta{value} may be:
 type. For example, if the entry was defined with
 \atentry{dualentry}, the \field{type} will be set to
 \optfmt{dualentry}.
+If you've used \csopt{entry-type-aliases}, this refers to the target
+entry type not the original entry type provided in the \ext{bib}
+file.
 
 \item \optfmt{same as base}: sets the \field{type} to the base name
 of the \ext{bib} file (without the extension) that provided the
@@ -9992,6 +10007,9 @@ The \meta{value} may be:
 type. For example, if the entry was defined with
 \atentry{dualentry}, the \field{category} will be set to
 \optfmt{dualentry}.
+If you've used \csopt{entry-type-aliases}, this refers to the target
+entry type not the original entry type provided in the \ext{bib}
+file.
 
 \item \optfmt{same as base}: sets the \field{category} to the base
 name of the \ext{bib} file (without the extension) that provided the
@@ -12397,20 +12415,27 @@ so most packages should be loaded before \sty{glossaries-extra}.
 Instead, I've just put a comment in the \ext{bib} file as a
 reminder.
 
-All entries are defined using \atentry{symbol}. With this entry
-type, if the \field{sort} field is omitted \bibgls\ will fallback on
-the label by default. It can be changed to fallback on the
-\field{name} field instead using \csopt[name]{symbol-sort-fallback}. 
-This will require the use of the interpreter as
-the names all contain a command but \bibgls\ recognises the
-\sty{mhchem} package and has a limited ability to interpret \cs{ce}.
-If \atentry{entry} is changed to \atentry{symbol} the fallback for
-the \field{sort} will be the entry's label.
+All entries are defined using a custom entry type
+\atentryfmt{chemical}. This must be aliased using
+\csopt{entry-type-aliases} or the entries will be ignored. For
+example, to make \atentryfmt{chemical} behave like \atentry{symbol}:
+\begin{codeenv}
+\csopt[chemical=symbol]{entry-type-aliases}
+\end{codeenv}
+Remember that with the \atentry{symbol} type, if the \field{sort}
+field is omitted \bibgls\ will fallback on the label by default. It
+can be changed to fallback on the \field{name} field instead using
+\csopt[name]{symbol-sort-fallback}.  This will require the use of
+the interpreter if the name contains a command but \bibgls\
+recognises the \sty{mhchem} package and has a limited ability to
+interpret \cs{ce}.  If \atentryfmt{chemical} is changed to
+\atentry{entry} instead then the fallback for the \field{sort} will be the
+entry's \field{name}.
 
 All entries only contain custom fields, which will all be ignored by
-\bibgls\ unless defined or aliased: \fieldfmt{identifier} set to
-\code{chemical} for all entries, \fieldfmt{formula} set to the
-chemical formula, and \fieldfmt{chemicalname} set to the chemical
+\bibgls\ unless defined or aliased: \fieldfmt{identifier}, which is set to
+\code{chemical} for all entries, \fieldfmt{formula}, which set to the
+chemical formula, and \fieldfmt{chemicalname}, which set to the chemical
 name. This allows the flexibility of determining whether the
 \field{name} or \field{symbol} field should contain the chemical
 formula on a per-resource basis. For example:
@@ -12442,17 +12467,25 @@ The contents of \filefmt{bacteria.bib} are as follows:
 \filesection{baseunits.bib}
 
 The \exfile{baseunits.bib} file contains base \idxpl{SIunit}. The entries
-are all defined using \atentry{symbol} but have custom fields
-\fieldfmt{unitname}, \fieldfmt{unitsymbol} and \fieldfmt{measurement},
-one of which must be aliased or copied to \field{name}. The others
-may be aliased or copied to \field{symbol} and \field{description}
-as required. The \fieldfmt{unitsymbol} fields all use \ics{si} provided
-by the \isty{siunitx} package, so that package must be loaded in the
+are all defined using the custom \atentryfmt{unit} entry
+type. This must be aliased with \csopt{entry-type-aliases} otherwise
+\bibgls\ will ignored all the entries. For example
+\begin{codeenv}
+\csopt[unit=symbol]{entry-type-aliases}
+\end{codeenv}
+will make \bibgls\ treat the entries as though they were defined
+using \atentry{symbol}. (Remember that \atentry{symbol} entry types use the label
+as the fallback field for \field{sort}.)
+
+The entries all have custom fields \fieldfmt{unitname},
+\fieldfmt{unitsymbol} and \fieldfmt{measurement}, one of which must
+be aliased or copied to \field{name}. The others may be aliased or
+copied to \field{symbol} and \field{description} as required. The
+\fieldfmt{unitsymbol} fields all use \ics{si} provided by the
+\isty{siunitx} package, so that package must be loaded in the
 document. This is one of the small number of packages recognised by
 \bibgls, so it's possible to sort according to the symbol if
-required. Remember that \atentry{symbol} entry types use the label
-as the fallback field for \field{sort}. In this case the labels all
-happen to match the \field{name}.
+required.
 
 The entries also all have a custom field \fieldfmt{identifier} set to 
 \code{baseunit}. This will be ignored by \bibgls\ unless it's
@@ -12465,7 +12498,9 @@ The contents of \filefmt{baseunits.bib} are as follows:
 \filesection{derivedunits.bib}
 
 The \exfile{derivedunits.bib} file is much like \exfile{baseunits.bib}
-but contains derived units.
+but contains derived units and in this case the custom entry type
+is \atentryfmt{measurement} must be aliased
+otherwise the entries will all be ignored.
 The entries all have a custom field \fieldfmt{identifier} set to 
 \code{derivedunit}. This will be ignored by \bibgls\ unless it's
 defined using \cs{glsaddkey} or \cs{glsaddstoragekey} or if it's
@@ -12895,13 +12930,13 @@ you can load \sty{ifsym} without the \styoptfmt{weather} option
 and use the internal definition of \sty{ifsym}'s \csfmt{Sun}
 and \csfmt{Lightning} commands:
 \begin{verbatim}
-@symbol{sun,
+@icon{sun,
   icon={\textweathersymbol{16}},
   description={sunny},
   identifier={weather}
 }
 
-@symbol{lightning,
+@icon{lightning,
   icon={\textweathersymbol{26}},
   description={thunderstorm},
   identifier={weather}
@@ -12909,6 +12944,13 @@ and \csfmt{Lightning} commands:
 \end{verbatim}
 This removes the conflict, and \csfmt{Sun} and \csfmt{Lightning}
 are as defined by \sty{marvosym}.
+
+This file uses a custom entry type \atentryfmt{icon}, which must be
+aliased to a recognised entry identifier otherwise the entries will
+all be ignored. For example:
+\begin{codeenv}
+\csopt[unit=symbol]{entry-type-aliases}
+\end{codeenv}
 
 There are three types of symbols defined: media controls, information
 and weather. They have the custom \fieldfmt{identifier}
@@ -12919,12 +12961,13 @@ be aliased to \field{name} and \field{description}.
 
 Neither of these packages are recognised by \bibgls, which means
 that \csopt{set-widest} won't be able to determine the widest name
-nor is this data suitable for sorting according to the \field{name}
-field. Instead, either sort by label (which is the default for
-\atentry{symbol}) or by the \field{description}. If you want to use
-one of the \glostyle{alttree} styles you can still use
-\csopt{set-widest}, but it will have to use the fallback command.
-Alternatively, you can omit \csopt{set-widest} and explicitly use
+nor is this data suitable for sorting according to the
+\fieldfmt{icon} field (or its alias). Instead, either sort by label
+(which is the default for \atentry{symbol}) or by the
+\field{description}. If you want to use one of the
+\glostyle{alttree} styles you can still use \csopt{set-widest}, but
+it will have to use the fallback command.  Alternatively, you can
+omit \csopt{set-widest} and explicitly use
 \cs{glsFindWidestTopLevelName}.
 
 The contents of \filefmt{miscsymbols.bib} are as follows:
@@ -13245,17 +13288,27 @@ efficient to instruct \bibgls\ to not save the number list with:
 \begin{codeenv}
 \csopt[false]{save-locations}
 \end{codeenv}
-The \exfile{chemicalformula.bib} file only has custom fields, so these 
+All entries are defined in \exfile{chemicalformula.bib} using
+a custom entry type \atentryfmt{chemical} which needs to be aliased
+in order for the entries to be recognised:
+\begin{codeenv}
+\csopt[chemical=symbol]{entry-type-aliases}
+\end{codeenv}
+Additionally, the entries only have custom fields, so these also
 need to be aliased. In this case I want the formula in the \field{name} field
 and the chemical name in the \field{description} field:
 \begin{codeenv}
 \csopt[formula=name,chemicalname=description]{field-aliases}
 \end{codeenv}
-The entries are all defined using \atentry{symbol} but I've decided
+The \atentry{symbol} entry type falls back on the label for the
+\field{sort} value by default, but I've decided
 to fallback on the \field{name} field for sorting:
 \begin{codeenv}
 \csopt[name]{symbol-sort-fallback}
 \end{codeenv}
+An alternative approach would simply be to alias
+\atentryfmt{chemical} to \atentry{entry} instead.
+
 Since the \field{name} field contains chemical formulae rather than
 words, it makes more sense to use one of the letter sort methods
 rather than a locale collator. In this case the names contain
@@ -13462,6 +13515,26 @@ for the second, and then set the group titles:
 I've used this method to make it easier to adapt to other languages
 that may need extended characters in the group titles.
 
+The \exfile{baseunits.bib} file use a custom entry type
+\atentryfmt{unit}, which must be aliased otherwise \bibgls\
+will ignore the entries. I decided to use \atentry{symbol} for
+semantic reasons:
+\begin{codeenv}
+\csopt[unit=symbol]{entry-type-aliases}
+\end{codeenv}
+Similarly for the custom \atentryfmt{measurement} entry type in
+\exfile{derivedunits.bib}:
+\begin{codeenv}
+\csopt[measurement=symbol]{entry-type-aliases}
+\end{codeenv}
+Remember that \atentry{symbol} uses the label as the default sort fallback,
+so I've changed it to use \field{name} instead:
+\begin{codeenv}
+\csopt[name]{symbol-sort-fallback}
+\end{codeenv}
+An alternative approach would be to alias \atentryfmt{unit}
+and \atentryfmt{measurement} to \atentry{entry} instead.
+
 Since there's no \csopt{type} set, all entries end up in the main
 glossary, but since there are two resource commands the glossary
 ends up with sorted blocks.
@@ -13475,12 +13548,8 @@ loading of the default styles with \styopt{nostyles} and used
 \styopt[mcols]{stylemods} to load \sty{glossary-mcols} and patch the
 styles. Note that although I've used \styopt{nostyles}, the
 \sty{glossary-tree} style is loaded as it's required by
-\sty{glossary-mcols}. The entries are defined using
-\atentry{symbol}, which uses the label as the default sort fallback,
-so I've changed the fallback:
-\begin{codeenv}
-\csopt[name]{symbol-sort-fallback}
-\end{codeenv}
+\sty{glossary-mcols}.
+
 As with the previous example, the custom fields need to be aliased:
 \begin{codeenv}
 \csopt[
@@ -13524,7 +13593,15 @@ used with book or report type of classes. I've also used the
 \styopt{nomain} option to suppress the creation of the main glossary
 as I want to define my own glossary types instead.
 
-As before the custom fields need to be aliased:
+As before the custom entry types need to be aliased:
+\begin{codeenv}
+\csopt[unit=symbol]{entry-type-aliases}
+\end{codeenv}
+for the first \idx{resourceset} and
+\begin{codeenv}
+\csopt[measurement=symbol]{entry-type-aliases}
+\end{codeenv}
+for the second. Similarly for the custom entry fields:
 \begin{codeenv}
 \csopt[
   unitname=name,
@@ -13566,10 +13643,14 @@ This is another example that uses the \exfile{baseunits.bib} and
 This time I want two glossaries containing all the units (base and
 derived) where the first glossary is ordered by name and the second
 is ordered by symbol. This can be done with a single resource
-command that instructs \bibgls\ to make \atentry{symbol} behave like
+command that instructs \bibgls\ to make the custom \atentryfmt{unit}
+and \atentryfmt{measurement} entry types behave like
 \atentry{dualsymbol}:
 \begin{codeenv}
-\csopt[symbol=dualsymbol]{entry-type-aliases}
+\csopt[
+  unit=dualsymbol,
+  measurement=dualsymbol
+]{entry-type-aliases}
 \end{codeenv}
 This causes the \field{name} and \field{symbol} fields to be swapped
 in the dual list. Remember that the fallback for the \field{sort} field is the
@@ -14408,6 +14489,12 @@ load \sty{ifsym}:
 The \sty{etoolbox} package is also loaded as it provides
 \ics{undef}.
 
+The custom entry type \atentryfmt{icon} must be aliased for the
+entries to be recognised:
+\begin{codeenv}
+\csopt[unit=symbol]{entry-type-aliases}
+\end{codeenv}
+
 Since none of the entries have a \field{name} or \field{description}
 field, the custom fields \fieldfmt{icon} and
 \fieldfmt{icondescription} need to be aliased to them.
@@ -15088,12 +15175,17 @@ index, such as using the \csopt{secondary} option or having a
 separate resource set with a copy \csopt{action}. In this case, I've
 decided to use a dual entry system. Since the entries aren't defined
 using any dual types, I've used \csopt{entry-type-aliases} to
-make \bibgls\ treat them as though they were:
+make \bibgls\ treat them as though they were, and I also need to
+alias the custom \atentryfmt{chemical}, \atentryfmt{unit} and 
+\atentryfmt{measurement} entry types:
 \begin{codeenv}
 \csopt[
   abbreviation=dualindexabbreviation,
   entry=dualindexentry,
-  symbol=dualindexsymbol
+  symbol=dualindexsymbol,
+  unit=dualindexsymbol,
+  measurement=dualindexsymbol,
+  chemical=dualindexsymbol
  ]{entry-type-aliases}
 \end{codeenv}
 Note that I haven't aliased the \atentry{index} types as I only want
@@ -15384,13 +15476,13 @@ This example is an alternative approach to
 \exfile{sample-multi1.tex}. Instead of using dual entry types to
 define entries that appear in both a glossary and the index, this
 example makes use of \csopt{record-label-prefix} to reselect the
-recorded entries for the index. This allows the entries that have
-natural word ordering to use a locale sort method while the
-entries that are symbolic can use one of the letter-number sort
-methods.
+recorded entries for the index. This is more complicated but it
+allows the entries that have natural word ordering to use a locale
+sort method while the entries that are symbolic can use one of the
+letter-number sort methods.
 
-This document uses some additional \ext{bib} files as it has some
-extra glossaries, which all need to be defined:
+This document uses some additional \ext{bib} files to the previous
+example, so it has extra glossaries, which all need to be defined:
 \begin{verbatim}
 \newglossary*{bacteria}{Bacteria}
 \newglossary*{markuplanguage}{Markup Languages}
@@ -15415,7 +15507,7 @@ files. (This doesn't include the standard \ext{aux} file and the
 \ext{out} file created by \sty{hyperref}.) With \bibgls, no
 additional write registers are required and the number of associated
 \bibgls\ files is equal to the number of resource commands plus the
-transcript file ($8+1=9$).
+transcript file (in this example, $8+1=9$).
 
 Since this document requires \exfile{people.bib}, \exfile{books.bib}
 and \exfile{films.bib} it also requires the files that
@@ -15562,6 +15654,7 @@ Next come the chemical formulae:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
  \csopt[chemicalformula]{src},
+ \csopt[chemical=symbol]{entry-type-aliases},
  \csopt[
    identifier=category,
    formula=name,
@@ -15579,6 +15672,7 @@ glossary:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
  src={baseunits,derivedunits},
+ \csopt[measurement=symbol,unit=symbol]{entry-type-aliases},
  field-aliases={
    unitname=description,
    unitsymbol=symbol,
@@ -15610,24 +15704,50 @@ parentheses after the description:
 
 The base units are replicated in the \code{baseunit} glossary, this
 time with the \field{name} field obtained from the custom
-\fieldfmt{unitsymbol} field. This means that I need to set a label
-prefix to prevent duplicate labels:
+\fieldfmt{unitsymbol} field. This means that I need to find a way to 
+prevent duplicate labels. The simplest method is to use
+\csopt{duplicate-label-suffix}:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
  \csopt[baseunits]{src},
+ \csopt[unit=symbol]{entry-type-aliases},
  \csopt[
    unitname=description,
    unitsymbol=name
  ]{field-aliases},
- \csopt[baseunit]{category},
+ \csopt[measurement]{category},
  \csopt[baseunit]{type},
- \csopt[rep.]{label-prefix},
- \csopt[rep.]{record-label-prefix},
+ \csopt[.copy]{duplicate-label-suffix},
  \csopt{set-widest},
  \csopt[name]{symbol-sort-fallback},
  \csopt[false]{save-locations}
 }
 \end{codeenv}
+
+The text symbols from \exfile{miscsymbols.bib} are all loaded in a
+single \idx{resourceset}, where the \field{type} field can be
+obtained from the \field{category}, which in turns is obtained from
+the custom \fieldfmt{identifier} field. Since \bibgls\ doesn't
+recognise any of the symbol commands, I'm sorting according to the
+\field{description} field. (Even if \bibgls\ could determine a
+Unicode value for each of the symbols, sorting by the description
+makes more sense in this case.)
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[miscsymbols]{src},
+ \csopt[
+   identifier=category,
+   icon=name,
+   icondescription=description
+ ]{field-aliases},
+ \csopt[icon=symbol]{entry-type-aliases},
+ \csopt[same as category]{type},
+ \csopt[description]{sort-field},
+ \csopt[false]{save-locations},
+ \csopt{set-widest}
+}
+\end{codeenv}
+
 Finally, all recorded and cross-referenced terms are needed for the
 index, but first \ics{glsxtrlongshortdescname} needs to be changed
 so that the abbreviations using the \abbrstyle{long-short-desc}
@@ -15652,48 +15772,94 @@ The abbreviations all need to be sorted according to the long form:
 \begin{codeenv}
 \csopt[long]{abbreviation-sort-fallback}
 \end{codeenv}
-The symbols need to fallback on the \field{name} field:
+The custom entry types and fields again need to be aliased
 \begin{codeenv}
-\csopt[name]{symbol-sort-fallback}
-\end{codeenv}
-The custom fields again need to be aliased:
-\begin{codeenv}
+\csopt[
+ chemical=index,
+ measurement=entry,
+ unit=dualentry,
+ icon=index
+]{entry-type-aliases},
 \csopt[
    identifier=category,
    formula=symbol,
    chemicalname=name,
-   unitname=name,
-   unitsymbol=symbol
+   unitname=description,
+   unitsymbol=symbol,
+   measurement=name,
+   icon=symbol,
+   icondescription=name
  ]{field-aliases}
 \end{codeenv}
-All \ext{bib} files used in the previous \idxpl{resourceset} are needed:
+The chemical formulae and icons are now defined using
+\atentry{index} with the \field{name} field set to a word form
+(chemical name and icon description). This means
+they're appropriate for alphabetical sorting. (Both \atentry{entry}
+and \atentry{symbol} require the \field{description} field, which is
+why I've aliased \atentryfmt{chemical} and \atentryfmt{icon}
+to \atentry{index} here.) The custom \atentryfmt{measurement} entry
+type has a \field{description} field (obtained from
+\fieldfmt{unitname}), so that's aliased to \atentry{entry} as again
+the \field{name} field is suitable for alphabetical sorting.
+
+I've aliased \atentryfmt{unit} to \atentry{dualentry}
+rather than \atentry{symbol} as I want both the unit name and the
+measurement in the index and I've combined their location lists:
+\begin{codeenv}
+\csopt[both]{combine-dual-locations}
+\end{codeenv}
+Both primary and dual entries need to go in the \code{index}
+glossary:
+\begin{codeenv}
+\csopt[index]{type},
+\csopt[index]{dual-type}
+\end{codeenv}
+
+All \ext{bib} files used in the previous \idxpl{resourceset} are needed
+as well as the \exfile{terms.bib} file:
 \begin{codeenv}
 \csopt[terms,bacteria,markuplanguages,vegetables,minerals,
   animals,chemicalformula,baseunits,derivedunits,people,
-  films,books]{src}
+  films,books,miscsymbols]{src}
 \end{codeenv}
 but this time I also want to select entries that haven't been
 recorded but have a cross-reference to a recorded entry:
 \begin{codeenv}
 \csopt{selection}[recorded and deps and see]
 \end{codeenv}
-Again it's necessary to provide label prefixes to avoid conflict:
+Again it's necessary to provide a way to avoid duplicate entry
+labels, which can be done with
 \begin{codeenv}
-\csopt[idx.]{label-prefix},
-\csopt[idx.]{record-label-prefix}
+\csopt[.copy]{duplicate-label-suffix},
 \end{codeenv}
+as above.  However, this will cause the cross-references (from the
+\field{alias} fields) to link to the glossary rather than the index.
+This may or may not confuse the reader. For consistency, it may be
+more suitable to have the cross-reference in the index link to the
+aliased entry in the index rather than in the glossary. I've
+therefore instead used:
+\begin{codeenv}
+ \csopt[idx.]{label-prefix},
+ \csopt[idx.]{record-label-prefix},
+\end{codeenv}
+This means that the entries defined in \exfile{terms.bib} need to be
+referenced with this prefix.
+
+All instances of \cs{gls} will link to the original entry, so all
+entries except for those in the \exfile{terms.bib} file will link to
+the relevant glossary. Those in the \exfile{terms.bib} file will
+link to the index. It's possible to disable the hyperlinks for those
+entries, but the reader may find it useful to jump to the index to
+look up other locations for that entry in the document.
+
 To deal with the identical book and film titles, I'm again using the
 \field{category} to resolve identical sort values:
 \begin{codeenv}
 \csopt[category]{identical-sort-action}
 \end{codeenv}
-These entries should all be in the index:
-\begin{codeenv}
-\csopt[index]{type}
-\end{codeenv}
 For the people who have a \field{first} field, I've decided that
-this would be more appropriate for the index as it's more compact,
-so here I've done the reverse to earlier and copied the
+this would be more appropriate for the index as it's more compact
+than the \field{name}, so here I've done the reverse to earlier and copied the
 \field{first} field (if supplied) into the \field{name} field, but
 since the \field{name} field is already provided the override 
 setting needs to be on:
@@ -15721,26 +15887,44 @@ I've redefined \ics{glsxtrbookindexname} in a similar manner to
   }%
   {%
     \glsifcategory{#1}{film}%
-    { (film)}%
+    {\ (film)}%
     {}%
   }%
 }
 \end{verbatim}
-This appends \qt{ (film)} to film names. I've chosen this method
+This appends \qt{(film)} to film names. I've chosen this method
 rather than using the \idx{postnamehook} as I only want this in the
-index and not in the list of people.
+index and not in the list of films.
+
+For some of the entries that are referenced in the document, I've
+appended information in parentheses:
+\begin{verbatim}
+\gls{Al2SO43} (\glsdesc{Al2SO43})
+\end{verbatim}
+This is all right for odd instances, but if this always needs to be done 
+on first use, then it's better to use the \idx{postlinkhook}, which
+is what I've done for the icons for comparison:
+\begin{verbatim}
+\newcommand*{\glsxtrpostlinkmediacontrol}{%
+ \glsxtrpostlinkAddDescOnFirstUse
+}
+
+\newcommand*{\glsxtrpostlinkinformation}{%
+ \glsxtrpostlinkAddDescOnFirstUse
+}
+
+\newcommand*{\glsxtrpostlinkweather}{%
+ \glsxtrpostlinkAddDescOnFirstUse
+}
+\end{verbatim}
 
 I've also provided some custom commands to make it easier to reference
 entries without worrying about the prefixes:
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{unit}}\marg{\ics{glssymbol}}
 \cs{newcommand}\marg{\csfmt{measurement}}\marg{\cs{gls}}
-\ics{glsxtrnewgls}\marg{rep.}\marg{\csfmt{baseunit}}
 \cs{glsxtrnewgls}\marg{film.}\marg{\csfmt{film}}
-\cs{glsxtrnewglslike}\marg{idx.}\marg{\csfmt{idx}}{\csfmt{idxpl}}{\csfmt{Idx}}{\csfmt{Idxpl}}
 \end{codeenv}
-So a term that only appears in the index is referenced with
-\csfmt{idx} (or \csfmt{idxpl}, \csfmt{Idx}, \csfmt{Idxpl}).
 
 It would be useful to include the page where the entries are defined
 in their corresponding lists. This can be done by redefining the
@@ -15785,8 +15969,8 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 
 \begin{figure}
 \figcontents
-{\pdftwocol[9]{../examples/sample-multi2.pdf}{10}}
-{\caption{\filefmt{sample-multi2.pdf} (pages~9 and 10)}}
+{\pdftwocol[9]{../examples/sample-multi2.pdf}{12}}
+{\caption{\filefmt{sample-multi2.pdf} (pages~9 and 12)}}
 {fig:sample-multi2.pdf3}
 \end{figure}
 

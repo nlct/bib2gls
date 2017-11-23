@@ -92,6 +92,7 @@
 
 \GlsXtrLoadResources[
  src={chemicalformula},
+ entry-type-aliases={chemical=symbol},
  field-aliases={
    identifier=category,
    formula=name,
@@ -106,6 +107,7 @@
 
 \GlsXtrLoadResources[
  src={baseunits,derivedunits},
+ entry-type-aliases={measurement=symbol,unit=symbol},
  field-aliases={
    unitname=description,
    unitsymbol=symbol,
@@ -120,14 +122,14 @@
 
 \GlsXtrLoadResources[
  src={baseunits},
+ entry-type-aliases={unit=symbol},
  field-aliases={
    unitname=description,
    unitsymbol=name
  },
- category={baseunit},
+ category={measurement},
  type={baseunit},
- label-prefix={rep.},
- record-label-prefix={rep.},
+ duplicate-label-suffix={.copy},
  set-widest,
  symbol-sort-fallback={name},
  save-locations=false
@@ -140,8 +142,9 @@
    icon=name,
    icondescription=description
  },
+ entry-type-aliases={icon=symbol},
  type={same as category},
- symbol-sort-fallback={description},
+ sort-field={description},
  save-locations=false,
  set-widest
 ]
@@ -165,24 +168,26 @@
    identifier=category,
    formula=symbol,
    chemicalname=name,
-   unitname=name,
-   unitsymbol=description,
-   measurement=symbol,
+   unitname=description,
+   unitsymbol=symbol,
+   measurement=name,
    icon=symbol,
    icondescription=name
  },
- entry-type-aliases={symbol=dualsymbol},
- dual-prefix={rep.},
+ entry-type-aliases={
+  chemical=index,
+  measurement=entry,
+  unit=dualentry,
+  icon=index
+ },
  label-prefix={idx.},
  record-label-prefix={idx.},
- duplicate-label-suffix={.copy},
  type=index,
  dual-type=index,
  combine-dual-locations=both,
  abbreviation-sort-fallback={long},
  replicate-override,
  replicate-fields={first=name},
- symbol-sort-fallback={name},
  identical-sort-action={category}
 ]
 
@@ -267,15 +272,11 @@
   {%
     \glsifcategory{#1}{chemical}%
     {, \glossentrysymbol{#1}}%
-    {%
-      \ifglshasdesc{#1}%
-      {\space(\glossentrydesc{#1})}%
-      {\space(\glossentrynameother{#1}{symbol})}%
-    }%
+    {\space(\glossentrynameother{#1}{symbol})}%
   }%
   {%
     \glsifcategory{#1}{film}%
-    { (film)}%
+    {\ (film)}%
     {}%
   }%
 }
@@ -287,7 +288,6 @@
 
 \newcommand{\unit}{\glssymbol}
 \newcommand{\measurement}{\gls}
-\glsxtrnewgls{rep.}{\baseunit}
 \glsxtrnewgls{film.}{\film}
 \glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
 
@@ -350,9 +350,9 @@ This section is about \idxpl{chemical}.
 \gls{Zr3PO44} (\glsdesc{Zr3PO44}), \gls{ZnF2} (\glsdesc{ZnF2}).
 
 \section{SI Units}
-\Idxpl{baseunit}: \baseunit{ampere} (measures \measurement{ampere}), 
-\baseunit{kilogram} (measures \measurement{kilogram}), \baseunit{metre}, 
-\baseunit{second}, \baseunit{kelvin}, \baseunit{mole}, \baseunit{candela}.
+\Idxpl{baseunit}: \unit{ampere} (measures \measurement{ampere}), 
+\unit{kilogram} (measures \measurement{kilogram}), \unit{metre}, 
+\unit{second}, \unit{kelvin}, \unit{mole}, \unit{candela}.
 
 \Idxpl{derivedunit}: \unit{area}, \unit{volume},
 \unit{velocity},
@@ -369,12 +369,12 @@ This section is about \idxpl{chemical}.
 \gls{doandroidsdreamofelectricsheep} (by \gls{dick},
 inspired the \idx{film} \film{bladerunner}).
 
-\Idxpl{film}: \gls{film.anunexpectedjourney}, \gls{film.desolationofsmaug}
-and \gls{film.thebattleoffivearmies} (adapted from the
+\Idxpl{film}: \film{anunexpectedjourney}, \film{desolationofsmaug}
+and \film{thebattleoffivearmies} (adapted from the
 \idx{book} \gls{thehobbit} by \gls{tolkien}), 
-\gls{film.thefellowshipofthering}, \gls{film.thetwotowers}
-and \gls{film.thereturnoftheking} (adapted from the
-\idx{book} \gls{thelordoftherings} by \gls{tolkien}).
+\film{thefellowshipofthering}, \film{thetwotowers}
+and \film{thereturnoftheking} (adapted from the
+\idx{book} \gls{thelordoftherings} also by \gls{tolkien}).
 
 \section{Miscellaneous Symbols}
 

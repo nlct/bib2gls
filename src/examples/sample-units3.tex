@@ -23,8 +23,11 @@
   },
   symbol-sort-fallback={name},
   selection=all,% select all entries
-  % make @symbol act like @dualsymbol:
-  entry-type-aliases={symbol=dualsymbol},
+  % make @measurement and @unit act like @dualsymbol:
+  entry-type-aliases={
+   measurement=dualsymbol,
+   unit=dualsymbol,
+  },
   set-widest,% needed for alttree style
   dual-sort={letternumber-upperlower},
   type=main,% put primary entries in 'main' glossary
