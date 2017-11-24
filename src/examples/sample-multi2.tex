@@ -130,7 +130,6 @@
  category={measurement},
  type={baseunit},
  duplicate-label-suffix={.copy},
- set-widest,
  symbol-sort-fallback={name},
  save-locations=false
 ]
@@ -430,7 +429,10 @@ and \film{thereturnoftheking} (adapted from the
   }%
 }
 
-\printunsrtglossary[type=baseunit,style=alttree,nogroupskip]
+\printunsrtglossary*[type=baseunit,style=alttree,nogroupskip]
+{%
+  \glsFindWidestTopLevelName[baseunit]%
+}
 \printunsrtglossary[type=information,style=alttree,nogroupskip]
 \printunsrtglossary[type=mediacontrol,style=alttree,nogroupskip]
 \printunsrtglossary[type=weather,style=alttree,nogroupskip]

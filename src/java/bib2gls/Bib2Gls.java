@@ -773,15 +773,9 @@ public class Bib2Gls implements TeXApp
             {
                getWriter().write("&ge;");
             }
-            else if (codePoint > 0xffff)
-            {
-               getWriter().write(String.format("%c%c", 
-                   Character.highSurrogate(codePoint), 
-                   Character.lowSurrogate(codePoint)));
-            }
             else
             {
-               getWriter().write(codePoint);
+               getWriter().write(String.format("%c", codePoint));
             }
          }
       };
@@ -3842,8 +3836,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.0.20171123 (EXPERIMENTAL)";
-   public static final String DATE = "2017-11-23";
+   public static final String VERSION = "1.0.20171124 (EXPERIMENTAL)";
+   public static final String DATE = "2017-11-24";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

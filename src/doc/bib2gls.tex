@@ -1938,24 +1938,46 @@ a glossary style that displays the group headings, there's no need
 to use this switch. Note that this switch doesn't automatically
 select an appropriate glossary style.
 
-There are four basic types of groups:
+There are eight types of groups:
 \begin{itemize}
 \item \idxpl{lettergroup} where the group title indicates the
-first letter of all the sort values within that group.
+first letter of all the sort values within that group (used with
+alphabetical, letter or letter-number sort methods, such as \csopt[locale]{sort}
+or \csopt[letternumber-nocase]{sort}).
 The group title is set with \csref{bibglslettergroup}.
-If the sort value is empty then no group is assigned to that entry.
 
 \item \idxpl{nonlettergroup} (or \idxpl{symbolgroup})
 where the first characters of all the sort values within that group
 are non-alphabetical. The group title is set with \csref{bibglsothergroup}.
 
+\item \idxpl{emptygroup} where the sort value is empty. This will
+occur when the sort value consists solely of commands that \bibgls\
+can't interpret for the alphabetical, letter or letter-number sort
+methods. The group title is set with \csref{bibglsemptygroup}.
+
 \item \idxpl{numbergroup} for all entries sorted by a numeric
 comparison (such as \csopt[integer]{sort}). 
 The group title is set with \csref{bibglsnumbergroup}.
 
+\item \idxpl{datetimegroup} for all entries sorted by a date-time
+comparison (such as \csopt[datetime]{sort}). 
+The group title is set with \csref{bibglsdatetimegroup}.
+
+\item \idxpl{dategroup} for all entries sorted by a date
+comparison (such as \csopt[date]{sort}). 
+The group title is set with \csref{bibglsdategroup}.
+
+\item \idxpl{timegroup} for all entries sorted by a date
+comparison (such as \csopt[time]{sort}). 
+The group title is set with \csref{bibglstimegroup}.
+
 \item \idxpl{customgroup} for all entries that have had the
-group title explicitly set using the \csopt[\meta{title}]{group} 
-resource option.
+group label explicitly set using the \csopt[\meta{label}]{group} 
+resource option. You will need to use \ics{glsxtrsetgrouptitle}
+to provide an associated title if the \meta{label} isn't the same as
+the title. Remember that the label can't contain any active
+characters, so you can't use non-ASCII characters in \meta{label}
+with \sty{inputenc} (but you can with \sty{fontspec}).
 \end{itemize}
 
 The letter group titles will typically have the first character
@@ -6114,13 +6136,16 @@ If you actually want the duplicate, you need to specify a
 suffix with \csopt{duplicate-label-suffix}. This suffix is only
 set just before writing the entry definition to the \ext{glstex}
 file, so it doesn't affect selection criteria nor can label
-substitutions be performed in any cross-references. The actual 
-suffix is formed from \meta{value}\meta{n} where \meta{n} is
-an integer that's incremented in the event of multiple duplicates.
-For example, \csopt[.copy]{duplicate-label-suffix} will 
-change the label to \meta{id}\code{.copy1} for the first duplicate of
-the entry whose label is \meta{id}, 
-\meta{id}\code{.copy2} for the second duplicate, etc.
+substitutions be performed in any cross-references. Options such as
+\csopt{set-widest} that reference entry labels are incompatible
+as they will use the unsuffixed label.
+
+The actual suffix is formed from \meta{value}\meta{n} where \meta{n}
+is an integer that's incremented in the event of multiple
+duplicates.  For example, \csopt[.copy]{duplicate-label-suffix} will
+change the label to \meta{id}\code{.copy1} for the first duplicate
+of the entry whose label is \meta{id}, \meta{id}\code{.copy2} for
+the second duplicate, etc.
 
 \optsection{record-label-prefix}
 
@@ -11409,7 +11434,7 @@ separately (see below).
 
 \cssection{bibglssetlettergrouptitle}
 
-For each group that's detected, \bibgls\ will write the line:
+For each \idx{lettergroup} that's detected, \bibgls\ will write the line:
 \formatdef{bibglssetlettergrouptitle}
 in the \ext{glstex} file, which sets the group's title using
 \format{glsxtrsetgrouptitle}
@@ -11455,7 +11480,7 @@ loaded you can do:
 \cssection{bibglslettergroup}
 
 \formatdef{bibglslettergroup}
-This command is used to determine the letter group label. The
+This command is used to determine the \idx{lettergroup} label. The
 default definition is \meta{type}\meta{id}, which ensures that no
 problematic characters occur in the label since \meta{type} can't
 contains special characters and \meta{id} is numeric. The
@@ -11465,7 +11490,7 @@ the hyperlink name must be unique.
 \cssection{bibglslettergrouptitle}
 
 \formatdef{bibglslettergrouptitle}
-This command is used to determine the letter group title.
+This command is used to determine the \idx{lettergroup} title.
 The default definition is \ics{unexpanded}\margm{title}, which guards
 against any expansion issues that may arise with characters outside
 the basic Latin set.
@@ -11540,8 +11565,8 @@ loaded by the \styfmt{glossaries} package.)
 
 \cssection{bibglssetothergrouptitle}
 
-The group label and title for non-alphabetic characters (symbols)
-are dealt with in a similar way to the letter groups, but in this
+The label and title for \idxpl{symbolgroup}
+are dealt with in a similar way to the \idxpl!{lettergroup}, but in this
 case the title is set using
 \formatdef{bibglssetothergrouptitle}
 This is defined in an analogous manner:
@@ -11577,7 +11602,7 @@ set using:
 \cssection{bibglsothergroup}
 
 \formatdef{bibglsothergroup}
-This expands to the group label for symbol groups. This just
+This expands to the label for \idxpl{symbolgroup}. This just
 defaults to \code{glssymbols} (ignoring all arguments), which
 replicates the label used when \idx!{makeindex} or \idx!{xindy}
 generate the glossary files.
@@ -11585,13 +11610,33 @@ generate the glossary files.
 \cssection{bibglsothergrouptitle}
 
 \formatdef{bibglsothergrouptitle}
-This expands to the group title for symbol groups. This just
+This expands to the title for \idxpl{symbolgroup}. This just
+expands to \ics{glssymbolsgroupname} by default.
+
+\cssection{bibglssetemptygrouptitle}
+
+Used when the sort value devolves to an empty string. This command
+sets the label and title.
+\formatdef{bibglssetemptygrouptitle}
+
+\cssection{bibglsemptygroup}
+
+\formatdef{bibglsemptygroup}
+This expands to the label for \idxpl{emptygroup}. This
+defaults to \code{glssymbols} to make it consistent with 
+\idxpl{nonlettergroup} (since the sort value likely contained
+unknown symbol commands).
+
+\cssection{bibglsemptygrouptitle}
+
+\formatdef{bibglsemptygrouptitle}
+This expands to the group title for \idx{emptygroup}. This just
 expands to \ics{glssymbolsgroupname} by default.
 
 \cssection{bibglssetnumbergrouptitle}
 
 The numeric sort methods (\tableref{tab:sortoptionsnumerical}) 
-all create number groups instead of letter
+all create \idxpl{numbergroup} instead of letter
 or symbol groups. These behave in an analogous way to the above.
 \formatdef{bibglssetnumbergrouptitle}
 In this case \meta{value} is the actual numeric sort value, and
@@ -11604,13 +11649,13 @@ to an integer. This command is defined as
 
 \cssection{bibglsnumbergroup}
 
-The number group label is obtained from:
+The \idx{numbergroup} label is obtained from:
 \formatdef{bibglsnumbergroup}
 This just defaults to \code{glsnumbers}.
 
 \cssection{bibglsnumbergrouptitle}
 
-The number group title is obtained from:
+The \idx{numbergroup} title is obtained from:
 \formatdef{bibglsnumbergrouptitle}
 This just defaults to \ics{glsnumbersgroupname}.
 
@@ -11618,7 +11663,7 @@ This just defaults to \ics{glsnumbersgroupname}.
 
 \formatdef{bibglsdatetimegroup}
 
-This command is used for group labels with \optfmt{datetime} sorting
+This command is used for \idx{datetimegroup} labels with \optfmt{datetime} sorting
 (\tableref{tab:sortoptionsdatetime}). This has ten arguments, which means a
 little trickery is needed to deal with the tenth argument.
 The default definition is
@@ -11631,7 +11676,7 @@ This forms the group label from the year, month, day and \meta{type}.
 
 \formatdef{bibglsdatetimegrouptitle}
 
-This command is used for group titles with \optfmt{datetime} sorting
+This command is used for \idx{datetimegroup} titles with \optfmt{datetime} sorting
 (\tableref{tab:sortoptionsdatetime}).
 The default definition is
 \begin{verbatim}
@@ -11645,7 +11690,7 @@ but may be redefined as appropriate.
 
 \formatdef{bibglsdategroup}
 
-This command is used for group labels with \optfmt{date} (no time) sorting 
+This command is used for \idx{dategroup} labels with \optfmt{date} (no time) sorting 
 (\tableref{tab:sortoptionsdatetime}). The default definition is
 \begin{verbatim}
 \providecommand{\bibglsdategroup}[7]{#1#2#4#7}
@@ -11657,7 +11702,7 @@ value used in calculating the sort value.
 \cssection{bibglsdategrouptitle}
 
 \formatdef{bibglsdategrouptitle}
-This command is used for group titles with \optfmt{date} (no time) sorting
+This command is used for \idx{dategroup} titles with \optfmt{date} (no time) sorting
 (\tableref{tab:sortoptionsdatetime}).  The default definition is
 \begin{verbatim}
 \providecommand{\bibglsdategrouptitle}[7]{#1-#2}
@@ -11668,14 +11713,14 @@ This just sets the title to the numeric year-month form
 \cssection{bibglstimegroup}
 
 \formatdef{bibglstimegroup}
-This command is used for group labels with \optfmt{time} (no date) sorting
+This command is used for \idx{timegroup} labels with \optfmt{time} (no date) sorting
 (\tableref{tab:sortoptionsdatetime}).
 
 \cssection{bibglstimegrouptitle}
 
 \formatdef{bibglstimegrouptitle}
 
-This command is used for group titles with \optfmt{time} (no date) sorting
+This command is used for \idx{timegroup} titles with \optfmt{time} (no date) sorting
 (\tableref{tab:sortoptionsdatetime}).
 
 \cssection{bibglshypergroup}
@@ -15718,11 +15763,19 @@ prevent duplicate labels. The simplest method is to use
  \csopt[measurement]{category},
  \csopt[baseunit]{type},
  \csopt[.copy]{duplicate-label-suffix},
- \csopt{set-widest},
  \csopt[name]{symbol-sort-fallback},
  \csopt[false]{save-locations}
 }
 \end{codeenv}
+I can't use \csopt{set-widest} here as it won't pick up the modified
+label and will instead use the label from the original entry.
+Instead I've used \cs{glsFindWidestTopLevelName} to find it:
+\begin{verbatim}
+\printunsrtglossary*[type=baseunit,style=alttree,nogroupskip]
+{%
+  \glsFindWidestTopLevelName[baseunit]%
+}
+\end{verbatim}
 
 The text symbols from \exfile{miscsymbols.bib} are all loaded in a
 single \idx{resourceset}, where the \field{type} field can be

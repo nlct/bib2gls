@@ -137,12 +137,30 @@ public class Bib2GlsEntryComparator extends SortComparator
          type = "";
       }
 
-      if (bib2gls.useGroupField() && value.length() > 0
-           && !entry.hasParent())
+      if (bib2gls.useGroupField() && !entry.hasParent())
       {
          if (entry.getFieldValue(groupField) != null)
          {
             // don't overwrite
+         }
+         else if (value.isEmpty())
+         {
+            GroupTitle grpTitle = resource.getGroupTitle(type, 0L);
+            String args;
+
+            if (grpTitle == null)
+            {
+               grpTitle = new EmptyGroupTitle(type);
+               resource.putGroupTitle(grpTitle, entry);
+               args = grpTitle.toString();
+            }
+            else
+            {
+               args = grpTitle.format(value);
+            }
+
+            entry.putField(groupField, 
+              String.format("\\%s%s", grpTitle.getCsLabelName(), args));
          }
          else if (collator instanceof RuleBasedCollator)
          {
@@ -237,18 +255,8 @@ public class Bib2GlsEntryComparator extends SortComparator
                {
                   int titleCodePoint = Character.toTitleCase(cp);
 
-                  if (titleCodePoint > 0xffff)
-                  {
-                     grp = String.format("%c%c%s",
-                          Character.highSurrogate(titleCodePoint),
-                          Character.lowSurrogate(titleCodePoint),
-                          grp.substring(Character.charCount(cp)).toLowerCase());
-                  }
-                  else
-                  {
-                     grp = String.format("%c%s", titleCodePoint,
+                  grp = String.format("%c%s", titleCodePoint,
                         grp.substring(Character.charCount(cp)).toLowerCase());
-                  }
 
                   cp = titleCodePoint;
                }
@@ -314,18 +322,7 @@ public class Bib2GlsEntryComparator extends SortComparator
          {
             int codePoint = value.codePointAt(0);
 
-            String str;
-
-            if (codePoint > 0xffff)
-            {
-               str = String.format("%c%c",
-                 Character.highSurrogate(codePoint),
-                 Character.lowSurrogate(codePoint));
-            }
-            else
-            {
-               str = String.format("%c", codePoint);
-            }
+            String str = String.format("%c", codePoint);
 
             if (Character.isAlphabetic(codePoint))
             {

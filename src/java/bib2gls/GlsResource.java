@@ -5024,6 +5024,13 @@ public class GlsResource
             writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergroup#1}{\\bibglsothergrouptitle#1}}");
 
+            // empty groups:
+
+            writer.println("  \\providecommand{\\bibglsemptygroup}[1]{glssymbols}");
+            writer.println("  \\providecommand{\\bibglsemptygrouptitle}[1]{\\glssymbolsgroupname}");
+            writer.println("  \\providecommand{\\bibglssetemptygrouptitle}[1]{%");
+            writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygroup#1}{\\bibglsemptygrouptitle#1}}");
+
             // number groups
 
             writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
