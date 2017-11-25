@@ -129,13 +129,16 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems
    only.)
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf` (User manual.)
+ - *TEXMF*`/doc/support/bib2gls/examples/` (example files)
 
 Note that `texparserlib.jar` isn't an application. It's
 a library used by `bib2gls.jar` and `convertgls2bib.jar`
 and so needs to be on the same class path as them.
 
 The bash `.sh` scripts are provided for Unix-like users.
-They're not required for Windows.
+They're not required for Windows. The `.1` files are `man`
+files and should be placed where `man` can find them. (They
+are created from the `.pod` files.)
 
 To test installation:
 ```bash
@@ -156,10 +159,18 @@ a newer experimental version.
 
 ## User Manual (bib2gls.pdf)
 
+The examples directory needs to be ../examples relative to directory
+containing bib2gls.tex as the .bib, .tex and .pdf files are included
+in the manual.
+
 ```bash
-pdflatex bib2gls
-makeindex -s bib2gls.ist bib2gls
-pdflatex bib2gls
+xelatex bib2gls
+bibtex bib2gls
+bib2gls -g bib2gls
+xelatex bib2gls
+bib2gls -g bib2gls
+xelatex bib2gls
+xelatex bib2gls
 ```
 
 ## JAR Files

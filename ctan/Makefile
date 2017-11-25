@@ -13,6 +13,7 @@ bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib
 	cp ../src/doc/bib2gls.tex bib2gls/src
 	cp ../src/doc/bib2gls.pdf bib2gls
 	cp ../src/doc/*.pod bib2gls/src
+	cp ../src/doc/*.bib bib2gls/src
 	cp ../src/doc/*.1 bib2gls
 	cp ../src/lib/resources/*.xml bib2gls
 	cp ../src/examples/*.{tex,bib,pdf} bib2gls/examples

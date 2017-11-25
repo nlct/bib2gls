@@ -1,4 +1,4 @@
-v1.1 (pending):
+v1.1 (2017-11-25):
 
    * New resource options: 
 
@@ -107,6 +107,8 @@ v1.1 (pending):
      --no-expand-fields, --record-count (-c), --no-record-count,
      --record-count-unit (-n), --no-record-count-unit,
      --no-break-space, --break-space
+
+   * fixed fallback if kpsewhich fails.
 
    * texparserlib: added extra core maths commands.
 
