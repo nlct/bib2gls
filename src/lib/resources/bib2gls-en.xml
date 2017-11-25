@@ -226,6 +226,7 @@ Defaulting to: {0}.
 <entry key="message.clearing.entry.aliases">Clearing entry type aliases.</entry>
 <entry key="message.setting.entry.aliases">Setting entry type aliases.</entry>
 <entry key="message.removing.missing.parent">Stripping missing parent ''{0}'' from entry {1}</entry>
+<entry key="message.missing.sort.fallback">Entry ''{0}'' missing sort field ''{1}''. Falling back on field ''{2}''.</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -254,7 +255,8 @@ Defaulting to: {0}.
 <entry key="warning.entry.already.defined">Entry {0} is being defined in {1} but it has already been defined in a previous .glstex file.</entry>
 <entry key="warning.can.find.arg">Can''t detect argument for: \{0}</entry>
 <entry key="warning.no.default.sort">Can''t determine sort value for: {0}
-(Using sort field ''{1}''. Entry type: {2})</entry>
+(Using sort field ''{1}''. Entry type: {2}.)
+Falling back on ID.</entry>
 <entry key="warning.cant.parse.sort">Can''t parse sort value ''{0}'' for: {1}
 </entry>
 <entry key="warning.cant.parse.pattern.sort">Can''t parse sort value ''{0}'' for ''{1}'' (pattern: ''{2}'')

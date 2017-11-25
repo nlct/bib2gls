@@ -4,7 +4,8 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
-	sample-maths.pdf sample-textsymbols.pdf sample-usergroups.pdf \
+	sample-maths.pdf sample-textsymbols.pdf \
+	sample-constants.pdf sample-usergroups.pdf \
 	sample-languages.pdf sample-multi1.pdf sample-multi2.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
@@ -102,6 +103,11 @@ sample-multi2.pdf	: $(DEPS) sample-multi2.tex \
 	pdflatex sample-multi2
 	$(BIB2GLS) --break-space sample-multi2
 	pdflatex sample-multi2
+
+sample-constants.pdf	: $(DEPS) sample-constants.tex constants.bib
+	pdflatex sample-constants
+	$(BIB2GLS) --no-group sample-constants
+	pdflatex sample-constants
 
 clean	:
 	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}

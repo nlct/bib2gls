@@ -704,6 +704,23 @@ public class SortSettings
       return padMinus;
    }
 
+   public String getMissingFieldFallback()
+   {
+      return missingFieldFallback;
+   }
+
+   public void setMissingFieldFallback(String field)
+   {
+      if ("".equals(field))
+      {
+         missingFieldFallback = null;
+      }
+      else
+      {
+         missingFieldFallback = field;
+      }
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -747,4 +764,6 @@ public class SortSettings
 
    private String padMinus = "<";
    private String padPlus = ">";
+
+   private String missingFieldFallback=null;
 }

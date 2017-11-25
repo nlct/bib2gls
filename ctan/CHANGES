@@ -73,6 +73,9 @@ v1.1 (pending):
      - alias
      - primary-dual-dependency
      - duplicate-label-suffix
+     - missing-sort-fallback
+     - dual-missing-sort-fallback
+     - secondary-missing-sort-fallback
 
    * Added 'same as base' as a keyword value of 'category',
      'type', 'dual-category', 'dual-type', and

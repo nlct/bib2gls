@@ -1467,6 +1467,27 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.missing-sort-fallback,
+   name={\csoptfmt{missing\dhyphen sort\dhyphen fallback}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-missing-sort-fallback,
+   name={\csoptfmt{dual\dhyphen missing\dhyphen sort\dhyphen fallback}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-missing-sort-fallback,
+   name={\csoptfmt{secondary\dhyphen missing\dhyphen sort\dhyphen fallback}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.sort-rule,
    name={\csoptfmt{sort\dhyphen rule}},
    user1={\meta{value}},
@@ -4505,6 +4526,14 @@ field.},
   name={\filefmt{sample\dhyphen chemical.tex}}
 }
 
+@dualindexentry{file.constants.bib,
+  name={\filefmt{constants.bib}}
+}
+
+@dualindexentry{file.sample-constants.tex,
+  name={\filefmt{sample\dhyphen constants.tex}}
+}
+
 @dualindexentry{file.baseunits.bib,
   name={\filefmt{baseunits.bib}}
 }
@@ -4784,7 +4813,7 @@ label of the current entry},
 @index{glsxtrifhasfield,
   name={\csfmt{gls\-xtr\-if\-has\-field}},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
-  description={tests if the given entry has the given field set
+  description={tests if the given entry has the given \emph{internal} field set
    (defined and not empty)
    without testing if the entry exists and adds implicit scoping
    to \meta{true} and \meta{false}},

@@ -1,0 +1,56 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ postdot,% add dot after descriptions
+% load glossary-tree.sty and patch styles:
+ stylemods={tree},
+ style=alttree]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={constants},% data in constants.bib
+  % make @constant behave like @symbol
+  entry-type-aliases={constant=symbol},
+  field-aliases={
+    identifier=category,
+    constantsymbol=name,
+    constantname=description,
+    value=user1,
+    definition=user2,
+    alternative=user3
+  },
+  type=main,
+  set-widest,
+  sort-field=user1,
+  missing-sort-fallback=name,
+  sort=double,
+  selection=all
+]
+
+\newcommand{\glsxtrpostdescconstant}{%
+  \glsxtrifhasfield{useriii}{\glscurrententrylabel}%
+  { (also denoted \glscurrentfieldvalue
+      \glsxtrifhasfield{useri}{\glscurrententrylabel}%
+      {, approximately \glscurrentfieldvalue}%
+      {}%
+   )%
+  }%
+  {%
+    \glsxtrifhasfield{useri}{\glscurrententrylabel}%
+    { (approximately \glscurrentfieldvalue)}%
+    {}%
+  }%
+  \glsxtrifhasfield{userii}{\glscurrententrylabel}%
+  {: \glscurrentfieldvalue}%
+  {}%
+}
+
+\begin{document}
+\printunsrtglossary[title={Constants}]
+\end{document}

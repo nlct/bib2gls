@@ -8698,34 +8698,75 @@ be an integer used as a seed for the random number generator.
 
 The \csopt{sort-field} key indicates which field provides the sort
 value. The default is the \field{sort} field. For example
-\begin{verbatim}
-\GlsXtrLoadResources[
- src={entries-terms},% data in entries-terms.bib
- sort-label=category,% sort by 'category' field
- sort=letter-case% case-sensitive letter sort
-]
-\end{verbatim}
+\begin{codeenv}
+\gls!{GlsXtrLoadResources}\oarg{
+ \csopt[entries-terms]{src},\idx!{commentchar} data in entries-terms.bib
+ \csopt[category]{sort-field},\idx!{commentchar} sort by 'category' field
+ \csopt[letter-case]{sort}\idx!{commentchar} case-sensitive letter sort
+}
+\end{codeenv}
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
 You may also use \csopt[id]{sort-field} to sort according to
 the label.
 
 If an entry is missing a value for \meta{field}, then the value of
-the fallback field will be used instead. For example, with the
-default \csopt[sort]{sort-field}, then for an entry defined with
-\atentry{entry}, if the \field{sort} field is missing the fallback
-field will be the \field{name} or the \field{parent} field if the
-\field{name} field is missing.
+the fallback field will be used instead. If \csopt{missing-sort-fallback} is
+set, then that's used as the fallback, otherwise it depends on the
+entry type. 
 
-If the entry is instead defined with \atentry{abbreviation} (or
+For example, with the default \csopt[sort]{sort-field}, then for an
+entry defined with \atentry{entry}, if the \field{sort} field is
+missing the fallback field will be the \field{name} (or the
+\field{parent} field if the \field{name} field is missing).
+
+If the entry is instead defined with an abbreviation type (for
+example, \atentry{abbreviation} or
 \atentry{acronym}) then if the \field{sort} field is missing,
 \bibgls\ will fallback on the field given by
-\csopt{abbreviation-sort-fallback}.
+\csopt{abbreviation-sort-fallback}. This is only used with
+\csopt[sort]{sort-field}.
 
-The \atentry{symbol} and \atentry{number} entry types
-fallback on the label (not the \field{name}) if the \field{sort} is missing.
+The symbol-like entry types fallback on the field given by
+\csopt{symbol-sort-fallback} if the \field{sort} is missing.  This
+is only used with \csopt[sort]{sort-field}.
 
 If no fallback field can be found, the entry's label will be used.
+
+\optsection{missing-sort-fallback}
+
+With \csopt[\meta{sort-field}]{sort-field}, if the value of the field
+identified by \meta{sort-field} is missing, then \bibgls\ behaves as
+follows:
+\begin{enumerate}
+\item If \csopt[\meta{fallback-field}]{missing-sort-fallback} is set, then
+\bibgls\ will fallback on the value provided by the field
+\meta{fallback-field}.  If \meta{fallback-field} is
+missing, then \bibgls\ will query the entry type's fallback for
+\meta{fallback-field} (not for \meta{sort-field}).
+\item If the entry type has a fallback rule for \meta{sort-field},
+then that rule is used. When \csopt[sort]{sort-field} this means:
+\begin{itemize}
+\item If the entry was defined using
+one of the symbol types, then \bibgls\
+will fallback on the value given by \csopt{symbol-sort-fallback}.
+\item If the entry was defined using
+one of the abbreviation types, then \bibgls\
+will fallback on the value given by
+\csopt{abbreviation-sort-fallback}.
+\end{itemize}
+If \meta{sort-field} is not \field{sort}, then there may not be a
+fallback, in which case the next condition applies:
+\item Otherwise the sort value will be set to the entry label and \bibgls\
+will issue a warning.
+\end{enumerate}
+The default setting is \csopt[\empty]{missing-sort-fallback}, which
+means that step~1 above is omitted.
+
+Use \csopt{dual-missing-sort-fallback} when sorting dual entries
+separately from primaries, and use
+\csopt{secondary-missing-sort-fallback} for \csopt{secondary}
+sorting.
 
 \optsection{abbreviation-sort-fallback}
 
@@ -8740,14 +8781,19 @@ specify the field. For example,
 \csopt{abbreviation-name-fallback} if the \field{name} field is
 omitted. The \meta{field} value must be a known field label.
 
+Note that \csopt{missing-sort-fallback} overrides this setting.
+
 \optsection{symbol-sort-fallback}
 
-The \atentry{symbol} and \atentry{number} entry types will, by default,
-fallback on the label if the \field{sort} field is
-missing (assuming the default \csopt[sort]{sort-field}). If you prefer to
-fallback on a different field, then you can use this option to
-specify the field. For example, \csopt[name]{symbol-sort-fallback}.
-The \meta{field} value must be a known field label.
+The entry types that define symbols (such as \atentry{symbol} and
+\atentry{number}) will, by default, fallback on the label if the
+\field{sort} field is missing (assuming the default
+\csopt[sort]{sort-field}). If you prefer to fallback on a different
+field, then you can use this option to specify the field. For
+example, \csopt[name]{symbol-sort-fallback}.  The \meta{field} value
+must be a known field label.
+
+Note that \csopt{missing-sort-fallback} overrides this setting.
 
 \optsection{trim-sort}
 
@@ -9797,6 +9843,10 @@ For example, if the entries are stored in \filefmt{entries.bib}:
 ]
 \end{verbatim}
 
+\optsection{secondary-missing-sort-fallback}
+
+As \csopt{missing-sort-fallback} but for secondary sorting.
+
 \optsection{secondary-trim-sort}
 
 As \csopt{trim-sort} but for secondary sorting.
@@ -10209,6 +10259,10 @@ If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
 This option indicates the field to use when sorting dual entries
 (when they haven't been combined with the primary entries). The
 default value is the same as the \csopt{sort-field} value.
+
+\optsection[\subsubsection]{dual-missing-sort-fallback}
+
+As \csopt{missing-sort-fallback} but for dual sorting.
 
 \optsection[\subsubsection]{dual-trim-sort}
 
@@ -12467,6 +12521,74 @@ is required to prevent \LaTeX\ from picking up the definitions.
 The contents of \filefmt{interpret-preamble2.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/interpret-preamble2.bib}
 
+\filesection{constants.bib}
+
+The \exfile{constants.bib} file contains mathematical constants.
+These all use a custom entry type \atentryfmt{constant}, which must
+be aliased otherwise the entries will all be ignored. The entries
+all have custom fields, which also need to be aliased.
+For example
+\begin{codeenv}
+\csopt[constant=entry]{entry-type-aliases},
+\csopt[
+  constantname=name,
+  constantsymbol=symbol,
+  definition=description,
+  identifier=category,
+  value=user1
+]{field-aliases}
+\end{codeenv}
+This setting means that, for example,
+\begin{verbatim}
+@constant{root2,
+  constantname={Pythagoras' constant},
+  constantsymbol={\ensuremath{\surd2}},
+  definition={the square root of 2},
+  value={1.41421},
+  identifier={constant}
+}
+\end{verbatim}
+is treated as though it was defined as
+\begin{verbatim}
+@entry{root2,
+  name={Pythagoras' constant},
+  symbol={\ensuremath{\surd2}},
+  description={the square root of 2},
+  user1={1.41421},
+  category={constant}
+}
+\end{verbatim}
+This use of custom fields and entry types allows more flexibility.
+For example, I may have another document that uses the same
+\ext{bib} file but requires a different definition, for example:
+\begin{verbatim}
+@number{root2,
+  description={Pythagoras' constant},
+  name={\ensuremath{\surd2}}
+}
+\end{verbatim}
+which can be obtained with
+\begin{codeenv}
+\csopt[constant=number]{entry-type-aliases},
+\csopt[
+  constantname=description,
+  constantsymbol=name
+]{field-aliases}
+\end{codeenv}
+Since the other custom fields haven't be aliased, they're ignored.
+
+The custom fields are: \fieldfmt{identifier} (set to \code{constant}
+for all the entries), \fieldfmt{constantname} (the constant's name),
+\fieldfmt{definition} (a definition of the constant),
+\fieldfmt{value} (the approximate numeric value of the constant),
+\fieldfmt{constantsymbol} (the symbolic representation of the
+constant) and \fieldfmt{alternative} (alternative symbol). 
+There's one entry that doesn't have the custom
+\fieldfmt{value} field as there's no real number value.
+
+The contents of \filefmt{constants.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/constants.bib}
+
 \filesection{chemicalformula.bib}
 
 The \exfile{chemicalformula.bib} file contains chemical formulae.
@@ -13347,6 +13469,181 @@ are no custom fields here.
 
 The contents of \filefmt{terms.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/terms.bib}
+
+\filesection{sample-constants.tex}
+
+This example just uses the \exfile{constants.bib} file. The aim here
+is to just have a list of all the constants defined in the \ext{bib}
+file. (There are no references in the document.) This means I need
+to use
+\begin{codeenv}
+\csopt[all]{selection}
+\end{codeenv}
+in order to select all entries. I also need to alias the custom
+\atentryfmt{constant} entry type otherwise all the entries will be
+ignored. I decided to make \atentryfmt{constant} behave like
+\atentry{symbol} for semantic reasons:
+\begin{codeenv}
+\csopt[constant=symbol]{entry-type-aliases}
+\end{codeenv}
+The custom fields also need aliasing:
+\begin{codeenv}
+\csopt[
+  identifier=category,
+  constantsymbol=name,
+  constantname=description,
+  value=user1,
+  definition=user2,
+  alternative=user3,
+]{field-aliases}
+\end{codeenv}
+I decided to use the \glostyle{altlist} style, so I've instructed
+\bibgls\ to determine the widest name:
+\begin{codeenv}
+\csopt{set-widest}
+\end{codeenv}
+It's always a good idea to specify the glossary type when using
+\csopt{set-widest}, although in this example there's only one
+glossary so it doesn't make much difference.
+\begin{codeenv}
+\csopt[main]{type}
+\end{codeenv}
+I decided to order the constants according to their (approximate)
+numerical value. I've aliased the custom \fieldfmt{value} field to
+\field{user1}, so I can sort by that field using a numerical
+comparison:
+\begin{codeenv}
+\csopt[user1]{sort-field},
+\csopt[double]{sort}
+\end{codeenv}
+There are three entries without the \fieldfmt{user1} field (as the
+custom \fieldfmt{value} field is missing in the \ext{bib} file):
+\code{zero}, \code{one} and \code{imaginary}. In the case of
+\code{zero} and \code{one} the exact value can be obtained from the
+\field{name} field. Since I've change the default \csopt{sort-field}, I
+can't use \csopt{symbol-sort-fallback}. Instead I need to use
+\begin{codeenv}
+\csopt[name]{missing-sort-fallback}
+\end{codeenv}
+
+What happens with the \code{imaginary} entry? It has no real
+representation.  The transcript (\ext{glg}) file shows the message:
+\begin{verbatim}
+Warning: Can't parse sort value 'i' for: imaginary
+\end{verbatim}
+With the numerical sort methods, if the field can't be parsed the
+value defaults to 0. This means that both \code{zero} and
+\code{imaginary} have 0 as the sort value, so the
+\csopt{identical-sort-action} is implemented. The default setting
+means that \bibgls\ will fallback on comparing the entry labels, so
+\code{imaginary} comes before \code{zero}.
+
+Since I'm just using the \glostyle{alttree} style, I only need
+\sty{glossary-tree}. I can improve efficiency in the document build
+by preventing the other glossary style packages from being loaded
+using the \styopt{nostyles} package option. This also prevents
+\sty{glossary-tree} from being loaded, but I can both load it and
+patch the styles with \sty{glossaries-extra-stylemods} through the
+option \styopt[tree]{stylemods}. Since the default \glostyle{list}
+style is no longer available, I need to set a new default with
+\styopt[alttree]{style}. I also want to automatically insert a
+\idx{full-stop} after the description, which can be done with
+\styopt{postdot}. Don't forget that the \styopt{record} option is
+always needed when using \bibgls. This means that the
+\sty{glossaries-extra} package needs to be loaded as follows:
+\begin{verbatim}
+\usepackage[record,nostyles,postdot,stylemods={tree},style=alttree]
+ {glossaries-extra}
+\end{verbatim}
+I've assigned the custom \fieldfmt{constantname} field to the
+\field{description} field and the custom \fieldfmt{definition} field to the
+\field{user2} field. This means that by default the glossary list
+will just show the symbolic representation and the constant's name.
+I'd like to append the value and definition after the description.
+With the base \sty{glossaries} package this would require defining a
+new glossary style but with \sty{glossaries-extra} it can easily be
+achieved through the \idx{postdescriptionhook}.
+
+I've aliased the custom \fieldfmt{identifier} field to
+\field{category}, which means that all the entries will have the
+\field{category} set to \code{constant}. The
+\idx{postdescriptionhook} is obtained from
+\idx{glsxtrpostdesccategory}, so I need to define
+the command \csfmt{glsxtrpostdescconstant}. A simple definition is
+\begin{verbatim}
+\newcommand{\glsxtrpostdescconstant}{%
+ \space (approximately \glsentryuseri{\glscurrententrylabel})%
+ : \glsentryuserii{\glscurrententrylabel}%
+}
+\end{verbatim}
+This is fine if all entries have the \field{user1} and \field{user2}
+fields set. A more generic approach tests for the existence of these
+fields. This can either be done with \idx{ifglshasfield}:
+\begin{verbatim}
+\newcommand{\glsxtrpostdescconstant}{%
+  \ifglshasfield{user1}{\glscurrententrylabel}%
+  { (approximately \glscurrentfieldvalue)}%
+  {}%
+  \ifglshasfield{user2}{\glscurrententrylabel}%
+  {: \glscurrentfieldvalue}%
+  {}%
+}
+\end{verbatim}
+or with \idx{glsxtrifhasfield}:
+\begin{verbatim}
+\newcommand{\glsxtrpostdescconstant}{%
+  \glsxtrifhasfield{useri}{\glscurrententrylabel}%
+  { (approximately \glscurrentfieldvalue)}%
+  {}%
+  \glsxtrifhasfield{userii}{\glscurrententrylabel}%
+  {: \glscurrentfieldvalue}%
+  {}%
+}
+\end{verbatim}
+(Note the need to use the internal field label \field{useri} and
+\field{userii} with \idx{glsxtrifhasfield}.)
+
+A modification can be made to also show the alternative
+representation (obtained from the custom \fieldfmt{alternative}
+field which has been aliased to \field{user3}):
+\begin{verbatim}
+\newcommand{\glsxtrpostdescconstant}{%
+  \glsxtrifhasfield{useriii}{\glscurrententrylabel}%
+  { (also denoted \glscurrentfieldvalue
+      \glsxtrifhasfield{useri}{\glscurrententrylabel}%
+      {, approximately \glscurrentfieldvalue}%
+      {}%
+   )%
+  }%
+  {%
+    \glsxtrifhasfield{useri}{\glscurrententrylabel}%
+    { (approximately \glscurrentfieldvalue)}%
+    {}%
+  }%
+  \glsxtrifhasfield{userii}{\glscurrententrylabel}%
+  {: \glscurrentfieldvalue}%
+  {}%
+}
+\end{verbatim}
+
+The complete code is listed below.  The document build is:
+\begin{verbatim}
+pdflatex sample-constants
+bib2gls sample-constants
+pdflatex sample-constants
+\end{verbatim}
+The complete document is shown in \figureref{fig:sample-constants.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-constants.tex}
+
+\begin{figure}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-constants.pdf}}%
+}
+{\caption{\filefmt{sample-constants.pdf}}}
+{fig:sample-constants.pdf}
+\end{figure}
 
 \filesection{sample-chemical.tex}
 

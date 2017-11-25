@@ -1321,6 +1321,21 @@ public class GlsResource
 
             dualSortSettings.setSortField(field);
          }
+         else if (opt.equals("missing-sort-fallback"))
+         {
+            sortSettings.setMissingFieldFallback(
+              getOptional(parser, list, opt));
+         }
+         else if (opt.equals("dual-missing-sort-fallback"))
+         {
+            dualSortSettings.setMissingFieldFallback(
+              getOptional(parser, list, opt));
+         }
+         else if (opt.equals("secondary-missing-sort-fallback"))
+         {
+            secondarySortSettings.setMissingFieldFallback(
+              getOptional(parser, list, opt));
+         }
          else if (opt.equals("abbreviation-sort-fallback"))
          {
             abbrevDefaultSortField = getRequired(parser, list, opt);

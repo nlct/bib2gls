@@ -314,6 +314,22 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
          if (value == null)
          {
+            String fallbackField = settings.getMissingFieldFallback();
+
+            if (fallbackField != null)
+            {
+               bib2gls.debugMessage("message.missing.sort.fallback", 
+               id, sortField, fallbackField);
+
+               value = entry.getFieldValue(fallbackField);
+               list = entry.getField(fallbackField);
+
+               sortField = fallbackField;
+            }
+         }
+
+         if (value == null)
+         {
             value = entry.getFallbackValue(sortField);
             list = entry.getFallbackContents(sortField);
          }
