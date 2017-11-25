@@ -4,9 +4,19 @@
 
 % Encoding: UTF-8
 
+% Requires upgreek.sty
+
+@preamble{"\providecommand{\constanti}{\mathrm{i}}
+\providecommand{\constantj}{\mathrm{j}}
+\providecommand{\constante}{\mathrm{e}}
+\providecommand{\constantpi}{\uppi}
+\providecommand{\constantgamma}{\upgamma}
+\providecommand{\constantphi}{\upphi}
+\providecommand{\constantlambda}{\uplambda}"}
+
 @constant{pi,
   constantname={pi},
-  constantsymbol={\ensuremath{\pi}},
+  constantsymbol={\ensuremath{\constantpi}},
   definition={the ratio of the length of the circumference
     of a circle to its diameter},
   value={3.14159},
@@ -15,7 +25,7 @@
 
 @constant{eulercons,
   constantname={Euler's constant},
-  constantsymbol={\ensuremath{\gamma}},
+  constantsymbol={\ensuremath{\constantgamma}},
   definition={the limit of \[\sum_{r=1}^n\frac{1}{r}-\ln n\]
     as $n\to\infty$},
   value={0.57721},
@@ -24,7 +34,7 @@
 
 @constant{e,
   constantname={Euler's number},
-  constantsymbol={\ensuremath{e}},
+  constantsymbol={\ensuremath{\constante}},
   definition={base of natural logarithms},
   value={2.71828},
   identifier={constant}
@@ -40,7 +50,7 @@
 
 @constant{goldenratio,
   constantname={golden ratio},
-  constantsymbol={\ensuremath{\phi}},
+  constantsymbol={\ensuremath{\constantphi}},
   definition={the ratio $\frac{1+\surd5}{2}$},
   value={1.61803},
   identifier={constant}
@@ -56,7 +66,7 @@
 
 @constant{conwaysconstant,
   constantname={Conway's constant},
-  constantsymbol={\ensuremath{\lambda}},
+  constantsymbol={\ensuremath{\constantlambda}},
   definition={the invariant growth rate of all derived strings},
   value={1.30357},
   identifier={constant}
@@ -64,22 +74,22 @@
 
 @constant{zero,
   constantname={zero},
-  constantsymbol={0},
+  constantsymbol={\ensuremath{0}},
   definition={nothing or nil},
   identifier={constant}
 }
 
 @constant{one,
   constantname={one},
-  constantsymbol={1},
+  constantsymbol={\ensuremath{1}},
   definition={single entity, unity},
   identifier={constant}
 }
 
 @constant{imaginary,
   constantname={imaginary unit},
-  constantsymbol={\ensuremath{i}},
-  definition={defined as $i^2 = -1$},
+  constantsymbol={\ensuremath{\constanti}},
+  definition={defined as $\constanti^2 = -1$},
   identifier={constant},
-  alternative={\ensuremath{j}}
+  alternative={\ensuremath{\constantj}}
 }

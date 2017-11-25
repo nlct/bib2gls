@@ -670,6 +670,8 @@ public class Bib2Gls implements TeXApp
                  ||pkg.equals("stix")
                  ||pkg.equals("textcomp")
                  ||pkg.equals("mnsymbol")
+                 ||pkg.equals("fourier")
+                 ||pkg.equals("upgreek")
                  ||pkg.equals("xspace")
                  ||pkg.equals("siunitx")
                  ||pkg.equals("fontenc")

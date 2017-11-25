@@ -1320,9 +1320,9 @@ work. In particular, in this case it's being used in a fragmented
 context without knowing most of the packages used by the
 document\footnote{\bibgls\ can detect from the log file a small
 number of packages that the parser can support, such as
-\isty{pifonts}, \isty{wasysym}, \isty{amssymb}, \isty{stix}, \isty{mhchem}
-and \isty{bpchem}. There's also partial support for \isty{siunitx}'s
-\ics{si} command.}\ or any custom
+\isty{pifonts}, \isty{upgreek}, \isty{wasysym}, \isty{amssymb},
+\isty{stix}, \isty{mhchem} and \isty{bpchem}. There's also partial
+support for \isty{siunitx}'s \ics{si} command.}\ or any custom
 commands or environments provided within the document.
 
 Since the parser doesn't have a full set of commands available
@@ -12583,8 +12583,31 @@ for all the entries), \fieldfmt{constantname} (the constant's name),
 \fieldfmt{value} (the approximate numeric value of the constant),
 \fieldfmt{constantsymbol} (the symbolic representation of the
 constant) and \fieldfmt{alternative} (alternative symbol). 
-There's one entry that doesn't have the custom
-\fieldfmt{value} field as there's no real number value.
+There are three entries that don't have the custom
+\fieldfmt{value} field: \code{zero} and \code{one} (the exact value
+is in the \fieldfmt{constantsymbol} field in both cases) and \code{imaginary}
+(where there's no real number value).
+
+I've provided some commands in the \atentry{preamble} for
+constants that are represented by Latin and Greek letters.
+These can be defined in the document before the \idx{resourceset}
+if different notation required. The upright Greek commands require
+the \isty{upgreek} package.
+
+If it's likely that there may be a need to sort according to
+\fieldfmt{definition}, then it would be better to use \cs{sortart}
+describe above:
+\begin{verbatim}
+@constant{root2,
+  constantname={Pythagoras' constant},
+  constantsymbol={\ensuremath{\surd2}},
+  definition={\sortart{the}{square root of 2}},
+  value={1.41421},
+  identifier={constant}
+}
+\end{verbatim}
+Remember that this would need \exfile{no-interpret-preamble.bib} to
+ensure the command is recognised in the document.
 
 The contents of \filefmt{constants.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/constants.bib}
@@ -13472,7 +13495,7 @@ The contents of \filefmt{terms.bib} are as follows:
 
 \filesection{sample-constants.tex}
 
-This example just uses the \exfile{constants.bib} file. The aim here
+This example uses the \exfile{constants.bib} file. The aim here
 is to just have a list of all the constants defined in the \ext{bib}
 file. (There are no references in the document.) This means I need
 to use
@@ -13482,9 +13505,9 @@ to use
 in order to select all entries. I also need to alias the custom
 \atentryfmt{constant} entry type otherwise all the entries will be
 ignored. I decided to make \atentryfmt{constant} behave like
-\atentry{symbol} for semantic reasons:
+\atentry{number} for semantic reasons:
 \begin{codeenv}
-\csopt[constant=symbol]{entry-type-aliases}
+\csopt[constant=number]{entry-type-aliases}
 \end{codeenv}
 The custom fields also need aliasing:
 \begin{codeenv}
@@ -13556,8 +13579,8 @@ always needed when using \bibgls. This means that the
  {glossaries-extra}
 \end{verbatim}
 I've assigned the custom \fieldfmt{constantname} field to the
-\field{description} field and the custom \fieldfmt{definition} field to the
-\field{user2} field. This means that by default the glossary list
+\field{description} field and the custom \fieldfmt{constantsymbol} field to the
+\field{name} field. This means that by default the glossary list
 will just show the symbolic representation and the constant's name.
 I'd like to append the value and definition after the description.
 With the base \sty{glossaries} package this would require defining a
@@ -13601,7 +13624,7 @@ or with \idx{glsxtrifhasfield}:
 }
 \end{verbatim}
 (Note the need to use the internal field label \field{useri} and
-\field{userii} with \idx{glsxtrifhasfield}.)
+\field{userii} with \ics{glsxtrifhasfield}.)
 
 A modification can be made to also show the alternative
 representation (obtained from the custom \fieldfmt{alternative}

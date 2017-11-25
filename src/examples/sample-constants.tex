@@ -5,6 +5,7 @@
 \documentclass[12pt,a4paper]{article}
 
 \usepackage[T1]{fontenc}
+\usepackage{upgreek}
 
 \usepackage[record,% use bib2gls
  nostyles,% don't load default styles
@@ -15,8 +16,8 @@
 
 \GlsXtrLoadResources[
   src={constants},% data in constants.bib
-  % make @constant behave like @symbol
-  entry-type-aliases={constant=symbol},
+  % make @constant behave like @number
+  entry-type-aliases={constant=number},
   field-aliases={
     identifier=category,
     constantsymbol=name,
