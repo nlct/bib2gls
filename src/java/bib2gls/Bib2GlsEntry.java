@@ -715,7 +715,6 @@ public class Bib2GlsEntry extends BibEntry
 
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
-
       if (resource.changeShortCase())
       {
          BibValueList value = getField("short");

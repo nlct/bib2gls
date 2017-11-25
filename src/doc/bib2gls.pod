@@ -38,7 +38,7 @@ Switch off debug mode. (Equivalent to B<--debug> B<0>)
 
 Switch on verbose mode.
 
-=item B<--no-verbose>
+=item B<--no-verbose> (or B<--noverbose>)
 
 Switch off verbose mode. (Some messages will still be written to
 STDOUT.)
@@ -62,9 +62,15 @@ Set the transcript file.
 Files are relative to I<directory>. (This doesn't change the current
 working directory.)
 
+=item B<--tex-encoding> I<name>
+
+Set the character encoding for the output files. This overrides the
+setting given in I<auxfile>.
+
 =item B<--interpret>
 
-Use the TeX parser library to interpret known (La)TeX commands.
+Use the TeX parser library to interpret known (La)TeX commands
+(default).
 
 =item B<--no-interpret>
 
@@ -78,7 +84,7 @@ Interpret tilde character as a normal space.
 
 Interpret tilde as a non-breaking space (default).
 
-=item B<--packages> I<list>
+=item B<--packages> I<list> (or B<-p> I<list>)
 
 Instruct the TeX parser library to pretend the packages listed 
 in I<list> have been used by the document. Note that there's only a
@@ -106,14 +112,7 @@ This option will be overridden by B<--no-mfirstuc-protection>.
 
 =item B<--no-mfirstuc-math-protection>
 
-Switch off the auto-insertion of an empty group for math-shirt ($).
-
-=item B<--shortcuts> I<option>
-
-Check for the shortcut commands when searching for dependencies.
-Permitted values of I<option>: B<acronyms> (or B<acro>), B<ac>,
-B<abbreviations> (or B<abbr>), B<all> (or B<true>), B<none> (or
-B<false>). This overrides the setting given in I<auxfile>.
+Switch off the auto-insertion of an empty group for math-shift ($).
 
 =item B<--nested-link-check> I<list>|B<none>
 
@@ -128,8 +127,15 @@ If B<none>, disable check.
 Don't check for potentially problematic nested link text.
 (Equivalent to B<--nested-link-check> B<none>)
 
-=item B<--map-format> I<key>B<=>I<value>[B<,>I<key>B<=>I<value>]* (or 
-B<-m> I<key>B<=>I<value>[B<,>I<key>B<=>I<value>]*)
+=item B<--shortcuts> I<option>
+
+Check for the shortcut commands when searching for dependencies.
+Permitted values of I<option>: B<acronyms> (or B<acro>), B<ac>,
+B<abbreviations> (or B<abbr>), B<all> (or B<true>), B<none> (or
+B<false>). This overrides the setting given in I<auxfile>.
+
+=item B<--map-format> I<key>B<:>I<value>[B<,>I<key>B<:>I<value>]* (or 
+B<-m> I<key>B<:>I<value>[B<,>I<key>B<:>I<value>]*)
 
 Set location format mappings.
 
@@ -139,7 +145,7 @@ Add 'group' field to entries.
 
 =item B<--no-group>
 
-Don't add 'group' field to entries.
+Don't add 'group' field to entries (default).
 
 =item B<--record-count> or B<-c>
 
@@ -147,7 +153,7 @@ Add record count fields to entries.
 
 =item B<--no-record-count>
 
-Don't add record count field to entries.
+Don't add record count field to entries (default).
 This option automatically implements B<--no-record-count-unit>.
 
 =item B<--record-count-unit> or B<-n>
@@ -157,7 +163,7 @@ This option automatically implements B<--record-count>.
 
 =item B<--no-record-count-unit>
 
-Don't add unit record count field to entries.
+Don't add unit record count field to entries (default).
 
 =item B<--trim-fields>
 
@@ -167,10 +173,13 @@ Trim leading and trailing spaces from fields.
 
 Don't trim leading and trailing spaces from fields (default).
 
-=item B<--tex-encoding> I<name>
+=item B<--expand-fields>
 
-Set the character encoding for the output files. This overrides the
-setting given in I<auxfile>.
+Don't write B<\glsnoexpandfields> to the B<.glstex> file.
+
+=item B<--no-expand-fields>
+
+Write B<\glsnoexpandfields> to the B<.glstex> file (default).
 
 =back
 

@@ -36,9 +36,10 @@ See the manual for further details.</entry>
 <entry key="syntax.interpret">{0}		Switch on interpret mode (default).</entry>
 <entry key="syntax.no.interpret">{0}		Switch off interpret mode.</entry>
 <entry key="syntax.break.space">{0}		Interpret tilde character as normal space.</entry>
-<entry key="syntax.no.break.space">{0}		Interpret tilde character as a non-breaking space (default).</entry>
+<entry key="syntax.no.break.space">{0}	Interpret tilde character as a non-breaking space 
+			(default).</entry>
 
-<entry key="syntax.mfirstuc">{0} &lt;fields&gt;|all (or {1} &lt;fields&gt;|all)
+<entry key="syntax.mfirstuc">{0} &lt;fields&gt;|"all" (or {1} &lt;fields&gt;|"all")
 			Insert an empty group if fields start 
 			with certain problematic commands
 			to protect against case-changing commands
@@ -84,17 +85,17 @@ See the manual for further details.</entry>
 			Don''t check for potentially problematic
 			nested link text. (Equivalent to
 			{1} "none")</entry>
-<entry key="syntax.format.map">{0} &lt;key&gt;=&lt;value&gt;[,&lt;key&gt;=&lt;value&gt;]* (or {1}  &lt;key&gt;=&lt;value&gt;[,&lt;key&gt;=&lt;value&gt;]*)
+<entry key="syntax.format.map">{0} &lt;key&gt;:&lt;value&gt;[,&lt;key&gt;:&lt;value&gt;]* (or {1}  &lt;key&gt;:&lt;value&gt;[,&lt;key&gt;:&lt;value&gt;]*)
 			Set location format mappings.</entry>
 <entry key="syntax.group">{0} or {1}
 			Add ''group'' field to entries.</entry>
 <entry key="syntax.no.group">{0}
-			Don''t add ''group'' field to entries.</entry>
+			Don''t add ''group'' field to entries (default).</entry>
 <entry key="syntax.record.count">{0} or {1}
 			Add record count fields to entries.</entry>
 <entry key="syntax.no.record.count">{0}
 			Don''t add record count fields to entries.
-			(Automatically implements {2})</entry>
+			(Automatically implements {1})</entry>
 <entry key="syntax.record.count.unit">{0} or {1}
 			Add unit record count fields to entries.
 			(Automatically implements {2})</entry>
@@ -104,8 +105,15 @@ See the manual for further details.</entry>
 			Trim leading and trailing spaces from fields.</entry>
 <entry key="syntax.no.trim.fields">{0}
 			Don''t trim leading and trailing spaces from fields (default).</entry>
+<entry key="syntax.expand.fields">{0}
+			Don''t write \glsnoexpandfields to the .glstex file.</entry>
+<entry key="syntax.no.expand.fields">{0}
+			Write \glsnoexpandfields to the .glstex file (default).</entry>
 <entry key="syntax.tex.encoding">{0} &lt;name&gt;
 			Set the character encoding for the output files.</entry>
+<entry key="syntax.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
+			Instruct interpreter to pretend the listed 
+			packages have been used in the document.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>

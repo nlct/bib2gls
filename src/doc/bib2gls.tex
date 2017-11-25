@@ -221,7 +221,7 @@
 \newcommand*{\idprefixfmt}[1]{%
  \texorpdfstring{\texttt{#1\spacefactor999 .}}{#1.}}
 
-\newcommand*{\argor}{\texorpdfstring{\protect\textbar}{\string\|}}
+\newcommand*{\argor}{\texorpdfstring{\protect\textbar}{|}}
 
 \newrobustcmd*{\texmeta}[1]{{\normalfont\normalcolor$\langle$\emph{#1}$\rangle$}}
 
@@ -520,17 +520,22 @@
 \newcommand{\argsection}[2][\section]{%
  \def\switcharg{}%
  \def\switchalt{}%
- \glsxtrifhasfield{useri}{switch.#2}%
+ \def\switchaltpdf{}%
+ \glsxtrifhasfield*{useri}{switch.#2}%
  {%
    \edef\switcharg{ \expandonce\glscurrentfieldvalue}%
  }%
  {}%
- \glsxtrifhasfield{symbol}{switch.#2}%
+ \ifglshassymbol{switch.#2}%
  {%
-   \edef\switchalt{ (or \expandonce\glscurrentfieldvalue\noexpand\switcharg)}%
+   \def\switchalt{ (or \protect\glsentrysymbol{switch.#2}\switcharg)}%
  }%
  {}%
- #1[\texorpdfstring{\glsxtrheadname{switch.#2}}{\glsentryname{switch.#2}}\switcharg\switchalt]
+ #1[\texorpdfstring
+     {\glsxtrheadname{switch.#2}}%
+     {\glsentryname{switch.#2}}%
+     \switcharg\switchalt
+   ]
    {\glsadd{switch.#2}%
     \glsxtrglossentry{switch.#2}\switcharg\switchalt}%
 }
@@ -1751,9 +1756,10 @@ Commands like \ics{Gls} use \ics{makefirstuc} provided by the
 things that can break it is the use of a referencing command 
 at the start of its argument. The \sty{glossaries-extra} package has
 more detail about the problem in the \qt{Nested Links} section of
-the user manual. If a glossary field starts with one of these
-problematic commands, the recommended method (if the command can't
-be replaced) is to insert an empty group in front of it.
+the user manual~\cite{glossaries-extra}. If a glossary field starts
+with one of these problematic commands, the recommended method (if
+the command can't be replaced) is to insert an empty group in front
+of it.
 
 For example, the following definition
 \begin{verbatim}
@@ -1769,10 +1775,14 @@ The above example, would be written in a \ext{bib} file as:
 }
 \end{verbatim}
 
-With the \longarg{mfirstuc-protection} switch on (the default
-behaviour), \bibgls\ will automatically insert an empty group at the
-start of the \field{long} field to guard against this problem. A
-warning will be written to the transcript.
+The argument should either be a comma-separated list of fields or
+the keyword \code{all} (which indicates all fields).
+\bibgls\ will automatically insert an empty group at the
+start of the listed fields that start with a problematic command,
+and a warning will be written to the transcript. Unknown fields are
+skipped even if they're included in the list. An empty argument is
+equivalent to \longarg{no-mfirstuc-protection}. The default value is
+\code{all}.
 
 \argsection{no-mfirstuc-protection}
 
@@ -1837,7 +1847,13 @@ but in general there is little need to use this switch.
 \argsection{map-format}
 
 This sets up the rule of precedence for partial location
-matches (see \sectionref{sec:locationopts}). For example, 
+matches (see \sectionref{sec:locationopts}). The argument may be
+a comma-separated list of \meta{map}\code{:}\meta{value} pairs.
+Alternatively, you can have multiple instances of 
+\longarg{map-format} \meta{map}\dcolon\meta{value} which have a
+cumulative effect.
+
+For example, 
 \begin{verbatim}
 bib2gls --map-format "emph:hyperbf" mydoc
 \end{verbatim}
@@ -1847,13 +1863,7 @@ involving \encap{emph}, try replacing \encap{emph} with
 
 Note that if the conflict includes a range formation, the
 range takes precedence.
-
-If you have multiple mappings, you can either use a single
-\longarg{map-format} with a comma separated list of
-\meta{format1}\dcolon\meta{format2} or you can have multiple instances of 
-\longarg{map-format} \meta{format1}\dcolon\meta{format2}.
-
-Note that the mapping tests are applied as the records are
+The mapping tests are applied as the records are
 read. For example, suppose the records are listed in the \ext{aux}
 file as:
 \begin{verbatim}
@@ -1927,60 +1937,75 @@ and \encap{hyperbf} or \encap{hyperit} for a primary reference.)
 
 \argsection{group}
 
-The \styfmt{glossaries-extra} \styopt{record} package option automatically creates a new field
-called \field{group}. If the \longarg{group} switch is used then, when
-sorting, \bibgls\ will try to determine the letter group for each
-entry and add it to the \field{group} field.  (Some \csopt{sort}
-options ignore this setting.) This value will be picked up by
-\ics{printunsrtglossary} if group headings are required (for
-example with the \glostyle{indexgroup} style). If you're not using
-a glossary style that displays the group headings, there's no need
-to use this switch. Note that this switch doesn't automatically
-select an appropriate glossary style.
+The \styfmt{glossaries-extra} \styopt{record} package option
+automatically creates a new field called \field{group}. If the
+\longarg{group} switch is used then, when sorting, \bibgls\ will try
+to determine the letter group for each entry and add it to the
+\field{group} field.  (Some \csopt{sort} options ignore this
+setting.) This value will be picked up by \ics{printunsrtglossary}
+if group headings are required (for example with the
+\glostyle{indexgroup} style) or if group separators are required
+(for example, the \glostyle{index} style with the default 
+\styopt[false]{nogroupskip}). If you don't require grouping within
+the glossary, there's no need to use this switch. Note that this
+switch doesn't automatically select an appropriate glossary style.
 
 There are eight types of groups:
-\begin{itemize}
-\item \idxpl{lettergroup} where the group title indicates the
-first letter of all the sort values within that group (used with
-alphabetical, letter or letter-number sort methods, such as \csopt[locale]{sort}
-or \csopt[letternumber-nocase]{sort}).
-The group title is set with \csref{bibglslettergroup}.
+\begin{description}
+\item[\idx{lettergroup}] The first non-ignored character of the
+sort value is alphabetic. This type of group occurs when using the
+alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
+with the letter sort methods listed in
+\tableref{tab:sortoptionsletter} or with the letter-number sort
+methods listed in \tableref{tab:sortoptionsletternumber}. The group
+label is obtained from \csref{bibglslettergroup}.
 
-\item \idxpl{nonlettergroup} (or \idxpl{symbolgroup})
-where the first characters of all the sort values within that group
-are non-alphabetical. The group title is set with \csref{bibglsothergroup}.
+\item[\idx{nonlettergroup} (or \idx{symbolgroup})]
+The first non-ignored character of all the sort values within this group
+are non-alphabetical. This type of group occurs when using the
+alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
+with the letter sort methods listed in
+\tableref{tab:sortoptionsletter} or with the letter-number sort
+methods listed in \tableref{tab:sortoptionsletternumber}.
+The alphabetic sort methods ignore many punctuation
+characters, so an entry that has a non-alphabetic initial
+character in the sort value may actually be placed in a
+\idx{lettergroup}.
+The group label is obtained from \csref{bibglsothergroup}.
 
-\item \idxpl{emptygroup} where the sort value is empty. This will
-occur when the sort value consists solely of commands that \bibgls\
-can't interpret for the alphabetical, letter or letter-number sort
-methods. The group title is set with \csref{bibglsemptygroup}.
+\item[\idx{emptygroup}] The sort value is empty when sorting with an
+alphabetical, letter or letter-number method, typically a
+result of the original value consisting solely of commands that \bibgls\
+can't interpret. The group label is obtained from \csref{bibglsemptygroup}.
 
-\item \idxpl{numbergroup} for all entries sorted by a numeric
-comparison (such as \csopt[integer]{sort}). 
-The group title is set with \csref{bibglsnumbergroup}.
+\item[\idx{numbergroup}] The entries were sorted by one of the
+numeric comparisons listed in \tableref{tab:sortoptionsnumerical}.
+The group label is obtained from \csref{bibglsnumbergroup}.
 
-\item \idxpl{datetimegroup} for all entries sorted by a date-time
-comparison (such as \csopt[datetime]{sort}). 
-The group title is set with \csref{bibglsdatetimegroup}.
+\item[\idx{datetimegroup}] The entries were sorted by one of the date-time
+comparisons listed in \tableref{tab:sortoptionsdatetime} (where both
+date and time are present). 
+The group label is obtained from \csref{bibglsdatetimegroup}.
 
-\item \idxpl{dategroup} for all entries sorted by a date
-comparison (such as \csopt[date]{sort}). 
-The group title is set with \csref{bibglsdategroup}.
+\item[\idx{dategroup}] The entries were sorted by one of the date
+comparisons (where the time is omitted). 
+The group label is obtained from \csref{bibglsdategroup}.
 
-\item \idxpl{timegroup} for all entries sorted by a date
-comparison (such as \csopt[time]{sort}). 
-The group title is set with \csref{bibglstimegroup}.
+\item[\idx{timegroup}] The entries were sorted by one of the time
+comparisons (where the date is omitted). 
+The group label is obtained from \csref{bibglstimegroup}.
 
-\item \idxpl{customgroup} for all entries that have had the
-group label explicitly set using the \csopt[\meta{label}]{group} 
-resource option. You will need to use \ics{glsxtrsetgrouptitle}
-to provide an associated title if the \meta{label} isn't the same as
-the title. Remember that the label can't contain any active
-characters, so you can't use non-ASCII characters in \meta{label}
-with \sty{inputenc} (but you can with \sty{fontspec}).
-\end{itemize}
+\item[\idx{customgroup}] The group label is explicitly set either in
+the \ext{bib} file or using the \csopt[\meta{label}]{group} resource
+option. You will need to use \ics{glsxtrsetgrouptitle} to provide an
+associated title if the \meta{label} isn't the same as the title.
+Remember that the label can't contain any active characters, so you
+can't use non-ASCII characters in \meta{label} with \sty{inputenc}
+(but you can with \sty{fontspec}).
 
-The letter group titles will typically have the first character
+\end{description}
+
+The \idx{lettergroup} titles will typically have the first character
 converted to upper case for the alphabet sort methods
 (\tableref{tab:sortoptionsrule}). A \qt{letter} may not necessarily
 be a single character (depending on the sort rule), but may be
@@ -1999,21 +2024,21 @@ If there isn't a \code{grouptitle.case.\meta{lc}} key (where
 \meta{lc} is the lower case version), then only the first character
 will be converted to upper case otherwise the value supplied by the
 resource file is used. This resource key is only checked for
-the locale and custom rule comparisons. If the initial part of
-the sort value isn't recognised as a letter according to the sort rule, 
-then the entry will be in a non-letter group (even if the character
-is alphabetical).
+the alphabetical comparisons listed in
+\tableref{tab:sortoptionsrule}. If the initial part of the sort
+value isn't recognised as a letter according to the sort rule, then
+the entry will be in a \idx{nonlettergroup} (even if the character is
+alphabetical).
 
-The locale-independent character code comparisons (such as
-\csopt[letter-nocase]{sort}) only select the first character of the
-sort value for the group. If the character is
+The letter (\tableref{tab:sortoptionsletter}) and letter-number
+(\tableref{tab:sortoptionsletternumber}) methods only select the
+first character of the sort value for the group. If the character is
 alphabetical\footnote{according to Java's
-\code{Character.isAlphabetic(int)} method} then it will be a
-letter group otherwise it's a non-letter group.  The
-case-insensitive ordering (such as \csopt[letter-nocase]{sort})
-will convert the letter group character to upper case. The
-case-sensitive ordering (such as \csopt[letter-case]{sort}) won't
-change the case.
+\code{Character.isAlphabetic(int)} method} then it will be a 
+\idx{lettergroup} otherwise it's a \idx{nonlettergroup}.  The case-insensitive
+ordering (such as \csopt[letter-nocase]{sort}) will convert the
+letter group character to upper case. The case-sensitive ordering
+(such as \csopt[letter-case]{sort}) won't change the case.
 
 Glossary styles with navigational links to groups (such as
 \glostyle{indexhypergroup}) require an extra run for the ordinary
@@ -15552,7 +15577,7 @@ files. (This doesn't include the standard \ext{aux} file and the
 \ext{out} file created by \sty{hyperref}.) With \bibgls, no
 additional write registers are required and the number of associated
 \bibgls\ files is equal to the number of resource commands plus the
-transcript file (in this example, $8+1=9$).
+transcript file (in this example, $9+1=10$).
 
 Since this document requires \exfile{people.bib}, \exfile{books.bib}
 and \exfile{films.bib} it also requires the files that
@@ -15802,7 +15827,42 @@ makes more sense in this case.)
 \end{codeenv}
 
 Finally, all recorded and cross-referenced terms are needed for the
-index, but first \ics{glsxtrlongshortdescname} needs to be changed
+index. This includes entries that have already been defined in the
+earlier \idxpl{resourceset} (so a guard against duplicates is
+necessary) but it also includes entries from the \exfile{terms.bib}
+file that haven't yet been dealt with. I'd like the index to start
+with a \idx{symbolgroup} containing the icons from
+\exfile{miscsymbols.bib}. This needs to be dealt with separately from
+the rest of the index to keep them together in a single group:
+\begin{codeenv}
+\cs{GlsXtrLoadResources}\oarg{
+  \csopt[miscsymbols]{src},
+  \csopt[recorded no deps]{selection},
+  \csopt[.copy]{duplicate-label-suffix},
+  \csopt[icon=index]{entry-type-aliases},
+  \csopt[
+   identifier=category,
+   icondescription=symbol,
+   icon=name
+  ]{field-aliases},
+  \csopt[index]{type},
+  \csopt[symbol]{sort-field},
+  \csopt[glssymbols]{group}
+}
+\end{codeenv}
+Since I know that there are no parents or cross-references in this
+set of entries I've used \csopt[recorded no deps]{selection} to skip
+the dependency checks. In this \idx{resourceset}, the \field{name}
+field has the symbol command (obtained from the custom
+\fieldfmt{icon} field), and the \field{symbol} field has the symbol
+description (obtained from the custom \fieldfmt{icondescription}
+field), which is used as the sort field. I've set the \field{group}
+label to \code{glssymbols}, which keeps all these entries in a
+single group and the title will be obtained from
+\ics{glssymbolsgroupname}.
+
+Before loading the final \idx{resourceset} \ics{glsxtrlongshortdescname} needs 
+to be changed
 so that the abbreviations using the \abbrstyle{long-short-desc}
 style (that is, the abbreviations with the \field{category} set to 
 \code{markuplanguage}) have the \field{name} field set to

@@ -672,6 +672,8 @@ public class Bib2Gls implements TeXApp
                  ||pkg.equals("mnsymbol")
                  ||pkg.equals("xspace")
                  ||pkg.equals("siunitx")
+                 ||pkg.equals("fontenc")
+                 ||pkg.equals("tipa")
                )
                {
                   packages.add(pkg);
@@ -2970,6 +2972,8 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.break.space", "--break-space"));
       System.out.println(getMessage("syntax.no.break.space", "--no-break-space"));
       System.out.println();
+      System.out.println(getMessage("syntax.packages", "--packages", "-p"));
+      System.out.println();
 
       System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
@@ -2980,12 +2984,12 @@ public class Bib2Gls implements TeXApp
          "--no-mfirstuc-protection"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.no.math.mfirstuc",
-         "--no-mfirstuc-math-protection"));
-
-      System.out.println();
       System.out.println(getMessage("syntax.math.mfirstuc",
          "--mfirstuc-math-protection", "--no-mfirstuc-protection"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.math.mfirstuc",
+         "--no-mfirstuc-math-protection"));
 
       System.out.println();
       System.out.println(getMessage("syntax.check.shortcuts",
@@ -3034,6 +3038,14 @@ public class Bib2Gls implements TeXApp
       System.out.println();
       System.out.println(getMessage("syntax.no.trim.fields",
          "--no-trim-fields"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.expand.fields",
+         "--expand-fields"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.expand.fields",
+         "--no-expand-fields"));
 
       System.out.println();
       System.out.println(getMessage("syntax.tex.encoding",
