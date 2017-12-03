@@ -31,21 +31,6 @@ public class Bib2GlsAdapter extends TeXAppAdapter
       this.bib2gls = bib2gls;
    }
 
-   public String getMessage(String label)
-   {
-      return bib2gls.getMessage(label);
-   }
-
-   public String getMessage(String label, String param)
-   {
-      return bib2gls.getMessage(label, param);
-   }
-
-   public String getMessage(String label, String[] params)
-   {
-      return bib2gls.getMessage(label, params);
-   }
-
    public String getMessage(String label, Object... params)
    {
       return bib2gls.getMessage(label, params);

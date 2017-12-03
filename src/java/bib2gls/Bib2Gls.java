@@ -2375,81 +2375,6 @@ public class Bib2Gls implements TeXApp
    /*
     *  TeXApp method. 
     */ 
-   public String getMessage(String label)
-   {
-      if (messages == null) return label;
-
-      String msg = label;
-
-      try
-      {
-         msg = messages.getMessage(label);
-      }
-      catch (IllegalArgumentException e)
-      {
-         warning(String.format(
-           "Error fetching message for label '%s': %s", 
-            label, e.getMessage()), e);
-      }
-
-      return msg;
-   }
-
-   /*
-    *  TeXApp method.
-    */ 
-   public String getMessage(String label, String param)
-   {
-      if (messages == null)
-      {// message system hasn't been initialised
-         return String.format("%s[%s]", label, param);
-      }
-
-      String msg = label;
-
-      try
-      {
-         msg = messages.getMessage(label, param);
-      }
-      catch (IllegalArgumentException e)
-      {
-         warning("Can't find message for label: "+label, e);
-      }
-
-      return msg;
-   }
-
-   /*
-    *  TeXApp method.
-    */ 
-   public String getMessage(String label, String[] params)
-   {
-      if (messages == null)
-      {// message system hasn't been initialised
-
-         String param = (params.length == 0 ? "" : params[0]);
-
-         for (int i = 1; i < params.length; i++)
-         {
-            param += ","+params[0];
-         }
-
-         return String.format("%s[%s]", label, param);
-      }
-
-      String msg = label;
-
-      try
-      {
-         msg = messages.getMessage(label, (Object[])params);
-      }
-      catch (IllegalArgumentException e)
-      {
-         warning("Can't find message for label: "+label, e);
-      }
-
-      return msg;
-   }
 
    public String getMessage(String label, Object... params)
    {
@@ -3082,7 +3007,7 @@ public class Bib2Gls implements TeXApp
 
       URL url = getClass().getResource(name);
 
-      String jar = "";
+      String jar = null;
 
       if (debugLevel > 0)
       {
@@ -3092,7 +3017,11 @@ public class Bib2Gls implements TeXApp
 
       if (url == null)
       {
-         debug(String.format("Can't find language resource: %s!%s", jar, name));
+         if (jar != null)
+         {
+            debug(String.format("Can't find language resource: %s!%s",
+               jar, name));
+         }
 
          lang = locale.getLanguage();
 
@@ -3850,8 +3779,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.1";
-   public static final String DATE = "2017-11-25";
+   public static final String VERSION = "1.1.20171203";
+   public static final String DATE = "2017-12-03";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

@@ -38,8 +38,7 @@ public class Bib2GlsAt extends At
       if (!(contents instanceof TeXObjectList))
       {
          throw new BibTeXSyntaxException(parser,
-           BibTeXSyntaxException.ERROR_EXPECTING_OR,
-           new String[] {"{", "("});
+           BibTeXSyntaxException.ERROR_EXPECTING_OR, "{", "(");
       }
 
       Bib2GlsBibParser bibParser = (Bib2GlsBibParser)parser.getListener();
