@@ -160,7 +160,8 @@ public class NewGlossaryEntry extends ControlSequence
          {
             TeXObjectList list = (TeXObjectList)object;
 
-            TeXObject opt = list.popArg(parser, true, '[', ']');
+            TeXObject opt = list.popArg(parser, TeXObjectList.POP_SHORT,
+              '[', ']');
 
             TeXObjectList newVal = new TeXObjectList();
 

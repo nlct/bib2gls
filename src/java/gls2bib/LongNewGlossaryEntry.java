@@ -86,7 +86,7 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
 
       processEntry(parser, parser.popNextArg(), 
         KeyValList.getList(parser, parser.popNextArg()),
-        parser.popNextArg(false), isStar);
+        parser.popNextArg((byte)0), isStar);
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
@@ -104,7 +104,7 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
 
       processEntry(parser, list.popArg(parser), 
         KeyValList.getList(parser, list.popArg(parser)),
-        list.popArg(parser, false), isStar);
+        list.popArg(parser, (byte)0), isStar);
    }
 
 }

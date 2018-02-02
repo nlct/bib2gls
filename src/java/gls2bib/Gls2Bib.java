@@ -41,6 +41,7 @@ import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
+import com.dickimawbooks.texparserlib.primitives.Undefined;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
@@ -146,7 +147,7 @@ public class Gls2Bib extends LaTeXParserListener
    // Ignore unknown control sequences
    public ControlSequence createUndefinedCs(String name)
    {
-      return new Gls2BibUndefined(name);
+      return new Undefined(name, Undefined.ACTION_IGNORE);
    }
 
    @Override
@@ -309,6 +310,13 @@ public class Gls2Bib extends LaTeXParserListener
            "Ignoring unexpected request to convert %s to %s%n",
            wmfFile.toString(), epsFile.toString());
       }
+   }
+
+   /*
+    *  TeXApp method.
+    */ 
+   public void progress(int percent)
+   {
    }
 
    /*
@@ -964,8 +972,8 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
-   public static final String VERSION = "1.1";
-   public static final String DATE = "2017-11-25";
+   public static final String VERSION = "1.1.20180202";
+   public static final String DATE = "2018-02-02";
 
    private Vector<GlsData> data;
 
