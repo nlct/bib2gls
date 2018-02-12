@@ -59,6 +59,69 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
       return sortStr;
    }
 
+   protected long getDefaultGroupId(Bib2GlsEntry entry,
+     int codePoint, Object sortValue)
+   {
+      String value = sortValue.toString();
+
+      if (codePoint == -1 || value.isEmpty())
+      {
+         return 0L;
+      }
+
+      if (Character.isAlphabetic(codePoint))
+      {
+         String str = new String(Character.toChars(codePoint));
+
+         String grp = (caseStyle == CASE ? str : str.toUpperCase());
+   
+         int cp = grp.codePointAt(0);
+   
+         if (caseStyle == UPPERLOWER || caseStyle == LOWERUPPER)
+         {
+            cp = Character.toLowerCase(cp);
+         }
+
+         return cp;
+      }
+
+      return codePoint;
+   }
+
+   protected GroupTitle createDefaultGroupTitle(int codePoint,
+     Object sortValue, String type)
+   {
+      String value = sortValue.toString();
+
+      if (codePoint == -1 || value.isEmpty())
+      {
+         return new EmptyGroupTitle(type);
+      }
+
+      String str = new String(Character.toChars(codePoint));
+   
+      if (Character.isAlphabetic(codePoint))
+      {
+         String grp = (caseStyle == CASE ? str : str.toUpperCase());
+   
+         int cp = grp.codePointAt(0);
+   
+         if (caseStyle == UPPERLOWER || caseStyle == LOWERUPPER)
+         {
+            cp = Character.toLowerCase(cp);
+         }
+   
+         return new GroupTitle(grp, str, cp, type);
+      }
+
+      if (str.equals("\\") || str.equals("{") || str.equals("}"))
+      {
+         str = "\\char`\\"+str;
+      }
+   
+      return new OtherGroupTitle(str, codePoint, type);
+   }
+
    protected String updateSortValue(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> entries)
    {
@@ -80,82 +143,12 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
          }
          else if (value.isEmpty())
          {
-            GroupTitle grpTitle = resource.getGroupTitle(type, 0L);
-            String args;
-
-            if (grpTitle == null)
-            {
-               grpTitle = new EmptyGroupTitle(type);
-               resource.putGroupTitle(grpTitle, entry);
-               args = grpTitle.toString();
-            }
-            else
-            {
-               args = grpTitle.format(value);
-            }
-
-            entry.putField(groupField, 
-              String.format("\\%s%s", grpTitle.getCsLabelName(), args));
+            setGroupTitle(entry, -1, value, value, type);
          }
          else
          {
             int codePoint = value.codePointAt(0);
-   
-            String str = String.format("%c", codePoint);
-   
-            if (Character.isAlphabetic(codePoint))
-            {
-               grp = (caseStyle == CASE ? str : str.toUpperCase());
-   
-               int cp = grp.codePointAt(0);
-   
-               if (caseStyle == UPPERLOWER || caseStyle == LOWERUPPER)
-               {
-                  cp = Character.toLowerCase(cp);
-               }
-   
-               GroupTitle grpTitle = resource.getGroupTitle(type, cp);
-               String args;
-   
-               if (grpTitle == null)
-               {
-                  grpTitle = new GroupTitle(grp, str, cp, type);
-                  resource.putGroupTitle(grpTitle, entry);
-                  args = grpTitle.toString();
-               }
-               else
-               {
-                  args = grpTitle.format(str);
-               }
-   
-               entry.putField(groupField, 
-                  String.format("\\%s%s", grpTitle.getCsLabelName(), args));
-            }
-            else
-            {
-               if (str.equals("\\") || str.equals("{") ||
-                   str.equals("}"))
-               {
-                  str = "\\char`\\"+str;
-               }
-   
-               GroupTitle grpTitle = resource.getGroupTitle(entryType, codePoint);
-               String args;
-   
-               if (grpTitle == null)
-               {
-                  grpTitle = new OtherGroupTitle(str, codePoint, type);
-                  resource.putGroupTitle(grpTitle, entry);
-                  args = grpTitle.toString();
-               }
-               else
-               {
-                  args = grpTitle.format(str);
-               }
-   
-               entry.putField(groupField, 
-                  String.format("\\%s%s", grpTitle.getCsLabelName(), args)); 
-            }
+            grp = setGroupTitle(entry, codePoint, value, value, type);
          }
       }
 

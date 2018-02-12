@@ -2,7 +2,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{pifont}
-\usepackage[record,nomain,stylemods={mcols},style=mcolindex]{glossaries-extra}
+\usepackage[record,nomain,stylemods={mcols},style=mcolindexgroup]{glossaries-extra}
 
 \newglossary*{nosort}{Symbols (Unsorted)}
 \newglossary*{byname}{Symbols (Letter Order)}
@@ -19,6 +19,7 @@
 \GlsXtrLoadResources[
   src={test-pifonts},% test-pifonts.bib
   sort={letter-case},
+  sort-field={name},
   type={byname},
   label-prefix={byname.},
   selection={all}

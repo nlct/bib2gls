@@ -1,3 +1,11 @@
+v1.2 (pending):
+
+   * New resource options:
+
+     - group-formation
+     - secondary-group-formation
+     - dual-group-formation
+
 v1.1 (2017-11-25):
 
    * New resource options: 

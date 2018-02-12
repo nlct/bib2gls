@@ -106,6 +106,53 @@ public class Bib2GlsEntryComparator extends SortComparator
       }
    }
 
+   protected long getDefaultGroupId(Bib2GlsEntry entry,
+     int codePoint, Object sortValue)
+   {
+      String value = sortValue.toString();
+
+      if (value.isEmpty())
+      {
+         return 0L;
+      }
+      else
+      {
+         return codePoint;
+      }
+   }
+
+   protected GroupTitle createDefaultGroupTitle(int codePoint, 
+     Object sortValue, String type)
+   {
+      String value = sortValue.toString();
+
+      if (value.isEmpty())
+      {
+         return new EmptyGroupTitle(type);
+      }
+
+      String str = new String(Character.toChars(codePoint));
+      String grp = str;
+
+      if (Character.isAlphabetic(codePoint))
+      {
+         grp = str.toUpperCase();
+         int cp = grp.codePointAt(0);
+
+         return new GroupTitle(grp, str, cp, type);
+      }
+      else
+      {
+         if (str.equals("\\") || str.equals("{") ||
+          str.equals("}"))
+         {
+            str = "\\char`\\"+str;
+         }
+
+         return new OtherGroupTitle(str, codePoint, type);
+      }
+   }
+
    protected String updateSortValue(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> entries)
    {
@@ -234,132 +281,110 @@ public class Bib2GlsEntryComparator extends SortComparator
                cp = grp.codePointAt(0);
             }
 
-            // The Dutch ij digraph should have both letters
-            // converted to upper case. Other digraphs only have the
-            // first letter converted. Rather than hard-coding
-            // for just "ij", allow other exceptions to be provided
-            // in the language resource file. For example
-            // <entry key="grouptitle.case.ij">IJ</entry>
-
-            String grpCase = bib2gls.getMessageIfExists(
-              String.format("grouptitle.case.%s", grp));
-
-            if (grpCase != null)
+            if (settings.getGroupFormation() != SortSettings.GROUP_DEFAULT)
             {
-               grp = grpCase;
-               cp = Character.toTitleCase(cp);
+               grp = setGroupTitle(entry, cp, value, str, type);
             }
             else
             {
-               if (Character.isAlphabetic(cp))
+               // The Dutch ij digraph should have both letters
+               // converted to upper case. Other digraphs only have the
+               // first letter converted. Rather than hard-coding
+               // for just "ij", allow exceptions to be provided
+               // in the language resource file. For example
+               // <entry key="grouptitle.case.ij">IJ</entry>
+   
+               String grpCase = bib2gls.getMessageIfExists(
+                 String.format("grouptitle.case.%s", grp));
+   
+               if (grpCase != null)
                {
-                  int titleCodePoint = Character.toTitleCase(cp);
-
-                  grp = String.format("%c%s", titleCodePoint,
-                        grp.substring(Character.charCount(cp)).toLowerCase());
-
-                  cp = titleCodePoint;
-               }
-            }
-
-            if (Character.isAlphabetic(cp))
-            {
-               if (collator.getStrength() != Collator.PRIMARY)
-               {
-                  elem = cp;
-               }
-
-               GroupTitle grpTitle = resource.getGroupTitle(type, elem);
-               String args;
-
-               if (grpTitle == null)
-               {
-                  grpTitle = new GroupTitle(grp, str, elem, type);
-                  resource.putGroupTitle(grpTitle, entry);
-                  args = grpTitle.toString();
+                  grp = grpCase;
+                  cp = Character.toTitleCase(cp);
                }
                else
                {
-                  args = grpTitle.format(str);
-
-                  if (grpTitle.getTitle().matches(".*[^\\p{ASCII}].*")
-                      && grp.matches("\\p{ASCII}+"))
+                  if (Character.isAlphabetic(cp))
                   {
-                     grpTitle.setTitle(grp);
+                     int titleCodePoint = Character.toTitleCase(cp);
+   
+                     grp = String.format("%c%s", titleCodePoint,
+                           grp.substring(Character.charCount(cp)).toLowerCase());
+   
+                     cp = titleCodePoint;
                   }
                }
-
-               entry.putField(groupField, 
-                 String.format("\\%s%s", grpTitle.getCsLabelName(), args));
-            }
-            else
-            {
-               if (str.equals("\\") || str.equals("{") ||
-                str.equals("}"))
+   
+               if (Character.isAlphabetic(cp))
                {
-                  str = "\\char`\\"+str;
-               }
-
-               GroupTitle grpTitle = resource.getGroupTitle(type, elem);
-               String args;
-
-               if (grpTitle == null)
-               {
-                  grpTitle = new OtherGroupTitle(str, elem, type);
-                  resource.putGroupTitle(grpTitle, entry);
-                  args = grpTitle.toString();
+                  if (collator.getStrength() != Collator.PRIMARY)
+                  {
+                     elem = cp;
+                  }
+   
+                  GroupTitle grpTitle = resource.getGroupTitle(type, elem);
+                  String args;
+   
+                  if (grpTitle == null)
+                  {
+                     grpTitle = new GroupTitle(grp, str, elem, type);
+                     resource.putGroupTitle(grpTitle, entry);
+                     args = grpTitle.toString();
+                  }
+                  else
+                  {
+                     args = grpTitle.format(str);
+   
+                     if (grpTitle.getTitle().matches(".*[^\\p{ASCII}].*")
+                         && grp.matches("\\p{ASCII}+"))
+                     {
+                        grpTitle.setTitle(grp);
+                     }
+                  }
+   
+                  entry.putField(groupField, 
+                    String.format("\\%s%s", grpTitle.getCsLabelName(), args));
                }
                else
                {
-                  args = grpTitle.format(str);
+                  if (str.equals("\\") || str.equals("{") ||
+                   str.equals("}"))
+                  {
+                     str = "\\char`\\"+str;
+                  }
+   
+                  GroupTitle grpTitle = resource.getGroupTitle(type, elem);
+                  String args;
+   
+                  if (grpTitle == null)
+                  {
+                     grpTitle = new OtherGroupTitle(str, elem, type);
+                     resource.putGroupTitle(grpTitle, entry);
+                     args = grpTitle.toString();
+                  }
+                  else
+                  {
+                     args = grpTitle.format(str);
+                  }
+   
+                  entry.putField(groupField, 
+                    String.format("\\%s%s", grpTitle.getCsLabelName(), args));
                }
-
-               entry.putField(groupField, 
-                 String.format("\\%s%s", grpTitle.getCsLabelName(), args));
             }
          }
          else
          {
             int codePoint = value.codePointAt(0);
 
-            String str = String.format("%c", codePoint);
+            String str = new String(Character.toChars(codePoint));
 
             if (Character.isAlphabetic(codePoint))
             {
                grp = str.toUpperCase();
-               int cp = grp.codePointAt(0);
-
-               GroupTitle grpTitle = resource.getGroupTitle(type, cp);
-               String args;
-
-               if (grpTitle == null)
-               {
-                  grpTitle = new GroupTitle(grp, str, cp,
-                    resource.getType(entry));
-                  resource.putGroupTitle(grpTitle, entry);
-                  args = grpTitle.toString();
-               }
-               else
-               {
-                  args = String.format("{%s}{%s}{%d}{%s}", grpTitle.getTitle(), 
-                    str, cp, type);
-               }
-
-               entry.putField(groupField, 
-                 String.format("\\bibglslettergroup%s", args));
+               codePoint = grp.codePointAt(0);
             }
-            else
-            {
-               if (str.equals("\\") || str.equals("{") ||
-                str.equals("}"))
-               {
-                  str = "\\char`\\"+str;
-               }
 
-               entry.putField(groupField, 
-                 String.format("\\bibglsothergroup{%s}{%X}{%s}", 
-                               str, codePoint, type));
-            }
+            grp = setGroupTitle(entry, codePoint, value, str, type);
          }
       }
 

@@ -135,6 +135,20 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
       return value;
    }
 
+   protected long getDefaultGroupId(Bib2GlsEntry entry, int codePoint, 
+     Object sortValue)
+   {
+      return entry.getNumericSort().longValue();
+   }
+
+   protected GroupTitle createDefaultGroupTitle(int codePoint,
+      Object sortValue, String type)
+   {
+      return new DateTimeGroupTitle(dateFormat, (Date)sortValue, 
+                 type, hasDate, hasTime);
+   }
+
+
    protected String updateSortValue(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> entries)
    {
@@ -159,26 +173,8 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
       {
          if (entry.getFieldValue(groupField) == null)
          {
-            long groupId = num.longValue();
-
-            GroupTitle grpTitle = resource.getGroupTitle(type, groupId);
-            String args;
-
-            if (grpTitle == null)
-            {
-               grpTitle = new DateTimeGroupTitle(dateFormat, dateValue, 
-                 type, hasDate, hasTime);
-
-               resource.putGroupTitle(grpTitle, entry);
-               args = grpTitle.toString();
-            }
-            else
-            {
-               args = grpTitle.format(dateFormat.format(dateValue));
-            }
-
-            entry.putField(groupField, 
-               String.format("\\%s%s", grpTitle.getCsLabelName(), args)); 
+            grp = setGroupTitle(entry, -1, dateValue,
+              dateFormat.format(dateValue), type);
          }
       }
 

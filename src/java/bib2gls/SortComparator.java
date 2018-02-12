@@ -39,6 +39,73 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
    }
 
+   protected abstract long getDefaultGroupId(Bib2GlsEntry entry, 
+     int codePoint, Object sortValue);
+
+   protected abstract GroupTitle createDefaultGroupTitle(int codePoint, Object sortValue, String type);
+
+   protected String setGroupTitle(Bib2GlsEntry entry,
+     int codePoint, Object sortValue, String actual, String type)
+   {
+      int groupFormation = settings.getGroupFormation();
+      GlsResource resource = bib2gls.getCurrentResource();
+
+      GroupTitle groupTitle;
+
+      if (codePoint == -1 
+           && groupFormation != SortSettings.GROUP_DEFAULT)
+      {
+         String sort = sortValue.toString();
+
+         if (sort.isEmpty())
+         {
+            groupFormation = SortSettings.GROUP_DEFAULT;
+         }
+         else
+         {
+            codePoint = sort.codePointAt(0);
+         }
+      }
+
+      if (groupFormation == SortSettings.GROUP_DEFAULT)
+      {
+         groupTitle = resource.getGroupTitle(type, 
+          getDefaultGroupId(entry, codePoint, sortValue));
+      }
+      else
+      {
+         groupTitle = resource.getGroupTitle(type, 
+           UnicodeGroupTitle.getGroupId(codePoint, groupFormation));
+      }
+
+      String args;
+
+      if (groupTitle == null)
+      {
+         if (groupFormation == SortSettings.GROUP_DEFAULT)
+         {
+            groupTitle = createDefaultGroupTitle(codePoint, sortValue, type);
+         }
+         else
+         {
+            groupTitle = UnicodeGroupTitle.createUnicodeGroupTitle(
+               codePoint, type, groupFormation);
+         }
+
+         resource.putGroupTitle(groupTitle, entry);
+         args = groupTitle.toString();
+      }
+      else
+      {
+         args = groupTitle.format(actual);
+      }
+
+      entry.putField(groupField, 
+         String.format("\\%s%s", groupTitle.getCsLabelName(), args));
+
+      return groupTitle.getTitle();
+   }
+
    protected boolean useSortSuffix()
    {
       return (settings.getSuffixOption() != SortSettings.SORT_SUFFIX_NONE);

@@ -721,6 +721,27 @@ public class SortSettings
       }
    }
 
+   public void setGroupFormation(int setting)
+   {
+      switch (setting)
+      {
+         case GROUP_DEFAULT:
+         case GROUP_UNICODE_CODEPOINT:
+         case GROUP_UNICODE_CATEGORY:
+         case GROUP_UNICODE_SCRIPT:
+         case GROUP_UNICODE_CATEGORY_SCRIPT:
+            groupFormation = setting;
+         break;
+         default:
+            throw new IllegalArgumentException("Invalid group formation: "+setting);
+      }
+   }
+
+   public int getGroupFormation()
+   {
+      return groupFormation;
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -757,6 +778,14 @@ public class SortSettings
    public static final int IDENTICAL_SORT_USE_ORIGINAL_ID=3;
 
    private int identicalSortAction = IDENTICAL_SORT_USE_ID;
+
+   public static final int GROUP_DEFAULT=0;
+   public static final int GROUP_UNICODE_CODEPOINT=1;
+   public static final int GROUP_UNICODE_CATEGORY=2;
+   public static final int GROUP_UNICODE_SCRIPT=3;
+   public static final int GROUP_UNICODE_CATEGORY_SCRIPT=4;
+
+   private int groupFormation = GROUP_DEFAULT;
 
    private String identicalSortField = null;
 

@@ -951,6 +951,99 @@ public class GlsResource
             secondarySortSettings.setSuffixMarker(
                replaceHex(getOptional(parser, "", list, opt)));
          }
+         else if (opt.equals("group-formation"))
+         {
+             String val = getChoice(parser, list, opt, "default", 
+               "codepoint", "unicode category", "unicode script",
+               "unicode category and script");
+
+             if (val.equals("codepoint"))
+             {
+                sortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CODEPOINT);
+             }
+             else if (val.equals("unicode category"))
+             {
+                sortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CATEGORY);
+             }
+             else if (val.equals("unicode script"))
+             {
+                sortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_SCRIPT);
+             }
+             else if (val.equals("unicode category and script"))
+             {
+                sortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CATEGORY_SCRIPT);
+             }
+             else // if (val.equals("default"))
+             {
+                sortSettings.setGroupFormation(SortSettings.GROUP_DEFAULT);
+             }
+         }
+         else if (opt.equals("secondary-group-formation"))
+         {
+             String val = getChoice(parser, list, opt, "default", 
+               "codepoint", "unicode category", "unicode script",
+               "unicode category and script");
+
+             if (val.equals("codepoint"))
+             {
+                secondarySortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CODEPOINT);
+             }
+             else if (val.equals("unicode category"))
+             {
+                secondarySortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CATEGORY);
+             }
+             else if (val.equals("unicode script"))
+             {
+                secondarySortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_SCRIPT);
+             }
+             else if (val.equals("unicode category and script"))
+             {
+                secondarySortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CATEGORY_SCRIPT);
+             }
+             else // if (val.equals("default"))
+             {
+                secondarySortSettings.setGroupFormation(SortSettings.GROUP_DEFAULT);
+             }
+         }
+         else if (opt.equals("dual-group-formation"))
+         {
+             String val = getChoice(parser, list, opt, "default", 
+               "codepoint", "unicode category", "unicode script",
+               "unicode category and script");
+
+             if (val.equals("codepoint"))
+             {
+                dualSortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CODEPOINT);
+             }
+             else if (val.equals("unicode category"))
+             {
+                dualSortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CATEGORY);
+             }
+             else if (val.equals("unicode script"))
+             {
+                dualSortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_SCRIPT);
+             }
+             else if (val.equals("unicode category and script"))
+             {
+                dualSortSettings.setGroupFormation(
+                   SortSettings.GROUP_UNICODE_CATEGORY_SCRIPT);
+             }
+             else // if (val.equals("default"))
+             {
+                dualSortSettings.setGroupFormation(SortSettings.GROUP_DEFAULT);
+             }
+         }
          else if (opt.equals("identical-sort-action"))
          {
             String val = getRequired(parser, list, opt);
@@ -2595,7 +2688,7 @@ public class GlsResource
       // Replace \\u<hex> sequences with the appropriate Unicode
       // characters.
 
-      Pattern p = Pattern.compile("\\\\u ?([0-9A-Fa-f]+)");
+      Pattern p = Pattern.compile("\\\\u\\s?([0-9A-Fa-f]+)");
 
       Matcher m = p.matcher(original);
 
@@ -5031,6 +5124,13 @@ public class GlsResource
             writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{\\unexpanded{#1}}");
             writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
+
+            // unicode groups:
+
+            writer.println("  \\providecommand{\\bibglsunicodegroup}[4]{#4#3}");
+            writer.println("  \\providecommand{\\bibglsunicodegrouptitle}[4]{\\unexpanded{#1}}");
+            writer.println("  \\providecommand{\\bibglssetunicodegrouptitle}[1]{%");
+            writer.println("    \\glsxtrsetgrouptitle{\\bibglsunicodegroup#1}{\\bibglsunicodegrouptitle#1}}");
 
             // other groups:
 
