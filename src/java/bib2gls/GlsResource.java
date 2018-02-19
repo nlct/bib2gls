@@ -538,6 +538,18 @@ public class GlsResource
          {
             externalPrefixes = getStringArray(parser, list, opt);
          }
+         else if (opt.equals("labelify"))
+         {
+            labelifyFields = getFieldArray(parser, list, opt);
+         }
+         else if (opt.equals("labelify-list"))
+         {
+            labelifyListFields = getFieldArray(parser, list, opt);
+         }
+         else if (opt.equals("labelify-replace"))
+         {
+            labelifyReplaceMap = getSubstitutionMap(parser, list, opt);
+         }
          else if (opt.equals("interpret-preamble"))
          {
             interpretPreamble = getBoolean(parser, list, opt);
@@ -3082,6 +3094,29 @@ public class GlsResource
       return array;
    }
 
+   private String[] getFieldArray(TeXParser parser, KeyValList list, 
+     String opt)
+    throws IOException
+   {
+      String[] array = getStringArray(parser, list, opt);
+
+      if (array == null)
+      {
+         return null;
+      }
+
+      for (String field : array)
+      {
+         if (!bib2gls.isKnownField(field))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.field", field, opt));
+         }
+      }
+
+      return array;
+   }
+
    private TeXObject[] getTeXObjectArray(TeXParser parser, KeyValList list, 
      String opt)
     throws IOException
@@ -3325,7 +3360,7 @@ public class GlsResource
 
          for (int j = 0; j < n; j++)
          {
-            TeXObject obj = csvList.getValue(i);
+            TeXObject obj = csvList.getValue(j);
 
             if (obj instanceof TeXObjectList)
             {
@@ -3336,6 +3371,52 @@ public class GlsResource
          }
 
          map.put(field, valList);
+      }
+
+      return map;
+   }
+
+   private HashMap<String,String> getSubstitutionMap(TeXParser parser, 
+      KeyValList list, String opt)
+    throws IOException
+   {
+      TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+      if (array == null)
+      {
+         return null;
+      }
+
+      HashMap<String,String> map = new HashMap<String,String>();
+
+      for (TeXObject obj : array)
+      {
+         if (!(obj instanceof TeXObjectList 
+               || ((TeXObjectList)obj).size() != 2))
+         {
+            throw new IllegalArgumentException(
+               bib2gls.getMessage("error.invalid.substitution", 
+                obj.toString(parser), opt));
+         }
+
+         TeXObject regexArg = ((TeXObjectList)obj).get(0);
+         TeXObject replacementArg = ((TeXObjectList)obj).get(1);
+
+         if (regexArg instanceof Group && !(regexArg instanceof MathGroup))
+         {
+            regexArg = ((Group)regexArg).toList();
+         }
+
+         if (replacementArg instanceof Group
+              && !(replacementArg instanceof MathGroup))
+         {
+            replacementArg = ((Group)replacementArg).toList();
+         }
+
+         String regex = regexArg.toString(parser);
+         String replacement = replacementArg.toString(parser);
+
+         map.put(regex, replacement);
       }
 
       return map;
@@ -6858,6 +6939,35 @@ public class GlsResource
       return stripTrailingNoPost;
    }
 
+   public boolean isLabelifyField(String field)
+   {
+      if (labelifyFields == null) return false;
+
+      for (String f : labelifyFields)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
+   public boolean isLabelifyListField(String field)
+   {
+      if (labelifyListFields == null) return false;
+
+      for (String f : labelifyListFields)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
+   public HashMap<String,String> getLabelifySubstitutions()
+   {
+      return labelifyReplaceMap;
+   }
+
    public boolean isCheckEndPuncOn()
    {
       return checkEndPunc != null;
@@ -7629,6 +7739,10 @@ public class GlsResource
    private String[] externalPrefixes = null;
 
    private String[] checkEndPunc = null;
+
+   private String[] labelifyFields=null;
+   private String[] labelifyListFields=null;
+   private HashMap<String,String> labelifyReplaceMap;
 
    private String type=null, category=null, counter=null;
 

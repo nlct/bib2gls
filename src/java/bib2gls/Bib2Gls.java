@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Calendar;
+import java.text.Normalizer;
 
 // Requires Java 1.7:
 import java.nio.charset.Charset;
@@ -1013,6 +1014,67 @@ public class Bib2Gls implements TeXApp
 
          return texCode;
       }
+   }
+
+   public String convertToLabel(TeXParser parser, BibValueList value, GlsResource resource, boolean isList)
+    throws IOException
+   {
+      TeXObjectList list = value.expand(parser);
+
+      String strVal = list.toString(parser);
+
+      if (strVal.matches("(?s).*[\\\\\\{\\}].*"))
+      {
+         // no point checking for other special characters
+         // as they won't expand to a simple alphanumeric string
+
+         strVal = interpret(strVal, value, true);
+      }
+
+      // apply substitutions
+      HashMap<String,String> map = resource.getLabelifySubstitutions();
+
+      if (map != null)
+      {
+         Iterator<String> it = map.keySet().iterator();
+
+         while (it.hasNext())
+         {
+            String regex = it.next();
+            String replacement = map.get(regex);
+
+            strVal = strVal.replaceAll(regex, replacement);
+         }
+      }
+
+      // strip all characters that aren't alphanumeric or
+      // the following punctuation characters: . - +
+
+      if (isList)
+      {// keep commas as well
+         strVal = strVal.replaceAll(
+            "[^,\\.\\-\\+\\p{IsAlphabetic}\\p{IsDigit}]", "");
+      }
+      else
+      {
+         strVal = strVal.replaceAll(
+            "[^\\.\\-\\+\\p{IsAlphabetic}\\p{IsDigit}]", "");
+      }
+
+      if (!fontSpecLoaded())
+      {
+         strVal = Normalizer.normalize(strVal, Normalizer.Form.NFD);
+         strVal = strVal.replaceAll("[^a-zA-Z0-9\\.,\\-\\+]", "");
+      }
+
+      if (isList)
+      {
+         // remove empty elements
+         strVal = strVal.replaceAll(",,+", ",");
+         strVal = strVal.replaceAll("^,|,$", "");
+      }
+
+      return strVal;
    }
 
    public void process(String[] args) 
@@ -3786,8 +3848,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.1.20180212";
-   public static final String DATE = "2018-02-12";
+   public static final String VERSION = "1.1.20180219";
+   public static final String DATE = "2018-02-19";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

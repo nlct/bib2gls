@@ -5,6 +5,9 @@ v1.2 (pending):
      - group-formation
      - secondary-group-formation
      - dual-group-formation
+     - labelify
+     - labelify-list
+     - labelify-replace
 
 v1.1 (2017-11-25):
 

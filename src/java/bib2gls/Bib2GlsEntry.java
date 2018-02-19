@@ -874,6 +874,21 @@ public class Bib2GlsEntry extends BibEntry
                value.add(new BibUserString(list));
             }
 
+            boolean isLabelifyList = resource.isLabelifyListField(field);
+
+            if (isLabelifyList || resource.isLabelifyField(field))
+            {
+               String strVal = bib2gls.convertToLabel(parser,
+                  value, resource, isLabelifyList);
+
+               list = parser.getListener().createString(strVal);
+
+               value.clear();
+               value.add(new BibUserString(list));
+
+               putField(field, strVal);
+            }
+
             if (field.equals("parent") || field.equals("category")
                || field.equals("type") || field.equals("group")
                || field.equals("seealso") || field.equals("alias"))
