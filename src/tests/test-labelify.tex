@@ -13,7 +13,8 @@
  labelify-list={description},
  labelify-replace={
    { and }{,},% replace " and " with ","
-   {['\string\\-]}{}% remove ' and - 
+   {['\string\- ]}{},% remove ' and - and space
+   {\glshex 00D8}{O}% replace \O with O
  },
  selection=all]
 

@@ -1030,6 +1030,8 @@ the corresponding set of \ext{bib} files:
   (if not already done in any of the previous steps);
   \item any fields that have been identified by
   \csopt{bibtex-contributor-fields} are converted;
+  \item any fields that must be converted into a label form
+  (\csopt{labelify} or \csopt{labelify-list}) are processed;
   \item any fields whose value must be a label are interpreted
   if \csopt{interpret-label-fields} is set;
   \item the \field{parent} field is adjusted according to the label prefix 
@@ -1117,10 +1119,13 @@ Cross-resource references disabled.
 \end{verbatim}
 The mode can only be enabled if the following condition is satisfied:
 \begin{itemize}
+\item \csopt{labelify} and \csopt{labelify-list} don't include
+cross-reference fields (\field{see}, \field{seealso},
+\field{alias} and \field{parent}), and
 \item the interpreter is off (\longarg{no-interpret}), or
 \item every \idx{resourceset} either doesn't have a preamble
 (provided by \atentry{preamble} in the associated \ext{bib} files) or has
-\csopt[false]{interpret-preamble} or
+\csopt[false]{interpret-preamble} or 
 \csopt[false]{interpret-label-fields} set.
 \end{itemize}
 Note that if you don't use either \csopt[recorded and
@@ -1316,16 +1321,30 @@ and will expand some things that aren't expanded by \LaTeX\
 that would be expanded by \LaTeX\ (such as commands defined
 in terms of complicated internals).
 
-The \file{texparserlib.jar} library is not a
-\TeX\ engine and there are plenty of situations where it doesn't
-work. In particular, in this case it's being used in a fragmented
-context without knowing most of the packages used by the
-document\footnote{\bibgls\ can detect from the log file a small
-number of packages that the parser can support, such as
-\isty{pifonts}, \isty{upgreek}, \isty{wasysym}, \isty{amssymb},
-\isty{stix}, \isty{mhchem} and \isty{bpchem}. There's also partial
-support for \isty{siunitx}'s \ics{si} command.}\ or any custom
-commands or environments provided within the document.
+The \file{texparserlib.jar} library is not a \TeX\ engine and there
+are plenty of situations where it doesn't work. In particular, in
+this case it's being used in a fragmented context without knowing
+most of the packages used by the document or any custom commands or
+environments provided within the document.
+
+\bibgls\ can detect from the log file a small
+number of packages that the parser recognises. Note that in
+some cases there's only very limited support. For example, 
+\isty{siunitx}'s \ics{si} command is recognised but other
+commands aren't from that package aren't. \bibgls\ checks for the
+following packages:
+\isty{amsmath}, \isty{amssymb}, \isty{pifont}, \isty{textcase},
+\isty{wasysym}, \isty{lipsum}, \isty{natbib}, \isty{mhchem}, 
+\isty{bpchem}, \isty{stix}, \isty{textcomp}, \isty{MnSymbol}, 
+\isty{fourier}, \isty{upgreek}, \isty{xspace}, \isty{siunitx}, 
+\isty{fontenc} and \isty{tipa}. If you're wondering about the
+selection, the \file{texparserlib.jar} library was originally written for
+another application that required support for some of them. There
+are a few other packages that the library supports (see
+\url{https://github.com/nlct/texparser/tree/master/src/java/lib/latex}), but \bibgls\
+doesn't check for them as they're unlikely to be needed within
+field values. (You can explicitly request them with
+\longarg{packages} if required.)
 
 Since the parser doesn't have a full set of commands available
 within the \LaTeX\ document, when it encounters \ics{renewcommand} it
@@ -1334,12 +1353,14 @@ defined, it will simply behave like \cs{newcommand}. Whereas
 with \ics{providecommand} the parser will only define the command
 if it's unrecognised.
 
-If a command isn't recognised, you can provide it and use \ics{char}
-to map it to the most appropriate Unicode character. For example,
-suppose your document loads a package that provides symbols for use
-on maps, such as \csfmt{Harbour}, \csfmt{Battlefield} and
-\csfmt{Stadium}, then you can provide versions of these commands
-just for \bibgls's use:
+If a command isn't recognised, you can provide it in the
+\atentry{preamble} and use \ics{char} to map a symbol to the most
+appropriate Unicode character. For example, suppose your document
+loads a package that provides symbols for use on maps, such as
+\csfmt{Harbour}, \csfmt{Battlefield} and \csfmt{Stadium}, then you
+can provide versions of these commands just for \bibgls's
+use:\footnote{These commands won't work with PDF\LaTeX, as the
+\cs{char} values are too large, but they're fine for \bibgls.}
 \begin{verbatim}
 @preamble{"\providecommand{\Harbour}{\char"2693}
 \providecommand{\Battlefield}{\char"2694}
@@ -1349,9 +1370,12 @@ Since these use \cs{providecommand}, they won't overwrite the
 document's version (provided these commands have been defined before
 \cs{GlsXtrLoadResources}). Alternatively, you can instruct \bibgls\
 to not write the \atentry{preamble} contents to the resource file
-using \csopt[false]{write-preamble}. Now you can either sort them by
-their Unicode values or provide a custom rule that recognises these
-Unicode characters.
+using \csopt[false]{write-preamble}. Now you can either sort these
+symbols by
+their Unicode values (\csopt[letter-case]{sort}) or provide a custom
+rule that recognises these Unicode characters (for example,
+\csopt[custom]{sort},
+\csopt[\cs{glshex}2694 \string< \cs{glshex}2693 \string< \cs{glshex}26BD]{sort-rule}).
 
 \TeX\ syntax can be quite complicated and, in some cases, far too
 complicated for simple regular expressions. The \TeX\ parser library performs
@@ -1430,7 +1454,7 @@ code. For simplicity, \bibgls\ uses the library's HTML output and
 then strips the HTML markup and trims any leading or trailing
 spaces. The library method that writes \idx{non-ASCII} characters
 using \qtt{\&x\meta{hex};} markup is overridden by \bibgls\ to just
-write the Unicode character, which means that the letter-based
+write the actual Unicode character, which means that the letter-based
 sorting options will sort according to the integer value \meta{hex}
 rather than the string \qtt{\&x\meta{hex};}.
 
@@ -1460,7 +1484,7 @@ texparserlib: {}$\mtx{M}$ -> M
 So the \field{sort} value for this entry is set to \qtt{M}. The font
 change (caused by math-mode and \ics{boldsymbol}) has been 
 ignored. The sort value therefore consists of a single Unicode
-character 0x4D (Latin upper case letter \qtt{M}, decimal value 77).
+character \hex{4D} (Latin upper case letter \qtt{M}, decimal value 77).
 
 For the \code{v} entry, the code is:
 \begin{verbatim}
@@ -1471,9 +1495,9 @@ The transcript shows:
 texparserlib: \marg{}\$\csfmt{vec}\marg{v}\$ -> \usebox\varrow
 \end{alltt}
 So the \field{sort} value for this entry is set to \qtt{\usebox\varrow},
-which consists of two Unicode characters 0x76
+which consists of two Unicode characters \hex{76}
 (Latin lower case letter \qtt{v}, decimal value 118) and 
-0x20D7 (combining right arrow above, decimal value 8407).
+\hex{20D7} (combining right arrow above, decimal value 8407).
 
 For the \code{set} entry, the code is:
 \begin{verbatim}
@@ -1485,7 +1509,7 @@ texparserlib: {}$\set{S}$ -> S
 \end{verbatim}
 So the \field{sort} value for this entry is set to \qtt{S} (again
 ignoring the font change). This consists of a single Unicode
-character 0x53 (Latin upper case letter \qtt{S}, decimal value~83).
+character \hex{53} (Latin upper case letter \qtt{S}, decimal value~83).
 
 For the \code{card} entry, the code is:
 \begin{verbatim}
@@ -1499,9 +1523,10 @@ So the \field{sort} value for this entry is set to \qtt{|S|}
 (the \textbar\ characters from the definition of \csfmt{card} provided
 in \atentry{preamble} have been included, but the
 font change has been discarded). In this case the sort value
-consists of three Unicode characters 0x7C (vertical line, decimal
+consists of three Unicode characters \hex{7C} (vertical line, decimal
 value 124),
-0x53 (Latin upper case letter \qtt{S}, decimal value 83) and 0x7C again.
+\hex{53} (Latin upper case letter \qtt{S}, decimal value 83) and
+\hex{7C} again.
 If \csopt[false]{interpret-preamble} had been used, \csfmt{card}
 wouldn't be recognised and would be discarded leaving just \qtt{S}
 as the sort value.
@@ -1612,11 +1637,31 @@ However, if I change the locale to \csopt[sv]{sort}, the
 letter group.
 
 If you are using Java~8, you can set the
-\code{java.locale.providers} property to \code{CLDR,JRE} to use
+\code{java.locale.providers} property~\cite{javacldr} to use
 the Common Locale Data Repository, which has more extensive
-support for locales than the native \idx{JRE}.
+support for locales than the native \idx{JRE}. For example:
+\begin{verbatim}
+java.locale.providers=CLDR,JRE
+\end{verbatim}
 This isn't available for Java~7, and should be enabled by default
-for the proposed Java~9.
+for the proposed Java~9. Alternatively, you can provide your own
+rule using \csopt[custom]{sort} and \csopt{sort-rule}. The property
+can either be set in a script that runs \bibgls, for example,
+\begin{verbatim}
+java -Djava.locale.providers=CLDR,JRE,SPI -jar "$jarpath" "$@"
+\end{verbatim}
+(where \verb|$jarpath| is the path to the \file{bib2gls.jar}
+file and \verb|"$@"| is the argument list) or you can set the
+property as the default for all Java applications by adding
+the definition to the \code{\_JAVA\_OPTIONS} environment variable.
+For example, in a bash shell:
+\begin{verbatim}
+export _JAVA_OPTIONS='-Djava.locale.providers=CLDR,JRE,SPI'
+\end{verbatim}
+or in Windows:
+\begin{verbatim}
+set _JAVA_OPTIONS=-Djava.locale.providers=CLDR,JRE,SPI
+\end{verbatim}
 
 \chapter{Command Line Options}
 \label{sec:switches}
@@ -2360,7 +2405,8 @@ Each entry type may have required fields, optional fields and
 ignored fields. These are set using a \keyvallist\ within
 \code{@\meta{entry-type}\marg{\meta{id},\meta{fields}}} in the
 \ext{bib} file. Most keys recognised by
-\gls{newglossaryentry} may be used as a field.
+\gls{newglossaryentry} may be used as a field. In general, you
+shouldn't need to use the \field{sort} field.
 
 Predefined fields for use in \ext{bib} files are listed in
 Tables~\ref{tab:fields}, \ref{tab:bib2glsfields},
@@ -2370,23 +2416,21 @@ custom keys in your document using \ics{glsaddkey} or
 first use of \gls{GlsXtrLoadResources} to ensure that \bibgls\
 recognises them as a field name. 
 
-Fields that may be set by \bibgls\ when it creates the \iext{glstex}
+Internal fields that may be set by \bibgls\ when it creates the \iext{glstex}
 files are listed in Table~\ref{tab:internalfields}. These typically
-shouldn't be set in the \ext{bib} file (although you may need
-\field{sort} for cases where \bibgls\ doesn't recognise any of the
-commands in the \field{name} field). Some of these fields can be set
+shouldn't be set in the \ext{bib} file. Some of these fields can be set
 for a particular document using a resource option, such as
 \csopt{type} or \csopt{category}.
 
 There are also some fields that are set and used by 
 \styfmt{glossaries} or \styfmt{glossaries-extra} listed in
-Table~\ref{tab:baseinternalfields} that are unrecognised by \bibgls.
+Table~\ref{tab:baseinternalfields} that aren't recognised by \bibgls.
 In most cases these fields don't have a designated key and are only
 intended for internal use by \bibgls\ or by the \styfmt{glossaries} or
 \styfmt{glossaries-extra} package. Note that the value of the \field{sort} field
 written to the \ext{bib} file doesn't always exactly match the sort
 value used by \bibgls\ (which is stored in \field{bib2gls@sort}).
-Any special characters found in sort value are always substituted
+Any special characters found in the sort value are always substituted
 before writing the \ext{bib} file to avoid syntax errors.
 
 Any unrecognised fields will be ignored by \bibgls. This is more
@@ -2555,8 +2599,9 @@ For example:
 \end{verbatim}
 Neither entry has the \field{sort} field, so \bibgls\ has to fall
 back on the \field{name} field and, since this contains the special
-characters \idx{escchar} \idx{mshiftchar} \idx{bgroupchar}
-\idx{egroupchar}, the \TeX\ parser library is used to interpret it.
+characters \idx{escchar} (backslash), \idx{mshiftchar} (maths
+shift), \idx{bgroupchar} (begin group) and
+\idx{egroupchar} (end group), the \TeX\ parser library is used to interpret it.
 The definitions provided by \atentry{preamble} allow \bibgls\ to
 deduce that the \field{sort} value of the \code{S} entry is just
 \code{S} and the \field{sort} value of the \code{card} entry is
@@ -2722,7 +2767,7 @@ The \ext{bib} file is now:
 }
 \end{verbatim}
 This has removed the \csfmt{setfmt} command from the definition of
-\csfmt{cardfmt}. Now the definitions in the document:
+\csfmt{cardfmt}. Now the definitions in the document are:
 \begin{verbatim}
 \newcommand{\gset}[1]{\glsxtrentryfmt{set}{#1}}
 \newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardinality}{#2}}
@@ -4403,12 +4448,13 @@ contents will still be written to the \iext{glstex} file, but any
 commands provided in the preamble won't be recognised if the
 interpreter is needed to determine an entry's sort value.
 
-Related options are \csopt{interpret-label-fields}, which governs
-whether or not fields that must only contain a label should be
-interpreted, \csopt{labelify}, which converts a field into a string
-suitable for use as a label, \csopt{labelify-list}, which converts a
-field into a string suitable for use as a comma-separated list of
-labels.
+Related options are \csopt{set-widest}, which uses the interpreter
+to determine the widest name for the \glostyle{alttree} style,
+\csopt{interpret-label-fields}, which governs whether or not fields
+that must only contain a label should be interpreted,
+\csopt{labelify}, which converts a field into a string suitable for
+use as a label, and \csopt{labelify-list}, which converts a field
+into a string suitable for use as a comma-separated list of labels.
 
 \optsection{write-preamble}
 
@@ -4473,7 +4519,7 @@ selected. This will then be implemented as follows:
   \end{itemize}
 \item If the \field{type} is known then:
   \begin{itemize}
-   \item if the interpret resolves all \field{name} fields for that
+   \item if the interpreter resolves all \field{name} fields for that
     type to the empty string (that is the \field{name} fields all consist of
      unknown commands) then
     \begin{itemize}
@@ -5558,23 +5604,40 @@ supplementary resource files (omitting the primary
 This is a boolean option that determines whether or not the fields
 that may only contain labels should have their values interpreted
 (\field{parent}, \field{category}, \field{type}, \field{group},
-\field{seealso} and \field{alias}).
+\field{seealso} and \field{alias}). Although this option interprets
+commands within those fields, it doesn't strip any characters that
+can't be used within a label.
+
 The default setting is \csopt[false]{interpret-label-fields}.
 Note that if this setting is on, cross-resource references aren't
 permitted. This setting has no effect if the interpreter has been
 disabled.
 
+Related settings are \csopt{labelify} and
+\csopt{labelify-list} which can be used to strip content that
+can't be used in labels and may be used more generally for other
+fields. The \csopt{labelify} and \csopt{labelify-list} options
+are performed before \csopt{interpret-label-fields}.
+
 \optsection{labelify}
 
-This option should take a comma-separated list of field names as the
-value. Each listed field will be converted into a string suitable
-for use in as a label. (Not necessarily a glossary entry label, but
+This option should take a comma-separated list of recognised field names as the
+value. (If a field is present in both \csopt{labelify} and
+\csopt{labelify-list}, then \csopt{labelify-list} takes precedence.) 
+Note that if this setting is on, cross-resource references aren't
+permitted. 
+
+Each listed field will be converted into a string suitable
+for use as a label. (Not necessarily a glossary entry label, but
 any label that may be used in the construction of a control sequence
-name.) The conversion is performed in the following order:
+name.) 
+
+The conversion is performed in the following order:
 \begin{enumerate}
 \item If the interpreter is on and the value contains
 any of the characters \idx{escchar} (backslash), \idx{bgroupchar}
-(begin group) or \idx{egroupchar} (end group), then the value is
+(begin group), \idx{egroupchar} (end group), \idx{nbspchar}
+(non-breakable space) or \idx{mshiftchar} (maths shift), then the value is
 be interpreted.
 
 \item Any substitutions that have been specified with
@@ -5600,7 +5663,7 @@ characters are removed.
 For example, suppose the \ext{bib} file contains:
 \begin{verbatim}
 @index{sample,
-  name={\AA ngstr\"om, d'Vere, and Fotheringay-Smythe}
+  name={\AA ngstr\"om, \O stergaard, d'Arcy, and Fotheringay-Smythe}
 }
 \end{verbatim}
 Then
@@ -5612,12 +5675,21 @@ Then
 \end{verbatim}
 will convert the \field{name} field into
 \begin{verbatim}
-Angstrom d'Vere and Fotheringay-Smythe
+Angstrom stergaard d'Arcy and Fotheringay-Smythe
 \end{verbatim}
 if the document hasn't used \sty{fontspec} otherwise it will be
 \begin{verbatim}
-Ångström d'Vere and Fotheringay-Smythe
+Ångström Østergaard d'Arcy and Fotheringay-Smythe
 \end{verbatim}
+Note that \O\ is considered an unmodified letter and so can't
+be decomposed into a basic Latin letter with a combining diacritic.
+It's therefore removed completely from the non-\sty{fontspec}
+version. Whereas \AA\ can be decomposed into \qt{A} followed by the
+\qt{combining ring above} character and \"o can be decomposed into \qt{o}
+followed by the \qt{combining diaresis} character. You can use
+\csopt{labelify-replace} to replace non-ASCII characters into
+the closest match. Alternatively, switch to using \XeLaTeX\ or
+\LuaLaTeX.
 
 It's more useful to use this option with \csopt{replicate-fields} in
 order to retain the original:
@@ -5644,11 +5716,11 @@ the \ext{bib} entry from above:
 \end{verbatim}
 will convert the \field{user1} field into
 \begin{verbatim}
-Angstrom, d'Vere, and Fotheringay-Smythe
+Angstrom, stergaard, d'Arcy, and Fotheringay-Smythe
 \end{verbatim}
 or
 \begin{verbatim}
-Ångström, d'Vere, and Fotheringay-Smythe
+Ångström, Østergaard, d'Arcy, and Fotheringay-Smythe
 \end{verbatim}
 depending on whether or not \sty{fontspec} was detected.
 
@@ -5660,8 +5732,9 @@ where \margm{regex} is a regular expression (that conforms to \href{http://docs.
 Pattern class}~\cite{pattern}) and \meta{replacement}
 is the replacement text. Remember that the argument of
 \cs{GlsXtrLoadResources} is expanded when written to the \ext{aux}
-file so take care to protect any special characters. For example, to match a literal
-\idx{full-stop} use \cs{cs.string}\ics{cs.period} not \ics{cs.period} (backslash dot).
+file so take care to protect any special characters. For example, to
+match a literal \idx{full-stop} use \cs{cs.string}\ics{cs.period}
+rather than just \ics{cs.period} (backslash dot).
 
 Both \csopt{labelify} and \csopt{labelify-list} use this setting to 
 perform substitutions. For example, to replace the sub-string \qt{ and }
@@ -5676,11 +5749,11 @@ perform substitutions. For example, to replace the sub-string \qt{ and }
 \end{verbatim}
 The earlier example will now end up as
 \begin{verbatim}
-Angstrom, d'Vere,Fotheringay-Smythe
+Angstrom, stergaard, d'Arcy,Fotheringay-Smythe
 \end{verbatim}
 or
 \begin{verbatim}
-Ångström, d'Vere,Fotheringay-Smythe
+Ångström, Østergaard, d'Arcy,Fotheringay-Smythe
 \end{verbatim}
 depending on whether or not \sty{fontspec} was detected.
 
@@ -5696,19 +5769,20 @@ You can have more than one replacement:
  replicate-fields={name={user1}},
  labelify-replace={
    { and }{,},% first substitution
-   {['\string\\- ]}{}% second substitution
+   {[ '\string\-]}{},% second substitution
+   {\string\u00D8}{O}% third substitution
  },
  labelify-list={user1}
 ]
 \end{verbatim}
 This additionally removes the space, apostrophe and hyphen
-characters so the string now ends up as
+characters and replaces \qt{\O} (\hex{00D8}) with \qt{O} so the string now ends up as
 \begin{verbatim}
-Angstrom,dVere,FotheringaySmythe
+Angstrom,Ostergaard,dArcy,FotheringaySmythe
 \end{verbatim}
 or
 \begin{verbatim}
-Ångström,dVere,FotheringaySmythe
+Ångström,Ostergaard,dArcy,FotheringaySmythe
 \end{verbatim}
 depending on whether or not \sty{fontspec} was detected.
 
@@ -8381,8 +8455,8 @@ This only detects base 10 integers (unlike the numeric methods
 such as \csopt[hexadecimal]{sort} or \csopt[float]{sort}) but in
 addition to recognising all the digits in the Unicode \idx{numberdecimaldigit} 
 category it also recognises the subscript and
-superscript digits, such as \textsuperscript{1} (0x00B9)
-and \textsuperscript{2} (0x00B2).
+superscript digits, such as \textsuperscript{1} (\hex{00B9})
+and \textsuperscript{2} (\hex{00B2}).
 
 As with the letter sort methods, letters are compared using a
 character code comparison not by a locale alphabet. The closest
@@ -8446,8 +8520,8 @@ indicates the hexadecimal character code. The first three characters
 from each string are identical (\code{abc}). At this point there's
 no difference detected, so the comparator moves on to the next
 character, \code{1\hexsb{31}} for the first string and
-\code{6\hexsb{36}} for the second string. Since 0x31 is less than 
-0x36, the first string (\code{abc12foo}) is considered less than the second
+\code{6\hexsb{36}} for the second string. Since \hex{31} is less than 
+\hex{36}, the first string (\code{abc12foo}) is considered less than the second
 (\code{abc6bar}).
 
 With the letter-number comparison using
@@ -8473,8 +8547,9 @@ such as chemical formulae, rather than for words or phrases.)
 
 Signed integers are also recognised, so \code{abc-12foo} is less
 than \code{abc+6bar}, which is again different from the result
-obtained with a straight letter comparator where the character~\code{+} (0x2B)
-comes before the character~\code{-} (0x2D). The sign must be followed by at
+obtained with a straight letter comparator where the
+character~\code{+} (\hex{2B})
+comes before the character~\code{-} (\hex{2D}). The sign must be followed by at
 least one digit for it to be recognised as a number otherwise it's
 treated as a punctuation character.
 
@@ -9640,10 +9715,10 @@ rule) and punctuation comes last;
 rule) and white space comes last;
 \item\optfmt{punc-first-space-zero}: punctuation comes first
 (although numbers may come before)
-and white space is replaced by the digit~\code{0} (0x30);
+and white space is replaced by the digit~\code{0} (\hex{30});
 \item\optfmt{punc-last-space-zero}: punctuation comes last
 (although numbers may come after)
-and white space is replaced by the digit~\code{0} (0x30).
+and white space is replaced by the digit~\code{0} (\hex{30}).
 \item\optfmt{punc-first-space-zero-match-next}: punctuation comes first
 (although numbers may come before)
 and white space is replaced by zero;
@@ -9655,22 +9730,22 @@ Remember that the reverse sort methods will invert order governed by this settin
 
 For the \optfmt{space-zero-match-next} settings, the sort value will
 have all spaces replaced with a digit that represents zero. If the
-space isn't followed by a digit, the basic Latin \code{0} (0x30)
+space isn't followed by a digit, the basic Latin \code{0} (\hex{30})
 will be used, otherwise \bibgls\ will try to match the zero with the
 following digit group. For example, if the space is followed by
-\textsuperscript{1} (0xB9) the space will be replaced by
-\textsuperscript{0} (0x2070),  resulting in the sub-string
-\code{\textsuperscript{01}} (0xB9 0x2070). 
+\textsuperscript{1} (\hex{B9}) the space will be replaced by
+\textsuperscript{0} (\hex{2070}),  resulting in the sub-string
+\code{\textsuperscript{01}} (\hex{B9} \hex{2070}). 
 
 If just the \optfmt{space-zero}
 (without the \optfmt{-match-next}) is used then the space will just
 be replaced with \code{0} resulting in the sub-string
-\code{0\textsuperscript{1}} (0x30 0x2070). In this case, the
+\code{0\textsuperscript{1}} (\hex{30} \hex{2070}). In this case, the
 \code{0} will be distinct from \textsuperscript{1} (rather than
 being considered a leading zero). However, for 
 other numbering systems the \code{0} will be treated as a leading
 zero. For example, if the space is followed by the Devanagari digit
-one (0x0967) then the sub-string will be 0x30 0x0967 but here the
+one (\hex{0967}) then the sub-string will be \hex{30} \hex{0967} but here the
 mixture is allowed to form a number (with a leading zero) as both
 characters belong to the Unicode category \idx{numberdecimaldigit}.
 
@@ -12917,9 +12992,9 @@ unless keys are provided (using \cs{glsaddkey} or
 fields have dates that are \emph{almost} in the default \code{en-GB} locale
 format, but they include a tilde \verb|~| to prevent awkward line
 breaks. By default \bibgls's interpreter converts \verb|~| to the non-breaking
-space character 0xA0 which isn't recognised by the date format.
+space character \hex{A0} which isn't recognised by the date format.
 This can easily be fixed with the \longarg{break-space} switch which
-will interpret \verb|~| as a normal breakable space (0x20), so 
+will interpret \verb|~| as a normal breakable space (\hex{20}), so 
 with that switch \csopt[date]{sort} or \csopt[date-reverse]{sort}
 can be used on either of those fields.
 

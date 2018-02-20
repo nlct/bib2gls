@@ -10,7 +10,10 @@
  replicate-fields={name={symbol,description}},
  labelify={symbol},
  labelify-list={description},
- labelify-replace={{ and }{,}},
+ labelify-replace={
+   { and }{,},% replace " and " with ","
+   {['\string\- ]}{}% remove ' and - and space
+ },
  selection=all]
 
 \begin{document}

@@ -1016,18 +1016,27 @@ public class Bib2Gls implements TeXApp
       }
    }
 
-   public String convertToLabel(TeXParser parser, BibValueList value, GlsResource resource, boolean isList)
+   public String convertToLabel(TeXParser parser, BibValueList value, 
+      GlsResource resource, boolean isList)
     throws IOException
    {
       TeXObjectList list = value.expand(parser);
 
       String strVal = list.toString(parser);
 
-      if (strVal.matches("(?s).*[\\\\\\{\\}\\~].*"))
-      {
-         // no point checking for other special characters
-         // as they won't expand to a simple alphanumeric string
+      // Check for \ { } ~ and $ to determine whether or not to
+      // interpret the value.
+      // There's no point checking for the other special characters.
+      // For example, ^ and _ need to be in maths mode, so $ or \
+      // (from \ensuremath or \begin or \_ etc) will be present.
+      // \# \& and \% will match on the backslash. Comments are best
+      // avoided within field values, but ought to have already been
+      // removed if present. # and & shouldn't occur without some
+      // kind of markup, and would likely be too complicated to
+      // interpret anyway.
 
+      if (strVal.matches("(?s).*[\\\\\\{\\}\\~\\$].*"))
+      {
          strVal = interpret(strVal, value, true);
       }
 
@@ -3847,8 +3856,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.1.20180219";
-   public static final String DATE = "2018-02-19";
+   public static final String VERSION = "1.1.20180220";
+   public static final String DATE = "2018-02-20";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

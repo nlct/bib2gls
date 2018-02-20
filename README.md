@@ -1,15 +1,18 @@
 # bib2gls
 Command line application to convert `.bib` files to `glossaries-extra.sty` resource file
 
-(Developed as a follow-up
-from [my answer on TeX on
+(Developed as a follow-up from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).)
 
 This application requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
 (2017-02-03). (Although newer versions are recommended.)
 The main home page is [`dickimaw-books.com/software/bib2gls`](http://www.dickimaw-books.com/software/bib2gls/).
-The latest stable version is on [CTAN](https://ctan.org/pkg/bib2gls).
+
+The latest stable version of `bib2gls` is available from [CTAN](https://ctan.org/pkg/bib2gls).
+The code in this GitHub repository may be for an unstable version.
+Stable versions have a version number in the form _major_._minor_.
+Unstable versions have a version number in the form _major_._minor_._YYYYMMDD_. 
 
 If you already have a `.tex` file containing lots of
 definitions using `\newglossaryentry`,

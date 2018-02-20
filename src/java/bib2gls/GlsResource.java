@@ -7637,8 +7637,38 @@ public class GlsResource
 
    public boolean allowsCrossResourceRefs()
    {
-      return preamble == null || !interpretPreamble
-               || !isInterpretLabelFieldsEnabled();
+      return (preamble == null || !interpretPreamble
+               || !isInterpretLabelFieldsEnabled())
+             && !labelifyIncludesCrossRefs();
+   }
+
+   public boolean labelifyIncludesCrossRefs()
+   {
+      if (labelifyFields != null)
+      {
+         for (String field : labelifyFields)
+         {
+            if (field.equals("see") || field.equals("seealso") 
+                || field.equals("alias") || field.equals("parent"))
+            {
+               return true;
+            }
+         }
+      }
+
+      if (labelifyListFields != null)
+      {
+         for (String field : labelifyListFields)
+         {
+            if (field.equals("see") || field.equals("seealso") 
+                || field.equals("alias") || field.equals("parent"))
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
    }
 
    public boolean isStripMissingParentsEnabled()
