@@ -21,7 +21,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dualindexentry.pdf test-dualindexentry2.pdf \
 	  test-dual-mix.pdf test-letternumber.pdf \
 	  test-numeric.pdf test-copy.pdf test-seetrail.pdf \
-	  test-record-prefix.pdf
+	  test-record-prefix.pdf test-labelify.pdf \
+	  test-labelify-fontspec.pdf test-custom-symbols.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -383,6 +384,27 @@ test-record-prefix.pdf	: test-record-prefix.glstex
 test-record-prefix.glstex	: test-record-prefix.tex test-entries.bib $(DEPS)
 		pdflatex test-record-prefix
 		$(BIB2GLS) test-record-prefix
+
+test-labelify.pdf	: test-labelify.glstex
+		pdflatex test-labelify
+
+test-labelify.glstex	: test-labelify.tex test-labelify.bib $(DEPS)
+		pdflatex test-labelify
+		$(BIB2GLS) test-labelify
+
+test-labelify-fontspec.pdf	: test-labelify-fontspec.glstex
+		xelatex test-labelify-fontspec
+
+test-labelify-fontspec.glstex	: test-labelify-fontspec.tex test-labelify.bib $(DEPS)
+		xelatex test-labelify-fontspec
+		$(BIB2GLS) test-labelify-fontspec
+
+test-custom-symbols.pdf	: test-custom-symbols.glstex
+		pdflatex test-custom-symbols
+
+test-custom-symbols.glstex	: test-custom-symbols.tex test-custom-symbols.bib $(DEPS)
+		pdflatex test-custom-symbols
+		$(BIB2GLS) test-custom-symbols
 
 clean	:
 	$(RM) *.aux

@@ -1293,6 +1293,8 @@ The other cases that the interpreter is used for are:
 \begin{itemize}
 \item when \csopt{set-widest} is used to determine the width of
 the \field{name} field;
+\item if \csopt{labelify} or \csopt{labelify-list} are set the
+identified field values are first interpreted before being converted to labels;
 \item if \csopt[true]{interpret-label-fields} and the
 \field{parent}, \field{category}, \field{type}, \field{group},
 \field{seealso} or \field{alias} fields contain \idx{escchar}
@@ -1332,8 +1334,27 @@ defined, it will simply behave like \cs{newcommand}. Whereas
 with \ics{providecommand} the parser will only define the command
 if it's unrecognised.
 
+If a command isn't recognised, you can provide it and use \ics{char}
+to map it to the most appropriate Unicode character. For example,
+suppose your document loads a package that provides symbols for use
+on maps, such as \csfmt{Harbour}, \csfmt{Battlefield} and
+\csfmt{Stadium}, then you can provide versions of these commands
+just for \bibgls's use:
+\begin{verbatim}
+@preamble{"\providecommand{\Harbour}{\char"2693}
+\providecommand{\Battlefield}{\char"2694}
+\providecommand{\Stadium}{\char"26BD}"}
+\end{verbatim}
+Since these use \cs{providecommand}, they won't overwrite the
+document's version (provided these commands have been defined before
+\cs{GlsXtrLoadResources}). Alternatively, you can instruct \bibgls\
+to not write the \atentry{preamble} contents to the resource file
+using \csopt[false]{write-preamble}. Now you can either sort them by
+their Unicode values or provide a custom rule that recognises these
+Unicode characters.
+
 \TeX\ syntax can be quite complicated and, in some cases, far too
-complicated for simple regular expressions. The library performs
+complicated for simple regular expressions. The \TeX\ parser library performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls\ (and by
 \idx{convertgls2bib}). When
@@ -4382,9 +4403,12 @@ contents will still be written to the \iext{glstex} file, but any
 commands provided in the preamble won't be recognised if the
 interpreter is needed to determine an entry's sort value.
 
-A related option is \csopt{interpret-label-fields} which governs
+Related options are \csopt{interpret-label-fields}, which governs
 whether or not fields that must only contain a label should be
-interpreted.
+interpreted, \csopt{labelify}, which converts a field into a string
+suitable for use as a label, \csopt{labelify-list}, which converts a
+field into a string suitable for use as a comma-separated list of
+labels.
 
 \optsection{write-preamble}
 
@@ -5539,6 +5563,154 @@ The default setting is \csopt[false]{interpret-label-fields}.
 Note that if this setting is on, cross-resource references aren't
 permitted. This setting has no effect if the interpreter has been
 disabled.
+
+\optsection{labelify}
+
+This option should take a comma-separated list of field names as the
+value. Each listed field will be converted into a string suitable
+for use in as a label. (Not necessarily a glossary entry label, but
+any label that may be used in the construction of a control sequence
+name.) The conversion is performed in the following order:
+\begin{enumerate}
+\item If the interpreter is on and the value contains
+any of the characters \idx{escchar} (backslash), \idx{bgroupchar}
+(begin group) or \idx{egroupchar} (end group), then the value is
+be interpreted.
+
+\item Any substitutions that have been specified with
+\csopt{labelify-replace} are performed.
+
+\item All characters that aren't alphanumeric or the space character
+ or the punctuation
+characters \code{.} (full stop), \code{-} (hyphen), \code{+} (plus),
+\code{:} (colon), \code{;} (semi-colon), \code{\string|} (pipe),
+\code{/} (forward slash), \code{!} (exclamation mark), \code{?}
+(question mark), \code{*} (asterisk), \code{<} (less than), \code{>}
+(greater than), \code{\textasciigrave} (backtick), \code{'}
+(apostrophe) or \code{@} (at-sign) are stripped. If you want to
+retain commas, use \csopt{labelify-list} instead. If you want to
+strip any of the allowed punctuation, use \csopt{labelify-replace} to
+remove the unwanted characters.
+
+\item If \bibgls\ hasn't detected \sty{fontspec} in the document's
+transcript file, the value is then decomposed and all non-ASCII
+characters are removed.
+\end{enumerate}
+
+For example, suppose the \ext{bib} file contains:
+\begin{verbatim}
+@index{sample,
+  name={\AA ngstr\"om, d'Vere, and Fotheringay-Smythe}
+}
+\end{verbatim}
+Then
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src=entries,% data in entries.bib
+ labelify={name}
+]
+\end{verbatim}
+will convert the \field{name} field into
+\begin{verbatim}
+Angstrom d'Vere and Fotheringay-Smythe
+\end{verbatim}
+if the document hasn't used \sty{fontspec} otherwise it will be
+\begin{verbatim}
+Ångström d'Vere and Fotheringay-Smythe
+\end{verbatim}
+
+It's more useful to use this option with \csopt{replicate-fields} in
+order to retain the original:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src=entries,% data in entries.bib
+ replicate-fields={name={user1}},
+ labelify={user1}
+]
+\end{verbatim}
+
+\optsection{labelify-list}
+
+This option is like \csopt{labelify} but it retains commas, as it's
+designed for fields that should be converted into a comma-separated
+list of labels. Any empty elements are removed. For example, with
+the \ext{bib} entry from above:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src=entries,% data in entries.bib
+ replicate-fields={name={user1}},
+ labelify-list={user1}
+]
+\end{verbatim}
+will convert the \field{user1} field into
+\begin{verbatim}
+Angstrom, d'Vere, and Fotheringay-Smythe
+\end{verbatim}
+or
+\begin{verbatim}
+Ångström, d'Vere, and Fotheringay-Smythe
+\end{verbatim}
+depending on whether or not \sty{fontspec} was detected.
+
+\optsection{labelify-replace}
+
+This option takes a comma-separated list as a value with each
+element in the list in the form \margm{regex}\margm{replacement}
+where \margm{regex} is a regular expression (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
+Pattern class}~\cite{pattern}) and \meta{replacement}
+is the replacement text. Remember that the argument of
+\cs{GlsXtrLoadResources} is expanded when written to the \ext{aux}
+file so take care to protect any special characters. For example, to match a literal
+\idx{full-stop} use \cs{cs.string}\ics{cs.period} not \ics{cs.period} (backslash dot).
+
+Both \csopt{labelify} and \csopt{labelify-list} use this setting to 
+perform substitutions. For example, to replace the sub-string \qt{ and }
+(including spaces) with a comma:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src=entries,% data in entries.bib
+ replicate-fields={name={user1}},
+ labelify-replace={{ and }{,}},
+ labelify-list={user1}
+]
+\end{verbatim}
+The earlier example will now end up as
+\begin{verbatim}
+Angstrom, d'Vere,Fotheringay-Smythe
+\end{verbatim}
+or
+\begin{verbatim}
+Ångström, d'Vere,Fotheringay-Smythe
+\end{verbatim}
+depending on whether or not \sty{fontspec} was detected.
+
+Note that this produces the same result regardless of whether or not
+the Oxford comma is present as \verb*|, and | would first be
+converted to \verb|,,| and then the empty element is removed
+resulting in a single comma.
+
+You can have more than one replacement:
+\begin{verbatim}
+\GlsXtrLoadResources[
+ src=entries,% data in entries.bib
+ replicate-fields={name={user1}},
+ labelify-replace={
+   { and }{,},% first substitution
+   {['\string\\- ]}{}% second substitution
+ },
+ labelify-list={user1}
+]
+\end{verbatim}
+This additionally removes the space, apostrophe and hyphen
+characters so the string now ends up as
+\begin{verbatim}
+Angstrom,dVere,FotheringaySmythe
+\end{verbatim}
+or
+\begin{verbatim}
+Ångström,dVere,FotheringaySmythe
+\end{verbatim}
+depending on whether or not \sty{fontspec} was detected.
 
 \optsection{strip-missing-parents}
 

@@ -1023,7 +1023,7 @@ public class Bib2Gls implements TeXApp
 
       String strVal = list.toString(parser);
 
-      if (strVal.matches("(?s).*[\\\\\\{\\}].*"))
+      if (strVal.matches("(?s).*[\\\\\\{\\}\\~].*"))
       {
          // no point checking for other special characters
          // as they won't expand to a simple alphanumeric string
@@ -1032,39 +1032,38 @@ public class Bib2Gls implements TeXApp
       }
 
       // apply substitutions
-      HashMap<String,String> map = resource.getLabelifySubstitutions();
+      Vector<PatternReplace> regexList = resource.getLabelifySubstitutions();
 
-      if (map != null)
+      if (regexList != null)
       {
-         Iterator<String> it = map.keySet().iterator();
-
-         while (it.hasNext())
+         for (PatternReplace patRep : regexList)
          {
-            String regex = it.next();
-            String replacement = map.get(regex);
-
-            strVal = strVal.replaceAll(regex, replacement);
+            strVal = patRep.replaceAll(strVal);
          }
       }
 
-      // strip all characters that aren't alphanumeric or
-      // the following punctuation characters: . - +
+      // strip all characters that aren't alphanumeric or spaces or
+      // the following punctuation characters:
+      // . - + : ; | / ! ? * < > @ ' `
+
+      String allowedASCII = " \\.\\-\\+\\:\\;\\|\\/\\!\\?\\*\\<\\>\\@\\'\\`";
 
       if (isList)
       {// keep commas as well
          strVal = strVal.replaceAll(
-            "[^,\\.\\-\\+\\p{IsAlphabetic}\\p{IsDigit}]", "");
+            "[^,"+allowedASCII+"\\p{IsAlphabetic}\\p{IsDigit}]", "");
       }
       else
       {
          strVal = strVal.replaceAll(
-            "[^\\.\\-\\+\\p{IsAlphabetic}\\p{IsDigit}]", "");
+            "[^"+allowedASCII+"\\p{IsAlphabetic}\\p{IsDigit}]", "");
       }
 
       if (!fontSpecLoaded())
       {
          strVal = Normalizer.normalize(strVal, Normalizer.Form.NFD);
-         strVal = strVal.replaceAll("[^a-zA-Z0-9\\.,\\-\\+]", "");
+         strVal = strVal.replaceAll("[^,"+allowedASCII+"a-zA-Z0-9]",
+           "");
       }
 
       if (isList)

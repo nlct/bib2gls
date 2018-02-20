@@ -1,20 +1,16 @@
-% arara: pdflatex
+% arara: xelatex
 % arara: bib2gls
-% arara: pdflatex
+% arara: xelatex
 \documentclass{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+\usepackage{fontspec}
 \usepackage[record,stylemods=tree,style=index]{glossaries-extra}
 
 \GlsXtrLoadResources[src=test-labelify,
  replicate-fields={name={symbol,description}},
  labelify={symbol},
  labelify-list={description},
- labelify-replace={
-   { and }{,},% replace " and " with ","
-   {['\string\\-]}{}% remove ' and - 
- },
+ labelify-replace={{ and }{,}},
  selection=all]
 
 \begin{document}

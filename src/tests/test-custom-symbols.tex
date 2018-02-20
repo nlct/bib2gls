@@ -1,0 +1,26 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{marvosym}
+\usepackage{arev}
+\usepackage[record]{glossaries-extra}
+
+\newcommand{\Stadium}{\Football}
+\newcommand{\Battlefield}{$\swords$}
+\newcommand{\Harbour}{$\anchor$}
+
+\GlsXtrLoadResources[src={test-custom-symbols},
+ write-preamble=false,
+ sort=letter-case,
+ symbol-sort-fallback=name,
+ selection=all
+]
+
+\begin{document}
+
+\printunsrtglossary
+\end{document}

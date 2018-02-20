@@ -9,6 +9,8 @@ v1.2 (pending):
      - labelify-list
      - labelify-replace
 
+   * Bug fix: replicate-fields now parsed correctly
+
 v1.1 (2017-11-25):
 
    * New resource options: 

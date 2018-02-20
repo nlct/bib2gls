@@ -548,7 +548,7 @@ public class GlsResource
          }
          else if (opt.equals("labelify-replace"))
          {
-            labelifyReplaceMap = getSubstitutionMap(parser, list, opt);
+            labelifyReplaceMap = getSubstitutionList(parser, list, opt);
          }
          else if (opt.equals("interpret-preamble"))
          {
@@ -3376,7 +3376,7 @@ public class GlsResource
       return map;
    }
 
-   private HashMap<String,String> getSubstitutionMap(TeXParser parser, 
+   private Vector<PatternReplace> getSubstitutionList(TeXParser parser, 
       KeyValList list, String opt)
     throws IOException
    {
@@ -3387,7 +3387,7 @@ public class GlsResource
          return null;
       }
 
-      HashMap<String,String> map = new HashMap<String,String>();
+      Vector<PatternReplace> regexList = new Vector<PatternReplace>();
 
       for (TeXObject obj : array)
       {
@@ -3416,10 +3416,10 @@ public class GlsResource
          String regex = regexArg.toString(parser);
          String replacement = replacementArg.toString(parser);
 
-         map.put(regex, replacement);
+         regexList.add(new PatternReplace(regex, replacement));
       }
 
-      return map;
+      return regexList;
    }
 
    private int getLetterNumberRule(TeXParser parser, KeyValList list,
@@ -6963,7 +6963,7 @@ public class GlsResource
       return false;
    }
 
-   public HashMap<String,String> getLabelifySubstitutions()
+   public Vector<PatternReplace> getLabelifySubstitutions()
    {
       return labelifyReplaceMap;
    }
@@ -7742,7 +7742,7 @@ public class GlsResource
 
    private String[] labelifyFields=null;
    private String[] labelifyListFields=null;
-   private HashMap<String,String> labelifyReplaceMap;
+   private Vector<PatternReplace> labelifyReplaceMap;
 
    private String type=null, category=null, counter=null;
 
