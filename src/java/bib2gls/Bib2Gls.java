@@ -805,6 +805,9 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new NewCommand("renewcommand",
         NewCommand.OVERWRITE_ALLOW));
 
+      listener.putControlSequence(new NewCommand("glsxtrprovidecommand",
+        NewCommand.OVERWRITE_ALLOW));
+
       listener.putControlSequence(new EnableTagging());
       listener.putControlSequence(new AtFirstOfTwo("bibglscontributorlist"));
       listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
