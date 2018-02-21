@@ -22,7 +22,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual-mix.pdf test-letternumber.pdf \
 	  test-numeric.pdf test-copy.pdf test-seetrail.pdf \
 	  test-record-prefix.pdf test-labelify.pdf \
-	  test-labelify-fontspec.pdf test-custom-symbols.pdf
+	  test-labelify-fontspec.pdf test-custom-symbols.pdf \
+	  test-crossresource-refs.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -405,6 +406,13 @@ test-custom-symbols.pdf	: test-custom-symbols.glstex
 test-custom-symbols.glstex	: test-custom-symbols.tex test-custom-symbols.bib $(DEPS)
 		pdflatex test-custom-symbols
 		$(BIB2GLS) test-custom-symbols
+
+test-crossresource-refs.pdf	: test-crossresource-refs.glstex
+		pdflatex test-crossresource-refs
+
+test-crossresource-refs.glstex	: test-crossresource-refs.tex test-xr1.bib test-xr1.bib $(DEPS)
+		pdflatex test-crossresource-refs
+		$(BIB2GLS) --force-cross-resource-refs test-crossresource-refs
 
 clean	:
 	$(RM) *.aux

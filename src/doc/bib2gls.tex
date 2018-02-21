@@ -1095,13 +1095,17 @@ of dependencies are instances of commands such as \cs{gls} being
 found (for example, in the \field{description} field), or the
 cross-reference fields (\field{see}, \field{seealso} or
 \field{alias}) in recorded entries that reference unrecorded
-entries. The \qt{cross-referenced by} dependencies enabled with
+entries.
+
+The \qt{cross-referenced by} dependencies enabled with
 \csopt[recorded and deps and see]{selection} (where an unrecorded
 entry references a recorded entry through the cross-reference
-fields) aren't supported across \idxpl{resourceset}.
+fields) \emph{aren't supported} across \idxpl{resourceset} (even with
+\longarg{force-cross-resource-refs}).
 
-A \idx{crossresourceref} is a reference from an entry provided in one
-\idx{resourceset} to an entry in another \idx{resourceset}. Since
+A \idx{crossresourceref} is a reference from a recorded entry provided in one
+\idx{resourceset} to an unrecorded entry in another \idx{resourceset}.
+Since
 the contents of each \idx{resourceset}['s] preamble must be
 processed before fields can be interpreted and one
 \idx{resourceset}['s] preamble may contain definitions that override
@@ -1119,16 +1123,15 @@ Cross-resource references disabled.
 \end{verbatim}
 The mode can only be enabled if the following condition is satisfied:
 \begin{itemize}
-\item \csopt{labelify} and \csopt{labelify-list} don't include
-cross-reference fields (\field{see}, \field{seealso},
-\field{alias} and \field{parent}), and
 \item the interpreter is off (\longarg{no-interpret}), or
 \item every \idx{resourceset} either doesn't have a preamble
-(provided by \atentry{preamble} in the associated \ext{bib} files) or has
-\csopt[false]{interpret-preamble} or 
-\csopt[false]{interpret-label-fields} set.
+(\atentry{preamble}) or has \csopt[false]{interpret-preamble} set.
 \end{itemize}
-Note that if you don't use either \csopt[recorded and
+If you know the preamble contents won't cause a problem, you
+can force the \idxpl{crossresourceref} mode on with 
+\longarg{force-cross-resource-refs}.
+
+If you don't use either \csopt[recorded and
 deps]{selection} or \csopt[recorded and deps and see]{selection}
 then the dependencies aren't picked up for that \idx{resourceset}
 (and so can't be cross-referenced from another \idx{resourceset}).
@@ -1800,6 +1803,17 @@ space (default).
 
 The interpreter treats a tilde character \idx{nbspchar} as a normal
 space.
+
+\argsection{force-cross-resource-refs}
+
+Force \idx{crossresourceref} mode on (see
+\sectionref{sec:resourcesets}).
+
+\argsection{no-force-cross-resource-refs}
+
+Don't force \idx{crossresourceref} mode on (default). 
+The mode will be enabled if applicable (see
+\sectionref{sec:resourcesets}).
 
 \argsection{packages}
 
@@ -5691,8 +5705,8 @@ followed by the \qt{combining diaresis} character. You can use
 the closest match. Alternatively, switch to using \XeLaTeX\ or
 \LuaLaTeX.
 
-It's more useful to use this option with \csopt{replicate-fields} in
-order to retain the original:
+You can use this option with \csopt{replicate-fields} if you need
+to retain the original:
 \begin{verbatim}
 \GlsXtrLoadResources[
  src=entries,% data in entries.bib
@@ -5776,7 +5790,8 @@ You can have more than one replacement:
 ]
 \end{verbatim}
 This additionally removes the space, apostrophe and hyphen
-characters and replaces \qt{\O} (\hex{00D8}) with \qt{O} so the string now ends up as
+characters (second substitution) and replaces \qt{\O} (\hex{00D8})
+with \qt{O} (third substitution) so the string now ends up as
 \begin{verbatim}
 Angstrom,Ostergaard,dArcy,FotheringaySmythe
 \end{verbatim}

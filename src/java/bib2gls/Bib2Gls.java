@@ -1626,8 +1626,8 @@ public class Bib2Gls implements TeXApp
          // Stage 2: parse all the bib files for this resource 
          currentResource.parseBibFiles(parser);
 
-         if (allowsCrossResourceRefs && 
-              !currentResource.allowsCrossResourceRefs())
+         if (allowsCrossResourceRefs && !forceCrossResourceRefs
+              && !currentResource.allowsCrossResourceRefs())
          {
             debugMessage("message.cross-resource.notallowed", 
               currentResource);
@@ -1637,7 +1637,7 @@ public class Bib2Gls implements TeXApp
 
       if (allowsCrossResourceRefs)
       {
-         verboseMessage("message.cross-resource.dep.allowed");
+         logMessage(getMessage("message.cross-resource.dep.allowed"));
 
          dependencies = new Vector<String>();
 
@@ -1666,7 +1666,8 @@ public class Bib2Gls implements TeXApp
       }
       else
       {
-         verboseMessage("message.cross-resource.dep.notallowed");
+         logMessage(getMessage("message.cross-resource.dep.notallowed",
+           "--force-cross-resource-refs"));
 
          for (int i = 0; i < glsresources.size(); i++)
          {
@@ -2976,6 +2977,9 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.break.space", "--break-space"));
       System.out.println(getMessage("syntax.no.break.space", "--no-break-space"));
       System.out.println();
+      System.out.println(getMessage("syntax.force.cross.resource.refs", "--force-cross-resource-refs", "-xr"));
+      System.out.println(getMessage("syntax.no.force.cross.resource.refs", "--no-force-cross-resource-refs"));
+      System.out.println();
       System.out.println(getMessage("syntax.packages", "--packages", "-p"));
       System.out.println();
 
@@ -3458,6 +3462,15 @@ public class Bib2Gls implements TeXApp
          {
             useNonBreakSpace = true;
          }
+         else if (args[i].equals("--force-cross-resource-refs") 
+                   || args[i].equals("-xr"))
+         {
+            forceCrossResourceRefs = true;
+         }
+         else if (args[i].equals("--no-force-cross-resource-refs"))
+         {
+            forceCrossResourceRefs = false;
+         }
          else if (args[i].equals("--no-mfirstuc-protection"))
          {
             mfirstucProtect = false;
@@ -3925,6 +3938,8 @@ public class Bib2Gls implements TeXApp
    private TeXParser interpreter = null;
 
    private boolean useNonBreakSpace = true;
+
+   private boolean forceCrossResourceRefs = false;
 
    private Vector<String> dependencies = null;
 

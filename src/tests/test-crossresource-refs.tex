@@ -1,0 +1,24 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-xr2},
+ label-prefix={gls1.},
+ ext-prefixes={gls2.}
+]
+
+\GlsXtrLoadResources[src={test-xr1},
+ label-prefix={gls2.},
+ ext-prefixes={gls1.}
+]
+
+\begin{document}
+\gls{gls2.xr1}.
+
+\printunsrtglossaries
+\end{document}

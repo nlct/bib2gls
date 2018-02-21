@@ -84,6 +84,14 @@ Interpret tilde character as a normal space.
 
 Interpret tilde as a non-breaking space (default).
 
+=item B<--force-cross-resource-refs> or B<-xr>
+
+Force cross-resource referencing mode on.
+
+=item B<--no-force-cross-resource-refs>
+
+Don't force cross-resource referencing mode on (default).
+
 =item B<--packages> I<list> (or B<-p> I<list>)
 
 Instruct the TeX parser library to pretend the packages listed 

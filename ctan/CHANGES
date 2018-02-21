@@ -9,6 +9,11 @@ v1.2 (pending):
      - labelify-list
      - labelify-replace
 
+   * New command line switches:
+
+     - --force-cross-resource-refs (-xr)
+     - --no-force-cross-resource-refs
+
    * Bug fix: replicate-fields now parsed correctly
 
 v1.1 (2017-11-25):

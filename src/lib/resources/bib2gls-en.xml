@@ -38,6 +38,8 @@ See the manual for further details.</entry>
 <entry key="syntax.break.space">{0}		Interpret tilde character as normal space.</entry>
 <entry key="syntax.no.break.space">{0}	Interpret tilde character as a non-breaking space 
 			(default).</entry>
+<entry key="syntax.force.cross.resource.refs">{0} (or {1})		Force cross-resource referencing mode on.</entry>
+<entry key="syntax.force.no.cross.resource.refs">{0}		Don''t force cross-resource referencing mode on (default).</entry>
 
 <entry key="syntax.mfirstuc">{0} &lt;fields&gt;|"all" (or {1} &lt;fields&gt;|"all")
 			Insert an empty group if fields start 
@@ -188,7 +190,8 @@ See the manual for further details.</entry>
 <entry key="message.processing.master">Processing master {0}.</entry>
 <entry key="message.selecting.entries">Selecting entries for resource {0}.</entry>
 <entry key="message.cross-resource.dep.allowed">Cross-resource references allowed.</entry>
-<entry key="message.cross-resource.dep.notallowed">Cross-resource references disabled.</entry>
+<entry key="message.cross-resource.dep.notallowed">Cross-resource references disabled.
+(Use {0} to override.)</entry>
 <entry key="message.cross-resource.notallowed">Cross-resource references can''t be supported for resource set {0}.</entry>
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>

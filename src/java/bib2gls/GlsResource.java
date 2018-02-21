@@ -7635,37 +7635,25 @@ public class GlsResource
       return interpretLabelFields && bib2gls.useInterpreter();
    }
 
+   // Cross-resource references aren't permitted if the resource set
+   // has a preamble that's interpreted
+   //     (preamble != null && interpretPreamble)
+
    public boolean allowsCrossResourceRefs()
    {
-      return (preamble == null || !interpretPreamble
-               || !isInterpretLabelFieldsEnabled())
-             && !labelifyIncludesCrossRefs();
+      return preamble == null || !interpretPreamble;
    }
 
-   public boolean labelifyIncludesCrossRefs()
+   public boolean isLabelifyEnabled()
    {
-      if (labelifyFields != null)
+      if (labelifyFields == null || labelifyFields.length == 0)
       {
-         for (String field : labelifyFields)
-         {
-            if (field.equals("see") || field.equals("seealso") 
-                || field.equals("alias") || field.equals("parent"))
-            {
-               return true;
-            }
-         }
+         return true;
       }
 
-      if (labelifyListFields != null)
+      if (labelifyListFields == null || labelifyListFields.length == 0)
       {
-         for (String field : labelifyListFields)
-         {
-            if (field.equals("see") || field.equals("seealso") 
-                || field.equals("alias") || field.equals("parent"))
-            {
-               return true;
-            }
-         }
+         return true;
       }
 
       return false;
