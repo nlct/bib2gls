@@ -151,6 +151,7 @@ See the manual for further details.</entry>
 <entry key="message.sort.date.format">Date/time sort format: {0}</entry>
 <entry key="message.sort.numeric.locale">Numeric sort locale: {0}</entry>
 <entry key="message.sort.numeric.format">Numeric sort format: {0}</entry>
+<entry key="message.no.sort.required">No sorting required.</entry>
 <entry key="message.label.prefix">Label prefix: {0}</entry>
 <entry key="message.dual.label.prefix">Dual label prefix: {0}</entry>
 <entry key="message.tertiary.label.prefix">Tertiary label prefix: {0}</entry>

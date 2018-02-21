@@ -4583,7 +4583,8 @@ public class GlsResource
             entries.add(entry);
          }
       }
-      else if (entrySort == null || matchAction == MATCH_ACTION_ADD)
+      else if (entrySort == null || entrySort.equals("none")
+         || matchAction == MATCH_ACTION_ADD)
       {
          // add all entries that have been recorded in the order of
          // definition
@@ -4898,6 +4899,10 @@ public class GlsResource
       if (settings.requiresSorting() && entries.size() > 0)
       {
          sortData(entries, settings, entryGroupField, null);
+      }
+      else
+      {
+         bib2gls.verboseMessage("message.no.sort.required");
       }
    }
 

@@ -18,6 +18,8 @@ v1.2 (pending):
 
    * Bug fix: corrected hierarchical sorting
 
+   * Bug fix: fixed sort=none
+
 v1.1 (2017-11-25):
 
    * New resource options: 
