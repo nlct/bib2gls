@@ -1023,6 +1023,7 @@ public class Bib2Gls implements TeXApp
       TeXObjectList list = value.expand(parser);
 
       String strVal = list.toString(parser);
+      String original = strVal;
 
       // Check for \ { } ~ and $ to determine whether or not to
       // interpret the value.
@@ -1080,6 +1081,12 @@ public class Bib2Gls implements TeXApp
          // remove empty elements
          strVal = strVal.replaceAll(",,+", ",");
          strVal = strVal.replaceAll("^,|,$", "");
+      }
+
+      if (verboseLevel > 0 && !original.equals(strVal))
+      {
+         logMessage(String.format("%s: %s -> %s",
+          isList? "labelify-list" : "labelify", original, strVal));
       }
 
       return strVal;
@@ -3869,8 +3876,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.1.20180220";
-   public static final String DATE = "2018-02-20";
+   public static final String VERSION = "1.1.20180221";
+   public static final String DATE = "2018-02-21";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

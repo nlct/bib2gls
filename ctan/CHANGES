@@ -16,6 +16,8 @@ v1.2 (pending):
 
    * Bug fix: replicate-fields now parsed correctly
 
+   * Bug fix: corrected hierarchical sorting
+
 v1.1 (2017-11-25):
 
    * New resource options: 
