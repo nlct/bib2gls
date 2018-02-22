@@ -2552,6 +2552,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{glossaries-extra-bib2gls,
+  name={\styfmt{glossaries\dhyphen extra\dhyphen bib2gls}},
+  category={package},
+  parent={packages}
+}
+
 @index{glossary-list,
   name={\styfmt{glossary\dhyphen list}},
   category={package},
@@ -5769,7 +5775,17 @@ defined},
   name={\csfmt{glshex}},
   user1={},
   description={expands to \cs{cs.string}\cs{u}},
-  note={provided by \styfmt{glossaries-extra} v1.21+},
+  note={provided by \styfmt{glossaries-extra} v1.21+ (moved to
+\styfmt{glossaries-extra-bib2gls} in v1.27)},
+  category={command}
+}
+
+@index{\glsxtrprovidecommand,
+  name={\csfmt{\glsxtrprovidecommand}},
+  user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
+  description={behaves like \cs{providecommand} in the document but
+   like \cs{renewcommand} in \bibgls},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
 

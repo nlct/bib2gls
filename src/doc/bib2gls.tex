@@ -2590,6 +2590,12 @@ For example:
   description={rectangular array of values, denoted $\mtx{M}$}
 }
 \end{verbatim}
+Alternatively you can use \ics{glsxtrprovidecommand} which behaves
+the same as \ics{providecommand} within the document but behaves
+like \ics{renewcommand} within \bibgls, which allows you to change
+\bibgls's internal definition of a command without affecting the
+definition within the document (if it's already been defined before
+the resource file is input).
 
 The \TeX\ parser library used by \bibgls\ will parse the contents of
 \atentry{preamble} before trying to interpret the field value used
@@ -4221,7 +4227,9 @@ way the entries are sorted and on the \csopt{dual-sort} setting.
 
 Make sure that you use \isty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
-up the required information from the \iext{aux} file. It also
+up the required information from the \iext{aux} file, and it also
+loads the supplementary \ics{glossaries-extra-bib2gls} package
+(from version 1.27 onwards). The option also
 switches on the \styopt[none]{sort} package option (if you have a new
 enough version of the base \isty{glossaries} package), which means
 that there's no attempt to assign or process the \field{sort} key if
@@ -9069,16 +9077,20 @@ and \csopt[\meta{boolean}]{secondary-trim-sort}.
 \optsection{sort-rule}
 
 If the \csopt[custom]{sort} option is used, the sort rule must be
-provided with \optfmt{sort-rule}. In this case the collation is
-performed using Java's
+provided with \optfmt{sort-rule}. If \csopt{sort} is not set to
+\optfmt{custom}, the \optfmt{sort-rule} setting will be ignored.
+This setting uses Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/RuleBasedCollator.html}{RuleBasedCollator}
-class~\cite{rulebasedcollator}. Remember that the options will be
-expanded as they are written to the \iext{aux} file, so be careful
-of any special characters that occur in the rule. For the special
-characters \idx{param} \idx{commentchar} \idx{sbchar} \idx{colsep}
-\idx{bgroupchar} and \idx{egroupchar} you can use \ics{cs.hash},
-\ics{cs.percent}, \ics{cs.underscore}, \ics{cs.amp}, \ics{cs.openbrace}
-and \ics{cs.closebrace}. These will be written to the \ext{aux} file
+class~\cite{rulebasedcollator}, and the rule syntax needs to conform
+to that format.
+
+Remember that the options will be expanded as they are written to
+the \iext{aux} file, so be careful of any special characters that
+occur in the rule. For the special characters \idx{param}
+\idx{commentchar} \idx{sbchar} \idx{colsep} \idx{bgroupchar} and
+\idx{egroupchar} you can use \ics{cs.hash}, \ics{cs.percent},
+\ics{cs.underscore}, \ics{cs.amp}, \ics{cs.openbrace} and
+\ics{cs.closebrace}. These will be written to the \ext{aux} file
 with the leading backslash, but \bibgls\ will remove it for this
 resource option. Remember that the \styfmt{glossaries} package
 provides \ics{glsbackslash} and \ics{glstildechar} which can be used
@@ -9102,7 +9114,9 @@ code) to represent a Unicode character. For example:
 \end{verbatim}
 It's best to use \ics{cs.string} rather than \ics{protect} to avoid
 unwanted spaces interfering with \meta{hex}. Note that
-\sty{glossaries-extra} v1.21+ provides \ics{glshex}
+\sty{glossaries-extra} v1.21+ provides\footnote{The command
+definition was moved to \isty{glossaries-extra-bib2gls} from version
+1.27 since it's only needed with \bibgls.}\ \ics{glshex}
 which just does \stringu\ so you can do
 \verb|\glshex 00E6| instead of \verb|\string\u00E6|.
 This is only one character different, but you can redefine
@@ -9113,8 +9127,83 @@ the protected write is performed. For example:
 \end{verbatim}
 Then you can just do \verb|\u00E6| instead of \verb|\string\u00E6|.
 
-If \csopt{sort} is not set to \optfmt{custom}, the
-\optfmt{sort-rule} setting will be ignored.
+The \isty{glossaries-extra-bib2gls} package (which is automatically loaded by
+the \styopt{record} option) provides some commands for common rule blocks 
+that may be used in the construction of custom rules. For example:
+\begin{verbatim}
+sort-rule={\glsxtrcontrolrules
+ ;\glsxtrspacerules
+ ;\glsxtrnonprintablerules
+ ;\glsxtrcombiningdiacriticrules
+ ,\glsxtrhyphenrules
+ <\glsxtrgeneralpuncrules
+ <\glsxtrdigitrules
+ <\glsxtrVulgarFractionrules
+ <\glsxtrMathItalicGreekIrules
+ <\glsxtrGeneralLatinIVrules
+ <\glsxtrLatinExtensionIIrules
+}
+\end{verbatim}
+This places the Greek maths symbols (such as \cs{alpha}) before the
+Latin block. See the \sty{glossaries-extra} documentation for
+further details of these commands.
+
+You might find it convenient to provide similar commands in a
+package for rules you may often need. For example, suppose I have a
+package called, say, \styfmt{mapsymbols} for providing map symbols:
+\begin{verbatim}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mapsymbols}
+% some package or font loading stuff here to provide
+% the appropriate symbols
+\newcommand{\Stadium}{...}
+\newcommand{\Battlefield}{...}
+\newcommand{\Harbour}{...}
+% etc
+
+% Provide a rule block:
+\newcommand{\MapSymbolOrder}{%
+ \glshex 2694 % crossed-swords 0x2694
+ < \glshex 2693 % anchor 0x2693
+ < \glshex 26BD % football 0x26BD
+}
+\end{verbatim}
+In addition to \filefmt{mapsymbols.sty}, I also need to create
+\filefmt{mapssymbols.bib} to provide the appropriate definitions for
+\bibgls:
+\begin{verbatim}
+@preamble{"\glsxtrprovidecommand{\Harbour}{\char"2693}
+\glsxtrprovidecommand{\Battlefield}{\char"2694}
+\glsxtrprovidecommand{\Stadium}{\char"26BD}"}
+\end{verbatim}
+The use of \ics{glsxtrprovidecommand} will override any previous
+definitions of these commands in \bibgls's interpreter but will act
+like \ics{providecommand} within the document, and so won't
+interfere with the commands defined in \filefmt{mapsymbols.sty}.
+Now I can just do
+\begin{verbatim}
+\usepackage{mapsymbols}% my custom package
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={mapsymbols,% <--- my custom mapsymbols.bib
+   entries% data in entries.bib
+  },
+  sort={custom},
+  sort-rule={\glsxtrcontrolrules % control codes
+ ;\glsxtrspacerules % space characters
+ ;\glsxtrnonprintablerules % non-printable characters
+ ;\glsxtrcombiningdiacriticrules % combining diacritics
+ ,\glsxtrhyphenrules % hyphens
+ <\glsxtrgeneralpuncrules % general punctuation
+ <\glsxtrdigitrules % 0, ..., 9
+ <\glsxtrVulgarFractionrules % fraction symbols
+ <\MapSymbolOrder % <--- custom map symbols
+ <\glsxtrMathItalicGreekIrules % math-greek symbols
+ <\glsxtrGeneralLatinIrules % Latin letters
+ }
+]
+\end{verbatim}
 
 \optsection{break-at}
 
@@ -13202,7 +13291,9 @@ by the \field{name} field (for example, with \csopt[name]{sort-field})
 the \TeX\ parser library recognises all the mathematical Greek letter commands 
 provided in the \LaTeX\ kernel. Additionally it recognises
 \ics{omicron} which isn't provided by \LaTeX\ (the symbol can be
-reproduced with a lower case Latin \qt{o}).
+reproduced with a lower case Latin \qt{o}). Note that
+\isty{glossaries-extra-bib2gls} (\sty{glossaries-extra} v1.27+)
+provides all the missing Greek letters (such as \cs{omicron}).
 
 The \ext{bib} file could just use \code{o}:
 \begin{verbatim}
@@ -13230,7 +13321,9 @@ but \LaTeX\ needs a definition for this, so it's provided in the
 \begin{verbatim}
 @preamble{"\providecommand{\omicron}{o}"}
 \end{verbatim}
-The \TeX\ parser library similarly provides the missing upper case
+(With \sty{glossaries-extra} v1.27+, this is no longer needed.)
+The \TeX\ parser library and \sty{glossaries-extra-bib2gls} 
+similarly provide the missing upper case
 Greek letters, and these can be dealt with in the same way.
 
 The contents of \filefmt{mathgreek.bib} are as follows:
