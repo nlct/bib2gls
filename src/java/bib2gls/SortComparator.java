@@ -666,21 +666,30 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       int n2 = entry2.getHierarchyCount();
 
       int n = Integer.min(n1, n2);
-      int result = 0;
 
       for (int i = 0; i < n; i++)
       {
          Bib2GlsEntry e1 = entry1.getHierarchyElement(i);
          Bib2GlsEntry e2 = entry2.getHierarchyElement(i);
 
-         result = compareElements(e1, e2);
+         if (e1.equals(e2))
+         {
+            continue;
+         }
+
+         int result = compareElements(e1, e2);
+
+         if (result == 0)
+         {
+            result = getIdenticalSortFallback(e1, e2);
+         }
 
          if (reverse)
          {
             result = -result;
          }
 
-         if (bib2gls.getDebugLevel() > 1)
+         if (bib2gls.getDebugLevel() > 0)
          {
             bib2gls.logAndPrintMessage(String.format("%s %c %s",
               e1.getFieldValue(sortStorageField),
@@ -692,13 +701,6 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          {
             return result;
          }
-      }
-
-      if (result == 0)
-      {
-         result = getIdenticalSortFallback(entry1, entry2);
-
-         if (result != 0) return result;
       }
 
       // hierarchy needs preserving

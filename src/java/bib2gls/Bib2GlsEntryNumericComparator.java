@@ -230,15 +230,7 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
       Number val1 = entry1.getNumericSort();
       Number val2 = entry2.getNumericSort();
 
-      int result = compare(val1, val2);
-
-      if (bib2gls.getDebugLevel() > 0)
-      {
-         bib2gls.logMessage(String.format("[%s] %s <=> [%s] %s = %d", 
-           entry1.getId(), val1, entry2.getId(), val2, result));
-      }
-
-      return result;
+      return compare(val1, val2);
    }
 
    private String sort, sortMethod;

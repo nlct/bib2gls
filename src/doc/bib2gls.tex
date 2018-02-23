@@ -2595,7 +2595,8 @@ the same as \ics{providecommand} within the document but behaves
 like \ics{renewcommand} within \bibgls, which allows you to change
 \bibgls's internal definition of a command without affecting the
 definition within the document (if it's already been defined before
-the resource file is input).
+the resource file is input). In general, it's best to just use
+\cs{providecommand}.
 
 The \TeX\ parser library used by \bibgls\ will parse the contents of
 \atentry{preamble} before trying to interpret the field value used

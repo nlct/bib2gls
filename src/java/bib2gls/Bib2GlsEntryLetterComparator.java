@@ -315,15 +315,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
       String val1 = entry1.getFieldValue(sortStorageField);
       String val2 = entry2.getFieldValue(sortStorageField);
 
-      int result = compare(val1, val2);
-
-      if (bib2gls.getDebugLevel() > 0)
-      {
-         bib2gls.logMessage(String.format("[%s] %s <=> [%s] %s = %d", 
-           entry1.getId(), val1, entry2.getId(), val2, result));
-      }
-
-      return result;
+      return compare(val1, val2);
    }
 
 

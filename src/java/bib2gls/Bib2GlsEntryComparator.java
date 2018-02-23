@@ -423,17 +423,8 @@ public class Bib2GlsEntryComparator extends SortComparator
    {
       CollationKey key1 = entry1.getCollationKey();
       CollationKey key2 = entry2.getCollationKey();
-      int result = key1.compareTo(key2);
 
-      if (bib2gls.getDebugLevel() > 0)
-      {
-         bib2gls.logMessage(String.format("[%s] %s <=> [%s] %s = %d", 
-           entry1.getId(), key1.getSourceString(),
-           entry2.getId(), key2.getSourceString(),
-           result));
-      }
-
-      return result;
+      return key1.compareTo(key2);
    }
 
    public Collator getCollator()
