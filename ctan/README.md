@@ -155,7 +155,7 @@ below. The source is also available on GitHub, but that may be for
 a newer experimental version.
 
   - https://github.com/nlct/bib2gls
-  - https://github.com/nlct/texparserlib
+  - https://github.com/nlct/texparser
 
 
 ## User Manual (bib2gls.pdf)
