@@ -84,13 +84,27 @@ Interpret tilde character as a normal space.
 
 Interpret tilde as a non-breaking space (default).
 
-=item B<--force-cross-resource-refs> or B<-xr>
+=item B<--force-cross-resource-refs> or B<-x>
 
 Force cross-resource referencing mode on.
 
 =item B<--no-force-cross-resource-refs>
 
 Don't force cross-resource referencing mode on (default).
+
+=item B<--support-unicode-script>
+
+Text superscript (\textsuperscript) or subscripts (\textsubscript)
+will use Unicode superscript/subscript characters if available.
+For example, \textsuperscript{2} will be converted to U+00B2
+(superscript two).
+
+=item B<--no-support-unicode-script>
+
+Text superscript (\textsuperscript) or subscripts (\textsubscript)
+won't be converted to Unicode superscript/subscript characters.
+For example, \textsuperscript{2} will be converted to <sup>2</sup>
+and the markup will be stripped leaving just the character 2.
 
 =item B<--packages> I<list> (or B<-p> I<list>)
 
@@ -193,7 +207,7 @@ Write B<\glsnoexpandfields> to the B<.glstex> file (default).
 
 =head1 REQUIRES
 
-Java 7 and a TeX distribution.
+Java 7 or later and a TeX distribution.
 
 =head1 LICENSE
 

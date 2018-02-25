@@ -15,11 +15,10 @@ See the manual for further details.</entry>
 <entry key="syntax.options">Options:</entry>
 <entry key="syntax.version">{0} (or {1})	Display version and exit.</entry>
 <entry key="syntax.help">{0} (or {1})		Display this help message and exit.</entry>
-<entry key="syntax.debug">{0} [&lt;n&gt;]		Switch on debug mode (optionally with the 
-					given level).</entry>
+<entry key="syntax.debug">{0} [&lt;n&gt;]		Switch on debug mode (optionally with the given level).</entry>
 <entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)</entry>
 <entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)
-					Synonym: {1}</entry>
+			Synonym: {1}</entry>
 <entry key="syntax.verbose">{0}		Switch on verbose mode.</entry>
 <entry key="syntax.noverbose">{0}		Switch off verbose mode. (Default.)
 			Some messages are displayed.
@@ -38,8 +37,20 @@ See the manual for further details.</entry>
 <entry key="syntax.break.space">{0}		Interpret tilde character as normal space.</entry>
 <entry key="syntax.no.break.space">{0}	Interpret tilde character as a non-breaking space 
 			(default).</entry>
-<entry key="syntax.force.cross.resource.refs">{0} (or {1})		Force cross-resource referencing mode on.</entry>
-<entry key="syntax.force.no.cross.resource.refs">{0}		Don''t force cross-resource referencing mode on (default).</entry>
+<entry key="syntax.force.cross.resource.refs">{0} (or {1})
+			Force cross-resource referencing mode on.</entry>
+<entry key="syntax.no.force.cross.resource.refs">{0}
+			Don''t force cross-resource referencing mode on 
+			(default).</entry>
+
+<entry key="syntax.support.unicode.script">{0}
+			Text superscripts or subscripts will use Unicode 
+			superscript or subscript characters if possible
+			(default).</entry>
+<entry key="syntax.no.support.unicode.script">{0}
+			Text superscripts or subscripts won''t use Unicode
+			superscript or subscript characters.</entry>
+
 
 <entry key="syntax.mfirstuc">{0} &lt;fields&gt;|"all" (or {1} &lt;fields&gt;|"all")
 			Insert an empty group if fields start 
@@ -106,7 +117,8 @@ See the manual for further details.</entry>
 <entry key="syntax.trim.fields">{0}
 			Trim leading and trailing spaces from fields.</entry>
 <entry key="syntax.no.trim.fields">{0}
-			Don''t trim leading and trailing spaces from fields (default).</entry>
+			Don''t trim leading and trailing spaces from fields 
+			(default).</entry>
 <entry key="syntax.expand.fields">{0}
 			Don''t write \glsnoexpandfields to the .glstex file.</entry>
 <entry key="syntax.no.expand.fields">{0}

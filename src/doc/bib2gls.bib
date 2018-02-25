@@ -22,6 +22,11 @@
  long = {{}\TeX\ Users Group}
 }
 
+@abbreviation{CLDR,
+ short = {CLDR},
+ long = {Unicode Common Locale Data Repository}
+}
+
 @abbreviation{SIunit,
  short = {SI unit},
  long = {International System of Units},
@@ -496,6 +501,30 @@ given label},
   name={\csfmt{bib\-gls\-empty\-group\-title}},
   user1={\margm{type}},
   description={expands to the empty group title},
+  category={command}
+}
+
+@dualindexentry{bibglssetunicodegrouptitle,
+  name={\csfmt{bib\-gls\-set\-unicode\-group\-title}},
+  user1={\marg{\margm{label}\margm{character}\margm{id}\margm{type}}},
+  description={sets the Unicode script, category or character code
+title},
+  category={command}
+}
+
+@dualindexentry{bibglsunicodegroup,
+  name={\csfmt{bib\-gls\-unicode\-group}},
+  user1={\margm{label}\margm{character}\margm{id}\margm{type}},
+  description={expands to the Unicode script or category label or
+character code},
+  category={command}
+}
+
+@dualindexentry{bibglsunicodegrouptitle,
+  name={\csfmt{bib\-gls\-unicode\-group\-title}},
+  user1={\margm{label}\margm{character}\margm{id}\margm{type}},
+  description={expands to the Unicode script or category label or
+character code},
   category={command}
 }
 
@@ -1301,6 +1330,27 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.group,
    name={\csoptfmt{group}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.group-formation,
+   name={\csoptfmt{group\dhyphen formation}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.secondary-group-formation,
+   name={\csoptfmt{secondary\dhyphen group\dhyphen formation}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-group-formation,
+   name={\csoptfmt{dual\dhyphen group\dhyphen formation}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -2164,10 +2214,19 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{alpha,
+  name={\csfmt{alpha}},
+  user1={},
+  description={Greek letter alpha $\alpha$},
+  note={kernel command (maths mode only)},
+  category={command}
+}
+
 @index{omicron,
   name={\csfmt{omicron}},
   user1={},
-  description={custom command},
+  description={Greek letter omicron $\omicron$},
+  note={provided by \styfmt{glossaries-extra-bib2gls}},
   category={command}
 }
 
@@ -2614,6 +2673,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{fontspec,
   name={\styfmt{fontspec}},
+  category={package},
+  parent={packages}
+}
+
+@index{amsmath,
+  name={\styfmt{amsmath}},
   category={package},
   parent={packages}
 }
@@ -4232,7 +4297,7 @@ field.},
 
 @dualindexentry{switch.force-cross-resource-refs,
   name={\longargfmt{force\dhyphen cross\dhyphen resource\dhyphen refs}},
-  symbol={\shortargfmt{xr}},
+  symbol={\shortargfmt{x}},
   user1={},
   category={switch},
   parent={commandlineoptions}
@@ -4240,6 +4305,20 @@ field.},
 
 @dualindexentry{switch.no-force-cross-resource-refs,
   name={\longargfmt{no\dhyphen force\dhyphen cross\dhyphen resource\dhyphen refs}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.support-unicode-script,
+  name={\longargfmt{support\dhyphen unicode\dhyphen script}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-support-unicode-script,
+  name={\longargfmt{no\dhyphen support\dhyphen unicode\dhyphen script}},
   user1={},
   category={switch},
   parent={commandlineoptions}
@@ -4427,6 +4506,10 @@ field.},
 
 @index{customgroup,
   name={custom group}
+}
+
+@index{localeprovider,
+  name={locale provider}
 }
 
 @index{ignoredglossary,

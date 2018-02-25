@@ -4,27 +4,46 @@
 \documentclass{article}
 
 \usepackage{fontspec}
+\usepackage{upgreek}
 \usepackage{amsmath}
 \usepackage{testidx}
 \usepackage[record,nostyles,stylemods={bookindex},style=bookindex]{glossaries-extra}
 
 \setmainfont{FreeSerif}
 
-\renewcommand{\glstreenamefmt}[1]{#1}
+\renewcommand{\glstreenamefmt}[1]{#1 (\glscurrententrylabel)}
+\renewcommand{\glstreegroupheaderfmt}[1]{#1}
 
 \newcommand{\mtx}[1]{\pmb{#1}}
+
+\newcommand{\bibglsunicodegrouptitle}{\bibglsunicodegroup}
+%\newcommand{\bibglsunicodegrouptitle}[4]{%
+%  \ifnum"#3>64 
+%   \ifnum"#3 < 91 
+%     A--Z%
+%   \else 
+%     \ifnum"#3 > 96
+%       \ifnum"#3 < 123
+%         A--Z%
+%       \fi
+%     \fi
+%   \fi
+%  \fi
+%}
 
 \GlsXtrLoadResources[
  src={testidx-glossaries-samples-utf8,
   testidx-glossaries-samples,
-  anglo-saxon,greek,
+  anglo-saxon,greek,upgreek,
   testidx-glossaries-numbers}, 
  ignore-fields={description},
  symbol-sort-fallback=name,
  %group-formation={unicode category and script},
- %group-formation={codepoint},
- group-formation={unicode category},
+ group-formation={codepoint},
+ %group-formation={unicode category},
+ %group-formation={unicode script},
  %sort={en-GB},
+ %sort={sv},
  sort={custom},
  sort-rule={% requires glossaries-extra v1.27
   \glsxtrcontrolrules;
@@ -32,14 +51,19 @@
   ;\glsxtrcombiningdiacriticrules,\glsxtrhyphenrules
   <\glsxtrgeneralpuncrules
   <\glsxtrdigitrules
+  <\glsxtrfractionrules
   %<\glsxtrGeneralLatinVIIIrules
   <\glsxtrGeneralLatinVIIrules
+  %<\glsxtrGeneralLatinIrules
+  %<\glsxtrLatinAA
   <\glsxtrLatinLslash
   <\glsxtrLatinOslash
+  %<\glsxtrMathUpGreekIrules
   %<\glsxtrMathItalicGreekIrules
-  <\glsxtrUpDigamma
-  <\glsxtrMathItalicUpperGreekIIrules
-  <\glsxtrMathItalicLowerGreekIIrules
+  <\glsxtrMathGreekIrules
+  %<\glsxtrUpDigamma
+  %<\glsxtrMathItalicUpperGreekIrules
+  %<\glsxtrMathItalicLowerGreekIrules
  },
  selection=all
 ]

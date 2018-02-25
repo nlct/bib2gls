@@ -48,6 +48,8 @@
 
 \glsxtrprovidestoragekey{note}{}{}
 
+\providecommand{\omicron}{o}
+
 % put break before dash to avoid confusion with a hyphen
 \newcommand{\dhyphen}{%
  \texorpdfstring
@@ -343,6 +345,8 @@
 
 \newcommand*{\ics}[2][]{\glsadd[#1]{idx.#2}\cs{#2}}
 
+\newcommand*{\icswithargs}[2][]{\glsadd[#1]{idx.#2}\cs{#2}\glsentryuseri{#2}}
+
 \newcommand*{\encap}[2][]{\glsadd[#1]{idx.#2}%
  {%
    \let\csfmt\code
@@ -605,21 +609,23 @@
 }
 
 \newlength\imagewidth
+\newcount\tmpctr
+
 \newcommand*{\pdftwocol}[3][1]{%
   \renewcommand{\tabcolsep}{2pt}%
   \setlength{\imagewidth}{\dimexpr.5\linewidth-2\tabcolsep}%
   \def\tabcontents{\begin{tabular}{@{}cc@{}}}%
-  \count0=\numexpr#1-1\relax
+  \tmpctr\numexpr#1-1\relax
   \loop
-  \advance\count0 by 1\relax
+  \advance\tmpctr by 1\relax
   \eappto\tabcontents{\noexpand\frame{%
-   \noexpand\includegraphics[page=\the\count0,width=\noexpand\imagewidth]{#2}}}%
-  \ifodd\count0
+   \noexpand\includegraphics[page=\the\tmpctr,width=\noexpand\imagewidth]{#2}}}%
+  \ifodd\tmpctr
     \appto\tabcontents{&}%
   \else
     \appto\tabcontents{\\}%
   \fi
-  \ifnum\count0<#3
+  \ifnum\tmpctr<#3
   \repeat
   \appto\tabcontents{\end{tabular}}%
   \tabcontents
@@ -1302,8 +1308,10 @@ The other cases that the interpreter is used for are:
 \item when \csopt{set-widest} is used to determine the width of
 the \field{name} field;
 \item if \csopt{labelify} or \csopt{labelify-list} are set the
-identified field values are first interpreted before being converted to labels;
-\item if \csopt[true]{interpret-label-fields} and the
+identified field values are first interpreted (if they contain
+\idx{escchar} \idx{bgroupchar} \idx{egroupchar} 
+\idx{nbspchar} or \idx{mshiftchar}) before being converted to labels;
+\item if \csopt[true]{interpret-label-fields} is set and the
 \field{parent}, \field{category}, \field{type}, \field{group},
 \field{seealso} or \field{alias} fields contain \idx{escchar}
 or \idx{bgroupchar} or \idx{egroupchar} the interpreter is used 
@@ -1314,11 +1322,12 @@ characters allowed in a label).
 
 The \longarg{no-interpret} switch will turn off the interpreter, but
 the library will still be used to parse the \ext{aux} and \ext{bib}
-files. Note that the \field{see} field doesn't use the interpreter as
+files. Note that the \field{see} field doesn't use the interpreter
+with \csopt[true]{interpret-label-fields} as
 it may legitimately contain \LaTeX\ code in the optional tag part
 (such as \cs{seealsoname}).
 
-The parser has a different concept of expansion to \LaTeX\
+The parser has a different concept of expansion to \TeX\
 and will expand some things that aren't expanded by \LaTeX\
 (such as \ics{MakeUppercase} and \ics{char}) and won't expand other commands
 that would be expanded by \LaTeX\ (such as commands defined
@@ -1641,7 +1650,7 @@ letter group.
 
 If you are using Java~8, you can set the
 \code{java.locale.providers} property~\cite{javacldr} to use
-the Common Locale Data Repository, which has more extensive
+the \idx{CLDR} \idx{localeprovider}, which has more extensive
 support for locales than the native \idx{JRE}. For example:
 \begin{verbatim}
 java.locale.providers=CLDR,JRE
@@ -1814,6 +1823,50 @@ Force \idx{crossresourceref} mode on (see
 Don't force \idx{crossresourceref} mode on (default). 
 The mode will be enabled if applicable (see
 \sectionref{sec:resourcesets}).
+
+\argsection{support-unicode-script}
+
+Text superscript (\cs{textsuperscript}) and subscript
+(\cs{textsubscript}) will use Unicode super/subscript characters
+if available (default). For example,
+\begin{verbatim}
+\textsuperscript{(2)}
+\end{verbatim}
+will be converted to \hex{207D} (superscript left parenthesis)
+\hex{00B2} (superscript two) \hex{207E} (superscript right
+parenthesis). If the entire contents of the argument can't be
+represented by Unicode characters, the interpreter uses \verb|<sup>|
+and \verb|<sub>| markup, which is then stripped by \bibgls. For
+example,
+\begin{verbatim}
+\textsuperscript{(2,3)}
+\end{verbatim}
+will be converted to
+\begin{verbatim}
+<sup>(2,3)</sup>
+\end{verbatim}
+(since there's no superscript comma). The markup is stripped leaving
+just \code{(2,3)}.
+
+Superscripts and subscripts in maths mode always use markup
+regardless of this setting. Some supported packages that use
+\idx{spchar} or \idx{sbchar} as shortcuts within an encapsulating
+command may internally use the same code as \cs{textsuperscript} and
+\cs{textsubscript}, in which case they will be sensitive to this
+setting.
+
+\argsection{no-support-unicode-script}
+
+Text superscript (\cs{textsuperscript}) and subscript
+(\cs{textsubscript}) won't use Unicode super/subscript characters.
+Note that if other commands are provided that expand to Unicode
+superscript or subscript characters, then they won't be affected by
+this setting. For example, if \csfmt{superiortwo} is defined as
+\begin{verbatim}
+\providecommand{\superiortwo}{\char"B2}
+\end{verbatim}
+then it will be interpreted as \hex{00B2} (superscript two) even if
+this setting is on.
 
 \argsection{packages}
 
@@ -2081,7 +2134,7 @@ option. You will need to use \ics{glsxtrsetgrouptitle} to provide an
 associated title if the \meta{label} isn't the same as the title.
 Remember that the label can't contain any active characters, so you
 can't use non-ASCII characters in \meta{label} with \sty{inputenc}
-(but you can with \sty{fontspec}).
+(but you can use non-ASCII alphanumerics with \sty{fontspec}).
 
 \end{description}
 
@@ -6975,8 +7028,8 @@ the field is defined (so \ics{GlsXtrIfFieldUndef} does the
 This option may only be used with the \longarg{group} switch.
 This will set the \field{group} field to \meta{value} unless
 \meta{value} is \optfmt{auto}, in which case the value is
-set automatically during the sorting. 
-For example:
+set automatically during the sorting (see also
+\csopt{group-formation}).  For example:
 \begin{verbatim}
 \GlsXtrLoadResources[sort=integer,group={Constants},
  src={entries-constants}% data in entries-constants.bib
@@ -8884,6 +8937,9 @@ to be the default for that locale but you can change this with
 own custom pattern you must make sure that it matches the selected
 \optfmt{sort} option.
 
+Take care if you switch from using the \idx{JRE} to the \idx{CLDR}
+ \idx{localeprovider} as you may find the default pattern changes.
+
 The locale and pattern information is used by \bibgls\ to parse the
 field.  If the field value can't be parsed then \bibgls\ will issue
 a warning and assume the current date (or time).
@@ -9139,13 +9195,14 @@ sort-rule={\glsxtrcontrolrules
  ,\glsxtrhyphenrules
  <\glsxtrgeneralpuncrules
  <\glsxtrdigitrules
- <\glsxtrVulgarFractionrules
+ <\glsxtrfractionrules
  <\glsxtrMathItalicGreekIrules
  <\glsxtrGeneralLatinIVrules
- <\glsxtrLatinExtensionIIrules
+ <\glsxtrLatinAA
+ <\glsxtrLatinOslash
 }
 \end{verbatim}
-This places the Greek maths symbols (such as \cs{alpha}) before the
+This places the Greek maths symbols (such as \ics{alpha}) before the
 Latin block. See the \sty{glossaries-extra} documentation for
 further details of these commands.
 
@@ -9198,7 +9255,7 @@ Now I can just do
  ,\glsxtrhyphenrules % hyphens
  <\glsxtrgeneralpuncrules % general punctuation
  <\glsxtrdigitrules % 0, ..., 9
- <\glsxtrVulgarFractionrules % fraction symbols
+ <\glsxtrfractionrules % fraction symbols
  <\MapSymbolOrder % <--- custom map symbols
  <\glsxtrMathItalicGreekIrules % math-greek symbols
  <\glsxtrGeneralLatinIrules % Latin letters
@@ -10042,6 +10099,46 @@ the year and era:
 \end{verbatim}
 (The use of \csfmt{number} strips the leading zero from the year.)
 
+\optsection{group-formation}
+
+If the \field{group} field hasn't been set in
+the \ext{bib} file or through options like \csopt{group}, then it is 
+assigned according to this option's setting during sorting. Permitted values:
+\begin{itemize}
+\item\optfmt{default}: the group is assigned according to 
+the sort method's default group formation. This is the default
+setting.
+
+\item\optfmt{codepoint}: the group is set to
+\icswithargs{bibglsunicodegroup}, where the first argument is the 
+first significant character (converted to lower case and decomposed,
+if applicable) of the sort value.
+
+\item\optfmt{unicode category}: the group is set to
+\icswithargs{bibglsunicodegroup}, where the first argument is the
+label identifying the Unicode category of the first significant
+character of the sort value. For example, the label \code{Ll}
+signifies a lower case letter and \code{Lu} signifies an upper case
+letter.
+
+\item\optfmt{unicode script}: the group is set to
+\icswithargs{bibglsunicodegroup}, where the first argument is the
+label identifying the Unicode script of the first significant
+character of the sort value. For example, the label \code{LATIN}
+indicates Latin, \code{GREEK} indicates Greek and \code{COMMON}
+indicates common characters (such as mathematical Greek characters
+that are often used with non-Greek scripts).
+
+\item\optfmt{unicode category and script}: the group is set to
+\icswithargs{bibglsunicodegroup}, where the first argument is the
+label corresponding to the Unicode category and script of the first
+significant character of the sort value. For example, the label
+\code{Ll.LATIN} indicates a lower case Latin letter.
+\end{itemize}
+This option has no effect with \longarg{no-group} or if no sorting
+is applied. Use \csopt{secondary-group-formation} for secondary
+sorting and \csopt{dual-group-formation} for dual entries.
+
 \section{Secondary Glossary}
 \label{sec:secondaryopts}
 
@@ -10272,6 +10369,10 @@ As \csopt{date-sort-locale} but for secondary date-time sorting.
 \optsection{secondary-date-sort-format}
 
 As \csopt{date-sort-format} but for secondary date-time sorting.
+
+\optsection{secondary-group-formation}
+
+As \csopt{group-formation} but for secondary sorting.
 
 \section{Dual Entries}
 \label{sec:dualopts}
@@ -10693,6 +10794,11 @@ use a date/time sort.
 
 As \csopt{date-sort-format} but for dual entries that
 use a date/time sort.
+
+\optsection[\subsubsection]{dual-group-formation}
+
+As \csopt{group-formation} but for dual sorting.
+
 
 \subsection{Dual Mappings}
 \label{sec:dualoptsmap}
@@ -11826,6 +11932,13 @@ defines the entries. The actual group heading is inserted by
 the entry has a \field{group} field and comparing it to the previous
 entry's \field{group} field. 
 
+The default behaviour of the group formation implemented by the sort
+methods may be changed with \csopt{group-formation}. With any
+setting other than \csopt[default]{group-formation}, the group label
+is set to \cs{bibglsunicodegroup} and the title is set to
+\cs{bibglsunicodegrouptitle} (see below) otherwise the label and
+title are determined by the sort method.
+
 The collators used by the locale and letter-based rules save the
 following information for each entry based on the first significant letter of
 the \field{sort} field (if the letter is recognised as alphabetical,
@@ -12153,6 +12266,98 @@ This command is used for \idx{timegroup} labels with \optfmt{time} (no date) sor
 
 This command is used for \idx{timegroup} titles with \optfmt{time} (no date) sorting
 (\tableref{tab:sortoptionsdatetime}).
+
+\cssection{bibglssetunicodegrouptitle}
+
+\formatdef{bibglssetunicodegrouptitle}
+This command is used to assign the group titles when the group
+formation is set to any value other than the default. For example,
+this command will be used with \csopt[codepoint]{group-formation}.
+The label is obtained from \cs{bibglsunicodegroup} and the title is
+obtained from \cs{bibglsunicodegrouptitle}.
+
+\cssection{bibglsunicodegroup}
+
+\formatdef{bibglsunicodegroup}
+The \meta{label} depends on the \csopt{group-formation} setting:
+\begin{itemize}
+\item\csopt[codepoint]{group-formation}: the \meta{label} is the
+Unicode value of \meta{character} (converted to lower case and
+decomposed, if applicable);
+\item\csopt[unicode category]{group-formation}: the \meta{label} is the
+Unicode category of \meta{character} (for example, \code{Lu} means
+an upper case letter);
+\item\csopt[unicode script]{group-formation}: the \meta{label} is the
+Unicode script associated with \meta{character} (for example,
+\code{LATIN});
+\item\csopt[unicode category and script]{group-formation}: the \meta{label}
+identifies both the Unicode category and script associated with 
+\meta{character} (for example, \code{Lu.LATIN}).
+\end{itemize}
+(Similarly for \csopt{secondary-group-formation} and
+\csopt{dual-group-formation}.) By default this command expands to
+\meta{type}\meta{label}.
+
+The \meta{character} is the first significant character of the sort
+value. The \meta{id} is the hexadecimal code of (possibly decomposed) 
+\meta{character}. 
+
+For example, with \csopt[codepoint]{group-formation}, an unset
+\field{type} and a sort value of \qt{\AA ngstr\"om} with \qt{\AA} as a
+significant character distinct from \qt{A} then the \field{group} 
+field will be assigned using:
+\begin{verbatim}
+group={\bibglsunicodegroup{å}{Å}{C5}{}}
+\end{verbatim}
+whereas with \csopt[unicode category and script]{group-formation} it will be:
+\begin{verbatim}
+group={\bibglsunicodegroup{Lu.LATIN}{Å}{C5}{}}
+\end{verbatim}
+(upper case Latin letter). 
+
+If instead \qt{\AA} is considered equivalent to \qt{A} according to the 
+collator, then with \csopt[codepoint]{group-formation}, the value will be:
+\begin{verbatim}
+group={\bibglsunicodegroup{a}{Å}{61}{}}
+\end{verbatim}
+Note that the \meta{id} is now \hex{61} (the decomposed \qt{A}) not
+\hex{C5}.
+
+\cssection{bibglsunicodegrouptitle}
+
+\formatdef{bibglsunicodegrouptitle}
+The title for Unicode group formations by default simply expands to
+\code{\cs{unexpanded}\margm{label}} so you will need to change it to
+something more appropriate. For example (before the \idx{resourceset}):
+\begin{verbatim}
+\newcommand{\bibglsunicodegrouptitle}[4]{%
+  \ifnum"#3>64 
+   \ifnum"#3 < 91 
+     A--Z%
+   \else 
+     \ifnum"#3 > 96
+       \ifnum"#3 < 123
+         A--Z%
+       \fi
+     \fi
+   \fi
+  \fi
+}
+\end{verbatim}
+This will make the title \qt{A--Z} if \meta{id} is greater
+than 64 and less than 91 or greater than 96 and less than 123 
+(and will be empty otherwise).
+
+Note that this setting can create an odd effect if the sorting
+causes the groups to be split up. For example, if some of the sort values
+start with extended or non-Latin characters this can break up the
+groups. First check how the group labels are assigned using:
+\begin{verbatim}
+\newcommand{\bibglsunicodegrouptitle}{\bibglsunicodegroup}
+\end{verbatim}
+then adjust the definition of \cs{bibglsunicodegroup} until the
+grouping is correct, and then change the definition of 
+\cs{bibglsunicodegrouptitle} so that the title is correct.
 
 \cssection{bibglshypergroup}
 
@@ -13094,14 +13299,18 @@ type. There are some non-standard fields: \fieldfmt{born},
 unless keys are provided (using \cs{glsaddkey} or
 \cs{glsaddstoragekey}) or the fields are aliased (using
 \csopt{field-aliases}). The \fieldfmt{born} and \fieldfmt{died}
-fields have dates that are \emph{almost} in the default \code{en-GB} locale
-format, but they include a tilde \verb|~| to prevent awkward line
-breaks. By default \bibgls's interpreter converts \verb|~| to the non-breaking
-space character \hex{A0} which isn't recognised by the date format.
-This can easily be fixed with the \longarg{break-space} switch which
-will interpret \verb|~| as a normal breakable space (\hex{20}), so 
-with that switch \csopt[date]{sort} or \csopt[date-reverse]{sort}
-can be used on either of those fields.
+fields have dates that are \emph{almost} in the default \code{en-GB}
+locale format with the \idx{JRE} \idx{localeprovider}, but they include a
+tilde \verb|~| to prevent awkward line breaks. By default \bibgls's
+interpreter converts \verb|~| to the non-breaking space character
+\hex{A0} which isn't recognised by the date format.  This can easily
+be fixed with the \longarg{break-space} switch which will interpret
+\verb|~| as a normal breakable space (\hex{20}), so with that switch
+\csopt[date]{sort} or \csopt[date-reverse]{sort} can be used on
+either of those fields. However, the \idx{CLDR} has a slightly
+different default format than the \idx{JRE} for dates with
+\code{en-GB}, so it's probably simplest to actually specify the
+required format.
 
 An alternative approach would be to provide a command that can be
 modified in the document to adjust the date style. For example, the
@@ -14778,8 +14987,18 @@ option:
 \csopt[date:user1:bybirth]{secondary}
 \end{codeenv}
 This sorts according to the \field{user1} field (which was
-originally the \fieldfmt{birth} field). I've changed the 
-date group headings by redefining \gls{bibglsdategroup} and
+originally the \fieldfmt{birth} field).
+Note that different locales have different default date formats.
+There may also be a difference in the default date format depending
+on the Java \idx{localeprovider}. For example, if you switch from
+using the \idx{JRE} to using the \idx{CLDR} you may find a change in
+the default format. In case the format provided in the \ext{bib}
+file isn't recognised, the required format can be set with:
+\begin{codeenv}
+  \csopt[d MMM YYYY G]{secondary-date-sort-format}
+\end{codeenv}
+
+I've changed the date group headings by redefining \gls{bibglsdategroup} and
 \gls{bibglsdategrouptitle}, which means that the grouping in the
 \code{bybirth} glossary will be in the form \meta{year} \meta{era}:
 \begin{verbatim}

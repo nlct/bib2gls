@@ -170,6 +170,11 @@ public class UnicodeGroupTitle extends GroupTitle
          title = actual;
       }
 
+      if (!script && !category)
+      {
+         title = title.toLowerCase();
+      }
+
       return new UnicodeGroupTitle(title, actual, id, type);
    }
 

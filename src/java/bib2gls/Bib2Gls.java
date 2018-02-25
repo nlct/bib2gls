@@ -643,6 +643,15 @@ public class Bib2Gls implements TeXApp
 
       BufferedReader in = null;
 
+      for (String sty : packages)
+      {
+         if (sty.equals("fontspec"))
+         {
+            fontspec = true;
+            break;
+         }
+      }
+
       try
       {
          checkReadAccess(logFile);
@@ -787,6 +796,7 @@ public class Bib2Gls implements TeXApp
 
       listener.setUseMathJax(false);
       listener.setIsInDocEnv(true);
+      listener.setSupportUnicodeScript(supportUnicodeSubSuperScripts);
 
       interpreter = new TeXParser(listener);
 
@@ -2987,8 +2997,16 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.break.space", "--break-space"));
       System.out.println(getMessage("syntax.no.break.space", "--no-break-space"));
       System.out.println();
-      System.out.println(getMessage("syntax.force.cross.resource.refs", "--force-cross-resource-refs", "-xr"));
-      System.out.println(getMessage("syntax.no.force.cross.resource.refs", "--no-force-cross-resource-refs"));
+      System.out.println(getMessage("syntax.force.cross.resource.refs",
+         "--force-cross-resource-refs", "-x"));
+      System.out.println(getMessage("syntax.no.force.cross.resource.refs",
+         "--no-force-cross-resource-refs"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.support.unicode.script",
+        "--support-unicode-script"));
+      System.out.println(getMessage("syntax.no.support.unicode.script",
+        "--no-support-unicode-script"));
       System.out.println();
       System.out.println(getMessage("syntax.packages", "--packages", "-p"));
       System.out.println();
@@ -3473,13 +3491,21 @@ public class Bib2Gls implements TeXApp
             useNonBreakSpace = true;
          }
          else if (args[i].equals("--force-cross-resource-refs") 
-                   || args[i].equals("-xr"))
+                   || args[i].equals("-x"))
          {
             forceCrossResourceRefs = true;
          }
          else if (args[i].equals("--no-force-cross-resource-refs"))
          {
             forceCrossResourceRefs = false;
+         }
+         else if (args[i].equals("--support-unicode-script"))
+         {
+            supportUnicodeSubSuperScripts = true;
+         }
+         else if (args[i].equals("--no-support-unicode-script"))
+         {
+            supportUnicodeSubSuperScripts = false;
          }
          else if (args[i].equals("--no-mfirstuc-protection"))
          {
@@ -3879,8 +3905,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.1.20180222";
-   public static final String DATE = "2018-02-22";
+   public static final String VERSION = "1.2";
+   public static final String DATE = "2018-02-25";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -3950,6 +3976,10 @@ public class Bib2Gls implements TeXApp
    private boolean useNonBreakSpace = true;
 
    private boolean forceCrossResourceRefs = false;
+
+   // \textsuperscript and \textsubscript will use Unicode
+   // super/subscript characters if possible if true:
+   private boolean supportUnicodeSubSuperScripts=true;
 
    private Vector<String> dependencies = null;
 
