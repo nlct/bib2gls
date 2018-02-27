@@ -80,7 +80,14 @@ public class Bib2GlsEntry extends BibEntry
 
    public void setBase(String base)
    {
-      this.base = base;
+      if (base != null && base.endsWith(".bib"))
+      {
+         this.base = base.substring(0, base.length()-4);
+      }
+      else
+      {
+         this.base = base;
+      }
    }
 
    public void setDual(Bib2GlsEntry dualEntry)

@@ -1177,6 +1177,7 @@ public class Bib2Gls implements TeXApp
          {
             // defer creating resources until all aux data
             // processed.
+
             resourceData.add(data);
          }
          else if (name.equals("glsxtr@shortcutsval"))
@@ -3905,8 +3906,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.2";
-   public static final String DATE = "2018-02-25";
+   public static final String VERSION = "1.2.20180227";
+   public static final String DATE = "2018-02-27";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
