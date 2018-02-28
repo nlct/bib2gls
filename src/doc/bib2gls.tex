@@ -1208,6 +1208,59 @@ the correct translation (in English, this would be
 \csopt[Page\dcomma Pages]{loc-prefix}). The default definition of
 \csref{bibglspassim} is also obtained from the resource file.
 
+\section{Conditional Document Build}
+
+If you are using a document build method that tries to determine
+whether or not \bibgls\ should be run, you can find the information
+by searching the \iext{aux} file for instances of
+\nosecdef{glsxtr@resource}
+Each instance corresponds to an instance of \gls{glsxtrresourcefile}
+where \meta{filename} is the base name of the \iext{glstex} file
+that \bibgls\ needs to create for this resource set. If the
+\meta{options} part is missing the \csopt{src} option, this also indicates 
+the base name for the \iext{bib} file.
+
+So the simplest check to determine if \bibgls\ needs to be run is to test
+if the \iext{aux} file contains \gls{glsxtrresourcefile}. For
+example, with \idx{arara} version 4.0:
+\begin{verbatim}
+% arara: bib2gls if found("aux", "glsxtr@resource")
+\end{verbatim}
+A sophisticated method could check if
+\meta{filename}\ext{glstex} is missing or is older than the document
+\ext{tex} file for each instance of \gls{glsxtr@resource} found in
+the \ext{aux} file.
+
+It might also be possible, although far more complex, to
+parse the \meta{options} part in each instance of \gls{glsxtr@resource}
+for \csopt{src} and determine if the corresponding \ext{bib} file or
+files are newer than the \ext{tex} file.
+
+It's not possible to determine if the location lists require
+updating, just as it's not possible to do this for the table of
+contents, list of figures, list of tables etc. (Or, if it could be
+implemented, the required code would make the document build far more
+complicated.)
+
+In general, the basic algorithm is:
+\begin{enumerate}
+\item If \gls{glsxtr@resource} is found in the \ext{aux} file then:
+
+   \begin{enumerate}
+   \item run \bibgls;
+   \item run \LaTeX\ (or PDF\LaTeX\ etc).
+   \end{enumerate}
+
+\item If \gls{@istfilename} is found in the \ext{aux} file then:
+
+   \begin{enumerate}
+   \item run \idx{makeglossaries} (or \idx{makeglossaries-lite});
+   \item run \LaTeX\ (or PDF\LaTeX\ etc).
+   \end{enumerate}
+
+\end{enumerate}
+This allows for the \styopt[alsoindex]{record} package option.
+
 \section{Manual Installation}
 
 If you are unable to install \bibgls\ through your \TeX\ package
@@ -2263,7 +2316,7 @@ The glossary won't have groups even if a group style, such as
 \bibgls\ tries to determine the character encoding to use for the
 output files. If the document has loaded the \isty{inputenc} package then
 \bibgls\ can obtain the value of the encoding from the
-\iext{aux} file. This then needs to be converted to a name
+\iext{aux} file. This is then converted to a name
 recognised by Java. For example, \code{utf8} will be mapped to
 \code{UTF-8}. If the \isty{fontspec} package has been loaded,
 \styfmt{glossaries-extra} will assume the encoding is \code{utf8} and
@@ -2273,7 +2326,27 @@ If neither package has been loaded, \bibgls\ will assume the
 operating system's default encoding. If this is incorrect or if
 \bibgls\ can't work out the appropriate mapping then you can specify
 the correct encoding using \longargfmt{tex-encoding} \meta{name}
-where \meta{name} is the encoding name.
+where \meta{name} is the encoding name (such as \code{UTF-8}).
+
+If you have a problem with non-ASCII characters not displaying
+correctly in your document:
+\begin{itemize}
+\item Check that the file encoding of your document \ext{tex} file (or files)
+has been correctly set by your text editor.
+\item Check that your document supports that encoding (for example,
+through the \isty{inputenc} package).
+\item Check \bibgls's transcript file (\ext{glg}) for the line that
+starts
+\begin{verbatim}
+TeX character encoding:
+\end{verbatim}
+This should be followed by the encoding used by \bibgls\ when
+creating the \ext{glstex} files. If this is incorrect use
+\longargfmt{tex-encoding}.
+\item Check that the encoding of the \ext{bib} files (set by your
+text editor or bibliographic management system) matches the encoding
+line in the \ext{bib} file or the \csopt{charset} resource option.
+\end{itemize}
 
 \argsection{no-expand-fields}
 
