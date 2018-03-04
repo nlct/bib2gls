@@ -12,3 +12,6 @@ glossaries.sty
 *.glo
 *.gls
 *.xdy
+*.idx
+*.ilg
+*.ind

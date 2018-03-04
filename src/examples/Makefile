@@ -93,6 +93,8 @@ sample-multi1.pdf	: $(DEPS) sample-multi1.tex \
 	pdflatex sample-multi1
 	$(BIB2GLS) sample-multi1
 	pdflatex sample-multi1
+	$(BIB2GLS) sample-multi1
+	pdflatex sample-multi1
 
 sample-multi2.pdf	: $(DEPS) sample-multi2.tex \
 	bacteria.bib markuplanguages.bib minerals.bib \

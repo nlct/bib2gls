@@ -1937,6 +1937,14 @@ public class GlsResource
          parseMaster(parser, master);
       }
 
+      if (!dualPrimaryDependency && !dualSortSettings.requiresSorting())
+      {
+         bib2gls.warningMessage("warning.option.clash", 
+          "dual-sort="+dualSortSettings.getMethodName(), 
+          "primary-dual-dependency=false");
+         dualPrimaryDependency=true;
+      }
+
       String docLocale = bib2gls.getDocDefaultLocale();
 
       sortSettings.setDocLocale(docLocale);
@@ -5023,10 +5031,6 @@ public class GlsResource
                {
                   Bib2GlsEntry dual = entry.getDual();
 
-                  setDualType(dual);
-                  setDualCategory(dual);
-                  setDualCounter(dual);
-
                   dualEntries.add(dual);
                }
             }
@@ -5034,16 +5038,16 @@ public class GlsResource
          else
          {
             processData(dualData, dualEntries, dualSortSettings.getMethod());
-
-            for (Bib2GlsEntry dual : dualEntries)
-            {
-               setDualType(dual);
-               setDualCategory(dual);
-               setDualCounter(dual);
-            }
          }
 
          processDeps(dualData, dualEntries);
+
+         for (Bib2GlsEntry dual : dualEntries)
+         {
+            setDualType(dual);
+            setDualCategory(dual);
+            setDualCounter(dual);
+         }
 
          entryCount += dualEntries.size();
 

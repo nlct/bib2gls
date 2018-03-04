@@ -156,6 +156,7 @@ Derived: \gls{area}, \gls{volume}, \gls{velocity},
 \gls{specificvolume}, \gls{concentration}, \gls{wavenumber}.
 
 \chapter*{Glossaries}
+\renewcommand{\glsextrapostnamehook}[1]{\glsadd[format=hyperbf]{#1}}
 \printunsrtglossary[type=bacteria,style=mcoltree]
 \printunsrtglossary[type=markuplanguage,style=altlist]
 \printunsrtglossary[type=vegetable,style=tree,nogroupskip]
@@ -172,6 +173,7 @@ Derived: \gls{area}, \gls{volume}, \gls{velocity},
 \printunsrtglossary[type=baseunit,style=alttree]
 \printunsrtglossary[type=derivedunit,style=alttree]
 
+\renewcommand{\glsextrapostnamehook}[1]{}
 \setupglossaries{section=chapter}
 \printunsrtglossary[type=index,style=bookindex]
 \end{document}}

@@ -10532,6 +10532,10 @@ This is a boolean setting that determines whether or not primary and
 dual entries should be considered mutual dependencies. The default value is
 \csopt[true]{primary-dual-dependency}, which means that if a primary
 has records then the dual is added as a dependency and vice versa.
+The setting \csopt[false]{primary-dual-dependency} can't be used
+with \csopt[none]{dual-sort} or \csopt[use]{dual-sort} (but may be
+used with \csopt[combine]{dual-sort} and \csopt[none]{sort} or
+\csopt[use]{sort}).
 
 \optsection[\subsubsection]{combine-dual-locations}
 
@@ -16548,12 +16552,28 @@ The dual entry's label is easily obtained because \csopt{dual-field}
 has provided the \fieldfmt{dual} internal field and set it to the
 corresponding label.
 
-The complete document code is listed below. The document build is:
+It's sometimes useful for the index to include a reference to the
+term's definition. This can be done by making use of 
+\idx{glsextrapostnamehook}, which can be redefined before the
+glossaries to automatically record each entry:
+\begin{verbatim}
+\renewcommand{\glsextrapostnamehook}[1]{\glsadd[format=hyperbf]{#1}}
+\end{verbatim}
+This needs to be redefined to ignore its argument before the index,
+to avoid the redundant index record:
+\begin{verbatim}
+\renewcommand{\glsextrapostnamehook}[1]{}
+\end{verbatim}
+Remember that if any records are added within a glossary, an extra
+\LaTeX\ and \bibgls\ call are required, so the document build is:
 \begin{verbatim}
 pdflatex sample-multi1
 bib2gls --group sample-multi1
 pdflatex sample-multi1
+bib2gls --group sample-multi1
+pdflatex sample-multi1
 \end{verbatim}
+The complete document code is listed below. 
 The resulting document is shown in \figureref{fig:sample-multi1.pdf}
 and \figureref{fig:sample-multi1.pdf2}.
 

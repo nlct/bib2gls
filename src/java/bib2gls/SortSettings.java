@@ -267,6 +267,12 @@ public class SortSettings
       return sortMethod;
    }
 
+   public String getMethodName()
+   {
+      return sortMethod == null ? "none" : sortMethod;
+   }
+
+
    public String getUnderlyingMethod()
    {
       if (sortMethod == null) return null;
