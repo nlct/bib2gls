@@ -2754,7 +2754,15 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      if (alias != null)
+      if (alias == null)
+      {
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.field.not.set", "alias"));
+         }
+      }
+      else
       {
          alias = processLabel(alias);
 
@@ -2775,6 +2783,12 @@ public class Bib2GlsEntry extends BibEntry
    public void initCrossRefs(TeXParser parser)
     throws IOException
    {
+      if (bib2gls.getVerboseLevel() > 0)
+      {
+         bib2gls.logMessage(bib2gls.getMessage(
+            "message.checking.crossrefs", getId()));
+      }
+
       initAlias(parser);
 
       // Is there a 'see' field?
@@ -2785,10 +2799,22 @@ public class Bib2GlsEntry extends BibEntry
       if (value == null)
       {// no 'see' field, is there a 'seealso' field?
 
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.field.not.set", "see"));
+         }
+
          if (seeAlsoValue != null)
          {
             initAlsoCrossRefs(parser, seeAlsoValue, getFieldValue("seealso"));
             return;
+         }
+
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.field.not.set", "seealso"));
          }
 
          // check for \glssee moved

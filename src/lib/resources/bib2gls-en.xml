@@ -128,6 +128,9 @@ See the manual for further details.</entry>
 <entry key="syntax.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
 			Instruct interpreter to pretend the listed 
 			packages have been used in the document.</entry>
+<entry key="syntax.ignore.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
+			Don''t check the log file for the listed
+			packages.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
@@ -140,6 +143,7 @@ See the manual for further details.</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.by">Entry {0} cross-referenced by {1}</entry>
 <entry key="message.checking.crossrefs">Checking cross-references for: {0}</entry>
+<entry key="message.field.not.set">Field {0} not set.</entry>
 <entry key="message.dual.dep">Dual found: {0} (primary {1})</entry>
 <entry key="message.added.alias.dep">Adding alias {0} as dependency for {1}</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>

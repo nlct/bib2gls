@@ -1155,6 +1155,59 @@ If the \idx{crossresourceref} mode is enabled then stage~3 and
 stage~4 are processed in separate loops, otherwise they are
 processed in the same loop.
 
+\section{Indexing}
+
+The dual entries such as \atentry{dualindexentry} (described in
+\sectionref{sec:dualentry}) are designed to provide a way of
+including an entry in both a list of terms (or symbols or
+abbreviations) optionally with a description and also include the
+term (without the description) in an index.  Additional terms that
+should only appear in the index can be defined with \atentry{index}.
+
+Although \bibgls\ is designed to create indexes as well as glossary
+lists using the same interface (commands like \cs{gls}), it is
+possible to have a mixture of \bibgls\ and \cs{index}, although
+it's not recommended and adds to the build complexity. However, if
+you really want to automatically \cs{index} an entry every time it's
+used with commands like \cs{gls}, then you can use the following
+approach:
+\begin{verbatim}
+\documentclass{report}
+
+\usepackage{makeidx}
+\usepackage[record]{glossaries-extra}
+
+\makeindex
+\GlsXtrLoadResources[src={entries}]
+
+\glssetcategoryattribute{general}{dualindex}{true}
+\glssetcategoryattribute{symbol}{dualindex}{true}
+\glssetcategoryattribute{abbreviation}{dualindex}{true}
+
+\glssetcategoryattribute{general}{indexname}{textbf}
+\glssetcategoryattribute{symbol}{indexname}{textbf}
+\glssetcategoryattribute{abbreviation}{indexname}{textbf}
+
+\begin{document}
+\chapter{Example}
+\gls{bird}, \gls{html}, $\gls{v}$ and \glspl{goose}.
+
+\printunsrtglossaries
+\printindex
+\end{document}
+\end{verbatim}
+If the document is called \filefmt{myDoc.tex} then the document
+build is:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+makeindex myDoc.idx
+pdflatex myDoc
+\end{verbatim}
+Note that this will use the \field{sort} value obtained from
+\bibgls.
+
 \section{Security}
 
 \TeX\ Live come with security settings
@@ -1402,7 +1455,8 @@ following packages:
 \isty{wasysym}, \isty{lipsum}, \isty{natbib}, \isty{mhchem}, 
 \isty{bpchem}, \isty{stix}, \isty{textcomp}, \isty{MnSymbol}, 
 \isty{fourier}, \isty{upgreek}, \isty{xspace}, \isty{siunitx}, 
-\isty{fontenc} and \isty{tipa}. If you're wondering about the
+\isty{fontenc} and \isty{tipa}. (You can omit checking for specific
+packages with \longarg{ignore-packages}.) If you're wondering about the
 selection, the \file{texparserlib.jar} library was originally written for
 another application that required support for some of them. There
 are a few other packages that the library supports (see
@@ -1934,6 +1988,17 @@ Note that there's only a limited number of packages supported by the
 using a command from a package that the interpreter doesn't support
 but it happens to have the same name and meaning as a command from
 a package that the interpreter does support.
+
+\argsection{ignore-packages}
+
+This option is cumulative. When the document \iext{log} file is
+parsed for known packages, \bibgls\ will skip the check for any
+listed in \meta{list}. Note that this option simply instructs
+\bibgls\ to ignore the package information in the log file. Any packages
+that are identified with \longarg{packages} will be passed to the
+interpreter if support is available, even if the package is also
+listed in \longargfmt{ignore-packages}.  Note that
+\sty{glossaries-extra} can't be included in the ignored \meta{list}.
 
 \argsection{mfirstuc-protection}
 

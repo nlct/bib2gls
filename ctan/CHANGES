@@ -4,6 +4,8 @@ v1.3 (pending):
 
    * bug fix: corrected category={same as base}
 
+   * New switch --ignore-packages
+
 v1.2 (2018-02-25):
 
    * New resource options:

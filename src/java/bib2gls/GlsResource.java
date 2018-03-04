@@ -3951,22 +3951,10 @@ public class GlsResource
             {
                // does this entry have a "see" or "seealso" field?
 
-               if (bib2gls.getVerboseLevel() > 0)
-               {
-                  bib2gls.logMessage(bib2gls.getMessage(
-                     "message.checking.crossrefs", primaryId));
-               }
-
                entry.initCrossRefs(parser);
 
                if (dual != null)
                {
-                  if (bib2gls.getVerboseLevel() > 0)
-                  {
-                     bib2gls.logMessage(bib2gls.getMessage(
-                        "message.checking.crossrefs", dualId));
-                  }
-
                   dual.initCrossRefs(parser);
                }
 
@@ -5045,13 +5033,13 @@ public class GlsResource
          }
          else
          {
-            for (Bib2GlsEntry dual : dualData)
+            processData(dualData, dualEntries, dualSortSettings.getMethod());
+
+            for (Bib2GlsEntry dual : dualEntries)
             {
                setDualType(dual);
                setDualCategory(dual);
                setDualCounter(dual);
-
-               dualEntries.add(dual);
             }
          }
 

@@ -1,0 +1,20 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+% arara: makeindex
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage{makeidx}
+\usepackage[record]{glossaries-extra}
+
+\makeindex
+\GlsXtrLoadResources[src={test-index}]
+
+\begin{document}
+\chapter{Example}
+\gls{sample1} and \gls{sample2}.
+
+\printunsrtglossaries
+\printindex
+\end{document}

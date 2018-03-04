@@ -841,6 +841,16 @@ name},
   category={command}
 }
 
+@dualindexentry{glsxtr@resource,
+  name={\csfmt{glsxtr@resource}},
+  user1={\margm{options}\margm{filename}},
+  description={this internal command is written to the \ext{aux}
+file by \gls{glsxtrresourcefile}
+   to provide \bibgls\ with the resource information},
+  note={internal command provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @dualindexentry{glssetexpandfield,
   name={\csfmt{gls\-set\-expand\-field}},
   user1={\margm{field}},
@@ -2458,6 +2468,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{kpsewhich,
   name={\appfmt{kpsewhich}},
+  category={application},
+  parent={applications}
+}
+
+@index{arara,
+  name={\appfmt{arara}},
   category={application},
   parent={applications}
 }
@@ -4332,6 +4348,14 @@ field.},
   parent={commandlineoptions}
 }
 
+@dualindexentry{switch.ignore-packages,
+  name={\longargfmt{ignore-packages}},
+  symbol={\shortargfmt{k}},
+  user1={\meta{list}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
 @dualindexentry{switch.mfirstuc-protection,
   name={\longargfmt{mfirstuc\dhyphen protection}},
   symbol={\shortargfmt{u}},
@@ -5457,6 +5481,16 @@ label of the current entry},
   description={emphasizes the given text (italic or slanted
    if the surrounding font is upright, otherwise upright font is 
    used)},
+  note={kernel command},
+  category={command}
+}
+
+@index{index,
+  name={\csfmt{index}},
+  user1={\margm{text}},
+  description={indexes the given term by writing the relevant
+information to an associated file that can then be processed
+by \gls{makeindex} or \gls{xindy}},
   note={kernel command},
   category={command}
 }

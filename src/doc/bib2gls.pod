@@ -114,6 +114,15 @@ limited number of packages supported by the TeX parser library.
 This option has a cumulative action so B<--packages wasysym,pifont>
 is the same as B<--packages wasysym --packages pifont>.
 
+=item B<--ignore-packages> I<list> (or B<-k> I<list>)
+
+Don't parse the log file for the packages listed in I<list>. Note
+that B<--packages> overrides this option, so if the same package is
+listed in both B<--ignore-packages> and B<--packages> then the
+interpreter will check if it's supported. This option has a
+cumulative action. (The B<glossaries-extra> package can't be
+included in the ignored I<list>.)
+
 =item B<--mfirstuc-protection> I<fields>|B<all> (or B<-u> I<fields>|B<all>)
 
 Insert an empty group if fields start with certain problematic

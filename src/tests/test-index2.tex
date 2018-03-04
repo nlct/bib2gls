@@ -1,0 +1,28 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+% arara: makeindex
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage{makeidx}
+\usepackage[record]{glossaries-extra}
+
+\makeindex
+\GlsXtrLoadResources[src={entries}]
+
+\glssetcategoryattribute{general}{dualindex}{true}
+\glssetcategoryattribute{symbol}{dualindex}{true}
+\glssetcategoryattribute{abbreviation}{dualindex}{true}
+
+\glssetcategoryattribute{general}{indexname}{textbf}
+\glssetcategoryattribute{symbol}{indexname}{textbf}
+\glssetcategoryattribute{abbreviation}{indexname}{textbf}
+
+\begin{document}
+\chapter{Example}
+\gls{bird}, \gls{html}, $\gls{v}$ and \glspl{goose}.
+
+\printunsrtglossaries
+\printindex
+\end{document}

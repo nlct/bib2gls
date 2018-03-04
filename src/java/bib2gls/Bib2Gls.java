@@ -668,7 +668,10 @@ public class Bib2Gls implements TeXApp
             {
                String pkg = m.group(1).toLowerCase();
 
-               if (pkg.equals("amsmath")
+               if (ignorePackages != null && ignorePackages.contains(pkg))
+               {// skip
+               }
+               else if (pkg.equals("amsmath")
                  ||pkg.equals("amssymb")
                  ||pkg.equals("pifont")
                  ||pkg.equals("textcase")
@@ -3011,6 +3014,9 @@ public class Bib2Gls implements TeXApp
       System.out.println();
       System.out.println(getMessage("syntax.packages", "--packages", "-p"));
       System.out.println();
+      System.out.println(getMessage("syntax.ignore.packages", 
+        "--ignore-packages", "-k"));
+      System.out.println();
 
       System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
@@ -3467,6 +3473,35 @@ public class Bib2Gls implements TeXApp
                packages.add(sty);
             }
          }
+         else if (isArg(args[i], "k", "ignore-packages"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            String[] styList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+
+            if (ignorePackages == null)
+            {
+               ignorePackages = new Vector<String>();
+            }
+
+            for (String sty : styList)
+            {
+               if (sty.equals("glossaries-extra"))
+               {
+                  warningMessage("error.invalid.opt.value", argVal[0], sty);
+               }
+               else
+               {
+                  ignorePackages.add(sty);
+               }
+            }
+         }
          else if (args[i].equals("--expand-fields"))
          {
             expandFields = true;
@@ -3906,8 +3941,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.2.20180227";
-   public static final String DATE = "2018-02-27";
+   public static final String VERSION = "1.2.20180304";
+   public static final String DATE = "2018-03-04";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -3970,7 +4005,7 @@ public class Bib2Gls implements TeXApp
 
    private boolean interpret = true;
 
-   private Vector<String> packages = null;
+   private Vector<String> packages = null, ignorePackages=null;
 
    private TeXParser interpreter = null;
 
