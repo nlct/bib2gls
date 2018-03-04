@@ -77,8 +77,20 @@ public class NewAbbreviation extends NewGlossaryEntry
    {
       TeXObject options = parser.popNextArg('[', ']');
 
+      TeXObject labelArg = parser.popNextArg();
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
       processEntry(parser, 
-        parser.popNextArg(), // label
+        labelArg, // label
         parser.popNextArg(), // short
         parser.popNextArg(), // long
         options);
@@ -88,8 +100,21 @@ public class NewAbbreviation extends NewGlossaryEntry
    {
       TeXObject options = list.popArg(parser, '[', ']');
 
+      TeXObject labelArg = list.popArg(parser);
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
+            list);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
       processEntry(parser, 
-        list.popArg(parser), // label
+        labelArg, // label
         list.popArg(parser), // short
         list.popArg(parser), // long
         options);

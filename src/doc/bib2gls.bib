@@ -749,6 +749,38 @@ name},
   category={command}
 }
 
+@dualindexentry{glsexpandfields,
+  name={\csfmt{gls\-expand\-fields}},
+  user1={},
+  description={switches on field expansion},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glsnoexpandfields,
+  name={\csfmt{gls\-no\-expand\-fields}},
+  user1={},
+  description={switches off field expansion},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glssetexpandfield,
+  name={\csfmt{gls\-set\-expand\-field}},
+  user1={\margm{field}},
+  description={switches on field expansion for the given field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glssetnoexpandfield,
+  name={\csfmt{gls\-set\-no\-expand\-field}},
+  user1={\margm{field}},
+  description={switches off field expansion for the given field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @dualindexentry{newglossaryentry,
   name={\csfmt{new\-glossary\-entry}},
   user1={\margm{label}\margm{\keyvallist}},
@@ -848,15 +880,6 @@ name},
 file by \gls{glsxtrresourcefile}
    to provide \bibgls\ with the resource information},
   note={internal command provided by \styfmt{glossaries-extra}},
-  category={command}
-}
-
-@dualindexentry{glssetexpandfield,
-  name={\csfmt{gls\-set\-expand\-field}},
-  user1={\margm{field}},
-  description={when defining a new entry, the given field should be
-    expanded},
-  note={provided by \styfmt{glossaries}},
   category={command}
 }
 
@@ -5151,14 +5174,6 @@ label of the current entry},
   description={creates a hyper target for the group given by
     \meta{label} for the given glossary type and displays the text},
   note={provided by \styfmt{glossary-hypernav}},
-  category={command}
-}
-
-@index{glsnoexpandfields,
-  name={\csfmt{gls\-noexpand\-fields}},
-  user1={},
-  description={don't expand fields when an entry is defined},
-  note={provided by \styfmt{glossaries}},
   category={command}
 }
 

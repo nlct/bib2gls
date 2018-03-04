@@ -23,7 +23,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-numeric.pdf test-copy.pdf test-seetrail.pdf \
 	  test-record-prefix.pdf test-labelify.pdf \
 	  test-labelify-fontspec.pdf test-custom-symbols.pdf \
-	  test-crossresource-refs.pdf test-custom-rules.pdf
+	  test-crossresource-refs.pdf test-custom-rules.pdf \
+	  test-same-as-base.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -420,6 +421,13 @@ test-custom-rules.pdf	: test-custom-rules.glstex
 test-custom-rules.glstex	: test-custom-rules.tex anglo-saxon.bib greek.bib upgreek.bib $(DEPS)
 		xelatex test-custom-rules
 		$(BIB2GLS) test-custom-rules
+
+test-same-as-base.pdf	: test-same-as-base.glstex
+		pdflatex test-same-as-base
+
+test-same-as-base.glstex	: test-same-as-base.tex bacteria.bib topics.bib $(DEPS)
+		pdflatex test-same-as-base
+		$(BIB2GLS) test-same-as-base
 
 clean	:
 	$(RM) *.aux

@@ -152,6 +152,19 @@ public class NewGlossaryEntry extends ControlSequence
             }
          }
 
+         if (gls2bib.fieldExpansionOn(field))
+         {
+            if (object instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+               if (expanded != null)
+               {
+                  object = expanded;
+               }
+            }
+         }
+
          if (spaceSub != null 
              && (field.equals("see") || field.equals("seealso")
                || field.equals("alias"))
@@ -274,13 +287,38 @@ public class NewGlossaryEntry extends ControlSequence
 
    public void process(TeXParser parser) throws IOException
    {
-      processEntry(parser, parser.popNextArg(), 
+      TeXObject labelArg = parser.popNextArg();
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
+      processEntry(parser, labelArg, 
         KeyValList.getList(parser, parser.popNextArg()));
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
-      processEntry(parser, list.popArg(parser), 
+      TeXObject labelArg = list.popArg(parser);
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
+            list);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
+      processEntry(parser, labelArg, 
         KeyValList.getList(parser, list.popArg(parser)));
    }
 

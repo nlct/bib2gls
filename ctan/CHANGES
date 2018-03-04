@@ -4,7 +4,7 @@ v1.3 (pending):
 
    * bug fix: corrected category={same as base}
 
-   * New switch --ignore-packages
+   * New switch --ignore-packages (-k)
 
 v1.2 (2018-02-25):
 

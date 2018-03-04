@@ -84,7 +84,19 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
          parser.popStack();
       }
 
-      processEntry(parser, parser.popNextArg(), 
+      TeXObject labelArg = parser.popNextArg();
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
+      processEntry(parser, labelArg, 
         KeyValList.getList(parser, parser.popNextArg()),
         parser.popNextArg((byte)0), isStar);
    }
@@ -102,7 +114,20 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
          list.popStack(parser);
       }
 
-      processEntry(parser, list.popArg(parser), 
+      TeXObject labelArg = list.popArg(parser);
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
+            list);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
+      processEntry(parser, labelArg, 
         KeyValList.getList(parser, list.popArg(parser)),
         list.popArg(parser, (byte)0), isStar);
    }

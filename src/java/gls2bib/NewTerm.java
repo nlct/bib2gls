@@ -87,18 +87,39 @@ public class NewTerm extends NewGlossaryEntry
    {
       TeXObject options = parser.popNextArg('[', ']');
 
-      processEntry(parser, 
-        parser.popNextArg(), // label
-        options);
+      TeXObject labelArg = parser.popNextArg();
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
+      processEntry(parser, labelArg, options);
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
    {
       TeXObject options = list.popArg(parser, '[', ']');
 
-      processEntry(parser, 
-        list.popArg(parser), // label
-        options);
+      TeXObject labelArg = list.popArg(parser);
+
+      if (labelArg instanceof Expandable)
+      {
+         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
+            list);
+
+         if (expanded != null)
+         {
+            labelArg = expanded;
+         }
+      }
+
+      processEntry(parser, labelArg, options);
    }
 
 }

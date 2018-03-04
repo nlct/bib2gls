@@ -2422,7 +2422,7 @@ This is useful if constructing field values programmatically
 commands are included in the field. 
 
 The switch \longarg{no-expand-fields} makes \bibgls\ write
-\ics{glsnoexpandfields} to the \iext{glstex} file, which
+\gls{glsnoexpandfields} to the \iext{glstex} file, which
 switches off the expansion.  Since \bibgls\ is simply
 fetching the data from \iext{bib} files, it's unlikely 
 that this automatic expansion is required and since it can
@@ -2431,12 +2431,11 @@ switch it off with \longarg{expand-fields}.
 
 \argsection{expand-fields}
 
-Don't write \ics{glsnoexpandfields} to the \iext{glstex} file,
+Don't write \gls{glsnoexpandfields} to the \iext{glstex} file,
 allowing fields to expand when the entries are defined.
 Remember that this doesn't include the \field{name}, \field{symbol}
 or \field{description} fields, which need to have their
-expansion switched on with
-\nosecdef{glssetexpandfield}
+expansion switched on with \gls{glssetexpandfield}
 before the entries are defined (that is, before using
 \gls!{GlsXtrLoadResources}).
 
@@ -12864,6 +12863,38 @@ recommended in \meta{\keyvallist} when loading files with
 argument to set the \field{type}. With \bibgls\ you can use the
 \csopt{type} option instead.)
 
+\cssection[\section]{glsexpandfields}
+The base \styfmt{glossaries} package provides:
+\formatdef{glsexpandfields}
+If present, this instructs \idx{convertgls2bib} to expand all fields
+except for those explicitly identified by \gls{glssetnoexpandfield}.
+Remember that there are many commands that aren't recognised by
+\idx{convertgls2bib} so it may not be possible to correctly expand
+field values. Conversely, there are some commands that will be
+expanded by \idx{convertgls2bib} that aren't expandable in \TeX\
+(such as \ics{MakeUppercase} and \ics{char}).
+
+\cssection[\section]{glsnoexpandfields}
+The base \styfmt{glossaries} package provides:
+\formatdef{glsnoexpandfields}
+If present, this instructs \idx{convertgls2bib} to not expand fields
+unless explicitly identified by \gls{glssetexpandfield}.
+
+\cssection[\section]{glssetexpandfield}
+The base \styfmt{glossaries} package provides:
+\formatdef{glssetexpandfield}
+If present, this instructs \idx{convertgls2bib} to expand the
+given field, even if \gls{glsnoexpandfields} has been used.
+
+\cssection[\section]{glssetnoexpandfield}
+The base \styfmt{glossaries} package provides:
+\formatdef{glssetnoexpandfield}
+If present, this instructs \idx{convertgls2bib} to not expand the
+given field, even if \gls{glsexpandfields} has been used.
+Unlike the default behaviour with the \sty{glossaries} package, there are no
+fields switched explicitly switched off by default with
+\idx{convertgls2bib}.
+
 \cssection[\section]{newglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{newglossaryentry}
@@ -17092,10 +17123,10 @@ entries without worrying about the prefixes:
 \cs{glsxtrnewgls}\marg{film.}\marg{\csfmt{film}}
 \end{codeenv}
 
-It would be useful to include the page where the entries are defined
-in their corresponding lists. This can be done by redefining the
-general purpose non-category post-name hook
-\ics{glsextrapostnamehook}:
+As with \exfile{sample-multi1.tex}, it would be useful to include
+the page where the entries are defined in their corresponding lists.
+Again this can be done by redefining the general purpose
+non-category post-name hook \ics{glsextrapostnamehook}:
 \begin{verbatim}
 \newcommand*{\glsextrapostnamehook}[1]{%
   \glsadd[format=hyperbf]{#1}%

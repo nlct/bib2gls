@@ -1179,7 +1179,26 @@ public class Bib2Gls implements TeXApp
          if (name.equals("glsxtr@resource"))
          {
             // defer creating resources until all aux data
-            // processed.
+            // processed, but strip double-quotes from the second
+            // argument. (A literal double-quote can be identified
+            // with \" but such a file naming scheme should not be
+            // encouraged!)
+
+            TeXObject glsFile = data.getArg(1);
+
+            if (glsFile instanceof TeXObjectList)
+            {
+               for (int i = ((TeXObjectList)glsFile).size()-1; i >= 0; i--)
+               {
+                  TeXObject obj = ((TeXObjectList)glsFile).get(i);
+
+                  if (obj instanceof CharObject
+                       && ((CharObject)obj).getCharCode() == '"')
+                  {
+                     ((TeXObjectList)glsFile).remove(i);
+                  }
+               }
+            }
 
             resourceData.add(data);
          }

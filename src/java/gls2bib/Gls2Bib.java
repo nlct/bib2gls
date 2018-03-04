@@ -29,6 +29,7 @@ package com.dickimawbooks.gls2bib;
  */
 
 import java.util.Vector;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Locale;
 import java.text.MessageFormat;
@@ -141,6 +142,12 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new NewSymbol(this));
       parser.putControlSequence(new NewSymbol("newsym", this));
       parser.putControlSequence(new NewDualEntry(this));
+      parser.putControlSequence(new GlsExpandFields(this));
+      parser.putControlSequence(new GlsExpandFields(
+       "glsnoexpandfields", false, this));
+      parser.putControlSequence(new GlsSetExpandField(this));
+      parser.putControlSequence(new GlsSetExpandField(
+        "glssetnoexpandfield", false, this));
 
    }
 
@@ -972,8 +979,38 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
+   public boolean fieldExpansionOn(String field)
+   {
+      if (expandFieldMap != null)
+      {
+         Boolean bool = expandFieldMap.get(field);
+
+         if (bool != null)
+         {
+            return bool.booleanValue();
+         }
+      }
+
+      return expandFields;
+   }
+
+   public void setFieldExpansion(boolean on)
+   {
+      expandFields = on;
+   }
+
+   public void setFieldExpansion(String field, boolean on)
+   {
+      if (expandFieldMap == null)
+      {
+         expandFieldMap = new HashMap<String,Boolean>();
+      }
+
+      expandFieldMap.put(field, Boolean.valueOf(on));
+   }
+
    public static final String VERSION = "1.2";
-   public static final String DATE = "2018-02-25";
+   public static final String DATE = "2018-03-04";
 
    private Vector<GlsData> data;
 
@@ -990,6 +1027,10 @@ public class Gls2Bib extends LaTeXParserListener
    private Gls2BibMessages messages;
 
    private int debugLevel = 0;
+
+   private boolean expandFields = false;
+
+   private HashMap<String,Boolean> expandFieldMap;
 
    private TeXParser texParser;
 }
