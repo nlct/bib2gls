@@ -51,12 +51,12 @@ public class Gls2Bib extends LaTeXParserListener
   implements Writeable,TeXApp
 {
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
-     String outCharset, String spaceSub, String langTag, boolean ignoreSort, int debug)
+     String outCharset, String spaceSub, String langTag, boolean ignoreSort, int verbose)
     throws Gls2BibException,IOException
    {
       super(null);
 
-      this.debugLevel = debug;
+      this.verboseLevel = verbose;
       this.ignoreSortField = ignoreSort;
 
       initMessages(langTag);
@@ -85,9 +85,28 @@ public class Gls2Bib extends LaTeXParserListener
          bibCharsetName = charset.name();
       }
 
+      initKeyToFieldMap();
+
       setWriteable(this);
 
       texParser = new TeXParser(this);
+   }
+
+   private void initKeyToFieldMap()
+   {
+      keyToFieldMap = new HashMap<String,String>();
+      keyToFieldMap.put("sortvalue", "sort");
+      keyToFieldMap.put("firstpl", "firstplural");
+      keyToFieldMap.put("desc", "description");
+      keyToFieldMap.put("descplural", "descriptionplural");
+      keyToFieldMap.put("useri", "user1");
+      keyToFieldMap.put("userii", "user2");
+      keyToFieldMap.put("useriii", "user3");
+      keyToFieldMap.put("useriv", "user4");
+      keyToFieldMap.put("userv", "user5");
+      keyToFieldMap.put("uservi", "user6");
+      keyToFieldMap.put("longpl", "longplural");
+      keyToFieldMap.put("shortpl", "shortplural");
    }
 
    public TeXApp getTeXApp()
@@ -107,7 +126,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void debug(String message)
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {
          System.out.println(message);
       }
@@ -115,7 +134,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void debug(Throwable e)
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {
          e.printStackTrace();
       }
@@ -148,13 +167,13 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new GlsSetExpandField(this));
       parser.putControlSequence(new GlsSetExpandField(
         "glssetnoexpandfield", false, this));
-
    }
 
    // Ignore unknown control sequences
    public ControlSequence createUndefinedCs(String name)
    {
-      return new Undefined(name, Undefined.ACTION_IGNORE);
+      return new Undefined(name,
+       verboseLevel == SILENT ? Undefined.ACTION_IGNORE: Undefined.ACTION_WARN);
    }
 
    @Override
@@ -203,6 +222,7 @@ public class Gls2Bib extends LaTeXParserListener
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
    {
+      debug("Ignoring \\overwithdelims");
    }
 
    public void abovewithdelims(TeXObject firstDelim,
@@ -210,30 +230,36 @@ public class Gls2Bib extends LaTeXParserListener
      TeXObject after)
     throws IOException
    {
+      debug("Ignoring \\abovewithdelims");
    }
 
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {
    }
+
    public void href(String url, TeXObject text)
       throws IOException
    {
+      debug("Ignoring \\href");
    }
 
    public void subscript(TeXObject arg)
      throws IOException
    {
+      debug("Ignoring _");
    }
 
    public void superscript(TeXObject arg)
      throws IOException
    {
+      debug("Ignoring ^");
    }
 
    public void includegraphics(KeyValList options, String imgName)
      throws IOException
    {
+      debug("Ignoring \\includegraphics");
    }
 
    public boolean isWriteAccessAllowed(File file)
@@ -263,7 +289,7 @@ public class Gls2Bib extends LaTeXParserListener
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {
          System.err.format(
            "Ignoring unexpected request to copy files %s -> %s%n",
@@ -274,7 +300,7 @@ public class Gls2Bib extends LaTeXParserListener
    public String requestUserInput(String message)
      throws IOException
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {
          System.err.format(
            "Ignoring unexpected request for user input. Message: %s%n",
@@ -296,7 +322,7 @@ public class Gls2Bib extends LaTeXParserListener
    public void epstopdf(File epsFile, File pdfFile)
      throws IOException,InterruptedException
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
@@ -311,7 +337,7 @@ public class Gls2Bib extends LaTeXParserListener
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
@@ -527,7 +553,10 @@ public class Gls2Bib extends LaTeXParserListener
     */ 
    public void message(String text)
    {
-      System.out.println(text);
+      if (verboseLevel != SILENT)
+      {
+         System.out.println(text);
+      }
    }
 
    public static String fileLineMessage(File file, int lineNum,
@@ -545,6 +574,7 @@ public class Gls2Bib extends LaTeXParserListener
    public void beginParse(File file)
       throws IOException
    {
+      message(getMessage("message.reading", file));
    }
 
    public Charset getCharSet()
@@ -557,16 +587,19 @@ public class Gls2Bib extends LaTeXParserListener
     */ 
    public void warning(TeXParser parser, String message)
    {
-      int lineNum = parser.getLineNumber();
-      File file = parser.getCurrentFile();
+      if (verboseLevel != SILENT)
+      {
+         int lineNum = parser.getLineNumber();
+         File file = parser.getCurrentFile();
 
-      if (lineNum == -1 || file == null)
-      {
-         warning(message);
-      }
-      else
-      {
-         warning(file, lineNum, message);
+         if (lineNum == -1 || file == null)
+         {
+            warning(message);
+         }
+         else
+         {
+            warning(file, lineNum, message);
+         }
       }
    }
 
@@ -582,22 +615,33 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void warning(String message)
    {
-      message = getMessageWithFallback("warning.title",
-         "Warning: {0}", message);
+      if (verboseLevel != SILENT)
+      {
+         message = getMessageWithFallback("warning.title",
+            "Warning: {0}", message);
 
-      System.err.println(message);
+         System.err.println(message);
+      }
    }
 
    public void warning()
    {
-      System.err.println();
+      if (verboseLevel != SILENT)
+      {
+         System.err.println();
+      }
    }
 
    public void warning(String message, Exception e)
    {
-      if (debugLevel > 0)
+      if (verboseLevel >= NORMAL)
       {
-         e.printStackTrace();
+         System.err.println(message);
+
+         if (verboseLevel >= DEBUG)
+         {
+            e.printStackTrace();
+         }
       }
    }
 
@@ -622,7 +666,7 @@ public class Gls2Bib extends LaTeXParserListener
          error(msg);
       }
 
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {
          e.printStackTrace();
       }
@@ -689,6 +733,8 @@ public class Gls2Bib extends LaTeXParserListener
             throw new IOException("No entries found");
          }
 
+         message(getMessage("message.writing", bibFile));
+
          if (bibCharsetName == null)
          {
             out = new PrintWriter(bibFile);
@@ -740,7 +786,7 @@ public class Gls2Bib extends LaTeXParserListener
 
       String jar = "";
 
-      if (debugLevel > 0)
+      if (verboseLevel >= DEBUG)
       {
          jar = getClass().getProtectionDomain().getCodeSource().getLocation()
                .toString();
@@ -847,6 +893,9 @@ public class Gls2Bib extends LaTeXParserListener
       System.out.println("--no-ignore-sort\tdon't ignore sort field");
       System.out.println("--space-sub <value>\tsubstitute spaces in labels with <value>");
       System.out.println("--locale <lang tag>\tuse language resource file for locale given by <lang tag>");
+      System.out.println("--silent\tsuppress messages");
+      System.out.println("--verbose\tnormal messages");
+      System.out.println("--debug\tdebug mode");
    }
 
    public static void main(String[] args)
@@ -858,7 +907,7 @@ public class Gls2Bib extends LaTeXParserListener
       String spaceSub = null;
       String langTag = null;
       boolean ignoreSort = true;
-      int debug = 0;
+      int verbose = NORMAL;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -922,7 +971,15 @@ public class Gls2Bib extends LaTeXParserListener
          }
          else if (args[i].equals("--debug"))
          {
-            debug = 1;
+            verbose = DEBUG;
+         }
+         else if (args[i].equals("--silent"))
+         {
+            verbose = SILENT;
+         }
+         else if (args[i].equals("--verbose"))
+         {
+            verbose = NORMAL;
          }
          else if (args[i].startsWith("-"))
          {
@@ -963,7 +1020,7 @@ public class Gls2Bib extends LaTeXParserListener
       try
       {
          Gls2Bib gls2bib = new Gls2Bib(texFile, bibFile, texCharset, bibCharset,
-           spaceSub, langTag, ignoreSort, debug);
+           spaceSub, langTag, ignoreSort, verbose);
 
          gls2bib.process();
       }
@@ -1001,6 +1058,13 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void setFieldExpansion(String field, boolean on)
    {
+      String val = keyToFieldMap.get(field);
+
+      if (val != null)
+      {
+         field = val;
+      }
+
       if (expandFieldMap == null)
       {
          expandFieldMap = new HashMap<String,Boolean>();
@@ -1009,8 +1073,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.2";
-   public static final String DATE = "2018-03-04";
+   public static final String VERSION = "1.3";
+   public static final String DATE = "2018-03-05";
 
    private Vector<GlsData> data;
 
@@ -1026,11 +1090,15 @@ public class Gls2Bib extends LaTeXParserListener
 
    private Gls2BibMessages messages;
 
-   private int debugLevel = 0;
+   public static final int SILENT=0, NORMAL=1, DEBUG=2;
+
+   private int verboseLevel=NORMAL;
 
    private boolean expandFields = false;
 
    private HashMap<String,Boolean> expandFieldMap;
+
+   private HashMap<String,String> keyToFieldMap;
 
    private TeXParser texParser;
 }

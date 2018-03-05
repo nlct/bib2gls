@@ -20,6 +20,18 @@ Display help message and exit.
 
 Display version information and exit.
 
+=item B<--silent>
+
+Suppress all messages except for errors.
+
+=item B<--verbose>
+
+Display messages.
+
+=item B<--debug>
+
+Display debugging messages.
+
 =item B<--texenc> I<name>
 
 Set the character encoding to I<name> for the input B<.tex> files.

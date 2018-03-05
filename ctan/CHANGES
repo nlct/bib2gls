@@ -1,8 +1,10 @@
-v1.3 (pending):
+v1.3 (2018-03-05):
 
-   * bug fix: check for quoted path elements
+   * bug fix: check for quoted path elements (spaces in file names)
 
    * bug fix: corrected category={same as base}
+
+   * bug fix: corrected dual selection
 
    * New switch --ignore-packages (-k)
 

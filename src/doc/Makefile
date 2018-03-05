@@ -5,7 +5,6 @@ bib2gls.pdf	: bib2gls.tex bib2gls.bib bib2gls-cite.bib\
 		   ../examples/*.tex ../examples/*.bib
 		make -C ../examples
 		arara --verbose bib2gls
-		cp bib2gls.pdf ../../unstable/
 
 bib2gls.1	: bib2gls.pod
 		pod2man -c bib2gls bib2gls.pod bib2gls.1

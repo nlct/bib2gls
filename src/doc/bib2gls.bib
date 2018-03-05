@@ -2489,6 +2489,12 @@ cs}\margm{Glspl-like cs}},
   parent={applications}
 }
 
+@index{makeglossaries-lite,
+  name={\appfmt{make\-glos\-saries\dhyphen lite}},
+  category={application},
+  parent={applications}
+}
+
 @index{kpsewhich,
   name={\appfmt{kpsewhich}},
   category={application},
@@ -4902,6 +4908,24 @@ field.},
   category={command}
 }
 
+@index{glsxtrautoindexassignsort,
+  name={\csfmt{gls\-xtr\-auto\-index\-assign\-sort}},
+  user1={\margm{cs}\margm{label}},
+  description={assigns the sort value for \cs{index} when
+   using auto-indexing},
+  note={provided by \styfmt{glossaries-extra} v1.16+},
+  category={command}
+}
+
+@index{glsxtrautoindexentry,
+  name={\csfmt{gls\-xtr\-auto\-index\-entry}},
+  user1={\margm{label}},
+  description={used for the actual value in \cs{index} when
+   using auto-indexing},
+  note={provided by \styfmt{glossaries-extra} v1.16+},
+  category={command}
+}
+
 @index{glsseeformat,
   name={\csfmt{gls\-see\-format}},
   user1={\margm{tag}\margm{labels}\margm{location (ignored)}},
@@ -5515,6 +5539,16 @@ by \gls{makeindex} or \gls{xindy}},
   user1={\margm{text}},
   description={does nothing but when used as a location format
    \bibgls\ recognises it as an ignored location},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{@istfilename,
+  name={\csfmt{@istfilename}},
+  user1={\margm{filename}},
+  description={identifies the style file in the \ext{aux}
+   file for the benefit of external tools like 
+    \idx{makeglossaries} and \idx{makeglossaries-lite}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6633,6 +6667,14 @@ has three or more items},
   name={\csfmt{textsc}},
   user1={\margm{text}},
   description={applies small-caps font to \meta{text}},
+  note={kernel command},
+  category={command}
+}
+
+@index{usepackage,
+  name={\csfmt{use\-pack\-age}},
+  user1={\oargm{options}\margm{name}\oargm{min version}},
+  description={loads the package identified by \meta{name}},
   note={kernel command},
   category={command}
 }

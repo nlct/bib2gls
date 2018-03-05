@@ -1157,20 +1157,17 @@ processed in the same loop.
 
 \section{Indexing}
 
-The dual entries such as \atentry{dualindexentry} (described in
+The dual index entries such as \atentry{dualindexentry} (described in
 \sectionref{sec:dualentry}) are designed to provide a way of
-including an entry in both a list of terms (or symbols or
-abbreviations) optionally with a description and also include the
-term (without the description) in an index.  Additional terms that
-should only appear in the index can be defined with \atentry{index}.
+including an entry in both a glossary (with a description) and also
+include the term (without the description) in an index.  Additional
+terms that should only appear in the index can be defined with
+\atentry{index}.  (See, for example, the \exfile{sample-multi1.tex}
+and \exfile{sample-multi2.tex} sample files.)
 
 Although \bibgls\ is designed to create indexes as well as glossary
-lists using the same interface (commands like \cs{gls}), it is
-possible to have a mixture of \bibgls\ and \cs{index}, although
-it's not recommended and adds to the build complexity. However, if
-you really want to automatically \cs{index} an entry every time it's
-used with commands like \cs{gls}, then you can use the following
-approach:
+lists using the same interface (\cs{gls} etc), it is
+possible to have a mixture of \bibgls\ and \ics{index}. For example:
 \begin{verbatim}
 \documentclass{report}
 
@@ -1184,9 +1181,9 @@ approach:
 \glssetcategoryattribute{symbol}{dualindex}{true}
 \glssetcategoryattribute{abbreviation}{dualindex}{true}
 
-\glssetcategoryattribute{general}{indexname}{textbf}
-\glssetcategoryattribute{symbol}{indexname}{textbf}
-\glssetcategoryattribute{abbreviation}{indexname}{textbf}
+\glssetcategoryattribute{general}{indexname}{hyperbf}
+\glssetcategoryattribute{symbol}{indexname}{hyperbf}
+\glssetcategoryattribute{abbreviation}{indexname}{hyperbf}
 
 \begin{document}
 \chapter{Example}
@@ -1205,8 +1202,23 @@ pdflatex myDoc
 makeindex myDoc.idx
 pdflatex myDoc
 \end{verbatim}
-Note that this will use the \field{sort} value obtained from
-\bibgls.
+This requires an additional \LaTeX\ call between \bibgls\ and
+\idx{makeindex} since the entries must be defined before they can be
+indexed (and they can't be defined until \bibgls\ creates the
+associated \ext{glstex} files).
+
+Note that this method will use the \field{sort} value obtained by \bibgls\
+as the \meta{sort} part within
+\code{\cs{index}\marg{\meta{sort}@\meta{actual}}}.
+Be careful if you use \idx{makeindex} as this can result in Unicode
+characters appearing in the sort value, which \idx{makeindex}
+doesn't support.
+The \meta{actual} part is given by
+\code{\ics{glsentryname}\margm{label}}.
+(You can change the \meta{sort} and \meta{actual} parts by
+redefining \ics{glsxtrautoindexassignsort} and
+\ics{glsxtrautoindexentry}. See the \sty{glossaries-extra} manual
+for further details.)
 
 \section{Security}
 
@@ -1274,11 +1286,11 @@ that \bibgls\ needs to create for this resource set. If the
 the base name for the \iext{bib} file.
 
 So the simplest check to determine if \bibgls\ needs to be run is to test
-if the \iext{aux} file contains \gls{glsxtrresourcefile}. For
+if the \iext{aux} file contains \gls{glsxtr@resource}. For
 example, with \idx{arara} version 4.0:
-\begin{verbatim}
-% arara: bib2gls if found("aux", "glsxtr@resource")
-\end{verbatim}
+\begin{codeenv}
+\% arara: bib2gls if found("aux", "glsxtr@resource")
+\end{codeenv}
 A sophisticated method could check if
 \meta{filename}\ext{glstex} is missing or is older than the document
 \ext{tex} file for each instance of \gls{glsxtr@resource} found in
@@ -1304,7 +1316,7 @@ In general, the basic algorithm is:
    \item run \LaTeX\ (or PDF\LaTeX\ etc).
    \end{enumerate}
 
-\item If \gls{@istfilename} is found in the \ext{aux} file then:
+\item If \idx{@istfilename} is found in the \ext{aux} file then:
 
    \begin{enumerate}
    \item run \idx{makeglossaries} (or \idx{makeglossaries-lite});
@@ -1939,7 +1951,8 @@ if available (default). For example,
 \begin{verbatim}
 \textsuperscript{(2)}
 \end{verbatim}
-will be converted to \hex{207D} (superscript left parenthesis)
+will be converted to \code{\textsuperscript{(2)}}, which consists
+of: \hex{207D} (superscript left parenthesis)
 \hex{00B2} (superscript two) \hex{207E} (superscript right
 parenthesis). If the entire contents of the argument can't be
 represented by Unicode characters, the interpreter uses \verb|<sup>|
@@ -12823,6 +12836,13 @@ sort value than either \idx!{makeindex} or \idx!{xindy}.
 
 \item[\longargfmt{no-ignore-sort}] Don't ignore the \field{sort} field.
 
+\item[\longargfmt{silent}] Suppress all messages except for errors.
+
+\item[\longargfmt{verbose}] Display messages and warnings (default).
+
+\item[\longargfmt{debug}] Display debugging messages (stack
+traces and other information in addition to \longargfmt{verbose}).
+
 \item[\longargfmt{help} or \shortargfmt{h}] Display help message and
 quit.
 \item[\longargfmt{version} or \shortargfmt{v}] Display version
@@ -12831,7 +12851,10 @@ information and quit.
 
 This application recognises the commands listed below. Avoid any
 overly complicated code within the \ext{tex} file. The \TeX\ parser
-library isn't a \TeX\ engine!
+library isn't a \TeX\ engine! The \ext{tex} file doesn't need to be
+a complete document, but if you want certain commands recognised
+from packages that the \TeX\ parser library supports, you'll need to
+include \ics{usepackage} in the \ext{tex} file.
 In all cases below, if \meta{\keyvallist} contains
 \begin{alltt}
 see=[\ics{seealsoname}]\margm{label(s)}
@@ -15710,7 +15733,7 @@ round so that the short form is shown first, which conveniently
 matches the default \csopt{abbreviation-sort-fallback}.
 \begin{verbatim}
 \renewcommand*{\glsxtrlongshortdescname}{%
-  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
+  \protect\glsabbrvfont{\the\glsshorttok}\space
   \glsxtrparen{\glslongfont{\the\glslongtok}}%
 }
 \end{verbatim}
@@ -16653,12 +16676,12 @@ example, so it has extra glossaries, which all need to be defined:
 \newglossary*{information}{Information Symbols}
 \newglossary*{weather}{Weather Symbols}
 \end{verbatim}
-Note that this is a total of 15 (including the \code{index})
-glossaries. With the \ics{makeglossaries} method, this would require
-16 write registers (including the write register used to create the
-indexing style file), and a total of $15\times3 + 1 = 46$ associated
-files. (This doesn't include the standard \ext{aux} file and the
-\ext{out} file created by \sty{hyperref}.) With \bibgls, no
+Note that this is a total of 15~glossaries (including the
+\code{index}). With the basic \ics{makeglossaries} method, this would
+require 16 write registers (including the write register used to
+create the indexing style file), and a total of $15\times3 + 1 = 46$
+associated files. (This doesn't include the standard \ext{aux} file
+and the \ext{out} file created by \sty{hyperref}.) With \bibgls, no
 additional write registers are required and the number of associated
 \bibgls\ files is equal to the number of resource commands plus the
 transcript file (in this example, $9+1=10$).
@@ -16812,7 +16835,7 @@ Next come the chemical formulae:
  \csopt[
    identifier=category,
    formula=name,
-   chemicalname=description,
+   chemicalname=description
  ]{field-aliases},
  \csopt[chemical]{type},
  \csopt{set-widest},
@@ -16825,18 +16848,18 @@ and the \idxpl{SIunit}, which are now combined into a single
 glossary:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
- src={baseunits,derivedunits},
+ \csopt[baseunits,derivedunits]{src},
  \csopt[measurement=symbol,unit=symbol]{entry-type-aliases},
- field-aliases={
+ \csopt[
    unitname=description,
    unitsymbol=symbol,
    measurement=name
- },
- category={measurement},
- type={measurement},
- set-widest,
- symbol-sort-fallback={name},
- save-locations=false
+ ]{field-aliases},
+ \csopt[measurement]{category},
+ \csopt[measurement]{type},
+ \csopt{set-widest},
+ \csopt[name]{symbol-sort-fallback},
+ \csopt[false]{save-locations}
 }
 \end{codeenv}
 Here the \field{name} field is obtained from the custom
@@ -16953,7 +16976,7 @@ style (that is, the abbreviations with the \field{category} set to
 \meta{long} (\meta{short}):
 \begin{verbatim}
 \renewcommand*{\glsxtrlongshortdescname}{%
-  \protect\protect\glslongfont{\the\glslongtok}\space
+  \protect\glslongfont{\the\glslongtok}\space
   \glsxtrparen{\glsabbrvfont{\the\glsshorttok}}%
 }
 \end{verbatim}

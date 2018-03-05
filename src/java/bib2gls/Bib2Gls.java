@@ -1178,7 +1178,7 @@ public class Bib2Gls implements TeXApp
  
          if (name.equals("glsxtr@resource"))
          {
-            // defer creating resources until all aux data
+            // Defer creating resources until all aux data
             // processed, but strip double-quotes from the second
             // argument. (A literal double-quote can be identified
             // with \" but such a file naming scheme should not be
@@ -3960,8 +3960,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.2.20180304";
-   public static final String DATE = "2018-03-04";
+   public static final String VERSION = "1.3";
+   public static final String DATE = "2018-03-05";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

@@ -493,4 +493,32 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="bibtex.error.too_many_commas">Too many commas in name ''{0}''</entry>
 <entry key="bibtex.error.string_name_undefined">String name ''{0}'' undefined</entry>
 <entry key="bibtex.error.repeated_entry">Repeated entry ''{0}''</entry>
+
+<!--  Package messages -->
+
+<!-- probsoln messages -->
+
+<entry key="probsoln.no_such_db">ProbSoln database ''{0}'' doesn''t exist.</entry>
+<entry key="probsoln.no_such_entry_in_db">Entry ''{0}'' doesn''t exist in ProbSoln database '{1}'.</entry>
+<entry key="probsoln.db_exists">ProbSoln database ''{0}'' already exists.</entry>
+<entry key="probsoln.request_args">Problem ''{0}'' (in database ''{1}'') requires {2} arguments. Please specify</entry>
+<entry key="probsoln.request_arg">Problem ''{0}'' (in database ''{1}'') requires 1 argument. Please specify</entry>
+
+<!-- datatool messages -->
+
+<entry key="datatool.db_exists">Database ''{0}'' already exists.</entry>
+<entry key="datatool.db_doesnt_exist">Database ''{0}'' doesn''t exist.</entry>
+<entry key="datatool.mismatched">Unmatched ''{0}'' (ended with ''{1}'').</entry>
+<entry key="datatool.invalid.header">Invalid header specs ''{0}''.</entry>
+<entry key="datatool.invalid.contents">Invalid contents specs ''{0}''.</entry>
+<entry key="datatool.header.exists">Header ''{0}'' already exists.</entry>
+<entry key="datatool.header.doesnt_exist">Header ''{0}'' doesn''t exist.</entry>
+<entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
+<entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
+
+<!--  ifthen messages -->
+
+<entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
+
+
 </properties>
