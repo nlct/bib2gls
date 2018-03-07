@@ -5213,21 +5213,21 @@ public class GlsResource
             // other groups:
 
             writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
-            writer.println("  \\providecommand{\\bibglsothergrouptitle}[3]{\\glssymbolsgroupname}");
+            writer.println("  \\providecommand{\\bibglsothergrouptitle}[3]{\\protect\\glssymbolsgroupname}");
             writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergroup#1}{\\bibglsothergrouptitle#1}}");
 
             // empty groups:
 
             writer.println("  \\providecommand{\\bibglsemptygroup}[1]{glssymbols}");
-            writer.println("  \\providecommand{\\bibglsemptygrouptitle}[1]{\\glssymbolsgroupname}");
+            writer.println("  \\providecommand{\\bibglsemptygrouptitle}[1]{\\protect\\glssymbolsgroupname}");
             writer.println("  \\providecommand{\\bibglssetemptygrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygroup#1}{\\bibglsemptygrouptitle#1}}");
 
             // number groups
 
             writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
-            writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\glsnumbersgroupname}");
+            writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\protect\\glsnumbersgroupname}");
             writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
             writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
 
