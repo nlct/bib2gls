@@ -3079,6 +3079,13 @@ public class Bib2GlsEntry extends BibEntry
          bib2gls.debug(e);
       }
 
+      String type = getFieldValue("type");
+
+      if (type != null)
+      {
+         parentEntry.putField("type", type);
+      }
+
       return parentEntry;
    }
 

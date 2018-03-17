@@ -836,6 +836,15 @@ public class GlsResource
          {
             dualCategory = getRequired(parser, list, opt);
          }
+         else if (opt.equals("missing-parent-category"))
+         {
+            missingParentCategory = getRequired(parser, list, opt);
+
+            if ("no value".equals(missingParentCategory))
+            {
+               missingParentCategory = null;
+            }
+         }
          else if (opt.equals("counter"))
          {
             counter = getRequired(parser, list, opt);
@@ -4446,6 +4455,27 @@ public class GlsResource
            parent.getId(), childEntry.getId());
 
          data.add(parent);
+
+         if (missingParentCategory != null)
+         {
+            if (missingParentCategory.equals("same as child"))
+            {
+               String childCat = childEntry.getFieldValue("category");
+
+               if (childCat != null)
+               {
+                  parent.putField("category", childCat);
+               }
+            }
+            else if (missingParentCategory.equals("same as base"))
+            {
+               parent.putField("category", parent.getBase());
+            }
+            else
+            {
+               parent.putField("category", missingParentCategory);
+            }
+         }
       }
 
       return parent;
@@ -7838,6 +7868,8 @@ public class GlsResource
    private Vector<PatternReplace> labelifyReplaceMap;
 
    private String type=null, category=null, counter=null;
+
+   private String missingParentCategory=null;
 
    private SortSettings sortSettings = new SortSettings("locale");
    private SortSettings dualSortSettings = new SortSettings();

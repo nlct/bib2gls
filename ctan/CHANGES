@@ -5,9 +5,10 @@ v1.4 (pending):
      --list-known-packages
      --custom-packages
 
-   * added resource option:
+   * added resource options:
 
      - missing-parents
+     - missing-parent-category
 
 v1.3 (2018-03-05):
 

@@ -6091,13 +6091,19 @@ As an alternative to \csopt{strip-missing-parents}, as from version
 \begin{itemize}
 \item \optfmt{strip}: this is equivalent to
 \csopt[true]{strip-missing-parents};
+
 \item \optfmt{ignore}: this is equivalent to the default
 \csopt[false]{strip-missing-parents};
+
 \item \optfmt{create}: this will create a new \atentry{index}
 entry with the missing parent's label (after it's been processed by
 options such as \csopt{labelify}) with the \field{name} obtained
-from the original value of the \field{parent} field (before being
+from the \emph{original} value of the \field{parent} field (before being
 processed by options like \csopt{labelify}).
+If the child entry has the \field{type} field set, then the new
+parent entry will be given the same value. The \field{category} for
+the new parent entry can be assigned with
+\csopt{missing-parent-category}.
 \end{itemize}
 
 For example, consider the \exfile{books.bib} file which contains
@@ -6598,6 +6604,24 @@ then both the \code{dog} and \code{dual.dog} entries will
 have their \field{category} field set to \optfmt{dual} since the
 new definition of \gls{bibglsnewdualentry} has overridden
 the \csopt[animals]{category} option.
+
+\optsection{missing-parent-category}
+
+If a missing parent entry is created through the use of
+\csopt[create]{missing-parents} then the \field{category} field can
+be assigned to the new parent entry with this option. The
+\meta{value} may be one of:
+\begin{itemize}
+ \item \code{same as child}: the parent entry's \field{category}
+  field is set to the same value as the child's (if set).
+ \item \code{same as base}: the parent entry's \field{category} is
+  set to the base name of the \ext{bib} file that provided the
+  child entry's definition;
+ \item \code{no value}: don't set the \field{category} field;
+ \item \meta{label}: the parent entry's \field{category} field is set to
+  \meta{label}. 
+\end{itemize}
+The default setting is \csopt[no value]{missing-parent-category}.
 
 \optsection{type}
 
