@@ -126,11 +126,17 @@ See the manual for further details.</entry>
 <entry key="syntax.tex.encoding">{0} &lt;name&gt;
 			Set the character encoding for the output files.</entry>
 <entry key="syntax.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
-			Instruct interpreter to pretend the listed 
-			packages have been used in the document.</entry>
+			Instruct interpreter to assume the listed 
+			packages have been used in the document.
+			(The packages must be known by the interpreter.)</entry>
 <entry key="syntax.ignore.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
 			Don''t check the log file for the listed
 			packages.</entry>
+<entry key="syntax.custom.packages">{0} &lt;list&gt; 
+			Instruct the interpreter to parse
+			the listed packages.</entry>
+<entry key="syntax.list.known.packages"> 
+			List the packages known to the interpreter.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
@@ -247,6 +253,9 @@ Defaulting to: {0}.
 <entry key="message.setting.entry.aliases">Setting entry type aliases.</entry>
 <entry key="message.removing.missing.parent">Stripping missing parent ''{0}'' from entry {1}</entry>
 <entry key="message.missing.sort.fallback">Entry ''{0}'' missing sort field ''{1}''. Falling back on field ''{2}''.</entry>
+<entry key="message.list.known.packages.auto">Automatic support for: </entry>
+<entry key="message.list.known.packages.extra">Support available for: </entry>
+<entry key="message.created.missing.parent">Created missing parent ''{0}'' for entry ''{1}''</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -405,6 +414,12 @@ Error occurred before: {3}
 <entry key="error.field.alias.trail">''field-aliases'' can''t contain both ''{0}={1}'' and ''{2}={0}'' (trails not permitted)</entry>
 <entry key="error.field.alias.identity">''field-aliases'' can''t contain identity mapping ''{0}={0}''</entry>
 <entry key="error.cyclic.sameas.type.category">Cyclic reference category='{'same as type'}' and type='{'same as category'}'</entry>
+<entry key="error.unsupported.package">Package ''{0}'' doesn't have in-built support.
+Use {1} {0} to allow the interpreter to parse {0}.sty if the package isn''t too complicated.</entry>
+<entry key="error.supported.package">Package ''{0}'' has in-built support.
+Use {1} {0} instead.</entry>
+<entry key="error.create.missing.parent.failed">Attempt to create missing parent ''{0}'' for entry ''{1}'' caused a problem:
+{2}</entry>
 
 <!--
     The following messages are used by convertgls2bib

@@ -1,3 +1,14 @@
+v1.4 (pending):
+
+   * added switches:
+
+     --list-known-packages
+     --custom-packages
+
+   * added resource option:
+
+     - missing-parents
+
 v1.3 (2018-03-05):
 
    * bug fix: check for quoted path elements (spaces in file names)

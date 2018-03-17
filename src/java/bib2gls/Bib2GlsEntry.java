@@ -720,6 +720,18 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      if (resource.isCreateMissingParentsEnabled())
+      {
+         orgParentValue = getField("parent");
+
+         if (orgParentValue != null)
+         {
+            TeXObjectList list = orgParentValue.expand(parser);
+            orgParentValue = new BibValueList();
+            orgParentValue.add(new BibUserString((TeXObjectList)list.clone()));
+         }
+      }
+
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
       if (resource.changeShortCase())
@@ -3018,6 +3030,58 @@ public class Bib2GlsEntry extends BibEntry
       return groupId;
    }
 
+   public Bib2GlsEntry createParent(TeXParser texParser)
+   {
+      if (orgParentValue == null)
+      {
+         return null;
+      }
+
+      String label = getParent();
+      String orgLabel = label;
+
+      if (label == null)
+      {
+         return null;
+      }
+
+      Bib2GlsEntry parentEntry = new Bib2GlsIndex(bib2gls);
+
+      if (labelPrefix != null && label.startsWith(labelPrefix))
+      {
+         parentEntry.setId(labelPrefix, label.substring(labelPrefix.length()));
+      }
+      else
+      {
+         parentEntry.setId(null, label);
+      }
+
+      parentEntry.base = base;
+
+      parentEntry.putField("name", orgParentValue);
+
+      try
+      {
+         parentEntry.parseFields(texParser);
+      }
+      catch (TeXSyntaxException e)
+      {
+         bib2gls.error(bib2gls.getMessage( 
+           "error.create.missing.parent.failed", orgLabel, getId(), 
+             e.getMessage(bib2gls)));
+         bib2gls.debug(e);
+      }
+      catch (IOException e)
+      {
+         bib2gls.error(bib2gls.getMessage( 
+           "error.create.missing.parent.failed", orgLabel, getId(), 
+             e.getMessage()));
+         bib2gls.debug(e);
+      }
+
+      return parentEntry;
+   }
+
    public static Bib2GlsEntry getEntry(String entryId,
      Vector<Bib2GlsEntry> entries)
    {
@@ -3229,6 +3293,8 @@ public class Bib2GlsEntry extends BibEntry
    private Vector<Bib2GlsEntry> hierarchy;
 
    private Vector<Bib2GlsEntry> crossRefdBy;
+
+   private BibValueList orgParentValue=null;
 
    private String crossRefTag = null;
    private String[] crossRefs = null;

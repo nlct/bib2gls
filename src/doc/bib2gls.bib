@@ -961,6 +961,13 @@ file by \gls{glsxtrresourcefile}
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.missing-parents,
+   name={\csoptfmt{missing\dhyphen parents}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.copy-alias-to-see,
    name={\csoptfmt{copy\dhyphen alias\dhyphen to\dhyphen see}},
    user1={\meta{boolean}},
@@ -2698,6 +2705,54 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{booktabs,
+  name={\styfmt{booktabs}},
+  category={package},
+  parent={packages}
+}
+
+@index{color,
+  name={\styfmt{color}},
+  category={package},
+  parent={packages}
+}
+
+@index{graphics,
+  name={\styfmt{graphics}},
+  category={package},
+  parent={packages}
+}
+
+@index{graphicx,
+  name={\styfmt{graphicx}},
+  category={package},
+  parent={packages}
+}
+
+@index{ifthen,
+  name={\styfmt{ifthen}},
+  category={package},
+  parent={packages}
+}
+
+@index{probsoln,
+  name={\styfmt{probsoln}},
+  category={package},
+  parent={packages}
+}
+
+@index{shortvrb,
+  name={\styfmt{shortvrb}},
+  category={package},
+  parent={packages}
+}
+
+@index{jmlrutils,
+  name={\styfmt{jmlrutils}},
+  category={package},
+  parent={packages}
+}
+
 @index{inputenc,
   name={\styfmt{inputenc}},
   category={package},
@@ -4381,6 +4436,19 @@ field.},
   name={\longargfmt{ignore-packages}},
   symbol={\shortargfmt{k}},
   user1={\meta{list}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.custom-packages,
+  name={\longargfmt{custom\dhyphen packages}},
+  user1={\meta{list}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.list-known-packages,
+  name={\longargfmt{list\dhyphen known\dhyphen packages}},
   category={switch},
   parent={commandlineoptions}
 }
@@ -6675,6 +6743,55 @@ has three or more items},
   name={\csfmt{use\-pack\-age}},
   user1={\oargm{options}\margm{name}\oargm{min version}},
   description={loads the package identified by \meta{name}},
+  note={kernel command},
+  category={command}
+}
+
+@index{RequirePackage,
+  name={\csfmt{Require\-Pack\-age}},
+  user1={\oargm{options}\margm{name}\oargm{min version}},
+  description={loads the package identified by \meta{name} from
+    within another package},
+  note={kernel command},
+  category={command}
+}
+
+@index{ProvidesPackage,
+  name={\csfmt{Provides\-Pack\-age}},
+  user1={\margm{name}\oargm{version}},
+  description={identifies a package},
+  note={kernel command},
+  category={command}
+}
+
+@index{DeclareOption,
+  name={\csfmt{Declare\-Opt\-ions}},
+  user1={\margm{name}\margm{code}},
+  description={declares an option with the given \meta{name}},
+  note={kernel command},
+  category={command}
+}
+
+@index{DeclareOption*,
+  name={\csfmt{Declare\-Opt\-ions*}},
+  user1={\margm{code}},
+  description={indicates what to do with unknown options},
+  note={kernel command},
+  category={command}
+}
+
+@index{ProcessOptions,
+  name={\csfmt{Process\-Opt\-ions}},
+  description={processes supplied options},
+  note={kernel command},
+  category={command}
+}
+
+@index{PackageError,
+  name={\csfmt{Pack\-age\-Err\-or}},
+  user1={\margm{name}\margm{code}\margm{help}},
+  description={generates an error message for the package identified
+by \meta{name}},
   note={kernel command},
   category={command}
 }

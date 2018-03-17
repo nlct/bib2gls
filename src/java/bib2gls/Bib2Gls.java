@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
@@ -540,7 +541,7 @@ public class Bib2Gls implements TeXApp
       {
          return "Cp437";
       }
-      else if (texCharset.equals("865"))
+      else if (texCharset.equals("cp865"))
       {
          return "Cp865";
       }
@@ -668,40 +669,7 @@ public class Bib2Gls implements TeXApp
             {
                String pkg = m.group(1).toLowerCase();
 
-               if (ignorePackages != null && ignorePackages.contains(pkg))
-               {// skip
-               }
-               else if (pkg.equals("amsmath")
-                 ||pkg.equals("amssymb")
-                 ||pkg.equals("pifont")
-                 ||pkg.equals("textcase")
-                 ||pkg.equals("wasysym")
-                 ||pkg.equals("lipsum")
-                 ||pkg.equals("natbib")
-                 ||pkg.equals("mhchem")
-                 ||pkg.equals("bpchem")
-                 ||pkg.equals("stix")
-                 ||pkg.equals("textcomp")
-                 ||pkg.equals("mnsymbol")
-                 ||pkg.equals("fourier")
-                 ||pkg.equals("upgreek")
-                 ||pkg.equals("xspace")
-                 ||pkg.equals("siunitx")
-                 ||pkg.equals("fontenc")
-                 ||pkg.equals("tipa")
-               )
-               {
-                  packages.add(pkg);
-               }
-               else if (pkg.equals("hyperref"))
-               {
-                  hyperref = true;
-               }
-               else if (pkg.equals("fontspec"))
-               {
-                  fontspec = true;
-               }
-               else if (pkg.equals("glossaries-extra"))
+               if (pkg.equals("glossaries-extra"))
                {
                   try
                   {
@@ -732,6 +700,21 @@ public class Bib2Gls implements TeXApp
                        "glossaries-extra");
                      debug(e);
                   }
+               }
+               else if (ignorePackages != null && ignorePackages.contains(pkg))
+               {// skip
+               }
+               else if (pkg.equals("hyperref"))
+               {
+                  hyperref = true;
+               }
+               else if (pkg.equals("fontspec"))
+               {
+                  fontspec = true;
+               }
+               else if (isAutoSupportPackage(pkg))
+               {
+                  packages.add(pkg);
                }
             }
             else if (line.contains(auxname))
@@ -768,11 +751,42 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public static boolean isAutoSupportPackage(String pkg)
+   {
+      for (String name : AUTO_SUPPORT_PACKAGES)
+      {
+         if (name.compareToIgnoreCase(pkg) == 0)
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public static boolean isExtraSupportedPackage(String pkg)
+   {
+      for (String name : EXTRA_SUPPORTED_PACKAGES)
+      {
+         if (name.equals(pkg))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public static boolean isKnownPackage(String pkg)
+   {
+      return isAutoSupportPackage(pkg) || isExtraSupportedPackage(pkg);
+   }
+
    private void initInterpreter(Vector<AuxData> data)
      throws IOException
    {
       L2HStringConverter listener = new L2HStringConverter(
-         new Bib2GlsAdapter(this), data)
+         new Bib2GlsAdapter(this), data, customPackages != null)
       {
          public void writeCodePoint(int codePoint) throws IOException
          {
@@ -792,9 +806,19 @@ public class Bib2Gls implements TeXApp
             }
             else
             {
-               getWriter().write(String.format("%c", codePoint));
+               getWriter().write(new String(Character.toChars(codePoint)));
             }
          }
+
+         public void parsePackageFile(LaTeXSty sty) throws IOException
+         {
+            if (isParsePackageSupportOn() 
+                 && customPackages.contains(sty.getName()))
+            {
+               sty.parseFile();
+            }
+         }
+
       };
 
       listener.setUseMathJax(false);
@@ -811,7 +835,7 @@ public class Bib2Gls implements TeXApp
       {
          for (String sty : packages)
          {
-            listener.usepackage(null, sty);
+            listener.usepackage(null, sty, false);
          }
       }
 
@@ -916,6 +940,18 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(listener.createSymbol("bibglscircumchar", '^'));
       listener.putControlSequence(listener.createSymbol("glsbackslash", '\\'));
       listener.putControlSequence(listener.createSymbol("glstildechar", '~'));
+
+      // custom packages may override the definitions of any of the
+      // above
+
+      if (customPackages != null)
+      {
+         for (String sty : customPackages)
+         {
+            listener.usepackage(null, sty, false);
+         }
+      }
+
    }
 
    public void provideCommand(String csName, String text)
@@ -3036,6 +3072,12 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.ignore.packages", 
         "--ignore-packages", "-k"));
       System.out.println();
+      System.out.println(getMessage("syntax.custom.packages", 
+        "--custom-packages"));
+      System.out.println();
+      System.out.println(getMessage("syntax.list.known.packages", 
+        "--list-known-packages"));
+      System.out.println();
 
       System.out.println();
       System.out.println(getMessage("syntax.mfirstuc",
@@ -3489,7 +3531,47 @@ public class Bib2Gls implements TeXApp
 
             for (String sty : styList)
             {
-               packages.add(sty);
+               if (isKnownPackage(sty))
+               {
+                  packages.add(sty);
+               }
+               else
+               {
+                  throw new Bib2GlsSyntaxException(
+                     getMessage("error.unsupported.package", sty, 
+                     "--custom-packages"));
+               }
+            }
+         }
+         else if (isArg(args[i], "custom-packages"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            String[] styList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+
+            if (customPackages == null)
+            {
+               customPackages = new Vector<String>();
+            }
+
+            for (String sty : styList)
+            {
+               if (isKnownPackage(sty))
+               {
+                  throw new Bib2GlsSyntaxException(
+                     getMessage("error.supported.package", sty, 
+                     "--packages"));
+               }
+               else
+               {
+                  customPackages.add(sty);
+               }
             }
          }
          else if (isArg(args[i], "k", "ignore-packages"))
@@ -3511,15 +3593,58 @@ public class Bib2Gls implements TeXApp
 
             for (String sty : styList)
             {
-               if (sty.equals("glossaries-extra"))
-               {
-                  warningMessage("error.invalid.opt.value", argVal[0], sty);
-               }
-               else
+               if (isKnownPackage(sty))
                {
                   ignorePackages.add(sty);
                }
+               else
+               {
+                  warningMessage("error.invalid.opt.value", argVal[0], sty);
+               }
             }
+         }
+         else if (args[i].equals("--list-known-packages"))
+         {
+            System.out.println(getMessage("message.list.known.packages.auto"));
+
+            for (int j = 0; j < AUTO_SUPPORT_PACKAGES.length; j++)
+            {
+               if (j%5 == 0)
+               {
+                  System.out.println();
+                  System.out.print("\t");
+               }
+               else
+               {
+                  System.out.print(", ");
+               }
+
+               System.out.print(AUTO_SUPPORT_PACKAGES[j]);
+            }
+
+            System.out.println();
+            System.out.println();
+
+            System.out.println(getMessage("message.list.known.packages.extra"));
+
+            for (int j = 0; j < EXTRA_SUPPORTED_PACKAGES.length; j++)
+            {
+               if (j%5 == 0)
+               {
+                  System.out.println();
+                  System.out.print("\t");
+               }
+               else
+               {
+                  System.out.print(", ");
+               }
+
+               System.out.print(EXTRA_SUPPORTED_PACKAGES[j]);
+            }
+
+            System.out.println();
+
+            System.exit(0);
          }
          else if (args[i].equals("--expand-fields"))
          {
@@ -3960,8 +4085,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.3.20180307";
-   public static final String DATE = "2018-03-07";
+   public static final String VERSION = "1.3.20180317";
+   public static final String DATE = "2018-03-17";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4024,7 +4149,22 @@ public class Bib2Gls implements TeXApp
 
    private boolean interpret = true;
 
-   private Vector<String> packages = null, ignorePackages=null;
+   private Vector<String> packages = null, ignorePackages=null,
+      customPackages = null;
+
+   public static final String[] AUTO_SUPPORT_PACKAGES = new String[]
+    { 
+      "amsmath", "amssymb", "bpchem", "fontenc", "fontspec", 
+      "fourier", "hyperref", "lipsum", "mhchem", "MnSymbol", 
+      "natbib", "pifont", "siunitx", "stix", "textcase", 
+      "textcomp", "tipa", "upgreek", "wasysym"
+    };
+
+   public static final String[] EXTRA_SUPPORTED_PACKAGES = new String[]
+    { "booktabs", "color", "datatool-base", "datatool", "etoolbox",
+      "graphics", "graphicx", "ifthen", "jmlrutils", "probsoln", 
+      "shortvrb", "xspace"
+    };
 
    private TeXParser interpreter = null;
 

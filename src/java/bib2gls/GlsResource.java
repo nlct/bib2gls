@@ -561,6 +561,32 @@ public class GlsResource
          else if (opt.equals("strip-missing-parents"))
          {
             stripMissingParents = getBoolean(parser, list, opt);
+
+            if (stripMissingParents)
+            {
+               createMissingParents = false;
+            }
+         }
+         else if (opt.equals("missing-parents"))
+         {
+            String val = getChoice(parser, list, opt, "strip", "create",
+             "ignore");
+
+            if (val.equals("strip"))
+            {
+               stripMissingParents = true;
+               createMissingParents = false;
+            }
+            else if (val.equals("create"))
+            {
+               stripMissingParents = false;
+               createMissingParents = true;
+            }
+            else if (val.equals("ignore"))
+            {
+               stripMissingParents = false;
+               createMissingParents = false;
+            }
          }
          else if (opt.equals("write-preamble"))
          {
@@ -4394,6 +4420,37 @@ public class GlsResource
       }
    }
 
+   private Bib2GlsEntry addMissingParent(Bib2GlsEntry childEntry, 
+      Vector<Bib2GlsEntry> data)
+   {
+      String parentId = childEntry.getParent();
+
+      if (parentId == null) return null;
+
+      // has parent already been defined?
+
+      Bib2GlsEntry parent = getEntry(parentId, data);
+
+      if (parent != null)
+      {
+         return null;
+      }
+
+      TeXParser bibParser = bibParserListener.getParser();
+
+      parent = childEntry.createParent(bibParser);
+
+      if (parent != null)
+      {
+         bib2gls.verboseMessage("message.created.missing.parent",
+           parent.getId(), childEntry.getId());
+
+         data.add(parent);
+      }
+
+      return parent;
+   }
+
    private void addHierarchy(Bib2GlsEntry childEntry, 
       Vector<Bib2GlsEntry> entries, Vector<Bib2GlsEntry> data)
    {
@@ -4824,6 +4881,22 @@ public class GlsResource
                      }
                   }
                }
+            }
+         }
+      }
+
+      if (createMissingParents)
+      {
+         for (int i = 0; i < entries.size(); i++)
+         {
+            Bib2GlsEntry entry = entries.get(i);
+
+            Bib2GlsEntry parentEntry = addMissingParent(entry, data);
+
+            if (parentEntry != null 
+                 && selectionMode != SELECTION_RECORDED_NO_DEPS)
+            {
+               entries.add(parentEntry);
             }
          }
       }
@@ -7661,6 +7734,11 @@ public class GlsResource
       return stripMissingParents;
    }
 
+   public boolean isCreateMissingParentsEnabled()
+   {
+      return createMissingParents;
+   }
+
    public boolean isCopyAliasToSeeEnabled()
    {
       return copyAliasToSee;
@@ -7964,6 +8042,8 @@ public class GlsResource
    private int limit=0;
 
    private boolean copyAliasToSee = false;
+
+   private boolean createMissingParents = false;
 
    private Bib2GlsBibParser bibParserListener = null;
 }

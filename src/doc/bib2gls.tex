@@ -562,6 +562,9 @@
   {\string-\string-#1}%
 }
 
+\newcommand*{\longargpageref}[1]{%
+ \longarg{#1} (page~\glsxtrpageref{switch.#1})}%
+
 \newcommand*{\longargorshort}[1]{%
   \texorpdfstring
   {\gls{switch.#1}\ifglshassymbol{switch.#1}{ or \glssymbol{switch.#1}}{}}%
@@ -1461,21 +1464,8 @@ environments provided within the document.
 number of packages that the parser recognises. Note that in
 some cases there's only very limited support. For example, 
 \isty{siunitx}'s \ics{si} command is recognised but other
-commands aren't from that package aren't. \bibgls\ checks for the
-following packages:
-\isty{amsmath}, \isty{amssymb}, \isty{pifont}, \isty{textcase},
-\isty{wasysym}, \isty{lipsum}, \isty{natbib}, \isty{mhchem}, 
-\isty{bpchem}, \isty{stix}, \isty{textcomp}, \isty{MnSymbol}, 
-\isty{fourier}, \isty{upgreek}, \isty{xspace}, \isty{siunitx}, 
-\isty{fontenc} and \isty{tipa}. (You can omit checking for specific
-packages with \longarg{ignore-packages}.) If you're wondering about the
-selection, the \file{texparserlib.jar} library was originally written for
-another application that required support for some of them. There
-are a few other packages that the library supports (see
-\url{https://github.com/nlct/texparser/tree/master/src/java/lib/latex}), but \bibgls\
-doesn't check for them as they're unlikely to be needed within
-field values. (You can explicitly request them with
-\longarg{packages} if required.)
+commands aren't from that package aren't. See
+\longargpageref{list-known-packages} for further details.
 
 Since the parser doesn't have a full set of commands available
 within the \LaTeX\ document, when it encounters \ics{renewcommand} it
@@ -1988,9 +1978,47 @@ this setting. For example, if \csfmt{superiortwo} is defined as
 then it will be interpreted as \hex{00B2} (superscript two) even if
 this setting is on.
 
+\argsection{list-known-packages}
+
+This option will list all the packages supported by the \TeX\ parser
+library and will then exit \bibgls. The results are divided into two
+sections: those packages that are searched for in the \iext{log}
+file and those packages that aren't searched for in the \iext{log}
+file but have some support available. Some of the support is very
+limited. Package options aren't detected.
+The transcript file is always searched for \isty{glossaries-extra}
+to ensure that the version is new enough to support \bibgls. 
+
+Packages that fall into the first category are:
+\isty{amsmath}, \isty{amssymb}, \isty{bpchem}, \isty{fontenc},
+\isty{fontspec}, \isty{fourier}, 
+\isty{hyperref}, \isty{lipsum}, \isty{MnSymbol}, \isty{mhchem}, \isty{natbib},
+\isty{pifont}, \isty{siunitx} (limited), \isty{stix},
+\isty{textcase}, \isty{textcomp}, \isty{tipa}, \isty{upgreek} and
+\isty{wasysym}.  (You can omit checking for specific packages with
+\longarg{ignore-packages}.) These are packages that provide commands
+that might be needed within entry fields. The check for
+\isty{fontspec} is to simply determine whether or not UTF-8
+characters are allowed in labels (for \csopt{labelify} and 
+\csopt{labelify-list}).
+
+Packages that fall into the second category are:
+\isty{booktabs}, \isty{color}, \isty{datatool-base} (very limited),
+\isty{datatool} (very limited), \isty{etoolbox} (very limited), \isty{graphics},
+\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils}, \isty{probsoln}, \isty{shortvrb},
+and \isty{xspace}. These are less likely to be needed within fields
+and so aren't checked for by default. If they are needed then you
+can instruct \bibgls\ to support them with \longarg{packages}.
+
+(If you're wondering about the selection, the \file{texparserlib.jar}
+library was originally written for another application that required
+support for some of them.)
+
+
+
 \argsection{packages}
 
-Instruct the interpreter to pretend the packages listed 
+Instruct the interpreter to assume the packages listed 
 in \meta{list} have been used by the document.
 This option has a cumulative action so \code{\longarg{packages}
 "wasysym,pifont"} is the same as \code{\longarg{packages} wasysym 
@@ -2000,7 +2028,21 @@ Note that there's only a limited number of packages supported by the
 \TeX\ parser library. This option is provided for cases where you're
 using a command from a package that the interpreter doesn't support
 but it happens to have the same name and meaning as a command from
-a package that the interpreter does support.
+a package that the interpreter does support. You can also use it to
+provide support for known packages that aren't checked for when the
+\ext{log} file is parsed. If you want \bibgls\ to parse an
+unsupported package use \longarg{custom-packages}.
+
+\argsection{custom-packages}
+
+Instruct the interpreter to parse the package files identified in
+\meta{list}. The package files need to be quite simple. When this
+switch is used, the interpreter can recognise \ics{ProvidesPackage},
+\ics{DeclareOption} (and \ics{DeclareOption*}),
+\ics{ProcessOptions}, \ics{PackageError} and \ics{RequirePackage},
+but it can't deal with complicated code.  In the case of
+\ics{RequirePackage}, support will also be governed by
+\longargfmt{custom-packages}.  This option has a cumulative action.
 
 \argsection{ignore-packages}
 
@@ -2011,7 +2053,7 @@ listed in \meta{list}. Note that this option simply instructs
 that are identified with \longarg{packages} will be passed to the
 interpreter if support is available, even if the package is also
 listed in \longargfmt{ignore-packages}.  Note that
-\sty{glossaries-extra} can't be included in the ignored \meta{list}.
+unknown packages can't be included in the ignored \meta{list}.
 
 \argsection{mfirstuc-protection}
 
@@ -6037,7 +6079,74 @@ typing mistake in the \field{parent} field. If you actually want
 missing parents to be stripped before sorting (but after the
 selection process) then use \csopt[true]{strip-missing-parents}. If
 you want all parents stripped then use \csopt{flatten} or
-\csopt[parent]{ignore-fields} instead.
+\csopt[parent]{ignore-fields} instead. As from version 1.4, if you
+want \bibgls\ to create the missing parents, then you can use 
+\csopt[create]{missing-parents}.
+
+\optsection{missing-parents}
+
+As an alternative to \csopt{strip-missing-parents}, as from version
+1.4 you can now use \csopt[\meta{value}]{missing-parents} where
+\meta{value} may be one of:
+\begin{itemize}
+\item \optfmt{strip}: this is equivalent to
+\csopt[true]{strip-missing-parents};
+\item \optfmt{ignore}: this is equivalent to the default
+\csopt[false]{strip-missing-parents};
+\item \optfmt{create}: this will create a new \atentry{index}
+entry with the missing parent's label (after it's been processed by
+options such as \csopt{labelify}) with the \field{name} obtained
+from the original value of the \field{parent} field (before being
+processed by options like \csopt{labelify}).
+\end{itemize}
+
+For example, consider the \exfile{books.bib} file which contains
+entries like
+\begin{verbatim}
+@entry{ubik,
+  name={Ubik},
+  description={novel by Philip K. Dick},
+  identifier={book},
+  author={\sortmediacreator{Philip K.}{Dick}},
+  year={1969}
+}
+\end{verbatim}
+then the field alias
+\begin{codeenv}
+\csopt[author=parent]{field-aliases}
+\end{codeenv}
+will treat
+\begin{verbatim}
+  author={\sortmediacreator{Philip K.}{Dick}},
+\end{verbatim}
+as though it had been defined as
+\begin{verbatim}
+  parent={\sortmediacreator{Philip K.}{Dick}},
+\end{verbatim}
+This can be converted into a label with the options:
+\begin{codeenv}
+ \csopt[parent]{labelify},
+ \csopt[\marg{
+   \marg{[ '\cs{cs.string}\csfmt{-}\cs{cs.string}\csfmt{.}]}\marg{}
+ }]{labelify-replace}
+\end{codeenv}
+If the interpreter has been provided with the definition:
+\begin{verbatim}
+\providecommand*{\sortmediacreator}[2]{#2 #1}
+\end{verbatim}
+then the \field{parent} field for the \code{ubik} entry
+will become \code{DickPhilipK} but the original value is retained
+when \csopt[create]{missing-parents} is set. Once all the entries
+have been processed, if \code{ubik} has been selected but no entry
+can be found with the label \code{DickPhilipK} then a new entry will
+be created as though it had been defined with:
+\begin{verbatim}
+@index{DickPhilipK,
+  name={\sortmediacreator{Philip K.}{Dick}}
+}
+\end{verbatim}
+This is an alternative approach to the \exfile{sample-authors.tex}
+document from the \hyperref[sec:examples]{examples chapter}.
 
 \optsection{abbreviation-name-fallback}
 
