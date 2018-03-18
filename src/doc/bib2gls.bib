@@ -4867,6 +4867,10 @@ field.},
   name={\filefmt{bib2gls.bat}}
 }
 
+@index{file.xampl.bib,
+  name={\filefmt{xampl.bib}}
+}
+
 @index{file.sample-dual.tex,
   name={\filefmt{sample\dhyphen dual.tex}}
 }
@@ -6919,7 +6923,7 @@ by \meta{name}},
   name={\csfmt{citation}},
   user1={\margm{label}},
   description={written to the \ext{aux} file on each occurrence of
-   \gls[noindex]{idx.cite}},
+   \gls[noindex]{cite}},
   note={kernel command},
   category={command}
 }
@@ -6928,6 +6932,14 @@ by \meta{name}},
   name={\csfmt{cite}},
   user1={\margm{label}},
   description={cross-reference a bibliographic citation},
+  note={kernel command},
+  category={command}
+}
+
+@index{bibliography,
+  name={\csfmt{bibliography}},
+  user1={\margm{file list}},
+  description={display bibliography created by \BibTeX},
   note={kernel command},
   category={command}
 }

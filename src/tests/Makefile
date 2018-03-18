@@ -438,6 +438,7 @@ test-books.glstex	: test-books.tex books.bib $(DEPS)
 
 test-bibtexdata.pdf	: test-bibtexdata.glstex
 		pdflatex test-bibtexdata
+		pdflatex test-bibtexdata
 
 test-bibtexdata.glstex	: test-bibtexdata.tex $(DEPS)
 		pdflatex test-bibtexdata

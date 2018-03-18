@@ -2,10 +2,10 @@
 % arara: bib2gls: {options: [--cite-as-record]}
 % arara: bibtex
 % arara: pdflatex
+% arara: pdflatex
 \documentclass{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[record,nomain,style=altlist]{glossaries-extra}
+\usepackage[record,nomain]{glossaries-extra}
 
 \newglossary*{contributors}{Authors/Editors}
 \newglossary*{titles}{Titles}
@@ -23,9 +23,23 @@
   field-aliases={
     title=name
   },
+  replicate-fields={
+    note=name
+  },
+  labelify-replace={
+    {[ \string\-\string\.]}{}
+  },
   type={contributors},
-  category={same as original entry}
+  category={same as original entry},
+  sort-field={category},
+  sort-suffix={name}
 ]
+
+\glsxtrsetgrouptitle{article}{Articles}
+\glsxtrsetgrouptitle{booklet}{Booklets}
+\glsxtrsetgrouptitle{book}{Books}
+\glsxtrsetgrouptitle{inbook}{Book Chapters}
+\glsxtrsetgrouptitle{misc}{Miscellaneous}
 
 \newcommand{\contributorhandler}[1]{\par\glsentryname{#1} (#1)}
 
@@ -40,13 +54,19 @@
 }
 
 \begin{document}
-\cite{book-minimal}
-\newpage
-\cite{article-full}
+Sample~\cite{book-minimal,article-full,inbook-full,misc-minimal}.
+Another sample~\cite{booklet-minimal,misc-full,article-minimal}.
+
 
 \bibliographystyle{plain}
 \bibliography{xampl}
 
-\printunsrtglossaries
+\printunsrtglossary[type=contributors,style=altlist]
+\printunsrtglossary*[type=titles,style=indexgroup]
+{%
+ \renewcommand{\glsxtrgroupfield}{category}%
+ \renewcommand{\glstreenamefmt}[1]{\emph{#1}}%
+ \renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
+}
 
 \end{document}
