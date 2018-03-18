@@ -1,0 +1,23 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={xampl},
+  selection=all,
+  entry-type-aliases={
+   \GlsXtrBibTeXEntryAliases
+  },
+  field-aliases={
+    title=name
+  },
+  category={same as original entry}
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

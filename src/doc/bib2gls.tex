@@ -3287,6 +3287,24 @@ The \atentry{acronym} entry type is like \atentry{abbreviation} except that
 the term is written to the output file using the command
 \csref{bibglsnewacronym}.
 
+\entrysection{author}
+
+The \atentry{author} entry type is primarily provided for use 
+by the \atentry{bibtexentry} type. You may use it explicitly
+if you want, but you need to take care that it doesn't clash with
+\atentry{bibtexentry}. It behaves much like \atentry{index} except that the
+term is written to the output file using the command
+\csref{bibglsnewauthor}.
+
+\entrysection{editor}
+
+The \atentry{editor} entry type is primarily provided for use 
+by the \atentry{bibtexentry} type. You may use it explicitly
+if you want, but you need to take care that it doesn't clash with
+\atentry{bibtexentry}. It behaves much like \atentry{index} except that the
+term is written to the output file using the command
+\csref{bibglsneweditor}.
+
 \section{Dual Entry Types}
 \label{sec:dualentry}
 
@@ -4467,6 +4485,89 @@ which defines the secondary as an abbreviation using
 always defined immediately after the corresponding secondary entry.
 The primary may be defined earlier or later in the file depending on the
 way the entries are sorted and on the \csopt{dual-sort} setting.
+
+\section{Multi-Entry Types}
+\label{sec:multientry}
+
+A multi-entry type is a primary entry that may spawn multiple 
+primary entries. This means that both the main entry and the
+spawned entries are sorted together along with all the other primary
+entries. A multi-entry type may not spawn additional entries
+depending on the supplied field values.
+
+\entrysection{bibtexentry}
+
+The \atentry{bibtexentry} type will typically need to be aliased
+as it's designed for converting \BibTeX\ entries into \bibgls\
+entries. For example, to make \bibgls\ treat \atentryfmt{article}
+and \atentryfmt{book} as though they were both
+\atentry{bibtexentry}:
+\begin{codeenv}
+\csopt[\marg{
+  article=bibtexentry,
+  book=bibtexentry
+}]{entry-type-aliases}
+\end{codeenv}
+For convenience, \isty{glossaries-extra-bib2gls} v1.29+
+provides \ics{GlsXtrBibTeXEntryAliases} which covers all the
+basic \BibTeX's entry types. If you use 
+\csopt[same as original entry]{category}, the \field{category}
+field will be set to the original entry type (for example,
+\code{article} or \code{book}). Similarly you can use
+\csopt[same as original entry]{type} to set the \field{type}
+field (but remember that the glossary types will need to be defined
+in the document).
+
+You will also need to provide field aliases. For example:
+\begin{codeenv}
+\csopt[\marg{
+  title=name
+}]{field-aliases}
+\end{codeenv}
+Since \BibTeX's \fieldfmt{type} field conflicts with \bibgls's
+\field{type} field, when \bibgls\ parses \atentry{bibtexentry}
+if will convert \fieldfmt{type} to \field{bibtextype}, so you
+must use \field{bibtextype} as the identifier when aliasing
+(or provide the \field{bibtextype} key with \cs{glsaddkey} etc).
+
+The \atentry{bibtexentry} essentially creates an \atentry{index}
+form of entry, but it additionally defines an \atentry{author}
+or \atentry{editor} entry for each listed author or editor
+and makes the \atentry{bibtexentry} dependent on the 
+author and editor entries and vice versa. Each author is effectively
+defined as
+\begin{codeenv}
+\atentry{author}\marg{\meta{label},
+  name=\marg{\ics{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}}
+}
+\end{codeenv}
+and each editor is effectively defined as
+\begin{codeenv}
+\atentry{editor}\marg{\meta{label},
+  name=\marg{\ics{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}}
+}
+\end{codeenv}
+In both cases, the label is obtained by converting the \field{name}
+to a label, using the same function as \csopt{labelify} (which
+means it's governed by \csopt{labelify-replace}).
+
+The main \atentry{bibtexentry} is defined using
+\ics{bibglsnewbibtexentry} and is followed by
+\begin{codeenv}
+\ics{glsxtrfieldlistadd}\margm{id}\marg{bibtex\meta{contributor-type}}\margm{contributor-id}
+\end{codeenv}
+where \meta{id} is the label identifying the main
+\atentry{bibtexentry}, \meta{contributor-type} is either
+\code{author} or \code{editor} and \meta{contributor-id} is the
+label identifier the contributor.
+
+Each author is defined using
+\ics{bibglsnewauthor} and each editor is defined using
+\ics{bibglsneweditor}. In both cases the definition is followed
+by:
+\begin{codeenv}
+\ics{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry}\margm{id}
+\end{codeenv}
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
@@ -6531,7 +6632,12 @@ The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: set the
 \field{category} to the \ext{bib} entry type used to define it
-(without the leading \code{@});
+(lower case and without the initial \code{@});
+
+\item \optfmt{same as original entry}: set the \field{category} 
+to the original entry type (lower case and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased);
 
 \item \optfmt{same as base}: set the \field{category}
 to the base name of the \ext{bib} file (without the extension) 
@@ -6613,13 +6719,13 @@ be assigned to the new parent entry with this option. The
 \meta{value} may be one of:
 \begin{itemize}
  \item \code{same as child}: the parent entry's \field{category}
-  field is set to the same value as the child's (if set).
+  field is set to the same value as the child's (if set);
  \item \code{same as base}: the parent entry's \field{category} is
   set to the base name of the \ext{bib} file that provided the
   child entry's definition;
  \item \code{no value}: don't set the \field{category} field;
  \item \meta{label}: the parent entry's \field{category} field is set to
-  \meta{label}. 
+  \meta{label} (which shouldn't contain any special characters). 
 \end{itemize}
 The default setting is \csopt[no value]{missing-parent-category}.
 
@@ -6628,13 +6734,21 @@ The default setting is \csopt[no value]{missing-parent-category}.
 The \meta{value} may be one of:
 \begin{itemize}
  \item \optfmt{same as entry} set the \field{type} field
-  to the entry type (without the initial \code{@}); 
+  to the entry type (lower case and without the initial \code{@}); 
+
+ \item \optfmt{same as original entry} set the \field{type} 
+  to the original entry type (lower case and without 
+  the initial \code{@}) before it was aliased (behaves like 
+  \optfmt{same as entry} if the entry type wasn't aliased);
+
  \optfmt{same as base} set the \field{type} field
   to the base name of the corresponding \ext{bib} file
   (without the extension);
+
  \item \optfmt{same as category} set the \field{type} field
    to the same value as the \field{category} field
    (\field{type} unchanged if \field{category} not set);
+
  \item\meta{label} sets the \field{type} field to the glossary 
    identified by \meta{label}.
 \end{itemize}
@@ -10792,12 +10906,18 @@ file (or created through a mapping). The \meta{value} is required.
 The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: sets the \field{type} to the entry
-type. For example, if the entry was defined with
+type (lower case and without 
+the initial \code{@}). For example, if the entry was defined with
 \atentry{dualentry}, the \field{type} will be set to
 \optfmt{dualentry}.
 If you've used \csopt{entry-type-aliases}, this refers to the target
 entry type not the original entry type provided in the \ext{bib}
 file.
+
+\item \optfmt{same as original entry}: set the \field{type} field
+to the original entry type (lower case and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased).
 
 \item \optfmt{same as base}: sets the \field{type} to the base name
 of the \ext{bib} file (without the extension) that provided the
@@ -10844,12 +10964,18 @@ file (or created through a mapping). The \meta{value} may be empty.
 The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: sets the \field{category} to the entry
-type. For example, if the entry was defined with
+type (lower case and without 
+the initial \code{@}). For example, if the entry was defined with
 \atentry{dualentry}, the \field{category} will be set to
 \optfmt{dualentry}.
 If you've used \csopt{entry-type-aliases}, this refers to the target
 entry type not the original entry type provided in the \ext{bib}
 file.
+
+\item \optfmt{same as original entry}: set the \field{category} field
+to the original entry type (lower case and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased).
 
 \item \optfmt{same as base}: sets the \field{category} to the base
 name of the \ext{bib} file (without the extension) that provided the
@@ -11780,6 +11906,26 @@ to format the name, which ensures that it uses the same font as the
 long form for the dual abbreviation. This will use
 \ics{glsuselongfont} if it's defined otherwise it will be defined to
 replicate that command.
+
+\cssection{bibglsnewbibtexentry}
+
+\formatdef{bibglsnewbibtexentry}
+This command is used to define the main term identified with
+\atentry{bibtexentry}.
+
+\cssection{bibglsnewauthor}
+
+\formatdef{bibglsnewauthor}
+This command is used to define terms identified with
+\atentry{author} (typically implicitly created through
+\atentry{bibtexentry}).
+
+\cssection{bibglsneweditor}
+
+\formatdef{bibglsneweditor}
+This command is used to define terms identified with
+\atentry{editor} (typically implicitly created through
+\atentry{bibtexentry}).
 
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}

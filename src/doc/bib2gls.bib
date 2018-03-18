@@ -224,6 +224,27 @@
   category={command}
 }
 
+@dualindexentry{bibglsnewbibtexentry,
+  name={\csfmt{bib\-gls\-new\-bib\-tex\-entry}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \gls[noindex]{dual.entry.bibtexentry}},
+  category={command}
+}
+
+@dualindexentry{bibglsnewauthor,
+  name={\csfmt{bib\-gls\-new\-author}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \gls[noindex]{dual.entry.author}},
+  category={command}
+}
+
+@dualindexentry{bibglsneweditor,
+  name={\csfmt{bib\-gls\-new\-author}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \gls[noindex]{dual.entry.author}},
+  category={command}
+}
+
 @dualindexentry{bibglsuselongfont,
   name={\csfmt{bib\-gls\-use\-long\-font}},
   user1={\margm{text}\margm{category}},
@@ -3953,6 +3974,34 @@ field.},
   parent={internalfields}
 }
 
+@dualindexentry{field.bibtextype,
+  name={\fieldfmt{bib\-tex\-type}},
+  description={Used by \bibgls\ as a substitution for \BibTeX's
+   \fieldfmt{type} field when parsing \atentry{bibtexentry}. Needs
+   to be defined or aliased to make it available in the document.},
+  note={internal field set by \bibgls},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.bibtexauthor,
+  name={\fieldfmt{bib\-tex\-author}},
+  description={Used when an \atentry{author} entry is automatically
+  created by \atentry{bibtexentry}.},
+  note={internal field set by \bibgls},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.bibtexeditor,
+  name={\fieldfmt{bib\-tex\-editor}},
+  description={Used when an \atentry{editor} entry is automatically
+  created by \atentry{bibtexentry}.},
+  note={internal field set by \bibgls},
+  category={internalfield},
+  parent={internalfields}
+}
+
 @dualindexentry{field.currcount,
   name={\fieldfmt{currcount}},
   description={Used with entry counting to store the current total.},
@@ -4281,6 +4330,24 @@ field.},
 
 @dualindexentry{entry.tertiaryindexabbreviationentry,
   name={\atentryfmt{tert\-iary\-index\-abbre\-via\-tion\-entry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.bibtexentry,
+  name={\atentryfmt{bib\-tex\-entry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.author,
+  name={\atentryfmt{author}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.editor,
+  name={\atentryfmt{editor}},
   category={entrytype},
   parent={entrytypes}
 }
@@ -6018,6 +6085,15 @@ defined},
   description={expands to \cs{cs.string}\cs{u}},
   note={provided by \styfmt{glossaries-extra} v1.21+ (moved to
 \styfmt{glossaries-extra-bib2gls} in v1.27)},
+  category={command}
+}
+
+@index{GlsXtrBibTeXEntryAliases,
+  name={\csfmt{Gls\-Xtr\-Bib\-TeX\-Entry\-Aliases}},
+  user1={},
+  description={expands to the set of common entry aliases for
+\atentry{bibtexentry}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.29+},
   category={command}
 }
 

@@ -24,7 +24,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-record-prefix.pdf test-labelify.pdf \
 	  test-labelify-fontspec.pdf test-custom-symbols.pdf \
 	  test-crossresource-refs.pdf test-custom-rules.pdf \
-	  test-same-as-base.pdf
+	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -428,6 +428,20 @@ test-same-as-base.pdf	: test-same-as-base.glstex
 test-same-as-base.glstex	: test-same-as-base.tex bacteria.bib topics.bib $(DEPS)
 		pdflatex test-same-as-base
 		$(BIB2GLS) test-same-as-base
+
+test-books.pdf	: test-books.glstex
+		pdflatex test-books
+
+test-books.glstex	: test-books.tex books.bib $(DEPS)
+		pdflatex test-books
+		$(BIB2GLS) test-books
+
+test-bibtexdata.pdf	: test-bibtexdata.glstex
+		pdflatex test-bibtexdata
+
+test-bibtexdata.glstex	: test-bibtexdata.tex $(DEPS)
+		pdflatex test-bibtexdata
+		$(BIB2GLS) test-bibtexdata
 
 clean	:
 	$(RM) *.aux

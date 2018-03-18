@@ -5211,27 +5211,7 @@ public class GlsResource
             writer.println("\\bibgls@sep\\bibgls@item\\def\\bibgls@sep{, }}%");
             writer.println(" }");
             writer.println("}");
-            writer.println("\\providecommand*{\\bibglscontributor}[4]{%");
-
-            switch (contributorOrder)
-            {
-               case CONTRIBUTOR_ORDER_SURNAME:
-                 writer.print("  #3\\ifstrempty{#4}{}{, #4}");
-                 writer.print("\\ifstrempty{#1}{}{, #1}");
-                 writer.println("\\ifstrempty{#2}{}{, #2}%");
-               break;
-               case CONTRIBUTOR_ORDER_VON:
-                 writer.print("  \\ifstrempty{#2}{}{#2 }#3");
-                 writer.print("\\ifstrempty{#4}{}{, #4}");
-                 writer.println("\\ifstrempty{#1}{}{, #1}%");
-               break;
-               case CONTRIBUTOR_ORDER_FORENAMES:
-                 writer.print("  #1\\ifstrempty{#2}{}{ #2} #3");
-                 writer.println("\\ifstrempty{#4}{}{, #4}%");
-               break;
-            }
-
-            writer.println("}");
+            writeBibGlsContributorDef(writer);
          }
 
          if (dateTimeList != null)
@@ -5842,6 +5822,32 @@ public class GlsResource
       }
 
       return entryCount;
+   }
+
+   public void writeBibGlsContributorDef(PrintWriter writer)
+     throws IOException
+   {
+      writer.println("\\providecommand*{\\bibglscontributor}[4]{%");
+
+      switch (contributorOrder)
+      {
+         case CONTRIBUTOR_ORDER_SURNAME:
+           writer.print("  #3\\ifstrempty{#4}{}{, #4}");
+           writer.print("\\ifstrempty{#1}{}{, #1}");
+           writer.println("\\ifstrempty{#2}{}{, #2}%");
+         break;
+         case CONTRIBUTOR_ORDER_VON:
+           writer.print("  \\ifstrempty{#2}{}{#2 }#3");
+           writer.print("\\ifstrempty{#4}{}{, #4}");
+           writer.println("\\ifstrempty{#1}{}{, #1}%");
+         break;
+         case CONTRIBUTOR_ORDER_FORENAMES:
+           writer.print("  #1\\ifstrempty{#2}{}{ #2} #3");
+           writer.println("\\ifstrempty{#4}{}{, #4}%");
+         break;
+      }
+
+      writer.println("}");
    }
 
    private void writeBibEntryDef(PrintWriter writer, Bib2GlsEntry entry)
@@ -7460,6 +7466,11 @@ public class GlsResource
          return entry.getEntryType();
       }
 
+      if (value.equals("same as original entry"))
+      {
+         return entry.getOriginalEntryType();
+      }
+
       if (value.equals("same as base"))
       {
          return entry.getBase();
@@ -7551,6 +7562,11 @@ public class GlsResource
       if (value.equals("same as entry"))
       {
          return entry.getEntryType();
+      }
+
+      if (value.equals("same as original entry"))
+      {
+         return entry.getOriginalEntryType();
       }
 
       if (value.equals("same as base"))

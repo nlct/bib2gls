@@ -498,8 +498,9 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>
 <entry key="bibtex.error.expecting_or">Expecting ''{0}'' or ''{1}''</entry>
-<entry key="bibtex.error.missing_field_part">Missing field part</entry>
-<entry key="bibtex.error.missing_field_name">Missing field name</entry>
+<entry key="bibtex.error.missing_id">Missing identifier</entry>
+<entry key="bibtex.error.missing_field_part">Missing field value</entry>
+<entry key="bibtex.error.missing_field_name">Missing field identifier</entry>
 <entry key="bibtex.error.unbalanced_braces">Unbalanced braces</entry>
 <entry key="bibtex.error.immediately_follows_entry_type">''{0}'' immediately follows entry type</entry>
 <entry key="bibtex.error.immediately_follows_field_name">''{0}'' immediately follows field name</entry>

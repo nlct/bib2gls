@@ -1,0 +1,27 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,nostyles,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\newcommand{\sortmediacreator}[2]{#1 #2}
+\newcommand{\sortart}[2]{#1 #2}
+
+\GlsXtrLoadResources[
+  src={books},
+  selection=all,
+  field-aliases={author=parent,identifier=category},
+  labelify={parent},
+  labelify-replace={
+   {[ '\string\-]}{}% remove spaces, apostrophes and hyphens
+  },
+% missing-parents=strip
+ missing-parents=create
+]
+
+\begin{document}
+
+\printunsrtglossaries
+\end{document}

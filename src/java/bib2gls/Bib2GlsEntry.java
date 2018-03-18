@@ -48,6 +48,7 @@ public class Bib2GlsEntry extends BibEntry
    {
       super(entryType.toLowerCase());
       this.bib2gls = bib2gls;
+      this.originalEntryType = entryType;
 
       resource = bib2gls.getCurrentResource();
 
@@ -151,6 +152,16 @@ public class Bib2GlsEntry extends BibEntry
    {
       labelPrefix = prefix;
       setId(label);
+   }
+
+   public void setOriginalEntryType(String originalEntryType)
+   {
+      this.originalEntryType = originalEntryType;
+   }
+
+   public String getOriginalEntryType()
+   {
+      return originalEntryType;
    }
 
    public String processLabel(String label)
@@ -653,6 +664,11 @@ public class Bib2GlsEntry extends BibEntry
             checkGlsCs(parser, (TeXObjectList)object, false, fieldName);
          }
       }
+   }
+
+   protected boolean fieldsParsed()
+   {
+      return fieldsParsed;
    }
 
    public void parseFields(TeXParser parser)
@@ -3290,6 +3306,8 @@ public class Bib2GlsEntry extends BibEntry
    private Vector<GlsRecord> ignoredRecords;
 
    private String base="";
+
+   private String originalEntryType;
 
    private Vector<Bib2GlsEntry> children;
 

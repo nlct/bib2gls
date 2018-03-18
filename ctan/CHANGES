@@ -10,6 +10,15 @@ v1.4 (pending):
      - missing-parents
      - missing-parent-category
 
+   * added extra keyword "same as original entry" 
+     to category and type assignments.
+
+   * added new entry types:
+
+     - @bibtexentry
+     - @author
+     - @editor
+
 v1.3 (2018-03-05):
 
    * bug fix: check for quoted path elements (spaces in file names)

@@ -46,6 +46,7 @@ public class Bib2GlsAt extends At
       Bib2Gls bib2gls = (Bib2Gls)bibParser.getTeXApp();
 
       String entryType = entryTypeList.toString(parser).trim().toLowerCase();
+      String originalEntryType = entryType;
 
       entryType = resource.mapEntryType(entryType);
 
@@ -110,6 +111,15 @@ public class Bib2GlsAt extends At
             || entryType.equals("dualnumber"))
       {
          data = new Bib2GlsDualSymbol(bib2gls, entryType);
+      }
+      else if (entryType.equals("bibtexentry"))
+      {
+         data = new Bib2GlsBibTeXEntry(bib2gls);
+      }
+      else if (entryType.equals("author")
+            || entryType.equals("editor"))
+      {
+         data = new Bib2GlsContributor(bib2gls, entryType);
       }
       else
       {
@@ -208,6 +218,7 @@ public class Bib2GlsAt extends At
       }
       else if (data instanceof Bib2GlsEntry)
       {
+         ((Bib2GlsEntry)data).setOriginalEntryType(originalEntryType);
          String id = ((Bib2GlsEntry)data).getId();
 
          if (bibParser.getBibEntry(id) != null)
@@ -220,6 +231,11 @@ public class Bib2GlsAt extends At
       }
 
       bibParser.addBibData(data);
+
+      if (data instanceof Bib2GlsMultiEntry)
+      {
+         ((Bib2GlsMultiEntry)data).populate(bibParser);
+      }
    }
 
    protected boolean containsSpecialChars(String id)
