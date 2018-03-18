@@ -3300,10 +3300,22 @@ public class Bib2GlsEntry extends BibEntry
       return getId();
    }
 
+   public void setSelected(boolean selected)
+   {
+      this.selected = selected;
+   }
+
+   public boolean isSelected()
+   {
+      return selected;
+   }
+
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
    private Vector<GlsRecord> supplementalRecords;
    private Vector<GlsRecord> ignoredRecords;
+
+   private boolean selected = false;
 
    private String base="";
 

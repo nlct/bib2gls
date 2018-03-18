@@ -84,6 +84,14 @@ Interpret tilde character as a normal space.
 
 Interpret tilde as a non-breaking space (default).
 
+=item B<--cite-as-record>
+
+Treat B<\citation> as an ignored record.
+
+=item B<--no-cite-as-record>
+
+Don't check for instances of B<\citation> in the B<.aux> file (default).
+
 =item B<--force-cross-resource-refs> or B<-x>
 
 Force cross-resource referencing mode on.

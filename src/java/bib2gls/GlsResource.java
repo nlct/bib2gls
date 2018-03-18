@@ -4517,7 +4517,7 @@ public class GlsResource
       {
          bib2gls.verboseMessage("message.added.parent", parentId);
          addHierarchy(parent, entries, data);
-         entries.add(parent);
+         addEntry(entries, parent);
       }
    }
 
@@ -4658,6 +4658,12 @@ public class GlsResource
       return recordLabelPrefix+record.getLabel();
    }
 
+   private void addEntry(Vector<Bib2GlsEntry> entries, Bib2GlsEntry entry)
+   {
+      entries.add(entry);
+      entry.setSelected(true);
+   }
+
    private void processData(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries, String entrySort)
       throws Bib2GlsException
@@ -4674,7 +4680,7 @@ public class GlsResource
 
          for (Bib2GlsEntry entry : data)
          {
-            entries.add(entry);
+            addEntry(entries, entry);
          }
       }
       else if (entrySort == null || entrySort.equals("none")
@@ -4730,7 +4736,7 @@ public class GlsResource
                   addHierarchy(entry, entries, data);
                }
 
-               entries.add(entry);
+               addEntry(entries, entry);
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
@@ -4775,7 +4781,7 @@ public class GlsResource
                   addHierarchy(entry, entries, data);
                }
 
-               entries.add(entry);
+               addEntry(entries, entry);
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
@@ -4815,7 +4821,7 @@ public class GlsResource
                   addHierarchy(entry, entries, data);
                }
 
-               entries.add(entry);
+               addEntry(entries, entry);
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
@@ -4849,7 +4855,7 @@ public class GlsResource
                         addHierarchy(entry, entries, data);
                      }
 
-                     entries.add(entry);
+                     addEntry(entries, entry);
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
@@ -4874,7 +4880,7 @@ public class GlsResource
                               addHierarchy(entry, entries, data);
                            }
 
-                           entries.add(entry);
+                           addEntry(entries, entry);
 
                            if (selectionMode == SELECTION_RECORDED_AND_DEPS
                              ||selectionMode
@@ -4913,7 +4919,7 @@ public class GlsResource
                         addHierarchy(entry, entries, data);
                      }
 
-                     entries.add(entry);
+                     addEntry(entries, entry);
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
@@ -4937,7 +4943,7 @@ public class GlsResource
             if (parentEntry != null 
                  && selectionMode != SELECTION_RECORDED_NO_DEPS)
             {
-               entries.add(parentEntry);
+               addEntry(entries, parentEntry);
             }
          }
       }
@@ -4971,7 +4977,7 @@ public class GlsResource
             if (dep != null && !entries.contains(dep))
             {
                addHierarchy(dep, entries, data);
-               entries.add(dep);
+               addEntry(entries, dep);
             }
          }
       }
@@ -5117,6 +5123,11 @@ public class GlsResource
 
       if (limit > 0 && entries.size() > limit)
       {
+         for (int i = limit; i < entries.size(); i++)
+         {
+            entries.get(i).setSelected(false);
+         }
+
          bib2gls.verboseMessage("message.truncated", limit);
          entries.setSize(limit);
       }
@@ -5145,7 +5156,7 @@ public class GlsResource
                {
                   Bib2GlsEntry dual = entry.getDual();
 
-                  dualEntries.add(dual);
+                  addEntry(dualEntries, dual);
                }
             }
          }

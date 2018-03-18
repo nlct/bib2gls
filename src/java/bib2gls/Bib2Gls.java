@@ -1182,6 +1182,11 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
             addAuxCommand("glsxtr@pluralsuffixes", 4);
+
+            if (useCiteAsRecord)
+            {
+               addAuxCommand("citation", 1);
+            }
          }
       };
 
@@ -1317,13 +1322,32 @@ public class Bib2Gls implements TeXApp
             seeRecords.add(new GlsSeeRecord(
               data.getArg(0), data.getArg(1), parser));
          }
-         else if (name.equals("glsxtr@record"))
+         else if (name.equals("glsxtr@record") 
+                   || (useCiteAsRecord && name.equals("citation")))
          {
-            GlsRecord newRecord = new GlsRecord(data.getArg(0).toString(parser),
-                        data.getArg(1).toString(parser),
-                        data.getArg(2).toString(parser),
-                        data.getArg(3).toString(parser),
-                        data.getArg(4).toString(parser));
+            String recordLabel = data.getArg(0).toString(parser);
+            String recordPrefix;
+            String recordCounter;
+            String recordFormat;
+            String recordLocation;
+
+            if (data.getNumArgs() == 5)
+            {
+               recordPrefix = data.getArg(1).toString(parser);
+               recordCounter = data.getArg(2).toString(parser);
+               recordFormat = data.getArg(3).toString(parser);
+               recordLocation = data.getArg(4).toString(parser);
+            }
+            else
+            {
+               recordPrefix = "";
+               recordCounter = "page";
+               recordFormat = "glsignore";
+               recordLocation = "";
+            }
+
+            GlsRecord newRecord = new GlsRecord(recordLabel, recordPrefix,
+               recordCounter, recordFormat, recordLocation);
 
             incRecordCount(newRecord);
 
@@ -3055,6 +3079,12 @@ public class Bib2Gls implements TeXApp
       System.out.println();
       System.out.println(getMessage("syntax.break.space", "--break-space"));
       System.out.println(getMessage("syntax.no.break.space", "--no-break-space"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.cite.as.record", 
+        "--cite-as-record"));
+      System.out.println(getMessage("syntax.no.cite.as.record", 
+        "--no-cite-as-record"));
       System.out.println();
       System.out.println(getMessage("syntax.force.cross.resource.refs",
          "--force-cross-resource-refs", "-x"));
@@ -3670,6 +3700,14 @@ public class Bib2Gls implements TeXApp
          {
             useNonBreakSpace = true;
          }
+         else if (args[i].equals("--cite-as-record"))
+         {
+            useCiteAsRecord = true;
+         }
+         else if (args[i].equals("--no-cite-as-record"))
+         {
+            useCiteAsRecord = false;
+         }
          else if (args[i].equals("--force-cross-resource-refs") 
                    || args[i].equals("-x"))
          {
@@ -4127,6 +4165,8 @@ public class Bib2Gls implements TeXApp
      saveRecordCountUnit=false, commonCommandsDone=false;
 
    private Charset texCharset = null;
+
+   private boolean useCiteAsRecord=false;
 
    private Bib2GlsMessages messages;
 

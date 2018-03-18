@@ -4,6 +4,8 @@ v1.4 (pending):
 
      --list-known-packages
      --custom-packages
+     --cite-as-record
+     --no-cite-as-record
 
    * added resource options:
 

@@ -1,28 +1,29 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: {options: [--cite-as-record]}
 % arara: bibtex
 % arara: pdflatex
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
-\usepackage[record,style=altlist]{glossaries-extra}
+\usepackage[record,nomain,style=altlist]{glossaries-extra}
 
-\provideignoredglossary*{titles}
+\newglossary*{contributors}{Authors/Editors}
+\newglossary*{titles}{Titles}
 
 \newcommand{\bibglsnewbibtexentry}[4]{%
- \longnewglossaryentry*{#1}{name={#3},type={titles},#2}{#4}%
+ \longnewglossaryentry*{#1}{name={#3},#2,type={titles}}{#4}%
 }
 
 \GlsXtrLoadResources[
   src={xampl},
   write-preamble=false,
-  selection=all,
   entry-type-aliases={
    \GlsXtrBibTeXEntryAliases
   },
   field-aliases={
     title=name
   },
+  type={contributors},
   category={same as original entry}
 ]
 
@@ -40,6 +41,8 @@
 
 \begin{document}
 \cite{book-minimal}
+\newpage
+\cite{article-full}
 
 \bibliographystyle{plain}
 \bibliography{xampl}

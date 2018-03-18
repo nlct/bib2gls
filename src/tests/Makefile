@@ -441,7 +441,7 @@ test-bibtexdata.pdf	: test-bibtexdata.glstex
 
 test-bibtexdata.glstex	: test-bibtexdata.tex $(DEPS)
 		pdflatex test-bibtexdata
-		$(BIB2GLS) test-bibtexdata
+		$(BIB2GLS) --cite-as-record test-bibtexdata
 		bibtex test-bibtexdata
 
 clean	:

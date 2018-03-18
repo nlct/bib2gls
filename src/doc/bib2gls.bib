@@ -4472,6 +4472,20 @@ field.},
   parent={commandlineoptions}
 }
 
+@dualindexentry{switch.cite-as-record,
+  name={\longargfmt{cite\dhyphen as\dhyphen record}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.no-cite-as-record,
+  name={\longargfmt{no\dhyphen cite\dhyphen as\dhyphen record}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
 @dualindexentry{switch.force-cross-resource-refs,
   name={\longargfmt{force\dhyphen cross\dhyphen resource\dhyphen refs}},
   symbol={\shortargfmt{x}},
@@ -6898,6 +6912,23 @@ by \meta{name}},
   description={displays \meta{CJK characters} in the appropriate
    encoding},
   note={provided by \styfmt{CJKutf8}},
+  category={command}
+}
+
+@index{citation,
+  name={\csfmt{citation}},
+  user1={\margm{label}},
+  description={written to the \ext{aux} file on each occurrence of
+   \gls[noindex]{idx.cite}},
+  note={kernel command},
+  category={command}
+}
+
+@index{cite,
+  name={\csfmt{cite}},
+  user1={\margm{label}},
+  description={cross-reference a bibliographic citation},
+  note={kernel command},
   category={command}
 }
 

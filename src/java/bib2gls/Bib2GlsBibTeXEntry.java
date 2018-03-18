@@ -217,8 +217,11 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsMultiEntry
 
       for (Bib2GlsEntry contributor : contributorList)
       {
-         writer.println(String.format("\\glsxtrfieldlistadd{%s}{%s}{%s}",
-          getId(), contributor.getEntryType(), contributor.getId()));
+         if (contributor.isSelected())
+         {
+            writer.println(String.format("\\glsxtrfieldlistadd{%s}{%s}{%s}",
+               getId(), contributor.getEntryType(), contributor.getId()));
+         }
       }
    }
 
@@ -233,10 +236,10 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsMultiEntry
    public void initCrossRefs(TeXParser parser)
     throws IOException
    {
-      for (Bib2GlsEntry entry : contributorList)
+      for (Bib2GlsEntry contributor : contributorList)
       {
-         addDependency(entry.getId());
-         entry.addDependency(getId());
+         addDependency(contributor.getId());
+         contributor.addCrossRefdBy(this);
       }
 
       super.initCrossRefs(parser);

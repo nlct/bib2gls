@@ -63,10 +63,15 @@ public class Bib2GlsContributor extends Bib2GlsEntry
 
       for (Bib2GlsEntry title : titleList)
       {
-         writer.println(String.format("\\glsxtrfieldlistadd{%s}{bibtexentry}{%s}",
-          getId(), title.getId()));
-         writer.println(String.format("\\glsxtrfieldlistadd{%s}{bibtex%s}{%s}",
-          getId(), title.getOriginalEntryType(), title.getId()));
+         if (title.isSelected())
+         {
+            writer.println(String.format(
+              "\\glsxtrfieldlistadd{%s}{bibtexentry}{%s}",
+                 getId(), title.getId()));
+            writer.println(String.format(
+              "\\glsxtrfieldlistadd{%s}{bibtex%s}{%s}",
+                 getId(), title.getOriginalEntryType(), title.getId()));
+         }
       }
    }
 
