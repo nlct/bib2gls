@@ -1340,6 +1340,12 @@ public class Bib2Gls implements TeXApp
             }
             else
             {
+               if (recordLabel.equals("*"))
+               {
+                  verboseMessage("message.ignored.record", "\\citation{*}");
+                  continue;
+               }
+
                recordPrefix = "";
                recordCounter = "page";
                recordFormat = "glsignore";
