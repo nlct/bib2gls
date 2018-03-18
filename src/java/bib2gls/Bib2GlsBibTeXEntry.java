@@ -44,18 +44,39 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsMultiEntry
 
    public String getFallbackValue(String field)
    {
+      String val;
+
+      if (field.equals("sort"))
+      {
+         field = resource.getBibTeXEntryDefaultSortField();
+         val = getFieldValue(field);
+
+         if (val != null)
+         {
+            return val;
+         }
+      }
+
       if (field.equals("name"))
       {
          return getOriginalId();
       }
-      else
-      {
-         return super.getFallbackValue(field);
-      }
+
+      return super.getFallbackValue(field);
    }
 
    public BibValueList getFallbackContents(String field)
    {
+      BibValueList val;
+
+      if (field.equals("sort"))
+      {
+         String fallbackField = resource.getBibTeXEntryDefaultSortField();
+         val = getField(fallbackField);
+
+         return val == null ? getFallbackContents(fallbackField) : val;
+      }
+
       if (field.equals("name") && bib2gls.useInterpreter())
       {
          String name = getOriginalId();
@@ -65,12 +86,9 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsMultiEntry
 
          return list;
       }
-      else
-      {
-         return super.getFallbackContents(field);
-      }
-   }
 
+      return super.getFallbackContents(field);
+   }
    public void parseFields(TeXParser parser)
      throws IOException
    {
@@ -93,19 +111,19 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsMultiEntry
 
       if (contributors != null)
       {
-         addContributors(parserListener, contributors, "author");
+         addContributors(parserListener, contributors);
       }
 
       contributors = getEditors(parserListener.getParser());
 
       if (contributors != null)
       {
-         addContributors(parserListener, contributors, "editor");
+         addContributors(parserListener, contributors);
       }
    }
 
    protected void addContributors(BibParser parserListener, 
-      Vector<Contributor> contributors, String type)
+      Vector<Contributor> contributors)
     throws IOException
    {
       for (Contributor contributor : contributors)
@@ -168,7 +186,7 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsMultiEntry
 
          if (entry == null)
          {
-            entry = new Bib2GlsContributor(bib2gls, type);
+            entry = new Bib2GlsContributor(bib2gls);
             entry.setId(label);
             entry.putField("name", value);
 

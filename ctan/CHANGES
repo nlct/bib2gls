@@ -9,6 +9,7 @@ v1.4 (pending):
 
      - missing-parents
      - missing-parent-category
+     - bibtexentry-sort-fallback
 
    * added extra keyword "same as original entry" 
      to category and type assignments.
@@ -16,8 +17,7 @@ v1.4 (pending):
    * added new entry types:
 
      - @bibtexentry
-     - @author
-     - @editor
+     - @contributor
 
 v1.3 (2018-03-05):
 

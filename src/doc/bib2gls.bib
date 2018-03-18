@@ -231,17 +231,11 @@
   category={command}
 }
 
-@dualindexentry{bibglsnewauthor,
-  name={\csfmt{bib\-gls\-new\-author}},
+@dualindexentry{bibglsnewcontributor,
+  name={\csfmt{bib\-gls\-new\-con\-trib\-u\-tor}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
-  description={defines terms provided with \gls[noindex]{dual.entry.author}},
-  category={command}
-}
-
-@dualindexentry{bibglsneweditor,
-  name={\csfmt{bib\-gls\-new\-author}},
-  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
-  description={defines terms provided with \gls[noindex]{dual.entry.author}},
+  description={defines terms provided with
+   \gls[noindex]{dual.entry.contributor}},
   category={command}
 }
 
@@ -1594,6 +1588,13 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.abbreviation-name-fallback,
    name={\csoptfmt{abbreviation\dhyphen name\dhyphen fallback}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.bibtexentry-sort-fallback,
+   name={\csoptfmt{bibtexentry\dhyphen sort\dhyphen fallback}},
    user1={\meta{field}},
    category={resourceoption},
    parent={resourceoptions}
@@ -3984,19 +3985,27 @@ field.},
   parent={internalfields}
 }
 
-@dualindexentry{field.bibtexauthor,
-  name={\fieldfmt{bib\-tex\-author}},
-  description={Used when an \atentry{author} entry is automatically
+@dualindexentry{field.bibtexcontributor,
+  name={\fieldfmt{bib\-tex\-con\-trib\-u\-tor}},
+  description={An internal list field provided when a
+  \atentry{contributor} entry is automatically
   created by \atentry{bibtexentry}.},
   note={internal field set by \bibgls},
   category={internalfield},
   parent={internalfields}
 }
 
-@dualindexentry{field.bibtexeditor,
-  name={\fieldfmt{bib\-tex\-editor}},
-  description={Used when an \atentry{editor} entry is automatically
-  created by \atentry{bibtexentry}.},
+@dualindexentry{field.bibtexentry,
+  name={\fieldfmt{bib\-tex\-entry}},
+  description={An internal list field created by \atentry{bibtexentry}.},
+  note={internal field set by \bibgls},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.bibtexentry@entrytype,
+  name={\fieldfmt{bib\-tex\-entry\-@\meta{entry-type}}},
+  description={An internal list field created by \atentry{bibtexentry}.},
   note={internal field set by \bibgls},
   category={internalfield},
   parent={internalfields}
@@ -4340,14 +4349,8 @@ field.},
   parent={entrytypes}
 }
 
-@dualindexentry{entry.author,
-  name={\atentryfmt{author}},
-  category={entrytype},
-  parent={entrytypes}
-}
-
-@dualindexentry{entry.editor,
-  name={\atentryfmt{editor}},
+@dualindexentry{entry.contributor,
+  name={\atentryfmt{contributor}},
   category={entrytype},
   parent={entrytypes}
 }
@@ -5037,7 +5040,8 @@ field.},
   user1={\margm{label}\margm{field}\margm{handler}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list, using the given handler},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra}, use at least v1.29 to
+avoid a bug},
   category={command}
 }
 
@@ -6093,6 +6097,15 @@ defined},
   user1={},
   description={expands to the set of common entry aliases for
 \atentry{bibtexentry}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.29+},
+  category={command}
+}
+
+@index{GlsXtrProvideBibTeXFields,
+  name={\csfmt{Gls\-Xtr\-Provide\-Bib\-TeX\-Fields}},
+  user1={},
+  description={defines the standard \BibTeX\ fields using
+   \cs{glsaddstoragekey}},
   note={provided by \styfmt{glossaries-extra-bib2gls} v1.29+},
   category={command}
 }

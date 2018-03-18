@@ -116,10 +116,9 @@ public class Bib2GlsAt extends At
       {
          data = new Bib2GlsBibTeXEntry(bib2gls);
       }
-      else if (entryType.equals("author")
-            || entryType.equals("editor"))
+      else if (entryType.equals("contributor"))
       {
-         data = new Bib2GlsContributor(bib2gls, entryType);
+         data = new Bib2GlsContributor(bib2gls);
       }
       else
       {

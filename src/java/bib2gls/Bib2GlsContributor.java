@@ -26,6 +26,11 @@ import com.dickimawbooks.texparserlib.bib.*;
 
 public class Bib2GlsContributor extends Bib2GlsEntry
 {
+   public Bib2GlsContributor(Bib2Gls bib2gls)
+   {
+      this(bib2gls, "contributor");
+   }
+
    public Bib2GlsContributor(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
@@ -58,8 +63,10 @@ public class Bib2GlsContributor extends Bib2GlsEntry
 
       for (Bib2GlsEntry title : titleList)
       {
+         writer.println(String.format("\\glsxtrfieldlistadd{%s}{bibtexentry}{%s}",
+          getId(), title.getId()));
          writer.println(String.format("\\glsxtrfieldlistadd{%s}{bibtex%s}{%s}",
-          getId(), title.getEntryType(), title.getId()));
+          getId(), title.getOriginalEntryType(), title.getId()));
       }
    }
 

@@ -1498,6 +1498,17 @@ public class GlsResource
                    symbolDefaultSortField));
             }
          }
+         else if (opt.equals("bibtexentry-sort-fallback"))
+         {
+            bibTeXEntryDefaultSortField = getRequired(parser, list, opt);
+
+            if (!bib2gls.isKnownField(bibTeXEntryDefaultSortField))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                   bibTeXEntryDefaultSortField));
+            }
+         }
          else if (opt.equals("abbreviation-name-fallback"))
          {
             abbrevDefaultNameField = getRequired(parser, list, opt);
@@ -7716,6 +7727,11 @@ public class GlsResource
       return dualCategory;
    }
 
+   public String getAbbrevDefaultNameField()
+   {
+      return abbrevDefaultNameField;
+   }
+
    public String getAbbrevDefaultSortField()
    {
       return abbrevDefaultSortField;
@@ -7726,9 +7742,9 @@ public class GlsResource
       return symbolDefaultSortField;
    }
 
-   public String getAbbrevDefaultNameField()
+   public String getBibTeXEntryDefaultSortField()
    {
-      return abbrevDefaultNameField;
+      return bibTeXEntryDefaultSortField;
    }
 
    public boolean useNonBreakSpace()
@@ -7895,6 +7911,8 @@ public class GlsResource
 
    private String abbrevDefaultSortField = "short";
    private String abbrevDefaultNameField = "short";
+
+   private String bibTeXEntryDefaultSortField = "name";
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 

@@ -1,13 +1,21 @@
 % arara: pdflatex
 % arara: bib2gls
+% arara: bibtex
 % arara: pdflatex
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,style=altlist]{glossaries-extra}
+
+\provideignoredglossary*{titles}
+
+\newcommand{\bibglsnewbibtexentry}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},type={titles},#2}{#4}%
+}
 
 \GlsXtrLoadResources[
   src={xampl},
+  write-preamble=false,
   selection=all,
   entry-type-aliases={
    \GlsXtrBibTeXEntryAliases
@@ -18,6 +26,24 @@
   category={same as original entry}
 ]
 
+\newcommand{\contributorhandler}[1]{\par\glsentryname{#1} (#1)}
+
+\newcommand{\glsxtrpostdesccontributor}{%
+  \glsxtrifhasfield{bibtexentry}{\glscurrententrylabel}%
+  {%
+    \glsxtrfieldforlistloop
+    {\glscurrententrylabel}{bibtexentry}%
+    {\contributorhandler}%
+  }%
+  {\par No titles.}%
+}
+
 \begin{document}
+\cite{book-minimal}
+
+\bibliographystyle{plain}
+\bibliography{xampl}
+
 \printunsrtglossaries
+
 \end{document}
