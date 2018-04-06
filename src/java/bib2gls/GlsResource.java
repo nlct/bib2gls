@@ -570,7 +570,7 @@ public class GlsResource
          else if (opt.equals("missing-parents"))
          {
             String val = getChoice(parser, list, opt, "strip", "create",
-             "ignore");
+             "warn");
 
             if (val.equals("strip"))
             {
@@ -582,7 +582,7 @@ public class GlsResource
                stripMissingParents = false;
                createMissingParents = true;
             }
-            else if (val.equals("ignore"))
+            else if (val.equals("warn"))
             {
                stripMissingParents = false;
                createMissingParents = false;
