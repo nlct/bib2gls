@@ -1392,7 +1392,7 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.group,
    name={\csoptfmt{group}},
-   user1={\meta{value}},
+   user1={\meta{label}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -2790,6 +2790,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{fontenc,
   name={\styfmt{fontenc}},
+  category={package},
+  parent={packages}
+}
+
+@index{babel,
+  name={\styfmt{babel}},
   category={package},
   parent={packages}
 }
@@ -4729,6 +4735,10 @@ field.},
   plural={ignored glossaries}
 }
 
+@index{ignoredrecord,
+  name={ignored record}
+}
+
 @index{postlinkhook,
   name={post-link hook}
 }
@@ -5702,7 +5712,7 @@ by \gls{makeindex} or \gls{xindy}},
   name={\csfmt{glsignore}},
   user1={\margm{text}},
   description={does nothing but when used as a location format
-   \bibgls\ recognises it as an ignored location},
+   \bibgls\ recognises it as an \idx{ignoredrecord}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5721,7 +5731,7 @@ by \gls{makeindex} or \gls{xindy}},
   name={\csfmt{gls\-trigger\-record\-format}},
   user1={\margm{text}},
   description={does nothing but when used as a location format
-   \bibgls\ recognises it as an ignored location indexed by
+   \bibgls\ recognises it as an \idx{ignoredrecord} indexed by
    commands like \cs{rgls}},
   note={provided by \styfmt{glossaries-extra} v1.21+},
   category={command}
