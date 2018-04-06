@@ -524,6 +524,9 @@
  {#2}%
 }
 
+\newcommand*{\atentrypageref}[1]{%
+ \atentry{#1} (page~\glsxtrpageref{entry.#1})}%
+
 \newcommand{\argsection}[2][\section]{%
  \def\switcharg{}%
  \def\switchalt{}%
@@ -648,11 +651,11 @@
 \newcommand*{\card}[1]{|\set{#1}|}
 \newcommand*{\imaginary}{i}
 
-\newcommand{\addr}[1]{\\\url{#1}}
+\newcommand{\addr}[1]{\\\href{https://www.#1/}{\nolinkurl{#1}}}
 \title{\bibgls: a command line Java application to convert
 \filefmt{.bib} files to \filefmt{glossaries-extra.sty} resource
 files}
-\author{Nicola Talbot\addr{http://www.dickimaw-books.com/}}
+\author{Nicola Talbot\addr{dickimaw-books.com}}
 \date{\DTMusedate{moddate}}
 
 \makeatletter
@@ -690,7 +693,7 @@ files}
 \begin{abstract}
 The \bibgls\ command line application can be used to extract
 glossary information stored in a \ext{bib} file and convert it
-into glossary entry definition commands that can be read using
+into glossary entry definitions that can be read using
 \styfmt{glossaries-extra}'s \ics{GlsXtrLoadResources} command. When used
 in combination with the \styoptfmt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
@@ -709,7 +712,7 @@ first \LaTeX\ run due to the unknown references being replaced with
 ?? which can be significantly shorter than the actual text produced
 when the reference is known. 
 
-Note that \bibgls\ is a Java application, and requires Java~7
+Note that \bibgls\ is a Java application, and requires at least Java~7
 (although the latest version is recommended).  Additionally,
 \sty{glossaries-extra} must be at least version 1.12.
 (Although again the latest version is recommended.)
@@ -1928,15 +1931,15 @@ space.
 \argsection{cite-as-record}
 
 Treat instances of \ics{citation}\margm{label} found in the 
-\ext{aux} file as though it was actually an ignored record:
+\ext{aux} file as though it was actually an \idx{ignoredrecord}:
 \begin{codeenv}
 \gls{glsxtr@record}\margm{label}\marg{}\marg{page}\marg{glsignore}\marg{}
 \end{codeenv}
-Note that \code{\cs{citation}\marg{*}} will be ignored. Use
+Note that \code{\cs{citation}\marg{*}} will always be skipped. Use
 \csopt[all]{selection} to select all entries.
 
-This option is most useful in conjunction with
-\atentry{bibtexentry}.
+This switch is most useful in conjunction with
+\atentrypageref{bibtexentry}.
 
 \argsection{no-cite-as-record}
 
@@ -2564,7 +2567,7 @@ then \ics{rgls} writes a record to the \iext{aux} file
 with the \glsopt{format} set to \encap{glstriggerrecordformat}.
 This ensures that the record count is correct on the next run,
 but the record isn't added to the location list as
-\bibgls\ recognises it as a special ignored location.
+\bibgls\ recognises it as a special \idx{ignoredrecord}.
 Note that the entry will still appear in the usual glossary unless
 you assign it to a different one with \csopt{trigger-type}.
 
@@ -2729,7 +2732,7 @@ by using commands like \ics{gls} or \ics{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
 rebuild the document to ensure the location lists are correct.  Use
-of the \ics{glssee} command will create an ignored location and the
+of the \ics{glssee} command will create an \idx{ignoredrecord} and the
 \field{see} field will be set to the relevant information.  If an
 entry has the \field{see} field already set, any instance of
 \ics{glssee} in the document for that entry will be appended to the
@@ -3348,12 +3351,12 @@ fields can be set for the
 \end{verbatim}
 The resource options then need to include:
 \begin{codeenv}
- \csopt[\marg{
+ \csopt[
    \ics{GlsXtrBibTeXEntryAliases}
- }]{entry-type-aliases},
- \csopt[\marg{
+ ]{entry-type-aliases},
+ \csopt[
   \marg{[ \cs{cs.string}\csfmt{-}\cs{cs.string}\csfmt{.}]}\marg{}
- }]{labelify-replace}
+ ]{labelify-replace}
 \end{codeenv}
 
 If the \atentry{contributor} entry is deferred until after the
@@ -4556,10 +4559,10 @@ entries. For example, to make \bibgls\ treat \atentryfmt{article}
 and \atentryfmt{book} as though they were both
 \atentry{bibtexentry}:
 \begin{codeenv}
-\csopt[\marg{
+\csopt[
   article=bibtexentry,
   book=bibtexentry
-}]{entry-type-aliases}
+]{entry-type-aliases}
 \end{codeenv}
 For convenience, \isty{glossaries-extra-bib2gls} v1.29+
 provides \ics{GlsXtrBibTeXEntryAliases} which covers all the
@@ -4576,9 +4579,9 @@ field is given by \csopt{bibtexentry-sort-fallback}. If you want to
 access any of the \BibTeX\ fields, you will need to alias or define
 them.  For example:
 \begin{codeenv}
-\csopt[\marg{
+\csopt[
   title=name
-}]{field-aliases}
+]{field-aliases}
 \end{codeenv}
 Since \BibTeX's \fieldfmt{type} field conflicts with \bibgls's
 \field{type} field, when \bibgls\ parses \atentry{bibtexentry}
@@ -4603,8 +4606,8 @@ each \atentry{contributor} is treated as having a cross-reference to
 the main \atentry{bibtexentry} (so if a \atentry{contributor}
 has a record then all the linked \atentry{bibtexentry} terms will
 be selected if \csopt[recorded and deps and see]{selection}).
-You can instruct \bibgls\ to treat \ics{citation} as an ignored 
-record using \longarg{cite-as-record}.
+You can instruct \bibgls\ to treat \ics{citation} as an 
+\idx{ignoredrecord} using \longarg{cite-as-record}.
 
 Each contributor is effectively defined as
 \begin{codeenv}
@@ -4664,7 +4667,7 @@ For example:
   \marg{\csfmt{par} No titles.}\%
 }
 \end{codeenv}
-(where the resource option \csopt[\marg{title=name}]{field-aliases}
+(where the resource option \csopt[title=name]{field-aliases}
 has been used).
 
 
@@ -4685,18 +4688,18 @@ provided with \TeX\ distributions:
 \cs{GlsXtrLoadResources}[
   \csopt[xampl]{src},
   \csopt[false]{write-preamble},
-  \csopt[\marg{
+  \csopt[
    \ics{GlsXtrBibTeXEntryAliases}
-  }]{entry-type-aliases},
-  \csopt[\marg{
+  ]{entry-type-aliases},
+  \csopt[
     title=name
-  }]{field-aliases},
-  \csopt[\marg{
+  ]{field-aliases},
+  \csopt[
     note=name
-  }]{replicate-fields},
-  \csopt[\marg{
+  ]{replicate-fields},
+  \csopt[
     \marg{[ \cs{cs.string}\csfmt{-}\cs{cs.string}\csfmt{.}]}\marg{}
-  }]{labelify-replace},
+  ]{labelify-replace},
   \csopt[contributors]{type},
   \csopt[same as original entry]{category},
   \csopt[category]{sort-field},
@@ -6147,6 +6150,202 @@ supplementary resource files (omitting the primary
 \section{Field and Label Options}
 \label{sec:labelopts}
 
+The options in this section may be used to set or adjust field
+values or labels.  Some field values are expected to be labels (such
+as \field{group}).  These labels must not contain special
+characters or commands, but it's possible to convert a field value
+into a valid label using options such as \csopt{labelify}.
+
+\optsection{group}
+
+The \csopt{group} option may only be used with the \longarg{group} switch.
+This will set the \field{group} field to \meta{label} unless
+\meta{label} is \optfmt{auto}, in which case the value is
+set automatically during the sorting (see also
+\csopt{group-formation}). 
+The corresponding title can be set
+with \gls{glsxtrsetgrouptitle} if the title is different from the
+label.  The default behaviour is \csopt[auto]{group}.
+
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[sort=integer,group={Constants},
+ src={entries-constants}% data in entries-constants.bib
+]
+\GlsXtrLoadResources[sort=letter-case,group={Variables},
+ src={entries-variables}% data in entries-variables.bib
+]
+\end{verbatim}
+In this case, if the \field{type} field hasn't been set in the \ext{bib} files,
+these entries will be added to the same glossary, but will
+be grouped according to each instance of \gls{GlsXtrLoadResources},
+with the provided group label.
+
+
+\optsection{category}
+
+The selected entries may all have their \field{category} field
+changed before writing their definitions to the \ext{glstex} file.
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: set the
+\field{category} to the \ext{bib} entry type used to define it
+(lower case and without the initial \code{@}) after any aliasing,
+if applicable;
+
+\item \optfmt{same as original entry}: (new to v1.4) set the \field{category} 
+to the original entry type (lower case and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased);
+
+\item \optfmt{same as base}: (new to v1.1) set the \field{category}
+to the base name of the \ext{bib} file (without the extension) 
+that provided the entry definition;
+
+\item \optfmt{same as type}: set the \field{category} to the same
+value as the \field{type} field (if that field has been provided
+either in the \ext{bib} file or through the \csopt{type} option);
+
+\item \meta{label}: the \field{category} is set to
+\meta{label} (which mustn't contain any special characters).
+\end{itemize}
+This will override any
+\field{category} fields supplied in the \ext{bib} file.
+
+When used with \csopt{entry-type-aliases}, the option \csopt[same as
+entry]{category} refers to the \emph{target} entry type whereas
+\csopt[same as original entry]{category} refers to the
+\emph{original} entry type given in the \ext{bib} file.  In both
+cases, the value is converted to lower case to ensure consistency.
+
+For example, if the \ext{bib} file contains:
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal}
+}
+
+@index{duck}
+
+@index{goose,plural="geese"}
+
+@dualentry{dog,
+  name={dog},
+  description={chien}
+}
+\end{verbatim}
+then if the document contains
+\begin{verbatim}
+\GlsXtrLoadResources[category={same as entry},src={entries}]
+\end{verbatim}
+this will set the \field{category} of the \code{bird} term to
+\optfmt{entry} (since it was defined with \atentry{entry}), the \field{category} of the \code{duck} and
+\code{goose} terms to \optfmt{index} (since they were defined
+with \atentry{index}), and the \field{category} of the \code{dog}
+term to \optfmt{dualentry} (since it was
+defined with \atentry{dualentry}). Note that the dual entry
+\code{dual.dog} doesn't have the category set, since that's
+governed by \csopt{dual-category} instead.
+
+If, instead, the document contains
+\begin{verbatim}
+\GlsXtrLoadResources[category={animals},src={entries}]
+\end{verbatim}
+then the \field{category} of all the primary selected entries will 
+be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
+doesn't have the \field{category} set.
+
+Note that the categories may be overridden by the commands,
+such as \csref{bibglsnewindex}, that are used to actually define the
+entries.
+
+For example, if the document contains
+\begin{verbatim}
+\newcommand{\bibglsnewdualentry}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},#2,category={dual}}{#4}%
+}
+
+\GlsXtrLoadResources[category={animals},src={entries}]
+\end{verbatim}
+then both the \code{dog} and \code{dual.dog} entries will
+have their \field{category} field set to \optfmt{dual} since the
+new definition of \gls{bibglsnewdualentry} has overridden
+the \csopt[animals]{category} option.
+
+\optsection{type}
+
+The \meta{value} may be one of:
+\begin{itemize}
+ \item \optfmt{same as entry} set the \field{type} field
+  to the entry type (lower case and without the initial \code{@}); 
+
+ \item \optfmt{same as original entry} set the \field{type} 
+  to the original entry type (lower case and without 
+  the initial \code{@}) before it was aliased (behaves like 
+  \optfmt{same as entry} if the entry type wasn't aliased);
+
+ \optfmt{same as base} set the \field{type} field
+  to the base name of the corresponding \ext{bib} file
+  (without the extension);
+
+ \item \optfmt{same as category} set the \field{type} field
+   to the same value as the \field{category} field
+   (\field{type} unchanged if \field{category} not set);
+
+ \item\meta{label} sets the \field{type} field to the glossary 
+   identified by \meta{label}.
+\end{itemize}
+When used with \csopt{entry-type-aliases}, the option \csopt[same as
+entry]{type} refers to the \emph{target} entry type and \csopt[same
+as original entry]{type} refers to the \emph{original} entry type
+given in the \ext{bib} file.  It's not possible to have both
+\csopt[same as type]{category} and \csopt[same as category]{type}.
+
+Note that this setting only changes the \field{type} field for
+primary entries. Use \csopt{dual-type} for dual entries.
+
+For example:
+\begin{verbatim}
+\usepackage[record,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries-symbols},type=symbols]
+\end{verbatim}
+
+Make sure that the glossary type has already been defined
+(see \sectionref{sec:newglossary}). In the above, the
+\styopt{symbols} option defines the \code{symbols} glossary.
+If you want to use a custom glossary, you need to provide it. For
+example:
+\begin{verbatim}
+\usepackage[record,nomain]{glossaries-extra}
+
+\newglossary*{dictionary}{Dictionary}
+
+\GlsXtrLoadResources[src={entries-symbols},type=dictionary]
+\end{verbatim}
+(The \styopt{nomain} option was added to suppress the
+creation of the default \code{main} glossary.)
+
+\optsection{trigger-type}
+
+The record counting commands, such as \ics{rgls}, use the special
+format \ics{glstriggerrecordformat}, which \bibgls\ also treats
+as an \idx{ignoredrecord}. This means the entry will still be
+identified as having a record for selection purposes, which is
+necessary for the entry to be defined for use in the document, but
+in order to prevent it from appearing in the glossary you need to
+transfer the entry with \csopt[\meta{type}]{trigger-type}.
+This will override the \csopt{type}, \csopt{dual-type},
+\csopt{tertiary-type} and the type specification in
+\csopt{secondary}.
+
+The provided value \meta{type} must be a glossary label (not one of
+the keywords allowed by \csopt{type}).
+You can define the glossary before loading the resource, but
+it's not required as \bibgls\ will write
+\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file
+(see \sectionref{sec:newglossary}).
+
 \optsection{interpret-label-fields}
 
 This is a boolean option that determines whether or not the fields
@@ -6154,10 +6353,12 @@ that may only contain labels should have their values interpreted
 (\field{parent}, \field{category}, \field{type}, \field{group},
 \field{seealso} and \field{alias}). Although this option interprets
 commands within those fields, it doesn't strip any characters that
-can't be used within a label.
+can't be used within a label. The \field{see} field isn't included
+as it may optionally start with \code{[\meta{tag}]} where \meta{tag}
+may legitimately contain \LaTeX\ code that shouldn't be interpreted.
 
 The default setting is \csopt[false]{interpret-label-fields}.
-Note that if this setting is on, cross-resource references aren't
+Note that if this setting is on, \idxpl{crossresourceref} aren't
 permitted. This setting has no effect if the interpreter has been
 disabled.
 
@@ -6172,7 +6373,7 @@ are performed before \csopt{interpret-label-fields}.
 This option should take a comma-separated list of recognised field names as the
 value. (If a field is present in both \csopt{labelify} and
 \csopt{labelify-list}, then \csopt{labelify-list} takes precedence.) 
-Note that if this setting is on, cross-resource references aren't
+Note that if this setting is on, \idxpl{crossresourceref} aren't
 permitted. 
 
 Each listed field will be converted into a string suitable
@@ -6182,26 +6383,28 @@ name.)
 
 The conversion is performed in the following order:
 \begin{enumerate}
-\item If the interpreter is on and the value contains
-any of the characters \idx{escchar} (backslash), \idx{bgroupchar}
-(begin group), \idx{egroupchar} (end group), \idx{nbspchar}
-(non-breakable space) or \idx{mshiftchar} (maths shift), then the value is
-be interpreted.
+\item If the interpreter is on and the field value contains
+any of the characters \idx{escchar}~(backslash), 
+\idx{bgroupchar}~(begin group), \idx{egroupchar}~(end group), 
+\idx{nbspchar}~(non-breakable space) or \idx{mshiftchar}~(maths shift), 
+then the value is interpreted.
 
 \item Any substitutions that have been specified with
 \csopt{labelify-replace} are performed.
 
 \item All characters that aren't alphanumeric or the space character
- or the punctuation
-characters \code{.} (full stop), \code{-} (hyphen), \code{+} (plus),
-\code{:} (colon), \code{;} (semi-colon), \code{\string|} (pipe),
-\code{/} (forward slash), \code{!} (exclamation mark), \code{?}
-(question mark), \code{*} (asterisk), \code{<} (less than), \code{>}
-(greater than), \code{\textasciigrave} (backtick), \code{'}
-(apostrophe) or \code{@} (at-sign) are stripped. If you want to
+ or any of the following punctuation
+characters \code{.}~(full stop), \code{-}~(hyphen), \code{+}~(plus),
+\code{:}~(colon), \code{;}~(semi-colon), \code{\string|}~(pipe),
+\code{/}~(forward slash), \code{!}~(exclamation mark), 
+\code{?}~(question mark), \code{*}~(asterisk), \code{<}~(less than), 
+\code{>}~(greater than), \code{\textasciigrave}~(backtick), 
+\code{'}~(apostrophe) or \code{@}~(at-sign) are stripped. If you want to
 retain commas, use \csopt{labelify-list} instead. If you want to
 strip any of the allowed punctuation, use \csopt{labelify-replace} to
-remove the unwanted characters.
+remove the unwanted characters. (Remember that \sty{babel} can make
+some of these punctuation characters active, in which case they need
+to be stripped.)
 
 \item If \bibgls\ hasn't detected \sty{fontspec} in the document's
 transcript file, the value is then decomposed and all non-ASCII
@@ -6372,7 +6575,7 @@ As an alternative to \csopt{strip-missing-parents}, as from version
 \item \optfmt{strip}: this is equivalent to
 \csopt[true]{strip-missing-parents};
 
-\item \optfmt{ignore}: this is equivalent to the default
+\item \optfmt{warn}: this is equivalent to the default
 \csopt[false]{strip-missing-parents};
 
 \item \optfmt{create}: this will create a new \atentry{index}
@@ -6412,9 +6615,9 @@ as though it had been defined as
 This can be converted into a label with the options:
 \begin{codeenv}
  \csopt[parent]{labelify},
- \csopt[\marg{
-   \marg{[ '\cs{cs.string}\csfmt{-}\cs{cs.string}\csfmt{.}]}\marg{}
- }]{labelify-replace}
+ \csopt[
+   \marg{[ \cs{cs.string}\csfmt{.}]}\marg{}
+ ]{labelify-replace}
 \end{codeenv}
 If the interpreter has been provided with the definition:
 \begin{verbatim}
@@ -6433,6 +6636,24 @@ be created as though it had been defined with:
 \end{verbatim}
 This is an alternative approach to the \exfile{sample-authors.tex}
 document from the \hyperref[sec:examples]{examples chapter}.
+
+\optsection{missing-parent-category}
+
+If a missing parent entry is created through the use of
+\csopt[create]{missing-parents} then the \field{category} field can
+be assigned to the new parent entry with this option. The
+\meta{value} may be one of:
+\begin{itemize}
+ \item \code{same as child}: the parent entry's \field{category}
+  field is set to the same value as the child's (if set);
+ \item \code{same as base}: the parent entry's \field{category} is
+  set to the base name of the \ext{bib} file that provided the
+  child entry's definition;
+ \item \code{no value}: don't set the \field{category} field;
+ \item \meta{label}: the parent entry's \field{category} field is set to
+  \meta{label} (which shouldn't contain any special characters). 
+\end{itemize}
+The default setting is \csopt[no value]{missing-parent-category}.
 
 \optsection{abbreviation-name-fallback}
 
@@ -6802,184 +7023,6 @@ This option also sets
 The value is the locale used when parsing fields identified
 by \csopt{time-fields}. The \meta{value} is as for
 \csopt{date-sort-locale}.
-
-\optsection{category}
-
-The selected entries may all have their \field{category} field
-changed before writing their definitions to the \ext{glstex} file.
-The \meta{value} may be:
-\begin{itemize}
-\item \optfmt{same as entry}: set the
-\field{category} to the \ext{bib} entry type used to define it
-(lower case and without the initial \code{@});
-
-\item \optfmt{same as original entry}: set the \field{category} 
-to the original entry type (lower case and without 
-the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased);
-
-\item \optfmt{same as base}: set the \field{category}
-to the base name of the \ext{bib} file (without the extension) 
-that provided the entry definition (new to v1.1);
-
-\item \optfmt{same as type}: set the \field{category} to the same
-value as the \field{type} field (if that field has been provided
-either in the \ext{bib} file or through the \csopt{type} option);
-
-\item \meta{label}: the \field{category} is set to
-\meta{label} (which mustn't contain any special characters).
-\end{itemize}
-This will override any
-\field{category} fields supplied in the \ext{bib} file.
-
-Note that if you've used \csopt{entry-type-aliases}, \optfmt{same as
-entry} refers to the target entry type not the original entry type
-provided in the \ext{bib} file.
-
-For example, if the \ext{bib} file contains:
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal}
-}
-
-@index{duck}
-
-@index{goose,plural="geese"}
-
-@dualentry{dog,
-  name={dog},
-  description={chien}
-}
-\end{verbatim}
-then if the document contains
-\begin{verbatim}
-\GlsXtrLoadResources[category={same as entry},src={entries}]
-\end{verbatim}
-this will set the \field{category} of the \code{bird} field to
-\optfmt{entry} (since it was defined with \atentry{entry}), the \field{category} of the \code{duck} and
-\code{goose} entries to \optfmt{index} (since they were defined
-with \atentry{index}), and the \field{category} of the \code{dog}
-entry to \optfmt{dualentry} (since it was
-defined with \atentry{dualentry}). Note that the dual entry
-\code{dual.dog} doesn't have the category set, since that's
-governed by \csopt{dual-category} instead.
-
-If, instead, the document contains
-\begin{verbatim}
-\GlsXtrLoadResources[category={animals},src={entries}]
-\end{verbatim}
-then the \field{category} of all the primary selected entries will 
-be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
-doesn't have the \field{category} set.
-
-Note that the categories may be overridden by the commands,
-such as \csref{bibglsnewindex}, that are used to actually define the
-entries.
-
-For example, if the document contains
-\begin{verbatim}
-\newcommand{\bibglsnewdualentry}[4]{%
- \longnewglossaryentry*{#1}{name={#3},#2,category={dual}}{#4}%
-}
-
-\GlsXtrLoadResources[category={animals},src={entries}]
-\end{verbatim}
-then both the \code{dog} and \code{dual.dog} entries will
-have their \field{category} field set to \optfmt{dual} since the
-new definition of \gls{bibglsnewdualentry} has overridden
-the \csopt[animals]{category} option.
-
-\optsection{missing-parent-category}
-
-If a missing parent entry is created through the use of
-\csopt[create]{missing-parents} then the \field{category} field can
-be assigned to the new parent entry with this option. The
-\meta{value} may be one of:
-\begin{itemize}
- \item \code{same as child}: the parent entry's \field{category}
-  field is set to the same value as the child's (if set);
- \item \code{same as base}: the parent entry's \field{category} is
-  set to the base name of the \ext{bib} file that provided the
-  child entry's definition;
- \item \code{no value}: don't set the \field{category} field;
- \item \meta{label}: the parent entry's \field{category} field is set to
-  \meta{label} (which shouldn't contain any special characters). 
-\end{itemize}
-The default setting is \csopt[no value]{missing-parent-category}.
-
-\optsection{type}
-
-The \meta{value} may be one of:
-\begin{itemize}
- \item \optfmt{same as entry} set the \field{type} field
-  to the entry type (lower case and without the initial \code{@}); 
-
- \item \optfmt{same as original entry} set the \field{type} 
-  to the original entry type (lower case and without 
-  the initial \code{@}) before it was aliased (behaves like 
-  \optfmt{same as entry} if the entry type wasn't aliased);
-
- \optfmt{same as base} set the \field{type} field
-  to the base name of the corresponding \ext{bib} file
-  (without the extension);
-
- \item \optfmt{same as category} set the \field{type} field
-   to the same value as the \field{category} field
-   (\field{type} unchanged if \field{category} not set);
-
- \item\meta{label} sets the \field{type} field to the glossary 
-   identified by \meta{label}.
-\end{itemize}
-If you've used \csopt{entry-type-aliases}, \optfmt{same as
-entry} refers to the target entry type not the original entry type
-provided in the \ext{bib} file.
-
-
-Note that this setting only changes the \field{type} field for
-primary entries. Use \csopt{dual-type} for dual entries.
-
-For example:
-\begin{verbatim}
-\usepackage[record,symbols]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries-symbols},type=symbols]
-\end{verbatim}
-
-Make sure that the glossary type has already been defined
-(see \sectionref{sec:newglossary}). In the above, the
-\styopt{symbols} option defines the \code{symbols} glossary.
-If you want to use a custom glossary, you need to provide it. For
-example:
-\begin{verbatim}
-\usepackage[record,nomain]{glossaries-extra}
-
-\newglossary*{dictionary}{Dictionary}
-
-\GlsXtrLoadResources[src={entries-symbols},type=dictionary]
-\end{verbatim}
-(The \styopt{nomain} option was added to suppress the
-creation of the default \code{main} glossary.)
-
-\optsection{trigger-type}
-
-The record counting commands, such as \ics{rgls}, use the special
-format \ics{glstriggerrecordformat}, which \bibgls\ also treats
-as an ignored location. This means the entry will still be
-identified as having a record for selection purposes, which is
-necessary for the entry to be defined for use in the document, but
-in order to prevent it from appearing in the glossary you need to
-transfer the entry with \csopt[\meta{type}]{trigger-type}.
-This will override the \csopt{type}, \csopt{dual-type},
-\csopt{tertiary-type} and the type specification in
-\csopt{secondary}.
-
-The provided value \meta{type} must be a glossary label (not one of
-the keywords allowed by \csopt{type}).
-You can define the glossary before loading the resource, but
-it's not required as \bibgls\ will write
-\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file
-(see \sectionref{sec:newglossary}).
 
 \optsection{counter}
 
@@ -7599,27 +7642,6 @@ the field is defined (so \ics{GlsXtrIfFieldUndef} does the
 \meta{false} argument) but it's considered unset (so commands like
 \ics{ifglshasfield} do the \meta{false} argument).
 
-\optsection{group}
-
-This option may only be used with the \longarg{group} switch.
-This will set the \field{group} field to \meta{value} unless
-\meta{value} is \optfmt{auto}, in which case the value is
-set automatically during the sorting (see also
-\csopt{group-formation}).  For example:
-\begin{verbatim}
-\GlsXtrLoadResources[sort=integer,group={Constants},
- src={entries-constants}% data in entries-constants.bib
-]
-\GlsXtrLoadResources[sort=letter-case,group={Variables},
- src={entries-variables}% data in entries-variables.bib
-]
-\end{verbatim}
-If the \field{type} field hasn't been set in the \ext{bib} files,
-these entries will be added to the same glossary, but will
-be grouped according to each instance of \gls{GlsXtrLoadResources},
-with the provided group label.
-The default behaviour is \csopt[auto]{group}.
-
 \optsection{copy-action-group-field}
 
 This option may only be used when invoking \bibgls\ with the
@@ -7880,7 +7902,7 @@ The \styopt{record} package option automatically adds two new keys:
 the option \csopt[false]{save-locations} is used). The
 \field{loclist} field has the syntax of an \isty{etoolbox} internal list
 and includes every location (except for the discarded duplicates and
-ignored formats).
+\idxpl{ignoredrecord}).
 Each item in the list is provided in the form
 \begin{alltt}
 \ics{glsseeformat}\oargm{tag}\margm{label list}\marg{}
@@ -7928,6 +7950,9 @@ for example \verb|\gls[format=textbf]{sample}| then it would cause a
 warning and be moved before the start of the range so that the
 location list would then be 1, \textbf{3}, 2--4. 
 
+An \idx{ignoredrecord} identifies a term that needs to be treated as
+though it has a record for selection purposes, but the record
+should not be included in the location list.
 The special format \glsaddopt[glsignore]{format} is provided
 by the \styfmt{glossaries} package for cases where the location
 should be ignored. (The command \ics{glsignore} simply ignores its
@@ -7940,7 +7965,7 @@ will be selected but the record will be discarded.
 This means that the location list will be empty if the entry was
 only indexed with the special ignored format, but if the entry was also
 indexed with another format then the location list won't include the
-ignored records. (This format is used by \ics{glsaddallunused} but
+\idxpl{ignoredrecord}. (This format is used by \ics{glsaddallunused} but
 remember that iterative commands like this don't work with \bibgls.
 Instead, just use \csopt[all]{selection} to select all entries.
 Those that don't have records won't have a location list.)
@@ -7977,7 +8002,7 @@ this special format and is not recommended.
 
 The record counting commands, such as \ics{rgls}, use the special
 format \encap{glstriggerrecordformat}, which \bibgls\ also treats
-as an ignored location and the same rules as for \encap{glsignore} apply.
+as an \idx{ignoredrecord} and the same rules as for \encap{glsignore} apply.
 
 The locations are always listed in the order in which they were indexed,
 (except for the cross-reference which may be placed at the start or
@@ -8033,12 +8058,14 @@ makes the following tests:
 range takes precedence.
 
 \item If one of the formats is \encap{glsnumberformat} (as in the
-above example) or \encap{glsignore}, that format will be skipped.
-So in the above example, the second record will be added to the
-location list, but not the first. (A message will only be written to
-the transcript if the \longarg{debug} switch is used.) The default
-\encap{glsnumberformat} will take precedence over the ignored
-format \encap{glsignore}.
+above example) or an \idx{ignoredrecord} format such as
+\encap{glsignore}, that format will be skipped.  So in the above
+example, the second record will be added to the location list, but
+not the first. (A message will only be written to the transcript if
+the \longarg{debug} switch is used.) The default
+\encap{glsnumberformat} will take precedence over the
+\idx{ignoredrecord} formats (\encap{glsignore} and
+\encap{glstriggerrecordformat}).
 
 \item If a mapping has been set with the \longarg{map-format}
 switch that mapping will be checked.
@@ -8409,7 +8436,7 @@ preamble providing an \ics{ifcase} condition:
 \end{alltt}
 
 \item \optfmt{comma}: 
-essentially equivalent to \csopt[\marg{,~}]{loc-prefix} but
+essentially equivalent to \csopt[,~]{loc-prefix} but
 avoids confusion with the list format. 
 \item \optfmt{list}: equivalent to \csopt[\ics{pagelistname} ]{loc-prefix}.
 \item \optfmt{true}: equivalent to 
@@ -10299,7 +10326,7 @@ different to using
 \begin{alltt}
 \ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
 \end{alltt}
-which creates an ignored record. Even though the record is ignored
+which creates an \idx{ignoredrecord}. Even though the record is ignored
 (and so won't show in the location list) the record still influences
 the selection order and the record count.
 
@@ -13908,7 +13935,7 @@ The contents of \filefmt{bacteria.bib} are as follows:
 The \exfile{baseunits.bib} file contains base \idxpl{SIunit}. The entries
 are all defined using the custom \atentryfmt{unit} entry
 type. This must be aliased with \csopt{entry-type-aliases} otherwise
-\bibgls\ will ignored all the entries. For example
+\bibgls\ will ignore all the entries. For example
 \begin{codeenv}
 \csopt[unit=symbol]{entry-type-aliases}
 \end{codeenv}
