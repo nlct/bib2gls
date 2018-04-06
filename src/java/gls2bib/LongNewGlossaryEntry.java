@@ -96,9 +96,13 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
          }
       }
 
+      TeXObject keyListArg = parser.popNextArg();
+
+      TeXObject descriptionArg = parser.popNextArg();
+
       processEntry(parser, labelArg, 
-        KeyValList.getList(parser, parser.popNextArg()),
-        parser.popNextArg((byte)0), isStar);
+        KeyValList.getList(parser, keyListArg),
+        descriptionArg, isStar);
    }
 
    public void process(TeXParser parser, TeXObjectList list) throws IOException
@@ -129,7 +133,7 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
 
       processEntry(parser, labelArg, 
         KeyValList.getList(parser, list.popArg(parser)),
-        list.popArg(parser, (byte)0), isStar);
+        list.popArg(parser), isStar);
    }
 
 }
