@@ -1182,11 +1182,6 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
             addAuxCommand("glsxtr@pluralsuffixes", 4);
-
-            if (useCiteAsRecord)
-            {
-               addAuxCommand("citation", 1);
-            }
          }
       };
 
@@ -1337,6 +1332,19 @@ public class Bib2Gls implements TeXApp
                recordCounter = data.getArg(2).toString(parser);
                recordFormat = data.getArg(3).toString(parser);
                recordLocation = data.getArg(4).toString(parser);
+
+               if (recordCounter.equals("wrglossary"))
+               {
+                  TeXObject pageRef = AuxData.getPageReference(
+                    auxData, parser, "wrglossary."+recordLocation);
+
+                  if (pageRef != null)
+                  {
+                     recordLocation = String.format(
+                       "\\glsxtr@wrglossarylocation{%s}{%s}", 
+                       recordLocation, pageRef.toString(parser));
+                  }
+               }
             }
             else
             {
@@ -1352,7 +1360,7 @@ public class Bib2Gls implements TeXApp
                recordLocation = "";
             }
 
-            GlsRecord newRecord = new GlsRecord(recordLabel, recordPrefix,
+            GlsRecord newRecord = new GlsRecord(this, recordLabel, recordPrefix,
                recordCounter, recordFormat, recordLocation);
 
             incRecordCount(newRecord);
@@ -1875,6 +1883,16 @@ public class Bib2Gls implements TeXApp
    public Charset getTeXCharset()
    {
       return texCharset;
+   }
+
+   public boolean useCiteAsRecord()
+   {
+      return useCiteAsRecord;
+   }
+
+   public boolean mergeWrGlossaryLocations()
+   {
+      return mergeWrGlossaryLocations;
    }
 
    public boolean checkAcroShortcuts()
@@ -3092,6 +3110,11 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.no.cite.as.record", 
         "--no-cite-as-record"));
       System.out.println();
+      System.out.println(getMessage("syntax.merge.wrglossary.records", 
+        "--merge-wrglossary-records"));
+      System.out.println(getMessage("syntax.no.merge.wrglossary.records", 
+        "--no-merge-wrglossary-records"));
+      System.out.println();
       System.out.println(getMessage("syntax.force.cross.resource.refs",
          "--force-cross-resource-refs", "-x"));
       System.out.println(getMessage("syntax.no.force.cross.resource.refs",
@@ -3714,6 +3737,14 @@ public class Bib2Gls implements TeXApp
          {
             useCiteAsRecord = false;
          }
+         else if (args[i].equals("--merge-wrglossary-records"))
+         {
+            mergeWrGlossaryLocations = true;
+         }
+         else if (args[i].equals("--no-merge-wrglossary-records"))
+         {
+            mergeWrGlossaryLocations = false;
+         }
          else if (args[i].equals("--force-cross-resource-refs") 
                    || args[i].equals("-x"))
          {
@@ -4130,7 +4161,7 @@ public class Bib2Gls implements TeXApp
 
    public static final String NAME = "bib2gls";
    public static final String VERSION = "1.4";
-   public static final String DATE = "2018-04-07";
+   public static final String DATE = "2018-04-08";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4173,6 +4204,8 @@ public class Bib2Gls implements TeXApp
    private Charset texCharset = null;
 
    private boolean useCiteAsRecord=false;
+
+   private boolean mergeWrGlossaryLocations = true;
 
    private Bib2GlsMessages messages;
 

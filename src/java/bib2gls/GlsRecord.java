@@ -25,13 +25,13 @@ import java.util.Iterator;
 
 public class GlsRecord
 {
-   public GlsRecord(String label, String prefix, String counter,
+   public GlsRecord(Bib2Gls bib2gls, String label, String prefix, String counter,
       String format, String location)
    {
-      this(label, prefix, counter, format, location, globalIndex++);
+      this(bib2gls, label, prefix, counter, format, location, globalIndex++);
    }
 
-   protected GlsRecord(String label, String prefix, String counter,
+   protected GlsRecord(Bib2Gls bib2gls, String label, String prefix, String counter,
       String format, String location, long index)
    {
       this.label = label;
@@ -40,16 +40,17 @@ public class GlsRecord
       this.format = format;
       this.location = location;
       this.index = index;
+      this.bib2gls = bib2gls;
    }
 
    public GlsRecord copy(String newLabel)
    {
-      return new GlsRecord(newLabel, prefix, counter, format, location, index);
+      return new GlsRecord(bib2gls, newLabel, prefix, counter, format, location, index);
    }
 
    public Object clone()
    {
-      return new GlsRecord(label, prefix, counter, format, location, index);
+      return new GlsRecord(bib2gls, label, prefix, counter, format, location, index);
    }
 
    public int compareTo(GlsRecord record)
@@ -132,6 +133,27 @@ public class GlsRecord
          prefix, counter, format, location);
    }
 
+   public boolean locationMatch(GlsRecord record)
+   {
+      if (location.equals(record.location))
+      {
+         return true;
+      }
+
+      if (bib2gls.mergeWrGlossaryLocations())
+      {
+         Matcher m1 = WRGLOSSARY_PATTERN.matcher(location);
+         Matcher m2 = WRGLOSSARY_PATTERN.matcher(record.location);
+
+         if (m1.matches() && m2.matches() && m1.group(2).equals(m2.group(2)))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public boolean equals(Object obj)
    {
       if (obj == null || !(obj instanceof GlsRecord)) return false;
@@ -142,7 +164,7 @@ public class GlsRecord
            && prefix.equals(record.prefix)
            && counter.equals(record.counter)
            && format.equals(record.format)
-           && location.equals(record.location);
+           && locationMatch(record);
    }
 
    /*
@@ -153,7 +175,7 @@ public class GlsRecord
       return label.equals(record.label)
            && prefix.equals(record.prefix)
            && counter.equals(record.counter)
-           && location.equals(record.location);
+           && locationMatch(record);
    }
 
    // does location for this follow location for other record?
@@ -178,8 +200,24 @@ public class GlsRecord
          return false;
       }
 
-      Matcher m1 = CS_PATTERN.matcher(location1);
-      Matcher m2 = CS_PATTERN.matcher(location2);
+      Matcher m1 = WRGLOSSARY_PATTERN.matcher(location1);
+      Matcher m2 = WRGLOSSARY_PATTERN.matcher(location2);
+
+      if (m1.matches() && m2.matches())
+      {
+         String loc1 = m1.group(2);
+         String loc2 = m2.group(2);
+
+         if (loc1.equals(loc2))
+         {
+            return false;
+         }
+
+         return consecutive(loc1, loc2, gap, maxGap);
+      }
+
+      m1 = CS_PATTERN.matcher(location1);
+      m2 = CS_PATTERN.matcher(location2);
 
       if (m1.matches() && m2.matches())
       {
@@ -875,6 +913,8 @@ public class GlsRecord
 
    private long index=0;
 
+   private Bib2Gls bib2gls;
+
    private static long globalIndex=0L;
 
    private static final Pattern DIGIT_PATTERN
@@ -891,4 +931,7 @@ public class GlsRecord
 
    private static final Pattern CS_PATTERN
      = Pattern.compile("(.*?)(?:\\\\protect\\s*)?(\\\\[\\p{javaAlphabetic}@]+)\\s*\\{([\\p{javaDigit}\\p{javaAlphabetic}]+)\\}");
+
+   private static final Pattern WRGLOSSARY_PATTERN
+     = Pattern.compile("\\\\glsxtr@wrglossarylocation\\{(\\p{javaDigit}+)\\}\\{(.*)\\}");
 }

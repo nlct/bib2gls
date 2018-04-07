@@ -1946,6 +1946,19 @@ This switch is most useful in conjunction with
 Don't check for instances of \ics{citation} in the \ext{aux} file
 (default).
 
+\argsection{merge-wrglossary-records}
+
+For use with the \styopt{indexcounter} package option
+(\styfmt{glossaries-extra} v1.29+), this switch merges an entry's
+\counter{wrglossary} records for the same page location. This is the
+default setting.
+
+\argsection{no-merge-wrglossary-records}
+
+Don't merge an entry's \counter{wrglossary} records. This means that you
+may end up with duplicate page numbers in the entry's location list,
+but they will link to different parts of the page.
+
 \argsection{force-cross-resource-refs}
 
 Force \idx{crossresourceref} mode on (see
@@ -6624,11 +6637,12 @@ If the interpreter has been provided with the definition:
 \providecommand*{\sortmediacreator}[2]{#2 #1}
 \end{verbatim}
 then the \field{parent} field for the \code{ubik} entry
-will become \code{DickPhilipK} but the original value is retained
-when \csopt[create]{missing-parents} is set. Once all the entries
-have been processed, if \code{ubik} has been selected but no entry
-can be found with the label \code{DickPhilipK} then a new entry will
-be created as though it had been defined with:
+will become \code{DickPhilipK} but the original value is stored
+internally when \csopt[create]{missing-parents} is set so that it
+can be used as the \field{name} if the parent needs to be created.
+Once all the entries have been processed, if \code{ubik} has been
+selected but no entry can be found with the label \code{DickPhilipK}
+then a new entry will be added as though it had been defined with:
 \begin{verbatim}
 @index{DickPhilipK,
   name={\sortmediacreator{Philip K.}{Dick}}

@@ -2700,14 +2700,56 @@ public class GlsResource
 
       for (AuxData data : auxData)
       {
-         if (data.getName().equals("glsxtr@record"))
+         String name = data.getName();
+
+         if (name.equals("glsxtr@record")
+              || (bib2gls.useCiteAsRecord() && name.equals("citation")))
          {
+            String recordLabel = data.getArg(0).toString(auxTeXParser);
+            String recordPrefix;
+            String recordCounter;
+            String recordFormat;
+            String recordLocation;
+
+            if (data.getNumArgs() == 5)
+            {
+               recordPrefix = data.getArg(1).toString(auxTeXParser);
+               recordCounter = data.getArg(2).toString(auxTeXParser);
+               recordFormat = data.getArg(3).toString(auxTeXParser);
+               recordLocation = data.getArg(4).toString(auxTeXParser);
+
+               // No support for wrglossary counter in supplemental
+               // records. Convert to page location if found.
+
+               if (recordCounter.equals("wrglossary"))
+               {
+                  TeXObject pageRef = AuxData.getPageReference(
+                    auxData, auxTeXParser, "wrglossary."+recordLocation);
+
+                  if (pageRef != null)
+                  {
+                     recordCounter = "page";
+                     recordLocation = pageRef.toString(auxTeXParser);
+                  }
+               }
+            }
+            else
+            {
+               if (recordLabel.equals("*"))
+               {
+                  bib2gls.verboseMessage("message.ignored.record", "\\citation{*}");
+                  continue;
+               }
+
+               recordPrefix = "";
+               recordCounter = "page";
+               recordFormat = "glsignore";
+               recordLocation = "";
+            }
+
             supplementalRecords.add(new GlsRecord(
-              data.getArg(0).toString(auxTeXParser),
-              data.getArg(1).toString(auxTeXParser),
-              data.getArg(2).toString(auxTeXParser),
-              data.getArg(3).toString(auxTeXParser),
-              data.getArg(4).toString(auxTeXParser)));
+              bib2gls, recordLabel, recordPrefix, recordCounter,
+              recordFormat, recordLocation));
          }
       }
 

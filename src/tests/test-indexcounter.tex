@@ -1,0 +1,32 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{lipsum}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,indexcounter]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-entries}]
+
+\begin{document}
+
+A \gls{sample}. \lipsum*[1] A \gls{duck}.
+
+An equation:
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+\lipsum[2]
+
+Another \gls{sample}. \lipsum*[3] Another \gls{duck}.
+
+\gls{pi}. \lipsum[4]
+
+A \gls{sample}. \lipsum*[5] A \gls{duck}.
+
+\lipsum*[6] A \gls{duck}.
+
+\printunsrtglossaries
+\end{document}

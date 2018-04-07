@@ -92,6 +92,15 @@ Treat B<\citation> as an ignored record.
 
 Don't check for instances of B<\citation> in the B<.aux> file (default).
 
+=item B<--merge-wrglossary-records>
+
+Merge an entry's B<wrglossary> records for the same page locations.
+(For use with the B<indexcounter> package option.)
+
+=item B<--no-merge-wrglossary-records>
+
+Don't merge an entry's B<wrglossary> records.
+
 =item B<--force-cross-resource-refs> or B<-x>
 
 Force cross-resource referencing mode on.

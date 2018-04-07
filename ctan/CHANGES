@@ -6,6 +6,8 @@ v1.4 (pending):
      --custom-packages
      --cite-as-record
      --no-cite-as-record
+     --merge-wrglossary-records
+     --no-merge-wrglossary-records
 
    * added resource options:
 

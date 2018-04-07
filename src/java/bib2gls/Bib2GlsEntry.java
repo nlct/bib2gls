@@ -1942,7 +1942,7 @@ public class Bib2GlsEntry extends BibEntry
    {
       // add as an ignored record
 
-      addIgnoredRecord(new GlsRecord(record.getLabel(),
+      addIgnoredRecord(new GlsRecord(bib2gls, record.getLabel(),
        "", "page", "glsignore", ""));
 
       StringBuilder builder = new StringBuilder();

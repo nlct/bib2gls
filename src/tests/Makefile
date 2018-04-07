@@ -24,7 +24,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-record-prefix.pdf test-labelify.pdf \
 	  test-labelify-fontspec.pdf test-custom-symbols.pdf \
 	  test-crossresource-refs.pdf test-custom-rules.pdf \
-	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf
+	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf \
+	  test-indexcounter.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -444,6 +445,13 @@ test-bibtexdata.glstex	: test-bibtexdata.tex $(DEPS)
 		pdflatex test-bibtexdata
 		$(BIB2GLS) --cite-as-record test-bibtexdata
 		bibtex test-bibtexdata
+
+test-indexcounter.pdf	: test-indexcounter.glstex
+		pdflatex test-indexcounter
+
+test-indexcounter.glstex	: test-indexcounter.tex test-entries.bib $(DEPS)
+		pdflatex test-indexcounter
+		$(BIB2GLS) test-indexcounter
 
 clean	:
 	$(RM) *.aux
