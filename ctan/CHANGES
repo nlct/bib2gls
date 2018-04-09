@@ -1,4 +1,4 @@
-v1.4 (pending):
+v1.4 (2018-04-09):
 
    * added switches:
 
@@ -14,6 +14,7 @@ v1.4 (pending):
      - missing-parents
      - missing-parent-category
      - bibtexentry-sort-fallback
+     - save-index-counter
 
    * added extra keyword "same as original entry" 
      to category and type assignments.

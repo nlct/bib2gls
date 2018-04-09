@@ -37,10 +37,12 @@ See the manual for further details.</entry>
 <entry key="syntax.break.space">{0}		Interpret tilde character as normal space.</entry>
 <entry key="syntax.no.break.space">{0}	Interpret tilde character as a non-breaking space 
 			(default).</entry>
-<entry key="syntax.cite.as.record">{0}		Treat \citation as an ignored record.</entry>
-<entry key="syntax.no.cite.as.record">{0}		Don''t treat \citation as an ignored record (default).</entry>
-<entry key="syntax.merge.wrglossary.records">{0}		Merge wrglossary counter records (default).</entry>
-<entry key="syntax.merge.no.wrglossary.records">{0}		Don''t merge wrglossary counter records.</entry>
+<entry key="syntax.cite.as.record">{0}	Treat \citation as an ignored record.</entry>
+<entry key="syntax.no.cite.as.record">{0}	Don''t treat \citation as an ignored record (default).</entry>
+<entry key="syntax.merge.wrglossary.records">{0}
+			Merge wrglossary counter records (default).</entry>
+<entry key="syntax.no.merge.wrglossary.records">{0}
+			Don''t merge wrglossary counter records.</entry>
 <entry key="syntax.force.cross.resource.refs">{0} (or {1})
 			Force cross-resource referencing mode on.</entry>
 <entry key="syntax.no.force.cross.resource.refs">{0}

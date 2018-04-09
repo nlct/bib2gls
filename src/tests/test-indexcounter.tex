@@ -3,11 +3,18 @@
 % arara: pdflatex
 \documentclass{article}
 
+\usepackage{amsmath}
 \usepackage{lipsum}
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,indexcounter]{glossaries-extra}
 
-\GlsXtrLoadResources[src={test-entries}]
+\newcommand{\primary}[1]{\hyperbf{#1}}
+
+\GlsXtrLoadResources[src={test-entries},
+ save-index-counter=primary
+]
+
+\renewcommand{\glsnamefont}[1]{\GlsXtrIndexCounterLink{#1}{\glscurrententrylabel}}
 
 \begin{document}
 
@@ -17,16 +24,21 @@ An equation:
 \begin{equation}
 \gls[counter=equation]{pi}
 \end{equation}
+And some more equations:
+\begin{align}
+A &= b\\
+f(x) &= \gls[counter=equation]{pi}x
+\end{align}
 
 \lipsum[2]
 
-Another \gls{sample}. \lipsum*[3] Another \gls{duck}.
+Another \gls[format=primary]{sample}. \lipsum*[3] Another \gls{duck}.
 
 \gls{pi}. \lipsum[4]
 
-A \gls{sample}. \lipsum*[5] A \gls{duck}.
+A \gls{sample}. \lipsum*[5] A \gls{duck} and \gls[format=primary]{pi}.
 
-\lipsum*[6] A \gls{duck}.
+\lipsum*[6] A \gls[format=primary]{duck}.
 
 \printunsrtglossaries
 \end{document}

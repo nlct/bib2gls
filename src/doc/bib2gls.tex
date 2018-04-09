@@ -1951,7 +1951,7 @@ Don't check for instances of \ics{citation} in the \ext{aux} file
 For use with the \styopt{indexcounter} package option
 (\styfmt{glossaries-extra} v1.29+), this switch merges an entry's
 \counter{wrglossary} records for the same page location. This is the
-default setting.
+default setting. (See also \csopt{save-index-counter}.)
 
 \argsection{no-merge-wrglossary-records}
 
@@ -8601,6 +8601,163 @@ the locations are listed in the document order of use, or
 \csopt[false]{save-locations} to omit the location lists.  Note that
 you can't form counter groups from
 \hyperref[sec:supplementalopts]{supplemental location lists}.
+
+\optsection{save-index-counter}
+
+\emph{This option requires at least version 1.29 of
+\isty{glossaries-extra}.} The \meta{value} may be one of:
+\begin{itemize}
+\item \optfmt{false}: don't create the \field{indexcounter} field
+(default);
+\item \optfmt{true}: create the \field{indexcounter} field with the
+value set to the first \counter{wrglossary} location;
+\item \meta{encap}: create the \field{indexcounter} field with the
+value set to the first \counter{wrglossary} location
+where the \glsopt{format} is \meta{encap}.
+\end{itemize}
+This setting will have no effect if the \styopt{indexcounter} package
+option hasn't been used. In the case where the \meta{value} is
+\meta{encap}, make sure that this format takes priority in the
+location precedence rules (\longarg{map-format}). If the location
+with that \meta{encap} format value is discarded then it can't be
+saved.
+
+The \styopt{indexcounter} package option
+(\sty{glossaries-extra} v1.29+) creates a new counter called
+\counter{wrglossary} that's incremented every time a term is
+indexed (recorded), except for cross-references such as \cs{glssee}.
+The increment is performed using \ics{refstepcounter} and is
+followed by \code{\ics{label}\marg{wrglossary.\meta{n}}} where
+\meta{n} is the value of the \counter{wrglossary} counter.
+This option is intended for use with the \sty{hyperref} package to
+allow locations to link back to the particular part of the page where
+the term was referenced rather than to the top of the page.
+
+The \styopt{indexcounter} package option also automatically
+implements the option \styopt[wrglossary]{counter}, which means that
+each instance of \code{\ics{gls}\margm{id}} writes the label
+information to the \iext{aux} file:
+\begin{alltt}
+\csfmt{newlabel}\marg{wrglossary.\meta{n}}\marg{\margm{n}\margm{page}\marg{}\marg{wrglossary.\meta{n}}\marg{}}
+\end{alltt}
+(where \meta{page} is the page number) followed by the record:
+\begin{alltt}
+\cs{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{glsnumberformat}\margm{n}
+\end{alltt}
+The location here is actually the value of the \counter{wrglossary}
+counter not the page number, but \bibgls\ can pick up the
+corresponding \meta{page} from the \csfmt{newlabel} command. It then
+replaces the record's location \meta{n} with
+\nosecdef{glsxtr@wrglossarylocation}
+(but it only does this for records that have the \counter{wrglossary}
+counter).
+
+The \sty{glossaries-extra} package (v1.29+) adjusts the definition
+of \ics{glshypernumber} (which is internally used by
+\cs{glsnumberformat}, \cs{hyperbf} etc when \sty{hyperref} has been
+loaded) so that if the counter is \counter{wrglossary} then
+\ics{pageref} is used instead of \ics{hyperlink}. This means that the
+page number is displayed in the location list but it links back to
+the place where the corresponding \cs{label} occurred.
+
+This method works partially with \appfmt{makeindex} and \appfmt{xindy}
+but from their point of view the location is the value of the
+\counter{wrglossary} counter, which interferes with their ability to
+merge duplicate page numbers and form ranges. Since \bibgls\ is
+designed specifically to work with \sty{glossaries-extra}, it's
+aware of this special counter and will merge and collate the
+locations according to the corresponding page number instead.
+
+With the default \longarg{merge-wrglossary-records} switch, if a
+term has multiple \counter{wrglossary} records for a given page they
+will be merged. The reference link will be the dominant record for
+that page.
+
+The \csopt{save-index-counter} option allows you to save the first
+of the \counter{wrglossary} locations for a given entry or the first
+instance of a specific format of the \counter{wrglossary} locations
+for a given entry. This location is stored in the
+\field{indexcounter} internal field using:
+\begin{codeenv}
+\ics{GlsXtrSetField}\margm{id}\marg{indexcounter}\marg{\gls{glsxtr@wrglossarylocation}\margm{n}\margm{page}}
+\end{codeenv}
+Since \gls{glsxtr@wrglossarylocation} simply expands to its first
+argument, the corresponding label can be obtained with
+\begin{alltt}
+wrglossary.\gls{glsxtr@wrglossarylocation}\margm{n}\margm{page}
+\end{alltt}
+For convenience, \sty{glossaries-extra-bib2gls} provides
+\nosecdef{GlsXtrIndexCounterLink}
+which will do
+\begin{alltt}
+\csfmt{hyperref}\oarg{wrglossary.\meta{value}}\margm{text}
+\end{alltt}
+where \meta{value} is the value of the \field{indexcounter} field if
+it has been set. If the \field{indexcounter} field hasn't been set
+(or if \sty{hyperref} hasn't been loaded) then just \meta{text} is
+done.
+
+This provides a convenient way of encapsulating the \field{name} in
+the glossary so that it links back to the first \counter{wrglossary}
+entry or the first \glsopt[\meta{encap}]{format} \counter{wrglossary}
+entry. This encapsulation can be done by providing a new glossary
+style or more simply by redefining \ics{glsnamefont}:
+\begin{verbatim}
+\renewcommand{\glsnamefont}[1]{%
+ \GlsXtrIndexCounterLink{#1}{\glscurrententrylabel}}
+\end{verbatim}
+Here's a complete example:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage{lipsum}% dummy filler text
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,indexcounter]{glossaries-extra}
+
+\newcommand{\primary}[1]{\hyperbf{#1}}
+
+\GlsXtrLoadResources[
+ src={entries},% terms defined in entries.bib
+ save-index-counter=primary
+]
+
+\renewcommand{\glsnamefont}[1]{%
+ \GlsXtrIndexCounterLink{#1}{\glscurrententrylabel}}
+
+\begin{document}
+
+A \gls{sample}. \lipsum*[1] A \gls{duck}.
+
+An equation:
+\begin{equation}
+\gls[counter=equation]{pi}
+\end{equation}
+
+\lipsum[2]
+
+Another \gls[format=primary]{sample}. \lipsum*[3] Another
+\gls{duck}.
+
+\gls{pi}. \lipsum[4]
+
+A \gls{sample}. \lipsum*[5] A \gls{duck} and
+\gls[format=primary]{pi}.
+
+\lipsum*[6] A \gls[format=primary]{duck}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+Note that the \glsopt[equation]{counter} entry will have its own
+independent location. In this example, it's difficult to tell the
+difference between 1 (the equation reference) and 1 (the page
+reference) in the location list for the \code{pi} entry.
+
+The \glsopt[primary]{format} instances indicate primary references.
+They're displayed in bold (since \csfmt{primary} is defined to use
+\csfmt{hyperbf}) and these are the locations saved in the
+\field{indexcounter} field because that's the \meta{encap}
+identified by the \csopt[primary]{save-index-counter} setting.
 
 \section{Supplemental Locations}
 \label{sec:supplementalopts}

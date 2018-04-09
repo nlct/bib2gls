@@ -898,6 +898,26 @@ file by \gls{glsxtrresourcefile}
   category={command}
 }
 
+@dualindexentry{glsxtr@wrglossarylocation,
+  name={\csfmt{gls\-xtr\-@wr\-glossary\-location}},
+  user1={\margm{n}\margm{page}},
+  description={This command simply expands to \meta{n}, the value of
+the \counter{wrglossary} counter for the given page},
+  note={internal command provided by
+   \styfmt{glossaries-extra-bib2gls} v1.29+},
+  category={command}
+}
+
+@dualindexentry{GlsXtrIndexCounterLink,
+  name={\csfmt{Gls\-Xtr\-Index\-Counter\-Link}},
+  user1={\margm{text}\margm{label}},
+  description={Creates a hyperlink to the \counter{wrglossary}
+location obtained from the \field{indexcounter} field},
+  note={internal command provided by
+   \styfmt{glossaries-extra-bib2gls} v1.29+},
+  category={command}
+}
+
 @dualindexentry{glsxtrfmt,
   name={\csfmt{gls\-xtr\-fmt}},
   user1={\oargm{options}\margm{label}\margm{text}},
@@ -1526,6 +1546,13 @@ field\dhyphen locale}},
 @dualindexentry{opt.loc-counters,
    name={\csoptfmt{loc\dhyphen counters}},
    user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.save-index-counter,
+   name={\csoptfmt{save\dhyphen index\dhyphen counter}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -3450,8 +3477,14 @@ cs}\margm{Glspl-like cs}},
   parent={packageoptions}
 }
 
+@index{styopt.counter,
+  name={\styoptfmt{counter}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
 @index{styopt.indexcounter,
-  name={\styoptfmt{indexcounter}},
+  name={\styoptfmt{index\-counter}},
   category={packageoption},
   parent={packageoptions}
 }
@@ -3882,6 +3915,15 @@ field.},
   name={\fieldfmt{childcount}},
   description={Stores the number of children this entry has
     had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.indexcounter,
+  name={\fieldfmt{index\-counter}},
+  description={Stores the location corresponding to the matching
+\counter{wrglossary} reference.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}
@@ -4511,7 +4553,7 @@ field.},
 }
 
 @dualindexentry{switch.no-merge-wrglossary-records,
-  name={\longargfmt{no\hyphen merge\dhyphen wrglossary\dhyphen records}},
+  name={\longargfmt{no\dhyphen merge\dhyphen wrglossary\dhyphen records}},
   user1={},
   category={switch},
   parent={commandlineoptions}
@@ -5681,7 +5723,16 @@ label of the current entry},
 @index{glsnumberformat,
   name={\csfmt{gls\-number\-format}},
   user1={\margm{text}},
-  description={default location format},
+  description={default location format, uses \cs{glshypernumber} if
+hyperlinks enabled otherwise just does \meta{text}},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glshypernumber,
+  name={\csfmt{gls\-hyper\-number}},
+  user1={\margm{text}},
+  description={a location format that has a hyperlink (if enabled)},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6976,6 +7027,60 @@ by \meta{name}},
   user1={\margm{file list}},
   description={display bibliography created by \BibTeX},
   note={kernel command},
+  category={command}
+}
+
+@index{refstepcounter,
+  name={\csfmt{refstepcounter}},
+  user1={\margm{counter name}},
+  description={increments the given counter in a manner compatible
+   with the \cs{label} cross-referencing mechanism},
+  note={kernel command},
+  category={command}
+}
+
+@index{label,
+  name={\csfmt{label}},
+  user1={\margm{id}},
+  description={creates a label that can be referenced with \ics{ref}
+or \ics{pageref}},
+  note={kernel command},
+  category={command}
+}
+
+@index{pageref,
+  name={\csfmt{pageref}},
+  user1={\margm{id}},
+  description={cross-reference the page where \cs{label}\margm{id}
+occurred},
+  note={kernel command},
+  category={command}
+}
+
+@index{ref,
+  name={\csfmt{ref}},
+  user1={\margm{id}},
+  description={cross-reference the location where \cs{label}\margm{id}
+occurred},
+  note={kernel command},
+  category={command}
+}
+
+@index{hyperlink,
+  name={\csfmt{hyperlink}},
+  user1={\margm{target name}\margm{text}},
+  description={create a hyperlink to \meta{target name} with the given
+\meta{text}},
+  note={provided by \styfmt{hyperref}},
+  category={command}
+}
+
+@index{hypertarget,
+  name={\csfmt{hypertarget}},
+  user1={\margm{target name}\margm{text}},
+  description={create a hypertarget with the given \meta{target
+name} and the displayed \meta{text}},
+  note={provided by \styfmt{hyperref}},
   category={command}
 }
 

@@ -1748,6 +1748,15 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
+   public void writeIndexCounterField(PrintWriter writer)
+   throws IOException
+   {
+      if (indexCounterRecord == null) return;
+
+      writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+         getId(), "indexcounter", indexCounterRecord.getLocation());
+   }
+
    public Set<String> getFieldSet()
    {
       return fieldValues.keySet();
@@ -2056,14 +2065,36 @@ public class Bib2GlsEntry extends BibEntry
       {
          bib2gls.debugMessage("message.ignored.record", record);
          addIgnoredRecord(record);
+         return;
       }
-      else if (record.getFormat().equals("glstriggerrecordformat"))
+
+      if (record.getFormat().equals("glstriggerrecordformat"))
       {
          triggerRecordFound = true;
          bib2gls.debugMessage("message.ignored.record", record);
          addIgnoredRecord(record);
+         return;
       }
-      else if (records != null)
+
+
+      if (indexCounterRecord == null)
+      {
+         String indexCounter = resource.getSaveIndexCounter();
+
+         if (indexCounter != null && record.getCounter().equals("wrglossary"))
+         {
+            if (indexCounter.equals("true"))
+            {
+               indexCounterRecord = record;
+            }
+            else if (record.getFormat().equals(indexCounter))
+            {
+               indexCounterRecord = record;
+            }
+         }
+      }
+
+      if (records != null)
       {
          if (!records.contains(record))
          {
@@ -3360,6 +3391,8 @@ public class Bib2GlsEntry extends BibEntry
    private boolean triggerRecordFound=false;
 
    private Vector<String> locationList = null;
+
+   private GlsRecord indexCounterRecord = null;
 
    private static final Pattern EXT_PREFIX_PATTERN = Pattern.compile(
      "ext(\\d+)\\.(.*)");

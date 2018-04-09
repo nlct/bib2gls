@@ -45,12 +45,14 @@ public class GlsRecord
 
    public GlsRecord copy(String newLabel)
    {
-      return new GlsRecord(bib2gls, newLabel, prefix, counter, format, location, index);
+      return new GlsRecord(bib2gls, newLabel, prefix, counter, format, 
+         location, index);
    }
 
    public Object clone()
    {
-      return new GlsRecord(bib2gls, label, prefix, counter, format, location, index);
+      return new GlsRecord(bib2gls, label, prefix, counter, format, location, 
+        index);
    }
 
    public int compareTo(GlsRecord record)
@@ -96,6 +98,11 @@ public class GlsRecord
    public String getLocation()
    {
       return location;
+   }
+
+   public void setLocation(String newLocation)
+   {
+      location = newLocation;
    }
 
    public String getListTeXCode()

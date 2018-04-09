@@ -250,6 +250,15 @@ public class GlsResource
          {
             copyAliasToSee = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("save-index-counter"))
+         {
+            indexCounter = getOptional(parser, "true", list, opt);
+
+            if (indexCounter.equals("false"))
+            {
+               indexCounter = null;
+            }
+         }
          else if (opt.equals("post-description-dot"))
          {
             String val = getChoice(parser, list, opt, "none", "all", "check");
@@ -5987,6 +5996,11 @@ public class GlsResource
       {
          bib2gls.writeRecordCount(id, writer);
       }
+
+      if (indexCounter != null)
+      {
+         entry.writeIndexCounterField(writer);
+      }
    }
 
    private void writeBibEntryCopy(PrintWriter writer, Bib2GlsEntry entry)
@@ -7904,6 +7918,11 @@ public class GlsResource
       return locGap;
    }
 
+   public String getSaveIndexCounter()
+   {
+      return indexCounter;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -8135,6 +8154,8 @@ public class GlsResource
    private String groupField = null;
 
    private String saveOriginalId = null;
+
+   private String indexCounter=null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE=1;
