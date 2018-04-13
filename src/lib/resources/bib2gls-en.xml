@@ -488,6 +488,16 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="tex.error.illegal_align">Illegal alignment {0}</entry>
 <entry key="tex.error.misplaced_omit">Misplaced \omit</entry>
 <entry key="tex.error.improper_alphabetic_constant">Improper alphabetic constant {0}</entry>
+<entry key="tex.error.register_expected">Register expected</entry>
+<entry key="tex.error.register_expected_but_found">Register expected (found ''{0}'')</entry>
+<entry key="tex.error.numeric register_expected">Numeric register expected</entry>
+<entry key="tex.error.register_not_numeric">Register ''{0}'' not numeric</entry>
+<entry key="tex.error.register_not_token">Register ''{0}'' not a token register</entry>
+<entry key="tex.error.generic">{0}</entry>
+<entry key="tex.error.file.not.found">File ''{0}'' not found.</entry>
+<entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
+
+
 
 <entry key="latex.error.no_alignment">No alignment specifiers found</entry>
 <entry key="latex.error.undefined_counter">No counter ''{0}'' defined</entry>
@@ -500,6 +510,10 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="latex.error.defined">''{0}'' already defined</entry>
 <entry key="latex.error.illegal_array_arg_char">Illegal character ''{0}'' in array arg</entry>
 <entry key="latex.error.lonely_item">Lonely \item</entry>
+<entry key="latex.package.error">Package {0} Error: {1}</entry>
+<entry key="latex.class.error">Class {0} Error: {1}</entry>
+<entry key="latex.illegal.argtype">Illegal argument type {0}</entry>
+<entry key="latex.package.not.loaded">Package ''{0}'' has not been loaded</entry>
 
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>
@@ -542,5 +556,13 @@ converted to @dualabbreviationentry.)</entry>
 
 <entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
 
+<!--  inputenc messages -->
+
+<entry key="inputenc.unknown.encoding">Unknown encoding ''{0}''.</entry>
+
+<!-- color messages -->
+<entry key="color.unsupported">Unsupported ''{0}'' model colour {1}</entry>
+<entry key="color.invalid.specs">Invalid specification ''{0}'' for colour model {1}</entry>
+<entry key="color.unknown">Unknown named colour ''{0}''</entry>
 
 </properties>
