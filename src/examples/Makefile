@@ -6,7 +6,8 @@ all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
 	sample-maths.pdf sample-textsymbols.pdf \
 	sample-constants.pdf sample-usergroups.pdf \
-	sample-languages.pdf sample-multi1.pdf sample-multi2.pdf
+	sample-languages.pdf sample-multi1.pdf sample-multi2.pdf \
+	sample-citations.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
@@ -111,5 +112,12 @@ sample-constants.pdf	: $(DEPS) sample-constants.tex constants.bib
 	$(BIB2GLS) --no-group sample-constants
 	pdflatex sample-constants
 
+sample-citations.pdf	: $(DEPS) sample-citations.tex citations.bib
+	pdflatex sample-citations
+	bibtex sample-citations
+	$(BIB2GLS) --cite-as-record sample-citations
+	pdflatex sample-citations
+	pdflatex sample-citations
+
 clean	:
-	\rm -f *.{glg,glstex,aux,log,out,toc,pdf}
+	\rm -f *.{glg,glstex,aux,log,out,toc,pdf,bbl,blg}
