@@ -440,6 +440,13 @@ given label},
   category={command}
 }
 
+@dualindexentry{bibglssetlastgrouptitle,
+  name={\csfmt{bib\-gls\-set\-last\-group\-title}},
+  user1={\margm{cs}\margm{group specs}},
+  description={sets the last group title},
+  category={command}
+}
+
 @dualindexentry{bibglssetlettergrouptitle,
   name={\csfmt{bib\-gls\-set\-letter\-group\-title}},
   user1={\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}},
@@ -915,6 +922,27 @@ the \counter{wrglossary} counter for the given page},
 location obtained from the \field{indexcounter} field},
   note={internal command provided by
    \styfmt{glossaries-extra-bib2gls} v1.29+},
+  category={command}
+}
+
+@dualindexentry{GlsXtrDualBackLink,
+  name={\csfmt{Gls\-Xtr\-Dual\-Back\-Link}},
+  user1={\margm{text}\margm{label}},
+  description={Creates a hyperlink to the dual entry whose label is
+   obtained from the field given by \gls{GlsXtrDualField}},
+  note={internal command provided by
+   \styfmt{glossaries-extra-bib2gls} v1.30+},
+  category={command}
+}
+
+@dualindexentry{GlsXtrDualField,
+  name={\csfmt{Gls\-Xtr\-Dual\-Field}},
+  user1={},
+  description={The field used to store the dual label. This defaults 
+   to \field{dual} but will need to be redefined if a different
+   value is given by \csopt{dual-field}},
+  note={internal command provided by
+   \styfmt{glossaries-extra-bib2gls} v1.30+},
   category={command}
 }
 
@@ -3338,6 +3366,12 @@ cs}\margm{Glspl-like cs}},
   parent={categoryattribute}
 }
 
+@index{nohyperfirst,
+  name={\catattrfmt{nohyperfirst}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
 @index{ctr.equation,
   name={\counterfmt{equation}},
   category={counter}
@@ -3355,6 +3389,16 @@ cs}\margm{Glspl-like cs}},
 
 @index{ctr.wrglossary,
   name={\counterfmt{wrglossary}},
+  category={counter}
+}
+
+@index{ctr.glossaryentry,
+  name={\counterfmt{glossaryentry}},
+  category={counter}
+}
+
+@index{ctr.glossarysubentry,
+  name={\counterfmt{glossarysubentry}},
   category={counter}
 }
 
@@ -3389,132 +3433,642 @@ cs}\margm{Glspl-like cs}},
 
 @index{styopt.record,
   name={\styoptfmt{record}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.automake,
-  name={\styoptfmt{automake}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.shortcuts,
-  name={\styoptfmt{shortcuts}},
+  user1={\meta{value}},
+  description={unless the value is \styoptfmt{off}, this option sets
+  up \styfmt{glossaries-extra} for use with \bibgls: \styoptfmt{only}
+  (assumed if no \meta{value} supplied, indexing performed by
+  \bibgls) and \styoptfmt{alsoindex} (\bibgls\ is used to provide
+  the entry definitions but \idx{makeindex} or \idx{xindy} is used
+  for the indexing)},
+  package={glossaries-extra},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.accsupp,
   name={\styoptfmt{accsupp}},
+  description={load the \sty{glossaries-accsupp} package to provide
+   accessibility support},
+  package={glossaries,glossaries-extra},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.abbreviations,
   name={\styoptfmt{abbreviations}},
+  description={creates the \code{abbreviations} glossary},
+  package={glossaries-extra},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.symbols,
   name={\styoptfmt{symbols}},
+  package={glossaries,glossaries-extra},
+  description={defines the \code{symbols} glossary; with 
+   \styfmt{glossaries-extra} additionally defines
+   \gls{glsxtrnewsymbol}},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.numbers,
   name={\styoptfmt{numbers}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.sort,
-  name={\styoptfmt{sort}},
+  package={glossaries,glossaries-extra},
+  description={defines the \code{numbers} glossary; with 
+   \styfmt{glossaries-extra} additionally defines
+   \gls{glsxtrnewnumber}},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.undefaction,
   name={\styoptfmt{undefaction}},
+  user1={\meta{value}},
+  description={indicates what to do if an undefined entry is
+  referenced: \styoptfmt{warn} (generate a warning and show ?? in
+  the text, default with \styopt{record}), \styoptfmt{error}
+  (generate an error)},
+  package={glossaries-extra},
   category={packageoption},
   parent={packageoptions}
 }
 
-@index{styopt.nomain,
-  name={\styoptfmt{nomain}},
+@index{styopt.indexcrossrefs,
+  name={\styoptfmt{indexcrossrefs}},
+  user1={\meta{boolean}},
+  package={glossaries-extra},
   category={packageoption},
-  parent={packageoptions}
+  parent={packageoptions},
+  description={(not relevant with \bibgls) if true, at the end of
+  the document automatically index cross-referenced entries that 
+  haven't been marked as used}
 }
 
-@index{styopt.nonumberlist,
-  name={\styoptfmt{nonumberlist}},
+@index{styopt.autoseeindex,
+  name={\styoptfmt{autoseeindex}},
+  user1={\meta{boolean}},
+  package={glossaries-extra},
   category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.nogroupskip,
-  name={\styoptfmt{nogroupskip}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.xindy,
-  name={\styoptfmt{xindy}},
-  category={packageoption},
-  parent={packageoptions}
+  parent={packageoptions},
+  description={(not relevant with \bibgls) if true, the \field{see}
+   and \field{seealso} keys automatically indexes the cross-referenced term}
 }
 
 @index{styopt.nopostdot,
   name={\styoptfmt{nopostdot}},
+  user1={\meta{boolean}},
+  package={glossaries,glossaries-extra},
+  description={if true, suppresses the automatic post-description 
+   punctuation},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.postdot,
   name={\styoptfmt{postdot}},
+  package={glossaries-extra},
+  description={equivalent to \styopt[dot]{postpunc}},
   category={packageoption},
   parent={packageoptions}
 }
 
-@index{styopt.counter,
-  name={\styoptfmt{counter}},
+@index{styopt.postpunc,
+  name={\styoptfmt{postpunc}},
+  user1={\meta{value}},
+  package={glossaries-extra},
   category={packageoption},
-  parent={packageoptions}
+  parent={packageoptions},
+  description={controls the automatic post-description punctuation;
+  the value may be one of: \styoptfmt{none} (no post-description
+   punctuation), \styoptfmt{comma} (uses a comma),
+  \styoptfmt{dot} (uses a \idx{full-stop}), \meta{punctuation}
+  (use \meta{punctuation})}
 }
 
 @index{styopt.indexcounter,
   name={\styoptfmt{index\-counter}},
+  description={creates the \counter{indexcounter} counter, which is
+  incremented every time an entry is indexed with that counter, and sets
+  that as the default location counter},
+  package={glossaries-extra},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.docdef,
+  name={\styoptfmt{docdef}},
+  user1={\meta{value}},
+  package={glossaries-extra},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) determines whether
+  entries can be defined in the \envfmt{document} environment; the
+  \meta{value} may be one of: \styoptfmt{false} (entries must be 
+  defined in the preamble), \styoptfmt{true} (entries may be defined
+  in the \envfmt{document} environment), \styoptfmt{restricted}
+  (entries may only be defined in the \envfmt{document} environment
+  if the definition comes before all glossaries and before any
+  reference to the entry)}
+}
+
+@index{styopt.nomissingglstext,
+  name={\styoptfmt{nomissingglstext}},
+  user1={\meta{boolean}},
+  package={glossaries-extra},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not applicable with \bibgls) if true, suppress the
+  warning text that appears in the document with \cs{printglossary}
+  if the associated external file doesn't exist}
+}
+
+@index{styopt.stylemods,
+  name={\styoptfmt{stylemods}},
+  user1={\meta{value}},
+  description={load the \sty{glossaries-stylemods} package with the
+  supplied options (which should be a list of suffix parts
+  identifying glossary style packages \styfmt{glossary-}\meta{suffix}); 
+  there are two keyword values: \styoptfmt{default}
+  (equivalent to omitting \meta{value}) and \styoptfmt{all}, which
+  loads all predefined styles},
+  package={glossaries-extra},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nowarn,
+  name={\styoptfmt{nowarn}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={suppresses all \styfmt{glossaries}-related warnings}
+}
+
+@index{styopt.nolangwarn,
+  name={\styoptfmt{nolangwarn}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={suppresses warnings generated by missing language modules}
+}
+
+@index{styopt.noredefwarn,
+  name={\styoptfmt{noredefwarn}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={suppresses warnings if overriding glossary commands
+   provided by another class or package}
+}
+
+@index{styopt.debug,
+  name={\styoptfmt{debug}},
+  user1={\meta{value}},
+  package={glossaries,glossaries-extra},
+  category={packageoption},
+  parent={packageoptions},
+  description={add debugging information; allowed values: 
+  \styoptfmt{false} (default), \styoptfmt{true} (info added to
+   transcript), \styoptfmt{showtargets} (info added to transcript
+   and show target name in the document for glossary-related 
+   hyperlinks), \styoptfmt{showwrgloss}\extstyopt\ show mark in
+   document where indexing occurs and \styoptfmt{all}\extstyopt\
+   (implement both \styoptfmt{showtargets} and
+   \styoptfmt{showwrgloss})}
+}
+
+@index{styopt.seenoindex,
+  name={\styoptfmt{seenoindex}},
+  user1={\meta{value}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) determines whether the 
+  \field{see} key automatically indexes the entry using \cs{glsadd}; 
+  allowed values: \styoptfmt{error} (attempts indexing but triggers
+  an error if used before \cs{cs.makeglossaries}); \styoptfmt{warn}
+  (attempts indexing but triggers a warning if used before
+  \cs{cs.makeglossaries}); \styoptfmt{ignore} (attempts indexing but
+  does nothing if used before \cs{cs.makeglossaries})}
+}
+
+@index{styopt.nomain,
+  name={\styoptfmt{nomain}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={suppresses the creation of the default \code{main} glossary}
+}
+
+@index{styopt.sanitizesort,
+  name={\styoptfmt{sanitizesort}},
+  user1={\meta{boolean}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) determines whether or not
+   to sanitize the \field{sort} key}
+}
+
+@index{styopt.savewrites,
+  name={\styoptfmt{savewrites}},
+  user1={\meta{boolean}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) if true, indexing
+  information is stored in token registers that are only written at
+  the end of the document to save creating a write register per
+  glossary indexing file}
+}
+
+@index{styopt.translate,
+  name={\styoptfmt{translate}},
+  user1={\meta{value}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={determines the multilingual support provided by
+   \styfmt{glossaries}; allowed values: \styoptfmt{true} (default
+   with just base \styfmt{glossaries}; if
+   \styfmt{babel} has been loaded and \styfmt{translator} is
+   installed, use \styfmt{translator} interface), \styoptfmt{false}
+   (don't provide translations), \styoptfmt{babel} (default with
+   \styfmt{glossaries-extra}; don't load the 
+   \styfmt{translator} package, just load \styfmt{glossaries-babel})}
+}
+
+@index{styopt.notranslate,
+  name={\styoptfmt{notranslate}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={equivalent to \styopt[false]{translate}}
+}
+
+@index{styopt.nohypertypes,
+  name={\styoptfmt{nohypertypes}},
+  user1={\meta{list}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={suppress hyperlinks for the listed glossary types}
+}
+
+@index{styopt.hyperfirst,
+  name={\styoptfmt{hyperfirst}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if false, terms on first use don't have hyperlinks
+  unless explicitly set (with \styfmt{glossaries-extra}, the 
+  \catattr{nohyperfirst} category attribute can selectively apply this)}
+}
+
+@index{styopt.indexonlyfirst,
+  name={\styoptfmt{indexonlyfirst}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true, only performs indexing on first use}
+}
+
+@index{styopt.savenumberlist,
+  name={\styoptfmt{savenumberlist}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true, stores the number list for each entry (with
+  \bibgls\ use the \csopt{save-locations} resource option instead)}
+}
+
+@index{styopt.toc,
+  name={\styoptfmt{toc}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true (default for \styfmt{glossaries-extra}), 
+  automatically add each glossary to the table of contents}
+}
+
+@index{styopt.numberline,
+  name={\styoptfmt{numberline}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={when used with \styopt[true]{toc}, this will add 
+  \code{\csfmt{numberline}\marg{}} to the start of the TOC entry}
+}
+
+@index{styopt.section,
+  name={\styoptfmt{section}},
+  user1={value},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={indicates the sectional unit to use for the glossary
+  heading (the value should be the name of the section command without
+  the leading backslash, for example \styopt[subsection]{section})}
+}
+
+@index{styopt.ucmark,
+  name={\styoptfmt{ucmark}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true, converts the glossary mark (used in page
+  headings) to upper case with \cs{MakeTextUppercase}}
+}
+
+@index{styopt.numberedsection,
+  name={\styoptfmt{numberedsection}},
+  user1={value},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={determines whether to use numbered (unstarred) or unnumbered 
+  (starred) section units, and whether or not to automatically add
+  \cs{label}; the value may be one of: \styoptfmt{false} (no
+  numbering and no label), \styoptfmt{nolabel} (numbered but no
+  label), \styoptfmt{autolabel} (numbered with automatic label), 
+  \styoptfmt{nameref} (unnumbered but labelled)}
+}
+
+@index{styopt.entrycounter,
+  name={\styoptfmt{entrycounter}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true, creates the \counter{glossaryentry} counter
+  and each main (level 0) glossary entry will be
+  numbered (which can be referenced with \cs{glsrefentry} or 
+  \cs{glsxtrpageref})}
+}
+
+@index{styopt.counterwithin,
+  name={\styoptfmt{counterwithin}},
+  user1={counter name},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={automatically sets \styopt[true]{entrycounter} and 
+  indicates the master counter for \counter{glossaryentry}}
+}
+
+@index{styopt.subentrycounter,
+  name={\styoptfmt{subentrycounter}},
+  user1={boolean},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true, creates the \counter{glossarysubentry} counter
+  and each level~1 glossary entry will be
+  numbered (which can be referenced with \cs{glsrefentry} or 
+  \cs{glsxtrpageref}); this option and associated counter are
+  independent of \styopt{entrycounter} and \counter{glossaryentry}}
+}
+
+@index{styopt.style,
+  name={\styoptfmt{style}},
+  user1={\meta{name}},
+  package={glossaries},
+  description={sets the default glossary style to \meta{name}},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nolong,
+  name={\styoptfmt{nolong}},
+  package={glossaries},
+  description={prevents the \sty{glossary-long} package (which
+   provides the \glostyle{long} styles) from being
+   automatically loaded},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nosuper,
+  name={\styoptfmt{nosuper}},
+  package={glossaries},
+  description={prevents the \sty{glossary-super} package (which
+   provides the \glostyle{super} styles) from being
+   automatically loaded},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nolist,
+  name={\styoptfmt{nolist}},
+  package={glossaries},
+  description={prevents the \sty{glossary-list} package (which
+   provides the \glostyle{list} styles) from being
+   automatically loaded},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.notree,
+  name={\styoptfmt{notree}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={prevents the \sty{glossary-tree} package (which
+   provides the \glostyle{tree} styles) from being
+   automatically loaded}
+}
+
+@index{styopt.nostyles,
+  name={\styoptfmt{nostyles}},
+  package={glossaries},
+  description={prevents all the default styles from being loaded},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.esclocations,
+  name={\styoptfmt{esclocations}},
+  user1={\meta{boolean}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) if true,
+  \styfmt{glossaries} tries to escape special characters from the
+  locations}
+}
+
+@index{styopt.nonumberlist,
+  name={\styoptfmt{nonumberlist}},
+  package={glossaries},
+  description={suppresses the \idxpl{locationlist} from being
+  displayed in the glossary lists (the package
+  option isn't boolean, but the option of the same name for
+  \cs{printglossary}, \cs{printunsrtglossary} and
+  \cs{printnoidxglossary} is boolean); it's better to use
+  \csopt[false]{save-locations} with \bibgls},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.seeautonumberlist,
+  name={\styoptfmt{seeautonumberlist}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) if \styopt{nonumberlist}
+  is used, this allows the \field{see} key to override the setting
+  for the associated entry}
+}
+
+@index{styopt.counter,
+  name={\styoptfmt{counter}},
+  user1={\meta{value}},
+  description={sets the default location counter to \meta{value}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.nogroupskip,
+  name={\styoptfmt{nogroupskip}},
+  user1={\meta{boolean}},
+  description={if true, suppresses the visual separation between
+  letter groups},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.sort,
+  name={\styoptfmt{sort}},
+  user1={\meta{value}},
+  description={(not relevant with \bibgls, use the \csopt{sort}
+   resource option instead) sets the sort method},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.order,
+  name={\styoptfmt{order}},
+  user1={\meta{value}},
+  description={(not relevant with \bibgls, use the \csopt{break-at}
+   resource option instead) sets whether to use word or letter
+   ordering},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.makeindex,
+  name={\styoptfmt{makeindex}},
+  description={(not relevant with \bibgls) write the indexing
+   information using \idx{makeindex}'s format},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.xindy,
+  name={\styoptfmt{xindy}},
+  user1={\meta{settings}},
+  description={(not relevant with \bibgls) write the indexing
+   information using \idx{xindy}'s format where the optional
+   \meta{settings} may supply the language and code page and whether
+   or not to define the default number group},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.xindygloss,
+  name={\styoptfmt{xindygloss}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) equivalent to
+   \styopt[\marg{}]{xindy}}
+}
+
+@index{styopt.xindynoglsnumbers,
+  name={\styoptfmt{xindynoglsnumbers}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={(not relevant with \bibgls) equivalent to
+   \styopt[\marg{glsnumbers=false}]{xindy}}
+}
+
+@index{styopt.automake,
+  name={\styoptfmt{automake}},
+  user1={\meta{boolean}},
+  description={if true, tries to use \TeX's shell escape to
+   automatically run the required indexing application (may not
+   be permitted by \TeX's security settings)},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions}
+}
+
+@index{styopt.acronym,
+  name={\styoptfmt{acronym}},
+  user1={\meta{boolean}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={if true, creates a new glossary with the label \code{acronym}}
+}
+
+@index{styopt.acronyms,
+  name={\styoptfmt{acronyms}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={equivalent to \styopt[true]{acronym}}
+}
+
+@index{styopt.acronymlists,
+  name={\styoptfmt{acronymlists}},
+  user1={\meta{list}},
+  package={glossaries},
+  category={packageoption},
+  parent={packageoptions},
+  description={identifies the glossaries that are lists of acronyms
+  (don't use with \sty{glossaries-extra})}
+}
+
+@index{styopt.shortcuts,
+  name={\styoptfmt{shortcuts}},
+  package={glossaries,glossaries-extra},
+  user1={\meta{value}},
+  description={sets up short cut commands; the value may be one of
+  \styoptfmt{false} (default), \styoptfmt{true} (provides \cs{ac}
+   like shortcuts; with \styfmt{glossaries-extra} implements 
+   \styopt[ac]{shortcuts}, \styopt[abbreviations]{shortcuts} and
+   \styopt[other]{shortcuts}), \styoptfmt{acronyms}\extstyopt\ 
+   (equivalent to base \styopt[true]{shortcuts}, synonym
+   \styoptfmt{acro}), \styoptfmt{ac}\extstyopt\ (provides \cs{ac}
+   shortcuts that use \styfmt{glossaries-extra}'s new abbreviation
+   commands), \styoptfmt{abbreviations}\extstyopt\ (provides \cs{ab}
+   shortcuts), \styoptfmt{other}\extstyopt\ (provides other shortcut
+   commands), \styoptfmt{all}\extstyopt\ (synonym for
+   \styopt[true]{shortcuts}) and \styoptfmt{none}\extstyopt\
+   (synonym for \styopt[false]{shortcuts})},
   category={packageoption},
   parent={packageoptions}
 }
 
 @index{styopt.index,
   name={\styoptfmt{index}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.nostyles,
-  name={\styoptfmt{nostyles}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.stylemods,
-  name={\styoptfmt{stylemods}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.style,
-  name={\styoptfmt{style}},
-  category={packageoption},
-  parent={packageoptions}
-}
-
-@index{styopt.section,
-  name={\styoptfmt{section}},
+  package={glossaries},
+  description={defines the \code{index} glossary and \gls{newterm}},
   category={packageoption},
   parent={packageoptions}
 }
@@ -4003,6 +4557,15 @@ field.},
   name={\fieldfmt{secondarysort}},
   description={The sort value determined by the
    comparator used with the \gls{dual.opt.secondary} sort.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.dual,
+  name={\fieldfmt{dual}},
+  description={Created by \csopt{dual-field} if set with no value,
+   this field is used to store the dual label.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}
@@ -5453,7 +6016,7 @@ label of the current entry},
 @index{newsym,
   name={\csfmt{newsym}},
   user1={\margm{label}\margm{\keyvallist}\margm{symbol}},
-  description={equivalent to \cs{glsxtrnewsymbol}},
+  description={equivalent to \gls{glsxtrnewsymbol}},
   note={provided by \styfmt{glossaries-extra}'s
    \gls{styopt.shortcuts} package option},
   category={command}
@@ -5462,7 +6025,7 @@ label of the current entry},
 @index{newnum,
   name={\csfmt{newnum}},
   user1={\margm{label}\margm{\keyvallist}},
-  description={equivalent to \cs{glsxtrnewnumber}},
+  description={equivalent to \gls{glsxtrnewnumber}},
   note={provided by \styfmt{glossaries-extra}'s
 \gls{styopt.shortcuts} package option},
   category={command}
@@ -6106,6 +6669,15 @@ usual delay},
   description={equivalent to \cs{gls}},
   note={provided by \styfmt{glossaries-extra} \gls{styopt.shortcuts} package
 option},
+  category={command}
+}
+
+@index{ab,
+  name={\csfmt{ab}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={equivalent to \cs{gls}},
+  note={provided by \styfmt{glossaries-extra} 
+  \styopt[abbreviations]{shortcuts} package option},
   category={command}
 }
 
@@ -7081,6 +7653,26 @@ occurred},
   description={create a hypertarget with the given \meta{target
 name} and the displayed \meta{text}},
   note={provided by \styfmt{hyperref}},
+  category={command}
+}
+
+@index{glsrefentry,
+  name={\csfmt{glsrefentry}},
+  user1={\margm{label}},
+  description={when used with \styopt{entrycounter} or
+   \styopt{subentrycounter} may be used to cross-reference the
+  entry's number in the glossary list with \cs{ref}},
+  note={provided by \styfmt{glossaries} v3.0+},
+  category={command}
+}
+
+@index{glsxtrpageref,
+  name={\csfmt{glsxtrpageref}},
+  user1={\margm{label}},
+  description={when used with \styopt{entrycounter} or
+   \styopt{subentrycounter} may be used to cross-reference the
+  entry's number in the glossary list with \cs{pageref}},
+  note={provided by \styfmt{glossaries-extra} v1.11},
   category={command}
 }
 

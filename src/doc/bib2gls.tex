@@ -206,6 +206,7 @@
   {\string\\jobname-#1.glstex}%
 }
 
+\newcommand{\extstyopt}{\textsuperscript{\textdagger}}
 
 \newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
@@ -757,8 +758,13 @@ from the \ext{bib} file. Since \bibgls\ can also perform
 hierarchical sorting and can collate location lists, it doubles as
 an indexing application, which means that the \idx{makeglossaries}
 step can be skipped.
+Note that \bibgls\ doesn't warn you if an entry that's referenced
+in the document doesn't exist in any of the supplied \ext{bib}
+files, but instead relies on the \styfmt{glossaries-extra} package
+to generate the warning. So at the end of the document build check
+the \ext{log} file for warnings.
 
-You can't use \ics{glsaddall} with this method as that command works
+You can't use \ics{glsaddall} with \bibgls\ as that command works
 by iterating over all defined entries and calling
 \ics{glsadd}\margm{label}. On the first \LaTeX\ run there are no
 entries defined, so \ics{glsaddall} does nothing. If you want to
@@ -1846,6 +1852,14 @@ written to the transcript file, which can be inspected afterwards.
 Specify the preferred \langxml, where \meta{lang} is a valid \idx{IETF} language tag.
 This option requires an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
 resource file otherwise \bibgls\ will fallback on English.
+This also sets the default document locale when \csopt[doc]{sort} is
+used and the document doesn't have any language support.
+Note that \csopt[locale]{sort} uses the \idx{JVM}['s] default
+locale and is not governed by this switch.
+
+If a document doesn't have any locale support or has support
+for more than one language then it's best to explicitly set
+the required locale in the appropriate \idx{resourceset}.
 
 \argsection{log-file}
 
@@ -2808,6 +2822,12 @@ option instead.
 \caption[Fields Set by \bibgls]{Fields Sometimes Set by \bibgls\ in
 the \iext{glstex} File}
 \label{tab:internalfields}
+You may define and assign \field{bibtextype} (although it's more
+likely to be aliased). Don't define any of others, and don't use any
+of them in the \ext{bib} file, except for \field{group},
+\field{sort} or \field{type} although those three are best
+assigned in the resource command or by \bibgls.\par
+\bigskip
 \centering
 \printfields{internalfield}%
 \end{table}
@@ -2815,8 +2835,12 @@ the \iext{glstex} File}
 \begin{table}[hbtp]
 \caption[Internal Fields Set by \styfmt{glossaries} or
 \styfmt{glossaries-extra} or \bibgls]{Internal Fields Set by
-\styfmt{glossaries} or \styfmt{glossaries-extra} or \bibgls\
-(don't use in \ext{bib} files)}\label{tab:baseinternalfields}
+\styfmt{glossaries} or \styfmt{glossaries-extra} or \bibgls}%
+\label{tab:baseinternalfields}
+\medskip
+Don't define any of these and don't use any of them in the \ext{bib}
+file.\par
+\bigskip
 \centering
 \printfields{baseinternalfield}%
 \end{table}
@@ -11820,13 +11844,39 @@ defined with \atentry{dualsymbol} instead of \atentry{dualentry}.
 
 Analogous to \csopt{dual-entry-backlink} but for entries
 defined with \atentry{dualabbreviationentry} instead of
-\atentry{dualentry}.
+\atentry{dualentry}. This setting can be problematic as the
+backlinks rely on the relevant field being known to \bibgls.
+Since the abbreviation style typically sets the \field{name}
+field (and sometimes the \field{description} field as well), you may
+find that no backlink appears. A simple workaround is to 
+use \csopt{dual-field} (or \csopt[dual]{dual-field}) 
+to store the dual label in the \field{dual} field, and then
+use a style that checks for this field and adds the backlink.
+
+With \sty{glossaries-extra} v1.30+ you can use
+\nosecdef{GlsXtrDualBackLink}
+which encapsulates \meta{text} with a hyperlink to the dual.
+The \meta{label} identifies the entry that requires a backlink.
+The dual's label is obtained from the field given by
+\nosecdef{GlsXtrDualField}
+which defaults to \field{dual}. Note that if you assign a 
+different field label with \csopt{dual-field}, then you will
+need to redefine \cs{GlsXtrDualField} as appropriate.
+
+For example:
+\begin{verbatim}
+\renewcommand*{\glsuserdescription}[2]{%
+  \GlsXtrDualBackLink{\glslonguserfont{#1}}{#2}%
+}
+\setabbreviationstyle{long-short-user}
+\GlsXtrLoadResources[src={entries},dual-field]
+\end{verbatim}
 
 \optsection[\subsubsection]{dual-entryabbrv-backlink}
 
-Analogous to \csopt{dual-entry-backlink} but for entries
+As \csopt{dual-abbrventry-backlink} but for entries
 defined with \atentry{dualentryabbreviation} instead of
-\atentry{dualentry}.
+\atentry{dualabbreviationentry}.
 
 \optsection[\subsubsection]{dual-indexentry-backlink}
 
@@ -12798,6 +12848,51 @@ group=\marg{\gls{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{t
 This field needs to expand to a simple label, which \csref{bibglslettergroup}
 is designed to do.  Note that non-letter groups are dealt with
 separately (see below).
+
+\cssection{bibglssetlastgrouptitle}
+
+In the last resource (\ext{glstex}) file, after all the relevant
+group titles have been set with the commands listed below, there's a
+final title setting:
+\formatdef{bibglssetlastgrouptitle}
+This does nothing by default, but the arguments are set to
+correspond to the group with the maximum id for that resource file.
+It's provided as a convenient way of overriding the final group
+title without the inconvenience of looking up the group label in the
+\ext{glstex} file. If you have multiple glossaries or if you want to
+override a different group, then you need to inspect the
+\ext{glstex} file to work out the corresponding label (by finding
+the \field{group} assignment for one of the entries in that group).
+
+The \meta{cs} argument is the control sequence used in the
+\field{group} field to obtain the label from \meta{specs}. For
+example, if the highest \meta{id} is 2147418112 from
+\begin{codeenv}
+\field{group}=\marg{\gls{bibglslettergroup}\marg{Ø}\marg{Ø}\marg{2147418112}\marg{}}
+\end{codeenv}
+then the last group is identified with
+\begin{verbatim}
+\bibglssetlastgrouptitle{\bibglslettergroup}{{Ø}{Ø}{2147418112}{}}
+\end{verbatim}
+In this case \meta{cs} is \gls{bibglslettergroup} and \meta{specs}
+are the arguments for that command. If you want \gls{bibglssetlastgrouptitle}
+to change the group title then you need to define it before the
+\idx{resourceset}. For example:
+\begin{verbatim}
+\newcommand*{\bibglssetlastgrouptitle}[2]{%
+ \glsxtrsetgrouptitle{#1#2}{Foreign Words}}
+
+\GlsXtrLoadResources[sec={entries}]
+\end{verbatim}
+If you need to change a particular group title, then it has to be
+done after the \idx{resourceset}:
+\begin{verbatim}
+\GlsXtrLoadResources[sec={entries}]
+
+\glsxtrsetgrouptitle
+ {\bibglslettergroup{{Ø}{Ø}{2147418112}{}}}% label
+ {Foreign Words}% title
+\end{verbatim}
 
 \cssection{bibglssetlettergrouptitle}
 
