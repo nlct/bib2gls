@@ -1,0 +1,71 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+% bib2gls must be run with the --cite-as-record switch
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[record,% using bib2gls
+nostyles,% don't load default styles
+nomain,% don't define main glossary
+stylemods={tree,list}% load glossary-tree and patch styles
+]{glossaries-extra}
+
+\newglossary*{contributors}{Authors}
+\newglossary*{titles}{Titles}
+
+\newcommand{\bibglsnewbibtexentry}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},#2,type={titles}}{#4}%
+}
+
+\GlsXtrLoadResources[
+ src={citations},% data in citations.bib
+ entry-type-aliases={\GlsXtrBibTeXEntryAliases},
+  field-aliases={
+    title=name
+  },
+  replicate-fields={
+    note=name
+  },
+  labelify-replace={
+    {[ \string\-\string\.]}{}
+  },
+  type={contributors},
+  category={same as original entry},
+  sort-field={category},
+  sort-suffix={name}
+]
+
+\glsxtrsetgrouptitle{article}{Articles}
+\glsxtrsetgrouptitle{book}{Books}
+
+\newcommand{\contributorhandler}[1]{\par\glsentryname{#1} \cite{#1}}
+
+\newcommand{\glsxtrpostdesccontributor}{%
+  \glsxtrifhasfield{bibtexentry}{\glscurrententrylabel}%
+  {%
+    \glsxtrfieldforlistloop
+    {\glscurrententrylabel}{bibtexentry}%
+    {\contributorhandler}%
+  }%
+  {\par No titles.}%
+}
+
+\begin{document}
+This is a sample document with some citations~\cite{macaw,parrot}
+and some more citations~\cite{duck2018,duck2016} and don't
+forget~\cite{ing,parrot2012} and lastly~\cite{quackalot}.
+
+\printunsrtglossary[type=contributors,style=altlist]
+\printunsrtglossary*[type=titles,style=indexgroup]
+{%
+ \renewcommand{\glsxtrgroupfield}{category}%
+ \renewcommand{\glstreenamefmt}[1]{\emph{#1}}%
+ \renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
+}
+
+\bibliographystyle{unsrt}
+\bibliography{citations}
+
+\end{document}
