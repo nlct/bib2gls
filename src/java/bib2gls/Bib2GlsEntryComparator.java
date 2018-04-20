@@ -51,10 +51,9 @@ public class Bib2GlsEntryComparator extends SortComparator
 
          if (breakPoint != BREAK_NONE)
          {
-            String docLocale = bib2gls.getDocDefaultLocale();
+            Locale docLocale = bib2gls.getDefaultLocale();
    
-            setBreakPoint(breakPoint, breakMarker,
-                          Locale.forLanguageTag(docLocale));
+            setBreakPoint(breakPoint, breakMarker, docLocale);
          }
       }
       else
@@ -81,6 +80,11 @@ public class Bib2GlsEntryComparator extends SortComparator
    {
       breakPointMarker = breakMarker;
       this.breakPoint = breakPoint;
+
+      if (locale == null)
+      {
+         locale = Locale.getDefault();
+      }
 
       switch (breakPoint)
       {

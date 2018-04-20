@@ -25,7 +25,8 @@ See the manual for further details.</entry>
 			Synonym: {1}</entry>
 <entry key="syntax.silent">{0}		Only display error messages.</entry>
 <entry key="syntax.locale">{0} &lt;lang&gt; (or {1} &lt;lang&gt;)
-			Use language resource file for &lt;lang&gt;.</entry>
+			Use language resource file for &lt;lang&gt;.
+			Also sets default document language.</entry>
 <entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
 			Set transcript file name.</entry>
 <entry key="syntax.dir">{0} &lt;directory&gt; (or {1} &lt;directory&gt;)
@@ -141,7 +142,7 @@ See the manual for further details.</entry>
 <entry key="syntax.custom.packages">{0} &lt;list&gt; 
 			Instruct the interpreter to parse
 			the listed packages.</entry>
-<entry key="syntax.list.known.packages"> 
+<entry key="syntax.list.known.packages">{0}
 			List the packages known to the interpreter.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
@@ -242,6 +243,7 @@ into explicit range {1}</entry>
 Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
+<entry key="message.default.locale">Default document locale: {0} {1}</entry>
 <entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.supplemental.record">Adding supplemental record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.counter.record">Adding record {0} to entry {1}''s {2} record list.</entry>
@@ -347,6 +349,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.identical.field">Falling back on ''{0}'' field (''{1}'' &lt;=&gt; ''{2}'' = {3})</entry>
 <entry key="warning.unknown.widest.fortype">Can''t determine widest level {0} entry for glossary type ''{1}''. Using fallback method.</entry>
 <entry key="warning.unknown.widest">Can''t determine widest level {0} entry for unknown glossary type. Using fallback method.</entry>
+<entry key="warning.invalid.locale">Unrecognised locale: {0}. Using {1} instead.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
@@ -368,7 +371,7 @@ Have you indexed your entries using commands like \gls?</entry>
 (Did you forget to use the ''src'' key?)</entry>
 <entry key="error.dir.not.found">Directory not found: {0}</entry>
 <entry key="error.not.dir">Not a directory: {0}</entry>
-<entry key="error.cant.open.log">Can't open log file: {0}</entry>
+<entry key="error.cant.open.log">Can''t open log file: {0}</entry>
 <entry key="error.invalid.id">Invalid or missing id
 {0}</entry>
 <entry key="error.invalid.sort.value">Invalid sort method ''{0}'' given in option: {1}</entry>

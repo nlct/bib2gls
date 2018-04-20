@@ -59,6 +59,10 @@ public class GlsResource
    {
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
+      sortSettings = new SortSettings("locale", bib2gls);
+      dualSortSettings = new SortSettings(bib2gls);
+      secondarySortSettings = new SortSettings(bib2gls);
+
       TeXPath texPath = new TeXPath(parser, 
         arg.toString(parser), "glstex", false);
 
@@ -3140,11 +3144,12 @@ public class GlsResource
       }
       else if ("doc".equals(value))
       {
-         return Locale.forLanguageTag(bib2gls.getDocDefaultLocale());
+         // if null, this becomes equivalent to the above
+         return bib2gls.getDefaultLocale();
       }
       else
       {
-         return Locale.forLanguageTag(value);
+         return bib2gls.getLocale(value);
       }
    }
 
@@ -5465,6 +5470,13 @@ public class GlsResource
 
             writer.println();
 
+            if (bib2gls.isLastResource(this))
+            {
+               writer.println("\\providecommand{\\bibglssetlastgrouptitle}[2]{}");
+
+               writer.println();
+            }
+
             createHyperGroups = writeGroupDefs(writer);
 
             if (!createHyperGroups)
@@ -6104,12 +6116,21 @@ public class GlsResource
       boolean allowHyper = bib2gls.hyperrefLoaded()
                 && bib2gls.createHyperGroupsOn();
 
+      GroupTitle lastTitle = null;
+      boolean isLastResource = bib2gls.isLastResource(this);
+
       for (Iterator<String> it = groupTitleMap.keySet().iterator();
           it.hasNext(); )
       {
          String key = it.next();
 
          GroupTitle groupTitle = groupTitleMap.get(key);
+
+         if (isLastResource && 
+              (lastTitle == null || lastTitle.getId() < groupTitle.getId()))
+         {
+            lastTitle = groupTitle;
+         }
 
          if (groupTitle.getType() == null)
          {
@@ -6121,6 +6142,12 @@ public class GlsResource
       }
 
       writer.println();
+
+      if (lastTitle != null)
+      {
+         writer.format("\\bibglssetlastgrouptitle{\\%s}{%s}%n",
+           lastTitle.getCsLabelName(), lastTitle);
+      }
 
       return allowHyper;
    }
@@ -7975,9 +8002,9 @@ public class GlsResource
 
    private String missingParentCategory=null;
 
-   private SortSettings sortSettings = new SortSettings("locale");
-   private SortSettings dualSortSettings = new SortSettings();
-   private SortSettings secondarySortSettings = new SortSettings();
+   private SortSettings sortSettings;
+   private SortSettings dualSortSettings;
+   private SortSettings secondarySortSettings;
 
    private String symbolDefaultSortField = "id";
 

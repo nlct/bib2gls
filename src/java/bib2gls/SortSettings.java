@@ -27,14 +27,15 @@ import java.text.SimpleDateFormat;
 
 public class SortSettings
 {
-   public SortSettings()
+   public SortSettings(Bib2Gls bib2gls)
    {
-      sortMethod = null;
+      this(null, bib2gls);
    }
 
-   public SortSettings(String method)
+   public SortSettings(String method, Bib2Gls bib2gls)
    {
       setMethod(method);
+      this.bib2gls = bib2gls;
    }
 
    public static boolean isValidSortMethod(String method)
@@ -450,7 +451,7 @@ public class SortSettings
             method = method.substring(0, idx);
          }
 
-         return Locale.forLanguageTag(method);
+         return bib2gls.getLocale(method);
       }
    }
 
@@ -462,7 +463,7 @@ public class SortSettings
       }
       else
       {
-         return Locale.forLanguageTag(dateLocale);
+         return bib2gls.getLocale(dateLocale);
       }
    }
 
@@ -479,7 +480,7 @@ public class SortSettings
       }
       else
       {
-         return Locale.forLanguageTag(numberLocale);
+         return bib2gls.getLocale(numberLocale);
       }
    }
 
@@ -801,4 +802,6 @@ public class SortSettings
    private String padPlus = ">";
 
    private String missingFieldFallback=null;
+
+   private Bib2Gls bib2gls;
 }

@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.IllformedLocaleException;
 import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -1256,7 +1257,7 @@ public class Bib2Gls implements TeXApp
          }
          else if (name.equals("glsxtr@langtag"))
          {
-            setDocDefaultLocale(data.getArg(0).toString(parser));
+            setDocDefaultLocale(getLocale(data.getArg(0).toString(parser)));
          }
          else if (texCharset == null && name.equals("glsxtr@texencoding"))
          {
@@ -1645,6 +1646,19 @@ public class Bib2Gls implements TeXApp
          verboseMessage("message.tex.charset", texCharset);
       }
 
+      if (verboseLevel > 0)
+      {
+         Locale l = getDefaultLocale();
+
+         if (l == null)
+         {
+            l = Locale.getDefault();
+         }
+
+         logMessage(getMessage("message.default.locale", l.toLanguageTag(),
+           l.getDisplayName()));
+      }
+
       for (AuxData data : resourceData)
       {
          glsresources.add(new GlsResource(parser, data,
@@ -1884,6 +1898,12 @@ public class Bib2Gls implements TeXApp
    public GlsResource getCurrentResource()
    {
       return currentResource;
+   }
+
+   public boolean isLastResource(GlsResource resource)
+   {
+      return glsresources == null ? false : 
+                (glsresources.lastElement() == resource);
    }
 
    public Charset getTeXCharset()
@@ -3234,14 +3254,30 @@ public class Bib2Gls implements TeXApp
 
       if (langTag == null || "".equals(langTag))
       {
-         locale = Locale.getDefault();
+         if (defaultLocale == null)
+         {
+            locale = Locale.getDefault();
+         }
+         else
+         {
+            locale = defaultLocale;
+         }
       }
       else
       {
-         locale = Locale.forLanguageTag(langTag);
+         try
+         {
+            setDocDefaultLocale(langTag);
+            locale = getDefaultLocale();
+         }
+         catch (IllformedLocaleException e)
+         {
+            locale = Locale.getDefault();
+            setDocDefaultLocale(locale);
+            error(e.getMessage());
+            debug(e);
+         }
       }
-
-      docLocale = locale.toLanguageTag();
 
       String lang = locale.toLanguageTag();
 
@@ -3371,14 +3407,47 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void setDocDefaultLocale(Locale locale)
+   {
+      docLocale = locale.toLanguageTag();
+      defaultLocale = locale;
+   }
+
    public void setDocDefaultLocale(String languageTag)
+    throws IllformedLocaleException
    {
       docLocale = languageTag;
+      defaultLocale = new Locale.Builder().setLanguageTag(languageTag).build();
    }
 
    public String getDocDefaultLocale()
    {
       return docLocale;
+   }
+
+   public Locale getDefaultLocale()
+   {
+      return defaultLocale;
+   }
+
+   public Locale getLocale(String langTag)
+   {
+      try
+      {
+         return new Locale.Builder().setLanguageTag(langTag).build();
+      }
+      catch (IllformedLocaleException e)
+      {
+         Locale locale = defaultLocale;
+
+         if (locale == null)
+         {
+            locale = Locale.getDefault();
+         }
+
+         warningMessage("warning.invalid.locale", langTag, locale);
+         return locale;
+      }
    }
 
    public void setTrimFields(boolean trimFields)
@@ -4166,8 +4235,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.4";
-   public static final String DATE = "2018-04-09";
+   public static final String VERSION = "1.4.20180419";
+   public static final String DATE = "2018-04-19";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4226,7 +4295,8 @@ public class Bib2Gls implements TeXApp
 
    private GlsResource currentResource = null;
 
-   private String docLocale;
+   private String docLocale = null;
+   private Locale defaultLocale = null;
 
    private boolean trimFields = false;
 
