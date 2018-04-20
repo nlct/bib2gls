@@ -10,8 +10,31 @@
 
 \newcommand{\primary}[1]{\hyperbf{#1}}
 
+\renewcommand{\glslinkpresetkeys}{%
+ \ifmmode \setkeys{glslink}{counter=equation}\fi}
+\renewcommand{\glsaddpresetkeys}{%
+ \ifmmode \setkeys{glossadd}{counter=equation}\fi}
+
+\newcommand{\wrglossaryname}{page}
+\newcommand{\wrglossarysname}{pages}
+
+\newcommand{\countertag}[1]{\ifcsdef{#1name}{\csuse{#1name}}{#1}}
+\newcommand{\counterpltag}[1]{\ifcsdef{#1sname}{\csuse{#1sname}}{#1s}}
+
+\newcommand*{\bibglslocationgroup}[3]{%
+\ifnum#1=1
+  \countertag{#2}:
+\else
+  \counterpltag{#2}:
+\fi
+#3%
+}
+
+\newcommand*{\bibglslocationgroupsep}{; }
+
 \GlsXtrLoadResources[src={test-entries},
- save-index-counter=primary
+ save-index-counter=primary,
+ loc-counters={wrglossary,equation}
 ]
 
 \renewcommand{\glsnamefont}[1]{\GlsXtrIndexCounterLink{#1}{\glscurrententrylabel}}
@@ -22,7 +45,7 @@ A \gls{sample}. \lipsum*[1] A \gls{duck}.
 
 An equation:
 \begin{equation}
-\gls[counter=equation]{pi}
+a = \gls{pi}r^2\label{eq:area}
 \end{equation}
 And some more equations:
 \begin{align}

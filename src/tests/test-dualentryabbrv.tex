@@ -6,29 +6,18 @@
 \usepackage[T1]{fontenc}
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,abbreviations,style=indexgroup]{glossaries-extra}
-    
-\setabbreviationstyle{long-short-sc}
+
+\renewcommand*{\glsuserdescription}[2]{%
+  \GlsXtrDualBackLink{\glslonguserfont{#1}}{#2}%
+}
+
+\renewcommand*{\glsxtrusersuffix}{\glsxtrscsuffix}
+\renewcommand*{\glsabbrvuserfont}[1]{\glsabbrvscfont{#1}}
+
+\setabbreviationstyle{long-short-user}
 \GlsXtrLoadResources[src={entries-dualentryabbrv},
   dual-backlink,
   dual-field]
-
-\renewcommand*{\glsxtrpostdescabbreviation}{%
-    \ifglshasfield{dualid}{\glscurrententrylabel}
-    {%
-    \space
-    (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
-    }%
-  {no dualid}%
-}
-
-\renewcommand*{\glsxtrpostdescgeneral}{%
-    \ifglshasfield{dualid}{\glscurrententrylabel}
-    {%
-    \space
-    (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
-    }%
-  {no dualid}%
-}
 
 \begin{document}
 First use: \gls{shtml}. Next use: \gls{shtml}.

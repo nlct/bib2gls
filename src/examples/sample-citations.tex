@@ -7,8 +7,9 @@
 \documentclass[12pt,a4paper]{article}
 
 \usepackage[record,% using bib2gls
-nostyles,% don't load default styles
 nomain,% don't define main glossary
+postdot,% full stop after descriptions
+nostyles,% don't load default styles
 stylemods={tree,list}% load glossary-tree and patch styles
 ]{glossaries-extra}
 
@@ -20,16 +21,10 @@ stylemods={tree,list}% load glossary-tree and patch styles
 }
 
 \GlsXtrLoadResources[
- src={citations},% data in citations.bib
- entry-type-aliases={\GlsXtrBibTeXEntryAliases},
+  src={citations},% data in citations.bib
+  entry-type-aliases={\GlsXtrBibTeXEntryAliases},
   field-aliases={
     title=name
-  },
-  replicate-fields={
-    note=name
-  },
-  labelify-replace={
-    {[ \string\-\string\.]}{}
   },
   type={contributors},
   category={same as original entry},
@@ -51,6 +46,9 @@ stylemods={tree,list}% load glossary-tree and patch styles
   }%
   {\par No titles.}%
 }
+
+\newcommand{\glsxtrpostdescarticle}{\cite{\glscurrententrylabel}}
+\newcommand{\glsxtrpostdescbook}{\cite{\glscurrententrylabel}}
 
 \begin{document}
 This is a sample document with some citations~\cite{macaw,parrot}

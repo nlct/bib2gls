@@ -4,17 +4,20 @@
     \documentclass{article} 
 
     \usepackage[T1]{fontenc}
-    \usepackage[record,style=indexgroup]{glossaries-extra}
+    \usepackage[record,debug=showwrgloss,style=indexgroup]{glossaries-extra}
     
     \setabbreviationstyle{long-short-sc-desc}
     \GlsXtrLoadResources[src={entries-abbrv},
        %short-case-change={uc},
-       short-case-change={firstuc},
+       %short-case-change={firstuc},
        %ignore-fields={description}
     ]
 
     \begin{document}
     First use: \gls{shtml}. Next use: \gls{shtml}.
+
+    \newpage
+    Full form: \glsxtrfull{shtml}.
 
     \GlsXtrSetDefaultNumberFormat{glsignore}
     \printunsrtglossaries

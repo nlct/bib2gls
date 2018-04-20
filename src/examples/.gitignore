@@ -10,3 +10,5 @@
 *.gls
 *.xdy
 *.sty
+*.bbl
+*.blg

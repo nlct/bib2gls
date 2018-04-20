@@ -14453,6 +14453,30 @@ doesn't occur in the \field{description} field. (Note that
 The contents of \filefmt{films.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/films.bib}
 
+\filesection{citations.bib}
+
+The \exfile{citations.bib} file is actually a \BibTeX\ file, but it
+can be parsed by \bibgls\ if the \BibTeX\ entry types are converted
+to \atentry{bibtexentry}, which can easily be done with
+\begin{codeenv}
+entry-type-aliases=\marg{\ics{GlsXtrBibTeXEntryAliases}}
+\end{codeenv}
+The field names will also need to be defined or aliased. For
+example:
+\begin{codeenv}
+field-aliases=\marg{title=name}
+\end{codeenv}
+If \bibgls\ is then run with \longarg{cite-as-record} any
+\ics{citation} commands found in the \ext{aux} file will be treated
+as ignored records. The \atentry{preamble} provides a formatting
+command that's used by both \BibTeX\ and \bibgls, so \cs{providecommand}
+is required rather than \cs{newcommand} as it will appear in both
+the \iext{bbl} and the \iext{glstex} files. (In general it's best to
+use \cs{providecommand} rather than \cs{newcommand} in the
+\atentry{preamble} but in this case it's essential.)
+The contents of \filefmt{citations.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/citations.bib}
+
 \filesection{mathgreek.bib}
 
 The \exfile{mathgreek.bib} file contains Greek letters for use in
@@ -16212,8 +16236,6 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 
 \lstinputlisting[firstline=5]{../examples/sample-authors.tex}
 
-\lstinputlisting[firstline=5]{../examples/sample-authors.tex}
-
 \begin{figure}
 \figcontents
 {%
@@ -16221,6 +16243,165 @@ The resulting document is shown in \figureref{fig:sample-authors.pdf}.
 }
 {\caption{\filefmt{sample-authors.pdf}}}
 {fig:sample-authors.pdf}
+\end{figure}
+
+\filesection{sample-citations.tex}
+
+This example uses the \BibTeX\ file \exfile{citations.bib} to create
+a document that has both a bibliography created by \BibTeX\ and
+glossaries created by \bibgls\ listing the authors and the titles.
+There are no glossary reference commands, such as \cs{gls}, but
+\bibgls\ can be run with \longarg{cite-as-record} to treat the
+\ics{citation} commands (written to the \ext{aux} file by \ics{cite})
+as ignored records. Since \cs{cite} doesn't record the page number,
+there are no associated locations.
+
+The \code{main} glossary isn't required, so I've used
+\styopt{nomain} to suppress its creation. I want to use both the
+\glostyle{altlist} and \glostyle{indexgroup} styles but none of the
+other styles, so I've used \styopt{nostyles} to prevent the
+automatic loading of the default style packages and 
+\styopt{stylemods} to load the \sty{glossary-tree} and
+\sty{glossary-list} packages and patch the styles. A \idx{full-stop}
+is automatically placed after the descriptions with
+\styopt{postdot}.
+\begin{verbatim}
+\usepackage[record,% using bib2gls
+nomain,% don't define main glossary
+postdot,% full stop after descriptions
+nostyles,% don't load default styles
+stylemods={tree,list}% load glossary-tree and patch styles
+]{glossaries-extra}
+\end{verbatim}
+Next I need to create the glossaries for the list of authors and
+list of titles:
+\begin{codeenv}
+\cs{newglossary*}\marg{contributors}\marg{Authors}
+\cs{newglossary*}\marg{titles}\marg{Titles}
+\end{codeenv}
+The simplest way of assigning the authors to the \code{contributors}
+glossary and the titles to the \code{titles} glossary is to use
+\begin{codeenv}
+\csopt[contributors]{type}
+\end{codeenv}
+in the \idx{resourceset} and provide a
+modified version of \ics{bibglsnewbibtexentry} that assigns
+\field{type} after the options:
+\begin{codeenv}
+\cs{newcommand}\marg{\cs{bibglsnewbibtexentry}}[4]\marg{\idx{commentchar}
+ \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{name=\marg{\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\idx{commentchar}
+}
+\end{codeenv}
+The standard \BibTeX\ entry types need aliasing to
+\atentry{bibtexentry}:
+\begin{codeenv}
+\csopt[\ics{GlsXtrBibTeXEntryAliases}]{entry-type-aliases}
+\end{codeenv}
+and the \fieldfmt{title} field is aliased to \field{name}:
+\begin{codeenv}
+\csopt[title=name]{field-aliases}
+\end{codeenv}
+(The other fields aren't required for the glossary lists.)
+The \field{category} is set to the original entry type:
+\begin{codeenv}
+\csopt[same as original entry]{category}
+\end{codeenv}
+So, for example, an entry that's provided in the \ext{bib} file with
+\atentryfmt{article} has the \field{category} field set to
+\code{article}. (Compare this with \csopt[same as entry]{category}
+which would set the \field{category} to \code{bibtexentry}.)
+The spawned entries are all defined using \atentry{contributor} and
+aren't aliased so both the entry type and the original entry type
+are \code{contributor}.
+
+In order to list the titles according to category, I've use this as
+the sort field:
+\begin{codeenv}
+\csopt[category]{sort-field}
+\end{codeenv}
+and setting the sort suffix to the \field{name} field sub-sorts
+the \atentry{bibtexentry} types according to the title 
+(which was aliased to the \field{name}) and the
+\atentry{contributor} types according to the author:
+\begin{codeenv}
+\csopt[name]{sort-suffix}
+\end{codeenv}
+
+Next the groups identified by the labels \code{article} and \code{book} 
+are assigned titles.
+\begin{codeenv}
+\cs{glsxtrsetgrouptitle}\marg{article}\marg{Articles}
+\cs{glsxtrsetgrouptitle}\marg{book}\marg{Books}
+\end{codeenv}
+The \field{group} field is actually set to the associated letter by the default
+\csopt{sort} method. These labels are stored in the \field{category} 
+field. Since the entries are sorted by category, then they are naturally 
+in those sub-blocks, which means that the group titles can be set by locally
+redefining \ics{glsxtrgroupfield} to \code{category}:
+\begin{codeenv}
+\cs{printunsrtglossary*}[type=titles,style=indexgroup]
+\marg{\idx{commentchar}
+ \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{category}\idx{commentchar}
+ \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\idx{commentchar}
+ \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\idx{commentchar}
+}
+\end{codeenv}
+There's no \field{description} field set for these entries, but the
+\idx{postdescriptionhook} can still be used to append information.
+In this case, I've appended a cross-reference to the bibliography.
+Since the bibliography entry and the glossary term both have the
+same label, the citation can easily be obtained with
+\code{\ics{cite}\marg{\cs{glscurrententrylabel}}}:
+\begin{codeenv}
+\cs{newcommand}\marg{\postdeschook{article}}\marg{\cs{cite}\marg{\cs{glscurrententrylabel}}}
+\cs{newcommand}\marg{\postdeschook{book}}\marg{\cs{cite}\marg{\cs{glscurrententrylabel}}}
+\end{codeenv}
+Note that this needs to be done for each \BibTeX\ entry type, but in
+this case the \ext{bib} file only contains \atentryfmt{article} and
+\atentryfmt{book} entries. (Similarly for the group titles above.)
+
+The list of contributors can simply be displayed with:
+\begin{codeenv}
+\cs{printunsrtglossary}[type=contributors,style=altlist]
+\end{codeenv}
+This will only list the names as there's no description, but again
+the \idx{postdescriptionhook} can be used. In this case, it iterates
+over the internal list provided by the \field{bibtexentry} field.
+This allows the titles to be listed as well:
+\begin{codeenv}
+\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\idx{commentchar}
+  \ics{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\idx{commentchar}
+  \marg{\idx{commentchar}
+    \cs{glsxtrfieldforlistloop}
+    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\idx{commentchar}
+    \marg{\csfmt{contributorhandler}}\idx{commentchar}
+  }\idx{commentchar}
+  \marg{\ics{par} No titles.}\idx{commentchar}
+}
+\end{codeenv}
+The handler macro displays the name of the associated
+\atentry{bibtexentry} term and the citation:
+\begin{codeenv}
+\cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\cs{par}\ics{glsentryname}\marg{\idx{param}1} \cs{cite}\marg{\idx{param}1}}
+\end{codeenv}
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-citations
+bib2gls --group --cite-as-record sample-citations
+bibtex sample-citations
+pdflatex sample-citations
+pdflatex sample-citations
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-citations.pdf}.
+
+\lstinputlisting[firstline=7]{../examples/sample-citations.tex}
+
+\begin{figure}
+\figcontents
+{\pdftwocol{../examples/sample-citations.pdf}{2}}
+{\caption{\filefmt{sample-citations.pdf}}}
+{fig:sample-citations.pdf}
 \end{figure}
 
 \filesection{sample-msymbols.tex}
