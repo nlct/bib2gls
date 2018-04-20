@@ -1,3 +1,9 @@
+v1.4 (pending):
+
+  * new .glstex helper command:
+
+    \bibglssetlastgrouptitle
+
 v1.4 (2018-04-09):
 
    * added switches:
