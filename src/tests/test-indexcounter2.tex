@@ -1,0 +1,50 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks]{hyperref}
+\PassOptionsToPackage{indexcounter}{glossaries-extra}
+\usepackage[bib2gls]{testidx-glossaries}
+
+\renewcommand{\glslinkpresetkeys}{%
+ \ifmmode \setkeys{glslink}{counter=equation}\fi}
+\renewcommand{\glsaddpresetkeys}{%
+ \ifmmode \setkeys{glossadd}{counter=equation}\fi}
+
+\renewcommand{\glossarypreamble}{%
+ \renewcommand*{\tstidxencapi}[1]{\textcolor{blue}{\glsnumberformat{##1}}}%
+ \renewcommand*{\tstidxencapii}[1]{\textcolor{cyan}{\glsnumberformat{##1}}}%
+ \renewcommand*{\tstidxencapiii}[1]{\textcolor{magenta}{\glsnumberformat{##1}}}%
+}
+
+\newcommand{\wrglossaryname}{page}
+\newcommand{\wrglossarysname}{pages}
+
+\newcommand{\countertag}[1]{\ifcsdef{#1name}{\csuse{#1name}}{#1}}
+\newcommand{\counterpltag}[1]{\ifcsdef{#1sname}{\csuse{#1sname}}{#1s}}
+
+\newcommand*{\bibglslocationgroup}[3]{%
+\ifnum#1=1
+  \countertag{#2}:
+\else
+  \counterpltag{#2}:
+\fi
+#3%
+}
+
+\newcommand*{\bibglslocationgroupsep}{; }
+
+\tstidxmakegloss[save-index-counter,
+ loc-counters={wrglossary,equation}]
+
+\renewcommand{\glsnamefont}[1]{%
+ \GlsXtrIndexCounterLink{\textmd{#1}}{\glscurrententrylabel}}
+
+\begin{document}
+\testidx
+
+\printunsrtglossaries
+\end{document}
