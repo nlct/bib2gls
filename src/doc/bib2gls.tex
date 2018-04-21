@@ -9,6 +9,8 @@
 \documentclass[titlepage=false,index=totoc,bibliography=totoc,
  fontsize=12pt,captions=tableheading]{scrreprt}
 
+\usepackage{pifont}
+
 % Need support for extended characters
 % and need a mono font that supports hyphenation
 \usepackage[no-math]{fontspec}
@@ -41,12 +43,15 @@
    entrycounter,% enable entry counting
    subentrycounter,% enable entry counting
    %debug=showtargets,% debugging information
-   stylemods=bookindex,% adjust predefined styles and load glossary-bookindex.sty
+   stylemods={mcols,bookindex},% adjust predefined styles and load glossary-mcols.sty and glossary-bookindex.sty
    style=bookindex
  ]
  {glossaries-extra}
 
+\renewcommand*{\glsshowtarget}[1]{\texttt{\small [#1]}}
+
 \glsxtrprovidestoragekey{note}{}{}
+\glsxtrprovidestoragekey{package}{}{}
 
 \providecommand{\omicron}{o}
 
@@ -298,7 +303,7 @@
 \newcommand*{\styopt}[2][]{%
   \texorpdfstring%
   {%
-    \idx{styopt.#2}\styoptfmt{\ifblank{#1}{}{\dequals\marg{#1}}}%
+    \gls{styopt.#2}\styoptfmt{\ifblank{#1}{}{\dequals\marg{#1}}}%
   }%
   {#2\ifblank{#1}{}{=#1}}%
 }
@@ -510,6 +515,69 @@
   ]%
   {%
    \let\printunsrtglossaryentryprocesshook\commandsummaryhook
+   \glsxtrlocalsetgrouptitle{glssymbols}{@}%
+  }%
+}
+
+\newglossarystyle{styoptsummary}%
+{%
+  \setglossarystyle{mcolindex}%
+  \renewcommand{\glossarypreamble}{%
+    Most options are in the form \meta{option}=\meta{value} and
+    may have a default if \meta{value} is omitted, 
+    but some options don't have values and should not have
+    one assigned.  For boolean options, 
+    if the value is omitted \styoptfmt{true} is assumed. 
+    \extstyopt Indicates a value that's only provided by
+    \styfmt{glossaries-extra} and not by the base
+    \styfmt{glossaries} package. \par
+  }%
+  \renewcommand*{\glossaryheader}{}%
+  \renewcommand*{\glsgroupheading}[1]{%
+    \glsxtrgetgrouptitle{##1}{\thisgrptitle}%
+    \glsxtrbookindexbookmark{\thisgrptitle}{styopt.##1}%
+    \glsxtrbookindexformatheader{\thisgrptitle}%
+    \nopagebreak\indexspace\nopagebreak\csuse{@afterheading}%
+  }%
+  \renewcommand*{\glossentry}[2]{%
+   \item \glstarget{##1}{\strut}%
+   \glsxtrifhasfield{dualid}{##1}%
+   {%
+     \glshyperlink{\glscurrentfieldvalue}%
+   }%
+   {%
+     \gls[hyper=false]{##1}%
+   }%
+   \glsxtrifhasfield{useri}{##1}{=\glscurrentfieldvalue}{}%
+   \nopagebreak\par\hspace{10pt}%
+   \Glossentrydesc{##1}.%
+   \glsxtrifhasfield{package}{##1}%
+   {\nopagebreak\par \ding{43}Provided by 
+     \ifdefstring{\glscurrentfieldvalue}{glossaries,glossaries-extra}
+     {\styfmt{glossaries} and modified by \styfmt{glossaries-extra}}%
+     {\styfmt{\glscurrentfieldvalue}}.}%
+   {}%
+   \glsxtrifhasfield{note}{##1}%
+   {\space \xmakefirstuc{\glscurrentfieldvalue}.}%
+   {}%
+   \par\medskip
+  }%
+}
+
+\newcommand*{\styoptsummaryhook}[1]{%
+  \edef\currentcategory{\glscategory{#1}}%
+  \ifdefstring{\currentcategory}{packageoption}%
+  {}%
+  {\printunsrtglossaryskipentry}%
+}
+
+\newcommand*{\printstyoptsummary}{%
+  \printunsrtglossary*[type=main,
+    style=styoptsummary,
+    title={Package Option Summary}
+  ]%
+  {%
+   \let\printunsrtglossaryentryprocesshook\styoptsummaryhook
    \glsxtrlocalsetgrouptitle{glssymbols}{@}%
   }%
 }
@@ -16270,7 +16338,8 @@ is automatically placed after the descriptions with
 nomain,% don't define main glossary
 postdot,% full stop after descriptions
 nostyles,% don't load default styles
-stylemods={tree,list}% load glossary-tree and patch styles
+% load glossary-tree and glossary-list and patch styles:
+stylemods={tree,list}
 ]{glossaries-extra}
 \end{verbatim}
 Next I need to create the glossaries for the list of authors and
@@ -16334,7 +16403,7 @@ are assigned titles.
 \cs{glsxtrsetgrouptitle}\marg{book}\marg{Books}
 \end{codeenv}
 The \field{group} field is actually set to the associated letter by the default
-\csopt{sort} method. These labels are stored in the \field{category} 
+\csopt{sort} method. The desired labels are stored in the \field{category} 
 field. Since the entries are sorted by category, then they are naturally 
 in those sub-blocks, which means that the group titles can be set by locally
 redefining \ics{glsxtrgroupfield} to \code{category}:
@@ -16365,7 +16434,8 @@ The list of contributors can simply be displayed with:
 \cs{printunsrtglossary}[type=contributors,style=altlist]
 \end{codeenv}
 This will only list the names as there's no description, but again
-the \idx{postdescriptionhook} can be used. In this case, it iterates
+the \idx{postdescriptionhook} can be used, in this case for the \code{contributor}
+category. The hook iterates
 over the internal list provided by the \field{bibtexentry} field.
 This allows the titles to be listed as well:
 \begin{codeenv}
@@ -18141,6 +18211,7 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 {fig:sample-multi2.pdf3}
 \end{figure}
 
+\printstyoptsummary
 \printcommandsummary
 
 \bibliographystyle{plain}
