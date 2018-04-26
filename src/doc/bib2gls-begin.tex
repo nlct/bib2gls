@@ -1,0 +1,950 @@
+% arara: xelatex
+% arara: bib2gls
+% arara: bibtex
+% arara: xelatex
+% arara: xelatex if found ("log", "Rerun")
+\documentclass[titlepage=false,fontsize=12pt,captions=tableheading]{scrreprt}
+
+\usepackage[no-math]{fontspec}
+\setmainfont{Linux Libertine O}
+
+\newfontface\cyrillicmono{FreeMono}[Scale=MatchLowercase]
+\newcommand{\textcyrillicmono}[1]{{\cyrillicmono #1}}
+
+\usepackage[x11names]{xcolor}
+\usepackage{upquote}
+\usepackage{hologo}
+\usepackage{pifont}
+\usepackage{graphicx}
+\usepackage{datetime2}
+\usepackage{listings}
+
+\usepackage{xr-hyper}
+\usepackage[hidelinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\glsdisablehyper
+
+\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
+ frame=lines,rulecolor={\color{lightgray}},
+ commentstyle={\color{gray}},
+ texcs={newglossaryentry,gls,Gls,glspl,Glspl,glsentrydesc,glsentryname},
+ texcsstyle=*{\color{teal}}}
+
+\newcommand{\dhyphen}{%
+ \texorpdfstring
+ {\discretionary{}{}{}\texttt{-}}%
+ {-}%
+}
+
+\renewrobustcmd{\-}{%
+ \discretionary
+ {{\rmfamily\char\ifnum\hyphenchar\font<0
+  \defaulthyphenchar\else\hyphenchar\font\fi
+ }}%
+ {}{}%
+}
+
+\setabbreviationstyle[common]{short-nolong}
+
+\GlsXtrLoadResources[
+ src={bib2gls},
+ save-locations=false,
+ entry-type-aliases={dualindexentry=entry}
+]
+
+\DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
+
+\IfFileExists{../java/Bib2Gls.java}
+{
+  \DTMsavefilemoddate{moddate}{../java/Bib2Gls.java}
+}
+{
+  \DTMsavenow{moddate}
+}
+
+\newcommand{\bibgls}{\appfmt{bib2gls}}
+
+\newcommand*{\BibTeX}{\hologo{BibTeX}}
+\newcommand*{\eTeX}{\hologo{eTeX}}
+\newcommand*{\XeLaTeX}{\hologo{XeLaTeX}}
+\newcommand*{\LuaLaTeX}{\hologo{LuaLaTeX}}
+\newcommand*{\pdfLaTeX}{\hologo{pdfLaTeX}}
+
+\newcommand{\qt}[1]{``#1''}
+
+\newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
+
+\newcommand{\incorrect}{\marginpar{\textcolor{red}{\ding{55}}}}
+\newcommand{\correct}{\marginpar{\textcolor{green}{\ding{52}}}}
+
+\newenvironment{result}%
+{%
+ \begin{quotation}%
+ \marginpar
+  [\raisebox{-2ex}{\ding{43}}]%
+  {\raisebox{-2ex}{\reflectbox{\ding{43}}}}%
+ \ignorespaces
+}
+{\end{quotation}\ignorespacesafterend}
+
+\newcommand{\dequals}{%
+ \texorpdfstring
+ {\discretionary{}{}{}\texttt{=}\discretionary{}{}{}}%
+ {=}%
+}
+
+\newcommand{\dcomma}{%
+ \texorpdfstring
+ {\texttt{,}\discretionary{}{}{}}%
+ {,}%
+}
+
+\newcommand{\dcolon}{%
+ \texorpdfstring
+ {\texttt{:}\discretionary{}{}{}}%
+ {:}%
+}
+
+\pdfstringdefDisableCommands{%
+  \def\dhyphen{-}%
+  \def\dcolon{:}%
+  \def\dcomma{,}%
+  \def\dequals{,}%
+  \let\-\empty
+}
+
+\newcommand*{\csfmt}[1]{%
+ \texorpdfstring
+ {\texttt{\char`\\ #1}}%
+ {\string\\#1}%
+}
+
+\newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
+\newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\envfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
+\newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{DarkSeaGreen4}{\optfmt{#1}}}{#1}}
+\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{DarkOrchid4}{\optfmt{#1}}}{#1}}
+\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{DarkSlateGray4}#1}}{#1}}
+\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{SteelBlue4}#1}}{#1}}
+\newcommand*{\atentryfmt}[1]{\entryfmt{@#1}}
+\newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\counterfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\filefmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
+\newcommand*{\metafilefmt}[3]{%
+  \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
+}
+
+\newcommand*{\extfmt}[1]{\filefmt{.#1}}%
+
+\newcommand*{\argor}{\texorpdfstring{\protect\textbar}{|}}
+
+\newrobustcmd*{\texmeta}[1]{{\normalfont\normalcolor$\langle$\emph{#1}$\rangle$}}
+
+\newcommand*{\meta}[1]{%
+ \texorpdfstring{\ifmmode\text{\texmeta{#1}}\else\texmeta{#1}\fi}{#1}%
+}
+
+\newcommand*{\oarg}[1]{\discretionary{}{}{}[#1]}
+\newcommand*{\oargm}[1]{\oarg{\meta{#1}}}
+
+\newcommand*{\marg}[1]{\texorpdfstring
+ {\discretionary{}{}{}\char`\{#1\char`\} }%
+ {\{#1\}}%
+}
+
+\newcommand*{\margm}[1]{\marg{\meta{#1}}}
+
+\newcommand{\switcharg}{}
+\newcommand{\switchalt}{}
+
+\makeatletter
+\newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
+\newenvironment{codeenv}
+ {\begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces}
+ {\end{flushleft}\ignorespacesafterend}
+\makeatother
+
+\newcommand{\primary}{\emph}
+
+\newcommand{\pidx}[1][]{\gls[textformat=primary,#1]}
+
+\newcommand{\idx}{\gls}
+\newcommand{\idxpl}{\glspl}
+\newcommand{\Idx}{\Gls}
+\newcommand{\Idxpl}{\Glspl}
+
+\newcommand{\ext}{\gls}
+
+\newcommand*{\iext}[1]{%
+ \glsxtrtitleorpdforheading{\idx{#1}}{.#1}{\extfmt{#1}}%
+}
+
+\newcommand{\sty}{\gls}
+
+\newcommand*{\isty}[1]{%
+  \texorpdfstring{\idx{#1}}{#1}%
+}
+
+\newcommand*{\env}[1]{%
+  \texorpdfstring{\idx{env.#1}}{#1}%
+}
+
+\newcommand*{\abbrstyle}[1]{%
+  \texorpdfstring{\idx{#1}}{#1}%
+}
+
+\newcommand*{\glostyle}[1]{%
+  \texorpdfstring{\idx{glostyle.#1}}{#1}%
+}
+
+\newcommand*{\catattr}[1]{%
+  \texorpdfstring{\idx{#1}}{#1}%
+}
+
+\newcommand*{\counter}[1]{%
+  \texorpdfstring{\idx{ctr.#1}}{#1}%
+}
+
+\newcommand*{\styopt}[2][]{%
+  \texorpdfstring%
+  {%
+    \gls{styopt.#2}\styoptfmt{\ifblank{#1}{}{\dequals\marg{#1}}}%
+  }%
+  {#2\ifblank{#1}{}{=#1}}%
+}
+
+\newcommand*{\keyvallist}{%
+ \texorpdfstring
+ {key\dequals value list}%
+ {key=value list}%
+}
+
+\newcommand{\nosecformatdef}[1]{%
+  \begin{definition}
+   \glsadd{#1}\glsxtrglossentry{#1}%
+   \glsentryuseri{#1}%
+  \end{definition}\ignorespaces
+}
+
+\newcommand*{\cs}{\gls}
+
+\newcommand*{\ics}{\cs}
+
+\newcommand*{\icswithargs}[2][]{\cs{#2}\glsentryuseri{#2}}
+
+\glsxtrnewgls{file.}{\exfile}
+
+\newcommand*{\csopt}[2][]{\gencsopt{#1}{opt}{#2}}%
+\newcommand*{\glsopt}[2][]{\gencsopt{#1}{gls}{#2}}%
+\newcommand*{\glsaddopt}[2][]{\gencsopt{#1}{glsadd}{#2}}%
+
+\newcommand*{\gencsopt}[3]{%
+  \texorpdfstring%
+  {%
+    \gls{#2.#3}%
+    \csoptfmt{\ifblank{#1}{}{\dequals\marg{#1}}}%
+  }%
+  {#3\ifblank{#1}{}{=#1}}%
+}
+
+\newcommand*{\field}[1]{%
+ \texorpdfstring
+ {\gls{field.#1}}%
+ {#1}%
+}
+
+\newcommand*{\atentry}[2][]{%
+ \texorpdfstring
+ {\gls[#1]{entry.#2}}%
+ {#2}%
+}
+
+\newrobustcmd{\longswitch}{\string-{}\string-}
+
+\newcommand*{\longargfmt}[1]{%
+ \texorpdfstring{\texttt{\longswitch #1}}%
+ {\string-\string-#1}%
+}
+
+\newcommand*{\shortargfmt}[1]{%
+ \texorpdfstring{\texttt{\string-#1}}%
+ {\string-#1}%
+}
+
+\newcommand*{\longarg}[1]{%
+  \texorpdfstring
+  {\gls{switch.#1}}%
+  {\string-\string-#1}%
+}
+
+\definecolor{defbackground}{rgb}{1,1,0.75}
+
+\newsavebox\borderedboxcontents
+\newlength\borderedboxwidth
+
+\newenvironment{definition}%
+{%
+  \setlength{\fboxsep}{4pt}\setlength{\fboxrule}{1.25pt}%
+  \begin{lrbox}{\borderedboxcontents}%
+   \setlength\borderedboxwidth\linewidth
+   \addtolength\borderedboxwidth{-2\fboxrule}%
+   \addtolength\borderedboxwidth{-2\fboxsep}%
+   \begin{minipage}{\borderedboxwidth}
+   \flushleft\ttfamily\ignorespaces
+}%
+{%
+   \end{minipage}%
+  \end{lrbox}\par\medskip\noindent
+  \fcolorbox{black}{defbackground}{\usebox\borderedboxcontents}%
+  \medskip\par\noindent
+  \ignorespacesafterend
+}
+
+\newenvironment{important}{%
+  \setlength{\fboxrule}{4pt}%
+  \setlength\borderedboxwidth{\linewidth}%
+  \addtolength\borderedboxwidth{-2\fboxsep}%
+  \addtolength\borderedboxwidth{-2\fboxrule}%
+  \begin{lrbox}{\borderedboxcontents}%
+    \begin{minipage}{\borderedboxwidth}%
+    \raggedright
+    \setlength\parindent{1em}%
+    \noindent\ignorespaces
+}%
+{%
+    \end{minipage}%
+  \end{lrbox}%
+  \par\vskip10pt\noindent
+  \fcolorbox{red}{white}{\usebox{\borderedboxcontents}}\par\vskip10pt
+  \noindent\ignorespacesafterend
+}
+
+\newcommand*{\sectionref}[1]{section~\ref{#1}}
+\newcommand*{\Sectionref}[1]{Section~\ref{#1}}
+
+\newcommand{\glossarytitle}{Index}
+\externaldocument{bib2gls}
+
+\newcommand{\addr}[1]{\\\href{https://www.#1/}{\nolinkurl{#1}}}
+\title{\bibgls\ and \styfmt{glossaries-extra}: A Guide for Beginners}
+\author{Nicola Talbot\addr{dickimaw-books.com}}
+\date{\DTMusedate{moddate}}
+
+\makeatletter
+\begingroup
+ \renewcommand{\addr}[1]{}
+ \let\texorpdfstring\@secondoftwo
+ \DTMsetstyle{pdf}
+ \protected@edef\x{\endgroup
+   \noexpand\hypersetup{%
+     pdfinfo={
+       Title={\@title},
+       Author={\@author},
+       CreationDate={\DTMuse{creation}},
+       ModDate={\DTMuse{moddate}},
+     }%
+   }%
+ }\x
+
+\makeatother
+
+\begin{document}
+\maketitle
+\pagenumbering{alph}
+\thispagestyle{empty}
+
+\begin{abstract}
+This document is an introductory guide to \bibgls\ and the
+\sty{glossaries-extra} package to help you get started. For
+further information, including more complex commands and settings,
+see the main \bibgls\ user manual (\filefmt{bib2gls.pdf},
+in the same directory as this document),
+the \isty{glossaries-extra} user manual,
+(distributed with the \sty{glossaries-extra}
+package~\cite{glossaries-extra})
+and the \isty{glossaries} user manual
+(distributed with the \sty{glossaries} package~\cite{glossaries}).
+
+The \sty{glossaries} package is the \emph{base} package. The 
+\sty{glossaries-extra} package internally loads the \sty{glossaries} package 
+and extends it, providing extra options or modifying the base
+commands to increase flexibility. If you want to use \bibgls, you
+must load \sty{glossaries-extra}, which provides the interface
+required by \bibgls.
+\end{abstract}
+
+\clearpage
+\pagenumbering{roman}
+\tableofcontents
+
+\clearpage
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+\label{sec:beginintro}
+
+The \sty{glossaries} package provides a way of defining terms,
+notation or abbreviations that can then be used in the document.
+This ensures consistent naming and formatting. (With the help of the
+\sty{hyperref} package, it's also possible to create hyperlinks from
+the reference to a place in the document that provides a definition
+of the term, but more about that later.) Each entry (term,
+notation or abbreviation) is defined using
+\nosecformatdef{newglossaryentry}
+Here's a simple example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{duck}% label
+{% information about this term:
+  name={duck},% display name
+  description={a waterbird with webbed feet}% description
+}
+
+\newglossaryentry{goose}% label
+{% information about this term:
+  name={goose},% display name
+  plural={geese},% plural form
+  description={a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill}
+}
+
+\begin{document}
+The pond contained a \gls{duck} (\glsentrydesc{duck}) and 
+a \gls{goose} (\glsentrydesc{goose}). \Glspl{duck} and
+\glspl{goose} are fowl.
+\end{document}
+\end{lstlisting}
+The resulting text is:
+\begin{result}
+The pond contained a \gls{ex1.duck} (\glsentrydesc{ex1.duck}) and 
+a \gls{ex1.goose} (\glsentrydesc{ex1.goose}). \Glspl{ex1.duck} and
+\glspl{ex1.goose} are fowl.
+\end{result}
+For convenience, the text produced by commands such as \cs{gls} is called the 
+\pidx{link-text} (even if there are no hyperlinks).
+
+The first argument of \gls{newglossaryentry} is a label that
+uniquely identifies the term (see \sectionref{sec:labels}). The
+second argument is a comma-separated list of
+\meta{setting}\dequals\meta{value} assignments.  Each \meta{setting}
+is referred to as a \qt{key} in the \isty{glossaries} manual or as a
+\qt{field} in the \bibgls\ manual. A list of the available base keys
+can be found in the \isty{glossaries} user manual.  The
+\isty{glossaries-extra} package provides some additional keys that
+are described in the \sty{glossaries-extra} manual. The \bibgls\
+user manual summarises all keys (fields) in \sectionref{sec:fields}.
+
+\begin{important}
+If the field value contains commas or equal signs the value must be grouped
+to hide those characters from the \meta{key}\dequals\meta{value} parser.
+\end{important}
+
+The two main keys are \field{name} and \field{description}. The
+\field{name} identifies how the term should be displayed in the
+glossary (see \sectionref{sec:printgloss}). It also provides the
+default singular term, if not explicitly given. The default plural
+is obtained by appending \qt{s} to the singular form. If this isn't
+correct (as with \qt{geese}), then the plural form can be specified
+with the \field{plural} key.
+
+The description (set with the \field{description} key) is usually
+only displayed in the glossary, but you can display it in the text
+using
+\nosecformatdef{glsentrydesc}
+as in the above example. This simply expands to the value of the
+\field{description} field (or does nothing if there's no entry
+associated with the given label).
+
+The main command used to reference a term is
+\nosecformatdef{gls}
+In the above example, it just displays the singular form, but you
+can provide alternative text to use the first time a term is
+referenced (see \sectionref{sec:firstuse}). The plural form is obtained with
+\nosecformatdef{glspl}
+If you want to start a sentence with an entry then you can use
+\nosecformatdef{Gls}
+for the singular form and
+\nosecformatdef{Glspl}
+for the plural form.
+The \meta{insert} optional argument is provided to insert additional material.
+For example:
+\begin{lstlisting}
+The \gls{goose} liked the \gls{duck}['s] hat.
+\end{lstlisting}
+which produces (assuming the above definitions):
+\begin{result}
+The \gls{ex1.goose} liked the \gls{ex1.duck}['s] hat.
+\end{result}
+In some cases, there may not be a noticeable difference between the
+above and the following:
+\begin{lstlisting}
+The \gls{goose} liked the \gls{duck}'s hat.
+\end{lstlisting}
+It depends on other settings, such as whether or not hyperlinks have
+been enabled. (The inserted material is commonly moved inside the
+hyperlink.) Take care if you need a literal open square bracket
+following \code{\cs{gls}\margm{label}} as you need to prevent it from being
+interpreted as the optional \meta{insert} argument. For example:
+\begin{lstlisting}
+The \gls{goose} liked the \gls{duck}{['s]} hat.
+\end{lstlisting}
+which now produces:
+\begin{result}
+The \gls{ex1.goose} liked the \gls{ex1.duck}{['s]} hat.
+\end{result}
+An alternative in this case could be to define
+\begin{lstlisting}
+\newcommand*{\missing}[1]{[#1]}
+\end{lstlisting}
+and then use
+\begin{lstlisting}
+The \gls{goose} liked the \gls{duck}\missing{'s} hat.
+\end{lstlisting}
+This conveniently hides the open square bracket from \cs{gls}.
+
+\begin{important}
+Commands like \gls{gls} are \idx{robust}. Commands like
+\gls{glsentrydesc} are \idx{expandable}. (See \sectionref{sec:robust}.)
+If you want the entry to appear in a PDF bookmark, you need to use an 
+expandable command to reference it.
+\end{important}
+
+There are some helper commands that internally use
+\gls{newglossaryentry}, such as \cs{newabbreviation} (described in
+\sectionref{sec:abbreviations}) and \cs{glsxtrnewsymbol} (described
+in \sectionref{sec:symbols}). If the description contains paragraph
+breaks then 
+\nosecformatdef{longnewglossaryentry}
+is required instead.
+
+\section{Labels}
+\label{sec:labels}
+
+The label used to identify the entry can't contain any special
+characters, such as \gls{commentchar} (percent), \gls{ampchar}
+(ampersand), \gls{param} (hash) or \gls{nbspchar} (tilde). Be
+careful of packages that make other characters active (such as
+\isty{babel} with its shortcuts). If you are using \isty{inputenc},
+this also includes extended Latin characters and characters from
+other scripts. If you want to include UTF-8 characters in the label
+then you must use a \TeX\ engine with native Unicode support (that
+is, \XeLaTeX\ or \LuaLaTeX).
+
+For example, with no UTF-8 support (not even \sty{inputenc}):
+\begin{lstlisting}
+\newglossaryentry{elite}% label (no UTF-8 support)
+{
+  name = {{\'e}lite},
+  description = {group of people regarded as
+  the best of a particular society or organisation}
+}
+\end{lstlisting}
+or with \sty{inputenc}:
+\begin{lstlisting}
+\newglossaryentry{elite}% label (UTF-8 not natively supported)
+{
+  name = {élite},
+  description = {group of people regarded as
+  the best of a particular society or organisation}
+}
+\end{lstlisting}
+Whereas with \XeLaTeX\ or \LuaLaTeX\ you can do:
+\begin{lstlisting}
+\newglossaryentry{élite}% label (UTF-8 natively supported)
+{
+  name = {élite},
+  description = {group of people regarded as
+  the best of a particular society or organisation}
+}
+\end{lstlisting}
+
+You may have noticed the grouping of the initial (accented) letter
+in the \gls{ASCII} example (\verb|{\'e}lite|). This is necessary to
+ensure that the first-letter case-changing commands, such as
+\ics{Gls}, work. It also used to be required around the
+\qtt{é} with \sty{inputenc}, but if you have up-to-date versions of
+\sty{glossaries} and \sty{datatool} then it should no longer be
+necessary. No special treatment is needed with \XeLaTeX\ or \LuaLaTeX\
+where \qtt{é} is a single token.
+
+If you can't use extended characters in the label (because you're
+not using \XeLaTeX\ or \LuaLaTeX), then simply stripping the accents
+to create an \gls{ASCII} alternative may be sufficient, but take
+care if this may cause a conflict. For example:
+\begin{lstlisting}
+\newglossaryentry{resume}% label
+{
+  name = {resume},
+  description = {continue after an interruption}
+}
+
+\newglossaryentry{resumee}% label
+{
+  name = {r\'esum\'e},
+  description = {summary of something or curriculum vitae}
+}
+\end{lstlisting}
+For languages that use a non-Latin script, if you can't or don't
+want to use \XeLaTeX\ or \LuaLaTeX, then you need to decide the most
+appropriate \gls{ASCII} naming scheme.
+
+For example:
+\begin{lstlisting}[escapechar=|]
+\newglossaryentry{goose}% using translation for label
+{
+  name = {|\textcyrillicmono{гусь}|},
+  plural = {|\textcyrillicmono{гуси}|},
+  description = {...}
+}
+\end{lstlisting}
+or
+\begin{lstlisting}[escapechar=|]
+\newglossaryentry{hus}% using closest ASCII match for label
+{
+  name = {|\textcyrillicmono{гусь}|},
+  plural = {|\textcyrillicmono{гуси}|},
+  description = {...}
+}
+\end{lstlisting}
+
+In addition to labels identifying entries, there are also labels
+that identify other things, such as a glossary, category or letter
+group. The same restrictions apply to those labels.
+
+\section{First Use}
+\label{sec:firstuse}
+
+Each entry has a \pidx{firstuseflag} (boolean variable) that
+determines whether or not the entry has been referenced in the
+document.  Commands like \gls{gls} and \gls{glspl} change the flag
+to indicate that the entry has been used. Commands like
+\gls{glsentrydesc} don't. Here's a modification of the earlier
+example document that provides different versions depending on 
+whether or not the entry has already been referenced:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{duck}% label
+{% information about this term:
+  name   = {Duck (noun)},% display name
+  first  = {duck (quack, quack)},% first use singular
+  firstplural = {ducks (quack, quack)},% first use plural
+  text   = {duck},% subsequent use singular
+  description = {a waterbird with webbed feet}% description
+}
+
+\newglossaryentry{goose}% label
+{% information about this term:
+  name   = {Goose (noun, plural geese)},% display name
+  first  = {goose (honk, honk)},% first use singular
+  firstplural = {geese (honk, honk)},% first use plural
+  text   = {goose},% subsequent use singular 
+  plural = {geese},% subsequent use plural 
+  description={a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill}
+}
+
+\begin{document}
+The pond contained a \gls{duck}\footnote{\glsentryname{duck}:
+\glsentrydesc{duck}} and two 
+\glspl{goose}\footnote{\glsentryname{goose}: 
+\glsentrydesc{goose}}. \Glspl{duck} and \glspl{goose} are fowl.
+\end{document}
+\end{lstlisting}
+This now produces:
+\begin{result}
+The pond contained a \gls{ex2.duck}\footnote{\glsentryname{ex2.duck}:
+\glsentrydesc{ex2.duck}} and two
+\glspl{ex2.goose}\footnote{\glsentryname{ex2.goose}: 
+\glsentrydesc{ex2.goose}}. \Glspl{ex2.duck} and \glspl{ex2.goose} are fowl.
+\end{result}
+This uses
+\nosecformatdef{glsentryname}
+which works in a similar way to \gls{glsentrydesc}. In this case,
+\gls{glsentryname} simply expands to the value of the \field{name}
+key. There's also a case-changing version
+\nosecformatdef{Glsentryname}
+which changes the initial character to upper case,
+but (unlike \cs{glsentryname}) this command isn't expandable. If,
+for example, I had instead set the duck's \field{name} key using:
+\begin{lstlisting}
+name = {duck (noun)}
+\end{lstlisting}
+then I would need to use \code{\cs{Glsentryname}\marg{duck}}
+instead.
+
+So on first use, \cs{gls} uses the value of the \field{first} key
+and \cs{glspl} uses the value of the \field{firstplural} key. On
+subsequent use, \cs{gls} uses the value of the \field{text} key and
+\cs{glspl} uses the value of the \field{plural} key.
+
+If the first use for a particular group of terms always has the
+same pattern (such as following the term with a brief description or
+alternative representation), then it's simpler to use one of the
+automated methods provided, such as the abbreviation mechanism
+(\sectionref{sec:abbreviations}) or defining a \idx{postlinkhook}
+(\sectionref{sec:postlinkhooks}).
+
+\section{Spaces}
+\label{sec:spaces}
+
+With \LaTeX\ in general, spaces are sometimes significant and
+sometimes ignored. When defining entries, any spaces around the
+equal sign or comma are ignored. For example, if an entry is defined
+as
+\begin{lstlisting}
+\newglossaryentry{sample}
+{
+  name = {sample} , description = {an example}
+}
+\end{lstlisting}
+then
+\begin{lstlisting}
+/\gls{sample}/
+\end{lstlisting}
+will produce
+\begin{result}
+/sample/
+\end{result}
+(no spaces). Similarly with
+\begin{lstlisting}
+\newglossaryentry{sample}
+{
+  name = sample , description = {an example}
+}
+\end{lstlisting}
+However, spaces at the start or end of the value if it's been
+enclosed in braces aren't ignored. For example, if the entry is now
+defined as:
+\begin{lstlisting}
+\newglossaryentry{sample}
+{
+  name = { sample } , description = {an example}
+}
+\end{lstlisting}
+then 
+\begin{lstlisting}
+/\gls{sample}/
+\end{lstlisting}
+produces
+\begin{result}
+/ sample /
+\end{result}
+The spaces in this case have been retained.
+
+Spaces in labels are significant. For example, in \verb|\gls{ duck }|
+the spaces are considered part of the label. If the entry was
+actually defined without spaces in the label then the entry
+referenced in \verb|\gls{ duck }| won't be found.
+
+\section{Robust, Fragile and Expandable Commands}
+\label{sec:robust}
+
+Commands like \gls{gls} are \pidx{robust}. This protects them from
+premature expansion in situations that would otherwise break the
+command. If content containing a \idx{robust} command is written to
+an external file, the command itself is written instead of its
+definition. For example, consider the following document:
+\begin{lstlisting}
+\documentclass{article}
+\newcommand{\test}{some sample text}
+\begin{document}
+\tableofcontents
+\section{\test}
+\end{document}
+\end{lstlisting}
+In this case, \csfmt{test} is expandable. Its definition doesn't
+contain anything complicated. The \ext{toc} file (which is input by
+\csfmt{tableofcontents}) contains the line:
+\begin{lstlisting}
+\contentsline {section}{\numberline {1}some sample text}{1}
+\end{lstlisting}
+So \csfmt{test} has been expanded to its definition when it was
+written to the \ext{toc} file. If \csfmt{test} is defined in terms
+of another command, that will also be expanded. For example:
+\begin{lstlisting}
+\documentclass{article}
+\newcommand{\sample}{sample}
+\newcommand{\test}{some \sample\ text}
+\begin{document}
+\tableofcontents
+\section{\test}
+\end{document}
+\end{lstlisting}
+The \ext{toc} file now contains:
+\begin{lstlisting}
+\contentsline {section}{\numberline {1}some sample\ text}{1}
+\end{lstlisting}
+So \csfmt{sample} has also been expanded but \idx{cs.space} hasn't
+been expanded. \Idx{robust} commands don't expand. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{duck}
+{
+  name={duck},
+  description={a waterbird with webbed feet}
+}
+
+\begin{document}
+\tableofcontents
+\section{\Gls{duck}: \glsentrydesc{duck}}
+\end{document}
+\end{lstlisting}
+The \ext{toc} file now contains:
+\begin{lstlisting}
+\contentsline {section}{\numberline {1}\Gls {duck}: a waterbird 
+with webbed feet}{1}
+\end{lstlisting}
+So \gls{Gls} doesn't expand and the command is written to the
+\ext{toc} file, but \gls{glsentrydesc} does expand.
+
+A \pidx{fragile} command is one that breaks (causes an error) when
+it's expanded in this type of context. One such command is \gls{footnote}.
+For example, the following won't work:
+\begin{lstlisting}[moretexcs={footnote},escapechar=|]
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{duck}
+{
+  name={duck},
+  description={a waterbird with webbed feet}
+}
+
+\begin{document}
+\tableofcontents
+\section{\Gls{duck}\footnote{\glsentrydesc{duck}}}|\incorrect|
+\end{document}
+\end{lstlisting}
+This causes the error:
+\begin{verbatim}
+! Argument of \@sect has an extra }.
+\end{verbatim}
+Inserting \gls{protect} before the command prevents the attempted
+expansion, which makes the command behave as though it was robust:
+\begin{lstlisting}[moretexcs={footnote,protect}]
+\section{\Gls{duck}\protect\footnote{\glsentrydesc{duck}}}
+\end{lstlisting}
+In this case, it's unlikely that you'd want the footnote to appear
+in the table of contents, so it would be better to use the optional
+argument:
+\begin{lstlisting}[moretexcs={footnote},escapechar=|]
+\section[Duck]{\Gls{duck}\footnote{\glsentrydesc{duck}}}|\correct|
+\end{lstlisting}
+Now the \ext{toc} file is just:
+\begin{lstlisting}
+\contentsline {section}{\numberline {1}Duck}{1}
+\end{lstlisting}
+If the \field{description} field contains a \idx{fragile} command
+then \gls{glsentrydesc} will break in expandable contexts. For
+example, the following doesn't work:
+\begin{lstlisting}[moretexcs={footnote},escapechar=|]
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{duck}
+{
+  name={duck},
+  description={a waterbird\footnote{a bird that lives on or 
+   near water} with webbed feet}
+}
+
+\begin{document}
+\tableofcontents
+\section{\Gls{duck}: \glsentrydesc{duck}}|\incorrect|
+\end{document}
+\end{lstlisting}
+This is a contrived example. In this case, it would be better to
+also define the term \qt{waterbird}: 
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{waterbird}
+{
+  name={waterbird},
+  description={a bird that lives on or near water}
+}
+
+\newglossaryentry{duck}
+{
+  name={duck},
+  description={a \gls{waterbird} with webbed feet}
+}
+
+\begin{document}
+\tableofcontents
+\section{\Gls{duck}: \glsentrydesc{duck}}
+\end{document}
+\end{lstlisting}
+The \ext{toc} file now contains:
+\begin{lstlisting}
+\contentsline {section}{\numberline {1}\Gls {duck}: a \gls 
+{waterbird} with webbed feet}{1}
+\end{lstlisting}
+
+\begin{important}
+The examples in this section are used to illustrate the differences
+between \idx{robust}, \idx{fragile} and \idx{expandable} commands.
+In general, it's better not to use commands like \gls{gls} in
+headings or captions (see \sectionref{sec:headings}) and using
+commands like \gls{gls} in field values can be problematic (see
+\sectionref{sec:nested}).
+\end{important}
+
+\chapter{Abbreviations}
+\label{sec:abbreviations}
+
+The abbreviation handling provided by the base \isty{glossaries}
+package is quite restrictive and only one abbreviation style can be
+used for all abbreviations. The \isty{glossaries-extra} package
+internally loads the \sty{glossaries} package and extends it,
+providing new options and a better abbreviation mechanism that
+allows different styles per abbreviation category.
+
+\chapter{Symbols}
+\label{sec:symbols}
+
+\chapter{Problematic Areas}
+\label{sec:problems}
+
+There are some places where the use of commands like \gls{gls} can
+cause problems. These are listed below, with workarounds provided.
+
+\section{Headings and Captions}
+\label{sec:headings}
+
+\section{Nesting}
+\label{sec:nested}
+
+\chapter{Displaying the Definition}
+\label{sec:printgloss}
+
+\section{Standalone}
+
+\section{Listing the Terms (Glossary)}
+
+\chapter{Changing the Formatting}
+\label{sec:glsformats}
+
+\section{Post-Link Category Hooks}
+\label{sec:postlinkhooks}
+
+\bibliographystyle{plain}
+\bibliography{bib2gls-cite}
+\end{document}

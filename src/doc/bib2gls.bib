@@ -34,6 +34,12 @@
  category={common}
 }
 
+@abbreviation{ASCII,
+  short = {ASCII},
+  long = {American Standard Code for Information Interchange},
+  category={common}
+}
+
 @dualindexentry{bibglsnewentry,
   name={\csfmt{bib\-gls\-new\-entry}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
@@ -2535,6 +2541,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{log,
   name={\extfmt{log}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{toc,
+  name={\extfmt{toc}},
   category={fileformat},
   parent={fileformats}
 }
@@ -5457,6 +5469,18 @@ field.},
   name={cross-resource reference}
 }
 
+@index{firstuseflag,
+  name={first use flag}
+}
+
+@index{link-text,
+ name={link text}
+}
+
+@index{robust}
+@index{fragile}
+@index{expandable}
+
 @index{unicodecategories,
   name={Unicode categories},
   text={Unicode category},
@@ -5821,6 +5845,25 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \gls[noindex]{dual.field.name} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryname,
+  name={\csfmt{Gls\-entry\-name}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \gls[noindex]{dual.field.name} field with the first character
+     converted to upper case},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentrydesc,
+  name={\csfmt{gls\-entry\-desc}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.description} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6397,6 +6440,14 @@ hyperlinks enabled otherwise just does \meta{text}},
   name={\csfmt{textbf}},
   user1={\margm{text}},
   description={displays the given text in bold},
+  note={kernel command},
+  category={command}
+}
+
+@index{footnote,
+  name={\csfmt{footnote}},
+  user1={\oargm{number}\margm{text}},
+  description={displays the given text as a footnote},
   note={kernel command},
   category={command}
 }
@@ -7400,7 +7451,8 @@ indexing},
 @index{glstextformat,
   name={\csfmt{glstextformat}},
   user1={\margm{text}},
-  description={used by commands like \cs{gls} to format the link-text},
+  description={used by commands like \cs{gls} to format the 
+  \idx{link-text}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -7762,5 +7814,39 @@ name} and the displayed \meta{text}},
   entry's number in the glossary list with \cs{pageref}},
   note={provided by \styfmt{glossaries-extra} v1.11},
   category={command}
+}
+
+@entry{ex1.duck,
+  name={duck},
+  description={a waterbird with webbed feet},
+  identifier={animal}
+}
+
+@entry{ex1.goose,
+  name={goose},
+  plural={geese},
+  description={a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill},
+  identifier={animal}
+}
+
+@entry{ex2.duck,
+  name={Duck (noun)},
+  first={duck (quack, quack)},
+  firstplural={ducks (quack, quack)},
+  text={duck},
+  description={a waterbird with webbed feet},
+  identifier={animal}
+}
+
+@entry{ex2.goose,
+  name={Goose (noun, plural geese)},
+  first={goose (honk, honk)},
+  firstplural={geese (honk, honk)},
+  text={goose},
+  plural={geese},
+  description={a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill},
+  identifier={animal}
 }
 

@@ -29,7 +29,6 @@
 \usepackage{etoolbox}
 
 \usepackage{hologo}
-\usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{accents}
 \usepackage{tikz}
@@ -741,14 +740,12 @@ files}
  \DTMsetstyle{pdf}
  \protected@edef\x{\endgroup
    \noexpand\hypersetup{%
-   pdfinfo={
-     Title={\@title},
-     Author={\@author},
-     CreationDate={\DTMuse{creation}},
-     ModDate={\DTMuse{moddate}},
-   }%
-   %\noexpand\pdfinfo{/CreationDate (\DTMuse{creation})
-   %/ModDate (\DTMuse{moddate})}
+     pdfinfo={
+       Title={\@title},
+       Author={\@author},
+       CreationDate={\DTMuse{creation}},
+       ModDate={\DTMuse{moddate}},
+     }%
    }%
  }\x
 

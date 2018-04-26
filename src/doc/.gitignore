@@ -15,4 +15,4 @@
 *.bbl
 *.blg
 arara.xml
-bib2gls.pdf
+bib2gls*.pdf
