@@ -3102,6 +3102,16 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{csdef,
+  name={\csfmt{csdef}},
+  user1={\margm{cs-name}\meta{syntax}\margm{definition}},
+  description={defines the control sequence whose name
+   is given by \meta{cs-name}, without checking if the command
+   already exists},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
 @index{xifinlist,
   name={\csfmt{xifinlist}},
   user1={\margm{element}\margm{list cs}\margm{true}\margm{false}},
@@ -3165,61 +3175,67 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{long-noshort-desc,
-  name={\abbrstylefmt{long-noshort-desc}},
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-short-sc,
-  name={\abbrstylefmt{long-short-sc}},
+  name={\abbrstylefmt{long\dhyphen short\dhyphen sc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-short-sm,
-  name={\abbrstylefmt{long-short-sm}},
+  name={\abbrstylefmt{long\dhyphen short\dhyphen sm}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-short,
-  name={\abbrstylefmt{long-short}},
+  name={\abbrstylefmt{long\dhyphen short}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-short-user,
-  name={\abbrstylefmt{long-short-user}},
+  name={\abbrstylefmt{long\dhyphen short\dhyphen user}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-short-desc,
-  name={\abbrstylefmt{long-short-desc}},
+  name={\abbrstylefmt{long\dhyphen short\dhyphen desc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-short-user-desc,
-  name={\abbrstylefmt{long-short-user-desc}},
+  name={\abbrstylefmt{long\dhyphen short\dhyphen user\dhyphen desc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-postshort-user-desc,
-  name={\abbrstylefmt{long-postshort-user-desc}},
+  name={\abbrstylefmt{long\dhyphen postshort\dhyphen user\dhyphen desc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{short-long,
-  name={\abbrstylefmt{short-long}},
+  name={\abbrstylefmt{short\dhyphen long}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{short-nolong,
+  name={\abbrstylefmt{short\dhyphen nolong}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
 @index{long-only-short-only,
-  name={\abbrstylefmt{long-only-short-only}},
+  name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -3316,6 +3332,12 @@ cs}\margm{Glspl-like cs}},
 @index{categoryattribute,
   name={category attributes},
   text={category attribute}
+}
+
+@index{attribute,
+  name = {attributes},
+  text = {attribute},
+  seealso = {category attributes}
 }
 
 @index{recordcount,
@@ -5469,6 +5491,14 @@ field.},
   name={cross-resource reference}
 }
 
+@index{firstuse,
+  name={first use}
+}
+
+@index{subsequentuse,
+  name={subsequent use}
+}
+
 @index{firstuseflag,
   name={first use flag}
 }
@@ -5868,6 +5898,37 @@ post-name hook},
   category={command}
 }
 
+@index{glsentrysymbol,
+  name={\csfmt{gls\-entry\-symbol}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.symbol} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrpostlinkAddDescOnFirstUse,
+  name={\csfmt{gls\-xtr\-post\-link\-Add\-Desc\-On\-First\-Use}},
+  description={only for use in the post-link hooks,
+   this appends a space and the value of the 
+   \gls[noindex]{dual.field.description} field in parentheses
+   if the entry that was just referenced was used for the
+   first time},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrpostlinkAddSymbolOnFirstUse,
+  name={\csfmt{gls\-xtr\-post\-link\-Add\-Symbol\-On\-First\-Use}},
+  description={only for use in the post-link hooks,
+   this appends a space and the value of the 
+   \gls[noindex]{dual.field.symbol} field in parentheses
+   if the entry that was just referenced was used for the
+   first time},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @index{glspluralsuffix,
   name={\csfmt{gls\-plural\-suffix}},
   user1={},
@@ -5901,6 +5962,14 @@ post-name hook},
   description={the default suffix used to construct the plural for
    the short form of abbreviations},
   note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsdefpostlink,
+  name={\csfmt{gls\-def\-post\-link}},
+  user1={\margm{category}\margm{definition}},
+  description={define the post-link hook for the given category},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
 
@@ -7840,7 +7909,7 @@ name} and the displayed \meta{text}},
 }
 
 @entry{ex2.goose,
-  name={Goose (noun, plural geese)},
+  name={Goose (noun, pl.\ geese)},
   first={goose (honk, honk)},
   firstplural={geese (honk, honk)},
   text={goose},

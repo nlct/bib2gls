@@ -28,8 +28,14 @@
 \lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
  frame=lines,rulecolor={\color{lightgray}},
  commentstyle={\color{gray}},
- texcs={newglossaryentry,gls,Gls,glspl,Glspl,glsentrydesc,glsentryname},
- texcsstyle=*{\color{teal}}}
+ keywords={name,text,firstplural,first,plural,description,symbol,category},
+ keywordstyle={\color{DarkSlateGray4}},
+ texcs={newglossaryentry,longnewglossaryentry,newabbreviation,newacronym,
+  gls,Gls,glspl,Glspl,glsentrydesc,glsentryname,glsentrysymbol,
+  glsnoexpandfields,glsxtrifwasfirstuse,glsxtrpostlinkAddSymbolOnFirstUse,
+  glsxtrpostlinkAddDescOnFirstUse,setabbreviationstyle},
+ texcsstyle=*{\color{DarkSeaGreen4}}
+}
 
 \newcommand{\dhyphen}{%
  \texorpdfstring
@@ -70,6 +76,10 @@
 \newcommand*{\XeLaTeX}{\hologo{XeLaTeX}}
 \newcommand*{\LuaLaTeX}{\hologo{LuaLaTeX}}
 \newcommand*{\pdfLaTeX}{\hologo{pdfLaTeX}}
+
+\newcommand*{\ctanfile}[2]{%
+ \href{http://mirrors.ctan.org/macros/latex/contrib/#1/#2}{\nolinkurl{#2}}%
+}
 
 \newcommand{\qt}[1]{``#1''}
 
@@ -171,6 +181,7 @@
 \newcommand{\primary}{\emph}
 
 \newcommand{\pidx}[1][]{\gls[textformat=primary,#1]}
+\newcommand{\pidxpl}[1][]{\glspl[textformat=primary,#1]}
 
 \newcommand{\idx}{\gls}
 \newcommand{\idxpl}{\glspl}
@@ -235,6 +246,13 @@
 \newcommand*{\ics}{\cs}
 
 \newcommand*{\icswithargs}[2][]{\cs{#2}\glsentryuseri{#2}}
+
+\newcommand*{\postdeschook}[2][]{%
+ \glslink[#1]{idx.glsxtrpostdesccategory}{\csfmt{glsxtrpostdesc#2}}}
+
+\newcommand*{\postlinkhook}[2][]{%
+ \glslink[#1]{idx.glsxtrpostlinkcategory}{\csfmt{glsxtrpostlink#2}}}
+
 
 \glsxtrnewgls{file.}{\exfile}
 
@@ -326,6 +344,8 @@
 \newcommand*{\sectionref}[1]{section~\ref{#1}}
 \newcommand*{\Sectionref}[1]{Section~\ref{#1}}
 
+\pagestyle{headings}
+
 \newcommand{\glossarytitle}{Index}
 \externaldocument{bib2gls}
 
@@ -393,7 +413,7 @@ This ensures consistent naming and formatting. (With the help of the
 \sty{hyperref} package, it's also possible to create hyperlinks from
 the reference to a place in the document that provides a definition
 of the term, but more about that later.) Each entry (term,
-notation or abbreviation) is defined using
+notation or abbreviation) is defined using:
 \nosecformatdef{newglossaryentry}
 Here's a simple example:
 \begin{lstlisting}
@@ -456,19 +476,19 @@ with the \field{plural} key.
 
 The description (set with the \field{description} key) is usually
 only displayed in the glossary, but you can display it in the text
-using
+using:
 \nosecformatdef{glsentrydesc}
 as in the above example. This simply expands to the value of the
 \field{description} field (or does nothing if there's no entry
 associated with the given label).
 
-The main command used to reference a term is
+The main command used to reference a term is:
 \nosecformatdef{gls}
 In the above example, it just displays the singular form, but you
 can provide alternative text to use the first time a term is
 referenced (see \sectionref{sec:firstuse}). The plural form is obtained with
 \nosecformatdef{glspl}
-If you want to start a sentence with an entry then you can use
+If you want to start a sentence with an entry then you can use:
 \nosecformatdef{Gls}
 for the singular form and
 \nosecformatdef{Glspl}
@@ -499,11 +519,11 @@ which now produces:
 \begin{result}
 The \gls{ex1.goose} liked the \gls{ex1.duck}{['s]} hat.
 \end{result}
-An alternative in this case could be to define
+An alternative in this case could be to define:
 \begin{lstlisting}
 \newcommand*{\missing}[1]{[#1]}
 \end{lstlisting}
-and then use
+and then use:
 \begin{lstlisting}
 The \gls{goose} liked the \gls{duck}\missing{'s} hat.
 \end{lstlisting}
@@ -520,7 +540,7 @@ There are some helper commands that internally use
 \gls{newglossaryentry}, such as \cs{newabbreviation} (described in
 \sectionref{sec:abbreviations}) and \cs{glsxtrnewsymbol} (described
 in \sectionref{sec:symbols}). If the description contains paragraph
-breaks then 
+breaks then:
 \nosecformatdef{longnewglossaryentry}
 is required instead.
 
@@ -594,7 +614,6 @@ care if this may cause a conflict. For example:
 For languages that use a non-Latin script, if you can't or don't
 want to use \XeLaTeX\ or \LuaLaTeX, then you need to decide the most
 appropriate \gls{ASCII} naming scheme.
-
 For example:
 \begin{lstlisting}[escapechar=|]
 \newglossaryentry{goose}% using translation for label
@@ -644,7 +663,7 @@ whether or not the entry has already been referenced:
 
 \newglossaryentry{goose}% label
 {% information about this term:
-  name   = {Goose (noun, plural geese)},% display name
+  name   = {Goose (noun, pl.\ geese)},% display name
   first  = {goose (honk, honk)},% first use singular
   firstplural = {geese (honk, honk)},% first use plural
   text   = {goose},% subsequent use singular 
@@ -667,11 +686,11 @@ The pond contained a \gls{ex2.duck}\footnote{\glsentryname{ex2.duck}:
 \glspl{ex2.goose}\footnote{\glsentryname{ex2.goose}: 
 \glsentrydesc{ex2.goose}}. \Glspl{ex2.duck} and \glspl{ex2.goose} are fowl.
 \end{result}
-This uses
+This uses:
 \nosecformatdef{glsentryname}
 which works in a similar way to \gls{glsentrydesc}. In this case,
 \gls{glsentryname} simply expands to the value of the \field{name}
-key. There's also a case-changing version
+key. There's also a case-changing version:
 \nosecformatdef{Glsentryname}
 which changes the initial character to upper case,
 but (unlike \cs{glsentryname}) this command isn't expandable. If,
@@ -682,17 +701,148 @@ name = {duck (noun)}
 then I would need to use \code{\cs{Glsentryname}\marg{duck}}
 instead.
 
-So on first use, \cs{gls} uses the value of the \field{first} key
+So on \pidx{firstuse}, \cs{gls} uses the value of the \field{first} key
 and \cs{glspl} uses the value of the \field{firstplural} key. On
-subsequent use, \cs{gls} uses the value of the \field{text} key and
+\pidx{subsequentuse}, \cs{gls} uses the value of the \field{text} key and
 \cs{glspl} uses the value of the \field{plural} key.
 
 If the first use for a particular group of terms always has the
 same pattern (such as following the term with a brief description or
 alternative representation), then it's simpler to use one of the
 automated methods provided, such as the abbreviation mechanism
-(\sectionref{sec:abbreviations}) or defining a \idx{postlinkhook}
-(\sectionref{sec:postlinkhooks}).
+(\sectionref{sec:abbreviations}) or changing the formatting
+(\sectionref{sec:glsformats}).
+
+\section{Categories}
+\label{sec:categories}
+
+The \isty{glossaries-extra} extension package provides the
+\field{category} key, which isn't available with just the base
+\sty{glossaries} package. The value of this key must be a
+label as it's used to construct command names. You can choose
+whatever label you like (as long as it conforms to the valid
+labelling scheme, described in \sectionref{sec:labels}). If you
+don't specify a category, then \gls{newglossaryentry} and
+\gls{longnewglossaryentry} assume \code{general}. The helper
+commands, such as \gls{newabbreviation}, have different defaults.
+
+The category allows you to apply certain types of formatting. These
+are described in more detail in \sectionref{sec:glsformats}. For
+abbreviations, the category also governs the abbreviation style.
+
+Consider the following document:
+\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant}]
+\documentclass{article}
+
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  description = {typographic ornament}
+}
+
+\newglossaryentry{pi}% label
+{
+  name = {pi},
+  symbol = {\ensuremath{\pi}},
+  category = {constant},
+  description = {Archimedes' constant}
+}
+
+% post-link hook for 'constant' category:
+\newcommand{\glsxtrpostlinkconstant}{% 
+ \space (\glsentrysymbol{\glslabel})}
+
+\begin{document}
+A \gls{fleuron} and \gls{pi}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+A fleuron and pi ($\pi$).
+\end{result}
+The \code{fleuron} entry doesn't have the \field{category} key
+explicitly set, so it defaults to \code{general}, but the \code{pi}
+entry has the \field{category} set to \code{constant}, so it's
+affected by the \idx{postlinkhook} for that category, which in this
+case is given by \csfmt{glsxtrpostlinkconstant} (see
+\sectionref{sec:postlinkhooks} for further details). This hook is
+defined to use:
+\nosecformatdef{glsentrysymbol}
+which works like \gls{glsentrydesc}, but in this case it expands to
+the value of the \field{symbol} key. (The entry label is obtained
+from \gls{glslabel}, which is set by \gls{gls} and similar commands.)
+
+This means that \verb|\gls{pi}| is automatically followed by the
+symbol in parentheses, but \verb|\gls{fleuron}| isn't because it's
+governed by the \code{general} \idx{postlinkhook} instead. Note that
+the above is a simple example to demonstrate one of the uses of the
+\field{category} field. In general, you're unlikely to need the
+symbol appended on every use of \verb|\gls{pi}|. A better definition
+is
+\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant}]
+\newcommand*{\glsxtrpostlinkconstant}{%
+ \glsxtrpostlinkAddSymbolOnFirstUse
+}
+\end{lstlisting}
+See \sectionref{sec:postlinkhooks} for further details.
+
+Categories may be assigned \pidxpl{attribute} that can also be used
+to modify formatting or styles. Unlike the \idx{postlinkhook}, which
+needs to be defined before an entry is used (with commands like
+\gls{gls}), some \idxpl{attribute} need to be set before the entry
+is defined, so it's best to set them up as soon as possible in the
+preamble (after loading \sty{glossaries-extra}).
+
+For example, the \catattr{textformat} attribute may be used to set the 
+name of a formatting command (without the leading backslash) as in the
+following:
+\begin{lstlisting}[morekeywords={textformat}]
+\documentclass{article}
+
+\usepackage{xcolor}% provides colour
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newcommand{\ornamentfmt}[1]{\textcolor{purple}{#1}}
+\newcommand{\constantfmt}[1]{\textcolor{blue}{#1}}
+
+\glssetcategoryattribute{ornament}{textformat}{ornamentfmt}
+\glssetcategoryattribute{constant}{textformat}{constantfmt}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+\newglossaryentry{pi}% label
+{
+  name = {\ensuremath{\pi}},
+  category = {constant},
+  description = {Archimedes' constant}
+}
+
+\begin{document}
+A \gls{fleuron} and \gls{pi}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+A \textcolor{purple}{\ding{167}} and \textcolor{blue}{$\pi$}.
+\end{result}
+In this case, the \code{fleuron} entry is assigned the category
+\code{ornament}. The \code{pi} entry still has the category
+\code{constant}. I've defined some custom commands to provide the
+formatting (\csfmt{ornamentfmt} and \csfmt{constantfmt}), not only
+for semantic reasons but also because the \catattr{textformat}
+attribute requires that the command identified by the value must
+take a single mandatory argument.  This means that it's not possible
+to put \code{textcolor} directly in the attribute value.
 
 \section{Spaces}
 \label{sec:spaces}
@@ -715,7 +865,7 @@ will produce
 \begin{result}
 /sample/
 \end{result}
-(no spaces). Similarly with
+(no spaces). Similarly with:
 \begin{lstlisting}
 \newglossaryentry{sample}
 {
@@ -725,21 +875,50 @@ will produce
 However, spaces at the start or end of the value if it's been
 enclosed in braces aren't ignored. For example, if the entry is now
 defined as:
-\begin{lstlisting}
+\begin{lstlisting}[escapechar=|]
 \newglossaryentry{sample}
 {
-  name = { sample } , description = {an example}
+  name = { sample } , description = {an example}|\incorrect|
 }
 \end{lstlisting}
-then 
+then:
 \begin{lstlisting}
 /\gls{sample}/
 \end{lstlisting}
-produces
+produces:
 \begin{result}
 / sample /
 \end{result}
-The spaces in this case have been retained.
+The spaces in this case have been retained. The unstarred version of
+\gls{longnewglossaryentry} appends \csfmt{unskip} to the end of the
+description, which removes any trailing spaces. The starred version
+(only available with \sty{glossaries-extra}) doesn't. In both cases 
+any leading spaces are retained. For example,
+if the entry is defined as:
+\begin{lstlisting}[escapechar=|]
+\longnewglossaryentry{sample}{name={sample}}{ an example }|\incorrect|
+\end{lstlisting}
+then:
+\begin{lstlisting}
+/\glsentrydesc{sample}/
+\end{lstlisting}
+produces:
+\begin{result}
+/ an example/
+\end{result}
+(trailing space removed), whereas if the entry is defined as:
+\begin{lstlisting}[escapechar=|]
+\longnewglossaryentry*{sample}{name={sample}}{ an example }|\incorrect|
+\end{lstlisting}
+then:
+\begin{lstlisting}
+/\glsentrydesc{sample}/
+\end{lstlisting}
+produces:
+\begin{result}
+/ an example /
+\end{result}
+(leading and trailing spaces retained).
 
 Spaces in labels are significant. For example, in \verb|\gls{ duck }|
 the spaces are considered part of the label. If the entry was
@@ -752,9 +931,9 @@ referenced in \verb|\gls{ duck }| won't be found.
 Commands like \gls{gls} are \pidx{robust}. This protects them from
 premature expansion in situations that would otherwise break the
 command. If content containing a \idx{robust} command is written to
-an external file, the command itself is written instead of its
+an external file, the \idx{robust} command itself is written instead of its
 definition. For example, consider the following document:
-\begin{lstlisting}
+\begin{lstlisting}[keywords={},moretexcs={test,section}]
 \documentclass{article}
 \newcommand{\test}{some sample text}
 \begin{document}
@@ -765,15 +944,15 @@ definition. For example, consider the following document:
 In this case, \csfmt{test} is expandable. Its definition doesn't
 contain anything complicated. The \ext{toc} file (which is input by
 \csfmt{tableofcontents}) contains the line:
-\begin{lstlisting}
+\begin{lstlisting}[keywords={}]
 \contentsline {section}{\numberline {1}some sample text}{1}
 \end{lstlisting}
 So \csfmt{test} has been expanded to its definition when it was
 written to the \ext{toc} file. If \csfmt{test} is defined in terms
 of another command, that will also be expanded. For example:
-\begin{lstlisting}
+\begin{lstlisting}[keywords={},moretexcs={test,section,sample,emph}]
 \documentclass{article}
-\newcommand{\sample}{sample}
+\newcommand{\sample}{\emph{sample}}
 \newcommand{\test}{some \sample\ text}
 \begin{document}
 \tableofcontents
@@ -781,10 +960,12 @@ of another command, that will also be expanded. For example:
 \end{document}
 \end{lstlisting}
 The \ext{toc} file now contains:
-\begin{lstlisting}
-\contentsline {section}{\numberline {1}some sample\ text}{1}
+\begin{lstlisting}[keywords={},moretexcs={emph}]
+\contentsline {section}{\numberline {1}some \emph {sample}\ 
+text}{1}
 \end{lstlisting}
-So \csfmt{sample} has also been expanded but \idx{cs.space} hasn't
+So \csfmt{sample} has also been expanded but neither
+\gls{emph} nor \idx{cs.space} (backslash space) have
 been expanded. \Idx{robust} commands don't expand. For example:
 \begin{lstlisting}
 \documentclass{article}
@@ -807,7 +988,7 @@ The \ext{toc} file now contains:
 \contentsline {section}{\numberline {1}\Gls {duck}: a waterbird 
 with webbed feet}{1}
 \end{lstlisting}
-So \gls{Gls} doesn't expand and the command is written to the
+So \gls{Gls} doesn't expand, and the command itself is written to the
 \ext{toc} file, but \gls{glsentrydesc} does expand.
 
 A \pidx{fragile} command is one that breaks (causes an error) when
@@ -907,6 +1088,66 @@ commands like \gls{gls} in field values can be problematic (see
 \sectionref{sec:nested}).
 \end{important}
 
+By default, most of the field values are expanded when the entry is
+defined. This allows for defining entries programmatically, but it
+can cause a problem if the value contains any \idx{fragile} commands.
+For example:
+\begin{lstlisting}[escapechar=|,moretexcs={footnote}]
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{duck}% label
+{
+  name = {duck},
+  first = {duck\footnote{quack, quack}},|\incorrect|
+  description = {a waterbird with webbed feet}
+}
+
+\begin{document}
+A \gls{duck}.
+\end{document}
+\end{lstlisting}
+This causes the confusing error:
+\begin{verbatim}
+! Undefined control sequence.
+\in@ #1#2->\begingroup \def \in@@ 
+\end{verbatim}
+In order for this example to work, the \idx{fragile} command must either be
+protected:
+\begin{lstlisting}[escapechar=|,moretexcs={protect,footnote}]
+\newglossaryentry{duck}% label
+{
+  name = {duck},
+  first = {duck\protect\footnote{quack, quack}},|\correct|
+  description = {a waterbird with webbed feet}
+}
+\end{lstlisting}
+or the expansion must first be switched off:
+\begin{lstlisting}[escapechar=|,moretexcs={footnote}]
+\glsnoexpandfields |\correct|
+\newglossaryentry{duck}% label
+{
+  name = {duck},
+  first = {duck\footnote{quack, quack}},
+  description = {a waterbird with webbed feet}
+}
+\end{lstlisting}
+Since it's not possible to programmatically define entries with
+\bibgls, the expansion is automatically switched off as \bibgls\
+writes \gls{glsnoexpandfields} to the \ext{glstex} file (although
+you can switch this feature off with \longarg{expand-fields}).
+
+The reason why \gls{footnote} didn't cause a problem in the
+\field{description} field \emph{when the entry was defined} is that, by
+default, expansion isn't performed on the \field{name},
+\field{description} and \field{symbol} fields, regardless of whether
+or not \gls{glsnoexpandfields} has been used. This only applies to
+the point when the entries are being defined. Unprotected
+\idx{fragile} commands can still cause a problem if the value is
+later used in a problematic context (such as the earlier example
+where \gls{glsentrydesc} was used in a section heading).
+
 \chapter{Abbreviations}
 \label{sec:abbreviations}
 
@@ -915,7 +1156,59 @@ package is quite restrictive and only one abbreviation style can be
 used for all abbreviations. The \isty{glossaries-extra} package
 internally loads the \sty{glossaries} package and extends it,
 providing new options and a better abbreviation mechanism that
-allows different styles per abbreviation category.
+allows different styles per category.
+
+The base \sty{glossaries} package provides:
+\nosecformatdef{newacronym}
+The extension package \sty{glossaries-extra} provides:
+\nosecformatdef{newabbreviation}
+and redefines \gls{newacronym} in terms of \gls{newabbreviation} so
+that it effectively behaves like:
+\begin{codeenv}
+\gls{newabbreviation}\oarg{type=\gls{acronymtype},category=acronym,\meta{\keyvallist}}
+\margm{label}\margm{short}\margm{long}
+\end{codeenv}
+This makes it easier to transfer over from the base \sty{glossaries}
+package, but if you use \gls{newacronym} remember that the category 
+is set to \code{acronym} instead of \code{abbreviation}, which is
+the usual default for \gls{newabbreviation}.
+
+In both cases, \meta{label} is the entry's label used to identify
+the abbreviation in commands like \gls{gls}, \meta{short} is the
+short form and \meta{long} is the long form. Any additional
+settings, such as the \field{category} or \field{description} 
+can be set in the optional argument.
+
+The style must always be set before the abbreviations are defined
+using:
+\nosecformatdef{setabbreviationstyle}
+where \meta{category} is the category label and \meta{style-name} is
+the name of the style. If the optional argument is omitted,
+\code{abbreviation} is assumed. The \sty{glossaries-extra} package
+automatically sets the default styles:
+\begin{lstlisting}
+\setabbreviationstyle{long-short}
+\setabbreviationstyle[acronym]{short-nolong}
+\end{lstlisting}
+This means that if you don't explicitly set the style then any
+abbreviation defined with \gls{newacronym} will use the
+\abbrstyle{short-nolong} style (unless you change the category in
+the optional argument) and other abbreviations will use the
+\abbrstyle{long-short} style.
+
+If these styles aren't suitable, then you need to change them. Any
+abbreviation that's defined with a category that hasn't been
+assigned a style will fallback on the default
+style. There are many predefined styles to choose from and they come
+with commands to help adjust the formatting. See the
+\sty{glossaries-extra} user manual for the complete list. The
+\sty{glossaries-extra} package also comes with a sample document
+\ctanfile{glossaries-extra/samples}{sample-abbr-styles.pdf}
+demonstrating all the predefined styles.
+
+Some of the styles set the \field{description} field (typically to
+the \meta{long} form). The styles that end with \code{-desc} don't,
+and so that key must be set explicitly in the \meta{\keyvallist} optional part.
 
 \chapter{Symbols}
 \label{sec:symbols}
@@ -944,6 +1237,140 @@ cause problems. These are listed below, with workarounds provided.
 
 \section{Post-Link Category Hooks}
 \label{sec:postlinkhooks}
+
+Extra information can be appended after commands such as \gls{gls}
+by defining a \pidxpl{postlinkhook} for the given category. You can
+obtain the label of the entry that's just been referenced with:
+\nosecformatdef{glslabel}
+\Sectionref{sec:categories} gave a simple example, which is
+reproduced below with some minor modifications:
+\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant,glsxtrpostlinkornament}]
+\documentclass{article}
+
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+\newglossaryentry{pi}% label
+{
+  name = {pi},
+  symbol = {\ensuremath{\pi}},
+  category = {constant},
+  description = {Archimedes' constant}
+}
+
+% post-link hook for 'ornament' category:
+\newcommand{\glsxtrpostlinkornament}{% 
+ \space (\glsentrydesc{\glslabel})}
+
+% post-link hook for 'constant' category:
+\newcommand{\glsxtrpostlinkconstant}{% 
+ \space (\glsentrysymbol{\glslabel})}
+
+\begin{document}
+A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and \gls{pi}.
+Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+A fleuron (typographic ornament) and pi ($\pi$). Another fleuron (typographic
+ornament) and pi ($\pi$). Symbols: \ding{167} (typographic ornament) and
+$\pi$ ($\pi$).
+\end{result}
+The \idx{postlinkhook} is repeated after every instance of \gls{gls}
+or \gls{glssymbol} etc. In the case of the \code{ornament} category,
+the description is appended in parentheses and in the case of the
+\code{constant} category the symbol is appended. This results in
+redundant repetition, especially with \verb|\glssymbol{pi}| which
+displays the symbol followed by the symbol in parentheses.
+
+It's more likely that the information only needs to be appended
+after the \idx{firstuse}. You can determine if the
+\idx{postlinkhook} follows the \idx{firstuse} of the entry using:
+\nosecformatdef{glsxtrifwasfirstuse}
+For example:
+\begin{lstlisting}
+\newcommand{\glsxtrpostlinkconstant}{% 
+ \glsxtrifwasfirstuse{\space (\glsentrysymbol{\glslabel})}{}%
+}
+\end{lstlisting}
+Commands that don't check or modify the \idx{firstuseflag}, such as
+\gls{glssymbol}, always set \gls{glsxtrifwasfirstuse} so that it
+expands to \meta{false}. This means that even if \verb|\glssymbol{pi}|
+is placed before the first instance of \verb|\gls{pi}| it still
+won't be treated as the first use of that entry.
+
+For convenience, there's a shortcut command:
+\nosecformatdef{glsxtrpostlinkAddSymbolOnFirstUse}
+So an alternative definition is:
+\begin{lstlisting}
+\newcommand{\glsxtrpostlinkconstant}{% 
+  \glsxtrpostlinkAddSymbolOnFirstUse
+}
+\end{lstlisting}
+Similarly, there's a shortcut command for the description:
+\nosecformatdef{glsxtrpostlinkAddDescOnFirstUse}
+As from \sty{glossaries-extra} v1.31, there's also a shortcut
+command that you can use to define the \idx{postlinkhook}:
+\nosecformatdef{glsdefpostlink} 
+This is just a shortcut for:
+\begin{codeenv}
+\csfmt{csdef}\marg{glsxtrpostlink\meta{category}}\margm{definition}
+\end{codeenv}
+So the above document can be changed to:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+\newglossaryentry{pi}% label
+{
+  name = {pi},
+  symbol = {\ensuremath{\pi}},
+  category = {constant},
+  description = {Archimedes' constant}
+}
+
+% post-link hook for 'ornament' category:
+\glsdefpostlink{ornament}{% 
+  \glsxtrpostlinkAddDescOnFirstUse
+}
+
+% post-link hook for 'constant' category:
+\glsdefpostlink{constant}{% 
+  \glsxtrpostlinkAddSymbolOnFirstUse
+}
+
+\begin{document}
+Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
+A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and \gls{pi}.
+\end{document}
+\end{lstlisting}
+The result is now:
+\begin{result}
+Symbols: \ding{167} and $\pi$. A fleuron (typographic ornament) and
+pi ($\pi$). Another fleuron and pi.
+\end{result}
+
+\section{Post-Name and Post-Description Hooks}
+\label{sec:postfieldhooks}
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}
