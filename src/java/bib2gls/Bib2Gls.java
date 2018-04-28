@@ -1168,8 +1168,36 @@ public class Bib2Gls implements TeXApp
             debug(e);
          }
       }
+      else
+      {// check if fontspec was specified with --packages:
 
-      AuxParser auxParser = new AuxParser(this)
+         for (String sty : packages)
+         {
+            if (sty.equals("fontspec"))
+            {
+               fontspec = true;
+               break;
+            }
+         }
+      }
+
+      if (texCharset == null && fontspec)
+      {
+         // Assume UTF-8 (there may be UTF-8 labels in the
+         // aux records so the encoding needs to be set
+         // before the aux file is opened).
+
+         try
+         {
+            texCharset = Charset.forName("UTF-8");
+         }
+         catch (Exception e)
+         {// shouldn't happen
+            debug(e);
+         }
+      }
+
+      AuxParser auxParser = new AuxParser(this, texCharset)
       {
          protected void addPredefined()
          {
@@ -2295,6 +2323,66 @@ public class Bib2Gls implements TeXApp
    public String[] mfirstucProtectionFields()
    {
       return mfirstucProtectFields;
+   }
+
+   public void logEncodingDetected(Charset charset)
+   {
+      logMessage(getMessage("message.detected.charset", charset)); 
+   }
+
+   public void logEncoding(Charset charset)
+   {
+      if (charset == null)
+      {
+         logMessage(getMessage("message.charset",
+           getMessage("message.null"))); 
+      }
+      else
+      {
+         logMessage(getMessage("message.charset",
+           charset.name())); 
+      }
+   }
+
+   public void logEncoding(String charset)
+   {
+      if (charset == null)
+      {
+         logMessage(getMessage("message.charset",
+           getMessage("message.null"))); 
+      }
+      else
+      {
+         logMessage(getMessage("message.charset", charset)); 
+      }
+   }
+
+   public void logDefaultEncoding(Charset charset)
+   {
+      if (charset == null)
+      {
+         logMessage(getMessage("message.default.charset",
+           getMessage("message.null"))); 
+      }
+      else
+      {
+         logMessage(getMessage("message.default.charset",
+           charset.name())); 
+      }
+   }
+
+   public void logDefaultEncoding(String charset)
+   {
+      if (charset == null)
+      {
+         logMessage(getMessage("message.default.charset",
+           getMessage("message.null"))); 
+      }
+      else
+      {
+         logMessage(getMessage("message.default.charset",
+           charset)); 
+      }
    }
 
    public void logMessage(String message)
@@ -4235,8 +4323,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.4.20180419";
-   public static final String DATE = "2018-04-19";
+   public static final String VERSION = "1.4.20180428";
+   public static final String DATE = "2018-04-28";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

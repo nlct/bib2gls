@@ -1995,7 +1995,12 @@ for more details.
 \argsection{no-interpret}
 
 Switch off the interpreter mode. See \sectionref{sec:texparserlib}
-for more details.
+for more details about the interpreter. If the interpreter is off,
+the transcript (\iext{log}) file won't be parsed, so if you need
+\bibgls\ to know that you are using \sty{fontspec} but you don't
+want the interpreter on then you must use 
+\longarg{packages}\code{ fontspec} to indicate that UTF-8 is 
+natively supported.
 
 \argsection{no-break-space}
 

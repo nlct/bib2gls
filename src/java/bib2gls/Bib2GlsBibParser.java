@@ -73,13 +73,13 @@ public class Bib2GlsBibParser extends BibParser
    public void parse(File file)
       throws IOException
    {
-      parser.parse(file);
+      parser.parse(file, getCharSet());
    }
 
-   public void beginParse(File file)
+   public void beginParse(File file, Charset encoding)
       throws IOException
    {
-      super.beginParse(file);
+      super.beginParse(file, encoding);
       currentFile = file;
    }
 

@@ -2621,7 +2621,7 @@ public class GlsResource
       // Need to parse aux file to find .bib sources, the value of
       // \glolinkprefix, the label prefix and the .glstex files.
 
-      AuxParser auxParser = new AuxParser(bib2gls)
+      AuxParser auxParser = new AuxParser(bib2gls, bib2gls.getTeXCharset())
       {
          protected void addPredefined()
          {
@@ -2693,7 +2693,7 @@ public class GlsResource
 
       // Need to parse aux file to find records.
 
-      AuxParser auxParser = new AuxParser(bib2gls)
+      AuxParser auxParser = new AuxParser(bib2gls, bib2gls.getTeXCharset())
       {
          protected void addPredefined()
          {
@@ -3769,6 +3769,7 @@ public class GlsResource
    throws IOException
    {
       bib2gls.verboseMessage("message.parsing.resource.bib", texFile.getName());
+      bib2gls.logDefaultEncoding(bibCharset);
 
       stripUnknownFieldPatterns();
 
@@ -3810,6 +3811,8 @@ public class GlsResource
                      try
                      {
                         srcCharset = Charset.forName(encoding);
+
+                        bib2gls.logEncodingDetected(srcCharset);
                      }
                      catch (Exception e)
                      {
@@ -4377,8 +4380,11 @@ public class GlsResource
    private void processMaster()
       throws IOException,Bib2GlsException
    {
+      Charset charSet = bib2gls.getTeXCharset();
+
       bib2gls.message(bib2gls.getMessage("message.writing", 
        texFile.toString()));
+      bib2gls.logEncoding(charSet);
 
       // Already checked openout_any in init method
 
@@ -4386,7 +4392,7 @@ public class GlsResource
 
       try
       {
-         writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
+         writer = new PrintWriter(texFile, charSet.name());
 
          if (bib2gls.suppressFieldExpansion())
          {
@@ -5252,8 +5258,11 @@ public class GlsResource
          sortDataIfRequired(dualEntries, dualSortSettings, "group");
       }
 
+      String charSetName = bib2gls.getTeXCharset().name();
+
       bib2gls.message(bib2gls.getMessage("message.writing", 
        texFile.toString()));
+      bib2gls.logEncoding(charSetName);
 
       // Already checked openout_any in init method
 
@@ -5261,7 +5270,7 @@ public class GlsResource
 
       try
       {
-         writer = new PrintWriter(texFile, bib2gls.getTeXCharset().name());
+         writer = new PrintWriter(texFile, charSetName);
 
          if (bib2gls.suppressFieldExpansion())
          {
