@@ -28,12 +28,17 @@
 \lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
  frame=lines,rulecolor={\color{lightgray}},
  commentstyle={\color{gray}},
- keywords={name,text,firstplural,first,plural,description,symbol,category},
+ keywords={name,text,firstplural,first,plural,description,symbol,category,%
+  shortplural,longplural},
  keywordstyle={\color{DarkSlateGray4}},
  texcs={newglossaryentry,longnewglossaryentry,newabbreviation,newacronym,
-  gls,Gls,glspl,Glspl,glsentrydesc,glsentryname,glsentrysymbol,
+  gls,Gls,glspl,Glspl,glssymbol,glsentrydesc,glsentryname,glsentrysymbol,
   glsnoexpandfields,glsxtrifwasfirstuse,glsxtrpostlinkAddSymbolOnFirstUse,
-  glsxtrpostlinkAddDescOnFirstUse,setabbreviationstyle},
+  glsxtrpostlinkAddSymbolDescOnFirstUse,glsdefpostlink,
+  glsxtrpostlinkAddDescOnFirstUse,setabbreviationstyle,
+  glssetcategoryattribute,GlsXtrEnableInitialTagging,
+  glsxtrwordsep,glsxtrword,
+  glstextformat,glsxtrregularfont,glsxtrabbreviationfont},
  texcsstyle=*{\color{DarkSeaGreen4}}
 }
 
@@ -52,6 +57,15 @@
 }
 
 \setabbreviationstyle[common]{short-nolong}
+\setabbreviationstyle[markwordsexample]{long-hyphen-short-hyphen}
+\glssetcategoryattribute{markwordsexample}{markwords}{true}
+\GlsXtrEnableInitialTagging{taggingexample}{\itag}
+\glssetcategoryattribute{discardperiodexample}{discardperiod}{true}
+\glssetcategoryattribute{initialism}{insertdots}{true}
+\glssetcategoryattribute{initialism}{discardperiod}{true}
+\glssetcategoryattribute{initialism}{retainfirstuseperiod}{true}
+\setabbreviationstyle[initialism]{short-long}
+
 
 \GlsXtrLoadResources[
  src={bib2gls},
@@ -90,10 +104,13 @@
 
 \newenvironment{result}%
 {%
+ \glslocalreseteach{TUG,ASCII,SIunit,CLDR,ex1.duck,ex1.goose,%
+  ex2.duck,ex2.goose,ex.fleuron,ex.pi,ex.svm,ex.dante,ex.ssl,ex.xml,ex.gp,%
+  ex2.gp}%
  \begin{quotation}%
  \marginpar
-  [\raisebox{-2ex}{\ding{43}}]%
-  {\raisebox{-2ex}{\reflectbox{\ding{43}}}}%
+  [\raisebox{-2.5ex}{\ding{43}}]%
+  {\raisebox{-2.5ex}{\reflectbox{\ding{43}}}}%
  \ignorespaces
 }
 {\end{quotation}\ignorespacesafterend}
@@ -726,123 +743,19 @@ don't specify a category, then \gls{newglossaryentry} and
 \gls{longnewglossaryentry} assume \code{general}. The helper
 commands, such as \gls{newabbreviation}, have different defaults.
 
-The category allows you to apply certain types of formatting. These
-are described in more detail in \sectionref{sec:glsformats}. For
-abbreviations, the category also governs the abbreviation style.
-
-Consider the following document:
-\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant}]
-\documentclass{article}
-
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  description = {typographic ornament}
-}
-
-\newglossaryentry{pi}% label
-{
-  name = {pi},
-  symbol = {\ensuremath{\pi}},
-  category = {constant},
-  description = {Archimedes' constant}
-}
-
-% post-link hook for 'constant' category:
-\newcommand{\glsxtrpostlinkconstant}{% 
- \space (\glsentrysymbol{\glslabel})}
-
-\begin{document}
-A \gls{fleuron} and \gls{pi}.
-\end{document}
-\end{lstlisting}
-This produces:
-\begin{result}
-A fleuron and pi ($\pi$).
-\end{result}
-The \code{fleuron} entry doesn't have the \field{category} key
-explicitly set, so it defaults to \code{general}, but the \code{pi}
-entry has the \field{category} set to \code{constant}, so it's
-affected by the \idx{postlinkhook} for that category, which in this
-case is given by \csfmt{glsxtrpostlinkconstant} (see
-\sectionref{sec:postlinkhooks} for further details). This hook is
-defined to use:
-\nosecformatdef{glsentrysymbol}
-which works like \gls{glsentrydesc}, but in this case it expands to
-the value of the \field{symbol} key. (The entry label is obtained
-from \gls{glslabel}, which is set by \gls{gls} and similar commands.)
-
-This means that \verb|\gls{pi}| is automatically followed by the
-symbol in parentheses, but \verb|\gls{fleuron}| isn't because it's
-governed by the \code{general} \idx{postlinkhook} instead. Note that
-the above is a simple example to demonstrate one of the uses of the
-\field{category} field. In general, you're unlikely to need the
-symbol appended on every use of \verb|\gls{pi}|. A better definition
-is
-\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant}]
-\newcommand*{\glsxtrpostlinkconstant}{%
- \glsxtrpostlinkAddSymbolOnFirstUse
-}
-\end{lstlisting}
-See \sectionref{sec:postlinkhooks} for further details.
-
+The category allows you to apply certain types of formatting, such
+as the \idx{postlinkhook} (\sectionref{sec:postlinkhooks}).
+For abbreviations, the category also governs the abbreviation style (see
+\sectionref{sec:abbreviations}) and can be used for filtering.
 Categories may be assigned \pidxpl{attribute} that can also be used
-to modify formatting or styles. Unlike the \idx{postlinkhook}, which
+to modify formatting or styles. 
+
+Unlike the \idx{postlinkhook}, which
 needs to be defined before an entry is used (with commands like
 \gls{gls}), some \idxpl{attribute} need to be set before the entry
 is defined, so it's best to set them up as soon as possible in the
 preamble (after loading \sty{glossaries-extra}).
 
-For example, the \catattr{textformat} attribute may be used to set the 
-name of a formatting command (without the leading backslash) as in the
-following:
-\begin{lstlisting}[morekeywords={textformat}]
-\documentclass{article}
-
-\usepackage{xcolor}% provides colour
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newcommand{\ornamentfmt}[1]{\textcolor{purple}{#1}}
-\newcommand{\constantfmt}[1]{\textcolor{blue}{#1}}
-
-\glssetcategoryattribute{ornament}{textformat}{ornamentfmt}
-\glssetcategoryattribute{constant}{textformat}{constantfmt}
-
-\newglossaryentry{fleuron}% label
-{
-  name = {\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
-}
-
-\newglossaryentry{pi}% label
-{
-  name = {\ensuremath{\pi}},
-  category = {constant},
-  description = {Archimedes' constant}
-}
-
-\begin{document}
-A \gls{fleuron} and \gls{pi}.
-\end{document}
-\end{lstlisting}
-This produces:
-\begin{result}
-A \textcolor{purple}{\ding{167}} and \textcolor{blue}{$\pi$}.
-\end{result}
-In this case, the \code{fleuron} entry is assigned the category
-\code{ornament}. The \code{pi} entry still has the category
-\code{constant}. I've defined some custom commands to provide the
-formatting (\csfmt{ornamentfmt} and \csfmt{constantfmt}), not only
-for semantic reasons but also because the \catattr{textformat}
-attribute requires that the command identified by the value must
-take a single mandatory argument.  This means that it's not possible
-to put \code{textcolor} directly in the attribute value.
 
 \section{Spaces}
 \label{sec:spaces}
@@ -1206,24 +1119,403 @@ with commands to help adjust the formatting. See the
 \ctanfile{glossaries-extra/samples}{sample-abbr-styles.pdf}
 demonstrating all the predefined styles.
 
+There are also some category attributes that govern abbreviations (see later).
+These should be also set before the abbreviation is defined.
+
 Some of the styles set the \field{description} field (typically to
 the \meta{long} form). The styles that end with \code{-desc} don't,
 and so that key must be set explicitly in the \meta{\keyvallist} optional part.
 
+Here's a simple example that uses both \gls{newabbreviation} and
+\gls{newacronym} to illustrate the difference:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\newabbreviation{tug}{TUG}{\TeX\ Users Group}
+\newabbreviation{cldr}{CLDR}{Unicode Common Locale Data 
+Repository}
+
+\newacronym{SIunit}{SI unit}{International System of Units}
+\newacronym{ascii}{ASCII}{American Standard Code for 
+Information Interchange}
+
+\begin{document}
+First use: \gls{tug}, \gls{cldr}, \gls{SIunit}, \gls{ascii}.
+Next use: \gls{tug}, \gls{cldr}, \gls{SIunit}, \gls{ascii}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+First use: \gls{TUG}, \gls{CLDR}, \gls{SIunit}, \gls{ASCII}.
+Next use: \gls{TUG}, \gls{CLDR}, \gls{SIunit}, \gls{ASCII}.
+\end{result}
+Note that the \idx{firstuse} of \code{SIunit} and \code{ascii} only
+show the short form. This is because the default style for the
+\code{acronym} category is the \abbrstyle{short-nolong} style, which
+doesn't show the long form with \gls{gls} (and its variants, such as
+\gls{glspl}).
+
+If you only want \gls{gls} to show the short form but not the long
+form, use one of the \code{-nolong} styles (such as
+\abbrstyle{short-nolong}). If you only want the
+long form and not the short form, use one of the \code{-noshort}
+styles (such as \abbrstyle{long-noshort}). If you want only the long
+form on \idx{firstuse} and only the short form on subsequent use
+then use one of the \code{-only} styles, such as
+\abbrstyle{long-only-short-only}.
+
+If you want a specific instance to show only the short form, without
+modifying the \idx{firstuseflag}, then use
+\nosecformatdef{glsxtrshort}
+If you want a specific instance to show only the long form, without
+modifying the \idx{firstuseflag}, then use
+\nosecformatdef{glsxtrlong}
+If you want a specific instance to show both the long and short form, without
+modifying the \idx{firstuseflag}, then use
+\nosecformatdef{glsxtrfull}
+Depending on the style, this may not exactly match the format
+produced by the \idx{firstuse} of \gls{gls}.
+
+If you find these commands quite long-winded, there are some
+shortcuts available with the \styopt{shortcuts} option, but as these
+may interfere with other packages, you might want to consider
+investigating your text editor settings as the more sophisticated
+ones provide ways of inserting commonly-used commands to save typing.
+
+The final optional \meta{insert} argument of commands like \gls{gls}
+is typically moved inside, depending on the style. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\newabbreviation{svm}{SVM}{support vector machine}
+
+\begin{document}
+The \gls{svm}['s] parameters are\ldots
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+The \gls{ex.svm}['s] parameters are\ldots
+\end{result}
+Compare this with:
+\begin{lstlisting}
+The \gls{svm}'s parameters are\ldots
+\end{lstlisting}
+which produces:
+\begin{result}
+The \gls{ex.svm}'s parameters are\ldots
+\end{result}
+
+\section{Plural Abbreviations}
+If the abbreviation represents something countable then the plural
+form can again be obtained with \gls{glspl}:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\newabbreviation{svm}{SVM}{support vector machine}
+
+\begin{document}
+First use: \glspl{svm}. Next use: \glspl{svm}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+First use: \glspl{ex.svm}. Next use: \glspl{ex.svm}.
+\end{result}
+The default plural short and long forms are obtained by
+appending the letter \qt{s} after the singular form. These can be
+changed on an individual basis with the \field{shortplural} and
+\field{longplural} keys. For example:
+\begin{lstlisting}
+\newabbreviation
+ [longplural={lower triangular matrices}]
+ {ltm}{LTM}{lower triangular matrix}
+\end{lstlisting}
+
+It may be that you prefer to keep the short plural form the same as
+the short singular value for all abbreviations within a particular
+category. You can implement this with the
+\catattr{noshortplural} attribute, which must be set to \code{true}
+before the abbreviations for that category are defined. For example:
+\begin{lstlisting}
+\glssetcategoryattribute{abbreviation}{noshortplural}{true}
+\newabbreviation{svm}{SVM}{support vector machine}
+\end{lstlisting}
+Now:
+\begin{lstlisting}
+First use: \glspl{svm}. Next use: \glspl{svm}.
+\end{lstlisting}
+produces:
+\begin{result}
+First use: support vector machines (SVM). Next use: SVM.
+\end{result}
+A related attribute is \catattr{aposplural} which inserts \qtt{'s}
+(apostrophe followed by \qt{s}) to form the default short plural to
+help avoid ambiguity with lower case abbreviations where it might
+not be obvious that the \qt{s} indicates a plural (rather than
+another letter in the abbreviation). Again, this needs to be set
+before the abbreviations for the given category (or categories) are defined.
+
+\section{Abbreviation Markup}
+
+The \catattr{markwords} attribute can be set to \code{true} to
+indicate that \gls{newabbreviation} should parse the long form and
+markup the words using:
+\nosecformatdef{glsxtrword}
+The words are separated with
+\nosecformatdef{glsxtrwordsep}
+For example:
+\begin{lstlisting}
+\glssetcategoryattribute{abbreviation}{markwords}{true}
+\newabbreviation{ssl}{SSL}{Secure Sockets Layer}
+\end{lstlisting}
+This is essentially the same as
+\begin{lstlisting}
+\newabbreviation{ssl}{SSL}{\glsxtrword{Secure}\glsxtrwordsep
+\glsxtrword{Sockets}\glsxtrwordsep\glsxtrword{Layer}}
+\end{lstlisting}
+This is typically used with the \code{-hyphen} abbreviation styles.
+If the final optional \meta{insert} argument of commands like
+\gls{gls} starts with a hyphen, \gls{glsxtrwordsep} is locally
+changed to a hyphen.
+
+For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\setabbreviationstyle{long-hyphen-short-hyphen}
+
+\glssetcategoryattribute{abbreviation}{markwords}{true}
+
+\newabbreviation{ssl}{SSL}{Secure Sockets Layer}
+
+\begin{document}
+First use: \gls{ssl}[-enabled]. Next use: \gls{ssl}[-enabled].
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+First use: \gls{ex.ssl}[-enabled]. Next use: \gls{ex.ssl}[-enabled].
+\end{result}
+Compare this with:
+\begin{lstlisting}
+First use: \gls{ssl}-enabled. Next use: \gls{ssl}-enabled.
+\end{lstlisting}
+which instead produces:
+\begin{result}
+First use: \gls{ex.ssl}-enabled. Next use: \gls{ex.ssl}-enabled.
+\end{result}
+Whereas:
+\begin{lstlisting}
+First use: \gls{ssl}[ enabled]. Next use: \gls{ssl}[ enabled].
+\end{lstlisting}
+produces:
+\begin{result}
+First use: \gls{ex.ssl}[ enabled]. Next use: \gls{ex.ssl}[ enabled].
+\end{result}
+
+There's a related attribute \catattr{markshortwords} which applies
+to the short form instead. This is only useful if the short form contains
+spaces.
+
+Another markup-related attribute is \catattr{tagging}. In general,
+you don't need to explicitly set this attribute. Instead, you need
+to define a tagging command using:
+\nosecformatdef{GlsXtrEnableInitialTagging}
+This (robustly) defines \meta{cs} (a control sequence) to accept a
+single argument, which should be used in the \meta{long} part of the 
+abbreviation definition. This command automatically sets the
+\catattr{tagging} attribute to \code{true} for each of the listed
+categories, which ensures that \meta{cs} uses
+\nosecformatdef{glsxtrtagfont}
+within the glossary (see \sectionref{sec:printgloss}). Within the
+main text the command simply does its argument.
+For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\GlsXtrEnableInitialTagging{abbreviation}{\itag}
+
+\newabbreviation{xml}{XML}{e\itag{x}tensible \itag{m}arkup
+\itag{l}anguage}
+
+\begin{document}
+First use: \gls{xml}. Next use: \gls{xml}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+First use: \gls{ex.xml}. Next use: \gls{ex.xml}.
+\end{result}
+This doesn't show the markup as the tagging command (\csfmt{itag} in
+this example) simply expands to its argument in the main document
+text. The difference is only evident in the glossary.
+
+\section{Dotted Abbreviations}
+
+If an abbreviation ends with a \idx{full-stop}, it can be awkward
+when it appears at the end of a sentence, as you can end up with two
+dots by mistake. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\newabbreviation{dante}{DANTE e.V.}
+{Deutschsprachige Anwendervereinigung \TeX\ e.V.}
+
+\newabbreviation{gp}{G.P.}{General Practitioner}
+
+\begin{document}
+\gls{dante} is a local \TeX\ user group.
+The German-speaking local \TeX\ user group is \gls{dante}.
+
+A \gls{gp} is a medical doctor.
+I went to my surgery to see the \gls{gp}.
+\end{document}
+\end{lstlisting}
+This results in:
+\begin{result}
+\gls{ex.dante} is a local \TeX\ user group.
+The German-speaking local \TeX\ user group is \gls{ex.dante}\relax.
+
+A \gls{ex.gp} is a medical doctor.
+I went to my surgery to see the \gls{ex.gp}\relax.
+\end{result}
+The awkward double-dot at the end is caused by the final dot in the
+short form followed by the sentence terminating \idx{full-stop}.
+
+If the \catattr{discardperiod} attribute is set to \code{true}, the
+\idx{postlinkhook} will look ahead for a \idx{full-stop}. If it
+finds one, it will be discarded. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\glssetcategoryattribute{abbreviationdot}{discardperiod}{true}
+
+\newabbreviation[category=abbreviationdot]
+ {dante}{DANTE e.V.}{Deutschsprachige Anwendervereinigung 
+\TeX\ e.V.}
+
+\newabbreviation[category=abbreviationdot]
+ {gp}{G.P.}{General Practitioner}
+
+\begin{document}
+\gls{dante} is a local \TeX\ user group.
+The German-speaking local \TeX\ user group is \gls{dante}.
+
+A \gls{gp} is a medical doctor.
+I went to my surgery to see the \gls{gp}.
+\end{document}
+\end{lstlisting}
+This now results in:
+\begin{result}
+\gls{ex.dante} is a local \TeX\ user group.
+The German-speaking local \TeX\ user group is \gls{ex.dante}.
+
+A \gls{ex.gp} is a medical doctor.
+I went to my surgery to see the \gls{ex.gp}.
+\end{result}
+This attribute only affects the \emph{non-plural} commands, such as
+\gls{gls} and \gls{glsxtrshort}. If the last paragraph in the above 
+example is changed to:
+\begin{lstlisting}
+A \gls{gp} is a medical doctor.
+I went to my surgery to see the \glspl{gp}.
+\end{lstlisting}
+then the result is:
+\begin{result}
+A \gls{ex.gp} is a medical doctor.
+I went to my surgery to see the \glspl{ex.gp}.
+\end{result}
+In this case there's no need to discard the terminating
+\idx{full-stop} as the plural form doesn't end with one. If the
+plural form also ends with a \idx{full-stop}, for example the
+\catattr{noshortplural} attribute is also set, then you additionally
+need to set the \catattr{pluraldiscardperiod} attribute.
+
+The \idx{postlinkhook} is also applied to other commands, such as 
+\gls{glsxtrfull}, \gls{glsxtrlong}, \gls{glsxtrshort} and \gls{glssymbol}.
+For example:
+\begin{lstlisting}
+I went to my surgery to see the \glsxtrshort{gp}.
+\end{lstlisting}
+results in:
+\begin{result}
+I went to my surgery to see the \glsxtrshort{ex.gp}.
+\end{result}
+In some cases, this may be inappropriate, for example:
+\begin{lstlisting}
+I went to my surgery to see the \glsxtrlong{gp}.
+\end{lstlisting}
+results in:
+\begin{result}
+I went to my surgery to see the \glsxtrlong{ex.gp}.
+\end{result}
+In this case the terminating \idx{full-stop} shouldn't be discarded.
+There are several ways to prevent it. For example, moving the
+\idx{full-stop} into the \meta{insert} argument:
+\begin{lstlisting}
+I went to my surgery to see the \glsxtrlong{gp}[.]
+\end{lstlisting}
+This results in:
+\begin{result}
+I went to my surgery to see the \glsxtrlong{ex.gp}[.]
+\end{result}
+Alternatively, insert \csfmt{relax} before the \idx{full-stop}:
+\begin{lstlisting}
+I went to my surgery to see the \glsxtrlong{gp}\relax.
+\end{lstlisting}
+
+Depending on the abbreviation style, it may be inappropriate for the
+\idx{firstuse} to discard the \idx{full-stop}. In this case, it's a
+bit of a nuisance to keep track of whether the term is being
+referenced for the first time. Instead, set the
+\catattr{retainfirstuseperiod} attribute to \code{true}.
+
+If you have many abbreviations defined without dots and then you
+later decide to insert them, you may prefer an automated approach.
+This can be done by setting the \catattr{insertdots} attribute to \code{true}.
+For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries-extra}
+
+\glssetcategoryattribute{initialism}{insertdots}{true}
+\glssetcategoryattribute{initialism}{discardperiod}{true}
+\glssetcategoryattribute{initialism}{retainfirstuseperiod}{true}
+
+\setabbreviationstyle[initialism]{short-long}
+
+\newabbreviation[category=initialism]
+ {gp}{GP}{General Practitioner}
+
+\begin{document}
+Today I went to my surgery to see the \gls{gp}.
+Tomorrow I'm going to my surgery to see the \gls{gp}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+Today I went to my surgery to see the \gls{ex2.gp}.
+Tomorrow I'm going to my surgery to see the \gls{ex2.gp}.
+\end{result}
+
 \chapter{Symbols}
 \label{sec:symbols}
-
-\chapter{Problematic Areas}
-\label{sec:problems}
-
-There are some places where the use of commands like \gls{gls} can
-cause problems. These are listed below, with workarounds provided.
-
-\section{Headings and Captions}
-\label{sec:headings}
-
-\section{Nesting}
-\label{sec:nested}
 
 \chapter{Displaying the Definition}
 \label{sec:printgloss}
@@ -1235,15 +1527,269 @@ cause problems. These are listed below, with workarounds provided.
 \chapter{Changing the Formatting}
 \label{sec:glsformats}
 
+All commands like \gls{gls} and \gls{glssymbol} by default
+encapsulate the \idx{link-text} within the argument of
+\nosecformatdef{glstextformat}
+For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{xcolor}% provides colour
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newglossaryentry{duck}% label
+{
+   name = {duck},
+   description = {a waterbird with webbed feet}
+}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+\newabbreviation{tug}{TUG}{\TeX\ Users Group}
+
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}
+
+\begin{document}
+A \gls{duck}, a \gls{fleuron} (\glssymbol{fleuron}, 
+\glsentrydesc{fleuron}) and \gls{tug}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}%
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
+A \gls{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron}, 
+\glsentrydesc{ex.fleuron}) and \gls{TUG}.
+\end{result}
+Note that this has affected \gls{gls} and \gls{glssymbol} but not
+\gls{glsentrydesc}.
+
+A distinction can be made between abbreviations
+and non-abbreviations. A regular term is encapsulated with 
+\nosecformatdef{glsxtrregularfont}
+and an abbreviation is encapsulated with 
+\nosecformatdef{glsxtrabbreviationfont}
+For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{xcolor}% provides colour
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newglossaryentry{duck}% label
+{
+   name = {duck},
+   description = {a waterbird with webbed feet}
+}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+\newabbreviation{tug}{TUG}{\TeX\ Users Group}
+\newacronym{ascii}{ASCII}{American Standard Code for 
+Information Interchange}
+
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}
+\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}
+\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}
+
+\begin{document}
+Two \glspl{duck}, a \gls{fleuron} (\glssymbol{fleuron}, 
+\glsentrydesc{fleuron}), \gls{tug} and \gls{ascii}.
+\end{document}
+\end{lstlisting}
+This now produces:
+\begin{result}%
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
+\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}%
+\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}%
+Two \glspl{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron}, 
+\glsentrydesc{ex.fleuron}), \gls{TUG} and \gls{ASCII}.
+\end{result}
+Note the difference between the abbreviation defined with
+\gls{newabbreviation} and the one defined with \gls{newacronym}.
+This document is using the default styles, which is
+\abbrstyle{long-short} for the \code{abbreviation} category
+and \abbrstyle{short-nolong} for the \code{acronym} category.
+The \abbrstyle{short-nolong} style makes the abbreviation behave
+like a regular entry and so it's governed by \gls{glsxtrregularfont}
+not by \gls{glsxtrabbreviationfont}.
+
+The \gls{glstextformat} command is overridden by the
+\catattr{textformat} attribute. The value of this attribute must be
+the name (without the leading backslash) of a command that takes a
+single argument, which will be used instead of \gls{glstextformat}
+for any entry that has this attribute set for its category.
+For example:
+\begin{lstlisting}[morekeywords={textformat}]
+\documentclass{article}
+
+\usepackage{xcolor}% provides colour
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newcommand{\ornamentfmt}[1]{\textcolor{cyan}{#1}}
+
+\glssetcategoryattribute{ornament}{textformat}{ornamentfmt}
+
+\newglossaryentry{duck}% label
+{
+   name = {duck},
+   description = {a waterbird with webbed feet}
+}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+\newabbreviation{tug}{TUG}{\TeX\ Users Group}
+\newacronym{ascii}{ASCII}{American Standard Code for 
+Information Interchange}
+
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}
+\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}
+\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}
+
+\begin{document}
+Two \glspl{duck}, a \gls{fleuron} (\glssymbol{fleuron}, 
+\glsentrydesc{fleuron}), \gls{tug} and \gls{ascii}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
+\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}%
+\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}%
+\newcommand{\ornamentfmt}[1]{\textcolor{cyan}{#1}}%
+\glssetcategoryattribute{ornament}{textformat}{ornamentfmt}%
+Two \glspl{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron}, 
+\glsentrydesc{ex.fleuron}), \gls{TUG} and \gls{ASCII}.
+\end{result}
+So \verb|\gls{fleuron}| and \verb|\glssymbol{fleuron}| are now
+formatted according to the custom command \csfmt{ornamentfmt}
+not by \gls{glstextformat}, but they are still affected by
+\gls{glsxtrregularfont}.
+
+You can override a specific instance with the \glsopt{textformat}
+setting in the first optional argument of commands like \gls{gls}.
+For example, if the above is modified to:
+\begin{lstlisting}[morekeywords={textformat}]
+Two \glspl{duck}, a \gls[textformat=textbf]{fleuron} 
+(\glssymbol{fleuron}, \glsentrydesc{fleuron}), \gls{tug} 
+and \gls{ascii}.
+\end{lstlisting}
+then the result is now:
+\begin{result}
+\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
+\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}%
+\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}%
+\newcommand{\ornamentfmt}[1]{\textcolor{cyan}{#1}}%
+\glssetcategoryattribute{ornament}{textformat}{ornamentfmt}%
+Two \glspl{ex1.duck}, a \gls[textformat=textbf]{ex.fleuron} 
+(\glssymbol{ex.fleuron}, \glsentrydesc{ex.fleuron}), 
+\gls{TUG} and \gls{ASCII}.
+\end{result}
+In this case, only that specific instance is changed.
+
+Take care if the formatting command needs to parse its argument as
+the argument won't be the actual text but consists of intermediary commands
+that determine the required text and any inner formatting, such as
+the formatting applied by abbreviation styles. See
+\sectionref{sec:expandedfmt} for further details.
+
 \section{Post-Link Category Hooks}
 \label{sec:postlinkhooks}
 
 Extra information can be appended after commands such as \gls{gls}
-by defining a \pidxpl{postlinkhook} for the given category. You can
+by defining a \pidx{postlinkhook} for the given category. You can
 obtain the label of the entry that's just been referenced with:
 \nosecformatdef{glslabel}
-\Sectionref{sec:categories} gave a simple example, which is
-reproduced below with some minor modifications:
+The \idx{postlinkhook} is a command in the form
+\nosecformatdef{glsxtrpostlinkcategory}
+where \meta{category} is the category label. This hook is
+implemented after any instances of commands such as \gls{gls} or
+\gls{glssymbol} (but not after commands like \gls{glsentryname},
+\gls{glsentrydesc} or \gls{glsentryname}, which may be used in the
+hook).
+
+Consider the following document:
+\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant}]
+\documentclass{article}
+
+\usepackage{pifont}% provides \ding
+\usepackage{glossaries-extra}
+
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\ding{167}},
+  description = {typographic ornament}
+}
+
+\newglossaryentry{pi}% label
+{
+  name = {pi},
+  symbol = {\ensuremath{\pi}},
+  category = {constant},
+  description = {Archimedes' constant}
+}
+
+% post-link hook for 'constant' category:
+\newcommand{\glsxtrpostlinkconstant}{% 
+ \space (\glsentrysymbol{\glslabel})}
+
+\begin{document}
+A \gls{fleuron} and \gls{pi}.
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+\newcommand{\glsxtrpostlinkconstant}{\space (\glsentrysymbol{\glslabel})}%
+A \gls{ex.fleuron} and \gls{ex.pi}.
+\end{result}
+The \code{fleuron} entry doesn't have the \field{category} key
+explicitly set, so it defaults to \code{general}, but the \code{pi}
+entry has the \field{category} set to \code{constant}, so it's
+affected by the \idx{postlinkhook} for that category, which in this
+case is given by \csfmt{glsxtrpostlinkconstant}. This hook is
+defined to use:
+\nosecformatdef{glsentrysymbol}
+which works like \gls{glsentrydesc}, but in this case it expands to
+the value of the \field{symbol} key. (The entry label is obtained
+from \gls{glslabel}, which is set by \gls{gls} and similar commands.)
+
+\begin{important}
+If \code{\gls{glssymbol}\marg{\gls{glslabel}}} had been used instead of
+\code{\gls{glsentrysymbol}\marg{\gls{glslabel}}} it would've caused infinite
+recursion! Don't use commands like \gls{glssymbol}, \gls{glsdesc} or
+\gls{gls} in \idxpl{postlinkhook}.
+\end{important}
+
+This means that \verb|\gls{pi}| is automatically followed by the
+symbol in parentheses, but \verb|\gls{fleuron}| isn't because it's
+governed by the \code{general} \idx{postlinkhook} instead. Note that
+the above is a simple example to demonstrate one of the uses of the
+\field{category} field.
+
+Here's a minor modification that sets the category for the
+\code{fleuron} entry to \code{ornament} and creates another hook for
+that.
 \begin{lstlisting}[moretexcs={glsxtrpostlinkconstant,glsxtrpostlinkornament}]
 \documentclass{article}
 
@@ -1275,15 +1821,16 @@ reproduced below with some minor modifications:
  \space (\glsentrysymbol{\glslabel})}
 
 \begin{document}
-A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and \gls{pi}.
-Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
+A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and 
+\gls{pi}. Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
 \end{document}
 \end{lstlisting}
 This produces:
 \begin{result}
-A fleuron (typographic ornament) and pi ($\pi$). Another fleuron (typographic
-ornament) and pi ($\pi$). Symbols: \ding{167} (typographic ornament) and
-$\pi$ ($\pi$).
+\newcommand{\glsxtrpostlinkornament}{\space (\glsentrydesc{\glslabel})}%
+\newcommand{\glsxtrpostlinkconstant}{\space (\glsentrysymbol{\glslabel})}%
+A \gls{ex.fleuron} and \gls{ex.pi}. Another \gls{ex.fleuron} and 
+\gls{ex.pi}. Symbols: \glssymbol{ex.fleuron} and \glssymbol{ex.pi}.
 \end{result}
 The \idx{postlinkhook} is repeated after every instance of \gls{gls}
 or \gls{glssymbol} etc. In the case of the \code{ornament} category,
@@ -1316,9 +1863,17 @@ So an alternative definition is:
   \glsxtrpostlinkAddSymbolOnFirstUse
 }
 \end{lstlisting}
+This does nothing if the \field{symbol} field hasn't been set.
+
 Similarly, there's a shortcut command for the description:
 \nosecformatdef{glsxtrpostlinkAddDescOnFirstUse}
-As from \sty{glossaries-extra} v1.31, there's also a shortcut
+Version 1.31+ provides a combination:
+\nosecformatdef{glsxtrpostlinkAddSymbolDescOnFirstUse}
+If the \field{symbol} field is set, this displays the symbol
+followed by a comma and space. The description is always displayed
+at the end of the parenthetical material
+
+Also from \sty{glossaries-extra} v1.31, there's a shortcut
 command that you can use to define the \idx{postlinkhook}:
 \nosecformatdef{glsdefpostlink} 
 This is just a shortcut for:
@@ -1350,7 +1905,7 @@ So the above document can be changed to:
 
 % post-link hook for 'ornament' category:
 \glsdefpostlink{ornament}{% 
-  \glsxtrpostlinkAddDescOnFirstUse
+  \glsxtrpostlinkAddSymbolDescOnFirstUse
 }
 
 % post-link hook for 'constant' category:
@@ -1360,17 +1915,103 @@ So the above document can be changed to:
 
 \begin{document}
 Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
-A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and \gls{pi}.
+A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and 
+\gls{pi}.
 \end{document}
 \end{lstlisting}
 The result is now:
-\begin{result}
-Symbols: \ding{167} and $\pi$. A fleuron (typographic ornament) and
-pi ($\pi$). Another fleuron and pi.
+\begin{result}%
+\glsdefpostlink{ornament}{\glsxtrpostlinkAddSymbolDescOnFirstUse}%
+\glsdefpostlink{constant}{\glsxtrpostlinkAddSymbolOnFirstUse}%
+Symbols: \glssymbol{ex.fleuron} and \glssymbol{ex.pi}.
+A \gls{ex.fleuron} and \gls{ex.pi}. Another \gls{ex.fleuron} and
+\gls{ex.pi}.
 \end{result}
 
 \section{Post-Name and Post-Description Hooks}
 \label{sec:postfieldhooks}
+
+\chapter{Problematic Areas}
+\label{sec:problems}
+
+There are some places where the use of commands like \gls{gls} can
+cause problems. These are listed below, with workarounds provided.
+
+\section{Headings and Captions}
+\label{sec:headings}
+
+\section{Nesting}
+\label{sec:nested}
+
+\section{Formatting Commands that Need Direct Access to the Text}
+\label{sec:expandedfmt}
+
+If you want to redefine any of the formatting commands
+\gls{glstextformat}, \gls{glsxtrregularfont} or
+\gls{glsxtrabbreviationfont}, remember that their argument isn't the
+actual text but consists of intermediary commands
+that determine the required text and any inner formatting, such as
+the formatting applied by abbreviation styles.
+
+With the \glsopt{hyperoutside} setting on, the outermost level
+will be the command to apply the hyperlink with \gls{glstextformat}
+(or the equivalent provided by \catattr{textformat}) 
+inside the hyperlink text. (If hyperlinks aren't enabled the outer
+command simply does the hyperlink text.)
+
+With \glsopt[false]{hyperoutside}, the outermost level will be
+\gls{glstextformat} (or equivalent) with the command that applies
+the hyperlink inside the formatting argument.
+
+The next level down sets up the abbreviation styles for the given
+category (if appropriate). If the entry isn't an abbreviation or is
+an abbreviation classified as regular then
+\gls{glsxtrregularfont} is applied to the command that governs how
+regular entries are formatted. Otherwise \gls{glsxtrabbreviationfont}
+is applied to the command that governs how abbreviations are
+formatted.
+
+Finally, there are tests applied to determine if this is the
+\idx{firstuse}, if the plural is required, if any case-changing is
+required, if the final optional argument has been given, or if a
+command such as \gls{glssymbol} has been used.  These tests
+determine which field to obtain the \idx{link-text} from. With
+abbreviations, any formatting required by the abbreviation style is
+finally performed.
+
+This makes it very difficult to apply a formatting command that
+needs direct access to the actual text that needs to be displayed.
+One possible method is to use:
+\nosecformatdef{GlsXtrExpandedFmt}
+which first (protected) fully expands \meta{text} and then performs
+\meta{cs}\margm{expanded text} where \meta{cs} is a control
+sequence. For example, the \isty{soul} package provides the command
+\gls{ul} to underline text, but it needs to be able to parse its
+argument to work. If I simply try to change the standard
+\gls{underline} to \gls{ul} in the earlier example from
+\sectionref{sec:glsformats}:
+\begin{lstlisting}
+\renewcommand{\glsxtrregularfont}[1]{\ul{#1}}
+\end{lstlisting}
+then this causes the error:
+\begin{verbatim}
+! Package soul Error: Reconstruction failed.
+\end{verbatim}
+Instead I need:
+\begin{lstlisting}
+\renewcommand{\glsxtrregularfont}[1]{\GlsXtrExpandedFmt\ul{#1}}
+\end{lstlisting}
+\emph{and also} \gls{ding} now needs protection:
+\begin{lstlisting}
+\newglossaryentry{fleuron}% label
+{
+  name = {fleuron},
+  symbol = {\protect\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+\end{lstlisting}
+
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}

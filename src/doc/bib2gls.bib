@@ -2921,6 +2921,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{soul,
+  name={\styfmt{soul}},
+  category={package},
+  parent={packages}
+}
+
 @index{tracklang,
   name={\styfmt{tracklang}},
   category={package},
@@ -3174,6 +3180,12 @@ cs}\margm{Glspl-like cs}},
   text={abbreviation style}
 }
 
+@index{long-noshort,
+  name={\abbrstylefmt{long\dhyphen noshort}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
 @index{long-noshort-desc,
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc}},
   category={abbreviationstyle},
@@ -3341,73 +3353,109 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{recordcount,
-  name={\catattrfmt{recordcount}},
+  name={\catattrfmt{record\-count}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{glossname,
-  name={\catattrfmt{glossname}},
+  name={\catattrfmt{gloss\-name}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{glossnamefont,
-  name={\catattrfmt{glossnamefont}},
+  name={\catattrfmt{gloss\-name\-font}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{glossdescfont,
-  name={\catattrfmt{glossdescfont}},
+  name={\catattrfmt{gloss\-desc\-font}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{textformat,
-  name={\catattrfmt{textformat}},
+  name={\catattrfmt{text\-format}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{aposplural,
-  name={\catattrfmt{aposplural}},
+  name={\catattrfmt{apos\-plural}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{noshortplural,
-  name={\catattrfmt{noshortplural}},
+  name={\catattrfmt{no\-short\-plural}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{markwords,
+  name={\catattrfmt{mark\-words}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{markshortwords,
+  name={\catattrfmt{mark\-short\-words}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{targeturl,
-  name={\catattrfmt{targeturl}},
+  name={\catattrfmt{target\-url}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{targetname,
-  name={\catattrfmt{targetname}},
+  name={\catattrfmt{target\-name}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{externallocation,
-  name={\catattrfmt{externallocation}},
+  name={\catattrfmt{external\-location}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{discardperiod,
-  name={\catattrfmt{discardperiod}},
+  name={\catattrfmt{discard\-period}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{pluraldiscardperiod,
+  name={\catattrfmt{plural\-discard\-period}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{retainfirstuseperiod,
+  name={\catattrfmt{retain\-first\-use\-period}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{insertdots,
+  name={\catattrfmt{insert\-dots}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{tagging,
+  name={\catattrfmt{tagging}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
 @index{nohyperfirst,
-  name={\catattrfmt{nohyperfirst}},
+  name={\catattrfmt{no\-hyper\-first}},
   category={categoryattribute},
   parent={categoryattribute}
 }
@@ -5924,8 +5972,19 @@ post-name hook},
    this appends a space and the value of the 
    \gls[noindex]{dual.field.symbol} field in parentheses
    if the entry that was just referenced was used for the
-   first time},
+   first time and has the \field{symbol} field set},
   note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrpostlinkAddSymbolDescOnFirstUse,
+  name={\csfmt{gls\-xtr\-post\-link\-Add\-Symbol\-Desc\-On\-First\-Use}},
+  description={only for use in the post-link hooks, if the 
+   entry that was just referenced was used for the first time,
+   this appends a space and, in parentheses, the value of the 
+   \gls[noindex]{dual.field.symbol} field (if set)
+   followed by the value of the \gls[noindex]{dual.field.description} field},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
 
@@ -7198,6 +7257,35 @@ packages},
   category={command}
 }
 
+@index{glsxtrfull,
+  name={\csfmt{glsxtrfull}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{long} and \field{short}
+fields (using the
+   appropriate abbreviation style) 
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrword,
+  name={\csfmt{glsxtrword}},
+  user1={\margm{text}},
+  description={used to encapsulate each word in the long form of an
+abbreviation by the \catattr{markwords} attribute},
+  note={provided by \styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@index{glsxtrwordsep,
+  name={\csfmt{glsxtrwordsep}},
+  description={used to mark spaces between each word in the long form of an
+abbreviation by the \catattr{markwords} attribute},
+  note={provided by \styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
 @index{glstext,
   name={\csfmt{glstext}},
   user1={\oargm{options}\margm{label}},
@@ -7233,6 +7321,16 @@ packages},
   user1={\oargm{options}\margm{label}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{symbol} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsdesc,
+  name={\csfmt{glsdesc}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{description} field  
    without altering the first use flag},
   note={provided by \styfmt{glossaries}},
   category={command}
@@ -7302,6 +7400,18 @@ packages},
 
 @index{gls.noindex,
   name={\csoptfmt{noindex}},
+  category={commandoption},
+  parent={gls}
+}
+
+@index{gls.textformat,
+  name={\csoptfmt{textformat}},
+  category={commandoption},
+  parent={gls}
+}
+
+@index{gls.hyperoutside,
+  name={\csoptfmt{hyperoutside}},
   category={commandoption},
   parent={gls}
 }
@@ -7523,6 +7633,33 @@ indexing},
   description={used by commands like \cs{gls} to format the 
   \idx{link-text}},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrregularfont,
+  name={\csfmt{gls\-xtr\-reg\-u\-lar\-font}},
+  user1={\margm{text}},
+  description={used by commands like \cs{gls} to format the 
+  \idx{link-text} for regular terms},
+  note={provided by \styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@index{glsxtrabbreviationfont,
+  name={\csfmt{gls\-xtr\-abbre\-vi\-a\-tion\-font}},
+  user1={\margm{text}},
+  description={used by commands like \cs{gls} to format the 
+  \idx{link-text} for (non-regular) abbreviations},
+  note={provided by \styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@index{GlsXtrExpandedFmt,
+  name={\csfmt{Gls\-Xtr\-Expanded\-Fmt}},
+  user1={\margm{cs}\margm{text}},
+  description={Fully expands \meta{text} and then does
+   \meta{cs}\margm{expanded text}},
+  note={provided by \styfmt{glossaries-extra} v1.30+},
   category={command}
 }
 
@@ -7885,13 +8022,43 @@ name} and the displayed \meta{text}},
   category={command}
 }
 
+@index{underline,
+  name={\csfmt{underline}},
+  user1={\margm{text}},
+  description={underlines the given text},
+  note={kernel command},
+  category={command}
+}
+
+@index{ul,
+  name={\csfmt{ul}},
+  user1={\margm{text}},
+  description={underlines the given text},
+  note={provided by \styfmt{soul}},
+  category={command}
+}
+
+@index{ding,
+  name={\csfmt{ding}},
+  user1={\margm{number}},
+  description={displays the symbol associated with the given number},
+  note={provided by \styfmt{pifont}},
+  category={command}
+}
+
+@index{exampleterms,
+  name = {example terms}
+}
+
 @entry{ex1.duck,
+  parent={exampleterms},
   name={duck},
   description={a waterbird with webbed feet},
   identifier={animal}
 }
 
 @entry{ex1.goose,
+  parent={exampleterms},
   name={goose},
   plural={geese},
   description={a large waterbird with a long neck, short legs,
@@ -7900,6 +8067,7 @@ name} and the displayed \meta{text}},
 }
 
 @entry{ex2.duck,
+  parent={exampleterms},
   name={Duck (noun)},
   first={duck (quack, quack)},
   firstplural={ducks (quack, quack)},
@@ -7909,6 +8077,7 @@ name} and the displayed \meta{text}},
 }
 
 @entry{ex2.goose,
+  parent={exampleterms},
   name={Goose (noun, pl.\ geese)},
   first={goose (honk, honk)},
   firstplural={geese (honk, honk)},
@@ -7919,3 +8088,59 @@ name} and the displayed \meta{text}},
   identifier={animal}
 }
 
+@entry{ex.fleuron,
+  parent={exampleterms},
+  name = {fleuron},
+  symbol = {\ding{167}},
+  category = {ornament},
+  description = {typographic ornament}
+}
+
+@entry{ex.pi,
+  parent={exampleterms},
+  name = {pi},
+  symbol = {\ensuremath{\pi}},
+  category = {constant},
+  description = {Archimedes' constant}
+}
+
+@abbreviation{ex.svm,
+  parent={exampleterms},
+  short = {SVM},
+  long = {support vector machine}
+}
+
+@abbreviation{ex.ssl,
+  parent={exampleterms},
+  category = {markwordsexample},
+  short = {SSL},
+  long = {Secure Sockets Layer}
+}
+
+@abbreviation{ex.xml,
+  parent={exampleterms},
+  category = {taggingexample},
+  short = {XML},
+  long = {e\itag{x}tensible \itag{m}arkup \itag{l}anguage}
+}
+
+@abbreviation{ex.dante,
+  parent={exampleterms},
+  category = {discardperiodexample},
+  short = {DANTE e.V.},
+  long = {Deutschsprachige Anwendervereinigung \TeX\ e.V.}
+}
+
+@abbreviation{ex.gp,
+  parent={exampleterms},
+  category = {discardperiodexample},
+  short = {G.P.},
+  long = {General Practitioner}
+}
+
+@abbreviation{ex2.gp,
+  parent={exampleterms},
+  category = {initialism},
+  short = {GP},
+  long = {General Practitioner}
+}
