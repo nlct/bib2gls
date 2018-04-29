@@ -34,10 +34,11 @@
  texcs={newglossaryentry,longnewglossaryentry,newabbreviation,newacronym,
   gls,Gls,glspl,Glspl,glssymbol,glsentrydesc,glsentryname,glsentrysymbol,
   glsnoexpandfields,glsxtrifwasfirstuse,glsxtrpostlinkAddSymbolOnFirstUse,
-  glsxtrpostlinkAddSymbolDescOnFirstUse,glsdefpostlink,
+  glsxtrpostlinkAddSymbolDescOnFirstUse,glsdefpostlink,glsdefpostname,
+  glsdefpostdesc,GlsXtrIfFieldEqXpStr,
   glsxtrpostlinkAddDescOnFirstUse,setabbreviationstyle,
   glssetcategoryattribute,GlsXtrEnableInitialTagging,
-  glsxtrwordsep,glsxtrword,
+  glsxtrwordsep,glsxtrword,glsaddstoragekey,
   glstextformat,glsxtrregularfont,glsxtrabbreviationfont},
  texcsstyle=*{\color{DarkSeaGreen4}}
 }
@@ -199,6 +200,8 @@
 
 \newcommand{\pidx}[1][]{\gls[textformat=primary,#1]}
 \newcommand{\pidxpl}[1][]{\glspl[textformat=primary,#1]}
+\newcommand{\pIdx}[1][]{\Gls[textformat=primary,#1]}
+\newcommand{\pIdxpl}[1][]{\Glspl[textformat=primary,#1]}
 
 \newcommand{\idx}{\gls}
 \newcommand{\idxpl}{\glspl}
@@ -556,7 +559,7 @@ expandable command to reference it.
 There are some helper commands that internally use
 \gls{newglossaryentry}, such as \cs{newabbreviation} (described in
 \sectionref{sec:abbreviations}) and \cs{glsxtrnewsymbol} (described
-in \sectionref{sec:symbols}). If the description contains paragraph
+in \sectionref{sec:symbols}). If the description contains explicit paragraph
 breaks then:
 \nosecformatdef{longnewglossaryentry}
 is required instead.
@@ -721,7 +724,10 @@ instead.
 So on \pidx{firstuse}, \cs{gls} uses the value of the \field{first} key
 and \cs{glspl} uses the value of the \field{firstplural} key. On
 \pidx{subsequentuse}, \cs{gls} uses the value of the \field{text} key and
-\cs{glspl} uses the value of the \field{plural} key.
+\cs{glspl} uses the value of the \field{plural} key. \pIdx{regular}
+abbreviations also follow this usage. \pIdx{non-regular}
+abbreviations follow a different behaviour for \gls{gls} (and its
+variants) that's determined by the abbreviation style.
 
 If the first use for a particular group of terms always has the
 same pattern (such as following the term with a brief description or
@@ -751,11 +757,150 @@ Categories may be assigned \pidxpl{attribute} that can also be used
 to modify formatting or styles. 
 
 Unlike the \idx{postlinkhook}, which
-needs to be defined before an entry is used (with commands like
+needs to be defined before an entry is \emph{used} (with commands like
 \gls{gls}), some \idxpl{attribute} need to be set before the entry
-is defined, so it's best to set them up as soon as possible in the
+is \emph{defined}, so it's best to set them up as soon as possible in the
 preamble (after loading \sty{glossaries-extra}).
 
+\section{Adding Extra Information}
+\label{sec:userkeys}
+
+In addition to the \field{name} and \field{description} keys,
+there's also a \field{symbol} key which allows you to store an
+associated symbol. The value can be obtained with:
+\nosecformatdef{glssymbol}
+(which is robust and recognises the \idx{postlinkhook}) or with:
+\nosecformatdef{glsentrysymbol}
+(which behaves like \gls{glsentrydesc} and \gls{glsentryname}).
+Neither of the above commands affect the \idx{firstuseflag}.
+For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\newglossaryentry{pi}% label
+{% settings:
+   name = {Archimedes' constant},
+   symbol = {\ensuremath{\pi}},
+   description = {ratio of a circle's circumference to its 
+diameter}
+}
+
+\begin{document}
+\gls{pi} (\glssymbol{pi}).
+\end{document}
+\end{lstlisting}
+This produces:
+\begin{result}
+\gls{ex.pi} (\glssymbol{ex.pi}).
+\end{result}
+
+If you have additional information, such as a translation,
+associated image or citation, then you can supply this with the six
+user keys: \field{user1}, \ldots, \field{user6}. The value of the
+first field can be obtained with:
+\nosecformatdef{glsuseri}
+(which behaves like \gls{glssymbol}) or with:
+\nosecformatdef{glsentryuseri}
+(which behaves like \gls{glsentrysymbol}).
+The other fields are similarly obtained using lowercase Roman
+numerals, so the sixth field can be obtained with:
+\nosecformatdef{glsuservi}
+(which behaves like \gls{glssymbol}) or with:
+\nosecformatdef{glsentryuservi}
+(which behaves like \gls{glsentrysymbol}).
+For example:
+\begin{lstlisting}
+\newglossaryentry{polly.parrot}% label
+{%
+   name = {Polly Parrot},
+   description = {Senior assistant at the International 
+Society of Duck and Geese},
+   user1 = {British},% nationality
+   user2 = {1970-12-31},% date of birth
+   user3 = {female},% gender
+   user4 = {43 The Lane, Some Town, Noshire AB1 2XY}% address
+}
+\end{lstlisting}
+Alternatively you can define your own custom keys. If you don't need
+commands equivalent to \gls{glssymbol}, then you can use:
+\nosecformatdef{glsaddstoragekey}
+where \meta{key} is the name of the new key, \meta{default value} is
+the default value if the key isn't explicitly set and \meta{no link
+cs} is the name of the command to access the field value (equivalent
+to \gls{glsentrysymbol}). If you want commands equivalent to
+\gls{glssymbol} that obey the \idx{postlinkhook}, then use
+\nosecformatdef{glsaddkey}
+The first three arguments are as for \gls{glsaddstoragekey}.
+The next argument \meta{no link ucfirst cs} is like \meta{no link
+cs} but converts the first letter to upper case (analogous to
+\gls{Glsentryname}). The final three commands behave like
+\gls{glssymbol}, but \meta{link ucfirst cs} converts the first
+letter to upper case and \meta{link allcaps cs} converts the entire
+value to upper case.
+
+The new keys must be defined before the entries are defined (and
+the key definitions must come before the first \idx{resourceset}
+if you use \bibgls). For example:
+\begin{lstlisting}[morekeywords={nationality,dateofbirth,gender,address}]
+\glsaddstoragekey{nationality}{}{\Nationality}
+\glsaddstoragekey{dateofbirth}{}{\DateOfBirth}
+\glsaddstoragekey{gender}{}{\Gender}
+\glsaddstoragekey{address}{}{\Address}
+\newglossaryentry{polly.parrot}% label
+{%
+   name = {Polly Parrot},
+   description = {Senior assistant at the International 
+Society of Duck and Geese},
+   nationality = {British},% nationality
+   dateofbirth = {1970-12-31},% date of birth
+   gender = {female},% gender
+   address = {43 The Lane, Some Town, Noshire AB1 2XY}% address
+}
+\end{lstlisting}
+
+The earlier \code{duck} and \code{goose} examples from 
+\sectionref{sec:firstuse} can be rewritten to move the parenthetical
+material into separate keys:
+\begin{lstlisting}
+\newglossaryentry{duck}% label
+{% information about this term:
+  name   = {duck},
+  user1  = {noun},
+  user2  = {quack, quack},
+  description = {a waterbird with webbed feet}
+}
+
+\newglossaryentry{goose}% label
+{% information about this term:
+  name   = {goose},
+  plural = {geese},
+  user1  = {noun},
+  user2  = {honk, honk},
+  description={a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill}
+}
+\end{lstlisting}
+The \idx{postlinkhook} and glossary style can then be modified to 
+include the additional information (see \sectionref{sec:glsformats}
+for further details). For example:
+\begin{lstlisting}
+\glsdefpostlink{general}{%
+ \glsxtrifwasfirstuse{\space(\glsentryuserii{\glslabel})}{}%
+}
+
+\glssetcategoryattribute{general}{glossname}{firstuc}
+
+\glsdefpostname{general}{%
+ \space
+ (\glsentryuseri{\glscurrententrylabel}%
+  \GlsXtrIfFieldEqXpStr{plural}{\glscurrententrylabel}%
+  {\glsentrytext{\glscurrententrylabel}s}{}%
+  {, pl.\ \glsentryplural{\glscurrententrylabel}}%
+ )%
+}
+\end{lstlisting}
 
 \section{Spaces}
 \label{sec:spaces}
@@ -1119,8 +1264,10 @@ with commands to help adjust the formatting. See the
 \ctanfile{glossaries-extra/samples}{sample-abbr-styles.pdf}
 demonstrating all the predefined styles.
 
-There are also some category attributes that govern abbreviations (see later).
-These should be also set before the abbreviation is defined.
+The style determines whether the abbreviation is treated as a
+\idx{regular} term.  There are also some category attributes that govern
+abbreviations (see later).  These should be also set before the
+abbreviation is defined.
 
 Some of the styles set the \field{description} field (typically to
 the \meta{long} form). The styles that end with \code{-desc} don't,
@@ -1570,8 +1717,10 @@ A \gls{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron},
 Note that this has affected \gls{gls} and \gls{glssymbol} but not
 \gls{glsentrydesc}.
 
-A distinction can be made between abbreviations
-and non-abbreviations. A regular term is encapsulated with 
+A distinction can be made between abbreviations (\idx{non-regular}
+terms) and \idx{regular} terms (non-abbreviations or abbreviations
+that are considered \idx{regular} entries). 
+A \idx{regular} term is encapsulated with 
 \nosecformatdef{glsxtrregularfont}
 and an abbreviation is encapsulated with 
 \nosecformatdef{glsxtrabbreviationfont}
@@ -1624,7 +1773,7 @@ This document is using the default styles, which is
 \abbrstyle{long-short} for the \code{abbreviation} category
 and \abbrstyle{short-nolong} for the \code{acronym} category.
 The \abbrstyle{short-nolong} style makes the abbreviation behave
-like a regular entry and so it's governed by \gls{glsxtrregularfont}
+like a \idx{regular} entry and so it's governed by \gls{glsxtrregularfont}
 not by \gls{glsxtrabbreviationfont}.
 
 The \gls{glstextformat} command is overridden by the
@@ -1744,7 +1893,7 @@ Consider the following document:
 
 \newglossaryentry{pi}% label
 {
-  name = {pi},
+  name = {Archimedes' constant},
   symbol = {\ensuremath{\pi}},
   category = {constant},
   description = {Archimedes' constant}

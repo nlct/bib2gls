@@ -5558,6 +5558,8 @@ field.},
 @index{robust}
 @index{fragile}
 @index{expandable}
+@index{regular}
+@index{non-regular}
 
 @index{unicodecategories,
   name={Unicode categories},
@@ -5955,6 +5957,60 @@ post-name hook},
   category={command}
 }
 
+@index{glsentryuseri,
+  name={\csfmt{gls\-entry\-useri}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.user1} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryuserii,
+  name={\csfmt{gls\-entry\-userii}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.user2} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryuseriii,
+  name={\csfmt{gls\-entry\-useriii}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.user3} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryuseriv,
+  name={\csfmt{gls\-entry\-useriv}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.user4} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryuserv,
+  name={\csfmt{gls\-entry\-userv}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.user5} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryuservi,
+  name={\csfmt{gls\-entry\-uservi}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \gls[noindex]{dual.field.user6} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{glsxtrpostlinkAddDescOnFirstUse,
   name={\csfmt{gls\-xtr\-post\-link\-Add\-Desc\-On\-First\-Use}},
   description={only for use in the post-link hooks,
@@ -6109,6 +6165,24 @@ label of the current entry},
   description={tests if the given field isn't defined for the given
    entry, which may also not exist},
   note={provided by \styfmt{glossaries-extra} v1.23+},
+  category={command}
+}
+
+@index{GlsXtrIfFieldEqStr,
+  name={\csfmt{Gls\-Xtr\-If\-Field\-Eq\-Str}},
+  user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
+  description={tests if the given field value is the same as
+   \meta{text} for the given entry, which may not exist},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{GlsXtrIfFieldEqXpStr,
+  name={\csfmt{Gls\-Xtr\-If\-Field\-Eq\-Xp\-Str}},
+  user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
+  description={like \cs{GlsXtrIfFieldEqStr} but first (protected)
+fully expands \meta{text}},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
 
@@ -7336,6 +7410,66 @@ abbreviation by the \catattr{markwords} attribute},
   category={command}
 }
 
+@index{glsuseri,
+  name={\csfmt{glsuseri}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{user1} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsuserii,
+  name={\csfmt{glsuserii}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{user2} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsuseriii,
+  name={\csfmt{glsuseriii}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{user3} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsuseriv,
+  name={\csfmt{glsuseriv}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{user4} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsuserv,
+  name={\csfmt{glsuserv}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{user5} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsuservi,
+  name={\csfmt{glsuservi}},
+  user1={\oargm{options}\margm{label}},
+  description={links to the entry's location in the glossary with
+   the link text obtained from the \field{user6} field  
+   without altering the first use flag},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @dualindexentry{rgls,
   name={\csfmt{rgls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
@@ -8098,10 +8232,10 @@ name} and the displayed \meta{text}},
 
 @entry{ex.pi,
   parent={exampleterms},
-  name = {pi},
+  name = {Archimedes' constant},
   symbol = {\ensuremath{\pi}},
   category = {constant},
-  description = {Archimedes' constant}
+  description = {ratio of a circle's circumference to its diameter}
 }
 
 @abbreviation{ex.svm,
