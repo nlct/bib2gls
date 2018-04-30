@@ -282,7 +282,7 @@
 @dualindexentry{bibglsseesep,
   name={\csfmt{bib\-gls\-see\-sep}},
   user1={},
-  description={separator between \gls[noindex]{dual.field.see} 
+  description={separator between \field{see} 
    cross-references and location list},
   category={command}
 }
@@ -290,14 +290,14 @@
 @dualindexentry{bibglsaliassep,
   name={\csfmt{bib\-gls\-alias\-sep}},
   user1={},
-  description={separator between \gls[noindex]{dual.field.alias} 
+  description={separator between \field{alias} 
    cross-reference and location list},
   category={command}
 }
 @dualindexentry{bibglsseealsosep,
   name={\csfmt{bib\-gls\-see\-also\-sep}},
   user1={},
-  description={separator between \gls[noindex]{dual.field.seealso} 
+  description={separator between \field{seealso} 
    cross-references and location list},
   category={command}
 }
@@ -847,7 +847,7 @@ name},
   name={\csfmt{new\-term}},
   user1={\oargm{\keyvallist}\margm{label}},
   description={defines a new glossary entry where the
-   \gls[noindex]{dual.field.description} field defaults to empty},
+   \field{description} field defaults to empty},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -864,7 +864,7 @@ name},
   name={\csfmt{new\-acronym}},
   user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}},
   description={defines a new abbreviation with the 
-    \gls[noindex]{dual.field.category} set to \code{acronym}},
+    \field{category} set to \code{acronym}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -2321,7 +2321,7 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{gls\-no\-idx\-display\-loc}},
   user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}},
   description={handler used to display the number list stored in 
-   the \gls[noindex]{dual.field.loclist} field},
+   the \field{loclist} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -3349,7 +3349,7 @@ cs}\margm{Glspl-like cs}},
 @index{attribute,
   name = {attributes},
   text = {attribute},
-  seealso = {category attributes}
+  alias = {categoryattribute}
 }
 
 @index{recordcount,
@@ -4404,7 +4404,7 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{field.duallong,
   name={\fieldfmt{duallong}},
   description={The long form of a dual
-    abbreviation mapped by \gls{dual.entry.dualabbreviation}.},
+    abbreviation mapped by \atentry{dualabbreviation}.},
   note={provided by \appfmt{bib2gls}},
   category={bib2glsfield},
   parent={fields}
@@ -4413,7 +4413,7 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{field.duallongplural,
   name={\fieldfmt{duallongplural}},
   description={The plural long form of a dual
-    abbreviation mapped by \gls{dual.entry.dualabbreviation}.},
+    abbreviation mapped by \atentry{dualabbreviation}.},
   note={provided by \appfmt{bib2gls}},
   category={bib2glsfield},
   parent={fields}
@@ -4422,7 +4422,7 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{field.dualshort,
   name={\fieldfmt{dualshort}},
   description={The short form of a dual
-    abbreviation mapped by \gls{dual.entry.dualabbreviation}.},
+    abbreviation mapped by \atentry{dualabbreviation}.},
   note={provided by \appfmt{bib2gls}},
   category={bib2glsfield},
   parent={fields}
@@ -4431,7 +4431,7 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{field.dualshortplural,
   name={\fieldfmt{dualshortplural}},
   description={The plural short form of a dual abbreviation
-    mapped by \gls{dual.entry.dualabbreviation}.},
+    mapped by \atentry{dualabbreviation}.},
   note={provided by \appfmt{bib2gls}},
   category={bib2glsfield},
   parent={fields}
@@ -4439,7 +4439,7 @@ cs}\margm{Glspl-like cs}},
 
 @dualindexentry{field.prefix,
   name={\fieldfmt{prefix}},
-  description={The prefix associated with the \gls[noindex]{dual.field.text}
+  description={The prefix associated with the \field{text}
     field.},
   note={provided by \styfmt{glossaries-prefix}},
   category={prefixfield},
@@ -4448,7 +4448,7 @@ cs}\margm{Glspl-like cs}},
 
 @dualindexentry{field.prefixfirst,
   name={\fieldfmt{prefixfirst}},
-  description={The prefix associated with the \gls[noindex]{dual.field.first}
+  description={The prefix associated with the \field{first}
 field.},
   note={provided by \styfmt{glossaries-prefix}},
   category={prefixfield},
@@ -4458,7 +4458,7 @@ field.},
 @dualindexentry{field.prefixfirstplural,
   name={\fieldfmt{prefixfirstplural}},
   description={The prefix associated with the
-    \gls[noindex]{dual.field.firstplural} field.},
+    \field{firstplural} field.},
   note={provided by \styfmt{glossaries-prefix}},
   category={prefixfield},
   parent={fields}
@@ -4467,7 +4467,7 @@ field.},
 @dualindexentry{field.prefixplural,
   name={\fieldfmt{prefixplural}},
   description={The prefix associated with the
-    \gls[noindex]{dual.field.plural} field.},
+    \field{plural} field.},
   note={provided by \styfmt{glossaries-prefix}},
   category={prefixfield},
   parent={fields}
@@ -4475,7 +4475,7 @@ field.},
 
 @dualindexentry{field.access,
   name={\fieldfmt{access}},
-  description={The replacement text for the \gls[noindex]{dual.field.name} field.},
+  description={The replacement text for the \field{name} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4484,7 +4484,7 @@ field.},
 @dualindexentry{field.descriptionaccess,
   name={\fieldfmt{descriptionaccess}},
   description={The replacement text for the
-    \gls[noindex]{dual.field.description} field.},
+    \field{description} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4493,7 +4493,7 @@ field.},
 @dualindexentry{field.descriptionpluralaccess,
   name={\fieldfmt{descriptionpluralaccess}},
   description={The replacement text for the
-    \gls[noindex]{dual.field.descriptionplural} field.},
+    \field{descriptionplural} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4501,7 +4501,7 @@ field.},
 
 @dualindexentry{field.firstaccess,
   name={\fieldfmt{firstaccess}},
-  description={The replacement text for the \gls[noindex]{dual.field.first} field.},
+  description={The replacement text for the \field{first} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4510,7 +4510,7 @@ field.},
 @dualindexentry{field.firstpluralaccess,
   name={\fieldfmt{firstpluralaccess}},
   description={The replacement text for the
-   \gls[noindex]{dual.field.firstplural} field.},
+   \field{firstplural} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4518,7 +4518,7 @@ field.},
 
 @dualindexentry{field.longaccess,
   name={\fieldfmt{longaccess}},
-  description={The replacement text for the \gls[noindex]{dual.field.long} field.},
+  description={The replacement text for the \field{long} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4527,7 +4527,7 @@ field.},
 @dualindexentry{field.longpluralaccess,
   name={\fieldfmt{longpluralaccess}},
   description={The replacement text for the
-    \gls[noindex]{dual.field.longplural} field.},
+    \field{longplural} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4535,7 +4535,7 @@ field.},
 
 @dualindexentry{field.pluralaccess,
   name={\fieldfmt{pluralaccess}},
-  description={The replacement text for the \gls[noindex]{dual.field.plural} field.},
+  description={The replacement text for the \field{plural} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4543,7 +4543,7 @@ field.},
 
 @dualindexentry{field.shortaccess,
   name={\fieldfmt{shortaccess}},
-  description={The replacement text for the \gls[noindex]{dual.field.short} field.},
+  description={The replacement text for the \field{short} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4552,7 +4552,7 @@ field.},
 @dualindexentry{field.shortpluralaccess,
   name={\fieldfmt{shortpluralaccess}},
   description={The replacement text for the
-   \gls[noindex]{dual.field.shortplural} field.},
+   \field{shortplural} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4560,7 +4560,7 @@ field.},
 
 @dualindexentry{field.symbolaccess,
   name={\fieldfmt{symbolaccess}},
-  description={The replacement text for the \gls[noindex]{dual.field.symbol} field.},
+  description={The replacement text for the \field{symbol} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4569,7 +4569,7 @@ field.},
 @dualindexentry{field.symbolpluralaccess,
   name={\fieldfmt{symbolpluralaccess}},
   description={The replacement text for the
-    \gls[noindex]{dual.field.symbolplural} field.},
+    \field{symbolplural} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4578,7 +4578,7 @@ field.},
 @dualindexentry{field.textaccess,
   name={\fieldfmt{textaccess}},
   description={The replacement text for the
-     \gls[noindex]{dual.field.text} field.},
+     \field{text} field.},
   note={provided by \styfmt{glossaries-accsupp}},
   category={accessfield},
   parent={fields}
@@ -4775,7 +4775,7 @@ field.},
 
 @dualindexentry{field.desc,
   name={\fieldfmt{desc}},
-  description={Corresponds to \gls[noindex]{dual.field.description} key.},
+  description={Corresponds to \field{description} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4783,7 +4783,7 @@ field.},
 
 @dualindexentry{field.descplural,
   name={\fieldfmt{descplural}},
-  description={Corresponds to \gls[noindex]{dual.field.descriptionplural} key.},
+  description={Corresponds to \field{descriptionplural} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4791,7 +4791,7 @@ field.},
 
 @dualindexentry{field.firstpl,
   name={\fieldfmt{firstpl}},
-  description={Corresponds to \gls[noindex]{dual.field.firstplural} key.},
+  description={Corresponds to \field{firstplural} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4824,7 +4824,7 @@ field.},
 
 @dualindexentry{field.longpl,
   name={\fieldfmt{longpl}},
-  description={Corresponds to \gls[noindex]{dual.field.longplural} key.},
+  description={Corresponds to \field{longplural} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4876,7 +4876,7 @@ field.},
 
 @dualindexentry{field.shortpl,
   name={\fieldfmt{shortpl}},
-  description={Corresponds to \gls[noindex]{dual.field.shortplural} key.},
+  description={Corresponds to \field{shortplural} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4884,7 +4884,7 @@ field.},
 
 @dualindexentry{field.sortvalue,
   name={\fieldfmt{sortvalue}},
-  description={Original \gls[noindex]{dual.field.sort} value 
+  description={Original \field{sort} value 
    (before sanitizing and escaping special characters).},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
@@ -4902,7 +4902,7 @@ field.},
 
 @dualindexentry{field.useri,
   name={\fieldfmt{useri}},
-  description={Corresponds to \gls[noindex]{dual.field.user1} key.},
+  description={Corresponds to \field{user1} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4910,7 +4910,7 @@ field.},
 
 @dualindexentry{field.userii,
   name={\fieldfmt{userii}},
-  description={Corresponds to \gls[noindex]{dual.field.user2} key.},
+  description={Corresponds to \field{user2} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4918,7 +4918,7 @@ field.},
 
 @dualindexentry{field.useriii,
   name={\fieldfmt{useriii}},
-  description={Corresponds to \gls[noindex]{dual.field.user3} key.},
+  description={Corresponds to \field{user3} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4926,7 +4926,7 @@ field.},
 
 @dualindexentry{field.useriv,
   name={\fieldfmt{useriv}},
-  description={Corresponds to \gls[noindex]{dual.field.user4} key.},
+  description={Corresponds to \field{user4} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4934,7 +4934,7 @@ field.},
 
 @dualindexentry{field.userv,
   name={\fieldfmt{userv}},
-  description={Corresponds to \gls[noindex]{dual.field.user5} key.},
+  description={Corresponds to \field{user5} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -4942,7 +4942,7 @@ field.},
 
 @dualindexentry{field.uservi,
   name={\fieldfmt{uservi}},
-  description={Corresponds to \gls[noindex]{dual.field.user6} key.},
+  description={Corresponds to \field{user6} key.},
   note={internal field set by \styfmt{glossaries}},
   category={baseinternalfield},
   parent={internalfields}
@@ -5560,6 +5560,7 @@ field.},
 @index{expandable}
 @index{regular}
 @index{non-regular}
+@index{variant}
 
 @index{unicodecategories,
   name={Unicode categories},
@@ -5915,7 +5916,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-text}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.text} field},
+    \field{text} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5924,7 +5925,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-name}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.name} field},
+    \field{name} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5933,7 +5934,7 @@ post-name hook},
   name={\csfmt{Gls\-entry\-name}},
   user1={\margm{label}},
   description={displays the value of the
-    \gls[noindex]{dual.field.name} field with the first character
+    \field{name} field with the first character
      converted to upper case},
   note={provided by \styfmt{glossaries}},
   category={command}
@@ -5943,7 +5944,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-desc}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.description} field},
+    \field{description} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5952,7 +5953,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-symbol}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.symbol} field},
+    \field{symbol} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5961,7 +5962,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-useri}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.user1} field},
+    \field{user1} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5970,7 +5971,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-userii}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.user2} field},
+    \field{user2} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5979,7 +5980,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-useriii}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.user3} field},
+    \field{user3} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5988,7 +5989,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-useriv}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.user4} field},
+    \field{user4} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -5997,7 +5998,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-userv}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.user5} field},
+    \field{user5} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6006,7 +6007,7 @@ post-name hook},
   name={\csfmt{gls\-entry\-uservi}},
   user1={\margm{label}},
   description={expands to the value of the
-    \gls[noindex]{dual.field.user6} field},
+    \field{user6} field},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6015,7 +6016,7 @@ post-name hook},
   name={\csfmt{gls\-xtr\-post\-link\-Add\-Desc\-On\-First\-Use}},
   description={only for use in the post-link hooks,
    this appends a space and the value of the 
-   \gls[noindex]{dual.field.description} field in parentheses
+   \field{description} field in parentheses
    if the entry that was just referenced was used for the
    first time},
   note={provided by \styfmt{glossaries-extra}},
@@ -6026,7 +6027,7 @@ post-name hook},
   name={\csfmt{gls\-xtr\-post\-link\-Add\-Symbol\-On\-First\-Use}},
   description={only for use in the post-link hooks,
    this appends a space and the value of the 
-   \gls[noindex]{dual.field.symbol} field in parentheses
+   \field{symbol} field in parentheses
    if the entry that was just referenced was used for the
    first time and has the \field{symbol} field set},
   note={provided by \styfmt{glossaries-extra}},
@@ -6038,8 +6039,8 @@ post-name hook},
   description={only for use in the post-link hooks, if the 
    entry that was just referenced was used for the first time,
    this appends a space and, in parentheses, the value of the 
-   \gls[noindex]{dual.field.symbol} field (if set)
-   followed by the value of the \gls[noindex]{dual.field.description} field},
+   \field{symbol} field (if set)
+   followed by the value of the \field{description} field},
   note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -6100,7 +6101,7 @@ post-name hook},
 @index{glslabel,
   name={\csfmt{glslabel}},
   user1={},
-  description={only for use in the post-link hooks this
+  description={only for use in the post-link hooks, this
   expands to the label of the entry that was last referenced},
   note={provided by \styfmt{glossaries}},
   category={command}
@@ -6112,6 +6113,16 @@ post-name hook},
   description={only for use in the glossary, such as in the style or
 in the post-name or post-description hooks, this expands to the
 label of the current entry},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glscurrentfieldvalue,
+  name={\csfmt{gls\-current\-field\-value}},
+  user1={},
+  description={only for use in the \meta{true} part of
+\cs{ifglshasfield} or \cs{glsxtrifhasfield}, this expands to the
+field value},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6181,7 +6192,16 @@ label of the current entry},
   name={\csfmt{Gls\-Xtr\-If\-Field\-Eq\-Xp\-Str}},
   user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
   description={like \cs{GlsXtrIfFieldEqStr} but first (protected)
-fully expands \meta{text}},
+fully expands \meta{text} (but not the field value)},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{GlsXtrIfXpFieldEqXpStr,
+  name={\csfmt{Gls\-Xtr\-If\-Xp\-Field\-Eq\-Xp\-Str}},
+  user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
+  description={like \cs{GlsXtrIfFieldEqStr} but first (protected)
+fully expands both the field value and \meta{text}},
   note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -6329,7 +6349,7 @@ fully expands \meta{text}},
 @index{acronymtype,
   name={\csfmt{acronym\-type}},
   user1={},
-  description={expands to the default glossary type when using
+  description={expands to the default acronym glossary type when using
    \cs{newacronym}},
   note={provided by \styfmt{glossaries}},
   category={command}
@@ -7036,7 +7056,7 @@ option},
   name={\csfmt{gls\-xtr\-use\-see}},
   user1={\margm{label}},
   description={applies \cs{glsseeformat} to the entry's
-   \gls[noindex]{dual.field.see} field if not empty},
+   \field{see} field if not empty},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7045,7 +7065,7 @@ option},
   name={\csfmt{gls\-xtr\-use\-seealso}},
   user1={\margm{label}},
   description={applies \cs{glsseeformat} to the entry's
-   \gls[noindex]{dual.field.seealso} field if not empty},
+   \field{seealso} field if not empty},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7233,7 +7253,7 @@ packages},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
-   \gls[noindex]{dual.field.category} set to \code{abbreviation}},
+   \field{category} set to \code{abbreviation}},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7243,7 +7263,7 @@ packages},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
-   \gls[noindex]{dual.field.category} set to \code{symbol}},
+   \field{category} set to \code{symbol}},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7253,7 +7273,7 @@ packages},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
-   \gls[noindex]{dual.field.category} set to \code{general}},
+   \field{category} set to \code{general}},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7263,7 +7283,7 @@ packages},
   user1={},
   description={hook used after the description is displayed in the
    glossary for entries that have the
-   \gls[noindex]{dual.field.category} set to \meta{category}},
+   \field{category} set to \meta{category}},
   note={common category hooks such as 
    \cs{glsxtrpostdescgeneral} are provided by
 \styfmt{glossaries-extra}, custom categories need the hook defined},
@@ -7275,7 +7295,7 @@ packages},
   user1={},
   description={hook used after the name is displayed in the
    glossary for entries that have the
-   \gls[noindex]{dual.field.category} set to \meta{category}},
+   \field{category} set to \meta{category}},
   note={user needs to define hook for use with
    \styfmt{glossaries-extra}},
   category={command}
@@ -7286,7 +7306,7 @@ packages},
   user1={},
   description={hook used after commands like \cs{gls} 
    for entries that have the
-   \gls[noindex]{dual.field.category} set to \meta{category}},
+   \field{category} set to \meta{category}},
   note={user needs to define hook for use with
    \styfmt{glossaries-extra}},
   category={command}
@@ -7362,7 +7382,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glstext,
   name={\csfmt{glstext}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{text} field  
    without altering the first use flag},
@@ -7372,7 +7392,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsname,
   name={\csfmt{glsname}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{name} field  
    without altering the first use flag},
@@ -7382,7 +7402,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsfirst,
   name={\csfmt{glsfirst}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{first} field  
    without altering the first use flag},
@@ -7392,7 +7412,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glssymbol,
   name={\csfmt{glssymbol}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{symbol} field  
    without altering the first use flag},
@@ -7402,7 +7422,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsdesc,
   name={\csfmt{glsdesc}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{description} field  
    without altering the first use flag},
@@ -7412,7 +7432,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsuseri,
   name={\csfmt{glsuseri}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{user1} field  
    without altering the first use flag},
@@ -7422,7 +7442,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsuserii,
   name={\csfmt{glsuserii}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{user2} field  
    without altering the first use flag},
@@ -7432,7 +7452,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsuseriii,
   name={\csfmt{glsuseriii}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{user3} field  
    without altering the first use flag},
@@ -7442,7 +7462,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsuseriv,
   name={\csfmt{glsuseriv}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{user4} field  
    without altering the first use flag},
@@ -7452,7 +7472,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsuserv,
   name={\csfmt{glsuserv}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{user5} field  
    without altering the first use flag},
@@ -7462,7 +7482,7 @@ abbreviation by the \catattr{markwords} attribute},
 
 @index{glsuservi,
   name={\csfmt{glsuservi}},
-  user1={\oargm{options}\margm{label}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
   description={links to the entry's location in the glossary with
    the link text obtained from the \field{user6} field  
    without altering the first use flag},
@@ -7510,10 +7530,10 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{gls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={on first use displays the first use text
-   (the value of the \gls[noindex]{dual.field.first} field
+   (the value of the \field{first} field
     for general entries) and on subsequent use displays
     the subsequent use text (the value of the 
-    \gls[noindex]{dual.field.text} field
+    \field{text} field
     for general entries) where the text is optionally hyperlinked
     to the relevant place in the glossary},
   note={provided by \styfmt{glossaries}},
@@ -7571,6 +7591,22 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{Glspl}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{Gls} but shows the plural form},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{GLS,
+  name={\csfmt{GLS}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={as \cs{gls} but converts the link text to upper case},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{GLSpl,
+  name={\csfmt{GLSpl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={as \cs{GLS} but shows the plural form},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -8236,6 +8272,13 @@ name} and the displayed \meta{text}},
   symbol = {\ensuremath{\pi}},
   category = {constant},
   description = {ratio of a circle's circumference to its diameter}
+}
+
+@entry{ex.thetai,
+  parent = {exampleterms},
+  name = {theta parameter},
+  symbol = {\ensuremath{\theta_i}},
+  description = {one of the model parameters}
 }
 
 @abbreviation{ex.svm,

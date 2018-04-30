@@ -1,5 +1,5 @@
 % arara: xelatex
-% arara: bib2gls
+% arara: bib2gls: {group: on}
 % arara: bibtex
 % arara: xelatex
 % arara: xelatex if found ("log", "Rerun")
@@ -21,26 +21,29 @@
 
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,nostyles,stylemods={bookindex},style=index]{glossaries-extra}
 
-\glsdisablehyper
+\definecolor{field}{named}{DarkSlateGray4}
+\definecolor{cs}{named}{DarkSeaGreen4}
+\definecolor{sty}{named}{DarkOrchid4}
+\definecolor{entry}{named}{SteelBlue4}
 
 \lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
  frame=lines,rulecolor={\color{lightgray}},
  commentstyle={\color{gray}},
  keywords={name,text,firstplural,first,plural,description,symbol,category,%
   shortplural,longplural},
- keywordstyle={\color{DarkSlateGray4}},
+ keywordstyle={\color{field}},
  texcs={newglossaryentry,longnewglossaryentry,newabbreviation,newacronym,
   gls,Gls,glspl,Glspl,glssymbol,glsentrydesc,glsentryname,glsentrysymbol,
   glsnoexpandfields,glsxtrifwasfirstuse,glsxtrpostlinkAddSymbolOnFirstUse,
   glsxtrpostlinkAddSymbolDescOnFirstUse,glsdefpostlink,glsdefpostname,
-  glsdefpostdesc,GlsXtrIfFieldEqXpStr,
+  glsdefpostdesc,GlsXtrIfFieldEqStr,GlsXtrIfFieldEqXpStr,GlsXtrIfFieldXpEqXpStr,
   glsxtrpostlinkAddDescOnFirstUse,setabbreviationstyle,
   glssetcategoryattribute,GlsXtrEnableInitialTagging,
   glsxtrwordsep,glsxtrword,glsaddstoragekey,
   glstextformat,glsxtrregularfont,glsxtrabbreviationfont},
- texcsstyle=*{\color{DarkSeaGreen4}}
+ texcsstyle=*{\color{cs}}
 }
 
 \newcommand{\dhyphen}{%
@@ -67,11 +70,14 @@
 \glssetcategoryattribute{initialism}{retainfirstuseperiod}{true}
 \setabbreviationstyle[initialism]{short-long}
 
+\newcommand{\bibglspassim}{}
+\newcommand{\bibglsseealsosep}{\par\hangindent .75em\parindent .75em\relax}
 
 \GlsXtrLoadResources[
  src={bib2gls},
- save-locations=false,
- entry-type-aliases={dualindexentry=entry}
+ max-loc-diff=3,
+ entry-type-aliases={dualindexentry=entry},
+ field-aliases={note=user2}
 ]
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
@@ -105,9 +111,7 @@
 
 \newenvironment{result}%
 {%
- \glslocalreseteach{TUG,ASCII,SIunit,CLDR,ex1.duck,ex1.goose,%
-  ex2.duck,ex2.goose,ex.fleuron,ex.pi,ex.svm,ex.dante,ex.ssl,ex.xml,ex.gp,%
-  ex2.gp}%
+ \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{hyper=false,local}}%
  \begin{quotation}%
  \marginpar
   [\raisebox{-2.5ex}{\ding{43}}]%
@@ -142,9 +146,11 @@
   \let\-\empty
 }
 
+\newcommand*{\csfmtfont}[1]{\texttt{#1}}
+
 \newcommand*{\csfmt}[1]{%
  \texorpdfstring
- {\texttt{\char`\\ #1}}%
+ {\csfmtfont{\char`\\ #1}}%
  {\string\\#1}%
 }
 
@@ -152,10 +158,10 @@
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\envfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
-\newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{DarkSeaGreen4}{\optfmt{#1}}}{#1}}
-\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{DarkOrchid4}{\optfmt{#1}}}{#1}}
-\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{DarkSlateGray4}#1}}{#1}}
-\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{SteelBlue4}#1}}{#1}}
+\newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{cs}{\optfmt{#1}}}{#1}}
+\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{sty}{\optfmt{#1}}}{#1}}
+\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{field}#1}}{#1}}
+\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{entry}#1}}{#1}}
 \newcommand*{\atentryfmt}[1]{\entryfmt{@#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
@@ -197,11 +203,12 @@
 \makeatother
 
 \newcommand{\primary}{\emph}
+\newcommand{\primaryloc}{\hyperbf}
 
-\newcommand{\pidx}[1][]{\gls[textformat=primary,#1]}
-\newcommand{\pidxpl}[1][]{\glspl[textformat=primary,#1]}
-\newcommand{\pIdx}[1][]{\Gls[textformat=primary,#1]}
-\newcommand{\pIdxpl}[1][]{\Glspl[textformat=primary,#1]}
+\newcommand{\pidx}[1][]{\gls[textformat=primary,format=primaryloc,#1]}
+\newcommand{\pidxpl}[1][]{\glspl[textformat=primary,format=primaryloc,#1]}
+\newcommand{\pIdx}[1][]{\Gls[textformat=primary,format=primaryloc,#1]}
+\newcommand{\pIdxpl}[1][]{\Glspl[textformat=primary,format=primaryloc,#1]}
 
 \newcommand{\idx}{\gls}
 \newcommand{\idxpl}{\glspl}
@@ -256,7 +263,7 @@
 
 \newcommand{\nosecformatdef}[1]{%
   \begin{definition}
-   \glsadd{#1}\glsxtrglossentry{#1}%
+   \gls[format=primaryloc]{#1}%
    \glsentryuseri{#1}%
   \end{definition}\ignorespaces
 }
@@ -415,6 +422,8 @@ and extends it, providing extra options or modifying the base
 commands to increase flexibility. If you want to use \bibgls, you
 must load \sty{glossaries-extra}, which provides the interface
 required by \bibgls.
+This document doesn't cover the other indexing methods described in
+the base package.
 \end{abstract}
 
 \clearpage
@@ -504,15 +513,26 @@ associated with the given label).
 
 The main command used to reference a term is:
 \nosecformatdef{gls}
-In the above example, it just displays the singular form, but you
+In the above example, \gls{gls} just displays the singular form, but you
 can provide alternative text to use the first time a term is
 referenced (see \sectionref{sec:firstuse}). The plural form is obtained with
+the \pidx{variant} command:
 \nosecformatdef{glspl}
+There are other \idxpl{variant} of \gls{gls} that perform
+case-changing.
 If you want to start a sentence with an entry then you can use:
 \nosecformatdef{Gls}
 for the singular form and
 \nosecformatdef{Glspl}
-for the plural form.
+for the plural form. For all capitals, use:
+\nosecformatdef{GLS}
+for the singular form and
+\nosecformatdef{GLSpl}
+for the plural form. Any mention of \gls{gls} and its
+\idxpl{variant} in this guide or in the user manuals means that the
+comments applied to \gls{gls} also apply to the plural and
+case-changing versions.
+
 The \meta{insert} optional argument is provided to insert additional material.
 For example:
 \begin{lstlisting}
@@ -777,33 +797,53 @@ For example:
 \begin{lstlisting}
 \documentclass{article}
 
+\usepackage[hidelinks]{hyperref}
 \usepackage{glossaries}
 
 \newglossaryentry{pi}% label
 {% settings:
-   name = {Archimedes' constant},
+   name   = {Archimedes' constant},
    symbol = {\ensuremath{\pi}},
    description = {ratio of a circle's circumference to its 
 diameter}
 }
 
+\newglossaryentry{thetai}%label
+{% settings:
+   name   = {theta parameter},
+   symbol = {\ensuremath{\theta_i}},
+   description = {one of the model parameters}
+}
+
 \begin{document}
-\gls{pi} (\glssymbol{pi}).
+\gls{pi} (\glssymbol{pi}). Compare $\glssymbol{thetai}^2$
+with $\glssymbol{thetai}[^2]$.
 \end{document}
 \end{lstlisting}
 This produces:
 \begin{result}
-\gls{ex.pi} (\glssymbol{ex.pi}).
+\gls{ex.pi} (\glssymbol{ex.pi}). Compare $\glssymbol{ex.thetai}^2$
+with $\glssymbol{ex.thetai}[^2]$.
 \end{result}
+Note that in this case there is now a difference between using the
+final optional \meta{insert} argument and simply appending the extra
+material. This is a result of the hyperlink that causes an
+interruption between the subscript \verb|_i| and the following
+superscript \verb|^2|. (In this case, there's no target for the
+hyperlinks. That's covered in \sectionref{sec:printgloss}.)
 
 If you have additional information, such as a translation,
 associated image or citation, then you can supply this with the six
-user keys: \field{user1}, \ldots, \field{user6}. The value of the
+user keys:
+\field{user1}\glsaddeach{field.user2,field.user3,field.user4,field.user5}, 
+\ldots, \field{user6}. The value of the
 first field can be obtained with:
 \nosecformatdef{glsuseri}
 (which behaves like \gls{glssymbol}) or with:
 \nosecformatdef{glsentryuseri}
 (which behaves like \gls{glsentrysymbol}).
+\glsaddeach{glsuserii,glsuseriii,glsuseriv,glsuserv,%
+glsentryuserii,glsentryuseriii,glsentryuseriv,glsentryuserv}%
 The other fields are similarly obtained using lowercase Roman
 numerals, so the sixth field can be obtained with:
 \nosecformatdef{glsuservi}
@@ -811,18 +851,20 @@ numerals, so the sixth field can be obtained with:
 \nosecformatdef{glsentryuservi}
 (which behaves like \gls{glsentrysymbol}).
 For example:
-\begin{lstlisting}
+\begin{lstlisting}[escapechar=|,morekeywords={user}]
 \newglossaryentry{polly.parrot}% label
 {%
    name = {Polly Parrot},
    description = {Senior assistant at the International 
 Society of Duck and Geese},
-   user1 = {British},% nationality
-   user2 = {1970-12-31},% date of birth
-   user3 = {female},% gender
-   user4 = {43 The Lane, Some Town, Noshire AB1 2XY}% address
+   user|\fieldfmt{1}| = {British},% nationality
+   user|\fieldfmt{2}| = {1970-12-31},% date of birth
+   user|\fieldfmt{3}| = {female},% gender
+   user|\fieldfmt{4}| = {43 The Lane, Some Town, Noshire AB1 2XY},% address
+   user|\fieldfmt{5}| = {polly.parrot@example.com}% email
 }
 \end{lstlisting}
+
 Alternatively you can define your own custom keys. If you don't need
 commands equivalent to \gls{glssymbol}, then you can use:
 \nosecformatdef{glsaddstoragekey}
@@ -830,7 +872,8 @@ where \meta{key} is the name of the new key, \meta{default value} is
 the default value if the key isn't explicitly set and \meta{no link
 cs} is the name of the command to access the field value (equivalent
 to \gls{glsentrysymbol}). If you want commands equivalent to
-\gls{glssymbol} that obey the \idx{postlinkhook}, then use
+\gls{glssymbol} that have the \meta{options} and \meta{insert}
+optional arguments and obey the \idx{postlinkhook}, then use
 \nosecformatdef{glsaddkey}
 The first three arguments are as for \gls{glsaddstoragekey}.
 The next argument \meta{no link ucfirst cs} is like \meta{no link
@@ -843,11 +886,12 @@ value to upper case.
 The new keys must be defined before the entries are defined (and
 the key definitions must come before the first \idx{resourceset}
 if you use \bibgls). For example:
-\begin{lstlisting}[morekeywords={nationality,dateofbirth,gender,address}]
+\begin{lstlisting}[morekeywords={nationality,dateofbirth,gender,address,email}]
 \glsaddstoragekey{nationality}{}{\Nationality}
 \glsaddstoragekey{dateofbirth}{}{\DateOfBirth}
 \glsaddstoragekey{gender}{}{\Gender}
 \glsaddstoragekey{address}{}{\Address}
+\glsaddstoragekey{email}{}{\Email}
 \newglossaryentry{polly.parrot}% label
 {%
    name = {Polly Parrot},
@@ -855,20 +899,54 @@ if you use \bibgls). For example:
 Society of Duck and Geese},
    nationality = {British},% nationality
    dateofbirth = {1970-12-31},% date of birth
-   gender = {female},% gender
-   address = {43 The Lane, Some Town, Noshire AB1 2XY}% address
+   gender  = {female},% gender
+   address = {43 The Lane, Some Town, Noshire AB1 2XY},% address
+   email   = {polly.parrot@example.com}% email
 }
 \end{lstlisting}
+
+In addition to the commands like \gls{glssymbol} and
+\gls{glsentrysymbol}, there are other ways of accessing the field
+value or checking if the field has been set. In the commands listed
+below, the field label is the \emph{internal} label. In some cases,
+this is the same as the key, but there are a few that have a
+different internal label. See Table~\ref*{tab:internalfields} in the
+\bibgls\ user manual or Table~4.1 in the \sty{glossaries} user
+manual. Custom fields provided with \gls{glsaddkey} or \gls{glsaddstoragekey}
+have matching key and internal field labels.
+
+The base \sty{glossaries} package provides:
+\nosecformatdef{ifglshasfield}
+which tests if the given entry (identified by \meta{entry label}, 
+which must be defined) has the field identified by \meta{field label}
+set to a non-empty value. Within \meta{true}, you can access the
+field value with:
+\nosecformatdef{glscurrentfieldvalue}
+The \sty{glossaries-extra} package provides a similar command:
+\nosecformatdef{glsxtrifhasfield}
+which doesn't test if the entry exists. The unstarred form adds
+implicit grouping around \meta{true} or \meta{false} (allowing
+nested use). The starred form \gls{glsxtrifhasfield*} doesn't. 
+You can compare the field value with a string using:
+\nosecformatdef{GlsXtrIfFieldEqStr}
+If you need the string to be (protected) fully expanded before
+comparison, you need:
+\nosecformatdef{GlsXtrIfFieldEqXpStr}
+If you additionally need the field value (protected) fully expanded
+before comparison, use:
+\nosecformatdef{GlsXtrIfXpFieldEqXpStr}
+For a complete list of field commands, see the
+\sty{glossaries-extra} user manual.
 
 The earlier \code{duck} and \code{goose} examples from 
 \sectionref{sec:firstuse} can be rewritten to move the parenthetical
 material into separate keys:
-\begin{lstlisting}
+\begin{lstlisting}[escapechar=|,morekeywords={user}]
 \newglossaryentry{duck}% label
 {% information about this term:
   name   = {duck},
-  user1  = {noun},
-  user2  = {quack, quack},
+  user|\fieldfmt{1}|  = {noun},
+  user|\fieldfmt{2}|  = {quack, quack},
   description = {a waterbird with webbed feet}
 }
 
@@ -876,15 +954,14 @@ material into separate keys:
 {% information about this term:
   name   = {goose},
   plural = {geese},
-  user1  = {noun},
-  user2  = {honk, honk},
+  user|\fieldfmt{1}|  = {noun},
+  user|\fieldfmt{2}|  = {honk, honk},
   description={a large waterbird with a long neck, short legs,
    webbed feet and a short broad bill}
 }
 \end{lstlisting}
 The \idx{postlinkhook} and glossary style can then be modified to 
-include the additional information (see \sectionref{sec:glsformats}
-for further details). For example:
+include the additional information.  For example:
 \begin{lstlisting}
 \glsdefpostlink{general}{%
  \glsxtrifwasfirstuse{\space(\glsentryuserii{\glslabel})}{}%
@@ -895,12 +972,21 @@ for further details). For example:
 \glsdefpostname{general}{%
  \space
  (\glsentryuseri{\glscurrententrylabel}%
-  \GlsXtrIfFieldEqXpStr{plural}{\glscurrententrylabel}%
+  \GlsXtrIfXpFieldEqXpStr{plural}{\glscurrententrylabel}%
   {\glsentrytext{\glscurrententrylabel}s}{}%
   {, pl.\ \glsentryplural{\glscurrententrylabel}}%
  )%
 }
 \end{lstlisting}
+The \idx{postlinkhook} appends the value of the \field{user2} field
+after the \idx{firstuse} of \gls{gls} (or its variants).
+The \catattr{glossname} attribute converts the first letter of the
+\field{name} field to upper case when it's displayed in the
+glossary.  The \idx{postnamehook} appends (in parentheses) the value
+of the \field{user1} field and then checks if the plural form is the
+same as the singular form with \qt{s} appended, and only displays
+the plural if they are different. See \sectionref{sec:glsformats}
+and \sectionref{sec:printgloss} for further details.
 
 \section{Spaces}
 \label{sec:spaces}
@@ -982,6 +1068,100 @@ Spaces in labels are significant. For example, in \verb|\gls{ duck }|
 the spaces are considered part of the label. If the entry was
 actually defined without spaces in the label then the entry
 referenced in \verb|\gls{ duck }| won't be found.
+
+\section{Undefined References}
+\label{sec:undefaction}
+
+If an entry that hasn't been defined is referenced with \gls{gls},
+by default an error is triggered. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage{glossaries}
+
+\begin{document}
+A \gls{duck}.
+\end{document}
+\end{lstlisting}
+This produces the error:
+\begin{verbatim}
+Glossary entry `duck' has not been defined.
+\end{verbatim}
+If you instruct \LaTeX\ to ignore the error and continue, the result
+is
+\begin{result}
+A .
+\end{result}
+The \sty{glossaries-extra} package provides the option
+\styopt[warn]{undefaction}, which will convert the error to a
+warning. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage[undefaction=warn]{glossaries-extra}
+
+\begin{document}
+A \gls{duck}.
+\end{document}
+\end{lstlisting}
+This now produces the warning:
+\begin{verbatim}
+Glossary entry `duck' has not been defined on input line 6
+\end{verbatim}
+(There are also other warnings about an empty \code{main} glossary.)
+The result is now:
+\begin{result}
+A ??.
+\end{result}
+Notice the difference between using \gls{ifglshasfield}:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage[undefaction=warn]{glossaries-extra}
+
+\begin{document}
+A \gls{duck} 
+(\ifglshasfield{useri}{duck}{\glscurrentfieldvalue}{not set}).
+\end{document}
+\end{lstlisting}
+which produces:
+\begin{result}
+A ?? (??).
+\end{result}
+(and has two undefined warnings) and using \gls{glsxtrifhasfield}:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage[undefaction=warn]{glossaries-extra}
+
+\begin{document}
+A \gls{duck}
+(\glsxtrifhasfield{useri}{duck}{\glscurrentfieldvalue}{not set}).
+\end{document}
+\end{lstlisting}
+which only has one undefined warning and produces:
+\begin{result}
+A ?? (not set).
+\end{result}
+
+When you incorporate \bibgls\ into the build process (see
+\sectionref{sec:bib2gls}), the first \LaTeX\ run doesn't have any 
+entries defined. One of the actions that the \styopt{record} option 
+automatically performs is to switch on \styopt[warn]{undefaction}, which avoids
+undefined errors on the first \LaTeX\ run. For example:
+\begin{lstlisting}
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\begin{document}
+A \gls{duck}
+(\glsxtrifhasfield{useri}{duck}{\glscurrentfieldvalue}{not set}).
+\end{document}
+\end{lstlisting}
+This produces the same result as the previous example, but there's
+only the one warning (about an undefined reference) and no warning
+about the empty \code{main} glossary.
 
 \section{Robust, Fragile and Expandable Commands}
 \label{sec:robust}
@@ -1265,7 +1445,7 @@ with commands to help adjust the formatting. See the
 demonstrating all the predefined styles.
 
 The style determines whether the abbreviation is treated as a
-\idx{regular} term.  There are also some category attributes that govern
+\idx{regular} term.  There are also some \idxpl{categoryattribute} that govern
 abbreviations (see later).  These should be also set before the
 abbreviation is defined.
 
@@ -2161,7 +2341,42 @@ Instead I need:
 }
 \end{lstlisting}
 
+\chapter{Incorporating \bibgls}
+\label{sec:bib2gls}
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}
+
+\printunsrtglossary*
+ [style=treegroup,title={Command Summary},nonumberlist]
+{%
+ \renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+   \glsifcategory{#1}{command}{}{\printunsrtglossaryskipentry}%
+ }%
+ \glssetcategoryattribute{command}{glossdesc}{firstuc}%
+ \renewcommand*{\csfmtfont}[1]{\texttt{\color{cs}#1}}%
+ \renewcommand{\glstreenamefmt}{\texttt}%
+ \renewcommand{\glstreegroupheaderfmt}{\textbf}%
+ \renewcommand{\glstreesubitem}{\glspar\parindent=2em\hangindent2em}%
+ \renewcommand{\glstreepredesc}{\glsadd{\glscurrententrylabel}%
+   \nopagebreak\glstreesubitem}%
+ \glsdefpostname{command}{\glsentryuseri{\glscurrententrylabel}}%
+ \glsdefpostdesc{command}{.\nopagebreak\glstreesubitem
+  \Glsentryuserii{\glscurrententrylabel}.%
+  \glspar\medskip}%
+}
+
+\let\orgtarget\glstarget
+\renewcommand*{\glstarget}[2]{%
+ \glsifcategory{#1}{command}{#2}{\orgtarget{#1}{#2}}%
+}
+\renewcommand{\glstreeitem}{\par\parindent0pt}
+\renewcommand*{\glsxtrbookindexprelocation}[1]{%
+  \glsxtrifhasfield{location}{#1}%
+  {\enspace
+   \textcolor{lightgray}{\nolinebreak\cleaders\hbox to .5em{\hss.\hss}\hfill}%
+   \enspace}%
+  {}%
+}
+\printunsrtglossary[style=bookindex,title=Index]
 \end{document}
