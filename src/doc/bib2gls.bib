@@ -820,8 +820,19 @@ name},
 @dualindexentry{longnewglossaryentry,
   name={\csfmt{long\-new\-glossary\-entry}},
   user1={\margm{label}\margm{\keyvallist}\margm{description}},
-  description={defines a new glossary entry},
+  description={defines a new glossary entry and appends
+   \csfmt{leavemode}\csfmt{unskip}\gls{nopostdesc} at the end of
+\meta{description}},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{longnewglossaryentry*,
+  name={\csfmt{long\-new\-glossary\-entry*}},
+  user1={\margm{label}\margm{\keyvallist}\margm{description}},
+  description={defines a new glossary entry without appending any
+extra code to the end of \meta{description}},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
 
@@ -3224,6 +3235,13 @@ cs}\margm{Glspl-like cs}},
 
 @index{long-short-user-desc,
   name={\abbrstylefmt{long\dhyphen short\dhyphen user\dhyphen desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-hyphen-short-hyphen,
+  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen short\dhyphen
+hyphen}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -5921,6 +5939,15 @@ post-name hook},
   category={command}
 }
 
+@index{glsentryplural,
+  name={\csfmt{gls\-entry\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{plural} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{glsentryname,
   name={\csfmt{gls\-entry\-name}},
   user1={\margm{label}},
@@ -6012,6 +6039,15 @@ post-name hook},
   category={command}
 }
 
+@index{glssetcategoryattribute,
+  name={\csfmt{gls\-set\-cat\-e\-gory\-at\-tribute}},
+  user1={\margm{category}\margm{attribute}\margm{value}},
+  description={sets the value of the attribute for the given
+category},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @index{glsxtrpostlinkAddDescOnFirstUse,
   name={\csfmt{gls\-xtr\-post\-link\-Add\-Desc\-On\-First\-Use}},
   description={only for use in the post-link hooks,
@@ -6085,6 +6121,22 @@ post-name hook},
   name={\csfmt{gls\-def\-post\-link}},
   user1={\margm{category}\margm{definition}},
   description={define the post-link hook for the given category},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{glsdefpostname,
+  name={\csfmt{gls\-def\-post\-name}},
+  user1={\margm{category}\margm{definition}},
+  description={define the post-name hook for the given category},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{glsdefpostdesc,
+  name={\csfmt{gls\-def\-post\-desc}},
+  user1={\margm{category}\margm{definition}},
+  description={define the post-description hook for the given category},
   note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -6211,6 +6263,17 @@ fully expands both the field value and \meta{text}},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    given field set to a non-empty value},
+  note={provided by \styfmt{glossaries}},
+  seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@index{ifglshassymbol,
+  name={\csfmt{if\-gls\-has\-symbol}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{symbol} field set to value that's not empty and not
+     \csfmt{relax}},
   note={provided by \styfmt{glossaries}},
   seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -6733,7 +6796,10 @@ by \gls{makeindex} or \gls{xindy}},
 @index{ensuremath,
   name={\csfmt{ensuremath}},
   user1={\margm{maths}},
-  description={ensures the argument is in math mode},
+  description={ensures the argument is in math mode. As a general
+rule this should only be used if you know for certain that
+the argument just contains mathematical markup and doesn't cause a
+change in mode},
   note={kernel command},
   category={command}
 }
@@ -7984,6 +8050,14 @@ has three or more items},
   name={\csfmt{u}},
   user1={\margm{character}},
   description={puts a breve accent over \meta{character}},
+  note={kernel command},
+  category={command}
+}
+
+@index{acute,
+  name={\csfmt{'}},
+  user1={\margm{character}},
+  description={puts an acute accent over \meta{character}},
   note={kernel command},
   category={command}
 }

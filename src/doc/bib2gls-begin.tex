@@ -17,7 +17,6 @@
 \usepackage{pifont}
 \usepackage{graphicx}
 \usepackage{datetime2}
-\usepackage{listings}
 
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
@@ -25,26 +24,11 @@
 
 \definecolor{field}{named}{DarkSlateGray4}
 \definecolor{cs}{named}{DarkSeaGreen4}
-\definecolor{sty}{named}{DarkOrchid4}
+\definecolor{styopt}{named}{DarkOrchid4}
 \definecolor{entry}{named}{SteelBlue4}
-
-\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily},
- frame=lines,rulecolor={\color{lightgray}},
- commentstyle={\color{gray}},
- keywords={name,text,firstplural,first,plural,description,symbol,category,%
-  shortplural,longplural},
- keywordstyle={\color{field}},
- texcs={newglossaryentry,longnewglossaryentry,newabbreviation,newacronym,
-  gls,Gls,glspl,Glspl,glssymbol,glsentrydesc,glsentryname,glsentrysymbol,
-  glsnoexpandfields,glsxtrifwasfirstuse,glsxtrpostlinkAddSymbolOnFirstUse,
-  glsxtrpostlinkAddSymbolDescOnFirstUse,glsdefpostlink,glsdefpostname,
-  glsdefpostdesc,GlsXtrIfFieldEqStr,GlsXtrIfFieldEqXpStr,GlsXtrIfFieldXpEqXpStr,
-  glsxtrpostlinkAddDescOnFirstUse,setabbreviationstyle,
-  glssetcategoryattribute,GlsXtrEnableInitialTagging,
-  glsxtrwordsep,glsxtrword,glsaddstoragekey,
-  glstextformat,glsxtrregularfont,glsxtrabbreviationfont},
- texcsstyle=*{\color{cs}}
-}
+\definecolor{comment}{named}{gray}
+\definecolor{attribute}{named}{Purple4}
+\definecolor{style}{named}{Blue4}
 
 \newcommand{\dhyphen}{%
  \texorpdfstring
@@ -159,13 +143,13 @@
 \newcommand*{\envfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{cs}{\optfmt{#1}}}{#1}}
-\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{sty}{\optfmt{#1}}}{#1}}
+\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{styopt}{\optfmt{#1}}}{#1}}
 \newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{field}#1}}{#1}}
 \newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{entry}#1}}{#1}}
 \newcommand*{\atentryfmt}[1]{\entryfmt{@#1}}
-\newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{\color{style}#1}}{#1}}
 \newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
-\newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
+\newcommand*{\catattrfmt}[1]{\texorpdfstring{\textsf{\color{attribute}#1}}{#1}}
 \newcommand*{\counterfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\filefmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\metafilefmt}[3]{%
@@ -198,8 +182,18 @@
 \makeatletter
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
 \newenvironment{codeenv}
- {\begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces}
- {\end{flushleft}\ignorespacesafterend}
+ {%
+ \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+   \def\cmd{\char`\\}%
+   \def\comment##1{\textcolor{comment}{\%\ ##1}}%
+   \renewcommand*{\catattrfmt}[1]{\textcolor{attribute}{##1}}%
+   \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
+   \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
+    \begin{flushleft}\textcolor{lightgray}{\hrulefill}\par\nopagebreak
+     \medskip\nopagebreak
+     \ttfamily\obeylines\frenchspacing\@vobeyspaces}
+ {\nopagebreak\textcolor{lightgray}{\hrulefill}%
+  \end{flushleft}\ignorespacesafterend}
 \makeatother
 
 \newcommand{\primary}{\emph}
@@ -445,31 +439,31 @@ of the term, but more about that later.) Each entry (term,
 notation or abbreviation) is defined using:
 \nosecformatdef{newglossaryentry}
 Here's a simple example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{duck}% label
-{% information about this term:
-  name={duck},% display name
-  description={a waterbird with webbed feet}% description
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{\comment{ information about this term:}
+  \field{name}=\marg{duck},\comment{ display name}
+  \field{description}=\marg{a waterbird with webbed feet}\comment{description}
 }
-
-\newglossaryentry{goose}% label
-{% information about this term:
-  name={goose},% display name
-  plural={geese},% plural form
-  description={a large waterbird with a long neck, short legs,
+\strut
+\gls{newglossaryentry}\marg{goose}\comment{ label}
+\marg{\comment{information about this term:}
+  \field{name}=\marg{goose},\comment{display name}
+  \field{plural}=\marg{geese},\comment{plural form}
+  \field{description}=\marg{a large waterbird with a long neck, short legs,
    webbed feet and a short broad bill}
 }
-
-\begin{document}
-The pond contained a \gls{duck} (\glsentrydesc{duck}) and 
-a \gls{goose} (\glsentrydesc{goose}). \Glspl{duck} and
-\glspl{goose} are fowl.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+The pond contained a \gls{gls}\marg{duck} (\gls{glsentrydesc}\marg{duck}) and 
+a \gls{gls}\marg{goose} (\gls{glsentrydesc}\marg{goose}). \gls{Glspl}\marg{duck} and 
+\gls{glspl}\marg{goose} are fowl.
+\cmd{end}\marg{document}
+\end{codeenv}
 The resulting text is:
 \begin{result}
 The pond contained a \gls{ex1.duck} (\glsentrydesc{ex1.duck}) and 
@@ -535,38 +529,38 @@ case-changing versions.
 
 The \meta{insert} optional argument is provided to insert additional material.
 For example:
-\begin{lstlisting}
-The \gls{goose} liked the \gls{duck}['s] hat.
-\end{lstlisting}
+\begin{codeenv}
+The \gls{gls}\marg{goose} liked the \gls{gls}\marg{duck}['s] hat.
+\end{codeenv}
 which produces (assuming the above definitions):
 \begin{result}
 The \gls{ex1.goose} liked the \gls{ex1.duck}['s] hat.
 \end{result}
 In some cases, there may not be a noticeable difference between the
 above and the following:
-\begin{lstlisting}
-The \gls{goose} liked the \gls{duck}'s hat.
-\end{lstlisting}
+\begin{codeenv}
+The \gls{gls}\marg{goose} liked the \gls{gls}\marg{duck}'s hat.
+\end{codeenv}
 It depends on other settings, such as whether or not hyperlinks have
 been enabled. (The inserted material is commonly moved inside the
 hyperlink.) Take care if you need a literal open square bracket
 following \code{\cs{gls}\margm{label}} as you need to prevent it from being
 interpreted as the optional \meta{insert} argument. For example:
-\begin{lstlisting}
-The \gls{goose} liked the \gls{duck}{['s]} hat.
-\end{lstlisting}
+\begin{codeenv}
+The \gls{gls}\marg{goose} liked the \gls{gls}\marg{duck}\marg{['s]} hat.
+\end{codeenv}
 which now produces:
 \begin{result}
 The \gls{ex1.goose} liked the \gls{ex1.duck}{['s]} hat.
 \end{result}
 An alternative in this case could be to define:
-\begin{lstlisting}
-\newcommand*{\missing}[1]{[#1]}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{newcommand}*\marg{\cmd{missing}}[1]\marg{[\gls*{param}1]}
+\end{codeenv}
 and then use:
-\begin{lstlisting}
-The \gls{goose} liked the \gls{duck}\missing{'s} hat.
-\end{lstlisting}
+\begin{codeenv}
+The \gls{gls}\marg{goose} liked the \gls{gls}\marg{duck}\cmd{missing}\marg{'s} hat.
+\end{codeenv}
 This conveniently hides the open square bracket from \cs{gls}.
 
 \begin{important}
@@ -587,91 +581,90 @@ is required instead.
 \section{Labels}
 \label{sec:labels}
 
-The label used to identify the entry can't contain any special
-characters, such as \gls{commentchar} (percent), \gls{ampchar}
-(ampersand), \gls{param} (hash) or \gls{nbspchar} (tilde). Be
-careful of packages that make other characters active (such as
-\isty{babel} with its shortcuts). If you are using \isty{inputenc},
-this also includes extended Latin characters and characters from
-other scripts. If you want to include UTF-8 characters in the label
-then you must use a \TeX\ engine with native Unicode support (that
-is, \XeLaTeX\ or \LuaLaTeX).
+The label used to identify the entry can't contain any special characters, such
+as \gls{commentchar} (percent), \gls{ampchar} (ampersand), \gls{param} (hash),
+\gls{mshiftchar} (dollar), or \gls{nbspchar} (tilde).  Be careful of packages
+that make other characters active (such as \isty{babel} with its shortcuts). If
+you are using \isty{inputenc}, this also includes extended Latin characters and
+characters from other scripts. If you want to include UTF-8 characters in the
+label then you must use a \TeX\ engine with native Unicode support (that is,
+\XeLaTeX\ or \LuaLaTeX).
 
 For example, with no UTF-8 support (not even \sty{inputenc}):
-\begin{lstlisting}
-\newglossaryentry{elite}% label (no UTF-8 support)
-{
-  name = {{\'e}lite},
-  description = {group of people regarded as
+\begin{codeenv}
+\gls{newglossaryentry}\marg{elite}\comment{label (no UTF-8 support)}
+\marg{
+  \field{name} = \marg{\marg{\gls{acute}e}lite},
+  \field{description} = \marg{group of people regarded as
   the best of a particular society or organisation}
 }
-\end{lstlisting}
+\end{codeenv}
 or with \sty{inputenc}:
-\begin{lstlisting}
-\newglossaryentry{elite}% label (UTF-8 not natively supported)
-{
-  name = {élite},
-  description = {group of people regarded as
+\begin{codeenv}
+\gls{newglossaryentry}\marg{elite}\comment{label (UTF-8 not natively supported)}
+\marg{
+  \field{name} = \marg{élite},
+  \field{description} = \marg{group of people regarded as
   the best of a particular society or organisation}
 }
-\end{lstlisting}
+\end{codeenv}
 Whereas with \XeLaTeX\ or \LuaLaTeX\ you can do:
-\begin{lstlisting}
-\newglossaryentry{élite}% label (UTF-8 natively supported)
-{
-  name = {élite},
-  description = {group of people regarded as
+\begin{codeenv}
+\gls{newglossaryentry}\marg{élite}\comment{label (UTF-8 natively supported)}
+\marg{
+  \field{name} = \marg{élite},
+  \field{description} = \marg{group of people regarded as
   the best of a particular society or organisation}
 }
-\end{lstlisting}
+\end{codeenv}
 
 You may have noticed the grouping of the initial (accented) letter
-in the \gls{ASCII} example (\verb|{\'e}lite|). This is necessary to
-ensure that the first-letter case-changing commands, such as
-\ics{Gls}, work. It also used to be required around the
+in the \gls{ASCII} example (\code{\marg{\gls{acute}e}lite}). This is
+necessary to ensure that the first-letter case-changing commands,
+such as \ics{Gls}, work. It also used to be required around the
 \qtt{é} with \sty{inputenc}, but if you have up-to-date versions of
 \sty{glossaries} and \sty{datatool} then it should no longer be
-necessary. No special treatment is needed with \XeLaTeX\ or \LuaLaTeX\
-where \qtt{é} is a single token.
+necessary. No special treatment is needed with \XeLaTeX\ or
+\LuaLaTeX\ where \qtt{é} is a single token.
 
 If you can't use extended characters in the label (because you're
 not using \XeLaTeX\ or \LuaLaTeX), then simply stripping the accents
 to create an \gls{ASCII} alternative may be sufficient, but take
 care if this may cause a conflict. For example:
-\begin{lstlisting}
-\newglossaryentry{resume}% label
-{
-  name = {resume},
-  description = {continue after an interruption}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{resume}\comment{label}
+\marg{
+  \field{name} = \marg{resume},
+  \field{description} = \marg{continue after an interruption}
 }
-
-\newglossaryentry{resumee}% label
-{
-  name = {r\'esum\'e},
-  description = {summary of something or curriculum vitae}
+\strut
+\gls{newglossaryentry}\marg{resumee}\comment{label}
+\marg{
+  \field{name} = \marg{r\gls{acute}esum\gls{acute}e},
+  \field{description} = \marg{summary of something or curriculum vitae}
 }
-\end{lstlisting}
+\end{codeenv}
 For languages that use a non-Latin script, if you can't or don't
 want to use \XeLaTeX\ or \LuaLaTeX, then you need to decide the most
 appropriate \gls{ASCII} naming scheme.
 For example:
-\begin{lstlisting}[escapechar=|]
-\newglossaryentry{goose}% using translation for label
-{
-  name = {|\textcyrillicmono{гусь}|},
-  plural = {|\textcyrillicmono{гуси}|},
-  description = {...}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{goose}\comment{using translation for label}
+\marg{
+  \field{name} = \marg{\textcyrillicmono{гусь}},
+  \field{plural} = \marg{\textcyrillicmono{гуси}},
+  \field{description} = \marg{\textnormal{\ldots}}
 }
-\end{lstlisting}
+\end{codeenv}
 or
-\begin{lstlisting}[escapechar=|]
-\newglossaryentry{hus}% using closest ASCII match for label
-{
-  name = {|\textcyrillicmono{гусь}|},
-  plural = {|\textcyrillicmono{гуси}|},
-  description = {...}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{hus}\comment{using closest ASCII match for label}
+\marg{
+  \field{name} = \marg{\textcyrillicmono{гусь}},
+  \field{plural} = \marg{\textcyrillicmono{гуси}},
+  \field{description} = \marg{\textnormal{\ldots}}
 }
-\end{lstlisting}
+\end{codeenv}
 
 In addition to labels identifying entries, there are also labels
 that identify other things, such as a glossary, category or letter
@@ -687,38 +680,38 @@ to indicate that the entry has been used. Commands like
 \gls{glsentrydesc} don't. Here's a modification of the earlier
 example document that provides different versions depending on 
 whether or not the entry has already been referenced:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{duck}% label
-{% information about this term:
-  name   = {Duck (noun)},% display name
-  first  = {duck (quack, quack)},% first use singular
-  firstplural = {ducks (quack, quack)},% first use plural
-  text   = {duck},% subsequent use singular
-  description = {a waterbird with webbed feet}% description
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{\comment{information about this term:}
+  \field{name}   = \marg{Duck (noun)},\comment{display name}
+  \field{first}  = \marg{duck (quack, quack)},\comment{first use singular}
+  \field{firstplural} = \marg{ducks (quack, quack)},\comment{first use plural}
+  \field{text}   = \marg{duck},\comment{subsequent use singular}
+  \field{description} = \marg{a waterbird with webbed feet}\comment{description}
 }
-
-\newglossaryentry{goose}% label
-{% information about this term:
-  name   = {Goose (noun, pl.\ geese)},% display name
-  first  = {goose (honk, honk)},% first use singular
-  firstplural = {geese (honk, honk)},% first use plural
-  text   = {goose},% subsequent use singular 
-  plural = {geese},% subsequent use plural 
-  description={a large waterbird with a long neck, short legs,
+\strut
+\gls{newglossaryentry}\marg{goose}\comment{label}
+\marg{\comment{information about this term:}
+  \field{name}   = \marg{Goose (noun, pl.\ geese)},\comment{display name}
+  \field{first}  = \marg{goose (honk, honk)},\comment{first use singular}
+  \field{firstplural} = \marg{geese (honk, honk)},\comment{first use plural}
+  \field{text}   = \marg{goose},\comment{subsequent use singular}
+  \field{plural} = \marg{geese},\comment{subsequent use plural}
+  \field{description}=\marg{a large waterbird with a long neck, short legs,
    webbed feet and a short broad bill}
 }
-
-\begin{document}
-The pond contained a \gls{duck}\footnote{\glsentryname{duck}:
-\glsentrydesc{duck}} and two 
-\glspl{goose}\footnote{\glsentryname{goose}: 
-\glsentrydesc{goose}}. \Glspl{duck} and \glspl{goose} are fowl.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+The pond contained a \gls{gls}\marg{duck}\cmd{footnote}\marg{\gls{glsentryname}\marg{duck}:
+\gls{glsentrydesc}\marg{duck}} and two 
+\gls{glspl}\marg{goose}\cmd{footnote}\marg{\gls{glsentryname}\marg{goose}: 
+\gls{glsentrydesc}\marg{goose}}. \gls{Glspl}\marg{duck} and \gls{glspl}\marg{goose} are fowl.
+\cmd{end}\marg{document}
+\end{codeenv}
 This now produces:
 \begin{result}
 The pond contained a \gls{ex2.duck}\footnote{\glsentryname{ex2.duck}:
@@ -735,10 +728,10 @@ key. There's also a case-changing version:
 which changes the initial character to upper case,
 but (unlike \cs{glsentryname}) this command isn't expandable. If,
 for example, I had instead set the duck's \field{name} key using:
-\begin{lstlisting}
-name = {duck (noun)}
-\end{lstlisting}
-then I would need to use \code{\cs{Glsentryname}\marg{duck}}
+\begin{codeenv}
+\field{name} = \marg{duck (noun)}
+\end{codeenv}
+then I would need to use \code{\gls{Glsentryname}\marg{duck}}
 instead.
 
 So on \pidx{firstuse}, \cs{gls} uses the value of the \field{first} key
@@ -747,7 +740,7 @@ and \cs{glspl} uses the value of the \field{firstplural} key. On
 \cs{glspl} uses the value of the \field{plural} key. \pIdx{regular}
 abbreviations also follow this usage. \pIdx{non-regular}
 abbreviations follow a different behaviour for \gls{gls} (and its
-variants) that's determined by the abbreviation style.
+\idxpl{variant}) that's determined by the abbreviation style.
 
 If the first use for a particular group of terms always has the
 same pattern (such as following the term with a brief description or
@@ -794,32 +787,32 @@ associated symbol. The value can be obtained with:
 (which behaves like \gls{glsentrydesc} and \gls{glsentryname}).
 Neither of the above commands affect the \idx{firstuseflag}.
 For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage[hidelinks]{hyperref}
-\usepackage{glossaries}
-
-\newglossaryentry{pi}% label
-{% settings:
-   name   = {Archimedes' constant},
-   symbol = {\ensuremath{\pi}},
-   description = {ratio of a circle's circumference to its 
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[hidelinks]\marg{hyperref}
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{pi}\comment{label}
+\marg{\comment{settings:}
+   \field{name}   = \marg{Archimedes' constant},
+   \field{symbol} = \marg{\gls[noindex=false]{ensuremath}\marg{\cmd{pi}}},
+   \field{description} = \marg{ratio of a circle's circumference to its 
 diameter}
 }
-
-\newglossaryentry{thetai}%label
-{% settings:
-   name   = {theta parameter},
-   symbol = {\ensuremath{\theta_i}},
-   description = {one of the model parameters}
+\strut
+\gls{newglossaryentry}\marg{thetai}\comment{label}
+\marg{\comment{settings:}
+   \field{name}   = \marg{theta parameter},
+   \field{symbol} = \marg{\gls{ensuremath}\marg{\cmd{theta}\gls{sbchar}i}},
+   \field{description} = \marg{one of the model parameters}
 }
-
-\begin{document}
-\gls{pi} (\glssymbol{pi}). Compare $\glssymbol{thetai}^2$
-with $\glssymbol{thetai}[^2]$.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{pi} (\gls{glssymbol}\marg{pi}). Compare \gls{mshiftchar}\gls{glssymbol}\marg{thetai}\gls[noindex=false]{spchar}2\gls{mshiftchar}
+with \gls{mshiftchar}\gls{glssymbol}\marg{thetai}[\gls{spchar}2]\gls{mshiftchar}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 \gls{ex.pi} (\glssymbol{ex.pi}). Compare $\glssymbol{ex.thetai}^2$
@@ -828,8 +821,8 @@ with $\glssymbol{ex.thetai}[^2]$.
 Note that in this case there is now a difference between using the
 final optional \meta{insert} argument and simply appending the extra
 material. This is a result of the hyperlink that causes an
-interruption between the subscript \verb|_i| and the following
-superscript \verb|^2|. (In this case, there's no target for the
+interruption between the subscript \code{\gls{sbchar}i} and the following
+superscript \code{\gls{spchar}2}. (In this case, there's no target for the
 hyperlinks. That's covered in \sectionref{sec:printgloss}.)
 
 If you have additional information, such as a translation,
@@ -851,19 +844,19 @@ numerals, so the sixth field can be obtained with:
 \nosecformatdef{glsentryuservi}
 (which behaves like \gls{glsentrysymbol}).
 For example:
-\begin{lstlisting}[escapechar=|,morekeywords={user}]
-\newglossaryentry{polly.parrot}% label
-{%
-   name = {Polly Parrot},
-   description = {Senior assistant at the International 
-Society of Duck and Geese},
-   user|\fieldfmt{1}| = {British},% nationality
-   user|\fieldfmt{2}| = {1970-12-31},% date of birth
-   user|\fieldfmt{3}| = {female},% gender
-   user|\fieldfmt{4}| = {43 The Lane, Some Town, Noshire AB1 2XY},% address
-   user|\fieldfmt{5}| = {polly.parrot@example.com}% email
+\begin{codeenv}
+\gls{newglossaryentry}\marg{polly.parrot}\comment{label}
+\marg{\comment{}
+   \field{name} = \marg{Polly Parrot},
+   \field{description} = \marg{Senior assistant at the International Society 
+of Duck and Geese},
+   \field{user1} = \marg{British},\comment{nationality}
+   \field{user2} = \marg{1970-12-31},\comment{date of birth}
+   \field{user3} = \marg{female},\comment{gender}
+   \field{user4} = \marg{43 The Lane, Some Town, Noshire AB1 2XY},\comment{address}
+   \field{user5} = \marg{polly.parrot@example.com}\comment{email}
 }
-\end{lstlisting}
+\end{codeenv}
 
 Alternatively you can define your own custom keys. If you don't need
 commands equivalent to \gls{glssymbol}, then you can use:
@@ -886,24 +879,24 @@ value to upper case.
 The new keys must be defined before the entries are defined (and
 the key definitions must come before the first \idx{resourceset}
 if you use \bibgls). For example:
-\begin{lstlisting}[morekeywords={nationality,dateofbirth,gender,address,email}]
-\glsaddstoragekey{nationality}{}{\Nationality}
-\glsaddstoragekey{dateofbirth}{}{\DateOfBirth}
-\glsaddstoragekey{gender}{}{\Gender}
-\glsaddstoragekey{address}{}{\Address}
-\glsaddstoragekey{email}{}{\Email}
-\newglossaryentry{polly.parrot}% label
-{%
-   name = {Polly Parrot},
-   description = {Senior assistant at the International 
-Society of Duck and Geese},
-   nationality = {British},% nationality
-   dateofbirth = {1970-12-31},% date of birth
-   gender  = {female},% gender
-   address = {43 The Lane, Some Town, Noshire AB1 2XY},% address
-   email   = {polly.parrot@example.com}% email
+\begin{codeenv}
+\gls{glsaddstoragekey}\marg{\fieldfmt{nationality}}\marg{}\marg{\cmd{Nationality}}
+\gls{glsaddstoragekey}\marg{\fieldfmt{dateofbirth}}\marg{}\marg{\cmd{DateOfBirth}}
+\gls{glsaddstoragekey}\marg{\fieldfmt{gender}}\marg{}\marg{\cmd{Gender}}
+\gls{glsaddstoragekey}\marg{\fieldfmt{address}}\marg{}\marg{\cmd{Address}}
+\gls{glsaddstoragekey}\marg{\fieldfmt{email}}\marg{}\marg{\cmd{Email}}
+\gls{newglossaryentry}\marg{polly.parrot}\comment{label}
+\marg{\comment{}
+   \field{name} = \marg{Polly Parrot},
+   \field{description} = \marg{Senior assistant at the International Society 
+of Duck and Geese},
+   \fieldfmt{nationality} = \marg{British},\comment{nationality}
+   \fieldfmt{dateofbirth} = \marg{1970-12-31},\comment{date of birth}
+   \fieldfmt{gender}  = \marg{female},\comment{gender}
+   \fieldfmt{address} = \marg{43 The Lane, Some Town, Noshire AB1 2XY},\comment{address}
+   \fieldfmt{email}   = \marg{polly.parrot@example.com}\comment{email}
 }
-\end{lstlisting}
+\end{codeenv}
 
 In addition to the commands like \gls{glssymbol} and
 \gls{glsentrysymbol}, there are other ways of accessing the field
@@ -916,8 +909,12 @@ manual. Custom fields provided with \gls{glsaddkey} or \gls{glsaddstoragekey}
 have matching key and internal field labels.
 
 The base \sty{glossaries} package provides:
+\nosecformatdef{ifglshassymbol}
+which tests if the \field{symbol} field has been assigned. There are similar 
+commands for other common fields. For a more general purpose test, you 
+can use:
 \nosecformatdef{ifglshasfield}
-which tests if the given entry (identified by \meta{entry label}, 
+which checks if the given entry (identified by \meta{entry label}, 
 which must be defined) has the field identified by \meta{field label}
 set to a non-empty value. Within \meta{true}, you can access the
 field value with:
@@ -941,45 +938,45 @@ For a complete list of field commands, see the
 The earlier \code{duck} and \code{goose} examples from 
 \sectionref{sec:firstuse} can be rewritten to move the parenthetical
 material into separate keys:
-\begin{lstlisting}[escapechar=|,morekeywords={user}]
-\newglossaryentry{duck}% label
-{% information about this term:
-  name   = {duck},
-  user|\fieldfmt{1}|  = {noun},
-  user|\fieldfmt{2}|  = {quack, quack},
+\begin{codeenv}
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{\comment{information about this term:}
+  \field{name}   = \marg{duck},
+  \field{user1}  = \marg{noun},
+  \field{user2}  = \marg{quack, quack},
   description = {a waterbird with webbed feet}
 }
-
-\newglossaryentry{goose}% label
-{% information about this term:
-  name   = {goose},
-  plural = {geese},
-  user|\fieldfmt{1}|  = {noun},
-  user|\fieldfmt{2}|  = {honk, honk},
-  description={a large waterbird with a long neck, short legs,
+\strut
+\gls{newglossaryentry}\marg{goose}\comment{label}
+\marg{\comment{information about this term:}
+  \field{name}   = \marg{goose},
+  \field{plural} = \marg{geese},
+  \field{user1}  = \marg{noun},
+  \field{user2}  = \marg{honk, honk},
+  \field{description}=\marg{a large waterbird with a long neck, short legs,
    webbed feet and a short broad bill}
 }
-\end{lstlisting}
+\end{codeenv}
 The \idx{postlinkhook} and glossary style can then be modified to 
 include the additional information.  For example:
-\begin{lstlisting}
-\glsdefpostlink{general}{%
- \glsxtrifwasfirstuse{\space(\glsentryuserii{\glslabel})}{}%
+\begin{codeenv}
+\gls[noindex=false]{glsdefpostlink}\marg{general}\marg{\comment{}
+ \gls[noindex=false]{glsxtrifwasfirstuse}\marg{\cmd{space}(\gls{glsentryuserii}\marg{\gls{glslabel}})}{}\comment{}
 }
-
-\glssetcategoryattribute{general}{glossname}{firstuc}
-
-\glsdefpostname{general}{%
- \space
- (\glsentryuseri{\glscurrententrylabel}%
-  \GlsXtrIfXpFieldEqXpStr{plural}{\glscurrententrylabel}%
-  {\glsentrytext{\glscurrententrylabel}s}{}%
-  {, pl.\ \glsentryplural{\glscurrententrylabel}}%
- )%
+\strut
+\gls[noindex=false]{glssetcategoryattribute}\marg{general}\marg{glossname}\marg{firstuc}
+\strut
+\gls[noindex=false]{glsdefpostname}\marg{general}\marg{\comment{}
+ \cmd{space}
+ (\gls{glsentryuseri}\marg{\gls[noindex=false]{glscurrententrylabel}}\comment{}
+  \gls{GlsXtrIfXpFieldEqXpStr}\marg{plural}\marg{\gls{glscurrententrylabel}}\comment{}
+  \marg{\gls[noindex=false]{glsentrytext}\marg{\gls{glscurrententrylabel}}s}\marg{}\comment{}
+  \marg{, pl.\gls{cs.space}\gls[noindex=false]{glsentryplural}{\gls{glscurrententrylabel}}}\comment{}
+ )\comment{}
 }
-\end{lstlisting}
+\end{codeenv}
 The \idx{postlinkhook} appends the value of the \field{user2} field
-after the \idx{firstuse} of \gls{gls} (or its variants).
+after the \idx{firstuse} of \gls{gls} (or its \idxpl{variant}).
 The \catattr{glossname} attribute converts the first letter of the
 \field{name} field to upper case when it's displayed in the
 glossary.  The \idx{postnamehook} appends (in parentheses) the value
@@ -995,69 +992,70 @@ With \LaTeX\ in general, spaces are sometimes significant and
 sometimes ignored. When defining entries, any spaces around the
 equal sign or comma are ignored. For example, if an entry is defined
 as
-\begin{lstlisting}
-\newglossaryentry{sample}
-{
-  name = {sample} , description = {an example}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{sample}
+\marg{
+  \field{name} = \marg{sample} , \field{description} = \marg{an example}
 }
-\end{lstlisting}
+\end{codeenv}
 then
-\begin{lstlisting}
-/\gls{sample}/
-\end{lstlisting}
+\begin{codeenv}
+/\gls{gls}\marg{sample}/
+\end{codeenv}
 will produce
 \begin{result}
 /sample/
 \end{result}
 (no spaces). Similarly with:
-\begin{lstlisting}
-\newglossaryentry{sample}
-{
-  name = sample , description = {an example}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{sample}
+\marg{
+  \field{name} = sample , \field{description} = \marg{an example}
 }
-\end{lstlisting}
+\end{codeenv}
 However, spaces at the start or end of the value if it's been
 enclosed in braces aren't ignored. For example, if the entry is now
 defined as:
-\begin{lstlisting}[escapechar=|]
-\newglossaryentry{sample}
-{
-  name = { sample } , description = {an example}|\incorrect|
+\begin{codeenv}
+\gls{newglossaryentry}\marg{sample}
+\marg{
+  \field{name} = \marg{ sample } , \field{description} = {an example}\incorrect
 }
-\end{lstlisting}
+\end{codeenv}
 then:
-\begin{lstlisting}
-/\gls{sample}/
-\end{lstlisting}
+\begin{codeenv}
+/\gls{gls}\marg{sample}/
+\end{codeenv}
 produces:
 \begin{result}
 / sample /
 \end{result}
 The spaces in this case have been retained. The unstarred version of
-\gls{longnewglossaryentry} appends \csfmt{unskip} to the end of the
-description, which removes any trailing spaces. The starred version
-(only available with \sty{glossaries-extra}) doesn't. In both cases 
-any leading spaces are retained. For example,
+\gls{longnewglossaryentry} appends extra code to the end of the
+description, which removes any trailing spaces (and also the 
+\gls{postdescriptionhook}). The starred version
+\gls{longnewglossaryentry*} (only available with \sty{glossaries-extra}) 
+doesn't. In both cases any leading spaces are retained. For example,
 if the entry is defined as:
-\begin{lstlisting}[escapechar=|]
-\longnewglossaryentry{sample}{name={sample}}{ an example }|\incorrect|
-\end{lstlisting}
+\begin{codeenv}
+\gls{longnewglossaryentry}\marg{sample}\marg{name=\marg{sample}}\marg{ an example }\incorrect
+\end{codeenv}
 then:
-\begin{lstlisting}
-/\glsentrydesc{sample}/
-\end{lstlisting}
+\begin{codeenv}
+/\gls{glsentrydesc}\marg{sample}/
+\end{codeenv}
 produces:
 \begin{result}
 / an example/
 \end{result}
 (trailing space removed), whereas if the entry is defined as:
-\begin{lstlisting}[escapechar=|]
-\longnewglossaryentry*{sample}{name={sample}}{ an example }|\incorrect|
-\end{lstlisting}
+\begin{codeenv}
+\gls{longnewglossaryentry*}\marg{sample}\marg{name=\marg{sample}}\marg{ an example }\incorrect
+\end{codeenv}
 then:
-\begin{lstlisting}
-/\glsentrydesc{sample}/
-\end{lstlisting}
+\begin{codeenv}
+/\gls{glsentrydesc}\marg{sample}/
+\end{codeenv}
 produces:
 \begin{result}
 / an example /
@@ -1074,15 +1072,15 @@ referenced in \verb|\gls{ duck }| won't be found.
 
 If an entry that hasn't been defined is referenced with \gls{gls},
 by default an error is triggered. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\begin{document}
-A \gls{duck}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces the error:
 \begin{verbatim}
 Glossary entry `duck' has not been defined.
@@ -1095,15 +1093,15 @@ A .
 The \sty{glossaries-extra} package provides the option
 \styopt[warn]{undefaction}, which will convert the error to a
 warning. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage[undefaction=warn]{glossaries-extra}
-
-\begin{document}
-A \gls{duck}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{undefaction}=warn]\marg{glossaries-extra}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This now produces the warning:
 \begin{verbatim}
 Glossary entry `duck' has not been defined on input line 6
@@ -1113,32 +1111,34 @@ The result is now:
 \begin{result}
 A ??.
 \end{result}
+This replaces the undefined reference with two question marks, just like 
+undefined cross-references.
 Notice the difference between using \gls{ifglshasfield}:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage[undefaction=warn]{glossaries-extra}
-
-\begin{document}
-A \gls{duck} 
-(\ifglshasfield{useri}{duck}{\glscurrentfieldvalue}{not set}).
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{undefaction}=warn]\marg{glossaries-extra}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck} 
+(\gls{ifglshasfield}\marg{\gls[noindex=false]{field.useri}}\marg{duck}\marg{\gls{glscurrentfieldvalue}}\marg{not set}).
+\cmd{end}\marg{document}
+\end{codeenv}
 which produces:
 \begin{result}
 A ?? (??).
 \end{result}
 (and has two undefined warnings) and using \gls{glsxtrifhasfield}:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage[undefaction=warn]{glossaries-extra}
-
-\begin{document}
-A \gls{duck}
-(\glsxtrifhasfield{useri}{duck}{\glscurrentfieldvalue}{not set}).
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{undefaction}=warn]\marg{glossaries-extra}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck}
+(\gls{glsxtrifhasfield}\marg{\field{useri}}\marg{duck}\marg{\gls{glscurrentfieldvalue}}\marg{not set}).
+\cmd{end}\marg{document}
+\end{codeenv}
 which only has one undefined warning and produces:
 \begin{result}
 A ?? (not set).
@@ -1149,16 +1149,16 @@ When you incorporate \bibgls\ into the build process (see
 entries defined. One of the actions that the \styopt{record} option 
 automatically performs is to switch on \styopt[warn]{undefaction}, which avoids
 undefined errors on the first \LaTeX\ run. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage[record]{glossaries-extra}
-
-\begin{document}
-A \gls{duck}
-(\glsxtrifhasfield{useri}{duck}{\glscurrentfieldvalue}{not set}).
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record}]\marg{glossaries-extra}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck}
+(\gls{glsxtrifhasfield}\marg{\field{useri}}\marg{duck}\marg{\gls{glscurrentfieldvalue}}\marg{not set}).
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces the same result as the previous example, but there's
 only the one warning (about an undefined reference) and no warning
 about the empty \code{main} glossary.
@@ -1171,151 +1171,149 @@ premature expansion in situations that would otherwise break the
 command. If content containing a \idx{robust} command is written to
 an external file, the \idx{robust} command itself is written instead of its
 definition. For example, consider the following document:
-\begin{lstlisting}[keywords={},moretexcs={test,section}]
-\documentclass{article}
-\newcommand{\test}{some sample text}
-\begin{document}
-\tableofcontents
-\section{\test}
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{newcommand}\marg{\csfmt{test}}\marg{some sample text}
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\gls[noindex=false]{section}\marg{\csfmt{test}}
+\cmd{end}\marg{document}
+\end{codeenv}
 In this case, \csfmt{test} is expandable. Its definition doesn't
 contain anything complicated. The \ext{toc} file (which is input by
 \csfmt{tableofcontents}) contains the line:
-\begin{lstlisting}[keywords={}]
-\contentsline {section}{\numberline {1}some sample text}{1}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}some sample text}\marg{1}
+\end{codeenv}
 So \csfmt{test} has been expanded to its definition when it was
 written to the \ext{toc} file. If \csfmt{test} is defined in terms
 of another command, that will also be expanded. For example:
-\begin{lstlisting}[keywords={},moretexcs={test,section,sample,emph}]
-\documentclass{article}
-\newcommand{\sample}{\emph{sample}}
-\newcommand{\test}{some \sample\ text}
-\begin{document}
-\tableofcontents
-\section{\test}
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{newcommand}\marg{\csfmt{sample}}\marg{\gls{emph}\marg{sample}}
+\cmd{newcommand}\marg{\csfmt{test}}\marg{some \csfmt{sample}\gls{cs.space}text}
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\gls{section}\marg{\csfmt{test}}
+\cmd{end}\marg{document}
+\end{codeenv}
 The \ext{toc} file now contains:
-\begin{lstlisting}[keywords={},moretexcs={emph}]
-\contentsline {section}{\numberline {1}some \emph {sample}\ 
-text}{1}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}some \gls{emph} \marg{sample}\gls{cs.space}text}\marg{1}
+\end{codeenv}
 So \csfmt{sample} has also been expanded but neither
 \gls{emph} nor \idx{cs.space} (backslash space) have
 been expanded. \Idx{robust} commands don't expand. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{duck}
-{
-  name={duck},
-  description={a waterbird with webbed feet}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+  \field{name}=\marg{duck},
+  \field{description}=\marg{a waterbird with webbed feet}
 }
-
-\begin{document}
-\tableofcontents
-\section{\Gls{duck}: \glsentrydesc{duck}}
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\gls{section}\marg{\gls{Gls}\marg{duck}: \gls{glsentrydesc}\marg{duck}}
+\cmd{end}\marg{document}
+\end{codeenv}
 The \ext{toc} file now contains:
-\begin{lstlisting}
-\contentsline {section}{\numberline {1}\Gls {duck}: a waterbird 
-with webbed feet}{1}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}\gls{Gls} \marg{duck}: a waterbird with 
+webbed feet}\marg{1}
+\end{codeenv}
 So \gls{Gls} doesn't expand, and the command itself is written to the
 \ext{toc} file, but \gls{glsentrydesc} does expand.
 
 A \pidx{fragile} command is one that breaks (causes an error) when
 it's expanded in this type of context. One such command is \gls{footnote}.
 For example, the following won't work:
-\begin{lstlisting}[moretexcs={footnote},escapechar=|]
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{duck}
-{
-  name={duck},
-  description={a waterbird with webbed feet}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+  \field{name}=\marg{duck},
+  \field{description}=\marg{a waterbird with webbed feet}
 }
-
-\begin{document}
-\tableofcontents
-\section{\Gls{duck}\footnote{\glsentrydesc{duck}}}|\incorrect|
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\gls{section}\marg{\gls{Gls}\marg{duck}\gls{footnote}\marg{\gls{glsentrydesc}\marg{duck}}}\incorrect
+\cmd{end}\marg{document}
+\end{codeenv}
 This causes the error:
 \begin{verbatim}
 ! Argument of \@sect has an extra }.
 \end{verbatim}
 Inserting \gls{protect} before the command prevents the attempted
 expansion, which makes the command behave as though it was robust:
-\begin{lstlisting}[moretexcs={footnote,protect}]
-\section{\Gls{duck}\protect\footnote{\glsentrydesc{duck}}}
-\end{lstlisting}
+\begin{codeenv}
+\gls{section}\marg{\gls{Gls}\marg{duck}\gls{protect}\gls{footnote}\marg{\gls{glsentrydesc}\marg{duck}}}
+\end{codeenv}
 In this case, it's unlikely that you'd want the footnote to appear
 in the table of contents, so it would be better to use the optional
 argument:
-\begin{lstlisting}[moretexcs={footnote},escapechar=|]
-\section[Duck]{\Gls{duck}\footnote{\glsentrydesc{duck}}}|\correct|
-\end{lstlisting}
+\begin{codeenv}
+\gls{section}\oarg{Duck}\marg{\gls{Gls}\marg{duck}\gls{footnote}\marg{\gls{glsentrydesc}\marg{duck}}}\correct
+\end{codeenv}
 Now the \ext{toc} file is just:
-\begin{lstlisting}
-\contentsline {section}{\numberline {1}Duck}{1}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}Duck}\marg{1}
+\end{codeenv}
 If the \field{description} field contains a \idx{fragile} command
 then \gls{glsentrydesc} will break in expandable contexts. For
 example, the following doesn't work:
-\begin{lstlisting}[moretexcs={footnote},escapechar=|]
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{duck}
-{
-  name={duck},
-  description={a waterbird\footnote{a bird that lives on or 
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+  \field{name}=\marg{duck},
+  \field{description}=\marg{a waterbird\gls{footnote}\marg{a bird that lives on or 
    near water} with webbed feet}
 }
-
-\begin{document}
-\tableofcontents
-\section{\Gls{duck}: \glsentrydesc{duck}}|\incorrect|
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\gls{section}\marg{\gls{Gls}\marg{duck}: \gls{glsentrydesc}\marg{duck}}\incorrect
+\cmd{end}\marg{document}
+\end{codeenv}
 This is a contrived example. In this case, it would be better to
 also define the term \qt{waterbird}: 
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{waterbird}
-{
-  name={waterbird},
-  description={a bird that lives on or near water}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{waterbird}
+\marg{
+  \field{name}=\marg{waterbird},
+  \field{description}=\marg{a bird that lives on or near water}
 }
-
-\newglossaryentry{duck}
-{
-  name={duck},
-  description={a \gls{waterbird} with webbed feet}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+  \field{name}=\marg{duck},
+  \field{description}=\marg{a \gls{gls}\marg{waterbird} with webbed feet}
 }
-
-\begin{document}
-\tableofcontents
-\section{\Gls{duck}: \glsentrydesc{duck}}
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\gls{section}\marg{\gls{Gls}\marg{duck}: \gls{glsentrydesc}\marg{duck}}
+\cmd{end}\marg{document}
+\end{codeenv}
 The \ext{toc} file now contains:
-\begin{lstlisting}
-\contentsline {section}{\numberline {1}\Gls {duck}: a \gls 
-{waterbird} with webbed feet}{1}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}\gls{Gls} \marg{duck}: a \gls{gls} \marg{waterbird} with webbed feet}\marg{1}
+\end{codeenv}
 
 \begin{important}
 The examples in this section are used to illustrate the differences
@@ -1330,22 +1328,22 @@ By default, most of the field values are expanded when the entry is
 defined. This allows for defining entries programmatically, but it
 can cause a problem if the value contains any \idx{fragile} commands.
 For example:
-\begin{lstlisting}[escapechar=|,moretexcs={footnote}]
-\documentclass{article}
-
-\usepackage{glossaries}
-
-\newglossaryentry{duck}% label
-{
-  name = {duck},
-  first = {duck\footnote{quack, quack}},|\incorrect|
-  description = {a waterbird with webbed feet}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{
+  \field{name} = \marg{duck},
+  \field{first} = \marg{duck\gls{footnote}\marg{quack, quack}},\incorrect
+  \field{description} = \marg{a waterbird with webbed feet}
 }
-
-\begin{document}
-A \gls{duck}.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This causes the confusing error:
 \begin{verbatim}
 ! Undefined control sequence.
@@ -1353,24 +1351,24 @@ This causes the confusing error:
 \end{verbatim}
 In order for this example to work, the \idx{fragile} command must either be
 protected:
-\begin{lstlisting}[escapechar=|,moretexcs={protect,footnote}]
-\newglossaryentry{duck}% label
-{
-  name = {duck},
-  first = {duck\protect\footnote{quack, quack}},|\correct|
-  description = {a waterbird with webbed feet}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{
+  \field{name} = \marg{duck},
+  \field{first} = \marg{duck\gls{protect}\gls{footnote}\marg{quack, quack}},\correct
+  \field{description} = \marg{a waterbird with webbed feet}
 }
-\end{lstlisting}
+\end{codeenv}
 or the expansion must first be switched off:
-\begin{lstlisting}[escapechar=|,moretexcs={footnote}]
-\glsnoexpandfields |\correct|
-\newglossaryentry{duck}% label
-{
-  name = {duck},
-  first = {duck\footnote{quack, quack}},
-  description = {a waterbird with webbed feet}
+\begin{codeenv}
+\gls{glsnoexpandfields} \correct
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{
+  \field{name} = \marg{duck},
+  \field{first} = \marg{duck\gls{footnote}\marg{quack, quack}},
+  \field{description} = \marg{a waterbird with webbed feet}
 }
-\end{lstlisting}
+\end{codeenv}
 Since it's not possible to programmatically define entries with
 \bibgls, the expansion is automatically switched off as \bibgls\
 writes \gls{glsnoexpandfields} to the \ext{glstex} file (although
@@ -1403,7 +1401,7 @@ The extension package \sty{glossaries-extra} provides:
 and redefines \gls{newacronym} in terms of \gls{newabbreviation} so
 that it effectively behaves like:
 \begin{codeenv}
-\gls{newabbreviation}\oarg{type=\gls{acronymtype},category=acronym,\meta{\keyvallist}}
+\gls{newabbreviation}\oarg{\gls[noindex=false]{field.type}=\gls{acronymtype},\field{category}=acronym,\meta{\keyvallist}}
 \margm{label}\margm{short}\margm{long}
 \end{codeenv}
 This makes it easier to transfer over from the base \sty{glossaries}
@@ -1424,10 +1422,10 @@ where \meta{category} is the category label and \meta{style-name} is
 the name of the style. If the optional argument is omitted,
 \code{abbreviation} is assumed. The \sty{glossaries-extra} package
 automatically sets the default styles:
-\begin{lstlisting}
-\setabbreviationstyle{long-short}
-\setabbreviationstyle[acronym]{short-nolong}
-\end{lstlisting}
+\begin{codeenv}
+\gls{setabbreviationstyle}\marg{\abbrstyle{long-short}}
+\gls{setabbreviationstyle}\oarg{acronym}\marg{\abbrstyle{short-nolong}}
+\end{codeenv}
 This means that if you don't explicitly set the style then any
 abbreviation defined with \gls{newacronym} will use the
 \abbrstyle{short-nolong} style (unless you change the category in
@@ -1436,11 +1434,12 @@ the optional argument) and other abbreviations will use the
 
 If these styles aren't suitable, then you need to change them. Any
 abbreviation that's defined with a category that hasn't been
-assigned a style will fallback on the default
-style. There are many predefined styles to choose from and they come
-with commands to help adjust the formatting. See the
-\sty{glossaries-extra} user manual for the complete list. The
-\sty{glossaries-extra} package also comes with a sample document
+assigned a style will fallback on the style for the default
+\code{abbreviation} category. There are many predefined styles to
+choose from and they come with commands to help adjust the
+formatting. See the \sty{glossaries-extra} user manual for the
+complete list. The \sty{glossaries-extra} package also comes with a
+sample document
 \ctanfile{glossaries-extra/samples}{sample-abbr-styles.pdf}
 demonstrating all the predefined styles.
 
@@ -1455,24 +1454,24 @@ and so that key must be set explicitly in the \meta{\keyvallist} optional part.
 
 Here's a simple example that uses both \gls{newabbreviation} and
 \gls{newacronym} to illustrate the difference:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\newabbreviation{tug}{TUG}{\TeX\ Users Group}
-\newabbreviation{cldr}{CLDR}{Unicode Common Locale Data 
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newabbreviation}\marg{tug}\marg{TUG}\marg{\cmd{TeX}\gls{cs.space}Users Group}
+\gls{newabbreviation}\marg{cldr}\marg{CLDR}\marg{Unicode Common Locale Data 
 Repository}
-
-\newacronym{SIunit}{SI unit}{International System of Units}
-\newacronym{ascii}{ASCII}{American Standard Code for 
+\strut
+\gls{newacronym}\marg{SIunit}\marg{SI unit}\marg{International System of Units}
+\gls{newacronym}\marg{ascii}\marg{ASCII}\marg{American Standard Code for 
 Information Interchange}
-
-\begin{document}
-First use: \gls{tug}, \gls{cldr}, \gls{SIunit}, \gls{ascii}.
-Next use: \gls{tug}, \gls{cldr}, \gls{SIunit}, \gls{ascii}.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+First use: \gls{gls}\marg{tug}, \gls{gls}\marg{cldr}, \gls{gls}\marg{SIunit}, \gls{gls}\marg{ascii}.
+Next use: \gls{gls}\marg{tug}, \gls{gls}\marg{cldr}, \gls{gls}\marg{SIunit}, \gls{gls}\marg{ascii}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 First use: \gls{TUG}, \gls{CLDR}, \gls{SIunit}, \gls{ASCII}.
@@ -1481,8 +1480,7 @@ Next use: \gls{TUG}, \gls{CLDR}, \gls{SIunit}, \gls{ASCII}.
 Note that the \idx{firstuse} of \code{SIunit} and \code{ascii} only
 show the short form. This is because the default style for the
 \code{acronym} category is the \abbrstyle{short-nolong} style, which
-doesn't show the long form with \gls{gls} (and its variants, such as
-\gls{glspl}).
+doesn't show the long form with \gls{gls} (and its \idxpl{variant}).
 
 If you only want \gls{gls} to show the short form but not the long
 form, use one of the \code{-nolong} styles (such as
@@ -1513,25 +1511,25 @@ ones provide ways of inserting commonly-used commands to save typing.
 
 The final optional \meta{insert} argument of commands like \gls{gls}
 is typically moved inside, depending on the style. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\newabbreviation{svm}{SVM}{support vector machine}
-
-\begin{document}
-The \gls{svm}['s] parameters are\ldots
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newabbreviation}\marg{svm}\marg{SVM}\marg{support vector machine}
+\strut
+\cmd{begin}\marg{document}
+The \gls{gls}\marg{svm}\oarg{'s} parameters are\cmd{ldots}
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 The \gls{ex.svm}['s] parameters are\ldots
 \end{result}
 Compare this with:
-\begin{lstlisting}
-The \gls{svm}'s parameters are\ldots
-\end{lstlisting}
+\begin{codeenv}
+The \gls{gls}\marg{svm}'s parameters are\cmd{ldots}
+\end{codeenv}
 which produces:
 \begin{result}
 The \gls{ex.svm}'s parameters are\ldots
@@ -1540,17 +1538,17 @@ The \gls{ex.svm}'s parameters are\ldots
 \section{Plural Abbreviations}
 If the abbreviation represents something countable then the plural
 form can again be obtained with \gls{glspl}:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\newabbreviation{svm}{SVM}{support vector machine}
-
-\begin{document}
-First use: \glspl{svm}. Next use: \glspl{svm}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newabbreviation}\marg{svm}\marg{SVM}\marg{support vector machine}
+\strut
+\cmd{begin}\marg{document}
+First use: \gls{glspl}\marg{svm}. Next use: \gls{glspl}\marg{svm}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 First use: \glspl{ex.svm}. Next use: \glspl{ex.svm}.
@@ -1559,25 +1557,25 @@ The default plural short and long forms are obtained by
 appending the letter \qt{s} after the singular form. These can be
 changed on an individual basis with the \field{shortplural} and
 \field{longplural} keys. For example:
-\begin{lstlisting}
-\newabbreviation
- [longplural={lower triangular matrices}]
- {ltm}{LTM}{lower triangular matrix}
-\end{lstlisting}
+\begin{codeenv}
+\gls{newabbreviation}
+ [\field{longplural}=\marg{lower triangular matrices}]
+ \marg{ltm}\marg{LTM}\marg{lower triangular matrix}
+\end{codeenv}
 
 It may be that you prefer to keep the short plural form the same as
 the short singular value for all abbreviations within a particular
 category. You can implement this with the
 \catattr{noshortplural} attribute, which must be set to \code{true}
 before the abbreviations for that category are defined. For example:
-\begin{lstlisting}
-\glssetcategoryattribute{abbreviation}{noshortplural}{true}
-\newabbreviation{svm}{SVM}{support vector machine}
-\end{lstlisting}
+\begin{codeenv}
+\gls{glssetcategoryattribute}\marg{abbreviation}\marg{\catattr{noshortplural}}\marg{true}
+\gls{newabbreviation}\marg{svm}\marg{SVM}\marg{support vector machine}
+\end{codeenv}
 Now:
-\begin{lstlisting}
-First use: \glspl{svm}. Next use: \glspl{svm}.
-\end{lstlisting}
+\begin{codeenv}
+First use: \gls{glspl}\marg{svm}. Next use: \gls{glspl}\marg{svm}.
+\end{codeenv}
 produces:
 \begin{result}
 First use: support vector machines (SVM). Next use: SVM.
@@ -1598,52 +1596,52 @@ markup the words using:
 The words are separated with
 \nosecformatdef{glsxtrwordsep}
 For example:
-\begin{lstlisting}
-\glssetcategoryattribute{abbreviation}{markwords}{true}
-\newabbreviation{ssl}{SSL}{Secure Sockets Layer}
-\end{lstlisting}
+\begin{codeenv}
+\gls{glssetcategoryattribute}\marg{abbreviation}\marg{\catattr{markwords}}\marg{true}
+\gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{Secure Sockets Layer}
+\end{codeenv}
 This is essentially the same as
-\begin{lstlisting}
-\newabbreviation{ssl}{SSL}{\glsxtrword{Secure}\glsxtrwordsep
-\glsxtrword{Sockets}\glsxtrwordsep\glsxtrword{Layer}}
-\end{lstlisting}
+\begin{codeenv}
+\gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{\gls{glsxtrword}\marg{Secure}\gls{glsxtrwordsep}
+\gls{glsxtrword}\marg{Sockets}\gls{glsxtrwordsep}\gls{glsxtrword}\marg{Layer}}
+\end{codeenv}
 This is typically used with the \code{-hyphen} abbreviation styles.
 If the final optional \meta{insert} argument of commands like
 \gls{gls} starts with a hyphen, \gls{glsxtrwordsep} is locally
 changed to a hyphen.
 
 For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\setabbreviationstyle{long-hyphen-short-hyphen}
-
-\glssetcategoryattribute{abbreviation}{markwords}{true}
-
-\newabbreviation{ssl}{SSL}{Secure Sockets Layer}
-
-\begin{document}
-First use: \gls{ssl}[-enabled]. Next use: \gls{ssl}[-enabled].
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{setabbreviationstyle}\marg{\gls[noindex=false]{long-hyphen-short-hyphen}}
+\strut
+\gls{glssetcategoryattribute}\marg{abbreviation}\marg{\catattr{markwords}}\marg{true}
+\strut
+\gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{Secure Sockets Layer}
+\strut
+\cmd{begin}\marg{document}
+First use: \gls{gls}\marg{ssl}\oarg{-enabled}. Next use: \gls{gls}\marg{ssl}\oarg{-enabled}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 First use: \gls{ex.ssl}[-enabled]. Next use: \gls{ex.ssl}[-enabled].
 \end{result}
 Compare this with:
-\begin{lstlisting}
-First use: \gls{ssl}-enabled. Next use: \gls{ssl}-enabled.
-\end{lstlisting}
+\begin{codeenv}
+First use: \gls{gls}\marg{ssl}-enabled. Next use: \gls{gls}\marg{ssl}-enabled.
+\end{codeenv}
 which instead produces:
 \begin{result}
 First use: \gls{ex.ssl}-enabled. Next use: \gls{ex.ssl}-enabled.
 \end{result}
 Whereas:
-\begin{lstlisting}
-First use: \gls{ssl}[ enabled]. Next use: \gls{ssl}[ enabled].
-\end{lstlisting}
+\begin{codeenv}
+First use: \gls{gls}\marg{ssl}\oarg{ enabled}. Next use: \gls{gls}\marg{ssl}\oarg{ enabled}.
+\end{codeenv}
 produces:
 \begin{result}
 First use: \gls{ex.ssl}[ enabled]. Next use: \gls{ex.ssl}[ enabled].
@@ -1666,20 +1664,20 @@ categories, which ensures that \meta{cs} uses
 within the glossary (see \sectionref{sec:printgloss}). Within the
 main text the command simply does its argument.
 For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\GlsXtrEnableInitialTagging{abbreviation}{\itag}
-
-\newabbreviation{xml}{XML}{e\itag{x}tensible \itag{m}arkup
-\itag{l}anguage}
-
-\begin{document}
-First use: \gls{xml}. Next use: \gls{xml}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrEnableInitialTagging}\marg{abbreviation}\marg{\cmd{itag}}
+\strut
+\gls{newabbreviation}\marg{xml}\marg{XML}\marg{e\cmd{itag}\marg{x}tensible \cmd{itag}\marg{m}arkup
+\cmd{itag}\marg{l}anguage}
+\strut
+\cmd{begin}\marg{document}
+First use: \gls{gls}\marg{xml}. Next use: \gls{gls}\marg{xml}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 First use: \gls{ex.xml}. Next use: \gls{ex.xml}.
@@ -1693,24 +1691,24 @@ text. The difference is only evident in the glossary.
 If an abbreviation ends with a \idx{full-stop}, it can be awkward
 when it appears at the end of a sentence, as you can end up with two
 dots by mistake. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\newabbreviation{dante}{DANTE e.V.}
-{Deutschsprachige Anwendervereinigung \TeX\ e.V.}
-
-\newabbreviation{gp}{G.P.}{General Practitioner}
-
-\begin{document}
-\gls{dante} is a local \TeX\ user group.
-The German-speaking local \TeX\ user group is \gls{dante}.
-
-A \gls{gp} is a medical doctor.
-I went to my surgery to see the \gls{gp}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newabbreviation}\marg{dante}\marg{DANTE e.V.}
+\marg{Deutschsprachige Anwendervereinigung \cmd{TeX}\gls{cs.space}e.V.}
+\strut
+\gls{newabbreviation}\marg{gp}\marg{G.P.}\marg{General Practitioner}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{dante} is a local \cmd{TeX}\gls{cs.space}user group.
+The German-speaking local \cmd{TeX}\gls{cs.space}user group is \gls{gls}\marg{dante}.
+\strut
+A \gls{gls}\marg{gp} is a medical doctor.
+I went to my surgery to see the \gls{gls}\marg{gp}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This results in:
 \begin{result}
 \gls{ex.dante} is a local \TeX\ user group.
@@ -1725,28 +1723,27 @@ short form followed by the sentence terminating \idx{full-stop}.
 If the \catattr{discardperiod} attribute is set to \code{true}, the
 \idx{postlinkhook} will look ahead for a \idx{full-stop}. If it
 finds one, it will be discarded. For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\glssetcategoryattribute{abbreviationdot}{discardperiod}{true}
-
-\newabbreviation[category=abbreviationdot]
- {dante}{DANTE e.V.}{Deutschsprachige Anwendervereinigung 
-\TeX\ e.V.}
-
-\newabbreviation[category=abbreviationdot]
- {gp}{G.P.}{General Practitioner}
-
-\begin{document}
-\gls{dante} is a local \TeX\ user group.
-The German-speaking local \TeX\ user group is \gls{dante}.
-
-A \gls{gp} is a medical doctor.
-I went to my surgery to see the \gls{gp}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{glssetcategoryattribute}\marg{abbreviationdot}\marg{\catattr{discardperiod}}\marg{true}
+\strut
+\gls{newabbreviation}\oarg{\field{category}=abbreviationdot}
+ \marg{dante}\marg{DANTE e.V.}\marg{Deutschsprachige Anwendervereinigung \cmd{TeX}\gls{cs.space}e.V.}
+\strut
+\gls{newabbreviation}\oarg{\field{category}=abbreviationdot}
+ \marg{gp}\marg{G.P.}\marg{General Practitioner}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{dante} is a local \cmd{TeX}\gls{cs.space}user group.
+The German-speaking local \cmd{TeX}\gls{cs.space}user group is \gls{gls}\marg{dante}.
+\strut
+A \gls{gls}\marg{gp} is a medical doctor.
+I went to my surgery to see the \gls{gls}\marg{gp}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This now results in:
 \begin{result}
 \gls{ex.dante} is a local \TeX\ user group.
@@ -1758,10 +1755,10 @@ I went to my surgery to see the \gls{ex.gp}.
 This attribute only affects the \emph{non-plural} commands, such as
 \gls{gls} and \gls{glsxtrshort}. If the last paragraph in the above 
 example is changed to:
-\begin{lstlisting}
-A \gls{gp} is a medical doctor.
-I went to my surgery to see the \glspl{gp}.
-\end{lstlisting}
+\begin{codeenv}
+A \gls{gls}\marg{gp} is a medical doctor.
+I went to my surgery to see the \gls{glspl}\marg{gp}.
+\end{codeenv}
 then the result is:
 \begin{result}
 A \gls{ex.gp} is a medical doctor.
@@ -1769,24 +1766,24 @@ I went to my surgery to see the \glspl{ex.gp}.
 \end{result}
 In this case there's no need to discard the terminating
 \idx{full-stop} as the plural form doesn't end with one. If the
-plural form also ends with a \idx{full-stop}, for example the
-\catattr{noshortplural} attribute is also set, then you additionally
+plural form also ends with a \idx{full-stop} (for example, if the
+\catattr{noshortplural} attribute is also set) then you additionally
 need to set the \catattr{pluraldiscardperiod} attribute.
 
 The \idx{postlinkhook} is also applied to other commands, such as 
 \gls{glsxtrfull}, \gls{glsxtrlong}, \gls{glsxtrshort} and \gls{glssymbol}.
 For example:
-\begin{lstlisting}
-I went to my surgery to see the \glsxtrshort{gp}.
-\end{lstlisting}
+\begin{codeenv}
+I went to my surgery to see the \gls{glsxtrshort}\marg{gp}.
+\end{codeenv}
 results in:
 \begin{result}
 I went to my surgery to see the \glsxtrshort{ex.gp}.
 \end{result}
 In some cases, this may be inappropriate, for example:
-\begin{lstlisting}
-I went to my surgery to see the \glsxtrlong{gp}.
-\end{lstlisting}
+\begin{codeenv}
+I went to my surgery to see the \gls{glsxtrlong}\marg{gp}.
+\end{codeenv}
 results in:
 \begin{result}
 I went to my surgery to see the \glsxtrlong{ex.gp}.
@@ -1794,17 +1791,17 @@ I went to my surgery to see the \glsxtrlong{ex.gp}.
 In this case the terminating \idx{full-stop} shouldn't be discarded.
 There are several ways to prevent it. For example, moving the
 \idx{full-stop} into the \meta{insert} argument:
-\begin{lstlisting}
-I went to my surgery to see the \glsxtrlong{gp}[.]
-\end{lstlisting}
+\begin{codeenv}
+I went to my surgery to see the \gls{glsxtrlong}\marg{gp}\oarg{.}
+\end{codeenv}
 This results in:
 \begin{result}
 I went to my surgery to see the \glsxtrlong{ex.gp}[.]
 \end{result}
 Alternatively, insert \csfmt{relax} before the \idx{full-stop}:
-\begin{lstlisting}
-I went to my surgery to see the \glsxtrlong{gp}\relax.
-\end{lstlisting}
+\begin{codeenv}
+I went to my surgery to see the \gls{glsxtrlong}\marg{gp}\cmd{relax}.
+\end{codeenv}
 
 Depending on the abbreviation style, it may be inappropriate for the
 \idx{firstuse} to discard the \idx{full-stop}. In this case, it's a
@@ -1816,25 +1813,25 @@ If you have many abbreviations defined without dots and then you
 later decide to insert them, you may prefer an automated approach.
 This can be done by setting the \catattr{insertdots} attribute to \code{true}.
 For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{glossaries-extra}
-
-\glssetcategoryattribute{initialism}{insertdots}{true}
-\glssetcategoryattribute{initialism}{discardperiod}{true}
-\glssetcategoryattribute{initialism}{retainfirstuseperiod}{true}
-
-\setabbreviationstyle[initialism]{short-long}
-
-\newabbreviation[category=initialism]
- {gp}{GP}{General Practitioner}
-
-\begin{document}
-Today I went to my surgery to see the \gls{gp}.
-Tomorrow I'm going to my surgery to see the \gls{gp}.
-\end{document}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{insertdots}}\marg{true}
+\gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{discardperiod}}\marg{true}
+\gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{retainfirstuseperiod}}\marg{true}
+\strut
+\gls{setabbreviationstyle}\oarg{initialism}\marg{\gls[noindex=false]{short-long}}
+\strut
+\gls{newabbreviation}\oarg{\field{category}=initialism}
+ \marg{gp}\marg{GP}\marg{General Practitioner}
+\strut
+\cmd{begin}\marg{document}
+Today I went to my surgery to see the \gls{gls}\marg{gp}.
+Tomorrow I'm going to my surgery to see the \gls{gls}\marg{gp}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 Today I went to my surgery to see the \gls{ex2.gp}.
@@ -1858,36 +1855,36 @@ All commands like \gls{gls} and \gls{glssymbol} by default
 encapsulate the \idx{link-text} within the argument of
 \nosecformatdef{glstextformat}
 For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{xcolor}% provides colour
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newglossaryentry{duck}% label
-{
-   name = {duck},
-   description = {a waterbird with webbed feet}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{xcolor}\comment{provides colour}
+\cmd{usepackage}\marg{pifont}\comment{provides \gls{ding}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet}
 }
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
+\strut
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls[noindex=false]{ding}\marg{167}},
+  \field{category} = \marg{ornament},
+  \field{description} = \marg{typographic ornament}
 }
-
-\newabbreviation{tug}{TUG}{\TeX\ Users Group}
-
-\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}
-
-\begin{document}
-A \gls{duck}, a \gls{fleuron} (\glssymbol{fleuron}, 
-\glsentrydesc{fleuron}) and \gls{tug}.
-\end{document}
-\end{lstlisting}
+\strut
+\gls{newabbreviation}\marg{tug}\marg{TUG}\marg{\cmd{TeX}\gls{cs.space}Users Group}
+\strut
+\cmd{renewcommand}\marg{\gls{glstextformat}}[1]\marg{\cmd{textcolor}\marg{violet}\marg{\gls{param}1}}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{duck}, a \gls{gls}\marg{fleuron} (\gls{glssymbol}\marg{fleuron}, 
+\gls{glsentrydesc}\marg{fleuron}) and \gls{gls}\marg{tug}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}%
 \renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
@@ -1905,40 +1902,40 @@ A \idx{regular} term is encapsulated with
 and an abbreviation is encapsulated with 
 \nosecformatdef{glsxtrabbreviationfont}
 For example:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{xcolor}% provides colour
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newglossaryentry{duck}% label
-{
-   name = {duck},
-   description = {a waterbird with webbed feet}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{xcolor}\comment{provides colour}
+\cmd{usepackage}\marg{pifont}\comment{provides \gls{ding}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet}
 }
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
+\strut
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls{ding}\marg{167}},
+  \field{category} = \marg{ornament},
+  \field{description} = \marg{typographic ornament}
 }
-
-\newabbreviation{tug}{TUG}{\TeX\ Users Group}
-\newacronym{ascii}{ASCII}{American Standard Code for 
+\strut
+\gls{newabbreviation}\marg{tug}\marg{TUG}\marg{\cmd{TeX}\gls{cs.space}Users Group}
+\gls{newacronym}\marg{ascii}\marg{ASCII}\marg{American Standard Code for 
 Information Interchange}
-
-\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}
-\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}
-\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}
-
-\begin{document}
-Two \glspl{duck}, a \gls{fleuron} (\glssymbol{fleuron}, 
-\glsentrydesc{fleuron}), \gls{tug} and \gls{ascii}.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{renewcommand}\marg{\gls{glstextformat}}[1]\marg{\cmd{textcolor}\marg{violet}\marg{\gls{param}1}}
+\cmd{renewcommand}\marg{\gls{glsxtrregularfont}}[1]\marg{\cmd{underline}\marg{\gls{param}1}}
+\cmd{renewcommand}\marg{\gls{glsxtrabbreviationfont}}[1]\marg{\gls{emph}\marg{\gls{param}1}}
+\strut
+\cmd{begin}\marg{document}
+Two \gls{glspl}\marg{duck}, a \gls{gls}\marg{fleuron} (\gls{glssymbol}\marg{fleuron}, 
+\gls{glsentrydesc}\marg{fleuron}), \gls{gls}\marg{tug} and \gls{gls}\marg{ascii}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This now produces:
 \begin{result}%
 \renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
@@ -1962,44 +1959,44 @@ the name (without the leading backslash) of a command that takes a
 single argument, which will be used instead of \gls{glstextformat}
 for any entry that has this attribute set for its category.
 For example:
-\begin{lstlisting}[morekeywords={textformat}]
-\documentclass{article}
-
-\usepackage{xcolor}% provides colour
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newcommand{\ornamentfmt}[1]{\textcolor{cyan}{#1}}
-
-\glssetcategoryattribute{ornament}{textformat}{ornamentfmt}
-
-\newglossaryentry{duck}% label
-{
-   name = {duck},
-   description = {a waterbird with webbed feet}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{xcolor}\comment{provides colour}
+\cmd{usepackage}\marg{pifont}\comment{provides \gls{ding}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\cmd{newcommand}\marg{\cmd{ornamentfmt}}[1]\marg{\cmd{textcolor}\marg{cyan}\marg{\gls{param}1}}
+\strut
+\gls{glssetcategoryattribute}\marg{ornament}\marg{\catattr{textformat}}\marg{ornamentfmt}
+\strut
+\gls{newglossaryentry}\marg{duck}\comment{label}
+\marg{
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet}
 }
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
+\strut
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls{ding}\marg{167}},
+  \field{category} = \marg{ornament},
+  \field{description} = \marg{typographic ornament}
 }
-
-\newabbreviation{tug}{TUG}{\TeX\ Users Group}
-\newacronym{ascii}{ASCII}{American Standard Code for 
+\strut
+\gls{newabbreviation}\marg{tug}\marg{TUG}\marg{\cmd{TeX}\gls{cs.space}Users Group}
+\gls{newacronym}\marg{ascii}\marg{ASCII}\marg{American Standard Code for 
 Information Interchange}
-
-\renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}
-\renewcommand{\glsxtrregularfont}[1]{\underline{#1}}
-\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}
-
-\begin{document}
-Two \glspl{duck}, a \gls{fleuron} (\glssymbol{fleuron}, 
-\glsentrydesc{fleuron}), \gls{tug} and \gls{ascii}.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{renewcommand}\marg{\gls{glstextformat}}[1]\marg{\cmd{textcolor}\marg{violet}\marg{\gls{param}1}}
+\cmd{renewcommand}\marg{\gls{glsxtrregularfont}}[1]\marg{\cmd{underline}\marg{\gls{param}1}}
+\cmd{renewcommand}\marg{\gls{glsxtrabbreviationfont}}[1]\marg{\gls{emph}\marg{\gls{param}1}}
+\strut
+\cmd{begin}\marg{document}
+Two \gls{glspl}\marg{duck}, a \gls{gls}\marg{fleuron} (\gls{glssymbol}\marg{fleuron}, 
+\gls{glsentrydesc}\marg{fleuron}), \gls{gls}\marg{tug} and \gls{gls}\marg{ascii}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 \renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
@@ -2010,7 +2007,7 @@ This produces:
 Two \glspl{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron}, 
 \glsentrydesc{ex.fleuron}), \gls{TUG} and \gls{ASCII}.
 \end{result}
-So \verb|\gls{fleuron}| and \verb|\glssymbol{fleuron}| are now
+So \code{\gls{gls}\marg{fleuron}} and \code{\gls{glssymbol}\marg{fleuron}} are now
 formatted according to the custom command \csfmt{ornamentfmt}
 not by \gls{glstextformat}, but they are still affected by
 \gls{glsxtrregularfont}.
@@ -2018,11 +2015,11 @@ not by \gls{glstextformat}, but they are still affected by
 You can override a specific instance with the \glsopt{textformat}
 setting in the first optional argument of commands like \gls{gls}.
 For example, if the above is modified to:
-\begin{lstlisting}[morekeywords={textformat}]
-Two \glspl{duck}, a \gls[textformat=textbf]{fleuron} 
-(\glssymbol{fleuron}, \glsentrydesc{fleuron}), \gls{tug} 
-and \gls{ascii}.
-\end{lstlisting}
+\begin{codeenv}
+Two \gls{glspl}\marg{duck}, a \gls{gls}\oarg{\glsopt{textformat}=textbf}\marg{fleuron} 
+(\gls{glssymbol}\marg{fleuron}, \gls{glsentrydesc}\marg{fleuron}), \gls{gls}\marg{tug} 
+and \gls{gls}\marg{ascii}.
+\end{codeenv}
 then the result is now:
 \begin{result}
 \renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
@@ -2058,35 +2055,35 @@ implemented after any instances of commands such as \gls{gls} or
 hook).
 
 Consider the following document:
-\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant}]
-\documentclass{article}
-
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  description = {typographic ornament}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{pifont}\comment{provides \gls{ding}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls{ding}\marg{167}},
+  \field{description} = \marg{typographic ornament}
 }
-
-\newglossaryentry{pi}% label
-{
-  name = {Archimedes' constant},
-  symbol = {\ensuremath{\pi}},
-  category = {constant},
-  description = {Archimedes' constant}
+\strut
+\gls{newglossaryentry}\marg{pi}\comment{label}
+\marg{
+  \field{name} = \marg{Archimedes' constant},
+  \field{symbol} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+  \field{category} = \marg{constant},
+  \field{description} = \marg{Archimedes' constant}
 }
-
-% post-link hook for 'constant' category:
-\newcommand{\glsxtrpostlinkconstant}{% 
- \space (\glsentrysymbol{\glslabel})}
-
-\begin{document}
-A \gls{fleuron} and \gls{pi}.
-\end{document}
-\end{lstlisting}
+\strut
+\comment{post-link hook for 'constant' category:}
+\cmd{newcommand}\marg{\csfmt{glsxtrpostlinkconstant}}\marg{\comment{} 
+ \cmd{space} (\gls{glsentrysymbol}\marg{\gls{glslabel}})}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{fleuron} and \gls{gls}\marg{pi}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 \newcommand{\glsxtrpostlinkconstant}{\space (\glsentrysymbol{\glslabel})}%
@@ -2097,11 +2094,8 @@ explicitly set, so it defaults to \code{general}, but the \code{pi}
 entry has the \field{category} set to \code{constant}, so it's
 affected by the \idx{postlinkhook} for that category, which in this
 case is given by \csfmt{glsxtrpostlinkconstant}. This hook is
-defined to use:
-\nosecformatdef{glsentrysymbol}
-which works like \gls{glsentrydesc}, but in this case it expands to
-the value of the \field{symbol} key. (The entry label is obtained
-from \gls{glslabel}, which is set by \gls{gls} and similar commands.)
+defined to use \gls{glsentrysymbol} where the entry label is obtained
+from \gls{glslabel}, which is set by \gls{gls} and similar commands.
 
 \begin{important}
 If \code{\gls{glssymbol}\marg{\gls{glslabel}}} had been used instead of
@@ -2110,8 +2104,8 @@ recursion! Don't use commands like \gls{glssymbol}, \gls{glsdesc} or
 \gls{gls} in \idxpl{postlinkhook}.
 \end{important}
 
-This means that \verb|\gls{pi}| is automatically followed by the
-symbol in parentheses, but \verb|\gls{fleuron}| isn't because it's
+This means that \code{\gls{gls}\marg{pi}} is automatically followed by the
+symbol in parentheses, but \code{\gls{gls}\marg{fleuron}} isn't because it's
 governed by the \code{general} \idx{postlinkhook} instead. Note that
 the above is a simple example to demonstrate one of the uses of the
 \field{category} field.
@@ -2119,41 +2113,41 @@ the above is a simple example to demonstrate one of the uses of the
 Here's a minor modification that sets the category for the
 \code{fleuron} entry to \code{ornament} and creates another hook for
 that.
-\begin{lstlisting}[moretexcs={glsxtrpostlinkconstant,glsxtrpostlinkornament}]
-\documentclass{article}
-
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{pifont}\comment{provides \gls{ding}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls{ding}\marg{167}},
+  \field{category} = \marg{ornament},
+  \field{description} = \marg{typographic ornament}
 }
-
-\newglossaryentry{pi}% label
-{
-  name = {pi},
-  symbol = {\ensuremath{\pi}},
-  category = {constant},
-  description = {Archimedes' constant}
+\strut
+\gls{newglossaryentry}\marg{pi}\comment{label}
+\marg{
+  \field{name} = \marg{pi},
+  \field{symbol} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+  \field{category} = \marg{constant},
+  \field{description} = \marg{Archimedes' constant}
 }
-
-% post-link hook for 'ornament' category:
-\newcommand{\glsxtrpostlinkornament}{% 
- \space (\glsentrydesc{\glslabel})}
-
-% post-link hook for 'constant' category:
-\newcommand{\glsxtrpostlinkconstant}{% 
- \space (\glsentrysymbol{\glslabel})}
-
-\begin{document}
-A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and 
-\gls{pi}. Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
-\end{document}
-\end{lstlisting}
+\strut
+\comment{post-link hook for 'ornament' category:}
+\cmd{newcommand}\marg{\csfmt{glsxtrpostlinkornament}}\marg{\comment{}
+ \cmd{space} (\gls{glsentrydesc}\marg{\gls{glslabel}})}
+\strut
+\comment{post-link hook for 'constant' category:}
+\cmd{newcommand}\marg{\csfmt{glsxtrpostlinkconstant}}{\comment{}
+ \cmd{space} (\gls{glsentrysymbol}\marg{\gls{glslabel}})}
+\strut
+\cmd{begin}\marg{document}
+A \gls{gls}\marg{fleuron} and \gls{gls}\marg{pi}. Another \gls{gls}\marg{fleuron} and 
+\gls{gls}\marg{pi}. Symbols: \gls{glssymbol}\marg{fleuron} and \gls{glssymbol}\marg{pi}.
+\cmd{end}\marg{document}
+\end{codeenv}
 This produces:
 \begin{result}
 \newcommand{\glsxtrpostlinkornament}{\space (\glsentrydesc{\glslabel})}%
@@ -2173,25 +2167,26 @@ after the \idx{firstuse}. You can determine if the
 \idx{postlinkhook} follows the \idx{firstuse} of the entry using:
 \nosecformatdef{glsxtrifwasfirstuse}
 For example:
-\begin{lstlisting}
-\newcommand{\glsxtrpostlinkconstant}{% 
- \glsxtrifwasfirstuse{\space (\glsentrysymbol{\glslabel})}{}%
+\begin{codeenv}
+\cmd{newcommand}\marg{\csfmt{glsxtrpostlinkconstant}}\marg{\comment{}
+ \gls{glsxtrifwasfirstuse}\marg{\cmd{space} (\gls{glsentrysymbol}\marg{\gls{glslabel}})}\marg{}\comment{}
 }
-\end{lstlisting}
+\end{codeenv}
 Commands that don't check or modify the \idx{firstuseflag}, such as
 \gls{glssymbol}, always set \gls{glsxtrifwasfirstuse} so that it
-expands to \meta{false}. This means that even if \verb|\glssymbol{pi}|
-is placed before the first instance of \verb|\gls{pi}| it still
+expands to \meta{false}. This means that even if
+\code{\gls{glssymbol}\marg{pi}}
+is placed before the first instance of \code{\gls{gls}\marg{pi}} it still
 won't be treated as the first use of that entry.
 
 For convenience, there's a shortcut command:
 \nosecformatdef{glsxtrpostlinkAddSymbolOnFirstUse}
 So an alternative definition is:
-\begin{lstlisting}
-\newcommand{\glsxtrpostlinkconstant}{% 
-  \glsxtrpostlinkAddSymbolOnFirstUse
+\begin{codeenv}
+\cmd{newcommand}\marg{\csfmt{glsxtrpostlinkconstant}}\marg{\comment{}
+  \gls{glsxtrpostlinkAddSymbolOnFirstUse}
 }
-\end{lstlisting}
+\end{codeenv}
 This does nothing if the \field{symbol} field hasn't been set.
 
 Similarly, there's a shortcut command for the description:
@@ -2210,44 +2205,44 @@ This is just a shortcut for:
 \csfmt{csdef}\marg{glsxtrpostlink\meta{category}}\margm{definition}
 \end{codeenv}
 So the above document can be changed to:
-\begin{lstlisting}
-\documentclass{article}
-
-\usepackage{pifont}% provides \ding
-\usepackage{glossaries-extra}
-
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{pifont}\comment{provides \gls{ding}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls{ding}\marg{167}},
+  \field{category} = \marg{ornament},
+  \field{description} = \marg{typographic ornament}
 }
-
-\newglossaryentry{pi}% label
-{
-  name = {pi},
-  symbol = {\ensuremath{\pi}},
-  category = {constant},
-  description = {Archimedes' constant}
+\strut
+\gls{newglossaryentry}\marg{pi}\comment{label}
+\marg{
+  \field{name} = \marg{pi},
+  \field{symbol} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+  \field{category} = \marg{constant},
+  \field{description} = \marg{Archimedes' constant}
 }
-
-% post-link hook for 'ornament' category:
-\glsdefpostlink{ornament}{% 
-  \glsxtrpostlinkAddSymbolDescOnFirstUse
+\strut
+\comment{post-link hook for 'ornament' category:}
+\gls{glsdefpostlink}\marg{ornament}\marg{\comment{}
+  \gls{glsxtrpostlinkAddSymbolDescOnFirstUse}
 }
-
-% post-link hook for 'constant' category:
-\glsdefpostlink{constant}{% 
-  \glsxtrpostlinkAddSymbolOnFirstUse
+\strut
+\comment{post-link hook for 'constant' category:}
+\gls{glsdefpostlink}\marg{constant}\marg{\comment{}
+  \gls{glsxtrpostlinkAddSymbolOnFirstUse}
 }
-
-\begin{document}
-Symbols: \glssymbol{fleuron} and \glssymbol{pi}.
-A \gls{fleuron} and \gls{pi}. Another \gls{fleuron} and 
-\gls{pi}.
-\end{document}
-\end{lstlisting}
+\strut
+\cmd{begin}\marg{document}
+Symbols: \gls{glssymbol}\marg{fleuron} and \gls{glssymbol}\marg{pi}.
+A \gls{gls}\marg{fleuron} and \gls{gls}\marg{pi}. Another \gls{gls}\marg{fleuron} and 
+\gls{gls}\marg{pi}.
+\cmd{end}\marg{document}
+\end{codeenv}
 The result is now:
 \begin{result}%
 \glsdefpostlink{ornament}{\glsxtrpostlinkAddSymbolDescOnFirstUse}%
@@ -2319,27 +2314,27 @@ sequence. For example, the \isty{soul} package provides the command
 argument to work. If I simply try to change the standard
 \gls{underline} to \gls{ul} in the earlier example from
 \sectionref{sec:glsformats}:
-\begin{lstlisting}
-\renewcommand{\glsxtrregularfont}[1]{\ul{#1}}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{renewcommand}\marg{\gls{glsxtrregularfont}}[1]\marg{\cmd{ul}\marg{\gls{param}1}}
+\end{codeenv}
 then this causes the error:
 \begin{verbatim}
 ! Package soul Error: Reconstruction failed.
 \end{verbatim}
 Instead I need:
-\begin{lstlisting}
-\renewcommand{\glsxtrregularfont}[1]{\GlsXtrExpandedFmt\ul{#1}}
-\end{lstlisting}
+\begin{codeenv}
+\cmd{renewcommand}\marg{\gls{glsxtrregularfont}}[1]\marg{\gls{GlsXtrExpandedFmt}\cmd{ul}\marg{\gls{param}1}}
+\end{codeenv}
 \emph{and also} \gls{ding} now needs protection:
-\begin{lstlisting}
-\newglossaryentry{fleuron}% label
-{
-  name = {fleuron},
-  symbol = {\protect\ding{167}},
-  category = {ornament},
-  description = {typographic ornament}
+\begin{codeenv}
+\gls{newglossaryentry}\marg{fleuron}\comment{label}
+\marg{
+  \field{name} = \marg{fleuron},
+  \field{symbol} = \marg{\gls{protect}\gls{ding}\marg{167}},
+  \field{category} = \marg{ornament},
+  \field{description} = \marg{typographic ornament}
 }
-\end{lstlisting}
+\end{codeenv}
 
 \chapter{Incorporating \bibgls}
 \label{sec:bib2gls}
@@ -2366,9 +2361,8 @@ Instead I need:
   \glspar\medskip}%
 }
 
-\let\orgtarget\glstarget
 \renewcommand*{\glstarget}[2]{%
- \glsifcategory{#1}{command}{#2}{\orgtarget{#1}{#2}}%
+ \glsifcategory{#1}{command}{#2}{\glsdohypertarget{\glolinkprefix#1}{#2}}%
 }
 \renewcommand{\glstreeitem}{\par\parindent0pt}
 \renewcommand*{\glsxtrbookindexprelocation}[1]{%
