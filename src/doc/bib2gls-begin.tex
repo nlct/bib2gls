@@ -53,6 +53,7 @@
 \glssetcategoryattribute{initialism}{discardperiod}{true}
 \glssetcategoryattribute{initialism}{retainfirstuseperiod}{true}
 \setabbreviationstyle[initialism]{short-long}
+\setabbreviationstyle[abbrvtrans]{long-short-user}
 
 \newcommand{\bibglspassim}{}
 \newcommand{\bibglsseealsosep}{\par\hangindent .75em\parindent .75em\relax}
@@ -61,7 +62,9 @@
  src={bib2gls},
  max-loc-diff=3,
  entry-type-aliases={dualindexentry=entry},
- field-aliases={note=user2}
+ field-aliases={note=user2},
+ break-at={none},
+ sort-replace={{,? +}{|},{\glshex2423}{ }}
 ]
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
@@ -1837,6 +1840,40 @@ This produces:
 Today I went to my surgery to see the \gls{ex2.gp}.
 Tomorrow I'm going to my surgery to see the \gls{ex2.gp}.
 \end{result}
+
+\section{Translations}
+\label{sec:abbrvtrans}
+
+If an abbreviation needs to be accompanied by a translation, then
+you can use a custom field or one of the supplied user fields
+described in \sectionref{sec:userkeys} to store the translation. The
+\code{-user} abbreviation styles can be used to include the extra
+information if the field is set. The \field{user1} field
+is the default, but you can change this by redefining
+\nosecformatdef{glsxtruserfield}
+to the \emph{internal} field name. (For example, \field{userii} for
+\field{user2}.) In the sample document below, the translation is
+supplied in the default \field{user1} field:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{setabbreviationstyle}\marg{\abbrstyle{long-short-user}}
+\strut
+\gls{newabbreviation}\oarg{\field{user1}=\marg{ribonucleic acid}}
+ \marg{rna}\marg{RNA}\marg{ribonukleins\gls[noindex=false]{umlaut}aure}
+\strut
+\cmd{begin}\marg{document}
+First use: \gls{gls}\marg{rna}.  Next use: \gls{gls}\marg{rna}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+First use: \gls{ex.rna}.  Next use: \gls{ex.rna}.
+\end{result}
+If the field is empty, \abbrstyle{long-short-user} behaves like
+\abbrstyle{long-short}.
 
 \chapter{Symbols}
 \label{sec:symbols}

@@ -10029,14 +10029,14 @@ applicable). For example, suppose the sort value is
 \begin{verbatim}
 \ensuremath{\approx 3.14}
 \end{verbatim}
-then the interpreter will convert this to \code{\char"2248 3.14} but
+then the interpreter will convert this to $\mathtt{\approx}$\texttt{3.14} but
 \begin{codeenv}
 \csopt[\marg{\cs{glshex}2248}\marg{}]{sort-replace}
 \end{codeenv}
-can be used to strip the $\approx$ symbol so that the value can
+can be used to strip the $\approx$ symbol (\hex{2248}) so that the value can
 now be parsed as a number if \csopt[double]{sort} has been used.
 
-Use \csopt{dual-sort-replace} for duals
+Use \csopt{dual-sort-replace} for dual
 and \csopt{secondary-sort-replace} for secondary sort methods.
 
 \optsection{sort-rule}
@@ -10193,6 +10193,16 @@ converted to \verb"sea|lion|" whereas \qt{sea} becomes \verb"sea|"
 and \qt{seal} becomes \verb"seal|". The default marker is \verb"|"
 which is commonly placed in collation rules before digits but 
 after the ignored characters, such as spaces and hyphens.
+
+Note that this action removes non-letters, so for example,
+if the sort value is \verb"# (parameter)" then it will be converted
+to \verb"parameter|" (hash, space and parentheses removed).
+If you only want to break at spaces (optionally following a command)
+use the following instead:
+\begin{codeenv}
+ \csopt[none]{break-at},
+ \csopt[\marg{,? +}\marg{|}]{sort-replace}
+\end{codeenv}
 
 You can change the construction of the break points with
 \csopt[\meta{option}]{break-at} where \meta{option} may be one of:
