@@ -21,6 +21,7 @@ package com.dickimawbooks.bib2gls;
 import java.util.Locale;
 import java.util.IllformedLocaleException;
 import java.util.MissingResourceException;
+import java.util.Vector;
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -749,6 +750,16 @@ public class SortSettings
       return groupFormation;
    }
 
+   public void setRegexList(Vector<PatternReplace> list)
+   {
+      this.regexList = list;
+   }
+
+   public Vector<PatternReplace> getRegexList()
+   {
+      return regexList;
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
@@ -802,6 +813,8 @@ public class SortSettings
    private String padPlus = ">";
 
    private String missingFieldFallback=null;
+
+   private Vector<PatternReplace> regexList = null;
 
    private Bib2Gls bib2gls;
 }

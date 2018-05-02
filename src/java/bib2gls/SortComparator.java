@@ -369,15 +369,17 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       String value = null;
 
-      if (sortField.equals("id"))
+      String entrySortField = sortField;
+
+      if (entrySortField.equals("id"))
       {
          value = id;
       }
       else
       {
-         value = entry.getFieldValue(sortField);
+         value = entry.getFieldValue(entrySortField);
 
-         BibValueList list = entry.getField(sortField);
+         BibValueList list = entry.getField(entrySortField);
 
          if (value == null)
          {
@@ -386,19 +388,19 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
             if (fallbackField != null)
             {
                bib2gls.debugMessage("message.missing.sort.fallback", 
-               id, sortField, fallbackField);
+               id, entrySortField, fallbackField);
 
                value = entry.getFieldValue(fallbackField);
                list = entry.getField(fallbackField);
 
-               sortField = fallbackField;
+               entrySortField = fallbackField;
             }
          }
 
          if (value == null)
          {
-            value = entry.getFallbackValue(sortField);
-            list = entry.getFallbackContents(sortField);
+            value = entry.getFallbackValue(entrySortField);
+            list = entry.getFallbackContents(entrySortField);
          }
 
          if (value == null)
@@ -406,7 +408,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
             value = id;
 
             bib2gls.debugMessage("warning.no.default.sort",
-              id, sortField, entry.getEntryType());
+              id, entrySortField, entry.getEntryType());
          }
          else if (bib2gls.useInterpreter() && list != null
                    && value.matches("(?s).*[\\\\\\$\\{\\}\\~].*"))
@@ -417,6 +419,16 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          if (useSortSuffix())
          {
             value = applySuffix(entry, value);
+         }
+      }
+
+      Vector<PatternReplace> regexList = settings.getRegexList();
+
+      if (regexList != null)
+      {
+         for (PatternReplace patternReplace : regexList)
+         {
+            value = patternReplace.replaceAll(value);
          }
       }
 

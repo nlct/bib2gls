@@ -1,8 +1,19 @@
-v1.4 (pending):
+v1.5 (pending):
 
   * new .glstex helper command:
 
     \bibglssetlastgrouptitle
+
+  * added resource options:
+
+   - sort-replace
+   - dual-sort-replace
+   - secondary-sort-replace
+
+  * bug fixes:
+
+   - corrected encoding setting 
+   - corrected sort fallback
 
 v1.4 (2018-04-09):
 

@@ -10019,6 +10019,26 @@ trailing spaces. The default setting is \csopt[true]{trim-sort}.
 This option automatically sets \csopt[\meta{boolean}]{dual-trim-sort}
 and \csopt[\meta{boolean}]{secondary-trim-sort}.
 
+\optsection{sort-replace}
+
+This option may be used to perform regular expression substitutions
+on the sort value and has the same syntax as \csopt{labelify-replace}. 
+This action is done after the interpreter parses the
+sort value (if applicable) and before \csopt{sort-number-pad} (if
+applicable). For example, suppose the sort value is
+\begin{verbatim}
+\ensuremath{\approx 3.14}
+\end{verbatim}
+then the interpreter will convert this to \code{\char"2248 3.14} but
+\begin{codeenv}
+\csopt[\marg{\cs{glshex}2248}\marg{}]{sort-replace}
+\end{codeenv}
+can be used to strip the $\approx$ symbol so that the value can
+now be parsed as a number if \csopt[double]{sort} has been used.
+
+Use \csopt{dual-sort-replace} for duals
+and \csopt{secondary-sort-replace} for secondary sort methods.
+
 \optsection{sort-rule}
 
 If the \csopt[custom]{sort} option is used, the sort rule must be
@@ -11188,6 +11208,10 @@ As \csopt{missing-sort-fallback} but for secondary sorting.
 
 As \csopt{trim-sort} but for secondary sorting.
 
+\optsection{secondary-sort-replace}
+
+As \csopt{sort-replace} but for secondary sorting.
+
 \optsection{secondary-sort-rule}
 
 As \csopt{sort-rule} but for secondary custom sorting.
@@ -11624,6 +11648,10 @@ As \csopt{missing-sort-fallback} but for dual sorting.
 \optsection[\subsubsection]{dual-trim-sort}
 
 As \csopt{trim-sort} but for dual sorting.
+
+\optsection[\subsubsection]{dual-sort-replace}
+
+As \csopt{sort-replace} but for dual sorting.
 
 \optsection[\subsubsection]{dual-sort-rule}
 

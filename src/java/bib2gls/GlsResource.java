@@ -563,6 +563,18 @@ public class GlsResource
          {
             labelifyReplaceMap = getSubstitutionList(parser, list, opt);
          }
+         else if (opt.equals("sort-replace"))
+         {
+            sortSettings.setRegexList(getSubstitutionList(parser, list, opt));
+         }
+         else if (opt.equals("dual-sort-replace"))
+         {
+            dualSortSettings.setRegexList(getSubstitutionList(parser, list, opt));
+         }
+         else if (opt.equals("secondary-sort-replace"))
+         {
+            secondarySortSettings.setRegexList(getSubstitutionList(parser, list, opt));
+         }
          else if (opt.equals("interpret-preamble"))
          {
             interpretPreamble = getBoolean(parser, list, opt);
