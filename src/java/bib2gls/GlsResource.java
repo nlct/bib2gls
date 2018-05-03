@@ -3535,6 +3535,42 @@ public class GlsResource
             replacementArg = ((Group)replacementArg).toList();
          }
 
+         // replace \$ with $ and backslash u<hex> with given character
+
+         if (replacementArg instanceof TeXObjectList)
+         {
+            TeXObjectList newList = new TeXObjectList();
+            TeXParserListener listener = parser.getListener();
+
+            while (((TeXObjectList)replacementArg).size() > 0)
+            {
+               TeXObject token = ((TeXObjectList)replacementArg).popToken();
+
+               if (token instanceof ControlSequence)
+               {
+                  String name = ((ControlSequence)token).getName();
+
+                  if (name.equals("$"))
+                  {
+                     token = listener.getOther('$');
+                  }
+                  else if (name.equals("u"))
+                  {
+                     ((TeXObjectList)replacementArg).push(
+                       listener.getOther('"'));
+                     TeXNumber num
+                       = ((TeXObjectList)replacementArg).popNumber(parser);
+                     token = listener.getOther(num.number(parser));
+                     newList.add(listener.getOther('\\'));
+                  }
+               }
+
+               newList.add(token);
+            }
+
+            replacementArg = newList;
+         }
+
          String regex = regexArg.toString(parser);
          String replacement = replacementArg.toString(parser);
 

@@ -6594,7 +6594,24 @@ file so take care to protect any special characters. For example, to
 match a literal \idx{full-stop} use \cs{cs.string}\ics{cs.period}
 rather than just \ics{cs.period} (backslash dot).
 
-Both \csopt{labelify} and \csopt{labelify-list} use this setting to 
+In the \meta{replacement} part, you can use
+\ics{glscapturedgroup}\meta{n} to reference a captured sub-sequence.
+For example:
+\begin{verbatim}
+\csopt[{([A-Z])\string\.}{\glscapturedgroup1}]{labelify-replace}
+\end{verbatim} 
+This removes any \idx{full-stop} that follows any of the characters
+A,\ldots,Z. Alternatively, you can just use \verb|\string\$|
+instead of \cs{glscapturedgroup}. If you want a literal dollar
+character, you need to use \cs{glshex}\code{24} (or
+\verb|\string\u|). This isn't recommended for labels (since special
+characters are automatically stripped), but
+\csopt{sort-replace} follows the same rules as
+\csopt{labelify-replace}, and it may be needed
+for that.
+
+Both \csopt{labelify} and \csopt{labelify-list} use the
+\csopt{labelify-replace} setting to 
 perform substitutions. For example, to replace the sub-string \qt{ and }
 (including spaces) with a comma:
 \begin{verbatim}

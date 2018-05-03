@@ -17,6 +17,7 @@
 \usepackage{pifont}
 \usepackage{graphicx}
 \usepackage{datetime2}
+\usepackage{siunitx}
 
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
@@ -63,8 +64,10 @@
  max-loc-diff=3,
  entry-type-aliases={dualindexentry=entry},
  field-aliases={note=user2},
+ symbol-sort-fallback={name},
  break-at={none},
- sort-replace={{,? +}{|},{\glshex2423}{ }}
+ sort-replace={{,? +}{|},{\glshex2423}{ },
+  {([a-zA-Z])\string\.}{\glscapturedgroup1}}
 ]
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
@@ -189,6 +192,7 @@
  \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
    \def\cmd{\char`\\}%
    \def\comment##1{\textcolor{comment}{\%\ ##1}}%
+   \renewcommand*{\styfmt}[1]{##1}%
    \renewcommand*{\catattrfmt}[1]{\textcolor{attribute}{##1}}%
    \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
    \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
@@ -1877,6 +1881,131 @@ If the field is empty, \abbrstyle{long-short-user} behaves like
 
 \chapter{Symbols}
 \label{sec:symbols}
+
+\Sectionref{sec:userkeys} described the \field{symbol} key, which can
+be used to additionally provide a symbol. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{\gls[noindex=false]{siunitx}}\comment{provides \gls{si}}
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{length}\comment{label}
+\marg{\comment{settings:}
+   \field{name}   = \marg{length},
+   \field{symbol} = \marg{\gls{si}\marg{\cmd{metre}}},
+   \field{description} = \marg{measurement between two points}
+}
+\strut
+\gls{newglossaryentry}\marg{area}\comment{label}
+\marg{\comment{settings:}
+   \field{name}   = \marg{area},
+   \field{symbol} = \marg{\gls[noindex=false]{si}\marg{\cmd{metre}\cmd{squared}}},
+   \field{description} = \marg{measurement of a surface}
+}
+\strut
+\cmd{begin}\marg{document}
+Measurements: \gls{gls}\marg{length} (\gls{glssymbol}\marg{length}) and
+\gls{gls}\marg{area} (\gls{glssymbol}\marg{area}).
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+Measurements: \gls{ex.length} (\glssymbol{ex.length}) and
+\gls{ex.area} (\glssymbol{ex.area}).
+\end{result}
+
+It may be that you prefer to have the symbol in the \field{name}
+field instead. The example document below is a modification of the
+above and uses the \idx{postlinkhook} to append the description on
+\idx{firstuse} (see \sectionref{sec:postlinkhooks}).
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{siunitx}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls[noindex=false]{glsnoexpandfields} \comment{name field contains \gls{si}}
+\strut
+\gls{glsdefpostlink}\marg{symbol}\marg{\gls{glsxtrpostlinkAddDescOnFirstUse}}
+\strut
+\gls{newglossaryentry}\marg{length}\comment{label}
+\marg{\comment{settings:}
+  \field{name} = \marg{\gls{si}\marg{\cmd{metre}}},
+  \field{description} = \marg{length},
+  \field{category} = \marg{symbol}
+}
+\strut
+\gls{newglossaryentry}\marg{area}\comment{label}
+\marg{\comment{settings:}
+  \field{name} = \marg{\gls{si}\marg{\cmd{metre}\cmd{squared}}},
+  \field{description} = \marg{area},
+  \field{category} = \marg{symbol}
+}
+\strut
+\cmd{begin}\marg{document}
+First use: \gls{gls}\marg{length} and \gls{gls}\marg{area}.
+Next use: \gls{gls}\marg{length} and \gls{gls}\marg{area}.
+\cmd{end}\marg{document}
+\end{codeenv}
+Note the need for \gls{glsnoexpandfields} (described in
+\sectionref{sec:robust}). This wasn't required in the previous
+example because the \sty{siunitx} commands were in the
+\field{symbol} field, which isn't expanded by default. The
+\field{name} field also isn't expanded by default, but its value is
+copied to the \field{text} and \field{first} fields, which are
+expanded by default. If \gls{glsnoexpandfields} is omitted from the
+above document, the following error would occur:
+\begin{verbatim}
+! Undefined control sequence.
+\@glo@name ->\si {\metre 
+                         }
+\end{verbatim}
+Although \gls{si} is robust, commands like \csfmt{metre} and
+\csfmt{squared} aren't.
+With \gls{glsnoexpandfields}, the document compiles correctly and
+produces:
+\begin{result}
+\glsdefpostlink{symbol}{\glsxtrpostlinkAddDescOnFirstUse}%
+First use: \gls{ex2.length} and \gls{ex2.area}.
+Next use: \gls{ex2.length} and \gls{ex2.area}.
+\end{result}
+
+The \sty{glossaries-extra}['s] \styopt{symbols} package option
+provides the command
+\nosecformatdef{glsxtrnewsymbol}
+which is a shortcut for
+\begin{codeenv}
+\gls{newglossaryentry}\margm{label}\marg{\field{name}=\margm{symbol},\field{category}=\marg{symbol},\gls[noindex=false]{field.sort}=\margm{label},
+\gls[noindex=false]{field.type}=\marg{symbols},\meta{\keyvallist}}
+\end{codeenv}
+So the above document can be changed to:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{siunitx}
+\cmd{usepackage}[\styopt{symbols}]\marg{glossaries-extra}
+\strut
+\gls{glsnoexpandfields}
+\strut
+\gls{glsdefpostlink}\marg{symbol}\marg{\gls{glsxtrpostlinkAddDescOnFirstUse}}
+\strut
+\gls{glsxtrnewsymbol}\oarg{\field{description} = \marg{length}}\marg{length}\marg{\gls{si}\marg{\cmd{metre}}}
+\strut
+\gls{glsxtrnewsymbol}\oarg{\field{description} = \marg{area}}\marg{area}\marg{\gls{si}\marg{\cmd{metre}\cmd{squared}}}
+\strut
+\cmd{begin}{document}
+First use: \gls{gls}\marg{length} and \gls{gls}\marg{area}.
+Next use: \gls{gls}\marg{length} and \gls{gls}\marg{area}.
+\cmd{end}\marg{document}
+\end{codeenv}
+The result is the same.
+
+\section{Functions}
+\label{sec:functions}
+
+\section{Dealing with Automated Case-Changing}
+\label{sec:symfirstuc}
 
 \chapter{Displaying the Definition}
 \label{sec:printgloss}
