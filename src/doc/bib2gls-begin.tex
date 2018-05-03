@@ -2004,6 +2004,176 @@ The result is the same.
 \section{Functions}
 \label{sec:functions}
 
+Some symbols may represent functions. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{symbols}]\marg{glossaries-extra}
+\strut
+\gls{glsnoexpandfields}
+\strut
+\gls{glsxtrnewsymbol}
+ \oarg{\field{description} = \marg{derivative}}
+ \marg{deriv}\comment{label}
+ \marg{\gls{ensuremath}\marg{f'(x)}}\comment{symbol}
+\strut
+\cmd{begin}\marg{document}
+The derivative is denoted \gls{gls}\marg{deriv}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+The derivative is denoted \gls{ex.deriv}.
+\end{result}
+What if I need to change the variable for a specific instance, for
+example, if I want $f'(x_i)$ instead of $f'(x)$? I can just use:
+\begin{codeenv}
+The gradient at \gls{mshiftchar}x\gls{sbchar}i\gls{mshiftchar} is \gls{mshiftchar}f'(x\gls{sbchar}i)\gls{mshiftchar}.
+\end{codeenv}
+So far, none of the example documents have a glossary or list of
+terms. The ultimate aim when using the \styfmt{glossaries} package
+is to ensure consistent formatting and notation, and, where
+applicable, include a list of all terms referenced in the document.
+The use of commands like \gls{gls} helps to achieve this. If the
+notation needs to be changed, only the entry definition (and
+associated formatting commands) should need to be redefined without
+having to go through the whole document changing the code. Using
+commands like \gls{gls} also identifies which entries need to be
+included in the list of terms and, if \sty{hyperref} is loaded, can
+be hyperlinked to the relevant place in that list.
+
+So explicitly using \verb|f'(x_i)| won't index the \code{deriv} entry 
+or mark it has having been used or create a hyperlink. One
+possibility is to use one of the following commands:
+\nosecformatdef{glslink}
+\nosecformatdef{glsdisp}
+They both work in much the same way, indexing the entry and
+displaying \meta{text} as the \idx{link-text}. The only difference is
+that \gls{glsdisp} also unsets the \idx{firstuseflag}, which marks the entry
+as having been used. For example:
+\begin{codeenv}
+The gradient at \gls{mshiftchar}x\gls{sbchar}i\gls{mshiftchar} is \gls{glslink}\marg{deriv}\marg{\gls{mshiftchar}f'(x\gls{sbchar}i)\gls{mshiftchar}}.
+\end{codeenv}
+This solves the problem of ensuring that the \code{deriv} entry is
+indexed and, if \sty{hyperref} is loaded, that the
+\idx{link-text} has a hyperlink to the relevant place in the list of
+notation, but it doesn't solve the problem of consistent formatting.
+
+One way of ensuring consistent formatting is to define a semantic
+command. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{symbols}]\marg{glossaries-extra}
+\strut
+\gls{glsnoexpandfields}
+\strut
+\cmd{newcommand}\marg{\cmd{derivfn}}[1]\marg{f'(\gls{param}1)}
+\strut
+\gls{glsxtrnewsymbol}
+ \oarg{\field{description} = \marg{derivative}}
+ \marg{deriv}\comment{label}
+ \marg{\gls{ensuremath}\marg{\cmd{derivfn}\marg{x}}}\comment{symbol}
+\strut
+\cmd{begin}\marg{document}
+The derivative is denoted \gls{gls}\marg{deriv}.
+The gradient at \gls{mshiftchar}x\gls{sbchar}i\gls{mshiftchar} is \gls{glslink}\marg{deriv}\marg{\gls{mshiftchar}\cmd{derivfn}\marg{x\gls{sbchar}i}\gls{mshiftchar}}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\providecommand{\derivfn}[1]{f'(#1)}
+The derivative is denoted \gls{ex.deriv}.
+The gradient at $x_i$ is \glslink{ex.deriv}{$\derivfn{x_i}$}.
+\end{result}
+Now only \csfmt{derivfn} needs modifying if the notation must change.
+This requires remembering both the entry label (\code{deriv} in this
+case) and the associated formatting command (\csfmt{derivfn} in this
+case). The \sty{glossaries-extra} package provides a way of storing
+the associated formatting command in one of the additional keys (see
+\sectionref{sec:userkeys}). The field is identified by:
+\nosecformatdef{GlsXtrFmtField}
+which defaults to \field{useri} (the internal representation of the
+\field{user1} key). The value must be the name (without the leading
+backslash) of a control sequence that takes a \emph{single}
+mandatory argument. The above custom command \code{derivfn}
+satisfies this requirement, so the entry can be defined as:
+\begin{codeenv}
+\gls{glsxtrnewsymbol}
+ \oarg{\comment{settings:}
+   \field{description} = \marg{derivative},
+   \field{user1} = \marg{derivfn}
+ }
+ \marg{deriv}\comment{label}
+ \marg{\gls{ensuremath}\marg{\cmd{derivfn}\marg{x}}}\comment{symbol}
+\end{codeenv}
+The formatting command can now be applied using one of the
+following:
+\nosecformatdef{glsxtrfmt}
+\nosecformatdef{glsxtrfmt*}
+which internally use \gls{glslink} or:
+\nosecformatdef{glsxtrentryfmt}
+which doesn't (as so is more like using \gls{glsentryname}).
+
+So an alternative approach is:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{symbols}]\marg{glossaries-extra}
+\strut
+\gls{glsnoexpandfields}
+\strut
+\cmd{newcommand}\marg{\cmd{derivfn}}[1]\marg{f'(\gls{param}1)}
+\strut
+\gls{glsxtrnewsymbol}
+ \oarg{\comment{settings:}
+   \field{description} = \marg{derivative},
+   \field{user1} = \marg{derivfn}
+ }
+ \marg{deriv}\comment{label}
+ \marg{\gls{ensuremath}\marg{\cmd{derivfn}\marg{x}}}\comment{symbol}
+\strut
+\cmd{begin}\marg{document}
+The derivative is denoted \gls{gls}\marg{deriv}.
+The gradient at \gls{mshiftchar}x\gls{sbchar}i\gls{mshiftchar} is \gls{mshiftchar}\gls{glsxtrfmt}\marg{deriv}\marg{x\gls{sbchar}i}\gls{mshiftchar}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This again produces:
+\begin{result}
+The derivative is denoted \gls{ex.deriv}.
+The gradient at $x_i$ is $\glsxtrfmt{ex.deriv}{x_i}$.
+\end{result}
+
+Both the starred \gls{glsxtrfmt*} and unstarred \gls{glsxtrfmt}
+format the \meta{text} argument using:
+\nosecformatdef{glsxtrfmtdisplay}
+where \meta{cs-name} is the control sequence name stored in the
+field identified by \gls{GlsXtrFmtField} and the \meta{insert} part
+is empty for the unstarred \gls{glsxtrfmt} and the final optional
+argument for the starred \gls{glsxtrfmt*}. If the command identified
+by \meta{cs-name} doesn't exist (or if the field providing it isn't
+set) then just \meta{text}\meta{insert} is done.
+
+\begin{important}
+Nested \idx{link-text} causes problems so don't use \gls{glsxtrfmt}
+in the optional part of commands like \gls{gls} or \gls{glssymbol}
+or in field values that are used by those types of command. Also
+don't use \gls{glsxtrfmt} within the \meta{text} or \meta{insert}
+part of another instance of \gls{glsxtrfmt} or in \gls{glslink} or
+\gls{glsdisp}. Use \gls{glsxtrentryfmt} instead.
+\end{important}
+
+If more than one argument is required, then a helper macro is
+needed. For example:
+\begin{verbatim}
+\newcommand{\iderivfn}[2][f]{#1'(#2)}
+\newcommand{\derivfn}[1]{\iderivfn#1}
+\end{verbatim}
+Now to obtain $g'(x_i)$:
+\begin{codeenv}
+\gls{mshiftchar}\gls{glsxtrfmt}\marg{deriv}\marg{[g]\marg{x\gls{sbchar}i}}\gls{mshiftchar}
+\end{codeenv}
+
 \section{Dealing with Automated Case-Changing}
 \label{sec:symfirstuc}
 

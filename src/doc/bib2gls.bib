@@ -1,6 +1,7 @@
 % Encoding: UTF-8
 
-@preamble{"\providecommand{\dhyphen}{-}"}
+@preamble{"\providecommand{\dhyphen}{-}
+\providecommand{\derivfn}[1]{f'(#1)}"}
 
 @abbreviation{IETF,
  short = {IETF},
@@ -987,6 +988,18 @@ location obtained from the \field{indexcounter} field},
   user1={\margm{label}\margm{text}},
   description={alternative to \cs{glsxtrfmt} for use in
     section headings},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtrfmtdisplay,
+  name={\csfmt{gls\-xtr\-fmt\-display}},
+  user1={\margm{cs-name}\margm{text}\oargm{insert}},
+  description={used by \cs{glsxtrfmt} to format the given
+\meta{text} where \meta{cs-name} is obtained from the field
+identified by \cs{GlsXtrFmtField} and \meta{insert} is empty for the
+unstarred \gls{glsxtrfmt} and the final optional argument of the
+starred version \gls{glsxtrfmt*}},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7421,6 +7434,17 @@ packages},
   description={links to the entry's location in the glossary with
    the given link text without altering the first use flag},
   note={provided by \styfmt{glossaries}},
+  seealso={glsdisp},
+  category={command}
+}
+
+@index{glsdisp,
+  name={\csfmt{glsdisp}},
+  user1={\oargm{options}\margm{label}\oargm{text}},
+  description={links to the entry's location in the glossary with
+   the given link text and marks the entry as having been used},
+  note={provided by \styfmt{glossaries}},
+  seealso={glslink},
   category={command}
 }
 
@@ -8465,5 +8489,12 @@ name} and the displayed \meta{text}},
   parent={exampleterms},
   description = {area},
   name = {\si{\metre\squared}}
+}
+
+@symbol{ex.deriv,
+  parent={exampleterms},
+  description = {derivative},
+  name = {\ensuremath{\derivfn{x}}},
+  user1 = {derivfn}
 }
 
