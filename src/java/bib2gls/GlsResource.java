@@ -4604,6 +4604,7 @@ public class GlsResource
 
    private void addHierarchy(Bib2GlsEntry childEntry, 
       Vector<Bib2GlsEntry> entries, Vector<Bib2GlsEntry> data)
+   throws Bib2GlsException
    {
       String parentId = childEntry.getParent();
 
@@ -4619,6 +4620,12 @@ public class GlsResource
 
             return;
          }
+      }
+
+      if (parentId.equals(childEntry.getId()))
+      {
+         throw new Bib2GlsException(bib2gls.getMessage("error.child.parent",
+           parentId));
       }
 
       Bib2GlsEntry parent = getEntry(parentId, data);

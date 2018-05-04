@@ -401,6 +401,7 @@ the second list ({3,number}).</entry>
 <entry key="error.forbidden.ext">Write access forbidden for extension: {0}</entry>
 <entry key="error.cant.open.process.stream">Unable to open input stream from process: {0}</entry>
 <entry key="error.cyclic.hierarchy">Cyclical hierarchy for entry: {0}</entry>
+<entry key="error.child.parent">Entry can''t be its own parent: {0}</entry>
 <entry key="error.duplicate.resource">Duplicate resource: {0}</entry>
 <entry key="error.nested.range">Nested location range: {0}
 Outer range started with: {1}</entry>
