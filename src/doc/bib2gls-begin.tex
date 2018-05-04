@@ -18,10 +18,11 @@
 \usepackage{graphicx}
 \usepackage{datetime2}
 \usepackage{siunitx}
+\usepackage{mhchem}
 
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
-\usepackage[record,nostyles,stylemods={bookindex},style=index]{glossaries-extra}
+\usepackage[record,subentrycounter,nostyles,stylemods={bookindex},style=index]{glossaries-extra}
 
 \definecolor{field}{named}{DarkSlateGray4}
 \definecolor{cs}{named}{DarkSeaGreen4}
@@ -62,7 +63,7 @@
 \GlsXtrLoadResources[
  src={bib2gls},
  max-loc-diff=3,
- entry-type-aliases={dualindexentry=entry},
+ entry-type-aliases={dualindexentry=index},
  field-aliases={note=user2},
  symbol-sort-fallback={name},
  break-at={none},
@@ -193,6 +194,7 @@
    \def\cmd{\char`\\}%
    \def\comment##1{\textcolor{comment}{\%\ ##1}}%
    \renewcommand*{\styfmt}[1]{##1}%
+   \renewcommand*{\counterfmt}[1]{##1}%
    \renewcommand*{\catattrfmt}[1]{\textcolor{attribute}{##1}}%
    \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
    \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
@@ -287,6 +289,7 @@
 \newcommand*{\csopt}[2][]{\gencsopt{#1}{opt}{#2}}%
 \newcommand*{\glsopt}[2][]{\gencsopt{#1}{gls}{#2}}%
 \newcommand*{\glsaddopt}[2][]{\gencsopt{#1}{glsadd}{#2}}%
+\newcommand*{\printglossopt}[2][]{\gencsopt{#1}{printgloss}{#2}}%
 
 \newcommand*{\gencsopt}[3]{%
   \texorpdfstring%
@@ -372,6 +375,24 @@
 \newcommand*{\sectionref}[1]{section~\ref{#1}}
 \newcommand*{\Sectionref}[1]{Section~\ref{#1}}
 
+\newcommand{\doglossaryentry}[1]{%
+  \glsxtrglossentry{#1} & \glsentrydesc{#1}\glspostdescription\\%
+}
+\newcounter{localglossary}
+\newenvironment{localglossary}
+{%
+  \stepcounter{localglossary}%
+  \renewcommand{\glolinkprefix}{\thelocalglossary.}%
+  \GlsXtrStartUnsetBuffering*
+}
+{%
+  \par
+  \begin{tabular}{ll}
+  \GlsXtrForUnsetBufferedList\doglossaryentry
+  \end{tabular}
+  \GlsXtrStopUnsetBuffering
+  \par
+}
 \pagestyle{headings}
 
 \newcommand{\glossarytitle}{Index}
@@ -498,7 +519,7 @@ to hide those characters from the \meta{key}\dequals\meta{value} parser.
 
 The two main keys are \field{name} and \field{description}. The
 \field{name} identifies how the term should be displayed in the
-glossary (see \sectionref{sec:printgloss}). It also provides the
+glossary (see \sectionref{sec:displaygloss}). It also provides the
 default singular term, if not explicitly given. The default plural
 is obtained by appending \qt{s} to the singular form. If this isn't
 correct (as with \qt{geese}), then the plural form can be specified
@@ -830,7 +851,7 @@ final optional \meta{insert} argument and simply appending the extra
 material. This is a result of the hyperlink that causes an
 interruption between the subscript \code{\gls{sbchar}i} and the following
 superscript \code{\gls{spchar}2}. (In this case, there's no target for the
-hyperlinks. That's covered in \sectionref{sec:printgloss}.)
+hyperlinks. That's covered in \sectionref{sec:displaygloss}.)
 
 If you have additional information, such as a translation,
 associated image or citation, then you can supply this with the six
@@ -990,7 +1011,7 @@ glossary.  The \idx{postnamehook} appends (in parentheses) the value
 of the \field{user1} field and then checks if the plural form is the
 same as the singular form with \qt{s} appended, and only displays
 the plural if they are different. See \sectionref{sec:glsformats}
-and \sectionref{sec:printgloss} for further details.
+and \sectionref{sec:displaygloss} for further details.
 
 \section{Spaces}
 \label{sec:spaces}
@@ -1668,7 +1689,7 @@ abbreviation definition. This command automatically sets the
 \catattr{tagging} attribute to \code{true} for each of the listed
 categories, which ensures that \meta{cs} uses
 \nosecformatdef{glsxtrtagfont}
-within the glossary (see \sectionref{sec:printgloss}). Within the
+within the glossary (see \sectionref{sec:displaygloss}). Within the
 main text the command simply does its argument.
 For example:
 \begin{codeenv}
@@ -2177,12 +2198,921 @@ Now to obtain $g'(x_i)$:
 \section{Dealing with Automated Case-Changing}
 \label{sec:symfirstuc}
 
-\chapter{Displaying the Definition}
-\label{sec:printgloss}
+Commands like \gls{Gls} don't usually make much sense for symbols as
+a change in case can cause a change in meaning. For example,
+$\boldsymbol{x}$ might denote a vector and $\boldsymbol{X}$ might
+denote a matrix. However, you may have a mixed list of terms
+containing both symbols and words, and if you set the
+\catattr{glossname} attribute to \code{firstuc}, which automatically
+converts the first letter of each \field{name} to upper case in the
+glossary, then this can cause a problem for entries where the
+\field{name} starts with a symbol. The simplest solution is to
+insert an empty group at the start of the \field{name} field for
+such entries. For example:
+\begin{codeenv}
+\gls{glsxtrnewsymbol}
+ \oarg{\field{description} = \marg{length}}\comment{settings}
+ \marg{length}\comment{label}
+ \marg{\marg{}\gls{si}\marg{\cmd{metre}}}\comment{name}
+\end{codeenv}
+This is done automatically by \bibgls, but if it causes any
+interference you can switch off the behaviour with
+\longarg{no-mfirstuc-math-protection}.
 
-\section{Standalone}
+\chapter{Displaying the Definition}
+\label{sec:displaygloss}
+
+The examples so far only use the defined entries in the documents
+with commands like \gls{gls} or \gls{glssymbol} or
+\gls{glsentrydesc}. These are useful for ensuring consistent
+formatting, but it's also useful to have a place in the document
+where the term is formally defined. This can be partially solved
+by including the description in parentheses on \idx{firstuse},
+either by explicitly including the description in the \field{first}
+field or with the use of the \idx{postlinkhook}, but the
+\idx{firstuse} might not be the most appropriate place for the
+description.
 
 \section{Listing the Terms (Glossary)}
+\label{sec:printgloss}
+
+If you want a complete list of all defined terms, you can use:
+\nosecformatdef{printunsrtglossary}
+This lists all the terms for the given glossary (identified by the
+\printglossopt{type} key in \meta{options}, see
+\sectionref{sec:multigloss}) in the order of definition.
+You can change the default title with the \printglossopt{title} option. For
+example:
+\begin{codeenv}
+\gls{printunsrtglossary}\oarg{\printglossopt[Nomenclature]{title}}
+\end{codeenv}
+The title used in the table of contents is assumed to be the same,
+but you can change it with \printglossopt{toctitle}. For example:
+\begin{codeenv}
+\gls{printunsrtglossary}\oarg{
+ \printglossopt[List of Terms and Notation]{title},
+ \printglossopt[Notation]{toctitle}
+}
+\end{codeenv}
+
+The glossary style can be set with the \printglossopt{style} key
+in \meta{options}. Alternatively, you can set a default style with the
+\styopt{style} package option. There are many predefined styles to
+choose from (see the
+\href{https://www.dickimaw-books.com/gallery/glossaries-styles/}{\styfmt{glossaries}
+gallery}~\cite{glossarystylesgallery}). The styles are provided in supplementary packages, some
+of which are automatically loaded. Since each package adds to the
+document overhead, and some require additional packages to be
+loaded, when using \sty{glossaries-extra}, it's a good idea to
+disable the automatic loading of all styles with \styopt{nostyles}
+and then use \styopt{stylemods} to load the specific packages (along
+with the \sty{glossaries-extra-stylemods} package). For example, the
+\glostyle{index} style is provided by the \styfmt{glossary-tree}
+package, so \styopt[tree]{stylemods} will automatically load
+\styfmt{glossary-tree} and provide all the tree-like styles,
+including \glostyle{index}. The \styopt{stylemods} value may be a
+comma-separated list, so to load both \styfmt{glossary-tree} and
+\styfmt{glossary-long}, use \styopt[tree,long]{stylemods}.
+For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{scrartcl}
+\cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
+ \styopt{nostyles},\comment{don't load default style packages}
+ \styopt[tree]{stylemods}\comment{load glossary-tree.sty}
+]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{area}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{A}},
+   \field{description} = \marg{area}
+}
+\strut
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{name} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+   \field{symbol} = \marg{\gls{ce}\marg{SiO2}}
+}
+\strut
+\gls{newglossaryentry}\marg{circumference}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{C}},
+   \field{description} = \marg{circumference}
+}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet}
+}
+\gls{newglossaryentry}\marg{goose}
+\marg{
+   \field{name} = \marg{goose},
+   \field{description} = \marg{a large waterbird with a long neck, short legs,
+webbed feet and a short broad bill}
+}
+\strut
+\gls{newglossaryentry}\marg{radius}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{r}},
+   \field{description} = \marg{radius}
+}
+\strut
+\gls{newglossaryentry}\marg{pi}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+   \field{description} = \marg{Archimedes' constant}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{printunsrtglossary}\oarg{\printglossopt[index]{style}}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\glsaddeach{ex3.goose,ex3.duck,ex2.amethyst,standalone.pi,%
+standalone.circumference,standalone.area,standalone.radius}%
+\setupglossaries{toc=false,section}%
+\glossariesextrasetup{postpunc=dot}%
+\renewcommand{\glsxtrgroupfield}{useriii}%
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \glsifcategory{#1}{standalone}{}{\printunsrtglossaryskipentry}%
+}%
+\printunsrtglossary[style=index,title=Glossary,nonumberlist,target=false]
+\end{result}
+The \glostyle{index} glossary style checks if the \field{symbol}
+field has been set. If it has, then the symbol is added in
+parentheses (as in the amethyst example). Only some of the styles
+include the \field{symbol} field. (Table~15.1 in the
+\sty{glossaries} user manual~\cite{glossaries} gives an overview of
+the features supported by the predefined styles.)
+
+The glossary is sub-divided into letter groups. By default, these
+sub-groups are separated with a vertical gap (for example, between
+duck and goose above). The letter group is determined by the first
+letter of the \field{sort} field. Since the default behaviour of
+both \sty{glossaries} and \sty{glossaries-extra} is to use
+\idx{makeindex}, the \field{sort} field (which is used by
+\idx{makeindex}) is set to the value of the \field{name} field
+(unless explicitly set) and then sanitized.
+
+When using \gls{printunsrtglossary}, the \field{sort} field is
+irrelevant except to determine the letter group. The sub-group
+heading is displayed by some styles, such as the
+\glostyle{indexgroup} style. For example, with:
+\begin{codeenv}
+\gls{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
+\end{codeenv}
+The glossary is now:
+\begin{result}
+\setupglossaries{toc=false,section}%
+\glossariesextrasetup{postpunc=dot}%
+\renewcommand{\glsxtrgroupfield}{useriii}%
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \glsifcategory{#1}{standalone}{}{\printunsrtglossaryskipentry}%
+}%
+\printunsrtglossary[style=indexgroup,title=Glossary,nonumberlist,target=false]
+\end{result}
+This explains why there's a gap between $A$ (area) and amethyst as
+they don't belong to the same letter group. The \field{sort} field
+for the \code{area} entry is \verb|\ensuremath{A}| which has been
+sanitized, so it starts with a literal backslash (\idx{backslashchar}).
+This means that \code{area} is assigned to the symbols letter group. The
+symbols group occurs three times, because the list is following the
+order of definition.
+
+The \field{group} key isn't defined by default, but if it is defined
+then \gls{printunsrtglossary} will use the \field{group} field
+instead. The value of this field must be a label (see
+\sectionref{sec:labels}). A title may be
+assigned to a group with:
+\nosecformatdef{glsxtrsetgrouptitle}
+If a title hasn't been assigned, the label is used as the title.
+The above command is the preferred form, but the base
+\sty{glossaries} package checks for a control sequence in the form
+\csfmt{\meta{label}groupname} where \meta{label} is the group label.
+The \sty{glossaries-extra} package also recognises this form to
+ensure backward-compatibility.  If the \field{group} field is empty
+the sub-group won't have a title.
+
+For example, the following defines the \field{group} field with a
+custom command \csfmt{grouplabel} (that's not needed, but it's
+required by the \gls{glsaddstoragekey} syntax):
+\begin{codeenv}
+\cmd{documentclass}\marg{scrartcl}
+\cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
+ \styopt{nostyles},\comment{don't load default style packages}
+ \styopt[tree]{stylemods}\comment{load glossary-tree.sty}
+]\marg{glossaries-extra}
+\strut
+\gls{glsaddstoragekey}\marg{group}\marg{}\marg{\cmd{grouplabel}}
+\gls{glsxtrsetgrouptitle}\marg{greek}\marg{Greek Symbols}
+\strut
+\gls{newglossaryentry}\marg{area}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{A}},
+   \field{description} = \marg{area},
+   \field{group} = \marg{A}
+}
+\strut
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{name} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+   \field{symbol} = \marg{\gls{ce}\marg{SiO2}},
+   \field{group} = \marg{A}
+}
+\strut
+\gls{newglossaryentry}\marg{circumference}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{C}},
+   \field{description} = \marg{circumference},
+   \field{group} = \marg{C}
+}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet},
+   \field{group} = \marg{D}
+}
+\strut
+\gls{newglossaryentry}\marg{goose}
+\marg{
+   \field{name} = \marg{goose},
+   \field{description} = \marg{a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill},
+   \field{group} = \marg{G}
+}
+\strut
+\gls{newglossaryentry}\marg{radius}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{r}},
+   \field{description} = \marg{radius},
+   \field{group} = \marg{R}
+}
+\strut
+\gls{newglossaryentry}\marg{pi}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+   \field{description} = \marg{Archimedes' constant},
+   \field{group} = \marg{greek}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\setupglossaries{toc=false,section}%
+\glossariesextrasetup{postpunc=dot}%
+\renewcommand{\glsxtrgroupfield}{useriv}%
+\glsxtrsetgrouptitle{greek}{Greek Symbols}%
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \glsifcategory{#1}{standalone}{}{\printunsrtglossaryskipentry}%
+}%
+\printunsrtglossary[style=indexgroup,title=Glossary,nonumberlist,target=false]
+\end{result}
+Note that with this method \emph{every} entry must be assigned a
+group or it will be assigned to the empty group.
+
+Similarly, if the \field{location} field is defined, you can use it
+to provide a location list. The \styopt{record} package option
+conveniently defines both \field{group} and \field{location}, so the
+following can be used instead:
+\begin{codeenv}
+\cmd{usepackage}[
+ \styopt{record},\comment{provides group and location fields (and other stuff)}
+ postpunc=dot,nostyles,stylemods={tree}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{area}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{A}},
+   \field{description} = \marg{area},
+   \field{group} = \marg{A},
+   \field{location} = \marg{page 1}
+}
+\end{codeenv}
+This very quickly becomes tedious and prone to errors as the entries
+have to be ordered manually, and every entry must be assigned the
+group and location (if required).  Every time the location changes
+through edits to the document, the locations must be updated.
+However, this is exactly the method that \bibgls\ uses, but it does
+it automatically for you by selecting the required data from one or
+more \ext{bib} files and then creating a file containing all the
+glossary entry definitions with the fields set appropriately. The \ext{aux}
+file provides \bibgls\ with the indexing information so that it
+knows which entries to select and what the locations are, and how to
+order the definitions. See \sectionref{sec:bib2gls} for further
+information.
+
+\section{Homographs and Hierarchical Terms}
+\label{sec:parent}
+
+An entry may be assigned a parent with the \field{parent} key. The
+value must be the label of a entry that's already defined. If the
+\field{name} key is omitted, the value is assumed to be the same as
+the parent's \field{name}. For example:
+\begin{codeenv}
+\comment{parent:}
+\gls{newglossaryentry}\marg{glossary}\marg{\field{name}=\marg{glossary},\field{description}=\marg{}}
+\comment{children:}
+\gls{newglossaryentry}\marg{glossarycol}
+\marg{\comment{settings:}
+ \field{parent} = \marg{glossary},\comment{parent label}
+ \field{description} = \marg{collection of glosses}
+}
+\gls{newglossaryentry}\marg{glossarylist}
+\marg{\comment{settings:}
+ \field{parent} = \marg{glossary},\comment{parent label}
+ \field{description} = \marg{list of technical words}
+}
+\end{codeenv}
+In this case the entry with the label \code{glossary} is the
+\pidx{parent-entry}, and the entries with
+the labels \code{glossarycol} and \code{glossarylist} are 
+\pidxpl{child-entry} (or sub-items). An entry that doesn't have a
+parent is a main or top-level or level~0 item. In this case, the
+\idxpl{child-entry} don't have the \field{name} key, so the name is
+obtained from the parent's name. This is an example of a
+\pidx{homograph}, where two words with different meanings
+have the same spelling. The parent entry has an empty description.
+
+Here's another example:
+\begin{codeenv}
+\comment{parent:}
+\gls{newglossaryentry}\marg{mineral}\comment{label}
+\marg{\comment{settings:}
+  \field{name} = \marg{mineral},
+  \field{description} = \marg{natural inorganic substance}
+}
+\comment{sub-entries:}
+\gls{newglossaryentry}\marg{quartz}\comment{label}
+\marg{
+  \field{parent} = \marg{mineral},\comment{parent label}
+  \field{name} = \marg{quartz},
+  \field{description} = \marg{hard mineral consisting of silica}
+}
+\gls{newglossaryentry}\marg{amethyst}\comment{label}
+\marg{
+  \field{parent} = \marg{quartz},\comment{parent label}
+  \field{name} = \marg{amethyst},
+  \field{description} = \marg{a purple type of quartz}
+}
+\end{codeenv}
+In this case, the \idxpl{child-entry} have the \field{name} key
+set. This is an example of a set of \pidxpl{hierarchical-entry},
+where each \idx{child-entry} is a sub-category of the parent.
+Some glossary styles are appropriate for \idxpl{homograph} and some
+are appropriate for \idxpl{hierarchical-entry} and some are only
+appropriate for flat glossaries (no child entries).
+For example, the \glostyle{index}, \glostyle{indexgroup},
+\glostyle{tree} and \glostyle{treegroup} styles are appropriate 
+for \idxpl{hierarchical-entry}:
+\begin{codeenv}
+\cmd{documentclass}\marg{scrartcl}
+\strut
+\cmd{usepackage}[\styopt{nostyles},\styopt[dot]{postpunc},\styopt[tree]{stylemods}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{animal}
+\marg{
+   \field{name} = \marg{animal},
+   \field{description} = \marg{living organism with a nervous system and sense organs
+    that can move independently}
+}
+\strut
+\gls{newglossaryentry}\marg{bird}
+\marg{
+  \field{parent} = \marg{animal},
+  \field{name} = \marg{bird},
+  \field{description} = \marg{warm-blooded egg-laying animal with feathers, wings
+   and a beak}
+}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+   \field{parent} = \marg{bird},
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet}
+}
+\strut
+\gls{newglossaryentry}\marg{goose}
+\marg{
+   \field{parent} = \marg{bird},
+   \field{name} = \marg{goose},
+   \field{description} = \marg{a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill}
+}
+\strut
+\gls{newglossaryentry}\marg{mineral}
+\marg{
+  \field{name} = \marg{mineral},
+  \field{description} = \marg{natural inorganic substance}
+}
+\strut
+\gls{newglossaryentry}\marg{quartz}
+\marg{
+  \field{parent} = \marg{mineral},
+  \field{name} = \marg{quartz},
+  \field{description} = \marg{hard mineral consisting of silica}
+}
+\strut
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{parent} = \marg{quartz},
+   \field{name} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+}
+\strut
+\gls{newglossaryentry}\marg{citrine}
+\marg{
+  \field{parent} = \marg{quartz},
+  \field{name} = \marg{citrine},
+  \field{description} = \marg{a form of quartz with a colour ranging
+  from pale yellow to brown due to ferric impurities}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{printunsrtglossary}\oarg{style=indexgroup}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\glsaddeach{hier.animal,hier.bird,hier.duck,hier.goose,hier.mineral,%
+hier.quartz,hier.amethyst,hier.citrine}%
+\setupglossaries{toc=false,section}%
+\glossariesextrasetup{postpunc=dot}%
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \glsifcategory{#1}{hierarchical}{}{\printunsrtglossaryskipentry}%
+}%
+\printunsrtglossary[subentrycounter=false,style=indexgroup,title=Glossary,nonumberlist,target=false]
+\end{result}
+
+The \glostyle{treenoname} or \glostyle{treenoname} styles are
+appropriate for \idxpl{homograph}. These are usually best with the
+\styopt{subentrycounter} package option, which defines the
+\counter{glossarysubentry} counter that's incremented and
+displayed for every level~1 entry (that is, an entry with a parent
+but not a grandparent). For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{scrartcl}
+\strut
+\cmd{usepackage}[\styopt{subentrycounter},\comment{create glossarysubentry counter}
+ \styopt[dot]{postpunc},\comment{append full stop after description}
+ \styopt{nostyles},\styopt[tree]{stylemods}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{glossary}\marg{\field{name}=\marg{glossary},\field{description}=\marg{}}
+\strut
+\gls{newglossaryentry}\marg{glossarycol}
+\marg{
+  \field{parent} = \marg{glossary},
+  \field{description} = \marg{collection of glosses}
+}
+\strut
+\gls{newglossaryentry}\marg{glossarylist}
+\marg{
+  \field{parent} = \marg{glossary},
+  \field{description} = \marg{list of technical words}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{printunsrtglossary}\oarg{style=treenoname}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces
+\begin{result}
+\glsaddeach{hom.glossary,hom.glossarycol,hom.glossarylist}%
+\setupglossaries{toc=false,section}%
+\glossariesextrasetup{postpunc=dot}%
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \glsifcategory{#1}{homograph}{}{\printunsrtglossaryskipentry}%
+}%
+\printunsrtglossary[style=treenoname,title=Glossary,nonumberlist,target=false]
+\end{result}
+The empty description for the top-level \code{glossary} entry has
+caused an odd effect with a space occurring between the name and 
+the post-description punctuation. This can be removed by redefining
+\nosecformatdef{glstreenonamedesc}
+so that it checks if the \field{description} field has been set
+with:
+\nosecformatdef{ifglshasdesc}
+For example:
+\begin{codeenv}
+\cmd{renewcommand}\marg{\gls{glstreenonamedesc}}[1]\marg{\comment{}
+  \gls{ifglshasdesc}\marg{\gls{param}1}
+  \marg{\gls[noindex=false]{glstreepredesc}\gls{glossentrydesc}\marg{\gls{param}1}\gls{glspostdescription}}
+  \marg{}\comment{description field is empty}
+}
+\end{codeenv}
+
+\section{Multiple Glossaries}
+\label{sec:multigloss}
+
+The default glossary has the label \code{main}, but it can also be referenced 
+with:
+\nosecformatdef{glsdefaulttype}
+The \styopt{nomain} package option suppresses the creation of the
+\code{main} glossary, in which case \gls{glsdefaulttype} will be set to
+the first glossary to be defined. (There must be at least one
+glossary defined, so if you use \styopt{nomain} you must provide
+another default.)
+
+Abbreviations defined with \gls{newabbreviation}
+(see \sectionref{sec:abbreviations}) are, by default, assigned to the glossary 
+given by
+\nosecformatdef{glsxtrabbrvtype}
+This initially expands to \gls{glsdefaulttype}, but the
+\styopt{abbreviations} option redefines this to \code{abbreviations}
+and creates a glossary with that label.
+
+Abbreviations defined with \gls{newacronym} are, by default,
+assigned to the glossary given by
+\nosecformatdef{acronymtype}
+This initially expands to \gls{glsdefaulttype}, but the
+\styopt{abbreviations} option redefines this to
+\gls{glsxtrabbrvtype}. However, the \styopt{acronyms} option
+redefines \gls{acronymtype} to \code{acronym} and creates a glossary
+with that label. So if you use both the \styopt{abbreviations} and
+\styopt{acronyms} package options, you will have two extra
+glossaries created, one as the default for \gls{newabbreviation} and
+the other as the default for \gls{newacronym}.
+
+The \styopt{symbols} package option creates a glossary with the
+label \code{symbols} and defines \gls{glsxtrnewsymbol} (see 
+\sectionref{sec:symbols}) which sets the glossary to
+\code{symbols}. There are also similar package options
+\styopt{numbers} and \styopt{index}, which create the \code{numbers}
+glossary (and \gls{glsxtrnewnumber}) and the \code{index} glossary
+(and \gls{newterm}).
+
+In each case, the default type can be overridden when defining an
+entry by using the \field{type} key in the assignment list. The
+value must be the label identifying a defined glossary.
+
+You can provide your own custom glossary using:
+\nosecformatdef{newglossary*}
+where \meta{type} is the label used to identify the glossary and
+\meta{title} is the default title used by \gls{printunsrtglossary}.
+(The unstarred version has a different syntax and is only applicable 
+with \gls{makeindex} or \gls{xindy}.) For example:
+\begin{codeenv}
+\gls{newglossary*}\marg{measurements}\marg{SI Units}
+\gls{newglossaryentry}\marg{length}
+\marg{\comment{settings:}
+  \field{name} = \marg{\gls{si}\marg{\cmd{metre}}},
+  \field{description} = \marg{length},
+  \field{type} = \marg{measurements}
+}
+\end{codeenv}
+In this case, the label identifying the new glossary is
+\code{measurements} and the title is \qt{SI Units}.
+
+You can specify the glossary using the \printglossopt{type} setting
+in the optional argument of \gls{printunsrtglossary}. For example, 
+the above \code{measurements} glossary can be displayed with:
+\begin{codeenv}
+\gls{printunsrtglossary}\oarg{\printglossopt[measurements]{type}}
+\end{codeenv}
+For convenience, there's a command that iterates over all defined
+glossaries and does
+\gls{printunsrtglossary}\oarg{\printglossopt[\meta{label}]{type}}
+for each glossary:
+\nosecformatdef{printunsrtglossaries}
+There's no optional argument for this command.
+
+You can also define an \pidx{ignoredglossary}, which is ignored by
+\gls{printunsrtglossaries}. This is a useful way of creating a
+glossary for common terms that shouldn't appear in a list or for
+stand-alone entries (see \sectionref{sec:standalone}). The unstarred
+form:
+\nosecformatdef{newignoredglossary}
+is useful for common terms where the list won't be displayed as it
+automatically suppresses hyperlinks for entries assigned to that
+glossary. The starred form:
+\nosecformatdef{newignoredglossary*}
+is useful for stand-alone entries as it doesn't automatically
+suppress the hyperlinks.
+Although \gls{printunsrtglossaries} skips \idxpl{ignoredglossary},
+it's still possible to display an \idx{ignoredglossary} with
+\gls{printunsrtglossary} but you'll need to use the
+\printglossopt{title} setting to override the default title.
+
+\section{Stand-alone Definitions}
+\label{sec:standalone}
+
+The \sty{glossaries-extra} package provides:
+\nosecformatdef{glsxtrglossentry}
+which may be used to create a target for a particular entry (identified by
+\meta{label}). This displays the value of the \field{name} field,
+but it also obeys the \idx{postnamehook} (see
+\sectionref{sec:postfieldhooks}), and the \catattr{glossname}
+and \catattr{glossnamefont} attributes (see \sectionref{sec:glossname}).
+You then need to add the other field values as appropriate.
+To pick up the \styopt{postpunc} setting and the
+\idx{postdescriptionhook}, append
+\nosecformatdef{glspostdescription}
+after the description.
+For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{\gls[noindex=false]{xcolor}}
+\cmd{usepackage}[colorlinks,linkcolor=purple]\marg{\gls[noindex=false]{hyperref}}
+\cmd{usepackage}[\styopt[dot]{postpunc}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{pi}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+   \field{description} = \marg{Archimedes' constant}
+}
+\strut
+\gls{newglossaryentry}\marg{radius}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{r}},
+   \field{description} = \marg{radius}
+}
+\strut
+\gls{newglossaryentry}\marg{area}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{A}},
+   \field{description} = \marg{area}
+}
+\strut
+\cmd{begin}\marg{document}
+\cmd{begin}\marg{equation}
+\gls{gls}\marg{area} = \gls{gls}\marg{pi}\gls{gls}\marg{radius}[\gls{spchar}2]
+\cmd{end}\marg{equation}
+\cmd{begin}\marg{tabular}\marg{ll}
+\gls{glsxtrglossentry}\marg{area} \gls[noindex=false]{colsep} \gls{glsentrydesc}\marg{area}\gls{glspostdescription}\gls[noindex=false]{cs.backslash}
+\gls{glsxtrglossentry}\marg{pi} \gls{colsep} \gls{glsentrydesc}\marg{pi}\gls{glspostdescription}\gls{cs.backslash}
+\gls{glsxtrglossentry}\marg{radius} \gls{colsep} \gls{glsentrydesc}\marg{radius}\gls{glspostdescription}
+\cmd{end}\marg{tabular}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\setcounter{equation}{0}%
+\renewcommand{\theequation}{\arabic{equation}}%
+\renewcommand{\theHequation}{\thechapter.standalone1.\arabic{equation}}%
+\renewcommand{\glolinkprefix}{standalone1}%
+\renewcommand{\glstextformat}[1]{\textcolor{purple}{#1}}%
+\renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{local}}%
+\glossariesextrasetup{postdot}%
+\begin{equation}
+\gls{standalone.area} = \gls{standalone.pi}\gls{standalone.radius}[^2]
+\end{equation}
+\begin{tabular}{ll}
+\glsxtrglossentry{standalone.area} & \glsentrydesc{standalone.area}\glspostdescription\\
+\glsxtrglossentry{standalone.pi} & \glsentrydesc{standalone.pi}\glspostdescription\\
+\glsxtrglossentry{standalone.radius} & \glsentrydesc{standalone.radius}\glspostdescription
+\end{tabular}
+\end{result}
+The purple text shows the hyperlinks to the relevant definition. The
+hypertargets are prefixed with
+\nosecformatdef{glolinkprefix}
+This can be locally changed to avoid clashes if the definition needs
+to be reproduced later.
+
+A more convenient approach to the above is to define an environment that can
+list all the referenced entries automatically. The
+\sty{glossaries-extra} package provides a way of buffering the
+boolean switch performed by \gls{gls} that ensures that the
+\idx{firstuseflag} is unset. This is intended for use where the
+switch causes a problem, but it can also be used in this case to
+store a list of used entries (since there's no difference between
+\idx{firstuse} and subsequent use in this case, it won't affect the
+\idx{link-text}). The buffering is started with:
+\nosecformatdef{GlsXtrStartUnsetBuffering}
+The unstarred form of this command may result in multiple
+occurrences of an entry in the buffer's internal list. The starred form,
+which only adds an entry's label to the list if not already present,
+is better if the list needs to contain unique items.
+
+The current buffer can be iterated over using;
+\nosecformatdef{GlsXtrForUnsetBufferedList}
+where \meta{cs} is a command that takes a single argument (the
+entry's label). Finally, entries in the buffer can be unset and the
+buffer cleared with:
+\nosecformatdef{GlsXtrStopUnsetBuffering}
+
+Here's a modified version of the above document:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{xcolor}
+\cmd{usepackage}[colorlinks,linkcolor=purple]\marg{hyperref}
+\cmd{usepackage}[\styopt[dot]{postpunc}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{pi}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+   \field{description} = \marg{Archimedes' constant}
+}
+\strut
+\gls{newglossaryentry}\marg{radius}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{r}},
+   \field{description} = \marg{radius}
+}
+\strut
+\gls{newglossaryentry}\marg{area}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{A}},
+   \field{description} = \marg{area}
+}
+\strut
+\gls{newglossaryentry}\marg{circumference}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{C}},
+   \field{description} = \marg{circumference}
+}
+\strut
+\cmd{newcommand}\marg{\cmd{doglossaryentry}}[1]\marg{\comment{handler macro}
+  \gls{glsxtrglossentry}\marg{\gls{param}1} \gls{colsep} \gls{glsentrydesc}\marg{\gls{param}1}\gls{glspostdescription}\gls{cs.backslash}\comment{}
+}
+\strut
+\cmd{newcounter}\marg{localglossary}
+\strut
+\cmd{newenvironment}\marg{localglossary}
+\marg{\comment{}
+  \cmd{stepcounter}\marg{localglossary}\comment{}
+  \cmd{renewcommand}\marg{\gls{glolinkprefix}}\marg{\cmd{thelocalglossary}.}\comment{}
+  \gls{GlsXtrStartUnsetBuffering}*
+}
+\marg{\comment{}
+  \cmd{par}
+  \cmd{begin}\marg{tabular}\marg{ll}
+  \gls{GlsXtrForUnsetBufferedList}\cmd{doglossaryentry}
+  \cmd{end}\marg{tabular}
+  \gls{GlsXtrStopUnsetBuffering}
+  \cmd{par}
+}
+\strut
+\cmd{begin}\marg{document}
+The area of a circle is given by:
+\cmd{begin}\marg{localglossary}
+\cmd{begin}\marg{equation}
+\gls{gls}\marg{area} = \gls{gls}\marg{pi}\gls{gls}\marg{radius}[\gls{spchar}2]
+\cmd{end}\marg{equation}
+\cmd{end}\marg{localglossary}
+The circumference of a circle is given by:
+\cmd{begin}\marg{localglossary}
+\cmd{begin}\marg{equation}
+\gls{gls}\marg{circumference} = 2\gls{gls}\marg{pi}\gls{gls}\marg{radius}
+\cmd{end}\marg{equation}
+\cmd{end}\marg{localglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\setcounter{equation}{0}%
+\renewcommand{\theequation}{\arabic{equation}}%
+\renewcommand{\theHequation}{\thechapter.standalone2.\arabic{equation}}%
+\renewcommand{\glolinkprefix}{standalone2}%
+\renewcommand{\glstextformat}[1]{\textcolor{purple}{#1}}%
+\renewcommand{\glslinkpresetkeys}{}%
+\glossariesextrasetup{postdot}%
+The area of a circle is given by:
+\begin{localglossary}
+\begin{equation}
+\gls{standalone.area} = \gls{standalone.pi}\gls{standalone.radius}[^2]
+\end{equation}
+\end{localglossary}
+The circumference of a circle is given by:
+\begin{localglossary}
+\begin{equation}
+\gls{standalone.circumference} = 2\gls{standalone.pi}\gls{standalone.radius}
+\end{equation}
+\end{localglossary}
+\end{result}
+The custom \counterfmt{localglossary} counter is defined and incremented to
+ensure that the target prefix \gls{glolinkprefix} is unique for each
+environment. This definition of the custom \envfmt{localglossary}
+environment is intentionally kept trivial since the main point here is
+the demonstration of \gls{glsxtrglossentry} and the buffering rather
+than the actual formatting of the entries. Additional vertical
+spacing, appropriate alignment and a paragraph column specifier are
+left as an exercise for the reader.
+
+The \styopt{entrycounter} package option creates a new counter
+called \counter{glossaryentry}, which will automatically be
+incremented and displayed at the start of \gls{glsxtrglossentry}
+for top-level entries. (The \counter{glossarysubentry} counter created with the
+\styopt{subentrycounter} option, described in \sectionref{sec:parent},
+is independent of the \styopt{entrycounter} package option.) In
+the above example, this counter will need to depend on the custom
+\counterfmt{localglossary} counter to ensure that it's reset at the
+start of each \envfmt{localglossary} environment. This can easily be
+done by using the name of the master counter as the value of
+\styopt{counterwithin} (which automatically implements
+\styopt{entrycounter}), but the master counter must be defined
+first:
+\begin{codeenv}
+\cmd{newcounter}\marg{localglossary}
+\cmd{usepackage}[\styopt[localglossary]{counterwithin}]\marg{glossaries-extra}
+\end{codeenv}
+The default definition of \gls{theHglossaryentry} is:
+\begin{codeenv}
+\gls[noindex=false]{currentglossary}.\gls[noindex=false]{theglossaryentry}
+\end{codeenv}
+Since this example is using stand-alone definitions rather than
+\gls{printunsrtglossary} (see \sectionref{sec:printgloss}), this
+definition isn't appropriate and will cause duplicate destination
+warnings. The simplest solution is to redefine
+\gls{theHglossaryentry} in terms of the custom
+\counterfmt{localglossary} counter value:
+\begin{codeenv}
+\cmd{renewcommand}\marg{\cmd{theHglossaryentry}}\marg{\comment{}
+ \cmd{thelocalglossary}.\cmd{arabic}\marg{\counter{glossaryentry}}}
+\end{codeenv}
+and change \gls{glsstepentry} to use a unique label:
+\begin{codeenv}
+\cmd{renewcommand}*\marg{\gls{glsstepentry}}[1]\marg{\comment{}
+  \cmd{refstepcounter}\marg{\counter{glossaryentry}}\comment{}
+  \gls[noindex=false]{label}\marg{glsentry\cmd{arabic}\marg{localglossary}-\gls{param}1}\comment{}
+}
+\end{codeenv}
+(or remove the \gls{label} from the definition if it's unrequired).
+
+Instead of using \gls{glsentrydesc}, you may find it more convenient
+to use:
+\nosecformatdef{glossentrydesc}
+Unlike
+\gls{glsentrydesc}, which just displays the value of the
+\field{description} field, \gls{glossentrydesc} obeys the
+\catattr{glossdesc} and \catattr{glossdescfont} attributes
+(\sectionref{sec:glossname}). Alternatively, you can use
+\nosecformatdef{Glossentrydesc}
+which converts the first letter of the description to uppercase.
+
+There's a similar command for symbols:
+\nosecformatdef{glossentrysymbol}
+There are currently no category attributes governing this
+command, but it does support the \styopt{accsupp} package option. 
+For other fields, you can use the commands described in
+\sectionref{sec:userkeys}.
+
+Unlike commands such as \gls{gls} which can be problematic in moving
+arguments, \gls{glsxtrglossentry} is designed to work in section
+headings. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{mhchem}
+\cmd{usepackage}[colorlinks,linkcolor=magenta]\marg{hyperref}
+\cmd{usepackage}[\styopt[dot]{postpunc}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{name} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+   \field{symbol} = \marg{\gls{ce}\marg{SiO2}},
+   \field{category} = \marg{mineral}
+}
+\strut
+\gls{glssetcategoryattribute}\marg{mineral}\marg{glossname}\marg{firstuc}
+\strut
+\cmd{newcommand}\marg{\cmd{displayterm}}[1]\marg{\comment{}
+ \cmd{subsection}\marg{\gls{glsxtrglossentry}\marg{\gls{param}1}}\comment{}
+ Chemical formula: \gls{glossentrysymbol}\marg{\gls{param}1}.
+ \gls{Glossentrydesc}\marg{\gls{param}1}\gls{glspostdescription}\cmd{par}
+}
+\cmd{begin}\marg{document}
+\cmd{tableofcontents}
+\cmd{section}\marg{Types of Quartz}
+A reference to \gls{gls}\marg{amethyst}.
+\strut
+\cmd{displayterm}\marg{amethyst}
+\cmd{end}\marg{document}
+\end{codeenv}
+(Again, improvements to the actual formatting of the custom
+\csfmt{displayterm} is left as an exercise to the reader. Additional
+fields could contain, for example, the name of an image file to
+illustrated the entry. See the
+\href{https://www.dickimaw-books.com/gallery/}{\styfmt{glossaries}
+gallery}~\cite{gallery} for further ideas.)
+
+The above example uses the \catattr{glossname} attribute to convert the first
+letter of the \field{name} to uppercase. Unfortunately this can't be
+applied to the PDF bookmark or table of contents. A solution to this
+would be to explicitly set the \field{name} with the first letter as
+an uppercase character and the \field{text} field in lowercase. For
+example:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{name} = \marg{Amethyst},
+   \field{text} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+   \field{symbol} = \marg{\gls{ce}\marg{SiO2}},
+   \field{category} = \marg{mineral}
+}
+\end{codeenv}
+The \catattr{glossname} attribute can then be omitted. This is a bit
+inconvenient, but if you use \bibgls\ (see \sectionref{sec:bib2gls})
+this can be performed automatically with the
+\csopt{name-case-change} resource option.
 
 \chapter{Changing the Formatting}
 \label{sec:glsformats}
@@ -2282,7 +3212,7 @@ Two \glspl{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron},
 \end{result}
 Note the difference between the abbreviation defined with
 \gls{newabbreviation} and the one defined with \gls{newacronym}.
-This document is using the default styles, which is
+The above example document is using the default styles, which is
 \abbrstyle{long-short} for the \code{abbreviation} category
 and \abbrstyle{short-nolong} for the \code{acronym} category.
 The \abbrstyle{short-nolong} style makes the abbreviation behave
@@ -2588,8 +3518,77 @@ A \gls{ex.fleuron} and \gls{ex.pi}. Another \gls{ex.fleuron} and
 \gls{ex.pi}.
 \end{result}
 
+\section{Glossary Name and Description Formatting}
+\label{sec:glossname}
+
+When an entry's definition is displayed within
+\gls{printunsrtglossary} or \gls{glsxtrglossentry} (see
+\sectionref{sec:displaygloss}), the value of the \field{name} field
+is encapsulated by
+\nosecformatdef{glsnamefont}
+This may be overridden with the \catattr{glossnamefont} attribute
+whose value must be the name (without the leading backslash) of a
+control sequence that takes a single argument. If set, this control
+sequence is used instead of \gls{glsnamefont}.
+
+By default \gls{glsnamefont} simply does its argument, but the
+glossary style may apply additional formatting. For example, the
+\glostyle{list} styles place the name in the optional argument of
+\csfmt{item} within the \envfmt{description} environment. With the
+standard document classes, this renders the name in bold, but other
+classes may apply different formatting.
+
+The \glostyle{tree} styles encapsulate the name within:
+\nosecformatdef{glstreenamefmt}
+which does \code{\gls{textbf}\margm{text}} by default. So, for
+example, if \gls{glsnamefont} is redefined to use \gls{emph} and
+the \glostyle{tree} style is used, then the name will appear in
+italic bold (assuming the surrounding font is upright).
+The letter group headings are encapsulated within:
+\nosecformatdef{glstreegroupheaderfmt}
+which defaults to \code{\gls{glstreenamefmt}\margm{text}}, so if you
+need to redefine \gls{glstreenamefmt} you may also need to redefine
+\gls{glstreegroupheaderfmt} if the headers should have different formatting.
+
+Case-changing can be automatically applied to the name with the
+\catattr{glossname} attribute, which may take one of the values:
+\code{firstuc} (convert the first letter to uppercase), \code{title}
+(convert to title case) or \code{uc} (convert to all capitals).
+Alternatively, if you're using \bibgls, you can use the
+\csopt{name-case-change} resource option.
+
+The description is similarly governed by the
+\catattr{glossdescfont}, which again should have the name (without
+the leading backslash) of a control sequence that takes a single
+argument. There's no equivalent of \gls{glsnamefont} for the
+description but the glossary or abbreviation style may apply
+particular formatting, which will be in addition to the formatting
+command given by \catattr{glossdescfont} (if set).
+
+Case-changing is also available for descriptions with the
+\catattr{glossdesc} attribute, but this only has two allowed values:
+\code{firstuc} (convert the first letter to uppercase) and
+\code{title} (convert to title case). 
+Alternatively, if you're using \bibgls, you can use the
+\csopt{description-case-change} resource option.
+
 \section{Post-Name and Post-Description Hooks}
 \label{sec:postfieldhooks}
+
+Punctuation can automatically be appended to the description in the
+glossary with the \styopt{postpunc} option.  (Note that the
+unstarred form of \gls{longnewglossaryentry} interferes with this
+option. Use the starred form \gls{longnewglossaryentry*} instead.)
+The post-description punctuation (if set) is placed after the
+\glslink{postdescriptionhook}{post-description category hook} (if
+provided). Both the post-description category hook and the
+post-description punctuation are implemented by
+\gls{glspostdescription}. The \sty{glossaries-extra-stylemods}
+package (which can be loaded with the \styopt{stylemods} option)
+patches the predefined styles provided with the base
+\sty{glossaries} package to ensure that the styles all use
+\gls{glspostdescription}.
+
 
 \chapter{Problematic Areas}
 \label{sec:problems}
@@ -2698,7 +3697,11 @@ Instead I need:
 }
 
 \renewcommand*{\glstarget}[2]{%
- \glsifcategory{#1}{command}{#2}{\glsdohypertarget{\glolinkprefix#1}{#2}}%
+ \glsifcategory{#1}{command}{#2}%
+ {%
+   \glsifcategory{#1}{standalone}{#2}%
+   {\glsdohypertarget{\glolinkprefix#1}{#2}}%
+ }%
 }
 \renewcommand{\glstreeitem}{\par\parindent0pt}
 \renewcommand*{\glsxtrbookindexprelocation}[1]{%
@@ -2708,5 +3711,9 @@ Instead I need:
    \enspace}%
   {}%
 }
-\printunsrtglossary[style=bookindex,title=Index]
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \glsxtriflabelinlist{\glscategory{#1}}{standalone,hierarchical,homograph}%
+  {\printunsrtglossaryskipentry}{}%
+}%
+\printunsrtglossary[style=bookindex,title=Index,subentrycounter=false]
 \end{document}

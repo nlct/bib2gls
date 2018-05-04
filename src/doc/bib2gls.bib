@@ -860,7 +860,8 @@ extra code to the end of \meta{description}},
   user1={\oargm{\keyvallist}\margm{label}},
   description={defines a new glossary entry where the
    \field{description} field defaults to empty},
-  note={provided by \styfmt{glossaries}},
+  note={provided by the \styfmt{glossaries}'s \styopt{index} package
+option},
   category={command}
 }
 
@@ -885,7 +886,8 @@ extra code to the end of \meta{description}},
   name={\csfmt{gls\-xtr\-new\-symbol}},
   user1={\oargm{\keyvallist}\margm{label}\margm{symbol}},
   description={defines a new symbol},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra}'s \styopt{symbols}
+package option},
   category={command}
 }
 
@@ -893,7 +895,8 @@ extra code to the end of \meta{description}},
   name={\csfmt{gls\-xtr\-new\-number}},
   user1={\oargm{\keyvallist}\margm{label}},
   description={defines a new number},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra}'s \styopt{numbers}
+package option},
   category={command}
 }
 
@@ -2972,6 +2975,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{xcolor,
+  name={\styfmt{xcolor}},
+  category={package},
+  parent={packages}
+}
+
 @index{tracklang,
   name={\styfmt{tracklang}},
   category={package},
@@ -3166,6 +3175,15 @@ cs}\margm{Glspl-like cs}},
 @index{xifinlist,
   name={\csfmt{xifinlist}},
   user1={\margm{element}\margm{list cs}\margm{true}\margm{false}},
+  description={tests if the expansion of \meta{element} is in the list stored
+   in the control sequence \meta{list cs}},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{ifinlist,
+  name={\csfmt{ifinlist}},
+  user1={\margm{element}\margm{list cs}\margm{true}\margm{false}},
   description={tests if \meta{element} is in the list stored
    in the control sequence \meta{list cs}},
   note={provided by \styfmt{etoolbox}},
@@ -3176,6 +3194,15 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{listxadd}},
   user1={\margm{list cs}\margm{element}},
   description={globally adds (expanded) \meta{element} to the list stored
+   in the control sequence \meta{list cs}},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{listgadd,
+  name={\csfmt{listgadd}},
+  user1={\margm{list cs}\margm{element}},
+  description={globally adds \meta{element} to the list stored
    in the control sequence \meta{list cs}},
   note={provided by \styfmt{etoolbox}},
   category={command}
@@ -3217,6 +3244,11 @@ cs}\margm{Glspl-like cs}},
 
 @index{env.longtable,
   name={\envfmt{longtable}},
+  category={environment}
+}
+
+@index{env.tabular,
+  name={\envfmt{tabular}},
   category={environment}
 }
 
@@ -3327,6 +3359,30 @@ hyphen}},
   parent={glossarystyle}
 }
 
+@index{glostyle.tree,
+  name={\glostylefmt{tree}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@index{glostyle.treegroup,
+  name={\glostylefmt{treegroup}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@index{glostyle.treenoname,
+  name={\glostylefmt{treenoname}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@index{glostyle.treenonamegroup,
+  name={\glostylefmt{treenonamegroup}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
 @index{glostyle.alttree,
   name={\glostylefmt{alttree}},
   category={glossarystyle},
@@ -3418,6 +3474,12 @@ hyphen}},
 
 @index{glossnamefont,
   name={\catattrfmt{gloss\-name\-font}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{glossdesc,
+  name={\catattrfmt{gloss\-desc}},
   category={categoryattribute},
   parent={categoryattribute}
 }
@@ -5607,12 +5669,28 @@ field.},
  name={link text}
 }
 
+@index{parent-entry,
+  name={parent entry},
+  plural={parent entries}
+}
+
+@index{child-entry,
+  name={child entry},
+  plural={child entries}
+}
+
+@index{hierarchical-entry,
+  name={hierarchical entry},
+  plural={hierarchical entries}
+}
+
 @index{robust}
 @index{fragile}
 @index{expandable}
 @index{regular}
 @index{non-regular}
 @index{variant}
+@index{homograph}
 
 @index{unicodecategories,
   name={Unicode categories},
@@ -6309,7 +6387,27 @@ fully expands both the field value and \meta{text}},
    \field{symbol} field set to value that's not empty and not
      \csfmt{relax}},
   note={provided by \styfmt{glossaries}},
-  seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
+  seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@index{ifglshasdesc,
+  name={\csfmt{if\-gls\-has\-desc}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{description} field set},
+  note={provided by \styfmt{glossaries}},
+  seealso={ifglshassymbol,ifglshasdescsuppressed},
+  category={command}
+}
+
+@index{ifglshasdescsuppressed,
+  name={\csfmt{if\-gls\-has\-suppressedesc}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{description} field set to \cs{nopostdesc}},
+  note={provided by \styfmt{glossaries}},
+  seealso={ifglshasdesc},
   category={command}
 }
 
@@ -6658,6 +6756,40 @@ fully expands both the field value and \meta{text}},
   name={\csoptfmt{counter}},
   category={commandoption},
   parent={glsadd}
+}
+
+@index{theglossaryentry,
+  name={\csfmt{theglossaryentry}},
+  description={textual representation of the \counter{glossaryentry}
+counter, which is defined with the \styopt{entrycounter} option},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{theHglossaryentry,
+  name={\csfmt{theHglossaryentry}},
+  description={hypertarget associated with the \counter{glossaryentry}
+counter, which is defined with the \styopt{entrycounter} option},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsstepentry,
+  name={\csfmt{gls\-step\-entry}},
+  user1 = {\margm{label}},
+  description={increments the \counter{glossaryentry} counter, which
+is defined with the \styopt{entrycounter} option, and automatically
+labels it with \cs{label}},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{currentglossary,
+  name={\csfmt{currentglossary}},
+  description={defined within the glossary to the current glossary
+type, this has no meaning outside of the glossary list},
+  note={provided by \styfmt{glossaries}},
+  category={command}
 }
 
 @index{frontmatter,
@@ -7064,6 +7196,30 @@ usual delay},
    and performs \cs{printunsrtglossary} for each one},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
+}
+
+@index{printgloss.type,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{type}},
+  category={commandoption},
+}
+
+@index{printgloss.style,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{style}},
+  category={commandoption},
+}
+
+@index{printgloss.title,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{title}},
+  category={commandoption},
+}
+
+@index{printgloss.toctitle,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{toctitle}},
+  category={commandoption},
 }
 
 @index{cs.makeglossaries,
@@ -7867,11 +8023,32 @@ indexing},
   category={command}
 }
 
+@index{Glossentrydesc,
+  name={\csfmt{Gloss\-entry\-desc}},
+  user1={\margm{label}},
+  description={like \cs{glossentrydesc} but converts the first
+letter to uppercase},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{glossentrysymbol,
   name={\csfmt{gloss\-entry\-symbol}},
   user1={\margm{label}},
   description={used by glossary styles to display the symbol},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glspostdescription,
+  name={\csfmt{glspostdescription}},
+  description={a hook added after the description in some glossary
+styles (all if the \sty{glossaries-extra-stylemods} package is
+loaded to patch them). This hook is used to reflect the
+\gls{styopt.nopostdot} package option for \sty{glossaries}
+and the \styopt{postpunc} option for \sty{glossaries-extra}},
+  note={provided by \styfmt{glossaries} and modified by
+\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -7946,9 +8123,61 @@ indexing},
 @index{GlsXtrExpandedFmt,
   name={\csfmt{Gls\-Xtr\-Expanded\-Fmt}},
   user1={\margm{cs}\margm{text}},
-  description={Fully expands \meta{text} and then does
+  description={fully expands \meta{text} and then does
    \meta{cs}\margm{expanded text}},
   note={provided by \styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@index{GlsXtrStartUnsetBuffering,
+  name={\csfmt{Gls\-Xtr\-Start\-Unset\-Buffer\-ing}},
+  description={starts buffering calls to \cs{glsunset}
+   for use in code where the boolean switch causes a problem.
+   The buffer can later be processed and cleared with
+   \gls{GlsXtrStopUnsetBuffering}. The starred form
+   (added to v1.31) avoids duplicate labels in the buffer's 
+   internal list},
+  note={provided by \styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@index{GlsXtrStopUnsetBuffering,
+  name={\csfmt{Gls\-Xtr\-Stop\-Unset\-Buffer\-ing}},
+  description={unsets (locally with the starred form) 
+    all the entry whose labels are stored in the
+    buffer that was started with
+   \gls{GlsXtrStartUnsetBuffering} and clears the buffer},
+  note={provided by \styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@index{GlsXtrForUnsetBufferedList,
+  name={\csfmt{Gls\-Xtr\-For\-Unset\-Buffered\-List}},
+  user1 = {\margm{cs}},
+  description={iterates over 
+    all the entry whose labels are stored in the
+    buffer that was started with
+   \gls{GlsXtrStartUnsetBuffering} and implements
+   \meta{cs}\margm{label} at each iteration},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{glsunset,
+  name={\csfmt{gls\-unset}},
+  user1 = {\margm{label}},
+  description={unsets the \idx{firstuseflag} so that the entry is
+marked as having been used},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsreset,
+  name={\csfmt{gls\-reset}},
+  user1 = {\margm{label}},
+  description={resets the \idx{firstuseflag} so that the entry is
+marked as not used},
+  note={provided by \styfmt{glossaries}},
   category={command}
 }
 
@@ -8260,6 +8489,7 @@ by \meta{name}},
   user1={\margm{id}},
   description={creates a label that can be referenced with \ics{ref}
 or \ics{pageref}},
+  seealso={ref,pageref},
   note={kernel command},
   category={command}
 }
@@ -8278,6 +8508,7 @@ occurred},
   user1={\margm{id}},
   description={cross-reference the location where \cs{label}\margm{id}
 occurred},
+  seealso={label},
   note={kernel command},
   category={command}
 }
@@ -8308,22 +8539,63 @@ name} and the displayed \meta{text}},
 }
 
 @index{glsrefentry,
-  name={\csfmt{glsrefentry}},
+  name={\csfmt{gls\-ref\-entry}},
   user1={\margm{label}},
   description={when used with \styopt{entrycounter} or
    \styopt{subentrycounter} may be used to cross-reference the
   entry's number in the glossary list with \cs{ref}},
+  seealso={ref},
   note={provided by \styfmt{glossaries} v3.0+},
   category={command}
 }
 
 @index{glsxtrpageref,
-  name={\csfmt{glsxtrpageref}},
+  name={\csfmt{gls\-xtr\-page\-ref}},
   user1={\margm{label}},
   description={when used with \styopt{entrycounter} or
    \styopt{subentrycounter} may be used to cross-reference the
   entry's number in the glossary list with \cs{pageref}},
+  seealso={pageref},
   note={provided by \styfmt{glossaries-extra} v1.11},
+  category={command}
+}
+
+@index{glsxtrglossentry,
+  name={\csfmt{gls\-xtr\-gloss\-entry}},
+  user1={\margm{label}},
+  description={displays the given entry name including a hypertarget (if
+\sty{hyperref} has been loaded) as the destination for commands like
+\gls{gls}},
+  note={provided by \styfmt{glossaries-extra} v1.21},
+  category={command}
+}
+
+@index{glsxtrglossother,
+  name={\csfmt{gls\-xtr\-gloss\-other}},
+  user1={\margm{cs}\margm{label}\margm{field}},
+  description={like \gls{glsxtrglossname} but uses the value given
+in the supplied internal \meta{field} where \meta{cs} is the command
+to use in the header (\meta{cs} may be empty if not required)},
+  note={provided by \styfmt{glossaries-extra} v1.22+},
+  category={command}
+}
+
+@index{glstreepredesc,
+  name={\csfmt{gls\-tree\-pre\-desc}},
+  user1={\margm{label}},
+  description={separator used before the description for the
+   \glostyle{tree} styles},
+  note={provided by \styfmt{glossary-tree} v4.26+},
+  category={command}
+}
+
+@index{glstreenonamedesc,
+  name={\csfmt{gls\-tree\-no\-name\-desc}},
+  user1={\margm{label}},
+  description={displays the pre-description separator, the
+   description and the post-description hook for the
+   \glostyle{treenoname} styles},
+  note={provided by \styfmt{glossaries-extra-stylemods} v1.31+},
   category={command}
 }
 
@@ -8496,5 +8768,139 @@ name} and the displayed \meta{text}},
   description = {derivative},
   name = {\ensuremath{\derivfn{x}}},
   user1 = {derivfn}
+}
+
+@index{hom.glossary,
+  name={glossary},
+  category = {homograph}
+}
+
+@entry{hom.glossarycol,
+  parent = {hom.glossary},
+  description = {collection of glosses},
+  category = {homograph}
+}
+
+@entry{hom.glossarylist,
+  parent = {hom.glossary},
+  description = {list of technical words},
+  category = {homograph}
+}
+
+@entry{hier.animal,
+ name = {animal},
+ description = {living organism with a nervous system and sense organs
+    that can move independently},
+ category = {hierarchical}
+}
+
+@entry{hier.bird,
+ parent = {hier.animal},
+ name = {bird},
+ description = {warm-blooded egg-laying animal with feathers, wings 
+   and a beak},
+ category = {hierarchical}
+}
+
+@entry{hier.duck,
+ parent = {hier.bird},
+ name = {duck},
+ description={a waterbird with webbed feet},
+ category = {hierarchical}
+}
+
+@entry{hier.goose,
+ parent = {hier.bird},
+ name = {goose},
+ description = {a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill},
+ category = {hierarchical}
+}
+
+@entry{hier.mineral,
+ name = {mineral},
+ description = {natural inorganic substance},
+ category = {hierarchical}
+}
+
+@entry{hier.quartz,
+ parent = {hier.mineral},
+ name = {quartz},
+ description = {hard mineral consisting of silica},
+ category = {hierarchical}
+}
+
+@entry{hier.amethyst,
+ parent = {hier.quartz},
+ name = {amethyst},
+ description = {a purple type of quartz},
+ category = {hierarchical}
+}
+
+@entry{hier.citrine,
+ parent = {hier.quartz},
+ name = {citrine},
+ description = {a form of quartz with a colour ranging
+from pale yellow to brown due to ferric impurities},
+ category = {hierarchical}
+}
+
+@entry{ex2.amethyst,
+ name = {amethyst},
+ description = {a purple type of quartz},
+ symbol = {\ce{SiO2}},
+ user3={A},
+ user4={A},
+ category = {standalone}
+}
+
+@entry{ex3.goose,
+  name={goose},
+  user3={G},
+  user4={G},
+  plural={geese},
+  description={a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill},
+  category={standalone}
+}
+
+@entry{ex3.duck,
+  name={duck},
+  user3={D},
+  user4={D},
+  description={a waterbird with webbed feet},
+  category={standalone}
+}
+
+@entry{standalone.pi,
+  name = {\ensuremath{\pi}},
+  description = {Archimedes' constant},
+  user3={glssymbols},
+  user4={greek},
+  category = {standalone}
+}
+
+@entry{standalone.area,
+  name = {\ensuremath{A}},
+  description = {area},
+  user3={glssymbols},
+  user4={A},
+  category = {standalone}
+}
+
+@entry{standalone.radius,
+  name = {\ensuremath{r}},
+  description = {radius},
+  user3={glssymbols},
+  user4={R},
+  category = {standalone}
+}
+
+@entry{standalone.circumference,
+  name = {\ensuremath{C}},
+  user3={glssymbols},
+  user4={C},
+  description = {circumference},
+  category = {standalone}
 }
 
