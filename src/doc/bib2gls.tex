@@ -190,6 +190,7 @@
 % Provide commands that work like \gls[#1]{idx.#2}[#3]
 
 \glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
+\newcommand{\idxlink}[3][]{\glslink[#1]{idx.#2}{#3}}
 
 \newcommand{\stringu}{\idx{cs.string}\idx{u}}
 
@@ -1628,7 +1629,7 @@ For example, suppose the \ext{bib} file includes:
 protects against the possibility that the \catattr{glossname}
 category attribute might be set to \optfmt{firstuc}, which
 automatically converts the first letter of the name to 
-upper case when displaying the glossary. See also
+\idx{uppercase} when displaying the glossary. See also
 \longarg{mfirstuc-protection} and
 \longarg{mfirstuc-math-protection}.)
 
@@ -1682,7 +1683,7 @@ texparserlib: {}$\mtx{M}$ -> M
 So the \field{sort} value for this entry is set to \qtt{M}. The font
 change (caused by math-mode and \ics{boldsymbol}) has been 
 ignored. The sort value therefore consists of a single Unicode
-character \hex{4D} (Latin upper case letter \qtt{M}, decimal value 77).
+character \hex{4D} (Latin \idx!{uppercase} letter \qtt{M}, decimal value 77).
 
 For the \code{v} entry, the code is:
 \begin{verbatim}
@@ -1694,7 +1695,7 @@ texparserlib: \marg{}\$\csfmt{vec}\marg{v}\$ -> \usebox\varrow
 \end{alltt}
 So the \field{sort} value for this entry is set to \qtt{\usebox\varrow},
 which consists of two Unicode characters \hex{76}
-(Latin lower case letter \qtt{v}, decimal value 118) and 
+(Latin \idx!{lowercase} letter \qtt{v}, decimal value 118) and 
 \hex{20D7} (combining right arrow above, decimal value 8407).
 
 For the \code{set} entry, the code is:
@@ -1707,7 +1708,7 @@ texparserlib: {}$\set{S}$ -> S
 \end{verbatim}
 So the \field{sort} value for this entry is set to \qtt{S} (again
 ignoring the font change). This consists of a single Unicode
-character \hex{53} (Latin upper case letter \qtt{S}, decimal value~83).
+character \hex{53} (Latin \idx!{uppercase} letter \qtt{S}, decimal value~83).
 
 For the \code{card} entry, the code is:
 \begin{verbatim}
@@ -1723,7 +1724,7 @@ in \atentry{preamble} have been included, but the
 font change has been discarded). In this case the sort value
 consists of three Unicode characters \hex{7C} (vertical line, decimal
 value 124),
-\hex{53} (Latin upper case letter \qtt{S}, decimal value 83) and
+\hex{53} (Latin \idx!{uppercase} letter \qtt{S}, decimal value 83) and
 \hex{7C} again.
 If \csopt[false]{interpret-preamble} had been used, \csfmt{card}
 wouldn't be recognised and would be discarded leaving just \qtt{S}
@@ -1772,7 +1773,7 @@ letter.)
 
 If \csopt[letter-nocase]{sort} is used instead then, after conversion
 by the interpreter, the sort values will all be changed to
-lower case. The order is now: \code{i} ($\imaginary$), 
+\idx{lowercase}. The order is now: \code{i} ($\imaginary$), 
 \code{M} ($\mtx{M}$), \code{S} ($\set{S}$),
 \code{v} ($\vec{v}$) and \code{card} ($\card{S}$).
 The transcript (with \longarg{verbose}) now shows
@@ -1792,7 +1793,7 @@ M -> 'm' (M) [109]
 S -> 's' (S) [115]
 v -> '\usebox\varrow' (V) [118 8407]
 \end{alltt}
-Note that the letter groups are upper case not lower case.
+Note that the letter groups are \idx{uppercase} not \idx{lowercase}.
 Again the \code{card} entry doesn't have an associated
 letter group.
 
@@ -2222,7 +2223,7 @@ This works in the same way as \longarg{mfirstuc-protection} but
 guards against fields starting with inline maths
 (\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the \field{name} field
 starts with \verb|$x$| and the glossary style automatically tries to
-convert the first letter of the name to upper case, then this will
+convert the first letter of the name to \idx{uppercase}, then this will
 cause a problem.
 
 With \longarg{mfirstuc-math-protection} set, \bibgls\ will
@@ -2433,7 +2434,7 @@ can't use non-ASCII characters in \meta{label} with \sty{inputenc}
 \end{description}
 
 The \idx{lettergroup} titles will typically have the first character
-converted to upper case for the alphabet sort methods
+converted to \idx{uppercase} for the alphabet sort methods
 (\tableref{tab:sortoptionsrule}). A \qt{letter} may not necessarily
 be a single character (depending on the sort rule), but may be
 composed of multiple characters, such as a \idx{digraph} (two
@@ -2448,8 +2449,8 @@ by the following line in the \langxml:
 <entry key="grouptitle.case.ij">IJ</entry>
 \end{verbatim}
 If there isn't a \code{grouptitle.case.\meta{lc}} key (where 
-\meta{lc} is the lower case version), then only the first character
-will be converted to upper case otherwise the value supplied by the
+\meta{lc} is the \idx!{lowercase} version), then only the first character
+will be converted to \idx{uppercase} otherwise the value supplied by the
 resource file is used. This resource key is only checked for
 the alphabetical comparisons listed in
 \tableref{tab:sortoptionsrule}. If the initial part of the sort
@@ -2464,7 +2465,7 @@ alphabetical\footnote{according to Java's
 \code{Character.isAlphabetic(int)} method} then it will be a 
 \idx{lettergroup} otherwise it's a \idx{nonlettergroup}.  The case-insensitive
 ordering (such as \csopt[letter-nocase]{sort}) will convert the
-letter group character to upper case. The case-sensitive ordering
+letter group character to \idx{uppercase}. The case-sensitive ordering
 (such as \csopt[letter-case]{sort}) won't change the case.
 
 Glossary styles with navigational links to groups (such as
@@ -3398,7 +3399,7 @@ instead do:
 \setabbreviationstyle{long-short-sc}
 \GlsXtrLoadResources[src={entries-abbrv.bib},ignore-fields={description}]
 \end{verbatim}
-or to convert the short value to upper case and use the
+or to convert the short value to \idx{uppercase} and use the
 \abbrstyle{long-short-sm} style instead:
 \begin{verbatim}
 \setabbreviationstyle{long-short-sm}
@@ -4755,7 +4756,7 @@ for each selected \atentry{bibtexentry} associated with that contributor. The
 second line provides the internal list field
 \field{bibtexentry@entrytype}, where \meta{entry-type} is the
 original entry type (before it was aliased to
-\atentry{bibtexentry} and converted to lower case).
+\atentry{bibtexentry} and converted to \idx!{lowercase}).
 For example \code{article} or \code{book}.
 
 You can iterate over these internal list fields using
@@ -6297,11 +6298,11 @@ The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: set the
 \field{category} to the \ext{bib} entry type used to define it
-(lower case and without the initial \code{@}) after any aliasing,
+(\idx!{lowercase} and without the initial \code{@}) after any aliasing,
 if applicable;
 
 \item \optfmt{same as original entry}: (new to v1.4) set the \field{category} 
-to the original entry type (lower case and without 
+to the original entry type (\idx!{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
 \optfmt{same as entry} if the entry type wasn't aliased);
 
@@ -6323,7 +6324,7 @@ When used with \csopt{entry-type-aliases}, the option \csopt[same as
 entry]{category} refers to the \emph{target} entry type whereas
 \csopt[same as original entry]{category} refers to the
 \emph{original} entry type given in the \ext{bib} file.  In both
-cases, the value is converted to lower case to ensure consistency.
+cases, the value is converted to \idx!{lowercase} to ensure consistency.
 
 For example, if the \ext{bib} file contains:
 \begin{verbatim}
@@ -6384,10 +6385,10 @@ the \csopt[animals]{category} option.
 The \meta{value} may be one of:
 \begin{itemize}
  \item \optfmt{same as entry} set the \field{type} field
-  to the entry type (lower case and without the initial \code{@}); 
+  to the entry type (\idx!{lowercase} and without the initial \code{@}); 
 
  \item \optfmt{same as original entry} set the \field{type} 
-  to the original entry type (lower case and without 
+  to the original entry type (\idx!{lowercase} and without 
   the initial \code{@}) before it was aliased (behaves like 
   \optfmt{same as entry} if the entry type wasn't aliased);
 
@@ -7416,24 +7417,24 @@ cross-references.
 \optsection{short-case-change}
 
 The value of the \field{short} field may be automatically converted
-to upper or lower case. This option may take one of the following
+to \idxlink{uppercase}{upper} or \idx{lowercase}. This option may take one of the following
 values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
-\item \optfmt{lc}: convert to lower case (ignoring 
+\item \optfmt{lc}: convert to \idx{lowercase} (ignoring 
 \idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \ics{ensuremath}\margm{maths} 
 and \ics{si}\margm{text});
-\item \optfmt{uc}: convert to upper case (ignoring 
+\item \optfmt{uc}: convert to \idx{uppercase} (ignoring 
 \idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \ics{ensuremath}\margm{maths} 
 and \ics{si}\margm{text});
-\item \optfmt{lc-cs}: convert to lower case using
+\item \optfmt{lc-cs}: convert to \idx{lowercase} using
 \ics{MakeTextLowercase};
-\item \optfmt{uc-cs}: convert to upper case using
+\item \optfmt{uc-cs}: convert to \idx{uppercase} using
 \ics{MakeTextUppercase};
-\item \optfmt{firstuc-cs}: convert to first letter upper case using
+\item \optfmt{firstuc-cs}: convert to first letter \idx{uppercase} using
 \ics{makefirstuc};
 \item \optfmt{firstuc}: convert the first alphabetical letter (or
-group) to upper case. This uses the following rules:
+group) to \idx{uppercase}. This uses the following rules:
 \begin{enumerate}
 \item if \idx{mshiftchar}\meta{maths}\idx{mshiftchar} then stop (no case change);
 \item if \ics{NoCaseChange}\margm{text} or
@@ -7443,7 +7444,7 @@ group) to upper case. This uses the following rules:
 \item if \csfmt{}\meta{csname} isn't followed by a group (and it's
 not \ics{protect}), then stop (no case change applied);
 \item if \margm{text} (a group) then convert the entire contents of
-\meta{text} to upper case and stop;
+\meta{text} to \idx{uppercase} and stop;
 \item if \meta{character} is an alphabetic character then change it
 to its title case and stop;
 \item otherwise skip and move on to the next token.
@@ -8133,7 +8134,7 @@ The locations are always listed in the order in which they were indexed,
 (except for the cross-reference which may be placed at the start or
 end of the list or omitted).
 This is different to \idx!{xindy} and \idx!{makeindex} where you can
-specify the ordering (such as lower case Roman first, then digits,
+specify the ordering (such as \idx!{lowercase} Roman first, then digits,
 etc), but unlike those applications, \bibgls\ allows any location,
 although it may not be able to work out an integer representation.
 (With \idx!{xindy}, you can define new location formats, but you need
@@ -8313,16 +8314,16 @@ $d$ is the value of \optfmt{max-loc-diff} then the locations
 are consecutive otherwise they're not consecutive.
   \end{enumerate}
 \item\label{itm:rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
-where \meta{n} is a lower case Roman numeral, which is converted to
+where \meta{n} is a \idx!{lowercase} Roman numeral, which is converted to
 a decimal value and the test is performed in the same way as the 
 above \hyperref[itm:decmatch]{decimal test}.
 \item\label{itm:Rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
-where \meta{n} is an upper case Roman numeral, which is converted to
+where \meta{n} is an \idx!{uppercase} Roman numeral, which is converted to
 a decimal value and the test is performed
 in the same way as the above \hyperref[itm:decmatch]{decimal test}.
 \item\label{itm:alphmatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{c}
-where \meta{c} is either a lower case letter from \code{a} to
-\code{z} or an upper case letter from \code{A} to \code{Z}.
+where \meta{c} is either a \idx!{lowercase} letter from \code{a} to
+\code{z} or an \idx!{uppercase} letter from \code{A} to \code{Z}.
 The character is converted to its code point and the test is
 performed in the same way as the \hyperref[itm:decmatch]{decimal pattern} above.
 \item\label{itm:nomatch} If none of the above, the locations aren't considered
@@ -9354,15 +9355,15 @@ rule provided by \csopt{sort-rule}.
 The sort methods listed in \tableref{tab:sortoptionsletter} 
 use letter case comparators. These simply compare the
 character codes. The \optfmt{-nocase} options first convert the
-\field{sort} field to lower case before performing the sort.
+\field{sort} field to \idx{lowercase} before performing the sort.
 Punctuation isn't ignored.
 Use \csopt[\meta{lang tag}]{sort} with \csopt[none]{break-at} to
 emulate \idx!{xindy}['s] locale letter ordering. The examples below
 show the ordering of the list \code{antelope}, \code{bee}, \code{Africa}, 
 \code{aardvark} and \code{Brazil}.
 \begin{itemize}
-\item \optfmt{letter-case}: case-sensitive letter sort. Upper case
-and lower case are in separate letter groups.
+\item \optfmt{letter-case}: case-sensitive letter sort.
+\Idx{uppercase} and \idx{lowercase} are in separate letter groups.
 Example: 
 
 \code{Africa} (letter group \qt{A}), \code{Brazil}
@@ -9372,7 +9373,8 @@ Example:
 \item \optfmt{letter-case-reverse}: reverse case-sensitive letter sort.
 
 \item \optfmt{letter-nocase}: case-insensitive letter sort. (All
-upper case characters will have first been converted to lower case.)
+\idx{uppercase} characters will have first been converted to
+\idx{lowercase}.)
 Example:
 
 \code{aardvark} (letter group \qt{A}), \code{Africa}
@@ -9383,9 +9385,9 @@ Example:
 \item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter sort.
 
 \item \optfmt{letter-upperlower}: each character pair is first
-compared according to their lower case values. If these are equal,
+compared according to their \idx{lowercase} values. If these are equal,
 then they are compared according to case. This puts upper and lower
-case in the same letter group but the upper case comes first.
+case in the same letter group but the \idx{uppercase} comes first.
 Example:
 
 \code{Africa} (letter group \qt{A}), \code{aardvark} (letter group
@@ -9395,9 +9397,9 @@ Example:
 \item \optfmt{letter-upperlower-reverse}: reverse upper-lower letter sort.
 
 \item \optfmt{letter-lowerupper}: each character pair is first
-compared according to their lower case values. If these are equal,
-then they are compared according to case. This puts upper and lower
-case in the same letter group but the lower case comes first.
+compared according to their \idx{lowercase} values. If these are equal,
+then they are compared according to case. This puts
+\idxlink{uppercase}{upper} and \idx{lowercase} in the same letter group but the \idx{lowercase} comes first.
 Example:
 
 \code{aardvark} (letter group \qt{A}), \code{antelope} (letter group \qt{A}),
@@ -9570,7 +9572,7 @@ letter-number sort.
 \item \optfmt{letternumber-nocase}: case-insensitive
 letter-number sort. The sort value is first converted to lower
 case. Note that \csopt[between]{letter-number-rule} doesn't make
-sense in this context as there won't be any upper case characters in
+sense in this context as there won't be any \idx!{uppercase} characters in
 the sort value, so numbers will always come before letters. Example:
 
 \code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
@@ -9589,7 +9591,8 @@ letter-number sort.
 \item \optfmt{letternumber-upperlower}: upper-lower
 letter-number sort. This behaves slightly differently to
 \optfmt{letter-upperlower} when used with \csopt[between]{letter-number-rule}
-as it will segregate the upper and lower case characters if there
+as it will segregate the \idxlink{uppercase}{upper} and 
+\idx{lowercase} characters if there
 are any numerical sub-strings. Example:
 
 \code{CH\textsubscript{2}O}, 
@@ -9603,9 +9606,9 @@ are any numerical sub-strings. Example:
 \code{Co\textsubscript{2}O\textsubscript{3}}.
 
 The \csopt[between]{letter-number-rule} setting enforces numbers
-after upper-case (for the case-sensitive and upper-lower methods)
-which makes the \code{\textsubscript{5}} come after the upper case
-\code{O} and forces the lower case characters to come after it.
+after \idx{uppercase} (for the case-sensitive and upper-lower methods)
+which makes the \code{\textsubscript{5}} come after the \idx{uppercase}
+\code{O} and forces the \idx{lowercase} characters to come after it.
 
 Compare this with \csopt[before letter]{letter-number-rule} which
 results in the order:
@@ -9638,16 +9641,16 @@ Example:
 \code{CH\textsubscript{2}O}. 
 
 The algorithm is reversed which means that when two letters are
-compared then, if both letters have the same lower case version,
-the upper-lower rule is reversed and lower case comes before
-upper case.  This means that \code{o} comes before \code{O}. 
-If their lower case versions aren't identical, the letter
-with the higher lower case Unicode value comes first. This means
+compared then, if both letters have the same \idx{lowercase} version,
+the upper-lower rule is reversed and \idx{lowercase} comes before
+\idx{uppercase}.  This means that \code{o} comes before \code{O}. 
+If their \idx{lowercase} versions aren't identical, the letter
+with the higher \idx{lowercase} Unicode value comes first. This means
 that both \code{o} and \code{O} come before \code{l} which comes
 before \code{H}.  So far, this gives the order: 
 \code{o}, \code{O}, \code{l}, \code{H}.
 The \csopt[between]{letter-number-rule} setting inserts numbers between 
-upper and lower case letters. This puts the numbers (in reverse
+\idxlink{uppercase}{upper} and \idx{lowercase} letters. This puts the numbers (in reverse
 order) between \code{o} and \code{O}.
 
 Compare this with \csopt[before letter]{letter-number-rule} which
@@ -9684,9 +9687,9 @@ Example:
 \code{CO}. 
 
 The \csopt[between]{letter-number-rule} setting enforces numbers
-after lower-case (for the lower-upper method)
+after \idx{lowercase} (for the lower-upper method)
 so the \code{\textsubscript{5}} is put after \code{o}, and forces
-the upper case characters after the numbers.
+the \idx{uppercase} characters after the numbers.
 
 Compare this with \csopt[before letter]{letter-number-rule} which
 results in the order:
@@ -10234,12 +10237,12 @@ For example, the sort value \qt{Tom, Dick, and Harry} becomes
 characters.
 \item \optfmt{character}: break after each character.
 \item \optfmt{sentence}: break after each sentence.
-\item \optfmt{upper-notlower}: break after any upper case character
-that's not followed by a lower case character. For example, 
+\item \optfmt{upper-notlower}: break after any \idx{uppercase} character
+that's not followed by a \idx{lowercase} character. For example, 
 \qt{MathML} becomes \verb"MathM|L|" and \qt{W3C} becomes
 \verb"W|3C|".
-\item \optfmt{upper-upper}: break after any upper case character
-that's followed by an upper case character.
+\item \optfmt{upper-upper}: break after any \idx{uppercase} character
+that's followed by an \idx{uppercase} character.
 \item \optfmt{upper-notlower-word}: first applies break-points
 according to \optfmt{upper-notlower} and then according to
 \optfmt{word}.
@@ -10247,7 +10250,8 @@ according to \optfmt{upper-notlower} and then according to
 according to \optfmt{upper-upper} and then according to
 \optfmt{word}.
 \item \optfmt{none}: don't create break points. Use this option to
-emulate \idx{makeindex} or \idx{xindy}'s letter ordering.
+emulate \idx{makeindex} or \idx{xindy}'s letter ordering, or combine
+with \csopt{sort-replace} to insert custom break points.
 \end{itemize}
 
 This option is ignored when used with the non-alphabetic \csopt{sort} options.
@@ -10757,9 +10761,10 @@ letter.
 letter.
 \item\optfmt{between}: (default) numbers come between letter cases.
 With the \optfmt{-case} or \optfmt{-upperlower} sort options,
-this will put numbers after upper case and before lower case.
+this will put numbers after \idx{uppercase} and before
+\idx{lowercase}.
 With the \optfmt{-lowerupper} sort option, this will put numbers
-after lower case and before upper case. This setting doesn't make
+after \idx{lowercase} and before \idx{uppercase}. This setting doesn't make
 much sense with the \optfmt{-nocase} option but, if used, this will put
 numbers before letters.
 \item\optfmt{first}: numbers are considered less than all
@@ -10769,8 +10774,8 @@ characters (including punctuation and spaces).
 \end{itemize}
 Note that the reverse sort methods will invert this setting.
 Remember also that the case-insensitive letter-number sort methods always
-first convert the \field{sort} field to lower case, which means that
-if you use one of them then there won't be any upper case
+first convert the \field{sort} field to \idx{lowercase}, which means that
+if you use one of them then there won't be any \idx{uppercase}
 characters. 
 
 Use \csopt{letter-number-punc-rule} to determine the relative
@@ -10987,7 +10992,7 @@ Then the entries can be sorted by date of birth using:
 \end{verbatim}
 
 The \code{G} (era) date pattern specifier expects a string, such as
-\qt{AD}. It will match lower case forms, such as \qt{ad}, so if you
+\qt{AD}. It will match \idx{lowercase} forms, such as \qt{ad}, so if you
 have \verb|\textsc{ad}| the interpreter will convert this to
 \code{ad} (stripping the text-block command). However, in general
 it's best to supply a semantic command that ensures that the
@@ -11046,15 +11051,15 @@ setting.
 
 \item\optfmt{codepoint}: the group is set to
 \icswithargs{bibglsunicodegroup}, where the first argument is the 
-first significant character (converted to lower case and decomposed,
+first significant character (converted to \idx{lowercase} and decomposed,
 if applicable) of the sort value.
 
 \item\optfmt{unicode category}: the group is set to
 \icswithargs{bibglsunicodegroup}, where the first argument is the
 label identifying the Unicode category of the first significant
 character of the sort value. For example, the label \code{Ll}
-signifies a lower case letter and \code{Lu} signifies an upper case
-letter.
+signifies a \idx!{lowercase} letter and \code{Lu} signifies an 
+\idx!{uppercase} letter.
 
 \item\optfmt{unicode script}: the group is set to
 \icswithargs{bibglsunicodegroup}, where the first argument is the
@@ -11068,7 +11073,7 @@ that are often used with non-Greek scripts).
 \icswithargs{bibglsunicodegroup}, where the first argument is the
 label corresponding to the Unicode category and script of the first
 significant character of the sort value. For example, the label
-\code{Ll.LATIN} indicates a lower case Latin letter.
+\code{Ll.LATIN} indicates a \idx!{lowercase} Latin letter.
 \end{itemize}
 This option has no effect with \longarg{no-group} or if no sorting
 is applied. Use \csopt{secondary-group-formation} for secondary
@@ -11448,7 +11453,7 @@ file (or created through a mapping). The \meta{value} is required.
 The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: sets the \field{type} to the entry
-type (lower case and without 
+type (\idx!{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
 \atentry{dualentry}, the \field{type} will be set to
 \optfmt{dualentry}.
@@ -11457,7 +11462,7 @@ entry type not the original entry type provided in the \ext{bib}
 file.
 
 \item \optfmt{same as original entry}: set the \field{type} field
-to the original entry type (lower case and without 
+to the original entry type (\idx!{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
 \optfmt{same as entry} if the entry type wasn't aliased).
 
@@ -11506,7 +11511,7 @@ file (or created through a mapping). The \meta{value} may be empty.
 The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{same as entry}: sets the \field{category} to the entry
-type (lower case and without 
+type (\idx{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
 \atentry{dualentry}, the \field{category} will be set to
 \optfmt{dualentry}.
@@ -11515,7 +11520,7 @@ entry type not the original entry type provided in the \ext{bib}
 file.
 
 \item \optfmt{same as original entry}: set the \field{category} field
-to the original entry type (lower case and without 
+to the original entry type (\idx{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
 \optfmt{same as entry} if the entry type wasn't aliased).
 
@@ -12946,7 +12951,7 @@ according to the rule):
 For example, if the rule recognises the digraph \qt{dz}, then the
 title is \qt{Dz}. Exceptions to this are included in the \langxml.
 If the key \code{grouptitle.case.\meta{lc}} exists, where
-\meta{lc} is the lower case version of \meta{title}, then the value
+\meta{lc} is the \idx!{lowercase} version of \meta{title}, then the value
 of that key is used instead. For example, the Dutch digraph \qt{ij}
 should be converted to \qt{IJ}, so \file{bib2gls-en.xml} includes:
 \begin{verbatim}
@@ -12954,7 +12959,7 @@ should be converted to \qt{IJ}, so \file{bib2gls-en.xml} includes:
 \end{verbatim}
 (See the \longarg{group} switch for more details.)
 \item \meta{letter} This is the actual letter at the start of the
-given entry's \field{sort} field, which may be lower case or may
+given entry's \field{sort} field, which may be \idx!{lowercase} or may
 contain diacritics that don't appear in \meta{title}.
 \item \meta{id} A numeric identifier. This may be the collation key
 or the code point for the given letter, depending on the sort
@@ -13325,11 +13330,11 @@ obtained from \cs{bibglsunicodegrouptitle}.
 The \meta{label} depends on the \csopt{group-formation} setting:
 \begin{itemize}
 \item\csopt[codepoint]{group-formation}: the \meta{label} is the
-Unicode value of \meta{character} (converted to lower case and
+Unicode value of \meta{character} (converted to \idx!{lowercase} and
 decomposed, if applicable);
 \item\csopt[unicode category]{group-formation}: the \meta{label} is the
 Unicode category of \meta{character} (for example, \code{Lu} means
-an upper case letter);
+an \idx!{uppercase} letter);
 \item\csopt[unicode script]{group-formation}: the \meta{label} is the
 Unicode script associated with \meta{character} (for example,
 \code{LATIN});
@@ -13356,7 +13361,7 @@ whereas with \csopt[unicode category and script]{group-formation} it will be:
 \begin{verbatim}
 group={\bibglsunicodegroup{Lu.LATIN}{Å}{C5}{}}
 \end{verbatim}
-(upper case Latin letter). 
+(\idx!{uppercase} Latin letter). 
 
 If instead \qt{\AA} is considered equivalent to \qt{A} according to the 
 collator, then with \csopt[codepoint]{group-formation}, the value will be:
@@ -14612,7 +14617,7 @@ by the \field{name} field (for example, with \csopt[name]{sort-field})
 the \TeX\ parser library recognises all the mathematical Greek letter commands 
 provided in the \LaTeX\ kernel. Additionally it recognises
 \ics{omicron} which isn't provided by \LaTeX\ (the symbol can be
-reproduced with a lower case Latin \qt{o}). Note that
+reproduced with a \idx!{lowercase} Latin \qt{o}). Note that
 \isty{glossaries-extra-bib2gls} (\sty{glossaries-extra} v1.27+)
 provides all the missing Greek letters (such as \cs{omicron}).
 
@@ -14644,7 +14649,7 @@ but \LaTeX\ needs a definition for this, so it's provided in the
 \end{verbatim}
 (With \sty{glossaries-extra} v1.27+, this is no longer needed.)
 The \TeX\ parser library and \sty{glossaries-extra-bib2gls} 
-similarly provide the missing upper case
+similarly provide the missing \idx!{uppercase}
 Greek letters, and these can be dealt with in the same way.
 
 The contents of \filefmt{mathgreek.bib} are as follows:
@@ -16286,7 +16291,7 @@ field with \csopt{field-aliases}:
 \csopt[author=parent]{field-aliases}
 \end{codeenv}
 but the author's label in the \exfile{people.bib}
-file is just the lower case surname.
+file is just the \idx!{lowercase} surname.
 
 Remember from \sectionref{sec:texparserlib} that the interpreter
 will be used on the \field{parent} field if the value contains
@@ -16833,7 +16838,7 @@ the \atentry{preamble} definition, which is now in the resource file.
 
 The tagging format is governed by \ics{glsxtrtagfont} which
 underlines its argument by default. I've redefined it to also
-convert the letter to uppercase:
+convert the letter to \idx{uppercase}:
 \begin{verbatim}
 \renewcommand*{\glsxtrtagfont}[1]{\underline{\MakeTextUppercase{#1}}}
 \end{verbatim}
@@ -16874,7 +16879,7 @@ location lists. This doesn't affect the entries that haven't been
 indexed.
 
 I decided to convert the first letter of the \field{name} field to
-uppercase. Since the \field{name} is implicitly set for
+\idx{uppercase}. Since the \field{name} is implicitly set for
 abbreviations based on the style, I've decided to implement this
 through the \catattr{glossname} attribute rather than using
 \csopt{name-case-change}:
@@ -17552,7 +17557,7 @@ rule for the duals, but with the numbers padded:
 \end{codeenv}
 This method doesn't work as well as the method used in
 \exfile{sample-chemical.tex} as it doesn't separate the capitals,
-digits and lower case characters in the way that can be achieved with the
+digits and \idx!{lowercase} characters in the way that can be achieved with the
 letter-number methods. An improvement can be made by changing the
 break-points. I could use \csopt[upper-upper]{dual-break-at} but
 this would put \qt{seal} before \qt{sea lion} in the \code{animal}

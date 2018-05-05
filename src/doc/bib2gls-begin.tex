@@ -56,6 +56,8 @@
 \glssetcategoryattribute{initialism}{retainfirstuseperiod}{true}
 \setabbreviationstyle[initialism]{short-long}
 \setabbreviationstyle[abbrvtrans]{long-short-user}
+\setabbreviationstyle[longshortem]{long-short-em}
+\setabbreviationstyle[shortsc]{short-sc-nolong}
 
 \newcommand{\bibglspassim}{}
 \newcommand{\bibglsseealsosep}{\par\hangindent .75em\parindent .75em\relax}
@@ -206,7 +208,7 @@
 \makeatother
 
 \newcommand{\primary}{\emph}
-\newcommand{\primaryloc}{\hyperbf}
+\newcommand{\primaryloc}[1]{\underline{\hyperbf{#1}}}
 
 \newcommand{\pidx}[1][]{\gls[textformat=primary,format=primaryloc,#1]}
 \newcommand{\pidxpl}[1][]{\glspl[textformat=primary,format=primaryloc,#1]}
@@ -234,8 +236,8 @@
   \texorpdfstring{\idx{env.#1}}{#1}%
 }
 
-\newcommand*{\abbrstyle}[1]{%
-  \texorpdfstring{\idx{#1}}{#1}%
+\newcommand*{\abbrstyle}[2][]{%
+  \texorpdfstring{\idx[#1]{#2}}{#2}%
 }
 
 \newcommand*{\glostyle}[1]{%
@@ -541,7 +543,7 @@ referenced (see \sectionref{sec:firstuse}). The plural form is obtained with
 the \pidx{variant} command:
 \nosecformatdef{glspl}
 There are other \idxpl{variant} of \gls{gls} that perform
-case-changing.
+\glslink{case-change}{case-changing}.
 If you want to start a sentence with an entry then you can use:
 \nosecformatdef{Gls}
 for the singular form and
@@ -753,7 +755,7 @@ which works in a similar way to \gls{glsentrydesc}. In this case,
 \gls{glsentryname} simply expands to the value of the \field{name}
 key. There's also a case-changing version:
 \nosecformatdef{Glsentryname}
-which changes the initial character to upper case,
+which changes the initial character to \idx{uppercase},
 but (unlike \cs{glsentryname}) this command isn't expandable. If,
 for example, I had instead set the duck's \field{name} key using:
 \begin{codeenv}
@@ -789,6 +791,27 @@ labelling scheme, described in \sectionref{sec:labels}). If you
 don't specify a category, then \gls{newglossaryentry} and
 \gls{longnewglossaryentry} assume \code{general}. The helper
 commands, such as \gls{newabbreviation}, have different defaults.
+
+For example:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{name} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+   \field{category} = \marg{mineral}
+}
+\end{codeenv}
+The value of the \field{category} field for a given entry can be obtained
+with:
+\nosecformatdef{glscategory}
+where \meta{label} identifies the entry. This command is expandable
+and does nothing if the entry hasn't been defined. You can test the
+value of the \field{category} field using:
+\nosecformatdef{glsifcategory}
+This checks if the \field{category} field for the entry given by
+\meta{label} is set to \meta{category}, but doesn't perform any
+expansion. It generates an error if the entry doesn't exist (or
+warning with \styopt[warn]{undefaction}).
 
 The category allows you to apply certain types of formatting, such
 as the \idx{postlinkhook} (\sectionref{sec:postlinkhooks}).
@@ -865,7 +888,7 @@ first field can be obtained with:
 (which behaves like \gls{glsentrysymbol}).
 \glsaddeach{glsuserii,glsuseriii,glsuseriv,glsuserv,%
 glsentryuserii,glsentryuseriii,glsentryuseriv,glsentryuserv}%
-The other fields are similarly obtained using lowercase Roman
+The other fields are similarly obtained using \idx{lowercase} Roman
 numerals, so the sixth field can be obtained with:
 \nosecformatdef{glsuservi}
 (which behaves like \gls{glssymbol}) or with:
@@ -898,11 +921,11 @@ optional arguments and obey the \idx{postlinkhook}, then use
 \nosecformatdef{glsaddkey}
 The first three arguments are as for \gls{glsaddstoragekey}.
 The next argument \meta{no link ucfirst cs} is like \meta{no link
-cs} but converts the first letter to upper case (analogous to
+cs} but converts the first letter to \idx{uppercase} (analogous to
 \gls{Glsentryname}). The final three commands behave like
 \gls{glssymbol}, but \meta{link ucfirst cs} converts the first
-letter to upper case and \meta{link allcaps cs} converts the entire
-value to upper case.
+letter to \idx{uppercase} and \meta{link allcaps cs} converts the entire
+value to \idx{uppercase}.
 
 The new keys must be defined before the entries are defined (and
 the key definitions must come before the first \idx{resourceset}
@@ -935,6 +958,12 @@ different internal label. See Table~\ref*{tab:internalfields} in the
 \bibgls\ user manual or Table~4.1 in the \sty{glossaries} user
 manual. Custom fields provided with \gls{glsaddkey} or \gls{glsaddstoragekey}
 have matching key and internal field labels.
+
+The \sty{glossaries-extra} package provides a generic way of
+accessing a field, analogous to commands like \gls{glsentryname}:
+\nosecformatdef{glsxtrusefield}
+This expands to the field value if defined or does nothing if the
+entry or field isn't defined.
 
 The base \sty{glossaries} package provides:
 \nosecformatdef{ifglshassymbol}
@@ -1006,12 +1035,132 @@ include the additional information.  For example:
 The \idx{postlinkhook} appends the value of the \field{user2} field
 after the \idx{firstuse} of \gls{gls} (or its \idxpl{variant}).
 The \catattr{glossname} attribute converts the first letter of the
-\field{name} field to upper case when it's displayed in the
+\field{name} field to \idx{uppercase} when it's displayed in the
 glossary.  The \idx{postnamehook} appends (in parentheses) the value
 of the \field{user1} field and then checks if the plural form is the
 same as the singular form with \qt{s} appended, and only displays
 the plural if they are different. See \sectionref{sec:glsformats}
 and \sectionref{sec:displaygloss} for further details.
+
+\section{Accessibility Support}
+\label{sec:accsupp}
+
+The base \sty{glossaries} package is distributed with the
+supplementary \sty{glossaries-accsupp} package, which uses the
+\sty{accsupp} package~\cite{accsupp} to provide accessibility support. With the
+\sty{glossaries-extra} extension package, the
+\sty{glossaries-accsupp} package needs to be loaded after \sty{glossaries}
+but before \sty{glossaries-extra} sets up the accessibility
+integration support. The simplest way to do this is with
+\sty{glossaries-extra}'s \styopt{accsupp} package option.
+
+The accessibility support is provided through the PDF
+\code{ActualText} specification (via the \sty{accsupp} package). 
+If you need \code{E} or \code{Alt} instead of \code{ActualText} then redefine:
+\nosecformatdef{glsaccsupp}
+as appropriate. For example:
+\begin{codeenv}
+\cmd{renewcommand}*\marg{\gls{glsaccsupp}}[2]\marg{\comment{}
+  \cmd{BeginAccSupp}\marg{Alt=\marg{\gls{param}1}}\gls{param}2\cmd{EndAccSupp}\marg{}\comment{}
+}
+\end{codeenv}
+
+The \sty{glossaries-accsupp} package provides additional keys (see
+Table~\ref{tab:accsuppfields} in the \bibgls\ user manual or
+Chapter~18 of the \sty{glossaries} user manual~\cite{glossaries}).
+The main keys are \field{access}, which provides an alternative to
+the \field{name} field, \field{symbolaccess}, which provides an
+alternative to the \field{symbol} field and \field{shortaccess},
+which provides an alternative to the \field{short} field,
+\field{firstaccess}, which provides an alternative to the
+\field{first} field, and \field{textaccess}, which provides an
+alternative to the \field{text} field. If any of the accessibility
+fields are unset, no accessibility support is provided for that
+field.
+For example:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{R}\comment{label}
+\marg{\comment{settings:}
+ \field{name}        = \marg{\cmd{ensuremath}\marg{\cmd{Re}}},
+ \field{access}      = \marg{set of real numbers symbol},\comment{name access}
+ \field{textaccess}  = \marg{set of real numbers},\comment{text access}
+ \field{firstaccess} = \marg{set of real numbers},\comment{first access}
+ \field{description} = \marg{set of real numbers}
+}
+\end{codeenv}
+This means that when the \field{name} field is displayed in the
+glossary, the corresponding accessibility text is \qt{set of real
+numbers symbol}, but the \idx{link-text} for \gls{gls} is just
+\qt{set of real numbers} (for both \idx{firstuse} and subsequent
+use).
+
+There are some category attributes that govern the default settings
+of some fields when using \gls{newabbreviation} (see
+\sectionref{sec:abbreviations}). If accessibility support is
+provided, there are some additional attributes (introduced to
+\sty{glossaries-extra} version 1.31):
+\begin{description}
+\item[\catattr{accessinsertdots}] This is a boolean attribute that behaves like
+\catattr{insertdots} but only applies to the \field{shortaccess}
+field, if it hasn't explicitly been set. This is useful for
+initialisms that should be read out as letters but the screen reader
+might interpret as a word. For example:
+\begin{codeenv}
+\gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{accessinsertdots}}\marg{true}
+\gls{newabbreviation}\oarg{\field{category}=initialism}\marg{pi}\marg{PI}\marg{Private Investigator}
+\end{codeenv}
+This means that the short form appears as just \qt{PI} in the
+document text, but the accessibility text is \qt{P.I.} which prompts
+the screen reader to read it as an abbreviation instead of the word
+\qt{pi}. Since the \field{shortaccess} field is an aid to the screen
+reader and doesn't modify the visible text, there's no check
+for the \catattr{retainfirstuseperiod} or \catattr{discardperiod}
+attributes for that field. This setting doesn't affect the
+accessibility support for the \field{name}, \field{first} or
+\field{text} fields.
+
+\item[\catattr{nameshortaccess}] This is a boolean attribute, where
+the value \code{true} indicates the attribute is set. If the
+\field{shortaccess} field is assigned (either explicitly with the key or
+implicitly through the use of the \catattr{accessinsertdots}
+attribute) and the \field{access} field isn't specified, then if the
+\catattr{nameshortaccess} attribute is set this will copy the
+\field{shortaccess} field to the \field{access} field. For example:
+\begin{codeenv}
+\gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{accessinsertdots}}\marg{true}
+\gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{nameshortaccess}}\marg{true}
+\gls{newabbreviation}\oarg{\field{category}=initialism}\marg{pi}\marg{PI}\marg{Private Investigator}
+\end{codeenv}
+Abbreviations that behave like regular terms (such as
+\abbrstyle{short-nolong}) may also need \catattr{textshortaccess}
+and \catattr{firstshortaccess} set.
+
+\item[\catattr{textshortaccess}] Like \catattr{nameshortaccess}, but
+applies to the \field{textaccess} field.
+
+\item[\catattr{firstshortaccess}] Like \catattr{firstshortaccess}, but
+applies to the \field{firstaccess} field.
+
+\item[\catattr{accessaposplural}] If the \field{shortaccess} field
+is set (either explicitly with the key or implicitly through the use
+of the \catattr{accessinsertdots} attribute) and the
+\field{shortpluralaccess} field isn't set, the
+\catattr{accessaposplural} boolean attribute behaves like
+\catattr{aposplural} but only applies to the
+\field{shortpluralaccess} field. If the \catattr{accessaposplural}
+attribute isn't set but the \catattr{aposplural} attribute is set,
+then that's used instead. If you want \catattr{aposplural} on but
+not apply it to \field{shortpluralaccess} then you need to set the
+\catattr{accessaposplural} attribute to \code{false}.
+
+\item[\catattr{accessnoshortplural}] A boolean attribute like
+\catattr{accessaposplural} but analogous to \catattr{noshortplural}
+instead.
+\end{description}
+These attributes have no effect for entries that aren't defined
+using \gls{newabbreviation}. (These attributes apply to
+\gls{newacronym} provided it internally uses \gls{newabbreviation},
+which is does by default with \sty{glossaries-extra}.)
 
 \section{Spaces}
 \label{sec:spaces}
@@ -1340,7 +1489,8 @@ also define the term \qt{waterbird}:
 \end{codeenv}
 The \ext{toc} file now contains:
 \begin{codeenv}
-\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}\gls{Gls} \marg{duck}: a \gls{gls} \marg{waterbird} with webbed feet}\marg{1}
+\cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}\gls{Gls} \marg{duck}: a \gls{gls} \marg{waterbird} 
+with webbed feet}\marg{1}
 \end{codeenv}
 
 \begin{important}
@@ -1426,16 +1576,18 @@ The base \sty{glossaries} package provides:
 \nosecformatdef{newacronym}
 The extension package \sty{glossaries-extra} provides:
 \nosecformatdef{newabbreviation}
-and redefines \gls{newacronym} in terms of \gls{newabbreviation} so
-that it effectively behaves like:
+which internally uses \gls{newglossaryentry} with the
+\field{category} set to \code{abbreviation} (which can be
+overridden in the optional \meta{\keyvallist}).
+The \gls{glossaries-extra} package also redefines \gls{newacronym} in 
+terms of \gls{newabbreviation} so that it effectively behaves like:
 \begin{codeenv}
 \gls{newabbreviation}\oarg{\gls[noindex=false]{field.type}=\gls{acronymtype},\field{category}=acronym,\meta{\keyvallist}}
 \margm{label}\margm{short}\margm{long}
 \end{codeenv}
 This makes it easier to transfer over from the base \sty{glossaries}
-package, but if you use \gls{newacronym} remember that the category 
-is set to \code{acronym} instead of \code{abbreviation}, which is
-the usual default for \gls{newabbreviation}.
+package, but if you use \gls{newacronym} remember that the
+\field{category} is set to \code{acronym} instead of \code{abbreviation}.
 
 In both cases, \meta{label} is the entry's label used to identify
 the abbreviation in commands like \gls{gls}, \meta{short} is the
@@ -1443,7 +1595,7 @@ short form and \meta{long} is the long form. Any additional
 settings, such as the \field{category} or \field{description} 
 can be set in the optional argument.
 
-The style must always be set before the abbreviations are defined
+The style must be set \emph{before the abbreviations are defined}
 using:
 \nosecformatdef{setabbreviationstyle}
 where \meta{category} is the category label and \meta{style-name} is
@@ -1465,7 +1617,8 @@ abbreviation that's defined with a category that hasn't been
 assigned a style will fallback on the style for the default
 \code{abbreviation} category. There are many predefined styles to
 choose from and they come with commands to help adjust the
-formatting. See the \sty{glossaries-extra} user manual for the
+formatting. See the \sty{glossaries-extra} user
+manual~\cite{glossaries-extra} for the
 complete list. The \sty{glossaries-extra} package also comes with a
 sample document
 \ctanfile{glossaries-extra/samples}{sample-abbr-styles.pdf}
@@ -1473,8 +1626,8 @@ demonstrating all the predefined styles.
 
 The style determines whether the abbreviation is treated as a
 \idx{regular} term.  There are also some \idxpl{categoryattribute} that govern
-abbreviations (see later).  These should be also set before the
-abbreviation is defined.
+abbreviations (see below and \sectionref{sec:accsupp}).  These
+should also be set before the abbreviation is defined.
 
 Some of the styles set the \field{description} field (typically to
 the \meta{long} form). The styles that end with \code{-desc} don't,
@@ -1515,7 +1668,7 @@ form, use one of the \code{-nolong} styles (such as
 \abbrstyle{short-nolong}). If you only want the
 long form and not the short form, use one of the \code{-noshort}
 styles (such as \abbrstyle{long-noshort}). If you want only the long
-form on \idx{firstuse} and only the short form on subsequent use
+form on \idx{firstuse} and only the short form subsequently
 then use one of the \code{-only} styles, such as
 \abbrstyle{long-only-short-only}.
 
@@ -1529,7 +1682,7 @@ If you want a specific instance to show both the long and short form, without
 modifying the \idx{firstuseflag}, then use
 \nosecformatdef{glsxtrfull}
 Depending on the style, this may not exactly match the format
-produced by the \idx{firstuse} of \gls{gls}.
+produced by the \idx{firstuse} of \code{\gls{gls}\margm{label}}.
 
 If you find these commands quite long-winded, there are some
 shortcuts available with the \styopt{shortcuts} option, but as these
@@ -1556,7 +1709,7 @@ The \gls{ex.svm}['s] parameters are\ldots
 \end{result}
 Compare this with:
 \begin{codeenv}
-The \gls{gls}\marg{svm}'s parameters are\cmd{ldots}
+The \gls{gls}\marg{svm}'s parameters are\cmd{ldots}\incorrect
 \end{codeenv}
 which produces:
 \begin{result}
@@ -1610,10 +1763,12 @@ First use: support vector machines (SVM). Next use: SVM.
 \end{result}
 A related attribute is \catattr{aposplural} which inserts \qtt{'s}
 (apostrophe followed by \qt{s}) to form the default short plural to
-help avoid ambiguity with lower case abbreviations where it might
+help avoid ambiguity with \idx{lowercase} abbreviations where it might
 not be obvious that the \qt{s} indicates a plural (rather than
 another letter in the abbreviation). Again, this needs to be set
-before the abbreviations for the given category (or categories) are defined.
+before the abbreviations for the given category (or categories) are
+defined (but check with your supervisor, publisher or editor as this 
+usage is controversial).
 
 \section{Abbreviation Markup}
 
@@ -1660,7 +1815,7 @@ First use: \gls{ex.ssl}[-enabled]. Next use: \gls{ex.ssl}[-enabled].
 \end{result}
 Compare this with:
 \begin{codeenv}
-First use: \gls{gls}\marg{ssl}-enabled. Next use: \gls{gls}\marg{ssl}-enabled.
+First use: \gls{gls}\marg{ssl}-enabled. Next use: \gls{gls}\marg{ssl}-enabled.\incorrect
 \end{codeenv}
 which instead produces:
 \begin{result}
@@ -1674,6 +1829,10 @@ produces:
 \begin{result}
 First use: \gls{ex.ssl}[ enabled]. Next use: \gls{ex.ssl}[ enabled].
 \end{result}
+Note that this is different to the result obtained with the
+\abbrstyle{long-short} style which doesn't include the inserted
+material in the parentheses (and doesn't check if the inserted
+text starts with a hyphen).
 
 There's a related attribute \catattr{markshortwords} which applies
 to the short form instead. This is only useful if the short form contains
@@ -1684,8 +1843,10 @@ you don't need to explicitly set this attribute. Instead, you need
 to define a tagging command using:
 \nosecformatdef{GlsXtrEnableInitialTagging}
 This (robustly) defines \meta{cs} (a control sequence) to accept a
-single argument, which should be used in the \meta{long} part of the 
-abbreviation definition. This command automatically sets the
+single argument, which you need to use in the \meta{long} part of the 
+abbreviation definition (it's not inserted automatically).
+
+The \gls{GlsXtrEnableInitialTagging} command also sets the
 \catattr{tagging} attribute to \code{true} for each of the listed
 categories, which ensures that \meta{cs} uses
 \nosecformatdef{glsxtrtagfont}
@@ -1714,6 +1875,15 @@ This doesn't show the markup as the tagging command (\csfmt{itag} in
 this example) simply expands to its argument in the main document
 text. The difference is only evident in the glossary.
 
+If all your abbreviations are defined in a separate file, it's
+useful to provide a definition of the tagging command with
+\gls{providecommand} to ensure it's defined if you decide not to use
+\gls{GlsXtrEnableInitialTagging}. With \bibgls, you can include it
+in the \atentry{preamble}. For example:
+\begin{codeenv}
+\atentry{preamble}\marg{"\gls{providecommand}\marg{\cmd{itag}}\oarg{1}\marg{\gls{param}1}"}
+\end{codeenv}
+
 \section{Dotted Abbreviations}
 
 If an abbreviation ends with a \idx{full-stop}, it can be awkward
@@ -1740,12 +1910,12 @@ I went to my surgery to see the \gls{gls}\marg{gp}.
 This results in:
 \begin{result}
 \gls{ex.dante} is a local \TeX\ user group.
-The German-speaking local \TeX\ user group is \gls{ex.dante}\relax.
+The German-speaking local \TeX\ user group is \gls{ex.dante}\relax.\incorrect
 
 A \gls{ex.gp} is a medical doctor.
-I went to my surgery to see the \gls{ex.gp}\relax.
+I went to my surgery to see the \gls{ex.gp}\relax.\incorrect
 \end{result}
-The awkward double-dot at the end is caused by the final dot in the
+The awkward double-dot is caused by the final dot in the
 short form followed by the sentence terminating \idx{full-stop}.
 
 If the \catattr{discardperiod} attribute is set to \code{true}, the
@@ -1983,7 +2153,9 @@ above document, the following error would occur:
                          }
 \end{verbatim}
 Although \gls{si} is robust, commands like \csfmt{metre} and
-\csfmt{squared} aren't.
+\csfmt{squared} are only available within the argument of \gls{si}
+(and other similar commands provided by \sty{siunitx}) and so break
+in expandable contexts.
 With \gls{glsnoexpandfields}, the document compiles correctly and
 produces:
 \begin{result}
@@ -2061,7 +2233,8 @@ associated formatting commands) should need to be redefined without
 having to go through the whole document changing the code. Using
 commands like \gls{gls} also identifies which entries need to be
 included in the list of terms and, if \sty{hyperref} is loaded, can
-be hyperlinked to the relevant place in that list.
+be hyperlinked to the relevant place in that list (see
+\sectionref{sec:displaygloss}).
 
 So explicitly using \verb|f'(x_i)| won't index the \code{deriv} entry 
 or mark it has having been used or create a hyperlink. One
@@ -2076,7 +2249,7 @@ as having been used. For example:
 The gradient at \gls{mshiftchar}x\gls{sbchar}i\gls{mshiftchar} is \gls{glslink}\marg{deriv}\marg{\gls{mshiftchar}f'(x\gls{sbchar}i)\gls{mshiftchar}}.
 \end{codeenv}
 This solves the problem of ensuring that the \code{deriv} entry is
-indexed and, if \sty{hyperref} is loaded, that the
+indexed and, if \sty{hyperref} is loaded, ensures that the
 \idx{link-text} has a hyperlink to the relevant place in the list of
 notation, but it doesn't solve the problem of consistent formatting.
 
@@ -2170,9 +2343,9 @@ format the \meta{text} argument using:
 \nosecformatdef{glsxtrfmtdisplay}
 where \meta{cs-name} is the control sequence name stored in the
 field identified by \gls{GlsXtrFmtField} and the \meta{insert} part
-is empty for the unstarred \gls{glsxtrfmt} and the final optional
-argument for the starred \gls{glsxtrfmt*}. If the command identified
-by \meta{cs-name} doesn't exist (or if the field providing it isn't
+is the final optional argument for the starred \gls{glsxtrfmt*} (if
+provided) otherwise it's empty. If the command identified by
+\meta{cs-name} doesn't exist (or if the field providing it isn't
 set) then just \meta{text}\meta{insert} is done.
 
 \begin{important}
@@ -2204,7 +2377,7 @@ $\boldsymbol{x}$ might denote a vector and $\boldsymbol{X}$ might
 denote a matrix. However, you may have a mixed list of terms
 containing both symbols and words, and if you set the
 \catattr{glossname} attribute to \code{firstuc}, which automatically
-converts the first letter of each \field{name} to upper case in the
+converts the first letter of each \field{name} to \idx{uppercase} in the
 glossary, then this can cause a problem for entries where the
 \field{name} starts with a symbol. The simplest solution is to
 insert an empty group at the start of the \field{name} field for
@@ -2225,7 +2398,7 @@ interference you can switch off the behaviour with
 The examples so far only use the defined entries in the documents
 with commands like \gls{gls} or \gls{glssymbol} or
 \gls{glsentrydesc}. These are useful for ensuring consistent
-formatting, but it's also useful to have a place in the document
+formatting, but it's also helpful to have a place in the document
 where the term is formally defined. This can be partially solved
 by including the description in parentheses on \idx{firstuse},
 either by explicitly including the description in the \field{first}
@@ -2278,7 +2451,8 @@ For example:
 \cmd{documentclass}\marg{scrartcl}
 \cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
  \styopt{nostyles},\comment{don't load default style packages}
- \styopt[tree]{stylemods}\comment{load glossary-tree.sty}
+\comment{load glossaries-extra-stylemods.sty and glossary-tree.sty:}
+ \styopt[tree]{stylemods}
 ]\marg{glossaries-extra}
 \strut
 \gls{newglossaryentry}\marg{area}
@@ -2349,12 +2523,12 @@ the features supported by the predefined styles.)
 
 The glossary is sub-divided into letter groups. By default, these
 sub-groups are separated with a vertical gap (for example, between
-duck and goose above). The letter group is determined by the first
-letter of the \field{sort} field. Since the default behaviour of
-both \sty{glossaries} and \sty{glossaries-extra} is to use
-\idx{makeindex}, the \field{sort} field (which is used by
-\idx{makeindex}) is set to the value of the \field{name} field
-(unless explicitly set) and then sanitized.
+duck and goose above). In the above example, the letter group is
+determined by the first character of the \field{sort} field. Since the
+default behaviour of both \sty{glossaries} and
+\sty{glossaries-extra} is to use \idx{makeindex}, the \field{sort}
+field (which is used by \idx{makeindex}) is set to the value of the
+\field{name} field (unless explicitly set) and then sanitized.
 
 When using \gls{printunsrtglossary}, the \field{sort} field is
 irrelevant except to determine the letter group. The sub-group
@@ -2381,11 +2555,15 @@ This means that \code{area} is assigned to the symbols letter group. The
 symbols group occurs three times, because the list is following the
 order of definition.
 
+\subsection{Groups and Locations}
+\label{sec:group}
+
 The \field{group} key isn't defined by default, but if it is defined
 then \gls{printunsrtglossary} will use the \field{group} field
-instead. The value of this field must be a label (see
-\sectionref{sec:labels}). A title may be
-assigned to a group with:
+instead of trying to determine the group from the first character of
+the \field{sort} field (as in the example above). The value of the
+\field{group} field must be a label (see \sectionref{sec:labels}). 
+A title may be assigned to a group with:
 \nosecformatdef{glsxtrsetgrouptitle}
 If a title hasn't been assigned, the label is used as the title.
 The above command is the preferred form, but the base
@@ -2402,7 +2580,7 @@ required by the \gls{glsaddstoragekey} syntax):
 \cmd{documentclass}\marg{scrartcl}
 \cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
  \styopt{nostyles},\comment{don't load default style packages}
- \styopt[tree]{stylemods}\comment{load glossary-tree.sty}
+ \styopt[tree]{stylemods}\comment{load glossary-tree.sty and patch styles}
 ]\marg{glossaries-extra}
 \strut
 \gls{glsaddstoragekey}\marg{group}\marg{}\marg{\cmd{grouplabel}}
@@ -2507,13 +2685,16 @@ knows which entries to select and what the locations are, and how to
 order the definitions. See \sectionref{sec:bib2gls} for further
 information.
 
-\section{Homographs and Hierarchical Terms}
+\subsection{Homographs and Hierarchical Terms}
 \label{sec:parent}
 
 An entry may be assigned a parent with the \field{parent} key. The
-value must be the label of a entry that's already defined. If the
-\field{name} key is omitted, the value is assumed to be the same as
-the parent's \field{name}. For example:
+value must be the label of a entry that's already defined. You can
+test if an entry has the \field{parent} field set with:
+\nosecformatdef{ifglshasparent}
+If the \field{name} key is omitted, the value is assumed to be the same as
+the parent's \field{name}.
+For example:
 \begin{codeenv}
 \comment{parent:}
 \gls{newglossaryentry}\marg{glossary}\marg{\field{name}=\marg{glossary},\field{description}=\marg{}}
@@ -2649,7 +2830,7 @@ hier.quartz,hier.amethyst,hier.citrine}%
 \printunsrtglossary[subentrycounter=false,style=indexgroup,title=Glossary,nonumberlist,target=false]
 \end{result}
 
-The \glostyle{treenoname} or \glostyle{treenoname} styles are
+The \glostyle{treenoname} and \glostyle{treenonamegroup} styles are
 appropriate for \idxpl{homograph}. These are usually best with the
 \styopt{subentrycounter} package option, which defines the
 \counter{glossarysubentry} counter that's incremented and
@@ -2661,6 +2842,21 @@ but not a grandparent). For example:
 \cmd{usepackage}[\styopt{subentrycounter},\comment{create glossarysubentry counter}
  \styopt[dot]{postpunc},\comment{append full stop after description}
  \styopt{nostyles},\styopt[tree]{stylemods}]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{bow}\marg{\field{name}=\marg{bow},\field{description}=\marg{}}
+\strut
+\gls{newglossaryentry}\marg{bowknot}
+\marg{
+  \field{parent} = \marg{bow},
+  \field{description} = \marg{a knot tied with two loops and loose ends}
+}
+\strut
+\gls{newglossaryentry}\marg{bowweapon}
+\marg{
+  \field{parent} = \marg{bow},
+  \field{description} = \marg{a weapon for shooting arrows, made of curved wood
+  joined at both ends with taut string}
+}
 \strut
 \gls{newglossaryentry}\marg{glossary}\marg{\field{name}=\marg{glossary},\field{description}=\marg{}}
 \strut
@@ -2682,7 +2878,8 @@ but not a grandparent). For example:
 \end{codeenv}
 This produces
 \begin{result}
-\glsaddeach{hom.glossary,hom.glossarycol,hom.glossarylist}%
+\glsaddeach{hom.bow,hom.bowknot,hom.bowweapon,%
+hom.glossary,hom.glossarycol,hom.glossarylist}%
 \setupglossaries{toc=false,section}%
 \glossariesextrasetup{postpunc=dot}%
 \renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
@@ -2690,23 +2887,23 @@ This produces
 }%
 \printunsrtglossary[style=treenoname,title=Glossary,nonumberlist,target=false]
 \end{result}
-The empty description for the top-level \code{glossary} entry has
-caused an odd effect with a space occurring between the name and 
-the post-description punctuation. This can be removed by redefining
+The empty description for the top-level \code{bow} and
+\code{glossary} entries has caused an odd effect with a space occurring 
+between the name and the post-description punctuation. This can be removed by 
+redefining:
 \nosecformatdef{glstreenonamedesc}
-so that it checks if the \field{description} field has been set
-with:
+so that it checks if the \field{description} field has been set with:
 \nosecformatdef{ifglshasdesc}
 For example:
 \begin{codeenv}
 \cmd{renewcommand}\marg{\gls{glstreenonamedesc}}[1]\marg{\comment{}
   \gls{ifglshasdesc}\marg{\gls{param}1}
   \marg{\gls[noindex=false]{glstreepredesc}\gls{glossentrydesc}\marg{\gls{param}1}\gls{glspostdescription}}
-  \marg{}\comment{description field is empty}
+  \marg{}\comment{do nothing, description field is empty}
 }
 \end{codeenv}
 
-\section{Multiple Glossaries}
+\subsection{Multiple Glossaries}
 \label{sec:multigloss}
 
 The default glossary has the label \code{main}, but it can also be referenced 
@@ -2720,14 +2917,14 @@ another default.)
 
 Abbreviations defined with \gls{newabbreviation}
 (see \sectionref{sec:abbreviations}) are, by default, assigned to the glossary 
-given by
+given by:
 \nosecformatdef{glsxtrabbrvtype}
 This initially expands to \gls{glsdefaulttype}, but the
 \styopt{abbreviations} option redefines this to \code{abbreviations}
 and creates a glossary with that label.
 
 Abbreviations defined with \gls{newacronym} are, by default,
-assigned to the glossary given by
+assigned to the glossary given by:
 \nosecformatdef{acronymtype}
 This initially expands to \gls{glsdefaulttype}, but the
 \styopt{abbreviations} option redefines this to
@@ -2740,7 +2937,7 @@ the other as the default for \gls{newacronym}.
 
 The \styopt{symbols} package option creates a glossary with the
 label \code{symbols} and defines \gls{glsxtrnewsymbol} (see 
-\sectionref{sec:symbols}) which sets the glossary to
+\sectionref{sec:symbols}) which sets the \field{type} to
 \code{symbols}. There are also similar package options
 \styopt{numbers} and \styopt{index}, which create the \code{numbers}
 glossary (and \gls{glsxtrnewnumber}) and the \code{index} glossary
@@ -2775,11 +2972,22 @@ the above \code{measurements} glossary can be displayed with:
 \gls{printunsrtglossary}\oarg{\printglossopt[measurements]{type}}
 \end{codeenv}
 For convenience, there's a command that iterates over all defined
-glossaries and does
+glossaries (in the order of definition) and does
 \gls{printunsrtglossary}\oarg{\printglossopt[\meta{label}]{type}}
 for each glossary:
 \nosecformatdef{printunsrtglossaries}
-There's no optional argument for this command.
+There's no optional argument for this command. When creating
+glossaries with package options, such as \styopt{abbreviations}, you
+may find an unexpected order as the options aren't always processed
+in the order in which they were specified. (Some
+\sty{glossaries-extra} options are passed to the base
+\sty{glossaries} package and are processed when that package is
+internally loaded not when the extension options are processed.) In
+which case you need to use \gls{printunsrtglossary} for each
+glossary in the required order. You will also need to do this if the
+glossary settings are different. (For example, if one glossary needs
+to use the \glostyle{tree} style and another needs to use the
+\glostyle{treenoname} style.)
 
 You can also define an \pidx{ignoredglossary}, which is ignored by
 \gls{printunsrtglossaries}. This is a useful way of creating a
@@ -2798,6 +3006,121 @@ it's still possible to display an \idx{ignoredglossary} with
 \gls{printunsrtglossary} but you'll need to use the
 \printglossopt{title} setting to override the default title.
 
+\subsection{Redisplaying or Filtering a Glossary}
+\label{sec:printglossagain}
+
+It's possible to use \gls{printunsrtglossary} multiple times for the
+same glossary, but if you have hyperlinks you will need to either
+suppress the targets with \printglossopt[false]{target} or change
+the target name. The target names are all prefixed with:
+\nosecformatdef{glolinkprefix}
+so changing this before displaying the glossary will change the
+targets, but commands like \gls{gls} also use this prefix, so they
+will only link to the glossary item with a matching prefix.
+
+The starred form of \gls{printunsrtglossary} has an extra
+argument:
+\nosecformatdef{printunsrtglossary*}
+This may be used to make local assignments. It's equivalent to:
+\begin{codeenv}
+\cmd{begingroup} \meta{code}\gls{printunsrtglossary}\oargm{options}\cmd{endgroup}
+\end{codeenv}
+For example, if the \field{group} key has been defined (see
+\sectionref{sec:group}) you can locally switch to a different field
+for the group label by redefining:
+\nosecformatdef{glsxtrgroupfield}
+within \meta{code}.
+For example, if the \field{secondarygroup} field has been defined:
+\begin{codeenv}
+\gls{printunsrtglossary*}\marg{\comment{}
+  \cmd{renewcommand}\marg{\gls{glsxtrgroupfield}}\marg{secondarygroup}\comment{}
+}
+\end{codeenv}
+
+Unlike \gls{printglossary} (used with \gls{makeindex} and
+\gls{xindy}) which inputs a file containing the code to typeset the glossary,
+\gls{printunsrtglossary} iterates over the labels defined in the
+given glossary and adds the appropriate code to an internal command.
+Once the construction of the internal command is completed, it's
+then performed. (The construction of this internal command is done
+to avoid complications when iterating within \env{tabular}-like
+environments, as some of the styles use \env{longtable} or
+\env{supertabular}.) There's a hook just before the internal command is 
+expanded:
+\nosecformatdef{printunsrtglossarypredoglossary}
+The glossary header and preamble are displayed before 
+the loop starts, so this hook won't change them (but you can make
+local changes in \meta{code} outside of the hook).
+The style is also set before the loop, but the start
+and end of the \env{theglossary} environment (which is defined by
+the glossary styles) is included in the internal command, so minor
+adjustments to the style can be made in this hook.
+
+There's another hook that's performed at each iteration:
+\nosecformatdef{printunsrtglossaryentryprocesshook}
+where \meta{label} is the current entry label. For example, the
+\glostyle{alttree} style needs to know the widest entry name in
+order to set up the correct indentation. The widest name is set
+using:
+\nosecformatdef{glssetwidest}
+but this requires knowing which entry has the widest name. There are
+some commands provided by the \sty{glossary-tree} and
+\sty{glossaries-extra-stylemods} packages that iterate over all
+entries, measuring each name, in order to find the widest, but since
+\gls{printunsrtglossary} already has to iterate over the list before
+typesetting it, this hook can be used to update the widest name at
+the same time. You can update the value with:
+\nosecformatdef{glsupdatewidest}
+which computes the width of \meta{text} and, if it's wider than the
+current widest name for the given level, sets the widest value to
+\meta{text} (without expanding it). If \meta{text} needs expanding
+you need to use:
+\nosecformatdef{eglsupdatewidest}
+The \meta{level} refers to the entry's hierarchical level with a
+value of~0 indicating top-level (that is, an entry without a parent).
+The level is stored in the internal \field{level} field and can only
+be accessed with \gls{glsxtrusefield} or similar commands 
+(see \sectionref{sec:userkeys}).
+
+You can also redefine this hook to filter the glossary list. 
+If an entry shouldn't appear in the list, use:
+\nosecformatdef{printunsrtglossaryskipentry}
+For example, to only include entries that have the \field{category}
+set to \code{formula}:
+\begin{codeenv}
+\gls{printunsrtglossary*}\oarg{\printglossopt{target}=false,\printglossopt{title}=\marg{Formula}}
+\marg{\comment{local code:}
+  \cmd{renewcommand}\marg{\gls{printunsrtglossaryentryprocesshook}}[1]\marg{\comment{}
+   \gls{glsifcategory}\marg{\gls{param}1}\marg{formula}
+   \marg{}\comment{category = formula}
+   \marg{\gls{printunsrtglossaryskipentry}}\comment{}
+  }\comment{}
+}
+\end{codeenv}
+This uses \gls{glsifcategory} to check the value of the entry's 
+\field{category} field (see \sectionref{sec:categories}). Another
+conditional you might find useful is:
+\nosecformatdef{glsxtriflabelinlist}
+which tests if the given \meta{label} is in the comma-separated
+\meta{list} of labels. Both \meta{label} and \meta{list} are fully
+expanded before testing. This command is only intended for labels,
+which must be fully expandable.
+For example, the following excludes any entries that have the
+\field{category} set to \code{abbreviation} or \code{acronym}:
+\begin{codeenv}
+\gls{printunsrtglossary*}\oarg{\printglossopt{target}=false,\printglossopt{title}=\marg{Formula}}
+\marg{\comment{local code:}
+  \cmd{renewcommand}\marg{\gls{printunsrtglossaryentryprocesshook}}[1]\marg{\comment{}
+   \gls{glsxtriflabelinlist}
+   \marg{\gls{glscategory}\marg{\gls{param}1}}\comment{category label for this entry}
+   \marg{abbreviation,acronym}\comment{exclusion list}
+   \marg{\gls{printunsrtglossaryskipentry}}\comment{}
+   \marg{}
+  }\comment{}
+}
+\end{codeenv}
+
+
 \section{Stand-alone Definitions}
 \label{sec:standalone}
 
@@ -2806,13 +3129,34 @@ The \sty{glossaries-extra} package provides:
 which may be used to create a target for a particular entry (identified by
 \meta{label}). This displays the value of the \field{name} field,
 but it also obeys the \idx{postnamehook} (see
-\sectionref{sec:postfieldhooks}), and the \catattr{glossname}
-and \catattr{glossnamefont} attributes (see \sectionref{sec:glossname}).
-You then need to add the other field values as appropriate.
+\sectionref{sec:postfieldhooks}), the \catattr{glossname}
+and \catattr{glossnamefont} attributes (see
+\sectionref{sec:glossname}), and provides accessibility support if
+the \field{access} field is set (see \sectionref{sec:accsupp}).
+This command doesn't display any of the other field values. 
+If any are required, you need to add them afterwards.
+For the description, you can use \gls{glsentrydesc}, but it's better
+to use:
+\nosecformatdef{glossentrydesc}
+Unlike \gls{glsentrydesc}, which just displays the value of the
+\field{description} field, \gls{glossentrydesc} obeys the
+\catattr{glossdesc} and \catattr{glossdescfont} attributes
+(\sectionref{sec:glossname}). Alternatively, you can use:
+\nosecformatdef{Glossentrydesc}
+which converts the first letter of the description to
+\idx{uppercase}.
+
+There's a similar command for symbols:
+\nosecformatdef{glossentrysymbol}
+There are currently no category attributes governing this
+command, but it does check for the \field{symbolaccess} field if
+accessibility support has been added (see \sectionref{sec:accsupp}). 
+For other fields, you can use the commands described in
+\sectionref{sec:userkeys}.
+
 To pick up the \styopt{postpunc} setting and the
-\idx{postdescriptionhook}, append
-\nosecformatdef{glspostdescription}
-after the description.
+\idx{postdescriptionhook}, append \gls{glspostdescription}
+after the description (see \sectionref{sec:postfieldhooks}).
 For example:
 \begin{codeenv}
 \cmd{documentclass}\marg{article}
@@ -2844,9 +3188,9 @@ For example:
 \gls{gls}\marg{area} = \gls{gls}\marg{pi}\gls{gls}\marg{radius}[\gls{spchar}2]
 \cmd{end}\marg{equation}
 \cmd{begin}\marg{tabular}\marg{ll}
-\gls{glsxtrglossentry}\marg{area} \gls[noindex=false]{colsep} \gls{glsentrydesc}\marg{area}\gls{glspostdescription}\gls[noindex=false]{cs.backslash}
-\gls{glsxtrglossentry}\marg{pi} \gls{colsep} \gls{glsentrydesc}\marg{pi}\gls{glspostdescription}\gls{cs.backslash}
-\gls{glsxtrglossentry}\marg{radius} \gls{colsep} \gls{glsentrydesc}\marg{radius}\gls{glspostdescription}
+\gls{glsxtrglossentry}\marg{area} \gls[noindex=false]{colsep} \gls{glossentrydesc}\marg{area}\gls{glspostdescription}\gls[noindex=false]{cs.backslash}
+\gls{glsxtrglossentry}\marg{pi} \gls{colsep} \gls{glossentrydesc}\marg{pi}\gls{glspostdescription}\gls{cs.backslash}
+\gls{glsxtrglossentry}\marg{radius} \gls{colsep} \gls{glossentrydesc}\marg{radius}\gls{glspostdescription}
 \cmd{end}\marg{tabular}
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -2863,38 +3207,26 @@ This produces:
 \gls{standalone.area} = \gls{standalone.pi}\gls{standalone.radius}[^2]
 \end{equation}
 \begin{tabular}{ll}
-\glsxtrglossentry{standalone.area} & \glsentrydesc{standalone.area}\glspostdescription\\
-\glsxtrglossentry{standalone.pi} & \glsentrydesc{standalone.pi}\glspostdescription\\
-\glsxtrglossentry{standalone.radius} & \glsentrydesc{standalone.radius}\glspostdescription
+\glsxtrglossentry{standalone.area} & \glossentrydesc{standalone.area}\glspostdescription\\
+\glsxtrglossentry{standalone.pi} & \glossentrydesc{standalone.pi}\glspostdescription\\
+\glsxtrglossentry{standalone.radius} & \glossentrydesc{standalone.radius}\glspostdescription
 \end{tabular}
 \end{result}
-The purple text shows the hyperlinks to the relevant definition. The
-hypertargets are prefixed with
-\nosecformatdef{glolinkprefix}
-This can be locally changed to avoid clashes if the definition needs
-to be reproduced later.
+The purple text shows the hyperlinks to the relevant definition. As
+with \gls{printunsrtglossary}, the hypertargets are prefixed with
+\gls{glolinkprefix} (see \sectionref{sec:printglossagain}).  This
+can be locally changed to avoid clashes if the definition needs to
+be reproduced later.
 
 A more convenient approach to the above is to define an environment that can
 list all the referenced entries automatically. The
 \sty{glossaries-extra} package provides a way of buffering the
 boolean switch performed by \gls{gls} that ensures that the
-\idx{firstuseflag} is unset. This is intended for use where the
-switch causes a problem, but it can also be used in this case to
-store a list of used entries (since there's no difference between
-\idx{firstuse} and subsequent use in this case, it won't affect the
-\idx{link-text}). The buffering is started with:
-\nosecformatdef{GlsXtrStartUnsetBuffering}
-The unstarred form of this command may result in multiple
-occurrences of an entry in the buffer's internal list. The starred form,
-which only adds an entry's label to the list if not already present,
-is better if the list needs to contain unique items.
-
-The current buffer can be iterated over using;
-\nosecformatdef{GlsXtrForUnsetBufferedList}
-where \meta{cs} is a command that takes a single argument (the
-entry's label). Finally, entries in the buffer can be unset and the
-buffer cleared with:
-\nosecformatdef{GlsXtrStopUnsetBuffering}
+\idx{firstuseflag} is unset (see \sectionref{sec:buffering}). 
+This is intended for use where the switch causes a problem, but it
+can also be used in this case to store a list of used entries (since
+there's no difference between \idx{firstuse} and subsequent use in
+this case, it won't affect the \idx{link-text}).
 
 Here's a modified version of the above document:
 \begin{codeenv}
@@ -2929,7 +3261,7 @@ Here's a modified version of the above document:
 }
 \strut
 \cmd{newcommand}\marg{\cmd{doglossaryentry}}[1]\marg{\comment{handler macro}
-  \gls{glsxtrglossentry}\marg{\gls{param}1} \gls{colsep} \gls{glsentrydesc}\marg{\gls{param}1}\gls{glspostdescription}\gls{cs.backslash}\comment{}
+  \gls{glsxtrglossentry}\marg{\gls{param}1} \gls{colsep} \gls{glossentrydesc}\marg{\gls{param}1}\gls{glspostdescription}\gls{cs.backslash}\comment{}
 }
 \strut
 \cmd{newcounter}\marg{localglossary}
@@ -3035,25 +3367,7 @@ and change \gls{glsstepentry} to use a unique label:
 \end{codeenv}
 (or remove the \gls{label} from the definition if it's unrequired).
 
-Instead of using \gls{glsentrydesc}, you may find it more convenient
-to use:
-\nosecformatdef{glossentrydesc}
-Unlike
-\gls{glsentrydesc}, which just displays the value of the
-\field{description} field, \gls{glossentrydesc} obeys the
-\catattr{glossdesc} and \catattr{glossdescfont} attributes
-(\sectionref{sec:glossname}). Alternatively, you can use
-\nosecformatdef{Glossentrydesc}
-which converts the first letter of the description to uppercase.
-
-There's a similar command for symbols:
-\nosecformatdef{glossentrysymbol}
-There are currently no category attributes governing this
-command, but it does support the \styopt{accsupp} package option. 
-For other fields, you can use the commands described in
-\sectionref{sec:userkeys}.
-
-Unlike commands such as \gls{gls} which can be problematic in moving
+Unlike commands such as \gls{gls}, which can be problematic in moving
 arguments, \gls{glsxtrglossentry} is designed to work in section
 headings. For example:
 \begin{codeenv}
@@ -3094,11 +3408,11 @@ illustrated the entry. See the
 gallery}~\cite{gallery} for further ideas.)
 
 The above example uses the \catattr{glossname} attribute to convert the first
-letter of the \field{name} to uppercase. Unfortunately this can't be
+letter of the \field{name} to \idx{uppercase}. Unfortunately this can't be
 applied to the PDF bookmark or table of contents. A solution to this
 would be to explicitly set the \field{name} with the first letter as
-an uppercase character and the \field{text} field in lowercase. For
-example:
+an \idx{uppercase} character and the \field{text} field in
+\idx{lowercase}. For example:
 \begin{codeenv}
 \gls{newglossaryentry}\marg{amethyst}
 \marg{
@@ -3118,7 +3432,7 @@ this can be performed automatically with the
 \label{sec:glsformats}
 
 All commands like \gls{gls} and \gls{glssymbol} by default
-encapsulate the \idx{link-text} within the argument of
+encapsulate the \idx{link-text} within the argument of:
 \nosecformatdef{glstextformat}
 For example:
 \begin{codeenv}
@@ -3236,6 +3550,9 @@ For example:
 \strut
 \gls{glssetcategoryattribute}\marg{ornament}\marg{\catattr{textformat}}\marg{ornamentfmt}
 \strut
+\gls{setabbreviationstyle}\marg{\abbrstyle[noindex=false]{long-short-em}}
+\gls{setabbreviationstyle}\oarg[acronym]\marg{short-sc-nolong}
+\strut
 \gls{newglossaryentry}\marg{duck}\comment{label}
 \marg{
    \field{name} = \marg{duck},
@@ -3251,12 +3568,13 @@ For example:
 }
 \strut
 \gls{newabbreviation}\marg{tug}\marg{TUG}\marg{\cmd{TeX}\gls{cs.space}Users Group}
-\gls{newacronym}\marg{ascii}\marg{ASCII}\marg{American Standard Code for 
-Information Interchange}
+\gls{newacronym}\marg{ascii}\comment{label}
+\marg{ascii}\comment{short form needs to be in lower case with sc styles}
+\marg{American Standard Code for Information Interchange}
 \strut
 \cmd{renewcommand}\marg{\gls{glstextformat}}[1]\marg{\cmd{textcolor}\marg{violet}\marg{\gls{param}1}}
 \cmd{renewcommand}\marg{\gls{glsxtrregularfont}}[1]\marg{\cmd{underline}\marg{\gls{param}1}}
-\cmd{renewcommand}\marg{\gls{glsxtrabbreviationfont}}[1]\marg{\gls{emph}\marg{\gls{param}1}}
+\cmd{renewcommand}\marg{\gls{glsxtrabbreviationfont}}[1]\marg{\gls{textbf}\marg{\gls{param}1}}
 \strut
 \cmd{begin}\marg{document}
 Two \gls{glspl}\marg{duck}, a \gls{gls}\marg{fleuron} (\gls{glssymbol}\marg{fleuron}, 
@@ -3267,16 +3585,32 @@ This produces:
 \begin{result}
 \renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
 \renewcommand{\glsxtrregularfont}[1]{\underline{#1}}%
-\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}%
+\renewcommand{\glsxtrabbreviationfont}[1]{\textbf{#1}}%
 \newcommand{\ornamentfmt}[1]{\textcolor{cyan}{#1}}%
 \glssetcategoryattribute{ornament}{textformat}{ornamentfmt}%
 Two \glspl{ex1.duck}, a \gls{ex.fleuron} (\glssymbol{ex.fleuron}, 
-\glsentrydesc{ex.fleuron}), \gls{TUG} and \gls{ASCII}.
+\glsentrydesc{ex.fleuron}), \gls{ex.tug} and \gls{ex.ascii}.
 \end{result}
 So \code{\gls{gls}\marg{fleuron}} and \code{\gls{glssymbol}\marg{fleuron}} are now
-formatted according to the custom command \csfmt{ornamentfmt}
-not by \gls{glstextformat}, but they are still affected by
-\gls{glsxtrregularfont}.
+formatted according to the custom command \csfmt{ornamentfmt} (cyan)
+not by \gls{glstextformat} (violet), but they are still affected by
+\gls{glsxtrregularfont} (underline).
+
+The \code{tug} abbreviation has been assigned the
+\abbrstyle{long-short-em} style which encapsulates the short form
+with \gls{emph}, but it also obeys \gls{glsxtrabbreviationfont}
+(bold) and it's encapsulated by \gls{glstextformat} (violet), so the
+full form on \idx{firstuse} is all violet and bold with the short
+form in italics.
+
+The \code{ascii} entry (which has the \field{category} set to
+\code{acronym}) has been assigned the \abbrstyle{short-sc-nolong}
+style, which encapsulates the short form with \gls{textsc} (so the
+short form must be converted to \idx{lowercase}) and identifies the
+entry as a \idx{regular} term, so it obeys \gls{glsxtrregularfont}
+(underline). Again, the \idx{link-text} is encapsulated with
+\gls{glstextformat} (violet) so the abbreviation is violet,
+underlined and in small-caps.
 
 You can override a specific instance with the \glsopt{textformat}
 setting in the first optional argument of commands like \gls{gls}.
@@ -3290,12 +3624,12 @@ then the result is now:
 \begin{result}
 \renewcommand{\glstextformat}[1]{\textcolor{violet}{#1}}%
 \renewcommand{\glsxtrregularfont}[1]{\underline{#1}}%
-\renewcommand{\glsxtrabbreviationfont}[1]{\emph{#1}}%
+\renewcommand{\glsxtrabbreviationfont}[1]{\textbf{#1}}%
 \newcommand{\ornamentfmt}[1]{\textcolor{cyan}{#1}}%
 \glssetcategoryattribute{ornament}{textformat}{ornamentfmt}%
 Two \glspl{ex1.duck}, a \gls[textformat=textbf]{ex.fleuron} 
-(\glssymbol{ex.fleuron}, \glsentrydesc{ex.fleuron}), 
-\gls{TUG} and \gls{ASCII}.
+(\glssymbol{ex.fleuron}, \glsentrydesc{ex.fleuron}),
+\gls{ex.tug} and \gls{ex.ascii}.
 \end{result}
 In this case, only that specific instance is changed.
 
@@ -3552,7 +3886,7 @@ need to redefine \gls{glstreenamefmt} you may also need to redefine
 
 Case-changing can be automatically applied to the name with the
 \catattr{glossname} attribute, which may take one of the values:
-\code{firstuc} (convert the first letter to uppercase), \code{title}
+\code{firstuc} (convert the first letter to \idx{uppercase}), \code{title}
 (convert to title case) or \code{uc} (convert to all capitals).
 Alternatively, if you're using \bibgls, you can use the
 \csopt{name-case-change} resource option.
@@ -3567,7 +3901,7 @@ command given by \catattr{glossdescfont} (if set).
 
 Case-changing is also available for descriptions with the
 \catattr{glossdesc} attribute, but this only has two allowed values:
-\code{firstuc} (convert the first letter to uppercase) and
+\code{firstuc} (convert the first letter to \idx{uppercase}) and
 \code{title} (convert to title case). 
 Alternatively, if you're using \bibgls, you can use the
 \csopt{description-case-change} resource option.
@@ -3583,7 +3917,8 @@ The post-description punctuation (if set) is placed after the
 \glslink{postdescriptionhook}{post-description category hook} (if
 provided). Both the post-description category hook and the
 post-description punctuation are implemented by
-\gls{glspostdescription}. The \sty{glossaries-extra-stylemods}
+\nosecformatdef{glspostdescription}
+The \sty{glossaries-extra-stylemods}
 package (which can be loaded with the \styopt{stylemods} option)
 patches the predefined styles provided with the base
 \sty{glossaries} package to ensure that the styles all use
@@ -3669,6 +4004,86 @@ Instead I need:
   \field{category} = \marg{ornament},
   \field{description} = \marg{typographic ornament}
 }
+\end{codeenv}
+
+\section{Buffering Changes to the First Use Flag}
+\label{sec:buffering}
+
+The \sty{soul} commands, described above, also have problems if the
+\idx{firstuseflag} is switched off within the argument. This can be
+demonstrated with the following:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{soul}
+\cmd{usepackage}\marg{glossaries-extra}
+\gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{Secure Sockets Layer}
+\cmd{begin}\marg{document}
+\cmd{ul}\marg{Some text about \gls{gls}\marg{ssl}.}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces the somewhat confusing error message:
+\begin{verbatim}
+Glossary entry `{ssl}' has not been defined.
+\end{verbatim}
+Enclosing \code{\gls{gls}\marg{ssl}} inside the argument of \csfmt{mbox} 
+changes the error message to:
+\begin{verbatim}
+! Package soul Error: Reconstruction failed.
+\end{verbatim}
+The only way to avoid an error is to switch on the \gls{glsunset}
+buffering, which modifies the internal command that normally changes
+the \idx{firstuseflag}. Instead, the entry label is simply stored in
+an internal list. The buffering is switched on with:
+\nosecformatdef{GlsXtrStartUnsetBuffering}
+The unstarred form of this command may result in multiple
+occurrences of an entry in the buffer's internal list. The starred form,
+which only adds an entry's label to the list if not already present,
+is better if the list needs to contain unique items.
+
+The current buffer can be iterated over using;
+\nosecformatdef{GlsXtrForUnsetBufferedList}
+where \meta{cs} is a command that takes a single argument (the
+entry's label). Finally, entries in the buffer can be unset and the
+buffer cleared with:
+\nosecformatdef{GlsXtrStopUnsetBuffering}
+
+The above example will work if it's changed to:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{soul}
+\cmd{usepackage}\marg{glossaries-extra}
+\gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{Secure Sockets Layer}
+\cmd{begin}\marg{document}
+\gls{GlsXtrStartUnsetBuffering}
+\cmd{ul}\marg{Some text about \cmd{mbox}\marg{\gls{gls}\marg{ssl}}.}
+\gls{GlsXtrStopUnsetBuffering}
+\cmd{end}\marg{document}
+\end{codeenv}
+Note the need for \csfmt{mbox}, which can cause a problem with
+line-breaking. Another problem is that if the entry is referenced
+multiple times within the same buffer, each use of \gls{gls} (or its
+\idxpl{variant}) will be treated as the \idx{firstuse}.
+
+Another workaround is to use \glsopt{textformat} with a command that
+uses \gls{GlsXtrExpandedFmt} (see \sectionref{sec:expandedfmt}). For
+example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{soul}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\cmd{newrobustcmd}\marg{\cmd{gul}}[1]\marg{\comment{}
+  \marg{\comment{}
+   \cmd{def}\gls{glsxtrabbreviationfont}\gls{param}\gls{param}1\marg{\gls{GlsXtrExpandedFmt}\marg{\cmd{ul}}\marg{\gls{param}\gls{param}1}}\comment{}
+   \cmd{def}\gls{glsxtrregularfont}\gls{param}\gls{param}1\marg{\gls{GlsXtrExpandedFmt}\marg{\cmd{ul}}\marg{\gls{param}\gls{param}1}}\comment{}
+   \gls{param}1\comment{}
+  }%
+}
+\strut
+\gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{Secure Sockets Layer}
+\cmd{begin}\marg{document}
+\cmd{ul}\marg{Some text about }\gls{gls}\oarg{\glsopt{textformat}=gul}\marg{ssl}.
+\cmd{end}\marg{document}
 \end{codeenv}
 
 \chapter{Incorporating \bibgls}

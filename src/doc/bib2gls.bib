@@ -2987,6 +2987,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{accsupp,
+  name={\styfmt{accsupp}},
+  category={package},
+  parent={packages}
+}
+
 @index{stringconcat,
   name={\code{\#} (string concatenation)},
   text={\code{\#}}
@@ -3252,6 +3258,22 @@ cs}\margm{Glspl-like cs}},
   category={environment}
 }
 
+@index{supertabular,
+  name={\styfmt{supertabular}},
+  category={package},
+  parent={packages}
+}
+
+@index{env.supertabular,
+  name={\envfmt{supertabular}},
+  category={environment}
+}
+
+@index{env.theglossary,
+  name={\envfmt{theglossary}},
+  category={environment}
+}
+
 @index{abbreviationstyles,
   name={abbreviation styles},
   text={abbreviation style}
@@ -3277,6 +3299,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{long-short-sm,
   name={\abbrstylefmt{long\dhyphen short\dhyphen sm}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-short-em,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen em}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -3326,6 +3354,12 @@ hyphen}},
 
 @index{short-nolong,
   name={\abbrstylefmt{short\dhyphen nolong}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{short-sc-nolong,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -3502,8 +3536,38 @@ hyphen}},
   parent={categoryattribute}
 }
 
+@index{accessaposplural,
+  name={\catattrfmt{access\-apos\-plural}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
 @index{noshortplural,
   name={\catattrfmt{no\-short\-plural}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{accessnoshortplural,
+  name={\catattrfmt{access\-no\-short\-plural}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{nameshortaccess,
+  name={\catattrfmt{name\-short\-access}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{firstshortaccess,
+  name={\catattrfmt{first\-short\-access}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{textshortaccess,
+  name={\catattrfmt{text\-short\-access}},
   category={categoryattribute},
   parent={categoryattribute}
 }
@@ -3558,6 +3622,12 @@ hyphen}},
 
 @index{insertdots,
   name={\catattrfmt{insert\-dots}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@index{accessinsertdots,
+  name={\catattrfmt{access\-insert\-dots}},
   category={categoryattribute},
   parent={categoryattribute}
 }
@@ -5692,6 +5762,19 @@ field.},
 @index{variant}
 @index{homograph}
 
+@index{uppercase,
+ name={upper case}
+}
+
+@index{lowercase,
+ name={lower case}
+}
+
+@index{case-change,
+  name = {case change},
+  seealso = {uppercase,lowercase}
+}
+
 @index{unicodecategories,
   name={Unicode categories},
   text={Unicode category},
@@ -6296,7 +6379,7 @@ field value},
   user1={\margm{entry label}\margm{field label}},
   description={expands to the value of the given field for the given
    entry},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
 
@@ -6306,7 +6389,7 @@ field value},
   description={assigns the given \meta{value} to the field
    identified by \meta{field label} for the
    entry identified by \meta{entry label}},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
 
@@ -6408,6 +6491,15 @@ fully expands both the field value and \meta{text}},
    \field{description} field set to \cs{nopostdesc}},
   note={provided by \styfmt{glossaries}},
   seealso={ifglshasdesc},
+  category={command}
+}
+
+@index{ifglshasparent,
+  name={\csfmt{if\-gls\-has\-parent}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{parent} field set},
+  note={provided by \styfmt{glossaries}},
   category={command}
 }
 
@@ -7198,6 +7290,61 @@ usual delay},
   category={command}
 }
 
+@index{printunsrtglossaryentryprocesshook,
+  name={\csfmt{print\-unsrt\-glos\-sary\-entry\-process\-hook}},
+  user1={\margm{label}},
+  description={performed at each iteration of the internal loop used
+by \gls{printunsrtglossary}},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{printunsrtglossaryskipentry,
+  name={\csfmt{print\-unsrt\-glos\-sary\-skip\-entry}},
+  description={only allowed within
+   \gls{printunsrtglossaryentryprocesshook} this command 
+   indicates that the current entry should be skipped},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{printunsrtglossarypredoglossary,
+  name={\csfmt{print\-unsrt\-glos\-sary\-pre\-do\-glos\-sary}},
+  description={hook performed by \gls{printunsrtglossary}},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@index{glscategory,
+  name={\csfmt{gls\-cat\-e\-gory}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{category} field
+for the entry identified by \meta{label} or nothing if the entry
+hasn't been defined},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsifcategory,
+  name={\csfmt{gls\-if\-cat\-e\-gory}},
+  user1={\margm{label}\margm{category}\margm{true}\margm{false}},
+  description={does \meta{true} if the \field{category} field for
+   the entry given by \meta{label} is \meta{category}},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsxtriflabelinlist,
+  name={\csfmt{gls\-xtr\-if\-label\-in\-list}},
+  user1={\margm{label}\margm{list}\margm{true}\margm{false}},
+  description={tests if the \meta{label} is contained
+   in the comma-separated \meta{list}, where both \meta{label}
+   and \meta{list} are fully expanded before testing. This test
+   is designed for \emph{labels} which should be fully expandable},
+  note={provided by \styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
 @index{printgloss.type,
   parent = {printunsrtglossary},
   name = {\csoptfmt{type}},
@@ -7219,6 +7366,12 @@ usual delay},
 @index{printgloss.toctitle,
   parent = {printunsrtglossary},
   name = {\csoptfmt{toctitle}},
+  category={commandoption},
+}
+
+@index{printgloss.target,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{target}},
   category={commandoption},
 }
 
@@ -7891,7 +8044,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\oargm{level}\margm{text}},
   description={used with the \glostyle{alttree} style to set the
    widest entry name for the given level},
-  note={provided by \styfmt{glossaries}},
+  note={provided by \styfmt{glossary-tree}},
   category={command}
 }
 
@@ -7902,7 +8055,17 @@ abbreviation by the \catattr{markwords} attribute},
 wider than the current value},
   note={provided by \styfmt{glossaries-extra-stylemods} version
 1.23+},
-  seealso={glssetwidest},
+  seealso={glssetwidest,eglsupdatewidest},
+  category={command}
+}
+
+@index{eglsupdatewidest,
+  name={\csfmt{egls\-update\-widest}},
+  user1={\oargm{level}\margm{text}},
+  description={as \cs{glsupdatewidest} but expands \meta{text}},
+  note={provided by \styfmt{glossaries-extra-stylemods} version
+1.23+},
+  seealso={glssetwidest,glsupdatewidest},
   category={command}
 }
 
@@ -8049,6 +8212,15 @@ loaded to patch them). This hook is used to reflect the
 and the \styopt{postpunc} option for \sty{glossaries-extra}},
   note={provided by \styfmt{glossaries} and modified by
 \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsaccsupp,
+  name={\csfmt{gls\-acc\-supp}},
+  user1={\margm{accessible text}\margm{text}},
+  description={used by the accessibility support to interface with
+the \sty{accsupp} package},
+  note={provided by \styfmt{glossaries-accsupp}},
   category={command}
 }
 
@@ -8688,6 +8860,19 @@ to use in the header (\meta{cs} may be empty if not required)},
   description = {one of the model parameters}
 }
 
+@abbreviation{ex.tug,
+  parent={exampleterms},
+  category = {longshortem},
+  short = {TUG},
+  long = {\TeX\ Users Group}
+}
+
+@abbreviation{ex.ascii,
+  short = {ascii},
+  long = {American Standard Code for Information Interchange},
+  category={shortsc}
+}
+
 @abbreviation{ex.svm,
   parent={exampleterms},
   short = {SVM},
@@ -8768,6 +8953,24 @@ to use in the header (\meta{cs} may be empty if not required)},
   description = {derivative},
   name = {\ensuremath{\derivfn{x}}},
   user1 = {derivfn}
+}
+
+@index{hom.bow,
+  name={bow},
+  category = {homograph}
+}
+
+@entry{hom.bowknot,
+  parent={hom.bow},
+  description = {a knot tied with two loops and loose ends},
+  category = {homograph}
+}
+
+@entry{hom.bowweapon,
+  parent={hom.bow},
+  description = {a weapon for shooting arrows, made of curved wood
+  joined at both ends with taut string},
+  category = {homograph}
 }
 
 @index{hom.glossary,
