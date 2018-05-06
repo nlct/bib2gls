@@ -1072,25 +1072,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.changeNameCase())
       {
-         BibValueList value = getField("name");
-
-         if (value != null)
-         {
-            BibValueList textValue = getField("text");
-
-            if (textValue == null)
-            {
-               putField("text", value);
-               putField("text", value.expand(parser).toString(parser));
-            }
-
-            value = resource.applyNameCaseChange(parser, value);
-
-            TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
-
-            putField("name", value);
-            putField("name", list.toString(parser));
-         }
+         changeNameCase(parser);
       }
 
       if (resource.isCopyAliasToSeeEnabled())
@@ -1115,6 +1097,39 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
       }
+   }
+
+   protected void changeNameCase(TeXParser parser)
+    throws IOException
+   {
+      BibValueList value = getField("name");
+
+      if (value == null)
+      {
+         value = getFallbackContents("name");
+
+         if (value == null)
+         {
+            return;
+         }
+
+         value = (BibValueList)value.clone();
+      }
+
+      BibValueList textValue = getField("text");
+
+      if (textValue == null)
+      {
+         putField("text", value);
+         putField("text", value.expand(parser).toString(parser));
+      }
+
+      value = resource.applyNameCaseChange(parser, value);
+
+      TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
+
+      putField("name", value);
+      putField("name", list.toString(parser));
    }
 
    public void convertFieldToDateTime(TeXParser parser,

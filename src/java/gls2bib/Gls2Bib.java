@@ -571,10 +571,15 @@ public class Gls2Bib extends LaTeXParserListener
    {
    }
 
-   public void beginParse(File file)
+   public void beginParse(File file, Charset charset)
       throws IOException
    {
       message(getMessage("message.reading", file));
+
+      if (charset != null)
+      {
+         message(getMessage("message.tex.charset", charset));
+      }
    }
 
    public Charset getCharSet()
@@ -722,7 +727,7 @@ public class Gls2Bib extends LaTeXParserListener
    {
       data = new Vector<GlsData>();
 
-      parser.parse(texFile);
+      parser.parse(texFile, charset);
 
       PrintWriter out = null;
 
@@ -1073,8 +1078,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.4.20180428";
-   public static final String DATE = "2018-04-28";
+   public static final String VERSION = "1.4.20180506";
+   public static final String DATE = "2018-05-06";
 
    private Vector<GlsData> data;
 

@@ -69,6 +69,13 @@
   category={command}
 }
 
+@dualindexentry{bibglsnewindexplural,
+  name={\csfmt{bib\-gls\-new\-index\-plural}},
+  user1={\margm{label}\margm{options}\margm{name}},
+  description={defines terms provided with \gls[noindex]{dual.entry.index}},
+  category={command}
+}
+
 @dualindexentry{bibglsnewabbreviation,
   name={\csfmt{bib\-gls\-new\-abbreviation}},
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
@@ -1522,7 +1529,7 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.save-child-count,
    name={\csoptfmt{save\dhyphen child\dhyphen count}},
-   user1={\meta{value}},
+   user1={\meta{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -5215,6 +5222,12 @@ field.},
 
 @dualindexentry{entry.index,
   name={\atentryfmt{index}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.indexplural,
+  name={\atentryfmt{indexplural}},
   category={entrytype},
   parent={entrytypes}
 }

@@ -1,0 +1,19 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={indexplural,entries-abbrv},
+ name-case-change=firstuc]
+
+\begin{document}
+Reference: \gls{duck}, \gls{goose}, \gls{chateau}.
+Abbreviation: \gls{html}.
+
+\printunsrtglossary
+\end{document}

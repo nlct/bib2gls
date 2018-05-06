@@ -355,6 +355,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.unknown.widest.fortype">Can''t determine widest level {0} entry for glossary type ''{1}''. Using fallback method.</entry>
 <entry key="warning.unknown.widest">Can''t determine widest level {0} entry for unknown glossary type. Using fallback method.</entry>
 <entry key="warning.invalid.locale">Unrecognised locale: {0}. Using {1} instead.</entry>
+<entry key="warning.interpreter.needed.fallback">Interpreter needed to obtain fallback contents for field {0} (entry {1})</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
@@ -440,9 +441,9 @@ Use {1} {0} instead.</entry>
     The following messages are used by convertgls2bib
 -->
 
-<entry key="gls2bib.override.newdualentry">Overriding default definition of \\newdualentry with custom 
-definition. (Change \\newcommand to \\providecommand if you want 
-\\newdualentry[options]'{'label'}{'short'}{'long'}{'description'}'
+<entry key="gls2bib.override.newdualentry">Overriding default definition of \newdualentry with custom 
+definition. (Change \newcommand to \providecommand if you want 
+\newdualentry[options]'{'label'}{'short'}{'long'}{'description'}'
 converted to @dualabbreviationentry.)</entry>
 
 <!--

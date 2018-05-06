@@ -96,6 +96,19 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       return super.getFallbackContents(field);
    }
 
+   protected void changeNameCase(TeXParser parser)
+    throws IOException
+   {
+      BibValueList value = getField("name");
+
+      if (value == null)
+      {
+         return;
+      }
+
+      super.changeNameCase(parser);
+   }
+
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
       // syntax: {label}{opts}{short}{long}

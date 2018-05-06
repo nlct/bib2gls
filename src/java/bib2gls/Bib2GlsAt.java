@@ -60,6 +60,10 @@ public class Bib2GlsAt extends At
       {
          data = new Bib2GlsIndex(bib2gls);
       }
+      else if (entryType.equals("indexplural"))
+      {
+         data = new Bib2GlsIndexPlural(bib2gls);
+      }
       else if (entryType.equals("acronym")
             || entryType.equals("abbreviation"))
       {

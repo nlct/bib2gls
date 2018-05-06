@@ -25,7 +25,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-labelify-fontspec.pdf test-custom-symbols.pdf \
 	  test-crossresource-refs.pdf test-custom-rules.pdf \
 	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf \
-	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf 
+	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf \
+	  test-indexplural.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -466,6 +467,13 @@ test-indexcounter2.pdf	: test-indexcounter2.glstex
 test-indexcounter2.glstex	: test-indexcounter2.tex $(DEPS)
 		pdflatex test-indexcounter2
 		$(BIB2GLS) test-indexcounter2
+
+test-indexplural.pdf	: test-indexplural.glstex
+		pdflatex test-indexplural
+
+test-indexplural.glstex	: test-indexplural.tex indexplural.bib $(DEPS)
+		pdflatex test-indexplural
+		$(BIB2GLS) test-indexplural
 
 clean	:
 	$(RM) *.aux

@@ -4,6 +4,9 @@ v1.5 (pending):
 
     \bibglssetlastgrouptitle
 
+  * added @indexplural and associated .glstex helper command
+    \bibglsnewindexplural
+
   * added resource options:
 
    - sort-replace
@@ -14,12 +17,14 @@ v1.5 (pending):
 
   * bug fixes:
 
-   - corrected encoding setting 
+   - corrected encoding setting (bib2gls and convertgls2bib)
+   - corrected \ (backslash space) eol causing unwanted extra eol
    - corrected sort fallback
    - labelify-replace now recognises \$ in the replacement part as a
      reference to a captured group
    - improved error handling for invalid entry IDs
    - save-child-count was partially switching on flatten-lonely
+   - corrected name-case-change for @index
 
 v1.4 (2018-04-09):
 

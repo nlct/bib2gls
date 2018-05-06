@@ -3350,6 +3350,52 @@ Example:
 Terms that are defined using \atentry{index} will be written to the output
 file using the command \csref{bibglsnewindex}.
 
+\entrysection{indexplural}
+
+The \atentry{indexplural} entry type is similar to the
+\atentry{index} entry type except that the \field{name} field if
+missing is obtained from the \field{plural} field. If the
+\field{plural} field is missing it's obtained from the \field{text}
+field with the plural suffix appended. If the \field{text} field is
+missing, it's obtained from the original entry label. If the
+\field{sort} field is missing the default is obtained from the
+\field{name} field. All fields are optional. For example:
+\begin{verbatim}
+@indexplural{goose,
+  plural = {geese}
+}
+
+@indexplural{duck}
+
+@indexplural{chateau,
+  text = {ch\^ateau},
+  plural = {ch\^ateaux}
+}
+\end{verbatim}
+This is equivalent to:
+\begin{verbatim}
+@indexplural{goose,
+  name = {geese},
+  text = {goose},
+  plural = {geese}
+}
+
+@indexplural{duck,
+  name = {ducks},
+  text = {duck},
+  plural = {ducks}
+}
+
+@indexplural{chateau,
+  name = {ch\^ateaux},
+  text = {ch\^ateau},
+  plural = {ch\^ateaux}
+}
+\end{verbatim}
+
+Terms that are defined using \atentry{indexplural} will be written to the output
+file using the command \csref{bibglsnewindexplural}.
+
 \entrysection{abbreviation}
 
 The \atentry{abbreviation} entry type is designed for abbreviations.
@@ -5659,6 +5705,101 @@ that tertiary entries are created when dual entries are defined in
 the \ext{glstex} file, so this will increase the total number of
 entries.
 
+\section{Hierarchical Options}
+\label{sec:hierarchicalopts}
+
+\optsection{save-child-count}
+
+This is a boolean option. The default setting is
+\csopt[false]{save-child-count}. 
+If \csopt[true]{save-child-count},
+each entry will be assigned a field called \field{childcount} with
+the value equal to the number of child entries that have been
+selected. As from version 1.5, this option also creates
+the \field{childlist} field for entries that have children
+selected. This field is in \sty{etoolbox}'s internal list
+format and can be iterated over using \ics{glsxtrfieldforlistloop}.
+
+The assignment is done using \ics{GlsXtrSetField} so there's
+no associated key. You can test if the field is set and non-zero
+using:
+\nosecformatdef{GlsXtrIfHasNonZeroChildCount}
+which is provided with \sty{glossaries-extra-bib2gls} v1.31+.
+Within \meta{true}, you can access the actual value with
+\ics{glscurrentfieldvalue}. If \csopt[false]{save-child-count},
+this command will do \meta{false} as the \field{childcount} field
+won't be set.
+
+For example, suppose \filefmt{entries.bib} contains:
+\begin{verbatim}
+@index{birds}
+@index{duck,parent={birds}}
+@index{goose,plural={geese},parent={birds}}
+@index{swan,parent={birds}}
+
+@index{minerals}
+@index{quartz,parent={minerals}}
+@index{corundum,parent={minerals}}
+@index{amethyst,parent={minerals}}
+@index{gypsum,parent={minerals}}
+@index{gold,parent={minerals}}
+\end{verbatim}
+and the document contains:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[record,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries},save-child-count]
+
+\begin{document}
+\gls{duck} and \gls{goose}.
+\gls{quartz}, \gls{corundum}, \gls{amethyst}.
+
+\printunsrtglossaries
+\end{document}
+\end{verbatim}
+Then the \ext{glstex} file will contain:
+\begin{verbatim}
+\GlsXtrSetField{birds}{childcount}{2}
+\GlsXtrSetField{duck}{childcount}{0}
+\glsxtrfieldlistadd{birds}{childlist}{duck}
+\GlsXtrSetField{goose}{childcount}{0}
+\glsxtrfieldlistadd{birds}{childlist}{goose}
+\GlsXtrSetField{minerals}{childcount}{3}
+\GlsXtrSetField{amethyst}{childcount}{0}
+\glsxtrfieldlistadd{minerals}{childlist}{amethyst}
+\GlsXtrSetField{corundum}{childcount}{0}
+\glsxtrfieldlistadd{minerals}{childlist}{corundum}
+\GlsXtrSetField{quartz}{childcount}{0}
+\glsxtrfieldlistadd{minerals}{childlist}{quartz}
+\end{verbatim}
+Note that although \code{birds} has three children defined in the
+\ext{bib} file, only two have been selected, so the child count is
+set to 2. Similarly the \code{minerals} entry has five children
+defined in the \ext{bib} file, but only three have been selected, so
+the child count is 3.
+
+The following uses the post-description hook to show the child count
+in parentheses:
+\begin{verbatim}
+\GlsXtrLoadResources[src={entries},category=general,save-child-count]
+
+\renewcommand{\glsxtrpostdescgeneral}{%
+  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
+  { (child count: \glscurrentfieldvalue.)}%
+  {}%
+}
+\end{verbatim}
+\ics{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
+It's slightly more efficient that \ics{ifglshasfield} provided by
+the base \styfmt{glossaries} package, and it doesn't complain if the
+entry or field don't exist, but note that \ics{glsxtrifhasfield}
+implicitly scopes its content. Use the starred version to omit the
+grouping.  With \sty{glossaries-extra} v1.31+ you can perform a
+numerical test with \ics{GlsXtrIfFieldNonZero} or
+\ics{GlsXtrIfFieldEqNum}.
+
 \optsection{flatten}
 
 This is a boolean option. The default value is \csopt[false]{flatten}. 
@@ -6019,6 +6160,124 @@ In the above, the location list includes records and
 cross-references obtained from the \field{see} or \field{seealso}
 fields. See \csopt{flatten-lonely} for further details.
 
+\optsection{strip-missing-parents}
+
+The \sty{glossaries} package requires that all child entries must be
+defined after the parent entry. An error occurs otherwise, so
+\bibgls\ will omit the \field{parent} field if it can't be found in
+the given \idx{resourceset}. However, when the default
+\csopt[false]{strip-missing-parents} is on, this omission only occurs
+while writing the definitions in the \ext{glstex} file (after
+selection and sorting).
+
+Sorting is performed hierarchically and the \field{group} field is set
+accordingly for the top-level entries (but not for child entries),
+which means that an entry with a \field{parent} field will be
+treated by the sort method as a child entry. This can lead to a
+strange result, which \bibgls\ warns about:
+\begin{alltt}
+Parent '\meta{parent id}' not found for entry \meta{child-id}
+\end{alltt}
+
+This is the default behaviour as it may simply be a result of a
+typing mistake in the \field{parent} field. If you actually want
+missing parents to be stripped before sorting (but after the
+selection process) then use \csopt[true]{strip-missing-parents}. If
+you want all parents stripped then use \csopt{flatten} or
+\csopt[parent]{ignore-fields} instead. As from version 1.4, if you
+want \bibgls\ to create the missing parents, then you can use 
+\csopt[create]{missing-parents}.
+
+\optsection{missing-parents}
+
+As an alternative to \csopt{strip-missing-parents}, as from version
+1.4 you can now use \csopt[\meta{value}]{missing-parents} where
+\meta{value} may be one of:
+\begin{itemize}
+\item \optfmt{strip}: this is equivalent to
+\csopt[true]{strip-missing-parents};
+
+\item \optfmt{warn}: this is equivalent to the default
+\csopt[false]{strip-missing-parents};
+
+\item \optfmt{create}: this will create a new \atentry{index}
+entry with the missing parent's label (after it's been processed by
+options such as \csopt{labelify}) with the \field{name} obtained
+from the \emph{original} value of the \field{parent} field (before being
+processed by options like \csopt{labelify}).
+If the child entry has the \field{type} field set, then the new
+parent entry will be given the same value. The \field{category} for
+the new parent entry can be assigned with
+\csopt{missing-parent-category}.
+\end{itemize}
+
+For example, consider the \exfile{books.bib} file which contains
+entries like
+\begin{verbatim}
+@entry{ubik,
+  name={Ubik},
+  description={novel by Philip K. Dick},
+  identifier={book},
+  author={\sortmediacreator{Philip K.}{Dick}},
+  year={1969}
+}
+\end{verbatim}
+then the field alias
+\begin{codeenv}
+\csopt[author=parent]{field-aliases}
+\end{codeenv}
+will treat
+\begin{verbatim}
+  author={\sortmediacreator{Philip K.}{Dick}},
+\end{verbatim}
+as though it had been defined as
+\begin{verbatim}
+  parent={\sortmediacreator{Philip K.}{Dick}},
+\end{verbatim}
+This can be converted into a label with the options:
+\begin{codeenv}
+ \csopt[parent]{labelify},
+ \csopt[
+   \marg{[ \cs{cs.string}\csfmt{.}]}\marg{}
+ ]{labelify-replace}
+\end{codeenv}
+If the interpreter has been provided with the definition:
+\begin{verbatim}
+\providecommand*{\sortmediacreator}[2]{#2 #1}
+\end{verbatim}
+then the \field{parent} field for the \code{ubik} entry
+will become \code{DickPhilipK} but the original value is stored
+internally when \csopt[create]{missing-parents} is set so that it
+can be used as the \field{name} if the parent needs to be created.
+Once all the entries have been processed, if \code{ubik} has been
+selected but no entry can be found with the label \code{DickPhilipK}
+then a new entry will be added as though it had been defined with:
+\begin{verbatim}
+@index{DickPhilipK,
+  name={\sortmediacreator{Philip K.}{Dick}}
+}
+\end{verbatim}
+This is an alternative approach to the \exfile{sample-authors.tex}
+document from the \hyperref[sec:examples]{examples chapter}.
+
+\optsection{missing-parent-category}
+
+If a missing parent entry is created through the use of
+\csopt[create]{missing-parents} then the \field{category} field can
+be assigned to the new parent entry with this option. The
+\meta{value} may be one of:
+\begin{itemize}
+ \item \code{same as child}: the parent entry's \field{category}
+  field is set to the same value as the child's (if set);
+ \item \code{same as base}: the parent entry's \field{category} is
+  set to the base name of the \ext{bib} file that provided the
+  child entry's definition;
+ \item \code{no value}: don't set the \field{category} field;
+ \item \meta{label}: the parent entry's \field{category} field is set to
+  \meta{label} (which shouldn't contain any special characters). 
+\end{itemize}
+The default setting is \csopt[no value]{missing-parent-category}.
+
 \section{Master Documents}
 \label{sec:master}
 
@@ -6256,7 +6515,7 @@ supplementary resource files (omitting the primary
 \end{verbatim}
 
 \section{Field and Label Options}
-\label{sec:labelopts}
+\label{sec:fieldlabelopts}
 
 The options in this section may be used to set or adjust field
 values or labels.  Some field values are expected to be labels (such
@@ -6264,197 +6523,10 @@ as \field{group}).  These labels must not contain special
 characters or commands, but it's possible to convert a field value
 into a valid label using options such as \csopt{labelify}.
 
-\optsection{group}
+\subsection{Label Options}
+\label{sec:labelopts}
 
-The \csopt{group} option may only be used with the \longarg{group} switch.
-This will set the \field{group} field to \meta{label} unless
-\meta{label} is \optfmt{auto}, in which case the value is
-set automatically during the sorting (see also
-\csopt{group-formation}). 
-The corresponding title can be set
-with \gls{glsxtrsetgrouptitle} if the title is different from the
-label.  The default behaviour is \csopt[auto]{group}.
-
-For example:
-\begin{verbatim}
-\GlsXtrLoadResources[sort=integer,group={Constants},
- src={entries-constants}% data in entries-constants.bib
-]
-\GlsXtrLoadResources[sort=letter-case,group={Variables},
- src={entries-variables}% data in entries-variables.bib
-]
-\end{verbatim}
-In this case, if the \field{type} field hasn't been set in the \ext{bib} files,
-these entries will be added to the same glossary, but will
-be grouped according to each instance of \gls{GlsXtrLoadResources},
-with the provided group label.
-
-
-\optsection{category}
-
-The selected entries may all have their \field{category} field
-changed before writing their definitions to the \ext{glstex} file.
-The \meta{value} may be:
-\begin{itemize}
-\item \optfmt{same as entry}: set the
-\field{category} to the \ext{bib} entry type used to define it
-(\idx!{lowercase} and without the initial \code{@}) after any aliasing,
-if applicable;
-
-\item \optfmt{same as original entry}: (new to v1.4) set the \field{category} 
-to the original entry type (\idx!{lowercase} and without 
-the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased);
-
-\item \optfmt{same as base}: (new to v1.1) set the \field{category}
-to the base name of the \ext{bib} file (without the extension) 
-that provided the entry definition;
-
-\item \optfmt{same as type}: set the \field{category} to the same
-value as the \field{type} field (if that field has been provided
-either in the \ext{bib} file or through the \csopt{type} option);
-
-\item \meta{label}: the \field{category} is set to
-\meta{label} (which mustn't contain any special characters).
-\end{itemize}
-This will override any
-\field{category} fields supplied in the \ext{bib} file.
-
-When used with \csopt{entry-type-aliases}, the option \csopt[same as
-entry]{category} refers to the \emph{target} entry type whereas
-\csopt[same as original entry]{category} refers to the
-\emph{original} entry type given in the \ext{bib} file.  In both
-cases, the value is converted to \idx!{lowercase} to ensure consistency.
-
-For example, if the \ext{bib} file contains:
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal}
-}
-
-@index{duck}
-
-@index{goose,plural="geese"}
-
-@dualentry{dog,
-  name={dog},
-  description={chien}
-}
-\end{verbatim}
-then if the document contains
-\begin{verbatim}
-\GlsXtrLoadResources[category={same as entry},src={entries}]
-\end{verbatim}
-this will set the \field{category} of the \code{bird} term to
-\optfmt{entry} (since it was defined with \atentry{entry}), the \field{category} of the \code{duck} and
-\code{goose} terms to \optfmt{index} (since they were defined
-with \atentry{index}), and the \field{category} of the \code{dog}
-term to \optfmt{dualentry} (since it was
-defined with \atentry{dualentry}). Note that the dual entry
-\code{dual.dog} doesn't have the category set, since that's
-governed by \csopt{dual-category} instead.
-
-If, instead, the document contains
-\begin{verbatim}
-\GlsXtrLoadResources[category={animals},src={entries}]
-\end{verbatim}
-then the \field{category} of all the primary selected entries will 
-be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
-doesn't have the \field{category} set.
-
-Note that the categories may be overridden by the commands,
-such as \csref{bibglsnewindex}, that are used to actually define the
-entries.
-
-For example, if the document contains
-\begin{verbatim}
-\newcommand{\bibglsnewdualentry}[4]{%
- \longnewglossaryentry*{#1}{name={#3},#2,category={dual}}{#4}%
-}
-
-\GlsXtrLoadResources[category={animals},src={entries}]
-\end{verbatim}
-then both the \code{dog} and \code{dual.dog} entries will
-have their \field{category} field set to \optfmt{dual} since the
-new definition of \gls{bibglsnewdualentry} has overridden
-the \csopt[animals]{category} option.
-
-\optsection{type}
-
-The \meta{value} may be one of:
-\begin{itemize}
- \item \optfmt{same as entry} set the \field{type} field
-  to the entry type (\idx!{lowercase} and without the initial \code{@}); 
-
- \item \optfmt{same as original entry} set the \field{type} 
-  to the original entry type (\idx!{lowercase} and without 
-  the initial \code{@}) before it was aliased (behaves like 
-  \optfmt{same as entry} if the entry type wasn't aliased);
-
- \optfmt{same as base} set the \field{type} field
-  to the base name of the corresponding \ext{bib} file
-  (without the extension);
-
- \item \optfmt{same as category} set the \field{type} field
-   to the same value as the \field{category} field
-   (\field{type} unchanged if \field{category} not set);
-
- \item\meta{label} sets the \field{type} field to the glossary 
-   identified by \meta{label}.
-\end{itemize}
-When used with \csopt{entry-type-aliases}, the option \csopt[same as
-entry]{type} refers to the \emph{target} entry type and \csopt[same
-as original entry]{type} refers to the \emph{original} entry type
-given in the \ext{bib} file.  It's not possible to have both
-\csopt[same as type]{category} and \csopt[same as category]{type}.
-
-Note that this setting only changes the \field{type} field for
-primary entries. Use \csopt{dual-type} for dual entries.
-
-For example:
-\begin{verbatim}
-\usepackage[record,symbols]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries-symbols},type=symbols]
-\end{verbatim}
-
-Make sure that the glossary type has already been defined
-(see \sectionref{sec:newglossary}). In the above, the
-\styopt{symbols} option defines the \code{symbols} glossary.
-If you want to use a custom glossary, you need to provide it. For
-example:
-\begin{verbatim}
-\usepackage[record,nomain]{glossaries-extra}
-
-\newglossary*{dictionary}{Dictionary}
-
-\GlsXtrLoadResources[src={entries-symbols},type=dictionary]
-\end{verbatim}
-(The \styopt{nomain} option was added to suppress the
-creation of the default \code{main} glossary.)
-
-\optsection{trigger-type}
-
-The record counting commands, such as \ics{rgls}, use the special
-format \ics{glstriggerrecordformat}, which \bibgls\ also treats
-as an \idx{ignoredrecord}. This means the entry will still be
-identified as having a record for selection purposes, which is
-necessary for the entry to be defined for use in the document, but
-in order to prevent it from appearing in the glossary you need to
-transfer the entry with \csopt[\meta{type}]{trigger-type}.
-This will override the \csopt{type}, \csopt{dual-type},
-\csopt{tertiary-type} and the type specification in
-\csopt{secondary}.
-
-The provided value \meta{type} must be a glossary label (not one of
-the keywords allowed by \csopt{type}).
-You can define the glossary before loading the resource, but
-it's not required as \bibgls\ will write
-\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file
-(see \sectionref{sec:newglossary}).
-
-\optsection{interpret-label-fields}
+\optsection[\subsubsection]{interpret-label-fields}
 
 This is a boolean option that determines whether or not the fields
 that may only contain labels should have their values interpreted
@@ -6476,7 +6548,7 @@ can't be used in labels and may be used more generally for other
 fields. The \csopt{labelify} and \csopt{labelify-list} options
 are performed before \csopt{interpret-label-fields}.
 
-\optsection{labelify}
+\optsection[\subsubsection]{labelify}
 
 This option should take a comma-separated list of recognised field names as the
 value. (If a field is present in both \csopt{labelify} and
@@ -6560,7 +6632,7 @@ to retain the original:
 ]
 \end{verbatim}
 
-\optsection{labelify-list}
+\optsection[\subsubsection]{labelify-list}
 
 This option is like \csopt{labelify} but it retains commas, as it's
 designed for fields that should be converted into a comma-separated
@@ -6583,7 +6655,7 @@ or
 \end{verbatim}
 depending on whether or not \sty{fontspec} was detected.
 
-\optsection{labelify-replace}
+\optsection[\subsubsection]{labelify-replace}
 
 This option takes a comma-separated list as a value with each
 element in the list in the form \margm{regex}\margm{replacement}
@@ -6663,508 +6735,7 @@ or
 \end{verbatim}
 depending on whether or not \sty{fontspec} was detected.
 
-\optsection{strip-missing-parents}
-
-The \sty{glossaries} package requires that all child entries must be
-defined after the parent entry. An error occurs otherwise, so
-\bibgls\ will omit the \field{parent} field if it can't be found in
-the given \idx{resourceset}. However, when the default
-\csopt[false]{strip-missing-parents} is on, this omission only occurs
-while writing the definitions in the \ext{glstex} file (after
-selection and sorting).
-
-Sorting is performed hierarchically and the \field{group} field is set
-accordingly for the top-level entries (but not for child entries),
-which means that an entry with a \field{parent} field will be
-treated by the sort method as a child entry. This can lead to a
-strange result, which \bibgls\ warns about:
-\begin{alltt}
-Parent '\meta{parent id}' not found for entry \meta{child-id}
-\end{alltt}
-
-This is the default behaviour as it may simply be a result of a
-typing mistake in the \field{parent} field. If you actually want
-missing parents to be stripped before sorting (but after the
-selection process) then use \csopt[true]{strip-missing-parents}. If
-you want all parents stripped then use \csopt{flatten} or
-\csopt[parent]{ignore-fields} instead. As from version 1.4, if you
-want \bibgls\ to create the missing parents, then you can use 
-\csopt[create]{missing-parents}.
-
-\optsection{missing-parents}
-
-As an alternative to \csopt{strip-missing-parents}, as from version
-1.4 you can now use \csopt[\meta{value}]{missing-parents} where
-\meta{value} may be one of:
-\begin{itemize}
-\item \optfmt{strip}: this is equivalent to
-\csopt[true]{strip-missing-parents};
-
-\item \optfmt{warn}: this is equivalent to the default
-\csopt[false]{strip-missing-parents};
-
-\item \optfmt{create}: this will create a new \atentry{index}
-entry with the missing parent's label (after it's been processed by
-options such as \csopt{labelify}) with the \field{name} obtained
-from the \emph{original} value of the \field{parent} field (before being
-processed by options like \csopt{labelify}).
-If the child entry has the \field{type} field set, then the new
-parent entry will be given the same value. The \field{category} for
-the new parent entry can be assigned with
-\csopt{missing-parent-category}.
-\end{itemize}
-
-For example, consider the \exfile{books.bib} file which contains
-entries like
-\begin{verbatim}
-@entry{ubik,
-  name={Ubik},
-  description={novel by Philip K. Dick},
-  identifier={book},
-  author={\sortmediacreator{Philip K.}{Dick}},
-  year={1969}
-}
-\end{verbatim}
-then the field alias
-\begin{codeenv}
-\csopt[author=parent]{field-aliases}
-\end{codeenv}
-will treat
-\begin{verbatim}
-  author={\sortmediacreator{Philip K.}{Dick}},
-\end{verbatim}
-as though it had been defined as
-\begin{verbatim}
-  parent={\sortmediacreator{Philip K.}{Dick}},
-\end{verbatim}
-This can be converted into a label with the options:
-\begin{codeenv}
- \csopt[parent]{labelify},
- \csopt[
-   \marg{[ \cs{cs.string}\csfmt{.}]}\marg{}
- ]{labelify-replace}
-\end{codeenv}
-If the interpreter has been provided with the definition:
-\begin{verbatim}
-\providecommand*{\sortmediacreator}[2]{#2 #1}
-\end{verbatim}
-then the \field{parent} field for the \code{ubik} entry
-will become \code{DickPhilipK} but the original value is stored
-internally when \csopt[create]{missing-parents} is set so that it
-can be used as the \field{name} if the parent needs to be created.
-Once all the entries have been processed, if \code{ubik} has been
-selected but no entry can be found with the label \code{DickPhilipK}
-then a new entry will be added as though it had been defined with:
-\begin{verbatim}
-@index{DickPhilipK,
-  name={\sortmediacreator{Philip K.}{Dick}}
-}
-\end{verbatim}
-This is an alternative approach to the \exfile{sample-authors.tex}
-document from the \hyperref[sec:examples]{examples chapter}.
-
-\optsection{missing-parent-category}
-
-If a missing parent entry is created through the use of
-\csopt[create]{missing-parents} then the \field{category} field can
-be assigned to the new parent entry with this option. The
-\meta{value} may be one of:
-\begin{itemize}
- \item \code{same as child}: the parent entry's \field{category}
-  field is set to the same value as the child's (if set);
- \item \code{same as base}: the parent entry's \field{category} is
-  set to the base name of the \ext{bib} file that provided the
-  child entry's definition;
- \item \code{no value}: don't set the \field{category} field;
- \item \meta{label}: the parent entry's \field{category} field is set to
-  \meta{label} (which shouldn't contain any special characters). 
-\end{itemize}
-The default setting is \csopt[no value]{missing-parent-category}.
-
-\optsection{abbreviation-name-fallback}
-
-The entry types that define abbreviations (such as
-\atentry{abbreviation} and \atentry{acronym}) will, by default,
-fallback on the \field{short} field if the \field{name} field is
-missing and it's required for some reason (for example, with
-\csopt[name]{sort-field}).  If you prefer to
-fallback on a different field, then you can use this option to
-specify the field. For example,
-\csopt[long]{abbreviation-name-fallback}.
-The \meta{field} value must be a known field label.
-
-\optsection{ignore-fields}
-
-The \csopt{ignore-fields} key indicates that you want \bibgls\ to
-skip the fields listed in the supplied comma-separated \meta{list} of field
-labels. Remember that unrecognised fields will always be skipped.
-
-For example, suppose my \ext{bib} file contains
-\begin{verbatim}
-@abbreviation{html,
-  short ="html",
-  long  = {hypertext markup language},
-  description={a markup language for creating web pages},
-  seealso={xml}
-}
-\end{verbatim}
-but I want to use the \abbrstyle{short-long} style and I don't want
-the cross-referenced term, then I can use
-\csopt[seealso,description]{ignore-fields}.
-
-Note that \csopt[parent]{ignore-fields} removes the \field{parent}
-before determining the dependency lists. This means that
-\csopt[recorded and deps]{selection} and 
-\csopt[recorded and ancestors]{selection} won't pick up the
-label in the \field{parent} field.
-
-If you want to maintain the dependency and ancestor relationship but
-omit the \field{parent} field when writing the entries to the
-\ext{glstex} file, you need to use \csopt{flatten} instead.
-
-\optsection{field-aliases}
-
-You can instruct \bibgls\ to treat one field as though it
-was another using this option. The value should be a comma-separated
-list of \meta{field1}\dequals\meta{field2} pairs, where
-\meta{field1} and \meta{field2} are field names. Identical
-mappings and trails aren't permitted. (That is, \meta{field1}
-and \meta{field2} can't be the same nor can you have both
-\meta{field1}\dequals\meta{field2} and
-\meta{field2}\dequals\meta{field3}.) If you want to swap
-fields you need to use one of the dual entry types instead.
-Field aliases are performed before \csopt{ignore-fields},
-so if \meta{field1} is listed in \csopt{ignore-fields} it won't
-be ignored (unless \meta{field2} is in \csopt{ignore-fields}).
-
-For example, suppose \filefmt{people.bib} contains:
-\begin{verbatim}
-@entry{alexander,
-  name={Alexander III of Macedon},
-  description={Ancient Greek king of Macedon},
-  born={20 July 356 BC},
-  died={10 June 323 BC},
-  othername={Alexander the Great}
-}
-\end{verbatim}
-This contains three non-standard fields: \fieldfmt{born},
-\fieldfmt{died} and \fieldfmt{othername}. I could define
-these fields using \ics{glsaddkey}, but another possibility
-is to map these onto the user keys \field{user1}, \field{user2}
-and \field{user3}, which saves the overhead of providing new 
-keys:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  field-aliases={born=user1,died=user2,othername=user3}
-]
-\end{verbatim}
-
-\optsection{replicate-fields}
-
-The value of one field can be copied to other fields using
-this option where each \meta{key}\dequals\meta{value} pair
-is in the form
-\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}
-where all values are field names. This copies the contents
-of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
-(only if the target field isn't already set with
-\csopt[false]{replicate-override}). This action is
-performed after \csopt{ignore-fields} (see
-\sectionref{sec:resourcesets}).
-
-For example, suppose \filefmt{people.bib} contains:
-\begin{verbatim}
-@entry{alexander,
-  name={Alexander III of Macedon (Alexander the Great)},
-  text={Alexander},
-  description={Ancient Greek king of Macedon}
-}
-\end{verbatim}
-Since the \field{first} field hasn't been supplied, it
-will default to the value of the \field{text} field, but
-perhaps for one of my documents I'd like the \field{first}
-field to be the same as the \field{name} field. Rather than
-editing the \ext{bib} file, I can just do:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name=first}
-]
-\end{verbatim}
-This copies the contents of the \field{name} field into the
-\field{first} field. If you have more than one field
-in the list take care to brace the lists to avoid confusion.
-For example, if for some reason I want to copy the value
-of the \field{name} field to both \field{first} and
-\field{firstplural} and copy the value of the \field{text}
-field to the \field{plural} field, then this requires braces
-for the inner list:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name={first,firstplural},text=plural}
-]
-\end{verbatim}
-
-If my \filefmt{people.bib} file instead contained:
-\begin{verbatim}
-@entry{alexander,
-  name={Alexander III of Macedon (Alexander the Great)},
-  first={Alexander the Great},
-  text={Alexander},
-  description={Ancient Greek king of Macedon}
-}
-\end{verbatim}
-then
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name=first}
-]
-\end{verbatim}
-won't alter the \field{first} field since \csopt{replicate-fields}
-never overrides values. However, since \csopt{replicate-fields}
-is always performed after \csopt{ignore-fields} it's possible to
-ignore the \field{first} field which means that the \field{name}
-value can then be copied into it:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  ignore-fields={first},
-  replicate-fields={name=first}
-]
-\end{verbatim}
-Note that the ordering within the resource options doesn't
-make a difference. The same result occurs with:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name=first},
-  ignore-fields={first}
-]
-\end{verbatim}
-
-\optsection{replicate-override}
-
-This is a boolean option. The default setting is
-\csopt[false]{replicate-override}. If \optfmt{true},
-\csopt{replicate-fields} will override the existing value if the
-target field is already set.
-
-\optsection{bibtex-contributor-fields}
-
-This option indicates that the listed fields all use \BibTeX's name
-syntax (as used in \BibTeX's \code{author} and \code{editor} fields).
-The values of these fields will be converted into the form:
-\begin{alltt}
-\gls{bibglscontributorlist}\margm{contributor list}\margm{n}
-\end{alltt}
-where \meta{n} is the number of names in the list and
-\meta{contributor-list} is a comma-separated list of names in the
-form:
-\begin{alltt}
-\gls{bibglscontributor}\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}
-\end{alltt}
-
-The \gls{bibglscontributorlist} commands is initially defined in 
-\bibgls's interpreter to just do the first argument and ignore the
-second. This means that if you're sorting on this field, the \qt{and}
-part between the final names doesn't appear in the sort value.
-The actual definition of \gls{bibglscontributorlist} provided in the 
-\ext{glstex} file depends on whether or not \ics{DTLformatlist} is defined.
-(Note that \styfmt{glossaries} automatically loads \sty{datatool-base}
-so this command will be defined if you have at least v2.28 of
-\sty{datatool-base}.)
-
-For example, if the \field{name} field is specified as:
-\begin{verbatim}
-name={John Smith and Jane Doe and Dickie von Duck}
-\end{verbatim}
-then \csopt[name]{bibtex-contributor-fields} will convert the
-\field{name} field value to 
-\begin{verbatim}
-\bibglscontributorlist{%
- \bibglscontributor{John}{}{Smith}{},%
- \bibglscontributor{Jane}{}{Doe}{},%
- \bibglscontributor{Dickie}{von}{Duck}{}}{3}
-\end{verbatim}
-With \csopt[von]{contributor-order} the sort value obtained from
-this field will be:
-\begin{verbatim}
-Smith, John,Doe, Jane,von Duck, Dickie
-\end{verbatim}
-With one of the locale sort methods and with the default
-\csopt[word]{break-at}, this will end up as:
-\begin{verbatim}
-Smith|John|Doe|Jane|von|Duck|Dickie
-\end{verbatim}
-
-\optsection{contributor-order}
-
-The \gls{bibglscontributor} command is defined in
-\bibgls's interpreter and its definition is dependent on this
-setting. The \meta{value} may be one of (where the parts in square 
-brackets are omitted if that argument is empty):
-\begin{itemize}
-\item \optfmt{surname}: \gls{bibglscontributor} expands to
-\meta{surname}\oarg{, \meta{suffix}}\oarg{, \meta{forenames}}\oarg{,
-\meta{von-part}};
-\item \optfmt{von}: \gls{bibglscontributor} expands to
-\oarg{\meta{von-part} }\meta{surname}\oarg{, \meta{suffix}}\oarg{, \meta{forenames}};
-\item \optfmt{forenames}: \gls{bibglscontributor} expands to
-\oarg{\meta{forenames} }\oarg{\meta{von-part} }\meta{surname}\oarg{,
-\meta{suffix}}.
-\end{itemize}
-The default value is \optfmt{von}. Note that if you have multiple
-resource sets, this option governs the way \bibgls's version of
-\gls{bibglscontributor} behaves. The actual definition is written to
-the \ext{glstex} using \cs{providecommand}, which means that \LaTeX\
-will only pick up the first definition.
-
-For example:
-\begin{verbatim}
-\newcommand*{\bibglscontributor}[4]{%
-  #1\ifstrempty{#2}{}{ #2} #3\ifstrempty{#4}{}{, #4}%
-}
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  bibtex-contributor-fields={name}
-]
-\end{verbatim}
-This will display the names in the glossary with the forenames
-first, but \bibgls\ will sort according to surname.
-
-An alternative approach, if you need an initial resource set
-such as with the \exfile{no-interpret-preamble.bib} file:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src={no-interpret-preamble},
-  interpret-preamble=false,
-  bibtex-contributor-fields={name},
-  contributor-order={forenames}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  bibtex-contributor-fields={name}
-]
-\end{verbatim}
-Note the need to use \csopt[name]{bibtex-contributor-fields}
-in the first resource set even though there are no entries in 
-the \ext{bib} file. This is because the definition of
-\gls{bibglscontributor} is only written to the \ext{glstex} file if
-\csopt{bibtex-contributor-fields} has been set to a non-empty list.
-The second resource set will use the default 
-\csopt[von]{bibtex-contributor-fields} setting when obtaining the
-sort value.
-
-\optsection{date-time-fields}
-
-This option indicates that the listed fields all contain 
-date and time information. Primary entries will have these fields
-parsed according to \csopt{date-time-field-format} and
-\csopt{date-time-field-locale} and dual entries will have these
-fields parsed according to \csopt{dual-date-time-field-format} and
-\csopt{dual-date-time-field-locale}. If the field value is missing
-or doesn't match the given pattern it remains unchanged, otherwise
-it's converted into the form
-\nosecdef{bibglsdatetime}
-where \meta{original} is the value of the field before conversion.
-If the interpreter is on, the value will be interpreted before
-being parsed if it contains \idx{escchar}, \idx{mshiftchar},
-\idx{bgroupchar}, \idx{egroupchar} or \idx{nbspchar}. (Remember that
-\idx{nbspchar} is converted to the non-breaking space character
-\hex{A0} unless \longarg{break-space} is used.)
-
-\optsection{date-fields}
-
-As \csopt{date-time-fields} but for fields that only contain date
-(not time) information. If parsed correctly, the field is converted
-to
-\nosecdef{bibglsdate}
-The fields are parsed according to
-\csopt{date-field-format} and
-\csopt{date-field-locale} for primary entries and according to
-\csopt{dual-date-field-format} and
-\csopt{dual-date-field-locale} for dual entries.
-
-\optsection{time-fields}
-
-As \csopt{date-time-fields} but for fields that only contain time
-(not date) information. If parsed correctly, the field is converted
-to
-\nosecdef{bibglstime}
-The fields are parsed according to
-\csopt{time-field-format} and
-\csopt{time-field-locale} for primary entries and according to
-\csopt{dual-time-field-format} and
-\csopt{dual-time-field-locale} for dual entries.
-
-\optsection{date-time-field-format}
-
-This option also sets
-\csopt[\meta{value}]{dual-date-time-field-format}.
-The value is the format pattern used when parsing fields identified
-by \csopt{date-time-fields}. The \meta{value} is as for
-\csopt{date-sort-format}.
-
-\optsection{date-field-format}
-
-This option also sets
-\csopt[\meta{value}]{dual-date-field-format}.
-The value is the format pattern used when parsing fields identified
-by \csopt{date-fields}. The \meta{value} is as for
-\csopt{date-sort-format}.
-
-\optsection{time-field-format}
-
-This option also sets
-\csopt[\meta{value}]{dual-time-field-format}.
-The value is the format pattern used when parsing fields identified
-by \csopt{time-fields}. The \meta{value} is as for
-\csopt{date-sort-format}.
-
-\optsection{date-time-field-locale}
-
-This option also sets
-\csopt[\meta{value}]{dual-date-time-field-locale}.
-The value is the locale used when parsing fields identified
-by \csopt{date-time-fields}. The \meta{value} is as for
-\csopt{date-sort-locale}.
-
-\optsection{date-field-locale}
-
-This option also sets
-\csopt[\meta{value}]{dual-date-field-locale}.
-The value is the locale used when parsing fields identified
-by \csopt{date-fields}. The \meta{value} is as for
-\csopt{date-sort-locale}.
-
-\optsection{time-field-locale}
-
-This option also sets
-\csopt[\meta{value}]{dual-time-field-locale}.
-The value is the locale used when parsing fields identified
-by \csopt{time-fields}. The \meta{value} is as for
-\csopt{date-sort-locale}.
-
-\optsection{counter}
-
-The \csopt{counter} option assigns the default counter to use
-for the selected entries. (This can be overridden with the
-\glsopt{counter} key when using commands like \csfmt{gls}.)
-The value must be the name of a counter. Since \bibgls\ doesn't know
-which counters are defined within the document, there's no check to
-determine if the value is valid (except for ensuring that
-\meta{value} is non-empty).
-
-Note that this will require an extra \LaTeX\ and \bibgls\ call since
-the counter can't be used for the indexing until the entry has been
-defined.
-
-\optsection{label-prefix}
+\optsection[\subsubsection]{label-prefix}
 
 The \csopt{label-prefix} option prepends \meta{tag} to each
 entry's label. This \meta{tag} will also be inserted in front of any
@@ -7213,7 +6784,7 @@ it's as though the entries had been defined as:
 Remember to use this prefix when you reference the terms in the
 document with commands like \ics{gls}.
 
-\optsection{duplicate-label-suffix}
+\optsection[\subsubsection]{duplicate-label-suffix}
 
 The \sty{glossaries} package doesn't permit entries with duplicate
 labels (even if they're in different glossaries). If you
@@ -7240,7 +6811,7 @@ change the label to \meta{id}\code{.copy1} for the first duplicate
 of the entry whose label is \meta{id}, \meta{id}\code{.copy2} for
 the second duplicate, etc.
 
-\optsection{record-label-prefix}
+\optsection[\subsubsection]{record-label-prefix}
 
 If set, this option will cause \bibgls\ to pretend that each record
 label starts with \meta{tag}, if it doesn't already. For example, suppose
@@ -7261,7 +6832,7 @@ though the records were given as:
 \end{verbatim}
 
 
-\optsection{cs-label-prefix}
+\optsection[\subsubsection]{cs-label-prefix}
 
 If you have commands such as \ics{gls}\margm{label} or
 \ics{glstext}\marg{label} in field
@@ -7318,7 +6889,7 @@ The \csopt{cs-label-prefix} setting doesn't affect labels in the
 fields that have an entry label or label list as the value
 (\field{parent}, \field{alias}, \field{see} and \field{seealso}).
 
-\optsection{ext-prefixes}
+\optsection[\subsubsection]{ext-prefixes}
 
 Any cross-references in the \iext{bib} file that start with
 \idprefix{extn} (where \meta{n} is a positive integer) will be 
@@ -7414,7 +6985,806 @@ start of the labels in the entry definitions and will replace
 the \idprefixfmt{ext1} prefix with \idprefixfmt{gls} in the
 cross-references.
 
-\optsection{short-case-change}
+\optsection[\subsubsection]{save-original-id}
+
+The \meta{value} may be either the keyword \code{false} or
+the name of an internal field in which to store the entry's original
+label (as given in the \ext{bib} file). The default setting is
+\csopt[false]{save-original-id}. If \meta{value} is omitted,
+\csopt[originalid]{save-original-id} is assumed.
+
+If \meta{value} is a known field, it will be set after the field
+aliases, otherwise it will simply be added to the \ext{glstex} file
+using \ics{GlsXtrSetField} after the entry definition. 
+
+\subsection{Assignments}
+\label{sec:fieldassignments}
+
+\optsection[\subsubsection]{group}
+
+The \csopt{group} option may only be used with the \longarg{group} switch.
+This will set the \field{group} field to \meta{label} unless
+\meta{label} is \optfmt{auto}, in which case the value is
+set automatically during the sorting (see also
+\csopt{group-formation}). 
+The corresponding title can be set
+with \gls{glsxtrsetgrouptitle} if the title is different from the
+label.  The default behaviour is \csopt[auto]{group}.
+
+For example:
+\begin{verbatim}
+\GlsXtrLoadResources[sort=integer,group={Constants},
+ src={entries-constants}% data in entries-constants.bib
+]
+\GlsXtrLoadResources[sort=letter-case,group={Variables},
+ src={entries-variables}% data in entries-variables.bib
+]
+\end{verbatim}
+In this case, if the \field{type} field hasn't been set in the \ext{bib} files,
+these entries will be added to the same glossary, but will
+be grouped according to each instance of \gls{GlsXtrLoadResources},
+with the provided group label.
+
+
+\optsection[\subsubsection]{category}
+
+The selected entries may all have their \field{category} field
+changed before writing their definitions to the \ext{glstex} file.
+The \meta{value} may be:
+\begin{itemize}
+\item \optfmt{same as entry}: set the
+\field{category} to the \ext{bib} entry type used to define it
+(\idx!{lowercase} and without the initial \code{@}) after any aliasing,
+if applicable;
+
+\item \optfmt{same as original entry}: (new to v1.4) set the \field{category} 
+to the original entry type (\idx!{lowercase} and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased);
+
+\item \optfmt{same as base}: (new to v1.1) set the \field{category}
+to the base name of the \ext{bib} file (without the extension) 
+that provided the entry definition;
+
+\item \optfmt{same as type}: set the \field{category} to the same
+value as the \field{type} field (if that field has been provided
+either in the \ext{bib} file or through the \csopt{type} option);
+
+\item \meta{label}: the \field{category} is set to
+\meta{label} (which mustn't contain any special characters).
+\end{itemize}
+This will override any
+\field{category} fields supplied in the \ext{bib} file.
+
+When used with \csopt{entry-type-aliases}, the option \csopt[same as
+entry]{category} refers to the \emph{target} entry type whereas
+\csopt[same as original entry]{category} refers to the
+\emph{original} entry type given in the \ext{bib} file.  In both
+cases, the value is converted to \idx!{lowercase} to ensure consistency.
+
+For example, if the \ext{bib} file contains:
+\begin{verbatim}
+@entry{bird,
+  name={bird},
+  description = {feathered animal}
+}
+
+@index{duck}
+
+@index{goose,plural="geese"}
+
+@dualentry{dog,
+  name={dog},
+  description={chien}
+}
+\end{verbatim}
+then if the document contains
+\begin{verbatim}
+\GlsXtrLoadResources[category={same as entry},src={entries}]
+\end{verbatim}
+this will set the \field{category} of the \code{bird} term to
+\optfmt{entry} (since it was defined with \atentry{entry}), the \field{category} of the \code{duck} and
+\code{goose} terms to \optfmt{index} (since they were defined
+with \atentry{index}), and the \field{category} of the \code{dog}
+term to \optfmt{dualentry} (since it was
+defined with \atentry{dualentry}). Note that the dual entry
+\code{dual.dog} doesn't have the category set, since that's
+governed by \csopt{dual-category} instead.
+
+If, instead, the document contains
+\begin{verbatim}
+\GlsXtrLoadResources[category={animals},src={entries}]
+\end{verbatim}
+then the \field{category} of all the primary selected entries will 
+be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
+doesn't have the \field{category} set.
+
+Note that the categories may be overridden by the commands,
+such as \csref{bibglsnewindex}, that are used to actually define the
+entries.
+
+For example, if the document contains
+\begin{verbatim}
+\newcommand{\bibglsnewdualentry}[4]{%
+ \longnewglossaryentry*{#1}{name={#3},#2,category={dual}}{#4}%
+}
+
+\GlsXtrLoadResources[category={animals},src={entries}]
+\end{verbatim}
+then both the \code{dog} and \code{dual.dog} entries will
+have their \field{category} field set to \optfmt{dual} since the
+new definition of \gls{bibglsnewdualentry} has overridden
+the \csopt[animals]{category} option.
+
+\optsection[\subsubsection]{type}
+
+The \meta{value} may be one of:
+\begin{itemize}
+ \item \optfmt{same as entry} set the \field{type} field
+  to the entry type (\idx!{lowercase} and without the initial \code{@}); 
+
+ \item \optfmt{same as original entry} set the \field{type} 
+  to the original entry type (\idx!{lowercase} and without 
+  the initial \code{@}) before it was aliased (behaves like 
+  \optfmt{same as entry} if the entry type wasn't aliased);
+
+ \optfmt{same as base} set the \field{type} field
+  to the base name of the corresponding \ext{bib} file
+  (without the extension);
+
+ \item \optfmt{same as category} set the \field{type} field
+   to the same value as the \field{category} field
+   (\field{type} unchanged if \field{category} not set);
+
+ \item\meta{label} sets the \field{type} field to the glossary 
+   identified by \meta{label}.
+\end{itemize}
+When used with \csopt{entry-type-aliases}, the option \csopt[same as
+entry]{type} refers to the \emph{target} entry type and \csopt[same
+as original entry]{type} refers to the \emph{original} entry type
+given in the \ext{bib} file.  It's not possible to have both
+\csopt[same as type]{category} and \csopt[same as category]{type}.
+
+Note that this setting only changes the \field{type} field for
+primary entries. Use \csopt{dual-type} for dual entries.
+
+For example:
+\begin{verbatim}
+\usepackage[record,symbols]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries-symbols},type=symbols]
+\end{verbatim}
+
+Make sure that the glossary type has already been defined
+(see \sectionref{sec:newglossary}). In the above, the
+\styopt{symbols} option defines the \code{symbols} glossary.
+If you want to use a custom glossary, you need to provide it. For
+example:
+\begin{verbatim}
+\usepackage[record,nomain]{glossaries-extra}
+
+\newglossary*{dictionary}{Dictionary}
+
+\GlsXtrLoadResources[src={entries-symbols},type=dictionary]
+\end{verbatim}
+(The \styopt{nomain} option was added to suppress the
+creation of the default \code{main} glossary.)
+
+\optsection[\subsubsection]{trigger-type}
+
+The record counting commands, such as \ics{rgls}, use the special
+format \ics{glstriggerrecordformat}, which \bibgls\ also treats
+as an \idx{ignoredrecord}. This means the entry will still be
+identified as having a record for selection purposes, which is
+necessary for the entry to be defined for use in the document, but
+in order to prevent it from appearing in the glossary you need to
+transfer the entry with \csopt[\meta{type}]{trigger-type}.
+This will override the \csopt{type}, \csopt{dual-type},
+\csopt{tertiary-type} and the type specification in
+\csopt{secondary}.
+
+The provided value \meta{type} must be a glossary label (not one of
+the keywords allowed by \csopt{type}).
+You can define the glossary before loading the resource, but
+it's not required as \bibgls\ will write
+\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file
+(see \sectionref{sec:newglossary}).
+
+\optsection[\subsubsection]{abbreviation-name-fallback}
+
+The entry types that define abbreviations (such as
+\atentry{abbreviation} and \atentry{acronym}) will, by default,
+fallback on the \field{short} field if the \field{name} field is
+missing and it's required for some reason (for example, with
+\csopt[name]{sort-field}).  If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example,
+\csopt[long]{abbreviation-name-fallback}.
+The \meta{field} value must be a known field label.
+
+\optsection[\subsubsection]{ignore-fields}
+
+The \csopt{ignore-fields} key indicates that you want \bibgls\ to
+skip the fields listed in the supplied comma-separated \meta{list} of field
+labels. Remember that unrecognised fields will always be skipped.
+
+For example, suppose my \ext{bib} file contains
+\begin{verbatim}
+@abbreviation{html,
+  short ="html",
+  long  = {hypertext markup language},
+  description={a markup language for creating web pages},
+  seealso={xml}
+}
+\end{verbatim}
+but I want to use the \abbrstyle{short-long} style and I don't want
+the cross-referenced term, then I can use
+\csopt[seealso,description]{ignore-fields}.
+
+Note that \csopt[parent]{ignore-fields} removes the \field{parent}
+before determining the dependency lists. This means that
+\csopt[recorded and deps]{selection} and 
+\csopt[recorded and ancestors]{selection} won't pick up the
+label in the \field{parent} field.
+
+If you want to maintain the dependency and ancestor relationship but
+omit the \field{parent} field when writing the entries to the
+\ext{glstex} file, you need to use \csopt{flatten} instead.
+
+\optsection[\subsubsection]{field-aliases}
+
+You can instruct \bibgls\ to treat one field as though it
+was another using this option. The value should be a comma-separated
+list of \meta{field1}\dequals\meta{field2} pairs, where
+\meta{field1} and \meta{field2} are field names. Identical
+mappings and trails aren't permitted. (That is, \meta{field1}
+and \meta{field2} can't be the same nor can you have both
+\meta{field1}\dequals\meta{field2} and
+\meta{field2}\dequals\meta{field3}.) If you want to swap
+fields you need to use one of the dual entry types instead.
+Field aliases are performed before \csopt{ignore-fields},
+so if \meta{field1} is listed in \csopt{ignore-fields} it won't
+be ignored (unless \meta{field2} is in \csopt{ignore-fields}).
+
+For example, suppose \filefmt{people.bib} contains:
+\begin{verbatim}
+@entry{alexander,
+  name={Alexander III of Macedon},
+  description={Ancient Greek king of Macedon},
+  born={20 July 356 BC},
+  died={10 June 323 BC},
+  othername={Alexander the Great}
+}
+\end{verbatim}
+This contains three non-standard fields: \fieldfmt{born},
+\fieldfmt{died} and \fieldfmt{othername}. I could define
+these fields using \ics{glsaddkey}, but another possibility
+is to map these onto the user keys \field{user1}, \field{user2}
+and \field{user3}, which saves the overhead of providing new 
+keys:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  field-aliases={born=user1,died=user2,othername=user3}
+]
+\end{verbatim}
+
+\optsection[\subsubsection]{replicate-fields}
+
+The value of one field can be copied to other fields using
+this option where each \meta{key}\dequals\meta{value} pair
+is in the form
+\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}
+where all values are field names. This copies the contents
+of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
+(only if the target field isn't already set with
+\csopt[false]{replicate-override}). This action is
+performed after \csopt{ignore-fields} (see
+\sectionref{sec:resourcesets}).
+
+For example, suppose \filefmt{people.bib} contains:
+\begin{verbatim}
+@entry{alexander,
+  name={Alexander III of Macedon (Alexander the Great)},
+  text={Alexander},
+  description={Ancient Greek king of Macedon}
+}
+\end{verbatim}
+Since the \field{first} field hasn't been supplied, it
+will default to the value of the \field{text} field, but
+perhaps for one of my documents I'd like the \field{first}
+field to be the same as the \field{name} field. Rather than
+editing the \ext{bib} file, I can just do:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name=first}
+]
+\end{verbatim}
+This copies the contents of the \field{name} field into the
+\field{first} field. If you have more than one field
+in the list take care to brace the lists to avoid confusion.
+For example, if for some reason I want to copy the value
+of the \field{name} field to both \field{first} and
+\field{firstplural} and copy the value of the \field{text}
+field to the \field{plural} field, then this requires braces
+for the inner list:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name={first,firstplural},text=plural}
+]
+\end{verbatim}
+
+If my \filefmt{people.bib} file instead contained:
+\begin{verbatim}
+@entry{alexander,
+  name={Alexander III of Macedon (Alexander the Great)},
+  first={Alexander the Great},
+  text={Alexander},
+  description={Ancient Greek king of Macedon}
+}
+\end{verbatim}
+then
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name=first}
+]
+\end{verbatim}
+won't alter the \field{first} field since \csopt{replicate-fields}
+never overrides values. However, since \csopt{replicate-fields}
+is always performed after \csopt{ignore-fields} it's possible to
+ignore the \field{first} field which means that the \field{name}
+value can then be copied into it:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  ignore-fields={first},
+  replicate-fields={name=first}
+]
+\end{verbatim}
+Note that the ordering within the resource options doesn't
+make a difference. The same result occurs with:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src=people,% data in people.bib
+  replicate-fields={name=first},
+  ignore-fields={first}
+]
+\end{verbatim}
+
+\optsection[\subsubsection]{replicate-override}
+
+This is a boolean option. The default setting is
+\csopt[false]{replicate-override}. If \optfmt{true},
+\csopt{replicate-fields} will override the existing value if the
+target field is already set.
+
+\optsection[\subsubsection]{counter}
+
+The \csopt{counter} option assigns the default counter to use
+for the selected entries. (This can be overridden with the
+\glsopt{counter} key when using commands like \csfmt{gls}.)
+The value must be the name of a counter. Since \bibgls\ doesn't know
+which counters are defined within the document, there's no check to
+determine if the value is valid (except for ensuring that
+\meta{value} is non-empty).
+
+Note that this will require an extra \LaTeX\ and \bibgls\ call since
+the counter can't be used for the indexing until the entry has been
+defined.
+
+\optsection[\subsubsection]{copy-action-group-field}
+
+This option may only be used when invoking \bibgls\ with the
+\longarg{group} (or \shortargfmt{g}) switch. If an action
+other than the default \csopt[define]{action} is set,
+this option can be used to identify a field in which to save
+the letter group information 
+where \meta{value} is the name of the field. This just uses
+\cs{GlsXtrSetField}. You will need to redefine
+\ics{glsxtrgroupfield} to \meta{value} before displaying the glossary.
+For example, if \csopt[dupgroup]{copy-action-group-field},
+\csopt[copy]{action} and \csopt[copies]{type} are set in
+the resource options and \code{copies} identifies a custom
+glossary:
+\begin{alltt}
+\ics{printunsrtglossary*}\oarg{type=copies,style=indexgroup}
+ \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
+\end{alltt}
+
+This option is ignored when used with \csopt[define]{action}.
+This option is not used by \csopt{secondary} which will
+always save the group information in the \field{secondarygroup}
+field. When used with \csopt[define or copy]{action}, entries
+that are defined will have both \field{group} and
+the field given by \csopt{copy-action-group-field} set.
+
+Note that you may do \csopt[group]{copy-action-group-field} which
+will override the \field{group} field from the original definition.
+This may be useful if you don't use grouping in the primary
+glossary. That is, you use \code{nogroupskip} and a non-group
+style. For example:
+\begin{verbatim}
+\printunsrtglossary[nogroupskip,style=index]
+\printunsrtglossary[type=copies,style=indexgroup]
+\end{verbatim}
+
+\optsection[\subsubsection]{copy-alias-to-see}
+
+If set, the value of the \field{alias} field is copied to
+the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
+
+\subsection{Field Adjustments}
+\label{sec:fieldmods}
+
+\optsection[\subsubsection]{post-description-dot}
+
+The \styopt{postdot} package option (or \styopt[false]{nopostdot})
+can be used to append a \idx{full-stop} (\idx{periodchar})\ to the
+end of all the descriptions. This can be awkward if some of the
+descriptions end with punctuation characters. This resource option
+can be used instead. The \meta{value} may be one of:
+\begin{itemize}
+\item\optfmt{none}: don't append a \idx{full-stop} (default);
+\item\optfmt{all}: append a \idx{full-stop} to all \field{description}
+  fields in this resource set;
+\item\optfmt{check}: selectively append a \idx{full-stop} (see below).
+\end{itemize}
+Note that if you have dual entries and you use this option to
+append a \idx{full-stop}, then it will be copied over to the mapped field.
+This is different to the \styopt{postdot} option which doesn't
+add the dot to the field but incorporates it in the 
+\idx{postdescriptionhook}. This means that a dot inserted with
+\csopt{post-description-dot} will come before the
+\idx{postdescriptionhook} whereas with \styopt{postdot} the
+punctuation comes after any category-specific hook.
+
+The \csopt[check]{post-description-dot} setting determines whether
+to append the dot as follows:
+\begin{itemize}
+\item If the \field{description} field ends with
+\ics{nopostdesc} or \ics{glsxtrnopostpunc}, then a dot isn't appended.
+\item If the \field{description} field doesn't end with a regular
+(ungrouped letter or other) character, then a dot is appended.
+(For example, if the description ends with a control sequence
+or an end group token.)
+\item If the \field{description} field ends with a character 
+that belongs to the Unicode category \idx{punctuationclose}
+or \idx{punctuationfinalquote} then the token preceding
+that character is checked.
+\item If the \field{description} field doesn't end with
+a character that belongs to the Unicode category
+\idx{punctuationother} then the dot is added.
+\end{itemize}
+Note that the interpreter isn't used during the check.
+If the \field{description} ends with a command then a dot will be
+appended (unless it's \cs{glsxtrnopostpunc} or \cs{nopostdesc}) even if
+that command expands in such a way that it ends with a terminating
+punctuation character. This option only applies to the
+\field{description} field.
+
+\optsection[\subsubsection]{strip-trailing-nopost}
+
+This option is always performed before \csopt{post-description-dot}
+when adjusting the \field{description} field. The default
+setting is \csopt[false]{strip-trailing-nopost}. If 
+\optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{glsxtrnopostpunc}
+found in the \field{description} field will be removed.
+Note that the command (possibly followed by ignored space) must be
+at the very end of the description for it to be removed. A
+description should not contain both commands. This option
+only applies to the \field{description} field.
+
+For example, \cs{nopostdesc} will be stripped from:
+\begin{verbatim}
+description={sample\nopostdesc}
+\end{verbatim}
+since it's at the end. It will also be stripped from
+\begin{verbatim}
+description={sample\nopostdesc }
+\end{verbatim}
+since the trailing space is ignored as it follows a control
+word. It won't be stripped from
+\begin{verbatim}
+description={sample\nopostdesc{} }
+\end{verbatim}
+because the final space is now significant, but even without the
+space it still won't be stripped as the field ends with
+an empty group not with \cs{nopostdesc}. Similarly it won't be
+stripped from
+\begin{verbatim}
+description={sample\nopostdesc\relax}
+\end{verbatim}
+because again it's not at the end.
+
+\optsection[\subsubsection]{check-end-punctuation}
+
+This options checks the end of all the fields given in \meta{list} for
+end of sentence punctuation. This is determined as follows, for each
+\meta{field} in the comma-separated \meta{list}:
+\begin{itemize}
+\item if the last character is of type \idx{punctuationclose}
+or \idx{punctuationfinalquote}, check the character that comes
+before it;
+\item if the character is of type \idx{punctuationother}, then check
+if it's listed in the entry given by \code{sentence.terminators} 
+in \bibgls's \langxml.
+\end{itemize}
+If a sentence terminator is found, an internal field is created
+called \field{fieldendpunc} that contains the punctuation
+character. Fields whose values must be labels (such as
+\field{parent}, \field{category} and \field{type}) aren't checked,
+even if they're included in \meta{list}.
+
+The default \code{sentence.terminators} is defined in \file{bib2gls-en.xml}
+as:
+\begin{verbatim}
+<entry key="sentence.terminators">.?!</entry>
+\end{verbatim}
+Any character that isn't of type \idx{punctuationother} won't
+match.
+
+For example, the sample \exfile{books.bib} file contains:
+\begin{verbatim}
+@entry{whydidnttheyaskevans,
+  name={Why Didn't They Ask Evans?},
+  description={novel by Agatha Christie},
+  identifier={book},
+  author={\sortmediacreator{Agatha}{Christie}},
+  year={1934}
+}
+\end{verbatim}
+With \csopt[name]{check-end-punctuation}, this entry will be
+assigned an internal field called 
+\fielddisp{fieldendpunc}{namendpunc} set to \code{?}\
+as that's included in \code{sentence.terminators} and is found
+at the end of the \field{name} field:
+\begin{verbatim}
+\GlsXtrSetField{whydidnttheyaskevans}{nameendpunc}{?}
+\end{verbatim}
+(Note that \csopt[first,text]{check-end-punctuation} won't match
+as there's no \field{first} or \field{text} field supplied.)
+
+If you have a field that ends with an abbreviation followed by a
+\idx{full-stop}, this will be considered an end of sentence terminator, but
+the main purpose of this option is to provide a way to deal with
+cases like
+\begin{verbatim}
+Agatha Christie wrote \gls{whydidnttheyaskevans}.
+\end{verbatim}
+where the end of sentence punctuation following \cs{gls} needs to be
+discarded. This is needed regardless of whether or not
+the link text ends with an abbreviation or is a complete sentence.
+
+It's then possible to hook into the \idx{postlinkhook} \qt{discard
+period} check. By default this just checks the category attributes
+that govern whether or not to discard a following period, but
+(with \styfmt{glossaries-extra} v1.23+) it's possible to provide
+an additional check by redefining
+\nosecdef{glsxtrifcustomdiscardperiod}
+This should expand to \meta{true} if the check should be performed
+otherwise it should expand to \meta{false}. You can reference the
+label using \cs{glslabel}. For example:
+\begin{verbatim}
+\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
+ \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+}
+\end{verbatim}
+This uses \ics{GlsXtrIfFieldUndef} rather than
+\ics{glsxtrifhasfield*} since there's no need to access the field's
+value. (The unstarred form \ics{glsxtrifhasfield} can't be used
+as it introduces implicit scoping, which would interfere with the
+punctuation lookahead.) The other difference between
+\ics{GlsXtrIfFieldUndef} and the other \csfmt{\ldots hasfield} tests
+is the case where the field is set to an empty value. In this case
+the field is defined (so \ics{GlsXtrIfFieldUndef} does the
+\meta{false} argument) but it's considered unset (so commands like
+\ics{ifglshasfield} do the \meta{false} argument).
+
+\optsection[\subsubsection]{bibtex-contributor-fields}
+
+This option indicates that the listed fields all use \BibTeX's name
+syntax (as used in \BibTeX's \code{author} and \code{editor} fields).
+The values of these fields will be converted into the form:
+\begin{alltt}
+\gls{bibglscontributorlist}\margm{contributor list}\margm{n}
+\end{alltt}
+where \meta{n} is the number of names in the list and
+\meta{contributor-list} is a comma-separated list of names in the
+form:
+\begin{alltt}
+\gls{bibglscontributor}\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}
+\end{alltt}
+
+The \gls{bibglscontributorlist} commands is initially defined in 
+\bibgls's interpreter to just do the first argument and ignore the
+second. This means that if you're sorting on this field, the \qt{and}
+part between the final names doesn't appear in the sort value.
+The actual definition of \gls{bibglscontributorlist} provided in the 
+\ext{glstex} file depends on whether or not \ics{DTLformatlist} is defined.
+(Note that \styfmt{glossaries} automatically loads \sty{datatool-base}
+so this command will be defined if you have at least v2.28 of
+\sty{datatool-base}.)
+
+For example, if the \field{name} field is specified as:
+\begin{verbatim}
+name={John Smith and Jane Doe and Dickie von Duck}
+\end{verbatim}
+then \csopt[name]{bibtex-contributor-fields} will convert the
+\field{name} field value to 
+\begin{verbatim}
+\bibglscontributorlist{%
+ \bibglscontributor{John}{}{Smith}{},%
+ \bibglscontributor{Jane}{}{Doe}{},%
+ \bibglscontributor{Dickie}{von}{Duck}{}}{3}
+\end{verbatim}
+With \csopt[von]{contributor-order} the sort value obtained from
+this field will be:
+\begin{verbatim}
+Smith, John,Doe, Jane,von Duck, Dickie
+\end{verbatim}
+With one of the locale sort methods and with the default
+\csopt[word]{break-at}, this will end up as:
+\begin{verbatim}
+Smith|John|Doe|Jane|von|Duck|Dickie
+\end{verbatim}
+
+\optsection[\subsubsection]{contributor-order}
+
+The \gls{bibglscontributor} command is defined in
+\bibgls's interpreter and its definition is dependent on this
+setting. The \meta{value} may be one of (where the parts in square 
+brackets are omitted if that argument is empty):
+\begin{itemize}
+\item \optfmt{surname}: \gls{bibglscontributor} expands to
+\meta{surname}\oarg{, \meta{suffix}}\oarg{, \meta{forenames}}\oarg{,
+\meta{von-part}};
+\item \optfmt{von}: \gls{bibglscontributor} expands to
+\oarg{\meta{von-part} }\meta{surname}\oarg{, \meta{suffix}}\oarg{, \meta{forenames}};
+\item \optfmt{forenames}: \gls{bibglscontributor} expands to
+\oarg{\meta{forenames} }\oarg{\meta{von-part} }\meta{surname}\oarg{,
+\meta{suffix}}.
+\end{itemize}
+The default value is \optfmt{von}. Note that if you have multiple
+resource sets, this option governs the way \bibgls's version of
+\gls{bibglscontributor} behaves. The actual definition is written to
+the \ext{glstex} using \cs{providecommand}, which means that \LaTeX\
+will only pick up the first definition.
+
+For example:
+\begin{verbatim}
+\newcommand*{\bibglscontributor}[4]{%
+  #1\ifstrempty{#2}{}{ #2} #3\ifstrempty{#4}{}{, #4}%
+}
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  bibtex-contributor-fields={name}
+]
+\end{verbatim}
+This will display the names in the glossary with the forenames
+first, but \bibgls\ will sort according to surname.
+
+An alternative approach, if you need an initial resource set
+such as with the \exfile{no-interpret-preamble.bib} file:
+\begin{verbatim}
+\GlsXtrLoadResources[
+  src={no-interpret-preamble},
+  interpret-preamble=false,
+  bibtex-contributor-fields={name},
+  contributor-order={forenames}
+]
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  bibtex-contributor-fields={name}
+]
+\end{verbatim}
+Note the need to use \csopt[name]{bibtex-contributor-fields}
+in the first resource set even though there are no entries in 
+the \ext{bib} file. This is because the definition of
+\gls{bibglscontributor} is only written to the \ext{glstex} file if
+\csopt{bibtex-contributor-fields} has been set to a non-empty list.
+The second resource set will use the default 
+\csopt[von]{bibtex-contributor-fields} setting when obtaining the
+sort value.
+
+\optsection[\subsubsection]{date-time-fields}
+
+This option indicates that the listed fields all contain 
+date and time information. Primary entries will have these fields
+parsed according to \csopt{date-time-field-format} and
+\csopt{date-time-field-locale} and dual entries will have these
+fields parsed according to \csopt{dual-date-time-field-format} and
+\csopt{dual-date-time-field-locale}. If the field value is missing
+or doesn't match the given pattern it remains unchanged, otherwise
+it's converted into the form
+\nosecdef{bibglsdatetime}
+where \meta{original} is the value of the field before conversion.
+If the interpreter is on, the value will be interpreted before
+being parsed if it contains \idx{escchar}, \idx{mshiftchar},
+\idx{bgroupchar}, \idx{egroupchar} or \idx{nbspchar}. (Remember that
+\idx{nbspchar} is converted to the non-breaking space character
+\hex{A0} unless \longarg{break-space} is used.)
+
+\optsection[\subsubsection]{date-fields}
+
+As \csopt{date-time-fields} but for fields that only contain date
+(not time) information. If parsed correctly, the field is converted
+to
+\nosecdef{bibglsdate}
+The fields are parsed according to
+\csopt{date-field-format} and
+\csopt{date-field-locale} for primary entries and according to
+\csopt{dual-date-field-format} and
+\csopt{dual-date-field-locale} for dual entries.
+
+\optsection[\subsubsection]{time-fields}
+
+As \csopt{date-time-fields} but for fields that only contain time
+(not date) information. If parsed correctly, the field is converted
+to
+\nosecdef{bibglstime}
+The fields are parsed according to
+\csopt{time-field-format} and
+\csopt{time-field-locale} for primary entries and according to
+\csopt{dual-time-field-format} and
+\csopt{dual-time-field-locale} for dual entries.
+
+\optsection[\subsubsection]{date-time-field-format}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-time-field-format}.
+The value is the format pattern used when parsing fields identified
+by \csopt{date-time-fields}. The \meta{value} is as for
+\csopt{date-sort-format}.
+
+\optsection[\subsubsection]{date-field-format}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-field-format}.
+The value is the format pattern used when parsing fields identified
+by \csopt{date-fields}. The \meta{value} is as for
+\csopt{date-sort-format}.
+
+\optsection[\subsubsection]{time-field-format}
+
+This option also sets
+\csopt[\meta{value}]{dual-time-field-format}.
+The value is the format pattern used when parsing fields identified
+by \csopt{time-fields}. The \meta{value} is as for
+\csopt{date-sort-format}.
+
+\optsection[\subsubsection]{date-time-field-locale}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-time-field-locale}.
+The value is the locale used when parsing fields identified
+by \csopt{date-time-fields}. The \meta{value} is as for
+\csopt{date-sort-locale}.
+
+\optsection[\subsubsection]{date-field-locale}
+
+This option also sets
+\csopt[\meta{value}]{dual-date-field-locale}.
+The value is the locale used when parsing fields identified
+by \csopt{date-fields}. The \meta{value} is as for
+\csopt{date-sort-locale}.
+
+\optsection[\subsubsection]{time-field-locale}
+
+This option also sets
+\csopt[\meta{value}]{dual-time-field-locale}.
+The value is the locale used when parsing fields identified
+by \csopt{time-fields}. The \meta{value} is as for
+\csopt{date-sort-locale}.
+
+\subsection{Case-Changing}
+\label{sec:fieldcase}
+
+\optsection[\subsubsection]{short-case-change}
 
 The value of the \field{short} field may be automatically converted
 to \idxlink{uppercase}{upper} or \idx{lowercase}. This option may take one of the following
@@ -7593,326 +7963,21 @@ the result is
 See \csopt{dual-short-case-change} to adjust the \field{dualshort}
 field.
 
-\optsection{name-case-change}
+\optsection[\subsubsection]{name-case-change}
 
 As \csopt{short-case-change} but is applied to the \field{name}
 field. If the \field{text} field hasn't been set, the \field{name}
-value is first copied to the \field{text} field.
+value is first copied to the \field{text} field. If the \field{name}
+field hasn't been set (for example, with the \atentry{index} entry
+type), it's copied from the fallback value (which
+depends on the entry type) unless the entry type is
+\atentry{abbreviation} or \atentry{acronym}, in which case if
+the \field{name} field is missing no action is performed.
 
-\optsection{description-case-change}
+\optsection[\subsubsection]{description-case-change}
 
 As \csopt{short-case-change} but is applied to the
 \field{description} field.
-
-\optsection{post-description-dot}
-
-The \styopt{postdot} package option (or \styopt[false]{nopostdot})
-can be used to append a \idx{full-stop} (\idx{periodchar})\ to the
-end of all the descriptions. This can be awkward if some of the
-descriptions end with punctuation characters. This resource option
-can be used instead. The \meta{value} may be one of:
-\begin{itemize}
-\item\optfmt{none}: don't append a \idx{full-stop} (default);
-\item\optfmt{all}: append a \idx{full-stop} to all \field{description}
-  fields in this resource set;
-\item\optfmt{check}: selectively append a \idx{full-stop} (see below).
-\end{itemize}
-Note that if you have dual entries and you use this option to
-append a \idx{full-stop}, then it will be copied over to the mapped field.
-This is different to the \styopt{postdot} option which doesn't
-add the dot to the field but incorporates it in the 
-\idx{postdescriptionhook}. This means that a dot inserted with
-\csopt{post-description-dot} will come before the
-\idx{postdescriptionhook} whereas with \styopt{postdot} the
-punctuation comes after any category-specific hook.
-
-The \csopt[check]{post-description-dot} setting determines whether
-to append the dot as follows:
-\begin{itemize}
-\item If the \field{description} field ends with
-\ics{nopostdesc} or \ics{glsxtrnopostpunc}, then a dot isn't appended.
-\item If the \field{description} field doesn't end with a regular
-(ungrouped letter or other) character, then a dot is appended.
-(For example, if the description ends with a control sequence
-or an end group token.)
-\item If the \field{description} field ends with a character 
-that belongs to the Unicode category \idx{punctuationclose}
-or \idx{punctuationfinalquote} then the token preceding
-that character is checked.
-\item If the \field{description} field doesn't end with
-a character that belongs to the Unicode category
-\idx{punctuationother} then the dot is added.
-\end{itemize}
-Note that the interpreter isn't used during the check.
-If the \field{description} ends with a command then a dot will be
-appended (unless it's \cs{glsxtrnopostpunc} or \cs{nopostdesc}) even if
-that command expands in such a way that it ends with a terminating
-punctuation character. This option only applies to the
-\field{description} field.
-
-\optsection{strip-trailing-nopost}
-
-This option is always performed before \csopt{post-description-dot}
-when adjusting the \field{description} field. The default
-setting is \csopt[false]{strip-trailing-nopost}. If 
-\optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{glsxtrnopostpunc}
-found in the \field{description} field will be removed.
-Note that the command (possibly followed by ignored space) must be
-at the very end of the description for it to be removed. A
-description should not contain both commands. This option
-only applies to the \field{description} field.
-
-For example, \cs{nopostdesc} will be stripped from:
-\begin{verbatim}
-description={sample\nopostdesc}
-\end{verbatim}
-since it's at the end. It will also be stripped from
-\begin{verbatim}
-description={sample\nopostdesc }
-\end{verbatim}
-since the trailing space is ignored as it follows a control
-word. It won't be stripped from
-\begin{verbatim}
-description={sample\nopostdesc{} }
-\end{verbatim}
-because the final space is now significant, but even without the
-space it still won't be stripped as the field ends with
-an empty group not with \cs{nopostdesc}. Similarly it won't be
-stripped from
-\begin{verbatim}
-description={sample\nopostdesc\relax}
-\end{verbatim}
-because again it's not at the end.
-
-\optsection{check-end-punctuation}
-
-This options checks the end of all the fields given in \meta{list} for
-end of sentence punctuation. This is determined as follows, for each
-\meta{field} in the comma-separated \meta{list}:
-\begin{itemize}
-\item if the last character is of type \idx{punctuationclose}
-or \idx{punctuationfinalquote}, check the character that comes
-before it;
-\item if the character is of type \idx{punctuationother}, then check
-if it's listed in the entry given by \code{sentence.terminators} 
-in \bibgls's \langxml.
-\end{itemize}
-If a sentence terminator is found, an internal field is created
-called \field{fieldendpunc} that contains the punctuation
-character. Fields whose values must be labels (such as
-\field{parent}, \field{category} and \field{type}) aren't checked,
-even if they're included in \meta{list}.
-
-The default \code{sentence.terminators} is defined in \file{bib2gls-en.xml}
-as:
-\begin{verbatim}
-<entry key="sentence.terminators">.?!</entry>
-\end{verbatim}
-Any character that isn't of type \idx{punctuationother} won't
-match.
-
-For example, the sample \exfile{books.bib} file contains:
-\begin{verbatim}
-@entry{whydidnttheyaskevans,
-  name={Why Didn't They Ask Evans?},
-  description={novel by Agatha Christie},
-  identifier={book},
-  author={\sortmediacreator{Agatha}{Christie}},
-  year={1934}
-}
-\end{verbatim}
-With \csopt[name]{check-end-punctuation}, this entry will be
-assigned an internal field called 
-\fielddisp{fieldendpunc}{namendpunc} set to \code{?}\
-as that's included in \code{sentence.terminators} and is found
-at the end of the \field{name} field:
-\begin{verbatim}
-\GlsXtrSetField{whydidnttheyaskevans}{nameendpunc}{?}
-\end{verbatim}
-(Note that \csopt[first,text]{check-end-punctuation} won't match
-as there's no \field{first} or \field{text} field supplied.)
-
-If you have a field that ends with an abbreviation followed by a
-\idx{full-stop}, this will be considered an end of sentence terminator, but
-the main purpose of this option is to provide a way to deal with
-cases like
-\begin{verbatim}
-Agatha Christie wrote \gls{whydidnttheyaskevans}.
-\end{verbatim}
-where the end of sentence punctuation following \cs{gls} needs to be
-discarded. This is needed regardless of whether or not
-the link text ends with an abbreviation or is a complete sentence.
-
-It's then possible to hook into the \idx{postlinkhook} \qt{discard
-period} check. By default this just checks the category attributes
-that govern whether or not to discard a following period, but
-(with \styfmt{glossaries-extra} v1.23+) it's possible to provide
-an additional check by redefining
-\nosecdef{glsxtrifcustomdiscardperiod}
-This should expand to \meta{true} if the check should be performed
-otherwise it should expand to \meta{false}. You can reference the
-label using \cs{glslabel}. For example:
-\begin{verbatim}
-\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
- \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
-}
-\end{verbatim}
-This uses \ics{GlsXtrIfFieldUndef} rather than
-\ics{glsxtrifhasfield*} since there's no need to access the field's
-value. (The unstarred form \ics{glsxtrifhasfield} can't be used
-as it introduces implicit scoping, which would interfere with the
-punctuation lookahead.) The other difference between
-\ics{GlsXtrIfFieldUndef} and the other \csfmt{\ldots hasfield} tests
-is the case where the field is set to an empty value. In this case
-the field is defined (so \ics{GlsXtrIfFieldUndef} does the
-\meta{false} argument) but it's considered unset (so commands like
-\ics{ifglshasfield} do the \meta{false} argument).
-
-\optsection{copy-action-group-field}
-
-This option may only be used when invoking \bibgls\ with the
-\longarg{group} (or \shortargfmt{g}) switch. If an action
-other than the default \csopt[define]{action} is set,
-this option can be used to identify a field in which to save
-the letter group information 
-where \meta{value} is the name of the field. This just uses
-\cs{GlsXtrSetField}. You will need to redefine
-\ics{glsxtrgroupfield} to \meta{value} before displaying the glossary.
-For example, if \csopt[dupgroup]{copy-action-group-field},
-\csopt[copy]{action} and \csopt[copies]{type} are set in
-the resource options and \code{copies} identifies a custom
-glossary:
-\begin{alltt}
-\ics{printunsrtglossary*}\oarg{type=copies,style=indexgroup}
- \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
-\end{alltt}
-
-This option is ignored when used with \csopt[define]{action}.
-This option is not used by \csopt{secondary} which will
-always save the group information in the \field{secondarygroup}
-field. When used with \csopt[define or copy]{action}, entries
-that are defined will have both \field{group} and
-the field given by \csopt{copy-action-group-field} set.
-
-Note that you may do \csopt[group]{copy-action-group-field} which
-will override the \field{group} field from the original definition.
-This may be useful if you don't use grouping in the primary
-glossary. That is, you use \code{nogroupskip} and a non-group
-style. For example:
-\begin{verbatim}
-\printunsrtglossary[nogroupskip,style=index]
-\printunsrtglossary[type=copies,style=indexgroup]
-\end{verbatim}
-
-\optsection{save-child-count}
-
-This is a boolean option. The default setting is
-\csopt[false]{save-child-count}. 
-If \csopt[true]{save-child-count},
-each entry will be assigned a field called \field{childcount} with
-the value equal to the number of child entries that have been
-selected. As from version 1.5, this option also creates
-the \field{childlist} field for entries that have children
-selected. This field is in \sty{etoolbox}'s internal list
-format and can be iterated over using \ics{glsxtrfieldforlistloop}.
-
-The assignment is done using \ics{GlsXtrSetField} so there's
-no associated key. You can test if the field is set and non-zero
-using:
-\nosecformatdef{GlsXtrIfHasNonZeroChildCount}
-which is provided with \sty{glossaries-extra-bib2gls} v1.31+.
-Within \meta{true}, you can access the actual value with
-\ics{glscurrentfieldvalue}. If \csopt[false]{save-child-count},
-this command will do \meta{false} as the \field{childcount} field
-won't be set.
-
-For example, suppose \filefmt{entries.bib} contains:
-\begin{verbatim}
-@index{birds}
-@index{duck,parent={birds}}
-@index{goose,plural={geese},parent={birds}}
-@index{swan,parent={birds}}
-
-@index{minerals}
-@index{quartz,parent={minerals}}
-@index{corundum,parent={minerals}}
-@index{amethyst,parent={minerals}}
-@index{gypsum,parent={minerals}}
-@index{gold,parent={minerals}}
-\end{verbatim}
-and the document contains:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,style=indexgroup]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries},save-child-count]
-
-\begin{document}
-\gls{duck} and \gls{goose}.
-\gls{quartz}, \gls{corundum}, \gls{amethyst}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
-Then the \ext{glstex} file will contain:
-\begin{verbatim}
-\GlsXtrSetField{birds}{childcount}{2}
-\GlsXtrSetField{duck}{childcount}{0}
-\glsxtrfieldlistadd{birds}{childlist}{duck}
-\GlsXtrSetField{goose}{childcount}{0}
-\glsxtrfieldlistadd{birds}{childlist}{goose}
-\GlsXtrSetField{minerals}{childcount}{3}
-\GlsXtrSetField{amethyst}{childcount}{0}
-\glsxtrfieldlistadd{minerals}{childlist}{amethyst}
-\GlsXtrSetField{corundum}{childcount}{0}
-\glsxtrfieldlistadd{minerals}{childlist}{corundum}
-\GlsXtrSetField{quartz}{childcount}{0}
-\glsxtrfieldlistadd{minerals}{childlist}{quartz}
-\end{verbatim}
-Note that although \code{birds} has three children defined in the
-\ext{bib} file, only two have been selected, so the child count is
-set to 2. Similarly the \code{minerals} entry has five children
-defined in the \ext{bib} file, but only three have been selected, so
-the child count is 3.
-
-The following uses the post-description hook to show the child count
-in parentheses:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries},category=general,save-child-count]
-
-\renewcommand{\glsxtrpostdescgeneral}{%
-  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
-  { (child count: \glscurrentfieldvalue.)}%
-  {}%
-}
-\end{verbatim}
-(\ics{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
-It's slightly more efficient that \ics{ifglshasfield} provided by
-the base \styfmt{glossaries} package, and it doesn't complain if the
-entry or field don't exist, but note that \ics{glsxtrifhasfield}
-implicitly scopes its content. Use the starred version to omit the
-grouping.)
-
-You can perform a numerical test with \ics{GlsXtrIfFieldNonZero} or
-\ics{GlsXtrIfFieldEqNum}.
-
-\optsection{save-original-id}
-
-The \meta{value} may be either the keyword \code{false} or
-the name of an internal field in which to store the entry's original
-label (as given in the \ext{bib} file). The default setting is
-\csopt[false]{save-original-id}. If \meta{value} is omitted,
-\csopt[originalid]{save-original-id} is assumed.
-
-If \meta{value} is a known field, it will be set after the field
-aliases, otherwise it will simply be added to the \ext{glstex} file
-using \ics{GlsXtrSetField} after the entry definition. 
-
-\optsection{copy-alias-to-see}
-
-If set, the value of the \field{alias} field is copied to
-the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
 
 \section{Plurals}
 \label{sec:plurals}
@@ -12169,14 +12234,28 @@ file is:
  \newglossaryentry{#1}{name={#1},category={index},description={},#2}%
 }
 \end{verbatim}
-This makes the \field{name} default to the \meta{label}, assigns the
+This makes the \field{name} default to the \meta{label}, assigns 
 the \field{category} to \code{index} and sets an empty
 \field{description}. These settings may be overridden by
 \meta{options}.
 
 Note that the \field{description} doesn't include
-\ics{nopostdesc} to allow for the post-description hook used by
+\ics{nopostdesc} to allow for the \idx{postdescriptionhook} used by
 category attributes.
+
+\cssection{bibglsnewindexplural}
+
+\formatdef{bibglsnewindexplural}
+This command is used to define terms identified with the
+\atentry{indexplural} type. The definition provided in the \ext{glstex}
+file is:
+\begin{verbatim}
+\providecommand{\bibglsnewindexplural}[3]{%
+ \newglossaryentry{#1}{name={#3},category={indexplural},description={},#2}%
+}
+\end{verbatim}
+This assigns the \field{category} to \code{indexplural} and sets an empty
+\field{description}. These settings may be overridden by \meta{options}.
 
 \cssection{bibglsnewabbreviation}
 

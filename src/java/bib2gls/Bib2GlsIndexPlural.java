@@ -25,19 +25,19 @@ import java.util.Iterator;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 
-public class Bib2GlsIndex extends Bib2GlsEntry
+public class Bib2GlsIndexPlural extends Bib2GlsIndex
 {
-   public Bib2GlsIndex(Bib2Gls bib2gls)
+   public Bib2GlsIndexPlural(Bib2Gls bib2gls)
    {
-      this(bib2gls, "index");
+      this(bib2gls, "indexplural");
    }
 
-   public Bib2GlsIndex(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsIndexPlural(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
    }
 
-   // initialise the name field if a label prefix is supplied
+   // initialise the text field if a label prefix is supplied
 
    public void parseContents(TeXParser parser,
     TeXObjectList contents, TeXObject endGroupChar)
@@ -46,21 +46,28 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       super.parseContents(parser, contents, endGroupChar);
 
       if (getResource().getLabelPrefix() != null
-         && getFieldValue("name") == null)
+         && getFieldValue("text") == null)
       {
-         putField("name", getOriginalId());
+         putField("text", getOriginalId());
       }
-   }
-
-   public void checkRequiredFields()
-   {// no required fields
    }
 
    public String getFallbackValue(String field)
    {
-      if (field.equals("name"))
+      if (field.equals("text"))
       {
          return getOriginalId();
+      }
+      else if (field.equals("name"))
+      {
+         String val = getFieldValue("plural");
+
+         if (val != null)
+         {
+            return val;
+         }
+
+         return getFallbackValue("plural");
       }
       else
       {
@@ -70,7 +77,7 @@ public class Bib2GlsIndex extends Bib2GlsEntry
 
    public BibValueList getFallbackContents(String field)
    {
-      if (field.equals("name"))
+      if (field.equals("text"))
       {
          if (!bib2gls.useInterpreter())
          {
@@ -86,6 +93,17 @@ public class Bib2GlsIndex extends Bib2GlsEntry
 
          return list;
       }
+      else if (field.equals("name"))
+      {
+         BibValueList val = getField("plural");
+
+         if (val != null)
+         {
+            return val;
+         }
+
+         return getFallbackContents("plural");
+      }
       else
       {
          return super.getFallbackContents(field);
@@ -99,6 +117,8 @@ public class Bib2GlsIndex extends Bib2GlsEntry
 
       String sep = "";
 
+      String name = null;
+
       Set<String> keyset = getFieldSet();
 
       Iterator<String> it = keyset.iterator();
@@ -107,7 +127,11 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       {
          String field = it.next();
 
-         if (bib2gls.isKnownField(field))
+         if (field.equals("name"))
+         {
+            name = getFieldValue(field);
+         }
+         else if (bib2gls.isKnownField(field))
          {
             writer.format("%s", sep);
             sep = String.format(",%n");
@@ -121,15 +145,23 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       }
 
       writer.println("}");
+
+      if (name == null)
+      {
+         name = getFallbackValue("name");
+      }
+
+      writer.println(String.format("{%s}", name));
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
-      // syntax: {label}{opts}
+      // syntax: {label}{opts}{name}
 
-      writer.format("\\providecommand{\\%s}[2]{%%%n", getCsName());
+      writer.format("\\providecommand{\\%s}[3]{%%%n", getCsName());
 
-      writer.println(" \\newglossaryentry{#1}{name={#1},category={index},description={},#2}%");
+      writer.print(" \\newglossaryentry{#1}");
+      writer.println("{name={#3},category={indexplural},description={},#2}%");
 
       writer.println("}");
    }
