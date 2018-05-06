@@ -125,6 +125,11 @@ public class Bib2GlsEntry extends BibEntry
    {
       String id = super.getId();
 
+      if (id == null)
+      {
+         return bib2gls.getMessage("message.missing.id");
+      }
+
       if (labelPrefix == null && labelSuffix == null)
       {
          return id;

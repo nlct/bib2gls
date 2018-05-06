@@ -7814,7 +7814,15 @@ the value equal to the number of child entries that have been
 selected.
 
 The assignment is done using \ics{GlsXtrSetField} so there's
-no associated key.
+no associated key. You can test if the field is set and non-zero
+using:
+\nosecformatdef{GlsXtrIfHasNonZeroChildCount}
+which is provided with \sty{glossaries-extra-bib2gls} v1.31+.
+Within \meta{true}, you can access the actual value with
+\ics{glscurrentfieldvalue}. If \csopt[false]{save-child-count},
+this command will do \meta{false} as the \field{childcount} field
+won't be set.
+
 For example, suppose \filefmt{entries.bib} contains:
 \begin{verbatim}
 @index{birds}

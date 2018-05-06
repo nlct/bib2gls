@@ -2413,7 +2413,11 @@ If you want a complete list of all defined terms, you can use:
 \nosecformatdef{printunsrtglossary}
 This lists all the terms for the given glossary (identified by the
 \printglossopt{type} key in \meta{options}, see
-\sectionref{sec:multigloss}) in the order of definition.
+\sectionref{sec:multigloss}) according to the order of the
+glossary's internal list of labels, which is typically in the order of 
+definition. (As each entry is defined, its label is appended to the
+internal list of the associated glossary.)
+
 You can change the default title with the \printglossopt{title} option. For
 example:
 \begin{codeenv}
@@ -2439,7 +2443,8 @@ document overhead, and some require additional packages to be
 loaded, when using \sty{glossaries-extra}, it's a good idea to
 disable the automatic loading of all styles with \styopt{nostyles}
 and then use \styopt{stylemods} to load the specific packages (along
-with the \sty{glossaries-extra-stylemods} package). For example, the
+with the \sty{glossaries-extra-stylemods} package, which patches
+some of the predefined styles). For example, the
 \glostyle{index} style is provided by the \styfmt{glossary-tree}
 package, so \styopt[tree]{stylemods} will automatically load
 \styfmt{glossary-tree} and provide all the tree-like styles,
@@ -2843,19 +2848,47 @@ but not a grandparent). For example:
  \styopt[dot]{postpunc},\comment{append full stop after description}
  \styopt{nostyles},\styopt[tree]{stylemods}]\marg{glossaries-extra}
 \strut
-\gls{newglossaryentry}\marg{bow}\marg{\field{name}=\marg{bow},\field{description}=\marg{}}
+\gls{newglossaryentry}\marg{bow1}
+\marg{
+ \field{name}=\marg{bow},
+ \field{description}=\marg{(rhymes with toe)}
+}
 \strut
 \gls{newglossaryentry}\marg{bowknot}
 \marg{
-  \field{parent} = \marg{bow},
+  \field{parent} = \marg{bow1},
   \field{description} = \marg{a knot tied with two loops and loose ends}
 }
 \strut
 \gls{newglossaryentry}\marg{bowweapon}
 \marg{
-  \field{parent} = \marg{bow},
+  \field{parent} = \marg{bow1},
   \field{description} = \marg{a weapon for shooting arrows, made of curved wood
   joined at both ends with taut string}
+}
+\strut
+\gls{newglossaryentry}\marg{bow2}
+\marg{
+ \field{name}=\marg{bow},
+ \field{description}=\marg{(rhymes with cow)}
+}
+\strut
+\gls{newglossaryentry}\marg{bowbend}
+\marg{
+  \field{parent} = \marg{bow2},
+  \field{description} = \marg{bend head or upper body}
+}
+\strut
+\gls{newglossaryentry}\marg{bowpressure}
+\marg{
+  \field{parent} = \marg{bow2},
+  \field{description} = \marg{give in to pressure}
+}
+\strut
+\gls{newglossaryentry}\marg{bow3}
+\marg{
+ \field{name}=\marg{bow},
+ \field{description}=\marg{(also bows) the front end of a ship}
 }
 \strut
 \gls{newglossaryentry}\marg{glossary}\marg{\field{name}=\marg{glossary},\field{description}=\marg{}}
@@ -2878,7 +2911,8 @@ but not a grandparent). For example:
 \end{codeenv}
 This produces
 \begin{result}
-\glsaddeach{hom.bow,hom.bowknot,hom.bowweapon,%
+\glsaddeach{hom.bow1,hom.bowknot,hom.bowweapon,%
+hom.bow2,hom.bowbend,hom.bowpressure,hom.bow3,%
 hom.glossary,hom.glossarycol,hom.glossarylist}%
 \setupglossaries{toc=false,section}%
 \glossariesextrasetup{postpunc=dot}%
@@ -2887,10 +2921,9 @@ hom.glossary,hom.glossarycol,hom.glossarylist}%
 }%
 \printunsrtglossary[style=treenoname,title=Glossary,nonumberlist,target=false]
 \end{result}
-The empty description for the top-level \code{bow} and
-\code{glossary} entries has caused an odd effect with a space occurring 
-between the name and the post-description punctuation. This can be removed by 
-redefining:
+The empty description for the top-level \code{glossary} entry has
+caused an odd effect with a space occurring between the name and the
+post-description punctuation. This can be removed by redefining:
 \nosecformatdef{glstreenonamedesc}
 so that it checks if the \field{description} field has been set with:
 \nosecformatdef{ifglshasdesc}
@@ -2902,6 +2935,18 @@ For example:
   \marg{}\comment{do nothing, description field is empty}
 }
 \end{codeenv}
+Another variation is to check if the entry has children add use a
+colon instead of a \idx{full-stop}. The base \sty{glossaries}
+package provides:
+\nosecformatdef{ifglshaschildren}
+However this method is very inefficient as it has to iterate over
+all defined entries and check if any have the \field{parent} field
+set to \meta{entry label}. A more efficient method can be obtained
+with \bibgls\ and the \csopt{save-child-count} resource option,
+which will save the number of child entries that have been indexed
+in an internal field labelled \field{childcount}. In this case, a
+more efficient method is to use:
+\nosecformatdef{GlsXtrIfHasNonZeroChildCount}
 
 \subsection{Multiple Glossaries}
 \label{sec:multigloss}
@@ -3036,6 +3081,8 @@ For example, if the \field{secondarygroup} field has been defined:
   \cmd{renewcommand}\marg{\gls{glsxtrgroupfield}}\marg{secondarygroup}\comment{}
 }
 \end{codeenv}
+Note that this just changes the group labels. The order is still
+according to the glossary's internal list of labels.
 
 Unlike \gls{printglossary} (used with \gls{makeindex} and
 \gls{xindy}) which inputs a file containing the code to typeset the glossary,
@@ -3153,6 +3200,20 @@ command, but it does check for the \field{symbolaccess} field if
 accessibility support has been added (see \sectionref{sec:accsupp}). 
 For other fields, you can use the commands described in
 \sectionref{sec:userkeys}.
+
+If you need to substitute the \field{name} for another field in the
+target, you can use:
+\nosecformatdef{glsxtrglossentryother}
+instead of \gls{glsxtrglossentry},
+where \meta{label} identifies the entry and \meta{field} is the
+internal field label to use instead of the \field{name}. The
+\meta{header} argument is the code to use in the header, which
+should be left empty for the default value, if
+\gls{glsxtrglossentryother} is used in a sectioning command. (The
+first argument doesn't use standard \LaTeX\ optional syntax because
+the command has to be expandable in order for it to work correctly
+in section arguments.) This command obeys the \idx{postnamehook}
+even though it's not actually displaying the name.
 
 To pick up the \styopt{postpunc} setting and the
 \idx{postdescriptionhook}, append \gls{glspostdescription}

@@ -6503,6 +6503,59 @@ fully expands both the field value and \meta{text}},
   category={command}
 }
 
+@index{ifglshaschildren,
+  name={\csfmt{if\-gls\-has\-children}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has
+  child entries. This method is inefficient as it has to
+  iterate over all defined entries to determine which ones
+  have \meta{entry label} as the value of the \field{parent}
+  field. With \bibgls, a more efficient approach is to
+  use \csopt{save-child-count} and test the value of
+  the \field{childcount} field},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{GlsXtrIfFieldNonZero,
+  name={\csfmt{Gls\-Xtr\-If\-Field\-Non\-Zero}},
+  user1={\margm{field}\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given field value expands to a non-zero
+integer. If the field is undefined or empty, the value is assumed to
+be 0. If the field is set, it must expand to an integer value.
+The value can be referenced in \meta{true} or \meta{false}
+with \cs{glscurrentfieldvalue}},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  seealso={GlsXtrIfFieldEqNum},
+  category={command}
+}
+
+@index{GlsXtrIfFieldEqNum,
+  name={\csfmt{Gls\-Xtr\-If\-Field\-Eq\-Num}},
+  user1={\margm{field}\margm{entry label}\margm{number}\margm{true}\margm{false}},
+  description={tests if the given field value expands to the given
+integer \meta{number}. If the field is undefined or empty, the value is assumed to
+be 0. If the field is set, it must expand to an integer value.
+The value can be referenced in \meta{true} or \meta{false}
+with \cs{glscurrentfieldvalue}},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  seealso={GlsXtrIfFieldNonZero},
+  category={command}
+}
+
+@dualindexentry{GlsXtrIfHasNonZeroChildCount,
+  name={\csfmt{\Gls\-Xtr\-If\-Has\-Non\-Zero\-Child\-Count}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={for use with the \csopt{save-child-count} resource
+option, this uses \cs{GlsXtrIfFieldNonZero} to test if the
+\field{childcount} field has a non-zero value. The value
+can be referenced in \meta{true} or \meta{false} with
+\cs{glscurrentfieldvalue}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.31+},
+  seealso={GlsXtrIfFieldNonZero},
+  category={command}
+}
+
 @dualindexentry{glsxtrifcustomdiscardperiod,
   name={\csfmt{gls\-xtr\-if\-custom\-discard\-period}},
   user1={\margm{true}\margm{false}},
@@ -8742,12 +8795,13 @@ name} and the displayed \meta{text}},
   category={command}
 }
 
-@index{glsxtrglossother,
-  name={\csfmt{gls\-xtr\-gloss\-other}},
-  user1={\margm{cs}\margm{label}\margm{field}},
-  description={like \gls{glsxtrglossname} but uses the value given
-in the supplied internal \meta{field} where \meta{cs} is the command
-to use in the header (\meta{cs} may be empty if not required)},
+@index{glsxtrglossentryother,
+  name={\csfmt{gls\-xtr\-gloss\-entry\-other}},
+  user1={\margm{header}\margm{label}\margm{field}},
+  description={like \gls{glsxtrglossentry} but uses the value given
+in the supplied internal \meta{field} where \meta{header} is the
+code
+to use in the header (leave empty for default)},
   note={provided by \styfmt{glossaries-extra} v1.22+},
   category={command}
 }
@@ -8955,21 +9009,46 @@ to use in the header (\meta{cs} may be empty if not required)},
   user1 = {derivfn}
 }
 
-@index{hom.bow,
+@index{hom.bow1,
   name={bow},
+  description={(rhymes with toe)},
   category = {homograph}
 }
 
 @entry{hom.bowknot,
-  parent={hom.bow},
+  parent={hom.bow1},
   description = {a knot tied with two loops and loose ends},
   category = {homograph}
 }
 
 @entry{hom.bowweapon,
-  parent={hom.bow},
+  parent={hom.bow1},
   description = {a weapon for shooting arrows, made of curved wood
   joined at both ends with taut string},
+  category = {homograph}
+}
+
+@index{hom.bow2,
+  name={bow},
+  description={(rhymes with cow)},
+  category = {homograph}
+}
+
+@index{hom.bowbend,
+  parent={hom.bow2},
+  description={bend head or upper body},
+  category = {homograph}
+}
+
+@index{hom.bowpressure,
+  parent={hom.bow2},
+  description={give in to pressure},
+  category = {homograph}
+}
+
+@index{hom.bow3,
+  name={bow},
+  description={(also bows) the front end of a ship},
   category = {homograph}
 }
 

@@ -247,6 +247,7 @@ Defaulting to: {0}.
 <entry key="message.detected.charset">Detected encoding: {0}</entry>
 <entry key="message.default.charset">Default encoding: {0}</entry>
 <entry key="message.null">not set</entry>
+<entry key="message.missing.id">id missing</entry>
 <entry key="message.default.locale">Default document locale: {0} {1}</entry>
 <entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.supplemental.record">Adding supplemental record {0} to entry {1}''s record list.</entry>
@@ -526,7 +527,8 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>
 <entry key="bibtex.error.expecting_or">Expecting ''{0}'' or ''{1}''</entry>
-<entry key="bibtex.error.missing_id">Missing identifier</entry>
+<entry key="bibtex.error.missing.id">Missing identifier</entry>
+<entry key="bibtex.error.invalid.id">Invalid identifier element {0}</entry>
 <entry key="bibtex.error.missing_field_part">Missing field value</entry>
 <entry key="bibtex.error.missing_field_name">Missing field identifier</entry>
 <entry key="bibtex.error.unbalanced_braces">Unbalanced braces</entry>
