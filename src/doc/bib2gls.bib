@@ -2389,6 +2389,27 @@ cs}\margm{Glspl-like cs}},
   description={adds the given item to the given field that contains
    an \styfmt{etoolbox} internal list},
   note={provided by \styfmt{glossaries-extra} v1.12+},
+  seealso={glsxtrfieldifinlist,glsxtrfieldforlistloop,glsxtrfielddolistloop},
+  category={command}
+}
+
+@index{glsxtrfieldifinlist,
+  name={\csfmt{gls\-xtr\-field\-if\-in\-list}},
+  user1={\margm{label}\margm{field}\margm{item}\margm{true}\margm{false}},
+  description={tests if the given item is in the given field that contains
+   an \styfmt{etoolbox} internal list},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
+  seealso={glsxtrfieldxifinlist,glsxtrfieldlistadd,glsxtrfieldforlistloop,glsxtrfielddolistloop},
+  category={command}
+}
+
+@index{glsxtrfieldxifinlist,
+  name={\csfmt{gls\-xtr\-field\-x\-if\-in\-list}},
+  user1={\margm{label}\margm{field}\margm{item}\margm{true}\margm{false}},
+  description={tests if the expansion of the given item is in the given field that contains
+   an \styfmt{etoolbox} internal list},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
+  seealso={glsxtrfieldifinlist},
   category={command}
 }
 
@@ -4782,6 +4803,15 @@ field.},
   parent={internalfields}
 }
 
+@dualindexentry{field.childlist,
+  name={\fieldfmt{childlist}},
+  description={A list of labels (in \sty{etoolbox}'s internal list
+   format) of the children this entry has had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
 @dualindexentry{field.indexcounter,
   name={\fieldfmt{index\-counter}},
   description={Stores the location corresponding to the matching
@@ -6058,6 +6088,7 @@ field.},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list},
   note={provided by \styfmt{glossaries-extra}},
+  seealso={glsxtrfieldforlistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
   category={command}
 }
 
@@ -6068,6 +6099,7 @@ field.},
    an \styfmt{etoolbox} internal list, using the given handler},
   note={provided by \styfmt{glossaries-extra}, use at least v1.29 to
 avoid a bug},
+  seealso={glsxtrfielddolistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
   category={command}
 }
 
@@ -6544,7 +6576,7 @@ with \cs{glscurrentfieldvalue}},
 }
 
 @dualindexentry{GlsXtrIfHasNonZeroChildCount,
-  name={\csfmt{\Gls\-Xtr\-If\-Has\-Non\-Zero\-Child\-Count}},
+  name={\csfmt{Gls\-Xtr\-If\-Has\-Non\-Zero\-Child\-Count}},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={for use with the \csopt{save-child-count} resource
 option, this uses \cs{GlsXtrIfFieldNonZero} to test if the

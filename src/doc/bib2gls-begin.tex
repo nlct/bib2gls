@@ -2,6 +2,8 @@
 % arara: bib2gls: {group: on}
 % arara: bibtex
 % arara: xelatex
+% arara: bib2gls if found ("log", "has not been defined")
+% arara: xelatex if found ("log", "has not been defined")
 % arara: xelatex if found ("log", "Rerun")
 \documentclass[titlepage=false,fontsize=12pt,captions=tableheading]{scrreprt}
 
@@ -2454,6 +2456,7 @@ comma-separated list, so to load both \styfmt{glossary-tree} and
 For example:
 \begin{codeenv}
 \cmd{documentclass}\marg{scrartcl}
+\cmd{usepackage}\marg{\gls[noindex=false]{mhchem}}
 \cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
  \styopt{nostyles},\comment{don't load default style packages}
 \comment{load glossaries-extra-stylemods.sty and glossary-tree.sty:}
@@ -2470,7 +2473,7 @@ For example:
 \marg{
    \field{name} = \marg{amethyst},
    \field{description} = \marg{a purple type of quartz},
-   \field{symbol} = \marg{\gls{ce}\marg{SiO2}}
+   \field{symbol} = \marg{\gls[noindex=false]{ce}\marg{SiO2}}
 }
 \strut
 \gls{newglossaryentry}\marg{circumference}
@@ -2583,6 +2586,7 @@ custom command \csfmt{grouplabel} (that's not needed, but it's
 required by the \gls{glsaddstoragekey} syntax):
 \begin{codeenv}
 \cmd{documentclass}\marg{scrartcl}
+\cmd{usepackage}\marg{mhchem}
 \cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
  \styopt{nostyles},\comment{don't load default style packages}
  \styopt[tree]{stylemods}\comment{load glossary-tree.sty and patch styles}
@@ -2947,6 +2951,9 @@ which will save the number of child entries that have been indexed
 in an internal field labelled \field{childcount}. In this case, a
 more efficient method is to use:
 \nosecformatdef{GlsXtrIfHasNonZeroChildCount}
+If you don't use \bibgls, this command will always do \meta{false}
+unless you explicitly set the internal fields to the correct
+values.
 
 \subsection{Multiple Glossaries}
 \label{sec:multigloss}

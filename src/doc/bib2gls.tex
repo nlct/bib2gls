@@ -7811,7 +7811,10 @@ This is a boolean option. The default setting is
 If \csopt[true]{save-child-count},
 each entry will be assigned a field called \field{childcount} with
 the value equal to the number of child entries that have been
-selected.
+selected. As from version 1.5, this option also creates
+the \field{childlist} field for entries that have children
+selected. This field is in \sty{etoolbox}'s internal list
+format and can be iterated over using \ics{glsxtrfieldforlistloop}.
 
 The assignment is done using \ics{GlsXtrSetField} so there's
 no associated key. You can test if the field is set and non-zero
@@ -7856,11 +7859,16 @@ Then the \ext{glstex} file will contain:
 \begin{verbatim}
 \GlsXtrSetField{birds}{childcount}{2}
 \GlsXtrSetField{duck}{childcount}{0}
+\glsxtrfieldlistadd{birds}{childlist}{duck}
 \GlsXtrSetField{goose}{childcount}{0}
+\glsxtrfieldlistadd{birds}{childlist}{goose}
 \GlsXtrSetField{minerals}{childcount}{3}
 \GlsXtrSetField{amethyst}{childcount}{0}
+\glsxtrfieldlistadd{minerals}{childlist}{amethyst}
 \GlsXtrSetField{corundum}{childcount}{0}
+\glsxtrfieldlistadd{minerals}{childlist}{corundum}
 \GlsXtrSetField{quartz}{childcount}{0}
+\glsxtrfieldlistadd{minerals}{childlist}{quartz}
 \end{verbatim}
 Note that although \code{birds} has three children defined in the
 \ext{bib} file, only two have been selected, so the child count is
@@ -7885,6 +7893,9 @@ the base \styfmt{glossaries} package, and it doesn't complain if the
 entry or field don't exist, but note that \ics{glsxtrifhasfield}
 implicitly scopes its content. Use the starred version to omit the
 grouping.)
+
+You can perform a numerical test with \ics{GlsXtrIfFieldNonZero} or
+\ics{GlsXtrIfFieldEqNum}.
 
 \optsection{save-original-id}
 

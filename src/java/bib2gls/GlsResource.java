@@ -6050,6 +6050,14 @@ public class GlsResource
       {
          writer.format("\\GlsXtrSetField{%s}{childcount}{%d}%n",
            id, entry.getChildCount());
+
+         String parentId = entry.getParent();
+
+         if (parentId != null)
+         {
+            writer.format("\\glsxtrfieldlistadd{%s}{childlist}{%s}%n",
+              parentId, id);
+         }
       }
 
       if (checkEndPunc != null)
@@ -6683,6 +6691,24 @@ public class GlsResource
 
    private void flattenLonelyChildren(Vector<Bib2GlsEntry> entries)
    {
+      // This has to be done first to ensure the parent-child
+      // information is all correct.
+
+      for (int i = 0, n = entries.size(); i < n; i++)
+      {
+         Bib2GlsEntry entry = entries.get(i);
+         checkParent(entry, i, entries);
+      }
+
+      // This method will be called if saveChildCount == true
+      // && flattenLonely != FLATTEN_LONELY_PRE_SORT
+      // Don't need to go any further if flattenLonely == FLATTEN_LONELY_FALSE
+
+      if (flattenLonely == FLATTEN_LONELY_FALSE)
+      {
+         return;
+      }
+
       // The entries need to be traversed down the hierarchical
       // system otherwise moving a grandchild up the hierarchy
       // before the parent entry has been checked will confuse the
@@ -6695,14 +6721,6 @@ public class GlsResource
       TreeSet<Integer> keys = new TreeSet<Integer>();
 
       Vector<Bib2GlsEntry> discardList = new Vector<Bib2GlsEntry>();
-
-      // This has to be done first to ensure the parent-child
-      // information is all correct.
-      for (int i = 0, n = entries.size(); i < n; i++)
-      {
-         Bib2GlsEntry entry = entries.get(i);
-         checkParent(entry, i, entries);
-      }
 
       for (int i = 0, n = entries.size(); i < n; i++)
       {

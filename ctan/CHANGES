@@ -10,12 +10,16 @@ v1.5 (pending):
    - dual-sort-replace
    - secondary-sort-replace
 
+  * save-child-count now also creates the childlist internal field.
+
   * bug fixes:
 
    - corrected encoding setting 
    - corrected sort fallback
    - labelify-replace now recognises \$ in the replacement part as a
      reference to a captured group
+   - improved error handling for invalid entry IDs
+   - save-child-count was partially switching on flatten-lonely
 
 v1.4 (2018-04-09):
 
