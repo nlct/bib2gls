@@ -576,7 +576,12 @@ public class Gls2Bib extends LaTeXParserListener
    {
       message(getMessage("message.reading", file));
 
-      if (charset != null)
+      if (charset == null)
+      {
+         message(getMessage("message.default.charset", 
+            Charset.defaultCharset()));
+      }
+      else
       {
          message(getMessage("message.tex.charset", charset));
       }
