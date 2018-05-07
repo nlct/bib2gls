@@ -2943,6 +2943,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{slantsc,
+  name={\styfmt{slantsc}},
+  category={package},
+  parent={packages}
+}
+
 @index{babel,
   name={\styfmt{babel}},
   category={package},
@@ -3558,6 +3564,12 @@ hyphen}},
   parent={categoryattribute}
 }
 
+@index{headuc,
+  name={\catattrfmt{headuc}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
 @index{aposplural,
   name={\catattrfmt{apos\-plural}},
   category={categoryattribute},
@@ -3848,8 +3860,8 @@ hyphen}},
   the value may be one of: \styoptfmt{none} (not required, 
   the \field{description} or glossary style already supplies the 
   terminating punctuation), \styoptfmt{comma} (use a comma),
-  \styoptfmt{dot} (use a \idx{full-stop}), \meta{punctuation}
-  (use \meta{punctuation})}
+  \styoptfmt{dot} (use a \idx{full-stop} with the space factor
+   adjusted), \meta{punctuation} (use \meta{punctuation})}
 }
 
 @dualindexentry{styopt.indexcounter,
@@ -5805,6 +5817,10 @@ field.},
 @index{variant}
 @index{homograph}
 
+@index{moving-argument,
+  name={moving argument}
+}
+
 @index{uppercase,
  name={upper case}
 }
@@ -7085,6 +7101,15 @@ hyperlinks enabled otherwise just does \meta{text}},
   category={command}
 }
 
+@index{textit,
+  name={\csfmt{textit}},
+  user1={\margm{text}},
+  description={displays the given text in italic},
+  note={kernel command},
+  seealso={emph},
+  category={command}
+}
+
 @index{footnote,
   name={\csfmt{footnote}},
   user1={\oargm{number}\margm{text}},
@@ -7318,6 +7343,14 @@ usual delay},
   category={command}
 }
 
+@index{caption,
+  name={\csfmt{caption}},
+  user1={\oargm{list title}\margm{title}},
+  description={caption title},
+  note={kernel command},
+  category={command}
+}
+
 @index{boldsymbol,
   name={\csfmt{boldsymbol}},
   user1={\margm{symbol}},
@@ -7470,6 +7503,18 @@ hasn't been defined},
 @index{printgloss.target,
   parent = {printunsrtglossary},
   name = {\csoptfmt{target}},
+  category={commandoption},
+}
+
+@index{printgloss.targetnameprefix,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{target\-name\-prefix}},
+  category={commandoption},
+}
+
+@index{printgloss.prefix,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{prefix}},
   category={commandoption},
 }
 
@@ -8085,7 +8130,13 @@ abbreviation by the \catattr{markwords} attribute},
 }
 
 @index{gls.textformat,
-  name={\csoptfmt{textformat}},
+  name={\csoptfmt{text\-format}},
+  category={commandoption},
+  parent={gls}
+}
+
+@index{gls.prefix,
+  name={\csoptfmt{prefix}},
   category={commandoption},
   parent={gls}
 }
@@ -8208,7 +8259,9 @@ glossaries},
   name={\csfmt{gls\-tree\-name\-fmt}},
   user1={\margm{text}},
   description={used with the tree styles to format the entry's name},
-  note={provided by \styfmt{glossary-tree}},
+  note={provided by \styfmt{glossary-tree} v4.08+ and redefined by
+\styfmt{glossaries-extra-stylemods} v1.31+},
+  seealso={glstreegroupheaderfmt,glstreenavigationfmt,glstreedefaultnamefmt},
   category={command}
 }
 
@@ -8217,7 +8270,27 @@ glossaries},
   user1={\margm{text}},
   description={used with the tree styles to format the group
 headings},
-  note={provided by \styfmt{glossary-tree}},
+  note={provided by \styfmt{glossary-tree} v4.22+ and redefined
+  by \styfmt{glossaries-extra-stylemods} v1.31+},
+  category={command}
+}
+
+@index{glstreenavigationfmt,
+  name={\csfmt{gls\-tree\-navigation\-fmt}},
+  user1={\margm{text}},
+  description={used with the tree styles to format the navigation
+elements},
+  note={provided by \styfmt{glossary-tree} v4.22+ and redefined
+  by \styfmt{glossaries-extra-stylemods} v1.31+},
+  category={command}
+}
+
+@index{glstreedefaultnamefmt,
+  name={\csfmt{gls\-tree\-default\-name\-fmt}},
+  user1={\margm{text}},
+  description={used as the default format for \cs{glstreenamefmt},
+   \cs{glstreegroupheaderfmt} and \cs{glstreenavigationfmt}},
+  note={provided by \styfmt{glossaries-extra-stylemods} v1.31+},
   category={command}
 }
 
@@ -8851,6 +8924,67 @@ to use in the header (leave empty for default)},
   category={command}
 }
 
+@index{glsshowtarget,
+  name={\csfmt{gls\-show\-target}},
+  user1={\margm{label}},
+  description={used to show the target name when the
+\styopt[showtargets]{debug} option is on},
+  note={provided by \styfmt{glossaries} v4.32+},
+  category={command}
+}
+
+@index{GlsEntryCounterLabelPrefix,
+  name={\csfmt{Gls\-Entry\-Counter\-Label\-Prefix}},
+  description={used as a prefix in the \gls{label} command
+   automatically implemented by the \styopt{entrycounter}
+    and \styopt{subentrycounter} options},
+  note={provided by \styfmt{glossaries} v4.38+},
+  category={command}
+}
+
+@index{GlsXtrStandaloneGlossaryType,
+  name={\csfmt{Gls\-Xtr\-Stand\-alone\-Glossary\-Type}},
+  description={expands to the label for \gls{currentglossary}
+   within \gls{glsxtrglossentry} and \gls{glsxtrglossentryother}},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{GlsXtrStandaloneSubEntryItem,
+  name={\csfmt{Gls\-Xtr\-Stand\-alone\-Sub\-Entry\-Item}},
+  user1 = {\margm{label}},
+  description={used within \gls{glsxtrglossentry} and
+\gls{glsxtrglossentryother} to display sub-item labels},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{glsresetentrycounter,
+  name={\csfmt{gls\-reset\-entry\-counter}},
+  description={resets the \counter{glossaryentry} counter if the
+\styopt{entrycounter} setting is on},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{setupglossaries,
+  name={\csfmt{set\-up\-glossaries}},
+  user1 = {\margm{\keyvallist}},
+  description={applies the base \styfmt{glossaries} options
+  that are allowed to be changed after the package has loaded},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossariesextrasetup,
+  name={\csfmt{glossaries\-extra\-setup}},
+  user1 = {\margm{\keyvallist}},
+  description={applies the extension \styfmt{glossaries-extra} options
+  that are allowed to be changed after the package has loaded},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
 @index{glstreepredesc,
   name={\csfmt{gls\-tree\-pre\-desc}},
   user1={\margm{label}},
@@ -8870,8 +9004,71 @@ to use in the header (leave empty for default)},
   category={command}
 }
 
+@index{glsfmtshort,
+  name={\csfmt{gls\-fmt\-short}},
+  user1={\margm{label}},
+  description={provided for use in section or caption titles, this
+displays the short form of the given abbreviation},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsfmtlong,
+  name={\csfmt{gls\-fmt\-long}},
+  user1={\margm{label}},
+  description={provided for use in section or caption titles, this
+displays the long form of the given abbreviation},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsfmtfull,
+  name={\csfmt{gls\-fmt\-full}},
+  user1={\margm{label}},
+  description={provided for use in section or caption titles, this
+displays the full form of the given abbreviation},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsfmtname,
+  name={\csfmt{gls\-fmt\-name}},
+  user1={\margm{label}},
+  description={provided for use in section or caption titles, this
+displays the given entry's name},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsfmtfirst,
+  name={\csfmt{gls\-fmt\-first}},
+  user1={\margm{label}},
+  description={provided for use in section or caption titles, this
+displays the given entry's \field{first} field},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glsfmttext,
+  name={\csfmt{gls\-fmt\-text}},
+  user1={\margm{label}},
+  description={provided for use in section or caption titles, this
+displays the given entry's \field{text} field},
+  note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{tableofcontents,
+  name={\csfmt{table\-of\-contents}},
+  description={displays the table of contents (by reading in the
+\ext{toc} file) and then opens \ext{toc} file to allow the
+sectioning commands to write to it},
+  note={kernel command},
+  category={command}
+}
+
 @index{underline,
-  name={\csfmt{underline}},
+  name={\csfmt{under\-line}},
   user1={\margm{text}},
   description={underlines the given text},
   note={kernel command},
@@ -9147,6 +9344,13 @@ to use in the header (leave empty for default)},
 @entry{hier.mineral,
  name = {mineral},
  description = {natural inorganic substance},
+ category = {hierarchical}
+}
+
+@entry{hier.calcite,
+ parent = {hier.mineral},
+ name = {calcite},
+ description = {a carbonate mineral},
  category = {hierarchical}
 }
 

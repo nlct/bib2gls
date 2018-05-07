@@ -1,5 +1,10 @@
 v1.5 (pending):
 
+  * added introductory guide (bib2gls-begin.pdf)
+
+  * rearranged some the listing of resource options in 
+    the main user manual (bib2gls.pdf)
+
   * new .glstex helper command:
 
     \bibglssetlastgrouptitle

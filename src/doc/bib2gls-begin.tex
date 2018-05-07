@@ -24,7 +24,11 @@
 
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
-\usepackage[record,subentrycounter,nostyles,stylemods={bookindex},style=index]{glossaries-extra}
+\usepackage[record,
+ entrycounter,subentrycounter,%need to define counters for some examples
+ nostyles,stylemods={bookindex},style=index]{glossaries-extra}
+
+\setupglossaries{entrycounter=false,subentrycounter=false}
 
 \definecolor{field}{named}{DarkSlateGray4}
 \definecolor{cs}{named}{DarkSeaGreen4}
@@ -33,6 +37,8 @@
 \definecolor{comment}{named}{gray}
 \definecolor{attribute}{named}{Purple4}
 \definecolor{style}{named}{Blue4}
+
+\newcommand{\extstyopt}{\textsuperscript{\textdagger}}
 
 \newcommand{\dhyphen}{%
  \texorpdfstring
@@ -107,6 +113,7 @@
 \newenvironment{result}%
 {%
  \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{hyper=false,local}}%
+ \glsresetentrycounter
  \begin{quotation}%
  \marginpar
   [\raisebox{-2.5ex}{\ding{43}}]%
@@ -403,7 +410,7 @@
 \externaldocument{bib2gls}
 
 \newcommand{\addr}[1]{\\\href{https://www.#1/}{\nolinkurl{#1}}}
-\title{\bibgls\ and \styfmt{glossaries-extra}: A Guide for Beginners}
+\title{\styfmt{glossaries-extra} and \bibgls: An Introductory Guide}
 \author{Nicola Talbot\addr{dickimaw-books.com}}
 \date{\DTMusedate{moddate}}
 
@@ -1354,7 +1361,7 @@ definition. For example, consider the following document:
 \cmd{documentclass}\marg{article}
 \cmd{newcommand}\marg{\csfmt{test}}\marg{some sample text}
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \gls[noindex=false]{section}\marg{\csfmt{test}}
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -1372,7 +1379,7 @@ of another command, that will also be expanded. For example:
 \cmd{newcommand}\marg{\csfmt{sample}}\marg{\gls{emph}\marg{sample}}
 \cmd{newcommand}\marg{\csfmt{test}}\marg{some \csfmt{sample}\gls{cs.space}text}
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \gls{section}\marg{\csfmt{test}}
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -1395,7 +1402,7 @@ been expanded. \Idx{robust} commands don't expand. For example:
 }
 \strut
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \gls{section}\marg{\gls{Gls}\marg{duck}: \gls{glsentrydesc}\marg{duck}}
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -1422,7 +1429,7 @@ For example, the following won't work:
 }
 \strut
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \gls{section}\marg{\gls{Gls}\marg{duck}\gls{footnote}\marg{\gls{glsentrydesc}\marg{duck}}}\incorrect
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -1461,7 +1468,7 @@ example, the following doesn't work:
 }
 \strut
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \gls{section}\marg{\gls{Gls}\marg{duck}: \gls{glsentrydesc}\marg{duck}}\incorrect
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -1485,7 +1492,7 @@ also define the term \qt{waterbird}:
 }
 \strut
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \gls{section}\marg{\gls{Gls}\marg{duck}: \gls{glsentrydesc}\marg{duck}}
 \cmd{end}\marg{document}
 \end{codeenv}
@@ -2456,7 +2463,7 @@ comma-separated list, so to load both \styfmt{glossary-tree} and
 For example:
 \begin{codeenv}
 \cmd{documentclass}\marg{scrartcl}
-\cmd{usepackage}\marg{\gls[noindex=false]{mhchem}}
+\cmd{usepackage}\marg{\gls[noindex=false]{mhchem}}\comment{provides \gls{ce}}
 \cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
  \styopt{nostyles},\comment{don't load default style packages}
 \comment{load glossaries-extra-stylemods.sty and glossary-tree.sty:}
@@ -2801,6 +2808,13 @@ for \idxpl{hierarchical-entry}:
   \field{description} = \marg{natural inorganic substance}
 }
 \strut
+\gls{newglossaryentry}\marg{calcite}\comment{label}
+\marg{
+  \field{parent} = \marg{mineral},\comment{parent label}
+  \field{name} = \marg{calcite},
+  \field{description} = \marg{a carbonate mineral}
+}
+\strut
 \gls{newglossaryentry}\marg{quartz}
 \marg{
   \field{parent} = \marg{mineral},
@@ -2830,13 +2844,13 @@ for \idxpl{hierarchical-entry}:
 This produces:
 \begin{result}
 \glsaddeach{hier.animal,hier.bird,hier.duck,hier.goose,hier.mineral,%
-hier.quartz,hier.amethyst,hier.citrine}%
+hier.calcite,hier.quartz,hier.amethyst,hier.citrine}%
 \setupglossaries{toc=false,section}%
 \glossariesextrasetup{postpunc=dot}%
 \renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
   \glsifcategory{#1}{hierarchical}{}{\printunsrtglossaryskipentry}%
 }%
-\printunsrtglossary[subentrycounter=false,style=indexgroup,title=Glossary,nonumberlist,target=false]
+\printunsrtglossary[style=indexgroup,title=Glossary,nonumberlist,target=false]
 \end{result}
 
 The \glostyle{treenoname} and \glostyle{treenonamegroup} styles are
@@ -2844,7 +2858,18 @@ appropriate for \idxpl{homograph}. These are usually best with the
 \styopt{subentrycounter} package option, which defines the
 \counter{glossarysubentry} counter that's incremented and
 displayed for every level~1 entry (that is, an entry with a parent
-but not a grandparent). For example:
+but not a grandparent). If the \styopt{entrycounter} option is also
+used, \counter{glossaryentry} is set as the master counter for
+\counter{glossarysubentry} (although it's not included in the 
+display form of that counter), but \styopt{subentrycounter} may be used
+without \styopt{entrycounter}, in which case
+\counter{glossarysubentry} has no master counter. If
+\styopt{subentrycounter} is used as a package option and
+\styopt{entrycounter} is later switched on outside of the package
+option list (through \gls{setupglossaries} or in the optional argument of
+\gls{printunsrtglossary}) then it won't be made the master counter.
+
+For example:
 \begin{codeenv}
 \cmd{documentclass}\marg{scrartcl}
 \strut
@@ -2918,7 +2943,7 @@ This produces
 \glsaddeach{hom.bow1,hom.bowknot,hom.bowweapon,%
 hom.bow2,hom.bowbend,hom.bowpressure,hom.bow3,%
 hom.glossary,hom.glossarycol,hom.glossarylist}%
-\setupglossaries{toc=false,section}%
+\setupglossaries{toc=false,section,subentrycounter}%
 \glossariesextrasetup{postpunc=dot}%
 \renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
   \glsifcategory{#1}{homograph}{}{\printunsrtglossaryskipentry}%
@@ -2948,12 +2973,21 @@ all defined entries and check if any have the \field{parent} field
 set to \meta{entry label}. A more efficient method can be obtained
 with \bibgls\ and the \csopt{save-child-count} resource option,
 which will save the number of child entries that have been indexed
-in an internal field labelled \field{childcount}. In this case, a
-more efficient method is to use:
+in an internal field labelled \field{childcount} and a list of child
+entry labels is stored in the internal field labelled
+\field{childlist}. In this case, a more efficient method is to use:
 \nosecformatdef{GlsXtrIfHasNonZeroChildCount}
+which checks the \field{childcount} field for a non-zero value.
 If you don't use \bibgls, this command will always do \meta{false}
 (unless you explicitly set the internal fields to the correct
-values).
+values, which is tedious and has to be updated whenever 
+definitions are added, deleted or have the \field{parent} field
+changed).
+
+Another variation could use custom fields (see
+\sectionref{sec:userkeys}) to store the pronunciation guide (\qt{rhymes
+with \ldots}) and the alternative version (\qt{also \ldots}) as well
+as other information, such as whether the word is a noun or verb.
 
 \subsection{Multiple Glossaries}
 \label{sec:multigloss}
@@ -2965,7 +2999,11 @@ The \styopt{nomain} package option suppresses the creation of the
 \code{main} glossary, in which case \gls{glsdefaulttype} will be set to
 the first glossary to be defined. (There must be at least one
 glossary defined, so if you use \styopt{nomain} you must provide
-another default.)
+another default.) If you use the \styopt{entrycounter} package
+option, the associated counter isn't reset at the start of the
+glossary. If you have multiple glossaries and you need it to be reset, add:
+\nosecformatdef{glsresetentrycounter}
+before the start of the appropriate glossary.
 
 Abbreviations defined with \gls{newabbreviation}
 (see \sectionref{sec:abbreviations}) are, by default, assigned to the glossary 
@@ -3011,7 +3049,7 @@ with \gls{makeindex} or \gls{xindy}.) For example:
 \marg{\comment{settings:}
   \field{name} = \marg{\gls{si}\marg{\cmd{metre}}},
   \field{description} = \marg{length},
-  \field{type} = \marg{measurements}
+  \field{type} = \marg{measurements}\comment{glossary label}
 }
 \end{codeenv}
 In this case, the label identifying the new glossary is
@@ -3064,11 +3102,7 @@ it's still possible to display an \idx{ignoredglossary} with
 It's possible to use \gls{printunsrtglossary} multiple times for the
 same glossary, but if you have hyperlinks you will need to either
 suppress the targets with \printglossopt[false]{target} or change
-the target name. The target names are all prefixed with:
-\nosecformatdef{glolinkprefix}
-so changing this before displaying the glossary will change the
-targets, but commands like \gls{gls} also use this prefix, so they
-will only link to the glossary item with a matching prefix.
+the target name (see \sectionref{sec:targetnames}).
 
 The starred form of \gls{printunsrtglossary} has an extra
 argument:
@@ -3168,12 +3202,53 @@ For example, the following excludes any entries that have the
    \gls{glsxtriflabelinlist}
    \marg{\gls{glscategory}\marg{\gls{param}1}}\comment{category label for this entry}
    \marg{abbreviation,acronym}\comment{exclusion list}
-   \marg{\gls{printunsrtglossaryskipentry}}\comment{}
-   \marg{}
+   \marg{\gls{printunsrtglossaryskipentry}}\comment{skip (exclude)}
+   \marg{}\comment{don't skip (include)}
   }\comment{}
 }
 \end{codeenv}
 
+\subsection{Hyperlink Targets}
+\label{sec:targetnames}
+
+The naming system used for the hyperlinks from commands like
+\gls{gls} and \gls{glssymbol} to the corresponding definition in the
+glossary is given by \meta{prefix}\meta{label} where \meta{label} is
+the entry's label and \meta{prefix} is given by:
+\nosecformatdef{glolinkprefix}
+This can locally be changed within commands like \gls{gls} and
+\gls{glssymbol} with the \glsopt{prefix} option. There is a matching
+\printglossopt{prefix} option for \gls{printunsrtglossary}.
+You can set an additional prefix in the glossary with
+\printglossopt[\meta{extra}]{targetnameprefix}, which means that the
+target name in the glossary is now
+\code{\meta{extra}\gls{glolinkprefix}\meta{label}} (so
+\printglossopt{targetnameprefix} doesn't modify \gls{glolinkprefix}
+but prepends an extra prefix).
+
+If you change the prefix either by using the above options or by
+redefining \gls{glolinkprefix}, you need to make sure that the
+target names match for the links to work correctly.
+The \styopt[showtargets]{debug} package option can be used to show
+the target names in the document. The target is displayed in the
+document using:
+\nosecformatdef{glsshowtarget}
+which may be redefined as appropriate. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{hyperref}
+\cmd{usepackage}[\styopt{debug}=showtargets]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{sample}\marg{\field{name}=\marg{sample},\field{description}=\marg{an example}}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\oarg{\glsopt{prefix}=\marg{TARGET.}}\marg{sample}.
+\strut
+\gls{printunsrtglossary}\oarg{\printglossopt{prefix}=\marg{TARGET.}}
+\gls{printunsrtglossary}\oarg{\printglossopt{prefix}=\marg{TARGET.},\printglossopt{targetnameprefix}=\marg{EXTRA.}}
+\cmd{end}\marg{document}
+\end{codeenv}
 
 \section{Stand-alone Definitions}
 \label{sec:standalone}
@@ -3187,6 +3262,11 @@ but it also obeys the \idx{postnamehook} (see
 and \catattr{glossnamefont} attributes (see
 \sectionref{sec:glossname}), and provides accessibility support if
 the \field{access} field is set (see \sectionref{sec:accsupp}).
+This command may be used for both top-level and child entries, and
+will obey the \styopt{entrycounter} (see below) and \styopt{subentrycounter}
+(see \sectionref{sec:parent}) package options according to the
+entry's hierarchical level.
+
 This command doesn't display any of the other field values. 
 If any are required, you need to add them afterwards.
 For the description, you can use \gls{glsentrydesc}, but it's better
@@ -3199,6 +3279,10 @@ Unlike \gls{glsentrydesc}, which just displays the value of the
 \nosecformatdef{Glossentrydesc}
 which converts the first letter of the description to
 \idx{uppercase}.
+To pick up the \styopt{postpunc} setting and the
+\glslink{postdescriptionhook}{post-description category hook}, 
+append \gls{glspostdescription}
+after the description (see \sectionref{sec:postfieldhooks}).
 
 There's a similar command for symbols:
 \nosecformatdef{glossentrysymbol}
@@ -3211,25 +3295,28 @@ For other fields, you can use the commands described in
 If you need to substitute the \field{name} for another field in the
 target, you can use:
 \nosecformatdef{glsxtrglossentryother}
-instead of \gls{glsxtrglossentry},
+instead of \code{\gls{glsxtrglossentry}\margm{label}},
 where \meta{label} identifies the entry and \meta{field} is the
 internal field label to use instead of the \field{name}. The
-\meta{header} argument is the code to use in the header, which
-should be left empty for the default value, if
-\gls{glsxtrglossentryother} is used in a sectioning command. (The
-first argument doesn't use standard \LaTeX\ optional syntax because
-the command has to be expandable in order for it to work correctly
-in section arguments.) This command obeys the \idx{postnamehook}
-even though it's not actually displaying the name.
+\meta{header} argument is the code to use in the header (which
+should be left empty for the default value\footnote{The
+\meta{header} argument doesn't use standard \LaTeX\ optional syntax
+\code{\oargm{option}} because \gls{glsxtrglossentryother} has to be 
+expandable in order for it to work correctly in section arguments.})\ if
+\gls{glsxtrglossentryother} is used in a sectioning command. This
+command obeys the \catattr{glossname} and \catattr{glossnamefont}
+attributes and the \idx{postnamehook}, even though it's not actually
+displaying the name. For example,
+\begin{codeenv}
+\cmd{section}\marg{\gls{glsxtrglossentryother}\marg{}\marg{duck}\marg{\field{plural}}}
+\end{codeenv}
 
-To pick up the \styopt{postpunc} setting and the
-\idx{postdescriptionhook}, append \gls{glspostdescription}
-after the description (see \sectionref{sec:postfieldhooks}).
-For example:
+Here's a complete example that uses \gls{glsxtrglossentry} after an
+equation to describe the notation:
 \begin{codeenv}
 \cmd{documentclass}\marg{article}
 \strut
-\cmd{usepackage}\marg{\gls[noindex=false]{xcolor}}
+\cmd{usepackage}\marg{\gls[noindex=false]{xcolor}}\comment{provides colour}
 \cmd{usepackage}[colorlinks,linkcolor=purple]\marg{\gls[noindex=false]{hyperref}}
 \cmd{usepackage}[\styopt[dot]{postpunc}]\marg{glossaries-extra}
 \strut
@@ -3395,12 +3482,15 @@ than the actual formatting of the entries. Additional vertical
 spacing, appropriate alignment and a paragraph column specifier are
 left as an exercise for the reader.
 
+\subsection{Numbering Top-Level Entries}
+\label{sec:entrycounter}
+
 The \styopt{entrycounter} package option creates a new counter
 called \counter{glossaryentry}, which will automatically be
 incremented and displayed at the start of \gls{glsxtrglossentry}
 for top-level entries. (The \counter{glossarysubentry} counter created with the
 \styopt{subentrycounter} option, described in \sectionref{sec:parent},
-is independent of the \styopt{entrycounter} package option.) In
+may be used independently of the \styopt{entrycounter} package option.) In
 the above example, this counter will need to depend on the custom
 \counterfmt{localglossary} counter to ensure that it's reset at the
 start of each \envfmt{localglossary} environment. This can easily be
@@ -3414,26 +3504,29 @@ first:
 \end{codeenv}
 The default definition of \gls{theHglossaryentry} is:
 \begin{codeenv}
-\gls[noindex=false]{currentglossary}.\gls[noindex=false]{theglossaryentry}
+\gls{currentglossary}.\gls[noindex=false]{theglossaryentry}
 \end{codeenv}
-Since this example is using stand-alone definitions rather than
-\gls{printunsrtglossary} (see \sectionref{sec:printgloss}), this
-definition isn't appropriate and will cause duplicate destination
-warnings. The simplest solution is to redefine
-\gls{theHglossaryentry} in terms of the custom
+The prefix \gls{currentglossary} is set by both
+\gls{printunsrtglossary} and \gls{glsxtrglossentry} to the current
+glossary label (given by the \printglossopt{type} option in
+\gls{printunsrtglossary} and by the entry's \field{type} field for
+\gls{glsxtrglossentry}). In the case of \gls{glsxtrglossentry}
+(and \gls{glsxtrglossentryother}), the value of
+\gls{currentglossary} is obtained from:
+\nosecformatdef{GlsXtrStandaloneGlossaryType}
+which defaults to the value of the \field{type} field for the
+current entry.
+
+Since this example is using multiple stand-alone definitions that
+may repeat the same entry, this definition isn't appropriate and will 
+cause duplicate destination warnings. The simplest solution is to redefine
+\gls{GlsXtrStandaloneGlossaryType} in terms of the custom
 \counterfmt{localglossary} counter value:
 \begin{codeenv}
-\cmd{renewcommand}\marg{\cmd{theHglossaryentry}}\marg{\comment{}
- \cmd{thelocalglossary}.\cmd{arabic}\marg{\counter{glossaryentry}}}
-\end{codeenv}
-and change \gls{glsstepentry} to use a unique label:
-\begin{codeenv}
-\cmd{renewcommand}*\marg{\gls{glsstepentry}}[1]\marg{\comment{}
-  \cmd{refstepcounter}\marg{\counter{glossaryentry}}\comment{}
-  \gls[noindex=false]{label}\marg{glsentry\cmd{arabic}\marg{localglossary}-\gls{param}1}\comment{}
+\cmd{renewcommand}\marg{\cmd{GlsXtrStandaloneGlossaryType}}\marg{\comment{}
+ standalone.\cmd{thelocalglossary}.\cmd{arabic}\marg{\counter{glossaryentry}}\comment{}
 }
 \end{codeenv}
-(or remove the \gls{label} from the definition if it's unrequired).
 
 Unlike commands such as \gls{gls}, which can be problematic in moving
 arguments, \gls{glsxtrglossentry} is designed to work in section
@@ -3461,7 +3554,7 @@ headings. For example:
  \gls{Glossentrydesc}\marg{\gls{param}1}\gls{glspostdescription}\cmd{par}
 }
 \cmd{begin}\marg{document}
-\cmd{tableofcontents}
+\gls{tableofcontents}
 \cmd{section}\marg{Types of Quartz}
 A reference to \gls{gls}\marg{amethyst}.
 \strut
@@ -3495,6 +3588,142 @@ The \catattr{glossname} attribute can then be omitted. This is a bit
 inconvenient, but if you use \bibgls\ (see \sectionref{sec:bib2gls})
 this can be performed automatically with the
 \csopt{name-case-change} resource option.
+
+\subsection{Stand-alone Hierarchical Entries}
+\label{sec:standalonehierarchy}
+
+Sub-entries can also be displayed with \gls{glsxtrglossentry} or
+\gls{glsxtrglossentryother}. These check if the entry has a parent
+(with \gls{ifglshasparent}).  If it doesn't, then it will display
+the \counter{glossaryentry} counter label if the
+\styopt{entrycounter} package option has been used. If the entry
+does have a parent, it uses:
+\nosecformatdef{GlsXtrStandaloneSubEntryItem}
+which checks the internal \field{level} field to
+determine the hierarchical level. If the \field{level} is~1 (that
+is, the entry has a parent but not a grandparent) then it will
+display the \counter{glossarysubentry} label if that counter has
+been defined, otherwise it does nothing.
+
+Here's an example document with a top-level entry (\code{mineral}),
+a level~1 entry (\code{quartz}) and a level~2 entry (\code{amethyst}).
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{xcolor}\comment{provides colour}
+\cmd{usepackage}[colorlinks,linkcolor=magenta]\marg{hyperref}
+\cmd{usepackage}[
+ \styopt{entrycounter},\comment{enable top-level counter}
+ \styopt{subentrycounter},\comment{enable level 1 counter}
+ \styopt{postpunc}=\marg{dot},\comment{put full-stop after description}
+ \styopt{nostyles},\comment{suppress automatic loading of default styles}
+ \styopt[tree]{stylemods}\comment{load glossary-tree.sty}
+]\marg{glossaries-extra}
+\strut
+\gls{newglossaryentry}\marg{mineral}
+\marg{
+  \field{name} = \marg{mineral},
+  \field{description} = \marg{natural inorganic substance},
+  \field{category} = \marg{mineral}
+}
+\strut
+\gls{newglossaryentry}\marg{calcite}
+\marg{
+  \field{parent} = \marg{mineral},
+  \field{name} = \marg{calcite},
+  \field{description} = \marg{a carbonate mineral},
+  \field{category} = \marg{mineral}
+}
+\strut
+\gls{newglossaryentry}\marg{quartz}
+\marg{
+  \field{parent} = \marg{mineral},
+  \field{name} = \marg{quartz},
+  \field{description} = \marg{hard mineral consisting of silica},
+  \field{category} = \marg{mineral}
+}
+\strut
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+  \field{parent} = \marg{quartz},
+  \field{name} = \marg{amethyst},
+  \field{description} = \marg{a purple type of quartz},
+  \field{category} = \marg{mineral}
+}
+\strut
+\gls{glssetcategoryattribute}\marg{mineral}\marg{glossname}\marg{firstuc}
+\strut
+\cmd{renewcommand}\marg{\gls[noindex=false]{GlsXtrStandaloneGlossaryType}}\marg{standalone}
+\strut
+\cmd{newcommand}\marg{\cmd{displayterm}}\oarg{1}\marg{\comment{}
+ \cmd{par}
+ Definition \gls{glsxtrglossentry}\marg{\gls{param}1}:
+ \gls{glossentrydesc}\marg{\gls{param}1}\gls{glspostdescription}\cmd{par}
+}
+\strut
+\cmd{begin}\marg{document}
+\cmd{displayterm}\marg{mineral}
+\cmd{displayterm}\marg{calcite}
+\cmd{displayterm}\marg{quartz}
+\cmd{displayterm}\marg{amethyst}
+\strut
+A reference to \gls{gls}\marg{mineral}.
+A reference to \gls{gls}\oarg{\printglossopt{prefix}={main.}}\marg{amethyst}.
+\strut
+\cmd{renewcommand}\marg{\gls{GlsEntryCounterLabelPrefix}}\marg{main.glsentry-}
+\gls{glsresetentrycounter}
+\gls{printunsrtglossary}\oarg{\printglossopt{prefix}=\marg{main.},\printglossopt{style}=tree}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+\renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{local}}%
+\def\glolinkprefix{standalone.hier.}%
+\renewcommand{\glstextformat}[1]{\textcolor{magenta}{#1}}%
+\setupglossaries{entrycounter,subentrycounter,section,toc=false}%
+\glossariesextrasetup{postdot}%
+\glssetcategoryattribute{hierarchical}{glossname}{firstuc}%
+\renewcommand{\GlsXtrStandaloneGlossaryType}{standalone}%
+\newcommand{\displayterm}[1]{%
+ \par
+ \begingroup
+   Definition \glsxtrglossentry{#1}:
+   \glossentrydesc{#1}\glspostdescription\par
+ \endgroup
+}%
+\displayterm{hier.mineral}
+\displayterm{hier.calcite}
+\displayterm{hier.quartz}
+\displayterm{hier.amethyst}
+
+A reference to \gls{hier.mineral}.
+A reference to \gls[prefix={hierarchical.main.}]{hier.amethyst}.
+
+\printunsrtglossary*[prefix={hierarchical.main.},style=tree,nonumberlist]
+{%
+  \glsresetentrycounter
+  \renewcommand{\GlsEntryCounterLabelPrefix}{hierarchical.main.glsentry-}%
+  \renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+    \glsxtriflabelinlist{#1}{hier.mineral,hier.calcite,hier.quartz,hier.amethyst}%
+    {}{\printunsrtglossaryskipentry}%
+  }%
+}
+\end{result}
+Note the need to reset the \counter{glossaryentry} counter with 
+\gls{glsresetentrycounter} before the main glossary. The top-level
+entry (\code{mineral}) has the label formatted as
+\qt{1.\textvisiblespace} and the level~1 entries (\code{calcite}
+and \code{quartz}) have their labels formatted as
+\qt{1)\textvisiblespace} and \qt{2)\textvisiblespace} but the
+level~2 entry (\code{amethyst}) doesn't have an associated number.
+If you want to number levels deeper than 1, you will have to provide
+your own custom counters. (If the stand-alone level~2 entry shows a
+number when you try this, then you've encountered a bug that's been
+fixed in \sty{glossaries-extra} version~1.31.)
+
+The hyperlinks are shown in magenta. The first (\code{mineral}) links to the
+stand-alone target, and the second (\code{amethyst}) links to the entry in 
+the main glossary.
 
 \chapter{Changing the Formatting}
 \label{sec:glsformats}
@@ -3619,7 +3848,7 @@ For example:
 \gls{glssetcategoryattribute}\marg{ornament}\marg{\catattr{textformat}}\marg{ornamentfmt}
 \strut
 \gls{setabbreviationstyle}\marg{\abbrstyle[noindex=false]{long-short-em}}
-\gls{setabbreviationstyle}\oarg[acronym]\marg{short-sc-nolong}
+\gls{setabbreviationstyle}\oarg{acronym}\marg{\abbrstyle[noindex=false]{short-sc-nolong}}
 \strut
 \gls{newglossaryentry}\marg{duck}\comment{label}
 \marg{
@@ -3821,7 +4050,7 @@ This produces:
 \newcommand{\glsxtrpostlinkornament}{\space (\glsentrydesc{\glslabel})}%
 \newcommand{\glsxtrpostlinkconstant}{\space (\glsentrysymbol{\glslabel})}%
 A \gls{ex.fleuron} and \gls{ex.pi}. Another \gls{ex.fleuron} and 
-\gls{ex.pi}. Symbols: \glssymbol{ex.fleuron} and \glssymbol{ex.pi}.
+\gls{ex.pi}. Symbols: \glssymbol{ex.fleuron} and \glssymbol{ex.pi}.\incorrect
 \end{result}
 The \idx{postlinkhook} is repeated after every instance of \gls{gls}
 or \gls{glssymbol} etc. In the case of the \code{ornament} category,
@@ -3863,7 +4092,7 @@ Version 1.31+ provides a combination:
 \nosecformatdef{glsxtrpostlinkAddSymbolDescOnFirstUse}
 If the \field{symbol} field is set, this displays the symbol
 followed by a comma and space. The description is always displayed
-at the end of the parenthetical material
+at the end of the parenthetical material.
 
 Also from \sty{glossaries-extra} v1.31, there's a shortcut
 command that you can use to define the \idx{postlinkhook}:
@@ -3940,17 +4169,27 @@ glossary style may apply additional formatting. For example, the
 standard document classes, this renders the name in bold, but other
 classes may apply different formatting.
 
-The \glostyle{tree} styles encapsulate the name within:
+The \glostyle{tree} styles defined by the \sty{glossary-tree} style 
+encapsulate the name within:
 \nosecformatdef{glstreenamefmt}
 which does \code{\gls{textbf}\margm{text}} by default. So, for
-example, if \gls{glsnamefont} is redefined to use \gls{emph} and
+example, if \gls{glsnamefont} is redefined to use \gls{textit} and
 the \glostyle{tree} style is used, then the name will appear in
-italic bold (assuming the surrounding font is upright).
-The letter group headings are encapsulated within:
+italic bold.  The letter group headings are encapsulated within:
 \nosecformatdef{glstreegroupheaderfmt}
 which defaults to \code{\gls{glstreenamefmt}\margm{text}}, so if you
 need to redefine \gls{glstreenamefmt} you may also need to redefine
 \gls{glstreegroupheaderfmt} if the headers should have different formatting.
+The \sty{glossaries-extra-stylemods} package (as from v1.31) now
+redefine both \gls{glstreenamefmt} and \gls{glstreegroupheaderfmt}
+to use:
+\nosecformatdef{glstreedefaultnamefmt}
+which does \code{\gls{textbf}\margm{text}} by default. This means
+that if you want to change both the header and name to a different
+font, you can just redefine \gls{glstreedefaultnamefmt}, and if you
+want to change only the font used for the name, then now you only
+need to redefine \gls{glstreenamefmt}, without also having to
+redefine \gls{glstreegroupheaderfmt}.
 
 Case-changing can be automatically applied to the name with the
 \catattr{glossname} attribute, which may take one of the values:
@@ -3977,7 +4216,8 @@ Alternatively, if you're using \bibgls, you can use the
 \section{Post-Name and Post-Description Hooks}
 \label{sec:postfieldhooks}
 
-Punctuation can automatically be appended to the description in the
+Punctuation (such as a \idx{full-stop} or comma) can automatically be 
+appended to the description in the
 glossary with the \styopt{postpunc} option.  (Note that the
 unstarred form of \gls{longnewglossaryentry} interferes with this
 option. Use the starred form \gls{longnewglossaryentry*} instead.)
@@ -4001,6 +4241,148 @@ cause problems. These are listed below, with workarounds provided.
 
 \section{Headings and Captions}
 \label{sec:headings}
+
+The arguments of sectioning commands (such as \gls{chapter} or
+\gls{section}) and of captions (\gls{caption}) are
+\pidxpl{moving-argument}. The text is not only displayed at the
+point in the document, but may also be copied to the table of
+contents or list of figures etc. Additionally, depending on the page
+style, the section argument may also be reproduced in the page
+header. This repeated use of the same material can cause
+complications, in particular it can prematurely triggering the 
+\idx{firstuseflag} switch and cause unwanted indexing. If the
+content appears in the page header and the page styles converts
+headers to upper case, this can also cause a problem.
+
+For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}\marg{lipsum}\comment{provides \cmd{lipsum}}
+\cmd{usepackage}\marg{glossaries}
+\strut
+\gls{newglossaryentry}\marg{sample}\marg{\field{name}=\marg{sample},\field{description}=\marg{an example}}
+\strut
+\cmd{begin}{document}
+\gls{chapter}\marg{A \gls{gls}\marg{sample} chapter}
+\cmd{lipsum}\comment{dummy text}
+\cmd{end}\marg{document}
+\end{codeenv}
+I've used \csfmt{lipsum} here to create some dummy text that ensures
+a multi-paged document as the problem doesn't occur until the second
+page. The error message is:
+\begin{verbatim}
+Glossary entry `SAMPLE' has not been defined.
+\end{verbatim}
+The problem here is that the chapter title is copied to the header
+(which doesn't appear on the chapter's first page) but the header
+uses \gls{MakeUppercase}, which can't expand \gls{gls} but it does
+change the label, so \code{\gls{gls}\marg{sample}} is converted to
+\code{\gls{gls}\marg{SAMPLE}}, but there's no entry with that label.
+(Labels are case-sensitive.)
+
+Here's an example that doesn't cause an error, but does cause
+unexpected output:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{setabbreviationstyle}\marg{\abbrstyle{long-short-sc}}
+\gls{newabbreviation}\marg{html}\marg{html}\marg{hypertext markup language}
+\strut
+\cmd{begin}\marg{document}
+\gls{tableofcontents}
+\gls{chapter}\marg{A chapter about \gls{gls}\marg{html}}
+Reference \gls{gls}\marg{html}.
+\cmd{end}\marg{document}
+\end{codeenv}
+On the first \LaTeX\ run, the table of contents is empty as the
+associated \ext{toc} file didn't exist at the start. The chapter title
+appears as \qt{A chapter about hypertext markup language (HTML)},
+which shows the \idx{firstuse} of \code{\gls{gls}\marg{html}}. The
+\ext{toc} file (which was created but not read by
+\gls{tableofcontents}) now contains:
+\begin{codeenv}
+\cmd{contentsline} \marg{chapter}\marg{\cmd{numberline} \marg{1}A chapter about \gls{gls} \marg{html}}\marg{3}
+\end{codeenv}
+This means that on the next \LaTeX\ run, the table of contents now
+includes \code{\gls{gls}\marg{html}}. Since the table of contents
+occurs at the start of the document, this is now the \idx{firstuse}
+of \code{html}, so the full form is shown in the table of contents,
+but the chapter title is now \qt{A chapter about HTML}, which shows
+the subsequent use.
+
+The \sty{glossaries-extra} package provides some commands that are
+designed for use in section or caption titles. These include:
+\nosecformatdef{glsfmtshort}
+which shows the short form of an abbreviation,
+\nosecformatdef{glsfmtlong}
+which shows the long form of an abbreviation,
+\nosecformatdef{glsfmtfull}
+which shows the full form of an abbreviation, 
+\nosecformatdef{glsfmtname}
+which shows the entry's name, 
+\nosecformatdef{glsfmtfirst}
+which shows the entry's \field{first} field, and
+\nosecformatdef{glsfmttext}
+which shows the entry's \field{text} field.
+
+Here's a modified version of the above:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}\marg{lipsum}\comment{provides \cmd{lipsum}}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{setabbreviationstyle}\marg{\abbrstyle{long-short-sc}}
+\gls{newabbreviation}\marg{html}\marg{html}\marg{hypertext markup language}
+\strut
+\cmd{begin}\marg{document}
+\gls{tableofcontents}
+\gls{chapter}\marg{A chapter about \gls{glsfmtlong}\marg{html}}
+Reference \gls{gls}\marg{html}.
+\cmd{lipsum}\comment{dummy text}
+\cmd{end}\marg{document}
+\end{codeenv}
+This now shows the long form in the table of contents and the
+chapter title. Since \gls{glsfmtlong} doesn't affect the
+\idx{firstuseflag}, the reference after the chapter title now shows
+the \idx{firstuse} full form. There's no longer an error with the
+page header on the second page, but it's not quite right as the
+case-change hasn't been applied, so the page heading appears as:
+\begin{result}
+4\hfill \emph{CHAPTER 1. A CHAPTER ABOUT hypertext markup language}
+\end{result} 
+This can be corrected by setting the \catattr{headuc} attribute to
+\code{true}:
+\begin{codeenv}
+\gls{glssetcategoryattribute}\marg{abbreviation}\marg{headuc}\marg{true}
+\end{codeenv}
+This now makes the page header too long, but remember that you can
+use the optional argument of sectioning commands to provide a
+shorter form for both the page heading and table of contents:
+\begin{codeenv}
+\gls{chapter}\oarg{A chapter about \gls{glsfmtshort}\marg{html}}\marg{A chapter about 
+\gls{glsfmtlong}\marg{html}}
+\end{codeenv}
+One final problem remains and it's due to the
+\abbrstyle{long-short-sc} abbreviation style which uses \gls{textsc}
+to display the short form in small capitals. The combination of
+italic and small capitals isn't supported with the default fonts and
+results in a font substitution. There's a similar problem in the 
+table of contents which displays the chapter title in bold. There's 
+a warning at the end of the transcript:
+\begin{verbatim}
+Some font shapes were not available, defaults substituted.
+\end{verbatim}
+The conflict between bold and small capitals can be solved by
+switching to the T1 font encoding:
+\begin{codeenv}
+\cmd{usepackage}[T1]\marg{\sty[noindex=false]{fontenc}}
+\end{codeenv}
+The conflict between italic and small capitals can be solved with
+the \sty{slantsc} package.
 
 \section{Nesting}
 \label{sec:nested}
@@ -4198,5 +4580,5 @@ example:
   \glsxtriflabelinlist{\glscategory{#1}}{standalone,hierarchical,homograph}%
   {\printunsrtglossaryskipentry}{}%
 }%
-\printunsrtglossary[style=bookindex,title=Index,subentrycounter=false]
+\printunsrtglossary[style=bookindex,title=Index]
 \end{document}
