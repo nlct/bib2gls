@@ -4903,7 +4903,7 @@ be simplified to:
 \gls{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
 \cmd{end}\marg{document}
 \end{codeenv}
-This is much neater, but maintaining the \filefmt{entries.tex} is
+This is much neater, but maintaining the \filefmt{entries.tex} file is
 quite troublesome. Each entry must be defined in the correct order
 (that matches the desired listing in \gls{printunsrtglossary}) and
 only those entries that should appear in \gls{printunsrtglossary}
@@ -4922,8 +4922,11 @@ in the correct order and with the \field{group} or \field{location}
 fields set, if appropriate. To avoid accidentally overwriting an
 important document file, \bibgls\ uses the extension \ext{glstex}
 rather than \ext{tex} (but it's still a file containing \LaTeX\ code
-that defines the entries using \gls{newglossaryentry} or
-\gls{newabbreviation}).
+that defines the entries using \gls{newabbreviation} or
+\gls{newglossaryentry}\footnote{Actually it uses
+\gls{longnewglossaryentry*} to allow for multi-paragraph descriptions,
+and \gls{longnewglossaryentry*} and \gls{newabbreviation} are used
+indirectly through helper commands.}).
 
 Instead of using \gls{input} in the document preamble, you now need
 to use:
@@ -4944,7 +4947,7 @@ aren't defined on the first \LaTeX\ run);
 instead writes the indexing information as a record in the \ext{aux}
 file;
 \item loads \sty{glossaries-extra-bib2gls} (which provides
-additional commands specific to \bibgls).
+extra commands specific to \bibgls).
 \end{itemize}
 Each time you use a command like \gls{gls} or \gls{glssymbol} (but
 not like \gls{glsentrysymbol}) in the document, a record is added to
@@ -4966,13 +4969,133 @@ setting:
 This doesn't explicitly name any \ext{bib} file. The default is 
 \code{\gls{jobname}\ext{bib}} but you can change this with the
 \csopt{src} option. For example, if the entries are defined in
-\filefmt{entries.bib} (regular entries), \filefmt{symbols.bib}
+\filefmt{entries.bib} (regular terms), \filefmt{symbols.bib}
 (symbols) and \filefmt{abbrvs.bib} (abbreviations) then you need 
 to use:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
   \csopt[entries,symbols,abbrvs]{src},\comment{bib files}
   \csopt[all]{selection}\comment{select all entries}
+}
+\end{codeenv}
+
+You can have multiple instances of \gls{GlsXtrLoadResources}, but
+remember that each instance inputs a file containing definitions, and
+the glossary produced with \gls{printunsrtglossary} follows the same
+order. This means that you can have blocks within the same glossary
+that use different sorting methods. For example:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[symbols]{src},\comment{bib file}
+  \csopt[letter-case]{sort},\comment{sort according to character code}
+  \csopt[symbol]{category},\comment{set this as the \field{category} field}
+  \csopt[glssymbols]{group}\comment{set this as the \field{group} field}
+}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries,abbrvs]{src},\comment{bib files}
+  \csopt[en-GB]{sort}
+}
+\end{codeenv}
+The first instance fetches the data from \filefmt{symbols.bib},
+sorts the entries according to the character code, sets the
+\field{category} field to \code{symbol}, and sets the
+\field{group} field to \code{glssymbols} for each definition
+written to the \ext{glstex} file. This group label is recognised by
+the \sty{glossaries} package and the title is obtained from the
+language-sensitive \gls{glssymbolsgroupname} command (\qt{Symbols}
+in English). So all the glossary will start with a symbols group
+that contains all the entries selected from \filefmt{symbols.bib}.
+The rest of the glossary is obtained from the data selected from the
+\filefmt{entries.bib} and \filefmt{abbrvs.bib} file sorted according
+to the en-GB locale. These entries will have the \field{group} field
+set by the locale's sort rule.
+
+The \ext{bib} files define entry data in the form:
+\begin{codeenv}
+\gls[noindex=false]{atchar}\meta{entry type}\marg{\meta{id},
+  \meta{field$_1$} = \margm{value},
+  \ldots
+  \meta{field$_n$} = \margm{value}
+}
+\end{codeenv}
+where \meta{id} is the entry's label. The most basic entry type is
+\atentry{entry}. For example:
+\begin{codeenv}
+\atentry{entry}\marg{goose,
+  \field{name} = \marg{goose},
+  \field{plural} = \marg{geese},
+  \field{description} = \marg{a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill}
+}
+\end{codeenv}
+This is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{goose}
+\marg{
+  \field{name} = \marg{goose},
+  \field{plural} = \marg{geese},
+  \field{description} = \marg{a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill}
+}
+\end{codeenv}
+You can use any of the defined keys, such as \field{symbol}:
+\begin{codeenv}
+\atentry{entry}\marg{amethyst,
+  \field{name} = \marg{amethyst},
+  \field{description} = \marg{a purple type of quartz},
+  \field{symbol} = \marg{\gls{ce}\marg{SiO2}}
+}
+\end{codeenv}
+but avoid using internal fields. If you define custom keys in your
+document, make sure you define them all before the first instance of
+\gls{GlsXtrLoadResources} as all the recognised keys are written to
+the \ext{aux} file for \bibgls\ to detect. Any unrecognised fields
+in the \ext{bib} file are ignored.
+
+The \atentry{entry} type requires the \field{description} field and
+either the \field{name} or \field{parent} field. There's a similar
+command that doesn't have any required fields: \atentry{index}. If
+the \field{name} isn't supplied, it's assumed to be the same as the
+\meta{id}. If the \field{description} isn't supplied it's assumed to
+be empty. So:
+\begin{codeenv}
+\atentry{index}\marg{duck}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{duck}\marg{\field{name}=\marg{duck},\field{description}=\marg{}}
+\end{codeenv}
+and
+\begin{codeenv}
+\atentry{index}\marg{goose,
+  \field{plural} = \marg{geese}
+}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{goose}
+\marg{
+ \field{name}=\marg{goose},
+ \field{plural}=\marg{geese},
+ \field{description}=\marg{}
+}
+\end{codeenv}
+If the name contains content that can't be used in a label (see
+\sectionref{sec:labels}), then
+you need the \field{name} field. For example:
+\begin{codeenv}
+\atentry{index}\marg{chateau,
+  \field{name} = \marg{ch\^ateu},
+  \field{plural} = \marg{ch\^ateux}
+}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{chateau}
+\marg{
+ \field{name}=\marg{ch\^ateau},
+ \field{plural}=\marg{ch\^ateaux},
+ \field{description}=\marg{}
 }
 \end{codeenv}
 
