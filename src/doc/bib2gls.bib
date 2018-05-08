@@ -3168,6 +3168,10 @@ cs}\margm{Glspl-like cs}},
   text={\code{\glstildechar}}
 }
 
+@index{doublequotechar,
+  name = {\code{"}}
+}
+
 @index{cs.tilde,
   name={\csfmt{\glstildechar}}
 }
@@ -7591,7 +7595,7 @@ option},
   name={\csfmt{glsxtrp}},
   user1={\margm{field}\margm{label}},
   description={displays the given field for the entry given by label},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.07+},
   category={command}
 }
 
@@ -7600,7 +7604,7 @@ option},
   user1={},
   description={expands to the internal label of the field used
    to store the control sequence name for use with \cs{glsxtrfmt}},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.12},
   category={command}
 }
 
@@ -7609,7 +7613,7 @@ option},
   user1={\margm{label}},
   description={applies \cs{glsseeformat} to the entry's
    \field{see} field if not empty},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.06+},
   category={command}
 }
 
@@ -7618,7 +7622,7 @@ option},
   user1={\margm{label}},
   description={applies \cs{glsseeformat} to the entry's
    \field{seealso} field if not empty},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.16+},
   category={command}
 }
 
@@ -7626,7 +7630,7 @@ option},
   name={\csfmt{gls\-xtr\-set\-alias\-noindex}},
   user1={},
   description={hooks into the alias \gls{gls.noindex} setting},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
 
@@ -7634,8 +7638,9 @@ option},
   name={\csfmt{gls\-xtr\-use\-seealso\-format}},
   user1={\margm{xr list}},
   description={used to format the entries whose labels are 
-   given in \meta{xr list} as a list of \qt{see also} cross-references},
-  note={provided by \styfmt{glossaries-extra}},
+   given in \meta{xr list} as a list of \qt{see also}
+cross-references},
+  note={provided by \styfmt{glossaries-extra} v1.16+},
   category={command}
 }
 
@@ -7643,7 +7648,7 @@ option},
   name={\csfmt{gls\-xtr\-index\-seealso}},
   user1={\margm{label}\margm{xr list}},
   description={indexes a \qt{see also} cross-reference},
-  note={provided by \styfmt{glossaries-extra}},
+  note={provided by \styfmt{glossaries-extra} v1.16+},
   category={command}
 }
 
@@ -7652,6 +7657,15 @@ option},
   user1={\oargm{tag}\margm{label}\margm{xr label list}},
   description={indexes a \qt{see} cross-reference},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsxtrseelist,
+  name={\csfmt{gls\-xtr\-see\-list}},
+  user1={\margm{xr label list}},
+  description={formats the list of cross-reference labels, without
+the initial \qt{see} tag},
+  note={provided by \styfmt{glossaries-extra} v1.16+},
   category={command}
 }
 
@@ -8252,6 +8266,34 @@ glossaries},
   description={used with the \glostyle{bookindex} style to
    format the entry's name},
   note={provided by \styfmt{glossary-bookindex}},
+  category={command}
+}
+
+@index{glsabbrvscfont,
+  name={\csfmt{gls\-abbrv\-sc\-font}},
+  user1={\margm{text}},
+  description={used with \qt{sc} abbreviation styles to format the
+short form using \gls{textsc}},
+  note={provided by \styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@index{glsxtrifinmark,
+  name={\csfmt{gls\-xtr\-if\-in\-mark}},
+  user1={\margm{true}\margm{true}},
+  description={used by commands like \gls{glsfmtshort}, this expands
+to \meta{true} in page headings and the table of contents, 
+  otherwise it expands to \meta{false}},
+  note={provided by \styfmt{glossaries-extra} v1.07+},
+  category={command}
+}
+
+@index{glsxtrRevertTocMarks,
+  name={\csfmt{gls\-xtr\-Revert\-Toc\-Marks}},
+  description={restores original behaviour of \gls{tableofcontents}
+  so that \gls{glsxtrifinmark} expands to \meta{false} in the table
+of contents},
+  note={provided by \styfmt{glossaries-extra} v1.07+},
   category={command}
 }
 

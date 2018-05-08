@@ -4216,6 +4216,45 @@ Alternatively, if you're using \bibgls, you can use the
 \section{Post-Name and Post-Description Hooks}
 \label{sec:postfieldhooks}
 
+Information can be appended to the \field{name} in the glossary for
+a particular category using the \pidx{postnamehook}, which is given
+by the command:
+\nosecformatdef{glsxtrpostnamecategory}
+The current entry's label can be referenced with:
+\nosecformatdef{glscurrententrylabel}
+For example, if the preferred glossary style doesn't include the
+\field{symbol} field, but you want the symbol displayed after the
+name for entries with the \field{category} field set to \code{symbol}:
+\begin{codeenv}
+\cmd{newcommand}\marg{\cmd{glsxtrpostnamesymbol}}\marg{\cmd{space} 
+ (\gls{glsentrysymbol}\marg{\gls{glscurrententrylabel}})}
+\end{codeenv}
+There's a convenient shortcut:
+\nosecformatdef{glsdefpostname}
+which defines \gls{glsxtrpostnamecategory} to \meta{definition}
+(using \gls{csdef}). There's also a more general purpose \idx{postnamehook} 
+used regardless of the category:
+\nosecformatdef{glsextrapostnamehook}
+
+The \idx{postnamehook} is placed inside the formatting command used
+for the \field{name} field in the glossary. It's only present in the
+glossary (see \sectionref{sec:printgloss}) or stand-alone entries
+(see \sectionref{sec:standalone}).
+
+There is a similar \pidx{postdescriptionhook}. For a particular category,
+the hook is given by:
+\nosecformatdef{glsxtrpostdesccategory}
+There are some categories that have empty hooks already defined,
+such as
+\nosecformatdef{glsxtrpostdescgeneral}
+These will need \csfmt{renewcommand} rather than \csfmt{newcommand}.
+Again there's a shortcut command provided:
+\nosecformatdef{glsdefpostdesc}
+which just uses \gls{csdef}, so there's no check if the command is
+already defined.
+As with the \idx{postnamehook}, the entry's label can be accessed
+with \gls{glscurrententrylabel}.
+
 Punctuation (such as a \idx{full-stop} or comma) can automatically be 
 appended to the description in the
 glossary with the \styopt{postpunc} option.  (Note that the
@@ -4229,7 +4268,7 @@ post-description punctuation are implemented by
 The \sty{glossaries-extra-stylemods}
 package (which can be loaded with the \styopt{stylemods} option)
 patches the predefined styles provided with the base
-\sty{glossaries} package to ensure that the styles all use
+\sty{glossaries} package to ensure that the standard styles all use
 \gls{glspostdescription}.
 
 
@@ -4237,7 +4276,7 @@ patches the predefined styles provided with the base
 \label{sec:problems}
 
 There are some places where the use of commands like \gls{gls} can
-cause problems. These are listed below, with workarounds provided.
+cause problems. Common issues are listed below, with workarounds provided.
 
 \section{Headings and Captions}
 \label{sec:headings}
@@ -4245,14 +4284,15 @@ cause problems. These are listed below, with workarounds provided.
 The arguments of sectioning commands (such as \gls{chapter} or
 \gls{section}) and of captions (\gls{caption}) are
 \pidxpl{moving-argument}. The text is not only displayed at the
-point in the document, but may also be copied to the table of
-contents or list of figures etc. Additionally, depending on the page
-style, the section argument may also be reproduced in the page
-header. This repeated use of the same material can cause
-complications, in particular it can prematurely triggering the 
-\idx{firstuseflag} switch and cause unwanted indexing. If the
-content appears in the page header and the page styles converts
-headers to upper case, this can also cause a problem.
+point in the document where the command occurs, but may also be
+copied to the table of contents or list of figures etc.
+Additionally, depending on the page style, the section argument may
+also be reproduced in the page header. This repeated use of the same
+material can cause complications, in particular it can prematurely
+triggering the \idx{firstuseflag} switch and cause unwanted
+indexing. If the content appears in the page header and the page
+styles converts headers to upper case, this can also cause a
+problem.
 
 For example:
 \begin{codeenv}
@@ -4265,11 +4305,11 @@ For example:
 \strut
 \cmd{begin}{document}
 \gls{chapter}\marg{A \gls{gls}\marg{sample} chapter}
-\cmd{lipsum}\comment{dummy text}
+\cmd{lipsum} \comment{dummy text}
 \cmd{end}\marg{document}
 \end{codeenv}
 I've used \csfmt{lipsum} here to create some dummy text that ensures
-a multi-paged document as the problem doesn't occur until the second
+a multi-paged document because the problem doesn't occur until the second
 page. The error message is:
 \begin{verbatim}
 Glossary entry `SAMPLE' has not been defined.
@@ -4281,8 +4321,8 @@ change the label, so \code{\gls{gls}\marg{sample}} is converted to
 \code{\gls{gls}\marg{SAMPLE}}, but there's no entry with that label.
 (Labels are case-sensitive.)
 
-Here's an example that doesn't cause an error, but does cause
-unexpected output:
+Here's an example that doesn't cause an error (because there's not
+enough text to trigger a page break) but does cause unexpected output:
 \begin{codeenv}
 \cmd{documentclass}\marg{book}
 \strut
@@ -4299,10 +4339,10 @@ Reference \gls{gls}\marg{html}.
 \end{codeenv}
 On the first \LaTeX\ run, the table of contents is empty as the
 associated \ext{toc} file didn't exist at the start. The chapter title
-appears as \qt{A chapter about hypertext markup language (HTML)},
-which shows the \idx{firstuse} of \code{\gls{gls}\marg{html}}. The
-\ext{toc} file (which was created but not read by
-\gls{tableofcontents}) now contains:
+appears as \qt{A chapter about hypertext markup language
+(\textsc{html})}, which shows the \idx{firstuse} of
+\code{\gls{gls}\marg{html}}. The \ext{toc} file (which was created
+but not read by \gls{tableofcontents}) now contains:
 \begin{codeenv}
 \cmd{contentsline} \marg{chapter}\marg{\cmd{numberline} \marg{1}A chapter about \gls{gls} \marg{html}}\marg{3}
 \end{codeenv}
@@ -4310,7 +4350,7 @@ This means that on the next \LaTeX\ run, the table of contents now
 includes \code{\gls{gls}\marg{html}}. Since the table of contents
 occurs at the start of the document, this is now the \idx{firstuse}
 of \code{html}, so the full form is shown in the table of contents,
-but the chapter title is now \qt{A chapter about HTML}, which shows
+but the chapter title is now \qt{A chapter about \textsc{html}}, which shows
 the subsequent use.
 
 The \sty{glossaries-extra} package provides some commands that are
@@ -4342,7 +4382,7 @@ Here's a modified version of the above:
 \gls{tableofcontents}
 \gls{chapter}\marg{A chapter about \gls{glsfmtlong}\marg{html}}
 Reference \gls{gls}\marg{html}.
-\cmd{lipsum}\comment{dummy text}
+\cmd{lipsum} \comment{dummy text}
 \cmd{end}\marg{document}
 \end{codeenv}
 This now shows the long form in the table of contents and the
@@ -4382,10 +4422,243 @@ switching to the T1 font encoding:
 \cmd{usepackage}[T1]\marg{\sty[noindex=false]{fontenc}}
 \end{codeenv}
 The conflict between italic and small capitals can be solved with
-the \sty{slantsc} package.
+the \sty{slantsc} package. Another possibility is to redefine:
+\nosecformatdef{glsabbrvscfont}
+which is used by the \qt{sc} abbreviation styles:
+\begin{codeenv}
+\cmd{renewcommand}\marg{\gls{glsabbrvscfont}}[1]\marg{\comment{}
+ \gls{glsxtrifinmark}\marg{\gls{MakeTextUppercase}\marg{\gls{param}1}}\marg{\gls{textsc}\marg{\gls{param}1}}\comment{}
+}
+\end{codeenv}
+This uses:
+\nosecformatdef{glsxtrifinmark}
+which expands to \meta{true} in headings and the table of contents,
+otherwise it expands to \meta{false}. This use of
+\gls{MakeTextUppercase} replaces the need for the \catattr{headuc}
+attribute. Both \catattr{headuc} and the above redefinition of
+\gls{glsabbrvscfont} will cause the abbreviation to appear in
+\idx{uppercase} in the table of contents. If you don't want this,
+you can defer making these modifications until after the table of
+contents. Alternatively, use:
+\nosecformatdef{glsxtrRevertTocMarks}
+which makes \gls{glsxtrifinmark} expand to \meta{false} in the table
+of contents.  For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}[T1]\marg{fontenc}
+\cmd{usepackage}\marg{lipsum}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\cmd{renewcommand}\marg{\gls{glsabbrvscfont}}[1]\marg{\comment{}
+ \gls{glsxtrifinmark}\marg{\gls{MakeTextUppercase}\marg{\gls{param}1}}\marg{\gls{textsc}{\gls{param}1}}\comment{}
+}
+\strut
+\gls{setabbreviationstyle}\marg{\abbrstyle{long-short-sc}}
+\gls{newabbreviation}\marg{html}\marg{html}\marg{hypertext markup language}
+\strut
+\cmd{begin}\marg{document}
+\gls{tableofcontents}
+\gls{chapter}\oarg{A chapter about \gls{glsfmtshort}\marg{html}}\marg{A chapter 
+about \gls{glsfmtlong}\marg{html}}
+Reference \gls{gls}\marg{html}.
+\cmd{lipsum} \comment{dummy text}
+\cmd{end}\marg{document}
+\end{codeenv}
+
 
 \section{Nesting}
 \label{sec:nested}
+
+Nesting refers to commands like \gls{gls} and \gls{glssymbol} being
+used in the \idx{link-text} of similar commands. This occurs if
+these commands are used in fields that form part of the
+\idx{link-text} or if they occur in the final \meta{insert}
+optional argument (which is included in the \idx{link-text}) or in the 
+\idx{postlinkhook} (which isn't included in the \idx{link-text} but
+is still problematic).
+
+The most serious problem is when the \idx{postlinkhook} includes one
+of these commands that references an entry with the same category
+(and therefore the same \idx{postlinkhook} code) as
+you can end up with an infinite loop. For example:
+\begin{codeenv}
+\gls{glsdefpostlink}\marg{symbol}\marg{ (\gls{glssymbol}\marg{\gls{glslabel}})}\comment{infinite loop!}\incorrect
+\end{codeenv}
+Instead, use \gls{glsentrysymbol}:
+\begin{codeenv}
+\gls{glsdefpostlink}\marg{symbol}\marg{ (\gls{glsentrysymbol}\marg{\gls{glslabel}})}\correct
+\end{codeenv}
+Better still, use commands like
+\gls{glsxtrpostlinkAddSymbolOnFirstUse} (see \sectionref{sec:postlinkhooks}).
+
+The next most problematic nesting is the use of \gls{gls} in
+abbreviations. It's far more of a problem if you only use the base
+\sty{glossaries} package. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\gls{usepackage}\marg{glossaries}
+\strut
+\gls{newacronym}\marg{ssi}\marg{SSI}\marg{server-side includes}
+\gls{newacronym}\marg{html}\marg{HTML}\marg{hypertext markup language}
+\gls{newacronym}\marg{shtml}\marg{SHTML}\marg{\gls{gls}\marg{ssi} enabled \gls{gls}\marg{html}}\incorrect
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{shtml}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This results in:
+\begin{result}
+server-side includes (SSI) enabled hypertext markup language (HTML) (SHTML).
+\end{result}
+The \sty{glossaries-extra} package temporarily changes \gls{gls}
+within the \idx{link-text} to avoid this type of problem.
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
+\gls{newabbreviation}\marg{html}\marg{HTML}\marg{hypertext markup language}
+\gls{newabbreviation}\marg{shtml}\marg{SHTML}\marg{\gls{gls}\marg{ssi} enabled \gls{gls}\marg{html}}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{shtml}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This now produces:
+\begin{result}
+SSI enabled HTML (SHTML).
+\end{result}
+This doesn't seem so bad, but now let's see what happens if the
+\catattr{glossdesc} is set to \code{firstuc}:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{glssetcategoryattribute}\marg{abbreviation}\marg{\catattr{glossdesc}}\marg{firstuc}
+\gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
+\gls{newabbreviation}\marg{html}\marg{HTML}\marg{hypertext markup language}
+\gls{newabbreviation}\marg{shtml}\marg{SHTML}\marg{\gls{gls}\marg{ssi} enabled \gls{gls}\marg{html}}\incorrect
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{shtml}.
+\gls{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+This now causes an error:
+\begin{verbatim}
+! Missing \endcsname inserted.
+<to be read again> 
+                   \protect 
+\end{verbatim}
+The problem here is that the first-letter upper-casing command is
+being applied to \code{\gls{gls}\marg{ssi}}. This results in
+\code{\gls{gls}\marg{\gls{MakeTextUppercase} ssi}} which has an
+invalid label. A workaround is to insert an empty group before
+the initial \gls{gls}:
+\begin{codeenv}
+\gls{newabbreviation}\marg{shtml}\marg{SHTML}\marg{\marg{}\gls{gls}\marg{ssi} enabled \gls{gls}\marg{html}}
+\end{codeenv}
+However, \gls{gls} functions normally within the glossary, so the
+result is:
+\begin{result}
+\textbf{SSI} Server-side includes
+
+\textbf{HTML} Hypertext markup language
+
+\textbf{SHTML} server-side includes (SSI) enabled hypertext markup language (HTML)
+\end{result}
+Since neither \code{ssi} nor \code{html} have been referenced in the
+document, the reference in the \code{shtml} description in the
+glossary is the \idx{firstuse} for both of them, so they show the
+full form, but the upper-casing can't be applied. This means that
+the description for the \code{shtml} entry doesn't start with an
+\idx{uppercase} letter. The best solution is to avoid using
+\gls{gls} in the \field{long} field:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}[\styopt{record}]\marg{glossaries-extra}
+\strut
+\gls{glssetcategoryattribute}\marg{abbreviation}\marg{glossdesc}\marg{firstuc}
+\strut
+\gls[noindex]{glsdefpostdesc}\marg{abbreviation}\marg{\comment{}
+ \gls{glsxtrifhasfield}\marg{\field{seealso}}\marg{\gls{glscurrententrylabel}}\comment{}
+ \marg{ (\gls{emph}\marg{see also} \gls[noindex=false]{glsxtrseelist}\marg{\gls{glscurrentfieldvalue}})}\comment{}
+ \marg{}\comment{}
+}
+\strut
+\gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
+\gls{newabbreviation}\marg{html}\marg{HTML}\marg{hypertext markup language}
+\gls{newabbreviation}\oarg{\field{seealso}=\marg{ssi,html}}\marg{shtml}\marg{SHTML}
+\marg{server-side includes enabled hypertext markup language}
+\strut
+\cmd{begin}\marg{document}
+\gls{Gls}\marg{shtml}.
+\gls{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+I've used the \field{seealso} key here. (The value should be a
+comma-separated list of labels.) It doesn't show
+in the glossary by default as it needs an indexing application to add it
+automatically to the location list, so I've used the
+\idx{postdescriptionhook} to append the cross-reference. The
+\styopt{record} option is needed, otherwise the default
+\gls{makeindex} setting will be assumed and an error will occur as
+the associated \gls{makeindex} file hasn't been opened. If \bibgls\
+support is added then the hook won't be needed.
+
+\section{Shortcut Commands or Active Characters}
+\label{sec:activeshortcuts}
+
+Some packages, such as \sty{babel}, provide shortcut commands or
+active characters that can be enabled through a particular setting. 
+It's best not to use these in entry definitions.
+Instead use the full command name. The main problem comes when the
+shortcuts aren't enabled until the start of the \envfmt{document}
+environment. For example, the \code{ngerman} language setting in
+\sty{babel} makes the double quote character (\idx{doublequotechar})
+active and it becomes a shortcut for \gls{umlaut} (the umlaut accent
+command):
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[ngerman]\marg{babel}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\gls{newabbreviation}\marg{rna}\marg{RNA}\marg{ribonukleins"aure}\incorrect
+\strut
+\cmd{begin}\marg{document}
+Explicit use: ribonukleins"aure.
+Reference: \gls{gls}\marg{rna}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+Explicit use: ribonukleins\"aure. Reference: ribonukleins"aure (RNA).
+\end{result}
+This is because the double quote character still had its normal
+meaning when the \code{rna} entry was defined, so the
+\idx{doublequotechar} in the long form is an actual double quote
+character not a shortcut for \gls{umlaut}.
+
+Another problem occurs when you have a large file containing entry
+definitions that will be shared by multiple documents. If shortcut
+commands are used in the entry definitions then every document that
+uses those entries must ensure that the appropriate shortcut
+commands are set up before use. Also, when using \bibgls, it
+recognises commands like \gls{umlaut} but not \sty{babel}
+shorthands, so the sorting will be adversely affected if you simply
+use \idx{doublequotechar} instead of \gls{umlaut}.
+
+For large files that are written once (with minor subsequent edits),
+but reused many times for multiple documents, it's better to use the
+actual command (that simply requires the appropriate package to be
+loaded, if applicable, without specific options to enable it).
+
 
 \section{Formatting Commands that Need Direct Access to the Text}
 \label{sec:expandedfmt}
@@ -4538,6 +4811,171 @@ example:
 
 \chapter{Incorporating \bibgls}
 \label{sec:bib2gls}
+
+So far, the examples haven't actually used \bibgls, so what does it
+actually do? Recall the example document in \sectionref{sec:group},
+reproduced below:
+\begin{codeenv}
+\cmd{documentclass}\marg{scrartcl}
+\cmd{usepackage}\marg{mhchem}
+\cmd{usepackage}[\styopt[dot]{postpunc},\comment{full stop after description}
+ \styopt{nostyles},\comment{don't load default style packages}
+ \styopt[tree]{stylemods}\comment{load glossary-tree.sty and patch styles}
+]\marg{glossaries-extra}
+\strut
+\gls{glsaddstoragekey}\marg{group}\marg{}\marg{\cmd{grouplabel}}
+\gls{glsxtrsetgrouptitle}\marg{greek}\marg{Greek Symbols}
+\strut
+\gls{newglossaryentry}\marg{area}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{A}},
+   \field{description} = \marg{area},
+   \field{group} = \marg{A}
+}
+\strut
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+   \field{name} = \marg{amethyst},
+   \field{description} = \marg{a purple type of quartz},
+   \field{symbol} = \marg{\gls{ce}\marg{SiO2}},
+   \field{group} = \marg{A}
+}
+\strut
+\gls{newglossaryentry}\marg{circumference}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{C}},
+   \field{description} = \marg{circumference},
+   \field{group} = \marg{C}
+}
+\strut
+\gls{newglossaryentry}\marg{duck}
+\marg{
+   \field{name} = \marg{duck},
+   \field{description} = \marg{a waterbird with webbed feet},
+   \field{group} = \marg{D}
+}
+\strut
+\gls{newglossaryentry}\marg{goose}
+\marg{
+   \field{name} = \marg{goose},
+   \field{description} = \marg{a large waterbird with a long neck, short legs,
+   webbed feet and a short broad bill},
+   \field{group} = \marg{G}
+}
+\strut
+\gls{newglossaryentry}\marg{radius}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{r}},
+   \field{description} = \marg{radius},
+   \field{group} = \marg{R}
+}
+\strut
+\gls{newglossaryentry}\marg{pi}
+\marg{
+   \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+   \field{description} = \marg{Archimedes' constant},
+   \field{group} = \marg{greek}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
+\cmd{end}\marg{document}
+\end{codeenv}
+The document preamble is quite cluttered. It could be tidied up by
+moving all the \gls{newglossaryentry} code into a separate file
+called, say, \filefmt{entries.tex}. The main document code can now
+be simplified to:
+\begin{codeenv}
+\cmd{documentclass}\marg{scrartcl}
+\cmd{usepackage}\marg{mhchem}
+\cmd{usepackage}[
+ \styopt{record},\comment{create \field{group} field}
+ \styopt[dot]{postpunc},\comment{full stop after description}
+ \styopt{nostyles},\comment{don't load default style packages}
+ \styopt[tree]{stylemods}\comment{load glossary-tree.sty and patch styles}
+]\marg{glossaries-extra}
+\strut
+\gls{glsxtrsetgrouptitle}\marg{greek}\marg{Greek Symbols}
+\strut
+\gls[noindex=false]{input}\marg{entries}\comment{input entries.tex}
+\strut
+\cmd{begin}\marg{document}
+\gls{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
+\cmd{end}\marg{document}
+\end{codeenv}
+This is much neater, but maintaining the \filefmt{entries.tex} is
+quite troublesome. Each entry must be defined in the correct order
+(that matches the desired listing in \gls{printunsrtglossary}) and
+only those entries that should appear in \gls{printunsrtglossary}
+should be defined (unless you want the laborious task of filtering
+them out, as in \sectionref{sec:printglossagain}). The \field{group}
+field needs setting for every entry, and if the \field{location}
+field also needs setting then the \filefmt{entries.tex} file will
+need to be modified every time the document changes cause a shift in
+the page numbers.
+
+With \bibgls, you write all the entry definitions (without the
+\field{group} or \field{location} fields set) in one or more
+\ext{bib} files. It's then \bibgls\ that creates the equivalent of
+the above \filefmt{entries.tex} file with all the entry definitions
+in the correct order and with the \field{group} or \field{location}
+fields set, if appropriate. To avoid accidentally overwriting an
+important document file, \bibgls\ uses the extension \ext{glstex}
+rather than \ext{tex} (but it's still a file containing \LaTeX\ code
+that defines the entries using \gls{newglossaryentry} or
+\gls{newabbreviation}).
+
+Instead of using \gls{input} in the document preamble, you now need
+to use:
+\nosecformatdef{GlsXtrLoadResources}
+The \ext{glstex} file doesn't exist on the first \LaTeX\ run as
+\bibgls\ can only create the file once the \ext{aux} file has been
+created (since the \ext{aux} file contains all the information about
+which entries to select, the name of the \ext{bib} files where their
+definitions are stored and how to order them).
+So \gls{GlsXtrLoadResources} tests if the \ext{glstex} file exists
+before trying to input it. The \styopt{record} option is necessary
+because it:
+\begin{itemize}
+\item enables the \styopt[warn]{undefaction} option (the entries
+aren't defined on the first \LaTeX\ run);
+\item creates the \field{group} and \field{location} fields;
+\item disables the \gls{makeindex}\slash\gls{xindy} indexing and
+instead writes the indexing information as a record in the \ext{aux}
+file;
+\item loads \sty{glossaries-extra-bib2gls} (which provides
+additional commands specific to \bibgls).
+\end{itemize}
+Each time you use a command like \gls{gls} or \gls{glssymbol} (but
+not like \gls{glsentrysymbol}) in the document, a record is added to
+the \ext{aux} file containing the entry's label, the location (by
+default the page number) where the entry was used, and extra
+information including how to format the location. The default
+behaviour of \bibgls\ is to only select those entries that have
+records in the \ext{aux} file and any dependent entries.
+
+The example above doesn't include any references (commands like
+\gls{gls}), so \bibgls\ won't select any entries and the
+\ext{glstex} file won't contain any definitions. This means that the
+glossary will be empty. If you want all entries from the specified
+\ext{bib} files selected then you need to change the \csopt{selection}
+setting:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[all]{selection}}
+\end{codeenv}
+This doesn't explicitly name any \ext{bib} file. The default is 
+\code{\gls{jobname}\ext{bib}} but you can change this with the
+\csopt{src} option. For example, if the entries are defined in
+\filefmt{entries.bib} (regular entries), \filefmt{symbols.bib}
+(symbols) and \filefmt{abbrvs.bib} (abbreviations) then you need 
+to use:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries,symbols,abbrvs]{src},\comment{bib files}
+  \csopt[all]{selection}\comment{select all entries}
+}
+\end{codeenv}
+
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}
