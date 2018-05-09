@@ -89,12 +89,19 @@
 \newcommand{\glsxtrpostnameenvironment}{\space environment}
 \newcommand{\glsxtrpostnamecounter}{\space counter}
 
+\newcommand*{\csfmt}[1]{%
+ \texorpdfstring
+ {\texttt{\char`\\ #1}}%
+ {\string\\#1}%
+}
+
 \setabbreviationstyle[common]{short-nolong}
 
 \GlsXtrLoadResources[
   label-prefix={idx.},
   save-loclist=false,
   sort={letternumber-nocase},
+  sort-replace={{\glshex2423}{ },{\string\\([a-zA-Z])}{\glscapturedgroup1}},
   type={index},
   dual-field={dualid},
   match-action={add},
@@ -179,12 +186,6 @@
   \def\dcomma{,}%
   \def\dequals{,}%
   \let\-\empty
-}
-
-\newcommand*{\csfmt}[1]{%
- \texorpdfstring
- {\texttt{\char`\\ #1}}%
- {\string\\#1}%
 }
 
 % Provide commands that work like \gls[#1]{idx.#2}[#3]
@@ -11650,7 +11651,9 @@ to the start of the \iext{glstex} file providing the key given by
 \meta{value}.  Any entries defined using \atentry{dualentry}
 will be written to the \ext{glstex} file with an extra field called
 \meta{value} that is set to the mirror entry. If \meta{value} is
-omitted \code{dual} is assumed.
+omitted \csopt[dual]{dual-field} is assumed. If you use a different
+value, you will need to redefine \gls{GlsXtrDualField} (either
+locally or globally).
 
 For example, if the \ext{bib} file contains
 \begin{verbatim}
@@ -12080,7 +12083,7 @@ The dual's label is obtained from the field given by
 \nosecdef{GlsXtrDualField}
 which defaults to \field{dual}. Note that if you assign a 
 different field label with \csopt{dual-field}, then you will
-need to redefine \cs{GlsXtrDualField} as appropriate.
+need to redefine \gls{GlsXtrDualField} as appropriate.
 
 For example:
 \begin{verbatim}

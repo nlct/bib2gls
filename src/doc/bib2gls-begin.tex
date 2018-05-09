@@ -70,6 +70,12 @@
 \newcommand{\bibglspassim}{}
 \newcommand{\bibglsseealsosep}{\par\hangindent .75em\parindent .75em\relax}
 
+\newcommand*{\csfmt}[1]{%
+ \texorpdfstring
+ {\csfmtfont{\char`\\ #1}}%
+ {\string\\#1}%
+}
+
 \GlsXtrLoadResources[
  src={bib2gls},
  max-loc-diff=3,
@@ -78,6 +84,7 @@
  symbol-sort-fallback={name},
  break-at={none},
  sort-replace={{,? +}{|},{\glshex2423}{ },
+  {\string\\([a-zA-Z])}{\glscapturedgroup1},
   {([a-zA-Z])\string\.}{\glscapturedgroup1}}
 ]
 
@@ -102,6 +109,8 @@
 \newcommand*{\ctanfile}[2]{%
  \href{http://mirrors.ctan.org/macros/latex/contrib/#1/#2}{\nolinkurl{#2}}%
 }
+
+\newcommand{\hex}[1]{0x#1}
 
 \newcommand{\qt}[1]{``#1''}
 
@@ -149,12 +158,6 @@
 }
 
 \newcommand*{\csfmtfont}[1]{\texttt{#1}}
-
-\newcommand*{\csfmt}[1]{%
- \texorpdfstring
- {\csfmtfont{\char`\\ #1}}%
- {\string\\#1}%
-}
 
 \newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
@@ -456,7 +459,10 @@ commands to increase flexibility. If you want to use \bibgls, you
 must load \sty{glossaries-extra}, which provides the interface
 required by \bibgls.
 This document doesn't cover the other indexing methods described in
-the base package.
+the base package. If you get an undefined control sequence or
+unknown option error when trying out any of the examples here, check
+that you are using the latest versions of \sty{glossaries},
+\sty{glossaries-extra} and \bibgls.
 \end{abstract}
 
 \clearpage
@@ -1170,6 +1176,49 @@ These attributes have no effect for entries that aren't defined
 using \gls{newabbreviation}. (These attributes apply to
 \gls{newacronym} provided it internally uses \gls{newabbreviation},
 which is does by default with \sty{glossaries-extra}.)
+
+\section{Prefixes}
+\label{sec:prefixes}
+
+The \sty{glossaries} package is distributed with the supplementary
+\sty{glossaries-prefix} package. This automatically loads
+\sty{glossaries}, but if you are using \sty{glossaries-extra}, it's
+best loaded after. This supplementary package supplies extra keys
+and some commands analogous to \gls{gls}. The main purpose is to
+provide a different prefix to \gls{gls}, depending on whether it's
+the \idx{firstuse} or subsequent use. For example, if the
+\idx{firstuse} starts with a vowel (or vowel sound), you may need \qt{an
+\gls{gls}\margm{label}} but if the subsequent use starts with a
+constant, you may need \qt{a \gls{gls}\margm{label}}. The prefix for
+the \idx{firstuse} form specified in the \field{prefixfirst} field
+and the prefix for the subsequent use form is specified in the
+\field{prefix} field. If a space is required between the prefix and
+\gls{gls}, this needs to be included, as the prefixing system allows
+for prefixes like l' which shouldn't be followed by a space.
+
+To include the prefix, use:
+\nosecformatdef{pgls}
+instead of \gls{gls}. For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\strut
+\cmd{usepackage}\marg{glossaries-extra}
+\cmd{usepackage}\marg{glossaries-prefix}
+\strut
+\gls{newabbreviation}
+ \oarg{\field{prefixfirst}=\marg{a\gls[noindex=false]{nbspchar}},\field{prefix}=\marg{an\cmd{space}}}
+ \marg{svm}\marg{SVM}\marg{support vector machine}
+\strut
+\cmd{begin}\marg{document}
+With a prefix: \gls{pgls}\marg{svm} or \gls{pgls}\marg{svm}.
+Without a prefix: the \gls{gls}\marg{svm}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{result}
+With a prefix: a support vector machine (SVM) or an SVM. Without a
+prefix: the SVM.
+\end{result}
 
 \section{Spaces}
 \label{sec:spaces}
@@ -2672,7 +2721,7 @@ Note that with this method \emph{every} entry must be assigned a
 group or it will be assigned to the empty group.
 
 Similarly, if the \field{location} field is defined, you can use it
-to provide a location list. The \styopt{record} package option
+to provide a \idx{locationlist}. The \styopt{record} package option
 conveniently defines both \field{group} and \field{location}, so the
 following can be used instead:
 \begin{codeenv}
@@ -4604,7 +4653,7 @@ the description for the \code{shtml} entry doesn't start with an
 I've used the \field{seealso} key here. (The value should be a
 comma-separated list of labels.) It doesn't show
 in the glossary by default as it needs an indexing application to add it
-automatically to the location list, so I've used the
+automatically to the \idx{locationlist}, so I've used the
 \idx{postdescriptionhook} to append the cross-reference. The
 \styopt{record} option is needed, otherwise the default
 \gls{makeindex} setting will be assumed and an error will occur as
@@ -5000,15 +5049,30 @@ The first instance fetches the data from \filefmt{symbols.bib},
 sorts the entries according to the character code, sets the
 \field{category} field to \code{symbol}, and sets the
 \field{group} field to \code{glssymbols} for each definition
-written to the \ext{glstex} file. This group label is recognised by
-the \sty{glossaries} package and the title is obtained from the
+written to the \ext{glstex} file. The \code{glssymbols} group label is recognised by
+the \sty{glossaries} package, and the title is obtained from the
 language-sensitive \gls{glssymbolsgroupname} command (\qt{Symbols}
-in English). So all the glossary will start with a symbols group
+in English). So the glossary will start with a symbols group
 that contains all the entries selected from \filefmt{symbols.bib}.
 The rest of the glossary is obtained from the data selected from the
 \filefmt{entries.bib} and \filefmt{abbrvs.bib} file sorted according
 to the en-GB locale. These entries will have the \field{group} field
 set by the locale's sort rule.
+
+The document build now needs to include a call to \bibgls. For
+example, if the main document file is called \filefmt{myDoc.tex}
+then the build process is:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls --group myDoc
+pdflatex myDoc
+\end{verbatim}
+Omit the \longarg{group} switch if you want the \field{group} field
+left empty, and replace \code{pdflatex} with \code{xelatex} etc, as
+appropriate.
+
+\section{The \extfmt{bib} Format}
+\label{sec:bibentries}
 
 The \ext{bib} files define entry data in the form:
 \begin{codeenv}
@@ -5052,18 +5116,35 @@ document, make sure you define them all before the first instance of
 the \ext{aux} file for \bibgls\ to detect. Any unrecognised fields
 in the \ext{bib} file are ignored.
 
+\begin{important}
+The \atentry{entry} type is intended mainly for words or phrases,
+optionally with an associated \field{symbol}. If
+the \field{name} field contains symbols or other non-alphabetic
+content (such as punctuation that shouldn't be ignored by the sort
+comparator) see \sectionref{sec:@symbol}.
+\end{important}
+
+\subsection{Defining Terms with Optional Descriptions}
+\label{sec:@index}
+
 The \atentry{entry} type requires the \field{description} field and
 either the \field{name} or \field{parent} field. There's a similar
 command that doesn't have any required fields: \atentry{index}. If
 the \field{name} isn't supplied, it's assumed to be the same as the
 \meta{id}. If the \field{description} isn't supplied it's assumed to
-be empty. So:
+be empty. This type behaves like \atentry{entry}, but it sets the
+default \field{category} to \code{index}.  So:
 \begin{codeenv}
 \atentry{index}\marg{duck}
 \end{codeenv}
 is analogous to:
 \begin{codeenv}
-\gls{newglossaryentry}\marg{duck}\marg{\field{name}=\marg{duck},\field{description}=\marg{}}
+\gls{newglossaryentry}\marg{duck}
+\marg{
+ \field{name}=\marg{duck},
+ \field{description}=\marg{},
+ \field{category}=\marg{index}
+}
 \end{codeenv}
 and
 \begin{codeenv}
@@ -5077,7 +5158,8 @@ is analogous to:
 \marg{
  \field{name}=\marg{goose},
  \field{plural}=\marg{geese},
- \field{description}=\marg{}
+ \field{description}=\marg{},
+ \field{category}=\marg{index}
 }
 \end{codeenv}
 If the name contains content that can't be used in a label (see
@@ -5085,20 +5167,382 @@ If the name contains content that can't be used in a label (see
 you need the \field{name} field. For example:
 \begin{codeenv}
 \atentry{index}\marg{chateau,
-  \field{name} = \marg{ch\^ateu},
-  \field{plural} = \marg{ch\^ateux}
+  \field{name} = \marg{ch\gls[noindex=false]{cs.circum}ateau},
+  \field{plural} = \marg{ch\gls{cs.circum}ateaux}
 }
 \end{codeenv}
 is analogous to:
 \begin{codeenv}
 \gls{newglossaryentry}\marg{chateau}
 \marg{
- \field{name}=\marg{ch\^ateau},
- \field{plural}=\marg{ch\^ateaux},
- \field{description}=\marg{}
+ \field{name}=\marg{ch\gls{cs.circum}ateau},
+ \field{plural}=\marg{ch\gls{cs.circum}ateaux},
+ \field{description}=\marg{},
+ \field{category}=\marg{index}
+}
+\end{codeenv}
+There's a similar entry type \atentry{indexplural} that sets the
+\field{name} field (if not provided) to the plural form, which is 
+obtained from the \field{plural} field, if set. Otherwise it's 
+obtained by appending the plural suffix (\qt{s}) to the \field{text} 
+field. If the \field{text} field isn't set it's obtained from the label. 
+The other difference is that it sets the default \field{category} field to
+\code{indexplural}.  For example, 
+\begin{codeenv}
+\atentry{indexplural}\marg{duck}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{duck}
+\marg{
+ \field{name}=\marg{ducks},
+ \field{text}=\marg{duck},
+ \field{description}=\marg{},
+ \field{category}=\marg{indexplural}
+}
+\end{codeenv}
+and
+\begin{codeenv}
+\atentry{indexplural}\marg{goose,
+  \field{plural} = \marg{geese}
+}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{goose}
+\marg{
+ \field{name}=\marg{geese},
+ \field{text}=\marg{goose},
+ \field{plural}=\marg{geese},
+ \field{description}=\marg{},
+ \field{category}=\marg{indexplural}
 }
 \end{codeenv}
 
+The \csopt[firstuc]{name-case-change} resource option converts the
+first letter of the \field{name} field to \idx{uppercase}, so with
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[firstuc]{name-case-change}}
+\end{codeenv}
+then 
+\begin{codeenv}
+\atentry{index}\marg{duck}
+\end{codeenv}
+is now analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{duck}
+\marg{
+ \field{name}=\marg{Duck},
+ \field{text}=\marg{duck},
+ \field{description}=\marg{},
+ \field{category}=\marg{index}
+}
+\end{codeenv}
+and
+\begin{codeenv}
+\atentry{indexplural}\marg{goose,
+  \field{plural} = \marg{geese}
+}
+\end{codeenv}
+is now analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{goose}
+\marg{
+ \field{name}=\marg{Geese},
+ \field{text}=\marg{goose},
+ \field{plural}=\marg{geese},
+ \field{description}=\marg{},
+ \field{category}=\marg{indexplural}
+}
+\end{codeenv}
+and
+\begin{codeenv}
+\atentry{entry}\marg{amethyst,
+  \field{name} = \marg{amethyst},
+  \field{description} = \marg{a purple type of quartz},
+  \field{symbol} = \marg{\gls{ce}\marg{SiO2}}
+}
+\end{codeenv}
+is now analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{amethyst}
+\marg{
+ \field{name}=\marg{Amethyst},
+ \field{text}=\marg{amethyst},
+ \field{description}=\marg{a purple type of quartz},
+ \field{symbol} = \marg{\gls{ce}\marg{SiO2}}
+}
+\end{codeenv}
+
+\subsection{Defining Abbreviations}
+\label{sec:@abbreviation}
+
+Abbreviations can be defined with \atentry{abbreviation}. For
+example:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = \marg{HTML},
+  \field{long} = \marg{hypertext markup language}
+}
+\end{codeenv}
+which is analogous to:
+\begin{codeenv}
+\gls{newabbreviation}\marg{html}\marg{HTML}\marg{hypertext markup language}
+\end{codeenv}
+(which sets the \field{category} to \code{abbreviation}).
+Alternatively, you can use \atentry{acronym}. For example:
+\begin{codeenv}
+\atentry{acronym}\marg{html,
+  \field{short} = \marg{HTML},
+  \field{long} = \marg{hypertext markup language}
+}
+\end{codeenv}
+which is analogous to:
+\begin{codeenv}
+\gls{newacronym}\marg{html}\marg{HTML}\marg{hypertext markup language}
+\end{codeenv}
+(which sets the \field{category} to \code{acronym}).
+If you decide to use one of the abbreviation styles that formats the
+\field{short} field with \gls{textsc} (for example,
+\abbrstyle{long-short-sc}) then the \field{short} value needs to be
+in \idx{lowercase}. (Remember that \gls{textsc} only changes
+\idx{lowercase} characters to small capitals. For example,
+\code{\gls{textsc}\marg{html}} is displayed as \textsc{html} but
+\code{\gls{textsc}\marg{HTML}} is displayed as \textsc{HTML}.)
+This can easily be accomplished with the
+\csopt{short-case-change} resource option. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[lc]{short-case-change}}
+\end{codeenv}
+Recall from \sectionref{sec:abbreviations} that the abbreviation
+style must be set \emph{before} the abbreviations are defined. This
+means that if you want to use \gls{setabbreviationstyle} it must
+come before \gls{GlsXtrLoadResources}.
+
+The default sort value used by \bibgls\ is usually taken from the
+\field{name} field. This typically isn't supplied with abbreviations.
+The actual value depends on the abbreviation style, which \bibgls\
+doesn't know about, so \bibgls\ uses the \field{short}
+field instead for abbreviations. If you want to change this, for
+example, if you are using the \abbrstyle{long-noshort-desc} style,
+then use the \csopt{abbreviation-sort-fallback} option. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[long]{abbreviation-sort-fallback}}
+\end{codeenv}
+
+\subsection{Defining Symbols}
+\label{sec:@symbol}
+
+If the \field{name} field contains the symbol (rather than having a
+textual \field{name} and the symbol in \field{symbol}) then the
+notation can be defined with \atentry{symbol}. For example:
+\begin{codeenv}
+\atentry{symbol}\marg{pi,
+  \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+  \field{description} = \marg{Archimedes' constant}
+}
+\end{codeenv}
+This behaves much like \atentry{entry} but there are two significant
+differences: the \field{category} defaults to \code{symbol} and the
+default value used when sorting is the label not the value of the \field{name}
+field. So in this case, the sort value defaults to \code{pi}.
+Therefore the above is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{pi}
+\marg{
+  \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+  \field{description} = \marg{Archimedes' constant},
+  \field{category} = \marg{symbol},
+  \field{sort} = \marg{pi}
+}
+\end{codeenv}
+This is essentially like \gls{glsxtrnewsymbol} but it doesn't set
+the \field{type} field.
+
+You can change the default value used for sorting symbols with the
+\csopt{symbol-sort-fallback} option. For example, to sort symbols according
+to the \field{name} field:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[name]{symbol-sort-fallback},
+ \csopt[none]{break-at}
+}
+\end{codeenv}
+This means that the sort value for the above example entry is now
+\code{\gls{ensuremath}\marg{\csfmt{pi}}}, which \bibgls's \TeX\
+interpreter converts to the Unicode symbol \hex{1D70B} (mathematical
+italic small pi, $\pi$). The interpreter used by \bibgls\ recognises
+all the standard mathematical Greek commands, and also the missing
+Greek commands \gls{omicron}, \gls{Alpha} etc (which are provided by
+\sty{glossaries-extra-bib2gls}). Using these commands rather than
+the Latin equivalent ensures correct sorting (\gls{omicron} comes
+between \csfmt{xi} and \csfmt{pi}, but \code{o} comes between \code{n}
+and \code{p}). See \sectionref{sec:texparserlib} (\TeX\ Parser
+Library) in the \bibgls\ user manual for further details.
+
+\begin{important}
+The default sort method is designed for words and phrases, so
+non-letters, such as punctuation characters, are discarded.
+If your sort values include symbols that need to be taken into
+account by the comparator, use \csopt[none]{break-at} to prevent
+them from being discarded.
+\end{important}
+
+Alternatively, you may prefer to sort symbols according to the
+description:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{\csopt[description]{symbol-sort-fallback}}
+\end{codeenv}
+
+There's a similar entry type \atentry{number}, which behaves much
+like \atentry{symbol} except that it sets the default
+\field{category} to \code{number}. It also follows the
+\csopt{symbol-sort-fallback} setting. For example, the \code{pi}
+entry could be defined as:
+\begin{codeenv}
+\atentry{symbol}\marg{pi,
+  \field{name} = \marg{\gls{ensuremath}\marg{\cmd{pi}}},
+  \field{description} = \marg{Archimedes' constant},
+  \fieldfmt{value} = \marg{3.141592654}
+}
+\end{codeenv}
+I've used a custom field here (\fieldfmt{value}) that \bibgls\ will
+ignore by default. I can instruct \bibgls\ to convert this to a
+known field with \csopt{field-aliases}. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[value=user1]{field-aliases}}
+\end{codeenv}
+This makes \bibgls\ treat;
+\begin{codeenv}
+  \fieldfmt{value} = \marg{3.141592654}
+\end{codeenv}
+as though it had been:
+\begin{codeenv}
+  \fieldfmt{user1} = \marg{3.141592654}
+\end{codeenv}
+This can now be used in one of the hooks (described in
+\sectionref{sec:glsformats}). For example, the
+\idx{postdescriptionhook}:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{glsdefpostdesc}\marg{number}\marg{\comment{check if \field{user1} field given:}
+  \gls{glsxtrifhasfield}\marg{\field{useri}}\marg{\gls{glscurrententrylabel}}
+  \marg{ (\gls{glscurrentfieldvalue})}
+  \marg{}\comment{not provided}
+}
+\end{codeenv}
+It can also be used if you want to order the entries numerically.
+For example:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[value=user1]{field-aliases},
+ \csopt[double]{sort},\comment{use double-precision numeric comparisons}
+ \csopt[user1]{sort-field}
+}
+\end{codeenv}
+This uses \csopt{sort-field} to set the field used for sorting. This
+affects all entry types.
+
+There are more examples in \sectionref{sec:examples} of the main
+\bibgls\ user manual.
+
+\section{Indexing}
+
+By default, \bibgls\ selects entries from the specified \ext{bib}
+files that have been directly indexed in the document or that are
+dependencies of selected entries. Indexing is performed through
+commands like \gls{gls} and \gls{glssymbol} (but not by commands
+like \gls{glsentrysymbol}). The \styopt{record} package option
+ensures that the indexing is done that matches the requirements of
+\bibgls\ (rather than the default \gls{makeindex} syntax).
+
+Each instance of \gls{gls}, \gls{glssymbol} etc writes a
+\pidx{record} to the \ext{aux} file, that includes the entry's
+label, the location in the document where the record was triggered
+and the associated format to encapsulate the location. For example,
+if \code{\gls{gls}\marg{duck}} appears on page~3, the record label
+is \code{duck}, the location is~3 and the format is the default 
+\gls{glsnumberformat}.
+
+The format can be changed with the \glsopt{format} key. For example:
+\begin{codeenv}
+\gls{gls}\oarg{\glsopt{format}=hyperbf}\marg{duck}
+\end{codeenv}
+This sets the format to \code{hyperbf}, which makes a bold
+hyperlink, if \sty{hyperref} has been loaded, otherwise it just uses
+\gls{textbf}. The value of the \glsopt{format} option should be the
+name (without a leading backslash) of a text-block command that
+takes a single argument (the location to be formatted). The
+\sty{glossaries} package provides some commands like \gls{hyperbf}
+that may be used to ensure a hyperlink (if supported). The basic
+command is:
+\nosecformatdef{glshypernumber}
+which provides the hyperlink (if enabled) otherwise it just does its
+argument. So, if you want, for example, an underlined hyperlink:
+\begin{codeenv}
+\cmd{newcommand}\marg{\cmd{hyperul}}[1]\marg{\gls[noindex=false]{underline}\marg{\gls{glshypernumber}\marg{\gls{param}1}}}
+\end{codeenv}
+Now you can use \glsopt[hyperul]{format}.
+
+There's a special command \gls{glsignore} that ignores its argument.
+With \gls{makeindex} and \gls{xindy}, this can lead to spurious
+commas in the \idx{locationlist}, because the location is still
+included in the list, even though the location itself isn't
+displayed (since it's discarded by \gls{glsignore}). However, \bibgls\
+recognises \glsopt[glsignore]{format} as a special \idx{ignoredrecord}. This
+indicates that \bibgls\ should select that particular entry but not
+include that record in the \idx{locationlist}.
+
+If a selected entry depends on another entry that hasn't been
+indexed, for example, a parent entry, then the dependent entry will
+automatically be selected as well, by default. The dependent entry
+won't have a \idx{locationlist} if it hasn't been indexed anywhere.
+If you don't want the \idxpl{locationlist} to appear in a particular
+glossary, use \printglossopt{nonumberlist} in the optional argument
+of \gls{printunsrtglossary}.
+
+If you want to index an entry without actually displaying any text,
+you can use:
+\nosecformatdef{glsadd}
+where \meta{label} is the entry's label.  The \glsaddopt{format} key
+is again available in \meta{options}. For example:
+\begin{codeenv}
+\cmd{renewcommand}\marg{\gls{glsextrapostnamehook}}[1]\marg{\comment
+  \gls{glsadd}\oarg{\glsaddopt{format}=hyperbf}\marg{\gls{param}1}\comment{}
+}
+\end{codeenv}
+This automatically indexes the given entry in the
+\idx{postnamehook}. This is redundant if you only have a single
+glossary, but may be useful if the entry is repeated in a later
+list. Alternatively, if you are using a dual entry type (see
+\sectionref{sec:dualentry} in the main \bibgls\ user manual), the
+hook could check for the existence of the dual label (identified by
+the \csopt{dual-field} resource option) and use that instead. For
+example:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\cmd{renewcommand}\marg{\gls{glsextrapostnamehook}}[1]\marg{\comment
+  \gls{glsxtrifhasfield}\marg{\gls{GlsXtrDualField}}\marg{\gls{param}1}
+  \marg{\comment{}
+    \gls{glsadd}\oarg{\glsaddopt{format}=hyperbf}\marg{\gls{glscurrentfieldvalue}}\comment{}
+  }\comment{}
+  \marg{}\comment{no dual}
+}
+\end{codeenv}
+
+If you want to index multiple entries at the same time with the same
+set of options, you can use:
+\nosecformatdef{glsaddeach}
+This just iterates through the comma-separated list of labels and
+performs \gls{glsadd}\oargm{options}\margm{label} for each label in
+\meta{label list}. For example, to ensure that \bibgls\ selects the
+entries with the labels \code{duck}, \code{goose} and \code{parrot},
+even if they aren't referenced in the document:
+\begin{codeenv}
+\gls{glsaddeach}\oarg{\glsaddopt[glsignore]{format}}\marg{duck,goose,parrot}
+\end{codeenv}
+To select all entries, regardless of whether or not they have been
+indexed, use the \csopt[all]{selection} resource option. There are
+other selection criteria. See the main \bibgls\ user manual for
+further details.
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}

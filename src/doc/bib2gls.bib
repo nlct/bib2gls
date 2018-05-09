@@ -1,6 +1,7 @@
 % Encoding: UTF-8
 
 @preamble{"\providecommand{\dhyphen}{-}
+\providecommand{\csfmt}[1]{\texttt{\glsbackslash #1}}%
 \providecommand{\derivfn}[1]{f'(#1)}"}
 
 @abbreviation{IETF,
@@ -967,7 +968,7 @@ location obtained from the \field{indexcounter} field},
   name={\csfmt{Gls\-Xtr\-Dual\-Field}},
   user1={},
   description={The field used to store the dual label. This defaults 
-   to \field{dual} but will need to be redefined if a different
+   to \gls{field.dual} but will need to be redefined if a different
    value is given by \csopt{dual-field}},
   note={internal command provided by
    \styfmt{glossaries-extra-bib2gls} v1.30+},
@@ -2436,6 +2437,14 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{Alpha,
+  name={\csfmt{Alpha}},
+  user1={},
+  description={Greek letter alpha $\Alpha$},
+  note={provided by \styfmt{glossaries-extra-bib2gls}},
+  category={command}
+}
+
 @index{bigoperatornamefmt,
   name={\csfmt{bigoperatornamefmt}},
   user1={\margm{text}},
@@ -3132,7 +3141,11 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.circum,
-  name={\csfmt{\char`\^}}
+  name={\csfmt{\char`\^}},
+  user1={\margm{character}},
+  description={puts a circumflex accent over \meta{character}},
+  note={kernel command},
+  category={command}
 }
 
 @index{mshiftchar,
@@ -5741,6 +5754,14 @@ field.},
   name={ignored record}
 }
 
+@index{record,
+  seealso={ignoredrecord}
+}
+
+@index{locationlist,
+  name = {location list}
+}
+
 @index{postlinkhook,
   name={post-link hook}
 }
@@ -6949,6 +6970,15 @@ can be referenced in \meta{true} or \meta{false} with
   category={command}
 }
 
+@index{glsaddeach,
+  name={\csfmt{gls\-add\-each}},
+  user1={\oargm{options}\margm{label list}},
+  description={indexes each entry identified in the comma-separated
+  list of labels without displaying any text},
+  note={provided by \styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
 @index{glsadd.thevalue,
   name={\csoptfmt{thevalue}},
   category={commandoption},
@@ -7138,7 +7168,7 @@ by \gls{makeindex} or \gls{xindy}},
 }
 
 @index{glsignore,
-  name={\csfmt{glsignore}},
+  name={\csfmt{gls\-ignore}},
   user1={\margm{text}},
   description={does nothing but when used as a location format
    \bibgls\ recognises it as an \idx{ignoredrecord}},
@@ -7524,6 +7554,12 @@ hasn't been defined},
 @index{printgloss.prefix,
   parent = {printunsrtglossary},
   name = {\csoptfmt{prefix}},
+  category={commandoption},
+}
+
+@index{printgloss.nonumberlist,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{no\-number\-list}},
   category={commandoption},
 }
 
@@ -8204,6 +8240,16 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{GLS} but shows the plural form},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{pgls,
+  name={\csfmt{pgls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={does \meta{prefix}\gls{gls}\oargm{options}\margm{label}\oargm{insert},
+  where the \meta{prefix} is obtained from the appropriate prefix
+  field},
+  note={provided by \styfmt{glossaries-prefix}},
   category={command}
 }
 

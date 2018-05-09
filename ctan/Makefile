@@ -1,7 +1,7 @@
 TEXPARSERDIR=$(HOME)/programming/java/texparser-git
 BIB2GLSDIR=$(HOME)/programming/java/bib2gls
 
-bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib.jar ../src/bin/bib2gls.sh ../src/bin/convertgls2bib.sh ../src/doc/bib2gls.pdf
+bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib.jar ../src/bin/bib2gls.sh ../src/bin/convertgls2bib.sh ../src/doc/bib2gls.pdf ../src/doc/bib2gls-begin.pdf
 	mkdir -p bib2gls
 	mkdir -p bib2gls/src
 	mkdir -p bib2gls/examples
@@ -10,8 +10,8 @@ bib2gls.zip	: README.md CHANGES ../src/lib/bib2gls.jar ../src/lib/convertgls2bib
 	cp ../src/lib/bib2gls.jar bib2gls
 	cp ../src/lib/convertgls2bib.jar bib2gls
 	cp -L ../src/lib/texparserlib.jar bib2gls
-	cp ../src/doc/bib2gls.tex bib2gls/src
-	cp ../src/doc/bib2gls.pdf bib2gls
+	cp ../src/doc/bib2gls*.tex bib2gls/src
+	cp ../src/doc/bib2gls*.pdf bib2gls
 	cp ../src/doc/*.pod bib2gls/src
 	cp ../src/doc/*.bib bib2gls/src
 	cp ../src/doc/*.1 bib2gls

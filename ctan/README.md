@@ -174,6 +174,8 @@ xelatex bib2gls
 xelatex bib2gls
 ```
 
+Similarly for the bib2gls-begin.pdf document.
+
 ## JAR Files
 
 Create the following directories:

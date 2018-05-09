@@ -1,8 +1,8 @@
-v1.5 (pending):
+v1.5 (2018-05-09):
 
   * added introductory guide (bib2gls-begin.pdf)
 
-  * rearranged some the listing of resource options in 
+  * rearranged some of the resource option sections in 
     the main user manual (bib2gls.pdf)
 
   * new .glstex helper command:
