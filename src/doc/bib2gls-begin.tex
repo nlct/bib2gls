@@ -119,10 +119,14 @@
 \newcommand{\incorrect}{\marginpar{\textcolor{red}{\ding{55}}}}
 \newcommand{\correct}{\marginpar{\textcolor{green}{\ding{52}}}}
 
+\newcounter{result}
+
 \newenvironment{result}%
 {%
  \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{hyper=false,local}}%
  \glsresetentrycounter
+ \stepcounter{result}%
+ \renewcommand{\GlsEntryCounterLabelPrefix}{glsentry\theresult-}%
  \begin{quotation}%
  \marginpar
   [\raisebox{-2.5ex}{\ding{43}}]%
@@ -1721,33 +1725,6 @@ show the short form. This is because the default style for the
 \code{acronym} category is the \abbrstyle{short-nolong} style, which
 doesn't show the long form with \gls{gls} (and its \idxpl{variant}).
 
-If you only want \gls{gls} to show the short form but not the long
-form, use one of the \code{-nolong} styles (such as
-\abbrstyle{short-nolong}). If you only want the
-long form and not the short form, use one of the \code{-noshort}
-styles (such as \abbrstyle{long-noshort}). If you want only the long
-form on \idx{firstuse} and only the short form subsequently
-then use one of the \code{-only} styles, such as
-\abbrstyle{long-only-short-only}.
-
-If you want a specific instance to show only the short form, without
-modifying the \idx{firstuseflag}, then use
-\nosecformatdef{glsxtrshort}
-If you want a specific instance to show only the long form, without
-modifying the \idx{firstuseflag}, then use
-\nosecformatdef{glsxtrlong}
-If you want a specific instance to show both the long and short form, without
-modifying the \idx{firstuseflag}, then use
-\nosecformatdef{glsxtrfull}
-Depending on the style, this may not exactly match the format
-produced by the \idx{firstuse} of \code{\gls{gls}\margm{label}}.
-
-If you find these commands quite long-winded, there are some
-shortcuts available with the \styopt{shortcuts} option, but as these
-may interfere with other packages, you might want to consider
-investigating your text editor settings as the more sophisticated
-ones provide ways of inserting commonly-used commands to save typing.
-
 The final optional \meta{insert} argument of commands like \gls{gls}
 is typically moved inside, depending on the style. For example:
 \begin{codeenv}
@@ -1774,7 +1751,53 @@ which produces:
 The \gls{ex.svm}'s parameters are\ldots
 \end{result}
 
+\section{Only Long or Only Short}
+\label{sec:longorshort}
+
+If you only want \gls{gls} to show the short form but not the long
+form (including on \idx{firstuse}), use one of the \code{-nolong}
+styles (such as \abbrstyle{short-nolong}). If you only want the long
+form and not the short form (including subsequent use), use one of
+the \code{-noshort} styles (such as \abbrstyle{long-noshort}).
+
+If you want only the long form on \idx{firstuse} (without the short
+form) and only the short form subsequently then use one of the
+\code{-only} styles, such as \abbrstyle{long-only-short-only}.
+
+If you need to reshow the full form, you can reset the
+\idx{firstuseflag} with:
+\nosecformatdef{glsreset}
+which will make the next instance of \code{\gls{gls}\margm{labe}}
+act according to \idx{firstuse}.
+
+\begin{important}
+If you need an abbreviation in a caption or section title, see 
+\sectionref{sec:headings}.
+\end{important}
+
+Otherwise, if you want a \emph{specific} instance to show only the short 
+form, without modifying the \idx{firstuseflag}, then use
+\nosecformatdef{glsxtrshort}
+If you want a specific instance to show only the long form, without
+modifying the \idx{firstuseflag}, then use
+\nosecformatdef{glsxtrlong}
+If you want a specific instance to show both the long and short form, without
+modifying the \idx{firstuseflag}, then use
+\nosecformatdef{glsxtrfull}
+Depending on the style, this may not exactly match the format
+produced by the \idx{firstuse} of \code{\gls{gls}\margm{label}}.
+Don't use these commands for every use. Change the style instead,
+which will make it easier to modify the document at a later date.
+
+If you find these commands quite long-winded, there are some
+shortcuts available with the \styopt{shortcuts} option, but as these
+may interfere with other packages, you might want to consider
+investigating your text editor settings as the more sophisticated
+ones provide ways of inserting commonly-used commands to save typing.
+
 \section{Plural Abbreviations}
+\label{sec:pluralabbr}
+
 If the abbreviation represents something countable then the plural
 form can again be obtained with \gls{glspl}:
 \begin{codeenv}
@@ -1829,6 +1852,7 @@ defined (but check with your supervisor, publisher or editor as this
 usage is controversial).
 
 \section{Abbreviation Markup}
+\label{sec:markwords}
 
 The \catattr{markwords} attribute can be set to \code{true} to
 indicate that \gls{newabbreviation} should parse the long form and
@@ -1943,6 +1967,7 @@ in the \atentry{preamble}. For example:
 \end{codeenv}
 
 \section{Dotted Abbreviations}
+\label{sec:dotabbr}
 
 If an abbreviation ends with a \idx{full-stop}, it can be awkward
 when it appears at the end of a sentence, as you can end up with two
@@ -2102,7 +2127,7 @@ you can use a custom field or one of the supplied user fields
 described in \sectionref{sec:userkeys} to store the translation. The
 \code{-user} abbreviation styles can be used to include the extra
 information if the field is set. The \field{user1} field
-is the default, but you can change this by redefining
+is the default, but you can change this by redefining:
 \nosecformatdef{glsxtruserfield}
 to the \emph{internal} field name. (For example, \field{userii} for
 \field{user2}.) In the sample document below, the translation is
@@ -2127,6 +2152,254 @@ First use: \gls{ex.rna}.  Next use: \gls{ex.rna}.
 \end{result}
 If the field is empty, \abbrstyle{long-short-user} behaves like
 \abbrstyle{long-short}.
+
+Here's an example where the native language is English:
+\begin{codeenv}
+\gls{newabbreviation}\marg{iso}\marg{ISO}\marg{International Organization for Standardization}
+\strut
+\gls{newabbreviation}\oarg{
+  \field{user1} = \marg{Associa\gls{c}\marg{c}\gls{cs.tilde}ao Brasileria de Normas T\cs{acute}ecnicas},
+  \field{user2} = \marg{pt-BR},
+  \field{category} = \marg{foreignabbreviation}
+}
+\marg{abnt}\marg{ABNT}\marg{Brazilian National Standards Organization}
+\strut
+\gls{newabbreviation}\oarg{
+  \field{user1} = \marg{Deutsches Institut f\gls{umlaut}ur Normung e.V.},
+  \field{user2} = \marg{de-1996},
+  \field{category} = \marg{foreignabbreviation}
+}\marg{din}\marg{DIN}\marg{German Institute for Standardization}
+\end{codeenv}
+The use of the custom \field{category} label
+\code{foreignabbrevaiation} means I can set up different abbreviation
+styles. For example:
+\begin{codeenv}
+\gls{setabbreviationstyle}\marg{short-nolong}
+\gls{setabbreviationstyle}\oarg{foreignabbreviation}\marg{long-short-user}
+\end{codeenv}
+This example differs from the previous one as there are now two
+foreign languages (Portuguese and German) with English as the native
+language. The previous had German as the native language and English
+as the sole foreign language. In this case, I've used the
+\field{user2} field to identify the language of the original text
+(stored in the \field{user1} field).
+
+For example, suppose I'm using \sty{babel} with the language options
+\code{british}, \code{brazilian} and \code{ngerman}:
+\begin{codeenv}
+\cmd{usepackage}[main=british,brazilian,ngerman]\marg{babel}
+\end{codeenv}
+then I might want to modify \gls{glsxtruserparen} to use
+\gls{foreignlanguage}. This would be easier if the \field{user2}
+field used a recognised \sty{babel} dialect label, but that's less
+consistent across documents. For example, in another document I
+might use \code{UKenglish} or just \code{english} (or perhaps use
+\sty{polyglossia} instead).
+
+The \sty{glossaries} package loads \sty{tracklang}~\cite{tracklang},
+which provides:
+\nosecformatdef{GetTrackedDialectFromLanguageTag}
+If the given language tag matches a document dialect that's been
+tracked (by \sty{tracklang}), this stores the \emph{\sty{tracklang}
+dialect label} in the control sequence \meta{cs} otherwise it sets
+that control sequence to empty. The match requires that five
+properties of the language tag and \sty{tracklang}'s dialect label
+are the same: root language, region, sub-language, variant and
+script. Some of these elements may be empty, in which case those
+elements must be empty for both. If the script is missing in either
+case, the default script for the given root language is assumed. For
+example, \code{Latn} for \code{en} (English).
+
+\begin{important}
+The \sty{tracklang} dialect label isn't always the same as
+\sty{babel}'s dialect label.
+\end{important}
+
+The simplest way to test if the \sty{tracklang} label matches the
+\sty{babel} label is to test for the existence of
+\csfmt{captions}\meta{label}. For example, using \sty{etoolbox}'s
+\gls{ifcsundef}:
+\begin{codeenv}
+\gls{GetTrackedDialectFromLanguageTag}\marg{pt-BR}\marg{\cmd{dialectlabel}}
+\gls{ifdefempty}\cmd{dialectlabel}
+\marg{}\comment{no exact match found}
+\marg{\comment{exact match found}
+  \gls{ifcsundef}\marg{captions\cmd{dialectlabel}}
+  \marg{}\comment{not a recognised \sty{babel} label}
+  \marg{}\comment{recognised \sty{babel} label}
+}
+\end{codeenv}
+In the \qt{not a recognised \sty{babel} label} argument, you can
+find out if the \sty{tracklang} dialect label has a mapping to the
+closest known \sty{babel} dialect label with:
+\nosecformatdef{IfTrackedDialectHasMapping}
+If true, you can fetch the corresponding \sty{babel} label with:
+\nosecformatdef{GetTrackedDialectToMapping}
+If false, can try the root language label instead, which can be
+obtained with:
+\nosecformatdef{TrackedLanguageFromDialect}
+For example:
+\begin{codeenv}
+\gls{GetTrackedDialectFromLanguageTag}\marg{pt-BR}\marg{\cmd{dialectlabel}}
+\gls{ifdefempty}\cmd{dialectlabel}
+\marg{}\comment{no exact match found}
+\marg{\comment{exact match found}
+  \gls{ifcsundef}\marg{captions\cmd{dialectlabel}}
+  \marg{\comment{not a recognised \sty{babel} label, use root language}
+    \cmd{edef}\cmd{dialectlabel}\marg{\gls{TrackedLanguageFromDialect}\cmd{dialectlabel}}\comment{}
+  }\comment{}
+  \marg{}\comment{recognised \sty{babel} label}
+}
+\end{codeenv}
+
+Consider the following document:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[british]\marg{babel}
+\cmd{usepackage}\marg{tracklang}
+\strut
+\cmd{begin}\marg{document}
+\gls{GetTrackedDialectFromLanguageTag}\marg{en-GB}\marg{\cmd{trackeddialect}}%
+Tracked dialect label: \cmd{trackeddialect}.
+\gls{IfTrackedDialectHasMapping}\marg{\cmd{trackeddialect}}\comment{}
+\marg{Has mapping: \gls{GetTrackedDialectToMapping}\marg{\cmd{trackeddialect}}}\comment{}
+\marg{No mapping}.
+Root language: \gls{TrackedLanguageFromDialect}\marg{\cmd{trackeddialect}}.
+\cmd{end}\marg{document}
+\end{codeenv}
+In this case the \sty{tracklang} dialect label is the same as
+\sty{babel}'s dialect label. The above produces:
+\begin{result}
+Tracked dialect label: british. No mapping. Root language: english.
+\end{result}
+Now consider this document:
+\begin{codeenv}
+\cmd{documentclass}[en-MT]\marg{article}
+\strut
+\cmd{usepackage}[british]\oarg{babel}
+\cmd{usepackage}\marg{tracklang}
+\strut
+\cmd{begin}\marg{document}
+en-GB: \gls{GetTrackedDialectFromLanguageTag}\marg{en-GB}\marg{\cmd{trackeddialect}}\comment{} Tracked dialect label: \cmd{trackeddialect}.
+\gls{IfTrackedDialectHasMapping}\marg{\cmd{trackeddialect}}\comment{}
+\marg{Has mapping: \gls{GetTrackedDialectToMapping}\marg{\cmd{trackeddialect}}}\comment{}
+\marg{No mapping}.
+Root language: \gls{TrackedLanguageFromDialect}\marg{\cmd{trackeddialect}}.
+\strut
+en-MT: \gls{GetTrackedDialectFromLanguageTag}\marg{en-MT}\marg{\cmd{trackeddialect}}\comment{} Tracked dialect label: \cmd{trackeddialect}.
+\gls{IfTrackedDialectHasMapping}\marg{\cmd{trackeddialect}}\comment{}
+\marg{Has mapping: \gls{GetTrackedDialectToMapping}\marg{\cmd{trackeddialect}}}\comment{}
+\marg{No mapping}.
+Root language: \gls{TrackedLanguageFromDialect}\marg{\cmd{trackeddialect}}.
+\cmd{end}\marg{document}
+\end{codeenv}
+In this case the document requires Maltese English but \sty{babel}
+doesn't have an associated dialect so \code{british} is used
+instead in \sty{babel}'s options list. However, \sty{tracklang} does
+recognise \code{en-MT} as a document class option, which allows
+extra localisation from other locale-sensitive packages. (For
+example, \sty{datetime2} will use different time zone abbreviations.) If
+\sty{tracklang} picks up document class options, these override any
+\sty{babel} settings, but the mapping allows a way of accessing the
+captions hook provided by \sty{babel}.
+
+The above document produces:
+\begin{result}
+en-GB: Tracked dialect label: . No mapping. Root language: .
+en-MT: Tracked dialect label: maltaenglish. Has mapping: british.
+Root language: english.
+\end{result}
+So now, even though \sty{babel}'s \code{british} option has been
+used, en-GB isn't recognised as a tracked locale. Things are a
+little more complicated if the language tag is too specific compared
+to the \sty{babel} dialect label. For example, while the dialect
+label \code{nswissgerman} identifies the region, the \code{ngerman}
+label doesn't.
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[ngerman]\marg{babel}
+\cmd{usepackage}\marg{tracklang}
+\strut
+\cmd{begin}\marg{document}
+\gls{GetTrackedDialectFromLanguageTag}\marg{de-DE-1996}\marg{\cmd{trackeddialect}}%
+Tracked dialect label: \cmd{trackeddialect}.
+\gls{IfTrackedDialectHasMapping}\marg{\cmd{trackeddialect}}\comment{}
+\marg{Has mapping: \gls{GetTrackedDialectToMapping}\marg{\cmd{trackeddialect}}}\comment{}
+\marg{No mapping}.
+\end{codeenv}
+In this case no dialect label is found. The result is:
+\begin{result}
+Tracked dialect label: . No mapping.
+\end{result}
+This is because the document doesn't have a dialect that matches
+both the language \emph{and} region. As from \sty{tracklang} version
+1.3.6, \gls{GetTrackedDialectToMapping} sets:
+\nosecformatdef{TrackedDialectClosestSubMatch}
+to the closest dialect label that has the same root language if the
+exact match isn't found. This will be empty if there's no tracked
+dialect with the given root language (and may also be empty if an
+exact match is found). 
+ 
+Returning to \sty{glossaries-extra} with the original text stored in
+the \field{user1} field (identified by \gls{glsxtruserfield} in the
+\abbrstyle{long-short-user} style) and the language tag stored in
+the \field{user2} field, then if you have at least version 1.32 of
+\sty{glossaries-extra} and version 1.3.6 of \sty{tracklang} you
+can use:
+\nosecformatdef{GlsXtrForeignText}
+to encapsulate \meta{text} with:
+\nosecformatdef{foreignlanguage}
+where the field containing the appropriate locale tag is stored in
+the field given by:
+\nosecformatdef{GlsXtrForeignTextField}
+which defaults to the \field{userii} internal field for the entry
+identified by \meta{label} (corresponding to the \field{user2} field).
+For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[main=british,brazilian,ngerman]\marg{babel}
+\cmd{usepackage}[\styopt{record}]\marg{glossaries-extra}
+\strut
+\gls{setabbreviationstyle}\oarg{foreignabbreviation}\marg{long-short-user}
+\strut
+\gls{newabbreviation}\marg{iso}\marg{ISO}\marg{International Organization for Standardization}
+\strut
+\gls{newabbreviation}\oarg{
+  \field{user1} = \marg{Associa\gls{c}\marg{c}\gls{cs.tilde}ao Brasileria de Normas T\cs{acute}ecnicas},
+  \field{user2} = \marg{pt-BR},
+  \field{category} = \marg{foreignabbreviation}
+}
+\marg{abnt}\marg{ABNT}\marg{Brazilian National Standards Organization}
+\strut
+\gls{newabbreviation}\oarg{
+  \field{user1} = \marg{Deutsches Institut f\gls{umlaut}ur Normung e.V.},
+  \field{user2} = \marg{de-1996},
+  \field{category} = \marg{foreignabbreviation}
+}\marg{din}\marg{DIN}\marg{German Institute for Standardization}
+\strut
+\cmd{renewcommand}*\marg{\gls{glsxtruserparen}}[2]\marg{\comment{}
+  \gls{glsxtrfullsep}\marg{\gls{param}2}\comment{}
+  \gls{glsxtrparen}
+  \marg{\gls{param}1\comment{}
+   \gls{ifglshasfield}\marg{\gls{glsxtruserfield}}\marg{\gls{param}2}\comment{}
+   \marg{, \gls{emph}\marg{\gls{GlsXtrForeignText}\marg{\gls{param}2}\marg{\gls{glscurrentfieldvalue}}}}\comment{}
+   \marg{}\comment{}
+  }\comment{}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{abnt}, \gls{gls}\marg{din}.
+\cmd{end}\marg{document}
+\end{codeenv}
+This essentially uses the earlier \sty{tracklang} code where an
+extra \gls{ifdefempty} is inserted, which sets the equivalent of
+\csfmt{trackeddialect} to \gls{TrackedDialectClosestSubMatch}. If
+the test for the captions hook is false, then \gls{foreignlanguage}
+isn't used.
+
 
 \chapter{Symbols}
 \label{sec:symbols}
@@ -3751,7 +4024,7 @@ A reference to \gls[prefix={hierarchical.main.}]{hier.amethyst}.
 \printunsrtglossary*[prefix={hierarchical.main.},style=tree,nonumberlist]
 {%
   \glsresetentrycounter
-  \renewcommand{\GlsEntryCounterLabelPrefix}{hierarchical.main.glsentry-}%
+  \renewcommand{\GlsEntryCounterLabelPrefix}{main.glsentry-}%
   \renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
     \glsxtriflabelinlist{#1}{hier.mineral,hier.calcite,hier.quartz,hier.amethyst}%
     {}{\printunsrtglossaryskipentry}%
@@ -5446,6 +5719,7 @@ There are more examples in \sectionref{sec:examples} of the main
 \bibgls\ user manual.
 
 \section{Indexing}
+\label{sec:record}
 
 By default, \bibgls\ selects entries from the specified \ext{bib}
 files that have been directly indexed in the document or that are
@@ -5543,6 +5817,229 @@ To select all entries, regardless of whether or not they have been
 indexed, use the \csopt[all]{selection} resource option. There are
 other selection criteria. See the main \bibgls\ user manual for
 further details.
+
+\section{Aliasing Fields and Entry Types}
+\label{sec:resourcealias}
+
+In \sectionref{sec:abbrvtrans}, the \field{user1} key was used to
+store a translation:
+\begin{codeenv}
+\gls{newabbreviation}\oarg{\field{user1}=\marg{ribonucleic acid}}
+ \marg{rna}\marg{RNA}\marg{ribonukleins\gls{umlaut}aure}
+\end{codeenv}
+You can also use the generic user fields in \ext{bib} files, but
+a more flexible approach is to use a semantic naming scheme in the
+\ext{bib} file and use resource aliasing to convert these custom
+field names into recognised keys. For example, the above
+abbreviation could be written in the \ext{bib} file as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{rna,
+  \field{short} = \marg{RNA},
+  \field{long} = \marg{ribonukleins\gls{umlaut}aure},
+  \fieldfmt{translation} = \marg{ribonucleic acid}
+}
+\end{codeenv}
+The custom \fieldfmt{translation} field will be ignored by \bibgls,
+unless it's first defined in the document or aliased in the resource
+options:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[abbrvs]{src},\comment{entries defined in abbrvs.bib}
+ \comment{treat \fieldfmt{translation} as though it's \field{user1}:}
+ \csopt[translation=user1]{field-aliases}
+}
+\end{codeenv}
+This makes \bibgls\ behave as though the entry was defined in the
+\bibgls\ file as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{rna,
+  \field{short} = \marg{RNA},
+  \field{long} = \marg{ribonukleins\gls{umlaut}aure},
+  \field{user1} = \marg{ribonucleic acid}
+}
+\end{codeenv}
+The definition is now the same as the above example from
+\sectionref{sec:abbrvtrans}. The \ext{bib} entry type can also be
+aliased. Here's a modified version:
+\begin{codeenv}
+\atentryfmt{foreignabbreviation}\marg{rna,
+  \field{short} = \marg{RNA},
+  \fieldfmt{nativelong} = \marg{ribonukleins\gls{umlaut}aure},
+  \fieldfmt{foreignlong} = \marg{ribonucleic acid}
+}
+\end{codeenv}
+and here are the aliases:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[abbrvs]{src},\comment{entries defined in abbrvs.bib}
+ \comment{treat \atentryfmt{foreignabbreviation} as though it's \atentry{abbreviation}:}
+ \csopt[foreignabbreviation=abbreviation]{entry-type-aliases},
+ \csopt[nativelong=long,foreignlong=user1]{field-aliases}
+}
+\end{codeenv}
+This has the same result, but suppose another document is in English
+rather than German:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[abbrvs]{src},\comment{entries defined in abbrvs.bib}
+ \csopt[foreignabbreviation=abbreviation]{entry-type-aliases},
+ \csopt[foreignlong=long]{field-aliases}
+}
+\end{codeenv}
+Now the \field{long} field is set to the English version, and the
+German long form is ignored.
+
+Here's another example where the native language is now English:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\atentry{abbreviation}\marg{iso,
+  \field{short} = \marg{ISO},
+  \field{long} = \marg{International Organization for Standardization}
+}
+\strut
+\atentryfmt{foreignabbreviation}\marg{abnt,
+  \field{short} = \marg{ABNT},
+  \fieldfmt{foreignlong} = \marg{Associa\gls{c}\marg{c}\gls{cs.tilde}ao Brasileria de Normas T\cs{acute}ecnicas},
+  \fieldfmt{nativelong} = \marg{Brazilian National Standards Organization},
+  \fieldfmt{language} = \marg{pt-BR}
+}
+\strut
+\atentryfmt{foreignabbreviation}\marg{din,
+  \field{short} = \marg{DIN},
+  \fieldfmt{foreignlong} = \marg{Deutsches Institut f\gls{umlaut}ur Normung e.V.},
+  \fieldfmt{nativelong} = \marg{German Institute for Standardization},
+  \fieldfmt{language} = \marg{de-DE-1996}
+}
+\end{codeenv}
+The aliasing is again identified in the resource options:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[abbrvs]{src},\comment{entries defined in abbrvs.bib}
+ \csopt[foreignabbreviation=abbreviation]{entry-type-aliases},
+ \csopt[nativelong=long,foreignlong=user1,language=user2]{field-aliases},
+ \csopt[same as original entry]{category}
+}
+\end{codeenv}
+This has an extra setting that assigns the \field{category} field to
+the original entry type (before any aliasing occurred) without the
+leading \gls{atchar} (and converted to \idx{lowercase}). This makes
+\bibgls\ act as though the abbreviations had actually been defined
+as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{iso,
+  \field{short} = \marg{ISO},
+  \field{long} = \marg{International Organization for Standardization},
+  \field{category} = \marg{abbreviation}
+}
+\strut
+\atentryfmt{abbreviation}\marg{abnt,
+  \field{short} = \marg{ABNT},
+  \field{user1} = \marg{Associa\gls{c}\marg{c}\gls{cs.tilde}ao Brasileria de Normas T\cs{acute}ecnicas},
+  \field{long} = \marg{Brazilian National Standards Organization},
+  \field{user2} = \marg{pt-BR},
+  \field{category} = \marg{foreignabbreviation}
+}
+\strut
+\atentryfmt{abbreviation}\marg{din,
+  \field{short} = \marg{DIN},
+  \field{user1} = \marg{Deutsches Institut f\gls{umlaut}ur Normung e.V.},
+  \field{long} = \marg{German Institute for Standardization},
+  \field{user2} = \marg{de-1996},
+  \field{category} = \marg{foreignabbreviation}
+}
+\end{codeenv}
+which is now the same as an earlier example in
+\sectionref{sec:abbrvtrans}.
+If I don't need a particular custom field (such as
+\fieldfmt{language} in the above), I can simply omit it from the
+aliasing, but it's available for other documents if the need arises.
+Here's the complete document modified from
+\sectionref{sec:abbrvtrans}:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[main=british,brazilian,ngerman]\marg{babel}
+\cmd{usepackage}[\styopt{record}]\marg{glossaries-extra}
+\strut
+\gls{setabbreviationstyle}\oarg{foreignabbreviation}\marg{long-short-user}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[abbrvs]{src},\comment{entries defined in abbrvs.bib}
+ \csopt[foreignabbreviation=abbreviation]{entry-type-aliases},
+ \csopt[nativelong=long,foreignlong=user1,language=user2]{field-aliases},
+ \csopt[same as original entry]{category}
+}
+\strut
+\cmd{renewcommand}*\marg{\gls{glsxtruserparen}}[2]\marg{\comment{}
+  \gls{glsxtrfullsep}\marg{\gls{param}2}\comment{}
+  \gls{glsxtrparen}
+  \marg{\gls{param}1\comment{}
+   \gls{ifglshasfield}\marg{\gls{glsxtruserfield}}\marg{\gls{param}2}\comment{}
+   \marg{, \gls{emph}\marg{\gls{GlsXtrForeignText}\marg{\gls{param}2}\marg{\gls{glscurrentfieldvalue}}}}\comment{}
+   \marg{}\comment{}
+  }\comment{}
+}
+\strut
+\cmd{begin}\marg{document}
+\gls{gls}\marg{abnt}, \gls{gls}\marg{din}.
+\cmd{end}\marg{document}
+\end{codeenv}
+
+Here's another example where field and entry aliasing can make the
+\ext{bib} data more flexible:
+\begin{codeenv}
+\atentryfmt{mineral}\marg{amethyst,
+ \fieldfmt{mineralname} = \marg{amethyst},
+ \fieldfmt{mineraldescription} = \marg{a purple type of quartz},
+ \fieldfmt{mineralformula} = \marg{\gls{ce}\marg{SiO2}}
+}
+\end{codeenv}
+For one document, I might use:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[mineral=symbol]{entry-type-aliases},
+  \csopt[
+    mineralformula=name,
+    mineralname=description
+  ]{field-aliases},
+ \csopt[same as original entry]{category}
+}
+\end{codeenv}
+This makes the \code{amethyst} entry behave as though it was defined
+as:
+\begin{codeenv}
+\atentry{symbol}\marg{amethyst,
+ \field{description} = \marg{amethyst},
+ \field{name} = \marg{\gls{ce}\marg{SiO2}},
+ \field{category} = \marg{mineral}
+}
+\end{codeenv}
+Another document might have:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[mineral=entry]{entry-type-aliases},
+  \csopt[
+    mineralformula=symbol,
+    mineralname=name
+    mineraldescription=description
+  ]{field-aliases},
+ \csopt[same as original entry]{category}
+}
+\end{codeenv}
+which now makes the \code{amethyst} entry behave as though it was defined
+as:
+\begin{codeenv}
+\atentry{entry}\marg{amethyst,
+ \field{name} = \marg{amethyst},
+ \field{description} = \marg{a purple type of quartz},
+ \field{symbol} = \marg{\gls{ce}\marg{SiO2}},
+ \field{category} = \marg{mineral}
+}
+\end{codeenv}
+
+See \sectionref{sec:examples} in the main \bibgls\ user manual for
+more examples of aliasing fields and entry types.
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}

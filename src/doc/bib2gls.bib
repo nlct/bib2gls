@@ -3191,7 +3191,11 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.tilde,
-  name={\csfmt{\glstildechar}}
+  name={\csfmt{\glstildechar}},
+  user1={\margm{character}},
+  description={puts tilde accent over \meta{character}},
+  note={kernel command},
+  category={command}
 }
 
 @index{zeroormore,
@@ -3234,6 +3238,32 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{ifdefempty,
+  name={\csfmt{if\-def\-empty}},
+  user1={\margm{cs}\margm{true}\margm{false}},
+  description={tests if the control sequence \meta{cs} is empty},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{ifcsundef,
+  name={\csfmt{if\-cs\-un\-def}},
+  user1={\margm{cs-name}\margm{true}\margm{false}},
+  description={tests if the control sequence given by \meta{cs-name}
+is undefined},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{ifcsdef,
+  name={\csfmt{if\-cs\-def}},
+  user1={\margm{cs-name}\margm{true}\margm{false}},
+  description={tests if the control sequence given by \meta{cs-name}
+is defined},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
 @index{xifinlist,
   name={\csfmt{xifinlist}},
   user1={\margm{element}\margm{list cs}\margm{true}\margm{false}},
@@ -3267,6 +3297,15 @@ cs}\margm{Glspl-like cs}},
   description={globally adds \meta{element} to the list stored
    in the control sequence \meta{list cs}},
   note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{foreignlanguage,
+  name={\csfmt{foreign\-language}},
+  user1={\margm{language name}\margm{text}},
+  description={typesets \meta{text} according to the rules of the
+given language},
+  note={provided by \styfmt{babel}},
   category={command}
 }
 
@@ -3373,6 +3412,12 @@ cs}\margm{Glspl-like cs}},
 
 @index{long-short-user,
   name={\abbrstylefmt{long\dhyphen short\dhyphen user}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{short-long-user,
+  name={\abbrstylefmt{short\dhyphen long\dhyphen user}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -7856,10 +7901,49 @@ packages},
 
 @index{glsxtruserparen,
   name={\csfmt{gls\-xtr\-user\-paren}},
-  user1={},
-  description={used by the parenthetical abbreviation styles
-   to format the parenthetical material},
+  user1={\margm{text}\margm{label}},
+  description={used by the \abbrstyle{long-short-user} and
+  \abbrstyle{short-long-user} abbreviation styles
+   to format the parenthetical material where \meta{text}
+   is the default parenthetical text and \meta{label}
+   is the entry's label. This checks the field given
+   by \gls{glsxtruserfield} and, if set, the \meta{text} is
+   followed by a comma and the user value},
+  note={provided by \styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@index{glsxtrfullsep,
+  name={\csfmt{gls\-xtr\-full\-sep}},
+  user1={\margm{label}},
+  description={the separator used in the full format for the parenthetical styles},
   note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{GlsXtrForeignText,
+  name={\csfmt{Gls\-Xtr\-Foreign\-Text}},
+  user1={\margm{label}\margm{text}},
+  description={encapsulates \meta{text} in \csfmt{foreignlanguage}
+  where the language label is obtained from the locale tag
+  given in the field identified by \gls{GlsXtrForeignTextField}},
+  note={provided by \styfmt{glossaries-extra} v1.32+},
+  category={command}
+}
+
+@index{GlsXtrForeignTextField,
+  name={\csfmt{Gls\-Xtr\-Foreign\-Text\-Field}},
+  description={used by \gls{GlsXtrForeignText} to identify
+   the field containing the locale tag},
+  note={provided by \styfmt{glossaries-extra} v1.32+},
+  category={command}
+}
+
+@index{glsxtrparen,
+  name={\csfmt{gls\-xtr\-paren}},
+  user1={\margm{text}},
+  description={used to markup parenthetical material},
+  note={provided by \styfmt{glossaries-extra} v1.17+},
   category={command}
 }
 
@@ -8529,6 +8613,44 @@ the \sty{accsupp} package},
   category={command}
 }
 
+@index{GetTrackedDialectFromLanguageTag,
+  name={\csfmt{Get\-Tracked\-Dialect\-From\-Language\-Tag}},
+  user1={\margm{language tag}\margm{cs}},
+  description={gets the \styfmt{tracklang} dialect label from the
+given language tag and stores it in the command \meta{cs}. The
+result will be empty if there's no tracked dialect associated with
+the given language tag},
+  note={provided by \styfmt{tracklang} version 1.3+},
+  category={command}
+}
+
+@index{TrackedDialectClosestSubMatch,
+  name={\csfmt{Tracked\-Dialect\-Closest\-Sub\-Match}},
+  description={set by \gls{GetTrackedDialectFromLanguageTag}
+  if an exact match isn't found but a partial match on the
+  root language is found},
+  note={provided by \styfmt{tracklang} version 1.3.6+},
+  category={command}
+}
+
+@index{IfTrackedDialectHasMapping,
+  name={\csfmt{If\-Tracked\-Dialect\-Has\-Mapping}},
+  user1={\margm{tracklang label}\margm{true}\margm{false}},
+  description={tests if the \styfmt{tracklang} dialect label has
+been assigned a mapping to a language hook label},
+  note={provided by \styfmt{tracklang} version 1.3+},
+  category={command}
+}
+
+@index{GetTrackedDialectToMapping,
+  name={\csfmt{Get\-Tracked\-Dialect\-To\-Mapping}},
+  user1={\margm{tracklang label}},
+  description={the language hook label corresponding to the given
+\sty{tracklang} label},
+  note={provided by \styfmt{tracklang} version 1.3+},
+  category={command}
+}
+
 @index{glstextformat,
   name={\csfmt{glstextformat}},
   user1={\margm{text}},
@@ -8784,6 +8906,14 @@ has three or more items},
   name={\csfmt{"}},
   user1={\margm{character}},
   description={puts an umlaut accent over \meta{character}},
+  note={kernel command},
+  category={command}
+}
+
+@index{c,
+  name={\csfmt{c}},
+  user1={\margm{character}},
+  description={puts a cedilla accent over \meta{character}},
   note={kernel command},
   category={command}
 }
