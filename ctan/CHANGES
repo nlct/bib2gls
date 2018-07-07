@@ -1,3 +1,9 @@
+v1.6 (2018-07-07):
+
+  * corrected some of the latin<n> to Java encoding names
+
+  * added check for \@input in .aux file
+
 v1.5 (2018-05-09):
 
   * added introductory guide (bib2gls-begin.pdf)

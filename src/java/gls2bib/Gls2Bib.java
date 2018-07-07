@@ -879,8 +879,9 @@ public class Gls2Bib extends LaTeXParserListener
 
    public static void version()
    {
-      System.out.println(String.format("convertgls2bib v%s (%s)", VERSION, DATE));
-      System.out.println("Copyright 2017 Nicola Talbot");
+      System.out.format("convertgls2bib v%s (%s)%n", VERSION, DATE);
+      System.out.format("Copyright 2017-%s Nicola Talbot%n", 
+        DATE.substring(0,4));
       System.out.print("License GPLv3+: GNU GPL version 3 or later");
       System.out.println(" <http://gnu.org/licenses/gpl.html>");
       System.out.print("This is free software: you are free to change");
@@ -1083,8 +1084,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.5";
-   public static final String DATE = "2018-05-09";
+   public static final String VERSION = "1.6";
+   public static final String DATE = "2018-07-07";
 
    private Vector<GlsData> data;
 

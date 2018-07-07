@@ -1,0 +1,15 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src=test-entries]
+
+\begin{document}
+\include{test-include-subfile1}
+\include{test-include-subfile2}
+
+\printunsrtglossary
+\end{document}

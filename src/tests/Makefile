@@ -26,7 +26,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-crossresource-refs.pdf test-custom-rules.pdf \
 	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf \
 	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf \
-	  test-indexplural.pdf
+	  test-indexplural.pdf test-include.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -474,6 +474,13 @@ test-indexplural.pdf	: test-indexplural.glstex
 test-indexplural.glstex	: test-indexplural.tex indexplural.bib $(DEPS)
 		pdflatex test-indexplural
 		$(BIB2GLS) test-indexplural
+
+test-include.pdf	: test-include.glstex
+		pdflatex test-include
+
+test-include.glstex	: test-include.tex test-include-subfile1.tex test-include-subfile2.tex test-entries.bib $(DEPS)
+		pdflatex test-include
+		$(BIB2GLS) test-include
 
 clean	:
 	$(RM) *.aux

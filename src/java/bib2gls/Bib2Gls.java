@@ -512,15 +512,27 @@ public class Bib2Gls implements TeXApp
       }
       else if (texCharset.equals("latin5"))
       {
-         return "ISO-8859-5";
+         return "ISO-8859-9";
+      }
+      else if (texCharset.equals("latin6"))
+      {
+         return "ISO-8859-10";
+      }
+      else if (texCharset.equals("latin7"))
+      {
+         return "ISO-8859-13";
+      }
+      else if (texCharset.equals("latin8"))
+      {
+         return "ISO-8859-14";
       }
       else if (texCharset.equals("latin9"))
       {
-         return "ISO-8859-9";
+         return "ISO-8859-15";
       }
       else if (texCharset.equals("latin10"))
       {
-         return "ISO-8859-10";
+         return "ISO-8859-16";
       }
       else if (texCharset.equals("decmulti"))
       {
@@ -556,7 +568,7 @@ public class Bib2Gls implements TeXApp
       }
       else if (texCharset.equals("next"))
       {
-         // don't known appropriate Java encoding label for this one
+         // don't know appropriate Java encoding label for this one
       }
       else if (texCharset.equals("cp1250"))
       {
@@ -3180,7 +3192,8 @@ public class Bib2Gls implements TeXApp
 
    public void license()
    {
-      System.out.println("Copyright 2017 Nicola Talbot");
+      System.out.format("Copyright 2017-%s Nicola Talbot%n",
+       DATE.substring(0,4));
       System.out.println(getMessage("about.license"));
    }
 
@@ -4323,8 +4336,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.5";
-   public static final String DATE = "2018-05-09";
+   public static final String VERSION = "1.6";
+   public static final String DATE = "2018-07-07";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
