@@ -6481,6 +6481,31 @@ category},
   category={command}
 }
 
+@index{ifglsused,
+  name={\csfmt{if\-gls\-used}},
+  user1={\margm{label}\margm{true}\margm{false}},
+  description={does \meta{true} if the entry given by \meta{label} has been
+  used, \meta{false} if the entry hasn't been used and neither
+  if the entry doesn't exist (an error or warning message will
+  occur and ?? will appear in the document).
+  This command is not for use in the post-link hooks},
+  note={provided by \styfmt{glossaries}},
+  seealso={GlsXtrIfUnusedOrUndefined,glsxtrifwasfirstuse},
+  category={command}
+}
+
+@index{GlsXtrIfUnusedOrUndefined,
+  name={\csfmt{Gls\-Xtr\-If\-Un\-used\-Or\-Un\-defined}},
+  user1={\margm{label}\margm{true}\margm{false}},
+  description={does \meta{true} if the entry given by \meta{label}
+hasn't been
+  used or is undefined, otherwise it does \meta{false}.
+  This command is not for use in the post-link hooks},
+  note={provided by \styfmt{glossaries-extra} v1.34+},
+  seealso={ifglsused,glsxtrifwasfirstuse},
+  category={command}
+}
+
 @index{glslabel,
   name={\csfmt{glslabel}},
   user1={},

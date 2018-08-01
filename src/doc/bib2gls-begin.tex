@@ -798,6 +798,25 @@ automated methods provided, such as the abbreviation mechanism
 (\sectionref{sec:abbreviations}) or changing the formatting
 (\sectionref{sec:glsformats}).
 
+You can test if an entry has been used with:
+\nosecformatdef{ifglsused}
+This requires that the entry (identified by \meta{label}) is
+defined. If it isn't then neither \meta{true} nor \meta{false} is
+done and an error or warning occurs. Otherwise, the command will do
+\meta{true} if the entry has been used or \meta{false} if the entry
+hasn't been used.
+
+When using \bibgls, entries are never defined on the first \LaTeX\
+run, so you may instead prefer:
+\nosecformatdef{GlsXtrIfUnusedOrUndefined}
+which does \meta{true} if either the entry hasn't been defined or
+hasn't been marked as used, otherwise it does \meta{false}.
+
+Neither \gls{ifglsused} nor \gls{GlsXtrIfUnusedOrUndefined} should
+occur in the \idx{postlinkhook} as the entry will have already
+been used by that point. Instead, you need \gls{glsxtrifwasfirstuse} 
+(see \sectionref{sec:postlinkhooks}).
+
 \section{Categories}
 \label{sec:categories}
 
