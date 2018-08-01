@@ -371,7 +371,7 @@ Have you used the glossaries-extra.sty ''record'' option?
 Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.missing.aux.new.cs">Missing \{0} in aux file (make sure glossaries-extra.sty is at least {1}).</entry>
 <entry key="error.only.one.aux">Only one aux file permitted.</entry>
-<entry key="error.no.aux">Missing aux file. Use --help for help.</entry>
+<entry key="error.no.aux">Aux file not supplied. Syntax: bib2gls [&lt;options&gt;] &lt;aux file&gt;</entry>
 <entry key="error.file.not.found">File not found: {0}</entry>
 <entry key="error.missing.src">File not found: {0}
 (Did you forget to use the ''src'' key?)</entry>
