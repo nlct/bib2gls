@@ -1758,6 +1758,14 @@ public class Bib2Gls implements TeXApp
          fields.add("category");
       }
 
+      // If --group is used, make sure that the group field is
+      // defined.
+
+      if (useGroupField() && !fields.contains("group"))
+      {
+         warningMessage("warning.no_group_field");
+      }
+
       // add the fields needed for dualabbreviation
       addField("dualshort");
       addField("dualshortplural");
@@ -4336,8 +4344,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.6";
-   public static final String DATE = "2018-07-07";
+   public static final String VERSION = "1.6.20180809";
+   public static final String DATE = "2018-08-09";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

@@ -335,6 +335,7 @@ Ignoring {1}</entry>
 Ignoring {1}</entry>
 <entry key="warning.option.pair.required">Resource option {0} requires option {1}</entry>
 <entry key="warning.group.option.required">Resource option {0} requires application switch {1}</entry>
+<entry key="warning.no_group_field">You have the --group switch on but the document hasn''t defined the ''group'' key. (Have you forgotten to use the ''record'' package option?)</entry>
 <entry key="warning.parent.missing">Parent {0} does not occur before entry {1} so removing relationship.</entry>
 <entry key="warning.unknown.field.pattern">Ignoring pattern for unknown field: {0}</entry>
 <entry key="warning.notbasiclatin.id">Problematic entry label: {0}
