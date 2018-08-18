@@ -2169,22 +2169,49 @@ public class Bib2GlsEntry extends BibEntry
          supplementalRecords = new Vector<GlsRecord>();
       }
 
-      String fmt = record.getFormat();
+      if (!bib2gls.isMultipleSupplementarySupported())
+      {
+         String fmt = record.getFormat();
 
-      if (fmt.startsWith("("))
-      {
-         fmt = "(glsxtrsupphypernumber";
-      }
-      else if (fmt.startsWith(")"))
-      {
-         fmt = ")glsxtrsupphypernumber";
-      }
-      else
-      {
-         fmt = "glsxtrsupphypernumber";
-      }
+         if (fmt.startsWith("("))
+         {
+            fmt = "(glsxtrsupphypernumber";
+         }
+         else if (fmt.startsWith(")"))
+         {
+            fmt = ")glsxtrsupphypernumber";
+         }
+         else
+         {
+            fmt = "glsxtrsupphypernumber";
+         }
 
-      record.setFormat(fmt);
+         record.setFormat(fmt);
+      }
+      else if (record instanceof GlsSuppRecord)
+      {
+         GlsSuppRecord suppRecord = (GlsSuppRecord)record;
+
+         if (supplementalRecordMap == null)
+         {
+            supplementalRecordMap = new HashMap<TeXPath,Vector<GlsRecord>>();
+         }
+
+         TeXPath source = suppRecord.getSource();
+
+         Vector<GlsRecord> list = supplementalRecordMap.get(source);
+
+         if (list == null)
+         {
+            list = new Vector<GlsRecord>();
+            supplementalRecordMap.put(source, list);
+         }
+
+         if (!list.contains(suppRecord))
+         {
+            list.add(suppRecord);
+         }
+      }
 
       if (!supplementalRecords.contains(record))
       {
@@ -2700,8 +2727,38 @@ public class Bib2GlsEntry extends BibEntry
             builder.append(String.format("%s\\bibglssupplemental{%d}{", 
               supplSep, supplementalRecords.size()));
 
-            builder = updateLocationList(minRange, suffixF, suffixFF, gap,
-              supplementalRecords, builder);
+            if (bib2gls.isMultipleSupplementarySupported())
+            {
+               // Fetch the list from resources to maintain correct
+               // order.
+               Vector<TeXPath> sources = resource.getSupplementalPaths();
+
+               String supplSubSep = "";
+
+               for (TeXPath source : sources)
+               {
+                  Vector<GlsRecord> subList = supplementalRecordMap.get(source);
+
+                  if (subList != null)
+                  {
+                     builder.append(String.format(
+                       "%s\\bibglssupplementalsublist{%d}{%s}{", 
+                       supplSubSep, subList.size(), source));
+
+                     supplSubSep = "\\bibglssupplementalsubsep ";
+
+                     builder = updateLocationList(minRange, suffixF, suffixFF, 
+                      gap, subList, builder);
+
+                     builder.append("}");
+                  }
+               }
+            }
+            else
+            {
+               builder = updateLocationList(minRange, suffixF, suffixFF, gap,
+                 supplementalRecords, builder);
+            }
 
             builder.append("}");
          }
@@ -3363,8 +3420,10 @@ public class Bib2GlsEntry extends BibEntry
 
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
-   private Vector<GlsRecord> supplementalRecords;
    private Vector<GlsRecord> ignoredRecords;
+
+   private Vector<GlsRecord> supplementalRecords;
+   private HashMap<TeXPath,Vector<GlsRecord>> supplementalRecordMap;
 
    private boolean selected = false;
 

@@ -446,6 +446,20 @@
   category={command}
 }
 
+@dualindexentry{bibglssupplementalsublist,
+  name={\csfmt{bib\-gls\-supple\-mental\-sub\-list}},
+  user1={\margm{n}\margm{external document}\margm{list}},
+  description={supplemental sub-list encapsulator},
+  category={command}
+}
+
+@dualindexentry{bibglssupplementalsubsep,
+  name={\csfmt{bib\-gls\-supple\-mental\-sub\-sep}},
+  user1={},
+  description={separator between supplementary sub-lists},
+  category={command}
+}
+
 @dualindexentry{glsgroupheading,
   name={\csfmt{gls\-group\-heading}},
   user1={\margm{label}},
@@ -2379,6 +2393,24 @@ cs}\margm{Glspl-like cs}},
   description={handler used to display the number list stored in 
    the \field{loclist} field},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@dualindexentry{glsxtrdisplaysupploc,
+  name={\csfmt{gls\-xtr\-display\-supp\-loc}},
+  user1={\margm{prefix}\margm{counter}\margm{format}\margm{src}\margm{location}},
+  description={used to display an external location in the
+   supplementary list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.36+},
+  category={command}
+}
+
+@dualindexentry{glsxtrmultisupplocation,
+  name={\csfmt{gls\-xtr\-multi\-supp\-location}},
+  user1={\margm{location}\margm{src}\margm{format}},
+  description={used by \gls{glsxtrdisplaysupploc} to format the
+  external location},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.36+},
   category={command}
 }
 

@@ -10,7 +10,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual-abbrv-desc.pdf test-numbers.pdf \
 	  test-book.pdf test-article.pdf test-dual-symbols.pdf \
 	  test-alias.pdf test-dep.pdf test-ranges.pdf test-counters.pdf \
-	  test-supp.pdf test-supp-main.pdf test-random.pdf \
+	  test-supp.pdf test-supp2.pdf test-supp-main.pdf test-random.pdf \
 	  test-glsignore.pdf test-dual-entryabbrv.pdf \
 	  test-match-entrytype.pdf test-digraphs.pdf \
 	  sample-testidx.pdf sample-testidx-alsoindex.pdf \
@@ -212,10 +212,17 @@ test-supp.glstex	: test-supp.tex $(DEPS) test-entries.bib
 		pdflatex test-supp
 		$(BIB2GLS) test-supp
 
+test-supp2.pdf	: test-supp2.glstex
+		pdflatex test-supp2
+
+test-supp2.glstex	: test-supp2.tex $(DEPS) test-entries.bib
+		pdflatex test-supp2
+		$(BIB2GLS) test-supp2
+
 test-supp-main.pdf	: test-supp-main.glstex
 		pdflatex test-supp-main
 
-test-supp-main.glstex	: test-supp-main.tex test-supp.pdf $(DEPS) test-entries.bib
+test-supp-main.glstex	: test-supp-main.tex test-supp.pdf test-supp2.pdf $(DEPS) test-entries.bib
 		pdflatex test-supp-main
 		$(BIB2GLS) test-supp-main
 

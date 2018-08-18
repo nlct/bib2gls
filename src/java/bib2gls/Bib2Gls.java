@@ -687,22 +687,35 @@ public class Bib2Gls implements TeXApp
                   try
                   {
                      Calendar minVersion = Calendar.getInstance();
-                     minVersion.set(2017, 02, 03);
+                     minVersion.set(2017, 1, 3); // v1.12 (2017/02/03)
 
                      int year = Integer.parseInt(m.group(2));
                      int mon = Integer.parseInt(m.group(3));
                      int day = Integer.parseInt(m.group(4));
 
                      Calendar cal = Calendar.getInstance();
-                     cal.set(year, mon, day);
+                     cal.set(year, mon-1, day);
+
+                     SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+
+                     glossariesExtraVersion = df.format(cal.getTime());
 
                      if (cal.compareTo(minVersion) < 0)
                      {
-                        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 
                         warningMessage("error.sty.too.old", 
-                         "glossaries-extra", df.format(cal.getTime()), 
+                         "glossaries-extra", glossariesExtraVersion, 
                            df.format(minVersion.getTime()));
+                     }
+                     else
+                     {
+                        // Are multiple supplementary sources
+                        // supported?
+
+                        minVersion.set(MIN_MULTI_SUPP_YEAR, 
+                           MIN_MULTI_SUPP_MONTH-1, MIN_MULTI_SUPP_DAY);
+
+                        multiSuppSupported = (cal.compareTo(minVersion) >= 0);
                      }
                   }
                   catch (Exception e)
@@ -762,6 +775,11 @@ public class Bib2Gls implements TeXApp
 
          debug();
       }
+   }
+
+   public String getGlossariesExtraVersion()
+   {
+      return glossariesExtraVersion;
    }
 
    public static boolean isAutoSupportPackage(String pkg)
@@ -1998,6 +2016,11 @@ public class Bib2Gls implements TeXApp
    public boolean useGroupField()
    {
       return addGroupField;
+   }
+
+   public boolean isMultipleSupplementarySupported()
+   {
+      return multiSuppSupported;
    }
 
    public Vector<String> getFields()
@@ -4344,8 +4367,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.6.20180809";
-   public static final String DATE = "2018-08-09";
+   public static final String VERSION = "1.7";
+   public static final String DATE = "2018-08-18";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4440,6 +4463,10 @@ public class Bib2Gls implements TeXApp
    // super/subscript characters if possible if true:
    private boolean supportUnicodeSubSuperScripts=true;
 
+   private boolean multiSuppSupported=false;
+
+   private String glossariesExtraVersion="????/??/??";
+
    private Vector<String> dependencies = null;
 
    private int exitCode;
@@ -4449,6 +4476,11 @@ public class Bib2Gls implements TeXApp
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",
      "long", "longplural", "short", "shortplural", "symbol"};
+
+   public static final String MIN_MULTI_SUPP_VERSION="1.36";
+   public static final int MIN_MULTI_SUPP_YEAR=2018;
+   public static final int MIN_MULTI_SUPP_MONTH=8;
+   public static final int MIN_MULTI_SUPP_DAY=18;
 
    public static final int SUPERSCRIPT_ZERO=0x2070;
    public static final int SUPERSCRIPT_ONE=0x00B9;

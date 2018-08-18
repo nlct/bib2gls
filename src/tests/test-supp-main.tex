@@ -6,15 +6,33 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage[record]{glossaries-extra}
 
-\newcommand{\bibglssupplementalsep}{; }
+\newcommand{\bibglssupplementalsep}{.}
+\newcommand{\bibglssupplementalsubsep}{; }
+
+\newcommand{\bibglssupplemental}[2]{%
+ \par
+ \ifnum#1=1 
+  External reference:
+ \else
+  External references:
+ \fi
+ #2.%
+}
+
+\newcommand{\bibglssupplementalsublist}[3]{%
+  #2: #3%
+}
 
 \GlsXtrLoadResources[
  src=test-entries,% data in test-entries.bib
-% Requires glossaries-extra.sty v1.14:
+% The following requires glossaries-extra.sty v1.14+ for a single 
+% location and v1.36+ for multiple external sources.
 % Entries used in this document that have locations recorded
 % in 'test-supp.tex' can have the 'test-supp' locations
 % appended to their location lists:
- supplemental-locations=test-supp,
+ %supplemental-locations=test-supp,
+% Multiple supplementary sources:
+ supplemental-locations={test-supp,test-supp2},
 % set the category label for entries that have supplemental
 % locations:
  supplemental-category={supplemental},

@@ -1,3 +1,8 @@
+v1.7 (2018-08-18):
+
+  * added support for multiple supplementary sources
+    (requires at least glossaries-extra v1.36)
+
 v1.6 (2018-07-07):
 
   * corrected some of the latin<n> to Java encoding names

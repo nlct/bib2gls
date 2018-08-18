@@ -904,9 +904,9 @@ public class Gls2Bib extends LaTeXParserListener
       System.out.println("--no-ignore-sort\tdon't ignore sort field");
       System.out.println("--space-sub <value>\tsubstitute spaces in labels with <value>");
       System.out.println("--locale <lang tag>\tuse language resource file for locale given by <lang tag>");
-      System.out.println("--silent\tsuppress messages");
-      System.out.println("--verbose\tnormal messages");
-      System.out.println("--debug\tdebug mode");
+      System.out.println("--silent\t\tsuppress messages");
+      System.out.println("--verbose\t\tnormal messages");
+      System.out.println("--debug\t\t\tdebug mode");
    }
 
    public static void main(String[] args)
@@ -1084,8 +1084,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.6";
-   public static final String DATE = "2018-07-07";
+   public static final String VERSION = "1.7";
+   public static final String DATE = "2018-08-18";
 
    private Vector<GlsData> data;
 

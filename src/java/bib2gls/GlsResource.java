@@ -81,7 +81,7 @@ public class GlsResource
       String[] srcList = null;
 
       String master = null;
-      String supplemental = null;
+      String[] supplemental = null;
 
       String writeActionSetting = "define";
 
@@ -119,8 +119,10 @@ public class GlsResource
             masterSelection = getStringArray(parser, list, opt);
          }
          else if (opt.equals("supplemental-locations"))
-         {// fetch supplemental locations from another document
-            supplemental = getRequired(parser, list, opt);
+         {// Fetch supplemental locations from another document.
+          // As from v1.7, the value may now be a list of
+          // document base names.
+            supplemental = getStringArray(parser, list, opt);
          }
          else if (opt.equals("supplemental-category"))
          {
@@ -2000,7 +2002,27 @@ public class GlsResource
 
       if (supplemental != null)
       {
-         parseSupplemental(parser, supplemental);
+         if (supplemental.length > 1 &&
+               !bib2gls.isMultipleSupplementarySupported())
+         {
+            bib2gls.warningMessage("warning.multi_supp_unsupported",
+             supplemental[0], 
+             bib2gls.getGlossariesExtraVersion(),
+             String.format("%s %4d/%02d/%02d", 
+               bib2gls.MIN_MULTI_SUPP_VERSION,
+               bib2gls.MIN_MULTI_SUPP_YEAR,
+               bib2gls.MIN_MULTI_SUPP_MONTH,
+               bib2gls.MIN_MULTI_SUPP_DAY));
+
+            parseSupplemental(parser, supplemental[0]);
+         }
+         else
+         {
+            for (String suppRef : supplemental)
+            {
+               parseSupplemental(parser, suppRef);
+            }
+         }
       }
 
       if (master != null)
@@ -2717,11 +2739,21 @@ public class GlsResource
 
       supplementalPdfPath = new TeXPath(parser, basename+".pdf", false);
 
+      if (supplementalPdfPaths == null)
+      {
+         supplementalPdfPaths = new Vector<TeXPath>();
+      }
+
+      supplementalPdfPaths.add(supplementalPdfPath);
+
       TeXParser auxTeXParser = auxParser.parseAuxFile(auxFile);
 
       Vector<AuxData> auxData = auxParser.getAuxData();
 
-      supplementalRecords = new Vector<GlsRecord>();
+      if (supplementalRecords == null)
+      {
+         supplementalRecords = new Vector<GlsSuppRecord>();
+      }
 
       for (AuxData data : auxData)
       {
@@ -2762,7 +2794,9 @@ public class GlsResource
             {
                if (recordLabel.equals("*"))
                {
-                  bib2gls.verboseMessage("message.ignored.record", "\\citation{*}");
+                  bib2gls.verboseMessage("message.ignored.record", 
+                   "\\citation{*}");
+
                   continue;
                }
 
@@ -2772,9 +2806,9 @@ public class GlsResource
                recordLocation = "";
             }
 
-            supplementalRecords.add(new GlsRecord(
+            supplementalRecords.add(new GlsSuppRecord(
               bib2gls, recordLabel, recordPrefix, recordCounter,
-              recordFormat, recordLocation));
+              recordFormat, recordLocation, supplementalPdfPath));
          }
       }
 
@@ -4312,7 +4346,7 @@ public class GlsResource
    {
       if (supplementalRecords != null)
       {
-         for (GlsRecord record : supplementalRecords)
+         for (GlsSuppRecord record : supplementalRecords)
          {
             String label = getRecordLabel(record);
 
@@ -4950,7 +4984,7 @@ public class GlsResource
 
          if (supplementalRecords != null && supplementalSelection != null)
          {
-            for (GlsRecord record : supplementalRecords)
+            for (GlsSuppRecord record : supplementalRecords)
             {
                String label = getRecordLabel(record);
 
@@ -5387,6 +5421,14 @@ public class GlsResource
          {
             writer.println("\\providecommand{\\bibglssupplementalsep}{\\bibglsdelimN}");
             writer.println("\\providecommand{\\bibglssupplemental}[2]{#2}");
+
+            if (bib2gls.isMultipleSupplementarySupported())
+            {
+               writer.println("\\providecommand{\\bibglssupplementalsubsep}{\\bibglsdelimN}");
+
+               writer.println("\\providecommand{\\bibglssupplementalsublist}[3]{#3}");
+            }
+
             writer.println();
          }
 
@@ -5675,7 +5717,9 @@ public class GlsResource
             frc = new FontRenderContext(null, false, false);
          }
 
-         if (supplementalPdfPath != null && supplementalCategory != null)
+         if (!bib2gls.isMultipleSupplementarySupported()
+             && supplementalPdfPath != null
+             && supplementalCategory != null)
          {
             writer.format(
               "\\glssetcategoryattribute{%s}{externallocation}{%s}%n%n", 
@@ -5760,7 +5804,8 @@ public class GlsResource
 
             writeBibEntry(writer, entry);
 
-            if (supplementalPdfPath != null 
+            if (!bib2gls.isMultipleSupplementarySupported()
+                && supplementalPdfPath != null 
                 && supplementalCategory == null 
                 && entry.supplementalRecordCount() > 0)
             {
@@ -8032,6 +8077,11 @@ public class GlsResource
       return indexCounter;
    }
 
+   public Vector<TeXPath> getSupplementalPaths()
+   {
+      return supplementalPdfPaths;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -8255,8 +8305,9 @@ public class GlsResource
 
    private HashMap<String,GroupTitle> groupTitleMap=null;
 
-   private Vector<GlsRecord> supplementalRecords=null;
+   private Vector<GlsSuppRecord> supplementalRecords=null;
    private TeXPath supplementalPdfPath=null;
+   private Vector<TeXPath> supplementalPdfPaths=null;
    private String[] supplementalSelection=null;
    private String supplementalCategory=null;
 

@@ -357,6 +357,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.unknown.widest">Can''t determine widest level {0} entry for unknown glossary type. Using fallback method.</entry>
 <entry key="warning.invalid.locale">Unrecognised locale: {0}. Using {1} instead.</entry>
 <entry key="warning.interpreter.needed.fallback">Interpreter needed to obtain fallback contents for field {0} (entry {1})</entry>
+<entry key="warning.multi_supp_unsupported">Multiple supplemental locations not supported with glossaries-extra {1}. Restricting selection to just {0}. Update to at least glossaries-extra version {2} to support multiple supplementary sources.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>

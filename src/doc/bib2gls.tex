@@ -8964,9 +8964,12 @@ identified by the \csopt[primary]{save-index-counter} setting.
 \section{Supplemental Locations}
 \label{sec:supplementalopts}
 
-\emph{These options require at least version 1.14 of \isty{glossaries-extra}.}
-
-\optsection{supplemental-locations}
+\emph{These options require at least version 1.14 of
+\isty{glossaries-extra}.} If you require locations from multiple
+external sources, then you need at least version 1.36 of
+\isty{glossaries-extra} (or, more specifically,
+\isty{glossaries-extra-bib2gls}, which is automatically loaded
+by the \styopt[only]{record} package option).
 
 The \sty{glossaries-extra} package (from v1.14) provides a way of
 manually adding locations in supplemental documents through the use
@@ -9035,9 +9038,35 @@ setting the \catattr{externallocation} attribute and using
 and \glsaddopt[glsxtrsupphypernumber]{format}.
 
 This can be simplified with \bibgls\ by using the
-\optfmt{supplemental-locations} option. The value should be the base
-name (without the extension) of the supplementary document
-(\optfmt{suppl} in the above example). For example:
+\optfmt{supplemental-locations} option, described below. 
+
+Version 1.36 of \isty{glossaries-extra-bib2gls} introduces some
+special location formatting commands that don't use the
+\catattr{externallocation} attribute, but instead have an extra
+argument that indicates the external reference. The additional
+argument means that it can't be used by the \glsaddopt{format}
+key, but with \bibgls\ you don't use \cs{glsadd} to record
+the external locations. Instead it obtains the records from
+the corresponding supplementary \ext{aux} file, and adjusts the
+location encapsulator as appropriate.
+
+If \bibgls\ detects an older version of \sty{glossaries-extra},
+it will only allow one external supplemental source, and
+will set the \catattr{externallocation} attribute and use
+the \optfmt{glsxtrsupphypernumber} format. Otherwise \bibgls\
+will allow multiple sources and use the newer method.
+
+\optsection{supplemental-locations}
+
+The value should be the base name (without the extension) of the
+supplementary document (\optfmt{suppl} in the above example).
+If you have at least version 1.36 of \sty{glossaries-extra},
+the value may be a comma-separated list of base names (without the
+extensions) of the supplementary documents. If an older version is
+detected, \bibgls\ will issue a warning and only accept the first
+element of the list.
+
+For example:
 \begin{verbatim}
 \documentclass{article}
 
@@ -9056,16 +9085,84 @@ name (without the extension) of the supplementary document
 \end{document}
 \end{verbatim}
 The location list for \code{sample} will now be \qt{1, S1} (page~1
-from the main document and S1 from the supplementary document). Note
-that the original location format from the supplementary document
-will be replaced by \optfmt{glsxtrsupphypernumber}, which will
-produce an external hyperlink if the main document loads the
-\isty{hyperref} package. (Note that not all PDF viewers can handle
-external hyperlinks, and some that can open the external PDF file may not 
-recognise the destination within that file.)
+from the main document and S1 from the supplementary document).
+
+With \sty{glossaries-extra} v1.36+, the location from the
+supplementary document will be encapsulated with:
+\nosecdef{glsxtrdisplaysupploc}
+By default, this simply creates an external hyperlink to the
+supplementary document with the location as the hyperlink text.
+The hyperlink is created using \meta{src} as the target path
+with the fragment part (anchor) formed from the prefix and 
+location. The \catattr{externallocation} attribute is not set in
+this case. The actual formatting is done via
+\nosecdef{glsxtrmultisupplocation}
+which ignores the \meta{format} argument by default. Its
+definition is simply:
+\begin{verbatim}
+\newcommand*{\glsxtrmultisupplocation}[3]{%
+ {% scope required to localise changes
+   \def\glsxtrsupplocationurl{#2}%
+   \glshypernumber{#1}%
+ }%
+}
+\end{verbatim}
+which locally sets the command checked by \ics{glshypernumber}
+to establish an external rather than internal link. You can
+redefine this command to retain the original formatting
+command used in the target document:
+\begin{verbatim}
+\renewcommand*{\glsxtrmultisupplocation}[3]{%
+ {% scope required to localise changes
+   \def\glsxtrsupplocationurl{#2}%
+   \csuse{#3}{#1}%
+ }%
+}
+\end{verbatim}
+but remember that if a hyperlink is required, the identified
+control sequence name must correspond to a command that
+uses \cs{glshyperlink} (such as \cs{hyperbf}), otherwise you
+will lose the hyperlink.
+
+With older versions of \sty{glossaries-extra},
+the original location format from the supplementary document
+will be replaced by \optfmt{glsxtrsupphypernumber}, which 
+again produces an external hyperlink. The \catattr{externallocation}
+attribute also needs to be set (this can be done automatically with
+\csopt{supplemental-category}) to identify the external document.
+The original format can't be accessed.
+
+In both cases, if the document hasn't loaded the \isty{hyperref}
+package, the location will simply be displayed without a hyperlink.
+(Note that not all PDF viewers can handle external hyperlinks, and
+some that can open the external PDF file may not recognise the
+destination within that file.)
 
 The supplementary locations lists are encapsulated within
-\gls{bibglssupplemental}.
+\gls{bibglssupplemental}. With \sty{glossaries-extra} v1.36+,
+this command will encapsulate the sub-lists with
+\gls{bibglssupplementalsublist}.
+
+So the above example with an old version of \sty{glossaries-extra}
+(pre 1.36) will set the supplemental location list (which only consists
+of one location) to
+\begin{verbatim}
+\bibglssupplemental{1}{\setentrycounter[I]{section}\glsxtrsupphypernumber{S1}}
+\end{verbatim}
+and the external target must be supplied through the
+\catattr{externallocation} attribute, which can be set 
+with the \csopt{supplemental-category} option.
+
+Whereas with at least version 1.36, the list will be
+\begin{verbatim}
+\bibglssupplemental{1}{\bibglssupplementalsublist{1}{suppl.pdf}
+{\glsxtrdisplaysupploc{I}{section}{glsnumberformat}{suppl.pdf}{S1}}}
+\end{verbatim}
+
+If an entry has both a main location list and a supplementary
+location list (such as the \code{sample} entry above), the lists
+will be separated by \csref{bibglssupplementalsep}. The sub-lists
+(when supported) are separated by \csref{bibglssupplementalsubsep}.
 
 \optsection{supplemental-selection}
 
@@ -9119,10 +9216,6 @@ This will additionally add the \code{html} and \code{ssi} entries
 even though they haven't been used in this document. The
 \code{goose} entry used in the supplementary document won't be
 included.
-
-If an entry has both a main location list and a supplementary
-location list (such as the \code{sample} entry above), the lists
-will be separated by \csref{bibglssupplementalsep}.
 
 \optsection{supplemental-category}
 
@@ -12946,6 +13039,22 @@ from a supplementary document are encapsulated within the \meta{list}
 part of \gls{bibglssupplemental}. The first argument \meta{n}
 (ignored by default) is the number of supplementary locations.
 
+If multiple supplemental sources are permitted (that is, 
+\bibgls\ has detected that the document is using at least
+version 1.36 of \sty{glossaries-extra}), then the \meta{list}
+part will consist of sub-lists for each external source. In this
+case, \meta{n} will be the total number of elements across
+all the sub-lists.
+
+\cssection{bibglssupplementalsublist}
+
+\formatdef{bibglssupplementalsublist}
+If multiple supplemental sources are permitted, this will be used
+to format each sub-list, where \meta{n} (ignored by default)
+is the number of elements in the sub-list, \meta{external document}
+(ignored by default) is the external source and \meta{list}
+is the list of supplementary locations in \meta{external document}.
+
 \cssection{bibglssupplementalsep}
 
 \formatdef{bibglssupplementalsep}
@@ -12967,6 +13076,12 @@ or redefined after the resources are loaded:
 
 \renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
+
+\cssection{bibglssupplementalsubsep}
+
+\formatdef{bibglssupplementalsubsep}
+The separator between the supplementary
+location sub-lists. By default this is just \csref{bibglsdelimN}.
 
 \section{Letter Groups}
 \label{sec:lettergroupdefs}

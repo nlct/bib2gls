@@ -65,6 +65,11 @@ public class GlsRecord
       return index < record.index ? -1 : 1;
    }
 
+   public long getIndex()
+   {
+      return index;
+   }
+
    public String getLabel()
    {
       return label;
@@ -920,7 +925,7 @@ public class GlsRecord
 
    private long index=0;
 
-   private Bib2Gls bib2gls;
+   protected Bib2Gls bib2gls;
 
    private static long globalIndex=0L;
 
