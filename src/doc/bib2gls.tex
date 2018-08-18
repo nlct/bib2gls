@@ -2780,10 +2780,26 @@ you may end up with a mismatched encoding.
 \section{Comments}
 \label{sec:bibcomments}
 
-You may have comments within the \ext{bib} file provided they are
-outside of entry definitions. The most common type of comment is the
-encoding comment, described above.
-Avoid using comments within field values.
+The original \ext{bib} file format as defined by \BibTeX\ doesn't
+have a designated comment character, but instead treats anything
+outside of \code{@\meta{entry}\margm{data}} as unwanted material
+that's ignored. This can catch out users who try to do something
+like:
+\begin{verbatim}
+%@misc{sample, title={Sample} }
+\end{verbatim}
+In this case, the percent character is simply discarded and the
+line is treated as:
+\begin{verbatim}
+@misc{sample, title={Sample} }
+\end{verbatim}
+Some applications that parse \ext{bib} files are less tolerant of
+unwanted material. In the case of \bibgls, the percent character is
+treated as a comment character and other unwanted material
+should be omitted.  Avoid using comments within field values.
+Comments are best placed outside of entry definitions.
+
+The most common type of comment is the encoding comment, described above.
 
 \section{Fields}
 \label{sec:fields}

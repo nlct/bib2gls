@@ -2279,7 +2279,7 @@ Consider the following document:
 \cmd{usepackage}\marg{tracklang}
 \strut
 \cmd{begin}\marg{document}
-\gls{GetTrackedDialectFromLanguageTag}\marg{en-GB}\marg{\cmd{trackeddialect}}%
+\gls{GetTrackedDialectFromLanguageTag}\marg{en-GB}\marg{\cmd{trackeddialect}}\comment{}
 Tracked dialect label: \cmd{trackeddialect}.
 \gls{IfTrackedDialectHasMapping}\marg{\cmd{trackeddialect}}\comment{}
 \marg{Has mapping: \gls{GetTrackedDialectToMapping}\marg{\cmd{trackeddialect}}}\comment{}
@@ -2326,6 +2326,7 @@ captions hook provided by \sty{babel}.
 The above document produces:
 \begin{result}
 en-GB: Tracked dialect label: . No mapping. Root language: .
+
 en-MT: Tracked dialect label: maltaenglish. Has mapping: british.
 Root language: english.
 \end{result}
@@ -2342,7 +2343,7 @@ label doesn't.
 \cmd{usepackage}\marg{tracklang}
 \strut
 \cmd{begin}\marg{document}
-\gls{GetTrackedDialectFromLanguageTag}\marg{de-DE-1996}\marg{\cmd{trackeddialect}}%
+\gls{GetTrackedDialectFromLanguageTag}\marg{de-DE-1996}\marg{\cmd{trackeddialect}}\comment{}
 Tracked dialect label: \cmd{trackeddialect}.
 \gls{IfTrackedDialectHasMapping}\marg{\cmd{trackeddialect}}\comment{}
 \marg{Has mapping: \gls{GetTrackedDialectToMapping}\marg{\cmd{trackeddialect}}}\comment{}
@@ -2415,7 +2416,7 @@ For example:
 \end{codeenv}
 This essentially uses the earlier \sty{tracklang} code where an
 extra \gls{ifdefempty} is inserted, which sets the equivalent of
-\csfmt{trackeddialect} to \gls{TrackedDialectClosestSubMatch}. If
+\csfmt{trackeddialect} in the above to \gls{TrackedDialectClosestSubMatch}. If
 the test for the captions hook is false, then \gls{foreignlanguage}
 isn't used.
 
@@ -5252,7 +5253,7 @@ should be defined (unless you want the laborious task of filtering
 them out, as in \sectionref{sec:printglossagain}). The \field{group}
 field needs setting for every entry, and if the \field{location}
 field also needs setting then the \filefmt{entries.tex} file will
-need to be modified every time the document changes cause a shift in
+need to be modified every time new document edits cause a shift in
 the page numbers.
 
 With \bibgls, you write all the entry definitions (without the
