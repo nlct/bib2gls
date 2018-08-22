@@ -813,7 +813,7 @@ which does \meta{true} if either the entry hasn't been defined or
 hasn't been marked as used, otherwise it does \meta{false}.
 
 Neither \gls{ifglsused} nor \gls{GlsXtrIfUnusedOrUndefined} should
-occur in the \idx{postlinkhook} as the entry will have already
+occur in the \idx{postlinkhook} (described later) as the entry will have already
 been used by that point. Instead, you need \gls{glsxtrifwasfirstuse} 
 (see \sectionref{sec:postlinkhooks}).
 
@@ -965,7 +965,7 @@ cs} but converts the first letter to \idx{uppercase} (analogous to
 letter to \idx{uppercase} and \meta{link allcaps cs} converts the entire
 value to \idx{uppercase}.
 
-The new keys must be defined before the entries are defined (and
+The new keys must be provided before the entries are defined (and
 the key definitions must come before the first \idx{resourceset}
 if you use \bibgls). For example:
 \begin{codeenv}
@@ -994,8 +994,9 @@ below, the field label is the \emph{internal} label. In some cases,
 this is the same as the key, but there are a few that have a
 different internal label. See Table~\ref*{tab:internalfields} in the
 \bibgls\ user manual or Table~4.1 in the \sty{glossaries} user
-manual. Custom fields provided with \gls{glsaddkey} or \gls{glsaddstoragekey}
-have matching key and internal field labels.
+manual~\cite{glossaries}. Custom fields provided with
+\gls{glsaddkey} or \gls{glsaddstoragekey} have matching key and
+internal field labels.
 
 The \sty{glossaries-extra} package provides a generic way of
 accessing a field, analogous to commands like \gls{glsentryname}:
@@ -1028,7 +1029,7 @@ If you additionally need the field value (protected) fully expanded
 before comparison, use:
 \nosecformatdef{GlsXtrIfXpFieldEqXpStr}
 For a complete list of field commands, see the
-\sty{glossaries-extra} user manual.
+\sty{glossaries-extra} user manual~\cite{glossaries-extra}.
 
 The earlier \code{duck} and \code{goose} examples from 
 \sectionref{sec:firstuse} can be rewritten to move the parenthetical
@@ -1055,13 +1056,13 @@ material into separate keys:
 The \idx{postlinkhook} and glossary style can then be modified to 
 include the additional information.  For example:
 \begin{codeenv}
-\gls[noindex=false]{glsdefpostlink}\marg{general}\marg{\comment{}
+\gls[noindex=false]{glsdefpostlink}\marg{general}\marg{\comment{post-link hook}
  \gls[noindex=false]{glsxtrifwasfirstuse}\marg{\cmd{space}(\gls{glsentryuserii}\marg{\gls{glslabel}})}{}\comment{}
 }
 \strut
 \gls[noindex=false]{glssetcategoryattribute}\marg{general}\marg{glossname}\marg{firstuc}
 \strut
-\gls[noindex=false]{glsdefpostname}\marg{general}\marg{\comment{}
+\gls[noindex=false]{glsdefpostname}\marg{general}\marg{\comment{post-name hook}
  \cmd{space}
  (\gls{glsentryuseri}\marg{\gls[noindex=false]{glscurrententrylabel}}\comment{}
   \gls{GlsXtrIfXpFieldEqXpStr}\marg{plural}\marg{\gls{glscurrententrylabel}}\comment{}
@@ -1072,13 +1073,14 @@ include the additional information.  For example:
 \end{codeenv}
 The \idx{postlinkhook} appends the value of the \field{user2} field
 after the \idx{firstuse} of \gls{gls} (or its \idxpl{variant}).
-The \catattr{glossname} attribute converts the first letter of the
-\field{name} field to \idx{uppercase} when it's displayed in the
-glossary.  The \idx{postnamehook} appends (in parentheses) the value
-of the \field{user1} field and then checks if the plural form is the
-same as the singular form with \qt{s} appended, and only displays
-the plural if they are different. See \sectionref{sec:glsformats}
-and \sectionref{sec:displaygloss} for further details.
+The \catattr{glossname} attribute is set to \code{firstuc}, which
+converts the first letter of the \field{name} field to
+\idx{uppercase} when it's displayed in the glossary.  The
+\idx{postnamehook} appends (in parentheses) the value of the
+\field{user1} field and then checks if the plural form is the same
+as the singular form with \qt{s} appended, and only displays the
+plural if they are different. See \sectionref{sec:glsformats} and
+\sectionref{sec:displaygloss} for further details.
 
 \section{Accessibility Support}
 \label{sec:accsupp}
@@ -1213,8 +1215,8 @@ the \idx{firstuse} or subsequent use. For example, if the
 \idx{firstuse} starts with a vowel (or vowel sound), you may need \qt{an
 \gls{gls}\margm{label}} but if the subsequent use starts with a
 constant, you may need \qt{a \gls{gls}\margm{label}}. The prefix for
-the \idx{firstuse} form specified in the \field{prefixfirst} field
-and the prefix for the subsequent use form is specified in the
+the \idx{firstuse} form is specified in the \field{prefixfirst}
+field, and the prefix for the subsequent use form is specified in the
 \field{prefix} field. If a space is required between the prefix and
 \gls{gls}, this needs to be included, as the prefixing system allows
 for prefixes like l' which shouldn't be followed by a space.
@@ -2254,7 +2256,7 @@ closest known \sty{babel} dialect label with:
 \nosecformatdef{IfTrackedDialectHasMapping}
 If true, you can fetch the corresponding \sty{babel} label with:
 \nosecformatdef{GetTrackedDialectToMapping}
-If false, can try the root language label instead, which can be
+If false, you can try the root language label instead, which can be
 obtained with:
 \nosecformatdef{TrackedLanguageFromDialect}
 For example:
@@ -2658,7 +2660,7 @@ following:
 \nosecformatdef{glsxtrfmt*}
 which internally use \gls{glslink} or:
 \nosecformatdef{glsxtrentryfmt}
-which doesn't (as so is more like using \gls{glsentryname}).
+which doesn't (and so is more like using \gls{glsentryname}).
 
 So an alternative approach is:
 \begin{codeenv}
@@ -2717,6 +2719,12 @@ needed. For example:
 Now to obtain $g'(x_i)$:
 \begin{codeenv}
 \gls{mshiftchar}\gls{glsxtrfmt}\marg{deriv}\marg{[g]\marg{x\gls{sbchar}i}}\gls{mshiftchar}
+\end{codeenv}
+Note that for this simplistic helper macro, the mandatory inner
+argument needs extra braces if it consists of more than a single
+token. For example:
+\begin{codeenv}
+\gls{mshiftchar}\gls{glsxtrfmt}\marg{deriv}\marg{\marg{x\gls{sbchar}i}}\gls{mshiftchar}
 \end{codeenv}
 
 \section{Dealing with Automated Case-Changing}
@@ -2878,6 +2886,14 @@ include the \field{symbol} field. (Table~15.1 in the
 \sty{glossaries} user manual~\cite{glossaries} gives an overview of
 the features supported by the predefined styles.)
 
+The \glostyle{bookindex} style is provided by the
+\isty{glossary-bookindex} package, which is distributed with
+\sty{glossaries-extra}. This style is designed for indexes
+and omits both the description and the symbol by default. It's
+customized specifically for use with \bibgls. Without the
+\idxpl{locationlist} obtained by \bibgls, this simply becomes a list
+of the \field{name} values for each term.
+
 The glossary is sub-divided into letter groups. By default, these
 sub-groups are separated with a vertical gap (for example, between
 duck and goose above). In the above example, the letter group is
@@ -2888,9 +2904,10 @@ field (which is used by \idx{makeindex}) is set to the value of the
 \field{name} field (unless explicitly set) and then sanitized.
 
 When using \gls{printunsrtglossary}, the \field{sort} field is
-irrelevant except to determine the letter group. The sub-group
+irrelevant except to determine the letter group (unless the
+\field{group} field has been defined). The sub-group
 heading is displayed by some styles, such as the
-\glostyle{indexgroup} style. For example, with:
+\glostyle{indexgroup} and \glostyle{bookindex} styles. For example, with:
 \begin{codeenv}
 \gls{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
 \end{codeenv}
@@ -3047,7 +3064,7 @@ information.
 \label{sec:parent}
 
 An entry may be assigned a parent with the \field{parent} key. The
-value must be the label of a entry that's already defined. You can
+value must be the label of an entry that's already defined. You can
 test if an entry has the \field{parent} field set with:
 \nosecformatdef{ifglshasparent}
 If the \field{name} key is omitted, the value is assumed to be the same as
@@ -3436,7 +3453,7 @@ suppress the hyperlinks.
 Although \gls{printunsrtglossaries} skips \idxpl{ignoredglossary},
 it's still possible to display an \idx{ignoredglossary} with
 \gls{printunsrtglossary} but you'll need to use the
-\printglossopt{title} setting to override the default title.
+\printglossopt{title} option to override the default title.
 
 \subsection{Redisplaying or Filtering a Glossary}
 \label{sec:printglossagain}

@@ -8144,9 +8144,13 @@ for the cross-reference supplied by the \field{see} field,
 \ics{glsxtruseseealsoformat}\margm{label list}
 \end{alltt}
 for the cross-reference supplied by the \field{seealso} field,
-and
 \nosecdef{glsnoidxdisplayloc}
-for the locations. You can iterate through the \field{loclist} value
+for standard the internal locations and 
+\nosecdef{glsxtrdisplaysupploc}
+for supplemental (external) locations. (See \sectionref{sec:supplementalopts}
+for more information about supplemental locations.)
+
+You can iterate through the \field{loclist} value
 using one of \sty{etoolbox}'s internal list loops (either
 by first fetching the list using \ics{glsfieldfetch}
 or through \styfmt{glossaries-extra}'s \ics{glsxtrfielddolistloop}
@@ -8157,11 +8161,29 @@ when using commands like \ics{gls} or \ics{glsadd} (the encapsulator or encap in
 \idx!{makeindex} parlance). If omitted, the default
 \glsopt[glsnumberformat]{format} is assumed (unless this
 default value is changed with \ics{GlsXtrSetDefaultNumberFormat}.
+The value of the \glsopt{format} key must be the name of 
+a text-block command without the leading backslash that takes 
+a single argument (the location). The location
+is encapsulated by that command. For example, 
+\begin{verbatim}
+\gls[format=textbf]{sample}
+\end{verbatim}
+will display the corresponding location in bold, but note that this
+will no longer have a hyperlink if you've used \sty{hyperref}.
+If you want to retain the hyperlink you need the location
+encapsulated with \cs{hyperbf} instead of \cs{textbf}:
+\begin{verbatim}
+\gls[format=hyperbf]{sample}
+\end{verbatim}
+The \csfmt{hyper}\meta{xx} set of commands all internally use
+\cs{glshypernumber} which adds the appropriate hyperlink to the
+location. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
+user manual for a list of all the \csfmt{hyper}\meta{xx} commands.
 
 Ranges can be explicitly formed using the parenthetical encap
 syntax \glsopt[(]{format} and
 \glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
-\glsopt[)\meta{csname}]{format} (where \meta{csname} is the name of 
+\glsopt[)\meta{csname}]{format} (where \meta{csname} is again the name of 
 a text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be

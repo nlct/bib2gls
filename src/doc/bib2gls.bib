@@ -1019,7 +1019,7 @@ location obtained from the \field{indexcounter} field},
 
 @index{glsxtrfmtdisplay,
   name={\csfmt{gls\-xtr\-fmt\-display}},
-  user1={\margm{cs-name}\margm{text}\oargm{insert}},
+  user1={\margm{cs-name}\margm{text}\margm{insert}},
   description={used by \cs{glsxtrfmt} to format the given
 \meta{text} where \meta{cs-name} is obtained from the field
 identified by \cs{GlsXtrFmtField} and \meta{insert} is empty for the
@@ -2408,7 +2408,7 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{glsxtrmultisupplocation,
   name={\csfmt{gls\-xtr\-multi\-supp\-location}},
   user1={\margm{location}\margm{src}\margm{format}},
-  description={used by \gls{glsxtrdisplaysupploc} to format the
+  description={used by \cs{glsxtrdisplaysupploc} to format the
   external location},
   note={provided by \styfmt{glossaries-extra-bib2gls} v1.36+},
   category={command}
@@ -2419,7 +2419,16 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}},
   description={this command is written to the \ext{aux} file each
    time an entry is indexed to provide \bibgls\ with the record information},
-  note={provided by \styfmt{glossaries}},
+  note={provided by \styfmt{glossaries-extra} v1.08+},
+  category={command}
+}
+
+@dualindexentry{glsxtr@record@nameref,
+  name={\csfmt{glsxtr@record@name\-ref}},
+  user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}},
+  description={used instead of \gls{glsxtr@record} when the
+   \styopt[nameref]{record} option is used},
+  note={provided by \styfmt{glossaries-extra} v1.37+},
   category={command}
 }
 
@@ -8078,7 +8087,7 @@ packages},
 
 @index{glslink,
   name={\csfmt{glslink}},
-  user1={\oargm{options}\margm{label}\oargm{text}},
+  user1={\oargm{options}\margm{label}\margm{text}},
   description={links to the entry's location in the glossary with
    the given link text without altering the first use flag},
   note={provided by \styfmt{glossaries}},
@@ -8088,7 +8097,7 @@ packages},
 
 @index{glsdisp,
   name={\csfmt{glsdisp}},
-  user1={\oargm{options}\margm{label}\oargm{text}},
+  user1={\oargm{options}\margm{label}\margm{text}},
   description={links to the entry's location in the glossary with
    the given link text and marks the entry as having been used},
   note={provided by \styfmt{glossaries}},
