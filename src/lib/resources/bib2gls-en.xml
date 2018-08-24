@@ -274,6 +274,7 @@ Defaulting to: {0}.
 <entry key="message.missing.sort.fallback">Entry ''{0}'' missing sort field ''{1}''. Falling back on field ''{2}''.</entry>
 <entry key="message.list.known.packages.auto">Automatic support for: </entry>
 <entry key="message.list.known.packages.extra">Support available for: </entry>
+<entry key="message.list.known.packages.info">Support may be quite limited in some cases.</entry>
 <entry key="message.created.missing.parent">Created missing parent ''{0}'' for entry ''{1}''</entry>
 
 <entry key="tag.page">Page</entry>
@@ -297,6 +298,8 @@ Defaulting to: {0}.
 <entry key="warning.title">Warning: {0}</entry>
 <entry key="warning.substituting">Substituting {0} with {1}</entry>
 <entry key="warning.removing">Removing {0}</entry>
+<entry key="warning.cant.parse.file">Can''t parse {0}
+{1}</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.ignoring.unknown.field">Ignoring unknown field: {0}</entry>

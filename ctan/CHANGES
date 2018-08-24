@@ -10,6 +10,10 @@ v1.8 (pending):
     This matches the way the record is added to the loclist field
     and makes it easier to adjust the record formatting.
 
+  * bib2gls now always parses the .log file even if the interpreter
+  * setting is off. (It still needs to know version details and
+    whether hyperlinks and Unicode are supported by the document.)
+
 v1.7 (2018-08-18):
 
   * added support for multiple supplementary sources

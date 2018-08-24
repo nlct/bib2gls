@@ -143,14 +143,17 @@ public class Bib2Gls implements TeXApp
          {
             File f = (new TeXPath(null, texmfoutputPath, false)).getFile();
 
-            if (!f.isDirectory())
+            if (f.isDirectory())
+            {
+               texmfoutput = f.toPath();
+            }
+            else
             {
                // not a directory so ignore it
 
-               System.err.println("TEXMFOUT not a directory: "+texmfoutputPath);
+               System.err.println("TEXMFOUT not a directory: "
+                 + texmfoutputPath);
             }
-
-            texmfoutput = f.toPath();
          }
       }
       catch (IOException e)
@@ -235,6 +238,8 @@ public class Bib2Gls implements TeXApp
 
       Path base = path.getBaseDir();
       Path relPath = path.getRelativePath();
+
+      // normalize() eliminates redundant path elements.
 
       Path p = (base == null ? relPath.normalize() : 
          base.resolve(relPath).normalize());
@@ -331,6 +336,13 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   /*
+   * Used by GlsResource to check the given .glstex file
+   * is allowed write access and adds it to the list (ensuring no
+   * duplicates). No duplicates should occur with
+   * \GlsXtrLoadResources but it's possible if
+   * \glsxtrresourcefile is used explicitly.
+   */
    public void registerTeXFile(File file) throws IOException
    {
       checkWriteAccess(file);
@@ -343,7 +355,6 @@ public class Bib2Gls implements TeXApp
 
       texFiles.add(file);
    }
-
 
    public boolean isWriteAccessAllowed(TeXPath path)
    {
@@ -427,6 +438,10 @@ public class Bib2Gls implements TeXApp
       return path.toAbsolutePath().normalize().startsWith(cwd);
    }
 
+   /*
+    * A file is considered hidden if any element on the path
+    * starts with '.' (not including '.' itself or '..') 
+    */ 
    public boolean isHidden(Path path)
    {
       for (int i = path.getNameCount()-1; i >= 0; i--)
@@ -487,6 +502,9 @@ public class Bib2Gls implements TeXApp
       return resolveFile(new File(name));
    }
 
+   /*
+    * Convert inputenc.sty encoding options to Java charset names.
+    */ 
    private String texToJavaCharset(String texCharset)
     throws Bib2GlsException
    {
@@ -636,7 +654,15 @@ public class Bib2Gls implements TeXApp
       createHyperGroups = flag;
    }
 
-   // Search for some packages that texparserlib.jar recognises
+   /*
+   * Search the log file for some packages that texparserlib.jar recognises.
+   * Also check and save the glossaries-extra.sty version.
+   * If fontspec is loaded, then bib2gls assumes that UTF-8 is 
+   * natively supported by the document and will allow non-ASCII 
+   * labels in the bib files. If hyperref is loaded, then hyperref
+   * support can be implemented.
+   */
+
    private void parseLog() throws IOException
    {
       String auxname = auxFile.getName();
@@ -656,6 +682,15 @@ public class Bib2Gls implements TeXApp
       File logFile = new File(auxFile.getParentFile(), name);
 
       BufferedReader in = null;
+
+      // Check the list supplied by the --packages switch to find
+      // out fontspec is included. It seems unlikely that a
+      // XeLaTeX or LuaLaTeX document wouldn't include it, but
+      // allow for it just in case. (If a user does --packages
+      // fontspec with a pdflatex document, then bib2gls won't
+      // warn against non-ASCII labels in the bib files, so
+      // they won't find out about it until pdflatex generates 
+      // an error.)
 
       for (String sty : packages)
       {
@@ -870,6 +905,12 @@ public class Bib2Gls implements TeXApp
          }
       }
 
+      // Since the interpreter only has access to code fragments
+      // not the entire document, there's no way for it to know the
+      // complete set of defined commands, so allow \renewcommand
+      // to unconditionally define a command without complaining
+      // if it doesn't already exist.
+
       listener.putControlSequence(new NewCommand("renewcommand",
         NewCommand.OVERWRITE_ALLOW));
 
@@ -964,6 +1005,7 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentrysymbolplural", "symbolplural", 
          GlsEntryFieldValue.CASE_SENTENCE, this));
+
       listener.putControlSequence(listener.createSymbol("bibglshashchar", '#'));
       listener.putControlSequence(listener.createSymbol("bibglsunderscorechar", '_'));
       listener.putControlSequence(listener.createSymbol("bibglsdollarchar", '$'));
@@ -972,8 +1014,8 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(listener.createSymbol("glsbackslash", '\\'));
       listener.putControlSequence(listener.createSymbol("glstildechar", '~'));
 
-      // custom packages may override the definitions of any of the
-      // above
+      // Custom packages may override the definitions of any of the
+      // above.
 
       if (customPackages != null)
       {
@@ -985,6 +1027,10 @@ public class Bib2Gls implements TeXApp
 
    }
 
+   /*
+    * Add the command whose control sequence name is given by csName
+    * that expands to the given (literal) text. 
+    */ 
    public void provideCommand(String csName, String text)
    {
       if (interpreter != null)
@@ -996,6 +1042,11 @@ public class Bib2Gls implements TeXApp
               listener.createString(text)));
       }
    }
+
+   /*
+    * Process the contents of @preamble to pick up any command
+    * definitions. 
+    */ 
 
    public void processPreamble(BibValueList list)
      throws IOException
@@ -1023,7 +1074,9 @@ public class Bib2Gls implements TeXApp
     *  Attempts to interpret LaTeX code. This won't work on anything
     *  complicated and assumes custom user commands are provided in
     *  the .bib file @preamble{...} 
-    *  Some standard LaTeX commands are recognised.
+    *  Some standard LaTeX commands are recognised. The trim value
+    *  determines whether or not to trim leading/trailing spaces
+    *  from the result.
     */ 
    public String interpret(String texCode, BibValueList bibVal, boolean trim)
    {
@@ -1099,6 +1152,10 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   /*
+    * Converts the given TeX code into a string that's suitable for
+    * use as a label.
+    */ 
    public String convertToLabel(TeXParser parser, BibValueList value, 
       GlsResource resource, boolean isList)
     throws IOException
@@ -1108,16 +1165,18 @@ public class Bib2Gls implements TeXApp
       String strVal = list.toString(parser);
       String original = strVal;
 
-      // Check for \ { } ~ and $ to determine whether or not to
-      // interpret the value.
-      // There's no point checking for the other special characters.
-      // For example, ^ and _ need to be in maths mode, so $ or \
-      // (from \ensuremath or \begin or \_ etc) will be present.
-      // \# \& and \% will match on the backslash. Comments are best
-      // avoided within field values, but ought to have already been
-      // removed if present. # and & shouldn't occur without some
-      // kind of markup, and would likely be too complicated to
-      // interpret anyway.
+      /*
+      * Check for \ { } ~ and $ to determine whether or not to
+      * interpret the value.
+      * There's no point checking for the other special characters.
+      * For example, ^ and _ need to be in maths mode, so $ or \
+      * (from \ensuremath or \begin{math} etc) will be present.
+      * \_ \# \& and \% will match on the backslash. Comments are best
+      * avoided within field values, but ought to have already been
+      * removed if present. # and & shouldn't occur without some
+      * kind of markup, and would likely be too complicated to
+      * interpret anyway.
+      */
 
       if (strVal.matches("(?s).*[\\\\\\{\\}\\~\\$].*"))
       {
@@ -1154,6 +1213,14 @@ public class Bib2Gls implements TeXApp
 
       if (!fontSpecLoaded())
       {
+         /*
+          * If fontspec hasn't been loaded, then assume non-ASCII
+          * characters aren't allowed. Try to strip accents first
+          * (if any non-ASCII character can be decomposed into
+          * a basic Latin letter with combining diacritic) before
+          * removing forbidden content.
+          */ 
+
          strVal = Normalizer.normalize(strVal, Normalizer.Form.NFD);
          strVal = strVal.replaceAll("[^,"+allowedASCII+"a-zA-Z0-9]",
            "");
@@ -1166,7 +1233,7 @@ public class Bib2Gls implements TeXApp
          strVal = strVal.replaceAll("^,|,$", "");
       }
 
-      if (verboseLevel > 0 && !original.equals(strVal))
+      if (verboseLevel > 0 && (!original.equals(strVal) || debugLevel > 0))
       {
          logMessage(String.format("%s: %s -> %s",
           isList? "labelify-list" : "labelify", original, strVal));
@@ -1175,6 +1242,9 @@ public class Bib2Gls implements TeXApp
       return strVal;
    }
 
+   /*
+    * Process the command line arguments and do the main action.
+    */ 
    public void process(String[] args) 
      throws IOException,InterruptedException,Bib2GlsException
    {
@@ -1185,30 +1255,20 @@ public class Bib2Gls implements TeXApp
          recordCount = new HashMap<GlsRecord,Integer>();
       }
 
-      if (interpret)
+      try
       {
-         try
-         {
-            parseLog();
-         }
-         catch (IOException e)
-         {
-            // Parsing the log file isn't essential.
-
-            debug(e);
-         }
+         parseLog();
       }
-      else
-      {// check if fontspec was specified with --packages:
+      catch (IOException e)
+      {
+         // Parsing the log file isn't essential although it
+         // determines the glossaries-extra.sty version,
+         // if the TeX engine natively supports Unicode, and if
+         // hyperref is available.
 
-         for (String sty : packages)
-         {
-            if (sty.equals("fontspec"))
-            {
-               fontspec = true;
-               break;
-            }
-         }
+         warningMessage("warning.cant.parse.file", logFile, 
+           e.getMessage());
+         debug(e);
       }
 
       if (texCharset == null && fontspec)
@@ -1274,7 +1334,7 @@ public class Bib2Gls implements TeXApp
  
          if (name.equals("glsxtr@resource"))
          {
-            // Defer creating resources until all aux data
+            // Defer creating resources until all aux data is
             // processed, but strip double-quotes from the second
             // argument. (A literal double-quote can be identified
             // with \" but such a file naming scheme should not be
@@ -1692,13 +1752,13 @@ public class Bib2Gls implements TeXApp
                      {
                         // no map found. Discard the new record with a warning
 
-                        warning();
-                        warning(
-                          getMessage("warning.discarding.conflicting.record",
+                        logMessage();
+                        warningMessage(
+                          "warning.discarding.conflicting.record",
                           newPrefix+newFmt, 
                           existingPrefix+existingFmt,
-                          newRecord, existingRecord));
-                        warning();
+                          newRecord, existingRecord);
+                        logMessage();
                      }
                   }
 
@@ -2731,8 +2791,8 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method needs defining, but not needed for
-    *  the purposes of this application.
+    * TeXApp method (texparserlib.jar) needs defining,
+    * but not needed for the purposes of this application.
     */ 
    public void epstopdf(File epsFile, File pdfFile)
      throws IOException,InterruptedException
@@ -2761,7 +2821,11 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method. This is used by the TeX parser library
+    *  when substituting deprecated commands, but this is
+    *  only likely to occur when obtaining the sort value.
+    *  Any deprecated commands in the bib fields will be copied
+    *  to the glstex file.
     */ 
    public void substituting(TeXParser parser, String original, 
      String replacement)
@@ -2770,14 +2834,15 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method used for progress updates for long actions,
+    *  such as loading datatool files, which isn't relevant here.
     */ 
    public void progress(int percent)
    {
    }
 
    /*
-    *  TeXApp method. 
+    *  TeXApp method used for obtaining a message from a given label. 
     */ 
 
    public String getMessage(String label, Object... params)
@@ -2891,7 +2956,7 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method for providing informational messages to the user.
     */ 
    public void message(String text)
    {
@@ -3099,7 +3164,7 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method for providing warning messages.
     */ 
    public void warning(TeXParser parser, String message)
    {
@@ -3184,7 +3249,7 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method for providing error messages.
     */ 
    public void error(Exception e)
    {
@@ -3226,8 +3291,11 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method needs defining, but unlikely to be needed for
-    *  the purposes of this application.
+    *  TeXApp method needs defining, but shouldn't be needed for
+    *  the purposes of this application. This is mainly used by
+    *  the TeX parser library to copy images to a designated output
+    *  directory when performing LaTeX -> LaTeX or LaTeX -> HTML
+    *  actions.
     */ 
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException
@@ -3241,8 +3309,10 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
-    *  TeXApp method needs defining, but unlikely to be needed for
-    *  the purposes of this application. Just return empty string.
+    * TeXApp method needs defining, but unlikely to be needed for
+    * the purposes of this application. (It doesn't make any 
+    * sense to have something like \read-1 in a bib field.)
+    * Just return empty string.
     */ 
    public String requestUserInput(String message)
      throws IOException
@@ -3924,6 +3994,11 @@ public class Bib2Gls implements TeXApp
             {
                if (j%5 == 0)
                {
+                  if (j > 0)
+                  {
+                     System.out.print(",");
+                  }
+
                   System.out.println();
                   System.out.print("\t");
                }
@@ -3944,6 +4019,11 @@ public class Bib2Gls implements TeXApp
             {
                if (j%5 == 0)
                {
+                  if (j > 0)
+                  {
+                     System.out.print(",");
+                  }
+
                   System.out.println();
                   System.out.print("\t");
                }
@@ -3956,6 +4036,8 @@ public class Bib2Gls implements TeXApp
             }
 
             System.out.println();
+
+            System.out.println(getMessage("message.list.known.packages.info"));
 
             System.exit(0);
          }

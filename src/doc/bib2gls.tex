@@ -1318,6 +1318,24 @@ settings, so if these values are unset, \bibgls\ will default to
 \code{a} (any) for \texmfcnf{openinany} and \code{p} (paranoid) for
 \texmfcnf{openoutany}.
 
+The only external processes that are run by \bibgls\ are calls to
+\idx{kpsewhich} to check the security settings and locate files on
+\TeX's path. These are started with Java's \code{ProcessBuilder}
+class so there should be no issues with spaces in the argument. 
+The \longarg{debug} switch will write the process call in the
+transcript file and will delimit the argument in the log with single
+quote characters for convenience.
+
+\bibgls\ creates files with the extension \ext{glstex}, which are
+input by \cs{GlsXtrLoadResources}. This extension is fixed and is
+imposed by both \bibgls\ and \cs{GlsXtrLoadResources}. \bibgls\ also
+creates a transcript file with the default extension \ext{glg}. This
+may be overridden by the \longarg{log-file} switch, but \bibgls\
+always forbids write access to any file with the following
+extensions: \extfmt{tex}, \extfmt{ltx}, \extfmt{sty}, \extfmt{cls},
+\extfmt{bib}, \extfmt{dtx}, \extfmt{ins}, \extfmt{def} and
+\extfmt{ldf}.
+
 \section{Localisation}
 \label{sec:lang.xml}
 
@@ -2002,12 +2020,7 @@ for more details.
 \argsection{no-interpret}
 
 Switch off the interpreter mode. See \sectionref{sec:texparserlib}
-for more details about the interpreter. If the interpreter is off,
-the transcript (\iext{log}) file won't be parsed, so if you need
-\bibgls\ to know that you are using \sty{fontspec} but you don't
-want the interpreter on then you must use 
-\longarg{packages}\code{ fontspec} to indicate that UTF-8 is 
-natively supported.
+for more details about the interpreter. 
 
 \argsection{no-break-space}
 
@@ -8254,7 +8267,10 @@ a text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be
 encapsulated by \csref{bibglsrange}. (This command is not used with
-ranges that are formed by collating consecutive locations.)
+ranges that are formed by collating consecutive locations.) The
+initial marker is stripped from the location formatting commands,
+such as \cs{glsnoidxdisplayloc}, to allow for easy conversion to the
+corresponding text-block command.
 
 Explicit ranges don't merge with neighbouring locations, but will
 absorb any single locations within the range that don't conflict.
