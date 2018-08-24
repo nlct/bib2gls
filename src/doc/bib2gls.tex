@@ -8202,8 +8202,10 @@ the option \csopt[false]{save-locations} is used). The
 
 The \field{loclist} field has the syntax of an \isty{etoolbox} internal list
 and includes every location (except for the discarded duplicates and
-\idxpl{ignoredrecord}). Any explicit range markup is stripped from
-the format (encap) information.  Each item in the list is provided
+\idxpl{ignoredrecord}) with no range formations. Any explicit range markup 
+is stripped from the format (encap) information, so you just get the
+start and end locations added as individual elements. Each item in the 
+list is provided
 in the form:
 \begin{codeenv}
 \ics{glsseeformat}\oargm{tag}\margm{label list}\marg{}
@@ -9210,7 +9212,7 @@ For example:
 The location list for \code{sample} will now be \qt{1, S1} (page~1
 from the main document and S1 from the supplementary document).
 
-With \sty{glossaries-extra} v1.36+, the location from the
+With \sty{glossaries-extra} v1.36+, a regular location from the
 supplementary document will be encapsulated with:
 \nosecdef{glsxtrdisplaysupploc}
 By default, this simply creates an external hyperlink to the
@@ -9260,6 +9262,25 @@ package, the location will simply be displayed without a hyperlink.
 (Note that not all PDF viewers can handle external hyperlinks, and
 some that can open the external PDF file may not recognise the
 destination within that file.)
+
+The special \code{nameref} locations (see
+\longarg{merge-nameref-on}) are still identified with
+\ics{glsxtrdisplaylocnameref} but the \meta{file} argument will now
+be set.
+
+As from \bibgls\ v1.7, any awkward characters if the file path are
+replaced with \ics{bibglshrefchar} or (for non-ASCII characters when
+\sty{fontspec} is loaded) \ics{bibglshrefunicode}. Both commands
+take two arguments: the hexadecimal character code and the actual
+character. In the case of \ics{bibglshrefchar}, the second
+argument is ignored, and the first is preceded by a literal percent
+character, so \filefmt{file name.pdf} will be converted to:
+\begin{codeenv}
+file\cs{bibglshrefchar}\marg{20}\marg{ }name.pdf
+\end{codeenv}
+In the case of \ics{bibglshrefunicode}, the first argument is
+ignored.
+
 
 The supplementary locations lists are encapsulated within
 \gls{bibglssupplemental}. With \sty{glossaries-extra} v1.36+,
@@ -13205,6 +13226,16 @@ or redefined after the resources are loaded:
 \formatdef{bibglssupplementalsubsep}
 The separator between the supplementary
 location sub-lists. By default this is just \csref{bibglsdelimN}.
+
+\cssection{bibglshrefchar}
+
+\formatdef{bibglshrefchar}
+Expands to a literal percent character followed by \meta{hex}. The
+second argument is ignored.
+
+\formatdef{bibglshrefunicode}
+Expands to the second argument. The first argument is ignored.
+
 
 \section{Letter Groups}
 \label{sec:lettergroupdefs}

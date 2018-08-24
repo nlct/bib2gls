@@ -2384,6 +2384,12 @@ public class Bib2Gls implements TeXApp
       writer.println("\\providecommand{\\bibglsdollarchar}{\\expandafter\\@gobble\\string\\$}");
       writer.println("\\providecommand{\\bibglsampersandchar}{\\expandafter\\@gobble\\string\\&}");
       writer.println("\\providecommand{\\bibglsunderscorechar}{\\expandafter\\@gobble\\string\\_}");
+      writer.println("\\providecommand{\\bibglshrefchar}[2]{\\glspercentchar #1}");
+      if (fontspec)
+      {
+         writer.println("\\providecommand{\\bibglshrefunicode}[2]{#2}");
+      }
+
       writer.println("\\providecommand{\\bibglsusesee}[1]{\\glsxtrusesee{#1}}");
       writer.println("\\providecommand{\\bibglsusealias}[1]{%");
       writer.println(" \\glsxtrifhasfield{alias}{#1}%");
@@ -2788,6 +2794,107 @@ public class Bib2Gls implements TeXApp
       }
 
       return path;
+   }
+
+   /*
+    * Converts a TeXPath reference to a string with special characters
+    * replaced for use as a hyperlink reference. (Never
+    * underestimate the determination of users who insist on using
+    * problematic characters in their file names.)
+    *
+    * Not sure if Unicode characters cause a problem with
+    * hyperlinks with XeLaTeX/LuaLaTeX, so provide both hex and char. 
+    * The default definition of \bibglshrefunicode just does the second
+    * argument but can be defined to use the code point instead.
+    *
+    * The potentially problematic ASCII characters (or Unicode if
+    * fontspec not loaded) use \bibglshrefchar instead, which does a
+    * literal percent followed by the hexadecimal value. The
+    * character is included in the syntax but is ignored by default.
+    * \bibglshrefchar can locally be set to \@secondoftwo if the
+    * file name needs displaying in the document.
+    */  
+   public String getTeXPathHref(TeXPath src)
+   {
+      String path = src.toString();
+
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < path.length(); )
+      {
+         int cp = path.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (cp == '-' || cp == '.' || cp == ':' 
+              || (cp >= '/' && cp <= '9') 
+              || (cp >= 'A' && cp <= 'Z')
+              || (cp >= 'a' && cp <= 'z'))
+         {
+            builder.appendCodePoint(cp);
+         }
+         else if (fontspec && cp > 0x7F)
+         {
+            builder.append(String.format("\\bibglshrefunicode{%02X}{%s}", cp,
+              new String(Character.toChars(cp))));
+         }
+         else if (cp == '\\')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\glsbackslash }", cp));
+         }
+         else if (cp == '%')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\glspercentchar }", cp));
+         }
+         else if (cp == '#')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\bibglshashchar }", cp));
+         }
+         else if (cp == '$')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\bibglsdollarchar }", cp));
+         }
+         else if (cp == '_')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\bibglsunderscorechar }", cp));
+         }
+         else if (cp == '&')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\bibglsampersandchar }", cp));
+         }
+         else if (cp == '^')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\bibglscircumchar }", cp));
+         }
+         else if (cp == '{')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\glsopenbrace }", cp));
+         }
+         else if (cp == '}')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\glsclosebrace }", cp));
+         }
+         else if (cp == '~')
+         {
+            builder.append(String.format(
+             "\\bibglshrefchar{%02X}{\\glstildechar }", cp));
+         }
+         else
+         {
+            builder.append(String.format("\\bibglshrefchar{%02X}{%s}", cp,
+              new String(Character.toChars(cp))));
+         }
+      }
+
+      return builder.toString();
    }
 
    /*

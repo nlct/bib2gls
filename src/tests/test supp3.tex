@@ -1,0 +1,20 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{book}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,counter=chapter]{glossaries-extra}
+
+\GlsXtrLoadResources[src={test-entries}]
+
+\begin{document}
+\chapter{Sample Chapter}
+\gls{html}.
+\gls{ssi}.
+
+\chapter{Another Chapter}
+\gls{goose}. \gls{sample}. \gls{html}.
+
+\printunsrtglossaries
+\end{document}

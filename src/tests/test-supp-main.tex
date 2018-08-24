@@ -19,9 +19,11 @@
  #2.%
 }
 
+\makeatletter
 \newcommand{\bibglssupplementalsublist}[3]{%
-  #2: #3%
+  {\let\bibglshrefchar\@secondoftwo #2}: #3%
 }
+\makeatother
 
 \GlsXtrLoadResources[
  src=test-entries,% data in test-entries.bib
@@ -32,7 +34,7 @@
 % appended to their location lists:
  %supplemental-locations=test-supp,
 % Multiple supplementary sources:
- supplemental-locations={test-supp,test-supp2},
+ supplemental-locations={test-supp,test-supp2,test supp3},
 % set the category label for entries that have supplemental
 % locations:
  supplemental-category={supplemental},

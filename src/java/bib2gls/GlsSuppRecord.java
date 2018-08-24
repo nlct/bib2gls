@@ -79,7 +79,8 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
       }
 
       return String.format("\\glsxtrdisplaysupploc{%s}{%s}{%s}{%s}{%s}",
-         getPrefix(), getCounter(), fmt, src, getLocation());
+         getPrefix(), getCounter(), fmt, bib2gls.getTeXPathHref(src), 
+         getLocation());
    }
 
    public boolean locationMatch(GlsRecord record)
@@ -124,8 +125,8 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
    {
       return String.format(
         "{%s}{%s}{%s}{%s}{%s}{%s}",
-         getLabel(), getPrefix(), getCounter(), getFormat(), src, 
-         getLocation());
+         getLabel(), getPrefix(), getCounter(), getFormat(), 
+         bib2gls.getTeXPathHref(src), getLocation());
    }
 
    private TeXPath src;

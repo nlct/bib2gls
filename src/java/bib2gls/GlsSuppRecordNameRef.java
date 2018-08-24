@@ -82,7 +82,7 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
       return String.format(
          "\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
          getPrefix(), getCounter(), fmt, getLocation(),
-         getTitle(), getHref(), src);
+         getTitle(), getHref(), bib2gls.getTeXPathHref(src));
    }
 
    public boolean locationMatch(GlsRecord record)
@@ -133,7 +133,8 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
       return String.format(
         "{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
          getLabel(), getPrefix(), getCounter(), getFormat(), 
-         getLocation(), getTitle(), getHref(), src);
+         getLocation(), getTitle(), getHref(), 
+         bib2gls.getTeXPathHref(src));
    }
 
    private TeXPath src;

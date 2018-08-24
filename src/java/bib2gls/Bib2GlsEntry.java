@@ -2741,7 +2741,8 @@ public class Bib2GlsEntry extends BibEntry
                   {
                      builder.append(String.format(
                        "%s\\bibglssupplementalsublist{%d}{%s}{", 
-                       supplSubSep, subList.size(), source));
+                       supplSubSep, subList.size(), 
+                       bib2gls.getTeXPathHref(source)));
 
                      supplSubSep = "\\bibglssupplementalsubsep ";
 

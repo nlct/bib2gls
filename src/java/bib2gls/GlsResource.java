@@ -5752,7 +5752,7 @@ public class GlsResource
          {
             writer.format(
               "\\glssetcategoryattribute{%s}{externallocation}{%s}%n%n", 
-              supplementalCategory, supplementalPdfPath);
+              supplementalCategory, bib2gls.getTeXPathHref(supplementalPdfPath));
          }
 
          if (flattenLonely == FLATTEN_LONELY_POST_SORT
