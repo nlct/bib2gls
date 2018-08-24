@@ -64,13 +64,6 @@ public class GlsRecordNameRef extends GlsRecord
       return href;
    }
 
-   public String getListTeXCode()
-   {
-      return String.format("\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{}",
-         getPrefix(), getCounter(), getFormat(), getLocation(),
-         title, href);
-   }
-
    public String getFmtTeXCode()
    {
       String fmt = getFormat();
@@ -98,12 +91,19 @@ public class GlsRecordNameRef extends GlsRecord
 
    public boolean locationMatch(GlsRecord record)
    {
-      if (bib2gls.mergeNameRefOnCounter())
+      if (bib2gls.mergeNameRefOnLocation())
       {
          return super.locationMatch(record);
       }
 
       if (!(record instanceof GlsRecordNameRef))
+      {
+         return false;
+      }
+
+      // don't match if the counter name isn't the same
+
+      if (!getCounter().equals(record.getCounter()))
       {
          return false;
       }
@@ -137,13 +137,20 @@ public class GlsRecordNameRef extends GlsRecord
     */ 
    public boolean partialMatch(GlsRecord record)
    {
-      if (bib2gls.mergeNameRefOnCounter() 
+      if (bib2gls.mergeNameRefOnLocation() 
            || !(record instanceof GlsRecordNameRef))
       {
          return super.partialMatch(record);
       }
 
       if (!getLabel().equals(record.getLabel()))
+      {
+         return false;
+      }
+
+      // don't match if the counter name isn't the same
+
+      if (!getCounter().equals(record.getCounter()))
       {
          return false;
       }

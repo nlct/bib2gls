@@ -110,39 +110,35 @@ public class GlsRecord
       location = newLocation;
    }
 
+   // v1.8+ now uses the same code for each element in location and
+   // loclist fields.
    public String getListTeXCode()
    {
-      return String.format("\\glsnoidxdisplayloc{%s}{%s}{%s}{%s}",
-         prefix, counter, format, location);
+      return getFmtTeXCode();
    }
 
    public String getFmtTeXCode()
    {
-      if (format.isEmpty())
+      String fmt = getFormat();
+
+      if (fmt.isEmpty())
       {
-         return String.format("\\setentrycounter[%s]{%s}%s",
-            prefix, counter, location);
+         fmt = "glsnumberformat";
       }
-
-      char c = format.charAt(0);
-
-      if (c == '(' || c == ')')
+      else if (fmt.startsWith("(") || fmt.startsWith(")"))
       {
-         if (format.length() == 1)
+         if (fmt.length() == 1)
          {
-            return String.format(
-               "\\setentrycounter[%s]{%s}\\glsnumberformat{%s}",
-               prefix, counter, location);
+            fmt = "glsnumberformat";
          }
          else
          {
-            return String.format("\\setentrycounter[%s]{%s}\\%s{%s}",
-               prefix, counter, format.substring(1), location);
+            fmt = fmt.substring(1);
          }
       }
 
-      return String.format("\\setentrycounter[%s]{%s}\\%s{%s}",
-         prefix, counter, format, location);
+      return String.format("\\glsnoidxdisplayloc{%s}{%s}{%s}{%s}",
+         prefix, counter, fmt, location);
    }
 
    public boolean locationMatch(GlsRecord record)

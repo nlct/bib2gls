@@ -1,3 +1,15 @@
+v1.8 (pending):
+
+  * added support for the new glossaries-extra package option
+    record=nameref (introduced to glossaries-extra v1.37).
+
+  * normal locations are now written to the location field as
+    \glsnoidxdisplayloc{<prefix>}{<counter>}{<format>}{<location>}
+    instead of explicitly using
+    \setentrycounter[<prefix>]{<counter>}\<format>{<location>}
+    This matches the way the record is added to the loclist field
+    and makes it easier to adjust the record formatting.
+
 v1.7 (2018-08-18):
 
   * added support for multiple supplementary sources

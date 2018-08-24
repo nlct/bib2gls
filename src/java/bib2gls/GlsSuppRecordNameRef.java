@@ -20,32 +20,38 @@ package com.dickimawbooks.bib2gls;
 
 import com.dickimawbooks.texparserlib.TeXPath;
 
-public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
+public class GlsSuppRecordNameRef extends GlsRecordNameRef 
+   implements SupplementalRecord
 {
-   public GlsSuppRecord(Bib2Gls bib2gls, String label, String prefix, 
-      String counter, String format, String location, TeXPath src)
+   public GlsSuppRecordNameRef(Bib2Gls bib2gls, String label, 
+      String prefix, String counter, String format, String location, 
+      String title, String href, TeXPath src)
    {
-      super(bib2gls, label, prefix, counter, format, location);
+      super(bib2gls, label, prefix, counter, format, location, title, href);
       this.src = src;
    }
 
-   protected GlsSuppRecord(Bib2Gls bib2gls, String label, String prefix, 
-      String counter, String format, String location, TeXPath src, long index)
+   protected GlsSuppRecordNameRef(Bib2Gls bib2gls, String label, 
+      String prefix, String counter, String format, String location, 
+      String title, String href, TeXPath src, long index)
    {
-      super(bib2gls, label, prefix, counter, format, location, index);
+      super(bib2gls, label, prefix, counter, format, location, title, href, 
+        index);
       this.src = src;
    }
 
    public GlsRecord copy(String newLabel)
    {
-      return new GlsSuppRecord(bib2gls, newLabel, getPrefix(), getCounter(), 
-         getFormat(), getLocation(), src, getIndex());
+      return new GlsSuppRecordNameRef(bib2gls, newLabel, getPrefix(), 
+        getCounter(), getFormat(), getLocation(), getTitle(), getHref(),
+        src, getIndex());
    }
 
    public Object clone()
    {
-      return new GlsSuppRecord(bib2gls, getLabel(), getPrefix(), getCounter(), 
-        getFormat(), getLocation(), src, getIndex());
+      return new GlsSuppRecordNameRef(bib2gls, getLabel(), getPrefix(), 
+       getCounter(), getFormat(), getLocation(), getTitle(), getHref(),
+        src, getIndex());
    }
 
    public TeXPath getSource()
@@ -55,11 +61,6 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
 
    public String getFmtTeXCode()
    {
-      if (!bib2gls.isMultipleSupplementarySupported())
-      {
-         return super.getFmtTeXCode();
-      }
-
       String fmt = getFormat();
 
       if (fmt.isEmpty())
@@ -78,18 +79,25 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
          }
       }
 
-      return String.format("\\glsxtrdisplaysupploc{%s}{%s}{%s}{%s}{%s}",
-         getPrefix(), getCounter(), fmt, src, getLocation());
+      return String.format(
+         "\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
+         getPrefix(), getCounter(), fmt, getLocation(),
+         getTitle(), getHref(), src);
    }
 
    public boolean locationMatch(GlsRecord record)
    {
-      if (!(record instanceof GlsSuppRecord))
+      if (bib2gls.mergeNameRefOnLocation())
+      {
+         return super.locationMatch(record);
+      }
+
+      if (!(record instanceof GlsSuppRecordNameRef))
       {
          return false;
       }
 
-      GlsSuppRecord suppRecord = (GlsSuppRecord)record;
+      GlsSuppRecordNameRef suppRecord = (GlsSuppRecordNameRef)record;
 
       if (!src.equals(suppRecord.src))
       {
@@ -101,31 +109,31 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
 
    public boolean equals(Object obj)
    {
-      if (!(obj instanceof GlsSuppRecord) || !super.equals(obj))
+      if (!(obj instanceof GlsSuppRecordNameRef) || !super.equals(obj))
       {
          return false;
       }
 
-      return src.equals(((GlsSuppRecord)obj).src);
+      return src.equals(((GlsSuppRecordNameRef)obj).src);
    }
 
    public boolean partialMatch(GlsRecord record)
    {
-      if (!(record instanceof GlsSuppRecord) 
+      if (!(record instanceof GlsSuppRecordNameRef) 
             || !super.partialMatch(record))
       {
          return false;
       }
 
-      return src.equals(((GlsSuppRecord)record).src);
+      return src.equals(((GlsSuppRecordNameRef)record).src);
    }
 
    public String toString()
    {
       return String.format(
-        "{%s}{%s}{%s}{%s}{%s}{%s}",
-         getLabel(), getPrefix(), getCounter(), getFormat(), src, 
-         getLocation());
+        "{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
+         getLabel(), getPrefix(), getCounter(), getFormat(), 
+         getLocation(), getTitle(), getHref(), src);
    }
 
    private TeXPath src;

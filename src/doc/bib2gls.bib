@@ -2390,9 +2390,18 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{glsnoidxdisplayloc,
   name={\csfmt{gls\-no\-idx\-display\-loc}},
   user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}},
-  description={handler used to display the number list stored in 
-   the \field{loclist} field},
-  note={provided by \styfmt{glossaries}},
+  description={used to display a regular location in the
+  \field{location} field},
+  note={provided by \styfmt{glossaries} v4.04+},
+  category={command}
+}
+
+@dualindexentry{glsxtrdisplaylocnameref,
+  name={\csfmt{gls\-xtr\-display\-loc\-name\-ref}},
+  user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}\margm{file}},
+  description={used to display a \code{nameref} location in the
+  \field{location} field},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
   category={command}
 }
 
@@ -5589,6 +5598,13 @@ field.},
 @dualindexentry{switch.no-merge-wrglossary-records,
   name={\longargfmt{no\dhyphen merge\dhyphen wrglossary\dhyphen records}},
   user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@dualindexentry{switch.merge-nameref-on,
+  name={\longargfmt{merge\dhyphen nameref\dhyphen on}},
+  user1={\meta{rule}},
   category={switch},
   parent={commandlineoptions}
 }
@@ -9169,6 +9185,25 @@ name} and the displayed \meta{text}},
   note={provided by \styfmt{hyperref}},
   category={command}
 }
+
+@index{@currentlabelname,
+  name={\csfmt{@current\-label\-name}},
+  user1={},
+  description={used to store the current title information for the next instance
+   of \cs{label}},
+  note={provided by \styfmt{hyperref}},
+  category={command}
+}
+
+@index{@currentHref,
+  name={\csfmt{@current\-H\-ref}},
+  user1={},
+  description={used to store the current anchor for the next instance
+   of \cs{label}},
+  note={provided by \styfmt{hyperref}},
+  category={command}
+}
+
 
 @index{glsrefentry,
   name={\csfmt{gls\-ref\-entry}},

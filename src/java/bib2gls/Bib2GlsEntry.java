@@ -2188,16 +2188,14 @@ public class Bib2GlsEntry extends BibEntry
 
          record.setFormat(fmt);
       }
-      else if (record instanceof GlsSuppRecord)
+      else if (record instanceof SupplementalRecord)
       {
-         GlsSuppRecord suppRecord = (GlsSuppRecord)record;
-
          if (supplementalRecordMap == null)
          {
             supplementalRecordMap = new HashMap<TeXPath,Vector<GlsRecord>>();
          }
 
-         TeXPath source = suppRecord.getSource();
+         TeXPath source = ((SupplementalRecord)record).getSource();
 
          Vector<GlsRecord> list = supplementalRecordMap.get(source);
 
@@ -2207,9 +2205,9 @@ public class Bib2GlsEntry extends BibEntry
             supplementalRecordMap.put(source, list);
          }
 
-         if (!list.contains(suppRecord))
+         if (!list.contains(record))
          {
-            list.add(suppRecord);
+            list.add(record);
          }
       }
 

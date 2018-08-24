@@ -50,6 +50,12 @@ See the manual for further details.</entry>
 			Don''t force cross-resource referencing mode on 
 			(default).</entry>
 
+<entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;
+			Rule for merging locations with record=nameref
+			(requires glossaries-extra version 1.37+).
+			&lt;rule&gt; may be one of: ''href'', ''title''
+			or ''location''.</entry>
+
 <entry key="syntax.support.unicode.script">{0}
 			Text superscripts or subscripts will use Unicode 
 			superscript or subscript characters if possible

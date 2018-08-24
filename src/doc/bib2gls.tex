@@ -2050,6 +2050,58 @@ Don't merge an entry's \counter{wrglossary} records. This means that you
 may end up with duplicate page numbers in the entry's location list,
 but they will link to different parts of the page.
 
+\argsection{merge-nameref-on}
+
+The \styopt[nameref]{record} package option (introduced to 
+\sty{glossaries-extra} version 1.37) provides extra information
+in the record when indexing, obtained from \ics{@currentlabelname}
+and \ics{@currentHref}. Instead of writing the record as:
+\begin{codeenv}
+\ics{glsxtr@record}\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}
+\end{codeenv}
+the record is written as:
+\nosecdef{glsxtr@record@nameref}
+If \isty{hyperref} hasn't been loaded \meta{title} and \meta{href}
+will always be empty. If either \meta{title} or \meta{href} is
+empty, \bibgls\ will treat the record as though it had been
+identified with the normal \cs{glsxtr@record}.
+
+The \code{nameref} record will be written to the \idx{locationlist} using:
+\nosecdef{glsxtrdisplaylocnameref}
+The \meta{file} part will be empty for normal internal locations,
+and will be set to the corresponding file name for supplemental
+locations.
+
+The \meta{title} will also be empty at the
+start of the document. With \sty{hyperref}, the \meta{href} will be
+\code{Doc-Start} at the start of the document and is updated
+globally on every instance of \ics{refstepcounter}. The 
+\meta{title} is updated locally by certain commands, such as 
+\ics{section} or \ics{caption}. This means that the \meta{href}
+may not always correspond to the \meta{title}, so using
+the \styopt[nameref]{record} package option can have unpredictable
+results. Since numbered equations don't naturally have a title, the
+\sty{glossaries-extra} package switches to normal records in
+known numbered maths environments.
+
+For compactness, \bibgls\ tries to merge duplicate or near
+duplicate records. There are three possible rules that it will
+use for \code{nameref} records, identified by \meta{rule} in the
+\longarg{merge-nameref-on} switch:
+\begin{itemize}
+\item \optfmt{location}: merge records that match on the
+\meta{prefix}, \meta{counter} and \meta{location} parts (as regular
+records);
+\item \optfmt{title}: merge records that match on the \meta{counter}
+and \meta{title} parts;
+\item \optfmt{href}: merge records that match on the \meta{counter}
+and \meta{href} parts.
+\end{itemize}
+The default \meta{rule} is \optfmt{location}. Note that for all
+rules the \meta{counter} must match. See the \qt{Nameref Record}
+section of the \sty{glossaries-extra} user manual for further
+details.
+
 \argsection{force-cross-resource-refs}
 
 Force \idx{crossresourceref} mode on (see
@@ -8132,23 +8184,37 @@ The \styopt{record} package option automatically adds two new keys:
 \field{loclist} and \field{location}. These two fields are set by
 \bibgls\ from the information supplied in the \iext{aux} file (unless
 the option \csopt[false]{save-locations} is used). The
-\field{loclist} field has the syntax of an \isty{etoolbox} internal list
+\field{location} field contains the code to typeset the formatted
+\idx{locationlist}.
+
+The \field{loclist} field has the syntax of an \isty{etoolbox} internal list
 and includes every location (except for the discarded duplicates and
-\idxpl{ignoredrecord}).
-Each item in the list is provided in the form
-\begin{alltt}
+\idxpl{ignoredrecord}). Any explicit range markup is stripped from
+the format (encap) information.  Each item in the list is provided
+in the form:
+\begin{codeenv}
 \ics{glsseeformat}\oargm{tag}\margm{label list}\marg{}
-\end{alltt}
+\end{codeenv}
 for the cross-reference supplied by the \field{see} field,
-\begin{alltt}
-\ics{glsxtruseseealsoformat}\margm{label list}
-\end{alltt}
+\begin{codeenv}
+\ics{glsxtruseseealsoformat}\margm{xr list}
+\end{codeenv}
 for the cross-reference supplied by the \field{seealso} field,
-\nosecdef{glsnoidxdisplayloc}
-for standard the internal locations and 
-\nosecdef{glsxtrdisplaysupploc}
-for supplemental (external) locations. (See \sectionref{sec:supplementalopts}
-for more information about supplemental locations.)
+\begin{codeenv}
+\format{glsnoidxdisplayloc}
+\end{codeenv}
+for standard the internal locations, 
+\begin{codeenv}
+\format{glsxtrdisplaysupploc}
+\end{codeenv}
+for supplemental (external) locations and
+\begin{codeenv}
+\format{glsxtrdisplaylocnameref}
+\end{codeenv}
+for \code{nameref} records. (See \sectionref{sec:supplementalopts}
+for more information about supplemental locations and
+\longarg{merge-nameref-on} for more information about \code{nameref}
+records.)
 
 You can iterate through the \field{loclist} value
 using one of \sty{etoolbox}'s internal list loops (either
@@ -8285,8 +8351,9 @@ macro, which simply displays each location separated by \ics{delimN}.
 \href{http://www.dickimaw-books.com/latex/admin/html/foreachtips.shtml}{Iteration
 Tips and Tricks}~\cite{iterationtips}.)
 
-Each location is listed in the \iext{aux} file in the form:
+Each regular location is listed in the \iext{aux} file in the form:
 \nosecdef{glsxtr@record}
+(See \longarg{merge-nameref-on} for \code{nameref} records.)
 Exact duplicates are discarded. For example, if \code{cat}
 is indexed twice on page 1:
 \begin{verbatim}
@@ -8872,6 +8939,8 @@ followed by \code{\ics{label}\marg{wrglossary.\meta{n}}} where
 This option is intended for use with the \sty{hyperref} package to
 allow locations to link back to the particular part of the page where
 the term was referenced rather than to the top of the page.
+(This option can conflict with the \styopt[nameref]{record}
+option, so it's best not to use them both.)
 
 The \styopt{indexcounter} package option also automatically
 implements the option \styopt[wrglossary]{counter}, which means that
@@ -8881,9 +8950,9 @@ information to the \iext{aux} file:
 \csfmt{newlabel}\marg{wrglossary.\meta{n}}\marg{\margm{n}\margm{page}\marg{}\marg{wrglossary.\meta{n}}\marg{}}
 \end{alltt}
 (where \meta{page} is the page number) followed by the record:
-\begin{alltt}
+\begin{codeenv}
 \cs{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{glsnumberformat}\margm{n}
-\end{alltt}
+\end{codeenv}
 The location here is actually the value of the \counter{wrglossary}
 counter not the page number, but \bibgls\ can pick up the
 corresponding \meta{page} from the \csfmt{newlabel} command. It then

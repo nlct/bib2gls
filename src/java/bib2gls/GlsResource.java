@@ -2752,7 +2752,7 @@ public class GlsResource
 
       if (supplementalRecords == null)
       {
-         supplementalRecords = new Vector<GlsSuppRecord>();
+         supplementalRecords = new Vector<SupplementalRecord>();
       }
 
       for (AuxData data : auxData)
@@ -2760,20 +2760,35 @@ public class GlsResource
          String name = data.getName();
 
          if (name.equals("glsxtr@record")
-              || (bib2gls.useCiteAsRecord() && name.equals("citation")))
+              || (bib2gls.useCiteAsRecord() && name.equals("citation"))
+              || name.equals("glsxtr@record@nameref"))
          {
             String recordLabel = data.getArg(0).toString(auxTeXParser);
             String recordPrefix;
             String recordCounter;
             String recordFormat;
             String recordLocation;
+            String recordTitle = null;
+            String recordHref = null;
 
-            if (data.getNumArgs() == 5)
+            if (data.getNumArgs() >= 5)
             {
                recordPrefix = data.getArg(1).toString(auxTeXParser);
                recordCounter = data.getArg(2).toString(auxTeXParser);
                recordFormat = data.getArg(3).toString(auxTeXParser);
                recordLocation = data.getArg(4).toString(auxTeXParser);
+
+               if (data.getNumArgs() == 7)
+               {
+                  recordTitle = data.getArg(5).toString(auxTeXParser);
+                  recordHref = data.getArg(6).toString(auxTeXParser);
+
+                  if ("".equals(recordTitle) || "".equals(recordHref))
+                  {
+                     recordTitle = null;
+                     recordHref = null;
+                  }
+               }
 
                // No support for wrglossary counter in supplemental
                // records. Convert to page location if found.
@@ -2806,9 +2821,19 @@ public class GlsResource
                recordLocation = "";
             }
 
-            supplementalRecords.add(new GlsSuppRecord(
-              bib2gls, recordLabel, recordPrefix, recordCounter,
-              recordFormat, recordLocation, supplementalPdfPath));
+            if (recordTitle == null || recordHref == null)
+            {
+               supplementalRecords.add(new GlsSuppRecord(
+                 bib2gls, recordLabel, recordPrefix, recordCounter,
+                 recordFormat, recordLocation, supplementalPdfPath));
+            }
+            else
+            {
+               supplementalRecords.add(new GlsSuppRecordNameRef(
+                 bib2gls, recordLabel, recordPrefix, recordCounter,
+                 recordFormat, recordLocation, recordTitle,
+                 recordHref, supplementalPdfPath));
+            }
          }
       }
 
@@ -4346,8 +4371,10 @@ public class GlsResource
    {
       if (supplementalRecords != null)
       {
-         for (GlsSuppRecord record : supplementalRecords)
+         for (SupplementalRecord suppRecord : supplementalRecords)
          {
+            GlsRecord record = (GlsRecord)suppRecord;
+
             String label = getRecordLabel(record);
 
             Bib2GlsEntry entry = getEntry(label, bibData);
@@ -4984,8 +5011,10 @@ public class GlsResource
 
          if (supplementalRecords != null && supplementalSelection != null)
          {
-            for (GlsSuppRecord record : supplementalRecords)
+            for (SupplementalRecord suppRecord : supplementalRecords)
             {
+               GlsRecord record = (GlsRecord) suppRecord;
+
                String label = getRecordLabel(record);
 
                Bib2GlsEntry entry = getEntry(label, data);
@@ -8305,7 +8334,7 @@ public class GlsResource
 
    private HashMap<String,GroupTitle> groupTitleMap=null;
 
-   private Vector<GlsSuppRecord> supplementalRecords=null;
+   private Vector<SupplementalRecord> supplementalRecords=null;
    private TeXPath supplementalPdfPath=null;
    private Vector<TeXPath> supplementalPdfPaths=null;
    private String[] supplementalSelection=null;

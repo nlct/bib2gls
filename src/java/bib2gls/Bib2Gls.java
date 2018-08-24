@@ -2009,9 +2009,9 @@ public class Bib2Gls implements TeXApp
       return useCiteAsRecord;
    }
 
-   public boolean mergeNameRefOnCounter()
+   public boolean mergeNameRefOnLocation()
    {
-      return mergeNameRefOn == MERGE_NAMEREF_ON_COUNTER;
+      return mergeNameRefOn == MERGE_NAMEREF_ON_LOCATION;
    }
 
    public boolean mergeNameRefOnTitle()
@@ -3314,6 +3314,11 @@ public class Bib2Gls implements TeXApp
         "--merge-wrglossary-records"));
       System.out.println(getMessage("syntax.no.merge.wrglossary.records", 
         "--no-merge-wrglossary-records"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.merge.nameref.on",
+         "--merge-nameref-on"));
+
       System.out.println();
       System.out.println(getMessage("syntax.force.cross.resource.refs",
          "--force-cross-resource-refs", "-x"));
@@ -4014,9 +4019,9 @@ public class Bib2Gls implements TeXApp
             {
                mergeNameRefOn = MERGE_NAMEREF_ON_TITLE;
             }
-            else if (arg.equals("counter"))
+            else if (arg.equals("location"))
             {
-               mergeNameRefOn = MERGE_NAMEREF_ON_COUNTER;
+               mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
             }
             else
             {
@@ -4439,8 +4444,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20180822";
-   public static final String DATE = "2018-08-22";
+   public static final String VERSION = "1.7.20180824";
+   public static final String DATE = "2018-08-24";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4486,11 +4491,11 @@ public class Bib2Gls implements TeXApp
 
    private boolean mergeWrGlossaryLocations = true;
 
-   private byte mergeNameRefOn = MERGE_NAMEREF_ON_HREF;
+   private byte mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
 
    private static final byte MERGE_NAMEREF_ON_HREF=(byte)0;
    private static final byte MERGE_NAMEREF_ON_TITLE=(byte)1;
-   private static final byte MERGE_NAMEREF_ON_COUNTER=(byte)2;
+   private static final byte MERGE_NAMEREF_ON_LOCATION=(byte)2;
 
    private Bib2GlsMessages messages;
 
