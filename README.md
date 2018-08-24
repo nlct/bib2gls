@@ -3,10 +3,25 @@ Command line application to convert `.bib` files to `glossaries-extra.sty` resou
 
 (Developed as a follow-up from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).)
+This tool forms part of a LaTeX document build, performing two
+functions in one: glossary information is fetched from one or
+more `.bib` files by examining the `.aux` file (similar to BibTeX)
+and the terms are then sorted hierarchically and the locations collated into
+compact lists (similar to Makeindex/Xindy). A `.glstex` file 
+is then created containing the data defined in terms of
+`\longnewglossaryentry*` or `\newabbreviation` (provided by
+`glossaries-extra.sty`) in the appropriate order. This file
+is input by `\GlsXtrLoadResources` (which also writes the required
+settings to the `.aux` file for `bib2gls`). The glossary
+can then simply by displayed with `\printunsrtglossary`. The
+`.bib` files can be managed in an application like JabRef.
+You may prefer to start with the [introductory guide](http://mirrors.ctan.org/support/bib2gls/bib2gls-begin.pdf)
+before moving on to the [main user manual](http://mirrors.ctan.org/support/bib2gls/bib2gls.pdf).
 
 This application requires at least Java 7 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
-(2017-02-03). (Although newer versions are recommended.)
+(2017-02-03) and at least v4.04 of [glossaries.sty](http://ctan.org/pkg/glossaries). (Although newer versions are recommended, 
+and may be required for some features.)
 The main home page is [`dickimaw-books.com/software/bib2gls`](http://www.dickimaw-books.com/software/bib2gls/).
 
 The latest stable version of `bib2gls` is available from [CTAN](https://ctan.org/pkg/bib2gls).
