@@ -2734,6 +2734,7 @@ public class GlsResource
             super.addPredefined();
 
             addAuxCommand("glsxtr@record", 5);
+            addAuxCommand("glsxtr@record@nameref", 7);
          }
       };
 
