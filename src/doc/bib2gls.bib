@@ -2413,7 +2413,7 @@ cs}\margm{Glspl-like cs}},
 
 @dualindexentry{glsxtrdisplaylocnameref,
   name={\csfmt{gls\-xtr\-display\-loc\-name\-ref}},
-  user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}\margm{file}},
+  user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}\margm{hcounter}\margm{file}},
   description={used to display a \code{nameref} location in the
   \field{location} field},
   note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
@@ -2449,7 +2449,7 @@ cs}\margm{Glspl-like cs}},
 
 @dualindexentry{glsxtr@record@nameref,
   name={\csfmt{glsxtr@record@name\-ref}},
-  user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}},
+  user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}\margm{hcounter}},
   description={used instead of \gls{glsxtr@record} when the
    \styopt[nameref]{record} option is used},
   note={provided by \styfmt{glossaries-extra} v1.37+},
@@ -9394,6 +9394,17 @@ displays the given entry's \field{first} field},
   description={provided for use in section or caption titles, this
 displays the given entry's \field{text} field},
   note={provided by \styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{theHentrycounter,
+  name={\csfmt{the\-H\-entry\-counter}},
+  user1={},
+  description={when indexing, this is set to the
+   \csfmt{theH}\meta{counter} command corresponding to the 
+   current indexing counter (or, if undefined, 
+   \csfmt{the}\meta{counter})},
+  note={provided by \styfmt{glossaries}},
   category={command}
 }
 

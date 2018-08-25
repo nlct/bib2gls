@@ -4,17 +4,47 @@
 \documentclass{book}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record=nameref,counter=chapter]{glossaries-extra}
+\usepackage[
+ record=nameref,% include nameref information (glossaries-extra v1.37+)
+ floats,% auto switch counter in floats (glossaries-extra v1.37+)
+ equations,% auto switch counter in equations (glossaries-extra v1.37+)
+ counter=chapter]{glossaries-extra}
 
-\GlsXtrLoadResources[src={test-entries}]
+\GlsXtrLoadResources[src={test-entries,entries-symbols}]
+
+% nameref records use \glsxtrdisplaylocnameref in the location list
+%This can be redefined to use a different link text according to the
+%counter.
+
+%\renewcommand*{\glsxtrdisplaylocnameref}[8]{%
+%  \ifstrequal{#2}{equation}%
+%  {\glsxtrnamereflink{#3}{eq~(#4)}{#2.#7}{#8}}%
+%  {\glsxtrnamereflink{#3}{#5}{#2.#7}{#8}}%
+%}
 
 \begin{document}
 \chapter{Sample Chapter}
-\gls{goose}. \gls{sample}. \gls{html}.
+\gls{goose}. \gls{sample}. \gls{html}, $\gls{i}$.
+
+\begin{equation}
+z = x + \gls{i}y\label{eq:sample}
+\end{equation}
+
+\begin{figure}[htbp]
+\centering
+\fbox{X}
+\caption{Sample Figure}\glsadd{html}
+\end{figure}
+
+\gls{goose}. \gls{sample}. \gls{html}, $\gls{i}$.
 
 \chapter{Another Chapter}
 \gls{html}.
 \gls{ssi}.
+
+\begin{align}
+z &= x + \gls{i}y
+\end{align}
 
 \printunsrtglossaries
 \end{document}

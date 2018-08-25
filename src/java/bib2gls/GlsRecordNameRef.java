@@ -26,31 +26,34 @@ import java.util.Iterator;
 public class GlsRecordNameRef extends GlsRecord
 {
    public GlsRecordNameRef(Bib2Gls bib2gls, String label, String prefix, String counter,
-      String format, String location, String title, String href)
+      String format, String location, String title, String href, String hcounter)
    {
       super(bib2gls, label, prefix, counter, format, location);
       this.title = title;
       this.href = href;
+      this.hcounter = hcounter;
    }
 
    protected GlsRecordNameRef(Bib2Gls bib2gls, String label, String prefix, String counter,
-      String format, String location, String title, String href, long index)
+      String format, String location, String title, String href, String hcounter, long index)
    {
       super(bib2gls, label, prefix, counter, format, location, index);
       this.title = title;
       this.href = href;
+      this.hcounter = hcounter;
    }
 
    public GlsRecord copy(String newLabel)
    {
       return new GlsRecordNameRef(bib2gls, newLabel, getPrefix(), 
-        getCounter(), getFormat(), getLocation(), title, href, getIndex());
+        getCounter(), getFormat(), getLocation(), title, href, hcounter, 
+        getIndex());
    }
 
    public Object clone()
    {
       return new GlsRecordNameRef(bib2gls, getLabel(), getPrefix(), 
-       getCounter(), getFormat(), getLocation(), title, href,
+       getCounter(), getFormat(), getLocation(), title, href, hcounter,
         getIndex());
    }
 
@@ -62,6 +65,11 @@ public class GlsRecordNameRef extends GlsRecord
    public String getHref()
    {
       return href;
+   }
+
+   public String getHcounter()
+   {
+      return hcounter;
    }
 
    public String getFmtTeXCode()
@@ -84,9 +92,9 @@ public class GlsRecordNameRef extends GlsRecord
          }
       }
 
-      return String.format("\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{}",
+      return String.format("\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{%s}{}",
          getPrefix(), getCounter(), fmt, getLocation(),
-         getTitle(), getHref());
+         getTitle(), getHref(), getHcounter());
    }
 
    public boolean locationMatch(GlsRecord record)
@@ -129,7 +137,8 @@ public class GlsRecordNameRef extends GlsRecord
 
       GlsRecordNameRef record = (GlsRecordNameRef)obj;
 
-      return href.equals(record.href) && title.equals(record.title);
+      return href.equals(record.href) && title.equals(record.title)
+              && hcounter.equals(record.hcounter);
    }
 
    /*
@@ -155,6 +164,11 @@ public class GlsRecordNameRef extends GlsRecord
          return false;
       }
 
+      if (bib2gls.mergeNameRefOnHcounter())
+      {
+         return hcounter.equals(((GlsRecordNameRef)record).hcounter);
+      }
+
       if (bib2gls.mergeNameRefOnTitle())
       {
          return title.equals(((GlsRecordNameRef)record).title);
@@ -163,19 +177,13 @@ public class GlsRecordNameRef extends GlsRecord
       return href.equals(((GlsRecordNameRef)record).href);
    }
 
-   // no range formations
-   public boolean follows(GlsRecord record, int gap, int[] maxGap)
-   {
-      return false;
-   }
-
    public String toString()
    {
       return String.format(
-        "{%s}{%s}{%s}{%s}{%s}{%s}{%s}{}",
+        "{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}{}",
          getLabel(), getPrefix(), getCounter(), getFormat(), 
-         getLocation(), getTitle(), getHref());
+         getLocation(), getTitle(), getHref(), getHcounter());
    }
 
-   private String title, href;
+   private String title, href, hcounter;
 }

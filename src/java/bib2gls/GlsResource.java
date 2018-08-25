@@ -121,8 +121,12 @@ public class GlsResource
          else if (opt.equals("supplemental-locations"))
          {// Fetch supplemental locations from another document.
           // As from v1.7, the value may now be a list of
-          // document base names.
-            supplemental = getStringArray(parser, list, opt);
+          // document base names. In the event that the user has
+          // non-ASCII characters in the file names but is using
+          // PDFLaTeX, then the list may contain accenting commands,
+          // so the expandfully value is true to convert them to
+          // Unicode. 
+            supplemental = getStringArray(parser, list, opt, true);
          }
          else if (opt.equals("supplemental-category"))
          {
@@ -2734,7 +2738,7 @@ public class GlsResource
             super.addPredefined();
 
             addAuxCommand("glsxtr@record", 5);
-            addAuxCommand("glsxtr@record@nameref", 7);
+            addAuxCommand("glsxtr@record@nameref", 8);
          }
       };
 
@@ -2771,6 +2775,7 @@ public class GlsResource
             String recordLocation;
             String recordTitle = null;
             String recordHref = null;
+            String recordHcounter = null;
 
             if (data.getNumArgs() >= 5)
             {
@@ -2779,16 +2784,11 @@ public class GlsResource
                recordFormat = data.getArg(3).toString(auxTeXParser);
                recordLocation = data.getArg(4).toString(auxTeXParser);
 
-               if (data.getNumArgs() == 7)
+               if (data.getNumArgs() == 8)
                {
                   recordTitle = data.getArg(5).toString(auxTeXParser);
                   recordHref = data.getArg(6).toString(auxTeXParser);
-
-                  if ("".equals(recordTitle) || "".equals(recordHref))
-                  {
-                     recordTitle = null;
-                     recordHref = null;
-                  }
+                  recordHcounter = data.getArg(7).toString(auxTeXParser);
                }
 
                // No support for wrglossary counter in supplemental
@@ -2822,7 +2822,7 @@ public class GlsResource
                recordLocation = "";
             }
 
-            if (recordTitle == null || recordHref == null)
+            if (recordTitle == null)
             {
                supplementalRecords.add(new GlsSuppRecord(
                  bib2gls, recordLabel, recordPrefix, recordCounter,
@@ -2833,7 +2833,7 @@ public class GlsResource
                supplementalRecords.add(new GlsSuppRecordNameRef(
                  bib2gls, recordLabel, recordPrefix, recordCounter,
                  recordFormat, recordLocation, recordTitle,
-                 recordHref, supplementalPdfPath));
+                 recordHref, recordHcounter, supplementalPdfPath));
             }
          }
       }
@@ -3229,7 +3229,14 @@ public class GlsResource
      KeyValList list, String opt)
     throws IOException
    {
-      String[] array = getStringArray(parser, list, opt);
+      return getStringArray(parser, defValue, list, opt, false);
+   }
+
+   private String[] getStringArray(TeXParser parser, String defValue, 
+     KeyValList list, String opt, boolean expandfully)
+    throws IOException
+   {
+      String[] array = getStringArray(parser, list, opt, expandfully);
 
       if (array == null)
       {
@@ -3241,6 +3248,13 @@ public class GlsResource
 
    private String[] getStringArray(TeXParser parser, KeyValList list, 
      String opt)
+    throws IOException
+   {
+      return getStringArray(parser, list, opt, false);
+   }
+
+   private String[] getStringArray(TeXParser parser, KeyValList list, 
+     String opt, boolean expandfully)
     throws IOException
    {
       TeXObject object = list.getValue(opt);
@@ -3264,6 +3278,25 @@ public class GlsResource
       for (int i = 0; i < n; i++)
       {
          TeXObject obj = csvList.getValue(i);
+
+         if (expandfully && obj instanceof Expandable)
+         {
+            TeXObjectList expanded = null;
+
+            try
+            {
+               expanded = ((Expandable)obj).expandfully(parser);
+            }
+            catch (IOException e)
+            {
+               bib2gls.debug(e);
+            }
+
+            if (expanded != null)
+            {
+               obj = expanded;
+            }
+         }
 
          if (obj instanceof TeXObjectList)
          {

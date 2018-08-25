@@ -105,9 +105,7 @@ Don't merge an entry's B<wrglossary> records.
 
 Rule for merging locations created with the record=nameref package option
 (requires glossaries-extra.sty version 1.37+). The I<rule> may be
-one of: B<href>, B<title> or B<location>. Note that even with
-record=nameref, some locations may be treated as normal records
-under certain circumstances.
+one of: B<hcounter>, B<href>, B<title> or B<location>.
 
 =item B<--force-cross-resource-refs> or B<-x>
 

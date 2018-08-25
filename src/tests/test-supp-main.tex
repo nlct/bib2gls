@@ -26,7 +26,7 @@
 \makeatother
 
 \GlsXtrLoadResources[
- src=test-entries,% data in test-entries.bib
+ src={test-entries,entries-symbols},% data in test-entries.bib and entries-symbols.bib
 % The following requires glossaries-extra.sty v1.14+ for a single 
 % location and v1.36+ for multiple external sources.
 % Entries used in this document that have locations recorded
@@ -41,7 +41,7 @@
 % In addition to the entries referenced in this document,
 % also add these listed entries (that were recorded in 'test-supp'
 % and are defined in the same test-entries.bib file)
- supplemental-selection={html,ssi},
+ supplemental-selection={html,ssi,i},
 % Add all entries in the supplemental file that have been
 % defined in test-entries.bib:
  %supplemental-selection={all}

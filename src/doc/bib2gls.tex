@@ -2068,16 +2068,26 @@ but they will link to different parts of the page.
 The \styopt[nameref]{record} package option (introduced to 
 \sty{glossaries-extra} version 1.37) provides extra information
 in the record when indexing, obtained from \ics{@currentlabelname}
-and \ics{@currentHref}. Instead of writing the record as:
+\ics{@currentHref} and \ics{theHentrycounter}. Instead of writing the record as:
 \begin{codeenv}
 \ics{glsxtr@record}\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}
 \end{codeenv}
 the record is written as:
 \nosecdef{glsxtr@record@nameref}
 If \isty{hyperref} hasn't been loaded \meta{title} and \meta{href}
-will always be empty. If either \meta{title} or \meta{href} is
-empty, \bibgls\ will treat the record as though it had been
-identified with the normal \cs{glsxtr@record}.
+will always be empty. The most reliable target is \meta{hcounter},
+obtained from \cs{theHentrycounter}, which is set to the hyper
+target command \csfmt{theH}\meta{counter} during indexing. Since
+this information can't be included in the location when indexing
+with \idx{makeindex} or \idx{xindy}, the base \sty{glossaries}
+package tries to obtain a prefix from which the target name can be
+formed. This doesn't work if \csfmt{theH}\meta{counter} can't be
+formed from \meta{prefix}\csfmt{the}\meta{counter}, which results in
+broken links. Since \bibgls\ doesn't have the same restrictions, the
+actual target can be included in the record. You can then customize
+the document to choose whether to use \meta{href} (to link to the
+nearest anchor) or \meta{hcounter} to link to the place where the
+indexing counter was incremented.
 
 The \code{nameref} record will be written to the \idx{locationlist} using:
 \nosecdef{glsxtrdisplaylocnameref}
@@ -2085,20 +2095,18 @@ The \meta{file} part will be empty for normal internal locations,
 and will be set to the corresponding file name for supplemental
 locations.
 
-The \meta{title} will also be empty at the
-start of the document. With \sty{hyperref}, the \meta{href} will be
+With \sty{hyperref}, \meta{title} is initially empty. The \meta{href} will be
 \code{Doc-Start} at the start of the document and is updated
 globally on every instance of \ics{refstepcounter}. The 
 \meta{title} is updated locally by certain commands, such as 
 \ics{section} or \ics{caption}. This means that the \meta{href}
 may not always correspond to the \meta{title}, so using
 the \styopt[nameref]{record} package option can have unpredictable
-results. Since numbered equations don't naturally have a title, the
-\sty{glossaries-extra} package switches to normal records in
-known numbered maths environments.
+results if the \meta{title} is used as link text with \meta{href} as
+the target. 
 
 For compactness, \bibgls\ tries to merge duplicate or near
-duplicate records. There are three possible rules that it will
+duplicate records. There are four possible rules that it will
 use for \code{nameref} records, identified by \meta{rule} in the
 \longarg{merge-nameref-on} switch:
 \begin{itemize}
@@ -2108,9 +2116,11 @@ records);
 \item \optfmt{title}: merge records that match on the \meta{counter}
 and \meta{title} parts;
 \item \optfmt{href}: merge records that match on the \meta{counter}
-and \meta{href} parts.
+and \meta{href} parts;
+\item \optfmt{hcounter}: merge records that match on the \meta{counter}
+and \meta{hcounter} parts.
 \end{itemize}
-The default \meta{rule} is \optfmt{location}. Note that for all
+The default \meta{rule} is \optfmt{hcounter}. Note that for all
 rules the \meta{counter} must match. See the \qt{Nameref Record}
 section of the \sty{glossaries-extra} user manual for further
 details.
@@ -8957,8 +8967,6 @@ followed by \code{\ics{label}\marg{wrglossary.\meta{n}}} where
 This option is intended for use with the \sty{hyperref} package to
 allow locations to link back to the particular part of the page where
 the term was referenced rather than to the top of the page.
-(This option can conflict with the \styopt[nameref]{record}
-option, so it's best not to use them both.)
 
 The \styopt{indexcounter} package option also automatically
 implements the option \styopt[wrglossary]{counter}, which means that

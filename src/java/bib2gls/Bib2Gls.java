@@ -1297,7 +1297,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@fields", 1);
             addAuxCommand("glsxtr@record", 5);
             addAuxCommand("glsxtr@recordsee", 2);
-            addAuxCommand("glsxtr@record@nameref", 7);
+            addAuxCommand("glsxtr@record@nameref", 8);
             addAuxCommand("glsxtr@texencoding", 1);
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
@@ -1448,6 +1448,7 @@ public class Bib2Gls implements TeXApp
             String recordLocation;
             String recordTitle=null;
             String recordHref=null;
+            String recordHcounter=null;
 
             if (data.getNumArgs() >= 5)
             {
@@ -1456,16 +1457,11 @@ public class Bib2Gls implements TeXApp
                recordFormat = data.getArg(3).toString(parser);
                recordLocation = data.getArg(4).toString(parser);
 
-               if (data.getNumArgs() == 7)
+               if (data.getNumArgs() == 8)
                {
                   recordTitle = data.getArg(5).toString(parser);
                   recordHref = data.getArg(6).toString(parser);
-
-                  if ("".equals(recordTitle) || "".equals(recordHref))
-                  {
-                     recordTitle = null;
-                     recordHref = null;
-                  }
+                  recordHcounter = data.getArg(7).toString(parser);
                }
 
                if (recordCounter.equals("wrglossary"))
@@ -1506,7 +1502,7 @@ public class Bib2Gls implements TeXApp
             {
                newRecord = new GlsRecordNameRef(this, recordLabel, recordPrefix,
                   recordCounter, recordFormat, recordLocation, recordTitle,
-                  recordHref);
+                  recordHref, recordHcounter);
             }
 
             incRecordCount(newRecord);
@@ -2082,6 +2078,11 @@ public class Bib2Gls implements TeXApp
    public boolean mergeNameRefOnHref()
    {
       return mergeNameRefOn == MERGE_NAMEREF_ON_HREF;
+   }
+
+   public boolean mergeNameRefOnHcounter()
+   {
+      return mergeNameRefOn == MERGE_NAMEREF_ON_HCOUNTER;
    }
 
    public boolean mergeWrGlossaryLocations()
@@ -4212,6 +4213,10 @@ public class Bib2Gls implements TeXApp
             {
                mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
             }
+            else if (arg.equals("hcounter"))
+            {
+               mergeNameRefOn = MERGE_NAMEREF_ON_HCOUNTER;
+            }
             else
             {
                throw new Bib2GlsSyntaxException(
@@ -4633,8 +4638,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20180824";
-   public static final String DATE = "2018-08-24";
+   public static final String VERSION = "1.7.20180825";
+   public static final String DATE = "2018-08-25";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4680,11 +4685,12 @@ public class Bib2Gls implements TeXApp
 
    private boolean mergeWrGlossaryLocations = true;
 
-   private byte mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
+   private byte mergeNameRefOn = MERGE_NAMEREF_ON_HCOUNTER;
 
    private static final byte MERGE_NAMEREF_ON_HREF=(byte)0;
    private static final byte MERGE_NAMEREF_ON_TITLE=(byte)1;
    private static final byte MERGE_NAMEREF_ON_LOCATION=(byte)2;
+   private static final byte MERGE_NAMEREF_ON_HCOUNTER=(byte)3;
 
    private Bib2GlsMessages messages;
 

@@ -25,18 +25,19 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
 {
    public GlsSuppRecordNameRef(Bib2Gls bib2gls, String label, 
       String prefix, String counter, String format, String location, 
-      String title, String href, TeXPath src)
+      String title, String href, String hcounter, TeXPath src)
    {
-      super(bib2gls, label, prefix, counter, format, location, title, href);
+      super(bib2gls, label, prefix, counter, format, location, title, href,
+        hcounter);
       this.src = src;
    }
 
    protected GlsSuppRecordNameRef(Bib2Gls bib2gls, String label, 
       String prefix, String counter, String format, String location, 
-      String title, String href, TeXPath src, long index)
+      String title, String href, String hcounter, TeXPath src, long index)
    {
       super(bib2gls, label, prefix, counter, format, location, title, href, 
-        index);
+        hcounter, index);
       this.src = src;
    }
 
@@ -44,14 +45,14 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
    {
       return new GlsSuppRecordNameRef(bib2gls, newLabel, getPrefix(), 
         getCounter(), getFormat(), getLocation(), getTitle(), getHref(),
-        src, getIndex());
+        getHcounter(), src, getIndex());
    }
 
    public Object clone()
    {
       return new GlsSuppRecordNameRef(bib2gls, getLabel(), getPrefix(), 
        getCounter(), getFormat(), getLocation(), getTitle(), getHref(),
-        src, getIndex());
+       getHcounter(), src, getIndex());
    }
 
    public TeXPath getSource()
@@ -80,18 +81,13 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
       }
 
       return String.format(
-         "\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
+         "\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
          getPrefix(), getCounter(), fmt, getLocation(),
-         getTitle(), getHref(), bib2gls.getTeXPathHref(src));
+         getTitle(), getHref(), getHcounter(), bib2gls.getTeXPathHref(src));
    }
 
    public boolean locationMatch(GlsRecord record)
    {
-      if (bib2gls.mergeNameRefOnLocation())
-      {
-         return super.locationMatch(record);
-      }
-
       if (!(record instanceof GlsSuppRecordNameRef))
       {
          return false;
@@ -131,9 +127,9 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
    public String toString()
    {
       return String.format(
-        "{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
+        "{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
          getLabel(), getPrefix(), getCounter(), getFormat(), 
-         getLocation(), getTitle(), getHref(), 
+         getLocation(), getTitle(), getHref(), getHcounter(), 
          bib2gls.getTeXPathHref(src));
    }
 
