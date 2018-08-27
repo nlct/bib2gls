@@ -2928,7 +2928,7 @@ public class Bib2GlsEntry extends BibEntry
 
    public String getPrimaryRecordList() throws Bib2GlsException
    {
-      if (primaryRecords != null)
+      if (primaryRecords == null)
       {
          return null;
       }
