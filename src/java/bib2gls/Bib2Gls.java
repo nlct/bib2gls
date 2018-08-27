@@ -54,6 +54,8 @@ public class Bib2Gls implements TeXApp
    public Bib2Gls(int debug, int verbose, String langTag)
      throws IOException,InterruptedException,Bib2GlsException
    {
+      kpsewhichResults = new HashMap<String,String>();
+
       try
       {
          pending = new StringWriter();
@@ -301,6 +303,45 @@ public class Bib2Gls implements TeXApp
             // on the current working directory path so allow
 
             return true;
+         }
+
+         // has kpsewhich found this file?
+
+         String result = kpsewhichResults.get(
+            path.getName(path.getNameCount()-1).toString());
+
+         if (result != null)
+         {
+            File file;
+
+            if (File.separatorChar == '/')
+            {
+               file = new File(result);
+            }
+            else
+            {
+               // convert from TeX path to native:
+               String[] split = result.split("/");
+
+               file = new File(split[0]+File.separator);
+
+               for (int i = 0; i < split.length; i++)
+               {
+                  file = new File(file, split[i]);
+               }
+            }
+
+            try
+            {
+               if (Files.isSameFile(path, file.toPath()))
+               {
+                  return true;
+               }
+            }
+            catch (IOException e)
+            {
+               debug(e);
+            }
          }
 
          if (texmfoutput != null)
@@ -2671,6 +2712,15 @@ public class Bib2Gls implements TeXApp
    public String kpsewhich(String arg)
      throws IOException,InterruptedException
    {
+      // has kpsewhich already been called with this argument? 
+
+      String result = kpsewhichResults.get(arg);
+
+      if (result != null)
+      {
+         return result;
+      }
+
       debug(getMessageWithFallback("message.running", 
         "Running {0}",
         String.format("kpsewhich '%s'", arg)));
@@ -2728,6 +2778,8 @@ public class Bib2Gls implements TeXApp
            "{0} failed with exit code {1}",
            String.format("kpsewhich '%s'", arg),  exitCode));
       }
+
+      kpsewhichResults.put(arg, line);
 
       return line;
    }
@@ -4638,8 +4690,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20180825";
-   public static final String DATE = "2018-08-25";
+   public static final String VERSION = "1.7.20180827";
+   public static final String DATE = "2018-08-27";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4746,6 +4798,8 @@ public class Bib2Gls implements TeXApp
    private String glossariesExtraVersion="????/??/??";
 
    private Vector<String> dependencies = null;
+
+   private HashMap<String,String> kpsewhichResults;
 
    private int exitCode;
 
