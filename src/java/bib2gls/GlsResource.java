@@ -96,7 +96,14 @@ public class GlsResource
 
          if (opt.equals("src"))
          {
-            srcList = getStringArray(parser, list, opt);
+          // In the event that the user has
+          // non-ASCII characters in the file names but is using
+          // PDFLaTeX, then the list may contain accenting commands,
+          // so the expandfully value is true to convert them to
+          // Unicode unless fontspec has been loaded, in which case
+          // there won't be a problem.
+            srcList = getStringArray(parser, list, opt,
+              !bib2gls.fontSpecLoaded());
 
             if (srcList == null)
             {
@@ -125,8 +132,10 @@ public class GlsResource
           // non-ASCII characters in the file names but is using
           // PDFLaTeX, then the list may contain accenting commands,
           // so the expandfully value is true to convert them to
-          // Unicode. 
-            supplemental = getStringArray(parser, list, opt, true);
+          // Unicode unless fontspec has been loaded, in which case
+          // there won't be a problem. 
+            supplemental = getStringArray(parser, list, opt,
+               !bib2gls.fontSpecLoaded());
          }
          else if (opt.equals("supplemental-category"))
          {
@@ -670,6 +679,37 @@ public class GlsResource
          else if (opt.equals("save-loclist"))
          {
             saveLocList = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("save-primary-locations"))
+         {
+            String val = getChoice(parser, list, opt,
+              "false", "remove", "retain", "start");
+
+            if (val.equals("false"))
+            {
+               savePrimaryLocations = SAVE_PRIMARY_LOCATION_OFF;
+            }
+            else if (val.equals("remove"))
+            {
+               savePrimaryLocations = SAVE_PRIMARY_LOCATION_REMOVE;
+            }
+            else if (val.equals("retain"))
+            {
+               savePrimaryLocations = SAVE_PRIMARY_LOCATION_RETAIN;
+            }
+            else if (val.equals("start"))
+            {
+               savePrimaryLocations = SAVE_PRIMARY_LOCATION_START;
+            }
+         }
+         else if (opt.equals("primary-location-formats"))
+         {
+            primaryLocationFormats = getStringArray(parser, list, opt);
+
+            if (savePrimaryLocations == SAVE_PRIMARY_LOCATION_OFF)
+            {
+               savePrimaryLocations = SAVE_PRIMARY_LOCATION_RETAIN;
+            }
          }
          else if (opt.equals("combine-dual-locations"))
          {
@@ -2105,6 +2145,15 @@ public class GlsResource
            "secondary-sort-number-pattern"));
       }
 
+      if (savePrimaryLocations != SAVE_PRIMARY_LOCATION_OFF
+           && primaryLocationFormats == null)
+      {
+         throw new IllegalArgumentException(bib2gls.getMessage(
+           "warning.option.pair.required",
+           "save-primary-locations",
+           "primary-location-formats"));
+      }
+
       if (limit > 0 && master != null)
       {
          throw new IllegalArgumentException(bib2gls.getMessage(
@@ -3233,10 +3282,11 @@ public class GlsResource
    }
 
    private String[] getStringArray(TeXParser parser, String defValue, 
-     KeyValList list, String opt, boolean expandfully)
+     KeyValList list, String opt, boolean expandIfBackslashFound)
     throws IOException
    {
-      String[] array = getStringArray(parser, list, opt, expandfully);
+      String[] array = getStringArray(parser, list, opt, 
+         expandIfBackslashFound);
 
       if (array == null)
       {
@@ -3254,7 +3304,7 @@ public class GlsResource
    }
 
    private String[] getStringArray(TeXParser parser, KeyValList list, 
-     String opt, boolean expandfully)
+     String opt, boolean expandIfBackslashFound)
     throws IOException
    {
       TeXObject object = list.getValue(opt);
@@ -3279,31 +3329,34 @@ public class GlsResource
       {
          TeXObject obj = csvList.getValue(i);
 
-         if (expandfully && obj instanceof Expandable)
-         {
-            TeXObjectList expanded = null;
-
-            try
-            {
-               expanded = ((Expandable)obj).expandfully(parser);
-            }
-            catch (IOException e)
-            {
-               bib2gls.debug(e);
-            }
-
-            if (expanded != null)
-            {
-               obj = expanded;
-            }
-         }
-
          if (obj instanceof TeXObjectList)
          {
             obj = trimList((TeXObjectList)obj);
          }
 
          array[i] = obj.toString(parser).trim();
+
+         if (expandIfBackslashFound && array[i].contains("\\")
+                && obj instanceof Expandable)
+         {
+            TeXObjectList expanded = null;
+
+            try
+            {
+               expanded = ((Expandable)obj).expandfully(parser);
+
+               if (expanded != null)
+               {
+                  obj = trimList(expanded);
+                  array[i] = obj.toString(parser).trim();
+               }
+            }
+            catch (IOException e)
+            {
+               bib2gls.debug(e);
+            }
+         }
+
       }
 
       return array;
@@ -5682,6 +5735,11 @@ public class GlsResource
             }
          }
 
+         if (getSavePrimaryLocationSetting() != SAVE_PRIMARY_LOCATION_OFF)
+         {
+            writer.println("\\providecommand{\\bibglsprimary}[2]{#2}");
+         }
+
          if (locationPrefix != null)
          {
             writer.println("\\providecommand{\\bibglspostlocprefix}{\\ }");
@@ -6108,7 +6166,7 @@ public class GlsResource
    }
 
    private void writeBibEntryDef(PrintWriter writer, Bib2GlsEntry entry)
-     throws IOException
+     throws IOException,Bib2GlsException
    {
       String id = entry.getId();
 
@@ -6152,6 +6210,17 @@ public class GlsResource
       if (saveLocList)
       {
          entry.writeLocList(writer);
+      }
+
+      if (getSavePrimaryLocationSetting() != SAVE_PRIMARY_LOCATION_OFF)
+      {
+         String val = entry.getPrimaryRecordList();
+
+         if (val != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{primarylocations}{%s}%n",
+              id, val);
+         }
       }
 
       if (saveChildCount)
@@ -6254,7 +6323,7 @@ public class GlsResource
    }
 
    private void writeBibEntry(PrintWriter writer, Bib2GlsEntry entry)
-     throws IOException
+     throws IOException,Bib2GlsException
    {
       switch (writeAction)
       {
@@ -8145,6 +8214,35 @@ public class GlsResource
       return supplementalPdfPaths;
    }
 
+   public boolean isPrimaryLocation(String format)
+   {
+      if (primaryLocationFormats == null 
+           || savePrimaryLocations == SAVE_PRIMARY_LOCATION_OFF)
+      {
+         return false;
+      }
+
+      if (format.startsWith("(") || format.startsWith(")"))
+      {
+         format = format.substring(1);
+      }
+
+      for (String primaryFmt : primaryLocationFormats)
+      {
+         if (primaryFmt.equals(format))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public int getSavePrimaryLocationSetting()
+   {
+      return savePrimaryLocations;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -8281,6 +8379,15 @@ public class GlsResource
 
    private boolean saveLocations = true;
    private boolean saveLocList = true;
+
+   private int savePrimaryLocations = SAVE_PRIMARY_LOCATION_OFF;
+
+   private String[] primaryLocationFormats = null;
+
+   public static final int SAVE_PRIMARY_LOCATION_OFF=0;
+   public static final int SAVE_PRIMARY_LOCATION_REMOVE=1;
+   public static final int SAVE_PRIMARY_LOCATION_RETAIN=2;
+   public static final int SAVE_PRIMARY_LOCATION_START=3;
 
    public static final int COMBINE_DUAL_LOCATIONS_OFF=0;
    public static final int COMBINE_DUAL_LOCATIONS_BOTH=1;

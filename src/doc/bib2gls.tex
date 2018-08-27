@@ -8454,6 +8454,87 @@ If you want the \field{location} field but don't need
 \field{loclist}, you can use \csopt[false]{save-loclist}.
 This can help to save resources and build time.
 
+\optsection{save-primary-locations}
+
+This option may take one of the following values:
+\begin{itemize}
+\item \optfmt{false}: don't save primary locations (default);
+\item \optfmt{retain}: save primary locations in the
+\field{primarylocations} field but don't remove from the usual
+\idx{locationlist};
+\item \optfmt{start}: save primary locations in the
+\field{primarylocations} field and also move to the start of the
+usual \idx{locationlist};
+\item \optfmt{remove}: save primary locations in the
+\field{primarylocations} field and remove from the usual
+\idx{locationlist}.
+\end{itemize}
+The primary locations are identified with
+\csopt{primary-location-formats}, which must be set if the
+default \csopt[false]{save-primary-locations} is changed.
+
+The primary locations are copied to the \field{primarylocations}
+field and encapsulated with \cs{bibglsprimary}.
+If you use \csopt[remove]{save-primary-locations}, the
+\field{location} field will end up empty if the locations for the
+associated entry were all identified as primary. If you use
+\csopt[start]{save-primary-locations}, all primary locations will be
+moved to the start of the \idx{locationlist} stored in the
+\field{location} field, but there will be no additional markup
+(other than the given format) to identify them. If you need
+additional markup, then use \csopt[remove]{save-primary-locations}
+and adjust the \idx{locationlist} format to insert the primary
+locations at the start. This can be done by modifying the glossary
+style. For example, the \glostyle{bookindex} style inserts
+\ics{glsxtrbookindexprelocation} before the location, so you could
+redefine this:
+\begin{verbatim}
+\renewcommand*{\glsxtrbookindexprelocation}[1]{%
+  \glsxtrifhasfield{primarylocations}{#1}%
+  {%
+    \glsxtrprelocation
+    \glscurrentfieldvalue
+    \glsxtrifhasfield{location}{#1}{;}{}%
+  }%
+  {}%
+  \glsxtrprelocation
+}
+\end{verbatim}
+(Note that if \csopt{loc-prefix} is used, the prefix will be
+in the \field{location} field and so will come after the primary
+locations in the above example. Similarly for cross-references
+unless they've been omitted.)
+
+You can switch from using the \field{location} field to the
+\field{primarylocations} field by locally changing
+\ics{GlsXtrLocationField}:
+\begin{codeenv}
+\cs{printunsrtglossary*}\marg{\comment{}
+  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\comment{}
+}
+\end{codeenv}
+Remember that the handler used by \cs{printunsrtglossary} will
+fallback on the \field{loclist} field if the field identified
+by \cs{GlsXtrLocationField} is missing or empty. You may want to
+consider using \csopt[false]{save-loclist} to prevent this.
+
+\optsection{primary-location-formats}
+
+This option will automatically set
+\csopt[retain]{save-primary-locations} unless it has already been
+changed from the default \csopt[false]{save-primary-locations}
+setting. The argument should be a comma-separated list of 
+formats. If a record's format is contained in this list then it will
+be considered a primary location and it will be included in the
+associated entry's \field{primarylocations} field.
+
+For example:
+\begin{codeenv}
+\cs{GlsXtrLoadResources}\oarg{
+  \csopt[hyperbf,hyperemph]{primary-location-formats}
+}
+\end{codeenv}
+
 \optsection{min-loc-range}
 
 By default, three or more consecutive locations \meta{loc-1},
@@ -13106,6 +13187,16 @@ Note that this is slightly different from \gls{bibglslocprefix} as
 it includes the 0 case, which in this instance means that there were
 no locations but there was a cross-reference. This command isn't
 added when the location list is empty.
+
+\cssection{bibglsprimary}
+
+\formatdef{bibglsprimary}
+When the \csopt{save-primary-locations} option is used, the primary
+locations are stored in the \field{primarylocations} field
+encapsulated with this command. The first argument is the number of
+locations in the list. The second argument is the list of locations
+formatted in the usual way. The default definition is to ignore the
+first argument and simply do the second.
 
 \cssection{bibglslocationgroup}
 

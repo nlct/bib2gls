@@ -389,6 +389,14 @@
   category={command}
 }
 
+@dualindexentry{bibglsprimary,
+  name={\csfmt{bib\-gls\-primary}},
+  user1={\margm{n}\margs{locations}},
+  description={location list encapsulator used in the
+\field{primarylocations} field},
+  category={command}
+}
+
 @dualindexentry{bibglspagename,
   name={\csfmt{bib\-gls\-page\-name}},
   user1={},
@@ -1588,6 +1596,20 @@ field\dhyphen locale}},
 @dualindexentry{opt.save-loclist,
    name={\csoptfmt{save\dhyphen loclist}},
    user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.save-primary-locations,
+   name={\csoptfmt{save\dhyphen primary\dhyphen locations}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.primary-location-formats,
+   name={\csoptfmt{primary\dhyphen location\dhyphen formats}},
+   user1={\meta{list}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -4958,6 +4980,15 @@ field.},
   name={\fieldfmt{childlist}},
   description={A list of labels (in \sty{etoolbox}'s internal list
    format) of the children this entry has had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.primarylocations,
+  name={\fieldfmt{primarylocations}},
+  description={Stores the locations that use one of the designated
+primary formats, if enabled.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}
@@ -8497,6 +8528,15 @@ glossaries},
   user1={\margm{label}},
   description={used with the \glostyle{bookindex} style to
    format the entry's name},
+  note={provided by \styfmt{glossary-bookindex}},
+  category={command}
+}
+
+@index{glsxtrbookindexprelocation,
+  name={\csfmt{glsxtr\-book\-index\-pre\-location}},
+  user1={\margm{label}},
+  description={used with the \glostyle{bookindex} style before the
+location list},
   note={provided by \styfmt{glossary-bookindex}},
   category={command}
 }
