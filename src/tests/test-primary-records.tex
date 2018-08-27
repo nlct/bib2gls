@@ -1,0 +1,51 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,
+ postpunc={dot},
+ nostyles,
+ stylemods={tree,bookindex},
+ style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={topics},
+  primary-location-formats={hyperbf,hyperemph},
+  save-primary-locations={remove}% save to primarylocations field and remove from location field
+  %save-primary-locations={retain}% save to primarylocations field and keep in location field
+  %save-primary-locations={start}% save to primarylocations field
+  %and move to start of location field
+]
+
+\renewcommand*{\glsxtrbookindexprelocation}[1]{%
+  \glsxtrifhasfield{primarylocations}{#1}%
+  {%
+    \glsxtrprelocation
+    \glscurrentfieldvalue
+    \glsxtrifhasfield{location}{#1}{;}{}%
+  }%
+  {}%
+  \glsxtrprelocation
+}
+
+\begin{document}
+\chapter{Sample}
+\gls[format=hyperbf]{waterfowl}, \gls{bird} and \gls{zebra}.
+
+\chapter{Another Sample}
+\gls{waterfowl}, \gls[format=hyperbf]{bird} and \gls{zebra}.
+
+\chapter{Yet Another Sample}
+\gls{bird} and \gls[format=hyperbf]{zebra}.
+
+\printunsrtglossary*[style=tree,nonumberlist]{%
+% \renewcommand{\GlsXtrLocationField}{primarylocations}%
+ \renewcommand*{\glsextrapostnamehook}[1]{\glsadd[format=hyperemph]{#1}}%
+}
+
+\printunsrtglossary[title=Index,target=false]
+\end{document}

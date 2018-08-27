@@ -391,7 +391,7 @@
 
 @dualindexentry{bibglsprimary,
   name={\csfmt{bib\-gls\-primary}},
-  user1={\margm{n}\margs{locations}},
+  user1={\margm{n}\margm{locations}},
   description={location list encapsulator used in the
 \field{primarylocations} field},
   category={command}
@@ -6609,6 +6609,15 @@ hasn't been
   category={command}
 }
 
+@index{GlsXtrLocationField,
+  name={\csfmt{GlsXtrLocationField}},
+  user1={},
+  description={expands to the internal name of the field storing the
+location list, defaulting to \field{location}},
+  note={provided by \styfmt{glossaries-extra} v1.37+},
+  category={command}
+}
+
 @index{glslabel,
   name={\csfmt{glslabel}},
   user1={},
@@ -8538,6 +8547,17 @@ glossaries},
   description={used with the \glostyle{bookindex} style before the
 location list},
   note={provided by \styfmt{glossary-bookindex}},
+  category={command}
+}
+
+@index{glsxtrprelocation,
+  name={\csfmt{glsxtr\-pre\-location}},
+  user1={},
+  description={used before the location list in the
+   \glostyle{bookindex} style and the styles patched by 
+   \styfmt{glossaries-extra-stylemods}},
+  note={provided by \styfmt{glossary-bookindex} v1.21+ and
+   \styfmt{glossaries-extra-stylemods} v1.21+},
   category={command}
 }
 

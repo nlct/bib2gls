@@ -26,7 +26,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-crossresource-refs.pdf test-custom-rules.pdf \
 	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf \
 	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf \
-	  test-indexplural.pdf test-include.pdf
+	  test-indexplural.pdf test-include.pdf test-primary-records.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -495,6 +495,15 @@ test-include.pdf	: test-include.glstex
 test-include.glstex	: test-include.tex test-include-subfile1.tex test-include-subfile2.tex test-entries.bib $(DEPS)
 		pdflatex test-include
 		$(BIB2GLS) test-include
+
+test-primary-records.pdf	: test-primary-records.glstex
+		pdflatex test-primary-records
+
+test-primary-records.glstex	: test-primary-records.tex $(DEPS) topics.bib
+		pdflatex test-primary-records
+		$(BIB2GLS) test-primary-records
+		pdflatex test-primary-records
+		$(BIB2GLS) test-primary-records
 
 clean	:
 	$(RM) *.aux

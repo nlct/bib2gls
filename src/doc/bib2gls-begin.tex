@@ -2403,8 +2403,8 @@ For example:
 }\marg{din}\marg{DIN}\marg{German Institute for Standardization}
 \strut
 \cmd{renewcommand}*\marg{\gls{glsxtruserparen}}[2]\marg{\comment{}
-  \gls{glsxtrfullsep}\marg{\gls{param}2}\comment{}
-  \gls{glsxtrparen}
+  \gls[noindex=false]{glsxtrfullsep}\marg{\gls{param}2}\comment{}
+  \gls[noindex=false]{glsxtrparen}
   \marg{\gls{param}1\comment{}
    \gls{ifglshasfield}\marg{\gls{glsxtruserfield}}\marg{\gls{param}2}\comment{}
    \marg{, \gls{emph}\marg{\gls{GlsXtrForeignText}\marg{\gls{param}2}\marg{\gls{glscurrentfieldvalue}}}}\comment{}
@@ -4029,7 +4029,7 @@ a level~1 entry (\code{quartz}) and a level~2 entry (\code{amethyst}).
 A reference to \gls{gls}\marg{mineral}.
 A reference to \gls{gls}\oarg{\printglossopt{prefix}={main.}}\marg{amethyst}.
 \strut
-\cmd{renewcommand}\marg{\gls{GlsEntryCounterLabelPrefix}}\marg{main.glsentry-}
+\cmd{renewcommand}\marg{\gls[noindex=false]{GlsEntryCounterLabelPrefix}}\marg{main.glsentry-}
 \gls{glsresetentrycounter}
 \gls{printunsrtglossary}\oarg{\printglossopt{prefix}=\marg{main.},\printglossopt{style}=tree}
 \cmd{end}\marg{document}

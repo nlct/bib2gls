@@ -8474,7 +8474,7 @@ The primary locations are identified with
 default \csopt[false]{save-primary-locations} is changed.
 
 The primary locations are copied to the \field{primarylocations}
-field and encapsulated with \cs{bibglsprimary}.
+field and encapsulated with \csref{bibglsprimary}.
 If you use \csopt[remove]{save-primary-locations}, the
 \field{location} field will end up empty if the locations for the
 associated entry were all identified as primary. If you use
@@ -8488,18 +8488,18 @@ locations at the start. This can be done by modifying the glossary
 style. For example, the \glostyle{bookindex} style inserts
 \ics{glsxtrbookindexprelocation} before the location, so you could
 redefine this:
-\begin{verbatim}
-\renewcommand*{\glsxtrbookindexprelocation}[1]{%
-  \glsxtrifhasfield{primarylocations}{#1}%
-  {%
-    \glsxtrprelocation
-    \glscurrentfieldvalue
-    \glsxtrifhasfield{location}{#1}{;}{}%
-  }%
-  {}%
-  \glsxtrprelocation
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\idx{commentchar}
+  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\idx{commentchar}
+  \marg{\idx{commentchar}
+    \ics{glsxtrprelocation}
+    \cs{glscurrentfieldvalue}
+    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\idx{commentchar}
+  }\idx{commentchar}
+  \marg{}\idx{commentchar}
+  \cs{glsxtrprelocation}
 }
-\end{verbatim}
+\end{codeenv}
 (Note that if \csopt{loc-prefix} is used, the prefix will be
 in the \field{location} field and so will come after the primary
 locations in the above example. Similarly for cross-references
@@ -8509,8 +8509,8 @@ You can switch from using the \field{location} field to the
 \field{primarylocations} field by locally changing
 \ics{GlsXtrLocationField}:
 \begin{codeenv}
-\cs{printunsrtglossary*}\marg{\comment{}
-  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\comment{}
+\cs{printunsrtglossary*}\marg{\idx{commentchar}
+  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
 }
 \end{codeenv}
 Remember that the handler used by \cs{printunsrtglossary} will
