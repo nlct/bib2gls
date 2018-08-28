@@ -22,9 +22,26 @@
 
 \newcommand{\primaryfmt}[1]{\hyperbf{#1}}
 
-\GlsXtrAutoAddOnFormat{primaryfmt}{counter=chapter,format=hyperrm}
+%\GlsXtrAutoAddOnFormat{primaryfmt}{counter=chapter,format=hyperrm}
 
-\glsxtrnewglslike[format=primaryfmt]{}{\primary}{\primarypl}{\Primary}{\Primarypl}
+%\glsxtrnewglslike[format=primaryfmt]{}{\primary}{\primarypl}{\Primary}{\Primarypl}
+
+\newcommand{\primary}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \gls[#1]{#2}%
+}
+\newcommand{\primarypl}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \glspl[#1]{#2}%
+}
+\newcommand{\Primary}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \Gls[#1]{#2}%
+}
+\newcommand{\Primarypl}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \Glspl[#1]{#2}%
+}
 
 \begin{document}
 \chapter{Sample}

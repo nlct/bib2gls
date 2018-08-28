@@ -8703,6 +8703,31 @@ they were identified as primary records). These just show the page
 number as that's the default display with \styopt[nameref]{record} 
 for records with the \counter{page} counter.
 
+An alternative to \ics{GlsXtrAutoAddOnFormat} would be to simply
+define the custom commands as follows:
+\begin{verbatim}
+\newcommand{\primary}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \gls[format=primaryfmt,#1]{#2}%
+}
+\newcommand{\primarypl}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \glspl[format=primaryfmt,#1]{#2}%
+}
+\newcommand{\Primary}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \Gls[format=primaryfmt,#1]{#2}%
+}
+\newcommand{\Primarypl}[2][]{% 
+ \glsadd[counter=chapter,format=hyperrm]{#2}%
+ \Glspl[format=primaryfmt,#1]{#2}%
+}
+\end{verbatim}
+This is more useful if you want to simply omit the
+\code{format=primaryfmt} option (just remove it from the above four 
+definitions), which makes it easier to merge the locations into
+ranges in the index.
+
 \optsection{min-loc-range}
 
 By default, three or more consecutive locations \meta{loc-1},
