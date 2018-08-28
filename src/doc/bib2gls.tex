@@ -8462,6 +8462,10 @@ This option may take one of the following values:
 \item \optfmt{retain}: save primary locations in the
 \field{primarylocations} field but don't remove from the usual
 \idx{locationlist};
+\item \optfmt{default format}: similar to \optfmt{retain} but the
+format for the primary records in the \field{location} field is
+converted to the default \code{glsnumberformat} (the records in the
+\field{primarylocations} field retain their given format);
 \item \optfmt{start}: save primary locations in the
 \field{primarylocations} field and also move to the start of the
 usual \idx{locationlist};
@@ -8605,6 +8609,12 @@ is used to indicate the primary location in the main document text
 and the emphasized format is used to indicate the location in the
 main glossary.
 
+The primary records are removed from the \field{location} field
+due to the \csopt[remove]{save-primary-locations} setting. This can
+lead to a ragged location list. The option 
+\csopt[default format]{save-primary-locations} can allow the primary
+location to be absorbed into a range.
+
 The main glossary records are added through the category-independent
 post-name hook with \cs{glsadd}. This won't be implemented until the
 entries are actually defined as the actual page number won't be
@@ -8669,7 +8679,8 @@ each instance of \cs{gls} that has the format set to the custom
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
 \ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\idx{commentchar}
-  \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}\idx{commentchar}
+ \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
 }
 
 \cs{printunsrtglossary}\oarg{title=Index,target=false}

@@ -2115,6 +2115,7 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       GlsRecord primary = null;
+      int setting = GlsResource.SAVE_PRIMARY_LOCATION_OFF;
 
       if (resource.isPrimaryLocation(record.getFormat()))
       {
@@ -2126,6 +2127,8 @@ public class Bib2GlsEntry extends BibEntry
          }
 
          primaryRecords.add(primary);
+
+         setting = resource.getSavePrimaryLocationSetting();
       }
 
       if (records != null)
@@ -2135,20 +2138,26 @@ public class Bib2GlsEntry extends BibEntry
             bib2gls.debugMessage("message.adding.record", record,
              getId());
 
-            if (primary == null || resource.getSavePrimaryLocationSetting()
-                   == GlsResource.SAVE_PRIMARY_LOCATION_RETAIN)
+            if (primary != null 
+                 && setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
+            {
+               record = (GlsRecord)record.clone();
+               record.setFormat("glsnumberformat");
+               records.add(record);
+            }
+            else if (primary == null
+                || setting == GlsResource.SAVE_PRIMARY_LOCATION_RETAIN)
             {
                records.add(record);
             }
-            else if (resource.getSavePrimaryLocationSetting()
-                == GlsResource.SAVE_PRIMARY_LOCATION_START)
+            else if (setting == GlsResource.SAVE_PRIMARY_LOCATION_START)
             {
                records.add(primaryRecords.size()-1, record);
             }
          }
       }
-      else if (primary == null || resource.getSavePrimaryLocationSetting()
-              != GlsResource.SAVE_PRIMARY_LOCATION_REMOVE)
+      else if (primary == null
+                || setting != GlsResource.SAVE_PRIMARY_LOCATION_REMOVE)
       {
          String counter = record.getCounter();
          Vector<GlsRecord> list = recordMap.get(counter);
@@ -2158,8 +2167,15 @@ public class Bib2GlsEntry extends BibEntry
             bib2gls.debugMessage("message.adding.counter.record", record,
              getId(), counter);
 
-            if (primary == null || resource.getSavePrimaryLocationSetting()
-                   == GlsResource.SAVE_PRIMARY_LOCATION_RETAIN)
+            if (primary != null
+               || setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
+            {
+               record = (GlsRecord)record.clone();
+               record.setFormat("glsnumberformat");
+               list.add(record);
+            }
+            else if (primary == null
+                  || setting == GlsResource.SAVE_PRIMARY_LOCATION_RETAIN)
             {
                list.add(record);
             }

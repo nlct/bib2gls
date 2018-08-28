@@ -683,7 +683,7 @@ public class GlsResource
          else if (opt.equals("save-primary-locations"))
          {
             String val = getChoice(parser, list, opt,
-              "false", "remove", "retain", "start");
+              "false", "remove", "retain", "start", "default format");
 
             if (val.equals("false"))
             {
@@ -700,6 +700,10 @@ public class GlsResource
             else if (val.equals("start"))
             {
                savePrimaryLocations = SAVE_PRIMARY_LOCATION_START;
+            }
+            else if (val.equals("default format"))
+            {
+               savePrimaryLocations = SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT;
             }
          }
          else if (opt.equals("primary-location-formats"))
@@ -8388,6 +8392,7 @@ public class GlsResource
    public static final int SAVE_PRIMARY_LOCATION_REMOVE=1;
    public static final int SAVE_PRIMARY_LOCATION_RETAIN=2;
    public static final int SAVE_PRIMARY_LOCATION_START=3;
+   public static final int SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT=4;
 
    public static final int COMBINE_DUAL_LOCATIONS_OFF=0;
    public static final int COMBINE_DUAL_LOCATIONS_BOTH=1;

@@ -45,6 +45,7 @@
 ]
 {%
  \renewcommand{\GlsXtrLocationField}{primarylocations}%
+ \renewcommand*{\glsextrapostnamehook}[1]{\glsadd[format=hyperemph]{#1}}%
 }
 
 \printunsrtglossary[title=Index,target=false]
