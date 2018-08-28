@@ -271,6 +271,19 @@
   category={command}
 }
 
+@index{GlsXtrAutoAddOnFormat,
+  name={\csfmt{GlsXtrAutoAddOnFormat}},
+  user1={\oargm{label}\margm{format list}\margm{glsadd options}},
+  description={makes commands like \cs{gls} and \cs{glslink}
+   (but not \cs{glsadd}) automatically insert \cs{glsadd}\oargm{glsadd
+   options}\margm{label} if the format (supplied in the optional
+   argument of the invoking \cs{gls}, \cs{glslink} etc) matches any in the given
+   comma-separated elements of \meta{format list}. The format isn't automatically
+   applied to the \cs{glsadd} options},
+  note={provided by \styfmt{glossaries-extra} v1.37+},
+  category={command}
+}
+
 @dualindexentry{bibglsuseabbrvfont,
   name={\csfmt{bib\-gls\-use\-abbrv\-font}},
   user1={\margm{text}\margm{category}},

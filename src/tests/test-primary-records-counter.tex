@@ -1,0 +1,51 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[
+ record=nameref,
+ postpunc={dot},
+ nostyles,
+ stylemods={tree,bookindex},
+ style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={topics},
+  %loc-counters={chapter,page},% separate locations into sub-lists according to the counter
+  primary-location-formats={hyperrm},
+  save-primary-locations={remove}
+]
+
+\newcommand{\primaryfmt}[1]{\hyperbf{#1}}
+
+\GlsXtrAutoAddOnFormat{primaryfmt}{counter=chapter,format=hyperrm}
+
+\glsxtrnewglslike[format=primaryfmt]{}{\primary}{\primarypl}{\Primary}{\Primarypl}
+
+\begin{document}
+\chapter{Sample}
+\Primary{waterfowl}, \gls{bird} and \gls{zebra}.
+
+\chapter{Another Sample}
+\Gls{waterfowl}, \primary{bird} and \gls{zebra}.
+
+\chapter{Yet Another Sample}
+\Gls{waterfowl}, \gls{bird} and \primary{zebra}.
+
+\chapter{Yet Another Sample Again}
+\Gls{waterfowl}, \gls{bird}, \primarypl{parrot} and \gls{zebra}.
+
+\printunsrtglossary*[
+ style=tree,
+ title={Summary}
+]
+{%
+ \renewcommand{\GlsXtrLocationField}{primarylocations}%
+}
+
+\printunsrtglossary[title=Index,target=false]
+\end{document}

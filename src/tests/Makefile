@@ -26,7 +26,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-crossresource-refs.pdf test-custom-rules.pdf \
 	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf \
 	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf \
-	  test-indexplural.pdf test-include.pdf test-primary-records.pdf
+	  test-indexplural.pdf test-include.pdf \
+	  test-primary-records.pdf test-primary-records-counter.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -504,6 +505,15 @@ test-primary-records.glstex	: test-primary-records.tex $(DEPS) topics.bib
 		$(BIB2GLS) test-primary-records
 		pdflatex test-primary-records
 		$(BIB2GLS) test-primary-records
+
+test-primary-records-counter.pdf	: test-primary-records-counter.glstex
+		pdflatex test-primary-records-counter
+
+test-primary-records-counter.glstex	: test-primary-records-counter.tex $(DEPS) topics.bib
+		pdflatex test-primary-records-counter
+		$(BIB2GLS) test-primary-records-counter
+		pdflatex test-primary-records-counter
+		$(BIB2GLS) test-primary-records-counter
 
 clean	:
 	$(RM) *.aux

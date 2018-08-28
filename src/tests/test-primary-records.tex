@@ -32,19 +32,32 @@
   \glsxtrprelocation
 }
 
+\glsxtrnewglslike[format=hyperbf]{}{\primary}{\primarypl}{\Primary}{\Primarypl}
+
 \begin{document}
 \chapter{Sample}
-\gls[format=hyperbf]{waterfowl}, \gls{bird} and \gls{zebra}.
+\Primary{waterfowl}, \gls{bird} and \gls{zebra}.
 
 \chapter{Another Sample}
-\gls{waterfowl}, \gls[format=hyperbf]{bird} and \gls{zebra}.
+\Gls{waterfowl}, \primary{bird} and \gls{zebra}.
 
 \chapter{Yet Another Sample}
-\gls{bird} and \gls[format=hyperbf]{zebra}.
+\Gls{waterfowl}, \gls{bird} and \primary{zebra}.
+
+\chapter{Yet Another Sample Again}
+\Gls{waterfowl}, \gls{bird}, \primarypl{parrot} and \gls{zebra}.
 
 \printunsrtglossary*[style=tree,nonumberlist]{%
-% \renewcommand{\GlsXtrLocationField}{primarylocations}%
  \renewcommand*{\glsextrapostnamehook}[1]{\glsadd[format=hyperemph]{#1}}%
+}
+
+\printunsrtglossary*[
+ style=tree,
+ target=false,
+ title={Summary with Primary Locations Only}
+]
+{%
+ \renewcommand{\GlsXtrLocationField}{primarylocations}%
 }
 
 \printunsrtglossary[title=Index,target=false]

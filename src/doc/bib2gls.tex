@@ -8528,12 +8528,169 @@ formats. If a record's format is contained in this list then it will
 be considered a primary location and it will be included in the
 associated entry's \field{primarylocations} field.
 
-For example:
+For example, suppose the file \filefmt{entries.bib} contains:
 \begin{codeenv}
-\cs{GlsXtrLoadResources}\oarg{
-  \csopt[hyperbf,hyperemph]{primary-location-formats}
+\atentry{entry}\marg{bird,
+  \field{name}=\marg{bird},
+  \field{description}=\marg{feathered animal}
+}
+\atentry{entry}\marg{waterfowl,
+  \field{name}=\marg{waterfowl},
+  \field{description}=\marg{any bird that lives in or about water}
+}
+\atentry{entry}\marg{zebra,
+  \field{name}=\marg{zebra},
+  \field{description}=\marg{striped African horse}
+}
+\atentry{entry}\marg{parrot,
+  \field{name}=\marg{parrot},
+  \field{description}=\marg{mainly tropical bird with bright plumage}
 }
 \end{codeenv}
+and the document \filefmt{test.tex} contains:
+\begin{codeenv}
+\csfmt{documentclass}\marg{report}
+
+\cs{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cs{usepackage}\oarg{record,
+ postpunc=\marg{dot},
+ nostyles,
+ stylemods=\marg{tree,bookindex},
+ style=bookindex}\marg{glossaries-extra}
+
+\cs{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},
+  \csopt[hyperbf,hyperemph]{primary-location-formats},
+  \csopt[remove]{save-primary-locations}
+}
+
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\idx{commentchar}
+  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\idx{commentchar}
+  \marg{\idx{commentchar}
+    \ics{glsxtrprelocation}
+    \cs{glscurrentfieldvalue}
+    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\idx{commentchar}
+  }\idx{commentchar}
+  \marg{}\idx{commentchar}
+  \cs{glsxtrprelocation}
+}
+
+\ics{glsxtrnewglslike}\oarg{format=hyperbf}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+
+\csfmt{begin}\marg{document}
+\cs{chapter}\marg{Sample}
+\csfmt{Primary}\marg{waterfowl}, \cs{gls}\marg{bird} and \cs{gls}\marg{zebra}.
+
+\cs{chapter}\marg{Another Sample}
+\cs{Gls}\marg{waterfowl}, \csfmt{primary}\marg{bird} and \cs{gls}\marg{zebra}.
+
+\cs{chapter}\marg{Yet Another Sample}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird} and \csfmt{primary}\marg{zebra}.
+
+\cs{chapter}\marg{Yet Another Sample Again}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
+
+\ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\idx{commentchar}
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}\idx{commentchar}
+}
+
+\cs{printunsrtglossary}\oarg{title=Index,target=false}
+\csfmt{end}\marg{document}
+\end{codeenv}
+
+The \csopt[hyperbf,hyperemph]{primary-location-formats} setting in
+the above indicates that locations encapsulated with \ics{hyperbf} and
+\ics{hyperemph} are primary records. In this case, the bold format
+is used to indicate the primary location in the main document text
+and the emphasized format is used to indicate the location in the
+main glossary.
+
+The main glossary records are added through the category-independent
+post-name hook with \cs{glsadd}. This won't be implemented until the
+entries are actually defined as the actual page number won't be
+known until the glossary can be displayed. This means that the
+document build requires an extra \bibgls\ and \LaTeX\ run:
+\begin{verbatim}
+pdflatex test
+bib2gls --group test
+pdflatex test
+bib2gls --group test
+pdflatex test
+\end{verbatim}
+
+For consistency, I've used \cs{glsxtrnewglslike} to provide commands
+used to indicate a primary reference in the text. This means that if
+I decide to change the optional arguments used for primary
+references I only need to edit one line. For example, I might want to 
+change the default counter:
+\begin{codeenv}
+\ics{glsxtrnewglslike}\oarg{format=hyperbf,counter=chapter}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+\end{codeenv}
+
+Here's another example that only has one primary format but uses
+\ics{GlsXtrAutoAddOnFormat} to automatically insert
+\ics{glsadd}\oarg{counter=chapter,format=hyperrm}\margm{label} on
+each instance of \cs{gls} that has the format set to the custom
+\code{primaryfmt}:
+\begin{codeenv}
+\csfmt{documentclass}\marg{report}
+
+\cs{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cs{usepackage}\marg{
+ record=nameref,
+ postpunc=dot,
+ nostyles,
+ stylemods=\marg{tree,bookindex},
+ style=bookindex}\marg{glossaries-extra}
+
+\cs{GlsXtrLoadResources}\oarg{
+  src=\marg{topics},
+  primary-location-formats=\marg{hyperrm},
+  save-primary-locations=\marg{remove}
+}
+
+\cs{newcommand}\marg{\csfmt{primaryfmt}}\oarg{1}\marg{\cs{hyperbf}\marg{\idx{param}1}}
+
+\ics{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{counter=chapter,format=hyperrm}
+
+\cs{glsxtrnewglslike}\oarg{format=primaryfmt}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+
+\csfmt{begin}\marg{document}
+\cs{chapter}\marg{Sample}
+\csfmt{Primary}\marg{waterfowl}, \cs{gls}\marg{bird} and \cs{gls}\marg{zebra}.
+
+\cs{chapter}\marg{Another Sample}
+\cs{Gls}\marg{waterfowl}, \csfmt{primary}\marg{bird} and \cs{gls}\marg{zebra}.
+
+\cs{chapter}\marg{Yet Another Sample}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird} and \csfmt{primary}\marg{zebra}.
+
+\cs{chapter}\marg{Yet Another Sample Again}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
+
+\ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\idx{commentchar}
+  \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
+}
+
+\cs{printunsrtglossary}\oarg{title=Index,target=false}
+\csfmt{end}\marg{document}
+\end{codeenv}
+
+Note that in this case, the \bibgls\ primary format is identified
+as \code{hyperrm} not \code{primaryfmt}. This picks out the records
+created with the automated \ics{glsadd}, which have the counter set
+to \counter{chapter}. The first glossary (with the title
+\qt{Summary}) switches the location field so that only the primary
+records are listed. Since \styopt[nameref]{record} has been used
+this means that the chapter title is shown rather than the chapter
+number.
+
+The second glossary (\qt{Index}) shows the location lists that only
+have the \counter{page} counter (because the automated \cs{glsadd}
+records with the \counter{chapter} counter have been removed because
+they were identified as primary records). These just show the page
+number as that's the default display with \styopt[nameref]{record} 
+for records with the \counter{page} counter.
 
 \optsection{min-loc-range}
 
