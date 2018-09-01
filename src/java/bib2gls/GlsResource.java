@@ -6080,33 +6080,55 @@ public class GlsResource
 
          if (setWidest)
          {
-            writer.println("\\ifdef\\glsupdatewidest");
+            writer.println("\\ifdef\\glsxtrSetWidest");
             writer.println("{");
             writer.println("  \\providecommand*{\\bibglssetwidest}[2]{%");
-            writer.println("    \\glsupdatewidest[#1]{#2}%");
+            writer.println("    \\glsxtrSetWidest{}{#1}{#2}%");
             writer.println("  }");
             writer.println("  \\providecommand*{\\bibglssetwidestfortype}[3]{%");
-            writer.print("    \\apptoglossarypreamble[#1]");
+            writer.println("    \\glsxtrSetWidest{#1}{#2}{#3}%");
+            writer.println("  }");
+            writer.println("}");
+            writer.println("{");
+            writer.println("  \\ifdef\\glsupdatewidest");
+            writer.println("  {");
+            writer.println("    \\providecommand*{\\bibglssetwidest}[2]{%");
+            writer.println("      \\glsupdatewidest[#1]{#2}%");
+            writer.println("    }");
+            writer.println("    \\providecommand*{\\bibglssetwidestfortype}[3]{%");
+            writer.print("      \\apptoglossarypreamble[#1]");
             writer.println("{\\glsupdatewidest[#2]{#3}}%");
+            writer.println("    }");
+            writer.println("  }");
+            writer.println("  {");
+            writer.println("    \\providecommand*{\\bibglssetwidest}[2]{%");
+            writer.println("      \\glssetwidest[#1]{#2}%");
+            writer.println("    }");
+            writer.println("    \\providecommand*{\\bibglssetwidestfortype}[3]{%");
+            writer.print("      \\apptoglossarypreamble[#1]");
+            writer.println("{\\glssetwidest[#2]{#3}}%");
+            writer.println("    }");
+            writer.println("  }");
+            writer.println("}");
+
+            writer.println("\\ifdef\\glsxtrSetWidestFallback");
+            writer.println("{");
+            writer.println("  \\providecommand*{\\bibglssetwidestfallback}[1]{%");
+            writer.println("    \\glsxtrSetWidestFallback{2}{#1}%");
+            writer.println("  }");
+            writer.println("  \\providecommand*{\\bibglssetwidesttoplevelfallback}[1]{%");
+            writer.println("    \\glsxtrSetWidestFallback{0}{#1}%");
             writer.println("  }");
             writer.println("}");
             writer.println("{");
-            writer.println("  \\providecommand*{\\bibglssetwidest}[2]{%");
-            writer.println("    \\glssetwidest[#1]{#2}%");
+            writer.println("  \\providecommand*{\\bibglssetwidestfallback}[1]{%");
+            writer.println("    \\glsFindWidestLevelTwo[#1]%");
             writer.println("  }");
-            writer.println("  \\providecommand*{\\bibglssetwidestfortype}[3]{%");
-            writer.print("    \\apptoglossarypreamble[#1]");
-            writer.println("{\\glssetwidest[#2]{#3}}%");
-            writer.println("  }");
-            writer.println("}");
 
-            writer.println("\\providecommand*{\\bibglssetwidestfallback}[1]{%");
-            writer.println("  \\glsFindWidestLevelTwo[#1]%");
-            writer.println("}");
-
-            writer.print("\\providecommand*");
+            writer.print("  \\providecommand*");
             writer.println("{\\bibglssetwidesttoplevelfallback}[1]{%");
-            writer.println("  \\glsFindWidestTopLevelName[#1]%");
+            writer.println("    \\glsFindWidestTopLevelName[#1]%");
+            writer.println("  }");
             writer.println("}");
 
             writer.print("\\providecommand*");

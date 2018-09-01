@@ -1,11 +1,10 @@
-% arara: xelatex
+% arara: lualatex
+% arara: bib2gls: {group: on} if missing("glstex") || changed("bib") || found("log", "Warning: Glossary entry")
 % arara: bibtex
-% arara: bib2gls: {group: on} if missing("glstex") || changed("bib")
-% arara: xelatex if missing("toc")
-% arara: xelatex if changed("glstex")
+% arara: lualatex if changed("glstex") || missing("toc")
 % arara: bib2gls: {group: on}
-% arara: xelatex
-% arara: xelatex if found ("log", "Rerun")
+% arara: lualatex
+% arara: lualatex if found ("log", "Rerun")
 \documentclass[titlepage=false,index=totoc,bibliography=totoc,
  fontsize=12pt,captions=tableheading]{scrreprt}
 
@@ -46,6 +45,9 @@
    style=bookindex
  ]
  {glossaries-extra}
+
+\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily\small},
+ commentstyle={\color{gray}}}
 
 \renewcommand*{\glsshowtarget}[1]{\texttt{\small [#1]}}
 
@@ -762,7 +764,7 @@ files}
 The \bibgls\ command line application can be used to extract
 glossary information stored in a \ext{bib} file and convert it
 into glossary entry definitions that can be read using
-\styfmt{glossaries-extra}'s \ics{GlsXtrLoadResources} command. When used
+\styfmt{glossaries-extra}'s \csref{GlsXtrLoadResources} command. When used
 in combination with the \styoptfmt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
@@ -1327,8 +1329,8 @@ transcript file and will delimit the argument in the log with single
 quote characters for convenience.
 
 \bibgls\ creates files with the extension \ext{glstex}, which are
-input by \cs{GlsXtrLoadResources}. This extension is fixed and is
-imposed by both \bibgls\ and \cs{GlsXtrLoadResources}. \bibgls\ also
+input by \gls{GlsXtrLoadResources}. This extension is fixed and is
+imposed by both \bibgls\ and \gls{GlsXtrLoadResources}. \bibgls\ also
 creates a transcript file with the default extension \ext{glg}. This
 may be overridden by the \longarg{log-file} switch, but \bibgls\
 always forbids write access to any file with the following
@@ -1591,7 +1593,7 @@ use:\footnote{These commands won't work with PDF\LaTeX, as the
 \end{verbatim}
 Since these use \cs{providecommand}, they won't overwrite the
 document's version (provided these commands have been defined before
-\cs{GlsXtrLoadResources}). Alternatively, you can instruct \bibgls\
+\gls!{GlsXtrLoadResources}). Alternatively, you can instruct \bibgls\
 to not write the \atentry{preamble} contents to the resource file
 using \csopt[false]{write-preamble}. Now you can either sort these
 symbols by
@@ -2070,7 +2072,7 @@ The \styopt[nameref]{record} package option (introduced to
 in the record when indexing, obtained from \ics{@currentlabelname}
 \ics{@currentHref} and \ics{theHentrycounter}. Instead of writing the record as:
 \begin{codeenv}
-\ics{glsxtr@record}\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}
+\format{glsxtr@record}
 \end{codeenv}
 the record is written as:
 \nosecdef{glsxtr@record@nameref}
@@ -2506,7 +2508,7 @@ The group label is obtained from \csref{bibglstimegroup}.
 
 \item[\idx{customgroup}] The group label is explicitly set either in
 the \ext{bib} file or using the \csopt[\meta{label}]{group} resource
-option. You will need to use \ics{glsxtrsetgrouptitle} to provide an
+option. You will need to use \gls{glsxtrsetgrouptitle} to provide an
 associated title if the \meta{label} isn't the same as the title.
 Remember that the label can't contain any active characters, so you
 can't use non-ASCII characters in \meta{label} with \sty{inputenc}
@@ -2728,7 +2730,7 @@ number of records found for the entry;
 \item \field{recordcount.counter}: set to the total
 number of records found for the entry for the given counter.
 \end{itemize}
-These fields can then be used with the \ics{rgls}-like commands.
+These fields can then be used with the \gls{rgls}-like commands.
 The default behaviour of
 \nosecdef{rgls}
 is to check the \field{recordcount} field against the \catattr{recordcount}
@@ -2737,12 +2739,12 @@ attribute value. This attribute can be set with
 where \meta{category list} is a comma-separated list
 of category labels and \meta{value} is a positive integer.
 If the value of the \field{recordcount} field is greater than
-\meta{value} then \ics{rgls} behaves like \ics{gls}, otherwise
+\meta{value} then \gls{rgls} behaves like \ics{gls}, otherwise
 it does
 \nosecdef{rglsformat}
 instead.
-If the use of \ics{rglsformat} is triggered in this way,
-then \ics{rgls} writes a record to the \iext{aux} file
+If the use of \gls{rglsformat} is triggered in this way,
+then \gls{rgls} writes a record to the \iext{aux} file
 with the \glsopt{format} set to \encap{glstriggerrecordformat}.
 This ensures that the record count is correct on the next run,
 but the record isn't added to the location list as
@@ -2751,10 +2753,10 @@ Note that the entry will still appear in the usual glossary unless
 you assign it to a different one with \csopt{trigger-type}.
 
 If the \catattr{recordcount} attribute hasn't been set
-\ics{rgls} behaves like \ics{gls}. (That is, \ics{rgls}
+\gls{rgls} behaves like \ics{gls}. (That is, \gls{rgls}
 uses the same internal command used by \ics{gls}.) You can use
 \ics{glsxtrenablerecordcount} to redefine \ics{gls}
-to \ics{rgls}, so that you can continue to use \ics{gls}
+to \gls{rgls}, so that you can continue to use \ics{gls}
 without having to switch command name.
 
 For example:
@@ -2778,7 +2780,7 @@ Switch off record counting. (Default.)
 
 Automatically implements \longarg{record-count} and additionally
 sets the \field{recordcount.counter.location} fields.
-These fields can then be used with the \ics{rgls}-like
+These fields can then be used with the \gls{rgls}-like
 commands.
 
 \argsection{no-record-count-unit}
@@ -3574,7 +3576,7 @@ term is written to the output file using the command
 value is the entry's label. When this entry type is automatically
 created by \atentry{bibtexentry}, the \field{name} is set to 
 \begin{codeenv}
-\ics{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}
+\gls{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}
 \end{codeenv}
 
 If you do explicitly use \atentry{contributor} you need to make sure it's
@@ -4288,7 +4290,9 @@ which, in this case, essentially does
 but the new commands will also recognise the \ics{gls} modifiers, so
 \verb|\idx+| will behave like \verb|\gls+| which wouldn't be
 possible if \csfmt{idx} was defined using \ics{newcommand} in the
-above manner.
+above manner. There's a similar command:
+\nosecformatdef{glsxtrnewgls}
+if no case-changing versions are required.
 
 I've also redefined \csref{bibglsnewdualindexsymbolsecondary} to put
 the dual entries created with \atentry{dualindexsymbol} into
@@ -4863,7 +4867,7 @@ You can instruct \bibgls\ to treat \ics{citation} as an
 Each contributor is effectively defined as
 \begin{codeenv}
 \atentry{contributor}\marg{\meta{label},
-  name=\marg{\ics{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}}
+  name=\marg{\gls{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}}
 }
 \end{codeenv}
 The label is obtained by converting the \field{name}
@@ -4880,20 +4884,20 @@ new \atentry{bibtexentry} added to its internal \field{bibtexentry}
 field.
 
 The main \atentry{bibtexentry} is defined using
-\ics{bibglsnewbibtexentry} and is followed by
+\gls{bibglsnewbibtexentry} and is followed by
 \begin{codeenv}
-\ics{glsxtrfieldlistadd}\margm{id}\marg{bibtexcontributor}\margm{contributor-id}
+\gls{glsxtrfieldlistadd}\margm{id}\marg{bibtexcontributor}\margm{contributor-id}
 \end{codeenv}
 where \meta{id} is the label identifying the main
 \atentry{bibtexentry} and \meta{contributor-id} is the
 label identifier the contributor, for each contributor that has
 been selected.
 
-Each contributor is defined using \ics{bibglsnewcontributor}. The definition 
+Each contributor is defined using \gls{bibglsnewcontributor}. The definition 
 is followed by
 \begin{codeenv}
-\ics{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry}\margm{id}
-\ics{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry@\meta{entry-type}}\margm{id}
+\gls{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry}\margm{id}
+\gls{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry@\meta{entry-type}}\margm{id}
 \end{codeenv}
 for each selected \atentry{bibtexentry} associated with that contributor. The
 second line provides the internal list field
@@ -4932,11 +4936,11 @@ provided with \TeX\ distributions:
 \cs{newglossary*}\marg{contributors}\marg{Authors/Editors}
 \cs{newglossary*}\marg{titles}\marg{Titles}
 
-\cs{newcommand}\marg{\ics{bibglsnewbibtexentry}}[4]\marg{\%
- \cs{longnewglossaryentry}*\marg{\#1}\marg{name={\#3},\#2,type=\marg{titles}}\marg{\#4}\%
+\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\%
+ \cs{longnewglossaryentry*}\marg{\#1}\marg{name={\#3},\#2,type=\marg{titles}}\marg{\#4}\%
 }
 
-\cs{GlsXtrLoadResources}[
+\gls!{GlsXtrLoadResources}\oarg{
   \csopt[xampl]{src},
   \csopt[false]{write-preamble},
   \csopt[
@@ -4955,13 +4959,13 @@ provided with \TeX\ distributions:
   \csopt[same as original entry]{category},
   \csopt[category]{sort-field},
   \csopt[name]{sort-suffix}
-]
+}
 
-\ics{glsxtrsetgrouptitle}\marg{article}\marg{Articles}
-\cs{glsxtrsetgrouptitle}\marg{booklet}\marg{Booklets}
-\cs{glsxtrsetgrouptitle}\marg{book}\marg{Books}
-\cs{glsxtrsetgrouptitle}\marg{inbook}\marg{Book Chapters}
-\cs{glsxtrsetgrouptitle}\marg{misc}\marg{Miscellaneous}
+\gls{glsxtrsetgrouptitle}\marg{article}\marg{Articles}
+\gls{glsxtrsetgrouptitle}\marg{booklet}\marg{Booklets}
+\gls{glsxtrsetgrouptitle}\marg{book}\marg{Books}
+\gls{glsxtrsetgrouptitle}\marg{inbook}\marg{Book Chapters}
+\gls{glsxtrsetgrouptitle}\marg{misc}\marg{Miscellaneous}
 
 \cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\csfmt{par}\ics{glsentryname}\marg{\#1} (\#1)}
 
@@ -5008,7 +5012,7 @@ pdflatex myDoc
 Make sure that you use \isty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
 up the required information from the \iext{aux} file, and it also
-loads the supplementary \ics{glossaries-extra-bib2gls} package
+loads the supplementary \isty{glossaries-extra-bib2gls} package
 (from version 1.27 onwards). The option also
 switches on the \styopt[none]{sort} package option (if you have a new
 enough version of the base \isty{glossaries} package), which means
@@ -5122,7 +5126,7 @@ defined entries, this is the ordering used.
 Abbreviation styles must be set (using \ics{setabbreviationstyle})
 before the resource command that selects the abbreviations from the
 appropriate \ext{bib} file, since the entries are defined (through
-\gls{newabbreviation} or \cs{newacronym}) when
+\gls{newabbreviation} or \gls{newacronym}) when
 \gls{glsxtrresourcefile} inputs the \ext{glstex} file. (Similarly for any
 associated abbreviation style commands that must be set before
 abbreviations are defined, such as \cs{glsxtrlongshortdescname}.)
@@ -5279,6 +5283,21 @@ which name is the widest. Alternative one of the iterative commands
 such as \ics{glsFindWidestTopLevelName} can be used, which slows the
 document build as it has to iterate over all defined entries.
 
+The \isty{glossary-longextra} package, provided with
+\sty{glossaries-extra} v1.37+, also needs to know the widest name,
+but in this case only the top-level is needed. If this has already
+been found through the commands provided with the \glostyle{alttree}
+style then that value will be used as the default, but you can set another
+value that's only used for the \sty{glossary-longextra} styles with
+\ics{glslongextraSetWidest}.
+
+For convenience, the \sty{glossaries-extra-bib2gls} package v1.37+
+provides \ics{glsxtrSetWidest}, which will set the widest name for 
+those styles that need it. As from version 1.8, \bibgls\ now checks
+for the existence of this command and will use it with
+\csopt{set-widest} to allow for the new styles provided by the
+\sty{glossary-longextra} package.
+
 The boolean option \csopt[true]{set-widest} will try to calculate
 the widest names for each hierarchical level to help remove the need
 to determine the correct value within the document. 
@@ -5336,7 +5355,8 @@ selected. This will then be implemented as follows:
 This leaves \TeX\ to compute the width according to the document
 fonts. If \bibgls\ can't correctly determine the widest entry then
 you will need to use one of the commands provided by
-\sty{glossary-tree} or \sty{glossaries-extra-stylemods} to set it.
+\sty{glossary-tree}, \sty{glossary-longextra} or 
+\sty{glossaries-extra-stylemods} to set it.
 
 In general, if you have more than one glossary it's best to
 set the \field{type} using options like \csopt{type} and
@@ -5692,7 +5712,7 @@ Pattern class}~\cite{pattern}. The pattern is anchored
 empty. Remember that \TeX\ will expand the option list as
 it writes the information to the \ext{aux} file so take
 care with special characters. For example, to match a literal
-period use \cs{cs.string}\ics{cs.period} not \ics{cs.period} (backslash dot).
+period use \cs{cs.string}\idx{cs.period} not \idx{cs.period} (backslash dot).
 
 If the field is missing its value it is assumed to be empty for
 the purposes of the pattern match even if it will be assigned a
@@ -6759,10 +6779,10 @@ element in the list in the form \margm{regex}\margm{replacement}
 where \margm{regex} is a regular expression (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}) and \meta{replacement}
 is the replacement text. Remember that the argument of
-\cs{GlsXtrLoadResources} is expanded when written to the \ext{aux}
+\gls{GlsXtrLoadResources} is expanded when written to the \ext{aux}
 file so take care to protect any special characters. For example, to
-match a literal \idx{full-stop} use \cs{cs.string}\ics{cs.period}
-rather than just \ics{cs.period} (backslash dot).
+match a literal \idx{full-stop} use \cs{cs.string}\idx{cs.period}
+rather than just \idx{cs.period} (backslash dot).
 
 In the \meta{replacement} part, you can use
 \ics{glscapturedgroup}\meta{n} to reference a captured sub-sequence.
@@ -7269,7 +7289,7 @@ creation of the default \code{main} glossary.)
 
 \optsection[\subsubsection]{trigger-type}
 
-The record counting commands, such as \ics{rgls}, use the special
+The record counting commands, such as \gls{rgls}, use the special
 format \ics{glstriggerrecordformat}, which \bibgls\ also treats
 as an \idx{ignoredrecord}. This means the entry will still be
 identified as having a record for selection purposes, which is
@@ -7685,15 +7705,15 @@ the field is defined (so \ics{GlsXtrIfFieldUndef} does the
 This option indicates that the listed fields all use \BibTeX's name
 syntax (as used in \BibTeX's \code{author} and \code{editor} fields).
 The values of these fields will be converted into the form:
-\begin{alltt}
+\begin{codeenv}
 \gls{bibglscontributorlist}\margm{contributor list}\margm{n}
-\end{alltt}
+\end{codeenv}
 where \meta{n} is the number of names in the list and
 \meta{contributor-list} is a comma-separated list of names in the
 form:
-\begin{alltt}
+\begin{codeenv}
 \gls{bibglscontributor}\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}
-\end{alltt}
+\end{codeenv}
 
 The \gls{bibglscontributorlist} commands is initially defined in 
 \bibgls's interpreter to just do the first argument and ignore the
@@ -8225,9 +8245,7 @@ for the cross-reference supplied by the \field{see} field,
 \ics{glsxtruseseealsoformat}\margm{xr list}
 \end{codeenv}
 for the cross-reference supplied by the \field{seealso} field,
-\begin{codeenv}
-\format{glsnoidxdisplayloc}
-\end{codeenv}
+\nosecdef{glsnoidxdisplayloc}
 for standard the internal locations, 
 \begin{codeenv}
 \format{glsxtrdisplaysupploc}
@@ -8281,7 +8299,7 @@ form a range, regardless of \csopt{min-loc-range}, and will be
 encapsulated by \csref{bibglsrange}. (This command is not used with
 ranges that are formed by collating consecutive locations.) The
 initial marker is stripped from the location formatting commands,
-such as \cs{glsnoidxdisplayloc}, to allow for easy conversion to the
+such as \gls{glsnoidxdisplayloc}, to allow for easy conversion to the
 corresponding text-block command.
 
 Explicit ranges don't merge with neighbouring locations, but will
@@ -8348,7 +8366,7 @@ then the range will be included in the location list (encapsulated
 with \ics{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
 
-The record counting commands, such as \ics{rgls}, use the special
+The record counting commands, such as \gls{rgls}, use the special
 format \encap{glstriggerrecordformat}, which \bibgls\ also treats
 as an \idx{ignoredrecord} and the same rules as for \encap{glsignore} apply.
 
@@ -8562,7 +8580,7 @@ and the document \filefmt{test.tex} contains:
  stylemods=\marg{tree,bookindex},
  style=bookindex}\marg{glossaries-extra}
 
-\cs{GlsXtrLoadResources}\oarg{
+\gls!{GlsXtrLoadResources}\oarg{
   \csopt[entries]{src},
   \csopt[hyperbf,hyperemph]{primary-location-formats},
   \csopt[remove]{save-primary-locations}
@@ -8579,7 +8597,7 @@ and the document \filefmt{test.tex} contains:
   \cs{glsxtrprelocation}
 }
 
-\ics{glsxtrnewglslike}\oarg{format=hyperbf}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+\gls{glsxtrnewglslike}\oarg{format=hyperbf}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
 
 \csfmt{begin}\marg{document}
 \cs{chapter}\marg{Sample}
@@ -8595,7 +8613,7 @@ and the document \filefmt{test.tex} contains:
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
 \ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\idx{commentchar}
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}\idx{commentchar}
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\idx{commentchar}
 }
 
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
@@ -8628,13 +8646,13 @@ bib2gls --group test
 pdflatex test
 \end{verbatim}
 
-For consistency, I've used \cs{glsxtrnewglslike} to provide commands
+For consistency, I've used \gls{glsxtrnewglslike} to provide commands
 used to indicate a primary reference in the text. This means that if
 I decide to change the optional arguments used for primary
 references I only need to edit one line. For example, I might want to 
 change the default counter:
 \begin{codeenv}
-\ics{glsxtrnewglslike}\oarg{format=hyperbf,counter=chapter}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+\gls{glsxtrnewglslike}\oarg{format=hyperbf,counter=chapter}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
 \end{codeenv}
 
 Here's another example that only has one primary format but uses
@@ -8653,7 +8671,7 @@ each instance of \cs{gls} that has the format set to the custom
  stylemods=\marg{tree,bookindex},
  style=bookindex}\marg{glossaries-extra}
 
-\cs{GlsXtrLoadResources}\oarg{
+\gls!{GlsXtrLoadResources}\oarg{
   src=\marg{topics},
   primary-location-formats=\marg{hyperrm},
   save-primary-locations=\marg{remove}
@@ -8663,7 +8681,7 @@ each instance of \cs{gls} that has the format set to the custom
 
 \ics{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{counter=chapter,format=hyperrm}
 
-\cs{glsxtrnewglslike}\oarg{format=primaryfmt}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+\gls!{glsxtrnewglslike}\oarg{format=primaryfmt}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
 
 \csfmt{begin}\marg{document}
 \cs{chapter}\marg{Sample}
@@ -8679,7 +8697,7 @@ each instance of \cs{gls} that has the format set to the custom
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
 \ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\idx{commentchar}
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}\idx{commentchar}
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\idx{commentchar}
  \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
 }
 
@@ -9251,7 +9269,7 @@ information to the \iext{aux} file:
 \end{alltt}
 (where \meta{page} is the page number) followed by the record:
 \begin{codeenv}
-\cs{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{glsnumberformat}\margm{n}
+\gls{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{glsnumberformat}\margm{n}
 \end{codeenv}
 The location here is actually the value of the \counter{wrglossary}
 counter not the page number, but \bibgls\ can pick up the
@@ -9547,20 +9565,20 @@ destination within that file.)
 
 The special \code{nameref} locations (see
 \longarg{merge-nameref-on}) are still identified with
-\ics{glsxtrdisplaylocnameref} but the \meta{file} argument will now
+\csref{glsxtrdisplaylocnameref} but the \meta{file} argument will now
 be set.
 
 As from \bibgls\ v1.7, any awkward characters if the file path are
-replaced with \ics{bibglshrefchar} or (for non-ASCII characters when
-\sty{fontspec} is loaded) \ics{bibglshrefunicode}. Both commands
+replaced with \csref{bibglshrefchar} or (for non-ASCII characters when
+\sty{fontspec} is loaded) \csref{bibglshrefunicode}. Both commands
 take two arguments: the hexadecimal character code and the actual
-character. In the case of \ics{bibglshrefchar}, the second
+character. In the case of \csref{bibglshrefchar}, the second
 argument is ignored, and the first is preceded by a literal percent
 character, so \filefmt{file name.pdf} will be converted to:
 \begin{codeenv}
-file\cs{bibglshrefchar}\marg{20}\marg{ }name.pdf
+file\gls{bibglshrefchar}\marg{20}\marg{ }name.pdf
 \end{codeenv}
-In the case of \ics{bibglshrefunicode}, the first argument is
+In the case of \csref{bibglshrefunicode}, the first argument is
 ignored.
 
 
@@ -11659,19 +11677,19 @@ the sort method's default group formation. This is the default
 setting.
 
 \item\optfmt{codepoint}: the group is set to
-\icswithargs{bibglsunicodegroup}, where the first argument is the 
-first significant character (converted to \idx{lowercase} and decomposed,
+\format{bibglsunicodegroup}, where the first argument is the first
+significant character (converted to \idx{lowercase} and decomposed,
 if applicable) of the sort value.
 
 \item\optfmt{unicode category}: the group is set to
-\icswithargs{bibglsunicodegroup}, where the first argument is the
-label identifying the Unicode category of the first significant
-character of the sort value. For example, the label \code{Ll}
-signifies a \idx!{lowercase} letter and \code{Lu} signifies an 
-\idx!{uppercase} letter.
+\format{bibglsunicodegroup}, where the first argument is the label
+identifying the Unicode category of the first significant character
+of the sort value. For example, the label \code{Ll} signifies a
+\idx!{lowercase} letter and \code{Lu} signifies an \idx!{uppercase}
+letter.
 
 \item\optfmt{unicode script}: the group is set to
-\icswithargs{bibglsunicodegroup}, where the first argument is the
+\format{bibglsunicodegroup}, where the first argument is the
 label identifying the Unicode script of the first significant
 character of the sort value. For example, the label \code{LATIN}
 indicates Latin, \code{GREEK} indicates Greek and \code{COMMON}
@@ -11679,7 +11697,7 @@ indicates common characters (such as mathematical Greek characters
 that are often used with non-Greek scripts).
 
 \item\optfmt{unicode category and script}: the group is set to
-\icswithargs{bibglsunicodegroup}, where the first argument is the
+\format{bibglsunicodegroup}, where the first argument is the
 label corresponding to the Unicode category and script of the first
 significant character of the sort value. For example, the label
 \code{Ll.LATIN} indicates a \idx!{lowercase} Latin letter.
@@ -13525,6 +13543,8 @@ location sub-lists. By default this is just \csref{bibglsdelimN}.
 Expands to a literal percent character followed by \meta{hex}. The
 second argument is ignored.
 
+\cssection{bibglshrefunicode}
+
 \formatdef{bibglshrefunicode}
 Expands to the second argument. The first argument is ignored.
 
@@ -13605,8 +13625,8 @@ entry's \field{group} field.
 The default behaviour of the group formation implemented by the sort
 methods may be changed with \csopt{group-formation}. With any
 setting other than \csopt[default]{group-formation}, the group label
-is set to \cs{bibglsunicodegroup} and the title is set to
-\cs{bibglsunicodegrouptitle} (see below) otherwise the label and
+is set to \gls{bibglsunicodegroup} and the title is set to
+\gls{bibglsunicodegrouptitle} (see below) otherwise the label and
 title are determined by the sort method.
 
 The collators used by the locale and letter-based rules save the
@@ -13696,7 +13716,9 @@ done after the \idx{resourceset}:
 For each \idx{lettergroup} that's detected, \bibgls\ will write the line:
 \formatdef{bibglssetlettergrouptitle}
 in the \ext{glstex} file, which sets the group's title using
+\begin{codeenv}
 \format{glsxtrsetgrouptitle}
+\end{codeenv}
 where the \meta{group label} part matches the corresponding \field{group}
 value.
 
@@ -13988,8 +14010,8 @@ This command is used for \idx{timegroup} titles with \optfmt{time} (no date) sor
 This command is used to assign the group titles when the group
 formation is set to any value other than the default. For example,
 this command will be used with \csopt[codepoint]{group-formation}.
-The label is obtained from \cs{bibglsunicodegroup} and the title is
-obtained from \cs{bibglsunicodegrouptitle}.
+The label is obtained from \gls{bibglsunicodegroup} and the title is
+obtained from \gls{bibglsunicodegrouptitle}.
 
 \cssection{bibglsunicodegroup}
 
@@ -14070,9 +14092,9 @@ groups. First check how the group labels are assigned using:
 \begin{verbatim}
 \newcommand{\bibglsunicodegrouptitle}{\bibglsunicodegroup}
 \end{verbatim}
-then adjust the definition of \cs{bibglsunicodegroup} until the
+then adjust the definition of \gls{bibglsunicodegroup} until the
 grouping is correct, and then change the definition of 
-\cs{bibglsunicodegrouptitle} so that the title is correct.
+\gls{bibglsunicodegrouptitle} so that the title is correct.
 
 \cssection{bibglshypergroup}
 
@@ -14207,11 +14229,14 @@ This is used by \csopt{set-widest} to set the widest name for the
 given hierarchical level where the glossary type can't be determined.
 This is defined as:
 \begin{verbatim}
+\providecommand*{\bibglssetwidest}[2]{\glsxtrSetWidest{}{#1}{#2}}
+\end{verbatim}
+if \ics{glsxtrSetWidest} has been defined, or:
+\begin{verbatim}
 \providecommand*{\bibglssetwidest}[2]{\glsupdatewidest[#1]{#2}}
 \end{verbatim}
 if \ics{glsupdatewidest} is defined, otherwise it will be
-defined to use
-\ics{glssetwidest}:
+defined to use \ics{glssetwidest}:
 \begin{verbatim}
 \providecommand*{\bibglssetwidest}[2]{\glssetwidest[#1]{#2}}
 \end{verbatim}
@@ -14225,6 +14250,12 @@ set the \field{type} using options like \csopt{type}.
 This is used by \csopt{set-widest} to set the widest name for the
 given hierarchical level where the glossary type is known. This
 is defined as:
+\begin{verbatim}
+\providecommand*{\bibglssetwidestfortype}[3]{%
+  \glsxtrSetWidest{#1}{#2}{#3}%
+}
+\end{verbatim}
+if \ics{glsxtrSetWidest} has been defined, or:
 \begin{verbatim}
 \providecommand*{\bibglssetwidestfortype}[3]{%
   \apptoglossarypreamble[#1]{\glsupdatewidest[#2]{#3}}%
@@ -14247,8 +14278,13 @@ This is used by \csopt{set-widest} instead of \gls{bibglssetwidest}
 when all \field{name} fields end up as an empty string when
 interpreted by \bibgls. This typically means that all the
 \field{name} fields contain unknown commands. This fallback command
-will use \ics{glsFindWidestLevelTwo}, which sets the widest name for
-the top-level and first two sub-levels.
+will use
+\begin{codeenv}
+\ics{glsxtrSetWidestFallback}\marg{2}\marg{glossary list}
+\end{codeenv}
+if defined otherwise it will use \ics{glsFindWidestLevelTwo}, which
+sets the widest name for the top-level and first two sub-levels
+across all the listed glossaries.
 
 \cssection{bibglssetwidestfortypefallback}
 
@@ -14268,8 +14304,12 @@ This is used by \csopt{set-widest} instead of \gls{bibglssetwidest}
 when all \field{name} fields end up as an empty string when
 interpreted by \bibgls. This typically means that all the
 \field{name} fields contain unknown commands. This fallback command
-will use \ics{glsFindWidestTopLevelName}, which sets the widest name for
-the top-level.
+will use
+\begin{codeenv}
+\ics{glsxtrSetWidestFallback}\marg{0}\marg{glossary list}
+\end{codeenv}
+if defined otherwise it will use \ics{glsFindWidestTopLevelName},
+which sets the widest name for the top-level.
 
 \cssection{bibglssetwidesttoplevelfortypefallback}
 
@@ -14739,8 +14779,6 @@ contain:
 \chapter{Examples}
 \label{sec:examples}
 \setcounter{secnumdepth}{0}
-\lstset{language={[LaTeX]TeX},upquote,basicstyle={\ttfamily\small},
- commentstyle={\color{gray}}}
 
 The example files described here can be found in the
 \filefmt{examples} sub-directory. The \ext{bib} files are listed
@@ -14828,7 +14866,7 @@ The contents of \filefmt{interpret-preamble.bib} are as follows:
 \filesection{interpret-preamble2.bib}
 
 An alternative to \exfile{interpret-preamble.bib} with a different
-definition of \cs{sortmediacreator}. This uses \cs{renewcommand}
+definition of \gls{sortmediacreator}. This uses \cs{renewcommand}
 instead of \cs{providecommand} so \csopt[false]{write-preamble}
 is required to prevent \LaTeX\ from picking up the definitions.
 
@@ -14909,7 +14947,7 @@ if different notation required. The upright Greek commands require
 the \isty{upgreek} package.
 
 If it's likely that there may be a need to sort according to
-\fieldfmt{definition}, then it would be better to use \cs{sortart}
+\fieldfmt{definition}, then it would be better to use \gls!{sortart}
 describe above:
 \begin{verbatim}
 @constant{root2,
@@ -15181,7 +15219,7 @@ with \idprefixfmt{film} rather than relying on \csopt{label-prefix}.
 This ensures that both \exfile{books.bib} and \exfile{films.bib}
 can be loaded in the same resource set (otherwise they'd have to be
 loaded in separate resource sets with different prefixes). Remember
-that you can use \ics{glsxtrnewgls}. For example:
+that you can use \gls{glsxtrnewgls}. For example:
 \begin{verbatim}
 \glsxtrnewgls{film.}{\film}
 \end{verbatim}
@@ -15428,9 +15466,9 @@ which is used to format inverses,
 which is used to format \meta{symbol} as a vector and
 \nosecdef{mtxfmt}
 which is used to format \meta{symbol} as a matrix.
-These commands are intended for use with \ics{glsxtrfmt},
+These commands are intended for use with \gls{glsxtrfmt},
 but \csref{setmembershipfmt} causes a problem as it has two
-arguments and \ics{glsxtrfmt} requires the control sequence to 
+arguments and \gls{glsxtrfmt} requires the control sequence to 
 have exactly one argument. This means employing a little trick.
 A command with just one argument is provided:
 \nosecdef{setmembershiponeargfmt}
@@ -17083,10 +17121,10 @@ glossary and the titles to the \code{titles} glossary is to use
 \csopt[contributors]{type}
 \end{codeenv}
 in the \idx{resourceset} and provide a
-modified version of \ics{bibglsnewbibtexentry} that assigns
+modified version of \gls{bibglsnewbibtexentry} that assigns
 \field{type} after the options:
 \begin{codeenv}
-\cs{newcommand}\marg{\cs{bibglsnewbibtexentry}}[4]\marg{\idx{commentchar}
+\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\idx{commentchar}
  \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{name=\marg{\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\idx{commentchar}
 }
 \end{codeenv}
@@ -17128,8 +17166,8 @@ the \atentry{bibtexentry} types according to the title
 Next the groups identified by the labels \code{article} and \code{book} 
 are assigned titles.
 \begin{codeenv}
-\cs{glsxtrsetgrouptitle}\marg{article}\marg{Articles}
-\cs{glsxtrsetgrouptitle}\marg{book}\marg{Books}
+\gls{glsxtrsetgrouptitle}\marg{article}\marg{Articles}
+\gls{glsxtrsetgrouptitle}\marg{book}\marg{Books}
 \end{codeenv}
 The \field{group} field is actually set to the associated letter by the default
 \csopt{sort} method. The desired labels are stored in the \field{category} 
@@ -17467,7 +17505,7 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 This example uses \exfile{markuplanguages.bib}. Since the file
 includes abbreviations, any commands that must be used before
 abbreviations are defined need to go before
-\ics{GlsXtrLoadResources}. This includes the abbreviation style, 
+\csref{GlsXtrLoadResources}. This includes the abbreviation style, 
 which I've set to \abbrstyle{long-short-desc}:
 \begin{verbatim}
 \setabbreviationstyle[markuplanguage]{long-short-desc}
@@ -17722,7 +17760,7 @@ to the list.
 Next the \field{useri} field is set to \code{text}\meta{language}
 which is the name of the control sequence used with
 \sty{polyglossia} to switch languages. This means that
-\ics{glsxtrentryfmt}\margm{text} can be used to format \meta{text}
+\gls{glsxtrentryfmt}\margm{text} can be used to format \meta{text}
 in the relevant language. Finally, \ics{glsxtrendfor} is used to
 break out of the loop.
 \begin{verbatim}
@@ -17776,7 +17814,7 @@ attributes for the custom \code{tug} category:
   \glsxtrentryfmt{\glslabel}{#1}%
 }
 \end{verbatim}
-This uses \ics{glsxtrentryfmt} to encapsulate the given text
+This uses \gls{glsxtrentryfmt} to encapsulate the given text
 in the appropriate language command (if provided). When this is set
 as the \catattr{textformat} attribute, it will be used instead of
 \ics{glstextformat}, which means that the entry label can be
@@ -18108,7 +18146,7 @@ entries, which will cause an unwanted duplication if the dual
 entries are displayed using a glossary style that shows the
 \field{symbol} field. Another field (such as \field{user1}) could be
 used instead or \gls{bibglsnewdualindexabbreviation} could be
-defined before \ics{GlsXtrLoadResources}:
+defined before \gls{GlsXtrLoadResources}:
 \begin{verbatim}
 \newcommand{\bibglsnewdualindexabbreviation}[7]{%
  \longnewglossaryentry*{#1}{%
@@ -18423,7 +18461,7 @@ example, so it has extra glossaries, which all need to be defined:
 \newglossary*{weather}{Weather Symbols}
 \end{verbatim}
 Note that this is a total of 15~glossaries (including the
-\code{index}). With the basic \ics{makeglossaries} method, this would
+\code{index}). With the basic \ics{cs.makeglossaries} method, this would
 require 16 write registers (including the write register used to
 create the indexing style file), and a total of $15\times3 + 1 = 46$
 associated files. (This doesn't include the standard \ext{aux} file
@@ -18688,7 +18726,7 @@ with a \idx{symbolgroup} containing the icons from
 \exfile{miscsymbols.bib}. This needs to be dealt with separately from
 the rest of the index to keep them together in a single group:
 \begin{codeenv}
-\cs{GlsXtrLoadResources}\oarg{
+\gls!{GlsXtrLoadResources}\oarg{
   \csopt[miscsymbols]{src},
   \csopt[recorded no deps]{selection},
   \csopt[.copy]{duplicate-label-suffix},
@@ -18834,8 +18872,8 @@ setting needs to be on:
 \csopt[first=name]{replicate-fields}
 \end{codeenv}
 As with \exfile{sample-people.tex} I've provided some custom
-commands to make it easier to locally redefined \cs{sortname} and
-\cs{sortvonname}:
+commands to make it easier to locally redefine \gls{sortname} and
+\gls{sortvonname}:
 \begin{verbatim}
 \newcommand*{\swaptwo}[2]{#2, #1}
 \newcommand*{\swapthree}[3]{#2 #3, #1}
@@ -18889,7 +18927,7 @@ entries without worrying about the prefixes:
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{unit}}\marg{\ics{glssymbol}}
 \cs{newcommand}\marg{\csfmt{measurement}}\marg{\cs{gls}}
-\cs{glsxtrnewgls}\marg{film.}\marg{\csfmt{film}}
+\gls!{glsxtrnewgls}\marg{film.}\marg{\csfmt{film}}
 \end{codeenv}
 
 As with \exfile{sample-multi1.tex}, it would be useful to include

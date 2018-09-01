@@ -711,7 +711,9 @@ name},
   user1={\margm{glossary list}},
   description={fallback used instead of \gls{bibglssetwidest}
    in the event that \bibgls\ can't determine the widest name
-   where there are only top level entries},
+   where there are only top level entries,
+   where \meta{glossary list} is a comma-separated list
+   of glossary labels},
   category={command}
 }
 
@@ -719,7 +721,9 @@ name},
   name={\csfmt{bib\-gls\-set\-widest\-fallback}},
   user1={\margm{glossary list}},
   description={fallback used instead of \gls{bibglssetwidest}
-   in the event that \bibgls\ can't determine the widest name},
+   in the event that \bibgls\ can't determine the widest name,
+   where \meta{glossary list} is a comma-separated list
+   of glossary labels},
   category={command}
 }
 
@@ -1038,7 +1042,7 @@ location obtained from the \field{indexcounter} field},
 @dualindexentry{glsxtrfmt*,
   name={\csfmt{gls\-xtr\-fmt*}},
   user1={\oargm{options}\margm{label}\margm{text}\oargm{insert}},
-  description={like \cs{glsxtrfmt} but inserts extra
+  description={like \gls{glsxtrfmt} but inserts extra
    material into the link text but outside of the formatting command},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
@@ -1047,7 +1051,7 @@ location obtained from the \field{indexcounter} field},
 @dualindexentry{glsxtrentryfmt,
   name={\csfmt{gls\-xtr\-entry\-fmt}},
   user1={\margm{label}\margm{text}},
-  description={alternative to \cs{glsxtrfmt} for use in
+  description={alternative to \gls{glsxtrfmt} for use in
     section headings},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
@@ -1056,7 +1060,7 @@ location obtained from the \field{indexcounter} field},
 @index{glsxtrfmtdisplay,
   name={\csfmt{gls\-xtr\-fmt\-display}},
   user1={\margm{cs-name}\margm{text}\margm{insert}},
-  description={used by \cs{glsxtrfmt} to format the given
+  description={used by \gls{glsxtrfmt} to format the given
 \meta{text} where \meta{cs-name} is obtained from the field
 identified by \cs{GlsXtrFmtField} and \meta{insert} is empty for the
 unstarred \gls{glsxtrfmt} and the final optional argument of the
@@ -2467,7 +2471,7 @@ cs}\margm{Glspl-like cs}},
 @dualindexentry{glsxtrmultisupplocation,
   name={\csfmt{gls\-xtr\-multi\-supp\-location}},
   user1={\margm{location}\margm{src}\margm{format}},
-  description={used by \cs{glsxtrdisplaysupploc} to format the
+  description={used by \gls{glsxtrdisplaysupploc} to format the
   external location},
   note={provided by \styfmt{glossaries-extra-bib2gls} v1.36+},
   category={command}
@@ -2992,6 +2996,12 @@ cs}\margm{Glspl-like cs}},
   parent={packages}
 }
 
+@index{glossary-longextra,
+  name={\styfmt{glossary\dhyphen longextra}},
+  category={package},
+  parent={packages}
+}
+
 @index{booktabs,
   name={\styfmt{booktabs}},
   category={package},
@@ -3157,7 +3167,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.hash,
-  name={\csfmt{\#}}
+  name={\csfmt{\#}},
+  category={command}
 }
 
 @index{colsep,
@@ -3171,7 +3182,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.amp,
-  name={\csfmt{\&}}
+  name={\csfmt{\&}},
+  category={command}
 }
 
 @index{bgroupchar,
@@ -3185,7 +3197,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.openbrace,
-  name={\csfmt{\{}}
+  name={\csfmt{\{}},
+  category={command}
 }
 
 @index{egroupchar,
@@ -3199,7 +3212,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.closebrace,
-  name={\csfmt{\}}}
+  name={\csfmt{\}}},
+  category={command}
 }
 
 @index{commentchar,
@@ -3213,7 +3227,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.percent,
-  name={\csfmt{\%}}
+  name={\csfmt{\%}},
+  category={command}
 }
 
 @index{sbchar,
@@ -3227,7 +3242,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.underscore,
-  name={\csfmt{\_}}
+  name={\csfmt{\_}},
+  category={command}
 }
 
 @index{spchar,
@@ -3317,7 +3333,8 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{cs.space,
-  name={\csfmt{\textvisiblespace}}
+  name={\csfmt{\textvisiblespace}},
+  category={command}
 }
 
 @index{undef,
@@ -3863,6 +3880,11 @@ hyphen}},
 
 @index{ctr.section,
   name={\counterfmt{section}},
+  category={counter}
+}
+
+@index{ctr.chapter,
+  name={\counterfmt{chapter}},
   category={counter}
 }
 
@@ -6891,7 +6913,7 @@ can be referenced in \meta{true} or \meta{false} with
 @index{glsaddkey,
   name={\csfmt{gls\-add\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}\margm{no link ucfirst cs}\margm{link cs}\margm{link ucfirst cs}\margm{link allcaps cs}},
-  description={adds a new key for use in \cs{newglossaryentry}
+  description={adds a new key for use in \csref[noindex]{newglossaryentry}
    and associated commands to access it},
   note={provided by \styfmt{glossaries}},
   category={command}
@@ -6900,7 +6922,8 @@ can be referenced in \meta{true} or \meta{false} with
 @index{glsxtrprovidestoragekey,
   name={\csfmt{gls\-xtr\-provide\-storage\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}},
-  description={adds a new key, if not already defined, for use in \cs{newglossaryentry}
+  description={adds a new key, if not already defined, for use in
+\csref[noindex]{newglossaryentry}
    and an associated command
    to access it where (unlike \cs{glsaddstoragekey})
    the \meta{no link cs} part may be empty if unrequired},
@@ -6912,7 +6935,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{gls\-add\-storage\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}},
   description={adds a new key for internal use that can be set in 
-    \cs{newglossaryentry}},
+    \csref[noindex]{newglossaryentry}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6976,7 +6999,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{acronym\-type}},
   user1={},
   description={expands to the default acronym glossary type when using
-   \cs{newacronym}},
+   \csref{newacronym}},
   note={provided by \styfmt{glossaries}},
   category={command}
 }
@@ -6985,7 +7008,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{gls\-xtr\-abbrv\-type}},
   user1={},
   description={expands to the default glossary type when using
-   \cs{newabbreviation}},
+   \gls{newabbreviation}},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -7317,6 +7340,15 @@ hyperlinks enabled otherwise just does \meta{text}},
   category={command}
 }
 
+@index{hyperemph,
+  name={\csfmt{hyperemph}},
+  user1={\margm{text}},
+  description={a location format that uses \ics{emph} to set the
+  font and also has a hyperlink (if enabled)},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{emph,
   name={\csfmt{emph}},
   user1={\margm{text}},
@@ -7386,7 +7418,7 @@ by \gls{makeindex} or \gls{xindy}},
   user1={\margm{text}},
   description={does nothing but when used as a location format
    \bibgls\ recognises it as an \idx{ignoredrecord} indexed by
-   commands like \cs{rgls}},
+   commands like \gls{rgls}},
   note={provided by \styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -7839,7 +7871,7 @@ option},
   name={\csfmt{Gls\-Xtr\-Fmt\-Field}},
   user1={},
   description={expands to the internal label of the field used
-   to store the control sequence name for use with \cs{glsxtrfmt}},
+   to store the control sequence name for use with \gls{glsxtrfmt}},
   note={provided by \styfmt{glossaries-extra} v1.12},
   category={command}
 }
@@ -7964,7 +7996,7 @@ defined},
   user1={},
   description={provides code that locally redefines commands 
    during the protected write operation performed by 
-   \cs{glsxtrresourcefile}},
+   \gls{glsxtrresourcefile}},
   note={provided by \styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -8164,7 +8196,7 @@ packages},
 @index{GlsXtrFmtDefaultOptions,
   name={\csfmt{Gls\-Xtr\-Fmt\-Default\-Options}},
   user1={},
-  description={the default options used by \cs{glsxtrfmt}},
+  description={the default options used by \gls{glsxtrfmt}},
   note={provided by \styfmt{glossaries-extra}},
   category={command}
 }
@@ -8362,7 +8394,7 @@ abbreviation by the \catattr{markwords} attribute},
 @dualindexentry{rglsformat,
   name={\csfmt{rglsformat}},
   user1={\margm{label}\oargm{insert}},
-  description={used by \cs{rgls} if the record count
+  description={used by \gls{rgls} if the record count
    switch is triggered},
   note={provided by \styfmt{glossaries-extra} version 1.21+},
   category={command}
@@ -8372,7 +8404,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{glsxtr\-enable\-record\-count}},
   user1={},
   description={redefines \cs{gls} etc to their 
-   \cs{rgls} counterpart},
+   \gls{rgls} counterpart},
   note={provided by \styfmt{glossaries-extra} version 1.21+},
   category={command}
 }
@@ -8493,6 +8525,50 @@ abbreviation by the \catattr{markwords} attribute},
   description={used with the \glostyle{alttree} style to set the
    widest entry name for the given level},
   note={provided by \styfmt{glossary-tree}},
+  category={command}
+}
+
+@index{glsxtrSetWidest,
+  name={\csfmt{gls\-xtr\-Set\-Widest}},
+  user1={\margm{type}\margm{level}\margm{text}},
+  description={used by \gls{bibglssetwidest} to set the
+   widest entry name for the given level for the \glostyle{alttree}
+   style and the styles provided by \sty{glossary-longextra}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glssetwidest,glslongextraSetWidest},
+  category={command}
+}
+
+@index{glsxtrSetWidestFallback,
+  name={\csfmt{gls\-xtr\-Set\-Widest\-Fallback}},
+  user1={\margm{max depth}\margm{list}},
+  description={used by \gls{bibglssetwidesttoplevelfallback} and
+   \gls{bibglssetwidestfallback} to set the
+   widest entry name for the \glostyle{alttree}
+   style and the styles provided by \sty{glossary-longextra}
+   using the commands provided by \sty{glossaries-extra-stylemods}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glsFindWidestTopLevelName,glsFindWidestLevelTwo},
+  category={command}
+}
+
+@index{glslongextraSetWidest,
+  name={\csfmt{gls\-long\-extra\-Set\-Widest}},
+  user1={\margm{text}},
+  description={used with the styles provided by the
+  \sty{glossary-longextra} package to set the
+   widest entry name},
+  note={provided by \styfmt{glossary-longextra} v1.37+},
+  seealso={glslongextraUpdateWidest},
+  category={command}
+}
+
+@index{glslongextraUpdateWidest,
+  name={\csfmt{gls\-long\-extra\-Update\-Widest}},
+  user1={\margm{text}},
+  description={as \cs{glslongextraSetWidest} but only sets if \meta{text} is
+  wider than the current value},
+  note={provided by \styfmt{glossary-longextra} v1.37+},
   category={command}
 }
 

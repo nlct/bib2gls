@@ -1,10 +1,10 @@
-% arara: xelatex
-% arara: bib2gls: {group: on}
+% arara: lualatex
+% arara: bib2gls: {group: on} if missing("glstex") || changed(toFile("bib2gls.bib")) || found("log", "Warning: Glossary entry")
 % arara: bibtex
-% arara: xelatex
-% arara: bib2gls if found ("log", "has not been defined")
-% arara: xelatex if found ("log", "has not been defined")
-% arara: xelatex if found ("log", "Rerun")
+% arara: lualatex if changed("glstex") || missing("toc")
+% arara: bib2gls: {group: on}
+% arara: lualatex 
+% arara: lualatex if found ("log", "Rerun")
 \documentclass[titlepage=false,fontsize=12pt,captions=tableheading]{scrreprt}
 
 \usepackage[no-math]{fontspec}
@@ -20,7 +20,7 @@
 \usepackage{graphicx}
 \usepackage{datetime2}
 \usepackage{siunitx}
-\usepackage{mhchem}
+\usepackage[version=4]{mhchem}
 
 \usepackage{xr-hyper}
 \usepackage[hidelinks]{hyperref}
@@ -75,6 +75,8 @@
  {\csfmtfont{\char`\\ #1}}%
  {\string\\#1}%
 }
+
+\newcommand*{\csref}{\gls}
 
 \GlsXtrLoadResources[
  src={bib2gls},
