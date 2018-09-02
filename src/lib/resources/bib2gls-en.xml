@@ -253,6 +253,7 @@ Defaulting to: {0}.
 <entry key="message.detected.charset">Detected encoding: {0}</entry>
 <entry key="message.default.charset">Default encoding: {0}</entry>
 <entry key="message.null">not set</entry>
+<entry key="message.detected.fontenc">Detected font encoding: {0}</entry>
 <entry key="message.missing.id">id missing</entry>
 <entry key="message.default.locale">Default document locale: {0} {1}</entry>
 <entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>

@@ -59,7 +59,7 @@ public class GlsResource
    {
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
-      sortSettings = new SortSettings("locale", bib2gls);
+      sortSettings = new SortSettings("doc", bib2gls);
       dualSortSettings = new SortSettings(bib2gls);
       secondarySortSettings = new SortSettings(bib2gls);
 
@@ -96,14 +96,7 @@ public class GlsResource
 
          if (opt.equals("src"))
          {
-          // In the event that the user has
-          // non-ASCII characters in the file names but is using
-          // PDFLaTeX, then the list may contain accenting commands,
-          // so the expandfully value is true to convert them to
-          // Unicode unless fontspec has been loaded, in which case
-          // there won't be a problem.
-            srcList = getStringArray(parser, list, opt,
-              !bib2gls.fontSpecLoaded());
+            srcList = getStringArray(parser, list, opt);
 
             if (srcList == null)
             {
@@ -128,14 +121,8 @@ public class GlsResource
          else if (opt.equals("supplemental-locations"))
          {// Fetch supplemental locations from another document.
           // As from v1.7, the value may now be a list of
-          // document base names. In the event that the user has
-          // non-ASCII characters in the file names but is using
-          // PDFLaTeX, then the list may contain accenting commands,
-          // so the expandfully value is true to convert them to
-          // Unicode unless fontspec has been loaded, in which case
-          // there won't be a problem. 
-            supplemental = getStringArray(parser, list, opt,
-               !bib2gls.fontSpecLoaded());
+          // document base names. 
+            supplemental = getStringArray(parser, list, opt);
          }
          else if (opt.equals("supplemental-category"))
          {
@@ -2088,6 +2075,18 @@ public class GlsResource
 
       String docLocale = bib2gls.getDocDefaultLocale();
 
+      if (docLocale == null)
+      {
+         Locale locale = bib2gls.getDefaultLocale();
+
+         if (locale == null)
+         {
+            locale = Locale.getDefault();
+         }
+
+         docLocale = locale.toLanguageTag();
+      }
+
       sortSettings.setDocLocale(docLocale);
       dualSortSettings.setDocLocale(docLocale);
 
@@ -3282,15 +3281,7 @@ public class GlsResource
      KeyValList list, String opt)
     throws IOException
    {
-      return getStringArray(parser, defValue, list, opt, false);
-   }
-
-   private String[] getStringArray(TeXParser parser, String defValue, 
-     KeyValList list, String opt, boolean expandIfBackslashFound)
-    throws IOException
-   {
-      String[] array = getStringArray(parser, list, opt, 
-         expandIfBackslashFound);
+      String[] array = getStringArray(parser, list, opt);
 
       if (array == null)
       {
@@ -3302,13 +3293,6 @@ public class GlsResource
 
    private String[] getStringArray(TeXParser parser, KeyValList list, 
      String opt)
-    throws IOException
-   {
-      return getStringArray(parser, list, opt, false);
-   }
-
-   private String[] getStringArray(TeXParser parser, KeyValList list, 
-     String opt, boolean expandIfBackslashFound)
     throws IOException
    {
       TeXObject object = list.getValue(opt);
@@ -3339,27 +3323,6 @@ public class GlsResource
          }
 
          array[i] = obj.toString(parser).trim();
-
-         if (expandIfBackslashFound && array[i].contains("\\")
-                && obj instanceof Expandable)
-         {
-            TeXObjectList expanded = null;
-
-            try
-            {
-               expanded = ((Expandable)obj).expandfully(parser);
-
-               if (expanded != null)
-               {
-                  obj = trimList(expanded);
-                  array[i] = obj.toString(parser).trim();
-               }
-            }
-            catch (IOException e)
-            {
-               bib2gls.debug(e);
-            }
-         }
 
       }
 

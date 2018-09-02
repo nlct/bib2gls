@@ -46,6 +46,7 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
+import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
@@ -819,9 +820,23 @@ public class Bib2Gls implements TeXApp
                   packages.add(pkg);
                }
             }
-            else if (line.contains(auxname))
+            else
             {
-               break;
+               m = PATTERN_ENCDEF.matcher(line);
+
+               if (m.matches())
+               {
+                  if (fontencList == null)
+                  {
+                     fontencList = new Vector<String>();
+                  }
+
+                  fontencList.add(m.group(1));
+               }
+               else if (line.contains(auxname))
+               {
+                  break;
+               }
             }
          }
       }
@@ -940,9 +955,28 @@ public class Bib2Gls implements TeXApp
 
       if (packages != null)
       {
-         for (String sty : packages)
+         for (String styname : packages)
          {
-            listener.usepackage(null, sty, false);
+            LaTeXSty sty = listener.usepackage(null, styname, false);
+
+            if (fontencList != null && styname.equals("fontenc"))
+            {
+               if (sty == null || !(sty instanceof FontEncSty))
+               {
+                  sty = listener.getFontEncSty();
+               }
+
+               if (sty != null && sty instanceof FontEncSty)
+               {
+                  for (String enc : fontencList)
+                  {
+                     debugMessage("message.detected.fontenc", enc);
+                     sty.processOption(enc.toUpperCase(), null);
+                  }
+
+                  fontencList = null;
+               }
+            }
          }
       }
 
@@ -4690,8 +4724,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20180831";
-   public static final String DATE = "2018-08-31";
+   public static final String VERSION = "1.7.20180902";
+   public static final String DATE = "2018-09-02";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4709,6 +4743,11 @@ public class Bib2Gls implements TeXApp
 
    public static final Pattern PATTERN_PACKAGE = Pattern.compile(
        "Package: ([^\\s]+)(?:\\s+(\\d{4})/(\\d{2})/(\\d{2}))?.*");
+
+   public static final Pattern PATTERN_ENCDEF = Pattern.compile(
+       "File: ([^ ]+)enc\\.def .*");
+
+   private Vector<String> fontencList = null;
 
    private boolean fontspec = false;
    private boolean hyperref = false;

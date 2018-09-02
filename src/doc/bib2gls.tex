@@ -5613,6 +5613,30 @@ will assume \optfmt{src=\ics{jobname}}. Remember that subsequent uses
 of \gls{GlsXtrLoadResources} append a suffix, so in general it's
 best to always supply \csopt{src}.
 
+If you have non-ASCII characters in the \ext{bib} filename but
+aren't using \XeLaTeX\ or \LuaLaTeX, then you will need to use
+\ics{detokenize} to prevent expansion when the information is
+written to the \ext{aux} file. Similarly for any special characters
+that need protecting (although it's better not to use special
+characters in filenames). For example:
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src = {\detokenize{кириллица}},% data in кириллица.bib
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossary
+\end{document}
+\end{verbatim}
+
 \optsection{selection}
 
 By default all entries that have records in the \iext{aux} file will

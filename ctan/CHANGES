@@ -19,6 +19,8 @@ v1.8 (pending):
   * setting is off. (It still needs to know version details and
     whether hyperlinks and Unicode are supported by the document.)
 
+  * bug fix: corrected default sort=doc
+
 v1.7 (2018-08-18):
 
   * added support for multiple supplementary sources

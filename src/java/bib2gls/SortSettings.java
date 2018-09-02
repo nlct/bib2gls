@@ -485,25 +485,30 @@ public class SortSettings
       }
    }
 
-   public void setDocLocale(String locale)
+   public void setDocLocale(String localeTag)
    {
+      if (localeTag == null)
+      {
+         throw new NullPointerException();
+      }
+
       if ("doc".equals(sortMethod))
       {
-         sortMethod = locale;
+         sortMethod = localeTag;
       }
       else if ("doc-reverse".equals(sortMethod))
       {
-         sortMethod = locale+"-reverse";
+         sortMethod = localeTag+"-reverse";
       }
 
       if ("doc".equals(dateLocale))
       {
-         dateLocale = locale;
+         dateLocale = localeTag;
       }
 
       if ("doc".equals(numberLocale))
       {
-         numberLocale = locale;
+         numberLocale = localeTag;
       }
    }
 
