@@ -1,0 +1,20 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[record,
+  nostyles,
+  stylemods={bookindex},
+  style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src = {cyrillic-ascii},
+  sort = ru,
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossary
+\end{document}

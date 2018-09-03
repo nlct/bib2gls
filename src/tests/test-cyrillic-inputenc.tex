@@ -1,0 +1,21 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[record,
+  nostyles,
+  stylemods={bookindex},
+  style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src = {cyrillic-utf8},
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossary
+\end{document}

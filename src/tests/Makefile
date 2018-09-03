@@ -27,7 +27,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-same-as-base.pdf test-books.pdf test-bibtexdata.pdf \
 	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf \
 	  test-indexplural.pdf test-include.pdf \
-	  test-primary-records.pdf test-primary-records-counter.pdf
+	  test-primary-records.pdf test-primary-records-counter.pdf \
+	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -514,6 +515,20 @@ test-primary-records-counter.glstex	: test-primary-records-counter.tex $(DEPS) t
 		$(BIB2GLS) test-primary-records-counter
 		pdflatex test-primary-records-counter
 		$(BIB2GLS) test-primary-records-counter
+
+test-cyrillic-ascii.pdf	: test-cyrillic-ascii.glstex
+		pdflatex test-cyrillic-ascii
+
+test-cyrillic-ascii.glstex	: test-cyrillic-ascii.tex $(DEPS) cyrillic-ascii.bib
+		pdflatex test-cyrillic-ascii
+		$(BIB2GLS) test-cyrillic-ascii
+
+test-cyrillic-inputenc.pdf	: test-cyrillic-inputenc.glstex
+		pdflatex test-cyrillic-inputenc
+
+test-cyrillic-inputenc.glstex	: test-cyrillic-inputenc.tex $(DEPS) cyrillic-utf8.bib
+		pdflatex test-cyrillic-inputenc
+		$(BIB2GLS) test-cyrillic-inputenc
 
 clean	:
 	$(RM) *.aux
