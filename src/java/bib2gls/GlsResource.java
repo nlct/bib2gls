@@ -5683,7 +5683,9 @@ public class GlsResource
                writer.println("    \\let\\bibglsorgnavhypertarget\\@glsnavhypertarget");
                writer.println("  }");
                writer.println("  \\renewcommand*{\\@glsnavhypertarget}[3]{%");
-               writer.println("    \\@glstarget{\\glsnavhyperlinkname{#1}{#2}}{#3}%");
+               writer.println("    \\ifcsdef{@gls@hypergrouplist@#1}%");
+               writer.println("    {\\@glstarget{\\glsnavhyperlinkname{#1}{#2}}{#3}}%");
+               writer.println("    {\\bibglsorgnavhypertarget{#1}{#2}{#3}}%");
                writer.println("  }");
                writer.println("  \\providecommand{\\bibglshypergroup}{\\@gls@hypergroup}");
                writer.println("}");

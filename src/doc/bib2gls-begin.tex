@@ -210,7 +210,7 @@
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
 \newenvironment{codeenv}
  {%
- \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
    \def\cmd{\char`\\}%
    \def\comment##1{\textcolor{comment}{\%\ ##1}}%
    \renewcommand*{\styfmt}[1]{##1}%
@@ -5250,7 +5250,7 @@ be simplified to:
 \cmd{documentclass}\marg{scrartcl}
 \cmd{usepackage}\marg{mhchem}
 \cmd{usepackage}[
- \styopt{record},\comment{create \field{group} field}
+ \styopt{record},\comment{create \field{group} field and other stuff}
  \styopt[dot]{postpunc},\comment{full stop after description}
  \styopt{nostyles},\comment{don't load default style packages}
  \styopt[tree]{stylemods}\comment{load glossary-tree.sty and patch styles}

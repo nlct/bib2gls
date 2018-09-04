@@ -19,7 +19,12 @@ v1.8 (pending):
   * setting is off. (It still needs to know version details and
     whether hyperlinks and Unicode are supported by the document.)
 
+  * Underscores now allowed in bib labels.
+
   * bug fix: corrected default sort=doc
+
+  * \@glsnavhypertarget will now fallback on original definition
+    (which requires an extra LaTeX call) if the type is unknown.
 
 v1.7 (2018-08-18):
 

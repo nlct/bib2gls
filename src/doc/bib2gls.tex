@@ -15,6 +15,9 @@
 \usepackage[no-math]{fontspec}
 \setmainfont{Linux Libertine O}
 
+\newfontface\cyrillicmono{FreeMono}[Scale=MatchLowercase]
+\newcommand{\textcyrillicmono}[1]{{\cyrillicmono #1}}
+
 \newfontface\greekmono{FreeMono}[Scale=MatchLowercase]
 \newfontface\devangari{FreeSerif}
 \newcommand{\devone}{{\devangari\char"0967}}
@@ -91,9 +94,11 @@
 \newcommand{\glsxtrpostnameenvironment}{\space environment}
 \newcommand{\glsxtrpostnamecounter}{\space counter}
 
+\newcommand*{\csfmtfont}[1]{\texttt{#1}}
+
 \newcommand*{\csfmt}[1]{%
  \texorpdfstring
- {\texttt{\char`\\ #1}}%
+ {\csfmtfont{\char`\\ #1}}%
  {\string\\#1}%
 }
 
@@ -214,16 +219,24 @@
   {\string\\jobname-#1.glstex}%
 }
 
+\definecolor{field}{named}{DarkSlateGray4}
+\definecolor{cs}{named}{DarkSeaGreen4}
+\definecolor{styopt}{named}{DarkOrchid4}
+\definecolor{entry}{named}{SteelBlue4}
+\definecolor{comment}{named}{gray}
+\definecolor{attribute}{named}{Purple4}
+\definecolor{style}{named}{Blue4}
+
 \newcommand{\extstyopt}{\textsuperscript{\textdagger}}
 
 \newcommand*{\appfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\styfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\envfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\optfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
-\newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{DarkSeaGreen4}{\optfmt{#1}}}{#1}}
-\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{DarkOrchid4}{\optfmt{#1}}}{#1}}
-\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{DarkSlateGray4}#1}}{#1}}
-\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{SteelBlue4}#1}}{#1}}
+\newcommand*{\csoptfmt}[1]{\texorpdfstring{\textcolor{cs}{\optfmt{#1}}}{#1}}
+\newcommand*{\styoptfmt}[1]{\texorpdfstring{\textcolor{styopt}{\optfmt{#1}}}{#1}}
+\newcommand*{\fieldfmt}[1]{\texorpdfstring{\texttt{\color{field}#1}}{#1}}
+\newcommand*{\entryfmt}[1]{\texorpdfstring{\texttt{\color{entry}#1}}{#1}}
 \newcommand*{\atentryfmt}[1]{\entryfmt{@#1}}
 \newcommand*{\abbrstylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\glostylefmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
@@ -311,6 +324,8 @@
   {#2\ifblank{#1}{}{=#1}}%
 }
 
+\newcommand*{\styoptref}[1]{\gls[format=glsignore]{styopt.#1}}
+
 \newcommand*{\keyvallist}{%
  \texorpdfstring
  {key\dequals value list}%
@@ -345,7 +360,7 @@
   \end{flushleft}\ignorespaces
 }
 
-\newcommand*{\csref}{\gls}
+\newcommand*{\csref}[1][noindex=false]{\gls[#1]}
 
 \newcommand*{\cs}[1]{%
   \glsdoifexists{idx.#1}%
@@ -418,6 +433,8 @@
  \glsadd{field.#1}%
  \glsxtrglossentry{field.#1}{}%
 }
+
+\newcommand*{\fieldref}[1]{\gls[format=glsignore]{field.#1}}
 
 \newglossarystyle{fieldstyle}{%
   \renewenvironment{theglossary}%
@@ -599,6 +616,8 @@
 \newcommand*{\atentrypageref}[1]{%
  \atentry{#1} (page~\glsxtrpageref{entry.#1})}%
 
+\newcommand*{\atentryref}[1]{\gls[format=glsignore]{entry.#1}}
+
 \newcommand{\argsection}[2][\section]{%
  \def\switcharg{}%
  \def\switchalt{}%
@@ -673,6 +692,9 @@
   \ignorespacesafterend
 }
 
+\newcommand{\introguide}{\href{bib2gls-begin.pdf}{\qt{\styfmt{glossaries-extra}
+and \bibgls: An Introductory Guide} (\filefmt{bib2gls-begin.pdf})}}
+
 \setcounter{tocdepth}{4}
 
 \newcommand*{\sectionref}[1]{\cref{#1}}
@@ -734,8 +756,19 @@ files}
 \renewcommand{\fps@figure}{htbp}
 
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
+
 \newenvironment{codeenv}
- {\begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces}
+ {%
+   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+   \def\cmd{\char`\\}%
+   \def\comment##1{\mbox{\textcolor{comment}{\idx{commentchar}\ ##1}}}%
+   \renewcommand*{\styfmt}[1]{##1}%
+   \renewcommand*{\counterfmt}[1]{##1}%
+   \renewcommand*{\catattrfmt}[1]{\textcolor{attribute}{##1}}%
+   \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
+   \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
+   \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
+ }
  {\end{flushleft}\ignorespacesafterend}
 
 \begingroup
@@ -797,7 +830,7 @@ then you can use the supplementary tool \idx{convertgls2bib}
 to convert the entries to the \ext{bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
 
-The supplementary file \filefmt{bib2gls-begin.pdf} is an
+The supplementary file \introguide\ is an
 introductory guide to the \sty{glossaries-extra} package, which you
 may prefer to start with if you are unfamiliar with the
 \sty{glossaries} and \sty{glossaries-extra} packages.
@@ -873,44 +906,44 @@ enabled.)
 \section{Example Use}
 The glossary entries are stored in a \ext{bib} file. For
 example, the file \filefmt{entries.bib} might contain:
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal}
+\begin{codeenv}
+\atentry{entry}\marg{bird,
+  \field{name}=\marg{bird},
+  \field{description} = \marg{feathered animal}
 }
-
-@abbreviation{html,
-  short="html",
-  long={hypertext markup language}
+\strut
+\atentry{abbreviation}\marg{html,
+  \field{short}="html",
+  \field{long}=\marg{hypertext markup language}
 }
-
-@symbol{v,
-  name={$\vec{v}$},
-  text={\vec{v}},
-  description={a vector}
+\strut
+\atentry{symbol}\marg{v,
+  \field{name}=\marg{\idx{mshiftchar}\cs{vec}\marg{v}\idx{mshiftchar}},
+  \field{text}=\marg{\cs{vec}\marg{v}},
+  \field{description}=\marg{a vector}
 }
-
-@index{goose,plural="geese"}
-\end{verbatim}
+\strut
+\atentry{index}\marg{goose,\field{plural}="geese"}
+\end{codeenv}
 Here's an example document that uses this data:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  sort={en-GB}% sort according to 'en-GB' locale
-]
-
-\begin{document}
-\Gls{bird} and \gls{goose}.
-Symbol: $\gls{v}$.
-Abbreviation: \gls{html}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styoptref{record}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[en-GB]{sort}\comment{sort according to 'en-GB' locale}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{Gls}\marg{bird} and \cs{gls}\marg{goose}.
+Symbol: \idx{mshiftchar}\cs{gls}\marg{v}\idx{mshiftchar}.
+Abbreviation: \cs{gls}\marg{html}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 If this document is called \filefmt{myDoc.tex}, the build 
 process is:
 \begin{verbatim}
@@ -920,51 +953,58 @@ pdflatex myDoc
 \end{verbatim}
 (This manual assumes \appfmt{pdflatex} for simplicity. Replace
 with \appfmt{latex}, \appfmt{xelatex} or \appfmt{lualatex} as
-appropriate.)
+appropriate.) If you want \idxpl{lettergroup} (either headed, with
+styles like \glostyle{indexgroup}, or just a blank line separator
+with \styopt[false]{nogroupskip}) then you need to use the
+\longarg{group} switch:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls --group myDoc
+pdflatex myDoc
+\end{verbatim}
 
 You can have multiple instances of \gls{GlsXtrLoadResources}. For
 example:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,index,abbreviations,symbols]{glossaries-extra}
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  sort={en-GB},% sort according to 'en-GB' locale
-  match={entrytype={entry}},% only select @entry
-  type={main}% put these entries in the 'main' glossary
-]
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  sort={en-GB},% sort according to 'en-GB' locale
-  match={entrytype={abbreviation}},% only select @abbreviation
-  type={abbreviations}% put these entries in the 'abbreviations' glossary
-]
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  sort={letter-case},% case-sensitive letter sort
-  match={entrytype={symbol}},% only select @symbol
-  type={symbols}% put these entries in the 'symbols' glossary
-]
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  sort={en-GB},% sort according to 'en-GB' locale
-  match={entrytype={index}},% only select @index
-  type={index}% put these entries in the 'index' glossary
-]
-
-\begin{document}
-\Gls{bird} and \gls{goose}.
-Symbol: $\gls{v}$.
-Abbreviation: \gls{html}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styopt{record},\styopt{index},\styopt{abbreviations},\styopt{symbols}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[en-GB]{sort},\comment{sort according to 'en-GB' locale}
+  \csopt[entrytype=\marg{entry}]{match},\comment{only select \atentry{entry}}
+  \csopt[main]{type}\comment{put these entries in the 'main' glossary}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[en-GB]{sort},\comment{sort according to 'en-GB' locale}
+  \csopt[entrytype=\marg{abbreviation}]{match},\comment{only select \atentry{abbreviation}}
+  \csopt[abbreviations]{type}\comment{put these in the 'abbreviations' glossary}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[letter-case]{sort},\comment{case-sensitive letter sort}
+  \csopt[entrytype=\marg{symbol}]{match},\comment{only select \atentry{symbol}}
+  \csopt[symbols]{type}\comment{put these entries in the 'symbols' glossary}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[en-GB]{sort},\comment{sort according to 'en-GB' locale}
+  \csopt[entrytype=\marg{index}]{match},\comment{only select \atentry{index}}
+  \csopt[index]{type}\comment{put these entries in the 'index' glossary}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{Gls}\marg{bird} and \cs{gls}\marg{goose}.
+Symbol: \idx!{mshiftchar}\cs{gls}\marg{v}\idx!{mshiftchar}. Abbreviation: \cs{gls}\marg{html}.
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+There are more examples provided in \sectionref{sec:examples}.
 
 Note that there's no need to called \idx!{xindy} or \idx!{makeindex}
 since \bibgls\ automatically sorts the entries and collates the locations
@@ -978,7 +1018,18 @@ those entries that are required in the document are defined, so
 \ics{printunsrtglossary} (or \ics{printunsrtglossaries}) may be used.
 (The \qtt{unsrt} part of the command name indicates that all
 defined entries should be listed in the order of definition from
-\styfmt{glossaries-extra}'s point of view.)
+\styfmt{glossaries-extra}'s point of view, see the supplementary
+document \introguide\ for further details.)
+
+If you don't provide a value with the \styopt{record} option, then
+\styopt[only]{record} is assumed. This saves the same indexing
+information that's used with the \ics{cs.makeglossaries} and
+\ics{makenoidxglossaries} methods (described in the main
+\styfmt{glossaries} user manual~\cite{glossaries}). As from
+\styfmt{glossaries-extra} version 1.37, you can instead use
+\styopt[nameref]{record}, which saves some extra information for
+each location that's not available for the other indexing methods. 
+See \longarg{merge-nameref-on} for further details.
 
 If you additionally want to use an indexing application, such
 as \idx{xindy}, you need the package option
@@ -993,16 +1044,22 @@ makeglossaries myDoc
 pdflatex myDoc
 \end{verbatim}
 (The entries aren't defined until the second \LaTeX\ run, so the
-indexing files required by \idx!{makeindex} or \idx!{xindy} can't be
-created until then.) There are more examples provided in
-\sectionref{sec:examples}.
+indexing files required by \idx!{xindy} or \idx!{makeindex} can't be
+created until then.) In this case, \bibgls\ is simply being used to
+fetch the entry definitions from one or more \ext{bib} files, with
+the sorting and collating performed by the other indexing
+application (so the resource option list would need
+\csopt[none]{sort} and \csopt[false]{save-locations}).  In general, 
+it's best to avoid this hybrid method unless you have a particular
+set of \idx{xindy} rules that can't be replicated with \bibgls.
 
 \section{Defining a New Glossary}
 \label{sec:newglossary}
 
 Some of the examples in this manual use \ics{newglossary*} to define
 a new glossary type and some use \ics{newignoredglossary} or
-\ics{newignoredglossary*}. Why define an \idx{ignoredglossary}?
+\ics{newignoredglossary*}. Why the starred forms and why define an
+\idx{ignoredglossary}?
 
 The base \styfmt{glossaries} package was originally designed to work
 with \idx!{makeindex}. Support for \idx!{xindy} was later added, but
@@ -1052,9 +1109,9 @@ So \cs{newignoredglossary} is useful with \bibgls\ if you're happy
 to use \cs{printunsrtglossary} as it reduces the overall number of
 internal control sequences. Since there is now the possibility of
 targets (created within \cs{printunsrtglossary}), it's useful to
-have an \idx{ignoredglossary} that doesn't suppress the hyperlinks.
-The \styfmt{glossaries-extra} package provides a starred form
-\ics{newignoredglossary*} that doesn't suppress the hyperlinks.
+have an \idx{ignoredglossary} that doesn't suppress the hyperlinks,
+which can be obtained with the starred form \ics{newignoredglossary*}
+provided by \styfmt{glossaries-extra}.
 
 Some resource options, such as \csopt{master}, \csopt{secondary} and
 \csopt{trigger-type}, need to ensure that a
@@ -1082,7 +1139,7 @@ in stages:
 \begin{description}
 
 \item[Stage 1 (Initialisation)] Occurs after the \ext{aux} file has
-been parsed, this stage parses the resource option list and ensures
+been read, this stage parses the resource option list and ensures
 options are valid and don't cause a conflict. The transcript will
 show the message
 \begin{alltt}
@@ -1717,7 +1774,7 @@ For the \code{v} entry, the code is:
 \end{verbatim}
 The transcript shows:
 \begin{alltt}
-texparserlib: \marg{}\$\csfmt{vec}\marg{v}\$ -> \usebox\varrow
+texparserlib: \marg{}\$\ics{vec}\marg{v}\$ -> \usebox\varrow
 \end{alltt}
 So the \field{sort} value for this entry is set to \qtt{\usebox\varrow},
 which consists of two Unicode characters \hex{76}
@@ -2553,7 +2610,7 @@ letter group character to \idx{uppercase}. The case-sensitive ordering
 
 Glossary styles with navigational links to groups (such as
 \glostyle{indexhypergroup}) require an extra run for the ordinary
-\csfmt{makeglossaries} and \csfmt{makenoidxglossaries} methods. For
+\cs{cs.makeglossaries} and \cs{makenoidxglossaries} methods. For
 example, for the document \filefmt{myDoc.tex}:
 \begin{verbatim}
 pdflatex myDoc
@@ -2573,7 +2630,9 @@ With \bibgls, if the \optfmt{type} is provided (through the
 \field{type} field or via options such as \csopt{type} and
 \csopt{dual-type}) then this information can be determined when
 \bibgls\ is ready to write the \iext{glstex} file, which means that
-the extra \LaTeX\ run isn't necessary.
+the extra \LaTeX\ run isn't necessary. If \bibgls\ doesn't know
+the glossary type then it will fallback on the original method
+which requires an extra \LaTeX\ run.
 
 For example:
 \begin{verbatim}
@@ -5619,23 +5678,23 @@ aren't using \XeLaTeX\ or \LuaLaTeX, then you will need to use
 written to the \ext{aux} file. Similarly for any special characters
 that need protecting (although it's better not to use special
 characters in filenames). For example:
-\begin{verbatim}
-\documentclass{article}
+\begin{codeenv}
+\csfmt{documentclass}\marg{article}
 
-\usepackage[T2A]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage[russian]{babel}
-\usepackage[record]{glossaries-extra}
+\cs{usepackage}\oarg{T2A}\marg{fontenc}
+\cs{usepackage}\oarg{utf8}\marg{inputenc}
+\cs{usepackage}\oarg{russian}\marg{babel}
+\cs{usepackage}\oarg{record}\marg{glossaries-extra}
 
-\GlsXtrLoadResources[
-  src = {\detokenize{кириллица}},% data in кириллица.bib
+\gls{GlsXtrLoadResources}\oarg{
+  src = {\cs{detokenize}{\textcyrillicmono{кириллица}}},\comment data in \textcyrillicmono{кириллица.bib}
   selection=all
-]
+}
 
-\begin{document}
-\printunsrtglossary
-\end{document}
-\end{verbatim}
+\csfmt{begin}\marg{document}
+\cs{printunsrtglossary}
+\csfmt{end}\marg{document}
+\end{codeenv}
 
 \optsection{selection}
 
@@ -8535,14 +8594,14 @@ style. For example, the \glostyle{bookindex} style inserts
 \ics{glsxtrbookindexprelocation} before the location, so you could
 redefine this:
 \begin{codeenv}
-\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\idx{commentchar}
-  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\idx{commentchar}
-  \marg{\idx{commentchar}
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment
+  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment 
+  \marg{\comment 
     \ics{glsxtrprelocation}
     \cs{glscurrentfieldvalue}
-    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\idx{commentchar}
-  }\idx{commentchar}
-  \marg{}\idx{commentchar}
+    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment 
+  }\comment 
+  \marg{}\comment 
   \cs{glsxtrprelocation}
 }
 \end{codeenv}
@@ -8555,8 +8614,8 @@ You can switch from using the \field{location} field to the
 \field{primarylocations} field by locally changing
 \ics{GlsXtrLocationField}:
 \begin{codeenv}
-\cs{printunsrtglossary*}\marg{\idx{commentchar}
-  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
+\cs{printunsrtglossary*}\marg{\comment 
+  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\comment 
 }
 \end{codeenv}
 Remember that the handler used by \cs{printunsrtglossary} will
@@ -8610,14 +8669,14 @@ and the document \filefmt{test.tex} contains:
   \csopt[remove]{save-primary-locations}
 }
 
-\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\idx{commentchar}
-  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\idx{commentchar}
-  \marg{\idx{commentchar}
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment 
+  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment 
+  \marg{\comment 
     \ics{glsxtrprelocation}
     \cs{glscurrentfieldvalue}
-    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\idx{commentchar}
-  }\idx{commentchar}
-  \marg{}\idx{commentchar}
+    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment 
+  }\comment 
+  \marg{}\comment 
   \cs{glsxtrprelocation}
 }
 
@@ -8636,8 +8695,8 @@ and the document \filefmt{test.tex} contains:
 \cs{chapter}\marg{Yet Another Sample Again}
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
-\ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\idx{commentchar}
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\idx{commentchar}
+\ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\comment 
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment 
 }
 
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
@@ -8720,9 +8779,9 @@ each instance of \cs{gls} that has the format set to the custom
 \cs{chapter}\marg{Yet Another Sample Again}
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
-\ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\idx{commentchar}
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\idx{commentchar}
- \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\idx{commentchar}
+\ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\comment 
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment 
+ \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\comment 
 }
 
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
@@ -17148,8 +17207,8 @@ in the \idx{resourceset} and provide a
 modified version of \gls{bibglsnewbibtexentry} that assigns
 \field{type} after the options:
 \begin{codeenv}
-\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\idx{commentchar}
- \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{name=\marg{\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\idx{commentchar}
+\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\comment 
+ \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{name=\marg{\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\comment 
 }
 \end{codeenv}
 The standard \BibTeX\ entry types need aliasing to
@@ -17200,10 +17259,10 @@ in those sub-blocks, which means that the group titles can be set by locally
 redefining \ics{glsxtrgroupfield} to \code{category}:
 \begin{codeenv}
 \cs{printunsrtglossary*}[type=titles,style=indexgroup]
-\marg{\idx{commentchar}
- \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{category}\idx{commentchar}
- \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\idx{commentchar}
- \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\idx{commentchar}
+\marg{\comment 
+ \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{category}\comment 
+ \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\comment 
+ \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\comment 
 }
 \end{codeenv}
 There's no \field{description} field set for these entries, but the
@@ -17230,14 +17289,14 @@ category. The hook iterates
 over the internal list provided by the \field{bibtexentry} field.
 This allows the titles to be listed as well:
 \begin{codeenv}
-\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\idx{commentchar}
-  \ics{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\idx{commentchar}
-  \marg{\idx{commentchar}
+\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\comment 
+  \ics{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\comment 
+  \marg{\comment 
     \cs{glsxtrfieldforlistloop}
-    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\idx{commentchar}
-    \marg{\csfmt{contributorhandler}}\idx{commentchar}
-  }\idx{commentchar}
-  \marg{\ics{par} No titles.}\idx{commentchar}
+    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\comment 
+    \marg{\csfmt{contributorhandler}}\comment 
+  }\comment 
+  \marg{\ics{par} No titles.}\comment 
 }
 \end{codeenv}
 The handler macro displays the name of the associated

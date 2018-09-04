@@ -2770,7 +2770,7 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{makeindex,
-  name={\appfmt{makeindex}},
+  name={\appfmt{make\-index}},
   category={application},
   parent={applications}
 }
@@ -3310,6 +3310,14 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{\glstildechar}},
   user1={\margm{character}},
   description={puts tilde accent over \meta{character}},
+  note={kernel command},
+  category={command}
+}
+
+@index{vec,
+  name={\csfmt{vec}},
+  user1={\margm{character}},
+  description={maths mode command that puts right arrow accent over \meta{character}},
   note={kernel command},
   category={command}
 }
@@ -3938,7 +3946,9 @@ hyphen}},
   description={unless the value is \styoptfmt{off}, this option sets
   up \styfmt{glossaries-extra} for use with \bibgls: \styoptfmt{only}
   (assumed if no \meta{value} supplied, indexing performed by
-  \bibgls) and \styoptfmt{alsoindex} (\bibgls\ is used to provide
+  \bibgls), \styoptfmt{nameref} (\sty{glossaries-extra} v1.37+) 
+  like \styoptfmt{only} but includes extra information in the records, and 
+  \styoptfmt{alsoindex} (\bibgls\ is used to provide
   the entry definitions but \idx{makeindex} or \idx{xindy} is used
   for the indexing)},
   package={glossaries-extra},
@@ -4467,7 +4477,7 @@ hyphen}},
   name={\styoptfmt{nogroupskip}},
   user1={\meta{boolean}},
   description={if true, suppresses the visual separation between
-  letter groups},
+  letter groups in glossary styles that support this option},
   package={glossaries},
   category={packageoption},
   parent={packageoptions}
@@ -7804,6 +7814,17 @@ hasn't been defined},
   description={opens associated glossary files to be processed
    by \gls{makeindex} or \gls{xindy}},
   note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
+@index{makenoidxglossaries,
+  name={\csfmt{make\-noidx\-glos\-saries}},
+  user1={},
+  description={indicates that \TeX\ should be used to sort and
+   collate the glossary information instead of using an
+   external application; this command should not be used
+   with \bibgls},
+  note={provided by \styfmt{glossaries} v4.04+},
   category={command}
 }
 
