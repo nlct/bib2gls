@@ -250,11 +250,11 @@ public class Bib2GlsAt extends At
 
          // Unlikely that some of these will occur as it would've
          // confused the parser before reaching this point.
+         // (Underscore is now allowed.)
 
          if (codepoint == '$' || codepoint == '^' || codepoint == '~'
            || codepoint == '#' || codepoint == '{' || codepoint == '}'
-           || codepoint == '_' || codepoint == '&' || codepoint == '\\'
-           || codepoint == '%')
+           || codepoint == '&' || codepoint == '\\' || codepoint == '%')
          {
             return true;
          }
