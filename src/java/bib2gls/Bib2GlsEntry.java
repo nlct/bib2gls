@@ -536,7 +536,7 @@ public class Bib2GlsEntry extends BibEntry
                   {
                      int code = ((CharObject)arg).getCharCode();
 
-                     if (code == '*' || code == '+')
+                     if (code == '*' || code == '+' || code == bib2gls.getAltModifier())
                      {
                         pre = arg.toString(parser);
 

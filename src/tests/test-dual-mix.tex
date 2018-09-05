@@ -15,6 +15,7 @@
  dual-sort={letter-nocase},
  combine-dual-locations=primary,
  tertiary-type={main},
+ label-prefix={idx.},
  type=index,
  selection=all
 ]
@@ -23,13 +24,20 @@
 %\csshow{glolist@index}
 %\csshow{glolist@abbreviations}
 
+\glsxtraddlabelprefix{dual.}
+\glsxtraddlabelprefix{idx.}
+
+\GlsXtrSetAltModifier{!}{textformat=textbf}
+
+\glsxtrnewglslike[hyper=false]{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
+
 \begin{document}
 \chapter{Primary}
 
-Standard: \gls{aardvark}, \gls{zebra}, \gls{mouse}.
+Standard: \idx{aardvark}, \idx{zebra}, \idx{mouse}.
 
-Primary: \gls{antelope}, \gls{zander}, \gls{xml}, \gls{ssi},
-\gls{html}, \gls{css}.
+Primary: \idx{antelope}, \idx!{zander}, \idx{xml}, \idx{ssi},
+\idx{html}, \idx{css}.
 
 \chapter{Secondary}
 

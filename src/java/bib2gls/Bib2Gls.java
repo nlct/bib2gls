@@ -1387,6 +1387,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
             addAuxCommand("glsxtr@pluralsuffixes", 4);
+            addAuxCommand("@glsxtr@altmodifier", 1);
             addAuxCommand("@glsxtr@newglslike", 2);
             addAuxCommand("@glsxtr@prefixlabellist", 1);
          }
@@ -1460,6 +1461,15 @@ public class Bib2Gls implements TeXApp
             shortPluralSuffix = data.getArg(1).toString(parser);
             acrPluralSuffix = data.getArg(2).toString(parser);
             defShortPluralSuffix = data.getArg(3).toString(parser);
+         }
+         else if (name.equals("@glsxtr@altmodifier"))
+         {
+            String modifier = data.getArg(0).toString(parser).trim();
+
+            if (!modifier.isEmpty())
+            {
+               altModifier = modifier.codePointAt(0);
+            }
          }
          else if (name.equals("@glsxtr@newglslike"))
          {
@@ -2210,6 +2220,11 @@ public class Bib2Gls implements TeXApp
    public boolean checkAbbrvShortcuts()
    {
       return checkAbbrvShortcuts;
+   }
+
+   public int getAltModifier()
+   {
+      return altModifier;
    }
 
    // identify commands that have been defined with \@glsxtrnewgls
@@ -4818,6 +4833,8 @@ public class Bib2Gls implements TeXApp
    private boolean fontspec = false;
    private boolean hyperref = false;
    private boolean createHyperGroups = true;
+
+   private int altModifier = -1;
 
    private Vector<GlsResource> glsresources;
    private Vector<String> fields;
