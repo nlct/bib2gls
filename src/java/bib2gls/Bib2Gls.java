@@ -1387,6 +1387,8 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
             addAuxCommand("glsxtr@pluralsuffixes", 4);
+            addAuxCommand("@glsxtr@newglslike", 2);
+            addAuxCommand("@glsxtr@prefixlabellist", 1);
          }
       };
 
@@ -1458,6 +1460,31 @@ public class Bib2Gls implements TeXApp
             shortPluralSuffix = data.getArg(1).toString(parser);
             acrPluralSuffix = data.getArg(2).toString(parser);
             defShortPluralSuffix = data.getArg(3).toString(parser);
+         }
+         else if (name.equals("@glsxtr@newglslike"))
+         {
+            addGlsLike(data.getArg(0).toString(parser), 
+             data.getArg(1).toString(parser).substring(1));
+         }
+         else if (name.equals("@glsxtr@prefixlabellist"))
+         {
+            String[] split = data.getArg(0).toString(parser).split(",");
+
+            if (split != null && split.length > 0)
+            {
+               // Use fallback prefix, which is the final element in
+               // the list.
+
+               String prefix = split[split.length-1];
+
+               if (!prefix.isEmpty())
+               {
+                  addGlsLike(prefix, "dgls");
+                  addGlsLike(prefix, "dGls");
+                  addGlsLike(prefix, "dglspl");
+                  addGlsLike(prefix, "dGlspl");
+               }
+            }
          }
          else if (name.equals("glsxtr@langtag"))
          {
@@ -2185,6 +2212,29 @@ public class Bib2Gls implements TeXApp
       return checkAbbrvShortcuts;
    }
 
+   // identify commands that have been defined with \@glsxtrnewgls
+   public boolean isGlsLike(String csname)
+   {
+      if (glsLike == null) return false;
+
+      return glsLike.get(csname) != null;
+   }
+
+   public void addGlsLike(String prefix, String csname)
+   {
+      if (glsLike == null)
+      {
+         glsLike = new HashMap<String,String>();
+      }
+
+      glsLike.put(csname, prefix);
+   }
+
+   public String getGlsLikePrefix(String csname)
+   {
+      return glsLike == null ? null : glsLike.get(csname);
+   }
+
    // is the given field likely to occur in link text?
    public boolean checkNestedLinkTextField(String fieldName)
    {
@@ -2491,6 +2541,12 @@ public class Bib2Gls implements TeXApp
         getMessage("tag.passim"));
       writer.println("\\providecommand{\\bibglspassim}{ \\bibglspassimname}");
       writer.println("\\providecommand*{\\bibglshyperlink}[2]{\\glshyperlink[#1]{#2}}");
+      writer.println();
+
+      writer.println("\\providecommand{\\bibglsprimaryprefixlabel}[1]{}");
+      writer.println("\\providecommand{\\bibglsdualprefixlabel}[1]{}");
+      writer.println("\\providecommand{\\bibglstertiaryprefixlabel}[1]{}");
+      writer.println("\\providecommand{\\bibglsexternalprefixlabel}[2]{}");
       writer.println();
 
       if (recordCount != null)
@@ -4734,8 +4790,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20180904";
-   public static final String DATE = "2018-09-04";
+   public static final String VERSION = "1.7.20180905";
+   public static final String DATE = "2018-09-05";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4768,6 +4824,8 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsRecord> records;
    private Vector<GlsSeeRecord> seeRecords;
    private Vector<String> selectedEntries;
+
+   private HashMap<String,String> glsLike;
 
    private HashMap<String,String> fieldMap;
 

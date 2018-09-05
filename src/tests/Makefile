@@ -28,7 +28,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-indexcounter.pdf test-dualentryabbrv.pdf test-indexcounter2.pdf \
 	  test-indexplural.pdf test-include.pdf \
 	  test-primary-records.pdf test-primary-records-counter.pdf \
-	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf
+	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf \
+	  test-dual2.pdf 
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -529,6 +530,13 @@ test-cyrillic-inputenc.pdf	: test-cyrillic-inputenc.glstex
 test-cyrillic-inputenc.glstex	: test-cyrillic-inputenc.tex $(DEPS) cyrillic-utf8.bib
 		pdflatex test-cyrillic-inputenc
 		$(BIB2GLS) test-cyrillic-inputenc
+
+test-dual2.pdf	: test-dual2.glstex
+		pdflatex test-dual2
+
+test-dual2.glstex	: test-dual2.tex test-dual-mix2.bib $(DEPS)
+		pdflatex test-dual2
+		$(BIB2GLS) test-dual2
 
 clean	:
 	$(RM) *.aux

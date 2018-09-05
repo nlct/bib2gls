@@ -1305,7 +1305,7 @@ processed in the same loop.
 
 The dual index entries such as \atentry{dualindexentry} (described in
 \sectionref{sec:dualentry}) are designed to provide a way of
-including an entry in both a glossary (with a description) and also
+including an entry in a glossary (with a description) and also
 include the term (without the description) in an index.  Additional
 terms that should only appear in the index can be defined with
 \atentry{index}.  (See, for example, the \exfile{sample-multi1.tex}
@@ -1314,31 +1314,31 @@ and \exfile{sample-multi2.tex} sample files.)
 Although \bibgls\ is designed to create indexes as well as glossary
 lists using the same interface (\cs{gls} etc), it is
 possible to have a mixture of \bibgls\ and \ics{index}. For example:
-\begin{verbatim}
-\documentclass{report}
-
-\usepackage{makeidx}
-\usepackage[record]{glossaries-extra}
-
-\makeindex
-\GlsXtrLoadResources[src={entries}]
-
-\glssetcategoryattribute{general}{dualindex}{true}
-\glssetcategoryattribute{symbol}{dualindex}{true}
-\glssetcategoryattribute{abbreviation}{dualindex}{true}
-
-\glssetcategoryattribute{general}{indexname}{hyperbf}
-\glssetcategoryattribute{symbol}{indexname}{hyperbf}
-\glssetcategoryattribute{abbreviation}{indexname}{hyperbf}
-
-\begin{document}
-\chapter{Example}
-\gls{bird}, \gls{html}, $\gls{v}$ and \glspl{goose}.
-
-\printunsrtglossaries
-\printindex
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{report}
+\strut
+\cmd{usepackage}\marg{makeidx}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries-extra}
+\strut
+\cmd{makeindex}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\strut
+\ics{glssetcategoryattribute}\marg{general}\marg{dualindex}\marg{true}
+\cs{glssetcategoryattribute}\marg{symbol}\marg{dualindex}\marg{true}
+\cs{glssetcategoryattribute}\marg{abbreviation}\marg{dualindex}\marg{true}
+\strut
+\cs{glssetcategoryattribute}\marg{general}\marg{indexname}\marg{hyperbf}
+\cs{glssetcategoryattribute}\marg{symbol}\marg{indexname}\marg{hyperbf}
+\cs{glssetcategoryattribute}\marg{abbreviation}\marg{indexname}\marg{hyperbf}
+\strut
+\cmd{begin}\marg{document}
+\cmd{chapter}\marg{Example}
+\cs{gls}\marg{bird}, \cs{gls}\marg{html}, \idx{mshiftchar}\cs{gls}\marg{v}\idx{mshiftchar} and \cs{glspl}\marg{goose}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{printindex}
+\cmd{end}\marg{document}
+\end{codeenv}
 If the document is called \filefmt{myDoc.tex} then the document
 build is:
 \begin{verbatim}
@@ -1380,10 +1380,11 @@ settings, so if these values are unset, \bibgls\ will default to
 The only external processes that are run by \bibgls\ are calls to
 \idx{kpsewhich} to check the security settings and locate files on
 \TeX's path. These are started with Java's \code{ProcessBuilder}
-class so there should be no issues with spaces in the argument. 
-The \longarg{debug} switch will write the process call in the
-transcript file and will delimit the argument in the log with single
-quote characters for convenience.
+class so there should be no issues with spaces or shell special characters
+in the argument.  The \longarg{debug} switch will write the process
+call in the transcript file and will delimit the argument in the log
+with single quote characters for convenience, but the process isn't
+actually called in that way.
 
 \bibgls\ creates files with the extension \ext{glstex}, which are
 input by \gls{GlsXtrLoadResources}. This extension is fixed and is
@@ -1473,6 +1474,8 @@ complicated.)
 
 In general, the basic algorithm is:
 \begin{enumerate}
+\item Run \LaTeX\ (or PDF\LaTeX\ etc).
+
 \item If \gls{glsxtr@resource} is found in the \ext{aux} file then:
 
    \begin{enumerate}
@@ -1488,7 +1491,12 @@ In general, the basic algorithm is:
    \end{enumerate}
 
 \end{enumerate}
-This allows for the \styopt[alsoindex]{record} package option.
+This allows for the \styopt[alsoindex]{record} package option.  See
+also
+\href{https://www.dickimaw-books.com/latex/buildglossaries}{\qt{Incorporating
+\idx[hyper=false,noindex]{makeglossaries} or
+\idx[hyper=false,noindex]{makeglossaries-lite} or \bibgls\ into
+the document build}}~\cite{buildglossaries}.
 
 \section{Manual Installation}
 
@@ -1509,6 +1517,8 @@ Copy the files provided to the following locations:
 (English resource file.)
 \item \meta{TEXMF}\filefmt{/doc/support/bib2gls/bib2gls.pdf}
 (This document.)
+\item \meta{TEXMF}\filefmt{/doc/support/bib2gls/bib2gls-begin.pdf}
+(Introductory guide.)
 \end{itemize}
 
 If you are using a Unix-like system, there are also bash scripts
@@ -1602,6 +1612,14 @@ since these fields must be just a label
 characters allowed in a label).
 \end{itemize}
 
+Information in the \ext{aux} file is parsed for specific commands
+but the arguments of those commands are not interpreted so, for
+example, UTF-8 characters that occur in any resource options will
+need to be detokenized when using \sty{inputenc} to prevent
+expansion when they are written to the \ext{aux} file. (In some
+options, such as \csopt{sort-rule}, you can use \cs{glshex}\meta{hex}
+syntax to specify a UTF-8 character.)
+
 The \longarg{no-interpret} switch will turn off the interpreter, but
 the library will still be used to parse the \ext{aux} and \ext{bib}
 files. Note that the \field{see} field doesn't use the interpreter
@@ -1625,7 +1643,7 @@ environments provided within the document.
 number of packages that the parser recognises. Note that in
 some cases there's only very limited support. For example, 
 \isty{siunitx}'s \ics{si} command is recognised but other
-commands aren't from that package aren't. See
+commands from that package aren't. See
 \longargpageref{list-known-packages} for further details.
 
 Since the parser doesn't have a full set of commands available
@@ -1663,51 +1681,51 @@ rule that recognises these Unicode characters (for example,
 complicated for simple regular expressions. The \TeX\ parser library performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls\ (and by
-\idx{convertgls2bib}). When
-the \longarg{debug} mode is on, any warnings or errors triggered by
-the \longarg{interpret} mode will be written to the transcript
-prefixed with \code{texparserlib:} (the results of the conversions
-will be included in the transcript as informational messages
-prefixed with \code{texparserlib:} even with \longarg{no-debug}).
+\idx{convertgls2bib}). When the \longarg{debug} mode is on, any
+warnings or errors triggered by the interpreter will be written to
+the transcript prefixed with \code{texparserlib:} (the results of
+the conversions will be included in the transcript as informational
+messages prefixed with \code{texparserlib:} even with
+\longarg{no-debug}).
 
 For example, suppose the \ext{bib} file includes:
-\begin{verbatim}
-@preamble{
-"\providecommand{\mtx}[1]{\boldsymbol{#1}}
-\providecommand{\set}[1]{\mathcal{#1}}
-\providecommand{\card}[1]{|\set{#1}|}
-\providecommand{\imaginary}{i}"}
-
-@entry{M,
-  name={{}$\mtx{M}$},
-  text={\mtx{M}},
-  description={a matrix}
+\begin{codeenv}
+\atentry{preamble}\marg{
+"\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{set}}[1]\marg{\ics{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}
+\cs{providecommand}\marg{\cmd{imaginary}}\marg{i}"}
+\strut
+\atentry{entry}\marg{M,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{mtx}\marg{M}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{mtx}\marg{M}},
+  \field{description}=\marg{a matrix}
 }
-
-@entry{v,
-  name={{}$\vec{v}$},
-  text={\vec{v}},
-  description={a vector}
+\strut
+\atentry{entry}\marg{v,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cs{vec}\marg{v}\idx{mshiftchar}},
+  \field{text}=\marg{\cs{vec}\marg{v}},
+  \field{description}=\marg{a vector}
 }
-
-@entry{S,
-  name={{}$\set{S}$},
-  text={\set{S}},
-  description={a set}
+\strut
+\atentry{entry}\marg{S,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{set}\marg{S}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{set}\marg{S}},
+  \field{description}=\marg{a set}
 }
-
-@entry{card,
-  name={{}$\card{S}$},
-  text={\card{S}},
-  description={the cardinality of the set $\set{S}$}
+\strut
+\atentry{entry}\marg{card,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{card}\marg{S}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{card}\marg{S}},
+  \field{description}=\marg{the cardinality of the set \idx{mshiftchar}\cmd{set}\marg{S}\idx{mshiftchar}}
 }
-
-@entry{i,
-  name={{}$\imaginary$},
-  text={\imaginary},
-  description={square root of minus one ($\sqrt{-1}$)}
+\strut
+\atentry{entry}\marg{i,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{imaginary}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{imaginary}},
+  \field{description}=\marg{square root of minus one (\idx{mshiftchar}\cmd{sqrt}\marg{-1}\idx{mshiftchar})}
 }
-\end{verbatim}
+\end{codeenv}
 (The empty group at the start of the \field{name} fields
 protects against the possibility that the \catattr{glossname}
 category attribute might be set to \optfmt{firstuc}, which
@@ -1742,12 +1760,12 @@ rather than the string \qtt{\&x\meta{hex};}.
 
 The interpreter is first passed the code provided with
 \atentry{preamble}:
-\begin{verbatim}
-\providecommand{\mtx}[1]{\boldsymbol{#1}}
-\providecommand{\set}[1]{\mathcal{#1}}
-\providecommand{\card}[1]{|\set{#1}|}
-\providecommand{\imaginary}{i}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}
+\cs{providecommand}\marg{\cmd{imaginary}}\marg{i}
+\end{codeenv}
 (unless \csopt[false]{interpret-preamble}).
 This means that the provided commands are now recognised by the
 interpreter when it has to parse the fields later.
@@ -2665,7 +2683,8 @@ the default behaviour of \isty{glossary-hypernav}'s
 
 If \isty{hyperref} isn't loaded or the \longargfmt{group} switch
 isn't used or the \field{type} isn't set or your version of
-\sty{glossaries} is too old, then the information isn't saved.
+\sty{glossaries} is too old, then the information can't be saved in
+the \ext{glstex} file.
 
 For example:
 \begin{verbatim}
@@ -4377,6 +4396,13 @@ bib2gls -g myDoc
 pdflatex myDoc
 \end{verbatim}
 
+As from \sty{glossaries-extra-bib2gls} version 1.37, an alternative
+method is to identify possible label prefixes with
+\ics{glsxtraddlabelprefix} or \ics{glsxtrprependlabelprefix} and use
+\ics{dgls}, \ics{dglspl}, \ics{dGls} or \ics{dGlspl}. See the
+\styfmt{glossaries-extra} user manual~\cite{glossaries-extra} for
+further details.
+
 \entrysection{dualindexnumber}
 
 The \atentry{dualindexnumber} entry type is almost identical to
@@ -5687,7 +5713,7 @@ characters in filenames). For example:
 \cs{usepackage}\oarg{record}\marg{glossaries-extra}
 
 \gls{GlsXtrLoadResources}\oarg{
-  src = {\cs{detokenize}{\textcyrillicmono{кириллица}}},\comment data in \textcyrillicmono{кириллица.bib}
+  src = {\cs{detokenize}{\textcyrillicmono{кириллица}}},\comment{data in \textcyrillicmono{кириллица.bib}}
   selection=all
 }
 
@@ -6944,6 +6970,12 @@ cross-references, unless they start with \idprefix{dual} or
 \csopt{dual-prefix} to change the dual label prefixes and
 \csopt{ext-prefixes} to change the external label prefixes.
 
+As from version 1.8, the primary label prefix is identified
+in the \ext{glstex} file with:
+\begin{codeenv}
+\format{bibglsprimaryprefixlabel}
+\end{codeenv}
+
 For example, if the \ext{bib} file contains
 \begin{verbatim}
 @entry{bird,
@@ -7099,6 +7131,12 @@ substituted with the \meta{n}th tag listed in the comma-separated
 an empty list, which will strip all \idprefix{extn} prefixes.
 Remember that \idx{crossresourceref} mode needs to be enabled for
 this option to work (see \sectionref{sec:resourcesets}).
+
+As from version 1.8, the external label prefixes are identified
+in the \ext{glstex} file with:
+\begin{codeenv}
+\format{bibglsexternalprefixlabel}
+\end{codeenv}
 
 For example, suppose the file \filefmt{entries-terms.bib} contains:
 \begin{verbatim}
@@ -8595,13 +8633,13 @@ style. For example, the \glostyle{bookindex} style inserts
 redefine this:
 \begin{codeenv}
 \cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment
-  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment 
-  \marg{\comment 
+  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment{}
+  \marg{\comment{}
     \ics{glsxtrprelocation}
     \cs{glscurrentfieldvalue}
-    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment 
-  }\comment 
-  \marg{}\comment 
+    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment{}
+  }\comment{}
+  \marg{}\comment{}
   \cs{glsxtrprelocation}
 }
 \end{codeenv}
@@ -8614,8 +8652,8 @@ You can switch from using the \field{location} field to the
 \field{primarylocations} field by locally changing
 \ics{GlsXtrLocationField}:
 \begin{codeenv}
-\cs{printunsrtglossary*}\marg{\comment 
-  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\comment 
+\cs{printunsrtglossary*}\marg{\comment{}
+  \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\comment{}
 }
 \end{codeenv}
 Remember that the handler used by \cs{printunsrtglossary} will
@@ -8669,14 +8707,14 @@ and the document \filefmt{test.tex} contains:
   \csopt[remove]{save-primary-locations}
 }
 
-\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment 
-  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment 
-  \marg{\comment 
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment{}
+  \marg{\comment{}
     \ics{glsxtrprelocation}
     \cs{glscurrentfieldvalue}
-    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment 
-  }\comment 
-  \marg{}\comment 
+    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment{}
+  }\comment{}
+  \marg{}\comment{}
   \cs{glsxtrprelocation}
 }
 
@@ -8695,8 +8733,8 @@ and the document \filefmt{test.tex} contains:
 \cs{chapter}\marg{Yet Another Sample Again}
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
-\ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\comment 
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment 
+\ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\comment{}
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment{}
 }
 
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
@@ -8779,9 +8817,9 @@ each instance of \cs{gls} that has the format set to the custom
 \cs{chapter}\marg{Yet Another Sample Again}
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 
-\ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\comment 
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment 
- \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\comment 
+\ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\comment{}
+ \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment{}
+ \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\comment{}
 }
 
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
@@ -12042,6 +12080,12 @@ Any references to dual entries within the \ext{bib} file should use
 the prefix \idprefix{dual} which will be replaced by \meta{value}
 when the \ext{bib} file is parsed.
 
+As from version 1.8, the dual label prefix is identified
+in the \ext{glstex} file with:
+\begin{codeenv}
+\format{bibglsdualprefixlabel}
+\end{codeenv}
+
 \optsection[\subsubsection]{primary-dual-dependency}
 
 This is a boolean setting that determines whether or not primary and
@@ -12758,6 +12802,12 @@ Shortcut for:
 This option indicates the prefix to use for the tertiary entries. The
 default value is \idprefix{tertiary} (including the terminating period). 
 
+As from version 1.8, the tertiary label prefix is identified
+in the \ext{glstex} file with:
+\begin{codeenv}
+\format{bibglstertiaryprefixlabel}
+\end{codeenv}
+
 \optsection{tertiary-type}
 
 This option indicates that the tertiary entries should have
@@ -12782,6 +12832,17 @@ definitions for custom commands in the form \csfmt{bibgls...} which
 may be changed as required. The command definitions all use
 \ics{providecommand} which means that you can define the command with
 \ics{newcommand} before the resource file is loaded.
+
+Note that if you try to redefine any of these commands after the
+resource file has been loaded with \ics{renewcommand}, you will get
+an error on the first \LaTeX\ run when the \ext{glstex} file doesn't
+exist.
+
+Since many of the commands are actually used within the \ext{glstex}
+file, it's best to use \cs{newcommand} before the first
+\idx{resourceset} and \cs{renewcommand} between \idxpl{resourceset}
+if adjustments are necessary.
+
 
 \section{Entry Definitions}
 \label{sec:newentrydefs}
@@ -13254,6 +13315,8 @@ Or you can redefine it afterwards:
 \GlsXtrLoadResources[src={entries}]
 \renewcommand{\bibglsseesep}{; }
 \end{verbatim}
+(but this will only work once the \ext{glstex} file has actually
+been created).
 
 \cssection{bibglsseealsosep}
 
@@ -13319,6 +13382,8 @@ Or you can redefine it afterwards:
 \GlsXtrLoadResources[src={entries}]
 \renewcommand{\bibglspassim}{}
 \end{verbatim}
+(but this will only work once the \ext{glstex} file has actually
+been created).
 
 \cssection{bibglspassimname}
 
@@ -13397,6 +13462,8 @@ Or you can redefine it afterwards:
 \GlsXtrLoadResources[src={entries},loc-prefix]
 \renewcommand{\bibglspostlocprefix}{: }
 \end{verbatim}
+(but this will only work once the \ext{glstex} file has actually
+been created).
 
 \cssection{bibglslocprefix}
 
@@ -13567,6 +13634,8 @@ or redefined after the resources are loaded:
 
 \renewcommand*{\bibglslocationgroupsep}{; }
 \end{verbatim}
+(but this will only work once the \ext{glstex} file has actually
+been created).
 
 \cssection{bibglssupplemental}
 
@@ -13613,6 +13682,8 @@ or redefined after the resources are loaded:
 
 \renewcommand{\bibglssupplementalsep}{; }
 \end{verbatim}
+(but this will only work once the \ext{glstex} file has actually
+been created).
 
 \cssection{bibglssupplementalsubsep}
 
@@ -14445,6 +14516,39 @@ resource sets, that option governs the way \bibgls's version of
 \gls{bibglscontributor} behaves. The definition is written to the
 \ext{glstex} using \cs{providecommand}, so \LaTeX\ will only pick up
 the first definition.
+
+\cssection{bibglsprimaryprefixlabel}
+
+\formatdef{bibglsprimaryprefixlabel}
+A hook to pick up the primary prefix label (identified with
+\csopt{label-prefix}) if required. This does nothing by default. If
+required, this command should be defined before the
+\idx{resourceset} is loaded.
+
+\cssection{bibglsdualprefixlabel}
+
+\formatdef{bibglsdualprefixlabel}
+A hook to pick up the dual prefix label (identified with
+\csopt{dual-prefix}) if required. This does nothing by default. If
+required, this command should be defined before the
+\idx{resourceset} is loaded.
+
+\cssection{bibglstertiaryprefixlabel}
+
+\formatdef{bibglstertiaryprefixlabel}
+A hook to pick up the tertiary prefix label (identified with
+\csopt{tertiary-prefix}) if required. This does nothing by default. If
+required, this command should be defined before the
+\idx{resourceset} is loaded.
+
+\cssection{bibglsexternalprefixlabel}
+
+\formatdef{bibglsexternalprefixlabel}
+A hook to pick up the \meta{n}th external prefix label (identified with
+\csopt{ext-prefixes}) if required. This does nothing by default and
+won't be used if the list of external prefixes is empty. If required,
+this command should be defined before the \idx{resourceset} is
+loaded.
 
 \cssection{bibglshashchar}
 
@@ -17207,8 +17311,8 @@ in the \idx{resourceset} and provide a
 modified version of \gls{bibglsnewbibtexentry} that assigns
 \field{type} after the options:
 \begin{codeenv}
-\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\comment 
- \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{name=\marg{\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\comment 
+\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\comment{}
+ \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{name=\marg{\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\comment{}
 }
 \end{codeenv}
 The standard \BibTeX\ entry types need aliasing to
@@ -17259,10 +17363,10 @@ in those sub-blocks, which means that the group titles can be set by locally
 redefining \ics{glsxtrgroupfield} to \code{category}:
 \begin{codeenv}
 \cs{printunsrtglossary*}[type=titles,style=indexgroup]
-\marg{\comment 
- \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{category}\comment 
- \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\comment 
- \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\comment 
+\marg{\comment{}
+ \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{category}\comment{}
+ \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\comment{}
+ \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\comment{}
 }
 \end{codeenv}
 There's no \field{description} field set for these entries, but the
@@ -17289,14 +17393,14 @@ category. The hook iterates
 over the internal list provided by the \field{bibtexentry} field.
 This allows the titles to be listed as well:
 \begin{codeenv}
-\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\comment 
-  \ics{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\comment 
-  \marg{\comment 
+\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\comment{}
+  \ics{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{\comment{}
     \cs{glsxtrfieldforlistloop}
-    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\comment 
-    \marg{\csfmt{contributorhandler}}\comment 
-  }\comment 
-  \marg{\ics{par} No titles.}\comment 
+    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\comment{}
+    \marg{\csfmt{contributorhandler}}\comment{}
+  }\comment{}
+  \marg{\ics{par} No titles.}\comment{}
 }
 \end{codeenv}
 The handler macro displays the name of the associated

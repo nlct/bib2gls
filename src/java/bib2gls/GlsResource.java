@@ -4564,6 +4564,8 @@ public class GlsResource
 
          bib2gls.writeCommonCommands(writer);
 
+         writeLabelPrefixHooks(writer);
+
          // Save original definition of \@glsxtr@s@longnewglossaryentry
          // and \glsxtr@newabbreviation
 
@@ -5450,6 +5452,8 @@ public class GlsResource
          }
 
          bib2gls.writeCommonCommands(writer);
+
+         writeLabelPrefixHooks(writer);
 
          if (triggerType != null)
          {
@@ -6528,6 +6532,27 @@ public class GlsResource
          }
       }
 
+   }
+
+   private void writeLabelPrefixHooks(PrintWriter writer)
+      throws IOException
+   {
+      // Identify label prefixes if required.
+      writer.format("\\bibglstertiaryprefixlabel{%s}%n",
+        tertiaryPrefix == null ? "" : tertiaryPrefix);
+      writer.format("\\bibglsdualprefixlabel{%s}%n",
+        dualPrefix == null ? "" : dualPrefix);
+      writer.format("\\bibglsprimaryprefixlabel{%s}%n",
+        labelPrefix == null ? "" : labelPrefix);
+
+      if (externalPrefixes != null)
+      {
+         for (int i = 0; i < externalPrefixes.length; i++)
+         {
+            writer.format("\\bibglsexternalprefixlabel{%d}{%s}%n",
+              i+1, externalPrefixes[i]);
+         }
+      }
    }
 
    private void updateWidestName(Bib2GlsEntry entry, 

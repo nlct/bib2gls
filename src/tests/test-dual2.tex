@@ -1,0 +1,39 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,abbreviations,index,stylemods={mcols},style=indexgroup]{glossaries-extra}
+
+\glssetcategoryattribute{index}{glossnamefont}{textmd}
+\setabbreviationstyle{long-em-short-em}
+
+\newcommand{\bibglsprimaryprefixlabel}[1]{\glsxtraddlabelprefix{#1}}
+\newcommand{\bibglsdualprefixlabel}[1]{\glsxtrprependlabelprefix{#1}}
+
+\GlsXtrLoadResources[
+ src={test-dual-mix2},
+ dual-sort={letter-nocase},
+ combine-dual-locations=primary,
+ tertiary-type={main},
+ label-prefix={idx.},
+ dual-prefix={},
+ type=index,
+ selection=all
+]
+
+\glsxtraddlabelprefix{idx.}
+
+\begin{document}
+\dgls{aardvark}, \dgls{zebra}, \dgls{mouse}.
+
+\dgls{antelope}, \dgls{zander}, \dgls{xml}, \dgls{ssi},
+\dgls{html}, \dgls{css}.
+
+Next use: \dgls{xml}, \dgls{ssi}, \dgls{html}, \dgls{css}.
+
+\printunsrtglossary
+\printunsrtglossary[type=abbreviations]
+\printunsrtglossary[type=index,style=mcolindexgroup]
+\end{document}

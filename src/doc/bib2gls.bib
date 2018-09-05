@@ -840,6 +840,38 @@ name},
   category={command}
 }
 
+@dualindexentry{bibglsprimaryprefixlabel,
+  name={\csfmt{bib\-gls\-primary\-prefix\-label}},
+  user1={\margm{prefix}},
+  description={hook provided to pick up the primary prefix, if
+   required},
+  category={command}
+}
+
+@dualindexentry{bibglsdualprefixlabel,
+  name={\csfmt{bib\-gls\-dual\-prefix\-label}},
+  user1={\margm{prefix}},
+  description={hook provided to pick up the dual prefix, if
+   required},
+  category={command}
+}
+
+@dualindexentry{bibglstertiaryprefixlabel,
+  name={\csfmt{bib\-gls\-tertiary\-prefix\-label}},
+  user1={\margm{prefix}},
+  description={hook provided to pick up the tertiary prefix, if
+   required},
+  category={command}
+}
+
+@dualindexentry{bibglsexternalprefixlabel,
+  name={\csfmt{bib\-gls\-external\-prefix\-label}},
+  user1={\margm{n}\margm{prefix}},
+  description={hook provided to pick up the \meta{n}th external prefix, if
+   required},
+  category={command}
+}
+
 @dualindexentry{glsexpandfields,
   name={\csfmt{gls\-expand\-fields}},
   user1={},
@@ -7572,7 +7604,7 @@ usual delay},
 }
 
 @index{renewcommand,
-  name={\csfmt{renewcommand}},
+  name={\csfmt{re\-new\-com\-mand}},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={redefines an existing command},
   note={kernel command},
@@ -7580,7 +7612,7 @@ usual delay},
 }
 
 @index{newcommand,
-  name={\csfmt{newcommand}},
+  name={\csfmt{new\-com\-mand}},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={defines a new command},
   note={kernel command},
@@ -7588,7 +7620,7 @@ usual delay},
 }
 
 @index{providecommand,
-  name={\csfmt{providecommand}},
+  name={\csfmt{pro\-vide\-com\-mand}},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={defines a command if it's not already defined},
   note={kernel command},
@@ -7641,6 +7673,14 @@ usual delay},
   description={renders given maths symbol in bold if supported by
     the current font},
   note={provided by \styfmt{amsmath}},
+  category={command}
+}
+
+@index{mathcal,
+  name={\csfmt{mathcal}},
+  user1={\margm{character}},
+  description={renders the given (uppercase) maths character in a calligraphic font},
+  note={maths mode kernel command},
   category={command}
 }
 
@@ -8545,6 +8585,77 @@ abbreviation by the \catattr{markwords} attribute},
   where the \meta{prefix} is obtained from the appropriate prefix
   field},
   note={provided by \styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@index{dgls,
+  name={\csfmt{dgls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={intended for documents with a mixture of 
+   single and dual entries, this is like \cs{gls} but tries to 
+   determine the label prefix from the label prefix list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
+  category={command}
+}
+
+@index{dglspl,
+  name={\csfmt{dglspl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={intended for documents with a mixture of 
+   single and dual entries, this is like \cs{glspl} but tries to 
+   determine the label prefix from the label prefix list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
+  category={command}
+}
+
+@index{dGls,
+  name={\csfmt{dGls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={intended for documents with a mixture of 
+   single and dual entries, this is like \cs{Gls} but tries to 
+   determine the label prefix from the label prefix list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
+  category={command}
+}
+
+@index{dGlspl,
+  name={\csfmt{dGlspl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={intended for documents with a mixture of 
+   single and dual entries, this is like \cs{Glspl} but tries to 
+   determine the label prefix from the label prefix list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
+  category={command}
+}
+
+@index{glsxtraddlabelprefix,
+  name={\csfmt{gls\-xtr\-add\-label\-prefix}},
+  user1={\margm{prefix}},
+  description={appends \meta{prefix} to the prefix label list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={dgls,glsxtrprependlabelprefix,glsxtrclearlabelprefixes},
+  category={command}
+}
+
+@index{glsxtrprependlabelprefix,
+  name={\csfmt{gls\-xtr\-prepend\-label\-prefix}},
+  user1={\margm{prefix}},
+  description={prepends \meta{prefix} to the prefix label list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={dgls,glsxtraddlabelprefix,glsxtrclearlabelprefixes},
+  category={command}
+}
+
+@index{glsxtrclearlabelprefixes,
+  name={\csfmt{gls\-xtr\-clear\-label\-prefixes}},
+  user1={\margm{prefix}},
+  description={clears the prefix label list},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
   category={command}
 }
 

@@ -21,6 +21,13 @@ v1.8 (pending):
 
   * Underscores now allowed in bib labels.
 
+  * Hooks added to pick up label prefixes if needed:
+
+     \bibglsprimaryprefixlabel
+     \bibglsdualprefixlabel
+     \bibglstertiaryprefixlabel
+     \bibglsexternalprefixlabel
+
   * bug fix: corrected default sort=doc
 
   * \@glsnavhypertarget will now fallback on original definition

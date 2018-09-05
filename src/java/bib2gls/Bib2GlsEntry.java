@@ -361,9 +361,15 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (object instanceof TeXCsRef)
          {
-            String csname = ((TeXCsRef)object).getName().toLowerCase();
+            String csname = ((TeXCsRef)object).getName();
+
+            String glsLikeLabelPrefix = bib2gls.getGlsLikePrefix(csname);
 
             boolean found = false;
+
+            csname = csname.toLowerCase();
+
+            boolean glslike = (glsLikeLabelPrefix != null || csname.matches("dgls(pl)?"));
 
             try
             {
@@ -512,7 +518,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   addDependency(label);
                }
-               else if (isGlsCsOptLabel(csname))
+               else if (isGlsCsOptLabel(csname) || glslike)
                {
                   found = (i==0);
 
@@ -595,18 +601,29 @@ public class Bib2GlsEntry extends BibEntry
                      label = arg.toString(parser);
                   }
 
-                  String newLabel = processLabel(label, true);
+                  // Don't replace the label for \dgls etc
+                  // or the \gls-like commands that may have the
+                  // prefix hidden from bib2gls.
 
-                  if (!label.equals(newLabel))
+                  if (!glslike)
                   {
-                     label = newLabel;
+                     String newLabel = processLabel(label, true);
 
-                     for ( ; i > start; i--)
+                     if (!label.equals(newLabel))
                      {
-                        list.remove(i);
-                     }
+                        label = newLabel;
 
-                     list.set(i, parser.getListener().createGroup(label));
+                        for ( ; i > start; i--)
+                        {
+                           list.remove(i);
+                        }
+
+                        list.set(i, parser.getListener().createGroup(label));
+                     }
+                  }
+                  else if (glsLikeLabelPrefix != null)
+                  {
+                     label = glsLikeLabelPrefix+label;
                   }
 
                   if (bib2gls.getVerboseLevel() > 0)
@@ -624,7 +641,8 @@ public class Bib2GlsEntry extends BibEntry
                      bib2gls.warning(parser, 
                        bib2gls.getMessage("warning.potential.nested.link",
                        getId(), fieldName,
-                       String.format("\\%s%s%s", csname, pre, opt),
+                       String.format("\\%s%s%s", ((TeXCsRef)object).getName(), 
+                         pre, opt),
                        label));
                   }
 
