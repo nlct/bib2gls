@@ -120,6 +120,9 @@
   strip-missing-parents
 ]
 
+\glsxtraddlabelprefix{}
+\glsxtraddlabelprefix{idx.}
+
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
 
 \IfFileExists{../java/Bib2Gls.java}
@@ -367,7 +370,11 @@
   {\glsdohyperlink{\glolinkprefix cs.idx.#1}{\glsentryname{idx.#1}}}%
 }
 
+\glsxtridentifyglslike{idx.}{\cs}
+
 \newcommand*{\ics}[2][]{\glsadd[#1]{idx.#2}\cs{#2}}
+
+\glsxtridentifyglslike{idx.}{\ics}
 
 \newcommand*{\icswithargs}[2][]{\glsadd[#1]{idx.#2}\cs{#2}\glsentryuseri{#2}}
 
@@ -8047,6 +8054,8 @@ group) to \idx{uppercase}. This uses the following rules:
 \item if \idx{mshiftchar}\meta{maths}\idx{mshiftchar} then stop (no case change);
 \item if \ics{NoCaseChange}\margm{text} or
 \ics{ensuremath}\margm{maths} or \ics{si}\margm{text} or \ics{protect} then skip;
+\item if \csfmt{}\meta{csname} is known to have a case-variant, then
+perform the appropriate substitution and stop;
 \item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
 \meta{text} and stop;
 \item if \csfmt{}\meta{csname} isn't followed by a group (and it's

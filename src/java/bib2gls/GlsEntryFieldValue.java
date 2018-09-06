@@ -65,10 +65,11 @@ public class GlsEntryFieldValue extends ControlSequence
       switch (caseChange)
       {
          case CASE_SENTENCE:
-           GlsResource.toSentenceCase(obj);
+           bib2gls.getCurrentResource().toSentenceCase(obj,
+             parser.getListener());
          break;
          case CASE_TO_UPPER:
-           GlsResource.toUpperCase(obj);
+           bib2gls.getCurrentResource().toUpperCase(obj);
          break;
       }
 

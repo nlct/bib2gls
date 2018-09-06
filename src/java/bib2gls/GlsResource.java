@@ -7519,7 +7519,7 @@ public class GlsResource
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
 
-   public static void toLowerCase(TeXObjectList list)
+   public void toLowerCase(TeXObjectList list)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -7566,7 +7566,7 @@ public class GlsResource
       }
    }
 
-   public static void toUpperCase(TeXObjectList list)
+   public void toUpperCase(TeXObjectList list)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -7617,7 +7617,7 @@ public class GlsResource
       }
    }
 
-   public static void toSentenceCase(TeXObjectList list)
+   public void toSentenceCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -7653,6 +7653,8 @@ public class GlsResource
 
             if (csname.equals("protect")) continue;
 
+            int csIdx = i;
+
             i++;
 
             while (i < n)
@@ -7668,24 +7670,177 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                || csname.equals("si") )
+                || csname.equals("si") || csname.equals("glsentrytitlecase"))
             {
                continue;
             }
 
-            // if a group follows the command, title case the group
-            // otherwise finish.
-
-            if (object instanceof Group && !(object instanceof MathGroup))
+            if (csname.equals("glshyperlink"))
             {
-               // title case argument
+               TeXObjectList subList = new TeXObjectList();
 
-               toSentenceCase((TeXObjectList)object);
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  TeXObject obj = list.get(i);
+
+                  while (!(obj instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == ']'))
+                  {
+                     subList.add(list.remove(i));
+
+                     if (i >= list.size()) break;
+
+                     obj = list.get(i);
+                  }
+
+                  toSentenceCase(subList, listener);
+               }
+               else
+               {// no optional argument
+                  subList.add(listener.getOther('['));
+                  subList.add(new TeXCsRef("Glsentrytext"));
+                  subList.add(new TeXCsRef("glslabel"));
+                  subList.add(listener.getOther(']'));
+               }
+
+               list.addAll(i, subList);
+
+               return;
+            }
+
+            String sentenceCsname = null;
+
+            if (csname.matches("d?gls(disp|link)"))
+            {
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  // skip optional argument
+
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     if (object instanceof CharObject 
+                            && ((CharObject)object).getCharCode() == ']')
+                     {
+                        break;
+                     }
+
+                     i++;
+                  }
+
+                  // skip ignoreables following optional argument
+
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     if (!(object instanceof Ignoreable))
+                     {
+                        break;
+                     }
+
+                     i++;
+                  }
+               }
+
+               // 'object' should now be label argument. Skip
+               // ignoreables to get text argument.
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+            }
+            else
+            {
+               sentenceCsname = getSentenceCsName(csname);
+            }
+
+            if (sentenceCsname == null)
+            {
+               // if a group follows the command, title case the group
+               // otherwise finish.
+
+               if (object instanceof Group && !(object instanceof MathGroup))
+               {
+                  // title case argument
+
+                  toSentenceCase((TeXObjectList)object, listener);
+               }
+            }
+            else
+            {
+               list.set(csIdx, new TeXCsRef(sentenceCsname));
             }
 
             return;
          }
       }
+   }
+
+   public String getSentenceCsName(String csname)
+   {
+      if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
+      {
+         return "G"+csname.substring(1);
+      }
+
+      if (csname.matches("acr(short|full|long)(pl)?")
+        || (bib2gls.checkAcroShortcuts() 
+           && csname.matches("ac(sp?|lp?|fp?)?"))
+        || (bib2gls.checkAbbrvShortcuts() 
+           && csname.matches("a[bslf]p?")))
+      {
+         return "A"+csname.substring(1);
+      }
+
+      if (csname.matches("[rdpc]gls(pl)?"))
+      {
+         return String.format("%cG%s", csname.charAt(0), csname.substring(2));
+      }
+
+      Matcher m = PATTERN_FIELD_CS.matcher(csname);
+
+      if (m.matches())
+      {
+         String tail = m.group(1);
+
+         if (bib2gls.isKnownField(tail) || tail.matches("full(pl)?"))
+         {
+            return "G"+csname.substring(1);
+         }
+      }
+
+      if (bib2gls.isGlsLike(csname))
+      {
+         int cp = csname.codePointAt(0);
+
+         int i = Character.charCount(cp);
+
+         String str = new String(Character.toChars(Character.toUpperCase(cp)));
+
+         if (i < csname.length())
+         {
+            str = String.format("%s%s", str, csname.substring(i));
+         }
+
+         if (bib2gls.isGlsLike(str))
+         {
+            return str;
+         }
+      }
+
+      return null;
    }
 
    public BibValueList applyCaseChange(TeXParser parser,
@@ -7735,7 +7890,7 @@ public class GlsResource
       }
       else if (change.equals("firstuc"))
       {
-         toSentenceCase(list);
+         toSentenceCase(list, parser.getListener());
       }
       else
       {
@@ -8376,6 +8531,9 @@ public class GlsResource
 
    private static final String PATTERN_FIELD_ID = "id";
    private static final String PATTERN_FIELD_ENTRY_TYPE = "entrytype";
+
+   private static final Pattern PATTERN_FIELD_CS = 
+       Pattern.compile("gls(?:entry|access|xtr|fmt)?(.+)");
 
    private Vector<Bib2GlsEntry> bibData;
 

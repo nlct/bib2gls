@@ -266,6 +266,11 @@ public class Bib2GlsEntry extends BibEntry
        || csname.equals("glsxtrlongpl") || csname.equals("glsps")
        || csname.equals("glspt") || csname.equals("glshyperlink"))
       {
+         if (csname.startsWith("acr"))
+         {
+// TODO: warn
+         }
+
          return true;
       }
       else if (bib2gls.checkAcroShortcuts() 

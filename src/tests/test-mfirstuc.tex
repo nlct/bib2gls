@@ -1,0 +1,17 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={test-mfirstuc},
+ description-case-change={firstuc}
+]
+
+\begin{document}
+\Gls{duck}, \gls{goose} and \gls{waterbird}.
+
+\printunsrtglossaries
+\end{document}

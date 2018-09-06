@@ -29,7 +29,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-indexplural.pdf test-include.pdf \
 	  test-primary-records.pdf test-primary-records-counter.pdf \
 	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf \
-	  test-dual2.pdf 
+	  test-dual2.pdf test-mfirstuc.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -537,6 +537,13 @@ test-dual2.pdf	: test-dual2.glstex
 test-dual2.glstex	: test-dual2.tex test-dual-mix2.bib $(DEPS)
 		pdflatex test-dual2
 		$(BIB2GLS) test-dual2
+
+test-mfirstuc.pdf	: test-mfirstuc.glstex
+		pdflatex test-mfirstuc
+
+test-mfirstuc.glstex	: test-mfirstuc.tex test-mfirstuc.bib $(DEPS)
+		pdflatex test-mfirstuc
+		$(BIB2GLS) test-mfirstuc
 
 clean	:
 	$(RM) *.aux

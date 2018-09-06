@@ -1491,8 +1491,12 @@ public class Bib2Gls implements TeXApp
                {
                   addGlsLike(prefix, "dgls");
                   addGlsLike(prefix, "dGls");
+                  addGlsLike(prefix, "dGLS");
                   addGlsLike(prefix, "dglspl");
                   addGlsLike(prefix, "dGlspl");
+                  addGlsLike(prefix, "dGLSpl");
+                  addGlsLike(prefix, "dglslink");
+                  addGlsLike(prefix, "dglsdisp");
                }
             }
          }
