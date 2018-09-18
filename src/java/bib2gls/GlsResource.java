@@ -7670,9 +7670,15 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                || csname.equals("si") || csname.equals("glsentrytitlecase"))
+                || csname.equals("si"))
             {
+//TODO return?
                continue;
+            }
+
+            if (csname.equals("glsentrytitlecase"))
+            {
+               return;
             }
 
             if (csname.equals("glshyperlink"))
@@ -7697,7 +7703,7 @@ public class GlsResource
                   toSentenceCase(subList, listener);
                }
                else
-               {// no optional argument
+               {// no optional argument, need to add one
                   subList.add(listener.getOther('['));
                   subList.add(new TeXCsRef("Glsentrytext"));
                   subList.add(new TeXCsRef("glslabel"));
