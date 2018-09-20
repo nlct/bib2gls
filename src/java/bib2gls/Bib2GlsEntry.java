@@ -778,6 +778,7 @@ public class Bib2GlsEntry extends BibEntry
 
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
       String[] protectFields = bib2gls.mfirstucProtectionFields();
+
       if (resource.changeShortCase())
       {
          BibValueList value = getField("short");
@@ -816,69 +817,18 @@ public class Bib2GlsEntry extends BibEntry
       String shortPluralSuffix = resource.getShortPluralSuffix();
       String dualShortPluralSuffix = resource.getDualShortPluralSuffix();
 
-      if (shortPluralSuffix != null)
-      {
-         BibValueList value = getField("shortplural");
+      appendShortPluralSuffix(parser, "short", "shortplural", 
+        shortPluralSuffix);
 
-         if (value == null)
-         {
-            value = getField("short");
-
-            if (value != null)
-            {
-               TeXObjectList newVal = (TeXObjectList)value.getContents(true);
-
-               BibValueList list = new BibValueList();
-
-               if (newVal != null)
-               {
-                  list.add(new BibUserString(newVal));
-               }
-
-               if (!shortPluralSuffix.isEmpty())
-               {
-                  list.add(new BibUserString(
-                   parser.getListener().createString(shortPluralSuffix)));
-               }
-
-               putField("shortplural", list);
-            }
-         }
-      }
-
-      if (dualShortPluralSuffix != null)
-      {
-         BibValueList value = getField("dualshortplural");
-
-         if (value == null)
-         {
-            value = getField("dualshort");
-
-            if (value != null)
-            {
-               TeXObjectList newVal = (TeXObjectList)value.getContents(true);
-
-               BibValueList list = new BibValueList();
-
-               if (newVal != null)
-               {
-                  list.add(new BibUserString(newVal));
-               }
-
-               if (!shortPluralSuffix.isEmpty())
-               {
-                  list.add(new BibUserString(
-                   parser.getListener().createString(dualShortPluralSuffix)));
-               }
-
-               putField("dualshortplural", list);
-            }
-         }
-      }
+      appendShortPluralSuffix(parser, "dualshort", "dualshortplural", 
+        dualShortPluralSuffix);
 
       if (resource.hasFieldCopies())
       {
          boolean override = resource.isReplicateOverrideOn();
+
+         boolean updateShortPlural = false;
+         boolean updateDualShortPlural = false;
 
          for (Iterator<String> it=resource.getFieldCopiesIterator();
               it.hasNext();)
@@ -895,10 +845,57 @@ public class Bib2GlsEntry extends BibEntry
                {
                   if (getField(dup) == null || override)
                   {
-                     putField(dup, (BibValueList)val.clone());
+                     BibValueList dupValue = (BibValueList)val.clone();
+
+                     if (dup.equals("description") 
+                          && resource.changeDescriptionCase())
+                     {
+                        dupValue = resource.applyDescriptionCaseChange(parser, 
+                          dupValue);
+                     }
+                     else if (dup.equals("short"))
+                     {
+                        if (resource.changeShortCase())
+                        {
+                           dupValue = resource.applyShortCaseChange(parser, 
+                             dupValue);
+                        }
+
+                        if (shortPluralSuffix != null)
+                        {
+                           updateShortPlural = true;
+                        }
+                     }
+                     else if (dup.equals("dualshort"))
+                     {
+                        if (resource.changeDualShortCase())
+                        {
+                           dupValue = resource.applyShortCaseChange(parser, 
+                             dupValue);
+                        }
+
+                        if (dualShortPluralSuffix != null)
+                        {
+                           updateDualShortPlural = true;
+                        }
+                     }
+
+                     putField(dup, dupValue);
                   }
                }
             }
+         }
+
+         if (updateShortPlural)
+         {
+            appendShortPluralSuffix(parser, "short", "shortplural", 
+              shortPluralSuffix);
+         }
+
+         if (updateDualShortPlural)
+         {
+            appendShortPluralSuffix(parser, "dualshort", "dualshortplural", 
+              dualShortPluralSuffix);
          }
       }
 
@@ -1120,6 +1117,34 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
       }
+   }
+
+   protected void appendShortPluralSuffix(TeXParser parser,
+     String shortField, String shortPluralField, String suffix)
+    throws IOException
+   {
+      if (suffix == null || suffix.isEmpty()) return;
+
+      BibValueList value = getField(shortPluralField);
+
+      if (value != null) return;
+
+      value = getField(shortField);
+
+      if (value == null) return;
+
+      TeXObjectList newVal = (TeXObjectList)value.getContents(true);
+
+      BibValueList list = new BibValueList();
+
+      if (newVal != null)
+      {
+         list.add(new BibUserString(newVal));
+      }
+
+      list.add(new BibUserString(parser.getListener().createString(suffix)));
+
+      putField(shortPluralField, list);
    }
 
    protected void changeNameCase(TeXParser parser)

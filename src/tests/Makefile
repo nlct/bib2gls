@@ -36,6 +36,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 
 test.pdf	: test.glstex
 		pdflatex test
+		pdflatex test
 
 test.glstex	: test.tex $(DEPS) test-entries.bib
 		pdflatex test
@@ -259,6 +260,7 @@ test-dual-entryabbrv.glstex	: test-dual-entryabbrv.tex $(DEPS) entries-dual-entr
 
 test-match-entrytype.pdf	: test-match-entrytype.glstex
 		pdflatex test-match-entrytype
+		pdflatex test-match-entrytype
 
 test-match-entrytype.glstex	: test-match-entrytype.tex $(DEPS) entries.bib
 		pdflatex test-match-entrytype
@@ -479,6 +481,7 @@ test-dualentryabbrv.glstex	: test-dualentryabbrv.tex entries-dualentryabbrv.bib 
 		$(BIB2GLS) test-dualentryabbrv
 
 test-indexcounter2.pdf	: test-indexcounter2.glstex
+		pdflatex test-indexcounter2
 		pdflatex test-indexcounter2
 
 test-indexcounter2.glstex	: test-indexcounter2.tex $(DEPS)
