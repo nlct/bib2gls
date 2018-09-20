@@ -7519,7 +7519,7 @@ public class GlsResource
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
 
-   public void toLowerCase(TeXObjectList list)
+   public void toLowerCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -7537,19 +7537,51 @@ public class GlsResource
          }
          else if (object instanceof TeXObjectList)
          {
-            toLowerCase((TeXObjectList)object);
+            toLowerCase((TeXObjectList)object, listener);
          }
          else if (object instanceof ControlSequence)
          {
             String csname = ((ControlSequence)object).getName();
 
-            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si"))
+            if (csname.equals("protect")) continue;
+
+            if (csname.equals("O") || csname.equals("L")
+               || csname.equals("AE") || csname.equals("OE")
+               || csname.equals("AA") || csname.equals("SS")
+               || csname.equals("NG") || csname.equals("TH"))
             {
-               // skip argument
+               list.set(i, new TeXCsRef(csname.toLowerCase()));
+               continue;
+            }
+
+            int csIdx = i;
+
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
 
                i++;
+            }
 
+            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
+                 || csname.equals("si") || csname.endsWith("ref"))
+            {
+               // skip argument
+            }
+
+            if (csname.equals("glsentrytitlecase"))
+            {
+               list.set(csIdx, new TeXCsRef("glsxtrusefield"));
+
+               // skip next argument as well
+               i++;
                while (i < n)
                {
                   object = list.get(i);
@@ -7560,6 +7592,117 @@ public class GlsResource
                   }
 
                   i++;
+               }
+            }
+            else if (csname.equals("glshyperlink"))
+            {
+               TeXObjectList subList = new TeXObjectList();
+
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  TeXObject obj = list.get(i);
+
+                  while (!(obj instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == ']'))
+                  {
+                     subList.add(list.remove(i));
+
+                     if (i >= list.size()) break;
+
+                     obj = list.get(i);
+                  }
+
+                  toLowerCase(subList, listener);
+               }
+               else
+               {// no optional argument, need to add one
+                  subList.add(listener.getOther('['));
+
+                  subList.add(new TeXCsRef("MakeTextLowercase"));
+
+                  Group arg = listener.createGroup();
+                  subList.add(arg);
+
+                  arg.add(new TeXCsRef("glsentrytext"));
+                  arg.add(new TeXCsRef("glslabel"));
+
+                  subList.add(listener.getOther(']'));
+               }
+
+               list.addAll(i, subList);
+            }
+            else
+            {
+               String lowerCsname = null;
+
+               if (csname.matches("d?gls(disp|link)"))
+               {
+                  if (object instanceof CharObject 
+                       && ((CharObject)object).getCharCode() == '[')
+                  {
+                     // skip optional argument
+   
+                     while (i < n)
+                     {
+                        object = list.get(i);
+   
+                        if (object instanceof CharObject 
+                               && ((CharObject)object).getCharCode() == ']')
+                        {
+                           break;
+                        }
+   
+                        i++;
+                     }
+   
+                     // skip ignoreables following optional argument
+   
+                     while (i < n)
+                     {
+                        object = list.get(i);
+   
+                        if (!(object instanceof Ignoreable))
+                        {
+                           break;
+                        }
+   
+                        i++;
+                     }
+                  }
+   
+                  // 'object' should now be label argument. Skip
+                  // ignoreables to get text argument.
+   
+                  while (i < n)
+                  {
+                     object = list.get(i);
+   
+                     if (!(object instanceof Ignoreable))
+                     {
+                        break;
+                     }
+   
+                     i++;
+                  }
+               }
+               else
+               {
+                  lowerCsname = getLowerCsName(csname);
+
+                  if (lowerCsname == null)
+                  {
+                     // ignore this command
+
+                     if (i > csIdx)
+                     {
+                        i--;
+                     }
+                  }
+                  else
+                  {
+                     list.set(csIdx, new TeXCsRef(lowerCsname));
+                  }
                }
             }
          }
@@ -7629,6 +7772,8 @@ public class GlsResource
             }
             else if (csname.equals("glsentrytitlecase"))
             { // skip next argument as well
+
+               list.set(csIdx, new TeXCsRef("GLSxtrusefield"));
 
                i++;
                while (i < n)
@@ -8016,6 +8161,45 @@ public class GlsResource
       return null;
    }
 
+   public String getLowerCsName(String csname)
+   {
+      if (csname.matches("(Gls|GLS)(pl|xtrshort|xtrlong|xtrfull|xtrp)?")
+        || csname.matches("[rdpc](Gls|GLS)(pl)?")
+        || csname.matches("(Acr|ACR)(short|full|long)(pl)?")
+        || (bib2gls.checkAcroShortcuts() 
+           && (csname.matches("Ac(sp?|lp?|fp?)?")
+               || csname.matches("AC(SP?|LP?|FP?)?")))
+        || (bib2gls.checkAbbrvShortcuts() 
+           && (csname.matches("A[bslf]p?") || csname.matches("A[BSLF]P?"))))
+      {
+         return csname.toLowerCase();
+      }
+
+      Matcher m = PATTERN_FIELD_CAP_CS.matcher(csname);
+
+      if (m.matches())
+      {
+         String tail = m.group(1);
+
+         if (bib2gls.isKnownField(tail) || tail.matches("full(pl)?"))
+         {
+            return csname.toLowerCase();
+         }
+      }
+
+      if (bib2gls.isGlsLike(csname))
+      {
+         String str = csname.toLowerCase();
+
+         if (bib2gls.isGlsLike(str))
+         {
+            return str;
+         }
+      }
+
+      return null;
+   }
+
    public String getAllCapsCsName(String csname)
    {
       if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
@@ -8115,7 +8299,7 @@ public class GlsResource
       }
       else if (change.equals("lc"))
       {
-         toLowerCase(list);
+         toLowerCase(list, parser.getListener());
       }
       else if (change.equals("uc"))
       {
@@ -8767,6 +8951,9 @@ public class GlsResource
 
    private static final Pattern PATTERN_FIELD_CS = 
        Pattern.compile("gls(?:entry|access|xtr|fmt)?(.+)");
+
+   private static final Pattern PATTERN_FIELD_CAP_CS = 
+       Pattern.compile("(Gls|GLS)(?:entry|access|xtr|fmt)?(.+)");
 
    private Vector<Bib2GlsEntry> bibData;
 

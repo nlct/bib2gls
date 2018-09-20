@@ -7,13 +7,16 @@
 
 \GlsXtrLoadResources[
  src={test-mfirstuc},
- description-case-change={firstuc},
+ %description-case-change={firstuc},
+ description-case-change={lc},
  replicate-fields={long=description}
 ]
 
 \begin{document}
 \Gls{duck}, \gls{goose} and \gls{waterbird}.
 \Gls{shtml}. \Gls{shtml}.
+
+\mfirstucMakeUppercase{\glsxtrusefield{duck}{name}}.
 
 \printunsrtglossaries
 \end{document}
