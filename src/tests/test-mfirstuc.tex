@@ -1,5 +1,5 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: {options: [--mfirstuc-protection, 'long,short,name']}
 % arara: pdflatex
 \documentclass{article}
 
@@ -7,11 +7,13 @@
 
 \GlsXtrLoadResources[
  src={test-mfirstuc},
- description-case-change={firstuc}
+ description-case-change={firstuc},
+ replicate-fields={long=description}
 ]
 
 \begin{document}
 \Gls{duck}, \gls{goose} and \gls{waterbird}.
+\Gls{shtml}. \Gls{shtml}.
 
 \printunsrtglossaries
 \end{document}

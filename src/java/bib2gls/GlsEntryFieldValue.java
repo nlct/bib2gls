@@ -69,7 +69,8 @@ public class GlsEntryFieldValue extends ControlSequence
              parser.getListener());
          break;
          case CASE_TO_UPPER:
-           bib2gls.getCurrentResource().toUpperCase(obj);
+           bib2gls.getCurrentResource().toUpperCase(obj,
+             parser.getListener());
          break;
       }
 

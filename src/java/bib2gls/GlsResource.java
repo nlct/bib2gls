@@ -7566,7 +7566,7 @@ public class GlsResource
       }
    }
 
-   public void toUpperCase(TeXObjectList list)
+   public void toUpperCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
@@ -7588,19 +7588,49 @@ public class GlsResource
          }
          else if (object instanceof TeXObjectList)
          {
-            toUpperCase((TeXObjectList)object);
+            toUpperCase((TeXObjectList)object, listener);
          }
          else if (object instanceof ControlSequence)
          {
             String csname = ((ControlSequence)object).getName();
 
+            if (csname.equals("protect")) continue;
+
+            if (csname.equals("o") || csname.equals("l")
+               || csname.equals("ae") || csname.equals("oe")
+               || csname.equals("aa") || csname.equals("ss")
+               || csname.equals("ng") || csname.equals("th"))
+            {
+               list.set(i, new TeXCsRef(csname.toUpperCase()));
+               continue;
+            }
+
+            int csIdx = i;
+
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
+
+               i++;
+            }
+
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si"))
+                 || csname.equals("si") || csname.endsWith("ref"))
             {
                // skip argument
 
-               i++;
+            }
+            else if (csname.equals("glsentrytitlecase"))
+            { // skip next argument as well
 
+               i++;
                while (i < n)
                {
                   object = list.get(i);
@@ -7611,6 +7641,127 @@ public class GlsResource
                   }
 
                   i++;
+               }
+            }
+            else if (csname.equals("glshyperlink"))
+            {
+               TeXObjectList subList = new TeXObjectList();
+
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  TeXObject obj = list.get(i);
+
+                  while (!(obj instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == ']'))
+                  {
+                     subList.add(list.remove(i));
+
+                     if (i >= list.size()) break;
+
+                     obj = list.get(i);
+                  }
+
+                  toUpperCase(subList, listener);
+               }
+               else
+               {// no optional argument, need to add one
+                  subList.add(listener.getOther('['));
+
+                  subList.add(new TeXCsRef("mfirstucMakeUppercase"));
+
+                  Group arg = listener.createGroup();
+                  subList.add(arg);
+
+                  arg.add(new TeXCsRef("glsentrytext"));
+                  arg.add(new TeXCsRef("glslabel"));
+
+                  subList.add(listener.getOther(']'));
+               }
+
+               list.addAll(i, subList);
+            }
+            else
+            {
+               String allcapsCSname = null;
+
+               if (csname.matches("d?gls(disp|link)"))
+               {
+                  if (object instanceof CharObject 
+                       && ((CharObject)object).getCharCode() == '[')
+                  {
+                     // skip optional argument
+   
+                     while (i < n)
+                     {
+                        object = list.get(i);
+   
+                        if (object instanceof CharObject 
+                               && ((CharObject)object).getCharCode() == ']')
+                        {
+                           break;
+                        }
+   
+                        i++;
+                     }
+   
+                     // skip ignoreables following optional argument
+   
+                     while (i < n)
+                     {
+                        object = list.get(i);
+   
+                        if (!(object instanceof Ignoreable))
+                        {
+                           break;
+                        }
+   
+                        i++;
+                     }
+                  }
+   
+                  // 'object' should now be label argument. Skip
+                  // ignoreables to get text argument.
+   
+                  while (i < n)
+                  {
+                     object = list.get(i);
+   
+                     if (!(object instanceof Ignoreable))
+                     {
+                        break;
+                     }
+   
+                     i++;
+                  }
+               }
+               else if (csname.matches("glsp[st]"))
+               {
+                  // need to replace \glsps{label} with \GLSxtrp{short}{label}
+                  // and \glspt{label} with \GLSxtrp{text}{label}
+   
+                  list.set(csIdx, new TeXCsRef("GLSxtrp"));
+   
+                  list.add(i, listener.createGroup(
+                   csname.endsWith("s") ? "short" : "text"));
+               }
+               else
+               {
+                  allcapsCSname = getAllCapsCsName(csname);
+
+                  if (allcapsCSname == null)
+                  {
+                     // ignore this command
+
+                     if (i > csIdx)
+                     {
+                        i--;
+                     }
+                  }
+                  else
+                  {
+                     list.set(csIdx, new TeXCsRef(allcapsCSname));
+                  }
                }
             }
          }
@@ -7643,7 +7794,7 @@ public class GlsResource
          {
             // upper case group contents
 
-            toUpperCase((TeXObjectList)object);
+            toUpperCase((TeXObjectList)object, listener);
 
             return;
          }
@@ -7652,6 +7803,15 @@ public class GlsResource
             String csname = ((ControlSequence)object).getName();
 
             if (csname.equals("protect")) continue;
+
+            if (csname.equals("o") || csname.equals("l")
+               || csname.equals("ae") || csname.equals("oe")
+               || csname.equals("aa") || csname.equals("ss")
+               || csname.equals("ng") || csname.equals("th"))
+            {
+               list.set(i, new TeXCsRef(csname.toUpperCase()));
+               return;
+            }
 
             int csIdx = i;
 
@@ -7670,13 +7830,8 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                || csname.equals("si"))
-            {
-//TODO return?
-               continue;
-            }
-
-            if (csname.equals("glsentrytitlecase"))
+                || csname.equals("si") || csname.endsWith("ref")
+                || csname.equals("glsentrytitlecase"))
             {
                return;
             }
@@ -7767,6 +7922,18 @@ public class GlsResource
                   i++;
                }
             }
+            else if (csname.matches("glsp[st]"))
+            {
+               // need to replace \glsps{label} with \Glsxtrp{short}{label}
+               // and \glspt{label} with \Glsxtrp{text}{label}
+
+               list.set(csIdx, new TeXCsRef("Glsxtrp"));
+
+               list.add(i, listener.createGroup(
+                csname.endsWith("s") ? "short" : "text"));
+
+               return;
+            }
             else
             {
                sentenceCsname = getSentenceCsName(csname);
@@ -7849,6 +8016,66 @@ public class GlsResource
       return null;
    }
 
+   public String getAllCapsCsName(String csname)
+   {
+      if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
+      {
+         return "GLS"+csname.substring(3);
+      }
+
+      if (csname.matches("acr(short|full|long)(pl)?"))
+      {
+         return "ACR"+csname.substring(3);
+      }
+
+      if ((bib2gls.checkAcroShortcuts() 
+           && csname.matches("ac(sp?|lp?|fp?)?"))
+        || (bib2gls.checkAbbrvShortcuts() 
+           && csname.matches("a[bslf]p?")))
+      {
+         return csname.toUpperCase();
+      }
+
+      if (csname.matches("[rdpc]gls(pl)?"))
+      {
+         return String.format("%cGLS%s", csname.charAt(0), csname.substring(4));
+      }
+
+      Matcher m = PATTERN_FIELD_CS.matcher(csname);
+
+      if (m.matches())
+      {
+         String tail = m.group(1);
+
+         if (bib2gls.isKnownField(tail) || tail.matches("full(pl)?"))
+         {
+            return "GLS"+csname.substring(3);
+         }
+      }
+
+      if (bib2gls.isGlsLike(csname))
+      {
+         String str = csname.toUpperCase();
+
+         if (bib2gls.isGlsLike(str))
+         {
+            return str;
+         }
+
+         if (csname.endsWith("pl"))
+         {
+            str = csname.substring(0, csname.length()-2).toUpperCase()+"pl";
+
+            if (bib2gls.isGlsLike(str))
+            {
+               return str;
+            }
+         }
+      }
+
+      return null;
+   }
+
    public BibValueList applyCaseChange(TeXParser parser,
       BibValueList value, String change)
     throws IOException
@@ -7892,7 +8119,7 @@ public class GlsResource
       }
       else if (change.equals("uc"))
       {
-         toUpperCase(list);
+         toUpperCase(list, parser.getListener());
       }
       else if (change.equals("firstuc"))
       {

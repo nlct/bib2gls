@@ -316,6 +316,7 @@ Falling back on ID.</entry>
 <entry key="warning.cant.parse.datetime.pattern">Can''t parse {0} value ''{1}'' (pattern: ''{2}'')</entry>
 <entry key="warning.deprecated.type">Entry type ''{0}'' deprecated. Use ''{1}'' instead.</entry>
 <entry key="warning.deprecated.option">Option ''{0}'' deprecated. Use ''{1}'' instead.</entry>
+<entry key="warning.deprecated.cs">Command ''{0}'' deprecated. Use ''{1}'' instead.</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
 <entry key="warning.potential.nested.link">Entry ''{0}'' has potentially nested link text in field: {1}
 Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry>
