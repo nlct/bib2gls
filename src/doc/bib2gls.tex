@@ -1988,7 +1988,6 @@ bib2gls \oargm{options} \meta{filename}
 \end{alltt}
 where \meta{filename} is the name of the \ext{aux} file. (The
 extension may be omitted.) Only one \meta{filename} is permitted.
-
 Available options are listed below.
 
 \argsection{help}
@@ -2048,7 +2047,7 @@ Sets the name of the transcript file. By default, the name is the
 same as the \iext{aux} file but with a \iext{glg} extension. Note that
 if you use \bibgls\ in combination with \idx{xindy} or
 \idx{makeindex}, you will need to change the transcript file name to
-prevent interference.
+prevent conflict.
 
 \argsection{dir}
 
@@ -2064,9 +2063,9 @@ then you need to take care how you invoke \bibgls.
 Suppose I have a file called \filefmt{test-entries.bib} that
 contains my entry definitions and a document called
 \filefmt{mydoc.tex} that selects the \ext{bib} file using:
-\begin{verbatim}
-\GlsXtrLoadResources[src={test-entries}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[test-entries]{src}}
+\end{codeenv}
 (\filefmt{test-entries.bib} is in the same directory as
 \filefmt{mydoc.tex}).
 If I compile this document using
@@ -2076,9 +2075,9 @@ pdflatex -output-directory tmp mydoc
 then the auxiliary file \filefmt{mydoc.aux} will be written to the
 \filefmt{tmp} sub-directory. The resource information is listed in
 the \ext{aux} file as
-\begin{verbatim}
-\glsxtr@resource{src={test-entries}}{mydoc}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@resource}\marg{\csopt[test-entries]{src}}\marg{mydoc}
+\end{codeenv}
 If I run \bibgls\ from the \filefmt{tmp} directory, then it won't
 be able to find the \filefmt{test-entries.bib} file (since it's in
 the parent directory).
@@ -2089,7 +2088,7 @@ using
 bib2gls tmp/mydoc
 \end{verbatim}
 then the \ext{aux} file is found and the transcript file is
-\filefmt{tmp/mydoc.glg} (since the default is the same as the
+\filefmt{tmp/mydoc.glg} (since the default path name is the same as the
 \ext{aux} file but with the extension changed to \iext{glg}) but the
 output file \filefmt{mydoc.glstex} will be written to the current
 directory.
@@ -2125,14 +2124,13 @@ space.
 
 \argsection{cite-as-record}
 
-Treat instances of \ics{citation}\margm{label} found in the 
+Treat instances of \code{\ics{citation}\margm{label}} found in the 
 \ext{aux} file as though it was actually an \idx{ignoredrecord}:
 \begin{codeenv}
 \gls{glsxtr@record}\margm{label}\marg{}\marg{page}\marg{glsignore}\marg{}
 \end{codeenv}
 Note that \code{\cs{citation}\marg{*}} will always be skipped. Use
 \csopt[all]{selection} to select all entries.
-
 This switch is most useful in conjunction with
 \atentrypageref{bibtexentry}.
 
@@ -2158,7 +2156,7 @@ but they will link to different parts of the page.
 
 The \styopt[nameref]{record} package option (introduced to 
 \sty{glossaries-extra} version 1.37) provides extra information
-in the record when indexing, obtained from \ics{@currentlabelname}
+in the record when indexing, obtained from \ics{@currentlabelname},
 \ics{@currentHref} and \ics{theHentrycounter}. Instead of writing the record as:
 \begin{codeenv}
 \format{glsxtr@record}
@@ -2166,7 +2164,9 @@ in the record when indexing, obtained from \ics{@currentlabelname}
 the record is written as:
 \nosecdef{glsxtr@record@nameref}
 If \isty{hyperref} hasn't been loaded \meta{title} and \meta{href}
-will always be empty. The most reliable target is \meta{hcounter},
+will always be empty. The most reliable target is given by
+\code{\meta{counter}.\meta{hcounter}}, where \meta{counter} is the
+associated counter name and \meta{hcounter} is
 obtained from \cs{theHentrycounter}, which is set to the hyper
 target command \csfmt{theH}\meta{counter} during indexing. Since
 this information can't be included in the location when indexing
@@ -2229,12 +2229,12 @@ The mode will be enabled if applicable (see
 
 \argsection{support-unicode-script}
 
-Text superscript (\cs{textsuperscript}) and subscript
-(\cs{textsubscript}) will use Unicode super/subscript characters
+Text superscript (\ics{textsuperscript}) and subscript
+(\ics{textsubscript}) will use Unicode super/subscript characters
 if available (default). For example,
-\begin{verbatim}
-\textsuperscript{(2)}
-\end{verbatim}
+\begin{codeenv}
+\cs{textsuperscript}\marg{(2)}
+\end{codeenv}
 will be converted to \code{\textsuperscript{(2)}}, which consists
 of: \hex{207D} (superscript left parenthesis)
 \hex{00B2} (superscript two) \hex{207E} (superscript right
@@ -2242,9 +2242,9 @@ parenthesis). If the entire contents of the argument can't be
 represented by Unicode characters, the interpreter uses \verb|<sup>|
 and \verb|<sub>| markup, which is then stripped by \bibgls. For
 example,
-\begin{verbatim}
-\textsuperscript{(2,3)}
-\end{verbatim}
+\begin{codeenv}
+\cs{textsuperscript}\marg{(2,3)}
+\end{codeenv}
 will be converted to
 \begin{verbatim}
 <sup>(2,3)</sup>
@@ -2266,9 +2266,9 @@ Text superscript (\cs{textsuperscript}) and subscript
 Note that if other commands are provided that expand to Unicode
 superscript or subscript characters, then they won't be affected by
 this setting. For example, if \csfmt{superiortwo} is defined as
-\begin{verbatim}
-\providecommand{\superiortwo}{\char"B2}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\cmd{superiortwo}}\marg{\cs{char}"B2}
+\end{codeenv}
 then it will be interpreted as \hex{00B2} (superscript two) even if
 this setting is on.
 
@@ -2362,24 +2362,26 @@ the command can't be replaced) is to insert an empty group in front
 of it.
 
 For example, the following definition
-\begin{verbatim}
-\newabbreviation{shtml}{shtml}{\glsps{ssi} enabled \glsps{short}{html}}
-\end{verbatim}
-will cause a problem for \verb|\Gls{shtml}| on first use.
-
-The above example, would be written in a \ext{bib} file as:
-\begin{verbatim}
-@abbreviation{shtml,
-  short={shtml},
-  long={\glsps{ssi} enabled \glsps{html}}
+\begin{codeenv}
+\gls{newabbreviation}\marg{shtml}\marg{shtml}\marg{\ics{glsps}\marg{ssi} enabled \cs{glsps}\marg{short}\marg{html}}
+\end{codeenv}
+will cause a problem for \code{\cs{Gls}\marg{shtml}} on first use.
+The above example would be written in a \ext{bib} file as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{shtml,
+  \field{short}=\marg{shtml},
+  \field{long}=\marg{\cs{glsps}\marg{ssi} enabled \cs{glsps}\marg{html}}
 }
-\end{verbatim}
+\end{codeenv}
+The default \sty{mfirstuc} protection will automatically insert an empty
+group before \code{\cs{glsps}\marg{ssi}} when writing the definition
+in the \ext{glstex} file.
 
-The argument should either be a comma-separated list of fields or
-the keyword \code{all} (which indicates all fields).
-\bibgls\ will automatically insert an empty group at the
-start of the listed fields that start with a problematic command,
-and a warning will be written to the transcript. Unknown fields are
+The argument for this switch should either be a comma-separated list
+of fields or the keyword \code{all} (which indicates all fields).
+\bibgls\ will automatically insert an empty group at the start of
+the listed fields that start with a problematic command, and a
+warning will be written to the transcript. Unknown fields are
 skipped even if they're included in the list. An empty argument is
 equivalent to \longarg{no-mfirstuc-protection}. The default value is
 \code{all}.

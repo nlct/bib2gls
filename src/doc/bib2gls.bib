@@ -3994,12 +3994,12 @@ hyphen}},
   user1={\meta{value}},
   description={unless the value is \styoptfmt{off}, this option sets
   up \styfmt{glossaries-extra} for use with \bibgls: \styoptfmt{only}
-  (assumed if no \meta{value} supplied, indexing performed by
-  \bibgls), \styoptfmt{nameref} (\sty{glossaries-extra} v1.37+) 
-  like \styoptfmt{only} but includes extra information in the records, and 
-  \styoptfmt{alsoindex} (\bibgls\ is used to provide
+  (assumed if no \meta{value} supplied) indexing is performed by
+  \bibgls; \styoptfmt{nameref} (\sty{glossaries-extra} v1.37+) 
+  like \styoptfmt{only} but includes extra information in the records; 
+  \styoptfmt{alsoindex} (hybrid method) \bibgls\ is used to provide
   the entry definitions but \idx{makeindex} or \idx{xindy} is used
-  for the indexing)},
+  for the indexing},
   package={glossaries-extra},
   category={packageoption},
   parent={packageoptions}
@@ -7949,6 +7949,22 @@ option},
   name={\csfmt{glsxtrp}},
   user1={\margm{field}\margm{label}},
   description={displays the given field for the entry given by label},
+  note={provided by \styfmt{glossaries-extra} v1.07+},
+  category={command}
+}
+
+@index{glsps,
+  name={\csfmt{glsps}},
+  user1={\margm{label}},
+  description={shortcut for \code{\cs{glsxtrp}\marg{short}\margm{label}}},
+  note={provided by \styfmt{glossaries-extra} v1.07+},
+  category={command}
+}
+
+@index{glspt,
+  name={\csfmt{glspt}},
+  user1={\margm{label}},
+  description={shortcut for \code{\cs{glsxtrp}\marg{text}\margm{label}}},
   note={provided by \styfmt{glossaries-extra} v1.07+},
   category={command}
 }
