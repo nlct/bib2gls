@@ -268,7 +268,8 @@ public class Bib2GlsEntry extends BibEntry
       {
          if (csname.startsWith("acr"))
          {
-// TODO: warn
+            bib2gls.warningMessage("warning.deprecated.cs",
+             csname, "glsxtr"+csname.substring(3));
          }
 
          return true;
