@@ -5455,6 +5455,8 @@ public class GlsResource
 
          writeLabelPrefixHooks(writer);
 
+         writeAllCapsCsDefs(writer);
+
          if (triggerType != null)
          {
             writer.format("\\provideignoredglossary*{%s}%n", triggerType);
@@ -6534,6 +6536,30 @@ public class GlsResource
 
    }
 
+   private void writeAllCapsCsDefs(PrintWriter writer)
+      throws IOException
+   {
+      if (allCapsEntryField != null)
+      {
+         for (String field : allCapsEntryField)
+         {
+            writer.format("\\providecommand{\\GLSentry%s}[1]{%%%n", field);
+            writer.format("  \\mfirstucMakeUppercase{\\glsentry%s{#1}}%%%n", field);
+            writer.println("}");
+         }
+      }
+
+      if (allCapsAccessField != null)
+      {
+         for (String field : allCapsAccessField)
+         {
+            writer.format("\\providecommand{\\GLSaccess%s}[1]{%%%n", field);
+            writer.format("  \\mfirstucMakeUppercase{\\glsaccess%s{#1}}%%%n", field);
+            writer.println("}");
+         }
+      }
+   }
+
    private void writeLabelPrefixHooks(PrintWriter writer)
       throws IOException
    {
@@ -7598,6 +7624,9 @@ public class GlsResource
             {
                TeXObjectList subList = new TeXObjectList();
 
+               // Convert contents of optional argument to lower
+               // case, if present.
+
                if (object instanceof CharObject 
                     && ((CharObject)object).getCharCode() == '[')
                {
@@ -7614,23 +7643,9 @@ public class GlsResource
                   }
 
                   toLowerCase(subList, listener);
+
+                  list.addAll(i, subList);
                }
-               else
-               {// no optional argument, need to add one
-                  subList.add(listener.getOther('['));
-
-                  subList.add(new TeXCsRef("MakeTextLowercase"));
-
-                  Group arg = listener.createGroup();
-                  subList.add(arg);
-
-                  arg.add(new TeXCsRef("glsentrytext"));
-                  arg.add(new TeXCsRef("glslabel"));
-
-                  subList.add(listener.getOther(']'));
-               }
-
-               list.addAll(i, subList);
             }
             else
             {
@@ -7808,6 +7823,8 @@ public class GlsResource
                   }
 
                   toUpperCase(subList, listener);
+
+                  list.addAll(i, subList);
                }
                else
                {// no optional argument, need to add one
@@ -7822,9 +7839,13 @@ public class GlsResource
                   arg.add(new TeXCsRef("glslabel"));
 
                   subList.add(listener.getOther(']'));
-               }
 
-               list.addAll(i, subList);
+                  list.addAll(i, subList);
+
+                  i += 4;
+
+                  n = list.size();
+               }
             }
             else
             {
@@ -7889,6 +7910,22 @@ public class GlsResource
    
                   list.add(i, listener.createGroup(
                    csname.endsWith("s") ? "short" : "text"));
+
+                  n = list.size();
+
+                  // skip next argument
+                  i++;
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     if (!(object instanceof Ignoreable))
+                     {
+                        break;
+                     }
+
+                     i++;
+                  }
                }
                else
                {
@@ -8202,6 +8239,8 @@ public class GlsResource
 
    public String getAllCapsCsName(String csname)
    {
+      csname = csname.toLowerCase();
+
       if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
       {
          return "GLS"+csname.substring(3);
@@ -8231,8 +8270,26 @@ public class GlsResource
       {
          String tail = m.group(1);
 
-         if (bib2gls.isKnownField(tail) || tail.matches("full(pl)?"))
+         boolean isKnown = bib2gls.isKnownField(tail);
+
+         if (isKnown || tail.matches("full(pl)?"))
          {
+            // This can result in commands like \GLSentrytext, which
+            // aren't provided. The simplest method is to just
+            // provide these commands in the .glstex file.
+
+            if (isKnown)
+            {
+               if (csname.startsWith("glsentry"))
+               {
+                  provideAllCapsEntryCs(tail);
+               }
+               else if (csname.startsWith("glsaccess"))
+               {
+                  provideAllCapsAccessCs(tail);
+               }
+            }
+
             return "GLS"+csname.substring(3);
          }
       }
@@ -8258,6 +8315,32 @@ public class GlsResource
       }
 
       return null;
+   }
+
+   private void provideAllCapsEntryCs(String field)
+   {
+      if (allCapsEntryField == null)
+      {
+         allCapsEntryField = new Vector<String>();
+      }
+
+      if (!allCapsEntryField.contains(field))
+      {
+         allCapsEntryField.add(field);
+      }
+   }
+
+   private void provideAllCapsAccessCs(String field)
+   {
+      if (allCapsAccessField == null)
+      {
+         allCapsAccessField = new Vector<String>();
+      }
+
+      if (!allCapsAccessField.contains(field))
+      {
+         allCapsAccessField.add(field);
+      }
    }
 
    public BibValueList applyCaseChange(TeXParser parser,
@@ -8954,6 +9037,9 @@ public class GlsResource
 
    private static final Pattern PATTERN_FIELD_CAP_CS = 
        Pattern.compile("(Gls|GLS)(?:entry|access|xtr|fmt)?(.+)");
+
+   private Vector<String> allCapsEntryField=null;
+   private Vector<String> allCapsAccessField=null;
 
    private Vector<Bib2GlsEntry> bibData;
 
