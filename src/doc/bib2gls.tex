@@ -774,6 +774,7 @@ files}
    \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
    \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
    \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
+   \parindent\z@\parfillskip\@flushglue\parskip\z@skip
  }
  {\end{flushleft}\ignorespacesafterend}
 
@@ -2470,11 +2471,11 @@ range takes precedence.
 The mapping tests are applied as the records are
 read. For example, suppose the records are listed in the \ext{aux}
 file as:
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{emph}{3}
-\glsxtr@record{gls.sample}{}{page}{hypersf}{3}
-\glsxtr@record{gls.sample}{}{page}{hyperbf}{3}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{emph}}\marg{3}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{hypersf}}\marg{3}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{hyperbf}}\marg{3}
+\end{codeenv}
 and \bibgls\ is invoked with
 \begin{verbatim}
 bib2gls --map-format "emph:hyperbf,hypersf:hyperit" mydoc
@@ -2671,19 +2672,19 @@ the glossary type then it will fallback on the original method
 which requires an extra \LaTeX\ run.
 
 For example:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,abbreviations,style=indexhypergroup]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries},% data in entries.bib
-  type={main}% put these entries in the 'main' glossary
-]
-
-\GlsXtrLoadResources[src={abbrvs},% data in abbrvs.bib
-  type={abbreviations}% put these entries in the 'abbreviations' glossary
-]
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt[indexhypergroup]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[main]{type}\comment{put these entries in the 'main' glossary}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbrvs]{src},\comment{data in abbrvs.bib}
+  \csopt[abbreviations]{type}\comment{put entries in the 'abbreviations' glossary}
+}
+\end{codeenv}
 Here the \csopt{type} is set and \bibgls\ can detect that
 \isty{hyperref} has been loaded, so if the \longargfmt{group} switch
 is used, then the group hyperlinks can be set (using
@@ -2705,15 +2706,14 @@ isn't used or the \field{type} isn't set or your version of
 the \ext{glstex} file.
 
 For example:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,abbreviations,style=indexhypergroup]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries}]% data in entries.bib
-
-\GlsXtrLoadResources[src={abbrvs}]% data in abbrvs.bib
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt[indexhypergroup]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}\comment{data in entries.bib}
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbrvs]{src}}\comment{data in abbrvs.bib}
+\end{codeenv}
 This requires the build process:
 \begin{verbatim}
 pdflatex myDoc
@@ -2743,11 +2743,11 @@ recognised by Java. For example, \code{utf8} will be mapped to
 \styfmt{glossaries-extra} will assume the encoding is \code{utf8} and
 write that value to the \ext{aux} file.
 
-If neither package has been loaded, \bibgls\ will assume the
-operating system's default encoding. If this is incorrect or if
-\bibgls\ can't work out the appropriate mapping then you can specify
-the correct encoding using \longargfmt{tex-encoding} \meta{name}
-where \meta{name} is the encoding name (such as \code{UTF-8}).
+If neither package has been loaded, \bibgls\ will assume the \idx{JVM}['s]
+default encoding (identified by the \code{file.encoding} property). If this is
+incorrect or if \bibgls\ can't work out the appropriate mapping then you can
+specify the correct encoding using \longargfmt{tex-encoding} \meta{name} where
+\meta{name} is the encoding name (such as \code{UTF-8}).
 
 If you have a problem with non-ASCII characters not displaying
 correctly in your document:
@@ -2799,14 +2799,14 @@ before the entries are defined (that is, before using
 
 Trim leading and trailing spaces from field values. For example,
 if the \ext{bib} file contains:
-\begin{verbatim}
-@entry{sample,
-  name = { sample },
-  description = {
+\begin{codeenv}
+\atentry{entry}\marg{sample,
+  \field{name} = \marg{ sample },
+  \field{description} = \marg{
     an example
   }
 }
-\end{verbatim}
+\end{codeenv}
 This will cause spurious spaces. Using \longarg{trim-fields} will
 automatically trim the values before writing the \iext{glstex} file.
 
@@ -2856,15 +2856,15 @@ to \gls{rgls}, so that you can continue to use \ics{gls}
 without having to switch command name.
 
 For example:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=abbrevs,% entries defined in abbrevs.bib
- trigger-type=ignored,
- category=abbreviation
-]
-\glsxtrenablerecordcount
-\GlsXtrSetRecordCountAttribute{abbreviation}{1}
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[abbrevs]{src},\comment{entries defined in abbrevs.bib}
+ \csopt[ignored]{trigger-type},
+ \csopt[abbreviation]{category}
+}
+\cs{glsxtrenablerecordcount}
+\gls{GlsXtrSetRecordCountAttribute}\marg{abbreviation}\marg{1}
+\end{codeenv}
 See the \sty{glossaries-extra} user manual~\cite{glossaries-extra} 
 for further details.
 
@@ -2902,9 +2902,11 @@ Entries are defined in the usual \ext{bib} format:
 where \meta{entry-type} is the entry type (listed below),
 \meta{field-name-1}, \ldots, \meta{field-name-n} are the field names and
 \meta{id} is a unique label. The label can't contain any spaces or
-commas. In general it's best to stick with alpha-numeric labels.
-The field values may be delimited by braces \margm{text} or
-double-quotes \code{"\meta{text}"}.
+commas, and most special characters are forbidden. The hyphen character and
+some other punctuation characters are allowed by \bibgls, but you need to make 
+sure that your document hasn't made them active. In general it's best to
+stick with alpha-numeric labels.  The field values may be delimited by braces
+\margm{text} or double-quotes \code{"\meta{text}"}.
 
 The \csopt{label-prefix} option can be used to instruct \bibgls\ to
 insert prefixes to the labels (\meta{id}) when the data is read.
@@ -3079,9 +3081,9 @@ Provided by \isty{glossaries-accsupp}}
 Don't load \isty{glossaries-accsupp} directly (with \csfmt{usepackage}) when using
 \styfmt{glossaries-extra}. Load using the \styopt{accsupp} package
 option instead.
-\begin{verbatim}
-\usepackage[record,accsupp]{glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
+\end{codeenv}
 \end{table}
 
 \begin{table}[hbtp]
@@ -3123,26 +3125,26 @@ variables that may be used in field values. Don't include braces or
 double-quote delimiters when referencing a variable. You can use
 \idx{stringconcat} to concatenate strings.
 For example:
-\begin{verbatim}
-@string{ssi={server-side includes}}
-@string{html={hypertext markup language}}
-
-@abbreviation{shtml,
-  short="shtml",
-  long=ssi # " enabled " # html,
-  see={ssi,html}
+\begin{codeenv}
+\atentry{string}\marg{ssi=\marg{server-side includes}}
+\atentry{string}\marg{html=\marg{hypertext markup language}}
+\strut
+\atentry{abbreviation}\marg{shtml,
+  \field{short}="shtml",
+  \field{long}=ssi \idx{stringconcat} " enabled " \idx{stringconcat} html,
+  \field{see}=\marg{ssi,html}
 }
-
-@abbreviation{html,
-  short="html",
-  long=html
+\strut
+\atentry{abbreviation}\marg{html,
+  \field{short}="html",
+  \field{long}=html
 }
-
-@abbreviation{ssi,
-  short="ssi",
-  long=ssi
+\strut
+\atentry{abbreviation}\marg{ssi,
+  \field{short}="ssi",
+  \field{long}=ssi
 }
-\end{verbatim}
+\end{codeenv}
 Note the difference between \code{="ssi"} (a field value delimited by
 double-quotes), the undelimited \code{=ssi} (a reference to the
 variable), the grouped \code{=\marg{ssi,html}} (a field value
@@ -3153,15 +3155,15 @@ delimited by braces) and \code{ssi} the entry label.
 The standard \atentry{preamble} is available and can be used to
 provide command definitions used within field values.
 For example:
-\begin{verbatim}
-@preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
-
-@entry{matrix,
-  name={matrix},
-  plural={matrices},
-  description={rectangular array of values, denoted $\mtx{M}$}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}"}
+\strut
+\atentry{entry}\marg{matrix,
+  \field{name}=\marg{matrix},
+  \field{plural}=\marg{matrices},
+  \field{description}=\marg{rectangular array of values, denoted \idx{mshiftchar}\cmd{mtx}\marg{M}\idx{mshiftchar}}
 }
-\end{verbatim}
+\end{codeenv}
 Alternatively you can use \ics{glsxtrprovidecommand} which behaves
 the same as \ics{providecommand} within the document but behaves
 like \ics{renewcommand} within \bibgls, which allows you to change
@@ -3175,21 +3177,21 @@ The \TeX\ parser library used by \bibgls\ will parse the contents of
 as a fallback when \field{sort} is omitted (unless
 \csopt[false]{interpret-preamble} is set in the resource options).
 For example:
-\begin{verbatim}
-@preamble{"\providecommand{\set}[1]{\mathcal{#1}}
-\providecommand{\card}[1]{|\set{#1}|}"}
-
-@entry{S,
-  name={{}$\set{S}$},
-  text={\set{S}},
-  description={a set}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}"}
+\strut
+\atentry{entry}\marg{S,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{set}\marg{S}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{set}\marg{S}},
+  \field{description}=\marg{a set}
 }
-@entry{card,
-  name={{}$\card{S}$},
-  text={\card{S}},
-  description={the cardinality of \gls{S}}
+\atentry{entry}\marg{card,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{card}\marg{S}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{card}\marg{S}},
+  \field{description}=\marg{the cardinality of \cs{gls}\marg{S}}
 }
-\end{verbatim}
+\end{codeenv}
 Neither entry has the \field{sort} field, so \bibgls\ has to fall
 back on the \field{name} field and, since this contains the special
 characters \idx{escchar} (backslash), \idx{mshiftchar} (maths
@@ -3213,17 +3215,17 @@ interpret the \field{name} fields.
 
 \item Define the commands in both the document and in
 \atentry{preamble}. For example:
-\begin{verbatim}
-\newcommand{\set}[1]{\mathcal{#1}}
-\newcommand{\card}[1]{|\set{#1}|}
-\GlsXtrLoadResources[src={my-data}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{newcommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}
+\gls{GlsXtrLoadResources}\oarg{\csopt[my-data]{src}}
+\end{codeenv}
 Alternatively:
-\begin{verbatim}
-\GlsXtrLoadResources[src={my-data}]
-\providecommand{\set}[1]{\mathcal{#1}}
-\providecommand{\card}[1]{|\set{#1}|}
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[my-data]{src}}
+\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}
+\end{codeenv}
 If the provided definitions match those given in the \ext{bib} file,
 there's no difference. If they don't match then in the first example 
 the document definitions will take precedence (but the interpreter
@@ -3236,23 +3238,23 @@ The default is the \field{user1} field, but this can be changed to
 another field by redefining \ics{GlsXtrFmtField}.
 
 The \ext{bib} file can now look like this:
-\begin{verbatim}
-@preamble{"\providecommand{\set}[1]{\mathcal{#1}}
-\providecommand{\card}[1]{|\set{#1}|}"}
-
-@symbol{S,
-  name={{}$\set{S}$},
-  text={\set{S}},
-  user1={set},
-  description={a set}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}"}
+\strut
+\atentry{symbol}\marg{S,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{set}\marg{S}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{set}\marg{S}},
+  \field{user1}=\marg{set},
+  \field{description}=\marg{a set}
 }
-@symbol{cardS,
-  name={{}$\card{S}$},
-  text={\card{S}},
-  user1={card},
-  description={the cardinality of \gls{S}}
+\atentry{symbol}\marg{cardS,
+  \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{card}\marg{S}\idx{mshiftchar}},
+  \field{text}=\marg{\cmd{card}\marg{S}},
+  \field{user1}=\marg{card},
+  \field{description}=\marg{the cardinality of \cs{gls}\marg{S}}
 }
-\end{verbatim}
+\end{codeenv}
 Within the document, you can format \meta{text} using the formatting
 command provided in the \field{user1} field with:
 \nosecformatdef{glsxtrfmt}
@@ -3270,10 +3272,10 @@ then \csref{glsxtrfmt} just does \meta{text} (followed by \meta{insert} for
 the starred version) and a warning is issued. (There's no warning 
 if the entry is defined but the field hasn't been set.)
 The \meta{options} are as for \ics{glslink} but \ics{glslink} will
-actually be using
-\begin{alltt}
-\ics{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\csfmt{}\meta{csname}\margm{text}\meta{insert}}
-\end{alltt}
+actually be using:
+\begin{codeenv}
+\ics{glslink}\oarg{\meta{def-options},\meta{options}}\margm{label}\marg{\cmd{}\meta{csname}\margm{text}\meta{insert}}
+\end{codeenv}
 where the default options \meta{def-options} are given by
 \ics{GlsXtrFmtDefaultOptions}. The default definition of this is
 just \code{noindex} which suppresses the automatic indexing or
@@ -3283,11 +3285,11 @@ manual~\cite{glossaries-extra} for further details.) The
 
 This means that the document doesn't need to actually provide
 \verb|\set| or \verb|\card| but can instead use, for example,
-\begin{alltt}
+\begin{codeenv}
 \gls{glsxtrfmt}\marg{S}\marg{A}
 \gls{glsxtrentryfmt}\marg{cardS}\marg{B}
-\end{alltt}
-instead of
+\end{codeenv}
+instead of:
 \begin{verbatim}
 \set{A}
 \card{B}
@@ -3297,11 +3299,11 @@ a warning.
 
 Since this is a bit cumbersome to write, you can provide shortcut
 commands. For example:
-\begin{verbatim}
-\GlsXtrLoadResources[src={my-data}]
-\newcommand{\gset}[2][]{\glsxtrfmt[#1]{S}{#2}}
-\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardS}{#2}}
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[my-data]{src}}
+\cs{newcommand}\marg{\cmd{gset}}[2][]\marg{\gls{glsxtrfmt}\oarg{\idx{param}1}\marg{S}\marg{\idx{param}2}}
+\cs{newcommand}\marg{\cmd{gcard}}[2][]\marg{\gls{glsxtrfmt}\oarg{\idx{param}1}\marg{cardS}\marg{\idx{param}2}}
+\end{codeenv}
 Whilst this doesn't seem a great deal different from simply
 providing the definitions of \csfmt{set} and \csfmt{card} in the
 document, this means you don't have to worry about remembering 
@@ -3313,58 +3315,58 @@ automatically produce a hyperlink to the glossary entry if the
 
 Here's an alternative \ext{bib} that defines entries with a term, a
 description and a symbol:
-\begin{verbatim}
-@preamble{"\providecommand{\setfmt}[1]{\mathcal{#1}}
-\providecommand{\cardfmt}[1]{|\setfmt{#1}|}"}
-
-@entry{set,
-  name={set},
-  symbol={\setfmt{S}},
-  user1={setfmt},
-  description={collection of values}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{setfmt}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{cardfmt}}[1]\marg{|\cmd{setfmt}\marg{\idx{param}1}|}"}
+\strut
+\atentry{entry}\marg{set,
+  \field{name}=\marg{set},
+  \field{symbol}=\marg{\cmd{setfmt}\marg{S}},
+  \field{user1}=\marg{setfmt},
+  \field{description}=\marg{collection of values}
 }
-@entry{cardinality,
-  name={cardinality},
-  symbol={\cardfmt{S}},
-  user1={cardfmt},
-  description={the number of elements in the \gls{set} $\glssymbol{set}$}
+\atentry{entry}\marg{cardinality,
+  \field{name}=\marg{cardinality},
+  \field{symbol}=\marg{\cmd{cardfmt}\marg{S}},
+  \field{user1}=\marg{cardfmt},
+  \field{description}=\marg{the number of elements in the \cs{gls}\marg{set} \idx{mshiftchar}\cs{glssymbol}\marg{set}\idx{mshiftchar}}
 }
-\end{verbatim}
+\end{codeenv}
 I've changed the entry labels and the names of the formatting commands.
 The definitions in the document need to reflect the change in label
 but not the change in the formatting commands:
-\begin{verbatim}
-\newcommand{\gset}[2][]{\glsxtrfmt[#1]{set}{#2}}
-\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardinality}{#2}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{gset}}[2][]\marg{\gls{glsxtrfmt}\oarg{\idx{param}1}\marg{set}\marg{\idx{param}2}}
+\cs{newcommand}\marg{\cmd{gcard}}[2][]\marg{\gls{glsxtrfmt}\oarg{\idx{param}1}\marg{cardinality}\marg{\idx{param}2}}
+\end{codeenv}
 
 Here's another approach that allows for a more complicated argument
 for the cardinality. (For example, if the argument is an expression
 involving set unions or intersections.)
 The \ext{bib} file is now:
-\begin{verbatim}
-@preamble{"\providecommand{\setfmt}[1]{\mathcal{#1}}
-\providecommand{\cardfmt}[1]{|#1|}"}
-
-@entry{set,
-  name={set},
-  symbol={\setfmt{S}},
-  user1={setfmt},
-  description={collection of values}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{setfmt}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{cardfmt}}[1]\marg{|\idx{param}1|}"}
+\strut
+\atentry{entry}\marg{set,
+  \field{name}=\marg{set},
+  \field{symbol}=\marg{\cmd{setfmt}\marg{S}},
+  \field{user1}=\marg{setfmt},
+  \field{description}=\marg{collection of values}
 }
-@entry{cardinality,
-  name={cardinality},
-  symbol={\cardfmt{\setfmt{S}}},
-  user1={cardfmt},
-  description={the number of elements in the \gls{set} $\glssymbol{set}$}
+\atentry{entry}\marg{cardinality,
+  \field{name}=\marg{cardinality},
+  \field{symbol}=\marg{\cmd{cardfmt}\marg{\cmd{setfmt}\marg{S}}},
+  \field{user1}=\marg{cardfmt},
+  \field{description}=\marg{the number of elements in the \cs{gls}\marg{set} \idx{mshiftchar}\cs{glssymbol}\marg{set}\idx{mshiftchar}}
 }
-\end{verbatim}
+\end{codeenv}
 This has removed the \csfmt{setfmt} command from the definition of
 \csfmt{cardfmt}. Now the definitions in the document are:
-\begin{verbatim}
-\newcommand{\gset}[1]{\glsxtrentryfmt{set}{#1}}
-\newcommand{\gcard}[2][]{\glsxtrfmt[#1]{cardinality}{#2}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{gset}}[1]\marg{\gls{glsxtrentryfmt}\marg{set}\marg{\idx{param}1}}
+\cs{newcommand}\marg{\cmd{gcard}}[2][]\marg{\gls{glsxtrfmt}\oarg{\idx{param}1}\marg{cardinality}\marg{\idx{param}2}}
+\end{codeenv}
 This allows for code such as:
 \begin{verbatim}
 \[ \gcard{\gset{A} \cap \gset{B}} \]
@@ -3372,10 +3374,10 @@ This allows for code such as:
 which will link back to the \code{cardinality} entry in the
 glossary and avoids any hyperlinking with \csfmt{gset}.
 Alternatively to avoid links with \csfmt{gcard} as well:
-\begin{verbatim}
-\newcommand{\gset}[1]{\glsxtrentryfmt{set}{#1}}
-\newcommand{\gcard}[1]{\glsxtrentryfmt{cardinality}{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{gset}}[1]\marg{\gls{glsxtrentryfmt}\marg{set}\marg{\idx{param}1}}
+\cs{newcommand}\marg{\cmd{gcard}}[1]\marg{\gls{glsxtrentryfmt}\marg{cardinality}\marg{\idx{param}1}}
+\end{codeenv}
 Now \csfmt{gset} and \csfmt{gcard} are simply formatting commands,
 but their actual definitions are determined in the \ext{bib} file.
 
@@ -3384,23 +3386,23 @@ but their actual definitions are determined in the \ext{bib} file.
 
 The entry types described in this section create a single glossary
 definition per entry (from \styfmt{glossaries-extra}'s point of view). 
-For example
-\begin{verbatim}
-@entry{matrix,
-  name={matrix},
-  plural={matrices},
-  description={rectangular array of values}
+For example:
+\begin{codeenv}
+\atentry{entry}\marg{matrix,
+  \field{name}=\marg{matrix},
+  \field{plural}=\marg{matrices},
+  \field{description}=\marg{rectangular array of values}
 }
-\end{verbatim}
-is analogous to
-\begin{verbatim}
-\newglossaryentry{matrix}% label
-{% fields
-  name={matrix},
-  plural={matrices},
-  description={rectangular array of values}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{matrix}\comment{label}
+\marg{\comment{fields}
+  \field{name}=\marg{matrix},
+  \field{plural}=\marg{matrices},
+  \field{description}=\marg{rectangular array of values}
 }
-\end{verbatim}
+\end{codeenv}
 The \csopt{secondary} option allows the creation of a fake glossary
 with the entry labels in its internal list in a different order.
 This means that the same data can be displayed in two separate lists
@@ -3414,38 +3416,38 @@ definitions per \ext{bib} entry.
 
 Regular terms are defined by the \atentry{entry} field. This requires the
 \field{description} field and either \field{name} or \field{parent}.
-
 For example:
-\begin{verbatim}
-@preamble{"\providecommand{\mtx}[1]{\boldsymbol{#1}}"}
-
-@entry{matrix,
-  name={matrix},
-  plural={matrices},
-  description={rectangular array of values, denoted \gls{M}},
-  seealso={vector}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}"}
+\strut
+\atentry{entry}\marg{matrix,
+  \field{name}=\marg{matrix},
+  \field{plural}=\marg{matrices},
+  \field{description}=\marg{rectangular array of values, denoted \cs{gls}\marg{M}},
+  \field{seealso}=\marg{vector}
 }
-
-@entry{M,
-  name={\ensuremath{M}},
-  description={a \gls{matrix}}
+\strut
+\atentry{entry}\marg{M,
+  \field{name}=\marg{\cs{ensuremath}\marg{M}},
+  \field{description}=\marg{a \cs{gls}\marg{matrix}}
 }
-
-@entry{vector,
-  name = "vector",
-  description = {column or row of values, denoted \gls{v}},
-  seealso={matrix}
+\strut
+\atentry{entry}\marg{vector,
+  \field{name} = "vector",
+  \field{description} = \marg{column or row of values, denoted \cs{gls}\marg{v}},
+  \field{seealso}=\marg{matrix}
 }
-
-@entry{v,
-  name={\ensuremath{\vec{v}}},
-  description={a \gls{vector}}
+\strut
+\atentry{entry}\marg{v,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{vec}\marg{v}}},
+  \field{description}=\marg{a \cs{gls}\marg{vector}}
 }
-\end{verbatim}
-If the \field{name} field is omitted it will be set from the
-parent's \field{name}. If the \field{sort} field is missing the
-default is obtained from the \field{name} field.
-(This can be overridden with \csopt{sort-field}.)
+\end{codeenv}
+
+If the \field{sort} field is missing the default is obtained from the
+\field{name} field.  (A different field can be selected for the sort value with
+\csopt{sort-field}.) For hierarchical entries, if the \field{name} field is
+omitted it will be obtained from the parent's \field{name}. 
 
 Terms defined using \atentry{entry} will be written to the output
 (\ext{glstex}) file using the command \csref{bibglsnewentry}.
@@ -3456,12 +3458,12 @@ The \atentry{symbol} entry type is much like \atentry{entry}, but it's
 designed specifically for symbols, so in the previous example, the
 \code{M} and \code{v} terms would be better defined using the
 \atentry{symbol} entry type instead. For example:
-\begin{verbatim}
-@symbol{M,
-  name={\ensuremath{M}},
-  description={a \gls{matrix}}
+\begin{codeenv}
+\atentry{symbol}\marg{M,
+  \field{name}=\marg{\cs{ensuremath}\marg{M}},
+  \field{description}=\marg{a \cs{gls}\marg{matrix}}
 }
-\end{verbatim}
+\end{codeenv}
 
 The required fields are \field{name} or \field{parent}. The
 \field{description} field is required if the \field{name} field is
@@ -3484,40 +3486,40 @@ using the command \csref{bibglsnewnumber}.
 
 For example, the file \filefmt{constants.bib} might define
 mathematical constants like this:
-\begin{verbatim}
-@number{pi,
-   name={\ensuremath{\pi}},
-   description={the ratio of the length of the circumference
+\begin{codeenv}
+\atentry{number}\marg{pi,
+   \field{name}=\marg{\cs{ensuremath}\marg{\ics{pi}}},
+   \field{description}=\marg{the ratio of the length of the circumference
     of a circle to its diameter},
-   user1={3.14159}
+   \field{user1}=\marg{3.14159}
 }
-
-@number{e,
-  name={\ensuremath{e}},
-  description={base of natural logarithms},
-  user1={2.71828}
+\strut
+\atentry{number}\marg{e,
+  \field{name}=\marg{\cs{ensuremath}\marg{e}},
+  \field{description}=\marg{base of natural logarithms},
+  \field{user1}=\marg{2.71828}
 }
-\end{verbatim}
+\end{codeenv}
 This stores the approximate value in the \field{user1} field. This
 can be used to sort the entries in numerical order according to the
 values rather than the symbols:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src={constants},% constants.bib
-  category={number},% set the category for all selected entries
-  sort={double},% numerical double-precision sort
-  sort-field={user1}% sort according to 'user1' field
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[constants]{src},\comment{constants.bib}
+  \csopt[number]{category},\comment{set the category for all selected entries}
+  \csopt[double]{sort},\comment{numerical double-precision sort}
+  \csopt[user1]{sort-field}\comment{sort according to 'user1' field}
+}
+\end{codeenv}
 The \csopt[number]{category} option makes it easy to adjust the
 glossary format to include the \field{user1} field:
-\begin{verbatim}
-\renewcommand{\glsxtrpostdescnumber}{%
-  \ifglshasfield{useri}{\glscurrententrylabel}
-  { (approximate value: \glscurrentfieldvalue)}%
-  {}%
+\begin{codeenv}
+\ics{glsdefpostdesc}\marg{number}\marg{\comment{}
+  \cs{ifglshasfield}\marg{useri}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{ (approximate value: \cs{glscurrentfieldvalue})}\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \entrysection{index}
 
