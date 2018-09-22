@@ -3528,21 +3528,17 @@ have a description. Only the label is required. If \field{name} is
 omitted, it's assumed to be the same as the label, even if
 \field{parent} is present. (Note this is different to the fallback
 behaviour of \atentry{entry}, which fetches the name from the parent
-entry.) However, this means that if the name contains any characters
-that can't be used in the label, you will need the \field{name}
-field. If the \field{sort} field is missing the
-default is obtained from the \field{name} field.
+entry.) If the name contains any characters that can't be used in
+the label, you must use the \field{name} field. If the \field{sort}
+field is missing the default is obtained from the \field{name}.
 
 Example:
-\begin{verbatim}
-@index{duck}
-
-@index{goose,plural={geese}}
-
-@index{sealion,name={sea lion}}
-
-@index{facade,name={fa\c{c}ade}}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{duck}
+\atentry{index}\marg{goose,\field{plural}=\marg{geese}}
+\atentry{index}\marg{sealion,\field{name}=\marg{sea lion}}
+\atentry{index}\marg{facade,\field{name}=\marg{fa\ics{c}\marg{c}ade}}
+\end{codeenv}
 
 Terms that are defined using \atentry{index} will be written to the output
 file using the command \csref{bibglsnewindex}.
@@ -3550,45 +3546,45 @@ file using the command \csref{bibglsnewindex}.
 \entrysection{indexplural}
 
 The \atentry{indexplural} entry type is similar to the
-\atentry{index} entry type except that the \field{name} field if
-missing is obtained from the \field{plural} field. If the
+\atentry{index} entry type except that the \field{name} field, if
+missing, is obtained from the \field{plural} field. If the
 \field{plural} field is missing it's obtained from the \field{text}
 field with the plural suffix appended. If the \field{text} field is
 missing, it's obtained from the original entry label. If the
 \field{sort} field is missing the default is obtained from the
 \field{name} field. All fields are optional. For example:
-\begin{verbatim}
-@indexplural{goose,
-  plural = {geese}
+\begin{codeenv}
+\atentry{indexplural}\marg{goose,
+  \field{plural} = \marg{geese}
 }
-
-@indexplural{duck}
-
-@indexplural{chateau,
-  text = {ch\^ateau},
-  plural = {ch\^ateaux}
+\strut
+\atentry{indexplural}\marg{duck}
+\strut
+\atentry{indexplural}\marg{chateau,
+  \field{text} = \marg{ch\ics{cs.circum}ateau},
+  \field{plural} = \marg{ch\cs{cs.circum}ateaux}
 }
-\end{verbatim}
+\end{codeenv}
 This is equivalent to:
-\begin{verbatim}
-@indexplural{goose,
-  name = {geese},
-  text = {goose},
-  plural = {geese}
+\begin{codeenv}
+\atentry{indexplural}\marg{goose,
+  \field{name} = \marg{geese},
+  \field{text} = \marg{goose},
+  \field{plural} = \marg{geese}
 }
-
-@indexplural{duck,
-  name = {ducks},
-  text = {duck},
-  plural = {ducks}
+\strut
+\atentry{indexplural}\marg{duck,
+  \field{name} = \marg{ducks},
+  \field{text} = \marg{duck},
+  \field{plural} = \marg{ducks}
 }
-
-@indexplural{chateau,
-  name = {ch\^ateaux},
-  text = {ch\^ateau},
-  plural = {ch\^ateaux}
+\strut
+\atentry{indexplural}\marg{chateau,
+  \field{name} = \marg{ch\cs{cs.circum}ateaux},
+  \field{text} = {ch\cs{cs.circum}ateau},
+  \field{plural} = {ch\cs{cs.circum}ateaux}
 }
-\end{verbatim}
+\end{codeenv}
 
 Terms that are defined using \atentry{indexplural} will be written to the output
 file using the command \csref{bibglsnewindexplural}.
@@ -3599,12 +3595,15 @@ The \atentry{abbreviation} entry type is designed for abbreviations.
 The required fields are \field{short} and \field{long}. If the
 \field{sort} key is missing, \bibgls\ will use the field given by
 \csopt{abbreviation-sort-fallback}, which defaults to the \field{short} field.
-You can also use \csopt{short-case-change} to convert the case of
-the \field{short} field.
+(If you want an equivalent of \gls!{newdualentry}, use
+\atentry{dualabbreviationentry} instead.)
 
-If you use \csopt[name]{sort-field}, then the fallback for the
+If you use \csopt[name]{sort-field} (rather than the default
+\csopt[sort]{sort-field}), then the fallback for the
 \field{name} field is always the \field{short} field, regardless of
-the \csopt{abbreviation-sort-fallback} setting.
+the \csopt{abbreviation-sort-fallback} setting, unless you use
+\csopt{abbreviation-name-fallback} to change the fallback for the
+\field{name} field.
 
 Note that you must set the abbreviation style before loading the
 resource file to ensure that the abbreviations are defined
@@ -3621,37 +3620,74 @@ you sometimes need it, and then instruct \bibgls\ to ignore it when
 you don't want it.
 
 For example:
-\begin{verbatim}
-@abbreviation{html,
-  short ="html",
-  long  = {hypertext markup language},
-  description={a markup language for creating web pages}
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = \marg{html},
+  \field{long}  = \marg{hypertext markup language},
+  \field{description} = \marg{a markup language for creating web pages}
 }
-\end{verbatim}
+\end{codeenv}
 If you want the \abbrstyle{long-noshort-desc} style, then you can put
 the following in your document (where the \ext{bib} file is called
 \filefmt{entries-abbrv.bib}):
-\begin{verbatim}
-\setabbreviationstyle{long-noshort-desc}
-\GlsXtrLoadResources[src={entries-abbrv.bib},
- abbreviation-sort-fallback={long}]
-\end{verbatim}
+\begin{codeenv}
+\ics{setabbreviationstyle}\marg{long-noshort-desc}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-abbrv]{src},
+ \csopt[long]{abbreviation-sort-fallback}}
+\end{codeenv}
 Whereas, if you want the \abbrstyle{long-short-sc} style, then you can
 instead do:
-\begin{verbatim}
-\setabbreviationstyle{long-short-sc}
-\GlsXtrLoadResources[src={entries-abbrv.bib},ignore-fields={description}]
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-short-sc}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-abbrv]{src},\csopt[description]{ignore-fields}}
+\end{codeenv}
 or to convert the short value to \idx{uppercase} and use the
 \abbrstyle{long-short-sm} style instead:
-\begin{verbatim}
-\setabbreviationstyle{long-short-sm}
-\GlsXtrLoadResources[src={entries-abbrv.bib},
- short-case-change={uc},% convert short value to upper case
- ignore-fields={description}]
-\end{verbatim}
-(If you want an equivalent of \csfmt{newdualentry}, use
-\atentry{dualabbreviationentry} instead.)
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-short-sm}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-abbrv]{src},
+ \csopt[uc]{short-case-change},\comment{convert short value to upper case}
+ \csopt[description]{ignore-fields}}
+\end{codeenv}
+
+Case-changing can be applied with \csopt{short-case-change} to
+convert the case of the \field{short} field, as illustrated above. 
+If you use a style that obtains the \field{description} from the
+\field{long} form, but you want to apply a case-change to the
+\field{description} field with \csopt{description-case-change}, then
+you can copy the \field{long} field to the \field{description} with
+\csopt[long=description]{replicate-fields}.
+
+For example, if \filefmt{entries-abbrv.bib} contains:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = \marg{html},
+  \field{long}  = \marg{hypertext markup language}
+}
+\end{codeenv}
+then the document may include:
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-short-sc}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-abbrv]{src},
+ \csopt[firstuc]{description-case-change},
+ \csopt[long=description]{replicate-fields}}
+\end{codeenv}
+Note that this can cause a problem for styles that set the
+\field{description} field to the \field{long} form encapsulated by a
+style command (such as with the \abbrstyle{long-em-short-em} style)
+as this will override the style setting.
+
+Similarly, if you want to change the case of the \field{name} field:
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-short-sc}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-abbrv]{src},
+ \csopt[firstuc]{description-case-change},
+ \csopt[uc]{name-case-change},
+ \csopt[long=description,short=name]{replicate-fields}}
+\end{codeenv}
+Again, this will lose any custom formatting command that would
+usually be applied by the abbreviation style to the \field{name}
+field (and \field{description}, if applicable).
 
 Terms defined using \atentry{abbreviation} will be written to the output
 file using the command \csref{bibglsnewabbreviation}.
@@ -3668,7 +3704,7 @@ The \atentry{contributor} entry type is primarily provided for use
 by the \atentry{bibtexentry} type. You may use it explicitly
 if you want, but you need to take care that it doesn't clash with
 \atentry{bibtexentry}. It behaves much like \atentry{index} except that the
-term is written to the output file using the command
+term is written to the \ext{glstex} file using the command
 \csref{bibglsnewcontributor}. There are no required fields. As with
 \atentry{index}, if the \field{name} field is missing, the fallback
 value is the entry's label. When this entry type is automatically
@@ -3686,25 +3722,23 @@ updated, and
 the \field{bibtexentry} and \field{bibtexentry@entrytype} internal
 fields can be set for the
 \atentry{contributor} entry.  For example:
-\begin{verbatim}
-@contributor{KnuthDonaldE,
-  name={\bibglscontributor{Donald E.}{}{Knuth}{}},
-  description={Famous mathematician and computer scientist who
-   created \TeX}
+\begin{codeenv}
+\atentry{contributor}\marg{KnuthDonaldE,
+  \field{name}=\marg{\gls{bibglscontributor}\marg{Donald E.}\marg{}\marg{Knuth}\marg{}},
+  \field{description}=\marg{Famous mathematician and computer scientist who
+   created \cmd{TeX}}
 }
-
-@book{texbook,
-  title = {The {\TeX book}},
-  author = {Donald E. Knuth},
-  publisher = {Addison-Wesley},
+\strut
+@book\marg{texbook,
+  title = \marg{The {\cmd{TeX} book}},
+  author = \marg{Donald E. Knuth},
+  publisher = \marg{Addison-Wesley},
   year = 1986
 }
-\end{verbatim}
+\end{codeenv}
 The resource options then need to include:
 \begin{codeenv}
- \csopt[
-   \ics{GlsXtrBibTeXEntryAliases}
- ]{entry-type-aliases},
+ \csopt[\ics{GlsXtrBibTeXEntryAliases}]{entry-type-aliases},
  \csopt[
   \marg{[ \cs{cs.string}\csfmt{-}\cs{cs.string}\csfmt{.}]}\marg{}
  ]{labelify-replace}
@@ -3730,32 +3764,32 @@ functionally like \atentry{symbol}) or
 is functionally like \code{@}\meta{primary} and the dual is
 functionally like \code{@}\meta{dual}.
 
-For example
-\begin{verbatim}
-@dualabbreviationentry{svm,
-  short = {SVM},
-  long = {support vector machine},
-  description = {statistical pattern recognition technique}
+For example:
+\begin{codeenv}
+\atentry{dualabbreviationentry}\marg{svm,
+  \field{short} = \marg{SVM},
+  \field{long} = \marg{support vector machine},
+  \field{description} = \marg{statistical pattern recognition technique}
 }
-\end{verbatim}
-is like
-\begin{verbatim}
-@abbreviation{svm,
-  short = {SVM},
-  long = {support vector machine},
+\end{codeenv}
+is like:
+\begin{codeenv}
+\atentry{abbreviation}\marg{svm,
+  \field{short} = \marg{SVM},
+  \field{long} = \marg{support vector machine},
 }
-@entry{dual.svm,
-  text = {SVM},
-  name = {support vector machine},
-  description = {statistical pattern recognition technique}
+\atentry{entry}\marg{dual.svm,
+  \field{text} = \marg{SVM},
+  \field{name} = \marg{support vector machine},
+  \field{description} = \marg{statistical pattern recognition technique}
 }
-\end{verbatim}
-and is analogous to
-\begin{verbatim}
-\newabbreviation{svm}{SVM}{support vector machine}
-\newglossaryentry{dual.svm}{name={support vector machine},text={SVM},
- description={statistical pattern recognition technique}}
-\end{verbatim}
+\end{codeenv}
+and is analogous to:
+\begin{codeenv}
+\gls{newabbreviation}\marg{svm}\marg{SVM}\marg{support vector machine}
+\gls{newglossaryentry}\marg{dual.svm}\marg{\field{name}=\marg{support vector machine},\field{text}=\marg{SVM},
+ \field{description}=\marg{statistical pattern recognition technique}}
+\end{codeenv}
 but both entries are considered dependent on each other. This means
 that if you only reference the primary entry (using \ics{gls} etc)
 then the dual entry will still be selected if the \csopt{selection}
@@ -3804,48 +3838,48 @@ the \ext{glstex} file so that the internal list of labels is in the
 appropriate order.
 
 For example, suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@index{aardvark}
-@index{mouse}
-@index{zebra}
-@dualindexabbreviation{xml,
- short={XML},
- long={extensible markup language}
+\begin{codeenv}
+\atentry{index}\marg{aardvark}
+\atentry{index}\marg{mouse}
+\atentry{index}\marg{zebra}
+\atentry{dualindexabbreviation}\marg{xml,
+ \field{short}=\marg{XML},
+ \field{long}=\marg{extensible markup language}
 }
-@dualabbreviationentry{ssi,
-  short={SSI},
-  long={server-side includes},
-  description={directives placed in \gls{html} pages
+\atentry{dualabbreviationentry}\marg{ssi,
+  \field{short}=\marg{SSI},
+  \field{long}=\marg{server-side includes},
+  \field{description}=\marg{directives placed in \cs{gls}\marg{html} pages
    evaluated by the server}
 }
-@dualindexabbreviation{html,
- short={HTML},
- long={hypertext markup language}
+\atentry{dualindexabbreviation}\marg{html,
+ \field{short}=\marg{HTML},
+ \field{long}=\marg{hypertext markup language}
 }
-@dualabbreviationentry{css,
- short={CSS},
- long={cascading stylesheets},
- description={a language that describes the style of an
-  \gls{html} document}
+\atentry{dualabbreviationentry}\marg{css,
+ \field{short}=\marg{CSS},
+ \field{long}=\marg{cascading stylesheets},
+ \field{description}=\marg{a language that describes the style of an
+  \cs{gls}\marg{html} document}
 }
-\end{verbatim}
+\end{codeenv}
 This contains a mixture of entry types, including
 \atentry{dualindexabbreviation} (where the dual is the
 abbreviation) and \atentry{dualabbreviationentry} (where the
 primary is the abbreviation).
 
 Now consider the following document:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,abbreviations]{glossaries-extra}
-
-\GlsXtrLoadResources[selection=all,src=entries]
-
-\begin{document}
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt{abbreviations}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[all]{selection},\csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 This uses the default \csopt[combine]{sort}, so all the entries are
 sorted together, resulting in the order: 
 \code{aardvark},
@@ -3862,44 +3896,44 @@ sorted together, resulting in the order:
 
 The \LaTeX\ code written to the \iext{glstex} file is essentially
 (but not exactly):
-\begin{verbatim}
-% from @index{aardvark}:
-\newglossaryentry{aardvark}{name={aardvark},description={}}
-
-% dual of @dualabbreviationentry{css,...}:
-\newglossaryentry{dual.css}{name={cascading stylesheets},text={CSS},
- description={a language that describes the style of an
-  \glsxtrshort{html} document}}
-
-% primary of @dualabbreviationentry{css,...}:
-\newabbreviation{css}{CSS}{cascading stylesheets}
-
-% primary of @dualindexabbreviation{html,...}:
-\newglossaryentry{html}{name={HTML},description={}}
-
-% dual of @dualindexabbreviation{html,...}:
-\newabbreviation{dual.html}{HTML}{hypertext markup language}
-
-% from @index{mouse}:
-\newglossaryentry{mouse}{name={mouse},description={}}
-
-% dual of @dualabbreviationentry{ssi,...}:
-\newglossaryentry{dual.ssi}{name={server-side includes},text={SSI},
- description={directives placed in \glsxtrshort{html} pages
+\begin{codeenv}
+\comment{from \atentry{index}\marg{aardvark}:}
+\gls{newglossaryentry}\marg{aardvark}\marg{\field{name}=\marg{aardvark},\field{description}=\marg{}}
+\strut
+\comment{dual of \atentry{dualabbreviationentry}\marg{css,...}:}
+\gls{newglossaryentry}\marg{dual.css}\marg{\field{name}=\marg{cascading stylesheets},\marg{text}=\marg{CSS},
+ \field{description}=\marg{a language that describes the style of an
+  \cs{glsxtrshort}\marg{html} document}}
+\strut
+\comment{primary of \atentry{dualabbreviationentry}\marg{css,...}:}
+\gls{newabbreviation}\marg{css}\marg{CSS}\marg{cascading stylesheets}
+\strut
+\comment{primary of \atentry{dualindexabbreviation}\marg{html,...}:}
+\gls{newglossaryentry}\marg{html}\marg{\field{name}=\marg{HTML},\field{description}=\marg{}}
+\strut
+\comment{dual of \atentry{dualindexabbreviation}\marg{html,...}:}
+\gls{newabbreviation}\marg{dual.html}\marg{HTML}\marg{hypertext markup language}
+\strut
+\comment{from \atentry{index}\marg{mouse}:}
+\gls{newglossaryentry}\marg{mouse}{\marg{name}=\marg{mouse},\field{description}=\marg{}}
+\strut
+\comment{dual of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\gls{newglossaryentry}\marg{dual.ssi}\marg{\field{name}=\marg{server-side includes},\field{text}=\marg{SSI},
+ \field{description}=\marg{directives placed in \cs{glsxtrshort}\marg{html} pages
  evaluated by the server}}
-
-% primary of @dualabbreviationentry{ssi,...}:
-\newabbreviation{ssi}{SSI}{server-side includes}
-
-% primary of @dualindexabbreviation{xml,...}:
-\newglossaryentry{xml}{name={XML},description={}}
-
-% dual of @dualindexabbreviation{xml,...}:
-\newabbreviation{dual.xml}{XML}{extensible markup language}
-
-% from @index{zebra}:
-\newglossaryentry{zebra}{name={zebra},description={}}
-\end{verbatim}
+\strut
+\comment{primary of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
+\strut
+\comment{primary of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\gls{newglossaryentry}\marg{xml}\marg{\field{name}=\marg{XML},\field{description}=\marg{}}
+\strut
+\comment{dual of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\gls{newabbreviation}\marg{dual.xml}\marg{XML}\marg{extensible markup language}
+\strut
+\comment{from \atentry{index}\marg{zebra}:}
+\gls{newglossaryentry}\marg{zebra}\marg{\field{name}=\marg{zebra},\field{description}=\marg{}}
+\end{codeenv}
 Since the document uses the \styopt{abbreviations} package option,
 \gls{newabbreviation} automatically assigns the abbreviation 
 to the \code{abbreviations} glossary (created through that package
@@ -3939,13 +3973,13 @@ as different field mappings are used.
 If the document is changed so that the dual entries are now
 sorted and written after all the primary entries have been dealt
 with:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=entries,
- dual-sort={letter-nocase},
- selection=all
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},
+ \csopt[letter-nocase]{dual-sort},
+ \csopt[all]{selection}
+}
+\end{codeenv}
 then \bibgls\ first orders the primaries:
 \begin{itemize}
 \item \code{aardvark} (name: aardvark),
@@ -3958,28 +3992,28 @@ then \bibgls\ first orders the primaries:
 \end{itemize}
 and writes them to the \ext{glstex} file
 (functionally like):
-\begin{verbatim}
-% from @index{aardvark}:
-\newglossaryentry{aardvark}{name={aardvark},description={}}
-
-% primary of @dualabbreviationentry{css,...}:
-\newabbreviation{css}{CSS}{cascading stylesheets}
-
-% primary of @dualindexabbreviation{html,...}:
-\newglossaryentry{html}{name={HTML},description={}}
-
-% from @index{mouse}:
-\newglossaryentry{mouse}{name={mouse},description={}}
-
-% primary of @dualabbreviationentry{ssi,...}:
-\newabbreviation{ssi}{SSI}{server-side includes}
-
-% primary of @dualindexabbreviation{xml,...}:
-\newglossaryentry{xml}{name={XML},description={}}
-
-% from @index{zebra}:
-\newglossaryentry{zebra}{name={zebra},description={}}
-\end{verbatim}
+\begin{codeenv}
+\comment{from \atentry{index}\marg{aardvark}:}
+\gls{newglossaryentry}\marg{aardvark}\marg{\field{name}=\marg{aardvark},\field{description}=\marg{}}
+\strut
+\comment{primary of \atentry{dualabbreviationentry}\marg{css,...}:}
+\gls{newabbreviation}\marg{css}\marg{CSS}\marg{cascading stylesheets}
+\strut
+\comment{primary of \atentry{dualindexabbreviation}\marg{html,...}:}
+\gls{newglossaryentry}\marg{html}\marg{\field{name}=\marg{HTML},\field{description}=\marg{}}
+\strut
+\comment{from \atentry{index}\marg{mouse}:}
+\gls{newglossaryentry}\marg{mouse}\marg{\field{name}=\marg{mouse},\field{description}=\marg{}}
+\strut
+\comment{primary of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
+\strut
+\comment{primary of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\gls{newglossaryentry}\marg{xml}\marg{\field{name}=\marg{XML},\field{description}=\marg{}}
+\strut
+\comment{from \atentry{index}\marg{zebra}:}
+\gls{newglossaryentry}\marg{zebra}\marg{\field{name}=\marg{zebra},\field{description}=\marg{}}
+\end{codeenv}
 Then \bibgls\ orders the duals:
 \begin{itemize}
 \item \code{dual.css} (name: cascading stylesheets),
@@ -3989,23 +4023,23 @@ Then \bibgls\ orders the duals:
 \end{itemize}
 and writes them to the \ext{glstex} file
 (functionally like):
-\begin{verbatim}
-% dual of @dualabbreviationentry{css,...}:
-\newglossaryentry{dual.css}{name={cascading stylesheets},text={CSS},
- description={a language that describes the style of an
-  \glsxtrshort{html} document}}
-
-% dual of @dualindexabbreviation{html,...}:
-\newabbreviation{dual.html}{HTML}{hypertext markup language}
-
-% dual of @dualabbreviationentry{ssi,...}:
-\newglossaryentry{dual.ssi}{name={server-side includes},text={SSI},
- description={directives placed in \glsxtrshort{html} pages
+\begin{codeenv}
+\comment{dual of \atentry{dualabbreviationentry}\marg{css,...}:}
+\gls{newglossaryentry}\marg{dual.css}\marg{\field{name}=\marg{cascading stylesheets},\field{text}=\marg{CSS},
+ \field{description}=\marg{a language that describes the style of an
+  \cs{glsxtrshort}\marg{html} document}}
+\strut
+\comment{dual of \atentry{dualindexabbreviation}\marg{html,...}:}
+\gls{newabbreviation}\marg{dual.html}\marg{HTML}\marg{hypertext markup language}
+\strut
+\comment{dual of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\gls{newglossaryentry}\marg{dual.ssi}\marg{\field{name}=\marg{server-side includes},\field{text}=\marg{SSI},
+ \field{description}=\marg{directives placed in \cs{glsxtrshort}\marg{html} pages
  evaluated by the server}}
-
-% dual of @dualindexabbreviation{xml,...}:
-\newabbreviation{dual.xml}{XML}{extensible markup language}
-\end{verbatim}
+\strut
+\comment{dual of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\gls{newabbreviation}\marg{dual.xml}\marg{XML}\marg{extensible markup language}
+\end{codeenv}
 When the \ext{glstex} file is input (during the next \LaTeX\ run) 
 the entries are defined in the order:
 \begin{enumerate}
@@ -4066,29 +4100,29 @@ The default mappings are:
 The required fields are as for \atentry{entry}.
 
 For example:
-\begin{verbatim}
-@dualentry{child,
-  name={child},
-  plural={children},
-  description={enfant}
+\begin{codeenv}
+\atentry{dualentry}\marg{child,
+  \field{name}=\marg{child},
+  \field{plural}=\marg{children},
+  \field{description}=\marg{enfant}
 }
-\end{verbatim}
-Is like
-\begin{verbatim}
-@entry{child,
-  name={child},
-  plural={children},
-  description={enfant}
-  descriptionplural={enfants}
+\end{codeenv}
+is like:
+\begin{codeenv}
+\atentry{entry}\marg{child,
+  \field{name}=\marg{child},
+  \field{plural}=\marg{children},
+  \field{description}=\marg{enfant}
+  \field{descriptionplural}=\marg{enfants}
 }
-
-@entry{dual.child,
-  description={child},
-  descriptionplural={children},
-  name={enfant}
-  plural={enfants}
+\strut
+\atentry{entry}\marg{dual.child,
+  \field{description}=\marg{child},
+  \field{descriptionplural}=\marg{children},
+  \field{name}=\marg{enfant}
+  \field{plural}=\marg{enfants}
 }
-\end{verbatim}
+\end{codeenv}
 where \idprefix{dual} is replaced by the value of the
 \csopt{dual-prefix} option. However, instead of defining the entries
 with \csfmt{bibglsnewentry} both the primary and dual entries are
@@ -4097,20 +4131,20 @@ and \field{type} fields can be set for the dual entry using the
 \csopt{dual-category} and \csopt{dual-type} options.
 
 For example:
-\begin{verbatim}
-\newglossary*{english}{English}
-\newglossary*{french}{French}
-
-\GlsXtrLoadResources[
- src           = {entries-dual},% data in entries-dual.bib
- type          = {english},% put primary entries in glossary 'english'
- dual-type     = {french},% put dual entries in glossary 'french'
- category      = {dictionary},% set the primary category to 'dictionary'
- dual-category = {dictionary},% set the dual category to 'dictionary'
- sort          = {en},% sort primary entries according to language 'en'
- dual-sort     = {fr}% sort dual entries according to language 'fr'
-]
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{english}\marg{English}
+\cs{newglossary*}\marg{french}\marg{French}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries-dual]{src},\comment{data in entries-dual.bib}
+ \csopt[english]{type},\comment{put primary entries in glossary 'english'}
+ \csopt[french]{dual-type},\comment{put dual entries in glossary 'french'}
+ \csopt[dictionary]{category},\comment{set the primary category to 'dictionary'}
+ \csopt[dictionary]{dual-category},\comment{set the dual category to 'dictionary'}
+ \csopt[en]{sort},\comment{sort primary entries according to language 'en'}
+ \csopt[fr]{dual-sort}\comment{sort dual entries according to language 'fr'}
+}
+\end{codeenv}
 
 \entrysection{dualindexentry}
 
@@ -4130,20 +4164,20 @@ be a subset of all indexed entries.
 
 If no \field{name} is given, the dual entry is assigned the
 (unprefixed) entry label. For example:
-\begin{verbatim}
-@dualindexentry{array,
-  description={ordered list of values}
+\begin{codeenv}
+\atentry{dualindexentry}\marg{array,
+  \field{description}=\marg{ordered list of values}
 }
-\end{verbatim}
-This is effectively like
-\begin{verbatim}
-@index{array}
-
-@entry{dual.array,
-  name={array},
-  description={ordered list of values}
+\end{codeenv}
+This is effectively like:
+\begin{codeenv}
+\atentry{index}\marg{array}
+\strut
+\atentry{entry}\marg{dual.array,
+  \field{name}=\marg{array},
+  \field{description}=\marg{ordered list of values}
 }
-\end{verbatim}
+\end{codeenv}
 The primary entries are defined using
 \csref{bibglsnewdualindexentry},
 which by default sets the \field{category} to \optfmt{index}
@@ -4154,64 +4188,68 @@ The dual entries are defined with
 This is the most convenient way of having an entry that's also
 automatically indexed. For example, suppose the file
 \filefmt{terms.bib} contains:
-\begin{verbatim}
-@index{duck}
-@index{zebra}
-@index{aardvark}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{duck}
+\atentry{index}\marg{zebra}
+\atentry{index}\marg{aardvark}
+\end{codeenv}
 and suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@dualindexentry{array,
-  description={ordered list of values}
+\begin{codeenv}
+\atentry{dualindexentry}\marg{array,
+  \field{description}=\marg{ordered list of values}
 }
-
-@dualindexentry{vector,
-  name={vector},
-  description={column or row of values}
+\strut
+\atentry{dualindexentry}\marg{vector,
+  \field{name}=\marg{vector},
+  \field{description}=\marg{column or row of values}
 }
-
-@dualindexentry{set,
-  description={collection of values}
+\strut
+\atentry{dualindexentry}\marg{set,
+  \field{description}=\marg{collection of values}
 }
-
-@dualindexentry{matrix,
-  plural={matrices},
-  description={rectangular array of values}
+\strut
+\atentry{dualindexentry}\marg{matrix,
+  \field{plural}=\marg{matrices},
+  \field{description}=\marg{rectangular array of values}
 }
-\end{verbatim}
+\end{codeenv}
 These entries can be used in an example document that has an 
 index and a glossary:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,index,stylemods=mcols]{glossaries-extra}
-
-\GlsXtrLoadResources[
- src={terms,entries},
- type=index,
- label-prefix={idx.},
- dual-prefix={gls.},
- combine-dual-locations={primary},
- dual-type=main
-]
-
-\begin{document}
-\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
-
-\gls{idx.duck}, \gls{idx.aardvark}, \gls{idx.zebra}.
-
-\renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
-\printunsrtglossary[type=main,style=index,nogroupskip]
-
-\renewcommand{\glstreenamefmt}[1]{#1}
-\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
-\printunsrtglossary[type=index,style=mcolindexgroup]
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt{index},\styopt[mcols]{stylemods}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[terms,entries]{src},
+ \csopt[index]{type},
+ \csopt[idx.]{label-prefix},
+ \csopt[gls.]{dual-prefix},
+ \csopt[primary]{combine-dual-locations},
+ \csopt[main]{dual-type}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{gls.array}, \cs{gls}\marg{gls.vector}, \cs{gls}\marg{gls.set}, \cs{gls}\marg{gls.matrix}.
+\strut
+\cs{gls}\marg{idx.duck}, \cs{gls}\marg{idx.aardvark}, \cs{gls}\marg{idx.zebra}.
+\strut
+\cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\ics{textsc}\marg{\idx{param}1}}
+\cs{printunsrtglossary}\oarg{type=main,style=index,nogroupskip}
+\strut
+\cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\idx{param}1}
+\cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\cs{textbf}\marg{\idx{param}1}}
+\cs{printunsrtglossary}\oarg{type=index,style=mcolindexgroup}
+\cmd{end}\marg{document}
+\end{codeenv}
 This uses \csopt{combine-dual-locations} to combine the locations
 for the primary and dual entries so that they only appear in the
 index.
+
+To avoid the inconvenience of remembering which prefix to use, you can
+set up the prefixes with \ics{glsxtraddlabelprefix} and reference entries
+with \ics{dgls}, \ics{dGls} etc instead of \cs{gls}, \cs{Gls} etc.
 
 \entrysection{dualindexabbreviation}
 
@@ -4224,26 +4262,26 @@ field mapping is:
 However in this case the required fields are \field{short} and
 \field{long}. The \field{name} for the primary entry defaults to
 \field{short} if omitted. (This may be changed with the
-\csopt{abbreviation-name-fallback} option) The fallback for the
+\csopt{abbreviation-name-fallback} option.) The fallback for the
 \field{sort} field is given by \csopt{abbreviation-sort-fallback},
 which defaults to the \field{short} field.
 
 For example:
-\begin{verbatim}
-@dualindexabbreviation{html,
-  short={html},
-  long = {hypertext markup language}
+\begin{codeenv}
+\atentry{dualindexabbreviation}\marg{html,
+  \field{short} = \marg{HTML},
+  \field{long}  = \marg{hypertext markup language}
 }
-\end{verbatim}
-is like
-\begin{verbatim}
-@index{html}
-
-@abbreviation{dual.html,
-  short={html},
-  long = {hypertext markup language}
+\end{codeenv}
+is like:
+\begin{codeenv}
+\atentry{index}\marg{html,\field{name}=\marg{HTML}}
+\strut
+\atentry{abbreviation}\marg{dual.html,
+  \field{short} = \marg{HTML},
+  \field{long}  = \marg{hypertext markup language}
 }
-\end{verbatim}
+\end{codeenv}
 The primary term is defined using
 \csref{bibglsnewdualindexabbreviation}, which encapsulates the
 \field{name} to match the font used by
@@ -4279,99 +4317,91 @@ and the dual entries are defined using
 \csref{bibglsnewdualindexsymbolsecondary},
 which by default sets the \field{category} to \optfmt{symbol}.
 For example:
-\begin{verbatim}
-@dualindexsymbol{pi,
-  symbol={\ensuremath{\pi}},
-  description={ratio of a circle's circumference to its diameter}
+\begin{codeenv}
+\atentry{dualindexsymbol}\marg{pi,
+  \field{symbol}=\marg{\cs{ensuremath}\marg{\ics{pi}}},
+  \field{description}=\marg{ratio of a circle's circumference to its diameter}
 }
-\end{verbatim}
-is like
-\begin{verbatim}
-@index{pi,symbol={\ensuremath{\pi}}}
-
-@symbol{dual.pi,
-  name={\ensuremath{\pi}},
-  symbol={pi},
-  description={ratio of a circle's circumference to its diameter}
+\end{codeenv}
+is like:
+\begin{codeenv}
+\atentry{index}\marg{pi,\field{symbol}=\marg{\cs{ensuremath}\marg{\cs{pi}}}}
+\strut
+\atentry{symbol}\marg{dual.pi,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{symbol}=\marg{pi},
+  \field{description}=\marg{ratio of a circle's circumference to its diameter}
 }
-\end{verbatim}
+\end{codeenv}
 
 For example, suppose I have a file called \filefmt{symbols.bib} that
 contains:
-\begin{verbatim}
-@dualindexsymbol{pi,
-  symbol={\ensuremath{\pi}},
-  description={ratio of a circle's circumference to its diameter}
+\begin{codeenv}
+\atentry{dualindexsymbol}\marg{pi,
+  \field{symbol}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{description}=\marg{ratio of a circle's circumference to its diameter}
 }
-
-@dualindexsymbol{e,
-  name={Euler's number},
-  symbol={\ensuremath{e}},
-  description={base of the natural logarithm}
+\strut
+\atentry{dualindexsymbol}\marg{e,
+  \field{name}=\marg{Euler's number},
+  \field{symbol}=\marg{\cs{ensuremath}\marg{e}},
+  \field{description}=\marg{base of the natural logarithm}
 }
-\end{verbatim}
+\end{codeenv}
 Then the previous example document can be modified to have an index,
 a glossary and a list of symbols:
-\begin{verbatim}
-\documentclass{report}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,symbols,index,stylemods=mcols]{glossaries-extra}
-
-\newcommand{\bibglsnewdualindexsymbolsecondary}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},category=symbol,%
-    symbol={#4},#2,type={symbols}}{#5}%
+\begin{codeenv}
+\cmd{documentclass}\marg{report}
+\strut
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt{symbols},\styopt{index},\styopt[mcols]{stylemods}]\marg{glossaries-extra}
+\strut
+\cs{newcommand}\marg{\gls{bibglsnewdualindexsymbolsecondary}}[5]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=symbol,\comment{}
+    \field{symbol}=\marg{\idx{param}4},\idx{param}2,\field{type}=\marg{symbols}}\marg{\idx{param}5}\comment{}
 }
-
-\newcommand{\indexprimary}[1]{\glsadd[format=hyperbf]{idx.#1}}
-
-\renewcommand{\glsxtrpostdescsymbol}{%
-  \indexprimary{\glscurrententrylabel}%
+\strut
+\cs{newcommand}\marg{\cmd{indexprimary}}[1]\marg{\ics{glsadd}\oarg{format=hyperbf}\marg{idx.\idx{param}1}}
+\strut
+\cs{glsdefpostdesc}\marg{symbol}\marg{\cmd{indexprimary}\marg{\cs{glscurrententrylabel}}}
+\cs{glsdefpostdesc}\marg{general}\marg{\cmd{indexprimary}\marg{\cs{glscurrententrylabel}}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries,terms,symbols]{src},
+ \csopt[index]{type},
+ \csopt{set-widest},
+ \csopt[idx.]{label-prefix},
+ \csopt[\empty]{dual-prefix},
+ \csopt[primary]{combine-dual-locations},
+ \csopt[letter-case]{dual-sort},
+ \csopt[main]{dual-type}
 }
-
-\renewcommand{\glsxtrpostdescgeneral}{%
-  \indexprimary{\glscurrententrylabel}%
-}
-
-\GlsXtrLoadResources[
- src={entries,terms,symbols},
- type=index,
- set-widest,
- label-prefix={idx.},
- dual-prefix={},
- combine-dual-locations={primary},
- dual-sort={letter-case},
- dual-type=main
-]
-
-\glsxtrnewglslike[hyper=false]{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
-
-\begin{document}
-\gls{array}, \gls{vector}, \gls{set}, \glspl{matrix}.
-
-\idx{duck}, \idx{aardvark}, \idx{zebra}.
-
-\gls{e} and \gls{pi}.
-
-\newpage
-\gls{array}, \idx{vector}, \idx{set}, \gls{matrix}.
-
-\newpage
-\gls{array}, \gls{vector}, \gls{set}, \gls{matrix}.
-
-
-\renewcommand{\glstreenamefmt}[1]{\textsc{#1}}
-\printunsrtglossary[type=main,nogroupskip,style=alttree]
-
-\renewcommand{\glstreenamefmt}[1]{#1}
-\printunsrtglossary[type=symbols,nogroupskip,style=index]
-
-\renewcommand{\glstreenamefmt}[1]{#1}
-\renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
-\printunsrtglossary[type=index,style=mcolindexgroup]
-
-\end{document}
-\end{verbatim}
+\strut
+\gls{glsxtrnewglslike}\oarg{hyper=false}\marg{idx.}\marg{\cmd{idx}}\marg{\cmd{idxpl}}\marg{\cmd{Idx}}\marg{\cmd{Idxpl}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{array}, \cs{gls}\marg{vector}, \cs{gls}\marg{set}, \cs{glspl}\marg{matrix}.
+\cmd{idx}\marg{duck}, \cmd{idx}\marg{aardvark}, \cmd{idx}\marg{zebra}.
+\cs{gls}\marg{e} and \cs{gls}\marg{pi}.
+\strut
+\cmd{newpage}
+\cs{gls}\marg{array}, \cmd{idx}\marg{vector}, \cmd{idx}\marg{set}, \cs{gls}\marg{matrix}.
+\strut
+\cmd{newpage}
+\cs{gls}\marg{array}, \cs{gls}\marg{vector}, \cs{gls}\marg{set}, \cs{gls}\marg{matrix}.
+\strut
+\cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{textsc}\marg{\idx{param}1}}
+\cs{printunsrtglossary}\oarg{type=main,nogroupskip,style=alttree}
+\strut
+\cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\idx{param}1}
+\cs{printunsrtglossary}\oarg{type=symbols,nogroupskip,style=index}
+\strut
+\cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\idx{param}1}
+\cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\cs{textbf}\marg{\idx{param}1}}
+\cs{printunsrtglossary}\oarg{type=index,style=mcolindexgroup}
+\strut
+\cmd{end}\marg{document}
+\end{codeenv}
 Here I've provided some convenient commands for referencing the
 primary (index) terms (\csfmt{idx}, \csfmt{idxpl}, \csfmt{Idx}
 and \csfmt{Idxpl}). This means I don't need to worry about the
@@ -4462,25 +4492,25 @@ The fallback for the \field{sort} is given by
 \field{short} field.
 
 For example:
-\begin{verbatim}
-@dualabbreviationentry{svm,
-   long = {support vector machine},
-   short = {SVM},
-   description = {statistical pattern recognition technique}
+\begin{codeenv}
+\atentry{dualabbreviationentry}\marg{svm,
+   \field{long} = \marg{support vector machine},
+   \field{short} = \marg{SVM},
+   \field{description} = \marg{statistical pattern recognition technique}
 }
-\end{verbatim}
-is rather like doing
-\begin{verbatim}
-@abbreviation{svm,
-   long = {support vector machine},
-   short = {SVM}
+\end{codeenv}
+is rather like doing:
+\begin{codeenv}
+\atentry{abbreviation}\marg{svm,
+   \field{long} = \marg{support vector machine},
+   \field{short} = \marg{SVM}
 }
-
-@entry{dual.svm,
-   name = {support vector machine},
-   description = {statistical pattern recognition technique}
+\strut
+\atentry{entry}\marg{dual.svm,
+   \field{name} = \marg{support vector machine},
+   \field{description} = \marg{statistical pattern recognition technique}
 }
-\end{verbatim}
+\end{codeenv}
 but \code{dual.svm} will automatically be selected if \code{svm}
 is indexed in the document. If \code{dual.svm} isn't explicitly
 indexed, it won't have a location list.
@@ -4504,7 +4534,7 @@ with
 \end{alltt}
 (which uses \gls{longnewglossaryentry}) for the secondary entries.
 This means that if the \styopt{abbreviations}
-package option is used, this will put the primary entry in the
+package option is used, the primary entry will be put in the
 \optfmt{abbreviations} glossary and the secondary entry in the
 \optfmt{main} glossary.  Use the \csopt{type} and
 \csopt{dual-type} options to override this.
@@ -4526,14 +4556,14 @@ This is like \atentry{dualentry} but the default mappings are:
 \end{itemize}
 The \field{name} and \field{symbol} fields are required.
 For example:
-\begin{verbatim}
-@dualsymbol{pi,
-   name={pi},
-   symbol={\ensuremath{\pi}},
-   description={the ratio of the length of the circumference
+\begin{codeenv}
+\atentry{dualsymbol}\marg{pi,
+   \field{name}=\marg{pi},
+   \field{symbol}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+   \field{description}=\marg{the ratio of the length of the circumference
     of a circle to its diameter}
 }
-\end{verbatim}
+\end{codeenv}
 
 Entries are defined using \csref{bibglsnewdualsymbol}, which by 
 default sets the \field{category} to \optfmt{symbol}.
@@ -4546,38 +4576,38 @@ the \field{category} to \optfmt{number}.
 
 The above example could be defined as a number since $\pi$ is a
 constant:
-\begin{verbatim}
-@dualnumber{pi,
-   name={pi},
-   symbol={\ensuremath{\pi}},
-   description={the ratio of the length of the circumference
+\begin{codeenv}
+\atentry{dualnumber}\marg{pi,
+   \field{name}=\marg{pi},
+   \field{symbol}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+   \field{description}=\marg{the ratio of the length of the circumference
     of a circle to its diameter},
-   user1={3.14159}
+   \field{user1}=\marg{3.14159}
 }
-\end{verbatim}
+\end{codeenv}
 
 This has stored the approximate value in the \field{user1} field.
 The post-description hook could then be adapted to show this.
-\begin{verbatim}
-\renewcommand{\glsxtrpostdescnumber}{%
-  \ifglshasfield{useri}{\glscurrententrylabel}
-  { (approximate value: \glscurrentfieldvalue)}%
-  {}%
+\begin{codeenv}
+\cs{glsdefpostdesc}\marg{number}\marg{\comment{}
+  \cs{ifglshasfield}\marg{useri}\marg{\cs{glscurrententrylabel}}
+  \marg{ (approximate value: \cs{glscurrentfieldvalue})}\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 This use of the \field{user1} field means that the dual entries
 could be sorted numerically according to the approximate value:
-\begin{verbatim}
-\usepackage[record,postdot,numbers,style=index]{glossaries-extra}
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  dual-type={numbers},
-  dual-sort={double},% decimal sort
-  dual-sort-field={user1}
-]
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}[\styopt{record},\styopt{postdot},\styopt{numbers},\styopt[index]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{entries.bib}
+  \csopt[numbers]{dual-type},
+  \csopt[double]{dual-sort},\comment{decimal sort}
+  \csopt[user1]{dual-sort-field}
+}
+\end{codeenv}
 
 \entrysection{dualabbreviation}
 
@@ -4600,9 +4630,9 @@ This includes some new fields: \field{dualshort},
 \field{dualshortplural}, \field{duallong} and
 \field{duallongplural}. If these aren't already defined, they
 will be provided in the \iext{glstex} file with
-\begin{alltt}
+\begin{codeenv}
 \ics{glsxtrprovidestoragekey}\margm{key}\marg{}\marg{}
-\end{alltt}
+\end{codeenv}
 Note that this use with an empty third argument prevents
 the creation of a field access command (analogous to
 \ics{glsentrytext}). The value can be accessed with
@@ -4621,84 +4651,83 @@ written to the output file using \csref{bibglsnewdualabbreviation}.
 If the \csopt{dual-abbrv-backlink} option is on, the default field
 used for the backlinks is the \field{dualshort} field, so you'll need
 to make sure you adapt the glossary style to show that field. The
-simplest way to do this is through the category post description
-hook.
+simplest way to do this is through the category \idx{postdescriptionhook}.
 
 For example, if the entries all have the \field{category} set
 to \optfmt{abbreviation}, then this requires redefining
-\ics{glsxtrpostdescabbreviation}.
+\ics{glsxtrpostdescabbreviation} (either with \cs{renewcommand}
+or via \cs{glsdefpostdesc}).
 
 Here's an example dual abbreviation for a document where English is
 the primary language and German is the secondary language:
-\begin{alltt}
-@dualabbreviation\marg{rna,
-  short=\marg{RNA},
-  dualshort=\marg{RNS},
-  long=\marg{ribonucleic acid},
-  duallong=\marg{Ribonukleins\"aure}
+\begin{codeenv}
+\atentry{dualabbreviation}\marg{rna,
+  \field{short}=\marg{RNA},
+  \field{dualshort}=\marg{RNS},
+  \field{long}=\marg{ribonucleic acid},
+  \field{duallong}=\marg{Ribonukleins\"aure}
 }
-\end{alltt}
+\end{codeenv}
 If the abbreviation is in the file called
 \filefmt{entries-dual-abbrv.bib}, then here's an example document:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-
-\usepackage[ngerman,main=english]{babel}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,nomain]{glossaries-extra}
-
-\newglossary*{english}{English}
-\newglossary*{german}{German}
-
-\setabbreviationstyle{long-short}
-
-\renewcommand*{\glsxtrpostdescabbreviation}{%
-  \ifglshasfield{dualshort}{\glscurrententrylabel}
-  {%
-    \space(\glscurrentfieldvalue)%
-  }%
-  {}%
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[T1]\marg{fontenc}
+\cmd{usepackage}[utf8]\marg{inputenc}
+\strut
+\cmd{usepackage}[ngerman,main=english]\marg{babel}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt{nomain}]\marg{glossaries-extra}
+\strut
+\cs{newglossary*}\marg{english}\marg{English}
+\cs{newglossary*}\marg{german}\marg{German}
+\strut
+\cs{setabbreviationstyle}\marg{long-short}
+\strut
+\cs{glsdefpostdesc}\marg{abbreviation}\marg{\comment{}
+  \cs{ifglshasfield}\marg{dualshort}\marg{\cs{glscurrententrylabel}}
+  \marg{\comment{}
+    \cmd{space}(\cs{glscurrentfieldvalue})\comment{}
+  }\comment{}
+  \marg{}\comment{}
 }
-
-\GlsXtrLoadResources[
- src={entries-dual-abbrv},% entries-dual-abbrv.bib
- type=english,% put primary entries in glossary 'english'
- dual-type=german,% put primary entries in glossary 'german'
- label-prefix={en.},% primary label prefix
- dual-prefix={de.},% dual label prefix
- sort=en,% sort primary entries according to language 'en'
- dual-sort=de-1996,% sort dual entries according to 'de-1996'
-                   % (German new orthography)
- dual-abbrv-backlink% add links in the glossary to the opposite
-                    %entry
-]
-
-\begin{document}
-
-English: \gls{en.rna}; \gls{en.rna}.
-
-German: \gls{de.rna}; \gls{de.rna}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries-dual-abbrv]{src},\comment{entries-dual-abbrv.bib}
+ \csopt[english]{type},\comment{put primary entries in glossary 'english'}
+ \csopt[german]{dual-type},\comment{put primary entries in glossary 'german'}
+ \csopt[en.]{label-prefix},\comment{primary label prefix}
+ \csopt[de.]{dual-prefix},\comment{dual label prefix}
+ \csopt[en]{sort},\comment{sort primary entries according to language 'en'}
+ \csopt[de-1996]{dual-sort},\comment{sort dual entries according to 'de-1996'}
+                     \comment{(German new orthography)}
+ \csopt{dual-abbrv-backlink}\comment{add links in the glossary to the opposite entry}
+}
+\strut
+\cmd{begin}\marg{document}
+\strut
+English: \cs{gls}\marg{en.rna}; \cs{gls}\marg{en.rna}.
+\strut
+German: \cs{gls}\marg{de.rna}; \cs{gls}\marg{de.rna}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 If the \csopt{label-prefix} is omitted, then only the dual entries
 will have a prefix:
-\begin{verbatim}
-English: \gls{rna}; \gls{rna}.
-
-German: \gls{de.rna}; \gls{de.rna}.
-\end{verbatim}
+\begin{codeenv}
+English: \cs{gls}\marg{rna}; \cs{gls}\marg{rna}.
+\strut
+German: \cs{gls}\marg{de.rna}; \cs{gls}\marg{de.rna}.
+\end{codeenv}
 Another variation is to use the \abbrstyle{long-short-user}
 abbreviation style and modify the associated \ics{glsxtruserfield} so that
 the \field{duallong} field is selected for the parenthetical
 material:
-\begin{verbatim}
-\renewcommand*{\glsxtruserfield}{duallong}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtruserfield}}\marg{duallong}
+\end{codeenv}
 This means that the first use of the primary entry is displayed as
 \begin{quote}
 ribonucleic acid (RNA, Ribonukleins\"aure)
@@ -4710,114 +4739,112 @@ Ribonukleins\"aure (RNS, ribonucleic acid)
 
 Here's an example to be used with the \abbrstyle{long-short-desc}
 style:
-\begin{alltt}
-@dualabbreviation\marg{rna,
-  short=\marg{RNA},
-  dualshort=\marg{RNS},
-  long=\marg{ribonucleic acid},
-  duallong=\marg{Ribonukleins\"aure}
-  description=\marg{a polymeric molecule},
-  user1=\marg{Ein polymeres Molek\"ul}
+\begin{codeenv}
+\atentry{dualabbreviation}\marg{rna,
+  \field{short}=\marg{RNA},
+  \field{dualshort}=\marg{RNS},
+  \field{long}=\marg{ribonucleic acid},
+  \field{duallong}=\marg{Ribonukleins\"aure}
+  \field{description}=\marg{a polymeric molecule},
+  \field{user1}=\marg{Ein polymeres Molek\"ul}
 }
-\end{alltt}
+\end{codeenv}
 This stores the dual description in the \field{user1} field,
 so this needs a mapping.
 The new example document is much the same as the previous one, except
 that the \csopt{dual-abbrv-map} option is needed to include the 
 mapping between the \field{description} and \field{user1} fields:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-
-\usepackage[ngerman,main=english]{babel}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,nomain]{glossaries-extra}
-
-\newglossary*{english}{English}
-\newglossary*{german}{German}
-
-\setabbreviationstyle{long-short-desc}
-
-\renewcommand*{\glsxtrpostdescabbreviation}{%
-  \ifglshasfield{dualshort}{\glscurrententrylabel}
-  {%
-    \space(\glscurrentfieldvalue)%
-  }%
-  {}%
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[T1]\marg{fontenc}
+\cmd{usepackage}[utf8]\marg{inputenc}
+\strut
+\cmd{usepackage}[ngerman,main=english]\marg{babel}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt{nomain}]\marg{glossaries-extra}
+\strut
+\cs{newglossary*}\marg{english}\marg{English}
+\cs{newglossary*}\marg{german}\marg{German}
+\strut
+\cs{setabbreviationstyle}\marg{long-short-desc}
+\strut
+\cs{glsdefpostdesc}\marg{abbreviation}\marg{\comment{}
+  \cs{ifglshasfield}\marg{dualshort}\marg{\cs{glscurrententrylabel}}
+  \marg{\comment{}
+    \cmd{space}(\cs{glscurrentfieldvalue})\comment{}
+  }\comment{}
+  \marg{}\comment{}
 }
-
-\GlsXtrLoadResources[
- src={entries-dual-abbrv-desc},% entries-dual-abbrv-desc.bib
- type=english,% put primary entries in glossary 'english'
- dual-type=german,% put primary entries in glossary 'german'
- label-prefix={en.},% primary label prefix
- dual-prefix={de.},% dual label prefix
- sort=en,% sort primary entries according to language 'en'
- abbreviation-sort-fallback={long},% fallback on 'long' field
- dual-sort=de-1996,% sort dual entries according to 'de-1996'
-                   % (German new orthography)
- dual-abbrv-backlink,% add links in the glossary to the opposite
-                     % entry
-% dual key mappings:
- dual-abbrv-map={%
-   {short,shortplural,long,longplural,dualshort,dualshortplural,
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries-dual-abbrv-desc]{src},\comment{entries-dual-abbrv-desc.bib}
+ \csopt[english]{type},\comment{put primary entries in glossary 'english'}
+ \csopt[german]{dual-type},\comment{put primary entries in glossary 'german'}
+ \csopt[en.]{label-prefix},\comment{primary label prefix}
+ \csopt[de.]{dual-prefix},\comment{dual label prefix}
+ \csopt[en]{sort},\comment{sort primary entries according to language 'en'}
+ \csopt[long]{abbreviation-sort-fallback},\comment{fallback on 'long' field}
+ \csopt[de-1996]{dual-sort},\comment{sort dual entries according to 'de-1996'}
+                   \comment{(German new orthography)}
+ \csopt{dual-abbrv-backlink},\comment{add links in the glossary to the opposite entry}
+\comment{ dual key mappings:}
+ \csopt[\comment{}
+   \marg{short,shortplural,long,longplural,dualshort,dualshortplural,
      duallong,duallongplural,description,user1},
-   {dualshort,dualshortplural,duallong,duallongplural,short,shortplural,
+   \marg{dualshort,dualshortplural,duallong,duallongplural,short,shortplural,
      long,longplural,user1,description}
- }
-]
-
-\begin{document}
-
-English: \gls{en.rna}; \gls{en.rna}.
-
-German: \gls{de.rna}; \gls{de.rna}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+ ]{dual-abbrv-map}
+}
+\strut
+\cmd{begin}\marg{document}
+\strut
+English: \cs{gls}\marg{en.rna}; \cs{gls}\marg{en.rna}.
+\strut
+German: \cs{gls}\marg{de.rna}; \cs{gls}\marg{de.rna}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 Note that since this document uses the \abbrstyle{long-short-desc}
 abbreviation style, the \csopt{abbreviation-sort-fallback} needs to be changed
 to \optfmt{long}.
 
 If I change the order of the mapping to:
-\begin{verbatim}
- dual-abbrv-map={%
-   {long,longplural,short,shortplural,dualshort,dualshortplural,
+\begin{codeenv}
+ \csopt[\comment{}
+   \marg{long,longplural,short,shortplural,dualshort,dualshortplural,
      duallong,duallongplural,description,user1},
-   {duallong,duallongplural,dualshort,dualshortplural,short,shortplural,
+   \marg{duallong,duallongplural,dualshort,dualshortplural,short,shortplural,
      long,longplural,user1,description}
-\end{verbatim}
+ ]{dual-abbrv-map}
+\end{codeenv}
 Then the back-link field will switch to \field{duallong}. The
-post-description hook can be modified to allow for this:
-\begin{verbatim}
-\renewcommand*{\glsxtrpostdescabbreviation}{%
-  \ifglshasfield{duallong}{\glscurrententrylabel}
-  {%
-    \space(\glscurrentfieldvalue)%
-  }%
-  {}%
+\idx{postdescriptionhook} can be modified to allow for this:
+\begin{codeenv}
+\cs{glsdefpostdesc}\marg{abbreviation}\marg{\comment{}
+  \cs{ifglshasfield}\marg{duallong}\marg{\cs{glscurrententrylabel}}
+  \marg{\comment{}
+    \cmd{space}(\cs{glscurrentfieldvalue})\comment{}
+  }\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 An alternative is to use the \abbrstyle{long-short-user-desc} style
-without the post-description hook:
-\begin{verbatim}
-\setabbreviationstyle{long-short-user-desc}
-
-\renewcommand*{\glsxtruserfield}{duallong}
-\end{verbatim}
+without the \idx{postdescriptionhook}:
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-short-user-desc}
+\cs{renewcommand}*\marg{\cs{glsxtruserfield}}\marg{duallong}
+\end{codeenv}
 However be careful with this approach as it can cause nested
 hyperlinks. In this case it's better to use the
 \abbrstyle{long-postshort-user-desc} style which defers the
 parenthetical material until after the link-text:
-\begin{verbatim}
-\setabbreviationstyle{long-postshort-user-desc}
-
-\renewcommand*{\glsxtruserfield}{duallong}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-postshort-user-desc}
+\cs{renewcommand}*\marg{\cs{glsxtruserfield}}\marg{duallong}
+\end{codeenv}
 If the back-link field has been switched to \field{duallong} then
 the post-description hook is no longer required.
 

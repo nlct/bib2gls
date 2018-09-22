@@ -960,7 +960,7 @@ option},
 }
 
 @dualindexentry{newabbreviation,
-  name={\csfmt{new\-abbreviation}},
+  name={\csfmt{new\-abbre\-vi\-a\-tion}},
   user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}},
   description={defines a new abbreviation},
   note={provided by \styfmt{glossaries-extra}},
@@ -3600,6 +3600,12 @@ given language},
 
 @index{short-long-user,
   name={\abbrstylefmt{short\dhyphen long\dhyphen user}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@index{long-em-short-em,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen short\dhyphen em}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -6656,7 +6662,8 @@ category},
 @index{glsdefpostlink,
   name={\csfmt{gls\-def\-post\-link}},
   user1={\margm{category}\margm{definition}},
-  description={define the post-link hook for the given category},
+  description={define the post-link hook 
+  \csfmt{glsxtrpostlink}\meta{category} for the given category},
   note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -6664,7 +6671,8 @@ category},
 @index{glsdefpostname,
   name={\csfmt{gls\-def\-post\-name}},
   user1={\margm{category}\margm{definition}},
-  description={define the post-name hook for the given category},
+  description={define the post-name hook 
+  \csfmt{glsxtrpostname}\meta{category} for the given category},
   note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -6672,7 +6680,8 @@ category},
 @index{glsdefpostdesc,
   name={\csfmt{gls\-def\-post\-desc}},
   user1={\margm{category}\margm{definition}},
-  description={define the post-description hook for the given category},
+  description={define the post-description hook
+  \csfmt{glsxtrpostdesc}\meta{category} for the given category},
   note={provided by \styfmt{glossaries-extra} v1.31+},
   category={command}
 }
