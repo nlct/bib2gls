@@ -4832,7 +4832,7 @@ Then the back-link field will switch to \field{duallong}. The
 \end{codeenv}
 
 An alternative is to use the \abbrstyle{long-short-user-desc} style
-without the \idx{postdescriptionhook}:
+without the \idx!{postdescriptionhook}:
 \begin{codeenv}
 \cs{setabbreviationstyle}\marg{long-short-user-desc}
 \cs{renewcommand}*\marg{\cs{glsxtruserfield}}\marg{duallong}
@@ -4846,7 +4846,7 @@ parenthetical material until after the link-text:
 \cs{renewcommand}*\marg{\cs{glsxtruserfield}}\marg{duallong}
 \end{codeenv}
 If the back-link field has been switched to \field{duallong} then
-the post-description hook is no longer required.
+the \idx!{postdescriptionhook} is no longer required.
 
 \entrysection{dualacronym}
 
@@ -4883,46 +4883,46 @@ This entry type is very similar to
 well.  The required fields are: \field{short} and \field{long} (as for
 \atentry{dualindexabbreviation}) and also \field{description}.  The
 mappings are shared by both entry types.  For example:
-\begin{verbatim}
-@tertiaryindexabbreviationentry{html,
-  short={HTML},
-  long = {hypertext markup language},
-  description={a markup language for creating web pages}
+\begin{codeenv}
+\atentry{tertiaryindexabbreviationentry}\marg{html,
+  \field{short} = \marg{HTML},
+  \field{long} = \marg{hypertext markup language},
+  \field{description} = \marg{a markup language for creating web pages}
 }
-\end{verbatim}
-is analogous to
-\begin{verbatim}
-\newglossaryentry{html,name={HTML},description={}}
-
-\newabbreviation{dual.html}{HTML}{hypertext markup language}
-
-\newglossaryentry{tertiary.html, 
-  name={hypertext markup language},
-  description={a markup language for creating web pages}
+\end{codeenv}
+is analogous to:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{html,\field{name}=\marg{HTML},\field{description}=\marg{}}
+\strut
+\gls{newabbreviation}\marg{dual.html}\marg{HTML}\marg{hypertext markup language}
+\strut
+\gls{newglossaryentry}\marg{tertiary.html, 
+  \field{name}=\marg{hypertext markup language},
+  \field{description}=\marg{a markup language for creating web pages}
 }
-\end{verbatim}
+\end{codeenv}
 The last two are actually defined using one command:
-\begin{verbatim}
-\bibglsnewtertiaryindexabbreviationentrysecondary
-  {dual.html}% secondary label
-  {tertiary.html}% tertiary label
-  {...}% secondary fields
-  {...}% tertiary fields
-  {HTML}% primary name
-  {HTML}% short
-  {hypertext markup language}% long
-  {a markup language for creating web pages}% description
-\end{verbatim}
+\begin{codeenv}
+\gls{bibglsnewtertiaryindexabbreviationentrysecondary}
+  \marg{dual.html}\comment{secondary label}
+  \marg{tertiary.html}\comment{tertiary label}
+  \marg{...}\comment{secondary fields}
+  \marg{...}\comment{tertiary fields}
+  \marg{HTML}\comment{primary name}
+  \marg{HTML}\comment{short}
+  \marg{hypertext markup language}\comment{long}
+  \marg{a markup language for creating web pages}\comment{description}
+\end{codeenv}
 The \csref{bibglsnewtertiaryindexabbreviationentrysecondary}
 command is provided in the \iext{glstex} file as:
-\begin{verbatim}
-\providecommand{\bibglsnewtertiaryindexabbreviationentrysecondary}[8]{%
-  \newabbreviation[#3]{#1}{#6}{#7}%
-  \longnewglossaryentry*{#2}%
-  {name={\protect\bibglsuselongfont{#7}{\glscategory{#1}}},#4}%
-  {#8}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewtertiaryindexabbreviationentrysecondary}}[8]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}3}\marg{\idx{param}1}\marg{\idx{param}6}\marg{\idx{param}7}\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}2}\comment{}
+  \marg{\field{name}=\marg{\cmd{protect}\gls{bibglsuselongfont}\marg{\idx{param}7}\marg{\ics{glscategory}\marg{\idx{param}1}}},\idx{param}4}\comment{}
+  \marg{\idx{param}8}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 which defines the secondary as an abbreviation using
 \csfmt{newabbreviation} and the tertiary as a regular entry using
 \csfmt{longnewglossaryentry}. This means that the tertiary entry is
@@ -4976,7 +4976,7 @@ if will convert \fieldfmt{type} to \field{bibtextype}, so you
 must use \field{bibtextype} as the identifier when aliasing.
 
 Alternatively, you can use \ics{GlsXtrProvideBibTeXFields} which
-uses \ics{glsaddstoragekey} to provided all the standard \BibTeX\
+uses \ics{glsaddstoragekey} to provide all the standard \BibTeX\
 fields. (Remember that new fields must be defined before the first 
 \idx{resourceset}.)
 
@@ -5022,11 +5022,11 @@ The main \atentry{bibtexentry} is defined using
 \end{codeenv}
 where \meta{id} is the label identifying the main
 \atentry{bibtexentry} and \meta{contributor-id} is the
-label identifier the contributor, for each contributor that has
+label identifying the contributor, for each contributor that has
 been selected.
 
 Each contributor is defined using \gls{bibglsnewcontributor}. The definition 
-is followed by
+is followed by:
 \begin{codeenv}
 \gls{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry}\margm{id}
 \gls{glsxtrfieldlistadd}\margm{contributor-id}\marg{bibtexentry@\meta{entry-type}}\margm{id}
@@ -5044,35 +5044,34 @@ For example:
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\csfmt{par}\cs{glsentryname}\marg{\#1}}
 
-\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\%
-  \cs{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\%
-  \marg{\%
+\cs{newcommand}\marg{\postdeschook{contributor}}\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{\comment{}
     \cs{glsxtrfieldforlistloop}
-    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\%
-    \marg{\csfmt{contributorhandler}}\%
-  }%
-  \marg{\csfmt{par} No titles.}\%
+    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\comment{}
+    \marg{\csfmt{contributorhandler}}\comment{}
+  }\comment{}
+  \marg{\csfmt{par} No titles.}\comment{}
 }
 \end{codeenv}
 (where the resource option \csopt[title=name]{field-aliases}
 has been used).
 
-
 Here's an example that uses the test \file{xampl.bib} file that's
 provided with \TeX\ distributions:
 \begin{codeenv}
-\csfmt{documentclass}\marg{article}
-
-\cs{usepackage}[record,nomain]\marg{glossaries-extra}
-
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt{nomain}]\marg{glossaries-extra}
+\strut
 \cs{newglossary*}\marg{contributors}\marg{Authors/Editors}
 \cs{newglossary*}\marg{titles}\marg{Titles}
-
-\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\%
- \cs{longnewglossaryentry*}\marg{\#1}\marg{name={\#3},\#2,type=\marg{titles}}\marg{\#4}\%
+\strut
+\cs{newcommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{name={\idx{param}3},\idx{param}2,type=\marg{titles}}\marg{\idx{param}4}\comment{}
 }
-
-\gls!{GlsXtrLoadResources}\oarg{
+\strut
+\gls{GlsXtrLoadResources}\oarg{
   \csopt[xampl]{src},
   \csopt[false]{write-preamble},
   \csopt[
@@ -5092,40 +5091,40 @@ provided with \TeX\ distributions:
   \csopt[category]{sort-field},
   \csopt[name]{sort-suffix}
 }
-
+\strut
 \gls{glsxtrsetgrouptitle}\marg{article}\marg{Articles}
 \gls{glsxtrsetgrouptitle}\marg{booklet}\marg{Booklets}
 \gls{glsxtrsetgrouptitle}\marg{book}\marg{Books}
 \gls{glsxtrsetgrouptitle}\marg{inbook}\marg{Book Chapters}
 \gls{glsxtrsetgrouptitle}\marg{misc}\marg{Miscellaneous}
-
-\cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\csfmt{par}\ics{glsentryname}\marg{\#1} (\#1)}
-
-\cs{newcommand}\marg{\postdeschook{contributor}}{\%
-  \cs{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\%
-  \marg{\%
+\strut
+\cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\csfmt{par}\ics{glsentryname}\marg{\idx{param}1} (\idx{param}1)}
+\strut
+\cs{newcommand}\marg{\postdeschook{contributor}}{\comment{}
+  \cs{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{\comment{}
     \ics{glsxtrfieldforlistloop}
-    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\%
-    \marg{\csfmt{contributorhandler}}\%
-  }\%
-  \marg{\csfmt{par} No titles.}\%
+    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\comment{}
+    \marg{\csfmt{contributorhandler}}\comment{}
+  }\comment{}
+  \marg{\csfmt{par} No titles.}\comment{}
 }
-
+\strut
 \csfmt{begin}\marg{document}
-Sample\idx!{nbspchar}\ics{cite}\marg{book-minimal,article-full,inbook-full,misc-minimal}.
-Another sample\idx!{nbspchar}\cs{cite}\marg{booklet-minimal,misc-full,article-minimal}.
-
+Sample\idx{nbspchar}\ics{cite}\marg{book-minimal,article-full,inbook-full,misc-minimal}.
+Another sample\idx{nbspchar}\cs{cite}\marg{booklet-minimal,misc-full,article-minimal}.
+\strut
 \csfmt{bibliographystyle}\marg{plain}
 \ics{bibliography}\marg{xampl}
-
+\strut
 \cs{printunsrtglossary}[type=contributors,style=altlist]
 \cs{printunsrtglossary*}[type=titles,style=indexgroup]
-\marg{\%
- \cs{renewcommand}\marg{\ics{glsxtrgroupfield}}{category}\%
- \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\csfmt{emph}\marg{\#1}}\%
- \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\csfmt{textbf}\marg{\#1}}\%
+\marg{\comment{}
+ \cs{renewcommand}\marg{\ics{glsxtrgroupfield}}\marg{category}\comment{}
+ \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\comment{}
+ \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\cs{textbf}\marg{\idx{param}1}}\comment{}
 }
-
+\strut
 \csfmt{end}\marg{document}
 \end{codeenv}
 If the file is called \filefmt{myDoc.tex} then the document build
@@ -5143,16 +5142,19 @@ pdflatex myDoc
 
 Make sure that you use \isty{glossaries-extra} with the
 \styopt{record} package option. This ensures that \bibgls\ can pick
-up the required information from the \iext{aux} file, and it also
-loads the supplementary \isty{glossaries-extra-bib2gls} package
-(from version 1.27 onwards). The option also
-switches on the \styopt[none]{sort} package option (if you have a new
+up the required information from the \iext{aux} file, and both 
+\styopt[only]{record} and \styopt[nameref]{record} additionally
+load the supplementary \isty{glossaries-extra-bib2gls} package. 
+These two \styopt{record} option values also
+switch on the \styopt[none]{sort} package option (if you have a new
 enough version of the base \isty{glossaries} package), which means
 that there's no attempt to assign or process the \field{sort} key if
 it's omitted from \gls{newglossaryentry} (or similar commands). The
 \field{sort} key will be provided by \bibgls\ for informational
 purposes, but there's no need for \LaTeX\ to write it to any
-external files (unless you use \styopt[alsoindex]{record}).
+external files (unless you use the hybrid \styopt[alsoindex]{record}, 
+in which case you need to prevent \bibgls\ from sorting using the
+\csopt[none]{sort} resource option).
 
 The \iext{glstex} resource files created by \bibgls\ are loaded in
 the document using
@@ -5169,26 +5171,26 @@ resource file is called the \idx{resourceset} (see
 There's a shortcut command that uses
 \ics{jobname} in the \meta{filename}:
 \nosecformatdef{GlsXtrLoadResources}
-The first instance of this command is equivalent to
-\begin{alltt}
+The first instance of this command is equivalent to:
+\begin{codeenv}
 \gls{glsxtrresourcefile}\oargm{options}\marg{\ics{jobname}}
-\end{alltt}
-Any additional use of \gls{GlsXtrLoadResources} is equivalent to
-\begin{alltt}
+\end{codeenv}
+Any additional use of \gls{GlsXtrLoadResources} is equivalent to:
+\begin{codeenv}
 \gls{glsxtrresourcefile}\oargm{options}\marg{\ics{jobname}-\meta{n}}
-\end{alltt}
+\end{codeenv}
 where \meta{n} is number. For example:
-\begin{verbatim}
-\GlsXtrLoadResources[src=entries-en,sort={en}]
-\GlsXtrLoadResources[src=entries-fr,sort={fr}]
-\GlsXtrLoadResources[src=entries-de,sort={de-1996}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-en]{src},\csopt[en]{sort}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-fr]{src},\csopt[fr]{sort}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-de]{src},\csopt[de-1996]{sort}}
+\end{codeenv}
 This is equivalent to:
-\begin{verbatim}
-\glsxtrresourcefile[src=entries-en,sort={en}]{\jobname}
-\glsxtrresourcefile[src=entries-fr,sort={fr}]{\jobname-1}
-\glsxtrresourcefile[src=entries-de,sort={de-1996}]{\jobname-2}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtrresourcefile}\oarg{\csopt[entries-en]{src},\csopt[en]{sort}}\marg{\cs{jobname}}
+\gls{glsxtrresourcefile}\oarg{\csopt[entries-fr]{src},\csopt[fr]{sort}}\marg{\cs{jobname}-1}
+\gls{glsxtrresourcefile}\oarg{\csopt[entries-de]{src},\csopt[de-1996]{sort}}\marg{\cs{jobname}-2}
+\end{codeenv}
 In general, it's simplest just to use \gls{GlsXtrLoadResources}.
 
 The optional argument \meta{options} is a comma-separated
@@ -5211,43 +5213,43 @@ or you can load them separately with different settings applied.
 
 For example, if the files \filefmt{entries-terms.bib} and
 \filefmt{entries-symbols.bib} have the same settings:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms,entries-symbols}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms,entries-symbols]{src}}
+\end{codeenv}
 Alternatively, if they have different settings:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms},type=main]
-\GlsXtrLoadResources[src={entries-symbols},sort=use,type=symbols]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms]{src},\csopt[main]{type}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-symbols]{src},\csopt[use]{sort},\csopt[symbols]{type}}
+\end{codeenv}
 
 Note that the sorting is applied to each \idx{resourceset} independently
 of other \idxpl{resourceset}. This means that if you have multiple instances
 of \gls{glsxtrresourcefile} but only one glossary type, the glossary
 will effectively contain blocks of sorted entries. For example, if
 \filefmt{file1.bib} contains:
-\begin{verbatim}
-@index{duck}
-@index{zebra}
-@index{aardvark}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{duck}
+\atentry{index}\marg{zebra}
+\atentry{index}\marg{aardvark}
+\end{codeenv}
 and \filefmt{file2.bib} contains:
-\begin{verbatim}
-@index{caterpillar}
-@index{bee}
-@index{wombat}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{caterpillar}
+\atentry{index}\marg{bee}
+\atentry{index}\marg{wombat}
+\end{codeenv}
 then
-\begin{verbatim}
-\GlsXtrLoadResources[src={file1,file2}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[file1,file2]{src}}
+\end{codeenv}
 will result in the list: aardvark, bee, caterpillar, duck, wombat,
 zebra. These six entries are all defined when
 \csfmt{jobname}\filefmt{.glstex} is read.
 Whereas
-\begin{verbatim}
-\GlsXtrLoadResources[src={file1}]
-\GlsXtrLoadResources[src={file2}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[file1]{src}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[file2]{src}}
+\end{codeenv}
 will result in the list: aardvark, duck, zebra, bee, caterpillar,
 wombat. The first three (aardvark, duck, zebra) are defined when 
 \csfmt{jobname}\filefmt{.glstex} is read. The second three (bee,
@@ -5265,47 +5267,44 @@ abbreviations are defined, such as \cs{glsxtrlongshortdescname}.)
 
 Note \bibgls\ allows \iext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentry{preamble}.
-For example, suppose I have \filefmt{defs.bib} that just contains
-\begin{verbatim}
-@preamble{"\providecommand{\strong}[1]{\textbf{\color{red}#1}}
-\providecommand{\test}[2]{#2 (#1)}"}
-\end{verbatim}
+For example, suppose I have \filefmt{defs.bib} that just contains:
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{strong}}[1]\marg{\cs{textbf}\marg{\cmd{color}\marg{red}\idx{param}1}}
+\cs{providecommand}\marg{\cmd{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}"}
+\end{codeenv}
 This provides two commands:
 \nosecdef{strong}
 (which sets the font weight and colour) and 
-\begin{alltt}
-\csfmt{test}\margm{first}\margm{second}
-\end{alltt}
-(which just displays its second
-argument followed by the first in parentheses).
+\nosecdef{parenswap}
+(which just displays its second argument followed by the first in parentheses).
 
 Suppose I also have \filefmt{entries.bib} that contains:
-\begin{verbatim}
-@index{example,
-  name={\strong{\test{stuff}{example}}}
+\begin{codeenv}
+\atentry{index}\marg{example,
+  \field{name}=\marg{\gls{strong}\marg{\gls{parenswap}\marg{stuff}\marg{example}}}
 }
-@index{sample}
-@index{test}
-@index{foo}
-@index{bar}
-\end{verbatim}
+\atentry{index}\marg{sample}
+\atentry{index}\marg{test}
+\atentry{index}\marg{foo}
+\atentry{index}\marg{bar}
+\end{codeenv}
 This contains an entry that requires the commands provided in
 \filefmt{defs.bib}, so to ensure those commands are defined, I can
 do:
-\begin{verbatim}
-\GlsXtrLoadResources[src={defs,entries}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[defs,entries]{src}}
+\end{codeenv}
 Unfortunately this results in the sort value for \code{example} being
 set to \code{redexample (stuff)} because the interpreter has
-detected the provided commands and expanded 
-\begin{verbatim}
-\strong{\test{stuff}{example}}
-\end{verbatim}
-to
-\begin{verbatim}
-\textbf{\color{red}example (stuff)}
-\end{verbatim}
-It discards font changes, so \csfmt{textbf} is ignored, but it doesn't 
+detected the provided commands and expanded:
+\begin{codeenv}
+\gls{strong}\marg{\gls{parenswap}\marg{stuff}\marg{example}}
+\end{codeenv}
+to:
+\begin{codeenv}
+\cs{textbf}\marg{\cmd{color}\marg{red}example (stuff)}
+\end{codeenv}
+It discards font changes, so \cs{textbf} is ignored, but it doesn't 
 recognise \csfmt{color} and so doesn't know that the first argument is
 just the colour specifier and therefore doesn't discard it.
 This means that \qt{\textbf{\color{red}example (stuff)}} is placed
@@ -5313,15 +5312,15 @@ between \qt{foo} and \qt{sample} instead of between \qt{bar} and
 \qt{foo}.
 
 I can prevent the interpreter from parsing \atentry{preamble}:
-\begin{verbatim}
-\GlsXtrLoadResources[src={defs,entries},interpret-preamble=false]
-\end{verbatim}
-Now when the sort value for \code{example} is obtained from
-\begin{verbatim}
-\strong{\test{stuff}{example}}
-\end{verbatim}
-no expansion occurs (since \csfmt{strong} and \csfmt{test} are
-unrecognised) so the sort value ends up as
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[defs,entries]{src},\csopt[false]{interpret-preamble}}
+\end{codeenv}
+Now when the sort value for \code{example} is obtained from:
+\begin{codeenv}
+\gls{strong}\marg{\gls{parenswap}\marg{stuff}\marg{example}}
+\end{codeenv}
+no expansion occurs (since \gls{strong} and \gls{parenswap} are now
+unrecognised) so the sort value ends up as:
 \code{stuffexample}
 which places \qt{\textbf{\color{red}example (stuff)}} between 
 \qt{sample} and \qt{test}, which is again incorrect.
@@ -5331,29 +5330,29 @@ commands into two \iext{bib} files: one that shouldn't be interpreted
 and one that should.
 
 For example, \filefmt{defs-nointerpret.bib}:
-\begin{verbatim}
-@preamble{"\providecommand{\strong}[1]{\textbf{\color{red}#1}}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{strong}}[1]\marg{\cs{textbf}\marg{\cmd{color}\marg{red}\idx{param}1}}"}
+\end{codeenv}
 and \filefmt{defs-interpret.bib}:
-\begin{verbatim}
-@preamble{"\providecommand{\test}[2]{#2 (#1)}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}"}
+\end{codeenv}
 Now the first one can be loaded with \csopt[false]{interpret-preamble}:
-\begin{verbatim}
-\GlsXtrLoadResources[src={defs-nointerpret},interpret-preamble=false]
-\end{verbatim}
-This creates a \iext{glstex} file that provides \csfmt{strong} but
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[defs-nointerpret]{src},\csopt[false]{interpret-preamble}}
+\end{codeenv}
+This creates a \iext{glstex} file that provides \gls{strong} but
 doesn't define any entries. The other file \filefmt{defs-interpret.bib} can
 then be loaded with the default \csopt[true]{interpret-preamble}:
-\begin{verbatim}
-\GlsXtrLoadResources[src={defs-interpret,entries}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[defs-interpret,entries]{src}}
+\end{codeenv}
 The provided commands are remembered by the interpreter, so you can
 also do:
-\begin{verbatim}
-\GlsXtrLoadResources[src={defs-interpret}]
-\GlsXtrLoadResources[src={entries}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[defs-interpret]{src}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\end{codeenv}
 The \emph{contents} of \atentry{preamble} are only written to the
 associated \iext{glstex} file, but the definitions contained within
 the \atentry{preamble} are retained by the interpreter for subsequent
@@ -5383,16 +5382,16 @@ This is a boolean option that determines whether or not the
 interpreter should parse the contents of \atentry{preamble}.
 The default is \optfmt{true}. If \optfmt{false}, the preamble
 contents will still be written to the \iext{glstex} file, but any
-commands provided in the preamble won't be recognised if the
-interpreter is needed to determine an entry's sort value.
+commands provided in the preamble won't be recognised by the
+interpreter (see \sectionref{sec:texparserlib}).
 
-Related options are \csopt{set-widest}, which uses the interpreter
-to determine the widest name for the \glostyle{alttree} style,
-\csopt{interpret-label-fields}, which governs whether or not fields
-that must only contain a label should be interpreted,
-\csopt{labelify}, which converts a field into a string suitable for
-use as a label, and \csopt{labelify-list}, which converts a field
-into a string suitable for use as a comma-separated list of labels.
+Related options are: \csopt{set-widest} (which uses the interpreter to determine
+the widest name for the \glostyle{alttree} style or the
+\isty{glossary-longextra} styles), \csopt{interpret-label-fields} (which governs
+whether or not fields that must only contain a label should be interpreted),
+\csopt{labelify} (which converts a field into a string suitable for use as a
+label), and \csopt{labelify-list} (which converts a field into a string suitable
+for use as a comma-separated list of labels).
 
 \optsection{write-preamble}
 
@@ -5411,7 +5410,7 @@ The \glostyle{alttree} glossary style needs to know the widest
 using \ics{glssetwidest} provided by the \styfmt{glossary-tree}
 package (or similar commands like \ics{glsupdatewidest} provided by
 \styfmt{glossaries-extra-stylemods}), but this requires knowing
-which name is the widest. Alternative one of the iterative commands
+which name is the widest. Alternatively, one of the iterative commands
 such as \ics{glsFindWidestTopLevelName} can be used, which slows the
 document build as it has to iterate over all defined entries.
 
@@ -5423,10 +5422,9 @@ style then that value will be used as the default, but you can set another
 value that's only used for the \sty{glossary-longextra} styles with
 \ics{glslongextraSetWidest}.
 
-For convenience, the \sty{glossaries-extra-bib2gls} package v1.37+
-provides \ics{glsxtrSetWidest}, which will set the widest name for 
-those styles that need it. As from version 1.8, \bibgls\ now checks
-for the existence of this command and will use it with
+The \sty{glossaries-extra-bib2gls} package provides \ics{glsxtrSetWidest},
+which sets the widest name for those styles that need it. As from version
+1.8, \bibgls\ now checks for the existence of this command and will use it with
 \csopt{set-widest} to allow for the new styles provided by the
 \sty{glossary-longextra} package.
 
@@ -5436,19 +5434,19 @@ to determine the correct value within the document.
 Since \bibgls\ doesn't know the fonts that will be used
 in the document or if there are any non-standard commands that
 aren't provided in the \ext{bib} files preamble, \emph{this option may not
-work}. For example, if one entry has the \field{name} defined as
-\begin{verbatim}
-name={some {\Huge huge} text}
-\end{verbatim}
-and another entry has the \field{name} defined as
-\begin{verbatim}
-name={some {\small small} text}
-\end{verbatim}
+work}. For example, if one entry has the \field{name} defined as:
+\begin{codeenv}
+\field{name}=\marg{some \marg{\cmd{Huge} huge} text}
+\end{codeenv}
+and another entry has the \field{name} defined as:
+\begin{codeenv}
+\field{name}=\marg{some \marg{\cmd{small} small} text}
+\end{codeenv}
 then \bibgls\ will determine that the second name is the widest
 although the first will actually be wider when it's rendered in the
 document. 
 
-When using this option, the transcript file will include the message
+When using this option, the transcript file will include the message:
 \begin{alltt}
 Calculated width of '\meta{text}': \meta{number}
 \end{alltt}
@@ -5497,86 +5495,86 @@ set the \field{type} using options like \csopt{type} and
 \optsection{entry-type-aliases}
 
 In the \ext{bib} file, the data is identified by 
-\code{@\meta{entry-type}}, such as \code{@abbreviation}.
+\code{@\meta{entry-type}}, such as \atentry[noindex]{abbreviation}.
 It may be that you want to replace all instances of
 \code{@\meta{entry-type}} with a different 
 type of entry. For example, suppose my \ext{bib} file
 contains abbreviations defined in the form:
-\begin{verbatim}
-@abbreviation{html,
-  short ={html},
-  long  = {hypertext markup language},
-  description={a markup language for creating web pages}
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = \marg{html},
+  \field{long}  = \marg{hypertext markup language},
+  \field{description} = \marg{a markup language for creating web pages}
 }
-\end{verbatim}
+\end{codeenv}
 but suppose in one of my documents I actually want all these
-abbreviations defined with \atentry{dualabbreviationentry}
-instead of \atentry{abbreviation}. Instead of editing
+abbreviations defined with \atentry[noindex]{dualabbreviationentry}
+instead of \atentry[noindex]{abbreviation}. Instead of editing
 the \ext{bib} file I can just supply a mapping:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=entries,% data in entries.bib
-  entry-type-aliases={abbreviation=dualabbreviationentry}
-]
-\end{verbatim}
-This makes all instances of \code{@abbreviation}
-behave as \code{@dualabbreviationentry}. You can have more than
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[abbreviation=dualabbreviationentry]{entry-type-aliases}
+}
+\end{codeenv}
+This makes all instances of \atentry[noindex]{abbreviation}
+behave as \atentry[noindex]{dualabbreviationentry}. You can have more than
 one mapping. For example:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=entries,% data in entries.bib
-  entry-type-aliases={
-    % @abbreviation -> @dualabbreviationentry:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[
+    \comment{\atentry{abbreviation} -> \atentry{dualabbreviationentry}:}
     abbreviation=dualabbreviationentry,
-    % @entry -> @index:
+    \comment{\atentry{entry} -> \atentry{index}:}
     entry=index
-  }
-]
-\end{verbatim}
+  ]{entry-type-aliases}
+}
+\end{codeenv}
 This option isn't cumulative.  Multiple instances of
 \csopt{entry-type-aliases} override previous instances.
 If \meta{\keyvallist} is empty there will be no mappings.
 
 Here's another example entry in a \ext{bib} file:
-\begin{verbatim}
-@foo{html,
-   name={HTML},
-   short={HTML},
-   long={hypertext markup language},
-   description={hypertext markup language}
+\begin{codeenv}
+@foo\marg{html,
+   \field{name} = \marg{HTML},
+   \field{short} = \marg{HTML},
+   \field{long} = \marg{hypertext markup language},
+   \field{description} = \marg{hypertext markup language}
 }
-\end{verbatim}
+\end{codeenv}
 Ordinarily this entry would be ignored since \code{@foo}
 isn't recognised, but it can be mapped like this:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=entries,% data in entries.bib
-  ignore-fields={short,long},
-  entry-type-aliases={foo=entry}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[short,long]{ignore-fields},
+  \csopt[foo=entry]{entry-type-aliases}
+}
+\end{codeenv}
 This treats the entry as though it had been defined as:
-\begin{verbatim}
-@entry{html,
-   name={HTML},
-   description={hypertext markup language}
+\begin{codeenv}
+\atentry{entry}\marg{html,
+   \field{name} = \marg{HTML},
+   \field{description} = \marg{hypertext markup language}
 }
-\end{verbatim}
-whereas
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=entries,% data in entries.bib
-  ignore-fields={name,description},
-  entry-type-aliases={foo=abbreviation}
-]
-\end{verbatim}
+\end{codeenv}
+whereas:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[name,description]{ignore-fields},
+  \csopt[foo=abbreviation]{entry-type-aliases}
+}
+\end{codeenv}
 treats the entry as though it had been defined as:
-\begin{verbatim}
-@abbreviation{html,
-   short={HTML},
-   long={hypertext markup language}
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+   \field{short} = \marg{HTML},
+   \field{long} = \marg{hypertext markup language}
 }
-\end{verbatim}
+\end{codeenv}
 
 \optsection{action}
 
