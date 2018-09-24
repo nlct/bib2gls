@@ -763,21 +763,21 @@ name},
 
 @dualindexentry{bibglsdate,
   name={\csfmt{bib\-gls\-date}},
-  user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\marg{original}},
+  user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\margm{original}},
   description={used to markup a date converted from a field value},
   category={command}
 }
 
 @dualindexentry{bibglsdatetime,
   name={\csfmt{bib\-gls\-date\-time}},
-  user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\marg{original}},
+  user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\margm{original}},
   description={used to markup a date-time instance converted from a field value},
   category={command}
 }
 
 @dualindexentry{bibglsdatetimeremainder,
   name={\csfmt{bib\-gls\-date\-time\-remainder}},
-  user1={\margm{millisec}\margm{dst}\margm{zone}\marg{original}},
+  user1={\margm{millisec}\margm{dst}\margm{zone}\margm{original}},
   description={used internally to pick up the final four arguments of
    \gls{bibglsdatetime}},
   category={command}
@@ -785,7 +785,7 @@ name},
 
 @dualindexentry{bibglstime,
   name={\csfmt{bib\-gls\-time}},
-  user1={\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\marg{original}},
+  user1={\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\margm{original}},
   description={used to markup a time converted from a field value},
   category={command}
 }
@@ -1574,7 +1574,7 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.strip-trailing-nopost,
    name={\csoptfmt{strip\dhyphen trailing\dhyphen nopost}},
-   user1={\meta{value}},
+   user1={\meta{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -3385,11 +3385,13 @@ cs}\margm{Glspl-like cs}},
 }
 
 @index{zeroormore,
-  name={\code{*} (regular expression, zero or more)}
+  name={\code{*} (regular expression, zero or more)},
+  text={\code{*}}
 }
 
 @index{matchanydot,
-  name={\code{.}\ (regular expression, match any)}
+  name={\code{.}\ (regular expression, match any)},
+  text={\code{.}}
 }
 
 @index{periodchar,
@@ -3406,6 +3408,22 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{\textvisiblespace}},
   description={produces an inter-word space},
   note={kernel command},
+  category={command}
+}
+
+@index{ifstrempty,
+  name={\csfmt{if\-str\-empty}},
+  user1={\margm{string}\margm{true}\margm{false}},
+  description={tests if \meta{string} is empty},
+  note={provided by \styfmt{etoolbox}},
+  category={command}
+}
+
+@index{ifstrequal,
+  name={\csfmt{if\-str\-equal}},
+  user1={\margm{string1}\margm{string2}\margm{true}\margm{false}},
+  description={tests if \meta{string1} equals \meta{string2}},
+  note={provided by \styfmt{etoolbox}},
   category={command}
 }
 
@@ -6035,6 +6053,40 @@ primary formats, if enabled.},
 
 @index{postdescriptionhook,
   name={post-description hook}
+}
+
+@index{languagexml,
+  name={language resource file (\extfmt{xml})}
+}
+
+@index{tag.page,
+  name={\xmltagfmt{tag.page}},
+  parent={languagexml}
+}
+
+@index{tag.pages,
+  name={\xmltagfmt{tag.pages}},
+  parent={languagexml}
+}
+
+@index{tag.passim,
+  name={\xmltagfmt{tag.passim}},
+  parent={languagexml}
+}
+
+@index{sentence.terminators,
+  name={\xmltagfmt{sentence.terminators}},
+  parent={languagexml}
+}
+
+@index{grouptitle.case.lc,
+  name={\xmltagfmt{grouptitle.case.}\meta{lc}},
+  parent={languagexml}
+}
+
+@index{xmlsee,
+  name={XML resource file},
+  see={languagexml}
 }
 
 @index{encoding}
@@ -9368,6 +9420,27 @@ has three or more items},
   category={command}
 }
 
+@index{O,
+  name={\csfmt{O}},
+  description={produces the O-slash character \O},
+  note={kernel command},
+  category={command}
+}
+
+@index{ae,
+  name={\csfmt{ae}},
+  description={produces the \ae-ligature},
+  note={kernel command},
+  category={command}
+}
+
+@index{oe,
+  name={\csfmt{oe}},
+  description={produces the \oe-ligature},
+  note={kernel command},
+  category={command}
+}
+
 @index{textsuperscript,
   name={\csfmt{textsuperscript}},
   user1={\margm{text}},
@@ -9454,6 +9527,22 @@ has three or more items},
   description={generates an error message for the package identified
 by \meta{name}},
   note={kernel command},
+  category={command}
+}
+
+@index{cs.color,
+  name={\csfmt{color}},
+  user1={\oargm{model}\margm{spec}},
+  description={switches the current font colour},
+  note={provided by \styfmt{color}},
+  category={command}
+}
+
+@index{textcolor,
+  name={\csfmt{textcolor}},
+  user1={\oargm{model}\margm{spec}\margm{text}},
+  description={typesets \meta{text} in the given colour},
+  note={provided by \styfmt{color}},
   category={command}
 }
 

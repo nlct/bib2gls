@@ -1,0 +1,19 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={testseealsoentries},
+  %selection={recorded and deps and see}
+  selection={recorded and deps}
+]
+
+\begin{document}
+\gls{dash}.
+%\gls{sprint}.
+
+\printunsrtglossaries
+
+\end{document}

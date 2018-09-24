@@ -246,6 +246,7 @@
 \newcommand*{\counterfmt}[1]{\texorpdfstring{\textsf{#1}}{#1}}
 \newcommand*{\idprefixfmt}[1]{%
  \texorpdfstring{\texttt{#1\spacefactor999 .}}{#1.}}
+\newcommand*{\xmltagfmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 
 \newcommand*{\argor}{\texorpdfstring{\protect\textbar}{|}}
 
@@ -2625,7 +2626,7 @@ by the following line in the \langxml:
 \begin{verbatim}
 <entry key="grouptitle.case.ij">IJ</entry>
 \end{verbatim}
-If there isn't a \code{grouptitle.case.\meta{lc}} key (where 
+If there isn't a \idx{grouptitle.case.lc} key (where 
 \meta{lc} is the \idx!{lowercase} version), then only the first character
 will be converted to \idx{uppercase} otherwise the value supplied by the
 resource file is used. This resource key is only checked for
@@ -5269,7 +5270,7 @@ Note \bibgls\ allows \iext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentry{preamble}.
 For example, suppose I have \filefmt{defs.bib} that just contains:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{strong}}[1]\marg{\cs{textbf}\marg{\cmd{color}\marg{red}\idx{param}1}}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{strong}}[1]\marg{\cs{textbf}\marg{\ics{cs.color}\marg{red}\idx{param}1}}
 \cs{providecommand}\marg{\cmd{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}"}
 \end{codeenv}
 This provides two commands:
@@ -5302,10 +5303,10 @@ detected the provided commands and expanded:
 \end{codeenv}
 to:
 \begin{codeenv}
-\cs{textbf}\marg{\cmd{color}\marg{red}example (stuff)}
+\cs{textbf}\marg{\cs{cs.color}\marg{red}example (stuff)}
 \end{codeenv}
 It discards font changes, so \cs{textbf} is ignored, but it doesn't 
-recognise \csfmt{color} and so doesn't know that the first argument is
+recognise \cs{cs.color} and so doesn't know that the first argument is
 just the colour specifier and therefore doesn't discard it.
 This means that \qt{\textbf{\color{red}example (stuff)}} is placed
 between \qt{foo} and \qt{sample} instead of between \qt{bar} and
@@ -5331,7 +5332,7 @@ and one that should.
 
 For example, \filefmt{defs-nointerpret.bib}:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{strong}}[1]\marg{\cs{textbf}\marg{\cmd{color}\marg{red}\idx{param}1}}"}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{strong}}[1]\marg{\cs{textbf}\marg{\cs{cs.color}\marg{red}\idx{param}1}}"}
 \end{codeenv}
 and \filefmt{defs-interpret.bib}:
 \begin{codeenv}
@@ -5597,11 +5598,11 @@ definition will be ignored. (The warnings can be found in the
 \sty{glossaries-extra} not by \bibgls.)
 
 For example, if you try:
-\begin{verbatim}
-\newglossary*{copies}{Copies}
-\GlsXtrLoadResources[src={entries}]
-\GlsXtrLoadResources[sort=use,type=copies,src={entries}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{copies}\marg{Copies}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[use]{sort},\csopt[copies]{type},\csopt[entries]{src}}
+\end{codeenv}
 you'll find that the \code{copies} glossary is empty and there will
 be warnings in the \ext{log} file when the second resource file is
 loaded.
@@ -5653,24 +5654,25 @@ Remember that if you are using \sty{hyperref}, you need to use
 \ics{printunsrtglossary} for the glossary containing the copies to
 prevent duplicate hypertargets. Commands like \cs{gls} will link to
 the original entries. For example, in the preamble:
-\begin{verbatim}
-\newignoredglossary{copies}
-
-\GlsXtrLoadResources[src={entries}]
-
-\GlsXtrLoadResources[
- sort=use,
- action={copy},
- type=copies,
- src={entries}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newignoredglossary}\marg{copies}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[use]{sort},
+ \csopt[copy]{action},
+ \csopt[copies]{type},
+ \csopt[entries]{src}
+}
+\end{codeenv}
 and later in the document:
-\begin{verbatim}
-\printunsrtglossary[title={Glossary (Alphabetical)},style=indexgroup]
-\printunsrtglossary[type=copies,title={Glossary (Order of Use)},
- style=index,nogroupskip,
- target=false]
-\end{verbatim}
+\begin{codeenv}
+\cs{printunsrtglossary}\oarg{title=\marg{Glossary (Alphabetical)},style=indexgroup}
+\cs{printunsrtglossary}\oarg{type=copies,title=\marg{Glossary (Order of Use)},
+ style=index,nogroupskip,\comment{no grouping}
+ target=false}
+\end{codeenv}
 Note also the need to use \code{nogroupskip} and a non-group style
 for the duplicates since the \field{group} field will have been
 assigned in the first resource set if \bibgls\ was invoked with 
@@ -5685,17 +5687,17 @@ before you display the glossary. The simplest way to do this is with
 the starred form of \cs{printunsrtglossary}.
 For example, if \csopt[dupgroup]{copy-action-group-field} is added to
 the options for the second resource set:
-\begin{alltt}
-\ics{printunsrtglossary*}\oarg{type=copies,title={Duplicates},style=indexgroup}
+\begin{codeenv}
+\ics{printunsrtglossary*}\oarg{type=copies,title=\marg{Duplicates},style=indexgroup}
  \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
-\end{alltt}
+\end{codeenv}
 This just does:
-\begin{verbatim}
-\begingroup
- \renewcommand{\glsxtrgroupfield}{dupgroup}%
- \printunsrtglossary[type=copies,title={Duplicates},style=indexgroup]
-\endgroup
-\end{verbatim}
+\begin{codeenv}
+\cmd{begingroup}
+ \cs{renewcommand}\marg{\ics{glsxtrgroupfield}}\marg{dupgroup}\comment{}
+ \cs{printunsrtglossary}\oarg{type=copies,title=\marg{Duplicates},style=indexgroup}
+\cmd{endgroup}
+\end{codeenv}
 
 
 \section{Selection Options}
@@ -5712,22 +5714,22 @@ them).  The \ext{bib} extension may be omitted.  Remember that if
 \meta{list} contains multiple files it must be grouped to protect
 the comma from the \meta{options} list.
 
-For example
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms,entries-symbols}]
-\end{verbatim}
+For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms,entries-symbols]{src}}
+\end{codeenv}
 indicates that \bibgls\ must read the files
 \filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
 create the file given by \ics{jobname}\iext{glstex} on the first
 instance or \ics{jobname}\code{-}\meta{n}\ext{glstex} on subsequent
 use.
 
-With \csref{glsxtrresourcefile}\oargm{options}\margm{filename}, if 
+With \code{\csref{glsxtrresourcefile}\oargm{options}\margm{filename}}, if 
 the \csopt{src} option is omitted, 
 the \ext{bib} file is assumed to be \meta{filename}\ext{bib}. For example:
-\begin{verbatim}
-\glsxtrresourcefile{entries-symbols}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtrresourcefile}\marg{entries-symbols}
+\end{codeenv}
 indicates that \bibgls\ needs to read the file
 \filefmt{entries-symbols.bib}, which contains the entry data, and create the file
 \filefmt{entries-symbols.glstex}. If the \ext{bib} file is
@@ -5735,11 +5737,11 @@ different or if you have multiple \ext{bib} files, you need to use
 the \csopt{src} option.
 
 \gls{GlsXtrLoadResources} uses \ics{jobname} as the argument of 
-\gls{glsxtrresourcefile} on the first instance, so  
-\begin{verbatim}
-\GlsXtrLoadResources[]
-\end{verbatim}
-will assume \optfmt{src=\ics{jobname}}. Remember that subsequent uses
+\gls{glsxtrresourcefile} on the first instance, so:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{}
+\end{codeenv}
+will assume \csopt[\ics{jobname}]{src}. Remember that subsequent uses
 of \gls{GlsXtrLoadResources} append a suffix, so in general it's
 best to always supply \csopt{src}.
 
@@ -5750,21 +5752,21 @@ written to the \ext{aux} file. Similarly for any special characters
 that need protecting (although it's better not to use special
 characters in filenames). For example:
 \begin{codeenv}
-\csfmt{documentclass}\marg{article}
-
-\cs{usepackage}\oarg{T2A}\marg{fontenc}
-\cs{usepackage}\oarg{utf8}\marg{inputenc}
-\cs{usepackage}\oarg{russian}\marg{babel}
-\cs{usepackage}\oarg{record}\marg{glossaries-extra}
-
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{T2A}\marg{fontenc}
+\cmd{usepackage}\oarg{utf8}\marg{inputenc}
+\cmd{usepackage}\oarg{russian}\marg{babel}
+\cmd{usepackage}\oarg{record}\marg{glossaries-extra}
+\strut
 \gls{GlsXtrLoadResources}\oarg{
-  src = {\cs{detokenize}{\textcyrillicmono{кириллица}}},\comment{data in \textcyrillicmono{кириллица.bib}}
-  selection=all
+  \csopt[\cs{detokenize}\marg{\textcyrillicmono{кириллица}}]{src},\comment{data in \textcyrillicmono{кириллица.bib}}
+  \csopt[all]{selection}
 }
-
-\csfmt{begin}\marg{document}
+\strut
+\cmd{begin}\marg{document}
 \cs{printunsrtglossary}
-\csfmt{end}\marg{document}
+\cmd{end}\marg{document}
 \end{codeenv}
 
 \optsection{selection}
@@ -5776,11 +5778,11 @@ run, may need an additional build to ensure their location lists
 are updated.
 
 Remember that on the first \LaTeX\ run the \iext{glstex} files don't
-exist. This means that the entries can't be defined. The
+exist. This means that the entries aren't defined at that point. The
 \styopt{record} package option additionally switches on the
 \styopt[warn]{undefaction} option, which means that you'll only get
 warnings rather than errors when you reference entries in the
-document. This means that you can't use \ics{glsaddall} with
+document. You can't use \ics{glsaddall} with
 \bibgls\ because the glossary lists are empty on the first run, so
 there's nothing for \ics{glsaddall} to iterate over.
 Instead, if you want to add all defined entries, you need to
@@ -5807,15 +5809,13 @@ supplied in the \csopt{src} option.
 The \meta{value} must be supplied.
 
 For example, suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@index{run}
-
-@index{sprint,see={run}}
-
-@index{dash,see={sprint}}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{run}
+\atentry{index}\marg{sprint,\field{see}=\marg{run}}
+\atentry{index}\marg{dash,\field{see}=\marg{sprint}}
+\end{codeenv}
 If the document only references the \qt{run} entry (for example,
-using \verb|\gls{run}|) then:
+using \code{\cs{gls}\marg{run}}) then:
 \begin{itemize}
 \item If \csopt[recorded and deps]{selection}, only the \qt{run}
 entry is selected. The \qt{run} entry has a record, so it's
@@ -5833,17 +5833,69 @@ selected.
 \end{itemize}
 The above is just an example. The circuitous redirection of
 \qt{dash} to \qt{sprint} to \qt{run} is unhelpful to the reader and
-is best avoided. A better method would be:
-\begin{verbatim}
-@index{run}
-
-@index{sprint,see={run}}
-
-@index{dash,see={run}}
-\end{verbatim}
+is best avoided (especially for an index where there are no accompanying 
+descriptions and no \idx{locationlist} for the intermediate \qt{sprint}). 
+A better method would be:
+\begin{codeenv}
+\atentry{index}\marg{run}
+\atentry{index}\marg{sprint,\field{see}=\marg{run}}
+\atentry{index}\marg{dash,\field{see}=\marg{run}}
+\end{codeenv}
 The \csopt[recorded and deps and see]{selection} in this case will
 select all three entries, and the document won't send the reader on a
 long-winded detour.
+
+Now suppose that the file \filefmt{entries.bib} contains:
+\begin{codeenv}
+\atentry{entry}\marg{run,
+ \field{name} = \marg{run},
+ \field{description}=\marg{move fast using legs}
+}
+\strut
+\atentry{entry}\marg{sprint,
+ \field{name} = \marg{sprint},
+ \field{description}=\marg{run at full speed over short distance},
+ \field{seealso}=\marg{run}
+}
+\strut
+\atentry{entry}\marg{dash,
+ \field{name} = \marg{dash},
+ \field{description}=\marg{run in a great hurry},
+ \field{seealso}=\marg{sprint}
+}
+\end{codeenv}
+and suppose the document only references \qt{dash} (for example, with
+\code{\cs{gls}\marg{dash}}), then with the default \csopt[recorded and deps]{selection}
+\qt{dash} will be selected because it has a record, and \qt{sprint}
+will be selected because \qt{dash} requires it (for the cross-reference),
+and \qt{run} will be selected because \qt{sprint} requires it
+(for the cross-reference). In this case, neither \qt{sprint} nor \qt{run}
+have a \idx{locationlist} but they do both provide additional information
+for the reader in their descriptions.
+
+A better method here would be for each entry to have a cross-reference
+list that includes all related terms:
+\begin{codeenv}
+\atentry{entry}\marg{run,
+ \field{name} = \marg{run},
+ \field{description}=\marg{move fast using legs},
+ \field{seealso}=\marg{sprint,dash}
+}
+\strut
+\atentry{entry}\marg{sprint,
+ \field{name} = \marg{sprint},
+ \field{description}=\marg{run at full speed over short distance},
+ \field{seealso}=\marg{run,dash}
+}
+\strut
+\atentry{entry}\marg{dash,
+ \field{name} = \marg{dash},
+ \field{description}=\marg{run in a great hurry},
+ \field{seealso}=\marg{sprint,run}
+}
+\end{codeenv}
+Now, whichever one is indexed in the document, the other two will automatically
+be selected.
 
 \optsection{match}
 
@@ -5851,7 +5903,7 @@ It's possible to filter the selection by matching field values.
 If \meta{\keyvallist} is empty no filtering will be applied, otherwise
 \meta{\keyvallist} should be a \meta{key}=\meta{regexp} list, where
 \meta{key} is the name of a field or \optfmt{id} for the entry's
-label or \optfmt{entrytype} for the entry type (as in
+label or \optfmt{entrytype} for the \bibgls\ entry type (as in
 the part after \verb|@| identifying the entry not the \field{type}
 field identifying the glossary label). If you've used
 \csopt{entry-type-aliases}, this refers to the target entry type not
@@ -5861,7 +5913,7 @@ The \meta{regex} part should be a regular expression conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}. The pattern is anchored 
-(\code{oo\idx{matchanydot}\idx{zeroormore}} matches
+(\code{oo}\idx{matchanydot}\idx{zeroormore} matches
 \code{oops} but not \code{loops}) and \meta{regexp} can't be
 empty. Remember that \TeX\ will expand the option list as
 it writes the information to the \ext{aux} file so take
@@ -5875,7 +5927,7 @@ unrecognised by \bibgls\ any reference to it in \meta{\keyvallist} will
 be ignored.
 
 If a field is listed multiple times, the pattern for that
-field is concatenated using
+field is concatenated using:
 \begin{alltt}
 (?:\meta{pattern-1})|(?:\meta{pattern-2})
 \end{alltt}
@@ -5884,14 +5936,14 @@ and \meta{pattern-2} is the new pattern. This means it performs a
 logical OR\@. For the non-duplicate
 fields the logical operator is given by \csopt{match-op}.
 For example:
-\begin{verbatim}
-match-op={and},
-match={
+\begin{codeenv}
+\csopt[and]{match-op},
+\csopt[
   category=animals,
   topic=biology,
   category=vegetables
-}
-\end{verbatim}
+]{match}
+\end{codeenv}
 This will keep all the selected entries that satisfy:
 \begin{itemize}
 \item \field{category} matches \verb"(?:animals)|(?:vegetables)"
@@ -5946,13 +5998,13 @@ For example, if I want to select all record entries and their
 dependencies, but I also want to make sure that any entries with
 the category set to \code{important} are always selected regardless
 of whether or not they have any records:
-\begin{verbatim}
-\GlsXtrLoadResource[
-  src=entries,% data in entries.bib
-  match-action={add},
-  match={category=important}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[add]{match-action},
+  \csopt[category=important]{match}
+}
+\end{codeenv}
 
 \optsection{limit}
 
@@ -6002,68 +6054,68 @@ this command will do \meta{false} as the \field{childcount} field
 won't be set.
 
 For example, suppose \filefmt{entries.bib} contains:
-\begin{verbatim}
-@index{birds}
-@index{duck,parent={birds}}
-@index{goose,plural={geese},parent={birds}}
-@index{swan,parent={birds}}
-
-@index{minerals}
-@index{quartz,parent={minerals}}
-@index{corundum,parent={minerals}}
-@index{amethyst,parent={minerals}}
-@index{gypsum,parent={minerals}}
-@index{gold,parent={minerals}}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{birds}
+\atentry{index}\marg{duck,\field{parent}=\marg{birds}}
+\atentry{index}\marg{goose,\field{plural}=\marg{geese},\field{parent}=\marg{birds}}
+\atentry{index}\marg{swan,\field{parent}=\marg{birds}}
+\strut
+\atentry{index}\marg{minerals}
+\atentry{index}\marg{quartz,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{corundum,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{amethyst,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{gypsum,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{gold,\field{parent}=\marg{minerals}}
+\end{codeenv}
 and the document contains:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,style=indexgroup]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries},save-child-count]
-
-\begin{document}
-\gls{duck} and \gls{goose}.
-\gls{quartz}, \gls{corundum}, \gls{amethyst}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt[indexgroup]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt{save-child-count}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{duck} and \cs{gls}\marg{goose}.
+\cs{gls}\marg{quartz}, \cs{gls}\marg{corundum}, \cs{gls}\marg{amethyst}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 Then the \ext{glstex} file will contain:
-\begin{verbatim}
-\GlsXtrSetField{birds}{childcount}{2}
-\GlsXtrSetField{duck}{childcount}{0}
-\glsxtrfieldlistadd{birds}{childlist}{duck}
-\GlsXtrSetField{goose}{childcount}{0}
-\glsxtrfieldlistadd{birds}{childlist}{goose}
-\GlsXtrSetField{minerals}{childcount}{3}
-\GlsXtrSetField{amethyst}{childcount}{0}
-\glsxtrfieldlistadd{minerals}{childlist}{amethyst}
-\GlsXtrSetField{corundum}{childcount}{0}
-\glsxtrfieldlistadd{minerals}{childlist}{corundum}
-\GlsXtrSetField{quartz}{childcount}{0}
-\glsxtrfieldlistadd{minerals}{childlist}{quartz}
-\end{verbatim}
+\begin{codeenv}
+\cs{GlsXtrSetField}\marg{birds}\marg{childcount}\marg{2}
+\cs{GlsXtrSetField}\marg{duck}\marg{childcount}\marg{0}
+\gls{glsxtrfieldlistadd}\marg{birds}\marg{childlist}\marg{duck}
+\cs{GlsXtrSetField}\marg{goose}\marg{childcount}\marg{0}
+\gls{glsxtrfieldlistadd}\marg{birds}\marg{childlist}\marg{goose}
+\cs{GlsXtrSetField}\marg{minerals}\marg{childcount}\marg{3}
+\cs{GlsXtrSetField}\marg{amethyst}\marg{childcount}\marg{0}
+\gls{glsxtrfieldlistadd}\marg{minerals}\marg{childlist}\marg{amethyst}
+\cs{GlsXtrSetField}\marg{corundum}\marg{childcount}\marg{0}
+\gls{glsxtrfieldlistadd}\marg{minerals}\marg{childlist}\marg{corundum}
+\cs{GlsXtrSetField}\marg{quartz}\marg{childcount}\marg{0}
+\gls{glsxtrfieldlistadd}\marg{minerals}\marg{childlist}\marg{quartz}
+\end{codeenv}
 Note that although \code{birds} has three children defined in the
 \ext{bib} file, only two have been selected, so the child count is
-set to 2. Similarly the \code{minerals} entry has five children
+set to~2. Similarly the \code{minerals} entry has five children
 defined in the \ext{bib} file, but only three have been selected, so
-the child count is 3.
+the child count is~3.
 
 The following uses the post-description hook to show the child count
 in parentheses:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries},category=general,save-child-count]
-
-\renewcommand{\glsxtrpostdescgeneral}{%
-  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
-  { (child count: \glscurrentfieldvalue.)}%
-  {}%
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[general]{category},\csopt{save-child-count}}
+\strut
+\cs{glsdefpostdesc}\marg{general}\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{childcount}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{ (child count: \cs{glscurrentfieldvalue}.)}\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 \ics{glsxtrifhasfield} requires at least \sty{glossaries-extra} v1.19.
-It's slightly more efficient that \ics{ifglshasfield} provided by
+It's slightly more efficient than \ics{ifglshasfield} provided by
 the base \styfmt{glossaries} package, and it doesn't complain if the
 entry or field don't exist, but note that \ics{glsxtrifhasfield}
 implicitly scopes its content. Use the starred version to omit the
@@ -6092,7 +6144,7 @@ This may take one of three values: \optfmt{false} (default),
 Unlike the \csopt{flatten} option, which completely
 removes the hierarchy, the \csopt{flatten-lonely} option can be used
 to selectively alter the hierarchy.  In this case only those entries
-that have a parent but have no siblings are checked. This option
+that have a parent but have no siblings are considered. This option
 is affected by the \csopt{flatten-lonely-rule} setting. The conditions for
 moving a child up one hierarchical level are as follows:
 \begin{itemize}
@@ -6117,48 +6169,48 @@ or after sorting (\optfmt{postsort}). To disable this function
 use \csopt[false]{flatten-lonely}.
 
 For example, suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@index{birds}
-@index{duck,parent={birds}}
-@index{goose,plural={geese},parent={birds}}
-@index{swan,parent={birds}}
-@index{chicken,parent={birds}}
-
-@index{vegetable}
-@index{cabbage,parent={vegetable}}
-
-@index{minerals}
-@index{quartz,parent={minerals}}
-@index{corundum,parent={minerals}}
-@index{amethyst,parent={minerals}}
-@index{gypsum,parent={minerals}}
-
-@index{aardvark}
-@index{bard}
-@index{buzz}
-
-@index{item}
-@index{subitem,parent={item}}
-@index{subsubitem,parent={subitem}}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{birds}
+\atentry{index}\marg{duck,\field{parent}=\marg{birds}}
+\atentry{index}\marg{goose,\field{plural}=\marg{geese},\field{parent}=\marg{birds}}
+\atentry{index}\marg{swan,\field{parent}=\marg{birds}}
+\atentry{index}\marg{chicken,\field{parent}=\marg{birds}}
+\strut
+\atentry{index}\marg{vegetable}
+\atentry{index}\marg{cabbage,\field{parent}=\marg{vegetable}}
+\strut
+\atentry{index}\marg{minerals}
+\atentry{index}\marg{quartz,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{corundum,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{amethyst,\field{parent}=\marg{minerals}}
+\atentry{index}\marg{gypsum,\field{parent}=\marg{minerals}}
+\strut
+\atentry{index}\marg{aardvark}
+\atentry{index}\marg{bard}
+\atentry{index}\marg{buzz}
+\strut
+\atentry{index}\marg{item}
+\atentry{index}\marg{subitem,\field{parent}=\marg{item}}
+\atentry{index}\marg{subsubitem,\field{parent}=\marg{subitem}}
+\end{codeenv}
 and suppose the document contains:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,style=indexgroup]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries.bib}]
-
-\begin{document}
-\gls{duck}.
-\gls{quartz}, \gls{corundum}, \gls{amethyst}.
-\gls{aardvark}, \gls{bard}, \gls{buzz}.
-\gls{vegetable}, \gls{cabbage}.
-\gls{subsubitem}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt[indexgroup]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{duck}.
+\cs{gls}\marg{quartz}, \cs{gls}\marg{corundum}, \cs{gls}\marg{amethyst}.
+\cs{gls}\marg{aardvark}, \cs{gls}\marg{bard}, \cs{gls}\marg{buzz}.
+\cs{gls}\marg{vegetable}, \cs{gls}\marg{cabbage}.
+\cs{gls}\marg{subsubitem}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 Although the \code{duck} entry has siblings in the
 \filefmt{entries.bib} file, none of them have been recorded
 (indexed) in the document, nor has the parent \code{birds} entry.
@@ -6205,9 +6257,9 @@ but I don't want to use the \csopt{flatten} option, as I still want
 to keep the mineral hierarchy.
 
 If I now add \csopt[postsort]{flatten-lonely}:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries.bib},flatten-lonely=postsort]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src},\csopt[postsort]{flatten-lonely}}
+\end{codeenv}
 the hierarchy becomes:
 \begin{description}\setlength\itemsep{0pt}%
 \item[A] \null
@@ -6232,14 +6284,14 @@ the hierarchy becomes:
   \end{description}
 \end{description}
 The \field{name} field of the \code{duck} entry has been
-set to
-\begin{verbatim}
-name={\bibglsflattenedchildpostsort{birds}{duck}}
-\end{verbatim}
-the \field{text} field has been set to
-\begin{verbatim}
-text={duck}
-\end{verbatim}
+set to:
+\begin{codeenv}
+\field{name}=\marg{\gls{bibglsflattenedchildpostsort}\marg{birds}\marg{duck}}
+\end{codeenv}
+the \field{text} field has been set to:
+\begin{codeenv}
+\field{text}=\marg{duck}
+\end{codeenv}
 the \field{group} field is copied over from the parent entry (\qt{B}),
 and the \field{parent} field has been adjusted, moving \code{duck}
 up one hierarchical level.
@@ -6251,7 +6303,7 @@ formats its arguments so that they are separated by a comma and
 space (\qt{birds, duck}). If the \field{text} field had been set
 in the original \atentry{index} definition of \text{duck}, it
 wouldn't have been altered. This adjustment ensures that in the
-document \verb|\gls{duck}| still produces \qt{duck} rather than
+document \code{\cs{gls}\marg{duck}} still produces \qt{duck} rather than
 \qt{birds, duck}.
 (If the child and parent \field{name} fields are identical,
 the terms are considered homographs. See below for further details.)
@@ -6262,28 +6314,28 @@ the hierarchical levels:
 \begin{itemize}
 \item The \code{subitem} entry was adjusted, moving it from a
 sub-entry to a top-level entry. The \field{name} field was then
-modified to
-\begin{verbatim}
-name={\bibglsflattenedchildpostsort{item}{subitem}}
-\end{verbatim}
+modified to:
+\begin{codeenv}
+\field{name}=\marg{\gls{bibglsflattenedchildpostsort}\marg{item}\marg{subitem}}
+\end{codeenv}
 This now means that the \code{subsubitem} entry is now a sub-entry
 (rather than a sub-sub-entry). The \code{subitem} entry now has no
 parent, but at this stage the \code{subsubitem} entry still has
 \code{subitem} as its parent.
 \item The \code{subsubitem} entry is then adjusted moving from a
 sub-entry to a top-level entry. The \field{name} field was then
-modified to
-\begin{verbatim}
-name=
-{%
- \bibglsflattenedchildpostsort
- {%
-   % name from former parent
-   \bibglsflattenedchildpostsort{item}{subitem}%
- }%
- {subsubitem}% original name
+modified to:
+\begin{codeenv}
+\field{name}=
+\marg{\comment{}
+ \gls{bibglsflattenedchildpostsort}
+ \marg{\comment{}
+   \comment{name from former parent}
+   \gls{bibglsflattenedchildpostsort}\marg{item}\marg{subitem}\comment{}
+ }\comment{}
+ \marg{subsubitem}\comment{original name}
 }
-\end{verbatim}
+\end{codeenv}
 The first argument of \csref{bibglsflattenedchildpostsort} is
 obtained from the \field{name} field of the entry's former parent
 (which is removed from the child's set of ancestors). This field
@@ -6302,11 +6354,12 @@ Note that the \code{cabbage} sub-entry hasn't been adjusted. It
 doesn't have any siblings but its parent entry (\code{vegetable})
 has a location list so it can't be discarded.
 If I change the rule:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries.bib},
- flatten-lonely-rule=discard unrecorded,
- flatten-lonely=postsort]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src},
+ \csopt[discard unrecorded]{flatten-lonely-rule},
+ \csopt[postsort]{flatten-lonely}
+}
+\end{codeenv}
 then this will move the \code{cabbage} entry up a level but the
 original parent entry \code{vegetable} will remain:
 \begin{description}\setlength\itemsep{0pt}%
@@ -6338,11 +6391,12 @@ remains in the B letter group before \qt{buzz}.
 
 With \csopt[presort]{flatten-lonely} the adjustments are made before
 the sorting is performed. For example, using:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries.bib},
- flatten-lonely-rule=discard unrecorded,
- flatten-lonely=presort]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src},
+ \csopt[discard unrecorded]{flatten-lonely-rule},
+ \csopt[presort]{flatten-lonely}
+}
+\end{codeenv}
 the hierarchical order is now:
 \begin{description}\setlength\itemsep{0pt}%
 \item[A] \null
@@ -6368,9 +6422,9 @@ the hierarchical order is now:
 \end{description}
 This method uses a different format for the modified \field{name}
 field. For example, the \code{duck} entry now has:
-\begin{verbatim}
-name={\bibglsflattenedchildpresort{duck}{birds}}
-\end{verbatim}
+\begin{codeenv}
+\field{name}=\marg{\gls{bibglsflattenedchildpresort}\marg{duck}\marg{birds}}
+\end{codeenv}
 The default definition of \gls{bibglsflattenedchildpresort} simply
 does the first argument and ignores the second. The sorting is then
 performed, but the interpreter recognises this command and can
@@ -6380,15 +6434,15 @@ so \qt{duck} now ends up in the D letter group.
 If you provide a definition of \gls{bibglsflattenedchildpresort} in
 the \atentry{preamble}, it will be picked up by the interpreter.
 For example:
-\begin{verbatim}
-@preamble{"\providecommand{\bibglsflattenedchildpresort}[2]{#1 (#2)}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{bibglsflattenedchildpresort}}[2]\marg{\idx{param}1 (\idx{param}2)}"}
+\end{codeenv}
 
 Note that the \field{text} field is only changed if not already set.
 This option may have unpredictable results for abbreviations as the
 \field{name} field (and sometimes the \field{text} field) is
 typically set by the abbreviation style.  Remember that
-if the parent entry doesn't have a location list and the rule isn't
+if the parent entry doesn't have a \idx{locationlist} and the rule isn't
 set to \optfmt{no discard} then the parent entry will be discarded
 after all relevant entries and their dependencies have been
 selected, so any cross-references within the parent entry (such as
@@ -6398,10 +6452,10 @@ even if they wouldn't be selected if the parent entry didn't exist.
 With both \optfmt{presort} and \optfmt{postsort},
 if the parent \field{name} is the same as the child's \field{name}
 then the child is considered a homograph and
-the child's name is set to 
-\begin{alltt}
-\csref{bibglsflattenedhomograph}\margm{name}\margm{parent label}
-\end{alltt}
+the child's name is set to:
+\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\format{bibglsflattenedhomograph}
+\end{codeenv}
 instead of the corresponding \csfmt{bibglsflattenedchild...sort}. 
 This defaults to just \meta{name}.
 
@@ -6413,21 +6467,21 @@ determine which sub-entries (that have no siblings) to adjust and
 which parents to remove. The value may be one of the following:
 \begin{description}
 \item[\optfmt{only unrecorded parents}] Only the sub-entries
-that have a parent without a location list will be altered.
+that have a parent without a \idx{locationlist} will be altered.
 The parent entry will be removed from the selection.
 This value is the default setting.
 \item[\optfmt{discard unrecorded}] This setting will adjust all
 sub-entries that have no siblings regardless of whether or not the
-parent has a location list.
+parent has a \idx{locationlist}.
 Only the parent entries that don't have a location list will be
 removed from the selection.
 \item[\optfmt{no discard}] This setting will adjust all
 sub-entries that don't have siblings regardless of whether or not the
-parent has a location list. No entries will be discarded, so parent
-entries that don't have a location list will still appear in the
+parent has a \idx{locationlist}. No entries will be discarded, so parent
+entries that don't have a \idx{locationlist} will still appear in the
 glossary.
 \end{description}
-In the above, the location list includes records and
+In the above, the \idx{locationlist} includes records and
 cross-references obtained from the \field{see} or \field{seealso}
 fields. See \csopt{flatten-lonely} for further details.
 
@@ -6483,28 +6537,28 @@ the new parent entry can be assigned with
 \end{itemize}
 
 For example, consider the \exfile{books.bib} file which contains
-entries like
-\begin{verbatim}
-@entry{ubik,
-  name={Ubik},
-  description={novel by Philip K. Dick},
-  identifier={book},
-  author={\sortmediacreator{Philip K.}{Dick}},
-  year={1969}
+entries like:
+\begin{codeenv}
+\atentry{entry}\marg{ubik,
+  \field{name}=\marg{Ubik},
+  \field{description}=\marg{novel by Philip K. Dick},
+  identifier=\marg{book},
+  author=\marg{\gls{sortmediacreator}\marg{Philip K.}\marg{Dick}},
+  year=\marg{1969}
 }
-\end{verbatim}
-then the field alias
+\end{codeenv}
+then the field alias:
 \begin{codeenv}
 \csopt[author=parent]{field-aliases}
 \end{codeenv}
-will treat
-\begin{verbatim}
-  author={\sortmediacreator{Philip K.}{Dick}},
-\end{verbatim}
-as though it had been defined as
-\begin{verbatim}
-  parent={\sortmediacreator{Philip K.}{Dick}},
-\end{verbatim}
+will treat:
+\begin{codeenv}
+  author=\marg{\gls{sortmediacreator}\marg{Philip K.}\marg{Dick}},
+\end{codeenv}
+as though it had been defined as:
+\begin{codeenv}
+  \field{parent}=\marg{\gls{sortmediacreator}\marg{Philip K.}\marg{Dick}},
+\end{codeenv}
 This can be converted into a label with the options:
 \begin{codeenv}
  \csopt[parent]{labelify},
@@ -6513,9 +6567,9 @@ This can be converted into a label with the options:
  ]{labelify-replace}
 \end{codeenv}
 If the interpreter has been provided with the definition:
-\begin{verbatim}
-\providecommand*{\sortmediacreator}[2]{#2 #1}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{sortmediacreator}}[2]\marg{\idx{param}2 \idx{param}1}
+\end{codeenv}
 then the \field{parent} field for the \code{ubik} entry
 will become \code{DickPhilipK} but the original value is stored
 internally when \csopt[create]{missing-parents} is set so that it
@@ -6523,11 +6577,11 @@ can be used as the \field{name} if the parent needs to be created.
 Once all the entries have been processed, if \code{ubik} has been
 selected but no entry can be found with the label \code{DickPhilipK}
 then a new entry will be added as though it had been defined with:
-\begin{verbatim}
-@index{DickPhilipK,
-  name={\sortmediacreator{Philip K.}{Dick}}
+\begin{codeenv}
+\atentry{index}\marg{DickPhilipK,
+  \field{name}=\marg{\gls{sortmediacreator}\marg{Philip K.}\marg{Dick}}
 }
-\end{verbatim}
+\end{codeenv}
 This is an alternative approach to the \exfile{sample-authors.tex}
 document from the \hyperref[sec:examples]{examples chapter}.
 
@@ -6563,39 +6617,39 @@ glossary.
 This can be achieved with the \catattr{targeturl} and
 \catattr{targetname} category attributes. For example, without
 \bibgls\ the file \filefmt{mybook.tex} might look like:
-\begin{verbatim}
-\documentclass{book}
-\usepackage[colorlinks]{hyperref}
-\usepackage{glossaries-extra}
-
-\makeglossaries
-
-\newglossaryentry{sample}{name={sample},description={an example}}
-
-\begin{document}
-\chapter{Example}
-\gls{sample}.
-
-\printglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\cs{cs.makeglossaries}
+\strut
+\gls{newglossaryentry}\marg{sample}\marg{\field{name}=\marg{sample},\field{description}=\marg{an example}}
+\strut
+\cmd{begin}\marg{document}
+\cs{chapter}\marg{Example}
+\cs{gls}\marg{sample}.
+\strut
+\cs{printglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 The other document \filefmt{myarticle.tex} might look like:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[colorlinks]{hyperref}
-\usepackage{glossaries-extra}
-
-\newignoredglossary*{external}
-\glssetcategoryattribute{external}{targeturl}{mybook.pdf}
-\glssetcategoryattribute{external}{targetname}{\glolinkprefix\glslabel}
-
-\newglossaryentry{sample}{type=external,category=external,
- name={sample},description={an example}}
-
-\begin{document}
-\gls{sample}.
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}\marg{glossaries-extra}
+\strut
+\cs{newignoredglossary*}\marg{external}
+\ics{glssetcategoryattribute}\marg{external}\marg{targeturl}\marg{mybook.pdf}
+\cs{glssetcategoryattribute}\marg{external}\marg{targetname}\marg{\cs{glolinkprefix}\cs{glslabel}}
+\strut
+\gls{newglossaryentry}\marg{sample}\marg{\field{type}=external,\field{category}=external,
+ \field{name}=\marg{sample},\field{description}=\marg{an example}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{sample}.
+\cmd{end}\marg{document}
+\end{codeenv}
 In this case the \optfmt{main} glossary isn't used, but the category 
 attributes allow a mixture of internal and external references, so
 the \optfmt{main} glossary could be used for the internal
@@ -6606,48 +6660,49 @@ references. (In which case, \csfmt{makeglossaries} and
 Note that both documents had to define the common terms. The above
 documents can be rewritten to work with \bibgls. First a \ext{bib}
 file needs to be created:
-\begin{verbatim}
-@entry{sample,
-  name={sample},
-  description={an example}
+\begin{codeenv}
+\atentry{entry}\marg{sample,
+  \field{name}=\marg{sample},
+  \field{description}=\marg{an example}
 }
-\end{verbatim}
+\end{codeenv}
 Assuming this file is called \filefmt{myentries.bib}, then
 \filefmt{mybook.tex} can be changed to:
-\begin{verbatim}
-\documentclass{book}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[src={myentries}]
-
-\begin{document}
-\chapter{Example}
-\gls{sample}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{book}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[record]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[myentries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{chapter}\marg{Example}
+\cs{gls}\marg{sample}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 and \filefmt{myarticle.tex} can be changed to:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record]{glossaries-extra}
-
-\newignoredglossary*{external}
-\glssetcategoryattribute{external}{targeturl}{mybook.pdf}
-\glssetcategoryattribute{external}{targetname}{\glolinkprefix\glslabel}
-
-\GlsXtrLoadResources[
- src={myentries},
- sort=none,
- type=external,
- category=external]
-
-\begin{document}
-\gls{sample}.
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[record]\marg{glossaries-extra}
+\strut
+\cs{newignoredglossary*}\marg{external}
+\cs{glssetcategoryattribute}\marg{external}\marg{targeturl}\marg{mybook.pdf}
+\cs{glssetcategoryattribute}\marg{external}\marg{targetname}\marg{\cs{glolinkprefix}\cs{glslabel}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[myentries]{src},
+ \csopt[none]{sort},
+ \csopt[external]{type},
+ \csopt[external]{category}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{sample}.
+\cmd{end}\marg{document}
+\end{codeenv}
 Most of the options related to sorting and the glossary format are
 unneeded here since the glossary isn't being displayed. This may be
 sufficient for your needs, but it may be that the book has changed
@@ -6699,22 +6754,20 @@ or \csopt{category} options haven't been used, the corresponding
 value will default to \optfmt{master}. The \catattr{targeturl}
 and \catattr{targetname} category attributes will automatically be
 set, and the glossary type will be provided using
-\ics{provideignoredglossary*}\margm{type}.
+\code{\ics{provideignoredglossary*}\margm{type}}.
 
 The above \filefmt{myarticle.tex} can be changed to:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[colorlinks]{hyperref}
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[
- label-prefix={book.},
- master={mybook}]
-
-\begin{document}
-\gls{book.sample}.
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[record]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[book.]{label-prefix},\csopt[mybook]{master}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{book.sample}.
+\cmd{end}\marg{document}
+\end{codeenv}
 
 There are some settings from the master document that you 
 still need to repeat in the other document. These include
@@ -6726,33 +6779,31 @@ For example, if the master document loaded a resource file
 with \csopt[term.]{label-prefix} then you also need this
 prefix when you reference the entries in the dependent document
 in addition to the \optfmt{label-prefix} for the dependent document.
-Suppose \filefmt{mybook.tex} loads the resources using
-\begin{verbatim}
-\GlsXtrLoadResources[src={myentries},label-prefix={term.}]
-\end{verbatim}
+Suppose \filefmt{mybook.tex} loads the resources using:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[myentries]{src},\csopt[term.]{label-prefix}}
+\end{codeenv}
 and \filefmt{myarticle.tex} loads the resources using:
-\begin{verbatim}
-\GlsXtrLoadResources[
- label-prefix={book.},
- master={mybook}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[book.]{label-prefix},\csopt[mybook]{master}}
+\end{codeenv}
 Then the entries referenced in \filefmt{myarticle.tex} need
 to use the prefix \optfmt{book.term.}\ as in:
-\begin{verbatim}
-This is a \gls{book.term.sample} term.
-\end{verbatim}
+\begin{codeenv}
+This is a \cs{gls}\marg{book.term.sample} term.
+\end{codeenv}
 
 Remember that the category labels will need adjusting to reflect the
 change in category label in the dependent document.
 
 For example, if \filefmt{mybook.tex} included:
-\begin{verbatim}
-\setabbreviationstyle{long-short-sc}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\marg{long-short-sc}
+\end{codeenv}
 then \filefmt{myarticle.tex} will need:
-\begin{verbatim}
-\setabbreviationstyle[master]{long-short-sc}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\oarg{master}\marg{long-short-sc}
+\end{codeenv}
 (change \optfmt{master} to \meta{value} if you have used
 \csopt[\meta{value}]{category}). You can, of course, choose
 a different abbreviation style for the dependent document, 
@@ -6778,12 +6829,12 @@ resource file and the files \suppresourcefmt{\meta{n}}
 For example, to just select the first and third of the
 supplementary resource files (omitting the primary
 \filefmt{mybook.glstex}):
-\begin{verbatim}
-\GlsXtrLoadResources[
-  master={mybook},
-  master-resources={mybook-1,mybook-3}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[mybook]{master},
+  \csopt[mybook-1,mybook-3]{master-resources}
+}
+\end{codeenv}
 
 \section{Field and Label Options}
 \label{sec:fieldlabelopts}
@@ -6805,7 +6856,7 @@ that may only contain labels should have their values interpreted
 \field{seealso} and \field{alias}). Although this option interprets
 commands within those fields, it doesn't strip any characters that
 can't be used within a label. The \field{see} field isn't included
-as it may optionally start with \code{[\meta{tag}]} where \meta{tag}
+as it may optionally start with \code{\oargm{tag}} where \meta{tag}
 may legitimately contain \LaTeX\ code that shouldn't be interpreted.
 
 The default setting is \csopt[false]{interpret-label-fields}.
@@ -6863,23 +6914,23 @@ characters are removed.
 \end{enumerate}
 
 For example, suppose the \ext{bib} file contains:
-\begin{verbatim}
-@index{sample,
-  name={\AA ngstr\"om, \O stergaard, d'Arcy, and Fotheringay-Smythe}
+\begin{codeenv}
+\atentry{index}\marg{sample,
+  \field{name}=\marg{\ics{AA} ngstr\ics{umlaut}om, \ics{O} stergaard, d'Arcy, and Fotheringay-Smythe}
 }
-\end{verbatim}
-Then
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=entries,% data in entries.bib
- labelify={name}
-]
-\end{verbatim}
-will convert the \field{name} field into
+\end{codeenv}
+Then:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},\comment{data in entries.bib}
+ \csopt[name]{labelify}
+}
+\end{codeenv}
+will convert the \field{name} field into:
 \begin{verbatim}
 Angstrom stergaard d'Arcy and Fotheringay-Smythe
 \end{verbatim}
-if the document hasn't used \sty{fontspec} otherwise it will be
+if the document hasn't used \sty{fontspec} otherwise it will be:
 \begin{verbatim}
 Ångström Østergaard d'Arcy and Fotheringay-Smythe
 \end{verbatim}
@@ -6895,13 +6946,13 @@ the closest match. Alternatively, switch to using \XeLaTeX\ or
 
 You can use this option with \csopt{replicate-fields} if you need
 to retain the original:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=entries,% data in entries.bib
- replicate-fields={name={user1}},
- labelify={user1}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},\comment{data in entries.bib}
+ \csopt[name=\marg{user1}]{replicate-fields},
+ \csopt[user1]{labelify}
+}
+\end{codeenv}
 
 \optsection[\subsubsection]{labelify-list}
 
@@ -6909,18 +6960,18 @@ This option is like \csopt{labelify} but it retains commas, as it's
 designed for fields that should be converted into a comma-separated
 list of labels. Any empty elements are removed. For example, with
 the \ext{bib} entry from above:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=entries,% data in entries.bib
- replicate-fields={name={user1}},
- labelify-list={user1}
-]
-\end{verbatim}
-will convert the \field{user1} field into
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},\comment{data in entries.bib}
+ \csopt[name=\marg{user1}]{replicate-fields},
+ \csopt[user1]{labelify-list}
+}
+\end{codeenv}
+will convert the \field{user1} field into:
 \begin{verbatim}
 Angstrom, stergaard, d'Arcy, and Fotheringay-Smythe
 \end{verbatim}
-or
+or:
 \begin{verbatim}
 Ångström, Østergaard, d'Arcy, and Fotheringay-Smythe
 \end{verbatim}
@@ -6929,8 +6980,8 @@ depending on whether or not \sty{fontspec} was detected.
 \optsection[\subsubsection]{labelify-replace}
 
 This option takes a comma-separated list as a value with each
-element in the list in the form \margm{regex}\margm{replacement}
-where \margm{regex} is a regular expression (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
+element in the list in the form \code{\margm{regex}\margm{replacement}}
+where \meta{regex} is a regular expression (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}) and \meta{replacement}
 is the replacement text. Remember that the argument of
 \gls{GlsXtrLoadResources} is expanded when written to the \ext{aux}
@@ -6941,14 +6992,14 @@ rather than just \idx{cs.period} (backslash dot).
 In the \meta{replacement} part, you can use
 \ics{glscapturedgroup}\meta{n} to reference a captured sub-sequence.
 For example:
-\begin{verbatim}
-\csopt[{([A-Z])\string\.}{\glscapturedgroup1}]{labelify-replace}
-\end{verbatim} 
+\begin{codeenv}
+\csopt[\marg{([A-Z])\ics{cs.string}\idx{cs.period}}\marg{\cs{glscapturedgroup}1}]{labelify-replace}
+\end{codeenv} 
 This removes any \idx{full-stop} that follows any of the characters
 A,\ldots,Z. Alternatively, you can just use \verb|\string\$|
 instead of \cs{glscapturedgroup}. If you want a literal dollar
 character, you need to use \cs{glshex}\code{24} (or
-\verb|\string\u|). This isn't recommended for labels (since special
+\verb|\string\u24|). This isn't recommended for labels (since special
 characters are automatically stripped), but
 \csopt{sort-replace} follows the same rules as
 \csopt{labelify-replace}, and it may be needed
@@ -6958,19 +7009,19 @@ Both \csopt{labelify} and \csopt{labelify-list} use the
 \csopt{labelify-replace} setting to 
 perform substitutions. For example, to replace the sub-string \qt{ and }
 (including spaces) with a comma:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=entries,% data in entries.bib
- replicate-fields={name={user1}},
- labelify-replace={{ and }{,}},
- labelify-list={user1}
-]
-\end{verbatim}
-The earlier example will now end up as
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},\comment{data in entries.bib}
+ \csopt[name=\marg{user1}]{replicate-fields},
+ \csopt[\marg{ and }\marg{,}]{labelify-replace},
+ \csopt[user1]{labelify-list}
+}
+\end{codeenv}
+The earlier example will now end up as:
 \begin{verbatim}
 Angstrom, stergaard, d'Arcy,Fotheringay-Smythe
 \end{verbatim}
-or
+or:
 \begin{verbatim}
 Ångström, Østergaard, d'Arcy,Fotheringay-Smythe
 \end{verbatim}
@@ -6982,25 +7033,25 @@ converted to \verb|,,| and then the empty element is removed
 resulting in a single comma.
 
 You can have more than one replacement:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src=entries,% data in entries.bib
- replicate-fields={name={user1}},
- labelify-replace={
-   { and }{,},% first substitution
-   {[ '\string\-]}{},% second substitution
-   {\string\u00D8}{O}% third substitution
- },
- labelify-list={user1}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},\comment{data in entries.bib}
+ \csopt[name=\marg{user1}]{replicate-fields},
+ \csopt[
+   \marg{ and }\marg{,},\comment{first substitution}
+   \marg{[ '\cs{cs.string}\cmd{-}]}\marg{},\comment{second substitution}
+   \marg{\ics{glshex}00D8}\marg{O}\comment{third substitution}
+ ]{labelify-replace},
+ \csopt[user1]{labelify-list}
+}
+\end{codeenv}
 This additionally removes the space, apostrophe and hyphen
 characters (second substitution) and replaces \qt{\O} (\hex{00D8})
-with \qt{O} (third substitution) so the string now ends up as
+with \qt{O} (third substitution) so the string now ends up as:
 \begin{verbatim}
 Angstrom,Ostergaard,dArcy,FotheringaySmythe
 \end{verbatim}
-or
+or:
 \begin{verbatim}
 Ångström,Ostergaard,dArcy,FotheringaySmythe
 \end{verbatim}
@@ -7008,12 +7059,11 @@ depending on whether or not \sty{fontspec} was detected.
 
 \optsection[\subsubsection]{label-prefix}
 
-The \csopt{label-prefix} option prepends \meta{tag} to each
-entry's label. This \meta{tag} will also be inserted in front of any
-cross-references, unless they start with \idprefix{dual} or
-\idprefix{extn} (where \meta{n} is an integer). Use
-\csopt{dual-prefix} to change the dual label prefixes and
-\csopt{ext-prefixes} to change the external label prefixes.
+The \csopt{label-prefix} option prepends \meta{tag} to each entry's label. This
+\meta{tag} will also be inserted in front of any cross-references, unless they
+start with \idprefix{dual} or \idprefix{tertiary} or \idprefix{extn} (where
+\meta{n} is an integer). Use \csopt{dual-prefix} to change the dual label
+prefixes and \csopt{ext-prefixes} to change the external label prefixes.
 
 As from version 1.8, the primary label prefix is identified
 in the \ext{glstex} file with:
@@ -7021,42 +7071,41 @@ in the \ext{glstex} file with:
 \format{bibglsprimaryprefixlabel}
 \end{codeenv}
 
-For example, if the \ext{bib} file contains
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal, such as a \gls{duck} or \gls {goose}}
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{entry}\marg{bird,
+  \field{name}=\marg{bird},
+  \field{description} = \marg{feathered animal, such as a \cs{gls}\marg{duck} or \cs{gls}\marg{goose}}
 }
-
-@entry{waterfowl,
-  name={waterfowl},
-  description={Any \gls{bird} that lives in or about water},
-  see={[see also]{duck,goose}}
+\strut
+\atentry{entry}\marg{waterfowl,
+  \field{name}=\marg{waterfowl},
+  \field{description}=\marg{Any \cs{gls}\marg{bird} that lives in or about water},
+  \field{see}=\marg{[see also]\marg{duck,goose}}
 }
-
-@index{duck}
-
-@index{goose,plural="geese"}
-\end{verbatim}
+\strut
+\atentry{index}\marg{duck}
+\strut
+\atentry{index}\marg{goose,\field{plural}="geese"}
+\end{codeenv}
 Then if this \ext{bib} file is loaded with \csopt[gls.]{label-prefix}
 it's as though the entries had been defined as:
-\begin{verbatim}
-@entry{gls.bird,
-  name={bird},
-  description = {feathered animal, such as a \gls{gls.duck} or 
-\gls{gls.goose}}
+\begin{codeenv}
+\atentry{entry}\marg{gls.bird,
+  \field{name}=\marg{bird},
+  \field{description} = \marg{feathered animal, such as a \cs{gls}\marg{gls.duck} or \cs{gls}\marg{gls.goose}}
 }
-
-@entry{gls.waterfowl,
-  name={waterfowl},
-  description={Any \gls{gls.bird} that lives in or about water},
-  see={[see also]{gls.duck,gls.goose}}
+\strut
+\atentry{entry}\marg{gls.waterfowl,
+  \field{name}=\marg{waterfowl},
+  \field{description}=\marg{Any \cs{gls}\marg{gls.bird} that lives in or about water},
+  \field{see}=\marg{[see also]\marg{gls.duck,gls.goose}}
 }
-
-@index{gls.duck,name={duck}}
-
-@index{gls.goose,name={goose},plural="geese"}
-\end{verbatim}
+\strut
+\atentry{index}\marg{gls.duck,\field{name}=\marg{duck}}
+\strut
+\atentry{index}\marg{gls.goose,\field{name}=\marg{goose},\field{plural}="geese"}
+\end{codeenv}
 
 Remember to use this prefix when you reference the terms in the
 document with commands like \ics{gls}.
@@ -7085,7 +7134,7 @@ The actual suffix is formed from \meta{value}\meta{n} where \meta{n}
 is an integer that's incremented in the event of multiple
 duplicates.  For example, \csopt[.copy]{duplicate-label-suffix} will
 change the label to \meta{id}\code{.copy1} for the first duplicate
-of the entry whose label is \meta{id}, \meta{id}\code{.copy2} for
+of the entry whose label is \meta{id}, and \meta{id}\code{.copy2} for
 the second duplicate, etc.
 
 \optsection[\subsubsection]{record-label-prefix}
@@ -7093,20 +7142,20 @@ the second duplicate, etc.
 If set, this option will cause \bibgls\ to pretend that each record
 label starts with \meta{tag}, if it doesn't already. For example, suppose
 the records in the \ext{aux} file are:
-\begin{verbatim}
-\glsxtr@record{bird}{}{page}{glsnumberformat}{1}
-\glsxtr@record{waterfowl}{}{page}{glsnumberformat}{1}
-\glsxtr@record{idx.duck}{}{page}{glsnumberformat}{1}
-\glsxtr@record{idx.goose}{}{page}{glsnumberformat}{1}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{bird}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{waterfowl}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{idx.duck}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{idx.goose}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\end{codeenv}
 The use of \csopt[idx.]{record-label-prefix} makes \bibgls\ act as 
 though the records were given as:
-\begin{verbatim}
-\glsxtr@record{idx.bird}{}{page}{glsnumberformat}{1}
-\glsxtr@record{idx.waterfowl}{}{page}{glsnumberformat}{1}
-\glsxtr@record{idx.duck}{}{page}{glsnumberformat}{1}
-\glsxtr@record{idx.goose}{}{page}{glsnumberformat}{1}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{idx.bird}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{idx.waterfowl}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{idx.duck}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{idx.goose}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\end{codeenv}
 
 
 \optsection[\subsubsection]{cs-label-prefix}
@@ -7129,35 +7178,35 @@ prefixes then, if \csopt{cs-label-prefix} has been used the supplied
 value will be inserted otherwise the \csopt{label-prefix} setting
 will be inserted.
 \end{itemize}
-For example, given
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal, such as a \gls{duck} or \gls{goose}}
+For example, given:
+\begin{codeenv}
+\atentry{entry}\marg{bird,
+  \field{name}=\marg{bird},
+  \field{description} = \marg{feathered animal, such as a \cs{gls}\marg{duck} or \cs{gls}\marg{goose}}
 }
-\end{verbatim}
+\end{codeenv}
 then if \csopt[idx.]{label-prefix} is set but \csopt{cs-label-prefix}
 isn't included in the resource option list this will convert the
 \field{description} field to:
-\begin{verbatim}
-description = {feathered animal, such as a \gls{idx.duck} or
-\gls{idx.goose}}
-\end{verbatim}
+\begin{codeenv}
+\field{description} = \marg{feathered animal, such as a \cs{gls}\marg{idx.duck} or
+\cs{gls}\marg{idx.goose}}
+\end{codeenv}
 However with \csopt[gls.]{cs-label-prefix} the \field{description}
-field will be converted to
-\begin{verbatim}
-description = {feathered animal, such as a \gls{gls.duck} or
-\gls{gls.goose}}
-\end{verbatim}
+field will be converted to:
+\begin{codeenv}
+\field{description} = \marg{feathered animal, such as a \cs{gls}\marg{gls.duck} or
+\cs{gls}\marg{gls.goose}}
+\end{codeenv}
 regardless of the \csopt{label-prefix} setting. Whereas if the
-original entry definition is
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal, such as a \gls{dual.duck} or
-\gls{dual.goose}}
+original entry definition is:
+\begin{codeenv}
+\atentry{entry}\marg{bird,
+  \field{name}=\marg{bird},
+  \field{description} = \marg{feathered animal, such as a \cs{gls}\marg{dual.duck} or
+\cs{gls}\marg{dual.goose}}
 }
-\end{verbatim}
+\end{codeenv}
 then \idprefix{dual} will be replaced by the value of the
 \csopt{dual-prefix} option regardless of the \csopt{cs-label-prefix}
 setting.
@@ -7184,51 +7233,51 @@ in the \ext{glstex} file with:
 \end{codeenv}
 
 For example, suppose the file \filefmt{entries-terms.bib} contains:
-\begin{verbatim}
-@entry{set,
-  name={set},
-  description={collection of values, denoted \gls{ext1.set}}
+\begin{codeenv}
+\atentry{entry}\marg{set,
+  \field{name}=\marg{set},
+  \field{description}=\marg{collection of values, denoted \cs{gls}\marg{ext1.set}}
 }
-\end{verbatim}
+\end{codeenv}
 and the file \filefmt{entries-symbols.bib} contains:
-\begin{verbatim}
-@symbol{set,
-  name={\ensuremath{\mathcal{S}}},
-  description={a \gls{ext1.set}}
+\begin{codeenv}
+\atentry{symbol}\marg{set,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{mathcal}\marg{S}}},
+  \field{description}=\marg{a \cs{gls}\marg{ext1.set}}
 }
-\end{verbatim}
+\end{codeenv}
 
 These files both contain an entry with the label \code{set}
-but the \field{description} field includes \verb|\gls{ext1.set}| which is
-referencing the entry from the other file. These
+but the \field{description} field includes \code{\cs{gls}\marg{ext1.set}} 
+which is referencing the entry from the other file. These
 two files can be loaded without conflict using:
-\begin{verbatim}
-\usepackage[record,symbols]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries-terms},
- label-prefix={gls.},
- ext-prefixes={sym.}
-]
-
-\GlsXtrLoadResources[src={entries-symbols},
- type=symbols,
- label-prefix={sym.},
- ext-prefixes={gls.}
-]
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}[\styopt{record},\styopt{symbols}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms]{src},
+ \csopt[gls.]{label-prefix},
+ \csopt[sym.]{ext-prefixes}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-symbols]{src},
+ \csopt[symbols]{type},
+ \csopt[sym.]{label-prefix},
+ \csopt[gls.]{ext-prefixes}
+}
+\end{codeenv}
 
 Now the \code{set} entry from \filefmt{entries-terms.bib}
 will be defined with the label \code{gls.set} and the
-description will be
-\begin{verbatim}
-collection of values, denoted \gls{sym.set}
-\end{verbatim}
+description will be:
+\begin{codeenv}
+collection of values, denoted \cs{gls}\marg{sym.set}
+\end{codeenv}
 The \code{set} entry
 from \filefmt{entries-symbols.bib} will be defined with the label
-\code{sym.set} and the description will be 
-\begin{verbatim}
-a \gls{gls.set}
-\end{verbatim}
+\code{sym.set} and the description will be: 
+\begin{codeenv}
+a \cs{gls}\marg{gls.set}
+\end{codeenv}
 
 Note that in this case the \ext{bib} files have to be loaded 
 as two separate resources. They can't be combined into a 
@@ -7238,31 +7287,31 @@ If you want to allow the flexibility to choose between
 loading them together or separately, you'll have to give them
 unique labels. For example, \filefmt{entries-terms.bib} could
 contain:
-\begin{verbatim}
-@entry{set,
-  name={set},
-  description={collection of values, denoted \gls{ext1.S}}
+\begin{codeenv}
+\atentry{entry}\marg{set,
+  \field{name}=\marg{set},
+  \field{description}=\marg{collection of values, denoted \cs{gls}\marg{ext1.S}}
 }
-\end{verbatim}
+\end{codeenv}
 and \filefmt{entries-symbols.bib} could contain:
-\begin{verbatim}
-@symbol{S,
-  name={\ensuremath{\mathcal{S}}},
-  description={a \gls{ext1.set}}
+\begin{codeenv}
+\atentry{symbol}\marg{S,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{mathcal}\marg{S}}},
+  \field{description}=\marg{a \cs{gls}\marg{ext1.set}}
 }
-\end{verbatim}
+\end{codeenv}
 Now they can be combined with:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms,entries-symbols}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms,entries-symbols]{src}}
+\end{codeenv}
 which will simply strip the \glsdisp{idx.idprefix.extn}{\idprefixfmt{ext1}} 
 prefix from the cross-references. Alternatively:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries-terms,entries-symbols},
- label-prefix={gls.},
- ext-prefixes={gls.}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms,entries-symbols]{src},
+ \csopt[gls.]{label-prefix},
+ \csopt[gls.]{ext-prefixes}
+}
+\end{codeenv}
 which will insert the supplied \csopt{label-prefix} at the
 start of the labels in the entry definitions and will replace
 the \idprefixfmt{ext1} prefix with \idprefixfmt{gls} in the
@@ -7295,14 +7344,14 @@ with \gls{glsxtrsetgrouptitle} if the title is different from the
 label.  The default behaviour is \csopt[auto]{group}.
 
 For example:
-\begin{verbatim}
-\GlsXtrLoadResources[sort=integer,group={Constants},
- src={entries-constants}% data in entries-constants.bib
-]
-\GlsXtrLoadResources[sort=letter-case,group={Variables},
- src={entries-variables}% data in entries-variables.bib
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[integer]{sort},\csopt[Constants]{group},
+ \csopt[entries-constants]{src}\comment{data in entries-constants.bib}
+}
+\gls{GlsXtrLoadResources}\oarg{\csopt[letter-case]{sort},\csopt[Variables]{group},
+ \csopt[entries-variables]{src}\comment{data in entries-variables.bib}
+}
+\end{codeenv}
 In this case, if the \field{type} field hasn't been set in the \ext{bib} files,
 these entries will be added to the same glossary, but will
 be grouped according to each instance of \gls{GlsXtrLoadResources},
@@ -7346,54 +7395,52 @@ entry]{category} refers to the \emph{target} entry type whereas
 cases, the value is converted to \idx!{lowercase} to ensure consistency.
 
 For example, if the \ext{bib} file contains:
-\begin{verbatim}
-@entry{bird,
-  name={bird},
-  description = {feathered animal}
+\begin{codeenv}
+\atentry{entry}\marg{bird,
+  \field{name}=\marg{bird},
+  \field{description} = \marg{feathered animal}
 }
-
-@index{duck}
-
-@index{goose,plural="geese"}
-
-@dualentry{dog,
-  name={dog},
-  description={chien}
+\strut
+\atentry{index}\marg{duck}
+\strut
+\atentry{index}\marg{goose,\field{plural}="geese"}
+\strut
+\atentry{dualentry}\marg{dog,
+  \field{name}=\marg{dog},
+  \field{description}=\marg{chien}
 }
-\end{verbatim}
-then if the document contains
-\begin{verbatim}
-\GlsXtrLoadResources[category={same as entry},src={entries}]
-\end{verbatim}
-this will set the \field{category} of the \code{bird} term to
-\optfmt{entry} (since it was defined with \atentry{entry}), the \field{category} of the \code{duck} and
-\code{goose} terms to \optfmt{index} (since they were defined
-with \atentry{index}), and the \field{category} of the \code{dog}
-term to \optfmt{dualentry} (since it was
-defined with \atentry{dualentry}). Note that the dual entry
-\code{dual.dog} doesn't have the category set, since that's
+\end{codeenv}
+then if the document contains:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[same as entry]{category},\csopt[entries]{src}}
+\end{codeenv}
+this will set the \field{category} of the \code{bird} term to \optfmt{entry}
+(since it was defined with \atentry{entry}), the \field{category} of the
+\code{duck} and \code{goose} terms to \optfmt{index} (since they were defined
+with \atentry{index}), and the \field{category} of the \code{dog} term to
+\optfmt{dualentry} (since it was defined with \atentry{dualentry}). Note that
+the dual entry \code{dual.dog} doesn't have the category set, since that's
 governed by \csopt{dual-category} instead.
 
-If, instead, the document contains
-\begin{verbatim}
-\GlsXtrLoadResources[category={animals},src={entries}]
-\end{verbatim}
+If, instead, the document contains:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[animals]{category},\csopt[entries]{src}}
+\end{codeenv}
 then the \field{category} of all the primary selected entries will 
 be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
 doesn't have the \field{category} set.
 
-Note that the categories may be overridden by the commands,
-such as \csref{bibglsnewindex}, that are used to actually define the
-entries.
+Note that the categories may be overridden by the commands that are used to
+actually define the entries (such as \csref{bibglsnewindex}).
 
-For example, if the document contains
-\begin{verbatim}
-\newcommand{\bibglsnewdualentry}[4]{%
- \longnewglossaryentry*{#1}{name={#3},#2,category={dual}}{#4}%
+For example, if the document contains:
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglsnewdualentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2,\field{category}=\marg{dual}}\marg{\idx{param}4}\comment{}
 }
-
-\GlsXtrLoadResources[category={animals},src={entries}]
-\end{verbatim}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[animals]{category},\csopt[entries]{src}}
+\end{codeenv}
 then both the \code{dog} and \code{dual.dog} entries will
 have their \field{category} field set to \optfmt{dual} since the
 new definition of \gls{bibglsnewdualentry} has overridden
@@ -7432,24 +7479,24 @@ Note that this setting only changes the \field{type} field for
 primary entries. Use \csopt{dual-type} for dual entries.
 
 For example:
-\begin{verbatim}
-\usepackage[record,symbols]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries-symbols},type=symbols]
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}[\styopt{record},\styopt{symbols}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-symbols]{src},\csopt[symbols]{type}}
+\end{codeenv}
 
 Make sure that the glossary type has already been defined
 (see \sectionref{sec:newglossary}). In the above, the
 \styopt{symbols} option defines the \code{symbols} glossary.
 If you want to use a custom glossary, you need to provide it. For
 example:
-\begin{verbatim}
-\usepackage[record,nomain]{glossaries-extra}
-
-\newglossary*{dictionary}{Dictionary}
-
-\GlsXtrLoadResources[src={entries-symbols},type=dictionary]
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}[\styopt{record},\styopt{nomain}]\marg{glossaries-extra}
+\strut
+\cs{newglossary*}\marg{dictionary}\marg{Dictionary}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries-symbols]{src},\csopt[dictionary]{type}}
+\end{codeenv}
 (The \styopt{nomain} option was added to suppress the
 creation of the default \code{main} glossary.)
 
@@ -7470,7 +7517,7 @@ The provided value \meta{type} must be a glossary label (not one of
 the keywords allowed by \csopt{type}).
 You can define the glossary before loading the resource, but
 it's not required as \bibgls\ will write
-\ics{provideignoredglossary*}\margm{type} to the \ext{glstex} file
+\code{\ics{provideignoredglossary*}\margm{type}} to the \ext{glstex} file
 (see \sectionref{sec:newglossary}).
 
 \optsection[\subsubsection]{abbreviation-name-fallback}
@@ -7491,15 +7538,15 @@ The \csopt{ignore-fields} key indicates that you want \bibgls\ to
 skip the fields listed in the supplied comma-separated \meta{list} of field
 labels. Remember that unrecognised fields will always be skipped.
 
-For example, suppose my \ext{bib} file contains
-\begin{verbatim}
-@abbreviation{html,
-  short ="html",
-  long  = {hypertext markup language},
-  description={a markup language for creating web pages},
-  seealso={xml}
+For example, suppose my \ext{bib} file contains:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} ="html",
+  \field{long}  = \marg{hypertext markup language},
+  \field{description}=\marg{a markup language for creating web pages},
+  \field{seealso}=\marg{xml}
 }
-\end{verbatim}
+\end{codeenv}
 but I want to use the \abbrstyle{short-long} style and I don't want
 the cross-referenced term, then I can use
 \csopt[seealso,description]{ignore-fields}.
@@ -7530,34 +7577,34 @@ so if \meta{field1} is listed in \csopt{ignore-fields} it won't
 be ignored (unless \meta{field2} is in \csopt{ignore-fields}).
 
 For example, suppose \filefmt{people.bib} contains:
-\begin{verbatim}
-@entry{alexander,
-  name={Alexander III of Macedon},
-  description={Ancient Greek king of Macedon},
-  born={20 July 356 BC},
-  died={10 June 323 BC},
-  othername={Alexander the Great}
+\begin{codeenv}
+\atentry{entry}\marg{alexander,
+  \field{name}=\marg{Alexander III of Macedon},
+  \field{description}=\marg{Ancient Greek king of Macedon},
+  born=\marg{20 July 356 BC},
+  died=\marg{10 June 323 BC},
+  othername=\marg{Alexander the Great}
 }
-\end{verbatim}
+\end{codeenv}
 This contains three non-standard fields: \fieldfmt{born},
 \fieldfmt{died} and \fieldfmt{othername}. I could define
 these fields using \ics{glsaddkey}, but another possibility
 is to map these onto the user keys \field{user1}, \field{user2}
 and \field{user3}, which saves the overhead of providing new 
 keys:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  field-aliases={born=user1,died=user2,othername=user3}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},\comment{data in people.bib}
+  \csopt[born=user1,died=user2,othername=user3]{field-aliases}
+}
+\end{codeenv}
 
 \optsection[\subsubsection]{replicate-fields}
 
 The value of one field can be copied to other fields using
 this option where each \meta{key}\dequals\meta{value} pair
 is in the form
-\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}
+\code{\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}}
 where all values are field names. This copies the contents
 of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
 (only if the target field isn't already set with
@@ -7566,24 +7613,24 @@ performed after \csopt{ignore-fields} (see
 \sectionref{sec:resourcesets}).
 
 For example, suppose \filefmt{people.bib} contains:
-\begin{verbatim}
-@entry{alexander,
-  name={Alexander III of Macedon (Alexander the Great)},
-  text={Alexander},
-  description={Ancient Greek king of Macedon}
+\begin{codeenv}
+\atentry{entry}\marg{alexander,
+  \field{name}=\marg{Alexander III of Macedon (Alexander the Great)},
+  \field{text}=\marg{Alexander},
+  \field{description}=\marg{Ancient Greek king of Macedon}
 }
-\end{verbatim}
+\end{codeenv}
 Since the \field{first} field hasn't been supplied, it
 will default to the value of the \field{text} field, but
 perhaps for one of my documents I'd like the \field{first}
 field to be the same as the \field{name} field. Rather than
 editing the \ext{bib} file, I can just do:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name=first}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},\comment{data in people.bib}
+  \csopt[name=first]{replicate-fields}
+}
+\end{codeenv}
 This copies the contents of the \field{name} field into the
 \field{first} field. If you have more than one field
 in the list take care to brace the lists to avoid confusion.
@@ -7592,50 +7639,51 @@ of the \field{name} field to both \field{first} and
 \field{firstplural} and copy the value of the \field{text}
 field to the \field{plural} field, then this requires braces
 for the inner list:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name={first,firstplural},text=plural}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},\comment{data in people.bib}
+  \csopt[name=\marg{first,firstplural},text=plural]{replicate-fields}
+}
+\end{codeenv}
 
 If my \filefmt{people.bib} file instead contained:
-\begin{verbatim}
-@entry{alexander,
-  name={Alexander III of Macedon (Alexander the Great)},
-  first={Alexander the Great},
-  text={Alexander},
-  description={Ancient Greek king of Macedon}
+\begin{codeenv}
+\atentry{entry}\marg{alexander,
+  \field{name}=\marg{Alexander III of Macedon (Alexander the Great)},
+  \field{first}=\marg{Alexander the Great},
+  \field{text}=\marg{Alexander},
+  \field{description}=\marg{Ancient Greek king of Macedon}
 }
-\end{verbatim}
-then
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name=first}
-]
-\end{verbatim}
+\end{codeenv}
+then:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},\comment{data in people.bib}
+  \csopt[name=first]{replicate-fields}
+}
+\end{codeenv}
 won't alter the \field{first} field since \csopt{replicate-fields}
-never overrides values. However, since \csopt{replicate-fields}
-is always performed after \csopt{ignore-fields} it's possible to
-ignore the \field{first} field which means that the \field{name}
-value can then be copied into it:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  ignore-fields={first},
-  replicate-fields={name=first}
-]
-\end{verbatim}
+doesn't override existing values by default. You can use 
+\csopt{replicate-override} to change this. Alternatively, since 
+\csopt{replicate-fields} is always performed after \csopt{ignore-fields} 
+it's possible to ignore the \field{first} field which means that the 
+\field{name} value can then be copied into it:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},\comment{data in people.bib}
+  \csopt[first]{ignore-fields},
+  \csopt[name=first]{replicate-fields}
+}
+\end{codeenv}
 Note that the ordering within the resource options doesn't
 make a difference. The same result occurs with:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=people,% data in people.bib
-  replicate-fields={name=first},
-  ignore-fields={first}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[people]{src},\comment{data in people.bib}
+  \csopt[name=first]{replicate-fields},
+  \csopt[first]{ignore-fields}
+}
+\end{codeenv}
 
 \optsection[\subsubsection]{replicate-override}
 
@@ -7672,10 +7720,10 @@ For example, if \csopt[dupgroup]{copy-action-group-field},
 \csopt[copy]{action} and \csopt[copies]{type} are set in
 the resource options and \code{copies} identifies a custom
 glossary:
-\begin{alltt}
+\begin{codeenv}
 \ics{printunsrtglossary*}\oarg{type=copies,style=indexgroup}
  \marg{\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{dupgroup}}
-\end{alltt}
+\end{codeenv}
 
 This option is ignored when used with \csopt[define]{action}.
 This option is not used by \csopt{secondary} which will
@@ -7689,10 +7737,10 @@ will override the \field{group} field from the original definition.
 This may be useful if you don't use grouping in the primary
 glossary. That is, you use \code{nogroupskip} and a non-group
 style. For example:
-\begin{verbatim}
-\printunsrtglossary[nogroupskip,style=index]
-\printunsrtglossary[type=copies,style=indexgroup]
-\end{verbatim}
+\begin{codeenv}
+\cs{printunsrtglossary}\oarg{nogroupskip,style=index}
+\cs{printunsrtglossary}\oarg{type=copies,style=indexgroup}
+\end{codeenv}
 
 \optsection[\subsubsection]{copy-alias-to-see}
 
@@ -7750,36 +7798,34 @@ punctuation character. This option only applies to the
 
 \optsection[\subsubsection]{strip-trailing-nopost}
 
-This option is always performed before \csopt{post-description-dot}
-when adjusting the \field{description} field. The default
-setting is \csopt[false]{strip-trailing-nopost}. If 
-\optfmt{true} any trailing ungrouped \ics{nopostdesc} or \ics{glsxtrnopostpunc}
-found in the \field{description} field will be removed.
-Note that the command (possibly followed by ignored space) must be
-at the very end of the description for it to be removed. A
-description should not contain both commands. This option
-only applies to the \field{description} field.
+This option is always performed before \csopt{post-description-dot}. 
+The default setting is \csopt[false]{strip-trailing-nopost}. If \optfmt{true}
+any trailing ungrouped \ics{nopostdesc} or \ics{glsxtrnopostpunc} found in the
+\field{description} field will be removed.  Note that the command (possibly
+followed by ignored space) must be at the very end of the description for it to
+be removed. A description should not contain both commands. This option only
+applies to the \field{description} field.
 
 For example, \cs{nopostdesc} will be stripped from:
-\begin{verbatim}
-description={sample\nopostdesc}
-\end{verbatim}
-since it's at the end. It will also be stripped from
-\begin{verbatim}
-description={sample\nopostdesc }
-\end{verbatim}
+\begin{codeenv}
+\field{description}=\marg{sample\cs{nopostdesc}}
+\end{codeenv}
+since it's at the end. It will also be stripped from:
+\begin{codeenv}
+\field{description}=\marg{sample\cs{nopostdesc} }
+\end{codeenv}
 since the trailing space is ignored as it follows a control
-word. It won't be stripped from
-\begin{verbatim}
-description={sample\nopostdesc{} }
-\end{verbatim}
+word. It won't be stripped from:
+\begin{codeenv}
+\field{description}=\marg{sample\cs{nopostdesc}\marg{} }
+\end{codeenv}
 because the final space is now significant, but even without the
 space it still won't be stripped as the field ends with
 an empty group not with \cs{nopostdesc}. Similarly it won't be
-stripped from
-\begin{verbatim}
-description={sample\nopostdesc\relax}
-\end{verbatim}
+stripped from:
+\begin{codeenv}
+\field{description}=\marg{sample\cs{nopostdesc}\cmd{relax}}
+\end{codeenv}
 because again it's not at the end.
 
 \optsection[\subsubsection]{check-end-punctuation}
@@ -7792,7 +7838,7 @@ end of sentence punctuation. This is determined as follows, for each
 or \idx{punctuationfinalquote}, check the character that comes
 before it;
 \item if the character is of type \idx{punctuationother}, then check
-if it's listed in the entry given by \code{sentence.terminators} 
+if it's listed in the entry given by \idx{sentence.terminators} 
 in \bibgls's \langxml.
 \end{itemize}
 If a sentence terminator is found, an internal field is created
@@ -7801,7 +7847,7 @@ character. Fields whose values must be labels (such as
 \field{parent}, \field{category} and \field{type}) aren't checked,
 even if they're included in \meta{list}.
 
-The default \code{sentence.terminators} is defined in \file{bib2gls-en.xml}
+The default \idx{sentence.terminators} is defined in \file{bib2gls-en.xml}
 as:
 \begin{verbatim}
 <entry key="sentence.terminators">.?!</entry>
@@ -7810,33 +7856,33 @@ Any character that isn't of type \idx{punctuationother} won't
 match.
 
 For example, the sample \exfile{books.bib} file contains:
-\begin{verbatim}
-@entry{whydidnttheyaskevans,
-  name={Why Didn't They Ask Evans?},
-  description={novel by Agatha Christie},
-  identifier={book},
-  author={\sortmediacreator{Agatha}{Christie}},
-  year={1934}
+\begin{codeenv}
+\atentry{entry}\marg{whydidnttheyaskevans,
+  \field{name}=\marg{Why Didn't They Ask Evans?},
+  \field{description}=\marg{novel by Agatha Christie},
+  identifier=\marg{book},
+  author=\marg{\gls{sortmediacreator}\marg{Agatha}\marg{Christie}},
+  year=\marg{1934}
 }
-\end{verbatim}
+\end{codeenv}
 With \csopt[name]{check-end-punctuation}, this entry will be
 assigned an internal field called 
-\fielddisp{fieldendpunc}{namendpunc} set to \code{?}\
-as that's included in \code{sentence.terminators} and is found
+\fielddisp{fieldendpunc}{nameendpunc} set to \code{?}\
+as that's included in \idx{sentence.terminators} and is found
 at the end of the \field{name} field:
-\begin{verbatim}
-\GlsXtrSetField{whydidnttheyaskevans}{nameendpunc}{?}
-\end{verbatim}
+\begin{codeenv}
+\cs{GlsXtrSetField}\marg{whydidnttheyaskevans}\marg{nameendpunc}\marg{?}
+\end{codeenv}
 (Note that \csopt[first,text]{check-end-punctuation} won't match
 as there's no \field{first} or \field{text} field supplied.)
 
 If you have a field that ends with an abbreviation followed by a
 \idx{full-stop}, this will be considered an end of sentence terminator, but
 the main purpose of this option is to provide a way to deal with
-cases like
-\begin{verbatim}
-Agatha Christie wrote \gls{whydidnttheyaskevans}.
-\end{verbatim}
+cases like:
+\begin{codeenv}
+Agatha Christie wrote \cs{gls}\marg{whydidnttheyaskevans}.
+\end{codeenv}
 where the end of sentence punctuation following \cs{gls} needs to be
 discarded. This is needed regardless of whether or not
 the link text ends with an abbreviation or is a complete sentence.
@@ -7845,16 +7891,16 @@ It's then possible to hook into the \idx{postlinkhook} \qt{discard
 period} check. By default this just checks the category attributes
 that govern whether or not to discard a following period, but
 (with \styfmt{glossaries-extra} v1.23+) it's possible to provide
-an additional check by redefining
+an additional check by redefining:
 \nosecdef{glsxtrifcustomdiscardperiod}
 This should expand to \meta{true} if the check should be performed
 otherwise it should expand to \meta{false}. You can reference the
 label using \cs{glslabel}. For example:
-\begin{verbatim}
-\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
- \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\gls{glsxtrifcustomdiscardperiod}}[2]\marg{\comment{}
+ \cs{GlsXtrIfFieldUndef}\marg{nameendpunc}\marg{\cs{glslabel}}\marg{\idx{param}2}\marg{\idx{param}1}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This uses \ics{GlsXtrIfFieldUndef} rather than
 \ics{glsxtrifhasfield*} since there's no need to access the field's
 value. (The unstarred form \ics{glsxtrifhasfield} can't be used
@@ -7881,7 +7927,7 @@ form:
 \gls{bibglscontributor}\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}
 \end{codeenv}
 
-The \gls{bibglscontributorlist} commands is initially defined in 
+The \gls{bibglscontributorlist} command is initially defined in 
 \bibgls's interpreter to just do the first argument and ignore the
 second. This means that if you're sorting on this field, the \qt{and}
 part between the final names doesn't appear in the sort value.
@@ -7892,17 +7938,17 @@ so this command will be defined if you have at least v2.28 of
 \sty{datatool-base}.)
 
 For example, if the \field{name} field is specified as:
-\begin{verbatim}
-name={John Smith and Jane Doe and Dickie von Duck}
-\end{verbatim}
+\begin{codeenv}
+\field{name}=\marg{John Smith and Jane Doe and Dickie von Duck}
+\end{codeenv}
 then \csopt[name]{bibtex-contributor-fields} will convert the
-\field{name} field value to 
-\begin{verbatim}
-\bibglscontributorlist{%
- \bibglscontributor{John}{}{Smith}{},%
- \bibglscontributor{Jane}{}{Doe}{},%
- \bibglscontributor{Dickie}{von}{Duck}{}}{3}
-\end{verbatim}
+\field{name} field value to:
+\begin{codeenv}
+\gls{bibglscontributorlist}\marg{\comment{}
+ \gls{bibglscontributor}\marg{John}\marg{}\marg{Smith}\marg{},\comment{}
+ \gls{bibglscontributor}\marg{Jane}\marg{}\marg{Doe}\marg{},\comment{}
+ \gls{bibglscontributor}\marg{Dickie}\marg{von}\marg{Duck}\marg{}}\marg{3}
+\end{codeenv}
 With \csopt[von]{contributor-order} the sort value obtained from
 this field will be:
 \begin{verbatim}
@@ -7937,34 +7983,34 @@ the \ext{glstex} using \cs{providecommand}, which means that \LaTeX\
 will only pick up the first definition.
 
 For example:
-\begin{verbatim}
-\newcommand*{\bibglscontributor}[4]{%
-  #1\ifstrempty{#2}{}{ #2} #3\ifstrempty{#4}{}{, #4}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\gls{bibglscontributor}}[4]\marg{\comment{}
+  \idx{param}1\ics{ifstrempty}\marg{\idx{param}2}\marg{}\marg{ \idx{param}2} \idx{param}3\cs{ifstrempty}\marg{\idx{param}4}\marg{}\marg{, \idx{param}4}\comment{}
 }
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  bibtex-contributor-fields={name}
-]
-\end{verbatim}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[name]{bibtex-contributor-fields}
+}
+\end{codeenv}
 This will display the names in the glossary with the forenames
 first, but \bibgls\ will sort according to surname.
 
 An alternative approach, if you need an initial resource set
 such as with the \exfile{no-interpret-preamble.bib} file:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src={no-interpret-preamble},
-  interpret-preamble=false,
-  bibtex-contributor-fields={name},
-  contributor-order={forenames}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% data in entries.bib
-  bibtex-contributor-fields={name}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[no-interpret-preamble]{src},
+  \csopt[false]{interpret-preamble},
+  \csopt[name]{bibtex-contributor-fields},
+  \csopt[forenames]{contributor-order}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[name]{bibtex-contributor-fields}
+}
+\end{codeenv}
 Note the need to use \csopt[name]{bibtex-contributor-fields}
 in the first resource set even though there are no entries in 
 the \ext{bib} file. This is because the definition of
@@ -7983,7 +8029,7 @@ parsed according to \csopt{date-time-field-format} and
 fields parsed according to \csopt{dual-date-time-field-format} and
 \csopt{dual-date-time-field-locale}. If the field value is missing
 or doesn't match the given pattern it remains unchanged, otherwise
-it's converted into the form
+it's converted into the form:
 \nosecdef{bibglsdatetime}
 where \meta{original} is the value of the field before conversion.
 If the interpreter is on, the value will be interpreted before
@@ -7996,7 +8042,7 @@ being parsed if it contains \idx{escchar}, \idx{mshiftchar},
 
 As \csopt{date-time-fields} but for fields that only contain date
 (not time) information. If parsed correctly, the field is converted
-to
+to:
 \nosecdef{bibglsdate}
 The fields are parsed according to
 \csopt{date-field-format} and
@@ -8008,7 +8054,7 @@ The fields are parsed according to
 
 As \csopt{date-time-fields} but for fields that only contain time
 (not date) information. If parsed correctly, the field is converted
-to
+to:
 \nosecdef{bibglstime}
 The fields are parsed according to
 \csopt{time-field-format} and
@@ -8075,11 +8121,11 @@ values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
 \item \optfmt{lc}: convert to \idx{lowercase} (ignoring 
-\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \ics{ensuremath}\margm{maths} 
-and \ics{si}\margm{text});
+\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \code{\ics{ensuremath}\margm{maths}} 
+and \code{\ics{si}\margm{text}});
 \item \optfmt{uc}: convert to \idx{uppercase} (ignoring 
-\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \ics{ensuremath}\margm{maths} 
-and \ics{si}\margm{text});
+\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \code{\ics{ensuremath}\margm{maths}} 
+and \code{\ics{si}\margm{text}});
 \item \optfmt{lc-cs}: convert to \idx{lowercase} using
 \ics{MakeTextLowercase};
 \item \optfmt{uc-cs}: convert to \idx{uppercase} using
@@ -8089,13 +8135,13 @@ and \ics{si}\margm{text});
 \item \optfmt{firstuc}: convert the first alphabetical letter (or
 group) to \idx{uppercase}. This uses the following rules:
 \begin{enumerate}
-\item if \idx{mshiftchar}\meta{maths}\idx{mshiftchar} then stop (no case change);
-\item if \ics{NoCaseChange}\margm{text} or
-\ics{ensuremath}\margm{maths} or \ics{si}\margm{text} or \ics{protect} then skip;
+\item if \ics{protect} then skip and move on to the next token;
+\item if \idx{mshiftchar}\meta{maths}\idx{mshiftchar} or \ics{NoCaseChange}\margm{text} or
+\code{\ics{ensuremath}\margm{maths}} or \code{\ics{si}\margm{text}} then stop (no case change);
 \item if \csfmt{}\meta{csname} is known to have a case-variant, then
 perform the appropriate substitution and stop;
 \item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
-\meta{text} and stop;
+\meta{text} (using the same set of rules) and stop;
 \item if \csfmt{}\meta{csname} isn't followed by a group (and it's
 not \ics{protect}), then stop (no case change applied);
 \item if \margm{text} (a group) then convert the entire contents of
@@ -8107,82 +8153,82 @@ to its title case and stop;
 \end{itemize}
 
 For example, if the \ext{bib} file contains
-\begin{verbatim}
-@abbreviation{html,
-  short = "html",
-  long  = "hypertext markup language"
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = "html",
+  \field{long}  = "hypertext markup language"
 }
-\end{verbatim}
+\end{codeenv}
 then \csopt[uc]{short-case-change} would convert the value of the
 \field{short} field into
 \begin{verbatim}
 HTML
 \end{verbatim}
 whereas \csopt[uc-cs]{short-case-change} would convert it to
-\begin{verbatim}
-\MakeTextUppercase{html}
-\end{verbatim}
+\begin{codeenv}
+\cs{MakeTextUppercase}\marg{html}
+\end{codeenv}
 In the case of \csopt[uc]{short-case-change} and \csopt[lc]{short-case-change}
 only tokens that are recognised as characters will be converted.
 For example, suppose I have a slightly more eccentric definition:
-\begin{verbatim}
-@abbreviation{html,
-  short = "ht\emph{ml}",
-  long  = "hypertext markup language"
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = "ht\cs{emph}\marg{ml}",
+  \field{long}  = "hypertext markup language"
 }
-\end{verbatim}
+\end{codeenv}
 then \csopt[uc]{short-case-change} would convert the value of the
 \field{short} field into:
-\begin{verbatim}
-HT\emph{ML}
-\end{verbatim}
+\begin{codeenv}
+HT\cs{emph}{ML}
+\end{codeenv}
 Note that \csfmt{emph} isn't modified as it's recognised as a command.
 There's no attempt at interpreting the contents at this point (but
 the value may later be interpreted during sorting).
 
 For example, suppose an abbreviation is defined using:
-\begin{verbatim}
-short = "z\ae\oe",
-\end{verbatim}
+\begin{codeenv}
+\field{short} = "z\ics{ae}\ics{oe}",
+\end{codeenv}
 then with \csopt[uc]{short-case-change}, this would be converted to
-\begin{verbatim}
-Z\ae\oe
-\end{verbatim}
+\begin{codeenv}
+Z\cs{ae}\cs{oe}
+\end{codeenv}
 since the interpreter isn't being used at this stage. If the
 interpreter is later used during sorting, the sort value will be set to 
 \code{Z\ae\oe}.
 
 However, with \csopt[uc-cs]{short-case-change}, the \field{short}
 value would be converted to
-\begin{verbatim}
-\MakeTextUppercase{z\ae\oe}
-\end{verbatim}
+\begin{codeenv}
+\cs{MakeTextUppercase}\marg{z\cs{ae}\cs{oe}}
+\end{codeenv}
 If the interpreter is used during sorting, the sort value will be set to 
 \code{Z\AE\OE}.
 
-You can use \ics{NoCaseChange}\margm{text} to prevent the given \meta{text}
-from having the case changed. For example, if the \field{short}
-field is defined as
-\begin{verbatim}
-short = {a\NoCaseChange{bc}d}
-\end{verbatim}
-then with  \csopt[uc]{short-case-change}, this would be converted to
-\begin{verbatim}
-A\NoCaseChange{bc}D
-\end{verbatim}
+You can use \code{\ics{NoCaseChange}\margm{text}} to prevent the given 
+\meta{text} from having the case changed. For example, if the \field{short}
+field is defined as:
+\begin{codeenv}
+\field{short} = \marg{a\cs{NoCaseChange}\marg{bc}d}
+\end{codeenv}
+then with \csopt[uc]{short-case-change}, this would be converted to
+\begin{codeenv}
+A\cs{NoCaseChange}\marg{bc}D
+\end{codeenv}
 (This command is provided by \isty{textcase}, which is automatically
 loaded by \styfmt{glossaries}.)
 
 If you have a command that takes a label or identifier as an argument then it's
 best to hide the label in a custom command. For example, if the
 \field{short} field in the \ext{bib} definition is defined as:
-\begin{verbatim}
-  short = "ht\textcolor{red}{ml}",
-\end{verbatim}
+\begin{codeenv}
+  \field{short} = "ht\ics{textcolor}\marg{red}\marg{ml}",
+\end{codeenv}
 then with \csopt[uc]{short-case-change} this would end up as:
-\begin{verbatim}
-HT\textcolor{RED}{ML}
-\end{verbatim}
+\begin{codeenv}
+HT\cs{textcolor}\marg{RED}\marg{ML}
+\end{codeenv}
 which is incorrect. Instead, provide a command that hides the label
 (such as the \csfmt{strong} example described on page~\glsxtrpageref{strong}).
 
@@ -9251,8 +9297,8 @@ avoids confusion with the list format.
 \item \optfmt{true}: equivalent to 
 \csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
 where the definitions of \gls{bibglspagename} and
-\gls{bibglspagesname} are obtained from the \code{tag.page} and
-\code{tag.pages} entries in \bibgls's \langxml.
+\gls{bibglspagesname} are obtained from the \idx{tag.page} and
+\idx{tag.pages} entries in \bibgls's \langxml.
 This setting works best if the document's language matches the 
 language file. However, you can redefine these commands within
 the document's language hooks or in the glossary preamble.
@@ -13553,7 +13599,7 @@ be added instead:
 
 \formatdef{bibglspagename}
 If \csopt[true]{loc-prefix} is used, then this command is provided
-using the value of \code{tag.page} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
+using the value of \idx{tag.page} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
 \begin{verbatim}
 \providecommand{\bibglspagename}{Page}
 \end{verbatim}
@@ -13562,7 +13608,7 @@ using the value of \code{tag.page} from the \langxml. For example with \file{bib
 
 \formatdef{bibglspagesname}
 If \csopt[true]{loc-prefix} is used, then this command is provided
-using the value of \code{tag.pages} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
+using the value of \idx{tag.pages} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
 \begin{verbatim}
 \providecommand{\bibglspagesname}{Pages}
 \end{verbatim}
@@ -13838,7 +13884,7 @@ according to the rule):
 \item \meta{title} The group's title. This is typically title-cased.
 For example, if the rule recognises the digraph \qt{dz}, then the
 title is \qt{Dz}. Exceptions to this are included in the \langxml.
-If the key \code{grouptitle.case.\meta{lc}} exists, where
+If the key \idx{grouptitle.case.lc} exists, where
 \meta{lc} is the \idx!{lowercase} version of \meta{title}, then the value
 of that key is used instead. For example, the Dutch digraph \qt{ij}
 should be converted to \qt{IJ}, so \file{bib2gls-en.xml} includes:
