@@ -1,7 +1,7 @@
 #!/bin/sh
 # Adapted from tlcockpit.sh to ensure the script works with cygwin
 
-scriptname=`basename "${0%.sh}"`
+scriptname=`basename "$0" .sh`
 jar="$scriptname.jar"
 jarpath=`kpsewhich --progname="$scriptname" --format=texmfscripts "$jar"`
 
