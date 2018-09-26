@@ -6540,6 +6540,15 @@ post-name hook},
   category={command}
 }
 
+@index{Glsentrytext,
+  name={\csfmt{Gls\-entry\-text}},
+  user1={\margm{label}},
+  description={like \cs{glsentrytext} but converts the first letter
+to upper case},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{glsentryplural,
   name={\csfmt{gls\-entry\-plural}},
   user1={\margm{label}},
@@ -6817,12 +6826,39 @@ field value},
   category={command}
 }
 
+@index{glsentrytitlecase,
+  name={\csfmt{gls\-entry\-title\-case}},
+  user1={\margm{entry label}\margm{field label}},
+  description={fetches the given field and applies
+  \ics{capitalisewords} to it},
+  note={provided by \styfmt{glossaries} v4.22+},
+  category={command}
+}
+
+@index{capitalisewords,
+  name={\csfmt{capitalise\-words}},
+  user1={\margm{text}},
+  description={converts the first letter of each word to
+  \idx{uppercase} using \ics{makefirstuc}},
+  note={provided by \styfmt{mfirstuc} v1.06+},
+  category={command}
+}
+
 @index{glsxtrusefield,
   name={\csfmt{gls\-xtr\-use\-field}},
   user1={\margm{entry label}\margm{field label}},
   description={expands to the value of the given field for the given
    entry},
   note={provided by \styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
+@index{GLSxtrusefield,
+  name={\csfmt{GLS\-xtr\-use\-field}},
+  user1={\margm{entry label}\margm{field label}},
+  description={as \cs{glsxtrusefield} but converts the value to
+  \idx{uppercase}},
+  note={provided by \styfmt{glossaries-extra} v1.37+},
   category={command}
 }
 
@@ -9434,9 +9470,23 @@ has three or more items},
   category={command}
 }
 
+@index{AE,
+  name={\csfmt{AE}},
+  description={produces the \AE-ligature},
+  note={kernel command},
+  category={command}
+}
+
 @index{oe,
   name={\csfmt{oe}},
   description={produces the \oe-ligature},
+  note={kernel command},
+  category={command}
+}
+
+@index{OE,
+  name={\csfmt{OE}},
+  description={produces the \OE-ligature},
   note={kernel command},
   category={command}
 }

@@ -8120,12 +8120,14 @@ to \idxlink{uppercase}{upper} or \idx{lowercase}. This option may take one of th
 values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
-\item \optfmt{lc}: convert to \idx{lowercase} (ignoring 
-\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \code{\ics{ensuremath}\margm{maths}} 
-and \code{\ics{si}\margm{text}});
-\item \optfmt{uc}: convert to \idx{uppercase} (ignoring 
-\idx{mshiftchar}\meta{maths}\idx{mshiftchar}, \code{\ics{ensuremath}\margm{maths}} 
-and \code{\ics{si}\margm{text}});
+\item \optfmt{uc}: convert to \idx{uppercase} (using similar rules
+as for \optfmt{firstuc}, described below, but continuing onto the
+next token instead of stopping);\footnote{\ics{glsentrytitlecase}
+will be converted to \ics{GLSxtrusefield}, which requires
+\sty{glossaries-extra} v1.37+.}
+\item \optfmt{lc}: convert to \idx{lowercase} (using similar rules
+to \optfmt{uc} regarding non-letter content, with
+\ics{glsentrytitlecase} converted to \ics{glsxtrusefield});
 \item \optfmt{lc-cs}: convert to \idx{lowercase} using
 \ics{MakeTextLowercase};
 \item \optfmt{uc-cs}: convert to \idx{uppercase} using
@@ -8133,21 +8135,52 @@ and \code{\ics{si}\margm{text}});
 \item \optfmt{firstuc-cs}: convert to first letter \idx{uppercase} using
 \ics{makefirstuc};
 \item \optfmt{firstuc}: convert the first alphabetical letter (or
-group) to \idx{uppercase}. This uses the following rules:
+group) to \idx{uppercase}. This uses the following rules when trying
+to convert the first \qt{letter} of \meta{content} to \idx{uppercase}:
 \begin{enumerate}
-\item if \ics{protect} then skip and move on to the next token;
-\item if \idx{mshiftchar}\meta{maths}\idx{mshiftchar} or \ics{NoCaseChange}\margm{text} or
-\code{\ics{ensuremath}\margm{maths}} or \code{\ics{si}\margm{text}} then stop (no case change);
+\item if \meta{content} starts with \ics{protect} then skip and move on to the 
+next token;
+
+\item if \meta{content} starts with 
+\code{\idx{mshiftchar}\meta{maths}\idx{mshiftchar}} or 
+\code{\ics{NoCaseChange}\margm{text}} or
+\code{\ics{ensuremath}\margm{maths}} or \code{\ics{si}\margm{text}}
+or \code{\ics{glsentrytitlecase}\margm{text}} or any command in the form
+\code{\csfmt{\ldots ref}\margm{label}} (such as \ics{ref} or
+\ics{pageref}) then stop (no case change);\footnote{There was a bug in earlier
+versions of \bibgls\ that skipped rather than stopped.}
+
+\item if \meta{content} starts with any other control sequence
+\csfmt{}\meta{csname} then:
+
+\begin{enumerate}
 \item if \csfmt{}\meta{csname} is known to have a case-variant, then
-perform the appropriate substitution and stop;
+perform the appropriate substitution and stop (for example, 
+\ics{glsentrytext} will be converted to \ics{Glsentrytext} and
+\ics{ae} will be converted to \ics{AE});
+
+\item if \csfmt{}\meta{csname} is \ics{glslink}, \ics{glsdisp} or 
+\ics{glshyperlink}, perform the case-change on the relevant
+argument (which becomes the new \meta{content});\footnote{In
+general, it's best to avoid these commands in the \field{short}
+field, but the same algorithm is used for
+\csopt{description-case-change} where these commands may
+legitimately occur.}
+
 \item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
-\meta{text} (using the same set of rules) and stop;
-\item if \csfmt{}\meta{csname} isn't followed by a group (and it's
-not \ics{protect}), then stop (no case change applied);
+\meta{text} (which becomes the new \meta{content}) and stop;
+
+\item if \csfmt{}\meta{csname} isn't followed by a group, then stop 
+(no case change applied);
+
 \item if \margm{text} (a group) then convert the entire contents of
-\meta{text} to \idx{uppercase} and stop;
+\meta{text} to \idx{uppercase} (using the same rules as for
+\csopt[uc]{short-case-change}) and stop;
+\end{enumerate}
+
 \item if \meta{character} is an alphabetic character then change it
 to its title case and stop;
+
 \item otherwise skip and move on to the next token.
 \end{enumerate}
 \end{itemize}
@@ -8160,11 +8193,11 @@ For example, if the \ext{bib} file contains
 }
 \end{codeenv}
 then \csopt[uc]{short-case-change} would convert the value of the
-\field{short} field into
+\field{short} field into:
 \begin{verbatim}
 HTML
 \end{verbatim}
-whereas \csopt[uc-cs]{short-case-change} would convert it to
+whereas \csopt[uc-cs]{short-case-change} would convert it to:
 \begin{codeenv}
 \cs{MakeTextUppercase}\marg{html}
 \end{codeenv}
@@ -8184,7 +8217,10 @@ HT\cs{emph}{ML}
 \end{codeenv}
 Note that \csfmt{emph} isn't modified as it's recognised as a command.
 There's no attempt at interpreting the contents at this point (but
-the value may later be interpreted during sorting).
+the value may later be interpreted during sorting). When a command is 
+encountered during the case-changing, it's checked against a list of 
+known command names or specific patterns (such as \csfmt{glsentry}\meta{field},
+where \meta{field} is a recognised field).
 
 For example, suppose an abbreviation is defined using:
 \begin{codeenv}
@@ -8192,19 +8228,17 @@ For example, suppose an abbreviation is defined using:
 \end{codeenv}
 then with \csopt[uc]{short-case-change}, this would be converted to
 \begin{codeenv}
-Z\cs{ae}\cs{oe}
+Z\ics{AE}\ics{OE}
 \end{codeenv}
-since the interpreter isn't being used at this stage. If the
-interpreter is later used during sorting, the sort value will be set to 
-\code{Z\ae\oe}.
+because \cs{ae} and \cs{oe} have known \idx{uppercase} versions.
 
-However, with \csopt[uc-cs]{short-case-change}, the \field{short}
-value would be converted to
+With \csopt[uc-cs]{short-case-change}, the \field{short}
+value would be converted to:
 \begin{codeenv}
 \cs{MakeTextUppercase}\marg{z\cs{ae}\cs{oe}}
 \end{codeenv}
 If the interpreter is used during sorting, the sort value will be set to 
-\code{Z\AE\OE}.
+\code{Z\AE\OE} because the interpreter recognises all three commands.
 
 You can use \code{\ics{NoCaseChange}\margm{text}} to prevent the given 
 \meta{text} from having the case changed. For example, if the \field{short}
