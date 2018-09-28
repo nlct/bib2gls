@@ -285,22 +285,23 @@ public class GlsResource
          else if (opt.equals("name-case-change"))
          {
             nameCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
          }
          else if (opt.equals("description-case-change"))
          {
             descCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
          }
          else if (opt.equals("short-case-change"))
          {
             shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
          }
          else if (opt.equals("dual-short-case-change"))
          {
             dualShortCaseChange = getChoice(parser, list, opt,
-              "none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs");
+              "none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs", 
+              "title", "title-cs");
          }
          else if (opt.equals("short-plural-suffix"))
          {
@@ -7842,10 +7843,10 @@ public class GlsResource
 
                   list.addAll(i, subList);
 
-                  i += 4;
-
-                  n = list.size();
                }
+
+               i += subList.size();
+               n = list.size();
             }
             else
             {
@@ -8012,9 +8013,15 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                || csname.equals("si") || csname.endsWith("ref")
-                || csname.equals("glsentrytitlecase"))
+                || csname.equals("si") || csname.endsWith("ref"))
             {
+               return;
+            }
+
+            if (csname.equals("glsentrytitlecase"))
+            {
+               list.set(csIdx, new TeXCsRef("Glsxtrusefield"));
+
                return;
             }
 
@@ -8143,6 +8150,389 @@ public class GlsResource
       }
    }
 
+   public boolean isWordBoundary(TeXObject object)
+   {
+      if (object instanceof WhiteSpace 
+           || (object instanceof CharObject 
+                && Character.isWhitespace(((CharObject)object).getCharCode())))
+      {
+         return true;
+      }
+
+      if (object instanceof CharObject)
+      {
+         int codePoint = ((CharObject)object).getCharCode();
+
+         if (Character.isWhitespace(codePoint))
+         {
+            return true;
+         }
+
+         return false;
+      }
+
+      if (object instanceof ControlSequence)
+      {
+         String csname = ((ControlSequence)object).getName();
+
+         if (csname.equals("space") || csname.equals(" "))
+         {
+            return true;
+         }
+
+         return false;
+      }
+
+      return false;
+   }
+
+   public void toTitleCase(TeXObjectList list, TeXParserListener listener)
+   {
+      boolean wordBoundary = true;
+
+      for (int i = 0, n = list.size(); i < n; i++)
+      {
+         TeXObject object = list.get(i);
+
+         boolean prevWordBoundary = wordBoundary;
+
+         wordBoundary = isWordBoundary(object);
+
+         if (wordBoundary || !prevWordBoundary)
+         {
+            continue;
+         }
+
+         if (object instanceof CharObject)
+         {
+            int codePoint = ((CharObject)object).getCharCode();
+
+            if (Character.isAlphabetic(codePoint))
+            {
+               codePoint = Character.toTitleCase(codePoint);
+               ((CharObject)object).setCharCode(codePoint);
+            }
+            else
+            {
+               int charType = Character.getType(codePoint);
+
+               if (codePoint == '`' || codePoint == '\''
+                   || charType == Character.INITIAL_QUOTE_PUNCTUATION
+                   || charType == Character.START_PUNCTUATION)
+               {
+                  wordBoundary = prevWordBoundary;
+               }
+            }
+         }
+         else if (object instanceof MathGroup)
+         {
+            // don't try converting $...$ or \[...\]
+            continue;
+         }
+         else if (object instanceof Group)
+         {
+            // upper case entire group contents
+
+            toUpperCase((TeXObjectList)object, listener);
+         }
+         else if (object instanceof ControlSequence)
+         {
+            String csname = ((ControlSequence)object).getName();
+
+            if (csname.equals("protect"))
+            {
+               // skip \protect
+               wordBoundary = prevWordBoundary;
+               continue;
+            }
+
+            if (csname.equals("o") || csname.equals("l")
+               || csname.equals("ae") || csname.equals("oe")
+               || csname.equals("aa") || csname.equals("ss")
+               || csname.equals("ng") || csname.equals("th"))
+            {
+               list.set(i, new TeXCsRef(csname.toUpperCase()));
+               continue;
+            }
+
+            int csIdx = i;
+
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
+
+               i++;
+            }
+
+            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
+                || csname.equals("si") || csname.endsWith("ref"))
+            {// no case-change
+               continue;
+            }
+            else if (csname.equals("glsentrytitlecase"))
+            { // skip next argument as well
+
+               i++;
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+
+               continue;
+            }
+
+            if (csname.equals("glshyperlink"))
+            {
+               TeXObjectList subList = new TeXObjectList();
+
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  TeXObject obj = list.get(i);
+
+                  while (!(obj instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == ']'))
+                  {
+                     subList.add(list.remove(i));
+
+                     if (i >= list.size()) break;
+
+                     obj = list.get(i);
+                  }
+
+                  toTitleCase(subList, listener);
+               }
+               else
+               {// no optional argument, need to add one
+                  subList.add(listener.getOther('['));
+                  subList.add(new TeXCsRef("glsentrytitlecase"));
+                  subList.add(new TeXCsRef("glslabel"));
+                  subList.add(listener.createGroup("text"));
+                  subList.add(listener.getOther(']'));
+               }
+
+               list.addAll(i, subList);
+
+               i += subList.size();
+               n = list.size();
+
+               continue;
+            }
+
+            if (csname.matches("d?gls(disp|link)"))
+            {
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  // skip optional argument
+
+                  i++;
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     i++;
+
+                     if (object instanceof CharObject 
+                            && ((CharObject)object).getCharCode() == ']')
+                     {
+                        break;
+                     }
+                  }
+
+                  // skip ignoreables following optional argument
+
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     if (!(object instanceof Ignoreable))
+                     {
+                        break;
+                     }
+
+                     i++;
+                  }
+               }
+
+               // 'object' should now be label argument. Skip
+               // ignoreables to get text argument.
+
+               i++;
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+
+               if (object instanceof Group)
+               {
+                  // case-change argument
+                  toTitleCase((TeXObjectList)object, listener);
+               }
+               else
+               {
+                  // leave for the next iteration
+                  wordBoundary = prevWordBoundary;
+                  i--;
+               }
+
+               continue;
+            }
+            else if (csname.matches("glsp[st]"))
+            {
+               // need to replace \glsps{label} with \Glsxtrp{short}{label}
+               // and \glspt{label} with \Glsxtrp{text}{label}
+
+               list.set(csIdx, new TeXCsRef("Glsxtrp"));
+
+               list.add(i, listener.createGroup(
+                csname.endsWith("s") ? "short" : "text"));
+
+               i++;
+               n = list.size();
+
+               // skip label
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+
+               continue;
+            }
+
+            Matcher m = PATTERN_FIELD_CS.matcher(csname);
+
+            if (m.matches())
+            {
+               String tail = m.group(1);
+
+               if (bib2gls.isKnownField(tail))
+               {
+                  if (csname.startsWith("glsentry"))
+                  {
+                     // convert \glsentry<field>{label} 
+                     // to \glsentrytitlecase{label}{field}
+
+                     list.set(csIdx, new TeXCsRef("glsentrytitlecase"));
+
+                     i++;
+                     list.add(i, listener.createGroup(tail));
+
+                     n = list.size();
+
+                     continue;
+                  }
+                  else if (csname.equals("gls"+tail))
+                  {
+                     // convert \gls<field>[...]{label} 
+                     // to
+                     // \glslink>[...]{label}{\glsentrytitlecase{label}{field}}
+
+                     list.set(csIdx, new TeXCsRef("glslink"));
+
+                     if (object instanceof CharObject 
+                          && ((CharObject)object).getCharCode() == '[')
+                     {
+                        // skip optional argument
+
+                        i++;
+                        while (i < n)
+                        {
+                           object = list.get(i);
+                           i++;
+
+                           if (object instanceof CharObject 
+                                  && ((CharObject)object).getCharCode() == ']')
+                           {
+                              object = list.get(i);
+                              break;
+                           }
+                        }
+                     }
+
+                     // object should now be label
+
+                     TeXObject labelObj = (TeXObject)object.clone();
+                     i++;
+
+                     // skip label
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof Ignoreable))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+
+                     Group grp = listener.createGroup();
+                     list.add(i, grp);
+
+                     grp.add(new TeXCsRef("glsentrytitlecase"));
+                     grp.add(labelObj);
+                     grp.add(listener.createGroup(tail));
+
+                     i++;
+                     n = list.size();
+
+                     continue;
+                  }
+               }
+            }
+
+            String titleCsname = getTitleCsName(csname);
+
+            if (titleCsname == null)
+            {
+               // if a group follows the command, title case the group
+               // otherwise no case-change.
+
+               if (object instanceof Group && !(object instanceof MathGroup))
+               {
+                  // title case argument
+
+                  toTitleCase((TeXObjectList)object, listener);
+               }
+            }
+            else
+            {
+               list.set(csIdx, new TeXCsRef(titleCsname));
+            }
+         }
+      }
+   }
+
    public String getSentenceCsName(String csname)
    {
       if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
@@ -8196,6 +8586,18 @@ public class GlsResource
       }
 
       return null;
+   }
+
+   // This is harder than getSentenceCsName and this method will have to
+   // fallback on that method in most cases.
+   public String getTitleCsName(String csname)
+   {
+      if (csname.toLowerCase().equals("glsxtrusefield"))
+      {
+         return "glsentrytitlecase";
+      }
+
+      return getSentenceCsName(csname);
    }
 
    public String getLowerCsName(String csname)
@@ -8380,6 +8782,15 @@ public class GlsResource
          list.add(new TeXCsRef("makefirstuc"));
          list.add(grp);
       }
+      else if (change.equals("title-cs"))
+      {
+         Group grp = parser.getListener().createGroup();
+         grp.addAll(list);
+
+         list = new TeXObjectList();
+         list.add(new TeXCsRef("capitalisewords"));
+         list.add(grp);
+      }
       else if (change.equals("lc"))
       {
          toLowerCase(list, parser.getListener());
@@ -8391,6 +8802,10 @@ public class GlsResource
       else if (change.equals("firstuc"))
       {
          toSentenceCase(list, parser.getListener());
+      }
+      else if (change.equals("title"))
+      {
+         toTitleCase(list, parser.getListener());
       }
       else
       {
