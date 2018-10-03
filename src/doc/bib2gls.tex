@@ -8113,97 +8113,303 @@ by \csopt{time-fields}. The \meta{value} is as for
 \subsection{Case-Changing}
 \label{sec:fieldcase}
 
-\optsection[\subsubsection]{short-case-change}
+The \sty{glossaries-extra} package comes with the category
+attributes \catattr{glossdesc} and \catattr{glossname}, which may
+take the values \optfmt{firstuc} or \optfmt{title}. These don't
+change the actual \field{name} or \field{description} fields, but
+instead \ics{glossentryname} and \ics{glossentrydesc} (which are
+used by the default glossary styles) check for the corresponding
+attribute and apply the appropriate \idx{case-change} to the field value.
 
-The value of the \field{short} field may be automatically converted
-to \idxlink{uppercase}{upper} or \idx{lowercase}. This option may take one of the following
-values:
+So \ics{glossentryname} will use \ics{Glsentryname} if the
+\catattr{glossname} attribute for the given entry is set to \optfmt{firstuc} 
+and \ics{glossentrydesc} will use \ics{Glsentrydesc} if the
+\catattr{glossdesc} attribute is set to \optfmt{firstuc}.
+The \optfmt{title} setting will instead use \ics{capitalisewords}
+applied to the field value.
+
+The resource options described in this section provide an
+alternative to those attributes that actually modify the relevant
+field. There are two forms of modification: the field contents are
+modified so that the value is encapsulated by a command or \bibgls\
+will perform the actual \idx{case-change} according to its own
+algorithm. The results can vary according to the field content.
+
+Each of the case-changing resource options may take one of the
+following values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
-\item \optfmt{uc}: convert to \idx{uppercase} (using similar rules
-as for \optfmt{firstuc}, described below, but continuing onto the
-next token instead of stopping);\footnote{\ics{glsentrytitlecase}
-will be converted to \ics{GLSxtrusefield}, which requires
-\sty{glossaries-extra} v1.37+.}
-\item \optfmt{lc}: convert to \idx{lowercase} (using similar rules
-to \optfmt{uc} regarding non-letter content, with
-\ics{glsentrytitlecase} converted to \ics{glsxtrusefield});
-\item \optfmt{lc-cs}: convert to \idx{lowercase} using
-\ics{MakeTextLowercase};
-\item \optfmt{uc-cs}: convert to \idx{uppercase} using
-\ics{MakeTextUppercase};
-\item \optfmt{firstuc-cs}: convert to first letter \idx{uppercase} using
-\ics{makefirstuc};
-\item \optfmt{firstuc}: convert the first alphabetical letter (or
-group) to \idx{uppercase}. This uses the following rules when trying
-to convert the first \qt{letter} of \meta{content} to \idx{uppercase}:
-\begin{enumerate}
-\item if \meta{content} starts with \ics{protect} then skip and move on to the 
-next token;
-
-\item if \meta{content} starts with 
-\code{\idx{mshiftchar}\meta{maths}\idx{mshiftchar}} or 
-\code{\ics{NoCaseChange}\margm{text}} or
-\code{\ics{ensuremath}\margm{maths}} or \code{\ics{si}\margm{text}}
-or \code{\ics{glsentrytitlecase}\margm{text}} or any command in the form
-\code{\csfmt{\ldots ref}\margm{label}} (such as \ics{ref} or
-\ics{pageref}) then stop (no case change);\footnote{There was a bug in earlier
-versions of \bibgls\ that skipped rather than stopped.}
-
-\item if \meta{content} starts with any other control sequence
-\csfmt{}\meta{csname} then:
-
-\begin{enumerate}
-\item if \csfmt{}\meta{csname} is known to have a case-variant, then
-perform the appropriate substitution and stop (for example, 
-\ics{glsentrytext} will be converted to \ics{Glsentrytext} and
-\ics{ae} will be converted to \ics{AE});
-
-\item if \csfmt{}\meta{csname} is \ics{glslink}, \ics{glsdisp} or 
-\ics{glshyperlink}, perform the case-change on the relevant
-argument (which becomes the new \meta{content});\footnote{In
-general, it's best to avoid these commands in the \field{short}
-field, but the same algorithm is used for
-\csopt{description-case-change} where these commands may
-legitimately occur.}
-
-\item if \csfmt{}\meta{csname}\margm{text} then apply the case change to
-\meta{text} (which becomes the new \meta{content}) and stop;
-
-\item if \csfmt{}\meta{csname} isn't followed by a group, then stop 
-(no case change applied);
-
-\item if \margm{text} (a group) then convert the entire contents of
-\meta{text} to \idx{uppercase} (using the same rules as for
-\csopt[uc]{short-case-change}) and stop;
-\end{enumerate}
-
-\item if \meta{character} is an alphabetic character then change it
-to its title case and stop;
-
-\item otherwise skip and move on to the next token.
-\end{enumerate}
+\item \optfmt{lc-cs}: convert to \idx{lowercase} by encapsulating
+the field value with \ics{MakeTextLowercase};
+\item \optfmt{uc-cs}: convert to \idx{uppercase} by encapsulating
+the field value with \ics{MakeTextUppercase};
+\item \optfmt{firstuc-cs}: convert to first letter \idx{uppercase}
+by encapsulating the field value with \ics{makefirstuc};
+\item \optfmt{title-cs}: convert to \idx{titlecase} 
+by encapsulating the field value with \ics{capitalisewords};
+\item \optfmt{lc}: convert to \idx{lowercase} by making the
+appropriate modifications to tokens in the field value that have
+a known \idx{lowercase} alternative;
+\item \optfmt{uc}: convert to \idx{uppercase} by making the
+appropriate modifications to tokens in the field value that have
+a known \idx{uppercase} alternative;
+\item \optfmt{firstuc}: convert to first letter \idx{uppercase} 
+by making the appropriate modification, if it has 
+a known \idx{uppercase} alternative;
+\item \optfmt{title}: convert to \idx{titlecase} by making the
+appropriate modifications to the first letter of each identified
+word in the field value that has a known \idx{uppercase}
+alternative.
 \end{itemize}
+The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially
+a \idx{sentencecase} change, but there's no check for
+sentence-breaks within the value, so even if the value contains
+multiple sentences, only the first is changed.
 
-For example, if the \ext{bib} file contains
+The \optfmt{\meta{option}-cs} values defer the actual case-changing
+to \TeX. Be aware of the limitations of using any of the
+case-changing commands. See the \isty{textcase} and \isty{mfirstuc}
+package documentation for further details~\cite{textcase,mfirstuc}.
+You may use \code{\ics{NoCaseChange}\margm{content}} (provided by
+\sty{textcase}) to prevent any case-change to \meta{content}.
+
+For the options where \bibgls\ itself performs the case-change, then
+\bibgls\ will iterate over each token of the field value and apply
+the following rules:
+\begin{enumerate}
+
+\item If the token is a normal Unicode alphabetic character, it will
+be replaced with the corresponding upper/lower case character.
+For \optfmt{title} and \optfmt{firstuc}, the title case character is
+used as the replacement, for \optfmt{uc} the \idx{uppercase} character is
+used as the replacement, and for \optfmt{lc} the \idx{lowercase} character
+is used as the replacement. Most characters have the same upper and
+title case alternative (for example, \qt{a} will be converted to \qt{A}
+for the \optfmt{title}, \optfmt{firstuc} and \optfmt{uc} options) but
+some characters have different title/upper versions (for example, 
+the digraph \qt{\char"01F3} has the title version \qt{\char"01F2}
+and \idx{uppercase} version \qt{\char"01F1}).
+
+If the option is \optfmt{firstuc} then all the remaining tokens are
+skipped. If the option is \optfmt{title} then the subsequent tokens
+are skipped until a word-boundary is found.
+
+\item If the token is a normal Unicode character that isn't alphabetical,
+then this token will be skipped for all options.
+
+\item If \code{\idx{mshiftchar}\meta{maths}\idx{mshiftchar}} is
+encountered, it will be skipped. If the option is \optfmt{firstuc}
+then all remaining tokens are skipped, so no case-change will be
+performed.
+
+\item\label{case-change-group} If a group \code{\margm{content}} is
+found, then the case-change is applied to the entire \meta{content}
+(which may be empty). This corresponds to the way \ics{makefirstuc}
+and \ics{capitalisewords} work if a~word starts with a group. Note
+that with \optfmt{firstuc} and \optfmt{title} the group content will
+be converted according to \optfmt{uc}, so the normal \idx{uppercase}
+character is used rather than the title case character (if they are
+different).
+
+If the option is \optfmt{firstuc} then all the remaining tokens are
+skipped. If the option is \optfmt{title} then the subsequent tokens
+are skipped until a word-boundary is found.
+
+\item If a control sequence \csfmt{}\meta{csname} is found, then:
+
+  \begin{enumerate}
+  \item If the control sequence is \cs{protect}, this token is skipped
+  for all options.
+
+  \item If the control sequence is one of: \ics{o}, \ics{O}, \ics{l},
+  \ics{L}, \ics{ae}, \ics{AE}, \ics{oe}, \ics{OE}, \ics{aa}, \ics{AA},
+  \ics{ss}, \ics{SS}, \ics{ng}, \ics{NG}, \ics{th}, \ics{TH},
+  \ics{dh}, \ics{DH}, \ics{dj} or \ics{DJ}, then
+  it's replaced with its case-change counterpart (if not already the
+  correct case).
+
+  If the option is \optfmt{firstuc} then all the remaining tokens are
+  skipped. If the option is \optfmt{title} then the subsequent tokens
+  are skipped until a word-boundary is found.
+
+  \item If the control sequence is \ics{NoCaseChange}, then the 
+  control sequence and its argument is ignored. With \optfmt{firstuc}
+  and \optfmt{title}, if \code{\ics{NoCaseChange}\margm{text}}
+  occurs at the start of a word, then \bibgls\ will act as though
+  the word hasn't started yet (so the next token will be considered
+  for a case-change). This is different to the way \ics{makefirstuc}
+  and \ics{capitalisewords} work.
+
+  \item If the control sequence is \ics{ensuremath}, \ics{si} or if 
+  \meta{csname} ends with \qtt{ref} (for example, \ics{ref} or 
+  \ics{pageref}) then the control sequence and its argument is ignored.
+
+  If the option is \optfmt{firstuc} then all the remaining tokens are
+  skipped (so no case-change will be performed). If the option is 
+  \optfmt{title} then the subsequent tokens
+  are skipped until a word-boundary is found (so no case-change is
+  performed for this word).
+
+  \item If the control sequence is \ics{glsentrytitlecase} then:
+   \begin{description}
+   \item[\optfmt{lc}] the control sequence is converted to
+    \ics{glsxtrusefield};
+   \item[\optfmt{uc}] the control sequence is converted to
+    \ics{GLSxtrusefield};
+   \item[\optfmt{firstuc}] the control sequence is converted to
+    \ics{Glsxtrusefield} and the remaining tokens are skipped;
+   \item[\optfmt{title}] the control sequence is left unchanged
+   and subsequent tokens are skipped until a word-boundary is found.
+   \end{description}
+  (The field and entry labels are skipped.)
+
+  \item If the control sequence is \ics{glshyperlink} then the
+  case-change is applied to its optional argument. (If there was no
+  optional argument in the original field value, one will be inserted.)
+  The label argument is skipped.
+
+  If the option is \optfmt{firstuc} then all the remaining tokens are
+  skipped. If the option is \optfmt{title} then the subsequent tokens
+  are skipped until a word-boundary is found.
+
+  \item If the control sequence is \ics{glsdisp}, \ics{glslink},
+  \ics{dglsdisp} or \ics{dglslink} then the case-change will be
+  applied to the appropriate argument.
+
+  If the option is \optfmt{firstuc} then all the remaining tokens are
+  skipped. If the option is \optfmt{title} then the subsequent tokens
+  are skipped until a word-boundary is found.
+
+  \item If the control sequence has a known case variant, it will be
+  substituted. For example, \ics{gls} will be changed to \ics{Gls}
+  or \ics{GLS}. In some cases there isn't an appropriate variant.
+  For example, \ics{glsentrytext} has a first-letter upper case 
+  version \ics{Glsentrytext}, but not an all-caps version.
+
+  If the option is \optfmt{firstuc} then all the remaining tokens are
+  skipped. If the option is \optfmt{title} then the subsequent tokens
+  are skipped until a word-boundary is found.
+
+  \item If the control sequence is followed by a group, then the
+   appropriate case-change is applied to the group contents.
+   Unlike step~\ref{case-change-group}, the case-change isn't
+   applied to the entire group content with \optfmt{firstuc} and
+   \optfmt{title}. (Again, this follows the way that
+   \ics{makefirstuc} and \ics{capitalisewords} work.)
+
+  \item Otherwise the control sequence is skipped.
+  \end{enumerate}
+
+\item Anything else is skipped.
+
+\end{enumerate}
+
+For the \optfmt{title} option, a word-boundary is identified if a
+token is encountered that is a white space character or is
+\ics{space} or \ics{cs.space}.
+
+For example, if an entry is defined as:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
-  \field{short} = "html",
-  \field{long}  = "hypertext markup language"
+ \field{short} = \marg{HTML},
+ \field{long}  = \marg{hypertext markup language},
+ \field{description}=\marg{a markup language for creating web pages}
 }
 \end{codeenv}
-then \csopt[uc]{short-case-change} would convert the value of the
-\field{short} field into:
-\begin{verbatim}
-HTML
-\end{verbatim}
-whereas \csopt[uc-cs]{short-case-change} would convert it to:
+then:
 \begin{codeenv}
-\cs{MakeTextUppercase}\marg{html}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[lc]{short-case-change},
+  \csopt[title]{long-case-change},
+  \csopt[firstuc]{description-case-change}
+}
 \end{codeenv}
-In the case of \csopt[uc]{short-case-change} and \csopt[lc]{short-case-change}
-only tokens that are recognised as characters will be converted.
-For example, suppose I have a slightly more eccentric definition:
+will make the entry behave as if it had been defined as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+ \field{short} = \marg{html},
+ \field{long}  = \marg{Hypertext Markup Language},
+ \field{description}=\marg{A markup language for creating web pages}
+}
+\end{codeenv}
+whereas: 
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[lc-cs]{short-case-change},
+  \csopt[title-cs]{long-case-change},
+  \csopt[firstuc-cs]{description-case-change}
+}
+\end{codeenv}
+will make the entry behave as if it had been defined as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+ \field{short} = \marg{\cs{MakeTextLowercase}\marg{HTML}},
+ \field{long}  = \marg{\cs{capitalisewords}\marg{hypertext markup language}},
+ \field{description}=\marg{\cs{makefirstuc}\marg{a markup language for creating web pages}}
+}
+\end{codeenv}
+If the given field is missing, no change is made, except under
+certain circumstances (see the relevant resource option for details). 
+For example, if an abbreviation is simply defined as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+ \field{short} = \marg{html},
+ \field{long}  = \marg{hypertext markup language}
+}
+\end{codeenv}
+then:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[uc]{name-case-change},
+  \csopt[title]{description-case-change}
+}
+\end{codeenv}
+won't have an effect. The default \abbrstyle{long-short} abbreviation style 
+will set the \field{name} and \field{description} fields, but
+\bibgls\ doesn't have access to this information.
+
+Remember that you can create missing fields by copying the value
+from another field. So if the resource options are changed to:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[uc]{name-case-change},
+  \csopt[title]{description-case-change},
+  \csopt[short={name},long={description}]{replicate-fields}
+}
+\end{codeenv}
+then \bibgls\ will act as though the entry had been defined as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+ \field{short} = \marg{html},
+ \field{long}  = \marg{hypertext markup language},
+ \field{name} = \marg{HTML},
+ \field{description}  = \marg{Hypertext Markup Language}
+}
+\end{codeenv}
+If the \abbrstyle{long-short-sc} abbreviation style is set (before
+\gls{GlsXtrLoadResources}) then this will override the default style
+for the \field{name} and \field{description}, so
+\code{\cs{gls}\marg{html}} will display the short form using
+\code{\ics{textsc}\marg{html}} but the \field{name} in the glossary
+will be displayed using just \code{HTML}.
+
+Note that with \atentry{index} the \field{name} and \field{text}
+fields will automatically be created if they are missing and
+\csopt{name-case-change} is used. For example, if an entry is
+defined as:
+\begin{codeenv}
+\atentry{index}\marg{duck}
+\end{codeenv}
+then \csopt[firstuc]{name-case-change} will make this entry behave
+as though it was defined as:
+\begin{codeenv}
+\atentry{index}\marg{duck,
+  \field{name} = \marg{Duck},
+  \field{text} = \marg{duck}
+}
+\end{codeenv}
+
+Suppose I have a slightly eccentric abbreviation definition:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
   \field{short} = "ht\cs{emph}\marg{ml}",
@@ -8215,24 +8421,49 @@ then \csopt[uc]{short-case-change} would convert the value of the
 \begin{codeenv}
 HT\cs{emph}{ML}
 \end{codeenv}
-Note that \csfmt{emph} isn't modified as it's recognised as a command.
-There's no attempt at interpreting the contents at this point (but
-the value may later be interpreted during sorting). When a command is 
-encountered during the case-changing, it's checked against a list of 
-known command names or specific patterns (such as \csfmt{glsentry}\meta{field},
-where \meta{field} is a recognised field).
-
-For example, suppose an abbreviation is defined using:
+Note that \csfmt{emph} isn't modified as it's recognised as a
+command. There's a difference between a group that follows a control
+sequence and one that doesn't. For example:
 \begin{codeenv}
-\field{short} = "z\ics{ae}\ics{oe}",
+\atentry{abbreviation}\marg{html,
+  \field{short} = "\marg{ht}ml",
+  \field{long}  = "hypertext markup language"
+}
 \end{codeenv}
-then with \csopt[uc]{short-case-change}, this would be converted to
+In this case \csopt[firstuc]{short-case-change} will convert the
+\field{short} field value to:
+\begin{codeenv}
+\marg{HT}ml
+\end{codeenv}
+(The entire contents of the group \code{\marg{ht}} has been
+converted.) Whereas with:
+\begin{codeenv}
+\atentry{abbreviation}\marg{html,
+  \field{short} = "\cs{emph}\marg{ht}ml",
+  \field{long}  = "hypertext markup language"
+}
+\end{codeenv}
+then \csopt[firstuc]{short-case-change} will convert the
+\field{short} field value to:
+\begin{codeenv}
+\cs{emph}\marg{Ht}ml
+\end{codeenv}
+(Only the first letter of the argument \code{\marg{ht}} has been
+converted.)
+
+There's no attempt at interpreting the field contents at this point (but
+the value may later be interpreted during sorting).
+For example, suppose a \field{name} field is defined using:
+\begin{codeenv}
+\field{name} = "z\ics{ae}\ics{oe}",
+\end{codeenv}
+then with \csopt[uc]{name-case-change}, the value would be converted to
 \begin{codeenv}
 Z\ics{AE}\ics{OE}
 \end{codeenv}
 because \cs{ae} and \cs{oe} have known \idx{uppercase} versions.
 
-With \csopt[uc-cs]{short-case-change}, the \field{short}
+With \csopt[uc-cs]{name-case-change}, the \field{name}
 value would be converted to:
 \begin{codeenv}
 \cs{MakeTextUppercase}\marg{z\cs{ae}\cs{oe}}
@@ -8250,8 +8481,25 @@ then with \csopt[uc]{short-case-change}, this would be converted to
 \begin{codeenv}
 A\cs{NoCaseChange}\marg{bc}D
 \end{codeenv}
-(This command is provided by \isty{textcase}, which is automatically
-loaded by \styfmt{glossaries}.)
+
+Note that with \optfmt{firstuc} and \optfmt{title}, if
+\code{\ics{NoCaseChange}\margm{text}} occurs at the start of a word
+then it's skipped, and the case change is
+applied to the material following its argument. For example,
+suppose the \field{short} field is defined as:
+\begin{codeenv}
+\field{short}=\marg{\cs{NoCaseChange}\marg{h}tml}
+\end{codeenv}
+then the result is:
+\begin{codeenv}
+\cs{NoCaseChange}\marg{h}Tml
+\end{codeenv}
+whereas with:
+\begin{codeenv}
+\field{short}=\marg{\marg{}html}
+\end{codeenv}
+then the result is just \code{html} (since the case change is
+applied to the empty group, which has no effect).
 
 If you have a command that takes a label or identifier as an argument then it's
 best to hide the label in a custom command. For example, if the
@@ -8266,72 +8514,28 @@ HT\cs{textcolor}\marg{RED}\marg{ML}
 which is incorrect. Instead, provide a command that hides the label
 (such as the \csfmt{strong} example described on page~\glsxtrpageref{strong}).
 
-The first letter upper casing \csopt[firstuc]{short-case-change}
-is slightly more complicated. The simplest case is where
-the field only contains alphabetical characters. For example,
-suppose the \field{short} field is defined as:
-\begin{verbatim}
-short={html}
-\end{verbatim}
-then with \csopt[firstuc]{short-case-change} this would end up as
-\code{Html} whereas 
-\begin{verbatim}
-short={{ht}ml}
-\end{verbatim}
-would end up as \code{HTml} since it detects the grouping. 
-(You'll need to do this for the Dutch digraph \qt{ij}.)
-Note that \ics{NoCaseChange} is skipped, and the case change is
-applied to the material following its argument. For example,
-suppose the \field{short} field is defined as:
-\begin{verbatim}
-short={\NoCaseChange{h}tml}
-\end{verbatim}
-then the result is
-\begin{verbatim}
-\NoCaseChange{h}Tml
-\end{verbatim}
-whereas with
-\begin{verbatim}
-short={{}html}
-\end{verbatim}
-then the result is just \code{html}. If a command is followed by 
-a group then the case change is applied to the group (unless the
-command is \ics{NoCaseChange}, \ics{ensuremath} or \ics{si}). For
-example,
-suppose the \field{short} field is defined as:
-\begin{verbatim}
-short={\emph{ht}ml}
-\end{verbatim}
-then the result is
-\begin{verbatim}
-\emph{Ht}ml
-\end{verbatim}
-If a command isn't followed by a group (and it's not \ics{protect})
-then no change occurs. For example, 
-suppose the \field{short} field is defined as:
-\begin{verbatim}
-short={\ae html}
-\end{verbatim}
-then the result is
-\begin{verbatim}
-\ae html
-\end{verbatim}
-whereas with
-\begin{verbatim}
-short={\protect html}
-\end{verbatim}
-the result is
-\begin{verbatim}
-\protect Html
-\end{verbatim}
+\optsection[\subsubsection]{short-case-change}
+
+Applies a case-change to the \field{short} field (if present).
+This option may take one of the values described above.
 
 See \csopt{dual-short-case-change} to adjust the \field{dualshort}
 field.
 
+\optsection[\subsubsection]{long-case-change}
+
+Applies a case-change to the \field{long} field (if present).
+This option may take one of the values described above.
+
+See \csopt{dual-long-case-change} to adjust the \field{duallong}
+field.
+
 \optsection[\subsubsection]{name-case-change}
 
-As \csopt{short-case-change} but is applied to the \field{name}
-field. If the \field{text} field hasn't been set, the \field{name}
+Applies a case-change to the \field{name} field.
+This option may take one of the values described above.
+
+If the \field{text} field hasn't been set, the \field{name}
 value is first copied to the \field{text} field. If the \field{name}
 field hasn't been set (for example, with the \atentry{index} entry
 type), it's copied from the fallback value (which
@@ -8341,8 +8545,9 @@ the \field{name} field is missing no action is performed.
 
 \optsection[\subsubsection]{description-case-change}
 
-As \csopt{short-case-change} but is applied to the
-\field{description} field.
+Applies a case-change to the \field{description} field (if present).
+This option may take one of the values described above.
+
 
 \section{Plurals}
 \label{sec:plurals}
@@ -12433,6 +12638,11 @@ entry.
 \optsection[\subsubsection]{dual-short-case-change}
 
 As \csopt{short-case-change} but applies to the \field{dualshort}
+field instead.
+
+\optsection[\subsubsection]{dual-long-case-change}
+
+As \csopt{long-case-change} but applies to the \field{duallong}
 field instead.
 
 \optsection[\subsubsection]{dual-field}

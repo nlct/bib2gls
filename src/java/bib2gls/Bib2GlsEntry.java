@@ -793,6 +793,19 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      if (resource.changeLongCase())
+      {
+         BibValueList value = getField("long");
+
+         if (value != null)
+         {
+            TeXObjectList list = value.expand(parser);
+
+            putField("long", 
+               resource.applyLongCaseChange(parser, value));
+         }
+      }
+
       if (resource.changeDescriptionCase())
       {
          BibValueList value = getField("description");
@@ -812,6 +825,17 @@ public class Bib2GlsEntry extends BibEntry
          {
             putField("dualshort", 
                resource.applyShortCaseChange(parser, value));
+         }
+      }
+
+      if (resource.changeDualLongCase())
+      {
+         BibValueList value = getField("duallong");
+
+         if (value != null)
+         {
+            putField("duallong", 
+               resource.applyLongCaseChange(parser, value));
          }
       }
 
@@ -867,6 +891,14 @@ public class Bib2GlsEntry extends BibEntry
                            updateShortPlural = true;
                         }
                      }
+                     else if (dup.equals("long"))
+                     {
+                        if (resource.changeLongCase())
+                        {
+                           dupValue = resource.applyLongCaseChange(parser, 
+                             dupValue);
+                        }
+                     }
                      else if (dup.equals("dualshort"))
                      {
                         if (resource.changeDualShortCase())
@@ -878,6 +910,14 @@ public class Bib2GlsEntry extends BibEntry
                         if (dualShortPluralSuffix != null)
                         {
                            updateDualShortPlural = true;
+                        }
+                     }
+                     else if (dup.equals("duallong"))
+                     {
+                        if (resource.changeDualLongCase())
+                        {
+                           dupValue = resource.applyLongCaseChange(parser, 
+                             dupValue);
                         }
                      }
 

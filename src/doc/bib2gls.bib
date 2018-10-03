@@ -1551,6 +1551,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.long-case-change,
+   name={\csoptfmt{long\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.name-case-change,
    name={\csoptfmt{name\dhyphen case\dhyphen change}},
    user1={\meta{value}},
@@ -2112,6 +2119,13 @@ format}},
 
 @dualindexentry{opt.dual-short-case-change,
    name={\csoptfmt{dual\dhyphen short\dhyphen case\dhyphen change}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.dual-long-case-change,
+   name={\csoptfmt{dual\dhyphen long\dhyphen case\dhyphen change}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -3407,6 +3421,13 @@ cs}\margm{Glspl-like cs}},
 @index{cs.space,
   name={\csfmt{\textvisiblespace}},
   description={produces an inter-word space},
+  note={kernel command},
+  category={command}
+}
+
+@index{space,
+  name={\csfmt{space}},
+  description={produces a space},
   note={kernel command},
   category={command}
 }
@@ -6174,9 +6195,17 @@ primary formats, if enabled.},
  name={lower case}
 }
 
+@index{titlecase,
+ name={title case}
+}
+
+@index{sentencecase,
+ name={sentence case}
+}
+
 @index{case-change,
   name = {case change},
-  seealso = {uppercase,lowercase}
+  seealso = {uppercase,lowercase,titlecase,sentencecase}
 }
 
 @index{unicodecategories,
@@ -6586,6 +6615,16 @@ to upper case},
   category={command}
 }
 
+@index{Glsentrydesc,
+  name={\csfmt{Gls\-entry\-desc}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{description} field with the first letter converted to
+    upper case},
+  note={provided by \styfmt{glossaries}},
+  category={command}
+}
+
 @index{glsentrysymbol,
   name={\csfmt{gls\-entry\-symbol}},
   user1={\margm{label}},
@@ -6849,6 +6888,15 @@ field value},
   user1={\margm{entry label}\margm{field label}},
   description={expands to the value of the given field for the given
    entry},
+  note={provided by \styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
+@index{Glsxtrusefield,
+  name={\csfmt{Gls\-xtr\-use\-field}},
+  user1={\margm{entry label}\margm{field label}},
+  description={like \cs{glsxtrusefield} but converts the first
+   letter to \idx!{uppercase}},
   note={provided by \styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -8435,6 +8483,26 @@ packages},
   category={command}
 }
 
+@index{dglslink,
+  name={\csfmt{dgls\-link}},
+  user1={\oargm{options}\margm{label}\margm{text}},
+  description={like \cs{glslink} but tries the prefixes
+  identified with commands like \cs{glsxtraddlabelprefix}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={dglsdisp},
+  category={command}
+}
+
+@index{dglsdisp,
+  name={\csfmt{dgls\-disp}},
+  user1={\oargm{options}\margm{label}\margm{text}},
+  description={like \cs{glsdisp} but tries the prefixes
+  identified with commands like \cs{glsxtraddlabelprefix}},
+  note={provided by \styfmt{glossaries-extra-bib2gls} v1.37+},
+  seealso={dglsdisp},
+  category={command}
+}
+
 @index{glsxtrshort,
   name={\csfmt{glsxtrshort}},
   user1={\oargm{options}\margm{label}},
@@ -9451,42 +9519,140 @@ has three or more items},
 
 @index{AA,
   name={\csfmt{AA}},
-  description={produces the A-ring character \AA},
+  description={produces the \idx!{uppercase} A-ring character \AA},
+  note={kernel command},
+  category={command}
+}
+
+@index{aa,
+  name={\csfmt{aa}},
+  description={produces the \idx!{lowercase} a-ring character \aa},
   note={kernel command},
   category={command}
 }
 
 @index{O,
   name={\csfmt{O}},
-  description={produces the O-slash character \O},
+  description={produces the \idx!{uppercase} O-slash character \O},
+  note={kernel command},
+  category={command}
+}
+
+@index{o,
+  name={\csfmt{o}},
+  description={produces the \idx!{lowercase} o-slash character \o},
+  note={kernel command},
+  category={command}
+}
+
+@index{L,
+  name={\csfmt{L}},
+  description={produces the \idx!{uppercase} L-slash character \L},
+  note={kernel command},
+  category={command}
+}
+
+@index{l,
+  name={\csfmt{l}},
+  description={produces the \idx!{lowercase} l-slash character \l},
   note={kernel command},
   category={command}
 }
 
 @index{ae,
   name={\csfmt{ae}},
-  description={produces the \ae-ligature},
+  description={produces the \idx!{lowercase} \ae-ligature},
   note={kernel command},
   category={command}
 }
 
 @index{AE,
   name={\csfmt{AE}},
-  description={produces the \AE-ligature},
+  description={produces the \idx!{uppercase} \AE-ligature},
   note={kernel command},
   category={command}
 }
 
 @index{oe,
   name={\csfmt{oe}},
-  description={produces the \oe-ligature},
+  description={produces the \idx!{lowercase} \oe-ligature},
   note={kernel command},
   category={command}
 }
 
 @index{OE,
   name={\csfmt{OE}},
-  description={produces the \OE-ligature},
+  description={produces the \idx!{uppercase} \OE-ligature},
+  note={kernel command},
+  category={command}
+}
+
+@index{th,
+  name={\csfmt{th}},
+  description={produces the \idx!{lowercase} thorn \th},
+  note={kernel command},
+  category={command}
+}
+
+@index{TH,
+  name={\csfmt{TH}},
+  description={produces the \idx!{uppercase} thorn \TH},
+  note={kernel command},
+  category={command}
+}
+
+@index{ss,
+  name={\csfmt{ss}},
+  description={produces the \idx!{lowercase} eszett \ss},
+  note={kernel command},
+  category={command}
+}
+
+@index{SS,
+  name={\csfmt{SS}},
+  description={produces the \idx!{uppercase} eszett \SS},
+  note={kernel command},
+  category={command}
+}
+
+@index{ng,
+  name={\csfmt{ng}},
+  description={produces the \idx!{lowercase} eng \ng},
+  note={kernel command},
+  category={command}
+}
+
+@index{NG,
+  name={\csfmt{NG}},
+  description={produces the \idx!{uppercase} eng \NG},
+  note={kernel command},
+  category={command}
+}
+
+@index{dh,
+  name={\csfmt{dh}},
+  description={produces the \idx!{lowercase} eth \dh},
+  note={kernel command},
+  category={command}
+}
+
+@index{DH,
+  name={\csfmt{DH}},
+  description={produces the \idx!{uppercase} eth \DH},
+  note={kernel command},
+  category={command}
+}
+
+@index{dj,
+  name={\csfmt{dj}},
+  description={produces the \idx!{lowercase} d-stroke \dj},
+  note={kernel command},
+  category={command}
+}
+
+@index{DJ,
+  name={\csfmt{DJ}},
+  description={produces the \idx!{uppercase} d-stroke \DJ},
   note={kernel command},
   category={command}
 }

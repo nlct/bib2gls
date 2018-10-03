@@ -4,6 +4,8 @@ v1.8 (pending):
 
        --save-primary-locations
        --primary-location-formats
+       --long-case-change
+       --dual-long-case-change
 
   * added support for the new glossaries-extra package option
     record=nameref (introduced to glossaries-extra v1.37).

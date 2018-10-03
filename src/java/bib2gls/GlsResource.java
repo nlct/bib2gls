@@ -312,6 +312,17 @@ public class GlsResource
                shortPluralSuffix = null;
             }
          }
+         else if (opt.equals("long-case-change"))
+         {
+            longCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
+              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
+         }
+         else if (opt.equals("dual-long-case-change"))
+         {
+            dualLongCaseChange = getChoice(parser, list, opt,
+              "none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs", 
+              "title", "title-cs");
+         }
          else if (opt.equals("dual-short-plural-suffix"))
          {
             dualShortPluralSuffix = getOptional(parser, "", list, opt);
@@ -2504,6 +2515,18 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "dual-short-case-change"));
+      }
+
+      if (longCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "long-case-change"));
+      }
+
+      if (dualLongCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "dual-long-case-change"));
       }
 
       if (shortPluralSuffix != null)
@@ -7518,6 +7541,16 @@ public class GlsResource
       return dualShortCaseChange != null;
    }
 
+   public boolean changeLongCase()
+   {
+      return longCaseChange != null;
+   }
+
+   public boolean changeDualLongCase()
+   {
+      return dualLongCaseChange != null;
+   }
+
    public BibValueList applyNameCaseChange(TeXParser parser, 
       BibValueList value)
     throws IOException
@@ -7546,6 +7579,35 @@ public class GlsResource
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
 
+   public BibValueList applyLongCaseChange(TeXParser parser, 
+      BibValueList value)
+    throws IOException
+   {
+      return applyCaseChange(parser, value, longCaseChange);
+   }
+
+   public BibValueList applyDualLongCaseChange(TeXParser parser,
+      BibValueList value)
+    throws IOException
+   {
+      return applyCaseChange(parser, value, dualLongCaseChange);
+   }
+
+   public static boolean isUcLcCommand(String csname)
+   {
+      return (csname.equals("O") || csname.equals("o")
+             || csname.equals("L") || csname.equals("l")
+             || csname.equals("AE") || csname.equals("ae") 
+             || csname.equals("OE") || csname.equals("oe")
+             || csname.equals("AA") || csname.equals("aa") 
+             || csname.equals("SS") || csname.equals("ss")
+             || csname.equals("NG") || csname.equals("ng") 
+             || csname.equals("TH") || csname.equals("th")
+             || csname.equals("DH") || csname.equals("dh")
+             || csname.equals("DJ") || csname.equals("dj")
+       );
+   }
+
    public void toLowerCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
@@ -7562,6 +7624,10 @@ public class GlsResource
                ((CharObject)object).setCharCode(codePoint);
             }
          }
+         else if (object instanceof MathGroup)
+         {// skip
+            continue;
+         }
          else if (object instanceof TeXObjectList)
          {
             toLowerCase((TeXObjectList)object, listener);
@@ -7572,10 +7638,7 @@ public class GlsResource
 
             if (csname.equals("protect")) continue;
 
-            if (csname.equals("O") || csname.equals("L")
-               || csname.equals("AE") || csname.equals("OE")
-               || csname.equals("AA") || csname.equals("SS")
-               || csname.equals("NG") || csname.equals("TH"))
+            if (isUcLcCommand(csname))
             {
                list.set(i, new TeXCsRef(csname.toLowerCase()));
                continue;
@@ -7755,10 +7818,7 @@ public class GlsResource
 
             if (csname.equals("protect")) continue;
 
-            if (csname.equals("o") || csname.equals("l")
-               || csname.equals("ae") || csname.equals("oe")
-               || csname.equals("aa") || csname.equals("ss")
-               || csname.equals("ng") || csname.equals("th"))
+            if (isUcLcCommand(csname))
             {
                list.set(i, new TeXCsRef(csname.toUpperCase()));
                continue;
@@ -7831,7 +7891,7 @@ public class GlsResource
                {// no optional argument, need to add one
                   subList.add(listener.getOther('['));
 
-                  subList.add(new TeXCsRef("mfirstucMakeUppercase"));
+                  subList.add(new TeXCsRef("MakeTextUppercase"));
 
                   Group arg = listener.createGroup();
                   subList.add(arg);
@@ -7987,10 +8047,7 @@ public class GlsResource
 
             if (csname.equals("protect")) continue;
 
-            if (csname.equals("o") || csname.equals("l")
-               || csname.equals("ae") || csname.equals("oe")
-               || csname.equals("aa") || csname.equals("ss")
-               || csname.equals("ng") || csname.equals("th"))
+            if (isUcLcCommand(csname))
             {
                list.set(i, new TeXCsRef(csname.toUpperCase()));
                return;
@@ -8012,10 +8069,17 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                || csname.equals("si") || csname.endsWith("ref"))
+            if (csname.equals("ensuremath") || csname.equals("si") || csname.endsWith("ref"))
             {
                return;
+            }
+
+            if (csname.equals("NoCaseChange"))
+            {
+               // object should now be the argument, which should be
+               // skipped.
+
+               continue;
             }
 
             if (csname.equals("glsentrytitlecase"))
@@ -8246,10 +8310,7 @@ public class GlsResource
                continue;
             }
 
-            if (csname.equals("o") || csname.equals("l")
-               || csname.equals("ae") || csname.equals("oe")
-               || csname.equals("aa") || csname.equals("ss")
-               || csname.equals("ng") || csname.equals("th"))
+            if (isUcLcCommand(csname))
             {
                list.set(i, new TeXCsRef(csname.toUpperCase()));
                continue;
@@ -8271,7 +8332,14 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
+            if (csname.equals("NoCaseChange"))
+            {
+               // skip \NoCaseChange and its argument
+               wordBoundary = prevWordBoundary;
+               continue;
+            }
+
+            if (csname.equals("ensuremath")
                 || csname.equals("si") || csname.endsWith("ref"))
             {// no case-change
                continue;
@@ -9551,6 +9619,8 @@ public class GlsResource
    private String dualShortCaseChange=null;
    private String nameCaseChange=null;
    private String descCaseChange=null;
+   private String longCaseChange=null;
+   private String dualLongCaseChange=null;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;
