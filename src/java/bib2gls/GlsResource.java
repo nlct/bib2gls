@@ -35,6 +35,7 @@ import java.awt.font.TextLayout;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
+import com.dickimawbooks.texparserlib.generic.Nbsp;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
@@ -280,6 +281,41 @@ public class GlsResource
             else //if (val.equals("check"))
             {
                postDescDot = POST_DESC_DOT_CHECK;
+            }
+         }
+         else if (opt.equals("word-boundaries"))
+         {
+            String[] array = getStringArray(parser, list, opt);
+
+            wordBoundarySpace=false;
+            wordBoundaryCsSpace=false;
+            wordBoundaryNbsp=false;
+            wordBoundaryDash=false;
+
+            for (String element : array)
+            {
+               if (element.equals("white space"))
+               {
+                  wordBoundarySpace=true;
+               }
+               else if (element.equals("cs space"))
+               {
+                  wordBoundaryCsSpace=true;
+               }
+               else if (element.equals("dash"))
+               {
+                  wordBoundaryDash=true;
+               }
+               else if (element.equals("nbsp"))
+               {
+                  wordBoundaryNbsp=true;
+               }
+               else
+               {
+                  throw new IllegalArgumentException(
+                     bib2gls.getMessage("error.invalid.choice.value", opt, 
+                      element, "white space, cs space, dash, nbsp"));
+               }
             }
          }
          else if (opt.equals("name-case-change"))
@@ -8216,35 +8252,63 @@ public class GlsResource
 
    public boolean isWordBoundary(TeXObject object)
    {
-      if (object instanceof WhiteSpace 
-           || (object instanceof CharObject 
-                && Character.isWhitespace(((CharObject)object).getCharCode())))
-      {
-         return true;
-      }
+      int codePoint = -1;
+      String csname = null;
 
       if (object instanceof CharObject)
       {
-         int codePoint = ((CharObject)object).getCharCode();
-
-         if (Character.isWhitespace(codePoint))
-         {
-            return true;
-         }
-
-         return false;
+         codePoint = ((CharObject)object).getCharCode();
       }
 
       if (object instanceof ControlSequence)
       {
-         String csname = ((ControlSequence)object).getName();
+         csname = ((ControlSequence)object).getName();
+      }
 
-         if (csname.equals("space") || csname.equals(" "))
+      if (wordBoundarySpace)
+      {
+         if (object instanceof WhiteSpace 
+           || (codePoint != -1 && Character.isWhitespace(codePoint)))
+         {
+            return true;
+         }
+      }
+
+      if (wordBoundaryNbsp)
+      {
+         if (object instanceof Nbsp || codePoint == 0x00A0
+            || codePoint == 0x2007 || codePoint == 0x202F)
+         {
+            return true;
+         }
+      }
+
+      if (wordBoundaryCsSpace)
+      {
+         if (csname != null)
+         {
+            if (csname.equals("space") || csname.equals(" "))
+            {
+               return true;
+            }
+         }
+      }
+
+      if (wordBoundaryDash)
+      {
+         if (codePoint != -1 && 
+              Character.getType(codePoint) == Character.DASH_PUNCTUATION)
          {
             return true;
          }
 
-         return false;
+         if (csname != null)
+         {
+            if (csname.equals("textemdash") || csname.equals("textendash"))
+            {
+               return true;
+            }
+         }
       }
 
       return false;
@@ -9621,6 +9685,11 @@ public class GlsResource
    private String descCaseChange=null;
    private String longCaseChange=null;
    private String dualLongCaseChange=null;
+
+   private boolean wordBoundarySpace=true;
+   private boolean wordBoundaryCsSpace=true;
+   private boolean wordBoundaryNbsp=false;
+   private boolean wordBoundaryDash=false;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;

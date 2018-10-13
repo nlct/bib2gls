@@ -8130,63 +8130,114 @@ applied to the field value.
 
 The resource options described in this section provide an
 alternative to those attributes that actually modify the relevant
-field. There are two forms of modification: the field contents are
-modified so that the value is encapsulated by a command or \bibgls\
-will perform the actual \idx{case-change} according to its own
-algorithm. The results can vary according to the field content.
+field (rather than just adjusting the style code used to display it). 
+There are two forms of modification: the field is adjusted so that
+the original value is encapsulated by a command or \bibgls\ will
+perform the actual \idx{case-change} according to its own algorithm.
+The results can vary according to the field content.
+
+Only a subset of known fields have a resource option that can be
+used to apply a \idx{case-change}. For example, \csopt{name-case-change}
+can be used to change the case of the \field{name} field, but
+there's no equivalent option for the \field{text} field.
 
 Each of the case-changing resource options may take one of the
 following values:
 \begin{itemize}
 \item \optfmt{none}: don't apply any case-changing (default);
-\item \optfmt{lc-cs}: convert to \idx{lowercase} by encapsulating
-the field value with \ics{MakeTextLowercase};
-\item \optfmt{uc-cs}: convert to \idx{uppercase} by encapsulating
-the field value with \ics{MakeTextUppercase};
-\item \optfmt{firstuc-cs}: convert to first letter \idx{uppercase}
-by encapsulating the field value with \ics{makefirstuc};
-\item \optfmt{title-cs}: convert to \idx{titlecase} 
-by encapsulating the field value with \ics{capitalisewords};
+
+\item \optfmt{lc-cs}: make \bibgls\ behave as though the field
+assignment:
+\begin{codeenv}
+\meta{field} = \margm{text}
+\end{codeenv}
+had actually been specified as:
+\begin{codeenv}
+\meta{field} = \marg{\ics{MakeTextLowercase}\margm{text}}
+\end{codeenv}
+which uses \TeX\ to convert the field to \idx{lowercase};
+
+\item \optfmt{uc-cs}: make \bibgls\ behave as though the field
+assignment:
+\begin{codeenv}
+\meta{field} = \margm{text}
+\end{codeenv}
+had actually been specified as:
+\begin{codeenv}
+\meta{field} = \marg{\ics{MakeTextUppercase}\margm{text}}
+\end{codeenv}
+which uses \TeX\ to convert the field to \idx{uppercase};
+
+\item \optfmt{firstuc-cs}: make \bibgls\ behave as though the field
+assignment:
+\begin{codeenv}
+\meta{field} = \margm{text}
+\end{codeenv}
+had actually been specified as:
+\begin{codeenv}
+\meta{field} = \marg{\ics{makefirstuc}\margm{text}}
+\end{codeenv}
+which uses \TeX\ to convert the field to first-letter \idx{uppercase};
+
+\item \optfmt{title-cs}: make \bibgls\ behave as though the field
+assignment:
+\begin{codeenv}
+\meta{field} = \margm{text}
+\end{codeenv}
+had actually been specified as:
+\begin{codeenv}
+\meta{field} = \marg{\ics{capitalisewords}\margm{text}}
+\end{codeenv}
+which uses \TeX\ to convert the field to \idx{titlecase};
+
 \item \optfmt{lc}: convert to \idx{lowercase} by making the
 appropriate modifications to tokens in the field value that have
-a known \idx{lowercase} alternative;
+a known \idx{lowercase} alternative (see below);
+
 \item \optfmt{uc}: convert to \idx{uppercase} by making the
 appropriate modifications to tokens in the field value that have
-a known \idx{uppercase} alternative;
+a known \idx{uppercase} alternative (see below);
+
 \item \optfmt{firstuc}: convert to first letter \idx{uppercase} 
 by making the appropriate modification, if it has 
-a known \idx{uppercase} alternative;
+a known \idx{uppercase} alternative (see below);
+
 \item \optfmt{title}: convert to \idx{titlecase} by making the
 appropriate modifications to the first letter of each identified
 word in the field value that has a known \idx{uppercase}
-alternative.
+alternative (see below).  A word-boundary is identified
+according to the \csopt{word-boundaries} setting.
+
 \end{itemize}
 The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially
 a \idx{sentencecase} change, but there's no check for
 sentence-breaks within the value, so even if the value contains
 multiple sentences, only the first is changed.
 
-The \optfmt{\meta{option}-cs} values defer the actual case-changing
-to \TeX. Be aware of the limitations of using any of the
+The \optfmt{\meta{option}-cs} settings defer the actual case-changing
+to \TeX, which means that the case-changing has to be applied every
+time the field is typeset (and it introduces non-expandable content
+to the field value). Be aware of the limitations of using any of the
 case-changing commands. See the \isty{textcase} and \isty{mfirstuc}
 package documentation for further details~\cite{textcase,mfirstuc}.
 You may use \code{\ics{NoCaseChange}\margm{content}} (provided by
-\sty{textcase}) to prevent any case-change to \meta{content}.
+\sty{textcase}) to prevent any \idx{case-change} to \meta{content}.
 
-For the options where \bibgls\ itself performs the case-change, then
+For the settings where \bibgls\ itself performs the \idx{case-change}, then
 \bibgls\ will iterate over each token of the field value and apply
 the following rules:
 \begin{enumerate}
 
 \item If the token is a normal Unicode alphabetic character, it will
-be replaced with the corresponding upper/lower case character.
-For \optfmt{title} and \optfmt{firstuc}, the title case character is
+be replaced with the corresponding upper or lower case character, as
+appropriate.
+For \optfmt{title} and \optfmt{firstuc}, the \idx{titlecase} character is
 used as the replacement, for \optfmt{uc} the \idx{uppercase} character is
 used as the replacement, and for \optfmt{lc} the \idx{lowercase} character
 is used as the replacement. Most characters have the same upper and
 title case alternative (for example, \qt{a} will be converted to \qt{A}
-for the \optfmt{title}, \optfmt{firstuc} and \optfmt{uc} options) but
-some characters have different title/upper versions (for example, 
+for the \optfmt{title}, \optfmt{firstuc} and \optfmt{uc} settings), but
+some characters have different title and upper versions (for example, 
 the digraph \qt{\char"01F3} has the title version \qt{\char"01F2}
 and \idx{uppercase} version \qt{\char"01F1}).
 
@@ -8199,11 +8250,11 @@ then this token will be skipped for all options.
 
 \item If \code{\idx{mshiftchar}\meta{maths}\idx{mshiftchar}} is
 encountered, it will be skipped. If the option is \optfmt{firstuc}
-then all remaining tokens are skipped, so no case-change will be
+then all remaining tokens are skipped, so no \idx{case-change} will be
 performed.
 
 \item\label{case-change-group} If a group \code{\margm{content}} is
-found, then the case-change is applied to the entire \meta{content}
+found, then the \idx{case-change} is applied to the entire \meta{content}
 (which may be empty). This corresponds to the way \ics{makefirstuc}
 and \ics{capitalisewords} work if a~word starts with a group. Note
 that with \optfmt{firstuc} and \optfmt{title} the group content will
@@ -8225,7 +8276,7 @@ are skipped until a word-boundary is found.
   \ics{L}, \ics{ae}, \ics{AE}, \ics{oe}, \ics{OE}, \ics{aa}, \ics{AA},
   \ics{ss}, \ics{SS}, \ics{ng}, \ics{NG}, \ics{th}, \ics{TH},
   \ics{dh}, \ics{DH}, \ics{dj} or \ics{DJ}, then
-  it's replaced with its case-change counterpart (if not already the
+  it's replaced with its \idx{case-change} counterpart (if not already the
   correct case).
 
   If the option is \optfmt{firstuc} then all the remaining tokens are
@@ -8237,7 +8288,7 @@ are skipped until a word-boundary is found.
   and \optfmt{title}, if \code{\ics{NoCaseChange}\margm{text}}
   occurs at the start of a word, then \bibgls\ will act as though
   the word hasn't started yet (so the next token will be considered
-  for a case-change). This is different to the way \ics{makefirstuc}
+  for a \idx{case-change}). This is different to the way \ics{makefirstuc}
   and \ics{capitalisewords} work.
 
   \item If the control sequence is \ics{ensuremath}, \ics{si} or if 
@@ -8245,9 +8296,9 @@ are skipped until a word-boundary is found.
   \ics{pageref}) then the control sequence and its argument is ignored.
 
   If the option is \optfmt{firstuc} then all the remaining tokens are
-  skipped (so no case-change will be performed). If the option is 
+  skipped (so no \idx{case-change} will be performed). If the option is 
   \optfmt{title} then the subsequent tokens
-  are skipped until a word-boundary is found (so no case-change is
+  are skipped until a word-boundary is found (so no \idx{case-change} is
   performed for this word).
 
   \item If the control sequence is \ics{glsentrytitlecase} then:
@@ -8261,10 +8312,10 @@ are skipped until a word-boundary is found.
    \item[\optfmt{title}] the control sequence is left unchanged
    and subsequent tokens are skipped until a word-boundary is found.
    \end{description}
-  (The field and entry labels are skipped.)
+  The field and entry label arguments are skipped.
 
   \item If the control sequence is \ics{glshyperlink} then the
-  case-change is applied to its optional argument. (If there was no
+  \idx{case-change} is applied to its optional argument. (If there was no
   optional argument in the original field value, one will be inserted.)
   The label argument is skipped.
 
@@ -8273,8 +8324,9 @@ are skipped until a word-boundary is found.
   are skipped until a word-boundary is found.
 
   \item If the control sequence is \ics{glsdisp}, \ics{glslink},
-  \ics{dglsdisp} or \ics{dglslink} then the case-change will be
-  applied to the appropriate argument.
+  \ics{dglsdisp} or \ics{dglslink} then the \idx{case-change} will be
+  applied to the appropriate argument. The optional argument (if
+  present) and the label are skipped.
 
   If the option is \optfmt{firstuc} then all the remaining tokens are
   skipped. If the option is \optfmt{title} then the subsequent tokens
@@ -8291,8 +8343,8 @@ are skipped until a word-boundary is found.
   are skipped until a word-boundary is found.
 
   \item If the control sequence is followed by a group, then the
-   appropriate case-change is applied to the group contents.
-   Unlike step~\ref{case-change-group}, the case-change isn't
+   appropriate \idx{case-change} is applied to the group contents.
+   Unlike step~\ref{case-change-group}, the \idx{case-change} isn't
    applied to the entire group content with \optfmt{firstuc} and
    \optfmt{title}. (Again, this follows the way that
    \ics{makefirstuc} and \ics{capitalisewords} work.)
@@ -8303,10 +8355,6 @@ are skipped until a word-boundary is found.
 \item Anything else is skipped.
 
 \end{enumerate}
-
-For the \optfmt{title} option, a word-boundary is identified if a
-token is encountered that is a white space character or is
-\ics{space} or \ics{cs.space}.
 
 For example, if an entry is defined as:
 \begin{codeenv}
@@ -8513,6 +8561,31 @@ HT\cs{textcolor}\marg{RED}\marg{ML}
 \end{codeenv}
 which is incorrect. Instead, provide a command that hides the label
 (such as the \csfmt{strong} example described on page~\glsxtrpageref{strong}).
+
+\optsection[\subsubsection]{word-boundaries}
+
+Governs how the \optfmt{title} \idx{case-change} option
+determines word boundaries. The \meta{list} must contain one or
+more of the following keywords:
+\begin{description}
+\item[\optfmt{white space}] any white space Unicode character
+that is not a non-breakable space indicates a word-boundary;
+\item[\optfmt{cs space}] the control sequences
+\ics{space} or \ics{cs.space} indicate a word-boundary;
+\item[\optfmt{dash}] a Unicode character that belongs to the
+\idx{punctuationdash} block indicates a word-boundary;
+\item[\optfmt{nbsp}] the \idx{nbspchar} active character or the Unicode
+non-breakable characters \hex{00A0}, \hex{2007} and \hex{202F}
+indicate a word-boundary.
+\end{description}
+Any keyword that is not listed indicates that particular setting is off.  This
+option is not cumulative. Any subsequent use of
+\csopt{word-boundaries} within the same set of resource options will
+override previous settings.
+
+The default setting is \csopt[white space,cs
+space]{word-boundaries}, which excludes non-breakable
+spaces and dashes.
 
 \optsection[\subsubsection]{short-case-change}
 
