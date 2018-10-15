@@ -6604,7 +6604,7 @@ public class GlsResource
          for (String field : allCapsEntryField)
          {
             writer.format("\\providecommand{\\GLSentry%s}[1]{%%%n", field);
-            writer.format("  \\mfirstucMakeUppercase{\\glsentry%s{#1}}%%%n", field);
+            writer.format("  \\bibglsuppercase{\\glsentry%s{#1}}%%%n", field);
             writer.println("}");
          }
       }
@@ -6614,7 +6614,7 @@ public class GlsResource
          for (String field : allCapsAccessField)
          {
             writer.format("\\providecommand{\\GLSaccess%s}[1]{%%%n", field);
-            writer.format("  \\mfirstucMakeUppercase{\\glsaccess%s{#1}}%%%n", field);
+            writer.format("  \\bibglsuppercase{\\glsaccess%s{#1}}%%%n", field);
             writer.println("}");
          }
       }
@@ -7927,7 +7927,7 @@ public class GlsResource
                {// no optional argument, need to add one
                   subList.add(listener.getOther('['));
 
-                  subList.add(new TeXCsRef("MakeTextUppercase"));
+                  subList.add(new TeXCsRef("bibglsuppercase"));
 
                   Group arg = listener.createGroup();
                   subList.add(arg);
@@ -8994,7 +8994,7 @@ public class GlsResource
          grp.addAll(list);
 
          list = new TeXObjectList();
-         list.add(new TeXCsRef("MakeTextLowercase"));
+         list.add(new TeXCsRef("bibglslowercase"));
          list.add(grp);
       }
       else if (change.equals("uc-cs"))
@@ -9003,7 +9003,7 @@ public class GlsResource
          grp.addAll(list);
 
          list = new TeXObjectList();
-         list.add(new TeXCsRef("MakeTextUppercase"));
+         list.add(new TeXCsRef("bibglsuppercase"));
          list.add(grp);
       }
       else if (change.equals("firstuc-cs"))
@@ -9012,7 +9012,7 @@ public class GlsResource
          grp.addAll(list);
 
          list = new TeXObjectList();
-         list.add(new TeXCsRef("makefirstuc"));
+         list.add(new TeXCsRef("bibglsfirstuc"));
          list.add(grp);
       }
       else if (change.equals("title-cs"))
@@ -9021,7 +9021,7 @@ public class GlsResource
          grp.addAll(list);
 
          list = new TeXObjectList();
-         list.add(new TeXCsRef("capitalisewords"));
+         list.add(new TeXCsRef("bibglstitlecase"));
          list.add(grp);
       }
       else if (change.equals("lc"))

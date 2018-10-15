@@ -764,9 +764,7 @@ files}
 
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
 
-\newenvironment{codeenv}
- {%
-   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+\newcommand{\setupcodeenvfmts}{%
    \def\cmd{\char`\\}%
    \def\comment##1{\mbox{\textcolor{comment}{\idx{commentchar}\ ##1}}}%
    \renewcommand*{\styfmt}[1]{##1}%
@@ -774,6 +772,20 @@ files}
    \renewcommand*{\catattrfmt}[1]{\textcolor{attribute}{##1}}%
    \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
    \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
+}
+
+\newenvironment{codeenv}
+ {%
+   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+   \setupcodeenvfmts
+   \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
+   \parindent\z@\parfillskip\@flushglue\parskip\z@skip
+ }
+ {\end{flushleft}\ignorespacesafterend}
+
+\newenvironment{codeenv*}
+ {%
+   \setupcodeenvfmts
    \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
    \parindent\z@\parfillskip\@flushglue\parskip\z@skip
  }
@@ -6455,9 +6467,9 @@ With both \optfmt{presort} and \optfmt{postsort},
 if the parent \field{name} is the same as the child's \field{name}
 then the child is considered a homograph and
 the child's name is set to:
-\begin{codeenv}\renewcommand{\glslinkpresetkeys}{}%
+\begin{codeenv*}
 \format{bibglsflattenedhomograph}
-\end{codeenv}
+\end{codeenv*}
 instead of the corresponding \csfmt{bibglsflattenedchild...sort}. 
 This defaults to just \meta{name}.
 
@@ -8154,9 +8166,9 @@ assignment:
 \meta{field} = \margm{text}
 \end{codeenv}
 had actually been specified as:
-\begin{codeenv}
-\meta{field} = \marg{\ics{MakeTextLowercase}\margm{text}}
-\end{codeenv}
+\begin{codeenv*}
+\meta{field} = \marg{\gls{bibglslowercase}\margm{text}}
+\end{codeenv*}
 which uses \TeX\ to convert the field to \idx{lowercase};
 
 \item \optfmt{uc-cs}: make \bibgls\ behave as though the field
@@ -8165,9 +8177,9 @@ assignment:
 \meta{field} = \margm{text}
 \end{codeenv}
 had actually been specified as:
-\begin{codeenv}
-\meta{field} = \marg{\ics{MakeTextUppercase}\margm{text}}
-\end{codeenv}
+\begin{codeenv*}
+\meta{field} = \marg{\gls{bibglsuppercase}\margm{text}}
+\end{codeenv*}
 which uses \TeX\ to convert the field to \idx{uppercase};
 
 \item \optfmt{firstuc-cs}: make \bibgls\ behave as though the field
@@ -8176,9 +8188,9 @@ assignment:
 \meta{field} = \margm{text}
 \end{codeenv}
 had actually been specified as:
-\begin{codeenv}
-\meta{field} = \marg{\ics{makefirstuc}\margm{text}}
-\end{codeenv}
+\begin{codeenv*}
+\meta{field} = \marg{\gls{bibglsfirstuc}\margm{text}}
+\end{codeenv*}
 which uses \TeX\ to convert the field to first-letter \idx{uppercase};
 
 \item \optfmt{title-cs}: make \bibgls\ behave as though the field
@@ -8187,9 +8199,9 @@ assignment:
 \meta{field} = \margm{text}
 \end{codeenv}
 had actually been specified as:
-\begin{codeenv}
-\meta{field} = \marg{\ics{capitalisewords}\margm{text}}
-\end{codeenv}
+\begin{codeenv*}
+\meta{field} = \marg{\gls{bibglstitlecase}\margm{text}}
+\end{codeenv*}
 which uses \TeX\ to convert the field to \idx{titlecase};
 
 \item \optfmt{lc}: convert to \idx{lowercase} by making the
@@ -15006,6 +15018,30 @@ Expands to a literal ampersand character (\idx{ampchar}).
 
 \formatdef{bibglscircumchar}
 Expands to a literal circumflex character (\idx{circumchar}).
+
+\cssection{bibglsuppercase}
+
+\formatdef{bibglsuppercase}
+Converts \meta{text} to \idx{uppercase}. This just uses
+\ics{MakeTextUppercase} by default.
+
+\cssection{bibglslowercase}
+
+\formatdef{bibglslowercase}
+Converts \meta{text} to \idx{lowercase}. This just uses
+\ics{MakeTextLowercase} by default.
+
+\cssection{bibglstitlecase}
+
+\formatdef{bibglstitlecase}
+Converts \meta{text} to \idx{titlecase}. This just uses
+\ics{capitalisewords} by default.
+
+\cssection{bibglsfirstuc}
+
+\formatdef{bibglsfirstuc}
+Converts the first letter of \meta{text} to \idx{uppercase}. This just uses
+\ics{makefirstuc} by default.
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}

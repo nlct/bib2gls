@@ -2582,6 +2582,12 @@ public class Bib2Gls implements TeXApp
       writer.println("\\providecommand*{\\bibglshyperlink}[2]{\\glshyperlink[#1]{#2}}");
       writer.println();
 
+      writer.println("\\providecommand{\\bibglsuppercase}{\\MakeTextUppercase}");
+      writer.println("\\providecommand{\\bibglslowercase}{\\MakeTextLowercase}");
+      writer.println("\\providecommand{\\bibglsfirstuc}{\\makefirstuc}");
+      writer.println("\\providecommand{\\bibglstitlecase}{\\capitalisewords}");
+      writer.println();
+
       writer.println("\\providecommand{\\bibglsprimaryprefixlabel}[1]{}");
       writer.println("\\providecommand{\\bibglsdualprefixlabel}[1]{}");
       writer.println("\\providecommand{\\bibglstertiaryprefixlabel}[1]{}");
