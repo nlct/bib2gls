@@ -671,6 +671,26 @@ public class Bib2Gls implements TeXApp
        (L2HStringConverter)interpreter.getListener();
    }
 
+   public TeXObjectList getWordExceptionList()
+   {
+      // if mfirstuc has been loaded (which must be done using
+      // --packages mfirstuc) then the control sequence with the
+      // name "@mfu@nocaplist" will contain the list of exceptions.
+
+      ControlSequence cs = interpreter.getControlSequence("@mfu@nocaplist");
+
+      if (cs == null) return null;
+
+      TeXObjectList wordExceptions = null;
+
+      if (cs instanceof GenericCommand)
+      {
+         wordExceptions = ((GenericCommand)cs).getDefinition();
+      }
+
+      return wordExceptions;
+   }
+
    public Vector<String> getPackages()
    {
       return packages;
@@ -4809,8 +4829,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20181013";
-   public static final String DATE = "2018-10-13";
+   public static final String VERSION = "1.7.20181015";
+   public static final String DATE = "2018-10-15";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4907,7 +4927,8 @@ public class Bib2Gls implements TeXApp
 
    public static final String[] EXTRA_SUPPORTED_PACKAGES = new String[]
     { "booktabs", "color", "datatool-base", "datatool", "etoolbox",
-      "graphics", "graphicx", "ifthen", "jmlrutils", "probsoln", 
+      "graphics", "graphicx", "ifthen", "jmlrutils", 
+      "mfirstuc", "mfirstuc-english", "probsoln", 
       "shortvrb", "xspace"
     };
 

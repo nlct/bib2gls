@@ -546,7 +546,7 @@ test-mfirstuc.pdf	: test-mfirstuc.glstex
 
 test-mfirstuc.glstex	: test-mfirstuc.tex test-mfirstuc.bib $(DEPS)
 		pdflatex test-mfirstuc
-		$(BIB2GLS) test-mfirstuc
+		$(BIB2GLS) --mfirstuc-protection 'long,short,name' --packages mfirstuc-english test-mfirstuc
 
 clean	:
 	$(RM) *.aux

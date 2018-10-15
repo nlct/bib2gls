@@ -2303,16 +2303,18 @@ characters are allowed in labels (for \csopt{labelify} and
 Packages that fall into the second category are:
 \isty{booktabs}, \isty{color}, \isty{datatool-base} (very limited),
 \isty{datatool} (very limited), \isty{etoolbox} (very limited), \isty{graphics},
-\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils}, \isty{probsoln}, \isty{shortvrb},
+\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils}, \isty{mfirstuc},
+\isty{mfirstuc-english}, \isty{probsoln}, \isty{shortvrb},
 and \isty{xspace}. These are less likely to be needed within fields
 and so aren't checked for by default. If they are needed then you
 can instruct \bibgls\ to support them with \longarg{packages}.
+(Note that \sty{mfirstuc} is automatically loaded by the base \sty{glossaries}
+package, so it will always be present in the log file, but it's not
+implemented unless explicitly requested.)
 
-(If you're wondering about the selection, the \file{texparserlib.jar}
+If you're wondering about the selection, the \file{texparserlib.jar}
 library was originally written for another application that required
-support for some of them.)
-
-
+support for some of them.
 
 \argsection{packages}
 
@@ -8205,8 +8207,28 @@ a known \idx{uppercase} alternative (see below);
 \item \optfmt{title}: convert to \idx{titlecase} by making the
 appropriate modifications to the first letter of each identified
 word in the field value that has a known \idx{uppercase}
-alternative (see below).  A word-boundary is identified
-according to the \csopt{word-boundaries} setting.
+alternative (see below).
+
+A word-boundary is identified according to the
+\csopt{word-boundaries} setting. Exclusions (words that shouldn't be
+changed) require the \TeX\ parser library's implementation of
+\sty{mfirstuc}, which must be done explicitly with
+\code{\longarg{packages} mfirstuc}. Words to be excluded from the
+case-changing (unless they occur at the start) can be identified
+with \ics{MFUnocap} in the \atentry{preamble} or you can use
+\code{\longarg{packages} mfirstuc-english} for the exclusion list
+provided by the \isty{mfirstuc-english} package. Alternatively, you
+can use \longarg{custom-packages} to load a simple package that contains the
+required \cs{MFUnocap} commands (in a similar style to
+\sty{mfirstuc-english}).
+
+The \bibgls\ word-boundary implementation is slightly different with
+this setting than with the \cs{capitalisewords} command (implemented
+in \TeX\ or by the \TeX\ parser library, if \sty{mfirstuc} has been
+loaded, when interpreting field values).  Only words in the
+exclusion list that start with an alphabetical character can be
+matched.  Punctuation following a word-boundary is not considered
+part of the next word.
 
 \end{itemize}
 The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially

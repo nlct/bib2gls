@@ -8314,7 +8314,84 @@ public class GlsResource
       return false;
    }
 
+   protected boolean isWordException(TeXObjectList list, int index,
+     TeXObjectList wordExceptions)
+   {
+      if (wordExceptions == null || wordExceptions.size() == 0)
+      {
+         return false;
+      }
+
+      int endIndex = list.size();
+
+      // find the word boundary
+
+      for (int i = index; i < endIndex; i++)
+      {
+         TeXObject object = list.get(i);
+
+         if (isWordBoundary(object))
+         {
+            endIndex = i;
+         }
+      }
+
+      int wordLength = endIndex-index;
+
+      for (TeXObject wordExc : wordExceptions)
+      {
+         TeXObjectList tokenList;
+
+         if (wordExc instanceof TeXObjectList)
+         {
+            tokenList = (TeXObjectList)wordExc;
+         }
+         else
+         {
+            tokenList = new TeXObjectList();
+            tokenList.add(wordExc);
+         }
+
+         if (wordLength != tokenList.size())
+         {
+            continue;
+         }
+
+         boolean match = true;
+
+         for (int i = 0; i < wordLength; i++)
+         {
+            TeXObject obj1 = list.get(index+i);
+            TeXObject obj2 = tokenList.get(i);
+
+            if (!(
+                   (obj1 instanceof Ignoreable && obj2 instanceof Ignoreable)
+                || (   obj1 instanceof ControlSequence 
+                    && obj2 instanceof ControlSequence
+                    && ((ControlSequence)obj1).getName().equals(
+                        ((ControlSequence)obj2).getName())
+                   )
+                || obj1.equals(obj2)
+               ))
+            {
+               match = false;
+               break;
+            }
+         }
+
+         if (match) return true;
+      }
+
+      return false;
+   }
+
    public void toTitleCase(TeXObjectList list, TeXParserListener listener)
+   {
+      toTitleCase(list, listener, 0, bib2gls.getWordExceptionList());
+   }
+
+   private int toTitleCase(TeXObjectList list, TeXParserListener listener,
+     int wordCount, TeXObjectList wordExceptions)
    {
       boolean wordBoundary = true;
 
@@ -8337,8 +8414,13 @@ public class GlsResource
 
             if (Character.isAlphabetic(codePoint))
             {
-               codePoint = Character.toTitleCase(codePoint);
-               ((CharObject)object).setCharCode(codePoint);
+               wordCount++;
+
+               if (wordCount == 1 || !isWordException(list, i, wordExceptions))
+               {
+                  codePoint = Character.toTitleCase(codePoint);
+                  ((CharObject)object).setCharCode(codePoint);
+               }
             }
             else
             {
@@ -8355,12 +8437,14 @@ public class GlsResource
          else if (object instanceof MathGroup)
          {
             // don't try converting $...$ or \[...\]
+            wordCount++;
             continue;
          }
          else if (object instanceof Group)
          {
             // upper case entire group contents
 
+            wordCount++;
             toUpperCase((TeXObjectList)object, listener);
          }
          else if (object instanceof ControlSequence)
@@ -8376,7 +8460,13 @@ public class GlsResource
 
             if (isUcLcCommand(csname))
             {
-               list.set(i, new TeXCsRef(csname.toUpperCase()));
+               wordCount++;
+
+               if (wordCount > 1 && !isWordException(list, i, wordExceptions))
+               {
+                  list.set(i, new TeXCsRef(csname.toUpperCase()));
+               }
+
                continue;
             }
 
@@ -8406,6 +8496,7 @@ public class GlsResource
             if (csname.equals("ensuremath")
                 || csname.equals("si") || csname.endsWith("ref"))
             {// no case-change
+               wordCount++;
                continue;
             }
             else if (csname.equals("glsentrytitlecase"))
@@ -8424,6 +8515,7 @@ public class GlsResource
                   i++;
                }
 
+               wordCount++;
                continue;
             }
 
@@ -8446,7 +8538,8 @@ public class GlsResource
                      obj = list.get(i);
                   }
 
-                  toTitleCase(subList, listener);
+                  wordCount = toTitleCase(subList, listener, wordCount,
+                    wordExceptions);
                }
                else
                {// no optional argument, need to add one
@@ -8455,6 +8548,8 @@ public class GlsResource
                   subList.add(new TeXCsRef("glslabel"));
                   subList.add(listener.createGroup("text"));
                   subList.add(listener.getOther(']'));
+
+                  wordCount++;
                }
 
                list.addAll(i, subList);
@@ -8520,7 +8615,8 @@ public class GlsResource
                if (object instanceof Group)
                {
                   // case-change argument
-                  toTitleCase((TeXObjectList)object, listener);
+                  wordCount = toTitleCase((TeXObjectList)object, listener, 
+                     wordCount, wordExceptions);
                }
                else
                {
@@ -8557,9 +8653,11 @@ public class GlsResource
                   i++;
                }
 
+               wordCount++;
                continue;
             }
 
+            wordCount++;
             Matcher m = PATTERN_FIELD_CS.matcher(csname);
 
             if (m.matches())
@@ -8654,7 +8752,8 @@ public class GlsResource
                {
                   // title case argument
 
-                  toTitleCase((TeXObjectList)object, listener);
+                  wordCount = toTitleCase((TeXObjectList)object, listener, 
+                    wordCount-1, wordExceptions);
                }
             }
             else
@@ -8663,6 +8762,8 @@ public class GlsResource
             }
          }
       }
+
+      return wordCount;
    }
 
    public String getSentenceCsName(String csname)

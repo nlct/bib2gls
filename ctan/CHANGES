@@ -19,7 +19,7 @@ v1.8 (pending):
     and makes it easier to adjust the record formatting.
 
   * bib2gls now always parses the .log file even if the interpreter
-  * setting is off. (It still needs to know version details and
+    setting is off. (It still needs to know version details and
     whether hyperlinks and Unicode are supported by the document.)
 
   * Underscores now allowed in bib labels.
