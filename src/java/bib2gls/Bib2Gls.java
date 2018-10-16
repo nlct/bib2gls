@@ -47,6 +47,11 @@ import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
+import com.dickimawbooks.texparserlib.latex.textcase.MakeTextLowercase;
+import com.dickimawbooks.texparserlib.latex.textcase.MakeTextUppercase;
+import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
+import com.dickimawbooks.texparserlib.latex.mfirstuc.MakeFirstUc;
+import com.dickimawbooks.texparserlib.latex.mfirstuc.CapitaliseWords;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
@@ -971,6 +976,9 @@ public class Bib2Gls implements TeXApp
 
       interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
 
+      MfirstucSty mfirstucSty = 
+        (MfirstucSty)listener.usepackage(null, "mfirstuc", false);
+
       Vector<String> packages = getPackages();
 
       if (packages != null)
@@ -1021,6 +1029,12 @@ public class Bib2Gls implements TeXApp
 
       listener.putControlSequence(new NewCommand("glsxtrprovidecommand",
         NewCommand.OVERWRITE_ALLOW));
+
+      listener.putControlSequence(new MakeTextUppercase("bibglsuppercase"));
+      listener.putControlSequence(new MakeTextLowercase("bibglslowercase"));
+      listener.putControlSequence(new MakeFirstUc("bibglsfirstuc"));
+      listener.putControlSequence(new CapitaliseWords(mfirstucSty, 
+        "bibglstitlecase"));
 
       listener.putControlSequence(new EnableTagging());
       listener.putControlSequence(new AtFirstOfTwo("bibglscontributorlist"));
@@ -4835,8 +4849,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20181015";
-   public static final String DATE = "2018-10-15";
+   public static final String VERSION = "1.7.20181016";
+   public static final String DATE = "2018-10-16";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4934,8 +4948,7 @@ public class Bib2Gls implements TeXApp
    public static final String[] EXTRA_SUPPORTED_PACKAGES = new String[]
     { "booktabs", "color", "datatool-base", "datatool", "etoolbox",
       "graphics", "graphicx", "ifthen", "jmlrutils", 
-      "mfirstuc", "mfirstuc-english", "probsoln", 
-      "shortvrb", "xspace"
+      "mfirstuc-english", "probsoln", "shortvrb", "xspace"
     };
 
    private TeXParser interpreter = null;

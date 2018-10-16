@@ -2315,14 +2315,15 @@ characters are allowed in labels (for \csopt{labelify} and
 Packages that fall into the second category are:
 \isty{booktabs}, \isty{color}, \isty{datatool-base} (very limited),
 \isty{datatool} (very limited), \isty{etoolbox} (very limited), \isty{graphics},
-\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils}, \isty{mfirstuc},
+\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils},
 \isty{mfirstuc-english}, \isty{probsoln}, \isty{shortvrb},
 and \isty{xspace}. These are less likely to be needed within fields
 and so aren't checked for by default. If they are needed then you
 can instruct \bibgls\ to support them with \longarg{packages}.
-(Note that \sty{mfirstuc} is automatically loaded by the base \sty{glossaries}
-package, so it will always be present in the log file, but it's not
-implemented unless explicitly requested.)
+
+Note that \sty{mfirstuc} is always automatically loaded, but
+\sty{mfirstuc-english} is not implemented unless explicitly
+requested with \code{\longarg{packages} mfirstuc-english}.
 
 If you're wondering about the selection, the \file{texparserlib.jar}
 library was originally written for another application that required
@@ -8222,25 +8223,21 @@ word in the field value that has a known \idx{uppercase}
 alternative (see below).
 
 A word-boundary is identified according to the
-\csopt{word-boundaries} setting. Exclusions (words that shouldn't be
-changed) require the \TeX\ parser library's implementation of
-\sty{mfirstuc}, which must be done explicitly with
-\code{\longarg{packages} mfirstuc}. Words to be excluded from the
+\csopt{word-boundaries} setting. Words to be excluded from the
 case-changing (unless they occur at the start) can be identified
 with \ics{MFUnocap} in the \atentry{preamble} or you can use
 \code{\longarg{packages} mfirstuc-english} for the exclusion list
 provided by the \isty{mfirstuc-english} package. Alternatively, you
-can use \longarg{custom-packages} to load a simple package that contains the
-required \cs{MFUnocap} commands (in a similar style to
+can use \longarg{custom-packages} to load a simple package that
+contains the required \cs{MFUnocap} commands (in a similar style to
 \sty{mfirstuc-english}).
 
 The \bibgls\ word-boundary implementation is slightly different with
 this setting than with the \cs{capitalisewords} command (implemented
-in \TeX\ or by the \TeX\ parser library, if \sty{mfirstuc} has been
-loaded, when interpreting field values).  Only words in the
-exclusion list that start with an alphabetical character can be
-matched.  Punctuation following a word-boundary is not considered
-part of the next word.
+in \TeX\ or by the \TeX\ parser library when interpreting field
+values).  Only words in the exclusion list that start with an
+alphabetical character can be matched.  Punctuation following a
+word-boundary is not considered part of the next word.
 
 \end{itemize}
 The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially
@@ -8268,7 +8265,7 @@ appropriate.
 For \optfmt{title} and \optfmt{firstuc}, the \idx{titlecase} character is
 used as the replacement, for \optfmt{uc} the \idx{uppercase} character is
 used as the replacement, and for \optfmt{lc} the \idx{lowercase} character
-is used as the replacement. Most characters have the same upper and
+is used as the replacement. Many characters have the same upper and
 title case alternative (for example, \qt{a} will be converted to \qt{A}
 for the \optfmt{title}, \optfmt{firstuc} and \optfmt{uc} settings), but
 some characters have different title and upper versions (for example, 
@@ -8328,6 +8325,12 @@ are skipped until a word-boundary is found.
   \item If the control sequence is \ics{ensuremath}, \ics{si} or if 
   \meta{csname} ends with \qtt{ref} (for example, \ics{ref} or 
   \ics{pageref}) then the control sequence and its argument is ignored.
+  In the case where \meta{csname} ends with \qtt{ref}, a following
+  star (\code{*}) or optional argument before the mandatory argument 
+  will also be skipped. This allows for some common cross-referencing 
+  commands, such as \sty{hyperref}['s] \ics{autoref}, which may have 
+  a starred form, but does not allow for more complicated commands with 
+  multiple arguments.
 
   If the option is \optfmt{firstuc} then all the remaining tokens are
   skipped (so no \idx{case-change} will be performed). If the option is 
@@ -8383,6 +8386,13 @@ are skipped until a word-boundary is found.
    \optfmt{title}. (Again, this follows the way that
    \ics{makefirstuc} and \ics{capitalisewords} work.)
 
+   If there are subsequent groups, they won't be considered arguments, 
+   but will be treated as groups, as per step~\ref{case-change-group}. 
+   (This will only affect the \optfmt{title} setting as they will be 
+   skipped by the \optfmt{firstuc} setting.) For complex cases,
+   consider using a semantic command that hides non-textual context
+   such as the \csfmt{strong} example described on page~\glsxtrpageref{strong}.
+
   \item Otherwise the control sequence is skipped.
   \end{enumerate}
 
@@ -8425,9 +8435,9 @@ whereas:
 will make the entry behave as if it had been defined as:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
- \field{short} = \marg{\cs{MakeTextLowercase}\marg{HTML}},
- \field{long}  = \marg{\cs{capitalisewords}\marg{hypertext markup language}},
- \field{description}=\marg{\cs{makefirstuc}\marg{a markup language for creating web pages}}
+ \field{short} = \marg{\gls{bibglslowercase}\marg{HTML}},
+ \field{long}  = \marg{\gls{bibglstitlecase}\marg{hypertext markup language}},
+ \field{description}=\marg{\gls{bibglsfirstuc}\marg{a markup language for creating web pages}}
 }
 \end{codeenv}
 If the given field is missing, no change is made, except under
@@ -8548,7 +8558,7 @@ because \cs{ae} and \cs{oe} have known \idx{uppercase} versions.
 With \csopt[uc-cs]{name-case-change}, the \field{name}
 value would be converted to:
 \begin{codeenv}
-\cs{MakeTextUppercase}\marg{z\cs{ae}\cs{oe}}
+\gls{bibglsuppercase}\marg{z\cs{ae}\cs{oe}}
 \end{codeenv}
 If the interpreter is used during sorting, the sort value will be set to 
 \code{Z\AE\OE} because the interpreter recognises all three commands.

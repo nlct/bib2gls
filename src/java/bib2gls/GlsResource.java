@@ -7697,12 +7697,80 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si") || csname.endsWith("ref"))
+                 || csname.equals("si"))
             {
                // skip argument
             }
+            else if (csname.endsWith("ref"))
+            {
+               // Skip argument but check for star or optional
+               // argument.
 
-            if (csname.equals("glsentrytitlecase"))
+               if (object instanceof CharObject)
+               {
+                  int cp = ((CharObject)object).getCharCode();
+
+                  if (cp == '*')
+                  {
+                     // is there an optional argument after '*'?
+
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof Ignoreable))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+
+                     if (object instanceof CharObject)
+                     {
+                        cp = ((CharObject)object).getCharCode();
+                     }
+                  }
+
+                  if (cp == '[')
+                  {
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof CharObject
+                            && ((CharObject)object).getCharCode() == ']'))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+                  }
+                  else
+                  {
+                     continue;
+                  }
+               }
+               else
+               {
+                  continue;
+               }
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+
+            }
+            else if (csname.equals("glsentrytitlecase"))
             {
                list.set(csIdx, new TeXCsRef("glsxtrusefield"));
 
@@ -7877,9 +7945,78 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si") || csname.endsWith("ref"))
+                 || csname.equals("si"))
             {
                // skip argument
+
+            }
+            else if (csname.endsWith("ref"))
+            {
+               // Skip argument but check for star or optional
+               // argument.
+
+               if (object instanceof CharObject)
+               {
+                  int cp = ((CharObject)object).getCharCode();
+
+                  if (cp == '*')
+                  {
+                     // is there an optional argument after '*'?
+
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof Ignoreable))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+
+                     if (object instanceof CharObject)
+                     {
+                        cp = ((CharObject)object).getCharCode();
+                     }
+                  }
+
+                  if (cp == '[')
+                  {
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof CharObject
+                            && ((CharObject)object).getCharCode() == ']'))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+                  }
+                  else
+                  {
+                     continue;
+                  }
+               }
+               else
+               {
+                  continue;
+               }
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
 
             }
             else if (csname.equals("glsentrytitlecase"))
@@ -8105,7 +8242,8 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("ensuremath") || csname.equals("si") || csname.endsWith("ref"))
+            if (csname.equals("ensuremath") || csname.equals("si") 
+                 || csname.endsWith("ref"))
             {
                return;
             }
@@ -8493,10 +8631,83 @@ public class GlsResource
                continue;
             }
 
-            if (csname.equals("ensuremath")
-                || csname.equals("si") || csname.endsWith("ref"))
+            if (csname.equals("ensuremath") || csname.equals("si"))
             {// no case-change
                wordCount++;
+               continue;
+            }
+            else if (csname.endsWith("ref"))
+            {// No case-change, but check for star or optional argument.
+             // This won't work for some cases, but will work for
+             // the standard \ref{label}, \pageref{label}, and for
+             // hyperref's \ref*{label}, \pageref*{label}, \autoref{label} and
+             // \autopageref{label}
+
+               wordCount++;
+
+               if (object instanceof CharObject)
+               {
+                  int cp = ((CharObject)object).getCharCode();
+
+                  if (cp == '*')
+                  {
+                     // is there an optional argument after '*'?
+
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof Ignoreable))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+
+                     if (object instanceof CharObject)
+                     {
+                        cp = ((CharObject)object).getCharCode();
+                     }
+                  }
+
+                  if (cp == '[')
+                  {
+                     while (i < n)
+                     {
+                        object = list.get(i);
+
+                        if (!(object instanceof CharObject
+                            && ((CharObject)object).getCharCode() == ']'))
+                        {
+                           break;
+                        }
+
+                        i++;
+                     }
+                  }
+                  else
+                  {
+                     continue;
+                  }
+               }
+               else
+               {
+                  continue;
+               }
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+
                continue;
             }
             else if (csname.equals("glsentrytitlecase"))
