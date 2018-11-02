@@ -287,6 +287,12 @@ public class GlsResource
          {
             String[] array = getStringArray(parser, list, opt);
 
+            if (array == null || array.length == 0)
+            {
+               throw new IllegalArgumentException(
+                bib2gls.getMessage("error.missing.value", opt));
+            }
+
             wordBoundarySpace=false;
             wordBoundaryCsSpace=false;
             wordBoundaryNbsp=false;
