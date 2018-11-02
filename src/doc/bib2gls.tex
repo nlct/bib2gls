@@ -8590,7 +8590,7 @@ whereas with:
 \begin{codeenv}
 \field{short}=\marg{\marg{}html}
 \end{codeenv}
-then the result is just \code{html} (since the case change is
+then the result is just \code{\marg{}html} (since the case change is
 applied to the empty group, which has no effect).
 
 If you have a command that takes a label or identifier as an argument then it's
@@ -8728,15 +8728,15 @@ by category attributes}. This suffix command is set by the
 abbreviation styles. This means that every time an abbreviation
 style is implemented, \ics{abbrvpluralsuffix} is redefined. Most
 styles simply define this command as:
-\begin{verbatim}
-\renewcommand*{\abbrvpluralsuffix}{\glsxtrabbrvpluralsuffix}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{abbrvpluralsuffix}}\marg{\cs{glsxtrabbrvpluralsuffix}}
+\end{codeenv}
 where \ics{glsxtrabbrvpluralsuffix} expands to \ics{glspluralsuffix}.
 The \qt{sc} styles (such as \abbrstyle{long-short-sc}) use a different
 definition:
-\begin{verbatim}
-\renewcommand*{\abbrvpluralsuffix}{\protect\glsxtrscsuffix}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{abbrvpluralsuffix}}\marg{\cs{protect}\ics{glsxtrscsuffix}}
+\end{codeenv}
 This allows the suffix to be reverted back to the upright font,
 counter-acting the affect of the small-caps font.
 
@@ -8749,10 +8749,10 @@ use the category attributes.
 
 There are two attributes that affect the short plural suffix
 formation. The first is \catattr{aposplural} which uses the suffix
-\begin{verbatim}
-'\abbrvpluralsuffix
-\end{verbatim}
-That is, an apostrophe followed by \ics{abbrvpluralsuffix} is
+\begin{codeenv*}
+\idx{aposchar}\cs{abbrvpluralsuffix}
+\end{codeenv*}
+That is, an \idx{apostrophe} followed by \ics{abbrvpluralsuffix} is
 appended. The second attribute is \catattr{noshortplural} which
 suppresses the suffix and simply sets \field{shortplural} to the
 same as \field{short}.
@@ -8763,32 +8763,43 @@ have a suffix and some where the plural shouldn't have a suffix
 then there are two approaches.
 
 The first approach is to use the category attributes. For example:
-\begin{verbatim}
-\glssetcategoryattribute{french}{noshortplural}
-\end{verbatim}
+\begin{codeenv}
+\cs{glssetcategoryattribute}\marg{french}\marg{\catattr{noshortplural}}
+\end{codeenv}
 Now just make sure all the French abbreviations are have their
 \field{category} field set to \optfmt{french}:
-\begin{verbatim}
-\GlsXtrLoadResources[src={fr-abbrvs},category={french}]
-\end{verbatim} 
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[fr-abbrvs]{src},\csopt[french]{category}}
+\end{codeenv} 
 
-The other approach is to use the options listed below.
+The other approach is to use the options listed below for the given
+\idx{resourceset}. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[fr-abbrvs]{src},\csopt[\empty]{short-plural-suffix}}
+\end{codeenv} 
 
 \optsection{short-plural-suffix}
 
-Sets the plural suffix for the default \field{shortplural} to \meta{value}.  If
-this option is omitted or if
-\csopt[use-default]{short-plural-suffix}, then \bibgls\ will leave
+Sets the plural suffix for the default \field{shortplural} to
+\meta{value}. The \meta{value} may be one of:
+\begin{itemize}
+\item \meta{suffix}: add the
+\field{shortplural} field, if missing, with the given \meta{suffix}. 
+\item \meta{empty}: add the
+\field{shortplural} field, if missing, with no suffix.
+\item \optfmt{use-default}: leave
 it to \styfmt{glossaries-extra} to determine the appropriate default.
-If the \meta{value} is omitted or empty, the suffix is set to empty.
+\end{itemize}
+The default setting is \csopt[use-default]{short-plural-suffix}.
+If the \code{=\meta{value}} part is omitted, then
+\csopt[\empty]{short-plural-suffix} is assumed.
 
 \optsection{dual-short-plural-suffix}
 
 Sets the plural suffix for the default \field{dualshortplural} field to
-\meta{value}.  If this option is omitted or if
-\csopt[use-default]{dual-short-plural-suffix}, then \bibgls\ will leave it to
-\styfmt{glossaries-extra} to determine the appropriate default.
-If the \meta{value} is omitted or empty, the suffix is set to empty.
+\meta{value}. As with \csopt{short-plural-suffix}, the default
+setting is \csopt[use-default]{dual-short-plural-suffix}. If the
+\meta{value} is omitted or empty, the suffix is set to empty.
 
 \section{Location List Options}
 \label{sec:locationopts}
@@ -8844,16 +8855,16 @@ The value of the \glsopt{format} key must be the name of
 a text-block command without the leading backslash that takes 
 a single argument (the location). The location
 is encapsulated by that command. For example, 
-\begin{verbatim}
-\gls[format=textbf]{sample}
-\end{verbatim}
+\begin{codeenv}
+\cs{gls}\oarg{format=\encap{textbf}}\marg{sample}
+\end{codeenv}
 will display the corresponding location in bold, but note that this
 will no longer have a hyperlink if you've used \sty{hyperref}.
 If you want to retain the hyperlink you need the location
 encapsulated with \cs{hyperbf} instead of \cs{textbf}:
-\begin{verbatim}
-\gls[format=hyperbf]{sample}
-\end{verbatim}
+\begin{codeenv}
+\cs{gls}\oarg{format=\encap{hyperbf}}\marg{sample}
+\end{codeenv}
 The \csfmt{hyper}\meta{xx} set of commands all internally use
 \cs{glshypernumber} which adds the appropriate hyperlink to the
 location. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
@@ -8868,23 +8879,23 @@ argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be
 encapsulated by \csref{bibglsrange}. (This command is not used with
 ranges that are formed by collating consecutive locations.) The
-initial marker is stripped from the location formatting commands,
-such as \gls{glsnoidxdisplayloc}, to allow for easy conversion to the
-corresponding text-block command.
+initial marker is stripped from the \meta{format} argument of the
+location formatting commands, such as \gls{glsnoidxdisplayloc}, to
+allow for easy conversion to the corresponding text-block command.
 
 Explicit ranges don't merge with neighbouring locations, but will
 absorb any single locations within the range that don't conflict.
 (Conflicts will be moved to the start of the explicit range.)
-For example, if \verb|\gls{sample}| is used on page~1,
-\verb|\gls[format=(]{sample}| is used on page~2, 
-\verb|\gls{sample}| is used on page~3, and
-\verb|\gls[format=)]{sample}| is used on page~4, then the location
+For example, if \code{\cs{gls}\marg{sample}} is used on page~1,
+\code{\cs{gls}\oarg{format=(}\marg{sample}} is used on page~2, 
+\code{\cs{gls}\marg{sample}} is used on page~3, and
+\code{\cs{gls}\oarg{format=)}\marg{sample}} is used on page~4, then the location
 list will be 1, 2--4. The entry on page~3 is absorbed into the
 explicit range, but the range can't be expanded to include page~1.
 If the entry on page~3 had a different format to the explicit range,
-for example \verb|\gls[format=textbf]{sample}| then it would cause a
-warning and be moved before the start of the range so that the
-location list would then be 1, \textbf{3}, 2--4. 
+for example \code{\cs{gls}\oarg{format=\encap{textbf}}\marg{sample}} 
+then it would cause a warning and be moved before the start of the
+range so that the location list would then be 1, \textbf{3}, 2--4. 
 
 An \idx{ignoredrecord} identifies a term that needs to be treated as
 though it has a record for selection purposes, but the record
@@ -8909,29 +8920,29 @@ Those that don't have records won't have a location list.)
 For example, suppose you only want main matter locations in the
 number list, but you want entries that only appear in the back matter 
 to still appear in the glossary (without a location list), then you could do:
-\begin{alltt}
+\begin{codeenv}
 \ics{backmatter}
-\ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
-\end{alltt}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
+\end{codeenv}
 If you also want to drop front matter locations as well:
-\begin{alltt}
+\begin{codeenv}
 \ics{frontmatter}
-\cs{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\cs{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
 \ldots
 \ics{mainmatter}
-\cs{GlsXtrSetDefaultNumberFormat}\marg{glsnumberformat}
+\cs{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsnumberformat}}
 \ldots
 \cs{backmatter}
-\cs{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
-\end{alltt}
+\cs{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
+\end{codeenv}
 
 Note that explicit range formations aren't discarded, so if
-\encap{glsignore} is used in a range, such as
-\begin{verbatim}
-\glsadd[format=(glsignore]{sample}
-... 
-\glsadd[format=)glsignore]{sample} 
-\end{verbatim}
+\encap{glsignore} is used in a range, such as:
+\begin{codeenv}
+\ics{glsadd}\oarg{format=(glsignore}\marg{sample}
+\ldots 
+\cs{glsadd}\oarg{format=)glsignore}\marg{sample} 
+\end{codeenv}
 then the range will be included in the location list (encapsulated
 with \ics{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
@@ -8957,10 +8968,10 @@ and instead parse the \field{loclist} field and re-order the
 locations or process them in some other way. Remember that you can
 also use \ics{glsnoidxloclist}
 provided by \styfmt{glossaries}. For example:
-\begin{verbatim}
-\glsfieldfetch{gls.sample}{loclist}{\loclist}% fetch location list
-\glsnoidxloclist{\loclist}% iterate over locations
-\end{verbatim}
+\begin{codeenv}
+\cs{glsfieldfetch}\marg{gls.sample}\marg{loclist}\marg{\cmd{loclist}}\comment{fetch location list}
+\cs{glsnoidxloclist}\marg{\cmd{loclist}}\comment{iterate over locations}
+\end{codeenv}
 This uses \ics{glsnoidxloclisthandler} as the list's handler
 macro, which simply displays each location separated by \ics{delimN}.
 (See also
@@ -8972,22 +8983,23 @@ Each regular location is listed in the \iext{aux} file in the form:
 (See \longarg{merge-nameref-on} for \code{nameref} records.)
 Exact duplicates are discarded. For example, if \code{cat}
 is indexed twice on page 1:
-\begin{verbatim}
-\glsxtr@record{cat}{}{page}{glsnumberformat}{1}
-\glsxtr@record{cat}{}{page}{glsnumberformat}{1}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\end{codeenv}
 then the second record is discarded. Only the first record is added
 to the location list.
 
 Partial duplicates, where all arguments match except for
 \meta{format}, may be discarded depending on the value
 of \meta{format}. For example, if page~1 of the document
-uses \verb|\gls{cat}| and \verb|\gls[format=hyperbf]{cat}|
+uses \code{\cs{gls}\marg{cat}} and
+\code{\cs{gls}\oarg{format=\encap{hyperbf}}\marg{cat}}
 then the \ext{aux} file will contain:
-\begin{verbatim}
-\glsxtr@record{cat}{}{page}{glsnumberformat}{1}
-\glsxtr@record{cat}{}{page}{hyperbf}{1}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{hyperbf}}\marg{1}
+\end{codeenv}
 This is a partial record match. In this case, \bibgls\ 
 makes the following tests:
 \begin{itemize}
@@ -9044,6 +9056,16 @@ This can help to save resources and build time.
 
 \optsection{save-primary-locations}
 
+It's sometimes useful to identify primary locations with a different
+format, such as bold or italic. This helps the reader select which
+location to try first in the event of a long location list. However,
+you may prefer to store the primary location in a different field to
+give it a more prominent position. In order to do this you 
+need to specify the format (or formats) used to identify primary
+locations with \csopt{primary-location-formats} and 
+use \csopt{save-primary-locations} to determine how to deal with
+these locations.
+
 This option may take one of the following values:
 \begin{itemize}
 \item \optfmt{false}: don't save primary locations (default);
@@ -9052,7 +9074,7 @@ This option may take one of the following values:
 \idx{locationlist};
 \item \optfmt{default format}: similar to \optfmt{retain} but the
 format for the primary records in the \field{location} field is
-converted to the default \code{glsnumberformat} (the records in the
+converted to the default \encap{glsnumberformat} encap (the records in the
 \field{primarylocations} field retain their given format);
 \item \optfmt{start}: save primary locations in the
 \field{primarylocations} field and also move to the start of the
@@ -9061,9 +9083,6 @@ usual \idx{locationlist};
 \field{primarylocations} field and remove from the usual
 \idx{locationlist}.
 \end{itemize}
-The primary locations are identified with
-\csopt{primary-location-formats}, which must be set if the
-default \csopt[false]{save-primary-locations} is changed.
 
 The primary locations are copied to the \field{primarylocations}
 field and encapsulated with \csref{bibglsprimary}.
@@ -9077,11 +9096,13 @@ moved to the start of the \idx{locationlist} stored in the
 additional markup, then use \csopt[remove]{save-primary-locations}
 and adjust the \idx{locationlist} format to insert the primary
 locations at the start. This can be done by modifying the glossary
-style. For example, the \glostyle{bookindex} style inserts
+style.
+
+For example, the \glostyle{bookindex} style inserts
 \ics{glsxtrbookindexprelocation} before the location, so you could
 redefine this:
 \begin{codeenv}
-\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment{}
   \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment{}
   \marg{\comment{}
     \ics{glsxtrprelocation}
