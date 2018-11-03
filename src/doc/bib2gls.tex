@@ -9162,61 +9162,60 @@ For example, suppose the file \filefmt{entries.bib} contains:
 \end{codeenv}
 and the document \filefmt{test.tex} contains:
 \begin{codeenv}
-\csfmt{documentclass}\marg{report}
-
-\cs{usepackage}\oarg{colorlinks}\marg{hyperref}
-\cs{usepackage}\oarg{record,
- postpunc=\marg{dot},
- nostyles,
- stylemods=\marg{tree,bookindex},
- style=bookindex}\marg{glossaries-extra}
-
-\gls!{GlsXtrLoadResources}\oarg{
+\cmd{documentclass}\marg{report}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},
+ \styopt[dot]{postpunc},
+ \styopt{nostyles},
+ \styopt[tree,bookindex]{stylemods},
+ \styopt[bookindex]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
   \csopt[entries]{src},
   \csopt[hyperbf,hyperemph]{primary-location-formats},
   \csopt[remove]{save-primary-locations}
 }
-
-\cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment{}
-  \cs{glsxtrifhasfield}\marg{primarylocations}\marg{\idx{param}1}\comment{}
+\strut
+\cmd{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{\field{primarylocations}}\marg{\idx{param}1}\comment{}
   \marg{\comment{}
     \ics{glsxtrprelocation}
     \cs{glscurrentfieldvalue}
-    \cs{glsxtrifhasfield}\marg{location}\marg{\idx{param}1}\marg{;}\marg{}\comment{}
+    \cs{glsxtrifhasfield}\marg{\field{location}}\marg{\idx{param}1}\marg{;}\marg{}\comment{}
   }\comment{}
   \marg{}\comment{}
   \cs{glsxtrprelocation}
 }
-
-\gls{glsxtrnewglslike}\oarg{format=hyperbf}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
-
-\csfmt{begin}\marg{document}
-\cs{chapter}\marg{Sample}
-\csfmt{Primary}\marg{waterfowl}, \cs{gls}\marg{bird} and \cs{gls}\marg{zebra}.
-
-\cs{chapter}\marg{Another Sample}
-\cs{Gls}\marg{waterfowl}, \csfmt{primary}\marg{bird} and \cs{gls}\marg{zebra}.
-
-\cs{chapter}\marg{Yet Another Sample}
-\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird} and \csfmt{primary}\marg{zebra}.
-
-\cs{chapter}\marg{Yet Another Sample Again}
-\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
-
+\strut
+\gls{glsxtrnewglslike}\oarg{format=\encap{hyperbf}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
+\strut
+\cmd{begin}\marg{document}
+\cmd{chapter}\marg{Sample}
+\cmd{Primary}\marg{waterfowl}, \cs{gls}\marg{bird} and \cs{gls}\marg{zebra}.
+\strut
+\cmd{chapter}\marg{Another Sample}
+\cs{Gls}\marg{waterfowl}, \cmd{primary}\marg{bird} and \cs{gls}\marg{zebra}.
+\strut
+\cmd{chapter}\marg{Yet Another Sample}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird} and \cmd{primary}\marg{zebra}.
+\strut
+\cmd{chapter}\marg{Yet Another Sample Again}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \cmd{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
+\strut
 \ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\comment{}
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment{}
+ \cmd{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=\encap{hyperemph}}\marg{\idx{param}1}}\comment{}
 }
-
+\strut
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
-\csfmt{end}\marg{document}
+\cmd{end}\marg{document}
 \end{codeenv}
 
-The \csopt[hyperbf,hyperemph]{primary-location-formats} setting in
-the above indicates that locations encapsulated with \ics{hyperbf} and
-\ics{hyperemph} are primary records. In this case, the bold format
-is used to indicate the primary location in the main document text
-and the emphasized format is used to indicate the location in the
-main glossary.
+The \csopt[\encap{hyperbf},\encap{hyperemph}]{primary-location-formats} setting
+in the above indicates that locations encapsulated with \ics{hyperbf} and
+\ics{hyperemph} are primary records. In this case, the bold format is used to
+indicate the primary location in the main document text and the emphasized
+format is used to indicate the location in the main glossary.
 
 The primary records are removed from the \field{location} field
 due to the \csopt[remove]{save-primary-locations} setting. This can
@@ -9224,11 +9223,11 @@ lead to a ragged location list. The option
 \csopt[default format]{save-primary-locations} can allow the primary
 location to be absorbed into a range.
 
-The main glossary records are added through the category-independent
-post-name hook with \cs{glsadd}. This won't be implemented until the
-entries are actually defined as the actual page number won't be
-known until the glossary can be displayed. This means that the
-document build requires an extra \bibgls\ and \LaTeX\ run:
+The main glossary records are added through the category-independent post-name
+hook with \cs{glsadd}. This won't be implemented until the entries are actually
+defined as the page number can't be determined until the glossary can be
+displayed. This means that the document build requires an extra \bibgls\ and
+\LaTeX\ run:
 \begin{verbatim}
 pdflatex test
 bib2gls --group test
@@ -9243,67 +9242,73 @@ I decide to change the optional arguments used for primary
 references I only need to edit one line. For example, I might want to 
 change the default counter:
 \begin{codeenv}
-\gls{glsxtrnewglslike}\oarg{format=hyperbf,counter=chapter}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
+\gls{glsxtrnewglslike}\oarg{format=\encap{hyperbf},counter=\counter{chapter}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
 \end{codeenv}
 
-Here's another example that only has one primary format but uses
-\ics{GlsXtrAutoAddOnFormat} to automatically insert
-\ics{glsadd}\oarg{counter=chapter,format=hyperrm}\margm{label} on
-each instance of \cs{gls} that has the format set to the custom
-\code{primaryfmt}:
+Here's another example that only has one primary format (\encap{hyperrm}) 
+that's indexed through the use of \ics{GlsXtrAutoAddOnFormat}, which sets
+up a hook that automatically inserts:
 \begin{codeenv}
-\csfmt{documentclass}\marg{report}
-
-\cs{usepackage}\oarg{colorlinks}\marg{hyperref}
-\cs{usepackage}\marg{
- record=nameref,
- postpunc=dot,
- nostyles,
- stylemods=\marg{tree,bookindex},
- style=bookindex}\marg{glossaries-extra}
-
-\gls!{GlsXtrLoadResources}\oarg{
-  src=\marg{topics},
-  primary-location-formats=\marg{hyperrm},
-  save-primary-locations=\marg{remove}
+\ics{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\margm{label}
+\end{codeenv}
+on each instance of \code{\cs{gls}\oarg{format=primaryfmt}\margm{label}} (or
+similar).  This means that the entry is indexed twice when this particular
+format is used: first with the \encap{hyperrm} format and \counter{chapter} 
+counter (from the \cs{glsadd} command in the hook), and then with the
+\code{primaryfmt} format and the default counter (as per normal behaviour):
+\begin{codeenv}
+\cmd{documentclass}\marg{report}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{
+ \styopt[nameref]{record},
+ \styopt[dot]{postpunc},
+ \styopt{nostyles},
+ \styopt[tree,bookindex]{stylemods},
+ \styopt[bookindex]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[topics]{src},
+  \csopt[hyperrm]{primary-location-formats},
+  \csopt[remove]{save-primary-locations},
+  \csopt[false]{save-loclist}
 }
-
-\cs{newcommand}\marg{\csfmt{primaryfmt}}\oarg{1}\marg{\cs{hyperbf}\marg{\idx{param}1}}
-
-\ics{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{counter=chapter,format=hyperrm}
-
-\gls!{glsxtrnewglslike}\oarg{format=primaryfmt}\marg{}\marg{\csfmt{primary}}\marg{\csfmt{primarypl}}\marg{\csfmt{Primary}}\marg{\csfmt{Primarypl}}
-
-\csfmt{begin}\marg{document}
-\cs{chapter}\marg{Sample}
-\csfmt{Primary}\marg{waterfowl}, \cs{gls}\marg{bird} and \cs{gls}\marg{zebra}.
-
-\cs{chapter}\marg{Another Sample}
-\cs{Gls}\marg{waterfowl}, \csfmt{primary}\marg{bird} and \cs{gls}\marg{zebra}.
-
-\cs{chapter}\marg{Yet Another Sample}
-\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird} and \csfmt{primary}\marg{zebra}.
-
-\cs{chapter}\marg{Yet Another Sample Again}
-\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \csfmt{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
-
+\strut
+\cmd{newcommand}\marg{\cmd{primaryfmt}}\oarg{1}\marg{\cs{hyperbf}\marg{\idx{param}1}}
+\strut
+\ics{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{counter=\counter{chapter},format=\encap{hyperrm}}
+\strut
+\gls{glsxtrnewglslike}\oarg{format=primaryfmt}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
+\strut
+\cmd{begin}\marg{document}
+\cmd{chapter}\marg{Sample}
+\cmd{Primary}\marg{waterfowl}, \cs{gls}\marg{bird} and \cs{gls}\marg{zebra}.
+\strut
+\cmd{chapter}\marg{Another Sample}
+\cs{Gls}\marg{waterfowl}, \cmd{primary}\marg{bird} and \cs{gls}\marg{zebra}.
+\strut
+\cmd{chapter}\marg{Yet Another Sample}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird} and \cmd{primary}\marg{zebra}.
+\strut
+\cmd{chapter}\marg{Yet Another Sample Again}
+\cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \cmd{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
+\strut
 \ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\comment{}
- \cs{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=hyperemph}\marg{\idx{param}1}}\comment{}
- \cs{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{primarylocations}\comment{}
+ \cmd{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=\encap{hyperemph}}\marg{\idx{param}1}}\comment{}
+ \cmd{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{\field{primarylocations}}\comment{}
 }
-
+\strut
 \cs{printunsrtglossary}\oarg{title=Index,target=false}
-\csfmt{end}\marg{document}
+\cmd{end}\marg{document}
 \end{codeenv}
 
-Note that in this case, the \bibgls\ primary format is identified
-as \code{hyperrm} not \code{primaryfmt}. This picks out the records
-created with the automated \ics{glsadd}, which have the counter set
-to \counter{chapter}. The first glossary (with the title
-\qt{Summary}) switches the location field so that only the primary
-records are listed. Since \styopt[nameref]{record} has been used
-this means that the chapter title is shown rather than the chapter
-number.
+Note that in this case, from \bibgls' point of view, the primary format is
+\encap{hyperrm} not \code{primaryfmt}. This picks out the records created with
+the automated \ics{glsadd}, which have the counter set to \counter{chapter}.
+The first glossary (with the title \qt{Summary}) switches the location field to
+\field{primarylocations} so that only the primary records are listed. Since
+\styopt[nameref]{record} has been used this means that the chapter title is
+shown rather than the chapter number.
 
 The second glossary (\qt{Index}) shows the location lists that only
 have the \counter{page} counter (because the automated \cs{glsadd}
@@ -9314,24 +9319,24 @@ for records with the \counter{page} counter.
 
 An alternative to \ics{GlsXtrAutoAddOnFormat} would be to simply
 define the custom commands as follows:
-\begin{verbatim}
-\newcommand{\primary}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \gls[format=primaryfmt,#1]{#2}%
+\begin{codeenv}
+\cmd{newcommand}\marg{\cmd{primary}}[2][]\marg{\comment{}
+ \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
+ \cs{gls}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
 }
-\newcommand{\primarypl}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \glspl[format=primaryfmt,#1]{#2}%
+\cmd{newcommand}\marg{\cmd{primarypl}}[2][]\marg{\comment{}
+ \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
+ \cs{glspl}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
 }
-\newcommand{\Primary}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \Gls[format=primaryfmt,#1]{#2}%
+\cmd{newcommand}\marg{\cmd{Primary}}[2][]\marg{\comment{}
+ \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
+ \cs{Gls}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
 }
-\newcommand{\Primarypl}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \Glspl[format=primaryfmt,#1]{#2}%
+\cmd{newcommand}\marg{\cmd{Primarypl}}[2][]\marg{\comment{}
+ \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
+ \cs{Glspl}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This is more useful if you want to simply omit the
 \code{format=primaryfmt} option (just remove it from the above four 
 definitions), which makes it easier to merge the locations into
@@ -9342,8 +9347,8 @@ ranges in the index.
 By default, three or more consecutive locations \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
 the range \code{\meta{loc-1}\ics{delimR} \meta{loc-n}}. Otherwise
-the locations are separated by \csref{bibglsdelimN}. As mentioned
-above, these aren't merged with explicit range formations.
+the locations are separated by \csref{bibglsdelimN} or \csref{bibglslastDelimN}.
+As mentioned above, these aren't merged with explicit range formations.
 
 You can change this with the \csopt{min-loc-range} setting where
 \meta{value} is either \optfmt{none} (don't form ranges) or an
@@ -9351,9 +9356,9 @@ integer greater than one indicating how many consecutive locations should be
 converted into a range.
 
 \bibgls\ determines if one location
-\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2}
+\code{\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2}}
 is one unit more than another location
-\margm{prefix-1}\margm{counter-1}\margm{format-1}\margm{location-1} 
+\code{\margm{prefix-1}\margm{counter-1}\margm{format-1}\margm{location-1} }
 according to the following:
 \begin{enumerate}
 \item\label{itm:pre} If \meta{prefix-1} is not equal to \meta{prefix-2} or
@@ -9365,7 +9370,8 @@ then the locations aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern (line break for clarity only)\footnote{The Java class \code{\csfmt{p}\marg{javaDigit}}
 used in the regular expression will match any digits in the 
-Unicode \idx{numberdecimaldigit} category not just the digits in the Basic Latin set.}
+Unicode \idx{numberdecimaldigit} category not just the digits in the Basic Latin set. Similarly \code{\csfmt{p}\marg{javaAlphabetic}} will also match alphabetic
+characters outside the Basic Latin set.}
 \begin{verbatim}
 (.*?)(?:\\protect\s*)?(\\[\p{javaAlphabetic}@]+)\s*\{([\p{javaDigit}
 \p{javaAlphabetic}]+)\}
@@ -9439,27 +9445,27 @@ consecutive.
 Examples:
 \begin{enumerate}
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{2}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{2}
+\end{codeenv}
 These records are consecutive. The prefix, counter and format are
 identical (so the test passes step~\ref{itm:pre}), the locations match
 the \hyperref[itm:decmatch]{decimal pattern} and the test in
 step~\ref{itm:decgrp3} passes.
 
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1}
-\glsxtr@record{gls.sample}{}{page}{textbf}{2}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{textbf}}\marg{2}
+\end{codeenv}
 These records aren't consecutive since the formats are different.
 
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{A.i}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{A.ii}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{A.i}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{A.ii}
+\end{codeenv}
 These records are consecutive. The prefix, counter and format are
 identical (so it passes step~\ref{itm:pre}). The locations match
 the \hyperref[itm:rommatch]{lower case Roman numeral pattern}, where
@@ -9469,10 +9475,10 @@ the test is retried with the locations set to 1 and 2, respectively.
 This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
 
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{i.A}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{ii.A}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{i.A}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{ii.A}
+\end{codeenv}
 These records aren't consecutive. They match the
 \hyperref[itm:alphmatch]{alpha pattern}. The first location is
 considered to consist of the prefix \code{i}, the separator
@@ -9485,10 +9491,10 @@ The test fails because the numbers are equal and the prefixes are
 different.
 
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1.0}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{2.0}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1.0}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{2.0}
+\end{codeenv}
 These records are consecutive. They match the \hyperref[itm:decmatch]{decimal
 pattern}, and then step~\ref{itm:decgrp3eq} followed by
 step~\ref{itm:decgrp3eqsepeq}. The \code{.0} part is discarded and
@@ -9496,24 +9502,28 @@ the test is retried with the first location set to 1 and the second
 location set to 2.
 
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{1.1}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{2.1}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1.1}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{2.1}
+\end{codeenv}
 These records aren't consecutive as the test branches off into
 step~\ref{itm:decgrp3nz}.
 
 \item
-\begin{verbatim}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{\@alph{1}}
-\glsxtr@record{gls.sample}{}{page}{glsnumberformat}{\@alph{2}}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{\cmd{@alph}\marg{1}}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{\cmd{@alph}\marg{2}}
+\end{codeenv}
 These records are consecutive. The locations match the 
 \hyperref[itm.csmatch]{control sequence pattern}. The control
 sequences are the same, so the test is retried with the first
 location set to 1 and the second location set to 2.
-(Note that \csref{glsxtrresourcefile} changes the category code of
-\code{@} to allow for internal commands in locations.)
+
+In this example, the location has been written to the file as
+\code{\csfmt{@alph}\margm{number}} instead of fully expanding according to the
+normal behaviour of \code{\ics{alph}\margm{counter}}.  (Note that
+\csref{glsxtrresourcefile} changes the category code of \code{@} to allow for
+internal commands in locations.) This unusual case is for illustrative purposes.
 \end{enumerate}
 
 \optsection{max-loc-diff}
@@ -9537,7 +9547,8 @@ For example, if \meta{location-1} is \qt{B} and \meta{location-2}
 is \qt{C}, then $n_1 = 66$ and $n_2 = 67$. Since $n_2 = 67 = 66+1=
 n_1+1$ then \meta{location-2} immediately follows \meta{location-1}.
 
-This is used in the range formations within the location lists.
+This is used in the range formations within the location lists (as described
+in the above section).
 So, for example, the list \qt{1, 2, 3, 5, 7, 8, 10, 11, 12, 58, 59,
 61} becomes
 \qt{1--3, 5, 7, 8, 10--12, 58, 59, 61}.
@@ -9547,7 +9558,7 @@ the location lists can become long and ragged. You could
 deal with this by switching off the automatic indexing and
 only explicitly index pertinent use or you can adjust
 the value of \optfmt{max-loc-diff} so that a range can be formed even
-there are one or two gaps in it.
+if there are one or two gaps in it.
 By default, any location ranges that have skipped gaps in this
 manner will be followed by \csref{bibglspassim}. The default
 definition of this command is obtained from the resource file.
@@ -9587,7 +9598,7 @@ The default is \csopt[none]{suffixFF}.
 If an entry has a \field{see} field, this can be placed before or
 after the location list, or completely omitted (but the value will
 still be available in the \field{see} field for use with
-\ics{glsxtrusesee}). This option may take the following values:
+\ics{glsxtrusesee}). The required \meta{value} must be one of:
 \begin{itemize}
 \item \optfmt{omit}: omit the see reference from the location
 list.
@@ -9596,12 +9607,11 @@ list.
 \item \optfmt{after}: place the see reference after the location
 list (default).
 \end{itemize}
-The \meta{value} part is required.
 
 The separator between the location list and the cross-reference is
 provided by \csref{bibglsseesep}. This separator is omitted if the
 location list is empty. The cross-reference is written to the
-\field{location} field using \gls{bibglsusesee}\margm{label}.
+\field{location} field using \code{\gls{bibglsusesee}\margm{label}}.
 
 \optsection{seealso}
 
@@ -9610,20 +9620,20 @@ provided by the \field{seealso} field. You need at least v1.16
 of \sty{glossaries-extra} for this option. The values are the
 same as for \csopt{see} but the separator is given by
 \csref{bibglsseealsosep}. The cross-reference is written to the
-\field{location} field using \gls{bibglsuseseealso}\margm{label}.
+\field{location} field using \code{\gls{bibglsuseseealso}\margm{label}}.
 
 \optsection{alias}
 
 This is like \csopt{alias} but governs the location of the cross-references
 provided by the \field{alias} field. The separator is given by
 \csref{bibglsaliassep}. The cross-reference is written to the
-\field{location} field using \gls{bibglsusealias}\margm{label}.
+\field{location} field using \code{\gls{bibglsusealias}\margm{label}}.
 
 \optsection{alias-loc}
 
 If an entry has an \field{alias} field, the location list
 may be retained or omitted or transferred to the target entry.
-The \meta{value} may be one of:
+The required \meta{value} must be one of:
 \begin{itemize}
 \item\optfmt{keep}: keep the location list;
 \item\optfmt{transfer}: transfer the location list;
@@ -9638,39 +9648,42 @@ is left unchanged).
 Note that with \csopt[transfer]{alias-loc}, both the aliased
 entry and the target entry must be in the same resource set.
 (That is, both entries have been selected by the same instance of
-\csref{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version
-1.12, you may need to redefine \ics{glsxtrsetaliasnoindex} to do
+\csref{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version~1.12, 
+you may need to redefine \ics{glsxtrsetaliasnoindex} to do
 nothing if the location lists aren't showing correctly
-with aliased entries. (This was corrected in version 1.13.)
+with aliased entries. (This was corrected in version~1.13.)
 
 \optsection{loc-prefix}
 
 The \csopt{loc-prefix} setting indicates that the location lists
-should begin with \csref{bibglslocprefix}\margm{n}. The \meta{value} may
+should begin with \code{\csref{bibglslocprefix}\margm{n}}. The \meta{value} may
 be one of the following:
 \begin{itemize}
-\item \optfmt{false}: don't insert \gls{bibglslocprefix}\margm{n} at the start
-of the location lists (default).
+\item \optfmt{false}: don't insert \code{\gls{bibglslocprefix}\margm{n}} at the
+start of the location lists (default).
+
 \item \optfmt{\margm{prefix-1},\margm{prefix-2},\ldots,\margm{prefix-n}}:
-insert \gls{bibglslocprefix}\margm{n} (where \meta{n} is the number of
+insert \code{\gls{bibglslocprefix}\margm{n}} (where \meta{n} is the number of
 locations in the list) at the start of each location list and the
 definition of \gls{bibglslocprefix} will be appended to the glossary
 preamble providing an \ics{ifcase} condition:
-\begin{alltt}
-\csfmt{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\%
-  \ics{ifcase}\string#1
-  \csfmt{or} \meta{prefix-1}\csref{bibglspostlocprefix}
-  \csfmt{or} \meta{prefix-2}\csfmt{bibglspostlocprefix}
+\begin{codeenv}
+\cmd{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\comment{}
+  \ics{ifcase}\idx{param}1
+  \cmd{or} \meta{prefix-1}\gls{bibglspostlocprefix}
+  \cmd{or} \meta{prefix-2}\gls{bibglspostlocprefix}
   \ldots
-  \csfmt{else} \meta{prefix-n}\csfmt{bibglspostlocprefix}
-  \csfmt{fi}
+  \cmd{else} \meta{prefix-n}\gls{bibglspostlocprefix}
+  \cmd{fi}
 }
-\end{alltt}
+\end{codeenv}
 
-\item \optfmt{comma}: 
-essentially equivalent to \csopt[,~]{loc-prefix} but
-avoids confusion with the list format. 
+\item \optfmt{comma}: equivalent to \csopt[\marg{,~}]{loc-prefix} 
+but avoids confusion with the list syntax. That is, the prefix is a comma
+followed by a space for non-empty locations.
+
 \item \optfmt{list}: equivalent to \csopt[\ics{pagelistname} ]{loc-prefix}.
+
 \item \optfmt{true}: equivalent to 
 \csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
 where the definitions of \gls{bibglspagename} and
@@ -9679,6 +9692,7 @@ where the definitions of \gls{bibglspagename} and
 This setting works best if the document's language matches the 
 language file. However, you can redefine these commands within
 the document's language hooks or in the glossary preamble.
+
 \end{itemize}
 
 If \meta{value} is omitted, \optfmt{true} is assumed. Take care not
@@ -9689,11 +9703,11 @@ See the description of \csref{bibglslocprefix} for
 further details.
 
 For example:
-\begin{verbatim}
-\GlsXtrLoadResources[type=main,src={entries1},loc-prefix=false]
-\GlsXtrLoadResources[type=main,src={entries2},loc-prefix]
-\GlsXtrLoadResources[type=symbols,src={entries3},loc-prefix={p.,pp.}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{type=main,src=\marg{entries1},loc-prefix=false}
+\gls{GlsXtrLoadResources}\oarg{type=main,src=\marg{entries2},loc-prefix}
+\gls{GlsXtrLoadResources}\oarg{type=symbols,src=\marg{entries3},loc-prefix=\marg{p.,pp.}}
+\end{codeenv}
 This works since the conflicting \csopt[p.,pp.]{loc-prefix} and
 \csopt[true]{loc-prefix} are in different glossaries (assigned through the
 \csopt{type} key). The entries fetched from \filefmt{entries1.bib}
@@ -9706,11 +9720,11 @@ setting the \field{type} field for each entry in the \ext{bib}
 file.)
 
 If the \csopt{type} option isn't used:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries1},loc-prefix=false]
-\GlsXtrLoadResources[src={entries2},loc-prefix]
-\GlsXtrLoadResources[src={entries3},loc-prefix={p.,pp.}]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{src=\marg{entries1},loc-prefix=false}
+\gls{GlsXtrLoadResources}\oarg{src=\marg{entries2},loc-prefix}
+\gls{GlsXtrLoadResources}\oarg{src=\marg{entries3},loc-prefix=\marg{p.,pp.}}
+\end{codeenv}
 then \csopt[true]{loc-prefix} takes precedence over
 \csopt[p.,pp.]{loc-prefix} (since it was used first). The entries fetched from
 \filefmt{entries1.bib} still won't have a location prefix, but the entries
