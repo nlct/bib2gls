@@ -293,7 +293,7 @@
 
 \newcommand*{\cs}{\gls}
 
-\newcommand*{\ics}{\cs}
+\newcommand*{\ics}[1][]{\cs[noindex=false,#1]}
 
 \newcommand*{\icswithargs}[2][]{\cs{#2}\glsentryuseri{#2}}
 
@@ -493,7 +493,7 @@ Here's a simple example:
 \begin{codeenv}
 \cmd{documentclass}\marg{article}
 \strut
-\cmd{usepackage}\marg{glossaries}
+\ics{usepackage}\marg{glossaries}
 \strut
 \gls{newglossaryentry}\marg{duck}\comment{label}
 \marg{\comment{ information about this term:}

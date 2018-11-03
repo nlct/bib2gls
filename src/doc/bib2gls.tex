@@ -117,7 +117,8 @@
   dual-type={main},
   combine-dual-locations={primary},
   selection={recorded and deps and see},
-  strip-missing-parents
+  strip-missing-parents,
+  save-child-count
 ]
 
 \glsxtraddlabelprefix{}
@@ -363,7 +364,15 @@
   \end{flushleft}\ignorespaces
 }
 
-\newcommand*{\csref}[1][noindex=false]{\gls[#1]}
+\newcommand{\inlinedef}[1]{%
+  \code
+  {%
+   \glsadd{#1}\glsxtrglossentry{#1}%
+   \glsentryuseri{#1}%
+  }%
+}
+
+\newcommand*{\csref}{\gls}
 
 \newcommand*{\cs}[1]{%
   \glsdoifexists{idx.#1}%
@@ -506,24 +515,55 @@
     \nopagebreak\indexspace\nopagebreak\csuse{@afterheading}%
   }%
   \renewcommand*{\glossentry}[2]{%
-   \item
+   \glstreeitem \glstarget{cs.##1}{\strut}%
    \glsxtrifhasfield{dualid}{##1}%
    {%
      \glshyperlink{\glscurrentfieldvalue}%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
+     \glsxtrifhasfield{note}{##1}%
+     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+     {}%
      \nopagebreak\par\hspace{10pt}%
      \Glossentrydesc{\glscurrentfieldvalue}%
+     \ifglshasdesc{\glscurrentfieldvalue}{\@. }{}%
    }%
    {%
-     \glstarget{cs.##1}{\strut}\gls[hyper=false]{##1}%
+     \gls[hyper=false]{##1}%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
+     \glsxtrifhasfield{note}{##1}%
+     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+     {}%
      \nopagebreak\par\hspace{10pt}%
      \Glossentrydesc{##1}%
+     \ifglshasdesc{##1}{\@. }{}%
    }%
-   \glsxtrifhasfield{note}{##1}%
-   {\space(\glscurrentfieldvalue)}%
-   {}%
-   .%
+   \GlsXtrIfHasNonZeroChildCount{##1}%
+   {This command has \glscurrentfieldvalue\ forms:}{}%
+   \par\medskip
+  }%
+  \renewcommand*{\subglossentry}[3]{%
+   \glstreesubitem \glstarget{cs.##2}{\strut}%
+   \glsxtrifhasfield{dualid}{##2}%
+   {%
+     \glshyperlink{\glscurrentfieldvalue}%
+     \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+     \glsxtrifhasfield{note}{##2}%
+     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+     {}%
+     \nopagebreak\par\hspace{20pt}%
+     \Glossentrydesc{\glscurrentfieldvalue}%
+     \ifglshasdesc{\glscurrentfieldvalue}{.}{}%
+   }%
+   {%
+     \gls[hyper=false]{##2}%
+     \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+     \glsxtrifhasfield{note}{##2}%
+     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+     {}%
+     \nopagebreak\par\hspace{20pt}%
+     \Glossentrydesc{##2}%
+     \ifglshasdesc{##2}{.}{}%
+   }%
    \par\medskip
   }%
 }
@@ -542,6 +582,7 @@
   ]%
   {%
    \let\printunsrtglossaryentryprocesshook\commandsummaryhook
+   \let\csref\cs
    \glsxtrlocalsetgrouptitle{glssymbols}{}%
   }%
 }
@@ -819,7 +860,7 @@ files}
 The \bibgls\ command line application can be used to extract
 glossary information stored in a \ext{bib} file and convert it
 into glossary entry definitions that can be read using
-\styfmt{glossaries-extra}'s \csref{GlsXtrLoadResources} command. When used
+\styfmt{glossaries-extra}'s \gls{GlsXtrLoadResources} command. When used
 in combination with the \styoptfmt{record} package option, \bibgls\
 can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
@@ -951,7 +992,7 @@ Here's an example document that uses this data:
 \begin{codeenv}
 \cmd{documentclass}\marg{article}
 \strut
-\cmd{usepackage}\oarg{\styoptref{record}}\marg{glossaries-extra}
+\cs{usepackage}\oarg{\styoptref{record}}\marg{glossaries-extra}
 \strut
 \gls{GlsXtrLoadResources}\oarg{
   \csopt[entries]{src},\comment{data in entries.bib}
@@ -1461,7 +1502,7 @@ from the resource file. In the event that the loaded resource file
 doesn't match the document language, you will have to manually set
 the correct translation (in English, this would be
 \csopt[Page\dcomma Pages]{loc-prefix}). The default definition of
-\csref{bibglspassim} is also obtained from the resource file.
+\gls!{bibglspassim} is also obtained from the resource file.
 
 \section{Conditional Document Build}
 
@@ -2579,7 +2620,7 @@ alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
 with the letter sort methods listed in
 \tableref{tab:sortoptionsletter} or with the letter-number sort
 methods listed in \tableref{tab:sortoptionsletternumber}. The group
-label is obtained from \csref{bibglslettergroup}.
+label is obtained from \gls!{bibglslettergroup}.
 
 \item[\idx{nonlettergroup} (or \idx{symbolgroup})]
 The first non-ignored character of all the sort values within this group
@@ -2592,29 +2633,29 @@ The alphabetic sort methods ignore many punctuation
 characters, so an entry that has a non-alphabetic initial
 character in the sort value may actually be placed in a
 \idx{lettergroup}.
-The group label is obtained from \csref{bibglsothergroup}.
+The group label is obtained from \gls!{bibglsothergroup}.
 
 \item[\idx{emptygroup}] The sort value is empty when sorting with an
 alphabetical, letter or letter-number method, typically a
 result of the original value consisting solely of commands that \bibgls\
-can't interpret. The group label is obtained from \csref{bibglsemptygroup}.
+can't interpret. The group label is obtained from \gls!{bibglsemptygroup}.
 
 \item[\idx{numbergroup}] The entries were sorted by one of the
 numeric comparisons listed in \tableref{tab:sortoptionsnumerical}.
-The group label is obtained from \csref{bibglsnumbergroup}.
+The group label is obtained from \gls!{bibglsnumbergroup}.
 
 \item[\idx{datetimegroup}] The entries were sorted by one of the date-time
 comparisons listed in \tableref{tab:sortoptionsdatetime} (where both
 date and time are present). 
-The group label is obtained from \csref{bibglsdatetimegroup}.
+The group label is obtained from \gls!{bibglsdatetimegroup}.
 
 \item[\idx{dategroup}] The entries were sorted by one of the date
 comparisons (where the time is omitted). 
-The group label is obtained from \csref{bibglsdategroup}.
+The group label is obtained from \gls!{bibglsdategroup}.
 
 \item[\idx{timegroup}] The entries were sorted by one of the time
 comparisons (where the date is omitted). 
-The group label is obtained from \csref{bibglstimegroup}.
+The group label is obtained from \gls!{bibglstimegroup}.
 
 \item[\idx{customgroup}] The group label is explicitly set either in
 the \ext{bib} file or using the \csopt[\meta{label}]{group} resource
@@ -2704,7 +2745,7 @@ For example:
 Here the \csopt{type} is set and \bibgls\ can detect that
 \isty{hyperref} has been loaded, so if the \longargfmt{group} switch
 is used, then the group hyperlinks can be set (using
-\csref{bibglshypergroup}). This means that the build process is
+\gls!{bibglshypergroup}). This means that the build process is
 just:
 \begin{verbatim}
 pdflatex myDoc
@@ -3094,11 +3135,11 @@ Provided by \isty{glossaries-accsupp}}
 \printfields{accessfield}%
 \par}
 \medskip
-Don't load \isty{glossaries-accsupp} directly (with \csfmt{usepackage}) when using
+Don't load \isty{glossaries-accsupp} directly (with \ics{usepackage}) when using
 \styfmt{glossaries-extra}. Load using the \styopt{accsupp} package
 option instead.
 \begin{codeenv}
-\cmd{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
+\cs{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
 \end{codeenv}
 \end{table}
 
@@ -3284,7 +3325,7 @@ which inserts additional material inside the link text but outside
 the formatting command.
 
 If the entry given by \meta{label} hasn't been defined,
-then \csref{glsxtrfmt} just does \meta{text} (followed by \meta{insert} for
+then \gls!{glsxtrfmt} just does \meta{text} (followed by \meta{insert} for
 the starred version) and a warning is issued. (There's no warning 
 if the entry is defined but the field hasn't been set.)
 The \meta{options} are as for \ics{glslink} but \ics{glslink} will
@@ -3466,7 +3507,7 @@ If the \field{sort} field is missing the default is obtained from the
 omitted it will be obtained from the parent's \field{name}. 
 
 Terms defined using \atentry{entry} will be written to the output
-(\ext{glstex}) file using the command \csref{bibglsnewentry}.
+(\ext{glstex}) file using the command \gls!{bibglsnewentry}.
 
 \entrysection{symbol}
 
@@ -3489,7 +3530,7 @@ given by the entry label (unless overridden by
 \atentry{entry} where the sort defaults to \field{name} if omitted.
 
 Terms that are defined using \atentry{symbol} will be written to
-the output file using the command \csref{bibglsnewsymbol}.
+the output file using the command \gls!{bibglsnewsymbol}.
 
 \entrysection{number}
 
@@ -3498,7 +3539,7 @@ numbers. The numbers don't have to be explicit digits and may have a
 symbolic representation. There's no real difference between the
 behaviour of \atentry{number} and \atentry{symbol} except that terms
 defined using \atentry{number} will be written to the output file
-using the command \csref{bibglsnewnumber}.
+using the command \gls!{bibglsnewnumber}.
 
 For example, the file \filefmt{constants.bib} might define
 mathematical constants like this:
@@ -3557,7 +3598,7 @@ Example:
 \end{codeenv}
 
 Terms that are defined using \atentry{index} will be written to the output
-file using the command \csref{bibglsnewindex}.
+file using the command \gls!{bibglsnewindex}.
 
 \entrysection{indexplural}
 
@@ -3603,7 +3644,7 @@ This is equivalent to:
 \end{codeenv}
 
 Terms that are defined using \atentry{indexplural} will be written to the output
-file using the command \csref{bibglsnewindexplural}.
+file using the command \gls!{bibglsnewindexplural}.
 
 \entrysection{abbreviation}
 
@@ -3706,13 +3747,13 @@ usually be applied by the abbreviation style to the \field{name}
 field (and \field{description}, if applicable).
 
 Terms defined using \atentry{abbreviation} will be written to the output
-file using the command \csref{bibglsnewabbreviation}.
+file using the command \gls!{bibglsnewabbreviation}.
 
 \entrysection{acronym}
 
 The \atentry{acronym} entry type is like \atentry{abbreviation} except that
 the term is written to the output file using the command
-\csref{bibglsnewacronym}.
+\gls!{bibglsnewacronym}.
 
 \entrysection{contributor}
 
@@ -3721,7 +3762,7 @@ by the \atentry{bibtexentry} type. You may use it explicitly
 if you want, but you need to take care that it doesn't clash with
 \atentry{bibtexentry}. It behaves much like \atentry{index} except that the
 term is written to the \ext{glstex} file using the command
-\csref{bibglsnewcontributor}. There are no required fields. As with
+\gls!{bibglsnewcontributor}. There are no required fields. As with
 \atentry{index}, if the \field{name} field is missing, the fallback
 value is the entry's label. When this entry type is automatically
 created by \atentry{bibtexentry}, the \field{name} is set to 
@@ -4142,7 +4183,7 @@ is like:
 where \idprefix{dual} is replaced by the value of the
 \csopt{dual-prefix} option. However, instead of defining the entries
 with \csfmt{bibglsnewentry} both the primary and dual entries are
-defined using \csref{bibglsnewdualentry}. The \field{category} 
+defined using \gls!{bibglsnewdualentry}. The \field{category} 
 and \field{type} fields can be set for the dual entry using the
 \csopt{dual-category} and \csopt{dual-type} options.
 
@@ -4195,11 +4236,11 @@ This is effectively like:
 }
 \end{codeenv}
 The primary entries are defined using
-\csref{bibglsnewdualindexentry},
+\gls!{bibglsnewdualindexentry},
 which by default sets the \field{category} to \optfmt{index}
 (although this may be overridden, for example, by the \csopt{category} option).
 The dual entries are defined with
-\csref{bibglsnewdualindexentrysecondary}.
+\gls!{bibglsnewdualindexentrysecondary}.
 
 This is the most convenient way of having an entry that's also
 automatically indexed. For example, suppose the file
@@ -4299,7 +4340,7 @@ is like:
 }
 \end{codeenv}
 The primary term is defined using
-\csref{bibglsnewdualindexabbreviation}, which encapsulates the
+\gls!{bibglsnewdualindexabbreviation}, which encapsulates the
 \field{name} to match the font used by
 the dual abbreviation. The encapsulation command depends
 on the \csopt{abbreviation-name-fallback} value. If it's
@@ -4310,7 +4351,7 @@ The primary definition also
 by default sets the \field{category} to \optfmt{index} (although
 this again may be overridden).
 The dual term is defined using
-\csref{bibglsnewdualindexabbreviationsecondary}.
+\gls!{bibglsnewdualindexabbreviationsecondary}.
 
 \entrysection{dualindexsymbol}
 
@@ -4327,10 +4368,10 @@ The required field is: \field{symbol}.
 If the \field{name} field is omitted, the dual entry is assigned a
 symbol from the original (unprefixed) label.
 The primary entries are defined using
-\csref{bibglsnewdualindexsymbol},
+\gls!{bibglsnewdualindexsymbol},
 which by default sets the \field{category} to \optfmt{index},
 and the dual entries are defined using
-\csref{bibglsnewdualindexsymbolsecondary},
+\gls!{bibglsnewdualindexsymbolsecondary},
 which by default sets the \field{category} to \optfmt{symbol}.
 For example:
 \begin{codeenv}
@@ -4438,7 +4479,7 @@ above manner. There's a similar command:
 \nosecformatdef{glsxtrnewgls}
 if no case-changing versions are required.
 
-I've also redefined \csref{bibglsnewdualindexsymbolsecondary} to put
+I've also redefined \gls!{bibglsnewdualindexsymbolsecondary} to put
 the dual entries created with \atentry{dualindexsymbol} into
 the \code{symbols} glossary (which is created with the
 \styopt{symbols} package option), so it overrides the
@@ -4473,10 +4514,10 @@ further details.
 
 The \atentry{dualindexnumber} entry type is almost identical to
 \atentry{dualindexsymbol}, but the primary entries are defined using
-\csref{bibglsnewdualindexnumber},
+\gls!{bibglsnewdualindexnumber},
 which by default sets the \field{category} to \optfmt{index},
 and the dual entries are defined using
-\csref{bibglsnewdualindexnumbersecondary},
+\gls!{bibglsnewdualindexnumbersecondary},
 which by default sets the \field{category} to \optfmt{number}.
 
 \entrysection{dualabbreviationentry}
@@ -4540,14 +4581,14 @@ will be sorted according its \field{name} (which has been copied
 from the primary \field{long}).
 
 Entries provided using \atentry{dualabbreviationentry} will be defined
-with
-\begin{alltt}
-\csref{bibglsnewdualabbreviationentry}
-\end{alltt}
-(which uses \gls{newabbreviation}) for the primary entries and with 
-\begin{alltt}
-\csref{bibglsnewdualabbreviationentrysecondary}
-\end{alltt}
+with:
+\begin{codeenv}
+\gls{bibglsnewdualabbreviationentry}
+\end{codeenv}
+(which uses \gls{newabbreviation}) for the primary entries and with :
+\begin{codeenv}
+\gls{bibglsnewdualabbreviationentrysecondary}
+\end{codeenv}
 (which uses \gls{longnewglossaryentry}) for the secondary entries.
 This means that if the \styopt{abbreviations}
 package option is used, the primary entry will be put in the
@@ -4581,13 +4622,13 @@ For example:
 }
 \end{codeenv}
 
-Entries are defined using \csref{bibglsnewdualsymbol}, which by 
+Entries are defined using \gls!{bibglsnewdualsymbol}, which by 
 default sets the \field{category} to \optfmt{symbol}.
 
 \entrysection{dualnumber}
 
 This is almost identical to \atentry{dualsymbol} but entries are
-defined using \csref{bibglsnewdualnumber}, which by default sets
+defined using \gls!{bibglsnewdualnumber}, which by default sets
 the \field{category} to \optfmt{number}.
 
 The above example could be defined as a number since $\pi$ is a
@@ -4662,7 +4703,7 @@ need to be sorted according to the \field{long} field instead,
 use \csopt[long]{abbreviation-sort-fallback}.
 
 Terms that are defined using \atentry{dualabbreviation} will be
-written to the output file using \csref{bibglsnewdualabbreviation}.
+written to the output file using \gls!{bibglsnewdualabbreviation}.
 
 If the \csopt{dual-abbrv-backlink} option is on, the default field
 used for the backlinks is the \field{dualshort} field, so you'll need
@@ -4867,7 +4908,7 @@ the \idx!{postdescriptionhook} is no longer required.
 \entrysection{dualacronym}
 
 As \atentry{dualabbreviation} but defines the entries with
-\csref{bibglsnewdualacronym}.
+\gls!{bibglsnewdualacronym}.
 
 \section{Tertiary Entry Types}
 \label{sec:tertiaryentry}
@@ -4929,7 +4970,7 @@ The last two are actually defined using one command:
   \marg{hypertext markup language}\comment{long}
   \marg{a markup language for creating web pages}\comment{description}
 \end{codeenv}
-The \csref{bibglsnewtertiaryindexabbreviationentrysecondary}
+The \gls!{bibglsnewtertiaryindexabbreviationentrysecondary}
 command is provided in the \iext{glstex} file as:
 \begin{codeenv}
 \cs{providecommand}\marg{\gls{bibglsnewtertiaryindexabbreviationentrysecondary}}[8]\marg{\comment{}
@@ -5739,7 +5780,7 @@ create the file given by \ics{jobname}\iext{glstex} on the first
 instance or \ics{jobname}\code{-}\meta{n}\ext{glstex} on subsequent
 use.
 
-With \code{\csref{glsxtrresourcefile}\oargm{options}\margm{filename}}, if 
+With \code{\gls!{glsxtrresourcefile}\oargm{options}\margm{filename}}, if 
 the \csopt{src} option is omitted, 
 the \ext{bib} file is assumed to be \meta{filename}\ext{bib}. For example:
 \begin{codeenv}
@@ -6313,7 +6354,7 @@ up one hierarchical level.
 Finally, the former parent \code{birds} entry has been removed (the default
 \csopt[only unrecorded parents]{flatten-lonely-rule} is in effect).
 
-The default definition of \csref{bibglsflattenedchildpostsort}
+The default definition of \gls!{bibglsflattenedchildpostsort}
 formats its arguments so that they are separated by a comma and
 space (\qt{birds, duck}). If the \field{text} field had been set
 in the original \atentry{index} definition of \text{duck}, it
@@ -6351,7 +6392,7 @@ modified to:
  \marg{subsubitem}\comment{original name}
 }
 \end{codeenv}
-The first argument of \csref{bibglsflattenedchildpostsort} is
+The first argument of \gls!{bibglsflattenedchildpostsort} is
 obtained from the \field{name} field of the entry's former parent
 (which is removed from the child's set of ancestors). This field
 value was changed in the previous step, and the change is
@@ -6832,7 +6873,7 @@ then by default all the master document's
 you can use \optfmt{master-resources} to specify
 only those files that should be included. The value \meta{list} is 
 a comma-separated list of names, where each name corresponds
-to the final argument of \csref{glsxtrresourcefile}.
+to the final argument of \gls!{glsxtrresourcefile}.
 Remember that \gls{GlsXtrLoadResources} is just a shortcut
 for \gls{glsxtrresourcefile} that bases the name on \ics{jobname}.
 (Note that, as with the argument of \gls{glsxtrresourcefile},
@@ -7446,7 +7487,7 @@ be set to \optfmt{animals}. Again the dual entry \code{dual.dog}
 doesn't have the \field{category} set.
 
 Note that the categories may be overridden by the commands that are used to
-actually define the entries (such as \csref{bibglsnewindex}).
+actually define the entries (such as \gls!{bibglsnewindex}).
 
 For example, if the document contains:
 \begin{codeenv}
@@ -8877,7 +8918,7 @@ syntax \glsopt[(]{format} and
 a text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be
-encapsulated by \csref{bibglsrange}. (This command is not used with
+encapsulated by \gls!{bibglsrange}. (This command is not used with
 ranges that are formed by collating consecutive locations.) The
 initial marker is stripped from the \meta{format} argument of the
 location formatting commands, such as \gls{glsnoidxdisplayloc}, to
@@ -9085,7 +9126,7 @@ usual \idx{locationlist};
 \end{itemize}
 
 The primary locations are copied to the \field{primarylocations}
-field and encapsulated with \csref{bibglsprimary}.
+field and encapsulated with \gls!{bibglsprimary}.
 If you use \csopt[remove]{save-primary-locations}, the
 \field{location} field will end up empty if the locations for the
 associated entry were all identified as primary. If you use
@@ -9347,7 +9388,7 @@ ranges in the index.
 By default, three or more consecutive locations \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
 the range \code{\meta{loc-1}\ics{delimR} \meta{loc-n}}. Otherwise
-the locations are separated by \csref{bibglsdelimN} or \csref{bibglslastDelimN}.
+the locations are separated by \gls!{bibglsdelimN} or \gls!{bibglslastDelimN}.
 As mentioned above, these aren't merged with explicit range formations.
 
 You can change this with the \csopt{min-loc-range} setting where
@@ -9522,7 +9563,7 @@ location set to 1 and the second location set to 2.
 In this example, the location has been written to the file as
 \code{\csfmt{@alph}\margm{number}} instead of fully expanding according to the
 normal behaviour of \code{\ics{alph}\margm{counter}}.  (Note that
-\csref{glsxtrresourcefile} changes the category code of \code{@} to allow for
+\gls!{glsxtrresourcefile} changes the category code of \code{@} to allow for
 internal commands in locations.) This unusual case is for illustrative purposes.
 \end{enumerate}
 
@@ -9560,7 +9601,7 @@ only explicitly index pertinent use or you can adjust
 the value of \optfmt{max-loc-diff} so that a range can be formed even
 if there are one or two gaps in it.
 By default, any location ranges that have skipped gaps in this
-manner will be followed by \csref{bibglspassim}. The default
+manner will be followed by \gls!{bibglspassim}. The default
 definition of this command is obtained from the resource file.
 For English, this is \verb*| passim| (space followed by \qt{passim}).
 
@@ -9609,7 +9650,7 @@ list (default).
 \end{itemize}
 
 The separator between the location list and the cross-reference is
-provided by \csref{bibglsseesep}. This separator is omitted if the
+provided by \gls!{bibglsseesep}. This separator is omitted if the
 location list is empty. The cross-reference is written to the
 \field{location} field using \code{\gls{bibglsusesee}\margm{label}}.
 
@@ -9619,14 +9660,14 @@ This is like \csopt{see} but governs the location of the cross-references
 provided by the \field{seealso} field. You need at least v1.16
 of \sty{glossaries-extra} for this option. The values are the
 same as for \csopt{see} but the separator is given by
-\csref{bibglsseealsosep}. The cross-reference is written to the
+\gls!{bibglsseealsosep}. The cross-reference is written to the
 \field{location} field using \code{\gls{bibglsuseseealso}\margm{label}}.
 
 \optsection{alias}
 
 This is like \csopt{alias} but governs the location of the cross-references
 provided by the \field{alias} field. The separator is given by
-\csref{bibglsaliassep}. The cross-reference is written to the
+\gls!{bibglsaliassep}. The cross-reference is written to the
 \field{location} field using \code{\gls{bibglsusealias}\margm{label}}.
 
 \optsection{alias-loc}
@@ -9648,7 +9689,7 @@ is left unchanged).
 Note that with \csopt[transfer]{alias-loc}, both the aliased
 entry and the target entry must be in the same resource set.
 (That is, both entries have been selected by the same instance of
-\csref{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version~1.12, 
+\gls!{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version~1.12, 
 you may need to redefine \ics{glsxtrsetaliasnoindex} to do
 nothing if the location lists aren't showing correctly
 with aliased entries. (This was corrected in version~1.13.)
@@ -9656,7 +9697,7 @@ with aliased entries. (This was corrected in version~1.13.)
 \optsection{loc-prefix}
 
 The \csopt{loc-prefix} setting indicates that the location lists
-should begin with \code{\csref{bibglslocprefix}\margm{n}}. The \meta{value} may
+should begin with \code{\gls!{bibglslocprefix}\margm{n}}. The \meta{value} may
 be one of the following:
 \begin{itemize}
 \item \optfmt{false}: don't insert \code{\gls{bibglslocprefix}\margm{n}} at the
@@ -9685,7 +9726,7 @@ followed by a space for non-empty locations.
 \item \optfmt{list}: equivalent to \csopt[\ics{pagelistname} ]{loc-prefix}.
 
 \item \optfmt{true}: equivalent to 
-\csopt[\csref{bibglspagename},\csref{bibglspagesname}]{loc-prefix},
+\csopt[\gls{bibglspagename},\gls{bibglspagesname}]{loc-prefix},
 where the definitions of \gls{bibglspagename} and
 \gls{bibglspagesname} are obtained from the \idx{tag.page} and
 \idx{tag.pages} entries in \bibgls's \langxml.
@@ -9699,14 +9740,14 @@ If \meta{value} is omitted, \optfmt{true} is assumed. Take care not
 to mix different values of \csopt{loc-prefix} for entries for the
 same \csopt{type} setting. It's okay to mix \csopt[false]{loc-prefix} with 
 another value, but don't mix non-\optfmt{false} values. 
-See the description of \csref{bibglslocprefix} for
+See the description of \gls!{bibglslocprefix} for
 further details.
 
 For example:
 \begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{type=main,src=\marg{entries1},loc-prefix=false}
-\gls{GlsXtrLoadResources}\oarg{type=main,src=\marg{entries2},loc-prefix}
-\gls{GlsXtrLoadResources}\oarg{type=symbols,src=\marg{entries3},loc-prefix=\marg{p.,pp.}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[entries1]{src},\csopt[false]{loc-prefix}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[entries2]{src},\csopt{loc-prefix}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},\csopt[entries3]{src},\csopt[p.,pp.]{loc-prefix}}
 \end{codeenv}
 This works since the conflicting \csopt[p.,pp.]{loc-prefix} and
 \csopt[true]{loc-prefix} are in different glossaries (assigned through the
@@ -9721,9 +9762,9 @@ file.)
 
 If the \csopt{type} option isn't used:
 \begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{src=\marg{entries1},loc-prefix=false}
-\gls{GlsXtrLoadResources}\oarg{src=\marg{entries2},loc-prefix}
-\gls{GlsXtrLoadResources}\oarg{src=\marg{entries3},loc-prefix=\marg{p.,pp.}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries1]{src},\csopt[false]{loc-prefix}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries2]{src},\csopt{loc-prefix}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries3]{src},\csopt[p.,pp.]{loc-prefix}}
 \end{codeenv}
 then \csopt[true]{loc-prefix} takes precedence over
 \csopt[p.,pp.]{loc-prefix} (since it was used first). The entries fetched from
@@ -9745,7 +9786,7 @@ cross-reference), and so on. The final \meta{suffix-n} in the list
 is the suffix when the location list has \meta{n} or more locations
 (optionally with a cross-reference).
 
-This option will append \csref{bibglslocsuffix}\margm{n} to location
+This option will append \code{\gls!{bibglslocsuffix}\margm{n}} to location
 lists that either have a cross-reference or have at least one location.
 Unlike \gls{bibglslocprefix}, this command isn't used when the
 location list is completely empty. Also, unlike
@@ -9765,44 +9806,44 @@ counter to use for the location for that specific instance
 (overriding the default counter for the entry's glossary type).
 This is done with the \glsopt{counter} option. For example,
 consider the following document:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,style=tree]{glossaries-extra}
-
-\GlsXtrLoadResources[
-  src={entries}% data in entries.bib
-]
-
-\begin{document}
-
-\gls{pi}.
-\begin{equation}
-\gls[counter=equation]{pi}
-\end{equation}
-\begin{equation}
-\gls[counter=equation]{pi}
-\end{equation}
-
-\newpage
-\begin{equation}
-\gls[counter=equation]{pi}
-\end{equation}
-
-\newpage
-\gls{pi}.
-
-\newpage
-\gls{pi}.
-
-\newpage
-\gls{pi}.
-
-\newpage
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt[tree]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src}\comment{data in entries.bib}
+}
+\strut
+\cmd{begin}\marg{document}
+\strut
+\cs{gls}\marg{pi}.
+\cmd{begin}\marg{equation}
+\cs{gls}\oarg{counter=\counter{equation}}\marg{pi}
+\cmd{end}\marg{equation}
+\cmd{begin}\marg{equation}
+\cs{gls}\oarg{counter=\counter{equation}}\marg{pi}
+\cmd{end}\marg{equation}
+\strut
+\cmd{newpage}
+\cmd{begin}\marg{equation}
+\cs{gls}\oarg{counter=\counter{equation}}\marg{pi}
+\cmd{end}\marg{equation}
+\strut
+\cmd{newpage}
+\cs{gls}\marg{pi}.
+\strut
+\cmd{newpage}
+\cs{gls}\marg{pi}.
+\strut
+\cmd{newpage}
+\cs{gls}\marg{pi}.
+\strut
+\cmd{newpage}
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 This results in the location list \qt{1, 1--3, 3--5}. This
 looks a little odd and it may seem as though the range formation
 hasn't worked, but the locations are actually: page~1, equation~1,
@@ -9815,17 +9856,17 @@ the comma-separated \meta{list}. If a location has a counter
 that's not listed in \meta{list}, then the location is discarded.
 
 For example:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  loc-counters={equation,page},% group locations by counter
-  src={entries}% data in entries.bib
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[\counter{equation},\counter{page}]{loc-counters},\comment{group locations by counter}
+  \csopt[entries]{src}\comment{data in entries.bib}
+}
+\end{codeenv}
 This will first list the locations for the \counter{equation}
 counter and then the locations for the \counter{page} counter.
 Each group of locations is encapsulated within the command
-\csref{bibglslocationgroup}\margm{n}\margm{counter}\margm{locations}.
-The groups are separated by \csref{bibglslocationgroupsep}.
+\gls!{bibglslocationgroup}\margm{n}\margm{counter}\margm{locations}.
+The groups are separated by \gls!{bibglslocationgroupsep}.
 
 The \meta{list} value must be non-empty.  Use
 \csopt[as-use]{loc-counters} to restore the default behaviour, where
@@ -9869,17 +9910,17 @@ The \styopt{indexcounter} package option also automatically
 implements the option \styopt[wrglossary]{counter}, which means that
 each instance of \code{\ics{gls}\margm{id}} writes the label
 information to the \iext{aux} file:
-\begin{alltt}
-\csfmt{newlabel}\marg{wrglossary.\meta{n}}\marg{\margm{n}\margm{page}\marg{}\marg{wrglossary.\meta{n}}\marg{}}
-\end{alltt}
+\begin{codeenv}
+\cmd{newlabel}\marg{wrglossary.\meta{n}}\marg{\margm{n}\margm{page}\marg{}\marg{wrglossary.\meta{n}}\marg{}}
+\end{codeenv}
 (where \meta{page} is the page number) followed by the record:
 \begin{codeenv}
-\gls{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{glsnumberformat}\margm{n}
+\gls{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{\encap{glsnumberformat}}\margm{n}
 \end{codeenv}
 The location here is actually the value of the \counter{wrglossary}
 counter not the page number, but \bibgls\ can pick up the
 corresponding \meta{page} from the \csfmt{newlabel} command. It then
-replaces the record's location \meta{n} with
+replaces the record's location \meta{n} with:
 \nosecdef{glsxtr@wrglossarylocation}
 (but it only does this for records that have the \counter{wrglossary}
 counter).
@@ -9911,19 +9952,19 @@ instance of a specific format of the \counter{wrglossary} locations
 for a given entry. This location is stored in the
 \field{indexcounter} internal field using:
 \begin{codeenv}
-\ics{GlsXtrSetField}\margm{id}\marg{indexcounter}\marg{\gls{glsxtr@wrglossarylocation}\margm{n}\margm{page}}
+\ics{GlsXtrSetField}\margm{id}\marg{\field{indexcounter}}\marg{\gls{glsxtr@wrglossarylocation}\margm{n}\margm{page}}
 \end{codeenv}
 Since \gls{glsxtr@wrglossarylocation} simply expands to its first
-argument, the corresponding label can be obtained with
-\begin{alltt}
+argument, the corresponding label can be obtained with:
+\begin{codeenv}
 wrglossary.\gls{glsxtr@wrglossarylocation}\margm{n}\margm{page}
-\end{alltt}
-For convenience, \sty{glossaries-extra-bib2gls} provides
+\end{codeenv}
+For convenience, \sty{glossaries-extra-bib2gls} provides:
 \nosecdef{GlsXtrIndexCounterLink}
-which will do
-\begin{alltt}
-\csfmt{hyperref}\oarg{wrglossary.\meta{value}}\margm{text}
-\end{alltt}
+which will do:
+\begin{codeenv*}
+\ics{cs.hyperref.int}\oarg{wrglossary.\meta{value}}\margm{text}
+\end{codeenv*}
 where \meta{value} is the value of the \field{indexcounter} field if
 it has been set. If the \field{indexcounter} field hasn't been set
 (or if \sty{hyperref} hasn't been loaded) then just \meta{text} is
@@ -9934,52 +9975,52 @@ the glossary so that it links back to the first \counter{wrglossary}
 entry or the first \glsopt[\meta{encap}]{format} \counter{wrglossary}
 entry. This encapsulation can be done by providing a new glossary
 style or more simply by redefining \ics{glsnamefont}:
-\begin{verbatim}
-\renewcommand{\glsnamefont}[1]{%
- \GlsXtrIndexCounterLink{#1}{\glscurrententrylabel}}
-\end{verbatim}
+\begin{codeenv}
+\cmd{renewcommand}\marg{\cs{glsnamefont}}[1]\marg{\comment{}
+ \gls{GlsXtrIndexCounterLink}\marg{\idx{param}1}\marg{\cs{glscurrententrylabel}}}
+\end{codeenv}
 Here's a complete example:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage{lipsum}% dummy filler text
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,indexcounter]{glossaries-extra}
-
-\newcommand{\primary}[1]{\hyperbf{#1}}
-
-\GlsXtrLoadResources[
- src={entries},% terms defined in entries.bib
- save-index-counter=primary
-]
-
-\renewcommand{\glsnamefont}[1]{%
- \GlsXtrIndexCounterLink{#1}{\glscurrententrylabel}}
-
-\begin{document}
-
-A \gls{sample}. \lipsum*[1] A \gls{duck}.
-
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\marg{lipsum}\comment{dummy filler text}
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt{indexcounter}}\marg{glossaries-extra}
+\strut
+\cmd{newcommand}\marg{\cmd{primary}}[1]\marg{\cs{hyperbf}\marg{\idx{param}1}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},\comment{terms defined in entries.bib}
+ \csopt[primary]{save-index-counter}
+}
+\strut
+\cmd{renewcommand}\marg{\cs{glsnamefont}}[1]\marg{\comment{}
+ \gls{GlsXtrIndexCounterLink}\marg{\idx{param}1}\marg{\cs{glscurrententrylabel}}}
+\strut
+\cmd{begin}\marg{document}
+\strut
+A \cs{gls}\marg{sample}. \cmd{lipsum}*[1] A \cs{gls}\marg{duck}.
+\strut
 An equation:
-\begin{equation}
-\gls[counter=equation]{pi}
-\end{equation}
-
-\lipsum[2]
-
-Another \gls[format=primary]{sample}. \lipsum*[3] Another
-\gls{duck}.
-
-\gls{pi}. \lipsum[4]
-
-A \gls{sample}. \lipsum*[5] A \gls{duck} and
-\gls[format=primary]{pi}.
-
-\lipsum*[6] A \gls[format=primary]{duck}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\cmd{begin}\marg{equation}
+\cs{gls}\oarg{counter=equation}\marg{pi}
+\cmd{end}\marg{equation}
+\strut
+\cmd{lipsum}[2]
+\strut
+Another \cs{gls}\oarg{format=primary}\marg{sample}. \cmd{lipsum}*[3] Another
+\cs{gls}\marg{duck}.
+\strut
+\cs{gls}\marg{pi}. \cmd{lipsum}[4]
+\strut
+A \cs{gls}\marg{sample}. \cmd{lipsum}*[5] A \cs{gls}\marg{duck} and
+\cs{gls}\oarg{format=primary}\marg{pi}.
+\strut
+\cmd{lipsum}*[6] A \cs{gls}\oarg{format=primary}\marg{duck}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 Note that the \glsopt[equation]{counter} entry will have its own
 independent location. In this example, it's difficult to tell the
 difference between 1 (the equation reference) and 1 (the page
@@ -10170,20 +10211,20 @@ destination within that file.)
 
 The special \code{nameref} locations (see
 \longarg{merge-nameref-on}) are still identified with
-\csref{glsxtrdisplaylocnameref} but the \meta{file} argument will now
+\gls!{glsxtrdisplaylocnameref} but the \meta{file} argument will now
 be set.
 
 As from \bibgls\ v1.7, any awkward characters if the file path are
-replaced with \csref{bibglshrefchar} or (for non-ASCII characters when
-\sty{fontspec} is loaded) \csref{bibglshrefunicode}. Both commands
+replaced with \gls!{bibglshrefchar} or (for non-ASCII characters when
+\sty{fontspec} is loaded) \gls!{bibglshrefunicode}. Both commands
 take two arguments: the hexadecimal character code and the actual
-character. In the case of \csref{bibglshrefchar}, the second
+character. In the case of \gls!{bibglshrefchar}, the second
 argument is ignored, and the first is preceded by a literal percent
 character, so \filefmt{file name.pdf} will be converted to:
 \begin{codeenv}
 file\gls{bibglshrefchar}\marg{20}\marg{ }name.pdf
 \end{codeenv}
-In the case of \csref{bibglshrefunicode}, the first argument is
+In the case of \gls!{bibglshrefunicode}, the first argument is
 ignored.
 
 
@@ -10210,8 +10251,8 @@ Whereas with at least version 1.36, the list will be
 
 If an entry has both a main location list and a supplementary
 location list (such as the \code{sample} entry above), the lists
-will be separated by \csref{bibglssupplementalsep}. The sub-lists
-(when supported) are separated by \csref{bibglssupplementalsubsep}.
+will be separated by \gls!{bibglssupplementalsep}. The sub-lists
+(when supported) are separated by \gls!{bibglssupplementalsubsep}.
 
 \optsection{supplemental-selection}
 
@@ -12841,7 +12882,7 @@ hook could contain:
 \end{verbatim}
 Note that this new field won't be available for use within the
 \iext{bib} file (unless it was previously defined in the document
-before \csref{glsxtrresourcefile}).
+before \gls!{glsxtrresourcefile}).
 
 \optsection[\subsubsection]{dual-date-time-field-format}
 
@@ -13576,7 +13617,7 @@ In this case \meta{dual-label} is the dual entry's label, which is used
 to fetch the category label in \gls{bibglsuseabbrvfont}. (The
 \field{category} field for the dual isn't used as a custom
 definition of
-\csref{bibglsnewdualindexabbreviationsecondary} may override the
+\gls!{bibglsnewdualindexabbreviationsecondary} may override the
 value known to \bibgls.)
 
 Note that (as shown above) with the default 
@@ -13724,7 +13765,7 @@ set to \ics{acronymtype} and the default \field{category} set to
 \formatdef{bibglsnewtertiaryindexabbreviationentry}
 This is used to define primary terms identified with the
 \atentry{tertiaryindexabbreviationentry} type. It's essentially
-the same as \csref{bibglsnewdualindexabbreviation}.
+the same as \gls!{bibglsnewdualindexabbreviation}.
 The definition provided in the \ext{glstex} file is:
 \begin{verbatim}
 \providecommand{\bibglsnewtertiaryindexabbreviationentry}[7]{%
@@ -13901,7 +13942,7 @@ consecutive locations.
 If an explicit range conflicts with a record, a warning will be
 issued and the conflicting record will be shifted to the front
 of the range inside the argument of \gls{bibglsinterloper}.
-The default definition just does \meta{location}\csref{bibglsdelimN}
+The default definition just does \meta{location}\gls!{bibglsdelimN}
 so that it fits neatly into the list.
 
 For example, suppose on page~4 of my document I start a range with
@@ -13934,7 +13975,7 @@ discard the conflicting entries.)
 \cssection{bibglspostlocprefix}
 
 \formatdef{bibglspostlocprefix}
-If the \csopt{loc-prefix} option is on, \csref{bibglslocprefix} will
+If the \csopt{loc-prefix} option is on, \gls!{bibglslocprefix} will
 be inserted at the start of location lists. The command \gls{bibglspostlocprefix}
 is placed after the prefix text. This command is provided with:
 \begin{verbatim}
@@ -14154,7 +14195,7 @@ is the list of supplementary locations in \meta{external document}.
 
 \formatdef{bibglssupplementalsep}
 The separator between the main location list and the supplementary
-location list. By default this is just \csref{bibglsdelimN}. This may be
+location list. By default this is just \gls!{bibglsdelimN}. This may be
 defined before the resources are loaded:
 \begin{verbatim}
 \newcommand{\bibglssupplementalsep}{; }
@@ -14178,7 +14219,7 @@ been created).
 
 \formatdef{bibglssupplementalsubsep}
 The separator between the supplementary
-location sub-lists. By default this is just \csref{bibglsdelimN}.
+location sub-lists. By default this is just \gls!{bibglsdelimN}.
 
 \cssection{bibglshrefchar}
 
@@ -14305,7 +14346,7 @@ The \field{group} field is then set using:
 \begin{alltt}
 group=\marg{\gls{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{type}}
 \end{alltt}
-This field needs to expand to a simple label, which \csref{bibglslettergroup}
+This field needs to expand to a simple label, which \gls!{bibglslettergroup}
 is designed to do.  Note that non-letter groups are dealt with
 separately (see below).
 
@@ -14367,7 +14408,7 @@ value.
 
 Note that \gls{bibglssetlettergrouptitle} only has a single
 argument, but that argument contains the four arguments needed by
-\csref{bibglslettergroup} and \csref{bibglslettergrouptitle}.
+\gls!{bibglslettergroup} and \gls!{bibglslettergrouptitle}.
 These arguments are as described above.
 
 If \gls{glsxtrsetgrouptitle} has been defined (\sty{glossaries-extra}
@@ -14498,8 +14539,8 @@ This is defined in an analogous manner:
 \providecommand{\bibglssetothergrouptitle}[1]{%
  \glsxtrsetgrouptitle{\bibglsothergroup#1}{\bibglsothergrouptitle#1}}
 \end{verbatim}
-where the group label is obtained using \csref{bibglsothergroup} and
-the group title is obtained from \csref{bibglsothergrouptitle}.
+where the group label is obtained using \gls!{bibglsothergroup} and
+the group title is obtained from \gls!{bibglsothergrouptitle}.
 Note that since non-alphabetic characters don't have upper or lower
 case versions, there are only three arguments. The other difference
 between this and the letter group version is that the \meta{id} is
@@ -16068,34 +16109,34 @@ that have a large version in display mode. As with
 \atentry{symbol}. This example file requires the \isty{stix} package
 as not all of the commands are provided by the \LaTeX\ kernel. 
 This file also has a preamble:
-\begin{verbatim}
-@preamble{"\providecommand{\bigoperatornamefmt}[1]{%
- $\displaystyle#1\textstyle#1$}
-\providecommand{\nary}[1]{$#1$-ary}"}
-\end{verbatim}
-The first command \ics{bigoperatornamefmt} is used in the
-\field{name} field to display both the in-line and display versions
-of the symbol. The \TeX\ parser library only has a limited ability
-to interpret this as not all the symbols have Unicode in-line and large
-versions. In some cases, such as the integral symbol $\int$ only has
-a small version. (A large version would require construction from
-\hex{2320}, \hex{23AE} and \hex{2321}, which is too complicated in
-this context.) However, the interpreter works well enough to guess
-at the widest name if \csopt{set-widest} is used. There's no
-advantage in sorting according to the \field{name} field here, as
-the Unicode symbols are scattered about different blocks. Better
-approaches are to sort according to document use (\csopt[use]{sort})
-or to sort according to the \field{description} field.
+\begin{codeenv}
+\atentry{preamble}\marg{"\cmd{providecommand}\marg{\cmd{bigoperatornamefmt}}[1]\marg{\comment{}
+ \idx{mshiftchar}\cmd{displaystyle}\idx{param}1\cmd{textstyle}\idx{param}1\idx{mshiftchar}}
+\cmd{providecommand}\marg{\cmd{nary}}[1]\marg{\idx{mshiftchar}\idx{param}1\idx{mshiftchar}-ary}"}
+\end{codeenv}
+The first command \inlinedef{bigoperatornamefmt}
+is used in the \field{name} field to display both the in-line and display
+versions of the symbol. The \TeX\ parser library only has a limited ability to
+interpret this as not all the symbols have Unicode in-line and large versions.
+In some cases, such as the integral symbol $\int$ only has a small version. (A
+large version would require construction from \hex{2320}, \hex{23AE} and
+\hex{2321}, which is too complicated in this context.) However, the interpreter
+works well enough to guess at the widest name if \csopt{set-widest} is used.
+There's no advantage in sorting according to the \field{name} field here, as
+the Unicode symbols are scattered about different blocks. Better approaches are
+to sort according to document use (\csopt[use]{sort}) or to sort according to
+the \field{description} field.
 
-The other custom command is \ics{nary} to provide semantic markup
-for \qt{$n$-ary}. This could be defined without an argument:
-\begin{verbatim}
-\providecommand{\nary}{$n$-ary}
-\end{verbatim}
-but providing an argument will allow \verb|\nary{n}| to work
-with first letter uppercasing in the event that the
+The other custom command is \inlinedef{nary} to provide semantic markup for
+\qt{$n$-ary}. This could be defined without an argument:
+\begin{codeenv}
+\cmd{providecommand}\marg{\cmd{nary}}\marg{\idx{mshiftchar}n\idx{mshiftchar}-ary}
+\end{codeenv}
+but providing an argument will allow \code{\csfmt{nary}\marg{n}} to work
+with first letter upper-casing in the event that the
 \field{description} field has a case-change applied (otherwise
-it would end up as \qt{$N$-ARY}).
+it would end up as \qt{$N$-ARY}). Of course, it may be that no case-change 
+should be applied, but this example is just for illustrative purposes.
 
 As with the other sample \ext{bib} files, each entry is given a
 custom \fieldfmt{identifier} field, which by default will be
@@ -16167,22 +16208,22 @@ which is used to format \meta{symbol} as a vector and
 \nosecdef{mtxfmt}
 which is used to format \meta{symbol} as a matrix.
 These commands are intended for use with \gls{glsxtrfmt},
-but \csref{setmembershipfmt} causes a problem as it has two
+but \gls!{setmembershipfmt} causes a problem as it has two
 arguments and \gls{glsxtrfmt} requires the control sequence to 
 have exactly one argument. This means employing a little trick.
 A command with just one argument is provided:
 \nosecdef{setmembershiponeargfmt}
 that requires the actual two arguments to be supplied inside
 \verb|#1|. The outer grouping is removed and the two-argument
-\csref{setmembershipfmt} command is applied:
+\gls!{setmembershipfmt} command is applied:
 \begin{verbatim}
 \providecommand{\setmembershiponeargfmt}[1]{\setmembershipfmt#1}
 \end{verbatim}
 This means that the entry needs to be referenced in the document
 using:
-\begin{alltt}
-\csref{glsxtrfmt}\marg{setmembership}\marg{\margm{variable(s)}\margm{condition}}
-\end{alltt}
+\begin{codeenv}
+\gls{glsxtrfmt}\marg{setmembership}\marg{\margm{variable(s)}\margm{condition}}
+\end{codeenv}
 The simplest thing to do here is to provide a wrapper command in the
 document, for example:
 \begin{verbatim}
@@ -16199,7 +16240,7 @@ and entries that represent specific objects. In the first case
 there's a custom \fieldfmt{format} field
 that's set to the control sequence name of the relevant semantic
 command. If this field is defined or aliased then it can be used
-with \csref{glsxtrfmt} (as in the example above).
+with \gls!{glsxtrfmt} (as in the example above).
 
 In both cases there's a custom \fieldfmt{identifier} field that
 reflects the type of object: \code{numberspace} for number spaces,
@@ -16207,12 +16248,12 @@ reflects the type of object: \code{numberspace} for number spaces,
 
 Be careful with the set cardinality example. Remember that nested
 links cause problems and the \sty{glossaries-extra} manual advises
-against using commands like \cs{gls} or \csref{glsxtrfmt} within
+against using commands like \cs{gls} or \gls!{glsxtrfmt} within
 link text and that includes within the \meta{text} argument of 
-\csref{glsxtrfmt}. See \exfile{sample-maths.tex} for suggested
+\gls!{glsxtrfmt}. See \exfile{sample-maths.tex} for suggested
 usage.
 
-Some of the \field{description} fields use \csref{sortart}, so
+Some of the \field{description} fields use \gls!{sortart}, so
 \exfile{no-interpret-preamble.bib} and
 \exfile{interpret-preamble.bib} are also needed.
 
@@ -18039,9 +18080,9 @@ This example uses \exfile{bigmathsymbols.bib} and \exfile{mathsobjects.bib}.
 It has a fairly similar preamble to \exfile{sample-msymbols.tex},
 but \exfile{no-interpret-preamble.bib} and
 \exfile{interpret-preamble.bib} are now needed to provide
-the \csref{sortart} command:
+the \gls!{sortart} command:
 \begin{codeenv}
-\gls!{GlsXtrLoadResources}\oarg{
+\gls{GlsXtrLoadResources}\oarg{
   \csopt[no-interpret-preamble]{src},
   \csopt[false]{interpret-preamble}
 }
@@ -18050,7 +18091,7 @@ There's also an extra custom field to alias:
 \begin{codeenv}
 \csopt[identifier=category,format=user1]{field-aliases}
 \end{codeenv}
-I've aliased \fieldfmt{format} to \field{user1} since \csref{glsxtrfmt}
+I've aliased \fieldfmt{format} to \field{user1} since \gls!{glsxtrfmt}
 defaults to that field. If I decided to use a different field I also
 need to remember to redefine \ics{GlsXtrFmtField} to match.
 
@@ -18060,14 +18101,14 @@ indexed, so I've omitted the \csopt{selection} option I used in the
 I still don't want any number lists so I still have
 \csopt[false]{save-locations}.
 
-I want \csref{glsxtrfmt} to index (which it doesn't by default) so
+I want \gls!{glsxtrfmt} to index (which it doesn't by default) so
 that means I need to redefine \ics{GlsXtrFmtDefaultOptions} 
 to prevent it from using \code{noindex}:
 \begin{verbatim}
 \renewcommand{\GlsXtrFmtDefaultOptions}{}
 \end{verbatim}
 I've provided some convenient wrapper commands that use
-\csref{glsxtrfmt*} or the non-linking \csref{glsxtrentryfmt} that
+\gls!{glsxtrfmt*} or the non-linking \gls!{glsxtrentryfmt} that
 are in the form:
 \begin{verbatim}
 \newcommand{\set}[2][]{\glsxtrfmt*[#1]{set}{#2}}
@@ -18205,7 +18246,7 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 This example uses \exfile{markuplanguages.bib}. Since the file
 includes abbreviations, any commands that must be used before
 abbreviations are defined need to go before
-\csref{GlsXtrLoadResources}. This includes the abbreviation style, 
+\gls!{GlsXtrLoadResources}. This includes the abbreviation style, 
 which I've set to \abbrstyle{long-short-desc}:
 \begin{verbatim}
 \setabbreviationstyle[markuplanguage]{long-short-desc}
@@ -19684,5 +19725,14 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}
 
+\renewcommand*{\glsxtrbookindexsubname}[1]{%
+  \glsifcategory{#1}{command}%
+  {%
+    \glsxtrifhasfield{useri}{#1}%
+    {\glossentrynameother{#1}{useri}}%
+    {\glossentryname{#1}}%
+  }%
+  {\glossentryname{#1}}%
+}
 \printunsrtglossary[type=index]
 \end{document}
