@@ -8855,7 +8855,7 @@ the option \csopt[false]{save-locations} is used). The
 The \field{loclist} field has the syntax of an \isty{etoolbox} internal list
 and includes every location (except for the discarded duplicates and
 \idxpl{ignoredrecord}) with no range formations. Any explicit range markup 
-is stripped from the format (encap) information, so you just get the
+is stripped from the format (\idx{encap}) information, so you just get the
 start and end locations added as individual elements. Each item in the 
 list is provided
 in the form:
@@ -8888,8 +8888,8 @@ or through \styfmt{glossaries-extra}'s \ics{glsxtrfielddolistloop}
 or \ics{glsxtrfieldforlistloop} shortcuts).
 
 The \meta{format} is that supplied by the \glsopt{format} key
-when using commands like \ics{gls} or \ics{glsadd} (the encapsulator or encap in
-\idx!{makeindex} parlance). If omitted, the default
+when using commands like \ics{gls} or \ics{glsadd} (the encapsulator or 
+\idx{encap} in \idx!{makeindex} parlance). If omitted, the default
 \glsopt[glsnumberformat]{format} is assumed (unless this
 default value is changed with \ics{GlsXtrSetDefaultNumberFormat}.
 The value of the \glsopt{format} key must be the name of 
@@ -8911,7 +8911,7 @@ The \csfmt{hyper}\meta{xx} set of commands all internally use
 location. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
 user manual for a list of all the \csfmt{hyper}\meta{xx} commands.
 
-Ranges can be explicitly formed using the parenthetical encap
+Ranges can be explicitly formed using the parenthetical 
 syntax \glsopt[(]{format} and
 \glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
 \glsopt[)\meta{csname}]{format} (where \meta{csname} is again the name of 
@@ -9115,7 +9115,7 @@ This option may take one of the following values:
 \idx{locationlist};
 \item \optfmt{default format}: similar to \optfmt{retain} but the
 format for the primary records in the \field{location} field is
-converted to the default \encap{glsnumberformat} encap (the records in the
+converted to the default \encap{glsnumberformat} \idx{encap} (the records in the
 \field{primarylocations} field retain their given format);
 \item \optfmt{start}: save primary locations in the
 \field{primarylocations} field and also move to the start of the
@@ -10054,51 +10054,52 @@ document. (The simplest way to achieve this is to ensure that both
 documents use the same \ext{bib} files and the same prefixes.)
 
 For example, suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@entry{sample,
-  name={sample},
-  description="an example entry"
+\begin{codeenv}
+\atentry{entry}\marg{sample,
+  \field{name}=\marg{sample},
+  \field{description}="an example entry"
 }
-
-@abbreviation{html,
-  short="html",
-  long={hypertext markup language}
+\strut
+\atentry{abbreviation}\marg{html,
+  \field{short}="html",
+  \field{long}=\marg{hypertext markup language}
 }
-@abbreviation{ssi,
-  short="ssi",
-  long="server-side includes"
+\strut
+\atentry{abbreviation}\marg{ssi,
+  \field{short}="ssi",
+  \field{long}="server-side includes"
 }
-
-@index{goose,plural="geese"}
-\end{verbatim}
+\strut
+\atentry{index}\marg{goose,\field{plural}="geese"}
+\end{codeenv}
 Now suppose the supplementary document is contained in the file
 \filefmt{suppl.tex}:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,counter=section]{glossaries-extra}
-
-\GlsXtrLoadResources[src=entries]
-
-\renewcommand{\thesection}{S\arabic{section}}
-\renewcommand{\theHsection}{\thepart.\thesection}
-
-\begin{document}
-\part{Sample Part}
-\section{Sample Section}
-\gls{goose}. \gls{sample}.
-
-\part{Another Part}
-\section{Another Section}
-\gls{html}.
-\gls{ssi}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt[section]{counter}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\strut
+\cmd{renewcommand}\marg{\cmd{thesection}}\marg{S\cmd{arabic}\marg{section}}
+\cmd{renewcommand}\marg{\cmd{theHsection}}\marg{\cmd{thepart}.\cmd{thesection}}
+\strut
+\cmd{begin}\marg{document}
+\cmd{part}\marg{Sample Part}
+\cmd{section}\marg{Sample Section}
+\cs{gls}\marg{goose}. \cs{gls}\marg{sample}.
+\strut
+\cmd{part}\marg{Another Part}
+\cmd{section}\marg{Another Section}
+\cs{gls}\marg{html}.
+\cs{gls}\marg{ssi}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 This uses the \counter{section} counter for the locations and has a
-prefix (\verb|\thepart.|) for the section hyperlinks.
+prefix (\code{\csfmt{thepart}.})\ for the section hyperlinks.
 
 Now let's suppose I have another document called \filefmt{main.tex}
 that uses the \code{sample} entry, but also needs to include the
@@ -10106,7 +10107,7 @@ location (S1) from the supplementary document. The manual approached
 offered by \styfmt{glossaries-extra} is quite cumbersome and requires
 setting the \catattr{externallocation} attribute and using
 \ics{glsadd} with \glsaddopt[S1]{thevalue}, \glsaddopt[I.S1]{theHvalue}
-and \glsaddopt[glsxtrsupphypernumber]{format}.
+and \glsaddopt[\encap{glsxtrsupphypernumber}]{format}.
 
 This can be simplified with \bibgls\ by using the
 \optfmt{supplemental-locations} option, described below. 
@@ -10124,7 +10125,7 @@ location encapsulator as appropriate.
 If \bibgls\ detects an older version of \sty{glossaries-extra},
 it will only allow one external supplemental source, and
 will set the \catattr{externallocation} attribute and use
-the \optfmt{glsxtrsupphypernumber} format. Otherwise \bibgls\
+the \encap{glsxtrsupphypernumber} format. Otherwise \bibgls\
 will allow multiple sources and use the newer method.
 
 \optsection{supplemental-locations}
@@ -10138,23 +10139,22 @@ detected, \bibgls\ will issue a warning and only accept the first
 element of the list.
 
 For example:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[
- supplemental-locations=suppl,% fetch records from suppl.aux
- src=entries]
-
-\begin{document}
-\Gls{sample} document.
-
-\printunsrtglossaries
-
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[suppl]{supplemental-locations},\comment{fetch records from suppl.aux}
+ \csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{Gls}\marg{sample} document.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 The location list for \code{sample} will now be \qt{1, S1} (page~1
 from the main document and S1 from the supplementary document).
 
@@ -10170,26 +10170,26 @@ this case. The actual formatting is done via
 \nosecdef{glsxtrmultisupplocation}
 which ignores the \meta{format} argument by default. Its
 definition is simply:
-\begin{verbatim}
-\newcommand*{\glsxtrmultisupplocation}[3]{%
- {% scope required to localise changes
-   \def\glsxtrsupplocationurl{#2}%
-   \glshypernumber{#1}%
- }%
+\begin{codeenv}
+\cmd{newcommand}*\marg{\gls{glsxtrmultisupplocation}}[3]\marg{\comment{}
+ \marg{\comment{scope required to localise changes}
+   \cmd{def}\cs{glsxtrsupplocationurl}\marg{\idx{param}2}\comment{}
+   \cs{glshypernumber}\marg{\idx{param}1}\comment{}
+ }\comment{}
 }
-\end{verbatim}
-which locally sets the command checked by \ics{glshypernumber}
-to establish an external rather than internal link. You can
-redefine this command to retain the original formatting
-command used in the target document:
-\begin{verbatim}
-\renewcommand*{\glsxtrmultisupplocation}[3]{%
- {% scope required to localise changes
-   \def\glsxtrsupplocationurl{#2}%
-   \csuse{#3}{#1}%
- }%
+\end{codeenv}
+This locally sets the command \ics{glsxtrsupplocationurl}, which is checked 
+by \ics{glshypernumber} to establish an external rather than internal link. 
+You can redefine the supplemental location command to retain the original 
+\idx{encap} used in the target document:
+\begin{codeenv}
+\cmd{renewcommand}*\marg{\gls{glsxtrmultisupplocation}}[3]\marg{\comment{}
+ \marg{\comment{scope required to localise changes}
+   \cmd{def}\cs{glsxtrsupplocationurl}\marg{\idx{param}2}\comment{}
+   \ics{csuse}\marg{\idx{param}3}\marg{\idx{param}1}\comment{}
+ }\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 but remember that if a hyperlink is required, the identified
 control sequence name must correspond to a command that
 uses \cs{glshyperlink} (such as \cs{hyperbf}), otherwise you
@@ -10197,17 +10197,17 @@ will lose the hyperlink.
 
 With older versions of \sty{glossaries-extra},
 the original location format from the supplementary document
-will be replaced by \optfmt{glsxtrsupphypernumber}, which 
+will be replaced by \encap{glsxtrsupphypernumber}, which 
 again produces an external hyperlink. The \catattr{externallocation}
 attribute also needs to be set (this can be done automatically with
 \csopt{supplemental-category}) to identify the external document.
 The original format can't be accessed.
 
-In both cases, if the document hasn't loaded the \isty{hyperref}
-package, the location will simply be displayed without a hyperlink.
-(Note that not all PDF viewers can handle external hyperlinks, and
-some that can open the external PDF file may not recognise the
-destination within that file.)
+In both cases, if the document hasn't loaded the \isty{hyperref} package, the
+location will simply be displayed without a hyperlink.  Even if both the main
+and the supplementary documents have loaded \sty{hyperref}, note that not all
+PDF viewers can handle external hyperlinks, and some that can open the external
+PDF file may not recognise the destination within that file.
 
 The special \code{nameref} locations (see
 \longarg{merge-nameref-on}) are still identified with

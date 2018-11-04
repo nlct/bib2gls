@@ -42,6 +42,12 @@
   category={common}
 }
 
+@abbreviation{encap,
+  short = {encap},
+  long = {encapsulating command},
+  category = {common}
+}
+
 @dualindexentry{bibglsnewentry,
   name={\csfmt{bib\-gls\-new\-entry}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
@@ -1134,6 +1140,7 @@ starred version \csref{glsxtrfmt*}},
   seealso={resourceoptions,GlsXtrLoadResources},
   category={command}
 }
+
 
 @index{resourceoptions,
   name={resource options},
@@ -2554,6 +2561,40 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{glsxtrsupplocationurl,
+  name={\csfmt{gls\-xtr\-supp\-loc\-a\-tion\-url}},
+  description={set by \cs{glsxtrsupphypernumber}
+  and \csref{glsxtrmultisupplocation} to the
+   URL of the supplemental document for use by
+    \cs{glshypernumber}},
+  note={\styfmt{glossaries-extra} v1.14+},
+  seealso={glshypernumber,glsxtrsupphypernumber,glsxtrmultisupplocation,glsxtrlocationhyperlink},
+  category={command}
+}
+
+@index{glsxtrlocationhyperlink,
+  name={\csfmt{gls\-xtr\-loc\-a\-tion\-hyper\-link}},
+  user1={\margm{counter}\margm{prefix}\margm{location}},
+  description={used to create the location hyperlink,
+   this tests if an internal or external link is required
+   depending on the definition of \cs{glsxtrsupplocationurl}},
+  note={\styfmt{glossaries-extra} v1.14+},
+  seealso={glsxtrsupphypernumber,glsxtrsupplocationurl},
+  category={command}
+}
+
+@index{glsxtrsupphypernumber,
+  name={\csfmt{gls\-xtr\-supp\-hyper\-num\-ber}},
+  user1={\margm{location}},
+  description={uses \cs{glshypernumber} to create a hyperlink
+   to the given location (if hyperlinks are supported) but
+   first checks the \catattr{externallocation} attribute to determine
+   if an external link is required},
+  note={\styfmt{glossaries-extra} v1.14+},
+  seealso={glsxtrlocationhyperlink,glsxtrsupplocationurl},
+  category={command}
+}
+
 @dualindexentry{glsxtr@record,
   name={\csfmt{glsxtr@record}},
   user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}},
@@ -3505,6 +3546,16 @@ cs}\margm{Glspl-like cs}},
   description={defines the control sequence whose name
    is given by \meta{cs-name}, without checking if the command
    already exists},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
+@index{csuse,
+  name={\csfmt{csuse}},
+  user1={\margm{cs-name}},
+  description={uses the control sequence whose name
+   is given by \meta{cs-name} or does nothing if the command
+   isn't defined},
   note={\styfmt{etoolbox}},
   category={command}
 }
