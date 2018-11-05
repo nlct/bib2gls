@@ -1085,45 +1085,65 @@ public class Bib2Gls implements TeXApp
         "glsentrysymbolplural", "symbolplural", this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryname", "name", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryname", "name", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentrytext", "text", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentrytext", "text", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryshort", "short", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryshort", "short", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentrylong", "long", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentrylong", "long", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryfirst", "first", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryfirst", "first", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentrysymbol", "symbol", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentrysymbol", "symbol", GlsUseField.CASE_SENTENCE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuseri", "user1", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryuseri", "user1", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuserii", "user2", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryuserii", "user2", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuseriii", "user3", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryuseriii", "user3", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuseriv", "user4", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryuseriv", "user4", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuserv", "user5", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryuserv", "user5", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuservi", "user6", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryuservi", "user6", GlsUseField.CASE_SENTENCE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryplural", "plural", GlsEntryFieldValue.CASE_SENTENCE, this));
+        "Glsentryplural", "plural", GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentryfirstplural", "firstplural", 
-         GlsEntryFieldValue.CASE_SENTENCE, this));
+         GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentryshortpl", "shortplural", 
-         GlsEntryFieldValue.CASE_SENTENCE, this));
+         GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentrylongpl", "longplural", 
-         GlsEntryFieldValue.CASE_SENTENCE, this));
+         GlsUseField.CASE_SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentrysymbolplural", "symbolplural", 
-         GlsEntryFieldValue.CASE_SENTENCE, this));
+         GlsUseField.CASE_SENTENCE, this));
+
+      listener.putControlSequence(new GlsUseField(this));
+      listener.putControlSequence(new GlsUseField(
+        "Glsxtrusefield", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsUseField(
+        "GLSxtrusefield", GlsUseField.CASE_TO_UPPER, this));
+      listener.putControlSequence(new GlsUseField(
+        "glsentrytitlecase", GlsUseField.CASE_TITLE_CASE, this));
+
+      listener.putControlSequence(new GenericCommand(
+        "glsxtrhiernamesep", null, listener.createString(", ")));
+      listener.putControlSequence(new GlsHierName(this));
+      listener.putControlSequence(new GlsHierName("Glsxtrhiername",
+        GlsUseField.CASE_SENTENCE, true, this));
+      listener.putControlSequence(new GlsHierName("GlsXtrhiername",
+        GlsUseField.CASE_SENTENCE, false, this));
+      listener.putControlSequence(new GlsHierName("GLSxtrhiername",
+        GlsUseField.CASE_TO_UPPER, true, this));
+      listener.putControlSequence(new GlsHierName("GLSXTRhiername",
+        GlsUseField.CASE_TO_UPPER, false, this));
 
       listener.putControlSequence(listener.createSymbol("bibglshashchar", '#'));
       listener.putControlSequence(listener.createSymbol("bibglsunderscorechar", '_'));
@@ -4849,8 +4869,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.7.20181102";
-   public static final String DATE = "2018-11-02";
+   public static final String VERSION = "1.7.20181105";
+   public static final String DATE = "2018-11-05";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

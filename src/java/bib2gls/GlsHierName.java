@@ -23,29 +23,63 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 
-public class GlsEntryFieldValue extends GlsUseField
+public class GlsHierName extends GlsUseField
 {
-   public GlsEntryFieldValue(String name, String fieldLabel, Bib2Gls bib2gls)
+   public GlsHierName(Bib2Gls bib2gls)
    {
-      this(name, fieldLabel, CASE_NO_CHANGE, bib2gls);
+      this("glsxtrhiername", CASE_NO_CHANGE, false, bib2gls);
    }
 
-   public GlsEntryFieldValue(String name, String fieldLabel,
-     int caseChange, Bib2Gls bib2gls)
+   public GlsHierName(String name, Bib2Gls bib2gls)
+   {
+      this(name, CASE_NO_CHANGE, false, bib2gls);
+   }
+
+   public GlsHierName(String name, int caseChange, boolean topLevelChange, 
+      Bib2Gls bib2gls)
    {
       super(name, caseChange, bib2gls);
-      this.fieldLabel = fieldLabel;
+      this.topLevelChange = topLevelChange;
    }
 
    public Object clone()
    {
-      return new GlsEntryFieldValue(getName(), fieldLabel, getCaseChange(), 
-         bib2gls);
+      return new GlsHierName(getName(), getCaseChange(), topLevelChange, 
+        bib2gls);
    }
 
-   public String getFieldLabel()
+   protected void process(TeXParser parser, TeXObjectList stack,
+     String entryLabel)
+      throws IOException
    {
-      return fieldLabel;
+      Bib2GlsEntry entry = bib2gls.getCurrentResource().getEntry(entryLabel);
+
+      if (entry == null) return;
+
+      String parentLabel = entry.getParent();
+
+      if (parentLabel != null)
+      {
+         process(parser, stack, parentLabel);
+
+         ControlSequence cs = parser.getListener().getControlSequence(
+          "glsxtrhiernamesep");
+
+         cs.process(parser);
+      }
+
+      int change = CASE_NO_CHANGE;
+
+      if (parentLabel == null || !topLevelChange)
+      {
+         change = getCaseChange();
+      }
+
+      BibValueList val = entry.getField("short");
+
+      String fieldLabel = (val == null ? "name" : "short");
+
+      process(parser, stack, entry, fieldLabel, change);
    }
 
    public void process(TeXParser parser)
@@ -65,7 +99,7 @@ public class GlsEntryFieldValue extends GlsUseField
 
       String entryLabel = arg.toString();
 
-      process(parser, parser, entryLabel, fieldLabel);
+      process(parser, parser, entryLabel);
    }
 
    public void process(TeXParser parser, TeXObjectList stack)
@@ -85,8 +119,8 @@ public class GlsEntryFieldValue extends GlsUseField
 
       String entryLabel = arg.toString();
 
-      process(parser, stack, entryLabel, fieldLabel);
+      process(parser, stack, entryLabel);
    }
 
-   private String fieldLabel;
+   private boolean topLevelChange;
 }
