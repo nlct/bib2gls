@@ -44,8 +44,7 @@
 
 @abbreviation{encap,
   short = {encap},
-  long = {encapsulating command},
-  category = {common}
+  long = {encapsulating command}
 }
 
 @dualindexentry{bibglsnewentry,
@@ -6654,6 +6653,73 @@ primary formats, if enabled.},
   category={command}
 }
 
+@index{glsxtrhiername,
+  name={\csfmt{gls\-xtr\-hier\-name}},
+  user1={\margm{label}},
+  description={Displays the hierarchical name for the entry
+   identified by \meta{label} with each level separated by
+   \cs{glsxtrhiernamesep}},
+  note={\styfmt{glossaries-extra} v1.37+},
+  seealso={glsxtrhiernamesep},
+  category={command}
+}
+
+@index{glsxtrhiernamesep,
+  name={\csfmt{gls\-xtr\-hier\-name\-sep}},
+  description={Separator between hierarchical levels displayed with
+   \cs{glsxtrhiername} (and case-changing variants)},
+  note={\styfmt{glossaries-extra} v1.37+},
+  seealso={glsxtrhiername},
+  category={command}
+}
+
+@index{Glsxtrhiername,
+  name={\csfmt{Gls\-xtr\-hier\-name}},
+  user1={\margm{label}},
+  description={Displays the hierarchical name for the entry
+   identified by \meta{label} with each level separated by
+   \cs{glsxtrhiernamesep} where the top-most name has the
+   first letter converted to \idx{uppercase}},
+  note={\styfmt{glossaries-extra} v1.37+},
+  seealso={glsxtrhiername,glsxtrhiernamesep},
+  category={command}
+}
+
+@index{GlsXtrhiername,
+  name={\csfmt{Gls\-Xtr\-hier\-name}},
+  user1={\margm{label}},
+  description={Displays the hierarchical name for the entry
+   identified by \meta{label} with each level separated by
+   \cs{glsxtrhiernamesep} where each name has the
+   first letter converted to \idx{uppercase}},
+  note={\styfmt{glossaries-extra} v1.37+},
+  seealso={glsxtrhiername,glsxtrhiernamesep},
+  category={command}
+}
+
+@index{GLSxtrhiername,
+  name={\csfmt{GLS\-xtr\-hier\-name}},
+  user1={\margm{label}},
+  description={Displays the hierarchical name for the entry
+   identified by \meta{label} with each level separated by
+   \cs{glsxtrhiernamesep} where the top-most name is converted to \idx{uppercase}},
+  note={\styfmt{glossaries-extra} v1.37+},
+  seealso={glsxtrhiername,glsxtrhiernamesep},
+  category={command}
+}
+
+@index{GLSXTRhiername,
+  name={\csfmt{GLS\-XTR\-hier\-name}},
+  user1={\margm{label}},
+  description={Displays the hierarchical name for the entry
+   identified by \meta{label} with each level separated by
+   \cs{glsxtrhiernamesep} where each name is converted 
+   to \idx{uppercase}},
+  note={\styfmt{glossaries-extra} v1.37+},
+  seealso={glsxtrhiername,glsxtrhiernamesep},
+  category={command}
+}
+
 @index{glsextrapostnamehook,
   name={\csfmt{gls\-extra\-post\-name\-hook}},
   user1={\margm{label}},
@@ -6675,8 +6741,8 @@ post-name hook},
 @index{Glsentrytext,
   name={\csfmt{Gls\-entry\-text}},
   user1={\margm{label}},
-  description={like \cs{glsentrytext} but converts the first letter
-to upper case},
+  description={displays the value of the \field{text} field with 
+  the first letter converted to \idx{uppercase}},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -6686,6 +6752,54 @@ to upper case},
   user1={\margm{label}},
   description={expands to the value of the
     \field{plural} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryplural,
+  name={\csfmt{Gls\-entry\-plural}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{plural} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryfirst,
+  name={\csfmt{gls\-entry\-first}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{first} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryfirst,
+  name={\csfmt{Gls\-entry\-first}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{first} field with the first letter converted to
+    \idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryfirstplural,
+  name={\csfmt{gls\-entry\-first\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{firstplural} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryfirstplural,
+  name={\csfmt{Gls\-entry\-first\-plural}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{firstplural} field with the first letter converted to
+    \idx{uppercase}},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -6721,7 +6835,7 @@ to upper case},
 @index{Glsentrydesc,
   name={\csfmt{Gls\-entry\-desc}},
   user1={\margm{label}},
-  description={expands to the value of the
+  description={displays the value of the
     \field{description} field with the first letter converted to
     upper case},
   note={\styfmt{glossaries}},
@@ -6733,6 +6847,111 @@ to upper case},
   user1={\margm{label}},
   description={expands to the value of the
     \field{symbol} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentrysymbol,
+  name={\csfmt{Gls\-entry\-symbol}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{symbol} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentrysymbolplural,
+  name={\csfmt{gls\-entry\-symbol\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{symbolplural} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentrysymbolplural,
+  name={\csfmt{Gls\-entry\-symbol\-plural}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{symbolplural} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentrylong,
+  name={\csfmt{gls\-entry\-long}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{long} field 
+  without any formatting or indexing},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentrylongpl,
+  name={\csfmt{gls\-entry\-long\-pl}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{longplural} field 
+  without any formatting or indexing},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentrylong,
+  name={\csfmt{Gls\-entry\-long}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{long} field without any formatting or indexing but 
+    with the first letter converted to \idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentrylongpl,
+  name={\csfmt{Gls\-entry\-long\-pl}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{longplural} field without any formatting or indexing but 
+    with the first letter converted to \idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryshort,
+  name={\csfmt{gls\-entry\-short}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{short} field without any formatting or indexing},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryshortpl,
+  name={\csfmt{gls\-entry\-short\-pl}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{shortplural} field without any formatting or indexing},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryshort,
+  name={\csfmt{Gls\-entry\-short}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{short} field without any formatting or indexing but 
+    with the first letter converted to \idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryshortpl,
+  name={\csfmt{Gls\-entry\-short\-pl}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{shortplural} field without any formatting or indexing 
+    but with the first letter converted to \idx{uppercase}},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -6787,6 +7006,66 @@ to upper case},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user6} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryuseri,
+  name={\csfmt{Gls\-entry\-useri}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{user1} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryuserii,
+  name={\csfmt{Gls\-entry\-userii}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{user2} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryuseriii,
+  name={\csfmt{Gls\-entry\-useriii}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{user3} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryuseriv,
+  name={\csfmt{Gls\-entry\-useriv}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{user4} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryuserv,
+  name={\csfmt{Gls\-entry\-userv}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{user5} field with the first letter converted to
+\idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glsentryuservi,
+  name={\csfmt{Gls\-entry\-uservi}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{user6} field with the first letter converted to
+\idx{uppercase}},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9222,15 +9501,6 @@ symbol, description and location},
   category={command}
 }
 
-@index{glsentrylong,
-  name={\csfmt{gls\-entry\-long}},
-  user1={\margm{label}},
-  description={displays the long form without any formatting or
-indexing},
-  note={\styfmt{glossaries}},
-  category={command}
-}
-
 @index{glossentryname,
   name={\csfmt{gloss\-entry\-name}},
   user1={\margm{label}},
@@ -10132,6 +10402,15 @@ to use in the header (leave empty for default)},
   name={\csfmt{gls\-reset\-entry\-counter}},
   description={resets the \counter{glossaryentry} counter if the
 \styopt{entrycounter} setting is on},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{setentrycounter,
+  name={\csfmt{set\-entry\-counter}},
+  user1={\oargm{prefix}\margm{counter}},
+  description={sets up the entry's associated counter and prefix
+   required by \cs{glshypernumber}},
   note={\styfmt{glossaries}},
   category={command}
 }

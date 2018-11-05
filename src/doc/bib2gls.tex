@@ -782,6 +782,35 @@ and \bibgls: An Introductory Guide} (\filefmt{bib2gls-begin.pdf})}}
   \tabcontents
 }
 
+\makeatletter
+\newcommand*{\tablelistcs}[2]{%
+ \tmpctr=0\relax
+ \def\tabcontents{}%
+ \loop
+   \advance\tmpctr by 1\relax
+   \appto\tabcontents{l}%
+ \ifnum\tmpctr<#1
+ \repeat
+%
+ \edef\tabcontents{\noexpand\begin{tabular}{@{}\tabcontents @{}}}%
+ \def\thislist{#2}%
+ \dtlsortlist{\thislist}{\dtlicompare}%
+ \tmpctr=1\relax
+ \@for\thislabel:=\thislist\do{%
+  \eappto\tabcontents{\noexpand\ics{\thislabel}}%
+  \ifnum\tmpctr<#1\relax
+   \appto\tabcontents{&}%
+   \advance\tmpctr by 1\relax
+  \else
+   \appto\tabcontents{\\}%
+   \tmpctr=1\relax
+  \fi
+ }%
+ \appto\tabcontents{\end{tabular}}%
+ \tabcontents
+}
+\makeatother
+
 % This is a bit fiddly. Need to represent \vec{v} in typewriter
 % font for the interpreter examples. ($\mathtt{\vec{v}}$ doesn't
 % work)
@@ -1720,6 +1749,31 @@ won't check if the command is undefined. If the command isn't
 defined, it will simply behave like \cs{newcommand}. Whereas
 with \ics{providecommand} the parser will only define the command
 if it's unrecognised.
+
+The interpreter has its own internal implementation of the
+glossary-related commands listed in \tableref{tab:bibglsdefs}. These
+may be overridden by custom packages provided with the
+\longarg{custom-packages} switch.
+
+\begin{table}[htbp]
+\caption{Glossary-Related Commands Implemented by the \bibgls\ Interpreter}
+\label{tab:bibglsdefs}
+\setlength{\tabcolsep}{4pt}%
+\centering
+\tablelistcs{3}{glsxtrprovidecommand,bibglsuppercase,bibglslowercase,bibglsfirstuc,%
+bibglstitlecase,GlsXtrEnableInitialTagging,bibglscontributorlist,%
+bibglshyperlink,glshyperlink,bibglscontributor,bibglsdatetime,%
+bibglsdate,bibglstime,glsentryname,glsentrytext,glsentryshort,%
+glsentrylong,glsentryfirst,glsentrysymbol,glsentryuseri,%
+glsentryuserii,glsentryuseriii,glsentryuseriv,glsentryuserv,%
+glsentryuservi,glsentryplural,glsentryfirstplural,glsentryshortpl,%
+glsentrylongpl,glsentrysymbolplural,Glsentryname,Glsentrytext,%
+Glsentryshort,Glsentrylong,Glsentryfirst,Glsentrysymbol,%
+Glsentryuseri,Glsentryuserii,Glsentryuseriii,Glsentryuseriv,%
+Glsentryuserv,Glsentryuservi,Glsentryplural,Glsentryfirstplural,Glsentryshortpl,%
+Glsentrylongpl,Glsentrysymbolplural,bibglshashchar,bibglsunderscorechar,%
+bibglsdollarchar,bibglsampersandchar,bibglscircumchar,glsbackslash,glstildechar}
+\end{table}
 
 If a command isn't recognised, you can provide it in the
 \atentry{preamble} and use \ics{char} to map a symbol to the most
@@ -8855,10 +8909,10 @@ the option \csopt[false]{save-locations} is used). The
 The \field{loclist} field has the syntax of an \isty{etoolbox} internal list
 and includes every location (except for the discarded duplicates and
 \idxpl{ignoredrecord}) with no range formations. Any explicit range markup 
-is stripped from the format (\idx{encap}) information, so you just get the
-start and end locations added as individual elements. Each item in the 
-list is provided
-in the form:
+is stripped from the \glsopt{format} information to leave just the \idx{encap}
+name, so you just get the start and end locations added as individual 
+elements but they are still encapsulated with the associated formatting
+command. Each item in the list is provided in one of the following forms:
 \begin{codeenv}
 \ics{glsseeformat}\oargm{tag}\margm{label list}\marg{}
 \end{codeenv}
@@ -10214,17 +10268,17 @@ The special \code{nameref} locations (see
 \gls!{glsxtrdisplaylocnameref} but the \meta{file} argument will now
 be set.
 
-As from \bibgls\ v1.7, any awkward characters if the file path are
-replaced with \gls!{bibglshrefchar} or (for non-ASCII characters when
-\sty{fontspec} is loaded) \gls!{bibglshrefunicode}. Both commands
+As from \bibgls\ v1.7, any awkward characters in the file path are
+replaced with \gls{bibglshrefchar} or (for \idx{non-ASCII} characters when
+\sty{fontspec} is loaded) \gls{bibglshrefunicode}. Both commands
 take two arguments: the hexadecimal character code and the actual
-character. In the case of \gls!{bibglshrefchar}, the second
+character. In the case of \gls{bibglshrefchar}, the second
 argument is ignored, and the first is preceded by a literal percent
 character, so \filefmt{file name.pdf} will be converted to:
 \begin{codeenv}
 file\gls{bibglshrefchar}\marg{20}\marg{ }name.pdf
 \end{codeenv}
-In the case of \gls!{bibglshrefunicode}, the first argument is
+In the case of \gls{bibglshrefunicode}, the first argument is
 ignored.
 
 
@@ -10235,24 +10289,25 @@ this command will encapsulate the sub-lists with
 
 So the above example with an old version of \sty{glossaries-extra}
 (pre 1.36) will set the supplemental location list (which only consists
-of one location) to
-\begin{verbatim}
-\bibglssupplemental{1}{\setentrycounter[I]{section}\glsxtrsupphypernumber{S1}}
-\end{verbatim}
+of one location) to:
+\begin{codeenv}
+\gls{bibglssupplemental}
+\marg{1}\marg{\ics{setentrycounter}\oarg{I}\marg{\counter{section}}\cs{glsxtrsupphypernumber}\marg{S1}}
+\end{codeenv}
 and the external target must be supplied through the
 \catattr{externallocation} attribute, which can be set 
 with the \csopt{supplemental-category} option.
 
-Whereas with at least version 1.36, the list will be
-\begin{verbatim}
-\bibglssupplemental{1}{\bibglssupplementalsublist{1}{suppl.pdf}
-{\glsxtrdisplaysupploc{I}{section}{glsnumberformat}{suppl.pdf}{S1}}}
-\end{verbatim}
+Whereas with at least version 1.36, the list will be:
+\begin{codeenv}
+\gls{bibglssupplemental}\marg{1}\marg{\gls{bibglssupplementalsublist}\marg{1}\marg{suppl.pdf}
+\marg{\gls{glsxtrdisplaysupploc}\marg{I}\marg{\counter{section}}\marg{\encap{glsnumberformat}}\marg{suppl.pdf}\marg{S1}}}
+\end{codeenv}
 
 If an entry has both a main location list and a supplementary
 location list (such as the \code{sample} entry above), the lists
 will be separated by \gls!{bibglssupplementalsep}. The sub-lists
-(when supported) are separated by \gls!{bibglssupplementalsubsep}.
+(when supported) are separated by \gls{bibglssupplementalsubsep}.
 
 \optsection{supplemental-selection}
 
@@ -10284,24 +10339,23 @@ by the current resource set (through the \ext{bib} files listed in
 account when including supplementary locations.
 
 For example:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[
- supplemental-locations=suppl,
- supplemental-selection={html,ssi},
- src=entries]
-
-\begin{document}
-\Gls{sample} document.
-
-\printunsrtglossaries
-
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[suppl]{supplemental-locations},
+ \csopt[html,ssi]{supplemental-selection},
+ \csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{Gls}\marg{sample} document.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 This will additionally add the \code{html} and \code{ssi} entries
 even though they haven't been used in this document. The
 \code{goose} entry used in the supplementary document won't be
@@ -10314,25 +10368,24 @@ lists may be set using this option. If unset,
 \meta{value} defaults to the same as that given by the
 \csopt{category} option. The \meta{value} may either be a known
 identifier (as per \csopt{category}) or the category label. For example:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[
- supplemental-locations=suppl,
- supplemental-selection={html,ssi},
- supplemental-category={supplemental},
- src=entries]
-
-\begin{document}
-\Gls{sample} document.
-
-\printunsrtglossaries
-
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[suppl]{supplemental-locations},
+ \csopt[html,ssi]{supplemental-selection},
+ \csopt[supplemental]{supplemental-category},
+ \csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{Gls}\marg{sample} document.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 
 \section{Sorting}
 \label{sec:sortingopts}
@@ -10348,31 +10401,18 @@ the proof or solution. Therefore, somewhat unusually for
 an indexing application, \bibgls\ also provides the option
 to shuffle the entries instead of sorting them.
 
-\optsection{sort}
-
-The \csopt{sort} key indicates how entries should be sorted.
-If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
-\csopt{sort} option isn't used then \csopt[locale]{sort} is assumed.
-The reverse sort methods reverse the algorithm used by the
-comparators. This means that 
-\optfmt{\meta{method}\dhyphen reverse}
-may not produce a list that's the exact reverse of the
-underlying non-reversed \meta{method}. The reverse sorts maintain
-hierarchy, so sub-entries will still be listed after the parent
-entry.
-
 Remember that you can have \atentry{preamble} definitions that
 can be hidden from \bibgls's interpreter. For example,
 \exfile{no-interpret-preamble.bib} might contain:
-\begin{verbatim}
-@preamble{"\providecommand{\sortop}[2]{#1 #2}"}
-\end{verbatim}
-which is loaded using
-\begin{verbatim}
-\GlsXtrLoadResources[src={no-interpret-preamble},
- interpret-preamble=false]
-\end{verbatim}
-This provides a custom command 
+\begin{codeenv}
+\atentry{preamble}\marg{"\cmd{providecommand}\marg{\gls{sortop}}[2]\marg{\idx{param}1 \idx{param}2}"}
+\end{codeenv}
+which is loaded using:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[no-interpret-preamble]{src},
+ \csopt[false]{interpret-preamble}}
+\end{codeenv}
+This provides a custom command:
 \nosecdef{sortop}
 for internal use in the document. (Remember it won't be defined on
 the first \LaTeX\ run before the \iext{glstex} file has been
@@ -10380,28 +10420,57 @@ created and so is only used within entry fields.)
 
 Another file, say, \filefmt{interpret-preamble.bib} may provide
 a definition for \bibgls:
-\begin{verbatim}
-@preamble{"\providecommand{\sortop}[2]{#2, #1}"}
-\end{verbatim}
-which can be identified with:
-\begin{verbatim}
-\GlsXtrLoadResources[src={interpret-preamble}]
-\end{verbatim}
-This definition swaps the two arguments around for the sorting, but
-doesn't affect the document since \LaTeX\ has already defined
-\csfmt{sortop} from the first resource set.
+\begin{codeenv}
+\atentry{preamble}\marg{"\cmd{providecommand}\marg{\gls{sortop}}[2]\marg{\idx{param}2, \idx{param}1}"}
+\end{codeenv}
+which can be processed with:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[interpret-preamble]{src}}
+\end{codeenv}
+to provide \bibgls\ with this definition.
 
-For example:
-\begin{verbatim}
-@entry{caesar,
-  name={\sortop{Gaius Julius}{Caesar}},
-  first={Julius Caesar},
-  text={Caesar},
-  description={Roman politician and general}
+The \filefmt{entries.bib} could contain:
+\begin{codeenv}
+\atentry{entry}\marg{caesar,
+  \field{name}=\marg{\gls{sortop}\marg{Gaius Julius}\marg{Caesar}},
+  \field{first}=\marg{Julius Caesar},
+  \field{text}=\marg{Caesar},
+  \field{description}=\marg{Roman politician and general}
 }
-\end{verbatim}
-If \bibgls\ only recognises the second definition of \csfmt{sortop} then
-the sort value becomes \code{Caesar, Gaius Julius}.
+\end{codeenv}
+and then be processed with:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\end{codeenv}
+
+The definition provided in \filefmt{interpret-preamble.bib}, which
+swaps the two arguments around, is now picked up by \bibgls, so the
+sort value becomes \code{Caesar, Gaius Julius}, but this new
+definition doesn't affect the document since \LaTeX\ has already
+defined \gls{sortop} from the first resource set, so the name will
+appear as \qt{Gaius Julius Caesar} in the glossary. If you have
+\cs{renewcommand} rather than \cs{providecommand}, you can prevent
+the redefinition occurring in the document with \csopt[false]{write-preamble}.
+
+Alternatively both of these \ext{bib} files can be loaded in one
+\idx{resourceset}:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[interpret-preamble,entries]{src}}
+\end{codeenv}
+
+\optsection{sort}
+
+The \csopt{sort} key indicates how entries should be sorted.
+If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
+\csopt{sort} option isn't used then \csopt[doc]{sort} is assumed if the 
+document has a language that's been detected by \sty{tracklang}, 
+otherwise \csopt[locale]{sort} is assumed.
+The reverse sort methods reverse the algorithm used by the
+comparators. However \optfmt{\meta{method}\dhyphen reverse}
+may not produce a list that's the exact reverse of the
+underlying non-reversed \meta{method}. The reverse sorts maintain
+hierarchy, so sub-entries will still be listed after the parent
+entry.
 
 \begin{table}[p]
 \caption{Summary of Available Sort Options: No Actual Sorting}
@@ -10558,37 +10627,6 @@ punctuation and may ignore modifiers (such as accents).  Use with
 \csopt{break-at} to determine whether or not to split at word
 boundaries.
 
-Note that \csopt[locale]{sort} can provide more detail about the
-locale than \csopt[doc]{sort}, depending on how the document
-language has been specified.  For example, with:
-\begin{verbatim}
-\documentclass{article}
-\usepackage[ngerman]{babel}
-\usepackage[record]{glossaries}
-\GlsXtrLoadResources[src={german-terms}]
-\end{verbatim}
-the language tag will be \code{de-1996}, which doesn't have an
-associated region. Whereas with
-\begin{verbatim}
-\documentclass[de-DE-1996]{article}
-\usepackage[ngerman]{babel}
-\usepackage[record]{glossaries}
-\GlsXtrLoadResources[src={german-terms}]
-\end{verbatim}
-the language tag will be \code{de-DE-1996} because \isty{tracklang}
-has picked up the locale from the document class options. This is
-only likely to cause a difference if a language has different
-sorting rules according to the region or if the language may be
-written in multiple scripts.
-
-A multilingual document will need to have the \csopt{sort} specified
-when loading the resource to ensure the correct language is chosen. 
-For example:
-\begin{verbatim}
-\GlsXtrLoadResources[src={english-terms},sort={en-GB}]
-\GlsXtrLoadResources[src={german-terms},sort={de-DE-1996}]
-\end{verbatim}
-
 \begin{itemize}
 \item \meta{lang tag}: sort according to the rules of the locale
 given by the \idx{IETF} language tag \meta{lang tag}.
@@ -10622,6 +10660,50 @@ rule provided by \csopt{sort-rule}.
 \item \optfmt{custom-reverse}: reverse sort the entries according to the 
 rule provided by \csopt{sort-rule}.
 \end{itemize}
+
+Note that \csopt[\meta{locale}]{sort} can provide more detail about the
+given locale than \csopt[doc]{sort}, depending on how the document
+language has been specified.  For example, with:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\oarg{ngerman}\marg{babel}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries}
+\gls{GlsXtrLoadResources}\oarg{\csopt[german-terms]{src}}
+\end{codeenv}
+the language tag will be \code{de-1996}, which doesn't have an
+associated region, so this is equivalent to using \csopt[de-1996]{sort}. 
+Whereas with:
+\begin{codeenv}
+\cmd{documentclass}\oarg{de-DE-1996}\marg{article}
+\cmd{usepackage}\oarg{ngerman}\marg{babel}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries}
+\gls{GlsXtrLoadResources}\oarg{\csopt[german-terms]{src}}
+\end{codeenv}
+the language tag will be \code{de-DE-1996} because \isty{tracklang}
+has picked up the locale from the document class options, so this is 
+equivalent to using \csopt[de-DE-1996]{sort}. This is
+only likely to cause a difference if a language has different
+sorting rules according to the region or if the language may be
+written in multiple scripts.
+
+If no language package is loaded then the default is \csopt[locale]{sort}
+rather than \csopt[doc]{sort}. For example, with:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries}
+\gls{GlsXtrLoadResources}\oarg{\csopt[german-terms]{src}}
+\end{codeenv}
+the language tag will be whatever is the default locale for the \idx{JVM}.
+For a user in Germany, this could be \code{de-DE-1996} and for a user
+in Austria this could be \code{de-AT-1996}.
+
+A multilingual document will need to have the \csopt{sort} specified
+when loading the \idx{resourceset} to ensure the correct language is chosen. 
+For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[english-terms]{src},\csopt[en-GB]{sort}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[german-terms]{src},\csopt[de-DE-1996]{sort}}
+\end{codeenv}
 
 \subsubsection{Letter Case (Unicode Order)}
 
