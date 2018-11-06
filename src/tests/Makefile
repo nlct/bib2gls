@@ -29,7 +29,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-indexplural.pdf test-include.pdf \
 	  test-primary-records.pdf test-primary-records-counter.pdf \
 	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf \
-	  test-dual2.pdf test-mfirstuc.pdf
+	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
+	  test-sort-labels.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -547,6 +548,20 @@ test-mfirstuc.pdf	: test-mfirstuc.glstex
 test-mfirstuc.glstex	: test-mfirstuc.tex test-mfirstuc.bib $(DEPS)
 		pdflatex test-mfirstuc
 		$(BIB2GLS) --mfirstuc-protection 'long,short,name' --packages mfirstuc-english test-mfirstuc
+
+test-translations.pdf	: test-translations.glstex
+		pdflatex test-translations
+
+test-translations.glstex	: test-translations.tex entries-en.bib entries-pt.bib $(DEPS)
+		pdflatex test-translations
+		$(BIB2GLS) test-translations
+
+test-sort-labels.pdf	: test-sort-labels.glstex
+		pdflatex test-sort-labels
+
+test-sort-labels.glstex	: test-sort-labels.tex test-sort-labels.bib $(DEPS)
+		pdflatex test-sort-labels
+		$(BIB2GLS) test-sort-labels
 
 clean	:
 	$(RM) *.aux

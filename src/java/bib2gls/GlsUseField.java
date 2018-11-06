@@ -68,9 +68,50 @@ public class GlsUseField extends ControlSequence
       String entryLabel, String fieldLabel)
       throws IOException
    {
-      Bib2GlsEntry entry = bib2gls.getCurrentResource().getEntry(entryLabel);
+      // Try the current resource set first
 
-      if (entry == null) return;
+      GlsResource currentResource = bib2gls.getCurrentResource();
+
+      Bib2GlsEntry entry = currentResource.getEntry(entryLabel);
+
+      if (entry == null)
+      {
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.debug(String.format("\\%s -> %s", getName(),
+              bib2gls.getMessage("warning.unknown_entry_in_current_resource", 
+                   entryLabel, currentResource)));
+         }
+
+         // Try other resource sets, if there are any
+
+         for (GlsResource resource : bib2gls.getResources())
+         {
+            if (resource != currentResource)
+            {
+               entry = resource.getEntry(entryLabel);
+
+               if (entry != null)
+               {
+                  if (bib2gls.getDebugLevel() > 0)
+                  {
+                     bib2gls.debug(String.format("\\%s -> %s", getName(),
+                       bib2gls.getMessage("message.found_entry_in_resource", 
+                            entryLabel, resource)));
+                  }
+
+                  break;
+               }
+            }
+         }
+
+         if (entry == null)
+         {
+            bib2gls.warning(String.format("\\%s -> %s", getName(),
+              bib2gls.getMessage("warning.unknown_entry", entryLabel)));
+            return;
+         }
+      }
 
       process(parser, stack, entry, fieldLabel, caseChange);
    }
@@ -86,7 +127,13 @@ public class GlsUseField extends ControlSequence
          val = entry.getFallbackContents(fieldLabel);
       }
 
-      if (val == null) return;
+      if (val == null)
+      {
+         bib2gls.warning(String.format("\\%s{%s} -> %s", getName(),
+           entry.getId(),
+           bib2gls.getMessage("message.field.not.set", fieldLabel)));
+         return;
+      }
 
       TeXObjectList obj = ((BibValueList)val.clone()).expand(parser);
 
@@ -124,7 +171,7 @@ public class GlsUseField extends ControlSequence
          }
       }
 
-      String entryLabel = arg.toString();
+      String entryLabel = arg.toString(parser);
 
       arg = parser.popNextArg();
 
@@ -138,7 +185,7 @@ public class GlsUseField extends ControlSequence
          }
       }
 
-      String fieldLabel = arg.toString();
+      String fieldLabel = arg.toString(parser);
 
       process(parser, parser, entryLabel, fieldLabel);
    }
@@ -158,7 +205,7 @@ public class GlsUseField extends ControlSequence
          }
       }
 
-      String entryLabel = arg.toString();
+      String entryLabel = arg.toString(parser);
 
       arg = stack.popArg(parser);
 
@@ -172,7 +219,7 @@ public class GlsUseField extends ControlSequence
          }
       }
 
-      String fieldLabel = arg.toString();
+      String fieldLabel = arg.toString(parser);
 
       process(parser, stack, entryLabel, fieldLabel);
    }

@@ -187,6 +187,7 @@ See the manual for further details.</entry>
 <entry key="message.sort.numeric.locale">Numeric sort locale: {0}</entry>
 <entry key="message.sort.numeric.format">Numeric sort format: {0}</entry>
 <entry key="message.no.sort.required">No sorting required.</entry>
+<entry key="message.sort.labels">Label list sort method ''{0}'' on {1,choice,1#field|1&lt;fields}: {2}</entry>
 <entry key="message.label.prefix">Label prefix: {0}</entry>
 <entry key="message.dual.label.prefix">Dual label prefix: {0}</entry>
 <entry key="message.tertiary.label.prefix">Tertiary label prefix: {0}</entry>
@@ -277,6 +278,7 @@ Defaulting to: {0}.
 <entry key="message.list.known.packages.extra">Support available for: </entry>
 <entry key="message.list.known.packages.info">Support may be quite limited in some cases.</entry>
 <entry key="message.created.missing.parent">Created missing parent ''{0}'' for entry ''{1}''</entry>
+<entry key="message.found_entry_in_resource">Found entry ''{0}'' in resource set: {1}</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -369,6 +371,8 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.invalid.locale">Unrecognised locale: {0}. Using {1} instead.</entry>
 <entry key="warning.interpreter.needed.fallback">Interpreter needed to obtain fallback contents for field {0} (entry {1})</entry>
 <entry key="warning.multi_supp_unsupported">Multiple supplemental locations not supported with glossaries-extra {1}. Restricting selection to just {0}. Update to at least glossaries-extra version {2} to support multiple supplementary sources.</entry>
+<entry key="warning.unknown_entry">Unknown entry: {0}</entry>
+<entry key="warning.unknown_entry_in_current_resource">Unknown entry ''{0}'' in current resource set: {1}</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>

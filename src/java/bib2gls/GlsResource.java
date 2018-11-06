@@ -603,6 +603,32 @@ public class GlsResource
                  e);
             }
          }
+         else if (opt.equals("sort-label-list"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+            if (array == null || array.length == 0)
+            {
+               sortLabelList = null;
+            }
+            else
+            {
+               sortLabelList = new LabelListSortMethod[array.length];
+
+               for (int j = 0; j < array.length; j++)
+               {
+                  if (!(array[j] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", opt, 
+                       array[j].toString(parser)));
+                  }
+
+                  sortLabelList[j] = getLabelListSortMethod(parser, 
+                    (TeXObjectList)array[j], opt); 
+               }
+            }
+         }
          else if (opt.equals("ext-prefixes"))
          {
             externalPrefixes = getStringArray(parser, list, opt);
@@ -3891,6 +3917,70 @@ public class GlsResource
       throw new IllegalArgumentException("Invalid break at setting: "+val);
    }
 
+   private LabelListSortMethod getLabelListSortMethod(TeXParser parser, 
+     TeXObjectList list, String opt)
+   throws IOException
+   {
+      Vector<TeXObject> split = splitList(parser, ':', list);
+
+      int n = split.size();
+
+      if (n != 3)
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.opt.value", opt, 
+              list.toString(parser)));
+      }
+
+      TeXObject fieldListArg = split.get(0);
+      String[] fields;
+
+      if (fieldListArg instanceof TeXObjectList)
+      {
+         if (fieldListArg instanceof Group)
+         {
+            fieldListArg = ((Group)fieldListArg).toList();
+         }
+
+         CsvList csvList = CsvList.getList(parser, fieldListArg);
+
+         fields = new String[csvList.size()];
+
+         for (int i = 0; i < fields.length; i++)
+         {
+            fields[i] = csvList.getValue(i).toString(parser).trim();
+
+            if (!bib2gls.isKnownField(fields[i]))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.field", fields[i], opt));
+            }
+         }
+      }
+      else
+      {
+         fields = new String[1];
+         fields[0] = fieldListArg.toString(parser).trim();
+
+         if (!bib2gls.isKnownField(fields[0]))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.field", fields[0], opt));
+         }
+      }
+
+      String method = split.get(1).toString(parser).trim();
+      String csname = split.get(2).toString(parser).trim();
+
+      if (!SortSettings.isValidSortMethod(method))
+      {
+         throw new IllegalArgumentException(
+           bib2gls.getMessage("error.invalid.sort.value", method, opt));
+      }
+
+      return new LabelListSortMethod(fields, method, csname);
+   }
+
    public static TeXObjectList trimList(TeXObjectList list)
    {
       // strip redundant white space and grouping
@@ -5321,6 +5411,21 @@ public class GlsResource
       else
       {
          bib2gls.verboseMessage("message.no.sort.required");
+      }
+
+      if (sortLabelList != null)
+      {
+         for (LabelListSortMethod method : sortLabelList)
+         {
+            try
+            {
+               method.sort(entries, settings);
+            }
+            catch (IOException e)
+            {
+               throw new Bib2GlsException(e.getMessage(), e);
+            }
+         }
       }
    }
 
@@ -9779,6 +9884,170 @@ public class GlsResource
       return savePrimaryLocations;
    }
 
+   class LabelListSortMethod
+   {
+      public LabelListSortMethod(String[] fields, String sortMethod, 
+        String csname)
+      {
+         this.fields = fields;
+         this.method = sortMethod;
+         this.csname = csname;
+      }
+
+      public void sort(Vector<Bib2GlsEntry> entries, SortSettings baseSettings)
+       throws Bib2GlsException,IOException
+      {
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            if (fields.length == 1)
+            {
+               bib2gls.verboseMessage("message.sort.labels", method,
+                 fields.length, fields[0]);
+            }
+            else
+            {
+               StringBuilder builder = new StringBuilder(fields[0]);
+
+               for (int i = 1; i < fields.length; i++)
+               {
+                  builder.append(", ");
+                  builder.append(fields[i]);
+               }
+
+               bib2gls.verboseMessage("message.sort.labels", method,
+                 fields.length, builder);
+            }
+         }
+
+         SortSettings settings = baseSettings.copy(method, "name");
+
+         TeXParser bibParser = bibParserListener.getParser();
+
+         for (Bib2GlsEntry entry : entries)
+         {
+            if (hasField(entry))
+            {
+               for (String field : fields)
+               {
+                  BibValueList val = entry.getField(field);
+
+                  if (val != null)
+                  {
+                     TeXObjectList labelList = val.expand(bibParser);
+                     CsvList csvList = CsvList.getList(bibParser, labelList);
+
+                     if (csvList.size() > 1)
+                     {
+                        sort(bibParser, entry, csvList, settings, field);
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+// TODO
+      private void orderByUse(Bib2GlsEntry entry, 
+        CsvList csvList, SortSettings settings, String field)
+      {
+      }
+
+      private void sort(TeXParser bibParser, Bib2GlsEntry entry, 
+        CsvList csvList, SortSettings settings, String field)
+        throws IOException,Bib2GlsException
+      {
+         TeXParserListener listener = bibParser.getListener();
+
+         Vector<Bib2GlsEntry> list = new Vector<Bib2GlsEntry>();
+         TeXObject opt = null;
+
+         for (int i = 0, n = csvList.size(); i < n; i++)
+         {
+            TeXObject element = (TeXObject)csvList.getValue(i).clone();
+
+            if (i == 0 && element instanceof TeXObjectList
+                 && ((TeXObjectList)element).size() > 2)
+            {
+               TeXObjectList elemList = (TeXObjectList)element;
+
+               opt = elemList.popArg(bibParser, '[', ']');
+            }
+
+            TeXObjectList elementList = listener.createGroup();
+            elementList.add(new TeXCsRef(csname));
+            Group group = listener.createGroup();
+            elementList.add(group);
+
+            group.add(element);
+
+            BibValueList bibValList = new BibValueList();
+            bibValList.add(new BibUserString(elementList));
+
+            Bib2GlsEntry copy = entry.getMinimalCopy();
+            copy.setId(element.toString(bibParser));
+            copy.putField("name", bibValList);
+            copy.putField("name", elementList.toString(bibParser));
+
+            list.add(copy);
+         }
+
+         sortData(list, settings, "group", null);
+
+         StringBuilder builder = new StringBuilder();
+         TeXObjectList elementList = listener.createGroup();
+
+         if (opt != null)
+         {
+            elementList.add(listener.getOther('['));
+            elementList.add(opt);
+            elementList.add(listener.getOther(']'));
+
+            builder.append('[');
+            builder.append(opt.toString(bibParser));
+            builder.append(']');
+         }
+
+         for (int i = 0, n = list.size(); i < n; i++)
+         {
+            if (i > 0)
+            {
+               elementList.add(listener.getOther(','));
+               builder.append(',');
+            }
+
+            Bib2GlsEntry index = list.get(i);
+
+            String id = index.getId();
+
+            elementList.add(listener.createString(id));
+            builder.append(id);
+         }
+
+         BibValueList val = new BibValueList();
+         val.add(new BibUserString(elementList));
+
+         entry.putField(field, val);
+         entry.putField(field, builder.toString());
+      }
+
+      private boolean hasField(Bib2GlsEntry entry)
+      {
+         for (String field : fields)
+         {
+            if (entry.getField(field) != null)
+            {
+               return true;
+            }
+         }
+
+         return false;
+      }
+
+      private String[] fields;
+      private String method;
+      private String csname;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -9826,6 +10095,8 @@ public class GlsResource
    private String[] labelifyFields=null;
    private String[] labelifyListFields=null;
    private Vector<PatternReplace> labelifyReplaceMap;
+
+   private LabelListSortMethod[] sortLabelList = null;
 
    private String type=null, category=null, counter=null;
 

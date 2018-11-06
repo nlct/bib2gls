@@ -63,7 +63,7 @@ public class GlsEntryFieldValue extends GlsUseField
          }
       }
 
-      String entryLabel = arg.toString();
+      String entryLabel = arg.toString(parser);
 
       process(parser, parser, entryLabel, fieldLabel);
    }
@@ -83,7 +83,7 @@ public class GlsEntryFieldValue extends GlsUseField
          }
       }
 
-      String entryLabel = arg.toString();
+      String entryLabel = arg.toString(parser);
 
       process(parser, stack, entryLabel, fieldLabel);
    }

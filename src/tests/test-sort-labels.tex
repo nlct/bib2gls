@@ -1,0 +1,21 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,style=tree]{glossaries-extra}
+
+\GlsXtrLoadResources[ 
+ src={test-sort-labels},
+ sort={en},
+ %sort-label-list={{seealso,see}:en:glsentryname}
+ sort-label-list={{seealso,see}:en-reverse:glsentryname}
+]
+
+\begin{document}
+\Gls{parrot}, \gls{swan}, \gls{duck}, \gls{goose}, \gls{duckling}.
+
+\printunsrtglossaries
+\end{document}

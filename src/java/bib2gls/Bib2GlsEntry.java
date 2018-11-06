@@ -3590,6 +3590,21 @@ public class Bib2GlsEntry extends BibEntry
       return selected;
    }
 
+   // Gets a minimal copy of this
+   public Bib2GlsEntry getMinimalCopy()
+   {
+      Bib2GlsEntry entry = new Bib2GlsEntry(bib2gls);
+
+      entry.originalEntryType = originalEntryType;
+      entry.records = records;
+      entry.recordMap = recordMap;
+      entry.base = base;
+      entry.labelPrefix = labelPrefix;
+      entry.setId(getId());
+
+      return entry;
+   }
+
    private Vector<GlsRecord> records;
    private HashMap<String,Vector<GlsRecord>> recordMap;
    private Vector<GlsRecord> ignoredRecords;

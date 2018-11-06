@@ -7,6 +7,7 @@ v1.8 (pending):
        --long-case-change
        --dual-long-case-change
        --word-boundaries
+       --sort-label-list
 
   * added support for the new glossaries-extra package option
     record=nameref (introduced to glossaries-extra v1.37).

@@ -765,6 +765,39 @@ public class SortSettings
       return regexList;
    }
 
+   public SortSettings copy(String method, String sortField)
+   {
+      SortSettings settings = new SortSettings(method, bib2gls);
+
+      settings.setSortField(sortField);
+
+      settings.collationRule = collationRule;
+      settings.dateLocale = dateLocale;
+      settings.dateFormat = dateFormat;
+      settings.numberLocale = numberLocale;
+      settings.numberFormat = numberFormat;
+      settings.letterNumberRule = letterNumberRule;
+      settings.letterNumberPuncRule = letterNumberPuncRule;
+      settings.collatorStrength = collatorStrength;
+      settings.collatorDecomposition = collatorDecomposition;
+      settings.breakPoint = breakPoint;
+      settings.breakPointMarker = breakPointMarker;
+      settings.sortSuffixOption = sortSuffixOption;
+      settings.sortSuffixMarker = sortSuffixMarker;
+      settings.sortSuffixField = sortSuffixField;
+      settings.trim = trim;
+      settings.identicalSortAction = identicalSortAction;
+      settings.groupFormation = groupFormation;
+      settings.identicalSortField = identicalSortField;
+      settings.numberPad = numberPad;
+      settings.padMinus = padMinus;
+      settings.padPlus = padPlus;
+      settings.missingFieldFallback = missingFieldFallback;
+      settings.regexList = regexList;
+
+      return settings;
+   }
+
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;

@@ -97,7 +97,7 @@ public class GlsHierName extends GlsUseField
          }
       }
 
-      String entryLabel = arg.toString();
+      String entryLabel = arg.toString(parser);
 
       process(parser, parser, entryLabel);
    }
@@ -117,7 +117,7 @@ public class GlsHierName extends GlsUseField
          }
       }
 
-      String entryLabel = arg.toString();
+      String entryLabel = arg.toString(parser);
 
       process(parser, stack, entryLabel);
    }

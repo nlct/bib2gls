@@ -1753,7 +1753,12 @@ if it's unrecognised.
 The interpreter has its own internal implementation of the
 glossary-related commands listed in \tableref{tab:bibglsdefs}. These
 may be overridden by custom packages provided with the
-\longarg{custom-packages} switch.
+\longarg{custom-packages} switch. Note that commands that reference
+an entry, such as \cs{glsentryname}, aren't guaranteed to work
+across \idxpl{resourceset} and will only be able to look up field
+values that are known to \bibgls. (For example, the \field{name}
+field for abbreviations is typically set by the associated
+abbreviation style, which isn't available to \bibgls.)
 
 \begin{table}[htbp]
 \caption{Glossary-Related Commands Implemented by the \bibgls\ Interpreter}
@@ -8132,6 +8137,57 @@ the \ext{bib} file. This is because the definition of
 The second resource set will use the default 
 \csopt[von]{bibtex-contributor-fields} setting when obtaining the
 sort value.
+
+\optsection[\subsubsection]{sort-label-list}
+
+This option takes a list as the value with each element in the list
+in the form:
+\begin{codeenv}
+\code{\meta{field-list}:\meta{sort}:\meta{csname}}
+\end{codeenv}
+where \meta{field-list} is a comma-separated list of valid fields, 
+\meta{sort} is a valid sort method (as per the \csopt{sort} option)
+and \meta{csname} is the name (without a leading backslash) of a
+command that takes a label as its sole mandatory argument that's
+recognised by \bibgls' interpreter (such as those listed in
+\tableref{tab:bibglsdefs}). If the list has more than one element
+take care to use braces \code{\marg{}} to avoid confusion for the
+list-parser. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[\marg{see,seealso}:en:glsentryname]{sort-label-list}
+}
+\end{codeenv}
+
+After the main sorting of each set of selected entries is performed, if this
+option is set, then for each 
+\code{\margm{field-list}:\meta{sort}:\meta{csname}} the following
+steps are performed:
+\begin{enumerate}
+\item For each entry with the label \meta{id}:
+ \begin{enumerate}
+  \item For each \meta{field} in \meta{field-list}, if the field is
+    set for entry \meta{id} then:
+
+  \begin{enumerate}
+   \item The field value must be in the form
+     \code{\oargm{tag}\meta{label-list}} where
+     \meta{label-list} is a comma-separated list of entry labels
+     \meta{label$_1$}, \ldots, \meta{label$_n$}
+     (optionally preceded by \oargm{tag});
+   \item The \meta{label-list} is converted into a list where the
+    $i$th element is
+    \code{\marg{\cs{csuse}\margm{csname}\margm{label$_i$}}};
+   \item This new list is sorted according to the interpreter's
+    definition of the command given \meta{csname} and the designated
+    sort method;
+   \item The field value is reconstructed with the labels in the
+    corresponding order.
+  \end{enumerate}
+ \end{enumerate}
+\end{enumerate}
+Note that there is no hierarchy structure in the sorting of the field list
+even if any of the referenced entries has a parent.
 
 \optsection[\subsubsection]{date-time-fields}
 

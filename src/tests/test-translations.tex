@@ -1,0 +1,52 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[british,brazilian]{babel}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,
+ nomain,
+ nostyles,
+ stylemods=bookindex,
+ style=bookindex
+]{glossaries-extra}
+\usepackage{glossaries-prefix}
+
+\newglossary*{en}{English Terms}
+\newglossary*{pt}{Portuguese Terms}
+
+\GlsXtrLoadResources[
+  type=en,
+  src=entries-en,
+  category=en,
+  sort=en
+]
+\GlsXtrLoadResources[
+  type=pt,
+  src=entries-pt,
+  sort=pt,
+  category=pt,
+  see=omit,
+  field-aliases={translations-en=see},
+  sort-label-list={user1:en:glsentryname}
+]
+
+\begin{document}
+\selectlanguage{british}
+
+The \gls{cat} sat on the \gls{mat}.
+
+\selectlanguage{brazilian}
+
+O \gls{gato} sentou-se no \gls{tapete}.
+
+\renewcommand*{\glsxtrbookindexname}[1]{%
+ \glsxtrifhasfield{prefix}{#1}{\xmakefirstuc\glscurrentfieldvalue\space}{}%
+ \glossentryname{#1}%
+ \glsxtrifhasfield{see}{#1}{; translations: \glsxtrseelist\glscurrentfieldvalue}{}%
+}
+\printunsrtglossaries
+\end{document}
