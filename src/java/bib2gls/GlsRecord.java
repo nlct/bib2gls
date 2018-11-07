@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.Vector;
 import java.util.Iterator;
 
-public class GlsRecord
+public class GlsRecord implements Comparable<GlsRecord>
 {
    public GlsRecord(Bib2Gls bib2gls, String label, String prefix, String counter,
       String format, String location)

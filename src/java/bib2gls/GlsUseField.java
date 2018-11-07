@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 
-public class GlsUseField extends ControlSequence
+public class GlsUseField extends Command
 {
    public GlsUseField(Bib2Gls bib2gls)
    {
@@ -64,8 +64,7 @@ public class GlsUseField extends ControlSequence
       return caseChange;
    }
 
-   protected void process(TeXParser parser, TeXObjectList stack,
-      String entryLabel, String fieldLabel)
+   protected Bib2GlsEntry fetchEntry(String entryLabel)
       throws IOException
    {
       // Try the current resource set first
@@ -109,15 +108,104 @@ public class GlsUseField extends ControlSequence
          {
             bib2gls.warning(String.format("\\%s -> %s", getName(),
               bib2gls.getMessage("warning.unknown_entry", entryLabel)));
-            return;
          }
       }
 
-      process(parser, stack, entry, fieldLabel, caseChange);
+      return entry;
    }
 
-   protected void process(TeXParser parser, TeXObjectList stack,
-      Bib2GlsEntry entry, String fieldLabel, int caseChange)
+   public TeXObjectList expandonce(TeXParser parser)
+      throws IOException
+   {
+      return expandonce(parser, parser);
+   }
+
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+      throws IOException
+   {
+      TeXObject arg;
+
+      if (parser == stack)
+      {
+         arg = parser.popNextArg();
+      }
+      else
+      {
+         arg = stack.popArg(parser);
+      }
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (parser == stack)
+         {
+            expanded = ((Expandable)arg).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      String entryLabel = arg.toString(parser);
+
+      if (parser == stack)
+      {
+         arg = parser.popNextArg();
+      }
+      else
+      {
+         arg = stack.popArg(parser);
+      }
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (parser == stack)
+         {
+            expanded = ((Expandable)arg).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      String fieldLabel = arg.toString(parser);
+
+      TeXObjectList expanded = new TeXObjectList();
+
+      process(parser, entryLabel, fieldLabel, expanded);
+
+      return expanded;
+   }
+
+   protected void process(TeXParser parser,
+      String entryLabel, String fieldLabel, TeXObjectList pending)
+      throws IOException
+   {
+      Bib2GlsEntry entry = fetchEntry(entryLabel);
+
+      if (entry == null) return;
+
+      process(parser, entry, fieldLabel, caseChange, pending);
+   }
+
+   protected void process(TeXParser parser,
+      Bib2GlsEntry entry, String fieldLabel, int caseChange,
+      TeXObjectList pending)
       throws IOException
    {
       BibValueList val = entry.getField(fieldLabel);
@@ -153,75 +241,7 @@ public class GlsUseField extends ControlSequence
          break;
       }
 
-      stack.push(obj);
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String entryLabel = arg.toString(parser);
-
-      arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String fieldLabel = arg.toString(parser);
-
-      process(parser, parser, entryLabel, fieldLabel);
-   }
-
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String entryLabel = arg.toString(parser);
-
-      arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String fieldLabel = arg.toString(parser);
-
-      process(parser, stack, entryLabel, fieldLabel);
+      pending.add(obj);
    }
 
    protected Bib2Gls bib2gls;

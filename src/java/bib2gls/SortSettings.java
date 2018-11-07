@@ -53,7 +53,8 @@ public class SortSettings
          method = method.substring(0, method.lastIndexOf("-reverse"));
       }
 
-      if (method.equals("doc")
+      if (method.equals("use")
+       || method.equals("doc")
        || method.equals("locale")
        || method.equals("custom"))
       {
@@ -122,13 +123,13 @@ public class SortSettings
 
    public boolean requiresSorting()
    {
-      return sortMethod != null && !sortMethod.equals("use")
+      return sortMethod != null && !sortMethod.startsWith("use")
        && !sortMethod.equals("none");
    }
 
    public boolean isOrderOfRecords()
    {
-      return "use".equals(sortMethod);
+      return "use".equals(sortMethod) || "use-reverse".equals(sortMethod);
    }
 
    public boolean isUnsrt()
@@ -510,6 +511,13 @@ public class SortSettings
       {
          numberLocale = localeTag;
       }
+
+      docLocale = localeTag;
+   }
+
+   public String getDocLocaleTag()
+   {
+      return docLocale;
    }
 
    public void setNumberFormat(String format)
@@ -767,6 +775,18 @@ public class SortSettings
 
    public SortSettings copy(String method, String sortField)
    {
+      if (docLocale != null)
+      {
+         if ("doc".equals(method))
+         {
+            method = docLocale;
+         }
+         else if ("doc-reverse".equals(method))
+         {
+            method = docLocale+"-reverse";
+         }
+      }
+
       SortSettings settings = new SortSettings(method, bib2gls);
 
       settings.setSortField(sortField);
@@ -794,6 +814,7 @@ public class SortSettings
       settings.padPlus = padPlus;
       settings.missingFieldFallback = missingFieldFallback;
       settings.regexList = regexList;
+      settings.docLocale = docLocale;
 
       return settings;
    }
@@ -805,6 +826,8 @@ public class SortSettings
    private String dateFormat=null;
    private String numberLocale="locale";
    private String numberFormat=null;
+
+   private String docLocale;
 
    private int letterNumberRule
      = Bib2GlsEntryLetterNumberComparator.NUMBER_BETWEEN;

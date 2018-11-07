@@ -2272,7 +2272,7 @@ public class GlsResource
       {
          bib2gls.warning(
             bib2gls.getMessage("warning.option.clash", "selection=all",
-            "sort=use"));
+            "sort="+sortSettings.getMethod()));
 
          sortSettings.setMethod(null);
       }
@@ -2282,7 +2282,7 @@ public class GlsResource
          bib2gls.warning(
             bib2gls.getMessage("warning.option.clash", 
             "match-action=add",
-            "sort=use"));
+            "sort="+sortSettings.getMethod()));
 
          sortSettings.setMethod(null);
       }
@@ -3925,7 +3925,7 @@ public class GlsResource
 
       int n = split.size();
 
-      if (n != 3)
+      if (n < 2 || n > 3)
       {
          throw new IllegalArgumentException(
            bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -3970,9 +3970,20 @@ public class GlsResource
       }
 
       String method = split.get(1).toString(parser).trim();
-      String csname = split.get(2).toString(parser).trim();
+      String csname;
 
-      if (!SortSettings.isValidSortMethod(method))
+      if (n == 3)
+      {
+         csname = split.get(2).toString(parser).trim();
+      }
+      else
+      {
+         csname = null;
+      }
+
+      if (method.equals("none") || method.equals("unsrt")
+          || method.equals("combine")
+          || !SortSettings.isValidSortMethod(method))
       {
          throw new IllegalArgumentException(
            bib2gls.getMessage("error.invalid.sort.value", method, opt));
@@ -5528,6 +5539,20 @@ public class GlsResource
 
       processData(bibData, entries, sortSettings.getMethod());
 
+      if ("use-reverse".equals(sortSettings.getMethod()))
+      {
+         // reverse the list (won't work for hierarchical entries)
+
+         for (int i = 0, j = entries.size(), n = j/2; i < n; i++)
+         {
+            Bib2GlsEntry entry1 = entries.get(i);
+            Bib2GlsEntry entry2 = entries.get(--j);
+
+            entries.set(i, entry2);
+            entries.set(j, entry1);
+         }
+      }
+
       if (limit > 0 && entries.size() > limit)
       {
          for (int i = limit; i < entries.size(); i++)
@@ -5553,17 +5578,36 @@ public class GlsResource
       {
          dualEntries = new Vector<Bib2GlsEntry>();
 
-         // If dual-sort=use or none, use the same order as entries. 
+         // If dual-sort=use or none, use the same order as entries
+         // (unless reverse sort). 
 
          if (!dualSortSettings.requiresSorting())
          {
-            for (Bib2GlsEntry entry : entries)
+            if (!"use-reverse".equals(sortSettings.getMethod()) 
+                 && "use-reverse".equals(dualSortSettings.getMethod()))
             {
-               if (entry instanceof Bib2GlsDualEntry)
+               for (int i = entries.size()-1; i >= 0; i--)
                {
-                  Bib2GlsEntry dual = entry.getDual();
+                  Bib2GlsEntry entry = entries.get(i);
 
-                  addEntry(dualEntries, dual);
+                  if (entry instanceof Bib2GlsDualEntry)
+                  {
+                     Bib2GlsEntry dual = entry.getDual();
+
+                     addEntry(dualEntries, dual);
+                  }
+               }
+            }
+            else
+            {
+               for (Bib2GlsEntry entry : entries)
+               {
+                  if (entry instanceof Bib2GlsDualEntry)
+                  {
+                     Bib2GlsEntry dual = entry.getDual();
+
+                     addEntry(dualEntries, dual);
+                  }
                }
             }
          }
@@ -6175,18 +6219,41 @@ public class GlsResource
             {
                Vector<GlsRecord> records = bib2gls.getRecords();
 
-               for (GlsRecord record : records)
+               if (secondarySortSettings.isReverse())
                {
-                  Bib2GlsEntry entry = getEntry(getRecordLabel(record), 
-                     secondaryList);
-
-                  if (entry != null)
+                  for (int i = records.size()-1; i >= 0; i--)
                   {
-                     writeCopyToGlossary(writer, entry);
+                     GlsRecord record = records.get(i);
 
-                     if (setWidest)
+                     Bib2GlsEntry entry = getEntry(getRecordLabel(record), 
+                        secondaryList);
+
+                     if (entry != null)
                      {
-                        updateWidestName(entry, secondaryType, font, frc);
+                        writeCopyToGlossary(writer, entry);
+
+                        if (setWidest)
+                        {
+                           updateWidestName(entry, secondaryType, font, frc);
+                        }
+                     }
+                  }
+               }
+               else
+               {
+                  for (GlsRecord record : records)
+                  {
+                     Bib2GlsEntry entry = getEntry(getRecordLabel(record), 
+                        secondaryList);
+
+                     if (entry != null)
+                     {
+                        writeCopyToGlossary(writer, entry);
+
+                        if (setWidest)
+                        {
+                           updateWidestName(entry, secondaryType, font, frc);
+                        }
                      }
                   }
                }
@@ -9938,7 +10005,15 @@ public class GlsResource
 
                      if (csvList.size() > 1)
                      {
-                        sort(bibParser, entry, csvList, settings, field);
+                        if (settings.isOrderOfRecords())
+                        {
+                           orderByUse(bibParser, entry, csvList, field,
+                            settings.isReverse());
+                        }
+                        else
+                        {
+                           sort(bibParser, entry, csvList, settings, field);
+                        }
                      }
                   }
                }
@@ -9946,10 +10021,88 @@ public class GlsResource
          }
       }
 
-// TODO
-      private void orderByUse(Bib2GlsEntry entry, 
-        CsvList csvList, SortSettings settings, String field)
+      private void insertByUse(String element, TreeSet<GlsRecord> set)
       {
+         Vector<GlsRecord> allRecords = bib2gls.getRecords();
+
+         for (GlsRecord record : allRecords)
+         {
+            if (element.equals(record.getLabel()))
+            {
+               set.add(record);
+               return;
+            }
+         }
+
+         set.add(new GlsRecord(bib2gls, element, "", "page",
+           "glsignore", ""));
+      }
+
+      private void orderByUse(TeXParser bibParser, Bib2GlsEntry entry, 
+        CsvList csvList, String field, boolean reverse)
+      throws IOException
+      {
+         TeXParserListener listener = bibParser.getListener();
+
+         TeXObject opt = null;
+
+         TreeSet<GlsRecord> set = new TreeSet<GlsRecord>();
+
+         for (int i = 0, n = csvList.size(); i < n; i++)
+         {
+            TeXObject element = csvList.getValue(i);
+
+            if (i == 0 && element instanceof TeXObjectList)
+            {
+               TeXObjectList elemList = (TeXObjectList)element;
+
+               opt = elemList.popArg(bibParser, '[', ']');
+            }
+
+            insertByUse(element.toString(bibParser), set);
+         }
+
+         StringBuilder builder = new StringBuilder();
+         TeXObjectList elementList = listener.createGroup();
+
+         if (opt != null)
+         {
+            elementList.add(listener.getOther('['));
+            elementList.add(opt);
+            elementList.add(listener.getOther(']'));
+
+            builder.append('[');
+            builder.append(opt.toString(bibParser));
+            builder.append(']');
+         }
+
+         boolean addSep = false;
+
+         for (Iterator<GlsRecord> iter = reverse ? set.descendingIterator()
+           : set.iterator() ; iter.hasNext(); )
+         {
+            GlsRecord record = iter.next();
+
+            if (addSep)
+            {
+               elementList.add(listener.getOther(','));
+               builder.append(',');
+            }
+            else
+            {
+               addSep = true;
+            }
+
+            String id = record.getLabel();
+            elementList.add(listener.createString(id));
+            builder.append(id);
+         }
+
+         BibValueList val = new BibValueList();
+         val.add(new BibUserString(elementList));
+
+         entry.putField(field, val);
+         entry.putField(field, builder.toString());
       }
 
       private void sort(TeXParser bibParser, Bib2GlsEntry entry, 
@@ -9974,11 +10127,18 @@ public class GlsResource
             }
 
             TeXObjectList elementList = listener.createGroup();
-            elementList.add(new TeXCsRef(csname));
-            Group group = listener.createGroup();
-            elementList.add(group);
 
-            group.add(element);
+            if (csname == null)
+            {
+               elementList.add(element);
+            }
+            else
+            {
+               elementList.add(new TeXCsRef(csname));
+               Group group = listener.createGroup();
+               elementList.add(group);
+               group.add(element);
+            }
 
             BibValueList bibValList = new BibValueList();
             bibValList.add(new BibUserString(elementList));

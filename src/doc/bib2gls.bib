@@ -2681,6 +2681,14 @@ cs}\margm{Glspl-like cs}},
   category={command}
 }
 
+@index{triangleright,
+  name={\csfmt{triangleright}},
+  user1={},
+  description={right-pointing triangle $\triangleright$},
+  note={kernel command (maths mode)},
+  category={command}
+}
+
 @dualindexentry{bigoperatornamefmt,
   name={\csfmt{bigoperatornamefmt}},
   user1={\margm{text}},
@@ -6646,8 +6654,56 @@ primary formats, if enabled.},
   name={\csfmt{gls\-see\-format}},
   user1={\margm{tag}\margm{labels}\margm{location (ignored)}},
   description={formats the entries identified in the comma separated
-   list of labels as a set of cross-references},
+   list of labels as a set of cross-references, where each
+   item in the list is encapsulated with \cs{glsseeitem} and
+   each element is separated with \cs{glsseesep} or
+   \cs{glsseelastsep}},
   note={\styfmt{glossaries}},
+  seealso={glsseeitem,glsseeitemformat,glsseesep,glsseelastsep},
+  category={command}
+}
+
+@index{glsseeitem,
+  name={\csfmt{gls\-see\-item}},
+  user1={\margm{label}},
+  description={formats an element of the cross-reference list.
+   The default behaviour is to create a hyperlink (if enabled) to the 
+   referenced entry with the link text given by
+   \code{\cs{glsseeitemformat}\margm{label}}},
+  note={\styfmt{glossaries}},
+  seealso={glsseeformat,glsseeitemformat},
+  category={command}
+}
+
+@index{glsseeitemformat,
+  name={\csfmt{gls\-see\-item\-format}},
+  user1={\margm{label}},
+  description={formats an element of the cross-reference list.
+   With the base \styfmt{glossaries} package this just does
+   \code{\cs{glsentrytext}\margm{label}}. With
+   \styfmt{glossaries-extra} this uses either \cs{glsentryshort}
+   or \cs{glsentryname} depending on whether or not the
+   \field{short} field has been set},
+  note={\styfmt{glossaries} v3.0+},
+  seealso={glsseeformat,glsseeitem},
+  category={command}
+}
+
+@index{glsseesep,
+  name={\csfmt{gls\-see\-sep}},
+  description={the separator used between all but the last 
+  entries of a cross-reference list},
+  note={\styfmt{glossaries}},
+  seealso={glsseeformat,glsseelastsep},
+  category={command}
+}
+
+@index{glsseelastsep,
+  name={\csfmt{gls\-see\-last\-sep}},
+  description={the separator used between the penultimate and
+   ultimate entries of a cross-reference list},
+  note={\styfmt{glossaries}},
+  seealso={glsseeformat,glsseesep},
   category={command}
 }
 

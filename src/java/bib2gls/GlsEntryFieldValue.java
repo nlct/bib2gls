@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2018 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -48,14 +48,32 @@ public class GlsEntryFieldValue extends GlsUseField
       return fieldLabel;
    }
 
-   public void process(TeXParser parser)
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      TeXObject arg = parser.popNextArg();
+      TeXObject arg;
+
+      if (parser == stack)
+      {
+         arg = parser.popNextArg();
+      }
+      else
+      {
+         arg = stack.popArg(parser);
+      }
 
       if (arg instanceof Expandable)
       {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
+         TeXObjectList expanded;
+
+         if (parser == stack)
+         {
+            expanded = ((Expandable)arg).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(parser, stack);
+         }
 
          if (expanded != null)
          {
@@ -65,27 +83,11 @@ public class GlsEntryFieldValue extends GlsUseField
 
       String entryLabel = arg.toString(parser);
 
-      process(parser, parser, entryLabel, fieldLabel);
-   }
+      TeXObjectList expanded = new TeXObjectList();
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject arg = stack.popArg(parser);
+      process(parser, entryLabel, fieldLabel, expanded);
 
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String entryLabel = arg.toString(parser);
-
-      process(parser, stack, entryLabel, fieldLabel);
+      return expanded;
    }
 
    private String fieldLabel;

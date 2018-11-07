@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2018 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -35,92 +35,89 @@ public class GlsHierName extends GlsUseField
       this(name, CASE_NO_CHANGE, false, bib2gls);
    }
 
-   public GlsHierName(String name, int caseChange, boolean topLevelChange, 
+   public GlsHierName(String name, int caseChange, boolean topLevelOnlyChange, 
       Bib2Gls bib2gls)
    {
       super(name, caseChange, bib2gls);
-      this.topLevelChange = topLevelChange;
+      this.topLevelOnlyChange = topLevelOnlyChange;
    }
 
    public Object clone()
    {
-      return new GlsHierName(getName(), getCaseChange(), topLevelChange, 
+      return new GlsHierName(getName(), getCaseChange(), topLevelOnlyChange, 
         bib2gls);
    }
 
-   protected void process(TeXParser parser, TeXObjectList stack,
-     String entryLabel)
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
       throws IOException
    {
-      Bib2GlsEntry entry = bib2gls.getCurrentResource().getEntry(entryLabel);
+      TeXObject arg;
 
-      if (entry == null) return;
+      if (stack == parser)
+      {
+         arg = parser.popNextArg();
+      }
+      else
+      {
+         arg = stack.popArg(parser);
+      }
+
+      if (arg instanceof Expandable)
+      {
+         TeXObjectList expanded;
+
+         if (stack == parser)
+         {
+            expanded = ((Expandable)arg).expandfully(parser);
+         }
+         else
+         {
+            expanded = ((Expandable)arg).expandfully(parser, stack);
+         }
+
+         if (expanded != null)
+         {
+            arg = expanded;
+         }
+      }
+
+      String entryLabel = arg.toString(parser);
+
+      Bib2GlsEntry entry = fetchEntry(entryLabel);
+
+      TeXObjectList expanded = new TeXObjectList();
+
+      if (entry == null)
+      {
+         return expanded;
+      }
+
+      TeXParserListener listener = parser.getListener();
 
       String parentLabel = entry.getParent();
 
       if (parentLabel != null)
       {
-         process(parser, stack, parentLabel);
-
-         ControlSequence cs = parser.getListener().getControlSequence(
-          "glsxtrhiernamesep");
-
-         cs.process(parser);
-      }
-
-      int change = CASE_NO_CHANGE;
-
-      if (parentLabel == null || !topLevelChange)
-      {
-         change = getCaseChange();
+         expanded.add(this);
+         expanded.add(listener.createGroup(parentLabel));
+         expanded.add(new TeXCsRef("glsxtrhiernamesep"));
       }
 
       BibValueList val = entry.getField("short");
 
       String fieldLabel = (val == null ? "name" : "short");
 
-      process(parser, stack, entry, fieldLabel, change);
-   }
-
-   public void process(TeXParser parser)
-      throws IOException
-   {
-      TeXObject arg = parser.popNextArg();
-
-      if (arg instanceof Expandable)
+      if (parentLabel == null || !topLevelOnlyChange)
       {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
+         process(parser, entry, fieldLabel, getCaseChange(), expanded);
+      }
+      else
+      {
+         process(parser, entry, fieldLabel, CASE_NO_CHANGE, expanded);
       }
 
-      String entryLabel = arg.toString(parser);
-
-      process(parser, parser, entryLabel);
+      return expanded;
    }
 
-   public void process(TeXParser parser, TeXObjectList stack)
-      throws IOException
-   {
-      TeXObject arg = stack.popArg(parser);
-
-      if (arg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)arg).expandfully(parser, stack);
-
-         if (expanded != null)
-         {
-            arg = expanded;
-         }
-      }
-
-      String entryLabel = arg.toString(parser);
-
-      process(parser, stack, entryLabel);
-   }
-
-   private boolean topLevelChange;
+   private boolean topLevelOnlyChange;
 }

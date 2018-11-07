@@ -8145,12 +8145,33 @@ in the form:
 \begin{codeenv}
 \code{\meta{field-list}:\meta{sort}:\meta{csname}}
 \end{codeenv}
-where \meta{field-list} is a comma-separated list of valid fields, 
-\meta{sort} is a valid sort method (as per the \csopt{sort} option)
-and \meta{csname} is the name (without a leading backslash) of a
+or:
+\begin{codeenv}
+\code{\meta{field-list}:\meta{sort}}
+\end{codeenv}
+where:
+\begin{itemize}
+\item \meta{field-list} is a comma-separated list of valid fields;
+\item \meta{sort} is a valid sort method as per the \csopt{sort}
+option, but not including \optfmt{none}, \optfmt{unsrt} or
+\optfmt{combine};
+\item \meta{csname} is the name (without a leading backslash) of a
 command that takes a label as its sole mandatory argument that's
 recognised by \bibgls' interpreter (such as those listed in
-\tableref{tab:bibglsdefs}). If the list has more than one element
+\tableref{tab:bibglsdefs}).
+\end{itemize}
+The final \code{:\meta{csname}} part may be omitted if no command
+need be applied.
+
+The sorting options are as those for the main list.  For example,
+for entries in the primary list the break point is obtained from the
+\csopt{break-at} setting and for entries in the dual list the break
+point is obtained from \csopt{dual-break-at}.  (Remember that if
+\csopt[combine]{dual} then there is only one list that contains both
+the primary and dual entries, which is governed by the primary
+options only.)
+
+If the list has more than one element
 take care to use braces \code{\marg{}} to avoid confusion for the
 list-parser. For example:
 \begin{codeenv}
@@ -8159,7 +8180,13 @@ list-parser. For example:
 }
 \end{codeenv}
 
-After the main sorting of each set of selected entries is performed, if this
+Note that strange results may occur if this setting is used on any
+fields that don't simply contain a list of entry labels or if any of
+the referenced entries are processed in different
+\idxpl{resourceset}.
+
+After the main sorting of each set of selected entries is performed
+(as per \csopt{sort} or \csopt{dual-sort}), if this
 option is set, then for each 
 \code{\margm{field-list}:\meta{sort}:\meta{csname}} the following
 steps are performed:
@@ -8177,17 +8204,154 @@ steps are performed:
      (optionally preceded by \oargm{tag});
    \item The \meta{label-list} is converted into a list where the
     $i$th element is
-    \code{\marg{\cs{csuse}\margm{csname}\margm{label$_i$}}};
+    \code{\marg{\cs{csuse}\margm{csname}\margm{label$_i$}}}
+    unless \meta{csname} hasn't been set, in which case the
+    $i$th element is just \meta{label$_i$} (the optional
+    \oargm{tag} part is omitted);
    \item This new list is sorted according to the interpreter's
     definition of the command given \meta{csname} and the designated
     sort method;
    \item The field value is reconstructed with the labels in the
-    corresponding order.
+    corresponding order (prefixed with \code{\oargm{tag}} if it was
+    present in the original).
   \end{enumerate}
  \end{enumerate}
 \end{enumerate}
 Note that there is no hierarchy structure in the sorting of the field list
 even if any of the referenced entries has a parent.
+
+For example, if the file \filefmt{entries.bib} contains:
+\begin{codeenv}
+\atentry{index}{bird}
+\strut
+\atentry{index}\marg{waterfowl,
+  \field{parent}=\marg{bird}
+}
+\strut
+\atentry{index}\marg{duck,
+  \field{parent}=\marg{waterfowl},
+  \field{seealso}=\marg{swan,duckling,parrot,goose}
+}
+\strut
+\atentry{index}\marg{swan,
+  \field{parent}=\marg{waterfowl},
+  \field{seealso}=\marg{goose,duck}
+}
+\strut
+\atentry{index}\marg{goose,
+ \field{parent}=\marg{waterfowl},
+ \field{seealso}=\marg{duck}
+}
+\strut
+\atentry{index}\marg{parrot,
+ \field{parent}=\marg{bird}
+}
+\strut
+\atentry{index}\marg{duckling,
+ \field{see}=\marg{[related terms]fluffy,velociraptor,duck,tardigrade}
+}
+\strut
+\atentry{index}\marg{fluffy}
+\strut
+\atentry{index}\marg{tardigrade,
+  \field{name}=\marg{water bear}
+}
+\strut
+\atentry{index}\marg{velociraptor}
+\end{codeenv}
+Now suppose the document contains:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{ 
+ \csopt[entries]{src},
+ \csopt[en]{sort},
+ \csopt[\marg{seealso,see}:en:glsentryname]{sort-label-list}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{Gls}\marg{parrot}, \cs{gls}\marg{tardigrade}, \cs{gls}\marg{swan}, \cs{gls}\marg{duck}, 
+\cs{gls}\marg{goose}, \cs{gls}\marg{fluffy} \cs{gls}\marg{duckling}, \cs{gls}\marg{velociraptor}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+This reorders the \field{see} and \field{seealso} fields according to
+the referenced entry's name.
+
+For example, the \field{see} field for the \code{duckling} entry was
+originally:
+\begin{codeenv}
+\field{see}=\marg{[related terms]fluffy,velociraptor,duck,tardigrade}
+\end{codeenv}
+but in the \filefmt{glstex} file it's written as:
+\begin{codeenv}
+\field{see}=\marg{[related terms]duck,fluffy,velociraptor,tardigrade}
+\end{codeenv}
+The reason for \code{tardigrade} being placed after
+\code{velociraptor} is because
+\code{\ics{glsentryname}\marg{tardigrade}} is expanded to \qt{water
+bear}. If no encapsulating command was specified:
+\begin{codeenv}
+\csopt[\marg{seealso,see}:en]{sort-label-list}
+\end{codeenv}
+then the list would have been sorted according to the labels
+instead (and so \code{tardigrade} would come before
+\code{velociraptor}). Note that the optional tag is kept at the start of the 
+list.
+
+The \field{seealso} fields have also been changed. For example, 
+the \code{duck} entry originally had:
+\begin{codeenv}
+\field{seealso}=\marg{swan,duckling,parrot,goose}
+\end{codeenv}
+but in the \filefmt{glstex} file it's written as:
+\begin{codeenv}
+\field{seealso}=\marg{duckling,goose,parrot,swan}
+\end{codeenv}
+Note that the hierarchical structure hasn't been maintained. The glossary
+lists \qt{duckling} (a top-level entry) after \qt{swan} (a level~2 entry)
+but the \field{seealso} field has \code{duckling} first.
+
+If you want to maintain the hierarchy you can use \ics{glsxtrhiername} instead
+of \ics{glsentryname}:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{ 
+ \csopt[entries]{src},
+ \csopt[en]{sort},
+ \csopt[\marg{seealso,see}:en:glsxtrhiername]{sort-label-list}
+}
+\end{codeenv}
+In this case \code{\ics{glsxtrhiername}\marg{swan}} is converted to
+\qt{bird, waterfowl, swan} so the \field{seealso} field for the
+\code{duck} entry ends up as:
+\begin{codeenv}
+\field{seealso}=\marg{parrot,goose,swan,duckling}
+\end{codeenv}
+Now \code{swan} comes before \code{duckling} because the actual sort
+value started with a \qt{B} not \qt{S}.
+
+This hierarchical information isn't shown in the cross-reference by
+default, so the \code{duck} cross-reference list appears in the
+document as: parrot, goose, swan \& duckling.
+
+If you want the hierarchical information to appear to help assist
+the reader, you can redefine \ics{glsseeitemformat} in the document
+to use \ics{glsxtrhiername}. The separator between the levels is
+given by \ics{glsxtrhiernamesep} which defaults to a comma followed
+by a space. This can easily be confused with the cross-reference
+list comma, so you may want to redefine that as well. For example,
+the following uses \ics{triangleright}:
+\begin{codeenv}
+\cmd{renewcommand}\marg{\cs{glsxtrhiernamesep}}\marg{ \idx{mshiftchar}\cs{triangleright}\idx{mshiftchar} }
+\cmd{renewcommand}*\marg{\cs{glsseeitemformat}}[1]\marg{\cs{glsxtrhiername}\marg{\idx{param}1}}
+\end{codeenv}
+This means that the \code{duck} cross-reference now appears in the
+document as: bird $\triangleright$ parrot, bird $\triangleright$
+waterfowl $\triangleright$ goose, bird $\triangleright$ waterfowl
+$\triangleright$ swan \& duckling.
 
 \optsection[\subsubsection]{date-time-fields}
 
@@ -10460,6 +10624,12 @@ the proof or solution. Therefore, somewhat unusually for
 an indexing application, \bibgls\ also provides the option
 to shuffle the entries instead of sorting them.
 
+This section covers the resource options for sorting primary
+entries. See \sectionref{sec:dualoptssort} for sorting dual entries
+and also \csopt{sort-label-list} for sorting field values that
+contain a comma-separated list of entry labels (such as the
+\field{see} or \field{seealso} fields).
+
 Remember that you can have \atentry{preamble} definitions that
 can be hidden from \bibgls's interpreter. For example,
 \exfile{no-interpret-preamble.bib} might contain:
@@ -10519,7 +10689,7 @@ Alternatively both of these \ext{bib} files can be loaded in one
 
 \optsection{sort}
 
-The \csopt{sort} key indicates how entries should be sorted.
+The \csopt{sort} key indicates how primary entries should be sorted.
 If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
 \csopt{sort} option isn't used then \csopt[doc]{sort} is assumed if the 
 document has a language that's been detected by \sty{tracklang}, 
