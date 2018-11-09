@@ -352,6 +352,7 @@
 
 \newcommand{\nosecformatdef}[1]{%
   \begin{definition}
+   \renewcommand{\GlsXtrStandaloneEntryName}[1]{\glstarget{##1}{\strut}\cs{##1}}%
    \glsadd{#1}\glsxtrglossentry{#1}%
    \glsentryuseri{#1}%
   \end{definition}\ignorespaces
@@ -359,6 +360,7 @@
 
 \newcommand{\nosecdef}[1]{%
   \begin{flushleft}\ttfamily
+   \renewcommand{\GlsXtrStandaloneEntryName}[1]{\glstarget{##1}{\strut}\cs{##1}}%
    \glsadd{#1}\glsxtrglossentry{#1}%
    \glsentryuseri{#1}%
   \end{flushleft}\ignorespaces
@@ -2069,7 +2071,7 @@ However, if I change the locale to \csopt[sv]{sort}, the
 \longarg{group} switch shows that it's been placed in the \qt{\AA}
 letter group.
 
-If you are using Java~8, you can set the
+\label{locale.provider}If you are using Java~8, you can set the
 \code{java.locale.providers} property~\cite{javacldr} to use
 the \idx{CLDR} \idx{localeprovider}, which has more extensive
 support for locales than the native \idx{JRE}. For example:
@@ -2517,10 +2519,11 @@ above.
 
 This works in the same way as \longarg{mfirstuc-protection} but
 guards against fields starting with inline maths
-(\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the \field{name} field
-starts with \verb|$x$| and the glossary style automatically tries to
-convert the first letter of the name to \idx{uppercase}, then this will
-cause a problem.
+(\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the
+\field{name} field starts with
+\code{\idx{mshiftchar}x\idx{mshiftchar}} and the glossary style
+automatically tries to convert the first letter of the name to
+\idx{uppercase}, then this will cause a problem.
 
 With \longarg{mfirstuc-math-protection} set, \bibgls\ will
 automatically insert an empty group at the start of the field and
@@ -4524,16 +4527,17 @@ a glossary and a list of symbols:
 Here I've provided some convenient commands for referencing the
 primary (index) terms (\csfmt{idx}, \csfmt{idxpl}, \csfmt{Idx}
 and \csfmt{Idxpl}). This means I don't need to worry about the
-label prefix and it also switches off the hyperlinks. These custom
-commands are defined using
+label prefix and it also switches off the hyperlinks (with 
+\code{\glsopt[false]{hyper}}). These custom
+commands are defined using:
 \nosecformatdef{glsxtrnewglslike}
-which, in this case, essentially does
-\begin{verbatim}
-\newcommand{\idx}[2][]{\gls[hyper=false,#1]{idx.#2}}
-\newcommand{\Idx}[2][]{\Gls[hyper=false,#1]{idx.#2}}
-\newcommand{\idxpl}[2][]{\glspl[hyper=false,#1]{idx.#2}}
-\newcommand{\Idxpl}[2][]{\Glspl[hyper=false,#1]{idx.#2}}
-\end{verbatim}
+which, in this case, essentially does:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{idx}}[2][]\marg{\cs{gls}\oarg{\glsopt[false]{hyper},\idx{param}1}\marg{idx.\idx{param}2}}
+\cs{newcommand}\marg{\cmd{Idx}}[2][]\marg{\cs{Gls}\oarg{\glsopt[false]{hyper},\idx{param}1}\marg{idx.\idx{param}2}}
+\cs{newcommand}\marg{\cmd{idxpl}}[2][]\marg{\cs{glspl}\oarg{\glsopt[false]{hyper},\idx{param}1}\marg{idx.\idx{param}2}}
+\cs{newcommand}\marg{\cmd{Idxpl}}[2][]\marg{\cs{Glspl}\oarg{\glsopt[false]{hyper},\idx{param}1}\marg{idx.\idx{param}2}}
+\end{codeenv}
 but the new commands will also recognise the \ics{gls} modifiers, so
 \verb|\idx+| will behave like \verb|\gls+| which wouldn't be
 possible if \csfmt{idx} was defined using \ics{newcommand} in the
@@ -10553,7 +10557,7 @@ supplementary document with the location as the hyperlink text.
 The hyperlink is created using \meta{src} as the target path
 with the fragment part (anchor) formed from the prefix and 
 location. The \catattr{externallocation} attribute is not set in
-this case. The actual formatting is done via
+this case. The actual formatting is done via:
 \nosecdef{glsxtrmultisupplocation}
 which ignores the \meta{format} argument by default. Its
 definition is simply:
@@ -10611,8 +10615,13 @@ character, so \filefmt{file name.pdf} will be converted to:
 \begin{codeenv}
 file\gls{bibglshrefchar}\marg{20}\marg{ }name.pdf
 \end{codeenv}
+which will expand to \verb|file%20name.pdf|.
 In the case of \gls{bibglshrefunicode}, the first argument is
-ignored.
+ignored, so \filefmt{skr\'aarnafn.pdf} will be converted to:
+\begin{codeenv}
+skr\gls{bibglshrefunicode}\marg{E1}\marg{\'a}arnafn.pdf
+\end{codeenv}
+which will expand to \code{skr\'aarnafn.pdf}.
 
 
 The supplementary locations lists are encapsulated within
@@ -10766,7 +10775,7 @@ which can be processed with:
 \gls{GlsXtrLoadResources}\oarg{\csopt[interpret-preamble]{src}}
 \end{codeenv}
 to provide \bibgls\ with this definition.
-The \filefmt{entries.bib} could contain:
+The \filefmt{entries.bib} file could contain:
 \begin{codeenv}
 \atentry{entry}\marg{caesar,
   \field{name}=\marg{\gls{sortop}\marg{Gaius Julius}\marg{Caesar}},
@@ -10978,7 +10987,8 @@ The sort methods listed in \tableref{tab:sortoptionsrule} are for
 alphabets that are defined by a rule. These usually ignore most
 punctuation and may ignore modifiers (such as accents).  Use with
 \csopt{break-at} to determine whether or not to split at word
-boundaries.
+boundaries. The collation rules (except for the custom options) are obtained
+from the \idx{localeprovider} (see page~\pageref{locale.provider}).
 
 \begin{itemize}
 \item \meta{lang tag}: sort according to the rules of the locale
@@ -11058,10 +11068,10 @@ For example:
 \gls{GlsXtrLoadResources}\oarg{\csopt[german-terms]{src},\csopt[de-DE-1996]{sort}}
 \end{codeenv}
 
-\subsubsection{Letter Case (Unicode Order)}
+\subsubsection{Letter (Non Locale)}
 
 The sort methods listed in \tableref{tab:sortoptionsletter} 
-use letter case comparators. These simply compare the
+use letter comparators. These simply compare the
 character codes. The \optfmt{-nocase} options first convert the
 \field{sort} field to \idx{lowercase} before performing the sort.
 Punctuation isn't ignored.

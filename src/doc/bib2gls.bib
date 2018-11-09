@@ -9220,6 +9220,12 @@ abbreviation by the \catattr{markwords} attribute},
   parent={gls}
 }
 
+@index{gls.hyper,
+  name={\csoptfmt{hyper}},
+  category={commandoption},
+  parent={gls}
+}
+
 @index{gls.textformat,
   name={\csoptfmt{text\-format}},
   category={commandoption},
@@ -10469,6 +10475,24 @@ to use in the header (leave empty for default)},
   description={used within \gls{glsxtrglossentry} and
 \gls{glsxtrglossentryother} to display sub-item labels},
   note={\styfmt{glossaries-extra} v1.31+},
+  category={command}
+}
+
+@index{GlsXtrStandaloneEntryName,
+  name={\csfmt{Gls\-Xtr\-Stand\-alone\-Entry\-Name}},
+  user1 = {\margm{label}},
+  description={used within \gls{glsxtrglossentry} to
+   display the name (with a hypertarget, if supported)},
+  note={\styfmt{glossaries-extra} v1.37+},
+  category={command}
+}
+
+@index{GlsXtrStandaloneEntryOther,
+  name={\csfmt{Gls\-Xtr\-Stand\-alone\-Entry\-Other}},
+  user1 = {\margm{label}\margm{field}},
+  description={used within \gls{glsxtrglossentryother} to
+   display the given field value (with a hypertarget, if supported)},
+  note={\styfmt{glossaries-extra} v1.37+},
   category={command}
 }
 
