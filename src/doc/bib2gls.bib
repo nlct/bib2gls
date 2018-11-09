@@ -3645,6 +3645,14 @@ given language},
   category={command}
 }
 
+@index{selectlanguage,
+  name={\csfmt{select\-language}},
+  user1={\margm{language name}},
+  description={switch to the rules of the given language},
+  note={\styfmt{babel} and \styfmt{polyglossia}},
+  category={command}
+}
+
 @index{marvosym,
   name={\styfmt{marvosym}},
   category={package},
@@ -6730,7 +6738,10 @@ primary formats, if enabled.},
 @index{glsxtrhiernamesep,
   name={\csfmt{gls\-xtr\-hier\-name\-sep}},
   description={Separator between hierarchical levels displayed with
-   \cs{glsxtrhiername} (and case-changing variants)},
+   \cs{glsxtrhiername} (and case-changing variants). This defaults
+   to \qt{\glsxtrhiernamesep} with the \styfmt{glossaries-extra}
+   package, but the \bibgls\ interpreter has a different definition
+   to assist sorting},
   note={\styfmt{glossaries-extra} v1.37+},
   seealso={glsxtrhiername},
   category={command}

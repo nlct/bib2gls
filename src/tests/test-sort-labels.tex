@@ -6,22 +6,34 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage[record,style=tree]{glossaries-extra}
 
+\newcommand{\bibglsseealsosep}{\par}%
+\newcommand{\bibglsuseseealso}[1]{%
+ {%
+   \renewcommand{\glsseesep}{;\par\qquad}%
+   \renewcommand{\glsseelastsep}{\par\qquad\&\space}%
+   \renewcommand{\glsxtruseseealsoformat}[1]{\emph{\seealsoname}:
+\par\qquad\glsseelist{##1}}%
+   \glsxtruseseealso{#1}.%
+ }%
+}
+
 \GlsXtrLoadResources[ 
  src={test-sort-labels},
  sort={en},
  %sort-label-list={{seealso,see}:en:glsentryname}
- %sort-label-list={{seealso,see}:en:glsxtrhiername}
+ sort-label-list={{seealso,see}:en:glsxtrhiername}
  %sort-label-list={{seealso,see}:en}
- sort-label-list={{seealso,see}:use}
+ %sort-label-list={{seealso,see}:use}
 ]
 
-%\renewcommand{\glsxtrhiernamesep}{ $\triangleright$ }
-%\renewcommand*{\glsseeitemformat}[1]{\glsxtrhiername{#1}}
-
+\renewcommand*{\glsseeitemformat}[1]{\glsxtrhiername{#1}}
+\renewcommand*{\glsxtrhiernamesep}{\,{\small$\triangleright$}\,}
 
 \begin{document}
 \Gls{parrot}, \gls{tardigrade}, \gls{swan}, \gls{duck}, \gls{goose},
 \gls{fluffy} \gls{duckling}, \gls{velociraptor}.
+There's some \gls{birdseed} on the \gls{birdtable} inside the 
+\gls{birdcage}.
 
 \printunsrtglossaries
 \end{document}

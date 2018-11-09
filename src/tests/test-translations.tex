@@ -1,6 +1,7 @@
 % arara: pdflatex
 % arara: bib2gls: {group: on}
 % arara: pdflatex
+% arara: pdflatex
 \documentclass{article}
 
 \usepackage[T1]{fontenc}
@@ -19,34 +20,40 @@
 \newglossary*{pt}{Portuguese Terms}
 
 \GlsXtrLoadResources[
+  selection={all},
   type=en,
   src=entries-en,
+  sort=en-GB,
   category=en,
-  sort=en
+  field-aliases={translations-pt=user1},
+  sort-label-list={user1:pt-BR:glsentryname}
 ]
 \GlsXtrLoadResources[
+  selection={all},
   type=pt,
   src=entries-pt,
-  sort=pt,
+  sort=pt-BR,
   category=pt,
-  see=omit,
-  field-aliases={translations-en=see},
-  sort-label-list={user1:en:glsentryname}
+  field-aliases={translations-en=user1},
+  sort-label-list={user1:en-GB:glsentryname}
 ]
 
+\apptoglossarypreamble[en]{\selectlanguage{british}}
+\apptoglossarypreamble[pt]{\selectlanguage{brazilian}}
+
 \begin{document}
-\selectlanguage{british}
-
-The \gls{cat} sat on the \gls{mat}.
-
-\selectlanguage{brazilian}
-
-O \gls{gato} sentou-se no \gls{tapete}.
+%\selectlanguage{british}
+%
+%The \gls{cat} sat on the \gls{mat}.
+%
+%\selectlanguage{brazilian}
+%
+%O \gls{gato} sentou-se no \gls{tapete}.
 
 \renewcommand*{\glsxtrbookindexname}[1]{%
  \glsxtrifhasfield{prefix}{#1}{\xmakefirstuc\glscurrentfieldvalue\space}{}%
  \glossentryname{#1}%
- \glsxtrifhasfield{see}{#1}{; translations: \glsxtrseelist\glscurrentfieldvalue}{}%
+ \glsxtrifhasfield{useri}{#1}{; translations: \glsxtrseelist\glscurrentfieldvalue}{}%
 }
 \printunsrtglossaries
 \end{document}
