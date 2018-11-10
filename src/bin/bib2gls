@@ -4,4 +4,9 @@
 # file. The file bib2gls.sh will be the script that's distributed.
 
 bindir=`dirname "$0"`
-java -Djava.locale.providers=CLDR,JRE,SPI -jar "$bindir/../lib/bib2gls.jar" "$@"
+
+if [ -z "$JAVA_TOOL_OPTIONS" ]; then
+  java -Djava.locale.providers=CLDR,JRE,SPI -jar "$bindir/../lib/bib2gls.jar" "$@"
+else
+  java -jar "$bindir/../lib/bib2gls.jar" "$@"
+fi
