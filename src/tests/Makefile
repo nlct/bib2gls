@@ -30,7 +30,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-primary-records.pdf test-primary-records-counter.pdf \
 	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
-	  test-sort-labels.pdf
+	  test-sort-labels.pdf test-lettersort-examples.pdf \
+	  test-sortletternumber.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -562,6 +563,20 @@ test-sort-labels.pdf	: test-sort-labels.glstex
 test-sort-labels.glstex	: test-sort-labels.tex test-sort-labels.bib $(DEPS)
 		pdflatex test-sort-labels
 		$(BIB2GLS) test-sort-labels
+
+test-lettersort-examples.pdf	: test-lettersort-examples.glstex
+		pdflatex test-lettersort-examples
+
+test-lettersort-examples.glstex	: test-lettersort-examples.tex test-lettersort-examples.bib $(DEPS)
+		pdflatex test-lettersort-examples
+		$(BIB2GLS) test-lettersort-examples
+
+test-sortletternumber.pdf	: test-sortletternumber.glstex
+		pdflatex test-sortletternumber
+
+test-sortletternumber.glstex	: test-sortletternumber.tex test-sortletternumber.bib $(DEPS)
+		pdflatex test-sortletternumber
+		$(BIB2GLS) test-sortletternumber
 
 clean	:
 	$(RM) *.aux

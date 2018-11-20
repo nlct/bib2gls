@@ -232,34 +232,33 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
       }
       else if (caseStyle == LOWERUPPER)
       {
+         if (cp1 == cp2)
+         {
+            return 0;
+         }
+
          int lcp1 = Character.toLowerCase(cp1);
          int lcp2 = Character.toLowerCase(cp2);
 
          if (lcp1 == lcp2)
          {
-            if (cp1 == cp2)
-            {
-               return 0;
-            }
-            else if (Character.isLowerCase(cp1))
+            if (Character.isLowerCase(cp1) 
+              && (Character.isUpperCase(cp2) || Character.isTitleCase(cp2)))
             {
                return -1;
             }
-            else if (Character.isLowerCase(cp2))
+            else if (Character.isLowerCase(cp2) 
+              && (Character.isUpperCase(cp1) || Character.isTitleCase(cp1)))
             {
                return 1;
             }
+            else if (cp1 < cp2)
+            {
+               return -1;
+            }
             else
-            {// punctuation
-
-               if (cp1 < cp2)
-               {
-                  return -1;
-               }
-               else
-               {
-                  return 1;
-               }
+            {
+               return 1;
             }
          }
          else if (lcp1 < lcp2)

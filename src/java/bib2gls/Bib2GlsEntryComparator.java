@@ -70,7 +70,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       if (collator instanceof RuleBasedCollator && bib2gls.getDebugLevel() > 0)
       {
-         bib2gls.debug(bib2gls.getMessage("message.collator.rules",
+         bib2gls.logMessage(bib2gls.getMessage("message.collator.rules",
            ((RuleBasedCollator)collator).getRules()));
       }
    }

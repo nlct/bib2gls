@@ -718,7 +718,7 @@
   {\string-\string-#1}%
 }
 
-\newcommand*{\unicodecategoryfmt}[1]{\textsf{#1}}
+\newcommand*{\unicodecategoryfmt}[1]{\qt{\textsf{#1}}}
 
 \definecolor{defbackground}{rgb}{1,1,0.75}
 \newsavebox\defsbox
@@ -10818,12 +10818,11 @@ document has a language that's been detected by \sty{tracklang},
 otherwise \csopt[locale]{sort} is assumed.
 
 The \optfmt{\meta{method}\dhyphen reverse} options reverse the
-algorithm used by the corresponding \meta{method} comparator.
+result returned by the corresponding \meta{method} comparator.
 However \optfmt{\meta{method}\dhyphen reverse} may not produce a
 list that's the exact reverse of the underlying non-reversed
-\meta{method}. The reverse sort maintains hierarchy if the
-underlying \meta{method} supports hierarchical sorting, so
-sub-entries will still be listed after the parent entry.
+\meta{method} as the hierarchical structure or associated settings
+can affect the order.
 
 \begin{table}[p]
 \caption{Summary of Available Sort Options: No Actual Sorting}
@@ -11073,7 +11072,9 @@ For example:
 The sort methods listed in \tableref{tab:sortoptionsletter} 
 use letter comparators. These simply compare the
 character codes. The \optfmt{-nocase} options first convert the
-\field{sort} field to \idx{lowercase} before performing the sort.
+\field{sort} field to \idx{lowercase} before performing the sort to
+provide a case-insensitive comparison. 
+
 Punctuation isn't ignored.
 Use \csopt[\meta{lang tag}]{sort} with \csopt[none]{break-at} to
 emulate \idx!{xindy}['s] locale letter ordering. The examples below
@@ -11084,15 +11085,22 @@ show the ordering of the list \code{antelope}, \code{bee}, \code{Africa},
 \Idx{uppercase} and \idx{lowercase} are in separate letter groups.
 Example: 
 
-\code{Africa} (letter group \qt{A}), \code{Brazil}
-(letter group \qt{B}), \code{aardvark} (letter group \qt{a}),
-\code{antelope} (letter group \qt{a}), \code{bee} (letter group \qt{b}).
+\code{Africa} (letter group \idx{uppercase} \qt{A}), \code{Brazil}
+(letter group \idx{uppercase} \qt{B}), \code{aardvark} (letter group 
+\idx{lowercase} \qt{a}), \code{antelope} (letter group
+\idx{lowercase} \qt{a}), \code{bee} (letter group \idx{lowercase} \qt{b}).
 
 \item \optfmt{letter-case-reverse}: reverse case-sensitive letter sort.
+Example:
+
+\code{bee} (letter group \idx{lowercase} \qt{b}), \code{antelope}
+(letter group \idx{lowercase} \qt{a}), \code{aardvark} (letter group
+\idx{lowercase} \qt{a}) \code{Brazil} (letter group \idx{uppercase}
+\qt{B}), \code{Africa} (letter group \idx{uppercase} \qt{A}).
 
 \item \optfmt{letter-nocase}: case-insensitive letter sort. (All
 \idx{uppercase} characters will have first been converted to
-\idx{lowercase}.)
+\idx{lowercase} in the sort value.)
 Example:
 
 \code{aardvark} (letter group \qt{A}), \code{Africa}
@@ -11101,6 +11109,11 @@ Example:
 \code{Brazil} (letter group \qt{B}).
 
 \item \optfmt{letter-nocase-reverse}: reverse case-insensitive letter sort.
+Example:
+
+\code{Brazil} (letter group \qt{B}), \code{bee} (letter group
+\qt{B}), \code{antelope} (letter group \qt{A}), \code{Africa}
+(letter group \qt{A}), \code{aardvark} (letter group \qt{A}).
 
 \item \optfmt{letter-upperlower}: each character pair is first
 compared according to their \idx{lowercase} values. If these are equal,
@@ -11113,6 +11126,12 @@ Example:
 (letter group \qt{B}), \code{bee} (letter group \qt{B}).
 
 \item \optfmt{letter-upperlower-reverse}: reverse upper-lower letter sort.
+This now puts the \idx{lowercase} letters first within the letter group.
+Example:
+
+\code{bee} (letter group \qt{B}), \code{Brazil} (letter group
+\qt{B}), \code{antelope} (letter group \qt{A}), \code{aardvark}
+(letter group \qt{A}), \code{Africa} (letter group \qt{A}).
 
 \item \optfmt{letter-lowerupper}: each character pair is first
 compared according to their \idx{lowercase} values. If these are equal,
@@ -11121,10 +11140,17 @@ then they are compared according to case. This puts
 Example:
 
 \code{aardvark} (letter group \qt{A}), \code{antelope} (letter group \qt{A}),
- \code{Africa} (letter group \qt{A}), \code{bee} (letter group
+\code{Africa} (letter group \qt{A}), \code{bee} (letter group
 \qt{B}), \code{Brazil} (letter group \qt{B}).
 
 \item \optfmt{letter-lowerupper-reverse}: reverse lower-upper letter sort.
+This now puts the \idx{uppercase} letters first within the letter group.
+Example:
+
+\code{Brazil} (letter group \qt{B}), \code{bee} (letter group
+\qt{B}), \code{Africa} (letter group \qt{A}), \code{antelope}
+(letter group \qt{A}), \code{aardvark} (letter group \qt{A}).
+
 \end{itemize}
 
 \subsubsection{Letter-Number}
@@ -11246,18 +11272,25 @@ following:
 category. If both characters are white space, then they are compared
 according to their Unicode values otherwise they are ordered according to 
 the \csopt{letter-number-punc-rule} setting.
+
 \item letter: belongs to one of the Unicode categories \idx{letteruppercase}, 
 \idx{letterlowercase}, \idx{lettertitlecase},
 \idx{lettermodifier} or \idx{letterother}. If both characters
-are letters, then they are compared in the same way as the
+are letters then, for sort method \optfmt{letternumber-\meta{modifier}}, 
+the characters are compared in the same way as the
 corresponding \optfmt{letter-\meta{modifier}} sort method otherwise
 they are ordered according to the 
 \csopt{letter-number-punc-rule} setting.
+
 \item punctuation: everything else. If both characters are
 punctuation, then they are compared according to their Unicode value
 otherwise they are ordered according to 
 the \csopt{letter-number-punc-rule} setting.
 \end{itemize}
+For simplicity, the actual sort value used during sorting isn't a
+simple string but is converted into a list of objects that represent
+one of: letter, integer, space or other (punctuation). This reduces
+the amount of parsing of substrings that needs to be performed.
 
 The examples below show the ordering of the list:
 \code{CH\textsubscript{2}O}, 
@@ -11265,6 +11298,7 @@ The examples below show the ordering of the list:
 \code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
 \code{CO}, \code{Cl}, 
 \code{Co}, \code{Co\textsubscript{2}O\textsubscript{3}}, 
+\code{Co\textsubscript{2}}, \code{CO\textsubscript{2}},
 \code{CoMoO\textsubscript{4}} and \code{CoCl\textsubscript{2}},
 for the setting
 \csopt[between]{letter-number-rule}, where the subscripts are
@@ -11276,16 +11310,32 @@ letter-number sort. Example:
 
 \code{CH\textsubscript{2}O}, 
 \code{CO},
+\code{CO\textsubscript{2}},
 \code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
 \code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
 \code{Cl}, 
 \code{Co}, 
 \code{CoCl\textsubscript{2}},
 \code{CoMoO\textsubscript{4}}, 
+\code{Co\textsubscript{2}},
 \code{Co\textsubscript{2}O\textsubscript{3}}.
 
+(Order determined by: $\mathtt{H} < \mathtt{O} < 5 < 10 < \mathtt{l} < \mathtt{o}$.)
+
 \item \optfmt{letternumber-case-reverse}: reverse case-sensitive
-letter-number sort.
+letter-number sort. Example:
+
+\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{Co\textsubscript{2}},
+\code{CoMoO\textsubscript{4}}, 
+\code{CoCl\textsubscript{2}},
+\code{Co}, 
+\code{Cl}, 
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
+\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
+\code{CO\textsubscript{2}},
+\code{CO},
+\code{CH\textsubscript{2}O}.
 
 \item \optfmt{letternumber-nocase}: case-insensitive
 letter-number sort. The sort value is first converted to lower
@@ -11297,86 +11347,24 @@ the sort value, so numbers will always come before letters. Example:
 \code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
 \code{CH\textsubscript{2}O}, 
 \code{Cl}, 
-\code{Co}, 
 \code{CO}, 
+\code{Co}, 
+\code{CO\textsubscript{2}},
+\code{Co\textsubscript{2}},
 \code{Co\textsubscript{2}O\textsubscript{3}},
 \code{CoCl\textsubscript{2}},
 \code{CoMoO\textsubscript{4}}. 
 
+(Order determined by: $5 < 10 < \mathtt{h} < \mathtt{l} < \mathtt{o}$.)
+
 \item \optfmt{letternumber-nocase-reverse}: reverse case-insensitive
-letter-number sort.
-
-\item \optfmt{letternumber-upperlower}: upper-lower
-letter-number sort. This behaves slightly differently to
-\optfmt{letter-upperlower} when used with \csopt[between]{letter-number-rule}
-as it will segregate the \idxlink{uppercase}{upper} and 
-\idx{lowercase} characters if there
-are any numerical sub-strings. Example:
-
-\code{CH\textsubscript{2}O}, 
-\code{CO}, 
-\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
-\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
-\code{Cl}, 
-\code{Co}, 
-\code{CoCl\textsubscript{2}},
-\code{CoMoO\textsubscript{4}}, 
-\code{Co\textsubscript{2}O\textsubscript{3}}.
-
-The \csopt[between]{letter-number-rule} setting enforces numbers
-after \idx{uppercase} (for the case-sensitive and upper-lower methods)
-which makes the \code{\textsubscript{5}} come after the \idx{uppercase}
-\code{O} and forces the \idx{lowercase} characters to come after it.
-
-Compare this with \csopt[before letter]{letter-number-rule} which
-results in the order:
-
-\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
-\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
-\code{CH\textsubscript{2}O}, 
-\code{Cl}, 
-\code{CO}, 
-\code{Co}, 
-\code{Co\textsubscript{2}O\textsubscript{3}},
-\code{CoCl\textsubscript{2}},
-\code{CoMoO\textsubscript{4}}.
-
-
-\item \optfmt{letternumber-upperlower-reverse}: reverse upper-lower
-letter-number sort. Note that with
-\csopt[between]{letter-number-rule}, this can result in an order
-that isn't the actual reverse of \optfmt{letternumber-upperlower}.
-Example:
-
-\code{Co\textsubscript{2}O\textsubscript{3}},
-\code{CoMoO\textsubscript{4}}, 
-\code{CoCl\textsubscript{2}},
-\code{Co}, 
-\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
-\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
-\code{CO}, 
-\code{Cl}, 
-\code{CH\textsubscript{2}O}. 
-
-The algorithm is reversed which means that when two letters are
-compared then, if both letters have the same \idx{lowercase} version,
-the upper-lower rule is reversed and \idx{lowercase} comes before
-\idx{uppercase}.  This means that \code{o} comes before \code{O}. 
-If their \idx{lowercase} versions aren't identical, the letter
-with the higher \idx{lowercase} Unicode value comes first. This means
-that both \code{o} and \code{O} come before \code{l} which comes
-before \code{H}.  So far, this gives the order: 
-\code{o}, \code{O}, \code{l}, \code{H}.
-The \csopt[between]{letter-number-rule} setting inserts numbers between 
-\idxlink{uppercase}{upper} and \idx{lowercase} letters. This puts the numbers (in reverse
-order) between \code{o} and \code{O}.
-
-Compare this with \csopt[before letter]{letter-number-rule} which
-results in the order:
+letter-number sort, so numbers will now always come after letters. Example:
 
 \code{CoMoO\textsubscript{4}}, 
 \code{CoCl\textsubscript{2}},
 \code{Co\textsubscript{2}O\textsubscript{3}},
+\code{Co\textsubscript{2}},
+\code{CO\textsubscript{2}},
 \code{Co}, 
 \code{CO}, 
 \code{Cl}, 
@@ -11384,30 +11372,98 @@ results in the order:
 \code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
 \code{C\textsubscript{5}H\textsubscript{4}NCOOH}. 
 
-Remember that the associated settings as reversed
-well. So \csopt[before letter]{letter-number-rule} is 
-results in numbers \emph{after} letters.
-
-\item \optfmt{letternumber-lowerupper}: lower-upper
-letter-number sort. As with the upper-lower version, this behaves
-slightly differently to the corresponding
-\optfmt{letter-lowerupper} when used with \csopt[between]{letter-number-rule}. 
+\item \optfmt{letternumber-upperlower}: upper-lower
+letter-number sort. This behaves slightly differently to
+\optfmt{letter-upperlower} when used with \csopt[between]{letter-number-rule}
+and has a more complicated rule that's determined by the character
+following the number and implied numbers inserted between letters. 
+(There was a bug in earlier versions that has been corrected in v1.8
+so you may find a slightly different ordering when upgrading.)
 Example:
 
+\code{CH\textsubscript{2}O}, 
+\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
 \code{Cl}, 
+\code{CO}, 
+\code{CO\textsubscript{2}},
 \code{Co}, 
-\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{Co\textsubscript{2}},
 \code{CoCl\textsubscript{2}},
 \code{CoMoO\textsubscript{4}}, 
+\code{Co\textsubscript{2}O\textsubscript{3}}.
+
+(Order determined by: $\mathtt{H} < 5\mathtt{H} < 10\mathtt{H} <
+\mathtt{l} < \mathtt{O} < \mathtt{o}$, and for the terms starting
+with \code{CO} or \code{Co}: 2 comes after null and $\mathtt{C} <
+\mathtt{M} < 2\mathtt{O}$.)
+
+Compare this with \csopt[before letter]{letter-number-rule} which
+results in the order:
+
 \code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
 \code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
 \code{CH\textsubscript{2}O}, 
-\code{CO}. 
+\code{Cl}, 
+\code{CO}, 
+\code{CO\textsubscript{2}},
+\code{Co}, 
+\code{Co\textsubscript{2}},
+\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{CoCl\textsubscript{2}},
+\code{CoMoO\textsubscript{4}}.
 
-The \csopt[between]{letter-number-rule} setting enforces numbers
-after \idx{lowercase} (for the lower-upper method)
-so the \code{\textsubscript{5}} is put after \code{o}, and forces
-the \idx{uppercase} characters after the numbers.
+\item \optfmt{letternumber-upperlower-reverse}: reverse upper-lower
+letter-number sort. Example (with  \csopt[between]{letter-number-rule}):
+
+\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{CoMoO\textsubscript{4}}, 
+\code{CoCl\textsubscript{2}},
+\code{Co\textsubscript{2}},
+\code{Co}, 
+\code{CO\textsubscript{2}},
+\code{CO}, 
+\code{Cl}, 
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
+\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
+\code{CH\textsubscript{2}O}. 
+
+Compare this with \csopt[before letter]{letter-number-rule} which
+results in the order:
+
+\code{CoMoO\textsubscript{4}}, 
+\code{CoCl\textsubscript{2}},
+\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{Co\textsubscript{2}},
+\code{Co}, 
+\code{CO\textsubscript{2}},
+\code{CO}, 
+\code{Cl}, 
+\code{CH\textsubscript{2}O}, 
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
+\code{C\textsubscript{5}H\textsubscript{4}NCOOH}. 
+
+Remember that the associated settings are reversed
+well. So \csopt[before letter]{letter-number-rule} 
+results in numbers \emph{after} letters.
+
+\item \optfmt{letternumber-lowerupper}: lower-upper letter-number
+sort. As with the upper-lower option, this behaves slightly differently to
+\optfmt{letter-lowerupper} when used with \csopt[between]{letter-number-rule}
+and has a more complicated rule.
+Example:
+
+\code{CH\textsubscript{2}O}, 
+\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
+\code{Cl}, 
+\code{Co}, 
+\code{Co\textsubscript{2}},
+\code{CoCl\textsubscript{2}},
+\code{CoMoO\textsubscript{4}}, 
+\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{CO}, 
+\code{CO\textsubscript{2}}.
 
 Compare this with \csopt[before letter]{letter-number-rule} which
 results in the order:
@@ -11417,26 +11473,27 @@ results in the order:
 \code{CH\textsubscript{2}O}, 
 \code{Cl}, 
 \code{Co}, 
+\code{Co\textsubscript{2}},
 \code{Co\textsubscript{2}O\textsubscript{3}},
 \code{CoCl\textsubscript{2}},
 \code{CoMoO\textsubscript{4}}, 
-\code{CO}. 
+\code{CO}, 
+\code{CO\textsubscript{2}}.
 
 \item \optfmt{letternumber-lowerupper-reverse}: reverse lower-upper
-letter-number sort. Again with
-\csopt[between]{letter-number-rule}, this can result in an order
-that isn't the actual reverse of \optfmt{letternumber-lowerupper},
-although for this example it does happen to be the actual reverse:
+letter-number sort. Example (with \csopt[between]{letter-number-rule}):
 
+\code{CO\textsubscript{2}},
 \code{CO}, 
-\code{CH\textsubscript{2}O}, 
-\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
-\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
+\code{Co\textsubscript{2}O\textsubscript{3}},
 \code{CoMoO\textsubscript{4}}, 
 \code{CoCl\textsubscript{2}},
-\code{Co\textsubscript{2}O\textsubscript{3}},
+\code{Co\textsubscript{2}},
 \code{Co}, 
-\code{Cl}. 
+\code{Cl}, 
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
+\code{C\textsubscript{5}H\textsubscript{4}NCOOH}, 
+\code{CH\textsubscript{2}O}. 
 
 \end{itemize}
 
@@ -11449,7 +11506,9 @@ be a numeric value. If it can't be parsed then it's treated as 0
 These all recognise the digits in the Unicode \qt{Number,
 Decimal Digit} category but, unlike the hybrid letter-number
 comparators above, they don't recognise the superscript or subscript
-digits.
+digits. The \qt{non-locale} in some of the descriptions below
+indicates that the method doesn't recognise locale-sensitive
+formatting, such as group separators.
 \begin{itemize}
 \item \optfmt{integer}: integer sort. This is for non-locale integer sort
 values.
@@ -20179,5 +20238,6 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
   }%
   {\glossentryname{#1}}%
 }
+\renewcommand*{\unicodecategoryfmt}[1]{\textsf{#1}}
 \printunsrtglossary[type=index]
 \end{document}

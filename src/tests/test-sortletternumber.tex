@@ -1,0 +1,26 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{mhchem}
+\usepackage[record,nomain,index,nostyles,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  selection=all,
+  type=index,
+  letter-number-rule={between},
+  %letter-number-rule={before letter},
+  %sort={letternumber-case}
+  %sort={letternumber-case-reverse}
+  %sort={letternumber-nocase}
+  %sort={letternumber-nocase-reverse}
+  %sort={letternumber-upperlower}
+  %sort={letternumber-upperlower-reverse}
+  %sort={letternumber-lowerupper}
+  sort={letternumber-lowerupper-reverse}
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

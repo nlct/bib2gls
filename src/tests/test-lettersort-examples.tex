@@ -1,0 +1,23 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,nomain,index,nostyles,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  selection=all,
+  type=index,
+  %sort={letter-case}
+  %sort={letter-case-reverse}
+  %sort={letter-nocase}
+  %sort={letter-nocase-reverse}
+  %sort={letter-upperlower}
+  %sort={letter-upperlower-reverse}
+  %sort={letter-lowerupper}
+  sort={letter-lowerupper-reverse}
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

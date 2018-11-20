@@ -34,6 +34,9 @@ v1.8 (pending):
 
   * bug fix: corrected default sort=doc
 
+  * bug fix: corrected letternumber-upperlower and
+    letternumber-lowerupper sort methods.
+
   * \@glsnavhypertarget will now fallback on original definition
     (which requires an extra LaTeX call) if the type is unknown.
 
