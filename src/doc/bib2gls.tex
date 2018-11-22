@@ -19,10 +19,13 @@
 \newcommand{\textcyrillicmono}[1]{{\cyrillicmono #1}}
 
 \newfontface\greekmono{FreeMono}[Scale=MatchLowercase]
-\newfontface\devangari{FreeSerif}
-\newcommand{\devone}{{\devangari\char"0967}}
-\newcommand{\devtwo}{{\devangari\char"0968}}
-\newcommand{\devsix}{{\devangari\char"096C}}
+\newfontface\freeserif{FreeSerif}
+\newcommand{\devone}{{\freeserif\char"0967}}
+\newcommand{\devtwo}{{\freeserif\char"0968}}
+\newcommand{\devsix}{{\freeserif\char"096C}}
+\newcommand{\insularG}{{\freeserif\char"A77D}}
+\newcommand{\insularg}{{\freeserif\char"1D79}}
+\newcommand{\longs}{\char"017F}
 
 \usepackage[x11names]{xcolor}
 \usepackage{alltt}
@@ -848,7 +851,7 @@ files}
 
 \newenvironment{codeenv}
  {%
-   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{format=glsignore}}%
    \setupcodeenvfmts
    \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
    \parindent\z@\parfillskip\@flushglue\parskip\z@skip
@@ -11632,24 +11635,24 @@ In general, it doesn't make much sense to have hierarchical entries
 that need to be sorted by date, but it is possible as long as each
 level uses the same date format.
 
-For example, suppose my \ext{bib} file contains
-\begin{verbatim}
-@entry{journalentry,
-  name={10 Jan 2017},
-  description={an interesting journal entry}
+For example, suppose my \ext{bib} file contains:
+\begin{codeenv}
+\atentry{entry}\marg{journalentry,
+  \field{name}=\marg{10 Jan 2017},
+  \field{description}=\marg{an interesting journal entry}
 }
-\end{verbatim}
+\end{codeenv}
 The \field{name} field uses an abbreviated UK date format.
 If all my other entries also use this format in the \field{name}
 then I can sort them chronologically:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src=entries,% data in entries.bib
-  sort=date,
-  date-sort-locale={en-GB},
-  date-sort-format={medium}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[date]{sort},
+  \csopt[en-GB]{date-sort-locale},
+  \csopt[medium]{date-sort-format}
+}
+\end{codeenv}
 (The medium format is actually the default for this locale,
 and the locale matches my system locale, so I could omit
 both \csopt{date-sort-locale} and \csopt{date-sort-format}.)
@@ -11689,47 +11692,56 @@ be an integer used as a seed for the random number generator.
 \optsection{sort-field}
 
 The \csopt{sort-field} key indicates which field provides the sort
-value. The default is the \field{sort} field. For example
+value. The \meta{field} must be a recognised field name or you
+may use \csopt[id]{sort-field} to sort according to the label.
+The default value is the \field{sort} field (which is typically
+inferred rather than explicitly set).
+
+Example:
 \begin{codeenv}
-\gls!{GlsXtrLoadResources}\oarg{
- \csopt[entries-terms]{src},\idx!{commentchar} data in entries-terms.bib
- \csopt[category]{sort-field},\idx!{commentchar} sort by 'category' field
- \csopt[letter-case]{sort}\idx!{commentchar} case-sensitive letter sort
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries-terms]{src},\comment{data in entries-terms.bib}
+ \csopt[category]{sort-field},\comment{sort by 'category' field}
+ \csopt[letter-case]{sort}\comment{case-sensitive letter sort}
 }
 \end{codeenv}
 This sorts the entries according to the \field{category} field using
 a case-sensitive letter comparison.
-You may also use \csopt[id]{sort-field} to sort according to
-the label.
 
 If an entry is missing a value for \meta{field}, then the value of
 the fallback field will be used instead. If \csopt{missing-sort-fallback} is
 set, then that's used as the fallback, otherwise it depends on the
 entry type. 
+If no fallback field can be found, the entry's label will be used.
 
-For example, with the default \csopt[sort]{sort-field}, then for an
-entry defined with \atentry{entry}, if the \field{sort} field is
-missing the fallback field will be the \field{name} (or the
-\field{parent} field if the \field{name} field is missing).
+For the specific case with the default \csopt[sort]{sort-field}
+setting, the fallback for the \field{sort} field is governed not
+only by the entry type but also by some associated settings:
 
-If the entry is instead defined with an abbreviation type (for
-example, \atentry{abbreviation} or
-\atentry{acronym}) then if the \field{sort} field is missing,
-\bibgls\ will fallback on the field given by
-\csopt{abbreviation-sort-fallback}. This is only used with
-\csopt[sort]{sort-field}.
+\begin{itemize}
+\item For entries types like \atentry{entry} or \atentry{index},
+then if the \field{sort} field is missing the value is obtained from
+the \field{name} field. If that field is also missing, then the
+value is obtained from the particular entry type's fallback for the
+\field{name} field. (For example, \field{parent} for
+\atentry{entry}.)
 
-The symbol-like entry types fallback on the field given by
-\csopt{symbol-sort-fallback} if the \field{sort} is missing.  This
-is only used with \csopt[sort]{sort-field}.
+\item If the entry is defined with an abbreviation type (for
+example, \atentry{abbreviation} or \atentry{acronym}) then if the
+\field{sort} field is missing, \bibgls\ will fallback on the field
+given by \csopt{abbreviation-sort-fallback}.
 
-Entries defined using \atentry{bibtexentry} fallback on the field
+\item The symbol-like entry types fallback on the field given by
+\csopt{symbol-sort-fallback} if the \field{sort} field is missing.
+
+\item Entries defined using \atentry{bibtexentry} fallback on the field
 given by \csopt{bibtexentry-sort-fallback}, which defaults to the
 \field{name} field. Note that this only applies to the main entry.
 The spawned \atentry{contributor} entries behave like
 \atentry{index}.
 
-If no fallback field can be found, the entry's label will be used.
+\end{itemize}
+Use \csopt{dual-sort-field} when sorting dual entries.
 
 \optsection{missing-sort-fallback}
 
@@ -11822,11 +11834,11 @@ This option may be used to perform regular expression substitutions
 on the sort value and has the same syntax as \csopt{labelify-replace}. 
 This action is done after the interpreter parses the
 sort value (if applicable) and before \csopt{sort-number-pad} (if
-applicable). For example, suppose the sort value is
-\begin{verbatim}
-\ensuremath{\approx 3.14}
-\end{verbatim}
-then the interpreter will convert this to $\mathtt{\approx}$\texttt{3.14} but
+applicable). For example, suppose the sort value is:
+\begin{codeenv}
+\cs{ensuremath}\marg{\ics{approx} 3.14}
+\end{codeenv}
+then the interpreter will convert this to $\mathtt{\approx}$\texttt{3.14} but:
 \begin{codeenv}
 \csopt[\marg{\cs{glshex}2248}\marg{}]{sort-replace}
 \end{codeenv}
@@ -11862,51 +11874,51 @@ to produce a literal backslash (\idx{backslashchar}) and tilde
 You can also
 use \stringu\meta{hex} (where \meta{hex} is a hexadecimal
 code) to represent a Unicode character. For example:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  sort={custom},
-  sort-rule={< a,A < b,B < c,C < ch,Ch,CH < d,D
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[custom]{sort},
+  \csopt[< a,A < b,B < c,C < ch,Ch,CH < d,D
    < dd,Dd,DD < e,E < f,F < ff,Ff,FF
    < g,G < ng,Ng,NG < h,H < ij,Ij,IJ
    < i,I < j,J < k,K < l,L < ll,Ll,LL < m,M
    < n,N < o,O < p,P < ph,Ph,PH < q,Q < r,R < rh,Rh,RH
    < s,S < t,T < th,Th,TH < u,U < v,V < w,W < x,X < y,Y < z,Z
-   < \string\u00E6,\string\u00C6}
-]
-\end{verbatim}
+   < \stringu00E6,\stringu00C6]{sort-rule}
+}
+\end{codeenv}
 It's best to use \ics{cs.string} rather than \ics{protect} to avoid
 unwanted spaces interfering with \meta{hex}. Note that
 \sty{glossaries-extra} v1.21+ provides\footnote{The command
 definition was moved to \isty{glossaries-extra-bib2gls} from version
 1.27 since it's only needed with \bibgls.}\ \ics{glshex}
 which just does \stringu\ so you can do
-\verb|\glshex 00E6| instead of \verb|\string\u00E6|.
+\code{\ics{glshex} 00E6} instead of \code{\stringu00E6}.
 This is only one character different, but you can redefine
 \ics{glsxtrresourceinit} to locally set \ics{u} to \ics{glshex} while
 the protected write is performed. For example:
-\begin{verbatim}
-\renewcommand*{\glsxtrresourceinit}{\let\u\glshex}
-\end{verbatim}
-Then you can just do \verb|\u00E6| instead of \verb|\string\u00E6|.
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\cmd{let}\cmd{u}\cs{glshex}}
+\end{codeenv}
+Then you can just do \code{\csfmt{u}00E6} instead of \code{\stringu00E6}.
 
 The \isty{glossaries-extra-bib2gls} package (which is automatically loaded by
 the \styopt{record} option) provides some commands for common rule blocks 
 that may be used in the construction of custom rules. For example:
-\begin{verbatim}
-sort-rule={\glsxtrcontrolrules
- ;\glsxtrspacerules
- ;\glsxtrnonprintablerules
- ;\glsxtrcombiningdiacriticrules
- ,\glsxtrhyphenrules
- <\glsxtrgeneralpuncrules
- <\glsxtrdigitrules
- <\glsxtrfractionrules
- <\glsxtrMathItalicGreekIrules
- <\glsxtrGeneralLatinIVrules
- <\glsxtrLatinAA
- <\glsxtrLatinOslash
-}
-\end{verbatim}
+\begin{codeenv}
+\csopt[\ics{glsxtrcontrolrules}
+ ;\ics{glsxtrspacerules}
+ ;\ics{glsxtrnonprintablerules}
+ ;\ics{glsxtrcombiningdiacriticrules}
+ ,\ics{glsxtrhyphenrules}
+ <\ics{glsxtrgeneralpuncrules}
+ <\ics{glsxtrdigitrules}
+ <\ics{glsxtrfractionrules}
+ <\ics{glsxtrMathItalicGreekIrules}
+ <\ics{glsxtrGeneralLatinIVrules}
+ <\ics{glsxtrLatinAA}
+ <\ics{glsxtrLatinOslash}
+]{sort-rule}
+\end{codeenv}
 This places the Greek maths symbols (such as \ics{alpha}) before the
 Latin block. See the \sty{glossaries-extra} documentation for
 further details of these commands.
@@ -11914,59 +11926,59 @@ further details of these commands.
 You might find it convenient to provide similar commands in a
 package for rules you may often need. For example, suppose I have a
 package called, say, \styfmt{mapsymbols} for providing map symbols:
-\begin{verbatim}
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{mapsymbols}
-% some package or font loading stuff here to provide
-% the appropriate symbols
-\newcommand{\Stadium}{...}
-\newcommand{\Battlefield}{...}
-\newcommand{\Harbour}{...}
-% etc
-
-% Provide a rule block:
-\newcommand{\MapSymbolOrder}{%
- \glshex 2694 % crossed-swords 0x2694
- < \glshex 2693 % anchor 0x2693
- < \glshex 26BD % football 0x26BD
+\begin{codeenv}
+\cmd{NeedsTeXFormat}\marg{LaTeX2e}
+\cmd{ProvidesPackage}\marg{mapsymbols}
+\comment{some package or font loading stuff here to provide}
+\comment{the appropriate symbols}
+\cmd{newcommand}\marg{\cmd{Stadium}}\marg{\ldots}
+\cmd{newcommand}\marg{\cmd{Battlefield}}\marg{\ldots}
+\cmd{newcommand}\marg{\cmd{Harbour}}\marg{\ldots}
+\comment{etc}
+\strut
+\comment{Provide a rule block:}
+\cmd{newcommand}\marg{\cmd{MapSymbolOrder}}\marg{\comment{}
+ \cs{glshex} 2694 \comment{crossed-swords 0x2694}
+ < \cs{glshex} 2693 \comment{anchor 0x2693}
+ < \cs{glshex} 26BD \comment{football 0x26BD}
 }
-\end{verbatim}
+\end{codeenv}
 In addition to \filefmt{mapsymbols.sty}, I also need to create
 \filefmt{mapssymbols.bib} to provide the appropriate definitions for
 \bibgls:
-\begin{verbatim}
-@preamble{"\glsxtrprovidecommand{\Harbour}{\char"2693}
-\glsxtrprovidecommand{\Battlefield}{\char"2694}
-\glsxtrprovidecommand{\Stadium}{\char"26BD}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\ics{char}"2693}
+\cs{glsxtrprovidecommand}\marg{\cmd{Battlefield}}\marg{\cs{char}"2694}
+\cs{glsxtrprovidecommand}\marg{\cmd{Stadium}}\marg{\cs{char}"26BD}"}
+\end{codeenv}
 The use of \ics{glsxtrprovidecommand} will override any previous
 definitions of these commands in \bibgls's interpreter but will act
 like \ics{providecommand} within the document, and so won't
 interfere with the commands defined in \filefmt{mapsymbols.sty}.
-Now I can just do
-\begin{verbatim}
-\usepackage{mapsymbols}% my custom package
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[
-  src={mapsymbols,% <--- my custom mapsymbols.bib
-   entries% data in entries.bib
-  },
-  sort={custom},
-  sort-rule={\glsxtrcontrolrules % control codes
- ;\glsxtrspacerules % space characters
- ;\glsxtrnonprintablerules % non-printable characters
- ;\glsxtrcombiningdiacriticrules % combining diacritics
- ,\glsxtrhyphenrules % hyphens
- <\glsxtrgeneralpuncrules % general punctuation
- <\glsxtrdigitrules % 0, ..., 9
- <\glsxtrfractionrules % fraction symbols
- <\MapSymbolOrder % <--- custom map symbols
- <\glsxtrMathItalicGreekIrules % math-greek symbols
- <\glsxtrGeneralLatinIrules % Latin letters
- }
-]
-\end{verbatim}
+Now I can just do:
+\begin{codeenv}
+\cmd{usepackage}\marg{mapsymbols}\comment{my custom package}
+\cmd{usepackage}[\styopt{record}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[mapsymbols,\comment{<--- my custom mapsymbols.bib}
+   entries\comment{data in entries.bib}
+  ]{src},
+  \csopt[custom]{sort},
+  \csopt[\cs{glsxtrcontrolrules}
+ ;\cs{glsxtrspacerules}
+ ;\cs{glsxtrnonprintablerules}
+ ;\cs{glsxtrcombiningdiacriticrules}
+ ,\cs{glsxtrhyphenrules}
+ <\cs{glsxtrgeneralpuncrules}
+ <\cs{glsxtrdigitrules}
+ <\cs{glsxtrfractionrules}
+ <\cmd{MapSymbolOrder} \comment{<--- custom map symbols}
+ <\cs{glsxtrMathItalicGreekIrules}
+ <\ics{glsxtrGeneralLatinIrules}
+ ]{sort-rule}
+}
+\end{codeenv}
 
 \optsection{break-at}
 
