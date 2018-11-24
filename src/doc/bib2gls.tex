@@ -428,6 +428,7 @@
 \newcommand*{\csopt}[2][]{\gencsopt{#1}{opt}{#2}}%
 \newcommand*{\glsopt}[2][]{\gencsopt{#1}{idx.gls}{#2}}%
 \newcommand*{\glsaddopt}[2][]{\gencsopt{#1}{idx.glsadd}{#2}}%
+\newcommand*{\printglossopt}[2][]{\gencsopt{#1}{idx.printgloss}{#2}}%
 
 \newcommand*{\gencsopt}[3]{%
   \texorpdfstring%
@@ -851,7 +852,7 @@ files}
 
 \newenvironment{codeenv}
  {%
-   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{format=glsignore}}%
+   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
    \setupcodeenvfmts
    \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
    \parindent\z@\parfillskip\@flushglue\parskip\z@skip
@@ -11157,6 +11158,7 @@ Example:
 \end{itemize}
 
 \subsubsection{Letter-Number}
+\label{sec:letternumber}
 
 The sort methods listed in \tableref{tab:sortoptionsletternumber} 
 use a letter-integer hybrid. They behave in a similar way to the
@@ -11501,6 +11503,7 @@ letter-number sort. Example (with \csopt[between]{letter-number-rule}):
 \end{itemize}
 
 \subsubsection{Numerical}
+\label{sec:numerical}
 
 The sort methods listed in \tableref{tab:sortoptionsnumerical} 
 use numeric comparisons. The sort value is expected to
@@ -11944,7 +11947,7 @@ package called, say, \styfmt{mapsymbols} for providing map symbols:
 }
 \end{codeenv}
 In addition to \filefmt{mapsymbols.sty}, I also need to create
-\filefmt{mapssymbols.bib} to provide the appropriate definitions for
+\filefmt{mapsymbols.bib} to provide the appropriate definitions for
 \bibgls:
 \begin{codeenv}
 \atentry{preamble}\marg{"\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\ics{char}"2693}
@@ -11979,6 +11982,25 @@ Now I can just do:
  ]{sort-rule}
 }
 \end{codeenv}
+
+An alternative to providing \filefmt{mapsymbols.bib} is to provide a
+custom package just for \bibgls' use. For example,
+\filefmt{mapsymbols-bib2gls.sty}:
+\begin{codeenv}
+\comment{Provided for \bibgls\ only.}
+\comment{Use \cmd{usepackage}\marg{mapsymbols} in the document.}
+\cmd{NeedsTeXFormat}\marg{LaTeX2e}
+\cmd{ProvidesPackage}\marg{mapsymbols-bib2gls}
+\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\ics{char}"2693}
+\cs{glsxtrprovidecommand}\marg{\cmd{Battlefield}}\marg{\cs{char}"2694}
+\cs{glsxtrprovidecommand}\marg{\cmd{Stadium}}\marg{\cs{char}"26BD}
+\cmd{endinput}
+\end{codeenv}
+and instruct \bibgls\ to parse it with 
+\code{\longarg{custom-packages} mapsymbols-bib2gls} (and use
+\filefmt{mapsymbols.sty} in the document). Remember that \bibgls\
+isn't a \TeX\ engine so make sure to only use simple commands in
+this file.
 
 \optsection{break-at}
 
@@ -12043,9 +12065,13 @@ emulate \idx{makeindex} or \idx{xindy}'s letter ordering, or combine
 with \csopt{sort-replace} to insert custom break points.
 \end{itemize}
 
-This option is ignored when used with the non-alphabetic \csopt{sort} options.
-Use the \longarg{debug} switch to show the break points.
-(This will also show the collation rule.)
+This option is ignored when used with the non-alphabetic
+\csopt{sort} options. You can find the break points in the
+\field{sort} field for the entry's definition in the \ext{glstex}
+file (which is provided for information rather than for use in the
+document).  Alternatively, use the \longarg{debug} switch to show
+the break points in the transcript. (This will also show the
+collation rule.) 
 
 \optsection{break-marker}
 
@@ -12194,7 +12220,7 @@ hierarchical level in this context means that either both entries
 don't have a parent or both entries have the same parent. (That is,
 the entries are considered siblings.)
 
-This message will then be followed by
+This message will then be followed by:
 \begin{alltt}
 Appending suffix '\meta{suffix}' to the sort value '\meta{sort}' 
 for entry '\meta{id}'.
@@ -12207,133 +12233,130 @@ been appended.
 For example, suppose in my document I want to write about \appfmt{makeglossaries}
 (the application) and \csfmt{makeglossaries} (the command). I might
 decide to define semantic commands:
-\begin{verbatim}
-\newcommand*{\application}[1]{\texttt{#1}}
-\newcommand*{\command}[1]{\texttt{\char92 #1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{application}}[1]\marg{\ics{texttt}\marg{\idx{param}1}}
+\cs{newcommand}*\marg{\cmd{command}}[1]\marg{\cs{texttt}\marg{\cs{glsbackslash} \idx{param}1}}
+\end{codeenv}
 In my \ext{bib} file I might have:
-\begin{verbatim}
-@entry{cs.makeglossaries,
-  name={\command{makeglossaries}},
-  category={command},
-  description={opens glossary files}
+\begin{codeenv}
+\atentry{entry}\marg{cs.makeglossaries,
+  \field{name}=\marg{\cmd{command}\marg{makeglossaries}},
+  \field{category}=\marg{command},
+  \field{description}=\marg{opens glossary files}
 }
-
-@entry{ap.makeglossaries,
-  name={\application{makeglossaries}},
-  category={application},
-  description={Perl script}
+\strut
+\atentry{entry}\marg{ap.makeglossaries,
+  \field{name}=\marg{\cmd{application}\marg{makeglossaries}},
+  \field{category}=\marg{application},
+  \field{description}=\marg{Perl script}
 }
-\end{verbatim}
+\end{codeenv}
 If \bibgls\ is provided with the definitions of \csfmt{application}
-and \csfmt{command} (by interpreting the \atentry{preamble}) then it will
+and \csfmt{command} (by interpreting the \atentry{preamble} or a
+package provided with \longarg{custom-packages}) then it will
 determine that the sort value for \code{cs.makeglossaries} is
-\verb|\makeglossaries| and the sort value for
+\csfmt{makeglossaries} and the sort value for
 \code{ap.makeglossaries} is just \code{makeglossaries}. These are 
 two distinct sort values from \bibgls's point of view although the
 sort rule may consider them identical if the rule ignores the
-\verb|\| character (such as the locale sort methods), in which case,
+\idx{escchar} character (such as the locale sort methods), in which case,
 \bibgls\ will then act according to \csopt{identical-sort-action}.
 
 If \bibgls\ isn't provided with these custom definitions, then it
-will ignore them and both entries will end up with the sort value
-\code{makeglossaries}. The second instance will be recognised as a
-duplicate and the sort value will be converted to
+will ignore those semantic commands and both entries will end up with
+the sort value \code{makeglossaries}. The second instance will be
+recognised as a duplicate and the sort value will be converted to
 \code{makeglossaries1} (where the automated suffix is \code{1} and
-the suffix marker, see below, is the empty string). With
-\csopt[.]{sort-suffix-marker} then the sort value would become
+the suffix marker, see below, is the empty string). Whereas with,
+say, \csopt[.]{sort-suffix-marker}\ then the sort value would become
 \code{makeglossaries.1}.
 
 For comparison, consider the following document:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[style=indexgroup]{glossaries}
-
-\makeglossaries
-
-\newcommand*{\application}[1]{\texttt{#1}}
-\newcommand*{\command}[1]{\texttt{\char92 #1}}
-
-\newglossaryentry{cs.makeglossaries}{%
-  name={\command{makeglossaries}},
-  description={opens glossary files}}
-
-\newglossaryentry{ap.makeglossaries}{%
-  name={\application{makeglossaries}},
-  description={Perl script}}
-
-\begin{document}
-
-\gls{cs.makeglossaries} and \gls{ap.makeglossaries}.
-
-\printglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt[indexgroup]{style}]\marg{glossaries}
+\strut
+\ics{cs.makeglossaries}
+\strut
+\cs{newcommand}*\marg{\cmd{application}}[1]\marg{\cs{texttt}\marg{\idx{param}1}}
+\cs{newcommand}*\marg{\cmd{command}}[1]\marg{\cs{texttt}\marg{\cs{glsbackslash} \idx{param}1}}
+\strut
+\gls{newglossaryentry}\marg{cs.makeglossaries}\marg{\comment{}
+  \field{name}=\marg{\cmd{command}\marg{makeglossaries}},
+  \field{description}=\marg{opens glossary files}}
+\strut
+\gls{newglossaryentry}\marg{ap.makeglossaries}\marg{\comment{}
+  \field{name}=\marg{\cmd{application}\marg{makeglossaries}},
+  \field{description}=\marg{Perl script}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{cs.makeglossaries} and \cs{gls}\marg{ap.makeglossaries}.
+\ics{printglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 
 This uses \idx{makeindex}, which puts both entries in the
-\qt{Symbols} group (since they both start with \verb|\| from the
-start of \verb|\command| and \verb|\application|, respectively).
+\qt{Symbols} group (since they both start with \idx{escchar} from the
+start of \csfmt{command} and \csfmt{application}, respectively).
 The ordering is \appfmt{makeglossaries}, \csfmt{makeglossaries}
 because \qt{a} (second character of \csfmt{application}) comes
 before \qt{c} (second character of \csfmt{command}).
 
-The switch to \idx{xindy} just involves adding the \styoptfmt{xindy}
+The switch to \idx{xindy} just involves adding the \styopt{xindy}
 package option:
-\begin{verbatim}
-\usepackage[xindy,style=indexgroup]{glossaries}
-\end{verbatim}
+\begin{codeenv}
+\cs{usepackage}[\styopt{xindy},\styopt[indexgroup]{style}]\marg{glossaries}
+\end{codeenv}
 This results in a glossary that only contains one entry,
 \csfmt{makeglossaries}, because \idx{xindy} merges entries with
 duplicate sort values and the sort values end up as duplicates
-because \idx{xindy} discards the control sequences. Although
-\bibgls\ also ignores unknown control sequences, it doesn't perform
-this merger. 
+because \idx{xindy} discards the \csfmt{application} and
+\csfmt{command} control sequences. Although \bibgls\ also ignores
+unknown control sequences, it doesn't perform this merger. 
 
-If I add 
-\begin{verbatim}
-@preamble{"\providecommand*{\application}[1]{\texttt{#1}}
-\providecommand{\command}[1]{\texttt{\char92 #1}}"}
-\end{verbatim}
+If I add: 
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}*\marg{\cmd{application}}[1]\marg{\cs{texttt}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{command}}[1]\marg{\cs{texttt}\marg{\cs{glsbackslash} \idx{param}1}}"}
+\end{codeenv}
 to the earlier \ext{bib} file (called, say, \filefmt{entries.bib})
 then the document can be altered to use \bibgls:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,style=indexgroup]{glossaries-extra}
-
-\GlsXtrLoadResources{src=entries.bib,
-  sort-suffix=non-unique,
-  identical-sort-action=none
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt[indexgroup]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src},
+  \csopt[non-unique]{sort-suffix},
+  \csopt[none]{identical-sort-action}
 }
-
-\begin{document}
-
-\gls{cs.makeglossaries} and \gls{ap.makeglossaries}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
-This uses the default \csopt[locale]{sort} which considers \verb|\|
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{cs.makeglossaries} and \cs{gls}\marg{ap.makeglossaries}.
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+This uses the default \csopt[locale]{sort} which considers \idx{escchar}
 an ignored (punctuation) character, so both \csfmt{makeglossaries} and
 \appfmt{makeglossaries} are listed in the \qt{M} letter group, even
 though the interpreter has determined that the sort value for
-\code{cs.makeglossaries} is the literal string \verb|\makeglossaries|. 
+\code{cs.makeglossaries} is the literal string \csfmt{makeglossaries}. 
 Note that in this case \bibgls\ doesn't detect duplicate sort values
 since it only uses a simple string comparison to detect duplicates
 rather than using the collator.
 
 If I switch to using a letter-based sort rule instead, for example
 \csopt[letter-nocase]{sort}, then \csfmt{makeglossaries} will be
-listed in the \qt{Symbols} letter group since the leading \verb|\|
+listed in the \qt{Symbols} letter group since the leading \idx{escchar}
 from the sort value \csfmt{makeglossaries} isn't ignored with this
 rule.
 
 Now let's suppose I use \csopt[false]{interpret-preamble} to prevent 
 \bibgls\ from interpreting the preamble:
-\begin{verbatim}
-\GlsXtrLoadResources{src=entries.bib,interpret-preamble=false}
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src},\csopt[false]{interpret-preamble}}
+\end{codeenv}
 This means that the custom commands won't be recognised and will
 therefore be ignored, so both entries will have their sort values reduced to 
 \code{makeglosssaries}.
@@ -12359,30 +12382,30 @@ Both entries are listed in the \qt{M} letter group in the order
 \csfmt{makeglossaries}, \appfmt{makeglossaries}.
 
 If the records are reversed:
-\begin{verbatim}
-\gls{ap.makeglossaries} and \gls{cs.makeglossaries}.
-\end{verbatim}
+\begin{codeenv}
+\cs{gls}\marg{ap.makeglossaries} and \cs{gls}\marg{cs.makeglossaries}.
+\end{codeenv}
 then the sort value for \code{cs.makeglossaries} is now considered
 the duplicate and the order is reversed: \appfmt{makeglossaries},
 \csfmt{makeglossaries}.
 
 Suppose now I modify the \ext{bib} file so that
 \code{ap.makeglossaries} is defined as:
-\begin{verbatim}
-@entry{ap.makeglossaries,
-  name={\application{makeglossaries}},
-  category={application},
-  description={Perl script (must be used with \gls{cs.makeglossaries})}
+\begin{codeenv}
+\atentry{entry}\marg{ap.makeglossaries,
+  \field{name}=\marg{\cmd{application}\marg{makeglossaries}},
+  \field{category}=\marg{application},
+  \field{description}=\marg{Perl script (must be used with \cs{gls}\marg{cs.makeglossaries})}
 }
-\end{verbatim}
+\end{codeenv}
 and suppose the document only contains an explicit reference to
 \code{ap.makeglossaries}:
-\begin{verbatim}
-\begin{document}
-\gls{ap.makeglossaries}
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{begin}\marg{document}
+\cs{gls}\marg{ap.makeglossaries}
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 Now \code{ap.makeglossaries} is the first entry to be selected
 because entries with records are always selected before any
 (unrecorded) dependencies. In this case \code{cs.makeglossaries} is
@@ -12394,13 +12417,13 @@ This means that the ordering in the glossary is now:
 
 An oddity occurs if the glossary is moved to the start of the
 document:
-\begin{verbatim}
-\begin{document}
-\printunsrtglossaries
-\gls{ap.makeglossaries}
-\end{document}
-\end{verbatim}
-In this case, the first document build
+\begin{codeenv}
+\cmd{begin}\marg{document}
+\cs{printunsrtglossaries}
+\cs{gls}\marg{ap.makeglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+In this case, the first document build:
 \begin{verbatim}
 pdflatex myDoc
 bibgls --group --verbose myDoc
@@ -12417,20 +12440,20 @@ In this type of situation you might be better off with the
 \csopt[id]{identical-sort-action} option instead.
 
 Remember that you can temporarily switch off the indexing by locally
-setting
-\begin{alltt}
-\ics{GlsXtrSetDefaultGlsOpts}\marg{noindex}
-\end{alltt}
+setting:
+\begin{codeenv*}
+\ics{GlsXtrSetDefaultGlsOpts}\marg{\glsopt{noindex}}
+\end{codeenv*}
 Since the glossary preamble is scoped, you can simply do
-\begin{verbatim}
-\appto\glossarypreamble{\GlsXtrSetDefaultGlsOpts{noindex}}
-\end{verbatim}
+\begin{codeenv}
+\ics{appto}\ics{glossarypreamble}\marg{\cs{GlsXtrSetDefaultGlsOpts}\marg{\glsopt{noindex}}}
+\end{codeenv}
 to switch off the indexing within the glossary (or use
 \ics{apptoglossarypreamble}). Note that this is
-different to using
-\begin{alltt}
-\ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
-\end{alltt}
+different to using:
+\begin{codeenv}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
+\end{codeenv}
 which creates an \idx{ignoredrecord}. Even though the record is ignored
 (and so won't show in the location list) the record still influences
 the selection order and the record count.
@@ -12445,11 +12468,13 @@ If a suffix is appended to the sort value (see above) then it will
 be separated by the suffix marker, which can be set with
 \csopt[\meta{value}]{sort-suffix-marker} where \meta{value} is the
 marker. By default the marker is empty. You can use \stringu\meta{hex}
-to indicate Unicode characters outside the ASCII range.
-If, for some reason, you want to use a special character, such as
-\idx{param}, you will need to precede it with \ics{cs.string} (for example
-\verb|\string#|). If you use \ics{cs.hash} it will be treated as a
-literal string containing a backslash followed by a hash character.
+or \cs{glshex}\meta{hex} to indicate Unicode characters outside the
+\idx{ASCII} range. If, for some reason, you want to use a special
+character, such as \idx{param}, you will need to precede it with
+\ics{cs.string} (for example \code{\cs{cs.string}\idx{param}}) or
+use the above hexadecimal markup. If you use \ics{cs.hash} it will
+be treated as a literal string containing a backslash followed by a
+hash character.
 
 \optsection{strength}
 
@@ -12467,44 +12492,37 @@ assignment is locale dependent. See the documentation for Java's
 class}~\cite{collator} for further details.
 
 For example, suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@index{resume}
-
-@index{RESUME}
-
-@index{resumee,
- name={r\'esum\'e}}
-
-@index{rat}
-
-@index{rot}
-
-@index{aardvark}
-
-@index{zoo}
-\end{verbatim}
+\begin{codeenv}
+\atentry{index}\marg{resume}
+\atentry{index}\marg{RESUME}
+\atentry{index}\marg{resumee, \field{name}=\marg{r\ics{acute}esum\cs{acute}e}}
+\atentry{index}\marg{rat}
+\atentry{index}\marg{rot}
+\atentry{index}\marg{aardvark}
+\atentry{index}\marg{zoo}
+\end{codeenv}
 and the document contains:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record]{glossaries-extra}
-
-\GlsXtrLoadResources[sort={en},src={entries}]
-
-\begin{document}
-\gls{resumee}, \gls{resume}, \gls{RESUME},
-\gls{aardvark}, \gls{rat}, \gls{rot}, \gls{zoo}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[en]{sort},\csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{resumee}, \cs{gls}\marg{resume}, \cs{gls}\marg{RESUME},
+\cs{gls}\marg{aardvark}, \cs{gls}\marg{rat}, \cs{gls}\marg{rot}, \cs{gls}\marg{zoo}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 then this uses the default \csopt[primary]{strength}, so the entries
 are listed as aardvark, rat, r\'esum\'e, resume, RESUME, rot, zoo.
 
 If the strength is changed to \optfmt{secondary}:
-\begin{verbatim}
-\GlsXtrLoadResources[sort={en},src={entries},strength=secondary]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[en]{sort},\csopt[entries]{src},\csopt[secondary]{strength}}
+\end{codeenv}
 then the entries are listed as aardvark, rat, resume, RESUME,
 r\'esum\'e, rot, zoo.
 
@@ -12546,18 +12564,22 @@ one of:
 \begin{itemize}
 \item\optfmt{before letter}: numbers are considered less than any
 letter.
+
 \item\optfmt{after letter}: numbers are considered greater than any
 letter.
+
 \item\optfmt{between}: (default) numbers come between letter cases.
-With the \optfmt{-case} or \optfmt{-upperlower} sort options,
-this will put numbers after \idx{uppercase} and before
-\idx{lowercase}.
-With the \optfmt{-lowerupper} sort option, this will put numbers
-after \idx{lowercase} and before \idx{uppercase}. This setting doesn't make
-much sense with the \optfmt{-nocase} option but, if used, this will put
-numbers before letters.
+With the \optfmt{letternumber\dhyphen case} sort option, this will put
+numbers after \idx{uppercase} and before \idx{lowercase}.  This
+setting doesn't make much sense with the
+\optfmt{letternumber\dhyphen nocase} option but, if used, this will put
+numbers before letters. The \optfmt{letternumber\dhyphen upperlower} and
+\optfmt{letternumber\dhyphen lowerupper} options are more complicated. See 
+\sectionref{sec:letternumber} for more detail.
+
 \item\optfmt{first}: numbers are considered less than all
 characters (including punctuation and spaces).
+
 \item\optfmt{last}: numbers are considered greater than all
 characters (including punctuation and spaces).
 \end{itemize}
@@ -12612,10 +12634,10 @@ and white space is replaced by the digit~\code{0} (\hex{30});
 and white space is replaced by the digit~\code{0} (\hex{30}).
 \item\optfmt{punc-first-space-zero-match-next}: punctuation comes first
 (although numbers may come before)
-and white space is replaced by zero;
+and white space is replaced by the appropriate zero character (see below);
 \item\optfmt{punc-last-space-zero-match-next}: punctuation comes last
 (although numbers may come after)
-and white space is replaced by zero.
+and white space is replaced by the appropriate zero character (see below).
 \end{itemize}
 Remember that the reverse sort methods will invert order governed by this setting.
 
@@ -12651,16 +12673,16 @@ The \TeX\ parser library used by \bibgls\ recognises the standard
 \ics{textsubscript}\margm{text}
 and will use the Unicode superscript or subscript characters if they cover every
 character in \meta{text}, otherwise HTML markup is used, but that's
-then stripped by \bibgls. This means that
-\begin{verbatim}
-C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}
-\end{verbatim}
-will be converted to
-\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}} but 
-\begin{verbatim}
-X\textsubscript{1, 2}
-\end{verbatim}
-will be converted to
+then stripped by \bibgls. This means that:
+\begin{codeenv}
+C\cs{textsubscript}\marg{10}H\cs{textsubscript}\marg{10}O\cs{textsubscript}\marg{4}
+\end{codeenv}
+will be converted to:
+\code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}} but:
+\begin{codeenv}
+X\cs{textsubscript}\marg{1, 2}
+\end{codeenv}
+will be converted to:
 \begin{verbatim}
 X<sub>1, 2</sub>
 \end{verbatim}
@@ -12678,12 +12700,13 @@ If you use the custom \csopt[numberformat]{sort} or
 specify the format pattern with this option where
 \meta{value} is a pattern recognised by Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html}{\code{java.text.DecimalFormat}}
-class~\cite{decimalformat}. You can use \stringu\meta{hex} to
-indicate Unicode characters by their hexadecimal code. You can also
-use \ics{cs.hash}, \ics{cs.percent}, \ics{cs.underscore}, \ics{cs.amp},
-\ics{cs.openbrace} and \ics{cs.closebrace} to indicate
-\idx{hashchar}, \idx{percentchar}, \idx{underscorechar},
-\idx{ampchar}, \idx{openbracechar} and \idx{closebracechar}. 
+class~\cite{decimalformat}. You can use \stringu\meta{hex} or
+\cs{glshex}\meta{hex} to indicate Unicode characters by their
+hexadecimal code. You can also use \ics{cs.hash}, \ics{cs.percent},
+\ics{cs.underscore}, \ics{cs.amp}, \ics{cs.openbrace} and
+\ics{cs.closebrace} to indicate \idx{hashchar}, \idx{percentchar},
+\idx{underscorechar}, \idx{ampchar}, \idx{openbracechar} and
+\idx{closebracechar}. 
 
 Where the dual or secondary sort uses \optfmt{numberformat}
 or \optfmt{numberformat-reverse}, use \csopt{dual-numeric-sort-pattern} for 
@@ -12693,7 +12716,7 @@ for \csopt{secondary}.
 \optsection{numeric-locale}
 
 If you use any of the locale-sensitive numeric sort methods
-(\tableref{tab:sortoptionsnumerical}),
+described in \sectionref{sec:numerical},
 such as \csopt[numeric]{sort}, use this option to set
 the locale. The value may be:
 \begin{itemize}
@@ -12736,61 +12759,62 @@ The \meta{value} may be one of:
 \item\meta{pattern}: provide a custom pattern.
 This should match the specifications for Java's
 \href{http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html}{\code{SimpleDateFormat}}
-class~\cite{simpledateformat}. You may use \stringu\meta{hex} to indicate Unicode characters
+class~\cite{simpledateformat}. You may use \stringu\meta{hex} or
+\code{\cs{glshex} \meta{hex}} to indicate Unicode characters
 or \ics{cs.hash}, \ics{cs.percent}, \ics{cs.underscore}, \ics{cs.amp},
 \ics{cs.openbrace} and \ics{cs.closebrace} to indicate
 \idx{hashchar}, \idx{percentchar}, \idx{underscorechar},
-\idx{ampchar}, \idx{openbracechar} and \idx{closebracechar}.
+\idx{ampchar}, \idx{openbracechar} and~\idx{closebracechar}.
 \end{itemize}
 
 With the custom setting, if the pattern only contains date (but not
 time) information, then it must be used with \csopt[date]{sort}
 or \csopt[date-reverse]{sort}. If the pattern only contains time
 (but not date) information, then it must be used with
-\csopt[time]{sort} or \csopt[time-reverse]{sort}. If the pattern
+\csopt[time]{sort} or \csopt[time\dhyphen reverse]{sort}. If the pattern
 contains date and time information, then it must be used with
 \csopt[datetime]{sort} or \csopt[datetime-reverse]{sort}.
 
 For example, suppose each entry provides information about a person
 and the \field{user1} field is used to store their date of birth:
-\begin{verbatim}
-@entry{caesar,
-  name={Gaius Julius Caesar},
-  first={Julius Caesar},
-  text={Caesar},
-  description={Roman politician and general},
-  user1={13 July 100 BC}
+\begin{codeenv}
+\atentry{entry}\marg{caesar,
+  \field{name}=\marg{Gaius Julius Caesar},
+  \field{first}=\marg{Julius Caesar},
+  \field{text}=\marg{Caesar},
+  \field{description}=\marg{Roman politician and general},
+  \field{user1}=\marg{13 July 100 BC}
 }
-
-@entry{wellington,
-  name={Arthur Wellesley, 1st Duke of Wellington},
-  first={Arthur Wellesley (Duke of Wellington)},
-  text={Wellington},
-  description={Anglo-Irish soldier and statesman},
-  user1={1 May 1769 AD}
+\strut
+\atentry{entry}\marg{wellington,
+  \field{name}=\marg{Arthur Wellesley, 1st Duke of Wellington},
+  \field{first}=\marg{Arthur Wellesley (Duke of Wellington)},
+  \field{text}=\marg{Wellington},
+  \field{description}=\marg{Anglo-Irish soldier and statesman},
+  \field{user1}=\marg{1 May 1769 AD}
 }
-\end{verbatim}
+\end{codeenv}
 Then the entries can be sorted by date of birth using:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  src={entries}, % data in entries.bib
-  sort-field={user1},
-  sort={date},
-  date-sort-format={d MMM y G}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[user1]{sort-field},
+  \csopt[date]{sort},
+  \csopt[d MMM y G]{date-sort-format}
+}
+\end{codeenv}
 
 The \code{G} (era) date pattern specifier expects a string, such as
 \qt{AD}. It will match \idx{lowercase} forms, such as \qt{ad}, so if you
-have \verb|\textsc{ad}| the interpreter will convert this to
+have \code{\cs{textsc}\marg{ad}} the interpreter will convert this to
 \code{ad} (stripping the text-block command). However, in general
 it's best to supply a semantic command that ensures that the
 interpreted result matches the required format.
 
 For example, if \csfmt{era} is provided with:
-\begin{verbatim}
-@preamble{"\providecommand{\era}[1]{\textsc{\MakeLowercase{#1}}}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{era}}[1]\marg{\cs{textsc}\marg{\cs{MakeLowercase}\marg{\idx{param}1}}}"}
+\end{codeenv}
 If the definition is hidden from the interpreter
 (\csopt[false]{interpret-preamble}) and the field
 value contains \verb|\era{AD}| then the custom command will simply be stripped
@@ -12806,27 +12830,27 @@ interpreter.
 
 Here's a complete document that changes the \field{group} fields to use
 the year and era:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,style=indexgroup]{glossaries-extra}
-
-\newcommand{\bibglsdategroup}[7]{#1#4#7}
-\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
-
-\GlsXtrLoadResources[
-  src={entries},
-  sort-field={user1},
-  sort={date},
-  date-sort-format={d MMM y G},
-  selection=all
-]
-
-\begin{document}
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
-(The use of \csfmt{number} strips the leading zero from the year.)
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\styopt[indexgroup]{style}]\marg{glossaries-extra}
+\strut
+\cs{newcommand}\marg{\gls{bibglsdategroup}}[7]\marg{\idx{param}1\idx{param}4\idx{param}7}
+\cs{newcommand}\marg{\gls{bibglsdategrouptitle}}[7]\marg{\ics{number}\idx{param}1\cs{cs.space}\idx{param}4}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},
+  \csopt[user1]{sort-field},
+  \csopt[date]{sort},
+  \csopt[d MMM y G]{date-sort-format},
+  \csopt[all]{selection}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+(The use of \ics{number} strips the leading zero from the year.)
 
 \optsection{group-formation}
 
@@ -12890,7 +12914,7 @@ command with the same selection criteria.
 
 A simpler method is to use a single \gls{GlsXtrLoadResources}
 with the \csopt{secondary} option. The value
-(which must be supplied) should be in the format 
+(which must be supplied) should be in the format:
 \begin{definition}
 \meta{sort}:\meta{field}:\meta{type}
 \end{definition}
@@ -12942,31 +12966,31 @@ the existing entries aren't re-ordered. The new entries are
 simply appended to the list.
 
 For example, suppose the \ext{bib} file contains entries like:
-\begin{verbatim}
-@entry{quartz,
-  name={quartz},
-  description={hard mineral consisting of silica},
-  category={mineral}
+\begin{codeenv}
+\atentry{entry}\marg{quartz,
+  \field{name}=\marg{quartz},
+  \field{description}=\marg{hard mineral consisting of silica},
+  \field{category}=\marg{mineral}
 }
-
-@entry{cabbage,
-  name={cabbage},
-  description={vegetable with thick green or purple leaves},
-  category={vegetable}
+\strut
+\atentry{entry}\marg{cabbage,
+  \field{name}=\marg{cabbage},
+  \field{description}=\marg{vegetable with thick green or purple leaves},
+  \field{category}=\marg{vegetable}
 }
-
-@entry{waterfowl,
-  name={waterfowl},
-  description={any bird that lives in or about water},
-  category={animal}
+\strut
+\atentry{entry}\marg{waterfowl,
+  \field{name}=\marg{waterfowl},
+  \field{description}=\marg{any bird that lives in or about water},
+  \field{category}=\marg{animal}
 }
-\end{verbatim}
+\end{codeenv}
 and the document preamble contains:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries},sort={en-GB},
-  secondary={en-GB:category:topic}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[en-GB]{sort},
+  \csopt[en-GB:category:topic]{secondary}
+}
+\end{codeenv}
 This sorts the primary entries according to the default
 \csopt{sort-field} and then sorts the entries according
 to the \field{category} field and copies this list to
@@ -12977,49 +13001,49 @@ off to prevent duplicates. The cross-references will link to the
 original glossary.
 
 For example:
-\begin{verbatim}
-\printunsrtglossary[title={Summary (alphabetical)}]
-\printunsrtglossary[title={Summary (by topic)},target=false]
-\end{verbatim}
+\begin{codeenv*}
+\ics{printunsrtglossary}\oarg{\printglossopt[Summary (alphabetical)]{title}}
+\ics{printunsrtglossary}\oarg{\printglossopt[Summary (by topic)]{title},\printglossopt[false]{target}}
+\end{codeenv*}
 
 The alternative (or if more than two lists are required) is to
 reload the same \ext{bib} file with different label prefixes.
 For example, if the entries are stored in \filefmt{entries.bib}:
-\begin{verbatim}
-\newglossary*{nosort}{Symbols (Unsorted)}
-\newglossary*{byname}{Symbols (Letter Order)}
-\newglossary*{bydesc}{Symbols (Ordered by Description)}
-\newglossary*{byid}{Symbols (Ordered by Label)}
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={unsrt},
-  type={nosort}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={letter-case},
-  type={byname},
-  label-prefix={byname.}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={locale},
-  sort-field={description},
-  type={bydesc},
-  label-prefix={bydesc.}
-]
-
-\GlsXtrLoadResources[
-  src={entries},% entries.bib
-  sort={letter},
-  sort-field={id},
-  type={byid},
-  label-prefix={byid.}
-]
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{nosort}\marg{Symbols (Unsorted)}
+\cs{newglossary*}\marg{byname}\marg{Symbols (Letter Order)}
+\cs{newglossary*}\marg{bydesc}\marg{Symbols (Ordered by Description)}
+\cs{newglossary*}\marg{byid}\marg{Symbols (Ordered by Label)}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{entries.bib}
+  \csopt[unsrt]{sort},
+  \csopt[nosort]{type}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{entries.bib}
+  \csopt[letter-case]{sort},
+  \csopt[byname]{type},
+  \csopt[byname.]{label-prefix}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{entries.bib}
+  \csopt[locale]{sort},
+  \csopt[description]{sort-field},
+  \csopt[bydesc]{type},
+  \csopt[bydesc.]{label-prefix}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},\comment{entries.bib}
+  \csopt[letter]{sort},
+  \csopt[id]{sort-field},
+  \csopt[byid]{type},
+  \csopt[byid.]{label-prefix}
+}
+\end{codeenv}
 
 \optsection{secondary-missing-sort-fallback}
 
@@ -13140,13 +13164,8 @@ used with \csopt[combine]{dual-sort} and \csopt[none]{sort} or
 
 \optsection[\subsubsection]{combine-dual-locations}
 
-You can merge the location lists for each primary entry
-with that of the corresponding dual entry. This setting
-allows you to specify this and determine whether both primary and
-dual entries should have the combined location list or 
-whether only the primary or the dual should be assigned the
-combined list.
-
+This setting allows the location lists for each primary entry
+to be merged with that of the corresponding dual entry.
 The \meta{value} may be one of:
 \begin{itemize}
 \item\optfmt{false} This is the default setting. The location lists
@@ -13160,52 +13179,52 @@ location list. The dual's location list is emptied.
 \end{itemize}
 
 For example, suppose the file \filefmt{entries.bib} contains:
-\begin{verbatim}
-@dualindexentry{array,
-  description={ordered list of values}
+\begin{codeenv}
+\atentry{dualindexentry}\marg{array,
+  \field{description}=\marg{ordered list of values}
 }
-
-@dualindexentry{vector,
-  name={vector},
-  description={column or row of values}
+\strut
+\atentry{dualindexentry}\marg{vector,
+  \field{name}=\marg{vector},
+  \field{description}=\marg{column or row of values}
 }
-
-@dualindexentry{set,
-  description={collection of values}
+\strut
+\atentry{dualindexentry}\marg{set,
+  \field{description}=\marg{collection of values}
 }
-
-@dualindexentry{matrix,
-  plural={matrices},
-  description={rectangular array of values}
+\strut
+\atentry{dualindexentry}\marg{matrix,
+  \field{plural}=\marg{matrices},
+  \field{description}=\marg{rectangular array of values}
 }
-\end{verbatim}
+\end{codeenv}
 and the document contains:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[colorlinks]{hyperref}
-\usepackage[record,index,style=indexgroup]{glossaries-extra}
-
-\GlsXtrLoadResources[
- src={entries},
- type=index,
- label-prefix={idx.},
- dual-prefix={gls.},
- dual-type=main
-]
-
-\begin{document}
-\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
-
-\newpage
-\gls{gls.array}, \gls{idx.vector}, \gls{idx.set}, \gls{gls.matrix}.
-
-\newpage
-\gls{gls.array}, \gls{gls.vector}, \gls{gls.set}, \gls{gls.matrix}.
-
-\printunsrtglossaries
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[colorlinks]\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt{index},\styopt[indexgroup]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries]{src},
+ \csopt[index]{type},
+ \csopt[idx.]{label-prefix},
+ \csopt[gls.]{dual-prefix},
+ \csopt[main]{dual-type}
+}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{gls.array}, \cs{gls}\marg{gls.vector}, \cs{gls}\marg{gls.set}, \cs{gls}\marg{gls.matrix}.
+\strut
+\cmd{newpage}
+\cs{gls}\marg{gls.array}, \cs{gls}\marg{idx.vector}, \cs{gls}\marg{idx.set}, \cs{gls}\marg{gls.matrix}.
+\strut
+\cmd{newpage}
+\cs{gls}\marg{gls.array}, \cs{gls}\marg{gls.vector}, \cs{gls}\marg{gls.set}, \cs{gls}\marg{gls.matrix}.
+\strut
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
 In this case, the primary entries are placed in the \code{index}
 glossary type and are assigned the prefix \idprefixfmt{idx} but only
 two of the primary entries have been used in the document (both on
@@ -13218,11 +13237,11 @@ The \code{gls.vector} and \code{gls.set} entries have been indexed
 on pages~1 and~3.
 
 With the default setting, some of the locations are in the
-\code{main} glossary (corresponding to \verb|\gls{gls.array}|,
-\verb|\gls{gls.vector}|, \verb|\gls{gls.set}| and
-\verb|\gls{gls.matrix}|) and some of the locations are in the
-\code{index} glossary (corresponding to \verb|\gls{idx.vector}|
-and \verb|\gls{idx.set}|).
+\code{main} glossary (corresponding to \code{\cs{gls}\marg{gls.array}},
+\code{\cs{gls}\marg{gls.vector}}, \code{\cs{gls}\marg{gls.set}} and
+\code{\cs{gls}\marg{gls.matrix}}) and some of the locations are in the
+\code{index} glossary (corresponding to \code{\cs{gls}\marg{idx.vector}}
+and \code{\cs{gls}\marg{idx.set}}).
 
 If the option \csopt[primary]{combine-dual-locations} is added to
 the resource set, then all the locations are moved to the
@@ -13243,9 +13262,8 @@ hyperlink can point to the definition in the \code{main} glossary.
 This option sets the \field{type} field for all dual
 entries. (The primary entries obey the \csopt{type} option.) This
 will override any value of \field{type} provided in the \ext{bib}
-file (or created through a mapping). The \meta{value} is required.
-
-The \meta{value} may be:
+file (or created through a mapping). The \meta{value} is required and
+should be one of:
 \begin{itemize}
 \item \optfmt{same as entry}: sets the \field{type} to the entry
 type (\idx!{lowercase} and without 
@@ -13276,34 +13294,31 @@ unchanged.
 
 Remember that the glossary with that label must have already 
 been defined (see \sectionref{sec:newglossary}).
-
 For example:
-\begin{verbatim}
-\newglossary*{english}{English}
-\newglossary*{french}{French}
-
-\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
- type=english,
- dual-type=french]
-\end{verbatim}
-
+\begin{codeenv}
+\cs{newglossary*}\marg{english}\marg{English}
+\cs{newglossary*}\marg{french}\marg{French}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[en]{sort},\csopt[fr]{dual-sort},
+ \csopt[english]{type},
+ \csopt[french]{dual-type}}
+\end{codeenv}
 Alternatively:
-\begin{verbatim}
-\newglossary*{dictionary}{Dictionary}
-
-\GlsXtrLoadResources[src={entries},sort={en},dual-sort={fr},
- type=dictionary,
- dual-type={same as primary}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{dictionary}\marg{Dictionary}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[en]{sort},\csopt[fr]{dual-sort},
+ \csopt[dictionary]{type},
+ \csopt[same as primary]{dual-type}}
+\end{codeenv}
 
 \optsection[\subsubsection]{dual-category}
 
 This option sets the \field{category} field for all dual
 entries. (The primary entries obey the \csopt{category} option.) This
 will override any value of \field{category} provided in the \ext{bib}
-file (or created through a mapping). The \meta{value} may be empty.
-
-The \meta{value} may be:
+file (or created through a mapping). The \meta{value} may be empty or
+one of:
 \begin{itemize}
 \item \optfmt{same as entry}: sets the \field{category} to the entry
 type (\idx{lowercase} and without 
@@ -13358,44 +13373,45 @@ field instead.
 
 If this option is used, this will add \ics{glsxtrprovidestoragekey}
 to the start of the \iext{glstex} file providing the key given by
-\meta{value}.  Any entries defined using \atentry{dualentry}
-will be written to the \ext{glstex} file with an extra field called
-\meta{value} that is set to the mirror entry. If \meta{value} is
-omitted \csopt[dual]{dual-field} is assumed. If you use a different
-value, you will need to redefine \gls{GlsXtrDualField} (either
-locally or globally).
+\meta{value}.  Any entries defined using a dual entry type, such as
+\atentry{dualentry}, will be written to the \ext{glstex} file with
+an extra field called \meta{value} that is set to the mirror entry.
+If \meta{value} is omitted \csopt[dual]{dual-field} is assumed. If
+you use a different value, you will need to redefine
+\gls{GlsXtrDualField} (either locally or globally).
 
-For example, if the \ext{bib} file contains
-\begin{verbatim}
-@dualentry{child,
-  name={child},
-  plural={children},
-  description={enfant}
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{dualentry}\marg{child,
+  \field{name}=\marg{child},
+  \field{plural}=\marg{children},
+  \field{description}=\marg{enfant}
 }
-\end{verbatim}
-Then with \csopt[dualid]{dual-field} this will first add the line
-\begin{verbatim}
-\glsxtrprovidestoragekey{dualid}{}{}
-\end{verbatim}
-at the start of the file and will include the line
-\begin{verbatim}
-dualid={dual.child},
-\end{verbatim}
-for the primary entry (\code{child}) and the line
-\begin{verbatim}
-dualid={child},
-\end{verbatim}
+\end{codeenv}
+Then with \csopt[dual]{dual-field} (or simply \csopt{dual-field}
+without a value) this will first add the line:
+\begin{codeenv}
+\cs{glsxtrprovidestoragekey}\marg{\field{dual}}\marg{}\marg{}
+\end{codeenv}
+at the start of the file and will include the line:
+\begin{codeenv*}
+\field{dual}=\marg{dual.child},
+\end{codeenv*}
+for the primary entry (\code{child}) and the line:
+\begin{codeenv}
+\field{dual}=\marg{child},
+\end{codeenv}
 for the dual entry (\code{dual.child}). It's then possible to
 reference one entry from the other. For example, the post-description 
 hook could contain:
-\begin{verbatim}
- \ifglshasfield{dualid}{\glscurrententrylabel}
- {%
-   \space
-   (\glshyperlink{\glsxtrusefield{\glscurrententrylabel}{dualid}})%
- }%
- {}%
-\end{verbatim}
+\begin{codeenv}
+ \cs{ifglshasfield}\marg{\field{dual}}\marg{\cs{glscurrententrylabel}}
+ \marg{\comment{}
+   \cs{space}
+   (\cs{glshyperlink}\marg{\cs{glscurrentfieldvalue}})\comment{}
+ }\comment{}
+ \marg{}\comment{}
+\end{codeenv}
 Note that this new field won't be available for use within the
 \iext{bib} file (unless it was previously defined in the document
 before \gls!{glsxtrresourcefile}).
@@ -13441,28 +13457,27 @@ entries are sorted separately according to \meta{value} (as per
 \csopt{sort}) and the dual entries will be appended at the end of
 the \iext{glstex} file. The field used by the comparator is given by
 \csopt{dual-sort-field}.
-If \csopt[custom]{dual-sort}, then the dual entries according to the 
+If \csopt[custom]{dual-sort}, then the dual entries are sorted according to the 
 rule provided by \csopt{dual-sort-rule}.
 
-
 For example:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src={entries-dual},
- sort={en},
- dual-sort={de-CH-1996}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries-dual]{src},
+ \csopt[en]{sort},
+ \csopt[de-CH-1996]{dual-sort}
+}
+\end{codeenv}
 This will sort the primary entries according to \optfmt{en}
 (English) and the secondary entries according to \optfmt{de-CH-1996} 
 (Swiss German new orthography) whereas:
-\begin{verbatim}
-\GlsXtrLoadResources[
- src={entries-dual},
- sort={en-GB},
- dual-sort={combine}
-]
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[entries-dual]{src},
+ \csopt[en-GB]{sort},
+ \csopt[combine]{dual-sort}
+}
+\end{codeenv}
 will combine the dual entries with the primary entries and sort them
 all according to the \optfmt{en-GB} locale (British English).
 

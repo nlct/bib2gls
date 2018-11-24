@@ -3830,6 +3830,15 @@ is defined},
   category={command}
 }
 
+@index{appto,
+  name={\csfmt{appto}},
+  user1={\margm{cs}\margm{code}},
+  description={appends \meta{code} to the definition of
+   the control sequence \meta{cs}},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
 @index{foreignlanguage,
   name={\csfmt{foreign\-language}},
   user1={\margm{language name}\margm{text}},
@@ -8272,6 +8281,14 @@ hyperlinks enabled otherwise just does \meta{text}},
   category={command}
 }
 
+@index{texttt,
+  name={\csfmt{texttt}},
+  user1={\margm{text}},
+  description={displays the given text in monospaced font},
+  note={kernel command},
+  category={command}
+}
+
 @index{alph,
   name={\csfmt{alph}},
   user1={\margm{counter}},
@@ -8975,10 +8992,20 @@ glossary},
   category={command}
 }
 
+@index{glossarypreamble,
+  name={\csfmt{glossary\-preamble}},
+  description={the preamble for all glossaries except 
+  those that have the preamble explicitly set with
+  \cs{apptoglossarypreamble}},
+  note={\styfmt{glossaries-extra}},
+  seealso={apptoglossarypreamble},
+  category={command}
+}
+
 @index{glsbackslash,
   name={\csfmt{glsbackslash}},
   user1={},
-  description={expands to a literal backslash \texttt{\glsbackslash} 
+  description={expands to a literal backslash \idx{backslashchar} 
    character},
   note={\styfmt{glossaries}},
   category={command}
@@ -10141,6 +10168,15 @@ has three or more items},
   name={\csfmt{char}},
   user1={\meta{number}},
   description={accesses the character identified by \meta{number}},
+  note={{}\TeX\ primitive},
+  category={command}
+}
+
+@index{number,
+  name={\csfmt{number}},
+  user1={\meta{value}},
+  description={expands the given integer \meta{value} stripping any leading
+zeros},
   note={{}\TeX\ primitive},
   category={command}
 }
