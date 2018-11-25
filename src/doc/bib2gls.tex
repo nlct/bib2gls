@@ -13593,60 +13593,59 @@ entry from the primary one. Note that the \field{alias} field
 can't be mapped.
 
 The default setting is:
-\begin{verbatim}
-dual-entry-map=
-{
-  {name,plural,description,descriptionplural},
-  {description,descriptionplural,name,plural}
-}
-\end{verbatim}
+\begin{codeenv}
+\csopt[
+  \marg{\field{name},\field{plural},\field{description},\field{descriptionplural}},
+  \marg{\field{description},\field{descriptionplural},\field{name},\field{plural}}
+]{dual-entry-map}
+\end{codeenv}
 The dual entry is created by copying the value of the field in the
 first list \meta{list1} to the field in the corresponding place in the second
 list \meta{list2}. Any additional fields are copied over to the same
 field.
-
 For example:
-\begin{verbatim}
-@dualentry{cat,
-  name={cat},
-  description={chat},
-  see={dog}
+\begin{codeenv}
+\atentry{dualentry}\marg{cat,
+  \field{name}=\marg{cat},
+  \field{description}=\marg{chat},
+  \field{see}=\marg{dog}
 }
-\end{verbatim}
-defines two entries. The primary entry is essentially like
-\begin{verbatim}
-@entry{cat,
-  name={cat},
-  plural={cat\glspluralsuffix },
-  description={chat},
-  descriptionplural={chat\glspluralsuffix },
-  see={dog}
+\end{codeenv}
+defines two entries. The primary entry is essentially like:
+\begin{codeenv}
+\atentry{entry}\marg{cat,
+  \field{name}=\marg{cat},
+  \field{plural}=\marg{cat\cs{glspluralsuffix} },
+  \field{description}=\marg{chat},
+  \field{descriptionplural}=\marg{chat\cs{glspluralsuffix} },
+  \field{see}=\marg{dog}
 }
-\end{verbatim}
-and the dual entry is essentially like
-\begin{verbatim}
-@entry{dual.cat,
-  description={cat},
-  descriptionplural={cat\glspluralsuffix },
-  name={chat},
-  plural={chat\glspluralsuffix },
-  see={dog}
+\end{codeenv}
+and the dual entry is essentially like:
+\begin{codeenv}
+\atentry{entry}\marg{dual.cat,
+  \field{description}=\marg{cat},
+  \field{descriptionplural}=\marg{cat\cs{glspluralsuffix} },
+  \field{name}=\marg{chat},
+  \field{plural}=\marg{chat\cs{glspluralsuffix} },
+  \field{see}=\marg{dog}
 }
-\end{verbatim}
+\end{codeenv}
 (except they're defined using \gls{bibglsnewdualentry} instead of
 \gls{bibglsnewentry}, and each is considered dependent on the other.)
 
 The \field{see} field isn't listed in \csopt{dual-entry-map} so its
 value is simply copied directly over to the \field{see} field in the
-dual entry. Note that the missing plural fields (\field{plural} and
-\field{descriptionplural}) have been filled in.
+dual entry. Note that the missing \field{plural} and
+\field{descriptionplural} fields have been filled in using their
+fallback values.
 
 In general \bibgls\ doesn't try to supply missing fields, but in the
 dual entry cases it needs to do this for the mapped fields. This is
 because the shuffled fields might have different default values from
 the \styfmt{glossaries-extra} package's point of view. For example, 
 \gls{longnewglossaryentry} doesn't provide a default for
-\field{descriptionplural} if if hasn't been set.
+\field{descriptionplural} if it hasn't been set.
 
 \optsection[\subsubsection]{dual-abbrv-map}
 
@@ -13654,15 +13653,14 @@ This is like \csopt{dual-entry-map} but applies to
 \atentry{dualabbreviation} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
-\begin{verbatim}
-dual-abbrv-map=
-{
-  {short,shortplural,long,longplural,dualshort,dualshortplural,
-   duallong,duallongplural},
-  {dualshort,dualshortplural,duallong,duallongplural,short,shortplural,
-   long,longplural}
-}
-\end{verbatim}
+\begin{codeenv}
+\csopt[
+  \marg{\field{short},\field{shortplural},\field{long},\field{longplural},\field{dualshort},\field{dualshortplural},
+   \field{duallong},\field{duallongplural}},
+  \marg{\field{dualshort},\field{dualshortplural},\field{duallong},\field{duallongplural},\field{short},\field{shortplural},
+   \field{long},\field{longplural}}
+]{dual-abbrv-map}
+\end{codeenv}
 
 This essentially flips the \field{short} field with the
 \field{dualshort} field and the \field{long} field with the
@@ -13675,13 +13673,12 @@ This is like \csopt{dual-entry-map} but applies to
 \atentry{dualabbreviationentry} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
-\begin{verbatim}
-dual-abbrventry-map=
-{
-  {long,short,shortplural},
-  {name,text,plural}
-}
-\end{verbatim}
+\begin{codeenv}
+\csopt[
+  \marg{\field{long},\field{short},\field{shortplural}},
+  \marg{\field{name},\field{text},\field{plural}}
+]{dual-abbrventry-map}
+\end{codeenv}
 See \atentry{dualabbreviationentry} for further details.
 
 
@@ -13691,14 +13688,12 @@ This is like \csopt{dual-entry-map} but applies to
 \atentry{dualsymbol} rather than \atentry{dualentry}. 
 Note that the \field{alias} field can't be mapped. The
 default setting is:
-\begin{verbatim}
-dual-symbol-map=
-{
-  {name,plural,symbol,symbolplural},
-  {symbol,symbolplural,name,plural}
-}
-\end{verbatim}
-
+\begin{codeenv}
+\csopt[
+  \marg{\field{name},\field{plural},\field{symbol},\field{symbolplural}},
+  \marg{\field{symbol},\field{symbolplural},\field{name},\field{plural}}
+]{dual-symbol-map}
+\end{codeenv}
 This essentially flips the \field{name} field with the
 \field{symbol} field.
 
@@ -13706,17 +13701,41 @@ This essentially flips the \field{name} field with the
 
 This is like \csopt{dual-entry-map} but applies to
 \atentry{dualindexentry} rather than \atentry{dualentry}. 
+The default setting is:
+\begin{codeenv}
+\csopt[
+  \marg{\field{name}},
+  \marg{\field{name}}
+]{dual-indexentry-map}
+\end{codeenv}
+Note that there must always be at least one pair, even if it's the
+same field, since this identifies the field to use for the backlink,
+if set.
 
 \optsection[\subsubsection]{dual-indexsymbol-map}
 
 This is like \csopt{dual-entry-map} but applies to both
 \atentry{dualindexsymbol} and \atentry{dualindexnumber}. 
+The default setting is:
+\begin{codeenv}
+\csopt[
+  \marg{\field{symbol},\field{name},\field{symbolplural},\field{plural}},
+  \marg{\field{name},\field{symbol},\field{plural},\field{symbolplural}}
+]{dual-indexsymbol-map}
+\end{codeenv}
 
 \optsection[\subsubsection]{dual-indexabbrv-map}
 
 This is like \csopt{dual-entry-map} but applies to both the dual
 \atentry{dualindexabbreviation} and tertiary
 \atentry{tertiaryindexabbreviationentry} entry types. 
+The default setting is:
+\begin{codeenv}
+\csopt[
+  \marg{\field{name}},
+  \marg{\field{name}}
+]{dual-indexabbrv-map}
+\end{codeenv}
 
 \subsection{Dual Back-Links}
 \label{sec:dualoptsbacklinks}
@@ -13732,32 +13751,32 @@ with \gls{bibglshyperlink}.  The field is obtained from the first
 mapping listed in \csopt{dual-entry-map}.
 
 For example, if the document contains:
-\begin{verbatim}
-\GlsXtrLoadResource[dual-entry-backlink,
-  dual-entry-map={
-    {name,plural,description,descriptionplural},
-    {description,descriptionplural,name,plural}
-  },
-  src={entries-dual}]
-\end{verbatim}
-and if the \ext{bib} file contains
-\begin{verbatim}
-@dualentry{child,
-  name={child},
-  plural={children},
-  description={enfant}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt{dual-entry-backlink},
+  \csopt[
+    \marg{\field{name},\field{plural},\field{description},\field{descriptionplural}},
+    \marg{\field{description},\field{descriptionplural},\field{name},\field{plural}}
+  ]{dual-entry-map},
+  \csopt[entries-dual]{src}}
+\end{codeenv}
+and if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{dualentry}\marg{child,
+  \field{name}=\marg{child},
+  \field{plural}=\marg{children},
+  \field{description}=\marg{enfant}
 }
-\end{verbatim}
+\end{codeenv}
 Then the definition of the primary entry (\code{child}) in the
-\ext{glstex} file will set the \field{description} field to
-\begin{verbatim}
-\bibglshyperlink{enfant}{dual.child}
-\end{verbatim}
+\ext{glstex} file will set the \field{description} field to:
+\begin{codeenv}
+\gls{bibglshyperlink}\marg{enfant}\marg{dual.child}
+\end{codeenv}
 and the dual entry (\code{dual.child}) will have the
-\field{description} field set to
-\begin{verbatim}
-\bibglshyperlink{child}{child}
-\end{verbatim}
+\field{description} field set to:
+\begin{codeenv}
+\gls{bibglshyperlink}\marg{child}\marg{child}
+\end{codeenv}
 This use of the wrapper \gls{bibglshyperlink} (rather than explicitly
 using \ics{glshyperlink}) and inserting the actual field value
 (rather than using commands like \ics{glsentryname}) allows it 
@@ -13800,24 +13819,24 @@ use \csopt{dual-field} (or \csopt[dual]{dual-field})
 to store the dual label in the \field{dual} field, and then
 use a style that checks for this field and adds the backlink.
 
-With \sty{glossaries-extra} v1.30+ you can use
+With \sty{glossaries-extra} v1.30+ you can use:
 \nosecdef{GlsXtrDualBackLink}
 which encapsulates \meta{text} with a hyperlink to the dual.
 The \meta{label} identifies the entry that requires a backlink.
-The dual's label is obtained from the field given by
+The dual's label is obtained from the field given by:
 \nosecdef{GlsXtrDualField}
 which defaults to \field{dual}. Note that if you assign a 
 different field label with \csopt{dual-field}, then you will
 need to redefine \gls{GlsXtrDualField} as appropriate.
 
 For example:
-\begin{verbatim}
-\renewcommand*{\glsuserdescription}[2]{%
-  \GlsXtrDualBackLink{\glslonguserfont{#1}}{#2}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\ics{glsuserdescription}}[2]\marg{\comment{}
+  \gls{GlsXtrDualBackLink}\marg{\ics{glslonguserfont}\marg{\idx{param}1}}\marg{\idx{param}2}\comment{}
 }
-\setabbreviationstyle{long-short-user}
-\GlsXtrLoadResources[src={entries},dual-field]
-\end{verbatim}
+\cs{setabbreviationstyle}\marg{\abbrstyle{long-short-user}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt{dual-field}}
+\end{codeenv}
 
 \optsection[\subsubsection]{dual-entryabbrv-backlink}
 
@@ -13897,7 +13916,8 @@ may be changed as required. The command definitions all use
 Note that if you try to redefine any of these commands after the
 resource file has been loaded with \ics{renewcommand}, you will get
 an error on the first \LaTeX\ run when the \ext{glstex} file doesn't
-exist.
+exist. You may prefer to use \ics{glsrenewcommand} instead, which
+will generate a warning instead of an error.
 
 Since many of the commands are actually used within the \ext{glstex}
 file, it's best to use \cs{newcommand} before the first
@@ -13918,9 +13938,16 @@ the \ext{glstex} file immediately before the first entry that
 requires it, so only the commands that are actually needed are
 provided.
 
-After each entry is defined, if it has any associated locations, the
-locations are added using
+The \field{sort} key may be set within the \ext{glstex} entry
+definition, but its value is usually not required in the document
+unless you are using a hybrid method with \styopt[alsoindex]{record}.
+
+After each entry is defined, if it has any associated locations and
+the default \csopt[true]{save-loclist} is set, then the
+locations are added using:
 \nosecformatdef{glsxtrfieldlistadd}
+Any additional fields that don't have associated keys are then set (if
+required) with \ics{GlsXtrSetField}.
 
 \cssection{bibglsnewentry}
 
@@ -13928,11 +13955,11 @@ locations are added using
 This command is used to define terms identified with the
 \atentry{entry} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewentry}[4]{%
- \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This uses the starred form \ics{longnewglossaryentry*} that
 doesn't automatically append \ics{nopostdesc} (which interferes with
 the post-description hooks provided by category attributes).
@@ -13943,11 +13970,11 @@ the post-description hooks provided by category attributes).
 This command is used to define terms identified with the
 \atentry{symbol} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewsymbol}[4]{%
- \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewsymbol}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{symbol},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this sets the \field{sort} field to the label, but this
 may be overridden by the \meta{options} if the \field{sort} field
 was supplied or if \bibgls\ has determined the value whilst sorting
@@ -13964,11 +13991,11 @@ overridden with \csopt[\meta{value}]{category}.
 This command is used to define terms identified with the
 \atentry{number} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewnumber}[4]{%
- \longnewglossaryentry*{#1}{name={#3},sort={#1},category={number},#2}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewnumber}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{number},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This is much the same as \gls{bibglsnewsymbol} above but sets the 
 \field{category} to \optfmt{number}. Again the \field{sort} and
 \field{category} keys may be overridden by \meta{options}.
@@ -13979,11 +14006,11 @@ This is much the same as \gls{bibglsnewsymbol} above but sets the
 This command is used to define terms identified with the
 \atentry{index} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand*{\bibglsnewindex}[2]{%
- \newglossaryentry{#1}{name={#1},category={index},description={},#2}%
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglsnewindex}}[2]\marg{\comment{}
+ \gls{newglossaryentry}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}1},\field{category}=\marg{index},\field{description}=\marg{},\idx{param}2}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This makes the \field{name} default to the \meta{label}, assigns 
 the \field{category} to \code{index} and sets an empty
 \field{description}. These settings may be overridden by
@@ -13999,11 +14026,11 @@ category attributes.
 This command is used to define terms identified with the
 \atentry{indexplural} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewindexplural}[3]{%
- \newglossaryentry{#1}{name={#3},category={indexplural},description={},#2}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewindexplural}}[3]\marg{\comment{}
+ \gls{newglossaryentry}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{indexplural},\field{description}=\marg{},\idx{param}2}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This assigns the \field{category} to \code{indexplural} and sets an empty
 \field{description}. These settings may be overridden by \meta{options}.
 
@@ -14013,11 +14040,11 @@ This assigns the \field{category} to \code{indexplural} and sets an empty
 This command is used to define terms identified with the
 \atentry{abbreviation} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewabbreviation}[4]{%
-  \newabbreviation[#2]{#1}{#3}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewabbreviation}}[4]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Since this uses \gls{newabbreviation}, it obeys the 
 abbreviation style for its given \field{category} (which may have
 been set in \meta{options}, either from the \field{category} field
@@ -14032,11 +14059,11 @@ the value is supplied in the \ext{bib} file or through the
 This command is used to define terms identified with the
 \atentry{acronym} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewacronym}[4]{%
-  \newacronym[#2]{#1}{#3}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewacronym}}[4]\marg{\comment{}
+  \gls{newacronym}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This works in much the same way as \gls{bibglsnewabbreviation}.
 Remember that with the \styfmt{glossaries-extra} package \gls{newacronym}
 is redefined to just use \gls{newabbreviation} with the default \field{type}
@@ -14049,11 +14076,11 @@ set to \ics{acronymtype} and the default \field{category} set to
 This command is used to define terms identified with the
 \atentry{dualentry} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualentry}[4]{%
- \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglsnewdualindexentry}
 
@@ -14061,11 +14088,11 @@ file is:
 This command is used to define primary terms identified with the
 \atentry{dualindexentry} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexentry}[4]{%
-  \longnewglossaryentry*{#1}{name={#3},category={index},#2}{}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{index},\idx{param}2}\marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{description} argument.
 
 \cssection{bibglsnewdualindexentrysecondary}
@@ -14074,11 +14101,11 @@ Note that this definition ignores the \meta{description} argument.
 This command is used to define secondary terms identified with the
 \atentry{dualindexentry} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexentrysecondary}[4]{%
-  \longnewglossaryentry*{#1}{name={#3},#2}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexentrysecondary}}[4]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglsnewdualindexsymbol}
 
@@ -14086,11 +14113,11 @@ file is:
 This command is used to define primary terms identified with the
 \atentry{dualindexsymbol} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexsymbol}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},category={index},symbol={#4},#2}{}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexsymbol}}[5]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{index},\field{symbol}=\marg{\idx{param}4},\idx{param}2}\marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{description} argument.
 
 \cssection{bibglsnewdualindexsymbolsecondary}
@@ -14099,12 +14126,11 @@ Note that this definition ignores the \meta{description} argument.
 This command is used to define secondary terms identified with the
 \atentry{dualindexsymbol} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexsymbolsecondary}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},category={symbol},symbol={#4},#2}%
-  {#5}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexsymbolsecondary}}[5]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{symbol},\field{symbol}=\marg{\idx{param}4},\idx{param}2}\marg{\idx{param}5}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglsnewdualindexnumber}
 
@@ -14112,11 +14138,11 @@ file is:
 This command is used to define primary terms identified with the
 \atentry{dualindexnumber} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexnumber}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},category={index},symbol={#4},#2}{}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexnumber}}[5]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{index},\field{symbol}=\marg{\idx{param}4},\idx{param}2}\marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{description} argument.
 
 \cssection{bibglsnewdualindexnumbersecondary}
@@ -14125,12 +14151,11 @@ Note that this definition ignores the \meta{description} argument.
 This command is used to define secondary terms identified with the
 \atentry{dualindexnumber} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexnumbersecondary}[5]{%
-  \longnewglossaryentry*{#1}{name={#3},category={number},symbol={#4},#2}%
-  {#5}%
+\begin{codeenv}
+\cs{providecommand}\marg{\cs{bibglsnewdualindexnumbersecondary}}[5]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{number},\field{symbol}=\marg{\idx{param}4},\idx{param}2}\marg{\idx{param}5}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglsnewdualindexabbreviation}
 
@@ -14138,27 +14163,28 @@ file is:
 This command is used to define primary terms identified with the
 \atentry{dualindexabbreviation} type. The default definition provided in 
 the \ext{glstex} file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexabbreviation}[7]{%
-  \longnewglossaryentry*{#1}{%
-    name={\protect\bibglsuseabbrvfont{#4}{\glscategory{#2}}},%
-    category={index},#3}{}%
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexabbreviation}}[7]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\comment{}
+   \field{name}=\marg{\cs{protect}\gls{bibglsuseabbrvfont}\marg{\idx{param}4}\marg{\cs{glscategory}\marg{\idx{param}2}}},\comment{}
+   \field{category}=\marg{index},\idx{param}3}\marg{}\comment{}
+}
+\end{codeenv}
 In this case \meta{dual-label} is the dual entry's label, which is used 
 to fetch the category label in \gls{bibglsuseabbrvfont}. (The
-\field{category} field for the dual isn't used as a custom
+\field{category} field for the dual isn't used since a custom
 definition of
 \gls!{bibglsnewdualindexabbreviationsecondary} may override the
 value known to \bibgls.)
 
 Note that (as shown above) with the default 
-\csopt[short]{abbreviation-name-fallback} the \field{name} uses
+\csopt[short]{abbreviation-name-fallback} the \field{name} uses:
 \nosecformatdef{bibglsuseabbrvfont}
 to format the name, which ensures that it uses the same font as the
 short form for the dual abbreviation. This will use
 \ics{glsuseabbrvfont} if it's defined otherwise it will be defined
 to replicate that command. If \csopt{abbreviation-name-fallback} is
-set to some other field then the \field{name} uses
+set to some other field then the \field{name} uses:
 \nosecformatdef{bibglsuselongfont}
 instead, which ensures that it uses the same font as the
 long form for the dual abbreviation.
@@ -14168,15 +14194,14 @@ long form for the dual abbreviation.
 \formatdef{bibglsnewdualindexabbreviationsecondary}
 This command is used to define secondary terms identified with the
 \atentry{dualindexabbreviation} entry type.
-The definition provided in the
-\ext{glstex} file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualindexabbreviationsecondary}[6]{%
-  \ifstrempty{#6}%
-  {\newabbreviation[#2]{#1}{#4}{#5}}%
-  {\newabbreviation[#2,description={#6}]{#1}{#4}{#5}}%
+The definition provided in the \ext{glstex} file is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualindexabbreviationsecondary}}[6]\marg{\comment{}
+  \cs{ifstrempty}\marg{\idx{param}6}\comment{}
+  \marg{\gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}4}\marg{\idx{param}5}}\comment{}
+  \marg{\gls{newabbreviation}\oarg{\idx{param}2,\field{description}=\marg{\idx{param}6}}\marg{\idx{param}1}\marg{\idx{param}4}\marg{\idx{param}5}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This ensures that a missing or empty \field{description} doesn't
 interfere with the abbreviation style.
 
@@ -14186,11 +14211,11 @@ interfere with the abbreviation style.
 This command is used to define primary terms identified with the
 \atentry{dualabbreviationentry} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualabbreviationentry}[5]{%
-  \newabbreviation[#2]{#1}{#3}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualabbreviationentry}}[5]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{description} argument.
 
 \cssection{bibglsnewdualabbreviationentrysecondary}
@@ -14199,11 +14224,11 @@ Note that this definition ignores the \meta{description} argument.
 This command is used to define secondary terms identified with the
 \atentry{dualabbreviationentry} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualabbreviationentrysecondary}[5]{%
-  \longnewglossaryentry*{#1}{#2}{#5}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualabbreviationentrysecondary}}[5]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\idx{param}2}\marg{\idx{param}5}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{short} and \meta{long}
 arguments (which will typically be empty unless the default mappings
 are changed).
@@ -14215,11 +14240,11 @@ This command is used to define primary terms identified with the
 (now deprecated) entry type
 \atentry{dualentryabbreviation}. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualentryabbreviation}[5]{%
-  \newabbreviation[#2]{#1}{#3}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualentryabbreviation}}[5]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{description} argument.
 
 \cssection{bibglsnewdualentryabbreviationsecondary}
@@ -14229,11 +14254,11 @@ This command is used to define secondary terms identified with the
 (now deprecated) entry type
 \atentry{dualentryabbreviation}. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualentryabbreviationsecondary}[5]{%
-  \longnewglossaryentry*{#1}{#2}{#5}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualentryabbreviationsecondary}}[5]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\idx{param}2}\marg{\idx{param}5}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that this definition ignores the \meta{short} and \meta{long}
 arguments (which will typically be empty unless the default mappings
 are changed).
@@ -14244,10 +14269,10 @@ are changed).
 This command is used to define terms identified with the
 \atentry{dualsymbol} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualsymbol}[4]{%
- \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualsymbol}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{symbol},\idx{param}2}\marg{\idx{param}4}}
+\end{codeenv}
 
 \cssection{bibglsnewdualnumber}
 
@@ -14255,10 +14280,10 @@ file is:
 This command is used to define terms identified with the
 \atentry{dualnumber} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualnumber}[4]{%
- \longnewglossaryentry*{#1}{name={#3},sort={#1},category={symbol},#2}{#4}}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualnumber}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{symbol},\idx{param}2}\marg{\idx{param}4}}
+\end{codeenv}
 
 \cssection{bibglsnewdualabbreviation}
 
@@ -14268,11 +14293,11 @@ This command is used to define terms identified with the
 is swapped with the \field{long} field and the \field{dualshort}
 field is swapped with the \field{short} field. The definition provided in the
 \ext{glstex} file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualabbreviation}[4]{%
-  \newabbreviation[#2]{#1}{#3}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualabbreviation}}[4]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglsnewdualacronym}
 
@@ -14280,11 +14305,11 @@ field is swapped with the \field{short} field. The definition provided in the
 This command is used to define terms identified with the
 \atentry{dualacronym} type. The definition provided in the \ext{glstex}
 file is:
-\begin{verbatim}
-\providecommand{\bibglsnewdualacronym}[4]{%
-  \newacronym[#2]{#1}{#3}{#4}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewdualacronym}}[4]\marg{\comment{}
+  \gls{newacronym}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This works in much the same way as \gls{bibglsnewdualabbreviation}.
 Remember that with the \styfmt{glossaries-extra} package \gls{newacronym}
 is redefined to just use \gls{newabbreviation} with the default \field{type}
@@ -14298,13 +14323,13 @@ This is used to define primary terms identified with the
 \atentry{tertiaryindexabbreviationentry} type. It's essentially
 the same as \gls!{bibglsnewdualindexabbreviation}.
 The definition provided in the \ext{glstex} file is:
-\begin{verbatim}
-\providecommand{\bibglsnewtertiaryindexabbreviationentry}[7]{%
-  \longnewglossaryentry*{#1}{%
-      name={\protect\bibglsuseabbrvfont{#4}{\glscategory{#2}}},%
-      category={index},#3}{}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewtertiaryindexabbreviationentry}}[7]\marg{\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\comment{}
+      \field{name}=\marg{\cs{protect}\gls{bibglsuseabbrvfont}\marg{\idx{param}4}\marg{\cs{glscategory}\marg{\idx{param}2}}},\comment{}
+      \field{category}=\marg{index},\idx{param}3}{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglsnewtertiaryindexabbreviationentrysecondary}
 
@@ -14313,14 +14338,14 @@ This command is used to define both the secondary and tertiary terms identified 
 \atentry{tertiaryindexabbreviationentry} type. The secondary
 term is an abbreviation and the tertiary term is a regular entry.
 The definition written to the \ext{glstex} file is:
-\begin{verbatim}
-\providecommand{\bibglsnewtertiaryindexabbreviationentrysecondary}[8]{%
-  \newabbreviation[#3]{#1}{#6}{#7}%
-  \longnewglossaryentry*{#2}%
-  {name={\protect\bibglsuselongfont{#7}{\glscategory{#1}}},#4}%
-  {#8}%
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewtertiaryindexabbreviationentrysecondary}}[8]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}3}\marg{\idx{param}1}\marg{\idx{param}6}\marg{\idx{param}7}\comment{}
+  \cs{longnewglossaryentry*}\marg{\idx{param}2}\comment{}
+  \marg{\field{name}=\marg{\cs{protect}\gls{bibglsuselongfont}\marg{\idx{param}7}\marg{\cs{glscategory}\marg{\idx{param}1}}},\idx{param}4}\comment{}
+  \marg{\idx{param}8}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 The \meta{label} is the label for the secondary (abbreviation) entry
 and \meta{tertiary-label} is the label for the tertiary (regular)
 entry. The fifth argument (\meta{primary name}) isn't used but is
@@ -14337,6 +14362,12 @@ replicate that command.
 \formatdef{bibglsnewbibtexentry}
 This command is used to define the main term identified with
 \atentry{bibtexentry}.
+The definition written to the \ext{glstex} file is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewbibtexentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
 
 \cssection{bibglsnewcontributor}
 
@@ -14344,6 +14375,12 @@ This command is used to define the main term identified with
 This command is used to define terms identified with
 \atentry{contributor} (typically implicitly created through
 \atentry{bibtexentry}).
+The definition written to the \ext{glstex} file is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewcontributor}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
 
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}
@@ -14363,21 +14400,19 @@ location list (unless there are no locations, in which case just
 the \field{see} part is displayed without \gls{bibglsseesep}).
 
 This command is provided with:
-\begin{verbatim}
-\providecommand{\bibglsseesep}{, }
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsseesep}}\marg{, }
+\end{codeenv}
 You can define this before you load the \ext{bib} file:
-\begin{verbatim}
-\newcommand{\bibglsseesep}{; }
-\GlsXtrLoadResources[src={entries}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglsseesep}}\marg{; }
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\end{codeenv}
 Or you can redefine it afterwards:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries}]
-\renewcommand{\bibglsseesep}{; }
-\end{verbatim}
-(but this will only work once the \ext{glstex} file has actually
-been created).
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\cs{glsrenewcommand}\marg{\gls{bibglsseesep}}\marg{; }
+\end{codeenv}
 
 \cssection{bibglsseealsosep}
 
@@ -14422,38 +14457,36 @@ This defaults to \ics{delimN}.
 
 \formatdef{bibglslastDelimN}
 Separator between penultimate and final individual locations.
-This defaults to \verb|,~| to discourage lonely locations.
+This defaults to \code{,\idx{nbspchar}} to discourage lonely locations.
 
 \cssection{bibglspassim}
 
 \formatdef{bibglspassim}
-If \csopt{max-loc-diff} is greater than 1, then any ranges that have
+If \csopt{max-loc-diff} is greater than~1, then any ranges that have
 skipped over gaps will be followed by \gls{bibglspassim}, which is
 defined as:
-\begin{verbatim}
-\providecommand{\bibglspassim}{ \bibglspassimname}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglspassim}}\marg{ \gls{bibglspassimname}}
+\end{codeenv}
 You can define this before you load the \ext{bib} file:
-\begin{verbatim}
-\newcommand{\bibglspassim}{}
-\GlsXtrLoadResources[src={entries}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglspassim}}\marg{}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\end{codeenv}
 Or you can redefine it afterwards:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries}]
-\renewcommand{\bibglspassim}{}
-\end{verbatim}
-(but this will only work once the \ext{glstex} file has actually
-been created).
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\cs{glsrenewcommand}\marg{\gls{bibglspassim}}\marg{}
+\end{codeenv}
 
 \cssection{bibglspassimname}
 
 \formatdef{bibglspassimname}
-The default definition is obtained from the \langxml. For example, with \file{bib2gls-en.xml} the provided
-definition is
-\begin{verbatim}
-\providecommand{\bibglspassimname}{passim}
-\end{verbatim}
+The default definition is obtained from the \langxml. For example, with 
+\file{bib2gls-en.xml} the provided definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglspassimname}}\marg{passim}
+\end{codeenv}
 
 \cssection{bibglsrange}
 
@@ -14476,28 +14509,28 @@ of the range inside the argument of \gls{bibglsinterloper}.
 The default definition just does \meta{location}\gls!{bibglsdelimN}
 so that it fits neatly into the list.
 
-For example, suppose on page~4 of my document I start a range with
-\begin{verbatim}
-\glsadd[format={(}]{sample}
-\end{verbatim}
-and end it on page~9 with
-\begin{verbatim}
-\glsadd[format={)}]{sample}
-\end{verbatim}
+For example, suppose on page~4 of my document I start a range with:
+\begin{codeenv*}
+\cs{glsadd}\oarg{\glsaddopt[(]{format}}\marg{sample}
+\end{codeenv*}
+and end it on page~9 with:
+\begin{codeenv*}
+\cs{glsadd}\oarg{\glsaddopt[)]{format}}\marg{sample}
+\end{codeenv*}
 This forms an explicit range, but let's suppose on page~6 I
-have
-\begin{verbatim}
-\gls[format={hyperbf}]{sample}
-\end{verbatim}
+have:
+\begin{codeenv}
+\cs{gls}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{sample}
+\end{codeenv}
 This record conflicts with the explicit range (which doesn't include
-\code{hyperbf} in the format). This causes a warning and
+\encap{hyperbf} in the format). This causes a warning and
 the conflicting entry will be moved before the start of the
 explicit range resulting in \textbf{6}, 4--9.
 
 Note that implicit ranges can't be formed from interlopers (nor can
 implicit ranges be merged with explicit ones),
-so if \verb|\gls[format={hyperbf}]{sample}| also occurs
-on pages~7 and~8 then the result will be \textbf{6}, \textbf{7},
+so if \code{\cs{gls}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{sample}} 
+also occurs on pages~7 and~8 then the result will be \textbf{6}, \textbf{7},
 \textbf{8}, 4--9. Either remove the explicit range or
 remove the conflicting entries. (Alternatively, redefine
 \gls{bibglsinterloper} to ignore its argument, which will
@@ -14507,24 +14540,23 @@ discard the conflicting entries.)
 
 \formatdef{bibglspostlocprefix}
 If the \csopt{loc-prefix} option is on, \gls!{bibglslocprefix} will
-be inserted at the start of location lists. The command \gls{bibglspostlocprefix}
-is placed after the prefix text. This command is provided with:
-\begin{verbatim}
-\providecommand{\bibglspostlocprefix}{\ }
-\end{verbatim}
+be inserted at the start of location lists, and its default
+definition includes \gls{bibglspostlocprefix}
+placed after the prefix text. This command is provided with:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglspostlocprefix}}\marg{\cs{cs.space}}
+\end{codeenv}
 which puts a space between the prefix text and the location list.
 You can define this before you load the \ext{bib} file:
-\begin{verbatim}
-\newcommand{\bibglspostlocprefix}{: }
-\GlsXtrLoadResources[src={entries},loc-prefix]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglspostlocprefix}}\marg{: }
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt{loc-prefix}}
+\end{codeenv}
 Or you can redefine it afterwards:
-\begin{verbatim}
-\GlsXtrLoadResources[src={entries},loc-prefix]
-\renewcommand{\bibglspostlocprefix}{: }
-\end{verbatim}
-(but this will only work once the \ext{glstex} file has actually
-been created).
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt{loc-prefix}}
+\cs{glsrenewcommand}\marg{\gls{bibglspostlocprefix}}\marg{: }
+\end{codeenv}
 
 \cssection{bibglslocprefix}
 
@@ -14534,52 +14566,52 @@ provided. If the glossary type has been provided by \csopt{type}
 (and \csopt{dual-type} if there are any dual entries) then the
 definition of \gls{bibglslocprefix} will be appended to the glossary
 preamble for the given type (or types if there are dual entries).
-For example, if the document has
-\begin{verbatim}
-\GlsXtrLoadResources[type=main,loc-prefix={p.,pp.},src={entries}]
-\end{verbatim}
+For example, if the document has:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[p.,pp.]{loc-prefix},\csopt[entries]{src}}
+\end{codeenv}
 and there are no dual entries, then the following will be added to
 the \ext{glstex} file:
-\begin{verbatim}
-\apptoglossarypreamble[main]{%
- \providecommand{\bibglslocprefix}[1]{%
-  \ifcase##1
-  \or p.\bibglspostlocprefix
-  \else pp.\bibglspostlocprefix
-  \fi
- }%
+\begin{codeenv}
+\cs{apptoglossarypreamble}\oarg{main}\marg{\comment{}
+ \cs{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\comment{}
+  \cs{ifcase}\idx{param}\idx{param}1
+  \cmd{or} p.\gls{bibglspostlocprefix}
+  \cmd{else} pp.\gls{bibglspostlocprefix}
+  \cmd{fi}
+ }\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 However, if the \csopt{type} key is missing, then the following will
 be added instead:
-\begin{verbatim}
-\appto\glossarypreamble{%
- \providecommand{\bibglslocprefix}[1]{%
-  \ifcase#1
-  \or p.\bibglspostlocprefix
-  \else pp.\bibglspostlocprefix
-  \fi
- }%
+\begin{codeenv}
+\cs{appto}\cs{glossarypreamble}\marg{\comment{}
+ \cs{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\comment{}
+  \cs{ifcase}\idx{param}1
+  \cmd{or} p.\gls{bibglspostlocprefix}
+  \cmd{else} pp.\gls{bibglspostlocprefix}
+  \cmd{fi}
+ }\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglspagename}
 
 \formatdef{bibglspagename}
 If \csopt[true]{loc-prefix} is used, then this command is provided
 using the value of \idx{tag.page} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
-\begin{verbatim}
-\providecommand{\bibglspagename}{Page}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglspagename}}\marg{Page}
+\end{codeenv}
 
 \cssection{bibglspagesname}
 
 \formatdef{bibglspagesname}
 If \csopt[true]{loc-prefix} is used, then this command is provided
 using the value of \idx{tag.pages} from the \langxml. For example with \file{bib2gls-en.xml} the definition is:
-\begin{verbatim}
-\providecommand{\bibglspagesname}{Pages}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglspagesname}}\marg{Pages}
+\end{codeenv}
 
 \cssection{bibglslocsuffix}
 
@@ -14594,16 +14626,16 @@ This commands definition depends on the value provided by
 \csopt{loc-suffix}. For example, with 
 \csopt[\ics{at}{\idx{periodchar}}]{loc-suffix}
 the command is defined as:
-\begin{verbatim}
-\providecommand{\bibglslocsuffix}[1]{\@.}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglslocsuffix}}[1]\marg{\ics{at}.}
+\end{codeenv}
 (which ignores the argument).
 
 Whereas with \csopt[\meta{A}\dcomma\meta{B}\dcomma\meta{C}]{loc-suffix}
 the command is defined as:
-\begin{verbatim}
-\providecommand{\bibglslocsuffix}[1]{\ifcase#1 A\or B\else C\fi}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglslocsuffix}}[1]\marg{\cs{ifcase}\idx{param}1 \meta{A}\cmd{or} \meta{B}\cmd{else} \meta{C}\cmd{fi}}
+\end{codeenv}
 
 Note that this is slightly different from \gls{bibglslocprefix} as
 it includes the 0 case, which in this instance means that there were

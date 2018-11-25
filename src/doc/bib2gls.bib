@@ -8948,11 +8948,20 @@ defined},
 }
 
 @index{glsxtrprovidecommand,
-  name={\csfmt{glsxtrprovidecommand}},
+  name={\csfmt{gls\-xtr\-provide\-command}},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={behaves like \cs{providecommand} in the document but
    like \cs{renewcommand} in \bibgls},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
+  category={command}
+}
+
+@index{glsrenewcommand,
+  name={\csfmt{gls\-re\-new\-command}},
+  user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
+  description={behaves like \cs{renewcommand} but only generates a
+warning rather than an error if the command isn't already defined},
+  note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   category={command}
 }
 
@@ -9722,6 +9731,52 @@ location list},
   description={used with \qt{sc} abbreviation styles to format the
 short form using \cs{textsc}},
   note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@index{glsuserdescription,
+  name={\csfmt{gls\-user\-description}},
+  user1={\margm{description}\margm{label}},
+  description={used with \qt{user} abbreviation styles to
+   encapsulate the description. Just does
+  \code{\cs{glslonguserfont}\margm{description}} by default},
+  note={\styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@index{glslonguserfont,
+  name={\csfmt{gls\-long\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the long form},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@index{glsfirstlonguserfont,
+  name={\csfmt{gls\-first\-long\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the long form on first use},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@index{glsabbrvuserfont,
+  name={\csfmt{gls\-abbrv\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the short form},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@index{glsfirstabbrvuserfont,
+  name={\csfmt{gls\-first\-abbrv\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the short form on first use},
+  note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
 
