@@ -3,10 +3,13 @@
 % arara: pdflatex
 \documentclass{article}
 
-\usepackage[record,style=indexgroup]{glossaries-extra}
+\usepackage[record,nomain,style=indexgroup]{glossaries-extra}
+
+\newglossary*{dates}{Dates}
 
 \GlsXtrLoadResources[
  sort={date},
+ type={dates},
  %sort-field={symbol},
  %sort-field={user1},
  %sort-field={user3},
@@ -14,6 +17,36 @@
  %date-sort-format={short},
  sort-field={user5},
  date-sort-format={d MMM y G},
+ selection=all]
+
+\newglossary*{datetimes}{Date-Times}
+
+\GlsXtrLoadResources[
+ src={test-datetimes},
+ type={datetimes},
+ sort={datetime},
+ %sort-field={symbol},
+ sort-field={user1},
+ %sort-field={user3},
+ date-sort-locale={en-GB},
+ date-sort-format={short},
+ %sort-field={user5},
+ %date-sort-format={d MMM y G hh:mm:ss},
+ selection=all]
+
+\newglossary*{times}{Times}
+
+\GlsXtrLoadResources[
+ src={test-times},
+ type={times},
+ sort={time},
+ %sort-field={symbol},
+ %sort-field={user1},
+ %sort-field={user3},
+ %date-sort-locale={en-GB},
+ %date-sort-format={short},
+ %sort-field={user5},
+ %date-sort-format={hh:mm},
  selection=all]
 
 \begin{document}

@@ -37,6 +37,9 @@ v1.8 (pending):
   * bug fix: corrected letternumber-upperlower and
     letternumber-lowerupper sort methods.
 
+  * bug fix: corrected invalid datetime pattern that threw
+    InvalidArgumentException
+
   * \@glsnavhypertarget will now fallback on original definition
     (which requires an extra LaTeX call) if the type is unknown.
 

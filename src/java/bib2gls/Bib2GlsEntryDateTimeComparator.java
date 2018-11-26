@@ -47,7 +47,7 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
          hasDate = true;
          hasTime = true;
 
-         sortDateFormat = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ");
+         sortDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
       }
       else if (settings.isDateSort())
       {

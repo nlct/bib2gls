@@ -336,7 +336,7 @@ test-dups.glstex	: test-dups.tex test-dups.bib $(DEPS)
 test-dates.pdf	: test-dates.glstex
 		pdflatex test-dates
 
-test-dates.glstex	: test-dates.tex test-dates.bib $(DEPS)
+test-dates.glstex	: test-dates.tex test-dates.bib test-datetimes.bib test-times.bib $(DEPS)
 		pdflatex test-dates
 		$(BIB2GLS) test-dates
 
