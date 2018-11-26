@@ -282,10 +282,10 @@
 
 \newcommand*{\extfmt}[1]{\filefmt{.#1}}%
 
-\glsxtrnewgls[format=glsignore]{idx.}{\ext}
+\glsxtrnewgls[format=glsignore]{idx.ext.}{\ext}
 
 \newcommand*{\iext}[1]{%
- \glsxtrtitleorpdforheading{\idx{#1}}{.#1}{\extfmt{#1}}%
+ \glsxtrtitleorpdforheading{\idx{ext.#1}}{.#1}{\extfmt{#1}}%
 }
 
 \glsxtrnewgls[format=glsignore]{idx.}{\sty}
@@ -3018,13 +3018,13 @@ switch off record counting.
 \bibgls\ recognises certain entry types. Any unrecognised types will
 be ignored and a warning will be written to the transcript file.
 Entries are defined in the usual \ext{bib} format:
-\begin{alltt}
-@\meta{entry-type}\marg{\meta{id},
+\begin{codeenv*}
+\idx{atchar}\meta{entry-type}\marg{\meta{id},
   \meta{field-name-1} = \margm{text},
-  ...
+  \ldots
   \meta{field-name-n} = \margm{text}
 }
-\end{alltt}
+\end{codeenv*}
 where \meta{entry-type} is the entry type (listed below),
 \meta{field-name-1}, \ldots, \meta{field-name-n} are the field names and
 \meta{id} is a unique label. The label can't contain any spaces or
@@ -4026,35 +4026,35 @@ The \LaTeX\ code written to the \iext{glstex} file is essentially
 \comment{from \atentry{index}\marg{aardvark}:}
 \gls{newglossaryentry}\marg{aardvark}\marg{\field{name}=\marg{aardvark},\field{description}=\marg{}}
 \strut
-\comment{dual of \atentry{dualabbreviationentry}\marg{css,...}:}
+\comment{dual of \atentry{dualabbreviationentry}\marg{css,\ldots}:}
 \gls{newglossaryentry}\marg{dual.css}\marg{\field{name}=\marg{cascading stylesheets},\marg{text}=\marg{CSS},
  \field{description}=\marg{a language that describes the style of an
   \cs{glsxtrshort}\marg{html} document}}
 \strut
-\comment{primary of \atentry{dualabbreviationentry}\marg{css,...}:}
+\comment{primary of \atentry{dualabbreviationentry}\marg{css,\ldots}:}
 \gls{newabbreviation}\marg{css}\marg{CSS}\marg{cascading stylesheets}
 \strut
-\comment{primary of \atentry{dualindexabbreviation}\marg{html,...}:}
+\comment{primary of \atentry{dualindexabbreviation}\marg{html,\ldots}:}
 \gls{newglossaryentry}\marg{html}\marg{\field{name}=\marg{HTML},\field{description}=\marg{}}
 \strut
-\comment{dual of \atentry{dualindexabbreviation}\marg{html,...}:}
+\comment{dual of \atentry{dualindexabbreviation}\marg{html,\ldots}:}
 \gls{newabbreviation}\marg{dual.html}\marg{HTML}\marg{hypertext markup language}
 \strut
 \comment{from \atentry{index}\marg{mouse}:}
 \gls{newglossaryentry}\marg{mouse}{\marg{name}=\marg{mouse},\field{description}=\marg{}}
 \strut
-\comment{dual of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\comment{dual of \atentry{dualabbreviationentry}\marg{ssi,\ldots}:}
 \gls{newglossaryentry}\marg{dual.ssi}\marg{\field{name}=\marg{server-side includes},\field{text}=\marg{SSI},
  \field{description}=\marg{directives placed in \cs{glsxtrshort}\marg{html} pages
  evaluated by the server}}
 \strut
-\comment{primary of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\comment{primary of \atentry{dualabbreviationentry}\marg{ssi,\ldots}:}
 \gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
 \strut
-\comment{primary of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\comment{primary of \atentry{dualindexabbreviation}\marg{xml,\ldots}:}
 \gls{newglossaryentry}\marg{xml}\marg{\field{name}=\marg{XML},\field{description}=\marg{}}
 \strut
-\comment{dual of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\comment{dual of \atentry{dualindexabbreviation}\marg{xml,\ldots}:}
 \gls{newabbreviation}\marg{dual.xml}\marg{XML}\marg{extensible markup language}
 \strut
 \comment{from \atentry{index}\marg{zebra}:}
@@ -4122,19 +4122,19 @@ and writes them to the \ext{glstex} file
 \comment{from \atentry{index}\marg{aardvark}:}
 \gls{newglossaryentry}\marg{aardvark}\marg{\field{name}=\marg{aardvark},\field{description}=\marg{}}
 \strut
-\comment{primary of \atentry{dualabbreviationentry}\marg{css,...}:}
+\comment{primary of \atentry{dualabbreviationentry}\marg{css,\ldots}:}
 \gls{newabbreviation}\marg{css}\marg{CSS}\marg{cascading stylesheets}
 \strut
-\comment{primary of \atentry{dualindexabbreviation}\marg{html,...}:}
+\comment{primary of \atentry{dualindexabbreviation}\marg{html,\ldots}:}
 \gls{newglossaryentry}\marg{html}\marg{\field{name}=\marg{HTML},\field{description}=\marg{}}
 \strut
 \comment{from \atentry{index}\marg{mouse}:}
 \gls{newglossaryentry}\marg{mouse}\marg{\field{name}=\marg{mouse},\field{description}=\marg{}}
 \strut
-\comment{primary of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\comment{primary of \atentry{dualabbreviationentry}\marg{ssi,\ldots}:}
 \gls{newabbreviation}\marg{ssi}\marg{SSI}\marg{server-side includes}
 \strut
-\comment{primary of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\comment{primary of \atentry{dualindexabbreviation}\marg{xml,\ldots}:}
 \gls{newglossaryentry}\marg{xml}\marg{\field{name}=\marg{XML},\field{description}=\marg{}}
 \strut
 \comment{from \atentry{index}\marg{zebra}:}
@@ -4150,20 +4150,20 @@ Then \bibgls\ orders the duals:
 and writes them to the \ext{glstex} file
 (functionally like):
 \begin{codeenv}
-\comment{dual of \atentry{dualabbreviationentry}\marg{css,...}:}
+\comment{dual of \atentry{dualabbreviationentry}\marg{css,\ldots}:}
 \gls{newglossaryentry}\marg{dual.css}\marg{\field{name}=\marg{cascading stylesheets},\field{text}=\marg{CSS},
  \field{description}=\marg{a language that describes the style of an
   \cs{glsxtrshort}\marg{html} document}}
 \strut
-\comment{dual of \atentry{dualindexabbreviation}\marg{html,...}:}
+\comment{dual of \atentry{dualindexabbreviation}\marg{html,\ldots}:}
 \gls{newabbreviation}\marg{dual.html}\marg{HTML}\marg{hypertext markup language}
 \strut
-\comment{dual of \atentry{dualabbreviationentry}\marg{ssi,...}:}
+\comment{dual of \atentry{dualabbreviationentry}\marg{ssi,\ldots}:}
 \gls{newglossaryentry}\marg{dual.ssi}\marg{\field{name}=\marg{server-side includes},\field{text}=\marg{SSI},
  \field{description}=\marg{directives placed in \cs{glsxtrshort}\marg{html} pages
  evaluated by the server}}
 \strut
-\comment{dual of \atentry{dualindexabbreviation}\marg{xml,...}:}
+\comment{dual of \atentry{dualindexabbreviation}\marg{xml,\ldots}:}
 \gls{newabbreviation}\marg{dual.xml}\marg{XML}\marg{extensible markup language}
 \end{codeenv}
 When the \ext{glstex} file is input (during the next \LaTeX\ run) 
@@ -5033,8 +5033,8 @@ The last two are actually defined using one command:
 \gls{bibglsnewtertiaryindexabbreviationentrysecondary}
   \marg{dual.html}\comment{secondary label}
   \marg{tertiary.html}\comment{tertiary label}
-  \marg{...}\comment{secondary fields}
-  \marg{...}\comment{tertiary fields}
+  \marg{\ldots}\comment{secondary fields}
+  \marg{\ldots}\comment{tertiary fields}
   \marg{HTML}\comment{primary name}
   \marg{HTML}\comment{short}
   \marg{hypertext markup language}\comment{long}
@@ -6582,7 +6582,7 @@ the child's name is set to:
 \begin{codeenv*}
 \format{bibglsflattenedhomograph}
 \end{codeenv*}
-instead of the corresponding \csfmt{bibglsflattenedchild...sort}. 
+instead of the corresponding \csfmt{bibglsflattenedchild\ldots sort}. 
 This defaults to just \meta{name}.
 
 
@@ -13908,7 +13908,7 @@ recognised keywords.
 \label{sec:bibglscs}
 
 When \bibgls\ creates the \iext{glstex} file, it writes some
-definitions for custom commands in the form \csfmt{bibgls...} which
+definitions for custom commands in the form \csfmt{bibgls\ldots} which
 may be changed as required. The command definitions all use
 \ics{providecommand} which means that you can define the command with
 \ics{newcommand} before the resource file is loaded.
@@ -13928,7 +13928,7 @@ if adjustments are necessary.
 \section{Entry Definitions}
 \label{sec:newentrydefs}
 
-This section lists the commands (\csfmt{bibglsnew...}) used to
+This section lists the commands (\csfmt{bibglsnew\ldots}) used to
 define entries.  Note that the entry definition commands are
 actually used when \TeX\ inputs the resource file, so redefining
 them after the resource file is loaded won't have an effect on the
@@ -14667,42 +14667,42 @@ defined (before the resources are loaded) or redefined
 (after the resources are loaded) as required.
 
 For example:
-\begin{verbatim}
-\newcommand*{\bibglslocationgroup}[3]{%
-  \ifnum#1=1
-   #2:
-  \else
-   #2s:
-  \fi
-  #3%
+\begin{codeenv}
+\cs{newcommand}*\marg{\gls{bibglslocationgroup}}[3]\marg{\comment{}
+  \cs{ifnum}\idx{param}1=1
+   \idx{param}2:
+  \cmd{else}
+   \idx{param}2s:
+  \cmd{fi}
+  \idx{param}3\comment{}
 }
-
-\GlsXtrLoadResources[
-  loc-counters={equation,page},% group locations by counter
-  src={entries}% data in entries.bib
-]
-\end{verbatim}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[equation,page]{loc-counters},\comment{group locations by counter}
+  \csopt[entries]{src}\comment{data in entries.bib}
+}
+\end{codeenv}
 This will prefix each group with the counter name, if there's
 only one location, or the counter name followed by \qt{s},
 if there are multiple locations within the group.
 
 There are various ways to adapt this to translate the counter
 name to a different textual label, such as:
-\begin{verbatim}
-\providecommand{\pagename}{Page}
-\providecommand{\pagesname}{Pages}
-\providecommand{\equationname}{Equation}
-\providecommand{\equationsname}{Equations}
-
-\newcommand*{\bibglslocationgroup}[3]{%
-  \ifnum#1=1
-   \ifcsdef{#2name}{\csuse{#2name}}{#2}:
-  \else
-   \ifcsdef{#2sname}{\csuse{#2sname}}{#2s}:
-  \fi
-  #3%
+\begin{codeenv}
+\cs{providecommand}\marg{\cmd{pagename}}\marg{Page}
+\cs{providecommand}\marg{\cmd{pagesname}}\marg{Pages}
+\cs{providecommand}\marg{\cmd{equationname}}\marg{Equation}
+\cs{providecommand}\marg{\cmd{equationsname}}\marg{Equations}
+\strut
+\cs{newcommand}*\marg{\gls{bibglslocationgroup}}[3]\marg{\comment{}
+  \ics{ifnum}\idx{param}1=1
+   \ics{ifcsdef}\marg{\idx{param}2name}\marg{\cs{csuse}\marg{\idx{param}2name}}\marg{\idx{param}2}:
+  \cmd{else}
+   \cs{ifcsdef}\marg{\idx{param}2sname}\marg{\cs{csuse}\marg{\idx{param}2sname}}\marg{\idx{param}2s}:
+  \cmd{fi}
+  \idx{param}3\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglslocationgroupsep}
 
@@ -14710,25 +14710,23 @@ name to a different textual label, such as:
 When the \csopt{loc-counters} option is set, this command
 is used to separate each location sub-group. It may be defined
 before the resources are loaded:
-\begin{verbatim}
-\newcommand*{\bibglslocationgroupsep}{; }
-
-\GlsXtrLoadResources[
-  loc-counters={equation,page},% group locations by counter
-  src={entries}% data in entries.bib
-]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\gls{bibglslocationgroupsep}}\marg{; }
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[equation,page]{loc-counters},\comment{group locations by counter}
+  \csopt[entries]{src}\comment{data in entries.bib}
+}
+\end{codeenv}
 or redefined after the resources are loaded:
-\begin{verbatim}
-\GlsXtrLoadResources[
-  loc-counters={equation,page},% group locations by counter
-  src={entries}% data in entries.bib
-]
-
-\renewcommand*{\bibglslocationgroupsep}{; }
-\end{verbatim}
-(but this will only work once the \ext{glstex} file has actually
-been created).
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[equation,page]{loc-counters},\comment{group locations by counter}
+  \csopt[entries]{src}\comment{data in entries.bib}
+}
+\strut
+\cs{glsrenewcommand}*\marg{\gls{bibglslocationgroupsep}}\marg{; }
+\end{codeenv}
 
 \cssection{bibglssupplemental}
 
@@ -14760,23 +14758,21 @@ is the list of supplementary locations in \meta{external document}.
 The separator between the main location list and the supplementary
 location list. By default this is just \gls!{bibglsdelimN}. This may be
 defined before the resources are loaded:
-\begin{verbatim}
-\newcommand{\bibglssupplementalsep}{; }
-
-\GlsXtrLoadResources[
- supplemental-locations=supplDoc,
- src={entries}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglssupplementalsep}}\marg{; }
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[supplDoc]{supplemental-locations},
+ \csopt[entries]{src}}
+\end{codeenv}
 or redefined after the resources are loaded:
-\begin{verbatim}
-\GlsXtrLoadResources[
- supplemental-locations=supplDoc,
- src={entries}]
-
-\renewcommand{\bibglssupplementalsep}{; }
-\end{verbatim}
-(but this will only work once the \ext{glstex} file has actually
-been created).
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[supplDoc]{supplemental-locations},
+ \csopt[entries]{src}}
+\strut
+\cs{glsrenewcommand}\marg{\gls{bibglssupplementalsep}}\marg{; }
+\end{codeenv}
 
 \cssection{bibglssupplementalsubsep}
 
@@ -14795,7 +14791,6 @@ second argument is ignored.
 \formatdef{bibglshrefunicode}
 Expands to the second argument. The first argument is ignored.
 
-
 \section{Letter Groups}
 \label{sec:lettergroupdefs}
 
@@ -14808,18 +14803,18 @@ afterwards.
 
 The base \isty{glossaries} package determines group titles through a fairly
 simplistic rule. Both \idx!{makeindex} and \idx!{xindy} write the
-line
+line:
 \nosecformatdef{glsgroupheading}
 to the associated glossary file at the start of each new letter group.
 For example, the \qt{A} letter group will be written as:
-\begin{verbatim}
-\glsgroupheading{A}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsgroupheading}\marg{A}
+\end{codeenv}
 This is quite straightforward and the heading title can just be
-\qt{A}. The \qt{Symbols} group is written as
-\begin{verbatim}
-\glsgroupheading{glssymbols}
-\end{verbatim}
+\qt{A}. The \qt{Symbols} group is written as:
+\begin{codeenv}
+\gls{glsgroupheading}\marg{glssymbols}
+\end{codeenv}
 To allow for easy translation, the base \sty{glossaries} package has
 the simple rule: 
 \begin{itemize}
@@ -14837,7 +14832,7 @@ name. A problem arises when active characters occur in
 \meta{heading}, which happens with extended characters and
 \isty{inputenc}.
 
-The \sty{glossaries-extra} package (as from version 1.14) provides
+The \sty{glossaries-extra} package (as from version 1.14) provides:
 \nosecformatdef{glsxtrsetgrouptitle}
 to set the title for a group with the given label. The internal
 workings of \gls{glsgroupheading} are modified to use a slightly
@@ -14869,11 +14864,11 @@ defines the entries. The actual group heading is inserted by
 the entry has a \field{group} field and comparing it to the previous
 entry's \field{group} field. 
 
-The default behaviour of the group formation implemented by the sort
+The behaviour of the group formation implemented by the sort
 methods may be changed with \csopt{group-formation}. With any
 setting other than \csopt[default]{group-formation}, the group label
-is set to \gls{bibglsunicodegroup} and the title is set to
-\gls{bibglsunicodegrouptitle} (see below) otherwise the label and
+is set to \format{bibglsunicodegroup} and the title is set to
+\format{bibglsunicodegrouptitle} (see below) otherwise the label and
 title are determined by the sort method.
 
 The collators used by the locale and letter-based rules save the
@@ -14900,15 +14895,15 @@ or the code point for the given letter, depending on the sort
 method.
 \item \meta{type} The entry's glossary type. If not known, this will
 be empty. (\bibgls\ won't know if you've modified the associated 
-\csfmt{bibglsnew...} command to set the \field{type}. It can only
+\csfmt{bibglsnew\ldots} command to set the \field{type}. It can only
 know the type if it's in the original \ext{bib} definition or is set
 using resource options such as \csopt{type}.)
 \end{itemize}
 
 The \field{group} field is then set using:
-\begin{alltt}
-group=\marg{\gls{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{type}}
-\end{alltt}
+\begin{codeenv}
+\field{group}=\marg{\gls{bibglslettergroup}\margm{title}\margm{letter}\margm{id}\margm{type}}
+\end{codeenv}
 This field needs to expand to a simple label, which \gls!{bibglslettergroup}
 is designed to do.  Note that non-letter groups are dealt with
 separately (see below).
@@ -14930,39 +14925,37 @@ the \field{group} assignment for one of the entries in that group).
 
 The \meta{cs} argument is the control sequence used in the
 \field{group} field to obtain the label from \meta{specs}. For
-example, if the highest \meta{id} is 2147418112 from
+example, if the highest \meta{id} is 2147418112 from:
 \begin{codeenv}
 \field{group}=\marg{\gls{bibglslettergroup}\marg{Ø}\marg{Ø}\marg{2147418112}\marg{}}
 \end{codeenv}
-then the last group is identified with
-\begin{verbatim}
-\bibglssetlastgrouptitle{\bibglslettergroup}{{Ø}{Ø}{2147418112}{}}
-\end{verbatim}
+then the last group is identified with:
+\begin{codeenv}
+\gls{bibglssetlastgrouptitle}\marg{\gls{bibglslettergroup}}\marg{\marg{Ø}\marg{Ø}\marg{2147418112}\marg{}}
+\end{codeenv}
 In this case \meta{cs} is \gls{bibglslettergroup} and \meta{specs}
 are the arguments for that command. If you want \gls{bibglssetlastgrouptitle}
 to change the group title then you need to define it before the
 \idx{resourceset}. For example:
-\begin{verbatim}
-\newcommand*{\bibglssetlastgrouptitle}[2]{%
- \glsxtrsetgrouptitle{#1#2}{Foreign Words}}
-
-\GlsXtrLoadResources[sec={entries}]
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\gls{bibglssetlastgrouptitle}}[2]\marg{\comment{}
+ \cs{glsxtrsetgrouptitle}\marg{\idx{param}1\idx{param}2}\marg{Foreign Words}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\end{codeenv}
 If you need to change a particular group title, then it has to be
 done after the \idx{resourceset}:
-\begin{verbatim}
-\GlsXtrLoadResources[sec={entries}]
-
-\glsxtrsetgrouptitle
- {\bibglslettergroup{{Ø}{Ø}{2147418112}{}}}% label
- {Foreign Words}% title
-\end{verbatim}
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\cs{glsxtrsetgrouptitle}
+ \marg{\gls{bibglslettergroup}\marg{\marg{Ø}\marg{Ø}\marg{2147418112}\marg{}}}\comment{label}
+ \marg{Foreign Words}\comment{title}
+\end{codeenv}
 
 \cssection{bibglssetlettergrouptitle}
 
 For each \idx{lettergroup} that's detected, \bibgls\ will write the line:
 \formatdef{bibglssetlettergrouptitle}
-in the \ext{glstex} file, which sets the group's title using
+in the \ext{glstex} file, which sets the group's title using:
 \begin{codeenv}
 \format{glsxtrsetgrouptitle}
 \end{codeenv}
@@ -14976,11 +14969,11 @@ These arguments are as described above.
 
 If \gls{glsxtrsetgrouptitle} has been defined (\sty{glossaries-extra}
 version 1.14 onwards), then \gls{bibglssetlettergrouptitle} will be
-defined as
-\begin{verbatim}
-\providecommand{\bibglssetlettergrouptitle}[1]{%
-  \glsxtrsetgrouptitle{\bibglslettergroup#1}{\bibglslettergrouptitle#1}}
-\end{verbatim}
+defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglssetlettergrouptitle}}[1]\marg{\comment{}
+  \cs{glsxtrsetgrouptitle}\marg{\gls{bibglslettergroup}\idx{param}1}\marg{\gls{bibglslettergrouptitle}\idx{param}1}}
+\end{codeenv}
 If an earlier version of \sty{glossaries-extra} is used, then this
 function can't be supported and the command will be defined to
 simply ignore its argument. This will fall back on the original
@@ -14993,17 +14986,17 @@ modification. After the resource file has been loaded, you can
 adjust the title of a specific group, but you'll need to check the
 \ext{glstex} file for the appropriate arguments. For example, if the
 \ext{glstex} file contains:
-\begin{alltt}
+\begin{codeenv}
 \gls{bibglssetlettergrouptitle}\marg{\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}
-\end{alltt}
+\end{codeenv}
 but you actually want the group title to appear as \qt{\AE\ (AE)}
 instead of just \qt{\AE}, then after the resource file has been
 loaded you can do:
-\begin{alltt}
+\begin{codeenv}
 \gls{glsxtrsetgrouptitle}
- \marg{\gls{bibglslettergroup}\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}\% label
- \marg{\AE\ (AE)}\% title
-\end{alltt}
+ \marg{\gls{bibglslettergroup}\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}\comment{label}
+ \marg{\AE\ (AE)}\comment{title}
+\end{codeenv}
 
 \cssection{bibglslettergroup}
 
@@ -15024,78 +15017,75 @@ against any expansion issues that may arise with characters outside
 the basic Latin set.
 
 For example:
-\begin{verbatim}
-@entry{angstrom,
-  name={\AA ngstr\"om}
-  description={a unit of length equal to one hundred-millionth 
+\begin{codeenv}
+\atentry{entry}\marg{angstrom,
+  \field{name}=\marg{\cs{AA} ngstr\cs{umlaut}om}
+  \field{description}=\marg{a unit of length equal to one hundred-millionth 
 of a centimetre}
 }
-\end{verbatim}
+\end{codeenv}
 The \field{sort} value is \qtt{\AA ngstr\"om}. With \csopt[en]{sort}
 the \meta{title} part will be \code{A} but with \csopt[sv]{sort}
 the \meta{title} part will be \code{\AA}. In both cases the
 \meta{letter} argument will be \code{\AA}.
 
 Take care if you are using a script that needs encapsulating. For
-example, with the \isty{CJKutf8} package the CJK characters need to
+example, with the \isty{CJKutf8} package the \idx{CJK} characters need to
 be placed within the \env{CJK} environment, so any letter group
-titles that contain CJK characters will need special attention.
+titles that contain \idx{CJK} characters will need special attention.
 
 For example, suppose the \ext{bib} file contains entries in the
 form:
-\begin{alltt}
+\begin{codeenv}
 \atentry{dualentry}\marg{\meta{label},
-  name = \marg{\ics{cjkname}\margm{CJK characters}},
-  description = \margm{English description}
+  \field{name} = \marg{\ics{cjkname}\margm{\idx{CJK} characters}},
+  \field{description} = \margm{English translation}
 }
-\end{alltt}
+\end{codeenv}
 and the document contains:
-\begin{verbatim}
-\usepackage{CJKutf8}
-\usepackage[record,style=indexgroup,nomain]{glossaries-extra}
-
-\newglossary*{japanese}{Japanese to English}
-\newglossary*{english}{English to Japanese}
-
-\newrobustcmd{\cjkname}[1]{\begin{CJK}{UTF8}{min}#1\end{CJK}}
-\glsnoexpandfields
-
-\GlsXtrLoadResources[
-  src=testcjk,% bib file
-  sort={ja-JP},% locale used to sort primary entries
-  dual-sort={en-GB},% locale used to sort secondary entries
-  type=japanese,% put the primary entries in the 'japanese' glossary
-  dual-type=english,% put the primary entries in the 'english' glossary
-  dual-prefix={en.}
-]
-\end{verbatim}
-then CJK characters will appear in the \meta{title} argument of 
+\begin{codeenv}
+\cmd{usepackage}\marg{CJKutf8}
+\cmd{usepackage}[\styopt{record},\styopt[indexgroup]{style},\styopt{nomain}]\marg{glossaries-extra}
+\strut
+\cs{newglossary*}\marg{japanese}\marg{Japanese to English}
+\cs{newglossary*}\marg{english}\marg{English to Japanese}
+\strut
+\ics{newrobustcmd}\marg{\cmd{cjkname}}[1]\marg{\cmd{begin}\marg{CJK}\marg{UTF8}\marg{min}\idx{param}1\cmd{end}\marg{CJK}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[testcjk]{src},\comment{bib file}
+  \csopt[ja-JP]{sort},\comment{locale used to sort primary entries}
+  \csopt[en-GB]{dual-sort},\comment{locale used to sort secondary entries}
+  \csopt[japanese]{type},\comment{put the primary entries in the 'japanese' glossary}
+  \csopt[english]{dual-type},\comment{put the dual entries in the 'english' glossary}
+  \csopt[en.]{dual-prefix}
+}
+\end{codeenv}
+then \idx{CJK} characters will appear in the \meta{title} argument of 
 \gls{bibglslettergrouptitle} which causes a problem because they need
 to be encapsulated within the \env{CJK} environment. This can be more
-conveniently done with the user supplied \csfmt{cjkname}, but the CJK
+conveniently done with the user supplied \csfmt{cjkname}, but the \idx{CJK}
 characters need to be protected from expansion so \ics{unexpanded} is
 also needed. The new definition of \gls{bibglslettergrouptitle} needs
 to be defined before \gls{GlsXtrLoadResources}. For example:
-\begin{verbatim}
-\newcommand{\bibglslettergrouptitle}[4]{\unexpanded{\cjkname{#1}}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglslettergrouptitle}}[4]\marg{\cs{unexpanded}\marg{\cmd{cjkname}\marg{\idx{param}1}}}
+\end{codeenv}
 There's a slight problem here in that the English letter group titles 
 also end up encapsulated. An alternative approach is to use the
 \meta{type} part to provide different forms. For example:
-\begin{verbatim}
-\newcommand*{\englishlettergroup}[1]{#1}
-\newcommand*{\japaneselettergroup}[1]{\cjkname{#1}}
-\newcommand{\bibglslettergrouptitle}[4]{%
- \unexpanded{\csuse{#4lettergroup}{#1}}}
-\end{verbatim}
-(\csfmt{csuse} is provided by \sty{etoolbox}, which is automatically
-loaded by the \styfmt{glossaries} package.)
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{englishlettergroup}}[1]\marg{\idx{param}1}
+\cs{newcommand}*\marg{\cmd{japaneselettergroup}}[1]\marg{\cmd{cjkname}\marg{\idx{param}1}}
+\cs{newcommand}\marg{\gls{bibglslettergrouptitle}}[4]\marg{\comment{}
+ \cs{unexpanded}\marg{\cs{csuse}\marg{\idx{param}4lettergroup}\marg{\idx{param}1}}}
+\end{codeenv}
 
 \cssection{bibglssetothergrouptitle}
 
 The label and title for \idxpl{symbolgroup}
 are dealt with in a similar way to the \idxpl!{lettergroup}, but in this
-case the title is set using
+case the title is set using:
 \formatdef{bibglssetothergrouptitle}
 This is defined in an analogous manner:
 \begin{verbatim}

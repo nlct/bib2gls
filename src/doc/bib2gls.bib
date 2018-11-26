@@ -42,6 +42,12 @@
   category={common}
 }
 
+@abbreviation{CJK,
+  short = {CJK},
+  long = {Chinese, Japanese, Korean languages},
+  category={common}
+}
+
 @abbreviation{encap,
   short = {encap},
   long = {encapsulating command}
@@ -497,7 +503,7 @@ given label},
 
 @dualindexentry{bibglssetlastgrouptitle,
   name={\csfmt{bib\-gls\-set\-last\-group\-title}},
-  user1={\margm{cs}\margm{group specs}},
+  user1={\margm{cs}\margm{specs}},
   description={sets the last group title},
   category={command}
 }
@@ -3021,73 +3027,79 @@ and \L/\l\ treated as L/l},
   text={file format}
 }
 
-@index{tex,
+@index{ext.tex,
   name={\extfmt{tex}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{bib,
+@index{ext.bib,
   name={\extfmt{bib}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{aux,
+@index{ext.aux,
   name={\extfmt{aux}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{out,
+@index{ext.out,
   name={\extfmt{out}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{sh,
+@index{ext.sh,
   name={\extfmt{sh}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{bat,
+@index{ext.bat,
   name={\extfmt{bat}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{jar,
+@index{ext.jar,
   name={\extfmt{jar}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{glg,
+@index{ext.glg,
   name={\extfmt{glg}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{log,
+@index{ext.log,
   name={\extfmt{log}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{toc,
+@index{ext.toc,
   name={\extfmt{toc}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{glstex,
+@index{ext.glstex,
   name={\extfmt{glstex}},
   category={fileformat},
   parent={fileformats}
 }
 
-@index{bbl,
+@index{ext.gls,
+  name={\extfmt{gls}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@index{ext.bbl,
   name={\extfmt{bbl}},
   category={fileformat},
   parent={fileformats}
@@ -3764,6 +3776,15 @@ and \L/\l\ treated as L/l},
   description={uses the control sequence whose name
    is given by \meta{cs-name} or does nothing if the command
    isn't defined},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
+@index{newrobustcmd,
+  name={\csfmt{new\-robust\-cmd}},
+  user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
+  description={behaves like \cs{newcommand} but the newly defined
+command will be robust},
   note={\styfmt{etoolbox}},
   category={command}
 }
@@ -8483,6 +8504,14 @@ usual delay},
   category={command}
 }
 
+@index{ifnum,
+  name={\csfmt{ifnum}},
+  user1={\meta{number1}\meta{comparison}\meta{number2}},
+  description={integer conditional},
+  note={\TeX\ primitive},
+  category={command}
+}
+
 @index{renewcommand,
   name={\csfmt{re\-new\-com\-mand}},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
@@ -10533,9 +10562,7 @@ by \meta{name}},
 @index{cjkname,
   name={\csfmt{cjkname}},
   user1={\margm{CJK characters}},
-  description={displays \meta{CJK characters} in the appropriate
-   encoding},
-  note={\styfmt{CJKutf8}},
+  description={example command},
   category={command}
 }
 
