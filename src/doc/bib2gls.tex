@@ -15088,10 +15088,10 @@ are dealt with in a similar way to the \idxpl!{lettergroup}, but in this
 case the title is set using:
 \formatdef{bibglssetothergrouptitle}
 This is defined in an analogous manner:
-\begin{verbatim}
-\providecommand{\bibglssetothergrouptitle}[1]{%
- \glsxtrsetgrouptitle{\bibglsothergroup#1}{\bibglsothergrouptitle#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglssetothergrouptitle}}[1]\marg{\comment{}
+ \cs{glsxtrsetgrouptitle}\marg{\gls{bibglsothergroup}\idx{param}1}\marg{\gls{bibglsothergrouptitle}\idx{param}1}}
+\end{codeenv}
 where the group label is obtained using \gls!{bibglsothergroup} and
 the group title is obtained from \gls!{bibglsothergrouptitle}.
 Note that since non-alphabetic characters don't have upper or lower
@@ -15100,12 +15100,12 @@ between this and the letter group version is that the \meta{id} is
 given in hexadecimal format (corresponding to the character code).
 
 For example, suppose my \ext{bib} file contains:
-\begin{verbatim}
-@entry{sauthor,
-  name={/Author},
-  description = {author string}
+\begin{codeenv}
+\atentry{entry}\marg{sauthor,
+  \field{name}=\marg{/Author},
+  \field{description} = \marg{author string}
 }
-\end{verbatim}
+\end{codeenv}
 If a locale sort is used, the leading slash \code{/} will be
 ignored and this entry will belong to the \qt{A} letter group using
 the letter commands described above. If, instead, one of the
@@ -15113,9 +15113,9 @@ character code sort methods are used, such as
 \csopt[letter-case]{sort}, then this entry will be identified as
 belonging to a symbol (or \qt{other}) group and the title will be
 set using:
-\begin{verbatim}
-\bibglssetothergrouptitle{{/}{2F}{}}
-\end{verbatim}
+\begin{codeenv}
+\gls{bibglssetothergrouptitle}\marg{\marg{/}\marg{2F}\marg{}}
+\end{codeenv}
 
 \cssection{bibglsothergroup}
 
@@ -15133,9 +15133,11 @@ expands to \ics{glssymbolsgroupname} by default.
 
 \cssection{bibglssetemptygrouptitle}
 
-Used when the sort value devolves to an empty string. This command
+Used when the sort value degenerates to an empty string. This command
 sets the label and title.
 \formatdef{bibglssetemptygrouptitle}
+(Note the inner group, as with the other similar 
+\csfmt{bibglsset\ldots grouptitle} commands.)
 
 \cssection{bibglsemptygroup}
 
@@ -15159,11 +15161,11 @@ or symbol groups. These behave in an analogous way to the above.
 \formatdef{bibglssetnumbergrouptitle}
 In this case \meta{value} is the actual numeric sort value, and
 \meta{id} is a decimal number obtained from converting \meta{value}
-to an integer. This command is defined as
-\begin{verbatim}
-\providecommand{\bibglssetnumbergrouptitle}[1]{%
-  \glsxtrsetgrouptitle{\bibglsnumbergroup#1}{\bibglsnumbergrouptitle#1}}
-\end{verbatim}
+to an integer. This command is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglssetnumbergrouptitle}}[1]\marg{\comment{}
+  \cs{glsxtrsetgrouptitle}\marg{\gls{bibglsnumbergroup}\idx{param}1}\marg{\gls{bibglsnumbergrouptitle}\idx{param}1}}
+\end{codeenv}
 
 \cssection{bibglsnumbergroup}
 
@@ -15184,11 +15186,12 @@ This just defaults to \ics{glsnumbersgroupname}.
 This command is used for \idx{datetimegroup} labels with \optfmt{datetime} sorting
 (\tableref{tab:sortoptionsdatetime}). This has ten arguments, which means a
 little trickery is needed to deal with the tenth argument.
-The default definition is
-\begin{verbatim}
-\providecommand{\bibglsdatetimegroup}[9]{#1#2#3\@firstofone}
-\end{verbatim}
-This forms the group label from the year, month, day and \meta{type}.
+The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdatetimegroup}}[9]\marg{\idx{param}1\idx{param}2\idx{param}3\ics{@firstofone}}
+\end{codeenv}
+This forms the group label from the year \meta{YYYY}, month \meta{MM}, 
+day \meta{DD} and \meta{type}.
 
 \cssection{bibglsdatetimegrouptitle}
 
@@ -15196,10 +15199,10 @@ This forms the group label from the year, month, day and \meta{type}.
 
 This command is used for \idx{datetimegroup} titles with \optfmt{datetime} sorting
 (\tableref{tab:sortoptionsdatetime}).
-The default definition is
-\begin{verbatim}
-\providecommand{\bibglsdatetimegrouptitle}[9]{#1-#2-#3\@gobble}
-\end{verbatim}
+The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdatetimegrouptitle}}[9]\marg{\idx{param}1-\idx{param}2-\idx{param}3\ics{@gobble}}
+\end{codeenv}
 This sets the title to the numeric
 \code{\meta{YYYY}-\meta{MM}-\meta{DD}}
 but may be redefined as appropriate.
@@ -15209,10 +15212,10 @@ but may be redefined as appropriate.
 \formatdef{bibglsdategroup}
 
 This command is used for \idx{dategroup} labels with \optfmt{date} (no time) sorting 
-(\tableref{tab:sortoptionsdatetime}). The default definition is
-\begin{verbatim}
-\providecommand{\bibglsdategroup}[7]{#1#2#4#7}
-\end{verbatim}
+(\tableref{tab:sortoptionsdatetime}). The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdategroup}}[7]\marg{\idx{param}1\idx{param}2\idx{param}4\idx{param}7}
+\end{codeenv}
 This forms the group label from the year, month, era and type.
 In this case, the era is a textual representation not the numeric
 value used in calculating the sort value.
@@ -15221,10 +15224,10 @@ value used in calculating the sort value.
 
 \formatdef{bibglsdategrouptitle}
 This command is used for \idx{dategroup} titles with \optfmt{date} (no time) sorting
-(\tableref{tab:sortoptionsdatetime}).  The default definition is
-\begin{verbatim}
-\providecommand{\bibglsdategrouptitle}[7]{#1-#2}
-\end{verbatim}
+(\tableref{tab:sortoptionsdatetime}).  The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdategrouptitle}}[7]\marg{\idx{param}1-\idx{param}2}
+\end{codeenv}
 This just sets the title to the numeric year-month form 
 \code{\meta{YYYY}-\meta{MM}}.
 
