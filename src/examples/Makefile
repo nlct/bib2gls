@@ -6,7 +6,7 @@ all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
 	sample-maths.pdf sample-textsymbols.pdf \
 	sample-constants.pdf sample-usergroups.pdf \
-	sample-languages.pdf sample-multi1.pdf sample-multi2.pdf \
+	sample-markuplanguages.pdf sample-multi1.pdf sample-multi2.pdf \
 	sample-citations.pdf
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
@@ -81,11 +81,11 @@ sample-usergroups.pdf	: $(DEPS) sample-usergroups.tex \
 	$(BIB2GLS) sample-usergroups
 	xelatex sample-usergroups
 
-sample-languages.pdf	: $(DEPS) sample-languages.tex \
+sample-markuplanguages.pdf	: $(DEPS) sample-markuplanguages.tex \
 	markuplanguages.bib
-	pdflatex sample-languages
-	$(BIB2GLS) sample-languages
-	pdflatex sample-languages
+	pdflatex sample-markuplanguages
+	$(BIB2GLS) sample-markuplanguages
+	pdflatex sample-markuplanguages
 
 sample-multi1.pdf	: $(DEPS) sample-multi1.tex \
 	bacteria.bib markuplanguages.bib minerals.bib \

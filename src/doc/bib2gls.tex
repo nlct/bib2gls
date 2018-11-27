@@ -9189,7 +9189,7 @@ definition:
 \cs{renewcommand}*\marg{\cs{abbrvpluralsuffix}}\marg{\cs{protect}\ics{glsxtrscsuffix}}
 \end{codeenv}
 This allows the suffix to be reverted back to the upright font,
-counter-acting the affect of the small-caps font.
+counteracting the affect of the small-caps font.
 
 This means that if you want to change or strip the suffix used for
 the plural short form, it's usually not sufficient to redefine
@@ -16293,7 +16293,7 @@ is in the \fieldfmt{constantsymbol} field in both cases) and \code{imaginary}
 I've provided some commands in the \atentry{preamble} for
 constants that are represented by Latin and Greek letters.
 These can be defined in the document before the \idx{resourceset}
-if different notation required. The upright Greek commands require
+if different notation is required. The upright Greek commands require
 the \isty{upgreek} package.
 
 If it's likely that there may be a need to sort according to
@@ -16351,8 +16351,8 @@ entry's \field{name}.
 
 All entries only contain custom fields, which will all be ignored by
 \bibgls\ unless defined or aliased: \fieldfmt{identifier}, which is set to
-\code{chemical} for all entries, \fieldfmt{formula}, which set to the
-chemical formula, and \fieldfmt{chemicalname}, which set to the chemical
+\code{chemical} for all entries, \fieldfmt{formula}, which is set to the
+chemical formula, and \fieldfmt{chemicalname}, which is set to the chemical
 name. This allows the flexibility of determining whether the
 \field{name} or \field{symbol} field should contain the chemical
 formula on a per-resource basis. For example:
@@ -16396,7 +16396,8 @@ as the fallback field for \field{sort}.)
 
 The entries all have custom fields \fieldfmt{unitname},
 \fieldfmt{unitsymbol} and \fieldfmt{measurement}, one of which must
-be aliased or copied to \field{name}. The others may be aliased or
+be aliased or copied to \field{name} if \atentryfmt{unit} is aliased
+to an entry type that requires it. The other custom fields may be aliased or
 copied to \field{symbol} and \field{description} as required. The
 \fieldfmt{unitsymbol} fields all use \ics{si} provided by the
 \isty{siunitx} package, so that package must be loaded in the
@@ -16416,7 +16417,7 @@ The contents of \filefmt{baseunits.bib} are as follows:
 
 The \exfile{derivedunits.bib} file is much like \exfile{baseunits.bib}
 but contains derived units and in this case the custom entry type
-is \atentryfmt{measurement} must be aliased
+is \atentryfmt{measurement}, which must be aliased
 otherwise the entries will all be ignored.
 The entries all have a custom field \fieldfmt{identifier} set to 
 \code{derivedunit}. This will be ignored by \bibgls\ unless it's
@@ -16628,11 +16629,11 @@ that only conditionally append text.
 
 The best solution is with \styfmt{glossaries-extra} v1.23+ which
 provides \ics{glsxtrrestorepostpunc} for use in the category
-\idxpl{postdescriptionhook} that counter-acts \cs{glsxtrnopostpunc}.
+\idxpl{postdescriptionhook} that counteracts \cs{glsxtrnopostpunc}.
 This can be placed inside a conditional, as used in
 \exfile{sample-media.tex}, and does nothing if \cs{glsxtrnopostpunc}
 doesn't occur in the \field{description} field. (Note that 
-\cs{glsxtrrestorepostpunc} can't be used to counter-act
+\cs{glsxtrrestorepostpunc} can't be used to counteract
 \cs{nopostdesc}, since that completely suppresses the hook.)
 
 The contents of \filefmt{films.bib} are as follows:
@@ -16642,7 +16643,7 @@ The contents of \filefmt{films.bib} are as follows:
 
 The \exfile{citations.bib} file is actually a \BibTeX\ file, but it
 can be parsed by \bibgls\ if the \BibTeX\ entry types are converted
-to \atentry{bibtexentry}, which can easily be done with
+to \atentry{bibtexentry}, which can easily be done with:
 \begin{codeenv}
 \csopt[\ics{GlsXtrBibTeXEntryAliases}]{entry-type-aliases}
 \end{codeenv}
@@ -16665,7 +16666,7 @@ The contents of \filefmt{citations.bib} are as follows:
 \filesection{mathgreek.bib}
 
 The \exfile{mathgreek.bib} file contains Greek letters for use in
-maths mode. These are all defined use \atentry{symbol}, which means
+maths mode. These are all defined with \atentry{symbol}, which means
 that by default the \field{sort} field will be obtained from the
 label not from the \field{name} field. However, if you want to sort
 by the \field{name} field (for example, with \csopt[name]{sort-field})
@@ -16720,21 +16721,23 @@ as not all of the commands are provided by the \LaTeX\ kernel.
 This file also has a preamble:
 \begin{codeenv}
 \atentry{preamble}\marg{\qtdelim{\cmd{providecommand}\marg{\cmd{bigoperatornamefmt}}[1]\marg{\comment{}
- \idx{mshiftchar}\cmd{displaystyle}\idx{param}1\cmd{textstyle}\idx{param}1\idx{mshiftchar}}
+ \idx{mshiftchar}\ics{displaystyle}\idx{param}1\ics{textstyle}\idx{param}1\idx{mshiftchar}}
 \cmd{providecommand}\marg{\cmd{nary}}[1]\marg{\idx{mshiftchar}\idx{param}1\idx{mshiftchar}-ary}}}
 \end{codeenv}
 The first command \inlinedef{bigoperatornamefmt}
 is used in the \field{name} field to display both the in-line and display
 versions of the symbol. The \TeX\ parser library only has a limited ability to
 interpret this as not all the symbols have Unicode in-line and large versions.
-In some cases, such as the integral symbol $\int$ only has a small version. (A
-large version would require construction from \hex{2320}, \hex{23AE} and
-\hex{2321}, which is too complicated in this context.) However, the interpreter
-works well enough to guess at the widest name if \csopt{set-widest} is used.
-There's no advantage in sorting according to the \field{name} field here, as
-the Unicode symbols are scattered about different blocks. Better approaches are
-to sort according to document use (\csopt[use]{sort}) or to sort according to
-the \field{description} field.
+In some cases, such as the integral symbol $\int$, there is only a small 
+version. (A large version would require construction from \hex{2320}, 
+\hex{23AE} and \hex{2321}, which is too complicated in this context.) 
+However, the interpreter works well enough to guess at the widest
+name if \csopt{set-widest} is used.  There's no advantage in sorting
+according to the \field{name} field here, unless a custom rule is
+provided, as the Unicode symbols are scattered about different
+blocks. Better approaches are to sort according to document use
+(\csopt[use]{sort}) or to sort according to the \field{description}
+field.
 
 The other custom command is \inlinedef{nary} to provide semantic markup for
 \qt{$n$-ary}. This could be defined without an argument:
@@ -16762,10 +16765,11 @@ The \exfile{mathsrelations.bib} file contains mathematical
 relational symbols. These use the maths shift character
 \idx{mshiftchar} in the \field{name} field and just the symbol in
 the \field{text} field. This just illustrates an alternative way of
-defining symbols.  Since \ics{ensuremath} isn't used, commands
+defining symbols.  Since \ics{ensuremath} isn't used, commands like
 \cs{gls} must be explicitly placed in maths mode. For example,
-\verb|$\gls{leq}$| rather than simply \verb|\gls{leq}|. The custom
-\fieldfmt{identifier} field is set to \code{relation}.
+\code{\idx{mshiftchar}\cs{gls}\marg{leq}\idx{mshiftchar}} rather than simply 
+\code{\cs{gls}\marg{leq}}. The custom \fieldfmt{identifier} field is
+set to \code{relation}.
 
 The contents of \filefmt{mathsrelations.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/mathsrelations.bib}
@@ -16783,7 +16787,7 @@ The contents of \filefmt{binaryoperators.bib} are as follows:
 \filesection{unaryoperators.bib}
 
 The \exfile{unaryoperators.bib} file contains mathematical unary
-operators. This again uses \atentry{symbol} to define the symbols,
+operators. As above, this again uses \atentry{symbol} to define the symbols,
 but in this case \ics{ensuremath} is used in the \field{name}
 field and there's no \field{text} field. I've also used \ics{mathord}
 to ensure the symbol is treated as a unary (rather than binary)
@@ -16813,7 +16817,7 @@ which is used to format matrix and vector transposes,
 \nosecdef{invfmt}
 which is used to format inverses,
 \nosecdef{vecfmt}
-which is used to format \meta{symbol} as a vector and
+which is used to format \meta{symbol} as a vector, and
 \nosecdef{mtxfmt}
 which is used to format \meta{symbol} as a matrix.
 These commands are intended for use with \gls{glsxtrfmt},
@@ -16823,11 +16827,11 @@ have exactly one argument. This means employing a little trick.
 A command with just one argument is provided:
 \nosecdef{setmembershiponeargfmt}
 that requires the actual two arguments to be supplied inside
-\verb|#1|. The outer grouping is removed and the two-argument
+\code{\idx!{param}1}. The outer grouping is removed and the two-argument
 \gls!{setmembershipfmt} command is applied:
-\begin{verbatim}
-\providecommand{\setmembershiponeargfmt}[1]{\setmembershipfmt#1}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{setmembershiponeargfmt}}[1]\marg{\gls{setmembershipfmt}\idx{param}1}
+\end{codeenv}
 This means that the entry needs to be referenced in the document
 using:
 \begin{codeenv}
@@ -16835,13 +16839,13 @@ using:
 \end{codeenv}
 The simplest thing to do here is to provide a wrapper command in the
 document, for example:
-\begin{verbatim}
-\newcommand*{\setmembership}[2]{\glsxtrfmt{setmembership}{{#1}{#2}}}
-\end{verbatim}
-Now this can be used as
-\begin{alltt}
-\csfmt{setmembership}\margm{variable(s)}\margm{condition}
-\end{alltt}
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{setmembership}}[2]\marg{\gls{glsxtrfmt}\marg{setmembership}\marg{\marg{\idx{param}1}\marg{\idx{param}2}}}
+\end{codeenv}
+Now this can be used as:
+\begin{codeenv}
+\cmd{setmembership}\margm{variable(s)}\margm{condition}
+\end{codeenv}
 
 There are essentially two types of entry defined in this file: 
 entries that demonstrate the formatting for the objects
@@ -16852,8 +16856,9 @@ command. If this field is defined or aliased then it can be used
 with \gls!{glsxtrfmt} (as in the example above).
 
 In both cases there's a custom \fieldfmt{identifier} field that
-reflects the type of object: \code{numberspace} for number spaces,
-\code{set} for sets, \code{matrix} for matrices or vectors.
+reflects the type of object: \code{set} for sets, 
+\code{numberspace} for number spaces,
+\code{matrix} for matrices or vectors.
 
 Be careful with the set cardinality example. Remember that nested
 links cause problems and the \sty{glossaries-extra} manual advises
@@ -16880,19 +16885,19 @@ to provide the weather commands. Unfortunately both packages define
 you can load \sty{ifsym} without the \styoptfmt{weather} option
 and use the internal definition of \sty{ifsym}'s \csfmt{Sun}
 and \csfmt{Lightning} commands:
-\begin{verbatim}
-@icon{sun,
-  icon={\textweathersymbol{16}},
-  description={sunny},
-  identifier={weather}
+\begin{codeenv}
+\atentryfmt{icon}\marg{sun,
+  \fieldfmt{icon}=\marg{\ics{textweathersymbol}\marg{16}},
+  \fieldfmt{description}=\marg{sunny},
+  \fieldfmt{identifier}=\marg{weather}
 }
-
-@icon{lightning,
-  icon={\textweathersymbol{26}},
-  description={thunderstorm},
-  identifier={weather}
+\strut
+\atentryfmt{icon}\marg{lightning,
+  \fieldfmt{icon}=\marg{\cs{textweathersymbol}\marg{26}},
+  \field{description}=\marg{thunderstorm},
+  \fieldfmt{identifier}=\marg{weather}
 }
-\end{verbatim}
+\end{codeenv}
 This removes the conflict, and \csfmt{Sun} and \csfmt{Lightning}
 are as defined by \sty{marvosym}.
 
@@ -16900,7 +16905,7 @@ This file uses a custom entry type \atentryfmt{icon}, which must be
 aliased to a recognised entry identifier otherwise the entries will
 all be ignored. For example:
 \begin{codeenv}
-\csopt[icon=symbol]{entry-type-aliases}
+\csopt[\fieldfmt{icon}=\field{symbol}]{entry-type-aliases}
 \end{codeenv}
 
 There are three types of symbols defined: media controls, information
@@ -16945,8 +16950,8 @@ concatenation character \idx{stringconcat}. As with the other sample
 which will be ignored unless defined or aliased.
 
 The empty braces at the start some of the fields are there to
-protect against first letter uppercasing, where it might cause a
-problem.
+protect against first letter uppercasing within \TeX, where it might cause a
+problem. (For example, with the \catattr{glossname} attribute.)
 
 The contents of \filefmt{markuplanguages.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/markuplanguages.bib}
@@ -17248,12 +17253,12 @@ ignored. I decided to make \atentryfmt{constant} behave like
 The custom fields also need aliasing:
 \begin{codeenv}
 \csopt[
-  identifier=category,
-  constantsymbol=name,
-  constantname=description,
-  value=user1,
-  definition=user2,
-  alternative=user3,
+  \fieldfmt{identifier}=\field{category},
+  \fieldfmt{constantsymbol}=\field{name},
+  \fieldfmt{constantname}=\field{description},
+  \fieldfmt{value}=\field{user1},
+  \fieldfmt{definition}=\field{user2},
+  \fieldfmt{alternative}=\field{user3},
 ]{field-aliases}
 \end{codeenv}
 I decided to use the \glostyle{altlist} style, so I've instructed
@@ -17272,7 +17277,7 @@ numerical value. I've aliased the custom \fieldfmt{value} field to
 \field{user1}, so I can sort by that field using a numerical
 comparison:
 \begin{codeenv}
-\csopt[user1]{sort-field},
+\csopt[\field{user1}]{sort-field},
 \csopt[double]{sort}
 \end{codeenv}
 There are three entries without the \fieldfmt{user1} field (as the
@@ -17280,9 +17285,9 @@ custom \fieldfmt{value} field is missing in the \ext{bib} file):
 \code{zero}, \code{one} and \code{imaginary}. In the case of
 \code{zero} and \code{one} the exact value can be obtained from the
 \field{name} field. Since I've change the default \csopt{sort-field}, I
-can't use \csopt{symbol-sort-fallback}. Instead I need to use
+can't use \csopt{symbol-sort-fallback}. Instead I need to use:
 \begin{codeenv}
-\csopt[name]{missing-sort-fallback}
+\csopt[\field{name}]{missing-sort-fallback}
 \end{codeenv}
 
 What happens with the \code{imaginary} entry? It has no real
@@ -17310,10 +17315,10 @@ style is no longer available, I need to set a new default with
 \styopt{postdot}. Don't forget that the \styopt{record} option is
 always needed when using \bibgls. This means that the
 \sty{glossaries-extra} package needs to be loaded as follows:
-\begin{verbatim}
-\usepackage[record,nostyles,postdot,stylemods={tree},style=alttree]
- {glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cs{usepackage}\oarg{\styopt{record},\styopt{nostyles},\styopt{postdot},\styopt[tree]{stylemods},\styopt[alttree]{style}}
+ \marg{glossaries-extra}
+\end{codeenv}
 I've assigned the custom \fieldfmt{constantname} field to the
 \field{description} field and the custom \fieldfmt{constantsymbol} field to the
 \field{name} field. This means that by default the glossary list
@@ -17328,62 +17333,72 @@ I've aliased the custom \fieldfmt{identifier} field to
 \field{category} set to \code{constant}. The
 \idx{postdescriptionhook} is obtained from
 \idx{glsxtrpostdesccategory}, so I need to define
-the command \csfmt{glsxtrpostdescconstant}. A simple definition is
-\begin{verbatim}
-\newcommand{\glsxtrpostdescconstant}{%
- \space (approximately \glsentryuseri{\glscurrententrylabel})%
- : \glsentryuserii{\glscurrententrylabel}%
+the command \csfmt{glsxtrpostdescconstant}. A simple definition is:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{glsxtrpostdescconstant}}\marg{\comment{}
+ \cs{space} (approximately \cs{glsentryuseri}\marg{\cs{glscurrententrylabel}})\comment{}
+ : \cs{glsentryuserii}\marg{\cs{glscurrententrylabel}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This is fine if all entries have the \field{user1} and \field{user2}
 fields set. A more generic approach tests for the existence of these
-fields. This can either be done with \idx{ifglshasfield}:
-\begin{verbatim}
-\newcommand{\glsxtrpostdescconstant}{%
-  \ifglshasfield{user1}{\glscurrententrylabel}%
-  { (approximately \glscurrentfieldvalue)}%
-  {}%
-  \ifglshasfield{user2}{\glscurrententrylabel}%
-  {: \glscurrentfieldvalue}%
-  {}%
+fields. This can either be done with \ics{ifglshasfield}:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{glsxtrpostdescconstant}}\marg{\comment{}
+  \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{ (approximately \cs{glscurrentfieldvalue})}\comment{}
+  {}\comment{}
+  \cs{ifglshasfield}\marg{\field{user2}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{: \cs{glscurrentfieldvalue}}\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
-or with \idx{glsxtrifhasfield}:
-\begin{verbatim}
-\newcommand{\glsxtrpostdescconstant}{%
-  \glsxtrifhasfield{useri}{\glscurrententrylabel}%
-  { (approximately \glscurrentfieldvalue)}%
-  {}%
-  \glsxtrifhasfield{userii}{\glscurrententrylabel}%
-  {: \glscurrentfieldvalue}%
-  {}%
+\end{codeenv}
+or with \ics{glsxtrifhasfield}:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{glsxtrpostdescconstant}}{\comment{}
+  \cs{glsxtrifhasfield}\marg{\field{useri}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{ (approximately \cs{glscurrentfieldvalue})}\comment{}
+  \marg{}\comment{}
+  \cs{glsxtrifhasfield}\marg{\field{userii}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{: \cs{glscurrentfieldvalue}}\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 (Note the need to use the internal field label \field{useri} and
 \field{userii} with \ics{glsxtrifhasfield}.)
 
 A modification can be made to also show the alternative
 representation (obtained from the custom \fieldfmt{alternative}
 field which has been aliased to \field{user3}):
-\begin{verbatim}
-\newcommand{\glsxtrpostdescconstant}{%
-  \glsxtrifhasfield{useriii}{\glscurrententrylabel}%
-  { (also denoted \glscurrentfieldvalue
-      \glsxtrifhasfield{useri}{\glscurrententrylabel}%
-      {, approximately \glscurrentfieldvalue}%
-      {}%
-   )%
-  }%
-  {%
-    \glsxtrifhasfield{useri}{\glscurrententrylabel}%
-    { (approximately \glscurrentfieldvalue)}%
-    {}%
-  }%
-  \glsxtrifhasfield{userii}{\glscurrententrylabel}%
-  {: \glscurrentfieldvalue}%
-  {}%
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{glsxtrpostdescconstant}}{\comment{}
+  \cs{glsxtrifhasfield}\marg{\field{useriii}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{ (also denoted \cs{glscurrentfieldvalue}
+      \cs{glsxtrifhasfield}\marg{\field{useri}}\marg{\cs{glscurrententrylabel}}\comment{}
+      \marg{, approximately \cs{glscurrentfieldvalue}}\comment{}
+      \marg{}\comment{}
+   )\comment{}
+  }\comment{}
+  \marg{\comment{}
+    \cs{glsxtrifhasfield}\marg{\field{useri}}\marg{\cs{glscurrententrylabel}}\comment{}
+    \marg{ (approximately \cs{glscurrentfieldvalue})}\comment{}
+    \marg{}\comment{}
+  }\comment{}
+  \cs{glsxtrifhasfield}\marg{\field{userii}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{: \cs{glscurrentfieldvalue}}\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
+If you have at least \styfmt{glossaries-extra} v1.31, it's better to use:
+\begin{codeenv}
+\ics{glsdefpostdesc}\marg{constant}
+\end{codeenv}
+instead of:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{glsxtrpostdescconstant}}
+\end{codeenv}
+as it can guard against accidental misspelling of the \code{glsxtrpostdesc}
+part of the command name.
 
 The complete code is listed below.  The document build is:
 \begin{verbatim}
@@ -18850,7 +18865,7 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 {fig:sample-textsymbols.pdf}
 \end{figure}
 
-\filesection{sample-languages.tex}
+\filesection{sample-markuplanguages.tex}
 
 This example uses \exfile{markuplanguages.bib}. Since the file
 includes abbreviations, any commands that must be used before
@@ -18949,21 +18964,21 @@ difference as they already start with a capital. It's only the
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
-pdflatex sample-languages
-bib2gls --group sample-languages
-pdflatex sample-languages
+pdflatex sample-markuplanguages
+bib2gls --group sample-markuplanguages
+pdflatex sample-markuplanguages
 \end{verbatim}
-The resulting document is shown in \figureref{fig:sample-languages.pdf}.
+The resulting document is shown in \figureref{fig:sample-markuplanguages.pdf}.
 
-\lstinputlisting[firstline=5]{../examples/sample-languages.tex}
+\lstinputlisting[firstline=5]{../examples/sample-markuplanguages.tex}
 
 \begin{figure}
 \figcontents
 {%
- \frame{\includegraphics[height=.9\textheight]{../examples/sample-languages.pdf}}%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-markuplanguages.pdf}}%
 }
-{\caption{\filefmt{sample-languages.pdf}}}
-{fig:sample-languages.pdf}
+{\caption{\filefmt{sample-markuplanguages.pdf}}}
+{fig:sample-markuplanguages.pdf}
 \end{figure}
 
 
@@ -19421,14 +19436,14 @@ The remaining glossaries need defining:
 \newglossary*{baseunit}{SI Units}
 \newglossary*{derivedunit}{Derived Units}
 \end{verbatim}
-As with \exfile{sample-bacteria.tex} and \exfile{sample-languages.tex}
+As with \exfile{sample-bacteria.tex} and \exfile{sample-markuplanguages.tex}
 I need to set the abbreviation styles before the abbreviations are
 defined:
 \begin{verbatim}
 \setabbreviationstyle[bacteria]{long-only-short-only}
 \setabbreviationstyle[markuplanguage]{long-short-desc}
 \end{verbatim}
-Unlike the \exfile{sample-languages.tex} example, I'm not interested
+Unlike the \exfile{sample-markuplanguages.tex} example, I'm not interested
 in tagging the initials in this case, but I still want to change the
 way the \field{name} field is set with the
 \abbrstyle{long-short-desc} abbreviation style:
