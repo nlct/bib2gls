@@ -173,6 +173,13 @@
 
 \newcommand{\qtt}[1]{\qt{\,\texttt{#1}\,}}
 
+\newcommand{\qtdelim}[1]{\idx{doublequotechardelim}#1\idx{doublequotechardelim}}
+
+\newcommand{\ifnumhex}[1]{\cs{ifnum}\idx{doublequotecharhex}#1}
+
+\newcommand{\charhex}[1]{\cs{char}\idx{doublequotecharhex}#1}
+\newcommand{\icharhex}[1]{\ics{char}\idx[format=glsnumberformat,noindex=false]{doublequotecharhex}#1}
+
 \newcommand{\era}[1]{\texorpdfstring{\textsc{\MakeLowercase{#1}}}{#1}}
 
 \newcommand{\dequals}{%
@@ -327,6 +334,14 @@
   \texorpdfstring%
   {%
     \gls{styopt.#2}\styoptfmt{\ifblank{#1}{}{\dequals\marg{#1}}}%
+  }%
+  {#2\ifblank{#1}{}{=#1}}%
+}
+
+\newcommand*{\istyopt}[2][]{%
+  \texorpdfstring%
+  {%
+    \gls[noindex=false]{styopt.#2}\styoptfmt{\ifblank{#1}{}{\dequals\marg{#1}}}%
   }%
   {#2\ifblank{#1}{}{=#1}}%
 }
@@ -1011,7 +1026,7 @@ example, the file \filefmt{entries.bib} might contain:
 }
 \strut
 \atentry{abbreviation}\marg{html,
-  \field{short}="html",
+  \field{short}=\qtdelim{html},
   \field{long}=\marg{hypertext markup language}
 }
 \strut
@@ -1021,7 +1036,7 @@ example, the file \filefmt{entries.bib} might contain:
   \field{description}=\marg{a vector}
 }
 \strut
-\atentry{index}\marg{goose,\field{plural}="geese"}
+\atentry{index}\marg{goose,\field{plural}=\qtdelim{geese}}
 \end{codeenv}
 Here's an example document that uses this data:
 \begin{codeenv}
@@ -1798,9 +1813,9 @@ can provide versions of these commands just for \bibgls's
 use:\footnote{These commands won't work with PDF\LaTeX, as the
 \cs{char} values are too large, but they're fine for \bibgls.}
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{Harbour}}\marg{\cs{char}"2693}
-\cs{providecommand}\marg{\cmd{Battlefield}}\marg{\cs{char}"2694}
-\cs{providecommand}\marg{\cmd{Stadium}}\marg{\cs{char}"26BD}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{Harbour}}\marg{\charhex{2693}}
+\cs{providecommand}\marg{\cmd{Battlefield}}\marg{\charhex{2694}}
+\cs{providecommand}\marg{\cmd{Stadium}}\marg{\charhex{26BD}}}}
 \end{codeenv}
 Since these use \cs{providecommand}, they won't overwrite the
 document's version (provided these commands have been defined before
@@ -1827,10 +1842,10 @@ messages prefixed with \code{texparserlib:} even with
 For example, suppose the \ext{bib} file includes:
 \begin{codeenv}
 \atentry{preamble}\marg{
-"\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}
+\qtdelim{\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}
 \cs{providecommand}\marg{\cmd{set}}[1]\marg{\ics{mathcal}\marg{\idx{param}1}}
 \cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}
-\cs{providecommand}\marg{\cmd{imaginary}}\marg{i}"}
+\cs{providecommand}\marg{\cmd{imaginary}}\marg{i}}}
 \strut
 \atentry{entry}\marg{M,
   \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{mtx}\marg{M}\idx{mshiftchar}},
@@ -2392,7 +2407,7 @@ Note that if other commands are provided that expand to Unicode
 superscript or subscript characters, then they won't be affected by
 this setting. For example, if \csfmt{superiortwo} is defined as
 \begin{codeenv}
-\cs{providecommand}\marg{\cmd{superiortwo}}\marg{\cs{char}"B2}
+\cs{providecommand}\marg{\cmd{superiortwo}}\marg{\charhex{B2}}
 \end{codeenv}
 then it will be interpreted as \hex{00B2} (superscript two) even if
 this setting is on.
@@ -3032,7 +3047,7 @@ commas, and most special characters are forbidden. The hyphen character and
 some other punctuation characters are allowed by \bibgls, but you need to make 
 sure that your document hasn't made them active. In general it's best to
 stick with alpha-numeric labels.  The field values may be delimited by braces
-\margm{text} or double-quotes \code{"\meta{text}"}.
+\margm{text} or double-quotes \code{\qtdelim{\meta{text}}}.
 
 The \csopt{label-prefix} option can be used to instruct \bibgls\ to
 insert prefixes to the labels (\meta{id}) when the data is read.
@@ -3256,22 +3271,22 @@ For example:
 \atentry{string}\marg{html=\marg{hypertext markup language}}
 \strut
 \atentry{abbreviation}\marg{shtml,
-  \field{short}="shtml",
-  \field{long}=ssi \idx{stringconcat} " enabled " \idx{stringconcat} html,
+  \field{short}=\qtdelim{shtml},
+  \field{long}=ssi \idx{stringconcat} \qtdelim{ enabled } \idx{stringconcat} html,
   \field{see}=\marg{ssi,html}
 }
 \strut
 \atentry{abbreviation}\marg{html,
-  \field{short}="html",
+  \field{short}=\qtdelim{html},
   \field{long}=html
 }
 \strut
 \atentry{abbreviation}\marg{ssi,
-  \field{short}="ssi",
+  \field{short}=\qtdelim{ssi},
   \field{long}=ssi
 }
 \end{codeenv}
-Note the difference between \code{="ssi"} (a field value delimited by
+Note the difference between \code{=\qtdelim{ssi}} (a field value delimited by
 double-quotes), the undelimited \code{=ssi} (a reference to the
 variable), the grouped \code{=\marg{ssi,html}} (a field value
 delimited by braces) and \code{ssi} the entry label.
@@ -3282,7 +3297,7 @@ The standard \atentry{preamble} is available and can be used to
 provide command definitions used within field values.
 For example:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}}}
 \strut
 \atentry{entry}\marg{matrix,
   \field{name}=\marg{matrix},
@@ -3304,8 +3319,8 @@ as a fallback when \field{sort} is omitted (unless
 \csopt[false]{interpret-preamble} is set in the resource options).
 For example:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
-\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}}}
 \strut
 \atentry{entry}\marg{S,
   \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{set}\marg{S}\idx{mshiftchar}},
@@ -3365,8 +3380,8 @@ another field by redefining \ics{GlsXtrFmtField}.
 
 The \ext{bib} file can now look like this:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
-\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{set}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{card}}[1]\marg{|\cmd{set}\marg{\idx{param}1}|}}}
 \strut
 \atentry{symbol}\marg{S,
   \field{name}=\marg{\marg{}\idx{mshiftchar}\cmd{set}\marg{S}\idx{mshiftchar}},
@@ -3442,8 +3457,8 @@ automatically produce a hyperlink to the glossary entry if the
 Here's an alternative \ext{bib} that defines entries with a term, a
 description and a symbol:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{setfmt}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
-\cs{providecommand}\marg{\cmd{cardfmt}}[1]\marg{|\cmd{setfmt}\marg{\idx{param}1}|}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{setfmt}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{cardfmt}}[1]\marg{|\cmd{setfmt}\marg{\idx{param}1}|}}}
 \strut
 \atentry{entry}\marg{set,
   \field{name}=\marg{set},
@@ -3471,8 +3486,8 @@ for the cardinality. (For example, if the argument is an expression
 involving set unions or intersections.)
 The \ext{bib} file is now:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{setfmt}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
-\cs{providecommand}\marg{\cmd{cardfmt}}[1]\marg{|\idx{param}1|}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{setfmt}}[1]\marg{\cs{mathcal}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{cardfmt}}[1]\marg{|\idx{param}1|}}}
 \strut
 \atentry{entry}\marg{set,
   \field{name}=\marg{set},
@@ -3544,7 +3559,7 @@ Regular terms are defined by the \atentry{entry} field. This requires the
 \field{description} field and either \field{name} or \field{parent}.
 For example:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{mtx}}[1]\marg{\cs{boldsymbol}\marg{\idx{param}1}}}}
 \strut
 \atentry{entry}\marg{matrix,
   \field{name}=\marg{matrix},
@@ -3559,7 +3574,7 @@ For example:
 }
 \strut
 \atentry{entry}\marg{vector,
-  \field{name} = "vector",
+  \field{name} = \qtdelim{vector},
   \field{description} = \marg{column or row of values, denoted \cs{gls}\marg{v}},
   \field{seealso}=\marg{matrix}
 }
@@ -5396,8 +5411,8 @@ Note \bibgls\ allows \iext{bib} files that don't provide any entries.
 This can be used to provide commands in \atentry{preamble}.
 For example, suppose I have \filefmt{defs.bib} that just contains:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{strong}}[1]\marg{\cs{textbf}\marg{\ics{cs.color}\marg{red}\idx{param}1}}
-\cs{providecommand}\marg{\cmd{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{strong}}[1]\marg{\cs{textbf}\marg{\ics{cs.color}\marg{red}\idx{param}1}}
+\cs{providecommand}\marg{\cmd{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}}}
 \end{codeenv}
 This provides two commands:
 \nosecdef{strong}
@@ -5458,11 +5473,11 @@ and one that should.
 
 For example, \filefmt{defs-nointerpret.bib}:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{strong}}[1]\marg{\cs{textbf}\marg{\cs{cs.color}\marg{red}\idx{param}1}}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\gls{strong}}[1]\marg{\cs{textbf}\marg{\cs{cs.color}\marg{red}\idx{param}1}}}}
 \end{codeenv}
 and \filefmt{defs-interpret.bib}:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\gls{parenswap}}[2]\marg{\idx{param}2 (\idx{param}1)}}}
 \end{codeenv}
 Now the first one can be loaded with \csopt[false]{interpret-preamble}:
 \begin{codeenv}
@@ -6561,7 +6576,7 @@ If you provide a definition of \gls{bibglsflattenedchildpresort} in
 the \atentry{preamble}, it will be picked up by the interpreter.
 For example:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\gls{bibglsflattenedchildpresort}}[2]\marg{\idx{param}1 (\idx{param}2)}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\gls{bibglsflattenedchildpresort}}[2]\marg{\idx{param}1 (\idx{param}2)}}}
 \end{codeenv}
 
 Note that the \field{text} field is only changed if not already set.
@@ -7212,7 +7227,7 @@ For example, if the \ext{bib} file contains:
 \strut
 \atentry{index}\marg{duck}
 \strut
-\atentry{index}\marg{goose,\field{plural}="geese"}
+\atentry{index}\marg{goose,\field{plural}=\qtdelim{geese}}
 \end{codeenv}
 Then if this \ext{bib} file is loaded with \csopt[gls.]{label-prefix}
 it's as though the entries had been defined as:
@@ -7230,7 +7245,7 @@ it's as though the entries had been defined as:
 \strut
 \atentry{index}\marg{gls.duck,\field{name}=\marg{duck}}
 \strut
-\atentry{index}\marg{gls.goose,\field{name}=\marg{goose},\field{plural}="geese"}
+\atentry{index}\marg{gls.goose,\field{name}=\marg{goose},\field{plural}=\qtdelim{geese}}
 \end{codeenv}
 
 Remember to use this prefix when you reference the terms in the
@@ -7529,7 +7544,7 @@ For example, if the \ext{bib} file contains:
 \strut
 \atentry{index}\marg{duck}
 \strut
-\atentry{index}\marg{goose,\field{plural}="geese"}
+\atentry{index}\marg{goose,\field{plural}=\qtdelim{geese}}
 \strut
 \atentry{dualentry}\marg{dog,
   \field{name}=\marg{dog},
@@ -7667,7 +7682,7 @@ labels. Remember that unrecognised fields will always be skipped.
 For example, suppose my \ext{bib} file contains:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
-  \field{short} ="html",
+  \field{short} =\qtdelim{html},
   \field{long}  = \marg{hypertext markup language},
   \field{description}=\marg{a markup language for creating web pages},
   \field{seealso}=\marg{xml}
@@ -8940,8 +8955,8 @@ as though it was defined as:
 Suppose I have a slightly eccentric abbreviation definition:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
-  \field{short} = "ht\cs{emph}\marg{ml}",
-  \field{long}  = "hypertext markup language"
+  \field{short} = \qtdelim{ht\cs{emph}\marg{ml}},
+  \field{long}  = \qtdelim{hypertext markup language}
 }
 \end{codeenv}
 then \csopt[uc]{short-case-change} would convert the value of the
@@ -8954,8 +8969,8 @@ command. There's a difference between a group that follows a control
 sequence and one that doesn't. For example:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
-  \field{short} = "\marg{ht}ml",
-  \field{long}  = "hypertext markup language"
+  \field{short} = \qtdelim{\marg{ht}ml},
+  \field{long}  = \qtdelim{hypertext markup language}
 }
 \end{codeenv}
 In this case \csopt[firstuc]{short-case-change} will convert the
@@ -8967,8 +8982,8 @@ In this case \csopt[firstuc]{short-case-change} will convert the
 converted.) Whereas with:
 \begin{codeenv}
 \atentry{abbreviation}\marg{html,
-  \field{short} = "\cs{emph}\marg{ht}ml",
-  \field{long}  = "hypertext markup language"
+  \field{short} = \qtdelim{\cs{emph}\marg{ht}ml},
+  \field{long}  = \qtdelim{hypertext markup language}
 }
 \end{codeenv}
 then \csopt[firstuc]{short-case-change} will convert the
@@ -8983,7 +8998,7 @@ There's no attempt at interpreting the field contents at this point (but
 the value may later be interpreted during sorting).
 For example, suppose a \field{name} field is defined using:
 \begin{codeenv}
-\field{name} = "z\ics{ae}\ics{oe}",
+\field{name} = \qtdelim{z\ics{ae}\ics{oe}},
 \end{codeenv}
 then with \csopt[uc]{name-case-change}, the value would be converted to
 \begin{codeenv}
@@ -9033,7 +9048,7 @@ If you have a command that takes a label or identifier as an argument then it's
 best to hide the label in a custom command. For example, if the
 \field{short} field in the \ext{bib} definition is defined as:
 \begin{codeenv}
-  \field{short} = "ht\ics{textcolor}\marg{red}\marg{ml}",
+  \field{short} = \qtdelim{ht\ics{textcolor}\marg{red}\marg{ml}},
 \end{codeenv}
 then with \csopt[uc]{short-case-change} this would end up as:
 \begin{codeenv}
@@ -10452,20 +10467,20 @@ For example, suppose the file \filefmt{entries.bib} contains:
 \begin{codeenv}
 \atentry{entry}\marg{sample,
   \field{name}=\marg{sample},
-  \field{description}="an example entry"
+  \field{description}=\qtdelim{an example entry}
 }
 \strut
 \atentry{abbreviation}\marg{html,
-  \field{short}="html",
+  \field{short}=\qtdelim{html},
   \field{long}=\marg{hypertext markup language}
 }
 \strut
 \atentry{abbreviation}\marg{ssi,
-  \field{short}="ssi",
-  \field{long}="server-side includes"
+  \field{short}=\qtdelim{ssi},
+  \field{long}=\qtdelim{server-side includes}
 }
 \strut
-\atentry{index}\marg{goose,\field{plural}="geese"}
+\atentry{index}\marg{goose,\field{plural}=\qtdelim{geese}}
 \end{codeenv}
 Now suppose the supplementary document is contained in the file
 \filefmt{suppl.tex}:
@@ -10756,7 +10771,7 @@ Remember that you can have \atentry{preamble} definitions that
 can be hidden from \bibgls's interpreter. For example,
 \exfile{no-interpret-preamble.bib} might contain:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cmd{providecommand}\marg{\gls{sortop}}[2]\marg{\idx{param}1 \idx{param}2}"}
+\atentry{preamble}\marg{\qtdelim{\cmd{providecommand}\marg{\gls{sortop}}[2]\marg{\idx{param}1 \idx{param}2}}}
 \end{codeenv}
 which is loaded using:
 \begin{codeenv}
@@ -10772,7 +10787,7 @@ created and so is only used within entry fields.)
 Another file, say, \filefmt{interpret-preamble.bib} may provide
 a definition for \bibgls:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cmd{providecommand}\marg{\gls{sortop}}[2]\marg{\idx{param}2, \idx{param}1}"}
+\atentry{preamble}\marg{\qtdelim{\cmd{providecommand}\marg{\gls{sortop}}[2]\marg{\idx{param}2, \idx{param}1}}}
 \end{codeenv}
 which can be processed with:
 \begin{codeenv}
@@ -11950,9 +11965,9 @@ In addition to \filefmt{mapsymbols.sty}, I also need to create
 \filefmt{mapsymbols.bib} to provide the appropriate definitions for
 \bibgls:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\ics{char}"2693}
-\cs{glsxtrprovidecommand}\marg{\cmd{Battlefield}}\marg{\cs{char}"2694}
-\cs{glsxtrprovidecommand}\marg{\cmd{Stadium}}\marg{\cs{char}"26BD}"}
+\atentry{preamble}\marg{\qtdelim{\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\icharhex{2693}}
+\cs{glsxtrprovidecommand}\marg{\cmd{Battlefield}}\marg{\charhex{2694}}
+\cs{glsxtrprovidecommand}\marg{\cmd{Stadium}}\marg{\charhex{26BD}}}}
 \end{codeenv}
 The use of \ics{glsxtrprovidecommand} will override any previous
 definitions of these commands in \bibgls's interpreter but will act
@@ -11991,9 +12006,9 @@ custom package just for \bibgls' use. For example,
 \comment{Use \cmd{usepackage}\marg{mapsymbols} in the document.}
 \cmd{NeedsTeXFormat}\marg{LaTeX2e}
 \cmd{ProvidesPackage}\marg{mapsymbols-bib2gls}
-\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\ics{char}"2693}
-\cs{glsxtrprovidecommand}\marg{\cmd{Battlefield}}\marg{\cs{char}"2694}
-\cs{glsxtrprovidecommand}\marg{\cmd{Stadium}}\marg{\cs{char}"26BD}
+\cs{glsxtrprovidecommand}\marg{\cmd{Harbour}}\marg{\charhex{2693}}
+\cs{glsxtrprovidecommand}\marg{\cmd{Battlefield}}\marg{\charhex{2694}}
+\cs{glsxtrprovidecommand}\marg{\cmd{Stadium}}\marg{\charhex{26BD}}
 \cmd{endinput}
 \end{codeenv}
 and instruct \bibgls\ to parse it with 
@@ -12317,8 +12332,8 @@ unknown control sequences, it doesn't perform this merger.
 
 If I add: 
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}*\marg{\cmd{application}}[1]\marg{\cs{texttt}\marg{\idx{param}1}}
-\cs{providecommand}\marg{\cmd{command}}[1]\marg{\cs{texttt}\marg{\cs{glsbackslash} \idx{param}1}}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}*\marg{\cmd{application}}[1]\marg{\cs{texttt}\marg{\idx{param}1}}
+\cs{providecommand}\marg{\cmd{command}}[1]\marg{\cs{texttt}\marg{\cs{glsbackslash} \idx{param}1}}}}
 \end{codeenv}
 to the earlier \ext{bib} file (called, say, \filefmt{entries.bib})
 then the document can be altered to use \bibgls:
@@ -12813,7 +12828,7 @@ interpreted result matches the required format.
 
 For example, if \csfmt{era} is provided with:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cs{providecommand}\marg{\cmd{era}}[1]\marg{\cs{textsc}\marg{\cs{MakeLowercase}\marg{\idx{param}1}}}"}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{era}}[1]\marg{\cs{textsc}\marg{\cs{MakeLowercase}\marg{\idx{param}1}}}}}
 \end{codeenv}
 If the definition is hidden from the interpreter
 (\csopt[false]{interpret-preamble}) and the field
@@ -15179,6 +15194,20 @@ The \idx{numbergroup} title is obtained from:
 \formatdef{bibglsnumbergrouptitle}
 This just defaults to \ics{glsnumbersgroupname}.
 
+\cssection{bibglssetdatetimegrouptitle}
+
+The date-time sort methods (\tableref{tab:sortoptionsdatetime}) 
+create \idxpl{datetimegroup}. These behave in an analogous way to the above.
+\formatdef{bibglssetdatetimegrouptitle}
+This command is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglssetdatetimegrouptitle}}[1]\marg{\comment{}
+ \cs{glsxtrsetgrouptitle}
+  \marg{\gls{bibglsdatetimegroup}\idx{param}1}\comment{}
+  \marg{\gls{bibglsdatetimegrouptitle}\idx{param}1}\comment{}
+}
+\end{codeenv}
+
 \cssection{bibglsdatetimegroup}
 
 \formatdef{bibglsdatetimegroup}
@@ -15207,6 +15236,18 @@ This sets the title to the numeric
 \code{\meta{YYYY}-\meta{MM}-\meta{DD}}
 but may be redefined as appropriate.
 
+\cssection{bibglssetdategrouptitle}
+
+The date sort methods (\tableref{tab:sortoptionsdatetime}) 
+create \idxpl{dategroup} (the time isn't included). These behave in an 
+analogous way to the above.
+\formatdef{bibglssetdategrouptitle}
+This command is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglssetdategrouptitle}}[1]\marg{\comment{}
+ \cs{glsxtrsetgrouptitle}\marg{\gls{bibglsdategroup}\idx{param}1}\marg{\gls{bibglsdategrouptitle}\idx{param}1}}
+\end{codeenv}
+
 \cssection{bibglsdategroup}
 
 \formatdef{bibglsdategroup}
@@ -15231,11 +15272,27 @@ This command is used for \idx{dategroup} titles with \optfmt{date} (no time) sor
 This just sets the title to the numeric year-month form 
 \code{\meta{YYYY}-\meta{MM}}.
 
+\cssection{bibglssettimegrouptitle}
+
+The time sort methods (\tableref{tab:sortoptionsdatetime}) 
+create \idxpl{timegroup} (the date isn't included). These behave in an 
+analogous way to the above.
+\formatdef{bibglssettimegrouptitle}
+This command is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglssettimegrouptitle}}[1]\marg{\comment{}
+ \cs{glsxtrsetgrouptitle}\marg{\gls{bibglstimegroup}\idx{param}1}\marg{\gls{bibglstimegrouptitle}\idx{param}1}}
+\end{codeenv}
+
 \cssection{bibglstimegroup}
 
 \formatdef{bibglstimegroup}
 This command is used for \idx{timegroup} labels with \optfmt{time} (no date) sorting
 (\tableref{tab:sortoptionsdatetime}).
+This command is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglstimegroup}}[7]\marg{\idx{param}1\idx{param}2\idx{param}7}
+\end{codeenv}
 
 \cssection{bibglstimegrouptitle}
 
@@ -15243,6 +15300,10 @@ This command is used for \idx{timegroup} labels with \optfmt{time} (no date) sor
 
 This command is used for \idx{timegroup} titles with \optfmt{time} (no date) sorting
 (\tableref{tab:sortoptionsdatetime}).
+This command is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglstimegrouptitle}}[7]\marg{\idx{param}1}
+\end{codeenv}
 
 \cssection{bibglssetunicodegrouptitle}
 
@@ -15277,50 +15338,51 @@ identifies both the Unicode category and script associated with
 
 The \meta{character} is the first significant character of the sort
 value. The \meta{id} is the hexadecimal code of (possibly decomposed) 
-\meta{character}. 
+\meta{character}. The case of codepoint \meta{id} may or may not correspond 
+to the case of \meta{character}.
 
 For example, with \csopt[codepoint]{group-formation}, an unset
 \field{type} and a sort value of \qt{\AA ngstr\"om} with \qt{\AA} as a
 significant character distinct from \qt{A} then the \field{group} 
 field will be assigned using:
-\begin{verbatim}
-group={\bibglsunicodegroup{å}{Å}{C5}{}}
-\end{verbatim}
+\begin{codeenv}
+\field{group}=\marg{\gls{bibglsunicodegroup}\marg{å}\marg{Å}\marg{C5}\marg{}}
+\end{codeenv}
 whereas with \csopt[unicode category and script]{group-formation} it will be:
-\begin{verbatim}
-group={\bibglsunicodegroup{Lu.LATIN}{Å}{C5}{}}
-\end{verbatim}
+\begin{codeenv}
+\field{group}=\marg{\gls{bibglsunicodegroup}\marg{Lu.LATIN}\marg{Å}\marg{C5}\marg{}}
+\end{codeenv}
 (\idx!{uppercase} Latin letter). 
 
 If instead \qt{\AA} is considered equivalent to \qt{A} according to the 
 collator, then with \csopt[codepoint]{group-formation}, the value will be:
-\begin{verbatim}
-group={\bibglsunicodegroup{a}{Å}{61}{}}
-\end{verbatim}
-Note that the \meta{id} is now \hex{61} (the decomposed \qt{A}) not
-\hex{C5}.
+\begin{codeenv}
+\field{group}=\marg{\gls{bibglsunicodegroup}\marg{a}\marg{Å}\marg{61}\marg{}}
+\end{codeenv}
+Note that the \meta{id} is now \hex{61} (the decomposed \qt{A}
+converted to \idx{lowercase}) not \hex{C5}.
 
 \cssection{bibglsunicodegrouptitle}
 
 \formatdef{bibglsunicodegrouptitle}
-The title for Unicode group formations by default simply expands to
+The title for Unicode group formations is simply defined as 
 \code{\cs{unexpanded}\margm{label}} so you will need to change it to
 something more appropriate. For example (before the \idx{resourceset}):
-\begin{verbatim}
-\newcommand{\bibglsunicodegrouptitle}[4]{%
-  \ifnum"#3>64 
-   \ifnum"#3 < 91 
-     A--Z%
-   \else 
-     \ifnum"#3 > 96
-       \ifnum"#3 < 123
-         A--Z%
-       \fi
-     \fi
-   \fi
-  \fi
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglsunicodegrouptitle}}[4]\marg{\comment{}
+  \ifnumhex{\idx{param}3}>64 
+   \ifnumhex{\idx{param}3} < 91 
+     A-{}-Z\comment{}
+   \cmd{else} 
+     \ifnumhex{\idx{param}3} > 96
+       \ifnumhex{\idx{param}3} < 123
+         A-{}-Z\comment{}
+       \cmd{fi}
+     \cmd{fi}
+   \cmd{fi}
+  \cmd{fi}
 }
-\end{verbatim}
+\end{codeenv}
 This will make the title \qt{A--Z} if \meta{id} is greater
 than 64 and less than 91 or greater than 96 and less than 123 
 (and will be empty otherwise).
@@ -15329,9 +15391,9 @@ Note that this setting can create an odd effect if the sorting
 causes the groups to be split up. For example, if some of the sort values
 start with extended or non-Latin characters this can break up the
 groups. First check how the group labels are assigned using:
-\begin{verbatim}
-\newcommand{\bibglsunicodegrouptitle}{\bibglsunicodegroup}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglsunicodegrouptitle}}\marg{\gls{bibglsunicodegroup}}
+\end{codeenv}
 then adjust the definition of \gls{bibglsunicodegroup} until the
 grouping is correct, and then change the definition of 
 \gls{bibglsunicodegrouptitle} so that the title is correct.
@@ -15359,35 +15421,35 @@ The default definition simply does \meta{name}.
 
 This command is used if the child and parent name's are identical.
 For example, suppose the \ext{bib} file contains:
-\begin{verbatim}
-@index{super.glossary, name={glossary}}
-
-@entry{glossarycol,
-  parent={super.glossary},
-  description={collection of glosses}
+\begin{codeenv}
+\atentry{index}\marg{super.glossary, \field{name}=\marg{glossary}}
+\strut
+\atentry{entry}\marg{glossarycol,
+  \field{parent}=\marg{super.glossary},
+  \field{description}=\marg{collection of glosses}
 }
-
-@entry{glossarylist,
-  parent={super.glossary},
-  description={list of technical words}
+\strut
+\atentry{entry}\marg{glossarylist,
+  \field{parent}=\marg{super.glossary},
+  \field{description}=\marg{list of technical words}
 }
-\end{verbatim}
+\end{codeenv}
 The child entries don't have a \field{name} field, so the value is assumed
 to be the same as the parent's \field{name} field. Here's an example 
 document where both child entries are used:
-\begin{verbatim}
-\documentclass{article}
-
-\usepackage[record,subentrycounter,style=treenoname]{glossaries-extra}
-
-\GlsXtrLoadResources[src={entries}]
-
-\begin{document}
-\gls{glossarycol} (collection) vs \gls{glossarylist} (list).
-
-\printunsrtglossary
-\end{document}
-\end{verbatim}
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}[\styopt{record},\istyopt{subentrycounter},\styopt[treenoname]{style}]\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+\cs{gls}\marg{glossarycol} (collection) vs \cs{gls}\marg{glossarylist} (list).
+\strut
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
 This uses one of the glossary styles designed for homographs and the
 glossary has the structure:
 \begin{flushleft}
@@ -15407,10 +15469,10 @@ the child is moved up a hierarchical level. With
 name so that it appears as \meta{parent name}, \meta{child name}
 but in this case it would look a little odd for the name to 
 appear as \qt{glossary, glossary} so instead the name is
-set to
-\begin{verbatim}
-\bibglsflattenedhomograph{glossary}{super.glossary}
-\end{verbatim}
+set to:
+\begin{codeenv}
+\gls{bibglsflattenedhomograph}\marg{glossary}\marg{super.glossary}
+\end{codeenv}
 (where the first argument is the original name and the second argument is the
 label of the parent entry).
 
@@ -15429,9 +15491,9 @@ Used by the \csopt[presort]{flatten-lonely} option. This defaults
 to just \meta{child name}. If you want to change this, remember that
 you can let the interpreter know by adding the definition to
 \atentry{preamble}. For example:
-\begin{verbatim}
-@preamble{"\providecommand{\bibglsflattenedchildpresort}[2]{#1 (#2)}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\gls{bibglsflattenedchildpresort}}[2]\marg{\idx{param}1 (\idx{param}2)}}}
+\end{codeenv}
 
 \cssection{bibglsflattenedchildpostsort}
 
@@ -15446,9 +15508,9 @@ upper-casing. If either command is redefined to alter the ordering,
 then this can confuse the case-changing mechanism, in which case you
 may want to consider switching on the expansion of the \field{name}
 field using:
-\begin{verbatim}
-\glssetexpandfield{name}
-\end{verbatim}
+\begin{codeenv}
+\gls{glssetexpandfield}\marg{name}
+\end{codeenv}
 (before \gls{GlsXtrLoadResources}).
 
 \section{Other}
@@ -15457,10 +15519,10 @@ field using:
 
 \formatdef{bibglshyperlink}
 Used by the \hyperref[sec:dualoptsbacklinks]{back link options},
-this just defaults to 
-\begin{alltt}
+this just defaults to: 
+\begin{codeenv}
 \ics{glshyperlink}\oargm{text}\margm{label}
-\end{alltt}
+\end{codeenv}
 
 \cssection{bibglssetwidest}
 
@@ -15468,18 +15530,18 @@ this just defaults to
 This is used by \csopt{set-widest} to set the widest name for the
 given hierarchical level where the glossary type can't be determined.
 This is defined as:
-\begin{verbatim}
-\providecommand*{\bibglssetwidest}[2]{\glsxtrSetWidest{}{#1}{#2}}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglssetwidest}}[2]\marg{\cs{glsxtrSetWidest}\marg{}\marg{\idx{param}1}\marg{\idx{param}2}}
+\end{codeenv}
 if \ics{glsxtrSetWidest} has been defined, or:
-\begin{verbatim}
-\providecommand*{\bibglssetwidest}[2]{\glsupdatewidest[#1]{#2}}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglssetwidest}}[2]\marg{\cs{glsupdatewidest}\oarg{\idx{param}1}\marg{\idx{param}2}}
+\end{codeenv}
 if \ics{glsupdatewidest} is defined, otherwise it will be
 defined to use \ics{glssetwidest}:
-\begin{verbatim}
-\providecommand*{\bibglssetwidest}[2]{\glssetwidest[#1]{#2}}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglssetwidest}}[2]\marg{\cs{glssetwidest}\oarg{\idx{param}1}\marg{\idx{param}2}}
+\end{codeenv}
 Since this isn't scoped, this will affect other glossaries.
 In general, if you have more than one glossary it's best to
 set the \field{type} using options like \csopt{type}.
@@ -15490,24 +15552,24 @@ set the \field{type} using options like \csopt{type}.
 This is used by \csopt{set-widest} to set the widest name for the
 given hierarchical level where the glossary type is known. This
 is defined as:
-\begin{verbatim}
-\providecommand*{\bibglssetwidestfortype}[3]{%
-  \glsxtrSetWidest{#1}{#2}{#3}%
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglssetwidestfortype}}[3]\marg{\comment{}
+  \cs{glsxtrSetWidest}\marg{\idx{param}1}\marg{\idx{param}2}\marg{\idx{param}3}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 if \ics{glsxtrSetWidest} has been defined, or:
-\begin{verbatim}
-\providecommand*{\bibglssetwidestfortype}[3]{%
-  \apptoglossarypreamble[#1]{\glsupdatewidest[#2]{#3}}%
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglssetwidestfortype}}[3]\marg{\comment{}
+  \cs{apptoglossarypreamble}\oarg{\idx{param}1}\marg{\cs{glsupdatewidest}\oarg{\idx{param}2}\marg{\idx{param}3}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 if \ics{glsupdatewidest} is defined, otherwise it will be
 defined to use \ics{glssetwidest}:
-\begin{verbatim}
-\providecommand*{\bibglssetwidestfortype}[3]{%
-  \apptoglossarypreamble[#1]{\glssetwidest[#2]{#3}}%
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglssetwidestfortype}}[3]\marg{\comment{}
+  \cs{apptoglossarypreamble}\oarg{\idx{param}1}\marg{\cs{glssetwidest}\oarg{\idx{param}2}\marg{\idx{param}3}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Since the glossary preamble is scoped, this won't affect other
 glossaries.
 
@@ -15518,9 +15580,9 @@ This is used by \csopt{set-widest} instead of \gls{bibglssetwidest}
 when all \field{name} fields end up as an empty string when
 interpreted by \bibgls. This typically means that all the
 \field{name} fields contain unknown commands. This fallback command
-will use
+will use:
 \begin{codeenv}
-\ics{glsxtrSetWidestFallback}\marg{2}\marg{glossary list}
+\ics{glsxtrSetWidestFallback}\marg{2}\margm{glossary list}
 \end{codeenv}
 if defined otherwise it will use \ics{glsFindWidestLevelTwo}, which
 sets the widest name for the top-level and first two sub-levels
@@ -15544,9 +15606,9 @@ This is used by \csopt{set-widest} instead of \gls{bibglssetwidest}
 when all \field{name} fields end up as an empty string when
 interpreted by \bibgls. This typically means that all the
 \field{name} fields contain unknown commands. This fallback command
-will use
+will use:
 \begin{codeenv}
-\ics{glsxtrSetWidestFallback}\marg{0}\marg{glossary list}
+\ics{glsxtrSetWidestFallback}\marg{0}\margm{glossary list}
 \end{codeenv}
 if defined otherwise it will use \ics{glsFindWidestTopLevelName},
 which sets the widest name for the top-level.
@@ -15568,40 +15630,39 @@ preamble of the given type.
 This is used when \csopt{bibtex-contributor-fields} is set. The
 definition depends on whether or not \ics{DTLformatlist} has been
 defined:
-\begin{verbatim}
-\ifdef\DTLformatlist
-{% datatool v2.28+
- \providecommand*{\bibglscontributorlist}[2]{\DTLformatlist{#1}}
+\begin{codeenv}
+\ics{ifdef}\cs{DTLformatlist}
+\marg{\comment{datatool v2.28+}
+ \cs{providecommand}*\marg{\gls{bibglscontributorlist}}[2]\marg{\cs{DTLformatlist}\marg{\idx{param}1}}
 }
-{% datatool v2.27 or earlier
- \providecommand*{\bibglscontributorlist}[2]{%
-  \def\bibgls@sep{}%
-  \@for\bibgls@item:=#1\do{\bibgls@sep\bibgls@item\def\bibgls@sep{, }}%
+\marg{\comment{datatool v2.27 or earlier}
+ \cs{providecommand}*\marg{\gls{bibglscontributorlist}}[2]\marg{\comment{}
+  \ics{def}\cmd{bibgls@sep}\marg{}\comment{}
+  \ics{@for}\cmd{bibgls@item}:=\idx{param}1\cmd{do}\marg{\cmd{bibgls@sep}\cmd{bibgls@item}\cs{def}\cmd{bibgls@sep}\marg{, }}\comment{}
  }
 }
-\end{verbatim}
+\end{codeenv}
 The second argument allows you to provide definitions like:
-\begin{verbatim}
-\newcommand*{\bibglscontributorlist}[2]{%
- \ifcase#2
- \or
-  name:
- \else
-  names:
- \fi
- \DTLformatlist{#1}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\gls{bibglscontributorlist}}[2]\marg{\comment{}
+ \cs{ifcase}\idx{param}2
+ \cmd{or}
+   name:
+ \cmd{else}
+   names:
+ \cmd{fi}
+ \cs{DTLformatlist}\marg{\idx{param}1}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 \cssection{bibglscontributor}
 
 \formatdef{bibglscontributor}
 This is used when \csopt{bibtex-contributor-fields} is set. The
-definition depends on \csopt{contributor-order}. Note that if you have multiple
-resource sets, that option governs the way \bibgls's version of
-\gls{bibglscontributor} behaves. The definition is written to the
-\ext{glstex} using \cs{providecommand}, so \LaTeX\ will only pick up
-the first definition.
+definition depends on the value of \csopt{contributor-order}. Note that if you
+have multiple resource sets, that option governs the way \bibgls's version of
+\gls{bibglscontributor} behaves. The definition is written to the \ext{glstex}
+using \cs{providecommand}, so \LaTeX\ will only pick up the first definition.
 
 \cssection{bibglsprimaryprefixlabel}
 
@@ -15639,27 +15700,27 @@ loaded.
 \cssection{bibglshashchar}
 
 \formatdef{bibglshashchar}
-Expands to a literal hash character (\idx{hashchar}).
+Expands to a literal hash character (\,\idx{hashchar}\,).
 
 \cssection{bibglsunderscorechar}
 
 \formatdef{bibglsunderscorechar}
-Expands to a literal underscore character (\idx{underscorechar}).
+Expands to a literal underscore character (\,\idx{underscorechar}\,).
 
 \cssection{bibglsdollarchar}
 
 \formatdef{bibglsdollarchar}
-Expands to a literal dollar character (\idx{dollarchar}).
+Expands to a literal dollar character (\,\idx{dollarchar}\,).
 
 \cssection{bibglsampersandchar}
 
 \formatdef{bibglsampersandchar}
-Expands to a literal ampersand character (\idx{ampchar}).
+Expands to a literal ampersand character (\,\idx{ampchar}\,).
 
 \cssection{bibglscircumchar}
 
 \formatdef{bibglscircumchar}
-Expands to a literal circumflex character (\idx{circumchar}).
+Expands to a literal circumflex character (\,\idx{circumchar}\,).
 
 \cssection{bibglsuppercase}
 
@@ -15725,7 +15786,7 @@ If you want to strip the spaces, use an empty string for
 \meta{replacement}. You'll need to delimit this according to your
 operating system. For example:
 \begin{verbatim}
-gls2bib --space-sub '' entries.tex entries.bib
+convertgls2bib --space-sub '' entries.tex entries.bib
 \end{verbatim}
 
 \item[\longargfmt{ignore-sort}] Ignore the \field{sort} field.
@@ -15747,37 +15808,35 @@ quit.
 information and quit.
 \end{description}
 
-This application recognises the commands listed below. Avoid any
-overly complicated code within the \ext{tex} file. The \TeX\ parser
-library isn't a \TeX\ engine! The \ext{tex} file doesn't need to be
-a complete document, but if you want certain commands recognised
-from packages that the \TeX\ parser library supports, you'll need to
-include \ics{usepackage} in the \ext{tex} file.
-In all cases below, if \meta{\keyvallist} contains
-\begin{alltt}
-see=[\ics{seealsoname}]\margm{label(s)}
-\end{alltt}
-this will be substituted with 
-\begin{alltt}
-seealso=\margm{label(s)}
-\end{alltt}
+This application recognises the commands listed below. Avoid any overly
+complicated code within the \ext{tex} file. The
+\hyperref[sec:texparserlib]{\TeX\ parser library} isn't a \TeX\ engine! The
+\ext{tex} file doesn't need to be a complete document, but if you want certain
+commands recognised from packages that the \TeX\ parser library supports,
+you'll need to include \ics{usepackage} in the \ext{tex} file.
+In all cases below, if \meta{\keyvallist} contains:
+\begin{codeenv*}
+\field{see}=\marg{[\ics{seealsoname}]\meta{label(s)}}
+\end{codeenv*}
+this will be substituted with:
+\begin{codeenv*}
+\field{seealso}=\margm{label(s)}
+\end{codeenv*}
 For example:
-\begin{verbatim}
-\newterm[see={[\seealsoname]goose}]{duck}
-\end{verbatim}
-will be written as
-\begin{verbatim}
-@index{duck,
-  seealso = {goose}
+\begin{codeenv}
+\gls{newterm}\oarg{\field{see}=\marg{[\cs{seealsoname}]goose}}\marg{duck}
+\end{codeenv}
+will be written as:
+\begin{codeenv}
+\atentry{index}\marg{duck,
+  \field{seealso} = \marg{goose}
 }
-\end{verbatim}
-(The \field{seealso} key is provided by \sty{glossaries-extra}
-v1.16+.)
+\end{codeenv}
 
-Additionally, if \meta{\keyvallist} contains
-\begin{alltt}
-type=\marg{\ics{glsdefaulttype}}
-\end{alltt}
+Additionally, if \meta{\keyvallist} contains:
+\begin{codeenv}
+\field{type}=\marg{\ics{glsdefaulttype}}
+\end{codeenv}
 then this field will be ignored. (This \field{type} value is
 recommended in \meta{\keyvallist} when loading files with
 \ics{loadglsentries}\oargm{type}\margm{file} to allow the optional
@@ -15819,38 +15878,35 @@ fields switched explicitly switched off by default with
 \cssection[\section]{newglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{newglossaryentry}
-
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{entry}\marg{\meta{label},
   \meta{\keyvallist}
 }
-\end{alltt}
-
+\end{codeenv}
 \ics{newentry} is recognised as a synonym of \gls{newglossaryentry}.
 
 \cssection[\section]{provideglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{provideglossaryentry}
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{entry}\marg{\meta{label},
   \meta{\keyvallist}
 }
-\end{alltt}
+\end{codeenv}
 but only if \meta{label} hasn't already been defined.
 
 \cssection[\section]{longnewglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{longnewglossaryentry}
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{entry}\marg{\meta{label},
  \meta{\keyvallist},
- description = \margm{description}
+ \field{description} = \margm{description}
 }
-\end{alltt}
-
+\end{codeenv}
 The starred version provided by the \styfmt{glossaries-extra} package
 is also recognised. The unstarred version strips trailing spaces
 from \meta{description}. (This doesn't add \ics{nopostdesc}, but
@@ -15867,53 +15923,52 @@ As above, but only if \meta{label} hasn't already been defined.
 The base \styfmt{glossaries} package provides:
 \formatdef{newterm}
 (when the \styopt{index} option is used).
-
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{index}\marg{\meta{label},
  \meta{\keyvallist}
 }
-\end{alltt}
+\end{codeenv}
 if the optional argument is present, otherwise it's just converted
 to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{index}\marg{\meta{label}}
-\end{alltt}
+\end{codeenv}
 
 If \longargfmt{space-sub} is used and \meta{label} contains one or
 more spaces, then \field{name} will be set if not included in
 \meta{\keyvallist}. For example, if \filefmt{entries.bib}
-contains
+contains:
+\begin{codeenv}
+\gls{newterm}\marg{sea lion}
+\gls{newterm}\oarg{\field{seealso}=\marg{sea lion}}\marg{seal}
+\end{codeenv}
+then:
 \begin{verbatim}
-\newterm{sea lion}
-\newterm[seealso={sea lion}]{seal}
+convertgls2bib --space-sub '-' entries.bib entries.tex
 \end{verbatim}
-then
-\begin{verbatim}
-gls2bib --space-sub '-' entries.bib entries.tex
-\end{verbatim}
-will write the terms to \filefmt{entries.tex} as
-\begin{verbatim}
-@index{sea-lion,
-  name = {sea lion}
+will write the terms to \filefmt{entries.tex} as:
+\begin{codeenv}
+\atentry{index}\marg{sea-lion,
+  \field{name} = \marg{sea lion}
 }
-
-@index{seal,
-  seealso = {sea-lion}
+\strut
+\atentry{index}\marg{seal,
+  \field{seealso} = \marg{sea-lion}
 }
-\end{verbatim}
-whereas just
+\end{codeenv}
+whereas just:
 \begin{verbatim}
-gls2bib entries.bib entries.tex
+convertgls2bib entries.bib entries.tex
 \end{verbatim}
-will write the terms to \filefmt{entries.tex} as
-\begin{verbatim}
-@index{sea lion}
-
-@index{seal,
-  seealso = {sea lion}
+will write the terms to \filefmt{entries.tex} as:
+\begin{codeenv}
+\atentry{index}\marg{sea lion}
+\strut
+\atentry{index}\marg{seal,
+  \field{seealso} = \marg{sea lion}
 }
-\end{verbatim}
+\end{codeenv}
 which will cause a problem when the \ext{bib} file is parsed
 by \bibgls\ (and will probably also cause a problem for 
 bibliographic management systems).
@@ -15922,20 +15977,20 @@ bibliographic management systems).
 The \styfmt{glossaries-extra} package provides:
 \formatdef{newabbreviation}
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{abbreviation}\marg{\meta{label},
- short = \margm{short},
- long = \margm{long},
+ \field{short} = \margm{short},
+ \field{long} = \margm{long},
  \meta{\keyvallist}
 }
-\end{alltt}
+\end{codeenv}
 if the optional argument is present, otherwise it's converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{abbreviation}\marg{\meta{label},
- short = \margm{short},
- long = \margm{long}
+ \field{short} = \margm{short},
+ \field{long} = \margm{long}
 }
-\end{alltt}
+\end{codeenv}
 
 \cssection[\section]{newacronym}
 The base \styfmt{glossaries} package provides:
@@ -15950,26 +16005,25 @@ The \styfmt{glossaries-extra} package provides:
 \formatdef{glsxtrnewsymbol}
 (when the \styopt{symbols} option is used).
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{symbol}\marg{\meta{label},
- name = \margm{symbol}
+ \field{name} = \margm{symbol}
 }
-\end{alltt}
+\end{codeenv}
 if the optional argument is missing, otherwise it's converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{symbol}\marg{\meta{label},
- name = \margm{symbol},
+ \field{name} = \margm{symbol},
  \meta{\keyvallist}
 }
-\end{alltt}
+\end{codeenv}
 unless \meta{\keyvallist} contains the \field{name} field,
 in which case it's converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{symbol}\marg{\meta{label},
  \meta{\keyvallist}
 }
-\end{alltt}
-
+\end{codeenv}
 \ics{newsym} is recognised as a synonym for \gls{glsxtrnewsymbol}.
 
 \cssection[\section]{glsxtrnewnumber}
@@ -15978,26 +16032,25 @@ The \styfmt{glossaries-extra} package provides:
 \formatdef{glsxtrnewnumber}
 (when the \styopt{numbers} option is used).
 This is converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{number}\marg{\meta{label},
- name = \margm{label}
+ \field{name} = \margm{label}
 }
-\end{alltt}
+\end{codeenv}
 if the optional argument is missing, otherwise it's converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{number}\marg{\meta{label},
- name = \margm{label},
+ \field{name} = \margm{label},
  \meta{\keyvallist}
 }
-\end{alltt}
+\end{codeenv}
 if \field{name} isn't listed in \meta{\keyvallist},
 otherwise it's converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{number}\marg{\meta{label},
  \meta{\keyvallist}
 }
-\end{alltt}
-
+\end{codeenv}
 \ics{newnum} is recognised as a synonym for \gls{glsxtrnewnumber}.
 
 \cssection[\section]{newdualentry}
@@ -16014,64 +16067,64 @@ number of times it crops up on sites like
 defined using \ics{newcommand} or \ics{renewcommand} in the 
 input file. In which case the default definition will be overridden.
 
-If the command definition isn't overridden, then it's converted to
-\begin{alltt}
+If the command definition isn't overridden, then it's converted to:
+\begin{codeenv}
 \atentry{dualabbreviationentry}\marg{\meta{label},
-  short = \margm{short},
-  long = \margm{long},
-  description = \margm{description},
+  \field{short} = \margm{short},
+  \field{long} = \margm{long},
+  \field{description} = \margm{description},
   \meta{\keyvallist}
 }
-\end{alltt}
+\end{codeenv}
 if \meta{\keyvallist} is supplied, otherwise it's converted to:
-\begin{alltt}
+\begin{codeenv}
 \atentry{dualabbreviationentry}\marg{\meta{label},
-  short = \margm{short},
-  long = \margm{long},
-  description = \margm{description}
+  \field{short} = \margm{short},
+  \field{long} = \margm{long},
+  \field{description} = \margm{description}
 }
-\end{alltt}
+\end{codeenv}
 
-For example, if the original \ext{tex} file contains
-\begin{verbatim}
-\newcommand*{\newdualentry}[5][]{%
-  \newglossaryentry{main-#2}{name={#4},%
-  text={#3\glsadd{#2}},%
-  description={#5},%
-  #1
-  }%
-  \newacronym{#2}{#3\glsadd{main-#2}}{#4}
+For example, if the original \ext{tex} file contains:
+\begin{codeenv}
+\cs{newcommand}*\marg{\gls{newdualentry}}[5][]\marg{\comment{}
+  \gls{newglossaryentry}\marg{main-\idx{param}2}\marg{\field{name}=\marg{\idx{param}4},\comment{}
+    \field{text}=\marg{\idx{param}3\cs{glsadd}\marg{\idx{param}2}},\comment{}
+    \field{description}=\marg{\idx{param}5},\comment{}
+    \idx{param}1
+  }\comment{}
+  \gls{newacronym}\marg{\idx{param}2}\marg{\idx{param}3\cs{glsadd}\marg{main-\idx{param}2}}\marg{\idx{param}4}\comment{}
 }
-
-\newdualentry{svm}% label
-  {SVM}% abbreviation
-  {support vector machine}% long form
-  {Statistical pattern recognition technique}% description
-\end{verbatim}
-then the \ext{bib} file will contain
-\begin{verbatim}
-@entry{main-svm,
-  name = {support vector machine},
-  description = {Statistical pattern recognition technique},
-  text = {SVM\glsadd{svm}}
+\strut
+\gls{newdualentry}\marg{svm}\comment{label}
+  \marg{SVM}\comment{abbreviation}
+  \marg{support vector machine}\comment{long form}
+  \marg{Statistical pattern recognition technique}\comment{description}
+\end{codeenv}
+then the \ext{bib} file will contain:
+\begin{codeenv}
+\atentry{entry}\marg{main-svm,
+  \field{name} = \marg{support vector machine},
+  \field{description} = \marg{Statistical pattern recognition technique},
+  \field{text} = \marg{SVM\cs{glsadd}\marg{svm}}
 }
-
-@acronym{svm,
-  short = {SVM\glsadd{main-svm}},
-  long = {support vector machine}
+\strut
+\atentry{acronym}\marg{svm,
+  \field{short} = \marg{SVM\cs{glsadd}\marg{main-svm}},
+  \field{long} = \marg{support vector machine}
 }
-\end{verbatim}
+\end{codeenv}
 since \gls{newdualentry} was defined with \ics{newcommand}. However,
 if the original file uses \ics{providecommand} or omits the
 definition of \gls{newdualentry}, then the \ext{bib} file will
 contain:
-\begin{verbatim}
-@dualabbreviationentry{svm,
-  short = {SVM},
-  description = {Statistical pattern recognition technique},
-  long = {support vector machine}
+\begin{codeenv}
+\atentry{dualabbreviationentry}\marg{svm,
+  \field{short} = \marg{SVM},
+  \field{description} = \marg{Statistical pattern recognition technique},
+  \field{long} = \marg{support vector machine}
 }
-\end{verbatim}
+\end{codeenv}
 
 \chapter{Examples}
 \label{sec:examples}
@@ -16112,7 +16165,7 @@ definitions and must be loaded first with
 file can then be loaded to provide alternative definitions for
 \bibgls's interpreter.
 
-The first command is
+The first command is:
 \nosecdef{sortname}
 This is used in the \field{name} fields for entries containing
 information about a person. The aim here is for \bibgls\ to sort
@@ -16121,14 +16174,14 @@ glossary to display \meta{first name(s)} \meta{surname}. For names
 with a \qt{von} part, there's another command:
 \nosecdef{sortvonname}
 which has a similar purpose.
-The third command is
+The third command is:
 \nosecdef{sortart}
 This is the same as \gls{sortname} but is designed for titles,
 phrases or sentences that start with an article (such as \qt{a} or
 \qt{the}). Although it has the same definition as \gls{sortname}
 in this file, in the interpreted files the article part is omitted
 to completely ignore them in the sorting.
-The fourth command is
+The fourth command is:
 \nosecdef{sortmediacreator}
 which again is functionally the same as \gls{sortname}.
 
@@ -16176,52 +16229,52 @@ The \exfile{constants.bib} file contains mathematical constants.
 These all use a custom entry type \atentryfmt{constant}, which must
 be aliased otherwise the entries will all be ignored. The entries
 all have custom fields, which also need to be aliased.
-For example
+For example:
 \begin{codeenv}
 \csopt[constant=entry]{entry-type-aliases},
 \csopt[
-  constantname=name,
-  constantsymbol=symbol,
-  definition=description,
-  identifier=category,
-  value=user1
+  \fieldfmt{constantname}=\field{name},
+  \fieldfmt{constantsymbol}=\field{symbol},
+  \fieldfmt{definition}=\field{description},
+  \fieldfmt{identifier}=\field{category},
+  \fieldfmt{value}=\field{user1}
 ]{field-aliases}
 \end{codeenv}
 This setting means that, for example,
-\begin{verbatim}
-@constant{root2,
-  constantname={Pythagoras' constant},
-  constantsymbol={\ensuremath{\surd2}},
-  definition={the square root of 2},
-  value={1.41421},
-  identifier={constant}
+\begin{codeenv}
+\atentryfmt{constant}\marg{root2,
+  \fieldfmt{constantname}=\marg{Pythagoras' constant},
+  \fieldfmt{constantsymbol}=\marg{\cs{ensuremath}\marg{\ics{surd}2}},
+  \fieldfmt{definition}=\marg{the square root of 2},
+  \fieldfmt{value}=\marg{1.41421},
+  \fieldfmt{identifier}=\marg{constant}
 }
-\end{verbatim}
-is treated as though it was defined as
-\begin{verbatim}
-@entry{root2,
-  name={Pythagoras' constant},
-  symbol={\ensuremath{\surd2}},
-  description={the square root of 2},
-  user1={1.41421},
-  category={constant}
+\end{codeenv}
+is treated as though it was defined as:
+\begin{codeenv}
+\atentry{entry}\marg{root2,
+  \field{name}=\marg{Pythagoras' constant},
+  \field{symbol}=\marg{\cs{ensuremath}\marg{\cs{surd}2}},
+  \field{description}=\marg{the square root of 2},
+  \field{user1}=\marg{1.41421},
+  \field{category}=\marg{constant}
 }
-\end{verbatim}
+\end{codeenv}
 This use of custom fields and entry types allows more flexibility.
 For example, I may have another document that uses the same
-\ext{bib} file but requires a different definition, for example:
-\begin{verbatim}
-@number{root2,
-  description={Pythagoras' constant},
-  name={\ensuremath{\surd2}}
+\ext{bib} file but requires a different definition:
+\begin{codeenv}
+\atentry{number}\marg{root2,
+  \field{description}=\marg{Pythagoras' constant},
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{surd}2}}
 }
-\end{verbatim}
-which can be obtained with
+\end{codeenv}
+which can be obtained with:
 \begin{codeenv}
 \csopt[constant=number]{entry-type-aliases},
 \csopt[
-  constantname=description,
-  constantsymbol=name
+  \fieldfmt{constantname}=\field{description},
+  \fieldfmt{constantsymbol}=\field{name}
 ]{field-aliases}
 \end{codeenv}
 Since the other custom fields haven't be aliased, they're ignored.
@@ -16246,15 +16299,15 @@ the \isty{upgreek} package.
 If it's likely that there may be a need to sort according to
 \fieldfmt{definition}, then it would be better to use \gls!{sortart}
 describe above:
-\begin{verbatim}
-@constant{root2,
-  constantname={Pythagoras' constant},
-  constantsymbol={\ensuremath{\surd2}},
-  definition={\sortart{the}{square root of 2}},
-  value={1.41421},
-  identifier={constant}
+\begin{codeenv}
+\atentryfmt{constant}\marg{root2,
+  \fieldfmt{constantname}=\marg{Pythagoras' constant},
+  \fieldfmt{constantsymbol}=\marg{\cs{ensuremath}\marg{\cs{surd}2}},
+  \fieldfmt{definition}=\marg{\gls{sortart}\marg{the}\marg{square root of 2}},
+  \fieldfmt{value}=\marg{1.41421},
+  \fieldfmt{identifier}=\marg{constant}
 }
-\end{verbatim}
+\end{codeenv}
 Remember that this would need \exfile{no-interpret-preamble.bib} to
 ensure the command is recognised in the document.
 
@@ -16268,9 +16321,9 @@ Each entry has a field that uses \ics{ce} provided by \sty{mhchem}
 so the document will need to load that package. Since all resource
 files must be loaded in the preamble, it's possible to ensure that
 the package is loaded using:
-\begin{verbatim}
-@preamble{"\usepackage{mhchem}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{\qtdelim{\cs{usepackage}\marg{mhchem}}}
+\end{codeenv}
 However, it's best just to load it in the document otherwise it
 won't be available before the \ext{glstex} file has been loaded.
 Also, \sty{glossaries} (and therefore \sty{glossaries-extra}) must be
@@ -16284,7 +16337,7 @@ All entries are defined using a custom entry type
 \csopt{entry-type-aliases} or the entries will be ignored. For
 example, to make \atentryfmt{chemical} behave like \atentry{symbol}:
 \begin{codeenv}
-\csopt[chemical=symbol]{entry-type-aliases}
+\csopt[\fieldfmt{chemical}=\field{symbol}]{entry-type-aliases}
 \end{codeenv}
 Remember that with the \atentry{symbol} type, if the \field{sort}
 field is omitted \bibgls\ will fallback on the label by default. It
@@ -16304,11 +16357,11 @@ name. This allows the flexibility of determining whether the
 \field{name} or \field{symbol} field should contain the chemical
 formula on a per-resource basis. For example:
 \begin{codeenv}
-\csopt[formula=name,chemicalname=description]{field-aliases}
+\csopt[\fieldfmt{formula}=\field{name},\fieldfmt{chemicalname}=\field{description}]{field-aliases}
 \end{codeenv}
 or
 \begin{codeenv}
-\csopt[chemicalname=name,formula=symbol]{field-aliases}
+\csopt[\fieldfmt{chemicalname}=\field{name},\fieldfmt{formula}=\field{symbol}]{field-aliases}
 \end{codeenv}
 
 The contents of \filefmt{chemicalformula.bib} are as follows:
@@ -16333,9 +16386,9 @@ The contents of \filefmt{bacteria.bib} are as follows:
 The \exfile{baseunits.bib} file contains base \idxpl{SIunit}. The entries
 are all defined using the custom \atentryfmt{unit} entry
 type. This must be aliased with \csopt{entry-type-aliases} otherwise
-\bibgls\ will ignore all the entries. For example
+\bibgls\ will ignore all the entries. For example:
 \begin{codeenv}
-\csopt[unit=symbol]{entry-type-aliases}
+\csopt[\fieldfmt{unit}=\field{symbol}]{entry-type-aliases}
 \end{codeenv}
 will make \bibgls\ treat the entries as though they were defined
 using \atentry{symbol}. (Remember that \atentry{symbol} entry types use the label
@@ -16393,11 +16446,11 @@ unless keys are provided (using \cs{glsaddkey} or
 \csopt{field-aliases}). The \fieldfmt{born} and \fieldfmt{died}
 fields have dates that are \emph{almost} in the default \code{en-GB}
 locale format with the \idx{JRE} \idx{localeprovider}, but they include a
-tilde \verb|~| to prevent awkward line breaks. By default \bibgls's
-interpreter converts \verb|~| to the non-breaking space character
+tilde \idx{nbspchar} to prevent awkward line breaks. By default \bibgls's
+interpreter converts \idx{nbspchar} to the non-breaking space character
 \hex{A0} which isn't recognised by the date format.  This can easily
 be fixed with the \longarg{break-space} switch which will interpret
-\verb|~| as a normal breakable space (\hex{20}), so with that switch
+\idx{nbspchar} as a normal breakable space (\hex{20}), so with that switch
 \csopt[date]{sort} or \csopt[date-reverse]{sort} can be used on
 either of those fields. However, the \idx{CLDR} has a slightly
 different default format than the \idx{JRE} for dates with
@@ -16407,19 +16460,19 @@ required format.
 An alternative approach would be to provide a command that can be
 modified in the document to adjust the date style. For example, the
 \fieldfmt{born} field could be specified as:
-\begin{verbatim}
-born={\formatdate{13}{7}{100}{BC}}
-\end{verbatim}
+\begin{codeenv}
+\fieldfmt{born}=\marg{\cmd{formatdate}\marg{13}\marg{7}\marg{100}\marg{BC}}
+\end{codeenv}
 The definition provided for the document could then be, for example:
-\begin{verbatim}
-\providecommand{\formatdate}[4]{\DTMdisplaydate{#3}{#2}{#1}{-1} #4}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\cmd{formatdate}}[4]\marg{\ics{DTMdisplaydate}\marg{\idx{param}3}\marg{\idx{param}2}\marg{\idx{param}1}\marg{-1} \idx{param}4}
+\end{codeenv}
 (where \ics{DTMdisplaydate} is provided by the \isty{datetime2}
 package) and a definition could be provided for \bibgls's
 interpreter, for example:
-\begin{verbatim}
-\providecommand{\formatdate}[4]{#1/#2/#3 #4}
-\end{verbatim}
+\begin{codeenv}
+\cs{providecommand}\marg{\cmd{formatdate}}[4]\marg{\idx{param}1/\idx{param}2/\idx{param}3 \idx{param}4}
+\end{codeenv}
 This would need the date format set.  For example,
 \csopt[d/M/y G]{date-sort-format}.
 
@@ -16441,19 +16494,19 @@ fields use the same custom commands as used in the \field{name}
 field.
 
 There's one name with a \qt{von} part. In this case the \field{name}
-field is set to
-\begin{verbatim}
-\sortvonname{Manfred}{von}{Richthofen}
-\end{verbatim}
+field is set to:
+\begin{codeenv}
+\gls{sortvonname}\marg{Manfred}\marg{von}\marg{Richthofen}
+\end{codeenv}
 which will come under the \qt{V} letter group since \gls{sortvonname}
 is defined as \meta{von} \meta{surname}, \meta{first name(s)}
 
 If you prefer that this name should come under \qt{R} instead, then
 you need to adjust the definition of \gls{sortvonname}:
-\begin{verbatim}
-@preamble{"\providecommand{\sortname}[2]{#2, #1}
-\providecommand{\sortvonname}[3]{#3, #1 #2}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{sortname}}[2]\marg{\idx{param}2, \idx{param}1}
+\cs{providecommand}\marg{\cmd{sortvonname}}[3]\marg{\idx{param}3, \idx{param}1 \idx{param}2}}}
+\end{codeenv}
 An alternative approach would be to format the names using
 \BibTeX's contributor syntax and use
 \csopt[name]{bibtex-contributor-fields} to convert them.
@@ -16517,9 +16570,9 @@ This ensures that both \exfile{books.bib} and \exfile{films.bib}
 can be loaded in the same resource set (otherwise they'd have to be
 loaded in separate resource sets with different prefixes). Remember
 that you can use \gls{glsxtrnewgls}. For example:
-\begin{verbatim}
-\glsxtrnewgls{film.}{\film}
-\end{verbatim}
+\begin{codeenv}
+\gls{glsxtrnewgls}\marg{film.}\marg{\cmd{film}}
+\end{codeenv}
 This means you can do, for example, just \verb|\film{bladerunner}|
 if you want to reference a film without worrying about the prefix.
 
@@ -16538,11 +16591,11 @@ The book \qt{Do Androids Dream of Electric Sheep?}\ referenced at the end
 of the \qt{Blade Runner} film's \field{description} ends with 
 a question mark. (Similarly for \qt{Why Didn't They Ask Evans?}) 
 If the \field{description} field is simply set as:
-\begin{verbatim}
-description={a film starring Harrison Ford, Rutger Hauer
+\begin{codeenv}
+\field{description}=\marg{a film starring Harrison Ford, Rutger Hauer
  and Sean Young loosely based on the novel
- \gls{ext1.doandroidsdreamofelectricsheep}},
-\end{verbatim}
+ \cs{gls}\marg{ext1.doandroidsdreamofelectricsheep}},
+\end{codeenv}
 then the \styopt{postdot} package option will produce an odd
 result as the inserted \idx{full-stop} immediately follows the question
 mark. This is an awkward situation. One possibility is to explicitly 
@@ -16553,19 +16606,19 @@ interferes with the possibility of a category-dependent
 
 Another option is to put \ics{nopostdesc} in the 
 problematic entries. For example:
-\begin{verbatim}
-description={a film starring Harrison Ford, Rutger Hauer
+\begin{codeenv}
+\field{description}=\marg{a film starring Harrison Ford, Rutger Hauer
  and Sean Young loosely based on the novel
- \gls{ext1.doandroidsdreamofelectricsheep}\nopostdesc},
-\end{verbatim}
+ \cs{gls}\marg{ext1.doandroidsdreamofelectricsheep}\cs{nopostdesc}},
+\end{codeenv}
 Be careful with this as it will completely suppress the
 \idx{postdescriptionhook}.
 A third possibility is to use \ics{glsxtrnopostpunc} instead:
-\begin{verbatim}
-description={a film starring Harrison Ford, Rutger Hauer
+\begin{codeenv}
+\field{description}=\marg{a film starring Harrison Ford, Rutger Hauer
  and Sean Young loosely based on the novel
- \gls{ext1.doandroidsdreamofelectricsheep}\glsxtrnopostpunc},
-\end{verbatim}
+ \cs{gls}\marg{ext1.doandroidsdreamofelectricsheep}\cs{glsxtrnopostpunc}},
+\end{codeenv}
 This doesn't interfere with the \idx{postdescriptionhook} but if a hook
 is provided the post-punctuation may then be required. In both of
 the above two cases, \csopt{strip-trailing-nopost} could be used
@@ -16591,12 +16644,12 @@ The \exfile{citations.bib} file is actually a \BibTeX\ file, but it
 can be parsed by \bibgls\ if the \BibTeX\ entry types are converted
 to \atentry{bibtexentry}, which can easily be done with
 \begin{codeenv}
-entry-type-aliases=\marg{\ics{GlsXtrBibTeXEntryAliases}}
+\csopt[\ics{GlsXtrBibTeXEntryAliases}]{entry-type-aliases}
 \end{codeenv}
 The field names will also need to be defined or aliased. For
 example:
 \begin{codeenv}
-field-aliases=\marg{title=name}
+\csopt[\fieldfmt{title}=\field{name}]{field-aliases}
 \end{codeenv}
 If \bibgls\ is then run with \longarg{cite-as-record} any
 \ics{citation} commands found in the \ext{aux} file will be treated
@@ -16624,31 +16677,31 @@ reproduced with a \idx!{lowercase} Latin \qt{o}). Note that
 provides all the missing Greek letters (such as \cs{omicron}).
 
 The \ext{bib} file could just use \code{o}:
-\begin{verbatim}
-@symbol{omicron,
-  name={\ensuremath{o}},
-  description={omicron},
-  identifier={mathgreek}
+\begin{codeenv}
+\atentry{symbol}\marg{omicron,
+  \field{name}=\marg{\cs{ensuremath}\marg{o}},
+  \field{description}=\marg{omicron},
+  \fieldfmt{identifier}=\marg{mathgreek}
 }
-\end{verbatim}
+\end{codeenv}
 but this means that if \bibgls\ sorts according to the \field{name}
 field using a letter sort, this entry will come before all the other
 Greek letters since the character \qt{o} has Unicode value \hex{6F}
 whereas, for example, mathematical italic small alpha ($\alpha$)
 has Unicode value \hex{1D6FC}. This means that for sorting purposes
 it's better to use \ics{omicron}:
-\begin{verbatim}
-@symbol{omicron,
-  name={\ensuremath{\omicron}},
-  description={omicron},
-  identifier={mathgreek}
+\begin{codeenv}
+\atentry{symbol}\marg{omicron,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{omicron}}},
+  \field{description}=\marg{omicron},
+  \fieldfmt{identifier}=\marg{mathgreek}
 }
-\end{verbatim}
+\end{codeenv}
 but \LaTeX\ needs a definition for this, so it's provided in the
 \atentry{preamble}:
-\begin{verbatim}
-@preamble{"\providecommand{\omicron}{o}"}
-\end{verbatim}
+\begin{codeenv}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cs{omicron}}\marg{o}}}
+\end{codeenv}
 (With \sty{glossaries-extra} v1.27+, this is no longer needed.)
 The \TeX\ parser library and \sty{glossaries-extra-bib2gls} 
 similarly provide the missing \idx!{uppercase}
@@ -16666,9 +16719,9 @@ that have a large version in display mode. As with
 as not all of the commands are provided by the \LaTeX\ kernel. 
 This file also has a preamble:
 \begin{codeenv}
-\atentry{preamble}\marg{"\cmd{providecommand}\marg{\cmd{bigoperatornamefmt}}[1]\marg{\comment{}
+\atentry{preamble}\marg{\qtdelim{\cmd{providecommand}\marg{\cmd{bigoperatornamefmt}}[1]\marg{\comment{}
  \idx{mshiftchar}\cmd{displaystyle}\idx{param}1\cmd{textstyle}\idx{param}1\idx{mshiftchar}}
-\cmd{providecommand}\marg{\cmd{nary}}[1]\marg{\idx{mshiftchar}\idx{param}1\idx{mshiftchar}-ary}"}
+\cmd{providecommand}\marg{\cmd{nary}}[1]\marg{\idx{mshiftchar}\idx{param}1\idx{mshiftchar}-ary}}}
 \end{codeenv}
 The first command \inlinedef{bigoperatornamefmt}
 is used in the \field{name} field to display both the in-line and display

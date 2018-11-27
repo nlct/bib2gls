@@ -632,6 +632,13 @@ character code},
   category={command}
 }
 
+@dualindexentry{bibglssetdatetimegrouptitle,
+  name={\csfmt{bib\-gls\-set\-date\-time\-group\-title}},
+  user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}}},
+  description={sets the date-time group title},
+  category={command}
+}
+
 @dualindexentry{bibglsdatetimegroup,
   name={\csfmt{bib\-gls\-date\-time\-group}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
@@ -646,6 +653,13 @@ character code},
   category={command}
 }
 
+@dualindexentry{bibglssetdategrouptitle,
+  name={\csfmt{bib\-gls\-set\-date\-group\-title}},
+  user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}}},
+  description={sets the date (no time) group title},
+  category={command}
+}
+
 @dualindexentry{bibglsdategroup,
   name={\csfmt{bib\-gls\-date\-group}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}},
@@ -657,6 +671,13 @@ character code},
   name={\csfmt{bib\-gls\-date\-group\-title}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the date group title},
+  category={command}
+}
+
+@dualindexentry{bibglssettimegrouptitle,
+  name={\csfmt{bib\-gls\-set\-time\-group\-title}},
+  user1={\marg{\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}}},
+  description={sets the time (no date) group title},
   category={command}
 }
 
@@ -2881,6 +2902,14 @@ and \L/\l\ treated as L/l},
   category={command}
 }
 
+@index{surd,
+  name={\csfmt{surd}},
+  user1={},
+  description={surd symbol $\surd$},
+  note={kernel command (maths mode)},
+  category={command}
+}
+
 @index{triangleright,
   name={\csfmt{triangle\-right}},
   user1={},
@@ -3676,8 +3705,24 @@ and \L/\l\ treated as L/l},
   text={\code{\glstildechar}}
 }
 
+@index{doublequotechardelim,
+  name = {\code{"} (delimiter)},
+  text = {\code{"}}
+}
+
+@index{doublequotecharhex,
+  name = {\code{"} (hexadecimal identifier)},
+  text = {\code{"}}
+}
+
+@index{doublequoteactivechar,
+  name = {\code{"} (active)},
+  text = {\code{"}}
+}
+
 @index{doublequotechar,
-  name = {\code{"}}
+  name = {\code{"} (literal)},
+  text = {\code{"}}
 }
 
 @index{cs.tilde,
@@ -3734,6 +3779,15 @@ and \L/\l\ treated as L/l},
   name={\code{'} (apostrophe)},
   text={\code{'}},
   alias={apostrophe}
+}
+
+@index{def,
+  name={\csfmt{def}},
+  user1={\margm{cs}\meta{syntax}\margm{definition}},
+  description={defines the control sequence \meta{cs}, without checking if the command
+   already exists},
+  note={\TeX\ primitive},
+  category={command}
 }
 
 @index{ifstrempty,
@@ -3811,6 +3865,14 @@ is undefined},
   user1={\margm{cs-name}\margm{true}\margm{false}},
   description={tests if the control sequence given by \meta{cs-name}
 is defined},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
+@index{ifdef,
+  name={\csfmt{if\-def}},
+  user1={\margm{cs}\margm{true}\margm{false}},
+  description={tests if the control sequence \meta{cs} is defined},
   note={\styfmt{etoolbox}},
   category={command}
 }
@@ -8326,6 +8388,16 @@ hyperlinks enabled otherwise just does \meta{text}},
   category={command}
 }
 
+@index{@for,
+  name={\csfmt{@for}},
+  user1={\meta{cs}:=\meta{list}\csfmt{do}\margm{code}},
+  description={iterates over each item in the comma-separated
+\meta{list}, and on each iteration sets \meta{cs} to the current
+element and performs \meta{code}},
+  note={kernel command},
+  category={command}
+}
+
 @index{alph,
   name={\csfmt{alph}},
   user1={\margm{counter}},
@@ -10267,7 +10339,9 @@ has three or more items},
 @index{char,
   name={\csfmt{char}},
   user1={\meta{number}},
-  description={accesses the character identified by \meta{number}},
+  description={accesses the character identified by \meta{number}
+(use \code{\csfmt{char}\idx{doublequotecharhex}\meta{hex}} if the
+number is hexadecimal)},
   note={{}\TeX\ primitive},
   category={command}
 }
@@ -10275,8 +10349,10 @@ has three or more items},
 @index{number,
   name={\csfmt{number}},
   user1={\meta{value}},
-  description={expands the given integer \meta{value} stripping any leading
-zeros},
+  description={expands the given numerical \meta{value} to 
+  a base~10 integer number stripping any leading
+  zeros (use \code{\csfmt{char}\idx{doublequotecharhex}\meta{hex}} 
+  if the value is hexadecimal)},
   note={{}\TeX\ primitive},
   category={command}
 }

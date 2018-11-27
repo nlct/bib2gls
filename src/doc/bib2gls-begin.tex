@@ -4981,7 +4981,7 @@ It's best not to use these in entry definitions.
 Instead use the full command name. The main problem comes when the
 shortcuts aren't enabled until the start of the \envfmt{document}
 environment. For example, the \code{ngerman} language setting in
-\sty{babel} makes the double quote character (\idx{doublequotechar})
+\sty{babel} makes the double quote character (\idx{doublequoteactivechar})
 active and it becomes a shortcut for \gls{umlaut} (the umlaut accent
 command):
 \begin{codeenv}
@@ -5013,7 +5013,7 @@ uses those entries must ensure that the appropriate shortcut
 commands are set up before use. Also, when using \bibgls, it
 recognises commands like \gls{umlaut} but not \sty{babel}
 shorthands, so the sorting will be adversely affected if you simply
-use \idx{doublequotechar} instead of \gls{umlaut}.
+use \idx{doublequoteactivechar} instead of \gls{umlaut}.
 
 For large files that are written once (with minor subsequent edits),
 but reused many times for multiple documents, it's better to use the
