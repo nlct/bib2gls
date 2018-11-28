@@ -3711,6 +3711,14 @@ and \L/\l\ treated as L/l},
   name={\csfmt{\glsbackslash}}
 }
 
+@index{tabularnewline,
+  name={\csfmt{tabular\-new\-line}},
+  description={tabular version of \idx{cs.backslash} (avoids conflict
+with forced line breaks in paragraph column formats)},
+  note={kernel command},
+  category={command}
+}
+
 @index{nbspchar,
   name={\code{\glstildechar} (non-breakable space)},
   text={\code{\glstildechar}}
@@ -8142,7 +8150,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{glossentry}},
   user1={\margm{label}\margm{location list}},
   description={used in the glossary to display a top-level entry},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries} v3.08a+},
   category={command}
 }
 
@@ -8150,6 +8158,121 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{subglossentry}},
   user1={\margm{level}\margm{label}\margm{location list}},
   description={used in the glossary to display a sub-entry},
+  note={\styfmt{glossaries} v3.08a+},
+  category={command}
+}
+
+@index{newglossarystyle,
+  name={\csfmt{new\-glossary\-style}},
+  user1={\margm{name}\margm{definition}},
+  description={defines a new glossary style called \meta{name}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{setglossarystyle,
+  name={\csfmt{set\-glossary\-style}},
+  user1={\margm{name}},
+  description={sets the glossary style identified by \meta{name}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossaryheader,
+  name={\csfmt{glossary\-header}},
+  description={implemented at the start of a glossary (modified by
+glossary styles)},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glsentryitem,
+  name={\csfmt{gls\-entry\-item}},
+  user1={\margm{label}},
+  description={increments and displays the \counter{glossaryentry}
+counter, if appropriate},
+  note={\styfmt{glossaries} v3.0+},
+  category={command}
+}
+
+@index{glssubentryitem,
+  name={\csfmt{gls\-sub\-entry\-item}},
+  user1={\margm{label}},
+  description={increments and displays the \counter{glossarysubentry}
+counter, if appropriate},
+  note={\styfmt{glossaries} v3.0+},
+  category={command}
+}
+
+@index{glstarget,
+  name={\csfmt{gls\-target}},
+  user1={\margm{label}\margm{text}},
+  description={creates a hypertarget for the entry given by
+\meta{label} (the target for commands like \cs{gls}) and displays \meta{text}},
+  note={\styfmt{glossaries} v1.18+},
+  category={command}
+}
+
+@index{glsnamefont,
+  name={\csfmt{gls\-name\-font}},
+  user1={\margm{text}},
+  description={used by \cs{glossentryname} to format the name},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossentryname,
+  name={\csfmt{gloss\-entry\-name}},
+  user1={\margm{label}},
+  description={used by glossary styles to display the name},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glossentrysymbol,
+  name={\csfmt{gloss\-entry\-symbol}},
+  user1={\margm{label}},
+  description={used by glossary styles to display the symbol},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glspostdescription,
+  name={\csfmt{glspostdescription}},
+  description={a hook added after the description in some glossary
+styles (all if the \sty{glossaries-extra-stylemods} package is
+loaded to patch them). This hook is used to reflect the
+\styopt{nopostdot} package option for \sty{glossaries}
+and the \styopt{postpunc} option for \sty{glossaries-extra}},
+  note={\styfmt{glossaries} and modified by
+\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glossentrynameother,
+  name={\csfmt{gloss\-entry\-name\-other}},
+  user1={\margm{label}\margm{field}},
+  description={acts like \ics{glossentryname} (obeys 
+   \catattr{glossname} and \catattr{glossnamefont}
+   or \cs{glsnamefont} and the post-name hook) but uses
+   the given \meta{field} instead of the \field{name} field},
+  note={\styfmt{glossaries-extra} v1.22+},
+  category={command}
+}
+
+@index{glossentrydesc,
+  name={\csfmt{gloss\-entry\-desc}},
+  user1={\margm{label}},
+  description={used by glossary styles to display the description},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{Glossentrydesc,
+  name={\csfmt{Gloss\-entry\-desc}},
+  user1={\margm{label}},
+  description={like \cs{glossentrydesc} but converts the first
+letter to uppercase},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8363,10 +8486,32 @@ hyperlinks enabled otherwise just does \meta{text}},
   category={command}
 }
 
+@index{em,
+  name={\csfmt{em}},
+  description={switch to emphasized font (until end of current scope)},
+  note={kernel command},
+  category={command}
+}
+
+@index{textsf,
+  name={\csfmt{textsf}},
+  user1={\margm{text}},
+  description={displays the given text in sans-serif},
+  note={kernel command},
+  category={command}
+}
+
 @index{textbf,
   name={\csfmt{textbf}},
   user1={\margm{text}},
   description={displays the given text in bold},
+  note={kernel command},
+  category={command}
+}
+
+@index{bfseries,
+  name={\csfmt{bfseries}},
+  description={switch to bold (until end of current scope)},
   note={kernel command},
   category={command}
 }
@@ -9867,6 +10012,24 @@ short form using \cs{textsc}},
   category={command}
 }
 
+@index{glsabbrvonlyfont,
+  name={\csfmt{gls\-abbrv\-only\-font}},
+  user1={\margm{text}},
+  description={used with \qt{only} abbreviation styles to format the
+short form},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@index{glslongonlyfont,
+  name={\csfmt{gls\-long\-only\-font}},
+  user1={\margm{text}},
+  description={used with \qt{only} abbreviation styles to format the
+long form},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
 @index{glsuserdescription,
   name={\csfmt{gls\-user\-description}},
   user1={\margm{description}\margm{label}},
@@ -9987,70 +10150,6 @@ the width of the description column},
   description={used by the \glostyle{alttree} styles to format the
 symbol, description and location},
   note={\styfmt{glossaries-extra-stylemods}},
-  category={command}
-}
-
-@index{glossentryname,
-  name={\csfmt{gloss\-entry\-name}},
-  user1={\margm{label}},
-  description={used by glossary styles to display the name},
-  note={\styfmt{glossaries}},
-  category={command}
-}
-
-@index{glsnamefont,
-  name={\csfmt{gls\-name\-font}},
-  user1={\margm{text}},
-  description={used by \cs{glossentryname} to format the name},
-  note={\styfmt{glossaries}},
-  category={command}
-}
-
-@index{glossentrynameother,
-  name={\csfmt{gloss\-entry\-name\-other}},
-  user1={\margm{label}\margm{field}},
-  description={acts like \ics{glossentryname} (obeys 
-   \catattr{glossname} and \catattr{glossnamefont}
-   or \cs{glsnamefont} and the post-name hook) but uses
-   the given \meta{field} instead of the \field{name} field},
-  note={\styfmt{glossaries-extra} v1.22+},
-  category={command}
-}
-
-@index{glossentrydesc,
-  name={\csfmt{gloss\-entry\-desc}},
-  user1={\margm{label}},
-  description={used by glossary styles to display the description},
-  note={\styfmt{glossaries}},
-  category={command}
-}
-
-@index{Glossentrydesc,
-  name={\csfmt{Gloss\-entry\-desc}},
-  user1={\margm{label}},
-  description={like \cs{glossentrydesc} but converts the first
-letter to uppercase},
-  note={\styfmt{glossaries}},
-  category={command}
-}
-
-@index{glossentrysymbol,
-  name={\csfmt{gloss\-entry\-symbol}},
-  user1={\margm{label}},
-  description={used by glossary styles to display the symbol},
-  note={\styfmt{glossaries}},
-  category={command}
-}
-
-@index{glspostdescription,
-  name={\csfmt{glspostdescription}},
-  description={a hook added after the description in some glossary
-styles (all if the \sty{glossaries-extra-stylemods} package is
-loaded to patch them). This hook is used to reflect the
-\styopt{nopostdot} package option for \sty{glossaries}
-and the \styopt{postpunc} option for \sty{glossaries-extra}},
-  note={\styfmt{glossaries} and modified by
-\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -10324,6 +10423,43 @@ has three or more items},
   user1={\margm{number}},
   description={displays weather symbol identified by \meta{number}},
   note={\styfmt{ifsym}},
+  category={command}
+}
+
+@index{toprule,
+  name={\csfmt{top\-rule}},
+  description={horizontal rule for the top of a \envfmt{tabular}-like environment},
+  note={\styfmt{booktabs}},
+  category={command}
+}
+
+@index{midrule,
+  name={\csfmt{mid\-rule}},
+  description={horizontal rule for divider between header and main
+   content of a \envfmt{tabular}-like environment},
+  note={\styfmt{booktabs}},
+  category={command}
+}
+
+@index{bottomrule,
+  name={\csfmt{bottom\-rule}},
+  description={horizontal rule for the bottom of a 
+  \envfmt{tabular}-like environment},
+  note={\styfmt{booktabs}},
+  category={command}
+}
+
+@index{endhead,
+  name={\csfmt{end\-head}},
+  description={ends the header section},
+  note={\styfmt{longtable}},
+  category={command}
+}
+
+@index{endfoot,
+  name={\csfmt{end\-foot}},
+  description={ends the footer section},
+  note={\styfmt{longtable}},
   category={command}
 }
 

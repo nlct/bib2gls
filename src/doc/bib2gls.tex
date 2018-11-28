@@ -17101,7 +17101,7 @@ The contents of \filefmt{usergroups.bib} are as follows:
 @abbreviation{ITALIC,
   short={ITALIC},
   long={Irish \TeX\ and \LaTeX\ In-print Community},
-  language={en-GB,en-IE},
+  language={en-IE,en-GB},
   identifier={texusergroup}
 }
 
@@ -17239,7 +17239,7 @@ The contents of \filefmt{terms.bib} are as follows:
 This example uses the \exfile{constants.bib} file. The aim here
 is to just have a list of all the constants defined in the \ext{bib}
 file. (There are no references in the document.) This means I need
-to use
+to use:
 \begin{codeenv}
 \csopt[all]{selection}
 \end{codeenv}
@@ -17347,7 +17347,7 @@ fields. This can either be done with \ics{ifglshasfield}:
 \cs{newcommand}\marg{\cmd{glsxtrpostdescconstant}}\marg{\comment{}
   \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}\comment{}
   \marg{ (approximately \cs{glscurrentfieldvalue})}\comment{}
-  {}\comment{}
+  \marg{}\comment{}
   \cs{ifglshasfield}\marg{\field{user2}}\marg{\cs{glscurrententrylabel}}\comment{}
   \marg{: \cs{glscurrentfieldvalue}}\comment{}
   \marg{}\comment{}
@@ -17439,13 +17439,13 @@ Additionally, the entries only have custom fields, so these also
 need to be aliased. In this case I want the formula in the \field{name} field
 and the chemical name in the \field{description} field:
 \begin{codeenv}
-\csopt[formula=name,chemicalname=description]{field-aliases}
+\csopt[\fieldfmt{formula}=\field{name},\fieldfmt{chemicalname}=\field{description}]{field-aliases}
 \end{codeenv}
 The \atentry{symbol} entry type falls back on the label for the
 \field{sort} value by default, but I've decided
 to fallback on the \field{name} field for sorting:
 \begin{codeenv}
-\csopt[name]{symbol-sort-fallback}
+\csopt[\field{name}]{symbol-sort-fallback}
 \end{codeenv}
 An alternative approach would simply be to alias
 \atentryfmt{chemical} to \atentry{entry} instead.
@@ -17466,16 +17466,16 @@ needs to know the widest name, so I've use \csopt{set-widest} for
 convenience. The default behaviour of the tree styles is to 
 format the name in bold. This is done through the command
 \ics{glstreenamefmt} which is defined as:
-\begin{verbatim}
-\newcommand*{\glstreenamefmt}[1]{\textbf{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\cs{glstreenamefmt}}[1]\marg{\cs{textbf}\marg{\idx{param}1}}
+\end{codeenv}
 The group headings use \ics{glstreegroupheaderfmt} which defaults to
 \cs{glstreenamefmt}. Since I want to keep bold headings, I need to
 redefine this as well:
-\begin{verbatim}
-\renewcommand*{\glstreenamefmt}[1]{#1}
-\renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glstreenamefmt}}[1]\marg{\idx{param}1}
+\cs{renewcommand}*\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\cs{textbf}\marg{\idx{param}1}}
+\end{codeenv}
 (For a more compact layout, you could use \glostyle{mcolalttreegroup}
 instead.)
 
@@ -17507,16 +17507,16 @@ Bacteria names are often shown in the long form on first use
 This can easily be done with the \abbrstyle{long-only-short-only}
 style. Bacteria are usually typeset in italic. It's best to create a
 semantic command for this:
-\begin{verbatim}
-\newcommand{\bacteriafont}[1]{\emph{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{bacteriafont}}[1]\marg{\cs{emph}\marg{\idx{param}1}}
+\end{codeenv}
 There are two methods to apply this to the bacteria entries. The
 first is to redefine the formatting commands used by the
 \abbrstyle{long-only-short-only} style:
-\begin{verbatim}
-\renewcommand*{\glsabbrvonlyfont}[1]{\bacteriafont{#1}}
-\renewcommand*{\glslongonlyfont}[1]{\bacteriafont{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\ics{glsabbrvonlyfont}}[1]\marg{\cmd{bacteriafont}\marg{\idx{param}1}}
+\cs{renewcommand}*\marg{\ics{glslongonlyfont}}[1]\marg{\cmd{bacteriafont}\marg{\idx{param}1}}
+\end{codeenv}
 This is fine if I don't intend to use this style for other types of
 abbreviations. However, I may decide to extend the document at a
 later date to include other abbreviations that need
@@ -17529,15 +17529,15 @@ the \catattr{glossnamefont} attribute, the font used for the
 \cs{gls} in the document is governed by the \catattr{textformat}
 attribute (\styfmt{glossaries-extra} v1.21+). So if I set
 the \field{category} to \code{bacteria} then I can do:
-\begin{verbatim}
-\setabbreviationstyle[bacteria]{long-only-short-only}
-\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
-\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\oarg{bacteria}\marg{\abbrstyle{long-only-short-only}}
+\cs{glssetcategoryattribute}\marg{bacteria}\marg{\catattr{textformat}}\marg{bacteriafont}
+\cs{glssetcategoryattribute}\marg{bacteria}\marg{\catattr{glossnamefont}}\marg{bacteriafont}
+\end{codeenv}
 and (if the \field{description} field is displayed in the glossary):
-\begin{verbatim}
-\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
-\end{verbatim}
+\begin{codeenv}
+\cs{glssetcategoryattribute}\marg{bacteria}\marg{\catattr{glossdescfont}}\marg{bacteriafont}
+\end{codeenv}
 (Note that the attribute value is the control sequence name without
 the initial backslash.)
 
@@ -17547,12 +17547,12 @@ package.\footnote{\styfmt{glossary-bookindex}
 is distributed with \styfmt{glossaries-extra} v1.21+.} This isn't loaded
 automatically, but it can be loaded through the
 \styopt{stylemods} package option:
-\begin{verbatim}
-\usepackage[record,% use bib2gls
- nostyles,% don't load default style packages
- stylemods={bookindex},% load glossary-bookindex.sty and patch styles
- style=mcolindexgroup]{glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}[\styopt{record},\comment{use bib2gls}
+ \styopt{nostyles},\comment{don't load default style packages}
+ \styopt[bookindex]{stylemods},\comment{load glossary-bookindex.sty and patch styles}
+ \styopt[bookindex]{style}]\marg{glossaries-extra}
+\end{codeenv}
 I've used the \styopt{nostyles} package option to suppress loading
 the default style packages, since I'm not using them. If you inspect
 the \ext{log} file, you may notice that \sty{glossary-tree} is still
@@ -17567,9 +17567,9 @@ the \field{name} to the short form by default, only the short form
 will show in the glossary. I'd rather it was just the long form.
 This could simply be done using \csopt{replicate-fields} to copy the
 \field{long} field to the \field{name} field:
-\begin{verbatim}
-replicate-fields={long=name}
-\end{verbatim}
+\begin{codeenv}
+\csopt[\field{long}=\field{name}]{replicate-fields}
+\end{codeenv}
 Again, I want to consider the possibility of adding other types of
 abbreviations and this might not be appropriate for them (for
 example, I might want some abbreviations with the long form followed
@@ -17577,17 +17577,17 @@ by the short form in parentheses). Another
 approach is to redefine \ics{glsxtrbookindexname} which is used by
 the \glostyle{bookindex} style to display the name. This takes the
 entry's label as the argument. The default definition is:
-\begin{verbatim}
-\newcommand*{\glsxtrbookindexname}[1]{\glossentryname{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\cs{glsxtrbookindexname}}[1]\marg{\cs{glossentryname}\marg{\idx{param}1}}
+\end{codeenv}
 This can be changed to test for the entry's category:
-\begin{verbatim}
-\renewcommand*{\glsxtrbookindexname}[1]{%
- \glsifcategory{#1}{bacteria}
- {\glossentrynameother{#1}{long}}%
- {\glossentryname{#1}}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexname}}[1]\marg{\comment{}
+ \ics{glsifcategory}\marg{\idx{param}1}\marg{bacteria}
+ \marg{\cs{glossentrynameother}\marg{\idx{param}1}\marg{\field{long}}}\comment{}
+ \marg{\cs{glossentryname}\marg{\idx{param}1}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Note that I've used \ics{glossentrynameother} here rather than
 \ics{glsentrylong}. This ensures that it follows the same formatting
 as \ics{glossentryname} (so it will use \ics{glsnamefont} or the
@@ -17601,9 +17601,9 @@ fallback value is the \field{short} field (not the \field{name}
 field). In this case it would be better to fallback on the
 \field{long} field instead, which can be done with the
 \csopt{abbreviation-sort-fallback} option:
-\begin{verbatim}
-abbreviation-sort-fallback=long
-\end{verbatim}
+\begin{codeenv}
+\csopt[\field{long}]{abbreviation-sort-fallback}
+\end{codeenv}
 If I do add other types of abbreviations, they will all be sorted
 according to the \field{long} form, but at least this way I can have
 some \meta{long} (\meta{short}) names as well.
@@ -17671,7 +17671,7 @@ Similarly for the custom \atentryfmt{measurement} entry type in
 Remember that \atentry{symbol} uses the label as the default sort fallback,
 so I've changed it to use \field{name} instead:
 \begin{codeenv}
-\csopt[name]{symbol-sort-fallback}
+\csopt[\field{name}]{symbol-sort-fallback}
 \end{codeenv}
 An alternative approach would be to alias \atentryfmt{unit}
 and \atentryfmt{measurement} to \atentry{entry} instead.
@@ -17694,9 +17694,9 @@ styles. Note that although I've used \styopt{nostyles}, the
 As with the previous example, the custom fields need to be aliased:
 \begin{codeenv}
 \csopt[
-  unitname=name,
-  unitsymbol=symbol,
-  measurement=description
+  \fieldfmt{unitname}=\field{name},
+  \fieldfmt{unitsymbol}=\field{symbol},
+  \fieldfmt{measurement}=\field{description}
 ]{field-aliases}
 \end{codeenv}
 
@@ -17745,9 +17745,9 @@ for the first \idx{resourceset} and
 for the second. Similarly for the custom entry fields:
 \begin{codeenv}
 \csopt[
-  unitname=name,
-  unitsymbol=symbol,
-  measurement=description
+  \fieldfmt{unitname}=\field{name},
+  \fieldfmt{unitsymbol}=\field{symbol},
+  \fieldfmt{measurement}=\field{description}
 ]{field-aliases}
 \end{codeenv}
 
@@ -17776,9 +17776,9 @@ This is another example that uses the \exfile{baseunits.bib} and
 \exfile{derivedunits.bib} files. As before the custom fields need to be aliased:
 \begin{codeenv}
 \csopt[
-  unitname=name,
-  unitsymbol=symbol,
-  measurement=description
+  \fieldfmt{unitname}=\field{name},
+  \fieldfmt{unitsymbol}=\field{symbol},
+  \fieldfmt{measurement}=\field{description}
 ]{field-aliases}
 \end{codeenv}
 This time I want two glossaries containing all the units (base and
@@ -17793,12 +17793,11 @@ and \atentryfmt{measurement} entry types behave like
   measurement=dualsymbol
 ]{entry-type-aliases}
 \end{codeenv}
-This causes the \field{name} and \field{symbol} fields to be swapped
-in the dual list. Remember that the fallback for the \field{sort} field is the
-label for the symbol entry types so I need \csopt[name]{symbol-sort-fallback}
-to fallback on \field{name} field instead. (Alternative, I could
-just sort by the \field{name} field instead using
-\csopt[name]{sort-field}.)
+This causes the \field{name} and \field{symbol} fields to be swapped in the
+dual list. Remember that the fallback for the \field{sort} field is the label
+for the symbol entry types so I need \csopt[\field{name}]{symbol-sort-fallback}
+to fallback on \field{name} field instead. (Alternative, I could just sort by
+the \field{name} field instead using \csopt[\field{name}]{sort-field}.)
 
 The primary entries can still be sorted according to the default
 locale collator, but the dual entries need a sort method that's
@@ -17829,31 +17828,31 @@ style.
 Since my custom style is based on one of the long styles, I need to
 set the length register \ics{glsdescwidth} to adjust the width of
 the description column:
-\begin{verbatim}
-\setlength{\glsdescwidth}{.4\hsize}
-\end{verbatim}
+\begin{codeenv}
+\cmd{setlength}\marg{\cs{glsdescwidth}}\marg{.4\cmd{hsize}}
+\end{codeenv}
 The \glostyle{long3col-booktabs} style sets up a three column
 \env{longtable} so I just need to adjust the table header (to rename
 the column headers) and the way each row is formatted:
-\begin{verbatim}
-\newglossarystyle{units}% style name
-{% base it on long3col-booktabs
-  \setglossarystyle{long3col-booktabs}%
-  \renewcommand*{\glossaryheader}{%
-    \toprule
-    \bfseries Name &
-    \bfseries Measurement &
-    \bfseries Symbol
-    \tabularnewline\midrule\endhead
-    \bottomrule\endfoot}%
-% main entries:
-  \renewcommand{\glossentry}[2]{%
-    \glsentryitem{##1}\glstarget{##1}{\glossentryname{##1}} &
-    \glossentrydesc{##1}\glspostdescription &
-    \glossentrysymbol{##1}\tabularnewline
-  }%
+\begin{codeenv}
+\ics{newglossarystyle}\marg{units}\comment{style name}
+\marg{\comment{base it on \glostyle{long3col-booktabs}}
+  \ics{setglossarystyle}\marg{long3col-booktabs}\comment{}
+  \cs{renewcommand}*\marg{\ics{glossaryheader}}\marg{\comment{}
+    \ics{toprule}
+    \ics{bfseries} Name \idx{colsep}
+    \cs{bfseries} Measurement \idx{colsep}
+    \cs{bfseries} Symbol
+    \ics{tabularnewline}\ics{midrule}\ics{endhead}
+    \ics{bottomrule}\ics{endfoot}}\comment{}
+\comment{main entries:}
+  \cs{renewcommand}\marg{\ics{glossentry}}[2]\marg{\comment{}
+    \ics{glsentryitem}\marg{\idx{param}\idx{param}1}\ics{glstarget}\marg{\idx{param}\idx{param}1}\marg{\cs{glossentryname}\marg{\idx{param}\idx{param}1}} \idx{colsep}
+    \cs{glossentrydesc}\marg{\idx{param}\idx{param}1}\ics{glspostdescription} \idx{colsep}
+    \cs{glossentrysymbol}\marg{\idx{param}\idx{param}1}\cs{tabularnewline}
+  }\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 There are no sub-entries in this document so I haven't bothered to
 redefine \ics{subglossentry}. (The tabular styles aren't appropriate
 for hierarchical glossaries.) This puts the symbol into the third
@@ -17914,11 +17913,11 @@ are two simple ways to achieve this: use \csopt[same as base]{category}
 (which sets the \field{category} to \code{books} for entries in 
 \exfile{books.bib} and to \code{films} for entries in
 \exfile{films.bib}) or alias the custom \fieldfmt{identifier} field to
-\field{category}. I've chosen the later method and also provided
+\field{category}. I've chosen the latter method and also provided
 aliases for the custom \fieldfmt{year} and \fieldfmt{cast} fields:
 \begin{codeenv}
-\csopt[identifier=category,year=user1,cast=user2]{field-aliases},
-\csopt[category]{identical-sort-action}
+\csopt[\fieldfmt{identifier}=\field{category},\fieldfmt{year}=\field{user1},\fieldfmt{cast}=\field{user2}]{field-aliases},
+\csopt[\field{category}]{identical-sort-action}
 \end{codeenv}
 This ensures that books always come before films with the same
 title. An oddity is the film \qt{Whisky Galore!}\ which is one
@@ -17931,14 +17930,14 @@ still be placed after the book since the film title is longer.
 
 Since I've set the \field{category} I can provide semantic
 formatting commands (as for \exfile{sample-bacteria.tex}):
-\begin{verbatim}
-\newcommand*{\bookfont}[1]{\emph{#1}}
-\newcommand*{\filmfont}[1]{\textsf{\em #1}}
-\glssetcategoryattribute{book}{textformat}{bookfont}
-\glssetcategoryattribute{book}{glossnamefont}{bookfont}
-\glssetcategoryattribute{film}{textformat}{filmfont}
-\glssetcategoryattribute{film}{glossnamefont}{filmfont}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{bookfont}}[1]\marg{\cs{emph}\marg{\idx{param}1}}
+\cs{newcommand}*\marg{\cmd{filmfont}}[1]\marg{\ics{textsf}\marg{\ics{em} \idx{param}1}}
+\cs{glssetcategoryattribute}\marg{book}\marg{\catattr{textformat}}\marg{bookfont}
+\cs{glssetcategoryattribute}\marg{book}\marg{\catattr{glossnamefont}}\marg{bookfont}
+\cs{glssetcategoryattribute}\marg{film}\marg{\catattr{textformat}}\marg{filmfont}
+\cs{glssetcategoryattribute}\marg{film}\marg{\catattr{glossnamefont}}\marg{filmfont}
+\end{codeenv}
 I've given films a slightly different format to make them easier to
 distinguish from books of the same name.
 
@@ -17948,19 +17947,30 @@ or release, which I've assigned to the \field{user1} field.
 I can define \idxpl{postnamehook} for each category
 to append the year in brackets after the name is displayed in the
 glossary:
-\begin{verbatim}
-\newcommand*{\glsxtrpostnamebook}{%
- \ifglshasfield{user1}{\glscurrententrylabel}%
- {\space(published \glscurrentfieldvalue)}%
- {}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{glsxtrpostnamebook}}\marg{\comment{}
+ \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}\comment{}
+ \marg{\cs{space}(published \cs{glscurrentfieldvalue})}\comment{}
+ \marg{}\comment{}
 }
-
-\newcommand*{\glsxtrpostnamefilm}{%
- \ifglshasfield{user1}{\glscurrententrylabel}%
- {\space(released \glscurrentfieldvalue)}%
- {}%
+\strut
+\cs{newcommand}*\marg{\cmd{glsxtrpostnamefilm}}\marg{\comment{}
+ \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}\comment{}
+ \marg{\cs{space}(released \cs{glscurrentfieldvalue})}\comment{}
+ \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
+As with the post-description hook, if you have at least 
+\styfmt{glossaries-extra} v1.31, it's better to use:
+\begin{codeenv}
+\ics{glsdefpostname}\margm{category}
+\end{codeenv}
+instead of:
+\begin{codeenv}
+\cs{newcommand}\marg{\cs{glsxtrpostnamecategory}}
+\end{codeenv}
+as it can guard against accidental misspelling of the \code{glsxtrpostname}
+part of the command name.
 
 I've assigned the \fieldfmt{cast} field to the \field{user2} field,
 and since this field uses \BibTeX's contributor markup I need to 

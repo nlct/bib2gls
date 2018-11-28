@@ -43,6 +43,9 @@ v1.8 (pending):
   * \@glsnavhypertarget will now fallback on original definition
     (which requires an extra LaTeX call) if the type is unknown.
 
+  * Renamed example file sample-languages.tex to
+    sample-markuplanguages.tex
+
 v1.7 (2018-08-18):
 
   * added support for multiple supplementary sources
