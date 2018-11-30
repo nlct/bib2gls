@@ -3749,10 +3749,27 @@ with forced line breaks in paragraph column formats)},
   text = {\code{"}}
 }
 
+@index{openrange,
+  name = {\code{(} (start range)},
+  text = {\code{(}}
+}
+
+@index{closerange,
+  name = {\code{)} (end range)},
+  text = {\code{)}}
+}
+
 @index{cs.tilde,
   name={\csfmt{\glstildechar}},
   user1={\margm{character}},
   description={puts tilde accent over \meta{character}},
+  note={kernel command},
+  category={command}
+}
+
+@index{comma,
+  name={\csfmt{,}},
+  description={thin space},
   note={kernel command},
   category={command}
 }
@@ -3809,6 +3826,16 @@ with forced line breaks in paragraph column formats)},
   name={\csfmt{def}},
   user1={\margm{cs}\meta{syntax}\margm{definition}},
   description={defines the control sequence \meta{cs}, without checking if the command
+   already exists},
+  note={\TeX\ primitive},
+  category={command}
+}
+
+@index{edef,
+  name={\csfmt{edef}},
+  user1={\margm{cs}\meta{syntax}\margm{definition}},
+  description={defines the control sequence \meta{cs} to the full
+expansion of \meta{definition}, without checking if the command
    already exists},
   note={\TeX\ primitive},
   category={command}
@@ -3946,6 +3973,16 @@ is defined},
   category={command}
 }
 
+@index{forlistloop,
+  name={\csfmt{for\-list\-loop}},
+  user1={\margm{handler cs}\margm{list cs}},
+  description={iterates over the internal list given by the command 
+   \meta{list cs} and performs \meta{handler cs}\margm{element} for
+   each element},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
 @index{foreignlanguage,
   name={\csfmt{foreign\-language}},
   user1={\margm{language name}\margm{text}},
@@ -3960,6 +3997,30 @@ given language},
   user1={\margm{language name}},
   description={switch to the rules of the given language},
   note={\styfmt{babel} and \styfmt{polyglossia}},
+  category={command}
+}
+
+@index{setmainlanguage,
+  name={\csfmt{set\-main\-language}},
+  user1={\oargm{options}\margm{language name}},
+  description={load the main document language},
+  note={\styfmt{polyglossia}},
+  category={command}
+}
+
+@index{setotherlanguage,
+  name={\csfmt{set\-other\-language}},
+  user1={\oargm{options}\margm{language name}},
+  description={load a secondary document language},
+  note={\styfmt{polyglossia}},
+  category={command}
+}
+
+@index{textlanguage,
+  name={\csfmt{text\-\meta{language}}},
+  user1={\oargm{options}\margm{text}},
+  description={typeset \meta{text} according to \meta{language}},
+  note={\styfmt{polyglossia}},
   category={command}
 }
 
@@ -7706,6 +7767,16 @@ field value},
   category={command}
 }
 
+@index{xGlsXtrSetField,
+  name={\csfmt{xGls\-Xtr\-Set\-Field}},
+  user1={\margm{entry label}\margm{field label}\margm{value}},
+  description={globally assigns the (protected) full expansion of the given \meta{value} to the field
+   identified by \meta{field label} for the
+   entry identified by \meta{entry label}},
+  note={\styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
 @index{glsxtrifhasfield,
   name={\csfmt{gls\-xtr\-if\-has\-field}},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
@@ -7826,6 +7897,24 @@ fully expands both the field value and \meta{text}},
   field. With \bibgls, a more efficient approach is to
   use \csopt{save-child-count} and test the value of
   the \field{childcount} field},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{ifglshasshort,
+  name={\csfmt{if\-gls\-has\-short}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{short} field set},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{ifglshaslong,
+  name={\csfmt{if\-gls\-has\-long}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{long} field set},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8728,6 +8817,15 @@ usual delay},
   category={command}
 }
 
+@index{IfFileExists,
+  name={\csfmt{IfFileExists}},
+  user1={\margm{file}\margm{true}\margm{false}},
+  description={if the given \meta{file} exists does \meta{true}
+   otherwise does \meta{false}},
+  note={kernel command},
+  category={command}
+}
+
 @index{jobname,
   name={\csfmt{jobname}},
   user1={},
@@ -9560,6 +9658,15 @@ abbreviation by the \catattr{markwords} attribute},
   category={command}
 }
 
+@index{Glstext,
+  name={\csfmt{Glstext}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={as \cs{glstext} but converts the first letter to
+   \idx{uppercase}},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @index{glsname,
   name={\csfmt{glsname}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
@@ -10030,6 +10137,38 @@ long form},
   category={command}
 }
 
+@index{glsabbrvfont,
+  name={\csfmt{gls\-abbrv\-font}},
+  user1={\margm{text}},
+  description={generic abbreviation font command for the short form},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@index{glslongfont,
+  name={\csfmt{gls\-long\-font}},
+  user1={\margm{text}},
+  description={generic abbreviation font command for the long form},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@index{glsshorttok,
+  name={\csfmt{gls\-short\-tok}},
+  description={token register used in the construction of
+   acronyms or abbreviations to allow the style hooks to access the short form},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@index{glslongtok,
+  name={\csfmt{gls\-long\-tok}},
+  description={token register used in the construction of
+   acronyms or abbreviations to allow the style hooks to access the long form},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @index{glsuserdescription,
   name={\csfmt{gls\-user\-description}},
   user1={\margm{description}\margm{label}},
@@ -10150,6 +10289,14 @@ the width of the description column},
   description={used by the \glostyle{alttree} styles to format the
 symbol, description and location},
   note={\styfmt{glossaries-extra-stylemods}},
+  category={command}
+}
+
+@index{glsxtrAltTreePar,
+  name={\csfmt{gls\-xtr\-Alt\-Tree\-Par}},
+  description={used by the \glostyle{alttree} styles to indicate a
+paragraph break that retains the hanging indent},
+  note={\styfmt{glossaries-extra-stylemods} v1.05+},
   category={command}
 }
 
@@ -10513,6 +10660,15 @@ number is hexadecimal)},
   a base~10 integer number stripping any leading
   zeros (use \code{\csfmt{char}\idx{doublequotecharhex}\meta{hex}} 
   if the value is hexadecimal)},
+  note={{}\TeX\ primitive},
+  category={command}
+}
+
+@index{the,
+  name={\csfmt{the}},
+  user1={\meta{register}},
+  description={expands \meta{register} to the current value of the
+   register},
   note={{}\TeX\ primitive},
   category={command}
 }

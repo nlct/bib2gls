@@ -403,12 +403,32 @@
 
 \newcommand*{\ics}[2][]{\glsadd[#1]{idx.#2}\cs{#2}}
 
+\newcommand*{\csdisp}[2]{%
+ \texorpdfstring
+ {\glsdohyperlink{\glolinkprefix cs.idx.#1}{\csfmt{#2}}}%
+ {\string\\#2}%
+}
+
+\newcommand*{\icsdisp}[3][]{%
+ \glsadd[#1]{idx.#2}\glsdohyperlink{\glolinkprefix cs.idx.#2}{\csfmt{#3}}%
+}
+
+\newcommand*{\encapdisp}[2]{%
+ \texorpdfstring
+ {\glsdohyperlink{\glolinkprefix cs.idx.#1}{\code{#2}}}%
+ {#2}%
+}
+
 \glsxtridentifyglslike{idx.}{\ics}
 
 \newcommand*{\icswithargs}[2][]{\glsadd[#1]{idx.#2}\cs{#2}\glsentryuseri{#2}}
 
-\newcommand*{\postdeschook}[2][]{%
- \glslink[#1]{idx.glsxtrpostdesccategory}{\csfmt{glsxtrpostdesc#2}}}
+\newcommand*{\postdeschook}[1]{%
+ \glsdohyperlink{\glolinkprefix cs.idx.glsxtrpostdesccategory}{\csfmt{glsxtrpostdesc#1}}}
+\newcommand*{\postnamehook}[1]{%
+ \glsdohyperlink{\glolinkprefix cs.idx.glsxtrpostnamecategory}{\csfmt{glsxtrpostname#1}}}
+\newcommand*{\postlinkhook}[1]{%
+ \glsdohyperlink{\glolinkprefix cs.idx.glsxtrpostlinkcategory}{\csfmt{glsxtrpostlink#1}}}
 
 \newcommand*{\encap}[2][]{\glsadd[#1]{idx.#2}%
  {%
@@ -2267,7 +2287,7 @@ space.
 Treat instances of \code{\ics{citation}\margm{label}} found in the 
 \ext{aux} file as though it was actually an \idx{ignoredrecord}:
 \begin{codeenv}
-\gls{glsxtr@record}\margm{label}\marg{}\marg{page}\marg{glsignore}\marg{}
+\gls{glsxtr@record}\margm{label}\marg{}\marg{\counter{page}}\marg{\encap{glsignore}}\marg{}
 \end{codeenv}
 Note that \code{\cs{citation}\marg{*}} will always be skipped. Use
 \csopt[all]{selection} to select all entries.
@@ -9322,9 +9342,9 @@ location. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
 user manual for a list of all the \csfmt{hyper}\meta{xx} commands.
 
 Ranges can be explicitly formed using the parenthetical 
-syntax \glsopt[(]{format} and
-\glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
-\glsopt[)\meta{csname}]{format} (where \meta{csname} is again the name of 
+syntax \glsopt[\idx{openrange}]{format} and
+\glsopt[\idx{openrange}]{format} or \glsopt[\idx{openrange}\meta{csname}]{format} and
+\glsopt[\idx{closerange}\meta{csname}]{format} (where \meta{csname} is again the name of 
 a text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be
@@ -9338,20 +9358,20 @@ Explicit ranges don't merge with neighbouring locations, but will
 absorb any single locations within the range that don't conflict.
 (Conflicts will be moved to the start of the explicit range.)
 For example, if \code{\cs{gls}\marg{sample}} is used on page~1,
-\code{\cs{gls}\oarg{format=(}\marg{sample}} is used on page~2, 
+\code{\cs{gls}\oarg{\glsopt[\idx{openrange}]{format}}\marg{sample}} is used on page~2, 
 \code{\cs{gls}\marg{sample}} is used on page~3, and
-\code{\cs{gls}\oarg{format=)}\marg{sample}} is used on page~4, then the location
+\code{\cs{gls}\oarg{\glsopt[\idx{closerange}]{format}}\marg{sample}} is used on page~4, then the location
 list will be 1, 2--4. The entry on page~3 is absorbed into the
 explicit range, but the range can't be expanded to include page~1.
 If the entry on page~3 had a different format to the explicit range,
-for example \code{\cs{gls}\oarg{format=\encap{textbf}}\marg{sample}} 
+for example \code{\cs{gls}\oarg{\glsopt[\encap{textbf}]{format}}\marg{sample}} 
 then it would cause a warning and be moved before the start of the
 range so that the location list would then be 1, \textbf{3}, 2--4. 
 
 An \idx{ignoredrecord} identifies a term that needs to be treated as
 though it has a record for selection purposes, but the record
 should not be included in the location list.
-The special format \glsaddopt[glsignore]{format} is provided
+The special format \glsaddopt[\encap{glsignore}]{format} is provided
 by the \styfmt{glossaries} package for cases where the location
 should be ignored. (The command \ics{glsignore} simply ignores its
 argument.) This works reasonably well if an entry only has the one
@@ -9390,9 +9410,9 @@ If you also want to drop front matter locations as well:
 Note that explicit range formations aren't discarded, so if
 \encap{glsignore} is used in a range, such as:
 \begin{codeenv}
-\ics{glsadd}\oarg{format=(glsignore}\marg{sample}
+\ics{glsadd}\oarg{\glsopt[\idx{openrange}\encap{glsignore}]{format}}\marg{sample}
 \ldots 
-\cs{glsadd}\oarg{format=)glsignore}\marg{sample} 
+\cs{glsadd}\oarg{\glsopt[\idx{closerange}\encap{glsignore}]{format}}\marg{sample} 
 \end{codeenv}
 then the range will be included in the location list (encapsulated
 with \ics{glsignore}), but this case would be a rather odd use of
@@ -9445,7 +9465,7 @@ Partial duplicates, where all arguments match except for
 \meta{format}, may be discarded depending on the value
 of \meta{format}. For example, if page~1 of the document
 uses \code{\cs{gls}\marg{cat}} and
-\code{\cs{gls}\oarg{format=\encap{hyperbf}}\marg{cat}}
+\code{\cs{gls}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{cat}}
 then the \ext{aux} file will contain:
 \begin{codeenv}
 \gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
@@ -9639,7 +9659,7 @@ and the document \filefmt{test.tex} contains:
   \cs{glsxtrprelocation}
 }
 \strut
-\gls{glsxtrnewglslike}\oarg{format=\encap{hyperbf}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
+\gls{glsxtrnewglslike}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
 \strut
 \cmd{begin}\marg{document}
 \cmd{chapter}\marg{Sample}
@@ -9655,10 +9675,10 @@ and the document \filefmt{test.tex} contains:
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \cmd{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 \strut
 \ics{printunsrtglossary*}\oarg{style=tree,nonumberlist}\marg{\comment{}
- \cmd{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=\encap{hyperemph}}\marg{\idx{param}1}}\comment{}
+ \cmd{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{\glsopt[\encap{hyperemph}]{format}}\marg{\idx{param}1}}\comment{}
 }
 \strut
-\cs{printunsrtglossary}\oarg{title=Index,target=false}
+\cs{printunsrtglossary}\oarg{\printglossopt[Index]{title},\printglossopt[false]{target}}
 \cmd{end}\marg{document}
 \end{codeenv}
 
@@ -9693,16 +9713,16 @@ I decide to change the optional arguments used for primary
 references I only need to edit one line. For example, I might want to 
 change the default counter:
 \begin{codeenv}
-\gls{glsxtrnewglslike}\oarg{format=\encap{hyperbf},counter=\counter{chapter}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
+\gls{glsxtrnewglslike}\oarg{\glsopt[\encap{hyperbf}]{format},\glsopt[\counter{chapter}]{counter}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
 \end{codeenv}
 
 Here's another example that only has one primary format (\encap{hyperrm}) 
 that's indexed through the use of \ics{GlsXtrAutoAddOnFormat}, which sets
 up a hook that automatically inserts:
-\begin{codeenv}
-\ics{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\margm{label}
-\end{codeenv}
-on each instance of \code{\cs{gls}\oarg{format=primaryfmt}\margm{label}} (or
+\begin{codeenv*}
+\ics{glsadd}\oarg{\glsaddopt[\counter{chapter}]{counter},\glsaddopt[\encap{hyperrm}]{format}}\margm{label}
+\end{codeenv*}
+on each instance of \code{\cs{gls}\oarg{\glsopt[primaryfmt]{format}}\margm{label}} (or
 similar).  This means that the entry is indexed twice when this particular
 format is used: first with the \encap{hyperrm} format and \counter{chapter} 
 counter (from the \cs{glsadd} command in the hook), and then with the
@@ -9727,9 +9747,9 @@ counter (from the \cs{glsadd} command in the hook), and then with the
 \strut
 \cmd{newcommand}\marg{\cmd{primaryfmt}}\oarg{1}\marg{\cs{hyperbf}\marg{\idx{param}1}}
 \strut
-\ics{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{counter=\counter{chapter},format=\encap{hyperrm}}
+\ics{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{\glsaddopt[\counter{chapter}]{counter},\glsaddopt[\encap{hyperrm}]{format}}
 \strut
-\gls{glsxtrnewglslike}\oarg{format=primaryfmt}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
+\gls{glsxtrnewglslike}\oarg{\glsaddopt[primaryfmt]{format}}\marg{}\marg{\cmd{primary}}\marg{\cmd{primarypl}}\marg{\cmd{Primary}}\marg{\cmd{Primarypl}}
 \strut
 \cmd{begin}\marg{document}
 \cmd{chapter}\marg{Sample}
@@ -9745,11 +9765,11 @@ counter (from the \cs{glsadd} command in the hook), and then with the
 \cs{Gls}\marg{waterfowl}, \cs{gls}\marg{bird}, \cmd{primarypl}\marg{parrot} and \cs{gls}\marg{zebra}.
 \strut
 \ics{printunsrtglossary*}\oarg{style=tree,title={Summary}}\marg{\comment{}
- \cmd{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{format=\encap{hyperemph}}\marg{\idx{param}1}}\comment{}
+ \cmd{renewcommand}*\marg{\ics{glsextrapostnamehook}}[1]\marg{\ics{glsadd}\oarg{\glsaddopt[\encap{hyperemph}]{format}}\marg{\idx{param}1}}\comment{}
  \cmd{renewcommand}\marg{\ics{GlsXtrLocationField}}\marg{\field{primarylocations}}\comment{}
 }
 \strut
-\cs{printunsrtglossary}\oarg{title=Index,target=false}
+\cs{printunsrtglossary}\oarg{\printglossopt[Index]{title},\printglossopt[false]{target}}
 \cmd{end}\marg{document}
 \end{codeenv}
 
@@ -9772,24 +9792,24 @@ An alternative to \ics{GlsXtrAutoAddOnFormat} would be to simply
 define the custom commands as follows:
 \begin{codeenv}
 \cmd{newcommand}\marg{\cmd{primary}}[2][]\marg{\comment{}
- \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
- \cs{gls}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
+ \cs{glsadd}\oarg{\glsaddopt[\counter{chapter}]{counter},\glsaddopt[\encap{hyperrm}]{format}}\marg{\idx{param}2}\comment{}
+ \cs{gls}\oarg{\glsopt[primaryfmt]{format},\idx{param}1}\marg{\idx{param}2}\comment{}
 }
 \cmd{newcommand}\marg{\cmd{primarypl}}[2][]\marg{\comment{}
- \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
- \cs{glspl}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
+ \cs{glsadd}\oarg{\glsaddopt[\counter{chapter}]{counter},\glsaddopt[\encap{hyperrm}]{format}}\marg{\idx{param}2}\comment{}
+ \cs{glspl}\oarg{\glsopt[primaryfmt]{format},\idx{param}1}\marg{\idx{param}2}\comment{}
 }
 \cmd{newcommand}\marg{\cmd{Primary}}[2][]\marg{\comment{}
- \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
- \cs{Gls}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
+ \cs{glsadd}\oarg{\glsaddopt[\counter{chapter}]{counter},\glsaddopt[\encap{hyperrm}]{format}}\marg{\idx{param}2}\comment{}
+ \cs{Gls}\oarg{\glsopt[primaryfmt]{format},\idx{param}1}\marg{\idx{param}2}\comment{}
 }
 \cmd{newcommand}\marg{\cmd{Primarypl}}[2][]\marg{\comment{}
- \cs{glsadd}\oarg{counter=\counter{chapter},format=\encap{hyperrm}}\marg{\idx{param}2}\comment{}
- \cs{Glspl}\oarg{format=primaryfmt,\idx{param}1}\marg{\idx{param}2}\comment{}
+ \cs{glsadd}\oarg{\glsaddopt[\counter{chapter}]{counter},\glsaddopt[\encap{hyperrm}]{format}}\marg{\idx{param}2}\comment{}
+ \cs{Glspl}\oarg{\glsopt[primaryfmt]{format},\idx{param}1}\marg{\idx{param}2}\comment{}
 }
 \end{codeenv}
 This is more useful if you want to simply omit the
-\code{format=primaryfmt} option (just remove it from the above four 
+\code{\glsopt[primaryfmt]{format}} option (just remove it from the above four 
 definitions), which makes it easier to merge the locations into
 ranges in the index.
 
@@ -10413,25 +10433,25 @@ A \cs{gls}\marg{sample}. \cmd{lipsum}*[1] A \cs{gls}\marg{duck}.
 \strut
 An equation:
 \cmd{begin}\marg{equation}
-\cs{gls}\oarg{counter=equation}\marg{pi}
+\cs{gls}\oarg{\glsopt[\counter{equation}]{counter}}\marg{pi}
 \cmd{end}\marg{equation}
 \strut
 \cmd{lipsum}[2]
 \strut
-Another \cs{gls}\oarg{format=primary}\marg{sample}. \cmd{lipsum}*[3] Another
+Another \cs{gls}\oarg{\glsopt[primary]{format}}\marg{sample}. \cmd{lipsum}*[3] Another
 \cs{gls}\marg{duck}.
 \strut
 \cs{gls}\marg{pi}. \cmd{lipsum}[4]
 \strut
 A \cs{gls}\marg{sample}. \cmd{lipsum}*[5] A \cs{gls}\marg{duck} and
-\cs{gls}\oarg{format=primary}\marg{pi}.
+\cs{gls}\oarg{\glsopt[primary]{format}}\marg{pi}.
 \strut
-\cmd{lipsum}*[6] A \cs{gls}\oarg{format=primary}\marg{duck}.
+\cmd{lipsum}*[6] A \cs{gls}\oarg{\glsopt[primary]{format}}\marg{duck}.
 \strut
 \cs{printunsrtglossaries}
 \cmd{end}\marg{document}
 \end{codeenv}
-Note that the \glsopt[equation]{counter} entry will have its own
+Note that the \glsopt[\counter{equation}]{counter} entry will have its own
 independent location. In this example, it's difficult to tell the
 difference between 1 (the equation reference) and 1 (the page
 reference) in the location list for the \code{pi} entry.
@@ -14506,9 +14526,9 @@ The default definition is obtained from the \langxml. For example, with
 \cssection{bibglsrange}
 
 \formatdef{bibglsrange}
-Explicit ranges formed using \glsopt[(]{format} and
-\glsopt[)]{format} or \glsopt[(\meta{csname}]{format} and
-\glsopt[)\meta{csname}]{format} (where \meta{csname} matches and is a
+Explicit ranges formed using \glsopt[\idx{openrange}]{format} and
+\glsopt[\idx{closerange}]{format} or \glsopt[\idx{openrange}\meta{csname}]{format} and
+\glsopt[\idx{closerange}\meta{csname}]{format} (where \meta{csname} matches and is a
 text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd} are encapsulated within
 the argument of \gls{bibglsrange}. By default this simply does its
@@ -14526,11 +14546,11 @@ so that it fits neatly into the list.
 
 For example, suppose on page~4 of my document I start a range with:
 \begin{codeenv*}
-\cs{glsadd}\oarg{\glsaddopt[(]{format}}\marg{sample}
+\cs{glsadd}\oarg{\glsaddopt[\idx{openrange}]{format}}\marg{sample}
 \end{codeenv*}
 and end it on page~9 with:
 \begin{codeenv*}
-\cs{glsadd}\oarg{\glsaddopt[)]{format}}\marg{sample}
+\cs{glsadd}\oarg{\glsaddopt[\idx{closerange}]{format}}\marg{sample}
 \end{codeenv*}
 This forms an explicit range, but let's suppose on page~6 I
 have:
@@ -17948,13 +17968,13 @@ I can define \idxpl{postnamehook} for each category
 to append the year in brackets after the name is displayed in the
 glossary:
 \begin{codeenv}
-\cs{newcommand}*\marg{\cmd{glsxtrpostnamebook}}\marg{\comment{}
+\cs{newcommand}*\marg{\postnamehook{book}}\marg{\comment{}
  \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}\comment{}
  \marg{\cs{space}(published \cs{glscurrentfieldvalue})}\comment{}
  \marg{}\comment{}
 }
 \strut
-\cs{newcommand}*\marg{\cmd{glsxtrpostnamefilm}}\marg{\comment{}
+\cs{newcommand}*\marg{\postnamehook{film}}\marg{\comment{}
  \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}\comment{}
  \marg{\cs{space}(released \cs{glscurrentfieldvalue})}\comment{}
  \marg{}\comment{}
@@ -17975,25 +17995,25 @@ part of the command name.
 I've assigned the \fieldfmt{cast} field to the \field{user2} field,
 and since this field uses \BibTeX's contributor markup I need to 
 convert this to a form that's easier to customize:
-\begin{verbatim}
-bibtex-contributor-fields={user2}
-\end{verbatim}
+\begin{codeenv}
+\csopt[\field{user2}]{bibtex-contributor-fields}
+\end{codeenv}
 I'm not sorting by this field and it would look better in the
 document to list the forenames before the surname so I've also done:
-\begin{verbatim}
-contributor-order={forenames}
-\end{verbatim}
-Since I have \sty{datatool-base} v2.28+ installed, the list will be
-formatted using \ics{DTLformatlist}. If I want an Oxford comma, I need 
-to redefine \ics{DTLlistformatoxford} in the document:
-\begin{verbatim}
-\renewcommand*{\DTLlistformatoxford}{,}
-\end{verbatim}
+\begin{codeenv}
+\csopt[forenames]{contributor-order}
+\end{codeenv}
+Since I have at least version 2.28 of \sty{datatool-base} installed, 
+the list will be formatted using \ics{DTLformatlist}. If I want an 
+Oxford comma, I need to redefine \ics{DTLlistformatoxford} in the document:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{DTLlistformatoxford}}\marg{,}
+\end{codeenv}
 If I want to change \qt{\&} to \qt{and} I also need to redefine
 \ics{DTLandname}:
-\begin{verbatim}
-\renewcommand*{\DTLandname}{and}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{DTLandname}}\marg{and}
+\end{codeenv}
 If \ics{DTLformatlist} isn't defined (\sty{datatool-base} v2.27 or
 earlier), the cast list will look a little odd as it uses a comma
 separator between all elements of this list, including the final
@@ -18001,16 +18021,16 @@ pair (so there's no final \& or \qt{and}).
 
 I've provided a \idx{postdescriptionhook}
 \ics{glsxtrpostdesccategory} to append the cast list:
-\begin{verbatim}
-\newcommand*{\glsxtrpostdescfilm}{%
- \ifglshasfield{user2}{\glscurrententrylabel}%
- {%
-   \glsxtrrestorepostpunc % requires glossaries-extra v1.23+
-   \ featuring \glscurrentfieldvalue
- }%
- {}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\postdeschook{film}}\marg{\comment{}
+ \cs{ifglshasfield}\marg{\field{user2}}\marg{\cs{glscurrententrylabel}}\comment{}
+ \marg{\comment{}
+   \cs{glsxtrrestorepostpunc} \comment{requires glossaries-extra v1.23+}
+   \cs{cs.space}featuring \cs{glscurrentfieldvalue}
+ }\comment{}
+ \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This uses \ics{glsxtrrestorepostpunc} to restore the
 post-description punctuation if it was suppressed with
 \ics{glsxtrnopostpunc}. This means that if I decide not to include
@@ -18069,9 +18089,9 @@ so the keys either need to be defined or the fields need to be
 mapped to existing keys. In this case I've decided to map them to
 the \field{user1}, \field{user2} and \field{user3} fields using
 \csopt{field-aliases}:
-\begin{verbatim}
-field-aliases={born=user1,died=user2,othername=user3}
-\end{verbatim}
+\begin{codeenv}
+\csopt[\fieldfmt{born}=\field{user1},\fieldfmt{died}=\field{user2},\fieldfmt{othername}=\field{user3}]{field-aliases}
+\end{codeenv}
 Although the aliases haven't been referenced in the document, I've
 taken into account the possibility that they might later be added.
 To prevent them from showing in the first two lists I've filtered
@@ -18079,18 +18099,18 @@ them out. This is easy to do since the aliases are all defined using
 \atentry{index} whereas the remaining (non-aliased) entries are
 defined using \atentry{entry} so \csopt{match} can be used to only
 select entries defined with \atentry{entry}: 
-\begin{verbatim}
-match={entrytype=entry}
-\end{verbatim}
+\begin{codeenv}
+\csopt[entrytype=entry]{match}
+\end{codeenv}
 
 I'd like the first use of \ics{gls} to display the full name, except
 for the entry that has the \field{first} field set. The remaining
 entries only have \field{text} set to a shortened version of the
 name so they need to have the \field{name} field copied to the
 \field{first} field using \csopt{replicate-fields}:
-\begin{verbatim}
-replicate-fields={name={first}}
-\end{verbatim}
+\begin{codeenv}
+\csopt[\field{name}=\marg{\field{first}}]{replicate-fields}
+\end{codeenv}
 
 I'd like the first use to show the other name in parentheses where
 provided. The simplest way to achieve this is by defining the
@@ -18101,9 +18121,9 @@ could just define \csfmt{glsxtrpostlinkgeneral} but to allow for
 the possibility of extending the document to incorporate other types
 of entries I decided to set the \field{category} to \code{people}
 through the use of the \csopt{category} option:
-\begin{verbatim}
-category={people}
-\end{verbatim}
+\begin{codeenv}
+\csopt[people]{category}
+\end{codeenv}
 
 This means that I now need to define a command called
 \csfmt{glsxtrpostlinkpeople} that will be used after instances of
@@ -18113,30 +18133,30 @@ entry with \ics{glsxtrifwasfirstuse} and then tests if the
 \field{user3} field is set. If so, it does a space followed by that
 field's value in parentheses. The entry's label can be obtained from
 \ics{glslabel}:
-\begin{verbatim}
-\newcommand*{\glsxtrpostlinkpeople}{%
- \glsxtrifwasfirstuse
- {%
-   \ifglshasfield{user3}{\glslabel}%
-   {\space(\glscurrentfieldvalue)}%
-   {}%
- }%
- {}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\postlinkhook{people}}\marg{\comment{}
+ \cs{glsxtrifwasfirstuse}
+ \marg{\comment{}
+   \cs{ifglshasfield}\marg{\field{user3}}\marg{\cs{glslabel}}\comment{}
+   \marg{\cs{space}(\cs{glscurrentfieldvalue})}\comment{}
+   \marg{}\comment{}
+ }\comment{}
+ \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 I'd also like to do something similar after the name when the entry
 is displayed in the glossary. This means defining the \idx{postnamehook}
 \ics{glsxtrpostnamecategory}, in this case
 \csfmt{glsxtrpostnamepeople}. The entry's label is referenced
 with \ics{glscurrententrylabel}:
-\begin{verbatim}
-\newcommand*{\glsxtrpostnamepeople}{%
- \ifglshasfield{user3}{\glscurrententrylabel}%
- {\space(\glscurrentfieldvalue)}%
- {}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\postnamehook{people}}\marg{\comment{}
+ \cs{ifglshasfield}\marg{\field{user3}}\marg{\cs{glscurrententrylabel}}\comment{}
+ \marg{\cs{space}(\cs{glscurrentfieldvalue})}\comment{}
+ \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 (A different command is used since \cs{gls} may occur in the
 description, which would interfere with the current entry label if
 they shared the same command to reference the label.)
@@ -18146,21 +18166,21 @@ death dates. Although all the entries that have been selected from \exfile{peopl
 \fieldfmt{died} field, I've added a check for the corresponding
 \field{user3} field in case new references are added for people who are
 still alive:
-\begin{verbatim}
-\newcommand*{\glsxtrpostdescpeople}{%
- \ifglshasfield{user1}{\glscurrententrylabel}
- {% born
-   \space(\glscurrentfieldvalue\,--\,%
-     \ifglshasfield{user2}{\glscurrententrylabel}
-     {% died
-        \glscurrentfieldvalue
-     }%
-     {}%
-   )%
- }%
- {}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\postdeschook{people}}\marg{\comment{}
+ \cs{ifglshasfield}\marg{\field{user1}}\marg{\cs{glscurrententrylabel}}
+ \marg{\comment{born}
+   \cs{space}(\cs{glscurrentfieldvalue}\ics{comma}-{}-\cs{comma}\comment{}
+     \cs{ifglshasfield}\marg{user2}\marg{\cs{glscurrententrylabel}}
+     \marg{\comment{died}
+        \cs{glscurrentfieldvalue}
+     }\comment{}
+     \marg{}\comment{}
+   )\comment{}
+ }\comment{}
+ \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 
 The first list is quite straight-forward and can be created with:
 \begin{codeenv}
@@ -18168,8 +18188,8 @@ The first list is quite straight-forward and can be created with:
   \csopt[people]{src},
   \csopt[entrytype=entry]{match},
   \csopt[people]{category},
-  \csopt[name=\marg{first}]{replicate-fields},
-  \csopt[born=user1,died=user2,othername=user3]{field-aliases}
+  \csopt[\field{name}=\marg{\field{first}}]{replicate-fields},
+  \csopt[\fieldfmt{born}=\field{user1},\fieldfmt{died}=\field{user2},\fieldfmt{othername}=\field{user3}]{field-aliases}
 }
 \end{codeenv}
 I have used the \csopt{sort} option and there's no document language, 
@@ -18180,7 +18200,7 @@ entries are all sorted alphabetically according to the surnames.
 The second list can easily be created by adding the \csopt{secondary}
 option:
 \begin{codeenv}
-\csopt[date:user1:bybirth]{secondary}
+\csopt[date:\field{user1}:bybirth]{secondary}
 \end{codeenv}
 This sorts according to the \field{user1} field (which was
 originally the \fieldfmt{birth} field).
@@ -18197,14 +18217,14 @@ file isn't recognised, the required format can be set with:
 I've changed the date group headings by redefining \gls{bibglsdategroup} and
 \gls{bibglsdategrouptitle}, which means that the grouping in the
 \code{bybirth} glossary will be in the form \meta{year} \meta{era}:
-\begin{verbatim}
-\newcommand{\bibglsdategroup}[7]{#1#4#7}
-\newcommand{\bibglsdategrouptitle}[7]{\number#1\ #4}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglsdategroup}}[7]\marg{\idx{param}1\idx{param}4\idx{param}7}
+\cs{newcommand}\marg{\gls{bibglsdategrouptitle}}[7]\marg{\cs{number}\idx{param}1\ \idx{param}4}
+\end{codeenv}
 I've also defined the \code{bybirth} glossary and supplied a title:
-\begin{verbatim}
-\newglossary*{bybirth}{People (Ordered by Birth)}
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{bybirth}\marg{People (Ordered by Birth)}
+\end{codeenv}
 
 The first two glossaries have entries with fairly long names (especially those
 with the \idx{postnamehook}), so the best style is the
@@ -18229,14 +18249,14 @@ package option. I've set the default style to \glostyle{altlistgroup}
 but this can locally be changed to \glostyle{bookindex} when I
 display the index. The \styopt{record} option is needed to use
 \bibgls, so the \styfmt{glossaries-extra} package is loaded with:
-\begin{verbatim}
-\usepackage[record,% using bib2gls
- index,% create index glossary
- postdot,% dot after descriptions
-% load glossary-list.sty and glossary-bookindex.sty and patch:
- stylemods={list,bookindex},
- style=altlistgroup]{glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}[\styopt{record},\comment{using bib2gls}
+ \styopt{index},\comment{create index glossary}
+ \styopt{postdot},\comment{dot after descriptions}
+\comment{load glossary-list.sty and glossary-bookindex.sty and patch:}
+ \styopt[list,bookindex]{stylemods},
+ \styopt[altlistgroup]{style}]\marg{glossaries-extra}
+\end{codeenv}
 
 The index needs to include all the entries that have already been
 defined but also needs to include the aliased entries. This means
@@ -18255,9 +18275,9 @@ in which to save the group information using
 \end{codeenv}
 I need to remember to redefine \ics{glsxtrgroupfield} to this value before
 displaying the index:
-\begin{verbatim}
-\renewcommand{\glsxtrgroupfield}{indexgroup}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{indexgroup}
+\end{codeenv}
 
 The aliased entries won't be selected by default since they haven't
 been used in the document, so I need to change the selection
@@ -18270,26 +18290,27 @@ In the index, I'd like the surnames first. This can be done by
 redefining the custom commands used in the \field{name} fields.
 There's a slight complication here. These commands aren't defined on
 the first \LaTeX\ run as their definitions are written to the
-\ext{glstex} file by \bibgls, so I can't use \cs{renewcommand}.
-instead I've provided some custom commands:
-\begin{verbatim}
-\newcommand*{\swaptwo}[2]{#2, #1}
-\newcommand*{\swapthree}[3]{#2 #3, #1}
-\end{verbatim}
+\ext{glstex} file by \bibgls, so I can't use \cs{renewcommand} (although 
+I could use \cs{glsrenewcommand}).
+Instead I've provided some custom commands:
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{swaptwo}}[2]\marg{\idx{param}2, \idx{param}1}
+\cs{newcommand}*\marg{\cmd{swapthree}}[3]\marg{\idx{param}2 \idx{param}3, \idx{param}1}
+\end{codeenv}
 Now I just need to make an assignment using \ics{let}:
-\begin{verbatim}
-\let\sortname\swaptwo
-\let\sortart\swaptwo
-\let\sortvonname\swapthree
-\end{verbatim}
+\begin{codeenv}
+\cs{let}\gls{sortname}\cmd{swaptwo}
+\cs{let}\gls{sortart}\cmd{swaptwo}
+\cs{let}\gls{sortvonname}\cmd{swapthree}
+\end{codeenv}
 This doesn't perform any check to determine if the commands are
 already defined so there won't be a problem on the first run.
 
 The first two glossaries shouldn't have number lists:
-\begin{verbatim}
-\printunsrtglossary[title={People (Alphabetical)},nonumberlist]
-\printunsrtglossary[type=bybirth,target=false,nonumberlist]
-\end{verbatim}
+\begin{codeenv*}
+\cs{printunsrtglossary}\oarg{\printglossopt[People (Alphabetical)]{title},\printglossopt{nonumberlist}}
+\cs{printunsrtglossary}\oarg{\printglossopt[bybirth]{type},\printglossopt[false]{target},\printglossopt{nonumberlist}}
+\end{codeenv*}
 I'd like to use \sty{hyperref} but I have to switch off the
 hypertargets for the second glossary otherwise I'll end up with
 duplicate targets. This is done with \code{target=false}. 
@@ -18299,24 +18320,24 @@ I could also do this for the index but the cross-references in the
 aliased entries will link to the first glossary rather than the
 relevant entry in the index. The simplest way to fix this is to
 redefine \ics{glolinkprefix} to provide a different target:
-\begin{verbatim}
-\renewcommand*{\glolinkprefix}{idx:}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glolinkprefix}}\marg{idx:}
+\end{codeenv}
 These redefinitions need to be done before the index. I've decided
 to use the starred \ics{printunsrtglossary*} to localise these
 changes, although that's not needed for this document since the
 index comes right at the end:
-\begin{verbatim}
-\printunsrtglossary*
- [type=index,style=bookindex]
- {%
-   \let\sortname\swaptwo
-   \let\sortart\swaptwo
-   \let\sortvonname\swapthree
-   \renewcommand{\glsxtrgroupfield}{indexgroup}%
-   \renewcommand*{\glolinkprefix}{idx:}%
+\begin{codeenv*}
+\cs{printunsrtglossary*}
+ \oarg{\printglossopt[index]{type},\printglossopt[bookindex]{style}}
+ \marg{\comment{}
+   \cs{let}\gls!{sortname}\cmd{swaptwo}
+   \cs{let}\gls!{sortart}\cmd{swaptwo}
+   \cs{let}\gls!{sortvonname}\cmd{swapthree}
+   \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{indexgroup}\comment{}
+   \cs{renewcommand}*\marg{\cs{glolinkprefix}}\marg{idx:}\comment{}
  }
-\end{verbatim}
+\end{codeenv*}
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-people
@@ -18344,38 +18365,38 @@ finding a way of assigning each book entry a \field{parent} field that
 contains the label identifying the relevant author in \exfile{people.bib}.
 
 To recap, each author is defined in \exfile{people.bib} in the form:
-\begin{verbatim}
-@entry{dickens,
-  name={\sortname{Charles}{Dickens}},
-  text={Dickens},
-  description={English writer and social critic},
-  born={7~February 1812 AD},
-  died={9~June 1870 AD},
-  identifier={person}
+\begin{codeenv}
+\atentry{entry}\marg{dickens,
+  \field{name}=\marg{\gls{sortname}\marg{Charles}\marg{Dickens}},
+  \field{text}=\marg{Dickens},
+  \field{description}=\marg{English writer and social critic},
+  \fieldfmt{born}=\marg{7\idx{nbspchar}February 1812 AD},
+  \fieldfmt{died}=\marg{9\idx{nbspchar}June 1870 AD},
+  \fieldfmt{identifier}=\marg{person}
 }
-\end{verbatim}
+\end{codeenv}
 and each book is defined in \exfile{books.bib} in the form:
-\begin{verbatim}
-@entry{bleakhouse,
-  name={Bleak House},
-  description={novel by Charles Dickens},
-  identifier={book},
-  author={\sortmediacreator{Charles}{Dickens}},
-  year={1852}
+\begin{codeenv}
+\atentry{entry}\marg{bleakhouse,
+  \field{name}=\marg{Bleak House},
+  \field{description}=\marg{novel by Charles Dickens},
+  \fieldfmt{identifier}=\marg{book},
+  \fieldfmt{author}=\marg{\gls{sortmediacreator}\marg{Charles}\marg{Dickens}},
+  \fieldfmt{year}=\marg{1852}
 }
-\end{verbatim}
+\end{codeenv}
 There's a field here (the custom \fieldfmt{author} field) that contains
 the author's name, and this can be aliased to the \field{parent}
 field with \csopt{field-aliases}:
 \begin{codeenv}
-\csopt[author=parent]{field-aliases}
+\csopt[\fieldfmt{author}=\field{parent}]{field-aliases}
 \end{codeenv}
 but the author's label in the \exfile{people.bib}
 file is just the \idx!{lowercase} surname.
 
 Remember from \sectionref{sec:texparserlib} that the interpreter
 will be used on the \field{parent} field if the value contains
-\verb|\| or \verb|{| or \verb|}| and
+\idx{escchar} or \idx{bgroupchar} or \idx{egroupchar} and
 \csopt[true]{interpret-label-fields}.  This means that with this
 field alias and the interpreter on, \bibgls\ will attempt to
 interpret the field contents. So all that's needed is to ensure that
@@ -18391,21 +18412,21 @@ As with the \exfile{sample-people.tex} example, I need to copy
 the \field{name} field to the \field{first} field if that field is
 missing using \csopt{replicate-fields}:
 \begin{codeenv}
-\csopt[{name=\marg{first}}]{replicate-fields}
+\csopt[\field{name}=\marg{\field{first}}]{replicate-fields}
 \end{codeenv}
 and I also want to provide a semantic command to format the book
 title, so the field aliases also need to convert the custom
 \fieldfmt{identifier} field to \field{category}:
 \begin{codeenv}
-\csopt[identifier=category,author=parent]{field-aliases}
+\csopt[\fieldfmt{identifier}=\field{category},\fieldfmt{author}=\field{parent}]{field-aliases}
 \end{codeenv}
 so that the document can set the \catattr{textformat} and
 \catattr{glossnamefont} attributes:
-\begin{verbatim}
-\newcommand*{\bookfont}[1]{\emph{#1}}
-\glssetcategoryattribute{book}{textformat}{bookfont}
-\glssetcategoryattribute{book}{glossnamefont}{bookfont}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{bookfont}}[1]\marg{\cs{emph}\marg{\idx{param}1}}
+\cs{glssetcategoryattribute}\marg{book}\marg{\catattr{textformat}}\marg{bookfont}
+\cs{glssetcategoryattribute}\marg{book}\marg{\catattr{glossnamefont}}\marg{bookfont}
+\end{codeenv}
 As with \exfile{sample-media.tex}, the terminating question mark at
 the end of some of the \field{name} fields can cause an awkward
 situation if \cs{gls} is used at the end of a sentence. This can be
@@ -18416,24 +18437,24 @@ the \csopt{check-end-punctuation} option. In this example, the
 all the books, so it's sufficient just to check the \field{name}
 field:
 \begin{codeenv}
-\csopt[name]{check-end-punctuation}
+\csopt[\field{name}]{check-end-punctuation}
 \end{codeenv}
 With \sty{glossaries-extra} v1.23+ it's easy to hook into the
 \idx{postlinkhook} to check if 
-\fielddisp{fieldendpunc}{namendpunc} exists:
-\begin{verbatim}
-\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
- \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
+\fielddisp{fieldendpunc}{nameendpunc} exists:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrifcustomdiscardperiod}}[2]\marg{\comment{}
+ \cs{GlsXtrIfFieldUndef}\marg{\fielddisp{fieldendpunc}{nameendpunc}}\marg{\cs{glslabel}}\marg{\idx{param}2}\marg{\idx{param}1}\comment{}
 }
-\end{verbatim}
-This will now cause the full stops following
-\begin{verbatim}
-\gls{whydidnttheyaskevans}.
-\end{verbatim}
+\end{codeenv}
+This will now cause the full stops following:
+\begin{codeenv}
+\cs{gls}\marg{whydidnttheyaskevans}.
+\end{codeenv}
 and
-\begin{verbatim}
-\gls{doandroidsdreamofelectricsheep}.
-\end{verbatim}
+\begin{codeenv}
+\cs{gls}\marg{doandroidsdreamofelectricsheep}.
+\end{codeenv}
 to be discarded.
 
 The complete document code is listed below. The document build is:
@@ -18475,15 +18496,15 @@ automatic loading of the default style packages and
 \sty{glossary-list} packages and patch the styles. A \idx{full-stop}
 is automatically placed after the descriptions with
 \styopt{postdot}.
-\begin{verbatim}
-\usepackage[record,% using bib2gls
-nomain,% don't define main glossary
-postdot,% full stop after descriptions
-nostyles,% don't load default styles
-% load glossary-tree and glossary-list and patch styles:
-stylemods={tree,list}
-]{glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cs{usepackage}\oarg{\styopt{record},\comment{using bib2gls}
+\styopt{nomain},\comment{don't define main glossary}
+\styopt{postdot},\comment{full stop after descriptions}
+\styopt{nostyles},\comment{don't load default styles}
+\comment{load glossary-tree and glossary-list and patch styles:}
+\styopt[tree,list]{stylemods}
+}\marg{glossaries-extra}
+\end{codeenv}
 Next I need to create the glossaries for the list of authors and
 list of titles:
 \begin{codeenv}
@@ -18491,7 +18512,7 @@ list of titles:
 \cs{newglossary*}\marg{titles}\marg{Titles}
 \end{codeenv}
 The simplest way of assigning the authors to the \code{contributors}
-glossary and the titles to the \code{titles} glossary is to use
+glossary and the titles to the \code{titles} glossary is to use:
 \begin{codeenv}
 \csopt[contributors]{type}
 \end{codeenv}
@@ -18510,7 +18531,7 @@ The standard \BibTeX\ entry types need aliasing to
 \end{codeenv}
 and the \fieldfmt{title} field is aliased to \field{name}:
 \begin{codeenv}
-\csopt[title=name]{field-aliases}
+\csopt[\fieldfmt{title}=\field{name}]{field-aliases}
 \end{codeenv}
 (The other fields aren't required for the glossary lists.)
 The \field{category} is set to the original entry type:
@@ -18528,14 +18549,14 @@ are \code{contributor}.
 In order to list the titles according to category, I've use this as
 the sort field:
 \begin{codeenv}
-\csopt[category]{sort-field}
+\csopt[\field{category}]{sort-field}
 \end{codeenv}
 and setting the sort suffix to the \field{name} field sub-sorts
 the \atentry{bibtexentry} types according to the title 
 (which was aliased to the \field{name}) and the
 \atentry{contributor} types according to the author:
 \begin{codeenv}
-\csopt[name]{sort-suffix}
+\csopt[\field{name}]{sort-suffix}
 \end{codeenv}
 
 Next the groups identified by the labels \code{article} and \code{book} 
@@ -18550,9 +18571,9 @@ field. Since the entries are sorted by category, then they are naturally
 in those sub-blocks, which means that the group titles can be set by locally
 redefining \ics{glsxtrgroupfield} to \code{category}:
 \begin{codeenv}
-\cs{printunsrtglossary*}[type=titles,style=indexgroup]
+\cs{printunsrtglossary*}[\printglossopt[titles]{type},\printglossopt[indexgroup]{style}]
 \marg{\comment{}
- \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{category}\comment{}
+ \cs{renewcommand}\marg{\cs{glsxtrgroupfield}}\marg{\field{category}}\comment{}
  \cs{renewcommand}\marg{\cs{glstreenamefmt}}[1]\marg{\cs{emph}\marg{\idx{param}1}}\comment{}
  \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\comment{}
 }
@@ -18573,7 +18594,7 @@ this case the \ext{bib} file only contains \atentryfmt{article} and
 
 The list of contributors can simply be displayed with:
 \begin{codeenv}
-\cs{printunsrtglossary}[type=contributors,style=altlist]
+\cs{printunsrtglossary}[\printglossopt[contributors]{type},\printglossopt[altlist]{style}]
 \end{codeenv}
 This will only list the names as there's no description, but again
 the \idx{postdescriptionhook} can be used, in this case for the \code{contributor}
@@ -18582,10 +18603,10 @@ over the internal list provided by the \field{bibtexentry} field.
 This allows the titles to be listed as well:
 \begin{codeenv}
 \cs{newcommand}\marg{\postdeschook{contributor}}\marg{\comment{}
-  \ics{glsxtrifhasfield}\marg{bibtexentry}\marg{\cs{glscurrententrylabel}}\comment{}
+  \ics{glsxtrifhasfield}\marg{\field{bibtexentry}}\marg{\cs{glscurrententrylabel}}\comment{}
   \marg{\comment{}
     \cs{glsxtrfieldforlistloop}
-    \marg{\cs{glscurrententrylabel}}\marg{bibtexentry}\comment{}
+    \marg{\cs{glscurrententrylabel}}\marg{\field{bibtexentry}}\comment{}
     \marg{\csfmt{contributorhandler}}\comment{}
   }\comment{}
   \marg{\ics{par} No titles.}\comment{}
@@ -18628,13 +18649,13 @@ I'm using the \glostyle{mcolalttree} style for this document,
 which means that the \sty{glossary-mcols} package is required and
 the styles need patching, which can be done with 
 the \styopt{stylemods} package option:
-\begin{verbatim}
-\usepackage[record,% using bib2gls
- nostyles,% don't load default styles
- postdot,% append a dot after descriptions
- stylemods={mcols},% load glossary-mcols.sty and patch
- style=mcolalttree]{glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cs{usepackage}\oarg{\styopt{record},\comment{using bib2gls}
+ \styopt{nostyles},\comment{don't load default styles}
+ \styopt{postdot},\comment{append a dot after descriptions}
+ \styopt[mcols]{stylemods},\comment{load glossary-mcols.sty and patch}
+ \styopt[mcolalttree]{style}}\marg{glossaries-extra}
+\end{codeenv}
 I'm not using a group-based style which suggests that I don't need the
 \longarg{group} switch. However, although I don't want group titles,
 I still want a slight gap between logical groups, which means that I
@@ -18656,21 +18677,21 @@ I've used \csopt{field-aliases} to convert the custom
 \fieldfmt{identifier} field to \field{category}, which means I can
 also sort by that field:
 \begin{codeenv}
-\csopt[category]{sort-field},
-\csopt[identifier=category]{field-aliases}
+\csopt[\field{category}]{sort-field},
+\csopt[\fieldfmt{identifier}=\field{category}]{field-aliases}
 \end{codeenv}
 Since this will cause identical sort values, I need to provide a
 fallback. Here I've decided to fallback on the \field{description}
 field:
 \begin{codeenv}
-\csopt[description]{identical-sort-action}
+\csopt[\field{description}]{identical-sort-action}
 \end{codeenv}
-This means that entries will be order by \field{category} and 
+This means that entries will be ordered by \field{category} and 
 then \field{description}, which naturally creates blocks of symbol
 types in the glossary.
 
 Remember that I want a small vertical gap between each logical
-block. These needs the \field{group} field which, with the default
+block. These need the \field{group} field which, with the default
 locale sort, is obtained from the first letter of the sort value.
 In this case the sort value is obtained from the \field{category}
 field, and as each category happens to start with a different
@@ -18680,7 +18701,7 @@ with the same letter as an existing category, it's better to provide
 a more future-proof method, so I've set the \field{group} field to 
 fetch its value from the \field{category} field:
 \begin{codeenv}
-\csopt[category=group]{replicate-fields}
+\csopt[\field{category}=\field{group}]{replicate-fields}
 \end{codeenv}
 (Since the \csopt{field-aliases} option is always performed before
 \csopt{replicate-fields}, the \field{category} field will already
@@ -18723,7 +18744,7 @@ the \gls!{sortart} command:
 \end{codeenv}
 There's also an extra custom field to alias:
 \begin{codeenv}
-\csopt[identifier=category,format=user1]{field-aliases}
+\csopt[\fieldfmt{identifier}=\field{category},\fieldfmt{format}=\field{user1}]{field-aliases}
 \end{codeenv}
 I've aliased \fieldfmt{format} to \field{user1} since \gls!{glsxtrfmt}
 defaults to that field. If I decided to use a different field I also
@@ -18735,29 +18756,29 @@ indexed, so I've omitted the \csopt{selection} option I used in the
 I still don't want any number lists so I still have
 \csopt[false]{save-locations}.
 
-I want \gls!{glsxtrfmt} to index (which it doesn't by default) so
+I want \gls!{glsxtrfmt} to index the term (which it doesn't by default) so
 that means I need to redefine \ics{GlsXtrFmtDefaultOptions} 
 to prevent it from using \code{noindex}:
-\begin{verbatim}
-\renewcommand{\GlsXtrFmtDefaultOptions}{}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}\marg{\cs{GlsXtrFmtDefaultOptions}}\marg{}
+\end{codeenv}
 I've provided some convenient wrapper commands that use
 \gls!{glsxtrfmt*} or the non-linking \gls!{glsxtrentryfmt} that
 are in the form:
-\begin{verbatim}
-\newcommand{\set}[2][]{\glsxtrfmt*[#1]{set}{#2}}
-\newcommand{\nlset}[1]{\glsxtrentryfmt{set}{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{set}}[2][]\marg{\gls{glsxtrfmt*}\oarg{\idx{param}1}\marg{set}\marg{\idx{param}2}}
+\cs{newcommand}\marg{\cmd{nlset}}[1]\marg{\gls{glsxtrentryfmt}\marg{set}\marg{\idx{param}1}}
+\end{codeenv}
 The use of the starred form allows:
-\begin{verbatim}
-\[\set{A} = \gls{bigcup}[_{i=1}^n] \set{B}[_i] \]
-\end{verbatim}
+\begin{codeenv}
+\cmd{[}\cmd{set}\marg{A} = \cs{gls}\marg{bigcup}[\idx{sbchar}\marg{i=1}\idx{spchar}n] \cmd{set}\marg{B}[\idx{sbchar}i] \cmd{]}
+\end{codeenv}
 which produces:
 \[ \mathcal{A} = \bigcup_{i=1}^n \mathcal{B}_i \]
 Note the difference if the optional arguments aren't used:
-\begin{verbatim}
-\[\set{A} = \gls{bigcup}_{i=1}^n \set{B}_i \]
-\end{verbatim}
+\begin{codeenv}
+\cmd{[}\cmd{set}\marg{A} = \cs{gls}\marg{bigcup}\idx{sbchar}\marg{i=1}\idx{spchar}n \cmd{set}\marg{B}\idx{sbchar}i \cmd{]}
+\end{codeenv}
 This produces:
 \[ \mathcal{A} = \bigcup{}_{i=1}^n \mathcal{B}{}_i \]
 
@@ -18799,15 +18820,19 @@ the first package is loaded and before the second.
 Since I want the definitions provide by \sty{ifsym} I have to first
 load \sty{marvosym}, then undefine the conflicting commands and then
 load \sty{ifsym}:
-\begin{verbatim}
-\usepackage{etoolbox}
-\usepackage{marvosym}
-\undef\Sun
-\undef\Lightning
-\usepackage[weather]{ifsym}
-\end{verbatim}
+\begin{codeenv}
+\cs{usepackage}\marg{etoolbox}
+\cs{usepackage}\marg{marvosym}
+\cs{undef}\cmd{Sun}
+\cs{undef}\cmd{Lightning}
+\cs{usepackage}\oarg{\styoptfmt{weather}}\marg{ifsym}
+\end{codeenv}
 The \sty{etoolbox} package is also loaded as it provides
-\ics{undef}.
+\ics{undef}. (An alternative is to modify the
+\exfile{miscsymbols.bib} file so that it uses \sty{ifsym}'s more
+generic \cs{textweathersymbol} command and omit the \styoptfmt{weather}
+option when loading the package, but the method used here
+demonstrates how to deal with such conflicts.)
 
 The custom entry type \atentryfmt{icon} must be aliased for the
 entries to be recognised:
@@ -18823,18 +18848,18 @@ are obtained from the \field{category}, which again I obtain from
 the custom \fieldfmt{identifier} field using:
 \begin{codeenv}
 \csopt[
- identifier=category,
- icon=name,
- icondescription=description]{field-aliases},
-\csopt[category=group]{replicate-fields}
+ \fieldfmt{identifier}=\field{category},
+ \fieldfmt{icon}=\field{name},
+ \fieldfmt{icondescription}=\field{description}]{field-aliases},
+\csopt[\field{category}=\field{group}]{replicate-fields}
 \end{codeenv}
 The \field{group} field is just a label and an appropriate title needs to be
 supplied for each group label:
-\begin{verbatim}
-\glsxtrsetgrouptitle{information}{Information}
-\glsxtrsetgrouptitle{mediacontrol}{Media Controls}
-\glsxtrsetgrouptitle{weather}{Weather Symbols}
-\end{verbatim}
+\begin{codeenv}
+\cs{glsxtrsetgrouptitle}\marg{information}\marg{Information}
+\cs{glsxtrsetgrouptitle}\marg{mediacontrol}\marg{Media Controls}
+\cs{glsxtrsetgrouptitle}\marg{weather}\marg{Weather Symbols}
+\end{codeenv}
 This also requires sorting first by \field{category} and then
 fallback on another field. The most appropriate here is the
 \field{description} field, but instead of using
@@ -18842,8 +18867,8 @@ fallback on another field. The most appropriate here is the
 which works better with the default locale sort when the fallback
 field consists of words or phrases.
 \begin{codeenv}
-\csopt[category]{sort-field},
-\csopt[description]{sort-suffix},
+\csopt[\field{category}]{sort-field},
+\csopt[\field{description}]{sort-suffix},
 \csopt[|]{sort-suffix-marker}
 \end{codeenv}
 Since I'm using one of the \glostyle{alttree} styles, I need to set
@@ -18882,20 +18907,24 @@ includes abbreviations, any commands that must be used before
 abbreviations are defined need to go before
 \gls!{GlsXtrLoadResources}. This includes the abbreviation style, 
 which I've set to \abbrstyle{long-short-desc}:
-\begin{verbatim}
-\setabbreviationstyle[markuplanguage]{long-short-desc}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\oarg{markuplanguage}\marg{\abbrstyle{long-short-desc}}
+\end{codeenv}
 This style sets the \field{name} field using
 \ics{glsxtrlongshortdescname}, which defaults to the long form
-followed by the short form in parenthesis. I decided to switch this
+followed by the short form in parentheses. I decided to switch this
 round so that the short form is shown first, which conveniently
 matches the default \csopt{abbreviation-sort-fallback}.
-\begin{verbatim}
-\renewcommand*{\glsxtrlongshortdescname}{%
-  \protect\glsabbrvfont{\the\glsshorttok}\space
-  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrlongshortdescname}}\marg{\comment{}
+  \cs{protect}\ics{glsabbrvfont}\marg{\ics{the}\ics{glsshorttok}}\cs{space}
+  \ics{glsxtrparen}\marg{\ics{glslongfont}\marg{\cs{the}\ics{glslongtok}}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
+(The long form is still shown before the short form on the first use
+of \cs{gls} in the document. The switch in the above code only
+affects how the term is displayed in the glossary.)
+
 This redefinition must be done before the abbreviations are defined
 as it's expanded when the \field{name} field is set. (Note the need
 to protect commands that shouldn't be expanded.) If I decide not to change
@@ -18907,7 +18936,7 @@ that marks up the letters in the \field{long} field used to obtain
 the abbreviation. As with the abbreviation style, this must be
 done before the abbreviations are defined:
 \begin{codeenv}
-\cs{GlsXtrEnableInitialTagging}\marg{markuplanguage}\marg{\csfmt{abbrvtag}}
+\cs{GlsXtrEnableInitialTagging}\marg{markuplanguage}\marg{\cmd{abbrvtag}}
 \end{codeenv}
 If you accidentally place it after \gls{GlsXtrLoadResources}, you'll
 encounter an error on the second \LaTeX\ run (but not the first).
@@ -18919,15 +18948,15 @@ the \atentry{preamble} definition, which is now in the resource file.
 The tagging format is governed by \ics{glsxtrtagfont} which
 underlines its argument by default. I've redefined it to also
 convert the letter to \idx{uppercase}:
-\begin{verbatim}
-\renewcommand*{\glsxtrtagfont}[1]{\underline{\MakeTextUppercase{#1}}}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrtagfont}}[1]\marg{\ics{underline}\marg{\cs{MakeTextUppercase}\marg{\idx{param}1}}}
+\end{codeenv}
 Note that in the \code{mathml} case, the first tag consists of more
 than one letter:
-\begin{verbatim}
-long={\abbrvtag{m\NoCaseChange{ath}}ematical }#markuplang
-\end{verbatim}
-Here \ics{NoCaseChange} is used to prevent \ics{MakeTextUppercase}
+\begin{codeenv}
+\field{long}=\marg{\cmd{abbrvtag}\marg{m\cs{NoCaseChange}\marg{ath}}ematical }\idx{stringconcat}markuplang
+\end{codeenv}
+Here \ics{NoCaseChange} prevents \ics{MakeTextUppercase}
 from applying the case change.
 
 The default \csopt{selection} criteria includes entries that have
@@ -18936,24 +18965,24 @@ been indexed and any cross-references. Some of the
 up and the referenced entry is included in the dependency list.
 However, I don't want any indexing
 performed by commands occurring in the glossary. This can be dealt
-with in one of two ways: either switch the format to \code{glsignore}
+with in one of two ways: either switch the format to \encap{glsignore}
 or suppress the indexing by changing the default options with
 \ics{GlsXtrSetDefaultGlsOpts}. In this case I decided to turn the
 records into ignored records:
 \begin{codeenv}
-\ics{GlsXtrSetDefaultNumberFormat}\marg{glsignore}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
 \end{codeenv}
-This means that some of the entries won't have location lists, so I've provided
-a \idx{postdescriptionhook} that inserts a \idx{full-stop} after the
+This means that some of the entries won't have location lists, so
+I've defined a \idx{postdescriptionhook} that inserts a \idx{full-stop} after the
 \field{description} if there's no location otherwise it inserts a
 comma:
-\begin{verbatim}
-\newcommand{\glsxtrpostdescmarkuplanguage}{%
-  \glsxtrifhasfield{location}{\glscurrententrylabel}%
-  {,}%
-  {.}%
+\begin{codeenv}
+\cs{newcommand}\marg{\postdeschook{markuplanguage}}\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{\field{location}}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{,}\comment{}
+  \marg{.}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 I've used \csopt{loc-suffix} to append a \idx{full-stop} after the
 location lists. This doesn't affect the entries that haven't been
 indexed.
@@ -18963,14 +18992,24 @@ I decided to convert the first letter of the \field{name} field to
 abbreviations based on the style, I've decided to implement this
 through the \catattr{glossname} attribute rather than using
 \csopt{name-case-change}:
-\begin{verbatim}
-\glssetcategoryattribute{markuplanguage}{glossname}{firstuc}
-\end{verbatim}
+\begin{codeenv}
+\cs{glssetcategoryattribute}\marg{markuplanguage}\marg{\catattr{glossname}}\marg{firstuc}
+\end{codeenv}
 If this line causes an error when the glossary is displayed that goes 
 away if it's commented out, make sure you have at least version 2.06
 of \sty{mfirstuc}. For most of the entries, this doesn't make a
 difference as they already start with a capital. It's only the 
 \code{markdown} entry that's actually affected.
+
+The description case change is dealt with by \bibgls\ instead:
+\begin{codeenv}
+\csopt[firstuc]{description-case-change}
+\end{codeenv}
+This works better than the \catattr{glossdesc} attribute as \bibgls\ can
+convert commands like \ics{glstext} into \ics{Glstext} which
+\ics{makefirstuc} can't do. (Although in this particular example,
+there's no difference as both instances of \cs{glstext} already
+produce \idx{uppercase} text.)
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -19004,19 +19043,19 @@ If this field is present, the language is given by the first element
 of the custom \fieldfmt{language} field.
 
 In this case, I'm providing keys for the custom
-\fieldfmt{language} and \fieldfmt{translation} fields, and for a bit
+\fieldfmt{language} and \fieldfmt{translation} fields, and, for a bit
 of variety from the other examples, I'm ignoring the custom
 \fieldfmt{identifier} field. The custom keys are provided with
 \ics{glsaddstoragekey}:
-\begin{verbatim}
-\glsaddstoragekey{language}{}{\glsentrylanguage}
-\glsaddstoragekey{translation}{}{\glsentrytranslation}
-\end{verbatim}
+\begin{codeenv}
+\cs{glsaddstoragekey}\marg{language}\marg{}\marg{\cmd{glsentrylanguage}}
+\cs{glsaddstoragekey}\marg{translation}\marg{}\marg{\cmd{glsentrytranslation}}
+\end{codeenv}
 The \ext{bib} file includes abbreviations. Remember that the
 abbreviation style must be set before the resource file is loaded:
-\begin{verbatim}
-\setabbreviationstyle[tug]{long-short-user}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\oarg{tug}\marg{\abbrstyle{long-short-user}}
+\end{codeenv}
 For this example, I'm explicitly setting the \field{category} field
 to \code{tug}:
 \begin{codeenv}
@@ -19029,25 +19068,25 @@ subsequent use if the \field{short} field ends with a \idx{full-stop}.
 This means I need to check for end-of-sentence punctuation
 for the \field{short} field. It's also a good idea to do this for
 the \field{name} field for the non-abbreviations.
-\begin{verbatim}
-check-end-punctuation={name,short}
-\end{verbatim}
+\begin{codeenv}
+\csopt[\field{name},\field{short}]{check-end-punctuation}
+\end{codeenv}
 It's now possible to discard a \idx{full-stop} that follows
 \ics{gls}:
-\begin{verbatim}
-\renewcommand*{\glsxtrifcustomdiscardperiod}[2]{%
- \ifglshasshort{\glslabel}%
- {%
-   \glsxtrifwasfirstuse{}%
-   {%
-     \GlsXtrIfFieldUndef{shortendpunc}{\glslabel}{#2}{#1}%
-   }%
- }%
- {%
-   \GlsXtrIfFieldUndef{nameendpunc}{\glslabel}{#2}{#1}%
- }%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrifcustomdiscardperiod}}[2]\marg{\comment{}
+ \ics{ifglshasshort}\marg{\cs{glslabel}}\comment{}
+ \marg{\comment{}
+   \cs{glsxtrifwasfirstuse}\marg{}\comment{}
+   \marg{\comment{}
+     \cs{GlsXtrIfFieldUndef}\marg{\fielddisp{fieldendpunc}{shortendpunc}}\marg{\cs{glslabel}}\marg{\idx{param}2}\marg{\idx{param}1}\comment{}
+   }\comment{}
+ }\comment{}
+ \marg{\comment{}
+   \cs{GlsXtrIfFieldUndef}\marg{\fielddisp{fieldendpunc}{nameendpunc}}\marg{\cs{glslabel}}\marg{\idx{param}2}\marg{\idx{param}1}\comment{}
+ }\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This first tests if the entry that's just been referenced has a
 \field{short} field. If it has, then the next test is to check if
 that was the first use for that entry. If it was, nothing is done.
@@ -19067,10 +19106,10 @@ If you don't have it installed, you'll need to change it.
 \end{verbatim}
 Since it's a multilingual document I also need \sty{polyglossia}
 with the main language set to \code{english}:
-\begin{verbatim}
-\usepackage{polyglossia}
-\setmainlanguage[variant=uk]{english}
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}\marg{polyglossia}
+\ics{setmainlanguage}\oarg{variant=uk}\marg{english}
+\end{codeenv}
 Now comes the difficult bit. The document needs to determine what
 other languages need to be loaded. The \sty{tracklang} package
 provides a convenient interface when dealing with language tags.
@@ -19079,26 +19118,26 @@ it here explicitly as a reminder:
 \begin{verbatim}
 \usepackage{tracklang}
 \end{verbatim}
-Once the resource file has been loaded, I need to iterate over all
-the defined entries and check if the \fieldfmt{translation} field
-has been set. If it has, then the first language tag in the
-\fieldfmt{language} field will supply the language, but this needs
-to be converted from the \idx{IETF} language tag to a language name
-recognised by \sty{polyglossia}.
+Once the \hyperref[sec:resourcesets]{resource file} has been loaded, I need to
+iterate over all the defined entries and check if the \fieldfmt{translation}
+field has been set. If it has, then the first language tag in the
+\fieldfmt{language} field will supply the language, but this needs to be
+converted from the \idx{IETF} language tag to a language name recognised by
+\sty{polyglossia}.
 
 Iterating over all entries can be done with \ics{forglsentries}
 but remember that no entries will be defined before \bibgls\ has
 been run, so this does nothing on the first \LaTeX\ run.
-\begin{verbatim}
-\forglsentries{\thislabel}{%
-  \glsxtrifhasfield{translation}{\thislabel}%
-  {%
-    % requires glossaries-extra v1.24
-    \glsxtrforcsvfield{\thislabel}{language}{\addfirstlang}%
-  }%
-  {}%
+\begin{codeenv}
+\cs{forglsentries}\marg{\cmd{thislabel}}\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{translation}\marg{\cmd{thislabel}}\comment{}
+  \marg{\comment{}
+    \comment{requires glossaries-extra v1.24}
+    \cs{glsxtrforcsvfield}\marg{\cmd{thislabel}}\marg{language}\marg{\cmd{addfirstlang}}\comment{}
+  }\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Within the outer (\cs{forglsentries}) loop, there's a check
 for the \fieldfmt{translation} field using \ics{glsxtrifhasfield}.
 If it's present, then the first element of the \fieldfmt{language}
@@ -19115,7 +19154,7 @@ adds the given language tag as a tracked language using
 can then be converted to the root language label using
 \ics{TrackedLanguageFromDialect}. If this language is supported
 by \sty{polyglossia}, then there should be a file called
-\metafilefmt{gloss}{language}{.ldf}.
+\metafilefmt{gloss-}{language}{.ldf}.
 
 Some of the entries use the same language, so it's necessary to
 check if the language has already been defined before loading it.
@@ -19132,63 +19171,64 @@ already in the list before adding it. Since this part of the code is
 scoped, the global \ics{listxadd} is used to add the language label
 to the list.
 
-Next the \field{useri} field is set to \code{text}\meta{language}
+Next the \field{useri} field is set to 
+\encapdisp{textlanguage}{text\meta{language}}
 which is the name of the control sequence used with
-\sty{polyglossia} to switch languages. This means that
+\sty{polyglossia} to switch language for a short block of text. This means that
 \gls{glsxtrentryfmt}\margm{text} can be used to format \meta{text}
 in the relevant language. Finally, \ics{glsxtrendfor} is used to
 break out of the loop.
-\begin{verbatim}
-\newcommand*{\addfirstlang}[1]{%
-  \TrackLocale{#1}%
-  \edef\thislanguage{%
-    \TrackedLanguageFromDialect\TrackLangLastTrackedDialect}%
-  \IfFileExists{gloss-\thislanguage.ldf}%
-  {%
-    \xifinlist{\thislanguage}{\langlist}{}%
-    {\listxadd{\langlist}{\thislanguage}}%
-    \xGlsXtrSetField{\thislabel}{useri}{text\thislanguage}%
-    \glsxtrendfor
-  }%
-  {}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{addfirstlang}}[1]\marg{\comment{}
+  \cs{TrackLocale}\marg{\idx{param}1}\comment{}
+  \ics{edef}\cmd{thislanguage}\marg{\comment{}
+    \cs{TrackedLanguageFromDialect}\cs{TrackLangLastTrackedDialect}}\comment{}
+  \ics{IfFileExists}\marg{gloss-\cmd{thislanguage}.ldf}\comment{}
+  \marg{\comment{}
+    \ics{xifinlist}\marg{\cmd{thislanguage}}\marg{\cmd{langlist}}\marg{}\comment{}
+    \marg{\ics{listxadd}\marg{\cmd{langlist}}\marg{\cmd{thislanguage}}}\comment{}
+    \ics{xGlsXtrSetField}\marg{\cmd{thislabel}}\marg{\field{useri}}\marg{\encapdisp{textlanguage}{text\cmd{thislanguage}}}\comment{}
+    \ics{glsxtrendfor}
+  }\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Once the \ics{forglsentries} loop has found the appropriate
-languages, it's now necessary to iterator over the internal list
+languages, it's now necessary to iterate over the internal list
 \csfmt{langlist} and set the language:
-\begin{verbatim}
-\forlistloop{\setotherlanguage}{\langlist}
-\end{verbatim}
+\begin{codeenv}
+\ics{forlistloop}\marg{\ics{setotherlanguage}}\marg{\cmd{langlist}}
+\end{codeenv}
 The \abbrstyle{long-short-user} style now needs to be adjusted
 to ensure that it picks up the appropriate language change.
 By default this style checks the \field{useri} field, so this needs
 to be changed to \fieldfmt{translation} by redefining
 \ics{glsxtruserfield}:
-\begin{verbatim}
-\renewcommand*{\glsxtruserfield}{translation}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtruserfield}}\marg{translation}
+\end{codeenv}
 The command that governs the format of the parenthetical material
 (\ics{glsxtruserparen}) also needs adjusting. I've changed the
 space before the parenthesis to \ics{cs.space} because some of the
 long fields end with a \idx{full-stop} and this corrects the
 spacing. The \fieldfmt{translation} field is in English, 
-so this needs to be encapsulated with \csfmt{textenglish}
+so this needs to be encapsulated with \icsdisp{textlanguage}{textenglish}
 in case the surrounding text is in a different language.
-\begin{verbatim}
-\renewcommand*{\glsxtruserparen}[2]{%
-  \
-  \glsxtrparen{#1%
-  \ifglshasfield{\glsxtruserfield}{#2}{,
-   \textenglish{\glscurrentfieldvalue}}{}}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtruserparen}}[2]\marg{\comment{}
+  \cs{cs.space}
+  \cs{glsxtrparen}\marg{\idx{param}1\comment{}
+  \cs{ifglshasfield}\marg{\cs{glsxtruserfield}}\marg{\idx{param}2}\marg{,
+   \csdisp{textlanguage}{textenglish}\marg{\cs{glscurrentfieldvalue}}}\marg{}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Next I've defined a convenient command for use in the \catattr{textformat}
 attributes for the custom \code{tug} category:
-\begin{verbatim}
-\newcommand*{\tugtextformat}[1]{%
-  \glsxtrentryfmt{\glslabel}{#1}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{tugtextformat}}[1]\marg{\comment{}
+  \cs{glsxtrentryfmt}\marg{\cs{glslabel}}\marg{\idx{param}1}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 This uses \gls{glsxtrentryfmt} to encapsulate the given text
 in the appropriate language command (if provided). When this is set
 as the \catattr{textformat} attribute, it will be used instead of
@@ -19198,47 +19238,47 @@ referenced with \cs{glslabel}.
 There's a similar command for use in the \catattr{glossnamefont}
 attribute. This is used in the glossary, so the label is referenced
 with \cs{glscurrententrylabel}:
-\begin{verbatim}
-\newcommand*{\tugnameformat}[1]{%
-  \glsxtrentryfmt{\glscurrententrylabel}{#1}%
+\begin{codeenv}
+\cs{newcommand}*\marg{\cmd{tugnameformat}}[1]\marg{\comment{}
+  \cs{glsxtrentryfmt}\marg{\cs{glscurrententrylabel}}\marg{\idx{param}1}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 The attributes can now be set to the relevant control sequence name:
-\begin{verbatim}
-\glssetcategoryattribute{tug}{textformat}{tugtextformat}
-\glssetcategoryattribute{tug}{glossnamefont}{tugnameformat}
-\end{verbatim}
+\begin{codeenv}
+\cs{glssetcategoryattribute}\marg{tug}\marg{\catattr{textformat}}\marg{tugtextformat}
+\cs{glssetcategoryattribute}\marg{tug}\marg{\catattr{glossnamefont}}\marg{tugnameformat}
+\end{codeenv}
 
-This document uses the \glostyle{bookindex} style. This is set in
+The document uses the \glostyle{bookindex} style, which is set in
 the package options:
-\begin{verbatim}
-\usepackage[record,
- nostyles,
- stylemods={bookindex},
- style={bookindex}
-]{glossaries-extra}
-\end{verbatim}
-This style ignores the \field{description} field, so I've provided
-a \idx{postnamehook} to append it in parentheses (with the
+\begin{codeenv}
+\cmd{usepackage}\oarg{\styopt{record},
+ \styopt{nostyles},
+ \styopt[bookindex]{stylemods},
+ \styopt[bookindex]{style}
+}\marg{glossaries-extra}
+\end{codeenv}
+The \glostyle{bookindex} style ignores the \field{description} field, so I've 
+provided a \idx{postnamehook} to append it in parentheses (with the
 translation, if provided):
-\begin{verbatim}
-\newcommand{\glsxtrpostnametug}{%
-  \ifglshasdesc{\glscurrententrylabel}%
-  {\ (\glossentrydesc{\glscurrententrylabel}%
-     \glsxtrifhasfield{translation}{\glscurrententrylabel}%
-     {, \textenglish{\glscurrentfieldvalue}}%
-     {}%
-  )}%
-  {%
-   \glsxtrifhasfield{translation}{\glscurrententrylabel}%
-   {\ (\textenglish{\glscurrentfieldvalue})}%
-   {}%
-  }%
+\begin{codeenv}
+\cs{newcommand}\marg{\postnamehook{tug}}\marg{\comment{}
+  \ics{ifglshasdesc}\marg{\cs{glscurrententrylabel}}\comment{}
+  \marg{\cs{cs.space}(\cs{glossentrydesc}\marg{\cs{glscurrententrylabel}}\comment{}
+     \cs{glsxtrifhasfield}\marg{translation}\marg{\cs{glscurrententrylabel}}\comment{}
+     \marg{, \csdisp{textlanguage}{textenglish}\marg{\cs{glscurrentfieldvalue}}}\comment{}
+     \marg{}\comment{}
+  )}\comment{}
+  \marg{\comment{}
+   \cs{glsxtrifhasfield}\marg{translation}\marg{\cs{glscurrententrylabel}}\comment{}
+   \marg{\cs{cs.space}(\csdisp{textlanguage}{textenglish}\marg{\cs{glscurrentfieldvalue}})}\comment{}
+   \marg{}\comment{}
+  }\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Remember that this hook is included within the \field{name} font
 (provided by the \catattr{glossnamefont} attribute in this case)
-so \csfmt{textenglish} is again used to switch the language to
+so \csdisp{textlanguage}{textenglish} is again used to switch the language to
 English for the translation.
 
 The complete document code is listed below. The document build is:
@@ -19406,7 +19446,7 @@ languages, vegetables, minerals, animals, chemical formula, base
 units and derived units) and also an
 index listing all referenced entries with number lists as well as
 aliased entries that haven't explicitly been used but the
-cross-reference term as been indexed. This requires
+cross-reference term as been indexed. This requires:
 \begin{codeenv}
 \csopt[recorded and deps and see]{selection}
 \end{codeenv}
@@ -19424,66 +19464,66 @@ be in an unnumbered chapter, which is the default for book-like
 styles, but I want the other glossaries in unnumbered sections so
 I've used the \styopt{section} option. I just need to remember to
 switch this before displaying the index:
-\begin{verbatim}
-\usepackage[record,% use bib2gls
- section,% use \section* for glossary headings
- postdot,% insert dot after descriptions in glossaries
- nomain,% don't create 'main' glossary
- index,% create 'index' glossary
- nostyles,% don't load default styles
-% load and patch required style packages:
- stylemods={list,mcols,tree,bookindex}
-]{glossaries-extra}
-\end{verbatim}
+\begin{codeenv}
+\cmd{usepackage}\oarg{\styopt{record},\comment{use bib2gls}
+ \styopt{section},\comment{use \ics{section*} for glossary headings}
+ \styopt{postdot},\comment{insert dot after descriptions in glossaries}
+ \styopt{nomain},\comment{don't create 'main' glossary}
+ \styopt{index},\comment{create 'index' glossary}
+ \styopt{nostyles},\comment{don't load default styles}
+\comment{load and patch required style packages:}
+ \styopt[list,mcols,tree,bookindex]{stylemods}
+}\marg{glossaries-extra}
+\end{codeenv}
 The remaining glossaries need defining:
-\begin{verbatim}
-\newglossary*{bacteria}{Bacteria}
-\newglossary*{markuplanguage}{Markup Languages}
-\newglossary*{vegetable}{Vegetables}
-\newglossary*{mineral}{Minerals}
-\newglossary*{animal}{Animals}
-\newglossary*{chemical}{Chemical Formula}
-\newglossary*{baseunit}{SI Units}
-\newglossary*{derivedunit}{Derived Units}
-\end{verbatim}
+\begin{codeenv}
+\cs{newglossary*}\marg{bacteria}\marg{Bacteria}
+\cs{newglossary*}\marg{markuplanguage}\marg{Markup Languages}
+\cs{newglossary*}\marg{vegetable}\marg{Vegetables}
+\cs{newglossary*}\marg{mineral}\marg{Minerals}
+\cs{newglossary*}\marg{animal}\marg{Animals}
+\cs{newglossary*}\marg{chemical}\marg{Chemical Formula}
+\cs{newglossary*}\marg{baseunit}\marg{SI Units}
+\cs{newglossary*}\marg{derivedunit}\marg{Derived Units}
+\end{codeenv}
 As with \exfile{sample-bacteria.tex} and \exfile{sample-markuplanguages.tex}
 I need to set the abbreviation styles before the abbreviations are
 defined:
-\begin{verbatim}
-\setabbreviationstyle[bacteria]{long-only-short-only}
-\setabbreviationstyle[markuplanguage]{long-short-desc}
-\end{verbatim}
+\begin{codeenv}
+\cs{setabbreviationstyle}\oarg{bacteria}\marg{\abbrstyle{long-only-short-only}}
+\cs{setabbreviationstyle}\oarg{markuplanguage}\marg{\abbrstyle{long-short-desc}}
+\end{codeenv}
 Unlike the \exfile{sample-markuplanguages.tex} example, I'm not interested
 in tagging the initials in this case, but I still want to change the
 way the \field{name} field is set with the
 \abbrstyle{long-short-desc} abbreviation style:
-\begin{verbatim}
-\renewcommand*{\glsxtrlongshortdescname}{%
-  \protect\protect\glsabbrvfont{\the\glsshorttok}\space
-  \glsxtrparen{\glslongfont{\the\glslongtok}}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrlongshortdescname}}\marg{\comment{}
+  \cs{protect}\cs{glsabbrvfont}\marg{\cs{the}\cs{glsshorttok}}\cs{space}
+  \cs{glsxtrparen}\marg{\cs{glslongfont}\marg{\cs{the}\cs{glslongtok}}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Remember that this also needs to be set before the abbreviations are
 defined. The \catattr{textformat} and \catattr{glossnamefont}
 attributes may be set after definition:
-\begin{verbatim}
-\newcommand{\bacteriafont}[1]{\emph{#1}}
-\glssetcategoryattribute{bacteria}{textformat}{bacteriafont}
-\glssetcategoryattribute{bacteria}{glossnamefont}{bacteriafont}
-\end{verbatim}
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{bacteriafont}}[1]\marg{\cs{emph}\marg{\idx{param}1}}
+\cs{glssetcategoryattribute}\marg{bacteria}\marg{\catattr{textformat}}\marg{bacteriafont}
+\cs{glssetcategoryattribute}\marg{bacteria}\marg{\catattr{glossnamefont}}\marg{bacteriafont}
+\end{codeenv}
 The description font also needs to be set since this will contain
 the long form:
-\begin{verbatim}
-\glssetcategoryattribute{bacteria}{glossdescfont}{bacteriafont}
-\end{verbatim}
+\begin{codeenv}
+\cs{glssetcategoryattribute}\marg{bacteria}\marg{\catattr{glossdescfont}}\marg{bacteriafont}
+\end{codeenv}
 
 The \code{markuplanguage} glossary contains descriptions and some
 long names, so it's better suited to the \glostyle{altlist} style,
 in which case the descriptions would look better if they started
 with a capital letter:
-\begin{verbatim}
-\glssetcategoryattribute{markuplanguage}{glossdesc}{firstuc}
-\end{verbatim}
+\begin{codeenv}
+\cs{glssetcategoryattribute}\marg{markuplanguage}\marg{\catattr{glossdesc}}\marg{firstuc}
+\end{codeenv}
 Remember that the \glostyle{altlist} style uses the
 \env{description} environment, which is governed by the document
 class (and may be modified by list-related packages). In this case,
@@ -19522,14 +19562,14 @@ entries are displayed using a glossary style that shows the
 \field{symbol} field. Another field (such as \field{user1}) could be
 used instead or \gls{bibglsnewdualindexabbreviation} could be
 defined before \gls{GlsXtrLoadResources}:
-\begin{verbatim}
-\newcommand{\bibglsnewdualindexabbreviation}[7]{%
- \longnewglossaryentry*{#1}{%
-  name={\protect\bibglsuselongfont{#4}{\glscategory{#2}}},%
-  symbol={\protect\bibglsuseabbrvfont{#5}{\glscategory{#2}}},%
-  category={index},#3}{}%
+\begin{codeenv}
+\cs{newcommand}\marg{\gls{bibglsnewdualindexabbreviation}}[7]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\comment{}
+  \field{name}=\marg{\cs{protect}\gls{bibglsuselongfont}\marg{\idx{param}4}\marg{\cs{glscategory}\marg{\idx{param}2}}},\comment{}
+  \field{symbol}=\marg{\cs{protect}\gls{bibglsuseabbrvfont}\marg{\idx{param}5}\marg{\cs{glscategory}\marg{\idx{param}2}}},\comment{}
+  \field{category}=\marg{index},\idx{param}3}\marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 However, this will affect all \atentry{dualindexabbreviation} entry
 types, but it's not necessary for the bacteria abbreviations.
 Instead it's simpler to just keep a record of the dual label so that
@@ -19555,12 +19595,12 @@ I also need to alias the custom fields (especially for those in the
 \exfile{derivedunits.bib} files):
 \begin{codeenv}
 \csopt[
-  identifier=category,
-  formula=symbol,
-  chemicalname=name,
-  unitname=name,
-  unitsymbol=symbol,
-  measurement=description
+  \fieldfmt{identifier}=\field{category},
+  \fieldfmt{formula}=\field{symbol},
+  \fieldfmt{chemicalname}=\field{name},
+  \fieldfmt{unitname}=\field{name},
+  \fieldfmt{unitsymbol}=\field{symbol},
+  \fieldfmt{measurement}=\field{description}
 ]{field-aliases}
 \end{codeenv}
 There's a slight problem here. This ensures that the entries defined
@@ -19571,20 +19611,20 @@ entries don't have a \field{description} field. Since I'd like to
 use the \glostyle{mcolalttreegroup} style, this will end up with
 the odd appearance of the formula (stored in the \field{name} field for the
 dual) followed by the chemical name (stored in the \field{symbol}
-field for the dual) in parenthesis. This is default \meta{name}
+field for the dual) in parenthesis. This is the default \meta{name}
 (\meta{symbol}) \meta{description} format for the style. I've fixed
 this by locally redefining \ics{glsxtralttreeSymbolDescLocation} for
 just that glossary:
-\begin{verbatim}
-\printunsrtglossary*[type=chemical,style=mcolalttreegroup]
-{%
-  \renewcommand\glsxtralttreeSymbolDescLocation[2]{%
-   \glossentrysymbol{#1}\glspostdescription\glsxtrAltTreePar
-  }%
-  \renewcommand*{\glstreenamefmt}[1]{#1}%
-  \renewcommand*{\glstreegroupheaderfmt}[1]{\textbf{#1}}%
+\begin{codeenv}
+\cs{printunsrtglossary*}\oarg{\printglossopt[chemical]{type},\printglossopt[mcolalttreegroup]{style}}
+\marg{\comment{}
+  \cs{renewcommand}\cs{glsxtralttreeSymbolDescLocation}[2]\marg{\comment{}
+   \ics{glossentrysymbol}\marg{\idx{param}1}\cs{glspostdescription}\ics{glsxtrAltTreePar}
+  }\comment{}
+  \cs{renewcommand}*\marg{\cs{glstreenamefmt}}[1]\marg{\idx{param}1}\comment{}
+  \cs{renewcommand}*\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\cs{textbf}\marg{\idx{param}1}}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 I've also redefined \cs{glstreenamefmt} to prevent the names
 appearing in bold, which means I also need to redefine
 \cs{glstreegroupheaderfmt} to keep the headers bold.
@@ -19592,7 +19632,7 @@ appearing in bold, which means I also need to redefine
 All the \atentryfmt{dualindex\meta{type}} entry types provide a primary
 entry that behaves like \atentry{index}. The secondary behaves like
 \atentryfmt{\meta{type}}. This means that the primaries are
-conveniently gather together with all the unaliased \atentry{index}
+conveniently gathered together with all the unaliased \atentry{index}
 entries, so the primary entry type needs to be set to \code{index}:
 \begin{codeenv}
 \csopt[index]{type}
@@ -19603,7 +19643,7 @@ custom \fieldfmt{identifier} field, I can both alias this custom field
 to the \field{category} field and also set \csopt{dual-type} so that
 it matches the category:
 \begin{codeenv}
-\csopt[identifier=category]{field-aliases},
+\csopt[\fieldfmt{identifier}=\field{category}]{field-aliases},
 \csopt[same as category]{dual-type}
 \end{codeenv}
 The primary entries (in the \code{index} glossary) need to be sorted
@@ -19658,20 +19698,20 @@ something that won't cause them to be discarded:
 The document loads \sty{hyperref} which means that all the \cs{gls}
 references will create hyperlinks. Since the primaries are in the
 index, the default prefixes mean that, for example, 
-\verb|\gls{svg}| links to the \qt{scalable vector graphics} item in
+\code{\cs{gls}\marg{svg}} links to the \qt{scalable vector graphics} item in
 the index rather than to the abbreviation \qt{SVG} in the
 \code{markuplanguage} glossary. There are two alternatives: change
-\verb|\gls{svg}| to \verb|\gls{dual.svg}| or change the default
-prefixes, which is the more convenient approach as is the one used
+\code{\cs{gls}\marg{svg}} to \code{\cs{gls}\marg{dual.svg}} or change the 
+default prefixes, which is the more convenient approach and is the one used
 here:
 \begin{codeenv}
 \csopt[idx.]{label-prefix},
 \csopt[\empty]{dual-prefix}
 \end{codeenv}
-Now \verb|\gls{svg}| refers to the dual abbreviation \qt{SVG} and
-\verb|\gls{idx.svg}| refers to the primary entry \qt{scalable vector
+Now \code{\cs{gls}\marg{svg}} refers to the dual abbreviation \qt{SVG} and
+\code{\cs{gls}\marg{idx.svg}} refers to the primary entry \qt{scalable vector
 graphics}. Unfortunately this means that the records created with
-\verb|\gls{svg}| now refer to the dual abbreviation and will end up
+\code{\cs{gls}\marg{svg}} now refer to the dual abbreviation and will end up
 being displayed in the glossary instead of the index. This can be
 fixed with:
 \begin{codeenv}
@@ -19697,27 +19737,27 @@ The index is displayed using the \glostyle{bookindex} style. This
 doesn't show the description or symbol by default, but it would be
 useful to include the symbol in parentheses after the name. This can
 be done by redefining \ics{glsxtrbookindexname}:
-\begin{verbatim}
-\renewcommand*{\glsxtrbookindexname}[1]{%
-  \glossentryname{#1}%
-  \ifglshassymbol{#1}{\space(\glossentrysymbol{#1})}{}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexname}}[1]\marg{\comment{}
+  \cs{glossentryname}\marg{\idx{param}1}\comment{}
+  \cs{ifglshassymbol}\marg{\idx{param}1}\marg{\cs{space}(\cs{glossentrysymbol}\marg{\idx{param}1})}\marg{}%
 }
-\end{verbatim}
+\end{codeenv}
 However the chemical forumlae look a little odd in parentheses
 (especially those that contain parenthetical parts) but this can be
 fixed by adding a category check:
-\begin{verbatim}
-\renewcommand*{\glsxtrbookindexname}[1]{%
-  \glossentryname{#1}%
-  \ifglshassymbol{#1}%
-  {%
-    \glsifcategory{#1}{chemical}%
-    {, \glossentrysymbol{#1}}%
-    {\space(\glossentrysymbol{#1})}%
-  }%
-  {}%
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrbookindexname}}[1]\marg{\comment{}
+  \cs{glossentryname}\marg{\idx{param}1}\comment{}
+  \cs{ifglshassymbol}\marg{\idx{param}1}\comment{}
+  \marg{\comment{}
+    \cs{glsifcategory}\marg{\idx{param}1}\marg{chemical}\comment{}
+    \marg{, \cs{glossentrysymbol}\marg{\idx{param}1}}\comment{}
+    \marg{\cs{space}(\cs{glossentrysymbol}\marg{\idx{param}1})}\comment{}
+  }\comment{}
+  \marg{}\comment{}
 }
-\end{verbatim}
+\end{codeenv}
 Unfortunately \ics{glossentrysymbol} doesn't pick up the
 \catattr{glossnamefont} attribute, so if the short form of the
 abbreviations is saved in the \field{symbol} field, using one of the
@@ -19769,14 +19809,14 @@ It's sometimes useful for the index to include a reference to the
 term's definition. This can be done by making use of 
 \idx{glsextrapostnamehook}, which can be redefined before the
 glossaries to automatically record each entry:
-\begin{verbatim}
-\renewcommand{\glsextrapostnamehook}[1]{\glsadd[format=hyperbf]{#1}}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}\marg{\cs{glsextrapostnamehook}}[1]\marg{\cs{glsadd}\oarg{\glsaddopt[\encap{hyperbf}]{format}}\marg{\idx{param}1}}
+\end{codeenv}
 This needs to be redefined to ignore its argument before the index,
 to avoid the redundant index record:
-\begin{verbatim}
-\renewcommand{\glsextrapostnamehook}[1]{}
-\end{verbatim}
+\begin{codeenv}
+\cs{renewcommand}\marg{\cs{glsextrapostnamehook}}[1]\marg{}
+\end{codeenv}
 Remember that if any records are added within a glossary, an extra
 \LaTeX\ and \bibgls\ call are required, so the document build is:
 \begin{verbatim}
