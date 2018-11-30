@@ -990,6 +990,11 @@ public class Bib2GlsEntry extends BibEntry
                putField(field, strVal);
             }
 
+            if (resource.isDependencyListField(field))
+            {
+               parseCustomDependencyList(parser, list, field);
+            }
+
             if (field.equals("parent") || field.equals("category")
                || field.equals("type") || field.equals("group")
                || field.equals("seealso") || field.equals("alias"))
@@ -3304,6 +3309,75 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       putField("seealso", builder.toString());
+   }
+
+   // User has identified that the given value is a list like "see"
+   // so add dependencies but don't identify them as
+   // cross-references.
+   private void parseCustomDependencyList(TeXParser parser, 
+    TeXObjectList valList, String field)
+    throws IOException
+   {
+      if (valList instanceof Group)
+      {
+         valList = ((Group)valList).toList();
+      }
+
+      StringBuilder builder = new StringBuilder();
+
+      TeXObject opt = valList.popArg(parser, '[', ']');
+
+      if (opt != null)
+      {
+         String depTag = opt.toString(parser);
+
+         builder.append('[');
+         builder.append(depTag);
+         builder.append(']');
+      }
+
+      CsvList csvList = CsvList.getList(parser, valList);
+
+      int n = csvList.size();
+
+      if (n == 0) return;
+
+      for (int i = 0; i < n; i++)
+      {
+         TeXObject xr = csvList.getValue(i);
+
+         if (xr instanceof TeXObjectList)
+         {
+            xr = GlsResource.trimList((TeXObjectList)xr);
+         }
+
+         String dep = xr.toString(parser);
+
+         String label = processLabel(dep);
+
+         if (bib2gls.getVerboseLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage(
+               "message.custom.dep.found", field, getId(), field, label));
+         }
+
+         addDependency(label);
+         builder.append(label);
+
+         if (i != n-1)
+         {
+            builder.append(',');
+         }
+      }
+
+      if (opt != null)
+      {
+         valList.push(parser.getListener().getOther(']'));
+         valList.push(opt);
+         valList.push(parser.getListener().getOther('['));
+      }
+
+      putField(field, builder.toString());
    }
 
    public void setCollationKey(CollationKey key)

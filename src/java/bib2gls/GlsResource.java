@@ -645,6 +645,10 @@ public class GlsResource
          {
             labelifyReplaceMap = getSubstitutionList(parser, list, opt);
          }
+         else if (opt.equals("dependency-fields"))
+         {
+            dependencyListFields = getFieldArray(parser, list, opt);
+         }
          else if (opt.equals("sort-replace"))
          {
             sortSettings.setRegexList(getSubstitutionList(parser, list, opt));
@@ -7718,6 +7722,18 @@ public class GlsResource
       return labelifyReplaceMap;
    }
 
+   public boolean isDependencyListField(String field)
+   {
+      if (dependencyListFields == null) return false;
+
+      for (String f : dependencyListFields)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
    public boolean isCheckEndPuncOn()
    {
       return checkEndPunc != null;
@@ -10255,6 +10271,8 @@ public class GlsResource
    private String[] labelifyFields=null;
    private String[] labelifyListFields=null;
    private Vector<PatternReplace> labelifyReplaceMap;
+
+   private String[] dependencyListFields=null;
 
    private LabelListSortMethod[] sortLabelList = null;
 

@@ -1292,6 +1292,13 @@ starred version \csref{glsxtrfmt*}},
    parent={resourceoptions}
 }
 
+@dualindexentry{opt.dependency-fields,
+   name={\csoptfmt{dependency\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @dualindexentry{opt.labelify-replace,
    name={\csoptfmt{labelify\dhyphen replace}},
    user1={\meta{list}},
@@ -9104,6 +9111,12 @@ hasn't been defined},
   category={commandoption},
 }
 
+@index{printgloss.nogroupskip,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{no\-group\-skip}},
+  category={commandoption},
+}
+
 @index{cs.makeglossaries,
   name={\csfmt{make\-glos\-saries}},
   user1={},
@@ -9163,6 +9176,15 @@ hasn't been defined},
   user1={\margm{text}},
   description={converts the first letter of \meta{text} to upper case},
   note={\styfmt{mfirstuc}},
+  category={command}
+}
+
+@index{xmakefirstuc,
+  name={\csfmt{xmake\-first\-uc}},
+  user1={\margm{text}},
+  description={applies \cs{makefirstuc} with one level expansion
+   of the first token of \meta{text}},
+  note={\styfmt{mfirstuc} v1.01+},
   category={command}
 }
 
@@ -10273,6 +10295,14 @@ elements},
   category={command}
 }
 
+@index{glstreeprelocation,
+  name={\csfmt{gls\-tree\-pre\-location}},
+  description={inserted before the location list for top-level
+entries in the \glostyle{tree}-like styles},
+  note={\styfmt{glossaries-extra-stylemods} v1.21+},
+  category={command}
+}
+
 @index{glsdescwidth,
   name={\csfmt{gls\-desc\-width}},
   user1={},
@@ -10288,7 +10318,7 @@ the width of the description column},
   user1={\margm{label}\margm{location list}},
   description={used by the \glostyle{alttree} styles to format the
 symbol, description and location},
-  note={\styfmt{glossaries-extra-stylemods}},
+  note={\styfmt{glossaries-extra-stylemods} v1.05+},
   category={command}
 }
 

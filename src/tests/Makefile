@@ -552,6 +552,7 @@ test-mfirstuc.glstex	: test-mfirstuc.tex test-mfirstuc.bib $(DEPS)
 
 test-translations.pdf	: test-translations.glstex
 		pdflatex test-translations
+		pdflatex test-translations
 
 test-translations.glstex	: test-translations.tex entries-en.bib entries-pt.bib $(DEPS)
 		pdflatex test-translations
