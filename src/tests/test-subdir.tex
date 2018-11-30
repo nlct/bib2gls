@@ -1,0 +1,12 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src=subdir/entries.bib,selection=all]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}
