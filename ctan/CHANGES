@@ -40,6 +40,11 @@ v1.8 (pending):
   * bug fix: corrected invalid datetime pattern that threw
     InvalidArgumentException
 
+  * bug fix: https://github.com/nlct/bib2gls/issues/3
+    Files located in local texmf path are not determined correctly
+    on Windows.
+    (actual bug was in texparserlib.jar rather than bib2gls.jar)
+
   * \@glsnavhypertarget will now fallback on original definition
     (which requires an extra LaTeX call) if the type is unknown.
 
