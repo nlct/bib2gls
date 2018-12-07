@@ -117,7 +117,109 @@ public class GlsRecord implements Comparable<GlsRecord>
       return getFmtTeXCode();
    }
 
+   public String getFmtTeXCode(GlsRecord startRange, int compact)
+   {
+      if (compact < 2 || startRange == null)
+      {
+         return getFmtTeXCode();
+      }
+
+      Matcher m = CS_PATTERN.matcher(location);
+
+      String endLoc = location;
+      String endLocPrefix = "";
+      String endLocSuffix = "";
+
+      if (m.matches())
+      {
+         endLoc = m.group(3);
+         endLocPrefix = location.substring(0, m.start(3));
+         endLocSuffix = location.substring(m.end(3));
+      }
+
+      m = CS_PATTERN.matcher(startRange.location);
+
+      String startLoc = startRange.location;
+      String startLocPrefix = "";
+      String startLocSuffix = "";
+
+      if (m.matches())
+      {
+         startLoc = m.group(3);
+         startLocPrefix = startRange.location.substring(0, m.start(3));
+         startLocSuffix = startRange.location.substring(m.end(3));
+      }
+
+      if (!endLocPrefix.equals(startLocPrefix)
+         || !endLocSuffix.equals(startLocSuffix)
+         || endLoc.length() != startLoc.length()
+         || endLoc.length() < compact)
+      {
+         return getFmtTeXCode();
+      }
+
+      StringBuilder builder = new StringBuilder(endLoc.length());
+
+      int i = 0;
+
+      while (i < endLoc.length())
+      {
+         int cp1 = endLoc.codePointAt(i);
+         int cp2 = startLoc.codePointAt(i);
+
+         if (cp1 != cp2)
+         {
+            break;
+         }
+
+         i += Character.charCount(cp1);
+         builder.appendCodePoint(cp1);
+      }
+
+      if (i == startLoc.length())
+      {
+         return getFmtTeXCode();
+      }
+
+      // find out location type
+
+      String patternType;
+
+      if (DIGIT_PATTERN.matcher(endLoc).matches())
+      {
+         patternType = "digit";
+      }
+      else if (ROMAN_LC_PATTERN.matcher(endLoc).matches()
+            && ROMAN_LC_PATTERN.matcher(startLoc).matches())
+      {
+         patternType = "roman";
+      }
+      else if (ROMAN_UC_PATTERN.matcher(endLoc).matches()
+            && ROMAN_UC_PATTERN.matcher(startLoc).matches())
+      {
+         patternType = "ROMAN";
+      }
+      if (ALPHA_PATTERN.matcher(endLoc).matches())
+      {
+         patternType = "alpha";
+      }
+      else
+      {
+         patternType = "other";
+      }
+
+      return getFmtTeXCode(String.format(
+       "%s\\bibglscompact{%s}{%s}{%s}%s", 
+       endLocPrefix, patternType, builder.toString(), endLoc.substring(i), 
+       endLocSuffix));
+   }
+
    public String getFmtTeXCode()
+   {
+      return getFmtTeXCode(getLocation());
+   }
+
+   public String getFmtTeXCode(String theLocation)
    {
       String fmt = getFormat();
 
@@ -138,7 +240,7 @@ public class GlsRecord implements Comparable<GlsRecord>
       }
 
       return String.format("\\glsnoidxdisplayloc{%s}{%s}{%s}{%s}",
-         prefix, counter, fmt, location);
+         prefix, counter, fmt, theLocation);
    }
 
    public boolean locationMatch(GlsRecord record)

@@ -6,14 +6,11 @@
 \documentclass{article}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,index, stylemods]{glossaries-extra}
+\usepackage[record=nameref,index, stylemods]{glossaries-extra}
 
 \newcommand*{\bibglsnewindex}[2]{%
  \newglossaryentry{#1}{name={#1},type={index},description={},#2}%
 }
-
-%\show\glsnavigation
-%\show\glsnavhypertarget
 
 \GlsXtrLoadResources[sort=en-GB,% sort according to this locale
  %selection=all,% select all entries even if they haven't been used
@@ -23,7 +20,7 @@
 
 \begin{document}
 
-\gls{gls.sample}. \gls{gls.bird}. \gls{gls.waterfowl}.
+\gls{gls.sample}.  \gls{gls.bird}. \gls{gls.waterfowl}.
 Test underscore in label: \gls{gls.sea_lion}.
 
 \newpage

@@ -400,6 +400,7 @@ Have you indexed your entries using commands like \gls?</entry>
 {0}</entry>
 <entry key="error.invalid.sort.value">Invalid sort method ''{0}'' given in option: {1}</entry>
 <entry key="error.invalid.opt.value">Invalid ''{0}'' value: {1}</entry>
+<entry key="error.invalid.opt.intorbool.value">Invalid ''{0}'' value: {1} (number or boolean required)</entry>
 <entry key="error.invalid.opt.int.value">Invalid ''{0}'' value: {1} (number required)</entry>
 <entry key="error.invalid.opt.minint.value">Invalid ''{0}'' value: {1} (can''t be less than {2,number})</entry>
 <entry key="error.invalid.choice.value">Invalid ''{0}'' value: {1} (allowed values: {2})</entry>

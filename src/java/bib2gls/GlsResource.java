@@ -1702,6 +1702,32 @@ public class GlsResource
                suffixFF = null;
             }
          }
+         else if (opt.equals("compact-ranges"))
+         {
+            String val = getOptional(parser, "true", list, opt);
+
+            if (val.equals("false"))
+            {
+               compactRanges = 0;
+            }
+            else if (val.equals("true"))
+            {
+               compactRanges = 3;
+            }
+            else
+            {
+               try
+               {
+                  compactRanges = Integer.parseInt(val);
+               }
+               catch (NumberFormatException e)
+               {
+                  throw new IllegalArgumentException(
+                    bib2gls.getMessage("error.invalid.opt.intorbool.value",
+                      opt, val), e);
+               }
+            }
+         }
          else if (opt.equals("see"))
          {
             String val = getChoice(parser, list, opt, "omit", "before", "after");
@@ -5723,6 +5749,11 @@ public class GlsResource
             writer.println("\\providecommand{\\bibglslocationgroup}[3]{#3}");
             writer.println("\\providecommand{\\bibglslocationgroupsep}{\\bibglsdelimN}");
             writer.println();
+         }
+
+         if (compactRanges > 1)
+         {
+            writer.println("\\providecommand{\\bibglscompact}[3]{#3}");
          }
 
          if (supplementalRecords != null)
@@ -10224,6 +10255,11 @@ public class GlsResource
       private String csname;
    }
 
+   public int getCompactRanges()
+   {
+      return compactRanges;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -10516,6 +10552,8 @@ public class GlsResource
    private boolean copyAliasToSee = false;
 
    private boolean createMissingParents = false;
+
+   private int compactRanges = 0;
 
    private Bib2GlsBibParser bibParserListener = null;
 }

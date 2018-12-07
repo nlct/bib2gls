@@ -1,14 +1,21 @@
+v1.9 (pending):
+
+  * new resource option:
+
+     compact-ranges
+    
+
 v1.8 (2018-11-30):
 
   * new resource options:
 
-       --save-primary-locations
-       --primary-location-formats
-       --long-case-change
-       --dual-long-case-change
-       --word-boundaries
-       --sort-label-list
-       --dependency-fields
+     save-primary-locations
+     primary-location-formats
+     long-case-change
+     dual-long-case-change
+     word-boundaries
+     sort-label-list
+     dependency-fields
 
   * added support for the new glossaries-extra package option
     record=nameref (introduced to glossaries-extra v1.37).

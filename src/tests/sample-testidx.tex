@@ -2,16 +2,21 @@
 % arara: bib2gls: {group: on}
 % arara: pdflatex
 % arara: pdflatex
-\documentclass{article}
+\documentclass[12pt]{article}
 
+%\usepackage[a5paper]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[colorlinks]{hyperref}
 \usepackage[bib2gls]{testidx-glossaries}
+\glossariesextrasetup{record=nameref}
 \usepackage{glossary-bookindex}
 \setglossarystyle{bookindex}
 
-\tstidxmakegloss
+%\renewcommand{\thepage}{\textbf{\arabic{page}}}
+%\newcommand{\theHpage}{\arabic{page}}
+
+\tstidxmakegloss[compact-ranges]
 
 \begin{document}
 \testidx

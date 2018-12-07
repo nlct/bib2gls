@@ -53,11 +53,12 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
       return src;
    }
 
-   public String getFmtTeXCode()
+   @Override
+   public String getFmtTeXCode(String theLocation)
    {
       if (!bib2gls.isMultipleSupplementarySupported())
       {
-         return super.getFmtTeXCode();
+         return super.getFmtTeXCode(theLocation);
       }
 
       String fmt = getFormat();
@@ -80,7 +81,7 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
 
       return String.format("\\glsxtrdisplaysupploc{%s}{%s}{%s}{%s}{%s}",
          getPrefix(), getCounter(), fmt, bib2gls.getTeXPathHref(src), 
-         getLocation());
+         theLocation);
    }
 
    public boolean locationMatch(GlsRecord record)

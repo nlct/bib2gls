@@ -60,7 +60,8 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
       return src;
    }
 
-   public String getFmtTeXCode()
+   @Override
+   public String getFmtTeXCode(String theLocation)
    {
       String fmt = getFormat();
 
@@ -82,7 +83,7 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
 
       return String.format(
          "\\glsxtrdisplaylocnameref{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}",
-         getPrefix(), getCounter(), fmt, getLocation(),
+         getPrefix(), getCounter(), fmt, theLocation,
          getTitle(), getHref(), getHcounter(), bib2gls.getTeXPathHref(src));
    }
 

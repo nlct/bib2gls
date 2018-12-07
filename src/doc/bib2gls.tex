@@ -10209,6 +10209,51 @@ empty string. To remove the suffix formation use
 
 The default is \csopt[none]{suffixFF}.
 
+\optsection{compact-ranges}
+
+The \meta{value} may be an integer \meta{n} or \optfmt{false} (equivalent to
+\csopt[0]{compact-ranges}) or \optfmt{true} (equivalent to
+\csopt[3]{compact-ranges}). If no \meta{value} is specified,
+\optfmt{true} is assumed.
+
+This setting allows location ranges such as 184--189 to appear
+more compactly as 184--9. The end location is encapsulated
+in the command \gls{bibglscompact}, so the range would actually
+become:
+\begin{codeenv}
+184\ics{delimR}\gls{bibglscompact}\marg{digit}\marg{18}\marg{9}
+\end{codeenv}
+If the location is in the form \code{\meta{cs}\margm{loc}}
+(where \meta{cs} is a command)
+then \gls{bibglscompact} will be inside the argument.
+For example, if the range would normally be:
+\begin{codeenv}
+\cmd{custom}\marg{184}\ics{delimR}\cmd{custom}\marg{189}
+\end{codeenv}
+then it would become:
+\begin{codeenv}
+\cmd{custom}\marg{184}\ics{delimR}\cmd{custom}\marg{\gls{bibglscompact}\marg{digit}\marg{18}\marg{9}}
+\end{codeenv}
+The numerical value given in \csopt[\meta{n}]{compact-ranges}
+indicates that compaction should only occur if the actual location
+consists of at least \meta{n} characters, for $\meta{n} \geq 2$. 
+Any value of \meta{n} less than 2 will switch off compaction.
+
+For example, \code{189} consists of 3 characters, so it will be
+compacted with \csopt[3]{compact-ranges} but not with
+\csopt[4]{compact-ranges}. Whereas \code{\csfmt{custom}\marg{89}}
+would only be compacted with \csopt[2]{compact-ranges}
+because \code{89} only consists of 2 characters.
+
+The compaction isn't limited to decimal digits but it will only
+occur if both the start and end location have the same number of
+characters. For example, xvi--xviii can't be compacted because
+the start consists of three characters and the end consists
+of five characters, whereas xxv--xxx can be compacted to xxv--x,
+which may look a little strange. In this case, you may want to
+consider changing the definition of \cs{bibglscompact} so that
+it only performs the compaction for digits.
+
 \optsection{see}
 
 If an entry has a \field{see} field, this can be placed before or
@@ -14638,6 +14683,19 @@ This defaults to \ics{delimN}.
 \formatdef{bibglslastDelimN}
 Separator between penultimate and final individual locations.
 This defaults to \code{,\idx{nbspchar}} to discourage lonely locations.
+
+\cssection{bibglscompact}
+
+\formatdef{bibglscompact}
+The first argument \meta{pattern} indicates the location pattern:
+\code{digit} for digits, \code{roman} for \idx!{lowercase}
+Roman numerals, \code{ROMAN} for \idx!{uppercase} Roman
+numerals and \code{alpha} for alphabetical locations. The actual
+location is split into two parts, \meta{part1} and \meta{part2}.
+The string concatenation \meta{part1}\meta{part2} forms the
+actual location.
+
+This just does \meta{part2} by default.
 
 \cssection{bibglspassim}
 

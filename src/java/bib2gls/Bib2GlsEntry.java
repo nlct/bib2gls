@@ -2495,11 +2495,13 @@ public class Bib2GlsEntry extends BibEntry
       GlsRecord prev = null;
       int count = 0;
       StringBuilder mid = new StringBuilder();
+      GlsRecord implicitStart = null;
 
       int[] maxGap = new int[1];
       maxGap[0] = 0;
 
       boolean start=true;
+      int compact = resource.getCompactRanges();
 
       GlsRecord rangeStart=null;
       String rangeFmt = null;
@@ -2521,6 +2523,7 @@ public class Bib2GlsEntry extends BibEntry
 
             count = 0;
             mid.setLength(0);
+            implicitStart = null;
    
             if (paren == '(')
             {
@@ -2557,7 +2560,7 @@ public class Bib2GlsEntry extends BibEntry
                }
 
                builder.append("\\delimR ");
-               builder.append(record.getFmtTeXCode());
+               builder.append(record.getFmtTeXCode(rangeStart, compact));
                builder.append("}");
                rangeStart = null;
                rangeFmt = null;
@@ -2630,6 +2633,11 @@ public class Bib2GlsEntry extends BibEntry
          else if (minRange < Integer.MAX_VALUE
                   && record.follows(prev, gap, maxGap))
          {
+            if (count == 1)
+            {
+               implicitStart = prev;
+            }
+
             count++;
 
             mid.append(delimN);
@@ -2643,6 +2651,7 @@ public class Bib2GlsEntry extends BibEntry
             mid.setLength(0);
             count = 1;
             maxGap[0] = 0;
+            implicitStart = null;
          }
          else if (count > 2 && suffixFF != null)
          {
@@ -2652,11 +2661,12 @@ public class Bib2GlsEntry extends BibEntry
             mid.setLength(0);
             count = 1;
             maxGap[0] = 0;
+            implicitStart = null;
          }
          else if (count >= minRange)
          {
             builder.append("\\delimR ");
-            builder.append(prev.getFmtTeXCode());
+            builder.append(prev.getFmtTeXCode(implicitStart, compact));
 
             if (maxGap[0] > 1)
             {
@@ -2669,6 +2679,7 @@ public class Bib2GlsEntry extends BibEntry
             builder.append(record.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
+            implicitStart = null;
          }
          else
          {
@@ -2678,6 +2689,7 @@ public class Bib2GlsEntry extends BibEntry
             mid.setLength(0);
             count = 1;
             maxGap[0] = 0;
+            implicitStart = null;
          }
 
          prev = record;
@@ -2694,7 +2706,7 @@ public class Bib2GlsEntry extends BibEntry
          if (count >= minRange)
          {
             builder.append("\\delimR ");
-            builder.append(prev.getFmtTeXCode());
+            builder.append(prev.getFmtTeXCode(implicitStart, compact));
 
             if (maxGap[0] > 1)
             {
