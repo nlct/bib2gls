@@ -581,6 +581,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="datatool.header.doesnt_exist">Header ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
+<entry key="datatool.index.outofrange">List index ''{0}'' out of range.</entry>
 
 <!--  ifthen messages -->
 

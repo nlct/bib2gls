@@ -26,6 +26,8 @@
 \newcommand{\insularG}{{\freeserif\char"A77D}}
 \newcommand{\insularg}{{\freeserif\char"1D79}}
 \newcommand{\longs}{\char"017F}
+\newcommand{\Wynn}{\char"01F7}
+\newcommand{\wynn}{\char"01BF}
 
 \usepackage[x11names]{xcolor}
 \usepackage{alltt}
@@ -104,6 +106,14 @@
  {\csfmtfont{\char`\\ #1}}%
  {\string\\#1}%
 }
+
+\newcommand{\texparserdefnotetarget}{%
+  \raisebox{2ex}{\hypertarget{texparserdef}{}}%
+  \textsuperscript{*}Indicates command is
+  recognised by \bibgls's interpreter although it may have
+  a slightly different implementation.
+}
+\newcommand{\texparserdefnote}{\hyperlink{texparserdef}{*}}
 
 \setabbreviationstyle[common]{short-nolong}
 
@@ -627,6 +637,7 @@
     title={Command Summary}
   ]%
   {%
+   \def\glossarypreamble{\texparserdefnotetarget}%
    \let\printunsrtglossaryentryprocesshook\commandsummaryhook
    \let\csref\cs
    \glsxtrlocalsetgrouptitle{glssymbols}{}%

@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
+import com.dickimawbooks.texparserlib.latex.AtSecondOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
@@ -1152,6 +1153,11 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(listener.createSymbol("bibglscircumchar", '^'));
       listener.putControlSequence(listener.createSymbol("glsbackslash", '\\'));
       listener.putControlSequence(listener.createSymbol("glstildechar", '~'));
+
+      listener.putControlSequence(new FlattenedPostSort());
+      listener.putControlSequence(new FlattenedPreSort());
+      listener.putControlSequence(new HrefChar());
+      listener.putControlSequence(new AtSecondOfTwo("bibglshrefunicode"));
 
       // Custom packages may override the definitions of any of the
       // above.
@@ -4874,8 +4880,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.8.20181206";
-   public static final String DATE = "2018-12-06";
+   public static final String VERSION = "1.8.20181207";
+   public static final String DATE = "2018-12-07";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
