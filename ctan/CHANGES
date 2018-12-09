@@ -4,6 +4,7 @@ v1.9 (pending):
 
      compact-ranges
      progenitor-type
+     adopted-parent-field
 
   * new entry types:
 
@@ -15,6 +16,9 @@ v1.9 (pending):
      @spawnnumber
      @spawnabbreviation
      @spawnacronym
+
+  * The `type` option (and similar options that assign the `type`
+    field) now accepts the special setting "same as parent".
     
 
 v1.8 (2018-11-30):

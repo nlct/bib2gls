@@ -4,14 +4,14 @@
 \documentclass{article}
 
 \usepackage[record,
- %abbreviations,
+ abbreviations,
  stylemods={tree},style=index]{glossaries-extra}
 
 \GlsXtrLoadResources[
- entry-type-aliases={spawnabbreviation=spawnsymbol},
- field-aliases={short=name,long=description},
- %type=main,
- %progenitor-type=abbreviations,
+ %entry-type-aliases={spawnabbreviation=spawnsymbol},
+ %field-aliases={short=name,long=description},
+ type=main,
+ progenitor-type=abbreviations,
  src={test-spawn},selection={all}]
 
 \begin{document}

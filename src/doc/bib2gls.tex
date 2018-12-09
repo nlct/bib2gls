@@ -5365,7 +5365,36 @@ comma-separated list of labels. The \field{adoptparents} field
 must be set and must contain a least one label. This field is not
 available for use in any other context. 
 
-An entry defined as:
+This entry type creates a main \idx[textformat=emph]{progenitor}
+term (with all the given fields except \field{adoptparents})
+and $n$ spawned \idx[textformat=emph]{progeny} terms, where
+$n$ is the number of elements in the \field{adoptparents} field,
+that are dependent on the main term.
+
+Each of the spawned \idx{progeny} entries have the field identified by
+\csopt{adopted-parent-field} (\field{parent} by default) set to the
+corresponding element in the \field{adoptparents} field.
+
+All fields from the original definition are copied except for the
+\field{adoptparents}, \field{alias} and \field{parent} fields. The
+\field{parent} field is never copied, regardless of the value of
+\csopt{adopted-parent-field}.  If the adopted parent field is
+changed to one that's contained in the original entry, it's value
+will be from \field{adoptparents} not the value from the original
+entry.
+
+The copied fields follow the same conditions as normal
+entries. (For example, unknown fields are ignored, case-changes are
+applied, if appropriate, and the \field{type} field must reference a
+valid glossary, if set.) If \csopt{progenitor-type} is set, then
+this assignment is made after the \idx{progeny} are created
+and only applies to the main \idx{progenitor} entry. The
+type for the \idx{progeny} can be set with \csopt{progeny-type}.
+For example, \csopt[same as parent]{progeny-type} will ensure
+that the \idx{progeny} are in the same glossary type as
+their parent entry.
+
+For example, an entry defined as:
 \begin{codeenv}
 \atentry{progenitor}\marg{\meta{id},
   \field{adoptparents} = \marg{\meta{parent-1 id},\ldots,\meta{parent-N id}},
@@ -5401,33 +5430,31 @@ is essentially like:
   \meta{field-name-n} = \margm{text}
 }
 \end{codeenv}
-This creates the main \meta{id} entry, which contains all the fields
-(except for \field{adoptparents}) that were in the original
-\atentry{progenitor} definition and has the new field \field{progeny}
-set. The main entries are defined in the \ext{glstex} file with
-\gls{bibglsnewprogenitor}.
+This creates the main (\idx{progenitor}) \meta{id} entry, which
+contains all the fields (except for \field{adoptparents}) that were
+in the original \atentry{progenitor} definition and has the new
+field \field{progeny} set to the comma-separated list of spawned
+entry labels. The main entries are defined in the \ext{glstex} file
+with \gls{bibglsnewprogenitor}.
 
-In addition to the main \meta{id} entry, this also creates the
-spawned entries \code{\meta{parent-1 id}.\meta{id}}, \ldots, 
+In addition to the main \meta{id} entry, the above also creates the
+spawned \idx{progeny} entries \code{\meta{parent-1 id}.\meta{id}}, \ldots, 
 \code{\meta{parent-N id}.\meta{id}} that are dependent on the main
-\meta{id} entry.  The only fields that aren't copied from the original
-\atentry{progenitor} to the spawned entries are the
-\field{adoptparents} field (required in the original),
-and the \field{alias} and \field{parent} fields (if set).
+\meta{id} entry.
 
 The spawned entries have the \field{parent} field set to the
-corresponding label obtained from the \field{adoptparents} list. This parent
-entry must also be defined, as usual for the \field{parent} field.
-The spawned entry type needs to match the \field{parent}. The main
-entry can be assigned to a different type with the
-\csopt{progenitor-type} option. The spawned entries are defined in
-the \ext{glstex} file with \gls{bibglsnewspawnedindex}
+corresponding label obtained from the \field{adoptparents} list.
+This parent entry must also be defined, as usual for the
+\field{parent} field.  (This restriction obviously doesn't apply if
+\csopt{adopted-parent-field} is changed from the default
+\field{parent}.) The spawned entries are defined in the \ext{glstex}
+file with \gls{bibglsnewspawnedindex}
 
-If the main entry is referenced in the document then (assuming the
-default selection criteria) the spawned entries will also be automatically
-selected. You can check for the existence of the \field{progenitor}
-field using \cs{glsxtrifhasfield} and fetch the \field{location}
-field from the main entry, if required.
+If the main \idx{progenitor} entry is referenced in the document
+then (assuming the default selection criteria) the spawned entries
+will also be automatically selected. You can check for the existence
+of the \field{progenitor} field using \cs{glsxtrifhasfield} and
+fetch the \field{location} field from the main entry, if required.
 
 Although the spawned entries are considered dependents of the main
 entry, the reverse doesn't apply. If a spawned entry is referenced
@@ -5500,13 +5527,15 @@ parents.
 The following \atentryfmt{spawn\meta{type}} commands are all forms
 of \atentry{progenitor} that create the given
 \atentryfmt{\meta{type}} of entry. The spawned entries are actually
-created with the entry type \atentryfmt{spawned\meta{type}}. In the
+created with the private entry type \atentryfmt{spawned\meta{type}}. In the
 case of \atentry{progenitor}, the spawned entries are defined as 
 a \atentryfmt{spawnedindex} entry. These special
 \atentryfmt{spawned\meta{type}} entry types aren't intended for use
 in the \ext{bib} file, but if you reference the entry type (for
 example, with \csopt[same as entry]{category}) you will get 
-\atentryfmt{spawned\meta{type}} as the entry type.
+\atentryfmt{spawned\meta{type}} as the entry type. The
+original entry type for the spawned entries is the same as
+the original entry for the main \atentry{progenitor} entry.
 
 \entrysection{spawnindex}
 
@@ -8043,6 +8072,15 @@ The \meta{value} may be one of:
    to the same value as the \field{category} field
    (\field{type} unchanged if \field{category} not set);
 
+\item \optfmt{same as parent}: sets the \field{type} to the same as
+the entry's parent (new to v1.9). If the entry doesn't have a parent
+or if the parent doesn't have the \field{type} field set, then
+no change is made. Entries should always have the same type
+as their parent, but it's possible for spawned entries to 
+pick up the \field{type} field from their \idx{progenitor} entry
+(if it was explicitly set in the \ext{bib} file),
+which may be inappropriate.
+
  \item\meta{label} sets the \field{type} field to the glossary 
    identified by \meta{label}.
 \end{itemize}
@@ -8102,8 +8140,24 @@ it's not required as \bibgls\ will write
 This sets the default \field{type} field for the main term defined by 
 \atentry{progenitor}-like entries. The \meta{value} is as for
 \csopt{type}. This doesn't change the \field{type} for the spawned
-progeny, which need to be in the same glossary as their
-corresponding parent.
+\idx{progeny}.
+
+\optsection[\subsubsection]{progeny-type}
+
+This sets the default \field{type} field for the \idx{progeny} term
+spawned by 
+\atentry{progenitor}-like entries. The \meta{value} is as for
+\csopt{type}. This doesn't change the \field{type} for the main
+\idx{progenitor}. Remember that with the default
+\csopt[parent]{adopted-parent-field} setting, the given type 
+should match the type of the parent entry.
+
+\optsection[\subsubsection]{adopted-parent-field}
+
+This identifies the target field to be set to the corresponding
+value of the \field{adoptparents} list by the \idx{progeny}
+entries spawned by the \atentry{progenitor} type of entry.
+The default is \field{parent}.
 
 \optsection[\subsubsection]{abbreviation-name-fallback}
 
@@ -13792,6 +13846,11 @@ the corresponding primary entry's \field{type} (which may have been
 set with \csopt{type}). If the primary entry doesn't have the
 \field{type} field set, the dual's \field{type} will remain
 unchanged.
+
+\item \optfmt{same as parent}: sets the \field{type} to the same as
+the entry's parent (new to v1.9). If the entry doesn't have a parent
+or if the parent doesn't have the \field{type} field set, then
+no change is made.
 
 \item \meta{label}: sets the \field{type} field to \meta{label}.
 \end{itemize}

@@ -25,12 +25,7 @@ import java.util.Iterator;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 
-public abstract class Bib2GlsMultiEntry extends Bib2GlsEntry
+public interface Bib2GlsMultiEntry
 {
-   public Bib2GlsMultiEntry(Bib2Gls bib2gls, String entryType)
-   {
-      super(bib2gls, entryType);
-   }
-
    public abstract void populate(BibParser parser) throws IOException;
 }

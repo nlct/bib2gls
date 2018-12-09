@@ -974,6 +974,14 @@ public class GlsResource
          {
             progenitorType = getRequired(parser, list, opt);
          }
+         else if (opt.equals("progeny-type"))
+         {
+            progenyType = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("adopted-parent-field"))
+         {
+            adoptedParentField = getRequired(parser, list, opt);
+         }
          else if (opt.equals("dual-field"))
          {
             dualField = getOptional(parser, "dual", list, opt);
@@ -1065,7 +1073,8 @@ public class GlsResource
             {
                sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
-            else if (bib2gls.isKnownField(val))
+            else if (bib2gls.isKnownField(val)
+                     || bib2gls.isKnownSpecialField(val))
             {
                sortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_FIELD);
                sortSettings.setSuffixField(val);
@@ -1095,7 +1104,8 @@ public class GlsResource
                dualSortSettings.setSuffixOption(
                  SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
-            else if (bib2gls.isKnownField(val))
+            else if (bib2gls.isKnownField(val)
+                     || bib2gls.isKnownSpecialField(val))
             {
                dualSortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_FIELD);
                dualSortSettings.setSuffixField(val);
@@ -1120,9 +1130,11 @@ public class GlsResource
                secondarySortSettings.setSuffixOption(
                  SortSettings.SORT_SUFFIX_NON_UNIQUE);
             }
-            else if (bib2gls.isKnownField(val))
+            else if (bib2gls.isKnownField(val)
+                    || bib2gls.isKnownSpecialField(val))
             {
-               secondarySortSettings.setSuffixOption(SortSettings.SORT_SUFFIX_FIELD);
+               secondarySortSettings.setSuffixOption(
+                 SortSettings.SORT_SUFFIX_FIELD);
                secondarySortSettings.setSuffixField(val);
             }
             else
@@ -1260,7 +1272,8 @@ public class GlsResource
                sortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
             }
-            else if (bib2gls.isKnownField(val))
+            else if (bib2gls.isKnownField(val)
+                     || bib2gls.isKnownSpecialField(val))
             {
                sortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_FIELD);
@@ -1301,7 +1314,8 @@ public class GlsResource
                dualSortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
             }
-            else if (bib2gls.isKnownField(val))
+            else if (bib2gls.isKnownField(val)
+                   || bib2gls.isKnownSpecialField(val))
             {
                dualSortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_FIELD);
@@ -1332,7 +1346,8 @@ public class GlsResource
                secondarySortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
             }
-            else if (bib2gls.isKnownField(val))
+            else if (bib2gls.isKnownField(val)
+                  || bib2gls.isKnownSpecialField(val))
             {
                secondarySortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_FIELD);
@@ -1590,7 +1605,8 @@ public class GlsResource
          {
             String field = getRequired(parser, list, opt);
 
-            if (!field.equals("id") && !bib2gls.isKnownField(field))
+            if (!field.equals("id") && !bib2gls.isKnownField(field)
+                && !bib2gls.isKnownSpecialField(field))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, field));
@@ -1602,7 +1618,8 @@ public class GlsResource
          {
             String field = getRequired(parser, list, opt);
 
-            if (!field.equals("id") && !bib2gls.isKnownField(field))
+            if (!field.equals("id") && !bib2gls.isKnownField(field)
+                && !bib2gls.isKnownSpecialField(field))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", 
@@ -1630,7 +1647,8 @@ public class GlsResource
          {
             abbrevDefaultSortField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(abbrevDefaultSortField))
+            if (!bib2gls.isKnownField(abbrevDefaultSortField)
+             && !bib2gls.isKnownSpecialField(abbrevDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -1641,7 +1659,8 @@ public class GlsResource
          {
             symbolDefaultSortField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(symbolDefaultSortField))
+            if (!bib2gls.isKnownField(symbolDefaultSortField)
+             && !bib2gls.isKnownSpecialField(symbolDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -1652,7 +1671,8 @@ public class GlsResource
          {
             bibTeXEntryDefaultSortField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(bibTeXEntryDefaultSortField))
+            if (!bib2gls.isKnownField(bibTeXEntryDefaultSortField)
+             && !bib2gls.isKnownSpecialField(bibTeXEntryDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -1663,10 +1683,12 @@ public class GlsResource
          {
             abbrevDefaultNameField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(abbrevDefaultNameField))
+            if (!bib2gls.isKnownField(abbrevDefaultNameField)
+             && !bib2gls.isKnownSpecialField(abbrevDefaultNameField))
             {
                throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, abbrevDefaultNameField));
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                   abbrevDefaultNameField));
             }
          }
          else if (opt.equals("charset"))
@@ -3468,7 +3490,8 @@ public class GlsResource
 
       for (String field : array)
       {
-         if (!bib2gls.isKnownField(field))
+         if (!bib2gls.isKnownField(field)
+              && !bib2gls.isKnownSpecialField(field))
          {
             throw new IllegalArgumentException(
               bib2gls.getMessage("error.invalid.field", field, opt));
@@ -3984,7 +4007,8 @@ public class GlsResource
          {
             fields[i] = csvList.getValue(i).toString(parser).trim();
 
-            if (!bib2gls.isKnownField(fields[i]))
+            if (!bib2gls.isKnownField(fields[i])
+             && !bib2gls.isKnownSpecialField(fields[i]))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.field", fields[i], opt));
@@ -3996,7 +4020,8 @@ public class GlsResource
          fields = new String[1];
          fields[0] = fieldListArg.toString(parser).trim();
 
-         if (!bib2gls.isKnownField(fields[0]))
+         if (!bib2gls.isKnownField(fields[0])
+          && !bib2gls.isKnownSpecialField(fields[0]))
          {
             throw new IllegalArgumentException(
               bib2gls.getMessage("error.invalid.field", fields[0], opt));
@@ -4106,6 +4131,7 @@ public class GlsResource
          String field = it.next();
 
          if (!bib2gls.isKnownField(field) 
+             && !bib2gls.isKnownSpecialField(field)
              && !field.equals(PATTERN_FIELD_ID)
              && !field.equals(PATTERN_FIELD_ENTRY_TYPE))
          {
@@ -6475,7 +6501,8 @@ public class GlsResource
 
       entry.writeBibEntry(writer);
 
-      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId))
+      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId)
+          && !bib2gls.isKnownSpecialField(saveOriginalId))
       {
          writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
            id, saveOriginalId, entry.getOriginalId());
@@ -7311,9 +7338,18 @@ public class GlsResource
       {
          entry.putField("type", triggerType);
       }
-      else if (progenitorType != null && entry instanceof Bib2GlsProgenitor)
+      else if (progenitorType != null && entry.getFieldValue("progeny") != null)
       {
          String entryType = getType(entry, progenitorType, false);
+
+         if (entryType != null)
+         {
+            entry.putField("type", entryType);
+         }
+      }
+      else if (progenyType != null && entry.getFieldValue("progenitor") != null)
+      {
+         String entryType = getType(entry, progenyType, false);
 
          if (entryType != null)
          {
@@ -7643,7 +7679,7 @@ public class GlsResource
       {
          String key = it.next();
 
-         if (!bib2gls.isKnownField(key))
+         if (!bib2gls.isKnownField(key) && !bib2gls.isKnownSpecialField(key))
          {
             throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.field", key, optName));
@@ -7651,7 +7687,7 @@ public class GlsResource
 
          key = mapping.get(key);
 
-         if (!bib2gls.isKnownField(key))
+         if (!bib2gls.isKnownField(key) && !bib2gls.isKnownSpecialField(key))
          {
             throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.field", key, optName));
@@ -9543,9 +9579,13 @@ public class GlsResource
       {
          value = dualType;
       }
-      else if (entry instanceof Bib2GlsProgenitor)
+      else if (entry.getFieldValue("progeny") != null)
       {
          value = progenitorType;
+      }
+      else if (entry.getFieldValue("progenitor") != null)
+      {
+         value = progenyType;
       }
 
       return getType(entry, value, false);
@@ -9612,6 +9652,19 @@ public class GlsResource
       if (value.equals("same as base"))
       {
          return entry.getBase();
+      }
+
+      if (value.equals("same as parent"))
+      {
+         String parentId = entry.getParent();
+
+         if (parentId == null) return null;
+
+         Bib2GlsEntry parentEntry = getEntry(parentId);
+
+         if (parentEntry == null) return null;
+
+         return getType(parentEntry);
       }
 
       if (value.equals("same as primary") 
@@ -10279,6 +10332,11 @@ public class GlsResource
       return compactRanges;
    }
 
+   public String getAdoptedParentField()
+   {
+      return adoptedParentField;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -10350,7 +10408,9 @@ public class GlsResource
 
    private String triggerType=null;
 
-   private String progenitorType=null;
+   private String progenitorType=null, progenyType=null;
+
+   private String adoptedParentField = "parent";
 
    private String pluralSuffix="\\glspluralsuffix ";
    private String dualPluralSuffix="\\glspluralsuffix ";

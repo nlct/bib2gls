@@ -26,7 +26,8 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsProgenitor extends Bib2GlsMultiEntry
+public class Bib2GlsProgenitor extends Bib2GlsEntry 
+  implements Bib2GlsMultiEntry
 {
    public Bib2GlsProgenitor(Bib2Gls bib2gls)
    {
@@ -144,6 +145,7 @@ public class Bib2GlsProgenitor extends Bib2GlsMultiEntry
 
       String progenitorLabel = getOriginalId();
       String processedProgenitorLabel = processLabel(progenitorLabel);
+      String adoptedParentField = resource.getAdoptedParentField();
 
       StringBuilder builder = new StringBuilder();
 
@@ -194,7 +196,7 @@ public class Bib2GlsProgenitor extends Bib2GlsMultiEntry
          parentLabel = processLabel(parentLabel);
 
          spawnedEntry.putField("progenitor", processedProgenitorLabel);
-         spawnedEntry.putField("parent", parentLabel);
+         spawnedEntry.putField(adoptedParentField, parentLabel);
 
          value = new BibValueList();
          value.add(new BibUserString(parserListener.createString(
@@ -203,7 +205,7 @@ public class Bib2GlsProgenitor extends Bib2GlsMultiEntry
 
          value = new BibValueList();
          value.add(new BibUserString(parserListener.createString(parentLabel)));
-         spawnedEntry.putField("parent", value);
+         spawnedEntry.putField(adoptedParentField, value);
 
          addDependency(spawnedEntry.getId());
 

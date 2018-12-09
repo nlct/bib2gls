@@ -2391,6 +2391,21 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
+   // No key available but allow the field to be referenced
+   // in certain contexts.
+   public boolean isKnownSpecialField(String field)
+   {
+      for (String spField : SPECIAL_FIELDS)
+      {
+         if (spField.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public void selectedEntry(String label)
    {
       selectedEntries.add(label);
@@ -4880,8 +4895,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.8.20181208";
-   public static final String DATE = "2018-12-08";
+   public static final String VERSION = "1.8.20181209";
+   public static final String DATE = "2018-12-09";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4916,6 +4931,9 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsRecord> records;
    private Vector<GlsSeeRecord> seeRecords;
    private Vector<String> selectedEntries;
+
+   private static final String[] SPECIAL_FIELDS =
+    new String[] {"progeny", "progenitor"};
 
    private HashMap<String,String> glsLike;
 
