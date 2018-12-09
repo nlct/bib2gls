@@ -118,6 +118,38 @@
 \setabbreviationstyle[common]{short-nolong}
 
 \GlsXtrLoadResources[
+  entry-type-aliases={
+   bibglscommand=dualindexentry,
+   glscommand=index,
+   mainglscommand=dualindexentry,
+   resourceoption=dualindexentry,
+   command=index,
+   examplecommand=dualindexentry,
+   fileformat=index,
+   application=index,
+   package=index,
+   symbol=index,
+   specialchar=index,
+   environment=index,
+   glsenvironment=index,
+   abbreviationstyle=index,
+   glossarystyle=index,
+   categoryattribute=index,
+   counter=index,
+   labelprefix=index,
+   packageoption=dualindexentry,
+   field=dualindexentry,
+   entrytype=dualindexentry,
+   switch=dualindexentry,
+   xmltag=index,
+   unicodecategory=index,
+   texmfcnf=index,
+   file=index,
+   samplefile=dualindexentry,
+   printglossoption=index,
+   glsoption=index,
+   exampleentry=entry
+  },
   label-prefix={idx.},
   save-loclist=false,
   sort={letternumber-nocase},
@@ -1872,7 +1904,7 @@ Glsentryshort,Glsentrylong,Glsentryfirst,Glsentrysymbol,%
 Glsentryuseri,Glsentryuserii,Glsentryuseriii,Glsentryuseriv,%
 Glsentryuserv,Glsentryuservi,Glsentryplural,Glsentryfirstplural,Glsentryshortpl,%
 Glsentrylongpl,Glsentrysymbolplural,bibglshashchar,bibglsunderscorechar,%
-bibglsdollarchar,bibglsampersandchar,bibglscircumchar,glsbackslash,glstildechar,%
+bibglsdollarchar,bibglsampersandchar,bibglscircumchar,glsbackslash,glstildechar,glsopenbrace,glsclosebrace,glspercentchar,%
 glsxtrusefield,Glsxtrusefield,GLSxtrusefield,glsentrytitlecase,%
 glsxtrhiernamesep,glsxtrhiername,Glsxtrhiername,GlsXtrhiername,%
 GLSxtrhiername,GLSXTRhiername}
@@ -15787,7 +15819,7 @@ For example, suppose the \ext{bib} file contains entries in the
 form:
 \begin{codeenv}
 \atentry{dualentry}\marg{\meta{label},
-  \field{name} = \marg{\ics{cjkname}\margm{\idx{CJK} characters}},
+  \field{name} = \marg{\gls{cjkname}\margm{\idx{CJK} characters}},
   \field{description} = \margm{English translation}
 }
 \end{codeenv}
@@ -15799,7 +15831,7 @@ and the document contains:
 \cs{newglossary*}\marg{japanese}\marg{Japanese to English}
 \cs{newglossary*}\marg{english}\marg{English to Japanese}
 \strut
-\ics{newrobustcmd}\marg{\cmd{cjkname}}[1]\marg{\cmd{begin}\marg{CJK}\marg{UTF8}\marg{min}\idx{param}1\cmd{end}\marg{CJK}}
+\ics{newrobustcmd}\marg{\gls{cjkname}}[1]\marg{\cmd{begin}\marg{CJK}\marg{UTF8}\marg{min}\idx{param}1\cmd{end}\marg{CJK}}
 \strut
 \gls{GlsXtrLoadResources}\oarg{
   \csopt[testcjk]{src},\comment{bib file}
@@ -15813,19 +15845,19 @@ and the document contains:
 then \idx{CJK} characters will appear in the \meta{title} argument of 
 \gls{bibglslettergrouptitle} which causes a problem because they need
 to be encapsulated within the \env{CJK} environment. This can be more
-conveniently done with the user supplied \csfmt{cjkname}, but the \idx{CJK}
+conveniently done with the user supplied \inlinedef{cjkname}, but the \idx{CJK}
 characters need to be protected from expansion so \ics{unexpanded} is
 also needed. The new definition of \gls{bibglslettergrouptitle} needs
 to be defined before \gls{GlsXtrLoadResources}. For example:
 \begin{codeenv}
-\cs{newcommand}\marg{\gls{bibglslettergrouptitle}}[4]\marg{\cs{unexpanded}\marg{\cmd{cjkname}\marg{\idx{param}1}}}
+\cs{newcommand}\marg{\gls{bibglslettergrouptitle}}[4]\marg{\cs{unexpanded}\marg{\gls{cjkname}\marg{\idx{param}1}}}
 \end{codeenv}
 There's a slight problem here in that the English letter group titles 
 also end up encapsulated. An alternative approach is to use the
 \meta{type} part to provide different forms. For example:
 \begin{codeenv}
 \cs{newcommand}*\marg{\cmd{englishlettergroup}}[1]\marg{\idx{param}1}
-\cs{newcommand}*\marg{\cmd{japaneselettergroup}}[1]\marg{\cmd{cjkname}\marg{\idx{param}1}}
+\cs{newcommand}*\marg{\cmd{japaneselettergroup}}[1]\marg{\gls{cjkname}\marg{\idx{param}1}}
 \cs{newcommand}\marg{\gls{bibglslettergrouptitle}}[4]\marg{\comment{}
  \cs{unexpanded}\marg{\cs{csuse}\marg{\idx{param}4lettergroup}\marg{\idx{param}1}}}
 \end{codeenv}
