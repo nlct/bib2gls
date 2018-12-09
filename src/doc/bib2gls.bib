@@ -293,6 +293,127 @@
   category={command}
 }
 
+@dualindexentry{bibglsnewprogenitor,
+  name={\csfmt{bib\-gls\-new\-progenitor}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{progenitor}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnindex,
+  name={\csfmt{bib\-gls\-new\-spawn\-index}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{spawnindex}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnedindex,
+  name={\csfmt{bib\-gls\-new\-spawned\-index}},
+  user1={\margm{label}\margm{options}},
+  description={defines terms spawned from \atentry{progenitor}
+   or \atentry{spawnindex}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnindexplural,
+  name={\csfmt{bib\-gls\-new\-spawn\-index\-plural}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{spawnindexplural}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnedindexplural,
+  name={\csfmt{bib\-gls\-new\-spawned\-index\-plural}},
+  user1={\margm{label}\margm{options}\margm{name}},
+  description={defines terms spawned from \atentry{spawnindexplural}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnentry,
+  name={\csfmt{bib\-gls\-new\-spawn\-entry}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{spawnentry}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnedentry,
+  name={\csfmt{bib\-gls\-new\-spawned\-entry}},
+  user1={\margm{label}\margm{options}},
+  description={defines terms spawned from \atentry{spawnentry}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnabbreviation,
+  name={\csfmt{bib\-gls\-new\-spawn\-abbreviation}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms provided with \atentry{spawnabbreviation}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnedabbreviation,
+  name={\csfmt{bib\-gls\-new\-spawned\-abbreviation}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms spawned from \atentry{spawnabbreviation}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnacronym,
+  name={\csfmt{bib\-gls\-new\-spawn\-acronym}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms provided with \atentry{spawnacronym}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexentry{bibglsnewspawnedacronym,
+  name={\csfmt{bib\-gls\-new\-spawned\-acronym}},
+  user1={\margm{label}\margm{options}\margm{short}\margm{long}},
+  description={defines terms spawned from \atentry{spawnacronym}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexsymbol{bibglsnewspawnsymbol,
+  name={\csfmt{bib\-gls\-new\-spawn\-symbol}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{spawnsymbol}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexsymbol{bibglsnewspawnedsymbol,
+  name={\csfmt{bib\-gls\-new\-spawned\-symbol}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms spawned from \atentry{spawnsymbol}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexnumber{bibglsnewspawnnumber,
+  name={\csfmt{bib\-gls\-new\-spawn\-number}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{spawnnumber}},
+  note={\bibgls},
+  category={command}
+}
+
+@dualindexnumber{bibglsnewspawnednumber,
+  name={\csfmt{bib\-gls\-new\-spawned\-number}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms spawned from \atentry{spawnnumber}},
+  note={\bibgls},
+  category={command}
+}
+
 @dualindexentry{bibglsuselongfont,
   name={\csfmt{bib\-gls\-use\-long\-font}},
   user1={\margm{text}\margm{category}},
@@ -2170,6 +2291,13 @@ field\dhyphen locale}},
 
 @dualindexentry{opt.trigger-type,
    name={\csoptfmt{trigger\dhyphen type}},
+   user1={\meta{type}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@dualindexentry{opt.progenitor-type,
+   name={\csoptfmt{progenitor\dhyphen type}},
    user1={\meta{type}},
    category={resourceoption},
    parent={resourceoptions}
@@ -5563,7 +5691,7 @@ hyphen}},
 }
 
 @dualindexentry{field.duallongplural,
-  name={\fieldfmt{duallongplural}},
+  name={\fieldfmt{dual\-long\-plural}},
   description={The plural long form of a dual
     abbreviation mapped by \atentry{dualabbreviation}.},
   note={\appfmt{bib2gls}},
@@ -5581,9 +5709,19 @@ hyphen}},
 }
 
 @dualindexentry{field.dualshortplural,
-  name={\fieldfmt{dualshortplural}},
+  name={\fieldfmt{dual\-short\-plural}},
   description={The plural short form of a dual abbreviation
     mapped by \atentry{dualabbreviation}.},
+  note={\appfmt{bib2gls}},
+  category={bib2glsfield},
+  parent={fields}
+}
+
+@dualindexentry{field.adoptparents,
+  name={\fieldfmt{adopt\-parents}},
+  description={The list of adopted parents for entries spawned by
+    \atentry{progenitor}. (Field only available for use in 
+    \ext{bib} file within \atentry{progenitor}-like entries.)},
   note={\appfmt{bib2gls}},
   category={bib2glsfield},
   parent={fields}
@@ -5923,6 +6061,24 @@ primary formats, if enabled.},
   name={\fieldfmt{bib\-tex\-entry\-@\meta{entry-type}}},
   description={An internal list field created by \atentry{bibtexentry}.},
   note={internal field set by \bibgls},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.progeny,
+  name={\fieldfmt{progeny}},
+  description={A comma-separated list of labels identifying
+   the entries spawned by \atentry{progenitor}.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@dualindexentry{field.progenitor,
+  name={\fieldfmt{progenitor}},
+  description={The label identifying the \atentry{progenitor} 
+   that spawned this entry.},
+  note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}
 }
@@ -6273,6 +6429,54 @@ primary formats, if enabled.},
 
 @dualindexentry{entry.contributor,
   name={\atentryfmt{contributor}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.progenitor,
+  name={\atentryfmt{progenitor}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnindex,
+  name={\atentryfmt{spawnindex}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnindexplural,
+  name={\atentryfmt{spawnindexplural}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnentry,
+  name={\atentryfmt{spawnentry}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnsymbol,
+  name={\atentryfmt{spawnsymbol}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnnumber,
+  name={\atentryfmt{spawnnumber}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnabbreviation,
+  name={\atentryfmt{spawnabbreviation}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@dualindexentry{entry.spawnacronym,
+  name={\atentryfmt{spawnacronym}},
   category={entrytype},
   parent={entrytypes}
 }
@@ -8938,7 +9142,7 @@ usual delay},
   name={\csfmt{detokenize}},
   user1={\margm{general text}},
   description={expands the argument to a list of character tokens},
-  note={{}\eTeX\ primitive},
+  note={{}\eTeX\ primitive\texparserdefnote},
   category={command}
 }
 

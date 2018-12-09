@@ -3,6 +3,18 @@ v1.9 (pending):
   * new resource option:
 
      compact-ranges
+     progenitor-type
+
+  * new entry types:
+
+     @progenitor
+     @spawnindex
+     @spawnindexplural
+     @spawnentry
+     @spawnsymbol
+     @spawnnumber
+     @spawnabbreviation
+     @spawnacronym
     
 
 v1.8 (2018-11-30):

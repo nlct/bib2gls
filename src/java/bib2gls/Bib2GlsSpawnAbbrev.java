@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2018 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,46 +19,27 @@
 package com.dickimawbooks.bib2gls;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.Iterator;
-import java.util.Vector;
-import java.text.CollationKey;
+import java.util.Set;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
+public class Bib2GlsSpawnAbbrev extends Bib2GlsProgenitor
 {
-   public Bib2GlsDualAbbrev(Bib2Gls bib2gls)
+   public Bib2GlsSpawnAbbrev(Bib2Gls bib2gls)
    {
-      this(bib2gls, "dualabbreviation");
+      this(bib2gls, "spawnabbreviation");
    }
 
-   public Bib2GlsDualAbbrev(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsSpawnAbbrev(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
    }
 
-   public HashMap<String,String> getMappings()
+   protected void initMissingFields()
    {
-      return getResource().getDualAbbrevMap();
-   }
-
-   public String getFirstMap()
-   {
-      return getResource().getFirstDualAbbrevMap();
-   }
-
-   public boolean backLink()
-   {
-      return getResource().backLinkFirstDualAbbrevMap();
-   }
-
-   protected Bib2GlsDualEntry createDualEntry()
-   {
-      return new Bib2GlsDualAbbrev(bib2gls, getEntryType());
    }
 
    public void checkRequiredFields()
@@ -72,16 +53,6 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
       {
          missingFieldWarning("long");
       }
-
-      if (getField("dualshort") == null)
-      {
-         missingFieldWarning("dualshort");
-      }
-
-      if (getField("duallong") == null)
-      {
-         missingFieldWarning("duallong");
-      }
    }
 
    public String getFallbackValue(String field)
@@ -90,17 +61,24 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
 
       if (field.equals("sort"))
       {
-         String fallbackField = resource.getAbbrevDefaultSortField();
-         val = getFieldValue(fallbackField);
+         field = resource.getAbbrevDefaultSortField();
+         val = getFieldValue(field);
 
-         return val == null ? getFallbackValue(fallbackField) : val;
+         if (val != null)
+         {
+            return val;
+         }
       }
-      else if (field.equals("name"))
-      {
-         String fallbackField = resource.getAbbrevDefaultNameField();
-         val = getFieldValue(fallbackField);
 
-         return val == null ? getFallbackValue(fallbackField) : val;
+      if (field.equals("name"))
+      {
+         field = resource.getAbbrevDefaultNameField();
+         val = getFieldValue(field);
+
+         if (val != null)
+         {
+            return val;
+         }
       }
 
       return super.getFallbackValue(field);
@@ -126,6 +104,41 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
       }
 
       return super.getFallbackContents(field);
+   }
+
+   protected void changeNameCase(TeXParser parser)
+    throws IOException
+   {
+      BibValueList value = getField("name");
+
+      if (value == null)
+      {
+         return;
+      }
+
+      super.changeNameCase(parser);
+   }
+
+   public void writeCsDefinition(PrintWriter writer) throws IOException
+   {
+      // syntax: {label}{opts}{short}{long}
+
+      writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
+
+      String entryType = getEntryType();
+
+      if (entryType.endsWith("acronym"))
+      {
+         entryType = "acronym";
+      }
+      else
+      {
+         entryType = "abbreviation";
+      }
+
+      writer.format("  \\new%s[#2]{#1}{#3}{#4}%%%n", entryType);
+
+      writer.println("}");
    }
 
    public void writeBibEntry(PrintWriter writer)
@@ -161,7 +174,7 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
 
             writer.format("%s={%s}", field, getFieldValue(field));
          }
-         else if (bib2gls.getDebugLevel() > 0 && 
+         else if (bib2gls.getDebugLevel() > 0 &&
             !bib2gls.isInternalField(field))
          {
             bib2gls.debugMessage("warning.ignoring.unknown.field", field);
@@ -172,30 +185,4 @@ public class Bib2GlsDualAbbrev extends Bib2GlsDualEntry
         shortText, longText));
    }
 
-   public void writeCsDefinition(PrintWriter writer) throws IOException
-   {
-      // syntax: {label}{opts}{short}{long}
-
-      writer.println("\\glsxtrprovidestoragekey{dualshort}{}{}");
-      writer.println("\\glsxtrprovidestoragekey{dualshortplural}{}{}");
-      writer.println("\\glsxtrprovidestoragekey{duallong}{}{}");
-      writer.println("\\glsxtrprovidestoragekey{duallongplural}{}{}");
-
-      writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
-
-      String newcs = getEntryType();
-
-      if (newcs.endsWith("acronym"))
-      {
-         newcs = "acronym";
-      }
-      else
-      {
-         newcs = "abbreviation";
-      }
-
-      writer.format("  \\new%s[#2]{#1}{#3}{#4}%%%n", newcs);
-
-      writer.println("}");
-   }
 }

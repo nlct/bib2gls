@@ -305,6 +305,7 @@ Defaulting to: {0}.
 <entry key="warning.cant.parse.file">Can''t parse {0}
 {1}</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
+<entry key="warning.private.entry.type">Private entry type ''{0}'' found. Did you mean ''{1}''?</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.ignoring.unknown.field">Ignoring unknown field: {0}</entry>
 <entry key="warning.entry.already.defined">Entry {0} is being defined in {1} but it has already been defined in a previous .glstex file.</entry>

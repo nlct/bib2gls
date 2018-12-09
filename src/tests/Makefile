@@ -31,7 +31,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
-	  test-sortletternumber.pdf
+	  test-sortletternumber.pdf test-spawn.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -578,6 +578,13 @@ test-sortletternumber.pdf	: test-sortletternumber.glstex
 test-sortletternumber.glstex	: test-sortletternumber.tex test-sortletternumber.bib $(DEPS)
 		pdflatex test-sortletternumber
 		$(BIB2GLS) test-sortletternumber
+
+test-spawn.pdf	: test-spawn.glstex
+		pdflatex test-spawn
+
+test-spawn.glstex	: test-spawn.tex test-spawn.bib $(DEPS)
+		pdflatex test-spawn
+		$(BIB2GLS) test-spawn
 
 clean	:
 	$(RM) *.aux

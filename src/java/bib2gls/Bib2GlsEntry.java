@@ -1862,6 +1862,21 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
+   public void writeExtraFields(PrintWriter writer)
+   throws IOException
+   {
+      if (getEntryType().startsWith("spawned"))
+      {
+         String value = getFieldValue("progenitor");
+
+         if (value != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{progenitor}{%s}%n", getId(), 
+              value);
+         }
+      }
+   }
+
    public void writeIndexCounterField(PrintWriter writer)
    throws IOException
    {

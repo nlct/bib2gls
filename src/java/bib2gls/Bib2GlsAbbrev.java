@@ -115,7 +115,18 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       writer.format("\\providecommand{\\%s}[4]{%%%n", getCsName());
 
-      writer.format("  \\new%s[#2]{#1}{#3}{#4}%%%n", getEntryType());
+      String entryType = getEntryType();
+
+      if (entryType.endsWith("acronym"))
+      {
+         entryType = "acronym";
+      }
+      else
+      {
+         entryType = "abbreviation";
+      }
+
+      writer.format("  \\new%s[#2]{#1}{#3}{#4}%%%n", entryType);
 
       writer.println("}");
    }

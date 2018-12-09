@@ -970,6 +970,10 @@ public class GlsResource
          {
             triggerType = getRequired(parser, list, opt);
          }
+         else if (opt.equals("progenitor-type"))
+         {
+            progenitorType = getRequired(parser, list, opt);
+         }
          else if (opt.equals("dual-field"))
          {
             dualField = getOptional(parser, "dual", list, opt);
@@ -6532,6 +6536,8 @@ public class GlsResource
       {
          entry.writeIndexCounterField(writer);
       }
+
+      entry.writeExtraFields(writer);
    }
 
    private void writeBibEntryCopy(PrintWriter writer, Bib2GlsEntry entry)
@@ -7304,6 +7310,15 @@ public class GlsResource
       if (triggerType != null && entry.hasTriggerRecord())
       {
          entry.putField("type", triggerType);
+      }
+      else if (progenitorType != null && entry instanceof Bib2GlsProgenitor)
+      {
+         String entryType = getType(entry, progenitorType, false);
+
+         if (entryType != null)
+         {
+            entry.putField("type", entryType);
+         }
       }
       else if (type != null)
       {
@@ -9528,6 +9543,10 @@ public class GlsResource
       {
          value = dualType;
       }
+      else if (entry instanceof Bib2GlsProgenitor)
+      {
+         value = progenitorType;
+      }
 
       return getType(entry, value, false);
    }
@@ -10330,6 +10349,8 @@ public class GlsResource
    private String dualType=null, dualCategory=null, dualCounter=null;
 
    private String triggerType=null;
+
+   private String progenitorType=null;
 
    private String pluralSuffix="\\glspluralsuffix ";
    private String dualPluralSuffix="\\glspluralsuffix ";

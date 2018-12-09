@@ -512,11 +512,22 @@
   \renewenvironment{theglossary}%
    {%
      \setlength{\glsdescwidth}{\dimexpr\linewidth-\maxnamewidth-4\tabcolsep}%
-     \begin{tabular}{l>{\raggedright}p{\glsdescwidth}}%
+     \begin{longtable}{l>{\raggedright}p{\glsdescwidth}}%
    }%
-   {\end{tabular}}%
+   {\end{longtable}}%
   \renewcommand*{\glossaryheader}{%
-    \bfseries Field & \bfseries Description\tabularnewline}%
+    \noalign{\xdef\dofieldtabcaption{%
+      \noexpand\caption\expandonce\fieldtablelotcaption
+        {\expandonce\fieldtablecaption}}}%
+    \dofieldtabcaption
+    \fieldtablecaptionlabel
+    \fieldtablepostcaption\tabularnewline
+    \bfseries Field & \bfseries Description\tabularnewline
+    \endfirsthead
+    \caption*{\fieldtablecaption\ (Continued)}\tabularnewline
+    \bfseries Field & \bfseries Description\tabularnewline
+    \endhead
+  }%
   \renewcommand*{\glsgroupheading}[1]{}%
   \renewcommand{\glossentry}[2]{%
     \glsadd{##1}%
@@ -539,11 +550,36 @@
 
 \newlength\maxnamewidth
 
-\newcommand*{\printfields}[1]{%
+%\printfields[postcaption]{category list}[lot caption]{caption}{label}
+\newcommand*{\printfields}[2][]{%
+  \ifstrempty{#1}%
+  {%
+    \def\fieldtablepostcaption{}%
+  }%
+  {%
+    \def\fieldtablepostcaption{%
+      \tabularnewline
+      \multicolumn{2}{p{\linewidth}}{#1}%
+      \tabularnewline
+    }%
+  }%
+  \def\fieldcategories{#2}%
+  \innerprintfields
+}
+
+\newcommand*{\innerprintfields}[3][]{%
  \printunsrtglossary*[style=fieldstyle]{%
    \renewcommand*\glossarysection[2][]{}%
+   \ifstrempty{#1}%
+   {%
+     \def\fieldtablelotcaption{}%
+   }%
+   {%
+     \def\fieldtablelotcaption{[#1]}%
+   }%
+   \def\fieldtablecaption{#2}%
+   \def\fieldtablecaptionlabel{\label{#3}}%
    \setlength{\maxnamewidth}{0pt}%
-   \def\fieldcategories{#1}%
    \let\printunsrtglossaryentryprocesshook\fieldhook
  }%
 }
@@ -3237,67 +3273,64 @@ but it doesn't add any information to the cross-referencing part of the
 location list. The option may be used in combination with the \field{see} or
 \field{seealso} fields.
 
-\begin{table}[hbtp]
-\caption{Fields Provided by \styfmt{glossaries-extra}}\label{tab:fields}
-\centering
-\printfields{basefield,extrafield}%
-\end{table}
+\clearpage
 
-\begin{table}[hbtp]
-\caption{Fields Provided by \bibgls}\label{tab:bib2glsfields}
-\centering
-\printfields{bib2glsfield}%
-\end{table}
+\printfields
+ {basefield,extrafield}
+ {Fields Provided by \styfmt{glossaries-extra}}
+ {tab:fields}
 
-\begin{table}[hbtp]
-\caption[Fields Provided by \styfmt{glossaries-prefix}]{Fields
-Provided by \isty{glossaries-prefix}}\label{tab:prefixfields}
-\centering
-\printfields{prefixfield}%
-\end{table}
+\clearpage
 
-\begin{table}[hbtp]
-\caption[Fields Provided by \styfmt{glossaries-accsupp}]{Fields
-Provided by \isty{glossaries-accsupp}}
-\label{tab:accsuppfields}
-{\centering
-\printfields{accessfield}%
-\par}
-\medskip
-Don't load \isty{glossaries-accsupp} directly (with \ics{usepackage}) when using
-\styfmt{glossaries-extra}. Load using the \styopt{accsupp} package
-option instead.
+\printfields
+ {bib2glsfield}
+ {Fields Provided by \bibgls}
+ {tab:bib2glsfields}
+
+\printfields
+ {prefixfield}%
+ [Fields Provided by \styfmt{glossaries-prefix}]%
+ {Fields Provided by \isty{glossaries-prefix}}
+ {tab:prefixfields}
+
+\printfields
+ [%
+   Don't load \isty{glossaries-accsupp} directly (with \ics{usepackage}) 
+   when using \styfmt{glossaries-extra}. Load using the \styopt{accsupp} 
+   package option instead:
 \begin{codeenv}
 \cs{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
 \end{codeenv}
-\end{table}
+ ]%
+ {accessfield}%
+ [Fields Provided by \styfmt{glossaries-accsupp}]%
+ {Fields Provided by \isty{glossaries-accsupp}}
+ {tab:accsuppfields}
 
-\begin{table}[hbtp]
-\caption[Fields Set by \bibgls]{Fields Sometimes Set by \bibgls\ in
-the \iext{glstex} File}
-\label{tab:internalfields}
-You may define and assign \field{bibtextype} (although it's more
-likely to be aliased). Don't define any of others, and don't use any
-of them in the \ext{bib} file, except for \field{group},
-\field{sort} or \field{type} although those three are best
-set in the resource command or by \bibgls.\par
-\bigskip
-\centering
-\printfields{internalfield}%
-\end{table}
+\printfields
+ [%
+  You may define and assign \field{bibtextype} (although it's more
+  likely to be aliased). Don't define any of others, and don't use any
+  of them in the \ext{bib} file, except for \field{group},
+  \field{sort} or \field{type} although those three are best
+  set in the resource command or by \bibgls.%
+ ]%
+ {internalfield}%
+ [Fields Set by \bibgls]%
+ {Fields Sometimes Set by \bibgls\ in the \iext{glstex} File}%
+ {tab:internalfields}
 
-\begin{table}[hbtp]
-\caption[Internal Fields Set by \styfmt{glossaries} or
-\styfmt{glossaries-extra} or \bibgls]{Internal Fields Set by
-\styfmt{glossaries} or \styfmt{glossaries-extra} or \bibgls}%
-\label{tab:baseinternalfields}
-\medskip
-Don't define any of these and don't use any of them in the \ext{bib}
-file.\par
-\bigskip
-\centering
-\printfields{baseinternalfield}%
-\end{table}
+\printfields
+ [%
+   Don't define any of these and don't use any of them in the \ext{bib}
+   file.%
+ ]%
+ {baseinternalfield}%
+ [Internal Fields Set by \styfmt{glossaries} or \styfmt{glossaries-extra} 
+  or \bibgls]%
+ {Internal Fields Set by \isty{glossaries} or \isty{glossaries-extra} 
+  or \bibgls}%
+ {tab:baseinternalfields}
 
 \clearpage
 
@@ -5323,6 +5356,233 @@ bibtex myDoc
 pdflatex myDoc
 pdflatex myDoc
 \end{codeenv}
+
+\entrysection{progenitor}
+
+The \atentryfmt{progenitor} type of entries are the only place where
+the \field{adoptparents} field is permitted. The value should be a
+comma-separated list of labels. The \field{adoptparents} field
+must be set and must contain a least one label. This field is not
+available for use in any other context. 
+
+An entry defined as:
+\begin{codeenv}
+\atentry{progenitor}\marg{\meta{id},
+  \field{adoptparents} = \marg{\meta{parent-1 id},\ldots,\meta{parent-N id}},
+  \meta{field-name-1} = \margm{text},
+  \ldots
+  \meta{field-name-n} = \margm{text}
+}
+\end{codeenv}
+is essentially like:
+\begin{codeenv}
+\atentry{index}\marg{\meta{id},
+  \field{progeny} = \marg{\meta{parent-1 id}.\meta{id},\ldots,\meta{parent-N id}.\meta{id}},
+  \meta{field-name-1} = \margm{text},
+  \ldots
+  \meta{field-name-n} = \margm{text}
+}
+\strut
+\atentry{index}\marg{\meta{parent-1 id}.\meta{id},
+  \field{progenitor} = \margm{id},
+  \field{parent} = \margm{parent-1 id},
+  \meta{field-name-1} = \margm{text},
+  \ldots
+  \meta{field-name-n} = \margm{text}
+}
+\strut
+\ldots
+\strut
+\atentry{index}\marg{\meta{parent-N id}.\meta{id},
+  \field{progenitor} = \margm{id},
+  \field{parent} = \margm{parent-N id},
+  \meta{field-name-1} = \margm{text},
+  \ldots
+  \meta{field-name-n} = \margm{text}
+}
+\end{codeenv}
+This creates the main \meta{id} entry, which contains all the fields
+(except for \field{adoptparents}) that were in the original
+\atentry{progenitor} definition and has the new field \field{progeny}
+set. The main entries are defined in the \ext{glstex} file with
+\gls{bibglsnewprogenitor}.
+
+In addition to the main \meta{id} entry, this also creates the
+spawned entries \code{\meta{parent-1 id}.\meta{id}}, \ldots, 
+\code{\meta{parent-N id}.\meta{id}} that are dependent on the main
+\meta{id} entry.  The only fields that aren't copied from the original
+\atentry{progenitor} to the spawned entries are the
+\field{adoptparents} field (required in the original),
+and the \field{alias} and \field{parent} fields (if set).
+
+The spawned entries have the \field{parent} field set to the
+corresponding label obtained from the \field{adoptparents} list. This parent
+entry must also be defined, as usual for the \field{parent} field.
+The spawned entry type needs to match the \field{parent}. The main
+entry can be assigned to a different type with the
+\csopt{progenitor-type} option. The spawned entries are defined in
+the \ext{glstex} file with \gls{bibglsnewspawnedindex}
+
+If the main entry is referenced in the document then (assuming the
+default selection criteria) the spawned entries will also be automatically
+selected. You can check for the existence of the \field{progenitor}
+field using \cs{glsxtrifhasfield} and fetch the \field{location}
+field from the main entry, if required.
+
+Although the spawned entries are considered dependents of the main
+entry, the reverse doesn't apply. If a spawned entry is referenced
+in the document (with \code{\meta{parent-id}.\meta{id}}) then the
+main entry and its other spawned entries aren't automatically
+selected.
+
+For example, suppose the file \filefmt{entries.bib} contains:
+\begin{codeenv}
+\atentry{indexplural}\marg{stylesheet, \field{text}=\marg{stylesheet language}}
+\strut
+\atentry{index}\marg{webdesign, \field{name}=\marg{web design}}
+\strut
+\atentry{indexplural}\marg{markup, \field{text}=\marg{markup language}}
+\strut
+\atentry{progenitor}\marg{xml,
+  \field{name}=\marg{XML},
+  \field{adoptparents}=\marg{markup}
+}
+\strut
+\atentry{progenitor}\marg{css,
+  \field{name}=\marg{CSS},
+  \field{adoptparents}=\marg{stylesheet,webdesign}
+}
+\strut
+\atentry{progenitor}\marg{html,
+  \field{name}=\marg{HTML},
+  \field{adoptparents}=\marg{markup,webdesign}
+}
+\strut
+\atentry{progenitor}\marg{xsl,
+  \field{name}=\marg{XSL},
+  \field{adoptparents}=\marg{stylesheet}
+}
+\end{codeenv}
+and if the document contains:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styopt{record},\styopt[tree]{stylemods},\styopt[index]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[all]{selection}}
+\strut
+\cs{newcommand}*\marg{\cs{glstreenamefmt}}[1]\marg{\idx{param}1}
+\cmd{begin}\marg{document}
+\cs{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+Then the resulting list will be:
+\begin{quote}
+\setlength{\parindent}{0pt}%
+\setlength{\parskip}{0pt plus 0.3pt}%
+\glstreeitem CSS\par
+\glstreeitem HTML\par
+\glstreeitem markup language\par
+\glstreesubitem HTML\par
+\glstreesubitem XML\par
+\glstreeitem stylesheet language\par
+\glstreesubitem CSS\par
+\glstreesubitem XSL\par
+\glstreeitem web design\par
+\glstreesubitem CSS\par
+\glstreesubitem HTML\par
+\glstreeitem XML\par
+\glstreeitem XSL\par
+\end{quote}
+This allows the HTML and CSS entries to be listed under multiple
+parents.
+
+The following \atentryfmt{spawn\meta{type}} commands are all forms
+of \atentry{progenitor} that create the given
+\atentryfmt{\meta{type}} of entry. The spawned entries are actually
+created with the entry type \atentryfmt{spawned\meta{type}}. In the
+case of \atentry{progenitor}, the spawned entries are defined as 
+a \atentryfmt{spawnedindex} entry. These special
+\atentryfmt{spawned\meta{type}} entry types aren't intended for use
+in the \ext{bib} file, but if you reference the entry type (for
+example, with \csopt[same as entry]{category}) you will get 
+\atentryfmt{spawned\meta{type}} as the entry type.
+
+\entrysection{spawnindex}
+
+As \atentry{progenitor}, but the main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnindex} and the
+spawned entries are defined with \gls{bibglsnewspawnedindex}.
+
+\entrysection{spawnindexplural}
+
+As \atentry{progenitor}, except that it creates
+\atentry{indexplural} terms instead of \atentry{index}.
+As with \atentry{indexplural}, if the \field{name} field isn't set,
+it's assigned to the same value as the \field{plural} field (or the
+fallback for the \field{plural}, if not defined).
+
+The main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnindexplural} and the
+spawned entries are defined with \gls{bibglsnewspawnedindexplural}.
+
+\entrysection{spawnentry}
+
+As \atentry{progenitor}, except that it creates
+\atentry{entry} terms instead of \atentry{index}.
+As with \atentry{entry}, the \field{description} field is required
+and either \field{name} or \field{parent}.
+
+The main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnentry} and the
+spawned entries are defined with \gls{bibglsnewspawnedentry}.
+
+\entrysection{spawnabbreviation}
+
+As \atentry{progenitor}, except that it creates
+\atentry{abbreviation} terms instead of \atentry{index}.
+As with \atentry{abbreviation}, the \field{short} and \field{long} 
+fields are required.
+
+The main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnabbreviation} and the
+spawned entries are defined with \gls{bibglsnewspawnedabbreviation}.
+
+\entrysection{spawnacronym}
+
+As \atentry{progenitor}, except that it creates
+\atentry{acronym} terms instead of \atentry{index}.
+As with \atentry{acronym}, the \field{short} and \field{long} 
+fields are required.
+
+The main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnacronym} and the
+spawned entries are defined with \gls{bibglsnewspawnedacronym}.
+
+\entrysection{spawnsymbol}
+
+As \atentry{progenitor}, except that it creates
+\atentry{symbol} terms instead of \atentry{index}.
+As with \atentry{symbol}, the required fields are \field{name} or
+\field{parent}, and the \field{description} field is required if the
+\field{name} field is missing.
+
+The main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnsymbol} and the
+spawned entries are defined with \gls{bibglsnewspawnedsymbol}.
+
+\entrysection{spawnnumber}
+
+As \atentry{progenitor}, except that it creates
+\atentry{number} terms instead of \atentry{index}.
+As with \atentry{number}, the required fields are \field{name} or
+\field{parent}, and the \field{description} field is required if the
+\field{name} field is missing.
+
+The main entries are defined in the
+\ext{glstex} file with \gls{bibglsnewspawnnumber} and the
+spawned entries are defined with \gls{bibglsnewspawnednumber}.
+
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
@@ -7836,6 +8096,14 @@ You can define the glossary before loading the resource, but
 it's not required as \bibgls\ will write
 \code{\ics{provideignoredglossary*}\margm{type}} to the \ext{glstex} file
 (see \sectionref{sec:newglossary}).
+
+\optsection[\subsubsection]{progenitor-type}
+
+This sets the default \field{type} field for the main term defined by 
+\atentry{progenitor}-like entries. The \meta{value} is as for
+\csopt{type}. This doesn't change the \field{type} for the spawned
+progeny, which need to be in the same glossary as their
+corresponding parent.
 
 \optsection[\subsubsection]{abbreviation-name-fallback}
 
@@ -14616,6 +14884,179 @@ The definition written to the \ext{glstex} file is:
 \cs{providecommand}\marg{\gls{bibglsnewcontributor}}[4]\marg{\comment{}
  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
+\end{codeenv}
+
+\cssection{bibglsnewprogenitor}
+
+\formatdef{bibglsnewprogenitor}
+This command is used to define the main terms created by
+\atentry{progenitor}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewprogenitor}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnindex}
+
+\formatdef{bibglsnewspawnindex}
+This command is used to define the main terms created by
+\atentry{spawnindex}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnindex}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnedindex}
+
+\formatdef{bibglsnewspawnedindex}
+This command is used to define the terms spawned by
+\atentry{progenitor} or \atentry{spawnindex}. The definition is written 
+to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnedindex}}[2]\marg{\comment{}
+ \gls{newglossaryentry}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}1},\field{category}={index},\field{description}=\marg{},\idx{param}2}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnindexplural}
+
+\formatdef{bibglsnewspawnindexplural}
+This command is used to define the main terms created by
+\atentry{spawnindexplural}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnindexplural}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnedindexplural}
+
+\formatdef{bibglsnewspawnedindexplural}
+This command is used to define the terms spawned by
+\atentry{spawnindexplural}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnedindexplural}}[3]\marg{\comment{}
+ \gls{newglossaryentry}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{indexplural},\field{description}=\marg{},\idx{param}2}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnentry}
+
+\formatdef{bibglsnewspawnentry}
+This command is used to define the main terms created by
+\atentry{spawnentry}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnedentry}
+
+\formatdef{bibglsnewspawnedentry}
+This command is used to define the terms spawned by \atentry{spawnentry}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnedentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnabbreviation}
+
+\formatdef{bibglsnewspawnabbreviation}
+This command is used to define the main terms created by
+\atentry{spawnabbreviation}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnabbreviation}}[4]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnedabbreviation}
+
+\formatdef{bibglsnewspawnedabbreviation}
+This command is used to define the terms spawned by \atentry{spawnabbreviation}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnedabbreviation}}[4]\marg{\comment{}
+  \gls{newabbreviation}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnacronym}
+
+\formatdef{bibglsnewspawnacronym}
+This command is used to define the main terms created by
+\atentry{spawnacronym}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnacronym}}[4]\marg{\comment{}
+  \gls{newacronym}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnedacronym}
+
+\formatdef{bibglsnewspawnedacronym}
+This command is used to define the terms spawned by \atentry{spawnacronym}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnedacronym}}[4]\marg{\comment{}
+  \gls{newacronym}\oarg{\idx{param}2}\marg{\idx{param}1}\marg{\idx{param}3}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnsymbol}
+
+\formatdef{bibglsnewspawnsymbol}
+This command is used to define the main terms created by
+\atentry{spawnsymbol}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnsymbol}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnedsymbol}
+
+\formatdef{bibglsnewspawnedsymbol}
+This command is used to define the terms spawned by \atentry{spawnsymbol}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnedsymbol}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{spawnedsymbol},\idx{param}2}\marg{\idx{param}4}}
+\end{codeenv}
+
+\cssection{bibglsnewspawnnumber}
+
+\formatdef{bibglsnewspawnnumber}
+This command is used to define the main terms created by
+\atentry{spawnnumber}. The definition is written to the \ext{glstex}
+file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnnumber}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglsnewspawnednumber}
+
+\formatdef{bibglsnewspawnednumber}
+This command is used to define the terms spawned by \atentry{spawnnumber}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawnednumber}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{spawnednumber},\idx{param}2}\marg{\idx{param}4}}
 \end{codeenv}
 
 \section{Location Lists and Cross-References}

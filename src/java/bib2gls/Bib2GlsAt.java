@@ -50,81 +50,16 @@ public class Bib2GlsAt extends At
 
       entryType = resource.mapEntryType(entryType);
 
-      BibData data;
+      if (entryType.startsWith("spawned"))
+      {
+         bib2gls.warning(parser,
+            bib2gls.getMessage("warning.private.entry.type", 
+            entryType, "spawn"+entryType.substring(7)));
+      }
 
-      if (entryType.equals("entry"))
-      {
-         data = new Bib2GlsEntry(bib2gls);
-      }
-      else if (entryType.equals("index"))
-      {
-         data = new Bib2GlsIndex(bib2gls);
-      }
-      else if (entryType.equals("indexplural"))
-      {
-         data = new Bib2GlsIndexPlural(bib2gls);
-      }
-      else if (entryType.equals("acronym")
-            || entryType.equals("abbreviation"))
-      {
-         data = new Bib2GlsAbbrev(bib2gls, entryType);
-      }
-      else if (entryType.equals("symbol")
-            || entryType.equals("number"))
-      {
-         data = new Bib2GlsSymbol(bib2gls, entryType);
-      }
-      else if (entryType.equals("dualentry"))
-      {
-         data = new Bib2GlsDualEntry(bib2gls);
-      }
-      else if (entryType.equals("dualentryabbreviation"))
-      {
-         data = new Bib2GlsDualEntryAbbrev(bib2gls);
-      }
-      else if (entryType.equals("dualabbreviationentry"))
-      {
-         data = new Bib2GlsDualAbbrevEntry(bib2gls);
-      }
-      else if (entryType.equals("dualindexentry"))
-      {
-         data = new Bib2GlsDualIndexEntry(bib2gls);
-      }
-      else if (entryType.equals("dualindexsymbol"))
-      {
-         data = new Bib2GlsDualIndexSymbol(bib2gls);
-      }
-      else if (entryType.equals("dualindexnumber"))
-      {
-         data = new Bib2GlsDualIndexSymbol(bib2gls, entryType, "number");
-      }
-      else if (entryType.equals("dualindexabbreviation"))
-      {
-         data = new Bib2GlsDualIndexAbbrev(bib2gls);
-      }
-      else if (entryType.equals("tertiaryindexabbreviationentry"))
-      {
-         data = new Bib2GlsTertiaryIndexAbbrevEntry(bib2gls);
-      }
-      else if (entryType.equals("dualabbreviation")
-            || entryType.equals("dualacronym"))
-      {
-         data = new Bib2GlsDualAbbrev(bib2gls, entryType);
-      }
-      else if (entryType.equals("dualsymbol")
-            || entryType.equals("dualnumber"))
-      {
-         data = new Bib2GlsDualSymbol(bib2gls, entryType);
-      }
-      else if (entryType.equals("bibtexentry"))
-      {
-         data = new Bib2GlsBibTeXEntry(bib2gls);
-      }
-      else if (entryType.equals("contributor"))
-      {
-         data = new Bib2GlsContributor(bib2gls);
-      }
-      else
+      BibData data = createBib2GlsEntry(bib2gls, entryType);
+
+      if (data == null)
       {
          data = BibData.createBibData(entryType);
 
@@ -239,6 +174,100 @@ public class Bib2GlsAt extends At
       {
          ((Bib2GlsMultiEntry)data).populate(bibParser);
       }
+   }
+
+   public static Bib2GlsEntry createBib2GlsEntry(Bib2Gls bib2gls,
+      String entryType)
+   {
+      if (entryType.matches("^(spawned)?entry$"))
+      {
+         return new Bib2GlsEntry(bib2gls, entryType);
+      }
+      else if (entryType.matches("^(spawned)?index$"))
+      {
+         return new Bib2GlsIndex(bib2gls, entryType);
+      }
+      else if (entryType.matches("^(spawned)?indexplural$"))
+      {
+         return new Bib2GlsIndexPlural(bib2gls, entryType);
+      }
+      else if (entryType.matches("^(spawned)?(acronym|abbreviation)$"))
+      {
+         return new Bib2GlsAbbrev(bib2gls, entryType);
+      }
+      else if (entryType.matches("^(spawned)?(symbol|number)$"))
+      {
+         return new Bib2GlsSymbol(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualentry"))
+      {
+         return new Bib2GlsDualEntry(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualentryabbreviation"))
+      {
+         return new Bib2GlsDualEntryAbbrev(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualabbreviationentry"))
+      {
+         return new Bib2GlsDualAbbrevEntry(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualindexentry"))
+      {
+         return new Bib2GlsDualIndexEntry(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualindexsymbol"))
+      {
+         return new Bib2GlsDualIndexSymbol(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualindexnumber"))
+      {
+         return new Bib2GlsDualIndexSymbol(bib2gls, entryType, "number");
+      }
+      else if (entryType.equals("dualindexabbreviation"))
+      {
+         return new Bib2GlsDualIndexAbbrev(bib2gls, entryType);
+      }
+      else if (entryType.equals("tertiaryindexabbreviationentry"))
+      {
+         return new Bib2GlsTertiaryIndexAbbrevEntry(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualabbreviation")
+            || entryType.equals("dualacronym"))
+      {
+         return new Bib2GlsDualAbbrev(bib2gls, entryType);
+      }
+      else if (entryType.equals("dualsymbol")
+            || entryType.equals("dualnumber"))
+      {
+         return new Bib2GlsDualSymbol(bib2gls, entryType);
+      }
+      else if (entryType.equals("bibtexentry"))
+      {
+         return new Bib2GlsBibTeXEntry(bib2gls, entryType);
+      }
+      else if (entryType.equals("contributor"))
+      {
+         return new Bib2GlsContributor(bib2gls, entryType);
+      }
+      else if (entryType.equals("progenitor") 
+            || entryType.matches("^spawnindex(plural)?$"))
+      {
+         return new Bib2GlsProgenitor(bib2gls, entryType);
+      }
+      else if (entryType.equals("spawnentry"))
+      {
+         return new Bib2GlsSpawnEntry(bib2gls, entryType);
+      }
+      else if (entryType.matches("^spawn(abbreviation|acronym)$"))
+      {
+         return new Bib2GlsSpawnAbbrev(bib2gls, entryType);
+      }
+      else if (entryType.matches("^spawn(symbol|number)$"))
+      {
+         return new Bib2GlsSpawnSymbol(bib2gls, entryType);
+      }
+
+      return null;
    }
 
    protected boolean containsSpecialChars(String id)
