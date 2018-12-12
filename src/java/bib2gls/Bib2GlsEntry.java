@@ -1762,6 +1762,18 @@ public class Bib2GlsEntry extends BibEntry
       return contents;
    }
 
+   public void parseContents(TeXParser parser,
+    TeXObjectList contents, TeXObject endGroupChar)
+     throws IOException
+   {
+      super.parseContents(parser, contents, endGroupChar);
+      initMissingFields();
+   }
+
+   protected void initMissingFields()
+   {
+   }
+
    public void checkRequiredFields()
    {
       if (getField("name") == null && getField("parent") == null)
@@ -1834,7 +1846,8 @@ public class Bib2GlsEntry extends BibEntry
             writer.format("%s={%s}", field, value);
          }
          else if (bib2gls.getDebugLevel() > 0 && 
-            !bib2gls.isInternalField(field))
+            !bib2gls.isInternalField(field) &&
+            !bib2gls.isKnownSpecialField(field))
          {
             bib2gls.debugMessage("warning.ignoring.unknown.field", field);
          }

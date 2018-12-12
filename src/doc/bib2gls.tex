@@ -100,6 +100,7 @@
 \newcommand{\glsxtrpostnamecounter}{\space counter}
 
 \newcommand*{\csfmtfont}[1]{\texttt{#1}}
+\newcommand*{\csfmtcolourfont}[1]{\texttt{\textcolor{cs}{#1}}}
 
 \newcommand*{\csfmt}[1]{%
  \texorpdfstring
@@ -107,49 +108,36 @@
  {\string\\#1}%
 }
 
+\newcommand{\texparserdefprefix}{}
 \newcommand{\texparserdefnotetarget}{%
-  \raisebox{2ex}{\hypertarget{texparserdef}{}}%
+  \raisebox{2ex}{\hypertarget{\texparserdefprefix texparserdef}{}}%
   \textsuperscript{*}Indicates command is
   recognised by \bibgls's interpreter although it may have
   a slightly different implementation.
 }
-\newcommand{\texparserdefnote}{\hyperlink{texparserdef}{*}}
+\newcommand{\texparserdefnote}{\hyperlink{\texparserdefprefix texparserdef}{*}}
 
 \setabbreviationstyle[common]{short-nolong}
 
 \GlsXtrLoadResources[
   entry-type-aliases={
    bibglscommand=dualindexentry,
-   glscommand=index,
-   mainglscommand=dualindexentry,
+   mainglscommand=spawndualindexentry,
+   glscommand=spawnentry,
    resourceoption=dualindexentry,
-   command=index,
-   examplecommand=dualindexentry,
-   fileformat=index,
-   application=index,
-   package=index,
-   symbol=index,
-   specialchar=index,
-   environment=index,
-   glsenvironment=index,
-   abbreviationstyle=index,
-   glossarystyle=index,
-   categoryattribute=index,
-   counter=index,
-   labelprefix=index,
    packageoption=dualindexentry,
    field=dualindexentry,
    entrytype=dualindexentry,
    switch=dualindexentry,
-   xmltag=index,
-   unicodecategory=index,
-   texmfcnf=index,
-   file=index,
    samplefile=dualindexentry,
-   printglossoption=index,
-   glsoption=index,
+   examplecommand=dualindexentry,
+   examplesymbol=symbol,
+   exampleabbreviation=abbreviation,
    exampleentry=entry
   },
+  field-aliases={topics=adoptparents},
+  unknown-entry-alias={index},
+  save-original-entrytype,
   label-prefix={idx.},
   save-loclist=false,
   sort={letternumber-nocase},
@@ -157,11 +145,17 @@
   type={index},
   dual-field={dualid},
   match-action={add},
-  match={{category}={.*field}},
+  match-op={or},
+  match={
+   {category}={.*field},
+   {original entrytype}={.*glscommand}
+  },
   dual-prefix={},
   dual-type={main},
   combine-dual-locations={primary},
   selection={recorded and deps and see},
+  symbol-sort-fallback={name},
+  sort-label-list={progeny:letter-nocase:glsxtrentryparentname},
   strip-missing-parents,
   save-child-count
 ]
@@ -695,20 +689,100 @@
 \newcommand*{\commandsummaryhook}[1]{%
   \edef\currentcategory{\glscategory{#1}}%
   \ifdefstring{\currentcategory}{command}%
-  {}%
+  {%
+    \glsxtrifhasfield*{progenitor}{#1}%
+    {\printunsrtglossaryskipentry}{}%
+  }%
   {\printunsrtglossaryskipentry}%
 }
 
 \newcommand*{\printcommandsummary}{%
   \printunsrtglossary*[type=index,
     style=commandsummary,
-    title={Command Summary}
+    title={Command Summary},
   ]%
   {%
    \def\glossarypreamble{\texparserdefnotetarget}%
    \let\printunsrtglossaryentryprocesshook\commandsummaryhook
    \let\csref\cs
    \glsxtrlocalsetgrouptitle{glssymbols}{}%
+  }%
+}
+
+\newcommand{\topicxrhandler}[1]{%
+ \glsxtrifhasfield{parent}{#1}%
+ {%
+   \let\field\fieldfmt
+   \hyperlink
+   {topic.\glscurrentfieldvalue}%
+   {\glsentryname{\glscurrentfieldvalue}}%
+ }%
+ {\GenericWarning{}{Missing parent for `#1'}}% 
+}
+
+\newglossarystyle{commandtopic}%
+{%
+  \setglossarystyle{index}%
+  \renewcommand*{\glossaryheader}{\raggedright}%
+  \renewcommand*{\glsgroupheading}[1]{}%
+  \renewcommand*{\glossentry}[2]{%
+   \glsfieldfetch{##1}{name}{\thisvalue}%
+   \hypertarget{topic.##1}{}%
+   \pdfbookmark[1]{\thisvalue}{topic.##1}%
+   \section*{\glsdisp{##1}{\thisvalue}}%
+  }%
+  \renewcommand*{\subglossentry}[3]{%
+   \par 
+   {%
+     \let\csfmtfont\csfmtcolourfont
+     \glsxtrifhasfield{progenitor}{##2}{\gls{\glscurrentfieldvalue}}{\gls{##2}}%
+   }%
+   \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+   \glsxtrifhasfield{note}{##2}%
+   {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+   {}%
+   \nopagebreak\par\smallskip\par\nopagebreak
+   \Glossentrydesc{##2}%
+   \ifglshasdesc{##2}{.}{}%
+   \glsxtrifhasfield{progenitor}{##2}%
+   {%
+     \glsxtrifhasfield{progeny}{\glscurrentfieldvalue}% 
+     {\par\smallskip\par Topics: 
+        \let\DTLlistformatitem\topicxrhandler
+        \DTLformatlist{\glscurrentfieldvalue}.%
+     }%
+     {}%
+   }%
+   {}%
+   \par\medskip
+  }%
+}
+
+\newcommand*{\commandtopichook}[1]{%
+  \glsxtrifhasfield*{progenitor}{#1}%
+  {}%
+  {%
+    \GlsXtrIfFieldEqStr*{originalentrytype}{#1}{topic}%
+    {}%
+    {\printunsrtglossaryskipentry}%
+  }%
+}
+
+\newcommand*{\printcommandtopic}{%
+  \printunsrtglossary*[type=index,
+    style=commandtopic,
+    title={Summary by Topic of Commands Provided by 
+     \styfmt{glossaries}, \styfmt{glossaries-extra} and
+     Supplementary Glossary Packages},
+    toctitle={Summary by Topic},
+    nogroupskip,
+    nonumberlist
+  ]%
+  {%
+   \def\texparserdefprefix{topic.}%
+   \def\glossarypreamble{\texparserdefnotetarget}%
+   \let\printunsrtglossaryentryprocesshook\commandtopichook
+   \let\csref\cs
   }%
 }
 
@@ -779,6 +853,8 @@
  #1[\texorpdfstring{\glsxtrheadname{entry.#2}}{\glsentryname{entry.#2}}]
    {\glsadd{entry.#2}\glsxtrglossentry{entry.#2}}%
 }
+
+\newcommand{\entrydef}[1]{\glsadd{entry.#1}\glsxtrglossentry{entry.#1}}
 
 \newcommand*{\atentry}[2][]{%
  \texorpdfstring
@@ -1935,7 +2011,7 @@ rule that recognises these Unicode characters (for example,
 \csopt[\cs{glshex}2694 \string< \cs{glshex}2693 \string< \cs{glshex}26BD]{sort-rule}).
 
 \TeX\ syntax can be quite complicated and, in some cases, far too
-complicated for simple regular expressions. The \TeX\ parser library performs
+complicated for simple \idxpl!{regex}. The \TeX\ parser library performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls\ (and by
 \idx{convertgls2bib}). When the \longarg{debug} mode is on, any
@@ -3221,7 +3297,11 @@ treated as a comment character and other unwanted material
 should be omitted.  Avoid using comments within field values.
 Comments are best placed outside of entry definitions.
 
-The most common type of comment is the encoding comment, described above.
+The most common type of comment is the encoding comment, described
+above.  \BibTeX's \entrydef{comment} is also supported by \bibgls\
+for general comments, but not for the encoding. For example, JabRef
+uses \atentry{comment} for metadata.
+
 
 \section{Fields}
 \label{sec:fields}
@@ -5205,7 +5285,9 @@ and \atentryfmt{book} as though they were both
 \end{codeenv}
 For convenience, \isty{glossaries-extra-bib2gls} v1.29+
 provides \ics{GlsXtrBibTeXEntryAliases} which covers all the
-standard \BibTeX\ entry types. If you use 
+standard \BibTeX\ entry types. Alternatively, you can use
+\csopt[bibtexentry]{unknown-entry-alias} to alias all entries
+that aren't recognised by \bibgls. If you use 
 \csopt[same as original entry]{category}, the \field{category}
 field will be set to the original entry type (for example,
 \code{article} or \code{book}). Similarly you can use
@@ -5394,8 +5476,18 @@ pdflatex myDoc
 The \atentryfmt{progenitor} type of entries are the only place where
 the \field{adoptparents} field is permitted. The value should be a
 comma-separated list of labels. The \field{adoptparents} field
-must be set and must contain a least one label. This field is not
-available for use in any other context. 
+must be set and must contain a least one label. If the value
+contains any of the characters \idx{backslashchar} (backslash), 
+\idx{bgroupchar} (open brace) or \idx{egroupchar} (close brace) then
+the field will be interpreted (if the default \longarg{interpret} settings 
+is on).
+
+Since entries are spawned before fields are processed, the
+\field{adoptparents} field is parsed before any field aliases
+(\csopt{field-aliases}) or replication (\csopt{replicate-fields})
+takes place. However, if the \field{adoptparents} field isn't found,
+\bibgls\ will check for a simple mapping in both the
+\csopt{field-aliases} and \csopt{replicate-fields} settings.
 
 This entry type creates a main \idx[textformat=emph]{progenitor}
 term (with all the given fields except \field{adoptparents})
@@ -5556,9 +5648,9 @@ Then the resulting list will be:
 This allows the HTML and CSS entries to be listed under multiple
 parents.
 
-The following \atentryfmt{spawn\meta{type}} commands are all forms
+The following \atentryfmt{spawn\meta{single-type}} commands are all forms
 of \atentry{progenitor} that create the given
-\atentryfmt{\meta{type}} of entry. The spawned entries are actually
+\atentryfmt{\meta{single-type}} of entry. The spawned entries are actually
 created with the private entry type \atentryfmt{spawned\meta{type}}. In the
 case of \atentry{progenitor}, the spawned entries are defined as 
 a \atentryfmt{spawnedindex} entry. These special
@@ -5568,6 +5660,11 @@ example, with \csopt[same as entry]{category}) you will get
 \atentryfmt{spawned\meta{type}} as the entry type. The
 original entry type for the spawned entries is the same as
 the original entry for the main \atentry{progenitor} entry.
+
+There is currently only one form of dual \atentry{progenitor} entry and that's
+\atentry{spawndualindexentry}. Only the main \idx{progenitor} entry
+is a dual entry. The spawned \idx{progeny} are all \atentry{index} 
+primary entries.
 
 \entrysection{spawnindex}
 
@@ -5644,6 +5741,19 @@ The main entries are defined in the
 \ext{glstex} file with \gls{bibglsnewspawnnumber} and the
 spawned entries are defined with \gls{bibglsnewspawnednumber}.
 
+\entrysection{spawndualindexentry}
+
+As \atentry{progenitor}, except that the main (\idx{progenitor})
+entry behaves like \atentry{dualindexentry}. The spawned
+\idx{progeny} behave like \atentry{index} are so are all considered primary
+entries. The \field{adoptparents} field should therefore reference
+primary entries with the default \csopt[parent]{adopted-parent-field}.
+
+The main primary and secondary (dual) entries are defined in the
+\ext{glstex} file with
+\gls{bibglsnewspawndualindexentry} and
+\gls{bibglsnewspawndualindexentrysecondary}. The spawned
+\idx{progeny} are defined with \gls{bibglsnewspawnedindex}.
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
@@ -6042,6 +6152,9 @@ one mapping. For example:
 This option isn't cumulative.  Multiple instances of
 \csopt{entry-type-aliases} override previous instances.
 If \meta{\keyvallist} is empty there will be no mappings.
+You can save the original entry type in the
+\field{originalentrytype} field with
+\csopt{save-original-entrytype}.
 
 Here's another example entry in a \ext{bib} file:
 \begin{codeenv}
@@ -6083,6 +6196,14 @@ treats the entry as though it had been defined as:
    \field{long} = \marg{hypertext markup language}
 }
 \end{codeenv}
+
+\optsection{unknown-entry-alias}
+
+If this option is set, the \meta{value} is used as the alias for any
+unknown entry types (after any aliases provided with
+\csopt{entry-type-aliases} have been applied). If the value is
+missing or empty, unknown entry types will be ignored with a
+warning.
 
 \optsection{action}
 
@@ -6417,7 +6538,7 @@ field identifying the glossary label). If you've used
 \csopt{entry-type-aliases}, this refers to the target entry type not
 the original entry type specified in the \ext{bib} file.
 
-The \meta{regex} part should be a regular expression conforming
+The \meta{regex} part should be a \idx{regex} conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}. The pattern is anchored 
@@ -7489,7 +7610,7 @@ depending on whether or not \sty{fontspec} was detected.
 
 This option takes a comma-separated list as a value with each
 element in the list in the form \code{\margm{regex}\margm{replacement}}
-where \meta{regex} is a regular expression (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
+where \meta{regex} is a \idx{regex} (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}) and \meta{replacement}
 is the replacement text. Remember that the argument of
 \gls{GlsXtrLoadResources} is expanded when written to the \ext{aux}
@@ -8418,6 +8539,14 @@ style. For example:
 If set, the value of the \field{alias} field is copied to
 the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
 
+\optsection[\subsubsection]{save-original-entrytype}
+
+If this is set to \optfmt{true}, the original entry type
+(without the leading \idx{atchar}) is stored in the 
+\field{originalentrytype} field. If no entry aliasing has been
+applied (with \csopt{entry-type-aliases}) the field will be set to
+the actual entry type.
+
 \subsection{Field Adjustments}
 \label{sec:fieldmods}
 
@@ -9026,7 +9155,7 @@ fields parsed according to \csopt{dual-date-time-field-format} and
 \csopt{dual-date-time-field-locale}. If the field value is missing
 or doesn't match the given pattern it remains unchanged, otherwise
 it's converted into the form:
-\nosecdef{bibglsdatetime}
+\format{bibglsdatetime}
 where \meta{original} is the value of the field before conversion.
 If the interpreter is on, the value will be interpreted before
 being parsed if it contains \idx{escchar}, \idx{mshiftchar},
@@ -9953,7 +10082,7 @@ provided by \styfmt{glossaries}. For example:
 \cs{glsfieldfetch}\marg{gls.sample}\marg{loclist}\marg{\cmd{loclist}}\comment{fetch location list}
 \cs{glsnoidxloclist}\marg{\cmd{loclist}}\comment{iterate over locations}
 \end{codeenv}
-This uses \ics{glsnoidxloclisthandler} as the list's handler
+This uses \ics{glsnoidxloclisthandler} as the list's \idx{handler}
 macro, which simply displays each location separated by \ics{delimN}.
 (See also
 \href{http://www.dickimaw-books.com/latex/admin/html/foreachtips.shtml}{Iteration
@@ -10107,7 +10236,7 @@ You can switch from using the \field{location} field to the
   \cs{renewcommand}\marg{\cs{GlsXtrLocationField}}\marg{primarylocations}\comment{}
 }
 \end{codeenv}
-Remember that the handler used by \cs{printunsrtglossary} will
+Remember that the \idx{handler} used by \cs{printunsrtglossary} will
 fallback on the \field{loclist} field if the field identified
 by \cs{GlsXtrLocationField} is missing or empty. You may want to
 consider using \csopt[false]{save-loclist} to prevent this.
@@ -10350,7 +10479,7 @@ considered consecutive.
 then the locations aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern (line break for clarity only)\footnote{The Java class \code{\csfmt{p}\marg{javaDigit}}
-used in the regular expression will match any digits in the 
+used in the \idx{regex} will match any digits in the 
 Unicode \idx{numberdecimaldigit} category not just the digits in the Basic Latin set. Similarly \code{\csfmt{p}\marg{javaAlphabetic}} will also match alphabetic
 characters outside the Basic Latin set.}
 \begin{verbatim}
@@ -12423,7 +12552,7 @@ and \csopt[\meta{boolean}]{secondary-trim-sort}.
 
 \optsection{sort-replace}
 
-This option may be used to perform regular expression substitutions
+This option may be used to perform \idx{regex} substitutions
 on the sort value and has the same syntax as \csopt{labelify-replace}. 
 This action is done after the interpreter parses the
 sort value (if applicable) and before \csopt{sort-number-pad} (if
@@ -15150,6 +15279,32 @@ The definition is written to the \ext{glstex} file as:
  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{sort}=\marg{\idx{param}1},\field{category}=\marg{spawnednumber},\idx{param}2}\marg{\idx{param}4}}
 \end{codeenv}
 
+\cssection{bibglsnewspawndualindexentry}
+
+\formatdef{bibglsnewspawndualindexentry}
+This command is used to define the \idx{progenitor}['s] primary term created by 
+\atentry{spawndualindexentry}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawndualindexentry}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\field{category}=\marg{index},\idx{param}2}{}\comment{}
+}
+\end{codeenv}
+The \meta{description} argument is ignored.
+
+\cssection{bibglsnewspawndualindexentrysecondary}
+
+\formatdef{bibglsnewspawndualindexentrysecondary}
+This command is used to define the \idx{progenitor}['s] secondary
+(dual) term created by 
+\atentry{spawndualindexentry}. 
+The definition is written to the \ext{glstex} file as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnewspawndualindexentrysecondary}}[4]\marg{\comment{}
+ \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
+
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}
 
@@ -16429,6 +16584,20 @@ definition depends on the value of \csopt{contributor-order}. Note that if you
 have multiple resource sets, that option governs the way \bibgls's version of
 \gls{bibglscontributor} behaves. The definition is written to the \ext{glstex}
 using \cs{providecommand}, so \LaTeX\ will only pick up the first definition.
+
+\cssection{bibglsdatetime}
+
+\formatdef{bibglsdatetime}
+Used to encapsulate date-time fields identified with
+\csopt{date-time-fields}.
+Since \gls{bibglsdatetime} requires more than nine arguments, the
+remaining four arguments are picked up with:
+\nosecdef{bibglsdatetimeremainder}
+The default definitions are:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdatetime}}[9]\marg{\gls{bibglsdatetimeremainder}}
+\cs{providecommand}\marg{\gls{bibglsdatetimeremainder}}[4]\marg{\idx{param}4}
+\end{codeenv}
 
 \cssection{bibglsprimaryprefixlabel}
 
@@ -19358,7 +19527,7 @@ This allows the titles to be listed as well:
   \marg{\ics{par} No titles.}\comment{}
 }
 \end{codeenv}
-The handler macro displays the name of the associated
+The \idx{handler} macro displays the name of the associated
 \atentry{bibtexentry} term and the citation:
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\cs{par}\ics{glsentryname}\marg{\idx{param}1} \cs{cite}\marg{\idx{param}1}}
@@ -19892,7 +20061,7 @@ field is required. The simplest way to get this is to use
 given field (\fieldfmt{language} in this case) and break out of the
 loop (with \ics{glsxtrendfor}) once the language has been found.
 
-The handler function (\csfmt{addfirstlang}) is defined so that it
+The \idx{handler} function (\csfmt{addfirstlang}) is defined so that it
 adds the given language tag as a tracked language using
 \ics{TrackLocale}. This command sets
 \ics{TrackLangLastTrackedDialect} to the associated
@@ -21142,6 +21311,7 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 
 \printstyoptsummary
 \printcommandsummary
+\printcommandtopic
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}
@@ -21159,6 +21329,9 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
   \glsxtrifhasfield{location}{#1}%
   {\nobreak\cleaders\hbox to .44em{\hss\textcolor{lightgray}{.}\hss}\hfill}%
   {\glsxtrprelocation}%
+}
+\renewcommand{\printunsrtglossaryentryprocesshook}[1]{%
+ \glsxtrifhasfield*{progenitor}{#1}{\printunsrtglossaryskipentry}{}%
 }
 \renewcommand*{\unicodecategoryfmt}[1]{\textsf{#1}}
 \printunsrtglossary[type=index]

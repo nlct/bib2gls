@@ -26,15 +26,15 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
-public class Bib2GlsProgenitor extends Bib2GlsEntry 
+public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry 
   implements Bib2GlsMultiEntry
 {
-   public Bib2GlsProgenitor(Bib2Gls bib2gls)
+   public Bib2GlsSpawnDualIndexEntry(Bib2Gls bib2gls)
    {
-      this(bib2gls, "progenitor");
+      this(bib2gls, "spawndualindexentry");
    }
 
-   public Bib2GlsProgenitor(Bib2Gls bib2gls, String entryType)
+   public Bib2GlsSpawnDualIndexEntry(Bib2Gls bib2gls, String entryType)
    {
       super(bib2gls, entryType);
 
@@ -47,51 +47,13 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
       {
          missingFieldWarning("adoptparents");
       }
+
+      super.checkRequiredFields();
    }
 
-   public String getFallbackValue(String field)
+   protected String getProgenyEntryType()
    {
-      if (field.equals("name"))
-      {
-         return getOriginalId();
-      }
-      else
-      {
-         return super.getFallbackValue(field);
-      }
-   }
-
-   public BibValueList getFallbackContents(String field)
-   {
-      if (field.equals("name"))
-      {
-         if (!bib2gls.useInterpreter())
-         {
-            bib2gls.warningMessage("warning.interpreter.needed.fallback",
-              field, getId());
-            return null;
-         }
-
-         String name = getOriginalId();
-         BibValueList list = new BibValueList();
-         list.add(new BibUserString(
-            bib2gls.getInterpreterListener().createGroup(name)));
-
-         return list;
-      }
-      else
-      {
-         return super.getFallbackContents(field);
-      }
-   }
-
-   protected void initMissingFields()
-   {
-      if (getResource().getLabelPrefix() != null
-         && getFieldValue("name") == null)
-      {
-         putField("name", getOriginalId());
-      }
+      return "index";
    }
 
    public void populate(BibParser parserListener) throws IOException
@@ -100,11 +62,14 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
 
       if (value == null)
       {
-         String progenyField = resource.getOriginalField("adoptparents");
-
-         if (progenyField != null)
+         if (resource.hasFieldAliases())
          {
-            value = getField(progenyField);
+            String progenyField = resource.getOriginalField("adoptparents");
+
+            if (progenyField != null)
+            {
+               value = getField(progenyField);
+            }
          }
       }
 
@@ -142,16 +107,7 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
       {
          String parentLabel = csvList.getValue(i).toString(parser).trim();
 
-         String progenyEntryType = null;
-
-         if (getEntryType().startsWith("spawn"))
-         {
-            progenyEntryType = getEntryType().substring(5);
-         }
-         else
-         {
-            progenyEntryType = "index";
-         }
+         String progenyEntryType = getProgenyEntryType();
 
          String spawnedLabel = parentLabel+"."+getOriginalId();
 
@@ -188,7 +144,6 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
          }
 
          spawnedEntry.putField("progenitor", processedProgenitorLabel);
-         spawnedEntry.putField(adoptedParentField, parentLabel);
 
          value = new BibValueList();
          value.add(new BibUserString(parserListener.createString(
@@ -238,6 +193,21 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
    {
       writer.println(String.format("\\GlsXtrSetField{%s}{progeny}{%s}",
         getId(), getFieldValue("progeny")));
+   }
+
+   public Bib2GlsEntry createDual()
+   {
+      Bib2GlsEntry dual = super.createDual();
+
+      if (resource.hasDualPrimaryDepencendies())
+      {
+         for (Bib2GlsEntry entry : progeny)
+         {
+            dual.addDependency(entry.getId());
+         }
+      }
+
+      return dual;
    }
 
    private Vector<Bib2GlsEntry> progeny;

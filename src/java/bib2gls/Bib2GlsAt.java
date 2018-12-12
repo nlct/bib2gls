@@ -61,13 +61,27 @@ public class Bib2GlsAt extends At
 
       if (data == null)
       {
-         data = BibData.createBibData(entryType);
+         String unknownEntryType = resource.getUnknownEntryMap();
 
-         if (data instanceof BibEntry)
+         if (unknownEntryType != null 
+              && !entryType.equals("preamble") 
+              && !entryType.equals("string") 
+              && !entryType.equals("comment"))
          {
-            bib2gls.warning(parser,
-               bib2gls.getMessage("warning.ignoring.unknown.entry.type", 
-               entryType));
+            entryType = unknownEntryType;
+            data = createBib2GlsEntry(bib2gls, entryType);
+         }
+
+         if (data == null)
+         {
+            data = BibData.createBibData(entryType);
+
+            if (data instanceof BibEntry)
+            {
+               bib2gls.warning(parser,
+                  bib2gls.getMessage("warning.ignoring.unknown.entry.type", 
+                  entryType));
+            }
          }
       }
 
@@ -149,6 +163,12 @@ public class Bib2GlsAt extends At
 
       if (data instanceof BibPreamble)
       {
+         if (bib2gls.getDebugLevel() > 0 
+            && !entryType.equals(originalEntryType))
+         {
+            bib2gls.debug(String.format("@%s => @preamble", originalEntryType));
+         }
+
          BibValueList preamble = ((BibPreamble)data).getPreamble();
          TeXObjectList list = preamble.expand(parser);
 
@@ -158,6 +178,13 @@ public class Bib2GlsAt extends At
       {
          ((Bib2GlsEntry)data).setOriginalEntryType(originalEntryType);
          String id = ((Bib2GlsEntry)data).getId();
+
+         if (bib2gls.getDebugLevel() > 0 
+            && !entryType.equals(originalEntryType))
+         {
+            bib2gls.debug(String.format("@%s{%s} => @%s{%s}", originalEntryType,
+              id, entryType, id));
+         }
 
          if (bibParser.getBibEntry(id) != null)
          {
@@ -265,6 +292,10 @@ public class Bib2GlsAt extends At
       else if (entryType.matches("^spawn(symbol|number)$"))
       {
          return new Bib2GlsSpawnSymbol(bib2gls, entryType);
+      }
+      else if (entryType.equals("spawndualindexentry"))
+      {
+         return new Bib2GlsSpawnDualIndexEntry(bib2gls, entryType);
       }
 
       return null;

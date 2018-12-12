@@ -198,6 +198,15 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("unknown-entry-alias"))
+         {
+            unknownEntryMap = getOptional(parser, "", list, opt);
+
+            if ("".equals(unknownEntryMap))
+            {
+               unknownEntryMap = null;
+            }
+         }
          else if (opt.equals("field-aliases"))
          {
             fieldAliases = getHashMap(parser, list, opt);
@@ -476,6 +485,7 @@ public class GlsResource
                      p = Pattern.compile(String.format(
                             "(?:%s)|(?:%s)", p.pattern(), val));
                   }
+
                   try
                   {
                      fieldPatterns.put(field, p);
@@ -541,6 +551,7 @@ public class GlsResource
                      p = Pattern.compile(String.format(
                             "(?:%s)|(?:%s)", p.pattern(), val));
                   }
+
                   try
                   {
                      fieldPatterns.put(field, p);
@@ -811,6 +822,10 @@ public class GlsResource
          else if (opt.equals("save-child-count"))
          {
             saveChildCount = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("save-original-entrytype"))
+         {
+            saveOriginalEntryType = getBoolean(parser, list, opt);
          }
          else if (opt.equals("alias-loc"))
          {
@@ -4133,7 +4148,9 @@ public class GlsResource
          if (!bib2gls.isKnownField(field) 
              && !bib2gls.isKnownSpecialField(field)
              && !field.equals(PATTERN_FIELD_ID)
-             && !field.equals(PATTERN_FIELD_ENTRY_TYPE))
+             && !field.equals(PATTERN_FIELD_ENTRY_TYPE)
+             && !field.equals(PATTERN_FIELD_ORIGINAL_ENTRY_TYPE)
+         )
          {
             bib2gls.warning(bib2gls.getMessage("warning.unknown.field.pattern",
               field));
@@ -6538,6 +6555,12 @@ public class GlsResource
          }
       }
 
+      if (saveOriginalEntryType)
+      {
+         writer.format("\\GlsXtrSetField{%s}{originalentrytype}{%s}%n",
+           id, entry.getOriginalEntryType());
+      }
+
       if (checkEndPunc != null)
       {
          for (String f : checkEndPunc)
@@ -7726,6 +7749,10 @@ public class GlsResource
          else if (field.equals(PATTERN_FIELD_ENTRY_TYPE))
          {
             value = entry.getEntryType();
+         }
+         else if (field.equals(PATTERN_FIELD_ORIGINAL_ENTRY_TYPE))
+         {
+            value = entry.getOriginalEntryType();
          }
          else
          {
@@ -9847,6 +9874,11 @@ public class GlsResource
       return val == null ? entryType : val;
    }
 
+   public String getUnknownEntryMap()
+   {
+      return unknownEntryMap;
+   }
+
    public String getSaveOriginalIdField()
    {
       return saveOriginalId;
@@ -9865,6 +9897,40 @@ public class GlsResource
    public String getFieldAlias(String fieldName)
    {
       return fieldAliases.get(fieldName);
+   }
+
+   public String getOriginalField(String mappedName)
+   {
+      if (hasFieldAliases())
+      {
+         for (Iterator<String> it = getFieldAliasesIterator(); it.hasNext(); )
+         {
+            String key = it.next();
+
+            if (mappedName.equals(fieldAliases.get(key)))
+            {
+               return key;
+            }
+         }
+      }
+
+      if (hasFieldCopies())
+      {
+         for (Iterator<String> it = getFieldCopiesIterator();
+              it.hasNext(); )
+         {
+            String key = it.next();
+
+            Vector<String> list = getFieldCopy(key);
+
+            if (list != null && list.contains(mappedName))
+            {
+               return key;
+            }
+         }
+      }
+
+      return null;
    }
 
    public boolean isReplicateOverrideOn()
@@ -10263,7 +10329,17 @@ public class GlsResource
             bibValList.add(new BibUserString(elementList));
 
             Bib2GlsEntry copy = entry.getMinimalCopy();
-            copy.setId(element.toString(bibParser));
+            String id = element.toString(bibParser);
+
+            String prefix = entry.getPrefix();
+
+            if (prefix != null && id.startsWith(prefix) 
+                 && id.length() > prefix.length())
+            {
+               id = id.substring(prefix.length());
+            }
+
+            copy.setId(prefix, id);
             copy.putField("name", bibValList);
             copy.putField("name", elementList.toString(bibParser));
 
@@ -10337,6 +10413,11 @@ public class GlsResource
       return adoptedParentField;
    }
 
+   public boolean hasDualPrimaryDepencendies()
+   {
+      return dualPrimaryDependency;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -10346,6 +10427,8 @@ public class GlsResource
    private boolean stripMissingParents = false;
 
    private HashMap<String,String> entryTypeAliases = null;
+
+   private String unknownEntryMap = null;
 
    private HashMap<String,String> fieldAliases = null;
 
@@ -10462,6 +10545,7 @@ public class GlsResource
 
    private static final String PATTERN_FIELD_ID = "id";
    private static final String PATTERN_FIELD_ENTRY_TYPE = "entrytype";
+   private static final String PATTERN_FIELD_ORIGINAL_ENTRY_TYPE = "original entrytype";
 
    private static final Pattern PATTERN_FIELD_CS = 
        Pattern.compile("gls(?:entry|access|xtr|fmt)?(.+)");
@@ -10522,6 +10606,8 @@ public class GlsResource
      = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
 
    private boolean saveChildCount = false;
+
+   private boolean saveOriginalEntryType = false;
 
    private boolean defpagesname = false;
 

@@ -1134,6 +1134,9 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsUseField(
         "glsentrytitlecase", GlsUseField.CASE_TITLE_CASE, this));
 
+
+      listener.putControlSequence(new GlsEntryParentName(this));
+
       listener.putControlSequence(new GenericCommand(
         "glsxtrhiernamesep", null, listener.createString(".")));
       listener.putControlSequence(new GlsHierName(this));
@@ -2553,8 +2556,21 @@ public class Bib2Gls implements TeXApp
          switch (cp)
          {
             case '\\':
-               builder.append("\\glsbackslash ");
-               cs = true;
+
+               // is it followed by char`\\ ?
+
+               if (i < value.length() 
+                    && value.substring(i).startsWith("char`\\"))
+               {
+                  builder.append(value.substring(i-1, i+7));
+                  i = i+7;
+               }
+               else
+               {
+                  builder.append("\\glsbackslash ");
+                  cs = true;
+               }
+
             break;
             case '%':
                builder.append("\\glspercentchar ");
@@ -4895,8 +4911,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.8.20181209";
-   public static final String DATE = "2018-12-09";
+   public static final String VERSION = "1.8.20181212";
+   public static final String DATE = "2018-12-12";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -4933,7 +4949,7 @@ public class Bib2Gls implements TeXApp
    private Vector<String> selectedEntries;
 
    private static final String[] SPECIAL_FIELDS =
-    new String[] {"progeny", "progenitor"};
+    new String[] {"progeny", "progenitor", "adoptparents"};
 
    private HashMap<String,String> glsLike;
 

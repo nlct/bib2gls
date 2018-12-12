@@ -280,6 +280,7 @@ Defaulting to: {0}.
 <entry key="message.list.known.packages.info">Support may be quite limited in some cases.</entry>
 <entry key="message.created.missing.parent">Created missing parent ''{0}'' for entry ''{1}''</entry>
 <entry key="message.found_entry_in_resource">Found entry ''{0}'' in resource set: {1}</entry>
+<entry key="message.spawning">Spawning ''{0}'' (from ''{1}'')</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>

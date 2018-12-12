@@ -186,7 +186,8 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
             writer.format("%s={%s}", field, getFieldValue(field));
          }
          else if (bib2gls.getDebugLevel() > 0 && 
-            !bib2gls.isInternalField(field))
+            !bib2gls.isInternalField(field) &&
+            !bib2gls.isKnownSpecialField(field))
          {
             bib2gls.debugMessage("warning.ignoring.unknown.field", field);
          }

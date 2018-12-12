@@ -5,6 +5,8 @@ v1.9 (pending):
      compact-ranges
      progenitor-type
      adopted-parent-field
+     unknown-entry-alias
+     save-original-entrytype
 
   * new entry types:
 
@@ -20,6 +22,7 @@ v1.9 (pending):
   * The `type` option (and similar options that assign the `type`
     field) now accepts the special setting "same as parent".
     
+  * The `match` and `not-match` options now accept `original entrytype`.
 
 v1.8 (2018-11-30):
 

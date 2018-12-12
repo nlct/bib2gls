@@ -39,12 +39,8 @@ public class Bib2GlsIndexPlural extends Bib2GlsIndex
 
    // initialise the text field if a label prefix is supplied
 
-   public void parseContents(TeXParser parser,
-    TeXObjectList contents, TeXObject endGroupChar)
-     throws IOException
+   protected void initMissingFields()
    {
-      super.parseContents(parser, contents, endGroupChar);
-
       if (getResource().getLabelPrefix() != null
          && getFieldValue("text") == null)
       {
@@ -138,7 +134,8 @@ public class Bib2GlsIndexPlural extends Bib2GlsIndex
             writer.format("%s={%s}", field, getFieldValue(field));
          }
          else if (bib2gls.getDebugLevel() > 0 && 
-            !bib2gls.isInternalField(field))
+            !bib2gls.isInternalField(field) &&
+            !bib2gls.isKnownSpecialField(field))
          {
             bib2gls.debugMessage("warning.ignoring.unknown.field", field);
          }

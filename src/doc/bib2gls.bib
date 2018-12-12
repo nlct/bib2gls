@@ -2,44 +2,48 @@
 
 % Custom entry types will need aliasing.
 %
-% @bibglscommand     -> \bibgls... command provided by bib2gls
-% @glscommand        -> command provided by glossaries.sty,
-%                       glossaries-extra.sty or supplemental glossary packages.
-% @mainglscommand    -> glossary-related command with formal syntax described
-%                       in the main matter.
-% @resourceoption    -> \GlsXtrLoadResources option
-% @command           -> command provided by kernel or other package
-% @examplecommand    -> custom command defined in the examples
-% @fileformat        -> file format
-% @application       -> application
-% @package           -> package
-% @specialchar       -> special character
-% @environment       -> environment
-% @glsenvironment    -> environment provided by glossaries.sty
-% @abbreviationstyle -> abbreviation style
-% @glossarystyle     -> glossary style
-% @categoryattribute -> category attribute
-% @counter           -> counter
-% @labelprefix       -> label prefix
-% @packageoption     -> package option
-% @field             -> field
-% @entrytype         -> entry type
-% @switch            -> command line switch
-% @xmltag            -> tag in XML language resource file
-% @unicodecategory   -> Unicode category
-% @texmfcnf          -> texmf.cnf setting
-% @file              -> file
-% @samplefile        -> sample file
-% @printglossoption  -> \printunsrtglossary option
-% @glsoption         -> \gls option
-% @exampleentry      -> example entry
+% @bibglscommand       -> \bibgls... command provided by bib2gls
+% @glscommand          -> command provided by glossaries.sty,
+%                        glossaries-extra.sty or supplemental glossary packages.
+% @mainglscommand      -> glossary-related command with formal syntax described
+%                        in the main matter.
+% @resourceoption      -> \GlsXtrLoadResources option
+% @command             -> command provided by kernel or other package
+% @examplecommand      -> custom command defined in the examples
+% @fileformat          -> file format
+% @application         -> application
+% @package             -> package
+% @specialchar         -> special character
+% @environment         -> environment
+% @glsenvironment      -> environment provided by glossaries.sty
+% @abbreviationstyle   -> abbreviation style
+% @glossarystyle       -> glossary style
+% @categoryattribute   -> category attribute
+% @counter             -> counter
+% @labelprefix         -> label prefix
+% @packageoption       -> package option
+% @field               -> field
+% @entrytype           -> entry type
+% @switch              -> command line switch
+% @xmltag              -> tag in XML language resource file
+% @unicodecategory     -> Unicode category
+% @texmfcnf            -> texmf.cnf setting
+% @file                -> file
+% @samplefile          -> sample file
+% @printglossoption    -> \printunsrtglossary option
+% @glsoption           -> \gls option
+% @glsaddoption        -> \glsadd option
+% @exampleentry        -> example entry
+% @examplesymbol       -> example symbol
+% @exampleindex        -> example term
+% @exampleabbreviation -> example abbreviation
+% @topic               -> topic
 
 @preamble{"\providecommand{\dhyphen}{-}
 \providecommand{\csfmt}[1]{\texttt{\glsbackslash #1}}
 \providecommand{\derivfn}[1]{f'(#1)}
 \providecommand{\rangestartmark}{\symbol{40}}
-\providecommand{\rangeendmark}{\symbol{41}}
-"}
+\providecommand{\rangeendmark}{\symbol{41}}"}
 
 @abbreviation{IETF,
  short = {IETF},
@@ -90,11 +94,143 @@
   long = {encapsulating command}
 }
 
+@topic{definingterms,
+  name={defining terms}
+}
+
+@topic{formattingcommands,
+  name={formatting commands}
+}
+
+@topic{abbreviationcommands,
+  name={abbreviation commands}
+}
+
+@topic{glossarystylecommands,
+  name={glossary style commands}
+}
+
+@topic{separatorcommands,
+  name={separator commands}
+}
+
+@topic{crossrefcommands,
+  name={cross-referencing commands}
+}
+
+@topic{loclistcommands,
+  name={location list commands (records)}
+}
+
+@topic{fixedtextcommands,
+  name={fixed text commands}
+}
+
+@topic{fieldrefcommands,
+  name={field reference commands}
+}
+
+@topic{entryrefcommands,
+  name={entry reference commands}
+}
+
+@topic{glossrefs,
+  name={glossary lists (\NoCaseChange{\field{type}})}
+}
+
+@topic{standalonestyles,
+  name={standalone styles}
+}
+
+@topic{providingcommands,
+  name={defining or redefining commands}
+}
+
+@topic{linkcommands,
+  name={hyperlink-capable commands or targets}
+}
+
+@topic{supplementalrefs,
+  name={supplemental document references}
+}
+
+@topic{assigncommands,
+  name={assignment commands}
+}
+
+@topic{groupcommands,
+  name={glossary group commands}
+}
+
+@topic{charcommands,
+  name={character or symbol commands}
+}
+
+@topic{casecommands,
+  name={case-changing commands}
+}
+
+@topic{internalcommands,
+  name={internal commands}
+}
+
+@topic{auxcommands,
+  name={auxiliary file commands}
+}
+
+@topic{listcommands,
+  name={list commands (internal or comma-separated)}
+}
+
+@topic{collationsubrules,
+  name={collation sub-rules}
+}
+
+@topic{catattrcommands,
+  name={category attribute commands}
+}
+
+@topic{regex,
+  name={regular expressions},
+  text={regular expression},
+}
+
+@topic{access-support,
+  name={accessibility support}
+}
+
+@topic{conditionals,
+  name={conditionals and boolean values},
+  text={conditional},
+  plural={conditionals}
+}
+@indexplural{booleanvals,
+  text={boolean value},
+  alias={conditionals}
+}
+
+@topic{debugging,
+  name={debugging commands},
+  text={debugging command}
+}
+
+@topic{shortcutcommands,
+  name={shortcut commands},
+  text={shortcut command}
+}
+
+@topic{hooks}
+@topic{loops}
+@index{iteration,see={loops}}
+@indexplural{handler,seealso={loops}}
+@topic{indexing}
+
 @bibglscommand{bibglsnewentry,
   name={\csfmt{bib\-gls\-new\-entry}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{entry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -102,6 +238,7 @@
   name={\csfmt{bib\-gls\-new\-symbol}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{symbol}},
+  topics={definingterms},
   note={\bibgls},
   category={command}
 }
@@ -111,6 +248,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{number}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -119,6 +257,7 @@
   user1={\margm{label}\margm{options}},
   description={defines terms provided with \atentry{index}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -127,6 +266,7 @@
   user1={\margm{label}\margm{options}\margm{name}},
   description={defines terms provided with \atentry{index}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -135,6 +275,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms provided with \atentry{abbreviation}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -142,6 +283,7 @@
   name={\csfmt{bib\-gls\-new\-acronym}},
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms provided with \atentry{acronym}},
+  topics={definingterms},
   note={\bibgls},
   category={command}
 }
@@ -150,6 +292,7 @@
   name={\csfmt{bib\-gls\-new\-dual\-entry}},
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{dualentry}},
+  topics={definingterms},
   note={\bibgls},
   category={command}
 }
@@ -160,6 +303,7 @@
   description={defines primary terms provided with
 \atentry{dualindexentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -169,6 +313,7 @@
   description={defines secondary terms provided with
 \atentry{dualindexentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -177,6 +322,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{symbol}\margm{description}},
   description={defines primary terms provided with
 \atentry{dualindexsymbol}},
+  topics={definingterms},
   note={\bibgls},
   category={command}
 }
@@ -187,6 +333,7 @@
   description={defines secondary terms provided with
 \atentry{dualindexsymbol}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -196,6 +343,7 @@
   description={defines primary terms provided with
 \atentry{dualindexnumber}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -205,6 +353,7 @@
   description={defines secondary terms provided with
 \atentry{dualindexnumber}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -214,6 +363,7 @@
   description={defines primary terms provided with
 \atentry{dualindexabbreviation}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -223,6 +373,7 @@
   description={defines secondary terms provided with
 \atentry{dualindexabbreviation}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -232,6 +383,7 @@
   description={defines primary terms provided with
 \atentry{dualabbreviationentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -241,6 +393,7 @@
   description={defines secondary terms provided with
 \atentry{dualabbreviationentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -250,6 +403,7 @@
   description={defines primary terms provided with (deprecated)
 \atentry{dualentryabbreviation}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -258,6 +412,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}\margm{description}},
   description={defines secondary terms provided with (deprecated)
 \atentry{dualentryabbreviation}},
+  topics={definingterms},
   note={\bibgls},
   category={command}
 }
@@ -267,6 +422,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{dualsymbol}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -275,6 +431,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{dualnumber}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -283,6 +440,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms provided with
 \atentry{dualabbreviation}},
+  topics={definingterms},
   note={\bibgls},
   category={command}
 }
@@ -292,6 +450,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms provided with \atentry{dualacronym}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -301,6 +460,7 @@
   description={defines primary terms provided with
 \atentry{tertiaryindexabbreviationentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -310,6 +470,7 @@
   description={defines secondary and tertiary terms provided with
 \atentry{tertiaryindexabbreviationentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -318,6 +479,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{bibtexentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -327,6 +489,7 @@
   description={defines terms provided with
    \atentry{contributor}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -335,6 +498,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{progenitor}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -343,6 +507,25 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{spawnindex}},
   note={\bibgls},
+  topics={definingterms},
+  category={command}
+}
+
+@bibglscommand{bibglsnewspawndualindexentry,
+  name={\csfmt{bib\-gls\-new\-spawn\-dual\-index\-entry}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines terms provided with \atentry{spawndualindexentry}},
+  note={\bibgls},
+  topics={definingterms},
+  category={command}
+}
+
+@bibglscommand{bibglsnewspawndualindexentrysecondary,
+  name={\csfmt{bib\-gls\-new\-spawn\-dual\-index\-entry\-secondary}},
+  user1={\margm{label}\margm{options}\margm{name}\margm{description}},
+  description={defines secondary terms provided with \atentry{spawndualindexentry}},
+  note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -352,6 +535,7 @@
   description={defines terms spawned from \atentry{progenitor}
    or \atentry{spawnindex}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -360,6 +544,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{spawnindexplural}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -368,6 +553,7 @@
   user1={\margm{label}\margm{options}\margm{name}},
   description={defines terms spawned from \atentry{spawnindexplural}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -376,6 +562,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{spawnentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -384,6 +571,7 @@
   user1={\margm{label}\margm{options}},
   description={defines terms spawned from \atentry{spawnentry}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -392,6 +580,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms provided with \atentry{spawnabbreviation}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -400,6 +589,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms spawned from \atentry{spawnabbreviation}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -408,6 +598,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms provided with \atentry{spawnacronym}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -416,6 +607,7 @@
   user1={\margm{label}\margm{options}\margm{short}\margm{long}},
   description={defines terms spawned from \atentry{spawnacronym}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -424,6 +616,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{spawnsymbol}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -432,6 +625,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms spawned from \atentry{spawnsymbol}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -440,6 +634,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms provided with \atentry{spawnnumber}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -448,6 +643,7 @@
   user1={\margm{label}\margm{options}\margm{name}\margm{description}},
   description={defines terms spawned from \atentry{spawnnumber}},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -457,6 +653,7 @@
   description={ensures that the given text is formatted according to
     the given category's long format},
   note={\bibgls},
+  topics={definingterms},
   category={command}
 }
 
@@ -466,7 +663,7 @@
   description={applies the formatting command used for the long
    form for the abbreviation style associated with the given category},
   note={\styfmt{glossaries-extra} v1.21+},
-  note={\bibgls},
+  topics={formattingcommands,abbreviationcommands},
   category={command}
 }
 
@@ -480,6 +677,7 @@
    comma-separated elements of \meta{format list}. The format isn't automatically
    applied to the \cs{glsadd} options},
   note={\styfmt{glossaries-extra} v1.37+},
+  topics={hooks,indexing},
   category={command}
 }
 
@@ -489,6 +687,7 @@
   description={ensures that the given text is formatted according to
     the given category's short format},
   note={\bibgls},
+  topics={formattingcommands,abbreviationcommands},
   category={command}
 }
 
@@ -498,6 +697,7 @@
   description={applies the formatting command used for the short
    form for the abbreviation style associated with the given category},
   note={\styfmt{glossaries-extra} v1.21+},
+  topics={formattingcommands,abbreviationcommands},
   category={command}
 }
 
@@ -507,6 +707,7 @@
   description={separator between \field{see} 
    cross-references and location list},
   note={\bibgls},
+  topics={glossarystylecommands,separatorcommands,crossrefcommands,loclistcommands},
   category={command}
 }
 
@@ -516,6 +717,7 @@
   description={separator between \field{alias} 
    cross-reference and location list},
   note={\bibgls},
+  topics={glossarystylecommands,separatorcommands,crossrefcommands,loclistcommands},
   category={command}
 }
 
@@ -525,6 +727,7 @@
   description={separator between \field{seealso} 
    cross-references and location list},
   note={\bibgls},
+  topics={glossarystylecommands,separatorcommands,crossrefcommands,loclistcommands},
   category={command}
 }
 
@@ -533,6 +736,7 @@
   user1={\margm{pattern}\margm{part1}\margm{part2}},
   description={compaction used on the end range location},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands},
   category={command}
 }
 
@@ -541,6 +745,7 @@
   user1={},
   description={passim range suffix},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands},
   category={command}
 }
 
@@ -549,21 +754,24 @@
   user1={},
   description={name used by passim range suffix},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands,fixedtextcommands},
   category={command}
 }
 
 @bibglscommand{bibglsusesee,
   name={\csfmt{bib\-gls\-use\-see}},
   user1={\margm{label}},
-  description={display cross-reference list for given entry},
+  description={display \field{see} cross-reference list for given entry},
   note={\bibgls},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,fieldrefcommands},
   category={command}
 }
 
 @bibglscommand{bibglsusealias,
   name={\csfmt{bib\-gls\-use\-alias}},
   user1={\margm{label}},
-  description={display cross-reference list for given entry},
+  description={display the \field{alias} cross-reference for given entry},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,fieldrefcommands},
   note={\bibgls},
   category={command}
 }
@@ -571,7 +779,8 @@
 @bibglscommand{bibglsuseseealso,
   name={\csfmt{bib\-gls\-use\-see\-also}},
   user1={\margm{label}},
-  description={display cross-reference list for given entry},
+  description={display the \field{seealso} cross-reference list for given entry},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,fieldrefcommands},
   note={\bibgls},
   category={command}
 }
@@ -579,17 +788,20 @@
 @bibglscommand{bibglsdelimN,
   name={\csfmt{bib\-gls\-delimN}},
   user1={},
-  description={delimit individual locations (except last)},
+  description={separator for individual locations (except last)},
   seealso={bibglslastDelimN},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands,separatorcommands},
   category={command}
 }
 
 @bibglscommand{bibglslastDelimN,
   name={\csfmt{bib\-gls\-last\-DelimN}},
   user1={},
-  description={delimit last location},
+  description={separator before the last location (where there is
+    more than one location)},
   seealso={bibglsdelimN},
+  topics={glossarystylecommands,loclistcommands,separatorcommands},
   note={\bibgls},
   category={command}
 }
@@ -599,6 +811,7 @@
   user1={\marg{\meta{start}\cs{delimR} \meta{end}}},
   description={Explicit range format},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands},
   category={command}
 }
 
@@ -607,6 +820,7 @@
   user1={\margm{location}},
   description={interloper location format},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands},
   category={command}
 }
 
@@ -615,6 +829,7 @@
   user1={},
   description={location list post prefix},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands},
   category={command}
 }
 
@@ -622,6 +837,7 @@
   name={\csfmt{bib\-gls\-loc\-prefix}},
   user1={\margm{n}},
   description={location list prefix},
+  topics={glossarystylecommands,loclistcommands},
   note={\bibgls},
   category={command}
 }
@@ -631,6 +847,7 @@
   user1={\margm{n}\margm{locations}},
   description={location list encapsulator used in the
 \field{primarylocations} field},
+  topics={loclistcommands},
   note={\bibgls},
   category={command}
 }
@@ -639,6 +856,7 @@
   name={\csfmt{bib\-gls\-page\-name}},
   user1={},
   description={name used for single page},
+  topics={glossarystylecommands,loclistcommands,fixedtextcommands},
   note={\bibgls},
   category={command}
 }
@@ -647,6 +865,7 @@
   name={\csfmt{bib\-gls\-pages\-name}},
   user1={},
   description={name used for multiple pages},
+  topics={glossarystylecommands,loclistcommands,fixedtextcommands},
   note={\bibgls},
   category={command}
 }
@@ -655,6 +874,7 @@
   name={\csfmt{bib\-gls\-loc\-suffix}},
   user1={\margm{n}},
   description={location list suffix},
+  topics={glossarystylecommands,loclistcommands},
   note={\bibgls},
   category={command}
 }
@@ -664,6 +884,7 @@
   user1={\margm{text}\margm{label}},
   description={displays \meta{text} with a hyperlink to the entry
    given by \meta{label}, if supported},
+  topics={linkcommands,fieldrefcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -672,6 +893,7 @@
   name={\csfmt{bib\-gls\-location\-group}},
   user1={\margm{n}\margm{counter}\margm{list}},
   description={location group encapsulator},
+  topics={glossarystylecommands,loclistcommands},
   note={\bibgls},
   category={command}
 }
@@ -680,6 +902,7 @@
   name={\csfmt{bib\-gls\-location\-group\-sep}},
   user1={},
   description={location group separator},
+  topics={glossarystylecommands,loclistcommands,separatorcommands},
   note={\bibgls},
   category={command}
 }
@@ -689,6 +912,7 @@
   user1={\margm{n}\margm{list}},
   description={supplemental list encapsulator},
   note={\bibgls},
+  topics={glossarystylecommands,loclistcommands,supplementalrefs},
   category={command}
 }
 
@@ -696,6 +920,7 @@
   name={\csfmt{bib\-gls\-supple\-mental\-sep}},
   user1={},
   description={separator between main and supplementary locations},
+  topics={glossarystylecommands,loclistcommands,supplementalrefs,separatorcommands},
   note={\bibgls},
   category={command}
 }
@@ -704,6 +929,7 @@
   name={\csfmt{bib\-gls\-supple\-mental\-sub\-list}},
   user1={\margm{n}\margm{external document}\margm{list}},
   description={supplemental sub-list encapsulator},
+  topics={glossarystylecommands,loclistcommands,supplementalrefs},
   note={\bibgls},
   category={command}
 }
@@ -712,6 +938,7 @@
   name={\csfmt{bib\-gls\-supple\-mental\-sub\-sep}},
   user1={},
   description={separator between supplementary sub-lists},
+  topics={glossarystylecommands,loclistcommands,supplementalrefs,separatorcommands},
   note={\bibgls},
   category={command}
 }
@@ -721,6 +948,7 @@
   user1={\margm{label}},
   description={formats the heading for the group identified by the
 given label},
+  topics={glossarystylecommands,formattingcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -729,6 +957,7 @@ given label},
   name={\csfmt{bib\-gls\-set\-last\-group\-title}},
   user1={\margm{cs}\margm{specs}},
   description={sets the last group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -737,6 +966,7 @@ given label},
   name={\csfmt{bib\-gls\-set\-letter\-group\-title}},
   user1={\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}},
   description={sets the letter group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -745,14 +975,16 @@ given label},
   name={\csfmt{gls\-xtr\-set\-group\-title}},
   user1={\margm{group label}\margm{group title}},
   description={globally sets the title for the group identified by the given label},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\styfmt{glossaries-extra} v1.14+},
   category={command}
 }
 
-@mainglscommand{glsxtrlocalsetgrouptitle,
+@glscommand{glsxtrlocalsetgrouptitle,
   name={\csfmt{gls\-xtr\-local\-set\-group\-title}},
   user1={\margm{group label}\margm{group title}},
   description={locally sets the title for the group identified by the given label},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\styfmt{glossaries-extra} v1.24+},
   category={command}
 }
@@ -761,6 +993,7 @@ given label},
   name={\csfmt{bib\-gls\-letter\-group}},
   user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
   description={expands to the letter group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -769,6 +1002,7 @@ given label},
   name={\csfmt{bib\-gls\-letter\-group\-title}},
   user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
   description={expands to the letter group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -777,6 +1011,7 @@ given label},
   name={\csfmt{bib\-gls\-set\-other\-group\-title}},
   user1={\marg{\margm{character}\margm{id}\margm{type}}},
   description={sets the non-letter group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -785,6 +1020,7 @@ given label},
   name={\csfmt{bib\-gls\-other\-group}},
   user1={\margm{character}\margm{id}\margm{type}},
   description={expands to the non-letter group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -793,6 +1029,7 @@ given label},
   name={\csfmt{bib\-gls\-other\-group\-title}},
   user1={\margm{character}\margm{id}\margm{type}},
   description={expands to the non-letter group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -801,6 +1038,7 @@ given label},
   name={\csfmt{bib\-gls\-set\-empty\-group\-title}},
   user1={\marg{\margm{type}}},
   description={sets the empty group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -809,6 +1047,7 @@ given label},
   name={\csfmt{bib\-gls\-empty\-group}},
   user1={\margm{type}},
   description={expands to the empty group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -817,6 +1056,7 @@ given label},
   name={\csfmt{bib\-gls\-empty\-group\-title}},
   user1={\margm{type}},
   description={expands to the empty group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -826,6 +1066,7 @@ given label},
   user1={\marg{\margm{label}\margm{character}\margm{id}\margm{type}}},
   description={sets the Unicode script, category or character code
 title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -836,6 +1077,7 @@ title},
   description={expands to the Unicode script or category label or
 character code},
   note={\bibgls},
+  topics={glossarystylecommands,groupcommands},
   category={command}
 }
 
@@ -844,6 +1086,7 @@ character code},
   user1={\margm{label}\margm{character}\margm{id}\margm{type}},
   description={expands to the Unicode script or category label or
 character code},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -852,6 +1095,7 @@ character code},
   name={\csfmt{bib\-gls\-set\-number\-group\-title}},
   user1={\marg{\margm{value}\margm{id}\margm{type}}},
   description={sets the number group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -860,6 +1104,7 @@ character code},
   name={\csfmt{bib\-gls\-number\-group}},
   user1={\margm{value}\margm{id}\margm{type}},
   description={expands to the number group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -868,6 +1113,7 @@ character code},
   name={\csfmt{bib\-gls\-number\-group\-title}},
   user1={\margm{value}\margm{id}\margm{type}},
   description={expands to the number group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -876,6 +1122,7 @@ character code},
   name={\csfmt{bib\-gls\-set\-date\-time\-group\-title}},
   user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}}},
   description={sets the date-time group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -884,6 +1131,7 @@ character code},
   name={\csfmt{bib\-gls\-date\-time\-group}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the date-time group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -892,6 +1140,7 @@ character code},
   name={\csfmt{bib\-gls\-date\-time\-group\-title}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the date-time group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -900,6 +1149,7 @@ character code},
   name={\csfmt{bib\-gls\-set\-date\-group\-title}},
   user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}}},
   description={sets the date (no time) group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -908,6 +1158,7 @@ character code},
   name={\csfmt{bib\-gls\-date\-group}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the date group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -916,6 +1167,7 @@ character code},
   name={\csfmt{bib\-gls\-date\-group\-title}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the date group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -924,6 +1176,7 @@ character code},
   name={\csfmt{bib\-gls\-set\-time\-group\-title}},
   user1={\marg{\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}}},
   description={sets the time (no date) group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -932,6 +1185,7 @@ character code},
   name={\csfmt{bib\-gls\-time\-group}},
   user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the time group label},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -940,6 +1194,7 @@ character code},
   name={\csfmt{bib\-gls\-time\-group\-title}},
   user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the time group title},
+  topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
 }
@@ -948,6 +1203,7 @@ character code},
   name={\csfmt{bib\-gls\-hyper\-group}},
   user1={\margm{type}\margm{group\dhyphen id}},
   description={creates group navigation information},
+  topics={glossarystylecommands,groupcommands,linkcommands},
   note={\bibgls},
   category={command}
 }
@@ -956,6 +1212,7 @@ character code},
   name={\csfmt{bib\-gls\-flattened\-homograph}},
   user1={\margm{name}\margm{parent label}},
   description={expands to the flattened entry's new name},
+  topics={glossarystylecommands,formattingcommands},
   note={\bibgls},
   category={command}
 }
@@ -964,6 +1221,7 @@ character code},
   name={\csfmt{bib\-gls\-flattened\-child\-pre\-sort}},
   user1={\margm{child name}\margm{parent name}},
   description={expands to the pre-sort flattened child entry's new name},
+  topics={glossarystylecommands,formattingcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -973,6 +1231,7 @@ character code},
   user1={\margm{parent name}\margm{child name}},
   description={expands to the post-sort flattened child entry's new
 name},
+  topics={glossarystylecommands,formattingcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -981,6 +1240,7 @@ name},
   name={\csfmt{bib\-gls\-set\-widest}},
   user1={\margm{level}\margm{name}},
   description={sets the widest name},
+  topics={glossarystylecommands,assigncommands},
   note={\bibgls},
   category={command}
 }
@@ -989,6 +1249,7 @@ name},
   name={\csfmt{bib\-gls\-set\-widest\-for\-type}},
   user1={\margm{type}\margm{level}\margm{name}},
   description={sets the widest name for the given glossary type},
+  topics={glossarystylecommands,assigncommands},
   note={\bibgls},
   category={command}
 }
@@ -1001,6 +1262,7 @@ name},
    where there are only top level entries,
    where \meta{glossary list} is a comma-separated list
    of glossary labels},
+  topics={glossarystylecommands,assigncommands},
   note={\bibgls},
   category={command}
 }
@@ -1012,6 +1274,7 @@ name},
    in the event that \bibgls\ can't determine the widest name,
    where \meta{glossary list} is a comma-separated list
    of glossary labels},
+  topics={glossarystylecommands,assigncommands},
   note={\bibgls},
   category={command}
 }
@@ -1021,6 +1284,7 @@ name},
   user1={\margm{type}},
   description={fallback used instead of \csref{bibglssetwidestfortype}
    in the event that \bibgls\ can't determine the widest name},
+  topics={glossarystylecommands,assigncommands},
   note={\bibgls},
   category={command}
 }
@@ -1031,6 +1295,7 @@ name},
   description={fallback used instead of \csref{bibglssetwidestfortype}
    in the event that \bibgls\ can't determine the widest name
    where there are only top-level entries},
+  topics={glossarystylecommands,assigncommands},
   note={\bibgls},
   category={command}
 }
@@ -1041,6 +1306,7 @@ name},
   user1={\margm{list}\margm{number}},
   description={used to markup a list of names from a field 
    that was converted from \BibTeX's contributor syntax},
+  topics={formattingcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1050,6 +1316,7 @@ name},
   user1={\margm{forenames}\margm{von-part}\margm{surname}\margm{suffix}},
   description={used to markup a contributor's name that was converted from
    \BibTeX's contributor syntax},
+  topics={formattingcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1058,6 +1325,7 @@ name},
   name={\csfmt{bib\-gls\-date}},
   user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\margm{original}},
   description={used to markup a date converted from a field value},
+  topics={formattingcommands},
   note={\bibgls},
   category={command}
 }
@@ -1066,6 +1334,7 @@ name},
   name={\csfmt{bib\-gls\-date\-time}},
   user1={\margm{year}\margm{month}\margm{day-of-month}\margm{day-of-week}\margm{day-of-year}\margm{era}\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\margm{original}},
   description={used to markup a date-time instance converted from a field value},
+  topics={formattingcommands},
   note={\bibgls},
   category={command}
 }
@@ -1075,6 +1344,7 @@ name},
   user1={\margm{millisec}\margm{dst}\margm{zone}\margm{original}},
   description={used internally to pick up the final four arguments of
    \csref{bibglsdatetime}},
+  topics={formattingcommands},
   note={\bibgls},
   category={command}
 }
@@ -1083,6 +1353,7 @@ name},
   name={\csfmt{bib\-gls\-time}},
   user1={\margm{hour}\margm{minute}\margm{second}\margm{millisec}\margm{dst}\margm{zone}\margm{original}},
   description={used to markup a time converted from a field value},
+  topics={formattingcommands},
   note={\bibgls},
   category={command}
 }
@@ -1091,6 +1362,7 @@ name},
   name={\csfmt{bib\-gls\-hash\-char}},
   user1={},
   description={expands to a literal hash character},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1099,6 +1371,7 @@ name},
   name={\csfmt{bib\-gls\-under\-score\-char}},
   user1={},
   description={expands to a literal underscore character},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1107,6 +1380,7 @@ name},
   name={\csfmt{bib\-gls\-dollar\-char}},
   user1={},
   description={expands to a literal dollar character},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1115,6 +1389,7 @@ name},
   name={\csfmt{bib\-gls\-amper\-sand\-char}},
   user1={},
   description={expands to a literal ampersand character},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1123,6 +1398,7 @@ name},
   name={\csfmt{bib\-gls\-circum\-char}},
   user1={},
   description={expands to a literal circumflex character},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1132,6 +1408,7 @@ name},
   user1={\margm{hex}\margm{char}},
   description={expands to a literal percent character followed by
 \meta{hex}},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1140,6 +1417,7 @@ name},
   name={\csfmt{bib\-gls\-href\-unicode}},
   user1={\margm{hex}\margm{char}},
   description={expands to \meta{char} by default},
+  topics={charcommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1149,6 +1427,7 @@ name},
   user1={\margm{prefix}},
   description={hook provided to pick up the primary prefix, if
    required},
+  topics={hooks},
   note={\bibgls},
   category={command}
 }
@@ -1158,6 +1437,7 @@ name},
   user1={\margm{prefix}},
   description={hook provided to pick up the dual prefix, if
    required},
+  topics={hooks},
   note={\bibgls},
   category={command}
 }
@@ -1167,6 +1447,7 @@ name},
   user1={\margm{prefix}},
   description={hook provided to pick up the tertiary prefix, if
    required},
+  topics={hooks},
   note={\bibgls},
   category={command}
 }
@@ -1176,6 +1457,7 @@ name},
   user1={\margm{n}\margm{prefix}},
   description={hook provided to pick up the \meta{n}th external prefix, if
    required},
+  topics={hooks},
   note={\bibgls},
   category={command}
 }
@@ -1184,6 +1466,7 @@ name},
   name={\csfmt{bib\-gls\-upper\-case}},
   user1={\margm{text}},
   description={converts \meta{text} to \idx{uppercase}},
+  topics={formattingcommands,casecommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1192,6 +1475,7 @@ name},
   name={\csfmt{bib\-gls\-lower\-case}},
   user1={\margm{text}},
   description={converts \meta{text} to \idx{lowercase}},
+  topics={formattingcommands,casecommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1200,6 +1484,7 @@ name},
   name={\csfmt{bib\-gls\-title\-case}},
   user1={\margm{text}},
   description={converts \meta{text} to \idx{titlecase}},
+  topics={formattingcommands,casecommands},
   note={\bibgls\texparserdefnote},
   category={command}
 }
@@ -1208,6 +1493,7 @@ name},
   name={\csfmt{bib\-gls\-first\-uc}},
   user1={\margm{text}},
   description={converts the first letter of \meta{text} to \idx{uppercase}},
+  topics={formattingcommands,casecommands},
   note={\bibgls},
   category={command}
 }
@@ -1216,6 +1502,7 @@ name},
   name={\csfmt{gls\-expand\-fields}},
   user1={},
   description={switches on field expansion},
+  topics={assigncommands,definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1224,6 +1511,7 @@ name},
   name={\csfmt{gls\-no\-expand\-fields}},
   user1={},
   description={switches off field expansion},
+  topics={assigncommands,definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1232,6 +1520,7 @@ name},
   name={\csfmt{gls\-set\-expand\-field}},
   user1={\margm{field}},
   description={switches on field expansion for the given field},
+  topics={assigncommands,definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1240,6 +1529,7 @@ name},
   name={\csfmt{gls\-set\-no\-expand\-field}},
   user1={\margm{field}},
   description={switches off field expansion for the given field},
+  topics={assigncommands,definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1248,6 +1538,7 @@ name},
   name={\csfmt{new\-glossary\-entry}},
   user1={\margm{label}\margm{\keyvallist}},
   description={defines a new glossary entry},
+  topics={definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1258,6 +1549,7 @@ name},
   description={defines a new glossary entry and appends
    \csfmt{leavemode}\csfmt{unskip}\cs{nopostdesc} at the end of
 \meta{description}},
+  topics={definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1267,6 +1559,7 @@ name},
   user1={\margm{label}\margm{\keyvallist}\margm{description}},
   description={defines a new glossary entry without appending any
 extra code to the end of \meta{description}},
+  topics={definingterms},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -1276,6 +1569,7 @@ extra code to the end of \meta{description}},
   user1={\margm{label}\margm{\keyvallist}},
   description={defines a new glossary entry if one doesn't
     already exist with the given label},
+  topics={definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1285,6 +1579,7 @@ extra code to the end of \meta{description}},
   user1={\margm{label}\margm{\keyvallist}\margm{description}},
   description={defines a new glossary entry if one doesn't
     already exist with the given label},
+  topics={definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1294,6 +1589,7 @@ extra code to the end of \meta{description}},
   user1={\oargm{\keyvallist}\margm{label}},
   description={defines a new glossary entry where the
    \field{description} field defaults to empty},
+  topics={definingterms},
   note={\styfmt{glossaries}'s \styopt{index} package option},
   category={command}
 }
@@ -1302,6 +1598,7 @@ extra code to the end of \meta{description}},
   name={\csfmt{new\-abbre\-vi\-a\-tion}},
   user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}},
   description={defines a new abbreviation},
+  topics={definingterms},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -1313,6 +1610,7 @@ extra code to the end of \meta{description}},
     \styfmt{glossaries-extra} package redefines this to use
     \csref{newabbreviation} with the \field{category} set to 
     \code{acronym}},
+  topics={definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -1321,6 +1619,7 @@ extra code to the end of \meta{description}},
   name={\csfmt{gls\-xtr\-new\-symbol}},
   user1={\oargm{\keyvallist}\margm{label}\margm{symbol}},
   description={defines a new symbol},
+  topics={definingterms},
   note={\styfmt{glossaries-extra} \styopt{symbols}},
   category={command}
 }
@@ -1329,6 +1628,7 @@ extra code to the end of \meta{description}},
   name={\csfmt{gls\-xtr\-new\-number}},
   user1={\oargm{\keyvallist}\margm{label}},
   description={defines a new number},
+  topics={definingterms},
   note={\styfmt{glossaries-extra} \styopt{numbers}},
   category={command}
 }
@@ -1337,6 +1637,7 @@ extra code to the end of \meta{description}},
   name={\csfmt{new\-dual\-entry}},
   user1={\oargm{\keyvallist}\margm{label}\margm{short}\margm{long}\margm{description}},
   description={example given in \styfmt{glossaries} user manual},
+  topics={definingterms},
   category={command}
 }
 
@@ -1345,6 +1646,7 @@ extra code to the end of \meta{description}},
   user1={\margm{type}\margm{group id}},
   description={command written to the \ext{aux} file that identifies that the given group was used in the
    glossary on the previous run},
+  topics={groupcommands,internalcommands,auxcommands},
   note={\styfmt{glossary-hypernav}},
   category={command}
 }
@@ -1355,6 +1657,7 @@ extra code to the end of \meta{description}},
   description={this internal command is written to the \ext{aux}
 file by \csref{glsxtrresourcefile}
    to provide \bibgls\ with the resource information},
+  topics={internalcommands,auxcommands},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
 }
@@ -1364,6 +1667,7 @@ file by \csref{glsxtrresourcefile}
   user1={\margm{n}\margm{page}},
   description={This command simply expands to \meta{n}, the value of
 the \counter{wrglossary} counter for the given page},
+  topics={internalcommands,loclistcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.29+},
   category={command}
 }
@@ -1373,6 +1677,7 @@ the \counter{wrglossary} counter for the given page},
   user1={\margm{text}\margm{label}},
   description={Creates a hyperlink to the \counter{wrglossary}
 location obtained from the \field{indexcounter} field},
+  topics={linkcommands,loclistcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.29+},
   category={command}
 }
@@ -1382,6 +1687,7 @@ location obtained from the \field{indexcounter} field},
   user1={\margm{text}\margm{label}},
   description={Creates a hyperlink to the dual entry whose label is
    obtained from the field given by \csref{GlsXtrDualField}},
+  topics={linkcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.30+},
   category={command}
 }
@@ -1392,6 +1698,7 @@ location obtained from the \field{indexcounter} field},
   description={The field used to store the dual label. This defaults 
    to \field{dual} but will need to be redefined if a different
    value is given by \csopt{dual-field}},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.30+},
   category={command}
 }
@@ -1402,7 +1709,9 @@ location obtained from the \field{indexcounter} field},
   description={formats the given text according to the formatting 
    command identified by the value of the field obtained 
    from \cs{GlsXtrFmtField}},
+  topics={fieldrefcommands,linkcommands,formattingcommands},
   note={\styfmt{glossaries-extra} v1.12+},
+  seealso={glsxtrfmtdisplay},
   category={command}
 }
 
@@ -1411,6 +1720,8 @@ location obtained from the \field{indexcounter} field},
   user1={\oargm{options}\margm{label}\margm{text}\oargm{insert}},
   description={like \csref{glsxtrfmt} but inserts extra
    material into the link text but outside of the formatting command},
+  topics={fieldrefcommands,linkcommands,formattingcommands},
+  seealso={glsxtrfmtdisplay},
   note={\styfmt{glossaries-extra} v1.23+},
   category={command}
 }
@@ -1420,6 +1731,7 @@ location obtained from the \field{indexcounter} field},
   user1={\margm{label}\margm{text}},
   description={alternative to \csref{glsxtrfmt} for use in
     section headings},
+  topics={fieldrefcommands,formattingcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -1432,6 +1744,7 @@ location obtained from the \field{indexcounter} field},
 identified by \cs{GlsXtrFmtField} and \meta{insert} is empty for the
 unstarred \csref{glsxtrfmt} and the final optional argument of the
 starred version \csref{glsxtrfmt*}},
+  topics={formattingcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -1441,6 +1754,7 @@ starred version \csref{glsxtrfmt*}},
   user1={\oargm{options}\margm{filename}},
   description={input the \ext{glstex} file created by \bibgls\ and
    write resource instructions to the \ext{aux} file},
+  topics={indexing},
   note={\styfmt{glossaries-extra} v1.08+},
   seealso={resourceoptions,GlsXtrLoadResources},
   category={command}
@@ -1532,6 +1846,13 @@ starred version \csref{glsxtrfmt*}},
 @resourceoption{opt.entry-type-aliases,
    name={\csoptfmt{entry\dhyphen type\dhyphen aliases}},
    user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.unknown-entry-alias,
+   name={\csoptfmt{unknown\dhyphen entry\dhyphen alias}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -1985,6 +2306,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.save-original-entrytype,
+   name={\csoptfmt{save\dhyphen original\dhyphen entrytype}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.short-plural-suffix,
    name={\csoptfmt{short\dhyphen plural\dhyphen suffix}},
    user1={\meta{value}},
@@ -2343,7 +2671,7 @@ field\dhyphen locale}},
 }
 
 @resourceoption{opt.progeny-type,
-   name={\csoptfmt{progenitor\dhyphen type}},
+   name={\csoptfmt{progeny\dhyphen type}},
    user1={\meta{type}},
    category={resourceoption},
    parent={resourceoptions}
@@ -2836,6 +3164,7 @@ pattern}},
   name={\csfmt{Gls\-Xtr\-Load\-Resources}},
   user1={\oargm{options}},
   description={a shortcut command that uses \csref{glsxtrresourcefile}},
+  topics={indexing,shortcutcommands},
   note={\styfmt{glossaries-extra} v1.11+},
   seealso={resourceoptions,glsxtrresourcefile},
   category={command}
@@ -2846,6 +3175,7 @@ pattern}},
   user1={\margm{label}\margm{type}},
   description={copies the entry given by \meta{label} to the
 glossary given by \meta{type}},
+  topics={assigncommands,definingterms},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -2857,6 +3187,7 @@ cs}\margm{glspl-like cs}\margm{Gls-like
 cs}\margm{Glspl-like cs}},
   description={defines commands to behave like \ics{gls}, \ics{glspl},
    \ics{Gls} and \ics{Glspl} with the given label prefix},
+  topics={entryrefcommands,providingcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   seealso={glsxtrnewgls},
   category={command}
@@ -2867,6 +3198,7 @@ cs}\margm{Glspl-like cs}},
   user1={\oargm{options}\margm{prefix}\margm{cs}},
   description={defines the command \meta{cs} to behave like 
   \ics{gls} with the given label prefix},
+  topics={entryrefcommands,providingcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   seealso={gls},
   category={command}
@@ -2876,7 +3208,8 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{gls\-no\-idx\-display\-loc}},
   user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}},
   description={used to display a regular location in the
-  \field{location} field},
+  \field{location} field (with a hyperlink, if enabled)},
+  topics={loclistcommands,linkcommands},
   note={\styfmt{glossaries} v4.04+},
   category={command}
 }
@@ -2885,7 +3218,8 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{gls\-xtr\-display\-loc\-name\-ref}},
   user1={\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}\margm{hcounter}\margm{file}},
   description={used to display a \code{nameref} location in the
-  \field{location} field},
+  \field{location} field (with a hyperlink, if enabled)},
+  topics={loclistcommands,linkcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   category={command}
 }
@@ -2894,7 +3228,8 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{gls\-xtr\-display\-supp\-loc}},
   user1={\margm{prefix}\margm{counter}\margm{format}\margm{src}\margm{location}},
   description={used to display an external location in the
-   supplementary list},
+   supplementary list (with a hyperlink, if enabled)},
+  topics={loclistcommands,linkcommands,supplementalrefs},
   note={\styfmt{glossaries-extra-bib2gls} v1.36+},
   category={command}
 }
@@ -2903,7 +3238,8 @@ cs}\margm{Glspl-like cs}},
   name={\csfmt{gls\-xtr\-multi\-supp\-location}},
   user1={\margm{location}\margm{src}\margm{format}},
   description={used by \csref{glsxtrdisplaysupploc} to format the
-  external location},
+  external location (with a hyperlink, if enabled)},
+  topics={loclistcommands,linkcommands,formattingcommands,supplementalrefs},
   note={\styfmt{glossaries-extra-bib2gls} v1.36+},
   category={command}
 }
@@ -2914,6 +3250,7 @@ cs}\margm{Glspl-like cs}},
   and \csref{glsxtrmultisupplocation} to the
    URL of the supplemental document for use by
     \cs{glshypernumber}},
+  topics={loclistcommands,supplementalrefs},
   note={\styfmt{glossaries-extra} v1.14+},
   seealso={glshypernumber,glsxtrsupphypernumber,glsxtrmultisupplocation,glsxtrlocationhyperlink},
   category={command}
@@ -2925,6 +3262,7 @@ cs}\margm{Glspl-like cs}},
   description={used to create the location hyperlink,
    this tests if an internal or external link is required
    depending on the definition of \cs{glsxtrsupplocationurl}},
+  topics={loclistcommands,linkcommands,supplementalrefs},
   note={\styfmt{glossaries-extra} v1.14+},
   seealso={glsxtrsupphypernumber,glsxtrsupplocationurl},
   category={command}
@@ -2937,6 +3275,7 @@ cs}\margm{Glspl-like cs}},
    to the given location (if hyperlinks are supported) but
    first checks the \catattr{externallocation} attribute to determine
    if an external link is required},
+  topics={loclistcommands,linkcommands,supplementalrefs},
   note={\styfmt{glossaries-extra} v1.14+},
   seealso={glsxtrlocationhyperlink,glsxtrsupplocationurl},
   category={command}
@@ -2947,6 +3286,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}},
   description={this command is written to the \ext{aux} file each
    time an entry is indexed to provide \bibgls\ with the record information},
+  topics={internalcommands,auxcommands,indexing},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
 }
@@ -2956,6 +3296,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{prefix}\margm{counter}\margm{format}\margm{location}\margm{title}\margm{href}\margm{hcounter}},
   description={used instead of \csref{glsxtr@record} when the
    \styopt[nameref]{record} option is used},
+  topics={internalcommands,auxcommands,indexing},
   note={\styfmt{glossaries-extra} v1.37+},
   category={command}
 }
@@ -2965,6 +3306,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{field}\margm{item}},
   description={adds the given item to the given field that contains
    an \styfmt{etoolbox} internal list},
+  topics={listcommands,assigncommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldifinlist,glsxtrfieldforlistloop,glsxtrfielddolistloop},
   category={command}
@@ -2975,6 +3317,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{field}\margm{item}\margm{true}\margm{false}},
   description={tests if the given item is in the given field that contains
    an \styfmt{etoolbox} internal list},
+  topics={listcommands,conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldxifinlist,glsxtrfieldlistadd,glsxtrfieldforlistloop,glsxtrfielddolistloop},
   category={command}
@@ -2985,6 +3328,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{field}\margm{item}\margm{true}\margm{false}},
   description={tests if the expansion of the given item is in the given field that contains
    an \styfmt{etoolbox} internal list},
+  topics={listcommands,conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldifinlist},
   category={command}
@@ -2996,6 +3340,7 @@ cs}\margm{Glspl-like cs}},
   description={collation sub-rule for control characters usually
 placed at the start of a rule in the \qt{ignored characters} section
 (although there typically won't be any control codes in sort fields)},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3004,6 +3349,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-space\-rules}},
   user1={},
   description={collation sub-rule for space characters},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3012,6 +3358,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-non\-printable\-rules}},
   user1={},
   description={collation sub-rule for non-printable characters},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3020,6 +3367,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-combining\-diacritic\-rules}},
   user1={},
   description={collation sub-rule for combining diacritic characters},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3028,6 +3376,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-hyphen\-rules}},
   user1={},
   description={collation sub-rule for hyphen characters},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3036,6 +3385,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-general\-punc\-rules}},
   user1={},
   description={collation sub-rule for general punctuation characters},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3045,6 +3395,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   user1={},
   description={collation sub-rule for digits from the basic Latin
 set (0, \ldots, 9) as well as their subscript and superscript variants},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3053,6 +3404,7 @@ set (0, \ldots, 9) as well as their subscript and superscript variants},
   name={\csfmt{gls\-xtr\-fraction\-rules}},
   user1={},
   description={collation sub-rule for vulgar fraction characters},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3062,6 +3414,7 @@ set (0, \ldots, 9) as well as their subscript and superscript variants},
   user1={},
   description={collation sub-rule for math-Greek characters
 (includes upright digamma between epsilon and zeta)},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3072,6 +3425,7 @@ set (0, \ldots, 9) as well as their subscript and superscript variants},
   description={collation sub-rule for Latin characters
 (basic Latin set plus subscript and superscript Latin
 characters)},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   seealso={glsxtrGeneralLatinIIrules,glsxtrGeneralLatinIIIrules,glsxtrGeneralLatinIVrules,glsxtrGeneralLatinVrules,glsxtrGeneralLatinVIrules,glsxtrGeneralLatinVIIrules,glsxtrGeneralLatinVIIIrules},
   category={command}
@@ -3084,6 +3438,7 @@ characters)},
 (as \cs{glsxtrGeneralLatinIrules} but includes \DH/\dh\ between D/d
 and E/e
 and \ss\ treated as \qt{ss})},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3095,6 +3450,7 @@ and \ss\ treated as \qt{ss})},
 (as \cs{glsxtrGeneralLatinIrules} but includes \DH/\dh\ between D/d
 and E/e
 and \ss\ treated as \qt{sz})},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3107,6 +3463,7 @@ and \ss\ treated as \qt{sz})},
 and E/e
 and \AE/\ae\ treated as AE/ae, \OE/\oe\ treated
 as OE/oe, \TH/\th\ treated as TH/th and \ss\ treated as \qt{ss})},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3118,6 +3475,7 @@ as OE/oe, \TH/\th\ treated as TH/th and \ss\ treated as \qt{ss})},
 (as \cs{glsxtrGeneralLatinIrules} but includes \DH/\dh\ between D/d
 and E/e
 and \TH/\th\ treated as TH/th and \ss\ treated as \qt{ss})},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3129,6 +3487,7 @@ and \TH/\th\ treated as TH/th and \ss\ treated as \qt{ss})},
 (as \cs{glsxtrGeneralLatinIrules} but includes \DH/\dh\ between D/d
 and E/e
 and \TH/\th\ treated as TH/th and \ss\ treated as \qt{sz})},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3144,6 +3503,7 @@ G/g, \OE/\oe\
 between O/o and P/p, \longs\ (long S)
 equivalent to S/s, \TH/\th\ between T/t and U/u and \Wynn/\wynn\
 (wynn) as W/w},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3156,6 +3516,7 @@ as \cs{glsxtrGeneralLatinIrules} but includes \AE/\ae\ treated as
 A/a, \OE/\oe\ treated as OE/oe, \TH/\th\ treated as TH/th, \ss\
 treated as \qt{ss}, \DH/\dh\ treated as D/d, \O/\o\ treated as O/o
 and \L/\l\ treated as L/l},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3164,6 +3525,7 @@ and \L/\l\ treated as L/l},
   name={\csfmt{gls\-xtr\-Latin\-AA}},
   user1={},
   description={collation sub-rule for \AA/\aa},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3172,6 +3534,7 @@ and \L/\l\ treated as L/l},
   name={\csfmt{gls\-xtr\-Latin\-O\-slash}},
   user1={},
   description={collation sub-rule for \O/\o},
+  topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
   category={command}
 }
@@ -3192,18 +3555,20 @@ and \L/\l\ treated as L/l},
   category={command}
 }
 
-@command{omicron,
+@glscommand{omicron,
   name={\csfmt{omicron}},
   user1={},
   description={Greek letter omicron $\omicron$},
+  topics={charcommands},
   note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote},
   category={command}
 }
 
-@command{Alpha,
+@glscommand{Alpha,
   name={\csfmt{Alpha}},
   user1={},
   description={Greek letter alpha $\Alpha$},
+  topics={charcommands},
   note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote},
   category={command}
 }
@@ -3381,7 +3746,7 @@ and \L/\l\ treated as L/l},
   category={command}
 }
 
-@file{file.ormats,
+@index{fileformats,
   name={file formats},
   text={file format}
 }
@@ -5978,6 +6343,15 @@ field.},
   parent={internalfields}
 }
 
+@field{field.originalentrytype,
+  name={\fieldfmt{original\-entry\-type}},
+  description={The original entry type before any aliasing was
+  applied or the actual entry type if no aliasing.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
 @field{field.primarylocations,
   name={\fieldfmt{primarylocations}},
   description={Stores the locations that use one of the designated
@@ -6388,6 +6762,12 @@ primary formats, if enabled.},
   parent={entrytypes}
 }
 
+@entrytype{entry.comment,
+  name={\atentryfmt{comment}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
 @entrytype{entry.entry,
   name={\atentryfmt{entry}},
   category={entrytype},
@@ -6521,43 +6901,49 @@ primary formats, if enabled.},
 }
 
 @entrytype{entry.spawnindex,
-  name={\atentryfmt{spawnindex}},
+  name={\atentryfmt{spawn\-index}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @entrytype{entry.spawnindexplural,
-  name={\atentryfmt{spawnindexplural}},
+  name={\atentryfmt{spawn\-index\-plural}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @entrytype{entry.spawnentry,
-  name={\atentryfmt{spawnentry}},
+  name={\atentryfmt{spawn\-entry}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @entrytype{entry.spawnsymbol,
-  name={\atentryfmt{spawnsymbol}},
+  name={\atentryfmt{spawn\-symbol}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @entrytype{entry.spawnnumber,
-  name={\atentryfmt{spawnnumber}},
+  name={\atentryfmt{spawn\-number}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @entrytype{entry.spawnabbreviation,
-  name={\atentryfmt{spawnabbreviation}},
+  name={\atentryfmt{spawn\-abbreviation}},
   category={entrytype},
   parent={entrytypes}
 }
 
 @entrytype{entry.spawnacronym,
-  name={\atentryfmt{spawnacronym}},
+  name={\atentryfmt{spawn\-acronym}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@entrytype{entry.spawndualindexentry,
+  name={\atentryfmt{spawn\-dual\-index\-entry}},
   category={entrytype},
   parent={entrytypes}
 }
@@ -7398,6 +7784,7 @@ primary formats, if enabled.},
   user1={\oargm{link text}\margm{label}},
   description={creates a hyperlink to the entry information in the
    glossary},
+  topics={linkcommands,entryrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7407,6 +7794,7 @@ primary formats, if enabled.},
   user1={\margm{label}\margm{field}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list},
+  topics={listcommands,loops,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldforlistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
   category={command}
@@ -7417,6 +7805,7 @@ primary formats, if enabled.},
   user1={\margm{label}\margm{field}\margm{handler}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list, using the given handler},
+  topics={listcommands,loops,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.29+},
   seealso={glsxtrfielddolistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
   category={command}
@@ -7427,6 +7816,7 @@ primary formats, if enabled.},
   user1={\margm{label}\margm{field}\margm{cs}},
   description={fetches the value of the given field for the given
    label and stores it in the command \meta{cs}},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -7436,6 +7826,7 @@ primary formats, if enabled.},
   user1={\margm{cs}\margm{label}},
   description={assigns the sort value for \cs{index} when
    using auto-indexing},
+  topics={hooks,indexing},
   note={\styfmt{glossaries-extra} v1.16+},
   category={command}
 }
@@ -7445,6 +7836,7 @@ primary formats, if enabled.},
   user1={\margm{label}},
   description={used for the actual value in \cs{index} when
    using auto-indexing},
+  topics={hooks,indexing},
   note={\styfmt{glossaries-extra} v1.16+},
   category={command}
 }
@@ -7457,6 +7849,7 @@ primary formats, if enabled.},
    item in the list is encapsulated with \cs{glsseeitem} and
    each element is separated with \cs{glsseesep} or
    \cs{glsseelastsep}},
+  topics={formattingcommands,crossrefcommands,loclistcommands},
   note={\styfmt{glossaries}},
   seealso={glsseeitem,glsseeitemformat,glsseesep,glsseelastsep},
   category={command}
@@ -7469,6 +7862,7 @@ primary formats, if enabled.},
    The default behaviour is to create a hyperlink (if enabled) to the 
    referenced entry with the link text given by
    \code{\cs{glsseeitemformat}\margm{label}}},
+  topics={formattingcommands,crossrefcommands,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   seealso={glsseeformat,glsseeitemformat},
   category={command}
@@ -7483,6 +7877,7 @@ primary formats, if enabled.},
    \styfmt{glossaries-extra} this uses either \cs{glsentryshort}
    or \cs{glsentryname} depending on whether or not the
    \field{short} field has been set},
+  topics={formattingcommands,crossrefcommands,loclistcommands},
   note={\styfmt{glossaries} v3.0+},
   seealso={glsseeformat,glsseeitem},
   category={command}
@@ -7493,6 +7888,7 @@ primary formats, if enabled.},
   description={the separator used between all but the last 
   entries of a cross-reference list},
   note={\styfmt{glossaries}},
+  topics={separatorcommands,crossrefcommands,loclistcommands},
   seealso={glsseeformat,glsseelastsep},
   category={command}
 }
@@ -7501,6 +7897,7 @@ primary formats, if enabled.},
   name={\csfmt{gls\-see\-last\-sep}},
   description={the separator used between the penultimate and
    ultimate entries of a cross-reference list},
+  topics={separatorcommands,crossrefcommands,loclistcommands},
   note={\styfmt{glossaries}},
   seealso={glsseeformat,glsseesep},
   category={command}
@@ -7511,6 +7908,7 @@ primary formats, if enabled.},
   user1={\margm{tag}\margm{labels}},
   description={formats the entries identified in the comma separated
    list of labels as a set of cross-references},
+  topics={separatorcommands,crossrefcommands,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -7521,6 +7919,7 @@ primary formats, if enabled.},
   description={Displays the hierarchical name for the entry
    identified by \meta{label} with each level separated by
    \cs{glsxtrhiernamesep}},
+  topics={formattingcommands,entryrefcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   seealso={glsxtrhiernamesep},
   category={command}
@@ -7533,6 +7932,7 @@ primary formats, if enabled.},
    to \qt{\glsxtrhiernamesep} with the \styfmt{glossaries-extra}
    package, but the \bibgls\ interpreter has a different definition
    to assist sorting},
+  topics={separatorcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   seealso={glsxtrhiername},
   category={command}
@@ -7545,6 +7945,7 @@ primary formats, if enabled.},
    identified by \meta{label} with each level separated by
    \cs{glsxtrhiernamesep} where the top-most name has the
    first letter converted to \idx{uppercase}},
+  topics={formattingcommands,entryrefcommands,casecommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   seealso={glsxtrhiername,glsxtrhiernamesep},
   category={command}
@@ -7557,6 +7958,7 @@ primary formats, if enabled.},
    identified by \meta{label} with each level separated by
    \cs{glsxtrhiernamesep} where each name has the
    first letter converted to \idx{uppercase}},
+  topics={formattingcommands,entryrefcommands,casecommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   seealso={glsxtrhiername,glsxtrhiernamesep},
   category={command}
@@ -7568,6 +7970,7 @@ primary formats, if enabled.},
   description={Displays the hierarchical name for the entry
    identified by \meta{label} with each level separated by
    \cs{glsxtrhiernamesep} where the top-most name is converted to \idx{uppercase}},
+  topics={formattingcommands,entryrefcommands,casecommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   seealso={glsxtrhiername,glsxtrhiernamesep},
   category={command}
@@ -7580,6 +7983,7 @@ primary formats, if enabled.},
    identified by \meta{label} with each level separated by
    \cs{glsxtrhiernamesep} where each name is converted 
    to \idx{uppercase}},
+  topics={formattingcommands,entryrefcommands,casecommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   seealso={glsxtrhiername,glsxtrhiernamesep},
   category={command}
@@ -7590,6 +7994,7 @@ primary formats, if enabled.},
   user1={\margm{label}},
   description={additional category-independent code for the
 post-name hook},
+  topics={hooks},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
@@ -7599,6 +8004,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{text} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7608,6 +8014,7 @@ post-name hook},
   user1={\margm{label}},
   description={displays the value of the \field{text} field with 
   the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7617,6 +8024,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{plural} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7627,6 +8035,7 @@ post-name hook},
   description={displays the value of the
     \field{plural} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7636,6 +8045,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{first} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7646,6 +8056,7 @@ post-name hook},
   description={displays the value of the
     \field{first} field with the first letter converted to
     \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7655,6 +8066,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{firstplural} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7665,6 +8077,7 @@ post-name hook},
   description={displays the value of the
     \field{firstplural} field with the first letter converted to
     \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7674,6 +8087,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{name} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7684,6 +8098,7 @@ post-name hook},
   description={displays the value of the
     \field{name} field with the first character
      converted to upper case},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7693,6 +8108,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{description} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7703,6 +8119,7 @@ post-name hook},
   description={displays the value of the
     \field{description} field with the first letter converted to
     upper case},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7712,6 +8129,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{symbol} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7722,6 +8140,7 @@ post-name hook},
   description={displays the value of the
     \field{symbol} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7731,6 +8150,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{symbolplural} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7741,6 +8161,7 @@ post-name hook},
   description={displays the value of the
     \field{symbolplural} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7750,6 +8171,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the \field{long} field 
   without any formatting or indexing},
+  topics={fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7759,6 +8181,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the \field{longplural} field 
   without any formatting or indexing},
+  topics={fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7769,6 +8192,7 @@ post-name hook},
   description={displays the value of the
     \field{long} field without any formatting or indexing but 
     with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,abbreviationcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7779,6 +8203,7 @@ post-name hook},
   description={displays the value of the
     \field{longplural} field without any formatting or indexing but 
     with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,abbreviationcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7788,6 +8213,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{short} field without any formatting or indexing},
+  topics={fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7797,6 +8223,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{shortplural} field without any formatting or indexing},
+  topics={fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7807,6 +8234,7 @@ post-name hook},
   description={displays the value of the
     \field{short} field without any formatting or indexing but 
     with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,abbreviationcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7817,6 +8245,7 @@ post-name hook},
   description={displays the value of the
     \field{shortplural} field without any formatting or indexing 
     but with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,abbreviationcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7826,6 +8255,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user1} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7835,6 +8265,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user2} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7844,6 +8275,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user3} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7853,6 +8285,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user4} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7862,6 +8295,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user5} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7871,6 +8305,7 @@ post-name hook},
   user1={\margm{label}},
   description={expands to the value of the
     \field{user6} field},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7881,6 +8316,7 @@ post-name hook},
   description={displays the value of the
     \field{user1} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7891,6 +8327,7 @@ post-name hook},
   description={displays the value of the
     \field{user2} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7901,6 +8338,7 @@ post-name hook},
   description={displays the value of the
     \field{user3} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7911,6 +8349,7 @@ post-name hook},
   description={displays the value of the
     \field{user4} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7921,6 +8360,7 @@ post-name hook},
   description={displays the value of the
     \field{user5} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7931,7 +8371,17 @@ post-name hook},
   description={displays the value of the
     \field{user6} field with the first letter converted to
 \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
+  category={command}
+}
+
+@glscommand{glsxtrentryparentname,
+  name={\csfmt{gls\-xtr\-entry\-parent\-name}},
+  user1={\margm{label}},
+  description={expands to the entry's parent's name},
+  topics={fieldrefcommands},
+  note={\styfmt{glossaries-extra}\texparserdefnote\ v1.39+},
   category={command}
 }
 
@@ -7940,6 +8390,7 @@ post-name hook},
   user1={\margm{category}\margm{attribute}\margm{value}},
   description={sets the value of the attribute for the given
 category},
+  topics={assigncommands,catattrcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -7951,6 +8402,7 @@ category},
    \field{description} field in parentheses
    if the entry that was just referenced was used for the
    first time},
+  topics={hooks},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -7962,6 +8414,7 @@ category},
    \field{symbol} field in parentheses
    if the entry that was just referenced was used for the
    first time and has the \field{symbol} field set},
+  topics={hooks},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -7973,6 +8426,7 @@ category},
    this appends a space and, in parentheses, the value of the 
    \field{symbol} field (if set)
    followed by the value of the \field{description} field},
+  topics={hooks},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -7981,6 +8435,7 @@ category},
   name={\csfmt{gls\-plural\-suffix}},
   user1={},
   description={the suffix used to construct the default plural},
+  topics={fixedtextcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7990,6 +8445,7 @@ category},
   user1={},
   description={the suffix used to construct the default plural for
    the short form of acronyms},
+  topics={fixedtextcommands,abbreviationcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -7999,6 +8455,7 @@ category},
   user1={},
   description={the style sensitive suffix used to construct the 
    default plural for the short form of abbreviations},
+  topics={fixedtextcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote},
   seealso={glsxtrabbrvpluralsuffix},
   category={command}
@@ -8009,6 +8466,7 @@ category},
   user1={},
   description={the default suffix used to construct the plural for
    the short form of abbreviations},
+  topics={fixedtextcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote},
   category={command}
 }
@@ -8019,6 +8477,7 @@ category},
   description={the suffix used to construct the plural for
    the short form of abbreviations with one of the small-cap
    (\code{sc}) styles},
+  topics={fixedtextcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -8028,6 +8487,7 @@ category},
   user1={\margm{category}\margm{definition}},
   description={define the post-link hook 
   \cs{glsxtrpostlinkcategory} for the given category},
+  topics={hooks,providingcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -8037,6 +8497,7 @@ category},
   user1={\margm{category}\margm{definition}},
   description={define the post-name hook 
   \cs{glsxtrpostnamecategory} for the given category},
+  topics={hooks,providingcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -8046,6 +8507,7 @@ category},
   user1={\margm{category}\margm{definition}},
   description={define the post-description hook
   \csfmt{glsxtrpostdesc}\meta{category} for the given category},
+  topics={hooks,providingcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -8055,6 +8517,7 @@ category},
   user1={\margm{true}\margm{false}},
   description={only for use in the post-link hooks this
   tests if the entry just referenced was used for the first time},
+  topics={hooks,conditionals},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -8067,6 +8530,7 @@ category},
   if the entry doesn't exist (an error or warning message will
   occur and ?? will appear in the document).
   This command is not for use in the post-link hooks},
+  topics={conditionals},
   note={\styfmt{glossaries}},
   seealso={GlsXtrIfUnusedOrUndefined,glsxtrifwasfirstuse},
   category={command}
@@ -8079,6 +8543,7 @@ category},
 hasn't been
   used or is undefined, otherwise it does \meta{false}.
   This command is not for use in the post-link hooks},
+  topics={conditionals},
   note={\styfmt{glossaries-extra} v1.34+},
   seealso={ifglsused,glsxtrifwasfirstuse},
   category={command}
@@ -8089,6 +8554,7 @@ hasn't been
   user1={},
   description={expands to the internal name of the field storing the
 location list, defaulting to \field{location}},
+  topics={fieldrefcommands,loclistcommands},
   note={\styfmt{glossaries-extra} v1.37+},
   category={command}
 }
@@ -8098,6 +8564,7 @@ location list, defaulting to \field{location}},
   user1={},
   description={only for use in the post-link hooks, this
   expands to the label of the entry that was last referenced},
+  topics={hooks},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8108,6 +8575,7 @@ location list, defaulting to \field{location}},
   description={only for use in the glossary, such as in the style or
 in the post-name or post-description hooks, this expands to the
 label of the current entry},
+  topics={hooks},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8118,6 +8586,7 @@ label of the current entry},
   description={only for use in the \meta{true} part of
 \cs{ifglshasfield} or \cs{glsxtrifhasfield}, this expands to the
 field value},
+  topics={conditionals},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8127,6 +8596,7 @@ field value},
   user1={\margm{entry label}\margm{field label}},
   description={fetches the given field and applies
   \ics{capitalisewords} to it},
+  topics={casecommands,fieldrefcommands},
   note={\styfmt{glossaries}\texparserdefnote\ v4.22+},
   category={command}
 }
@@ -8155,6 +8625,7 @@ field value},
   user1={\margm{entry label}\margm{field label}},
   description={expands to the value of the given field for the given
    entry},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.12+},
   category={command}
 }
@@ -8164,6 +8635,7 @@ field value},
   user1={\margm{entry label}\margm{field label}},
   description={like \cs{glsxtrusefield} but converts the first
    letter to \idx!{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.12+},
   category={command}
 }
@@ -8173,6 +8645,7 @@ field value},
   user1={\margm{entry label}\margm{field label}},
   description={as \cs{glsxtrusefield} but converts the value to
   \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.37+},
   category={command}
 }
@@ -8183,6 +8656,7 @@ field value},
   description={assigns the given \meta{value} to the field
    identified by \meta{field label} for the
    entry identified by \meta{entry label}},
+  topics={assigncommands},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -8193,6 +8667,7 @@ field value},
   description={globally assigns the (protected) full expansion of the given \meta{value} to the field
    identified by \meta{field label} for the
    entry identified by \meta{entry label}},
+  topics={assigncommands},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -8204,6 +8679,7 @@ field value},
    (defined and not empty)
    without testing if the entry exists and adds implicit scoping
    to \meta{true} and \meta{false}},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.19+},
   seealso={GlsXtrIfFieldUndef},
   category={command}
@@ -8216,6 +8692,7 @@ field value},
    (defined and not empty)
    without testing if the entry exists and without introducing
    an implicit scope},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.19+},
   seealso={GlsXtrIfFieldUndef},
   category={command}
@@ -8226,6 +8703,7 @@ field value},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given field isn't defined for the given
    entry, which may also not exist},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.23+},
   category={command}
 }
@@ -8234,7 +8712,10 @@ field value},
   name={\csfmt{Gls\-Xtr\-If\-Field\-Eq\-Str}},
   user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
   description={tests if the given field value is the same as
-   \meta{text} for the given entry, which may not exist},
+   \meta{text} for the given entry, which may not exist. The unstarred
+form adds implicit grouping. The starred form (new to v1.39)
+doesn't},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -8243,7 +8724,10 @@ field value},
   name={\csfmt{Gls\-Xtr\-If\-Field\-Eq\-Xp\-Str}},
   user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
   description={like \cs{GlsXtrIfFieldEqStr} but first (protected)
-fully expands \meta{text} (but not the field value)},
+fully expands \meta{text} (but not the field value). The unstarred
+form adds implicit grouping. The starred form (new to v1.39)
+doesn't},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -8252,7 +8736,10 @@ fully expands \meta{text} (but not the field value)},
   name={\csfmt{Gls\-Xtr\-If\-Xp\-Field\-Eq\-Xp\-Str}},
   user1={\margm{field label}\margm{entry label}\margm{text}\margm{true}\margm{false}},
   description={like \cs{GlsXtrIfFieldEqStr} but first (protected)
-fully expands both the field value and \meta{text}},
+fully expands both the field value and \meta{text}. The unstarred
+form adds implicit grouping. The starred form (new to v1.39)
+doesn't},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -8263,6 +8750,7 @@ fully expands both the field value and \meta{text}},
   description={tests if the given entry, which must be defined, has the 
    given field set to a non-empty value},
   note={\styfmt{glossaries}},
+  topics={conditionals,fieldrefcommands},
   seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
 }
@@ -8273,6 +8761,7 @@ fully expands both the field value and \meta{text}},
   description={tests if the given entry, which must be defined, has the 
    \field{symbol} field set to value that's not empty and not
      \csfmt{relax}},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries}},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -8283,6 +8772,7 @@ fully expands both the field value and \meta{text}},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{description} field set},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries}},
   seealso={ifglshassymbol,ifglshasdescsuppressed},
   category={command}
@@ -8293,6 +8783,7 @@ fully expands both the field value and \meta{text}},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{description} field set to \cs{nopostdesc}},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries}},
   seealso={ifglshasdesc},
   category={command}
@@ -8303,6 +8794,7 @@ fully expands both the field value and \meta{text}},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{parent} field set},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8317,6 +8809,7 @@ fully expands both the field value and \meta{text}},
   field. With \bibgls, a more efficient approach is to
   use \csopt{save-child-count} and test the value of
   the \field{childcount} field},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8326,6 +8819,7 @@ fully expands both the field value and \meta{text}},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{short} field set},
+  topics={conditionals,fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8335,6 +8829,7 @@ fully expands both the field value and \meta{text}},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{long} field set},
+  topics={conditionals,fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8346,7 +8841,10 @@ fully expands both the field value and \meta{text}},
 integer. If the field is undefined or empty, the value is assumed to
 be 0. If the field is set, it must expand to an integer value.
 The value can be referenced in \meta{true} or \meta{false}
-with \cs{glscurrentfieldvalue}},
+with \cs{glscurrentfieldvalue}. The unstarred
+form adds implicit grouping. The starred form (new to v1.39)
+doesn't},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   seealso={GlsXtrIfFieldEqNum},
   category={command}
@@ -8359,7 +8857,27 @@ with \cs{glscurrentfieldvalue}},
 integer \meta{number}. If the field is undefined or empty, the value is assumed to
 be 0. If the field is set, it must expand to an integer value.
 The value can be referenced in \meta{true} or \meta{false}
-with \cs{glscurrentfieldvalue}},
+with \cs{glscurrentfieldvalue}. The unstarred
+form adds implicit grouping. The starred form (new to v1.39)
+doesn't},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries-extra} v1.31+},
+  seealso={GlsXtrIfFieldNonZero,GlsXtrIfFieldCmpNum},
+  category={command}
+}
+
+@glscommand{GlsXtrIfFieldCmpNum,
+  name={\csfmt{Gls\-Xtr\-If\-Field\-Cmp\-Num}},
+  user1={\margm{field}\margm{entry label}\margm{comparison}\margm{number}\margm{true}\margm{false}},
+  description={compares the given (numerical) field value to the given
+integer \meta{number}. The \meta{comparison} may be one of:
+\code{=}, \code{<} or \code{>}. If the field is undefined or empty, the value is assumed to
+be 0. If the field is set, it must expand to an integer value.
+The value can be referenced in \meta{true} or \meta{false}
+with \cs{glscurrentfieldvalue}. The unstarred
+form adds implicit grouping. The starred form (new to v1.39)
+doesn't},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   seealso={GlsXtrIfFieldNonZero},
   category={command}
@@ -8373,6 +8891,7 @@ option, this uses \cs{GlsXtrIfFieldNonZero} to test if the
 \field{childcount} field has a non-zero value. The value
 can be referenced in \meta{true} or \meta{false} with
 \cs{glscurrentfieldvalue}},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.31+},
   seealso={GlsXtrIfFieldNonZero},
   category={command}
@@ -8384,6 +8903,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={should expand to \meta{true} if the post-link hook
    should check for a following full stop (in addition to attribute
    checks) otherwise should expand to \meta{false}},
+  topics={conditionals,hooks},
   note={\styfmt{glossaries-extra} v1.23+},
   category={command}
 }
@@ -8393,6 +8913,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={governs the way the \field{name} field is set
    by the \abbrstyle{long-short-desc} abbreviation styles},
+  topics={abbreviationcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -8402,6 +8923,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={governs the way the \field{name} field is set
    by the \abbrstyle{long-short} abbreviation styles},
+  topics={abbreviationcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
@@ -8411,6 +8933,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={governs the way the \field{name} field is set
    by the \abbrstyle{long-only-short-only} abbreviation styles},
+  topics={abbreviationcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
@@ -8420,6 +8943,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={governs the way the \field{name} field is set
    by the \abbrstyle{long-only-short-only} abbreviation styles},
+  topics={abbreviationcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -8429,6 +8953,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{key}\margm{default value}\margm{no link cs}\margm{no link ucfirst cs}\margm{link cs}\margm{link ucfirst cs}\margm{link allcaps cs}},
   description={adds a new key for use in \csref{newglossaryentry}
    and associated commands to access it},
+  topics={definingterms,providingcommands,linkcommands,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8441,6 +8966,7 @@ can be referenced in \meta{true} or \meta{false} with
    and an associated command
    to access it where (unlike \cs{glsaddstoragekey})
    the \meta{no link cs} part may be empty if unrequired},
+  topics={definingterms,providingcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -8450,6 +8976,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{key}\margm{default value}\margm{no link cs}},
   description={adds a new key for internal use that can be set in 
     \csref{newglossaryentry}},
+  topics={definingterms,providingcommands,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8460,6 +8987,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={defines the control sequence \meta{cs}
    to be used with abbreviation tagging
    with the given categories},
+  topics={abbreviationcommands,formattingcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote},
   category={command}
 }
@@ -8470,6 +8998,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={font used by tagging command defined by
    \cs{GlsXtrEnableInitialTagging}},
   note={\styfmt{glossaries-extra}},
+  topics={abbreviationcommands,formattingcommands},
   category={command},
   seealso={GlsXtrEnableInitialTagging}
 }
@@ -8478,7 +9007,9 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{gls\-nav\-hyper\-target}},
   user1={\oargm{type}\margm{label}\margm{text}},
   description={creates a hyper target for the group given by
-    \meta{label} for the given glossary type and displays the text},
+    \meta{label} for the given glossary type and uses \meta{text}
+    for the hyperlink text},
+  topics={linkcommands,entryrefcommands},
   note={\styfmt{glossary-hypernav}},
   category={command}
 }
@@ -8487,7 +9018,8 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{newentry}},
   user1={\margm{label}\margm{\keyvallist}},
   description={equivalent to \csref{newglossaryentry}},
-  note={\styfmt{glossaries-extra}'s shortcuts},
+  topics={definingterms,shortcutcommands},
+  note={\styfmt{glossaries-extra} \styopt{shortcuts}},
   category={command}
 }
 
@@ -8496,6 +9028,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{label}\margm{\keyvallist}\margm{symbol}},
   description={equivalent to \csref{glsxtrnewsymbol}},
   note={\styfmt{glossaries-extra} \styopt{shortcuts}},
+  topics={definingterms,shortcutcommands},
   category={command}
 }
 
@@ -8503,6 +9036,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{newnum}},
   user1={\margm{label}\margm{\keyvallist}},
   description={equivalent to \csref{glsxtrnewnumber}},
+  topics={definingterms,shortcutcommands},
   note={\styfmt{glossaries-extra} \styopt{shortcuts}},
   category={command}
 }
@@ -8512,6 +9046,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={expands to the default acronym glossary type when using
    \csref{newacronym}},
+  topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8521,6 +9056,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={expands to the default glossary type when using
    \csref{newabbreviation}},
+  topics={glossrefs},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -8529,6 +9065,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{no\-post\-desc}},
   user1={},
   description={suppresses the post-description hook},
+  topics={hooks},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8538,6 +9075,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={suppresses the post-description punctuation
    without suppressing the post-description hook},
+  topics={hooks},
   note={\styfmt{glossaries-extra} v1.22+},
   category={command}
 }
@@ -8548,6 +9086,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={used within post-description category hooks, 
    this restores the post-description punctuation
    if it's been suppressed with \cs{glsxtrnopostpunc}},
+  topics={hooks},
   note={\styfmt{glossaries-extra} v1.23+},
   category={command}
 }
@@ -8557,6 +9096,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\oargm{type}\margm{file}},
   description={locally redefines \cs{glsdefaulttype}
     to \meta{type} and inputs \meta{file}},
+  topics={definingterms},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8567,6 +9107,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={defines a new glossary identified by \meta{type}
    with the given title and associated file extensions used by
    \appfmt{makeindex} or \appfmt{xindy}},
+  topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8576,6 +9117,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{type}\margm{title}},
   description={defines a new glossary identified by \meta{type}
    with the given title},
+  topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8587,6 +9129,7 @@ can be referenced in \meta{true} or \meta{false} with
    suppressed) identified by \meta{type}
    that's not included in the list used by commands, such
    as \cs{printunsrtglossaries}, that iterate over defined glossaries},
+  topics={glossrefs},
   note={\styfmt{glossaries} v4.08+},
   category={command}
 }
@@ -8598,6 +9141,7 @@ can be referenced in \meta{true} or \meta{false} with
    suppressing hyperlinks) identified by \meta{type}
    that's not included in the list used by commands, such
    as \cs{printunsrtglossaries}, that iterate over defined glossaries},
+  topics={glossrefs},
   note={\styfmt{glossaries-extra} v1.11+},
   category={command}
 }
@@ -8607,6 +9151,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{type}},
   description={as \cs{newignoredglossary} but does nothing
     if a glossary identified by \meta{type} already exists},
+  topics={glossrefs},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -8616,6 +9161,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{type}},
   description={as \ics{provideignoredglossary} but doesn't
     suppress hyperlinks},
+  topics={glossrefs},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -8624,6 +9170,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{delimN}},
   user1={},
   description={used to delimited individual locations},
+  topics={glossarystylecommands,separatorcommands,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8633,6 +9180,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={},
   description={used as a separator between the start and end locations
    of a range},
+  topics={glossarystylecommands,separatorcommands,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8642,6 +9190,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{location list cs}},
   description={iterates over the given internal location list using
    the \cs{glsnoidxloclisthandler} handler},
+  topics={glossarystylecommands,loops,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8650,6 +9199,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{gls\-noidx\-loc\-list\-handler}},
   description={the handler used by the internal list loop function used
     in \cs{glsnoidxloclist}},
+  topics={glossarystylecommands,loops,loclistcommands},
   user1={\margm{location}},
   note={\styfmt{glossaries}},
   category={command}
@@ -8659,6 +9209,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{glossentry}},
   user1={\margm{label}\margm{location list}},
   description={used in the glossary to display a top-level entry},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries} v3.08a+},
   category={command}
 }
@@ -8667,6 +9218,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{subglossentry}},
   user1={\margm{level}\margm{label}\margm{location list}},
   description={used in the glossary to display a sub-entry},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries} v3.08a+},
   category={command}
 }
@@ -8675,6 +9227,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{new\-glossary\-style}},
   user1={\margm{name}\margm{definition}},
   description={defines a new glossary style called \meta{name}},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8683,6 +9236,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{set\-glossary\-style}},
   user1={\margm{name}},
   description={sets the glossary style identified by \meta{name}},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8691,6 +9245,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{glossary\-header}},
   description={implemented at the start of a glossary (modified by
 glossary styles)},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8700,6 +9255,7 @@ glossary styles)},
   user1={\margm{label}},
   description={increments and displays the \counter{glossaryentry}
 counter, if appropriate},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries} v3.0+},
   category={command}
 }
@@ -8709,6 +9265,7 @@ counter, if appropriate},
   user1={\margm{label}},
   description={increments and displays the \counter{glossarysubentry}
 counter, if appropriate},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries} v3.0+},
   category={command}
 }
@@ -8718,6 +9275,7 @@ counter, if appropriate},
   user1={\margm{label}\margm{text}},
   description={creates a hypertarget for the entry given by
 \meta{label} (the target for commands like \cs{gls}) and displays \meta{text}},
+  topics={glossarystylecommands,linkcommands},
   note={\styfmt{glossaries} v1.18+},
   category={command}
 }
@@ -8726,6 +9284,7 @@ counter, if appropriate},
   name={\csfmt{gls\-name\-font}},
   user1={\margm{text}},
   description={used by \cs{glossentryname} to format the name},
+  topics={glossarystylecommands,formattingcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8734,6 +9293,7 @@ counter, if appropriate},
   name={\csfmt{gloss\-entry\-name}},
   user1={\margm{label}},
   description={used by glossary styles to display the name},
+  topics={glossarystylecommands,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8742,6 +9302,7 @@ counter, if appropriate},
   name={\csfmt{gloss\-entry\-symbol}},
   user1={\margm{label}},
   description={used by glossary styles to display the symbol},
+  topics={glossarystylecommands,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8753,6 +9314,7 @@ styles (all if the \sty{glossaries-extra-stylemods} package is
 loaded to patch them). This hook is used to reflect the
 \styopt{nopostdot} package option for \sty{glossaries}
 and the \styopt{postpunc} option for \sty{glossaries-extra}},
+  topics={glossarystylecommands,hooks},
   note={\styfmt{glossaries} and modified by
 \styfmt{glossaries-extra}},
   category={command}
@@ -8765,6 +9327,7 @@ and the \styopt{postpunc} option for \sty{glossaries-extra}},
    \catattr{glossname} and \catattr{glossnamefont}
    or \cs{glsnamefont} and the post-name hook) but uses
    the given \meta{field} instead of the \field{name} field},
+  topics={glossarystylecommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.22+},
   category={command}
 }
@@ -8773,6 +9336,7 @@ and the \styopt{postpunc} option for \sty{glossaries-extra}},
   name={\csfmt{gloss\-entry\-desc}},
   user1={\margm{label}},
   description={used by glossary styles to display the description},
+  topics={glossarystylecommands,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8782,6 +9346,7 @@ and the \styopt{postpunc} option for \sty{glossaries-extra}},
   user1={\margm{label}},
   description={like \cs{glossentrydesc} but converts the first
 letter to uppercase},
+  topics={glossarystylecommands,fieldrefcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8792,6 +9357,7 @@ letter to uppercase},
   description={iterates over all entries defined for all glossaries
    (or for the sub-list provided in the options) and performs
    \cs{glsadd} for each entry},
+  topics={loops,indexing},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8803,6 +9369,7 @@ letter to uppercase},
    (or for the sub-list provided in the options) and performs
    \cs{glsadd} for each entry that hasn't been used with
    the \glsaddopt{format} set to \code{glsignore}},
+  topics={loops,indexing},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8811,6 +9378,7 @@ letter to uppercase},
   name={\csfmt{glsadd}},
   user1={\oargm{options}\margm{label}},
   description={indexes the entry without displaying any text},
+  topics={indexing},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8820,29 +9388,30 @@ letter to uppercase},
   user1={\oargm{options}\margm{label list}},
   description={indexes each entry identified in the comma-separated
   list of labels without displaying any text},
+  topics={indexing},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
 
-@glscommand{glsadd.thevalue,
+@glsaddoption{glsadd.thevalue,
   name={\csoptfmt{thevalue}},
   category={commandoption},
   parent={glsadd}
 }
 
-@glscommand{glsadd.theHvalue,
+@glsaddoption{glsadd.theHvalue,
   name={\csoptfmt{theHvalue}},
   category={commandoption},
   parent={glsadd}
 }
 
-@glscommand{glsadd.format,
+@glsaddoption{glsadd.format,
   name={\csoptfmt{format}},
   category={commandoption},
   parent={glsadd}
 }
 
-@glscommand{glsadd.counter,
+@glsaddoption{glsadd.counter,
   name={\csoptfmt{counter}},
   category={commandoption},
   parent={glsadd}
@@ -8852,6 +9421,7 @@ letter to uppercase},
   name={\csfmt{theglossaryentry}},
   description={textual representation of the \counter{glossaryentry}
 counter, which is defined with the \styopt{entrycounter} option},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8860,6 +9430,7 @@ counter, which is defined with the \styopt{entrycounter} option},
   name={\csfmt{theHglossaryentry}},
   description={hypertarget associated with the \counter{glossaryentry}
 counter, which is defined with the \styopt{entrycounter} option},
+  topics={glossarystylecommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8870,6 +9441,7 @@ counter, which is defined with the \styopt{entrycounter} option},
   description={increments the \counter{glossaryentry} counter, which
 is defined with the \styopt{entrycounter} option, and automatically
 labels it with \cs{label}},
+  topics={glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8878,6 +9450,7 @@ labels it with \cs{label}},
   name={\csfmt{currentglossary}},
   description={defined within the glossary to the current glossary
 type, this has no meaning outside of the glossary list},
+  topics={glossarystylecommands,glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8911,6 +9484,7 @@ type, this has no meaning outside of the glossary list},
   user1={\margm{format}},
   description={set the default format to use if the
    \glsaddopt{format} key isn't set},
+  topics={formattingcommands,indexing},
   note={\styfmt{glossaries-extra} v1.19+},
   category={command}
 }
@@ -8919,6 +9493,8 @@ type, this has no meaning outside of the glossary list},
   name={\csfmt{Gls\-Xtr\-Set\-Default\-Gls\-Opts}},
   user1={\margm{options}},
   description={set the default options for commands like \cs{gls}},
+  topics={formattingcommands,indexing},
+  seealso={GlsXtrSetDefaultNumberFormat},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -8928,6 +9504,7 @@ type, this has no meaning outside of the glossary list},
   user1={\margm{text}},
   description={default location format, uses \cs{glshypernumber} if
 hyperlinks enabled otherwise just does \meta{text}},
+  topics={formattingcommands,indexing,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8936,6 +9513,7 @@ hyperlinks enabled otherwise just does \meta{text}},
   name={\csfmt{gls\-hyper\-number}},
   user1={\margm{text}},
   description={a location format that has a hyperlink (if enabled)},
+  topics={formattingcommands,indexing,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8945,6 +9523,7 @@ hyperlinks enabled otherwise just does \meta{text}},
   user1={\margm{text}},
   description={a location format that uses the sans-serif 
    font that also has a hyperlink (if enabled)},
+  topics={formattingcommands,indexing,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8954,6 +9533,7 @@ hyperlinks enabled otherwise just does \meta{text}},
   user1={\margm{text}},
   description={a location format that uses the italic 
    font that also has a hyperlink (if enabled)},
+  topics={formattingcommands,indexing,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8963,6 +9543,7 @@ hyperlinks enabled otherwise just does \meta{text}},
   user1={\margm{text}},
   description={a location format that uses the bold 
    font that also has a hyperlink (if enabled)},
+  topics={formattingcommands,indexing,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8972,6 +9553,7 @@ hyperlinks enabled otherwise just does \meta{text}},
   user1={\margm{text}},
   description={a location format that uses \ics{emph} to set the
   font and also has a hyperlink (if enabled)},
+  topics={formattingcommands,indexing,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -8981,6 +9563,7 @@ hyperlinks enabled otherwise just does \meta{text}},
   user1={\margm{text}},
   description={a location format that uses the serif (Roman) 
    font that also has a hyperlink (if enabled)},
+  topics={formattingcommands,indexing,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9100,6 +9683,7 @@ by \idx{makeindex} or \idx{xindy}},
   user1={\margm{text}},
   description={does nothing but when used as a location format
    \bibgls\ recognises it as an \idx{ignoredrecord}},
+  topics={formattingcommands,indexing,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9110,6 +9694,7 @@ by \idx{makeindex} or \idx{xindy}},
   description={identifies the style file in the \ext{aux}
    file for the benefit of external tools like 
     \idx{makeglossaries} and \idx{makeglossaries-lite}},
+  topics={internalcommands,auxcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9120,6 +9705,7 @@ by \idx{makeindex} or \idx{xindy}},
   description={does nothing but when used as a location format
    \bibgls\ recognises it as an \idx{ignoredrecord} indexed by
    commands like \csref{rgls}},
+  topics={formattingcommands,indexing,loclistcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9364,6 +9950,7 @@ usual delay},
   name={\csfmt{ifglsentryexists}},
   user1={\margm{label}\margm{true}\margm{false}},
   description={tests if the entry given by \meta{label} exists},
+  topics={conditionals,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9372,6 +9959,7 @@ usual delay},
   name={\csfmt{gls\-default\-type}},
   user1={},
   description={the default glossary type},
+  topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9380,6 +9968,7 @@ usual delay},
   name={\csfmt{gls\-symbols\-group\-name}},
   user1={},
   description={the name used for the symbols group},
+  topics={fixedtextcommands,glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9388,6 +9977,7 @@ usual delay},
   name={\csfmt{gls\-numbers\-group\-name}},
   user1={},
   description={the name used for the numbers group},
+  topics={fixedtextcommands,glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9398,6 +9988,7 @@ usual delay},
   description={display the glossary by iterating over all entries 
    associated with that glossary in the order in which they were
    defined},
+  topics={glossrefs,loops},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
 }
@@ -9408,6 +9999,7 @@ usual delay},
   description={as \cs{printunsrtglossary} but performs
   \meta{code} first (scoped to localise any assignments within
   \meta{code})},
+  topics={glossrefs,loops},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -9417,6 +10009,7 @@ usual delay},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printunsrtglossary} for each one},
+  topics={glossrefs,loops},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
 }
@@ -9426,6 +10019,7 @@ usual delay},
   user1={\margm{label}},
   description={performed at each iteration of the internal loop used
 by \cs{printunsrtglossary}},
+  topics={glossrefs,loops,hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9435,6 +10029,7 @@ by \cs{printunsrtglossary}},
   description={only allowed within
    \cs{printunsrtglossaryentryprocesshook} this command 
    indicates that the current entry should be skipped},
+  topics={glossrefs,loops,hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9442,6 +10037,7 @@ by \cs{printunsrtglossary}},
 @glscommand{printunsrtglossarypredoglossary,
   name={\csfmt{print\-unsrt\-glos\-sary\-pre\-do\-glos\-sary}},
   description={hook performed by \cs{printunsrtglossary}},
+  topics={glossrefs,hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9452,6 +10048,7 @@ by \cs{printunsrtglossary}},
   description={expands to the value of the \field{category} field
 for the entry identified by \meta{label} or nothing if the entry
 hasn't been defined},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9461,6 +10058,7 @@ hasn't been defined},
   user1={\margm{label}\margm{category}\margm{true}\margm{false}},
   description={does \meta{true} if the \field{category} field for
    the entry given by \meta{label} is \meta{category}},
+  topics={conditionals,fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9471,7 +10069,8 @@ hasn't been defined},
   description={tests if the \meta{label} is contained
    in the comma-separated \meta{list}, where both \meta{label}
    and \meta{list} are fully expanded before testing. This test
-   is designed for \emph{labels} which should be fully expandable},
+   is designed for \emph{labels} that are fully expandable},
+  topics={conditionals,listcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9535,6 +10134,7 @@ hasn't been defined},
   user1={},
   description={opens associated glossary files to be processed
    by \idx{makeindex} or \idx{xindy}},
+  topics={indexing},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9546,6 +10146,7 @@ hasn't been defined},
    collate the glossary information instead of using an
    external application; this command should not be used
    with \bibgls},
+  topics={indexing},
   note={\styfmt{glossaries} v4.04+},
   category={command}
 }
@@ -9554,6 +10155,7 @@ hasn't been defined},
   name={\csfmt{print\-glos\-sary}},
   user1={\oargm{options}},
   description={inputs file created by \idx{makeindex} or \idx{xindy}},
+  topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9563,6 +10165,7 @@ hasn't been defined},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printglossary} for each one},
+  topics={glossrefs,loops},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9571,6 +10174,7 @@ hasn't been defined},
   name={\csfmt{print\-noidx\-glos\-sary}},
   user1={\oargm{options}},
   description={uses \TeX\ to sort, collate and list the glossary},
+  topics={glossrefs},
   note={\styfmt{glossaries} v4.04+},
   category={command}
 }
@@ -9580,6 +10184,7 @@ hasn't been defined},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printnoidxglossary} for each one},
+  topics={glossrefs,loops},
   note={\styfmt{glossaries} v4.04+},
   category={command}
 }
@@ -9605,8 +10210,8 @@ hasn't been defined},
   name={\csfmt{ac}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={equivalent to \cs{gls}},
-  note={\styfmt{glossaries-extra} \styopt{shortcuts} package
-option},
+  topics={entryrefcommands,linkcommands,indexing,abbreviationcommands,shortcutcommands},
+  note={\styfmt{glossaries-extra} \styopt{shortcuts}},
   category={command}
 }
 
@@ -9614,6 +10219,7 @@ option},
   name={\csfmt{ab}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={equivalent to \cs{gls}},
+  topics={entryrefcommands,linkcommands,indexing,abbreviationcommands,shortcutcommands},
   note={\styfmt{glossaries-extra} 
   \styopt[abbreviations]{shortcuts}},
   category={command}
@@ -9622,7 +10228,10 @@ option},
 @glscommand{glsxtrp,
   name={\csfmt{glsxtrp}},
   user1={\margm{field}\margm{label}},
-  description={displays the given field for the entry given by label},
+  description={displays the given \meta{field} value for the entry given by 
+  \meta{label} (no hyperlinks, except in the glossary, and no indexing 
+  by default, but includes formatting, if appropriate)},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -9631,6 +10240,7 @@ option},
   name={\csfmt{glsps}},
   user1={\margm{label}},
   description={shortcut for \code{\cs{glsxtrp}\marg{short}\margm{label}}},
+  topics={fieldrefcommands,shortcutcommands},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -9639,6 +10249,25 @@ option},
   name={\csfmt{glspt}},
   user1={\margm{label}},
   description={shortcut for \code{\cs{glsxtrp}\marg{text}\margm{label}}},
+  topics={fieldrefcommands,shortcutcommands},
+  note={\styfmt{glossaries-extra} v1.07+},
+  category={command}
+}
+
+@glscommand{glsxtrsetpopts,
+  name={\csfmt{glsxtrsetpopts}},
+  user1={\margm{options}},
+  description={sets the default options for \cs{glsxtrp}},
+  topics={assigncommands},
+  note={\styfmt{glossaries-extra} v1.07+},
+  category={command}
+}
+
+@glscommand{glossxtrsetpopts,
+  name={\csfmt{glossxtrsetpopts}},
+  description={glossary hook that uses \cs{glsxtrsetpopts} 
+   to enable hyperlinks by default for \cs{glsxtrp}},
+  topics={assigncommands,hooks},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -9648,6 +10277,7 @@ option},
   user1={},
   description={expands to the internal label of the field used
    to store the control sequence name for use with \csref{glsxtrfmt}},
+  topics={fieldrefcommands,formattingcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -9657,6 +10287,7 @@ option},
   user1={\margm{label}},
   description={applies \cs{glsseeformat} to the entry's
    \field{see} field if not empty},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.06+},
   category={command}
 }
@@ -9666,6 +10297,7 @@ option},
   user1={\margm{label}},
   description={applies \cs{glsseeformat} to the entry's
    \field{seealso} field if not empty},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.16+},
   category={command}
 }
@@ -9674,6 +10306,7 @@ option},
   name={\csfmt{gls\-xtr\-set\-alias\-noindex}},
   user1={},
   description={hooks into the alias \glsopt{noindex} setting},
+  topics={hooks,crossrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -9684,6 +10317,7 @@ option},
   description={used to format the entries whose labels are 
    given in \meta{xr list} as a list of \qt{see also}
 cross-references},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,formattingcommands},
   note={\styfmt{glossaries-extra} v1.16+},
   category={command}
 }
@@ -9692,6 +10326,7 @@ cross-references},
   name={\csfmt{gls\-xtr\-index\-seealso}},
   user1={\margm{label}\margm{xr list}},
   description={indexes a \qt{see also} cross-reference},
+  topics={indexing,crossrefcommands},
   note={\styfmt{glossaries-extra} v1.16+},
   category={command}
 }
@@ -9700,6 +10335,7 @@ cross-references},
   name={\csfmt{glssee}},
   user1={\oargm{tag}\margm{label}\margm{xr label list}},
   description={indexes a \qt{see} cross-reference},
+  topics={indexing,crossrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9709,6 +10345,7 @@ cross-references},
   user1={\margm{xr label list}},
   description={formats the list of cross-reference labels, without
 the initial \qt{see} tag},
+  topics={glossarystylecommands,crossrefcommands,loclistcommands,formattingcommands},
   note={\styfmt{glossaries-extra} v1.16+},
   category={command}
 }
@@ -9719,6 +10356,7 @@ the initial \qt{see} tag},
   description={sets the abbreviation style to \meta{style-name} for the
 given \meta{category}, must be used before the abbreviation is
 defined},
+  topics={abbreviationcommands,assigncommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9727,6 +10365,7 @@ defined},
   name={\csfmt{glshex}},
   user1={},
   description={expands to \cs{cs.string}\cs{u}},
+  topics={charcommands,collationsubrules},
   note={\styfmt{glossaries-extra} v1.21+ (moved to
 \styfmt{glossaries-extra-bib2gls} in v1.27)},
   category={command}
@@ -9734,8 +10373,8 @@ defined},
 
 @glscommand{glscapturedgroup,
   name={\csfmt{glscapturedgroup}},
-  user1={},
   description={expands to \cs{cs.string}\idx{dollarchar}},
+  topics={charcommands,regex},
   note={\styfmt{glossaries-extra-bib2gls} v1.31+},
   category={command}
 }
@@ -9745,6 +10384,7 @@ defined},
   user1={},
   description={expands to the set of common entry aliases for
 \atentry{bibtexentry}},
+  topics={definingterms},
   note={\styfmt{glossaries-extra-bib2gls} v1.29+},
   category={command}
 }
@@ -9754,6 +10394,7 @@ defined},
   user1={},
   description={defines the standard \BibTeX\ fields using
    \cs{glsaddstoragekey}},
+  topics={definingterms,fieldrefcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.29+},
   category={command}
 }
@@ -9763,6 +10404,7 @@ defined},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={behaves like \cs{providecommand} in the document but
    like \cs{renewcommand} in \bibgls},
+  topics={providingcommands},
   note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote\ v1.27+},
   category={command}
 }
@@ -9772,6 +10414,7 @@ defined},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={behaves like \cs{renewcommand} but only generates a
 warning rather than an error if the command isn't already defined},
+  topics={providingcommands},
   note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote\ v1.37+},
   category={command}
 }
@@ -9782,6 +10425,7 @@ warning rather than an error if the command isn't already defined},
   description={provides code that locally redefines commands 
    during the protected write operation performed by 
    \csref{glsxtrresourcefile}},
+  topics={hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9791,6 +10435,7 @@ warning rather than an error if the command isn't already defined},
   user1={},
   description={expands to the field label used to store the
    entry group labels},
+  topics={fieldrefcommands,groupcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -9799,6 +10444,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{glo\-link\-prefix}},
   user1={},
   description={target name prefix used in entry hyperlinks},
+  topics={linkcommands,hooks},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9808,7 +10454,9 @@ warning rather than an error if the command isn't already defined},
   user1={\oargm{type}\margm{code}},
   description={appends \meta{code} to the preamble for the given
 glossary},
+  topics={glossrefs,hooks,glossarystylecommands},
   note={\styfmt{glossaries-extra}},
+  seealso={glossarypreamble},
   category={command}
 }
 
@@ -9817,6 +10465,7 @@ glossary},
   description={the preamble for all glossaries except 
   those that have the preamble explicitly set with
   \cs{apptoglossarypreamble}},
+  topics={glossrefs,hooks,glossarystylecommands},
   note={\styfmt{glossaries-extra}},
   seealso={apptoglossarypreamble},
   category={command}
@@ -9827,6 +10476,7 @@ glossary},
   user1={},
   description={expands to a literal backslash \idx{backslashchar} 
    character},
+  topics={charcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -9836,6 +10486,7 @@ glossary},
   user1={},
   description={expands to a literal open brace \idx{openbracechar} 
    character},
+  topics={charcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -9845,6 +10496,7 @@ glossary},
   user1={},
   description={expands to a literal close brace \idx{closebracechar} 
    character},
+  topics={charcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -9854,6 +10506,7 @@ glossary},
   user1={},
   description={expands to a literal percent character \idx{percentchar} 
    character},
+  topics={charcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -9863,6 +10516,7 @@ glossary},
   user1={\margm{text}},
   description={encapsulates \meta{text} with literal straight
    double-quotes \texttt{\glsquote{\meta{text}}}},
+  topics={charcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9871,6 +10525,7 @@ glossary},
   name={\csfmt{glstildechar}},
   user1={},
   description={expands to a literal tilde \texttt{\glstildechar} character},
+  topics={charcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
@@ -9880,6 +10535,7 @@ glossary},
   user1={},
   description={language-sensitive name used for the location list 
    header for some glossary styles},
+  topics={fixedtextcommands,glossarystylecommands,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9888,6 +10544,7 @@ glossary},
   name={\csfmt{seealsoname}},
   user1={},
   description={language sensitive \qt{see also} text},
+  topics={fixedtextcommands,glossarystylecommands,loclistcommands},
   note={\styfmt{glossaries-extra} or language packages},
   category={command}
 }
@@ -9898,6 +10555,7 @@ glossary},
   description={used by the parenthetical abbreviation styles, this
    expands to the label of the field used to store the parenthetical
    material},
+  topics={abbreviationcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -9912,6 +10570,7 @@ glossary},
    is the entry's label. This checks the field given
    by \cs{glsxtruserfield} and, if set, the \meta{text} is
    followed by a comma and the user value},
+  topics={abbreviationcommands,fieldrefcommands,formattingcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -9920,6 +10579,7 @@ glossary},
   name={\csfmt{gls\-xtr\-full\-sep}},
   user1={\margm{label}},
   description={the separator used in the full format for the parenthetical styles},
+  topics={abbreviationcommands,separatorcommands,formattingcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9930,6 +10590,7 @@ glossary},
   description={encapsulates \meta{text} in \csfmt{foreignlanguage}
   where the language label is obtained from the locale tag
   given in the field identified by \cs{GlsXtrForeignTextField}},
+  topics={formattingcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.32+},
   category={command}
 }
@@ -9938,6 +10599,7 @@ glossary},
   name={\csfmt{Gls\-Xtr\-Foreign\-Text\-Field}},
   description={used by \cs{GlsXtrForeignText} to identify
    the field containing the locale tag},
+  topics={fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.32+},
   category={command}
 }
@@ -9946,6 +10608,7 @@ glossary},
   name={\csfmt{gls\-xtr\-paren}},
   user1={\margm{text}},
   description={used to markup parenthetical material},
+  topics={formattingcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -9956,6 +10619,7 @@ glossary},
   description={hook used after the description is displayed in the
    glossary for entries that have the
    \field{category} set to \code{abbreviation}},
+  topics={hooks,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9966,6 +10630,7 @@ glossary},
   description={hook used after the description is displayed in the
    glossary for entries that have the
    \field{category} set to \code{symbol}},
+  topics={hooks},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9976,6 +10641,7 @@ glossary},
   description={hook used after the description is displayed in the
    glossary for entries that have the
    \field{category} set to \code{general}},
+  topics={hooks},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -9987,7 +10653,10 @@ glossary},
    glossary for entries that have the
    \field{category} set to \meta{category}. Common category hooks 
    such as \cs{glsxtrpostdescgeneral} are provided by
-   \styfmt{glossaries-extra}, custom categories need the hook defined},
+   \styfmt{glossaries-extra}.  If required,
+   this hook can be defined with \cs{glsdefpostdesc}},
+  topics={hooks,glossarystylecommands},
+  note={\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -9997,6 +10666,8 @@ glossary},
   description={hook used by \cs{glossentryname} for entries 
    that have the \field{category} set to \meta{category}. 
    If required, this hook can be defined with \cs{glsdefpostname}},
+  topics={hooks,glossarystylecommands},
+  note={\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -10007,6 +10678,8 @@ glossary},
    for entries that have the
    \field{category} set to \meta{category}. If required,
    this hook can be defined with \cs{glsdefpostlink}},
+  topics={hooks},
+  note={\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -10014,6 +10687,7 @@ glossary},
   name={\csfmt{Gls\-Xtr\-Fmt\-Default\-Options}},
   user1={},
   description={the default options used by \csref{glsxtrfmt}},
+  topics={formattingcommands,indexing},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -10021,8 +10695,9 @@ glossary},
 @glscommand{glslink,
   name={\csfmt{glslink}},
   user1={\oargm{options}\margm{label}\margm{text}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the given link text without altering the first use flag},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   seealso={glsdisp},
   category={command}
@@ -10031,8 +10706,9 @@ glossary},
 @glscommand{glsdisp,
   name={\csfmt{glsdisp}},
   user1={\oargm{options}\margm{label}\margm{text}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the given link text and marks the entry as having been used},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   seealso={glslink},
   category={command}
@@ -10043,6 +10719,7 @@ glossary},
   user1={\oargm{options}\margm{label}\margm{text}},
   description={like \cs{glslink} but tries the prefixes
   identified with commands like \cs{glsxtraddlabelprefix}},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={dglsdisp},
   category={command}
@@ -10053,6 +10730,7 @@ glossary},
   user1={\oargm{options}\margm{label}\margm{text}},
   description={like \cs{glsdisp} but tries the prefixes
   identified with commands like \cs{glsxtraddlabelprefix}},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={dglsdisp},
   category={command}
@@ -10061,10 +10739,10 @@ glossary},
 @glscommand{glsxtrshort,
   name={\csfmt{glsxtrshort}},
   user1={\oargm{options}\margm{label}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{short} field (using the
-   appropriate abbreviation style) 
-   without altering the first use flag},
+   appropriate abbreviation style) without altering the first use flag},
+  topics={entryrefcommands,linkcommands,abbreviationcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -10072,10 +10750,11 @@ glossary},
 @glscommand{glsxtrlong,
   name={\csfmt{glsxtrlong}},
   user1={\oargm{options}\margm{label}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{long} field (using the
    appropriate abbreviation style) 
    without altering the first use flag},
+  topics={entryrefcommands,linkcommands,abbreviationcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -10083,11 +10762,11 @@ glossary},
 @glscommand{glsxtrfull,
   name={\csfmt{glsxtrfull}},
   user1={\oargm{options}\margm{label}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{long} and \field{short}
-fields (using the
-   appropriate abbreviation style) 
+   fields (using the appropriate abbreviation style) 
    without altering the first use flag},
+  topics={entryrefcommands,linkcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -10097,6 +10776,7 @@ fields (using the
   user1={\margm{text}},
   description={used to encapsulate each word in the long form of an
 abbreviation by the \catattr{markwords} attribute},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -10104,7 +10784,8 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsxtrwordsep,
   name={\csfmt{glsxtrwordsep}},
   description={used to mark spaces between each word in the long form of an
-abbreviation by the \catattr{markwords} attribute},
+  abbreviation by the \catattr{markwords} attribute},
+  topics={separatorcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -10112,9 +10793,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glstext,
   name={\csfmt{glstext}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{text} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10124,6 +10806,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{glstext} but converts the first letter to
    \idx{uppercase}},
+  topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10131,9 +10814,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsname,
   name={\csfmt{glsname}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{name} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10141,9 +10825,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsfirst,
   name={\csfmt{glsfirst}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{first} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10151,9 +10836,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glssymbol,
   name={\csfmt{glssymbol}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{symbol} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10161,9 +10847,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsdesc,
   name={\csfmt{glsdesc}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{description} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10171,9 +10858,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsuseri,
   name={\csfmt{glsuseri}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{user1} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10181,9 +10869,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsuserii,
   name={\csfmt{glsuserii}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{user2} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10191,9 +10880,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsuseriii,
   name={\csfmt{glsuseriii}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{user3} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10201,9 +10891,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsuseriv,
   name={\csfmt{glsuseriv}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{user4} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10211,9 +10902,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsuserv,
   name={\csfmt{glsuserv}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{user5} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10221,9 +10913,10 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsuservi,
   name={\csfmt{glsuservi}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={links to the entry's location in the glossary with
+  description={links to the entry's definition in the glossary with
    the link text obtained from the \field{user6} field  
    without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10232,7 +10925,8 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{rgls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={like \cs{gls} but checks for the record
-   count trigger setting},
+   count trigger setting (the formatting is governed by \cs{rglsformat})},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -10242,6 +10936,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\margm{label}\oargm{insert}},
   description={used by \csref{rgls} if the record count
    switch is triggered},
+  topics={formattingcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -10249,8 +10944,8 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{glsxtrenablerecordcount,
   name={\csfmt{glsxtr\-enable\-record\-count}},
   user1={},
-  description={redefines \cs{gls} etc to their 
-   \csref{rgls} counterpart},
+  description={redefines \cs{gls} etc to their \csref{rgls} counterpart},
+  topics={providingcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -10260,6 +10955,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\margm{category list}\margm{value}},
   description={sets the \catattr{recordcount} attribute to
     \meta{value} for the given categories},
+  topics={assigncommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -10274,6 +10970,7 @@ abbreviation by the \catattr{markwords} attribute},
     \field{text} field
     for general entries) where the text is optionally hyperlinked
     to the relevant place in the glossary},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10324,6 +11021,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{glspl}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{gls} but shows the plural form},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10333,6 +11031,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{gls} but converts the first letter
     of the link text to upper case},
+  topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10341,6 +11040,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{Glspl}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{Gls} but shows the plural form},
+  topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10349,6 +11049,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{GLS}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{gls} but converts the link text to upper case},
+  topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10357,6 +11058,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{GLSpl}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{GLS} but shows the plural form},
+  topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10367,6 +11069,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={does \meta{prefix}\cs{gls}\oargm{options}\margm{label}\oargm{insert},
   where the \meta{prefix} is obtained from the appropriate prefix
   field},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries-prefix}},
   category={command}
 }
@@ -10377,6 +11080,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={intended for documents with a mixture of 
    single and dual entries, this is like \cs{gls} but tries to 
    determine the label prefix from the label prefix list},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
   category={command}
@@ -10388,6 +11092,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={intended for documents with a mixture of 
    single and dual entries, this is like \cs{glspl} but tries to 
    determine the label prefix from the label prefix list},
+  topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
   category={command}
@@ -10399,6 +11104,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={intended for documents with a mixture of 
    single and dual entries, this is like \cs{Gls} but tries to 
    determine the label prefix from the label prefix list},
+  topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
   category={command}
@@ -10410,6 +11116,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={intended for documents with a mixture of 
    single and dual entries, this is like \cs{Glspl} but tries to 
    determine the label prefix from the label prefix list},
+  topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
   category={command}
@@ -10419,6 +11126,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{gls\-xtr\-add\-label\-prefix}},
   user1={\margm{prefix}},
   description={appends \meta{prefix} to the prefix label list},
+  topics={listcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={dgls,glsxtrprependlabelprefix,glsxtrclearlabelprefixes},
   category={command}
@@ -10428,6 +11136,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{gls\-xtr\-prepend\-label\-prefix}},
   user1={\margm{prefix}},
   description={prepends \meta{prefix} to the prefix label list},
+  topics={listcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={dgls,glsxtraddlabelprefix,glsxtrclearlabelprefixes},
   category={command}
@@ -10437,6 +11146,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{gls\-xtr\-clear\-label\-prefixes}},
   user1={\margm{prefix}},
   description={clears the prefix label list},
+  topics={listcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
   category={command}
@@ -10447,6 +11157,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\oargm{level}\margm{text}},
   description={used with the \glostyle{alttree} style to set the
    widest entry name for the given level},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossary-tree}},
   category={command}
 }
@@ -10457,6 +11168,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={used by \csref{bibglssetwidest} to set the
    widest entry name for the given level for the \glostyle{alttree}
    style and the styles provided by \sty{glossary-longextra}},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glssetwidest,glslongextraSetWidest},
   category={command}
@@ -10470,6 +11182,7 @@ abbreviation by the \catattr{markwords} attribute},
    widest entry name for the \glostyle{alttree}
    style and the styles provided by \sty{glossary-longextra}
    using the commands provided by \sty{glossaries-extra-stylemods}},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsFindWidestTopLevelName,glsFindWidestLevelTwo},
   category={command}
@@ -10481,6 +11194,7 @@ abbreviation by the \catattr{markwords} attribute},
   description={used with the styles provided by the
   \sty{glossary-longextra} package to set the
    widest entry name},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossary-longextra} v1.37+},
   seealso={glslongextraUpdateWidest},
   category={command}
@@ -10491,6 +11205,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\margm{text}},
   description={as \cs{glslongextraSetWidest} but only sets if \meta{text} is
   wider than the current value},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossary-longextra} v1.37+},
   category={command}
 }
@@ -10500,6 +11215,7 @@ abbreviation by the \catattr{markwords} attribute},
   user1={\oargm{level}\margm{text}},
   description={as \cs{glssetwidest} but only sets if \meta{text} is
 wider than the current value},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods} v1.23+},
   seealso={glssetwidest,eglsupdatewidest},
   category={command}
@@ -10509,6 +11225,7 @@ wider than the current value},
   name={\csfmt{egls\-update\-widest}},
   user1={\oargm{level}\margm{text}},
   description={as \cs{glsupdatewidest} but expands \meta{text}},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods} v1.23+},
   seealso={glssetwidest,glsupdatewidest},
   category={command}
@@ -10518,6 +11235,7 @@ wider than the current value},
   name={\csfmt{gls\-Find\-Widest\-Top\-Level\-Name}},
   user1={\oargm{glossary list}},
   description={CamelCase synonym for \cs{glsfindwidesttoplevelname}},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods}},
   seealso={glsfindwidesttoplevelname},
   category={command}
@@ -10528,6 +11246,7 @@ wider than the current value},
   user1={\oargm{glossary list}},
   description={finds the widest top-level name in the given
 glossaries},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossary-tree}},
   category={command}
 }
@@ -10537,6 +11256,7 @@ glossaries},
   user1={\oargm{glossary list}},
   description={finds the widest name in the given glossaries
    for the top level and first two sub-levels},
+  topics={assigncommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods}},
   seealso={glsfindwidesttoplevelname},
   category={command}
@@ -10547,6 +11267,7 @@ glossaries},
   user1={\margm{label}},
   description={used with the \glostyle{bookindex} style to
    format the entry's name},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossary-bookindex}},
   category={command}
 }
@@ -10556,6 +11277,7 @@ glossaries},
   user1={\margm{label}},
   description={used with the \glostyle{bookindex} style before the
 location list},
+  topics={formattingcommands,separatorcommands,glossarystylecommands},
   note={\styfmt{glossary-bookindex}},
   category={command}
 }
@@ -10566,6 +11288,7 @@ location list},
   description={used before the location list in the
    \glostyle{bookindex} style and the styles patched by 
    \styfmt{glossaries-extra-stylemods}},
+  topics={formattingcommands,separatorcommands,glossarystylecommands},
   note={\styfmt{glossary-bookindex} v1.21+ and
    \styfmt{glossaries-extra-stylemods} v1.21+},
   category={command}
@@ -10576,6 +11299,7 @@ location list},
   user1={\margm{text}},
   description={used with \qt{sc} abbreviation styles to format the
 short form using \cs{textsc}},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -10585,6 +11309,7 @@ short form using \cs{textsc}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 short form},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -10594,6 +11319,7 @@ short form},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 long form},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -10602,6 +11328,7 @@ long form},
   name={\csfmt{gls\-abbrv\-font}},
   user1={\margm{text}},
   description={generic abbreviation font command for the short form},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -10610,6 +11337,7 @@ long form},
   name={\csfmt{gls\-long\-font}},
   user1={\margm{text}},
   description={generic abbreviation font command for the long form},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -10618,6 +11346,7 @@ long form},
   name={\csfmt{gls\-short\-tok}},
   description={token register used in the construction of
    acronyms or abbreviations to allow the style hooks to access the short form},
+  topics={hooks,abbreviationcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10626,6 +11355,7 @@ long form},
   name={\csfmt{gls\-long\-tok}},
   description={token register used in the construction of
    acronyms or abbreviations to allow the style hooks to access the long form},
+  topics={hooks,abbreviationcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10636,6 +11366,7 @@ long form},
   description={used with \qt{user} abbreviation styles to
    encapsulate the description. Just does
   \code{\cs{glslonguserfont}\margm{description}} by default},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.30+},
   category={command}
 }
@@ -10645,6 +11376,7 @@ long form},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
    format the long form},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -10654,6 +11386,7 @@ long form},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
    format the long form on first use},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -10663,6 +11396,7 @@ long form},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
    format the short form},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -10672,6 +11406,7 @@ long form},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
    format the short form on first use},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -10680,8 +11415,9 @@ long form},
   name={\csfmt{gls\-xtr\-if\-in\-mark}},
   user1={\margm{true}\margm{true}},
   description={used by commands like \cs{glsfmtshort}, this expands
-to \meta{true} in page headings and the table of contents, 
+  to \meta{true} in page headings and the table of contents, 
   otherwise it expands to \meta{false}},
+  topics={conditionals},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -10690,7 +11426,8 @@ to \meta{true} in page headings and the table of contents,
   name={\csfmt{gls\-xtr\-Revert\-Toc\-Marks}},
   description={restores original behaviour of \cs{tableofcontents}
   so that \cs{glsxtrifinmark} expands to \meta{false} in the table
-of contents},
+  of contents},
+  topics={providingcommands},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -10699,6 +11436,7 @@ of contents},
   name={\csfmt{gls\-tree\-name\-fmt}},
   user1={\margm{text}},
   description={used with the tree styles to format the entry's name},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossary-tree} v4.08+ and 
 \styfmt{glossaries-extra-stylemods} v1.31+},
   seealso={glstreegroupheaderfmt,glstreenavigationfmt,glstreedefaultnamefmt},
@@ -10708,8 +11446,8 @@ of contents},
 @glscommand{glstreegroupheaderfmt,
   name={\csfmt{gls\-tree\-group\-header\-fmt}},
   user1={\margm{text}},
-  description={used with the tree styles to format the group
-headings},
+  description={used with the tree styles to format the group headings},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossary-tree} v4.22+ and 
   \styfmt{glossaries-extra-stylemods} v1.31+},
   category={command}
@@ -10718,8 +11456,8 @@ headings},
 @glscommand{glstreenavigationfmt,
   name={\csfmt{gls\-tree\-navigation\-fmt}},
   user1={\margm{text}},
-  description={used with the tree styles to format the navigation
-elements},
+  description={used with the tree styles to format the navigation elements},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossary-tree} v4.22+ and 
   \styfmt{glossaries-extra-stylemods} v1.31+},
   category={command}
@@ -10730,6 +11468,7 @@ elements},
   user1={\margm{text}},
   description={used as the default format for \cs{glstreenamefmt},
    \cs{glstreegroupheaderfmt} and \cs{glstreenavigationfmt}},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods} v1.31+},
   category={command}
 }
@@ -10738,6 +11477,7 @@ elements},
   name={\csfmt{gls\-tree\-pre\-location}},
   description={inserted before the location list for top-level
 entries in the \glostyle{tree}-like styles},
+  topics={formattingcommands,separatorcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods} v1.21+},
   category={command}
 }
@@ -10747,6 +11487,7 @@ entries in the \glostyle{tree}-like styles},
   user1={},
   description={length register used by the tabular styles to specify
 the width of the description column},
+  topics={glossarystylecommands},
   note={\styfmt{glossary-long} and
    \styfmt{glossary-super}},
   category={command}
@@ -10757,6 +11498,7 @@ the width of the description column},
   user1={\margm{label}\margm{location list}},
   description={used by the \glostyle{alttree} styles to format the
 symbol, description and location},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods} v1.05+},
   category={command}
 }
@@ -10765,6 +11507,7 @@ symbol, description and location},
   name={\csfmt{gls\-xtr\-Alt\-Tree\-Par}},
   description={used by the \glostyle{alttree} styles to indicate a
 paragraph break that retains the hanging indent},
+  topics={formattingcommands,glossarystylecommands},
   note={\styfmt{glossaries-extra-stylemods} v1.05+},
   category={command}
 }
@@ -10773,7 +11516,8 @@ paragraph break that retains the hanging indent},
   name={\csfmt{gls\-acc\-supp}},
   user1={\margm{accessible text}\margm{text}},
   description={used by the accessibility support to interface with
-the \sty{accsupp} package},
+  the \sty{accsupp} package},
+  topics={access-support},
   note={\styfmt{glossaries-accsupp}},
   category={command}
 }
@@ -10784,6 +11528,7 @@ the \sty{accsupp} package},
   description={iterates over all entries defined in the listed
    glossaries and perform \meta{body} where you can use the
    control sequence \meta{cs} to reference the current label},
+  topics={loops},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10796,6 +11541,8 @@ the \sty{accsupp} package},
    by \meta{label} and performs \meta{handler}\margm{element}
    on each element of the list, where \meta{handler} is
    a control sequence which takes a single argument},
+  topics={loops,fieldrefcommands,listcommands},
+  note={\styfmt{glossaries}},
   note={\styfmt{glossaries-extra} v1.24+},
   seealso={glsxtrendfor},
   category={command}
@@ -10806,6 +11553,7 @@ the \sty{accsupp} package},
   user1={},
   description={may be used within the handler macro
    of \cs{glsxtrforcsvfield} to prematurely break the loop},
+  topics={loops,listcommands},
   note={\styfmt{glossaries-extra} v1.24+},
   seealso={glsxtrforcsvfield},
   category={command}
@@ -10862,6 +11610,7 @@ been assigned a mapping to a language hook label},
   user1={\margm{text}},
   description={used by commands like \cs{gls} to format the 
   \idx{link-text}},
+  topics={formattingcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10871,6 +11620,7 @@ been assigned a mapping to a language hook label},
   user1={\margm{text}},
   description={used by commands like \cs{gls} to format the 
   \idx{link-text} for regular terms},
+  topics={formattingcommands},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -10880,6 +11630,7 @@ been assigned a mapping to a language hook label},
   user1={\margm{text}},
   description={used by commands like \cs{gls} to format the 
   \idx{link-text} for (non-regular) abbreviations},
+  topics={formattingcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra} v1.30+},
   category={command}
 }
@@ -10889,6 +11640,7 @@ been assigned a mapping to a language hook label},
   user1={\margm{cs}\margm{text}},
   description={fully expands \meta{text} and then does
    \meta{cs}\margm{expanded text}},
+  topics={formattingcommands},
   note={\styfmt{glossaries-extra} v1.30+},
   category={command}
 }
@@ -10896,22 +11648,27 @@ been assigned a mapping to a language hook label},
 @glscommand{GlsXtrStartUnsetBuffering,
   name={\csfmt{Gls\-Xtr\-Start\-Unset\-Buffer\-ing}},
   description={starts buffering calls to \cs{glsunset}
+   (which is internally used by commands like \cs{gls})
    for use in code where the boolean switch causes a problem.
    The buffer can later be processed and cleared with
    \cs{GlsXtrStopUnsetBuffering}. The starred form
    (added to v1.31) avoids duplicate labels in the buffer's 
    internal list},
+  topics={entryrefcommands,conditionals},
   note={\styfmt{glossaries-extra} v1.30+},
+  seealso={GlsXtrForUnsetBufferedList},
   category={command}
 }
 
 @glscommand{GlsXtrStopUnsetBuffering,
   name={\csfmt{Gls\-Xtr\-Stop\-Unset\-Buffer\-ing}},
-  description={unsets (locally with the starred form) 
-    all the entry whose labels are stored in the
+  description={unsets (locally with the starred form) the 
+    \idx{firstuseflag} of all the entry whose labels are stored in the
     buffer that was started with
-   \cs{GlsXtrStartUnsetBuffering} and clears the buffer},
+   \cs{GlsXtrStartUnsetBuffering} and then clears the buffer},
+  topics={entryrefcommands,conditionals},
   note={\styfmt{glossaries-extra} v1.30+},
+  seealso={GlsXtrForUnsetBufferedList},
   category={command}
 }
 
@@ -10923,6 +11680,7 @@ been assigned a mapping to a language hook label},
     buffer that was started with
    \cs{GlsXtrStartUnsetBuffering} and implements
    \meta{cs}\margm{label} at each iteration},
+  topics={entryrefcommands,listcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -10932,6 +11690,7 @@ been assigned a mapping to a language hook label},
   user1 = {\margm{label}},
   description={unsets the \idx{firstuseflag} so that the entry is
 marked as having been used},
+  topics={conditionals},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10941,6 +11700,7 @@ marked as having been used},
   user1 = {\margm{label}},
   description={resets the \idx{firstuseflag} so that the entry is
 marked as not used},
+  topics={conditionals},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -10977,6 +11737,16 @@ given (\styfmt{tracklang}) dialect label},
   description={formats a comma-separated list},
   note={\styfmt{datatool-base}\texparserdefnote\ v2.28+},
   seealso={ifDTLlistskipempty},
+  category={command}
+}
+
+@command{DTLlistformatitem,
+  name={\csfmt{DTL\-list\-format\-item}},
+  user1={\margm{element}},
+  description={used by \ics{DTLformatlist} to format each
+   element in the list},
+  note={\styfmt{datatool-base}\texparserdefnote\ v2.28+},
+  seealso={DTLformatlist},
   category={command}
 }
 
@@ -11643,6 +12413,7 @@ name} and the displayed \meta{text}},
   description={when used with \styopt{entrycounter} or
    \styopt{subentrycounter} may be used to cross-reference the
   entry's number in the glossary list with \cs{ref}},
+  topics={crossrefcommands},
   seealso={ref},
   note={\styfmt{glossaries} v3.0+},
   category={command}
@@ -11655,6 +12426,7 @@ name} and the displayed \meta{text}},
    \styopt{subentrycounter} may be used to cross-reference the
   entry's number in the glossary list with \cs{pageref}},
   seealso={pageref},
+  topics={crossrefcommands},
   note={\styfmt{glossaries-extra} v1.11},
   category={command}
 }
@@ -11662,9 +12434,10 @@ name} and the displayed \meta{text}},
 @glscommand{glsxtrglossentry,
   name={\csfmt{gls\-xtr\-gloss\-entry}},
   user1={\margm{label}},
-  description={displays the given entry name including a hypertarget (if
+  description={displays the given entry \field{name} including a hypertarget (if
 \sty{hyperref} has been loaded) as the destination for commands like
 \cs{gls}},
+  topics={linkcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.21},
   category={command}
 }
@@ -11676,6 +12449,7 @@ name} and the displayed \meta{text}},
 in the supplied internal \meta{field} where \meta{header} is the
 code
 to use in the header (leave empty for default)},
+  topics={linkcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.22+},
   category={command}
 }
@@ -11684,7 +12458,8 @@ to use in the header (leave empty for default)},
   name={\csfmt{gls\-show\-target}},
   user1={\margm{label}},
   description={used to show the target name when the
-\styopt[showtargets]{debug} option is on},
+   \styopt[showtargets]{debug} option is on},
+  topics={debugging,linkcommands},
   note={\styfmt{glossaries} v4.32+},
   category={command}
 }
@@ -11694,6 +12469,7 @@ to use in the header (leave empty for default)},
   description={used as a prefix in the \cs{label} command
    automatically implemented by the \styopt{entrycounter}
     and \styopt{subentrycounter} options},
+  topics={hooks},
   note={\styfmt{glossaries} v4.38+},
   category={command}
 }
@@ -11702,6 +12478,7 @@ to use in the header (leave empty for default)},
   name={\csfmt{Gls\-Xtr\-Stand\-alone\-Glossary\-Type}},
   description={expands to the label for \gls{currentglossary}
    within \gls{glsxtrglossentry} and \gls{glsxtrglossentryother}},
+  topics={hooks,glossrefs,standalonestyles},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -11711,6 +12488,7 @@ to use in the header (leave empty for default)},
   user1 = {\margm{label}},
   description={used within \gls{glsxtrglossentry} and
 \gls{glsxtrglossentryother} to display sub-item labels},
+  topics={hooks,glossarystylecommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -11720,6 +12498,7 @@ to use in the header (leave empty for default)},
   user1 = {\margm{label}},
   description={used within \gls{glsxtrglossentry} to
    display the name (with a hypertarget, if supported)},
+  topics={hooks,glossarystylecommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries-extra} v1.37+},
   category={command}
 }
@@ -11729,6 +12508,7 @@ to use in the header (leave empty for default)},
   user1 = {\margm{label}\margm{field}},
   description={used within \gls{glsxtrglossentryother} to
    display the given field value (with a hypertarget, if supported)},
+  topics={hooks,glossarystylecommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries-extra} v1.37+},
   category={command}
 }
@@ -11737,6 +12517,7 @@ to use in the header (leave empty for default)},
   name={\csfmt{gls\-reset\-entry\-counter}},
   description={resets the \counter{glossaryentry} counter if the
 \styopt{entrycounter} setting is on},
+  topics={hooks,glossarystylecommands,assigncommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11746,6 +12527,7 @@ to use in the header (leave empty for default)},
   user1={\oargm{prefix}\margm{counter}},
   description={sets up the entry's associated counter and prefix
    required by \cs{glshypernumber}},
+  topics={glossarystylecommands,assigncommands,loclistcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11755,6 +12537,7 @@ to use in the header (leave empty for default)},
   user1 = {\margm{\keyvallist}},
   description={applies the base \styfmt{glossaries} options
   that are allowed to be changed after the package has loaded},
+  topics={assigncommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11764,6 +12547,7 @@ to use in the header (leave empty for default)},
   user1 = {\margm{\keyvallist}},
   description={applies the extension \styfmt{glossaries-extra} options
   that are allowed to be changed after the package has loaded},
+  topics={assigncommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11773,6 +12557,7 @@ to use in the header (leave empty for default)},
   user1={\margm{label}},
   description={separator used before the description for the
    \glostyle{tree} styles},
+  topics={glossarystylecommands,separatorcommands,formattingcommands},
   note={\styfmt{glossary-tree} v4.26+},
   category={command}
 }
@@ -11783,6 +12568,7 @@ to use in the header (leave empty for default)},
   description={displays the pre-description separator, the
    description and the post-description hook for the
    \glostyle{treenoname} styles},
+  topics={glossarystylecommands,separatorcommands,formattingcommands},
   note={\styfmt{glossaries-extra-stylemods} v1.31+},
   category={command}
 }
@@ -11792,6 +12578,7 @@ to use in the header (leave empty for default)},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the short form of the given abbreviation},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11801,6 +12588,7 @@ displays the short form of the given abbreviation},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the long form of the given abbreviation},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11810,6 +12598,7 @@ displays the long form of the given abbreviation},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the full form of the given abbreviation},
+  topics={formattingcommands,entryrefcommands,abbreviationcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11819,6 +12608,7 @@ displays the full form of the given abbreviation},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the given entry's name},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11828,6 +12618,7 @@ displays the given entry's name},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the given entry's \field{first} field},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11837,6 +12628,7 @@ displays the given entry's \field{first} field},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the given entry's \field{text} field},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11848,6 +12640,7 @@ displays the given entry's \field{text} field},
    \csfmt{theH}\meta{counter} command corresponding to the 
    current indexing counter (or, if undefined, 
    \csfmt{the}\meta{counter})},
+  topics={glossarystylecommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11927,7 +12720,7 @@ sectioning commands to write to it},
   identifier={animal}
 }
 
-@entry{ex.fleuron,
+@exampleentry{ex.fleuron,
   parent={exampleterms},
   name = {fleuron},
   symbol = {\ding{167}},
@@ -11935,7 +12728,7 @@ sectioning commands to write to it},
   description = {typographic ornament}
 }
 
-@entry{ex.pi,
+@exampleentry{ex.pi,
   parent={exampleterms},
   name = {Archimedes' constant},
   symbol = {\ensuremath{\pi}},
@@ -11943,68 +12736,68 @@ sectioning commands to write to it},
   description = {ratio of a circle's circumference to its diameter}
 }
 
-@entry{ex.thetai,
+@exampleentry{ex.thetai,
   parent = {exampleterms},
   name = {theta parameter},
   symbol = {\ensuremath{\theta_i}},
   description = {one of the model parameters}
 }
 
-@abbreviation{ex.tug,
+@exampleabbreviation{ex.tug,
   parent={exampleterms},
   category = {longshortem},
   short = {TUG},
   long = {\TeX\ Users Group}
 }
 
-@abbreviation{ex.ascii,
+@exampleabbreviation{ex.ascii,
   short = {ascii},
   long = {American Standard Code for Information Interchange},
   category={shortsc}
 }
 
-@abbreviation{ex.svm,
+@exampleabbreviation{ex.svm,
   parent={exampleterms},
   short = {SVM},
   long = {support vector machine}
 }
 
-@abbreviation{ex.ssl,
+@exampleabbreviation{ex.ssl,
   parent={exampleterms},
   category = {markwordsexample},
   short = {SSL},
   long = {Secure Sockets Layer}
 }
 
-@abbreviation{ex.xml,
+@exampleabbreviation{ex.xml,
   parent={exampleterms},
   category = {taggingexample},
   short = {XML},
   long = {e\itag{x}tensible \itag{m}arkup \itag{l}anguage}
 }
 
-@abbreviation{ex.dante,
+@exampleabbreviation{ex.dante,
   parent={exampleterms},
   category = {discardperiodexample},
   short = {DANTE e.V.},
   long = {Deutschsprachige Anwendervereinigung \TeX\ e.V.}
 }
 
-@abbreviation{ex.gp,
+@exampleabbreviation{ex.gp,
   parent={exampleterms},
   category = {discardperiodexample},
   short = {G.P.},
   long = {General Practitioner}
 }
 
-@abbreviation{ex2.gp,
+@exampleabbreviation{ex2.gp,
   parent={exampleterms},
   category = {initialism},
   short = {GP},
   long = {General Practitioner}
 }
 
-@abbreviation{ex.rna,
+@exampleabbreviation{ex.rna,
   parent={exampleterms},
   short = {RNA},
   long = {ribonukleins\"aure},
@@ -12012,107 +12805,107 @@ sectioning commands to write to it},
   category = {abbrvtrans}
 }
 
-@entry{ex.length,
+@exampleentry{ex.length,
   parent={exampleterms},
   name = {length},
   symbol = {\si{\metre}},
   description = {measurement between two points}
 }
 
-@entry{ex.area,
+@exampleentry{ex.area,
   parent={exampleterms},
   name = {area},
   symbol = {\si{\metre\squared}},
   description = {measurement of a surface}
 }
 
-@symbol{ex2.length,
+@examplesymbol{ex2.length,
   parent={exampleterms},
   description = {length},
   name = {\si{\metre}}
 }
 
-@symbol{ex2.area,
+@examplesymbol{ex2.area,
   parent={exampleterms},
   description = {area},
   name = {\si{\metre\squared}}
 }
 
-@symbol{ex.deriv,
+@examplesymbol{ex.deriv,
   parent={exampleterms},
   description = {derivative},
   name = {\ensuremath{\derivfn{x}}},
   user1 = {derivfn}
 }
 
-@index{hom.bow1,
+@exampleindex{hom.bow1,
   name={bow},
   description={(rhymes with toe)},
   category = {homograph}
 }
 
-@entry{hom.bowknot,
+@exampleentry{hom.bowknot,
   parent={hom.bow1},
   description = {a knot tied with two loops and loose ends},
   category = {homograph}
 }
 
-@entry{hom.bowweapon,
+@exampleentry{hom.bowweapon,
   parent={hom.bow1},
   description = {a weapon for shooting arrows, made of curved wood
   joined at both ends with taut string},
   category = {homograph}
 }
 
-@index{hom.bow2,
+@exampleindex{hom.bow2,
   name={bow},
   description={(rhymes with cow)},
   category = {homograph}
 }
 
-@index{hom.bowbend,
+@exampleindex{hom.bowbend,
   parent={hom.bow2},
   description={bend head or upper body},
   category = {homograph}
 }
 
-@index{hom.bowpressure,
+@exampleindex{hom.bowpressure,
   parent={hom.bow2},
   description={give in to pressure},
   category = {homograph}
 }
 
-@index{hom.bow3,
+@exampleindex{hom.bow3,
   name={bow},
   description={(also bows) the front end of a ship},
   category = {homograph}
 }
 
-@index{hom.glossary,
+@exampleindex{hom.glossary,
   name={glossary},
   category = {homograph}
 }
 
-@entry{hom.glossarycol,
+@exampleentry{hom.glossarycol,
   parent = {hom.glossary},
   description = {collection of glosses},
   category = {homograph}
 }
 
-@entry{hom.glossarylist,
+@exampleentry{hom.glossarylist,
   parent = {hom.glossary},
   description = {list of technical words},
   category = {homograph}
 }
 
-@entry{hier.animal,
+@exampleentry{hier.animal,
  name = {animal},
  description = {living organism with a nervous system and sense organs
     that can move independently},
  category = {hierarchical}
 }
 
-@entry{hier.bird,
+@exampleentry{hier.bird,
  parent = {hier.animal},
  name = {bird},
  description = {warm-blooded egg-laying animal with feathers, wings 
@@ -12120,14 +12913,14 @@ sectioning commands to write to it},
  category = {hierarchical}
 }
 
-@entry{hier.duck,
+@exampleentry{hier.duck,
  parent = {hier.bird},
  name = {duck},
  description={a waterbird with webbed feet},
  category = {hierarchical}
 }
 
-@entry{hier.goose,
+@exampleentry{hier.goose,
  parent = {hier.bird},
  name = {goose},
  description = {a large waterbird with a long neck, short legs,
@@ -12135,34 +12928,34 @@ sectioning commands to write to it},
  category = {hierarchical}
 }
 
-@entry{hier.mineral,
+@exampleentry{hier.mineral,
  name = {mineral},
  description = {natural inorganic substance},
  category = {hierarchical}
 }
 
-@entry{hier.calcite,
+@exampleentry{hier.calcite,
  parent = {hier.mineral},
  name = {calcite},
  description = {a carbonate mineral},
  category = {hierarchical}
 }
 
-@entry{hier.quartz,
+@exampleentry{hier.quartz,
  parent = {hier.mineral},
  name = {quartz},
  description = {hard mineral consisting of silica},
  category = {hierarchical}
 }
 
-@entry{hier.amethyst,
+@exampleentry{hier.amethyst,
  parent = {hier.quartz},
  name = {amethyst},
  description = {a purple type of quartz},
  category = {hierarchical}
 }
 
-@entry{hier.citrine,
+@exampleentry{hier.citrine,
  parent = {hier.quartz},
  name = {citrine},
  description = {a form of quartz with a colour ranging
