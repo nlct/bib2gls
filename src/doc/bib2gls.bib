@@ -31,7 +31,7 @@
 % @file                -> file
 % @samplefile          -> sample file
 % @printglossoption    -> \printunsrtglossary option
-% @glsoption           -> \gls option
+% @glslinkoption       -> \glslink option
 % @glsaddoption        -> \glsadd option
 % @exampleentry        -> example entry
 % @examplesymbol       -> example symbol
@@ -43,7 +43,8 @@
 \providecommand{\csfmt}[1]{\texttt{\glsbackslash #1}}
 \providecommand{\derivfn}[1]{f'(#1)}
 \providecommand{\rangestartmark}{\symbol{40}}
-\providecommand{\rangeendmark}{\symbol{41}}"}
+\providecommand{\rangeendmark}{\symbol{41}}
+\providecommand{\abbrvword}[1]{\textup{#1}}"}
 
 @abbreviation{IETF,
  short = {IETF},
@@ -71,7 +72,7 @@
 }
 
 @abbreviation{SIunit,
- short = {SI unit},
+ short = {SI \abbrvword{unit}},
  long = {International System of Units},
  longplural = {International System of Units},
  category={common}
@@ -94,6 +95,11 @@
   long = {encapsulating command}
 }
 
+@abbreviation{toc,
+  short = {TOC},
+  long = {table of contents}
+}
+
 @topic{definingterms,
   name={defining terms}
 }
@@ -103,7 +109,9 @@
 }
 
 @topic{abbreviationcommands,
-  name={abbreviation commands}
+  name={abbreviation commands (general)},
+  text={abbreviation command},
+  seealso={abbreviationstyles}
 }
 
 @topic{glossarystylecommands,
@@ -4841,7 +4849,7 @@ pages (not available in multi-column or certain other contexts)},
   category={environment}
 }
 
-@index{abbreviationstyles,
+@topic{abbreviationstyles,
   name={abbreviation styles},
   text={abbreviation style}
 }
@@ -4949,7 +4957,13 @@ hyphen}},
   parent={abbreviationstyles}
 }
 
-@index{glossarystyle,
+@abbreviationstyle{long-only-short-only-desc,
+  name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only\dhyphen desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@topic{glossarystyle,
   name={glossary styles},
   text={glossary style}
 }
@@ -5046,6 +5060,18 @@ hyphen}},
 
 @glossarystyle{glostyle.bookindex,
   name={\glostylefmt{bookindex}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@glossarystyle{glostyle.long,
+  name={\glostylefmt{long}},
+  category={glossarystyle},
+  parent={glossarystyle}
+}
+
+@glossarystyle{glostyle.super,
+  name={\glostylefmt{super}},
   category={glossarystyle},
   parent={glossarystyle}
 }
@@ -5659,7 +5685,7 @@ hyphen}},
   category={packageoption},
   parent={packageoptions},
   description={if true (default for \styfmt{glossaries-extra}), 
-  automatically add each glossary to the table of contents}
+  automatically add each glossary to the \glsxtrlong{toc}}
 }
 
 @packageoption{styopt.numberline,
@@ -5669,7 +5695,7 @@ hyphen}},
   category={packageoption},
   parent={packageoptions},
   description={when used with \styopt[true]{toc}, this will add 
-  \code{\csfmt{numberline}\marg{}} to the start of the TOC entry}
+  \code{\csfmt{numberline}\marg{}} to the start of the \idx{toc} entry}
 }
 
 @packageoption{styopt.section,
@@ -10360,25 +10386,40 @@ letter to \idx{uppercase}},
 
 @glsaddoption{glsadd.thevalue,
   name={\csoptfmt{thevalue}},
+  user1={\margm{value}},
+  description={overrides the record value so that it's the
+  given \meta{value} not obtained from the associated counter},
   category={commandoption},
+  note={\styfmt{glossaries-extra} v1.14+},
   parent={glsadd}
 }
 
 @glsaddoption{glsadd.theHvalue,
   name={\csoptfmt{theHvalue}},
+  user1={\margm{value}},
+  description={the hyperlink target corresponding to the value
+  of \glsopt{thevalue}, if appropriate},
   category={commandoption},
+  note={\styfmt{glossaries-extra} v1.14+},
   parent={glsadd}
 }
 
 @glsaddoption{glsadd.format,
   name={\csoptfmt{format}},
+  user1={\margm{encap}},
+  description={sets the \gls{encap} for the record to 
+  \meta{encap}, optionally with the start or end range markers},
   category={commandoption},
+  note={\styfmt{glossaries}},
   parent={glsadd}
 }
 
 @glsaddoption{glsadd.counter,
   name={\csoptfmt{counter}},
+  user1={\margm{counter-name}},
+  description={sets the counter to use for the record},
   category={commandoption},
+  note={\styfmt{glossaries}},
   parent={glsadd}
 }
 
@@ -10768,7 +10809,7 @@ usual delay},
   name={\csfmt{unexpanded}},
   user1={\margm{general text}},
   description={expands to the argument},
-  note={{}\eTeX\ primitive},
+  note={{}\eTeX\ primitive\texparserdefnote},
   category={command}
 }
 
@@ -10818,7 +10859,7 @@ usual delay},
   name={\csfmt{ifcase}},
   user1={\meta{number}},
   description={case conditional},
-  note={\TeX\ primitive},
+  note={\TeX\ primitive\texparserdefnote},
   category={command}
 }
 
@@ -10856,7 +10897,7 @@ usual delay},
 
 @command{section,
   name={\csfmt{section}},
-  user1={\oargm{toc title}\margm{title}},
+  user1={\oargm{\idx{toc} title}\margm{title}},
   description={section heading},
   note={most classes that have a concept of document sections},
   category={command}
@@ -10872,7 +10913,7 @@ usual delay},
 
 @command{chapter,
   name={\csfmt{chapter}},
-  user1={\oargm{toc title}\margm{title}},
+  user1={\oargm{\idx{toc} title}\margm{title}},
   description={chapter heading},
   note={book or report classes},
   category={command}
@@ -10954,9 +10995,11 @@ usual delay},
 @glscommand{printunsrtglossary,
   name={\csfmt{print\-unsrt\-glos\-sary}},
   user1={\oargm{options}},
-  description={display the glossary by iterating over all entries 
+  description={display a glossary by iterating over all entries 
    associated with that glossary in the order in which they were
-   defined},
+   defined (which, with \bibgls, should correspond to the
+   order obtained from the sort settings given in the
+   \idx{resourceset} options)},
   topics={glossrefs,loops},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
@@ -11047,93 +11090,138 @@ hasn't been defined},
 @printglossoption{printgloss.type,
   parent = {printunsrtglossary},
   name = {\csoptfmt{type}},
+  user1 = {\margm{glossary-label}},
+  description={identifies the glossary list (\cs{glsdefaulttype}, if
+   omitted)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.style,
   parent = {printunsrtglossary},
   name = {\csoptfmt{style}},
+  user1 = {\margm{style-name}},
+  description={use the glossary style identified by \meta{style-name} 
+   (overrides current style setting)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.entrycounter,
   parent = {printunsrtglossary},
   name = {\csoptfmt{entrycounter}},
+  user1 = {\margm{boolean}},
+  description = {locally enable or disable top-level enumeration 
+   (overrides \styopt{entrycounter} package option)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.subentrycounter,
   parent = {printunsrtglossary},
   name = {\csoptfmt{subentrycounter}},
+  user1 = {\margm{boolean}},
+  description = {locally enable or disable level~1 enumeration 
+   (overrides \styopt{subentrycounter} package option)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.nopostdot,
   parent = {printunsrtglossary},
   name = {\csoptfmt{nopostdot}},
+  user1 = {\margm{boolean}},
+  description = {locally omit the post-description punctuation (overrides
+   \styopt{nopostdot} and related package options)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.numberedsection,
   parent = {printunsrtglossary},
   name = {\csoptfmt{numbered\-section}},
+  user1={\margm{value}},
+  description={locally change whether or not to use a numbered
+   sectioning command (overrides \styopt{numberedsection} package
+   option)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.title,
   parent = {printunsrtglossary},
   name = {\csoptfmt{title}},
+  user1={\margm{text}},
+  description = {locally sets the title for this glossary},
   category={commandoption},
 }
 
 @printglossoption{printgloss.toctitle,
   parent = {printunsrtglossary},
   name = {\csoptfmt{toctitle}},
+  description = {locally sets the \idx{toc} title for this glossary},
+  user1={\margm{text}},
   category={commandoption},
 }
 
 @printglossoption{printgloss.target,
   parent = {printunsrtglossary},
   name = {\csoptfmt{target}},
+  user1={\margm{boolean}},
+  description = {locally enables or disables the hypertargets for
+   each item},
   category={commandoption},
 }
 
 @printglossoption{printgloss.targetnameprefix,
   parent = {printunsrtglossary},
   name = {\csoptfmt{target\-name\-prefix}},
+  user1={\margm{label}},
+  description = {locally assign a prefix for the hypertargets
+   assigned to each item (if \printglossopt[true]{target})
+   to avoid duplicate target names},
   category={commandoption},
 }
 
 @printglossoption{printgloss.prefix,
   parent = {printunsrtglossary},
   name = {\csoptfmt{prefix}},
+  user1 = {\margm{label}},
+  description = {locally redefine \cs{glolinkprefix} for the item
+  hypertargets and for any entry reference or cross-reference hyperlinks},
   category={commandoption},
 }
 
 @printglossoption{printgloss.nonumberlist,
   parent = {printunsrtglossary},
   name = {\csoptfmt{no\-number\-list}},
+  user1 = {\margm{boolean}},
+  description={locally change whether or not to display the
+   \idxpl{locationlist} (overrides \styopt{nonumberlist} package
+   option)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.nogroupskip,
   parent = {printunsrtglossary},
   name = {\csoptfmt{no\-group\-skip}},
+  user1 = {\margm{boolean}},
+  description={locally change whether or not to separate groups
+  with a vertical space if the glossary style that support this option 
+   (overrides \styopt{nogroupskip} package option)},
   category={commandoption},
 }
 
 @printglossoption{printgloss.label,
   parent = {printunsrtglossary},
   name = {\csoptfmt{label}},
+  user1 = {\margm{label}},
+  description = {creates a label for this glossary by locally
+   using \code{\ics{glsxtrsetglossarylabel}\margm{label}}},
   category={commandoption},
 }
 
 @glscommand{glsxtrsetglossarylabel,
-  name={\csfmt{glsxtrsetglossarylabel}},
+  name={\csfmt{gls\-xtr\-set\-glos\-sary\-label}},
   user1={\margm{label}},
   description={sets the label for subsequent glossaries
    (should be scoped or updated per glossary to prevent
-   duplicate labels). This is an alternative to the
+   duplicate labels) and defines \ics{@currentlabelname} to the
+   glossary's \idx{toc} title. This is an alternative to the
    \styopt[nameref]{numberedsection} package option or
    \printglossopt{label} \ics{printunsrtglossary} option},
   topics={crossrefcommands},
@@ -11790,7 +11878,8 @@ glossary (or the default of \meta{type} is omitted)},
   name={\csfmt{glsdisp}},
   user1={\oargm{options}\margm{label}\margm{text}},
   description={links to the entry's definition in the glossary with
-   the given link text and marks the entry as having been used},
+   the given link text and marks the entry as having been used.
+   The options are the same as for \cs{glslink}},
   topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   seealso={glslink},
@@ -12059,55 +12148,127 @@ abbreviation by the \catattr{markwords} attribute},
   description={on first use displays the first use text
    (the value of the \field{first} field
     for general entries) and on subsequent use displays
-    the subsequent use text (the value of the 
-    \field{text} field
+    the subsequent use text (the value of the \field{text} field
     for general entries) where the text is optionally hyperlinked
-    to the relevant place in the glossary},
+    to the relevant place in the glossary. The options are
+    the same as for \cs{glslink}},
   topics={entryrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
 
-@glsoption{gls.format,
+@glslinkoption{gls.format,
   name={\csoptfmt{format}},
+  user1={\margm{encap}},
   category={commandoption},
-  parent={gls}
+  description={sets the \gls{encap} for the record to 
+  \meta{encap}, optionally with the start or end range markers},
+  note={\styfmt{glossaries}},
+  parent={glslink}
 }
 
-@glsoption{gls.counter,
+@glslinkoption{gls.counter,
   name={\csoptfmt{counter}},
+  user1={\margm{counter-name}},
+  description={sets the counter to use for the record},
   category={commandoption},
-  parent={gls}
+  note={\styfmt{glossaries}},
+  parent={glslink}
 }
 
-@glsoption{gls.noindex,
+@glslinkoption{gls.noindex,
   name={\csoptfmt{noindex}},
+  user1={\margm{boolean}},
+  description={indicates whether or not to suppress indexing},
   category={commandoption},
-  parent={gls}
+  note={\styfmt{glossaries-extra}},
+  parent={glslink}
 }
 
-@glsoption{gls.hyper,
+@glslinkoption{gls.wrgloss,
+  name={\csoptfmt{wrgloss}},
+  user1={\margm{value}},
+  description={indicates whether to write the glossary information
+  before (\csoptfmt{wrgloss\dequals before}) or after
+  (\csoptfmt{wrgloss\dequals after}) the link text (default:
+   \csoptfmt{before})},
+  category={commandoption},
+  note={\styfmt{glossaries-extra} v1.14+},
+  parent={glslink}
+}
+
+@glslinkoption{gls.thevalue,
+  name={\csoptfmt{thevalue}},
+  user1={\margm{value}},
+  description={overrides the record value so that it's the
+  given \meta{value} not obtained from the associated counter},
+  category={commandoption},
+  note={\styfmt{glossaries-extra} v1.19+},
+  parent={glslink}
+}
+
+@glslinkoption{gls.theHvalue,
+  name={\csoptfmt{theHvalue}},
+  user1={\margm{value}},
+  description={the hyperlink target corresponding to the value
+  of \glsopt{thevalue}, if appropriate},
+  category={commandoption},
+  note={\styfmt{glossaries-extra} v1.19+},
+  parent={glslink}
+}
+
+@glslinkoption{gls.hyper,
   name={\csoptfmt{hyper}},
+  user1={\margm{boolean}},
+  description={indicates whether or not to make a hyperlink to the
+  relevant glossary entry},
   category={commandoption},
-  parent={gls}
+  note={\styfmt{glossaries}},
+  parent={glslink}
 }
 
-@glsoption{gls.textformat,
+@glslinkoption{gls.local,
+  name={\csoptfmt{local}},
+  user1={\margm{boolean}},
+  description={if \csoptfmt{true} indicates to use \ics{glslocalunset}
+   instead of the default global \cs{glsunset} to unset the
+   \idx{firstuseflag}},
+  category={commandoption},
+  note={\styfmt{glossaries}},
+  parent={glslink}
+}
+
+@glslinkoption{gls.textformat,
   name={\csoptfmt{text\-format}},
+  user1={\margm{cs-name}},
+  description={if set, replaces \cs{glstextformat} with
+  the command given by the control sequence name
+  \meta{cs-name} to format the \idx{link-text}},
   category={commandoption},
-  parent={gls}
+  note={\styfmt{glossaries-extra} v1.30+},
+  parent={glslink}
 }
 
-@glsoption{gls.prefix,
+@glslinkoption{gls.prefix,
   name={\csoptfmt{prefix}},
+  user1={\margm{label}},
+  description={locally changes \ics{glolinkprefix} to the
+  given \meta{label}},
   category={commandoption},
-  parent={gls}
+  note={\styfmt{glossaries-extra} v1.31+},
+  parent={glslink}
 }
 
-@glsoption{gls.hyperoutside,
-  name={\csoptfmt{hyperoutside}},
+@glslinkoption{gls.hyperoutside,
+  name={\csoptfmt{hyper\-out\-side}},
+  user1={\margm{boolean}},
+  description={determines whether \cs{hyperlink} should
+   be outside of \cs{glstextformat} (default
+  \csoptfmt{hyperoutside\dequals true}) or inside
+  (\csoptfmt{hyperoutside\dequals false})},
   category={commandoption},
-  parent={gls}
+  note={\styfmt{glossaries-extra} v1.21+},
+  parent={glslink}
 }
 
 @glscommand{glspl,
@@ -12457,7 +12618,7 @@ short form using \cs{textsc}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 short form},
-  topics={formattingcommands,abbreviationcommands},
+  topics={long-only-short-only,long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -12467,7 +12628,7 @@ short form},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 long form},
-  topics={formattingcommands,abbreviationcommands},
+  topics={long-only-short-only,long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -14007,7 +14168,7 @@ to use in the header (leave empty for default)},
 @glscommand{showgloglossaries,
   name={\csfmt{show\-glo\-glossaries}},
   description={interrupts the document build and shows the list
-  of all none-ignored glossary types in the transcript},
+  of all non-ignored glossary types in the transcript},
   topics={debugging,glossrefs},
   note={\styfmt{glossaries}},
   category={command}
@@ -14226,7 +14387,7 @@ displays the given entry's \field{text} field},
 
 @command{tableofcontents,
   name={\csfmt{table\-of\-contents}},
-  description={displays the table of contents (by reading in the
+  description={displays the \glsxtrlong{toc} (by reading in the
 \ext{toc} file) and then opens \ext{toc} file to allow the
 sectioning commands to write to it},
   note={kernel command\texparserdefnote},

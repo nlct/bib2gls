@@ -118,7 +118,8 @@
 }
 \newcommand{\texparserdefnote}{\hyperlink{\texparserdefprefix texparserdef}{*}}
 
-\setabbreviationstyle[common]{short-nolong}
+\setabbreviationstyle{long-short-sc}
+\setabbreviationstyle[common]{short-sc-nolong}
 
 \GlsXtrLoadResources[
   entry-type-aliases={
@@ -139,6 +140,8 @@
   field-aliases={topics=adoptparents},
   replicate-fields={name=nametitle},
   field-case-change={nametitle=title},
+  short-case-change={lc},
+  dual-short-case-change={lc},
   unknown-entry-alias={index},
   save-original-entrytype,
   label-prefix={idx.},
@@ -151,7 +154,8 @@
   match-op={or},
   match={
    {category}={.*field},
-   {original entrytype}={.*glscommand}
+   {original entrytype}={.*glscommand},
+   {original entrytype}={.*option}
   },
   dual-prefix={},
   dual-type={main},
@@ -625,6 +629,18 @@
  }%
 }
 
+\newcommand{\summarysubheaderfont}[1]{\textbf{\sffamily #1}}
+
+\newcommand{\summaryoptionhandler}[1]{%
+ \par\smallskip\nopagebreak
+ \par\noindent\hspace{1em}%
+ \code{\gls{#1}\glsxtrifhasfield{useri}{#1}{=\glscurrentfieldvalue}{}}%
+ \glsxtrifhasfield{note}{#1}%
+ {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+ {}%
+ \nopagebreak\par\hangindent2em\noindent\hspace{2em}\Glossentrydesc{#1}%
+}
+
 \newglossarystyle{commandsummary}%
 {%
   \setglossarystyle{index}%
@@ -639,7 +655,10 @@
    \glstreeitem \glstarget{cs.##1}{\strut}%
    \glsxtrifhasfield{dualid}{##1}%
    {%
-     \glshyperlink{\glscurrentfieldvalue}%
+     {%
+       \let\csfmtfont\csfmtcolourfont
+       \glshyperlink{\glscurrentfieldvalue}%
+     }%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
      \glsxtrifhasfield{note}{##1}%
      {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
@@ -649,7 +668,7 @@
      \ifglshasdesc{\glscurrentfieldvalue}{\@. }{}%
    }%
    {%
-     \gls[hyper=false]{##1}%
+     {\let\csfmtfont\csfmtcolourfont\gls[hyper=false]{##1}}%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
      \glsxtrifhasfield{note}{##1}%
      {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
@@ -658,15 +677,32 @@
      \Glossentrydesc{##1}%
      \ifglshasdesc{##1}{\@. }{}%
    }%
-   \GlsXtrIfHasNonZeroChildCount{##1}%
-   {This command has \glscurrentfieldvalue\ forms:}{}%
+   \GlsXtrIfFieldEqStr{originalentrytype}{##1}{glscommand}%
+   {%
+     % Does this entry have options?
+     \GlsXtrIfHasNonZeroChildCount{##1}%
+     {%
+       \glspar\medskip\glspar 
+       \summarysubheaderfont{Options:} 
+       \glsxtrfieldforlistloop{##1}{childlist}{\summaryoptionhandler}%
+     }%
+     {}%
+   }%
+   {%
+     \GlsXtrIfHasNonZeroChildCount{##1}%
+     {This command has \glscurrentfieldvalue\ forms:}{}%
+   }%
+   \listtopics{##1}%
    \par\medskip
   }%
   \renewcommand*{\subglossentry}[3]{%
    \glstreesubitem \glstarget{cs.##2}{\strut}%
    \glsxtrifhasfield{dualid}{##2}%
    {%
-     \glshyperlink{\glscurrentfieldvalue}%
+     {%
+       \let\csfmtfont\csfmtcolourfont
+       \glshyperlink{\glscurrentfieldvalue}%
+     }%
      \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
      \glsxtrifhasfield{note}{##2}%
      {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
@@ -676,7 +712,7 @@
      \ifglshasdesc{\glscurrentfieldvalue}{.}{}%
    }%
    {%
-     \gls[hyper=false]{##2}%
+     {\let\csfmtfont\csfmtcolourfont\gls[hyper=false]{##2}}%
      \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
      \glsxtrifhasfield{note}{##2}%
      {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
@@ -720,7 +756,25 @@
    {topic.\glscurrentfieldvalue}%
    {\glsentryname{\glscurrentfieldvalue}}%
  }%
- {\GenericWarning{}{Missing parent for `#1'}}% 
+ {%
+   \let\field\fieldfmt
+   \hyperlink{topic.#1}{\glsentryname{#1}}%
+ }% 
+}
+
+\newcommand{\listtopics}[1]{%
+ \glsxtrifhasfield{progeny}{#1}% 
+ {%
+   \ifdefequal\glscurrentfieldvalue\glscurrententrylabel
+   {}%
+   {%
+     \par\nopagebreak\medskip\par 
+     \summarysubheaderfont{Topics:} 
+     \let\DTLlistformatitem\topicxrhandler
+     \DTLformatlist{\glscurrentfieldvalue}.
+   }%
+ }%
+ {}%
 }
 
 \newglossarystyle{commandtopic}%
@@ -733,31 +787,41 @@
    \hypertarget{topic.##1}{}%
    \pdfbookmark[1]{\thisvalue}{topic.##1}%
    \section*{\glsdisp{##1}{\thisvalue}}%
+   \glsxtrifhasfield{seealso}{##1}%
+   {%
+     \emph{See also:} 
+     \let\DTLlistformatitem\topicxrhandler
+     \DTLformatlist{\glscurrentfieldvalue}.%
+     \par\medskip\par
+   }%
+   {}%
   }%
   \renewcommand*{\subglossentry}[3]{%
-   \par 
+   \glsifcategory{##2}{command}%
    {%
-     \let\csfmtfont\csfmtcolourfont
-     \glsxtrifhasfield{progenitor}{##2}{\gls{\glscurrentfieldvalue}}{\gls{##2}}%
-   }%
-   \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
-   \glsxtrifhasfield{note}{##2}%
-   {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
-   {}%
-   \nopagebreak\par\smallskip\par\nopagebreak
-   \Glossentrydesc{##2}%
-   \ifglshasdesc{##2}{.}{}%
-   \glsxtrifhasfield{progenitor}{##2}%
-   {%
-     \glsxtrifhasfield{progeny}{\glscurrentfieldvalue}% 
-     {\par\smallskip\par Topics: 
-        \let\DTLlistformatitem\topicxrhandler
-        \DTLformatlist{\glscurrentfieldvalue}.%
-     }%
+     \par 
+     \glsxtrifhasfield*{progenitor}{##2}%
+     {\let\originallabel\glscurrentfieldvalue}%
+     {\def\originallabel{##2}}%
+     % hyperlink to index:
+     {\let\csfmtfont\csfmtcolourfont\gls[format=glsignore]{\originallabel}}%
+     \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+     \glsxtrifhasfield{note}{##2}%
+     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
      {}%
+     \nopagebreak\par\smallskip\par\nopagebreak
+     \Glossentrydesc{##2}%
+     \ifglshasdesc{##2}{.}{}%
+     % Topics
+     \listtopics\originallabel
+     \par\bigskip
    }%
-   {}%
-   \par\medskip
+   {%
+     \glsfieldfetch{##2}{name}{\thisvalue}%
+     \hypertarget{topic.##2}{}%
+     \pdfbookmark[2]{\thisvalue}{topic.##2}%
+     \subsection*{\glsdisp{##2}{\thisvalue}}%
+   }%
   }%
 }
 
@@ -767,7 +831,15 @@
   {%
     \GlsXtrIfFieldEqStr*{originalentrytype}{#1}{topic}%
     {}%
-    {\printunsrtglossaryskipentry}%
+    {%
+      \glsxtrifhasfield*{parent}{#1}%
+      {%
+        \GlsXtrIfFieldEqStr*{originalentrytype}{\glscurrentfieldvalue}{topic}%
+        {}%
+        {\printunsrtglossaryskipentry}%
+      }%
+      {\printunsrtglossaryskipentry}%
+    }%
   }%
 }
 
@@ -1777,10 +1849,10 @@ for \csopt{src} and determine if the corresponding \ext{bib} file or
 files are newer than the \ext{tex} file.
 
 It's not possible to determine if the location lists require
-updating, just as it's not possible to do this for the table of
-contents, list of figures, list of tables etc. (Or, if it could be
-implemented, the required code would make the document build far more
-complicated.)
+updating, just as it's not possible to do this for the
+\idx{toc}, list of figures, list of tables etc. (Or, if it could
+be implemented, the required code would make the document build far
+more complicated.)
 
 In general, the basic algorithm is:
 \begin{enumerate}

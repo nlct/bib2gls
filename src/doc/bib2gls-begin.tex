@@ -1450,7 +1450,7 @@ definition. For example, consider the following document:
 \end{codeenv}
 In this case, \csfmt{test} is expandable. Its definition doesn't
 contain anything complicated. The \ext{toc} file (which is input by
-\csfmt{tableofcontents}) contains the line:
+\csfmt{tableofcontents}\glsadd{toc}) contains the line:
 \begin{codeenv}
 \cmd{contentsline} \marg{section}\marg{\cmd{numberline} \marg{1}some sample text}\marg{1}
 \end{codeenv}
@@ -1526,7 +1526,7 @@ expansion, which makes the command behave as though it was robust:
 \gls{section}\marg{\gls{Gls}\marg{duck}\gls{protect}\gls{footnote}\marg{\gls{glsentrydesc}\marg{duck}}}
 \end{codeenv}
 In this case, it's unlikely that you'd want the footnote to appear
-in the table of contents, so it would be better to use the optional
+in the \gls{toc}, so it would be better to use the optional
 argument:
 \begin{codeenv}
 \gls{section}\oarg{Duck}\marg{\gls{Gls}\marg{duck}\gls{footnote}\marg{\gls{glsentrydesc}\marg{duck}}}\correct
@@ -2791,7 +2791,7 @@ example:
 \begin{codeenv}
 \gls{printunsrtglossary}\oarg{\printglossopt[Nomenclature]{title}}
 \end{codeenv}
-The title used in the table of contents is assumed to be the same,
+The title used in the \gls{toc} is assumed to be the same,
 but you can change it with \printglossopt{toctitle}. For example:
 \begin{codeenv}
 \gls{printunsrtglossary}\oarg{
@@ -3938,7 +3938,7 @@ gallery}~\cite{gallery} for further ideas.)
 
 The above example uses the \catattr{glossname} attribute to convert the first
 letter of the \field{name} to \idx{uppercase}. Unfortunately this can't be
-applied to the PDF bookmark or table of contents. A solution to this
+applied to the PDF bookmark or \gls{toc}. A solution to this
 would be to explicitly set the \field{name} with the first letter as
 an \idx{uppercase} character and the \field{text} field in
 \idx{lowercase}. For example:
@@ -4653,7 +4653,7 @@ The arguments of sectioning commands (such as \gls{chapter} or
 \gls{section}) and of captions (\gls{caption}) are
 \pidxpl{moving-argument}. The text is not only displayed at the
 point in the document where the command occurs, but may also be
-copied to the table of contents or list of figures etc.
+copied to the \gls{toc} or list of figures etc.
 Additionally, depending on the page style, the section argument may
 also be reproduced in the page header. This repeated use of the same
 material can cause complications, in particular it can prematurely
@@ -4705,7 +4705,7 @@ enough text to trigger a page break) but does cause unexpected output:
 Reference \gls{gls}\marg{html}.
 \cmd{end}\marg{document}
 \end{codeenv}
-On the first \LaTeX\ run, the table of contents is empty as the
+On the first \LaTeX\ run, the \gls{toc} is empty as the
 associated \ext{toc} file didn't exist at the start. The chapter title
 appears as \qt{A chapter about hypertext markup language
 (\textsc{html})}, which shows the \idx{firstuse} of
@@ -4714,10 +4714,10 @@ but not read by \gls{tableofcontents}) now contains:
 \begin{codeenv}
 \cmd{contentsline} \marg{chapter}\marg{\cmd{numberline} \marg{1}A chapter about \gls{gls} \marg{html}}\marg{3}
 \end{codeenv}
-This means that on the next \LaTeX\ run, the table of contents now
-includes \code{\gls{gls}\marg{html}}. Since the table of contents
+This means that on the next \LaTeX\ run, the \gls{toc} now
+includes \code{\gls{gls}\marg{html}}. Since the \gls{toc}
 occurs at the start of the document, this is now the \idx{firstuse}
-of \code{html}, so the full form is shown in the table of contents,
+of \code{html}, so the full form is shown in the \gls{toc},
 but the chapter title is now \qt{A chapter about \textsc{html}}, which shows
 the subsequent use.
 
@@ -4753,7 +4753,7 @@ Reference \gls{gls}\marg{html}.
 \cmd{lipsum} \comment{dummy text}
 \cmd{end}\marg{document}
 \end{codeenv}
-This now shows the long form in the table of contents and the
+This now shows the long form in the \gls{toc} and the
 chapter title. Since \gls{glsfmtlong} doesn't affect the
 \idx{firstuseflag}, the reference after the chapter title now shows
 the \idx{firstuse} full form. There's no longer an error with the
@@ -4769,7 +4769,7 @@ This can be corrected by setting the \catattr{headuc} attribute to
 \end{codeenv}
 This now makes the page header too long, but remember that you can
 use the optional argument of sectioning commands to provide a
-shorter form for both the page heading and table of contents:
+shorter form for both the page heading and \gls{toc}:
 \begin{codeenv}
 \gls{chapter}\oarg{A chapter about \gls{glsfmtshort}\marg{html}}\marg{A chapter about 
 \gls{glsfmtlong}\marg{html}}
@@ -4779,7 +4779,7 @@ One final problem remains and it's due to the
 to display the short form in small capitals. The combination of
 italic and small capitals isn't supported with the default fonts and
 results in a font substitution. There's a similar problem in the 
-table of contents which displays the chapter title in bold. There's 
+\gls{toc} which displays the chapter title in bold. There's 
 a warning at the end of the transcript:
 \begin{verbatim}
 Some font shapes were not available, defaults substituted.
@@ -4800,17 +4800,17 @@ which is used by the \qt{sc} abbreviation styles:
 \end{codeenv}
 This uses:
 \nosecformatdef{glsxtrifinmark}
-which expands to \meta{true} in headings and the table of contents,
+which expands to \meta{true} in headings and the \gls{toc},
 otherwise it expands to \meta{false}. This use of
 \gls{MakeTextUppercase} replaces the need for the \catattr{headuc}
 attribute. Both \catattr{headuc} and the above redefinition of
 \gls{glsabbrvscfont} will cause the abbreviation to appear in
-\idx{uppercase} in the table of contents. If you don't want this,
-you can defer making these modifications until after the table of
-contents. Alternatively, use:
+\idx{uppercase} in the \gls{toc}. If you don't want this,
+you can defer making these modifications until after the 
+\gls{toc}. Alternatively, use:
 \nosecformatdef{glsxtrRevertTocMarks}
-which makes \gls{glsxtrifinmark} expand to \meta{false} in the table
-of contents.  For example:
+which makes \gls{glsxtrifinmark} expand to \meta{false} in the 
+\gls{toc}.  For example:
 \begin{codeenv}
 \cmd{documentclass}\marg{book}
 \strut
