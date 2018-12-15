@@ -335,24 +335,19 @@ public class GlsResource
          }
          else if (opt.equals("name-case-change"))
          {
-            nameCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
+            nameCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("description-case-change"))
          {
-            descCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
+            descCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("short-case-change"))
          {
-            shortCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
+            shortCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("dual-short-case-change"))
          {
-            dualShortCaseChange = getChoice(parser, list, opt,
-              "none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs", 
-              "title", "title-cs");
+            dualShortCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("short-plural-suffix"))
          {
@@ -365,14 +360,79 @@ public class GlsResource
          }
          else if (opt.equals("long-case-change"))
          {
-            longCaseChange = getChoice(parser, list, opt, "none", "lc", "uc",
-              "lc-cs", "uc-cs", "firstuc", "firstuc-cs", "title", "title-cs");
+            longCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("dual-long-case-change"))
          {
-            dualLongCaseChange = getChoice(parser, list, opt,
-              "none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs", 
-              "title", "title-cs");
+            dualLongCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+         }
+         else if (opt.equals("field-case-change"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+            if (array == null)
+            {
+               fieldCaseChange = null;
+            }
+            else
+            {
+               fieldCaseChange = new HashMap<String,String>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (!bib2gls.isKnownField(field))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.field", field, opt));
+                  }
+
+                  if (split.size() > 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  String val = split.size() == 1 ? "" 
+                               : split.get(1).toString(parser).trim();
+
+                  String caseChangeOpt = null;
+
+                  for (String caseOpt : CASE_OPTIONS)
+                  {
+                     if (caseOpt.equals(val))
+                     {
+                        caseChangeOpt = caseOpt;
+                        break;
+                     }
+                  }
+
+                  if (caseChangeOpt == null)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, val, opt));
+                  }
+                  else
+                  {
+                     fieldCaseChange.put(field, caseChangeOpt);
+                  }
+               }
+            }
          }
          else if (opt.equals("dual-short-plural-suffix"))
          {
@@ -2666,6 +2726,12 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "dual-long-case-change"));
+      }
+
+      if (fieldCaseChange != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "field-case-change"));
       }
 
       if (shortPluralSuffix != null)
@@ -7890,6 +7956,11 @@ public class GlsResource
       return dualLongCaseChange != null;
    }
 
+   public HashMap<String,String> getFieldCaseOptions()
+   {
+      return fieldCaseChange;
+   }
+
    public BibValueList applyNameCaseChange(TeXParser parser, 
       BibValueList value)
     throws IOException
@@ -10655,6 +10726,12 @@ public class GlsResource
    private String descCaseChange=null;
    private String longCaseChange=null;
    private String dualLongCaseChange=null;
+
+   private HashMap<String,String> fieldCaseChange = null;
+
+   private static final String[] CASE_OPTIONS = new String[]
+   {"none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs", 
+    "title", "title-cs"};
 
    private boolean wordBoundarySpace=true;
    private boolean wordBoundaryCsSpace=true;

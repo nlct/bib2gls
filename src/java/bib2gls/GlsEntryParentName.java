@@ -110,7 +110,7 @@ public class GlsEntryParentName extends GlsUseField
          }
          else
          {
-            process(parser, "name", parentLabel, expanded);
+            process(parser, parentLabel, "name", expanded);
          }
       }
 

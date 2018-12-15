@@ -1163,6 +1163,8 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
       }
+
+      changeFieldCase(parser);
    }
 
    protected void appendShortPluralSuffix(TeXParser parser,
@@ -1224,6 +1226,51 @@ public class Bib2GlsEntry extends BibEntry
 
       putField("name", value);
       putField("name", list.toString(parser));
+   }
+
+   protected void changeFieldCase(TeXParser parser)
+    throws IOException
+   {
+      HashMap<String,String> map = resource.getFieldCaseOptions();
+
+      if (map == null) return;
+
+      for (Iterator<String> it = map.keySet().iterator();
+           it.hasNext(); )
+      {
+         String field = it.next();
+         String caseChangeOpt = map.get(field);
+
+         if (!caseChangeOpt.equals("none"))
+         {
+            changeFieldCase(parser, field, caseChangeOpt);
+         }
+      }
+   }
+
+   protected void changeFieldCase(TeXParser parser, String field, String caseChangeOpt)
+    throws IOException
+   {
+      BibValueList value = getField(field);
+
+      if (value == null)
+      {
+         value = getFallbackContents(field);
+
+         if (value == null)
+         {
+            return;
+         }
+
+         value = (BibValueList)value.clone();
+      }
+
+      value = resource.applyCaseChange(parser, value, caseChangeOpt);
+
+      TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
+
+      putField(field, value);
+      putField(field, list.toString(parser));
    }
 
    public void convertFieldToDateTime(TeXParser parser,

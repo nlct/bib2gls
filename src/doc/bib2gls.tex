@@ -61,6 +61,7 @@
 
 \glsxtrprovidestoragekey{note}{}{}
 \glsxtrprovidestoragekey{package}{}{}
+\glsxtrprovidestoragekey{nametitle}{}{}
 
 \providecommand{\omicron}{o}
 
@@ -136,6 +137,8 @@
    exampleentry=entry
   },
   field-aliases={topics=adoptparents},
+  replicate-fields={name=nametitle},
+  field-case-change={nametitle=title},
   unknown-entry-alias={index},
   save-original-entrytype,
   label-prefix={idx.},
@@ -356,7 +359,7 @@
 }
 
 \newcommand*{\catattr}[1]{%
-  \texorpdfstring{\idx{#1}}{#1}%
+  \texorpdfstring{\idx{catattr.#1}}{#1}%
 }
 
 \newcommand*{\counter}[1]{%
@@ -726,7 +729,7 @@
   \renewcommand*{\glossaryheader}{\raggedright}%
   \renewcommand*{\glsgroupheading}[1]{}%
   \renewcommand*{\glossentry}[2]{%
-   \glsfieldfetch{##1}{name}{\thisvalue}%
+   \glsfieldfetch{##1}{nametitle}{\thisvalue}%
    \hypertarget{topic.##1}{}%
    \pdfbookmark[1]{\thisvalue}{topic.##1}%
    \section*{\glsdisp{##1}{\thisvalue}}%
@@ -775,6 +778,7 @@
      \styfmt{glossaries}, \styfmt{glossaries-extra} and
      Supplementary Glossary Packages},
     toctitle={Summary by Topic},
+    label={sec:topics},
     nogroupskip,
     nonumberlist
   ]%
@@ -1442,7 +1446,10 @@ at this point.
 
 \item[Stage 2 (Parsing)] All the \iext{bib} files associated with
 the \idx{resourceset} are parsed. Entry aliases (identified by
-\csopt{entry-type-aliases}) are performed. Preamble information (provided by
+\csopt{entry-type-aliases}) are performed. The
+\hyperref[sec:multientry]{multi-entry types}, such as
+\atentry{bibtexentry} and \atentry{progenitor}, spawn their
+associated primary entries. Preamble information (provided by
 \atentry{preamble}) is saved but is not interpreted at this stage.
 The transcript will show the message
 \begin{alltt}
@@ -1466,7 +1473,8 @@ the corresponding set of \ext{bib} files:
   \item ignored fields (identified by \csopt{ignore-fields}) are
   removed;
   \item case-changes (for example, \csopt{short-case-change}) are
-  performed, except for the \field{name} field;
+  performed, except for the \field{name} field and fields identified
+  with \csopt{field-case-change};
   \item suffixes are appended if required (for example, with
   \csopt{short-plural-suffix});
   \item field replications are made (\csopt{replicate-fields}),
@@ -1495,7 +1503,11 @@ the corresponding set of \ext{bib} files:
   \item end punctuation is checked according to
   \csopt{check-end-punctuation};
   \item \field{name} case-change is performed if
-  \csopt{name-case-change} is set.
+  \csopt{name-case-change} is set;
+  \item if \csopt[true]{copy-alias-to-see} the \field{alias} is copied 
+  to the \field{see} field;
+  \item general field case changes identified by
+  \csopt{field-case-change} are performed.
   \end{itemize}
 \item The dual version (if appropriate) is created.
 \item Records are added to the entry's location list (or transferred
@@ -5265,10 +5277,12 @@ way the entries are sorted and on the \csopt{dual-sort} setting.
 \section{Multi-Entry Types}
 \label{sec:multientry}
 
-A multi-entry type is a primary entry that may spawn multiple 
+A multi-entry type is an entry that may spawn multiple 
 primary entries. This means that both the main entry and the
 spawned entries are sorted together along with all the other primary
-entries.
+entries. In the case of \atentry{spawndualindexentry}, the main and
+spawned entries are primary. The main entry's dual is created as per
+\atentry{dualindexentry}.
 
 \entrysection{bibtexentry}
 
@@ -9775,6 +9789,39 @@ the \field{name} field is missing no action is performed.
 Applies a case-change to the \field{description} field (if present).
 This option may take one of the values described above.
 
+\optsection[\subsubsection]{field-case-change}
+
+A general case-change instruction. The value should be a
+comma-separated list of \code{\meta{field}\dequals\meta{setting}} for each
+field that needs a case-change applied. The \meta{setting} should be
+the same as the permitted values for the above options. This
+option is applied after all fields have been parsed. If the
+specified field is missing, the fallback for that field (if known) is copied
+into the field. For example:
+\begin{codeenv}
+\csopt[\field{user1}=uc,\field{user2}={firstuc}]{field-case-change}
+\end{codeenv}
+This manual provides a custom storage key called
+\fieldfmt{nametitle}:
+\begin{codeenv}
+\cs{glsxtrprovidestoragekey}\marg{\fieldfmt{nametitle}}\marg{}\marg{}
+\end{codeenv}
+The resource options copy the \field{name} value to this custom
+field and convert \fieldfmt{nametitle} to \idx{titlecase}:
+\begin{codeenv}
+\csopt[\field{name}=\fieldfmt{nametitle}]{replicate-fields},
+\csopt[\fieldfmt{nametitle}=title]{field-case-change},
+\end{codeenv}
+This means that the \hyperref[sec:topics]{topic summary}
+(page~\pageref{sec:topics}) can fetch the value of
+\fieldfmt{nametitle} instead of \field{name}, which provides an
+expandable \idx{titlecase} form that's suitable for the PDF
+bookmarks.
+
+This option isn't cumulative. If used multiple times in the same
+\idx{resourceset}, the last instance will be the one used. If
+the \keyvallist\ is missing, no general case-changing is applied
+(the default).
 
 \section{Plurals}
 \label{sec:plurals}

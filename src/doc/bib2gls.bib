@@ -187,7 +187,7 @@
 }
 
 @topic{catattrcommands,
-  name={category attribute commands}
+  name={categories and attributes}
 }
 
 @topic{regex,
@@ -2232,6 +2232,13 @@ field\dhyphen locale}},
 @resourceoption{opt.description-case-change,
    name={\csoptfmt{description\dhyphen case\dhyphen change}},
    user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.field-case-change,
+   name={\csoptfmt{field\dhyphen case\dhyphen change}},
+   user1={\margm{\keyvallist}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -4547,6 +4554,34 @@ expansion of \meta{definition}, without checking if the command
   category={command}
 }
 
+@command{ifcsstring,
+  name={\csfmt{if\-cs\-string}},
+  user1={\margm{cs-name}\margm{string}\margm{true}\margm{false}},
+  description={tests if the replacement text of the command
+  given by the control sequence name \meta{cs-name} equals \meta{string}},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
+@command{ifdefstrequal,
+  name={\csfmt{if\-def\-str\-equal}},
+  user1={\margm{cs1}\margm{cs2}\margm{true}\margm{false}},
+  description={tests if the replacement text of the command
+  \meta{cs1} equals the replacement text of the command \meta{cs2}},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
+@command{ifcsstrequal,
+  name={\csfmt{if\-cs\-str\-equal}},
+  user1={\margm{cs-name1}\margm{cs-name2}\margm{true}\margm{false}},
+  description={tests if the replacement text of the command given by
+  the control sequence name \meta{cs-name1} equals the replacement text 
+  of the command given by the control sequence name \meta{cs-name2}},
+  note={\styfmt{etoolbox}},
+  category={command}
+}
+
 @command{undef,
   name={\csfmt{undef}},
   user1={\meta{cs}},
@@ -4768,6 +4803,21 @@ pages (not available in multi-column or certain other contexts)},
   description={aligns material in rows and columns with \idx{colsep}
 to separate columns and \cs{cs.backslash} to separate rows},
   note={kernel environment},
+  category={environment}
+}
+
+@package{tabularx,
+  name={\styfmt{tabularx}},
+  category={package},
+  parent={packages}
+}
+
+@environment{env.tabularx,
+  name={\envfmt{tabularx}},
+  user1={\margm{width}\oargm{valign}\margm{column specs}},
+  description={a tabular-like environment that's designed to fit the
+   given \meta{width})},
+  note={\styfmt{tabularx}},
   category={environment}
 }
 
@@ -5023,158 +5073,188 @@ hyphen}},
   alias = {categoryattribute}
 }
 
-@categoryattribute{recordcount,
+@categoryattribute{catattr.recordcount,
   name={\catattrfmt{record\-count}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{glossname,
+@categoryattribute{catattr.glossname,
   name={\catattrfmt{gloss\-name}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{glossnamefont,
+@categoryattribute{catattr.glossnamefont,
   name={\catattrfmt{gloss\-name\-font}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{glossdesc,
+@categoryattribute{catattr.glossdesc,
   name={\catattrfmt{gloss\-desc}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{glossdescfont,
+@categoryattribute{catattr.glossdescfont,
   name={\catattrfmt{gloss\-desc\-font}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{textformat,
+@categoryattribute{catattr.textformat,
   name={\catattrfmt{text\-format}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{headuc,
+@categoryattribute{catattr.headuc,
   name={\catattrfmt{headuc}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{aposplural,
+@categoryattribute{catattr.aposplural,
   name={\catattrfmt{apos\-plural}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{accessaposplural,
+@categoryattribute{catattr.accessaposplural,
   name={\catattrfmt{access\-apos\-plural}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{noshortplural,
+@categoryattribute{catattr.noshortplural,
   name={\catattrfmt{no\-short\-plural}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{accessnoshortplural,
+@categoryattribute{catattr.accessnoshortplural,
   name={\catattrfmt{access\-no\-short\-plural}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{nameshortaccess,
+@categoryattribute{catattr.nameshortaccess,
   name={\catattrfmt{name\-short\-access}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{firstshortaccess,
+@categoryattribute{catattr.firstshortaccess,
   name={\catattrfmt{first\-short\-access}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{textshortaccess,
+@categoryattribute{catattr.textshortaccess,
   name={\catattrfmt{text\-short\-access}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{markwords,
+@categoryattribute{catattr.markwords,
   name={\catattrfmt{mark\-words}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{markshortwords,
+@categoryattribute{catattr.markshortwords,
   name={\catattrfmt{mark\-short\-words}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{targeturl,
+@categoryattribute{catattr.targeturl,
   name={\catattrfmt{target\-url}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{targetname,
+@categoryattribute{catattr.targetname,
   name={\catattrfmt{target\-name}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{externallocation,
+@categoryattribute{catattr.externallocation,
   name={\catattrfmt{external\-location}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{discardperiod,
+@categoryattribute{catattr.discardperiod,
   name={\catattrfmt{discard\-period}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{pluraldiscardperiod,
+@categoryattribute{catattr.pluraldiscardperiod,
   name={\catattrfmt{plural\-discard\-period}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{retainfirstuseperiod,
+@categoryattribute{catattr.retainfirstuseperiod,
   name={\catattrfmt{retain\-first\-use\-period}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{insertdots,
+@categoryattribute{catattr.insertdots,
   name={\catattrfmt{insert\-dots}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{accessinsertdots,
+@categoryattribute{catattr.accessinsertdots,
   name={\catattrfmt{access\-insert\-dots}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{tagging,
+@categoryattribute{catattr.tagging,
   name={\catattrfmt{tagging}},
   category={categoryattribute},
   parent={categoryattribute}
 }
 
-@categoryattribute{nohyperfirst,
+@categoryattribute{catattr.nohyperfirst,
   name={\catattrfmt{no\-hyper\-first}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@categoryattribute{catattr.nohyper,
+  name={\catattrfmt{no\-hyper}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@categoryattribute{catattr.entrycount,
+  name={\catattrfmt{entry\-count}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@categoryattribute{catattr.hyperoutside,
+  name={\catattrfmt{hyper\-outside}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@categoryattribute{catattr.regular,
+  name={\catattrfmt{regular}},
+  category={categoryattribute},
+  parent={categoryattribute}
+}
+
+@categoryattribute{catattr.wrgloss,
+  name={\catattrfmt{wrgloss}},
   category={categoryattribute},
   parent={categoryattribute}
 }
@@ -5615,7 +5695,7 @@ hyphen}},
   category={packageoption},
   parent={packageoptions},
   description={if true, converts the glossary mark (used in page
-  headings) to upper case with \cs{MakeTextUppercase}}
+  headings) to \idx{uppercase} with \cs{MakeTextUppercase}}
 }
 
 @packageoption{styopt.numberedsection,
@@ -7817,7 +7897,7 @@ primary formats, if enabled.},
   description={fetches the value of the given field for the given
    label and stores it in the command \meta{cs}},
   topics={fieldrefcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries} v4.16+},
   category={command}
 }
 
@@ -8097,7 +8177,7 @@ post-name hook},
   user1={\margm{label}},
   description={displays the value of the
     \field{name} field with the first character
-     converted to upper case},
+     converted to \idx{uppercase}},
   topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
@@ -8113,12 +8193,33 @@ post-name hook},
   category={command}
 }
 
+@glscommand{glsentrydescplural,
+  name={\csfmt{gls\-entry\-desc\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{descriptionplural} field},
+  topics={fieldrefcommands},
+  note={\styfmt{glossaries}\texparserdefnote},
+  category={command}
+}
+
 @glscommand{Glsentrydesc,
   name={\csfmt{Gls\-entry\-desc}},
   user1={\margm{label}},
   description={displays the value of the
     \field{description} field with the first letter converted to
-    upper case},
+    \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
+  note={\styfmt{glossaries}\texparserdefnote},
+  category={command}
+}
+
+@glscommand{Glsentrydescplural,
+  name={\csfmt{Gls\-entry\-desc\-plural}},
+  user1={\margm{label}},
+  description={displays the value of the
+    \field{descriptionplural} field with the first letter converted to
+    \idx{uppercase}},
   topics={fieldrefcommands,casecommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
@@ -8376,12 +8477,413 @@ post-name hook},
   category={command}
 }
 
+@glscommand{glsaccessname,
+  name={\csfmt{gls\-access\-name}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{name} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentryname})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessname,
+  name={\csfmt{Gls\-access\-name}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{name} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentryname})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccesstext,
+  name={\csfmt{gls\-access\-text}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{text} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrytext})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccesstext,
+  name={\csfmt{Gls\-access\-text}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{text} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrytext})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessplural,
+  name={\csfmt{gls\-access\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{plural} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentryplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessplural,
+  name={\csfmt{Gls\-access\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{plural} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentryplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessfirst,
+  name={\csfmt{gls\-access\-first}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{first} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentryfirst})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessfirst,
+  name={\csfmt{Gls\-access\-first}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{first} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentryfirst})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessfirstplural,
+  name={\csfmt{gls\-access\-first\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{firstplural} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentryfirstplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessfirstplural,
+  name={\csfmt{Gls\-access\-first\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{firstplural} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentryfirstplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccesssymbol,
+  name={\csfmt{gls\-access\-symbol}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{symbol} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrysymbol})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccesssymbol,
+  name={\csfmt{Gls\-access\-symbol}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{symbol} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrysymbol})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccesssymbolplural,
+  name={\csfmt{gls\-access\-symbol\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{symbolplural} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrysymbolplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccesssymbolplural,
+  name={\csfmt{Gls\-access\-symbol\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{symbolplural} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrysymbolplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessdesc,
+  name={\csfmt{gls\-access\-desc}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{description} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrydesc})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessdesc,
+  name={\csfmt{Gls\-access\-desc}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{description} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrydesc})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessdescplural,
+  name={\csfmt{gls\-access\-desc\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{descriptionplural} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrydescplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessdescplural,
+  name={\csfmt{Gls\-access\-desc\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{descriptionplural} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrydescplural})},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessshort,
+  name={\csfmt{gls\-access\-short}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{short} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentryshort})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessshort,
+  name={\csfmt{Gls\-access\-short}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{short} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentryshort})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccessshortpl,
+  name={\csfmt{gls\-access\-shortpl}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{shortplural} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentryshortpl})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccessshortpl,
+  name={\csfmt{Gls\-access\-shortpl}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{shortplural} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentryshortpl})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccesslong,
+  name={\csfmt{gls\-access\-long}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{long} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrylong})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccesslong,
+  name={\csfmt{Gls\-access\-long}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{long} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrylong})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsaccesslongpl,
+  name={\csfmt{gls\-access\-longpl}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{longplural} field with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{glsentrylongpl})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{Glsaccesslongpl,
+  name={\csfmt{Gls\-access\-longpl}},
+  user1={\margm{label}},
+  description={expands to the value of the
+    \field{longplural} field with the first letter converted to
+    \idx{uppercase} and with the accessibility support 
+    for that field, if provided (otherwise behaves the same as
+    \cs{Glsentrylongpl})},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
 @glscommand{glsxtrentryparentname,
   name={\csfmt{gls\-xtr\-entry\-parent\-name}},
   user1={\margm{label}},
   description={expands to the entry's parent's name},
   topics={fieldrefcommands},
   note={\styfmt{glossaries-extra}\texparserdefnote\ v1.39+},
+  category={command}
+}
+
+@glscommand{glsentryprefix,
+  name={\csfmt{gls\-entry\-prefix}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefix} field},
+  topics={fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{glsentryprefixplural,
+  name={\csfmt{gls\-entry\-prefix\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefixplural} field},
+  topics={fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{glsentryprefixfirst,
+  name={\csfmt{gls\-entry\-prefix\-first}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefixfirst} field},
+  topics={fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{glsentryprefixfirstplural,
+  name={\csfmt{gls\-entry\-prefix\-first\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefixfirstplural} field},
+  topics={fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{Glsentryprefix,
+  name={\csfmt{Gls\-entry\-prefix}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefix} field
+  with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{Glsentryprefixplural,
+  name={\csfmt{Gls\-entry\-prefix\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefixplural} field
+  with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{Glsentryprefixfirst,
+  name={\csfmt{Gls\-entry\-prefix\-first}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefixfirst} field
+  with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{Glsentryprefixfirstplural,
+  name={\csfmt{Gls\-entry\-prefix\-first\-plural}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{prefixfirstplural} field
+  with the first letter converted to \idx{uppercase}},
+  topics={fieldrefcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
   category={command}
 }
 
@@ -8392,6 +8894,263 @@ post-name hook},
 category},
   topics={assigncommands,catattrcommands},
   note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@glscommand{glsentryaccess,
+  name={\csfmt{gls\-entry\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{access} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrytextaccess,
+  name={\csfmt{gls\-entry\-text\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{textaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentryfirstaccess,
+  name={\csfmt{gls\-entry\-first\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{firstaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrypluralaccess,
+  name={\csfmt{gls\-entry\-plural\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{pluralaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentryfirstpluralaccess,
+  name={\csfmt{gls\-entry\-first\-plural\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{firstpluralaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrysymbolaccess,
+  name={\csfmt{gls\-entry\-symbol\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{symbolaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrysymbolpluralaccess,
+  name={\csfmt{gls\-entry\-symbol\-plural\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{symbolpluralaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrydescaccess,
+  name={\csfmt{gls\-entry\-desc\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{descriptionaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrydescpluralaccess,
+  name={\csfmt{gls\-entry\-desc\-plural\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{descriptionpluralaccess} field},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentryshortaccess,
+  name={\csfmt{gls\-entry\-short\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{shortaccess} field},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentryshortpluralaccess,
+  name={\csfmt{gls\-entry\-short\-plural\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{shortpluralaccess} field},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrylongaccess,
+  name={\csfmt{gls\-entry\-long\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{longaccess} field},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsentrylongpluralaccess,
+  name={\csfmt{gls\-entry\-long\-plural\-access}},
+  user1={\margm{label}},
+  description={expands to the value of the \field{longpluralaccess} field},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsnameaccessdisplay,
+  name={\csfmt{gls\-name\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentryaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glstextaccessdisplay,
+  name={\csfmt{gls\-text\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrytextaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glspluralaccessdisplay,
+  name={\csfmt{gls\-plural\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrypluralaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsfirstaccessdisplay,
+  name={\csfmt{gls\-first\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentryfirstaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsfirstpluralaccessdisplay,
+  name={\csfmt{gls\-first\-plural\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentryfirstpluralaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glssymbolaccessdisplay,
+  name={\csfmt{gls\-symbol\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrysymbolaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glssymbolpluralaccessdisplay,
+  name={\csfmt{gls\-symbol\-plural\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrysymbolpluralaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsdescriptionaccessdisplay,
+  name={\csfmt{gls\-descrip\-tion\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrydescaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsdescriptionpluralaccessdisplay,
+  name={\csfmt{gls\-descrip\-tion\-plural\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrydescpluralaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsshortaccessdisplay,
+  name={\csfmt{gls\-short\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentryshortaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsshortpluralaccessdisplay,
+  name={\csfmt{gls\-short\-plural\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentryshortpluralaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glslongaccessdisplay,
+  name={\csfmt{gls\-long\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrylongaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glslongpluralaccessdisplay,
+  name={\csfmt{gls\-long\-plural\-access\-display}},
+  user1={\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\cs{glsentrylongpluralaccess}\margm{label}}},
+  topics={fieldrefcommands,access-support,abbreviationcommands},
+  note={\styfmt{glossaries-access}},
+  category={command}
+}
+
+@glscommand{glsaccessdisplay,
+  name={\csfmt{gls\-access\-display}},
+  user1={\margm{field}\margm{text}\margm{label}},
+  description={displays \meta{text} with the accessibility support
+   provided by \code{\csfmt{glsentry\meta{field}access}\margm{label}}},
+  topics={fieldrefcommands,access-support},
+  note={\styfmt{glossaries-access}},
   category={command}
 }
 
@@ -8444,7 +9203,9 @@ category},
   name={\csfmt{acr\-plural\-suffix}},
   user1={},
   description={the suffix used to construct the default plural for
-   the short form of acronyms},
+   the short form of acronyms using the base \sty{glossaries}
+   package's acronym mechanism (not used with the
+   \sty{glossaries-extra} enhanced abbreviation mechanism)},
   topics={fixedtextcommands,abbreviationcommands},
   note={\styfmt{glossaries}\texparserdefnote},
   category={command}
@@ -8530,7 +9291,7 @@ category},
   if the entry doesn't exist (an error or warning message will
   occur and ?? will appear in the document).
   This command is not for use in the post-link hooks},
-  topics={conditionals},
+  topics={conditionals,entryrefcommands},
   note={\styfmt{glossaries}},
   seealso={GlsXtrIfUnusedOrUndefined,glsxtrifwasfirstuse},
   category={command}
@@ -8834,6 +9595,128 @@ doesn't},
   category={command}
 }
 
+@glscommand{ifglshasprefix,
+  name={\csfmt{if\-gls\-has\-prefix}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{prefix} field set to value that's not empty},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@glscommand{ifglshasprefixplural,
+  name={\csfmt{if\-gls\-has\-prefix\-plural}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{prefixplural} field set to value that's not empty},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@glscommand{ifglshasprefixfirst,
+  name={\csfmt{if\-gls\-has\-prefix\-first}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{prefixfirst} field set to value that's not empty},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@glscommand{ifglshasprefixfirstplural,
+  name={\csfmt{if\-gls\-has\-prefix\-first\-plural}},
+  user1={\margm{entry label}\margm{true}\margm{false}},
+  description={tests if the given entry, which must be defined, has the 
+   \field{prefixfirstplural} field set to value that's not empty},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries-prefix}},
+  seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
+  category={command}
+}
+
+@glscommand{ifglsfieldeq,
+  name={\csfmt{if\-gls\-field\-eq}},
+  user1={\margm{entry label}\margm{field label}\margm{string}\margm{true}\margm{false}},
+  description={tests if the given entry has the 
+   given field value equal to \meta{string}, where \meta{field label}
+   is the internal field label (not the key name). No expansion is
+   performed in the test (which just uses \cs{ifcsstring})},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
+@glscommand{ifglsfielddefeq,
+  name={\csfmt{if\-gls\-field\-def\-eq}},
+  user1={\margm{entry label}\margm{field label}\margm{cs}\margm{true}\margm{false}},
+  description={tests if the given entry has the 
+   given field value equal to the replacement text of the command
+   given by \meta{cs}, where \meta{field label}
+   is the internal field label (not the key name). The test 
+   uses \cs{ifdefstrequal}},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
+@glscommand{ifglsfieldcseq,
+  name={\csfmt{if\-gls\-field\-cs\-eq}},
+  user1={\margm{entry label}\margm{field label}\margm{cs-name}\margm{true}\margm{false}},
+  description={tests if the given entry has the 
+   given field value equal to the replacement text of the command
+   given by the control sequence name \meta{cs-name}, where \meta{field label}
+   is the internal field label (not the key name). The test 
+   uses \cs{ifcsstrequal}},
+  topics={conditionals,fieldrefcommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
+@glscommand{glsfielddef,
+  name={\csfmt{gls\-field\-def}},
+  user1={\margm{entry label}\margm{field label}\margm{definition}},
+  description={changes the value of the given
+  entry's field to \meta{definition} (localised by any scope)},
+  topics={fieldrefcommands,assigncommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
+@glscommand{glsfieldgdef,
+  name={\csfmt{gls\-field\-gdef}},
+  user1={\margm{entry label}\margm{field label}\margm{definition}},
+  description={globally changes the value of the given
+  entry's field to \meta{definition}},
+  topics={fieldrefcommands,assigncommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
+@glscommand{glsfieldedef,
+  name={\csfmt{gls\-field\-edef}},
+  user1={\margm{entry label}\margm{field label}\margm{definition}},
+  description={changes the value of the given entry's field to the 
+  full expansion of \meta{definition} (localised by any scope)},
+  topics={fieldrefcommands,assigncommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
+@glscommand{glsfieldxdef,
+  name={\csfmt{gls\-field\-xdef}},
+  user1={\margm{entry label}\margm{field label}\margm{definition}},
+  description={globally changes the value of the given entry's field to the 
+  full expansion of \meta{definition}},
+  topics={fieldrefcommands,assigncommands},
+  note={\styfmt{glossaries} v4.16+},
+  category={command}
+}
+
 @glscommand{GlsXtrIfFieldNonZero,
   name={\csfmt{Gls\-Xtr\-If\-Field\-Non\-Zero}},
   user1={\margm{field}\margm{entry label}\margm{true}\margm{false}},
@@ -8977,6 +9860,35 @@ can be referenced in \meta{true} or \meta{false} with
   description={adds a new key for internal use that can be set in 
     \csref{newglossaryentry}},
   topics={definingterms,providingcommands,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsautoprefix,
+  name={\csfmt{gls\-auto\-prefix}},
+  description={prefix used for the automatically labelling triggered
+  by the \styopt[autolabel]{numberedsection} option},
+  topics={hooks,crossrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsenablehyper,
+  name={\csfmt{gls\-enable\-hyper}},
+  description={enables the creation of hyperlinks and targets for
+  the glossary commands that support them (automatically implemented
+  if \sty{hyperref} is loaded before \sty{glossaries})},
+  topics={linkcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsdisablehyper,
+  name={\csfmt{gls\-disable\-hyper}},
+  description={disables the creation of hyperlinks and targets for
+  the glossary commands that support them (automatically implemented
+  if \sty{hyperref} isn't loaded before \sty{glossaries})},
+  topics={linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -9250,6 +10162,17 @@ glossary styles)},
   category={command}
 }
 
+@glscommand{glsgroupskip,
+  name={\csfmt{gls\-group\-skip}},
+  description={inserted between groups to create some vertical
+  spacing (this command is modified by
+  glossary styles, and may be switched off with the  
+  \styopt{nogroupskip} option)},
+  topics={glossarystylecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @glscommand{glsentryitem,
   name={\csfmt{gls\-entry\-item}},
   user1={\margm{label}},
@@ -9260,6 +10183,15 @@ counter, if appropriate},
   category={command}
 }
 
+@glscommand{glsentrycounterlabel,
+  name={\csfmt{gls\-entry\-counter\-label}},
+  description={governs the way the \counter{glossaryentry}
+  counter is displayed by \cs{glsentryitem}},
+  topics={glossarystylecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @glscommand{glssubentryitem,
   name={\csfmt{gls\-sub\-entry\-item}},
   user1={\margm{label}},
@@ -9267,6 +10199,15 @@ counter, if appropriate},
 counter, if appropriate},
   topics={glossarystylecommands},
   note={\styfmt{glossaries} v3.0+},
+  category={command}
+}
+
+@glscommand{glssubentrycounterlabel,
+  name={\csfmt{gls\-sub\-entry\-counter\-label}},
+  description={governs the way the \counter{glossarysubentry}
+  counter is displayed by \cs{glssubentryitem}},
+  topics={glossarystylecommands},
+  note={\styfmt{glossaries}},
   category={command}
 }
 
@@ -9345,7 +10286,27 @@ and the \styopt{postpunc} option for \sty{glossaries-extra}},
   name={\csfmt{Gloss\-entry\-desc}},
   user1={\margm{label}},
   description={like \cs{glossentrydesc} but converts the first
-letter to uppercase},
+letter to \idx{uppercase}},
+  topics={glossarystylecommands,fieldrefcommands,casecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{Glossentryname,
+  name={\csfmt{Gloss\-entry\-name}},
+  user1={\margm{label}},
+  description={like \cs{glossentryname} but converts the first
+letter to \idx{uppercase}},
+  topics={glossarystylecommands,fieldrefcommands,casecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{Glossentrysymbol,
+  name={\csfmt{Gloss\-entry\-symbol}},
+  user1={\margm{label}},
+  description={like \cs{glossentrysymbol} but converts the first
+letter to \idx{uppercase}},
   topics={glossarystylecommands,fieldrefcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
@@ -9355,8 +10316,10 @@ letter to uppercase},
   name={\csfmt{glsaddall}},
   user1={\oargm{options}},
   description={iterates over all entries defined for all glossaries
-   (or for the sub-list provided in the options) and performs
-   \cs{glsadd} for each entry},
+   (or for the sub-list provided by \optfmt{types=\margm{list}} in the options) 
+   and performs \code{\cs{glsadd}\oargm{options}} for each entry.
+   This command isn't suitable for use with \bibgls. Use the
+   \csopt{selection} option instead},
   topics={loops,indexing},
   note={\styfmt{glossaries}},
   category={command}
@@ -9368,7 +10331,9 @@ letter to uppercase},
   description={iterates over all entries defined for all glossaries
    (or for the sub-list provided in the options) and performs
    \cs{glsadd} for each entry that hasn't been used with
-   the \glsaddopt{format} set to \code{glsignore}},
+   the \glsaddopt{format} set to \code{glsignore}.
+   This command isn't suitable for use with \bibgls. Use the
+   \csopt{selection} option instead},
   topics={loops,indexing},
   note={\styfmt{glossaries}},
   category={command}
@@ -9967,7 +10932,9 @@ usual delay},
 @glscommand{glssymbolsgroupname,
   name={\csfmt{gls\-symbols\-group\-name}},
   user1={},
-  description={the name used for the symbols group},
+  description={language-sensitive name used for the symbols group and 
+   also used for the title of the glossary created with the \styopt{symbols} 
+   package option},
   topics={fixedtextcommands,glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
@@ -9976,7 +10943,9 @@ usual delay},
 @glscommand{glsnumbersgroupname,
   name={\csfmt{gls\-numbers\-group\-name}},
   user1={},
-  description={the name used for the numbers group},
+  description={language-sensitive name used for the numbers group 
+   and also used for the title of the glossary created with the 
+   \styopt{numbers} package option},
   topics={fixedtextcommands,glossarystylecommands},
   note={\styfmt{glossaries}},
   category={command}
@@ -10048,7 +11017,7 @@ by \cs{printunsrtglossary}},
   description={expands to the value of the \field{category} field
 for the entry identified by \meta{label} or nothing if the entry
 hasn't been defined},
-  topics={fieldrefcommands},
+  topics={fieldrefcommands,catattrcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -10058,7 +11027,7 @@ hasn't been defined},
   user1={\margm{label}\margm{category}\margm{true}\margm{false}},
   description={does \meta{true} if the \field{category} field for
    the entry given by \meta{label} is \meta{category}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditionals,fieldrefcommands,catattrcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -10084,6 +11053,30 @@ hasn't been defined},
 @printglossoption{printgloss.style,
   parent = {printunsrtglossary},
   name = {\csoptfmt{style}},
+  category={commandoption},
+}
+
+@printglossoption{printgloss.entrycounter,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{entrycounter}},
+  category={commandoption},
+}
+
+@printglossoption{printgloss.subentrycounter,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{subentrycounter}},
+  category={commandoption},
+}
+
+@printglossoption{printgloss.nopostdot,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{nopostdot}},
+  category={commandoption},
+}
+
+@printglossoption{printgloss.numberedsection,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{numbered\-section}},
   category={commandoption},
 }
 
@@ -10127,6 +11120,25 @@ hasn't been defined},
   parent = {printunsrtglossary},
   name = {\csoptfmt{no\-group\-skip}},
   category={commandoption},
+}
+
+@printglossoption{printgloss.label,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{label}},
+  category={commandoption},
+}
+
+@glscommand{glsxtrsetglossarylabel,
+  name={\csfmt{glsxtrsetglossarylabel}},
+  user1={\margm{label}},
+  description={sets the label for subsequent glossaries
+   (should be scoped or updated per glossary to prevent
+   duplicate labels). This is an alternative to the
+   \styopt[nameref]{numberedsection} package option or
+   \printglossopt{label} \ics{printunsrtglossary} option},
+  topics={crossrefcommands},
+  note={\styfmt{glossaries-extra} v1.39+},
+  category={command}
 }
 
 @glscommand{cs.makeglossaries,
@@ -10192,7 +11204,7 @@ hasn't been defined},
 @command{makefirstuc,
   name={\csfmt{make\-first\-uc}},
   user1={\margm{text}},
-  description={converts the first letter of \meta{text} to upper case},
+  description={converts the first letter of \meta{text} to \idx{uppercase}},
   note={\styfmt{mfirstuc}\texparserdefnote},
   category={command}
 }
@@ -10449,11 +11461,22 @@ warning rather than an error if the command isn't already defined},
   category={command}
 }
 
+@glscommand{setglossarypreamble,
+  name={\csfmt{set\-glossary\-preamble}},
+  user1={\oargm{type}\margm{code}},
+  description={sets \meta{code} as the preamble for the given
+glossary (or the default of \meta{type} is omitted)},
+  topics={glossrefs,hooks,glossarystylecommands},
+  note={\styfmt{glossaries}},
+  seealso={glossarypreamble},
+  category={command}
+}
+
 @glscommand{apptoglossarypreamble,
   name={\csfmt{app\-to\-glossary\-preamble}},
   user1={\oargm{type}\margm{code}},
   description={appends \meta{code} to the preamble for the given
-glossary},
+glossary (or the default of \meta{type} is omitted)},
   topics={glossrefs,hooks,glossarystylecommands},
   note={\styfmt{glossaries-extra}},
   seealso={glossarypreamble},
@@ -10466,7 +11489,16 @@ glossary},
   those that have the preamble explicitly set with
   \cs{apptoglossarypreamble}},
   topics={glossrefs,hooks,glossarystylecommands},
-  note={\styfmt{glossaries-extra}},
+  note={\styfmt{glossaries}},
+  seealso={apptoglossarypreamble},
+  category={command}
+}
+
+@glscommand{glossarypostamble,
+  name={\csfmt{glossary\-post\-amble}},
+  description={the postamble that's placed after each glossary},
+  topics={glossrefs,hooks,glossarystylecommands},
+  note={\styfmt{glossaries}},
   seealso={apptoglossarypreamble},
   category={command}
 }
@@ -10530,8 +11562,18 @@ glossary},
   category={command}
 }
 
+@glscommand{descriptionname,
+  name={\csfmt{description\-name}},
+  user1={},
+  description={language-sensitive name used for the description 
+   header for some glossary styles},
+  topics={fixedtextcommands,glossarystylecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @glscommand{pagelistname,
-  name={\csfmt{pagelistname}},
+  name={\csfmt{page\-list\-name}},
   user1={},
   description={language-sensitive name used for the location list 
    header for some glossary styles},
@@ -10546,6 +11588,47 @@ glossary},
   description={language sensitive \qt{see also} text},
   topics={fixedtextcommands,glossarystylecommands,loclistcommands},
   note={\styfmt{glossaries-extra} or language packages},
+  category={command}
+}
+
+@glscommand{glossaryname,
+  name={\csfmt{glossary\-name}},
+  user1={},
+  description={language-sensitive name used for the title of the default
+   \code{main} glossary},
+  topics={fixedtextcommands,glossarystylecommands},
+  note={\styfmt{glossaries} or language packages},
+  category={command}
+}
+
+@glscommand{indexname,
+  name={\csfmt{index\-name}},
+  user1={},
+  description={language-sensitive name used for the title of the 
+  glossary created with the \styopt{index} package option},
+  topics={fixedtextcommands,glossarystylecommands},
+  note={\styfmt{glossaries} or language packages},
+  category={command}
+}
+
+@glscommand{acronymname,
+  name={\csfmt{acronym\-name}},
+  user1={},
+  description={language-sensitive name used for the title of the
+   glossary created with the \styopt{acronym} or \styopt{acronyms} 
+   package option},
+  topics={fixedtextcommands,glossarystylecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{abbreviationname,
+  name={\csfmt{ab\-bre\-vi\-a\-tion\-name}},
+  user1={},
+  description={language-sensitive name used for the title of the
+   glossary created with the \styopt{abbreviations} package option},
+  topics={fixedtextcommands,glossarystylecommands},
+  note={\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -10833,6 +11916,16 @@ abbreviation by the \catattr{markwords} attribute},
   category={command}
 }
 
+@glscommand{Glsfirst,
+  name={\csfmt{Glsfirst}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={as \cs{glsfirst} but converts the first letter to
+  \idx{uppercase}},
+  topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @glscommand{glssymbol,
   name={\csfmt{glssymbol}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
@@ -11030,7 +12123,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csfmt{Gls}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
   description={as \cs{gls} but converts the first letter
-    of the link text to upper case},
+    of the link text to \idx{uppercase}},
   topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
@@ -11048,7 +12141,7 @@ abbreviation by the \catattr{markwords} attribute},
 @glscommand{GLS,
   name={\csfmt{GLS}},
   user1={\oargm{options}\margm{label}\oargm{insert}},
-  description={as \cs{gls} but converts the link text to upper case},
+  description={as \cs{gls} but converts the link text to \idx{uppercase}},
   topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries}},
   category={command}
@@ -11070,6 +12163,61 @@ abbreviation by the \catattr{markwords} attribute},
   where the \meta{prefix} is obtained from the appropriate prefix
   field},
   topics={entryrefcommands,fieldrefcommands,linkcommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{Pgls,
+  name={\csfmt{Pgls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={does \meta{prefix}\cs{gls}\oargm{options}\margm{label}\oargm{insert},
+  where the \meta{prefix} is obtained from the appropriate prefix
+  field with the first letter converted to \idx{uppercase}},
+  topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{PGLS,
+  name={\csfmt{PGLS}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={does \meta{prefix}\cs{GLS}\oargm{options}\margm{label}\oargm{insert},
+  where the \meta{prefix} is obtained from the appropriate prefix
+  field with the text converted to \idx{uppercase}},
+  topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{pglspl,
+  name={\csfmt{pglspl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={does \meta{prefix}\cs{glspl}\oargm{options}\margm{label}\oargm{insert},
+  where the \meta{prefix} is obtained from the appropriate prefix
+  field},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{Pglspl,
+  name={\csfmt{Pglspl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={does \meta{prefix}\cs{glspl}\oargm{options}\margm{label}\oargm{insert},
+  where the \meta{prefix} is obtained from the appropriate prefix
+  field with the first letter converted to \idx{uppercase}},
+  topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
+  note={\styfmt{glossaries-prefix}},
+  category={command}
+}
+
+@glscommand{PGLSpl,
+  name={\csfmt{PGLSpl}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={does \meta{prefix}\cs{GLSpl}\oargm{options}\margm{label}\oargm{insert},
+  where the \meta{prefix} is obtained from the appropriate prefix
+  field with the text converted to \idx{uppercase}},
+  topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries-prefix}},
   category={command}
 }
@@ -11516,19 +12664,61 @@ paragraph break that retains the hanging indent},
   name={\csfmt{gls\-acc\-supp}},
   user1={\margm{accessible text}\margm{text}},
   description={used by the accessibility support to interface with
-  the \sty{accsupp} package},
+  the \sty{accsupp} package (use \cs{xglsaccsupp} if \meta{text}
+  needs to be fully expanded first)},
   topics={access-support},
   note={\styfmt{glossaries-accsupp}},
+  seealso={xglsaccsupp},
+  category={command}
+}
+
+@glscommand{xglsaccsupp,
+  name={\csfmt{xgls\-acc\-supp}},
+  user1={\margm{accessible text}\margm{text}},
+  description={used by the accessibility support to interface with
+  the \sty{accsupp} package, where \meta{text} is fully expanded},
+  topics={access-support},
+  note={\styfmt{glossaries-accsupp}},
+  seealso={glsaccsupp},
   category={command}
 }
 
 @glscommand{forglsentries,
   name={\csfmt{for\-gls\-entries}},
+  user1={\oargm{type}\margm{cs}\margm{body}},
+  description={iterates over all entries defined in the glossary
+   identified by \meta{type} (or the default, if \meta{type}
+   is omitted) and perform \meta{body} where you can use the
+   control sequence \meta{cs} to reference the current entry label},
+  topics={loops,entryrefcommands},
+  note={\styfmt{glossaries}},
+  seealso={forallglsentries},
+  category={command}
+}
+
+@glscommand{forallglsentries,
+  name={\csfmt{for\-all\-gls\-entries}},
   user1={\oargm{glossary-list}\margm{cs}\margm{body}},
-  description={iterates over all entries defined in the listed
-   glossaries and perform \meta{body} where you can use the
-   control sequence \meta{cs} to reference the current label},
-  topics={loops},
+  description={iterates over all entries defined in the
+  comma-separated \meta{glossary-list} (or all defined non-ignored
+   glossaries if the optional argument is omitted) and perform 
+   \meta{body} where you can use the control sequence \meta{cs} to 
+   reference the current entry label},
+  topics={loops,glossrefs,entryrefcommands},
+  note={\styfmt{glossaries}},
+  seealso={forglsentries,forallglossaries},
+  category={command}
+}
+
+@glscommand{forallglossaries,
+  name={\csfmt{for\-all\-glos\-saries}},
+  user1={\oargm{glossary-list}\margm{cs}\margm{body}},
+  description={iterates over all glossaries identified in the 
+   comma-separated \meta{glossary-list} (or all defined non-ignored
+   glossaries if the optional argument is omitted) and performs \meta{body} 
+   where you can use the control sequence \meta{cs} to reference 
+   the current glossary label},
+  topics={loops,glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11556,6 +12746,74 @@ paragraph break that retains the hanging indent},
   topics={loops,listcommands},
   note={\styfmt{glossaries-extra} v1.24+},
   seealso={glsxtrforcsvfield},
+  category={command}
+}
+
+@glscommand{ifglossaryexists,
+  name={\csfmt{if\-glossary\-exists}},
+  user1={\margm{type}\margm{true}\margm{false}},
+  description={tests if the glossary given by \meta{type} exists
+  and does \meta{true} if it does exists, otherwise does \meta{false}},
+  topics={conditionals,glossrefs},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{ifignoredglossary,
+  name={\csfmt{if\-ignored\-glossary}},
+  user1={\margm{type}\margm{true}\margm{false}},
+  description={tests if the glossary given by \meta{type} was
+  defined as an ignored glossary},
+  topics={conditionals,glossrefs},
+  note={\styfmt{glossaries} v4.08+},
+  category={command}
+}
+
+@glscommand{glsdoifexists,
+  name={\csfmt{gls\-do\-if\-exists}},
+  user1={\margm{label}\margm{code}},
+  description={if the entry given by \meta{label} exists, \meta{code}
+  is done, otherwise an error (or warning with
+  \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
+  triggered},
+  topics={conditionals,entryrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsdoifnoexists,
+  name={\csfmt{gls\-do\-if\-no\-exists}},
+  user1={\margm{label}\margm{code}},
+  description={if the entry given by \meta{label} doesn't exist, \meta{code}
+  is done, otherwise an error (or warning with
+  \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
+  triggered},
+  topics={conditionals,entryrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsdoifexistsordo,
+  name={\csfmt{gls\-do\-if\-exists\-or\-do}},
+  user1={\margm{label}\margm{code}\margm{else code}},
+  description={if the entry given by \meta{label} exists, \meta{code}
+  is done, otherwise an error (or warning with
+  \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
+  triggered and \meta{else code} is done},
+  topics={conditionals,entryrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsdoifnoexistsordo,
+  name={\csfmt{gls\-do\-if\-no\-exists\-or\-do}},
+  user1={\margm{label}\margm{code}\margm{else code}},
+  description={if the entry given by \meta{label} doesn't exist, \meta{code}
+  is done, otherwise an error (or warning with
+  \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
+  triggered and \meta{else code} is done},
+  topics={conditionals,entryrefcommands},
+  note={\styfmt{glossaries}},
   category={command}
 }
 
@@ -11695,12 +12953,44 @@ marked as having been used},
   category={command}
 }
 
+@glscommand{glslocalunset,
+  name={\csfmt{gls\-local\-unset}},
+  user1 = {\margm{label}},
+  description={locally unsets the \idx{firstuseflag} so that the entry is
+marked as having been used},
+  topics={conditionals},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @glscommand{glsreset,
   name={\csfmt{gls\-reset}},
   user1 = {\margm{label}},
   description={resets the \idx{firstuseflag} so that the entry is
 marked as not used},
   topics={conditionals},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glslocalreset,
+  name={\csfmt{gls\-local\-reset}},
+  user1 = {\margm{label}},
+  description={locally resets the \idx{firstuseflag} so that the entry is
+marked as not used},
+  topics={conditionals},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glspatchtabularx,
+  name={\csfmt{gls\-patch\-tab\-ularx}},
+  description={preamble command that will patch the \env{tabularx}
+   environment to deal with the problem of unsetting the
+  \idx{firstuseflag} either explicitly with \cs{glsunset} or
+  implicitly through commands like \cs{gls} (does nothing if
+  \sty{tabularx} hasn't been loaded)},
+  topics={hooks,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11908,7 +13198,7 @@ has three or more items},
 @command{MakeTextUppercase,
   name={\csfmt{MakeTextUppercase}},
   user1={\margm{text}},
-  description={converts \meta{text} to upper case},
+  description={converts \meta{text} to \idx{uppercase}},
   note={\styfmt{textcase}\texparserdefnote},
   category={command}
 }
@@ -11925,7 +13215,7 @@ has three or more items},
 @command{MakeUppercase,
   name={\csfmt{MakeUppercase}},
   user1={\margm{text}},
-  description={converts \meta{text} to upper case},
+  description={converts \meta{text} to \idx{uppercase}},
   note={kernel command\texparserdefnote},
   category={command}
 }
@@ -12330,7 +13620,7 @@ occurred},
   description={cross-reference with textual tag inferred from the
 associated counter},
   seealso={label},
-  note={\sty{hyperref}},
+  note={\styfmt{hyperref}},
   category={command}
 }
 
@@ -12464,12 +13754,301 @@ to use in the header (leave empty for default)},
   category={command}
 }
 
+@glscommand{showgloparent,
+  name={\csfmt{show\-glo\-parent}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{parent} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglolevel,
+  name={\csfmt{show\-glo\-level}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the entry's
+   hierarchical level in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showgloname,
+  name={\csfmt{show\-glo\-name}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{name} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglosort,
+  name={\csfmt{show\-glo\-sort}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{sort} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglosymbol,
+  name={\csfmt{show\-glo\-symbol}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{symbol} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglosymbolplural,
+  name={\csfmt{show\-glo\-symbol\-plural}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{symbolplural} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showgloshort,
+  name={\csfmt{show\-glo\-short}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{short} field in the transcript},
+  topics={debugging,fieldrefcommands,abbreviationcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglolong,
+  name={\csfmt{show\-glo\-long}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{long} field in the transcript},
+  topics={debugging,fieldrefcommands,abbreviationcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showgloloclist,
+  name={\csfmt{show\-glo\-loc\-list}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{loclist} field in the transcript},
+  topics={debugging,fieldrefcommands,loclistcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showgloflag,
+  name={\csfmt{show\-glo\-flag}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \idx{firstuseflag} in the transcript},
+  topics={debugging,fieldrefcommands,conditionals},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglodesc,
+  name={\csfmt{show\-glo\-desc}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{description} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglodescplural,
+  name={\csfmt{show\-glo\-desc\-plural}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{descriptionplural} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglotext,
+  name={\csfmt{show\-glo\-text}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{text} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showgloplural,
+  name={\csfmt{show\-glo\-plural}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{plural} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglofirst,
+  name={\csfmt{show\-glo\-first}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{first} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglofirstpl,
+  name={\csfmt{show\-glo\-firstpl}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{firstplural} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglotype,
+  name={\csfmt{show\-glo\-type}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{type} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglocounter,
+  name={\csfmt{show\-glo\-counter}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{counter} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglouseri,
+  name={\csfmt{show\-glo\-useri}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{user1} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglouserii,
+  name={\csfmt{show\-glo\-userii}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{user2} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglouseriii,
+  name={\csfmt{show\-glo\-useriii}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{user3} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglouseriv,
+  name={\csfmt{show\-glo\-useriv}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{user4} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglouserv,
+  name={\csfmt{show\-glo\-userv}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{user5} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglouservi,
+  name={\csfmt{show\-glo\-uservi}},
+  user1={\margm{label}},
+  description={interrupts the document build and shows the value of
+   the \field{user6} field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglofield,
+  name={\csfmt{show\-glo\-field}},
+  user1={\margm{entry label}\margm{internal field}},
+  description={interrupts the document build and shows the value of
+   the given field in the transcript},
+  topics={debugging,fieldrefcommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showgloglossaries,
+  name={\csfmt{show\-glo\-glossaries}},
+  description={interrupts the document build and shows the list
+  of all none-ignored glossary types in the transcript},
+  topics={debugging,glossrefs},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglossarytitle,
+  name={\csfmt{show\-glos\-sary\-title}},
+  user1={\margm{type}},
+  description={interrupts the document build and shows the title
+   of the given glossary in the transcript},
+  topics={debugging,glossrefs},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglossarycounter,
+  name={\csfmt{show\-glos\-sary\-counter}},
+  user1={\margm{type}},
+  description={interrupts the document build and shows the default
+   counter for the given glossary in the transcript},
+  topics={debugging,glossrefs},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{showglossaryentries,
+  name={\csfmt{show\-glos\-sary\-entries}},
+  user1={\margm{type}},
+  description={interrupts the document build and shows the list of
+   entry labels for the given glossary in the transcript},
+  topics={debugging,glossrefs},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
 @glscommand{GlsEntryCounterLabelPrefix,
   name={\csfmt{Gls\-Entry\-Counter\-Label\-Prefix}},
   description={used as a prefix in the \cs{label} command
    automatically implemented by the \styopt{entrycounter}
     and \styopt{subentrycounter} options},
-  topics={hooks},
+  topics={hooks,crossrefcommands},
   note={\styfmt{glossaries} v4.38+},
   category={command}
 }
@@ -12517,7 +14096,7 @@ to use in the header (leave empty for default)},
   name={\csfmt{gls\-reset\-entry\-counter}},
   description={resets the \counter{glossaryentry} counter if the
 \styopt{entrycounter} setting is on},
-  topics={hooks,glossarystylecommands,assigncommands},
+  topics={hooks,glossarystylecommands,assigncommands,crossrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
