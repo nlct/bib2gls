@@ -8,7 +8,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[colorlinks]{hyperref}
-\usepackage[bib2gls]{testidx-glossaries}
+\usepackage[bib2gls,desc]{testidx-glossaries}
 \glossariesextrasetup{record=nameref}
 \usepackage{glossary-bookindex}
 \setglossarystyle{bookindex}
@@ -16,7 +16,11 @@
 %\renewcommand{\thepage}{\textbf{\arabic{page}}}
 %\newcommand{\theHpage}{\arabic{page}}
 
-\tstidxmakegloss[compact-ranges]
+\tstidxmakegloss[
+ compact-ranges,
+ encapsulate-fields={description=emph},
+ encapsulate-fields*={description=@firstoftwo}
+]
 
 \begin{document}
 \testidx

@@ -9,6 +9,8 @@ v1.9 (pending):
      save-original-entrytype
      field-case-change
      no-case-change-cs
+     encapsulate-fields
+     encapsulate-fields*
 
   * new entry types:
 

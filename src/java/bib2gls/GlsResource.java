@@ -438,6 +438,102 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("encapsulate-fields"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+            if (array == null)
+            {
+               encapFields = null;
+            }
+            else
+            {
+               encapFields = new HashMap<String,String>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (!bib2gls.isKnownField(field))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.field", field, opt));
+                  }
+
+                  if (split.size() > 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  String val = split.size() == 1 ? "" 
+                               : split.get(1).toString(parser).trim();
+
+                  encapFields.put(field, val);
+               }
+            }
+         }
+         else if (opt.equals("encapsulate-fields*"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+
+            if (array == null)
+            {
+               encapFieldsIncLabel = null;
+            }
+            else
+            {
+               encapFieldsIncLabel = new HashMap<String,String>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (!bib2gls.isKnownField(field))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.field", field, opt));
+                  }
+
+                  if (split.size() > 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  String val = split.size() == 1 ? "" 
+                               : split.get(1).toString(parser).trim();
+
+                  encapFieldsIncLabel.put(field, val);
+               }
+            }
+         }
          else if (opt.equals("dual-short-plural-suffix"))
          {
             dualShortPluralSuffix = getOptional(parser, "", list, opt);
@@ -10522,6 +10618,28 @@ public class GlsResource
       return dualPrimaryDependency;
    }
 
+   public String getFieldEncap(String field)
+   {
+      if (encapFields == null) return null;
+
+      String csname = encapFields.get(field);
+
+      if ("".equals(csname)) return null;
+
+      return csname;
+   }
+
+   public String getFieldEncapIncLabel(String field)
+   {
+      if (encapFieldsIncLabel == null) return null;
+
+      String csname = encapFieldsIncLabel.get(field);
+
+      if ("".equals(csname)) return null;
+
+      return csname;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -10772,6 +10890,8 @@ public class GlsResource
    private boolean wordBoundaryDash=false;
 
    private String[] noCaseChangeCs = null;
+
+   private HashMap<String,String> encapFields, encapFieldsIncLabel;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;

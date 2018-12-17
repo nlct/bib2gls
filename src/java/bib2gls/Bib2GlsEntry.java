@@ -975,6 +975,33 @@ public class Bib2GlsEntry extends BibEntry
                value.add(new BibUserString(list));
             }
 
+            String encap = resource.getFieldEncap(field);
+
+            if (encap != null)
+            {
+               Group grp = parser.getListener().createGroup();
+               grp.addAll(list);
+               list.clear();
+               list.add(new TeXCsRef(encap));
+               list.add(grp);
+               value.clear();
+               value.add(new BibUserString(list));
+            }
+
+            encap = resource.getFieldEncapIncLabel(field);
+
+            if (encap != null)
+            {
+               Group grp = parser.getListener().createGroup();
+               grp.addAll(list);
+               list.clear();
+               list.add(new TeXCsRef(encap));
+               list.add(grp);
+               list.add(parser.getListener().createGroup(getId()));
+               value.clear();
+               value.add(new BibUserString(list));
+            }
+
             boolean isLabelifyList = resource.isLabelifyListField(field);
 
             if (isLabelifyList || resource.isLabelifyField(field))

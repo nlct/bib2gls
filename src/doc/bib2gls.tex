@@ -1626,6 +1626,10 @@ the corresponding set of \ext{bib} files:
   (if not already done in any of the previous steps);
   \item any fields that have been identified by
   \csopt{bibtex-contributor-fields} are converted;
+  \item any fields that have been identified with
+  \csopt{encapsulate-fields} are converted;
+  \item any fields that have been identified with
+  \csopt{encapsulate-fields*} are converted;
   \item any fields that must be converted into a label form
   (\csopt{labelify} or \csopt{labelify-list}) are processed;
   \item any fields identified by \csopt{dependency-fields} are parsed for
@@ -9299,6 +9303,47 @@ the \ext{bib} file. This is because the definition of
 The second resource set will use the default 
 \csopt[von]{bibtex-contributor-fields} setting when obtaining the
 sort value.
+
+\optsection[\subsubsection]{encapsulate-fields}
+
+This option should take a comma-separated list of 
+\optfmt{\meta{field}\dequals\meta{cs-name-1arg}} values, where
+\meta{cs-name-1arg} is the name of a control sequence that takes
+one argument. During the processing stage, each field identified in
+the list (if defined) will have its value replaced with:
+\begin{codeenv}
+\cmd{\meta{cs-name-1arg}}\margm{value}
+\end{codeenv}
+where \meta{value} was its previous value. An
+empty list switches off encapsulation (the default).
+
+This action overrides any previous use of \csopt{encapsulate-fields}
+within the same \idx{resourceset} and is always performed before
+\csopt{encapsulate-fields*}, regardless of the order in the 
+\idx{resourceset}['s] list of options.
+
+\optsection[\subsubsection]{encapsulate-fields*}
+
+This option should take a comma-separated list of 
+\optfmt{\meta{field}\dequals\meta{cs-name-2arg}} values, where 
+\meta{cs-name-2arg} is the name of a control sequence that takes two
+arguments. During the processing stage, each field identified in the
+list (if defined) will have its value replaced with:
+\begin{codeenv}
+\cmd{\meta{cs-name-2arg}}\margm{value}\margm{label}
+\end{codeenv}
+where \meta{value} was its previous value and \meta{label} is the
+entry's label (including prefix, if appropriate). An
+empty list switches off encapsulation (the default). 
+
+This action overrides any previous use of
+\csopt{encapsulate-fields*} within the same \idx{resourceset}, and
+is always performed after \csopt{encapsulate-fields}, regardless of
+the order in the \idx{resourceset}['s] list of options, so if the
+same field is listed in both settings, its value will end up as:
+\begin{codeenv}
+\cmd{\meta{cs-name-2arg}}\marg{\cmd{\meta{cs-name-1arg}}\margm{value}}\margm{label}
+\end{codeenv}
 
 \optsection[\subsubsection]{date-time-fields}
 
