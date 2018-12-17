@@ -126,6 +126,8 @@
    bibglscommand=dualindexentry,
    mainglscommand=spawndualindexentry,
    glscommand=spawnentry,
+   abbrvstylecommand=spawnentry,
+   glostylecommand=spawnentry,
    resourceoption=dualindexentry,
    packageoption=dualindexentry,
    field=dualindexentry,
@@ -140,6 +142,7 @@
   field-aliases={topics=adoptparents},
   replicate-fields={name=nametitle},
   field-case-change={nametitle=title},
+  no-case-change-cs={fieldfmt,abbrstylefmt,glostylefmt},
   short-case-change={lc},
   dual-short-case-change={lc},
   unknown-entry-alias={index},
@@ -154,8 +157,10 @@
   match-op={or},
   match={
    {category}={.*field},
-   {original entrytype}={.*glscommand},
-   {original entrytype}={.*option}
+%   {original entrytype}={.*(gls|style)command},
+%   {original entrytype}={.*option},
+%   {original entrytype}={abbreviationstyle},
+%   {original entrytype}={glossarystyle},
   },
   dual-prefix={},
   dual-type={main},
@@ -757,9 +762,41 @@
    {\glsentryname{\glscurrentfieldvalue}}%
  }%
  {%
-   \let\field\fieldfmt
    \hyperlink{topic.#1}{\glsentryname{#1}}%
  }% 
+}
+
+% \iffirstprogeny{entry label}{topic label}{true}{false}
+\makeatletter
+\newcommand{\iffirstprogeny}[2]{%
+  \let\doiffirstprogeny\@secondoftwo
+  \def\firstprogeny{}%
+  \glsxtrifhasfield*{progeny}{#1}%
+  {%
+    \edef\suppliedprogeny{#2}%
+    \@for\thisprogeny:=\glscurrentfieldvalue\do{%
+      \let\firstprogeny\thisprogeny
+      \ifdefequal{\thisprogeny}{\suppliedprogeny}%
+      {\let\doiffirstprogeny\@firstoftwo}%
+      {\let\doiffirstprogeny\@secondoftwo}%
+      \@endfortrue
+    }%
+  }%
+  {}%
+  \doiffirstprogeny
+}
+\makeatother
+
+\newcommand{\ifstylecommand}[1]{%
+  \letcs\doifstylecommand{@firstoftwo}%
+  \GlsXtrIfFieldEqStr{originalentrytype}{#1}{abbrvstylecommand}%
+  {}%
+  {%
+    \GlsXtrIfFieldEqStr{originalentrytype}{#1}{glostylecommand}%
+    {}%
+    {\global\letcs\doifstylecommand{@secondoftwo}}%
+  }%
+  \doifstylecommand
 }
 
 \newcommand{\listtopics}[1]{%
@@ -769,7 +806,10 @@
    {}%
    {%
      \par\nopagebreak\medskip\par 
-     \summarysubheaderfont{Topics:} 
+     \ifstylecommand{#1}%
+     {\summarysubheaderfont{Styles:}}%
+     {\summarysubheaderfont{Topics:}}%
+     \space
      \let\DTLlistformatitem\topicxrhandler
      \DTLformatlist{\glscurrentfieldvalue}.
    }%
@@ -787,8 +827,10 @@
    \hypertarget{topic.##1}{}%
    \pdfbookmark[1]{\thisvalue}{topic.##1}%
    \section*{\glsdisp{##1}{\thisvalue}}%
+   \ifglshasdesc{##1}{\Glossentrydesc{##1}.}{}%
    \glsxtrifhasfield{seealso}{##1}%
    {%
+    \par\smallskip
      \emph{See also:} 
      \let\DTLlistformatitem\topicxrhandler
      \DTLformatlist{\glscurrentfieldvalue}.%
@@ -797,30 +839,57 @@
    {}%
   }%
   \renewcommand*{\subglossentry}[3]{%
+   \hypertarget{topic.##2}{}%
    \glsifcategory{##2}{command}%
    {%
-     \par 
      \glsxtrifhasfield*{progenitor}{##2}%
      {\let\originallabel\glscurrentfieldvalue}%
      {\def\originallabel{##2}}%
-     % hyperlink to index:
-     {\let\csfmtfont\csfmtcolourfont\gls[format=glsignore]{\originallabel}}%
-     \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
-     \glsxtrifhasfield{note}{##2}%
-     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
-     {}%
-     \nopagebreak\par\smallskip\par\nopagebreak
-     \Glossentrydesc{##2}%
-     \ifglshasdesc{##2}{.}{}%
-     % Topics
-     \listtopics\originallabel
-     \par\bigskip
+%
+     \ifstylecommand{##2}%
+     {%
+        \iffirstprogeny{\originallabel}{##2}%
+        {\letcs\dothisentry{@firstofone}}%
+        {%
+          \glspar
+          \ifdefempty\firstprogeny
+          {%
+            {\let\csfmtfont\csfmtcolourfont\gls[noindex]{\originallabel}}%
+            \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+          }%
+          {%
+            {\let\csfmtfont\csfmtcolourfont
+              \hyperlink{topic.\firstprogeny}{\glsentryname{\firstprogeny}}}%
+            \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+            \glsxtrifhasfield{parent}{\firstprogeny}%
+            {\space(\emph{see} \hyperlink{topic.\glscurrentfieldvalue}%
+             {\glsentryname{\glscurrentfieldvalue}})}{}%
+          }%
+          \letcs\dothisentry{@gobble}%
+        }%
+     }%
+     {\letcs\dothisentry{@firstofone}}%
+     \dothisentry
+     {%
+       \par 
+       % hyperlink to index:
+       {\let\csfmtfont\csfmtcolourfont\gls[format=glsignore]{\originallabel}}%
+       \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
+       \glsxtrifhasfield{note}{##2}%
+       {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
+       {}%
+       \nopagebreak\par\smallskip\par\nopagebreak
+       \ifglshasdesc{##2}{\Glossentrydesc{##2}.}{}%
+       % Topics
+       \listtopics\originallabel
+       \par\bigskip
+     }%
    }%
    {%
-     \glsfieldfetch{##2}{name}{\thisvalue}%
-     \hypertarget{topic.##2}{}%
+     \glsfieldfetch{##2}{nametitle}{\thisvalue}%
      \pdfbookmark[2]{\thisvalue}{topic.##2}%
      \subsection*{\glsdisp{##2}{\thisvalue}}%
+     \ifglshasdesc{##2}{\Glossentrydesc{##2}.\glspar\nopagebreak\medskip}{}%
    }%
   }%
 }
@@ -9510,9 +9579,11 @@ are skipped until a word-boundary is found.
   skipped. If the option is \optfmt{title} then the subsequent tokens
   are skipped until a word-boundary is found.
 
-  \item If the control sequence is \ics{NoCaseChange}, then the 
+  \item If the control sequence is \ics{NoCaseChange} or is in the
+  \csopt{no-case-change-cs} list, then the 
   control sequence and its argument is ignored. With \optfmt{firstuc}
   and \optfmt{title}, if \code{\ics{NoCaseChange}\margm{text}}
+  (but not any \csopt{no-case-change-cs} command)
   occurs at the start of a word, then \bibgls\ will act as though
   the word hasn't started yet (so the next token will be considered
   for a \idx{case-change}). This is different to the way \ics{makefirstuc}
@@ -9801,6 +9872,26 @@ HT\cs{textcolor}\marg{RED}\marg{ML}
 \end{codeenv}
 which is incorrect. Instead, provide a command that hides the label
 (such as the \csfmt{strong} example described on page~\glsxtrpageref{strong}).
+
+\optsection[\subsubsection]{no-case-change-cs}
+
+Instructs the non-\TeX\ case-changing options (where \bibgls, not
+\TeX, performs the modification) to treat the commands whose control
+sequence names are given in the comma-separated \meta{list} in the
+same way as it treats \cs{ensuremath} etc. That is, the case-change
+is omitted for the argument that follows any of those commands.
+
+For example, this manual defines some semantic commands such as
+\csfmt{fieldfmt} (to format field names), \csfmt{abbrstylefmt}
+(to format abbreviation style names) and \csfmt{glostylefmt} (to format
+glossary style names). These occur in some of the section
+and subsection headings in the \hyperref[sec:topics]{topic summary}
+which are converted to \idx{titlecase} (see \csopt{field-case-change}). 
+These formatting commands shouldn't have their argument changed so they 
+are identified with:
+\begin{codeenv}
+\csopt[fieldfmt,abbrstylefmt,glostylefmt]{no-case-change-cs}
+\end{codeenv}
 
 \optsection[\subsubsection]{word-boundaries}
 

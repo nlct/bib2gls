@@ -207,6 +207,9 @@ See the manual for further details.</entry>
 <entry key="message.dual.indexabbrv.mappings">Dual index-abbreviation mappings:</entry>
 <entry key="message.process.result">Processed returned: {0}</entry>
 <entry key="message.truncated">Truncating according to limit={0}.</entry>
+<entry key="message.entry.already.added">Entry ''{0}'' has already been added, ignoring.
+(Original entry: @{1}{2}. This entry: @{3}{4})</entry>
+<entry key="message.entry.lost.field">Entry ''{0}'' has lost its ''{1}'' field.</entry>
 
 <entry key="message.log.file">Transcript written to {0}.</entry>
 <entry key="message.written">{0} written to {1}.</entry>

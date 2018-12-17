@@ -333,6 +333,10 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("no-case-change-cs"))
+         {
+            noCaseChangeCs = getStringArray(parser, list, opt);
+         }
          else if (opt.equals("name-case-change"))
          {
             nameCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
@@ -5204,6 +5208,19 @@ public class GlsResource
 
    private void addEntry(Vector<Bib2GlsEntry> entries, Bib2GlsEntry entry)
    {
+      String id = entry.getId();
+
+      for (Bib2GlsEntry e : entries)
+      {
+         if (e.getId().equals(id))
+         {
+            bib2gls.debugMessage("message.entry.already.added", id,
+             e.getOriginalEntryType(), e.getOriginalId(),
+             entry.getOriginalEntryType(), entry.getOriginalId());
+            return;
+         }
+      }
+
       entries.add(entry);
       entry.setSelected(true);
    }
@@ -8071,7 +8088,7 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si"))
+                 || csname.equals("si") || isNoCaseChangeCs(csname))
             {
                // skip argument
             }
@@ -8319,7 +8336,7 @@ public class GlsResource
             }
 
             if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si"))
+                 || csname.equals("si") || isNoCaseChangeCs(csname))
             {
                // skip argument
 
@@ -8617,7 +8634,7 @@ public class GlsResource
             }
 
             if (csname.equals("ensuremath") || csname.equals("si") 
-                 || csname.endsWith("ref"))
+                 || csname.endsWith("ref") || isNoCaseChangeCs(csname))
             {
                return;
             }
@@ -8760,6 +8777,21 @@ public class GlsResource
             return;
          }
       }
+   }
+
+   public boolean isNoCaseChangeCs(String csname)
+   {
+      if (noCaseChangeCs == null) return false;
+
+      for (String cs : noCaseChangeCs)
+      {
+         if (cs.equals(csname))
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public boolean isWordBoundary(TeXObject object)
@@ -9005,7 +9037,8 @@ public class GlsResource
                continue;
             }
 
-            if (csname.equals("ensuremath") || csname.equals("si"))
+            if (csname.equals("ensuremath") || csname.equals("si") 
+                || isNoCaseChangeCs(csname))
             {// no case-change
                wordCount++;
                continue;
@@ -10737,6 +10770,8 @@ public class GlsResource
    private boolean wordBoundaryCsSpace=true;
    private boolean wordBoundaryNbsp=false;
    private boolean wordBoundaryDash=false;
+
+   private String[] noCaseChangeCs = null;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;

@@ -7,6 +7,8 @@
 %                        glossaries-extra.sty or supplemental glossary packages.
 % @mainglscommand      -> glossary-related command with formal syntax described
 %                        in the main matter.
+% @abbrvstylecommand   -> command used by abbreviation styles.
+% @glostylecommand     -> command used by glossary styles.
 % @resourceoption      -> \GlsXtrLoadResources option
 % @command             -> command provided by kernel or other package
 % @examplecommand      -> custom command defined in the examples
@@ -115,7 +117,9 @@
 }
 
 @topic{glossarystylecommands,
-  name={glossary style commands}
+  name={glossary style commands (general)},
+  text={glossary style command},
+  seealso={glossarystyle}
 }
 
 @topic{separatorcommands,
@@ -143,7 +147,7 @@
 }
 
 @topic{glossrefs,
-  name={glossary lists (\NoCaseChange{\field{type}})}
+  name={glossary lists (\fieldfmt{type})}
 }
 
 @topic{standalonestyles,
@@ -672,6 +676,44 @@
    form for the abbreviation style associated with the given category},
   note={\styfmt{glossaries-extra} v1.21+},
   topics={formattingcommands,abbreviationcommands},
+  category={command}
+}
+
+@glscommand{ifglsxtrinsertinside,
+  name={\csfmt{if\-gls\-xtr\-insert\-inside}},
+  description={switch that determines whether or not inserted text
+  (provided in the final optional argument of commands like \cs{gls})
+  is inside or outside of the font changing commands in the predefined
+  abbreviation styles. The default is \optfmt{false}},
+  topics={abbreviationcommands,conditionals},
+  note={\styfmt{glossaries-extra} v1.02+},
+  category={command}
+}
+
+@glscommand{glsxtrinsertinsidefalse,
+  name={\csfmt{gls\-xtr\-insert\-inside\-false}},
+  description={sets the \cs{ifglsxtrinsertinside} switch to \optfmt{false}},
+  topics={abbreviationcommands,conditionals},
+  note={\styfmt{glossaries-extra} v1.02+},
+  category={command}
+}
+
+@glscommand{glsxtrinsertinsidetrue,
+  name={\csfmt{gls\-xtr\-insert\-inside\-true}},
+  description={sets the \cs{ifglsxtrinsertinside} switch to \optfmt{true}},
+  topics={abbreviationcommands,conditionals},
+  note={\styfmt{glossaries-extra} v1.02+},
+  category={command}
+}
+
+@glscommand{glsxtrfullsep,
+  name={\csfmt{gls\-xtr\-full\-sep}},
+  user1={\margm{label}},
+  description={the separator used in the full format for the
+  parenthetical abbreviation styles or for inline parenthetical
+  styles. This just does a space by default},
+  topics={formattingcommands,abbreviationcommands},
+  note={\styfmt{glossaries-extra}},
   category={command}
 }
 
@@ -2253,6 +2295,13 @@ field\dhyphen locale}},
 
 @resourceoption{opt.word-boundaries,
    name={\csoptfmt{word\dhyphen boundaries}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.no-case-change-cs,
+   name={\csoptfmt{no\dhyphen case\dhyphen change\dhyphen cs}},
    user1={\meta{list}},
    category={resourceoption},
    parent={resourceoptions}
@@ -4082,6 +4131,12 @@ and \L/\l\ treated as L/l},
   parent={packages}
 }
 
+@package{glossary-super,
+  name={\styfmt{glossary\dhyphen super}},
+  category={package},
+  parent={packages}
+}
+
 @package{glossary-longbooktabs,
   name={\styfmt{glossary\dhyphen longbooktabs}},
   category={package},
@@ -4856,12 +4911,68 @@ pages (not available in multi-column or certain other contexts)},
 
 @abbreviationstyle{long-noshort,
   name={\abbrstylefmt{long\dhyphen noshort}},
+  description={this abbreviation style only displays the \field{long} form 
+   with the \cs{gls}-like commands (regardless of the \idx{firstuseflag}). 
+   The \field{short} form can be accessed with \cs{glsxtrshort}. 
+   The \field{name} field is set to \cs{glsxtrlongnoshortname} and the 
+   \field{description} field is set to the \field{long} form (unless 
+   overridden in the entry definition). This style sets the 
+   \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
+@abbreviationstyle{long-noshort-noreg,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{long-noshort} 
+   but doesn't set the \catattr{regular} attribute (or switches it
+to
+   \optfmt{false}, if already set)},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrlongnoshortname,
+  name={\csfmt{gls\-xtr\-long\-no\-short\-name}},
+  description={hook for the \abbrstyle{long-noshort} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form)},
+  topics={long-noshort,long-noshort-noreg},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
 @abbreviationstyle{long-noshort-desc,
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc}},
+  description={this abbreviation style only displays the \field{long} 
+   form with the \cs{gls}-like commands (regardless of the 
+   \idx{firstuseflag}). The \field{short}
+   form can be accessed with \cs{glsxtrshort}. The \field{name}
+   field is set to \cs{glsxtrlongnoshortdescname} and the \field{description}
+   field must be provided in the entry definition. This style sets the
+   \catattr{regular} attribute},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrlongnoshortdescname,
+  name={\csfmt{gls\-xtr\-long\-no\-short\-desc\-name}},
+  description={hook for the \abbrstyle{long-noshort-desc} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the long form)},
+  topics={long-noshort-desc,long-noshort-desc-noreg},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{long-noshort-desc-noreg,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{long-noshort-desc} 
+   but doesn't set the \catattr{regular} attribute (or switches it
+to
+   \optfmt{false}, if already set)},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -4870,6 +4981,27 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{long\dhyphen short\dhyphen sc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrscsuffix,
+  name={\csfmt{gls\-xtr\-sc\-suffix}},
+  user1={},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with one of the small-cap
+   (\code{sc}) styles},
+  topics={long-short-sc},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbrvstylecommand{glsabbrvscfont,
+  name={\csfmt{gls\-abbrv\-sc\-font}},
+  user1={\margm{text}},
+  description={used with \qt{sc} abbreviation styles to format the
+short form using \cs{textsc}},
+  topics={long-short-sc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
 }
 
 @abbreviationstyle{long-short-sm,
@@ -4886,6 +5018,86 @@ pages (not available in multi-column or certain other contexts)},
 
 @abbreviationstyle{long-short,
   name={\abbrstylefmt{long\dhyphen short}},
+  description={this abbreviation style displays the long form on
+  \idx{firstuse} of the \cs{gls}-like commands followed by the 
+  short form in parentheses (formatted with \cs{glsxtrparen}). 
+  Only the short form is shown on subsequent use. The
+  \field{description} field is set to the long form},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrlongshortname,
+  name={\csfmt{gls\-xtr\-long\-short\-name}},
+  description={hook for the \abbrstyle{long-short} abbreviation
+  styles that expands to the value that the \field{name} field is
+  assigned to when the abbreviation is defined with
+  \cs{newabbreviation} (defaults to the short form)},
+  topics={long-short,long-short-sc,long-short-sm,long-short-em,long-em-short-em,long-short-user,long-postshort-user,long-hyphen-short-hyphen,long-hyphen-postshort-hyphen},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{long-short-desc,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-short} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshortlongdescname,
+  name={\csfmt{gls\-xtr\-short\-long\-desc\-name}},
+  description={hook for the \abbrstyle{short-long-desc} abbreviation
+  styles that expands to the value that the \field{name} field is
+  assigned to when the abbreviation is defined with
+  \cs{newabbreviation} (defaults to the long form followed by the
+  short form in parentheses)},
+  topics={short-long-desc,short-sc-long-desc,short-sm-long-desc,short-em-long-desc,short-em-long-em-desc,short-hyphen-long-hyphen-desc,short-hyphen-postlong-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrlongshortdescname,
+  name={\csfmt{gls\-xtr\-long\-short\-desc\-name}},
+  description={hook for the \abbrstyle{long-short-desc} abbreviation
+  styles that expands to the value that the \field{name} field is
+  assigned to when the abbreviation is defined with
+  \cs{newabbreviation} (defaults to the long form followed by the
+  short form in parentheses)},
+  topics={long-short-desc,long-short-sc-desc,long-short-sm-desc,long-short-em-desc,long-em-short-em-desc,long-hyphen-short-hyphen-desc,long-hyphen-postshort-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{short-long,
+  name={\abbrstylefmt{short\dhyphen long}},
+  description={this abbreviation style displays the short form on
+  \idx{firstuse} of the \cs{gls}-like commands followed by the 
+  long form in parentheses (formatted with \cs{glsxtrparen}). 
+  Only the short form is shown on subsequent use. The
+  \field{description} field is set to the long form},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshortlongname,
+  name={\csfmt{gls\-xtr\-short\-long\-name}},
+  description={hook for the \abbrstyle{short-long} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form)},
+  topics={short-long,short-sc-long,short-sm-long,short-em-long,short-em-long-em,short-postlong-user,short-long-user,short-hyphen-long-hyphen,short-hyphen-postlong-hyphen},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{short-long-desc,
+  name={\abbrstylefmt{short\dhyphen long\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-long} style but the \field{description}
+   field must be provided in the entry definition},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -4896,6 +5108,192 @@ pages (not available in multi-column or certain other contexts)},
   parent={abbreviationstyles}
 }
 
+@abbreviationstyle{short-footnote,
+  name={\abbrstylefmt{short\dhyphen footnote}},
+  description={this abbreviation style displays the short form on
+  \idx{firstuse} of the \cs{gls}-like commands with the long form as
+  a footnote.  Only the short form is shown on subsequent use. The
+  \field{description} field is set to the long form. The inline full
+  form obtained with commands like \cs{glsxtrfull} uses a
+  parenthetical style. Since this can result in nested hyperlinks
+  (from the \idx{link-text} to the glossary and from the footnote
+  marker to the footnote) this style automatically sets the
+  \catattr{nohyperfirst} category attribute to \optfmt{false} for
+  the entry's category},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{short-postfootnote,
+  name={\abbrstylefmt{short\dhyphen postfootnote}},
+  description={this abbreviation style is like
+  \abbrstyle{short-footnote} but the footnote is moved to the
+  \idx{postlinkhook} (outside of the hyperlink, if enabled) to
+  prevent nested hyperlinks. This means that, unlike
+  \abbrstyle{short-footnote} the \catattr{nohyperfirst} attribute
+  isn't changed},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glslongfootnotefont,
+  name={\csfmt{gls\-long\-foot\-note\-font}},
+  user1={\margm{text}},
+  description={used with the \qt{footnote} abbreviation styles to
+   format the long form},
+  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  note={\styfmt{glossaries-extra} v1.05+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstlongfootnotefont,
+  name={\csfmt{gls\-first\-long\-foot\-note\-font}},
+  user1={\margm{text}},
+  description={used with the \qt{footnote} abbreviation styles to
+   format the long form on first use},
+  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  note={\styfmt{glossaries-extra} v1.05+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrabbrvfootnote,
+  name={\csfmt{gls\-xtr\-abbrv\-foot\-note}},
+  user1={\margm{label}\margm{long form}},
+  description={used with the \qt{footnote} abbreviation styles to
+   do the footnote. The \meta{label} is ignored by default. The
+   \meta{long form} includes the font changing command. This just
+   does \code{\cs{footnote}\margm{long form}}},
+  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  note={\styfmt{glossaries-extra} v1.07+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrfootnotename,
+  name={\csfmt{gls\-xtr\-foot\-note\-name}},
+  description={hook for the \qt{footnote} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form)},
+  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{short-nolong,
+  name={\abbrstylefmt{short\dhyphen nolong}},
+  description={this abbreviation style only displays the \field{short} form 
+   with the \cs{gls}-like commands (regardless of the \idx{firstuseflag}). 
+   The \field{long} form can be accessed with \cs{glsxtrlong}. 
+   The \field{name} field is set to \cs{glsxtrshortnolongname} and the 
+   \field{description} field is set to the \field{long} form (unless 
+   overridden in the entry definition). This style sets the 
+   \catattr{regular} attribute to \optfmt{true}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshortnolongname,
+  name={\csfmt{gls\-xtr\-short\-no\-long\-name}},
+  description={hook for the \abbrstyle{short-nolong} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form)},
+  topics={short-nolong,short-nolong-noreg,short-sc-nolong,short-sm-nolong,short-em-nolong},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{short-nolong-noreg,
+  name={\abbrstylefmt{short\dhyphen nolong\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{short-nolong} 
+   but doesn't set the \catattr{regular} attribute (or switches it
+to
+   \optfmt{false}, if already set)},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{short-nolong-desc,
+  name={\abbrstylefmt{short\dhyphen nolong\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-nolong} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{short-nolong-desc-noreg,
+  name={\abbrstylefmt{short\dhyphen nolong\dhyphen desc\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{short-nolong-desc} 
+   but doesn't set the \catattr{regular} attribute (or switches it
+to
+   \optfmt{false}, if already set)},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshortdescname,
+  name={\csfmt{gls\-xtr\-short\-desc\-name}},
+  description={hook for the \abbrstyle{short-nolong-desc} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form followed by long form in parentheses)},
+  topics={short-nolong-desc,short-nolong-desc-noreg,short-sc-nolong-desc,short-sm-nolong-desc,short-em-nolong-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsuserdescription,
+  name={\csfmt{gls\-user\-description}},
+  user1={\margm{description}\margm{label}},
+  description={used with \qt{user} abbreviation styles to
+   encapsulate the description. Just does
+  \code{\cs{glslonguserfont}\margm{description}} by default},
+  topics={long-short-user,short-long-user},
+  note={\styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@abbrvstylecommand{glslonguserfont,
+  name={\csfmt{gls\-long\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the long form},
+  topics={long-short-user,short-long-user},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstlonguserfont,
+  name={\csfmt{gls\-first\-long\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the long form on first use},
+  topics={long-short-user,short-long-user},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsabbrvuserfont,
+  name={\csfmt{gls\-abbrv\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the short form},
+  topics={long-short-user,short-long-user},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstabbrvuserfont,
+  name={\csfmt{gls\-first\-abbrv\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the short form on first use},
+  topics={long-short-user,short-long-user},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
 @abbreviationstyle{short-long-user,
   name={\abbrstylefmt{short\dhyphen long\dhyphen user}},
   category={abbreviationstyle},
@@ -4904,12 +5302,6 @@ pages (not available in multi-column or certain other contexts)},
 
 @abbreviationstyle{long-em-short-em,
   name={\abbrstylefmt{long\dhyphen em\dhyphen short\dhyphen em}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short-desc,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen desc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -4933,18 +5325,6 @@ hyphen}},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{short-long,
-  name={\abbrstylefmt{short\dhyphen long}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{short-nolong,
-  name={\abbrstylefmt{short\dhyphen nolong}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
 @abbreviationstyle{short-sc-nolong,
   name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong}},
   category={abbreviationstyle},
@@ -4955,6 +5335,26 @@ hyphen}},
   name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsabbrvonlyfont,
+  name={\csfmt{gls\-abbrv\-only\-font}},
+  user1={\margm{text}},
+  description={used with \qt{only} abbreviation styles to format the
+short form},
+  topics={long-only-short-only,long-only-short-only-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glslongonlyfont,
+  name={\csfmt{gls\-long\-only\-font}},
+  user1={\margm{text}},
+  description={used with \qt{only} abbreviation styles to format the
+long form},
+  topics={long-only-short-only,long-only-short-only-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
 }
 
 @abbreviationstyle{long-only-short-only-desc,
@@ -4971,120 +5371,140 @@ hyphen}},
 @glossarystyle{glostyle.indexgroup,
   name={\glostylefmt{indexgroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.mcolindexgroup,
   name={\glostylefmt{mcolindexgroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-mcols}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.indexhypergroup,
   name={\glostylefmt{indexhypergroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.tree,
   name={\glostylefmt{tree}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.treegroup,
   name={\glostylefmt{treegroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.treenoname,
   name={\glostylefmt{treenoname}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.treenonamegroup,
   name={\glostylefmt{treenonamegroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.alttree,
   name={\glostylefmt{alttree}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.alttreegroup,
   name={\glostylefmt{alttreegroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.mcolalttree,
   name={\glostylefmt{mcolalttree}},
   category={glossarystyle},
+  note={\styfmt{glossary-mcols}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.mcolalttreegroup,
   name={\glostylefmt{mcolalttreegroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-mcols}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.list,
   name={\glostylefmt{list}},
   category={glossarystyle},
+  note={\styfmt{glossary-list}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.altlist,
   name={\glostylefmt{altlist}},
   category={glossarystyle},
+  note={\styfmt{glossary-list}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.altlistgroup,
   name={\glostylefmt{altlistgroup}},
   category={glossarystyle},
+  note={\styfmt{glossary-list}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.index,
   name={\glostylefmt{index}},
   category={glossarystyle},
+  note={\styfmt{glossary-tree}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.bookindex,
   name={\glostylefmt{bookindex}},
   category={glossarystyle},
+  note={\styfmt{glossary-bookindex}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.long,
   name={\glostylefmt{long}},
   category={glossarystyle},
+  note={\styfmt{glossary-long}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.super,
   name={\glostylefmt{super}},
   category={glossarystyle},
+  note={\styfmt{glossary-long}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.long3col,
   name={\glostylefmt{long3col}},
   category={glossarystyle},
+  note={\styfmt{glossary-long}},
   parent={glossarystyle}
 }
 
 @glossarystyle{glostyle.long3col-booktabs,
   name={\glostylefmt{long3col\dhyphen booktabs}},
   category={glossarystyle},
+  note={\styfmt{glossary-longbooktabs}},
   parent={glossarystyle}
 }
 
@@ -5599,7 +6019,7 @@ hyphen}},
   parent={packageoptions},
   note={not relevant with \bibgls},
   description={determines whether or not
-   to sanitize the \field{sort} key}
+   to sanitize the \field{sort} key (not relevant with \bibgls)}
 }
 
 @packageoption{styopt.savewrites,
@@ -9258,17 +9678,6 @@ category},
   category={command}
 }
 
-@glscommand{glsxtrscsuffix,
-  name={\csfmt{gls\-xtr\-sc\-suffix}},
-  user1={},
-  description={the suffix used to construct the plural for
-   the short form of abbreviations with one of the small-cap
-   (\code{sc}) styles},
-  topics={fixedtextcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra}},
-  category={command}
-}
-
 @glscommand{glsdefpostlink,
   name={\csfmt{gls\-def\-post\-link}},
   user1={\margm{category}\margm{definition}},
@@ -9814,26 +10223,6 @@ can be referenced in \meta{true} or \meta{false} with
    checks) otherwise should expand to \meta{false}},
   topics={conditionals,hooks},
   note={\styfmt{glossaries-extra} v1.23+},
-  category={command}
-}
-
-@glscommand{glsxtrlongshortdescname,
-  name={\csfmt{gls\-xtr\-long\-short\-desc\-name}},
-  user1={},
-  description={governs the way the \field{name} field is set
-   by the \abbrstyle{long-short-desc} abbreviation styles},
-  topics={abbreviationcommands,glossarystylecommands},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
-}
-
-@glscommand{glsxtrlongshortname,
-  name={\csfmt{gls\-xtr\-long\-short\-name}},
-  user1={},
-  description={governs the way the \field{name} field is set
-   by the \abbrstyle{long-short} abbreviation styles},
-  topics={abbreviationcommands,glossarystylecommands},
-  note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
 
@@ -11746,15 +12135,6 @@ glossary (or the default of \meta{type} is omitted)},
   category={command}
 }
 
-@glscommand{glsxtrfullsep,
-  name={\csfmt{gls\-xtr\-full\-sep}},
-  user1={\margm{label}},
-  description={the separator used in the full format for the parenthetical styles},
-  topics={abbreviationcommands,separatorcommands,formattingcommands},
-  note={\styfmt{glossaries-extra}},
-  category={command}
-}
-
 @glscommand{GlsXtrForeignText,
   name={\csfmt{Gls\-Xtr\-Foreign\-Text}},
   user1={\margm{label}\margm{text}},
@@ -11778,7 +12158,10 @@ glossary (or the default of \meta{type} is omitted)},
 @glscommand{glsxtrparen,
   name={\csfmt{gls\-xtr\-paren}},
   user1={\margm{text}},
-  description={used to markup parenthetical material},
+  description={used to markup parenthetical material, such as
+   in \cs{glsxtrpostlinkAddDescOnFirstUse} or in the
+  \abbrstyle{long-short} and \abbrstyle{short-long} abbreviation
+  styles},
   topics={formattingcommands},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -12603,36 +12986,6 @@ location list},
   category={command}
 }
 
-@glscommand{glsabbrvscfont,
-  name={\csfmt{gls\-abbrv\-sc\-font}},
-  user1={\margm{text}},
-  description={used with \qt{sc} abbreviation styles to format the
-short form using \cs{textsc}},
-  topics={formattingcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
-}
-
-@glscommand{glsabbrvonlyfont,
-  name={\csfmt{gls\-abbrv\-only\-font}},
-  user1={\margm{text}},
-  description={used with \qt{only} abbreviation styles to format the
-short form},
-  topics={long-only-short-only,long-only-short-only-desc},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
-}
-
-@glscommand{glslongonlyfont,
-  name={\csfmt{gls\-long\-only\-font}},
-  user1={\margm{text}},
-  description={used with \qt{only} abbreviation styles to format the
-long form},
-  topics={long-only-short-only,long-only-short-only-desc},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
-}
-
 @glscommand{glsabbrvfont,
   name={\csfmt{gls\-abbrv\-font}},
   user1={\margm{text}},
@@ -12666,57 +13019,6 @@ long form},
    acronyms or abbreviations to allow the style hooks to access the long form},
   topics={hooks,abbreviationcommands},
   note={\styfmt{glossaries}},
-  category={command}
-}
-
-@glscommand{glsuserdescription,
-  name={\csfmt{gls\-user\-description}},
-  user1={\margm{description}\margm{label}},
-  description={used with \qt{user} abbreviation styles to
-   encapsulate the description. Just does
-  \code{\cs{glslonguserfont}\margm{description}} by default},
-  topics={formattingcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra} v1.30+},
-  category={command}
-}
-
-@glscommand{glslonguserfont,
-  name={\csfmt{gls\-long\-user\-font}},
-  user1={\margm{text}},
-  description={used with \qt{user} abbreviation styles to
-   format the long form},
-  topics={formattingcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra} v1.04+},
-  category={command}
-}
-
-@glscommand{glsfirstlonguserfont,
-  name={\csfmt{gls\-first\-long\-user\-font}},
-  user1={\margm{text}},
-  description={used with \qt{user} abbreviation styles to
-   format the long form on first use},
-  topics={formattingcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra} v1.04+},
-  category={command}
-}
-
-@glscommand{glsabbrvuserfont,
-  name={\csfmt{gls\-abbrv\-user\-font}},
-  user1={\margm{text}},
-  description={used with \qt{user} abbreviation styles to
-   format the short form},
-  topics={formattingcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra} v1.04+},
-  category={command}
-}
-
-@glscommand{glsfirstabbrvuserfont,
-  name={\csfmt{gls\-first\-abbrv\-user\-font}},
-  user1={\margm{text}},
-  description={used with \qt{user} abbreviation styles to
-   format the short form on first use},
-  topics={formattingcommands,abbreviationcommands},
-  note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
 

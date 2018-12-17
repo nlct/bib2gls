@@ -191,8 +191,17 @@ public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry
    public void writeExtraFields(PrintWriter writer)
    throws IOException
    {
-      writer.println(String.format("\\GlsXtrSetField{%s}{progeny}{%s}",
-        getId(), getFieldValue("progeny")));
+      String progeny = getFieldValue("progeny");
+
+      if (progeny == null)
+      {
+         bib2gls.debugMessage("message.entry.lost.field", getId(), "progeny");
+      }
+      else
+      {
+         writer.println(String.format("\\GlsXtrSetField{%s}{progeny}{%s}",
+           getId(), getFieldValue("progeny")));
+      }
    }
 
    public Bib2GlsEntry createDual()
