@@ -963,6 +963,8 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      Vector<String> interpretFields = null;
+
       for (String field : fields)
       {
          BibValueList value = getField(field);
@@ -1017,17 +1019,12 @@ public class Bib2GlsEntry extends BibEntry
 
             if (resource.isInterpretField(field))
             {
-               String orgStrVal = list.toString(parser);
-
-               String newStrVal = bib2gls.interpret(orgStrVal, value, bib2gls.trimFields());
-
-               if (!orgStrVal.equals(newStrVal))
+               if (interpretFields == null)
                {
-                  list.clear();
-                  list.addAll(parser.getListener().createString(newStrVal));
-                  value.clear();
-                  value.add(new BibUserString(list));
+                  interpretFields = new Vector<String>();
                }
+
+               interpretFields.add(field);
             }
 
             boolean isLabelifyList = resource.isLabelifyListField(field);
@@ -1220,6 +1217,28 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       changeFieldCase(parser);
+
+      if (interpretFields != null)
+      {
+         for (String field : interpretFields)
+         {
+            BibValueList value = getField(field);
+            TeXObjectList list = value.expand(parser);
+
+            String orgStrVal = list.toString(parser);
+
+            String newStrVal = Bib2Gls.replaceSpecialChars(
+              bib2gls.interpret(orgStrVal, value, bib2gls.trimFields()));
+
+            if (!orgStrVal.equals(newStrVal))
+            {
+               list.clear();
+               list.addAll(parser.getListener().createString(newStrVal));
+               value.clear();
+               value.add(new BibUserString(list));
+            }
+         }
+      }
    }
 
    protected void appendShortPluralSuffix(TeXParser parser,

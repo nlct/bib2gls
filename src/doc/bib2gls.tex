@@ -2,12 +2,13 @@
 % arara: bib2gls: {group: on} if missing("glstex") || changed("bib") || found("log", "Warning: Glossary entry")
 % arara: bibtex
 % arara: lualatex if changed("glstex") || missing("toc")
-% arara: bib2gls: {group: on}
+% arara: bib2gls: {group: on, packages: [mfirstuc-english]}
 % arara: lualatex
 % arara: lualatex if found ("log", "Rerun")
 \documentclass[titlepage=false,index=totoc,bibliography=totoc,
  fontsize=12pt,captions=tableheading]{scrreprt}
 
+\usepackage[autooneside=false]{scrlayer-scrpage}
 \usepackage{pifont}
 
 % Need support for extended characters
@@ -142,6 +143,7 @@
   field-aliases={topics=adoptparents},
   replicate-fields={name=nametitle},
   field-case-change={nametitle=title},
+  interpret-fields={nametitle},
   no-case-change-cs={fieldfmt,abbrstylefmt,glostylefmt},
   short-case-change={lc},
   dual-short-case-change={lc},
@@ -194,7 +196,8 @@
 
 \newcommand{\frontmatter}{%
  \clearpage\pagenumbering{roman}%
- \pagestyle{headings}%
+ \pagestyle{scrheadings}%
+ \automark[section]{chapter}%
  \mainmatterfalse
 }
 \newcommand{\mainmatter}{%
@@ -202,6 +205,25 @@
  \GlsXtrSetDefaultNumberFormat{glsnumberformat}%
  \mainmattertrue
 }
+
+\newcommand{\rightleftmark}[2]{\ifstrequal{#1}{#2}{#1}{#1: #2}}
+\makeatletter
+\newcommand{\setsecdepth}{\@ifstar\s@setsecdepth\@setsecdepth}
+\newcommand{\s@setsecdepth}[1]{%
+ \setcounter{secnumdepth}{#1}%
+ \automark[section]{chapter}%
+ \let\@rightmark\rightleftmark
+}
+\newcommand{\@setsecdepth}[1]{%
+ \setcounter{secnumdepth}{#1}%
+ \ifnum#1 > 0
+  \automark[section]{chapter}%
+ \else
+  \automark{chapter}%
+ \fi
+ \let\@rightmark\@secondoftwo
+}
+\makeatother
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
@@ -825,8 +847,8 @@
   \renewcommand*{\glossentry}[2]{%
    \glsfieldfetch{##1}{nametitle}{\thisvalue}%
    \hypertarget{topic.##1}{}%
-   \pdfbookmark[1]{\thisvalue}{topic.##1}%
-   \section*{\glsdisp{##1}{\thisvalue}}%
+   \section*{\pdfbookmark[1]{\thisvalue}{topic.##1}\glsdisp{##1}{\thisvalue}}%
+   \expandafter\sectionmark\expandafter{\thisvalue}%
    \ifglshasdesc{##1}{\Glossentrydesc{##1}.}{}%
    \glsxtrifhasfield{seealso}{##1}%
    {%
@@ -887,8 +909,9 @@
    }%
    {%
      \glsfieldfetch{##2}{nametitle}{\thisvalue}%
-     \pdfbookmark[2]{\thisvalue}{topic.##2}%
-     \subsection*{\glsdisp{##2}{\thisvalue}}%
+     \subsection*{\pdfbookmark[2]{\thisvalue}{topic.##2}%
+     \glsdisp{##2}{\thisvalue}}%
+     \expandafter\subsectionmark\expandafter{\thisvalue}%
      \ifglshasdesc{##2}{\Glossentrydesc{##2}.\glspar\nopagebreak\medskip}{}%
    }%
   }%
@@ -913,6 +936,8 @@
 }
 
 \newcommand*{\printcommandtopic}{%
+  \setsecdepth*{0}%
+  \automark[subsection]{section}%
   \printunsrtglossary*[type=index,
     style=commandtopic,
     title={Summary by Topic of Commands Provided by 
@@ -929,6 +954,7 @@
    \let\printunsrtglossaryentryprocesshook\commandtopichook
    \let\csref\cs
   }%
+  \setsecdepth{0}%
 }
 
 \newglossarystyle{styoptsummary}%
@@ -1631,8 +1657,6 @@ the corresponding set of \ext{bib} files:
   \item any fields that have been identified with
   \csopt{encapsulate-fields*} are converted;
   \item any fields that have been identified with
-  \csopt{interpret-fields} are replaced with their interpreted
-  values;
   \item any fields that must be converted into a label form
   (\csopt{labelify} or \csopt{labelify-list}) are processed;
   \item any fields identified by \csopt{dependency-fields} are parsed for
@@ -1655,7 +1679,9 @@ the corresponding set of \ext{bib} files:
   \item if \csopt[true]{copy-alias-to-see} the \field{alias} is copied 
   to the \field{see} field;
   \item general field case changes identified by
-  \csopt{field-case-change} are performed.
+  \csopt{field-case-change} are performed;
+  \csopt{interpret-fields} are replaced with their interpreted
+  values.
   \end{itemize}
 \item The dual version (if appropriate) is created.
 \item Records are added to the entry's location list (or transferred
@@ -2473,8 +2499,7 @@ set JAVA_TOOL_OPTIONS=-Djava.locale.providers=CLDR,JRE,SPI
 
 \chapter{Command Line Options}
 \label{sec:switches}
-
-\setcounter{secnumdepth}{0}
+\setsecdepth{0}
 
 The syntax of \bibgls\ is:
 \begin{alltt}
@@ -3382,7 +3407,7 @@ switch off record counting.
 
 \chapter{\iext{bib} Format}
 \label{sec:bib}
-\setcounter{secnumdepth}{1}
+\setsecdepth{1}
 
 \bibgls\ recognises certain entry types. Any unrecognised types will
 be ignored and a warning will be written to the transcript file.
@@ -9404,7 +9429,10 @@ This option indicates that the listed fields should be replaced by
 their interpreted values. The value is required for this key but
 may be empty, which indicates an empty set of fields (that is, the
 setting is switched off). Other fields not listed may still be
-interpreted depending on other settings.
+interpreted depending on other settings. As with the \field{sort}
+field, any special characters are replaced with commands like
+\ics{glsbackslash} and \ics{bibglsdollarchar}. This option is
+applied after \csopt{field-case-change} (if set).
 
 For example, suppose I have a file \filefmt{entries.bib} that
 contains definitions like:
@@ -9467,7 +9495,7 @@ stripped by the interpreter and the \cs{pi} and \cs{sigma} are
 converted to the Unicode characters \hex{1D70B} (mathematical italic
 small pi) and \hex{1D70E} (mathematical italic small sigma). With
 \XeLaTeX\ or \LuaLaTeX\ these characters can be written to the PDF
-bookmarks by adjusting the definition of my custom command:
+bookmarks by adjusting the definition of the custom command:
 \begin{codeenv}
 \cs{newcommand}\marg{\cmd{definition}}[1]\marg{\comment{}
   \cs{ifglsentryexists}\marg{\idx{param}1}\comment{}
@@ -10142,7 +10170,8 @@ may be empty, which indicates this option is switched off.
 
 The \meta{setting} should be
 the same as the permitted values for the above options. This
-option is applied after all fields have been parsed. If the
+option is applied after all fields have been parsed but before
+\csopt{interpret-fields}. If the
 specified field is missing, the fallback for that field (if known) is copied
 into the field. For example:
 \begin{codeenv}
@@ -17080,6 +17109,7 @@ Converts the first letter of \meta{text} to \idx{uppercase}. This just uses
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}
+\setsecdepth{0}
 
 If you have already been using the \styfmt{glossaries} or
 \styfmt{glossaries-extra} package with a large file containing all your
@@ -17460,7 +17490,7 @@ contain:
 
 \chapter{Examples}
 \label{sec:examples}
-\setcounter{secnumdepth}{0}
+\setsecdepth*{0}
 
 The example files described here can be found in the
 \filefmt{examples} sub-directory. The \ext{bib} files are listed
