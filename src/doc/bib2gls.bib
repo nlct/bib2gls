@@ -3647,6 +3647,14 @@ and \L/\l\ treated as L/l},
   category={command}
 }
 
+@command{sigma,
+  name={\csfmt{sigma}},
+  user1={},
+  description={Greek letter sigma $\sigma$},
+  note={kernel command\texparserdefnote\ (maths mode)},
+  category={command}
+}
+
 @glscommand{omicron,
   name={\csfmt{omicron}},
   user1={},
@@ -4937,114 +4945,7 @@ pages (not available in multi-column or certain other contexts)},
   text={abbreviation style}
 }
 
-@abbreviationstyle{long-noshort,
-  name={\abbrstylefmt{long\dhyphen noshort}},
-  description={this abbreviation style only displays the \field{long} form 
-   with the \cs{gls}-like commands (regardless of the \idx{firstuseflag}). 
-   The \field{short} form can be accessed with \cs{glsxtrshort}. 
-   The \field{name} field is set to \cs{glsxtrlongnoshortname} and the 
-   \field{description} field is set to the \field{long} form (unless 
-   overridden in the entry definition). This style sets the 
-   \catattr{regular} attribute to \optfmt{true}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-noshort-noreg,
-  name={\abbrstylefmt{long\dhyphen noshort\dhyphen noreg}},
-  description={this abbreviation style is like \abbrstyle{long-noshort} 
-   but doesn't set the \catattr{regular} attribute (or switches it
-to
-   \optfmt{false}, if already set)},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbrvstylecommand{glsxtrlongnoshortname,
-  name={\csfmt{gls\-xtr\-long\-no\-short\-name}},
-  description={hook for the \abbrstyle{long-noshort} abbreviation styles
-  that expands to the value that the \field{name} field is assigned
-  to when the abbreviation is defined with \cs{newabbreviation} 
-  (defaults to the short form)},
-  topics={long-noshort,long-noshort-noreg},
-  note={\styfmt{glossaries-extra} v1.25+},
-  category={command}
-}
-
-@abbreviationstyle{long-noshort-desc,
-  name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc}},
-  description={this abbreviation style only displays the \field{long} 
-   form with the \cs{gls}-like commands (regardless of the 
-   \idx{firstuseflag}). The \field{short}
-   form can be accessed with \cs{glsxtrshort}. The \field{name}
-   field is set to \cs{glsxtrlongnoshortdescname} and the \field{description}
-   field must be provided in the entry definition. This style sets the
-   \catattr{regular} attribute},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbrvstylecommand{glsxtrlongnoshortdescname,
-  name={\csfmt{gls\-xtr\-long\-no\-short\-desc\-name}},
-  description={hook for the \abbrstyle{long-noshort-desc} abbreviation styles
-  that expands to the value that the \field{name} field is assigned
-  to when the abbreviation is defined with \cs{newabbreviation} 
-  (defaults to the long form)},
-  topics={long-noshort-desc,long-noshort-desc-noreg},
-  note={\styfmt{glossaries-extra} v1.25+},
-  category={command}
-}
-
-@abbreviationstyle{long-noshort-desc-noreg,
-  name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc\dhyphen noreg}},
-  description={this abbreviation style is like \abbrstyle{long-noshort-desc} 
-   but doesn't set the \catattr{regular} attribute (or switches it
-to
-   \optfmt{false}, if already set)},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short-sc,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen sc}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbrvstylecommand{glsxtrscsuffix,
-  name={\csfmt{gls\-xtr\-sc\-suffix}},
-  user1={},
-  description={the suffix used to construct the plural for
-   the short form of abbreviations with one of the small-cap
-   (\code{sc}) styles},
-  topics={long-short-sc},
-  note={\styfmt{glossaries-extra}},
-  category={command}
-}
-
-@abbrvstylecommand{glsabbrvscfont,
-  name={\csfmt{gls\-abbrv\-sc\-font}},
-  user1={\margm{text}},
-  description={used with \qt{sc} abbreviation styles to format the
-short form using \cs{textsc}},
-  topics={long-short-sc},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
-}
-
-@abbreviationstyle{long-short-sm,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen sm}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short-em,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen em}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short,
+@abbreviationstyle{abbrstyle.long-short,
   name={\abbrstylefmt{long\dhyphen short}},
   description={this abbreviation style displays the long form on
   \idx{firstuse} of the \cs{gls}-like commands followed by the 
@@ -5061,86 +4962,58 @@ short form using \cs{textsc}},
   styles that expands to the value that the \field{name} field is
   assigned to when the abbreviation is defined with
   \cs{newabbreviation} (defaults to the short form)},
-  topics={long-short,long-short-sc,long-short-sm,long-short-em,long-em-short-em,long-short-user,long-postshort-user,long-hyphen-short-hyphen,long-hyphen-postshort-hyphen},
+  topics={abbrstyle.long-short,abbrstyle.long-short-sc,abbrstyle.long-short-sm,abbrstyle.long-short-em,abbrstyle.long-em-short-em,abbrstyle.long-short-user,abbrstyle.long-postshort-user,abbrstyle.long-hyphen-short-hyphen,abbrstyle.long-hyphen-postshort-hyphen},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
 
-@abbreviationstyle{long-short-desc,
+@abbrvstylecommand{glslongdefaultfont,
+  name={\csfmt{gls\-long\-default\-font}},
+  user1={\margm{text}},
+  description={used by the abbreviation styles that don't have a
+   specific font to format the long form},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc,abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstlongdefaultfont,
+  name={\csfmt{gls\-first\-long\-default\-font}},
+  user1={\margm{text}},
+  description={used by the abbreviation styles that don't have a
+   specific font to format the long form on \idx{firstuse}},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc,abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbrvstylecommand{glsabbrvdefaultfont,
+  name={\csfmt{gls\-abbrv\-default\-font}},
+  user1={\margm{text}},
+  description={used by the abbreviation styles that don't have a
+   specific font to format the short form},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstabbrvdefaultfont,
+  name={\csfmt{gls\-first\-abbrv\-default\-font}},
+  user1={\margm{text}},
+  description={used by the abbreviation styles that don't have a
+   specific font to format the short form on \idx{firstuse}},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-short-desc,
   name={\abbrstylefmt{long\dhyphen short\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{long-short} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
   parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short-sc-desc,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen sc\dhyphen desc}},
-  description={this abbreviation style is like the
-   \abbrstyle{long-short-sc} style but the \field{description}
-   field must be provided in the entry definition},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short-sm-desc,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen sm\dhyphen desc}},
-  description={this abbreviation style is like the
-   \abbrstyle{long-short-sm} style but the \field{description}
-   field must be provided in the entry definition},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-short-em-desc,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen em\dhyphen desc}},
-  description={this abbreviation style is like the
-   \abbrstyle{long-short-em} style but the \field{description}
-   field must be provided in the entry definition},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-em-short-em-desc,
-  name={\abbrstylefmt{long\dhyphen em\dhyphen short\dhyphen em\dhyphen desc}},
-  description={this abbreviation style is like the
-   \abbrstyle{long-em-short-em} style but the \field{description}
-   field must be provided in the entry definition},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-hyphen-short-hyphen-desc,
-  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen short\dhyphen
-hyphen\dhyphen desc}},
-  description={this abbreviation style is like the
-   \abbrstyle{long-hyphen-short-hyphen} style but the \field{description}
-   field must be provided in the entry definition},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{long-hyphen-postshort-hyphen-desc,
-  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen postshort\dhyphen
-hyphen\dhyphen desc}},
-  description={this abbreviation style is like the
-   \abbrstyle{long-hyphen-postshort-hyphen} style but the \field{description}
-   field must be provided in the entry definition},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbrvstylecommand{glsxtrshortlongdescname,
-  name={\csfmt{gls\-xtr\-short\-long\-desc\-name}},
-  description={hook for the \abbrstyle{short-long-desc} abbreviation
-  styles that expands to the value that the \field{name} field is
-  assigned to when the abbreviation is defined with
-  \cs{newabbreviation} (defaults to the long form followed by the
-  short form in parentheses)},
-  topics={short-long-desc,short-sc-long-desc,short-sm-long-desc,short-em-long-desc,short-em-long-em-desc,short-hyphen-long-hyphen-desc,short-hyphen-postlong-hyphen-desc},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
 }
 
 @abbrvstylecommand{glsxtrlongshortdescname,
@@ -5150,12 +5023,12 @@ hyphen\dhyphen desc}},
   assigned to when the abbreviation is defined with
   \cs{newabbreviation} (defaults to the long form followed by the
   short form in parentheses)},
-  topics={long-short-desc,long-short-sc-desc,long-short-sm-desc,long-short-em-desc,long-em-short-em-desc,long-hyphen-short-hyphen-desc,long-hyphen-postshort-hyphen-desc},
+  topics={abbrstyle.long-short-desc,abbrstyle.long-short-sc-desc,abbrstyle.long-short-sm-desc,abbrstyle.long-short-em-desc,abbrstyle.long-em-short-em-desc,abbrstyle.long-hyphen-short-hyphen-desc,abbrstyle.long-hyphen-postshort-hyphen-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
 
-@abbreviationstyle{short-long,
+@abbreviationstyle{abbrstyle.short-long,
   name={\abbrstylefmt{short\dhyphen long}},
   description={this abbreviation style displays the short form on
   \idx{firstuse} of the \cs{gls}-like commands followed by the 
@@ -5172,12 +5045,12 @@ hyphen\dhyphen desc}},
   that expands to the value that the \field{name} field is assigned
   to when the abbreviation is defined with \cs{newabbreviation} 
   (defaults to the short form)},
-  topics={short-long,short-sc-long,short-sm-long,short-em-long,short-em-long-em,short-postlong-user,short-long-user,short-hyphen-long-hyphen,short-hyphen-postlong-hyphen},
+  topics={abbrstyle.short-long,abbrstyle.short-sc-long,abbrstyle.short-sm-long,abbrstyle.short-em-long,abbrstyle.short-em-long-em,abbrstyle.short-postlong-user,abbrstyle.short-long-user,abbrstyle.short-hyphen-long-hyphen,abbrstyle.short-hyphen-postlong-hyphen},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
 
-@abbreviationstyle{short-long-desc,
+@abbreviationstyle{abbrstyle.short-long-desc,
   name={\abbrstylefmt{short\dhyphen long\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{short-long} style but the \field{description}
@@ -5186,13 +5059,19 @@ hyphen\dhyphen desc}},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{long-short-user,
-  name={\abbrstylefmt{long\dhyphen short\dhyphen user}},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
+@abbrvstylecommand{glsxtrshortlongdescname,
+  name={\csfmt{gls\-xtr\-short\-long\-desc\-name}},
+  description={hook for the \abbrstyle{short-long-desc} abbreviation
+  styles that expands to the value that the \field{name} field is
+  assigned to when the abbreviation is defined with
+  \cs{newabbreviation} (defaults to the long form followed by the
+  short form in parentheses)},
+  topics={abbrstyle.short-long-desc,abbrstyle.short-sc-long-desc,abbrstyle.short-sm-long-desc,abbrstyle.short-em-long-desc,abbrstyle.short-em-long-em-desc,abbrstyle.short-hyphen-long-hyphen-desc,abbrstyle.short-hyphen-postlong-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
 }
 
-@abbreviationstyle{short-footnote,
+@abbreviationstyle{abbrstyle.short-footnote,
   name={\abbrstylefmt{short\dhyphen footnote}},
   description={this abbreviation style displays the short form on
   \idx{firstuse} of the \cs{gls}-like commands with the long form as
@@ -5202,20 +5081,15 @@ hyphen\dhyphen desc}},
   parenthetical style. Since this can result in nested hyperlinks
   (from the \idx{link-text} to the glossary and from the footnote
   marker to the footnote) this style automatically sets the
-  \catattr{nohyperfirst} category attribute to \optfmt{false} for
+  \catattr{nohyperfirst} category attribute to \optfmt{true} for
   the entry's category},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{short-postfootnote,
-  name={\abbrstylefmt{short\dhyphen postfootnote}},
-  description={this abbreviation style is like
-  \abbrstyle{short-footnote} but the footnote is moved to the
-  \idx{postlinkhook} (outside of the hyperlink, if enabled) to
-  prevent nested hyperlinks. This means that, unlike
-  \abbrstyle{short-footnote} the \catattr{nohyperfirst} attribute
-  isn't changed},
+@abbreviationstyle{abbrstyle.footnote,
+  name={\abbrstylefmt{footnote}},
+  description={an alias for \abbrstyle{short-footnote}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -5225,7 +5099,7 @@ hyphen\dhyphen desc}},
   user1={\margm{text}},
   description={used with the \qt{footnote} abbreviation styles to
    format the long form},
-  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  topics={abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote},
   note={\styfmt{glossaries-extra} v1.05+},
   category={command}
 }
@@ -5235,7 +5109,7 @@ hyphen\dhyphen desc}},
   user1={\margm{text}},
   description={used with the \qt{footnote} abbreviation styles to
    format the long form on first use},
-  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  topics={abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote},
   note={\styfmt{glossaries-extra} v1.05+},
   category={command}
 }
@@ -5247,7 +5121,7 @@ hyphen\dhyphen desc}},
    do the footnote. The \meta{label} is ignored by default. The
    \meta{long form} includes the font changing command. This just
    does \code{\cs{footnote}\margm{long form}}},
-  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  topics={abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -5258,20 +5132,56 @@ hyphen\dhyphen desc}},
   that expands to the value that the \field{name} field is assigned
   to when the abbreviation is defined with \cs{newabbreviation} 
   (defaults to the short form)},
-  topics={short-footnote,short-postfootnote,short-sc-footnote,short-sc-postfootnote,short-sm-footnote,short-sm-postfootnote,short-em-footnote,short-em-postfootnote},
+  topics={abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
 
-@abbreviationstyle{short-nolong,
+@abbreviationstyle{abbrstyle.short-postfootnote,
+  name={\abbrstylefmt{short\dhyphen postfootnote}},
+  description={this abbreviation style is like
+  \abbrstyle{short-footnote} but the footnote is moved to the
+  \idx{postlinkhook} (outside of the hyperlink, if enabled) to
+  prevent nested hyperlinks. This means that, unlike
+  \abbrstyle{short-footnote} the \catattr{nohyperfirst} attribute
+  isn't changed},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.postfootnote,
+  name={\abbrstylefmt{postfootnote}},
+  description={an alias for \abbrstyle{short-postfootnote}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-nolong,
   name={\abbrstylefmt{short\dhyphen nolong}},
   description={this abbreviation style only displays the \field{short} form 
    with the \cs{gls}-like commands (regardless of the \idx{firstuseflag}). 
    The \field{long} form can be accessed with \cs{glsxtrlong}. 
    The \field{name} field is set to \cs{glsxtrshortnolongname} and the 
    \field{description} field is set to the \field{long} form (unless 
-   overridden in the entry definition). This style sets the 
-   \catattr{regular} attribute to \optfmt{true}},
+   overridden in the entry definition). The inline full form
+   displays the short form followed by the long form in parentheses. 
+   This style sets the \catattr{regular} attribute to \optfmt{true} 
+   for the entry's category},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short,
+  name={\abbrstylefmt{short}},
+  description={an alias for \abbrstyle{short-nolong}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-nolong-noreg,
+  name={\abbrstylefmt{short\dhyphen nolong\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{short-nolong} 
+   but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -5282,36 +5192,33 @@ hyphen\dhyphen desc}},
   that expands to the value that the \field{name} field is assigned
   to when the abbreviation is defined with \cs{newabbreviation} 
   (defaults to the short form)},
-  topics={short-nolong,short-nolong-noreg,short-sc-nolong,short-sm-nolong,short-em-nolong},
+  topics={abbrstyle.short-nolong,abbrstyle.short-nolong-noreg,abbrstyle.short-sc-nolong,abbrstyle.short-sm-nolong,abbrstyle.short-em-nolong},
   note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
 
-@abbreviationstyle{short-nolong-noreg,
-  name={\abbrstylefmt{short\dhyphen nolong\dhyphen noreg}},
-  description={this abbreviation style is like \abbrstyle{short-nolong} 
-   but doesn't set the \catattr{regular} attribute (or switches it
-to
-   \optfmt{false}, if already set)},
-  category={abbreviationstyle},
-  parent={abbreviationstyles}
-}
-
-@abbreviationstyle{short-nolong-desc,
+@abbreviationstyle{abbrstyle.short-nolong-desc,
   name={\abbrstylefmt{short\dhyphen nolong\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{short-nolong} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style sets
+  the \catattr{regular} attribute to \optfmt{true} for the entry's
+  category},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{short-nolong-desc-noreg,
+@abbreviationstyle{abbrstyle.short-desc,
+  name={\abbrstylefmt{short-desc}},
+  description={an alias for \abbrstyle{short-nolong-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-nolong-desc-noreg,
   name={\abbrstylefmt{short\dhyphen nolong\dhyphen desc\dhyphen noreg}},
   description={this abbreviation style is like \abbrstyle{short-nolong-desc} 
-   but doesn't set the \catattr{regular} attribute (or switches it
-to
-   \optfmt{false}, if already set)},
+   but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
@@ -5322,38 +5229,649 @@ to
   that expands to the value that the \field{name} field is assigned
   to when the abbreviation is defined with \cs{newabbreviation} 
   (defaults to the short form followed by long form in parentheses)},
-  topics={short-nolong-desc,short-nolong-desc-noreg,short-sc-nolong-desc,short-sm-nolong-desc,short-em-nolong-desc},
+  topics={abbrstyle.short-nolong-desc,abbrstyle.short-nolong-desc-noreg,abbrstyle.short-sc-nolong-desc,abbrstyle.short-sm-nolong-desc,abbrstyle.short-em-nolong-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
 
-@abbrvstylecommand{glsuserdescription,
-  name={\csfmt{gls\-user\-description}},
-  user1={\margm{description}\margm{label}},
-  description={used with \qt{user} abbreviation styles to
-   encapsulate the description. Just does
-  \code{\cs{glslonguserfont}\margm{description}} by default},
-  topics={long-short-user,short-long-user},
-  note={\styfmt{glossaries-extra} v1.30+},
+@abbreviationstyle{abbrstyle.nolong-short,
+  name={\abbrstylefmt{nolong\dhyphen short}},
+  description={this abbreviation style only displays the \field{short} form 
+   with the \cs{gls}-like commands (regardless of the \idx{firstuseflag}). 
+   The \field{long} form can be accessed with \cs{glsxtrlong}. 
+   The \field{name} field is set to \cs{glsxtrshortnolongname} and the 
+   \field{description} field is set to the \field{long} form (unless 
+   overridden in the entry definition). The inline full form
+   displays the long form followed by the short form in parentheses. 
+   This style sets the \catattr{regular} attribute to \optfmt{true}
+   for the entry's category},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.nolong-short-noreg,
+  name={\abbrstylefmt{nolong\dhyphen short\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{nolong-short} 
+   but doesn't set the \catattr{regular} attribute to \optfmt{true}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-desc,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc}},
+  description={this abbreviation style only displays the \field{long} 
+   form with the \cs{gls}-like commands (regardless of the 
+   \idx{firstuseflag}). The \field{short}
+   form can be accessed with \cs{glsxtrshort}. The \field{name}
+   field is set to \cs{glsxtrlongnoshortdescname} and the \field{description}
+   field must be provided in the entry definition. The inline full
+   form displays the long form followed by the short form in
+   parentheses. This style sets the \catattr{regular} attribute to 
+   \optfmt{true} for the entry's category},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-desc,
+  name={\abbrstylefmt{long-desc}},
+  description={an alias for \abbrstyle{long-noshort-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrlongnoshortdescname,
+  name={\csfmt{gls\-xtr\-long\-no\-short\-desc\-name}},
+  description={hook for the \abbrstyle{long-noshort-desc} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the long form)},
+  topics={abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg},
+  note={\styfmt{glossaries-extra} v1.25+},
   category={command}
 }
 
-@abbrvstylecommand{glslonguserfont,
-  name={\csfmt{gls\-long\-user\-font}},
+@abbreviationstyle{abbrstyle.long-noshort-desc-noreg,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen desc\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{long-noshort-desc} 
+   but doesn't set the \catattr{regular} attribute to \optfmt{true}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort,
+  name={\abbrstylefmt{long\dhyphen noshort}},
+  description={this abbreviation style only displays the \field{long} form 
+   with the \cs{gls}-like commands (regardless of the \idx{firstuseflag}). 
+   The \field{short} form can be accessed with \cs{glsxtrshort}. 
+   The \field{name} field is set to \cs{glsxtrlongnoshortname} and the 
+   \field{description} field is set to the \field{long} form (unless 
+   overridden in the entry definition). The inline full form
+   displays the long form followed by the short form in parentheses. 
+   This style sets the \catattr{regular} attribute to \optfmt{true} 
+   for the entry's category},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long,
+  name={\abbrstylefmt{long}},
+  description={an alias for \abbrstyle{long-noshort}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-noreg,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{long-noshort} 
+   but doesn't set the \catattr{regular} attribute to \optfmt{true}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrlongnoshortname,
+  name={\csfmt{gls\-xtr\-long\-no\-short\-name}},
+  description={hook for the \abbrstyle{long-noshort} abbreviation styles
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form)},
+  topics={abbrstyle.long-noshort,abbrstyle.long-noshort-noreg},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-short-sc,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen sc}},
+  description={this abbreviation style is like \abbrstyle{long-short}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrscsuffix,
+  name={\csfmt{gls\-xtr\-sc\-suffix}},
+  user1={},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with the small-cap
+   (\code{sc}) styles. This counteracts the effect of \cs{textsc}
+   using \ics{glstextup}},
+  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbrvstylecommand{glsabbrvscfont,
+  name={\csfmt{gls\-abbrv\-sc\-font}},
   user1={\margm{text}},
-  description={used with \qt{user} abbreviation styles to
-   format the long form},
-  topics={long-short-user,short-long-user},
+  description={used with \qt{sc} abbreviation styles to format the
+short form using \cs{textsc}},
+  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstabbrvscfont,
+  name={\csfmt{gls\-first\-abbrv\-sc\-font}},
+  user1={\margm{text}},
+  description={used with \qt{sc} abbreviation styles to format the
+   short form on \idx{firstuse}},
+  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-short-sc-desc,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen sc\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-short-sc} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-long,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen long}},
+  description={this abbreviation style is like \abbrstyle{short-long}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-long-desc,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen long\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-sc-long} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-nolong,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong}},
+  description={this abbreviation style is like \abbrstyle{short-nolong}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc,
+  name={\abbrstylefmt{short\dhyphen sc}},
+  description={an alias for \abbrstyle{short-sc-nolong}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-nolong-desc,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-sc-nolong} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-desc,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen desc}},
+  description={an alias for \abbrstyle{short-sc-nolong-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.nolong-short-sc,
+  name={\abbrstylefmt{nolong\dhyphen short\dhyphen sc}},
+  description={this abbreviation style is like \abbrstyle{nolong-short}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-sc,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen sc}},
+  description={this abbreviation style is like \abbrstyle{long-noshort}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-sc-desc,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen sc\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-noshort-sc} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-footnote,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen footnote}},
+  description={this abbreviation style is like \abbrstyle{short-footnote}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sc-postfootnote,
+  name={\abbrstylefmt{short\dhyphen sc\dhyphen postfootnote}},
+  description={this abbreviation style is like \abbrstyle{short-postfootnote}
+  but the short form is displayed in small-caps (so it needs to be
+  in \idx{lowercase})},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-short-sm,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen sm}},
+  description={this abbreviation style is like \abbrstyle{long-short}
+  but the short form is displayed using a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsabbrvsmfont,
+  name={\csfmt{gls\-abbrv\-sm\-font}},
+  user1={\margm{text}},
+  description={used with \qt{sm} abbreviation styles to format the
+short form using \ics{textsmaller}},
+  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstabbrvsmfont,
+  name={\csfmt{gls\-first\-abbrv\-sm\-font}},
+  user1={\margm{text}},
+  description={used with \qt{sm} abbreviation styles to format the
+   short form on \idx{firstuse}},
+  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrsmsuffix,
+  name={\csfmt{gls\-xtr\-sm\-suffix}},
+  user1={},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with the \qt{sm} styles},
+  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-short-sm-desc,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen sm\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-short-sm} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-long,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen long}},
+  description={this abbreviation style is like \abbrstyle{short-long}
+  but the short form is displayed using a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-long-desc,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen long\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-short-sm} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-nolong,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen nolong}},
+  description={this abbreviation style is like \abbrstyle{short-nolong}
+  but the short form is displayed using a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm,
+  name={\abbrstylefmt{short\dhyphen sm}},
+  description={an alias for \abbrstyle{short-sm-nolong}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-nolong-desc,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen nolong\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-sm-nolong} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-desc,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen desc}},
+  description={an alias for \abbrstyle{short-sm-nolong-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.nolong-short-sm,
+  name={\abbrstylefmt{nolong\dhyphen short\dhyphen sm}},
+  description={this abbreviation style is like \abbrstyle{nolong-short}
+  but the short form is displayed using a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-sm,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen sm}},
+  description={this abbreviation style is like \abbrstyle{long-noshort}
+  but the short form is displayed using a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-sm-desc,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen sm\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-noshort-sm} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-footnote,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen footnote}},
+  description={this abbreviation style is like \abbrstyle{short-footnote}
+  but the short form is displayed in a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-sm-postfootnote,
+  name={\abbrstylefmt{short\dhyphen sm\dhyphen postfootnote}},
+  description={this abbreviation style is like \abbrstyle{short-postfootnote}
+  but the short form is displayed in a smaller font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-short-em,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen em}},
+  description={this abbreviation style is like \abbrstyle{long-short}
+  but the short form is displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsabbrvemfont,
+  name={\csfmt{gls\-abbrv\-em\-font}},
+  user1={\margm{text}},
+  description={used with \qt{em} abbreviation styles to format the
+short form using \ics{emph}},
+  topics={abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
 
-@abbrvstylecommand{glsfirstlonguserfont,
-  name={\csfmt{gls\-first\-long\-user\-font}},
+@abbrvstylecommand{glsfirstabbrvemfont,
+  name={\csfmt{gls\-first\-abbrv\-em\-font}},
   user1={\margm{text}},
-  description={used with \qt{user} abbreviation styles to
-   format the long form on first use},
-  topics={long-short-user,short-long-user},
+  description={used with \qt{em} abbreviation styles to format the
+   short form on \idx{firstuse}},
+  topics={abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtremsuffix,
+  name={\csfmt{gls\-xtr\-em\-suffix}},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with the \qt{em} styles},
+  topics={abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@abbrvstylecommand{glslongemfont,
+  name={\csfmt{gls\-long\-em\-font}},
+  user1={\margm{text}},
+  description={used with \qt{long-em} abbreviation styles to format the
+long form using \ics{emph}},
+  topics={abbrstyle.long-em-short-em,abbrstyle.long-em-short-em-desc,abbrstyle.short-em-long-em,abbrstyle.short-em-long-em-desc,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstlongemfont,
+  name={\csfmt{gls\-first\-long\-em\-font}},
+  user1={\margm{text}},
+  description={used with \qt{long-em} abbreviation styles to format the
+   long form on \idx{firstuse}},
+  topics={abbrstyle.long-em-short-em,abbrstyle.long-em-short-em-desc,abbrstyle.short-em-long-em,abbrstyle.short-em-long-em-desc,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-short-em-desc,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen em\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-short-em} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-em-short-em,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen short\dhyphen em}},
+  description={this abbreviation style is like \abbrstyle{long-short}
+  but the short and long forms are displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-em-short-em-desc,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen short\dhyphen em\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-em-short-em} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-long,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen long}},
+  description={this abbreviation style is like \abbrstyle{short-long}
+  but the short form is displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-long-desc,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen long\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-em-long} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-long-em,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen long\dhyphen em}},
+  description={this abbreviation style is like \abbrstyle{short-long}
+  but the short and long forms are displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-long-em-desc,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen long\dhyphen em\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-em-long-em} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-nolong,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen nolong}},
+  description={this abbreviation style is like \abbrstyle{short-nolong}
+  but the short form is displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em,
+  name={\abbrstylefmt{short\dhyphen em}},
+  description={an alias for \abbrstyle{short-em-nolong}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-nolong-desc,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen nolong\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-em-nolong} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-desc,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen desc}},
+  description={an alias for \abbrstyle{short-em-nolong-desc}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.nolong-short-em,
+  name={\abbrstylefmt{nolong\dhyphen short\dhyphen em}},
+  description={this abbreviation style is like \abbrstyle{nolong-short}
+  but the short form is displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-em,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen em}},
+  description={this abbreviation style is like \abbrstyle{long-noshort}
+  but the short form is displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-em-noshort-em,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen noshort\dhyphen em}},
+  description={this abbreviation style is like \abbrstyle{long-noshort}
+  but the long and short forms are displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-em-noshort-em-noreg,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen noshort\dhyphen em\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{long-noshort-noreg}
+  but the long and short forms are displayed using an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-noshort-em-desc,
+  name={\abbrstylefmt{long\dhyphen noshort\dhyphen em\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-noshort-em} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-em-noshort-em-desc,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen noshort\dhyphen em\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-em-noshort-em} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-em-noshort-em-desc-noreg,
+  name={\abbrstylefmt{long\dhyphen em\dhyphen noshort\dhyphen em\dhyphen desc\dhyphen noreg}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-em-noshort-em-noreg} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-footnote,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen footnote}},
+  description={this abbreviation style is like \abbrstyle{short-footnote}
+  but the short form is displayed in an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-em-postfootnote,
+  name={\abbrstylefmt{short\dhyphen em\dhyphen postfootnote}},
+  description={this abbreviation style is like \abbrstyle{short-postfootnote}
+  but the short form is displayed in an emphasized font},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-short-user,
+  name={\abbrstylefmt{long\dhyphen short\dhyphen user}},
+  description={this abbreviation style is like \abbrstyle{long-short}
+  but the parenthetical material is governed by \cs{glsxtruserparen}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtruserfield,
+  name={\csfmt{gls\-xtr\-user\-field}},
+  description={used by the parenthetical abbreviation styles, this
+   expands to the label of the field used to store the parenthetical
+   material},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtruserparen,
+  name={\csfmt{gls\-xtr\-user\-paren}},
+  user1={\margm{text}\margm{label}},
+  description={used by the \abbrstyle{long-short-user} and
+  \abbrstyle{short-long-user} abbreviation styles
+   to format the parenthetical material where \meta{text}
+   is the default parenthetical text and \meta{label}
+   is the entry's label. This checks the field given
+   by \cs{glsxtruserfield} and, if set, the \meta{text} is
+   followed by a comma and the user value},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -5363,7 +5881,7 @@ to
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
    format the short form},
-  topics={long-short-user,short-long-user},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -5372,50 +5890,378 @@ to
   name={\csfmt{gls\-first\-abbrv\-user\-font}},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
-   format the short form on first use},
-  topics={long-short-user,short-long-user},
+   format the short form on \idx{firstuse}},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
 
-@abbreviationstyle{short-long-user,
-  name={\abbrstylefmt{short\dhyphen long\dhyphen user}},
+@abbrvstylecommand{glslonguserfont,
+  name={\csfmt{gls\-long\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the long form},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstlonguserfont,
+  name={\csfmt{gls\-first\-long\-user\-font}},
+  user1={\margm{text}},
+  description={used with \qt{user} abbreviation styles to
+   format the long form on first use},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrusersuffix,
+  name={\csfmt{gls\-xtr\-user\-suffix}},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with the \qt{user} styles},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
+  note={\styfmt{glossaries-extra} v1.04+},
+  category={command}
+}
+
+@abbrvstylecommand{glsuserdescription,
+  name={\csfmt{gls\-user\-description}},
+  user1={\margm{description}\margm{label}},
+  description={used with \qt{user} abbreviation styles to
+   encapsulate the description. Just does
+  \code{\cs{glslonguserfont}\margm{description}} by default},
+  topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
+  note={\styfmt{glossaries-extra} v1.30+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-postshort-user,
+  name={\abbrstylefmt{long\dhyphen postshort\dhyphen user}},
+  description={this abbreviation style is like \abbrstyle{long-short-user}
+  but the parenthetical material is moved to the \idx{postlinkhook}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{long-em-short-em,
-  name={\abbrstylefmt{long\dhyphen em\dhyphen short\dhyphen em}},
+@abbrvstylecommand{glsxtrlongshortuserdescname,
+  name={\csfmt{gls\-xtr\-long\-short\-user\-desc\-name}},
+  description={hook for the \abbrstyle{long-short-user-desc} abbreviation
+  styles that expands to the value that the \field{name} field is
+  assigned to when the abbreviation is defined with
+  \cs{newabbreviation} (defaults to the long form followed by the
+  parenthetical material)},
+  topics={abbrstyle.long-postshort-user-desc,abbrstyle.long-short-user-desc},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-postshort-user-desc,
+  name={\abbrstylefmt{long\dhyphen postshort\dhyphen user\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-postshort-user} style but the \field{description}
+   field must be provided in the entry definition},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{long-short-user-desc,
+@abbreviationstyle{abbrstyle.short-postlong-user,
+  name={\abbrstylefmt{short\dhyphen postlong\dhyphen user}},
+  description={this abbreviation style is like \abbrstyle{short-long-user}
+  but the parenthetical material is moved to the \idx{postlinkhook}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshortlonguserdescname,
+  name={\csfmt{gls\-xtr\-short\-long\-user\-desc\-name}},
+  description={hook for the \abbrstyle{short-long-user-desc} abbreviation
+  styles that expands to the value that the \field{name} field is
+  assigned to when the abbreviation is defined with
+  \cs{newabbreviation} (defaults to the short form followed by the
+  parenthetical material)},
+  topics={abbrstyle.short-postlong-user-desc,abbrstyle.short-long-user-desc},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.short-postlong-user-desc,
+  name={\abbrstylefmt{short\dhyphen postlong\dhyphen user\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-postlong-user} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-short-user-desc,
   name={\abbrstylefmt{long\dhyphen short\dhyphen user\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-short-user} style but the \field{description}
+   field must be provided in the entry definition},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{long-hyphen-short-hyphen,
+@abbreviationstyle{abbrstyle.short-long-user,
+  name={\abbrstylefmt{short\dhyphen long\dhyphen user}},
+  description={this abbreviation style is like \abbrstyle{short-long}
+  but the parenthetical material is governed by \cs{glsxtruserparen}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-long-user-desc,
+  name={\abbrstylefmt{short\dhyphen long\dhyphen user\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-long-user} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-hyphen-short-hyphen,
   name={\abbrstylefmt{long\dhyphen hyphen\dhyphen short\dhyphen
 hyphen}},
+  description={this abbreviation style is like \abbrstyle{long-short}
+  but is designed to work with the \catattr{markwords} attribute. If
+  the attribute is set, the style will check if the inserted
+  material (provided by the final optional argument of commands like
+  \cs{gls}) starts with a hyphen. If it does, the insert is added to
+  the parenthetical material},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{long-postshort-user-desc,
-  name={\abbrstylefmt{long\dhyphen postshort\dhyphen user\dhyphen desc}},
+@abbrvstylecommand{glsxtrifhyphenstart,
+  name={\csfmt{gls\-xtr\-if\-hyphen\-start}},
+  user1={\margm{text}\margm{true}\margm{false}},
+  description={used by the \qt{hyphen} abbreviation styles, this
+   checks if \meta{text} starts with a hyphen},
+  topics={abbrstyle.long-hyphen-short-hyphen,abbrstyle.long-hyphen-short-hyphen-desc,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-hyphen-postshort-hyphen,abbrstyle.long-hyphen-postshort-hyphen-desc,abbrstyle.short-hyphen-long-hyphen,abbrstyle.short-hyphen-long-hyphen-desc,abbrstyle.short-hyphen-postlong-hyphen,abbrstyle.short-hyphen-postlong-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrlonghyphenshort,
+  name={\csfmt{gls\-xtr\-long\-hyphen\-short}},
+  user1={\margm{label}\margm{long}\margm{short}\margm{insert}},
+  description={used by the \qt{long\dhyphen hyphen\dhyphen
+  short\dhyphen hyphen} abbreviation styles to format the full form},
+  topics={abbrstyle.long-hyphen-short-hyphen,abbrstyle.long-hyphen-short-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsabbrvhyphenfont,
+  name={\csfmt{gls\-abbrv\-hyphen\-font}},
+  user1={\margm{text}},
+  description={used by the \qt{hyphen} abbreviation styles to format
+   the short form},
+  topics={abbrstyle.long-hyphen-short-hyphen,abbrstyle.long-hyphen-short-hyphen-desc,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-hyphen-postshort-hyphen,abbrstyle.long-hyphen-postshort-hyphen-desc,abbrstyle.short-hyphen-long-hyphen,abbrstyle.short-hyphen-long-hyphen-desc,abbrstyle.short-hyphen-postlong-hyphen,abbrstyle.short-hyphen-postlong-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstabbrvhyphenfont,
+  name={\csfmt{gls\-first\-abbrv\-hyphen\-font}},
+  user1={\margm{text}},
+  description={used by the \qt{hyphen} abbreviation styles to format
+   the short form on \idx{firstuse}},
+  topics={abbrstyle.long-hyphen-short-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glslonghyphenfont,
+  name={\csfmt{gls\-long\-hyphen\-font}},
+  user1={\margm{text}},
+  description={used by the \qt{hyphen} abbreviation styles to format
+   the long form},
+  topics={abbrstyle.long-hyphen-short-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstlonghyphenfont,
+  name={\csfmt{gls\-first\-long\-hyphen\-font}},
+  user1={\margm{text}},
+  description={used by the \qt{hyphen} abbreviation styles to format
+   the long form on \idx{firstuse}},
+  topics={abbrstyle.long-hyphen-short-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrhyphensuffix,
+  name={\csfmt{gls\-xtr\-hyphen\-suffix}},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with the \qt{hyphen} styles},
+  topics={abbrstyle.long-hyphen-short-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-hyphen-short-hyphen-desc,
+  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen short\dhyphen
+hyphen\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-hyphen-short-hyphen} style but the \field{description}
+   field must be provided in the entry definition},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{short-sc-nolong,
-  name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong}},
+@abbrvstylecommand{glsxtrlonghyphennoshort,
+  name={\csfmt{gls\-xtr\-long\-hyphen\-noshort}},
+  user1={\margm{label}\margm{long}\margm{insert}},
+  description={used by the \qt{hyphen-noshort} abbreviation styles
+  to format the \idx{firstuse} form},
+  topics={abbrstyle.long-hyphen-noshort-desc-noreg},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-hyphen-noshort-desc-noreg,
+  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen noshort\dhyphen desc\dhyphen noreg}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-hyphen-noshort-noreg} style but the \field{description}
+   field must be provided in the entry definition},
   category={abbreviationstyle},
   parent={abbreviationstyles}
 }
 
-@abbreviationstyle{long-only-short-only,
+@abbreviationstyle{abbrstyle.long-hyphen-noshort-noreg,
+  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen noshort\dhyphen noreg}},
+  description={this abbreviation style is like \abbrstyle{long-noshort}
+  but is designed to work with the \catattr{markwords} attribute and 
+  the \catattr{regular} attribute isn't set to \optfmt{true}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-hyphen-postshort-hyphen,
+  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen postshort\dhyphen hyphen}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-hyphen-short-hyphen} style but the insert and
+   parenthetical material are moved into the \idx{postlinkhook}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrlonghyphen,
+  name={\csfmt{gls\-xtr\-long\-hyphen}},
+  user1={\margm{long}\margm{label}\margm{insert}},
+  description={used by the \abbrstyle{long-hyphen-postshort-hyphen} abbreviation 
+  to format the long form and check if the \meta{insert} starts with
+  a hyphen},
+  topics={abbrstyle.long-hyphen-postshort-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrposthyphenshort,
+  name={\csfmt{gls\-xtr\-post\-hyphen\-short}},
+  user1={\margm{label}\margm{insert}},
+  description={used by the \abbrstyle{long-hyphen-postshort-hyphen}
+  style in the \idx{postlinkhook}},
+  topics={abbrstyle.long-hyphen-postshort-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrposthyphensubsequent,
+  name={\csfmt{gls\-xtr\-post\-hyphen\-sub\-sequent}},
+  user1={\margm{label}\margm{insert}},
+  description={used by the \abbrstyle{long-hyphen-postshort-hyphen} abbreviation 
+  in the \idx{postlinkhook} for subsequent use},
+  topics={abbrstyle.long-hyphen-postshort-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.long-hyphen-postshort-hyphen-desc,
+  name={\abbrstylefmt{long\dhyphen hyphen\dhyphen postshort\dhyphen
+hyphen\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-hyphen-postshort-hyphen} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-hyphen-long-hyphen,
+  name={\abbrstylefmt{short\dhyphen hyphen\dhyphen long\dhyphen hyphen}},
+  description={this abbreviation style is like \abbrstyle{short-long}
+  but is designed to work with the \catattr{markwords} attribute. If
+  the attribute is set, the style will check if the inserted
+  material (provided by the final optional argument of commands like
+  \cs{gls}) starts with a hyphen. If it does, the insert is added to
+  the parenthetical material},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshorthyphenlong,
+  name={\csfmt{gls\-xtr\-short\-hyphen\-long}},
+  user1={\margm{label}\margm{short}\margm{long}\margm{insert}},
+  description={used by the \abbrstyle{short-hyphen-long-hyphen} style
+  to format the full form},
+  topics={abbrstyle.short-hyphen-long-hyphen,abbrstyle.short-hyphen-long-hyphen-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.short-hyphen-long-hyphen-desc,
+  name={\abbrstylefmt{short\dhyphen hyphen\dhyphen long\dhyphen
+hyphen\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-hyphen-long-hyphen} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.short-hyphen-postlong-hyphen,
+  name={\abbrstylefmt{short\dhyphen hyphen\dhyphen postlong\dhyphen hyphen}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-hyphen-long-hyphen} style but the insert and
+   parenthetical material are moved into the \idx{postlinkhook}},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbrvstylecommand{glsxtrshorthyphen,
+  name={\csfmt{gls\-xtr\-short\-hyphen}},
+  user1={\margm{short}\margm{label}\margm{insert}},
+  description={used by the \abbrstyle{short-hyphen-postlong-hyphen} style
+  to format the short form and check if \meta{insert} starts with a hyphen},
+  topics={abbrstyle.short-hyphen-postlong-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtrposthyphenlong,
+  name={\csfmt{gls\-xtr\-post\-hyphen\-long}},
+  user1={\margm{label}\margm{insert}},
+  description={used by the \abbrstyle{short-hyphen-postlong-hyphen}
+  style in the \idx{postlinkhook}},
+  topics={abbrstyle.long-hyphen-postshort-hyphen},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbreviationstyle{abbrstyle.short-hyphen-postlong-hyphen-desc,
+  name={\abbrstylefmt{short\dhyphen hyphen\dhyphen postlong\dhyphen
+hyphen\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{short-hyphen-postlong-hyphen} style but the \field{description}
+   field must be provided in the entry definition},
+  category={abbreviationstyle},
+  parent={abbreviationstyles}
+}
+
+@abbreviationstyle{abbrstyle.long-only-short-only,
   name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
@@ -5426,7 +6272,7 @@ hyphen}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 short form},
-  topics={long-only-short-only,long-only-short-only-desc},
+  topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -5436,12 +6282,12 @@ short form},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 long form},
-  topics={long-only-short-only,long-only-short-only-desc},
+  topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
 
-@abbreviationstyle{long-only-short-only-desc,
+@abbreviationstyle{abbrstyle.long-only-short-only-desc,
   name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only\dhyphen desc}},
   category={abbreviationstyle},
   parent={abbreviationstyles}
@@ -12197,32 +13043,6 @@ glossary (or the default of \meta{type} is omitted)},
   category={command}
 }
 
-@glscommand{glsxtruserfield,
-  name={\csfmt{gls\-xtr\-user\-field}},
-  user1={},
-  description={used by the parenthetical abbreviation styles, this
-   expands to the label of the field used to store the parenthetical
-   material},
-  topics={abbreviationcommands,fieldrefcommands},
-  note={\styfmt{glossaries-extra} v1.04+},
-  category={command}
-}
-
-@glscommand{glsxtruserparen,
-  name={\csfmt{gls\-xtr\-user\-paren}},
-  user1={\margm{text}\margm{label}},
-  description={used by the \abbrstyle{long-short-user} and
-  \abbrstyle{short-long-user} abbreviation styles
-   to format the parenthetical material where \meta{text}
-   is the default parenthetical text and \meta{label}
-   is the entry's label. This checks the field given
-   by \cs{glsxtruserfield} and, if set, the \meta{text} is
-   followed by a comma and the user value},
-  topics={abbreviationcommands,fieldrefcommands,formattingcommands},
-  note={\styfmt{glossaries-extra} v1.04+},
-  category={command}
-}
-
 @glscommand{GlsXtrForeignText,
   name={\csfmt{Gls\-Xtr\-Foreign\-Text}},
   user1={\margm{label}\margm{text}},
@@ -14022,6 +14842,25 @@ number is hexadecimal)},
   category={command}
 }
 
+@command{textsmaller,
+  name={\csfmt{text\-smaller}},
+  user1={\margm{text}},
+  description={typesets \meta{text} in a font size that's smaller
+  than the surrounding text},
+  note={\styfmt{relsize}},
+  category={command}
+}
+
+@glscommand{glstextup,
+  name={\csfmt{gls\-text\-up}},
+  user1={\margm{text}},
+  description={typesets \meta{text} in an upright font (used to
+cancel the effect of \cs{textsc} in abbreviation styles that use
+\ics{glsabbrvscfont})},
+  note={\styfmt{relsize}},
+  category={command}
+}
+
 @command{usepackage,
   name={\csfmt{use\-pack\-age}},
   user1={\oargm{options}\margm{name}\oargm{min version}},
@@ -14197,6 +15036,15 @@ associated counter},
   description={create a hypertarget with the given \meta{target
 name} and the displayed \meta{text}},
   note={\styfmt{hyperref}\texparserdefnote},
+  category={command}
+}
+
+@command{texorpdfstring,
+  name={\csfmt{texorpdfstring}},
+  user1={\margm{\TeX\ code}\margm{PDF text}},
+  description={does \meta{PDF text} if used in a PDF bookmark,
+   otherwise does \meta{\TeX\ code}},
+  note={\styfmt{hyperref}},
   category={command}
 }
 

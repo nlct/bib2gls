@@ -159,10 +159,10 @@
   match-op={or},
   match={
    {category}={.*field},
-%   {original entrytype}={.*(gls|style)command},
-%   {original entrytype}={.*option},
-%   {original entrytype}={abbreviationstyle},
-%   {original entrytype}={glossarystyle},
+   {original entrytype}={.*(gls|style)command},
+   {original entrytype}={.*option},
+   {original entrytype}={abbreviationstyle},
+   {original entrytype}={glossarystyle},
   },
   dual-prefix={},
   dual-type={main},
@@ -378,7 +378,7 @@
 \newcommand{\glsxtrpostdescenvironment}{environment}
 
 \newcommand*{\abbrstyle}[1]{%
-  \texorpdfstring{\idx{#1}}{#1}%
+  \texorpdfstring{\idx{abbrstyle.#1}}{#1}%
 }
 
 \newcommand*{\glostyle}[1]{%
@@ -1637,49 +1637,70 @@ the corresponding set of \ext{bib} files:
 \item Field checks and modifications are performed:
   \begin{itemize}
   \item field aliases are performed (\csopt{field-aliases}); 
+
   \item ignored fields (identified by \csopt{ignore-fields}) are
   removed;
+
   \item case-changes (for example, \csopt{short-case-change}) are
   performed, except for the \field{name} field and fields identified
   with \csopt{field-case-change};
+
   \item suffixes are appended if required (for example, with
   \csopt{short-plural-suffix});
+
   \item field replications are made (\csopt{replicate-fields}),
     and any of the above case-change or suffixes required
     on the replicated fields are performed;
+
   \item the \field{group} field is assigned if \csopt{group} is set;
+
   \item any variables (identified by \atentry{string}) are expanded
   (if not already done in any of the previous steps);
+
   \item any fields that have been identified by
   \csopt{bibtex-contributor-fields} are converted;
+
   \item any fields that have been identified with
   \csopt{encapsulate-fields} are converted;
+
   \item any fields that have been identified with
   \csopt{encapsulate-fields*} are converted;
-  \item any fields that have been identified with
+
   \item any fields that must be converted into a label form
   (\csopt{labelify} or \csopt{labelify-list}) are processed;
+
   \item any fields identified by \csopt{dependency-fields} are parsed for
   dependent entries;
+
   \item any fields whose value must be a label are interpreted
   if \csopt{interpret-label-fields} is set;
+
   \item the \field{parent} field is adjusted according to the label prefix 
   settings (\csopt{label-prefix} etc);
+
   \item \ics{makefirstuc} protection is applied according to 
   \longarg{mfirstuc-protection} and \longarg{mfirstuc-math-protection};
+
   \item fields are parsed for commands like \cs{gls} or
   \cs{glshyperlink} and also checked for nested links if
   \longarg{nested-link-check} is set;
+
   \item the \field{description} field is adjusted according to
   \csopt{strip-trailing-nopost};
+
   \item end punctuation is checked according to
   \csopt{check-end-punctuation};
+
   \item \field{name} case-change is performed if
   \csopt{name-case-change} is set;
+
   \item if \csopt[true]{copy-alias-to-see} the \field{alias} is copied 
   to the \field{see} field;
+
   \item general field case changes identified by
   \csopt{field-case-change} are performed;
+
+  \item any fields that have been identified with
   \csopt{interpret-fields} are replaced with their interpreted
   values.
   \end{itemize}
@@ -9438,12 +9459,12 @@ For example, suppose I have a file \filefmt{entries.bib} that
 contains definitions like:
 \begin{codeenv}
 \atentry{symbol}\marg{pi,
-  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{name}=\marg{\cs{ensuremath}\marg{\ics{pi}}},
   \field{description}=\marg{the ratio of a circle's circumference to its diameter},
 }
 \strut
 \atentry{symbol}\marg{sigma,
-  \field{name} = \marg{\cs{ensuremath}\marg{\cs{sigma}}},
+  \field{name} = \marg{\cs{ensuremath}\marg{\ics{sigma}}},
   \field{description} = \marg{standard deviation}
 }
 \end{codeenv}
@@ -9454,15 +9475,15 @@ I could define a command like this:
 \cs{newcommand}\marg{\cmd{definition}}[1]\marg{\comment{}
   \cs{ifglsentryexists}\marg{\idx{param}1}\comment{}
   \marg{\comment{}
-    \cs{section}\oarg{\cs{glsentryname}\marg{\idx{param}}}\marg{\cs{glsadd}\marg{\idx{param}1}\cs{glsxtrglossentry}\marg{\idx{param}1}}\comment{}
-    \cs{Glossentrydesc}\marg{\idx{param}1}\cs{glspostdescription}
+    \cs{section}\oarg{\cs{glsentryname}\marg{\idx{param}}}\marg{\cs{glsadd}\marg{\idx{param}1}\ics{glsxtrglossentry}\marg{\idx{param}1}}\comment{}
+    \ics{Glossentrydesc}\marg{\idx{param}1}\cs{glspostdescription}
   }\comment{}
-  {\cs{section}\oarg{Missing `\idx{param}1'}\marg{\cs{glsadd}\marg{\idx{param}1}}}\comment{}
+  \marg{\cs{section}\oarg{Missing `\idx{param}1'}\marg{\cs{glsadd}\marg{\idx{param}1}}}\comment{}
 }
 \end{codeenv}
 which can be used in the document:
 \begin{codeenv}
-\cs{tableofcontents}
+\ics{tableofcontents}
 \cmd{definition}\marg{pi}
 \cmd{definition}\marg{sigma}
 \end{codeenv}
@@ -9480,17 +9501,18 @@ that they can appear in the bookmarks. Since \bibgls' interpreter
 recognises these commands, I can get it to make the conversion
 instead of trying to implement a method within \TeX:
 \begin{codeenv}
+\cs{glsaddstoragekey}\marg{pdfname}\marg{}\marg{\cmd{pdfname}}
 \gls{GlsXtrLoadResources}\oarg{
   \csopt[entries]{src},
-  \csopt[\field{name}=\field{user1}]{replicate-fields},
+  \csopt[\field{name}=\fieldfmt{pdfname}]{replicate-fields},
   \csopt[fallback]{replicate-missing-field-action},
-  \csopt[\field{user1}]{interpret-fields}
+  \csopt[\fieldfmt{pdfname}]{interpret-fields}
 }
 \end{codeenv}
-This first copies the \field{name} field to one of the custom fields
-(\field{user1}) and then interprets the custom field. This leaves
+This first copies the \field{name} field to the custom
+\fieldfmt{pdfname} and then interprets the copy. This leaves
 the \field{name} field with the \LaTeX\ code to produce the symbol
-in the document, but the \field{user1} field ends up with all markup
+in the document, but the \fieldfmt{pdfname} field ends up with all markup
 stripped by the interpreter and the \cs{pi} and \cs{sigma} are
 converted to the Unicode characters \hex{1D70B} (mathematical italic
 small pi) and \hex{1D70E} (mathematical italic small sigma). With
@@ -9501,7 +9523,7 @@ bookmarks by adjusting the definition of the custom command:
   \cs{ifglsentryexists}\marg{\idx{param}1}\comment{}
   \marg{\comment{}
     \cs{section}
-    \oarg{\cs{texorpdfstring}\marg{\cs{glsentryname}\marg{\idx{param}1}}\marg{\cs{glsentryuseri}\marg{\idx{param}1}}}
+    \oarg{\ics{texorpdfstring}\marg{\cs{glsentryname}\marg{\idx{param}1}}\marg{\cmd{pdfname}\marg{\idx{param}1}}}
     \marg{\cs{glsadd}\marg{\idx{param}1}\cs{glsxtrglossentry}\marg{\idx{param}1}}\comment{}
     \cs{Glossentrydesc}\marg{\idx{param}1}\cs{glspostdescription}
   }\comment{}
@@ -9519,7 +9541,7 @@ fields parsed according to \csopt{dual-date-time-field-format} and
 \csopt{dual-date-time-field-locale}. If the field value is missing
 or doesn't match the given pattern it remains unchanged, otherwise
 it's converted into the form:
-\nosecdef{bibglsdatetime}
+\formatdef{bibglsdatetime}
 where \meta{original} is the value of the field before conversion.
 If the interpreter is on, the value will be interpreted before
 being parsed if it contains \idx{escchar}, \idx{mshiftchar},
@@ -9532,7 +9554,7 @@ being parsed if it contains \idx{escchar}, \idx{mshiftchar},
 As \csopt{date-time-fields} but for fields that only contain date
 (not time) information. If parsed correctly, the field is converted
 to:
-\nosecdef{bibglsdate}
+\formatdef{bibglsdate}
 The fields are parsed according to
 \csopt{date-field-format} and
 \csopt{date-field-locale} for primary entries and according to
@@ -9544,7 +9566,7 @@ The fields are parsed according to
 As \csopt{date-time-fields} but for fields that only contain time
 (not date) information. If parsed correctly, the field is converted
 to:
-\nosecdef{bibglstime}
+\formatdef{bibglstime}
 The fields are parsed according to
 \csopt{time-field-format} and
 \csopt{time-field-locale} for primary entries and according to
@@ -17023,6 +17045,26 @@ The default definitions are:
 \begin{codeenv}
 \cs{providecommand}\marg{\gls{bibglsdatetime}}[9]\marg{\gls{bibglsdatetimeremainder}}
 \cs{providecommand}\marg{\gls{bibglsdatetimeremainder}}[4]\marg{\idx{param}4}
+\end{codeenv}
+
+\cssection{bibglsdate}
+
+\formatdef{bibglsdate}
+Used to encapsulate date fields identified with
+\csopt{date-fields}.
+The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdate}}[7]\marg{\idx{param}7}
+\end{codeenv}
+
+\cssection{bibglstime}
+
+\formatdef{bibglstime}
+Used to encapsulate date fields identified with
+\csopt{time-fields}.
+The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglstime}}[7]\marg{\idx{param}7}
 \end{codeenv}
 
 \cssection{bibglsprimaryprefixlabel}

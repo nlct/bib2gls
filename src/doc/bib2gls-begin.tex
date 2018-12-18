@@ -215,21 +215,33 @@
 
 \makeatletter
 \newcommand{\code}[1]{\texorpdfstring{{\ttfamily\obeyspaces #1}}{#1}}
-\newenvironment{codeenv}
- {%
-   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+\newcommand{\setupcodeenvfmts}{%
    \def\cmd{\char`\\}%
-   \def\comment##1{\textcolor{comment}{\%\ ##1}}%
+   \def\comment##1{\mbox{\textcolor{comment}{\idx{commentchar}\ ##1}}}%
    \renewcommand*{\styfmt}[1]{##1}%
    \renewcommand*{\counterfmt}[1]{##1}%
    \renewcommand*{\catattrfmt}[1]{\textcolor{attribute}{##1}}%
    \renewcommand*{\abbrstylefmt}[1]{\textcolor{style}{##1}}%
    \renewcommand*{\csfmtfont}[1]{\textcolor{cs}{##1}}%
+}
+\newenvironment{codeenv}
+ {%
+   \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
+   \setupcodeenvfmts
     \begin{flushleft}\textcolor{lightgray}{\hrulefill}\par\nopagebreak
      \medskip\nopagebreak
      \ttfamily\obeylines\frenchspacing\@vobeyspaces}
  {\nopagebreak\textcolor{lightgray}{\hrulefill}%
   \end{flushleft}\ignorespacesafterend}
+
+\newenvironment{codeenv*}
+ {%
+   \setupcodeenvfmts
+   \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
+   \parindent\z@\parfillskip\@flushglue\parskip\z@skip
+ }
+ {\end{flushleft}\ignorespacesafterend}
+
 \makeatother
 
 \newcommand{\primary}{\emph}
@@ -262,7 +274,7 @@
 }
 
 \newcommand*{\abbrstyle}[2][]{%
-  \texorpdfstring{\idx[#1]{#2}}{#2}%
+  \texorpdfstring{\idx[#1]{abbrstyle.#2}}{#2}%
 }
 
 \newcommand*{\glostyle}[1]{%
@@ -1694,10 +1706,10 @@ where \meta{category} is the category label and \meta{style-name} is
 the name of the style. If the optional argument is omitted,
 \code{abbreviation} is assumed. The \sty{glossaries-extra} package
 automatically sets the default styles:
-\begin{codeenv}
+\begin{codeenv*}
 \gls{setabbreviationstyle}\marg{\abbrstyle{long-short}}
 \gls{setabbreviationstyle}\oarg{acronym}\marg{\abbrstyle{short-nolong}}
-\end{codeenv}
+\end{codeenv*}
 This means that if you don't explicitly set the style then any
 abbreviation defined with \gls{newacronym} will use the
 \abbrstyle{short-nolong} style (unless you change the category in
@@ -1900,7 +1912,8 @@ This is essentially the same as
 \gls{newabbreviation}\marg{ssl}\marg{SSL}\marg{\gls{glsxtrword}\marg{Secure}\gls{glsxtrwordsep}
 \gls{glsxtrword}\marg{Sockets}\gls{glsxtrwordsep}\gls{glsxtrword}\marg{Layer}}
 \end{codeenv}
-This is typically used with the \code{-hyphen} abbreviation styles.
+This is typically used with the \code{-hyphen} abbreviation styles,
+such as \abbrstyle{long-hyphen-short-hyphen}.
 If the final optional \meta{insert} argument of commands like
 \gls{gls} starts with a hyphen, \gls{glsxtrwordsep} is locally
 changed to a hyphen.
@@ -1911,7 +1924,7 @@ For example:
 \strut
 \cmd{usepackage}\marg{glossaries-extra}
 \strut
-\gls{setabbreviationstyle}\marg{\gls[noindex=false]{long-hyphen-short-hyphen}}
+\gls{setabbreviationstyle}\marg{\abbrstyle[noindex=false]{long-hyphen-short-hyphen}}
 \strut
 \gls{glssetcategoryattribute}\marg{abbreviation}\marg{\catattr{markwords}}\marg{true}
 \strut
@@ -2133,7 +2146,7 @@ For example:
 \gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{discardperiod}}\marg{true}
 \gls{glssetcategoryattribute}\marg{initialism}\marg{\catattr{retainfirstuseperiod}}\marg{true}
 \strut
-\gls{setabbreviationstyle}\oarg{initialism}\marg{\gls[noindex=false]{short-long}}
+\gls{setabbreviationstyle}\oarg{initialism}\marg{\abbrstyle[noindex=false]{short-long}}
 \strut
 \gls{newabbreviation}\oarg{\field{category}=initialism}
  \marg{gp}\marg{GP}\marg{General Practitioner}
