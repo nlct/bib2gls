@@ -11,6 +11,8 @@ v1.9 (pending):
      no-case-change-cs
      encapsulate-fields
      encapsulate-fields*
+     interpret-fields
+     replicate-missing-field-action
 
   * new entry types:
 

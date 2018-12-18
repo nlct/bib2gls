@@ -254,6 +254,23 @@ public class GlsResource
          {
             replicateOverride = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("replicate-missing-field-action"))
+         {
+            String val = getChoice(parser, list, opt, "skip", "fallback", "empty");
+
+            if (val.equals("skip"))
+            {
+               missingFieldReplicateAction = MISSING_FIELD_REPLICANT_SKIP;
+            }
+            else if (val.equals("fallback"))
+            {
+               missingFieldReplicateAction = MISSING_FIELD_REPLICANT_FALLBACK;
+            }
+            else // if (val.equals("empty"))
+            {
+               missingFieldReplicateAction = MISSING_FIELD_REPLICANT_EMPTY;
+            }
+         }
          else if (opt.equals("primary-dual-dependency"))
          {
             dualPrimaryDependency = getBoolean(parser, list, opt);
@@ -2135,9 +2152,19 @@ public class GlsResource
          {
             dualTimeListLocale = getLocale(parser, list, opt);
          }
+         else if (opt.equals("interpret-fields"))
+         {
+            interpretFields = getFieldArray(parser, list, opt);
+
+            if (interpretFields != null && !bib2gls.useInterpreter())
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.option.requires.interpreter", opt));
+            }
+         }
          else if (opt.equals("bibtex-contributor-fields"))
          {
-            bibtexAuthorList = getStringArray(parser, list, opt);
+            bibtexAuthorList = getFieldArray(parser, list, opt);
          }
          else if (opt.equals("contributor-order"))
          {
@@ -2850,6 +2877,18 @@ public class GlsResource
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "match"));
+      }
+
+      if (interpretFields != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "interpret-fields"));
+      }
+
+      if (bibtexAuthorList != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "bibtex-contributor-fields"));
       }
 
       if (secondaryType != null)
@@ -7696,6 +7735,25 @@ public class GlsResource
       return false;
    }
 
+   public boolean isInterpretField(String field)
+   {
+      if (interpretFields == null)
+      {
+         return false;
+      }
+
+      for (String f : interpretFields)
+      {
+         if (f.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+
    public String getLabelPrefix()
    {
       return labelPrefix;
@@ -10138,6 +10196,11 @@ public class GlsResource
       return replicateOverride;
    }
 
+   public byte getFallbackOnMissingReplicateAction()
+   {
+      return missingFieldReplicateAction;
+   }
+
    public boolean hasFieldCopies()
    {
       return fieldCopies != null;
@@ -10658,9 +10721,17 @@ public class GlsResource
 
    private boolean replicateOverride=false;
 
+   public static final byte MISSING_FIELD_REPLICANT_SKIP=(byte)0;
+   public static final byte MISSING_FIELD_REPLICANT_FALLBACK=(byte)1;
+   public static final byte MISSING_FIELD_REPLICANT_EMPTY=(byte)2;
+
+   private byte missingFieldReplicateAction = MISSING_FIELD_REPLICANT_SKIP;
+
    private String[] skipFields = null;
 
    private String[] bibtexAuthorList = null;
+
+   private String[] interpretFields = null;
 
    private String[] dateTimeList = null;
    private String[] dateList = null;

@@ -851,6 +851,7 @@ public class Bib2GlsEntry extends BibEntry
       if (resource.hasFieldCopies())
       {
          boolean override = resource.isReplicateOverrideOn();
+         byte missingAction = resource.getFallbackOnMissingReplicateAction();
 
          boolean updateShortPlural = false;
          boolean updateDualShortPlural = false;
@@ -861,6 +862,18 @@ public class Bib2GlsEntry extends BibEntry
             String field = it.next();
 
             BibValueList val = getField(field);
+
+            if (val == null)
+            {
+               if (missingAction == GlsResource.MISSING_FIELD_REPLICANT_FALLBACK)
+               {
+                  val = getFallbackContents(field);
+               }
+               else if (missingAction == GlsResource.MISSING_FIELD_REPLICANT_EMPTY)
+               {
+                  val = new BibValueList();
+               }
+            }
 
             if (val != null)
             {
@@ -1000,6 +1013,21 @@ public class Bib2GlsEntry extends BibEntry
                list.add(parser.getListener().createGroup(getId()));
                value.clear();
                value.add(new BibUserString(list));
+            }
+
+            if (resource.isInterpretField(field))
+            {
+               String orgStrVal = list.toString(parser);
+
+               String newStrVal = bib2gls.interpret(orgStrVal, value, bib2gls.trimFields());
+
+               if (!orgStrVal.equals(newStrVal))
+               {
+                  list.clear();
+                  list.addAll(parser.getListener().createString(newStrVal));
+                  value.clear();
+                  value.add(new BibUserString(list));
+               }
             }
 
             boolean isLabelifyList = resource.isLabelifyListField(field);

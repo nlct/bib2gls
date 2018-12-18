@@ -460,6 +460,7 @@ Use {1} {0} to allow the interpreter to parse {0}.sty if the package isn''t too 
 Use {1} {0} instead.</entry>
 <entry key="error.create.missing.parent.failed">Attempt to create missing parent ''{0}'' for entry ''{1}'' caused a problem:
 {2}</entry>
+<entry key="error.option.requires.interpreter">Interpreter needed for setting {0}</entry>
 
 <!--
     The following messages are used by convertgls2bib

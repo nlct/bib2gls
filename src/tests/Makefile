@@ -31,7 +31,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-cyrillic-ascii.pdf test-cyrillic-inputenc.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
-	  test-sortletternumber.pdf test-spawn.pdf
+	  test-sortletternumber.pdf test-spawn.pdf \
+	  test-interpret-fields.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -585,6 +586,14 @@ test-spawn.pdf	: test-spawn.glstex
 test-spawn.glstex	: test-spawn.tex test-spawn.bib $(DEPS)
 		pdflatex test-spawn
 		$(BIB2GLS) test-spawn
+
+test-interpret-fields.pdf	: test-interpret-fields.glstex
+		xelatex test-interpret-fields
+		xelatex test-interpret-fields
+
+test-interpret-fields.glstex	: test-interpret-fields.tex greek.bib $(DEPS)
+		xelatex test-interpret-fields
+		$(BIB2GLS) test-interpret-fields
 
 clean	:
 	$(RM) *.aux

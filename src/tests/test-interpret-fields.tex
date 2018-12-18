@@ -1,0 +1,34 @@
+% arara: xelatex
+% arara: bib2gls
+% arara: xelatex
+% arara: xelatex
+\documentclass{article}
+
+\usepackage{fontspec}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,postdot]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src=greek,
+  replicate-fields={name=user1},
+  replicate-missing-field-action=fallback,
+  interpret-fields={user1}
+]
+
+\newcommand{\definition}[1]{%
+  \ifglsentryexists{#1}%
+  {%
+    \section
+    [\texorpdfstring{\glsentryname{#1}}{\glsentryuseri{#1}}]
+    {\glsadd{#1}\glsxtrglossentry{#1}}%
+    \Glossentrydesc{#1}\glspostdescription
+  }%
+  {\section[Missing `#1']{\glsadd{#1}}}%
+}
+
+\begin{document}
+\tableofcontents
+\definition{pi}
+\definition{sigma}
+
+\end{document}

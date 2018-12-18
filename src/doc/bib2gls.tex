@@ -1630,6 +1630,9 @@ the corresponding set of \ext{bib} files:
   \csopt{encapsulate-fields} are converted;
   \item any fields that have been identified with
   \csopt{encapsulate-fields*} are converted;
+  \item any fields that have been identified with
+  \csopt{interpret-fields} are replaced with their interpreted
+  values;
   \item any fields that must be converted into a label form
   (\csopt{labelify} or \csopt{labelify-list}) are processed;
   \item any fields identified by \csopt{dependency-fields} are parsed for
@@ -2089,6 +2092,18 @@ and will expand some things that aren't expanded by \LaTeX\
 (such as \ics{MakeUppercase} and \ics{char}) and won't expand other commands
 that would be expanded by \LaTeX\ (such as commands defined
 in terms of complicated internals).
+
+If you get a \idx{StackOverflowError} while a field is being
+interpreted (with a long stack trace that contains repeated file names and
+line numbers) then it's likely you have an infinite loop. For
+example, this can be triggered if a field contains \csfmt{foo} that
+has been defined as:
+\begin{codeenv}
+\cs{def}\cmd{foo}\marg{\cmd{foo}}
+\end{codeenv}
+This will obviously also cause an error in the \LaTeX\ document as
+well (unless the document has a different definition that doesn't
+have this unbounded recursion).
 
 The \file{texparserlib.jar} library is not a \TeX\ engine and there
 are plenty of situations where it doesn't work. In particular, in
@@ -8561,7 +8576,9 @@ of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
 (only if the target field isn't already set with
 \csopt[false]{replicate-override}). This action is
 performed after \csopt{ignore-fields} (see
-\sectionref{sec:resourcesets}).
+\sectionref{sec:resourcesets}). If the source field is missing, the
+\csopt{replicate-missing-field-action} setting determines the
+action.
 
 For example, suppose \filefmt{people.bib} contains:
 \begin{codeenv}
@@ -8642,6 +8659,18 @@ This is a boolean option. The default setting is
 \csopt[false]{replicate-override}. If \optfmt{true},
 \csopt{replicate-fields} will override the existing value if the
 target field is already set.
+
+\optsection[\subsubsection]{replicate-missing-field-action}
+
+This option indicates what to do if a source field identified in 
+\csopt{replicate-fields} is missing. The value may be one of:
+\begin{itemize}
+\item \optfmt{skip}: skip the replication of the missing field
+(default);
+\item \optfmt{fallback}: use the fallback for the missing field, if
+one is available (otherwise skip);
+\item \optfmt{empty}: make the target field empty.
+\end{itemize}
 
 \optsection[\subsubsection]{counter}
 
@@ -9345,6 +9374,89 @@ same field is listed in both settings, its value will end up as:
 \cmd{\meta{cs-name-2arg}}\marg{\cmd{\meta{cs-name-1arg}}\margm{value}}\margm{label}
 \end{codeenv}
 
+\optsection[\subsubsection]{interpret-fields}
+
+This option indicates that the listed fields should be replaced by
+their interpreted values. The value should be a comma-separated list
+of field names. If the list is empty, this action is switched off
+(default). Other fields not listed may still be interpreted
+depending on other settings.
+
+For example, suppose I have a file \filefmt{entries.bib} that
+contains definitions like:
+\begin{codeenv}
+\atentry{symbol}\marg{pi,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{description}=\marg{the ratio of a circle's circumference to its diameter},
+}
+\strut
+\atentry{symbol}\marg{sigma,
+  \field{name} = \marg{\cs{ensuremath}\marg{\cs{sigma}}},
+  \field{description} = \marg{standard deviation}
+}
+\end{codeenv}
+Instead of having a list of terms (glossary), suppose I want to have
+standalone definitions, where the term appears in a section heading.
+I could define a command like this:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{definition}}[1]\marg{\comment{}
+  \cs{ifglsentryexists}\marg{\idx{param}1}\comment{}
+  \marg{\comment{}
+    \cs{section}\oarg{\cs{glsentryname}\marg{\idx{param}}}\marg{\cs{glsadd}\marg{\idx{param}1}\cs{glsxtrglossentry}\marg{\idx{param}1}}\comment{}
+    \cs{Glossentrydesc}\marg{\idx{param}1}\cs{glspostdescription}
+  }\comment{}
+  {\cs{section}\oarg{Missing `\idx{param}1'}\marg{\cs{glsadd}\marg{\idx{param}1}}}\comment{}
+}
+\end{codeenv}
+which can be used in the document:
+\begin{codeenv}
+\cs{tableofcontents}
+\cmd{definition}\marg{pi}
+\cmd{definition}\marg{sigma}
+\end{codeenv}
+A problem with this definition of my custom command occurs if I add
+\sty{hyperref} to the document, because this tries to write \cs{pi}
+and \cs{sigma} to the PDF bookmarks, which doesn't work because
+those commands can't be automatically converted to characters
+permitted in a PDF string. This leads to a warning from
+\sty{hyperref}:
+\begin{alltt}
+Token not allowed in a PDF string (Unicode)
+\end{alltt}
+Ideally I'd like to be able to convert these symbols to Unicode so
+that they can appear in the bookmarks. Since \bibgls' interpreter
+recognises these commands, I can get it to make the conversion
+instead of trying to implement a method within \TeX:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[entries]{src},
+  \csopt[\field{name}=\field{user1}]{replicate-fields},
+  \csopt[fallback]{replicate-missing-field-action},
+  \csopt[\field{user1}]{interpret-fields}
+}
+\end{codeenv}
+This first copies the \field{name} field to one of the custom fields
+(\field{user1}) and then interprets the custom field. This leaves
+the \field{name} field with the \LaTeX\ code to produce the symbol
+in the document, but the \field{user1} field ends up with all markup
+stripped by the interpreter and the \cs{pi} and \cs{sigma} are
+converted to the Unicode characters \hex{1D70B} (mathematical italic
+small pi) and \hex{1D70E} (mathematical italic small sigma). With
+\XeLaTeX\ or \LuaLaTeX\ these characters can be written to the PDF
+bookmarks by adjusting the definition of my custom command:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{definition}}[1]\marg{\comment{}
+  \cs{ifglsentryexists}\marg{\idx{param}1}\comment{}
+  \marg{\comment{}
+    \cs{section}
+    \oarg{\cs{texorpdfstring}\marg{\cs{glsentryname}\marg{\idx{param}1}}\marg{\cs{glsentryuseri}\marg{\idx{param}1}}}
+    \marg{\cs{glsadd}\marg{\idx{param}1}\cs{glsxtrglossentry}\marg{\idx{param}1}}\comment{}
+    \cs{Glossentrydesc}\marg{\idx{param}1}\cs{glspostdescription}
+  }\comment{}
+  \marg{\cs{section}\oarg{Missing `\idx{param}1'}\marg{\cs{glsadd}\marg{\idx{param}1}}}%
+}
+\end{codeenv}
+
 \optsection[\subsubsection]{date-time-fields}
 
 This option indicates that the listed fields all contain 
@@ -9355,7 +9467,7 @@ fields parsed according to \csopt{dual-date-time-field-format} and
 \csopt{dual-date-time-field-locale}. If the field value is missing
 or doesn't match the given pattern it remains unchanged, otherwise
 it's converted into the form:
-\format{bibglsdatetime}
+\nosecdef{bibglsdatetime}
 where \meta{original} is the value of the field before conversion.
 If the interpreter is on, the value will be interpreted before
 being parsed if it contains \idx{escchar}, \idx{mshiftchar},
