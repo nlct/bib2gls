@@ -37,6 +37,7 @@ import com.dickimawbooks.texparserlib.aux.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.generic.Nbsp;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
+import com.dickimawbooks.texparserlib.latex.MissingValue;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
@@ -248,7 +249,7 @@ public class GlsResource
          }
          else if (opt.equals("replicate-fields"))
          {
-            fieldCopies = getHashMapVector(parser, list, opt);
+            fieldCopies = getHashMapVector(parser, list, opt, true);
          }
          else if (opt.equals("replicate-override"))
          {
@@ -389,7 +390,7 @@ public class GlsResource
          }
          else if (opt.equals("field-case-change"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
 
             if (array == null)
             {
@@ -457,7 +458,7 @@ public class GlsResource
          }
          else if (opt.equals("encapsulate-fields"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
 
             if (array == null)
             {
@@ -505,7 +506,7 @@ public class GlsResource
          }
          else if (opt.equals("encapsulate-fields*"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
 
             if (array == null)
             {
@@ -612,7 +613,7 @@ public class GlsResource
          }
          else if (opt.equals("match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
             notMatch = false;
 
             if (array == null)
@@ -678,7 +679,7 @@ public class GlsResource
          }
          else if (opt.equals("not-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
             notMatch = true;
 
             if (array == null)
@@ -793,7 +794,7 @@ public class GlsResource
          }
          else if (opt.equals("sort-label-list"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt);
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
 
             if (array == null || array.length == 0)
             {
@@ -823,31 +824,34 @@ public class GlsResource
          }
          else if (opt.equals("labelify"))
          {
-            labelifyFields = getFieldArray(parser, list, opt);
+            labelifyFields = getFieldArray(parser, list, opt, true);
          }
          else if (opt.equals("labelify-list"))
          {
-            labelifyListFields = getFieldArray(parser, list, opt);
+            labelifyListFields = getFieldArray(parser, list, opt, true);
          }
          else if (opt.equals("labelify-replace"))
          {
-            labelifyReplaceMap = getSubstitutionList(parser, list, opt);
+            labelifyReplaceMap = getSubstitutionList(parser, list, opt, true);
          }
          else if (opt.equals("dependency-fields"))
          {
-            dependencyListFields = getFieldArray(parser, list, opt);
+            dependencyListFields = getFieldArray(parser, list, opt, true);
          }
          else if (opt.equals("sort-replace"))
          {
-            sortSettings.setRegexList(getSubstitutionList(parser, list, opt));
+            sortSettings.setRegexList(
+              getSubstitutionList(parser, list, opt, true));
          }
          else if (opt.equals("dual-sort-replace"))
          {
-            dualSortSettings.setRegexList(getSubstitutionList(parser, list, opt));
+            dualSortSettings.setRegexList(
+              getSubstitutionList(parser, list, opt, true));
          }
          else if (opt.equals("secondary-sort-replace"))
          {
-            secondarySortSettings.setRegexList(getSubstitutionList(parser, list, opt));
+            secondarySortSettings.setRegexList(
+              getSubstitutionList(parser, list, opt, true));
          }
          else if (opt.equals("interpret-preamble"))
          {
@@ -2154,7 +2158,7 @@ public class GlsResource
          }
          else if (opt.equals("interpret-fields"))
          {
-            interpretFields = getFieldArray(parser, list, opt);
+            interpretFields = getFieldArray(parser, list, opt, true);
 
             if (interpretFields != null && !bib2gls.useInterpreter())
             {
@@ -2164,7 +2168,7 @@ public class GlsResource
          }
          else if (opt.equals("bibtex-contributor-fields"))
          {
-            bibtexAuthorList = getFieldArray(parser, list, opt);
+            bibtexAuthorList = getFieldArray(parser, list, opt, true);
          }
          else if (opt.equals("contributor-order"))
          {
@@ -3349,7 +3353,7 @@ public class GlsResource
    {
       TeXObject obj = list.getValue(opt);
 
-      if (obj == null)
+      if (obj == null || obj instanceof MissingValue)
       {
          throw new IllegalArgumentException(
            bib2gls.getMessage("error.missing.value", opt));
@@ -3358,12 +3362,6 @@ public class GlsResource
       if (obj instanceof TeXObjectList)
       {
          obj = trimList((TeXObjectList)obj);
-
-         if (((TeXObjectList)obj).size() == 0)
-         {
-            throw new IllegalArgumentException(
-              bib2gls.getMessage("error.missing.value", opt));
-         }
       }
 
       return obj;
@@ -3374,7 +3372,7 @@ public class GlsResource
    {
       TeXObject obj = list.getValue(opt);
 
-      if (obj == null)
+      if (obj == null || obj instanceof MissingValue)
       {
          throw new IllegalArgumentException(
            bib2gls.getMessage("error.missing.value", opt));
@@ -3402,7 +3400,7 @@ public class GlsResource
    {
       TeXObject obj = list.getValue(opt);
 
-      if (obj == null) return defValue;
+      if (obj == null || obj instanceof MissingValue) return defValue;
 
       if (obj instanceof TeXObjectList)
       {
@@ -3663,7 +3661,23 @@ public class GlsResource
      String opt)
     throws IOException
    {
-      TeXObject object = list.getValue(opt);
+      return getStringArray(parser, list, opt, false);
+   }
+
+   private String[] getStringArray(TeXParser parser, KeyValList list, 
+     String opt, boolean isRequired)
+    throws IOException
+   {
+      TeXObject object;
+
+      if (isRequired)
+      {
+         object = getRequiredObject(parser, list, opt);
+      }
+      else
+      {
+         object = list.getValue(opt);
+      }
 
       if (object instanceof TeXObjectList)
       {
@@ -3698,10 +3712,10 @@ public class GlsResource
    }
 
    private String[] getFieldArray(TeXParser parser, KeyValList list, 
-     String opt)
+     String opt, boolean isRequired)
     throws IOException
    {
-      String[] array = getStringArray(parser, list, opt);
+      String[] array = getStringArray(parser, list, opt, isRequired);
 
       if (array == null)
       {
@@ -3722,10 +3736,19 @@ public class GlsResource
    }
 
    private TeXObject[] getTeXObjectArray(TeXParser parser, KeyValList list, 
-     String opt)
+     String opt, boolean isRequired)
     throws IOException
    {
-      TeXObject obj = list.getValue(opt);
+      TeXObject obj;
+
+      if (isRequired)
+      {
+         obj = getRequiredObject(parser, list, opt);
+      }
+      else
+      {
+         obj = list.getValue(opt);
+      }
 
       if (obj instanceof TeXObjectList)
       {
@@ -3920,10 +3943,10 @@ public class GlsResource
    }
 
    private HashMap<String,Vector<String>> getHashMapVector(TeXParser parser, 
-      KeyValList list, String opt)
+      KeyValList list, String opt, boolean isRequired)
     throws IOException
    {
-      TeXObject[] array = getTeXObjectArray(parser, list, opt);
+      TeXObject[] array = getTeXObjectArray(parser, list, opt, isRequired);
 
       if (array == null)
       {
@@ -3981,10 +4004,10 @@ public class GlsResource
    }
 
    private Vector<PatternReplace> getSubstitutionList(TeXParser parser, 
-      KeyValList list, String opt)
+      KeyValList list, String opt, boolean isRequired)
     throws IOException
    {
-      TeXObject[] array = getTeXObjectArray(parser, list, opt);
+      TeXObject[] array = getTeXObjectArray(parser, list, opt, isRequired);
 
       if (array == null)
       {

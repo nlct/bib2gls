@@ -6703,7 +6703,8 @@ be selected.
 \optsection{match}
 
 It's possible to filter the selection by matching field values.
-If \meta{\keyvallist} is empty no filtering will be applied, otherwise
+The value is required for this key but may be empty, which indicates 
+that the setting is switched off, otherwise
 \meta{\keyvallist} should be a \meta{key}=\meta{regexp} list, where
 \meta{key} is the name of a field or \optfmt{id} for the entry's
 label or \optfmt{entrytype} for the \bibgls\ entry type (as in
@@ -6780,11 +6781,11 @@ The default is \csopt[and]{match-op}.
 \optsection{not-match}
 
 If \csopt[\meta{\keyvallist}]{match} would cause an entry to be
-selected then \csopt[\meta{\keyvallist}]{not-match} would cause
-that entry to be ignored. If \meta{\keyvallist} is missing, the
-filtering is removed.  If you have both \csopt{match} and
-\csopt{not-match} in the same resource set, the last one listed
-takes precedence.
+selected then \csopt[\meta{\keyvallist}]{not-match} would cause that
+entry to be ignored.  The value is required for this key but may be
+empty, which indicates that the setting is switched off.  If you
+have both \csopt{match} and \csopt{not-match} in the same resource
+set, the last one listed takes precedence.
 
 \optsection{match-action}
 
@@ -7679,7 +7680,9 @@ This option should take a comma-separated list of recognised field names as the
 value. (If a field is present in both \csopt{labelify} and
 \csopt{labelify-list}, then \csopt{labelify-list} takes precedence.) 
 Note that if this setting is on, \idxpl{crossresourceref} aren't
-permitted. 
+permitted. The value is required for this key but may be empty,
+which indicates an empty set of fields (that is, the setting is 
+switched off).
 
 Each listed field will be converted into a string suitable
 for use as a label. (Not necessarily a glossary entry label, but
@@ -7786,7 +7789,11 @@ This option takes a comma-separated list as a value with each
 element in the list in the form \code{\margm{regex}\margm{replacement}}
 where \meta{regex} is a \idx{regex} (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}) and \meta{replacement}
-is the replacement text. Remember that the argument of
+is the replacement text. The value is required for this key but
+may be empty, which indicates that the
+setting is switched off.
+
+Remember that the argument of
 \gls{GlsXtrLoadResources} is expanded when written to the \ext{aux}
 file so take care to protect any special characters. For example, to
 match a literal \idx{full-stop} use \cs{cs.string}\idx{cs.period}
@@ -8136,12 +8143,14 @@ using \ics{GlsXtrSetField} after the entry definition.
 
 The \meta{list} should be a comma-separated list of fields that
 have values in the form \code{\oargm{tag}\meta{id-list}} where
-\meta{id-list} is a comma-separated list of entry labels. This
-makes those fields act like the \field{see} field by
+\meta{id-list} is a comma-separated list of entry labels. The value
+is required for this key but may be empty, which indicates an empty
+set of fields (that is, the setting is switched off).
+
+This setting makes those fields act like the \field{see} field by
 identifying the listed entries as dependencies, but the information
-isn't added to the cross-reference part of the location list.
-This action is performed after \csopt{labelify-list}, if that's also
-set.
+isn't added to the cross-reference part of the location list.  This
+action is performed after \csopt{labelify-list}, if that's also set.
 
 For example, suppose the file \filefmt{entries-en.bib} contains:
 \begin{codeenv}
@@ -8571,7 +8580,10 @@ The value of one field can be copied to other fields using
 this option where each \meta{key}\dequals\meta{value} pair
 is in the form
 \code{\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}}
-where all values are field names. This copies the contents
+where all values are field names. The value is required for this key
+but may be empty, which indicates that the setting is switched off.
+
+This option copies the contents
 of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
 (only if the target field isn't already set with
 \csopt[false]{replicate-override}). This action is
@@ -8922,7 +8934,8 @@ recognised by \bibgls' interpreter (such as those listed in
 \tableref{tab:bibglsdefs}).
 \end{itemize}
 The final \code{:\meta{csname}} part may be omitted if no command
-need be applied. (That is, sort by label.)
+need be applied. (That is, sort by label.) The value is required for this key but
+may be empty, which indicates the setting is switched off.
 
 The sorting options are as those for the main list.  For example,
 for entries in the primary list the break point is obtained from the
@@ -9228,7 +9241,10 @@ order isn't what you expect, check the transcript file for messages.
 \optsection[\subsubsection]{bibtex-contributor-fields}
 
 This option indicates that the listed fields all use \BibTeX's name
-syntax (as used in \BibTeX's \code{author} and \code{editor} fields).
+syntax (as used in \BibTeX's \code{author} and \code{editor} fields). The value is required for this key but
+may be empty, which indicates an empty set of fields (that is, the
+setting is switched off).
+
 The values of these fields will be converted into the form:
 \begin{codeenv}
 \gls{bibglscontributorlist}\margm{contributor list}\margm{n}
@@ -9338,7 +9354,11 @@ sort value.
 This option should take a comma-separated list of 
 \optfmt{\meta{field}\dequals\meta{cs-name-1arg}} values, where
 \meta{cs-name-1arg} is the name of a control sequence that takes
-one argument. During the processing stage, each field identified in
+one argument. The value is required for this key but
+may be empty, which indicates an empty set (that is, the
+setting is switched off). 
+
+During the processing stage, each field identified in
 the list (if defined) will have its value replaced with:
 \begin{codeenv}
 \cmd{\meta{cs-name-1arg}}\margm{value}
@@ -9356,7 +9376,11 @@ within the same \idx{resourceset} and is always performed before
 This option should take a comma-separated list of 
 \optfmt{\meta{field}\dequals\meta{cs-name-2arg}} values, where 
 \meta{cs-name-2arg} is the name of a control sequence that takes two
-arguments. During the processing stage, each field identified in the
+arguments. The value is required for this key but
+may be empty, which indicates an empty set (that is, the
+setting is switched off). 
+
+During the processing stage, each field identified in the
 list (if defined) will have its value replaced with:
 \begin{codeenv}
 \cmd{\meta{cs-name-2arg}}\margm{value}\margm{label}
@@ -9377,10 +9401,10 @@ same field is listed in both settings, its value will end up as:
 \optsection[\subsubsection]{interpret-fields}
 
 This option indicates that the listed fields should be replaced by
-their interpreted values. The value should be a comma-separated list
-of field names. If the list is empty, this action is switched off
-(default). Other fields not listed may still be interpreted
-depending on other settings.
+their interpreted values. The value is required for this key but
+may be empty, which indicates an empty set of fields (that is, the
+setting is switched off). Other fields not listed may still be
+interpreted depending on other settings.
 
 For example, suppose I have a file \filefmt{entries.bib} that
 contains definitions like:
@@ -10113,7 +10137,10 @@ This option may take one of the values described above.
 
 A general case-change instruction. The value should be a
 comma-separated list of \code{\meta{field}\dequals\meta{setting}} for each
-field that needs a case-change applied. The \meta{setting} should be
+field that needs a case-change applied.  The value is required for this key but
+may be empty, which indicates this option is switched off.
+
+The \meta{setting} should be
 the same as the permitted values for the above options. This
 option is applied after all fields have been parsed. If the
 specified field is missing, the fallback for that field (if known) is copied
@@ -12921,6 +12948,9 @@ and \csopt[\meta{boolean}]{secondary-trim-sort}.
 
 This option may be used to perform \idx{regex} substitutions
 on the sort value and has the same syntax as \csopt{labelify-replace}. 
+The value is required for this key but may be empty, which indicates
+that the setting is switched off.
+
 This action is done after the interpreter parses the
 sort value (if applicable) and before \csopt{sort-number-pad} (if
 applicable). For example, suppose the sort value is:
