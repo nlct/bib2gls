@@ -122,6 +122,8 @@
 \setabbreviationstyle{long-short-sc}
 \setabbreviationstyle[common]{short-sc-nolong}
 
+\glsxtrprovidestoragekey{unsortedprogeny}{}{}
+
 \GlsXtrLoadResources[
   entry-type-aliases={
    bibglscommand=dualindexentry,
@@ -141,7 +143,7 @@
    exampleentry=entry
   },
   field-aliases={topics=adoptparents},
-  replicate-fields={name=nametitle},
+  replicate-fields={name=nametitle,progeny=unsortedprogeny},
   field-case-change={nametitle=title},
   interpret-fields={nametitle},
   no-case-change-cs={fieldfmt,abbrstylefmt,glostylefmt},
@@ -381,8 +383,16 @@
   \texorpdfstring{\idx{abbrstyle.#1}}{#1}%
 }
 
+\newcommand*{\topicabbrstyle}[1]{%
+  \texorpdfstring{\idx[prefix=topic.]{abbrstyle.#1}}{#1}%
+}
+
 \newcommand*{\glostyle}[1]{%
   \texorpdfstring{\idx{glostyle.#1}}{#1}%
+}
+
+\newcommand*{\topicglostyle}[1]{%
+  \texorpdfstring{\idx[prefix=topic.]{glostyle.#1}}{#1}%
 }
 
 \newcommand*{\iglostyle}[1]{%
@@ -668,6 +678,12 @@
  \nopagebreak\par\hangindent2em\noindent\hspace{2em}\Glossentrydesc{#1}%
 }
 
+\newrobustcmd{\donote}[1]{%
+ \glsxtrifhasfield{note}{#1}%
+ {\nolinebreak\hfill\mbox{\normalfont\footnotesize\glscurrentfieldvalue}}%
+ {}%
+}
+
 \newglossarystyle{commandsummary}%
 {%
   \setglossarystyle{index}%
@@ -687,9 +703,7 @@
        \glshyperlink{\glscurrentfieldvalue}%
      }%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
-     \glsxtrifhasfield{note}{##1}%
-     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
-     {}%
+     \donote{##1}%
      \nopagebreak\par\hspace{10pt}%
      \Glossentrydesc{\glscurrentfieldvalue}%
      \ifglshasdesc{\glscurrentfieldvalue}{\@. }{}%
@@ -697,9 +711,7 @@
    {%
      {\let\csfmtfont\csfmtcolourfont\gls[hyper=false]{##1}}%
      \glsxtrifhasfield{useri}{##1}{\glscurrentfieldvalue}{}%
-     \glsxtrifhasfield{note}{##1}%
-     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
-     {}%
+     \donote{##1}%
      \nopagebreak\par\hspace{10pt}%
      \Glossentrydesc{##1}%
      \ifglshasdesc{##1}{\@. }{}%
@@ -731,22 +743,17 @@
        \glshyperlink{\glscurrentfieldvalue}%
      }%
      \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
-     \glsxtrifhasfield{note}{##2}%
-     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
-     {}%
+     \donote{##2}%
      \nopagebreak\par\hspace{20pt}%
-     \Glossentrydesc{\glscurrentfieldvalue}%
-     \ifglshasdesc{\glscurrentfieldvalue}{.}{}%
+     \ifglshasdesc{\glscurrentfieldvalue}%
+     {\Glossentrydesc{\glscurrentfieldvalue}.}{}%
    }%
    {%
      {\let\csfmtfont\csfmtcolourfont\gls[hyper=false]{##2}}%
      \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
-     \glsxtrifhasfield{note}{##2}%
-     {\nolinebreak\hfill\mbox{\footnotesize\glscurrentfieldvalue}}%
-     {}%
+     \donote{##2}%
      \nopagebreak\par\hspace{20pt}%
-     \Glossentrydesc{##2}%
-     \ifglshasdesc{##2}{.}{}%
+     \ifglshasdesc{##2}{\Glossentrydesc{##2}.}{}%
    }%
    \par\medskip
   }%
@@ -765,10 +772,13 @@
 \newcommand*{\printcommandsummary}{%
   \printunsrtglossary*[type=index,
     style=commandsummary,
-    title={Command Summary},
+    title={General Command Summary},
   ]%
   {%
-   \def\glossarypreamble{\texparserdefnotetarget}%
+   \def\glossarypreamble{This is an alphabetical summary of 
+    commands referenced in this document. See the
+    relevent user guides for further details.\endgraf\medskip
+    \texparserdefnotetarget}%
    \let\printunsrtglossaryentryprocesshook\commandsummaryhook
    \let\csref\cs
    \glsxtrlocalsetgrouptitle{glssymbols}{}%
@@ -793,7 +803,7 @@
 \newcommand{\iffirstprogeny}[2]{%
   \let\doiffirstprogeny\@secondoftwo
   \def\firstprogeny{}%
-  \glsxtrifhasfield*{progeny}{#1}%
+  \glsxtrifhasfield*{unsortedprogeny}{#1}%
   {%
     \edef\suppliedprogeny{#2}%
     \@for\thisprogeny:=\glscurrentfieldvalue\do{%
@@ -827,13 +837,13 @@
    \ifdefequal\glscurrentfieldvalue\glscurrententrylabel
    {}%
    {%
-     \par\nopagebreak\medskip\par 
+     \par\nopagebreak\medskip\par\footnotesize
      \ifstylecommand{#1}%
      {\summarysubheaderfont{Styles:}}%
      {\summarysubheaderfont{Topics:}}%
      \space
      \let\DTLlistformatitem\topicxrhandler
-     \DTLformatlist{\glscurrentfieldvalue}.
+     \DTLformatlist{\glscurrentfieldvalue}.\par
    }%
  }%
  {}%
@@ -842,12 +852,15 @@
 \newglossarystyle{commandtopic}%
 {%
   \setglossarystyle{index}%
-  \renewcommand*{\glossaryheader}{\raggedright}%
+  %\renewcommand*{\glossaryheader}{\raggedright}%
   \renewcommand*{\glsgroupheading}[1]{}%
   \renewcommand*{\glossentry}[2]{%
    \glsfieldfetch{##1}{nametitle}{\thisvalue}%
-   \hypertarget{topic.##1}{}%
-   \section*{\pdfbookmark[1]{\thisvalue}{topic.##1}\glsdisp{##1}{\thisvalue}}%
+   \section*{%
+     \raisebox{2ex}%
+     {\pdfbookmark[1]{\thisvalue}{topic.##1}\hypertarget{topic.##1}{}}%
+     \glsdisp{##1}{\thisvalue}\donote{##1}%
+   }%
    \expandafter\sectionmark\expandafter{\thisvalue}%
    \ifglshasdesc{##1}{\Glossentrydesc{##1}.}{}%
    \glsxtrifhasfield{seealso}{##1}%
@@ -861,9 +874,9 @@
    {}%
   }%
   \renewcommand*{\subglossentry}[3]{%
-   \hypertarget{topic.##2}{}%
    \glsifcategory{##2}{command}%
    {%
+     \glsdohypertarget{topic.##2}{\strut}%
      \glsxtrifhasfield*{progenitor}{##2}%
      {\let\originallabel\glscurrentfieldvalue}%
      {\def\originallabel{##2}}%
@@ -884,8 +897,10 @@
               \hyperlink{topic.\firstprogeny}{\glsentryname{\firstprogeny}}}%
             \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
             \glsxtrifhasfield{parent}{\firstprogeny}%
-            {\space(\emph{see} \hyperlink{topic.\glscurrentfieldvalue}%
-             {\glsentryname{\glscurrentfieldvalue}})}{}%
+            {\hfill
+             {\footnotesize\emph{see} \hyperlink{topic.\glscurrentfieldvalue}%
+             {\glsentryname{\glscurrentfieldvalue}}.}}
+            {}%
           }%
           \letcs\dothisentry{@gobble}%
         }%
@@ -893,7 +908,7 @@
      {\letcs\dothisentry{@firstofone}}%
      \dothisentry
      {%
-       \par 
+       \par\smallskip\par 
        % hyperlink to index:
        {\let\csfmtfont\csfmtcolourfont\gls[format=glsignore]{\originallabel}}%
        \glsxtrifhasfield{useri}{##2}{\glscurrentfieldvalue}{}%
@@ -904,15 +919,18 @@
        \ifglshasdesc{##2}{\Glossentrydesc{##2}.}{}%
        % Topics
        \listtopics\originallabel
-       \par\bigskip
+       \par\smallskip
      }%
    }%
    {%
      \glsfieldfetch{##2}{nametitle}{\thisvalue}%
-     \subsection*{\pdfbookmark[2]{\thisvalue}{topic.##2}%
-     \glsdisp{##2}{\thisvalue}}%
+     \subsection*{%
+       \raisebox{2ex}%
+       {\hypertarget{topic.##2}{}\pdfbookmark[2]{\thisvalue}{topic.##2}}%
+       \glsdisp{##2}{\thisvalue}\donote{##2}%
+     }%
      \expandafter\subsectionmark\expandafter{\thisvalue}%
-     \ifglshasdesc{##2}{\Glossentrydesc{##2}.\glspar\nopagebreak\medskip}{}%
+     \ifglshasdesc{##2}{\Glossentrydesc{##2}.\glspar\nopagebreak\smallskip}{}%
    }%
   }%
 }
@@ -940,17 +958,23 @@
   \automark[subsection]{section}%
   \printunsrtglossary*[type=index,
     style=commandtopic,
-    title={Summary by Topic of Commands Provided by 
-     \styfmt{glossaries}, \styfmt{glossaries-extra} and
-     Supplementary Glossary Packages},
-    toctitle={Summary by Topic},
+    title={Summary by Topic of Glossary Commands},
     label={sec:topics},
     nogroupskip,
     nonumberlist
   ]%
   {%
    \def\texparserdefprefix{topic.}%
-   \def\glossarypreamble{\texparserdefnotetarget}%
+   \def\glossarypreamble{This is a summary of commands provided
+    by \styfmt{glossaries}, \styfmt{glossaries-extra} and
+    their supplementary packages that may be useful to 
+    \bibgls\ users. Commands specific to other indexing methods
+    aren't listed unless they've been referenced in this manual.
+    See the appropriate user guides for further details.
+    \endgraf\medskip
+    \texparserdefnotetarget}%
+   \let\abbrstyle\topicabbrstyle
+   \let\glostyle\topicglostyle
    \let\printunsrtglossaryentryprocesshook\commandtopichook
    \let\csref\cs
   }%

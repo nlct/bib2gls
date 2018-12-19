@@ -107,7 +107,8 @@
 }
 
 @topic{formattingcommands,
-  name={formatting commands}
+  name={formatting commands},
+  text={formatting command}
 }
 
 @topic{abbreviationcommands,
@@ -167,7 +168,8 @@
 }
 
 @topic{assigncommands,
-  name={assignment commands}
+  name={assignment commands},
+  text={assignment command}
 }
 
 @topic{groupcommands,
@@ -179,7 +181,8 @@
 }
 
 @topic{casecommands,
-  name={case-changing commands}
+  name={case-changing commands},
+  text={case-changing command}
 }
 
 @topic{internalcommands,
@@ -187,11 +190,18 @@
 }
 
 @topic{auxcommands,
-  name={auxiliary file commands}
+  name={auxiliary file commands},
+  text={auxiliary file command}
+}
+
+@topic{capheadcommands,
+  name={caption or heading commands},
+  text={caption or heading command}
 }
 
 @topic{listcommands,
-  name={list commands (internal or comma-separated)}
+  name={list commands (internal or comma-separated)},
+  text={list command}
 }
 
 @topic{collationsubrules,
@@ -231,8 +241,8 @@
   text={shortcut command}
 }
 
-@topic{hooks}
-@topic{loops}
+@topic{hooks,name={hooks},text={hook}}
+@topic{loops,name={loops},text={loop}}
 @index{iteration,see={loops}}
 @indexplural{handler,seealso={loops}}
 @topic{indexing}
@@ -4942,7 +4952,13 @@ pages (not available in multi-column or certain other contexts)},
 
 @topic{abbreviationstyles,
   name={abbreviation styles},
-  text={abbreviation style}
+  text={abbreviation style},
+  description={abbreviation styles are set using
+  \ics{newabbreviation} and govern the format of commands like \ics{gls}
+  (display style) and \ics{glsxtrfull} (inline style). The
+  \styfmt{glossaries-extra} package comes with the file
+\href{http://mirrors.ctan.org/macros/latex/contrib/glossaries-extra/samples/sample-abbr-styles.pdf}{\filefmt{sample-abbr-styles.pdf}}
+  that demonstrates all predefined styles}
 }
 
 @abbreviationstyle{abbrstyle.long-short,
@@ -4953,6 +4969,7 @@ pages (not available in multi-column or certain other contexts)},
   Only the short form is shown on subsequent use. The
   \field{description} field is set to the long form},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5013,6 +5030,7 @@ pages (not available in multi-column or certain other contexts)},
    \abbrstyle{long-short} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5036,6 +5054,7 @@ pages (not available in multi-column or certain other contexts)},
   Only the short form is shown on subsequent use. The
   \field{description} field is set to the long form},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5056,6 +5075,7 @@ pages (not available in multi-column or certain other contexts)},
    \abbrstyle{short-long} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5084,6 +5104,7 @@ pages (not available in multi-column or certain other contexts)},
   \catattr{nohyperfirst} category attribute to \optfmt{true} for
   the entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5091,6 +5112,7 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{footnote}},
   description={an alias for \abbrstyle{short-footnote}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5146,6 +5168,7 @@ pages (not available in multi-column or certain other contexts)},
   \abbrstyle{short-footnote} the \catattr{nohyperfirst} attribute
   isn't changed},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04},
   parent={abbreviationstyles}
 }
 
@@ -5153,6 +5176,7 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{postfootnote}},
   description={an alias for \abbrstyle{short-postfootnote}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5168,6 +5192,7 @@ pages (not available in multi-column or certain other contexts)},
    This style sets the \catattr{regular} attribute to \optfmt{true} 
    for the entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04},
   parent={abbreviationstyles}
 }
 
@@ -5175,6 +5200,7 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{short}},
   description={an alias for \abbrstyle{short-nolong}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5183,6 +5209,7 @@ pages (not available in multi-column or certain other contexts)},
   description={this abbreviation style is like \abbrstyle{short-nolong} 
    but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -5205,6 +5232,7 @@ pages (not available in multi-column or certain other contexts)},
   the \catattr{regular} attribute to \optfmt{true} for the entry's
   category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5212,6 +5240,7 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{short-desc}},
   description={an alias for \abbrstyle{short-nolong-desc}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5220,6 +5249,7 @@ pages (not available in multi-column or certain other contexts)},
   description={this abbreviation style is like \abbrstyle{short-nolong-desc} 
    but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -5246,6 +5276,7 @@ pages (not available in multi-column or certain other contexts)},
    This style sets the \catattr{regular} attribute to \optfmt{true}
    for the entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.21+},
   parent={abbreviationstyles}
 }
 
@@ -5254,6 +5285,7 @@ pages (not available in multi-column or certain other contexts)},
   description={this abbreviation style is like \abbrstyle{nolong-short} 
    but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.21+},
   parent={abbreviationstyles}
 }
 
@@ -5269,6 +5301,7 @@ pages (not available in multi-column or certain other contexts)},
    parentheses. This style sets the \catattr{regular} attribute to 
    \optfmt{true} for the entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5276,6 +5309,7 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{long-desc}},
   description={an alias for \abbrstyle{long-noshort-desc}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5295,6 +5329,7 @@ pages (not available in multi-column or certain other contexts)},
   description={this abbreviation style is like \abbrstyle{long-noshort-desc} 
    but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -5310,6 +5345,7 @@ pages (not available in multi-column or certain other contexts)},
    This style sets the \catattr{regular} attribute to \optfmt{true} 
    for the entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5317,6 +5353,7 @@ pages (not available in multi-column or certain other contexts)},
   name={\abbrstylefmt{long}},
   description={an alias for \abbrstyle{long-noshort}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5325,6 +5362,7 @@ pages (not available in multi-column or certain other contexts)},
   description={this abbreviation style is like \abbrstyle{long-noshort} 
    but doesn't set the \catattr{regular} attribute to \optfmt{true}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -5345,6 +5383,7 @@ pages (not available in multi-column or certain other contexts)},
   but the short form is displayed in small-caps (so it needs to be
   in \idx{lowercase})},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5386,6 +5425,7 @@ short form using \cs{textsc}},
    \abbrstyle{long-short-sc} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5411,8 +5451,10 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong}},
   description={this abbreviation style is like \abbrstyle{short-nolong}
   but the short form is displayed in small-caps (so it needs to be
-  in \idx{lowercase})},
+  in \idx{lowercase}). This style sets the \catattr{regular}
+  attribute to \optfmt{true} for the entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5420,6 +5462,7 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{short\dhyphen sc}},
   description={an alias for \abbrstyle{short-sc-nolong}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5427,8 +5470,11 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{short\dhyphen sc\dhyphen nolong\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{short-sc-nolong} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5436,6 +5482,7 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{short\dhyphen sc\dhyphen desc}},
   description={an alias for \abbrstyle{short-sc-nolong-desc}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5443,8 +5490,11 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{nolong\dhyphen short\dhyphen sc}},
   description={this abbreviation style is like \abbrstyle{nolong-short}
   but the short form is displayed in small-caps (so it needs to be
-  in \idx{lowercase})},
+  in \idx{lowercase}). This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.21+},
   parent={abbreviationstyles}
 }
 
@@ -5452,8 +5502,11 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen sc}},
   description={this abbreviation style is like \abbrstyle{long-noshort}
   but the short form is displayed in small-caps (so it needs to be
-  in \idx{lowercase})},
+  in \idx{lowercase}). This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5461,8 +5514,11 @@ short form using \cs{textsc}},
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen sc\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{long-noshort-sc} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5472,6 +5528,7 @@ short form using \cs{textsc}},
   but the short form is displayed in small-caps (so it needs to be
   in \idx{lowercase})},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5481,6 +5538,7 @@ short form using \cs{textsc}},
   but the short form is displayed in small-caps (so it needs to be
   in \idx{lowercase})},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5489,6 +5547,7 @@ short form using \cs{textsc}},
   description={this abbreviation style is like \abbrstyle{long-short}
   but the short form is displayed using a smaller font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5528,6 +5587,7 @@ short form using \ics{textsmaller}},
    \abbrstyle{long-short-sm} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5536,6 +5596,7 @@ short form using \ics{textsmaller}},
   description={this abbreviation style is like \abbrstyle{short-long}
   but the short form is displayed using a smaller font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5545,14 +5606,18 @@ short form using \ics{textsmaller}},
    \abbrstyle{long-short-sm} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.short-sm-nolong,
   name={\abbrstylefmt{short\dhyphen sm\dhyphen nolong}},
   description={this abbreviation style is like \abbrstyle{short-nolong}
-  but the short form is displayed using a smaller font},
+  but the short form is displayed using a smaller font. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5560,6 +5625,7 @@ short form using \ics{textsmaller}},
   name={\abbrstylefmt{short\dhyphen sm}},
   description={an alias for \abbrstyle{short-sm-nolong}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5567,8 +5633,11 @@ short form using \ics{textsmaller}},
   name={\abbrstylefmt{short\dhyphen sm\dhyphen nolong\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{short-sm-nolong} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5576,22 +5645,29 @@ short form using \ics{textsmaller}},
   name={\abbrstylefmt{short\dhyphen sm\dhyphen desc}},
   description={an alias for \abbrstyle{short-sm-nolong-desc}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.nolong-short-sm,
   name={\abbrstylefmt{nolong\dhyphen short\dhyphen sm}},
   description={this abbreviation style is like \abbrstyle{nolong-short}
-  but the short form is displayed using a smaller font},
+  but the short form is displayed using a smaller font. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.21+},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.long-noshort-sm,
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen sm}},
   description={this abbreviation style is like \abbrstyle{long-noshort}
-  but the short form is displayed using a smaller font},
+  but the short form is displayed using a smaller font. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5599,8 +5675,11 @@ short form using \ics{textsmaller}},
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen sm\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{long-noshort-sm} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5609,6 +5688,7 @@ short form using \ics{textsmaller}},
   description={this abbreviation style is like \abbrstyle{short-footnote}
   but the short form is displayed in a smaller font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5617,6 +5697,7 @@ short form using \ics{textsmaller}},
   description={this abbreviation style is like \abbrstyle{short-postfootnote}
   but the short form is displayed in a smaller font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5625,6 +5706,7 @@ short form using \ics{textsmaller}},
   description={this abbreviation style is like \abbrstyle{long-short}
   but the short form is displayed using an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5683,6 +5765,7 @@ long form using \ics{emph}},
    \abbrstyle{long-short-em} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5691,6 +5774,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{long-short}
   but the short and long forms are displayed using an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5700,6 +5784,7 @@ long form using \ics{emph}},
    \abbrstyle{long-em-short-em} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5708,6 +5793,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{short-long}
   but the short form is displayed using an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5717,6 +5803,7 @@ long form using \ics{emph}},
    \abbrstyle{short-em-long} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5725,6 +5812,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{short-long}
   but the short and long forms are displayed using an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5734,14 +5822,18 @@ long form using \ics{emph}},
    \abbrstyle{short-em-long-em} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.short-em-nolong,
   name={\abbrstylefmt{short\dhyphen em\dhyphen nolong}},
   description={this abbreviation style is like \abbrstyle{short-nolong}
-  but the short form is displayed using an emphasized font},
+  but the short form is displayed using an emphasized font. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5749,6 +5841,7 @@ long form using \ics{emph}},
   name={\abbrstylefmt{short\dhyphen em}},
   description={an alias for \abbrstyle{short-em-nolong}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
@@ -5756,8 +5849,11 @@ long form using \ics{emph}},
   name={\abbrstylefmt{short\dhyphen em\dhyphen nolong\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{short-em-nolong} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5765,30 +5861,40 @@ long form using \ics{emph}},
   name={\abbrstylefmt{short\dhyphen em\dhyphen desc}},
   description={an alias for \abbrstyle{short-em-nolong-desc}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.nolong-short-em,
   name={\abbrstylefmt{nolong\dhyphen short\dhyphen em}},
   description={this abbreviation style is like \abbrstyle{nolong-short}
-  but the short form is displayed using an emphasized font},
+  but the short form is displayed using an emphasized font. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.21+},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.long-noshort-em,
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen em}},
   description={this abbreviation style is like \abbrstyle{long-noshort}
-  but the short form is displayed using an emphasized font},
+  but the short form is displayed using an emphasized font. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.long-em-noshort-em,
   name={\abbrstylefmt{long\dhyphen em\dhyphen noshort\dhyphen em}},
   description={this abbreviation style is like \abbrstyle{long-noshort}
-  but the long and short forms are displayed using an emphasized font},
+  but the long and short forms are displayed using an emphasized font.
+  This style sets the \catattr{regular} attribute to \optfmt{true} for the 
+  entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5797,6 +5903,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{long-noshort-noreg}
   but the long and short forms are displayed using an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -5804,8 +5911,11 @@ long form using \ics{emph}},
   name={\abbrstylefmt{long\dhyphen noshort\dhyphen em\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{long-noshort-em} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5813,8 +5923,11 @@ long form using \ics{emph}},
   name={\abbrstylefmt{long\dhyphen em\dhyphen noshort\dhyphen em\dhyphen desc}},
   description={this abbreviation style is like the
    \abbrstyle{long-em-noshort-em} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This style 
+   sets the \catattr{regular} attribute to \optfmt{true} for the 
+   entry's category},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5824,6 +5937,7 @@ long form using \ics{emph}},
    \abbrstyle{long-em-noshort-em-noreg} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -5832,6 +5946,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{short-footnote}
   but the short form is displayed in an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5840,6 +5955,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{short-postfootnote}
   but the short form is displayed in an emphasized font},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5848,6 +5964,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{long-short}
   but the parenthetical material is governed by \cs{glsxtruserparen}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -5941,6 +6058,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{long-short-user}
   but the parenthetical material is moved to the \idx{postlinkhook}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.12+},
   parent={abbreviationstyles}
 }
 
@@ -5962,6 +6080,7 @@ long form using \ics{emph}},
    \abbrstyle{long-postshort-user} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.12+},
   parent={abbreviationstyles}
 }
 
@@ -5970,6 +6089,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{short-long-user}
   but the parenthetical material is moved to the \idx{postlinkhook}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.12+},
   parent={abbreviationstyles}
 }
 
@@ -5991,6 +6111,7 @@ long form using \ics{emph}},
    \abbrstyle{short-postlong-user} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.12+},
   parent={abbreviationstyles}
 }
 
@@ -6000,6 +6121,7 @@ long form using \ics{emph}},
    \abbrstyle{long-short-user} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -6008,6 +6130,7 @@ long form using \ics{emph}},
   description={this abbreviation style is like \abbrstyle{short-long}
   but the parenthetical material is governed by \cs{glsxtruserparen}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -6017,6 +6140,7 @@ long form using \ics{emph}},
    \abbrstyle{short-long-user} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.04+},
   parent={abbreviationstyles}
 }
 
@@ -6030,6 +6154,7 @@ hyphen}},
   \cs{gls}) starts with a hyphen. If it does, the insert is added to
   the parenthetical material},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6109,13 +6234,14 @@ hyphen\dhyphen desc}},
    \abbrstyle{long-hyphen-short-hyphen} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
 @abbrvstylecommand{glsxtrlonghyphennoshort,
   name={\csfmt{gls\-xtr\-long\-hyphen\-noshort}},
   user1={\margm{label}\margm{long}\margm{insert}},
-  description={used by the \qt{hyphen-noshort} abbreviation styles
+  description={used by the \abbrstyle{long-hyphen-noshort-desc-noreg} style
   to format the \idx{firstuse} form},
   topics={abbrstyle.long-hyphen-noshort-desc-noreg},
   note={\styfmt{glossaries-extra} v1.17+},
@@ -6126,8 +6252,11 @@ hyphen\dhyphen desc}},
   name={\abbrstylefmt{long\dhyphen hyphen\dhyphen noshort\dhyphen desc\dhyphen noreg}},
   description={this abbreviation style is like the
    \abbrstyle{long-hyphen-noshort-noreg} style but the \field{description}
-   field must be provided in the entry definition},
+   field must be provided in the entry definition. This
+  style won't work with the \catattr{regular} attribute set, as the
+  regular form isn't flexible enough},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6135,8 +6264,11 @@ hyphen\dhyphen desc}},
   name={\abbrstylefmt{long\dhyphen hyphen\dhyphen noshort\dhyphen noreg}},
   description={this abbreviation style is like \abbrstyle{long-noshort}
   but is designed to work with the \catattr{markwords} attribute and 
-  the \catattr{regular} attribute isn't set to \optfmt{true}},
+  the \catattr{regular} attribute isn't set to \optfmt{true}. This
+  style won't work with the \catattr{regular} attribute set, as the
+  regular form isn't flexible enough},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6146,6 +6278,7 @@ hyphen\dhyphen desc}},
    \abbrstyle{long-hyphen-short-hyphen} style but the insert and
    parenthetical material are moved into the \idx{postlinkhook}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6187,6 +6320,7 @@ hyphen\dhyphen desc}},
    \abbrstyle{long-hyphen-postshort-hyphen} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6199,6 +6333,7 @@ hyphen\dhyphen desc}},
   \cs{gls}) starts with a hyphen. If it does, the insert is added to
   the parenthetical material},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6219,6 +6354,7 @@ hyphen\dhyphen desc}},
    \abbrstyle{short-hyphen-long-hyphen} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6228,6 +6364,7 @@ hyphen\dhyphen desc}},
    \abbrstyle{short-hyphen-long-hyphen} style but the insert and
    parenthetical material are moved into the \idx{postlinkhook}},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6258,12 +6395,18 @@ hyphen\dhyphen desc}},
    \abbrstyle{short-hyphen-postlong-hyphen} style but the \field{description}
    field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
 @abbreviationstyle{abbrstyle.long-only-short-only,
   name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only}},
+  description={this abbreviation style only displays the long form
+  on \idx{firstuse} and only the short form on subsequent use. The
+  inline full form shows the long form followed by the short form in
+  parentheses},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
@@ -6272,6 +6415,16 @@ hyphen\dhyphen desc}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
 short form},
+  topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsfirstabbrvonlyfont,
+  name={\csfmt{gls\-first\-abbrv\-only\-font}},
+  user1={\margm{text}},
+  description={used with \qt{only} abbreviation styles to format the
+short form on \idx{firstuse}},
   topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -6287,19 +6440,153 @@ long form},
   category={command}
 }
 
+@abbrvstylecommand{glsfirstlongonlyfont,
+  name={\csfmt{gls\-first\-long\-only\-font}},
+  user1={\margm{text}},
+  description={used with \qt{only} abbreviation styles to format the
+long form on \idx{firstuse}},
+  topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtronlysuffix,
+  name={\csfmt{gls\-xtr\-only\-suffix}},
+  description={the suffix used to construct the plural for
+   the short form of abbreviations with the \qt{only} styles},
+  topics={abbrstyle.long-only-short-only},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtronlyname,
+  name={\csfmt{gls\-xtr\-only\-name}},
+  description={hook for the \abbrstyle{long-only-short-only} style
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the short form)},
+  topics={abbrstyle.long-only-short-only},
+  note={\styfmt{glossaries-extra} v1.25+},
+  category={command}
+}
+
+@abbrvstylecommand{glsxtronlydescname,
+  name={\csfmt{gls\-xtr\-only\-\-name}},
+  description={hook for the \abbrstyle{long-only-short-only-desc} style
+  that expands to the value that the \field{name} field is assigned
+  to when the abbreviation is defined with \cs{newabbreviation} 
+  (defaults to the long form)},
+  topics={abbrstyle.long-only-short-only},
+  note={\styfmt{glossaries-extra} v1.17+},
+  category={command}
+}
+
 @abbreviationstyle{abbrstyle.long-only-short-only-desc,
   name={\abbrstylefmt{long\dhyphen only\dhyphen short\dhyphen only\dhyphen desc}},
+  description={this abbreviation style is like the
+   \abbrstyle{long-only-short-only} style but the \field{description}
+   field must be provided in the entry definition},
   category={abbreviationstyle},
+  note={\styfmt{glossaries-extra} v1.17+},
   parent={abbreviationstyles}
 }
 
 @topic{glossarystyle,
   name={glossary styles},
-  text={glossary style}
+  text={glossary style},
+  description={glossary styles are set using \ics{setglossarystyle} 
+  or with the \styopt{style} package option or the
+  \printglossopt{style} option in \cs{printunsrtglossary}. 
+  There are a number of styles provided in the supplementary packages. See the
+\href{https://www.dickimaw-books.com/gallery/glossaries-styles/}{\styfmt{glossaries}
+  gallery of predefined styles}~\cite{glossarystylesgallery} for
+  samples of each style}
+}
+
+@glossarystyle{glostyle.inline,
+  name={\glostylefmt{inline}},
+  description={this style is designed for inline glossaries. The
+  \field{symbol}, \idx{locationlist} and child \field{name} are omitted 
+  by default, but associated style commands may be redefined to
+  change this},
+  category={glossarystyle},
+  note={\styfmt{glossary-inline} v3.03+},
+  parent={glossarystyle}
+}
+
+@glostylecommand{glsinlinedopostchild,
+  name={\csfmt{gls\-in\-line\-do\-post\-child}},
+  description={group headings aren't supported by default, but if
+  they are required, this command should be added to start of the definition
+  of \cs{glsgroupheading} in case a heading follows a child entry},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glsinlineseparator,
+  name={\csfmt{gls\-in\-line\-separator}},
+  description={separator between entries},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glsinlinesubseparator,
+  name={\csfmt{gls\-in\-line\-sub\-separator}},
+  description={separator between sub-entries},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glsinlineparentchildseparator,
+  name={\csfmt{gls\-in\-line\-parent\-child\-separator}},
+  description={separator between parent and child entries},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glsinlinepostchild,
+  name={\csfmt{gls\-in\-line\-post\-child}},
+  description={hook between child and next entry},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glspostinline,
+  name={\csfmt{gls\-post-in\-line}},
+  description={glossary terminator},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glsinlinenameformat,
+  name={\csfmt{gls\-in\-line\-name\-format}},
+  user1={\margm{label}\margm{name}},
+  description={format's the entry's name including target, if
+  supported},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
+}
+
+@glostylecommand{glsinlinedescformat,
+  name={\csfmt{gls\-in\-line\-desc\-format}},
+  user1={\margm{description}\margm{symbol}\margm{location list}},
+  description={format's the entry's description, symbol and location
+  list. This ignores the symbol and location by default},
+  category={command},
+  note={\styfmt{glossary-inline} v3.03+},
+  topics={glostyle.inline}
 }
 
 @glossarystyle{glostyle.indexgroup,
   name={\glostylefmt{indexgroup}},
+  description={},
   category={glossarystyle},
   note={\styfmt{glossary-tree}},
   parent={glossarystyle}
@@ -11160,26 +11447,6 @@ can be referenced in \meta{true} or \meta{false} with
   category={command}
 }
 
-@glscommand{glsxtronlyname,
-  name={\csfmt{gls\-xtr\-only\-name}},
-  user1={},
-  description={governs the way the \field{name} field is set
-   by the \abbrstyle{long-only-short-only} abbreviation styles},
-  topics={abbreviationcommands,glossarystylecommands},
-  note={\styfmt{glossaries-extra} v1.25+},
-  category={command}
-}
-
-@glscommand{glsxtronlydescname,
-  name={\csfmt{gls\-xtr\-only\-desc\-name}},
-  user1={},
-  description={governs the way the \field{name} field is set
-   by the \abbrstyle{long-only-short-only} abbreviation styles},
-  topics={abbreviationcommands,glossarystylecommands},
-  note={\styfmt{glossaries-extra} v1.17+},
-  category={command}
-}
-
 @glscommand{glsaddkey,
   name={\csfmt{gls\-add\-key}},
   user1={\margm{key}\margm{default value}\margm{no link cs}\margm{no link ucfirst cs}\margm{link cs}\margm{link ucfirst cs}\margm{link allcaps cs}},
@@ -14857,7 +15124,8 @@ number is hexadecimal)},
   description={typesets \meta{text} in an upright font (used to
 cancel the effect of \cs{textsc} in abbreviation styles that use
 \ics{glsabbrvscfont})},
-  note={\styfmt{relsize}},
+  note={\styfmt{glossaries} v3.09a+},
+  topics={abbreviationcommands,formattingcommands},
   category={command}
 }
 
@@ -15556,7 +15824,7 @@ to use in the header (leave empty for default)},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the short form of the given abbreviation},
-  topics={formattingcommands,entryrefcommands,fieldrefcommands,abbreviationcommands},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,abbreviationcommands,capheadcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -15566,7 +15834,7 @@ displays the short form of the given abbreviation},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the long form of the given abbreviation},
-  topics={formattingcommands,entryrefcommands,fieldrefcommands,abbreviationcommands},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,abbreviationcommands,capheadcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -15575,8 +15843,9 @@ displays the long form of the given abbreviation},
   name={\csfmt{gls\-fmt\-full}},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
-displays the full form of the given abbreviation},
-  topics={formattingcommands,entryrefcommands,abbreviationcommands},
+  displays the full form of the given abbreviation (using the inline
+  style that matches \cs{glsxtrfull})},
+  topics={formattingcommands,entryrefcommands,abbreviationcommands,capheadcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -15586,7 +15855,7 @@ displays the full form of the given abbreviation},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the given entry's name},
-  topics={formattingcommands,entryrefcommands,fieldrefcommands},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,capheadcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -15596,7 +15865,7 @@ displays the given entry's name},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the given entry's \field{first} field},
-  topics={formattingcommands,entryrefcommands,fieldrefcommands},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,capheadcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -15606,7 +15875,7 @@ displays the given entry's \field{first} field},
   user1={\margm{label}},
   description={provided for use in section or caption titles, this
 displays the given entry's \field{text} field},
-  topics={formattingcommands,entryrefcommands,fieldrefcommands},
+  topics={formattingcommands,entryrefcommands,fieldrefcommands,capheadcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
