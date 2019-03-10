@@ -466,6 +466,33 @@ Use {1} {0} instead.</entry>
     The following messages are used by convertgls2bib
 -->
 
+<entry key="gls2bib.missing.encoding.value">Missing &lt;encoding&gt; after {0}</entry>
+<entry key="gls2bib.missing.arg.value">Missing &lt;value&gt; after {0}</entry>
+<entry key="gls2bib.unknown.arg">Unknown option: {0}
+Use {1} for help.</entry>
+<entry key="gls2bib.toomany.arg">Too many arguments.
+Use {0} for help.</entry>
+<entry key="gls2bib.missing.tex.arg">Missing &lt;tex file&gt;.
+Syntax: {0}
+Use {1} for help.</entry>
+<entry key="gls2bib.missing.bib.arg">Missing &lt;bib file&gt;
+Syntax: {0}
+Use {1} for help.</entry>
+<entry key="gls2bib.syntax">{0} [&lt;options&gt;] &lt;tex file&gt; &lt;bib file&gt;</entry>
+
+<entry key="gls2bib.syntax.options">Options:</entry>
+<entry key="gls2bib.syntax.version">{0} (or {1})	Display version information</entry>
+<entry key="gls2bib.syntax.help">{0} (or {1})	Display help</entry>
+<entry key="gls2bib.syntax.texenc">{0} &lt;encoding&gt;	.tex file encoding</entry>
+<entry key="gls2bib.syntax.bibenc">{0} &lt;encoding&gt;	.bib file encoding</entry>
+<entry key="gls2bib.syntax.ignore-sort">{0} 		Ignore sort field (default)</entry>
+<entry key="gls2bib.syntax.no-ignore-sort">{0} 		Don''t ignore sort field</entry>
+<entry key="gls2bib.syntax.space-sub">{0} &lt;value&gt;	Substitute spaces in labels with &lt;value&gt;</entry>
+<entry key="gls2bib.syntax.locale">{0} &lt;lang tag&gt;	Use language resource file given by &lt;lang tag&gt; for messages.</entry>
+<entry key="gls2bib.syntax.silent">{0}		Suppress messages.</entry>
+<entry key="gls2bib.syntax.verbose">{0}		Normal messages.</entry>
+<entry key="gls2bib.syntax.debug">{0}		Debug mode.</entry>
+
 <entry key="gls2bib.override.newdualentry">Overriding default definition of \newdualentry with custom 
 definition. (Change \newcommand to \providecommand if you want 
 \newdualentry[options]'{'label'}{'short'}{'long'}{'description'}'

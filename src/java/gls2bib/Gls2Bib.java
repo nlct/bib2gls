@@ -50,6 +50,23 @@ import com.dickimawbooks.texparserlib.latex.NewCommand;
 public class Gls2Bib extends LaTeXParserListener
   implements Writeable,TeXApp
 {
+   public Gls2Bib(String[] args, String langTag, int verbose)
+    throws Gls2BibException,IOException
+   {
+      super(null);
+
+      this.verboseLevel = verbose;
+      initMessages(langTag);
+
+      parseArgs(args);
+
+      initKeyToFieldMap();
+
+      setWriteable(this);
+
+      texParser = new TeXParser(this);
+   }
+
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
      String outCharset, String spaceSub, String langTag, boolean ignoreSort, int verbose)
     throws Gls2BibException,IOException
@@ -877,9 +894,9 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
-   public static void version()
+   public void version()
    {
-      System.out.format("convertgls2bib v%s (%s)%n", VERSION, DATE);
+      System.out.format("%s v%s (%s)%n", APP_NAME, VERSION, DATE);
       System.out.format("Copyright 2017-%s Nicola Talbot%n", 
         DATE.substring(0,4));
       System.out.print("License GPLv3+: GNU GPL version 3 or later");
@@ -890,35 +907,42 @@ public class Gls2Bib extends LaTeXParserListener
 
    }
 
-   public static void help()
+   public void help()
    {
-      System.out.println(
-        "convertgls2bib [<options>] <tex file> <bib file>");
-      System.out.println("Options:");
+      System.out.println(getMessage("gls2bib.syntax", APP_NAME));
+      System.out.println(getMessage("gls2bib.syntax.options"));
 
-      System.out.println("--version (or -v)\tDisplay version information");
-      System.out.println("--help (or -h)\t\tDisplay help");
-      System.out.println("--texenc <encoding>\t.tex file encoding");
-      System.out.println("--bibenc <encoding>\t.bib file encoding");
-      System.out.println("--ignore-sort\t\tignore sort field (default)");
-      System.out.println("--no-ignore-sort\tdon't ignore sort field");
-      System.out.println("--space-sub <value>\tsubstitute spaces in labels with <value>");
-      System.out.println("--locale <lang tag>\tuse language resource file for locale given by <lang tag>");
-      System.out.println("--silent\t\tsuppress messages");
-      System.out.println("--verbose\t\tnormal messages");
-      System.out.println("--debug\t\t\tdebug mode");
+      System.out.println(getMessage("gls2bib.syntax.version", "--version",
+       "-v"));
+      System.out.println(getMessage("gls2bib.syntax.help", "--help", "-h"));
+      System.out.println(getMessage("gls2bib.syntax.texenc", "--texenc"));
+      System.out.println(getMessage("gls2bib.syntax.bibenc", "--bibenc"));
+      System.out.println(getMessage("gls2bib.syntax.ignore-sort",
+        "--ignore-sort"));
+      System.out.println(getMessage("gls2bib.syntax.no-ignore-sort",
+        "--no-ignore-sort"));
+      System.out.println(getMessage("gls2bib.syntax.space-sub",
+        "--space-sub"));
+      System.out.println(getMessage("gls2bib.syntax.locale",
+        "--locale"));
+      System.out.println(getMessage("gls2bib.syntax.silent",
+        "--silent"));
+      System.out.println(getMessage("gls2bib.syntax.verbose",
+        "--verbose"));
+      System.out.println(getMessage("gls2bib.syntax.debug",
+        "--debug"));
    }
 
-   public static void main(String[] args)
+   protected void parseArgs(String[] args)
+    throws Gls2BibSyntaxException
    {
-      String texFile = null;
-      String bibFile = null;
-      String texCharset = null;
-      String bibCharset = null;
-      String spaceSub = null;
-      String langTag = null;
-      boolean ignoreSort = true;
-      int verbose = NORMAL;
+      texFile = null;
+      bibFile = null;
+      spaceSub = null;
+
+      charset = Charset.defaultCharset();
+      bibCharsetName = null;
+      ignoreSortField = true;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -936,31 +960,112 @@ public class Gls2Bib extends LaTeXParserListener
          {
             if (i == args.length-1)
             {
-               System.err.println("Missing <encoding> after "+args[i]);
-               System.exit(1);
+               throw new Gls2BibSyntaxException(
+                  getMessage("gls2bib.missing.encoding.value",
+                  args[i]));
             }
 
-            texCharset = args[++i];
+            charset = Charset.forName(args[++i]);
          }
          else if (args[i].equals("--bibenc"))
          {
             if (i == args.length-1)
             {
-               System.err.println("Missing <encoding> after "+args[i]);
-               System.exit(1);
+               throw new Gls2BibSyntaxException(
+                  getMessage("gls2bib.missing.encoding.value",
+                  args[i]));
             }
 
-            bibCharset = args[++i];
+            bibCharsetName = args[++i];
          }
          else if (args[i].equals("--space-sub"))
          {
             if (i == args.length-1)
             {
-               System.err.println("Missing <value> after "+args[i]);
-               System.exit(1);
+               throw new Gls2BibSyntaxException(
+                  getMessage("gls2bib.missing.arg.value",
+                  args[i]));
             }
 
             spaceSub = args[++i];
+
+            if (" ".equals(spaceSub))
+            {
+               spaceSub = null;
+            }
+         }
+         else if (args[i].equals("--locale"))
+         {
+            // already read this value in main(String[]).
+            i++;
+         }
+         else if (args[i].equals("--ignore-sort"))
+         {
+            ignoreSortField = true;
+         }
+         else if (args[i].equals("--no-ignore-sort"))
+         {
+            ignoreSortField = false;
+         }
+         else if (args[i].equals("--debug")
+               || args[i].equals("--silent")
+               || args[i].equals("--verbose"))
+         {// skip (already checked in main(String[]))
+         }
+         else if (args[i].startsWith("-"))
+         {
+            throw new Gls2BibSyntaxException(
+               getMessage("gls2bib.unknown.arg",
+               args[i], "--help"));
+         }
+         else if (texFile == null)
+         {
+            texFile = new File(args[i]);
+         }
+         else if (bibFile == null)
+         {
+            bibFile = new File(args[i]);
+         }
+         else
+         {
+            throw new Gls2BibSyntaxException(
+               getMessage("gls2bib.toomany.arg", "--help"));
+         }
+      }
+
+      if (texFile == null)
+      {
+          throw new Gls2BibSyntaxException(getMessage("gls2bib.missing.tex.arg",
+            getMessage("gls2bib.syntax", APP_NAME), "--help"));
+      }
+
+      if (bibFile == null)
+      {
+          throw new Gls2BibSyntaxException(getMessage("gls2bib.missing.bib.arg",
+            getMessage("gls2bib.syntax", APP_NAME), "--help"));
+      }
+
+      if (bibCharsetName == null)
+      {
+         bibCharsetName = charset.name();
+      }
+   }
+
+   public static void main(String[] args)
+   {
+      // Just check for verbosity and language tag.
+      // The rest is checked after the message system has been
+      // initialised.
+      String langTag = null;
+      int verbose = NORMAL;
+
+      for (int i = 0; i < args.length; i++)
+      {
+         if (args[i].equals("--texenc")
+          || args[i].equals("--bibenc")
+          || args[i].equals("--space-sub"))
+         {// skip 1 argument
+            i++;
          }
          else if (args[i].equals("--locale"))
          {
@@ -971,14 +1076,6 @@ public class Gls2Bib extends LaTeXParserListener
             }
 
             langTag = args[++i];
-         }
-         else if (args[i].equals("--ignore-sort"))
-         {
-            ignoreSort = true;
-         }
-         else if (args[i].equals("--no-ignore-sort"))
-         {
-            ignoreSort = false;
          }
          else if (args[i].equals("--debug"))
          {
@@ -992,48 +1089,18 @@ public class Gls2Bib extends LaTeXParserListener
          {
             verbose = NORMAL;
          }
-         else if (args[i].startsWith("-"))
-         {
-            System.err.println("Unknown option: "+args[i]);
-            System.err.println("Use --help for help.");
-            System.exit(1);
-         }
-         else if (texFile == null)
-         {
-            texFile = args[i];
-         }
-         else if (bibFile == null)
-         {
-            bibFile = args[i];
-         }
-         else
-         {
-            System.err.println("Too many arguments");
-            System.err.println("Use --help for help.");
-            System.exit(1);
-         }
-      }
-
-      if (texFile == null)
-      {
-          System.err.println("Missing <tex file>");
-          help();
-          System.exit(1);
-      }
-
-      if (bibFile == null)
-      {
-          System.err.println("Missing <bib file>");
-          help();
-          System.exit(1);
       }
 
       try
       {
-         Gls2Bib gls2bib = new Gls2Bib(texFile, bibFile, texCharset, bibCharset,
-           spaceSub, langTag, ignoreSort, verbose);
+         Gls2Bib gls2bib = new Gls2Bib(args, langTag, verbose);
 
          gls2bib.process();
+      }
+      catch (Gls2BibSyntaxException e)
+      {
+         System.err.println(e.getMessage());
+         System.exit(1);
       }
       catch (IOException e)
       {
@@ -1086,6 +1153,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public static final String VERSION = "1.8";
    public static final String DATE = "2018-11-30";
+   public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
 

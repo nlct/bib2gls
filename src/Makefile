@@ -21,7 +21,7 @@ lib/convertgls2bib.jar	: java/gls2bib/Manifest.txt classes/com/dickimawbooks/gls
 		com/dickimawbooks/gls2bib/*.class
 
 classes/com/dickimawbooks/gls2bib/Gls2Bib.class	: classes/com/dickimawbooks/gls2bib \
-	java/gls2bib/*.java
+	java/gls2bib/*.java 
 	cd java/gls2bib; \
 	javac -target 1.7 -source 1.7 -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
