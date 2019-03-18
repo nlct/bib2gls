@@ -9,11 +9,18 @@ Application Home Page: http://www.dickimaw-books.com/software/bib2gls
 
 # Licence
 
-Copyright (C) 2017-2018 Nicola L. C. Talbot (www.dickimaw-books.com)
+Copyright (C) 2017-2019 Nicola L. C. Talbot (www.dickimaw-books.com)
 License GPLv3+: GNU GPL version 3 or later
 http://gnu.org/licenses/gpl.html
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
+
+# Requirements
+
+  - Java Runtime Environment (at least Java 8).
+
+  - TeX distribution that includes `glossaries-extra.sty` 
+    and dependent packages (such as `glossaries.sty`).
 
 # Summary
 
@@ -130,6 +137,7 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems
    only.)
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf` (User manual.)
+ - *TEXMF*`/doc/support/bib2gls/bib2gls-begin.pdf` (Introductory Guide.)
  - *TEXMF*`/doc/support/bib2gls/examples/` (example files)
 
 Note that `texparserlib.jar` isn't an application. It's
