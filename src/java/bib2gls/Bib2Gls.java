@@ -1126,6 +1126,86 @@ public class Bib2Gls implements TeXApp
         "Glsentrysymbolplural", "symbolplural", 
          GlsUseField.CASE_SENTENCE, this));
 
+      // Treat \glsaccess... as \glsentry... etc
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessname", "name", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccesstext", "text", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessshort", "short", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccesslong", "long", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessfirst", "first", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccesssymbol", "symbol", this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessuseri", "user1", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessuserii", "user2", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessuseriii", "user3", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessuseriv", "user4", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessuserv", "user5", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessuservi", "user6", this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessplural", "plural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessfirstplural", "firstplural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccessshortpl", "shortplural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccesslongpl", "longplural", this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsaccesssymbolplural", "symbolplural", this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessname", "name", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccesstext", "text", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessshort", "short", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccesslong", "long", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessfirst", "first", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccesssymbol", "symbol", GlsUseField.CASE_SENTENCE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessuseri", "user1", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessuserii", "user2", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessuseriii", "user3", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessuseriv", "user4", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessuserv", "user5", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessuservi", "user6", GlsUseField.CASE_SENTENCE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessplural", "plural", GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessfirstplural", "firstplural", 
+         GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccessshortpl", "shortplural", 
+         GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccesslongpl", "longplural", 
+         GlsUseField.CASE_SENTENCE, this));
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsaccesssymbolplural", "symbolplural", 
+         GlsUseField.CASE_SENTENCE, this));
+
       listener.putControlSequence(new GlsUseField(this));
       listener.putControlSequence(new GlsUseField(
         "Glsxtrusefield", GlsUseField.CASE_SENTENCE, this));
@@ -4911,8 +4991,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.8.20181218";
-   public static final String DATE = "2018-12-18";
+   public static final String VERSION = "1.8.20190318";
+   public static final String DATE = "2019-03-18";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
