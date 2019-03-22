@@ -1303,14 +1303,16 @@ first \LaTeX\ run due to the unknown references being replaced with
 ?? which can be significantly shorter than the actual text produced
 when the reference is known. 
 
-Note that \bibgls\ is a Java application, and requires at least Java~7
-(although the latest version is recommended).  Additionally,
-\sty{glossaries-extra} must be at least version 1.12.
-(Although again the latest version is recommended.)
-This application was developed in response to the question
-\qt{\href{http://tex.stackexchange.com/q/342544}{Is there a program for
-managing glossary tags?}} on \TeX\ on StackExchange~\cite{tex.sx}. The \ext{bib}
-file can be managed in an application such as JabRef.
+Note that \bibgls\ is a Java application, and requires at least
+Java~8.\footnote{The \code{List.sort} method used to sort the
+entries was only introduced to Java~8.}  Additionally,
+\sty{glossaries-extra} must be at least version 1.12.  (Although
+the latest version is recommended.) This application was
+developed in response to the question
+\qt{\href{http://tex.stackexchange.com/q/342544}{Is there a program
+for managing glossary tags?}} on \TeX\ on
+StackExchange~\cite{tex.sx}. The \ext{bib} file can be managed in an
+application such as JabRef.
 
 If you already have a \ext{tex} file containing 
 entry definitions using commands like \gls{newglossaryentry}
@@ -2522,8 +2524,7 @@ support for locales than the native \idx{JRE}. For example:
 \begin{verbatim}
 java.locale.providers=CLDR,JRE
 \end{verbatim}
-This isn't available for Java~7, and should be enabled by default
-for the proposed Java~9. The property
+This should be enabled by default for Java~9. The property
 can either be set in a script that runs \bibgls, for example,
 \begin{verbatim}
 java -Djava.locale.providers=CLDR,JRE,SPI -jar "$jarpath" "$@"
