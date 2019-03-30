@@ -4165,6 +4165,12 @@ and \L/\l\ treated as L/l},
   parent={packages}
 }
 
+@package{glossary-topic,
+  name={\styfmt{glossary\dhyphen topic}},
+  category={package},
+  parent={packages}
+}
+
 @package{glossary-mcols,
   name={\styfmt{glossary\dhyphen mcols}},
   category={package},
@@ -4263,6 +4269,12 @@ and \L/\l\ treated as L/l},
 
 @package{slantsc,
   name={\styfmt{slantsc}},
+  category={package},
+  parent={packages}
+}
+
+@package{relsize,
+  name={\styfmt{relsize}},
   category={package},
   parent={packages}
 }
@@ -4955,8 +4967,14 @@ pages (not available in multi-column or certain other contexts)},
   text={abbreviation style},
   description={abbreviation styles are set using
   \ics{newabbreviation} and govern the format of commands like \ics{gls}
-  (display style) and \ics{glsxtrfull} (inline style). The
-  \styfmt{glossaries-extra} package comes with the file
+  (display style) and \ics{glsxtrfull} (inline style). The inline
+   style may or may not match the first use format of the display
+   style. To allow for greater flexibility in abbreviation styles,
+   \cs{gls} (and its variants) normally treat abbreviations
+   differently to other terms, but some abbreviation styles can work better 
+   if the abbreviation is treated as a general term so in those cases the 
+   style sets the \catattr{regular} attribute to \qt{true} for
+   the entry's category. The \styfmt{glossaries-extra} package comes with the file
 \href{http://mirrors.ctan.org/macros/latex/contrib/glossaries-extra/samples/sample-abbr-styles.pdf}{\filefmt{sample-abbr-styles.pdf}}
   that demonstrates all predefined styles}
 }
@@ -4988,8 +5006,9 @@ pages (not available in multi-column or certain other contexts)},
   name={\csfmt{gls\-long\-default\-font}},
   user1={\margm{text}},
   description={used by the abbreviation styles that don't have a
-   specific font to format the long form},
-  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc,abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc,abbrstyle.long-noshort},
+   specific font to format the long form. The default definition
+just does its argument without any formatting},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc,abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc,abbrstyle.long-noshort,abbrstyle.long-noshort-noreg,abbrstyle.long-short-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -4998,8 +5017,9 @@ pages (not available in multi-column or certain other contexts)},
   name={\csfmt{gls\-first\-long\-default\-font}},
   user1={\margm{text}},
   description={used by the abbreviation styles that don't have a
-   specific font to format the long form on \idx{firstuse}},
-  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc,abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc,abbrstyle.long-noshort},
+   specific font to format the long form on \idx{firstuse}. The
+   default definition uses \cs{glslongdefaultfont}},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc,abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc,abbrstyle.long-noshort,abbrstyle.long-noshort-noreg,abbrstyle.long-short-desc},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -5008,8 +5028,9 @@ pages (not available in multi-column or certain other contexts)},
   name={\csfmt{gls\-abbrv\-default\-font}},
   user1={\margm{text}},
   description={used by the abbreviation styles that don't have a
-   specific font to format the short form},
-  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-noshort},
+   specific font to format the short form. The default definition
+just does its argument without any formatting},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-noshort,abbrstyle.long-noshort-noreg,abbrstyle.long-short-desc},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -5018,8 +5039,9 @@ pages (not available in multi-column or certain other contexts)},
   name={\csfmt{gls\-first\-abbrv\-default\-font}},
   user1={\margm{text}},
   description={used by the abbreviation styles that don't have a
-   specific font to format the short form on \idx{firstuse}},
-  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-noshort},
+   specific font to format the short form on \idx{firstuse}. The
+   default definition uses \cs{glsabbrvdefaultfont}},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-noshort,abbrstyle.long-noshort-noreg,abbrstyle.long-short-desc},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -5392,9 +5414,9 @@ pages (not available in multi-column or certain other contexts)},
   user1={},
   description={the suffix used to construct the plural for
    the short form of abbreviations with the small-cap
-   (\code{sc}) styles. This counteracts the effect of \cs{textsc}
+   \qt{sc} styles. This counteracts the effect of \cs{textsc}
    using \ics{glstextup}},
-  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote},
+  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -5404,7 +5426,7 @@ pages (not available in multi-column or certain other contexts)},
   user1={\margm{text}},
   description={used with \qt{sc} abbreviation styles to format the
 short form using \cs{textsc}},
-  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote},
+  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -5413,8 +5435,8 @@ short form using \cs{textsc}},
   name={\csfmt{gls\-first\-abbrv\-sc\-font}},
   user1={\margm{text}},
   description={used with \qt{sc} abbreviation styles to format the
-   short form on \idx{firstuse}},
-  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote},
+   short form on \idx{firstuse}. This defaults to \cs{glsabbrvscfont}},
+  topics={abbrstyle.long-short-sc,abbrstyle.long-short-sc-desc,abbrstyle.short-sc-long,abbrstyle.short-sc-long-desc,abbrstyle.short-sc-nolong,abbrstyle.short-sc-nolong-desc,abbrstyle.nolong-short-sc,abbrstyle.short-sc-footnote,abbrstyle.short-sc-postfootnote,abbrstyle.long-noshort-sc,abbrstyle.long-noshort-sc-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -5545,7 +5567,8 @@ short form using \cs{textsc}},
 @abbreviationstyle{abbrstyle.long-short-sm,
   name={\abbrstylefmt{long\dhyphen short\dhyphen sm}},
   description={this abbreviation style is like \abbrstyle{long-short}
-  but the short form is displayed using a smaller font},
+  but the short form is displayed using a smaller font. The
+  \sty{relsize} package is required with this style},
   category={abbreviationstyle},
   note={\styfmt{glossaries-extra}},
   parent={abbreviationstyles}
@@ -5556,7 +5579,7 @@ short form using \cs{textsc}},
   user1={\margm{text}},
   description={used with \qt{sm} abbreviation styles to format the
 short form using \ics{textsmaller}},
-  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote},
+  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -5565,8 +5588,8 @@ short form using \ics{textsmaller}},
   name={\csfmt{gls\-first\-abbrv\-sm\-font}},
   user1={\margm{text}},
   description={used with \qt{sm} abbreviation styles to format the
-   short form on \idx{firstuse}},
-  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote},
+   short form on \idx{firstuse}. This defaults to \cs{glsabbrvsmfont}},
+  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -5575,8 +5598,9 @@ short form using \ics{textsmaller}},
   name={\csfmt{gls\-xtr\-sm\-suffix}},
   user1={},
   description={the suffix used to construct the plural for
-   the short form of abbreviations with the \qt{sm} styles},
-  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote},
+   the short form of abbreviations with the \qt{sm} styles. This
+   defaults to \cs{glsxtrabbrvpluralsuffix}},
+  topics={abbrstyle.long-short-sm,abbrstyle.long-short-sm-desc,abbrstyle.short-sm-long,abbrstyle.short-sm-long-desc,abbrstyle.short-sm-nolong,abbrstyle.short-sm-nolong-desc,abbrstyle.nolong-short-sm,abbrstyle.short-sm-footnote,abbrstyle.short-sm-postfootnote,abbrstyle.long-noshort-sm,abbrstyle.long-noshort-sm-desc},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -5715,7 +5739,7 @@ short form using \ics{textsmaller}},
   user1={\margm{text}},
   description={used with \qt{em} abbreviation styles to format the
 short form using \ics{emph}},
-  topics={abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg,abbrstyle.long-em-short-em-desc},
+  topics={abbrstyle.long-em-short-em,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg,abbrstyle.long-em-short-em-desc,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -5724,8 +5748,8 @@ short form using \ics{emph}},
   name={\csfmt{gls\-first\-abbrv\-em\-font}},
   user1={\margm{text}},
   description={used with \qt{em} abbreviation styles to format the
-   short form on \idx{firstuse}},
-  topics={abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em,abbrstyle.long-em-short-em-desc,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg},
+   short form on \idx{firstuse}. This defaults to \cs{glsabbrvemfont}},
+  topics={abbrstyle.long-em-short-em,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em-desc,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
 }
@@ -5733,8 +5757,9 @@ short form using \ics{emph}},
 @abbrvstylecommand{glsxtremsuffix,
   name={\csfmt{gls\-xtr\-em\-suffix}},
   description={the suffix used to construct the plural for
-   the short form of abbreviations with the \qt{em} styles},
-  topics={abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-short-em,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg},
+   the short form of abbreviations with the \qt{em} styles. This
+   defaults to \cs{glsxtrabbrvpluralsuffix}},
+  topics={abbrstyle.long-em-short-em,abbrstyle.long-short-em,abbrstyle.long-short-em-desc,abbrstyle.short-em-long,abbrstyle.short-em-long-desc,abbrstyle.short-em-nolong,abbrstyle.short-em-nolong-desc,abbrstyle.nolong-short-em,abbrstyle.short-em-footnote,abbrstyle.short-em-postfootnote,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg,abbrstyle.long-noshort-em,abbrstyle.long-noshort-em-desc},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -5753,7 +5778,7 @@ long form using \ics{emph}},
   name={\csfmt{gls\-first\-long\-em\-font}},
   user1={\margm{text}},
   description={used with \qt{long-em} abbreviation styles to format the
-   long form on \idx{firstuse}},
+   long form on \idx{firstuse}. This defaults to \cs{glslongemfont}},
   topics={abbrstyle.long-em-short-em,abbrstyle.long-em-short-em-desc,abbrstyle.short-em-long-em,abbrstyle.short-em-long-em-desc,abbrstyle.long-em-noshort-em,abbrstyle.long-em-noshort-em-desc,abbrstyle.long-em-noshort-em-desc-noreg,abbrstyle.long-em-noshort-em-noreg},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -5971,8 +5996,8 @@ long form using \ics{emph}},
 @abbrvstylecommand{glsxtruserfield,
   name={\csfmt{gls\-xtr\-user\-field}},
   description={used by the parenthetical abbreviation styles, this
-   expands to the label of the field used to store the parenthetical
-   material},
+   expands to the internal label of the field used to store the additional parenthetical
+   material. The default value is \field{useri}},
   topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -5981,8 +6006,7 @@ long form using \ics{emph}},
 @abbrvstylecommand{glsxtruserparen,
   name={\csfmt{gls\-xtr\-user\-paren}},
   user1={\margm{text}\margm{label}},
-  description={used by the \abbrstyle{long-short-user} and
-  \abbrstyle{short-long-user} abbreviation styles
+  description={used by the \qt{user} abbreviation styles
    to format the parenthetical material where \meta{text}
    is the default parenthetical text and \meta{label}
    is the entry's label. This checks the field given
@@ -5997,7 +6021,7 @@ long form using \ics{emph}},
   name={\csfmt{gls\-abbrv\-user\-font}},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
-   format the short form},
+   format the short form. The default definition just uses \cs{glsabbrvdefaultfont}},
   topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -6007,7 +6031,8 @@ long form using \ics{emph}},
   name={\csfmt{gls\-first\-abbrv\-user\-font}},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
-   format the short form on \idx{firstuse}},
+   format the short form on \idx{firstuse}. The default definition just uses
+\cs{glsabbrvuserfont}},
   topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -6017,7 +6042,7 @@ long form using \ics{emph}},
   name={\csfmt{gls\-long\-user\-font}},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
-   format the long form},
+   format the long form. The default definition just uses \cs{glslongdefaultfont}},
   topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -6027,7 +6052,8 @@ long form using \ics{emph}},
   name={\csfmt{gls\-first\-long\-user\-font}},
   user1={\margm{text}},
   description={used with \qt{user} abbreviation styles to
-   format the long form on first use},
+   format the long form on first use. The default definition just uses
+\cs{glslonguserfont}},
   topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -6036,7 +6062,8 @@ long form using \ics{emph}},
 @abbrvstylecommand{glsxtrusersuffix,
   name={\csfmt{gls\-xtr\-user\-suffix}},
   description={the suffix used to construct the plural for
-   the short form of abbreviations with the \qt{user} styles},
+   the short form of abbreviations with the \qt{user} styles.
+   The default definition just uses \cs{glsxtrabbrvpluralsuffix}},
   topics={abbrstyle.long-short-user,abbrstyle.short-long-user,abbrstyle.long-postshort-user,abbrstyle.long-postshort-user-desc,abbrstyle.short-postlong-user-desc,abbrstyle.long-short-user-desc,abbrstyle.short-long-user-desc},
   note={\styfmt{glossaries-extra} v1.04+},
   category={command}
@@ -6241,9 +6268,11 @@ hyphen\dhyphen desc}},
 @abbrvstylecommand{glsxtrlonghyphennoshort,
   name={\csfmt{gls\-xtr\-long\-hyphen\-noshort}},
   user1={\margm{label}\margm{long}\margm{insert}},
-  description={used by the \abbrstyle{long-hyphen-noshort-desc-noreg} style
-  to format the \idx{firstuse} form},
-  topics={abbrstyle.long-hyphen-noshort-desc-noreg},
+  description={used by the \qt{long-hyphen-noshort} styles
+  to format the \idx{firstuse} form. This checks if the inserted
+  material starts with a hyphen and makes the appropriate
+  modifications},
+  topics={abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -6371,7 +6400,7 @@ hyphen\dhyphen desc}},
 @abbrvstylecommand{glsxtrshorthyphen,
   name={\csfmt{gls\-xtr\-short\-hyphen}},
   user1={\margm{short}\margm{label}\margm{insert}},
-  description={used by the \abbrstyle{short-hyphen-postlong-hyphen} style
+  description={used by the \qt{postlong-hyphen} styles
   to format the short form and check if \meta{insert} starts with a hyphen},
   topics={abbrstyle.short-hyphen-postlong-hyphen},
   note={\styfmt{glossaries-extra} v1.17+},
@@ -6381,9 +6410,9 @@ hyphen\dhyphen desc}},
 @abbrvstylecommand{glsxtrposthyphenlong,
   name={\csfmt{gls\-xtr\-post\-hyphen\-long}},
   user1={\margm{label}\margm{insert}},
-  description={used by the \abbrstyle{short-hyphen-postlong-hyphen}
-  style in the \idx{postlinkhook}},
-  topics={abbrstyle.long-hyphen-postshort-hyphen},
+  description={used by the \qt{postlong-hyphen}
+  styles in the \idx{postlinkhook}},
+  topics={abbrstyle.short-hyphen-postlong-hyphen},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -6414,7 +6443,7 @@ hyphen\dhyphen desc}},
   name={\csfmt{gls\-abbrv\-only\-font}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
-short form},
+short form. The default definition just uses \cs{glsabbrvdefaultfont}},
   topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -6424,7 +6453,8 @@ short form},
   name={\csfmt{gls\-first\-abbrv\-only\-font}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
-short form on \idx{firstuse}},
+short form on \idx{firstuse}. The default definition just uses
+\cs{glsabbrvonlyfont}},
   topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -6434,7 +6464,7 @@ short form on \idx{firstuse}},
   name={\csfmt{gls\-long\-only\-font}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
-long form},
+long form. The default definition just uses \cs{glslongdefaultfont}},
   topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -6444,7 +6474,8 @@ long form},
   name={\csfmt{gls\-first\-long\-only\-font}},
   user1={\margm{text}},
   description={used with \qt{only} abbreviation styles to format the
-long form on \idx{firstuse}},
+long form on \idx{firstuse}. The default definition just uses
+\cs{glslongonlyfont}},
   topics={abbrstyle.long-only-short-only,abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -6453,7 +6484,8 @@ long form on \idx{firstuse}},
 @abbrvstylecommand{glsxtronlysuffix,
   name={\csfmt{gls\-xtr\-only\-suffix}},
   description={the suffix used to construct the plural for
-   the short form of abbreviations with the \qt{only} styles},
+   the short form of abbreviations with the \qt{only} styles.
+   The default definition just uses \cs{glsxtrabbrvpluralsuffix}},
   topics={abbrstyle.long-only-short-only},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
@@ -6471,12 +6503,12 @@ long form on \idx{firstuse}},
 }
 
 @abbrvstylecommand{glsxtronlydescname,
-  name={\csfmt{gls\-xtr\-only\-\-name}},
+  name={\csfmt{gls\-xtr\-only\-desc\-name}},
   description={hook for the \abbrstyle{long-only-short-only-desc} style
   that expands to the value that the \field{name} field is assigned
   to when the abbreviation is defined with \cs{newabbreviation} 
   (defaults to the long form)},
-  topics={abbrstyle.long-only-short-only},
+  topics={abbrstyle.long-only-short-only-desc},
   note={\styfmt{glossaries-extra} v1.17+},
   category={command}
 }
@@ -6659,6 +6691,20 @@ long form on \idx{firstuse}},
   name={\glostylefmt{mcolalttreegroup}},
   category={glossarystyle},
   note={\styfmt{glossary-mcols}},
+  parent={glossarystyle}
+}
+
+@glossarystyle{glostyle.topic,
+  name={\glostylefmt{topic}},
+  category={glossarystyle},
+  note={\styfmt{glossary-topic} v1.40+},
+  parent={glossarystyle}
+}
+
+@glossarystyle{glostyle.topicmcols,
+  name={\glostylefmt{topicmcols}},
+  category={glossarystyle},
+  note={\styfmt{glossary-topic} v1.40+},
   parent={glossarystyle}
 }
 
@@ -10889,13 +10935,15 @@ category},
   category={command}
 }
 
-@glscommand{glsxtrabbrvpluralsuffix,
+@abbrvstylecommand{glsxtrabbrvpluralsuffix,
   name={\csfmt{gls\-xtr\-abbrv\-plural\-suffix}},
   user1={},
   description={the default suffix used to construct the plural for
-   the short form of abbreviations},
-  topics={fixedtextcommands,abbreviationcommands},
+   the short form of abbreviations. This just uses
+   \cs{glspluralsuffix}. If you don't want a plural suffix, you can
+   use the \catattr{noshortplural} attribute},
   note={\styfmt{glossaries-extra}\texparserdefnote},
+  topics={abbrstyle.long-short,abbrstyle.short-long,abbrstyle.short-footnote,abbrstyle.short-postfootnote,abbrstyle.short-nolong,abbrstyle.nolong-short,abbrstyle.nolong-short-noreg,abbrstyle.short-nolong-desc,abbrstyle.long-noshort-desc,abbrstyle.long-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-desc-noreg,abbrstyle.long-hyphen-noshort-noreg,abbrstyle.long-noshort,abbrstyle.long-noshort-noreg,abbrstyle.long-short-desc},
   category={command}
 }
 
@@ -12323,6 +12371,22 @@ by \idx{makeindex} or \idx{xindy}},
   category={command}
 }
 
+@command{heartsuit,
+  name={\csfmt{heartsuit}},
+  user1={},
+  description={heart symbol ($\heartsuit$)},
+  note={kernel command\texparserdefnote\ (maths mode)},
+  category={command}
+}
+
+@command{diamondsuit,
+  name={\csfmt{diamondsuit}},
+  user1={},
+  description={diamond symbol ($\diamondsuit$)},
+  note={kernel command\texparserdefnote\ (maths mode)},
+  category={command}
+}
+
 @command{ensuremath,
   name={\csfmt{ensuremath}},
   user1={\margm{maths}},
@@ -13117,6 +13181,16 @@ warning rather than an error if the command isn't already defined},
    \csref{glsxtrresourcefile}},
   topics={hooks},
   note={\styfmt{glossaries-extra} v1.21+},
+  category={command}
+}
+
+@mainglscommand{GlsXtrDefaultResourceOptions,
+  name={\csfmt{Gls\-Xtr\-Default\-Resource\-Options}},
+  user1={},
+  description={provides default options for 
+   \csref{glsxtrresourcefile}},
+  topics={hooks},
+  note={\styfmt{glossaries-extra} v1.40+},
   category={command}
 }
 

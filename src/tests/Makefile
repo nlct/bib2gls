@@ -595,6 +595,13 @@ test-interpret-fields.glstex	: test-interpret-fields.tex greek.bib $(DEPS)
 		xelatex test-interpret-fields
 		$(BIB2GLS) test-interpret-fields
 
+test-blocks.pdf	: test-blocks.glstex
+		pdflatex test-blocks
+
+test-blocks.glstex	: test-blocks.tex blocks.bib $(DEPS)
+		pdflatex test-blocks
+		$(BIB2GLS) --no-group test-blocks
+
 clean	:
 	$(RM) *.aux
 	$(RM) *.log

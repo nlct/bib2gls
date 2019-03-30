@@ -1,0 +1,22 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,abbreviations,symbols]{glossaries-extra}
+
+\renewcommand{\GlsXtrDefaultResourceOptions}{selection=all,src=blocks,save-locations=false}
+
+\GlsXtrLoadResources[type=main,match={entrytype=entry}]
+\GlsXtrLoadResources[type=abbreviations,match={entrytype=abbreviation}]
+
+\GlsXtrLoadResources[type=symbols,
+ field-aliases={identifier=parent},
+ match={entrytype=symbol,entrytype=indexplural}]
+
+\begin{document}
+\tableofcontents
+\printunsrtglossary[type=abbreviations]
+\printunsrtglossary
+\printunsrtglossary[type=symbols,style=tree]
+\end{document}

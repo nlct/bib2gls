@@ -40,6 +40,7 @@
 \usepackage{amsmath}
 \usepackage{accents}
 \usepackage{tikz}
+\usepackage{tcolorbox}
 \usepackage{datetime2}
 \usepackage{listings}
 \usepackage[hidelinks]{hyperref}
@@ -226,6 +227,8 @@
  \let\@rightmark\@secondoftwo
 }
 \makeatother
+
+\newtcolorbox{important}{colback=red!5!white,colframe=red}
 
 \newcommand{\bibgls}{\appfmt{bib2gls}}
 
@@ -838,6 +841,7 @@
    {}%
    {%
      \par\nopagebreak\medskip\par\footnotesize
+     \sloppy
      \ifstylecommand{#1}%
      {\summarysubheaderfont{Styles:}}%
      {\summarysubheaderfont{Topics:}}%
@@ -1614,6 +1618,305 @@ won't be defined on the first run (if the definition is only
 provided in the \ext{glstex} file) but \cs{printunsrtglossary} will
 just give a warning if the type is undefined so it won't interrupt
 the document build.
+
+\section{Logical Divisions: \field{type} vs \field{parent} vs
+\field{group}}
+\label{sec:logicaldivisions}
+
+If you have a document with many terms that need listing, it's
+likely that you may want to divide the terms into separate blocks or
+units for easier reading. There are three fields that can be used
+for this.
+\begin{description}
+\item[\field{type}] The highest division is the glossary to which
+the entry belongs. The glossary must first be defined (see
+\sectionref{sec:newglossary}) with an associated label used to
+identify it. The title is assigned to the glossary when it is
+defined or it can be overridden with the \printglossopt{title} key.
+The glossary is displayed using \cs{printunsrtglossary} and the
+title is placed in a sectioning command by default.
+
+\begin{important}
+\bibgls\ does not provide any means of sorting glossary types. If
+you use \ics{printunsrtglossaries} the order will be according to
+the order used to define the glossaries. You may use
+\cs{printunsrtglossary} to list individual glossaries in your own
+preferred order.
+\end{important}
+
+\item[\field{group}] The entries within a glossary can form groups
+as a by-product of the sorting method. This must be enabled with the
+\longarg{group} switch and isn't available for the sort methods
+listed in \tableref{tab:sortoptionsnosort}. The group label is
+stored in the \field{group} field. This is an internal field that
+typically shouldn't be set in the \ext{bib} file.
+
+You can specify your own custom groups but if you do so you must
+ensure that the terms are ordered in such a way that they are
+gathered according to group. This is typically done by splitting the
+glossary into blocks using a separate \gls{GlsXtrLoadResources} with
+the \csopt{group} option set. You control the order of the groups by
+your ordering of \gls{GlsXtrLoadResources}. The group title can be
+assigned using \gls{glsxtrsetgrouptitle} within the document.
+
+\begin{important}
+\bibgls\ does not sort by group title. At most it can sort by the
+group label (by changing the \csopt{sort-field}) but this is usually
+an indication that you actually have a hierarchical glossary and you
+ought to be using the \field{parent} field instead.
+\end{important}
+
+\item[\field{parent}] An entry may have one of more sub-entries.
+Most of the sort methods will produce a hierarchical ordering that
+ensures that the sub-entries are listed immediately after their
+parent entry. The parent entry is identified by the \field{parent}
+field which should contain the parent's label.
+
+\begin{important}
+\bibgls\ sorts the parent and child entries using the same
+comparator. The sort methods listed
+in \tableref{tab:sortoptionsnosort} disregard the hierarchical
+level, which can result in child entries becoming detached from
+their parent entry. The other methods sort hierarchically using
+the same comparator but taking the hierarchical level into account.
+\end{important}
+
+\end{description}
+
+Suppose you have a mixture of terms, abbreviations and symbols, then
+you might want to have three glossaries that are listed in the table
+of contents. In this case, you use the \field{type} field or the
+\field{type} resource option. The ordering of the glossaries is
+determined by the document's ordering of the \cs{printunsrtglossary}
+commands. For example:
+\begin{codeenv}
+\cs{printunsrtglossary}
+\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type}}
+\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type}}
+\end{codeenv}
+
+Suppose that your list of terms spans many pages and you feel it
+would be helpful to the reader to split it up into letter groups
+then you would need to run \bibgls\ with the \longarg{group} switch
+and use a glossary style that supports letter groups for that
+glossary. For example:
+\begin{codeenv}
+\cs{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
+\end{codeenv}
+
+Suppose that your list of symbols consists of Latin characters,
+Greek characters and pictographs and you want them grouped together
+in that order. Then you would use a separate
+\gls{GlsXtrLoadResources} for each block and assign your own custom 
+group. This means ensuring that each \idx{resourceset} only selects
+the terms for that group. The simplest way of doing this is to
+have a separate \ext{bib} file for each set. For example:
+\begin{codeenv}
+\gls{glsxtrsetgrouptitle}\marg{latinsymbols}{Latin}
+\gls{glsxtrsetgrouptitle}\marg{greeksymbols}{Greek}
+\gls{glsxtrsetgrouptitle}\marg{pictographs}{Pictographs}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[latinsymbols]{src},
+  \csopt[latin]{group},
+  \csopt[symbols]{type}
+}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[greeksymbols]{src},
+  \csopt[greek]{group},
+  \csopt[symbols]{type}
+}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[pictographs]{src},
+  \csopt[pictographs]{group},
+  \csopt[symbols]{type}
+}
+\end{codeenv}
+
+Suppose instead that you have many of these logical blocks and you
+want them ordered according to the block title. In this case you
+have a hierarchical glossary and you need to use the \field{parent}
+field. You then need to select an appropriate \idx{glossarystyle}.
+
+If you only want to have a single \ext{bib} file that contains all
+your entries and you want to share it across multiple documents then
+the most flexible approach is to use custom fields and entry types
+that can be aliased according to the needs of the
+\idxpl{resourceset}.
+
+For example, the file \filefmt{entries.bib}:
+\begin{codeenv}
+\comment{Encoding: UTF-8}
+\strut
+\atentryfmt{indexplural}\marg{latin,\field{text}=\marg{Latin character}}
+\atentryfmt{indexplural}\marg{greek,\field{text}=\marg{Greek character}}
+\atentryfmt{indexplural}\marg{pictograph}
+\strut
+\atentry{symbol}\marg{fx,
+  \field{name}=\marg{\cs{ensuremath}\marg{f(x)}},
+  \field{description}=\marg{function of \idx{mshiftchar}x\idx{mshiftchar}},
+  \fieldfmt{identifier}=\marg{latin}
+}
+\strut
+\atentry{symbol}\marg{f\idx{aposchar}x,
+  \field{name}={\cs{ensuremath}\marg{f\idx{aposchar}(x)}},
+  \field{description}=\marg{derivative of \cs{gls}\marg{fx}},
+  \fieldfmt{identifier}=\marg{latin}
+}
+\strut
+\atentry{symbol}\marg{pi,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{description}=\marg{ratio of circumference to diameter},
+  \fieldfmt{identifier}=\marg{greek}
+}
+\strut
+\atentry{symbol}\marg{heart,
+  \field{name}=\marg{\cs{ensuremath}\marg{\ics{heartsuit}}},
+  \field{description}=\marg{heart},
+  \fieldfmt{identifier}=\marg{pictograph}
+}
+\strut
+\atentry{symbol}\marg{diamond,
+  \field{name}=\marg{\cs{ensuremath}\marg{\ics{diamondsuit}}},
+  \field{description}=\marg{diamond},
+  \fieldfmt{identifier}=\marg{pictograph}
+}
+\strut
+\atentry{abbreviation}\marg{html,
+  \field{short}=\marg{html},
+  \field{long}=\marg{hypertext markup language},
+  \fieldfmt{identifier}=\marg{markuplanguage}
+}
+\strut
+\atentry{abbreviation}\marg{xml,
+  \field{short}=\marg{xml},
+  \field{long}=\marg{extensible markup language},
+  \fieldfmt{identifier}=\marg{markuplanguage}
+}
+\strut
+\atentry{entry}\marg{duck,
+  \field{name}=\marg{duck},
+  \field{description}=\marg{a waterbird with webbed feet},
+  \fieldfmt{identifier}=\marg{animal}
+}
+\strut
+\atentry{entry}\marg{parrot,
+  \field{name}=\marg{parrot},
+  \field{description}=\marg{mainly tropical bird with bright plumage},
+  \fieldfmt{identifier}=\marg{animal}
+}
+\end{codeenv}
+This has a custom field \fieldfmt{identifier}. This will be ignored
+by \bibgls\ unless defined or aliased in the document.
+
+Here's an example document that creates three glossary types (the
+default \code{main}, the \code{abbreviations} glossary created with
+the \styopt{abbreviations} option and the \code{symbols} glossary
+created with the \styopt{symbols} option). They are listed in the
+order of \cs{printunsrtglossary} and their titles are added to the
+table of contents.
+
+The custom \fieldfmt{identifier} fields are ignored for the
+main and abbreviation glossaries, but they are aliased for the
+symbols to the \field{group} field. Since I've split the symbols
+glossary into blocks with each block only containing entries that
+have the same \field{group} value, this isn't a problem. The blocks
+appear in the same order as the corresponding \gls{GlsXtrLoadResources} 
+commands. The title for each block is provided in the document 
+using \gls{glsxtrsetgrouptitle}.
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt{symbols}}\marg{glossaries-extra}
+\strut
+\cs{renewcommand}\marg{\gls{GlsXtrDefaultResourceOptions}}\marg{
+ \csopt[all]{selection},\csopt[entries]{src},\csopt[false]{save-locations}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[\marg{entrytype=entry}]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbreviations]{type},\csopt[\marg{entrytype=abbreviation}]{match}}
+\strut
+\gls{glsxtrsetgrouptitle}\marg{pictograph}\marg{Pictographs}
+\gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
+ \csopt[\marg{identifier=\field{group}}]{field-aliases},
+ \csopt[\marg{\field{group}=pictograph}]{match}}
+\strut
+\gls{glsxtrsetgrouptitle}\marg{latin}\marg{Latin Characters}
+\gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
+ \csopt[\marg{identifier=\field{group}}]{field-aliases},
+ \csopt[\marg{\field{group}=latin}]{match}}
+\strut
+\gls{glsxtrsetgrouptitle}\marg{greek}\marg{Greek Characters}
+\gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
+ \csopt[\marg{identifier=\field{group}}]{field-aliases},
+ \csopt[\marg{\field{group}=greek}]{match}}
+\strut
+\cmd{begin}\marg{document}
+\cs{tableofcontents}
+\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type}}
+\cs{printunsrtglossary}
+\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type},\printglossopt[treegroup]{style}}
+\cmd{end}\marg{document}
+\end{codeenv}
+If this document is called \filefmt{myDoc.tex} then the document
+build should be:
+\begin{verbatim}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{verbatim}
+Note that the \longarg{group} switch isn't used as there's no need
+for \bibgls\ to form letter groups during sorting. If it is used
+then the main and abbreviation glossaries will have groups formed.
+With the default \glostyle{list} style this will just have vertical
+gaps between the groups. You can switch those gaps off with the
+\printglossopt{nogroupskip} option:
+\begin{codeenv}
+\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type},\printglossopt{nogroupskip}}
+\cs{printunsrtglossary}\oarg{\printglossopt{nogroupskip}}
+\end{codeenv}
+In general it's simpler not to use the \longarg{group} switch if
+it's not required, but if you have one glossary that needs it then
+you can use this approach with the other glossaries. For example:
+\begin{codeenv}
+\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type},\printglossopt{nogroupskip}}
+\cs{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
+\end{codeenv}
+
+In the above example document, the symbols list is divided into
+three groups, listed in the order: Pictographs, Latin characters and
+Greek characters. If you want these titles ordered alphabetically
+then you need a hierarchical structure instead. This can be obtained
+by aliasing the custom \fieldfmt{identifier} field to
+\field{parent}:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styopt{record},\styopt[topic]{stylemods},\styopt{abbreviations},\styopt{symbols}}\marg{glossaries-extra}
+\strut
+\cs{renewcommand}\marg{\gls{GlsXtrDefaultResourceOptions}}\marg{
+ \csopt[all]{selection},\csopt[entries]{src},\csopt[false]{save-locations}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[\marg{entrytype=entry}]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbreviations]{type},\csopt[\marg{entrytype=abbreviation}]{match}}
+\strut
+\gls{GlsXtrLoadResources}\oarg{csopt[symbols]{type},
+ \csopt[\marg{identifier=\field{parent}}]{field-aliases},
+ \csopt[\marg{entrytype=symbol,entrytype=indexplural}]{match}}
+\strut
+\cmd{begin}\marg{document}
+\cs{tableofcontents}
+\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type}}
+\cs{printunsrtglossary}
+\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type},\printglossopt[topic]{style}}
+\cmd{end}\marg{document}
+\end{codeenv}
+The document build is the same as before. The \longarg{group} switch
+again isn't required. The style used for the symbols list is now
+\glostyle{topic} rather than \glostyle{treegroup}. This results in a
+slightly different appearance. You can select the most appropriate
+style (see the
+\href{https://www.dickimaw-books.com/gallery/glossaries-styles/}{gallery
+of predefined styles}). The topic ordering is now: Greek characters,
+Latin characters and Pictographs.
 
 \section{Resource Sets}
 \label{sec:resourcesets}
@@ -3121,6 +3424,16 @@ if group headings are required (for example with the
 the glossary, there's no need to use this switch. Note that this
 switch doesn't automatically select an appropriate glossary style.
 
+\begin{important}
+The \field{group} field should typically not be set in the \ext{bib}
+file. This will override \bibgls's normal group formation behaviour,
+which can cause unexpected results. The custom use of the
+\field{group} field requires some care. As a general rule, if you
+find yourself wanting to use the \field{group} field in the \ext{bib} file,
+then the chances are that what you actually have is a hierarchical
+glossary (list of topics) and what you really need is the \field{parent} field.
+\end{important}
+
 There are eight types of groups:
 \begin{description}
 \item[\idx{lettergroup}] The first non-ignored character of the
@@ -3167,12 +3480,13 @@ comparisons (where the date is omitted).
 The group label is obtained from \gls!{bibglstimegroup}.
 
 \item[\idx{customgroup}] The group label is explicitly set either in
-the \ext{bib} file or using the \csopt[\meta{label}]{group} resource
-option. You will need to use \gls{glsxtrsetgrouptitle} to provide an
-associated title if the \meta{label} isn't the same as the title.
-Remember that the label can't contain any active characters, so you
-can't use non-ASCII characters in \meta{label} with \sty{inputenc}
-(but you can use non-ASCII alphanumerics with \sty{fontspec}).
+the \ext{bib} file (but note the above warning) or using the
+\csopt[\meta{label}]{group} resource option. You will need to use
+\gls{glsxtrsetgrouptitle} to provide an associated title if the
+\meta{label} isn't the same as the title.  Remember that the label
+can't contain any active characters, so you can't use non-ASCII
+characters in \meta{label} with \sty{inputenc} (but you can use
+non-ASCII alphanumerics with \sty{fontspec}).
 
 \end{description}
 
@@ -3665,10 +3979,12 @@ location list. The option may be used in combination with the \field{see} or
 \printfields
  [%
   You may define and assign \field{bibtextype} (although it's more
-  likely to be aliased). Don't define any of others, and don't use any
-  of them in the \ext{bib} file, except for \field{group},
-  \field{sort} or \field{type} although those three are best
-  set in the resource command or by \bibgls.%
+  likely to be aliased). Don't define any of others listed in this
+  table, and don't use any of them in the \ext{bib} file. A possible
+  exception is the \field{type} field, but it's more flexible to set
+  that through a resource option. The explicit use of \field{sort}
+  or \field{group} within a \ext{bib} file can cause unpredictable
+  results and are best set through a resource option or by \bibgls.%
  ]%
  {internalfield}%
  [Fields Set by \bibgls]%
@@ -6068,6 +6384,34 @@ over to the next resource set and, possibly,
 doesn't parse the options, but just writes the information to the
 \ext{aux} file. This means that any invalid options will be reported
 by \bibgls\ not by \sty{glossaries-extra}.
+
+As from \sty{glossaries-extra} v1.40 you can provide a default set
+of options by redefining:
+\nosecdef{GlsXtrDefaultResourceOptions}
+This command will be inserted at the start of the options list for
+all resource commands (and will expand as it's written to
+the \ext{aux} file).  For example:
+\begin{codeenv}
+\cs{renewcommand}\marg{\gls{GlsXtrDefaultResourceOptions}}\marg{\comment{}
+  \csopt[all]{selection},\csopt[entries]{src}}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[symbols]{type},
+  \csopt[entrytype=symbol]{match}}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[abbreviations]{type},
+  \csopt[entrytype=abbreviation]{match}}
+\end{codeenv}
+This acts like:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[all]{selection},\csopt[entries]{src},
+  \csopt[symbols]{type},
+  \csopt[entrytype=symbol]{match}}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[all]{selection},\csopt[entries]{src},
+  \csopt[abbreviations]{type},
+  \csopt[entrytype=abbreviation]{match}}
+\end{codeenv}
 
 If you have multiple \ext{bib} files you can either select them all
 using \csopt[\meta{bib list}]{src} in a single
