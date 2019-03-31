@@ -25,6 +25,13 @@ v1.9 (pending):
      @spawnabbreviation
      @spawnacronym
 
+  * New command line options:
+
+     --warn-non-bib-fields
+     --no-warn-non-bib-fields
+     --warn-unknown-entry-types
+     --no-warn-unknown-entry-types
+
   * The `type` option (and similar options that assign the `type`
     field) now accepts the special setting "same as parent".
     

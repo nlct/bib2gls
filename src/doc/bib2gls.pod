@@ -92,6 +92,24 @@ Treat B<\citation> as an ignored record.
 
 Don't check for instances of B<\citation> in the B<.aux> file (default).
 
+=item B<--warn-non-bib-fields>
+
+Warn if internal non-bib fields are found in the .bib file.
+
+=item B<--no-warn-non-bib-fields>
+
+Don't warn if internal non-bib fields are found in the .bib file.
+The use of these internal fields can cause unexpected results, so
+only use this option if you have taken appropriate precautions.
+
+=item B<--warn-unknown-entry-types>
+
+Warn if any unknown entry types are found in the .bib file.
+
+=item B<--no-warn-unknown-entry-types>
+
+Don't warn if any unknown entry types are found in the .bib file.
+
 =item B<--merge-wrglossary-records>
 
 Merge an entry's B<wrglossary> records for the same page locations.

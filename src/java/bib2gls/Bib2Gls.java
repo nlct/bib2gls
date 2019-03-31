@@ -2451,6 +2451,21 @@ public class Bib2Gls implements TeXApp
       return name.startsWith("bib2gls@");
    }
 
+   public boolean isNonBibField(String name)
+   {
+      for (String field : NON_BIB_FIELDS)
+      {
+         if (field.equals(name))
+         {
+            return true;
+         }
+      }
+
+      return isInternalField(name) || name.startsWith("bibtexentry@")
+         || name.endsWith("endpunc") || name.startsWith("recordcount.")
+         || name.startsWith("currcount@") || name.startsWith("prevcount@");
+   }
+
    public boolean isKnownField(String name)
    {
       if (fields.isEmpty())
@@ -2487,6 +2502,16 @@ public class Bib2Gls implements TeXApp
       }
 
       return false;
+   }
+
+   public boolean isCheckNonBibFieldsOn()
+   {
+      return checkNonBibFields;
+   }
+
+   public boolean isWarnUnknownEntryTypesOn()
+   {
+      return warnUnknownEntryTypes;
    }
 
    public void selectedEntry(String label)
@@ -3840,6 +3865,19 @@ public class Bib2Gls implements TeXApp
         "--cite-as-record"));
       System.out.println(getMessage("syntax.no.cite.as.record", 
         "--no-cite-as-record"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.warn.non.bib.fields", 
+         "--warn-non-bib-fields"));
+      System.out.println(getMessage("syntax.no.warn.non.bib.fields", 
+         "--no-warn-non-bib-fields"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.warn.unknown.entry.types", 
+         "--warn-unknown-entry-types"));
+      System.out.println(getMessage("syntax.no.warn.unknown.entry.types", 
+         "--no-warn-unknown-entry-types"));
+
       System.out.println();
       System.out.println(getMessage("syntax.merge.wrglossary.records", 
         "--merge-wrglossary-records"));
@@ -4510,6 +4548,22 @@ public class Bib2Gls implements TeXApp
          {
             expandFields = false;
          }
+         else if (args[i].equals("--warn-non-bib-fields"))
+         {
+            checkNonBibFields = true;
+         }
+         else if (args[i].equals("--no-warn-non-bib-fields"))
+         {
+            checkNonBibFields = false;
+         }
+         else if (args[i].equals("--warn-unknown-entry-types"))
+         {
+            warnUnknownEntryTypes = true;
+         }
+         else if (args[i].equals("--no-warn-unknown-entry-types"))
+         {
+            warnUnknownEntryTypes = false;
+         }
          else if (args[i].equals("--interpret"))
          {
             interpret = true;
@@ -4991,8 +5045,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.8.20190318";
-   public static final String DATE = "2019-03-18";
+   public static final String VERSION = "1.8.20190331";
+   public static final String DATE = "2019-03-31";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5019,6 +5073,8 @@ public class Bib2Gls implements TeXApp
    private boolean fontspec = false;
    private boolean hyperref = false;
    private boolean createHyperGroups = true;
+   private boolean checkNonBibFields = true;
+   private boolean warnUnknownEntryTypes = true;
 
    private int altModifier = -1;
 
@@ -5030,6 +5086,19 @@ public class Bib2Gls implements TeXApp
 
    private static final String[] SPECIAL_FIELDS =
     new String[] {"progeny", "progenitor", "adoptparents"};
+
+   private static final String[] NON_BIB_FIELDS =
+    new String[] {"bibtexcontributor", "bibtexentry", "childcount",
+     "childlist", "dual", "group", "indexcounter",
+     "location", "loclist", "originalentrytype", "primarylocations",
+     "progenitor", "progeny", "recordcount", "secondarygroup",
+     "secondarysort", "currcount", "desc", "descplural", "firstpl",
+     "flag", "index", "level", "longpl", "prevcount", "prevunitmax",
+     "prevunittotal", "shortpl", "sortvalue", "unitlist", "useri",
+     "userii", "useriii", "useriv", "userv", "uservi"};
+   /* Not including: 'nonumberlist', 'sort', 'type', 'bibtextype',
+    * 'counter'.
+    */ 
 
    private HashMap<String,String> glsLike;
 

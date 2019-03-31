@@ -387,7 +387,8 @@
 }
 
 \newcommand*{\topicabbrstyle}[1]{%
-  \texorpdfstring{\idx[prefix=topic.]{abbrstyle.#1}}{#1}%
+  %\texorpdfstring{\idx[prefix=topic.]{abbrstyle.#1}}{#1}%
+  \texorpdfstring{\idx{abbrstyle.#1}}{#1}%
 }
 
 \newcommand*{\glostyle}[1]{%
@@ -395,7 +396,8 @@
 }
 
 \newcommand*{\topicglostyle}[1]{%
-  \texorpdfstring{\idx[prefix=topic.]{glostyle.#1}}{#1}%
+ %\texorpdfstring{\idx[prefix=topic.]{glostyle.#1}}{#1}%
+ \texorpdfstring{\idx{glostyle.#1}}{#1}%
 }
 
 \newcommand*{\iglostyle}[1]{%
@@ -734,7 +736,7 @@
      \GlsXtrIfHasNonZeroChildCount{##1}%
      {This command has \glscurrentfieldvalue\ forms:}{}%
    }%
-   \listtopics{##1}%
+   %\listtopics{##1}%
    \par\medskip
   }%
   \renewcommand*{\subglossentry}[3]{%
@@ -1547,85 +1549,12 @@ application (so the resource option list would need
 it's best to avoid this hybrid method unless you have a particular
 set of \idx{xindy} rules that can't be replicated with \bibgls.
 
-\section{Defining a New Glossary}
-\label{sec:newglossary}
-
-Some of the examples in this manual use \ics{newglossary*} to define
-a new glossary type and some use \ics{newignoredglossary} or
-\ics{newignoredglossary*}. Why the starred forms and why define an
-\idx{ignoredglossary}?
-
-The base \styfmt{glossaries} package was originally designed to work
-with \idx!{makeindex}. Support for \idx!{xindy} was later added, but
-both require three files per glossary type: the transcript file
-(created by the indexing application), the file written by \LaTeX\
-(and input by the indexing application) and the file input by
-\LaTeX\ (and written by the indexing application). So when a new glossary
-is defined with \ics{newglossary}, this not only defines internal
-control sequences that store the list of entry labels associated
-with that glossary, the title and the entry format but also has to
-define internal control sequences that store the three file
-extensions. The starred form \cs{newglossary*} is just a shortcut
-that forms the extensions from the glossary label. For the purposes
-of \bibgls, this is simpler than the unstarred version since the
-extensions are now irrelevant as they are only applicable to
-\idx!{makeindex} and \idx!{xindy}. (Unless, of course, you are using
-a hybrid method with \styopt[alsoindex]{record}.)
-
-Since some users wanted the ability to define entries that were
-common enough to not be worth including in any glossary lists, the
-concept of an \idx{ignoredglossary} was introduced, defined with
-\cs{newignoredglossary}. This only requires an internal control
-sequence to store the list of entry labels associated with that
-glossary\footnote{All entries must be assigned to a glossary. If you
-don't use the \field{type} field the default is used.}\ and the
-associated internal command that governs the way that
-commands like \cs{gls} are displayed for that glossary type. 
-Since this type of glossary has no associated files, it can't be
-used with \cs{printglossary} and therefore isn't included in the
-list of glossary labels that's iterated over by commands like
-\cs{printglossaries}. Since there's no glossary list (and therefore
-no targets), \cs{newignoredglossary} additionally disables hyperlinks for that
-glossary type, but it doesn't disable indexing.  The indexing macro
-is still called, but because there's no associated file to write to,
-it has no effect. With \bibgls, the indexing is written to the
-\ext{aux} file and so does have an effect.
-
-Although \idxpl{ignoredglossary} can't be used with
-\cs{printglossary}, they can be used with \cs{printunsrtglossary},
-which is designed to work without any indexing, but you need to
-explicitly set the title in the optional argument to override the
-default. The \idxpl{ignoredglossary} still can't be used in
-\cs{printunsrtglossaries}, since they're not included in the list
-that this command iterates over.
-
-So \cs{newignoredglossary} is useful with \bibgls\ if you're happy
-to use \cs{printunsrtglossary} as it reduces the overall number of
-internal control sequences. Since there is now the possibility of
-targets (created within \cs{printunsrtglossary}), it's useful to
-have an \idx{ignoredglossary} that doesn't suppress the hyperlinks,
-which can be obtained with the starred form \ics{newignoredglossary*}
-provided by \styfmt{glossaries-extra}.
-
-Some resource options, such as \csopt{master}, \csopt{secondary} and
-\csopt{trigger-type}, need to ensure that a
-required glossary is defined. In this case, \bibgls\ uses
-\ics{provideignoredglossary*} in the \iext{glstex} file. If you
-haven't already defined that glossary in the document with \cs{newglossary*},
-you'll need to set the title in the optional argument of
-\cs{printunsrtglossary} if you don't want the default. The glossary
-won't be defined on the first run (if the definition is only
-provided in the \ext{glstex} file) but \cs{printunsrtglossary} will
-just give a warning if the type is undefined so it won't interrupt
-the document build.
-
-\section{Logical Divisions: \field{type} vs \field{parent} vs
-\field{group}}
+\section{Logical Divisions: \field{type} vs \field{group} vs \field{parent}}
 \label{sec:logicaldivisions}
 
 If you have a document with many terms that need listing, it's
 likely that you may want to divide the terms into separate blocks or
-units for easier reading. There are three fields that can be used
+units for easier reading. There are three fields that are used
 for this.
 \begin{description}
 \item[\field{type}] The highest division is the glossary to which
@@ -1639,7 +1568,7 @@ title is placed in a sectioning command by default.
 \begin{important}
 \bibgls\ does not provide any means of sorting glossary types. If
 you use \ics{printunsrtglossaries} the order will be according to
-the order used to define the glossaries. You may use
+the order in which the glossaries were defined. You may use
 \cs{printunsrtglossary} to list individual glossaries in your own
 preferred order.
 \end{important}
@@ -1678,7 +1607,7 @@ comparator. The sort methods listed
 in \tableref{tab:sortoptionsnosort} disregard the hierarchical
 level, which can result in child entries becoming detached from
 their parent entry. The other methods sort hierarchically using
-the same comparator but taking the hierarchical level into account.
+the same comparator but take the hierarchical level into account.
 \end{important}
 
 \end{description}
@@ -1687,8 +1616,8 @@ Suppose you have a mixture of terms, abbreviations and symbols, then
 you might want to have three glossaries that are listed in the table
 of contents. In this case, you use the \field{type} field or the
 \field{type} resource option. The ordering of the glossaries is
-determined by the document's ordering of the \cs{printunsrtglossary}
-commands. For example:
+determined by the ordering of the \cs{printunsrtglossary}
+commands within the document. For example:
 \begin{codeenv}
 \cs{printunsrtglossary}
 \cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type}}
@@ -1704,30 +1633,30 @@ glossary. For example:
 \cs{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
 \end{codeenv}
 
-Suppose that your list of symbols consists of Latin characters,
-Greek characters and pictographs and you want them grouped together
+Suppose that your list of symbols consists of pictographs, Latin characters
+and Greek characters and you want them grouped together
 in that order. Then you would use a separate
 \gls{GlsXtrLoadResources} for each block and assign your own custom 
 group. This means ensuring that each \idx{resourceset} only selects
 the terms for that group. The simplest way of doing this is to
 have a separate \ext{bib} file for each set. For example:
 \begin{codeenv}
-\gls{glsxtrsetgrouptitle}\marg{latinsymbols}{Latin}
-\gls{glsxtrsetgrouptitle}\marg{greeksymbols}{Greek}
-\gls{glsxtrsetgrouptitle}\marg{pictographs}{Pictographs}
+\gls{glsxtrsetgrouptitle}\marg{pictographs}\marg{Pictographs}
+\gls{glsxtrsetgrouptitle}\marg{latinsymbols}\marg{Latin Characters}
+\gls{glsxtrsetgrouptitle}\marg{greeksymbols}\marg{Greek Characters}
 \gls{GlsXtrLoadResources}\oarg{
-  \csopt[latinsymbols]{src},
+  \csopt[generalsymbols]{src},\comment{data in generalsymbols.bib}
+  \csopt[pictographs]{group},
+  \csopt[symbols]{type}
+}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[latinsymbols]{src},\comment{data in latinsymbols.bib}
   \csopt[latin]{group},
   \csopt[symbols]{type}
 }
 \gls{GlsXtrLoadResources}\oarg{
-  \csopt[greeksymbols]{src},
+  \csopt[greeksymbols]{src},\comment{data in greeksymbols.bib}
   \csopt[greek]{group},
-  \csopt[symbols]{type}
-}
-\gls{GlsXtrLoadResources}\oarg{
-  \csopt[pictographs]{src},
-  \csopt[pictographs]{group},
   \csopt[symbols]{type}
 }
 \end{codeenv}
@@ -1809,17 +1738,18 @@ This has a custom field \fieldfmt{identifier}. This will be ignored
 by \bibgls\ unless defined or aliased in the document.
 
 Here's an example document that creates three glossary types (the
-default \code{main}, the \code{abbreviations} glossary created with
-the \styopt{abbreviations} option and the \code{symbols} glossary
-created with the \styopt{symbols} option). They are listed in the
-order of \cs{printunsrtglossary} and their titles are added to the
-table of contents.
+default \code{main} glossary and the glossaries created with the
+\styopt{abbreviations} and \styopt{symbols} options). They are
+listed in the order of \cs{printunsrtglossary} and their titles are
+added to the table of contents.
 
 The custom \fieldfmt{identifier} fields are ignored for the
 main and abbreviation glossaries, but they are aliased for the
 symbols to the \field{group} field. Since I've split the symbols
 glossary into blocks with each block only containing entries that
-have the same \field{group} value, this isn't a problem. The blocks
+have the same \field{group} value, this isn't a problem. It also
+won't trigger a warning with \longarg{warn-non-bib-fields} as it's
+being aliased rather than set in the \ext{bib} file. The blocks
 appear in the same order as the corresponding \gls{GlsXtrLoadResources} 
 commands. The title for each block is provided in the document 
 using \gls{glsxtrsetgrouptitle}.
@@ -1831,54 +1761,31 @@ using \gls{glsxtrsetgrouptitle}.
 \cs{renewcommand}\marg{\gls{GlsXtrDefaultResourceOptions}}\marg{
  \csopt[all]{selection},\csopt[entries]{src},\csopt[false]{save-locations}}
 \strut
-\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[\marg{entrytype=entry}]{match}}
-\gls{GlsXtrLoadResources}\oarg{\csopt[abbreviations]{type},\csopt[\marg{entrytype=abbreviation}]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[entrytype=entry]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbreviations]{type},
+ \csopt[entrytype=abbreviation]{match}}
 \strut
 \gls{glsxtrsetgrouptitle}\marg{pictograph}\marg{Pictographs}
 \gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
- \csopt[\marg{identifier=\field{group}}]{field-aliases},
- \csopt[\marg{\field{group}=pictograph}]{match}}
+ \csopt[identifier=\field{group}]{field-aliases},
+ \csopt[\field{group}=pictograph]{match}}
 \strut
 \gls{glsxtrsetgrouptitle}\marg{latin}\marg{Latin Characters}
 \gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
- \csopt[\marg{identifier=\field{group}}]{field-aliases},
- \csopt[\marg{\field{group}=latin}]{match}}
+ \csopt[identifier=\field{group}]{field-aliases},
+ \csopt[\field{group}=latin]{match}}
 \strut
 \gls{glsxtrsetgrouptitle}\marg{greek}\marg{Greek Characters}
 \gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
- \csopt[\marg{identifier=\field{group}}]{field-aliases},
- \csopt[\marg{\field{group}=greek}]{match}}
+ \csopt[identifier=\field{group}]{field-aliases},
+ \csopt[\field{group}=greek]{match}}
 \strut
 \cmd{begin}\marg{document}
 \cs{tableofcontents}
 \cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type}}
 \cs{printunsrtglossary}
-\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type},\printglossopt[treegroup]{style}}
+\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type},\printglossopt[\glostyle{treegroup}]{style}}
 \cmd{end}\marg{document}
-\end{codeenv}
-If this document is called \filefmt{myDoc.tex} then the document
-build should be:
-\begin{verbatim}
-pdflatex myDoc
-bib2gls myDoc
-pdflatex myDoc
-\end{verbatim}
-Note that the \longarg{group} switch isn't used as there's no need
-for \bibgls\ to form letter groups during sorting. If it is used
-then the main and abbreviation glossaries will have groups formed.
-With the default \glostyle{list} style this will just have vertical
-gaps between the groups. You can switch those gaps off with the
-\printglossopt{nogroupskip} option:
-\begin{codeenv}
-\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type},\printglossopt{nogroupskip}}
-\cs{printunsrtglossary}\oarg{\printglossopt{nogroupskip}}
-\end{codeenv}
-In general it's simpler not to use the \longarg{group} switch if
-it's not required, but if you have one glossary that needs it then
-you can use this approach with the other glossaries. For example:
-\begin{codeenv}
-\cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type},\printglossopt{nogroupskip}}
-\cs{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
 \end{codeenv}
 
 In the above example document, the symbols list is divided into
@@ -1892,31 +1799,102 @@ by aliasing the custom \fieldfmt{identifier} field to
 \strut
 \cmd{usepackage}\oarg{\styopt{record},\styopt[topic]{stylemods},\styopt{abbreviations},\styopt{symbols}}\marg{glossaries-extra}
 \strut
-\cs{renewcommand}\marg{\gls{GlsXtrDefaultResourceOptions}}\marg{
+\cs{renewcommand}\marg{\gls{GlsXtrDefaultResourceOptions}}\marg{\comment{}
  \csopt[all]{selection},\csopt[entries]{src},\csopt[false]{save-locations}}
 \strut
-\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[\marg{entrytype=entry}]{match}}
-\gls{GlsXtrLoadResources}\oarg{\csopt[abbreviations]{type},\csopt[\marg{entrytype=abbreviation}]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[entrytype=entry]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbreviations]{type},
+ \csopt[entrytype=abbreviation]{match}}
 \strut
-\gls{GlsXtrLoadResources}\oarg{csopt[symbols]{type},
- \csopt[\marg{identifier=\field{parent}}]{field-aliases},
- \csopt[\marg{entrytype=symbol,entrytype=indexplural}]{match}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},
+ \csopt[identifier=\field{parent}]{field-aliases},
+ \csopt[entrytype=symbol,entrytype=indexplural]{match}}
 \strut
 \cmd{begin}\marg{document}
 \cs{tableofcontents}
 \cs{printunsrtglossary}\oarg{\printglossopt[abbreviations]{type}}
 \cs{printunsrtglossary}
-\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type},\printglossopt[topic]{style}}
+\cs{printunsrtglossary}\oarg{\printglossopt[symbols]{type},\printglossopt[\glostyle{topic}]{style}}
 \cmd{end}\marg{document}
 \end{codeenv}
-The document build is the same as before. The \longarg{group} switch
-again isn't required. The style used for the symbols list is now
-\glostyle{topic} rather than \glostyle{treegroup}. This results in a
-slightly different appearance. You can select the most appropriate
-style (see the
-\href{https://www.dickimaw-books.com/gallery/glossaries-styles/}{gallery
-of predefined styles}). The topic ordering is now: Greek characters,
-Latin characters and Pictographs.
+The style used for the symbols list is now \glostyle{topic} rather
+than \glostyle{treegroup}. This results in a slightly different
+appearance. You can select the most appropriate style according to
+your needs (see the gallery of predefined
+styles~\cite{glossarystylesgallery}). The topic ordering is now:
+Greek characters, Latin characters and Pictographs.
+
+\section{Defining a New Glossary}
+\label{sec:newglossary}
+
+Some of the examples in this manual use \ics{newglossary*} to define
+a new glossary type and some use \ics{newignoredglossary} or
+\ics{newignoredglossary*}. Why the starred forms and why define an
+\idx{ignoredglossary}?
+
+The base \styfmt{glossaries} package was originally designed to work
+with \idx!{makeindex}. Support for \idx!{xindy} was later added, but
+both require three files per glossary type: the transcript file
+(created by the indexing application), the file written by \LaTeX\
+(and input by the indexing application) and the file input by
+\LaTeX\ (and written by the indexing application). So when a new glossary
+is defined with \ics{newglossary}, this not only defines internal
+control sequences that store the list of entry labels associated
+with that glossary, the title and the entry format but also has to
+define internal control sequences that store the three file
+extensions. The starred form \cs{newglossary*} is just a shortcut
+that forms the extensions from the glossary label. For the purposes
+of \bibgls, this is simpler than the unstarred version since the
+extensions are now irrelevant as they are only applicable to
+\idx!{makeindex} and \idx!{xindy}. (Unless, of course, you are using
+a hybrid method with \styopt[alsoindex]{record}.)
+
+Since some users wanted the ability to define entries that were
+common enough to not be worth including in any glossary lists, the
+concept of an \idx{ignoredglossary} was introduced, defined with
+\cs{newignoredglossary}. This only requires an internal control
+sequence to store the list of entry labels associated with that
+glossary\footnote{All entries must be assigned to a glossary. If you
+don't use the \field{type} field the default is used.}\ and the
+associated internal command that governs the way that
+commands like \cs{gls} are displayed for that glossary type. 
+Since this type of glossary has no associated files, it can't be
+used with \cs{printglossary} and therefore isn't included in the
+list of glossary labels that's iterated over by commands like
+\cs{printglossaries}. Since there's no glossary list (and therefore
+no targets), \cs{newignoredglossary} additionally disables hyperlinks for that
+glossary type, but it doesn't disable indexing.  The indexing macro
+is still called, but because there's no associated file to write to,
+it has no effect. With \bibgls, the indexing is written to the
+\ext{aux} file and so does have an effect.
+
+Although \idxpl{ignoredglossary} can't be used with
+\cs{printglossary}, they can be used with \cs{printunsrtglossary},
+which is designed to work without any indexing, but you need to
+explicitly set the title in the optional argument to override the
+default. The \idxpl{ignoredglossary} still can't be used in
+\cs{printunsrtglossaries}, since they're not included in the list
+that this command iterates over.
+
+So \cs{newignoredglossary} is useful with \bibgls\ if you're happy
+to use \cs{printunsrtglossary} as it reduces the overall number of
+internal control sequences. Since there is now the possibility of
+targets (created within \cs{printunsrtglossary}), it's useful to
+have an \idx{ignoredglossary} that doesn't suppress the hyperlinks,
+which can be obtained with the starred form \ics{newignoredglossary*}
+provided by \styfmt{glossaries-extra}.
+
+Some resource options, such as \csopt{master}, \csopt{secondary} and
+\csopt{trigger-type}, need to ensure that a
+required glossary is defined. In this case, \bibgls\ uses
+\ics{provideignoredglossary*} in the \iext{glstex} file. If you
+haven't already defined that glossary in the document with \cs{newglossary*},
+you'll need to set the title in the optional argument of
+\cs{printunsrtglossary} if you don't want the default. The glossary
+won't be defined on the first run (if the definition is only
+provided in the \ext{glstex} file) but \cs{printunsrtglossary} will
+just give a warning if the type is undefined so it won't interrupt
+the document build.
 
 \section{Resource Sets}
 \label{sec:resourcesets}
@@ -3007,6 +2985,43 @@ This switch is most useful in conjunction with
 Don't check for instances of \ics{citation} in the \ext{aux} file
 (default).
 
+\argsection{warn-non-bib-fields}
+
+If any internal fields are found in the \ext{bib} file, this setting
+will issue a warning as their use can cause unexpected results.
+The fields checked for are those listed in Tables~\ref{tab:internalfields}
+and \ref{tab:baseinternalfields} with a few exceptions, notably
+\field{type} and \field{sort}. Ideally you shouldn't need to use
+\field{sort} as there should be an appropriate fallback set up to
+use if \field{sort} isn't set, such as the label for symbols or the
+name for terms or the short form for abbreviations.
+
+This is the default setting and was added as some users were
+confused over which fields could be used in the \ext{bib} file.
+The use of these fields can break \bibgls's normal behaviour and
+cause unexpected results.
+
+The check is performed before field aliasing, so it's possible to
+alias a field to an internal field, such as \field{group}, without
+triggering this warning. If you do this you need to make sure you
+have taken appropriate precautions to avoid unexpected results.
+
+\argsection{no-warn-non-bib-fields}
+
+Switches off the check for non-bib fields. If you use this option
+you need to make sure you have taken appropriate precautions to
+avoid unexpected results.
+
+\argsection{warn-unknown-entry-types}
+
+If any unknown entry types are found in the \ext{bib} file, \bibgls\
+will issue a warning with this option set (default).
+
+\argsection{no-warn-unknown-entry-types}
+
+This option will suppress the warning if an unknown entry types are
+found in the \ext{bib} file.
+
 \argsection{merge-wrglossary-records}
 
 For use with the \styopt{indexcounter} package option
@@ -3412,7 +3427,7 @@ and \encap{hyperbf} or \encap{hyperit} for a primary reference.)
 \argsection{group}
 
 The \styfmt{glossaries-extra} \styopt{record} package option
-automatically creates a new field called \field{group}. If the
+automatically creates a new internal field called \field{group}. If the
 \longarg{group} switch is used then, when sorting, \bibgls\ will try
 to determine the letter group for each entry and add it to the
 \field{group} field.  (Some \csopt{sort} options ignore this
@@ -3426,14 +3441,15 @@ switch doesn't automatically select an appropriate glossary style.
 
 \begin{important}
 The \field{group} field should typically not be set in the \ext{bib}
-file. This will override \bibgls's normal group formation behaviour,
+file and will trigger a warning if found. The explicit use of the
+\field{group} key will override \bibgls's normal group formation behaviour,
 which can cause unexpected results. The custom use of the
 \field{group} field requires some care. As a general rule, if you
 find yourself wanting to use the \field{group} field in the \ext{bib} file,
 then the chances are that what you actually have is a hierarchical
 glossary (list of topics) and what you really need is the \field{parent} field.
+See also \sectionref{sec:logicaldivisions}.
 \end{important}
-
 There are eight types of groups:
 \begin{description}
 \item[\idx{lettergroup}] The first non-ignored character of the
@@ -3479,10 +3495,10 @@ The group label is obtained from \gls!{bibglsdategroup}.
 comparisons (where the date is omitted). 
 The group label is obtained from \gls!{bibglstimegroup}.
 
-\item[\idx{customgroup}] The group label is explicitly set either in
-the \ext{bib} file (but note the above warning) or using the
+\item[\idx{customgroup}] The group label is explicitly set either by
+aliasing a field (with \csopt{field-aliases}) or by using the
 \csopt[\meta{label}]{group} resource option. You will need to use
-\gls{glsxtrsetgrouptitle} to provide an associated title if the
+\gls{glsxtrsetgrouptitle} in the document to provide an associated title if the
 \meta{label} isn't the same as the title.  Remember that the label
 can't contain any active characters, so you can't use non-ASCII
 characters in \meta{label} with \sty{inputenc} (but you can use
@@ -3608,7 +3624,7 @@ hyper-group styles, and make sure you have an up-to-date version of
 
 \argsection{no-group}
 
-Don't use the \field{group} field. (Default.)
+Don't automatically set the \field{group} field (default).
 The glossary won't have groups even if a group style, such as
 \glostyle{indexgroup}, is used.
 
@@ -3867,8 +3883,16 @@ Each entry type may have required fields, optional fields and
 ignored fields. These are set using a \keyvallist\ within
 \code{@\meta{entry-type}\marg{\meta{id},\meta{fields}}} in the
 \ext{bib} file. Most keys recognised by
-\gls{newglossaryentry} may be used as a field. In general, you
+\gls{newglossaryentry} may be used as a field unless \bibgls\
+considers them an internal field (see below). In general, you
 shouldn't need to use the \field{sort} field.
+
+If an optional field is missing and \bibgls\ needs to access it for
+some reason, \bibgls\ will try to fallback on another value. The
+actual fallback value depends on the entry type. The most common
+fallback is that used if the \field{sort} field is missing, which is
+typically the case. This approach allows different entry types to
+have different fields used for sorting.
 
 Predefined fields for use in \ext{bib} files are listed in
 Tables~\ref{tab:fields}, \ref{tab:bib2glsfields},
@@ -3876,13 +3900,17 @@ Tables~\ref{tab:fields}, \ref{tab:bib2glsfields},
 custom keys in your document using \ics{glsaddkey} or
 \ics{glsaddstoragekey}, those commands must be placed before the
 first use of \gls{GlsXtrLoadResources} to ensure that \bibgls\
-recognises them as a field name. 
+recognises them as a valid field name. 
 
-Internal fields that may be set by \bibgls\ when it creates the \iext{glstex}
-files are listed in Table~\ref{tab:internalfields}. These typically
-shouldn't be set in the \ext{bib} file. Some of these fields can be set
-for a particular document using a resource option, such as
-\csopt{type} or \csopt{category}.
+Internal fields that may be assigned within the document (the
+\LaTeX\ assignment code having been written by \bibgls\ in the
+\iext{glstex} file) are listed in Table~\ref{tab:internalfields}.
+These typically shouldn't be used in the \ext{bib} file. Some of
+these fields can be set for a particular document using a resource
+option, such as \csopt{type} or \csopt{group}. With
+\longarg{warn-non-bib-fields} set, \bibgls\ will check for internal
+fields that can cause interference with its normal operations and
+will warn if any are found in the \ext{bib} file.
 
 There are also some fields that are set and used by 
 \styfmt{glossaries} or \styfmt{glossaries-extra} listed in
@@ -3899,11 +3927,6 @@ Any unrecognised fields will be ignored by \bibgls. This is more
 convenient than using \ics{input} or \ics{loadglsentries}, which
 requires all the keys used in the file to be defined, regardless of
 whether or not you actually need them in the document.
-
-If an optional field is missing and \bibgls\ needs to access it for
-some reason (for example, for sorting), \bibgls\ will try to
-fallback on another value. The actual fallback value depends on the
-entry type.
 
 Other entries can be cross-referenced using the \field{see},
 \field{seealso} or \field{alias} fields or
@@ -3966,10 +3989,10 @@ location list. The option may be used in combination with the \field{see} or
  [%
    Don't load \isty{glossaries-accsupp} directly (with \ics{usepackage}) 
    when using \styfmt{glossaries-extra}. Load using the \styopt{accsupp} 
-   package option instead:
-\begin{codeenv}
-\cs{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
-\end{codeenv}
+   package option instead.
+%\begin{codeenv}
+%\cs{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
+%\end{codeenv}
  ]%
  {accessfield}%
  [Fields Provided by \styfmt{glossaries-accsupp}]%
@@ -3978,13 +4001,15 @@ location list. The option may be used in combination with the \field{see} or
 
 \printfields
  [%
-  You may define and assign \field{bibtextype} (although it's more
-  likely to be aliased). Don't define any of others listed in this
+  You may define and assign \field{bibtextype} as a key (although it's more
+  likely to be aliased). Don't define any of the others listed in this
   table, and don't use any of them in the \ext{bib} file. A possible
   exception is the \field{type} field, but it's more flexible to set
-  that through a resource option. The explicit use of \field{sort}
-  or \field{group} within a \ext{bib} file can cause unpredictable
-  results and are best set through a resource option or by \bibgls.%
+  that through a resource option. The explicit use of \field{group} 
+  within a \ext{bib} file can cause unpredictable
+  results and is best set through a resource option or by \bibgls.
+  In general, you shouldn't need to set the \field{sort} field as
+  appropriate fallbacks should produce useful sort values.%
  ]%
  {internalfield}%
  [Fields Set by \bibgls]%
@@ -3993,7 +4018,7 @@ location list. The option may be used in combination with the \field{see} or
 
 \printfields
  [%
-   Don't define any of these and don't use any of them in the \ext{bib}
+   Don't define any of these as keys and don't use any of them in the \ext{bib}
    file.%
  ]%
  {baseinternalfield}%
@@ -8691,14 +8716,14 @@ O \cs{gls}\marg{gato} sentou-se no \cs{gls}\marg{tapete}.
 
 \optsection[\subsubsection]{group}
 
-The \csopt{group} option may only be used with the \longarg{group} switch.
-This will set the \field{group} field to \meta{label} unless
-\meta{label} is \optfmt{auto}, in which case the value is
-set automatically during the sorting (see also
-\csopt{group-formation}). 
-The corresponding title can be set
-with \gls{glsxtrsetgrouptitle} if the title is different from the
-label.  The default behaviour is \csopt[auto]{group}.
+The \csopt{group} option may only be used with the \longarg{group}
+switch.  This will set the \field{group} field to \meta{label}
+unless \meta{label} is \optfmt{auto}, in which case the value is set
+automatically during the sorting (see also \csopt{group-formation}
+and \sectionref{sec:logicaldivisions}).  The corresponding title can
+be set with \gls{glsxtrsetgrouptitle} in the document if the title
+is different from the label.  The default behaviour is
+\csopt[auto]{group}.
 
 For example:
 \begin{codeenv}
@@ -14392,7 +14417,8 @@ the year and era:
 
 If the \field{group} field hasn't been set in
 the \ext{bib} file or through options like \csopt{group}, then it is 
-assigned according to this option's setting during sorting. Permitted values:
+assigned according to this option's setting during sorting if
+\longarg{group} has been used. Permitted values:
 \begin{itemize}
 \item\optfmt{default}: the group is assigned according to 
 the sort method's default group formation. This is the default
@@ -14427,6 +14453,9 @@ significant character of the sort value. For example, the label
 This option has no effect with \longarg{no-group} or if no sorting
 is applied. Use \csopt{secondary-group-formation} for secondary
 sorting and \csopt{dual-group-formation} for dual entries.
+Settings other than the default can cause the groups to become
+fragmented, so care is needed if you use this option.
+See also \sectionref{sec:logicaldivisions}.
 
 \section{Secondary Glossary}
 \label{sec:secondaryopts}
@@ -20637,6 +20666,13 @@ since it doesn't recognise any of the commands, so it will have to
 use the fallback command, which will use one of the commands
 provided by the \sty{glossaries-extra-stylemods} package.
 
+This is actually not the best method as \bibgls\ can't see the group
+titles as they're in the document, so it's only able to sort by the
+label. While this might work for English, it can become a problem
+for other languages that use extended Latin or non-Latin characters
+in their alphabet. A much better method is to treat this as a
+hierarchical glossary with topic titles as the top-level entries.
+
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-textsymbols
@@ -22152,7 +22188,7 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 
 \printstyoptsummary
 \printcommandsummary
-\printcommandtopic
+%\printcommandtopic
 
 \bibliographystyle{plain}
 \bibliography{bib2gls-cite}

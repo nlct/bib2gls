@@ -76,7 +76,7 @@ public class Bib2GlsAt extends At
          {
             data = BibData.createBibData(entryType);
 
-            if (data instanceof BibEntry)
+            if (data instanceof BibEntry && bib2gls.isWarnUnknownEntryTypesOn())
             {
                bib2gls.warning(parser,
                   bib2gls.getMessage("warning.ignoring.unknown.entry.type", 

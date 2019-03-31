@@ -7793,7 +7793,8 @@ long form on \idx{firstuse}. The default definition just uses
 
 @field{field.parent,
   name={\fieldfmt{parent}},
-  description={The parent entry's label.},
+  description={The parent entry's label. See 
+   \sectionref{sec:logicaldivisions}.},
   note={\styfmt{glossaries}},
   category={basefield},
   parent={fields}
@@ -8171,7 +8172,8 @@ primary formats, if enabled.},
 @field{field.group,
   name={\fieldfmt{group}},
   description={The letter group determined by the comparator
-   (or assigned by the \csopt{group} option).},
+   (or assigned by the \csopt{group} option). See 
+   \sectionref{sec:logicaldivisions}.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}
@@ -8258,7 +8260,8 @@ primary formats, if enabled.},
 @field{field.type,
   name={\fieldfmt{type}},
   description={The glossary this entry belongs to (assigned by
-   the \csopt{type} option).},
+   the \csopt{type} option). See 
+   \sectionref{sec:logicaldivisions}.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}
@@ -8835,6 +8838,34 @@ primary formats, if enabled.},
 
 @switch{switch.no-interpret,
   name={\longargfmt{no\dhyphen interpret}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.warn-non-bib-fields,
+  name={\longargfmt{warn\dhyphen non\dhyphen bib\dhyphen fields}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.no-warn-non-bib-fields,
+  name={\longargfmt{no\dhyphen warn\dhyphen non\dhyphen bib\dhyphen fields}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.warn-unknown-entry-types,
+  name={\longargfmt{warn\dhyphen unknown\dhyphen entry\dhyphen types}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.no-warn-unknown-entry-types,
+  name={\longargfmt{no\dhyphen warn\dhyphen unknown\dhyphen entry\dhyphen types}},
   user1={},
   category={switch},
   parent={commandlineoptions}

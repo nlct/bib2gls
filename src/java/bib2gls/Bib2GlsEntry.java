@@ -700,6 +700,21 @@ public class Bib2GlsEntry extends BibEntry
       return fieldsParsed;
    }
 
+   @Override
+   public boolean checkField(String field) throws BibTeXSyntaxException
+   {
+      if (bib2gls.isCheckNonBibFieldsOn())
+      {
+         if (bib2gls.isNonBibField(field))
+         {
+            bib2gls.warningMessage("warning.non_bib_field", 
+             field, base==null?"":base, getOriginalId());
+         }
+      }
+
+      return true;
+   }
+
    public void parseFields(TeXParser parser)
      throws IOException
    {

@@ -49,6 +49,14 @@ See the manual for further details.</entry>
 <entry key="syntax.no.force.cross.resource.refs">{0}
 			Don''t force cross-resource referencing mode on 
 			(default).</entry>
+<entry key="syntax.warn.non.bib.fields">{0}
+			Warn if internal non-bib fields are found in .bib file.</entry>
+<entry key="syntax.no.warn.non.bib.fields">{0}
+			Don''t warn if internal non-bib fields are found in .bib file.</entry>
+<entry key="syntax.warn.unknown.entry.types">{0}
+			Warn if unknown entry types are found in .bib file.</entry>
+<entry key="syntax.no-warn.unknown.entry.types">{0}
+			Don''t warn if unknown entry types are found in .bib file.</entry>
 
 <entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;
 			Rule for merging locations with record=nameref
@@ -312,6 +320,7 @@ Defaulting to: {0}.
 <entry key="warning.private.entry.type">Private entry type ''{0}'' found. Did you mean ''{1}''?</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
 <entry key="warning.ignoring.unknown.field">Ignoring unknown field: {0}</entry>
+<entry key="warning.non_bib_field">Found internal non bib-field ''{0}'' in ''{1}.bib'' file for entry ''{2}''. Unexpected results may occur.</entry>
 <entry key="warning.entry.already.defined">Entry {0} is being defined in {1} but it has already been defined in a previous .glstex file.</entry>
 <entry key="warning.can.find.arg">Can''t detect argument for: \{0}</entry>
 <entry key="warning.no.default.sort">Can''t determine sort value for: {0}
