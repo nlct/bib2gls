@@ -76,7 +76,7 @@ sample-textsymbols.pdf	: $(DEPS) sample-textsymbols.tex \
 	pdflatex sample-textsymbols
 
 sample-textsymbols2.pdf	: $(DEPS) sample-textsymbols2.tex \
-	miscsymbols.bib
+	miscsymbols.bib topics.bib
 	pdflatex sample-textsymbols2
 	$(BIB2GLS) sample-textsymbols2
 	pdflatex sample-textsymbols2

@@ -45,13 +45,19 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       }
    }
 
+   @Override
+   public String getSortFallbackField()
+   {
+      return resource.getAbbrevDefaultSortField();
+   }
+
    public String getFallbackValue(String field)
    {
       String val;
 
       if (field.equals("sort"))
       {
-         field = resource.getAbbrevDefaultSortField();
+         field = getSortFallbackField();
          val = getFieldValue(field);
 
          if (val != null)
@@ -80,7 +86,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       if (field.equals("sort"))
       {
-         String fallbackField = resource.getAbbrevDefaultSortField();
+         String fallbackField = getSortFallbackField();
          val = getField(fallbackField);
 
          return val == null ? getFallbackContents(fallbackField) : val;

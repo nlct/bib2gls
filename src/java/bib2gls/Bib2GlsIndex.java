@@ -52,6 +52,11 @@ public class Bib2GlsIndex extends Bib2GlsEntry
    {// no required fields
    }
 
+   public String getSortFallbackField()
+   {
+      return "name";
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("name"))

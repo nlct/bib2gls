@@ -1705,6 +1705,11 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
+   public String getSortFallbackField()
+   {
+      return resource.getEntryDefaultSortField();
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("text"))
@@ -1731,11 +1736,12 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("sort"))
       {
-         String value = fieldValues.get("name");
+         String fallbackField = getSortFallbackField();
+         String value = fieldValues.get(fallbackField);
 
          if (value != null) return value;
 
-         return getFallbackValue("name");
+         return getFallbackValue(fallbackField);
       }
       else if (field.equals("first"))
       {
@@ -1833,9 +1839,10 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("sort"))
       {
-         BibValueList contents = getField("name");
+         String fallbackField = getSortFallbackField();
+         BibValueList contents = getField(fallbackField);
 
-         return contents == null ? getFallbackContents("name") : contents;
+         return contents == null ? getFallbackContents(fallbackField) : contents;
       }
       else if (field.equals("first"))
       {

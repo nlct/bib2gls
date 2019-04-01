@@ -4364,10 +4364,11 @@ For example:
 }
 \end{codeenv}
 
-If the \field{sort} field is missing the default is obtained from the
-\field{name} field.  (A different field can be selected for the sort value with
-\csopt{sort-field}.) For hierarchical entries, if the \field{name} field is
-omitted it will be obtained from the parent's \field{name}. 
+If the \field{sort} field is missing the default is obtained from
+the \field{name} field (unless overridden by
+\csopt{entry-sort-fallback}). For hierarchical entries, if the
+\field{name} field is omitted it will be obtained from the parent's
+\field{name}. 
 
 Terms defined using \atentry{entry} will be written to the output
 (\ext{glstex}) file using the command \gls!{bibglsnewentry}.
@@ -4451,6 +4452,10 @@ behaviour of \atentry{entry}, which fetches the name from the parent
 entry.) If the name contains any characters that can't be used in
 the label, you must use the \field{name} field. If the \field{sort}
 field is missing the default is obtained from the \field{name}.
+Note that the \atentry{index} entry type is \emph{not} governed by
+\csopt{entry-sort-fallback}. This allows \atentry{index} and
+\atentry{entry} to have different fallbacks if the \field{sort}
+field is missing.
 
 Example:
 \begin{codeenv}
@@ -4472,7 +4477,9 @@ missing, is obtained from the \field{plural} field. If the
 field with the plural suffix appended. If the \field{text} field is
 missing, it's obtained from the original entry label. If the
 \field{sort} field is missing the default is obtained from the
-\field{name} field. All fields are optional. For example:
+\field{name} field. (As with \atentry{index}, \atentry{indexplural}
+is \emph{not} governed by \csopt{entry-sort-fallback}.) 
+All fields are optional. For example:
 \begin{codeenv}
 \atentry{indexplural}\marg{goose,
   \field{plural} = \marg{geese}
@@ -12315,7 +12322,50 @@ and also \csopt{sort-label-list} for sorting field values that
 contain a comma-separated list of entry labels (such as the
 \field{see} or \field{seealso} fields).
 
-Remember that you can have \atentry{preamble} definitions that
+The sort methods that use a comparison function (that is, all the
+sort methods except those listed in \tableref{tab:sortoptionsnosort})
+require a sort value for each entry. The function compares these
+values to determine the order. By default, this sort value is
+obtained from the \field{sort} field but for greater flexibility
+it's best to not actually set this field. \bibgls\ has a set of fallbacks
+that it uses if a field it needs to access is missing. These
+fallbacks depend on the entry type and resource settings.
+
+For example, if a term defined with \atentry{index} doesn't have the
+\field{sort} field set then \bibgls\ will use the value given by the
+\field{name} field because \field{name} is the fallback field for
+\field{sort} for \atentry{index} entries. If the \field{name} field
+isn't set either then \bibgls\ will use the fallback for that field.
+In the case of \atentry{index} that's the entry's label. If the
+\field{sort} field is explicitly set then there's no need to use the
+fallback.
+
+If, on the other hand, a term defined with \atentry{symbol} doesn't
+have the \field{sort} field set then \bibgls\ will use the value
+from the field identified by \csopt{symbol-sort-fallback}, which is
+the entry's label by default (not the \field{name} field).
+
+This means that if I don't explicitly set the \field{sort} field for
+any entries then I can, for example, sort terms defined with
+\atentry{index} by \field{name} and those defined with
+\atentry{symbol} by \field{description} with the setting:
+\begin{codeenv}
+\csopt[description]{symbol-sort-fallback}
+\end{codeenv}
+
+If the field used to obtain the sort value is changed
+(with \csopt{sort-field}) then the \field{sort} field won't be
+queried. This reduces the flexibility of selecting the most
+appropriate field for given entry types. For example,
+\csopt[name]{sort-field} will force all entries to be sorted by the
+\field{name} field, which may not be appropriate for symbols.
+
+\begin{important}
+If you choose a field whose value must be a label (such as
+\field{parent} or \field{group}) then the sort value will be that label.
+\end{important}
+
+You can have \atentry{preamble} definitions that
 can be hidden from \bibgls's interpreter. For example,
 \exfile{no-interpret-preamble.bib} might contain:
 \begin{codeenv}
@@ -13285,12 +13335,19 @@ setting, the fallback for the \field{sort} field is governed not
 only by the entry type but also by some associated settings:
 
 \begin{itemize}
-\item For entries types like \atentry{entry} or \atentry{index},
-then if the \field{sort} field is missing the value is obtained from
-the \field{name} field. If that field is also missing, then the
-value is obtained from the particular entry type's fallback for the
-\field{name} field. (For example, \field{parent} for
-\atentry{entry}.)
+\item If the entry is defined using \atentry{entry} (or a dual form
+that acts like \atentry{entry}), then if the \field{sort} field is
+missing the value is obtained from the field identified by
+\csopt{entry-sort-fallback}. If that field is also missing then
+that field's fallback is used.
+
+\item For the index entry types like \atentry{index} or
+\atentry{indexplural}, then if the \field{sort} field is missing the
+value is obtained from the \field{name} field. If that field is also
+missing, then the value is obtained from the particular entry type's
+fallback for the \field{name} field. (For example, the entry's label
+for \atentry{index} or the \field{plural} field for
+\atentry{indexplural}.)
 
 \item If the entry is defined with an abbreviation type (for
 example, \atentry{abbreviation} or \atentry{acronym}) then if the
@@ -13323,16 +13380,26 @@ missing, then \bibgls\ will query the entry type's fallback for
 \item If the entry type has a fallback rule for \meta{sort-field},
 then that rule is used. When \csopt[sort]{sort-field} this means:
 \begin{itemize}
+\item If the entry was defined using one of the index types (such as
+\atentry{index}), then \bibgls\ will fallback on the \field{name}
+field.
+
+\item If the entry was defined using the \atentry{entry} type (or a
+dual form that acts like \atentry{entry}), then \bibgls\ will
+fallback on the field given by \csopt{entry-sort-fallback}.
+
 \item If the entry was defined using
-one of the symbol types, then \bibgls\
-will fallback on the value given by \csopt{symbol-sort-fallback}.
+one of the symbol types (such as \atentry{symbol}), then \bibgls\
+will fallback on the field given by \csopt{symbol-sort-fallback}.
+
 \item If the entry was defined using
-one of the abbreviation types, then \bibgls\
-will fallback on the value given by
+one of the abbreviation types (such as \atentry{abbreviation}), then \bibgls\
+will fallback on the field given by
 \csopt{abbreviation-sort-fallback}.
+
 \item If the entry was defined using \atentry{bibtexentry} (but not
 the spawned \atentry{contributor} entries), then \bibgls\ will
-fallback on the value given by
+fallback on the field given by
 \csopt{bibtexentry-sort-fallback}.
 \end{itemize}
 If \meta{sort-field} is not \field{sort}, then there may not be a
@@ -13347,6 +13414,101 @@ Use \csopt{dual-missing-sort-fallback} when sorting dual entries
 separately from primaries, and use
 \csopt{secondary-missing-sort-fallback} for \csopt{secondary}
 sorting.
+
+\optsection{entry-sort-fallback}
+
+The regular entry types (such as \atentry{entry} and
+\atentry{dualentry}) will, by default, fallback on the \field{name}
+field if the \field{sort} field is missing (assuming
+\csopt[sort]{sort-field}). If you prefer to
+fallback on a different field, then you can use this option to
+specify the field.
+Note that \csopt{missing-sort-fallback} overrides this setting.
+
+This setting doesn't affect the index type of entries, such as
+\atentry{index} or \atentry{indexplural}. This is useful if your
+glossary contains homographs (terms with the same spelling) which
+can't be distinguished by the sort comparators. For example, suppose
+my file \filefmt{entries.bib} contains:
+\begin{codeenv}
+\atentry{index}\marg{pagelist,
+  \field{name}=\marg{page list},
+  \field{description}=\marg{a list of individual pages or page ranges}
+}
+\strut
+\atentry{index}\marg{glossary}
+\strut
+\atentry{entry}\marg{glossarylist,
+  \field{parent}=\marg{glossary},
+  \field{description}={list of technical words}
+}
+\strut
+\atentry{entry}\marg{glosscol,
+  \field{parent}=\marg{glossary},
+  \field{description}=\marg{collection of glosses}
+}
+\end{codeenv}
+Now first consider a document that uses the default settings:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styopt{record},\styopt{subentrycounter},\styopt[\glostyle{treenoname}]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+A test document describing \cs{glspl}\marg{pagelist} and
+\cs{gls}\marg{glosscol} (collection) vs \cs{gls}\marg{glossarylist} (list).
+\strut
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+The default behaviour for \atentry{entry} if the \field{sort} field
+is missing is to fallback on the \field{name} field. If the
+\field{name} field is missing (as with \code{glossarylist} and
+\code{glosscol}), then the value is obtained from the
+\field{name} field from the parent entry. The parent entry for these
+homographs is the \code{glossary} entry, which was defined with
+\atentry{index} and doesn't have the \field{name} field. For the
+\atentry{index} entries, if \field{name} is missing the value is
+obtained from the label.
+
+Therefore both \code{glossarylist} and \code{glosscol} end
+up with the same sort value: \code{glossary}. This triggers a
+message in verbose mode (\longarg{verbose}) which can be found 
+in the transcript file:
+\begin{verbatim}
+Identical sort values for 'glossarylist' and 'glosscol'
+Falling back on ID
+\end{verbatim}
+So the actual sort values used are \qt{glossarylist} and
+\qt{glosscol}. This puts the \code{glossarylist} entry
+before the \code{glosscol} entry.
+
+Now suppose a minor modification is made to the document:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}
+ \oarg{
+   \csopt[entries]{src},
+   \csopt[description]{entry-sort-fallback}
+ }
+\end{codeenv}
+This means that when the sort function fails to find the
+\field{sort} field for the terms defined with \atentry{entry}, it
+will fallback on the \field{description} field. This doesn't affect
+the terms defined with \atentry{index}, which still fallback on the
+\field{name} field. This time there's no message in the transcript
+file and the \code{glosscol} entry now comes before the
+\code{glossarylist} entry.
+
+\begin{important}
+The \csopt{entry-sort-fallback} setting is only used when \bibgls\
+tries to access the \field{sort} field for a term defined with
+\atentry{entry} and finds that the field hasn't been set. This means
+that this setting has no effect if you explicitly set the \field{sort}
+field or if you change the field used for sorting
+(\csopt{sort-field}).
+\end{important}
 
 \optsection{abbreviation-sort-fallback}
 
@@ -13363,6 +13525,14 @@ omitted. The \meta{field} value must be a known field label.
 
 Note that \csopt{missing-sort-fallback} overrides this setting.
 
+\begin{important}
+The \csopt{abbreviation-sort-fallback} setting is only used when \bibgls\
+tries to access the \field{sort} field for an abbreviation and finds
+that the field hasn't been set. This means that this setting has no effect 
+if you explicitly set the \field{sort} field or if you change the field used 
+for sorting (\csopt{sort-field}).
+\end{important}
+
 \optsection{symbol-sort-fallback}
 
 The entry types that define symbols (such as \atentry{symbol} and
@@ -13375,6 +13545,14 @@ must be a known field label.
 
 Note that \csopt{missing-sort-fallback} overrides this setting.
 
+\begin{important}
+The \csopt{symbol-sort-fallback} setting is only used when \bibgls\
+tries to access the \field{sort} field for a symbol and finds
+that the field hasn't been set. This means that this setting has no effect 
+if you explicitly set the \field{sort} field or if you change the field used 
+for sorting (\csopt{sort-field}).
+\end{important}
+
 \optsection{bibtexentry-sort-fallback}
 
 The main \atentry{bibtexentry} entry types will, by default,
@@ -13384,6 +13562,15 @@ fallback on the \field{name} if the
 field, then you can use this option to specify the field.
 
 Note that \csopt{missing-sort-fallback} overrides this setting.
+
+\begin{important}
+The \csopt{bibtexentry-sort-fallback} setting is only used when
+\bibgls\ tries to access the \field{sort} field for a main entry
+defined with \atentry{bibtexentry} and finds that the field hasn't
+been set. This means that this setting has no effect if you
+explicitly set the \field{sort} field or if you change the field used for
+sorting (\csopt{sort-field}).
+\end{important}
 
 \optsection{trim-sort}
 
@@ -18736,11 +18923,6 @@ it will have to use the fallback command.  Alternatively, you can
 omit \csopt{set-widest} and explicitly use
 \cs{glsFindWidestTopLevelName}.
 
-This file also includes \atentry{index} and \atentry{indexplural}
-entries whose labels match the custom \fieldfmt{identifier} fields.
-This means that you can, for example, alias \fieldfmt{identifier} to
-\field{parent}, as is done in \exfile{sample-textsymbols2.tex}.
-
 The contents of \filefmt{miscsymbols.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/miscsymbols.bib}
 
@@ -19048,6 +19230,14 @@ are no custom fields here.
 
 The contents of \filefmt{terms.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/terms.bib}
+
+\filesection{topics.bib}
+
+The \exfile{topics.bib} file contains entries defined using
+\atentry{index}. Again there are no custom fields here.
+
+The contents of \filefmt{topics.bib} are as follows:
+\lstinputlisting[firstline=5]{../examples/topics.bib}
 
 \filesection{sample-constants.tex}
 
@@ -20607,8 +20797,8 @@ The resulting document is shown in \figureref{fig:sample-maths.pdf}.
 
 \filesection{sample-textsymbols.tex}
 
-This example uses \exfile{miscsymbols.bib}. This requires both
-\isty{marvosym} and (with the \styoptfmt{weather} option)
+This example uses \exfile{miscsymbols.bib}. 
+This requires both \isty{marvosym} and (with the \styoptfmt{weather} option)
 \isty{ifsym}. Unfortunately both define the commands \csfmt{Sun}
 and \csfmt{Lightning}, so these commands need to be undefined after
 the first package is loaded and before the second.
@@ -20634,20 +20824,6 @@ entries to be recognised:
 \begin{codeenv}
 \csopt[icon=symbol]{entry-type-aliases}
 \end{codeenv}
-I want all the symbols but not the \atentry{index} or
-\atentry{indexplural} entries, so I've used a combination of
-\csopt[all]{selection} (to select all) and \csopt{match} (to filter
-out the unwanted entries):
-\begin{codeenv}
-  \csopt[all]{selection},
-  \csopt[entrytype=symbol]{match}
-\end{codeenv}
-An alternative filter criteria is:
-\begin{codeenv}
-  \csopt[original entrytype=icon]{match}
-\end{codeenv}
-(or \csopt{not-match} could be used but would be more complicated in
-this case).
 
 Since none of the entries have a \field{name} or \field{description}
 field, the custom fields \fieldfmt{icon} and
@@ -20729,13 +20905,16 @@ entries to be recognised:
 \begin{codeenv}
 \csopt[icon=symbol]{entry-type-aliases}
 \end{codeenv}
-Unlike the previous example, the custom \fieldfmt{identifier} field
-is now aliased to \field{parent}. The labels match the labels of the
-\atentry{index} and \atentry{indexplural} entries at the start of
-\exfile{miscsymbols.bib}. These represent the topics and unlike the
-previous example it's now possible to sort by the topic title
-(obtained from the \field{name} field) instead of by the label.
+
+The \exfile{topics.bib} file contains terms with
+labels that match the custom \fieldfmt{identifier} fields used in
+the \exfile{miscsymbols.bib} file. So both files are loaded and the
+\fieldfmt{identifier} field is now aliased to \field{parent}. These
+parent entries represent the topics and unlike the previous example
+it's now possible to sort by the topic title (obtained from the
+\field{name} field) instead of by the label.
 \begin{codeenv}
+\csopt[topics,miscsymbols]{src},
 \csopt[
  \fieldfmt{identifier}=\field{parent},
  \fieldfmt{icon}=\field{name},
@@ -20745,9 +20924,10 @@ There's no \csopt{sort-field} option in this example. The default
 \field{sort} field is used. Since it's not set for any of the
 entries, the fallback value will be used. In the case of the topic
 titles (\atentry{index} and \atentry{indexplural}), I want to sort
-by the \field{name}. This is the default fallback if the
-\field{sort} field is missing for \atentry{index} and \atentry{indexplural}.
-The default fallback for \field{sort} field for \atentry{symbol}
+by the \field{name}, which is the default fallback if the
+\field{sort} field is missing for the index entry types.
+
+The default fallback for the \field{sort} field for \atentry{symbol}
 entries is the label, but in this case I want to use the
 \field{description} field:
 \begin{codeenv}

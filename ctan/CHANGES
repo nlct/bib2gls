@@ -13,6 +13,7 @@ v1.9 (pending):
      encapsulate-fields*
      interpret-fields
      replicate-missing-field-action
+     entry-sort-fallback
 
   * new entry types:
 

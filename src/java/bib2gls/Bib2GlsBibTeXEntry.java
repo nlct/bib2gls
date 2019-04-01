@@ -43,13 +43,19 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
    {// no required fields
    }
 
+   @Override
+   public String getSortFallbackField()
+   {
+      return resource.getBibTeXEntryDefaultSortField();
+   }
+
    public String getFallbackValue(String field)
    {
       String val;
 
       if (field.equals("sort"))
       {
-         field = resource.getBibTeXEntryDefaultSortField();
+         field = getSortFallbackField();
          val = getFieldValue(field);
 
          if (val != null)
@@ -72,7 +78,7 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
 
       if (field.equals("sort"))
       {
-         String fallbackField = resource.getBibTeXEntryDefaultSortField();
+         String fallbackField = getSortFallbackField();
          val = getField(fallbackField);
 
          return val == null ? getFallbackContents(fallbackField) : val;

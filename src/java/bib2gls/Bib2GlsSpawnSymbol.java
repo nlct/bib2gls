@@ -66,11 +66,17 @@ public class Bib2GlsSpawnSymbol extends Bib2GlsProgenitor
       }
    }
 
+   @Override
+   public String getSortFallbackField()
+   {
+      return resource.getSymbolDefaultSortField();
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("sort"))
       {
-         field = resource.getSymbolDefaultSortField();
+         field = getSortFallbackField();
 
          if (field.equals("id"))
          {
@@ -92,7 +98,7 @@ public class Bib2GlsSpawnSymbol extends Bib2GlsProgenitor
    {
       if (field.equals("sort"))
       {
-         field = resource.getSymbolDefaultSortField();
+         field = getSortFallbackField();
 
          if (field.equals("id"))
          {

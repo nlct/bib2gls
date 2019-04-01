@@ -1839,12 +1839,30 @@ public class GlsResource
             secondarySortSettings.setMissingFieldFallback(
               getOptional(parser, list, opt));
          }
+         else if (opt.equals("entry-sort-fallback"))
+         {
+            entryDefaultSortField = getRequired(parser, list, opt);
+
+            // Don't allow unknown fields (to guard against typos).
+            // The fallback field can't be "sort" as it will cause
+            // infinite recursion.
+
+            if ((!bib2gls.isKnownField(entryDefaultSortField)
+             && !bib2gls.isKnownSpecialField(entryDefaultSortField))
+             || entryDefaultSortField.equals("sort"))
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                   entryDefaultSortField));
+            }
+         }
          else if (opt.equals("abbreviation-sort-fallback"))
          {
             abbrevDefaultSortField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(abbrevDefaultSortField)
+            if ((!bib2gls.isKnownField(abbrevDefaultSortField)
              && !bib2gls.isKnownSpecialField(abbrevDefaultSortField))
+             || abbrevDefaultSortField.equals("sort"))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -1855,8 +1873,9 @@ public class GlsResource
          {
             symbolDefaultSortField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(symbolDefaultSortField)
+            if ((!bib2gls.isKnownField(symbolDefaultSortField)
              && !bib2gls.isKnownSpecialField(symbolDefaultSortField))
+             || symbolDefaultSortField.equals("sort"))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -1867,8 +1886,9 @@ public class GlsResource
          {
             bibTeXEntryDefaultSortField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(bibTeXEntryDefaultSortField)
+            if ((!bib2gls.isKnownField(bibTeXEntryDefaultSortField)
              && !bib2gls.isKnownSpecialField(bibTeXEntryDefaultSortField))
+             || bibTeXEntryDefaultSortField.equals("sort"))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -1879,8 +1899,9 @@ public class GlsResource
          {
             abbrevDefaultNameField = getRequired(parser, list, opt);
 
-            if (!bib2gls.isKnownField(abbrevDefaultNameField)
+            if ((!bib2gls.isKnownField(abbrevDefaultNameField)
              && !bib2gls.isKnownSpecialField(abbrevDefaultNameField))
+             || abbrevDefaultNameField.equals("name"))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -10269,6 +10290,11 @@ public class GlsResource
       return abbrevDefaultSortField;
    }
 
+   public String getEntryDefaultSortField()
+   {
+      return entryDefaultSortField;
+   }
+
    public String getSymbolDefaultSortField()
    {
       return symbolDefaultSortField;
@@ -10797,6 +10823,7 @@ public class GlsResource
    private SortSettings secondarySortSettings;
 
    private String symbolDefaultSortField = "id";
+   private String entryDefaultSortField = "name";
 
    private String abbrevDefaultSortField = "short";
    private String abbrevDefaultNameField = "short";

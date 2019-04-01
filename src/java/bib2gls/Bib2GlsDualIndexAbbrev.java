@@ -74,14 +74,20 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       }
    }
 
+   @Override
+   public String getSortFallbackField()
+   {
+      return isPrimary() ?
+           "name" : resource.getAbbrevDefaultSortField();
+   }
+
    public String getFallbackValue(String field)
    {
       String val;
 
       if (field.equals("sort"))
       {
-         String fallbackField = isPrimary() ?
-           "name" : resource.getAbbrevDefaultSortField();
+         String fallbackField = getSortFallbackField();
 
          if (fallbackField.equals("id"))
          {
@@ -109,8 +115,7 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
 
       if (field.equals("sort"))
       {
-         String fallbackField = isPrimary() ?
-           "name" : resource.getAbbrevDefaultSortField();
+         String fallbackField = getSortFallbackField();
 
          if (fallbackField.equals("id"))
          {

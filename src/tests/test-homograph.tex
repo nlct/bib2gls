@@ -8,12 +8,13 @@
 \GlsXtrLoadResources
  [
    src={test-homograph}, % bib file
-   flatten-lonely=postsort
+   entry-sort-fallback={description},
+   %flatten-lonely=postsort
  ]
 
 \begin{document}
-%\gls{glossarycol} (collection) vs \gls{glossarylist} (list).
-\gls{glossarycol}
+A test document describing \glspl{pagelist} and
+\gls{glosscol} (collection) vs \gls{glossarylist} (list).
 
 \printunsrtglossary
 \end{document}
