@@ -1592,7 +1592,9 @@ assigned using \gls{glsxtrsetgrouptitle} within the document.
 \bibgls\ does not sort by group title. At most it can sort by the
 group label (by changing the \csopt{sort-field}) but this is usually
 an indication that you actually have a hierarchical glossary and you
-ought to be using the \field{parent} field instead.
+ought to be using the \field{parent} field instead. (Compare
+\exfile{sample-textsymbols.tex} and
+\exfile{sample-textsymbols2.tex}.)
 \end{important}
 
 \item[\field{parent}] An entry may have one of more sub-entries.
@@ -3448,7 +3450,8 @@ which can cause unexpected results. The custom use of the
 find yourself wanting to use the \field{group} field in the \ext{bib} file,
 then the chances are that what you actually have is a hierarchical
 glossary (list of topics) and what you really need is the \field{parent} field.
-See also \sectionref{sec:logicaldivisions}.
+Compare the example files \exfile{sample-textsymbols.tex} and
+\exfile{sample-textsymbols2.tex}. See also \sectionref{sec:logicaldivisions}.
 \end{important}
 There are eight types of groups:
 \begin{description}
@@ -3873,8 +3876,10 @@ Comments are best placed outside of entry definitions.
 The most common type of comment is the encoding comment, described
 above.  \BibTeX's \entrydef{comment} is also supported by \bibgls\
 for general comments, but not for the encoding. For example, JabRef
-uses \atentry{comment} for metadata.
-
+uses \atentryfmt{Comment} for metadata.
+\begin{codeenv}
+\atentryfmt{Comment}\marg{jabref-meta: databaseType:bib2gls;}
+\end{codeenv}
 
 \section{Fields}
 \label{sec:fields}
@@ -18731,6 +18736,11 @@ it will have to use the fallback command.  Alternatively, you can
 omit \csopt{set-widest} and explicitly use
 \cs{glsFindWidestTopLevelName}.
 
+This file also includes \atentry{index} and \atentry{indexplural}
+entries whose labels match the custom \fieldfmt{identifier} fields.
+This means that you can, for example, alias \fieldfmt{identifier} to
+\field{parent}, as is done in \exfile{sample-textsymbols2.tex}.
+
 The contents of \filefmt{miscsymbols.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/miscsymbols.bib}
 
@@ -20622,8 +20632,22 @@ demonstrates how to deal with such conflicts.)
 The custom entry type \atentryfmt{icon} must be aliased for the
 entries to be recognised:
 \begin{codeenv}
-\csopt[unit=symbol]{entry-type-aliases}
+\csopt[icon=symbol]{entry-type-aliases}
 \end{codeenv}
+I want all the symbols but not the \atentry{index} or
+\atentry{indexplural} entries, so I've used a combination of
+\csopt[all]{selection} (to select all) and \csopt{match} (to filter
+out the unwanted entries):
+\begin{codeenv}
+  \csopt[all]{selection},
+  \csopt[entrytype=symbol]{match}
+\end{codeenv}
+An alternative filter criteria is:
+\begin{codeenv}
+  \csopt[original entrytype=icon]{match}
+\end{codeenv}
+(or \csopt{not-match} could be used but would be more complicated in
+this case).
 
 Since none of the entries have a \field{name} or \field{description}
 field, the custom fields \fieldfmt{icon} and
@@ -20672,6 +20696,7 @@ label. While this might work for English, it can become a problem
 for other languages that use extended Latin or non-Latin characters
 in their alphabet. A much better method is to treat this as a
 hierarchical glossary with topic titles as the top-level entries.
+This is covered in the next example \exfile{sample-textsymbols2.tex}.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -20681,7 +20706,7 @@ pdflatex sample-textsymbols
 \end{verbatim}
 The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 
-\lstinputlisting[firstline=5]{../examples/sample-textsymbols.tex}
+\lstinputlisting[firstline=6]{../examples/sample-textsymbols.tex}
 
 \begin{figure}
 \figcontents
@@ -20690,6 +20715,82 @@ The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
 }
 {\caption{\filefmt{sample-textsymbols.pdf}}}
 {fig:sample-textsymbols.pdf}
+\end{figure}
+
+\filesection{sample-textsymbols2.tex}
+
+This example is a better approach than the 
+\exfile{sample-textsymbols.tex} example above. As with the previous
+example, this requires both \isty{marvosym} and \isty{ifsym} so the
+same patch is applied to avoid conflict.
+
+As before, the custom entry type \atentryfmt{icon} must be aliased for the
+entries to be recognised:
+\begin{codeenv}
+\csopt[icon=symbol]{entry-type-aliases}
+\end{codeenv}
+Unlike the previous example, the custom \fieldfmt{identifier} field
+is now aliased to \field{parent}. The labels match the labels of the
+\atentry{index} and \atentry{indexplural} entries at the start of
+\exfile{miscsymbols.bib}. These represent the topics and unlike the
+previous example it's now possible to sort by the topic title
+(obtained from the \field{name} field) instead of by the label.
+\begin{codeenv}
+\csopt[
+ \fieldfmt{identifier}=\field{parent},
+ \fieldfmt{icon}=\field{name},
+ \fieldfmt{icondescription}=\field{description}]{field-aliases},
+\end{codeenv}
+There's no \csopt{sort-field} option in this example. The default
+\field{sort} field is used. Since it's not set for any of the
+entries, the fallback value will be used. In the case of the topic
+titles (\atentry{index} and \atentry{indexplural}), I want to sort
+by the \field{name}. This is the default fallback if the
+\field{sort} field is missing for \atentry{index} and \atentry{indexplural}.
+The default fallback for \field{sort} field for \atentry{symbol}
+entries is the label, but in this case I want to use the
+\field{description} field:
+\begin{codeenv}
+  \csopt[description]{symbol-sort-fallback}
+\end{codeenv}
+The best styles for this kind of glossary are the topic styles
+provided by \isty{glossary-topic}. This package was only added to
+\sty{glossaries-extra} v1.40, so you need to make sure you have at
+least that version installed.
+
+In this case I've decided to use the \glostyle{topic} style. I can
+use it with or without the \csopt{set-widest} option. 
+As with the previous example, \bibgls\ won't be able to determine
+the widest name since it doesn't recognise any of the commands
+contained in the \field{name} fields, so it will have to use the
+fallback method, which will use one of the commands provided by the
+\sty{glossaries-extra-stylemods} package. The \code{tree} option is
+needed to enable the appropriate commands:
+\begin{codeenv}
+\cmd{usepackage}\oarg{\styopt{record},
+ \styopt{nostyles},
+ \styopt{postdot},
+ \styopt[tree,topic]{stylemods},
+ \styopt[topic]{style}}\marg{glossaries-extra}
+\end{codeenv}
+
+The complete document code is listed below. The document build is:
+\begin{verbatim}
+pdflatex sample-textsymbols2
+bib2gls --group sample-textsymbols2
+pdflatex sample-textsymbols2
+\end{verbatim}
+The resulting document is shown in \figureref{fig:sample-textsymbols2.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-textsymbols2.tex}
+
+\begin{figure}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-textsymbols2.pdf}}%
+}
+{\caption{\filefmt{sample-textsymbols2.pdf}}}
+{fig:sample-textsymbols2.pdf}
 \end{figure}
 
 \filesection{sample-markuplanguages.tex}

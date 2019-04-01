@@ -1,8 +1,7 @@
 % This file is public domain. See the "Examples" chapter
 % in the bib2gls user manual for a more detailed description
 % of this file.
-% Compare this file with sample-textsymbols2.tex which uses
-% a hierarchical approach.
+
 \documentclass[a4paper]{article}
 
 \usepackage[T1]{fontenc}
@@ -19,30 +18,22 @@
 \usepackage[record,% using bib2gls
  nostyles,% don't load default styles
  postdot,% append a dot after descriptions
- stylemods={tree},% load glossary-tree.sty and patch
- style=alttreegroup]{glossaries-extra}
+ stylemods={tree,topic},% load glossary-tree.sty and glossary-topic.sty
+ style=topic]{glossaries-extra}
 
 \GlsXtrLoadResources[
   src={miscsymbols},
 % make @icon behave like @symbol:
   entry-type-aliases={icon=symbol},
   field-aliases={
-   identifier=category,
+   identifier=parent,
    icon=name,
    icondescription=description
   },
-  replicate-fields={category=group},
-  sort-field={category},
-  sort-suffix={description},
-  sort-suffix-marker={|},
+  symbol-sort-fallback={description},
   set-widest,
-  selection=all,
-  match={entrytype=symbol}
+  selection=all
 ]
-
-\glsxtrsetgrouptitle{information}{Information}
-\glsxtrsetgrouptitle{mediacontrol}{Media Controls}
-\glsxtrsetgrouptitle{weather}{Weather Symbols}
 
 \begin{document}
 \printunsrtglossaries

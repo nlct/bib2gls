@@ -4,7 +4,7 @@ DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \
 	sample-media.pdf sample-authors.pdf sample-msymbols.pdf \
-	sample-maths.pdf sample-textsymbols.pdf \
+	sample-maths.pdf sample-textsymbols.pdf sample-textsymbols2.pdf \
 	sample-constants.pdf sample-usergroups.pdf \
 	sample-markuplanguages.pdf sample-multi1.pdf sample-multi2.pdf \
 	sample-citations.pdf
@@ -74,6 +74,12 @@ sample-textsymbols.pdf	: $(DEPS) sample-textsymbols.tex \
 	pdflatex sample-textsymbols
 	$(BIB2GLS) sample-textsymbols
 	pdflatex sample-textsymbols
+
+sample-textsymbols2.pdf	: $(DEPS) sample-textsymbols2.tex \
+	miscsymbols.bib
+	pdflatex sample-textsymbols2
+	$(BIB2GLS) sample-textsymbols2
+	pdflatex sample-textsymbols2
 
 sample-usergroups.pdf	: $(DEPS) sample-usergroups.tex \
 	usergroups.bib
