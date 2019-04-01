@@ -621,8 +621,8 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
             int result = value1.compareTo(value2);
 
-            bib2gls.verboseMessage(bib2gls.getMessage("warning.identical.field", 
-                 settings.getIdenticalSortField(), value1, value2, result));
+            bib2gls.verboseMessage("warning.identical.field", 
+                 settings.getIdenticalSortField(), value1, value2, result);
 
             return result;
       }
