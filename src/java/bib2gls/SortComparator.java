@@ -595,20 +595,20 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    private int getIdenticalSortFallback(Bib2GlsEntry entry1, 
      Bib2GlsEntry entry2)
    {
-      bib2gls.debug(bib2gls.getMessage("warning.identical",
-        entry1.getId(), entry2.getId()));
+      bib2gls.verboseMessage("warning.identical",
+        entry1.getId(), entry2.getId());
 
       switch (settings.getIdenticalSortAction())
       {
          case SortSettings.IDENTICAL_SORT_USE_ID:
 
-            bib2gls.debug(bib2gls.getMessage("warning.identical.id"));
+            bib2gls.verboseMessage("warning.identical.id");
 
             return entry1.getId().compareTo(entry2.getId());
 
          case SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID:
 
-            bib2gls.debug(bib2gls.getMessage("warning.identical.original_id"));
+            bib2gls.verboseMessage("warning.identical.original_id");
 
             return entry1.getOriginalId().compareTo(
                entry2.getOriginalId());
@@ -621,16 +621,13 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
             int result = value1.compareTo(value2);
 
-            if (bib2gls.getDebugLevel() > 0)
-            {
-               bib2gls.logMessage(bib2gls.getMessage("warning.identical.field", 
+            bib2gls.verboseMessage(bib2gls.getMessage("warning.identical.field", 
                  settings.getIdenticalSortField(), value1, value2, result));
-            }
 
             return result;
       }
 
-      bib2gls.debug(bib2gls.getMessage("warning.identical.none"));
+      bib2gls.verboseMessage("warning.identical.none");
 
       return 0;
    }
