@@ -1,4 +1,4 @@
-BIB2GLS=../bin/bib2gls --debug --verbose --group
+BIB2GLS=../bin/bib2gls --debug --verbose
 DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
@@ -11,46 +11,46 @@ all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical
-	$(BIB2GLS) sample-chemical
+	$(BIB2GLS) --group sample-chemical
 	pdflatex sample-chemical
 
 sample-units1.pdf	: $(DEPS) sample-units1.tex baseunits.bib derivedunits.bib
 	pdflatex sample-units1
-	$(BIB2GLS) sample-units1
+	$(BIB2GLS) --group sample-units1
 	pdflatex sample-units1
 
 sample-units2.pdf	: $(DEPS) sample-units2.tex baseunits.bib derivedunits.bib
 	pdflatex sample-units2
-	$(BIB2GLS) sample-units2
+	$(BIB2GLS) --group sample-units2
 	pdflatex sample-units2
 
 sample-units3.pdf	: $(DEPS) sample-units3.tex baseunits.bib derivedunits.bib
 	pdflatex sample-units3
-	$(BIB2GLS) sample-units3
+	$(BIB2GLS) --group sample-units3
 	pdflatex sample-units3
 	pdflatex sample-units3
 
 sample-people.pdf	: $(DEPS) sample-people.tex people.bib \
 	no-interpret-preamble.bib interpret-preamble.bib
 	pdflatex sample-people
-	$(BIB2GLS) sample-people --break-space
+	$(BIB2GLS) --group --break-space sample-people
 	pdflatex sample-people
 
 sample-bacteria.pdf	: $(DEPS) sample-bacteria.tex bacteria.bib
 	pdflatex sample-bacteria
-	$(BIB2GLS) sample-bacteria
+	$(BIB2GLS) --group sample-bacteria
 	pdflatex sample-bacteria
 
 sample-media.pdf	: $(DEPS) sample-media.tex \
 	books.bib films.bib no-interpret-preamble.bib interpret-preamble.bib
 	pdflatex sample-media
-	$(BIB2GLS) sample-media
+	$(BIB2GLS) --group sample-media
 	pdflatex sample-media
 
 sample-authors.pdf	: $(DEPS) sample-authors.tex \
 	books.bib people.bib no-interpret-preamble.bib interpret-preamble2.bib
 	pdflatex sample-authors
-	$(BIB2GLS) sample-authors
+	$(BIB2GLS) --group sample-authors
 	pdflatex sample-authors
 	pdflatex sample-authors
 
@@ -78,19 +78,19 @@ sample-textsymbols.pdf	: $(DEPS) sample-textsymbols.tex \
 sample-textsymbols2.pdf	: $(DEPS) sample-textsymbols2.tex \
 	miscsymbols.bib topics.bib
 	pdflatex sample-textsymbols2
-	$(BIB2GLS) sample-textsymbols2
+	$(BIB2GLS) --group sample-textsymbols2
 	pdflatex sample-textsymbols2
 
 sample-usergroups.pdf	: $(DEPS) sample-usergroups.tex \
 	usergroups.bib
 	xelatex sample-usergroups
-	$(BIB2GLS) sample-usergroups
+	$(BIB2GLS) --group sample-usergroups
 	xelatex sample-usergroups
 
 sample-markuplanguages.pdf	: $(DEPS) sample-markuplanguages.tex \
 	markuplanguages.bib
 	pdflatex sample-markuplanguages
-	$(BIB2GLS) sample-markuplanguages
+	$(BIB2GLS) --group sample-markuplanguages
 	pdflatex sample-markuplanguages
 
 sample-multi1.pdf	: $(DEPS) sample-multi1.tex \
@@ -98,9 +98,9 @@ sample-multi1.pdf	: $(DEPS) sample-multi1.tex \
 	vegetables.bib animals.bib chemicalformula.bib \
 	baseunits.bib derivedunits.bib
 	pdflatex sample-multi1
-	$(BIB2GLS) sample-multi1
+	$(BIB2GLS) --group sample-multi1
 	pdflatex sample-multi1
-	$(BIB2GLS) sample-multi1
+	$(BIB2GLS) --group sample-multi1
 	pdflatex sample-multi1
 
 sample-multi2.pdf	: $(DEPS) sample-multi2.tex \
@@ -108,14 +108,14 @@ sample-multi2.pdf	: $(DEPS) sample-multi2.tex \
 	vegetables.bib animals.bib chemicalformula.bib \
 	baseunits.bib derivedunits.bib terms.bib
 	pdflatex sample-multi2
-	$(BIB2GLS) --break-space sample-multi2
+	$(BIB2GLS) --group --break-space sample-multi2
 	pdflatex sample-multi2
-	$(BIB2GLS) --break-space sample-multi2
+	$(BIB2GLS) --group --break-space sample-multi2
 	pdflatex sample-multi2
 
 sample-constants.pdf	: $(DEPS) sample-constants.tex constants.bib
 	pdflatex sample-constants
-	$(BIB2GLS) --no-group sample-constants
+	$(BIB2GLS) sample-constants
 	pdflatex sample-constants
 
 sample-citations.pdf	: $(DEPS) sample-citations.tex citations.bib

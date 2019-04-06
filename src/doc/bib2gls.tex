@@ -2691,6 +2691,10 @@ If \csopt[false]{interpret-preamble} had been used, \csfmt{card}
 wouldn't be recognised and would be discarded leaving just \qtt{S}
 as the sort value.
 
+(Note that if \ics{vert} is used instead of \textbar\ then it would
+be converted into the mathematical operator \hex{2223} and result in
+a different order.)
+
 For the \code{i} entry, the code is:
 \begin{verbatim}
 {}$\imaginary$
@@ -4151,6 +4155,10 @@ there's no difference. If they don't match then in the first example
 the document definitions will take precedence (but the interpreter
 will use the \atentry{preamble} definitions) and in the second
 example the \atentry{preamble} definitions will take precedence.
+For example, the document may define \csfmt{card} as:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{card}}[1]\marg{\ics{vert}\cmd{set}\marg{\idx{param}1}\cs{vert}}
+\end{codeenv}
 
 \item Make use of \gls{glsxtrfmt} provided by \styfmt{glossaries-extra} which
 allows you to store the name of the formatting command in a field.
@@ -18807,6 +18815,8 @@ which is used to format the set contents,
 which is used to format the set membership criteria,
 \nosecdef{setcardfmt}
 which is used to format the cardinality of a set,
+(Note this uses \ics{vert} not \textbar\ as in some of the earlier
+examples.)
 \nosecdef{numspacefmt}
 which is used to format \meta{symbol} as a number space,
 \nosecdef{transposefmt}
@@ -19483,6 +19493,8 @@ redefine this as well:
 \end{codeenv}
 (For a more compact layout, you could use \glostyle{mcolalttreegroup}
 instead.)
+I also need the \longarg{group} switch to make the sort method
+automatically assign letter groups.
 
 The complete code is listed below.  The document build is:
 \begin{verbatim}
@@ -19564,6 +19576,8 @@ the \ext{log} file, you may notice that \sty{glossary-tree} is still
 loaded. This is because it's required by \sty{glossary-bookindex}
 as the \glostyle{bookindex} style is based on the \glostyle{index}
 style provided by \sty{glossary-tree}.
+With this style I need to use the \longarg{group} switch to instruct
+the sort method to automatically create the letter groups.
 
 The \glostyle{bookindex} style doesn't show the \field{description}
 field (which means I don't need the \catattr{glossdescfont}
@@ -19660,6 +19674,8 @@ for the second, and then set the group titles:
 \end{codeenv}
 I've used this method to make it easier to adapt to other languages
 that may need extended characters in the group titles.
+The \csopt{group} option requires the \longarg{group} switch to
+ensure that the \field{group} field is correctly assigned.
 
 The \exfile{baseunits.bib} file use a custom entry type
 \atentryfmt{unit}, which must be aliased otherwise \bibgls\
@@ -19755,6 +19771,8 @@ for the second. Similarly for the custom entry fields:
   \fieldfmt{measurement}=\field{description}
 ]{field-aliases}
 \end{codeenv}
+The \longarg{group} switch is needed to ensure that the
+\field{group} field is automatically assigned by the sort method.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
@@ -19862,6 +19880,9 @@ There are no sub-entries in this document so I haven't bothered to
 redefine \ics{subglossentry}. (The tabular styles aren't appropriate
 for hierarchical glossaries.) This puts the symbol into the third
 column (rather than the location list, which is ignored).
+This style supports the letter group separator (although it doesn't
+title the groups), so if I want this I need to use the
+\longarg{group} switch.
 
 I also need to make sure I've defined a glossary for the dual
 entries:
@@ -20031,6 +20052,8 @@ the books that have been referenced by the film entries. Since this
 looks a bit odd, I've added \csopt[false]{save-locations} to
 prevent \bibgls\ from saving the locations.
 
+I've used a style that shows letter group headings so I need to use
+the \longarg{group} switch.
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-media
@@ -20061,6 +20084,8 @@ document. The first two lists shouldn't include aliases but the
 index should. Not all the entries defined in \exfile{people.bib}
 are included in the document. Those that aren't either explicitly
 referenced or aliased are filtered by the \csopt{selection} criteria.
+I've used a style that shows letter group headings so I need to use
+the \longarg{group} switch.
 
 Since this is just an example document all the \cs{gls} commands
 only occur on page~1, which means that each number list is just
@@ -20348,6 +20373,8 @@ This example uses the files \exfile{people.bib},
 in \exfile{books.bib} and have them listed by author. This means
 finding a way of assigning each book entry a \field{parent} field that
 contains the label identifying the relevant author in \exfile{people.bib}.
+I've used a style that shows letter group headings so I need to use
+the \longarg{group} switch.
 
 To recap, each author is defined in \exfile{people.bib} in the form:
 \begin{codeenv}
@@ -20563,6 +20590,13 @@ redefining \ics{glsxtrgroupfield} to \code{category}:
  \cs{renewcommand}\marg{\cs{glstreegroupheaderfmt}}[1]\marg{\ics{textbf}\marg{\idx{param}1}}\comment{}
 }
 \end{codeenv}
+This again contradicts the advice given in
+\sectionref{sec:logicaldivisions} as I'm sorting by the
+\field{group} label. (Technically it's sorting by the
+\field{category} label but this is being used as the group.) In this
+case it's not a problem as the labels closely match the titles and
+the sorting options ensure that the groups aren't broken up.
+
 There's no \field{description} field set for these entries, but the
 \idx{postdescriptionhook} can still be used to append information.
 In this case, I've appended a cross-reference to the bibliography.
@@ -20606,7 +20640,7 @@ The \idx{handler} macro displays the name of the associated
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-citations
-bib2gls --group --cite-as-record sample-citations
+bib2gls --cite-as-record sample-citations
 bibtex sample-citations
 pdflatex sample-citations
 pdflatex sample-citations
@@ -20641,11 +20675,6 @@ the \styopt{stylemods} package option:
  \styopt[mcols]{stylemods},\comment{load glossary-mcols.sty and patch}
  \styopt[mcolalttree]{style}}\marg{glossaries-extra}
 \end{codeenv}
-I'm not using a group-based style which suggests that I don't need the
-\longarg{group} switch. However, although I don't want group titles,
-I still want a slight gap between logical groups, which means that I
-still need this switch. If I added the \styopt{nogroupskip} package
-option, then I can omit \longarg{group}.
 
 I'm not referencing any of the entries in the document as I'm just
 generating a complete list of all the defined symbols. This means I
@@ -20658,22 +20687,28 @@ the \field{location} field:
 Since I'm using a style that's based on \glostyle{alttree} I need to
 find the widest \field{name}, which can be done with \csopt{set-widest}.
 
-I've used \csopt{field-aliases} to convert the custom
-\fieldfmt{identifier} field to \field{category}, which means I can
-also sort by that field:
+The simplest way of dividing the glossary into logical blocks is to
+sort according to the category, but first I need to use \csopt{field-aliases} 
+to convert the custom \fieldfmt{identifier} field to \field{category}:
 \begin{codeenv}
-\csopt[\field{category}]{sort-field},
 \csopt[\fieldfmt{identifier}=\field{category}]{field-aliases}
 \end{codeenv}
+and sort by the \field{category} field:
+\begin{codeenv}
+\csopt[\field{category}]{sort-field}
+\end{codeenv}
 Since this will cause identical sort values, I need to provide a
-fallback. Here I've decided to fallback on the \field{description}
-field:
+a way of ordering these identical values. Here I've decided 
+to fallback on the \field{description} field:
 \begin{codeenv}
 \csopt[\field{description}]{identical-sort-action}
 \end{codeenv}
 This means that entries will be ordered by \field{category} and 
 then \field{description}, which naturally creates blocks of symbol
-types in the glossary.
+types in the glossary. This only uses a simple case-sensitive string
+comparison which is fine for English, but for another language it
+would be better to use \csopt{sort-suffix} as in the
+\exfile{sample-textsymbols.tex} file.
 
 Remember that I want a small vertical gap between each logical
 block. These need the \field{group} field which, with the default
@@ -20690,15 +20725,22 @@ fetch its value from the \field{category} field:
 \end{codeenv}
 (Since the \csopt{field-aliases} option is always performed before
 \csopt{replicate-fields}, the \field{category} field will already
-have been set and is available for replicating.) This means that the
-\field{group} label is the same as the \field{category} label rather
-than just the first letter. (For a quick check, change the glossary
-style to \glostyle{mcolalttreegroup} to display the group titles.)
+have been set and is available for replicating.)
+
+This means that I'm essentially sorting by the \field{group} labels,
+which this manual has warned against doing. In this case, it's an
+acceptable break from that rule as I've used options that ensure the
+groups aren't broken up during sorting and I'm not concerned with the group
+titles. A method such as that used in \exfile{sample-textsymbols2.tex}
+would end up with titled blocks, which I don't want here. By using
+resource options such as \csopt{field-aliases} and
+\csopt{replicate-fields} I can avoid the warning that's triggered
+with the default \longarg{warn-non-bib-fields}.
 
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-msymbols
-bib2gls --group sample-msymbols
+bib2gls sample-msymbols
 pdflatex sample-msymbols
 \end{verbatim}
 The resulting document is shown in \figureref{fig:sample-msymbols.pdf}.
@@ -20734,6 +20776,11 @@ There's also an extra custom field to alias:
 I've aliased \fieldfmt{format} to \field{user1} since \gls!{glsxtrfmt}
 defaults to that field. If I decided to use a different field I also
 need to remember to redefine \ics{GlsXtrFmtField} to match.
+
+As with \exfile{sample-msymbols.tex} I'm sorting by the
+\field{category} label and this value is copied to the \field{group}
+field, but again I don't have a hierarchical glossary as the logical
+blocks don't have titles.
 
 In this document I only want to select entries that have been
 indexed, so I've omitted the \csopt{selection} option I used in the
@@ -20771,7 +20818,8 @@ Be careful with the set cardinality example. You might be tempted to
 nest \csfmt{set} within the argument of \csfmt{setcard} but this
 results in nested hyperlinks. These are unpredictable and there's no
 consistent handling of them between different PDF viewers. It can
-also be confusing to the reader. If $|\mathcal{B}_1\cup\mathcal{B}_2|$
+also be confusing to the reader. If
+$\lvert\mathcal{B}_1\cup\mathcal{B}_2\rvert$
 shows up as what appears to be a single hyperlink, where would the 
 reader expect the target? This is the reason for providing the
 non-linking commands like \csfmt{nlset} and \csfmt{nlsetcard}.
@@ -20779,7 +20827,7 @@ non-linking commands like \csfmt{nlset} and \csfmt{nlsetcard}.
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-maths
-bib2gls --group sample-maths
+bib2gls sample-maths
 pdflatex sample-maths
 \end{verbatim}
 The resulting document is shown in \figureref{fig:sample-maths.pdf}.
@@ -20877,7 +20925,7 @@ This is covered in the next example \exfile{sample-textsymbols2.tex}.
 The complete document code is listed below. The document build is:
 \begin{verbatim}
 pdflatex sample-textsymbols
-bib2gls --group sample-textsymbols
+bib2gls sample-textsymbols
 pdflatex sample-textsymbols
 \end{verbatim}
 The resulting document is shown in \figureref{fig:sample-textsymbols.pdf}.
