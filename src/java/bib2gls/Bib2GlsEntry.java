@@ -968,14 +968,11 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      if (bib2gls.useGroupField())
-      {
-         String groupVal = resource.getGroupField();
+      String groupVal = resource.getGroupField();
 
-         if (groupVal != null)
-         {
-            putField("group", groupVal);
-         }
+      if (groupVal != null)
+      {
+         putField("group", groupVal);
       }
 
       Vector<String> interpretFields = null;

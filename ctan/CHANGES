@@ -35,6 +35,8 @@ v1.9 (pending):
 
   * The `type` option (and similar options that assign the `type`
     field) now accepts the special setting "same as parent".
+
+  * The `group` option no longer requires the --group switch.
     
   * The `match` and `not-match` options now accept `original entrytype`.
 

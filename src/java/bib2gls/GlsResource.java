@@ -1749,19 +1749,10 @@ public class GlsResource
          }
          else if (opt.equals("group"))
          {
-            if (bib2gls.useGroupField())
-            {
-               groupField = getOptional(parser, "auto", list, opt);
+            groupField = getOptional(parser, "auto", list, opt);
 
-               if (groupField.equals("auto"))
-               {
-                  groupField = null;
-               }
-            }
-            else
+            if (groupField.equals("auto"))
             {
-               bib2gls.warning(bib2gls.getMessage(
-                 "warning.group.option.required", opt, "--group"));
                groupField = null;
             }
          }

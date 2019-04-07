@@ -1597,7 +1597,7 @@ ought to be using the \field{parent} field instead. (Compare
 \exfile{sample-textsymbols2.tex}.)
 \end{important}
 
-\item[\field{parent}] An entry may have one of more sub-entries.
+\item[\field{parent}] An entry may have one or more sub-entries.
 Most of the sort methods will produce a hierarchical ordering that
 ensures that the sub-entries are listed immediately after their
 parent entry. The parent entry is identified by the \field{parent}
@@ -1961,7 +1961,8 @@ the corresponding set of \ext{bib} files:
     and any of the above case-change or suffixes required
     on the replicated fields are performed;
 
-  \item the \field{group} field is assigned if \csopt{group} is set;
+  \item the \field{group} field is assigned if \csopt[\meta{label}]{group} 
+    is set;
 
   \item any variables (identified by \atentry{string}) are expanded
   (if not already done in any of the previous steps);
@@ -3434,8 +3435,9 @@ and \encap{hyperbf} or \encap{hyperit} for a primary reference.)
 
 The \styfmt{glossaries-extra} \styopt{record} package option
 automatically creates a new internal field called \field{group}. If the
-\longarg{group} switch is used then, when sorting, \bibgls\ will try
-to determine the letter group for each entry and add it to the
+\longarg{group} switch is used with the default \csopt[auto]{group}
+option then, when sorting, \bibgls\ will try
+to determine the letter group for each entry and assign it to the
 \field{group} field.  (Some \csopt{sort} options ignore this
 setting.) This value will be picked up by \ics{printunsrtglossary}
 if group headings are required (for example with the
@@ -3631,9 +3633,10 @@ hyper-group styles, and make sure you have an up-to-date version of
 
 \argsection{no-group}
 
-Don't automatically set the \field{group} field (default).
-The glossary won't have groups even if a group style, such as
-\glostyle{indexgroup}, is used.
+Don't automatically set the \field{group} field with
+\csopt[auto]{group} (default). The glossary won't have groups even if a
+group style, such as \glostyle{indexgroup}, is used (unless the
+\field{group} field is set to a custom value).
 
 \argsection{tex-encoding}
 
@@ -8736,14 +8739,16 @@ O \cs{gls}\marg{gato} sentou-se no \cs{gls}\marg{tapete}.
 
 \optsection[\subsubsection]{group}
 
-The \csopt{group} option may only be used with the \longarg{group}
-switch.  This will set the \field{group} field to \meta{label}
-unless \meta{label} is \optfmt{auto}, in which case the value is set
-automatically during the sorting (see also \csopt{group-formation}
-and \sectionref{sec:logicaldivisions}).  The corresponding title can
-be set with \gls{glsxtrsetgrouptitle} in the document if the title
-is different from the label.  The default behaviour is
-\csopt[auto]{group}.
+The \csopt{group} option will set the \field{group} field to \meta{label}
+unless \meta{label} is \optfmt{auto}. If \csopt[auto]{group} then if
+the \longarg{group} switch is used the value of the \field{group}
+field is set automatically during the sorting (see also \csopt{group-formation}
+and \sectionref{sec:logicaldivisions}). If the \longarg{no-group}
+setting is on then \csopt[auto]{group} does nothing.
+
+The corresponding group title can be set with
+\gls{glsxtrsetgrouptitle} in the document if the title is different
+from the label. The default behaviour is \csopt[auto]{group}.
 
 For example:
 \begin{codeenv}
