@@ -18,6 +18,7 @@
 \usepackage{hologo}
 \usepackage{pifont}
 \usepackage{graphicx}
+\usepackage{tcolorbox}
 \usepackage{datetime2}
 \usepackage{siunitx}
 \usepackage[version=4]{mhchem}
@@ -392,24 +393,7 @@
   \ignorespacesafterend
 }
 
-\newenvironment{important}{%
-  \setlength{\fboxrule}{4pt}%
-  \setlength\borderedboxwidth{\linewidth}%
-  \addtolength\borderedboxwidth{-2\fboxsep}%
-  \addtolength\borderedboxwidth{-2\fboxrule}%
-  \begin{lrbox}{\borderedboxcontents}%
-    \begin{minipage}{\borderedboxwidth}%
-    \raggedright
-    \setlength\parindent{1em}%
-    \noindent\ignorespaces
-}%
-{%
-    \end{minipage}%
-  \end{lrbox}%
-  \par\vskip10pt\noindent
-  \fcolorbox{red}{white}{\usebox{\borderedboxcontents}}\par\vskip10pt
-  \noindent\ignorespacesafterend
-}
+\newtcolorbox{important}{colback=red!5!white,colframe=red}
 
 \newcommand*{\sectionref}[1]{section~\ref{#1}}
 \newcommand*{\Sectionref}[1]{Section~\ref{#1}}
@@ -476,6 +460,7 @@ the \isty{glossaries-extra} user manual,
 package~\cite{glossaries-extra})
 and the \isty{glossaries} user manual
 (distributed with the \sty{glossaries} package~\cite{glossaries}).
+See also the gallery~\cite{gallery} for examples.
 
 The \sty{glossaries} package is the \emph{base} package. The 
 \sty{glossaries-extra} package internally loads the \sty{glossaries} package 
@@ -554,9 +539,20 @@ can be found in the \isty{glossaries} user manual.  The
 are described in the \sty{glossaries-extra} manual. The \bibgls\
 user manual summarises all keys (fields) in \sectionref{sec:fields}.
 
+The term \qt{field} not only includes the keys that may be used with
+\gls{newglossaryentry} but also internal labels (which may or may
+not have a corresponding key) that are used to store information.
+Note that there are some fields that may be used in the document
+that are considered internal fields by \bibgls\ because the field
+value is typically set as a by-product of the way that \bibgls\
+works. If these fields are set manually then you may get unexpected
+results as this can break \bibgls's normal operation.
+
 \begin{important}
 If the field value contains commas or equal signs the value must be grouped
 to hide those characters from the \meta{key}\dequals\meta{value} parser.
+When using \bibgls, the field value must be delimited according to
+the \ext{bib} file format.
 \end{important}
 
 The two main keys are \field{name} and \field{description}. The
@@ -869,8 +865,8 @@ value of the \field{category} field using:
 \nosecformatdef{glsifcategory}
 This checks if the \field{category} field for the entry given by
 \meta{label} is set to \meta{category}, but doesn't perform any
-expansion. It generates an error if the entry doesn't exist (or
-warning with \styopt[warn]{undefaction}).
+expansion of \meta{category}. It generates an error if the entry
+doesn't exist (or warning with \styopt[warn]{undefaction}).
 
 The category allows you to apply certain types of formatting, such
 as the \idx{postlinkhook} (\sectionref{sec:postlinkhooks}).
@@ -940,7 +936,7 @@ associated image or citation, then you can supply this with the six
 user keys:
 \field{user1}\glsaddeach{field.user2,field.user3,field.user4,field.user5}, 
 \ldots, \field{user6}. The value of the
-first field can be obtained with:
+first field (\field{user1}) can be obtained with:
 \nosecformatdef{glsuseri}
 (which behaves like \gls{glssymbol}) or with:
 \nosecformatdef{glsentryuseri}
@@ -948,7 +944,7 @@ first field can be obtained with:
 \glsaddeach{glsuserii,glsuseriii,glsuseriv,glsuserv,%
 glsentryuserii,glsentryuseriii,glsentryuseriv,glsentryuserv}%
 The other fields are similarly obtained using \idx{lowercase} Roman
-numerals, so the sixth field can be obtained with:
+numerals, so value of the sixth field (\field{user6}) can be obtained with:
 \nosecformatdef{glsuservi}
 (which behaves like \gls{glssymbol}) or with:
 \nosecformatdef{glsentryuservi}
@@ -1599,9 +1595,9 @@ with webbed feet}\marg{1}
 
 \begin{important}
 The examples in this section are used to illustrate the differences
-between \idx{robust}, \idx{fragile} and \idx{expandable} commands.
+between \idx{fragile}, \idx{robust} and \idx{expandable} commands.
 In general, it's better not to use commands like \gls{gls} in
-headings or captions (see \sectionref{sec:headings}) and using
+headings or captions (see \sectionref{sec:headings}). Using
 commands like \gls{gls} in field values can be problematic (see
 \sectionref{sec:nested}).
 \end{important}
@@ -1654,7 +1650,7 @@ or the expansion must first be switched off:
 Since it's not possible to programmatically define entries with
 \bibgls, the expansion is automatically switched off as \bibgls\
 writes \gls{glsnoexpandfields} to the \ext{glstex} file (although
-you can switch this feature off with \longarg{expand-fields}).
+you can disable this feature with \longarg{expand-fields}).
 
 The reason why \gls{footnote} didn't cause a problem in the
 \field{description} field \emph{when the entry was defined} is that, by
@@ -2953,6 +2949,16 @@ order of definition.
 
 \subsection{Groups and Locations}
 \label{sec:group}
+
+\begin{important}
+The \field{group} and \field{location} fields are considered
+internal fields by \bibgls. They may be referenced within the
+document, but they should not be assigned in the \ext{bib} file.
+\bibgls\ assigns these fields according to the resource options and
+command line switches. Explicitly assigning them can cause
+unexpected results. See also \sectionref{sec:logicaldivisions} of
+the \bibgls\ manual.
+\end{important}
 
 The \field{group} key isn't defined by default, but if it is defined
 then \gls{printunsrtglossary} will use the \field{group} field

@@ -1,4 +1,8 @@
-v1.9 (pending):
+v1.9 (2019-04-09):
+
+  * manual:
+
+    - added section "Logical Divisions: type vs group vs parent"
 
   * new resource option:
 
