@@ -1,9 +1,12 @@
 # bib2gls
 Command line application to convert `.bib` files to `glossaries-extra.sty` resource file
 
-(Developed as a follow-up from [my answer on TeX on
+Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/cgi-bin/faq.cgi?action=view&categorylabel=bib2gls) and [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
+
+(This application was developed as a follow-up from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).)
-This tool forms part of a LaTeX document build, performing two
+
+The bib2gls tool forms part of a LaTeX document build, performing two
 functions in one: glossary information is fetched from one or
 more `.bib` files by examining the `.aux` file (similar to BibTeX)
 and the terms are then sorted hierarchically and the locations collated into
@@ -18,7 +21,7 @@ can then simply by displayed with `\printunsrtglossary`. The
 You may prefer to start with the [introductory guide](http://mirrors.ctan.org/support/bib2gls/bib2gls-begin.pdf)
 before moving on to the [main user manual](http://mirrors.ctan.org/support/bib2gls/bib2gls.pdf).
 
-This application requires at least Java 7 and at least v1.12 of
+This application requires at least Java 8 and at least v1.12 of
 [glossaries-extra.sty](http://ctan.org/pkg/glossaries-extra)
 (2017-02-03) and at least v4.04 of [glossaries.sty](http://ctan.org/pkg/glossaries). (Although newer versions are recommended, 
 and may be required for some features.)
