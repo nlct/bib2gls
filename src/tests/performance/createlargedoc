@@ -1,0 +1,236 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Data::Random::WordList;
+use List::Util qw/shuffle/;
+use Getopt::Long;
+
+my $count = 1000;
+my $chapcount = 10;
+my $minentriesperchapter=20;
+my $maxentriesperchapter=100;
+my $minrefsperchapter=5;
+my $maxrefsperchapter=50;
+my $help=0;
+
+&GetOptions(
+ "help" => \$help,
+ "entries=i" => \$count,
+ "chapters=i" => \$chapcount,
+ "entry-min=i" => \$minentriesperchapter,
+ "entry-max=i" => \$maxentriesperchapter,
+ "ref-min=i" => \$minrefsperchapter,
+ "ref-max=i" => \$maxrefsperchapter
+ ) or die("Syntax error (use --help for help)");
+
+if ($help)
+{
+   print "Syntax: $0 [<options>]\n";
+   print "Available options:\n";
+   print "--entries <n>\tTotal number of entries in .bib file.\n";
+   print "--chapters <n>\tTotal number of chapters.\n";
+   print "--entry-min <n>\tMinimum number of \\gls per chapter.\n";
+   print "--entry-max <n>\tMaximum number of \\gls per chapter.\n";
+   print "--ref-min <n>\tMinimum number of \\label/\\ref per chapter.\n";
+   print "--ref-max <n>\tMaximum number of \\label/\\ref per chapter.\n";
+   exit(0);
+}
+
+if ($count < 1)
+{
+   die "Invalid --entries value $count (must be > 0)\n";
+}
+
+if ($chapcount < 1)
+{
+   die "Invalid --chapters value $chapcount (must be > 0)\n";
+}
+
+if ($minentriesperchapter < 1)
+{
+   die "Invalid --entry-min value $minentriesperchapter (must be > 0)\n";
+}
+
+if ($minrefsperchapter < 0)
+{
+   die "Invalid --ref-min value $minrefsperchapter (must be >= 0)\n";
+}
+
+if ($maxentriesperchapter < $minentriesperchapter)
+{
+   die "Invalid --entry-max value $maxentriesperchapter (must be >= --entry-min)\n";
+}
+
+if ($maxentriesperchapter > $count)
+{
+   die "Invalid --entry-max value $maxentriesperchapter (must be <= --entries)\n";
+}
+
+if ($maxrefsperchapter < $minrefsperchapter)
+{
+   die "Invalid --ref-max value $maxrefsperchapter (must be >= --ref-min)\n";
+}
+
+my $basename = "testlargedoc";
+
+print "Creating document $basename.tex with:\n";
+print " $count entries defined in $basename.bib\n";
+print " $chapcount chapters\n";
+print " $minentriesperchapter to $maxentriesperchapter entries per chapter\n";
+print " $minrefsperchapter to $maxrefsperchapter references per chapter\n";
+
+my $wl = new Data::Random::WordList( wordlist => '/usr/share/dict/words');
+
+my @rand_words = shuffle($wl->get_words($count));
+
+$wl->close();
+
+my $fd;
+
+unless (open $fd, ">$basename.bib")
+{
+   die "Can't open '$basename.bib' $!\n";
+}
+
+for (my $idx = 0; $idx < $count; $idx++)
+{
+   my $word = $rand_words[$idx];
+
+   $word=~s/([\\\&#%_\{\}\$])/\\$1/g;
+
+   $word=~s/\^/\\textasciicircum /g;
+   $word=~s/\^/\\textasciitilde /g;
+
+   print $fd "\@entry{entry$idx,name={$word},description={sample $idx}}\n";
+}
+
+close $fd;
+
+unless (open $fd, ">$basename.tex")
+{
+   die "Can't open '$basename.tex' $!\n";
+}
+
+print $fd <<__END_DOC;
+% Test file created with $0
+% $count entries defined in $basename.bib
+% $chapcount chapters
+% $minentriesperchapter to $maxentriesperchapter entries per chapter
+% $minrefsperchapter to $maxrefsperchapter references per chapter
+%
+\\documentclass{report}
+\\usepackage[T1]{fontenc}
+\\usepackage[utf8]{inputenc}
+\\usepackage[colorlinks]{hyperref}
+\\usepackage[record,nostyles,stylemods=tree,style=indexgroup]{glossaries-extra}
+\\GlsXtrLoadResources
+\\title{Test Document}
+\\author{Test Author}
+\\begin{document}
+\\maketitle
+\\tableofcontents
+__END_DOC
+
+for (my $idx = 1; $idx <= $chapcount; $idx++)
+{
+   print $fd "\\include{$basename-ch$idx}\n";
+}
+
+print $fd "\\printunsrtglossaries\n\\end{document}\n";
+
+close $fd;
+
+for (my $idx = 1; $idx <= $chapcount; $idx++)
+{
+   my $file = "$basename-ch$idx.tex";
+
+   unless (open $fd, ">$file")
+   {
+      die "Can't open '$file' $!\n";
+   }
+
+   print $fd "\\chapter{Sample $idx}\n";
+
+   my $entrycount = int(rand($maxentriesperchapter-$minentriesperchapter))
+                   + $minentriesperchapter;
+
+   for (my $entry = 0; $entry < $entrycount; $entry++)
+   {
+      print $fd "Test entry \\gls{entry", int(rand($count)), "}.\n\n";
+   }
+
+   my $refcount = int(rand($maxrefsperchapter-$minrefsperchapter))
+                   + $minrefsperchapter;
+
+   for (my $ref = 1; $ref <= $refcount; $ref++)
+   {
+      print $fd "\\begin{figure}[tbhp]\n";
+      print $fd "\\caption{Sample $idx-$ref}\n";
+      print $fd "\\label{fig:sample-$idx-$ref}\n";
+      print $fd "\\end{figure}\n\n";
+      print $fd "Test reference Figure~\\ref{fig:sample-$idx-$ref}.\n\n";
+   }
+
+   close $fd;
+}
+
+print "Testing document build (no groups)...\n";
+
+my $start_time=time;
+
+`pdflatex -interaction batchmode $basename`;
+
+if ($? != 0)
+{
+   print "pdflatex -interaction batchmode $basename failed with exit code $?\n";
+}
+
+`bib2gls --silent $basename`;
+
+if ($? != 0)
+{
+   print "bib2gls --silent $basename failed with exit code $?\n";
+}
+
+`pdflatex -interaction batchmode $basename`;
+
+if ($? != 0)
+{
+   print "pdflatex -interaction batchmode $basename failed with exit code $?\n";
+}
+
+my $end_time=time;
+
+print "Time taken: ", ($end_time-$start_time), "s\n";
+
+print "Testing document build (groups)...\n";
+
+$start_time=time;
+
+`pdflatex -interaction batchmode $basename`;
+
+if ($? != 0)
+{
+   print "pdflatex -interaction batchmode $basename failed with exit code $?\n";
+}
+
+`bib2gls --silent --group $basename`;
+
+if ($? != 0)
+{
+   print "bib2gls --silent --group $basename failed with exit code $?\n";
+}
+
+`pdflatex -interaction batchmode $basename`;
+
+if ($? != 0)
+{
+   print "pdflatex -interaction batchmode $basename failed with exit code $?\n";
+}
+
+$end_time=time;
+
+print "Time taken: ", ($end_time-$start_time), "s\n";
+
+1;

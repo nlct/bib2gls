@@ -1,0 +1,29 @@
+% Test file created with ./createlargedoc
+% 5000 entries defined in testlargedoc.bib
+% 10 chapters
+% 200 to 500 entries per chapter
+% 200 to 500 references per chapter
+%
+\documentclass{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,nostyles,stylemods=tree,style=indexgroup]{glossaries-extra}
+\GlsXtrLoadResources
+\title{Test Document}
+\author{Test Author}
+\begin{document}
+\maketitle
+\tableofcontents
+\include{testlargedoc-ch1}
+\include{testlargedoc-ch2}
+\include{testlargedoc-ch3}
+\include{testlargedoc-ch4}
+\include{testlargedoc-ch5}
+\include{testlargedoc-ch6}
+\include{testlargedoc-ch7}
+\include{testlargedoc-ch8}
+\include{testlargedoc-ch9}
+\include{testlargedoc-ch10}
+\printunsrtglossaries
+\end{document}
