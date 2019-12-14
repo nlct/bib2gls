@@ -34,13 +34,13 @@ import java.util.regex.Matcher;
 import java.util.Calendar;
 import java.text.Normalizer;
 
-// Requires Java 1.7:
+// Requires at least Java 1.7:
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.aux.*;
+import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
@@ -5045,8 +5045,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.9";
-   public static final String DATE = "2019-04-09";
+   public static final String VERSION = "1.9.20191214";
+   public static final String DATE = "2019-12-14";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

@@ -33,7 +33,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.texparserlib.aux.*;
+import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.generic.Nbsp;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
