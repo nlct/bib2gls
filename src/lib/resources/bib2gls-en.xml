@@ -55,7 +55,7 @@ See the manual for further details.</entry>
 			Don''t warn if internal non-bib fields are found in .bib file.</entry>
 <entry key="syntax.warn.unknown.entry.types">{0}
 			Warn if unknown entry types are found in .bib file.</entry>
-<entry key="syntax.no-warn.unknown.entry.types">{0}
+<entry key="syntax.no.warn.unknown.entry.types">{0}
 			Don''t warn if unknown entry types are found in .bib file.</entry>
 
 <entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;
