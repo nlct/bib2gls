@@ -1240,7 +1240,7 @@ public class Bib2GlsEntry extends BibEntry
             String orgStrVal = list.toString(parser);
 
             String newStrVal = Bib2Gls.replaceSpecialChars(
-              bib2gls.interpret(orgStrVal, value, bib2gls.trimFields()));
+              bib2gls.interpret(orgStrVal, value, bib2gls.isTrimFieldOn(field)));
 
             if (!orgStrVal.equals(newStrVal))
             {
@@ -2062,7 +2062,7 @@ public class Bib2GlsEntry extends BibEntry
           "null value not permitted for field "+label);
       }
 
-      if (bib2gls.trimFields())
+      if (bib2gls.isTrimFieldOn(label))
       {
          value = value.trim();
       }

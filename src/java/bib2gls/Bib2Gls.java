@@ -3973,6 +3973,14 @@ public class Bib2Gls implements TeXApp
          "--trim-fields"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.trim.only.fields",
+         "--trim-only-fields"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.trim.except.fields",
+         "--trim-except-fields"));
+
+      System.out.println();
       System.out.println(getMessage("syntax.no.trim.fields",
          "--no-trim-fields"));
 
@@ -4203,9 +4211,25 @@ public class Bib2Gls implements TeXApp
       this.trimFields = trimFields;
    }
 
+   @Deprecated
    public boolean trimFields()
    {
       return trimFields;
+   }
+
+   public boolean isTrimFieldOn(String field)
+   {
+      if (trimOnlyFields == null && trimExceptFields == null)
+      {
+         return trimFields;
+      }
+
+      if (trimOnlyFields != null)
+      {
+         return trimOnlyFields.contains(field);
+      }
+
+      return !trimExceptFields.contains(field);
    }
 
    private static int parseArgVal(String[] args, int i, Object[] argVal)
@@ -4816,10 +4840,76 @@ public class Bib2Gls implements TeXApp
          else if (args[i].equals("--trim-fields"))
          {
             trimFields = true;
+            trimOnlyFields = null;
+            trimExceptFields = null;
          }
          else if (args[i].equals("--no-trim-fields"))
          {
             trimFields = false;
+            trimOnlyFields = null;
+            trimExceptFields = null;
+         }
+         else if (isArg(args[i], "trim-only-fields"))
+         {
+            if (trimExceptFields != null)
+            {
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.option.clash",
+                  "--trim-only-fields", "--trim-except-fields"));
+            }
+
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            String[] fieldList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+
+            if (trimOnlyFields == null)
+            {
+               trimOnlyFields = new Vector<String>();
+            }
+
+            for (String field : fieldList)
+            {
+               trimOnlyFields.add(field);
+            }
+
+            trimFields = true;
+         }
+         else if (isArg(args[i], "trim-except-fields"))
+         {
+            if (trimOnlyFields != null)
+            {
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.option.clash",
+                  "--trim-only-fields", "--trim-except-fields"));
+            }
+
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            String[] fieldList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+
+            if (trimExceptFields == null)
+            {
+               trimExceptFields = new Vector<String>();
+            }
+
+            for (String field : fieldList)
+            {
+               trimExceptFields.add(field);
+            }
+
+            trimFields = true;
          }
          else if (args[i].startsWith("-"))
          {
@@ -5045,8 +5135,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.9.20191217";
-   public static final String DATE = "2019-12-17";
+   public static final String VERSION = "1.9.20200108";
+   public static final String DATE = "2020-01-08";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5143,6 +5233,8 @@ public class Bib2Gls implements TeXApp
    private Locale defaultLocale = null;
 
    private boolean trimFields = false;
+
+   private Vector<String> trimOnlyFields = null, trimExceptFields = null;
 
    private boolean expandFields = false;
 

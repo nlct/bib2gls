@@ -254,11 +254,27 @@ Don't add unit record count field to entries (default).
 
 =item B<--trim-fields>
 
-Trim leading and trailing spaces from fields.
+Trim leading and trailing spaces from all fields.
+This option cancels B<--trim-only-fields> and B<--no-trim-fields>.
+
+=item B<--trim-only-fields> I<list>
+
+Trim leading and trailing spaces from only the listed fields.
+This option is cumulative but is cancelled by B<--trim-fields>
+and B<--no-trim-fields>. This option may not be used with
+B<--trim-except-fields>.
+
+=item B<--trim-except-fields> I<list>
+
+Trim leading and trailing spaces from all fields except those listed.
+This option is cumulative but is cancelled by B<--trim-fields>
+and B<--no-trim-fields>. This option may not be used with
+B<--trim-only-fields>.
 
 =item B<--no-trim-fields>
 
 Don't trim leading and trailing spaces from fields (default).
+This option cancels B<--trim-only-fields> and B<--trim-fields>.
 
 =item B<--expand-fields>
 

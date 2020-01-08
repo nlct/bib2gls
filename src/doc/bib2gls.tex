@@ -3703,7 +3703,7 @@ before the entries are defined (that is, before using
 
 \argsection{trim-fields}
 
-Trim leading and trailing spaces from field values. For example,
+Trim leading and trailing spaces from all field values. For example,
 if the \ext{bib} file contains:
 \begin{codeenv}
 \atentry{entry}\marg{sample,
@@ -3715,6 +3715,39 @@ if the \ext{bib} file contains:
 \end{codeenv}
 This will cause spurious spaces. Using \longarg{trim-fields} will
 automatically trim the values before writing the \iext{glstex} file.
+
+\argsection{trim-only-fields}
+
+Only trim leading and trailing spaces from the fields identified in
+the comma-separated \meta{list}. This option has a cumulative effect
+but is cancelled by \longarg{no-trim-fields} (which switches off all
+trimming) and by \longarg{trim-fields} (which switches on trimming
+for all fields). This option may not be used with
+\longarg{trim-except-fields}.
+
+For example, to only trim the \field{description} field:
+\begin{verbatim}
+bib2gls --trim-only-fields description myDoc
+\end{verbatim}
+
+\argsection{trim-except-fields}
+
+Trim all leading and trailing spaces from fields except those identified in
+the comma-separated \meta{list}. This option has a cumulative effect
+but is cancelled by \longarg{no-trim-fields} (which switches off all
+trimming) and by \longarg{trim-fields} (which switches on trimming
+for all fields). This option may not be used with
+\longarg{trim-only-fields}.
+
+For example, to trim all fields except \field{prefix} and
+\field{prefixfirst}:
+\begin{verbatim}
+bib2gls --trim-except-fields prefix,prefixfirst myDoc
+\end{verbatim}
+Or
+\begin{verbatim}
+bib2gls --trim-except-fields prefix --trim-except-fields prefixfirst myDoc
+\end{verbatim}
 
 \argsection{no-trim-fields}
 
@@ -10534,9 +10567,9 @@ is omitted for the argument that follows any of those commands.
 For example, this manual defines some semantic commands such as
 \csfmt{fieldfmt} (to format field names), \csfmt{abbrstylefmt}
 (to format abbreviation style names) and \csfmt{glostylefmt} (to format
-glossary style names). These occur in some of the section
-and subsection headings in the \hyperref[sec:topics]{topic summary}
-which are converted to \idx{titlecase} (see \csopt{field-case-change}). 
+glossary style names). If any these occur in section
+and subsection headings (which are converted to \idx{titlecase})
+then the case-change would produce an inappropriate result. 
 These formatting commands shouldn't have their argument changed so they 
 are identified with:
 \begin{codeenv}
@@ -10629,8 +10662,7 @@ field and convert \fieldfmt{nametitle} to \idx{titlecase}:
 \csopt[\field{name}=\fieldfmt{nametitle}]{replicate-fields},
 \csopt[\fieldfmt{nametitle}=title]{field-case-change},
 \end{codeenv}
-This means that the \hyperref[sec:topics]{topic summary}
-(page~\pageref{sec:topics}) can fetch the value of
+This means that it's possible to fetch the value of
 \fieldfmt{nametitle} instead of \field{name}, which provides an
 expandable \idx{titlecase} form that's suitable for the PDF
 bookmarks.

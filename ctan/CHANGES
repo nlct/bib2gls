@@ -1,3 +1,10 @@
+v2.0 (pending):
+
+  * New command line options:
+
+     --trim-only-fields
+     --trim-except-fields
+
 v1.9 (2019-04-09):
 
   * manual:

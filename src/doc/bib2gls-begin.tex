@@ -419,7 +419,10 @@
 \pagestyle{headings}
 
 \newcommand{\glossarytitle}{Index}
+\let\orgbibcite\bibcite
+\renewcommand{\bibcite}[2]{}
 \externaldocument{bib2gls}
+\let\bibcite\orgbibcite
 
 \newcommand{\addr}[1]{\\\href{https://www.#1/}{\nolinkurl{#1}}}
 \title{\styfmt{glossaries-extra} and \bibgls: An Introductory Guide}

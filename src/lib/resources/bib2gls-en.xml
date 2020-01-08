@@ -140,6 +140,12 @@ See the manual for further details.</entry>
 <entry key="syntax.no.trim.fields">{0}
 			Don''t trim leading and trailing spaces from fields 
 			(default).</entry>
+<entry key="syntax.trim.only.fields">{0} &lt;list&gt;
+			Only trim leading and trailing spaces from listed fields.
+			(Cumulative.)</entry>
+<entry key="syntax.trim.except.fields">{0} &lt;list&gt;
+			Trim leading and trailing spaces from all fields except those listed.
+			(Cumulative.)</entry>
 <entry key="syntax.expand.fields">{0}
 			Don''t write \glsnoexpandfields to the .glstex file.</entry>
 <entry key="syntax.no.expand.fields">{0}
