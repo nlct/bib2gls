@@ -5,6 +5,10 @@ v2.0 (pending):
      --trim-only-fields
      --trim-except-fields
 
+  * New resource option:
+
+     interpret-fields-action
+
   * Bug fix: corrected interpret-fields
 
 v1.9 (2019-04-09):

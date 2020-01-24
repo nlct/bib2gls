@@ -1232,6 +1232,8 @@ public class Bib2GlsEntry extends BibEntry
 
       if (interpretFields != null)
       {
+         byte action = resource.getInterpretFieldAction();
+
          for (String field : interpretFields)
          {
             BibValueList value = getField(field);
@@ -1242,7 +1244,9 @@ public class Bib2GlsEntry extends BibEntry
             String newStrVal = Bib2Gls.replaceSpecialChars(
               bib2gls.interpret(orgStrVal, value, bib2gls.isTrimFieldOn(field)));
 
-            if (!orgStrVal.equals(newStrVal))
+            if (!orgStrVal.equals(newStrVal) && 
+                (!newStrVal.isEmpty() 
+                   || action == GlsResource.INTERPRET_FIELD_ACTION_REPLACE))
             {
                list.clear();
                list.addAll(parser.getListener().createString(newStrVal));

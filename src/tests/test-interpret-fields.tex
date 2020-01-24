@@ -9,10 +9,11 @@
 \usepackage[record,postdot]{glossaries-extra}
 
 \GlsXtrLoadResources[
-  src=greek,
+  src={greek},
   replicate-fields={name=user1},
   replicate-missing-field-action=fallback,
-  interpret-fields={user1}
+  interpret-fields={user1},
+  %interpret-fields-action={replace non empty}
 ]
 
 \newcommand{\definition}[1]{%

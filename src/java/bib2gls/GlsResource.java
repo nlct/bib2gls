@@ -2178,6 +2178,19 @@ public class GlsResource
                  bib2gls.getMessage("error.option.requires.interpreter", opt));
             }
          }
+         else if (opt.equals("interpret-fields-action"))
+         {
+            String val = getChoice(parser, list, opt, "replace", "replace non empty");
+
+            if (val.equals("replace"))
+            {
+               interpretFieldAction = INTERPRET_FIELD_ACTION_REPLACE;
+            }
+            else // if (val.equals("replace non empty"))
+            {
+               interpretFieldAction = INTERPRET_FIELD_ACTION_REPLACE_NON_EMPTY;
+            }
+         }
          else if (opt.equals("bibtex-contributor-fields"))
          {
             bibtexAuthorList = getFieldArray(parser, list, opt, true);
@@ -7770,6 +7783,11 @@ public class GlsResource
       return false;
    }
 
+   public byte getInterpretFieldAction()
+   {
+      return interpretFieldAction;
+   }
+
    public boolean isInterpretField(String field)
    {
       if (interpretFields == null)
@@ -10772,6 +10790,10 @@ public class GlsResource
    private String[] bibtexAuthorList = null;
 
    private String[] interpretFields = null;
+
+   public static final byte INTERPRET_FIELD_ACTION_REPLACE=(byte)0;
+   public static final byte INTERPRET_FIELD_ACTION_REPLACE_NON_EMPTY=(byte)1;
+   private byte interpretFieldAction = (byte)0;
 
    private String[] dateTimeList = null;
    private String[] dateList = null;

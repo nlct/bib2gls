@@ -9994,6 +9994,21 @@ bookmarks by adjusting the definition of the custom command:
 }
 \end{codeenv}
 
+\optsection[\subsubsection]{interpret-fields-action}
+
+This option governs the behaviour of \csopt{interpret-fields}.
+Available values are: 
+\begin{itemize}
+\item\code{replace}: replace the field content with its interpreted
+value (default);
+\item\code{replace non empty}: only replace the field content with
+its interpreted value if the interpreted value isn't an empty
+string.
+\end{itemize}
+If a field value consists solely of commands that are unknown to the
+interpreter, then the resulting value will end up empty. In this
+case, it may be more appropriate to leave the field unchanged.
+
 \optsection[\subsubsection]{date-time-fields}
 
 This option indicates that the listed fields all contain 
