@@ -1248,6 +1248,8 @@ public class Bib2GlsEntry extends BibEntry
                list.addAll(parser.getListener().createString(newStrVal));
                value.clear();
                value.add(new BibUserString(list));
+
+               putField(field, newStrVal);
             }
          }
       }
