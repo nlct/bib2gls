@@ -3707,14 +3707,25 @@ Trim leading and trailing spaces from all field values. For example,
 if the \ext{bib} file contains:
 \begin{codeenv}
 \atentry{entry}\marg{sample,
-  \field{name} = \marg{ sample },
+  \field{name} = \marg{sample},
   \field{description} = \marg{
     an example
   }
 }
 \end{codeenv}
-This will cause spurious spaces. Using \longarg{trim-fields} will
-automatically trim the values before writing the \iext{glstex} file.
+This will cause spurious spaces in the \field{description} field. 
+Using \longarg{trim-fields} will automatically trim the values
+before writing the \iext{glstex} file.
+
+Note that even without this trimming option on, fields that are
+set as keys within \cs{longnewglossaryentry} or the optional
+argument of \cs{newabbreviation} will automatically have the leading and
+trailing spaces internally trimmed by the \sty{xkeyval} package, so
+this trimming action only affects fields that aren't set in this
+way, such as the \field{description}, \field{long} and \field{short}
+fields. If you specifically require a space at the start or end of a
+field then use a spacing command, such as \cs{cs.space} or \cs{space} 
+or \idx{nbspchar}.
 
 \argsection{trim-only-fields}
 
@@ -3737,22 +3748,22 @@ the comma-separated \meta{list}. This option has a cumulative effect
 but is cancelled by \longarg{no-trim-fields} (which switches off all
 trimming) and by \longarg{trim-fields} (which switches on trimming
 for all fields). This option may not be used with
-\longarg{trim-only-fields}.
+\longarg{trim-only-fields}. See the above note about \sty{xkeyval}.
 
-For example, to trim all fields except \field{prefix} and
-\field{prefixfirst}:
+For example, to trim all fields except \field{short} and
+\field{long}:
 \begin{verbatim}
-bib2gls --trim-except-fields prefix,prefixfirst myDoc
+bib2gls --trim-except-fields short,long myDoc
 \end{verbatim}
 Or
 \begin{verbatim}
-bib2gls --trim-except-fields prefix --trim-except-fields prefixfirst myDoc
+bib2gls --trim-except-fields short --trim-except-fields long myDoc
 \end{verbatim}
 
 \argsection{no-trim-fields}
 
-Don't trim any leading or trailing spaces from field values. 
-This is the default setting.
+Don't trim any leading or trailing spaces from field values (but see
+the above note about \sty{xkeyval}). This is the default setting.
 
 \argsection{record-count}
 
