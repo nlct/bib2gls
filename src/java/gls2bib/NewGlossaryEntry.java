@@ -212,7 +212,7 @@ public class NewGlossaryEntry extends ControlSequence
 
             object = newVal;
          }
-         else if (field.equals("type"))
+         else if (field.equals("type") && !gls2bib.ignoreType())
          {
             // Ignore type=\glsdefaulttype
 
