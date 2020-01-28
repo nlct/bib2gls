@@ -17860,6 +17860,13 @@ sort value than either \idx!{makeindex} or \idx!{xindy}.
 
 \item[\longargfmt{no-ignore-sort}] Don't ignore the \field{sort} field.
 
+\item[\longargfmt{ignore-type}] Ignore the \field{type} field.
+You may find it more flexible not to be locked into a specific
+glossary type if you have a large database of entries.
+
+\item[\longargfmt{no-ignore-type}] Don't ignore the \field{type} field
+(default).
+
 \item[\longargfmt{locale} \meta{lang tag}] Identifies the \langxml\
 to use for \idx{convertgls2bib}['s] messages.
 
@@ -21946,8 +21953,11 @@ Unfortunately \ics{glossentrysymbol} doesn't pick up the
 \catattr{glossnamefont} attribute, so if the short form of the
 abbreviations is saved in the \field{symbol} field, using one of the
 methods discussed above, then the custom \csfmt{bacteriafont} won't
-be applied. A simple solution is to use \ics{glossentrynameother}
-instead:
+be applied. (As from \sty{glossaries-extra} version 1.42, there is
+now the \catattr{glosssymbolfont} attribute that's used by
+\ics{glossentrysymbol}.)
+
+A simple solution is to use \ics{glossentrynameother} instead:
 \begin{codeenv}
 \cs{renewcommand}*\marg{\cs{glsxtrbookindexname}}[1]\marg{\comment{}
   \cs{glossentryname}\marg{\idx{param}1}\comment{}

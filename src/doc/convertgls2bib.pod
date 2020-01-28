@@ -48,6 +48,14 @@ Ignore the B<sort> field (default).
 
 Don't ignore the B<sort> field.
 
+=item B<--ignore-type>
+
+Ignore the B<type> field.
+
+=item B<--no-ignore-type>
+
+Don't ignore the B<type> field (default).
+
 =item B<--space-sub> I<value>
 
 Substitute spaces in labels with I<value>.

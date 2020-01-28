@@ -502,6 +502,8 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.bibenc">{0} &lt;encoding&gt;	.bib file encoding</entry>
 <entry key="gls2bib.syntax.ignore-sort">{0} 		Ignore sort field (default)</entry>
 <entry key="gls2bib.syntax.no-ignore-sort">{0} 	Don''t ignore sort field</entry>
+<entry key="gls2bib.syntax.ignore-type">{0} 		Ignore type field</entry>
+<entry key="gls2bib.syntax.no-ignore-type">{0} 	Don''t ignore type field (default)</entry>
 <entry key="gls2bib.syntax.space-sub">{0} &lt;value&gt;	Substitute spaces in labels with &lt;value&gt;</entry>
 <entry key="gls2bib.syntax.locale">{0} &lt;lang tag&gt;	Use language resource file given by &lt;lang tag&gt; for messages.</entry>
 <entry key="gls2bib.syntax.silent">{0}		Suppress messages.</entry>

@@ -68,13 +68,15 @@ public class Gls2Bib extends LaTeXParserListener
    }
 
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
-     String outCharset, String spaceSub, String langTag, boolean ignoreSort, int verbose)
+     String outCharset, String spaceSub, String langTag, boolean ignoreSort, 
+     int verbose, boolean ignoreType)
     throws Gls2BibException,IOException
    {
       super(null);
 
       this.verboseLevel = verbose;
       this.ignoreSortField = ignoreSort;
+      this.ignoreTypeField = ignoreType;
 
       initMessages(langTag);
 
@@ -134,6 +136,11 @@ public class Gls2Bib extends LaTeXParserListener
    public boolean ignoreSort()
    {
       return ignoreSortField;
+   }
+
+   public boolean ignoreType()
+   {
+      return ignoreTypeField;
    }
 
    public String getSpaceSub()
@@ -921,6 +928,10 @@ public class Gls2Bib extends LaTeXParserListener
         "--ignore-sort"));
       System.out.println(getMessage("gls2bib.syntax.no-ignore-sort",
         "--no-ignore-sort"));
+      System.out.println(getMessage("gls2bib.syntax.ignore-type",
+        "--ignore-type"));
+      System.out.println(getMessage("gls2bib.syntax.no-ignore-type",
+        "--no-ignore-type"));
       System.out.println(getMessage("gls2bib.syntax.space-sub",
         "--space-sub"));
       System.out.println(getMessage("gls2bib.syntax.locale",
@@ -943,6 +954,7 @@ public class Gls2Bib extends LaTeXParserListener
       charset = Charset.defaultCharset();
       bibCharsetName = null;
       ignoreSortField = true;
+      ignoreTypeField = false;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -1006,6 +1018,14 @@ public class Gls2Bib extends LaTeXParserListener
          else if (args[i].equals("--no-ignore-sort"))
          {
             ignoreSortField = false;
+         }
+         else if (args[i].equals("--ignore-type"))
+         {
+            ignoreTypeField = true;
+         }
+         else if (args[i].equals("--no-ignore-type"))
+         {
+            ignoreTypeField = false;
          }
          else if (args[i].equals("--debug")
                || args[i].equals("--silent")
@@ -1151,8 +1171,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9";
-   public static final String DATE = "2019-04-09";
+   public static final String VERSION = "1.9.20200128";
+   public static final String DATE = "2020-01-28";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
@@ -1166,6 +1186,7 @@ public class Gls2Bib extends LaTeXParserListener
    private String spaceSub = null;
 
    private boolean ignoreSortField=true;
+   private boolean ignoreTypeField=false;
 
    private Gls2BibMessages messages;
 

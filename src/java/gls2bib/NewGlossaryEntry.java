@@ -258,7 +258,8 @@ public class NewGlossaryEntry extends ControlSequence
                continue;
             }
          }
-         else if (gls2bib.ignoreSort() && field.equals("sort"))
+         else if ((gls2bib.ignoreSort() && field.equals("sort"))
+               || (gls2bib.ignoreType() && field.equals("type")))
          {
             continue;
          }

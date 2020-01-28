@@ -11,6 +11,13 @@ v2.0 (pending):
 
   * Bug fix: corrected interpret-fields
 
+  * convertgls2bib:
+
+    - new command line options:
+
+      --ignore-type
+      --no-ignore-type
+
 v1.9 (2019-04-09):
 
   * manual:
