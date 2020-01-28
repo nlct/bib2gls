@@ -56,6 +56,15 @@ Ignore the B<type> field.
 
 Don't ignore the B<type> field (default).
 
+=item B<--split-on-type>
+
+Split the entries into separate files according to the B<type> field.
+
+=item B<--no-split-on-type>
+
+Don't split the entries into separate files according to the B<type>
+field (default).
+
 =item B<--space-sub> I<value>
 
 Substitute spaces in labels with I<value>.

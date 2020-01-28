@@ -212,7 +212,7 @@ public class NewGlossaryEntry extends ControlSequence
 
             object = newVal;
          }
-         else if (field.equals("type") && !gls2bib.ignoreType())
+         else if (field.equals("type"))
          {
             // Ignore type=\glsdefaulttype
 
@@ -257,9 +257,36 @@ public class NewGlossaryEntry extends ControlSequence
             {
                continue;
             }
+
+            if (gls2bib.isSplitTypeOn())
+            {
+               TeXObject obj = object;
+
+               if (obj instanceof Expandable)
+               {
+                  TeXObjectList expanded = ((Expandable)obj).expandfully(parser);
+
+                  if (expanded != null)
+                  {
+                     obj = expanded;
+                  }
+               }
+
+               String glosType = obj.toString(parser);
+
+               if (!glosType.isEmpty())
+               {
+                  data.setGlossaryType(glosType);
+               }
+
+               continue;
+            }
+            else if (gls2bib.ignoreType())
+            {
+               continue;
+            }
          }
-         else if ((gls2bib.ignoreSort() && field.equals("sort"))
-               || (gls2bib.ignoreType() && field.equals("type")))
+         else if (gls2bib.ignoreSort() && field.equals("sort"))
          {
             continue;
          }

@@ -504,11 +504,13 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.no-ignore-sort">{0} 	Don''t ignore sort field</entry>
 <entry key="gls2bib.syntax.ignore-type">{0} 		Ignore type field</entry>
 <entry key="gls2bib.syntax.no-ignore-type">{0} 	Don''t ignore type field (default)</entry>
+<entry key="gls2bib.syntax.split-on-type">{0} 	Split entries into separate files according to type field</entry>
+<entry key="gls2bib.syntax.no-split-on-type">{0} 	Don''t split entries according to type field (default)</entry>
 <entry key="gls2bib.syntax.space-sub">{0} &lt;value&gt;	Substitute spaces in labels with &lt;value&gt;</entry>
 <entry key="gls2bib.syntax.locale">{0} &lt;lang tag&gt;	Use language resource file given by &lt;lang tag&gt; for messages.</entry>
 <entry key="gls2bib.syntax.silent">{0}		Suppress messages.</entry>
 <entry key="gls2bib.syntax.verbose">{0}		Normal messages.</entry>
-<entry key="gls2bib.syntax.debug">{0}		Debug mode.</entry>
+<entry key="gls2bib.syntax.debug">{0}			Debug mode.</entry>
 
 <entry key="gls2bib.override.newdualentry">Overriding default definition of \newdualentry with custom 
 definition. (Change \newcommand to \providecommand if you want 

@@ -17,6 +17,8 @@ v2.0 (pending):
 
       --ignore-type
       --no-ignore-type
+      --split-on-type
+      --no-split-on-type
 
 v1.9 (2019-04-09):
 

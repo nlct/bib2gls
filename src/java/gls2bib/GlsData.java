@@ -42,11 +42,26 @@ public class GlsData
       return id;
    }
 
+   public void setGlossaryType(String glosType)
+   {
+      this.glosType = glosType;
+   }
+
+   public String getGlossaryType()
+   {
+      return glosType;
+   }
+
    // top-level braces should already be added to the fieldValue
    // if required
    public void putField(String fieldName, String fieldValue)
    {
       fields.put(fieldName, fieldValue);
+   }
+
+   public String removeField(String fieldName)
+   {
+      return fields.remove(fieldName);
    }
 
    public void writeBibEntry(PrintWriter writer)
@@ -77,7 +92,7 @@ public class GlsData
       writer.println();
    }
 
-   private String id, type;
+   private String id, type, glosType;
 
    private HashMap<String,String> fields;
 }

@@ -32,6 +32,9 @@ import java.util.Vector;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Locale;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashMap;
 import java.text.MessageFormat;
 import java.io.*;
 
@@ -141,6 +144,11 @@ public class Gls2Bib extends LaTeXParserListener
    public boolean ignoreType()
    {
       return ignoreTypeField;
+   }
+
+   public boolean isSplitTypeOn()
+   {
+      return splitOnType;
    }
 
    public String getSpaceSub()
@@ -760,6 +768,13 @@ public class Gls2Bib extends LaTeXParserListener
 
       PrintWriter out = null;
 
+      HashMap<String,PrintWriter> types = null;
+
+      if (splitOnType)
+      {
+         types = new HashMap<String,PrintWriter>();
+      }
+
       try
       {
          if (data.isEmpty())
@@ -782,7 +797,45 @@ public class Gls2Bib extends LaTeXParserListener
 
          for (GlsData entry : data)
          {
-            entry.writeBibEntry(out);
+            if (splitOnType)
+            {
+               String type = entry.getGlossaryType();
+
+               if (type == null)
+               {
+                  entry.writeBibEntry(out);
+               }
+               else
+               {
+                  PrintWriter splitOut = types.get(type);
+
+                  if (splitOut == null)
+                  {
+                     File splitBibFile = new File(bibFile.getParent(), type+".bib");
+
+                     message(getMessage("message.writing", splitBibFile));
+
+                     if (bibCharsetName == null)
+                     {
+                        splitOut = new PrintWriter(splitBibFile);
+                     }
+                     else
+                     {
+                        splitOut = new PrintWriter(splitBibFile, bibCharsetName);
+
+                        splitOut.println("% Encoding: "+bibCharsetName);
+                     }
+
+                     types.put(type, splitOut);
+                  }
+
+                  entry.writeBibEntry(splitOut);
+               }
+            }
+            else
+            {
+               entry.writeBibEntry(out);
+            }
          }
       }
       finally
@@ -790,6 +843,17 @@ public class Gls2Bib extends LaTeXParserListener
          if (out != null)
          {
             out.close();
+         }
+
+         if (types != null)
+         {
+            Set<String> keySet = types.keySet();
+
+            for (Iterator<String> it=keySet.iterator(); it.hasNext(); )
+            {
+               String type = it.next();
+               types.get(type).close();
+            }
          }
       }
    }
@@ -932,6 +996,10 @@ public class Gls2Bib extends LaTeXParserListener
         "--ignore-type"));
       System.out.println(getMessage("gls2bib.syntax.no-ignore-type",
         "--no-ignore-type"));
+      System.out.println(getMessage("gls2bib.syntax.split-on-type",
+        "--split-on-type"));
+      System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
+        "--no-split-on-type"));
       System.out.println(getMessage("gls2bib.syntax.space-sub",
         "--space-sub"));
       System.out.println(getMessage("gls2bib.syntax.locale",
@@ -955,6 +1023,7 @@ public class Gls2Bib extends LaTeXParserListener
       bibCharsetName = null;
       ignoreSortField = true;
       ignoreTypeField = false;
+      splitOnType = false;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -1027,6 +1096,14 @@ public class Gls2Bib extends LaTeXParserListener
          {
             ignoreTypeField = false;
          }
+         else if (args[i].equals("--split-on-type"))
+         {
+            splitOnType = true;
+         }
+         else if (args[i].equals("--no-split-on-type"))
+         {
+            splitOnType = false;
+         }
          else if (args[i].equals("--debug")
                || args[i].equals("--silent")
                || args[i].equals("--verbose"))
@@ -1044,7 +1121,14 @@ public class Gls2Bib extends LaTeXParserListener
          }
          else if (bibFile == null)
          {
-            bibFile = new File(args[i]);
+            if (args[i].toLowerCase().endsWith(".bib"))
+            {
+               bibFile = new File(args[i]);
+            }
+            else
+            {
+               bibFile = new File(args[i]+".bib");
+            }
          }
          else
          {
@@ -1187,6 +1271,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    private boolean ignoreSortField=true;
    private boolean ignoreTypeField=false;
+   private boolean splitOnType=false;
 
    private Gls2BibMessages messages;
 
