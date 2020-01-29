@@ -49,6 +49,10 @@ import com.dickimawbooks.texparserlib.primitives.Undefined;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.AtGobble;
+import com.dickimawbooks.texparserlib.latex.AtGobbleThree;
+import com.dickimawbooks.texparserlib.latex.GobbleOpt;
+import com.dickimawbooks.texparserlib.latex.GobbleOptOne;
 
 public class Gls2Bib extends LaTeXParserListener
   implements Writeable,TeXApp
@@ -151,11 +155,6 @@ public class Gls2Bib extends LaTeXParserListener
       return splitOnType;
    }
 
-   public boolean isOverwriteOn()
-   {
-      return overwrite;
-   }
-
    public String getSpaceSub()
    {
       return spaceSub;
@@ -204,6 +203,36 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new GlsSetExpandField(this));
       parser.putControlSequence(new GlsSetExpandField(
         "glssetnoexpandfield", false, this));
+
+      // ignore common glossary preamble commands
+
+      parser.putControlSequence(new AtGobble("setupglossaries"));
+      parser.putControlSequence(new AtGobble("glossariesextrasetup"));
+      parser.putControlSequence(new GobbleOpt("makeglossaries"));
+      parser.putControlSequence(new Relax("makenoidxglossaries"));
+      parser.putControlSequence(new Relax("noist"));
+      parser.putControlSequence(new NewGlossary());
+      parser.putControlSequence(new NewGlossary("altnewglossary", 
+       NewGlossary.ALT));
+      parser.putControlSequence(new NewGlossary("newignoredglossary", 
+       NewGlossary.IGNORED));
+      parser.putControlSequence(new NewGlossary("provideignoredglossary", 
+       NewGlossary.IGNORED));
+      parser.putControlSequence(new GobbleOptOne("GlsSetXdyLanguage"));
+      parser.putControlSequence(new AtGobble("GlsSetXdyCodePage"));
+      parser.putControlSequence(new AtGobble("GlsAddXdyCounters"));
+      parser.putControlSequence(new AtGobble("GlsAddXdyAttribute"));
+      parser.putControlSequence(new GobbleOptOne("GlsAddXdyLocation")); 
+      parser.putControlSequence(new AtGobble("GlsSetXdyLocationClassOrder"));
+      parser.putControlSequence(new AtGobble("GlsSetXdyMinRangeLength"));
+      parser.putControlSequence(new AtGobble("GlsSetXdyFirstLetterAfterDigits"));
+      parser.putControlSequence(new AtGobble("GlsSetXdyNumberGroupOrder"));
+      parser.putControlSequence(new AtGobble("GlsAddXdyStyle"));
+
+      parser.putControlSequence(new GobbleOptOne("setabbreviationstyle")); 
+      parser.putControlSequence(new AtGobble("setacronymstyle")); 
+
+      parser.putControlSequence(new AtGobbleThree("newabbreviationstyle"));
    }
 
    // Ignore unknown control sequences
@@ -233,6 +262,19 @@ public class Gls2Bib extends LaTeXParserListener
       super.newcommand(overwrite, type, csName, isShort,
         numParams, defValue, definition);
    }
+
+   @Override
+   public void beginDocument()
+     throws IOException
+   {
+      super.beginDocument();
+
+      if (preambleOnly)
+      {
+         endDocument();
+      }
+   }
+
 
    // No write performed by parser (just gathering information)
    public void write(String text)
@@ -787,7 +829,7 @@ public class Gls2Bib extends LaTeXParserListener
             throw new IOException("No entries found");
          }
 
-         if (!overwrite && bibFile.exists())
+         if (!overwriteFiles && bibFile.exists())
          {
             throw new IOException(getMessage("error.file_exists.nooverwrite",
                bibFile, "--overwrite"));
@@ -824,7 +866,7 @@ public class Gls2Bib extends LaTeXParserListener
                   {
                      File splitBibFile = new File(bibFile.getParent(), type+".bib");
 
-                    if (!overwrite && splitBibFile.exists())
+                    if (!overwriteFiles && splitBibFile.exists())
                     {
                        throw new IOException(getMessage("error.file_exists.nooverwrite",
                           splitBibFile, "--overwrite"));
@@ -1021,6 +1063,10 @@ public class Gls2Bib extends LaTeXParserListener
         "--overwrite", "--split-on-type"));
       System.out.println(getMessage("gls2bib.syntax.no-overwrite",
         "--no-overwrite"));
+      System.out.println(getMessage("gls2bib.syntax.preamble-only",
+        "--preamble-only"));
+      System.out.println(getMessage("gls2bib.syntax.no-preamble-only",
+        "--no-preamble-only"));
       System.out.println(getMessage("gls2bib.syntax.space-sub",
         "--space-sub"));
       System.out.println(getMessage("gls2bib.syntax.locale",
@@ -1046,6 +1092,7 @@ public class Gls2Bib extends LaTeXParserListener
       ignoreTypeField = false;
       splitOnType = false;
       int overwrite_setting = -1;
+      preambleOnly = false;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -1134,6 +1181,14 @@ public class Gls2Bib extends LaTeXParserListener
          {
             overwrite_setting = 0;
          }
+         else if (args[i].equals("--preamble-only"))
+         {
+            preambleOnly = true;
+         }
+         else if (args[i].equals("--no-preamble-only"))
+         {
+            preambleOnly = false;
+         }
          else if (args[i].equals("--debug")
                || args[i].equals("--silent")
                || args[i].equals("--verbose"))
@@ -1187,13 +1242,13 @@ public class Gls2Bib extends LaTeXParserListener
       switch (overwrite_setting)
       {
          case -1:
-           overwrite = (splitOnType ? false : true);
+           overwriteFiles = (splitOnType ? false : true);
          break;
          case 0:
-           overwrite = false;
+           overwriteFiles = false;
          break;
          case 1:
-           overwrite = true;
+           overwriteFiles = true;
          break;
       }
    }
@@ -1315,7 +1370,8 @@ public class Gls2Bib extends LaTeXParserListener
    private boolean ignoreSortField=true;
    private boolean ignoreTypeField=false;
    private boolean splitOnType=false;
-   private boolean overwrite=true;
+   private boolean overwriteFiles=true;
+   private boolean preambleOnly=false;
 
    private Gls2BibMessages messages;
 

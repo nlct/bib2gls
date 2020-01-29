@@ -23,6 +23,8 @@ v2.0 (pending):
       --no-split-on-type
       --overwrite
       --no-overwrite
+      --preamble-only
+      --no-preamble-only
 
 v1.9 (2019-04-09):
 

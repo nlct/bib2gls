@@ -77,6 +77,14 @@ used.
 Don't overwrite existing .bib files. Default if B<--split-on-type>
 used.
 
+=item B<--preamble-only>
+
+Only parse the document preamble.
+
+=item B<--no-preamble-only>
+
+Parse the entire document (default).
+
 =item B<--space-sub> I<value>
 
 Substitute spaces in labels with I<value>.
