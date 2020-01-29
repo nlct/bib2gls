@@ -677,6 +677,8 @@ public class SortSettings
          case IDENTICAL_SORT_USE_ID:
          case IDENTICAL_SORT_USE_FIELD:
          case IDENTICAL_SORT_USE_ORIGINAL_ID:
+         case IDENTICAL_SORT_USE_DEF:
+         case IDENTICAL_SORT_USE_RECORD:
            identicalSortAction = action;
          break;
          default:
@@ -855,6 +857,8 @@ public class SortSettings
    public static final int IDENTICAL_SORT_USE_ID=1;
    public static final int IDENTICAL_SORT_USE_FIELD=2;
    public static final int IDENTICAL_SORT_USE_ORIGINAL_ID=3;
+   public static final int IDENTICAL_SORT_USE_DEF=4;
+   public static final int IDENTICAL_SORT_USE_RECORD=5;
 
    private int identicalSortAction = IDENTICAL_SORT_USE_ID;
 

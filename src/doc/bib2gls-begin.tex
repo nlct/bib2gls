@@ -1293,25 +1293,10 @@ will produce
   \field{name} = sample , \field{description} = \marg{an example}
 }
 \end{codeenv}
-However, spaces at the start or end of the value if it's been
-enclosed in braces aren't ignored. For example, if the entry is now
-defined as:
-\begin{codeenv}
-\gls{newglossaryentry}\marg{sample}
-\marg{
-  \field{name} = \marg{ sample } , \field{description} = {an example}\incorrect
-}
-\end{codeenv}
-then:
-\begin{codeenv}
-/\gls{gls}\marg{sample}/
-\end{codeenv}
-produces:
-\begin{result}
-/ sample /
-\end{result}
-The spaces in this case have been retained. The unstarred version of
-\gls{longnewglossaryentry} appends extra code to the end of the
+However, spaces at the start or end of the value that's provided as
+an argument (rather than in a \keyvallist) often aren't ignored.
+
+The unstarred version of \gls{longnewglossaryentry} appends extra code to the end of the
 description, which removes any trailing spaces (and also the 
 \gls{postdescriptionhook}). The starred version
 \gls{longnewglossaryentry*} (only available with \sty{glossaries-extra}) 

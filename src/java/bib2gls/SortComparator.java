@@ -442,7 +442,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       entry.putField(sortStorageField, value);
 
       if (settings.getIdenticalSortAction() 
-         == SortSettings.IDENTICAL_SORT_USE_FIELD)
+           == SortSettings.IDENTICAL_SORT_USE_FIELD)
       {
          String field = settings.getIdenticalSortField();
 
@@ -454,7 +454,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
             fallbackValue = "";
          }
          else if (bib2gls.useInterpreter() && list != null
-                   && fallbackValue.matches("(?s).*[\\\\\\$\\{\\}\\~].*"))
+                && fallbackValue.matches("(?s).*[\\\\\\$\\{\\}\\~].*"))
          {
             fallbackValue = bib2gls.interpret(fallbackValue, list, 
                settings.isTrimOn());
@@ -612,6 +612,20 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
             return entry1.getOriginalId().compareTo(
                entry2.getOriginalId());
+
+         case SortSettings.IDENTICAL_SORT_USE_RECORD:
+
+            bib2gls.verboseMessage("warning.identical.use");
+
+            return Long.compare(entry1.getRecordIndex(), 
+               entry1.getRecordIndex());
+
+         case SortSettings.IDENTICAL_SORT_USE_DEF:
+
+            bib2gls.verboseMessage("warning.identical.def");
+
+            return Long.compare(entry1.getDefinitionIndex(), 
+               entry1.getDefinitionIndex());
 
          case SortSettings.IDENTICAL_SORT_USE_FIELD:
 

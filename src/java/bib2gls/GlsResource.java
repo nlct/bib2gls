@@ -1468,6 +1468,16 @@ public class GlsResource
                sortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
             }
+            else if (val.equals("def"))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_DEF);
+            }
+            else if (val.equals("use"))
+            {
+               sortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_RECORD);
+            }
             else if (bib2gls.isKnownField(val)
                      || bib2gls.isKnownSpecialField(val))
             {
@@ -1510,6 +1520,16 @@ public class GlsResource
                dualSortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
             }
+            else if (val.equals("def"))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_DEF);
+            }
+            else if (val.equals("use"))
+            {
+               dualSortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_RECORD);
+            }
             else if (bib2gls.isKnownField(val)
                    || bib2gls.isKnownSpecialField(val))
             {
@@ -1541,6 +1561,16 @@ public class GlsResource
             {
                secondarySortSettings.setIdenticalSortAction(
                   SortSettings.IDENTICAL_SORT_USE_ORIGINAL_ID);
+            }
+            else if (val.equals("def"))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_DEF);
+            }
+            else if (val.equals("use"))
+            {
+               secondarySortSettings.setIdenticalSortAction(
+                  SortSettings.IDENTICAL_SORT_USE_RECORD);
             }
             else if (bib2gls.isKnownField(val)
                   || bib2gls.isKnownSpecialField(val))

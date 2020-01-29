@@ -9,6 +9,8 @@ v2.0 (pending):
 
      interpret-fields-action
 
+  * New values for 'identical-sort-action' option: 'def' and 'use'
+
   * Bug fix: corrected interpret-fields
 
   * convertgls2bib:

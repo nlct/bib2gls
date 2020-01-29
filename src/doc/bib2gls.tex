@@ -13967,6 +13967,9 @@ equal.  The \meta{value} may be one of:
 \begin{itemize}
 \item\optfmt{none}: don't take any further action if sort values are
 identical;
+\item\optfmt{def} if sort values are identical, order them according to definition;
+\item\optfmt{use}: if sort values are identical, order them
+according to use in the document (order determine by a normal record);
 \item\optfmt{id}: if sort values are identical, compare
 the entry labels;
 \item\optfmt{original id}: if sort values are identical, compare the
@@ -13974,9 +13977,8 @@ original unprefixed entry labels (as given in the \ext{bib} file);
 \item\meta{field}: if sort values are identical, compare
 the values from the given \meta{field}.
 \end{itemize}
-In each case (other than \csopt[none]{identical-sort-action}) a
-simple case-sensitive string comparison is used. If \meta{value}
-isn't a recognised keyword or valid field an error will occur.  The
+For the last three cases, a simple case-sensitive string comparison is used. 
+If \meta{value} isn't a recognised keyword or valid field an error will occur.  The
 default setting is \csopt[id]{identical-sort-action}.  If you're
 using one of the sort rules listed in \tableref{tab:sortoptionsrule}
 and you also want a locale-sensitive sort used on the fallback, then

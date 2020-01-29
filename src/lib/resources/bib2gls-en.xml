@@ -385,6 +385,8 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.identical">Identical sort values for ''{0}'' and ''{1}''</entry>
 <entry key="warning.identical.id">Falling back on ID</entry>
 <entry key="warning.identical.original_id">Falling back on original ID</entry>
+<entry key="warning.identical.def">Falling back on order of definition</entry>
+<entry key="warning.identical.use">Falling back on order of use</entry>
 <entry key="warning.identical.none">No fallback</entry>
 <entry key="warning.identical.field">Falling back on ''{0}'' field (''{1}'' &lt;=&gt; ''{2}'' = {3})</entry>
 <entry key="warning.unknown.widest.fortype">Can''t determine widest level {0} entry for glossary type ''{1}''. Using fallback method.</entry>

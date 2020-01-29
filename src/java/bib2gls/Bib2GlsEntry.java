@@ -44,11 +44,22 @@ public class Bib2GlsEntry extends BibEntry
       this(bib2gls, "entry");
    }
 
+   private Bib2GlsEntry(Bib2Gls bib2gls, long defIndex)
+   {
+      this(bib2gls, "entry", defIndex);
+   }
+
    public Bib2GlsEntry(Bib2Gls bib2gls, String entryType)
+   {
+      this(bib2gls, entryType, defIndexCount++);
+   }
+   
+   private Bib2GlsEntry(Bib2Gls bib2gls, String entryType, long defIndex)
    {
       super(entryType.toLowerCase());
       this.bib2gls = bib2gls;
       this.originalEntryType = entryType;
+      this.defIndex = defIndex;
 
       resource = bib2gls.getCurrentResource();
 
@@ -2356,6 +2367,11 @@ public class Bib2GlsEntry extends BibEntry
          return;
       }
 
+      if (recordIndex == -1)
+      {
+         recordIndex = record.getIndex();
+      }
+
       if (record.getFormat().equals("glstriggerrecordformat"))
       {
          triggerRecordFound = true;
@@ -3853,7 +3869,7 @@ public class Bib2GlsEntry extends BibEntry
    // Gets a minimal copy of this
    public Bib2GlsEntry getMinimalCopy()
    {
-      Bib2GlsEntry entry = new Bib2GlsEntry(bib2gls);
+      Bib2GlsEntry entry = new Bib2GlsEntry(bib2gls, defIndex);
 
       entry.originalEntryType = originalEntryType;
       entry.records = records;
@@ -3861,8 +3877,19 @@ public class Bib2GlsEntry extends BibEntry
       entry.base = base;
       entry.labelPrefix = labelPrefix;
       entry.setId(getId());
+      entry.recordIndex = recordIndex;
 
       return entry;
+   }
+
+   public long getDefinitionIndex()
+   {
+      return defIndex;
+   }
+
+   public long getRecordIndex()
+   {
+      return recordIndex;
    }
 
    private Vector<GlsRecord> records;
@@ -3921,6 +3948,10 @@ public class Bib2GlsEntry extends BibEntry
    private Vector<String> locationList = null;
 
    private GlsRecord indexCounterRecord = null;
+
+   private long defIndex=0, recordIndex=-1;
+
+   private static long defIndexCount=0;
 
    private static final Pattern EXT_PREFIX_PATTERN = Pattern.compile(
      "ext(\\d+)\\.(.*)");
