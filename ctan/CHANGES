@@ -19,6 +19,8 @@ v2.0 (pending):
       --no-ignore-type
       --split-on-type
       --no-split-on-type
+      --overwrite
+      --no-overwrite
 
 v1.9 (2019-04-09):
 

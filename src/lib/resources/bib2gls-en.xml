@@ -506,6 +506,8 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.no-ignore-type">{0} 	Don''t ignore type field (default)</entry>
 <entry key="gls2bib.syntax.split-on-type">{0} 	Split entries into separate files according to type field</entry>
 <entry key="gls2bib.syntax.no-split-on-type">{0} 	Don''t split entries according to type field (default)</entry>
+<entry key="gls2bib.syntax.overwrite">{0} 	Overwrite files (default unless {1})</entry>
+<entry key="gls2bib.syntax.no-overwrite">{0} 	Don''t overwrite files</entry>
 <entry key="gls2bib.syntax.space-sub">{0} &lt;value&gt;	Substitute spaces in labels with &lt;value&gt;</entry>
 <entry key="gls2bib.syntax.locale">{0} &lt;lang tag&gt;	Use language resource file given by &lt;lang tag&gt; for messages.</entry>
 <entry key="gls2bib.syntax.silent">{0}		Suppress messages.</entry>
@@ -539,6 +541,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="error.syntax.batch.missing_out">Output directory required for batch mode</entry>
 <entry key="error.syntax.batch.unknown_format">Unknown format ''{0}''</entry>
 <entry key="error.exists">{0} already exists</entry>
+<entry key="error.file_exists.nooverwrite">Can''t write to ''{0}'': file already exists (use {1} to force overwrite)</entry>
 
 <entry key="tex.error.bad_param">Parameter digit 1 to 9 expected. Found ''{0}''</entry>
 <entry key="tex.error.no_eg">Missing end group</entry>

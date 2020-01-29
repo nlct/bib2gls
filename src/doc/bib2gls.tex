@@ -17827,9 +17827,10 @@ the \ext{bib} file. This application is less secure than \bibgls\ as
 it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and 
 \texmfcnf{openoutany}. Take care not to accidentally overwrite
 existing \ext{bib} files as there's no check to determine if
-\meta{bib file} already exists. (If the \ext{bib} extension is
-missing from \meta{bib file}, it will be added. The extension is
-required for \meta{tex file}.)
+\meta{bib file} already exists with the default \longargfmt{overwrite}. 
+
+If the \ext{bib} extension is missing from \meta{bib file}, it will
+be added. The extension is required for \meta{tex file}.
 
 The \meta{options} are:
 \begin{description}
@@ -17867,7 +17868,7 @@ You may find it more flexible not to be locked into a specific
 glossary type if you have a large database of entries.
 
 \item[\longargfmt{no-ignore-type}] Don't ignore the \field{type} field
-(default).
+(default unless \longargfmt{split-on-type}).
 
 \item[\longargfmt{split-on-type}] Split the entries into separate
 files according to the \field{type} field. Any entries that don't
@@ -17875,13 +17876,20 @@ have the \field{type} field set or have it set to \ics{glsdefaulttype}
 will be written to \meta{bib file}. Otherwise entries will be
 written to \metafilefmt{}{type}{.bib} (in the same directory as
 \meta{bib file}) where \meta{type} is the value of the \field{type}
-field. This option automatically implements \longargfmt{ignore-type}.
+field. This option automatically implements \longargfmt{ignore-type}
+and \longargfmt{no-overwrite}.
 
 \item[\longargfmt{no-split-on-type}] Don't split the entries into separate
 files (default).
 
 \item[\longargfmt{locale} \meta{lang tag}] Identifies the \langxml\
 to use for \idx{convertgls2bib}['s] messages.
+
+\item[\longargfmt{overwrite}] Allow existing \ext{bib} files to be
+overwritten. (Default unless \longargfmt{split-on-type}.)
+
+\item[\longargfmt{no-overwrite}] Don't allow existing \ext{bib} files to be
+overwritten. (Default if \longargfmt{split-on-type}.)
 
 \item[\longargfmt{silent}] Suppress all messages except for errors.
 

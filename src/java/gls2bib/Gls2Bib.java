@@ -151,6 +151,11 @@ public class Gls2Bib extends LaTeXParserListener
       return splitOnType;
    }
 
+   public boolean isOverwriteOn()
+   {
+      return overwrite;
+   }
+
    public String getSpaceSub()
    {
       return spaceSub;
@@ -782,6 +787,12 @@ public class Gls2Bib extends LaTeXParserListener
             throw new IOException("No entries found");
          }
 
+         if (!overwrite && bibFile.exists())
+         {
+            throw new IOException(getMessage("error.file_exists.nooverwrite",
+               bibFile, "--overwrite"));
+         }
+
          message(getMessage("message.writing", bibFile));
 
          if (bibCharsetName == null)
@@ -812,6 +823,12 @@ public class Gls2Bib extends LaTeXParserListener
                   if (splitOut == null)
                   {
                      File splitBibFile = new File(bibFile.getParent(), type+".bib");
+
+                    if (!overwrite && splitBibFile.exists())
+                    {
+                       throw new IOException(getMessage("error.file_exists.nooverwrite",
+                          splitBibFile, "--overwrite"));
+                    }
 
                      message(getMessage("message.writing", splitBibFile));
 
@@ -1000,6 +1017,10 @@ public class Gls2Bib extends LaTeXParserListener
         "--split-on-type"));
       System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
         "--no-split-on-type"));
+      System.out.println(getMessage("gls2bib.syntax.overwrite",
+        "--overwrite", "--split-on-type"));
+      System.out.println(getMessage("gls2bib.syntax.no-overwrite",
+        "--no-overwrite"));
       System.out.println(getMessage("gls2bib.syntax.space-sub",
         "--space-sub"));
       System.out.println(getMessage("gls2bib.syntax.locale",
@@ -1024,6 +1045,7 @@ public class Gls2Bib extends LaTeXParserListener
       ignoreSortField = true;
       ignoreTypeField = false;
       splitOnType = false;
+      int overwrite_setting = -1;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -1104,6 +1126,14 @@ public class Gls2Bib extends LaTeXParserListener
          {
             splitOnType = false;
          }
+         else if (args[i].equals("--overwrite"))
+         {
+            overwrite_setting = 1;
+         }
+         else if (args[i].equals("--no-overwrite"))
+         {
+            overwrite_setting = 0;
+         }
          else if (args[i].equals("--debug")
                || args[i].equals("--silent")
                || args[i].equals("--verbose"))
@@ -1152,6 +1182,19 @@ public class Gls2Bib extends LaTeXParserListener
       if (bibCharsetName == null)
       {
          bibCharsetName = charset.name();
+      }
+
+      switch (overwrite_setting)
+      {
+         case -1:
+           overwrite = (splitOnType ? false : true);
+         break;
+         case 0:
+           overwrite = false;
+         break;
+         case 1:
+           overwrite = true;
+         break;
       }
    }
 
@@ -1255,8 +1298,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200128";
-   public static final String DATE = "2020-01-28";
+   public static final String VERSION = "1.9.20200129";
+   public static final String DATE = "2020-01-29";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
@@ -1272,6 +1315,7 @@ public class Gls2Bib extends LaTeXParserListener
    private boolean ignoreSortField=true;
    private boolean ignoreTypeField=false;
    private boolean splitOnType=false;
+   private boolean overwrite=true;
 
    private Gls2BibMessages messages;
 
