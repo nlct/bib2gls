@@ -191,6 +191,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new NewAbbreviation(this));
       parser.putControlSequence(new NewAbbreviation(
         "newacronym", "acronym", this));
+      parser.putControlSequence(new OldAcronym(this));
       parser.putControlSequence(new NewTerm(this));
       parser.putControlSequence(new NewNumber(this));
       parser.putControlSequence(new NewNumber("newnum", this));
@@ -210,6 +211,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new AtGobble("glossariesextrasetup"));
       parser.putControlSequence(new GobbleOpt("makeglossaries"));
       parser.putControlSequence(new Relax("makenoidxglossaries"));
+      parser.putControlSequence(new GobbleOpt("GlsXtrLoadResources"));
       parser.putControlSequence(new Relax("noist"));
       parser.putControlSequence(new NewGlossary());
       parser.putControlSequence(new NewGlossary("altnewglossary", 
@@ -233,6 +235,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new AtGobble("setacronymstyle")); 
 
       parser.putControlSequence(new AtGobbleThree("newabbreviationstyle"));
+      parser.putControlSequence(new AtGobbleThree("newacronymstyle"));
    }
 
    // Ignore unknown control sequences
