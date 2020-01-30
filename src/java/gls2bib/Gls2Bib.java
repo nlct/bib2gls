@@ -50,6 +50,7 @@ import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
+import com.dickimawbooks.texparserlib.latex.AtGobbleTwo;
 import com.dickimawbooks.texparserlib.latex.AtGobbleThree;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
 import com.dickimawbooks.texparserlib.latex.GobbleOptOne;
@@ -236,6 +237,11 @@ public class Gls2Bib extends LaTeXParserListener
 
       parser.putControlSequence(new AtGobbleThree("newabbreviationstyle"));
       parser.putControlSequence(new AtGobbleThree("newacronymstyle"));
+
+      parser.putControlSequence(new GobbleOptOne("glssetwidest")); 
+      parser.putControlSequence(new AtGobbleTwo("glsdefpostlink")); 
+      parser.putControlSequence(new AtGobbleTwo("glsdefpostname")); 
+      parser.putControlSequence(new AtGobbleTwo("glsdefpostdesc")); 
    }
 
    // Ignore unknown control sequences
