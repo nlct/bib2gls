@@ -3387,7 +3387,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (xr instanceof TeXObjectList)
          {
-            xr = GlsResource.trimList((TeXObjectList)xr);
+            xr = ((TeXObjectList)xr).trim();
          }
 
          crossRefs[i] = xr.toString(parser);
@@ -3488,7 +3488,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (xr instanceof TeXObjectList)
          {
-            xr = GlsResource.trimList((TeXObjectList)xr);
+            xr = ((TeXObjectList)xr).trim();
          }
 
          alsocrossRefs[i] = xr.toString(parser);
@@ -3550,7 +3550,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (xr instanceof TeXObjectList)
          {
-            xr = GlsResource.trimList((TeXObjectList)xr);
+            xr = ((TeXObjectList)xr).trim();
          }
 
          String dep = xr.toString(parser);

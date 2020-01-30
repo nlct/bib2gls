@@ -3416,7 +3416,7 @@ public class GlsResource
 
       if (obj instanceof TeXObjectList)
       {
-         obj = trimList((TeXObjectList)obj);
+         obj = ((TeXObjectList)obj).trim();
       }
 
       return obj;
@@ -3435,7 +3435,7 @@ public class GlsResource
 
       if (obj instanceof TeXObjectList)
       {
-         obj = trimList((TeXObjectList)obj);
+         obj = ((TeXObjectList)obj).trim();
       }
 
       String value = obj.toString(parser).trim();
@@ -3459,7 +3459,7 @@ public class GlsResource
 
       if (obj instanceof TeXObjectList)
       {
-         obj = trimList((TeXObjectList)obj);
+         obj = ((TeXObjectList)obj).trim();
       }
 
       String value = obj.toString(parser).trim();
@@ -3736,7 +3736,7 @@ public class GlsResource
 
       if (object instanceof TeXObjectList)
       {
-         object = trimList((TeXObjectList)object);
+         object = ((TeXObjectList)object).trim();
       }
 
       CsvList csvList = CsvList.getList(parser, object);
@@ -3756,7 +3756,7 @@ public class GlsResource
 
          if (obj instanceof TeXObjectList)
          {
-            obj = trimList((TeXObjectList)obj);
+            obj = ((TeXObjectList)obj).trim();
          }
 
          array[i] = obj.toString(parser).trim();
@@ -3807,7 +3807,7 @@ public class GlsResource
 
       if (obj instanceof TeXObjectList)
       {
-         obj = trimList((TeXObjectList)obj);
+         obj = ((TeXObjectList)obj).trim();
       }
 
       CsvList csvList = CsvList.getList(parser, obj);
@@ -3827,7 +3827,7 @@ public class GlsResource
 
          if (obj instanceof TeXObjectList)
          {
-            obj = trimList((TeXObjectList)obj);
+            obj = ((TeXObjectList)obj).trim();
          }
 
          array[i] = obj;
@@ -3844,7 +3844,7 @@ public class GlsResource
 
       if (object instanceof TeXObjectList)
       {
-         object = trimList((TeXObjectList)object);
+         object = ((TeXObjectList)object).trim();
       }
 
       CsvList csvList = CsvList.getList(parser, object);
@@ -3864,7 +3864,7 @@ public class GlsResource
 
          if (obj instanceof TeXObjectList)
          {
-            obj = trimList((TeXObjectList)obj);
+            obj = ((TeXObjectList)obj).trim();
          }
 
          array[i] = CsvList.getList(parser, obj);
@@ -3910,12 +3910,12 @@ public class GlsResource
 
          if (obj1 instanceof TeXObjectList)
          {
-            obj1 = trimList((TeXObjectList)obj1);
+            obj1 = ((TeXObjectList)obj1).trim();
          }
 
          if (obj2 instanceof TeXObjectList)
          {
-            obj2 = trimList((TeXObjectList)obj2);
+            obj2 = ((TeXObjectList)obj2).trim();
          }
 
          String key = obj1.toString(parser);
@@ -3946,7 +3946,7 @@ public class GlsResource
 
       if (val instanceof TeXObjectList)
       {
-         val = trimList((TeXObjectList)val);
+         val = ((TeXObjectList)val).trim();
       }
 
       KeyValList sublist = KeyValList.getList(parser, val);
@@ -3967,7 +3967,7 @@ public class GlsResource
 
       if (object instanceof TeXObjectList)
       {
-         object = trimList((TeXObjectList)object);
+         object = ((TeXObjectList)object).trim();
       }
 
       KeyValList keyList = KeyValList.getList(parser, object);
@@ -4046,7 +4046,7 @@ public class GlsResource
 
             if (obj instanceof TeXObjectList)
             {
-               obj = trimList((TeXObjectList)obj);
+               obj = ((TeXObjectList)obj).trim();
             }
 
             valList.add(obj.toString(parser).trim());
@@ -4349,30 +4349,6 @@ public class GlsResource
       return new LabelListSortMethod(fields, method, csname);
    }
 
-   public static TeXObjectList trimList(TeXObjectList list)
-   {
-      // strip redundant white space and grouping
-
-      while (list.size() > 0 && (list.get(0) instanceof WhiteSpace))
-      {
-         list.remove(0);
-      }
-
-      while (list.size() > 0
-        && (list.lastElement() instanceof WhiteSpace))
-      {
-         list.remove(list.size()-1);
-      }
-
-      if (list.size() == 1
-        && (list.get(0) instanceof Group))
-      {
-         list = ((Group)list.get(0)).toList(); 
-      }
-
-      return list;
-   }
-
    private Vector<TeXObject> splitList(TeXParser parser, char c, 
       TeXObjectList list)
     throws IOException
@@ -4392,7 +4368,7 @@ public class GlsResource
       {
          if (obj instanceof CharObject && ((CharObject)obj).getCharCode() == c)
          {
-            element = trimList(element);
+            element = element.trim();
 
             if (element.size() != 0)
             {
@@ -4407,7 +4383,7 @@ public class GlsResource
          }
       }
 
-      element = trimList(element);
+      element = element.trim();
 
       if (element.size() != 0)
       {
