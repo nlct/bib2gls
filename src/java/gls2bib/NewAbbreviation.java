@@ -52,7 +52,7 @@ public class NewAbbreviation extends NewGlossaryEntry
       return new NewAbbreviation(getName(), getType(), gls2bib, isProvide());
    }
 
-   private void processEntry(TeXParser parser, TeXObject labelArg,
+   protected void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject shortArg, TeXObject longArg, TeXObject options)
    throws IOException
    {

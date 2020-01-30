@@ -78,7 +78,7 @@ public class OldAcronym extends NewAbbreviation
          }
       }
 
-      if (labelArg = null)
+      if (labelArg == null)
       {
          labelArg = shortArg;
       }
@@ -94,8 +94,6 @@ public class OldAcronym extends NewAbbreviation
             longArg = expanded;
          }
       }
-
-      TeXObject longArg = parser.popNextArg();
 
       processEntry(parser, labelArg, shortArg, longArg, parser.popNextArg());
    }
