@@ -42,6 +42,7 @@
 % @topic               -> topic
 
 @preamble{"\providecommand{\dhyphen}{-}
+\providecommand{\longargfmt}[1]{-{}-#1}
 \providecommand{\csfmt}[1]{\texttt{\glsbackslash #1}}
 \providecommand{\derivfn}[1]{f'(#1)}
 \providecommand{\rangestartmark}{\symbol{40}}
@@ -8832,8 +8833,8 @@ primary formats, if enabled.},
   see={commandlineoptions,commandlineoptionsgls2bib}
 }
 
-@index{--switches,
-  name={-{}-\meta{switch}},
+@index{--switch,
+  name={\longargfmt{\meta{switch}}},
   see={commandlineoptions,commandlineoptionsgls2bib}
 }
 

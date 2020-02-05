@@ -620,7 +620,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="bibtex.error.illegal_end">Illegal end</entry>
 <entry key="bibtex.error.missing">Missing</entry>
 <entry key="bibtex.error.too_many_commas">Too many commas in name ''{0}''</entry>
-<entry key="bibtex.error.string_name_undefined">String name ''{0}'' undefined</entry>
+<entry key="bibtex.error.string_name_undefined">String name ''{0}'' undefined (did you forget braces or quotes?)</entry>
 <entry key="bibtex.error.repeated_entry">Repeated entry ''{0}''</entry>
 
 <!--  Package messages -->

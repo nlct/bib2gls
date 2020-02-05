@@ -81,6 +81,11 @@
 
 \newcommand{\texparserdefnote}{}
 
+\newcommand*{\longargfmt}[1]{%
+ \texorpdfstring{\texttt{\longswitch #1}}%
+ {\string-\string-#1}%
+}
+
 \GlsXtrLoadResources[
  src={bib2gls},
  max-loc-diff=3,
@@ -353,11 +358,6 @@
 }
 
 \newrobustcmd{\longswitch}{\string-{}\string-}
-
-\newcommand*{\longargfmt}[1]{%
- \texorpdfstring{\texttt{\longswitch #1}}%
- {\string-\string-#1}%
-}
 
 \newcommand*{\shortargfmt}[1]{%
  \texorpdfstring{\texttt{\string-#1}}%

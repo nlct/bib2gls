@@ -125,6 +125,11 @@
 
 \glsxtrprovidestoragekey{unsortedprogeny}{}{}
 
+\newcommand*{\longargfmt}[1]{%
+ \texorpdfstring{\texttt{\longswitch #1}}%
+ {\string-\string-#1}%
+}
+
 \GlsXtrLoadResources[
   entry-type-aliases={
    bibglscommand=dualindexentry,
@@ -1098,11 +1103,6 @@
 }
 
 \newrobustcmd{\longswitch}{\string-{}\string-}
-
-\newcommand*{\longargfmt}[1]{%
- \texorpdfstring{\texttt{\longswitch #1}}%
- {\string-\string-#1}%
-}
 
 \newcommand*{\shortargfmt}[1]{%
  \texorpdfstring{\texttt{\string-#1}}%

@@ -37,3 +37,17 @@
  name={alias sample},
  alias={sample4}
 }
+
+@index{anothersampleparent,name={another sample parent}}
+
+@index{samplechild1,
+ name={sample child1},
+ parent={anothersampleparent}}
+@index{samplechild2,
+ name={sample child2},
+ parent={anothersampleparent}}
+
+@index{seeanothersampleparent,
+   name={see another sample parent},
+  see={anothersampleparent}
+}

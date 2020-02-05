@@ -2982,7 +2982,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (i > 0) listBuilder.append(",");
 
-            listBuilder.append(processLabel(crossRefs[i]));
+            listBuilder.append(crossRefs[i]);
          }
 
          listBuilder.append("}{}");
@@ -3184,7 +3184,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             if (i > 0) listBuilder.append(",");
 
-            listBuilder.append(processLabel(crossRefs[i]));
+            listBuilder.append(crossRefs[i]);
          }
 
          listBuilder.append("}{}");
@@ -3390,9 +3390,9 @@ public class Bib2GlsEntry extends BibEntry
             xr = ((TeXObjectList)xr).trim();
          }
 
-         crossRefs[i] = xr.toString(parser);
+         crossRefs[i] = processLabel(xr.toString(parser));
 
-         String label = processLabel(crossRefs[i]);
+         String label = crossRefs[i];
 
          if (bib2gls.getVerboseLevel() > 0)
          {

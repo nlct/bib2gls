@@ -4983,7 +4983,7 @@ public class GlsResource
          // Has the dependency already been added or does it have
          // any records?  (Don't want to get stuck in an infinite loop!)
 
-         if (isDependent(dep))
+         if (isDependent(dep) || dep.equals(entry.getId()))
          {
             continue;
          }
@@ -5255,6 +5255,7 @@ public class GlsResource
          bib2gls.verboseMessage("message.added.parent", parentId);
          addHierarchy(parent, entries, data);
          addEntry(entries, parent);
+         childEntry.addDependency(parent.getId());
       }
    }
 
@@ -5336,23 +5337,53 @@ public class GlsResource
 
    public Bib2GlsEntry getEntry(String label)
    {
-      Bib2GlsEntry entry = getEntry(label, bibData);
+      return getEntry(label, false);
+   }
+
+   public Bib2GlsEntry getEntry(String label, boolean tryFlipping)
+   {
+      Bib2GlsEntry entry = getEntry(label, bibData, tryFlipping);
 
       if (entry != null)
       {
          return entry;
       }
 
-      return getEntry(label, dualData);
+      return getEntry(label, dualData, tryFlipping);
    }
 
-   public static Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
+   public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
    {
+      return getEntry(label, data, false);
+   }
+
+   public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data,
+     boolean tryFlipping)
+   {
+      String flippedLabel = (tryFlipping ? flipLabel(label) : null);
+
       for (Bib2GlsEntry entry : data)
       {
-         if (entry.getId().equals(label))
+         String id = entry.getId();
+
+         if (id.equals(label))
          {
             return entry;
+         }
+
+         if (tryFlipping)
+         {
+            if (id.equals(flippedLabel))
+            {
+               return entry;
+            }
+
+            String flippedId = flipLabel(id);
+
+            if (flippedId.equals(label) || flippedId.equals(flippedLabel))
+            {
+               return entry;
+            }
          }
       }
 
