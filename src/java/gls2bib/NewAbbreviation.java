@@ -57,6 +57,11 @@ public class NewAbbreviation extends NewGlossaryEntry
       return "abbreviations";
    }
 
+   public String getDefaultCategory()
+   {
+      return "abbreviation";
+   }
+
    protected void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject shortArg, TeXObject longArg, TeXObject options)
    throws IOException

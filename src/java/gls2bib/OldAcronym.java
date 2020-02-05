@@ -57,6 +57,11 @@ public class OldAcronym extends NewAbbreviation
       return "abbreviations";
    }
 
+   public String getDefaultCategory()
+   {
+      return "abbreviation";
+   }
+
    public void process(TeXParser parser) throws IOException
    {
       TeXObject labelArg = parser.popNextArg('[', ']');

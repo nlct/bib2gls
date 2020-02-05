@@ -52,6 +52,11 @@ public class NewDualEntry extends NewGlossaryEntry
       return "abbreviations";
    }
 
+   public String getDefaultCategory()
+   {
+      return "abbreviation";
+   }
+
    public Object clone()
    {
       return new NewDualEntry(getName(), getType(), gls2bib, isProvide());

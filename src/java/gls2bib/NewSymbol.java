@@ -57,6 +57,11 @@ public class NewSymbol extends NewGlossaryEntry
       return "symbols";
    }
 
+   public String getDefaultCategory()
+   {
+      return "symbol";
+   }
+
    private void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject symbolArg, TeXObject options)
    throws IOException

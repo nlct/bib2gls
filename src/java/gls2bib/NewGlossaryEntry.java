@@ -78,6 +78,7 @@ public class NewGlossaryEntry extends ControlSequence
       }
 
       String glosType = null;
+      String category = null;
 
       GlsData data = new GlsData(label, getType());
 
@@ -287,6 +288,35 @@ public class NewGlossaryEntry extends ControlSequence
                continue;
             }
          }
+         else if (field.equals("category"))
+         {
+            if (gls2bib.isSplitCategoryOn())
+            {
+               TeXObject obj = object;
+
+               if (obj instanceof Expandable)
+               {
+                  TeXObjectList expanded = ((Expandable)obj).expandfully(parser);
+
+                  if (expanded != null)
+                  {
+                     obj = expanded;
+                  }
+               }
+
+               category = obj.toString(parser);
+
+               if (!category.isEmpty())
+               {
+                  data.setCategory(category);
+               }
+            }
+
+            if (gls2bib.ignoreCategory())
+            {
+               continue;
+            }
+         }
          else if (gls2bib.ignoreSort() && field.equals("sort"))
          {
             continue;
@@ -313,10 +343,25 @@ public class NewGlossaryEntry extends ControlSequence
          }
       }
 
+      if (category == null && gls2bib.isSplitCategoryOn())
+      {
+         category = getDefaultCategory();
+
+         if (category != null)
+         {
+            data.putField("category", String.format("{%s}", category));
+         }
+      }
+
       gls2bib.addData(data);
    }
 
    public String getDefaultGlossaryType()
+   {
+      return null;
+   }
+
+   public String getDefaultCategory()
    {
       return null;
    }

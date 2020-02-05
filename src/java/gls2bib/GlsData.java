@@ -52,6 +52,16 @@ public class GlsData
       return glosType;
    }
 
+   public void setCategory(String category)
+   {
+      this.category = category;
+   }
+
+   public String getCategory()
+   {
+      return category;
+   }
+
    // top-level braces should already be added to the fieldValue
    // if required
    public void putField(String fieldName, String fieldValue)
@@ -92,7 +102,7 @@ public class GlsData
       writer.println();
    }
 
-   private String id, type, glosType;
+   private String id, type, glosType, category;
 
    private HashMap<String,String> fields;
 }

@@ -21,6 +21,10 @@ v2.0 (pending):
       --no-ignore-type
       --split-on-type
       --no-split-on-type
+      --ignore-category
+      --no-ignore-category
+      --split-on-category
+      --no-split-on-category
       --overwrite
       --no-overwrite
       --preamble-only

@@ -50,11 +50,11 @@ Don't ignore the B<sort> field.
 
 =item B<--ignore-type>
 
-Ignore the B<type> field. Default if B<--split-on-type>.
+Omit the B<type> field. Default if B<--split-on-type>.
 
 =item B<--no-ignore-type>
 
-Don't ignore the B<type> field. Default unless B<--split-on-type>.
+Don't omit the B<type> field. Default unless B<--split-on-type>.
 
 =item B<--split-on-type> or B<-t>
 
@@ -65,6 +65,25 @@ B<--no-overwrite>.
 =item B<--no-split-on-type>
 
 Don't split the entries into separate files according to the B<type>
+field (default).
+
+=item B<--ignore-category>
+
+Omit the B<category> field. Default if B<--split-on-category>.
+
+=item B<--no-ignore-category>
+
+Don't omit the B<category> field. Default unless B<--split-on-category>.
+
+=item B<--split-on-category> or B<-t>
+
+Split the entries into separate files according to the B<category> field.
+This option automatically implements B<--ignore-category> and
+B<--no-overwrite>.
+
+=item B<--no-split-on-category>
+
+Don't split the entries into separate files according to the B<category>
 field (default).
 
 =item B<--overwrite>

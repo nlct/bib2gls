@@ -294,6 +294,10 @@
 \newcommand*{\metafilefmt}[3]{%
   \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
 }
+\newcommand*{\metametafilefmt}[5]{%
+  \filefmt{#1}\discretionary{}{}{}\meta{#2}\discretionary{}{}{}\filefmt{#3}%
+  \discretionary{}{}{}\meta{#4}\discretionary{}{}{}\filefmt{#5}%
+}
 
 \newcommand*{\primaryresourcefmt}{%
  \texorpdfstring
@@ -1068,6 +1072,8 @@
 
 \newcommand*{\atentryref}[1]{\gls[format=glsignore]{entry.#1}}
 
+\newcommand{\convertglsbibarg}[2][\subsection]{\argsection[#1]{gls2bib.#2}}
+
 \newcommand{\argsection}[2][\section]{%
  \def\switcharg{}%
  \def\switchalt{}%
@@ -1106,6 +1112,12 @@
 \newcommand*{\longarg}[1]{%
   \texorpdfstring
   {\gls{switch.#1}}%
+  {\string-\string-#1}%
+}
+
+\newcommand*{\convertglsbiblongarg}[1]{%
+  \texorpdfstring
+  {\gls{switch.gls2bib.#1}}%
   {\string-\string-#1}%
 }
 
@@ -17814,7 +17826,7 @@ Converts the first letter of \meta{text} to \idx{uppercase}. This just uses
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}
-\setsecdepth{0}
+\setsecdepth{1}
 
 If you have already been using the \styfmt{glossaries} or
 \styfmt{glossaries-extra} package with a large file containing all your
@@ -17829,22 +17841,28 @@ the \ext{bib} file. This application is less secure than \bibgls\ as
 it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and 
 \texmfcnf{openoutany}. Take care not to accidentally overwrite
 existing \ext{bib} files as there's no check to determine if
-\meta{bib file} already exists with the default \longargfmt{overwrite}. 
+\meta{bib file} already exists with the default \convertglsbiblongarg{overwrite}. 
 
 If the \ext{bib} extension is missing from \meta{bib file}, it will
 be added. The extension is required for \meta{tex file}.
 
-The \meta{options} are:
-\begin{description}
-\item[\longargfmt{texenc} \meta{encoding}] The character encoding of the
-\ext{tex} file. If omitted, the operating system's default encoding
-is assumed (or the \idx{JVM}['s]).
+\section{Command Line Arguments}
 
-\item[\longargfmt{bibenc} \meta{encoding}] The character encoding of the
-\ext{bib} file. If omitted, the same encoding as the
-\ext{tex} file is assumed.
+The \meta{options} recognised by \idx{convertgls2bib} are described below.
 
-\item[\longargfmt{space-sub} \meta{replacement} or \shortargfmt{s} \meta{replacement}] 
+\convertglsbibarg{texenc}
+
+The character encoding of the \ext{tex} file. If omitted, the
+operating system's default encoding is assumed (or the
+\idx{JVM}['s]).
+
+\convertglsbibarg{bibenc}
+
+The character encoding of the \ext{bib} file. If omitted, the same
+encoding as the \ext{tex} file is assumed.
+
+\convertglsbibarg{space-sub}
+
 The \ext{bib} format doesn't allow spaces in labels. If your original
 definitions in your \ext{tex} file have spaces, use this option to
 replace spaces in labels. Each space will be substituted with
@@ -17859,27 +17877,42 @@ operating system. For example:
 convertgls2bib --space-sub '' entries.tex entries.bib
 \end{verbatim}
 
-\item[\longargfmt{ignore-sort}] Ignore the \field{sort} field.
-This is the default since \bibgls\ can work out a more intuitive
-sort value than either \idx!{makeindex} or \idx!{xindy}.
+\convertglsbibarg{ignore-sort}
 
-\item[\longargfmt{no-ignore-sort}] Don't ignore the \field{sort} field.
+Omit the \field{sort} field.  This is the default since \bibgls\ can
+work out a more intuitive sort value than either \idx!{makeindex} or
+\idx!{xindy}.
 
-\item[\longargfmt{ignore-type}] Ignore the \field{type} field.
-You may find it more flexible not to be locked into a specific
-glossary type if you have a large database of entries.
+\convertglsbibarg{no-ignore-sort}
 
-\item[\longargfmt{no-ignore-type}] Don't ignore the \field{type} field
-(default unless \longargfmt{split-on-type}).
+Don't ignore the \field{sort} field.
 
-\item[\longargfmt{split-on-type} or \shortargfmt{t}] 
+\convertglsbibarg{ignore-type}
+
+Omit the \field{type} field in the \ext{bib} file.  You may find it
+more flexible not to be locked into a specific glossary type if you
+have a large database of entries.
+
+\convertglsbibarg{no-ignore-type}
+
+ Don't omit the \field{type} field (default unless
+\convertglsbiblongarg{split-on-type}).
+
+\convertglsbibarg{split-on-type}
+
 Split the entries into separate files according to the \field{type}
 field. Any entries that have the \field{type} field set to \ics{glsdefaulttype}
 or that don't have the \field{type} field set and there's no default provided
-by the command used to define the entry (see below) will be written to \meta{bib
-file}. Otherwise entries will be written to
-\metafilefmt{}{type}{.bib} (in the same directory as \meta{bib
-file}) where \meta{type} is the value of the \field{type} field.
+by the command used to define the entry (see below) then the
+\atentryfmt{\meta{entry}} data will be written to the main \meta{bib
+file}. Otherwise entries will be written to the split file
+(in the same directory as \meta{bib file}). 
+
+The split file name depends on whether or not the
+\convertglsbiblongarg{split-on-category} switch has also been used.  With both
+and if the category and field values are different then
+the file name is \metametafilefmt{}{type}{-}{category}{.bib} otherwise
+it's \metafilefmt{}{type}{.bib}.
 
 Commands that have a default type are as follows:
 \begin{itemize}
@@ -17892,45 +17925,121 @@ of the definition of \ics{acronymtype} or \ics{glsxtrabbrvtype});
 \item \gls{newterm}: the default type is assumed to be \code{index}. 
 \end{itemize}
 
-This option automatically implements \longargfmt{ignore-type} and
-\longargfmt{no-overwrite}.
+This option automatically implements \convertglsbiblongarg{ignore-type} and
+\convertglsbiblongarg{no-overwrite}.
 
-\item[\longargfmt{no-split-on-type}] Don't split the entries into separate
-files (default).
+\convertglsbibarg{no-split-on-type}
 
-\item[\longargfmt{preamble-only} or \shortargfmt{p}] Only parse the document preamble.
-
-\item[\longargfmt{no-preamble-only}] Parse the entire document
+Don't split the entries into separate files according to their type
 (default).
 
-\item[\longargfmt{locale} \meta{lang tag}] Identifies the \langxml\
-to use for \idx{convertgls2bib}['s] messages.
+\convertglsbibarg{ignore-category}
 
-\item[\longargfmt{overwrite}] Allow existing \ext{bib} files to be
-overwritten. (Default unless \longargfmt{split-on-type}.)
+Omit the \field{category} field in the \ext{bib} file.
 
-\item[\longargfmt{no-overwrite}] Don't allow existing \ext{bib} files to be
-overwritten. (Default if \longargfmt{split-on-type}.)
+\convertglsbibarg{no-ignore-category}
 
-\item[\longargfmt{silent}] Suppress all messages except for errors.
+Don't omit the \field{category} field (default unless
+\convertglsbiblongarg{split-on-category}).
 
-\item[\longargfmt{verbose}] Display messages and warnings (default).
+\convertglsbibarg{split-on-category}
 
-\item[\longargfmt{debug}] Display debugging messages (stack
-traces and other information in addition to \longargfmt{verbose}).
+Split the entries into separate files according to the \field{category}.
+If the \field{category} field isn't present and there's no default provided
+by the command used to define the entry (see below) then the
+\atentryfmt{\meta{entry}} data will be written to the main \meta{bib
+file}. Otherwise entries will be written to the split file
+(in the same directory as \meta{bib file}). 
 
-\item[\longargfmt{help} or \shortargfmt{h}] Display help message and
-quit.
-\item[\longargfmt{version} or \shortargfmt{v}] Display version
-information and quit.
-\end{description}
+The split file name depends on whether or not the
+\convertglsbiblongarg{split-on-type} switch has also been used.  With both and
+if the category and field values are different then
+the file name is \metametafilefmt{}{type}{}{category}{.bib} otherwise
+it's \metafilefmt{}{category}{.bib}.
 
-This application recognises the commands listed below. Avoid any overly
+Commands that have a default category are as follows:
+\begin{itemize}
+\item \gls{newabbreviation}, \gls{newacronym}, \ics{oldacronym},
+\gls{newdualentry}:
+the default category is assumed to be \code{abbreviation};
+\item \gls{glsxtrnewsymbol}: the default category is assumed to be \code{symbol}; 
+\item \gls{glsxtrnewnumber}: the default category is assumed to be \code{number}; 
+\item \gls{newterm}: the default category is assumed to be \code{index}. 
+\end{itemize}
+
+For example, if you have both \convertglsbiblongarg{split-on-type} and
+\convertglsbiblongarg{split-on-category}, then the default file name for
+\gls{newabbreviation} will be
+\filefmt{abbreviations-abbreviation.bib} but the default file name
+for \gls{newterm} will be \filefmt{index.bib}. Whereas if you only
+have \convertglsbiblongarg{split-on-category} and not
+\convertglsbiblongarg{split-on-type}, then then default file name for
+\gls{newabbreviation} will be \filefmt{abbreviation.bib}.
+
+This option automatically implements \convertglsbiblongarg{ignore-category} and
+\convertglsbiblongarg{no-overwrite}.
+
+\convertglsbibarg{split-on-category}
+
+Don't split the entries into separate files according to their
+category (default).
+
+\convertglsbibarg{preamble-only}
+
+Only parse the document preamble.
+
+\convertglsbibarg{no-preamble-only}
+
+Parse the entire document (default).
+
+\convertglsbibarg{locale}
+
+Identifies the \langxml\ to use for \idx{convertgls2bib}['s]
+messages.
+
+\convertglsbibarg{overwrite}
+
+Allow existing \ext{bib} files to be overwritten. (Default unless
+\convertglsbiblongarg{split-on-type}.)
+
+\convertglsbibarg{no-overwrite}
+
+Don't allow existing \ext{bib} files to be overwritten. (Default if
+\convertglsbiblongarg{split-on-type}.)
+
+\convertglsbibarg{silent}
+
+Suppress all messages except for errors.
+
+\convertglsbibarg{verbose}
+
+Display messages and warnings (default).
+
+\convertglsbibarg{debug}
+
+Display debugging messages (stack traces and other information in
+addition to \convertglsbiblongarg{verbose}).
+
+\convertglsbibarg{help}
+
+Display help message and quit.
+
+\convertglsbibarg{version}
+
+Display version information and quit.
+
+\section{Recognised Commands}
+
+This application recognises the commands listed below as well as
+some standard commands such as \ics{newcommand}. Avoid any overly
 complicated code within the \ext{tex} file. The
 \hyperref[sec:texparserlib]{\TeX\ parser library} isn't a \TeX\ engine! The
 \ext{tex} file doesn't need to be a complete document, but if you want certain
 commands recognised from packages that the \TeX\ parser library supports,
-you'll need to include \ics{usepackage} in the \ext{tex} file.
+you'll need to include \ics{usepackage} in the \ext{tex} file. If
+you want to quit parsing the \ext{tex} file at the start of the
+document, use the \convertglsbiblongarg{preamble-only} switch.
+
 In all cases below, if \meta{\keyvallist} contains:
 \begin{codeenv*}
 \field{see}=\marg{[\ics{seealsoname}]\meta{label(s)}}
@@ -17960,7 +18069,7 @@ recommended in \meta{\keyvallist} when loading files with
 argument to set the \field{type}. With \bibgls\ you can use the
 \csopt{type} option instead.)
 
-\cssection[\section]{glsexpandfields}
+\cssection{glsexpandfields}
 The base \styfmt{glossaries} package provides:
 \formatdef{glsexpandfields}
 If present, this instructs \idx{convertgls2bib} to expand all fields
@@ -17971,19 +18080,19 @@ field values. Conversely, there are some commands that will be
 expanded by \idx{convertgls2bib} that aren't expandable in \TeX\
 (such as \ics{MakeUppercase} and \ics{char}).
 
-\cssection[\section]{glsnoexpandfields}
+\cssection{glsnoexpandfields}
 The base \styfmt{glossaries} package provides:
 \formatdef{glsnoexpandfields}
 If present, this instructs \idx{convertgls2bib} to not expand fields
 unless explicitly identified by \gls{glssetexpandfield}.
 
-\cssection[\section]{glssetexpandfield}
+\cssection{glssetexpandfield}
 The base \styfmt{glossaries} package provides:
 \formatdef{glssetexpandfield}
 If present, this instructs \idx{convertgls2bib} to expand the
 given field, even if \gls{glsnoexpandfields} has been used.
 
-\cssection[\section]{glssetnoexpandfield}
+\cssection{glssetnoexpandfield}
 The base \styfmt{glossaries} package provides:
 \formatdef{glssetnoexpandfield}
 If present, this instructs \idx{convertgls2bib} to not expand the
@@ -17992,7 +18101,7 @@ Unlike the default behaviour with the \sty{glossaries} package, there are no
 fields switched explicitly switched off by default with
 \idx{convertgls2bib}.
 
-\cssection[\section]{newglossaryentry}
+\cssection{newglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{newglossaryentry}
 This is converted to:
@@ -18003,7 +18112,7 @@ This is converted to:
 \end{codeenv}
 \ics{newentry} is recognised as a synonym of \gls{newglossaryentry}.
 
-\cssection[\section]{provideglossaryentry}
+\cssection{provideglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{provideglossaryentry}
 This is converted to:
@@ -18014,7 +18123,7 @@ This is converted to:
 \end{codeenv}
 but only if \meta{label} hasn't already been defined.
 
-\cssection[\section]{longnewglossaryentry}
+\cssection{longnewglossaryentry}
 The base \styfmt{glossaries} package provides:
 \formatdef{longnewglossaryentry}
 This is converted to:
@@ -18029,13 +18138,13 @@ is also recognised. The unstarred version strips trailing spaces
 from \meta{description}. (This doesn't add \ics{nopostdesc}, but
 \styfmt{glossaries-extra} defaults to \styopt{nopostdot}.)
 
-\cssection[\section]{longprovideglossaryentry}
+\cssection{longprovideglossaryentry}
 
 The base \styfmt{glossaries} package provides:
 \formatdef{longprovideglossaryentry}
 As above, but only if \meta{label} hasn't already been defined.
 
-\cssection[\section]{newterm}
+\cssection{newterm}
 
 The base \styfmt{glossaries} package provides:
 \formatdef{newterm}
@@ -18090,7 +18199,7 @@ which will cause a problem when the \ext{bib} file is parsed
 by \bibgls\ (and will probably also cause a problem for 
 bibliographic management systems).
 
-\cssection[\section]{newabbreviation}
+\cssection{newabbreviation}
 The \styfmt{glossaries-extra} package provides:
 \formatdef{newabbreviation}
 This is converted to:
@@ -18109,7 +18218,7 @@ if the optional argument is present, otherwise it's converted to:
 }
 \end{codeenv}
 
-\cssection[\section]{newacronym}
+\cssection{newacronym}
 The base \styfmt{glossaries} package provides:
 \formatdef{newacronym}
 (which is redefined by \styfmt{glossaries-extra} to use
@@ -18121,7 +18230,7 @@ defined with the precursor \styfmt{glossary} package. This has
 different syntax to \gls{newacronym} but is also recognised by \idx{convertgls2bib}
 and is converted to \atentry{acronym}.
 
-\cssection[\section]{glsxtrnewsymbol}
+\cssection{glsxtrnewsymbol}
 The \styfmt{glossaries-extra} package provides:
 \formatdef{glsxtrnewsymbol}
 (when the \styopt{symbols} option is used).
@@ -18147,7 +18256,7 @@ in which case it's converted to:
 \end{codeenv}
 \ics{newsym} is recognised as a synonym for \gls{glsxtrnewsymbol}.
 
-\cssection[\section]{glsxtrnewnumber}
+\cssection{glsxtrnewnumber}
 
 The \styfmt{glossaries-extra} package provides:
 \formatdef{glsxtrnewnumber}
@@ -18174,7 +18283,7 @@ otherwise it's converted to:
 \end{codeenv}
 \ics{newnum} is recognised as a synonym for \gls{glsxtrnewnumber}.
 
-\cssection[\section]{newdualentry}
+\cssection{newdualentry}
 
 \formatdef{newdualentry}
 This command isn't provided by either \styfmt{glossaries} or

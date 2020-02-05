@@ -77,7 +77,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public Gls2Bib(String texFilename, String bibFilename, String inCharset,
      String outCharset, String spaceSub, String langTag, boolean ignoreSort, 
-     int verbose, boolean ignoreType)
+     int verbose, boolean ignoreType, boolean ignoreCategory)
     throws Gls2BibException,IOException
    {
       super(null);
@@ -85,6 +85,7 @@ public class Gls2Bib extends LaTeXParserListener
       this.verboseLevel = verbose;
       this.ignoreSortField = ignoreSort;
       this.ignoreTypeField = ignoreType;
+      this.ignoreCategoryField = ignoreCategory;
 
       initMessages(langTag);
 
@@ -154,6 +155,16 @@ public class Gls2Bib extends LaTeXParserListener
    public boolean isSplitTypeOn()
    {
       return splitOnType;
+   }
+
+   public boolean ignoreCategory()
+   {
+      return ignoreCategoryField;
+   }
+
+   public boolean isSplitCategoryOn()
+   {
+      return splitOnCategory;
    }
 
    public String getSpaceSub()
@@ -829,11 +840,11 @@ public class Gls2Bib extends LaTeXParserListener
 
       PrintWriter out = null;
 
-      HashMap<String,PrintWriter> types = null;
+      HashMap<String,PrintWriter> splitOuts = null;
 
-      if (splitOnType)
+      if (splitOnType || splitOnCategory)
       {
-         types = new HashMap<String,PrintWriter>();
+         splitOuts = new HashMap<String,PrintWriter>();
       }
 
       try
@@ -864,21 +875,37 @@ public class Gls2Bib extends LaTeXParserListener
 
          for (GlsData entry : data)
          {
-            if (splitOnType)
+            if (splitOnType || splitOnCategory)
             {
-               String type = entry.getGlossaryType();
+               String type = (splitOnType ? entry.getGlossaryType() : null);
+               String category = (splitOnCategory ? entry.getCategory() : null);
 
-               if (type == null)
+               if (type == null && category == null)
                {
                   entry.writeBibEntry(out);
                }
                else
                {
-                  PrintWriter splitOut = types.get(type);
+                  String tag;
+
+                  if (type == null)
+                  {
+                     tag = category;
+                  }
+                  else if (category == null || type.equals(category))
+                  {
+                     tag = type;
+                  }
+                  else
+                  {
+                     tag = String.format("%s-%s", type, category);
+                  }
+
+                  PrintWriter splitOut = splitOuts.get(tag);
 
                   if (splitOut == null)
                   {
-                     File splitBibFile = new File(bibFile.getParent(), type+".bib");
+                     File splitBibFile = new File(bibFile.getParent(), tag+".bib");
 
                     if (!overwriteFiles && splitBibFile.exists())
                     {
@@ -899,7 +926,7 @@ public class Gls2Bib extends LaTeXParserListener
                         splitOut.println("% Encoding: "+bibCharsetName);
                      }
 
-                     types.put(type, splitOut);
+                     splitOuts.put(tag, splitOut);
                   }
 
                   entry.writeBibEntry(splitOut);
@@ -918,14 +945,14 @@ public class Gls2Bib extends LaTeXParserListener
             out.close();
          }
 
-         if (types != null)
+         if (splitOuts != null)
          {
-            Set<String> keySet = types.keySet();
+            Set<String> keySet = splitOuts.keySet();
 
             for (Iterator<String> it=keySet.iterator(); it.hasNext(); )
             {
-               String type = it.next();
-               types.get(type).close();
+               String tag = it.next();
+               splitOuts.get(tag).close();
             }
          }
       }
@@ -1073,8 +1100,16 @@ public class Gls2Bib extends LaTeXParserListener
         "--split-on-type", "-t"));
       System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
         "--no-split-on-type"));
+      System.out.println(getMessage("gls2bib.syntax.ignore-category",
+        "--ignore-category"));
+      System.out.println(getMessage("gls2bib.syntax.no-ignore-category",
+        "--no-ignore-category"));
+      System.out.println(getMessage("gls2bib.syntax.split-on-category",
+        "--split-on-category", "-c"));
+      System.out.println(getMessage("gls2bib.syntax.no-split-on-category",
+        "--no-split-on-category"));
       System.out.println(getMessage("gls2bib.syntax.overwrite",
-        "--overwrite", "--split-on-type"));
+        "--overwrite", "--split-on-type", "--split-on-category"));
       System.out.println(getMessage("gls2bib.syntax.no-overwrite",
         "--no-overwrite"));
       System.out.println(getMessage("gls2bib.syntax.preamble-only",
@@ -1105,7 +1140,9 @@ public class Gls2Bib extends LaTeXParserListener
       ignoreSortField = true;
       ignoreTypeField = false;
       splitOnType = false;
-      int overwrite_setting = -1;
+      ignoreCategoryField = false;
+      splitOnCategory = false;
+      overwriteFiles = true;
       preambleOnly = false;
 
       for (int i = 0; i < args.length; i++)
@@ -1183,18 +1220,37 @@ public class Gls2Bib extends LaTeXParserListener
          {
             splitOnType = true;
             ignoreTypeField = true;
+            overwriteFiles = false;
          }
          else if (args[i].equals("--no-split-on-type"))
          {
             splitOnType = false;
          }
+         else if (args[i].equals("--ignore-category"))
+         {
+            ignoreCategoryField = true;
+         }
+         else if (args[i].equals("--no-ignore-category"))
+         {
+            ignoreCategoryField = false;
+         }
+         else if (args[i].equals("--split-on-category") || args[i].equals("-c"))
+         {
+            splitOnCategory = true;
+            ignoreCategoryField = true;
+            overwriteFiles = false;
+         }
+         else if (args[i].equals("--no-split-on-category"))
+         {
+            splitOnCategory = false;
+         }
          else if (args[i].equals("--overwrite"))
          {
-            overwrite_setting = 1;
+            overwriteFiles = true;
          }
          else if (args[i].equals("--no-overwrite"))
          {
-            overwrite_setting = 0;
+            overwriteFiles = false;
          }
          else if (args[i].equals("--preamble-only") || args[i].equals("-p"))
          {
@@ -1252,19 +1308,6 @@ public class Gls2Bib extends LaTeXParserListener
       if (bibCharsetName == null)
       {
          bibCharsetName = charset.name();
-      }
-
-      switch (overwrite_setting)
-      {
-         case -1:
-           overwriteFiles = (splitOnType ? false : true);
-         break;
-         case 0:
-           overwriteFiles = false;
-         break;
-         case 1:
-           overwriteFiles = true;
-         break;
       }
    }
 
@@ -1385,6 +1428,8 @@ public class Gls2Bib extends LaTeXParserListener
    private boolean ignoreSortField=true;
    private boolean ignoreTypeField=false;
    private boolean splitOnType=false;
+   private boolean ignoreCategoryField=false;
+   private boolean splitOnCategory=false;
    private boolean overwriteFiles=true;
    private boolean preambleOnly=false;
 

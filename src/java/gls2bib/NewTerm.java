@@ -57,6 +57,11 @@ public class NewTerm extends NewGlossaryEntry
       return "index";
    }
 
+   public String getDefaultCategory()
+   {
+      return "index";
+   }
+
    private void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject options)
    throws IOException

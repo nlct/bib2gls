@@ -57,6 +57,11 @@ public class NewNumber extends NewGlossaryEntry
       return "numbers";
    }
 
+   public String getDefaultCategory()
+   {
+      return "number";
+   }
+
    private void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject options)
    throws IOException
