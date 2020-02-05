@@ -17874,11 +17874,24 @@ glossary type if you have a large database of entries.
 
 \item[\longargfmt{split-on-type} or \shortargfmt{t}] 
 Split the entries into separate files according to the \field{type}
-field. Any entries that don't have the \field{type} field set or
-have it set to \ics{glsdefaulttype} will be written to \meta{bib
+field. Any entries that have the \field{type} field set to \ics{glsdefaulttype}
+or that don't have the \field{type} field set and there's no default provided
+by the command used to define the entry (see below) will be written to \meta{bib
 file}. Otherwise entries will be written to
 \metafilefmt{}{type}{.bib} (in the same directory as \meta{bib
 file}) where \meta{type} is the value of the \field{type} field.
+
+Commands that have a default type are as follows:
+\begin{itemize}
+\item \gls{newabbreviation}, \gls{newacronym}, \ics{oldacronym},
+\gls{newdualentry}:
+the default type is assumed to be \code{abbreviations} (regardless
+of the definition of \ics{acronymtype} or \ics{glsxtrabbrvtype});
+\item \gls{glsxtrnewsymbol}: the default type is assumed to be \code{symbols}; 
+\item \gls{glsxtrnewnumber}: the default type is assumed to be \code{numbers}; 
+\item \gls{newterm}: the default type is assumed to be \code{index}. 
+\end{itemize}
+
 This option automatically implements \longargfmt{ignore-type} and
 \longargfmt{no-overwrite}.
 
@@ -18102,7 +18115,11 @@ The base \styfmt{glossaries} package provides:
 (which is redefined by \styfmt{glossaries-extra} to use
 \gls{newabbreviation}).
 
-As above but uses \atentry{acronym} instead.
+As above but uses \atentry{acronym} instead. The base package also
+provides \ics{oldacronym}, which emulates the way abbreviations were
+defined with the precursor \styfmt{glossary} package. This has
+different syntax to \gls{newacronym} but is also recognised by \idx{convertgls2bib}
+and is converted to \atentry{acronym}.
 
 \cssection[\section]{glsxtrnewsymbol}
 The \styfmt{glossaries-extra} package provides:

@@ -47,6 +47,11 @@ public class NewDualEntry extends NewGlossaryEntry
       super(name, type, gls2bib, provide);
    }
 
+   public String getDefaultGlossaryType()
+   {
+      return "abbreviations";
+   }
+
    public Object clone()
    {
       return new NewDualEntry(getName(), getType(), gls2bib, isProvide());

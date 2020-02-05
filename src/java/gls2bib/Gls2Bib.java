@@ -1182,6 +1182,7 @@ public class Gls2Bib extends LaTeXParserListener
          else if (args[i].equals("--split-on-type") || args[i].equals("-t"))
          {
             splitOnType = true;
+            ignoreTypeField = true;
          }
          else if (args[i].equals("--no-split-on-type"))
          {

@@ -77,6 +77,8 @@ public class NewGlossaryEntry extends ControlSequence
          return;
       }
 
+      String glosType = null;
+
       GlsData data = new GlsData(label, getType());
 
       Iterator<String> it = valuesArg.keySet().iterator();
@@ -272,16 +274,15 @@ public class NewGlossaryEntry extends ControlSequence
                   }
                }
 
-               String glosType = obj.toString(parser);
+               glosType = obj.toString(parser);
 
                if (!glosType.isEmpty())
                {
                   data.setGlossaryType(glosType);
                }
-
-               continue;
             }
-            else if (gls2bib.ignoreType())
+
+            if (gls2bib.ignoreType())
             {
                continue;
             }
@@ -300,10 +301,24 @@ public class NewGlossaryEntry extends ControlSequence
             data.putField(field, 
                String.format("{%s}", object.toString(parser)));
          }
+      }
 
+      if (glosType == null && gls2bib.isSplitTypeOn())
+      {
+         glosType = getDefaultGlossaryType();
+
+         if (glosType != null)
+         {
+            data.putField("type", String.format("{%s}", glosType));
+         }
       }
 
       gls2bib.addData(data);
+   }
+
+   public String getDefaultGlossaryType()
+   {
+      return null;
    }
 
    private void processEntry(TeXParser parser, TeXObject labelArg,

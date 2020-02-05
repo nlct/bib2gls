@@ -52,6 +52,11 @@ public class NewTerm extends NewGlossaryEntry
       return new NewTerm(getName(), getType(), gls2bib, isProvide());
    }
 
+   public String getDefaultGlossaryType()
+   {
+      return "index";
+   }
+
    private void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject options)
    throws IOException

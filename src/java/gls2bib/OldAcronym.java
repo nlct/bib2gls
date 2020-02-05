@@ -52,6 +52,11 @@ public class OldAcronym extends NewAbbreviation
       return new OldAcronym(getName(), getType(), gls2bib, isProvide());
    }
 
+   public String getDefaultGlossaryType()
+   {
+      return "abbreviations";
+   }
+
    public void process(TeXParser parser) throws IOException
    {
       TeXObject labelArg = parser.popNextArg('[', ']');

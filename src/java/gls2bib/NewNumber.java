@@ -52,6 +52,11 @@ public class NewNumber extends NewGlossaryEntry
       return new NewNumber(getName(), getType(), gls2bib, isProvide());
    }
 
+   public String getDefaultGlossaryType()
+   {
+      return "numbers";
+   }
+
    private void processEntry(TeXParser parser, TeXObject labelArg,
      TeXObject options)
    throws IOException
