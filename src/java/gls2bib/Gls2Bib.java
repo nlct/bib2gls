@@ -239,6 +239,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new GobbleOptOne("setabbreviationstyle")); 
       parser.putControlSequence(new AtGobble("setacronymstyle")); 
 
+      parser.putControlSequence(new AtGobbleThree("glssetcategoryattribute"));
       parser.putControlSequence(new AtGobbleThree("newabbreviationstyle"));
       parser.putControlSequence(new AtGobbleThree("newacronymstyle"));
 
@@ -1069,7 +1070,7 @@ public class Gls2Bib extends LaTeXParserListener
       System.out.println(getMessage("gls2bib.syntax.no-ignore-type",
         "--no-ignore-type"));
       System.out.println(getMessage("gls2bib.syntax.split-on-type",
-        "--split-on-type"));
+        "--split-on-type", "-t"));
       System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
         "--no-split-on-type"));
       System.out.println(getMessage("gls2bib.syntax.overwrite",
@@ -1077,11 +1078,11 @@ public class Gls2Bib extends LaTeXParserListener
       System.out.println(getMessage("gls2bib.syntax.no-overwrite",
         "--no-overwrite"));
       System.out.println(getMessage("gls2bib.syntax.preamble-only",
-        "--preamble-only"));
+        "--preamble-only", "-p"));
       System.out.println(getMessage("gls2bib.syntax.no-preamble-only",
         "--no-preamble-only"));
       System.out.println(getMessage("gls2bib.syntax.space-sub",
-        "--space-sub"));
+        "--space-sub", "-s"));
       System.out.println(getMessage("gls2bib.syntax.locale",
         "--locale"));
       System.out.println(getMessage("gls2bib.syntax.silent",
@@ -1141,7 +1142,7 @@ public class Gls2Bib extends LaTeXParserListener
 
             bibCharsetName = args[++i];
          }
-         else if (args[i].equals("--space-sub"))
+         else if (args[i].equals("--space-sub") || args[i].equals("-s"))
          {
             if (i == args.length-1)
             {
@@ -1178,7 +1179,7 @@ public class Gls2Bib extends LaTeXParserListener
          {
             ignoreTypeField = false;
          }
-         else if (args[i].equals("--split-on-type"))
+         else if (args[i].equals("--split-on-type") || args[i].equals("-t"))
          {
             splitOnType = true;
          }
@@ -1194,7 +1195,7 @@ public class Gls2Bib extends LaTeXParserListener
          {
             overwrite_setting = 0;
          }
-         else if (args[i].equals("--preamble-only"))
+         else if (args[i].equals("--preamble-only") || args[i].equals("-p"))
          {
             preambleOnly = true;
          }
@@ -1366,8 +1367,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200131";
-   public static final String DATE = "2020-01-31";
+   public static final String VERSION = "1.9.20200205";
+   public static final String DATE = "2020-02-05";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

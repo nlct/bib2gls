@@ -17844,8 +17844,8 @@ is assumed (or the \idx{JVM}['s]).
 \ext{bib} file. If omitted, the same encoding as the
 \ext{tex} file is assumed.
 
-\item[\longargfmt{space-sub} \meta{replacement}] The \ext{bib}
-format doesn't allow spaces in labels. If your original
+\item[\longargfmt{space-sub} \meta{replacement} or \shortargfmt{s} \meta{replacement}] 
+The \ext{bib} format doesn't allow spaces in labels. If your original
 definitions in your \ext{tex} file have spaces, use this option to
 replace spaces in labels. Each space will be substituted with
 \meta{replacement}. The cross-referencing fields, \field{see},
@@ -17872,19 +17872,20 @@ glossary type if you have a large database of entries.
 \item[\longargfmt{no-ignore-type}] Don't ignore the \field{type} field
 (default unless \longargfmt{split-on-type}).
 
-\item[\longargfmt{split-on-type}] Split the entries into separate
-files according to the \field{type} field. Any entries that don't
-have the \field{type} field set or have it set to \ics{glsdefaulttype}
-will be written to \meta{bib file}. Otherwise entries will be
-written to \metafilefmt{}{type}{.bib} (in the same directory as
-\meta{bib file}) where \meta{type} is the value of the \field{type}
-field. This option automatically implements \longargfmt{ignore-type}
-and \longargfmt{no-overwrite}.
+\item[\longargfmt{split-on-type} or \shortargfmt{t}] 
+Split the entries into separate files according to the \field{type}
+field. Any entries that don't have the \field{type} field set or
+have it set to \ics{glsdefaulttype} will be written to \meta{bib
+file}. Otherwise entries will be written to
+\metafilefmt{}{type}{.bib} (in the same directory as \meta{bib
+file}) where \meta{type} is the value of the \field{type} field.
+This option automatically implements \longargfmt{ignore-type} and
+\longargfmt{no-overwrite}.
 
 \item[\longargfmt{no-split-on-type}] Don't split the entries into separate
 files (default).
 
-\item[\longargfmt{preamble-only}] Only parse the document preamble.
+\item[\longargfmt{preamble-only} or \shortargfmt{p}] Only parse the document preamble.
 
 \item[\longargfmt{no-preamble-only}] Parse the entire document
 (default).

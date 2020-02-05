@@ -56,7 +56,7 @@ Ignore the B<type> field. Default if B<--split-on-type>.
 
 Don't ignore the B<type> field. Default unless B<--split-on-type>.
 
-=item B<--split-on-type>
+=item B<--split-on-type> or B<-t>
 
 Split the entries into separate files according to the B<type> field.
 This option automatically implements B<--ignore-type> and
@@ -77,7 +77,7 @@ used.
 Don't overwrite existing .bib files. Default if B<--split-on-type>
 used.
 
-=item B<--preamble-only>
+=item B<--preamble-only> or B<-p>
 
 Only parse the document preamble.
 
@@ -85,7 +85,7 @@ Only parse the document preamble.
 
 Parse the entire document (default).
 
-=item B<--space-sub> I<value>
+=item B<--space-sub> I<value> or B<-s> I<value>
 
 Substitute spaces in labels with I<value>.
 
