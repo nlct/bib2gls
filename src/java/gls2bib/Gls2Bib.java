@@ -50,10 +50,7 @@ import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
-import com.dickimawbooks.texparserlib.latex.AtGobbleTwo;
-import com.dickimawbooks.texparserlib.latex.AtGobbleThree;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
-import com.dickimawbooks.texparserlib.latex.GobbleOptOne;
 
 public class Gls2Bib extends LaTeXParserListener
   implements Writeable,TeXApp
@@ -236,28 +233,30 @@ public class Gls2Bib extends LaTeXParserListener
        NewGlossary.IGNORED));
       parser.putControlSequence(new NewGlossary("provideignoredglossary", 
        NewGlossary.IGNORED));
-      parser.putControlSequence(new GobbleOptOne("GlsSetXdyLanguage"));
+      parser.putControlSequence(new GobbleOpt("GlsSetXdyLanguage", 1, 1));
       parser.putControlSequence(new AtGobble("GlsSetXdyCodePage"));
       parser.putControlSequence(new AtGobble("GlsAddXdyCounters"));
       parser.putControlSequence(new AtGobble("GlsAddXdyAttribute"));
-      parser.putControlSequence(new GobbleOptOne("GlsAddXdyLocation")); 
+      parser.putControlSequence(new GobbleOpt("GlsAddXdyLocation", 1, 1)); 
       parser.putControlSequence(new AtGobble("GlsSetXdyLocationClassOrder"));
       parser.putControlSequence(new AtGobble("GlsSetXdyMinRangeLength"));
       parser.putControlSequence(new AtGobble("GlsSetXdyFirstLetterAfterDigits"));
       parser.putControlSequence(new AtGobble("GlsSetXdyNumberGroupOrder"));
       parser.putControlSequence(new AtGobble("GlsAddXdyStyle"));
 
-      parser.putControlSequence(new GobbleOptOne("setabbreviationstyle")); 
+      parser.putControlSequence(new GobbleOpt("setabbreviationstyle", 1, 1)); 
       parser.putControlSequence(new AtGobble("setacronymstyle")); 
 
-      parser.putControlSequence(new AtGobbleThree("glssetcategoryattribute"));
-      parser.putControlSequence(new AtGobbleThree("newabbreviationstyle"));
-      parser.putControlSequence(new AtGobbleThree("newacronymstyle"));
+      parser.putControlSequence(new AtGobble("glssetcategoryattribute", 3));
+      parser.putControlSequence(new AtGobble("newabbreviationstyle", 3));
+      parser.putControlSequence(new AtGobble("newacronymstyle", 3));
 
-      parser.putControlSequence(new GobbleOptOne("glssetwidest")); 
-      parser.putControlSequence(new AtGobbleTwo("glsdefpostlink")); 
-      parser.putControlSequence(new AtGobbleTwo("glsdefpostname")); 
-      parser.putControlSequence(new AtGobbleTwo("glsdefpostdesc")); 
+      parser.putControlSequence(new GobbleOpt("glssetwidest", 1, 1)); 
+      parser.putControlSequence(new AtGobble("glsdefpostlink", 2)); 
+      parser.putControlSequence(new AtGobble("glsdefpostname", 2)); 
+      parser.putControlSequence(new AtGobble("glsdefpostdesc", 2)); 
+      parser.putControlSequence(new GobbleOpt("glsaddkey", 0, 7, '*')); 
+      parser.putControlSequence(new GobbleOpt("glsaddstoragekey", 0, 3, '*')); 
    }
 
    // Ignore unknown control sequences
@@ -1411,8 +1410,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200205";
-   public static final String DATE = "2020-02-05";
+   public static final String VERSION = "1.9.20200206";
+   public static final String DATE = "2020-02-06";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
