@@ -4532,7 +4532,8 @@ public class GlsResource
       Vector<Bib2GlsEntry> seeList = null;
       Vector<Bib2GlsEntry> aliasList = null;
 
-      if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+      if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+       || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
       {
          seeList = new Vector<Bib2GlsEntry>();
       }
@@ -4724,7 +4725,8 @@ public class GlsResource
             }
 
             if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE ||
-                 selectionMode == SELECTION_RECORDED_AND_DEPS)
+                selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO ||
+                selectionMode == SELECTION_RECORDED_AND_DEPS)
             {
                // does this entry have a "see" or "seealso" field?
 
@@ -4737,14 +4739,26 @@ public class GlsResource
 
                if (seeList != null)
                {
-                  if (entry.hasCrossRefs() 
-                      || entry.getField("alias") != null)
+                  if ((entry.hasCrossRefs() 
+                        && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                            || entry.getField("seealso") == null)
+                      )
+                      || entry.getField("alias") != null
+                     )
                   {
                      seeList.add(entry);
                   }
 
-                  if (dual != null && (dual.hasCrossRefs() 
-                      || dual.getField("alias") != null))
+                  if (dual != null 
+                      && 
+                      (
+                        (dual.hasCrossRefs() 
+                          && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                               || dual.getField("seealso") == null)
+                         )
+                        || dual.getField("alias") != null
+                      )
+                     )
                   {
                      seeList.add(dual);
                   }
@@ -4846,7 +4860,8 @@ public class GlsResource
             }
             else
             {
-               if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+               if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE ||
+                   selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                {
                   bib2gls.debugMessage("message.added.alias.dep", entry.getId(),
                     target.getId());
@@ -4864,7 +4879,10 @@ public class GlsResource
          {
             addCrossRefs(entry, entry.getCrossRefs());
 
-            addCrossRefs(entry, entry.getAlsoCrossRefs());
+            if (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
+            {
+               addCrossRefs(entry, entry.getAlsoCrossRefs());
+            }
 
             String alias = entry.getFieldValue("alias");
 
@@ -5512,6 +5530,7 @@ public class GlsResource
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                {
                   addHierarchy(entry, entries, data);
@@ -5520,7 +5539,8 @@ public class GlsResource
                addEntry(entries, entry);
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                {
                   addDependencies(entry, data);
                }
@@ -5557,6 +5577,7 @@ public class GlsResource
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                {
                   addHierarchy(entry, entries, data);
@@ -5565,7 +5586,8 @@ public class GlsResource
                addEntry(entries, entry);
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                {
                   addDependencies(entry, data);
                }
@@ -5597,6 +5619,7 @@ public class GlsResource
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                {
                   addHierarchy(entry, entries, data);
@@ -5605,7 +5628,8 @@ public class GlsResource
                addEntry(entries, entry);
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                 ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                {
                   addDependencies(entry, data);
                }
@@ -5633,6 +5657,7 @@ public class GlsResource
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                      {
                         addHierarchy(entry, entries, data);
@@ -5641,7 +5666,8 @@ public class GlsResource
                      addEntry(entries, entry);
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                      {
                         addDependencies(entry, data);
                      }
@@ -5658,6 +5684,7 @@ public class GlsResource
 
                            if (selectionMode == SELECTION_RECORDED_AND_DEPS
                              ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                             ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                              ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                            {
                               addHierarchy(entry, entries, data);
@@ -5666,8 +5693,8 @@ public class GlsResource
                            addEntry(entries, entry);
 
                            if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                             ||selectionMode
-                                  == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                             ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                             ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                            {
                               addDependencies(entry, data);
                            }
@@ -5697,6 +5724,7 @@ public class GlsResource
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS)
                      {
                         addHierarchy(entry, entries, data);
@@ -5705,7 +5733,8 @@ public class GlsResource
                      addEntry(entries, entry);
 
                      if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                       ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
                      {
                         addDependencies(entry, data);
                      }
@@ -5741,7 +5770,8 @@ public class GlsResource
       // add any dependencies
 
       if (selectionMode == SELECTION_RECORDED_AND_DEPS
-        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE)
+        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO)
       {
          for (String id : dependencies)
          {
@@ -11100,12 +11130,14 @@ public class GlsResource
    public static final int SELECTION_RECORDED_NO_DEPS=2;
    public static final int SELECTION_RECORDED_AND_PARENTS=3;
    public static final int SELECTION_ALL=4;
+   public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO=5;
 
    private int selectionMode = SELECTION_RECORDED_AND_DEPS;
 
    private static final String[] SELECTION_OPTIONS = new String[]
     {"recorded and deps", "recorded and deps and see",
-     "recorded no deps", "recorded and ancestors", "all"};
+     "recorded no deps", "recorded and ancestors", "all",
+     "recorded and deps and see not also"};
 
    public static final byte CONTRIBUTOR_ORDER_SURNAME=0;
    public static final byte CONTRIBUTOR_ORDER_VON=1;

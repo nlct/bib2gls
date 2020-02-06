@@ -11,7 +11,13 @@ v2.0 (pending):
 
   * New values for 'identical-sort-action' option: 'def' and 'use'
 
-  * Bug fix: corrected interpret-fields
+  * New value for 'selection' option: 'recorded and deps and see not also'
+
+  * Bug fixes:
+
+    - corrected interpret-fields
+    - corrected selection={recorded and deps and see}
+
 
   * convertgls2bib:
 
@@ -19,15 +25,15 @@ v2.0 (pending):
 
       --ignore-type
       --no-ignore-type
-      --split-on-type
+      --split-on-type (-p)
       --no-split-on-type
       --ignore-category
       --no-ignore-category
-      --split-on-category
+      --split-on-category (-c)
       --no-split-on-category
       --overwrite
       --no-overwrite
-      --preamble-only
+      --preamble-only (-p)
       --no-preamble-only
 
 v1.9 (2019-04-09):

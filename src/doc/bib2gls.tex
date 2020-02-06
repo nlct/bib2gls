@@ -51,6 +51,7 @@
    entrycounter,% enable entry counting
    subentrycounter,% enable entry counting
    %debug=showtargets,% debugging information
+   %debug=showwrgloss,% debugging information
    stylemods={mcols,bookindex},% adjust predefined styles and load glossary-mcols.sty and glossary-bookindex.sty
    style=bookindex
  ]
@@ -92,8 +93,8 @@
 
 \newcommand{\bibglsseealsosep}{\glstreesubitem}
 
-\renewcommand*{\glsseesep}{, \glstreesubitem\qquad}
-\renewcommand*{\glsseelastsep}{\glstreesubitem\qquad\andname\space}
+\renewcommand*{\glsseesep}{, \glstreesubitem\quad}
+\renewcommand*{\glsseelastsep}{\glstreesubitem\quad\strut\llap{\andname\space}}
 
 \newcommand{\glsxtrpostnameabbreviation}{%
  \space(\glsentrylong{\glscurrententrylabel})%
@@ -148,6 +149,8 @@
    exampleabbreviation=abbreviation,
    exampleentry=entry
   },
+  max-loc-diff={2},
+  see=omit,seealso=omit,alias=omit,
   field-aliases={topics=adoptparents},
   replicate-fields={name=nametitle,progeny=unsortedprogeny},
   field-case-change={nametitle=title},
@@ -175,7 +178,7 @@
   dual-prefix={},
   dual-type={main},
   combine-dual-locations={primary},
-  selection={recorded and deps and see},
+  selection={recorded and deps and see not also},
   symbol-sort-fallback={name},
   sort-label-list={progeny:letter-nocase:glsxtrentryparentname},
   strip-missing-parents,
@@ -1020,7 +1023,7 @@
    \item \glstarget{##1}{\strut}%
    \glsxtrifhasfield{dualid}{##1}%
    {%
-     \glshyperlink{\glscurrentfieldvalue}%
+     \gls{\glscurrentfieldvalue}%
    }%
    {%
      \gls[hyper=false]{##1}%
@@ -1260,20 +1263,22 @@ files}
 
 \newenvironment{codeenv}
  {%
+   \GlsXtrStartUnsetBuffering
    \renewcommand{\glslinkpresetkeys}{\setkeys{glslink}{noindex}}%
    \setupcodeenvfmts
    \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
    \parindent\z@\parfillskip\@flushglue\parskip\z@skip
  }
- {\end{flushleft}\ignorespacesafterend}
+ {\end{flushleft}\GlsXtrDiscardUnsetBuffering\ignorespacesafterend}
 
 \newenvironment{codeenv*}
  {%
+   \GlsXtrStartUnsetBuffering
    \setupcodeenvfmts
    \begin{flushleft}\ttfamily\obeylines\frenchspacing\@vobeyspaces
    \parindent\z@\parfillskip\@flushglue\parskip\z@skip
  }
- {\end{flushleft}\ignorespacesafterend}
+ {\end{flushleft}\GlsXtrDiscardUnsetBuffering\ignorespacesafterend}
 
 \begingroup
  \renewcommand{\addr}[1]{}
@@ -1311,7 +1316,7 @@ required by not defining unnecessary commands.
 
 Since \bibgls\ can also sort and collate the recorded locations
 present in the \ext{aux} file, it can simultaneously by-pass the
-need to use \idx{makeindex} or \idx{xindy}, although \bibgls\ 
+need to use \idx!{makeindex} or \idx!{xindy}, although \bibgls\ 
 can be used together with an external indexing application if required. (For
 example, if a custom \idx{xindy} rule is needed.)
 
@@ -1339,7 +1344,7 @@ to convert the entries to the \ext{bib} format required by
 \bibgls. See \sectionref{sec:gls2bib} for further details.
 
 The supplementary file \introguide\ is an
-introductory guide to the \sty{glossaries-extra} package, which you
+introductory guide to the \isty{glossaries-extra} package, which you
 may prefer to start with if you are unfamiliar with the
 \sty{glossaries} and \sty{glossaries-extra} packages.
 \end{abstract}
@@ -1426,7 +1431,7 @@ example, the file \filefmt{entries.bib} might contain:
 }
 \strut
 \atentry{symbol}\marg{v,
-  \field{name}=\marg{\idx{mshiftchar}\cs{vec}\marg{v}\idx{mshiftchar}},
+  \field{name}=\marg{\idx!{mshiftchar}\cs{vec}\marg{v}\idx!{mshiftchar}},
   \field{text}=\marg{\cs{vec}\marg{v}},
   \field{description}=\marg{a vector}
 }
@@ -2124,8 +2129,8 @@ been recorded because $B$ hasn't been recorded and is in a different
 \idx{resourceset}.
 
 If the \idx{crossresourceref} mode is enabled then stage~3 and
-stage~4 are processed in separate loops, otherwise they are
-processed in the same loop.
+stage~4 are processed in separate \idxpl{loop}, otherwise they are
+processed in the same \idx{loop}.
 
 \section{Indexing}
 
@@ -2464,7 +2469,7 @@ in terms of complicated internals).
 
 If you get a \idx{StackOverflowError} while a field is being
 interpreted (with a long stack trace that contains repeated file names and
-line numbers) then it's likely you have an infinite loop. For
+line numbers) then it's likely you have an infinite \idx{loop}. For
 example, this can be triggered if a field contains \csfmt{foo} that
 has been defined as:
 \begin{codeenv}
@@ -2555,7 +2560,7 @@ rule that recognises these Unicode characters (for example,
 complicated for simple \idxpl!{regex}. The \TeX\ parser library performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls\ (and by
-\idx{convertgls2bib}). When the \longarg{debug} mode is on, any
+\idx!{convertgls2bib}). When the \longarg{debug} mode is on, any
 warnings or errors triggered by the interpreter will be written to
 the transcript prefixed with \code{texparserlib:} (the results of
 the conversions will be included in the transcript as informational
@@ -3692,7 +3697,7 @@ line in the \ext{bib} file or the \csopt{charset} resource option.
 By default, \gls{newglossaryentry} and similar commands expand field values
 (except for \field{name}, \field{symbol} and \field{description}).
 This is useful if constructing field values programmatically
-(for example in a loop) but can cause a problem if certain fragile
+(for example in a \idx!{loop}) but can cause a problem if certain fragile
 commands are included in the field. 
 
 The switch \longarg{no-expand-fields} makes \bibgls\ write
@@ -3732,7 +3737,7 @@ before writing the \iext{glstex} file.
 Note that even without this trimming option on, fields that are
 set as keys within \cs{longnewglossaryentry} or the optional
 argument of \cs{newabbreviation} will automatically have the leading and
-trailing spaces internally trimmed by the \sty{xkeyval} package, so
+trailing spaces internally trimmed by the \isty{xkeyval} package, so
 this trimming action only affects fields that aren't set in this
 way, such as the \field{description}, \field{long} and \field{short}
 fields. If you specifically require a space at the start or end of a
@@ -4021,7 +4026,7 @@ Note that the \field{seealso} field doesn't allow for the optional
 \oargm{tag} part. If you need a different tag, either use \field{see}
 or change the definition of \ics{seealsoname} or
 \ics{glsxtruseseealsoformat}.  Note that, unless you are using
-\idx{xindy}, \ics{glsxtrindexseealso} just does
+\idx!{xindy}, \ics{glsxtrindexseealso} just does
 \ics{glssee}\oarg{\ics{seealsoname}}, and so will be treated as \field{see}
 rather than \field{seealso} by \bibgls. Again, it's better to just
 use the \field{seealso} field directly.
@@ -4056,7 +4061,8 @@ location list. The option may be used in combination with the \field{see} or
 \printfields
  [%
    Don't load \isty{glossaries-accsupp} directly (with \ics{usepackage}) 
-   when using \styfmt{glossaries-extra}. Load using the \styopt{accsupp} 
+   when using \styfmt{glossaries-extra}. Load using the 
+   \glsadd{idx.accsupp}\styopt{accsupp} 
    package option instead.
 %\begin{codeenv}
 %\cs{usepackage}\oarg{\styopt{record},\styopt{accsupp}}\marg{glossaries-extra}
@@ -6038,7 +6044,7 @@ original entry type (before it was aliased to
 For example \code{article} or \code{book}.
 
 You can iterate over these internal list fields using
-\ics{glsxtrfielddolistloop} or \ics{glsxtrfieldforlistloop}.
+\glsadd{idx.loop}\ics{glsxtrfielddolistloop} or \ics{glsxtrfieldforlistloop}.
 For example:
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{contributorhandler}}[1]\marg{\csfmt{par}\cs{glsentryname}\marg{\#1}}
@@ -6718,9 +6724,9 @@ that don't get seen by \LaTeX.
 
 The \glostyle{alttree} glossary style needs to know the widest
 \field{name} (for each level, if hierarchical). This can be set
-using \ics{glssetwidest} provided by the \styfmt{glossary-tree}
+using \ics{glssetwidest} provided by the \isty{glossary-tree}
 package (or similar commands like \ics{glsupdatewidest} provided by
-\styfmt{glossaries-extra-stylemods}), but this requires knowing
+\isty{glossaries-extra-stylemods}), but this requires knowing
 which name is the widest. Alternatively, one of the iterative commands
 such as \ics{glsFindWidestTopLevelName} can be used, which slows the
 document build as it has to iterate over all defined entries.
@@ -7112,8 +7118,15 @@ following values are allowed:
 \begin{itemize}
 \item \optfmt{recorded and deps}: add all recorded entries and
 their dependencies (default).
+
 \item \optfmt{recorded and deps and see}: as above but will also
-add unrecorded entries whose \field{see} or \field{seealso} field refers to a recorded entry.
+add unrecorded entries whose \field{see}, \field{seealso} or
+\field{alias} field refers to a recorded entry.
+
+\item \optfmt{recorded and deps and see not also}: as above but will 
+add unrecorded entries whose \field{see} or \field{alias} (but not
+\field{seealso}) field refers to a recorded entry.
+
 \item \optfmt{recorded no deps}: add all recorded entries but not
 their dependencies. The dependencies include those referenced in the
 \field{see} or \field{seealso} field or fields identified by 
@@ -7121,10 +7134,12 @@ their dependencies. The dependencies include those referenced in the
 with commands like \ics{gls} in the field values that are parsed by
 \bibgls. With this setting, parents will be omitted unless they've
 been referenced in the document through commands like \ics{gls}.
+
 \item \optfmt{recorded and ancestors}: this is like the previous
 setting but parents are added even if they haven't been referenced
 in the document. The other dependent entries are omitted if they
 haven't been referenced in the document.
+
 \item \optfmt{all}: add all entries found in the \ext{bib} files
 supplied in the \csopt{src} option.
 \end{itemize}
@@ -7364,7 +7379,7 @@ the value equal to the number of child entries that have been
 selected. As from version 1.5, this option also creates
 the \field{childlist} field for entries that have children
 selected. This field is in \sty{etoolbox}'s internal list
-format and can be iterated over using \ics{glsxtrfieldforlistloop}.
+format and can be iterated over using \glsadd{idx.loop}\ics{glsxtrfieldforlistloop}.
 
 The assignment is done using \ics{GlsXtrSetField} so there's
 no associated key. You can test if the field is set and non-zero
@@ -7859,7 +7874,7 @@ the new parent entry can be assigned with
 \csopt{missing-parent-category}.
 \end{itemize}
 
-For example, consider the \exfile{books.bib} file which contains
+For example, consider the \exfile!{books.bib} file which contains
 entries like:
 \begin{codeenv}
 \atentry{entry}\marg{ubik,
@@ -8229,7 +8244,7 @@ characters \code{.}~(full stop), \code{-}~(hyphen), \code{+}~(plus),
 \code{'}~(apostrophe) or \code{@}~(at-sign) are stripped. If you want to
 retain commas, use \csopt{labelify-list} instead. If you want to
 strip any of the allowed punctuation, use \csopt{labelify-replace} to
-remove the unwanted characters. (Remember that \sty{babel} can make
+remove the unwanted characters. (Remember that \isty{babel} can make
 some of these punctuation characters active, in which case they need
 to be stripped.)
 
@@ -9376,7 +9391,7 @@ as:
 Any character that isn't of type \idx{punctuationother} won't
 match.
 
-For example, the sample \exfile{books.bib} file contains:
+For example, the sample \exfile!{books.bib} file contains:
 \begin{codeenv}
 \atentry{entry}\marg{whydidnttheyaskevans,
   \field{name}=\marg{Why Didn't They Ask Evans?},
@@ -10885,7 +10900,7 @@ for more information about supplemental locations and
 records.)
 
 You can iterate through the \field{loclist} value
-using one of \sty{etoolbox}'s internal list loops (either
+using one of \sty{etoolbox}'s internal list \idxpl{loop} (either
 by first fetching the list using \ics{glsfieldfetch}
 or through \styfmt{glossaries-extra}'s \ics{glsxtrfielddolistloop}
 or \ics{glsxtrfieldforlistloop} shortcuts).
@@ -11084,7 +11099,7 @@ For more information on adjusting the formatting see the
 By default, the locations will be processed and stored in the
 \field{location} and \field{loclist} fields. However, if you don't
 want the location lists (for example, you are using the
-\styopt{nonumberlist} option or you are using \idx{xindy} with a
+\styopt{nonumberlist} option or you are using \idx!{xindy} with a
 custom location rule), then there's no need for \bibgls\ to process
 the locations. To switch this function off, just use
 \csopt[false]{save-locations}. Note that with this setting, if
@@ -11981,7 +11996,7 @@ loaded) so that if the counter is \counter{wrglossary} then
 page number is displayed in the location list but it links back to
 the place where the corresponding \cs{label} occurred.
 
-This method works partially with \appfmt{makeindex} and \appfmt{xindy}
+This method works partially with \idx!{makeindex} and \idx!{xindy}
 but from their point of view the location is the value of the
 \counter{wrglossary} counter, which interferes with their ability to
 merge duplicate page numbers and form ranges. Since \bibgls\ is
@@ -13848,7 +13863,7 @@ The alphabet sort options (\tableref{tab:sortoptionsrule}) typically
 list non-letter characters before alphabetical characters and spaces
 are quite often in the ignored set. This means that the alphabet
 sort options are naturally in a letter order, similar to
-\idx{xindy}['s] \code{ord/letorder} module.  (This isn't the same as
+\idx!{xindy}['s] \code{ord/letorder} module.  (This isn't the same as
 \csopt[letter-nocase]{sort}, which just sorts according to the
 Unicode value not according to a particular alphabet.)
 
@@ -13897,7 +13912,7 @@ according to \optfmt{upper-notlower} and then according to
 according to \optfmt{upper-upper} and then according to
 \optfmt{word}.
 \item \optfmt{none}: don't create break points. Use this option to
-emulate \idx{makeindex} or \idx{xindy}'s letter ordering, or combine
+emulate \idx!{makeindex} or \idx!{xindy}'s letter ordering, or combine
 with \csopt{sort-replace} to insert custom break points.
 \end{itemize}
 
@@ -17979,7 +17994,7 @@ have \convertglsbiblongarg{split-on-category} and not
 This option automatically implements \convertglsbiblongarg{ignore-category} and
 \convertglsbiblongarg{no-overwrite}.
 
-\convertglsbibarg{split-on-category}
+\convertglsbibarg{no-split-on-category}
 
 Don't split the entries into separate files according to their
 category (default).
@@ -18860,7 +18875,7 @@ that only conditionally append text.
 The best solution is with \styfmt{glossaries-extra} v1.23+ which
 provides \ics{glsxtrrestorepostpunc} for use in the category
 \idxpl{postdescriptionhook} that counteracts \cs{glsxtrnopostpunc}.
-This can be placed inside a conditional, as used in
+This can be placed inside a \idx{conditional}, as used in
 \exfile{sample-media.tex}, and does nothing if \cs{glsxtrnopostpunc}
 doesn't occur in the \field{description} field. (Note that 
 \cs{glsxtrrestorepostpunc} can't be used to counteract
@@ -19784,7 +19799,7 @@ and (if the \field{description} field is displayed in the glossary):
 the initial backslash.)
 
 I'd like to use the \glostyle{bookindex} style, which is
-provided by the \sty{glossary-bookindex} 
+provided by the \isty{glossary-bookindex} 
 package.\footnote{\styfmt{glossary-bookindex}
 is distributed with \styfmt{glossaries-extra} v1.21+.} This isn't loaded
 automatically, but it can be loaded through the
@@ -19932,7 +19947,7 @@ files. There won't be any number lists since there are no records.
 I need a glossary style that shows the \field{symbol} field so I've
 used \glostyle{mcolindexgroup}. Again I've suppressed the automatic
 loading of the default styles with \styopt{nostyles} and used
-\styopt[mcols]{stylemods} to load \sty{glossary-mcols} and patch the
+\styopt[mcols]{stylemods} to load \isty{glossary-mcols} and patch the
 styles. Note that although I've used \styopt{nostyles}, the
 \sty{glossary-tree} style is loaded as it's required by
 \sty{glossary-mcols}.
@@ -20058,14 +20073,14 @@ letter-number methods listed in
 
 I've decided to define a custom style for the first glossary. Since
 it's based on the \glostyle{long3col-booktabs} style I need to 
-load \sty{glossary-longbooktabs}, which can conveniently be done with
+load \isty{glossary-longbooktabs}, which can conveniently be done with
 the \styopt{stylemods} option. This uses \env{longtable} (provided
-by \sty{longtable}, which is automatically loaded) which means
+by \isty{longtable}, which is automatically loaded) which means
 an extra \LaTeX\ call is required in the build process to ensure the
 column widths are correct. Again I'm using \styopt{nostyles} to
 suppress the automatic loading of the default styles, however
 \sty{glossary-tree} will be loaded as it's listed in the value of
-\styopt{stylemods} and \sty{glossary-long} will be loaded as it's
+\styopt{stylemods} and \isty{glossary-long} will be loaded as it's
 required by \sty{glossary-longbooktabs}. I can't use my custom style
 in the \styopt{style} package option as it hasn't been defined at
 that point. The default \glostyle{list} style is now unavailable
@@ -20472,7 +20487,7 @@ option to automatically load that package. I'd like to use the
 \begin{codeenv}
 \styopt[list,bookindex]{stylemods}
 \end{codeenv}
-This ensures that \sty{glossary-list} and \sty{glossary-bookindex}
+This ensures that \isty{glossary-list} and \sty{glossary-bookindex}
 are loaded and patches the list styles.
 
 The first two glossaries would look better with a terminating 
@@ -21450,7 +21465,7 @@ If you don't have it installed, you'll need to change it.
 \usepackage{fontspec}
 \setmainfont{Linux Libertine O}
 \end{verbatim}
-Since it's a multilingual document I also need \sty{polyglossia}
+Since it's a multilingual document I also need \isty{polyglossia}
 with the main language set to \code{english}:
 \begin{codeenv}
 \cmd{usepackage}\marg{polyglossia}
@@ -21469,7 +21484,7 @@ iterate over all the defined entries and check if the \fieldfmt{translation}
 field has been set. If it has, then the first language tag in the
 \fieldfmt{language} field will supply the language, but this needs to be
 converted from the \idx{IETF} language tag to a language name recognised by
-\sty{polyglossia}.
+\isty{polyglossia}.
 
 Iterating over all entries can be done with \ics{forglsentries}
 but remember that no entries will be defined before \bibgls\ has
@@ -21484,13 +21499,13 @@ been run, so this does nothing on the first \LaTeX\ run.
   \marg{}\comment{}
 }
 \end{codeenv}
-Within the outer (\cs{forglsentries}) loop, there's a check
+Within the outer (\cs{forglsentries}) \idx{loop}, there's a check
 for the \fieldfmt{translation} field using \ics{glsxtrifhasfield}.
 If it's present, then the first element of the \fieldfmt{language}
 field is required. The simplest way to get this is to use
 \ics{glsxtrforcsvfield} which iterates over all elements of the
 given field (\fieldfmt{language} in this case) and break out of the
-loop (with \ics{glsxtrendfor}) once the language has been found.
+\idx{loop} (with \ics{glsxtrendfor}) once the language has been found.
 
 The \idx{handler} function (\csfmt{addfirstlang}) is defined so that it
 adds the given language tag as a tracked language using
@@ -21499,7 +21514,7 @@ adds the given language tag as a tracked language using
 (\sty{tracklang}) dialect label for convenience. This dialect label
 can then be converted to the root language label using
 \ics{TrackedLanguageFromDialect}. If this language is supported
-by \sty{polyglossia}, then there should be a file called
+by \isty{polyglossia}, then there should be a file called
 \metafilefmt{gloss-}{language}{.ldf}.
 
 Some of the entries use the same language, so it's necessary to
@@ -21523,7 +21538,7 @@ which is the name of the control sequence used with
 \sty{polyglossia} to switch language for a short block of text. This means that
 \gls{glsxtrentryfmt}\margm{text} can be used to format \meta{text}
 in the relevant language. Finally, \ics{glsxtrendfor} is used to
-break out of the loop.
+break out of the \idx{loop}.
 \begin{codeenv}
 \cs{newcommand}*\marg{\cmd{addfirstlang}}[1]\marg{\comment{}
   \cs{TrackLocale}\marg{\idx{param}1}\comment{}
@@ -21539,7 +21554,7 @@ break out of the loop.
   \marg{}\comment{}
 }
 \end{codeenv}
-Once the \ics{forglsentries} loop has found the appropriate
+Once the \ics{forglsentries} \idx{loop} has found the appropriate
 languages, it's now necessary to iterate over the internal list
 \csfmt{langlist} and set the language:
 \begin{codeenv}
@@ -22235,11 +22250,11 @@ additional write registers are required and the number of associated
 \bibgls\ files is equal to the number of resource commands plus the
 transcript file (in this example, $9+1=10$).
 
-Since this document requires \exfile{people.bib}, \exfile{books.bib}
-and \exfile{films.bib} it also requires the files that
+Since this document requires \exfile!{people.bib}, \exfile!{books.bib}
+and \exfile!{films.bib} it also requires the files that
 supply the definitions of the custom commands
-(\exfile{no-interpret-preamble.bib} and either
-\exfile{interpret-preamble.bib} or \exfile{interpret-preamble2.bib})
+(\exfile!{no-interpret-preamble.bib} and either
+\exfile!{interpret-preamble.bib} or \exfile!{interpret-preamble2.bib})
 to ensure the custom commands are provided both for the document and
 for \bibgls's interpreter.
 
@@ -22743,6 +22758,7 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 {fig:sample-multi2.pdf3}
 \end{figure}
 
+\setupglossaries{indexonlyfirst}
 \printstyoptsummary
 \printcommandsummary
 %\printcommandtopic
@@ -22759,14 +22775,88 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
   }%
   {\glossentryname{#1}}%
 }
-\renewcommand*{\glsxtrbookindexprelocation}[1]{%
-  \glsxtrifhasfield{location}{#1}%
-  {\nobreak\cleaders\hbox to .44em{\hss\textcolor{lightgray}{.}\hss}\hfill}%
-  {\glsxtrprelocation}%
+\newcommand{\locationfont}{\small}
+\newcommand{\widecrossreffont}{\footnotesize}
+\newcommand{\ifwidecrossref}[3]{%
+  \dimen0=0pt\relax
+  \glsxtrifhasfield*{see}{#1}%
+  {\settowidth{\dimen0}{\locationfont\glsxtrusesee{#1}}}%
+  {%
+    \glsxtrifhasfield*{seealso}{#1}%
+    {\settowidth{\dimen0}{\locationfont\glsxtruseseealso{#1}}}%
+    {%
+      \glsxtrifhasfield*{alias}{#1}%
+      {\settowidth{\dimen0}{\locationfont\glsxtrusealias{#1}}}%
+      {}%
+    }%
+  }%
+  \ifdim\dimen0>0.4\linewidth #2\else#3\fi
 }
+\newcommand{\precrossref}{}
+\newcommand{\indexdotfill}{\,\cleaders\hbox to .44em{\hss\textcolor{lightgray}{.}\hss}\hfill\,}
+\renewcommand*{\glsxtrbookindexprelocation}[1]{%
+  \glsxtrifhasfield*{location}{#1}%
+  {\nobreak\indexdotfill
+   \ifwidecrossref{#1}%
+   {\def\precrossref{\widecrossreffont\glstreesubitem}}%
+   {\def\precrossref{, }}%
+  }%
+  {%
+    \ifwidecrossref{#1}{\nobreak\def\precrossref{\widecrossreffont\glstreesubitem}}%
+    {\def\precrossref{\nobreak\indexdotfill}}%
+    \glsxtrprelocation
+  }%
+}
+\renewcommand{\glsxtrbookindexlocation}[2]{%
+  \begingroup
+  \locationfont
+  #2%
+  \glsxtrifhasfield{see}{#1}{\precrossref\glsxtrusesee{#1}}%
+  {%
+    \glsxtrifhasfield{seealso}{#1}%
+    {\precrossref\glsxtruseseealso{#1}}%
+    {%
+      \glsxtrifhasfield{alias}{#1}{\precrossref\glsxtrusealias{#1}}{}%
+    }%
+  }%
+  \endgroup
+  \let\precrossref\empty
+}
+% With \printcommandtopic missing a lot of spawned entries will
+% appear in the index without a record. Without the topic list they
+% need to be skipped
 \renewcommand{\printunsrtglossaryentryprocesshook}[1]{%
- \glsxtrifhasfield*{progenitor}{#1}{\printunsrtglossaryskipentry}{}%
+ \glsxtrifhasfield*{progenitor}{#1}%
+ {%\typeout{SKIPPING [has progenitor] #1}
+   \printunsrtglossaryskipentry
+ }%
+ {%
+   \GlsXtrIfFieldEqStr*{originalentrytype}{#1}{topic}%
+   {%
+     \glsxtrifhasfield*{location}{#1}%
+     {}%
+     {%
+       \ifglshasdesc{#1}{}%
+       {%
+         %\typeout{SKIPPING [no location] #1}
+         \printunsrtglossaryskipentry
+       }%
+     }%
+   }%
+   {%
+     \GlsXtrIfFieldValueInCsvList*{#1}{category}%
+     {abbreviationstyle,packageoption,glossarystyle,package}%
+     {%
+       \glsxtrifhasfield*{location}{#1}{}%
+       {%\typeout{SKIPPING [topic \glscategory{#1} no location] #1}%
+        \printunsrtglossaryskipentry
+       }%
+     }%
+     {}%
+   }%
+ }%
 }
 \renewcommand*{\unicodecategoryfmt}[1]{\textsf{#1}}
+\renewcommand*{\bibglspassim}{}
 \printunsrtglossary[type=index]
 \end{document}

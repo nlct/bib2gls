@@ -213,7 +213,7 @@
   name={categories and attributes}
 }
 
-@topic{regex,
+@index{regex,
   name={regular expressions},
   text={regular expression},
 }
@@ -222,14 +222,14 @@
   name={accessibility support}
 }
 
-@topic{conditionals,
+@topic{conditional,
   name={conditionals and boolean values},
   text={conditional},
   plural={conditionals}
 }
 @indexplural{booleanvals,
   text={boolean value},
-  alias={conditionals}
+  alias={conditional}
 }
 
 @topic{debugging,
@@ -243,9 +243,9 @@
 }
 
 @topic{hooks,name={hooks},text={hook}}
-@topic{loops,name={loops},text={loop}}
-@index{iteration,see={loops}}
-@indexplural{handler,seealso={loops}}
+@topic{loop,name={loops},text={loop}}
+@index{iteration,see={loop}}
+@indexplural{handler,seealso={loop}}
 @topic{indexing}
 
 @bibglscommand{bibglsnewentry,
@@ -696,7 +696,7 @@
   (provided in the final optional argument of commands like \cs{gls})
   is inside or outside of the font changing commands in the predefined
   abbreviation styles. The default is \optfmt{false}},
-  topics={abbreviationcommands,conditionals},
+  topics={abbreviationcommands,conditional},
   note={\styfmt{glossaries-extra} v1.02+},
   category={command}
 }
@@ -704,7 +704,7 @@
 @glscommand{glsxtrinsertinsidefalse,
   name={\csfmt{gls\-xtr\-insert\-inside\-false}},
   description={sets the \cs{ifglsxtrinsertinside} switch to \optfmt{false}},
-  topics={abbreviationcommands,conditionals},
+  topics={abbreviationcommands,conditional},
   note={\styfmt{glossaries-extra} v1.02+},
   category={command}
 }
@@ -712,7 +712,7 @@
 @glscommand{glsxtrinsertinsidetrue,
   name={\csfmt{gls\-xtr\-insert\-inside\-true}},
   description={sets the \cs{ifglsxtrinsertinside} switch to \optfmt{true}},
-  topics={abbreviationcommands,conditionals},
+  topics={abbreviationcommands,conditional},
   note={\styfmt{glossaries-extra} v1.02+},
   category={command}
 }
@@ -3445,7 +3445,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{field}\margm{item}\margm{true}\margm{false}},
   description={tests if the given item is in the given field that contains
    an \styfmt{etoolbox} internal list},
-  topics={listcommands,conditionals,fieldrefcommands},
+  topics={listcommands,conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldxifinlist,glsxtrfieldlistadd,glsxtrfieldforlistloop,glsxtrfielddolistloop},
   category={command}
@@ -3456,7 +3456,7 @@ cs}\margm{Glspl-like cs}},
   user1={\margm{label}\margm{field}\margm{item}\margm{true}\margm{false}},
   description={tests if the expansion of the given item is in the given field that contains
    an \styfmt{etoolbox} internal list},
-  topics={listcommands,conditionals,fieldrefcommands},
+  topics={listcommands,conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldifinlist},
   category={command}
@@ -7565,7 +7565,7 @@ long form on \idx{firstuse}. The default definition just uses
 @packageoption{styopt.nosuper,
   name={\styoptfmt{nosuper}},
   package={glossaries},
-  description={prevents the \sty{glossary-super} package (which
+  description={prevents the \isty{glossary-super} package (which
    provides the \glostyle{super} styles) from being
    automatically loaded},
   category={packageoption},
@@ -9903,7 +9903,7 @@ primary formats, if enabled.},
   user1={\margm{label}\margm{field}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list},
-  topics={listcommands,loops,fieldrefcommands},
+  topics={listcommands,loop,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
   seealso={glsxtrfieldforlistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
   category={command}
@@ -9914,7 +9914,7 @@ primary formats, if enabled.},
   user1={\margm{label}\margm{field}\margm{handler}},
   description={iterates over the items the given field, which contains
    an \styfmt{etoolbox} internal list, using the given handler},
-  topics={listcommands,loops,fieldrefcommands},
+  topics={listcommands,loop,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.29+},
   seealso={glsxtrfielddolistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
   category={command}
@@ -11298,7 +11298,7 @@ category},
   user1={\margm{true}\margm{false}},
   description={only for use in the post-link hooks this
   tests if the entry just referenced was used for the first time},
-  topics={hooks,conditionals},
+  topics={hooks,conditional},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -11311,7 +11311,7 @@ category},
   if the entry doesn't exist (an error or warning message will
   occur and ?? will appear in the document).
   This command is not for use in the post-link hooks},
-  topics={conditionals,entryrefcommands},
+  topics={conditional,entryrefcommands},
   note={\styfmt{glossaries}},
   seealso={GlsXtrIfUnusedOrUndefined,glsxtrifwasfirstuse},
   category={command}
@@ -11324,7 +11324,7 @@ category},
 hasn't been
   used or is undefined, otherwise it does \meta{false}.
   This command is not for use in the post-link hooks},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries-extra} v1.34+},
   seealso={ifglsused,glsxtrifwasfirstuse},
   category={command}
@@ -11367,7 +11367,7 @@ label of the current entry},
   description={only for use in the \meta{true} part of
 \cs{ifglshasfield} or \cs{glsxtrifhasfield}, this expands to the
 field value},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11460,7 +11460,7 @@ field value},
    (defined and not empty)
    without testing if the entry exists and adds implicit scoping
    to \meta{true} and \meta{false}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.19+},
   seealso={GlsXtrIfFieldUndef},
   category={command}
@@ -11473,7 +11473,7 @@ field value},
    (defined and not empty)
    without testing if the entry exists and without introducing
    an implicit scope},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.19+},
   seealso={GlsXtrIfFieldUndef},
   category={command}
@@ -11484,7 +11484,7 @@ field value},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given field isn't defined for the given
    entry, which may also not exist},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.23+},
   category={command}
 }
@@ -11496,7 +11496,7 @@ field value},
    \meta{text} for the given entry, which may not exist. The unstarred
 form adds implicit grouping. The starred form (new to v1.39)
 doesn't},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -11508,7 +11508,7 @@ doesn't},
 fully expands \meta{text} (but not the field value). The unstarred
 form adds implicit grouping. The starred form (new to v1.39)
 doesn't},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -11520,7 +11520,7 @@ doesn't},
 fully expands both the field value and \meta{text}. The unstarred
 form adds implicit grouping. The starred form (new to v1.39)
 doesn't},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
 }
@@ -11531,7 +11531,7 @@ doesn't},
   description={tests if the given entry, which must be defined, has the 
    given field set to a non-empty value},
   note={\styfmt{glossaries}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
 }
@@ -11542,7 +11542,7 @@ doesn't},
   description={tests if the given entry, which must be defined, has the 
    \field{symbol} field set to value that's not empty and not
      \csfmt{relax}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries}},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -11553,7 +11553,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{description} field set},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries}},
   seealso={ifglshassymbol,ifglshasdescsuppressed},
   category={command}
@@ -11564,7 +11564,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{description} field set to \cs{nopostdesc}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries}},
   seealso={ifglshasdesc},
   category={command}
@@ -11575,7 +11575,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{parent} field set},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11590,7 +11590,7 @@ doesn't},
   field. With \bibgls, a more efficient approach is to
   use \csopt{save-child-count} and test the value of
   the \field{childcount} field},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11600,7 +11600,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{short} field set},
-  topics={conditionals,fieldrefcommands,abbreviationcommands},
+  topics={conditional,fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11610,7 +11610,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{long} field set},
-  topics={conditionals,fieldrefcommands,abbreviationcommands},
+  topics={conditional,fieldrefcommands,abbreviationcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -11620,7 +11620,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{prefix} field set to value that's not empty},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-prefix}},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -11631,7 +11631,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{prefixplural} field set to value that's not empty},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-prefix}},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -11642,7 +11642,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{prefixfirst} field set to value that's not empty},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-prefix}},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -11653,7 +11653,7 @@ doesn't},
   user1={\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
    \field{prefixfirstplural} field set to value that's not empty},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-prefix}},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
@@ -11666,7 +11666,7 @@ doesn't},
    given field value equal to \meta{string}, where \meta{field label}
    is the internal field label (not the key name). No expansion is
    performed in the test (which just uses \cs{ifcsstring})},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries} v4.16+},
   category={command}
 }
@@ -11679,7 +11679,7 @@ doesn't},
    given by \meta{cs}, where \meta{field label}
    is the internal field label (not the key name). The test 
    uses \cs{ifdefstrequal}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries} v4.16+},
   category={command}
 }
@@ -11692,7 +11692,7 @@ doesn't},
    given by the control sequence name \meta{cs-name}, where \meta{field label}
    is the internal field label (not the key name). The test 
    uses \cs{ifcsstrequal}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries} v4.16+},
   category={command}
 }
@@ -11747,7 +11747,7 @@ The value can be referenced in \meta{true} or \meta{false}
 with \cs{glscurrentfieldvalue}. The unstarred
 form adds implicit grouping. The starred form (new to v1.39)
 doesn't},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   seealso={GlsXtrIfFieldEqNum},
   category={command}
@@ -11763,7 +11763,7 @@ The value can be referenced in \meta{true} or \meta{false}
 with \cs{glscurrentfieldvalue}. The unstarred
 form adds implicit grouping. The starred form (new to v1.39)
 doesn't},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   seealso={GlsXtrIfFieldNonZero,GlsXtrIfFieldCmpNum},
   category={command}
@@ -11780,7 +11780,7 @@ The value can be referenced in \meta{true} or \meta{false}
 with \cs{glscurrentfieldvalue}. The unstarred
 form adds implicit grouping. The starred form (new to v1.39)
 doesn't},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.31+},
   seealso={GlsXtrIfFieldNonZero},
   category={command}
@@ -11794,7 +11794,7 @@ option, this uses \cs{GlsXtrIfFieldNonZero} to test if the
 \field{childcount} field has a non-zero value. The value
 can be referenced in \meta{true} or \meta{false} with
 \cs{glscurrentfieldvalue}},
-  topics={conditionals,fieldrefcommands},
+  topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.31+},
   seealso={GlsXtrIfFieldNonZero},
   category={command}
@@ -11806,7 +11806,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={should expand to \meta{true} if the post-link hook
    should check for a following full stop (in addition to attribute
    checks) otherwise should expand to \meta{false}},
-  topics={conditionals,hooks},
+  topics={conditional,hooks},
   note={\styfmt{glossaries-extra} v1.23+},
   category={command}
 }
@@ -12082,7 +12082,7 @@ can be referenced in \meta{true} or \meta{false} with
   user1={\margm{location list cs}},
   description={iterates over the given internal location list using
    the \cs{glsnoidxloclisthandler} handler},
-  topics={glossarystylecommands,loops,loclistcommands},
+  topics={glossarystylecommands,loop,loclistcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -12091,7 +12091,7 @@ can be referenced in \meta{true} or \meta{false} with
   name={\csfmt{gls\-noidx\-loc\-list\-handler}},
   description={the handler used by the internal list loop function used
     in \cs{glsnoidxloclist}},
-  topics={glossarystylecommands,loops,loclistcommands},
+  topics={glossarystylecommands,loop,loclistcommands},
   user1={\margm{location}},
   note={\styfmt{glossaries}},
   category={command}
@@ -12300,7 +12300,7 @@ letter to \idx{uppercase}},
    and performs \code{\cs{glsadd}\oargm{options}} for each entry.
    This command isn't suitable for use with \bibgls. Use the
    \csopt{selection} option instead},
-  topics={loops,indexing},
+  topics={loop,indexing},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -12314,7 +12314,7 @@ letter to \idx{uppercase}},
    the \glsaddopt{format} set to \code{glsignore}.
    This command isn't suitable for use with \bibgls. Use the
    \csopt{selection} option instead},
-  topics={loops,indexing},
+  topics={loop,indexing},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -12926,7 +12926,7 @@ usual delay},
   name={\csfmt{ifglsentryexists}},
   user1={\margm{label}\margm{true}\margm{false}},
   description={tests if the entry given by \meta{label} exists},
-  topics={conditionals,entryrefcommands},
+  topics={conditional,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -12970,7 +12970,7 @@ usual delay},
    defined (which, with \bibgls, should correspond to the
    order obtained from the sort settings given in the
    \idx{resourceset} options)},
-  topics={glossrefs,loops},
+  topics={glossrefs,loop},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
 }
@@ -12981,7 +12981,7 @@ usual delay},
   description={as \cs{printunsrtglossary} but performs
   \meta{code} first (scoped to localise any assignments within
   \meta{code})},
-  topics={glossrefs,loops},
+  topics={glossrefs,loop},
   note={\styfmt{glossaries-extra} v1.12+},
   category={command}
 }
@@ -12991,7 +12991,7 @@ usual delay},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printunsrtglossary} for each one},
-  topics={glossrefs,loops},
+  topics={glossrefs,loop},
   note={\styfmt{glossaries-extra} v1.08+},
   category={command}
 }
@@ -13001,7 +13001,7 @@ usual delay},
   user1={\margm{label}},
   description={performed at each iteration of the internal loop used
 by \cs{printunsrtglossary}},
-  topics={glossrefs,loops,hooks},
+  topics={glossrefs,loop,hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -13011,7 +13011,7 @@ by \cs{printunsrtglossary}},
   description={only allowed within
    \cs{printunsrtglossaryentryprocesshook} this command 
    indicates that the current entry should be skipped},
-  topics={glossrefs,loops,hooks},
+  topics={glossrefs,loop,hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -13040,7 +13040,7 @@ hasn't been defined},
   user1={\margm{label}\margm{category}\margm{true}\margm{false}},
   description={does \meta{true} if the \field{category} field for
    the entry given by \meta{label} is \meta{category}},
-  topics={conditionals,fieldrefcommands,catattrcommands},
+  topics={conditional,fieldrefcommands,catattrcommands},
   note={\styfmt{glossaries-extra}},
   category={command}
 }
@@ -13052,7 +13052,7 @@ hasn't been defined},
    in the comma-separated \meta{list}, where both \meta{label}
    and \meta{list} are fully expanded before testing. This test
    is designed for \emph{labels} that are fully expandable},
-  topics={conditionals,listcommands},
+  topics={conditional,listcommands},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command}
 }
@@ -13235,7 +13235,7 @@ hasn't been defined},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printglossary} for each one},
-  topics={glossrefs,loops},
+  topics={glossrefs,loop},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -13254,7 +13254,7 @@ hasn't been defined},
   user1={},
   description={iterates over all non-ignored defined glossaries
    and performs \cs{printnoidxglossary} for each one},
-  topics={glossrefs,loops},
+  topics={glossrefs,loop},
   note={\styfmt{glossaries} v4.04+},
   category={command}
 }
@@ -13444,7 +13444,7 @@ defined},
 @glscommand{glscapturedgroup,
   name={\csfmt{glscapturedgroup}},
   description={expands to \cs{cs.string}\idx{dollarchar}},
-  topics={charcommands,regex},
+  topics={charcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.31+},
   category={command}
 }
@@ -14593,7 +14593,7 @@ location list},
   description={used by commands like \cs{glsfmtshort}, this expands
   to \meta{true} in page headings and the table of contents, 
   otherwise it expands to \meta{false}},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries-extra} v1.07+},
   category={command}
 }
@@ -14664,8 +14664,7 @@ entries in the \glostyle{tree}-like styles},
   description={length register used by the tabular styles to specify
 the width of the description column},
   topics={glossarystylecommands},
-  note={\styfmt{glossary-long} and
-   \styfmt{glossary-super}},
+  note={\isty{glossary-long} and \isty{glossary-super}},
   category={command}
 }
 
@@ -14718,7 +14717,7 @@ paragraph break that retains the hanging indent},
    identified by \meta{type} (or the default, if \meta{type}
    is omitted) and perform \meta{body} where you can use the
    control sequence \meta{cs} to reference the current entry label},
-  topics={loops,entryrefcommands},
+  topics={loop,entryrefcommands},
   note={\styfmt{glossaries}},
   seealso={forallglsentries},
   category={command}
@@ -14732,7 +14731,7 @@ paragraph break that retains the hanging indent},
    glossaries if the optional argument is omitted) and perform 
    \meta{body} where you can use the control sequence \meta{cs} to 
    reference the current entry label},
-  topics={loops,glossrefs,entryrefcommands},
+  topics={loop,glossrefs,entryrefcommands},
   note={\styfmt{glossaries}},
   seealso={forglsentries,forallglossaries},
   category={command}
@@ -14746,7 +14745,7 @@ paragraph break that retains the hanging indent},
    glossaries if the optional argument is omitted) and performs \meta{body} 
    where you can use the control sequence \meta{cs} to reference 
    the current glossary label},
-  topics={loops,glossrefs},
+  topics={loop,glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14759,7 +14758,7 @@ paragraph break that retains the hanging indent},
    by \meta{label} and performs \meta{handler}\margm{element}
    on each element of the list, where \meta{handler} is
    a control sequence which takes a single argument},
-  topics={loops,fieldrefcommands,listcommands},
+  topics={loop,fieldrefcommands,listcommands},
   note={\styfmt{glossaries}},
   note={\styfmt{glossaries-extra} v1.24+},
   seealso={glsxtrendfor},
@@ -14771,7 +14770,7 @@ paragraph break that retains the hanging indent},
   user1={},
   description={may be used within the handler macro
    of \cs{glsxtrforcsvfield} to prematurely break the loop},
-  topics={loops,listcommands},
+  topics={loop,listcommands},
   note={\styfmt{glossaries-extra} v1.24+},
   seealso={glsxtrforcsvfield},
   category={command}
@@ -14782,7 +14781,7 @@ paragraph break that retains the hanging indent},
   user1={\margm{type}\margm{true}\margm{false}},
   description={tests if the glossary given by \meta{type} exists
   and does \meta{true} if it does exists, otherwise does \meta{false}},
-  topics={conditionals,glossrefs},
+  topics={conditional,glossrefs},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14792,7 +14791,7 @@ paragraph break that retains the hanging indent},
   user1={\margm{type}\margm{true}\margm{false}},
   description={tests if the glossary given by \meta{type} was
   defined as an ignored glossary},
-  topics={conditionals,glossrefs},
+  topics={conditional,glossrefs},
   note={\styfmt{glossaries} v4.08+},
   category={command}
 }
@@ -14804,7 +14803,7 @@ paragraph break that retains the hanging indent},
   is done, otherwise an error (or warning with
   \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
   triggered},
-  topics={conditionals,entryrefcommands},
+  topics={conditional,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14816,7 +14815,7 @@ paragraph break that retains the hanging indent},
   is done, otherwise an error (or warning with
   \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
   triggered},
-  topics={conditionals,entryrefcommands},
+  topics={conditional,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14828,7 +14827,7 @@ paragraph break that retains the hanging indent},
   is done, otherwise an error (or warning with
   \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
   triggered and \meta{else code} is done},
-  topics={conditionals,entryrefcommands},
+  topics={conditional,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14840,7 +14839,7 @@ paragraph break that retains the hanging indent},
   is done, otherwise an error (or warning with
   \sty{glossaries-extra}'s \styopt[warn]{undefaction} option) is
   triggered and \meta{else code} is done},
-  topics={conditionals,entryrefcommands},
+  topics={conditional,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14940,7 +14939,7 @@ been assigned a mapping to a language hook label},
    \cs{GlsXtrStopUnsetBuffering}. The starred form
    (added to v1.31) avoids duplicate labels in the buffer's 
    internal list},
-  topics={entryrefcommands,conditionals},
+  topics={entryrefcommands,conditional},
   note={\styfmt{glossaries-extra} v1.30+},
   seealso={GlsXtrForUnsetBufferedList},
   category={command}
@@ -14952,7 +14951,7 @@ been assigned a mapping to a language hook label},
     \idx{firstuseflag} of all the entry whose labels are stored in the
     buffer that was started with
    \cs{GlsXtrStartUnsetBuffering} and then clears the buffer},
-  topics={entryrefcommands,conditionals},
+  topics={entryrefcommands,conditional},
   note={\styfmt{glossaries-extra} v1.30+},
   seealso={GlsXtrForUnsetBufferedList},
   category={command}
@@ -14976,7 +14975,7 @@ been assigned a mapping to a language hook label},
   user1 = {\margm{label}},
   description={unsets the \idx{firstuseflag} so that the entry is
 marked as having been used},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14986,7 +14985,7 @@ marked as having been used},
   user1 = {\margm{label}},
   description={locally unsets the \idx{firstuseflag} so that the entry is
 marked as having been used},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -14996,7 +14995,7 @@ marked as having been used},
   user1 = {\margm{label}},
   description={resets the \idx{firstuseflag} so that the entry is
 marked as not used},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -15006,7 +15005,7 @@ marked as not used},
   user1 = {\margm{label}},
   description={locally resets the \idx{firstuseflag} so that the entry is
 marked as not used},
-  topics={conditionals},
+  topics={conditional},
   note={\styfmt{glossaries}},
   category={command}
 }
@@ -15017,7 +15016,7 @@ marked as not used},
    environment to deal with the problem of unsetting the
   \idx{firstuseflag} either explicitly with \cs{glsunset} or
   implicitly through commands like \cs{gls} (does nothing if
-  \sty{tabularx} hasn't been loaded)},
+  \isty{tabularx} hasn't been loaded)},
   topics={hooks,entryrefcommands},
   note={\styfmt{glossaries}},
   category={command}
@@ -15906,7 +15905,7 @@ to use in the header (leave empty for default)},
   user1={\margm{label}},
   description={interrupts the document build and shows the value of
    the \idx{firstuseflag} in the transcript},
-  topics={debugging,fieldrefcommands,conditionals},
+  topics={debugging,fieldrefcommands,conditional},
   note={\styfmt{glossaries}},
   category={command}
 }
