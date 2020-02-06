@@ -195,6 +195,7 @@ See the manual for further details.</entry>
 <entry key="message.field.notset">Field {0} not set for entry {1}</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
 <entry key="message.ignore.fields">Ignoring fields:</entry>
+<entry key="message.ignore.field">Ignoring field ''{0}'' for entry ''{1}''</entry>
 <entry key="message.sort.mode">Sort mode: {0}</entry>
 <entry key="message.sort.field">Sort field: {0}</entry>
 <entry key="message.sort.date.locale">Date/time sort locale: {0}</entry>
@@ -512,6 +513,7 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.no-ignore-category">{0} 		Don''t omit category field (default)</entry>
 <entry key="gls2bib.syntax.split-on-category">{0} or {1} 		Split entries into separate files according to category field</entry>
 <entry key="gls2bib.syntax.no-split-on-category">{0} 		Don''t split entries according to category field (default)</entry>
+<entry key="gls2bib.syntax.ignore-fields">{0} &lt;list&gt; or {1} &lt;list&gt; 		Ignore the fields contained in the comma-separated &lt;list&gt;</entry>
 <entry key="gls2bib.syntax.overwrite">{0} 			Overwrite files (default unless {1} or {2})</entry>
 <entry key="gls2bib.syntax.no-overwrite">{0} 			Don''t overwrite files</entry>
 <entry key="gls2bib.syntax.preamble-only">{0} or {1} 		Only parse the preamble</entry>

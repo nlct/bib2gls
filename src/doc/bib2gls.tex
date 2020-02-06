@@ -17999,6 +17999,38 @@ This option automatically implements \convertglsbiblongarg{ignore-category} and
 Don't split the entries into separate files according to their
 category (default).
 
+\convertglsbibarg{ignore-fields}
+
+Omit all the fields listed in \meta{list} from the \ext{bib} file.
+If \field{sort}, \field{type} or \field{category} are included
+in the list, this will automatically implement the corresponding
+\convertglsbiblongarg{ignore-sort},
+\convertglsbiblongarg{ignore-type} or
+\convertglsbiblongarg{ignore-category} option.
+
+This option is not cumulative. If the list is empty it will unset
+any previous list but won't unset any 
+\convertglsbiblongarg{ignore-sort},
+\convertglsbiblongarg{ignore-type} or
+\convertglsbiblongarg{ignore-category} option.
+
+For example:
+\begin{alltt}
+convertgls2bib \longargfmt{ignore-fields} 'user1,sort' entries.bib
+\end{alltt}
+is equivalent to:
+\begin{alltt}
+convertgls2bib \longargfmt{ignore-fields} user1 \longargfmt{ignore-sort entries.bib}
+\end{alltt}
+and
+\begin{alltt}
+convertgls2bib \longargfmt{ignore-fields} 'user1,sort' \longargfmt{ignore-fields} '' entries.bib
+\end{alltt}
+is equivalent to:
+\begin{alltt}
+convertgls2bib \longargfmt{ignore-sort} entries.bib
+\end{alltt}
+
 \convertglsbibarg{preamble-only}
 
 Only parse the document preamble.

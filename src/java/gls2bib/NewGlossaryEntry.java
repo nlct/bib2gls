@@ -87,6 +87,14 @@ public class NewGlossaryEntry extends ControlSequence
       while (it.hasNext())
       {
          String field = it.next();
+
+         if ((gls2bib.ignoreSort() && field.equals("sort"))
+            || gls2bib.isCustomIgnoreField(field))
+         {
+            gls2bib.debug(gls2bib.getMessage("message.ignore.field", field, label));
+            continue;
+         }
+
          TeXObject object = valuesArg.getValue(field);
 
          if (field.equals("see") && (object instanceof TeXObjectList))
@@ -228,6 +236,9 @@ public class NewGlossaryEntry extends ControlSequence
                   // This shouldn't happen as it suggests type={}
                   // which is invalid. Ignore this field.
 
+                  gls2bib.debug(gls2bib.getMessage("message.ignore.field",
+                       field, label));
+
                   continue;
                }
 
@@ -242,6 +253,9 @@ public class NewGlossaryEntry extends ControlSequence
                   if (list.peekStack() == null)
                   {
                      // ignore this field
+
+                     gls2bib.debug(gls2bib.getMessage("message.ignore.field",
+                       field, label));
 
                      continue;
                   }
@@ -258,6 +272,9 @@ public class NewGlossaryEntry extends ControlSequence
             else if (object instanceof ControlSequence
               && ((ControlSequence)object).getName().equals("glsdefaulttype"))
             {
+               gls2bib.debug(gls2bib.getMessage("message.ignore.field",
+                  field, label));
+
                continue;
             }
 
@@ -285,6 +302,9 @@ public class NewGlossaryEntry extends ControlSequence
 
             if (gls2bib.ignoreType())
             {
+               gls2bib.debug(gls2bib.getMessage("message.ignore.field",
+                  field, label));
+
                continue;
             }
          }
@@ -314,12 +334,11 @@ public class NewGlossaryEntry extends ControlSequence
 
             if (gls2bib.ignoreCategory())
             {
+               gls2bib.debug(gls2bib.getMessage("message.ignore.field",
+                  field, label));
+
                continue;
             }
-         }
-         else if (gls2bib.ignoreSort() && field.equals("sort"))
-         {
-            continue;
          }
 
          if ((object instanceof Group) && !(object instanceof MathGroup))

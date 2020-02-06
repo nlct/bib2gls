@@ -139,6 +139,24 @@ public class Gls2Bib extends LaTeXParserListener
       return this;
    }
 
+   public boolean isCustomIgnoreField(String field)
+   {
+      if (customIgnoreFields == null)
+      {
+         return false;
+      }
+
+      for (String f : customIgnoreFields)
+      {
+         if (f.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public boolean ignoreSort()
    {
       return ignoreSortField;
@@ -1107,6 +1125,8 @@ public class Gls2Bib extends LaTeXParserListener
         "--split-on-category", "-c"));
       System.out.println(getMessage("gls2bib.syntax.no-split-on-category",
         "--no-split-on-category"));
+      System.out.println(getMessage("gls2bib.syntax.ignore-fields",
+        "--ignore-fields", "-f"));
       System.out.println(getMessage("gls2bib.syntax.overwrite",
         "--overwrite", "--split-on-type", "--split-on-category"));
       System.out.println(getMessage("gls2bib.syntax.no-overwrite",
@@ -1140,6 +1160,7 @@ public class Gls2Bib extends LaTeXParserListener
       ignoreTypeField = false;
       splitOnType = false;
       ignoreCategoryField = false;
+      customIgnoreFields = null;
       splitOnCategory = false;
       overwriteFiles = true;
       preambleOnly = false;
@@ -1251,6 +1272,42 @@ public class Gls2Bib extends LaTeXParserListener
          {
             overwriteFiles = false;
          }
+         else if (args[i].equals("--ignore-fields") || args[i].equals("-f"))
+         {
+            if (i == args.length-1)
+            {
+               throw new Gls2BibSyntaxException(
+                  getMessage("gls2bib.missing.arg.value",
+                  args[i]));
+            }
+
+            String list = args[++i].trim();
+
+            if (list.isEmpty())
+            {
+               customIgnoreFields = null;
+            }
+            else
+            {
+               customIgnoreFields = list.split(" *, *");
+
+               for (String f : customIgnoreFields)
+               {
+                  if (f.equals("sort"))
+                  {
+                     ignoreSortField = true;
+                  }
+                  else if (f.equals("type"))
+                  {
+                     ignoreTypeField = true;
+                  }
+                  else if (f.equals("category"))
+                  {
+                     ignoreCategoryField = true;
+                  }
+               }
+            }
+         }
          else if (args[i].equals("--preamble-only") || args[i].equals("-p"))
          {
             preambleOnly = true;
@@ -1322,7 +1379,10 @@ public class Gls2Bib extends LaTeXParserListener
       {
          if (args[i].equals("--texenc")
           || args[i].equals("--bibenc")
-          || args[i].equals("--space-sub"))
+          || args[i].equals("--space-sub")
+          || args[i].equals("-s")
+          || args[i].equals("--ignore-fields")
+          || args[i].equals("-f"))
          {// skip 1 argument
             i++;
          }
@@ -1431,6 +1491,8 @@ public class Gls2Bib extends LaTeXParserListener
    private boolean splitOnCategory=false;
    private boolean overwriteFiles=true;
    private boolean preambleOnly=false;
+
+   private String[] customIgnoreFields;
 
    private Gls2BibMessages messages;
 

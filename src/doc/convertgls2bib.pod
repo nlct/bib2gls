@@ -86,6 +86,16 @@ B<--no-overwrite>.
 Don't split the entries into separate files according to the B<category>
 field (default).
 
+=item B<--ignore-fields> I<list> or B<-f> I<list>
+
+Ignore all the fields in the comma-separated I<list>. If the
+list includes B<sort>, B<type> or B<category> it will automatically
+implement the corresponding B<--ignore-sort>, B<--ignore-type> or
+B<--ignore--category> option.
+
+This option isn't cumulative. An empty list will clear a previously
+set list but won't undo the sort, type or category ignore options.
+
 =item B<--overwrite>
 
 Overwrite existing .bib files. Default unless B<--split-on-type>
