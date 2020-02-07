@@ -211,6 +211,15 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new NewCommand("renewcommand",
         NewCommand.OVERWRITE_ALLOW));
 
+      parser.putControlSequence(
+        new GenericCommand("glslongkey", null, createString("long")));
+      parser.putControlSequence(
+        new GenericCommand("glslongpluralkey", null, createString("longplural")));
+      parser.putControlSequence(
+        new GenericCommand("glsshortkey", null, createString("short")));
+      parser.putControlSequence(
+        new GenericCommand("glsshortpluralkey", null, createString("shortplural")));
+
       parser.putControlSequence(new NewGlossaryEntry(this));
       parser.putControlSequence(new NewGlossaryEntry(
         "newentry", this));
@@ -1470,8 +1479,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200206";
-   public static final String DATE = "2020-02-06";
+   public static final String VERSION = "1.9.20200207";
+   public static final String DATE = "2020-02-07";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
