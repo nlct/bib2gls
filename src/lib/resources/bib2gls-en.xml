@@ -344,6 +344,10 @@ Falling back on ID.</entry>
 <entry key="warning.missing.field">Entry ''{0}'' missing required field: {1}</entry>
 <entry key="warning.potential.nested.link">Entry ''{0}'' has potentially nested link text in field: {1}
 Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry>
+<entry key="warning.glsadd.in.field">Entry ''{0}'' contains \glsadd in field: {1}
+Consider using a dual entry or add ''{2}'' to one of the cross-referencing fields instead.
+(With a dual entry type, you don''t need to link a primary to its dual
+with \glsadd. They are automatically dependent on each other.)</entry>
 <entry key="warning.dir.no.write">Directory not writable: {0}
 Using TEXMFOUTPUT instead: {1}</entry>
 <entry key="warning.conflicting.range.format">Entry location conflict for formats: {0} and {1}
@@ -519,6 +523,8 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.preamble-only">{0} or {1} 		Only parse the preamble</entry>
 <entry key="gls2bib.syntax.no-preamble-only">{0} 		Parse the entire document (default).</entry>
 <entry key="gls2bib.syntax.space-sub">{0} &lt;val&gt; or {1} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;</entry>
+<entry key="gls2bib.syntax.index-conversion">{0} or {1}	Convert @entry to @index if no description.</entry>
+<entry key="gls2bib.syntax.no-index-conversion">{0} 		Don''t convert @entry to @index.</entry>
 <entry key="gls2bib.syntax.locale">{0} &lt;iso tag&gt;		Use language resource file given by &lt;iso tag&gt; for messages.</entry>
 <entry key="gls2bib.syntax.silent">{0}			Suppress messages.</entry>
 <entry key="gls2bib.syntax.verbose">{0}			Normal messages.</entry>
@@ -608,6 +614,8 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="latex.class.error">Class {0} Error: {1}</entry>
 <entry key="latex.illegal.argtype">Illegal argument type {0}</entry>
 <entry key="latex.package.not.loaded">Package ''{0}'' has not been loaded</entry>
+<entry key="latex.error.counter.too.large">Counter too large</entry>
+<entry key="latex.error.counter.out.of.range">Counter value {0} out of valid range ({1})</entry>
 
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>

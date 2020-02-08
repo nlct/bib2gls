@@ -655,12 +655,21 @@ public class Bib2GlsEntry extends BibEntry
                   if (bib2gls.checkNestedLinkTextField(fieldName)
                    && !csname.equals("glsps") && !csname.equals("glspt"))
                   {
-                     bib2gls.warning(parser, 
-                       bib2gls.getMessage("warning.potential.nested.link",
-                       getId(), fieldName,
-                       String.format("\\%s%s%s", ((TeXCsRef)object).getName(), 
-                         pre, opt),
-                       label));
+                     if (csname.equals("glsadd"))
+                     {
+                       bib2gls.warning(parser, 
+                         bib2gls.getMessage("warning.glsadd.in.field",
+                         getId(), fieldName, label));
+                     }
+                     else
+                     {
+                       bib2gls.warning(parser, 
+                         bib2gls.getMessage("warning.potential.nested.link",
+                         getId(), fieldName,
+                         String.format("\\%s%s%s", ((TeXCsRef)object).getName(), 
+                           pre, opt),
+                         label));
+                     }
                   }
 
                }
