@@ -80,7 +80,11 @@ public class NewGlossaryEntry extends ControlSequence
       String glosType = null;
       String category = null;
 
-      GlsData data = new GlsData(label, getType());
+      String entryType = getType();
+
+      boolean checkDesc = gls2bib.isIndexConversionOn() && entryType.equals("entry");
+
+      GlsData data = new GlsData(label, entryType);
 
       Iterator<String> it = valuesArg.keySet().iterator();
 
@@ -340,6 +344,48 @@ public class NewGlossaryEntry extends ControlSequence
                continue;
             }
          }
+         else if (checkDesc && field.equals("description"))
+         {
+            boolean doConversion = false;
+            ControlSequence cs = null;
+
+            if (object instanceof TeXObjectList)
+            {
+               TeXObjectList list = (TeXObjectList)object;
+
+               if (list.isEmpty())
+               {
+                  doConversion = true;
+               }
+               else if (list.size() == 1)
+               {
+                  TeXObject firstElem = list.firstElement();
+
+                  if (firstElem instanceof ControlSequence)
+                  {
+                     cs = (ControlSequence)firstElem;
+                  }
+               }
+            }
+            else if (object instanceof ControlSequence)
+            {
+               cs = (ControlSequence)object;
+            }
+
+            if (cs != null && (cs.getName().equals("nopostdesc")
+               || cs.getName().equals("glsxtrnopostpunc")))
+            {
+               doConversion = true;
+            }
+
+            checkDesc = false;
+
+            if (doConversion)
+            {
+               data.setEntryType("index");
+               continue;
+            }
+         }
 
          if ((object instanceof Group) && !(object instanceof MathGroup))
          {
@@ -358,7 +404,7 @@ public class NewGlossaryEntry extends ControlSequence
 
          if (glosType != null)
          {
-            data.putField("type", String.format("{%s}", glosType));
+            data.setGlossaryType(glosType);
          }
       }
 
@@ -368,7 +414,7 @@ public class NewGlossaryEntry extends ControlSequence
 
          if (category != null)
          {
-            data.putField("category", String.format("{%s}", category));
+            data.setCategory(category);
          }
       }
 

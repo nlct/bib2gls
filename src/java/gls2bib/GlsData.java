@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2017-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,11 @@ public class GlsData
    public String getId()
    {
       return id;
+   }
+
+   public void setEntryType(String type)
+   {
+      this.type = type;
    }
 
    public void setGlossaryType(String glosType)

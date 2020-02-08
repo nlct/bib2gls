@@ -139,6 +139,11 @@ public class Gls2Bib extends LaTeXParserListener
       return this;
    }
 
+   public boolean isIndexConversionOn()
+   {
+      return noDescEntryToIndex;
+   }
+
    public boolean isCustomIgnoreField(String field)
    {
       if (customIgnoreFields == null)
@@ -1146,6 +1151,10 @@ public class Gls2Bib extends LaTeXParserListener
         "--no-preamble-only"));
       System.out.println(getMessage("gls2bib.syntax.space-sub",
         "--space-sub", "-s"));
+      System.out.println(getMessage("gls2bib.syntax.index-conversion",
+        "--index-conversion", "-i"));
+      System.out.println(getMessage("gls2bib.syntax.no-index-conversion",
+        "--no-index-conversion"));
       System.out.println(getMessage("gls2bib.syntax.locale",
         "--locale"));
       System.out.println(getMessage("gls2bib.syntax.silent",
@@ -1173,6 +1182,7 @@ public class Gls2Bib extends LaTeXParserListener
       splitOnCategory = false;
       overwriteFiles = true;
       preambleOnly = false;
+      noDescEntryToIndex=false;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -1280,6 +1290,14 @@ public class Gls2Bib extends LaTeXParserListener
          else if (args[i].equals("--no-overwrite"))
          {
             overwriteFiles = false;
+         }
+         else if (args[i].equals("--index-conversion") || args[i].equals("-i"))
+         {
+            noDescEntryToIndex = true;
+         }
+         else if (args[i].equals("--no-index-conversion"))
+         {
+            noDescEntryToIndex = false;
          }
          else if (args[i].equals("--ignore-fields") || args[i].equals("-f"))
          {
@@ -1479,8 +1497,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200207";
-   public static final String DATE = "2020-02-07";
+   public static final String VERSION = "1.9.20200208";
+   public static final String DATE = "2020-02-08";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
@@ -1500,6 +1518,7 @@ public class Gls2Bib extends LaTeXParserListener
    private boolean splitOnCategory=false;
    private boolean overwriteFiles=true;
    private boolean preambleOnly=false;
+   private boolean noDescEntryToIndex=false;
 
    private String[] customIgnoreFields;
 

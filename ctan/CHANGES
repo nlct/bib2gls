@@ -36,6 +36,8 @@ v2.0 (pending):
       --no-overwrite
       --preamble-only (-p)
       --no-preamble-only
+      --index-conversion (-i)
+      --no-index-conversion 
 
 v1.9 (2019-04-09):
 

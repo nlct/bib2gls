@@ -18039,6 +18039,18 @@ Only parse the document preamble.
 
 Parse the entire document (default).
 
+\convertglsbibarg{index-conversion}
+
+Use \atentry{index} instead of \atentry{entry} if the
+\field{description} is empty or simply \ics{nopostdesc} or
+\ics{glsxtrnopostpunc}. (Only applies to terms that would otherwise
+be converted to \atentry{entry}, such as those defined with
+\gls{newglossaryentry}.)
+
+\convertglsbibarg{no-index-conversion}
+
+Don't convert \atentry{entry} to \atentry{index} (default).
+
 \convertglsbibarg{locale}
 
 Identifies the \langxml\ to use for \idx{convertgls2bib}['s]
@@ -18105,6 +18117,10 @@ will be written as:
   \field{seealso} = \marg{goose}
 }
 \end{codeenv}
+Note that it won't convert \code{\field{see}=\marg{[see also]\meta{labels}}}.
+If you have used explicit text instead of \cs{seealsoname} then
+consider performing a global search and replace on your file using
+your text editor.
 
 Additionally, if \meta{\keyvallist} contains:
 \begin{codeenv}
