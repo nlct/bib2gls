@@ -1022,6 +1022,18 @@ public class Bib2GlsEntry extends BibEntry
                value.add(new BibUserString(list));
             }
 
+            if (resource.isAppendPrefixFieldEnabled(field))
+            {
+               TeXObject suffix = resource.getAppendPrefixFieldObject(list);
+
+               if (suffix != null)
+               {
+                  list.add(suffix);
+                  value.clear();
+                  value.add(new BibUserString(list));
+               }
+            }
+
             String encap = resource.getFieldEncap(field);
 
             if (encap != null)

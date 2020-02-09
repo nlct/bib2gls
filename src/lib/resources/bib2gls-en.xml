@@ -438,6 +438,7 @@ Value must be a list of size {2,number}</entry>
 <entry key="error.invalid.opt.keylist.pattern">Invalid pattern ''{1}'' in {0}='{'{1}'}' (within option ''{2}'')</entry>
 <entry key="error.missing.value">Missing value for: {0}</entry>
 <entry key="error.option.clash">Option clash: {0} and {1}</entry>
+<entry key="error.append.prefix.field">Invalid {0} found in {1} (value should be a sequence of characters only)</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}
 The size of the first list ({2,number}) is not the same as the size of 
 the second list ({3,number}).</entry>

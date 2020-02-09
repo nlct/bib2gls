@@ -36,6 +36,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.generic.Nbsp;
+import com.dickimawbooks.texparserlib.generic.SpaceCs;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.MissingValue;
 import com.dickimawbooks.texparserlib.latex.CsvList;
@@ -550,6 +551,54 @@ public class GlsResource
 
                   encapFieldsIncLabel.put(field, val);
                }
+            }
+         }
+         else if (opt.equals("append-prefix-field"))
+         {
+            String val = getChoice(parser, list, opt, PREFIX_FIELD_OPTIONS);
+
+            appendPrefixField = -1;
+
+            for (int i = 0; i < PREFIX_FIELD_OPTIONS.length; i++)
+            {
+               if (val.equals(PREFIX_FIELD_OPTIONS[i]))
+               {
+                  appendPrefixField = i;
+                  break;
+               }
+            }
+         }
+         else if (opt.equals("append-prefix-field-exceptions"))
+         {
+            TeXObject obj = getRequiredObject(parser, list, opt);
+
+            prefixFieldExceptions = new Vector<Integer>();
+
+            if (obj instanceof CharObject)
+            {
+               prefixFieldExceptions.add(((CharObject)obj).getCharCode());
+            }
+            else if (obj instanceof TeXObjectList)
+            {
+               for (TeXObject o : (TeXObjectList)obj)
+               {
+                  if (o instanceof CharObject)
+                  {
+                     prefixFieldExceptions.add(((CharObject)o).getCharCode());
+                  }
+                  else if (!(o instanceof WhiteSpace || o instanceof Ignoreable))
+                  {
+                     throw new IllegalArgumentException(
+                        bib2gls.getMessage("error.append.prefix.field", 
+                         o.toString(parser), opt));
+                  }
+               }
+            }
+            else if (!(obj instanceof WhiteSpace || obj instanceof Ignoreable))
+            {
+               throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.append.prefix.field", 
+                       obj.toString(parser), opt));
             }
          }
          else if (opt.equals("dual-short-plural-suffix"))
@@ -2425,6 +2474,16 @@ public class GlsResource
             throw new IllegalArgumentException(
              bib2gls.getMessage("error.syntax.unknown_option", opt));
          }
+      }
+
+      if (prefixFieldExceptions == null)
+      {
+         prefixFieldExceptions = new Vector<Integer>();
+         prefixFieldExceptions.add(0x27);
+         prefixFieldExceptions.add(0x2D);
+         prefixFieldExceptions.add(0x2010);
+         prefixFieldExceptions.add(0x2011);
+         prefixFieldExceptions.add(0x2019);
       }
 
       if (csLabelPrefix == null)
@@ -10828,6 +10887,85 @@ public class GlsResource
       return csname;
    }
 
+   public boolean isAppendPrefixFieldEnabled(String field)
+   {
+      if (appendPrefixField == PREFIX_FIELD_NONE)
+      {
+         return false;
+      }
+
+      if (field.equals("prefix") || field.equals("prefixplural")
+        || field.equals("prefixfirst") || field.equals("prefixfirstplural"))
+      {
+         return true;
+      }
+
+      return false;
+   }
+
+   public TeXObject getAppendPrefixFieldObject(TeXObjectList list)
+   {
+      if (appendPrefixField == PREFIX_FIELD_NONE)
+      {
+         return null;
+      }
+
+      TeXObject obj = null;
+      int endIdx = list.size()-1;
+
+      for (; endIdx >= 0; endIdx--)
+      {
+         obj = list.get(endIdx);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            break;
+         }
+      }
+
+      if (obj == null || !(obj instanceof CharObject))
+      {
+         return null;
+      }
+
+      if (!(obj instanceof CharObject))
+      {
+         return new SpaceCs();
+      }
+
+      int codePoint = ((CharObject)obj).getCharCode();
+
+      for (Integer num : prefixFieldExceptions)
+      {
+         if (num.intValue() == codePoint)
+         {
+            return null;
+         }
+      }
+
+      if (appendPrefixField == PREFIX_FIELD_APPEND_SPACE)
+      {
+         return new SpaceCs();
+      }
+
+      for (int i = 0; i <= endIdx; i++)
+      {
+         obj = list.get(i);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            if (endIdx == i)
+            {
+               return new Nbsp();
+            }
+
+            return new SpaceCs();
+         }
+      }
+
+      return new SpaceCs();
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -11144,6 +11282,17 @@ public class GlsResource
    public static final byte CONTRIBUTOR_ORDER_FORENAMES=2;
 
    private byte contributorOrder=CONTRIBUTOR_ORDER_VON;
+
+   public static final int PREFIX_FIELD_NONE=0;
+   public static final int PREFIX_FIELD_APPEND_SPACE=1;
+   public static final int PREFIX_FIELD_APPEND_SPACE_OR_NBSP=2;
+
+   private int appendPrefixField = PREFIX_FIELD_NONE;
+
+   private static final String[] PREFIX_FIELD_OPTIONS = new String[]
+    {"none", "space", "space or nbsp"};
+
+   private Vector<Integer> prefixFieldExceptions = null;
 
    private Vector<String> dependencies;
 

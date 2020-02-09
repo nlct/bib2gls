@@ -9934,6 +9934,50 @@ same field is listed in both settings, its value will end up as:
 \cmd{\meta{cs-name-2arg}}\marg{\cmd{\meta{cs-name-1arg}}\margm{value}}\margm{label}
 \end{codeenv}
 
+\optsection[\subsubsection]{append-prefix-field}
+
+If you use the \sty{glossaries-prefix} package, the \field{prefix}
+set of fields become available. The default behaviour of \ics{pgls} is for no
+separator between the prefix and the text produced with \cs{gls}.
+This is because there are situations where there shouldn't be a
+space, although a space is more commonly required.
+
+This means that a space needs to be appended to the required prefix
+fields, but an actual space character can't be used because
+\sty{xkeyval} trims leading and trailing spaces. The \ics{space}
+command needs to be used instead, but there are also situations
+where an non-breakable space should be used. It's a bit tiresome
+having to remember to put \ics{space} or \idx{nbspchar} at the end
+of the prefix value. This option allows the automatic insertion of a
+space.
+
+Allowed values are:
+\begin{itemize}
+\item \optfmt{none}: don't append a space to the prefix fields (default);
+
+\item \optfmt{space}: append a space to the prefix field unless an
+exception applies (see below);
+
+\item \optfmt{space or nbsp}: append \cs{space} or \idx{nbspchar} to the prefix field unless an
+exception applies (see below). The non-breakable space is used if
+the field value consists of a single character.
+
+\end{itemize}
+
+The exceptions are when the field value ends with a character
+identified by \csopt{append-prefix-field-exceptions}.
+
+\optsection[\subsubsection]{append-prefix-field-exceptions}
+
+The value should be a sequence of characters. Spaces are stripped
+from \meta{sequence} so \csopt[ ' - ]{append-prefix-field-exceptions}
+is equivalent to \csopt['-]{append-prefix-field-exceptions}.
+
+The default set is the straight apostrophe character (\hex{0027}),
+the hyphen-minus character (\hex{002D}), the hyphen character
+(\hex{2010}), the non-breaking hyphen (\hex{2011}), and the right
+single quotation mark (\hex{2019}).
+
 \optsection[\subsubsection]{interpret-fields}
 
 This option indicates that the listed fields should be replaced by
