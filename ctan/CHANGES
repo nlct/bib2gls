@@ -11,6 +11,7 @@ v2.0 (pending):
      prefix-fields
      append-prefix-field
      append-prefix-field-exceptions
+     append-prefix-field-cs-exceptions
      append-prefix-field-nbsp-match
 
   * New values for 'identical-sort-action' option: 'def' and 'use'

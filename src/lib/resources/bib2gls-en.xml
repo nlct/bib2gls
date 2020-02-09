@@ -251,6 +251,7 @@ See the manual for further details.</entry>
 <entry key="message.cross-resource.notallowed">Cross-resource references can''t be supported for resource set {0}.</entry>
 <entry key="message.checking.read">Checking read access for {0}</entry>
 <entry key="message.checking.write">Checking write access for {0}</entry>
+<entry key="message.parsing.fields">Parsing fields for entry ''{0}''</entry>
 <entry key="message.setting.sort">Initialising collation keys (strength={0}, decomposition={1})</entry>
 <entry key="message.non_unique_sort">Sort value ''{0}'' (entry ''{1}'') not unique for the entry''s hierarchical level.</entry>
 <entry key="message.sort_suffix">Appending suffix ''{0}'' to the sort value ''{1}'' for entry ''{2}''.</entry>
@@ -301,7 +302,8 @@ Defaulting to: {0}.
 <entry key="message.spawning">Spawning ''{0}'' (from ''{1}'')</entry>
 <entry key="message.append.prefix.space">Append space for prefix field ''{0}''</entry>
 <entry key="message.append.prefix.nospace">Not appending space for prefix field ''{0}'' (ends with exception character code {1})</entry>
-<entry key="message.append.prefix.no.end.char">Appending space for prefix field ''{0}'' (''{1}'' doesn''t end with a character)</entry>
+<entry key="message.append.prefix.cs.nospace">Not appending space for prefix field ''{0}'' (ends with exception control sequence \{1})</entry>
+<entry key="message.append.prefix.no.excp">Appending space for prefix field ''{0}'' (''{1}'' doesn''t fit exception rules)</entry>
 <entry key="message.append.prefix.nbsp.match">Append nbsp for prefix field ''{0}'': matched ''{1}'' in ''{2}'' (pattern ''{3}'')</entry>
 
 <entry key="tag.page">Page</entry>
@@ -444,6 +446,7 @@ Value must be a list of size {2,number}</entry>
 <entry key="error.missing.value">Missing value for: {0}</entry>
 <entry key="error.option.clash">Option clash: {0} and {1}</entry>
 <entry key="error.append.prefix.field">Invalid {0} found in {1} (value should be a sequence of characters only)</entry>
+<entry key="error.append.prefix.field.cs">Invalid {0} found in {1} (value should be a sequence of commands only)</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}
 The size of the first list ({2,number}) is not the same as the size of 
 the second list ({3,number}).</entry>

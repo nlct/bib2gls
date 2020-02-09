@@ -740,6 +740,11 @@ public class Bib2GlsEntry extends BibEntry
    {
       if (fieldsParsed) return;
 
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logMessage(bib2gls.getMessage("message.parsing.fields", getId()));
+      }
+
       fieldsParsed = true;
 
       if (resource.hasFieldAliases())

@@ -578,18 +578,70 @@ public class GlsResource
             {
                prefixFieldExceptions.add(((CharObject)obj).getCharCode());
             }
+            else if (obj instanceof ActiveChar)
+            {
+               prefixFieldExceptions.add(((ActiveChar)obj).getCharCode());
+            }
             else if (obj instanceof TeXObjectList)
             {
-               for (TeXObject o : (TeXObjectList)obj)
+               while (((TeXObjectList)obj).size() > 0)
                {
+                  TeXObject o = ((TeXObjectList)obj).pop();
+
                   if (o instanceof CharObject)
                   {
                      prefixFieldExceptions.add(((CharObject)o).getCharCode());
+                  }
+                  else if (o instanceof ActiveChar)
+                  {
+                     prefixFieldExceptions.add(((ActiveChar)o).getCharCode());
+                  }
+                  else if (o instanceof ControlSequence && 
+                     ((ControlSequence)o).getName().equals("u"))
+                  {
+                     TeXNumber num = ((TeXObjectList)obj).popNumber(parser, 16);
+
+                     prefixFieldExceptions.add(num.getValue());
                   }
                   else if (!(o instanceof WhiteSpace || o instanceof Ignoreable))
                   {
                      throw new IllegalArgumentException(
                         bib2gls.getMessage("error.append.prefix.field", 
+                         o.toString(parser), opt));
+                  }
+               }
+            }
+            else if (!(obj instanceof WhiteSpace || obj instanceof Ignoreable))
+            {
+               throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.append.prefix.field", 
+                       obj.toString(parser), opt));
+            }
+         }
+         else if (opt.equals("append-prefix-field-cs-exceptions"))
+         {
+            TeXObject obj = getRequiredObject(parser, list, opt);
+
+            prefixFieldCsExceptions = new Vector<String>();
+
+            if (obj instanceof ControlSequence)
+            {
+               prefixFieldCsExceptions.add(((ControlSequence)obj).getName());
+            }
+            else if (obj instanceof TeXObjectList)
+            {
+               while (((TeXObjectList)obj).size() > 0)
+               {
+                  TeXObject o = ((TeXObjectList)obj).pop();
+
+                  if (o instanceof ControlSequence)
+                  {
+                     prefixFieldCsExceptions.add(((ControlSequence)o).getName());
+                  }
+                  else if (!(o instanceof WhiteSpace || o instanceof Ignoreable))
+                  {
+                     throw new IllegalArgumentException(
+                        bib2gls.getMessage("error.append.prefix.field.cs", 
                          o.toString(parser), opt));
                   }
                }
@@ -2499,9 +2551,42 @@ public class GlsResource
          prefixFieldExceptions = new Vector<Integer>();
          prefixFieldExceptions.add(0x27);
          prefixFieldExceptions.add(0x2D);
+         prefixFieldExceptions.add(0x7E);
          prefixFieldExceptions.add(0x2010);
          prefixFieldExceptions.add(0x2011);
          prefixFieldExceptions.add(0x2019);
+      }
+
+      if (prefixFieldCsExceptions == null)
+      {
+         prefixFieldCsExceptions = new Vector<String>();
+         prefixFieldCsExceptions.add("space");
+         prefixFieldCsExceptions.add("nobreakspace");
+         prefixFieldCsExceptions.add(" ");
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logMessageNoLn("append-prefix-field-exceptions:");
+
+         for (Integer num : prefixFieldExceptions)
+         {
+            int cp = num.intValue();
+
+            bib2gls.logMessageNoLn(String.format(" %s (0x%X)", 
+              new String(Character.toChars(cp)), cp));
+         }
+
+         bib2gls.logMessage();
+
+         bib2gls.logMessageNoLn("append-prefix-field-cs-exceptions:");
+
+         for (String csname : prefixFieldCsExceptions)
+         {
+            bib2gls.logMessageNoLn(String.format(" \\%s", csname));
+         }
+
+         bib2gls.logMessage(".");
       }
 
       if (csLabelPrefix == null)
@@ -10986,18 +11071,42 @@ public class GlsResource
          return null;
       }
 
-      if (!(obj instanceof CharObject))
+      if (obj instanceof ControlSequence && prefixFieldCsExceptions != null)
+      {
+         String csName = ((ControlSequence)obj).getName();
+
+         if (prefixFieldCsExceptions.contains(csName))
+         {
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.debugMessage("message.append.prefix.cs.nospace", field,
+                  csName);
+            }
+
+            return null;
+         }
+      }
+
+      int codePoint;
+
+      if (obj instanceof CharObject)
+      {
+         codePoint = ((CharObject)obj).getCharCode();
+      }
+      else if (obj instanceof ActiveChar)
+      {
+         codePoint = ((ActiveChar)obj).getCharCode();
+      }
+      else
       {
          if (bib2gls.getDebugLevel() > 0)
          {
-            bib2gls.debugMessage("message.append.prefix.no.end.char", field,
+            bib2gls.debugMessage("message.append.prefix.no.excp", field,
                obj.toString(parser));
          }
 
          return new SpaceCs();
       }
-
-      int codePoint = ((CharObject)obj).getCharCode();
 
       for (Integer num : prefixFieldExceptions)
       {
@@ -11402,6 +11511,8 @@ public class GlsResource
     {"none", "space", "space or nbsp"};
 
    private Vector<Integer> prefixFieldExceptions = null;
+
+   private Vector<String> prefixFieldCsExceptions = null;
 
    private String[] prefixFields = new String[] 
      {

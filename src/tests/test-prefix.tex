@@ -8,6 +8,7 @@
 \usepackage[record,prefix,nostyles,stylemods={bookindex},style=bookindex]{glossaries-extra}
 
 \GlsXtrLoadResources[src=test-prefix,
+  %append-prefix-field-exceptions={ ' \glshex2019 },
   %append-prefix-field-nbsp-match={..?},
   %append-prefix-field={none},
   %append-prefix-field={space},
@@ -32,6 +33,9 @@
 
 \Pglspl{chat} étaient assis dans \pglspl{maison}, \pglspl{oeil}
 fermés pendant \pglspl{heure}.
+
+Test exceptions:
+\Pgls{apple}, \pgls{pear}, \pgls{banana} and \pgls{pineapple}.
 
 \printunsrtglossaries
 \end{document}

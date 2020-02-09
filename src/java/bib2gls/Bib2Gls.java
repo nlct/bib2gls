@@ -2912,6 +2912,18 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void logMessageNoLn(String message)
+   {
+      if (logWriter != null)
+      {
+         logWriter.print(message);
+      }
+      else if (pendingWriter != null)
+      {
+         pendingWriter.print(message);
+      }
+   }
+
    public void logMessage(String message)
    {
       if (logWriter != null)
