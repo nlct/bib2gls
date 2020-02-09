@@ -300,10 +300,10 @@ Defaulting to: {0}.
 <entry key="message.created.missing.parent">Created missing parent ''{0}'' for entry ''{1}''</entry>
 <entry key="message.found_entry_in_resource">Found entry ''{0}'' in resource set: {1}</entry>
 <entry key="message.spawning">Spawning ''{0}'' (from ''{1}'')</entry>
-<entry key="message.append.prefix.space">Append space for prefix field ''{0}''</entry>
-<entry key="message.append.prefix.nospace">Not appending space for prefix field ''{0}'' (ends with exception character code {1})</entry>
-<entry key="message.append.prefix.cs.nospace">Not appending space for prefix field ''{0}'' (ends with exception control sequence \{1})</entry>
-<entry key="message.append.prefix.no.excp">Appending space for prefix field ''{0}'' (''{1}'' doesn''t fit exception rules)</entry>
+<entry key="message.append.prefix.space">Appending {0} for prefix field ''{1}''</entry>
+<entry key="message.append.prefix.nospace">Not appending anything for prefix field ''{0}'' (ends with exception character code {1})</entry>
+<entry key="message.append.prefix.cs.nospace">Not appending anything for prefix field ''{0}'' (ends with exception control sequence \{1})</entry>
+<entry key="message.append.prefix.no.excp">Appending {0} for prefix field ''{1}'' (''{2}'' doesn''t fit exception rules)</entry>
 <entry key="message.append.prefix.nbsp.match">Append nbsp for prefix field ''{0}'': matched ''{1}'' in ''{2}'' (pattern ''{3}'')</entry>
 
 <entry key="tag.page">Page</entry>
@@ -447,6 +447,7 @@ Value must be a list of size {2,number}</entry>
 <entry key="error.option.clash">Option clash: {0} and {1}</entry>
 <entry key="error.append.prefix.field">Invalid {0} found in {1} (value should be a sequence of characters only)</entry>
 <entry key="error.append.prefix.field.cs">Invalid {0} found in {1} (value should be a sequence of commands only)</entry>
+<entry key="error.append.prefix.field.spacecs">Invalid value ''{0}'' for option {1} (value should be a single command)</entry>
 <entry key="error.invalid.dual.map">Invalid mapping: {0}={1}
 The size of the first list ({2,number}) is not the same as the size of 
 the second list ({3,number}).</entry>

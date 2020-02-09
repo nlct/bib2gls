@@ -10,6 +10,7 @@ v2.0 (pending):
      interpret-fields-action
      prefix-fields
      append-prefix-field
+     append-prefix-field-cs
      append-prefix-field-exceptions
      append-prefix-field-cs-exceptions
      append-prefix-field-nbsp-match

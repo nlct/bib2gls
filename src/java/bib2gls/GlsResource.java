@@ -36,7 +36,6 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.generic.Nbsp;
-import com.dickimawbooks.texparserlib.generic.SpaceCs;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.MissingValue;
 import com.dickimawbooks.texparserlib.latex.CsvList;
@@ -566,6 +565,52 @@ public class GlsResource
                   appendPrefixField = i;
                   break;
                }
+            }
+         }
+         else if (opt.equals("append-prefix-field-cs"))
+         {
+            TeXObject obj = getRequiredObject(parser, list, opt);
+
+            if (obj instanceof ControlSequence)
+            {
+               prefixControlSequence = (ControlSequence)obj;
+            }
+            else if (obj instanceof TeXObjectList)
+            {
+               TeXObject o = ((TeXObjectList)obj).popStack(parser,
+                  TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+               if (o == null)
+               {
+                  throw new IllegalArgumentException(
+                        bib2gls.getMessage("error.append.prefix.field.spacecs", 
+                         "", opt));
+               }
+
+               if (!(o instanceof ControlSequence))
+               {
+                  throw new IllegalArgumentException(
+                        bib2gls.getMessage("error.append.prefix.field.spacecs", 
+                         o.toString(parser), opt));
+               }
+
+               prefixControlSequence = (ControlSequence)o;
+
+               o = ((TeXObjectList)obj).peekStack(
+                  TeXObjectList.POP_IGNORE_LEADING_SPACE);
+
+               if (o != null)
+               {
+                  throw new IllegalArgumentException(
+                        bib2gls.getMessage("error.append.prefix.field.spacecs", 
+                         o.toString(parser), opt));
+               }
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                     bib2gls.getMessage("error.append.prefix.field.spacecs", 
+                      obj.toString(parser), opt));
             }
          }
          else if (opt.equals("append-prefix-field-exceptions"))
@@ -11079,8 +11124,8 @@ public class GlsResource
          {
             if (bib2gls.getDebugLevel() > 0)
             {
-               bib2gls.debugMessage("message.append.prefix.cs.nospace", field,
-                  csName);
+               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.cs.nospace",
+                  field, csName));
             }
 
             return null;
@@ -11101,11 +11146,12 @@ public class GlsResource
       {
          if (bib2gls.getDebugLevel() > 0)
          {
-            bib2gls.debugMessage("message.append.prefix.no.excp", field,
-               obj.toString(parser));
+            bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp",
+               prefixControlSequence.toString(parser), field,
+               obj.toString(parser)));
          }
 
-         return new SpaceCs();
+         return prefixControlSequence;
       }
 
       for (Integer num : prefixFieldExceptions)
@@ -11114,8 +11160,8 @@ public class GlsResource
          {
             if (bib2gls.getDebugLevel() > 0)
             {
-               bib2gls.debugMessage("message.append.prefix.nospace", 
-                 field, String.format("0x%X", codePoint));
+               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.nospace", 
+                 field, String.format("0x%X", codePoint)));
             }
 
             return null;
@@ -11127,10 +11173,11 @@ public class GlsResource
       {
          if (bib2gls.getDebugLevel() > 0)
          {
-            bib2gls.debugMessage("message.append.prefix.space", field);
+            bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space", 
+              prefixControlSequence.toString(parser), field));
          }
 
-         return new SpaceCs();
+         return prefixControlSequence;
       }
 
       for (int i = 0; i <= endIdx; i++)
@@ -11147,8 +11194,9 @@ public class GlsResource
             {
                if (bib2gls.getDebugLevel() > 0)
                {
-                  bib2gls.debugMessage("message.append.prefix.nbsp.match",
-                    field, subStr, list.toString(parser), prefixFieldNbspPattern);
+                  bib2gls.logMessage(bib2gls.getMessage(
+                    "message.append.prefix.nbsp.match",
+                    field, subStr, list.toString(parser), prefixFieldNbspPattern));
                }
 
                return new Nbsp();
@@ -11156,20 +11204,21 @@ public class GlsResource
 
             if (bib2gls.getDebugLevel() > 0)
             {
-               bib2gls.debugMessage("message.append.prefix.space", field);
+               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space",
+                  prefixControlSequence.toString(parser), field));
             }
 
-            return new SpaceCs();
+            return prefixControlSequence;
          }
       }
 
       if (bib2gls.getDebugLevel() > 0)
       {
-         bib2gls.debugMessage("message.append.prefix.no.end.char", field,
-            obj.toString(parser));
+         bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp", field,
+            obj.toString(parser)));
       }
 
-      return null;
+      return prefixControlSequence;
    }
 
    private void addPrefixMaps(HashMap<String,String> map)
@@ -11527,6 +11576,8 @@ public class GlsResource
     };
 
    private Pattern prefixFieldNbspPattern = Pattern.compile(".");
+
+   private ControlSequence prefixControlSequence = new TeXCsRef("space");
 
    private Vector<String> dependencies;
 
