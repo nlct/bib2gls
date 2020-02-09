@@ -601,6 +601,24 @@ public class GlsResource
                        obj.toString(parser), opt));
             }
          }
+         else if (opt.equals("prefix-fields"))
+         {
+            prefixFields = getStringArray(parser, list, opt);
+         }
+         else if (opt.equals("append-prefix-field-nbsp-match"))
+         {
+            String val = getRequired(parser, list, opt);
+
+            try
+            {
+               prefixFieldNbspPattern = Pattern.compile(val);
+            }
+            catch (PatternSyntaxException e)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.pattern", val, opt), e);
+            }
+         }
          else if (opt.equals("dual-short-plural-suffix"))
          {
             dualShortPluralSuffix = getOptional(parser, "", list, opt);
@@ -2699,6 +2717,8 @@ public class GlsResource
                tertiaryPrefix == null ? "" : tertiaryPrefix)));
       }
 
+      boolean addDualPrefixes = bib2gls.isKnownField("prefix");
+
       if (dualEntryMap == null)
       {
          dualEntryMap = new HashMap<String,String>();
@@ -2706,6 +2726,11 @@ public class GlsResource
          dualEntryMap.put("plural", "descriptionplural");
          dualEntryMap.put("description", "name");
          dualEntryMap.put("descriptionplural", "plural");
+
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualEntryMap);
+         }
 
          dualEntryFirstMap = "name";
       }
@@ -2722,6 +2747,11 @@ public class GlsResource
          dualAbbrevMap.put("duallong", "long");
          dualAbbrevMap.put("duallongplural", "longplural");
 
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualAbbrevMap);
+         }
+
          dualAbbrevFirstMap = "short";
       }
 
@@ -2731,6 +2761,11 @@ public class GlsResource
          dualAbbrevEntryMap.put("long", "name");
          dualAbbrevEntryMap.put("longplural", "plural");
          dualAbbrevEntryMap.put("short", "text");
+
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualAbbrevEntryMap);
+         }
 
          dualAbbrevEntryFirstMap = "long";
       }
@@ -2743,6 +2778,11 @@ public class GlsResource
          dualSymbolMap.put("symbol", "name");
          dualSymbolMap.put("symbolplural", "plural");
 
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualSymbolMap);
+         }
+
          dualSymbolFirstMap = "name";
       }
 
@@ -2750,6 +2790,11 @@ public class GlsResource
       {
          dualIndexEntryMap = new HashMap<String,String>();
          dualIndexEntryMap.put("name", "name");
+
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualIndexEntryMap);
+         }
 
          dualIndexEntryFirstMap = "name";
       }
@@ -2762,6 +2807,11 @@ public class GlsResource
          dualIndexSymbolMap.put("symbolplural", "plural");
          dualIndexSymbolMap.put("plural", "symbolplural");
 
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualIndexSymbolMap);
+         }
+
          dualIndexSymbolFirstMap = "symbol";
       }
 
@@ -2769,6 +2819,11 @@ public class GlsResource
       {
          dualIndexAbbrevMap = new HashMap<String,String>();
          dualIndexAbbrevMap.put("name", "name");
+
+         if (addDualPrefixes)
+         {// add maps for prefix fields
+            addPrefixMaps(dualIndexAbbrevMap);
+         }
 
          dualIndexAbbrevFirstMap = "name";
       }
@@ -10889,23 +10944,26 @@ public class GlsResource
 
    public boolean isAppendPrefixFieldEnabled(String field)
    {
-      if (appendPrefixField == PREFIX_FIELD_NONE)
+      if (appendPrefixField == PREFIX_FIELD_NONE || prefixFields == null)
       {
          return false;
       }
 
-      if (field.equals("prefix") || field.equals("prefixplural")
-        || field.equals("prefixfirst") || field.equals("prefixfirstplural"))
+      for (String f : prefixFields)
       {
-         return true;
+         if (f.equals(field))
+         {
+            return true;
+         }
       }
 
       return false;
    }
 
-   public TeXObject getAppendPrefixFieldObject(TeXObjectList list)
+   public TeXObject getAppendPrefixFieldObject(TeXParser parser,
+     String field, TeXObjectList list)
    {
-      if (appendPrefixField == PREFIX_FIELD_NONE)
+      if (!isAppendPrefixFieldEnabled(field))
       {
          return null;
       }
@@ -10923,13 +10981,19 @@ public class GlsResource
          }
       }
 
-      if (obj == null || !(obj instanceof CharObject))
+      if (obj == null)
       {
          return null;
       }
 
       if (!(obj instanceof CharObject))
       {
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.debugMessage("message.append.prefix.no.end.char", field,
+               obj.toString(parser));
+         }
+
          return new SpaceCs();
       }
 
@@ -10939,12 +11003,24 @@ public class GlsResource
       {
          if (num.intValue() == codePoint)
          {
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.debugMessage("message.append.prefix.nospace", 
+                 field, String.format("0x%X", codePoint));
+            }
+
             return null;
          }
       }
 
-      if (appendPrefixField == PREFIX_FIELD_APPEND_SPACE)
+      if (appendPrefixField == PREFIX_FIELD_APPEND_SPACE
+            || prefixFieldNbspPattern == null)
       {
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.debugMessage("message.append.prefix.space", field);
+         }
+
          return new SpaceCs();
       }
 
@@ -10954,16 +11030,49 @@ public class GlsResource
 
          if (!(obj instanceof Ignoreable))
          {
-            if (endIdx == i)
+            String subStr = list.substring(parser, i, endIdx+1);
+
+            Matcher m = prefixFieldNbspPattern.matcher(subStr);
+
+            if (m.matches())
             {
+               if (bib2gls.getDebugLevel() > 0)
+               {
+                  bib2gls.debugMessage("message.append.prefix.nbsp.match",
+                    field, subStr, list.toString(parser), prefixFieldNbspPattern);
+               }
+
                return new Nbsp();
+            }
+
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.debugMessage("message.append.prefix.space", field);
             }
 
             return new SpaceCs();
          }
       }
 
-      return new SpaceCs();
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.debugMessage("message.append.prefix.no.end.char", field,
+            obj.toString(parser));
+      }
+
+      return null;
+   }
+
+   private void addPrefixMaps(HashMap<String,String> map)
+   {
+      map.put("prefix", "dualprefix");
+      map.put("dualprefix", "prefix");
+      map.put("prefixplural", "dualprefixplural");
+      map.put("dualprefixplural", "prefixplural");
+      map.put("prefixfirst", "dualprefixfirst");
+      map.put("dualprefixfirst", "prefixfirst");
+      map.put("prefixfirstplural", "dualprefixfirstplural");
+      map.put("dualprefixfirstplural", "prefixfirstplural");
    }
 
    private File texFile;
@@ -11293,6 +11402,20 @@ public class GlsResource
     {"none", "space", "space or nbsp"};
 
    private Vector<Integer> prefixFieldExceptions = null;
+
+   private String[] prefixFields = new String[] 
+     {
+       "prefix",
+       "prefixplural",
+       "prefixfirst",
+       "prefixfirstplural",
+       "dualprefix",
+       "dualprefixplural",
+       "dualprefixfirst",
+       "dualprefixfirstplural"
+    };
+
+   private Pattern prefixFieldNbspPattern = Pattern.compile(".");
 
    private Vector<String> dependencies;
 

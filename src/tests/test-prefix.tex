@@ -1,0 +1,37 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[record,prefix,nostyles,stylemods={bookindex},style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[src=test-prefix,
+  %append-prefix-field-nbsp-match={..?},
+  %append-prefix-field={none},
+  %append-prefix-field={space},
+  append-prefix-field={space or nbsp}]
+
+\newcommand{\PrefixName}[1]{%
+ \glsxtrifhasfield{prefix}{\glscurrententrylabel}%
+ {\glscurrentfieldvalue}{}%
+ #1%
+}
+
+\glssetcategoryattribute{index}{glossnamefont}{PrefixName}
+
+\begin{document}
+% not very grammatical, but this isn't a grammar test
+
+\Pgls{cat} sat in \pgls{house} with \pgls{eye} closed for \pgls{hour}.
+
+\Pgls{chat} était assis dans \pgls{maison}, \pgls{oeil} fermé pendant \pgls{heure}.
+
+\Pglspl{cat} sat in \pglspl{house} with \pglspl{eye} closed for \pglspl{hour}.
+
+\Pglspl{chat} étaient assis dans \pglspl{maison}, \pglspl{oeil}
+fermés pendant \pglspl{heure}.
+
+\printunsrtglossaries
+\end{document}

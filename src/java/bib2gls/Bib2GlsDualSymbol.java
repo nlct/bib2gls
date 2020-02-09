@@ -186,6 +186,8 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
 
       writer.println(String.format("}%%%n{%s}%%%n{%s}", name,
          description));
+
+      writeInternalFields(writer);
    }
 
 }

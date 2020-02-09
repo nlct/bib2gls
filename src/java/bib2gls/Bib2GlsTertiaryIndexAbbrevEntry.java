@@ -190,6 +190,8 @@ public class Bib2GlsTertiaryIndexAbbrevEntry extends Bib2GlsDualIndexAbbrev
 
       writer.println(String.format("{%s}{%s}{%s}%n{%s}", 
         nameStr, shortStr, longStr, descStr));
+
+      writeInternalFields(writer);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

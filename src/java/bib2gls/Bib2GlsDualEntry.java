@@ -143,6 +143,23 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return new Bib2GlsDualEntry(bib2gls, getEntryType());
    }
 
+   protected Vector<String> processSpecialFields(TeXParser parser,
+     boolean mfirstucProtect, String[] protectFields, String idField,
+     Vector<String> interpretFields)
+    throws IOException
+   {
+      interpretFields = super.processSpecialFields(parser, mfirstucProtect,
+        protectFields, idField, interpretFields);
+
+      for (String field : Bib2Gls.DUAL_SPECIAL_FIELDS)
+      {    
+         interpretFields = processField(parser, field, mfirstucProtect,
+           protectFields, idField, interpretFields);
+      }
+
+      return interpretFields;
+   }
+
    public Bib2GlsEntry createDual()
    {
       GlsResource resource = getResource();
@@ -300,5 +317,23 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return entry;
    }
 
+   public void writeInternalFields(PrintWriter writer) throws IOException
+   {
+      for (String field : DUAL_PREFIX_FIELDS)
+      {
+         String val = getFieldValue(field);
+
+         if (val != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+              getId(), field, val);
+         }
+      }
+   }
+
    private boolean isprimary=true;
+
+   public static final String[] DUAL_PREFIX_FIELDS =
+    new String[] {"dualprefix", "dualprefixplural",
+     "dualprefixfirst", "dualprefixfirstplural"};
 }

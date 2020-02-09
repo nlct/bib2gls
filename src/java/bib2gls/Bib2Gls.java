@@ -2493,7 +2493,15 @@ public class Bib2Gls implements TeXApp
    // in certain contexts.
    public boolean isKnownSpecialField(String field)
    {
-      for (String spField : SPECIAL_FIELDS)
+      for (String spField : SPAWN_SPECIAL_FIELDS)
+      {
+         if (spField.equals(field))
+         {
+            return true;
+         }
+      }
+
+      for (String spField : DUAL_SPECIAL_FIELDS)
       {
          if (spField.equals(field))
          {
@@ -5135,8 +5143,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "1.9.20200208";
-   public static final String DATE = "2020-02-08";
+   public static final String VERSION = "1.9.20200209";
+   public static final String DATE = "2020-02-09";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5174,8 +5182,11 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsSeeRecord> seeRecords;
    private Vector<String> selectedEntries;
 
-   private static final String[] SPECIAL_FIELDS =
+   public static final String[] SPAWN_SPECIAL_FIELDS =
     new String[] {"progeny", "progenitor", "adoptparents"};
+
+   public static final String[] DUAL_SPECIAL_FIELDS =
+    new String[] {"dualprefix", "dualprefixplural", "dualprefixfirst", "dualprefixfirstplural"};
 
    private static final String[] NON_BIB_FIELDS =
     new String[] {"bibtexcontributor", "bibtexentry", "childcount",

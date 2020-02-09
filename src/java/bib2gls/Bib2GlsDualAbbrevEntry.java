@@ -190,6 +190,8 @@ public class Bib2GlsDualAbbrevEntry extends Bib2GlsDualEntry
 
       writer.println(String.format("}%%%n{%s}{%s}%%%n{%s}",
         shortStr, longStr, descStr));
+
+      writeInternalFields(writer);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

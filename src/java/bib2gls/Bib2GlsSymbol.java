@@ -160,6 +160,8 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
 
       writer.println(String.format("}%%%n{%s}%%%n{%s}", name,
          description));
+
+      writeInternalFields(writer);
    }
 
 }

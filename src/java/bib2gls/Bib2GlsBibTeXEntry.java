@@ -217,10 +217,10 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
       return contributorList;
    }
 
-   public void writeBibEntry(PrintWriter writer)
+   public void writeInternalFields(PrintWriter writer)
    throws IOException
    {
-      super.writeBibEntry(writer);
+      super.writeInternalFields(writer);
 
       for (Bib2GlsEntry contributor : contributorList)
       {

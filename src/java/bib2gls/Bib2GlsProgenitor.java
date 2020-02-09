@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -92,6 +92,23 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
       {
          putField("name", getOriginalId());
       }
+   }
+
+   protected Vector<String> processSpecialFields(TeXParser parser,
+     boolean mfirstucProtect, String[] protectFields, String idField,
+     Vector<String> interpretFields)
+    throws IOException
+   {
+      interpretFields = super.processSpecialFields(parser, mfirstucProtect,
+        protectFields, idField, interpretFields);
+
+      for (String field : Bib2Gls.SPAWN_SPECIAL_FIELDS)
+      {    
+         interpretFields = processField(parser, field, mfirstucProtect,
+           protectFields, idField, interpretFields);
+      }
+
+      return interpretFields;
    }
 
    public void populate(BibParser parserListener) throws IOException

@@ -141,6 +141,8 @@ public class Bib2GlsDualIndexEntry extends Bib2GlsDualEntry
       }
 
       writer.println(String.format("}%%%n{%s}%n{%s}", nameStr, descStr));
+
+      writeInternalFields(writer);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

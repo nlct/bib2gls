@@ -999,235 +999,12 @@ public class Bib2GlsEntry extends BibEntry
 
       for (String field : fields)
       {
-         BibValueList value = getField(field);
-
-         if (value != null && !field.equals(idField))
-         {
-            // expand any variables
-
-            TeXObjectList list = value.expand(parser);
-
-            if (value.size() > 1 
-               || !(value.firstElement() instanceof BibUserString))
-            {
-               BibUserString bibVal = new BibUserString(list);
-               value.clear();
-               value.add(bibVal);
-            }
-
-            if (resource.isBibTeXAuthorField(field))
-            {
-               list = convertBibTeXAuthorField(parser, field, value);
-               value.clear();
-               value.add(new BibUserString(list));
-            }
-
-            if (resource.isAppendPrefixFieldEnabled(field))
-            {
-               TeXObject suffix = resource.getAppendPrefixFieldObject(list);
-
-               if (suffix != null)
-               {
-                  list.add(suffix);
-                  value.clear();
-                  value.add(new BibUserString(list));
-               }
-            }
-
-            String encap = resource.getFieldEncap(field);
-
-            if (encap != null)
-            {
-               Group grp = parser.getListener().createGroup();
-               grp.addAll(list);
-               list.clear();
-               list.add(new TeXCsRef(encap));
-               list.add(grp);
-               value.clear();
-               value.add(new BibUserString(list));
-            }
-
-            encap = resource.getFieldEncapIncLabel(field);
-
-            if (encap != null)
-            {
-               Group grp = parser.getListener().createGroup();
-               grp.addAll(list);
-               list.clear();
-               list.add(new TeXCsRef(encap));
-               list.add(grp);
-               list.add(parser.getListener().createGroup(getId()));
-               value.clear();
-               value.add(new BibUserString(list));
-            }
-
-            if (resource.isInterpretField(field))
-            {
-               if (interpretFields == null)
-               {
-                  interpretFields = new Vector<String>();
-               }
-
-               interpretFields.add(field);
-            }
-
-            boolean isLabelifyList = resource.isLabelifyListField(field);
-
-            if (isLabelifyList || resource.isLabelifyField(field))
-            {
-               String strVal = bib2gls.convertToLabel(parser,
-                  value, resource, isLabelifyList);
-
-               list = parser.getListener().createString(strVal);
-
-               value.clear();
-               value.add(new BibUserString(list));
-
-               putField(field, strVal);
-            }
-
-            if (resource.isDependencyListField(field))
-            {
-               parseCustomDependencyList(parser, list, field);
-            }
-
-            if (field.equals("parent") || field.equals("category")
-               || field.equals("type") || field.equals("group")
-               || field.equals("seealso") || field.equals("alias"))
-            {
-               // fields that should only expand to a simple label
-               // (cross-referencing fields processed elsewhere)
-
-               String strVal = list.toString(parser);
-
-               if (resource.isInterpretLabelFieldsEnabled() 
-                    && strVal.matches("(?s).*[\\\\\\{\\}].*"))
-               {
-                  // no point checking for other special characters
-                  // as they won't expand to a simple alphanumeric string
-
-                  strVal = bib2gls.interpret(strVal, value, true);
-               }
-
-               if (field.equals("parent"))
-               {
-                  putField(field, processLabel(strVal));
-               }
-               else
-               {
-                  putField(field, strVal);
-               }
-            }
-            else if (bib2gls.isKnownField(field))
-            {
-               boolean protect = mfirstucProtect;
-
-               if (protect && protectFields != null)
-               {
-                  protect = false;
-
-                  for (String pf : protectFields)
-                  {
-                     if (pf.equals(field))
-                     {
-                        protect = true;
-                        break;
-                     }
-                  }
-               }
-
-               checkGlsCs(parser, list, protect, field);
-
-               if (field.equals("description"))
-               {
-                  if (resource.isStripTrailingNoPostOn())
-                  {
-                     int n = list.size();
-
-                     for (int i = n-1; i >= 0; i--)
-                     {
-                        TeXObject obj = list.get(i);
-
-                        if (obj instanceof Ignoreable)
-                        {
-                           list.remove(i);
-                        }
-                        else
-                        {
-                           if (obj instanceof ControlSequence)
-                           {
-                              String name = ((ControlSequence)obj).getName();
-
-                              if (name.equals("nopostdesc")
-                               || name.equals("glsxtrnopostpunc"))
-                              {
-                                 list.remove(i);
-                              }
-                           }
-
-                           break;
-                        }
-                     }
-                  }
-
-                  switch (resource.getPostDescDot())
-                  {
-                     case GlsResource.POST_DESC_DOT_ALL:
-                       list.add(parser.getListener().getOther('.'));
-                       break;
-                     case GlsResource.POST_DESC_DOT_CHECK:
-
-                       int n = list.size();
-
-                       for (int i = n-1; i >= 0; i--)
-                       {
-                          TeXObject obj = list.get(i);
-
-                          if (obj instanceof CharObject)
-                          {
-                             int codePoint = ((CharObject)obj).getCharCode();
-                             int charType = Character.getType(codePoint);
-
-                             if (charType != Character.END_PUNCTUATION
-                              && charType != Character.FINAL_QUOTE_PUNCTUATION)
-                             {
-                                if (charType != Character.OTHER_PUNCTUATION)
-                                {
-                                   list.add(parser.getListener().getOther('.'));
-                                }
-
-                                break;
-                             }
-                          }
-                          else if (obj instanceof ControlSequence
-                          && (((ControlSequence)obj).getName().equals("nopostdesc")
-                            || ((ControlSequence)obj).getName().equals("glsxtrnopostpunc")))
-                          {
-                             break;
-                          }
-                          else if (!(obj instanceof Ignoreable))
-                          {
-                             list.add(parser.getListener().getOther('.'));
-                             break;
-                          }
-                       }
-                  }
-               }
-
-               if (resource.isCheckEndPuncOn(field))
-               {
-                  CharObject endPunc = getEndPunc(list);
-
-                  if (endPunc != null)
-                  {
-                     putField(field+"endpunc", endPunc.toString(parser));
-                  }
-               }
-
-               putField(field, list.toString(parser));
-            }
-         }
+         interpretFields = processField(parser, field, mfirstucProtect,
+           protectFields, idField, interpretFields);
       }
+
+      interpretFields = processSpecialFields(parser, mfirstucProtect,
+           protectFields, idField, interpretFields);
 
       // the name can't have its case changed until it's been
       // checked and been assigned a fallback if not present.
@@ -1289,6 +1066,260 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
       }
+   }
+
+   protected Vector<String> processSpecialFields(TeXParser parser,
+     boolean mfirstucProtect, String[] protectFields, String idField,
+     Vector<String> interpretFields)
+    throws IOException
+   {
+       return interpretFields;
+   }
+
+   protected Vector<String> processField(TeXParser parser, String field,
+     boolean mfirstucProtect, String[] protectFields, String idField,
+     Vector<String> interpretFields)
+    throws IOException
+   {
+      BibValueList value = getField(field);
+
+      if (value == null || field.equals(idField))
+      {
+         return interpretFields;
+      }
+
+      // expand any variables
+
+      TeXObjectList list = value.expand(parser);
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.debug(String.format(">> %s={%s}", field, list.toString(parser)));
+      }
+
+      if (value.size() > 1 
+         || !(value.firstElement() instanceof BibUserString))
+      {
+         BibUserString bibVal = new BibUserString(list);
+         value.clear();
+         value.add(bibVal);
+      }
+
+      if (resource.isBibTeXAuthorField(field))
+      {
+         list = convertBibTeXAuthorField(parser, field, value);
+         value.clear();
+         value.add(new BibUserString(list));
+      }
+
+      TeXObject suffix = resource.getAppendPrefixFieldObject(parser, field, list);
+
+      if (suffix != null)
+      {
+         list.add(suffix);
+         value.clear();
+         value.add(new BibUserString(list));
+      }
+
+      String encap = resource.getFieldEncap(field);
+
+      if (encap != null)
+      {
+         Group grp = parser.getListener().createGroup();
+         grp.addAll(list);
+         list.clear();
+         list.add(new TeXCsRef(encap));
+         list.add(grp);
+         value.clear();
+         value.add(new BibUserString(list));
+      }
+
+      encap = resource.getFieldEncapIncLabel(field);
+
+      if (encap != null)
+      {
+         Group grp = parser.getListener().createGroup();
+         grp.addAll(list);
+         list.clear();
+         list.add(new TeXCsRef(encap));
+         list.add(grp);
+         list.add(parser.getListener().createGroup(getId()));
+         value.clear();
+         value.add(new BibUserString(list));
+      }
+
+      if (resource.isInterpretField(field))
+      {
+         if (interpretFields == null)
+         {
+            interpretFields = new Vector<String>();
+         }
+
+         interpretFields.add(field);
+      }
+
+      boolean isLabelifyList = resource.isLabelifyListField(field);
+
+      if (isLabelifyList || resource.isLabelifyField(field))
+      {
+         String strVal = bib2gls.convertToLabel(parser,
+            value, resource, isLabelifyList);
+
+         list = parser.getListener().createString(strVal);
+
+         value.clear();
+         value.add(new BibUserString(list));
+
+         putField(field, strVal);
+      }
+
+      if (resource.isDependencyListField(field))
+      {
+         parseCustomDependencyList(parser, list, field);
+      }
+
+      if (field.equals("parent") || field.equals("category")
+         || field.equals("type") || field.equals("group")
+         || field.equals("seealso") || field.equals("alias"))
+      {
+         // fields that should only expand to a simple label
+         // (cross-referencing fields processed elsewhere)
+
+         String strVal = list.toString(parser);
+
+         if (resource.isInterpretLabelFieldsEnabled() 
+              && strVal.matches("(?s).*[\\\\\\{\\}].*"))
+         {
+            // no point checking for other special characters
+            // as they won't expand to a simple alphanumeric string
+
+            strVal = bib2gls.interpret(strVal, value, true);
+         }
+
+         if (field.equals("parent"))
+         {
+            putField(field, processLabel(strVal));
+         }
+         else
+         {
+            putField(field, strVal);
+         }
+      }
+      else
+      {
+         boolean protect = mfirstucProtect;
+
+         if (protect && protectFields != null)
+         {
+            protect = false;
+
+            for (String pf : protectFields)
+            {
+               if (pf.equals(field))
+               {
+                  protect = true;
+                  break;
+               }
+            }
+         }
+
+         checkGlsCs(parser, list, protect, field);
+
+         if (field.equals("description"))
+         {
+            if (resource.isStripTrailingNoPostOn())
+            {
+               int n = list.size();
+
+               for (int i = n-1; i >= 0; i--)
+               {
+                  TeXObject obj = list.get(i);
+
+                  if (obj instanceof Ignoreable)
+                  {
+                     list.remove(i);
+                  }
+                  else
+                  {
+                     if (obj instanceof ControlSequence)
+                     {
+                        String name = ((ControlSequence)obj).getName();
+
+                        if (name.equals("nopostdesc")
+                         || name.equals("glsxtrnopostpunc"))
+                        {
+                           list.remove(i);
+                        }
+                     }
+
+                     break;
+                  }
+               }
+            }
+
+            switch (resource.getPostDescDot())
+            {
+               case GlsResource.POST_DESC_DOT_ALL:
+                 list.add(parser.getListener().getOther('.'));
+                 break;
+               case GlsResource.POST_DESC_DOT_CHECK:
+
+                 int n = list.size();
+
+                 for (int i = n-1; i >= 0; i--)
+                 {
+                    TeXObject obj = list.get(i);
+
+                    if (obj instanceof CharObject)
+                    {
+                       int codePoint = ((CharObject)obj).getCharCode();
+                       int charType = Character.getType(codePoint);
+
+                       if (charType != Character.END_PUNCTUATION
+                        && charType != Character.FINAL_QUOTE_PUNCTUATION)
+                       {
+                          if (charType != Character.OTHER_PUNCTUATION)
+                          {
+                             list.add(parser.getListener().getOther('.'));
+                          }
+
+                          break;
+                       }
+                    }
+                    else if (obj instanceof ControlSequence
+                    && (((ControlSequence)obj).getName().equals("nopostdesc")
+                      || ((ControlSequence)obj).getName().equals("glsxtrnopostpunc")))
+                    {
+                       break;
+                    }
+                    else if (!(obj instanceof Ignoreable))
+                    {
+                       list.add(parser.getListener().getOther('.'));
+                       break;
+                    }
+                 }
+            }
+         }
+
+         if (resource.isCheckEndPuncOn(field))
+         {
+            CharObject endPunc = getEndPunc(list);
+
+            if (endPunc != null)
+            {
+               putField(field+"endpunc", endPunc.toString(parser));
+            }
+         }
+
+         putField(field, list.toString(parser));
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.debug(String.format("=>> %s={%s}", field, getFieldValue(field)));
+      }
+
+      return interpretFields;
    }
 
    protected void appendShortPluralSuffix(TeXParser parser,
@@ -1844,6 +1875,38 @@ public class Bib2GlsEntry extends BibEntry
             return suffix == null ? value : value+suffix;
          }
       }
+      else if (field.equals("prefixfirst"))
+      {
+         String value = getFieldValue("prefix");
+
+         if (value != null) return value;
+
+         return getFallbackValue("prefix");
+      }
+      else if (field.equals("prefixfirstplural"))
+      {
+         String value = getFieldValue("prefixplural");
+
+         if (value != null) return value;
+
+         return getFallbackValue("prefixplural");
+      }
+      else if (field.equals("dualprefixfirst"))
+      {
+         String value = getFieldValue("dualprefix");
+
+         if (value != null) return value;
+
+         return getFallbackValue("dualprefix");
+      }
+      else if (field.equals("dualprefixfirstplural"))
+      {
+         String value = getFieldValue("dualprefixplural");
+
+         if (value != null) return value;
+
+         return getFallbackValue("dualprefixplural");
+      }
 
       return null;
    }
@@ -1924,6 +1987,30 @@ public class Bib2GlsEntry extends BibEntry
       else if (field.equals("dualshortplural"))
       {
          return plural(getField("dualshort"), "abbrvpluralsuffix");
+      }
+      else if (field.equals("prefixfirst"))
+      {
+         BibValueList contents = getField("prefix");
+
+         return contents == null ? getFallbackContents("prefix") : contents;
+      }
+      else if (field.equals("prefixfirstplural"))
+      {
+         BibValueList contents = getField("prefixplural");
+
+         return contents == null ? getFallbackContents("prefixplural") : contents;
+      }
+      else if (field.equals("dualprefixfirst"))
+      {
+         BibValueList contents = getField("dualprefix");
+
+         return contents == null ? getFallbackContents("dualprefix") : contents;
+      }
+      else if (field.equals("dualprefixfirstplural"))
+      {
+         BibValueList contents = getField("dualprefixplural");
+
+         return contents == null ? getFallbackContents("dualprefixplural") : contents;
       }
 
       return null;
@@ -2039,6 +2126,12 @@ public class Bib2GlsEntry extends BibEntry
       writer.println("}%");
       writer.println(String.format("{%s}%%", name));
       writer.println(String.format("{%s}", description));
+
+      writeInternalFields(writer);
+   }
+
+   public void writeInternalFields(PrintWriter writer) throws IOException
+   {
    }
 
    public void writeLocList(PrintWriter writer)

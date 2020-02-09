@@ -123,6 +123,8 @@ public class Bib2GlsIndex extends Bib2GlsEntry
       }
 
       writer.println("}");
+
+      writeInternalFields(writer);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

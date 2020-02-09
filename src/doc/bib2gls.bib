@@ -2350,6 +2350,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.prefix-fields,
+   name={\csoptfmt{prefix\dhyphen fields}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.append-prefix-field,
    name={\csoptfmt{append\dhyphen prefix\dhyphen field}},
    user1={\meta{value}},
@@ -2360,6 +2367,13 @@ field\dhyphen locale}},
 @resourceoption{opt.append-prefix-field-exceptions,
    name={\csoptfmt{append\dhyphen prefix\dhyphen field\dhyphen exceptions}},
    user1={\meta{sequence}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.append-prefix-field-nbsp-match,
+   name={\csoptfmt{append\dhyphen prefix\dhyphen field\dhyphen nbsp\dhyphen match}},
+   user1={\meta{pattern}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -8096,6 +8110,46 @@ field.},
     \field{plural} field.},
   note={\styfmt{glossaries-prefix}},
   category={prefixfield},
+  parent={fields}
+}
+
+@field{field.dualprefix,
+  name={\fieldfmt{dual\-prefix}},
+  description={The dual of the \field{prefix} field. This field
+   isn't provided with a key or associated command, but can be
+   accessed as an internal field},
+  note={\appfmt{bib2gls}},
+  category={bib2glsfield},
+  parent={fields}
+}
+
+@field{field.dualprefixplural,
+  name={\fieldfmt{dual\-prefix\-plural}},
+  description={The dual of the \field{prefixplural} field. This field
+   isn't provided with a key or associated command, but can be
+   accessed as an internal field},
+  note={\appfmt{bib2gls}},
+  category={bib2glsfield},
+  parent={fields}
+}
+
+@field{field.dualprefixfirst,
+  name={\fieldfmt{dual\-prefix\-first}},
+  description={The dual of the \field{prefixfirst} field. This field
+   isn't provided with a key or associated command, but can be
+   accessed as an internal field},
+  note={\appfmt{bib2gls}},
+  category={bib2glsfield},
+  parent={fields}
+}
+
+@field{field.dualprefixfirstplural,
+  name={\fieldfmt{dual\-prefix\-first\-plural}},
+  description={The dual of the \field{prefixfirstplural} field. This field
+   isn't provided with a key or associated command, but can be
+   accessed as an internal field},
+  note={\appfmt{bib2gls}},
+  category={bib2glsfield},
   parent={fields}
 }
 

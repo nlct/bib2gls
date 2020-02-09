@@ -190,6 +190,8 @@ public class Bib2GlsSpawnAbbrev extends Bib2GlsProgenitor
 
       writer.println(String.format("}%%%n{%s}%%%n{%s}",
         shortText, longText));
+
+      writeInternalFields(writer);
    }
 
 }

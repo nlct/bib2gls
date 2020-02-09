@@ -56,10 +56,10 @@ public class Bib2GlsContributor extends Bib2GlsEntry
       titleList.add(title);
    }
 
-   public void writeBibEntry(PrintWriter writer)
+   public void writeInternalFields(PrintWriter writer)
    throws IOException
    {
-      super.writeBibEntry(writer);
+      super.writeInternalFields(writer);
 
       for (Bib2GlsEntry title : titleList)
       {

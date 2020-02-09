@@ -180,6 +180,8 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       writer.println(String.format("}%%%n{%s}%%%n{%s}",
         shortText, longText));
+
+      writeInternalFields(writer);
    }
 
 }

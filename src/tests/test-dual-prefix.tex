@@ -1,0 +1,56 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[record,nomain,prefix,nostyles,stylemods={tree},style=index]{glossaries-extra}
+
+\newglossary*{english}{English}
+\newglossary*{french}{French}
+
+\GlsXtrLoadResources[src=test-dual-prefix,
+  type=english,dual-type=french,
+  category={same as type},dual-category={same as type},
+  label-prefix={en.},dual-prefix={fr.},
+  sort=en,dual-sort=fr,
+  %append-prefix-field-nbsp-match={..?},
+  %append-prefix-field={none},
+  %append-prefix-field={space},
+  append-prefix-field={space or nbsp}]
+
+\newcommand{\PrefixName}[1]{%
+ \glsxtrifhasfield{prefix}{\glscurrententrylabel}%
+ {\glscurrentfieldvalue}{}%
+ #1%
+}
+
+\newcommand{\PrefixDesc}[1]{%
+ \glsxtrifhasfield{dualprefix}{\glscurrententrylabel}%
+ {\glscurrentfieldvalue}{}%
+ #1%
+}
+
+\glssetcategoryattribute{english}{glossnamefont}{PrefixName}
+\glssetcategoryattribute{french}{glossnamefont}{PrefixName}
+\glssetcategoryattribute{english}{glossdescfont}{PrefixDesc}
+\glssetcategoryattribute{french}{glossdescfont}{PrefixDesc}
+
+\begin{document}
+% not very grammatical, but this isn't a grammar test
+
+\Pgls{en.cat} sat in \pgls{en.house} with \pgls{en.eye} closed for
+\pgls{en.hour}.
+
+\Pgls{fr.cat} était assis dans \pgls{fr.house}, \pgls{fr.eye} fermé
+pendant \pgls{fr.hour}.
+
+\Pglspl{en.cat} sat in \pglspl{en.house} with \pglspl{en.eye} closed
+for \pglspl{en.hour}.
+
+\Pglspl{fr.cat} étaient assis dans \pglspl{fr.house}, \pglspl{fr.eye}
+fermés pendant \pglspl{fr.hour}.
+
+\printunsrtglossaries
+\end{document}

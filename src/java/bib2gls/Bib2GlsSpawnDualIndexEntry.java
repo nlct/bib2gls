@@ -56,6 +56,23 @@ public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry
       return "index";
    }
 
+   protected Vector<String> processSpecialFields(TeXParser parser,
+     boolean mfirstucProtect, String[] protectFields, String idField,
+     Vector<String> interpretFields)
+    throws IOException
+   {
+      interpretFields = super.processSpecialFields(parser, mfirstucProtect,
+        protectFields, idField, interpretFields);
+
+      for (String field : Bib2Gls.SPAWN_SPECIAL_FIELDS)
+      {    
+         interpretFields = processField(parser, field, mfirstucProtect,
+           protectFields, idField, interpretFields);
+      }
+
+      return interpretFields;
+   }
+
    public void populate(BibParser parserListener) throws IOException
    {
       BibValueList value = getField("adoptparents");

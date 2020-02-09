@@ -32,7 +32,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
-	  test-interpret-fields.pdf
+	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -601,6 +601,20 @@ test-blocks.pdf	: test-blocks.glstex
 test-blocks.glstex	: test-blocks.tex blocks.bib $(DEPS)
 		pdflatex test-blocks
 		$(BIB2GLS) --no-group test-blocks
+
+test-prefix.pdf	: test-prefix.glstex
+		pdflatex test-prefix
+
+test-prefix.glstex	: test-prefix.tex test-prefix.bib $(DEPS)
+		pdflatex test-prefix
+		$(BIB2GLS) test-prefix
+
+test-dual-prefix.pdf	: test-dual-prefix.glstex
+		pdflatex test-dual-prefix
+
+test-dual-prefix.glstex	: test-dual-prefix.tex test-dual-prefix.bib $(DEPS)
+		pdflatex test-dual-prefix
+		$(BIB2GLS) test-dual-prefix
 
 clean	:
 	$(RM) *.aux

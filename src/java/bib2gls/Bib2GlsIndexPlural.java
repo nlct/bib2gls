@@ -149,6 +149,7 @@ public class Bib2GlsIndexPlural extends Bib2GlsIndex
       }
 
       writer.println(String.format("{%s}", name));
+      writeInternalFields(writer);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

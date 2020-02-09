@@ -184,6 +184,8 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
 
       writer.println(String.format("}%%%n{%s}{%s}%n{%s}", 
         nameStr, symbolStr, descStr));
+
+      writeInternalFields(writer);
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

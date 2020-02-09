@@ -299,6 +299,10 @@ Defaulting to: {0}.
 <entry key="message.created.missing.parent">Created missing parent ''{0}'' for entry ''{1}''</entry>
 <entry key="message.found_entry_in_resource">Found entry ''{0}'' in resource set: {1}</entry>
 <entry key="message.spawning">Spawning ''{0}'' (from ''{1}'')</entry>
+<entry key="message.append.prefix.space">Append space for prefix field ''{0}''</entry>
+<entry key="message.append.prefix.nospace">Not appending space for prefix field ''{0}'' (ends with exception character code {1})</entry>
+<entry key="message.append.prefix.no.end.char">Appending space for prefix field ''{0}'' (''{1}'' doesn''t end with a character)</entry>
+<entry key="message.append.prefix.nbsp.match">Append nbsp for prefix field ''{0}'': matched ''{1}'' in ''{2}'' (pattern ''{3}'')</entry>
 
 <entry key="tag.page">Page</entry>
 <entry key="tag.pages">Pages</entry>
@@ -436,6 +440,7 @@ Value must be a list of size {2,number}</entry>
 <entry key="error.invalid.opt.keylist.value">Invalid ''{0}'' value ''{1}'' (within option ''{2}'')</entry>
 <entry key="error.invalid.opt.keylist.key">Invalid key ''{0}'' within option ''{1}''</entry>
 <entry key="error.invalid.opt.keylist.pattern">Invalid pattern ''{1}'' in {0}='{'{1}'}' (within option ''{2}'')</entry>
+<entry key="error.invalid.opt.pattern">Invalid pattern ''{0}'' in option ''{1}''</entry>
 <entry key="error.missing.value">Missing value for: {0}</entry>
 <entry key="error.option.clash">Option clash: {0} and {1}</entry>
 <entry key="error.append.prefix.field">Invalid {0} found in {1} (value should be a sequence of characters only)</entry>
