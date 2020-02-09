@@ -2469,6 +2469,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.save-sibling-count,
+   name={\csoptfmt{save\dhyphen sibling\dhyphen count}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.save-original-entrytype,
    name={\csoptfmt{save\dhyphen original\dhyphen entrytype}},
    user1={\meta{boolean}},
@@ -4752,6 +4759,13 @@ with forced line breaks in paragraph column formats)},
 @command{space,
   name={\csfmt{space}},
   description={produces a space},
+  note={kernel command\texparserdefnote},
+  category={command}
+}
+
+@command{nobreakspace,
+  name={\csfmt{nobreakspace}},
+  description={produces a non-breakable space},
   note={kernel command\texparserdefnote},
   category={command}
 }
@@ -8301,6 +8315,24 @@ field.},
   parent={internalfields}
 }
 
+@field{field.siblingcount,
+  name={\fieldfmt{siblingcount}},
+  description={Stores the number of siblings this entry has
+    had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@field{field.siblinglist,
+  name={\fieldfmt{siblinglist}},
+  description={A list of labels (in \sty{etoolbox}'s internal list
+   format) of the siblings this entry has had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
 @field{field.originalentrytype,
   name={\fieldfmt{original\-entry\-type}},
   description={The original entry type before any aliasing was
@@ -10008,7 +10040,7 @@ primary formats, if enabled.},
    an \styfmt{etoolbox} internal list},
   topics={listcommands,loop,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.12+},
-  seealso={glsxtrfieldforlistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
+  seealso={glsxtrfieldforlistloop,glsxtrfieldifinlist,glsxtrfieldlistadd,listbreak},
   category={command}
 }
 
@@ -10019,7 +10051,31 @@ primary formats, if enabled.},
    an \styfmt{etoolbox} internal list, using the given handler},
   topics={listcommands,loop,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.29+},
-  seealso={glsxtrfielddolistloop,glsxtrfieldifinlist,glsxtrfieldlistadd},
+  seealso={glsxtrfielddolistloop,glsxtrfieldifinlist,glsxtrfieldlistadd,listbreak},
+  category={command}
+}
+
+@glscommand{glsxtrfieldformatlist,
+  name={\csfmt{gls\-xtr\-field\-format\-list}},
+  user1={\margm{label}\margm{field}},
+  description={formats the items in the given field, which contains
+   an \styfmt{etoolbox} internal list, using the same handler as
+   \ics{DTLformatlist}},
+  topics={listcommands,loop,fieldrefcommands},
+  note={\styfmt{glossaries-extra} v1.42+},
+  seealso={glsxtrfieldforlistloop,glsxtrfielddolistloop,DTLformatlist,glsxtrfieldformatcsvlist},
+  category={command}
+}
+
+@glscommand{glsxtrfieldformatcsvlist,
+  name={\csfmt{gls\-xtr\-field\-format\-csv\-list}},
+  user1={\margm{label}\margm{field}},
+  description={formats the items in the given field, which contains
+   a comma-separated list, using the same handler as
+   \ics{DTLformatlist}},
+  topics={listcommands,loop,fieldrefcommands},
+  note={\styfmt{glossaries-extra} v1.42+},
+  seealso={glsxtrfieldforlistloop,glsxtrfielddolistloop,DTLformatlist,glsxtrfieldformatlist},
   category={command}
 }
 
@@ -14875,7 +14931,18 @@ paragraph break that retains the hanging indent},
    of \cs{glsxtrforcsvfield} to prematurely break the loop},
   topics={loop,listcommands},
   note={\styfmt{glossaries-extra} v1.24+},
-  seealso={glsxtrforcsvfield},
+  seealso={glsxtrforcsvfield,listbreak},
+  category={command}
+}
+
+@glscommand{listbreak,
+  name={\csfmt{list\-break}},
+  user1={},
+  description={may be used within the handler macro
+   of \sty{etoolbox}'s internal list loop commands to prematurely break the loop},
+  topics={loop,listcommands},
+  note={\styfmt{etoolbox}},
+  seealso={forlistloop,glsxtrfieldforlistloop,glsxtrfielddolistloop,glsxtrendfor},
   category={command}
 }
 

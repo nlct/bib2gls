@@ -14,10 +14,21 @@ v2.0 (pending):
      append-prefix-field-exceptions
      append-prefix-field-cs-exceptions
      append-prefix-field-nbsp-match
+     save-sibling-count
 
   * New values for 'identical-sort-action' option: 'def' and 'use'
 
   * New value for 'selection' option: 'recorded and deps and see not also'
+
+  * New internal fields: dualprefix, dualprefixplural,
+    dualprefixfirst, dualprefixfirstplural, siblingcount,
+    siblinglist
+
+  * Dual prefix mappings now added if the prefix field is defined
+    (provided by glosssaries-prefix.sty).
+
+  * Interpreter now supports \nobreakspace and it obeys
+    --break-space and --no-break-space in the same way as ~
 
   * Bug fixes:
 

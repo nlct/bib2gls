@@ -3,29 +3,42 @@
 % arara: pdflatex
 \documentclass{article}
 
-\usepackage[record,stylemods={mcols},style=mcolindexgroup]{glossaries-extra}
+\usepackage[record,postdot,stylemods={mcols},style=mcolindexgroup
+]{glossaries-extra}
 
 \newrobustcmd*{\cs}[1]{\texttt{\char`\\#1}}
 
 \GlsXtrLoadResources[src={test-children},
   %category=general,
   %flatten-lonely=presort,
-  flatten-lonely=postsort,
+  %flatten-lonely=postsort,
   %flatten-lonely-rule=only unrecorded parents,
   %flatten-lonely-rule=discard unrecorded,
-  flatten-lonely-rule=no discard,
-  save-child-count
+  %flatten-lonely-rule=no discard,
+  save-child-count,
+  save-sibling-count
 ]
 
 % adjust indexgroup style:
 \renewcommand{\glstreenamefmt}[1]{#1}
 \renewcommand{\glstreegroupheaderfmt}[1]{\textbf{#1}}
 
-%\renewcommand{\glsxtrpostdescgeneral}{%
-%  \glsxtrifhasfield{childcount}{\glscurrententrylabel}
-%  { (child count: \glscurrentfieldvalue.)}%
-%  {}%
-%}
+\newcommand*{\listchildren}[1]{%
+  \GlsXtrIfFieldNonZero{childcount}{#1}%
+  {child count: \glscurrentfieldvalue; children:
+   \let\DTLlistformatitem\glsfmtname
+   \glsxtrfieldformatlist{#1}{childlist}%
+  }%
+  {no children}%
+}
+\newcommand*{\listsiblings}[1]{%
+  \GlsXtrIfFieldNonZero{siblingcount}{#1}%
+  {sibling count: \glscurrentfieldvalue; siblings:
+   \let\DTLlistformatitem\glsfmtname
+   \glsxtrfieldformatlist{#1}{siblinglist}%
+  }%
+  {no siblings}%
+}
 
 \begin{document}
 \gls{duck}.
@@ -39,6 +52,14 @@
 \gls{subsubitem}.
 
 \gls{child}.
+
+bird: \listchildren{bird}.
+
+duck: \listsiblings{duck}.
+
+mineral: \listchildren{mineral}.
+
+corundum: \listsiblings{corundum}.
 
 \printunsrtglossaries
 \end{document}

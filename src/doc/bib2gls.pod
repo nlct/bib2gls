@@ -78,11 +78,11 @@ Don't try interpreting (La)TeX commands.
 
 =item B<--break-space>
 
-Interpret tilde character as a normal space.
+Interpret tilde character and \nobreakspace as a normal space.
 
 =item B<--no-break-space>
 
-Interpret tilde as a non-breaking space (default).
+Interpret tilde and \nobreakspace as a non-breaking space (default).
 
 =item B<--cite-as-record>
 

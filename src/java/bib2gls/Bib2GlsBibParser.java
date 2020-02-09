@@ -67,7 +67,11 @@ public class Bib2GlsBibParser extends BibParser
    protected void addPredefined()
    {
       parser.putActiveChar(new Bib2GlsAt(resource));
-      parser.putActiveChar(new Bib2GlsNbsp(resource.useNonBreakSpace()));
+
+      boolean nbsp = resource.useNonBreakSpace();
+
+      parser.putActiveChar(new Bib2GlsNbsp(nbsp));
+      parser.putControlSequence(new Bib2GlsNoBreakSpace(nbsp));
    }
 
    public void parse(File file)

@@ -2985,12 +2985,13 @@ for more details about the interpreter.
 \argsection{no-break-space}
 
 The interpreter treats a tilde character \idx{nbspchar} as a non-breakable
-space (default).
+space (default). Similarly \ics{nobreakspace} produces a
+non-breakable space character (\hex{00A0}).
 
 \argsection{break-space}
 
 The interpreter treats a tilde character \idx{nbspchar} as a normal
-space.
+space. Similarly \ics{nobreakspace} just produces a space.
 
 \argsection{cite-as-record}
 
@@ -7550,6 +7551,19 @@ grouping.  With \sty{glossaries-extra} v1.31+ you can perform a
 numerical test with \ics{GlsXtrIfFieldNonZero} or
 \ics{GlsXtrIfFieldEqNum}.
 
+\optsection{save-sibling-count}
+
+This is a boolean option. The default setting is
+\csopt[false]{save-sibling-count}. This is like
+\csopt{save-child-count} but saves the sibling count in 
+\field{siblingcount} and the sibling list in \field{siblinglist}.
+As with the child list, the sibling list is in \sty{etoolbox}['s]
+internal list format. The sibling information is only saved for
+entries that have a parent.
+
+The advantage with \field{siblinglist} over accessing the parent's
+\field{childlist} is that the entry itself is excluded from the list.
+
 \optsection{flatten}
 
 This is a boolean option. The default value is \csopt[false]{flatten}. 
@@ -10277,7 +10291,7 @@ by \csopt{append-prefix-field-nbsp-match}.
 
 Identifies the command \meta{cs} that should be used to append to
 the prefix fields. The default value is \ics{space}. Remember to use
-\cs{string} or \cs{protect} to prevent the command from being
+\cs{cs.string} or \cs{protect} to prevent the command from being
 expanded as it's written to the \ext{aux} file.
 
 \optsection[\subsubsection]{append-prefix-field-exceptions}
@@ -10303,9 +10317,9 @@ This setting identifies the set of commands that, if found at the
 end of a prefix field, prevent \csopt{append-prefix-field} from
 appending a space (either \ics{space} or \idx{nbspchar}). Any spaces
 found in \meta{sequence} are ignored. The default setting is the
-set: \cs{space}, \cs{nobreakspace} and \cs{cs.space}.
+set: \cs{space}, \ics{nobreakspace} and \cs{cs.space}.
 
-Remember that you will need to use \cs{string} or \cs{protect} to
+Remember that you will need to use \cs{cs.string} or \cs{protect} to
 prevent the command from being expanded while the resource options
 are written to the \ext{aux} file.
 

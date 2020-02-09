@@ -1168,6 +1168,10 @@ public class GlsResource
          {
             saveChildCount = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("save-sibling-count"))
+         {
+            saveSiblingCount = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("save-original-entrytype"))
          {
             saveOriginalEntryType = getBoolean(parser, list, opt);
@@ -6697,7 +6701,8 @@ public class GlsResource
          }
 
          if (flattenLonely == FLATTEN_LONELY_POST_SORT
-              || (saveChildCount && flattenLonely != FLATTEN_LONELY_PRE_SORT))
+              || ((saveChildCount || saveSiblingCount)
+                    && flattenLonely != FLATTEN_LONELY_PRE_SORT))
          {// Need to check parents before writing definitions.
           // This will already have been done if
           // flatten-lonely=presort
@@ -6753,7 +6758,8 @@ public class GlsResource
                }
             }
 
-            if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
+            if (flattenLonely == FLATTEN_LONELY_FALSE 
+                  && !(saveChildCount || saveSiblingCount))
             {
                checkParent(entry, i, entries);
             }
@@ -6794,7 +6800,8 @@ public class GlsResource
          if (dualEntries != null)
          {
             if (flattenLonely == FLATTEN_LONELY_POST_SORT
-                || (saveChildCount && flattenLonely != FLATTEN_LONELY_PRE_SORT))
+                || ((saveChildCount || saveSiblingCount)
+                       && flattenLonely != FLATTEN_LONELY_PRE_SORT))
             {// need to check parents before writing definitions
 
                flattenLonelyChildren(dualEntries);
@@ -6824,7 +6831,8 @@ public class GlsResource
                   entry.updateLocationList();
                }
 
-               if (flattenLonely == FLATTEN_LONELY_FALSE && !saveChildCount)
+               if (flattenLonely == FLATTEN_LONELY_FALSE 
+                     && !(saveChildCount || saveSiblingCount))
                {
                   checkParent(entry, i, dualEntries);
                }
@@ -7129,6 +7137,39 @@ public class GlsResource
          {
             writer.format("\\glsxtrfieldlistadd{%s}{childlist}{%s}%n",
               parentId, id);
+         }
+      }
+
+      if (saveSiblingCount)
+      {
+         String parentId = entry.getParent();
+
+         if (parentId != null)
+         {
+            Bib2GlsEntry parentEntry = getEntry(parentId);
+
+            if (parentEntry != null)
+            {
+               Vector<Bib2GlsEntry> children = parentEntry.getChildren();
+
+               int siblingCount = 0;
+
+               for (Bib2GlsEntry child : children)
+               {
+                  String childId = child.getId();
+
+                  if (!childId.equals(id))
+                  {
+                     siblingCount++;
+
+                     writer.format("\\glsxtrfieldlistadd{%s}{siblinglist}{%s}%n",
+                        id, childId);
+                  }
+               }
+
+               writer.format("\\GlsXtrSetField{%s}{siblingcount}{%d}%n", id,
+                 siblingCount);
+            }
          }
       }
 
@@ -7593,7 +7634,8 @@ public class GlsResource
 
          if (thisEntry.getId().equals(parentId))
          {
-            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount)
+            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount
+                  || saveSiblingCount)
             {
                thisEntry.addChild(entry);
             }
@@ -7608,7 +7650,8 @@ public class GlsResource
 
          if (thisEntry.getId().equals(parentId))
          {
-            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount)
+            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount
+                  || saveSiblingCount)
             {
                thisEntry.addChild(entry);
             }
@@ -7825,7 +7868,8 @@ public class GlsResource
          checkParent(entry, i, entries);
       }
 
-      // This method will be called if saveChildCount == true
+      // This method will be called if saveChildCount == true or
+      // saveSiblingCount == true
       // && flattenLonely != FLATTEN_LONELY_PRE_SORT
       // Don't need to go any further if flattenLonely == FLATTEN_LONELY_FALSE
 
@@ -11434,6 +11478,8 @@ public class GlsResource
      = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
 
    private boolean saveChildCount = false;
+
+   private boolean saveSiblingCount = false;
 
    private boolean saveOriginalEntryType = false;
 

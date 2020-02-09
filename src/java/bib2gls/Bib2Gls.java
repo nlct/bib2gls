@@ -5202,7 +5202,8 @@ public class Bib2Gls implements TeXApp
 
    private static final String[] NON_BIB_FIELDS =
     new String[] {"bibtexcontributor", "bibtexentry", "childcount",
-     "childlist", "dual", "group", "indexcounter",
+     "childlist", "siblingcount", "siblinglist",
+     "dual", "group", "indexcounter",
      "location", "loclist", "originalentrytype", "primarylocations",
      "progenitor", "progeny", "recordcount", "secondarygroup",
      "secondarysort", "currcount", "desc", "descplural", "firstpl",
