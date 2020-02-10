@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2017-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -139,6 +139,8 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
       String sep = "";
       String descStr = "";
       String nameStr = null;
+      String parentid = null;
+      String plural = null;
       String symbolStr = "";
 
       Set<String> keyset = getFieldSet();
@@ -163,11 +165,22 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
          }
          else if (bib2gls.isKnownField(field))
          {
+            String value = getFieldValue(field);
+
+            if (field.equals("parent"))
+            {
+               parentid = value;
+            }
+            else if (field.equals("plural"))
+            {
+               plural = value;
+            }
+
             writer.format("%s", sep);
 
             sep = String.format(",%n");
 
-            writer.format("%s={%s}", field, getFieldValue(field));
+            writer.format("%s={%s}", field, value);
          }
          else if (bib2gls.getDebugLevel() > 0 && 
             !bib2gls.isInternalField(field) &&
@@ -180,6 +193,8 @@ public class Bib2GlsDualIndexSymbol extends Bib2GlsDualEntry
       if (nameStr == null)
       {
          nameStr = getFallbackValue("name");
+
+         writePluralIfInherited(writer, nameStr, parentid, plural, sep);
       }
 
       writer.println(String.format("}%%%n{%s}{%s}%n{%s}", 

@@ -106,19 +106,7 @@ public class Bib2GlsSpawnEntry extends Bib2GlsProgenitor
       }
       else if (field.equals("plural"))
       {
-         String value = getFieldValue("text");
-
-         if (value == null)
-         {
-            value = getFallbackValue("text");
-         }
-
-         if (value != null)
-         {
-            String suffix = resource.getPluralSuffix();
-
-            return suffix == null ? value : value+suffix;
-         }
+         return getPluralFallbackValue();
       }
       else if (field.equals("firstplural"))
       {
@@ -205,14 +193,7 @@ public class Bib2GlsSpawnEntry extends Bib2GlsProgenitor
       }
       else if (field.equals("plural"))
       {
-         BibValueList contents = getField("text");
-
-         if (contents == null)
-         {
-            contents = getFallbackContents("text");
-         }
-
-         return plural(contents, "glspluralsuffix");
+         return getPluralFallbackContents();
       }
       else if (field.equals("firstplural"))
       {

@@ -34,6 +34,8 @@ v2.0 (pending):
 
     - corrected interpret-fields
     - corrected selection={recorded and deps and see}
+    - corrected plural for entries where the name is inherited from
+      the parent
 
 
   * convertgls2bib:

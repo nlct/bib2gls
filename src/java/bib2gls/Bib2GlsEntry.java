@@ -1781,6 +1781,63 @@ public class Bib2GlsEntry extends BibEntry
       return resource.getEntryDefaultSortField();
    }
 
+   public String getPluralFallbackValue()
+   {
+      // get the parent 
+
+      String parentid = fieldValues.get("parent");
+
+      String value = null;
+
+      if (parentid != null)
+      {// if the name is missing or is the same as the parent
+       // use the parent's plural
+
+         Bib2GlsEntry parent = resource.getEntry(parentid);
+
+         if (parent != null)
+         {
+            String name = getFieldValue("name");
+            String parentName = parent.getFieldValue("name");
+
+            if (name == null || name.equals(parentName))
+            {
+               value = parent.getFieldValue("plural");
+
+               if (value == null)
+               {
+                  value = parent.getFallbackValue("plural");
+
+                  if (value != null)
+                  {
+                     return value;
+                  }
+               }
+               else
+               {
+                  return value;
+               }
+            }
+         }
+      }
+
+      value = getFieldValue("text");
+
+      if (value == null)
+      {
+         value = getFallbackValue("text");
+      }
+
+      if (value != null)
+      {
+         String suffix = resource.getPluralSuffix();
+
+         return suffix == null ? value : value+suffix;
+      }
+
+      return null;
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("text"))
@@ -1805,6 +1862,10 @@ public class Bib2GlsEntry extends BibEntry
 
          return parent.getFallbackValue("name");
       }
+      else if (field.equals("plural"))
+      {
+         return getPluralFallbackValue();
+      }
       else if (field.equals("sort"))
       {
          String fallbackField = getSortFallbackField();
@@ -1821,22 +1882,6 @@ public class Bib2GlsEntry extends BibEntry
          if (value != null) return value;
 
          return getFallbackValue("text");
-      }
-      else if (field.equals("plural"))
-      {
-         String value = getFieldValue("text");
-
-         if (value == null)
-         {
-            value = getFallbackValue("text");
-         }
-
-         if (value != null)
-         {
-            String suffix = resource.getPluralSuffix();
-
-            return suffix == null ? value : value+suffix;
-         }
       }
       else if (field.equals("firstplural"))
       {
@@ -1916,6 +1961,54 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
+   public BibValueList getPluralFallbackContents()
+   {
+      // get the parent 
+
+      String parentid = fieldValues.get("parent");
+
+      BibValueList contents = null;
+
+      if (parentid != null)
+      {
+         Bib2GlsEntry parent = resource.getEntry(parentid);
+
+         if (parent != null)
+         {
+            BibValueList name = getField("name");
+            BibValueList parentName = getField("name");
+
+            if (name == null || name.equals(parentName))
+            {
+               contents = parent.getField("plural");
+
+               if (contents == null)
+               {
+                  contents = parent.getFallbackContents("plural");
+
+                  if (contents != null)
+                  {
+                     return contents;
+                  }
+               }
+            }
+            else
+            {
+               return contents;
+            }
+         }
+      }
+
+      contents = getField("text");
+
+      if (contents == null)
+      {
+         contents = getFallbackContents("text");
+      }
+
+      return plural(contents, "glspluralsuffix");
+   }
+
    public BibValueList getFallbackContents(String field)
    {
       if (field.equals("text"))
@@ -1940,6 +2033,10 @@ public class Bib2GlsEntry extends BibEntry
 
          return parent.getFallbackContents("name");
       }
+      else if (field.equals("plural"))
+      {
+         return getPluralFallbackContents();
+      }
       else if (field.equals("sort"))
       {
          String fallbackField = getSortFallbackField();
@@ -1952,17 +2049,6 @@ public class Bib2GlsEntry extends BibEntry
          BibValueList contents = getField("text");
 
          return contents == null ? getFallbackContents("text") : contents;
-      }
-      else if (field.equals("plural"))
-      {
-         BibValueList contents = getField("text");
-
-         if (contents == null)
-         {
-            contents = getFallbackContents("text");
-         }
-
-         return plural(contents, "glspluralsuffix");
       }
       else if (field.equals("firstplural"))
       {
@@ -2085,6 +2171,8 @@ public class Bib2GlsEntry extends BibEntry
 
       String description = "";
       String name = null;
+      String parentid = null;
+      String plural = null;
       String sep = "";
 
       Set<String> keyset = getFieldSet();
@@ -2109,6 +2197,15 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (bib2gls.isKnownField(field))
          {
+            if (field.equals("parent"))
+            {
+               parentid = value;
+            }
+            else if (field.equals("plural"))
+            {
+               plural = value;
+            }
+
             writer.format("%s", sep);
 
             sep = String.format(",%n");
@@ -2126,6 +2223,8 @@ public class Bib2GlsEntry extends BibEntry
       if (name == null)
       {
          name = getFallbackValue("name");
+
+         writePluralIfInherited(writer, name, parentid, plural, sep);
       }
 
       writer.println("}%");
@@ -2133,6 +2232,45 @@ public class Bib2GlsEntry extends BibEntry
       writer.println(String.format("{%s}", description));
 
       writeInternalFields(writer);
+   }
+
+   protected void writePluralIfInherited(PrintWriter writer, String name,
+     String parentid, String plural, String sep)
+     throws IOException
+   {
+      // check if this is a homograph (if it has the same name as
+      // its parent then the plural should be the same unless
+      // otherwise overridden)
+
+      if (parentid != null && plural == null)
+      {
+         Bib2GlsEntry parent = resource.getEntry(parentid);
+
+         if (parent != null)
+         {
+            String parentName = parent.getFieldValue("name");
+
+            if (parentName == null)
+            {
+               parentName = parent.getFallbackValue("name");
+            }
+
+            if (name.equals(parentName))
+            {
+               plural = parent.getFieldValue("plural");
+
+               if (plural == null)
+               {
+                  plural = parent.getFallbackValue("plural");
+               }
+
+               if (plural != null)
+               {
+                  writer.format("%splural={%s}", sep, plural);
+               }
+            }
+         }
+      }
    }
 
    public void writeInternalFields(PrintWriter writer) throws IOException
