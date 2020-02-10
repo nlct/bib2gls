@@ -51,6 +51,7 @@ import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
+import com.dickimawbooks.texparserlib.latex.GobbleOptMandOpt;
 
 public class Gls2Bib extends LaTeXParserListener
   implements Writeable,TeXApp
@@ -258,6 +259,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new Relax("makenoidxglossaries"));
       parser.putControlSequence(new GobbleOpt("GlsXtrLoadResources"));
       parser.putControlSequence(new Relax("noist"));
+
       parser.putControlSequence(new NewGlossary());
       parser.putControlSequence(new NewGlossary("altnewglossary", 
        NewGlossary.ALT));
@@ -287,12 +289,79 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new AtGobble("glsdefpostlink", 2)); 
       parser.putControlSequence(new AtGobble("glsdefpostname", 2)); 
       parser.putControlSequence(new AtGobble("glsdefpostdesc", 2)); 
-      parser.putControlSequence(new GobbleOpt("glsaddkey", 0, 7, '*')); 
-      parser.putControlSequence(new GobbleOpt("glsaddstoragekey", 0, 3, '*')); 
+      parser.putControlSequence(new GlsAddKey()); 
+      parser.putControlSequence(new GlsAddKey("glsaddstoragekey", true)); 
 
       parser.putControlSequence(new GobbleOpt("glssee", 1, 2)); 
       parser.putControlSequence(new GobbleOpt("glsadd", 1, 1)); 
       parser.putControlSequence(new GobbleOpt("glsaddall", 1, 0)); 
+
+      // Don't bother with these if --preamble-only
+
+      if (!preambleOnly)
+      {
+         parser.putControlSequence(new GobbleOptMandOpt("gls")); 
+         parser.putControlSequence(new GobbleOptMandOpt("glspl")); 
+         parser.putControlSequence(new GobbleOptMandOpt("Gls")); 
+         parser.putControlSequence(new GobbleOptMandOpt("Glspl")); 
+         parser.putControlSequence(new GobbleOptMandOpt("GLS")); 
+         parser.putControlSequence(new GobbleOptMandOpt("GLSpl")); 
+
+         for (String field : KNOWN_FIELDS)
+         {
+            parser.putControlSequence(new GobbleOptMandOpt("gls"+field)); 
+            parser.putControlSequence(new GobbleOptMandOpt("Gls"+field)); 
+            parser.putControlSequence(new GobbleOptMandOpt("GLS"+field)); 
+
+            parser.putControlSequence(new AtGobble("glsentry"+field));
+            parser.putControlSequence(new AtGobble("Glsentry"+field));
+
+            parser.putControlSequence(new GobbleOpt("glsfmt"+field, 1, 1));
+            parser.putControlSequence(new GobbleOpt("Glsfmt"+field, 1, 1));
+            parser.putControlSequence(new GobbleOpt("GLSfmt"+field, 1, 1));
+         }
+
+         for (String field : ABBR_FIELDS)
+         {
+            parser.putControlSequence(new AtGobble("glsentry"+field));
+            parser.putControlSequence(new AtGobble("Glsentry"+field));
+
+            parser.putControlSequence(new GobbleOptMandOpt("acr"+field));
+            parser.putControlSequence(new GobbleOptMandOpt("Acr"+field));
+            parser.putControlSequence(new GobbleOptMandOpt("ACR"+field));
+
+            parser.putControlSequence(new GobbleOptMandOpt("glsxtr"+field));
+            parser.putControlSequence(new GobbleOptMandOpt("Glsxtr"+field));
+            parser.putControlSequence(new GobbleOptMandOpt("GLSxtr"+field));
+
+            parser.putControlSequence(new GobbleOpt("glsfmt"+field, 1, 1));
+            parser.putControlSequence(new GobbleOpt("Glsfmt"+field, 1, 1));
+            parser.putControlSequence(new GobbleOpt("GLSfmt"+field, 1, 1));
+         }
+
+         parser.putControlSequence(new GobbleOpt("glsdisp", 1, 2)); 
+         parser.putControlSequence(new GobbleOpt("glslink", 1, 2)); 
+
+         parser.putControlSequence(new GobbleOptMandOpt("cgls")); 
+         parser.putControlSequence(new GobbleOptMandOpt("cglspl")); 
+         parser.putControlSequence(new GobbleOptMandOpt("cGls")); 
+         parser.putControlSequence(new GobbleOptMandOpt("cGlspl")); 
+         parser.putControlSequence(new GobbleOptMandOpt("cGLS")); 
+         parser.putControlSequence(new GobbleOptMandOpt("cGLSpl")); 
+
+         parser.putControlSequence(new GobbleOptMandOpt("pgls")); 
+         parser.putControlSequence(new GobbleOptMandOpt("pglspl")); 
+         parser.putControlSequence(new GobbleOptMandOpt("Pgls")); 
+         parser.putControlSequence(new GobbleOptMandOpt("Pglspl")); 
+         parser.putControlSequence(new GobbleOptMandOpt("PGLS")); 
+         parser.putControlSequence(new GobbleOptMandOpt("PGLSpl")); 
+
+         parser.putControlSequence(new GobbleOpt("printglossary", 1, 0)); 
+         parser.putControlSequence(new GobbleOpt("printnoidxglossary", 1, 0)); 
+
+         parser.putControlSequence(new Relax("printglossaries")); 
+         parser.putControlSequence(new Relax("printnoidxglossaries")); 
+      }
    }
 
    // Ignore unknown control sequences
@@ -1539,4 +1608,11 @@ public class Gls2Bib extends LaTeXParserListener
    private HashMap<String,String> keyToFieldMap;
 
    private TeXParser texParser;
+
+   public static final String[] KNOWN_FIELDS = new String[]
+   {"name", "text", "plural", "first", "firstplural", "symbol",
+    "desc", "useri", "userii", "useriii", "useriv", "userv", "uservi"};
+
+   public static final String[] ABBR_FIELDS = new String[]
+   {"short", "shortpl", "long", "longpl", "full", "fullpl"};
 }

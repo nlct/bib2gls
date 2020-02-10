@@ -587,7 +587,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="tex.error.expected">Expected {0}</entry>
 <entry key="tex.error.undefined">Undefined command {0}</entry>
 <entry key="tex.error.undefined_char">Undefined active character ''{0}''</entry>
-<entry key="tex.error.cs_expected">Control sequence expected (found ''{0}'')</entry>
+<entry key="tex.error.cs_expected">Control sequence expected (found ''{0}'', class ''{1}'')</entry>
 <entry key="tex.error.number_expected">Number expected (found ''{0}'')</entry>
 <entry key="tex.error.register_undef">Unknown register ''{0}''</entry>
 <entry key="tex.error.syntax">Invalid syntax for {0}</entry>
