@@ -289,6 +289,10 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new AtGobble("glsdefpostdesc", 2)); 
       parser.putControlSequence(new GobbleOpt("glsaddkey", 0, 7, '*')); 
       parser.putControlSequence(new GobbleOpt("glsaddstoragekey", 0, 3, '*')); 
+
+      parser.putControlSequence(new GobbleOpt("glssee", 1, 2)); 
+      parser.putControlSequence(new GobbleOpt("glsadd", 1, 1)); 
+      parser.putControlSequence(new GobbleOpt("glsaddall", 1, 0)); 
    }
 
    // Ignore unknown control sequences
@@ -1497,8 +1501,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200208";
-   public static final String DATE = "2020-02-08";
+   public static final String VERSION = "1.9.20200210";
+   public static final String DATE = "2020-02-10";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

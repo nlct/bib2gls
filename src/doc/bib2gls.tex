@@ -2459,7 +2459,7 @@ the library will still be used to parse the \ext{aux} and \ext{bib}
 files. Note that the \field{see} field doesn't use the interpreter
 with \csopt[true]{interpret-label-fields} as
 it may legitimately contain \LaTeX\ code in the optional tag part
-(such as \cs{seealsoname}).
+(such as \cs{seealsoname} or \cs{alsoname}).
 
 The parser has a different concept of expansion to \TeX\
 and will expand some things that aren't expanded by \LaTeX\
@@ -18237,11 +18237,13 @@ convertgls2bib \longargfmt{ignore-sort} entries.bib
 
 \convertglsbibarg{preamble-only}
 
-Only parse the document preamble.
+Stop parsing if the start of the \env{document} environment is found.
 
 \convertglsbibarg{no-preamble-only}
 
-Parse the entire document (default).
+Parse the entire file (default). Be prepared for a lot of
+unknown command warnings if you make \idx{convertgls2bib} parse an
+entire document.
 
 \convertglsbibarg{index-conversion}
 
@@ -18307,6 +18309,10 @@ In all cases below, if \meta{\keyvallist} contains:
 \begin{codeenv*}
 \field{see}=\marg{[\ics{seealsoname}]\meta{label(s)}}
 \end{codeenv*}
+or
+\begin{codeenv*}
+\field{see}=\marg{[\ics{alsoname}]\meta{label(s)}}
+\end{codeenv*}
 this will be substituted with:
 \begin{codeenv*}
 \field{seealso}=\margm{label(s)}
@@ -18322,9 +18328,9 @@ will be written as:
 }
 \end{codeenv}
 Note that it won't convert \code{\field{see}=\marg{[see also]\meta{labels}}}.
-If you have used explicit text instead of \cs{seealsoname} then
-consider performing a global search and replace on your file using
-your text editor.
+If you have used explicit text instead of \ics{seealsoname} or
+\ics{alsoname} then consider performing a global search and replace
+on your file using your text editor.
 
 Additionally, if \meta{\keyvallist} contains:
 \begin{codeenv}

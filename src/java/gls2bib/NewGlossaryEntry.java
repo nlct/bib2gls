@@ -103,7 +103,7 @@ public class NewGlossaryEntry extends ControlSequence
 
          if (field.equals("see") && (object instanceof TeXObjectList))
          {
-            // convert see=[\seealsoname] to seealso=
+            // convert see=[\seealsoname] or see=[\alsoname] to seealso=
 
             TeXObjectList list = (TeXObjectList)object;
 
@@ -117,7 +117,10 @@ public class NewGlossaryEntry extends ControlSequence
                if (elem1 instanceof CharObject 
                     && ((CharObject)elem1).getCharCode() == '['
                 && elem2 instanceof ControlSequence
-                    && ((ControlSequence)elem2).getName().equals("seealsoname")
+                    && 
+                    ( ((ControlSequence)elem2).getName().equals("seealsoname")
+                      || ((ControlSequence)elem2).getName().equals("alsoname")
+                    )
                   )
                {
                   TeXObject newVal = null;

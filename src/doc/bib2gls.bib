@@ -5032,6 +5032,13 @@ given language},
   category={environment}
 }
 
+@environment{env.document,
+  name={\envfmt{document}},
+  description={contains the entire document text},
+  note={kernel command\texparserdefnote},
+  category={environment}
+}
+
 @environment{env.description,
   name={\envfmt{description}},
   description={list-like environment},
@@ -13810,11 +13817,21 @@ glossary (or the default of \meta{type} is omitted)},
 }
 
 @command{seealsoname,
-  name={\csfmt{seealsoname}},
+  name={\csfmt{see\-also\-name}},
+  user1={},
+  description={language sensitive \qt{see also} text (as from v1.42
+   this will be defined to \cs{alsoname} if that command exists)},
+  topics={fixedtextcommands,glossarystylecommands,loclistcommands},
+  note={\styfmt{glossaries-extra}},
+  category={command}
+}
+
+@command{alsoname,
+  name={\csfmt{also\-name}},
   user1={},
   description={language sensitive \qt{see also} text},
-  topics={fixedtextcommands,glossarystylecommands,loclistcommands},
-  note={\styfmt{glossaries-extra} or language packages},
+  topics={fixedtextcommands},
+  note={language packages},
   category={command}
 }
 
