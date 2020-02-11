@@ -8612,10 +8612,14 @@ primary formats, if enabled.},
 
 @field{field.nonumberlist,
   name={\fieldfmt{nonumberlist}},
-  description={Used to suppress the location list for a specific entry.},
-  note={internal field set by \styfmt{glossaries}},
-  category={baseinternalfield},
-  parent={internalfields}
+  description={Used to suppress the location list for a specific entry.
+  Its value may only be \code{true} or \code{false}.
+  Technically this isn't actually a field as its value isn't saved
+  so it can't be referenced or modified after the entry has been
+  defined.},
+  note={\styfmt{glossaries}},
+  category={basefield},
+  parent={fields}
 }
 
 @field{field.prevcount,

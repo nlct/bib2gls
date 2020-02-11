@@ -30,6 +30,8 @@ v2.0 (pending):
   * Interpreter now supports \nobreakspace and it obeys
     --break-space and --no-break-space in the same way as ~
 
+  * Added support for nonumberlist
+
   * Bug fixes:
 
     - corrected interpret-fields

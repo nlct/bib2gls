@@ -390,7 +390,31 @@ public class NewGlossaryEntry extends ControlSequence
             }
          }
 
-         if ((object instanceof Group) && !(object instanceof MathGroup))
+         if (field.equals("nonumberlist"))
+         {
+            if (object instanceof Expandable)
+            {
+               TeXObjectList expanded = ((Expandable)object).expandfully(parser);
+
+               if (expanded != null)
+               {
+                  object = expanded;
+               }
+            }
+
+            String val = object.toString(parser);
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               data.putField(field, "true");
+            }
+            else
+            {
+               gls2bib.warning(parser, gls2bib.getMessage("gls2bib.discarding.field",
+                 field, val, label));
+            }
+         }
+         else if ((object instanceof Group) && !(object instanceof MathGroup))
          {
             data.putField(field, object.toString(parser));
          }

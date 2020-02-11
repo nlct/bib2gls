@@ -550,6 +550,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="gls2bib.absorbsee">Absorbing {0}</entry>
 <entry key="gls2bib.absorbsee.entryundef">Unable to absorb {0}: can''t find entry ''{1}''</entry>
 <entry key="gls2bib.absorbsee.failed">Unable to absorb {0} into {1}</entry>
+<entry key="gls2bib.discarding.field">Discarding field ''{0}={1}'' for entry {2}</entry>
 
 <!--
      The following messages are used by various parts of
