@@ -957,6 +957,8 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void process() throws IOException
    {
+      requirepackage("etoolbox");
+
       data = new Vector<GlsData>();
 
       parser.parse(texFile, charset);
