@@ -57,6 +57,8 @@ v2.0 (pending):
       --no-preamble-only
       --index-conversion (-i)
       --no-index-conversion 
+      --absorb-see
+      --no=absorb-see
 
     - added check for see=[\alsoname] in addition to
       see=[\seealsoname]

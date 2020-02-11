@@ -22,6 +22,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import com.dickimawbooks.texparserlib.TeXParser;
+import com.dickimawbooks.texparserlib.TeXApp;
 
 public class GlsData
 {
@@ -106,6 +112,64 @@ public class GlsData
       writer.println("}");
       writer.println();
    }
+
+   public void absorbSee(TeXParser parser, String original, String key,
+      String xrList, String optArg)
+   {
+      Gls2Bib gls2bib = (Gls2Bib)parser.getListener().getTeXApp();
+
+      String existingValue = fields.get(key);
+
+      if (existingValue == null)
+      {
+         if (key.equals("see"))
+         {
+            fields.put(key, String.format("{%s%s}", optArg, xrList));
+         }
+         else
+         {
+            fields.put(key, String.format("{%s}", xrList));
+         }
+
+         gls2bib.message(gls2bib.getMessage("gls2bib.absorbsee", original));
+         return;
+      }
+
+      // split and reconstruct 
+
+      Matcher m = SEE_PATTERN.matcher(existingValue);
+
+      if (m.matches())
+      {
+         String originalXrList = m.group(1); 
+
+         String[] originals = originalXrList.split(" *, *");
+         String[] newLabels = xrList.split(",");
+
+         String append = "";
+
+         for (String label : newLabels)
+         {
+            if (Arrays.binarySearch(originals, label) < 0)
+            {
+               append += ","+label;
+            }
+         }
+
+         fields.put(key, existingValue.substring(0, existingValue.length()-2)
+           + append + "}");
+
+         gls2bib.message(gls2bib.getMessage("gls2bib.absorbsee", original));
+      }
+      else
+      {
+         gls2bib.warning(parser, gls2bib.getMessage("gls2bib.absorbsee.failed",
+           original, String.format("%s=%s", key, existingValue)));
+      }
+   }
+
+   private static final Pattern SEE_PATTERN = 
+      Pattern.compile("\\{(?:\\[.*\\])?(.*)\\}");
 
    private String id, type, glosType, category;
 

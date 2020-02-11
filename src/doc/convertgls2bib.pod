@@ -5,7 +5,7 @@ B<convertgls2bib> [I<option>]+ I<auxfile>
 =head1 DESCRIPTION
 
 Converts a B<.tex> file containing glossary definitions using
-commands like B<\newglossaryentry> and B<\newacronym> to 
+commands like C<\newglossaryentry> and C<\newacronym> to 
 a B<.bib> file in the format required for B<bib2gls>.
 
 =head1 OPTIONS
@@ -106,6 +106,26 @@ used.
 Don't overwrite existing .bib files. Default if B<--split-on-type>
 used.
 
+=item B<--index-conversion> or B<-i>
+
+Any entries that would normally be converted to C<@entry> that don't
+have a description or just have the description set to
+C<\nopostdesc> or C<\glsxtrnopostpunc> will be converted to C<@index>
+and the B<description> field will be omitted.
+
+=item B<--no-index-conversion> 
+
+Don't use C<@index> instead of C<@entry> if the description is empty or
+just C<\nopostdesc> or C<\glsxtrnopostpunc> (default).
+
+=item B<--absorb-see> 
+
+Absorb C<\glssee> and C<\glsxtrindexseealso> into the data (default).
+
+=item B<--no-absorb-see> 
+
+Don't absorb C<\glssee> and C<\glsxtrindexseealso> into the data.
+
 =item B<--preamble-only> or B<-p>
 
 Only parse the document preamble.
@@ -128,7 +148,7 @@ tag I<lang tag>. If there isn't an appropriate file, the B<en>
 
 =head1 REQUIRES
 
-Java 7 and a TeX distribution.
+Java 8 and a TeX distribution.
 
 =head1 LICENSE
 

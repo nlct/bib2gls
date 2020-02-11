@@ -535,6 +535,8 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.space-sub">{0} &lt;val&gt; or {1} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;</entry>
 <entry key="gls2bib.syntax.index-conversion">{0} or {1}	Convert @entry to @index if no description.</entry>
 <entry key="gls2bib.syntax.no-index-conversion">{0} 		Don''t convert @entry to @index.</entry>
+<entry key="gls2bib.syntax.absorb-see">{0} 		Absorb \glssee and \glsxtrindexseealso into the data (default).</entry> 
+<entry key="gls2bib.syntax.no-absorb-see">{0} 		Don''t absorb \glssee and \glsxtrindexseealso into the data.</entry>
 <entry key="gls2bib.syntax.locale">{0} &lt;iso tag&gt;		Use language resource file given by &lt;iso tag&gt; for messages.</entry>
 <entry key="gls2bib.syntax.silent">{0}			Suppress messages.</entry>
 <entry key="gls2bib.syntax.verbose">{0}			Normal messages.</entry>
@@ -544,6 +546,10 @@ Use {1} for help.</entry>
 definition. (Change \newcommand to \providecommand if you want 
 \newdualentry[options]'{'label'}{'short'}{'long'}{'description'}'
 converted to @dualabbreviationentry.)</entry>
+
+<entry key="gls2bib.absorbsee">Absorbing {0}</entry>
+<entry key="gls2bib.absorbsee.entryundef">Unable to absorb {0}: can''t find entry ''{1}''</entry>
+<entry key="gls2bib.absorbsee.failed">Unable to absorb {0} into {1}</entry>
 
 <!--
      The following messages are used by various parts of

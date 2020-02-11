@@ -140,6 +140,11 @@ public class Gls2Bib extends LaTeXParserListener
       return this;
    }
 
+   public boolean isAbsorbSeeOn()
+   {
+      return absorbSee;
+   }
+
    public boolean isIndexConversionOn()
    {
       return noDescEntryToIndex;
@@ -292,7 +297,8 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new GlsAddKey()); 
       parser.putControlSequence(new GlsAddKey("glsaddstoragekey", true)); 
 
-      parser.putControlSequence(new GobbleOpt("glssee", 1, 2)); 
+      parser.putControlSequence(new GlsSee(this)); 
+      parser.putControlSequence(new GlsSee(this, "glsxtrindexseealso")); 
       parser.putControlSequence(new GobbleOpt("glsadd", 1, 1)); 
       parser.putControlSequence(new GobbleOpt("glsaddall", 1, 0)); 
 
@@ -936,6 +942,19 @@ public class Gls2Bib extends LaTeXParserListener
       return false;
    }
 
+   public GlsData getEntry(String label)
+   {
+      for (GlsData entryData : data)
+      {
+         if (entryData.getId().equals(label))
+         {
+            return entryData;
+         }
+      }
+
+      return null;
+   }
+
    public void process() throws IOException
    {
       data = new Vector<GlsData>();
@@ -1228,6 +1247,10 @@ public class Gls2Bib extends LaTeXParserListener
         "--index-conversion", "-i"));
       System.out.println(getMessage("gls2bib.syntax.no-index-conversion",
         "--no-index-conversion"));
+      System.out.println(getMessage("gls2bib.syntax.absorb-see",
+        "--absorb-see"));
+      System.out.println(getMessage("gls2bib.syntax.no-absorb-see",
+        "--no-absorb-see"));
       System.out.println(getMessage("gls2bib.syntax.locale",
         "--locale"));
       System.out.println(getMessage("gls2bib.syntax.silent",
@@ -1256,6 +1279,7 @@ public class Gls2Bib extends LaTeXParserListener
       overwriteFiles = true;
       preambleOnly = false;
       noDescEntryToIndex=false;
+      absorbSee=true;
 
       for (int i = 0; i < args.length; i++)
       {
@@ -1371,6 +1395,14 @@ public class Gls2Bib extends LaTeXParserListener
          else if (args[i].equals("--no-index-conversion"))
          {
             noDescEntryToIndex = false;
+         }
+         else if (args[i].equals("--absorb-see"))
+         {
+            absorbSee = true;
+         }
+         else if (args[i].equals("--no-absorb-see"))
+         {
+            absorbSee = false;
          }
          else if (args[i].equals("--ignore-fields") || args[i].equals("-f"))
          {
@@ -1570,8 +1602,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200210";
-   public static final String DATE = "2020-02-10";
+   public static final String VERSION = "1.9.20200211";
+   public static final String DATE = "2020-02-11";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
@@ -1592,6 +1624,7 @@ public class Gls2Bib extends LaTeXParserListener
    private boolean overwriteFiles=true;
    private boolean preambleOnly=false;
    private boolean noDescEntryToIndex=false;
+   private boolean absorbSee=true;
 
    private String[] customIgnoreFields;
 
