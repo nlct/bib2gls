@@ -11311,6 +11311,23 @@ you're not additionally using \idx!{makeindex} or \idx!{xindy}, then
 the locations won't be available even if you don't have the
 \styopt{nonumberlist} option set.
 
+The boolean \field{nonumberlist} key that may be used in
+\gls{newglossaryentry} can also be used in a \ext{bib} file, but in
+this case it can't have an empty value. The value must be either
+\code{true} or \code{false}. If \code{true} then \bibgls\ won't
+save the \field{location} or \field{loclist} fields.
+
+The \field{nonumberlist} key provided by the base \sty{glossaries}
+package doesn't represent a real field. The value isn't saved but,
+if used, it will alter the indexing information that's written to
+the \idx!{makeindex} or \idx!{xindy} file. It's a little hack to
+ensure that the location is hidden for a specific entry when used
+with \idx!{makeindex} and \idx!{xindy}.
+
+\bibgls\ will look for this key to determine if the location should
+be omitted for the given entry, but it won't write the key to the 
+\ext{glstex} file.
+
 \optsection{save-loclist}
 
 If you want the \field{location} field but don't need

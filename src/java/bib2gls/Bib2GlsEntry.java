@@ -1000,30 +1000,6 @@ public class Bib2GlsEntry extends BibEntry
          putField("group", groupVal);
       }
 
-      // has the nonumberlist key been used?
-
-      BibValueList noNumberList = getField("nonumberlist");
-
-      if (noNumberList != null)
-      {
-         TeXObjectList list = noNumberList.expand(parser);
-         String val = list.toString(parser);
-
-         if (val.equals("true"))
-         {
-             nonumberlist = true;
-         }
-         else if (val.equals("false"))
-         {
-             nonumberlist = false;
-         }
-         else
-         {
-             throw new TeXSyntaxException(parser, "error.invalid.choice.value",
-                val, "true, false");
-         }
-      }
-
       Vector<String> interpretFields = null;
 
       for (String field : fields)
@@ -1093,6 +1069,30 @@ public class Bib2GlsEntry extends BibEntry
 
                putField(field, newStrVal);
             }
+         }
+      }
+
+      // has the nonumberlist key been used?
+
+      BibValueList noNumberList = getField("nonumberlist");
+
+      if (noNumberList != null)
+      {
+         TeXObjectList list = noNumberList.expand(parser);
+         String val = list.toString(parser);
+
+         if (val.equals("true"))
+         {
+             nonumberlist = true;
+         }
+         else if (val.equals("false"))
+         {
+             nonumberlist = false;
+         }
+         else
+         {
+             throw new TeXSyntaxException(parser, "error.invalid.choice.value",
+                val, "true, false");
          }
       }
    }
