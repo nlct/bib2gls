@@ -276,7 +276,7 @@ public class Gls2Bib extends LaTeXParserListener
       parser.putControlSequence(new AtGobble("GlsSetXdyCodePage"));
       parser.putControlSequence(new AtGobble("GlsAddXdyCounters"));
       parser.putControlSequence(new AtGobble("GlsAddXdyAttribute"));
-      parser.putControlSequence(new GobbleOpt("GlsAddXdyLocation", 1, 1)); 
+      parser.putControlSequence(new GobbleOpt("GlsAddXdyLocation", 1, 2)); 
       parser.putControlSequence(new AtGobble("GlsSetXdyLocationClassOrder"));
       parser.putControlSequence(new AtGobble("GlsSetXdyMinRangeLength"));
       parser.putControlSequence(new AtGobble("GlsSetXdyFirstLetterAfterDigits"));
