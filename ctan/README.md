@@ -10,6 +10,7 @@ Application Home Page: http://www.dickimaw-books.com/software/bib2gls
 # Licence
 
 Copyright (C) 2017-2020 Nicola L. C. Talbot (www.dickimaw-books.com)
+
 License GPLv3+: GNU GPL version 3 or later
 http://gnu.org/licenses/gpl.html
 This is free software: you are free to change and redistribute it.

@@ -1,4 +1,4 @@
-v2.0 (pending):
+v2.0 (2020-02-12):
 
   * New command line options:
 
@@ -60,7 +60,7 @@ v2.0 (pending):
       --index-conversion (-i)
       --no-index-conversion 
       --absorb-see
-      --no=absorb-see
+      --no-absorb-see
 
     - added check for see=[\alsoname] in addition to
       see=[\seealsoname]
