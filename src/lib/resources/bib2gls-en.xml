@@ -513,6 +513,11 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax">{0} [&lt;options&gt;] &lt;tex file&gt; &lt;bib file&gt;</entry>
 
 <entry key="gls2bib.syntax.options">Options:</entry>
+<entry key="gls2bib.syntax.options.general">General:</entry>
+<entry key="gls2bib.syntax.options.locale">Encoding and Localisation:</entry>
+<entry key="gls2bib.syntax.options.filter">Filtering:</entry>
+<entry key="gls2bib.syntax.options.io">Output Files:</entry>
+<entry key="gls2bib.syntax.options.adjust">Adjustments:</entry>
 <entry key="gls2bib.syntax.version">{0} (or {1})		Display version information</entry>
 <entry key="gls2bib.syntax.help">{0} (or {1})			Display help</entry>
 <entry key="gls2bib.syntax.texenc">{0} &lt;encoding&gt;		.tex file encoding</entry>
@@ -523,11 +528,12 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.no-ignore-type">{0} 		Don''t omit type field (default)</entry>
 <entry key="gls2bib.syntax.split-on-type">{0} or {1} 		Split entries into separate files according to type field</entry>
 <entry key="gls2bib.syntax.no-split-on-type">{0} 		Don''t split entries according to type field (default)</entry>
-<entry key="gls2bib.syntax.ignore-category">{0} 			Omit category field</entry>
+<entry key="gls2bib.syntax.ignore-category">{0}		Omit category field</entry>
 <entry key="gls2bib.syntax.no-ignore-category">{0} 		Don''t omit category field (default)</entry>
-<entry key="gls2bib.syntax.split-on-category">{0} or {1} 		Split entries into separate files according to category field</entry>
+<entry key="gls2bib.syntax.split-on-category">{0} or {1} 	Split entries into separate files according to category field</entry>
 <entry key="gls2bib.syntax.no-split-on-category">{0} 		Don''t split entries according to category field (default)</entry>
-<entry key="gls2bib.syntax.ignore-fields">{0} &lt;list&gt; or {1} &lt;list&gt; 		Ignore the fields contained in the comma-separated &lt;list&gt;</entry>
+<entry key="gls2bib.syntax.ignore-fields">{0} &lt;list&gt; or {1} &lt;list&gt;
+		 		Ignore the fields contained in the comma-separated &lt;list&gt;</entry>
 <entry key="gls2bib.syntax.overwrite">{0} 			Overwrite files (default unless {1} or {2})</entry>
 <entry key="gls2bib.syntax.no-overwrite">{0} 			Don''t overwrite files</entry>
 <entry key="gls2bib.syntax.preamble-only">{0} or {1} 		Only parse the preamble</entry>
@@ -535,7 +541,7 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.space-sub">{0} &lt;val&gt; or {1} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;</entry>
 <entry key="gls2bib.syntax.index-conversion">{0} or {1}	Convert @entry to @index if no description.</entry>
 <entry key="gls2bib.syntax.no-index-conversion">{0} 		Don''t convert @entry to @index.</entry>
-<entry key="gls2bib.syntax.absorb-see">{0} 		Absorb \glssee and \glsxtrindexseealso into the data (default).</entry> 
+<entry key="gls2bib.syntax.absorb-see">{0}	 		Absorb \glssee and \glsxtrindexseealso into the data (default).</entry> 
 <entry key="gls2bib.syntax.no-absorb-see">{0} 		Don''t absorb \glssee and \glsxtrindexseealso into the data.</entry>
 <entry key="gls2bib.syntax.locale">{0} &lt;iso tag&gt;		Use language resource file given by &lt;iso tag&gt; for messages.</entry>
 <entry key="gls2bib.syntax.silent">{0}			Suppress messages.</entry>

@@ -362,6 +362,10 @@ public class Gls2Bib extends LaTeXParserListener
          parser.putControlSequence(new GobbleOptMandOpt("PGLS")); 
          parser.putControlSequence(new GobbleOptMandOpt("PGLSpl")); 
 
+         parser.putControlSequence(new AtGobble("glsentrynumberlist")); 
+         parser.putControlSequence(new AtGobble("glsdisplaynumberlist")); 
+         parser.putControlSequence(new GobbleOpt("chapter", 1, 1, '*')); 
+
          parser.putControlSequence(new GobbleOpt("printglossary", 1, 0)); 
          parser.putControlSequence(new GobbleOpt("printnoidxglossary", 1, 0)); 
 
@@ -1206,13 +1210,36 @@ public class Gls2Bib extends LaTeXParserListener
    public void help()
    {
       System.out.println(getMessage("gls2bib.syntax", APP_NAME));
+      System.out.println();
       System.out.println(getMessage("gls2bib.syntax.options"));
+      System.out.println();
+
+      System.out.println(getMessage("gls2bib.syntax.options.general"));
+      System.out.println();
 
       System.out.println(getMessage("gls2bib.syntax.version", "--version",
        "-v"));
       System.out.println(getMessage("gls2bib.syntax.help", "--help", "-h"));
+      System.out.println(getMessage("gls2bib.syntax.silent",
+        "--silent"));
+      System.out.println(getMessage("gls2bib.syntax.verbose",
+        "--verbose"));
+      System.out.println(getMessage("gls2bib.syntax.debug",
+        "--debug"));
+      System.out.println();
+
+      System.out.println(getMessage("gls2bib.syntax.options.locale"));
+      System.out.println();
+
       System.out.println(getMessage("gls2bib.syntax.texenc", "--texenc"));
       System.out.println(getMessage("gls2bib.syntax.bibenc", "--bibenc"));
+      System.out.println(getMessage("gls2bib.syntax.locale",
+        "--locale"));
+      System.out.println();
+
+      System.out.println(getMessage("gls2bib.syntax.options.filter"));
+      System.out.println();
+
       System.out.println(getMessage("gls2bib.syntax.ignore-sort",
         "--ignore-sort"));
       System.out.println(getMessage("gls2bib.syntax.no-ignore-sort",
@@ -1221,28 +1248,40 @@ public class Gls2Bib extends LaTeXParserListener
         "--ignore-type"));
       System.out.println(getMessage("gls2bib.syntax.no-ignore-type",
         "--no-ignore-type"));
-      System.out.println(getMessage("gls2bib.syntax.split-on-type",
-        "--split-on-type", "-t"));
-      System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
-        "--no-split-on-type"));
       System.out.println(getMessage("gls2bib.syntax.ignore-category",
         "--ignore-category"));
       System.out.println(getMessage("gls2bib.syntax.no-ignore-category",
         "--no-ignore-category"));
-      System.out.println(getMessage("gls2bib.syntax.split-on-category",
-        "--split-on-category", "-c"));
-      System.out.println(getMessage("gls2bib.syntax.no-split-on-category",
-        "--no-split-on-category"));
       System.out.println(getMessage("gls2bib.syntax.ignore-fields",
         "--ignore-fields", "-f"));
-      System.out.println(getMessage("gls2bib.syntax.overwrite",
-        "--overwrite", "--split-on-type", "--split-on-category"));
-      System.out.println(getMessage("gls2bib.syntax.no-overwrite",
-        "--no-overwrite"));
       System.out.println(getMessage("gls2bib.syntax.preamble-only",
         "--preamble-only", "-p"));
       System.out.println(getMessage("gls2bib.syntax.no-preamble-only",
         "--no-preamble-only"));
+
+      System.out.println();
+
+      System.out.println(getMessage("gls2bib.syntax.options.io"));
+      System.out.println();
+
+      System.out.println(getMessage("gls2bib.syntax.split-on-type",
+        "--split-on-type", "-t"));
+      System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
+        "--no-split-on-type"));
+      System.out.println(getMessage("gls2bib.syntax.split-on-category",
+        "--split-on-category", "-c"));
+      System.out.println(getMessage("gls2bib.syntax.no-split-on-category",
+        "--no-split-on-category"));
+      System.out.println(getMessage("gls2bib.syntax.overwrite",
+        "--overwrite", "--split-on-type", "--split-on-category"));
+      System.out.println(getMessage("gls2bib.syntax.no-overwrite",
+        "--no-overwrite"));
+
+      System.out.println();
+
+      System.out.println(getMessage("gls2bib.syntax.options.adjust"));
+      System.out.println();
+
       System.out.println(getMessage("gls2bib.syntax.space-sub",
         "--space-sub", "-s"));
       System.out.println(getMessage("gls2bib.syntax.index-conversion",
@@ -1253,14 +1292,6 @@ public class Gls2Bib extends LaTeXParserListener
         "--absorb-see"));
       System.out.println(getMessage("gls2bib.syntax.no-absorb-see",
         "--no-absorb-see"));
-      System.out.println(getMessage("gls2bib.syntax.locale",
-        "--locale"));
-      System.out.println(getMessage("gls2bib.syntax.silent",
-        "--silent"));
-      System.out.println(getMessage("gls2bib.syntax.verbose",
-        "--verbose"));
-      System.out.println(getMessage("gls2bib.syntax.debug",
-        "--debug"));
    }
 
    protected void parseArgs(String[] args)
@@ -1604,8 +1635,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "1.9.20200211";
-   public static final String DATE = "2020-02-11";
+   public static final String VERSION = "1.9.20200212";
+   public static final String DATE = "2020-02-12";
    public static final String APP_NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
