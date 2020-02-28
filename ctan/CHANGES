@@ -1,3 +1,10 @@
+v2.1 (2020-02-28):
+
+  * Bug fix (texparserlib.jar):
+
+    - "Fails to parse \@writefile{lot}{\egroup }" issue #2
+      https://github.com/nlct/texparser/issues/2
+
 v2.0 (2020-02-12):
 
   * New command line options:

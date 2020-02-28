@@ -3,9 +3,9 @@
 Command line application to convert `.bib` files to
 `glossaries-extra.sty` resource files.
 
-Author: Nicola Talbot (http://www.dickimaw-books.com/)
+Author: Nicola Talbot (https://www.dickimaw-books.com/contact)
 
-Application Home Page: http://www.dickimaw-books.com/software/bib2gls
+Application Home Page: https://www.dickimaw-books.com/software/bib2gls
 
 # Licence
 
