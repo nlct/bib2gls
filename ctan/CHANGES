@@ -1,5 +1,8 @@
 v2.1 (2020-02-28):
 
+  * Only trigger error exit code for bib parser exceptions
+    (just warn for interpreter and aux parser exceptions).
+
   * Bug fix (texparserlib.jar):
 
     - "Fails to parse \@writefile{lot}{\egroup }" issue #2
