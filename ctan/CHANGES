@@ -1,3 +1,11 @@
+v2.2 (2020-03-16):
+
+  * Bug fix (texparserlib.jar):
+
+    - "Files located in local texmf path are not determined
+      correctly" issue #3
+      https://github.com/nlct/bib2gls/issues/3
+
 v2.1 (2020-02-28):
 
   * Only trigger error exit code for bib parser exceptions
