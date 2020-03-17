@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2017-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,8 @@ public class SortSettings
        || method.equals("numeric")
        || method.equals("currency")
        || method.equals("percent")
-       || method.equals("numberformat"))
+       || method.equals("numberformat")
+       || method.equals("recordcount"))
       {
          return true;
       }
@@ -125,6 +126,11 @@ public class SortSettings
    {
       return sortMethod != null && !sortMethod.startsWith("use")
        && !sortMethod.equals("none");
+   }
+
+   public boolean requiresSortField()
+   {
+      return requiresSorting() && !sortMethod.startsWith("recordcount");
    }
 
    public boolean isOrderOfRecords()
@@ -197,6 +203,12 @@ public class SortSettings
             || sortMethod.startsWith("binary");
    }
 
+   public boolean isRecordCount()
+   {
+      if (sortMethod == null) return false;
+
+      return sortMethod.startsWith("recordcount");
+   }
 
    public boolean isReverse()
    {

@@ -1,0 +1,58 @@
+% The page numbers will be out on the first
+% pdflatex+bib2gls+pdflatex build as the undefined entries and
+% missing summary at the start of the document will result in a
+% shorter document with different page breaks. The first arara
+% conditional below simply tests if the .glstex file exists. This is
+% faster than searching the log file for text. The second
+% conditional has to search the log file instead as the .glstex file
+% should exist at that point (unless bib2gls failed but that will
+% cause arara to fail as well).
+%
+% arara: pdflatex
+% arara: bib2gls: { group: on, recordcount: on } if missing("glstex")
+% arara: pdflatex if found ("log", "No entries defined in glossary")
+% arara: bib2gls: { group: on, recordcount: on }
+% arara: pdflatex
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{pifont}
+\usepackage[colorlinks]{hyperref}
+\usepackage[bib2gls,nodesc,notestencaps,noprefix,noglsnumbers]{testidx-glossaries}
+%\glossariesextrasetup{record=nameref}
+\usepackage[bookindex,mcols]{glossaries-extra-stylemods}
+\setglossarystyle{bookindex}
+
+\renewcommand{\glstreeDescLoc}[2]{%
+  \space
+  \glsxtrifhasfield{recordcount}{#1}%
+  {(record count: \glscurrentfieldvalue)}%
+  {(no record count)}%
+  \space\glshyperlink[\ding{43}]{#1}%
+}
+
+
+\newglossary*{frequent}{Most Frequently Used Terms}
+
+\tstidxmakegloss[
+  secondary=recordcount-reverse:frequent
+]
+
+\newcommand{\filterhook}[1]{%
+  \GlsXtrIfFieldCmpNum*{recordcount}{#1}{>}{4}%
+  {\ifglshasparent{#1}{\printunsrtglossaryskipentry}{}}%
+  {\printunsrtglossaryskipentry}%
+}
+
+\begin{document}
+\printunsrtglossary*[style=mcolindex,target=false,type=frequent]{%
+  \let\glstreenamefmt\textmd
+  \let\printunsrtglossaryentryprocesshook\filterhook
+}
+
+\testidx
+
+\tstidxprintglossary
+
+\end{document}

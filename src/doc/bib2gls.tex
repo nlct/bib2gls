@@ -12763,14 +12763,18 @@ list that's the exact reverse of the underlying non-reversed
 can affect the order.
 
 \begin{table}[p]
-\caption{Summary of Available Sort Options: No Actual Sorting}
+\caption{Summary of Available Sort Options: No Sort Field}
 \label{tab:sortoptionsnosort}
+\textdagger Requires \longarg{record-count}.
+\medskip
 \centering
 \begin{tabular}{ll}
 \optfmt{none} or \optfmt{unsrt} & don't sort\tabularnewline
 \optfmt{random} & shuffle entries\tabularnewline
 \optfmt{use} & order of use\tabularnewline
-\optfmt{use-reverse} & reverse order of use
+\optfmt{use-reverse} & reverse order of use\tabularnewline
+\optfmt{recordcount}\textdagger & order of record count\tabularnewline
+\optfmt{recordcount-reverse}\textdagger & reverse order of record count
 \end{tabular}
 \end{table}
 
@@ -12885,12 +12889,15 @@ sort\tabularnewline
 \end{tabular}
 \end{table}
 
-\subsubsection{No Sort}
+\subsubsection{No Sort Field}
 
-The sort methods listed in \tableref{tab:sortoptionsnosort} 
+Most of the sort methods listed in \tableref{tab:sortoptionsnosort} 
 don't actually perform any sorting. This may cause a problem for
 hierarchical entries. In some cases this can lead to detached child
 entries or an attempt to define a child entry before its parent.
+The methods listed in this section all ignore the \csopt{sort-field}
+setting and all the various sort fallback settings, except where
+noted below.
 \begin{itemize}
 
 \item \optfmt{none} (or \optfmt{unsrt}): don't sort the entries.
@@ -12916,7 +12923,103 @@ first use of that term that's used as the sort value.
 \item \optfmt{use-reverse}: reverses the order that would be
 obtained with \csopt[use]{sort} without reference to hierarchy.
 
+\item \optfmt{recordcount}: order of record count (starting from 0). This order is
+determined by the total number of records written to the \iext{aux}
+file for each entry. Unlike the above methods, this performs a hierarchical sort.
+If letter groups are enabled with \longarg{group}, this method will assign the entries to
+the \idx{numbergroup}.
+
+This option requires the \longarg{record-count} switch. Although
+that switch makes \bibgls\ write the total record count to the
+\ext{glstex} file in the \field{recordcount} internal field (so that it
+can be accessed in the document), \bibgls\ doesn't actually have a
+field itself that contains the information. (The total is computed
+while the entry is being written to the \ext{glstex} file.) So
+although this option behaves much like \csopt[integer]{sort} it's
+not possible to select a field containing the required value. In the
+event of two or more entries having the same record count, the
+\csopt{identical-sort-action} option is used to determine the
+relative ordering between them.
+
+\item \optfmt{recordcount-reverse}: reverse order of record count
+(ending with 0). All the above notes applying to
+\optfmt{recordcount} also apply here.
+
 \end{itemize}
+
+Suppose the file \filefmt{entries.bib} contains
+definitions of a set of symbols that don't have any intuitive
+ordering (for example, they are all pictographs) then there may be
+no point in trying to order them, in which case you can do:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[none]{sort}}
+\end{codeenv}
+Alternatively, you could list them in order of use:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[use]{sort}}
+\end{codeenv}
+or by frequency of use. For example, starting with entries that
+don't have any records followed by the least used entries:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[recordcount]{sort}}
+\end{codeenv}
+Or starting with the most used entries:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[recordcount-reverse]{sort}}
+\end{codeenv}
+It all depends on what's likely to be most useful to the reader.
+
+Consider the following:
+\begin{codeenv}
+\ics{newglossary*}\marg{frequent}\marg{Most Frequently Used Terms}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
+ \csopt[use]{sort},
+ \csopt[recordcount-reverse:frequent]{secondary}
+}
+\cs{newcommand}\marg{\csfmt{filterhook}}[1]\marg{\comment{}
+  \ics{GlsXtrIfFieldCmpNum}*\marg{recordcount}\marg{\idx{hashchar}1}\marg{>}\marg{10}\comment{}
+  \marg{}\comment{}
+  \marg{\ics{printunsrtglossaryskipentry}}\comment{}
+}
+\csfmt{begin}\marg{document}
+\cs{printunsrtglossary*}\oarg{\printglossopt[false]{target},\printglossopt[frequent]{type}}\marg{\comment{}
+  \cs{let}\ics{printunsrtglossaryentryprocesshook}\csfmt{filterhook}
+}
+\comment{Main body of the document \ldots}
+\cs{printunsrtglossary}
+\csfmt{end}\marg{document}
+\end{codeenv}
+This has a summary at the start of the document that only contains
+entries that have at least 10 records and is ordered according to
+the total number of records (starting with the most frequently used
+entry). The main glossary at the end of the document is ordered
+according to use and contains all selected entries.
+
+Compare this with the following:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[use]{sort}}
+\cs{newcommand}\marg{\csfmt{filterhook}}[1]\marg{\comment{}
+  \ics{GlsXtrIfFieldCmpNum}*\marg{recordcount}\marg{\idx{hashchar}1}\marg{>}\marg{10}\comment{}
+  \marg{}\comment{}
+  \marg{\ics{printunsrtglossaryskipentry}}\comment{}
+}
+\csfmt{begin}\marg{document}
+\cs{printunsrtglossary*}\oarg{\printglossopt[false]{target},
+ \printglossopt[Most Frequently Used Terms]{title}}\marg{\comment{}
+  \cs{let}\ics{printunsrtglossaryentryprocesshook}\csfmt{filterhook}
+}
+\comment{Main body of the document \ldots}
+\cs{printunsrtglossary}
+\csfmt{end}\marg{document}
+\end{codeenv}
+This again has a summary at the start of the document that only
+contains entries that have at least 10 records but is now ordered
+according to use. 
+
+Both examples assume there are no child entries as the filtering can
+cause parent entries to be omitted. Both examples require
+\longarg{record-count} but only the first example sorts according to
+the record count.
 
 \subsubsection{Alphabet}
 
@@ -13638,12 +13741,19 @@ Example:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
  \csopt[entries-terms]{src},\comment{data in entries-terms.bib}
- \csopt[category]{sort-field},\comment{sort by 'category' field}
+ \csopt[symbol]{sort-field},\comment{sort by 'symbol' field}
  \csopt[letter-case]{sort}\comment{case-sensitive letter sort}
 }
 \end{codeenv}
-This sorts the entries according to the \field{category} field using
+This sorts the entries according to the \field{symbol} field using
 a case-sensitive letter comparison.
+
+\begin{important}
+In general it's better to use the default \csopt[sort]{sort-field} 
+and adjust the fallbacks instead. The \csopt{sort-field} option is
+provided if you want to use a specific field regardless of the entry
+type.
+\end{important}
 
 If an entry is missing a value for \meta{field}, then the value of
 the fallback field will be used instead. If \csopt{missing-sort-fallback} is

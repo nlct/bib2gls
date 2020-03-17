@@ -32,7 +32,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
-	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf
+	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf \
+	  sample-recordcount.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -615,6 +616,13 @@ test-dual-prefix.pdf	: test-dual-prefix.glstex
 test-dual-prefix.glstex	: test-dual-prefix.tex test-dual-prefix.bib $(DEPS)
 		pdflatex test-dual-prefix
 		$(BIB2GLS) test-dual-prefix
+
+sample-recordcount.pdf	: sample-recordcount.glstex
+		pdflatex sample-recordcount
+
+sample-recordcount.glstex	: sample-recordcount.tex $(DEPS)
+		pdflatex sample-recordcount
+		$(BIB2GLS) --record-count sample-recordcount
 
 clean	:
 	$(RM) *.aux

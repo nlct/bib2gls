@@ -371,7 +371,11 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       String entrySortField = sortField;
 
-      if (entrySortField.equals("id"))
+      if (!settings.requiresSortField())
+      {
+         value = "";
+      }
+      else if (entrySortField.equals("id"))
       {
          value = id;
       }

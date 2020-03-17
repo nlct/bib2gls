@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Nicola L.C. Talbot
+    Copyright (C) 2017-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -6132,6 +6132,14 @@ public class GlsResource
          Bib2GlsEntryLetterNumberComparator comparator = 
             new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
               settings, sortField, entryGroupField, entryType);
+
+         comparator.sortEntries();
+      }
+      else if (settings.isRecordCount())
+      {
+         Bib2GlsEntryRecordCountComparator comparator = 
+            new Bib2GlsEntryRecordCountComparator(bib2gls, entries, 
+              settings, entryGroupField, entryType);
 
          comparator.sortEntries();
       }
