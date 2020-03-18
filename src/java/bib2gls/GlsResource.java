@@ -5360,7 +5360,8 @@ public class GlsResource
          writer.println("}");
          writer.println();
 
-         writer.format("\\provideignoredglossary*{%s}%n", type);
+         provideGlossary(writer, type);
+
          writer.format("\\glssetcategoryattribute{%s}{targeturl}{%s}%n", 
            category, masterPdfPath);
          writer.format("\\glssetcategoryattribute{%s}{targetname}", 
@@ -6340,7 +6341,7 @@ public class GlsResource
 
          if (triggerType != null)
          {
-            writer.format("\\provideignoredglossary*{%s}%n", triggerType);
+            provideGlossary(writer, triggerType);
          }
 
          if (bibtexAuthorList != null)
@@ -6870,7 +6871,7 @@ public class GlsResource
 
          if (secondaryList != null)
          {
-            writer.format("\\provideignoredglossary*{%s}%n", secondaryType);
+            provideGlossary(writer, secondaryType);
 
             writer.println("\\ifdef\\glsxtrgroupfield{%");
             writer.format("  \\apptoglossarypreamble[%s]{",
@@ -7075,6 +7076,23 @@ public class GlsResource
       writer.println("}");
    }
 
+   private void provideGlossary(PrintWriter writer, String type)
+     throws IOException
+   {
+      if (bib2gls.isProvideGlossariesOn())
+      {
+         if (!bib2gls.isKnownGlossary(type))
+         {
+            writer.format("\\provideignoredglossary*{%s}%n", type);
+            bib2gls.addGlossary(type);
+         }
+      }
+      else
+      {
+         writer.format("\\provideignoredglossary*{%s}%n", type);
+      }
+   }
+
    private void writeBibEntryDef(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException,Bib2GlsException
    {
@@ -7107,6 +7125,18 @@ public class GlsResource
       else
       {
          bib2gls.selectedEntry(id);
+      }
+
+      if (bib2gls.isProvideGlossariesOn())
+      {
+         String type = entry.getFieldValue("type");
+
+         if (type != null && !bib2gls.isKnownGlossary(type))
+         {
+            writer.format("\\provideignoredglossary*{%s}%n", type);
+
+            bib2gls.addGlossary(type);
+         }
       }
 
       entry.writeBibEntry(writer);

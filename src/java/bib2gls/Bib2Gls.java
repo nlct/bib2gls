@@ -1533,6 +1533,11 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("@glsxtr@altmodifier", 1);
             addAuxCommand("@glsxtr@newglslike", 2);
             addAuxCommand("@glsxtr@prefixlabellist", 1);
+
+            if (knownGlossaries != null)
+            {
+               addAuxCommand("@newglossary", 4);
+            }
          }
       };
 
@@ -2037,6 +2042,10 @@ public class Bib2Gls implements TeXApp
                records.add(newRecord);
             }
          }
+         else if (knownGlossaries != null && name.equals("@newglossary"))
+         {
+            addGlossary(data.getArg(0).toString(parser));
+         }
       }
 
       provideCommand("glspluralsuffix", pluralSuffix);
@@ -2520,6 +2529,23 @@ public class Bib2Gls implements TeXApp
    public boolean isWarnUnknownEntryTypesOn()
    {
       return warnUnknownEntryTypes;
+   }
+
+   public boolean isProvideGlossariesOn()
+   {
+      return knownGlossaries != null;
+   }
+
+   public boolean isKnownGlossary(String label)
+   {
+      return knownGlossaries != null && knownGlossaries.contains(label);
+   }
+
+   // avoiding duplicate checks (only use once already checked isProvideGlossariesOn and
+   // isKnownGlossary)
+   public void addGlossary(String label)
+   {
+      knownGlossaries.add(label);
    }
 
    public void selectedEntry(String label)
@@ -4037,6 +4063,14 @@ public class Bib2Gls implements TeXApp
          "--no-expand-fields"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.provide.glossaries",
+         "--provide-glossaries"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.provide.glossaries",
+         "--no-provide-glossaries"));
+
+      System.out.println();
       System.out.println(getMessage("syntax.tex.encoding",
          "--tex-encoding"));
 
@@ -4390,6 +4424,7 @@ public class Bib2Gls implements TeXApp
       String dirName = null;
       String auxFileName = null;
       String logName = null;
+      boolean provideknownGlossaries=false;
 
       Object[] argVal = new Object[2];
 
@@ -4955,6 +4990,14 @@ public class Bib2Gls implements TeXApp
 
             trimFields = true;
          }
+         else if (args[i].equals("--provide-glossaries"))
+         {
+            provideknownGlossaries=true;
+         }
+         else if (args[i].equals("--no-provide-glossaries"))
+         {
+            provideknownGlossaries=false;
+         }
          else if (args[i].startsWith("-"))
          {
             throw new Bib2GlsSyntaxException(getMessage(
@@ -4968,6 +5011,11 @@ public class Bib2Gls implements TeXApp
          {
             throw new Bib2GlsSyntaxException(getMessage("error.only.one.aux"));
          }
+      }
+
+      if (provideknownGlossaries)
+      {
+         knownGlossaries = new Vector<String>();
       }
 
       if (auxFileName == null)
@@ -5179,8 +5227,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.2.20200317";
-   public static final String DATE = "2020-03-17";
+   public static final String VERSION = "2.2.20200318";
+   public static final String DATE = "2020-03-18";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5217,6 +5265,8 @@ public class Bib2Gls implements TeXApp
    private Vector<GlsRecord> records;
    private Vector<GlsSeeRecord> seeRecords;
    private Vector<String> selectedEntries;
+
+   private Vector<String> knownGlossaries=null;
 
    public static final String[] SPAWN_SPECIAL_FIELDS =
     new String[] {"progeny", "progenitor", "adoptparents"};

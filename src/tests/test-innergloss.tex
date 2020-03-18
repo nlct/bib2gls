@@ -1,0 +1,82 @@
+% arara: pdflatex
+% arara: bib2gls: { options: [ --provide-glossaries ]}
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,stylemods,section]{glossaries-extra}
+
+\GlsXtrLoadResources[src=topictitles,type=main,selection=all,
+ sort=en-GB-reverse]
+
+\GlsXtrLoadResources[src=topics,type={same as category},selection=all]
+
+\renewcommand{\glsnamefont}[1]{\textmd{\scshape #1}}
+
+\begin{document}
+\chapter{Separate Glossaries (list style)}
+\printunsrtglossary[type=animal,title=Animals]
+\printunsrtglossary[type=vegetable,title=Vegetables]
+\printunsrtglossary[type=mineral,title=Minerals]
+
+\chapter{list style}
+\begin{printunsrtglossarywrap}[style=list]
+\item[Animals]
+\printunsrtinnerglossary[type=animal]{}{}
+\item[Vegetables]
+\printunsrtinnerglossary[type=vegetable]{}{}
+\item[Minerals]
+\printunsrtinnerglossary[type=mineral]{}{}
+\end{printunsrtglossarywrap}
+
+\chapter{indexgroup style}
+\begin{printunsrtglossarywrap}[style=indexgroup]
+% Use the category field as the group label. No associated
+% title has been supplied so the label will be used as the title text.
+\renewcommand*{\glsxtrgroupfield}{category}%
+\printunsrtinnerglossary[type=animal]{}{\indexspace}
+\printunsrtinnerglossary[type=vegetable]{}{\indexspace}
+\printunsrtinnerglossary[type=mineral]{}{}
+\end{printunsrtglossarywrap}
+
+\chapter{indexgroup style with level offset}
+% As the previous section but treat the entries as though their
+% hierarchical level has been shifted by 1. (So a top-level entry is
+% displayed as a level 1 entry.)
+\begin{printunsrtglossarywrap}[style=indexgroup]
+\renewcommand*{\glsxtrgroupfield}{category}%
+\printunsrtinnerglossary[type=animal,leveloffset=1]{}{\indexspace}
+\printunsrtinnerglossary[type=vegetable,leveloffset=1]{}{\indexspace}
+\printunsrtinnerglossary[type=mineral,leveloffset=1]{}{}
+\end{printunsrtglossarywrap}
+
+\chapter{Nesting}
+
+\newcommand{\nestedhandler}[1]{%
+  \glsxtrunsrtdo{#1}%
+% Is there a glossary whose label (type) matches this entry's label?
+  \ifglossaryexists*{#1}%
+  {%
+    \printunsrtinnerglossary[type={#1},leveloffset=++1]{}{}%
+  }%
+  {}%
+}
+
+\printunsrtglossary*[type=main,style=index]{%
+  \let\printunsrtglossaryhandler\nestedhandler
+}
+
+\chapter{Manual}
+
+A silly example:
+\begin{printunsrtglossarywrap}[style=indexgroup]
+\glsgroupheading{W}%
+\xdef\glscurrententrylabel{cabbage}%
+\printunsrtglossaryhandler\glscurrententrylabel
+\glsgroupskip
+\glsgroupheading{Z}%
+\xdef\glscurrententrylabel{broccoli}%
+\printunsrtglossaryhandler\glscurrententrylabel
+\end{printunsrtglossarywrap}
+
+\end{document}

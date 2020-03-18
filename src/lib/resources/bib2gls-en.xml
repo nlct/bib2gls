@@ -164,6 +164,13 @@ See the manual for further details.</entry>
 			the listed packages.</entry>
 <entry key="syntax.list.known.packages">{0}
 			List the packages known to the interpreter.</entry>
+<entry key="syntax.provide.glossaries">{0}
+			Define any unknown glossaries with 
+			\provideignoredglossary*.</entry>
+<entry key="syntax.no.provide.glossaries">{0}
+			Don''t define unknown glossaries with 
+			\provideignoredglossary* except in certain situations
+			(default).</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>

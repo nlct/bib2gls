@@ -3,6 +3,11 @@ v2.3 (pending):
   * New sort methods: recordcount and recordcount-reverse
     (both require --record-count).
 
+  * New command line switches:
+
+    --provide-glossaries
+    --no-provide-glossaries
+
 v2.2 (2020-03-16):
 
   * Bug fix (texparserlib.jar):

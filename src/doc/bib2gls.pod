@@ -78,37 +78,37 @@ Don't try interpreting (La)TeX commands.
 
 =item B<--break-space>
 
-Interpret tilde character and \nobreakspace as a normal space.
+Interpret C<~> (tilde) character and C<\nobreakspace> as a normal space.
 
 =item B<--no-break-space>
 
-Interpret tilde and \nobreakspace as a non-breaking space (default).
+Interpret C<~> (tilde) and C<\nobreakspace> as a non-breaking space (default).
 
 =item B<--cite-as-record>
 
-Treat B<\citation> as an ignored record.
+Treat C<\citation> as an ignored record.
 
 =item B<--no-cite-as-record>
 
-Don't check for instances of B<\citation> in the B<.aux> file (default).
+Don't check for instances of C<\citation> in the F<.aux> file (default).
 
 =item B<--warn-non-bib-fields>
 
-Warn if internal non-bib fields are found in the .bib file.
+Warn if internal non-bib fields are found in the F<.bib> file.
 
 =item B<--no-warn-non-bib-fields>
 
-Don't warn if internal non-bib fields are found in the .bib file.
+Don't warn if internal non-bib fields are found in the F<.bib> file.
 The use of these internal fields can cause unexpected results, so
 only use this option if you have taken appropriate precautions.
 
 =item B<--warn-unknown-entry-types>
 
-Warn if any unknown entry types are found in the .bib file.
+Warn if any unknown entry types are found in the F<.bib> file.
 
 =item B<--no-warn-unknown-entry-types>
 
-Don't warn if any unknown entry types are found in the .bib file.
+Don't warn if any unknown entry types are found in the F<.bib> file.
 
 =item B<--merge-wrglossary-records>
 
@@ -121,8 +121,8 @@ Don't merge an entry's B<wrglossary> records.
 
 =item B<--merge-nameref-on> I<rule>
 
-Rule for merging locations created with the record=nameref package option
-(requires glossaries-extra.sty version 1.37+). The I<rule> may be
+Rule for merging locations created with the B<record=nameref> package option
+(requires F<glossaries-extra.sty> version 1.37+). The I<rule> may be
 one of: B<hcounter>, B<href>, B<title> or B<location>.
 
 =item B<--force-cross-resource-refs> or B<-x>
@@ -135,16 +135,16 @@ Don't force cross-resource referencing mode on (default).
 
 =item B<--support-unicode-script>
 
-Text superscript (\textsuperscript) or subscripts (\textsubscript)
+Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
 will use Unicode superscript/subscript characters if available.
-For example, \textsuperscript{2} will be converted to U+00B2
+For example, C<\textsuperscript{2}> will be converted to U+00B2
 (superscript two).
 
 =item B<--no-support-unicode-script>
 
-Text superscript (\textsuperscript) or subscripts (\textsubscript)
+Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
 won't be converted to Unicode superscript/subscript characters.
-For example, \textsuperscript{2} will be converted to <sup>2</sup>
+For example, C<\textsuperscript{2}> will be converted to C<E<lt>supE<gt>2E<lt>/supE<gt>>
 and the markup will be stripped leaving just the character 2.
 
 =item B<--packages> I<list> (or B<-p> I<list>)
@@ -182,7 +182,7 @@ packages may be used in B<--packages> or B<--ignore-packages>.
 =item B<--mfirstuc-protection> I<fields>|B<all> (or B<-u> I<fields>|B<all>)
 
 Insert an empty group if fields start with certain problematic
-commands to protect against case-changing commands like \Gls.
+commands to protect against case-changing commands like C<\Gls>.
 
 The default is to do this for all fields.  To do this for only a
 subset of fields, set I<fields> to a comma-separated list of fields
@@ -194,12 +194,12 @@ Switch off the auto-insertion of an empty group for all fields.
 
 =item B<--mfirstuc-math-protection>
 
-Switch on the auto-insertion of an empty group for math-shift ($).
+Switch on the auto-insertion of an empty group for math-shift (C<$>).
 This option will be overridden by B<--no-mfirstuc-protection>.
 
 =item B<--no-mfirstuc-math-protection>
 
-Switch off the auto-insertion of an empty group for math-shift ($).
+Switch off the auto-insertion of an empty group for math-shift (C<$>).
 
 =item B<--nested-link-check> I<list>|B<none>
 
@@ -228,11 +228,11 @@ Set location format mappings.
 
 =item B<--group> or B<-g>
 
-Add 'group' field to entries.
+Add B<group> field to entries.
 
 =item B<--no-group>
 
-Don't add 'group' field to entries (default).
+Don't add B<group> field to entries (default).
 
 =item B<--record-count> or B<-c>
 
@@ -278,11 +278,24 @@ This option cancels B<--trim-only-fields> and B<--trim-fields>.
 
 =item B<--expand-fields>
 
-Don't write B<\glsnoexpandfields> to the B<.glstex> file.
+Don't write C<\glsnoexpandfields> to the F<.glstex> file.
 
 =item B<--no-expand-fields>
 
-Write B<\glsnoexpandfields> to the B<.glstex> file (default).
+Write C<\glsnoexpandfields> to the F<.glstex> file (default).
+
+=item B<--provide-glossaries>
+
+Write C<\provideignoredglossary*> to the F<.glstex> file to provide
+unknown glossaries.
+
+=item B<--no-provide-glossaries>
+
+Don't write C<\provideignoredglossary*> to the F<.glstex> file to
+provide unknown glossaries except in documented situations
+(B<master>, B<secondary> and B<trigger-type> resource options).
+This setting is the default.
+
 
 =back
 
@@ -293,7 +306,7 @@ Java 7 or later and a TeX distribution.
 =head1 LICENSE
 
 License GPLv3+: GNU GPL version 3 or later
-<http://gnu.org/licenses/gpl.html>
+L<http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 
@@ -314,7 +327,7 @@ The glossaries manual:
 =head1 AUTHOR
 
 Nicola L. C. Talbot,
-L<http://www.dickimaw-books.com/>
+L<https://www.dickimaw-books.com/>
 
 =cut
 

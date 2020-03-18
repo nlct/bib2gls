@@ -1906,7 +1906,8 @@ provided by \styfmt{glossaries-extra}.
 Some resource options, such as \csopt{master}, \csopt{secondary} and
 \csopt{trigger-type}, need to ensure that a
 required glossary is defined. In this case, \bibgls\ uses
-\ics{provideignoredglossary*} in the \iext{glstex} file. If you
+\ics{provideignoredglossary*} in the \iext{glstex} file 
+even if \longarg{no-provide-glossaries} is set. If you
 haven't already defined that glossary in the document with \cs{newglossary*},
 you'll need to set the title in the optional argument of
 \cs{printunsrtglossary} if you don't want the default. The glossary
@@ -1914,6 +1915,11 @@ won't be defined on the first run (if the definition is only
 provided in the \ext{glstex} file) but \cs{printunsrtglossary} will
 just give a warning if the type is undefined so it won't interrupt
 the document build.
+
+If you want \bibgls\ to automatically provide unknown glossaries for
+all entries that have the \field{type} field set (unrelated to the
+\csopt{master}, \csopt{secondary} and \csopt{trigger-type} options)
+then use the \longarg{provide-glossaries} switch.
 
 \section{Resource Sets}
 \label{sec:resourcesets}
@@ -3784,6 +3790,28 @@ bib2gls --trim-except-fields short --trim-except-fields long myDoc
 
 Don't trim any leading or trailing spaces from field values (but see
 the above note about \sty{xkeyval}). This is the default setting.
+
+\argsection{provide-glossaries}
+
+This setting will make \bibgls\ add the line
+\begin{codeenv}
+\ics{provideignoredglossary*}\margm{type}
+\end{codeenv}
+to the \ext{glstex} file before an entry is defined that has an
+unknown glossary type. This ensures that the glossary exists.
+\bibgls\ can detect glossaries that have been defined with
+\cs{newglossary} but not with \cs{newignoredglossary}. The use of
+\ics{provideignoredglossary} will ensure there's no error if the
+glossary has already been defined.
+
+\argsection{no-provide-glossaries}
+
+This setting prevents \bibgls\ from providing unknown glossaries,
+except in a few documented situations (the \csopt{master},
+\csopt{trigger-type} and \csopt{secondary} options). This is the
+default since it's a useful way of detecting misspelt glossary
+labels. It's harder to detect the problem if a misspelt label has
+caused an entry to be added to a hidden glossary.
 
 \argsection{record-count}
 
@@ -8197,7 +8225,8 @@ or \csopt{category} options haven't been used, the corresponding
 value will default to \optfmt{master}. The \catattr{targeturl}
 and \catattr{targetname} category attributes will automatically be
 set, and the glossary type will be provided using
-\code{\ics{provideignoredglossary*}\margm{type}}.
+\code{\ics{provideignoredglossary*}\margm{type}} (even if
+\longarg{no-provide-glossaries} is set).
 
 The above \filefmt{myarticle.tex} can be changed to:
 \begin{codeenv}
@@ -9110,6 +9139,7 @@ the keywords allowed by \csopt{type}).
 You can define the glossary before loading the resource, but
 it's not required as \bibgls\ will write
 \code{\ics{provideignoredglossary*}\margm{type}} to the \ext{glstex} file
+even if \longarg{no-provide-glossaries} is set
 (see \sectionref{sec:newglossary}).
 
 \optsection[\subsubsection]{progenitor-type}
@@ -15150,7 +15180,8 @@ in the secondary glossary will be the same as for the primary
 glossary.
 
 (If the glossary \meta{type} doesn't exist, it will be
-defined with \ics{provideignoredglossary*}\margm{type}.)
+defined with \ics{provideignoredglossary*}\margm{type} 
+even if \longarg{no-provide-glossaries} is set.)
 Note that if the glossary already exists and contains entries,
 the existing entries aren't re-ordered. The new entries are
 simply appended to the list.

@@ -33,7 +33,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
 	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf \
-	  sample-recordcount.pdf
+	  sample-recordcount.pdf test-innergloss.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -623,6 +623,13 @@ sample-recordcount.pdf	: sample-recordcount.glstex
 sample-recordcount.glstex	: sample-recordcount.tex $(DEPS)
 		pdflatex sample-recordcount
 		$(BIB2GLS) --record-count sample-recordcount
+
+test-innergloss.pdf	: test-innergloss.glstex
+		pdflatex test-innergloss
+
+test-innergloss.glstex	: test-innergloss.tex $(DEPS)
+		pdflatex test-innergloss
+		$(BIB2GLS) --no-group test-innergloss
 
 clean	:
 	$(RM) *.aux
