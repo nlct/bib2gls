@@ -3797,12 +3797,14 @@ This setting will make \bibgls\ add the line
 \begin{codeenv}
 \ics{provideignoredglossary*}\margm{type}
 \end{codeenv}
-to the \ext{glstex} file before an entry is defined that has an
-unknown glossary type. This ensures that the glossary exists.
-\bibgls\ can detect glossaries that have been defined with
-\cs{newglossary} but not with \cs{newignoredglossary}. The use of
-\ics{provideignoredglossary} will ensure there's no error if the
-glossary has already been defined.
+to the \ext{glstex} file before an entry is defined where that entry
+has the \field{type} field set to an unknown glossary type (\bibgls\
+can detect from the \ext{aux} file all glossaries that have been
+defined with \cs{newglossary} but not those defined with \cs{newignoredglossary}).
+
+This ensures that the glossary exists, but the use of
+\ics{provideignoredglossary} (rather than \cs{newignoredglossary})
+will prevent an error if the glossary has already been defined.
 
 \argsection{no-provide-glossaries}
 
@@ -12795,17 +12797,18 @@ can affect the order.
 \begin{table}[p]
 \caption{Summary of Available Sort Options: No Sort Field}
 \label{tab:sortoptionsnosort}
-\textdagger Requires \longarg{record-count}.
-\medskip
 \centering
 \begin{tabular}{ll}
 \optfmt{none} or \optfmt{unsrt} & don't sort\tabularnewline
 \optfmt{random} & shuffle entries\tabularnewline
 \optfmt{use} & order of use\tabularnewline
 \optfmt{use-reverse} & reverse order of use\tabularnewline
-\optfmt{recordcount}\textdagger & order of record count\tabularnewline
-\optfmt{recordcount-reverse}\textdagger & reverse order of record count
+\optfmt{recordcount}\textsuperscript\textdagger & order of record count\tabularnewline
+\optfmt{recordcount-reverse}\textsuperscript\textdagger & reverse order of record count
 \end{tabular}
+\par
+\medskip
+\textsuperscript\textdagger Requires \longarg{record-count} switch.
 \end{table}
 
 \begin{table}[p]
@@ -12963,11 +12966,10 @@ This option requires the \longarg{record-count} switch. Although
 that switch makes \bibgls\ write the total record count to the
 \ext{glstex} file in the \field{recordcount} internal field (so that it
 can be accessed in the document), \bibgls\ doesn't actually have a
-field itself that contains the information. (The total is computed
-while the entry is being written to the \ext{glstex} file.) So
-although this option behaves much like \csopt[integer]{sort} it's
-not possible to select a field containing the required value. In the
-event of two or more entries having the same record count, the
+field itself that contains the information. So although this option
+behaves much like \csopt[integer]{sort} it's not possible to select
+a field containing the required value. In the event of two or more
+entries having the same record count, the
 \csopt{identical-sort-action} option is used to determine the
 relative ordering between them.
 
@@ -12989,7 +12991,8 @@ Alternatively, you could list them in order of use:
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[use]{sort}}
 \end{codeenv}
 or by frequency of use. For example, starting with entries that
-don't have any records followed by the least used entries:
+don't have any records followed by the least used entries (a rarely-used symbol 
+may be harder to remember and most likely to be looked up in the glossary):
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[recordcount]{sort}}
 \end{codeenv}
@@ -13002,12 +13005,11 @@ It all depends on what's likely to be most useful to the reader.
 Consider the following:
 \begin{codeenv}
 \ics{newglossary*}\marg{frequent}\marg{Most Frequently Used Terms}
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
- \csopt[use]{sort},
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[use]{sort},
  \csopt[recordcount-reverse:frequent]{secondary}
 }
 \cs{newcommand}\marg{\csfmt{filterhook}}[1]\marg{\comment{}
-  \ics{GlsXtrIfFieldCmpNum}*\marg{recordcount}\marg{\idx{hashchar}1}\marg{>}\marg{10}\comment{}
+  \ics{GlsXtrIfFieldCmpNum}*\marg{\field{recordcount}}\marg{\idx{hashchar}1}\marg{>}\marg{10}\comment{}
   \marg{}\comment{}
   \marg{\ics{printunsrtglossaryskipentry}}\comment{}
 }
@@ -13029,7 +13031,7 @@ Compare this with the following:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[use]{sort}}
 \cs{newcommand}\marg{\csfmt{filterhook}}[1]\marg{\comment{}
-  \ics{GlsXtrIfFieldCmpNum}*\marg{recordcount}\marg{\idx{hashchar}1}\marg{>}\marg{10}\comment{}
+  \ics{GlsXtrIfFieldCmpNum}*\marg{\field{recordcount}}\marg{\idx{hashchar}1}\marg{>}\marg{10}\comment{}
   \marg{}\comment{}
   \marg{\ics{printunsrtglossaryskipentry}}\comment{}
 }
@@ -13069,7 +13071,7 @@ given by the \idx{IETF} language tag \meta{lang tag}.
 
 \item \optfmt{locale}: equivalent to 
 \csopt[\meta{lang tag}]{sort} where \meta{lang tag} is obtained
-from the \idx{JRE} (which usually matches the
+from the \idx{JRE}['s] default locale (which usually matches the
 operating system's locale).
 
 \item \optfmt{locale-reverse}: equivalent to 
@@ -13515,7 +13517,7 @@ results in the order:
 \code{C\textsubscript{10}H\textsubscript{10}O\textsubscript{4}}, 
 \code{C\textsubscript{5}H\textsubscript{4}NCOOH}. 
 
-Remember that the associated settings are reversed
+Remember that the associated settings are reversed as
 well. So \csopt[before letter]{letter-number-rule} 
 results in numbers \emph{after} letters.
 
@@ -13611,7 +13613,7 @@ decimal sort values.
 \item \optfmt{double}: double-precision sort. This is for non-locale
 decimal sort values.
 
-\item \optfmt{float-reverse}: as above but reverses the order.
+\item \optfmt{double-reverse}: as above but reverses the order.
 
 \item \optfmt{numeric}: locale-sensitive numeric sort. Use
 \csopt{numeric-locale} to set the locale.
