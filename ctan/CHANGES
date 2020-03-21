@@ -3,8 +3,8 @@ v2.3 (pending):
   * New sort methods: recordcount and recordcount-reverse
     (both require --record-count).
 
-  * Resource option 'selection' now also allows the value
-    'deps but not recorded'
+  * Resource option 'selection' now also allows the values
+    'deps but not recorded' and 'ancestors but not recorded'
 
   * New command line switches:
 

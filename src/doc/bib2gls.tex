@@ -7269,6 +7269,14 @@ entries that have records. This means that you end up with only the
 unrecorded dependencies. (Recorded entries will need to be selected
 in a different resource set.)
 
+\item \optfmt{ancestors but not recorded}: this first selects
+entries as though \optfmt{recorded and ancestors} had been used, but
+after all ancestors have been added it then removes all entries that
+have records. This means that you end up with only the unrecorded
+ancestors. (Recorded entries will need to be selected
+in a different resource set.) See the \exfile{sample-nested.tex}
+example document.
+
 \item \optfmt{all}: add all entries found in the \ext{bib} files
 supplied in the \csopt{src} option.
 \end{itemize}
@@ -20017,7 +20025,7 @@ The \ics{printunsrtinnerglossary} command is unsuitable for use
 with tabular-like styles, such as \glostyle{long}, and can be
 problematic with \glostyle{list} styles. However, those styles
 aren't suitable for hierarchical glossaries anyway.
-\begin{important}
+\end{important}
 
 Normally, hierarchy is achieve through definitions like:
 \begin{codeenv}
@@ -20057,7 +20065,7 @@ existence check. If the glossary exists, it's then displayed using
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{nestedhandler}}[1]\marg{\comment{}
   \cs{glsxtrunsrtdo}\marg{\idx{hashchar}1}\comment{}
-  \cs{ifglossaryexists}*\marg{#1}\comment{}
+  \cs{ifglossaryexists}*\marg{\idx{hashchar}1}\comment{}
   \marg{\comment{}
     \cs{printunsrtinnerglossary}\oarg{\printglossopt[\idx{hashchar}1]{type},\printglossopt[++1]{leveloffset},\printglossopt[false]{groups}}\marg{}\marg{}\comment{}
   }\comment{}
@@ -20140,7 +20148,7 @@ complicated:
 \gls{GlsXtrLoadResources}\oarg{\csopt[terms,animals,minerals,vegetables]{src},
  \csopt[en-reverse]{sort},
  \csopt[{identifier=parent}]{field-aliases},
- \csopt[deps but not recorded]{selection}
+ \csopt[ancestors but not recorded]{selection}
 }
 
 \gls{GlsXtrLoadResources}\oarg{
@@ -20151,7 +20159,29 @@ complicated:
 }
 \end{codeenv}
 Fortunately in this example, cross-resource dependencies are
-permitted so the simpler alternative works.
+permitted so the simpler alternative works. (If they're not
+permitted, the \bibgls\ transcript file will contain
+\qt{Cross-resource references can't be supported for resource set
+\meta{filename}}.)
+
+The complete code is listed below.  The document build is:
+\begin{verbatim}
+pdflatex sample-nested
+bib2gls --group --provide-glossaries sample-nested
+pdflatex sample-nested
+\end{verbatim}
+The complete document is shown in \figureref{fig:sample-nested.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-nested.tex}
+
+\begin{figure}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-nested.pdf}}%
+}
+{\caption{\filefmt{sample-nested.pdf}}}
+{fig:sample-nested.pdf}
+\end{figure}
 
 \filesection{sample-constants.tex}
 
@@ -23521,6 +23551,6 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
  }%
 }
 \renewcommand*{\unicodecategoryfmt}[1]{\textsf{#1}}
-\renewcommand*{\bibglspassim}{}
+\glsrenewcommand*{\bibglspassim}{}
 \printunsrtglossary[type=index]
 \end{document}

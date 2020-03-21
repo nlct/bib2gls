@@ -14,15 +14,10 @@
  stylemods={tree},
  style=treegroup]{glossaries-extra}
 
-\GlsXtrLoadResources[src={terms,animals,minerals,vegetables,interpret-preamble},
-   %src=terms,
-   sort={en-reverse},
-  field-aliases={identifier=parent},
-  selection={deps but not recorded}
-]
+\GlsXtrLoadResources[src={terms},sort={en-reverse}]
 
 \GlsXtrLoadResources[
-  src={animals,minerals,vegetables,interpret-preamble},
+  src={animals,minerals,vegetables},
   field-aliases={identifier=type},
   dependency-fields=type,
   sort={en}

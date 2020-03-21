@@ -5782,7 +5782,8 @@ public class GlsResource
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS
-                 ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                 ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+                 ||selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
                {
                   addHierarchy(entry, entries, data);
                }
@@ -5833,7 +5834,8 @@ public class GlsResource
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS
-                 ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                 ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+                 ||selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
                {
                   addHierarchy(entry, entries, data);
                }
@@ -5877,7 +5879,8 @@ public class GlsResource
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                  ||selectionMode == SELECTION_RECORDED_AND_PARENTS
-                 ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                 ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+                 ||selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
                {
                   addHierarchy(entry, entries, data);
                }
@@ -5917,7 +5920,8 @@ public class GlsResource
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS
-                       ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                       ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+                       ||selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
                      {
                         addHierarchy(entry, entries, data);
                      }
@@ -5946,7 +5950,8 @@ public class GlsResource
                              ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                              ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                              ||selectionMode == SELECTION_RECORDED_AND_PARENTS
-                             ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                             ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+                             ||selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
                            {
                               addHierarchy(entry, entries, data);
                            }
@@ -5988,7 +5993,8 @@ public class GlsResource
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
                        ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
                        ||selectionMode == SELECTION_RECORDED_AND_PARENTS
-                       ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                       ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+                       ||selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
                      {
                         addHierarchy(entry, entries, data);
                      }
@@ -6027,8 +6033,10 @@ public class GlsResource
       processDeps(data, entries);
 
       // Now it's time to strip entries with records if SELECTION_DEPS_BUT_NOT_RECORDED
+      // or SELECTION_PARENTS_BUT_NOT_RECORDED
 
-      if (selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+      if (selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED
+       || selectionMode == SELECTION_PARENTS_BUT_NOT_RECORDED)
       {
          for (int i = entries.size()-1; i >= 0; i--)
          {
@@ -6037,8 +6045,7 @@ public class GlsResource
             if (entry.hasRecords())
             {
                bib2gls.verboseMessage("message.removing.entry.with.records",
-                 entry.getId(), "selection", 
-                 SELECTION_OPTIONS[SELECTION_DEPS_BUT_NOT_RECORDED]);
+                 entry.getId(), "selection", SELECTION_OPTIONS[selectionMode]);
   
                entries.remove(i);
             }
@@ -11656,6 +11663,7 @@ public class GlsResource
    public static final int SELECTION_ALL=4;
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO=5;
    public static final int SELECTION_DEPS_BUT_NOT_RECORDED=6;
+   public static final int SELECTION_PARENTS_BUT_NOT_RECORDED=7;
 
    private int selectionMode = SELECTION_RECORDED_AND_DEPS;
 
@@ -11663,7 +11671,7 @@ public class GlsResource
     {"recorded and deps", "recorded and deps and see",
      "recorded no deps", "recorded and ancestors", "all",
      "recorded and deps and see not also",
-     "deps but not recorded"};
+     "deps but not recorded", "ancestors but not recorded"};
 
    public static final byte CONTRIBUTOR_ORDER_SURNAME=0;
    public static final byte CONTRIBUTOR_ORDER_VON=1;

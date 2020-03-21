@@ -13205,6 +13205,29 @@ usual delay},
   category={command}
 }
 
+@glscommand{printunsrtglossaryhandler,
+  name={\csfmt{print\-unsrt\-glos\-sary\-handler}},
+  user1={\margm{label}},
+  description={used by \cs{printunsrtglossary} and
+   \cs{printunsrtinnerglossary} to handler each entry within the
+  loop. By default this simply does \cs{glsxtrunsrtdo}},
+  topics={glossrefs,loop},
+  note={\styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
+@glscommand{glsxtrunsrtdo,
+  name={\csfmt{gls\-xtr\-unsrt\-do}},
+  user1={\margm{label}},
+  description={displays the entry given by \meta{label} using
+   \cs{glossentry} or \cs{subglossentry} depending on the entry's 
+   hierarchical level (taking \printglossopt{leveloffset} into
+   account)},
+  topics={glossrefs,loop},
+  note={\styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
 @glscommand{printunsrtglossaries,
   name={\csfmt{print\-unsrt\-glos\-saries}},
   user1={},
@@ -13412,7 +13435,7 @@ hasn't been defined},
    (or \cs{printunsrtinnerglossary})
    should insert letter group markup. There's no visible difference
    for glossary styles that don't support letter groups (and
-   \pkgopt{nogroupskip} is in effect) or if there's no group
+   \styopt{nogroupskip} is in effect) or if there's no group
    information (for example, \longarg{nogroups} has been used)},
   category={commandoption},
 }
