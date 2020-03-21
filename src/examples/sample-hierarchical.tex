@@ -1,0 +1,31 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ postdot,% add a full stop after the description
+% load glossary-tree.sty and patch styles:
+ stylemods={tree},
+ style=treegroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={terms,animals,minerals,vegetables},% data these .bib files
+  field-aliases={identifier=parent}
+]
+
+\begin{document}
+Some sample terms: \gls{duck}, \gls{sealion}, \gls{armadillo},
+\gls{seal}, \gls{aardvark}, \gls{amethyst}, \gls{aquamarine},
+\gls{diamond}, \gls{dolomite}, \gls{chalcedony}, \gls{citrine},
+\gls{quetzalcoatlite}, \gls{cabbage}, \gls{cauliflower},
+\gls{artichoke}, \gls{courgette}.
+
+\GlsXtrSetDefaultNumberFormat{glsignore}% ignore records in the glossary
+\printunsrtglossary
+\end{document}

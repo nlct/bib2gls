@@ -1,0 +1,54 @@
+% This file is public domain. See the "Examples" chapter
+% in the bib2gls user manual for a more detailed description
+% of this file.
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[colorlinks]{hyperref}
+
+\usepackage[record,% use bib2gls
+ nostyles,% don't load default styles
+ postdot,% add a full stop after the description
+% load glossary-tree.sty and patch styles:
+ stylemods={tree},
+ style=treegroup]{glossaries-extra}
+
+\GlsXtrLoadResources[src={terms,animals,minerals,vegetables,interpret-preamble},
+   %src=terms,
+   sort={en-reverse},
+  field-aliases={identifier=parent},
+  selection={deps but not recorded}
+]
+
+\GlsXtrLoadResources[
+  src={animals,minerals,vegetables,interpret-preamble},
+  field-aliases={identifier=type},
+  dependency-fields=type,
+  sort={en}
+]
+
+\newcommand{\nestedhandler}[1]{%
+  \glsxtrunsrtdo{#1}%
+% Is there a glossary whose label (type) matches this entry's label?
+  \ifglossaryexists*{#1}%
+  {%
+    \printunsrtinnerglossary[type={#1},leveloffset=++1,groups=false]{}{}%
+  }%
+  {}%
+}
+
+\begin{document}
+Some sample terms: \gls{duck}, \gls{sealion}, \gls{armadillo},
+\gls{seal}, \gls{aardvark}, \gls{amethyst}, \gls{aquamarine},
+\gls{diamond}, \gls{dolomite}, \gls{chalcedony}, \gls{citrine},
+\gls{quetzalcoatlite}, \gls{cabbage}, \gls{cauliflower},
+\gls{artichoke}, \gls{courgette}.
+
+\GlsXtrSetDefaultNumberFormat{glsignore}% ignore records in the glossary
+
+\printunsrtglossary*{%
+  \let\printunsrtglossaryhandler\nestedhandler
+}
+
+\end{document}

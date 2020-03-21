@@ -3,6 +3,9 @@ v2.3 (pending):
   * New sort methods: recordcount and recordcount-reverse
     (both require --record-count).
 
+  * Resource option 'selection' now also allows the value
+    'deps but not recorded'
+
   * New command line switches:
 
     --provide-glossaries

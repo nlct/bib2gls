@@ -5105,6 +5105,11 @@ pages (not available in multi-column or certain other contexts)},
   category={environment}
 }
 
+@glsenvironment{env.printunsrtglossarywrap,
+  name={\envfmt{print\-unsrt\-glossary\-wrap}},
+  category={environment}
+}
+
 @topic{abbreviationstyles,
   name={abbreviation styles},
   text={abbreviation style},
@@ -9936,6 +9941,10 @@ primary formats, if enabled.},
   name={\filefmt{constants.bib}}
 }
 
+@samplefile{file.sample-hierarchical.tex,
+  name={\filefmt{sample\dhyphen hierarchical.tex}}
+}
+
 @samplefile{file.sample-constants.tex,
   name={\filefmt{sample\dhyphen constants.tex}}
 }
@@ -13171,6 +13180,20 @@ usual delay},
   category={command}
 }
 
+@glscommand{printunsrtinnerglossary,
+  name={\csfmt{print\-unsrt\-inner\-glos\-sary}},
+  user1={\oargm{options}\margm{pre code}\margm{post code}},
+  description={similar to \cs{printunsrtglossary} but only contains
+  the code that would typically be placed inside the \env{theglossary}
+  environment. This command should either be placed inside the
+  \env{printunsrtglossarywrap} environment or inside the handler macro
+  used by \cs{printunsrtglossary}. This command is unsuitable for
+  certain glossary styles, particularly tabular-like styles},
+  topics={glossrefs,loop},
+  note={\styfmt{glossaries-extra} v1.44+},
+  category={command}
+}
+
 @glscommand{printunsrtglossary*,
   name={\csfmt{print\-unsrt\-glos\-sary*}},
   user1={\oargm{options}\margm{code}},
@@ -13378,6 +13401,30 @@ hasn't been defined},
   user1 = {\margm{label}},
   description = {creates a label for this glossary by locally
    using \code{\ics{glsxtrsetglossarylabel}\margm{label}}},
+  category={commandoption},
+}
+
+@printglossoption{printgloss.group,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{group}},
+  user1 = {\margm{boolean}},
+  description = {controls whether or not \cs{printunsrtglossary}
+   (or \cs{printunsrtinnerglossary})
+   should insert letter group markup. There's no visible difference
+   for glossary styles that don't support letter groups (and
+   \pkgopt{nogroupskip} is in effect) or if there's no group
+   information (for example, \longarg{nogroups} has been used)},
+  category={commandoption},
+}
+
+@printglossoption{printgloss.leveloffset,
+  parent = {printunsrtglossary},
+  name = {\csoptfmt{level\-offset}},
+  user1 = {\margm{n}},
+  description = {makes the glossary style act as though each entry's
+   hierarchical level is \meta{offset} more than it actually is
+   where \meta{offset} is either \meta{n} or is locally incremented
+   by \meta{n} if \meta{n} starts with \code{++}},
   category={commandoption},
 }
 

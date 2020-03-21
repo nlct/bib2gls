@@ -7262,6 +7262,13 @@ setting but parents are added even if they haven't been referenced
 in the document. The other dependent entries are omitted if they
 haven't been referenced in the document.
 
+\item \optfmt{deps but not recorded}: this first selects entries as
+though \optfmt{recorded and deps} had been used, but after all
+ancestors and dependencies have been added it then removes all
+entries that have records. This means that you end up with only the
+unrecorded dependencies. (Recorded entries will need to be selected
+in a different resource set.)
+
 \item \optfmt{all}: add all entries found in the \ext{bib} files
 supplied in the \csopt{src} option.
 \end{itemize}
@@ -19919,6 +19926,232 @@ The \exfile{topics.bib} file contains entries defined using
 
 The contents of \filefmt{topics.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/topics.bib}
+
+\filesection{sample-hierarchical.tex}
+
+This example uses the \exfile{terms.bib}, \exfile{animals.bib},
+\exfile{minerals.bib} and \exfile{vegetables.bib} files to create a
+hierarchical glossary. These are specified with the resource option:
+\begin{codeenv}
+\csopt[{terms,animals,minerals,vegetables}]{src}
+\end{codeenv}
+The custom \fieldfmt{identifier} field is
+aliased to the \field{parent} field since it conveniently matches
+the labels of the animal, mineral and vegetable entries in the
+\exfile{terms.bib} file:
+\begin{codeenv}
+\csopt[{identifier=parent}]{field-aliases}
+\end{codeenv}
+The default \csopt{selection} setting means that only those terms
+referenced in the document and their dependencies are selected. The
+referenced entries simply have \qt{1} in the \idx{locationlist} as
+it's only a trivial single-paged example.
+
+The dependencies that haven't actually been referenced in the
+document don't have a \idx{locationlist}. (The \qt{seal} entry is a
+dependency, but it's also been referenced in the document, so it has a
+\idx{locationlist}.) The \qt{quartz}, \qt{beryl} and \qt{marrow}
+entries are dependencies because they occur in the description of
+some of the referenced entries. Normally this would mean that they
+have no \idx{locationlist} after the first \LaTeX+\bibgls+\LaTeX\
+build but once the glossary has been created the references to those
+dependent entries in the descriptions will create records and so on
+the next \bibgls+\LaTeX\ they will also have \idxpl{locationlist}.
+This would make the complete document build:
+\begin{verbatim}
+pdflatex sample-hierarchical
+bib2gls --group sample-hierarchical
+pdflatex sample-hierarchical
+bib2gls --group sample-hierarchical
+pdflatex sample-hierarchical
+\end{verbatim}
+However, in this example I've decided to ignore any records created
+in the glossary:
+\begin{codeenv}
+\ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
+\end{codeenv}
+This means that the document build is the usual \LaTeX+\bibgls+\LaTeX.
+
+I've used the \glostyle{treegroup} style so I need to invoke
+\bibgls\ with the \longarg{group} switch. This creates letter groups
+for the top-level entries. Note that sub-entries never have letter groups.
+
+The complete code is listed below.  The document build is:
+\begin{verbatim}
+pdflatex sample-hierarchical
+bib2gls --group sample-hierarchical
+pdflatex sample-hierarchical
+\end{verbatim}
+The complete document is shown in \figureref{fig:sample-hierarchical.pdf}.
+
+\lstinputlisting[firstline=5]{../examples/sample-hierarchical.tex}
+
+\begin{figure}
+\figcontents
+{%
+ \frame{\includegraphics[height=.9\textheight]{../examples/sample-hierarchical.pdf}}%
+}
+{\caption{\filefmt{sample-hierarchical.pdf}}}
+{fig:sample-hierarchical.pdf}
+\end{figure}
+
+\filesection{sample-nested.tex}
+
+As discussed in \sectionref{sec:logicaldivisions} there are three
+ways of creating logical divisions when displaying the entries
+through the use of the \field{type}, \field{group} and \field{parent} fields.
+In general, hierarchical glossaries are created with
+the \field{parent} field and an appropriate glossary style (as in
+the previous \exfile{sample-hierarchical.tex} example).
+
+This example creates a hierarchical effect but the entries don't
+actually have a hierarchical structure as none of them have the
+\field{parent} field set. Instead, what were the child entries in
+\exfile{sample-hierarchical.tex} now have the \field{type} field
+set. The hierarchical effect is achieved with
+\ics{printunsrtinnerglossary} (which requires at least
+\sty{glossaries-extra} v1.44).
+
+\begin{important}
+The \ics{printunsrtinnerglossary} command is unsuitable for use
+with tabular-like styles, such as \glostyle{long}, and can be
+problematic with \glostyle{list} styles. However, those styles
+aren't suitable for hierarchical glossaries anyway.
+\begin{important}
+
+Normally, hierarchy is achieve through definitions like:
+\begin{codeenv}
+\atentry{index}\marg{animal}
+\atentry{entry}\marg{duck,\field{name}=\marg{duck},
+  \field{description}=\marg{a waterbird with webbed feet},
+  \field{parent}=\marg{animal}
+}
+\end{codeenv}
+The previous example did this by loading both the \exfile{terms.bib}
+and \exfile{animals.bib} files and aliasing the custom
+\fieldfmt{identifier} field to \field{parent}. In this example, the
+custom field is aliased to \field{type}, which effectively makes the
+definitions behave like:
+\begin{codeenv}
+\atentry{index}\marg{animal}
+\atentry{entry}\marg{duck,\field{name}=\marg{duck},
+  \field{description}=\marg{a waterbird with webbed feet},
+  \field{type}=\marg{animal}
+}
+\end{codeenv}
+The aim here is for the \code{animal} entry to be placed in the main
+glossary so that it's listed with \cs{printunsrtglossary}. The
+\code{duck} entry is placed in a glossary that has a label
+(\code{animal}) that matches the label of the \qt{parent} entry
+(even though it's technically not a parent). This new glossary
+(\code{animal}) can be automatically defined by invoking \bibgls\
+with the \longarg{provide-glossaries} switch.
+
+A custom handler function is provided for the main glossary that
+will do the current entry as normal (with \cs{glsxtrunsrtdo}) but
+will then check for the existence of a glossary that has the same
+label as the current entry. This requires the starred version of
+\ics{ifglossaryexists} to included ignored glossaries in the
+existence check. If the glossary exists, it's then displayed using
+\ics{printunsrtinnerglossary}:
+\begin{codeenv}
+\cs{newcommand}\marg{\csfmt{nestedhandler}}[1]\marg{\comment{}
+  \cs{glsxtrunsrtdo}\marg{\idx{hashchar}1}\comment{}
+  \cs{ifglossaryexists}*\marg{#1}\comment{}
+  \marg{\comment{}
+    \cs{printunsrtinnerglossary}\oarg{\printglossopt[\idx{hashchar}1]{type},\printglossopt[++1]{leveloffset},\printglossopt[false]{groups}}\marg{}\marg{}\comment{}
+  }\comment{}
+  \marg{}\comment{}
+}
+\end{codeenv}
+The \printglossopt{leveloffset} option is required to achieve a
+hierarchical effect (provided the glossary style supports it) and
+the \printglossopt[false]{groups} option is needed to prevent letter
+groups showing for the nested glossary (which would otherwise create
+a strange effect). (This example uses the \glostyle{treegroup} style,
+which provides a hierarchical glossary with letter groups.)
+
+The \cs{printunsrtglossary} handler macro then needs to be set to
+this custom macro when the main glossary is displayed:
+\begin{codeenv}
+\cs{printunsrtglossary*}\marg{\comment{}
+  \cs{let}\cs{printunsrtglossaryhandler}\csfmt{nestedhandler}
+}
+\end{codeenv}
+The main difficulty comes with ensuring that all the necessary
+entries are selected. Now that the custom \fieldfmt{identifier}
+field has been aliased to \field{type} rather than \field{parent},
+the \code{animal} entry is no longer considered a dependent. The
+\code{duck} entry has been referenced in the document with \cs{gls}
+but the \code{animal} entry hasn't. The previous example ensured
+that the \code{animal} entry was selected because it was a parent of
+a selected entry. If the same resource options are used in this
+example, the main glossary will be empty, which means that the
+nested glossaries won't be displayed either.
+
+One way to ensure that the \qt{animal}, \qt{mineral} and
+\qt{vegetable} entries are selected is to identify the \field{type}
+field as a dependency field:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[{terms,animals,minerals,vegetables}]{src},
+  \csopt[{identifier=type}]{field-aliases},
+  \csopt[{type}]{dependency-fields}
+}
+\end{codeenv}
+This will achieve the same effect as the
+\exfile{sample-hierarchical.tex} document, but it's a far more
+convoluted method. The reason this example document is listed here
+is to demonstrate a sightly modified hierarchical effect that can't
+be achieved through the normal method.
+
+Suppose that, for some strange reason, I want the \qt{animal},
+\qt{mineral} and \qt{vegetable} entries to be listed in a different
+order (say, reverse alphabetical). The other entries (\qt{duck} etc)
+need to be sorted in normal alphabetical order.
+
+The \csopt{sort} option applies the same sort method to all
+hierarchical levels. The sort value chosen for particular entries
+can be altered through the use of fallbacks (such as the
+\csopt{symbol-sort-fallback} option) and a letter comparator may be
+used to resolve identical sort values, but the same method is
+applied to all entries in the same set. The only way to apply
+different sort methods is to separate the entries into different
+glossaries.
+
+This can be achieved by having one resource set for the main entries
+with one sort method and another resource set for all the other
+entries with a different sort method:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[terms]{src},\csopt[en-reverse]{sort}}
+
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[animals,minerals,vegetables]{src},
+  \csopt[{identifier=type}]{field-aliases},
+  \csopt[{type}]{dependency-fields}
+  \csopt[en]{sort}
+}
+\end{codeenv}
+This works when cross-resource dependencies are permitted (see
+\sectionref{sec:resourcesets}). In the event that cross-resource
+dependencies aren't permitted, the selection criteria is more
+complicated:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[terms,animals,minerals,vegetables]{src},
+ \csopt[en-reverse]{sort},
+ \csopt[{identifier=parent}]{field-aliases},
+ \csopt[deps but not recorded]{selection}
+}
+
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[animals,minerals,vegetables]{src},
+  \csopt[{identifier=type}]{field-aliases},
+  \csopt[{type}]{dependency-fields}
+  \csopt[en]{sort}
+}
+\end{codeenv}
+Fortunately in this example, cross-resource dependencies are
+permitted so the simpler alternative works.
 
 \filesection{sample-constants.tex}
 

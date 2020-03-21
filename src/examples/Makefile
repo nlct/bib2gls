@@ -7,7 +7,17 @@ all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-maths.pdf sample-textsymbols.pdf sample-textsymbols2.pdf \
 	sample-constants.pdf sample-usergroups.pdf \
 	sample-markuplanguages.pdf sample-multi1.pdf sample-multi2.pdf \
-	sample-citations.pdf
+	sample-citations.pdf sample-hierarchical.pdf sample-nested.pdf
+
+sample-hierarchical.pdf	: $(DEPS) sample-hierarchical.tex terms.bib animals.bib minerals.bib vegetables.bib
+	pdflatex sample-hierarchical
+	$(BIB2GLS) --group sample-hierarchical
+	pdflatex sample-hierarchical
+
+sample-nested.pdf	: $(DEPS) sample-nested.tex terms.bib animals.bib minerals.bib vegetables.bib
+	pdflatex sample-nested
+	$(BIB2GLS) --group --provide-glossaries sample-nested
+	pdflatex sample-nested
 
 sample-chemical.pdf	: $(DEPS) sample-chemical.tex chemicalformula.bib
 	pdflatex sample-chemical

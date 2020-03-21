@@ -300,6 +300,7 @@ Defaulting to: {0}.
 <entry key="message.clearing.entry.aliases">Clearing entry type aliases.</entry>
 <entry key="message.setting.entry.aliases">Setting entry type aliases.</entry>
 <entry key="message.removing.missing.parent">Stripping missing parent ''{0}'' from entry {1}</entry>
+<entry key="message.removing.entry.with.records">Removing ''{0}'' because it has records (''{1}={2}'' in effect).</entry>
 <entry key="message.missing.sort.fallback">Entry ''{0}'' missing sort field ''{1}''. Falling back on field ''{2}''.</entry>
 <entry key="message.list.known.packages.auto">Automatic support for: </entry>
 <entry key="message.list.known.packages.extra">Support available for: </entry>
