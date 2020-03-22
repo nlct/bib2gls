@@ -2658,6 +2658,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.custom-sort-fallbacks,
+   name={\csoptfmt{custom\dhyphen sort\dhyphen fallbacks}},
+   user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.entry-sort-fallback,
    name={\csoptfmt{entry\dhyphen sort\dhyphen fallback}},
    user1={\meta{field}},
@@ -7594,8 +7601,8 @@ long form on \idx{firstuse}. The default definition just uses
   package={glossaries},
   category={packageoption},
   parent={packageoptions},
-  description={automatically sets \styopt[true]{entrycounter} and 
-  indicates the master counter for \counter{glossaryentry}}
+  description={automatically sets the option \styopt[true]{entrycounter} 
+  and indicates the master counter for \counter{glossaryentry}}
 }
 
 @packageoption{styopt.subentrycounter,
@@ -9943,6 +9950,10 @@ primary formats, if enabled.},
 
 @samplefile{file.sample-hierarchical.tex,
   name={\filefmt{sample\dhyphen hierarchical.tex}}
+}
+
+@samplefile{file.sample-nested.tex,
+  name={\filefmt{sample\dhyphen nested.tex}}
 }
 
 @samplefile{file.sample-constants.tex,
@@ -13427,16 +13438,16 @@ hasn't been defined},
   category={commandoption},
 }
 
-@printglossoption{printgloss.group,
+@printglossoption{printgloss.groups,
   parent = {printunsrtglossary},
-  name = {\csoptfmt{group}},
+  name = {\csoptfmt{groups}},
   user1 = {\margm{boolean}},
   description = {controls whether or not \cs{printunsrtglossary}
    (or \cs{printunsrtinnerglossary})
    should insert letter group markup. There's no visible difference
    for glossary styles that don't support letter groups (and
    \styopt{nogroupskip} is in effect) or if there's no group
-   information (for example, \longarg{nogroups} has been used)},
+   information (for example, \longarg{no-group} has been used)},
   category={commandoption},
 }
 
@@ -15066,10 +15077,21 @@ paragraph break that retains the hanging indent},
 @glscommand{ifglossaryexists,
   name={\csfmt{if\-glossary\-exists}},
   user1={\margm{type}\margm{true}\margm{false}},
-  description={tests if the glossary given by \meta{type} exists
-  and does \meta{true} if it does exists, otherwise does \meta{false}},
+  description={tests if the glossary identified by \meta{type} exists
+  and does \meta{true} if it does exists, otherwise does
+  \meta{false}. The unstarred form treats ignored glossaries as
+  non-existent},
   topics={conditional,glossrefs},
   note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{ifglossaryexists*,
+  name={\csfmt{if\-glossary\-exists*}},
+  user1={\margm{type}\margm{true}\margm{false}},
+  description={the starred form of \cs{ifglossaryexists} treats ignored glossaries as existing},
+  topics={conditional,glossrefs},
+  note={\styfmt{glossaries} v4.46+ (or \styfmt{glossaries-extra} v1.44+)},
   category={command}
 }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Nicola L.C. Talbot
+    Copyright (C) 2018-2020 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -60,6 +60,13 @@ public class Bib2GlsSpawnEntry extends Bib2GlsProgenitor
    @Override
    public String getSortFallbackField()
    {
+      String field = resource.getCustomEntryDefaultSortField(getOriginalEntryType());
+
+      if (field != null)
+      {
+         return field;
+      }
+
       return resource.getEntryDefaultSortField();
    }
 

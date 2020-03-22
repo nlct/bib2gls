@@ -1891,17 +1891,23 @@ Although \idxpl{ignoredglossary} can't be used with
 \cs{printglossary}, they can be used with \cs{printunsrtglossary},
 which is designed to work without any indexing, but you need to
 explicitly set the title in the optional argument to override the
-default. The \idxpl{ignoredglossary} still can't be used in
+default. \Idxpl{ignoredglossary} still can't be used in
 \cs{printunsrtglossaries}, since they're not included in the list
 that this command iterates over.
 
-So \cs{newignoredglossary} is useful with \bibgls\ if you're happy
-to use \cs{printunsrtglossary} as it reduces the overall number of
-internal control sequences. Since there is now the possibility of
-targets (created within \cs{printunsrtglossary}), it's useful to
+So \cs{newignoredglossary} (or \cs{provideignoredglossary}) is
+useful with \bibgls\ if you're happy to use \cs{printunsrtglossary}
+with the \printglossopt{type} and \printglossopt{title} options as it reduces the overall
+number of internal control sequences.  \Idxpl{ignoredglossary} are
+also useful for stand-alone definitions (\ics{glsxtrglossentry}) or
+with \ics{printunsrtinnerglossary} as no title is required in those
+cases (see \exfile{sample-nested.tex} for an example). 
+
+Since there is now the possibility of targets (created within \cs{printunsrtglossary} or
+\cs{printunsrtinnerglossary} or \cs{glsxtrglossentry}), it's convenient to
 have an \idx{ignoredglossary} that doesn't suppress the hyperlinks,
 which can be obtained with the starred form \ics{newignoredglossary*}
-provided by \styfmt{glossaries-extra}.
+provided by \styfmt{glossaries-extra} (or \cs{provideignoredglossary*}).
 
 Some resource options, such as \csopt{master}, \csopt{secondary} and
 \csopt{trigger-type}, need to ensure that a
@@ -1920,6 +1926,22 @@ If you want \bibgls\ to automatically provide unknown glossaries for
 all entries that have the \field{type} field set (unrelated to the
 \csopt{master}, \csopt{secondary} and \csopt{trigger-type} options)
 then use the \longarg{provide-glossaries} switch.
+
+The base \sty{glossaries} package provides a command that can be
+used to test the existence of a glossary:
+\begin{codeenv}
+\ics{ifglossaryexists}\margm{label}\margm{true}\margm{false}
+\end{codeenv}
+The unstarred version considers ignored glossaries as non-existent
+(and so will do \meta{false} for an ignored glossary). As from
+v4.46, this command now has a starred version
+\ics{ifglossaryexists*} that considers ignored glossaries as
+existing (and so will do \meta{true} for an ignored glossary). In
+the event that you have an older version of \sty{glossaries}, the
+\sty{glossaries-extra} package (v1.44+) will provide the starred
+form if it hasn't been defined. (In general, it's best to have
+up-to-date versions of both \sty{glossaries} and
+\sty{glossaries-extra}.)
 
 \section{Resource Sets}
 \label{sec:resourcesets}
@@ -4471,7 +4493,7 @@ For example:
 \end{codeenv}
 
 If the \field{sort} field is missing the default is obtained from
-the \field{name} field (unless overridden by
+the \field{name} field (unless overridden by options like
 \csopt{entry-sort-fallback}). For hierarchical entries, if the
 \field{name} field is omitted it will be obtained from the parent's
 \field{name}. 
@@ -4495,7 +4517,7 @@ designed specifically for symbols, so in the previous example, the
 The required fields are \field{name} or \field{parent}. The
 \field{description} field is required if the \field{name} field is
 missing. If the \field{sort} field is omitted, the default sort is
-given by the entry label (unless overridden by
+given by the entry label (unless overridden by options like
 \csopt{symbol-sort-fallback}). Note that this is different from
 \atentry{entry} where the sort defaults to \field{name} if omitted.
 
@@ -4559,7 +4581,8 @@ entry.) If the name contains any characters that can't be used in
 the label, you must use the \field{name} field. If the \field{sort}
 field is missing the default is obtained from the \field{name}.
 Note that the \atentry{index} entry type is \emph{not} governed by
-\csopt{entry-sort-fallback}. This allows \atentry{index} and
+\csopt{entry-sort-fallback} (but it is governed by
+\csopt{custom-sort-fallbacks}). This allows \atentry{index} and
 \atentry{entry} to have different fallbacks if the \field{sort}
 field is missing.
 
@@ -4584,7 +4607,8 @@ field with the plural suffix appended. If the \field{text} field is
 missing, it's obtained from the original entry label. If the
 \field{sort} field is missing the default is obtained from the
 \field{name} field. (As with \atentry{index}, \atentry{indexplural}
-is \emph{not} governed by \csopt{entry-sort-fallback}.) 
+is \emph{not} governed by \csopt{entry-sort-fallback}, but it is
+governed by \csopt{custom-sort-fallbacks}.) 
 All fields are optional. For example:
 \begin{codeenv}
 \atentry{indexplural}\marg{goose,
@@ -10111,7 +10135,7 @@ contains definitions like:
 }
 \end{codeenv}
 Instead of having a list of terms (glossary), suppose I want to have
-standalone definitions, where the term appears in a section heading.
+stand-alone definitions, where the term appears in a section heading.
 I could define a command like this:
 \begin{codeenv}
 \cs{newcommand}\marg{\cmd{definition}}[1]\marg{\comment{}
@@ -10279,7 +10303,7 @@ by \csopt{time-fields}. The \meta{value} is as for
 \csopt{date-sort-locale}.
 
 \subsection{Prefix Fields}
-\label{sec:prefixes}
+\label{sec:prefixfields}
 
 If you use the \isty{glossaries-prefix} package, the prefix
 set of fields become available (\field{prefix},
@@ -13813,6 +13837,11 @@ setting, the fallback for the \field{sort} field is governed not
 only by the entry type but also by some associated settings:
 
 \begin{itemize}
+\item If the entry's original type (before being aliased with
+\csopt{entry-type-aliases}) is identified in
+\csopt{custom-sort-fallbacks}, then if the \field{sort} field is missing
+the value is obtained from the supplied custom mapping.
+
 \item If the entry is defined using \atentry{entry} (or a dual form
 that acts like \atentry{entry}), then if the \field{sort} field is
 missing the value is obtained from the field identified by
@@ -13893,6 +13922,56 @@ separately from primaries, and use
 \csopt{secondary-missing-sort-fallback} for \csopt{secondary}
 sorting.
 
+\optsection{custom-sort-fallbacks}
+
+The value should be a \keyvallist\ in the form
+\meta{entrytype}\dequals\meta{field} where \meta{entrytype} is the
+\emph{original} entry type (before being aliased with
+\csopt{entry-type-aliases}) and \meta{field} is the name of a field
+(\field{sort} isn't permitted). This will override any of the
+\optfmt{\meta{entrytype}\dhyphen sort\dhyphen fallback}
+options listed below.
+
+If an entry hasn't had its entry type aliased then \meta{entrytype}
+is its actual entry type. For example, consider the following
+definitions:
+\begin{codeenv}
+\atentry{abbreviation}\marg{svm,
+   \field{short}=\marg{SVM},
+   \field{long}=\marg{support vector machine}
+}
+\atentry{acronym}\marg{laser,
+  \field{short}=\marg{laser},
+  \field{long}=\marg{light amplification by stimulated emission of radiation}
+}
+\end{codeenv}
+Then \csopt[short]{abbreviation-sort-fallback} will make both
+entries fallback on the \field{short} field (since
+\csopt{abbreviation-sort-fallback} applies to both \atentry{acronym}
+and \atentry{abbreviation}), but the option:
+\begin{codeenv}
+\csopt[abbreviation=long,acronym=short]{custom-sort-fallbacks} 
+\end{codeenv}
+will make the entry defined with \atentry{abbreviation} fallback on
+the \field{long} field and the entry defined with \atentry{acronym}
+will fallback on the \field{short} field.
+
+Since the default setting is \csopt[short]{abbreviation-sort-fallback}
+this only needs to be:
+\begin{codeenv}
+\csopt[abbreviation=long]{custom-sort-fallbacks} 
+\end{codeenv}
+In this case, the entry defined with \atentry{abbreviation} (\qt{SVM}) will use
+the setting given in \csopt{custom-sort-fallbacks}, but the entry
+defined with \atentry{acronym} (\qt{laser}) will use the setting given by
+\csopt{abbreviation-sort-fallback} since \atentry{acronym} hasn't
+been identified in \csopt{custom-sort-fallbacks}.
+
+This option also covers dual entries. For example:
+\begin{codeenv}
+\csopt[dualnumber=user1,dualsymbol=user2]{custom-sort-fallbacks}
+\end{codeenv}
+
 \optsection{entry-sort-fallback}
 
 The regular entry types (such as \atentry{entry} and
@@ -13901,7 +13980,8 @@ field if the \field{sort} field is missing (assuming
 \csopt[sort]{sort-field}). If you prefer to
 fallback on a different field, then you can use this option to
 specify the field.
-Note that \csopt{missing-sort-fallback} overrides this setting.
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
 
 This setting doesn't affect the index type of entries, such as
 \atentry{index} or \atentry{indexplural}. This is useful if your
@@ -14001,7 +14081,8 @@ specify the field. For example,
 \csopt{abbreviation-name-fallback} if the \field{name} field is
 omitted. The \meta{field} value must be a known field label.
 
-Note that \csopt{missing-sort-fallback} overrides this setting.
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
 
 \begin{important}
 The \csopt{abbreviation-sort-fallback} setting is only used when \bibgls\
@@ -14021,7 +14102,8 @@ field, then you can use this option to specify the field. For
 example, \csopt[name]{symbol-sort-fallback}.  The \meta{field} value
 must be a known field label.
 
-Note that \csopt{missing-sort-fallback} overrides this setting.
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
 
 \begin{important}
 The \csopt{symbol-sort-fallback} setting is only used when \bibgls\
@@ -14039,7 +14121,8 @@ fallback on the \field{name} if the
 \csopt[sort]{sort-field}). If you prefer to fallback on a different
 field, then you can use this option to specify the field.
 
-Note that \csopt{missing-sort-fallback} overrides this setting.
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
 
 \begin{important}
 The \csopt{bibtexentry-sort-fallback} setting is only used when
@@ -20055,7 +20138,7 @@ glossary so that it's listed with \cs{printunsrtglossary}. The
 (\code{animal}) can be automatically defined by invoking \bibgls\
 with the \longarg{provide-glossaries} switch.
 
-A custom handler function is provided for the main glossary that
+This example document defines a custom handler function that
 will do the current entry as normal (with \cs{glsxtrunsrtdo}) but
 will then check for the existence of a glossary that has the same
 label as the current entry. This requires the starred version of
@@ -20065,9 +20148,10 @@ existence check. If the glossary exists, it's then displayed using
 \begin{codeenv}
 \cs{newcommand}\marg{\csfmt{nestedhandler}}[1]\marg{\comment{}
   \cs{glsxtrunsrtdo}\marg{\idx{hashchar}1}\comment{}
-  \cs{ifglossaryexists}*\marg{\idx{hashchar}1}\comment{}
+  \ics{ifglossaryexists*}\marg{\idx{hashchar}1}\comment{}
   \marg{\comment{}
-    \cs{printunsrtinnerglossary}\oarg{\printglossopt[\idx{hashchar}1]{type},\printglossopt[++1]{leveloffset},\printglossopt[false]{groups}}\marg{}\marg{}\comment{}
+    \cs{printunsrtinnerglossary}\oarg{\printglossopt[\idx{hashchar}1]{type},\printglossopt[++1]{leveloffset},\printglossopt[false]{groups}}
+    \marg{}\marg{}\comment{}
   }\comment{}
   \marg{}\comment{}
 }
@@ -20075,16 +20159,14 @@ existence check. If the glossary exists, it's then displayed using
 The \printglossopt{leveloffset} option is required to achieve a
 hierarchical effect (provided the glossary style supports it) and
 the \printglossopt[false]{groups} option is needed to prevent letter
-groups showing for the nested glossary (which would otherwise create
-a strange effect). (This example uses the \glostyle{treegroup} style,
+groups showing for the nested glossary, which would otherwise create
+a strange effect. (This example uses the \glostyle{treegroup} style,
 which provides a hierarchical glossary with letter groups.)
 
 The \cs{printunsrtglossary} handler macro then needs to be set to
 this custom macro when the main glossary is displayed:
 \begin{codeenv}
-\cs{printunsrtglossary*}\marg{\comment{}
-  \cs{let}\cs{printunsrtglossaryhandler}\csfmt{nestedhandler}
-}
+\cs{printunsrtglossary*}\marg{\cs{let}\cs{printunsrtglossaryhandler}\csfmt{nestedhandler}}
 \end{codeenv}
 The main difficulty comes with ensuring that all the necessary
 entries are selected. Now that the custom \fieldfmt{identifier}
@@ -20097,12 +20179,11 @@ a selected entry. If the same resource options are used in this
 example, the main glossary will be empty, which means that the
 nested glossaries won't be displayed either.
 
-One way to ensure that the \qt{animal}, \qt{mineral} and
-\qt{vegetable} entries are selected is to identify the \field{type}
+One way to ensure that the \code{animal}, \code{mineral} and
+\code{vegetable} entries are selected is to identify the \field{type}
 field as a dependency field:
 \begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{
-  \csopt[{terms,animals,minerals,vegetables}]{src},
+\gls{GlsXtrLoadResources}\oarg{\csopt[{terms,animals,minerals,vegetables}]{src},
   \csopt[{identifier=type}]{field-aliases},
   \csopt[{type}]{dependency-fields}
 }
@@ -20119,13 +20200,15 @@ order (say, reverse alphabetical). The other entries (\qt{duck} etc)
 need to be sorted in normal alphabetical order.
 
 The \csopt{sort} option applies the same sort method to all
-hierarchical levels. The sort value chosen for particular entries
+hierarchical levels. The sort \emph{value} chosen for particular entries
 can be altered through the use of fallbacks (such as the
-\csopt{symbol-sort-fallback} option) and a letter comparator may be
-used to resolve identical sort values, but the same method is
-applied to all entries in the same set. The only way to apply
-different sort methods is to separate the entries into different
-glossaries.
+\csopt{entry-sort-fallback} or \csopt{symbol-sort-fallback} options)
+and a letter comparator may be used to resolve identical sort
+values (\csopt{identical-sort-action}), but the same sort algorithm
+is applied to all entries in the same set (primary, secondary or dual
+within the same resource set). The only way to apply different sort
+methods is to separate the entries into different resource sets (or
+use dual or secondary sorting).
 
 This can be achieved by having one resource set for the main entries
 with one sort method and another resource set for all the other
@@ -20133,11 +20216,8 @@ entries with a different sort method:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[terms]{src},\csopt[en-reverse]{sort}}
 
-\gls{GlsXtrLoadResources}\oarg{
-  \csopt[animals,minerals,vegetables]{src},
-  \csopt[{identifier=type}]{field-aliases},
-  \csopt[{type}]{dependency-fields}
-  \csopt[en]{sort}
+\gls{GlsXtrLoadResources}\oarg{\csopt[animals,minerals,vegetables]{src},\csopt[en]{sort},
+  \csopt[{identifier=type}]{field-aliases},\csopt[{type}]{dependency-fields}
 }
 \end{codeenv}
 This works when cross-resource dependencies are permitted (see

@@ -2084,6 +2084,28 @@ public class GlsResource
                    bibTeXEntryDefaultSortField));
             }
          }
+         else if (opt.equals("custom-sort-fallbacks"))
+         {
+            customEntryDefaultSortFields = getHashMap(parser, list, opt);
+
+            if (customEntryDefaultSortFields != null)
+            {
+               Set<String> keys = customEntryDefaultSortFields.keySet();
+
+               for (Iterator<String> it1 = keys.iterator(); it1.hasNext(); )
+               {
+                  String key = it1.next();
+                  String field = customEntryDefaultSortFields.get(key);
+
+                  if ((!bib2gls.isKnownField(field) && !bib2gls.isKnownSpecialField(field))
+                       || field.equals("sort"))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.field", field, opt));
+                  }
+               }
+            }
+         }
          else if (opt.equals("abbreviation-name-fallback"))
          {
             abbrevDefaultNameField = getRequired(parser, list, opt);
@@ -10749,6 +10771,12 @@ public class GlsResource
       return bibTeXEntryDefaultSortField;
    }
 
+   public String getCustomEntryDefaultSortField(String originalEntryType)
+   {
+      return (customEntryDefaultSortFields == null ? null : 
+         customEntryDefaultSortFields.get(originalEntryType));
+   }
+
    public boolean useNonBreakSpace()
    {
       return bib2gls.useNonBreakSpace();
@@ -11438,6 +11466,8 @@ public class GlsResource
    private String abbrevDefaultNameField = "short";
 
    private String bibTeXEntryDefaultSortField = "name";
+
+   private HashMap<String,String> customEntryDefaultSortFields = null;
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 

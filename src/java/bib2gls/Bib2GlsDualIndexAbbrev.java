@@ -77,6 +77,13 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
    @Override
    public String getSortFallbackField()
    {
+      String field = resource.getCustomEntryDefaultSortField(getOriginalEntryType());
+
+      if (field != null)
+      {
+         return field;
+      }
+
       return isPrimary() ?
            "name" : resource.getAbbrevDefaultSortField();
    }
