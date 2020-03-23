@@ -1,0 +1,30 @@
+% arara: lualatex
+% arara: bib2gls: { group: on }
+% arara: lualatex
+\documentclass{article}
+
+\usepackage{fontspec}
+\usepackage{siunitx}
+\usepackage[record,index,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\renewcommand{\glsxtrbookindexlocation}[1]{%
+  (sort value: \texttt{\glsxtrusefield{#1}{sort}};
+   original entry type: \texttt{@\glscategory{#1}})
+}
+
+\GlsXtrLoadResources[src={test-dual-custom-fallback},
+ break-at={none},
+ category={same as original entry},
+ dual-category={same as original entry},
+ type=index,
+ dual-type=main,
+ custom-sort-fallbacks={
+   dualindexsymbol=description,
+   dualindexnumbersecondary=user1
+ },
+ selection=all]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}
+

@@ -5100,6 +5100,13 @@ public class Bib2Gls implements TeXApp
 
       logMessage(getMessage("about.version", NAME, VERSION, DATE));
 
+      if (getDebugLevel() > 0)
+      {
+         logMessage("Java "+System.getProperty("java.version"));
+         logMessage(String.format("texparserlib.jar %s (%s)",
+            TeXParser.VERSION, TeXParser.VERSION_DATE));
+      }
+
       if (logWriter != null)
       {
          logWriter.print(pending.toString());
@@ -5227,7 +5234,7 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.2.20200323";
+   public static final String VERSION = "2.3";
    public static final String DATE = "2020-03-23";
    public int debugLevel = 0;
    public int verboseLevel = 0;

@@ -151,7 +151,7 @@
   },
   max-loc-diff={2},
   see=omit,seealso=omit,alias=omit,
-  field-aliases={topics=adoptparents},
+  field-aliases={topics=adoptparents,annote=user2},
   replicate-fields={name=nametitle,progeny=unsortedprogeny},
   field-case-change={nametitle=title},
   interpret-fields={nametitle},
@@ -296,7 +296,7 @@
 \glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
 \newcommand{\idxlink}[3][]{\glslink[#1]{idx.#2}{#3}}
 
-\newcommand{\stringu}{\idx{cs.string}\idx{u}}
+\newcommand{\stringu}{\idx{cs.string}\idx{uhex}}
 
 \newcommand*{\filefmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\metafilefmt}[3]{%
@@ -1079,6 +1079,8 @@
  \atentry{#1} (page~\glsxtrpageref{entry.#1})}%
 
 \newcommand*{\atentryref}[1]{\gls[format=glsignore]{entry.#1}}
+
+\newcommand*{\entryref}[1]{\glslink[format=glsignore]{entry.#1}{\entryfmt{#1}}}
 
 \newcommand{\convertglsbibarg}[2][\subsection]{\argsection[#1]{gls2bib.#2}}
 
@@ -13885,14 +13887,21 @@ follows:
 \meta{fallback-field}.  If \meta{fallback-field} is
 missing, then \bibgls\ will query the entry type's fallback for
 \meta{fallback-field} (not for \meta{sort-field}).
-The \meta{fallback-field} may be a known field but not an internal
-field. It can't be the \field{sort} field. Unlike the options such
-as \csopt{entry-sort-fallback}, the field can't be a keyword to
-identify the label and can't be a composite.
+
+The \meta{fallback-field} must be a known field but not an internal
+field. It can't be the \field{sort} field. (Take care not to cause
+an infinite loop if \csopt{sort-field} has been changed.) Unlike the
+other sort fallback options such as \csopt{entry-sort-fallback}, the
+\meta{fallback-field} can't be a keyword (to identify the label) and can't be a
+composite.
 
 \item If the entry type has a fallback rule for \meta{sort-field},
 then that rule is used. When \csopt[sort]{sort-field} this means:
 \begin{itemize}
+\item If the entry's original entry type has been identified in
+\csopt{custom-sort-fallbacks}, then \bibgls\ will fallback on the
+designated custom setting.
+
 \item If the entry was defined using one of the index types (such as
 \atentry{index}), then \bibgls\ will fallback on the \field{name}
 field.
@@ -13933,18 +13942,61 @@ sorting.
 The value should be a \keyvallist\ in the form
 \meta{entrytype}\dequals\meta{field} where \meta{entrytype} is the
 \emph{original} entry type (before being aliased with
-\csopt{entry-type-aliases}). This will override any of the
-\optfmt{\meta{entrytype}\dhyphen sort\dhyphen fallback}
-options listed below.
+\csopt{entry-type-aliases}). This will override any of the sort fallback
+options listed below for entries whose original entry type matches
+\meta{entrytype}.
 
-The \meta{field} may be a known field but not an internal
-field. It can't be the \field{sort} field. It may also be
-one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label). The
-\meta{field} may also be a composite in the form
-\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
-sort value should be obtained by concatenating the values of given fields,
-where the separator is given by \csopt{field-concat-sep}.
+The \meta{field} may be a known field but not an internal field. For
+obvious reasons, it can't be the \field{sort} field (since
+\meta{field} is the fallback a missing \field{sort} field). It may also be one of the
+keywords: \optfmt{id} (for the entry's label) or \optfmt{original id}
+(for the entry's original label). The \meta{field} may also be a
+composite in the form \optfmt{\meta{field1}+\meta{field2}+\ldots}
+which indicates that the sort value should be obtained by
+concatenating the values of the given fields, where the separator is
+given by \csopt{field-concat-sep}.
+
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentryfmt{unit}\marg{ohm,
+  \field{name}=\marg{\cs{si}\marg{\csfmt{ohm}}},
+  \field{description}=\marg{electrical resistance}
+}
+\strut
+\atentryfmt{constant}\marg{pi,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{description}=\marg{the ratio of the length of the circumference
+    of a circle to its diameter},
+  \field{user1}=\marg{3.14159}
+}
+\strut
+\atentry{symbol}\marg{fx,
+  \field{name}=\marg{\cs{ensuremath}\marg{f(x)}},
+  \field{description}=\marg{a function of \idx{mshiftchar}x\idx{mshiftchar}}
+}
+\strut
+\atentry{number}\marg{zero,
+  \field{name}=\marg{0},
+  \field{description}=\marg{nothing or no quantity}
+}
+\end{codeenv}
+Then the resource options:
+\begin{codeenv}
+\csopt[\entryfmt{unit}=\entryref{symbol},\entryfmt{constant}=\entryref{number}]{entry-type-aliases},
+\csopt[\entryfmt{unit}=\field{name},\entryfmt{constant}=\field{user1}]{custom-sort-fallbacks}
+\end{codeenv}
+will treat the custom \atentryfmt{unit} and \atentryfmt{constant}
+entries as though they had been defined with \atentry{symbol}
+and \atentry{number}, respectively, but the fallback for the
+\field{sort} field is different: the \code{ohm} entry will use the
+\field{name} field for the sort fallback (because its original entry
+type was \entryfmt{unit}), the \code{pi} entry will use the
+\field{user1} field for the sort fallback (because its original
+entry type was \entryfmt{constant}) and the \code{fx} and
+\code{zero} entries will use the label for the sort fallback (since
+neither \entryfmt{symbol} nor \entryfmt{number} were identified in
+\csopt{custom-sort-fallbacks} so the \csopt{symbol-sort-fallback} is
+used).
 
 If an entry hasn't had its entry type aliased then \meta{entrytype}
 is its actual entry type. For example, consider the following
@@ -13964,7 +14016,7 @@ entries fallback on the \field{short} field (since
 \csopt{abbreviation-sort-fallback} applies to both \atentry{acronym}
 and \atentry{abbreviation}), but the option:
 \begin{codeenv}
-\csopt[abbreviation=long,acronym=short]{custom-sort-fallbacks} 
+\csopt[\entryref{abbreviation}=\field{long},\entryref{acronym}=\field{short}]{custom-sort-fallbacks} 
 \end{codeenv}
 will make the entry defined with \atentry{abbreviation} fallback on
 the \field{long} field and the entry defined with \atentry{acronym}
@@ -13973,7 +14025,7 @@ will fallback on the \field{short} field.
 Since the default setting is \csopt[short]{abbreviation-sort-fallback}
 this only needs to be:
 \begin{codeenv}
-\csopt[abbreviation=long]{custom-sort-fallbacks} 
+\csopt[\entryref{abbreviation}=\field{long}]{custom-sort-fallbacks} 
 \end{codeenv}
 In this case, the entry defined with \atentry{abbreviation} (\qt{SVM}) will use
 the setting given in \csopt{custom-sort-fallbacks}, but the entry
@@ -13983,8 +14035,22 @@ been identified in \csopt{custom-sort-fallbacks}.
 
 This option also covers dual entries. For example:
 \begin{codeenv}
-\csopt[dualnumber=user1,dualsymbol=user2]{custom-sort-fallbacks}
+\csopt[
+   \entryref{dualindexnumber}=\field{description},
+   \entryfmt{dualindexnumbersecondary}=\field{user1}
+]{custom-sort-fallbacks}
 \end{codeenv}
+Note that the entry type for the dual is in the form 
+\code{\meta{primary entry type}secondary}.
+
+\begin{important}
+The \csopt{custom-sort-fallbacks} setting is only used when \bibgls\
+tries to access the \field{sort} field for an entry (whose original
+entry type has been identified in this setting) and finds that the field
+hasn't been set. This means that this setting has no effect if you
+explicitly set the \field{sort} field or if you change the field
+used for sorting (\csopt{sort-field}).
+\end{important}
 
 \optsection{entry-sort-fallback}
 
@@ -13999,7 +14065,7 @@ Note that \csopt{missing-sort-fallback} and
 
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
-one of the keywords \optfmt{id} (for the entry's label) or
+one of the keywords: \optfmt{id} (for the entry's label) or
 \optfmt{original id} (for the entry's original label). The
 \meta{field} may also be a composite in the form
 \optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
@@ -14021,7 +14087,7 @@ my file \filefmt{entries.bib} contains:
 \strut
 \atentry{entry}\marg{glossarylist,
   \field{parent}=\marg{glossary},
-  \field{description}={list of technical words}
+  \field{description}=\marg{list of technical words}
 }
 \strut
 \atentry{entry}\marg{glosscol,
@@ -14106,7 +14172,7 @@ omitted.
 
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
-one of the keywords \optfmt{id} (for the entry's label) or
+one of the keywords: \optfmt{id} (for the entry's label) or
 \optfmt{original id} (for the entry's original label). The
 \meta{field} may also be a composite in the form
 \optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
@@ -14135,7 +14201,7 @@ example, \csopt[name]{symbol-sort-fallback}.
 
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
-one of the keywords \optfmt{id} (for the entry's label) or
+one of the keywords: \optfmt{id} (for the entry's label) or
 \optfmt{original id} (for the entry's original label). The
 \meta{field} may also be a composite in the form
 \optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
@@ -14163,7 +14229,7 @@ field, then you can use this option to specify the field.
 
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
-one of the keywords \optfmt{id} (for the entry's label) or
+one of the keywords: \optfmt{id} (for the entry's label) or
 \optfmt{original id} (for the entry's original label). The
 \meta{field} may also be a composite in the form
 \optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
@@ -14186,17 +14252,42 @@ sorting (\csopt{sort-field}).
 
 This option sets the field concatenation separator to \meta{value}.
 The default is a space. An empty value indicates no separator. You
-may use \ics{u}\meta{hex} to indicate a character by its hexadecimal
-code. For example:
+may use \ics{uhex}\meta{hex} to indicate a character by its hexadecimal
+code. For example, suppose the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{abbreviation}\marg{ac,
+  \field{short}=\marg{AC},
+  \field{long}=\marg{alternating current}
+}
+\atentry{index}\marg{acacia}
+\end{codeenv}
+Then the resource option:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
-  \csopt[long+short]{abbreviation-sort-fallback},
-  \csopt[]{field-concat-sep}
+  \csopt[letter-nocase]{sort},
+  \csopt[\field{short}+\field{long}]{abbreviation-sort-fallback}
+}
+\end{codeenv}
+will set the \code{ac} sort value to \qt{AC alternating current}.
+That is, the \field{short} value concatenated with the \field{long}
+value using the default space separator. With the
+\optfmt{letter-nocase} sort method, this will put the \code{ac}
+entry before the \code{acacia} entry (because the space character
+comes before \qt{a}).
+
+If the resource options are changed to:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[letter-nocase]{sort},
+  \csopt[\empty]{field-concat-sep},
+  \csopt[\field{short}+\field{long}]{abbreviation-sort-fallback}
 }
 \end{codeenv}
 This will obtain the sort value for abbreviations from a
-concatenation of the \meta{long} and \meta{short} values without a
-separator.
+concatenation of the \meta{short} and \meta{long} values without a
+separator. This means that the \code{ac} sort value will be
+\qt{ACalternating current} and so the \code{ac} entry will
+come after the \code{acacia} entry (since \qt{l} comes after \qt{c}).
 
 This setting is only used for the sort fallback options that allow
 field concatenation (such as \csopt{entry-sort-fallback} but not
@@ -14205,7 +14296,7 @@ field concatenation (such as \csopt{entry-sort-fallback} but not
 Note that due to the way that the \keyvallist\ parser trims leading and
 trailing spaces, you can't simply do \csopt[\space]{field-concat-sep}
 to indicate a space character as the value will end up as an empty
-string. You can instead do \csopt[\stringu32]{field-concat-sep} but
+string. You can instead do \csopt[\stringu20]{field-concat-sep} but
 since this is the default value there shouldn't be much need for it.
 
 Remember that the separator may be replaced with a break point
@@ -23710,5 +23801,8 @@ The resulting document is shown in \figureref{fig:sample-multi2.pdf},
 }
 \renewcommand*{\unicodecategoryfmt}[1]{\textsf{#1}}
 \glsrenewcommand*{\bibglspassim}{}
+\newcommand{\glsxtrpostnamecommand}{%
+  \glsxtrifhasfield{userii}{\glscurrententrylabel}{ (\glscurrentfieldvalue)}{}%
+}
 \printunsrtglossary[type=index]
 \end{document}

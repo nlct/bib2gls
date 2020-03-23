@@ -1,4 +1,4 @@
-v2.3 (pending):
+v2.3 (2020-03-23):
 
   * New sort methods: recordcount and recordcount-reverse
     (both require --record-count).

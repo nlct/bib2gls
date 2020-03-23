@@ -2660,7 +2660,7 @@ field\dhyphen locale}},
 
 @resourceoption{opt.custom-sort-fallbacks,
    name={\csoptfmt{custom\dhyphen sort\dhyphen fallbacks}},
-   user1={\meta{\keyvallist}},
+   user1={\margm{\keyvallist}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -15615,7 +15615,18 @@ number is hexadecimal)},
   user1={\margm{character}},
   description={puts a breve accent over \meta{character}},
   note={kernel command\texparserdefnote},
-  category={command}
+  category={command},
+  annote={accent}
+}
+
+@command{uhex,
+  name={\csfmt{u}},
+  user1={\meta{hex}},
+  description={identifies a character by its hexadecimal code in the
+    values of some (but not all) resource options},
+  note={\bibgls},
+  category={command},
+  annote={hex code}
 }
 
 @command{acute,

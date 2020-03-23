@@ -34,7 +34,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
 	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
-	  test-custom-sort-fallback.pdf
+	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -638,6 +638,13 @@ test-custom-sort-fallback.pdf	: test-custom-sort-fallback.glstex
 test-custom-sort-fallback.glstex	: test-custom-sort-fallback.tex test-custom-sort-fallback.bib $(DEPS)
 		lualatex test-custom-sort-fallback
 		$(BIB2GLS) test-custom-sort-fallback
+
+test-dual-custom-fallback.pdf	: test-dual-custom-fallback.glstex
+		lualatex test-dual-custom-fallback
+
+test-dual-custom-fallback.glstex	: test-dual-custom-fallback.tex test-dual-custom-fallback.bib $(DEPS)
+		lualatex test-dual-custom-fallback
+		$(BIB2GLS) test-dual-custom-fallback
 
 clean	:
 	$(RM) *.aux
