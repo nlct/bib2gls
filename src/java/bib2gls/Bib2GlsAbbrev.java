@@ -64,13 +64,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       if (field.equals("sort"))
       {
-         field = getSortFallbackField();
-         val = getFieldValue(field);
-
-         if (val != null)
-         {
-            return val;
-         }
+         return getSortFallbackValue();
       }
 
       if (field.equals("name"))
@@ -93,10 +87,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
       if (field.equals("sort"))
       {
-         String fallbackField = getSortFallbackField();
-         val = getField(fallbackField);
-
-         return val == null ? getFallbackContents(fallbackField) : val;
+         return getSortFallbackContents();
       }
       else if (field.equals("name"))
       {

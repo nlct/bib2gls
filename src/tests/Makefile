@@ -33,7 +33,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
 	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf \
-	  sample-recordcount.pdf test-innergloss.pdf
+	  sample-recordcount.pdf test-innergloss.pdf \
+	  test-custom-sort-fallback.pdf
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -629,7 +630,14 @@ test-innergloss.pdf	: test-innergloss.glstex
 
 test-innergloss.glstex	: test-innergloss.tex $(DEPS)
 		pdflatex test-innergloss
-		$(BIB2GLS) --no-group test-innergloss
+		$(BIB2GLS) --no-group --provide-glossaries test-innergloss
+
+test-custom-sort-fallback.pdf	: test-custom-sort-fallback.glstex
+		lualatex test-custom-sort-fallback
+
+test-custom-sort-fallback.glstex	: test-custom-sort-fallback.tex test-custom-sort-fallback.bib $(DEPS)
+		lualatex test-custom-sort-fallback
+		$(BIB2GLS) test-custom-sort-fallback
 
 clean	:
 	$(RM) *.aux

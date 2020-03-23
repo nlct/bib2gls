@@ -96,12 +96,7 @@ public class Bib2GlsSpawnEntry extends Bib2GlsProgenitor
       }
       else if (field.equals("sort"))
       {
-         String fallbackField = getSortFallbackField();
-         String value = getFieldValue(fallbackField);
-
-         if (value != null) return value;
-
-         return getFallbackValue(fallbackField);
+         return getSortFallbackValue();
       }
       else if (field.equals("first"))
       {
@@ -187,10 +182,7 @@ public class Bib2GlsSpawnEntry extends Bib2GlsProgenitor
       }
       else if (field.equals("sort"))
       {
-         String fallbackField = getSortFallbackField();
-         BibValueList contents = getField(fallbackField);
-
-         return contents == null ? getFallbackContents(fallbackField) : contents;
+         return getSortFallbackContents();
       }
       else if (field.equals("first"))
       {

@@ -2015,30 +2015,51 @@ public class GlsResource
          }
          else if (opt.equals("missing-sort-fallback"))
          {
-            sortSettings.setMissingFieldFallback(
-              getOptional(parser, list, opt));
+            String field = getOptional(parser, list, opt);
+
+            if (field == null || field.isEmpty() || isAllowedSortFallbackField(field))
+            {
+               sortSettings.setMissingFieldFallback(field);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, field));
+            }
          }
          else if (opt.equals("dual-missing-sort-fallback"))
          {
-            dualSortSettings.setMissingFieldFallback(
-              getOptional(parser, list, opt));
+            String field = getOptional(parser, list, opt);
+
+            if (field == null || field.isEmpty() || isAllowedSortFallbackField(field))
+            {
+               dualSortSettings.setMissingFieldFallback(field);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, field));
+            }
          }
          else if (opt.equals("secondary-missing-sort-fallback"))
          {
-            secondarySortSettings.setMissingFieldFallback(
-              getOptional(parser, list, opt));
+            String field = getOptional(parser, list, opt);
+
+            if (field == null || field.isEmpty() || isAllowedSortFallbackField(field))
+            {
+               secondarySortSettings.setMissingFieldFallback(field);
+            }
+            else
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, field));
+            }
          }
          else if (opt.equals("entry-sort-fallback"))
          {
             entryDefaultSortField = getRequired(parser, list, opt);
 
-            // Don't allow unknown fields (to guard against typos).
-            // The fallback field can't be "sort" as it will cause
-            // infinite recursion.
-
-            if ((!bib2gls.isKnownField(entryDefaultSortField)
-             && !bib2gls.isKnownSpecialField(entryDefaultSortField))
-             || entryDefaultSortField.equals("sort"))
+            if (!isAllowedSortFallbackField(entryDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -2049,9 +2070,7 @@ public class GlsResource
          {
             abbrevDefaultSortField = getRequired(parser, list, opt);
 
-            if ((!bib2gls.isKnownField(abbrevDefaultSortField)
-             && !bib2gls.isKnownSpecialField(abbrevDefaultSortField))
-             || abbrevDefaultSortField.equals("sort"))
+            if (!isAllowedSortFallbackField(abbrevDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -2062,9 +2081,7 @@ public class GlsResource
          {
             symbolDefaultSortField = getRequired(parser, list, opt);
 
-            if ((!bib2gls.isKnownField(symbolDefaultSortField)
-             && !bib2gls.isKnownSpecialField(symbolDefaultSortField))
-             || symbolDefaultSortField.equals("sort"))
+            if (!isAllowedSortFallbackField(symbolDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -2075,9 +2092,7 @@ public class GlsResource
          {
             bibTeXEntryDefaultSortField = getRequired(parser, list, opt);
 
-            if ((!bib2gls.isKnownField(bibTeXEntryDefaultSortField)
-             && !bib2gls.isKnownSpecialField(bibTeXEntryDefaultSortField))
-             || bibTeXEntryDefaultSortField.equals("sort"))
+            if (!isAllowedSortFallbackField(bibTeXEntryDefaultSortField))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -2097,8 +2112,7 @@ public class GlsResource
                   String key = it1.next();
                   String field = customEntryDefaultSortFields.get(key);
 
-                  if ((!bib2gls.isKnownField(field) && !bib2gls.isKnownSpecialField(field))
-                       || field.equals("sort"))
+                  if (!isAllowedSortFallbackField(field))
                   {
                      throw new IllegalArgumentException(
                        bib2gls.getMessage("error.invalid.field", field, opt));
@@ -2112,7 +2126,8 @@ public class GlsResource
 
             if ((!bib2gls.isKnownField(abbrevDefaultNameField)
              && !bib2gls.isKnownSpecialField(abbrevDefaultNameField))
-             || abbrevDefaultNameField.equals("name"))
+             || abbrevDefaultNameField.equals("name")
+             || abbrevDefaultNameField.equals("sort"))
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
@@ -3593,6 +3608,26 @@ public class GlsResource
       }
    }
 
+   public boolean isAllowedSortFallbackField(String field)
+   {
+      if (field.equals("id") || field.equals("original id"))
+      {
+         return true;
+      }
+
+      // Don't allow unknown fields (to guard against typos).
+      // The fallback field can't be "sort" as it will cause
+      // infinite recursion.
+
+      if (!bib2gls.isKnownField(abbrevDefaultSortField)
+             && !bib2gls.isKnownSpecialField(abbrevDefaultSortField))
+      {
+         return false;
+      }
+
+      return field.equals("sort") ? false : true;
+   }
+
    private String replaceHexAndSpecial(String original)
    {
       return replaceHex(replaceEscapeSpecialChar(original));
@@ -4780,6 +4815,11 @@ public class GlsResource
    public String toString()
    {
       return texFile == null ? super.toString() : texFile.getName();
+   }
+
+   public Bib2GlsBibParser getBibParserListener()
+   {
+      return bibParserListener;
    }
 
    public void processBibList(TeXParser parser)
@@ -11459,7 +11499,7 @@ public class GlsResource
    private SortSettings dualSortSettings;
    private SortSettings secondarySortSettings;
 
-   private String symbolDefaultSortField = "id";
+   private String symbolDefaultSortField = "original id";
    private String entryDefaultSortField = "name";
 
    private String abbrevDefaultSortField = "short";

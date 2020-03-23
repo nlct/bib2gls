@@ -90,19 +90,7 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
    {
       if (field.equals("sort"))
       {
-         field = getSortFallbackField();
-
-         if (field.equals("id"))
-         {
-            return getOriginalId();
-         }
-
-         String val = getFieldValue(field);
-
-         if (val != null)
-         {
-            return val;
-         }
+         return getSortFallbackValue();
       }
 
       return super.getFallbackValue(field);
@@ -112,16 +100,7 @@ public class Bib2GlsDualSymbol extends Bib2GlsDualEntry
    {
       if (field.equals("sort"))
       {
-         String fallbackField = getSortFallbackField();
-
-         if (fallbackField.equals("id"))
-         {
-            return getIdField();
-         }
-
-         BibValueList val = getField(fallbackField);
-
-         return val == null ? getFallbackContents(fallbackField) : val;
+         return getSortFallbackContents();
       }
       else if (field.equals("name"))
       {

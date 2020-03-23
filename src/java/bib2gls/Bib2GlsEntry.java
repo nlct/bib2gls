@@ -1869,6 +1869,27 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
+   public String getSortFallbackValue()
+   {
+      String fallbackField = getSortFallbackField();
+
+      if (fallbackField.equals("id"))
+      {
+         return getId();
+      }
+
+      if (fallbackField.equals("original id"))
+      {
+         return getOriginalId();
+      }
+
+      String value = fieldValues.get(fallbackField);
+
+      if (value != null) return value;
+
+      return getFallbackValue(fallbackField);
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("text"))
@@ -1899,12 +1920,7 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("sort"))
       {
-         String fallbackField = getSortFallbackField();
-         String value = fieldValues.get(fallbackField);
-
-         if (value != null) return value;
-
-         return getFallbackValue(fallbackField);
+         return getSortFallbackValue();
       }
       else if (field.equals("first"))
       {
@@ -2040,6 +2056,32 @@ public class Bib2GlsEntry extends BibEntry
       return plural(contents, "glspluralsuffix");
    }
 
+   public BibValueList getSortFallbackContents()
+   {
+      String fallbackField = getSortFallbackField();
+
+      BibValueList contents;
+
+      if (fallbackField.equals("original id") 
+          || (fallbackField.equals("id") && labelPrefix == null && labelSuffix == null))
+      {
+         return getIdField();
+      }
+
+      if (fallbackField.equals("id"))
+      {
+         contents = new BibValueList();
+         contents.add(new BibUserString(
+            resource.getBibParserListener().createString(getId())));
+
+         return contents;
+      }
+
+      contents = getField(fallbackField);
+
+      return contents == null ? getFallbackContents(fallbackField) : contents;
+   }
+
    public BibValueList getFallbackContents(String field)
    {
       if (field.equals("text"))
@@ -2070,10 +2112,7 @@ public class Bib2GlsEntry extends BibEntry
       }
       else if (field.equals("sort"))
       {
-         String fallbackField = getSortFallbackField();
-         BibValueList contents = getField(fallbackField);
-
-         return contents == null ? getFallbackContents(fallbackField) : contents;
+         return getSortFallbackContents();
       }
       else if (field.equals("first"))
       {

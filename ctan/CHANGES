@@ -6,6 +6,9 @@ v2.3 (pending):
   * Resource option 'selection' now also allows the values
     'deps but not recorded' and 'ancestors but not recorded'
 
+  * The sort fallback resource options now allow 'id' or 'original id'
+    as values.
+
   * New resource option: custom-sort-fallbacks
 
   * New command line switches:

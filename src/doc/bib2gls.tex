@@ -9217,7 +9217,8 @@ missing and it's required for some reason (for example, with
 fallback on a different field, then you can use this option to
 specify the field. For example,
 \csopt[long]{abbreviation-name-fallback}.
-The \meta{field} value must be a known field label.
+The \meta{field} value must be a known field (not an internal field)
+but can't be the \field{sort} field.
 
 \optsection[\subsubsection]{ignore-fields}
 
@@ -13884,6 +13885,11 @@ follows:
 \meta{fallback-field}.  If \meta{fallback-field} is
 missing, then \bibgls\ will query the entry type's fallback for
 \meta{fallback-field} (not for \meta{sort-field}).
+The \meta{fallback-field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label).
+
 \item If the entry type has a fallback rule for \meta{sort-field},
 then that rule is used. When \csopt[sort]{sort-field} this means:
 \begin{itemize}
@@ -13927,10 +13933,14 @@ sorting.
 The value should be a \keyvallist\ in the form
 \meta{entrytype}\dequals\meta{field} where \meta{entrytype} is the
 \emph{original} entry type (before being aliased with
-\csopt{entry-type-aliases}) and \meta{field} is the name of a field
-(\field{sort} isn't permitted). This will override any of the
+\csopt{entry-type-aliases}). This will override any of the
 \optfmt{\meta{entrytype}\dhyphen sort\dhyphen fallback}
 options listed below.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label).
 
 If an entry hasn't had its entry type aliased then \meta{entrytype}
 is its actual entry type. For example, consider the following
@@ -13982,6 +13992,11 @@ fallback on a different field, then you can use this option to
 specify the field.
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label).
 
 This setting doesn't affect the index type of entries, such as
 \atentry{index} or \atentry{indexplural}. This is useful if your
@@ -14079,7 +14094,12 @@ specify the field. For example,
 \csopt[long]{abbreviation-sort-fallback}. Note that if you use
 \csopt[name]{sort-field}, then the fallback field will be given by
 \csopt{abbreviation-name-fallback} if the \field{name} field is
-omitted. The \meta{field} value must be a known field label.
+omitted.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label).
 
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.
@@ -14095,12 +14115,16 @@ for sorting (\csopt{sort-field}).
 \optsection{symbol-sort-fallback}
 
 The entry types that define symbols (such as \atentry{symbol} and
-\atentry{number}) will, by default, fallback on the label if the
+\atentry{number}) will, by default, fallback on the entry's original label if the
 \field{sort} field is missing (assuming the default
 \csopt[sort]{sort-field}). If you prefer to fallback on a different
 field, then you can use this option to specify the field. For
-example, \csopt[name]{symbol-sort-fallback}.  The \meta{field} value
-must be a known field label.
+example, \csopt[name]{symbol-sort-fallback}.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label).
 
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.
@@ -14120,6 +14144,11 @@ fallback on the \field{name} if the
 \field{sort} field is missing (assuming the default
 \csopt[sort]{sort-field}). If you prefer to fallback on a different
 field, then you can use this option to specify the field.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label).
 
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.

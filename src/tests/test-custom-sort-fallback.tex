@@ -1,0 +1,31 @@
+% arara: lualatex
+% arara: bib2gls: { group: on }
+% arara: lualatex
+\documentclass{article}
+
+\usepackage{fontspec}
+\usepackage{siunitx}
+\usepackage[record,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\renewcommand{\glsxtrbookindexlocation}[1]{%
+  (sort value: \texttt{\glsxtrusefield{#1}{sort}}; 
+   original entry type: \texttt{@\glscategory{#1}})
+}
+
+
+\GlsXtrLoadResources[src={test-custom-sort-fallback},
+ break-at={none},
+ category={same as original entry},
+ entry-type-aliases={pictograph=symbol,unit=symbol,obelism=entry},
+ custom-sort-fallbacks={
+    pictograph=description,
+    number=user1,
+    abbreviation=long,
+    unit=symbol,
+    entry=description
+ },
+ selection=all]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

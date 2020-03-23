@@ -67,50 +67,6 @@ public class Bib2GlsSymbol extends Bib2GlsEntry
       return resource.getSymbolDefaultSortField();
    }
 
-   public String getFallbackValue(String field)
-   {
-      if (field.equals("sort"))
-      {
-         field = getSortFallbackField();
-
-         if (field.equals("id"))
-         {
-            return getOriginalId();
-         }
-
-         String val = getFieldValue(field);
-
-         if (val != null)
-         {
-            return val;
-         }
-      }
-
-      return super.getFallbackValue(field);
-   }
-
-   public BibValueList getFallbackContents(String field)
-   {
-      if (field.equals("sort"))
-      {
-         field = getSortFallbackField();
-
-         if (field.equals("id"))
-         {
-            return getIdField();
-         }
-
-         BibValueList val = getField(field);
-
-         if (val != null)
-         {
-            return val;
-         }
-      }
-
-      return super.getFallbackContents(field);
-   }
-
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
       // syntax: {label}{opts}{name}{description}
