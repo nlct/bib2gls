@@ -6,10 +6,16 @@ v2.3 (pending):
   * Resource option 'selection' now also allows the values
     'deps but not recorded' and 'ancestors but not recorded'
 
-  * The sort fallback resource options now allow 'id' or 'original id'
-    as values.
+  * New resource options:
+ 
+     custom-sort-fallbacks
+     field-concat-sep
 
-  * New resource option: custom-sort-fallbacks
+  * The sort fallback resource options custom-sort-fallbacks,
+    entry-sort-fallback, symbol-sort-fallback,
+    abbreviation-sort-fallback and bibtexentry-sort-fallback 
+    now allow 'id' or 'original id' as values or values that are 
+    field concatenations.
 
   * New command line switches:
 

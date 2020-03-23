@@ -1873,21 +1873,43 @@ public class Bib2GlsEntry extends BibEntry
    {
       String fallbackField = getSortFallbackField();
 
-      if (fallbackField.equals("id"))
+      String sep = resource.getFieldConcatenationSeparator();
+
+      String fields[] = fallbackField.split("\\+");
+
+      String value = "";
+
+      for (String field : fields)
       {
-         return getId();
+         if (!value.isEmpty())
+         {
+            value += sep;
+         }
+
+         if (field.equals("id"))
+         {
+            value += getId();
+         }
+         else if (field.equals("original id"))
+         {
+            value += getOriginalId();
+         }
+         else
+         {
+            String currentValue = fieldValues.get(field);
+
+            if (currentValue != null)
+            {
+               value += currentValue;
+            }
+            else
+            {
+               value += getFallbackValue(field);
+            }
+         }
       }
 
-      if (fallbackField.equals("original id"))
-      {
-         return getOriginalId();
-      }
-
-      String value = fieldValues.get(fallbackField);
-
-      if (value != null) return value;
-
-      return getFallbackValue(fallbackField);
+      return value;
    }
 
    public String getFallbackValue(String field)
@@ -2060,26 +2082,72 @@ public class Bib2GlsEntry extends BibEntry
    {
       String fallbackField = getSortFallbackField();
 
-      BibValueList contents;
+      TeXObjectList list = null;
 
-      if (fallbackField.equals("original id") 
-          || (fallbackField.equals("id") && labelPrefix == null && labelSuffix == null))
+      String sep = resource.getFieldConcatenationSeparator();
+
+      String fields[] = fallbackField.split("\\+");
+
+      for (String field : fields)
       {
-         return getIdField();
+         BibValueList value = null;
+
+         if (fallbackField.equals("original id") 
+            || (fallbackField.equals("id") && labelPrefix == null && labelSuffix == null))
+         {
+            value = getIdField();
+         }
+         else if (fallbackField.equals("id"))
+         {
+            value = new BibValueList();
+            value.add(new BibUserString(
+               resource.getBibParserListener().createString(getId())));
+         }
+         else
+         {
+            value = getField(field);
+
+            if (value == null)
+            {
+               value = getFallbackContents(field);
+            }
+         }
+
+         if (fields.length == 1)
+         {
+            return value;
+         }
+
+         try
+         {
+            TeXObjectList valueList = ((BibValueList)value.clone()).expand(
+                                      resource.getBibParserListener().getParser());
+
+            if (list == null)
+            {
+               list = valueList;
+            }
+            else
+            {
+               list.add(resource.getBibParserListener().createString(sep));
+               list.addAll(valueList);
+            }
+         }
+         catch (IOException e)
+         {
+            bib2gls.debug(e);
+            return value;
+         }
       }
 
-      if (fallbackField.equals("id"))
-      {
-         contents = new BibValueList();
-         contents.add(new BibUserString(
-            resource.getBibParserListener().createString(getId())));
+      BibValueList contents = new BibValueList();
 
-         return contents;
+      if (list != null)
+      {
+         contents.add(new BibUserString(list));
       }
 
-      contents = getField(fallbackField);
-
-      return contents == null ? getFallbackContents(fallbackField) : contents;
+      return contents;
    }
 
    public BibValueList getFallbackContents(String field)

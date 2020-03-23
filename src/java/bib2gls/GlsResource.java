@@ -2017,7 +2017,8 @@ public class GlsResource
          {
             String field = getOptional(parser, list, opt);
 
-            if (field == null || field.isEmpty() || isAllowedSortFallbackField(field))
+            if (field == null || field.isEmpty()
+                 || isAllowedSortFallbackField(field, false))
             {
                sortSettings.setMissingFieldFallback(field);
             }
@@ -2031,7 +2032,8 @@ public class GlsResource
          {
             String field = getOptional(parser, list, opt);
 
-            if (field == null || field.isEmpty() || isAllowedSortFallbackField(field))
+            if (field == null || field.isEmpty()
+                 || isAllowedSortFallbackField(field, false))
             {
                dualSortSettings.setMissingFieldFallback(field);
             }
@@ -2045,7 +2047,8 @@ public class GlsResource
          {
             String field = getOptional(parser, list, opt);
 
-            if (field == null || field.isEmpty() || isAllowedSortFallbackField(field))
+            if (field == null || field.isEmpty()
+                  || isAllowedSortFallbackField(field, false))
             {
                secondarySortSettings.setMissingFieldFallback(field);
             }
@@ -2059,45 +2062,25 @@ public class GlsResource
          {
             entryDefaultSortField = getRequired(parser, list, opt);
 
-            if (!isAllowedSortFallbackField(entryDefaultSortField))
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   entryDefaultSortField));
-            }
+            checkAllowedSortFallbackConcatenation(entryDefaultSortField, opt);
          }
          else if (opt.equals("abbreviation-sort-fallback"))
          {
             abbrevDefaultSortField = getRequired(parser, list, opt);
 
-            if (!isAllowedSortFallbackField(abbrevDefaultSortField))
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   abbrevDefaultSortField));
-            }
+            checkAllowedSortFallbackConcatenation(abbrevDefaultSortField, opt);
          }
          else if (opt.equals("symbol-sort-fallback"))
          {
             symbolDefaultSortField = getRequired(parser, list, opt);
 
-            if (!isAllowedSortFallbackField(symbolDefaultSortField))
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   symbolDefaultSortField));
-            }
+            checkAllowedSortFallbackConcatenation(symbolDefaultSortField, opt);
          }
          else if (opt.equals("bibtexentry-sort-fallback"))
          {
             bibTeXEntryDefaultSortField = getRequired(parser, list, opt);
 
-            if (!isAllowedSortFallbackField(bibTeXEntryDefaultSortField))
-            {
-               throw new IllegalArgumentException(
-                 bib2gls.getMessage("error.invalid.opt.value", opt, 
-                   bibTeXEntryDefaultSortField));
-            }
+            checkAllowedSortFallbackConcatenation(bibTeXEntryDefaultSortField, opt);
          }
          else if (opt.equals("custom-sort-fallbacks"))
          {
@@ -2112,12 +2095,17 @@ public class GlsResource
                   String key = it1.next();
                   String field = customEntryDefaultSortFields.get(key);
 
-                  if (!isAllowedSortFallbackField(field))
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.field", field, opt));
-                  }
+                  checkAllowedSortFallbackConcatenation(field, opt);
                }
+            }
+         }
+         else if (opt.equals("field-concat-sep"))
+         {
+            fieldConcatenationSeparator = getOptional(parser, "", list, opt);
+
+            if (fieldConcatenationSeparator != null)
+            {
+               fieldConcatenationSeparator = replaceHex(fieldConcatenationSeparator);
             }
          }
          else if (opt.equals("abbreviation-name-fallback"))
@@ -3608,9 +3596,29 @@ public class GlsResource
       }
    }
 
-   public boolean isAllowedSortFallbackField(String field)
+   private void checkAllowedSortFallbackConcatenation(String fields, String opt)
+    throws IllegalArgumentException
    {
-      if (field.equals("id") || field.equals("original id"))
+      String[] split = fields.split("\\+");
+
+      for (String field : split)
+      {
+         if (!isAllowedSortFallbackField(field, true))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.field", field, opt));
+         }
+      }
+   }
+
+   public String getFieldConcatenationSeparator()
+   {
+      return fieldConcatenationSeparator;
+   }
+
+   private boolean isAllowedSortFallbackField(String field, boolean allowKeywords)
+   {
+      if (allowKeywords && (field.equals("id") || field.equals("original id")))
       {
          return true;
       }
@@ -11508,6 +11516,8 @@ public class GlsResource
    private String bibTeXEntryDefaultSortField = "name";
 
    private HashMap<String,String> customEntryDefaultSortFields = null;
+
+   private String fieldConcatenationSeparator = " ";
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 

@@ -13886,9 +13886,9 @@ follows:
 missing, then \bibgls\ will query the entry type's fallback for
 \meta{fallback-field} (not for \meta{sort-field}).
 The \meta{fallback-field} may be a known field but not an internal
-field. It can't be the \field{sort} field. It may also be
-one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label).
+field. It can't be the \field{sort} field. Unlike the options such
+as \csopt{entry-sort-fallback}, the field can't be a keyword to
+identify the label and can't be a composite.
 
 \item If the entry type has a fallback rule for \meta{sort-field},
 then that rule is used. When \csopt[sort]{sort-field} this means:
@@ -13940,7 +13940,11 @@ options listed below.
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
 one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label).
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
 
 If an entry hasn't had its entry type aliased then \meta{entrytype}
 is its actual entry type. For example, consider the following
@@ -13996,7 +14000,11 @@ Note that \csopt{missing-sort-fallback} and
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
 one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label).
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
 
 This setting doesn't affect the index type of entries, such as
 \atentry{index} or \atentry{indexplural}. This is useful if your
@@ -14099,7 +14107,11 @@ omitted.
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
 one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label).
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
 
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.
@@ -14124,7 +14136,11 @@ example, \csopt[name]{symbol-sort-fallback}.
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
 one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label).
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
 
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.
@@ -14148,7 +14164,11 @@ field, then you can use this option to specify the field.
 The \meta{field} may be a known field but not an internal
 field. It can't be the \field{sort} field. It may also be
 one of the keywords \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label).
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
 
 Note that \csopt{missing-sort-fallback} and
 \csopt{custom-sort-fallbacks} override this setting.
@@ -14161,6 +14181,35 @@ been set. This means that this setting has no effect if you
 explicitly set the \field{sort} field or if you change the field used for
 sorting (\csopt{sort-field}).
 \end{important}
+
+\optsection{field-concat-sep}
+
+This option sets the field concatenation separator to \meta{value}.
+The default is a space. An empty value indicates no separator. You
+may use \ics{u}\meta{hex} to indicate a character by its hexadecimal
+code. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[long+short]{abbreviation-sort-fallback},
+  \csopt[]{field-concat-sep}
+}
+\end{codeenv}
+This will obtain the sort value for abbreviations from a
+concatenation of the \meta{long} and \meta{short} values without a
+separator.
+
+This setting is only used for the sort fallback options that allow
+field concatenation (such as \csopt{entry-sort-fallback} but not
+\csopt{missing-sort-fallback}). 
+
+Note that due to the way that the \keyvallist\ parser trims leading and
+trailing spaces, you can't simply do \csopt[\space]{field-concat-sep}
+to indicate a space character as the value will end up as an empty
+string. You can instead do \csopt[\stringu32]{field-concat-sep} but
+since this is the default value there shouldn't be much need for it.
+
+Remember that the separator may be replaced with a break point
+marker depending on the sort method and \csopt{break-at} setting.
 
 \optsection{trim-sort}
 

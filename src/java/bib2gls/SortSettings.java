@@ -744,6 +744,7 @@ public class SortSettings
       return missingFieldFallback;
    }
 
+   // check argument valid before calling this method
    public void setMissingFieldFallback(String field)
    {
       if ("".equals(field))
