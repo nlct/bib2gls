@@ -1,3 +1,8 @@
+v2.4 (2020-05-27):
+
+  * Bug fix (issue in TeX parser library used by bib2gls)
+    https://github.com/nlct/texparser/issues/3
+
 v2.3 (2020-03-23):
 
   * New sort methods: recordcount and recordcount-reverse
