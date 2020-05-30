@@ -1,3 +1,10 @@
+v2.5 (2020-05-30):
+
+  * --version switch now also shows version details for bundled
+    texparserlib.jar
+
+  * Bug fix (texparserlib.jar): corrected \else part of conditionals
+
 v2.4 (2020-05-27):
 
   * Bug fix (issue in TeX parser library used by bib2gls)

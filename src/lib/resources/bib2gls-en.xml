@@ -8,6 +8,8 @@
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.</entry>
 
+<entry key="about.library.version">Bundled with {0} version {1} ({2})</entry>
+
 <entry key="syntax.usage">Usage: {0} [&lt;option&gt;]+ &lt;aux file&gt;</entry>
 <entry key="syntax.info">Helper application for the glossaries-extra package.
 See the manual for further details.</entry>

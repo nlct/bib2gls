@@ -3891,9 +3891,20 @@ public class Bib2Gls implements TeXApp
 
    public void license()
    {
+      System.out.println("https://github.com/nlct/bib2gls");
+      System.out.println();
       System.out.format("Copyright 2017-%s Nicola Talbot%n",
        DATE.substring(0,4));
       System.out.println(getMessage("about.license"));
+   }
+
+   public void libraryVersion()
+   {
+      System.out.println();
+      System.out.println(getMessageWithFallback("about.library.version",
+        "Bundled with {0} version {1} ({2})", 
+        "texparserlib.jar", TeXParser.VERSION, TeXParser.VERSION_DATE));
+      System.out.println("https://github.com/nlct/texparser");
    }
 
    public void help()
@@ -4488,6 +4499,7 @@ public class Bib2Gls implements TeXApp
             }
 
             license();
+            libraryVersion();
             System.exit(0);
          }
          else if (isArg(args[i], "t", "log-file"))
@@ -5234,8 +5246,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.4";
-   public static final String DATE = "2020-05-27";
+   public static final String VERSION = "2.5";
+   public static final String DATE = "2020-05-30";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
