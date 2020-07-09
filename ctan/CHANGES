@@ -1,3 +1,7 @@
+v2.7 (pending):
+
+  * Added check for null in getSortFallbackContents
+
 v2.6 (2020-07-09):
 
   * Fixed bug where getSortFallbackValue returns string "null"

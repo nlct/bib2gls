@@ -2140,34 +2140,36 @@ public class Bib2GlsEntry extends BibEntry
             return value;
          }
 
-         try
+         if (value != null)
          {
-            TeXObjectList valueList = ((BibValueList)value.clone()).expand(
-                                      resource.getBibParserListener().getParser());
+            try
+            {
+               TeXObjectList valueList = ((BibValueList)value.clone()).expand(
+                                         resource.getBibParserListener().getParser());
 
-            if (list == null)
-            {
-               list = valueList;
+               if (list == null)
+               {
+                  list = valueList;
+               }
+               else
+               {
+                  list.add(resource.getBibParserListener().createString(sep));
+                  list.addAll(valueList);
+               }
             }
-            else
+            catch (IOException e)
             {
-               list.add(resource.getBibParserListener().createString(sep));
-               list.addAll(valueList);
+               bib2gls.debug(e);
+               return value;
             }
-         }
-         catch (IOException e)
-         {
-            bib2gls.debug(e);
-            return value;
          }
       }
+
+      if (list == null) return null;
 
       BibValueList contents = new BibValueList();
 
-      if (list != null)
-      {
-         contents.add(new BibUserString(list));
-      }
+      contents.add(new BibUserString(list));
 
       return contents;
    }
