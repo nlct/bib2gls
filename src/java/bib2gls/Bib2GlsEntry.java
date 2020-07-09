@@ -1877,34 +1877,56 @@ public class Bib2GlsEntry extends BibEntry
 
       String fields[] = fallbackField.split("\\+");
 
-      String value = "";
+      String value = null;
 
       for (String field : fields)
       {
-         if (!value.isEmpty())
+         if (value != null)
          {
             value += sep;
          }
 
          if (field.equals("id"))
          {
-            value += getId();
+            if (value == null)
+            {
+               value = getId();
+            }
+            else
+            {
+               value += getId();
+            }
          }
          else if (field.equals("original id"))
          {
-            value += getOriginalId();
+            if (value == null)
+            {
+               value = getOriginalId();
+            }
+            else
+            {
+               value += getOriginalId();
+            }
          }
          else
          {
             String currentValue = fieldValues.get(field);
 
+            if (currentValue == null)
+            {
+               currentValue = getFallbackValue(field);
+            }
+
             if (currentValue != null)
             {
-               value += currentValue;
-            }
-            else
-            {
-               value += getFallbackValue(field);
+               if (value == null)
+               {
+                  value = currentValue;
+               }
+               else
+               {
+                  value += currentValue;
+               }
             }
          }
       }

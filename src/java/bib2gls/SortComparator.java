@@ -404,6 +404,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          if (value == null)
          {
             value = entry.getFallbackValue(entrySortField);
+
             list = entry.getFallbackContents(entrySortField);
          }
 
