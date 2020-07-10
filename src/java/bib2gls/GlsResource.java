@@ -1174,7 +1174,22 @@ public class GlsResource
          }
          else if (opt.equals("save-original-entrytype"))
          {
-            saveOriginalEntryType = getBoolean(parser, list, opt);
+            saveOriginalEntryType = getOptional(parser, list, opt);
+
+            if (saveOriginalEntryType == null || saveOriginalEntryType.isEmpty()
+                || saveOriginalEntryType.equals("true"))
+            {
+               saveOriginalEntryType = "originalentrytype";
+            }
+            else if (saveOriginalEntryType.equals("false"))
+            {
+               saveOriginalEntryType = null;
+            }
+            else if (bib2gls.isKnownSpecialField(saveOriginalEntryType))
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                 "error.invalid.field", opt, saveOriginalEntryType));
+            }
          }
          else if (opt.equals("alias-loc"))
          {
@@ -1416,13 +1431,19 @@ public class GlsResource
          {
             saveOriginalId = getOptional(parser, list, opt);
 
-            if (saveOriginalId == null || saveOriginalId.isEmpty())
+            if (saveOriginalId == null || saveOriginalId.isEmpty()
+                || saveOriginalId.equals("true"))
             {
                saveOriginalId = "originalid";
             }
             else if (saveOriginalId.equals("false"))
             {
                saveOriginalId = null;
+            }
+            else if (bib2gls.isKnownSpecialField(saveOriginalId))
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                 "error.invalid.field", opt, saveOriginalId));
             }
          }
          else if (opt.equals("sort-suffix"))
@@ -7253,8 +7274,7 @@ public class GlsResource
 
       entry.writeBibEntry(writer);
 
-      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId)
-          && !bib2gls.isKnownSpecialField(saveOriginalId))
+      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId))
       {
          writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
            id, saveOriginalId, entry.getOriginalId());
@@ -7323,10 +7343,10 @@ public class GlsResource
          }
       }
 
-      if (saveOriginalEntryType)
+      if (saveOriginalEntryType != null && !bib2gls.isKnownField(saveOriginalEntryType))
       {
-         writer.format("\\GlsXtrSetField{%s}{originalentrytype}{%s}%n",
-           id, entry.getOriginalEntryType());
+         writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+           id, saveOriginalEntryType, entry.getOriginalEntryType());
       }
 
       if (checkEndPunc != null)
@@ -10700,6 +10720,11 @@ public class GlsResource
       return saveOriginalId;
    }
 
+   public String getSaveOriginalEntryTypeField()
+   {
+      return saveOriginalEntryType;
+   }
+
    public boolean hasFieldAliases()
    {
       return fieldAliases != null;
@@ -11641,7 +11666,7 @@ public class GlsResource
 
    private boolean saveSiblingCount = false;
 
-   private boolean saveOriginalEntryType = false;
+   private String saveOriginalEntryType = null;
 
    private boolean defpagesname = false;
 

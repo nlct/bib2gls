@@ -8841,15 +8841,17 @@ cross-references.
 
 \optsection[\subsubsection]{save-original-id}
 
-The \meta{value} may be either the keyword \code{false} or
+The \meta{value} may be the keywords \code{false} or \code{true} or
 the name of an internal field in which to store the entry's original
 label (as given in the \ext{bib} file). The default setting is
-\csopt[false]{save-original-id}. If \meta{value} is omitted,
-\csopt[originalid]{save-original-id} is assumed.
+\csopt[false]{save-original-id}. If \meta{value} is omitted or the
+keyword \code{true}, then \csopt[originalid]{save-original-id} 
+is assumed.
 
 If \meta{value} is a known field, it will be set after the field
 aliases, otherwise it will simply be added to the \ext{glstex} file
-using \ics{GlsXtrSetField} after the entry definition. 
+using \ics{GlsXtrSetField} after the entry definition (which means
+the field can't be referenced in other resource options). 
 
 \optsection[\subsubsection]{dependency-fields}
 
@@ -9457,11 +9459,19 @@ the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
 
 \optsection[\subsubsection]{save-original-entrytype}
 
-If this is set to \optfmt{true}, the original entry type
-(without the leading \idx{atchar}) is stored in the 
-\field{originalentrytype} field. If no entry aliasing has been
+The \meta{value} may be the keywords \code{false} or \code{true} or
+the name of an internal field.
+If this is set to \optfmt{true} or the value is omitted, the
+original entry type (without the leading \idx{atchar}) is stored in
+the \field{originalentrytype} field. If no entry aliasing has been
 applied (with \csopt{entry-type-aliases}) the field will be set to
 the actual entry type.
+
+If \meta{value} is the name of an internal field, then that field
+will be used instead and will be set after the field aliases,
+otherwise it will simply be added to the \ext{glstex} file
+using \ics{GlsXtrSetField} after the entry definition (which means
+the field can't be referenced in other resource options).
 
 \subsection{Field Adjustments}
 \label{sec:fieldmods}
@@ -14295,7 +14305,7 @@ field concatenation (such as \csopt{entry-sort-fallback} but not
 \csopt{missing-sort-fallback}). 
 
 Note that due to the way that the \keyvallist\ parser trims leading and
-trailing spaces, you can't simply do \csopt[\space]{field-concat-sep}
+trailing spaces, you can't simply do \csopt[~]{field-concat-sep}
 to indicate a space character as the value will end up as an empty
 string. You can instead do \csopt[\stringu20]{field-concat-sep} but
 since this is the default value there shouldn't be much need for it.

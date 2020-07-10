@@ -793,6 +793,18 @@ public class Bib2GlsEntry extends BibEntry
          putField(idField, getOriginalId());
       }
 
+      String entryTypeField = resource.getSaveOriginalEntryTypeField();
+
+      if (entryTypeField != null && bib2gls.isKnownField(entryTypeField))
+      {
+         BibUserString bibVal = new BibUserString(
+            parser.getListener().createString(getOriginalEntryType()));
+         BibValueList val = new BibValueList();
+         val.add(bibVal);
+         putField(entryTypeField, val);
+         putField(entryTypeField, getOriginalEntryType());
+      }
+
       Vector<String> fields = bib2gls.getFields();
 
       if (resource.hasSkippedFields())

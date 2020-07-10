@@ -35,6 +35,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf
+	@grep Exception *.glg || true
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..

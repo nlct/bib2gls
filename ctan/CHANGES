@@ -1,6 +1,14 @@
 v2.7 (pending):
 
-  * Added check for null in getSortFallbackContents
+  * save-original-entrytype option now allows the name of a field
+    as the value (making it consistent with the save-original-id
+    option)
+
+  * save-original-id option now has a check to disallow special
+    internal fields (instead of silently ignoring the setting)
+
+  * Bug fix: Added check for null in getSortFallbackContents
+    (to avoid NullPointerException)
 
 v2.6 (2020-07-09):
 
