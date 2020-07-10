@@ -9,14 +9,14 @@
 
 \renewcommand{\glsxtrbookindexlocation}[1]{%
   (sort value: \texttt{\glsxtrusefield{#1}{sort}}; 
-   original entry type: \texttt{@\glscategory{#1}})
+   category: \texttt{\glscategory{#1}};
+   original entry type: \texttt{@\glsxtrusefield{#1}{originalentrytype}})
 }
-
 
 \GlsXtrLoadResources[src={test-custom-sort-fallback},
  break-at={none},
  field-concat-sep={/},
- category={same as original entry},
+% category={same as original entry},
  entry-type-aliases={pictograph=symbol,unit=symbol,obelism=entry},
  custom-sort-fallbacks={
     pictograph=description,
@@ -25,6 +25,8 @@
     unit=symbol,
     entry=description
  },
+ save-original-entrytype,
+% save-original-entrytype-action=changed,
  selection=all]
 
 \begin{document}

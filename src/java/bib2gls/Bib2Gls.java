@@ -1241,6 +1241,7 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new FlattenedPreSort());
       listener.putControlSequence(new HrefChar());
       listener.putControlSequence(new AtSecondOfTwo("bibglshrefunicode"));
+      listener.putControlSequence(new HexUnicodeChar());
 
       // Custom packages may override the definitions of any of the
       // above.
@@ -2775,9 +2776,19 @@ public class Bib2Gls implements TeXApp
       writer.println("\\providecommand{\\bibglsampersandchar}{\\expandafter\\@gobble\\string\\&}");
       writer.println("\\providecommand{\\bibglsunderscorechar}{\\expandafter\\@gobble\\string\\_}");
       writer.println("\\providecommand{\\bibglshrefchar}[2]{\\glspercentchar #1}");
+
       if (fontspec)
       {
          writer.println("\\providecommand{\\bibglshrefunicode}[2]{#2}");
+      }
+
+      if (hyperref)
+      {
+         writer.println("\\providecommand{\\bibglshexunicodechar}[1]{\\csname Hy@unicode\\endcsname\\texorpdfstring{\\symbol{\\string\"#1}}{\\unichar{\\string\"#1}}\\else\\symbol{\\string\"#1}\\fi}");
+      }
+      else
+      {
+         writer.println("\\providecommand{\\bibglshexunicodechar}[1]{\\symbol{\\string\"#1}}");
       }
 
       writer.println("\\providecommand{\\bibglsusesee}[1]{\\glsxtrusesee{#1}}");

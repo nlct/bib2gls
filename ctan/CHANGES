@@ -14,6 +14,7 @@ v2.7 (pending):
 
      save-original-id-action
      save-original-entrytype-action
+     hex-unicode-fields
 
   * Bug fix: Added check for null in getSortFallbackContents
     (to avoid NullPointerException)

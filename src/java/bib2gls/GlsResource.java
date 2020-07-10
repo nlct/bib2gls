@@ -2503,6 +2503,10 @@ public class GlsResource
                interpretFieldAction = INTERPRET_FIELD_ACTION_REPLACE_NON_EMPTY;
             }
          }
+         else if (opt.equals("hex-unicode-fields"))
+         {
+            hexUnicodeFields = getFieldArray(parser, list, opt, true);
+         }
          else if (opt.equals("bibtex-contributor-fields"))
          {
             bibtexAuthorList = getFieldArray(parser, list, opt, true);
@@ -7477,7 +7481,7 @@ public class GlsResource
 
       additionalUserFields.add(field);
 
-      bib2gls.debugMessage("message.added.user.field", field);
+      bib2gls.verboseMessage("message.added.user.field", field);
    }
 
    private void writeBibEntryCopy(PrintWriter writer, Bib2GlsEntry entry)
@@ -8433,6 +8437,10 @@ public class GlsResource
       return false;
    }
 
+   public String[] getHexUnicodeFields()
+   {
+      return hexUnicodeFields;
+   }
 
    public String getLabelPrefix()
    {
@@ -11598,6 +11606,8 @@ public class GlsResource
    private String[] bibtexAuthorList = null;
 
    private String[] interpretFields = null;
+
+   private String[] hexUnicodeFields = null;
 
    public static final byte INTERPRET_FIELD_ACTION_REPLACE=(byte)0;
    public static final byte INTERPRET_FIELD_ACTION_REPLACE_NON_EMPTY=(byte)1;

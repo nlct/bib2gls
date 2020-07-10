@@ -1106,6 +1106,26 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
+      String[] hexUnicodeFields = resource.getHexUnicodeFields();
+
+      if (hexUnicodeFields != null)
+      {
+         for (String field : hexUnicodeFields)
+         {
+            BibValueList value = getField(field);
+
+            if (value != null)
+            {
+               TeXObjectList list = value.expand(parser);
+
+               if (convertUnicodeCharToHex(parser, list))
+               {
+                  putField(field, list.toString(parser));
+               }
+            }
+         }
+      }
+
       // has the nonumberlist key been used?
 
       BibValueList noNumberList = getField("nonumberlist");
@@ -1129,6 +1149,38 @@ public class Bib2GlsEntry extends BibEntry
                 val, "true, false");
          }
       }
+   }
+
+   private boolean convertUnicodeCharToHex(TeXParser parser, TeXObjectList list)
+   {
+      boolean changed = false;
+
+      for (int i = 0; i < list.size(); i++)
+      {
+         TeXObject obj = list.get(i);
+
+         if (obj instanceof TeXObjectList)
+         {
+            if (convertUnicodeCharToHex(parser, (TeXObjectList)obj))
+            {
+               changed = true;
+            }
+         }
+         else if (obj instanceof CharObject)
+         {
+            TeXObjectList subList = new TeXObjectList();
+
+            subList.add(new TeXCsRef("\\bibglshexunicodechar"));
+            subList.add(parser.getListener().createGroup(String.format("%X",
+             ((CharObject)obj).getCharCode())));
+
+            list.set(i, subList);
+
+            changed = true;
+         }
+      }
+
+      return changed;
    }
 
    protected Vector<String> processSpecialFields(TeXParser parser,

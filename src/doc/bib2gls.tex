@@ -2067,6 +2067,9 @@ the corresponding set of \ext{bib} files:
   \csopt{interpret-fields} are replaced with their interpreted
   values;
 
+  \item any fields that have been identified with
+  \csopt{hex-unicode-fields} will have Unicode characters replaced;
+
   \item check for \field{nonumberlist}.
   \end{itemize}
 \item The dual version (if appropriate) is created.
@@ -10294,6 +10297,16 @@ If a field value consists solely of commands that are unknown to the
 interpreter, then the resulting value will end up empty. In this
 case, it may be more appropriate to leave the field unchanged.
 
+\optsection[\subsubsection]{hex-unicode-fields}
+
+This option will convert any Unicode characters (outside of the
+Basic Latin set) that are found in the listed fields into
+\code{\gls{bibglshexunicodechar}\margm{hex-code}} where
+\meta{hex-code} is the hexadecimal character code.
+
+The \meta{list} should be a comma-separated list of field names.
+This action is performed after \csopt{interpret-fields}.
+
 \optsection[\subsubsection]{date-time-fields}
 
 This option indicates that the listed fields all contain 
@@ -17576,6 +17589,24 @@ second argument is ignored.
 
 \formatdef{bibglshrefunicode}
 Expands to the second argument. The first argument is ignored.
+
+\cssection{bibglshexunicodechar}
+
+\formatdef{bibglshexunicodechar}
+This command is used by the \csopt{hex-unicode-fields} option when
+replacing any Unicode characters. The argument \meta{hex} is the hexadecimal
+character code. Note that the argument isn't preceded by the double-quote
+character~\idx{doublequotecharhex} (which is normally used to
+identify hexadecimal numbers in \LaTeX). Instead, the definition
+needs to insert this character, if appropriate.
+
+If \bibgls\ has detected that the \sty{hyperref} package has been
+loaded, it will provide a definition that may be used in PDF
+bookmarks provided that \sty{hyperref}'s \styoptfmt{unicode} option is
+set. Otherwise the command will simply do
+\code{\ics{cs.symbol}\marg{\idx{doublequotecharhex}\meta{hex}}}
+(which will require an appropriate font in order to render the
+symbol correctly).
 
 \section{Letter Groups}
 \label{sec:lettergroupdefs}
