@@ -2287,6 +2287,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.save-original-id-action,
+   name={\csoptfmt{save\dhyphen original\dhyphen id\dhyphen action}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.short-case-change,
    name={\csoptfmt{short\dhyphen case\dhyphen change}},
    user1={\meta{value}},
@@ -2478,6 +2485,13 @@ field\dhyphen locale}},
 
 @resourceoption{opt.save-original-entrytype,
    name={\csoptfmt{save\dhyphen original\dhyphen entrytype}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.save-original-entrytype-action,
+   name={\csoptfmt{save\dhyphen original\dhyphen entrytype\dhyphen action}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -8363,6 +8377,14 @@ field.},
   name={\fieldfmt{original\-entry\-type}},
   description={The original entry type before any aliasing was
   applied or the actual entry type if no aliasing.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@field{field.originalid,
+  name={\fieldfmt{original\-id}},
+  description={The original label as given in the \ext{bib} file.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}

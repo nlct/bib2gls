@@ -785,24 +785,46 @@ public class Bib2GlsEntry extends BibEntry
 
       if (idField != null && bib2gls.isKnownField(idField))
       {
-         BibUserString bibVal = new BibUserString(
-            parser.getListener().createString(getOriginalId()));
-         BibValueList val = new BibValueList();
-         val.add(bibVal);
-         putField(idField, val);
-         putField(idField, getOriginalId());
+         int action = resource.getSaveOriginalIdAction();
+
+         if (action == GlsResource.SAVE_ORIGINAL_ALWAYS
+          || (action == GlsResource.SAVE_ORIGINAL_NO_OVERRIDE 
+               && getField(idField) == null)
+          || (!getId().equals(getOriginalId()) && 
+              (action == GlsResource.SAVE_ORIGINAL_CHANGED_OVERRIDE ||
+              (action == GlsResource.SAVE_ORIGINAL_CHANGED_NO_OVERRIDE
+                 && getField(idField) == null))))
+         {
+            BibUserString bibVal = new BibUserString(
+               parser.getListener().createString(getOriginalId()));
+            BibValueList val = new BibValueList();
+            val.add(bibVal);
+            putField(idField, val);
+            putField(idField, getOriginalId());
+         }
       }
 
       String entryTypeField = resource.getSaveOriginalEntryTypeField();
 
       if (entryTypeField != null && bib2gls.isKnownField(entryTypeField))
       {
-         BibUserString bibVal = new BibUserString(
-            parser.getListener().createString(getOriginalEntryType()));
-         BibValueList val = new BibValueList();
-         val.add(bibVal);
-         putField(entryTypeField, val);
-         putField(entryTypeField, getOriginalEntryType());
+         int action = resource.getSaveOriginalEntryTypeAction();
+
+         if (action == GlsResource.SAVE_ORIGINAL_ALWAYS
+          || (action == GlsResource.SAVE_ORIGINAL_NO_OVERRIDE 
+               && getField(entryTypeField) == null)
+          || (!getEntryType().equals(getOriginalEntryType()) && 
+              (action == GlsResource.SAVE_ORIGINAL_CHANGED_OVERRIDE ||
+              (action == GlsResource.SAVE_ORIGINAL_CHANGED_NO_OVERRIDE
+                 && getField(entryTypeField) == null))))
+         {
+            BibUserString bibVal = new BibUserString(
+               parser.getListener().createString(getOriginalEntryType()));
+            BibValueList val = new BibValueList();
+            val.add(bibVal);
+            putField(entryTypeField, val);
+            putField(entryTypeField, getOriginalEntryType());
+         }
       }
 
       Vector<String> fields = bib2gls.getFields();

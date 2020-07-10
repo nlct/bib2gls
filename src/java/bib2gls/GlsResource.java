@@ -250,6 +250,26 @@ public class GlsResource
          else if (opt.equals("replicate-fields"))
          {
             fieldCopies = getHashMapVector(parser, list, opt, true);
+
+            if (fieldCopies != null)
+            {
+               for (Iterator<String> mapIt = fieldCopies.keySet().iterator();
+                    mapIt.hasNext(); )
+               {
+                  String key = mapIt.next();
+
+                  Vector<String> values = fieldCopies.get(key);
+
+                  for (String f : values)
+                  {
+                     if (!(bib2gls.isKnownField(f) || bib2gls.isKnownSpecialField(f)
+                         || bib2gls.isInternalField(f) || bib2gls.isNonBibField(f)))
+                     {
+                        addUserField(f);
+                     }
+                  }
+               }
+            }
          }
          else if (opt.equals("replicate-override"))
          {
@@ -1191,6 +1211,30 @@ public class GlsResource
                  "error.invalid.field", opt, saveOriginalEntryType));
             }
          }
+         else if (opt.equals("save-original-entrytype-action"))
+         {
+            String val = getChoice(parser, list, opt, 
+              "always", "no override", "changed override", "changed no override",
+              "changed", "diff");
+
+            if (val.equals("always"))
+            {
+               saveOriginalEntryTypeAction = SAVE_ORIGINAL_ALWAYS;
+            }
+            else if (val.equals("no override"))
+            {
+               saveOriginalEntryTypeAction = SAVE_ORIGINAL_NO_OVERRIDE;
+            }
+            else if (val.equals("changed override") || val.equals("changed")
+                      || val.equals("diff"))
+            {
+               saveOriginalEntryTypeAction = SAVE_ORIGINAL_CHANGED_OVERRIDE;
+            }
+            else if (val.equals("changed no override"))
+            {
+               saveOriginalEntryTypeAction = SAVE_ORIGINAL_CHANGED_NO_OVERRIDE;
+            }
+         }
          else if (opt.equals("alias-loc"))
          {
             String val = getChoice(parser, list, opt, 
@@ -1444,6 +1488,30 @@ public class GlsResource
             {
                throw new Bib2GlsException(bib2gls.getMessage(
                  "error.invalid.field", opt, saveOriginalId));
+            }
+         }
+         else if (opt.equals("save-original-id-action"))
+         {
+            String val = getChoice(parser, list, opt, 
+              "always", "no override", "changed override", "changed no override",
+              "changed", "diff");
+
+            if (val.equals("always"))
+            {
+               saveOriginalIdAction = SAVE_ORIGINAL_ALWAYS;
+            }
+            else if (val.equals("no override"))
+            {
+               saveOriginalIdAction = SAVE_ORIGINAL_NO_OVERRIDE;
+            }
+            else if (val.equals("changed override") || val.equals("changed")
+                      || val.equals("diff"))
+            {
+               saveOriginalIdAction = SAVE_ORIGINAL_CHANGED_OVERRIDE;
+            }
+            else if (val.equals("changed no override"))
+            {
+               saveOriginalIdAction = SAVE_ORIGINAL_CHANGED_NO_OVERRIDE;
             }
          }
          else if (opt.equals("sort-suffix"))
@@ -7274,7 +7342,11 @@ public class GlsResource
 
       entry.writeBibEntry(writer);
 
-      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId))
+      if (saveOriginalId != null && !bib2gls.isKnownField(saveOriginalId)
+          && (saveOriginalIdAction == SAVE_ORIGINAL_ALWAYS
+              || saveOriginalIdAction == SAVE_ORIGINAL_NO_OVERRIDE
+              || !entry.getId().equals(entry.getOriginalId()))
+         )
       {
          writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
            id, saveOriginalId, entry.getOriginalId());
@@ -7343,7 +7415,11 @@ public class GlsResource
          }
       }
 
-      if (saveOriginalEntryType != null && !bib2gls.isKnownField(saveOriginalEntryType))
+      if (saveOriginalEntryType != null && !bib2gls.isKnownField(saveOriginalEntryType)
+          && (saveOriginalEntryTypeAction == SAVE_ORIGINAL_ALWAYS
+              || saveOriginalEntryTypeAction == SAVE_ORIGINAL_NO_OVERRIDE
+              || !entry.getEntryType().equals(entry.getOriginalEntryType()))
+          )
       {
          writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
            id, saveOriginalEntryType, entry.getOriginalEntryType());
@@ -7376,6 +7452,32 @@ public class GlsResource
       }
 
       entry.writeExtraFields(writer);
+
+      if (additionalUserFields != null)
+      {
+         for (String field : additionalUserFields)
+         {
+            String val = entry.getFieldValue(field);
+
+            if (val != null)
+            {
+               writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+                 id, field, val);
+            }
+         }
+      }
+   }
+
+   public void addUserField(String field)
+   {
+      if (additionalUserFields == null)
+      {
+         additionalUserFields = new Vector<String>();
+      }
+
+      additionalUserFields.add(field);
+
+      bib2gls.debugMessage("message.added.user.field", field);
    }
 
    private void writeBibEntryCopy(PrintWriter writer, Bib2GlsEntry entry)
@@ -8585,8 +8687,7 @@ public class GlsResource
 
          boolean result = m.matches();
 
-         bib2gls.debug(bib2gls.getMessage("message.pattern.info",
-            p.pattern(), field, value, result));
+         bib2gls.debugMessage("message.pattern.info", p.pattern(), field, value, result);
 
          if (fieldPatternsAnd)
          {
@@ -10650,8 +10751,8 @@ public class GlsResource
 
       if (key == null)
       {
-         bib2gls.debug("writeHyperGroupDef: No group ID for entry "
-            +entry.getId());
+         bib2gls.debugMessage("message.no.group.id", "writeHyperGroupDef",
+            entry.getId());
          return;
       }
 
@@ -10659,7 +10760,7 @@ public class GlsResource
 
       if (groupTitle == null)
       {
-         bib2gls.debug("writeHyperGroupDef: No group found for "+key);
+         bib2gls.debugMessage("message.no.group.found", "writeHyperGroupDef", key);
          return;
       }
 
@@ -10720,9 +10821,19 @@ public class GlsResource
       return saveOriginalId;
    }
 
+   public int getSaveOriginalIdAction()
+   {
+      return saveOriginalIdAction;
+   }
+
    public String getSaveOriginalEntryTypeField()
    {
       return saveOriginalEntryType;
+   }
+
+   public int getSaveOriginalEntryTypeAction()
+   {
+      return saveOriginalEntryTypeAction;
    }
 
    public boolean hasFieldAliases()
@@ -11759,6 +11870,14 @@ public class GlsResource
 
    private String saveOriginalId = null;
 
+   public static final int SAVE_ORIGINAL_ALWAYS=0;
+   public static final int SAVE_ORIGINAL_NO_OVERRIDE=1;
+   public static final int SAVE_ORIGINAL_CHANGED_OVERRIDE=2;
+   public static final int SAVE_ORIGINAL_CHANGED_NO_OVERRIDE=3;
+
+   private int saveOriginalIdAction = SAVE_ORIGINAL_ALWAYS;
+   private int saveOriginalEntryTypeAction = SAVE_ORIGINAL_ALWAYS;
+
    private String indexCounter=null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
@@ -11826,5 +11945,7 @@ public class GlsResource
    private int compactRanges = 0;
 
    private Bib2GlsBibParser bibParserListener = null;
+
+   private Vector<String> additionalUserFields = null;
 }
 

@@ -2,10 +2,18 @@ v2.7 (pending):
 
   * save-original-entrytype option now allows the name of a field
     as the value (making it consistent with the save-original-id
-    option)
+    option).
 
   * save-original-id option now has a check to disallow special
-    internal fields (instead of silently ignoring the setting)
+    internal fields (instead of silently ignoring the setting).
+
+  * replicate-fields option will now allow unknown fields in the
+    targets and will save them using \GlsXtrSetField.
+
+  * new options:
+
+     save-original-id-action
+     save-original-entrytype-action
 
   * Bug fix: Added check for null in getSortFallbackContents
     (to avoid NullPointerException)

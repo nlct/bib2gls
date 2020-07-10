@@ -43,6 +43,7 @@
 \usepackage{tcolorbox}
 \usepackage{datetime2}
 \usepackage{listings}
+\usepackage{scrhack}
 \usepackage[hidelinks]{hyperref}
 \usepackage{cleveref}
 \usepackage[% v1.21+
@@ -1993,6 +1994,11 @@ the corresponding set of \ext{bib} files:
 \item Field checks and modifications are performed:
   \begin{itemize}
   \item field aliases are performed (\csopt{field-aliases}); 
+
+  \item known fields identified with \csopt{save-original-id} and
+  \csopt{save-original-entrytype} are set (internal fields that
+  don't have a corresponding key for use with \gls!{newglossaryentry} aren't 
+  set until the \ext{glstex} file is written);
 
   \item ignored fields (identified by \csopt{ignore-fields}) are
   removed;
@@ -8842,16 +8848,40 @@ cross-references.
 \optsection[\subsubsection]{save-original-id}
 
 The \meta{value} may be the keywords \code{false} or \code{true} or
-the name of an internal field in which to store the entry's original
+the name of a field in which to store the entry's original
 label (as given in the \ext{bib} file). The default setting is
-\csopt[false]{save-original-id}. If \meta{value} is omitted or the
-keyword \code{true}, then \csopt[originalid]{save-original-id} 
-is assumed.
+\csopt[false]{save-original-id}. If \meta{value} is omitted or is the
+keyword \code{true}, then \field{originalid} is assumed.
 
-If \meta{value} is a known field, it will be set after the field
-aliases, otherwise it will simply be added to the \ext{glstex} file
+If \meta{value} has an associated key in \gls!{newglossaryentry}
+(for example, one provided with \cs{glsaddstoragekey}) it will be
+set after the field aliases, otherwise (for example,
+\field{originalid}) it will simply be added to the \ext{glstex} file
 using \ics{GlsXtrSetField} after the entry definition (which means
-the field can't be referenced in other resource options). 
+the field can't be referenced in other resource options). This
+setting is governed by \csopt{save-original-id-action}.
+
+\optsection[\subsubsection]{save-original-id-action}
+
+This option determines whether or not \csopt{save-original-id}
+should save the original entry label. No action is performed when
+\csopt[false]{save-original-id} otherwise the action is determined
+by \meta{value} which may be one of the following keywords:
+\begin{itemize}
+\item \code{always}: always save the original label (default);
+\item \code{no override}: don't override a field that's already been
+set;
+\item \code{changed override} or \code{changed} or \code{diff}:
+only save the original label if it's different from the final label;
+\item \code{changed no override}:
+only save the original label if it's different from the final label
+and the specified field hasn't been set. 
+\end{itemize}
+The \qt{no override} options make no difference if the given field
+has no associated key in \gls!{newglossaryentry} (such as
+\field{originalid}). For known fields, bear in mind that the field
+will be set after field aliasing but before other options, such as
+\csopt{ignore-fields}.
 
 \optsection[\subsubsection]{dependency-fields}
 
@@ -9298,8 +9328,15 @@ The value of one field can be copied to other fields using
 this option where each \meta{key}\dequals\meta{value} pair
 is in the form
 \code{\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}}
-where all values are field names. The value is required for this key
+where all values are known field names. The value is required for this key
 but may be empty, which indicates that the setting is switched off.
+
+\begin{important}
+Note that internal fields such as \field{originalid} aren't actually
+set as a field within \bibgls\ but are simply written to the
+\ext{glstex} file after the resource set has been processed.
+Therefore they can't be used as the source \meta{field1}.
+\end{important}
 
 This option copies the contents
 of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
@@ -9309,6 +9346,11 @@ performed after \csopt{ignore-fields} (see
 \sectionref{sec:resourcesets}). If the source field is missing, the
 \csopt{replicate-missing-field-action} setting determines the
 action.
+
+If the target field doesn't have an associated key
+recognised by \gls{newglossaryentry} then the value will be saved
+using \cs{GlsXtrSetField}. Avoid using special internal fields as
+this can cause unexpected results.
 
 For example, suppose \filefmt{people.bib} contains:
 \begin{codeenv}
@@ -9460,18 +9502,44 @@ the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
 \optsection[\subsubsection]{save-original-entrytype}
 
 The \meta{value} may be the keywords \code{false} or \code{true} or
-the name of an internal field.
-If this is set to \optfmt{true} or the value is omitted, the
-original entry type (without the leading \idx{atchar}) is stored in
-the \field{originalentrytype} field. If no entry aliasing has been
-applied (with \csopt{entry-type-aliases}) the field will be set to
-the actual entry type.
-
-If \meta{value} is the name of an internal field, then that field
-will be used instead and will be set after the field aliases,
-otherwise it will simply be added to the \ext{glstex} file
+the name of a field in which to store the original entry type (as
+given in the \ext{bib} file but without the leading \idx{atchar} and
+converted to \idx!{lowercase}). The setting is
+\csopt[false]{save-original-entrytype}. If \meta{value} is omitted or the
+keyword \code{true}, then \csopt[originalentrytype]{save-original-entrytype} 
+If \meta{value} has an associated key in \gls!{newglossaryentry}
+(for example, one provided with \cs{glsaddstoragekey}) it will be
+set after the field aliases, otherwise (for example,
+\field{originalentrytype}) it will simply be added to the \ext{glstex} file
 using \ics{GlsXtrSetField} after the entry definition (which means
-the field can't be referenced in other resource options).
+the field can't be referenced in other resource options). This
+setting is governed by \csopt{save-original-entrytype-action}.
+
+\optsection[\subsubsection]{save-original-entrytype-action}
+
+This option determines whether or not \csopt{save-original-entrytype}
+should save the original entry type. No action is performed when
+\csopt[false]{save-original-entrytype} otherwise the action is determined
+by \meta{value} which may be one of the following keywords:
+\begin{itemize}
+\item \code{always}: always save the original entry type (default);
+\item \code{no override}: don't override a field that's already been
+set;
+\item \code{changed override} or \code{changed} or \code{diff}:
+only save the original entry type if it's different from the final
+entry type;
+\item \code{changed no override}:
+only save the original entry type if it's different from the final
+entry type and the specified field hasn't been set. 
+\end{itemize}
+The \qt{no override} options make no difference if the given field
+is unknown (such as \field{originalentrytype}). For known fields, bear in
+mind that the field will be set after field aliasing but before
+other options, such as \csopt{ignore-fields}.
+
+The \qt{changed} options ignore case. For example, if the \ext{bib}
+file defined an entry with \atentryfmt{INDEX} then both the original
+and final entry type will be \code{index}.
 
 \subsection{Field Adjustments}
 \label{sec:fieldmods}
