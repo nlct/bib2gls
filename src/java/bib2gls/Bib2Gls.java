@@ -2784,7 +2784,7 @@ public class Bib2Gls implements TeXApp
 
       if (hyperref)
       {
-         writer.println("\\providecommand{\\bibglshexunicodechar}[1]{\\csname Hy@unicode\\endcsname\\texorpdfstring{\\symbol{\\string\"#1}}{\\unichar{\\string\"#1}}\\else\\symbol{\\string\"#1}\\fi}");
+         writer.println("\\providecommand{\\bibglshexunicodechar}[1]{\\csname ifHy@unicode\\endcsname\\texorpdfstring{\\symbol{\\string\"#1}}{\\unichar{\\string\"#1}}\\else\\symbol{\\string\"#1}\\fi}");
       }
       else
       {
@@ -5257,8 +5257,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.6.20200710";
-   public static final String DATE = "2020-07-10";
+   public static final String VERSION = "2.6.20200711";
+   public static final String DATE = "2020-07-11";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

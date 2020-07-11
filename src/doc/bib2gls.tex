@@ -9263,6 +9263,14 @@ but can't be the \field{sort} field.
 The \csopt{ignore-fields} key indicates that you want \bibgls\ to
 skip the fields listed in the supplied comma-separated \meta{list} of field
 labels. Remember that unrecognised fields will always be skipped.
+However, an unrecognised field can still be referenced with some
+options (such as \csopt{replicate-fields}) whereas any field
+excluded with \csopt{ignore-fields} will be discarded and can't be
+referenced.
+
+This setting is always implemented after \csopt{field-aliases}. If a
+field has been aliased then the original field name is no longer
+present and so ignoring it will have no effect.
 
 For example, suppose my \ext{bib} file contains:
 \begin{codeenv}
@@ -10281,6 +10289,18 @@ bookmarks by adjusting the definition of the custom command:
   \marg{\cs{section}\oarg{Missing `\idx{param}1'}\marg{\cs{glsadd}\marg{\idx{param}1}}}%
 }
 \end{codeenv}
+With \pdfLaTeX\ and \sty{fontenc}, you will need 
+\sty{hyperref}'s \styoptfmt{unicode} option:
+\begin{codeenv}
+\cs{usepackage}\oarg{\styoptfmt{unicode}}\marg{hyperref}
+\end{codeenv}
+If you still encounter problems with the Unicode characters not
+appearing in the PDF bookmarks, then try the
+\csopt{hex-unicode-fields} option. For example:
+\begin{codeenv}
+\csopt[pdfname]{hex-unicode-fields}
+\end{codeenv}
+This still requires \sty{hyperref}'s \styoptfmt{unicode} option.
 
 \optsection[\subsubsection]{interpret-fields-action}
 
@@ -10306,6 +10326,17 @@ Basic Latin set) that are found in the listed fields into
 
 The \meta{list} should be a comma-separated list of field names.
 This action is performed after \csopt{interpret-fields}.
+
+If the field contents need to be added to the PDF bookmarks (as in
+the earlier example) then you need to make sure you use
+\sty{hyperref}'s \styoptfmt{unicode} option
+otherwise you'll get the warning:
+\begin{verbatim}
+Token not allowed in a PDF string (PDFDocEncoding):
+removing `\char'
+\end{verbatim}
+and the bookmarks will show \idx{doublequotecharhex}\meta{hex-code}
+instead of the Unicode character.
 
 \optsection[\subsubsection]{date-time-fields}
 

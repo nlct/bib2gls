@@ -1170,7 +1170,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             TeXObjectList subList = new TeXObjectList();
 
-            subList.add(new TeXCsRef("\\bibglshexunicodechar"));
+            subList.add(new TeXCsRef("bibglshexunicodechar"));
             subList.add(parser.getListener().createGroup(String.format("%X",
              ((CharObject)obj).getCharCode())));
 

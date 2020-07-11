@@ -32,7 +32,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
-	  test-interpret-fields.pdf test-prefix.pdf test-dual-prefix.pdf \
+	  test-interpret-fields.pdf test-interpret-fields2.pdf test-prefix.pdf test-dual-prefix.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf
 	@grep Exception *.glg || true
@@ -597,6 +597,14 @@ test-interpret-fields.pdf	: test-interpret-fields.glstex
 test-interpret-fields.glstex	: test-interpret-fields.tex greek.bib $(DEPS)
 		xelatex test-interpret-fields
 		$(BIB2GLS) test-interpret-fields
+
+test-interpret-fields2.pdf	: test-interpret-fields2.glstex
+		pdflatex test-interpret-fields2
+		pdflatex test-interpret-fields2
+
+test-interpret-fields2.glstex	: test-interpret-fields2.tex greek.bib $(DEPS)
+		pdflatex test-interpret-fields2
+		$(BIB2GLS) test-interpret-fields2
 
 test-blocks.pdf	: test-blocks.glstex
 		pdflatex test-blocks
