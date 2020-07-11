@@ -9084,6 +9084,11 @@ entry]{category} refers to the \emph{target} entry type whereas
 \csopt[same as original entry]{category} refers to the
 \emph{original} entry type given in the \ext{bib} file.  In both
 cases, the value is converted to \idx!{lowercase} to ensure consistency.
+An alternative is to use \csopt[category]{save-original-entrytype}.
+When combined with \csopt[changed]{save-original-entrytype-action}
+it's then possible to only set the \field{category} to the original
+entry type for aliased entries and leave it unmodified for unaliased
+entries.
 
 For example, if the \ext{bib} file contains:
 \begin{codeenv}
@@ -9172,8 +9177,17 @@ which may be inappropriate.
 When used with \csopt{entry-type-aliases}, the option \csopt[same as
 entry]{type} refers to the \emph{target} entry type and \csopt[same
 as original entry]{type} refers to the \emph{original} entry type
-given in the \ext{bib} file.  It's not possible to have both
+given in the \ext{bib} file.  
+An alternative is to use \csopt[type]{save-original-entrytype}.
+When combined with \csopt[changed]{save-original-entrytype-action}
+it's then possible to only set the \field{type} to the original
+entry type for aliased entries and leave it unmodified for unaliased
+entries.
+
+\begin{important}
+It's not possible to have both
 \csopt[same as type]{category} and \csopt[same as category]{type}.
+\end{important}
 
 Note that this setting only changes the \field{type} field for
 primary entries. Use \csopt{dual-type} for dual entries.
@@ -9268,9 +9282,10 @@ options (such as \csopt{replicate-fields}) whereas any field
 excluded with \csopt{ignore-fields} will be discarded and can't be
 referenced.
 
-This setting is always implemented after \csopt{field-aliases}. If a
-field has been aliased then the original field name is no longer
-present and so ignoring it will have no effect.
+This setting is always implemented after \csopt{field-aliases} (see
+\sectionref{sec:resourcesets}). If a field has been aliased then the
+original field name is no longer present and so ignoring it will
+have no effect.
 
 For example, suppose my \ext{bib} file contains:
 \begin{codeenv}
@@ -9339,29 +9354,22 @@ The value of one field can be copied to other fields using
 this option where each \meta{key}\dequals\meta{value} pair
 is in the form
 \code{\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}}
-where all values are known field names. The value is required for this key
+where all values are field names. The value is required for this key
 but may be empty, which indicates that the setting is switched off.
-
-\begin{important}
-Note that internal fields such as \field{originalid} aren't actually
-set as a field within \bibgls\ but are simply written to the
-\ext{glstex} file after the resource set has been processed.
-Therefore they can't be used as the source \meta{field1}.
-\end{important}
 
 This option copies the contents
 of \meta{field1} to \meta{field2}, \meta{field3}, \ldots\
-(only if the target field isn't already set with
+(but only if the target field isn't already set with
 \csopt[false]{replicate-override}). This action is
 performed after \csopt{ignore-fields} (see
 \sectionref{sec:resourcesets}). If the source field is missing, the
 \csopt{replicate-missing-field-action} setting determines the
 action.
 
-If the target field doesn't have an associated key
-recognised by \gls{newglossaryentry} then the value will be saved
-using \cs{GlsXtrSetField}. Avoid using special internal fields as
-this can cause unexpected results.
+If the target field doesn't have an associated key recognised by
+\gls{newglossaryentry} then the value will be saved using
+\cs{GlsXtrSetField}.  Special internal fields aren't permitted as
+either source or target fields.
 
 For example, suppose \filefmt{people.bib} contains:
 \begin{codeenv}
@@ -15500,9 +15508,12 @@ significant character of the sort value. For example, the label
 This option has no effect with \longarg{no-group} or if no sorting
 is applied. Use \csopt{secondary-group-formation} for secondary
 sorting and \csopt{dual-group-formation} for dual entries.
+
+\begin{important}
 Settings other than the default can cause the groups to become
 fragmented, so care is needed if you use this option.
 See also \sectionref{sec:logicaldivisions}.
+\end{important}
 
 \section{Secondary Glossary}
 \label{sec:secondaryopts}

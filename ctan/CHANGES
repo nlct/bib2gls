@@ -1,4 +1,4 @@
-v2.7 (pending):
+v2.7 (2020-07-11):
 
   * save-original-entrytype option now allows the name of a field
     as the value (making it consistent with the save-original-id
@@ -7,8 +7,9 @@ v2.7 (pending):
   * save-original-id option now has a check to disallow special
     internal fields (instead of silently ignoring the setting).
 
-  * replicate-fields option will now allow unknown fields in the
-    targets and will save them using \GlsXtrSetField.
+  * replicate-fields option will now allow unknown fields (but not
+    special internal fields) in the targets and will save them using 
+    \GlsXtrSetField.
 
   * new options:
 

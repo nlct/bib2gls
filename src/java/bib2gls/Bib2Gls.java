@@ -2471,8 +2471,31 @@ public class Bib2Gls implements TeXApp
          }
       }
 
+      for (String field : PRIVATE_NON_BIB_FIELDS)
+      {
+         if (field.equals(name))
+         {
+            return true;
+         }
+      }
+
       return isInternalField(name) || name.startsWith("bibtexentry@")
          || name.endsWith("endpunc") || name.startsWith("recordcount.")
+         || name.startsWith("currcount@") || name.startsWith("prevcount@");
+   }
+
+   public boolean isPrivateNonBibField(String name)
+   {
+      for (String field : PRIVATE_NON_BIB_FIELDS)
+      {
+         if (field.equals(name))
+         {
+            return true;
+         }
+      }
+
+      return isInternalField(name) || name.startsWith("bibtexentry@")
+         || name.startsWith("recordcount.")
          || name.startsWith("currcount@") || name.startsWith("prevcount@");
    }
 
@@ -5257,7 +5280,7 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.6.20200711";
+   public static final String VERSION = "2.7";
    public static final String DATE = "2020-07-11";
    public int debugLevel = 0;
    public int verboseLevel = 0;
@@ -5304,19 +5327,22 @@ public class Bib2Gls implements TeXApp
    public static final String[] DUAL_SPECIAL_FIELDS =
     new String[] {"dualprefix", "dualprefixplural", "dualprefixfirst", "dualprefixfirstplural"};
 
-   private static final String[] NON_BIB_FIELDS =
-    new String[] {"bibtexcontributor", "bibtexentry", "childcount",
-     "childlist", "siblingcount", "siblinglist",
-     "dual", "group", "indexcounter", "originalid",
-     "location", "loclist", "originalentrytype", "primarylocations",
-     "progenitor", "progeny", "recordcount", "secondarygroup",
-     "secondarysort", "currcount", "desc", "descplural", "firstpl",
-     "flag", "index", "level", "longpl", "prevcount", "prevunitmax",
-     "prevunittotal", "shortpl", "sortvalue", "unitlist", "useri",
-     "userii", "useriii", "useriv", "userv", "uservi"};
    /* Not including: 'nonumberlist', 'sort', 'type', 'bibtextype',
     * 'counter'.
     */ 
+   private static final String[] NON_BIB_FIELDS =
+    new String[] {"bibtexcontributor", "bibtexentry", "dual", "group",
+     "progenitor", "progeny", "secondarygroup",
+     "secondarysort"};
+
+   private static final String[] PRIVATE_NON_BIB_FIELDS =
+    new String[] {"childcount", "childlist", "siblingcount", "siblinglist",
+     "indexcounter", "originalid", "originalentrytype", "location", "loclist",
+     "primarylocations", "recordcount", "currcount", "desc", "descplural", "firstpl",
+     "flag", "index", "level", "longpl", "prevcount", "prevunitmax",
+     "prevunittotal", "shortpl", "sortvalue", "unitlist", "useri",
+     "userii", "useriii", "useriv", "userv", "uservi"
+    };
 
    private HashMap<String,String> glsLike;
 

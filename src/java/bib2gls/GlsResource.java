@@ -258,12 +258,25 @@ public class GlsResource
                {
                   String key = mapIt.next();
 
+                  if (bib2gls.isPrivateNonBibField(key))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.field", key, opt));
+                  }
+
                   Vector<String> values = fieldCopies.get(key);
 
                   for (String f : values)
                   {
-                     if (!(bib2gls.isKnownField(f) || bib2gls.isKnownSpecialField(f)
-                         || bib2gls.isInternalField(f) || bib2gls.isNonBibField(f)))
+                     if (bib2gls.isPrivateNonBibField(f))
+                     {
+                        throw new IllegalArgumentException(
+                          bib2gls.getMessage("error.invalid.field", f, opt));
+                     }
+                     else if (!(bib2gls.isKnownField(f)
+                                || bib2gls.isKnownSpecialField(f)
+                                || bib2gls.isNonBibField(f)
+                                ))
                      {
                         addUserField(f);
                      }
