@@ -326,6 +326,33 @@ public class GlsResource
                indexCounter = null;
             }
          }
+         else if (opt.equals("save-from-alias"))
+         {
+            saveFromAlias = getOptional(parser, "from-alias", list, opt);
+
+            if (saveFromAlias.equals("false"))
+            {
+               saveFromAlias = null;
+            }
+         }
+         else if (opt.equals("save-from-seealso"))
+         {
+            saveFromSeeAlso = getOptional(parser, "from-seealso", list, opt);
+
+            if (saveFromSeeAlso.equals("false"))
+            {
+               saveFromSeeAlso = null;
+            }
+         }
+         else if (opt.equals("save-from-see"))
+         {
+            saveFromSee = getOptional(parser, "from-see", list, opt);
+
+            if (saveFromSee.equals("false"))
+            {
+               saveFromSee = null;
+            }
+         }
          else if (opt.equals("post-description-dot"))
          {
             String val = getChoice(parser, list, opt, "none", "all", "check");
@@ -5151,7 +5178,8 @@ public class GlsResource
             if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE ||
                 selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO ||
                 selectionMode == SELECTION_RECORDED_AND_DEPS ||
-                selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED ||
+                selectionMode == SELECTION_ALL)
             {
                // does this entry have a "see" or "seealso" field?
 
@@ -5162,43 +5190,46 @@ public class GlsResource
                   dual.initCrossRefs(parser);
                }
 
-               if (seeList != null)
+               if (selectionMode != SELECTION_ALL)
                {
-                  if ((entry.hasCrossRefs() 
-                        && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
-                            || entry.getField("seealso") == null)
-                      )
-                      || entry.getField("alias") != null
-                     )
+                  if (seeList != null)
                   {
-                     seeList.add(entry);
-                  }
-
-                  if (dual != null 
-                      && 
-                      (
-                        (dual.hasCrossRefs() 
-                          && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
-                               || dual.getField("seealso") == null)
+                     if ((entry.hasCrossRefs() 
+                           && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                               || entry.getField("seealso") == null)
                          )
-                        || dual.getField("alias") != null
-                      )
-                     )
-                  {
-                     seeList.add(dual);
+                         || entry.getField("alias") != null
+                        )
+                     {
+                        seeList.add(entry);
+                     }
+
+                     if (dual != null 
+                         && 
+                         (
+                           (dual.hasCrossRefs() 
+                             && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                                  || dual.getField("seealso") == null)
+                            )
+                           || dual.getField("alias") != null
+                         )
+                        )
+                     {
+                        seeList.add(dual);
+                     }
                   }
-               }
 
-               // if entry has records, register dependencies with the
-               // cross-resource list.
+                  // if entry has records, register dependencies with the
+                  // cross-resource list.
 
-               if (hasRecords || dualHasRecords)
-               {
-                  bib2gls.registerDependencies(entry);
-
-                  if (dual != null)
+                  if (hasRecords || dualHasRecords)
                   {
-                     bib2gls.registerDependencies(dual);
+                     bib2gls.registerDependencies(entry);
+
+                     if (dual != null)
+                     {
+                        bib2gls.registerDependencies(dual);
+                     }
                   }
                }
             }
@@ -7483,6 +7514,45 @@ public class GlsResource
             }
          }
       }
+
+      if (saveFromAlias != null)
+      {
+         String alias = entry.getAlias();
+
+         if (alias != null)
+         {
+            writer.format("\\glsxtrapptocsvfield{%s}{%s}{%s}%n",
+              alias, saveFromAlias, id);
+         }
+      }
+
+      if (saveFromSeeAlso != null)
+      {
+         String[] seealso = entry.getAlsoCrossRefs();
+
+         if (seealso != null)
+         {
+            for (String xr : seealso)
+            {
+               writer.format("\\glsxtrapptocsvfield{%s}{%s}{%s}%n",
+                 xr, saveFromSeeAlso, id);
+            }
+         }
+      }
+
+      if (saveFromSee != null)
+      {
+         String[] see = entry.getCrossRefs();
+
+         if (see != null)
+         {
+            for (String xr : see)
+            {
+               writer.format("\\glsxtrapptocsvfield{%s}{%s}{%s}%n",
+                 xr, saveFromSee, id);
+            }
+         }
+      }
    }
 
    public void addUserField(String field)
@@ -8209,7 +8279,7 @@ public class GlsResource
               // or parent doesn't have records or cross-references:
             || !parentHasRecordsOrCrossRefs)
          {
-            Integer level = new Integer(child.getLevel(entries));
+            Integer level = Integer.valueOf(child.getLevel(entries));
 
             Vector<Bib2GlsEntry> list = flattenMap.get(level);
 
@@ -11902,6 +11972,10 @@ public class GlsResource
    private int saveOriginalEntryTypeAction = SAVE_ORIGINAL_ALWAYS;
 
    private String indexCounter=null;
+
+   private String saveFromAlias = null;
+   private String saveFromSeeAlso = null;
+   private String saveFromSee = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE=1;
