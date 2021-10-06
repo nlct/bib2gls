@@ -1,3 +1,9 @@
+ifeq ($(origin JAVA8BOOTCLASSLIB),undefined)
+TARGET_VERSION :=
+else
+TARGET_VERSION := -target 1.8 -source 1.8 -bootclasspath $(JAVA8BOOTCLASSLIB)/rt.jar
+endif
+
 all	: lib/bib2gls.jar lib/convertgls2bib.jar
 
 lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bib2gls/Bib2Gls.class
@@ -8,7 +14,7 @@ lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bib2gls/Bi
 classes/com/dickimawbooks/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bib2gls \
 	java/bib2gls/*.java
 	cd java/bib2gls; \
-	javac -target 1.8 -source 1.8 -d ../../classes \
+	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar *.java
 
@@ -23,7 +29,7 @@ lib/convertgls2bib.jar	: java/gls2bib/Manifest.txt classes/com/dickimawbooks/gls
 classes/com/dickimawbooks/gls2bib/Gls2Bib.class	: classes/com/dickimawbooks/gls2bib \
 	java/gls2bib/*.java 
 	cd java/gls2bib; \
-	javac -target 1.8 -source 1.8 -d ../../classes \
+	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar *.java
 
