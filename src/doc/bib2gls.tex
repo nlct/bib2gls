@@ -7292,11 +7292,19 @@ their dependencies. The dependencies include those referenced in the
 with commands like \ics{gls} in the field values that are parsed by
 \bibgls. With this setting, parents will be omitted unless they've
 been referenced in the document through commands like \ics{gls}.
+This setting won't add any \field{see} or \field{seealso} lists to
+the \idx{locationlist}. The given field will be set, so you can
+access the information, but there's no guarantee that the
+cross-referenced entry will have been selected. The \field{alias}
+cross-reference will be added to the \idx{locationlist} but you will
+need to ensure that the target is also selected (or use
+\csopt[omit]{alias} to suppress it).
 
 \item \optfmt{recorded and ancestors}: this is like the previous
 setting but parents are added even if they haven't been referenced
 in the document. The other dependent entries are omitted if they
-haven't been referenced in the document.
+haven't been referenced in the document. The above notes regarding
+the cross-reference lists also applies.
 
 \item \optfmt{deps but not recorded}: this first selects entries as
 though \optfmt{recorded and deps} had been used, but after all
@@ -9517,6 +9525,53 @@ style. For example:
 
 If set, the value of the \field{alias} field is copied to
 the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
+
+\optsection[\subsubsection]{save-from-see}
+
+This option allows you to save a comma-separated list of entry
+labels in a designated internal field of the target entry identified
+by their \field{see} field. If the \meta{value} is omitted,
+\csopt[from-see]{save-from-see} is assumed. The value may be the
+keyword \code{false}, which switches off this setting, otherwise the
+value should be the desired name of the internal field.
+The default setting is \csopt[false]{save-from-see}.
+
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{index}\marg{gourd}
+\atentry{index}{cucumber,\field{see}=\marg{gourd}}
+\atentry{index}{pumpkin,\field{see}=\marg{gourd}}
+\end{codeenv}
+then the resource option \csopt[from-see]{save-from-see} will create
+an internal field called \code{from-see} for the \code{gourd} entry
+that contains the comma-separated list \code{cucumber,pumpkin}.
+
+Note that the given internal field isn't actually assigned within \bibgls, so it
+can't be accessed via any resource options. Each item in this list is added using
+\ics{glsxtrapptocsvfield} after the source entry (that is, the entry
+containing the \field{see} field) is defined in the \ext{glstex}
+file. This means that the list will be in the same order as the
+entries. You can then pass the field value to \ics{glsseelist}.
+For example:
+\begin{codeenv}
+\cs{glsdefpostdesc}\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{from-see}\marg{\cs{glscurrententrylabel}}
+  {, related: \cs{glsseelist}\marg{\cs{glscurrentfieldvalue}}}{}%
+}
+\end{codeenv}
+
+This option has no effect with the \qt{no dependency} selection
+criteria (such as \csopt[recorded no deps]{selection}).
+
+\optsection[\subsubsection]{save-from-seealso}
+
+As \csopt{save-from-see} but for the \field{seealso} field. If the
+value is omitted, \cs[from-seealso]{save-from-seealso} is assumed.
+
+\optsection[\subsubsection]{save-from-alias}
+
+As \csopt{save-from-see} but for the \field{alias} field. If the
+value is omitted, \cs[from-alias]{save-from-alias} is assumed.
 
 \optsection[\subsubsection]{save-original-entrytype}
 
@@ -12156,7 +12211,7 @@ same as for \csopt{see} but the separator is given by
 
 \optsection{alias}
 
-This is like \csopt{alias} but governs the location of the cross-references
+This is like \csopt{see} but governs the location of the cross-references
 provided by the \field{alias} field. The separator is given by
 \gls!{bibglsaliassep}. The cross-reference is written to the
 \field{location} field using \code{\gls{bibglsusealias}\margm{label}}.
@@ -19243,7 +19298,8 @@ These files are just examples of how to use \bibgls. There are other
 ways of defining similar entries and sometimes alternatives are
 suggested. Use the code here as a starting point if you need data
 like this and adapt it to a format appropriate for your
-requirements.
+requirements. There are also some example documents in the 
+\href{https://www.dickimaw-books.com/gallery}{Dickimaw Books gallery}.
 
 \filesection{no-interpret-preamble.bib}
 

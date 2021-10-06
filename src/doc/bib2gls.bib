@@ -2646,6 +2646,27 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.save-from-alias,
+   name={\csoptfmt{save\dhyphen from\dhyphen alias}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.save-from-seealso,
+   name={\csoptfmt{save\dhyphen from\dhyphen seealso}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.save-from-see,
+   name={\csoptfmt{save\dhyphen from\dhyphen see}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.supplemental-locations,
    name={\csoptfmt{supplemental\dhyphen locations}},
    user1={\meta{basename}},
@@ -10215,10 +10236,8 @@ primary formats, if enabled.},
   name={\csfmt{gls\-see\-format}},
   user1={\margm{tag}\margm{labels}\margm{location (ignored)}},
   description={formats the entries identified in the comma separated
-   list of labels as a set of cross-references, where each
-   item in the list is encapsulated with \cs{glsseeitem} and
-   each element is separated with \cs{glsseesep} or
-   \cs{glsseelastsep}},
+   list of labels as a set of cross-references. This just does
+   the tag (emphasized) followed by \cs{glsseelist}\margm{labels}},
   topics={formattingcommands,crossrefcommands,loclistcommands},
   note={\styfmt{glossaries}},
   seealso={glsseeitem,glsseeitemformat,glsseesep,glsseelastsep},
@@ -11711,6 +11730,18 @@ field value},
    entry identified by \meta{entry label}},
   topics={assigncommands},
   note={\styfmt{glossaries-extra} v1.12+},
+  category={command}
+}
+
+@glscommand{glsxtrapptocsvfield,
+  name={\csfmt{gls\-xtr\-app\-to\-csv\-field}},
+  user1={\margm{entry label}\margm{field label}\margm{value}},
+  description={appends a comma followed by \meta{value} to the given
+  field for the given entry, it that field has already been set,
+  otherwise it sets the field to just \meta{value} (there's no check
+  for the existence of either the entry or the field)},
+  topics={assigncommands},
+  note={\styfmt{glossaries-extra} v1.47+},
   category={command}
 }
 
@@ -13691,6 +13722,21 @@ hasn't been defined},
    \field{seealso} field if not empty},
   topics={glossarystylecommands,crossrefcommands,loclistcommands,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.16+},
+  category={command}
+}
+
+@glscommand{glsseelist,
+  name={\csfmt{gls\-see\-list}},
+  user1={\margm{label list}},
+  description={iterates through the comma-separated list of entry
+   labels to produce a formatted list, where each
+   item in the list is encapsulated with \cs{glsseeitem} and
+   each element is separated with \cs{glsseesep} or
+   \cs{glsseelastsep}. This command was provided for
+   the use of \cs{glsseeformat} to format cross-reference lists 
+   but may be used for any list of entry labels},
+  topics={formattingcommands,crossrefcommands},
+  note={\styfmt{glossaries}},
   category={command}
 }
 
