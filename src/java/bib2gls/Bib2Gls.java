@@ -4407,7 +4407,7 @@ public class Bib2Gls implements TeXApp
       {
          try
          {
-            argVal[1] = new Integer((String)argVal[1]);
+            argVal[1] = Integer.valueOf((String)argVal[1]);
          }
          catch (NumberFormatException e)
          {
@@ -4434,17 +4434,17 @@ public class Bib2Gls implements TeXApp
 
       if (argVal[1] == null)
       {
-         argVal[1] = new Integer(defVal);
+         argVal[1] = Integer.valueOf(defVal);
       }
       else
       {
          try
          {
-            argVal[1] = new Integer((String)argVal[1]);
+            argVal[1] = Integer.valueOf((String)argVal[1]);
          }
          catch (NumberFormatException e)
          {
-            argVal[1] = new Integer(defVal);
+            argVal[1] = Integer.valueOf(defVal);
             return i-1;
          }
       }
@@ -5280,8 +5280,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.7";
-   public static final String DATE = "2020-07-11";
+   public static final String VERSION = "2.8.20211006";
+   public static final String DATE = "2021-10-06";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
