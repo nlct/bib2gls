@@ -1,0 +1,26 @@
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[stylemods=bookindex,style=bookindex,record]{glossaries-extra}
+
+\GlsXtrLoadResources
+[
+  category=general,
+  selection=all,
+  save-from-alias,
+  save-from-seealso,
+  save-from-see
+]
+
+\glsdefpostname{general}{%
+ \glsxtrifhasfield{from-alias}{\glscurrententrylabel}%
+   {, \textbf{\color{green}referrer alias: \glsseelist\glscurrentfieldvalue}}{}%
+ \glsxtrifhasfield{from-seealso}{\glscurrententrylabel}
+   {, \textbf{\color{blue}referrer seealso: \glsseelist\glscurrentfieldvalue}}{}%
+ \glsxtrifhasfield{from-see}{\glscurrententrylabel}
+   {, \textbf{\color{cyan}referrer see: \glsseelist\glscurrentfieldvalue}}{}%
+}
+
+\begin{document}
+\printunsrtglossary
+\end{document}

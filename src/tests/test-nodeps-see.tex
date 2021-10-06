@@ -1,0 +1,23 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources
+[
+  selection=all,
+  %selection=recorded and ancestors,
+  %selection=recorded no deps,
+  %selection=recorded and deps,
+  %selection=recorded and deps and see,
+  %selection=recorded and deps and see not also
+]
+
+\begin{document}
+\gls{sample1}
+\gls{sample2}
+\gls{sample4}
+\printunsrtglossaries
+\end{document}

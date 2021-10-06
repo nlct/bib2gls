@@ -34,8 +34,10 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
 	  test-interpret-fields.pdf test-interpret-fields2.pdf test-prefix.pdf test-dual-prefix.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
-	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf
+	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
+	  test-from-xr.pdf test-nodeps-see.pdf
 	@grep Exception *.glg || true
+	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
@@ -654,6 +656,20 @@ test-dual-custom-fallback.pdf	: test-dual-custom-fallback.glstex
 test-dual-custom-fallback.glstex	: test-dual-custom-fallback.tex test-dual-custom-fallback.bib $(DEPS)
 		lualatex test-dual-custom-fallback
 		$(BIB2GLS) test-dual-custom-fallback
+
+test-from-xr.pdf	: test-from-xr.glstex
+		pdflatex test-from-xr
+
+test-from-xr.glstex	: test-from-xr.tex test-from-xr.bib $(DEPS)
+		pdflatex test-from-xr
+		$(BIB2GLS) test-from-xr
+
+test-nodeps-see.pdf	: test-nodeps-see.glstex
+		pdflatex test-nodeps-see
+
+test-nodeps-see.glstex	: test-nodeps-see.tex test-nodeps-see.bib $(DEPS)
+		pdflatex test-nodeps-see
+		$(BIB2GLS) test-nodeps-see
 
 clean	:
 	$(RM) *.aux
