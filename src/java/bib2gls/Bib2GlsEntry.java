@@ -2472,7 +2472,14 @@ public class Bib2GlsEntry extends BibEntry
       {
          name = getFallbackValue("name");
 
+         if (name == null) name = "";
+
          writePluralIfInherited(writer, name, parentid, plural, sep);
+      }
+
+      if (description == null)
+      {
+         description = "";
       }
 
       writer.println("}%");
@@ -2651,7 +2658,6 @@ public class Bib2GlsEntry extends BibEntry
    {
       return crossRefdBy.iterator();
    }
-
 
    public boolean hasDependent(String label)
    {
