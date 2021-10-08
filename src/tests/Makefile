@@ -35,7 +35,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-interpret-fields.pdf test-interpret-fields2.pdf test-prefix.pdf test-dual-prefix.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
-	  test-from-xr.pdf test-nodeps-see.pdf
+	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -670,6 +670,13 @@ test-nodeps-see.pdf	: test-nodeps-see.glstex
 test-nodeps-see.glstex	: test-nodeps-see.tex test-nodeps-see.bib $(DEPS)
 		pdflatex test-nodeps-see
 		$(BIB2GLS) test-nodeps-see
+
+test-standalone-range.pdf	: test-standalone-range.glstex
+		pdflatex test-standalone-range
+
+test-standalone-range.glstex	: test-standalone-range.tex $(DEPS)
+		pdflatex test-standalone-range
+		$(BIB2GLS) test-standalone-range
 
 clean	:
 	$(RM) *.aux

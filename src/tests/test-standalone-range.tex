@@ -1,0 +1,26 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[record,stylemods=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources
+[
+  src={example-glossaries-multipar}
+]
+
+\newcommand{\describeterm}[1]{%
+ \section{\glsxtrglossentry{#1}}%
+ \glsadd[format=(]{#1}%
+ \glsentrydesc{#1}%
+ \glsadd[format=)]{#1}%
+}
+
+\begin{document}
+\describeterm{loremi-ii}
+
+\describeterm{loremiii-iv}
+
+\printunsrtglossary[style=bookindex]
+\end{document}
