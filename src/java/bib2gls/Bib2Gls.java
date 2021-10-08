@@ -1847,10 +1847,15 @@ public class Bib2Gls implements TeXApp
                   }
                   else if (existingPrefix.equals("(") && newPrefix.equals(")"))
                   {// Start and end of the range occur at the same location.
-                   // A bit weird, but allow it if the format is the
-                   // same.
 
-                     if (existingFmt.equals(newFmt))
+                     if (collapseSamePageRange)
+                     {
+                        // Remove end record and convert start
+                        // record into an ordinary record.
+
+                        existingRecord.setFormat(existingFmt);
+                     }
+                     else if (existingFmt.equals(newFmt))
                      {
                         records.add(newRecord);
                      }
@@ -4796,6 +4801,14 @@ public class Bib2Gls implements TeXApp
          {
             supportUnicodeSubSuperScripts = false;
          }
+         else if (args[i].equals("--collapse-same-location-range"))
+         {
+            collapseSamePageRange = true;
+         }
+         else if (args[i].equals("--no-collapse-same-location-range"))
+         {
+            collapseSamePageRange = false;
+         }
          else if (args[i].equals("--no-mfirstuc-protection"))
          {
             mfirstucProtect = false;
@@ -5280,8 +5293,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.8.20211006";
-   public static final String DATE = "2021-10-06";
+   public static final String VERSION = "2.8.20211008";
+   public static final String DATE = "2021-10-08";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5422,6 +5435,8 @@ public class Bib2Gls implements TeXApp
    private boolean supportUnicodeSubSuperScripts=true;
 
    private boolean multiSuppSupported=false;
+
+   private boolean collapseSamePageRange = true;
 
    private String glossariesExtraVersion="????/??/??";
 

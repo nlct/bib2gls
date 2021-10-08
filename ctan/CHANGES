@@ -13,6 +13,15 @@ v2.8 (pending):
     - save-from-see
     - save-from-seealso
 
+  * issue #10: explicit ranges with identical start and end should
+    collapse to a normal location
+    https://github.com/nlct/bib2gls/issues/10
+
+    This has led to new switches:
+
+      --collapse-same-location-range (default)
+      --no-collapse-same-location-range
+
 v2.7 (2020-07-11):
 
   * save-original-entrytype option now allows the name of a field

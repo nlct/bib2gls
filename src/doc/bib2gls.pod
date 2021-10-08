@@ -119,6 +119,16 @@ Merge an entry's B<wrglossary> records for the same page locations.
 
 Don't merge an entry's B<wrglossary> records.
 
+=item B<--collapse-same-location-range>
+
+Collapse an explicit range that has a duplicate start and end
+location into a normal record (default).
+
+=item B<--no-collapse-same-location-range>
+
+Don't collapse an explicit range that has a duplicate start and end
+location into a normal record.
+
 =item B<--merge-nameref-on> I<rule>
 
 Rule for merging locations created with the B<record=nameref> package option

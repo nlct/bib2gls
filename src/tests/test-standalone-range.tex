@@ -3,7 +3,11 @@
 % arara: pdflatex
 \documentclass[12pt,a4paper]{article}
 
-\usepackage[record,stylemods=bookindex]{glossaries-extra}
+\usepackage{hyperref}
+\usepackage[
+ %record=only,
+ record=nameref,
+ stylemods=bookindex]{glossaries-extra}
 
 \GlsXtrLoadResources
 [
@@ -13,6 +17,9 @@
 \newcommand{\describeterm}[1]{%
  \section{\glsxtrglossentry{#1}}%
  \glsadd[format=(]{#1}%
+ \begin{enumerate}
+ \item Something that adds a new hypertarget.
+ \end{enumerate}
  \glsentrydesc{#1}%
  \glsadd[format=)]{#1}%
 }
@@ -22,5 +29,5 @@
 
 \describeterm{loremiii-iv}
 
-\printunsrtglossary[style=bookindex]
+\printunsrtglossary[style=bookindex,target=false,title=Index]
 \end{document}
