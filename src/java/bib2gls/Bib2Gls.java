@@ -2882,6 +2882,15 @@ public class Bib2Gls implements TeXApp
          }
       }
 
+      if (glossariesExtraVersion.compareTo("2021/09/20") <= 0)
+      {
+         writer.println("\\providecommand*{\\glsxtrapptocsvfield}[3]{%");
+         writer.println(" \\ifcsdef{glo@\\glsdetoklabel{#1}@#2}%");
+         writer.println(" {\\csappto{glo@\\glsdetoklabel{#1}@#2}{,#3}}%");
+         writer.println(" {\\csdef{glo@\\glsdetoklabel{#1}@#2}{#3}}%");
+         writer.println("}");
+      }
+
       commonCommandsDone = true;
    }
 
