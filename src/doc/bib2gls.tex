@@ -4,7 +4,7 @@
 % arara: lualatex if changed("glstex") || missing("toc")
 % arara: bib2gls: {group: on, packages: [mfirstuc-english]}
 % arara: lualatex
-% arara: lualatex if found ("log", "Rerun")
+% arara: lualatex
 \documentclass[titlepage=false,index=totoc,bibliography=totoc,
  fontsize=12pt,captions=tableheading]{scrreprt}
 
@@ -9576,12 +9576,12 @@ criteria (such as \csopt[recorded no deps]{selection}).
 \optsection[\subsubsection]{save-from-seealso}
 
 As \csopt{save-from-see} but for the \field{seealso} field. If the
-value is omitted, \cs[from-seealso]{save-from-seealso} is assumed.
+value is omitted, \csopt[from-seealso]{save-from-seealso} is assumed.
 
 \optsection[\subsubsection]{save-from-alias}
 
 As \csopt{save-from-see} but for the \field{alias} field. If the
-value is omitted, \cs[from-alias]{save-from-alias} is assumed.
+value is omitted, \csopt[from-alias]{save-from-alias} is assumed.
 
 \optsection[\subsubsection]{save-original-entrytype}
 
@@ -15733,6 +15733,32 @@ For example, if the entries are stored in \filefmt{entries.bib}:
   \csopt[byid.]{label-prefix}
 }
 \end{codeenv}
+
+\optsection{secondary-match}
+
+Similar to \csopt{match} but determines whether or not to include 
+a primary entry in the secondary list. The syntax is the same but
+this option is governed by \csopt{secondary-match-op} and
+\csopt{secondary-match-action}. Note that if an entry hasn't been
+selected for the primary list then it won't be added to the
+secondary list, regardless of this setting.
+
+\optsection{secondary-not-match}
+
+Similar to \csopt{not-match} but determines whether or not to include 
+a primary entry in the secondary list. The syntax is the same but
+this option is governed by \csopt{secondary-match-op} and
+\csopt{secondary-match-action}. Note that if an entry hasn't been
+selected for the primary list then it won't be added to the
+secondary list, regardless of this setting.
+
+\optsection{secondary-match-op}
+
+As \csopt{match-op} but for the secondary list selection.
+
+\optsection{secondary-match-action}
+
+As \csopt{match-action} but for the secondary list selection.
 
 \optsection{secondary-missing-sort-fallback}
 

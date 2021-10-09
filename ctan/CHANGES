@@ -12,6 +12,10 @@ v2.8 (pending):
     - save-from-alias
     - save-from-see
     - save-from-seealso
+    - secondary-match-action
+    - secondary-match-op
+    - secondary-match
+    - secondary-not-match
 
   * issue #10: explicit ranges with identical start and end should
     collapse to a normal location

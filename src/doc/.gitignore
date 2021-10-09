@@ -15,4 +15,5 @@
 *.bbl
 *.blg
 arara.xml
+arara.yaml
 bib2gls*.pdf

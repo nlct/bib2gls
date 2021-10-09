@@ -847,58 +847,7 @@ public class GlsResource
             else
             {
                fieldPatterns = new HashMap<String,Pattern>();
-
-               for (int i = 0; i < array.length; i++)
-               {
-                  if (!(array[i] instanceof TeXObjectList))
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.value", 
-                        opt, list.get(opt).toString(parser)));
-                  }
-
-                  Vector<TeXObject> split = splitList(parser, '=', 
-                     (TeXObjectList)array[i]);
-
-                  if (split == null || split.size() == 0) continue;
-
-                  String field = split.get(0).toString(parser);
-
-                  if (split.size() > 2)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
-                        field, array[i].toString(parser), opt));
-                  }
-
-                  String val = split.size() == 1 ? "" 
-                               : split.get(1).toString(parser);
-
-                  // Has this field already been added?
-
-                  Pattern p = fieldPatterns.get(field);
-
-                  if (p == null)
-                  {
-                     p = Pattern.compile(val);
-                  }
-                  else
-                  {
-                     p = Pattern.compile(String.format(
-                            "(?:%s)|(?:%s)", p.pattern(), val));
-                  }
-
-                  try
-                  {
-                     fieldPatterns.put(field, p);
-                  }
-                  catch (PatternSyntaxException e)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.keylist.pattern", 
-                        field, val, opt), e);
-                  }
-               }
+               setFieldMatchPatterns(fieldPatterns, array, opt, list, parser);
             }
          }
          else if (opt.equals("not-match"))
@@ -913,58 +862,56 @@ public class GlsResource
             else
             {
                fieldPatterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(fieldPatterns, array, opt, list, parser);
+            }
+         }
+         else if (opt.equals("secondary-match-action"))
+         {
+            String val = getChoice(parser, list, opt, "filter", "add");
 
-               for (int i = 0; i < array.length; i++)
-               {
-                  if (!(array[i] instanceof TeXObjectList))
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.value", 
-                        opt, list.get(opt).toString(parser)));
-                  }
+            if (val.equals("filter"))
+            {
+               secondaryMatchAction = MATCH_ACTION_FILTER;
+            }
+            else
+            {
+               secondaryMatchAction = MATCH_ACTION_ADD;
+            }
+         }
+         else if (opt.equals("secondary-match-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
 
-                  Vector<TeXObject> split = splitList(parser, '=', 
-                     (TeXObjectList)array[i]);
+            secondaryFieldPatternsAnd = val.equals("and");
+         }
+         else if (opt.equals("secondary-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            secondaryNotMatch = false;
 
-                  if (split == null || split.size() == 0) continue;
+            if (array == null)
+            {
+               secondaryFieldPatterns = null;
+            }
+            else
+            {
+               secondaryFieldPatterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(secondaryFieldPatterns, array, opt, list, parser);
+            }
+         }
+         else if (opt.equals("secondary-not-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            secondaryNotMatch = true;
 
-                  String field = split.get(0).toString(parser);
-
-                  if (split.size() > 2)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
-                        field, array[i].toString(parser), opt));
-                  }
-
-                  String val = split.size() == 1 ? "" 
-                               : split.get(1).toString(parser);
-
-                  // Has this field already been added?
-
-                  Pattern p = fieldPatterns.get(field);
-
-                  if (p == null)
-                  {
-                     p = Pattern.compile(val);
-                  }
-                  else
-                  {
-                     p = Pattern.compile(String.format(
-                            "(?:%s)|(?:%s)", p.pattern(), val));
-                  }
-
-                  try
-                  {
-                     fieldPatterns.put(field, p);
-                  }
-                  catch (PatternSyntaxException e)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.keylist.pattern", 
-                        field, val, opt), e);
-                  }
-               }
+            if (array == null)
+            {
+               secondaryFieldPatterns = null;
+            }
+            else
+            {
+               secondaryFieldPatterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(secondaryFieldPatterns, array, opt, list, parser);
             }
          }
          else if (opt.equals("limit"))
@@ -3729,6 +3676,63 @@ public class GlsResource
       }
    }
 
+   private void setFieldMatchPatterns(HashMap<String,Pattern> patterns,
+     TeXObject[] array, String opt, KeyValList list, TeXParser parser)
+   throws IllegalArgumentException,IOException
+   {
+      for (int i = 0; i < array.length; i++)
+      {
+         if (!(array[i] instanceof TeXObjectList))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.value", 
+               opt, list.get(opt).toString(parser)));
+         }
+
+         Vector<TeXObject> split = splitList(parser, '=', 
+            (TeXObjectList)array[i]);
+
+         if (split == null || split.size() == 0) continue;
+
+         String field = split.get(0).toString(parser);
+
+         if (split.size() > 2)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.keylist.value", 
+               field, array[i].toString(parser), opt));
+         }
+
+         String val = split.size() == 1 ? "" 
+                      : split.get(1).toString(parser);
+
+         // Has this field already been added?
+
+         Pattern p = patterns.get(field);
+
+         if (p == null)
+         {
+            p = Pattern.compile(val);
+         }
+         else
+         {
+            p = Pattern.compile(String.format(
+                   "(?:%s)|(?:%s)", p.pattern(), val));
+         }
+
+         try
+         {
+            patterns.put(field, p);
+         }
+         catch (PatternSyntaxException e)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.keylist.pattern", 
+               field, val, opt), e);
+         }
+      }
+   }
+
    private void checkAllowedSortFallbackConcatenation(String fields, String opt)
     throws IllegalArgumentException
    {
@@ -4841,11 +4845,18 @@ public class GlsResource
 
    private void stripUnknownFieldPatterns()
    {
-      if (fieldPatterns == null) return;
+      fieldPatterns = stripUnknownFieldPatterns(fieldPatterns);
+      secondaryFieldPatterns = stripUnknownFieldPatterns(secondaryFieldPatterns);
+   }
+
+   private HashMap<String,Pattern> stripUnknownFieldPatterns(
+      HashMap<String,Pattern> patterns)
+   {
+      if (patterns == null) return null;
 
       Vector<String> fields = new Vector<String>();
 
-      for (Iterator<String> it = fieldPatterns.keySet().iterator();
+      for (Iterator<String> it = patterns.keySet().iterator();
            it.hasNext(); )
       {
          String field = it.next();
@@ -4866,13 +4877,15 @@ public class GlsResource
 
       for (String field : fields)
       {
-         fieldPatterns.remove(field);
+         patterns.remove(field);
       }
 
-      if (fieldPatterns.size() == 0)
+      if (patterns.size() == 0)
       {
-         fieldPatterns = null;
+         patterns = null;
       }
+
+      return patterns;
    }
 
    public void parseBibFiles(TeXParser parser)
@@ -7051,7 +7064,7 @@ public class GlsResource
 
             if (secondaryList != null)
             {
-               secondaryList.add(entry);
+               addToSecondaryList(entry, secondaryList);
             }
          }
 
@@ -7113,7 +7126,7 @@ public class GlsResource
 
                if (secondaryList != null)
                {
-                  secondaryList.add(entry);
+                  addToSecondaryList(entry, secondaryList);
                }
             }
          }
@@ -7297,6 +7310,45 @@ public class GlsResource
       }
 
       return entryCount;
+   }
+
+   private void addToSecondaryList(Bib2GlsEntry entry, 
+      Vector<Bib2GlsEntry> secondaryList)
+   {
+      String id = entry.getId();
+
+      if (secondaryFieldPatterns == null)
+      {
+         bib2gls.verboseMessage("message.add.secondary.entry.no_filter", id);
+         secondaryList.add(entry);
+      }
+      else
+      {
+         boolean matches = !secondaryNotMatch(entry);
+
+         if (secondaryMatchAction == MATCH_ACTION_ADD)
+         {
+            bib2gls.debugMessage("message.secondary.filter", id, 
+              "add", matches);
+
+            if (matches)
+            {
+               bib2gls.verboseMessage("message.add.secondary.entry", id);
+               secondaryList.add(entry);
+            }
+         }
+         else
+         {
+            bib2gls.debugMessage("message.secondary.filter", id, 
+              "filter", matches);
+
+            if (!matches)
+            {
+               bib2gls.verboseMessage("message.add.secondary.entry", id);
+               secondaryList.add(entry);
+            }
+         }
+      }
    }
 
    public void writeBibGlsContributorDef(PrintWriter writer)
@@ -8741,9 +8793,20 @@ public class GlsResource
 
    private boolean notMatch(Bib2GlsEntry entry)
    {
-      boolean matches = fieldPatternsAnd;
+      return notMatch(entry, fieldPatternsAnd, fieldPatterns);
+   }
 
-      for (Iterator<String> it = fieldPatterns.keySet().iterator();
+   private boolean secondaryNotMatch(Bib2GlsEntry entry)
+   {
+      return notMatch(entry, secondaryFieldPatternsAnd, secondaryFieldPatterns);
+   }
+
+   private boolean notMatch(Bib2GlsEntry entry, boolean and, 
+       HashMap<String,Pattern> patterns)
+   {
+      boolean matches = and;
+
+      for (Iterator<String> it = patterns.keySet().iterator();
            it.hasNext(); )
       {
          String field = it.next();
@@ -8772,7 +8835,7 @@ public class GlsResource
             value = "";
          }
 
-         Pattern p = fieldPatterns.get(field);
+         Pattern p = patterns.get(field);
 
          Matcher m = p.matcher(value);
 
@@ -8780,7 +8843,7 @@ public class GlsResource
 
          bib2gls.debugMessage("message.pattern.info", p.pattern(), field, value, result);
 
-         if (fieldPatternsAnd)
+         if (and)
          {
             if (!result)
             {
@@ -11786,15 +11849,19 @@ public class GlsResource
    private boolean savePreamble = true;
 
    private HashMap<String,Pattern> fieldPatterns = null;
+   private HashMap<String,Pattern> secondaryFieldPatterns = null;
 
    private boolean notMatch=false;
+   private boolean secondaryNotMatch=false;
 
    private boolean fieldPatternsAnd=true;
+   private boolean secondaryFieldPatternsAnd=true;
 
    private final byte MATCH_ACTION_FILTER = 0; 
    private final byte MATCH_ACTION_ADD = 1; 
 
    private byte matchAction = MATCH_ACTION_FILTER;
+   private byte secondaryMatchAction = MATCH_ACTION_FILTER;
 
    private final byte WRITE_ACTION_DEFINE=0;
    private final byte WRITE_ACTION_COPY=1;
