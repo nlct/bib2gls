@@ -7,6 +7,9 @@ v2.8 (pending):
   * bug fix: selection=all doesn't show see and seealso lists in
     locations https://github.com/nlct/bib2gls/issues/9
 
+  * bug fix: integer sort method should cast to int
+    https://github.com/nlct/bib2gls/issues/11
+
   * new resource options:
 
     - save-from-alias

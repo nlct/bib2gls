@@ -1,0 +1,12 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[sort=integer,selection=all]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

@@ -111,7 +111,18 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
          }
          else if (sort.equals("integer"))
          {
-            number = Integer.valueOf(value);
+            int idx = value.indexOf(".");
+
+            if (idx == -1)
+            {
+               number = Integer.valueOf(value);
+            }
+            else
+            {
+               float dec = Float.parseFloat(value);
+               number = Integer.valueOf((int)dec);
+               value = ""+number;
+            }
          }
          else if (sort.equals("float"))
          {
