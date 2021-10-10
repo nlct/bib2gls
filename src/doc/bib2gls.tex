@@ -3511,6 +3511,11 @@ switch with a comma-separated list of formats that should be
 retained. Note that exact duplicates will still be merged.
 This switch has a cumulative effect.
 
+Take care if you use this switch and you have an explicit range with
+coincident start and end locations. If the primary record is between
+the start and end format markers then the range can't collapse
+to an ordinary record.
+
 \argsection{no-retain-formats}
 
 Normal location merging rules apply (default).

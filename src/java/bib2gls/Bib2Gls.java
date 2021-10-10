@@ -1786,8 +1786,16 @@ public class Bib2Gls implements TeXApp
 
             boolean found = false;
 
-            for (GlsRecord existingRecord : records)
+            // Go backwards through record list.
+            // Any duplicates are likely to be near the end of the
+            // list. If there are no duplicates the entire list will
+            // be traversed. If there is a duplicate the loop can be
+            // terminated more quickly this way.
+
+            for (int i = records.size()-1; i >= 0; i--)
             {
+               GlsRecord existingRecord = records.get(i);
+
                if (existingRecord.equals(newRecord))
                {// exact match, skip
                   found = true;
