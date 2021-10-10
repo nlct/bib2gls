@@ -42,6 +42,10 @@ See the manual for further details.</entry>
 			(default).</entry>
 <entry key="syntax.cite.as.record">{0}	Treat \citation as an ignored record.</entry>
 <entry key="syntax.no.cite.as.record">{0}	Don''t treat \citation as an ignored record (default).</entry>
+<entry key="syntax.collapse.same.location.range">{0}	Collapse explicit location ranges with coincident end-points (default).</entry>
+<entry key="syntax.no.collapse.same.location.range">{0}	Don''t collapse explicit location ranges with coincident end-points.</entry>
+<entry key="syntax.retain.formats">{0}	Retain non-identical locations with the given formats even if a partial match exists.</entry>
+<entry key="syntax.no.retain.formats">{0}	Don''t override normal location merging rules (default).</entry>
 <entry key="syntax.merge.wrglossary.records">{0}
 			Merge wrglossary counter records (default).</entry>
 <entry key="syntax.no.merge.wrglossary.records">{0}

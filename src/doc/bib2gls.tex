@@ -3501,6 +3501,20 @@ reason for more than two or three different location formats within
 the same list. (For example, \encap{glsnumberformat} as the default
 and \encap{hyperbf} or \encap{hyperit} for a primary reference.)
 
+\argsection{retain-formats}
+
+It's possible that you may not want to lose certain location
+formats, even if it means having duplicate locations. For example,
+if you want to move a primary location using
+\csopt[remove]{save-primary-locations}. In which case, use this
+switch with a comma-separated list of formats that should be
+retained. Note that exact duplicates will still be merged.
+This switch has a cumulative effect.
+
+\argsection{no-retain-formats}
+
+Normal location merging rules apply (default).
+
 \argsection{group}
 
 The \styfmt{glossaries-extra} \styopt{record} package option
@@ -11633,7 +11647,10 @@ converted to the default \encap{glsnumberformat} \idx{encap} (the records in the
 usual \idx{locationlist};
 \item \optfmt{remove}: save primary locations in the
 \field{primarylocations} field and remove from the usual
-\idx{locationlist}.
+\idx{locationlist}. You may want to consider using the
+\longswitch{retain-formats} switch with this setting if you don't
+want to lose a partial location match (for example, if the primary
+location coincides with the start of an explicit range).
 \end{itemize}
 
 The primary locations are copied to the \field{primarylocations}

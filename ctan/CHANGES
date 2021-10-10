@@ -29,6 +29,14 @@ v2.8 (pending):
       --collapse-same-location-range (default)
       --no-collapse-same-location-range
 
+  * issue #12 Primary locations need to be retained not merged (save-primary-locations=remove)
+    https://github.com/nlct/bib2gls/issues/12
+
+    This has led to new switches:
+
+      --retain-formats
+      --no-retain-formats
+
 v2.7 (2020-07-11):
 
   * save-original-entrytype option now allows the name of a field

@@ -1873,6 +1873,14 @@ public class Bib2Gls implements TeXApp
                         records.add(newRecord);
                      }
                   }
+                  else if (isRetainFormat(existingFmt) || isRetainFormat(newFmt))
+                  {
+                     // Format has been identified as one that
+                     // should always be kept, even if it results in
+                     // a duplicate location.
+
+                     records.add(newRecord);
+                  }
                   else if (newPrefix.isEmpty() && !existingPrefix.isEmpty())
                   {// discard new record
                    // (keep the record with the range formation)
@@ -2284,6 +2292,13 @@ public class Bib2Gls implements TeXApp
 
          message(getMessage("message.log.file", logFile));
       }
+   }
+
+   public boolean isRetainFormat(String fmt)
+   {
+      if (retainFormatList == null) return false;
+
+      return retainFormatList.contains(fmt);
    }
 
    public void registerDependencies(Bib2GlsEntry entry)
@@ -3996,6 +4011,22 @@ public class Bib2Gls implements TeXApp
         "--no-cite-as-record"));
 
       System.out.println();
+      System.out.println(getMessage("syntax.collapse.same.location.range",
+         "--collapse-same-location-range"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.collapse.same.location.range",
+         "--no-collapse-same-location-range"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.retain.formats",
+         "--retain-formats"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.no.retain.formats",
+         "--no-retain-formats"));
+
+      System.out.println();
       System.out.println(getMessage("syntax.warn.non.bib.fields", 
          "--warn-non-bib-fields"));
       System.out.println(getMessage("syntax.no.warn.non.bib.fields", 
@@ -4944,6 +4975,32 @@ public class Bib2Gls implements TeXApp
                formatMap.put(values[0], values[1]);
             }
          }
+         else if (isArg(args[i], "retain-formats"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            String[] fieldList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+
+            if (retainFormatList == null)
+            {
+               retainFormatList = new Vector<String>();
+            }
+
+            for (String field : fieldList)
+            {
+               retainFormatList.add(field);
+            }
+         }
+         else if (args[i].equals("--no-retain-formats"))
+         {
+            retainFormatList = null;
+         }
          else if (args[i].equals("--group") || args[i].equals("-g"))
          {
             addGroupField = true;
@@ -5411,6 +5468,8 @@ public class Bib2Gls implements TeXApp
    private boolean trimFields = false;
 
    private Vector<String> trimOnlyFields = null, trimExceptFields = null;
+
+   private Vector<String> retainFormatList = null;
 
    private boolean expandFields = false;
 

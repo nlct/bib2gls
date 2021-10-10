@@ -1,5 +1,5 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: { options: [--retain-formats, primary] }
 % arara: pdflatex
 \documentclass[12pt,a4paper]{article}
 
@@ -9,16 +9,23 @@
  record=nameref,
  stylemods=bookindex]{glossaries-extra}
 
+\newcommand*{\primary}[1]{\glsnumberformat{#1}}
+
 \GlsXtrLoadResources
 [
-  src={example-glossaries-multipar}
+  src={example-glossaries-multipar},
+  primary-location-formats=primary,
+  save-primary-locations=remove
 ]
 
 \newcommand{\describeterm}[1]{%
  \section{\glsxtrglossentry{#1}}%
+ \glsadd[format=primary]{#1}%
  \glsadd[format=(]{#1}%
  \begin{enumerate}
  \item Something that adds a new hypertarget.
+ \item \glsxtrifhasfield{primarylocations}{#1}%
+    {Primary location: \glscurrentfieldvalue}{No primary location}.
  \end{enumerate}
  \glsentrydesc{#1}%
  \glsadd[format=)]{#1}%
