@@ -10312,6 +10312,17 @@ primary formats, if enabled.},
   category={command}
 }
 
+@glscommand{glsseefirstitem,
+  name={\csfmt{gls\-see\-first\-item}},
+  user1={\margm{label}},
+  description={as \cs{glsseeitem} but is used for the first label in 
+  the list. This just does \cs{glsseeitem} by default},
+  topics={formattingcommands,crossrefcommands,loclistcommands,linkcommands},
+  note={\styfmt{glossaries-extra} v1.47+},
+  seealso={glsseeformat,glsseeitemformat},
+  category={command}
+}
+
 @glscommand{glsseeitemformat,
   name={\csfmt{gls\-see\-item\-format}},
   user1={\margm{label}},
@@ -10343,6 +10354,16 @@ primary formats, if enabled.},
    ultimate entries of a cross-reference list},
   topics={separatorcommands,crossrefcommands,loclistcommands},
   note={\styfmt{glossaries}},
+  seealso={glsseeformat,glsseesep},
+  category={command}
+}
+
+@glscommand{glsseelastoxfordsep,
+  name={\csfmt{gls\-see\-last\-oxford\-sep}},
+  description={used instead of \cs{glsseelastsep} if the list
+   contains three or more labels. This defaults to \cs{glsseelastsep}},
+  topics={separatorcommands,crossrefcommands,loclistcommands},
+  note={\styfmt{glossaries-extra} v1.47+},
   seealso={glsseeformat,glsseesep},
   category={command}
 }
@@ -13789,7 +13810,9 @@ hasn't been defined},
    each element is separated with \cs{glsseesep} or
    \cs{glsseelastsep}. This command was provided for
    the use of \cs{glsseeformat} to format cross-reference lists 
-   but may be used for any list of entry labels},
+   but may be used for any list of entry labels. This command is
+   redefined by \styfmt{glossaries-extra} (v1.47+) to additionally
+   use \cs{glsseefirstitem} and \cs{glsseelastoxfordsep}},
   topics={formattingcommands,crossrefcommands},
   note={\styfmt{glossaries}},
   category={command}
