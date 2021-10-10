@@ -205,6 +205,7 @@ See the manual for further details.</entry>
 <entry key="message.selecting.entry.dualrecords">Selecting entry {0} (dual {1} has one or more records).</entry>
 <entry key="message.selecting.entry.dep">Selecting entry {0} (is dependency).</entry>
 <entry key="message.selecting.entry">Selecting entry {0}.</entry>
+<entry key="message.selecting.entry.before">Selecting entry {0} (selected before).</entry>
 <entry key="message.datetime.field.check">Checking entry {0} field {1} for date/time data (date:{2}, time:{3}).</entry>
 <entry key="message.field.notset">Field {0} not set for entry {1}</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
@@ -514,6 +515,7 @@ Use {1} {0} instead.</entry>
 {2}</entry>
 <entry key="error.option.requires.interpreter">Interpreter needed for setting {0}</entry>
 <entry key="error.sort.requires.switch">Sort method ''{0}'' requires {1} switch.</entry>
+<entry key="error.selected_before.none_selected">Selection setting ''{0}'' requires previous selections from other resource sets.</entry>
 
 <!--
     The following messages are used by convertgls2bib

@@ -7128,7 +7128,10 @@ another method is to use \csopt[copy]{action} which simply writes
 instead of using one of the commands listed in
 \sectionref{sec:newentrydefs}. This copies the entries rather than
 defining them, which means the entries must already have been
-defined. The \meta{type} is determined as follows:
+defined. You can select entries that were selected in earlier
+\idxpl{resourceset} with \csopt[selected before]{selection}.
+
+The \meta{type} is determined as follows:
 \begin{itemize}
 \item if the entry has the \field{type} field set, that's used;
 \item if the entry is a tertiary and \csopt{tertiary-type} is set, that's
@@ -7349,6 +7352,15 @@ have records. This means that you end up with only the unrecorded
 ancestors. (Recorded entries will need to be selected
 in a different resource set.) See the \exfile{sample-nested.tex}
 example document.
+
+\item \optfmt{selected before}: select any entries that have been
+selected in a previous \idx{resourceset}. This is intended
+for use with \csopt[copy]{action} to copy entries to another
+glossary as an alternative to (or in addition to) the
+\csopt{secondary} option. Note that if you make any modifications to
+the fields (such as case-changing) the modification won't be saved
+to the \ext{glstex} file. This option can't be used in the first
+\idx{resourceset}.
 
 \item \optfmt{all}: add all entries found in the \ext{bib} files
 supplied in the \csopt{src} option.

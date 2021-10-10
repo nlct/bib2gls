@@ -2530,6 +2530,13 @@ public class GlsResource
                   break;
                }
             }
+
+            if (selectionMode == SELECTION_SELECTED_BEFORE 
+                 && bib2gls.anyEntriesSelected())
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.selected_before.none_selected", val));
+            }
          }
          else if (opt.equals("break-at"))
          {
@@ -2901,10 +2908,13 @@ public class GlsResource
          }
       }
 
-      if (selectionMode == SELECTION_ALL && sortSettings.isOrderOfRecords())
+      if ((selectionMode == SELECTION_ALL 
+             || selectionMode == SELECTION_SELECTED_BEFORE)
+           && sortSettings.isOrderOfRecords())
       {
          bib2gls.warning(
-            bib2gls.getMessage("warning.option.clash", "selection=all",
+            bib2gls.getMessage("warning.option.clash",
+            "selection="+SELECTION_OPTIONS[selectionMode],
             "sort="+sortSettings.getMethod()));
 
          sortSettings.setMethod(null);
@@ -5953,7 +5963,8 @@ public class GlsResource
          }
       }
       else if (entrySort == null || entrySort.equals("none")
-         || matchAction == MATCH_ACTION_ADD)
+         || matchAction == MATCH_ACTION_ADD
+         || selectionMode == SELECTION_SELECTED_BEFORE)
       {
          // add all entries that have been recorded in the order of
          // definition
@@ -5966,8 +5977,11 @@ public class GlsResource
               && dualPrimaryDependency);
             boolean recordedOrDependent = hasRecords
               || bib2gls.isDependent(entry.getId());
+            boolean selectedBefore = 
+              (selectionMode == SELECTION_SELECTED_BEFORE 
+                 && bib2gls.isEntrySelected(entry.getId()));
 
-            if (recordedOrDependent ||
+            if (recordedOrDependent || selectedBefore ||
                 (matchAction == MATCH_ACTION_ADD && fieldPatterns != null
                  && !notMatch(entry))
                || (dual != null && 
@@ -5977,7 +5991,12 @@ public class GlsResource
             {
                if (bib2gls.getDebugLevel() > 0)
                {
-                  if (hasRecords)
+                  if (selectedBefore)
+                  {
+                     bib2gls.debugMessage("message.selecting.entry.before",
+                      entry);
+                  }
+                  else if (hasRecords)
                   {
                      bib2gls.debugMessage("message.selecting.entry.records",
                       entry);
@@ -12052,6 +12071,7 @@ public class GlsResource
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO=5;
    public static final int SELECTION_DEPS_BUT_NOT_RECORDED=6;
    public static final int SELECTION_PARENTS_BUT_NOT_RECORDED=7;
+   public static final int SELECTION_SELECTED_BEFORE=8;
 
    private int selectionMode = SELECTION_RECORDED_AND_DEPS;
 
@@ -12059,7 +12079,8 @@ public class GlsResource
     {"recorded and deps", "recorded and deps and see",
      "recorded no deps", "recorded and ancestors", "all",
      "recorded and deps and see not also",
-     "deps but not recorded", "ancestors but not recorded"};
+     "deps but not recorded", "ancestors but not recorded",
+     "selected before"};
 
    public static final byte CONTRIBUTOR_ORDER_SURNAME=0;
    public static final byte CONTRIBUTOR_ORDER_VON=1;

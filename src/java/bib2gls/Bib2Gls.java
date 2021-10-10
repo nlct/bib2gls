@@ -2610,6 +2610,11 @@ public class Bib2Gls implements TeXApp
       return selectedEntries.contains(label);
    }
 
+   public boolean anyEntriesSelected()
+   {
+      return !selectedEntries.isEmpty();
+   }
+
    public GlsSeeRecord getSeeRecord(String label)
    {
       for (GlsSeeRecord record : seeRecords)
