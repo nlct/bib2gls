@@ -2659,6 +2659,147 @@ public class Bib2GlsEntry extends BibEntry
       return crossRefdBy.iterator();
    }
 
+   public String getCrossRefTail()
+   {
+      if (crossRefTail != null)
+      {// already obtained tail
+
+         if (crossRefTail.isEmpty())
+         {
+            return null;
+         }
+         else
+         {
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.logAndPrintMessage(
+                 bib2gls.getMessage("message.crossref.tail", getId(), crossRefTail));
+
+               bib2gls.logAndPrintMessage("[ " + getId()+" > "+crossRefTail+" ]");
+            }
+
+            return crossRefTail;
+         }
+      }
+
+      Vector<String> tailList = new Vector<String>();
+
+      String tail = getCrossRefTail(tailList);
+
+      if (tail != null && bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           bib2gls.getMessage("message.crossref.tail", getId(), tail));
+
+         bib2gls.logAndPrintMessageNoLn("[");
+
+         String sep = " ";
+
+         for (String id : tailList)
+         {
+            bib2gls.logAndPrintMessageNoLn(sep+id);
+            sep = ", ";
+         }
+
+         bib2gls.logAndPrintMessage(" ]");
+
+      }
+
+      return tail;
+   }
+
+   private String getCrossRefTail(Vector<String> tailList)
+   {
+      if (crossRefTail != null)
+      {// already obtained tail
+
+         if (crossRefTail.isEmpty())
+         {
+            return null;
+         }
+         else
+         {
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               tailList.add(getId());
+            }
+
+            return crossRefTail;
+         }
+      }
+
+      String tail = getFieldValue("alias");
+
+      if (tail == null)
+      {
+         if (crossRefs != null && crossRefs.length == 1)
+         {
+            tail = crossRefs[0];
+         }
+      }
+      else if (crossRefs != null && crossRefs.length > 0)
+      {
+         crossRefTail = "";
+         return null;
+      }
+
+      if (tail == null)
+      {
+         if (alsocrossRefs != null && alsocrossRefs.length == 1)
+         {
+            tail = alsocrossRefs[0];
+         }
+      }
+      else if (alsocrossRefs != null && alsocrossRefs.length > 0)
+      {
+         crossRefTail = "";
+         return null;
+      }
+
+      if (tail != null)
+      {
+         String id = getId();
+         String currentTail = null;
+
+         if (!tailList.isEmpty())
+         {
+            currentTail = tailList.lastElement();
+
+            if (tailList.contains(tail))
+            {
+               crossRefTail = currentTail;
+               return currentTail;
+            }
+         }
+
+         Bib2GlsEntry entry = resource.getEntry(tail);
+
+         if (entry == null)
+         {
+            crossRefTail = (currentTail == null ? "" : currentTail);
+            return currentTail;
+         }
+
+         tailList.add(id);
+
+         String newTail = entry.getCrossRefTail(tailList);
+
+         if (newTail != null && !id.equals(newTail))
+         {
+            tail = newTail;
+         }
+
+         if (id.equals(tail))
+         {
+            tail = null;
+         }
+      }
+
+      crossRefTail = (tail == null ? "" : tail);
+
+      return tail;
+   }
+
    public boolean hasDependent(String label)
    {
       return deps.contains(label);
@@ -4468,6 +4609,8 @@ public class Bib2GlsEntry extends BibEntry
    private GlsRecord indexCounterRecord = null;
 
    private long defIndex=0, recordIndex=-1;
+
+   private String crossRefTail = null;
 
    private static long defIndexCount=0;
 

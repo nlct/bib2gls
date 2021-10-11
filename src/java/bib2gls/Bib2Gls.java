@@ -3050,6 +3050,12 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   public void logAndPrintMessageNoLn(String message)
+   {
+      logMessageNoLn(message);
+      System.out.print(message);
+   }
+
    public void logAndPrintMessage(String message)
    {
       logMessage(message);
@@ -5372,8 +5378,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.8.20211010";
-   public static final String DATE = "2021-10-10";
+   public static final String VERSION = "2.8.20211011";
+   public static final String DATE = "2021-10-11";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

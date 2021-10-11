@@ -49,6 +49,8 @@ test.pdf	: test.glstex
 test.glstex	: test.tex $(DEPS) test-entries.bib
 		pdflatex test
 		$(BIB2GLS) test
+		pdflatex test
+		$(BIB2GLS) test
 
 test-utf8.pdf	: test-utf8.glstex
 		xelatex test-utf8

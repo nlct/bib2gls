@@ -189,6 +189,7 @@ See the manual for further details.</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.by">Entry {0} cross-referenced by {1}</entry>
 <entry key="message.checking.crossrefs">Checking cross-references for: {0}</entry>
+<entry key="message.crossref.tail">Cross-reference tail for ''{0}'': {1}</entry>
 <entry key="message.custom.dep.found">Entry {0}: found custom ''{1}'' dependency ({2}): {3}</entry>
 <entry key="message.field.not.set">Field {0} not set.</entry>
 <entry key="message.added.user.field">Adding internal user field: {0}</entry>

@@ -9614,6 +9614,56 @@ value is omitted, \csopt[from-seealso]{save-from-seealso} is assumed.
 As \csopt{save-from-see} but for the \field{alias} field. If the
 value is omitted, \csopt[from-alias]{save-from-alias} is assumed.
 
+\optsection[\subsubsection]{save-crossref-tail}
+
+If you have a cross-reference trail where one entry references
+another entry using \field{see}, \field{seealso} or \field{alias}
+and the referenced entry also references another, and so on, then
+you can save the tail end of the trail with this option. Note that
+the trail only follows single-label lists (in \field{see} or
+\field{seealso}). The trail is terminated if an entry doesn't have
+one of those three fields set or if it cross-references multiple
+entries or if the trail loops back on itself.
+
+If you have a loop, the tail for some entries may end prematurely
+since the algorithm to obtain the tail saves the tail for each
+sub-trail to avoid recalculating it.  It's best to avoid
+this setting if you have cross-reference loops. (Aside from two-way
+cross-references, it's best to avoid loops in general.)
+
+The tail label is stored in the field identified by 
+the \meta{value} of this option. If the value is omitted, 
+\csopt[crossref-tail]{save-crossref-tail} is assumed.
+The field won't be set if there's no tail. The tails are calculated
+when writing the entry definitions to the \ext{glstex} file so the
+value can't be referenced or otherwise accessed by \bibgls.
+
+Example:
+\begin{codeenv}
+\atentry{index}\marg{sample1,\field{see}=\marg{sample2}}
+\atentry{index}\marg{sample2,\field{see}=\marg{sample3}}
+\atentry{index}\marg{sample3,\field{see}=\marg{sample4}}
+\atentry{index}\marg{sample4}
+\end{codeenv}
+The tail for \code{sample1} is \code{sample4}. As a by-product of
+the recursion used in calculating the tail for \code{sample1}, the
+tail for each element in the trail (\code{sample2} and
+\code{sample3}) is also calculated.  The tail is the same for each
+entry in the trail. The final entry \code{sample4} doesn't have a
+tail.
+
+If \code{sample4} is modified to cross-reference \code{sample1}:
+\begin{codeenv}
+\atentry{index}\marg{sample4,\field{see}=\marg{sample1}}
+\end{codeenv}
+then when the tail for \code{sample4} is calculated the tail for its
+cross-reference (\code{sample1}) is consulted. This has already been
+set to \code{sample4}. An entry can't have itself as a tail so the
+tail for \code{sample4} is set to \code{sample3}. All the other
+entries still have \code{sample4} as their tail because their tail
+was determined while traversing the trail for \code{sample1}, which
+had to stop when it wrapped round to its starting point.
+
 \optsection[\subsubsection]{save-original-entrytype}
 
 The \meta{value} may be the keywords \code{false} or \code{true} or

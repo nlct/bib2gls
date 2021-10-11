@@ -15,6 +15,7 @@
   %selection={recorded and ancestors},
   %selection={recorded no deps},
   %ignore-fields={parent},
+  save-crossref-tail
 ]
 
 \renewcommand*{\glsxtrpostdescgeneral}{%
@@ -30,6 +31,8 @@
      }%
    }%
  }%
+ \glsxtrifhasfield{crossref-tail}{\glscurrententrylabel}%
+ {, crossref tail: \glscurrentfieldvalue}{}%
 }
 
 \begin{document}
@@ -39,6 +42,8 @@ A \gls{sample4}.
 %A \gls{sample4} (\gls{aliassample}).
 
 A \gls{samplechild1}.
+
+\gls{loop1}.
 
 \printunsrtglossary[style=tree,nonumberlist]
 \printunsrtglossary[type=index,style=bookindex]

@@ -353,6 +353,15 @@ public class GlsResource
                saveFromSee = null;
             }
          }
+         else if (opt.equals("save-crossref-tail"))
+         {
+            saveCrossRefTail = getOptional(parser, "crossref-tail", list, opt);
+
+            if (saveCrossRefTail.equals("false"))
+            {
+               saveCrossRefTail = null;
+            }
+         }
          else if (opt.equals("post-description-dot"))
          {
             String val = getChoice(parser, list, opt, "none", "all", "check");
@@ -7624,6 +7633,17 @@ public class GlsResource
             }
          }
       }
+
+      if (saveCrossRefTail != null)
+      {
+         String tail = entry.getCrossRefTail();
+
+         if (tail != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+              id, saveCrossRefTail, tail);
+         }
+      }
    }
 
    public void addUserField(String field)
@@ -12062,6 +12082,8 @@ public class GlsResource
    private String saveFromAlias = null;
    private String saveFromSeeAlso = null;
    private String saveFromSee = null;
+
+   private String saveCrossRefTail = null;
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE=1;
