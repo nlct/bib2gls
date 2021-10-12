@@ -209,7 +209,7 @@ public class GlsXtrIfHasField extends Command
          pending = grp;
       }
 
-      process(parser, entryLabel, fieldLabel, truePart, falsePart, expanded);
+      process(parser, entryLabel, fieldLabel, truePart, falsePart, pending);
 
       return expanded;
    }
