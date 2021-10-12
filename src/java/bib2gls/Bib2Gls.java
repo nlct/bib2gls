@@ -41,6 +41,7 @@ import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.auxfile.*;
+import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
@@ -1231,6 +1232,9 @@ public class Bib2Gls implements TeXApp
 
       listener.putControlSequence(new BibGlsDefinitionIndex(this));
       listener.putControlSequence(new BibGlsUseIndex(this));
+      listener.putControlSequence(new Relax("glscurrentfieldvalue"));
+      listener.putControlSequence(new GlsXtrIfHasField(this));
+      listener.putControlSequence(new GlsXtrIfHasField("ifglshasfield", false, this));
 
       listener.putControlSequence(listener.createSymbol("bibglshashchar", '#'));
       listener.putControlSequence(listener.createSymbol("bibglsunderscorechar", '_'));

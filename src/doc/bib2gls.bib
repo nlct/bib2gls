@@ -11888,7 +11888,7 @@ field value},
    without testing if the entry exists and adds implicit scoping
    to \meta{true} and \meta{false}},
   topics={conditional,fieldrefcommands},
-  note={\styfmt{glossaries-extra} v1.19+},
+  note={\styfmt{glossaries-extra} v1.19+\texparserdefnote},
   seealso={GlsXtrIfFieldUndef},
   category={command}
 }
@@ -11901,7 +11901,7 @@ field value},
    without testing if the entry exists and without introducing
    an implicit scope},
   topics={conditional,fieldrefcommands},
-  note={\styfmt{glossaries-extra} v1.19+},
+  note={\styfmt{glossaries-extra} v1.19+\texparserdefnote},
   seealso={GlsXtrIfFieldUndef},
   category={command}
 }
@@ -11956,8 +11956,9 @@ doesn't},
   name={\csfmt{if\-gls\-has\-field}},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
   description={tests if the given entry, which must be defined, has the 
-   given field set to a non-empty value},
-  note={\styfmt{glossaries}},
+   given field set to a non-empty value. This is implemented in
+   \bibgls\ in the same way as \cs{glsxtrifhasfield*}},
+  note={\styfmt{glossaries}\texparserdefnote},
   topics={conditional,fieldrefcommands},
   seealso={glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
