@@ -8935,6 +8935,38 @@ has no associated key in \gls!{newglossaryentry} (such as
 will be set after field aliasing but before other options, such as
 \csopt{ignore-fields}.
 
+\optsection[\subsubsection]{save-definition-index}
+
+This is a boolean option. If the value is omitted \code{true} is
+assumed. The default setting is \csopt[false]{save-definition-index}.
+
+This setting will save the definition index that's used by
+\csopt[def]{identical-sort-action} to determine the order of
+definition in the special internal field \field{definitionindex}.
+This field is assigned when the entry is first created
+and can be referenced with \gls{bibglsdefinitionindex}.
+
+Note that if you want to order all entries by definition, it's
+better to use \csopt[none]{sort}, which doesn't perform any sorting,
+so the order will be by definition.
+
+\optsection[\subsubsection]{save-use-index}
+
+This is a boolean option. If the value is omitted \code{true} is
+assumed. The default setting is \csopt[false]{save-use-index}.
+
+This setting will save the order of use index that's used by
+\csopt[use]{identical-sort-action} in the special internal field
+\field{recordindex}.  This field is assigned when the entry picks up
+its first record and can be referenced with \gls{bibglsuseindex}.
+
+Entries that don't have records won't have this field set. The order
+of use corresponds to the first time the entry is recorded (indexed
+and not ignored or merged) in the document.
+
+Note that if you want to order all entries by use, it's
+better to use \csopt[use]{sort}, which doesn't perform any sorting.
+
 \optsection[\subsubsection]{dependency-fields}
 
 The \meta{list} should be a comma-separated list of fields that
@@ -18798,6 +18830,26 @@ Converts \meta{text} to \idx{titlecase}. This just uses
 \formatdef{bibglsfirstuc}
 Converts the first letter of \meta{text} to \idx{uppercase}. This just uses
 \ics{makefirstuc} by default.
+
+\cssection{bibglsdefinitionindex}
+
+\formatdef{bibglsdefinitionindex}
+If \csopt{save-definition-index} has been set this command expands to the
+definition index of the entry identified by \meta{label}. This
+command will only be provided in the \ext{glstex} file if 
+\csopt{save-definition-index} has been set. However, the command is
+always defined by the \hyperref[sec:texparserlib]{\TeX\ parser library}
+but will expand to empty if the associated resource option hasn't
+been set.
+
+\formatdef{bibglsuseindex}
+If \csopt{save-use-index} has been set this command expands to the
+order of use index of the entry identified by \meta{label}. This
+command will only be provided in the \ext{glstex} file if 
+\csopt{save-use-index} has been set. However, the command is
+always defined by the \hyperref[sec:texparserlib]{\TeX\ parser library}
+but will expand to empty if the associated resource option hasn't
+been set.
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:gls2bib}

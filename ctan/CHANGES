@@ -8,6 +8,8 @@ v2.8 (pending):
     - save-from-see
     - save-from-seealso
     - save-crossref-tail
+    - save-definition-index
+    - save-use-index
     - secondary-match-action
     - secondary-match-op
     - secondary-match

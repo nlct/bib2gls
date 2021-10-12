@@ -1568,6 +1568,28 @@ name},
   category={command}
 }
 
+@bibglscommand{bibglsdefinitionindex,
+  name={\csfmt{bib\-gls\-definition\-index}},
+  user1={\margm{label}},
+  description={expands to the definition index of the entry
+  identified \meta{label} if \csopt{save-definition-index} is set
+  otherwise expands to empty},
+  topics={fieldrefcommands},
+  note={\bibgls\texparserdefnote},
+  category={command}
+}
+
+@bibglscommand{bibglsuseindex,
+  name={\csfmt{bib\-gls\-use\-index}},
+  user1={\margm{label}},
+  description={expands to the order of use index of the entry
+  identified \meta{label} if \csopt{save-use-index} is set and
+  the entry has records otherwise expands to empty},
+  topics={fieldrefcommands},
+  note={\bibgls\texparserdefnote},
+  category={command}
+}
+
 @mainglscommand{glsexpandfields,
   name={\csfmt{gls\-expand\-fields}},
   user1={},
@@ -2327,6 +2349,20 @@ field\dhyphen locale}},
 @resourceoption{opt.save-original-id-action,
    name={\csoptfmt{save\dhyphen original\dhyphen id\dhyphen action}},
    user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.save-definition-index,
+   name={\csoptfmt{save\dhyphen definition\dhyphen index}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.save-use-index,
+   name={\csoptfmt{save\dhyphen use\dhyphen index}},
+   user1={\meta{boolean}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -8440,6 +8476,22 @@ field.},
   name={\fieldfmt{siblinglist}},
   description={A list of labels (in \sty{etoolbox}'s internal list
    format) of the siblings this entry has had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@field{field.definitionindex,
+  name={\fieldfmt{definitionindex}},
+  description={Stores the definition index.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@field{field.recordindex,
+  name={\fieldfmt{recordindex}},
+  description={Stores the record index.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}

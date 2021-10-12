@@ -83,6 +83,16 @@ public class Bib2GlsEntry extends BibEntry
             recordMap.put(counter, new Vector<GlsRecord>());
          }
       }
+
+      String defIndexField = resource.getDefinitionIndexField();
+
+      if (defIndexField != null)
+      {
+         BibValueList val = new BibValueList();
+         val.add(new BibNumber(new UserNumber((int)defIndex)));
+         putField(defIndexField, val);
+         putField(defIndexField, ""+defIndex);
+      }
    }
 
    public String getBase()
@@ -3021,7 +3031,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (recordIndex == -1)
       {
-         recordIndex = record.getIndex();
+         setRecordIndex(record.getIndex());
       }
 
       if (record.getFormat().equals("glstriggerrecordformat"))
@@ -4534,9 +4544,27 @@ public class Bib2GlsEntry extends BibEntry
       entry.base = base;
       entry.labelPrefix = labelPrefix;
       entry.setId(getId());
-      entry.recordIndex = recordIndex;
+      entry.setRecordIndex(recordIndex);
 
       return entry;
+   }
+
+   private void setRecordIndex(long idx)
+   {
+      recordIndex = idx;
+
+      if (recordIndex != -1)
+      {
+         String recordIndexField = resource.getUseIndexField();
+
+         if (recordIndexField != null)
+         {
+            BibValueList val = new BibValueList();
+            val.add(new BibNumber(new UserNumber((int)recordIndex)));
+            putField(recordIndexField, val);
+            putField(recordIndexField, ""+recordIndex);
+         }
+      }
    }
 
    public long getDefinitionIndex()

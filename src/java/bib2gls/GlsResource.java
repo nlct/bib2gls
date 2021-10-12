@@ -362,6 +362,14 @@ public class GlsResource
                saveCrossRefTail = null;
             }
          }
+         else if (opt.equals("save-definition-index"))
+         {
+            saveDefinitionIndex = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("save-use-index"))
+         {
+            saveUseIndex = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("post-description-dot"))
          {
             String val = getChoice(parser, list, opt, "none", "all", "check");
@@ -6964,6 +6972,16 @@ public class GlsResource
             writer.println("}");
          }
 
+         if (saveDefinitionIndex)
+         {
+            writer.format("\\providecommand{\\bibglsdefinitionindex}[1]{\\glsxtrusefield{#1}{%s}}%n", DEFINITION_INDEX_FIELD);
+         }
+
+         if (saveUseIndex)
+         {
+            writer.format("\\providecommand{\\bibglsuseindex}[1]{\\glsxtrusefield{#1}{%s}}%n", USE_INDEX_FIELD);
+         }
+
          Vector<String> provided = new Vector<String>();
 
          if (preamble != null && savePreamble)
@@ -7642,6 +7660,28 @@ public class GlsResource
          {
             writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
               id, saveCrossRefTail, tail);
+         }
+      }
+
+      if (saveDefinitionIndex)
+      {
+         String val = entry.getFieldValue(DEFINITION_INDEX_FIELD);
+
+         if (val != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+              id, DEFINITION_INDEX_FIELD, val);
+         }
+      }
+
+      if (saveUseIndex)
+      {
+         String val = entry.getFieldValue(USE_INDEX_FIELD);
+
+         if (val != null)
+         {
+            writer.format("\\GlsXtrSetField{%s}{%s}{%s}%n",
+              id, USE_INDEX_FIELD, val);
          }
       }
    }
@@ -11762,6 +11802,16 @@ public class GlsResource
       map.put("dualprefixfirstplural", "prefixfirstplural");
    }
 
+   public String getDefinitionIndexField()
+   {
+      return saveDefinitionIndex ? DEFINITION_INDEX_FIELD : null;
+   }
+
+   public String getUseIndexField()
+   {
+      return saveUseIndex ? USE_INDEX_FIELD : null;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -12084,6 +12134,12 @@ public class GlsResource
    private String saveFromSee = null;
 
    private String saveCrossRefTail = null;
+
+   private boolean saveDefinitionIndex = false;
+   private boolean saveUseIndex = false;
+
+   public static final String DEFINITION_INDEX_FIELD ="definitionindex";
+   public static final String USE_INDEX_FIELD ="useindex";
 
    public static final int SELECTION_RECORDED_AND_DEPS=0;
    public static final int SELECTION_RECORDED_AND_DEPS_AND_SEE=1;
