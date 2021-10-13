@@ -1257,6 +1257,7 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       String integerFieldFormat = resource.getIntegerFieldFormat(field);
+      String decimalFieldFormat = resource.getDecimalFieldFormat(field);
 
       if (integerFieldFormat != null)
       {
@@ -1278,6 +1279,48 @@ public class Bib2GlsEntry extends BibEntry
             }
             catch (NumberFormatException e)
             {// not an integer
+
+               if (decimalFieldFormat != null)
+               {
+                  try
+                  {
+                     double num = Double.parseDouble(valStr);
+                     newVal = String.format(decimalFieldFormat, num);
+                  }
+                  catch (NumberFormatException e2)
+                  {// not a number
+                  }
+               }
+            }
+         }
+
+         if (newVal != null)
+         {
+            list = parser.getListener().createString(newVal);
+            value.clear();
+            value.add(new BibUserString(list));
+         }
+      }
+      else if (decimalFieldFormat != null)
+      {
+         String newVal = null;
+
+         if (list.size() == 1 && (list.firstElement() instanceof TeXNumber))
+         {
+            double num = (double)((TeXNumber)list.firstElement()).getValue();
+            newVal = String.format(decimalFieldFormat, num);
+         }
+         else
+         {
+            String valStr = list.toString(parser);
+
+            try
+            {
+               double num = Double.parseDouble(valStr);
+               newVal = String.format(decimalFieldFormat, num);
+            }
+            catch (NumberFormatException e)
+            {// not a number
             }
          }
 

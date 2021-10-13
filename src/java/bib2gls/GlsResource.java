@@ -631,57 +631,11 @@ public class GlsResource
          }
          else if (opt.equals("format-integer-fields"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
-
-            if (array == null)
-            {
-               formatIntegerFields = null;
-            }
-            else
-            {
-               formatIntegerFields = new HashMap<String,String>();
-
-               for (int i = 0; i < array.length; i++)
-               {
-                  if (!(array[i] instanceof TeXObjectList))
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.value", 
-                        opt, list.get(opt).toString(parser)));
-                  }
-
-                  Vector<TeXObject> split = splitList(parser, '=', 
-                     (TeXObjectList)array[i]);
-
-                  if (split == null || split.size() == 0) continue;
-
-                  String field = split.get(0).toString(parser);
-
-                  if (!isReferencableField(field))
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.field", field, opt));
-                  }
-
-                  if (split.size() != 2)
-                  {
-                     throw new IllegalArgumentException(
-                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
-                        field, array[i].toString(parser), opt));
-                  }
-
-                  TeXObject format = split.get(1);
-
-                  if (format instanceof TeXObjectList)
-                  {
-                     replaceStringFormatter(parser, (TeXObjectList)format);
-                  }
-
-                  String val = format.toString(parser).trim();
-
-                  formatIntegerFields.put(field, val);
-               }
-            }
+            formatIntegerFields = getFieldFormatPattern(parser, list, opt);
+         }
+         else if (opt.equals("format-decimal-fields"))
+         {
+            formatDecimalFields = getFieldFormatPattern(parser, list, opt);
          }
          else if (opt.equals("append-prefix-field"))
          {
@@ -4684,6 +4638,63 @@ public class GlsResource
       }
 
       return regexList;
+   }
+
+   private HashMap<String,String> getFieldFormatPattern(TeXParser parser,
+     KeyValList list, String opt)
+   throws IllegalArgumentException,IOException
+   {
+      TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+
+      if (array == null)
+      {
+         return null;
+      }
+
+      HashMap<String,String> formatMap = new HashMap<String,String>();
+
+      for (int i = 0; i < array.length; i++)
+      {
+         if (!(array[i] instanceof TeXObjectList))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.value", 
+               opt, list.get(opt).toString(parser)));
+         }
+
+         Vector<TeXObject> split = splitList(parser, '=', 
+            (TeXObjectList)array[i]);
+
+         if (split == null || split.size() == 0) continue;
+
+         String field = split.get(0).toString(parser);
+
+         if (!isReferencableField(field))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.field", field, opt));
+         }
+
+         if (split.size() != 2)
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.invalid.opt.keylist.value", 
+               field, array[i].toString(parser), opt));
+         }
+
+         TeXObject format = split.get(1);
+
+         if (format instanceof TeXObjectList)
+         {
+            replaceStringFormatter(parser, (TeXObjectList)format);
+         }
+
+         String val = format.toString(parser).trim();
+
+         formatMap.put(field, val);
+      }
+
+      return formatMap;
    }
 
    private void replaceStringFormatter(TeXParser parser, TeXObjectList format)
@@ -11776,6 +11787,15 @@ public class GlsResource
       return format;
    }
 
+   public String getDecimalFieldFormat(String field)
+   {
+      if (formatDecimalFields == null) return null;
+
+      String format = formatDecimalFields.get(field);
+
+      return format;
+   }
+
    public boolean isAppendPrefixFieldEnabled(String field)
    {
       if (appendPrefixField == PREFIX_FIELD_NONE || prefixFields == null)
@@ -12225,6 +12245,7 @@ public class GlsResource
 
    private HashMap<String,String> encapFields, encapFieldsIncLabel;
    private HashMap<String,String> formatIntegerFields;
+   private HashMap<String,String> formatDecimalFields;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;

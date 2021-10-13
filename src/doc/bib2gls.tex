@@ -10403,14 +10403,16 @@ This option should take a comma-separated list of
 format pattern} that contains a single numeric specifier.
 This will convert the value stored in the identified field to the
 given format. If the field doesn't contain an integer value it won't
-be changed.
+be changed. If the field contains a decimal value use
+\csopt{format-decimal-fields} instead. This setting is performed
+before field encapsulation.
 
 Since format patterns uses \idx{percentchar} as a placeholder, which
 can be problematic in the resource command, you will need to use
 \ics{cs.percent} instead.  You may also use \ics{cs.hash},
 \ics{cs.dollar}, \ics{cs.amp}, \ics{cs.openbrace},
-\ics{cs.closebrace}, \ics{cs.underscore}, \ics{cs.backslash} to
-indicate literal characters. You can also use \cs{u}\meta{XXXX} to
+\ics{cs.closebrace}, \ics{cs.underscore} and \ics{cs.backslash} to
+indicate the corresponding literal character. You can use \cs{u}\meta{XXXX} to
 indicate a character by its hexadecimal value, but remember that the
 resource options will be expanded when they are written to the
 resource file so use \cs{glshex} or \cs{cs.string}\cs{u}.
@@ -10425,6 +10427,23 @@ and then zero-pad it to four digits:
 This option can't be used for the \field{useindex} field 
 created with \csopt{save-use-index} as that field isn't set until
 after the field modifications are made.
+
+\optsection[\subsubsection]{format-decimal-fields}
+
+As \csopt{format-integer-fields} but for decimal values. If a field
+contains an integer then:
+\begin{itemize}
+\item if \csopt{format-integer-fields} has also been used to set a
+format for the given field, the integer format will take precedence;
+\item otherwise the integer value will be treated as a decimal
+number.
+\end{itemize}
+If you get an error like:
+\begin{verbatim}
+Error: d != java.lang.Double
+\end{verbatim}
+then it means you have used an invalid specifier. (The above error
+results from using \verb|%d| instead of \verb|%f| or \verb|%g|.)
 
 \optsection[\subsubsection]{interpret-fields}
 

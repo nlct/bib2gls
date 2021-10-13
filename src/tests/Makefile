@@ -271,6 +271,7 @@ test-dual-entryabbrv.glstex	: test-dual-entryabbrv.tex $(DEPS) entries-dual-entr
 test-match-entrytype.pdf	: test-match-entrytype.glstex
 		pdflatex test-match-entrytype
 		pdflatex test-match-entrytype
+		pdflatex test-match-entrytype
 
 test-match-entrytype.glstex	: test-match-entrytype.tex $(DEPS) entries.bib
 		pdflatex test-match-entrytype
