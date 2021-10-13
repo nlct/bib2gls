@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 
-public class GlsUseField extends Command
+public class GlsUseField extends EntryFieldCommand
 {
    public GlsUseField(Bib2Gls bib2gls)
    {
@@ -37,7 +37,7 @@ public class GlsUseField extends Command
 
    public GlsUseField(String name, int caseChange, Bib2Gls bib2gls)
    {
-      super(name);
+      super(name, bib2gls);
 
       switch (caseChange)
       {
@@ -50,8 +50,6 @@ public class GlsUseField extends Command
          default:
            throw new IllegalArgumentException("Invalid case change "+caseChange);
       }
-
-      this.bib2gls = bib2gls;
    }
 
    public Object clone()
@@ -62,56 +60,6 @@ public class GlsUseField extends Command
    public int getCaseChange()
    {
       return caseChange;
-   }
-
-   protected Bib2GlsEntry fetchEntry(String entryLabel)
-      throws IOException
-   {
-      // Try the current resource set first
-
-      GlsResource currentResource = bib2gls.getCurrentResource();
-
-      Bib2GlsEntry entry = currentResource.getEntry(entryLabel);
-
-      if (entry == null)
-      {
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.debug(String.format("\\%s -> %s", getName(),
-              bib2gls.getMessage("warning.unknown_entry_in_current_resource", 
-                   entryLabel, currentResource)));
-         }
-
-         // Try other resource sets, if there are any
-
-         for (GlsResource resource : bib2gls.getResources())
-         {
-            if (resource != currentResource)
-            {
-               entry = resource.getEntry(entryLabel);
-
-               if (entry != null)
-               {
-                  if (bib2gls.getDebugLevel() > 0)
-                  {
-                     bib2gls.debug(String.format("\\%s -> %s", getName(),
-                       bib2gls.getMessage("message.found_entry_in_resource", 
-                            entryLabel, resource)));
-                  }
-
-                  break;
-               }
-            }
-         }
-
-         if (entry == null)
-         {
-            bib2gls.warning(String.format("\\%s -> %s", getName(),
-              bib2gls.getMessage("warning.unknown_entry", entryLabel)));
-         }
-      }
-
-      return entry;
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -208,22 +156,9 @@ public class GlsUseField extends Command
       TeXObjectList pending)
       throws IOException
    {
-      BibValueList val = entry.getField(fieldLabel);
+      TeXObjectList obj = getFieldValue(parser, entry, fieldLabel);
 
-      if (val == null)
-      {
-         val = entry.getFallbackContents(fieldLabel);
-      }
-
-      if (val == null)
-      {
-         bib2gls.warning(String.format("\\%s{%s} -> %s", getName(),
-           entry.getId(),
-           bib2gls.getMessage("message.field.not.set", fieldLabel)));
-         return;
-      }
-
-      TeXObjectList obj = ((BibValueList)val.clone()).expand(parser);
+      if (obj == null) return;
 
       switch (caseChange)
       {
@@ -243,8 +178,6 @@ public class GlsUseField extends Command
 
       pending.add(obj);
    }
-
-   protected Bib2Gls bib2gls;
 
    public static final int CASE_NO_CHANGE=0;
    public static final int CASE_SENTENCE=1;

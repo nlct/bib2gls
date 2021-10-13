@@ -2538,6 +2538,24 @@ public class Bib2Gls implements TeXApp
          || name.startsWith("currcount@") || name.startsWith("prevcount@");
    }
 
+   public String getFieldKey(String name)
+   {
+      for (String field : fields)
+      {
+         if (field.equals(name))
+         {
+            return name;
+         }
+
+         if (name.equals(fieldMap.get(field)))
+         {
+            return field;
+         }
+      }
+
+      return name;
+   }
+
    public boolean isKnownField(String name)
    {
       if (fields.isEmpty())

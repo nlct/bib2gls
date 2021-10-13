@@ -23,7 +23,7 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 
-public class GlsXtrIfFieldEqStr extends Command
+public class GlsXtrIfFieldEqStr extends EntryFieldCommand
 {
    public GlsXtrIfFieldEqStr(Bib2Gls bib2gls)
    {
@@ -37,11 +37,11 @@ public class GlsXtrIfFieldEqStr extends Command
    }
 
    public GlsXtrIfFieldEqStr(String name, 
-     boolean expandField, boolean expandText, boolean defaultScope, Bib2Gls bib2gls)
+     boolean expandField, boolean expandText, boolean defaultScope,
+     Bib2Gls bib2gls)
    {
-      super(name);
+      super(name, bib2gls);
 
-      this.bib2gls = bib2gls;
       this.expandField = expandField;
       this.expandText = expandText;
    }
@@ -50,56 +50,6 @@ public class GlsXtrIfFieldEqStr extends Command
    {
       return new GlsXtrIfFieldEqStr(getName(), expandField, expandText,
         defaultScope, bib2gls);
-   }
-
-   protected Bib2GlsEntry fetchEntry(String entryLabel)
-      throws IOException
-   {
-      // Try the current resource set first
-
-      GlsResource currentResource = bib2gls.getCurrentResource();
-
-      Bib2GlsEntry entry = currentResource.getEntry(entryLabel);
-
-      if (entry == null)
-      {
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.debug(String.format("\\%s -> %s", getName(),
-              bib2gls.getMessage("warning.unknown_entry_in_current_resource", 
-                   entryLabel, currentResource)));
-         }
-
-         // Try other resource sets, if there are any
-
-         for (GlsResource resource : bib2gls.getResources())
-         {
-            if (resource != currentResource)
-            {
-               entry = resource.getEntry(entryLabel);
-
-               if (entry != null)
-               {
-                  if (bib2gls.getDebugLevel() > 0)
-                  {
-                     bib2gls.debug(String.format("\\%s -> %s", getName(),
-                       bib2gls.getMessage("message.found_entry_in_resource", 
-                            entryLabel, resource)));
-                  }
-
-                  break;
-               }
-            }
-         }
-
-         if (entry == null)
-         {
-            bib2gls.warning(String.format("\\%s -> %s", getName(),
-              bib2gls.getMessage("warning.unknown_entry", entryLabel)));
-         }
-      }
-
-      return entry;
    }
 
    public TeXObjectList expandonce(TeXParser parser)
@@ -258,25 +208,21 @@ public class GlsXtrIfFieldEqStr extends Command
       TeXObject truePart, TeXObject falsePart, TeXObjectList pending)
       throws IOException
    {
+      TeXObjectList fieldValue = null;
+
       Bib2GlsEntry entry = fetchEntry(entryLabel);
 
-      if (entry == null) return;
-
-      BibValueList val = entry.getField(fieldLabel);
-
-      if (val == null)
+      if (entry != null)
       {
-         val = entry.getFallbackContents(fieldLabel);
+         fieldValue = getFieldValue(parser, entry, fieldLabel);
       }
 
-      if (val == null || val.isEmpty())
+      if (fieldValue == null || fieldValue.isEmpty())
       {
          pending.add(falsePart);
       }
       else
       {
-         TeXObjectList fieldValue = ((BibValueList)val.clone()).expand(parser);
-
          if (expandField)
          {
             TeXObjectList expanded = fieldValue.expandfully(parser);
@@ -310,6 +256,5 @@ public class GlsXtrIfFieldEqStr extends Command
       }
    }
 
-   protected Bib2Gls bib2gls;
    protected boolean expandField, expandText, defaultScope;
 }
