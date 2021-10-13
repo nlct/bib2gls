@@ -1246,6 +1246,7 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsXtrIfFieldEqStr("GlsXtrIfFieldEqXpStr", false, true, this));
       listener.putControlSequence(new GlsXtrIfFieldEqStr("GlsXtrIfXpFieldEqXpStr", true, true, this));
       listener.putControlSequence(new GlsXtrIfFieldEqStr("ifglsfieldeq", false, false, false, this));
+      listener.putControlSequence(new GlsXtrIfHasNonZeroChildCount(this));
 
       listener.putControlSequence(listener.createSymbol("bibglshashchar", '#'));
       listener.putControlSequence(listener.createSymbol("bibglsunderscorechar", '_'));
