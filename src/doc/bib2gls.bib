@@ -2367,6 +2367,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.format-integer-fields,
+   name={\csoptfmt{format\dhyphen integer\dhyphen fields}},
+   user1={\margm{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.short-case-change,
    name={\csoptfmt{short\dhyphen case\dhyphen change}},
    user1={\meta{value}},
@@ -8489,9 +8496,9 @@ field.},
   parent={internalfields}
 }
 
-@field{field.recordindex,
-  name={\fieldfmt{recordindex}},
-  description={Stores the record index.},
+@field{field.useindex,
+  name={\fieldfmt{useindex}},
+  description={Stores the order of use index.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}

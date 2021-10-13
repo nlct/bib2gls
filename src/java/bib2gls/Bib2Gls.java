@@ -2581,6 +2581,14 @@ public class Bib2Gls implements TeXApp
          }
       }
 
+      for (String spField : OTHER_SPECIAL_FIELDS)
+      {
+         if (spField.equals(field))
+         {
+            return true;
+         }
+      }
+
       return false;
    }
 
@@ -5389,8 +5397,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.8.20211012";
-   public static final String DATE = "2021-10-12";
+   public static final String VERSION = "2.8.20211013";
+   public static final String DATE = "2021-10-13";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5436,6 +5444,11 @@ public class Bib2Gls implements TeXApp
    public static final String[] DUAL_SPECIAL_FIELDS =
     new String[] {"dualprefix", "dualprefixplural", "dualprefixfirst", "dualprefixfirstplural"};
 
+   public static final String[] OTHER_SPECIAL_FIELDS =
+   {
+      GlsResource.DEFINITION_INDEX_FIELD, GlsResource.USE_INDEX_FIELD
+   };
+
    /* Not including: 'nonumberlist', 'sort', 'type', 'bibtextype',
     * 'counter'.
     */ 
@@ -5450,8 +5463,7 @@ public class Bib2Gls implements TeXApp
      "primarylocations", "recordcount", "currcount", "desc", "descplural", "firstpl",
      "flag", "index", "level", "longpl", "prevcount", "prevunitmax",
      "prevunittotal", "shortpl", "sortvalue", "unitlist", "useri",
-     "userii", "useriii", "useriv", "userv", "uservi",
-     GlsResource.DEFINITION_INDEX_FIELD, GlsResource.USE_INDEX_FIELD
+     "userii", "useriii", "useriv", "userv", "uservi"
     };
 
    private HashMap<String,String> glsLike;

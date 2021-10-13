@@ -8945,6 +8945,9 @@ This setting will save the definition index that's used by
 definition in the special internal field \field{definitionindex}.
 This field is assigned when the entry is first created
 and can be referenced with \gls{bibglsdefinitionindex}.
+You can reference this field with certain resource options, such as
+\csopt{format-integer-fields}, but you must place the
+\csopt{save-definition-index} resource option first.
 
 Note that if you want to order all entries by definition, it's
 better to use \csopt[none]{sort}, which doesn't perform any sorting,
@@ -8957,8 +8960,10 @@ assumed. The default setting is \csopt[false]{save-use-index}.
 
 This setting will save the order of use index that's used by
 \csopt[use]{identical-sort-action} in the special internal field
-\field{recordindex}.  This field is assigned when the entry picks up
+\field{useindex}.  This field is assigned when the entry picks up
 its first record and can be referenced with \gls{bibglsuseindex}.
+You can't reference this field in resource options such as
+\csopt{format-integer-fields}.
 
 Entries that don't have records won't have this field set. The order
 of use corresponds to the first time the entry is recorded (indexed
@@ -10388,6 +10393,38 @@ same field is listed in both settings, its value will end up as:
 \begin{codeenv}
 \cmd{\meta{cs-name-2arg}}\marg{\cmd{\meta{cs-name-1arg}}\margm{value}}\margm{label}
 \end{codeenv}
+
+\optsection[\subsubsection]{format-integer-fields}
+
+This option should take a comma-separated list of
+\optfmt{\meta{field}\dequals\meta{format}} values, where
+\meta{format} is a
+\href{https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#syntax}{string
+format pattern} that contains a single numeric specifier.
+This will convert the value stored in the identified field to the
+given format. If the field doesn't contain an integer value it won't
+be changed.
+
+Since format patterns uses \idx{percentchar} as a placeholder, which
+can be problematic in the resource command, you will need to use
+\ics{cs.percent} instead.  You may also use \ics{cs.hash},
+\ics{cs.dollar}, \ics{cs.amp}, \ics{cs.openbrace},
+\ics{cs.closebrace}, \ics{cs.underscore}, \ics{cs.backslash} to
+indicate literal characters. You can also use \cs{u}\meta{XXXX} to
+indicate a character by its hexadecimal value, but remember that the
+resource options will be expanded when they are written to the
+resource file so use \cs{glshex} or \cs{cs.string}\cs{u}.
+
+If you want to format the \field{definitionindex} field you must use
+\csopt{save-definition-index} first. For example, to save this field
+and then zero-pad it to four digits:
+\begin{codeenv}
+\csopt{save-definition-index},
+\csopt[definitionindex=\ics{cs.percent}04d]{format-integer-fields}
+\end{codeenv}
+This option can't be used for the \field{useindex} field 
+created with \csopt{save-use-index} as that field isn't set until
+after the field modifications are made.
 
 \optsection[\subsubsection]{interpret-fields}
 
@@ -18841,6 +18878,8 @@ command will only be provided in the \ext{glstex} file if
 always defined by the \hyperref[sec:texparserlib]{\TeX\ parser library}
 but will expand to empty if the associated resource option hasn't
 been set.
+
+\cssection{bibglsuseindex}
 
 \formatdef{bibglsuseindex}
 If \csopt{save-use-index} has been set this command expands to the

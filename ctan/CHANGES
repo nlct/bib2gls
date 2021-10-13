@@ -10,6 +10,7 @@ v2.8 (pending):
     - save-crossref-tail
     - save-definition-index
     - save-use-index
+    - format-integer-fields
     - secondary-match-action
     - secondary-match-op
     - secondary-match

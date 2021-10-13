@@ -89,6 +89,7 @@ public class Bib2GlsEntry extends BibEntry
       if (defIndexField != null)
       {
          BibValueList val = new BibValueList();
+
          val.add(new BibNumber(new UserNumber((int)defIndex)));
          putField(defIndexField, val);
          putField(defIndexField, ""+defIndex);
@@ -1198,6 +1199,15 @@ public class Bib2GlsEntry extends BibEntry
      Vector<String> interpretFields)
     throws IOException
    {
+       String defIndexField = resource.getDefinitionIndexField();
+
+       if (defIndexField != null)
+       {
+          interpretFields = processField(parser, defIndexField,
+            mfirstucProtect, protectFields, idField,
+            interpretFields);
+       }
+
        return interpretFields;
    }
 
@@ -1244,6 +1254,39 @@ public class Bib2GlsEntry extends BibEntry
          list.add(suffix);
          value.clear();
          value.add(new BibUserString(list));
+      }
+
+      String integerFieldFormat = resource.getIntegerFieldFormat(field);
+
+      if (integerFieldFormat != null)
+      {
+         String newVal = null;
+
+         if (list.size() == 1 && (list.firstElement() instanceof TeXNumber))
+         {
+            int num = ((TeXNumber)list.firstElement()).getValue();
+            newVal = String.format(integerFieldFormat, num);
+         }
+         else
+         {
+            String valStr = list.toString(parser);
+
+            try
+            {
+               int num = Integer.parseInt(valStr);
+               newVal = String.format(integerFieldFormat, num);
+            }
+            catch (NumberFormatException e)
+            {// not an integer
+            }
+         }
+
+         if (newVal != null)
+         {
+            list = parser.getListener().createString(newVal);
+            value.clear();
+            value.add(new BibUserString(list));
+         }
       }
 
       String encap = resource.getFieldEncap(field);

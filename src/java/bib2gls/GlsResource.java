@@ -493,7 +493,7 @@ public class GlsResource
 
                   String field = split.get(0).toString(parser);
 
-                  if (!bib2gls.isKnownField(field))
+                  if (!isReferencableField(field))
                   {
                      throw new IllegalArgumentException(
                        bib2gls.getMessage("error.invalid.field", field, opt));
@@ -561,7 +561,7 @@ public class GlsResource
 
                   String field = split.get(0).toString(parser);
 
-                  if (!bib2gls.isKnownField(field))
+                  if (!isReferencableField(field))
                   {
                      throw new IllegalArgumentException(
                        bib2gls.getMessage("error.invalid.field", field, opt));
@@ -609,7 +609,7 @@ public class GlsResource
 
                   String field = split.get(0).toString(parser);
 
-                  if (!bib2gls.isKnownField(field))
+                  if (!isReferencableField(field))
                   {
                      throw new IllegalArgumentException(
                        bib2gls.getMessage("error.invalid.field", field, opt));
@@ -626,6 +626,60 @@ public class GlsResource
                                : split.get(1).toString(parser).trim();
 
                   encapFieldsIncLabel.put(field, val);
+               }
+            }
+         }
+         else if (opt.equals("format-integer-fields"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+
+            if (array == null)
+            {
+               formatIntegerFields = null;
+            }
+            else
+            {
+               formatIntegerFields = new HashMap<String,String>();
+
+               for (int i = 0; i < array.length; i++)
+               {
+                  if (!(array[i] instanceof TeXObjectList))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.value", 
+                        opt, list.get(opt).toString(parser)));
+                  }
+
+                  Vector<TeXObject> split = splitList(parser, '=', 
+                     (TeXObjectList)array[i]);
+
+                  if (split == null || split.size() == 0) continue;
+
+                  String field = split.get(0).toString(parser);
+
+                  if (!isReferencableField(field))
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.field", field, opt));
+                  }
+
+                  if (split.size() != 2)
+                  {
+                     throw new IllegalArgumentException(
+                       bib2gls.getMessage("error.invalid.opt.keylist.value", 
+                        field, array[i].toString(parser), opt));
+                  }
+
+                  TeXObject format = split.get(1);
+
+                  if (format instanceof TeXObjectList)
+                  {
+                     replaceStringFormatter(parser, (TeXObjectList)format);
+                  }
+
+                  String val = format.toString(parser).trim();
+
+                  formatIntegerFields.put(field, val);
                }
             }
          }
@@ -3703,6 +3757,21 @@ public class GlsResource
       }
    }
 
+   private boolean isReferencableField(String field)
+   {
+      if (bib2gls.isKnownField(field)) return true;
+
+      if (additionalUserFields != null)
+      {
+         for (String f : additionalUserFields)
+         {
+            if (f.equals(field)) return true;
+         }
+      }
+
+      return (saveDefinitionIndex && field.equals(DEFINITION_INDEX_FIELD));
+   }
+
    private void setFieldMatchPatterns(HashMap<String,Pattern> patterns,
      TeXObject[] array, String opt, KeyValList list, TeXParser parser)
    throws IllegalArgumentException,IOException
@@ -4615,6 +4684,63 @@ public class GlsResource
       }
 
       return regexList;
+   }
+
+   private void replaceStringFormatter(TeXParser parser, TeXObjectList format)
+   {
+      for (int i = 0; i < format.size(); i++)
+      {
+         TeXObject obj = format.get(i);
+
+         if (obj instanceof TeXObjectList)
+         {
+            replaceStringFormatter(parser, (TeXObjectList)obj);
+         }
+         else if (obj instanceof ControlSequence)
+         {
+            String name = ((ControlSequence)obj).getName();
+
+            if (name.equals("%"))
+            {
+               format.set(i, parser.getListener().getOther('%'));
+            }
+            else if (name.equals("#"))
+            {
+               format.set(i, parser.getListener().getOther('#'));
+            }
+            else if (name.equals("$"))
+            {
+               format.set(i, parser.getListener().getOther('$'));
+            }
+            else if (name.equals("&"))
+            {
+               format.set(i, parser.getListener().getOther('&'));
+            }
+            else if (name.equals("{"))
+            {
+               format.set(i, parser.getListener().getOther('{'));
+            }
+            else if (name.equals("}"))
+            {
+               format.set(i, parser.getListener().getOther('}'));
+            }
+            else if (name.equals("_"))
+            {
+               format.set(i, parser.getListener().getOther('_'));
+            }
+            else if (name.equals("\\"))
+            {
+               format.set(i, parser.getListener().getOther('\\'));
+            }
+            else if (name.equals("u"))
+            {
+               if (i != format.size()-1 && (format.get(i+1) instanceof Ignoreable))
+               {
+                  format.remove(i+1);
+               }
+            }
+         }
+      }
    }
 
    private int getLetterNumberRule(TeXParser parser, KeyValList list,
@@ -11641,6 +11767,15 @@ public class GlsResource
       return csname;
    }
 
+   public String getIntegerFieldFormat(String field)
+   {
+      if (formatIntegerFields == null) return null;
+
+      String format = formatIntegerFields.get(field);
+
+      return format;
+   }
+
    public boolean isAppendPrefixFieldEnabled(String field)
    {
       if (appendPrefixField == PREFIX_FIELD_NONE || prefixFields == null)
@@ -12089,6 +12224,7 @@ public class GlsResource
    private String[] noCaseChangeCs = null;
 
    private HashMap<String,String> encapFields, encapFieldsIncLabel;
+   private HashMap<String,String> formatIntegerFields;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;
