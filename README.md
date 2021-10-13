@@ -3,6 +3,12 @@ Command line application to convert `.bib` files to `glossaries-extra.sty` resou
 
 Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/cgi-bin/faq.cgi?action=view&categorylabel=bib2gls) and [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
 
+Related TUGboat articles:
+
+  - [Glossaries with bib2gls](http://tug.org/TUGboat/tb40-1/tb124talbot-bib2gls.pdf), issue [40:1, 2019](http://tug.org/TUGboat/Contents/contents40-1.html).
+  - [bib2gls: selection, cross-references and locations](http://tug.org/TUGboat/tb41-3/tb129talbot-bib2gls-more.pdf), issue [41:3, 2020](http://tug.org/TUGboat/Contents/contents41-3.html).
+  - bib2gls: sorting, issue [42:2, 2021](http://tug.org/TUGboat/Contents/contents42-2.html).
+
 (This application was developed as a follow-up from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).)
 
