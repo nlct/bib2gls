@@ -15329,6 +15329,16 @@ use the above hexadecimal markup. If you use \ics{cs.hash} it will
 be treated as a literal string containing a backslash followed by a
 hash character.
 
+\optsection{encapsulate-sort}
+
+This option will encapsulate the sort value (after modifications such 
+as \csopt{sort-suffix} and \csopt{sort-number-pad}) with
+\csfmt{\meta{csname}}\marg{value}\marg{entry-id} where \meta{value}
+is the sort value that would otherwise have been used and
+\meta{entry-id} is the entry's label. It will then be interpreted
+(if enabled). Note that \meta{value} may already have been
+interpreted in a previous step.
+
 \optsection{strength}
 
 This option automatically implements

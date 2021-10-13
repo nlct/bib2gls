@@ -1326,7 +1326,7 @@ public class Bib2Gls implements TeXApp
     *  determines whether or not to trim leading/trailing spaces
     *  from the result.
     */ 
-   public String interpret(String texCode, BibValueList bibVal, boolean trim)
+   public String interpret(String texCode, TeXObjectList objList, boolean trim)
    {
       if (interpreter == null) return texCode;
 
@@ -1337,12 +1337,6 @@ public class Bib2Gls implements TeXApp
 
          StringWriter writer = new StringWriter();
          listener.setWriter(writer);
-
-         TeXObjectList objList = bibVal.expand(interpreter);
-
-         if (objList == null) return texCode;
-
-         objList = (TeXObjectList)objList.clone();
 
          interpreter.addAll(objList);
 
@@ -1399,6 +1393,34 @@ public class Bib2Gls implements TeXApp
          return texCode;
       }
    }
+
+   public String interpret(String texCode, BibValueList bibVal, boolean trim)
+   {
+      if (interpreter == null) return texCode;
+
+      try
+      {
+         TeXObjectList objList = bibVal.expand(interpreter);
+
+         if (objList == null) return texCode;
+
+         objList = (TeXObjectList)objList.clone();
+
+         return interpret(texCode, objList, trim);
+      }
+      catch (IOException e)
+      {
+
+         if (getDebugLevel() > 0)
+         {
+            debug("texparserlib: ");
+            debug(e);
+         }
+
+         return texCode;
+      }
+
+    }
 
    /*
     * Converts the given TeX code into a string that's suitable for

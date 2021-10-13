@@ -629,6 +629,15 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("encapsulate-sort"))
+         {
+            encapSort = getOptional(parser, "", list, opt);
+
+            if (encapSort.isEmpty())
+            {
+               encapSort = null;
+            }
+         }
          else if (opt.equals("format-integer-fields"))
          {
             formatIntegerFields = getFieldFormatPattern(parser, list, opt);
@@ -11778,6 +11787,11 @@ public class GlsResource
       return csname;
    }
 
+   public String getSortEncapCsName()
+   {
+      return encapSort;
+   }
+
    public String getIntegerFieldFormat(String field)
    {
       if (formatIntegerFields == null) return null;
@@ -12246,6 +12260,8 @@ public class GlsResource
    private HashMap<String,String> encapFields, encapFieldsIncLabel;
    private HashMap<String,String> formatIntegerFields;
    private HashMap<String,String> formatDecimalFields;
+
+   private String encapSort = null;
 
    public static final byte POST_DESC_DOT_NONE=0;
    public static final byte POST_DESC_DOT_ALL=1;

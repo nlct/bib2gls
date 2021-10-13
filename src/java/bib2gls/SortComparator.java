@@ -22,6 +22,9 @@ import java.util.Vector;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.dickimawbooks.texparserlib.TeXObjectList;
+import com.dickimawbooks.texparserlib.TeXCsRef;
+import com.dickimawbooks.texparserlib.TeXParserListener;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
 public abstract class SortComparator implements Comparator<Bib2GlsEntry>
@@ -443,6 +446,22 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       }
 
       value = adjustSort(entry, value);
+
+      String sortEncap = bib2gls.getCurrentResource().getSortEncapCsName();
+
+      if (sortEncap != null)
+      {
+         TeXParserListener listener = bib2gls.getInterpreterListener();
+
+         TeXObjectList objList = new TeXObjectList();
+         objList.add(new TeXCsRef(sortEncap));
+         objList.add(listener.createGroup(value));
+         objList.add(listener.createGroup(entry.getId()));
+
+         value = bib2gls.interpret(
+           String.format("\\%s{%s}{%s}", sortEncap, value, entry.getId()),
+           objList, false);
+      }
 
       entry.putField(sortStorageField, value);
 
