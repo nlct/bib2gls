@@ -85,9 +85,18 @@ public abstract class EntryFieldCommand extends Command
       Bib2GlsEntry entry, String fieldLabel)
       throws IOException
    {
-      String key = bib2gls.getFieldKey(fieldLabel);
-
+      String key = fieldLabel;
       BibValueList val = entry.getField(key);
+
+      if (val == null)
+      {
+         key = bib2gls.getFieldKey(fieldLabel);
+
+         if (!key.equals(fieldLabel))
+         {
+            val = entry.getField(key);
+         }
+      }
 
       if (val == null)
       {
