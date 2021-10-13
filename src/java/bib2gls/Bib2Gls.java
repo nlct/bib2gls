@@ -1232,6 +1232,7 @@ public class Bib2Gls implements TeXApp
 
       listener.putControlSequence(new BibGlsDefinitionIndex(this));
       listener.putControlSequence(new BibGlsUseIndex(this));
+      listener.putControlSequence(new IfGlsHasChildren(this));
       listener.putControlSequence(new GlsIfHasKey("ifglshasparent", "parent", this));
       listener.putControlSequence(new GlsIfHasKey("ifglshasdesc", "description", this));
       listener.putControlSequence(new GlsIfHasKey("ifglshassymbol", "symbol", this));

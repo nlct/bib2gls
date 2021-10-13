@@ -11985,7 +11985,7 @@ doesn't},
    \field{symbol} field set to value that's not empty and not
      \csfmt{relax}},
   topics={conditional,fieldrefcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries}\texparserdefnote},
   seealso={ifglshasdesc,glsxtrifhasfield,GlsXtrIfFieldUndef},
   category={command}
 }
@@ -11996,7 +11996,7 @@ doesn't},
   description={tests if the given entry, which must be defined, has the 
    \field{description} field set},
   topics={conditional,fieldrefcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries}\texparserdefnote},
   seealso={ifglshassymbol,ifglshasdescsuppressed},
   category={command}
 }
@@ -12018,7 +12018,7 @@ doesn't},
   description={tests if the given entry, which must be defined, has the 
    \field{parent} field set},
   topics={conditional,fieldrefcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
 
@@ -12031,9 +12031,11 @@ doesn't},
   have \meta{entry label} as the value of the \field{parent}
   field. With \bibgls, a more efficient approach is to
   use \csopt{save-child-count} and test the value of
-  the \field{childcount} field},
+  the \field{childcount} field. The \TeX\ parser library recognises
+  this command and will simply use the child count (regardless of
+  whether or not the child count is saved)},
   topics={conditional,fieldrefcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
 
@@ -12043,7 +12045,7 @@ doesn't},
   description={tests if the given entry, which must be defined, has the 
    \field{short} field set},
   topics={conditional,fieldrefcommands,abbreviationcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
 
@@ -12053,7 +12055,7 @@ doesn't},
   description={tests if the given entry, which must be defined, has the 
    \field{long} field set},
   topics={conditional,fieldrefcommands,abbreviationcommands},
-  note={\styfmt{glossaries}},
+  note={\styfmt{glossaries}\texparserdefnote},
   category={command}
 }
 
