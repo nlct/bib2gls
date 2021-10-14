@@ -4570,12 +4570,18 @@ public class Bib2GlsEntry extends BibEntry
 
       if (!children.contains(child))
       {
+         bib2gls.debugMessage("message.adding.child", getId(), child.getId());
          children.add(child);
       }
    }
 
    public int getChildCount()
    {
+      if (children == null)
+      {
+         resource.updateChildLists();
+      }
+
       return children == null ? 0 : children.size();
    }
 

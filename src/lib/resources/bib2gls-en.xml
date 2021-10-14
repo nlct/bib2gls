@@ -197,6 +197,7 @@ See the manual for further details.</entry>
 <entry key="message.added.alias.dep">Adding alias {0} as dependency for {1}</entry>
 <entry key="message.added.dep">Added dependent: {0}</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
+<entry key="message.adding.child">Adding child {0} to parent {1}</entry>
 <entry key="message.selecting.all">Selecting all entries.</entry>
 <entry key="message.selecting.entry.records">Selecting entry {0} (has one or more records).</entry>
 <entry key="message.selecting.entry.record.match">Selecting entry {0} (matches record {1}).</entry>

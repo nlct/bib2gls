@@ -8243,6 +8243,50 @@ public class GlsResource
 
    }
 
+   public void updateChildLists()
+   {
+      if (childListUpdated) return;
+
+      for (int i = 0; i < bibData.size(); i++)
+      {
+         Bib2GlsEntry entry = bibData.get(i);
+
+         String parentId = entry.getParent();
+
+         if (!(parentId == null || parentId.isEmpty()))
+         {
+            Bib2GlsEntry parent = getEntry(parentId, bibData);
+
+            if (parent != null)
+            {
+               parent.addChild(entry);
+            }
+         }
+      }
+
+      if (dualData != null)
+      {
+         for (int i = 0; i < dualData.size(); i++)
+         {
+            Bib2GlsEntry entry = dualData.get(i);
+
+            String parentId = entry.getParent();
+
+            if (!(parentId == null || parentId.isEmpty()))
+            {
+               Bib2GlsEntry parent = getEntry(parentId, dualData);
+
+               if (parent != null)
+               {
+                  parent.addChild(entry);
+               }
+            }
+         }
+      }
+
+      childListUpdated = true;
+   }
+
    private void checkParent(Bib2GlsEntry entry, int i, 
       Vector<Bib2GlsEntry> list)
    {
@@ -12377,6 +12421,8 @@ public class GlsResource
    private boolean copyAliasToSee = false;
 
    private boolean createMissingParents = false;
+
+   private boolean childListUpdated = false;
 
    private int compactRanges = 0;
 
