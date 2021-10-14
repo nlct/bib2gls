@@ -10130,7 +10130,9 @@ public class GlsResource
       {
          TeXObject object = list.get(i);
 
-         if (isWordBoundary(object))
+         if (isWordBoundary(object)
+              || (object instanceof ControlSequence 
+                   && ((ControlSequence)object).getName().equals("MFUwordbreak")))
          {
             endIndex = i;
          }
@@ -10290,6 +10292,12 @@ public class GlsResource
             {
                // skip \NoCaseChange and its argument
                wordBoundary = prevWordBoundary;
+               continue;
+            }
+
+            if (csname.equals("MFUwordbreak"))
+            {
+               wordBoundary = true;
                continue;
             }
 

@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.latex.AtSecondOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
@@ -1229,6 +1230,8 @@ public class Bib2Gls implements TeXApp
         GlsUseField.CASE_TO_UPPER, true, this));
       listener.putControlSequence(new GlsHierName("GLSXTRhiername",
         GlsUseField.CASE_TO_UPPER, false, this));
+
+      listener.putControlSequence(new AtFirstOfOne("MFUwordbreak"));
 
       listener.putControlSequence(new BibGlsDefinitionIndex(this));
       listener.putControlSequence(new BibGlsUseIndex(this));
