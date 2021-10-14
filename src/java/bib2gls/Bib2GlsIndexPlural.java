@@ -48,6 +48,32 @@ public class Bib2GlsIndexPlural extends Bib2GlsIndex
       }
    }
 
+   public String getPluralFallbackValue()
+   {
+      String value = getFieldValue("text");
+
+      if (value == null)
+      {
+         value = getFallbackValue("text");
+      }
+
+      String suffix = resource.getPluralSuffix();
+
+      return suffix == null ? value : value+suffix;
+   }
+
+   public BibValueList getPluralFallbackContents()
+   {
+      BibValueList contents = getField("text");
+
+      if (contents == null)
+      {
+         contents = getFallbackContents("text");
+      }
+
+      return plural(contents, "glspluralsuffix");
+   }
+
    public String getFallbackValue(String field)
    {
       if (field.equals("text"))

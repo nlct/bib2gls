@@ -18,16 +18,6 @@ v2.8 (pending):
     - secondary-not-match
     - encapsulate-sort
 
-  * bug fix: @entry missing required name/description results in "null"
-    saved in the field value. This has been changed to an empty
-    string (but the warning about the missing field remains).
-
-  * bug fix: selection=all doesn't show see and seealso lists in
-    locations https://github.com/nlct/bib2gls/issues/9
-
-  * bug fix: integer sort method should cast to int
-    https://github.com/nlct/bib2gls/issues/11
-
   * issue #10: explicit ranges with identical start and end should
     collapse to a normal location
     https://github.com/nlct/bib2gls/issues/10
@@ -44,6 +34,19 @@ v2.8 (pending):
 
       --retain-formats
       --no-retain-formats
+
+  * bug fix: @entry missing required name/description results in "null"
+    saved in the field value. This has been changed to an empty
+    string (but the warning about the missing field remains).
+
+  * bug fix: selection=all doesn't show see and seealso lists in
+    locations https://github.com/nlct/bib2gls/issues/9
+
+  * bug fix: integer sort method should cast to int
+    https://github.com/nlct/bib2gls/issues/11
+
+  * bug fix: indexplural default name incorrect when parent field set
+    https://github.com/nlct/bib2gls/issues/13
 
 v2.7 (2020-07-11):
 
