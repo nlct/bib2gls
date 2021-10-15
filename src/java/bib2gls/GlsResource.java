@@ -10063,6 +10063,11 @@ public class GlsResource
       if (object instanceof ControlSequence)
       {
          csname = ((ControlSequence)object).getName();
+
+         if (csname.equals("MFUwordbreak"))
+         {
+            return true;
+         }
       }
 
       if (wordBoundarySpace)
@@ -10130,9 +10135,7 @@ public class GlsResource
       {
          TeXObject object = list.get(i);
 
-         if (isWordBoundary(object)
-              || (object instanceof ControlSequence 
-                   && ((ControlSequence)object).getName().equals("MFUwordbreak")))
+         if (isWordBoundary(object))
          {
             endIndex = i;
          }
@@ -10204,6 +10207,26 @@ public class GlsResource
          boolean prevWordBoundary = wordBoundary;
 
          wordBoundary = isWordBoundary(object);
+
+         if ((object instanceof ControlSequence) 
+              && ((ControlSequence)object).getName().equals("MFUwordbreak"))
+         {
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
+
+               i++;
+            }
+
+            continue;
+         }
 
          if (wordBoundary || !prevWordBoundary)
          {
@@ -10292,12 +10315,6 @@ public class GlsResource
             {
                // skip \NoCaseChange and its argument
                wordBoundary = prevWordBoundary;
-               continue;
-            }
-
-            if (csname.equals("MFUwordbreak"))
-            {
-               wordBoundary = true;
                continue;
             }
 
