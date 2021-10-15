@@ -5494,7 +5494,7 @@ public class Bib2Gls implements TeXApp
     new String[] {"progeny", "progenitor", "adoptparents"};
 
    public static final String[] DUAL_SPECIAL_FIELDS =
-    new String[] {"dualprefix", "dualprefixplural", "dualprefixfirst", "dualprefixfirstplural"};
+    new String[] {"dualprefix", "dualprefixplural", "dualprefixfirst", "dualprefixfirstplural", "dualdescription"};
 
    public static final String[] OTHER_SPECIAL_FIELDS =
    {

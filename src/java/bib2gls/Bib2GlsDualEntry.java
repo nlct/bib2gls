@@ -319,7 +319,7 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
 
    public void writeInternalFields(PrintWriter writer) throws IOException
    {
-      for (String field : DUAL_PREFIX_FIELDS)
+      for (String field : Bib2Gls.DUAL_SPECIAL_FIELDS)
       {
          String val = getFieldValue(field);
 
@@ -332,8 +332,4 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
    }
 
    private boolean isprimary=true;
-
-   public static final String[] DUAL_PREFIX_FIELDS =
-    new String[] {"dualprefix", "dualprefixplural",
-     "dualprefixfirst", "dualprefixfirstplural"};
 }

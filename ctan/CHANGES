@@ -5,6 +5,8 @@ v2.8 (pending):
 
   * title case now recognises \MFUwordbreak. 
 
+  * new dual field 'dualdescription'
+
   * new selection option 'selected before'
 
   * new resource options:

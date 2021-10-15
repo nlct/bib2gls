@@ -1,0 +1,20 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources
+[
+   dual-sort={combine},
+   dual-entry-map={{description},
+                   {dualdescription}},
+   field-aliases={user1=see}
+]
+
+\begin{document}
+A \gls{sample}.
+
+\printunsrtglossaries
+\end{document}

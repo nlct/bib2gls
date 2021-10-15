@@ -35,7 +35,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-interpret-fields.pdf test-interpret-fields2.pdf test-prefix.pdf test-dual-prefix.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
-	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf
+	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
+	  test-dual-samename.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -680,6 +681,13 @@ test-standalone-range.pdf	: test-standalone-range.glstex
 test-standalone-range.glstex	: test-standalone-range.tex $(DEPS)
 		pdflatex test-standalone-range
 		$(BIB2GLS) test-standalone-range
+
+test-dual-samename.pdf	: test-dual-samename.glstex
+		pdflatex test-dual-samename
+
+test-dual-samename.glstex	: test-dual-samename.tex test-dual-samename.bib $(DEPS)
+		pdflatex test-dual-samename
+		$(BIB2GLS) test-dual-samename
 
 clean	:
 	$(RM) *.aux

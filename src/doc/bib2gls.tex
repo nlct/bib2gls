@@ -4862,6 +4862,10 @@ functionally like \atentry{symbol}) or
 is functionally like \code{@}\meta{primary} and the dual is
 functionally like \code{@}\meta{dual}.
 
+If you need a field to store the dual description in (and you're not
+simply swapping known fields around), then you can use the special
+\field{dualdescription} field and add it to your map.
+
 If the fields provided by the \isty{glossaries-prefix} are defined,
 there will be additional mappings for the special internal fields
 \field{dualprefix}, \field{dualprefixfirst},
@@ -5259,6 +5263,22 @@ For example:
  \csopt[en]{sort},\comment{sort primary entries according to language 'en'}
  \csopt[fr]{dual-sort}\comment{sort dual entries according to language 'fr'}
 }
+\end{codeenv}
+
+If you need to keep the same name but have different descriptions
+then you can use \field{dualdescription} and set up a mapping to use
+it. For example:
+\begin{codeenv}
+\atentry{dualentry}\marg{sample,
+  \field{name}=\marg{sample},
+  \field{description}=\marg{primary sample description},
+  \field{dualdescription}=\marg{dual sample description}
+}
+\end{codeenv}
+The mapping can then be:
+\begin{codeenv}
+\csopt[\marg{\field{description}},
+  \marg{\field{dualdescription}}]{dual-entry-map}
 \end{codeenv}
 
 \entrysection{dualindexentry}
