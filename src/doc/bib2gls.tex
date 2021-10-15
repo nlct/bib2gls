@@ -10895,7 +10895,21 @@ example:
 The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially
 a \idx{sentencecase} change, but there's no check for
 sentence-breaks within the value, so even if the value contains
-multiple sentences, only the first is changed.
+multiple sentences, only the first is changed. If the text to be
+changed starts with a punctuation character it should be
+encapsulated with \ics{MFUskippunc} to apply the case-change to the
+following object. For example:
+\begin{codeenv}
+\field{name}=\marg{\cs{MFUskippunc}\marg{'}tis}
+\end{codeenv}
+If the \optfmt{firstuc} option is applied to the \field{name} field
+this will be converted to:
+\begin{codeenv}
+\field{name}=\marg{\cs{MFUskippunc}\marg{'}Tis}
+\end{codeenv}
+Using \ics{NoCaseChange} (provided by \sty{textcase}) instead will have the
+same effect, but this isn't consistent with the behaviour of
+\ics{makefirstuc} so it's best to use \cs{MFUskippunc} instead.
 
 The \optfmt{\meta{option}-cs} settings defer the actual case-changing
 to \TeX, which means that the case-changing has to be applied every
@@ -10903,8 +10917,6 @@ time the field is typeset (and it introduces non-expandable content
 to the field value). Be aware of the limitations of using any of the
 case-changing commands. See the \isty{textcase} and \isty{mfirstuc}
 package documentation for further details~\cite{textcase,mfirstuc}.
-You may use \code{\ics{NoCaseChange}\margm{content}} (provided by
-\sty{textcase}) to prevent any \idx{case-change} to \meta{content}.
 
 For the settings where \bibgls\ itself performs the \idx{case-change}, then
 \bibgls\ will iterate over each token of the field value and apply
@@ -10947,13 +10959,20 @@ different).
 
 If the option is \optfmt{firstuc} then all the remaining tokens are
 skipped. If the option is \optfmt{title} then the subsequent tokens
-are skipped until a word-boundary is found.
+are skipped until a word-boundary is found. A word-boundary can be
+marked up with \ics{MFUwordbreak}.
 
 \item If a control sequence \csfmt{}\meta{csname} is found, then:
 
   \begin{enumerate}
   \item If the control sequence is \cs{protect}, this token is skipped
   for all options.
+
+  \item With \optfmt{firstuc} and \optfmt{title}, if 
+  \code{\ics{MFUskippunc}\margm{text}} or \code{\ics{NoCaseChange}\margm{text}} 
+  occurs at the start of a word, then \bibgls\ will act as though
+  the word hasn't started yet (so the next token will be considered
+  for a \idx{case-change}).
 
   \item If the control sequence is one of: \ics{o}, \ics{O}, \ics{l},
   \ics{L}, \ics{ae}, \ics{AE}, \ics{oe}, \ics{OE}, \ics{aa}, \ics{AA},
@@ -10966,25 +10985,16 @@ are skipped until a word-boundary is found.
   skipped. If the option is \optfmt{title} then the subsequent tokens
   are skipped until a word-boundary is found.
 
-  \item If the control sequence is \ics{NoCaseChange} or is in the
-  \csopt{no-case-change-cs} list, then the 
-  control sequence and its argument is ignored. With \optfmt{firstuc}
-  and \optfmt{title}, if \code{\ics{NoCaseChange}\margm{text}}
-  (but not any \csopt{no-case-change-cs} command)
-  occurs at the start of a word, then \bibgls\ will act as though
-  the word hasn't started yet (so the next token will be considered
-  for a \idx{case-change}). This is different to the way \ics{makefirstuc}
-  and \ics{capitalisewords} work.
-
-  \item If the control sequence is \ics{ensuremath}, \ics{si} or if 
-  \meta{csname} ends with \qtt{ref} (for example, \ics{ref} or 
-  \ics{pageref}) then the control sequence and its argument is ignored.
-  In the case where \meta{csname} ends with \qtt{ref}, a following
-  star (\code{*}) or optional argument before the mandatory argument 
-  will also be skipped. This allows for some common cross-referencing 
-  commands, such as \sty{hyperref}['s] \ics{autoref}, which may have 
-  a starred form, but does not allow for more complicated commands with 
-  multiple arguments.
+  \item If the control sequence is in the \csopt{no-case-change-cs}
+  list or is \ics{ensuremath}, \ics{si} or if
+  \meta{csname} ends with \qtt{ref} (for example, \ics{ref} or
+  \ics{pageref}) then the control sequence and its argument is
+  ignored.  In the case where \meta{csname} ends with \qtt{ref}, a
+  following star (\code{*}) or optional argument before the mandatory
+  argument will also be skipped. This allows for some common
+  cross-referencing commands, such as \sty{hyperref}['s]
+  \ics{autoref}, which may have a starred form, but does not allow for
+  more complicated commands with multiple arguments.
 
   If the option is \optfmt{firstuc} then all the remaining tokens are
   skipped (so no \idx{case-change} will be performed). If the option is 
@@ -11229,16 +11239,16 @@ A\cs{NoCaseChange}\marg{bc}D
 \end{codeenv}
 
 Note that with \optfmt{firstuc} and \optfmt{title}, if
-\code{\ics{NoCaseChange}\margm{text}} occurs at the start of a word
+\code{\ics{MFUskippunc}\margm{text}} occurs at the start of a word
 then it's skipped, and the case change is
 applied to the material following its argument. For example,
 suppose the \field{short} field is defined as:
 \begin{codeenv}
-\field{short}=\marg{\cs{NoCaseChange}\marg{h}tml}
+\field{short}=\marg{\cs{MFUskippunc}\marg{h}tml}
 \end{codeenv}
 then the result is:
 \begin{codeenv}
-\cs{NoCaseChange}\marg{h}Tml
+\cs{MFUskippunc}\marg{h}Tml
 \end{codeenv}
 whereas with:
 \begin{codeenv}
@@ -11304,6 +11314,12 @@ override previous settings.
 The default setting is \csopt[white space,cs
 space]{word-boundaries}, which excludes non-breakable
 spaces and dashes.
+
+Note that you can explicitly markup word-boundary punctuation using
+\ics{MFUwordbreak}. For example:
+\begin{codeenv*}
+\field{name} = \marg{a book of rhyme\cs{MFUwordbreak}\marg{/}verse}
+\end{codeenv*}
 
 \optsection[\subsubsection]{short-case-change}
 

@@ -1232,6 +1232,7 @@ public class Bib2Gls implements TeXApp
         GlsUseField.CASE_TO_UPPER, false, this));
 
       listener.putControlSequence(new AtFirstOfOne("MFUwordbreak"));
+      listener.putControlSequence(new AtFirstOfOne("MFUskippunc"));
 
       listener.putControlSequence(new BibGlsDefinitionIndex(this));
       listener.putControlSequence(new BibGlsUseIndex(this));

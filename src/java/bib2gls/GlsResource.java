@@ -9344,8 +9344,7 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si") || isNoCaseChangeCs(csname))
+            if (isNoCaseChangeCs(csname))
             {
                // skip argument
             }
@@ -9592,11 +9591,9 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("NoCaseChange") || csname.equals("ensuremath")
-                 || csname.equals("si") || isNoCaseChangeCs(csname))
+            if (isNoCaseChangeCs(csname))
             {
                // skip argument
-
             }
             else if (csname.endsWith("ref"))
             {
@@ -9890,13 +9887,12 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("ensuremath") || csname.equals("si") 
-                 || csname.endsWith("ref") || isNoCaseChangeCs(csname))
+            if (csname.endsWith("ref") || isNoCaseChangeCs(csname))
             {
                return;
             }
 
-            if (csname.equals("NoCaseChange"))
+            if (csname.equals("MFUskippunc") || csname.equals("NoCaseChange"))
             {
                // object should now be the argument, which should be
                // skipped.
@@ -10038,6 +10034,12 @@ public class GlsResource
 
    public boolean isNoCaseChangeCs(String csname)
    {
+      if (csname.equals("si") || csname.equals("ensuremath")
+       || csname.equals("NoCaseChange"))
+      {
+         return true;
+      }
+
       if (noCaseChangeCs == null) return false;
 
       for (String cs : noCaseChangeCs)
@@ -10209,24 +10211,31 @@ public class GlsResource
 
          wordBoundary = isWordBoundary(object);
 
-         if ((object instanceof ControlSequence) 
-              && ((ControlSequence)object).getName().equals("MFUwordbreak"))
+         if ((object instanceof ControlSequence))
          {
-            i++;
+            String name = ((ControlSequence)object).getName();
 
-            while (i < n)
-            {
-               object = list.get(i);
+            if (name.equals("MFUwordbreak")
+                 || name.equals("MFUskippunc")
+                 || name.equals("NoCaseChange")
+               )
+            { 
+               i++;
 
-               if (!(object instanceof Ignoreable))
+               while (i < n)
                {
-                  break;
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
                }
 
-               i++;
+               continue;
             }
-
-            continue;
          }
 
          if (wordBoundary || !prevWordBoundary)
@@ -10312,15 +10321,7 @@ public class GlsResource
                i++;
             }
 
-            if (csname.equals("NoCaseChange"))
-            {
-               // skip \NoCaseChange and its argument
-               wordBoundary = prevWordBoundary;
-               continue;
-            }
-
-            if (csname.equals("ensuremath") || csname.equals("si") 
-                || isNoCaseChangeCs(csname))
+            if (isNoCaseChangeCs(csname))
             {// no case-change
                wordCount++;
                continue;

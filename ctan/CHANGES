@@ -1,5 +1,10 @@
 v2.8 (pending):
 
+  * sentence case (firstuc) and title case now recognise \MFUskippunc. 
+    This should used to skip leading punctuation.
+
+  * title case now recognises \MFUwordbreak. 
+
   * new selection option 'selected before'
 
   * new resource options:

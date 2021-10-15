@@ -11840,8 +11840,21 @@ field value},
 @command{MFUwordbreak,
   name={\csfmt{MFU\-word\-break}},
   user1={\margm{punctuation}},
-  description={identifies \meta{punctuation} as a word break
-   for use within \idx{capitalisewords}},
+  description={if \idx{capitalisewords} contains punctuation that
+   should be treated as a word break then \meta{punctuation} 
+   should be encapsulated with this command to apply the case-change
+   to the following character},
+  note={\styfmt{mfirstuc} v2.07+\texparserdefnote},
+  category={command}
+}
+
+@command{MFUskippunc,
+  name={\csfmt{MFU\-skip\-punc}},
+  user1={\margm{punctuation}},
+  description={if \idx{makefirstuc} starts with a punctuation
+  character it should be encapsulated with this command to skip
+  \meta{punctuation} and apply the case-change to the following
+   character},
   note={\styfmt{mfirstuc} v2.07+\texparserdefnote},
   category={command}
 }
