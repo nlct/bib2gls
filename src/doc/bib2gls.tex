@@ -10884,6 +10884,12 @@ in \TeX\ or by the \TeX\ parser library when interpreting field
 values).  Only words in the exclusion list that start with an
 alphabetical character can be matched.  Punctuation following a
 word-boundary is not considered part of the next word.
+If you want to identify that a particular character forms a word
+break, you can use \code{\ics{MFUwordbreak}\margm{char}}. For
+example:
+\begin{codeenv}
+\field{name}=\marg{some word\cs{MFUwordbreak}\marg{/}phrase}
+\end{codeenv}
 
 \end{itemize}
 The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially

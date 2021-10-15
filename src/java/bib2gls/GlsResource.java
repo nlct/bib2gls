@@ -6758,6 +6758,9 @@ public class GlsResource
          sortDataIfRequired(dualEntries, dualSortSettings, "group");
       }
 
+      // just in case \ifglshaschildren has been used in sort value
+      clearChildLists();
+
       String charSetName = bib2gls.getTeXCharset().name();
 
       bib2gls.message(bib2gls.getMessage("message.writing", 
@@ -8243,48 +8246,45 @@ public class GlsResource
 
    }
 
+   private void clearChildLists()
+   {
+      if (childListUpdated)
+      {
+         for (int i = 0, n = bibData.size(); i < n; i++)
+         {
+            Bib2GlsEntry entry = bibData.get(i);
+            entry.clearChildren();
+         }
+
+         childListUpdated = false;
+      }
+   }
+
    public void updateChildLists()
    {
-      if (childListUpdated) return;
-
-      for (int i = 0; i < bibData.size(); i++)
+      if (!childListUpdated)
       {
-         Bib2GlsEntry entry = bibData.get(i);
-
-         String parentId = entry.getParent();
-
-         if (!(parentId == null || parentId.isEmpty()))
+         for (int i = 0; i < bibData.size(); i++)
          {
-            Bib2GlsEntry parent = getEntry(parentId, bibData);
+            Bib2GlsEntry entry = bibData.get(i);
 
-            if (parent != null)
-            {
-               parent.addChild(entry);
-            }
-         }
-      }
-
-      if (dualData != null)
-      {
-         for (int i = 0; i < dualData.size(); i++)
-         {
-            Bib2GlsEntry entry = dualData.get(i);
+            if (!entry.isSelected()) continue;
 
             String parentId = entry.getParent();
 
             if (!(parentId == null || parentId.isEmpty()))
             {
-               Bib2GlsEntry parent = getEntry(parentId, dualData);
+               Bib2GlsEntry parent = getEntry(parentId, bibData);
 
-               if (parent != null)
+               if (parent != null && parent.isSelected())
                {
                   parent.addChild(entry);
                }
             }
          }
-      }
 
-      childListUpdated = true;
+         childListUpdated = true;
+      }
    }
 
    private void checkParent(Bib2GlsEntry entry, int i, 
@@ -8649,6 +8649,7 @@ public class GlsResource
       {
          entries.remove(discard);
       }
+
    }
 
    public boolean flattenSort()

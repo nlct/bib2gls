@@ -4595,6 +4595,11 @@ public class Bib2GlsEntry extends BibEntry
       return children.get(i);
    }
 
+   public void clearChildren()
+   {
+      children = null;
+   }
+
    private Bib2GlsEntry removeChild(String id)
    {
       if (children == null) return null;
