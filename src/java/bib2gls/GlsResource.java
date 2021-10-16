@@ -1492,6 +1492,10 @@ public class GlsResource
          {
             dupLabelSuffix = getOptional(parser, list, opt);
          }
+         else if (opt.equals("prefix-only-existing"))
+         {
+            insertPrefixOnlyExists = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("save-original-id"))
          {
             saveOriginalId = getOptional(parser, list, opt);
@@ -11746,18 +11750,30 @@ public class GlsResource
             BibValueList bibValList = new BibValueList();
             bibValList.add(new BibUserString(elementList));
 
-            Bib2GlsEntry copy = entry.getMinimalCopy();
+            Bib2GlsEntry copy;
+
             String id = element.toString(bibParser);
+            Bib2GlsEntry elementEntry = getEntry(id);
 
-            String prefix = entry.getPrefix();
-
-            if (prefix != null && id.startsWith(prefix) 
-                 && id.length() > prefix.length())
+            if (elementEntry == null)
             {
-               id = id.substring(prefix.length());
+               copy = entry.getMinimalCopy();
+
+               String prefix = entry.getPrefix();
+
+               if (prefix != null && id.startsWith(prefix) 
+                   && id.length() > prefix.length())
+               {
+                  id = id.substring(prefix.length());
+               }
+
+               copy.setId(prefix, id);
+            }
+            else
+            {
+               copy = elementEntry.getMinimalCopy();
             }
 
-            copy.setId(prefix, id);
             copy.putField("name", bibValList);
             copy.putField("name", elementList.toString(bibParser));
 
@@ -11814,6 +11830,21 @@ public class GlsResource
          }
 
          return false;
+      }
+
+      public String toString()
+      {
+         StringBuilder builder = new StringBuilder();
+
+         for (int i = 0; i < fields.length; i++)
+         {
+            if (i > 0) builder.append(',');
+
+            builder.append(fields[i]);
+         }
+
+         return String.format("%s[fields=[%s],method=%s,csname=%s]",
+            getClass().getSimpleName(), builder, method, csname);
       }
 
       private String[] fields;
@@ -11879,6 +11910,11 @@ public class GlsResource
       String format = formatDecimalFields.get(field);
 
       return format;
+   }
+
+   public boolean isInsertPrefixOnlyExists()
+   {
+      return insertPrefixOnlyExists;
    }
 
    public boolean isAppendPrefixFieldEnabled(String field)
@@ -12450,6 +12486,8 @@ public class GlsResource
    private boolean createMissingParents = false;
 
    private boolean childListUpdated = false;
+
+   private boolean insertPrefixOnlyExists=false;
 
    private int compactRanges = 0;
 

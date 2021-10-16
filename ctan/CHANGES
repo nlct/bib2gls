@@ -24,6 +24,7 @@ v2.8 (pending):
     - secondary-match
     - secondary-not-match
     - encapsulate-sort
+    - prefix-only-existing
 
   * issue #10: explicit ranges with identical start and end should
     collapse to a normal location

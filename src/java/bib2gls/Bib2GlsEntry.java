@@ -175,6 +175,11 @@ public class Bib2GlsEntry extends BibEntry
       return super.getId();
    }
 
+   private void setOriginalId(String id)
+   {
+      super.setId(id);
+   }
+
    public void setId(String prefix, String label)
    {
       labelPrefix = prefix;
@@ -196,8 +201,10 @@ public class Bib2GlsEntry extends BibEntry
       return processLabel(label, false);
    }
 
-   public String processLabel(String label, boolean isCs)
+   public String processLabel(String originalLabel, boolean isCs)
    {
+      String label = originalLabel;
+
       if (label.startsWith("dual."))
       {
          String prefix = resource.getDualPrefix();
@@ -265,6 +272,16 @@ public class Bib2GlsEntry extends BibEntry
          else if (labelPrefix != null)
          {
             label = String.format("%s%s", labelPrefix, label);
+         }
+      }
+
+      if (resource.isInsertPrefixOnlyExists())
+      {
+         Bib2GlsEntry entry = resource.getEntry(label);
+
+         if (entry == null)
+         {
+            return originalLabel;
          }
       }
 
@@ -4000,6 +4017,11 @@ public class Bib2GlsEntry extends BibEntry
 
       StringBuilder primaryBuilder = new StringBuilder();
 
+      if (locationList == null)
+      {
+         locationList = new Vector<String>();
+      }
+
       primaryBuilder = updateLocationList(resource.getMinLocationRange(), 
         resource.getSuffixF(), resource.getSuffixFF(), 
         resource.getLocationGap(),
@@ -4640,7 +4662,8 @@ public class Bib2GlsEntry extends BibEntry
       entry.recordMap = recordMap;
       entry.base = base;
       entry.labelPrefix = labelPrefix;
-      entry.setId(getId());
+      entry.labelSuffix = labelSuffix;
+      entry.setOriginalId(getOriginalId());
       entry.setRecordIndex(recordIndex);
 
       return entry;

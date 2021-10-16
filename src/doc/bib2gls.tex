@@ -8917,6 +8917,14 @@ start of the labels in the entry definitions and will replace
 the \idprefixfmt{ext1} prefix with \idprefixfmt{gls} in the
 cross-references.
 
+\optsection[\subsubsection]{prefix-only-existing}
+
+This is a boolean option. It's possible that a prefix can end up being
+inserted when there's no entry in the current \idx{resourceset} that
+matches the prefixed label.  If this option is set then the prefix
+won't be added if there's no matching entry.  The default setting is
+\csopt[false]{prefix-only-existing}.
+
 \optsection[\subsubsection]{save-original-id}
 
 The \meta{value} may be the keywords \code{false} or \code{true} or
