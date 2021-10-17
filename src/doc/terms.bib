@@ -1,0 +1,385 @@
+% Encoding: UTF-8
+
+@entry{primaryentry,
+  name={primary entry},
+  plural={primary entries},
+  user1`={idx.primary},
+  description={The original entry created from a dual-entry type
+   (such as \atentry{dualentry}) or the entry from single-entry
+   types (such as \atentry{entry}) or \glspl{spawnedentry}.}
+}
+
+@entry{dualentry,
+  name={dual entry},
+  plural={dual entries},
+  user1={idx.dual},
+  description={The duplicate entry created from a dual-entry type
+   (such as \atentry{dualentry}). This duplicate is based on the
+   \gls{primaryentry} with modifications made according to various
+   settings. With tertiary entry types, the dual entry represents 
+   two entries: the \glsdisp{secondaryentry}{secondary} and
+   \glsdisp{tertiaryentry}{tertiary}.
+   See \sectionref{sec:dualentry}.}
+}
+
+@entry{secondaryentry,
+  name={secondary entry},
+  plural={secondary entries},
+  user1={idx.secondary},
+  description={For the tertiary entry types, such as
+  \atentry{tertiaryindexabbreviationentry}, there are only actually
+  two objects defined within \bibgls: the 
+  \glsdisp{primaryentry}{primary} and the \glsdisp{dualentry}{dual},
+  but the code that is written in the \ext{glstex} file for the 
+  \gls{dualentry} actually defines two entries, which are the 
+  secondary and tertiary entries.
+  This should not be confused with the \gls{secondaryglossary}.
+  See \sectionref{sec:tertiaryentry}.}
+}
+
+@entry{tertiaryentry,
+  name={tertiary entry},
+  plural={tertiary entries},
+  user1={idx.tertiary},
+  description={An entry that isn't defined as a separated object
+  within \bibgls, but is defined within the \ext{glstex} file 
+  as a by-product of the dual definition code for tertiary entry
+  types.}
+}
+
+@entry{mainentry,
+  name={main entry},
+  plural={main entries},
+  description={The originating entry from which
+   the \glspl{spawnedentry} are created. A main entry may 
+   be a dual-entry type, consisting of a \gls{primaryentry}
+   and \gls{dualentry}.
+   (Not to be confused with the main glossary.)}
+}
+
+@entry{progenitor,
+  name={progenitor},
+  user1={idx.progenitor},
+  description={The \gls{mainentry} for the \atentry{progenitor}
+  entry type.}
+}
+
+@entry{progeny,
+  name={progeny},
+  user1={idx.progeny},
+  description={The \glspl{spawnedentry} for the \atentry{progenitor}
+  entry type.}
+}
+
+@entry{multientrytype,
+  name={multi-entry type},
+  description={An entry type that can spawn multiple
+   \glspl{primaryentry}. Some multi-entry types can also spawn a
+   \gls{dualentry}. See \sectionref{sec:multientry}.}
+}
+
+@entry{spawnedentry,
+  name={spawned entry},
+  plural={spawned entries},
+  description={A duplicate entry created from a \gls{multientrytype}
+   (such as \atentry{spawnentry}).}
+}
+
+@entry{principallocation,
+  name={principal (or primary) location},
+  text={principal location},
+  description={A special location (\gls{record}) which indicates the principal 
+   or primary place in the document where the entry is mentioned
+   or discussed. The location is identified by the principal or
+   primary format (\csopt{principal-location-formats}).}
+}
+
+@entry{mainglossary,
+  name={main glossary},
+  description={The default glossary in the document identified by
+   \cs{glsdefaulttype} (which will have the label \code{main} unless
+   \styopt{nomain} is used). If \styopt{nomain} is used then 
+   \cs{glsdefaulttype} will be set to the label of the first glossary 
+   to be defined.}
+}
+
+@entry{mainlist,
+  name={main (or primary) list},
+  text={main list},
+  description={The \bibgls\ list of \glspl{primaryentry}, which is sorted
+  according to the \csopt{sort} resource option. The entries may or
+  may not be assigned to the same glossary, and the list may only be
+  a subset of entries. If \csopt[combine]{dual-sort} is used, then
+  the main list will also contain all the \glspl{dualentry}.}
+}
+
+@entry{duallist,
+  name={dual list},
+  description={The \bibgls\ list of \glspl{dualentry}, which is sorted
+  according to the \csopt{dual-sort} resource option. The entries may or
+  may not be assigned to the same glossary, and the list may only be
+  a subset of entries. If \csopt[combine]{dual-sort} is used then
+  all entries will be in the \gls{mainlist} and there won't be a dual
+  list.}
+}
+
+@entry{primaryglossary,
+  name={primary (or principal) glossary},
+  text={primary glossary},
+  plural={primary glossaries},
+  description={A glossary that contains entries that have the \field{type}
+   field set to that glossary's label. Note that a primary glossary
+   may contain both \glsdisp{primaryentry}{primary} and
+   \glspl{dualentry}.}
+}
+
+@entry{secondaryglossary,
+  name={secondary glossary},
+  plural={secondary glossaries},
+  description={A secondary glossary is one that contains labels of
+   entries that have been defined for another glossary. The actual
+   entry's \field{type} field will be set to the 
+   \gls{primaryglossary}.}
+}
+
+@entry{record,
+  name={record},
+  description={Recording is \bibgls's equivalent of indexing. 
+  When the \styopt{record} package option is set, each
+  time an entry is indexed in the document (using commands like
+  \cs{gls} or \cs{glstext}) a record is added to the \ext{aux}
+  file that makes a note of the entry label, the location, the
+  counter that was used to obtain the location, and (optionally)
+  hyperlink information. A record may be \glsdisp{ignoredrecord}{ignored} 
+  or \glsdisp{discardedrecord}{discarded} but, regardless of this, 
+  if an entry has at least one record it will be considered for selection 
+  for any of the \qt{recorded} selection options.}
+}
+
+@entry{ignoredrecord,
+  name={ignored record},
+  user1={idx.ignoredrecord},
+  description={A record with the format \encap{glsignore} or
+  \encap{glstriggerrecordformat}. This record indicates that the 
+  entry should be considered for selection
+  with any of the \qt{recorded} selection options, but the record
+  should not be added to the location list.}
+}
+
+@entry{discardedrecord,
+  name={discarded record},
+  description={A record that is discarded because either it is
+  identical to another record or it conflicts with another record.}
+}
+
+@entry{supplementalrecord,
+  name={supplemental record},
+  description={A record obtained from another document.
+  See \sectionref{sec:supplementalopts}.}
+}
+
+@entry{supplementaldocument,
+  name={supplemental (or supplementary) document},
+  name={supplemental document},
+  description={A related document from which
+  \glspl{supplementalrecord} are obtained.}
+}
+
+@entry{maindocument,
+  name={main document},
+  description={The principal document that has its own glossary but
+  the \glspl{locationlist} may also contain external locations obtained from a 
+  \gls{supplementaldocument}.}
+}
+
+@entry{recordcount,
+  name={record count},
+  description={An entry's record count is the total number of records 
+   (including \glsdisp{discardedrecord}{discarded} and
+   \glsdisp{ignoredrecord}{ignored}) written to the \ext{aux} file
+   that are associated with the entry. It's also possible to have 
+   sub-totals for each record counter.}
+}
+
+@entry{recordedentry,
+  name={recorded entry},
+  plural={recorded entries},
+  description={An entry that has one or more \glspl{record}.}
+}
+
+@entry{unrecordedentry,
+  name={unrecorded entry},
+  plural={unrecorded entries},
+  description={An entry that doesn't have any \glspl{record}.}
+}
+
+@entry{locationlist,
+  name={location list},
+  user1={idx.locationlist},
+  description={Formatted list of locations obtained from an entry's
+  \glspl{record}. This won't include \glsdisp{ignoredrecord}{ignored}
+  or \glsdisp{discardedrecord}{discarded} records, and a run of
+  locations may be compressed into a range.}
+}
+
+@entry{parententry,
+  name={parent entry},
+  plural={parent entries},
+  description={An entry in a hierarchical glossary
+   that is linked to, but one level up from, its associated
+   \gls{childentry}.}
+}
+
+@entry{childentry,
+  name={child entry},
+  plural={child entries},
+  description={An entry in a hierarchical glossary
+   that is linked to, but one level down from, its associated
+   \gls{parententry}.}
+}
+
+@entry{sub-entry,
+  name={sub-entry},
+  plural={sub-entries},
+  description={A \gls{childentry}. More specifically, when
+  contrasted with sub-sub-entry etc, this may refer to level~1 entries 
+  (which have a \glsdisp{parententry}{parent} that is a
+  \gls{top-levelentry}).}
+}
+
+@entry{hierarchicalglossary,
+  name={hierarchical glossary},
+  plural={hierarchical glossaries},
+  description={A glossary where the entries are ranked according to 
+   some classification. Level~0 indicates \glspl{top-levelentry},
+   level~1 indicates \glspl{childentry} that have a
+   level~0 \glsdisp{parententry}{parent}, level~2 indicates 
+   \glspl{childentry} that have a
+   level~1 \glsdisp{parententry}{parent}, and so on.}
+}
+
+@entry{sibling,
+  name={sibling entry},
+  text={sibling},
+  description={Two or more \glspl{childentry} are siblings if
+   they all share the same \gls{parententry}.}
+}
+
+@entry{lonelychildentry,
+  name={lonely child entry},
+  plural={lonely child entries},
+  description={A \gls{childentry} that has no selected \glspl{sibling}.}
+}
+
+@entry{ancestor,
+  name={ancestor},
+  description={An entry's \glsdisp{parententry}{parent} or an ancestor of 
+  the \glsdisp{parententry}{parent}.}
+}
+
+@entry{top-levelentry,
+  name={top-level entry},
+  plural={top-level entries},
+  description={An entry that doesn't have a \gls{parententry}.}
+}
+
+@entry{masterdocument,
+  name={master document},
+  description={A main or principal document that contains a glossary
+   with entries referenced by smaller documents that don't have their own
+   glossary. See \sectionref{sec:master}.}
+}
+
+@entry{primarycollatorstrength,
+  name={primary collator strength},
+  description={A collator strength value that indicates only primary
+   differences are considered significant during comparison.
+   This is locale dependant, but typically different base letters
+   are considered a primary difference.}
+}
+
+@entry{secondarycollatorstrength,
+  name={secondary collator strength},
+  description={A collator strength value that indicates only primary
+  and secondary differences are considered significant during comparison.
+  This is locale dependant. For example, in some languages different
+  accented forms of the same base letter may be considered a
+  secondary difference.}
+}
+
+@entry{tertiarycollatorstrength,
+  name={tertiary collator strength},
+  description={A collator strength value that indicates only
+  primary, secondary and tertiary differences are considered
+  significant during comparison. This is locale dependant. For
+  example, different cases of the same base letter may be considered a
+  tertiary difference.}
+}
+
+@entry{identicalcollatorstrength,
+  name={identical collator strength},
+  description={A collator strength value that indicates that all
+  differences are considered significant during comparison.}
+}
+
+@entry{definitionindex,
+  name={definition index},
+  description={An index (starting from 0) that's incremented
+  every time a new entry object is created within \bibgls.
+  This relates to the order of definitions within the \ext{bib}
+  files. Each \gls{dualentry} and \gls{spawnedentry} will increment
+  the underlying counter but only when they are created, which
+  may not happen until after all bib files for the \gls{resourceset} have
+  been parsed.}
+}
+
+@entry{orderofuseindex,
+  name={order of use index},
+  description={The record index is a value (starting from 0) that's incremented
+  every time a record is created while parsing the \ext{aux} file.
+  The first time a non-ignored record is added to a given entry, the record
+  index is assigned to that entry's order of use index. So the index
+  provides a relative order of use. So if entry1 is the first entry
+  to be indexed, it will have order of use index~0. If entry1 is
+  then indexed twice more and then entry2 is indexed, then entry2's
+  order of use index will be~3.}
+}
+
+@entry{resourceset,
+  name={resource set},
+  user1={idx.resourceset},
+  description={The set of options and entries associated with a
+   \gls{resourcecommand}. See \sectionref{sec:resourcesets}.}
+}
+
+@entry{resourcecommand,
+  name={resource command},
+  description={\cs{glsxtrresourcefile} or \cs{GlsXtrLoadResources}.}
+}
+
+@entry{crossresourceref,
+  name={cross-resource reference},
+  user1={idx.crossresourceref},
+  description={A reference from a \gls{recordedentry} provided in
+  one \gls{resourceset} to an \gls{unrecordedentry} in another
+  \gls{resourceset}. See \sectionref{sec:resourcesets}.}
+}
+
+@entry{cross-referencefield,
+ name={cross-reference field},
+ description={A field used for cross-referencing another entry:
+ \field{see}, \field{seealso} and \field{alias}.
+ Other fields can be identified as a list of dependent entry labels
+ with \csopt{dependency-fields}.}
+}
+
+@entry{ignoredglossary,
+  name={ignored glossary},
+  plural={ignored glossaries},
+  user1={idx.ignoredglossary},
+  description={A glossary defined with commands like
+  \cs{newignoredglossary}. An ignored glossary doesn't have an
+associated title (so it one is required it needs to be explicitly
+set), and isn't picked up by iterative commands such as 
+  \cs{printunsrtglossaries}.}
+}
