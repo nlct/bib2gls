@@ -25,6 +25,8 @@ v2.8 (pending):
     - secondary-not-match
     - encapsulate-sort
     - prefix-only-existing
+    - save-principal-locations (synonym for save-primary-locations)
+    - principal-location-formats (synonym for primary-location-formats)
 
   * issue #10: explicit ranges with identical start and end should
     collapse to a normal location

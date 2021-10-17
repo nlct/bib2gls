@@ -1148,7 +1148,8 @@ public class GlsResource
          {
             saveLocList = getBoolean(parser, list, opt);
          }
-         else if (opt.equals("save-primary-locations"))
+         else if (opt.equals("save-primary-locations")
+                 || opt.equals("save-principal-locations"))
          {
             String val = getChoice(parser, list, opt,
               "false", "remove", "retain", "start", "default format");
@@ -1174,7 +1175,8 @@ public class GlsResource
                savePrimaryLocations = SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT;
             }
          }
-         else if (opt.equals("primary-location-formats"))
+         else if (opt.equals("primary-location-formats")
+               || opt.equals("principal-location-formats"))
          {
             primaryLocationFormats = getStringArray(parser, list, opt);
 
@@ -1186,7 +1188,8 @@ public class GlsResource
          else if (opt.equals("combine-dual-locations"))
          {
             String val = getChoice(parser, list, opt,
-              "false", "both", "dual", "primary");
+              "false", "both", "dual", "primary",
+              "dual retain principal", "primary retain principal");
 
             if (val.equals("false"))
             {
@@ -1203,6 +1206,14 @@ public class GlsResource
             else if (val.equals("primary"))
             {
                combineDualLocations = COMBINE_DUAL_LOCATIONS_PRIMARY;
+            }
+            else if (val.equals("dual retain principal"))
+            {
+               combineDualLocations = COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL;
+            }
+            else if (val.equals("primary retain principal"))
+            {
+               combineDualLocations = COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL;
             }
          }
          else if (opt.equals("save-child-count"))
@@ -5234,14 +5245,44 @@ public class GlsResource
 
                if (recordLabel.equals(primaryId))
                {
-                  entry.addRecord(record);
-                  hasRecords = true;
-
-                  if (dual != null &&
-                    combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
+                  if (dual == null)
                   {
-                     dual.addRecord(record.copy(dualId));
-                     dualHasRecords = true;
+                     entry.addRecord(record);
+                     hasRecords = true;
+                  }
+                  else
+                  {
+/*
+ * This record is for the primary entry.
+ */
+                     if (combineDualLocations == COMBINE_DUAL_LOCATIONS_OFF
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_BOTH
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL
+                         )
+                     {
+/*
+ * Add the record to the primary entry location list.
+ * If 'dual retain principal' is on, only add if this is a
+ * principal location.
+ */
+                        entry.addRecord(record,
+                         combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL);
+                        hasRecords = true;
+                     }
+
+                     if (combineDualLocations == COMBINE_DUAL_LOCATIONS_BOTH
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL
+                        )
+                     {
+/*
+ * Copy the record to the dual entry location list.
+ */
+                        dual.addRecord(record.copy(dualId));
+                        dualHasRecords = true;
+                     }
                   }
                }
 
@@ -5249,12 +5290,35 @@ public class GlsResource
                {
                   if (recordLabel.equals(dualId))
                   {
-                     dual.addRecord(record);
-                     dualHasRecords = true;
-
-
-                     if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
+/*
+ * This record is for the dual entry.
+ */
+                     if (combineDualLocations == COMBINE_DUAL_LOCATIONS_OFF
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_BOTH
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL
+                         )
                      {
+/*
+ * Add the record to the dual entry location list.
+ * If 'primary retain principal' is on, only add if this is a
+ * principal location.
+ */
+                        dual.addRecord(record,
+                           combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL);
+                        dualHasRecords = true;
+                     }
+
+
+                     if (combineDualLocations == COMBINE_DUAL_LOCATIONS_BOTH
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY
+                      || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL
+                        )
+                     {
+/*
+ * Copy the record to the primary entry location list.
+ */
                         entry.addRecord(record.copy(primaryId));
                         hasRecords = true;
                      }
@@ -7214,10 +7278,12 @@ public class GlsResource
                {
                   boolean isPrimary = ((Bib2GlsDualEntry)entry).isPrimary();
 
-                  if ((combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY 
-                        && isPrimary)
-                    ||(combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL 
-                        && !isPrimary))
+                  if (((combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY 
+                        || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL
+                        ) && isPrimary)
+                    ||((combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL 
+                        || combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL
+                        ) && !isPrimary))
                   {
                      entry.updateLocationList();
                   }
@@ -7296,7 +7362,9 @@ public class GlsResource
                }
 
                if (saveLocations
-                && combineDualLocations != COMBINE_DUAL_LOCATIONS_PRIMARY)
+                && !(combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY
+                    || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL
+                   ))
                {
                   entry.updateLocationList();
                }
@@ -7658,12 +7726,30 @@ public class GlsResource
 
       if (getSavePrimaryLocationSetting() != SAVE_PRIMARY_LOCATION_OFF)
       {
-         String val = entry.getPrimaryRecordList();
+         boolean writeLocations = true;
 
-         if (val != null)
+         if (entry instanceof Bib2GlsDualEntry)
          {
-            writer.format("\\GlsXtrSetField{%s}{primarylocations}{%s}%n",
-              id, val);
+            boolean isPrimary = ((Bib2GlsDualEntry)entry).isPrimary();
+
+            if ((combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY 
+                  && !isPrimary)
+              ||(combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL 
+                  && isPrimary))
+            {
+               writeLocations = false;
+            }
+         }
+
+         if (writeLocations)
+         {
+            String val = entry.getPrimaryRecordList();
+
+            if (val != null)
+            {
+               writer.format("\\GlsXtrSetField{%s}{primarylocations}{%s}%n",
+                 id, val);
+            }
          }
       }
 
@@ -12282,6 +12368,8 @@ public class GlsResource
    public static final int COMBINE_DUAL_LOCATIONS_BOTH=1;
    public static final int COMBINE_DUAL_LOCATIONS_PRIMARY=2;
    public static final int COMBINE_DUAL_LOCATIONS_DUAL=3;
+   public static final int COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL=4;
+   public static final int COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL=5;
 
    private int combineDualLocations = COMBINE_DUAL_LOCATIONS_OFF;
 

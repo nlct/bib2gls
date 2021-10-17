@@ -3125,6 +3125,11 @@ public class Bib2GlsEntry extends BibEntry
 
    public void addRecord(GlsRecord record)
    {
+      addRecord(record, false);
+   }
+
+   public void addRecord(GlsRecord record, boolean onlyIfPrimary)
+   {
       if (record.getFormat().equals("glsignore"))
       {
          bib2gls.debugMessage("message.ignored.record", record);
@@ -3165,6 +3170,7 @@ public class Bib2GlsEntry extends BibEntry
 
       GlsRecord primary = null;
       int setting = GlsResource.SAVE_PRIMARY_LOCATION_OFF;
+      boolean addRecord = !onlyIfPrimary;
 
       if (resource.isPrimaryLocation(record.getFormat()))
       {
@@ -3178,6 +3184,16 @@ public class Bib2GlsEntry extends BibEntry
          primaryRecords.add(primary);
 
          setting = resource.getSavePrimaryLocationSetting();
+
+         if (onlyIfPrimary)
+         {
+            addRecord = true;
+         }
+      }
+
+      if (!addRecord)
+      {
+         return;
       }
 
       if (records != null)
