@@ -88,9 +88,9 @@
 @entry{principallocation,
   name={principal (or primary) location},
   text={principal location},
-  description={A special location (\gls{record}) which indicates the principal 
+  description={A special \gls{location} (\gls{record}) which indicates the principal 
    or primary place in the document where the entry is mentioned
-   or discussed. The location is identified by the principal or
+   or discussed. The \gls{location} is identified by the principal or
    primary format (\csopt{principal-location-formats}).}
 }
 
@@ -149,11 +149,21 @@
   time an entry is indexed in the document (using commands like
   \cs{gls} or \cs{glstext}) a record is added to the \ext{aux}
   file that makes a note of the entry label, the location, the
-  counter that was used to obtain the location, and (optionally)
+  counter that was used to obtain the \gls{location}, and (optionally)
   hyperlink information. A record may be \glsdisp{ignoredrecord}{ignored} 
   or \glsdisp{discardedrecord}{discarded} but, regardless of this, 
   if an entry has at least one record it will be considered for selection 
   for any of the \qt{recorded} selection options.}
+}
+
+@entry{location,
+ name={location},
+ description={The value of the indexing counter when an entry is
+ \glsdisp{record}{recorded}. By default, this is the \counter{page}
+ counter. Each location has an associated format or \idx{encap},
+ which is the name of a formatting command that should be used to
+ encapsulate the location's value in the \gls{locationlist}.
+ The default is \encap{glsnumberformat}.}
 }
 
 @entry{ignoredrecord,
@@ -163,7 +173,7 @@
   \encap{glstriggerrecordformat}. This record indicates that the 
   entry should be considered for selection
   with any of the \qt{recorded} selection options, but the record
-  should not be added to the location list.}
+  should not be added to the \gls{locationlist}.}
 }
 
 @entry{discardedrecord,
@@ -188,8 +198,8 @@
 @entry{maindocument,
   name={main document},
   description={The principal document that has its own glossary but
-  the \glspl{locationlist} may also contain external locations obtained from a 
-  \gls{supplementaldocument}.}
+  the \glspl{locationlist} may also contain external
+  \glspl{location} obtained from a \gls{supplementaldocument}.}
 }
 
 @entry{recordcount,
@@ -216,71 +226,88 @@
 @entry{locationlist,
   name={location list},
   user1={idx.locationlist},
-  description={Formatted list of locations obtained from an entry's
+  description={Formatted list of \glspl{location} obtained from an entry's
   \glspl{record}. This won't include \glsdisp{ignoredrecord}{ignored}
   or \glsdisp{discardedrecord}{discarded} records, and a run of
-  locations may be compressed into a range.}
+  \glspl{location} may be compressed into a range. See
+  \sectionref{sec:locationopts} and \sectionref{sec:loclistdefs}.}
 }
 
 @entry{parententry,
   name={parent entry},
   plural={parent entries},
-  description={An entry in a hierarchical glossary
+  user1={idx.hierarchical-entry},
+  description={An entry in a \gls{hierarchicalglossary}
    that is linked to, but one level up from, its associated
-   \gls{childentry}.}
+   \gls{childentry}. See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{childentry,
   name={child entry},
   plural={child entries},
-  description={An entry in a hierarchical glossary
+  user1={idx.hierarchical-entry},
+  description={An entry in a \gls{hierarchicalglossary}
    that is linked to, but one level down from, its associated
-   \gls{parententry}.}
+   \gls{parententry}. See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{sub-entry,
   name={sub-entry},
   plural={sub-entries},
+  user1={idx.hierarchical-entry},
   description={A \gls{childentry}. More specifically, when
   contrasted with sub-sub-entry etc, this may refer to level~1 entries 
   (which have a \glsdisp{parententry}{parent} that is a
-  \gls{top-levelentry}).}
+  \gls{top-levelentry}). See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{hierarchicalglossary,
   name={hierarchical glossary},
   plural={hierarchical glossaries},
+  user1={idx.hierarchical-entry},
   description={A glossary where the entries are ranked according to 
    some classification. Level~0 indicates \glspl{top-levelentry},
    level~1 indicates \glspl{childentry} that have a
    level~0 \glsdisp{parententry}{parent}, level~2 indicates 
    \glspl{childentry} that have a
-   level~1 \glsdisp{parententry}{parent}, and so on.}
+   level~1 \glsdisp{parententry}{parent}, and so on. See \sectionref{sec:hierarchicalopts}.}
+}
+
+@entry{flatglossary,
+ name={flat glossary},
+ description={A glossary that has no \glsdisp{hierarchicalglossary}{hierarchy}.
+ That is, there are no \glspl{childentry}. See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{sibling,
   name={sibling entry},
   text={sibling},
   description={Two or more \glspl{childentry} are siblings if
-   they all share the same \gls{parententry}.}
+   they all share the same \gls{parententry}.
+   See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{lonelychildentry,
   name={lonely child entry},
   plural={lonely child entries},
-  description={A \gls{childentry} that has no selected \glspl{sibling}.}
+  user1={idx.hierarchical-entry},
+  description={A \gls{childentry} that has no selected \glspl{sibling}.
+  See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{ancestor,
   name={ancestor},
+  user1={idx.hierarchical-entry},
   description={An entry's \glsdisp{parententry}{parent} or an ancestor of 
-  the \glsdisp{parententry}{parent}.}
+  the \glsdisp{parententry}{parent}.  See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{top-levelentry,
   name={top-level entry},
   plural={top-level entries},
-  description={An entry that doesn't have a \gls{parententry}.}
+  user1={idx.hierarchical-entry},
+  description={An entry that doesn't have a \gls{parententry}.
+  See \sectionref{sec:hierarchicalopts}.}
 }
 
 @entry{masterdocument,
@@ -329,17 +356,17 @@
   This relates to the order of definitions within the \ext{bib}
   files. Each \gls{dualentry} and \gls{spawnedentry} will increment
   the underlying counter but only when they are created, which
-  may not happen until after all bib files for the \gls{resourceset} have
+  may not happen until after all \ext{bib} files for the \gls{resourceset} have
   been parsed.}
 }
 
 @entry{orderofuseindex,
   name={order of use index},
-  description={The record index is a value (starting from 0) that's incremented
-  every time a record is created while parsing the \ext{aux} file.
-  The first time a non-ignored record is added to a given entry, the record
-  index is assigned to that entry's order of use index. So the index
-  provides a relative order of use. So if entry1 is the first entry
+  description={The \gls{record} index is a value (starting from 0) that's incremented
+  every time a \gls{record} is created while parsing the \ext{aux} file.
+  The first time a non-\gls{ignoredrecord} is added to a given entry, the 
+  \gls{record} index is assigned to that entry's order of use index. So the 
+  index provides a relative order of use. So if entry1 is the first entry
   to be indexed, it will have order of use index~0. If entry1 is
   then indexed twice more and then entry2 is indexed, then entry2's
   order of use index will be~3.}
@@ -354,7 +381,7 @@
 
 @entry{resourcecommand,
   name={resource command},
-  description={\cs{glsxtrresourcefile} or \cs{GlsXtrLoadResources}.}
+  description={\gls{glsxtrresourcefile} or \gls{GlsXtrLoadResources}.}
 }
 
 @entry{crossresourceref,
@@ -381,5 +408,25 @@
   \cs{newignoredglossary}. An ignored glossary doesn't have an
 associated title (so it one is required it needs to be explicitly
 set), and isn't picked up by iterative commands such as 
-  \cs{printunsrtglossaries}.}
+  \cs{printunsrtglossaries}. See \sectionref{sec:newglossary}.}
+}
+
+@entry{homograph,
+  name={homograph},
+  user1={idx.homograph},
+  description={Each word in a set of words that all have the same
+   spelling but different meanings. For example, lead (to guide
+   someone) and lead (metallic element) are homographs.}
+}
+
+@entry{encoding,
+  name={encoding},
+  user1={idx.encoding},
+  description={A text format that maps a byte or sequence of bytes
+  to a character. See \sectionref{sec:bibencoding} and \longarg{tex-encoding} 
+  for the \ext{bib} file encoding and \csopt{charset} for the \ext{glstex} 
+  file encoding.  See also the blog article
+\href{https://dickimaw-books.com/blog/binary-files-text-files-and-file-encodings/}{Binary
+Files, Text Files and File Encodings} for further information about
+  file encodings in general.}
 }

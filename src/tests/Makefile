@@ -46,6 +46,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 test.pdf	: test.glstex
 		pdflatex test
 		pdflatex test
+		pdflatex test
 
 test.glstex	: test.tex $(DEPS) test-entries.bib
 		pdflatex test

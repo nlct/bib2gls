@@ -46,7 +46,7 @@
 \usepackage{scrhack}
 \usepackage[hidelinks]{hyperref}
 \usepackage{cleveref}
-\usepackage[% v1.21+
+\usepackage[% v1.47+
    record,% use bib2gls
    index,% create index glossary
    entrycounter,% enable entry counting
@@ -187,7 +187,7 @@
 ]
 
 \newglossary*{terms}{Glossary}
-\GlsXtrLoadResources[src=terms,type=terms,save-locations=false]
+\GlsXtrLoadResources[src=terms,type=terms,save-locations=false,category=term]
 
 \newcommand{\igls}[2][]{%
  \glsxtrifhasfield{useri}{#2}{\glsadd{\glscurrentfieldvalue}}{}%
@@ -1353,13 +1353,13 @@ can select only those entries that have been used in the document,
 as well as any dependent entries, which reduces the \TeX\ resources
 required by not defining unnecessary commands.
 
-Since \bibgls\ can also sort and collate the recorded locations
+Since \bibgls\ can also sort and collate the recorded \glspl{location}
 present in the \ext{aux} file, it can simultaneously by-pass the
 need to use \idx!{makeindex} or \idx!{xindy}, although \bibgls\ 
 can be used together with an external indexing application if required. (For
 example, if a custom \idx{xindy} rule is needed.)
 
-An additional build may be required to ensure the locations are
+An additional build may be required to ensure the \glspl{location} are
 up-to-date as the page-breaking may be slightly different on the
 first \LaTeX\ run due to the unknown references being replaced with
 ?? which can be significantly shorter than the actual text produced
@@ -1393,9 +1393,13 @@ may prefer to start with if you are unfamiliar with the
 \tableofcontents
 \listoftables
 \listoffigures
-\printunsrtglossary*[type=terms,style=index,groups=false]
+\printunsrtglossary*[type=terms,style=altlist,groups=false]
 {%
-  \renewcommand{\glsextrapostnamehook}[1]{%
+  \MFUhyphentrue
+  \glssetcategoryattribute{term}{glossname}{title}%
+  \renewcommand{\glslistitem}[1]{%
+    \item[\glsentryitem{#1}%
+          \glstarget{#1}{\glossentryname{#1}}]%
     \glsxtrifhasfield{useri}{#1}{\glsadd{\glscurrentfieldvalue}}{}%
   }
 }
@@ -1420,7 +1424,7 @@ can now be analogous to that used with \idx{bibtex} (or
 \appfmt{biber}), where only those entries that have been recorded in the
 document (and possibly their dependent entries) will be extracted
 from the \ext{bib} file. Since \bibgls\ can also perform
-\hierarchical\ sorting and can collate location lists, it doubles as
+\hierarchical\ sorting and can collate \glspl{locationlist}, it doubles as
 an indexing application, which means that the \idx{makeglossaries}
 step can be skipped.
 Note that \bibgls\ doesn't warn you if an entry that's referenced
@@ -1435,7 +1439,7 @@ by iterating over all defined entries and calling
 entries defined, so \ics{glsaddall} does nothing. If you want to
 select all entries, just use \csopt[all]{selection} instead (which
 has the advantage over \ics{glsaddall} in that it doesn't create a
-redundant location for each entry).
+redundant \gls{location} for each entry).
 
 Note that \bibgls\ requires the extension package
 \isty{glossaries-extra} and can't be used with just the base
@@ -1565,7 +1569,7 @@ Symbol: \idx!{mshiftchar}\cs{gls}\marg{v}\idx!{mshiftchar}. Abbreviation: \cs{gl
 There are more examples provided in \sectionref{sec:examples}.
 
 Note that there's no need to called \idx!{xindy} or \idx!{makeindex}
-since \bibgls\ automatically sorts the entries and collates the locations
+since \bibgls\ automatically sorts the entries and collates the \glspl{location}
 after selecting the required entries from the \ext{bib} file and
 before writing the temporary file that's input with \gls{glsxtrresourcefile}
 (or the more convenient shortcut
@@ -1586,7 +1590,7 @@ information that's used with the \ics{cs.makeglossaries} and
 \styfmt{glossaries} user manual~\cite{glossaries}). As from
 \styfmt{glossaries-extra} version 1.37, you can instead use
 \styopt[nameref]{record}, which saves some extra information for
-each location that's not available for the other indexing methods. 
+each \gls{location} that's not available for the other indexing methods. 
 See \longarg{merge-nameref-on} for further details.
 
 If you additionally want to use an indexing application, such
@@ -1976,11 +1980,11 @@ used to test the existence of a glossary:
 \begin{codeenv}
 \ics{ifglossaryexists}\margm{label}\margm{true}\margm{false}
 \end{codeenv}
-The unstarred version considers ignored glossaries as non-existent
-(and so will do \meta{false} for an ignored glossary). As from
+The unstarred version considers \glspl{ignoredglossary} as non-existent
+(and so will do \meta{false} for an \gls{ignoredglossary}). As from
 v4.46, this command now has a starred version
-\ics{ifglossaryexists*} that considers ignored glossaries as
-existing (and so will do \meta{true} for an ignored glossary). In
+\ics{ifglossaryexists*} that considers \glspl{ignoredglossary} as
+existing (and so will do \meta{true} for an \gls{ignoredglossary}). In
 the event that you have an older version of \sty{glossaries}, the
 \sty{glossaries-extra} package (v1.44+) will provide the starred
 form if it hasn't been defined. (In general, it's best to have
@@ -2381,7 +2385,7 @@ parse the \meta{options} part in each instance of \gls{glsxtr@resource}
 for \csopt{src} and determine if the corresponding \ext{bib} file or
 files are newer than the \ext{tex} file.
 
-It's not possible to determine if the location lists require
+It's not possible to determine if the \glspl{locationlist} require
 updating, just as it's not possible to do this for the
 \idx{toc}, list of figures, list of tables etc. (Or, if it could
 be implemented, the required code would make the document build far
@@ -3133,25 +3137,25 @@ found in the \ext{bib} file.
 
 \argsection{collapse-same-location-range}
 
-Collapse any explicit location range into a normal record if the locations
-are the same (default).
+Collapse any explicit \gls{location} range into a normal \gls{record} if
+the \glspl{location} are the same (default).
 
 \argsection{no-collapse-same-location-range}
 
-Don't collapse any explicit location range into a normal record if the locations
-are the same.
+Don't collapse any explicit \gls{location} range into a normal
+\gls{record} if the \glspl{location} are the same.
 
 \argsection{merge-wrglossary-records}
 
 For use with the \styopt{indexcounter} package option
 (\styfmt{glossaries-extra} v1.29+), this switch merges an entry's
-\counter{wrglossary} records for the same page location. This is the
+\counter{wrglossary} records for the same page \gls{location}. This is the
 default setting. (See also \csopt{save-index-counter}.)
 
 \argsection{no-merge-wrglossary-records}
 
 Don't merge an entry's \counter{wrglossary} records. This means that you
-may end up with duplicate page numbers in the entry's location list,
+may end up with duplicate page numbers in the entry's \gls{locationlist},
 but they will link to different parts of the page.
 
 \argsection{merge-nameref-on}
@@ -3171,7 +3175,7 @@ will always be empty. The most reliable target is given by
 associated counter name and \meta{hcounter} is
 obtained from \cs{theHentrycounter}, which is set to the hyper
 target command \csfmt{theH}\meta{counter} during indexing. Since
-this information can't be included in the location when indexing
+this information can't be included in the \gls{location} when indexing
 with \idx!{makeindex} or \idx!{xindy}, the base \sty{glossaries}
 package tries to obtain a prefix from which the target name can be
 formed. This doesn't work if \csfmt{theH}\meta{counter} can't be
@@ -3184,7 +3188,7 @@ indexing counter was incremented.
 
 The \code{nameref} record will be written to the \igls{locationlist} using:
 \nosecdef{glsxtrdisplaylocnameref}
-The \meta{file} part will be empty for normal internal locations,
+The \meta{file} part will be empty for normal internal \glspl{location},
 and will be set to the corresponding file name for 
 \glsdisp{supplementalrecord}{supplemental locations}.
 
@@ -3454,7 +3458,7 @@ but in general there is little need to use this switch.
 
 \argsection{map-format}
 
-This sets up the rule of precedence for partial location
+This sets up the rule of precedence for partial \gls{location}
 matches (see \sectionref{sec:locationopts}). The argument may be
 a comma-separated list of \meta{map}\code{:}\meta{value} pairs.
 Alternatively, you can have multiple instances of 
@@ -3465,7 +3469,7 @@ For example,
 \begin{verbatim}
 bib2gls --map-format "emph:hyperbf" mydoc
 \end{verbatim}
-This essentially means that if there's a record conflict
+This essentially means that if there's a \gls{record} conflict
 involving \encap{emph}, try replacing \encap{emph} with
 \encap{hyperbf} and see if that resolves the conflict.
 
@@ -3487,19 +3491,19 @@ or
 \begin{verbatim}
 bib2gls --map-format emph:hyperbf --map-format hypersf:hyperit mydoc
 \end{verbatim}
-then \bibgls\ will process these records as follows:
+then \bibgls\ will process these \glspl{record} as follows:
 \begin{enumerate}
-\item Accept the first record (\encap{emph}) since there's
-currently no conflict. (This is the first record for page~3 for the
+\item Accept the first \gls{record} (\encap{emph}) since there's
+currently no conflict. (This is the first \gls{record} for page~3 for the
 entry given by \code{gls.sample}.)
-\item The second record (\encap{hypersf}) conflicts 
-with the existing record (\encap{emph}). Neither has
+\item The second \gls{record} (\encap{hypersf}) conflicts 
+with the existing \gls{record} (\encap{emph}). Neither has
 the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
 \item The \encap{hypersf} format (from the new record) is mapped to
 \encap{hyperit},
-so \bibgls\ checks if the existing record
+so \bibgls\ checks if the existing \gls{record}
 has this format. In this case it doesn't (the format is
 \code{emph}). So \bibgls\ moves on to the next test:
 
@@ -3513,19 +3517,19 @@ the new record is discarded with a warning. Note that there's
 no look ahead to the next record. (There may be other 
 records for other entries also used on page~3 interspersed between these records.)
 \end{itemize}
-\item The third record (\encap{hyperbf}) conflicts 
-with the existing record (\encap{emph}). Neither has
+\item The third \gls{record} (\encap{hyperbf}) conflicts 
+with the existing \gls{record} (\encap{emph}). Neither has
 the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ again consults
 the mappings provided by \longargfmt{map-format}.
 \begin{itemize}
-\item  The new record's \encap{hyperbf} format has no mapping provided,
+\item  The new \gls{record}['s] \encap{hyperbf} format has no mapping provided,
 so \bibgls\ moves on to the next test:
 
-\item The existing record's \encap{emph} format has a mapping
-provided (\encap{hyperbf}). This matches the new record's format,
-so the new record takes precedence.
+\item The existing \gls{record}['s] \encap{emph} format has a mapping
+provided (\encap{hyperbf}). This matches the new \gls{record}['s] format,
+so the new \gls{record} takes precedence.
 
-This means that the location list ends up with the \encap{hyperbf}
+This means that the \gls{locationlist} ends up with the \encap{hyperbf}
 location for page~3.
 \end{itemize}
 \end{enumerate}
@@ -3534,20 +3538,20 @@ If, on the other hand, the mappings are given as
 \begin{verbatim}
 --map-format "emph:hyperit,hypersf:hyperit,hyperbf:hyperit"
 \end{verbatim}
-then all the three conflicting records (\encap{emph},
+then all the three conflicting \glspl{record} (\encap{emph},
 \encap{hypersf} and \encap{hyperbf}) will end up being replaced
-by a single record with \encap{hyperit} as the format.
+by a single \gls{record} with \encap{hyperit} as the format.
 
 Multiple conflicts will typically be rare as there's usually little
-reason for more than two or three different location formats within
+reason for more than two or three different \gls{location} formats within
 the same list. (For example, \encap{glsnumberformat} as the default
 and \encap{hyperbf} or \encap{hyperit} for a
 \gls{principallocation}.)
 
 \argsection{retain-formats}
 
-It's possible that you may not want to lose certain location
-formats, even if it means having duplicate locations. For example,
+It's possible that you may not want to lose certain \gls{location}
+formats, even if it means having duplicate \glspl{location}. For example,
 if you want to move a \gls{principallocation} using
 \csopt[remove]{save-principal-locations}. In which case, use this
 switch with a comma-separated list of formats that should be
@@ -3558,11 +3562,11 @@ Take care if you use this switch and you have an explicit range with
 coincident start and end locations. If the
 \glsdisp{principallocation}{principal record} is between
 the start and end format markers then the range can't collapse
-to an ordinary record.
+to an ordinary \gls{record}.
 
 \argsection{no-retain-formats}
 
-Normal location merging rules apply (default).
+Normal \gls{location} merging rules apply (default).
 
 \argsection{group}
 
@@ -3775,38 +3779,38 @@ group style, such as \glostyle{indexgroup}, is used (unless the
 
 \argsection{tex-encoding}
 
-\bibgls\ tries to determine the character encoding to use for the
+\bibgls\ tries to determine the character \igls{encoding} to use for the
 output files. If the document has loaded the \isty{inputenc} package then
-\bibgls\ can obtain the value of the encoding from the
+\bibgls\ can obtain the value of the \gls{encoding} from the
 \iext{aux} file. This is then converted to a name
 recognised by Java. For example, \code{utf8} will be mapped to
 \code{UTF-8}. If the \isty{fontspec} package has been loaded,
-\styfmt{glossaries-extra} will assume the encoding is \code{utf8} and
+\styfmt{glossaries-extra} will assume the \gls{encoding} is \code{utf8} and
 write that value to the \ext{aux} file.
 
 If neither package has been loaded, \bibgls\ will assume the \idx{JVM}['s]
-default encoding (identified by the \code{file.encoding} property). If this is
+default \gls{encoding} (identified by the \code{file.encoding} property). If this is
 incorrect or if \bibgls\ can't work out the appropriate mapping then you can
-specify the correct encoding using \longargfmt{tex-encoding} \meta{name} where
-\meta{name} is the encoding name (such as \code{UTF-8}).
+specify the correct \gls{encoding} using \longargfmt{tex-encoding} \meta{name} where
+\meta{name} is the \gls{encoding} name (such as \code{UTF-8}).
 
 If you have a problem with non-ASCII characters not displaying
 correctly in your document:
 \begin{itemize}
-\item Check that the file encoding of your document \ext{tex} file (or files)
+\item Check that the file \gls{encoding} of your document \ext{tex} file (or files)
 has been correctly set by your text editor.
-\item Check that your document supports that encoding (for example,
+\item Check that your document supports that \gls{encoding} (for example,
 through the \isty{inputenc} package).
 \item Check \bibgls's transcript file (\ext{glg}) for the line that
 starts
 \begin{verbatim}
 TeX character encoding:
 \end{verbatim}
-This should be followed by the encoding used by \bibgls\ when
+This should be followed by the \gls{encoding} used by \bibgls\ when
 creating the \ext{glstex} files. If this is incorrect use
 \longargfmt{tex-encoding}.
-\item Check that the encoding of the \ext{bib} files (set by your
-text editor or bibliographic management system) matches the encoding
+\item Check that the \gls{encoding} of the \ext{bib} files (set by your
+text editor or bibliographic management system) matches the \gls{encoding}
 line in the \ext{bib} file or the \csopt{charset} resource option.
 \end{itemize}
 
@@ -3949,10 +3953,10 @@ it does
 \nosecdef{rglsformat}
 instead.
 If the use of \gls{rglsformat} is triggered in this way,
-then \gls{rgls} writes a record to the \iext{aux} file
+then \gls{rgls} writes a \gls{record} to the \iext{aux} file
 with the \glsopt{format} set to \encap{glstriggerrecordformat}.
-This ensures that the record count is correct on the next run,
-but the record isn't added to the location list as
+This ensures that the \gls{recordcount} is correct on the next run,
+but the \gls{record} isn't added to the \gls{locationlist} as
 \bibgls\ recognises it as a special \igls{ignoredrecord}.
 Note that the entry will still appear in the usual glossary unless
 you assign it to a different one with \csopt{trigger-type}.
@@ -4042,24 +4046,32 @@ prefixed label.
 \label{sec:bibencoding}
 
 Avoid \idx{non-ASCII} characters in the \meta{id} if your document uses the 
-\isty{inputenc} package. (This isn't a problem for \XeLaTeX\ or
+\isty{inputenc} package.
+(This isn't a problem for \XeLaTeX\ or
 \LuaLaTeX, but you still need to avoid special characters.)
-You can set the character \idx{encoding} in the \ext{bib} file using:
+You can set the character \igls{encoding} in the \ext{bib} file using:
 \begin{codeenv}
 \idx{commentchar} Encoding: \meta{encoding-name}
 \end{codeenv}
-where \meta{encoding-name} is the name of the character encoding.
+where \meta{encoding-name} is the name of the character \gls{encoding}.
 For example:
 \begin{verbatim}
 % Encoding: UTF-8
 \end{verbatim}
-You can also set the encoding using the \csopt{charset} option,
+You can also set the \gls{encoding} using the \csopt{charset} option,
 but it's simpler to include the above comment on the first line of
 the \ext{bib} file. (This comment is also searched for by JabRef
-to determine the encoding, so it works for both applications.) 
+to determine the \gls{encoding}, so it works for both applications.) 
 If you don't use either method \bibgls\ will
 have to search the entire \ext{bib} file, which is inefficient and
-you may end up with a mismatched encoding.
+you may end up with a mismatched \gls{encoding}.
+
+Note that recent changes to the \LaTeX\ kernel now allow
+\idx{non-ASCII} characters in labels when using commands such as
+\cs{label} (with \sty{inputenc}). The commands used by the
+\sty{glossaries} package are more complicated, but changes have been
+made in \sty{glossaries} v4.47 and \sty{glossaries-extra} v1.46 to
+help support this, however it hasn't been fully tested.
 
 \section{Comments}
 \label{sec:bibcomments}
@@ -4083,13 +4095,9 @@ treated as a comment character and other unwanted material
 should be omitted.  Avoid using comments within field values.
 Comments are best placed outside of entry definitions.
 
-The most common type of comment is the encoding comment, described
+The most common type of comment is the \gls{encoding} comment, described
 above.  \BibTeX's \entrydef{comment} is also supported by \bibgls\
-for general comments, but not for the encoding. For example, JabRef
-uses \atentryfmt{Comment} for metadata.
-\begin{codeenv}
-\atentryfmt{Comment}\marg{jabref-meta: databaseType:bib2gls;}
-\end{codeenv}
+for general comments, but not for the \gls{encoding}.
 
 \section{Fields}
 \label{sec:fields}
@@ -4148,7 +4156,7 @@ Other entries can be cross-referenced using the \field{see},
 by using commands like \ics{gls} or \ics{glsxtrp} in any of the
 recognised fields. These will automatically be selected if the
 \csopt{selection} setting includes dependencies, but you may need to
-rebuild the document to ensure the location lists are correct.  Use
+rebuild the document to ensure the \glspl{locationlist} are correct.  Use
 of the \ics{glssee} command will create an \igls{ignoredrecord} and the
 \field{see} field will be set to the relevant information.  If an
 entry has the \field{see} field already set, any instance of
@@ -4177,7 +4185,7 @@ You can identify an arbitrary field as containing a list of dependent entry
 labels with \csopt{dependency-fields}. This instructs \bibgls\ to parse the 
 listed fields for dependencies in a similar manner to the \field{see} field, 
 but it doesn't add any information to the cross-referencing part of the 
-location list. The option may be used in combination with the \field{see} or
+\gls{locationlist}. The option may be used in combination with the \field{see} or
 \field{seealso} fields.
 
 \clearpage
@@ -5435,7 +5443,7 @@ index and a glossary:
 \cs{printunsrtglossary}\oarg{\printglossopt[index]{type},\printglossopt[mcolindexgroup]{style}}
 \cmd{end}\marg{document}
 \end{codeenv}
-This uses \csopt{combine-dual-locations} to combine the locations
+This uses \csopt{combine-dual-locations} to combine the \glspl{location}
 for the \primary\ and \dual\ entries so that they only appear in the
 index.
 
@@ -5742,7 +5750,7 @@ is rather like doing:
 \end{codeenv}
 but \code{dual.svm} will automatically be selected if \code{svm}
 is indexed in the document. If \code{dual.svm} isn't explicitly
-indexed, it won't have a location list.
+indexed, it won't have a \gls{locationlist}.
 
 If the \field{sort} field is missing \bibgls\ by default falls back
 on the \field{name} field. If this is missing, this sort value will
@@ -6123,7 +6131,7 @@ and \glsdisp{tertiaryentry}{tertiary} are both considered the
 \dual\ and are treated as a single entry for the purposes of sorting
 and collating.
 
-The \gls{tertiaryentry} will never have any locations. Any records
+The \gls{tertiaryentry} will never have any \glspl{location}. Any \glspl{record}
 found will be assigned to the \glsdisp{secondaryentry}{secondary}
 (and may then be moved to the \primary\ with
 \csopt[primary]{combine-dual-locations}). The
@@ -6941,17 +6949,17 @@ the \atentry{preamble} are retained by the interpreter for subsequent
 
 \optsection{charset}
 
-If the character \idx{encoding} hasn't been supplied in the \iext{bib} file
-with the encoding comment
+If the character \igls{encoding} hasn't been supplied in the \iext{bib} file
+with the \gls{encoding} comment
 \begin{alltt}
 \idx{commentchar} Encoding: \meta{encoding-name}
 \end{alltt}
-then you can supply the correct encoding using
+then you can supply the correct \gls{encoding} using
 \csopt[encoding-name]{charset}. In general, it's better to include
-the encoding in the \ext{bib} file where it can also be read by
+the \gls{encoding} in the \ext{bib} file where it can also be read by
 a \ext{bib} managing systems, such as JabRef.
 
-See \longarg{tex-encoding} for the encoding used to write the \ext{glstex}
+See \longarg{tex-encoding} for the \gls{encoding} used to write the \ext{glstex}
 file.
 
 \optsection{interpret-preamble}
@@ -7365,7 +7373,7 @@ characters in filenames). For example:
 By default all entries that have records in the \iext{aux} file will
 be selected as well as all their dependent entries. The dependent
 entries that don't have corresponding records on the first \LaTeX\
-run, may need an additional build to ensure their location lists
+run, may need an additional build to ensure their \glspl{locationlist}
 are updated.
 
 Remember that on the first \LaTeX\ run the \iext{glstex} files don't
@@ -7666,6 +7674,24 @@ entries.
 \section{Hierarchical Options}
 \label{sec:hierarchicalopts}
 
+Hierarchy is established by setting the \field{parent} field to the
+label of the parent entry. The parent and child entries are 
+sorted together, but hierarchical comparators will place child
+entries after their corresponding parent.
+
+The \sty{glossaries} package provides \ics{ifglshasparent} to
+determine whether or not an entry has the \field{parent} field set.
+If also provides \ics{ifglshaschildren}, but this command is
+inefficient as it has to iterate over all entries to find an entry
+with the \field{parent} field set to the relevant label. It's also
+non-trivial to determine which child entries have been included in
+the glossary with \idx!{makeindex} or \idx!{xindy}. \bibgls\ can
+provide this information with some of the options described in this
+section.
+
+It's also possible to \glsdisp{flatglossary}{flatten entries} (that is, remove the
+hierarchical information) or just flatten \glspl{lonelychildentry}.
+
 \optsection{save-child-count}
 
 This is a boolean option. The default setting is
@@ -7801,15 +7827,15 @@ moving a \child\ up one \hierarchicallevel\ are as follows:
 \item The \child\ must have a \parent, and
 \item the \child\ can't have any selected \glspl{sibling}, and
 \item if \csopt[only unrecorded parents]{flatten-lonely-rule}
-      then the \parent\ can't have a location list,
-      where the location list includes records and \field{see} or \field{seealso}
+      then the \parent\ can't have a \gls{locationlist}, where the 
+      \gls{locationlist} includes \glspl{record} and \field{see} or \field{seealso}
       cross-references (for the other rules the \parent\ 
-      may have a location list as long as it only has the one \child\ selected).
+      may have a \gls{locationlist} as long as it only has the one \child\ selected).
 \end{itemize}
 If the \child\ is selected for \hierarchical\ adjustment, 
 the \parent\ will be removed if:
 \begin{itemize}
-\item The \parent\ has no location list, and
+\item The \parent\ has no \gls{locationlist}, and
 \item \csopt{flatten-lonely-rule} isn't set to \optfmt{no discard}.
 \end{itemize}
 
@@ -7862,8 +7888,9 @@ and suppose the document contains:
 \cmd{end}\marg{document}
 \end{codeenv}
 Although the \code{duck} entry has \glspl{sibling} in the
-\filefmt{entries.bib} file, none of them have been recorded
-(indexed) in the document, nor has the \parent\ \code{birds} entry.
+\filefmt{entries.bib} file, none of them have been
+\glsdisp{recordedentry}{recorded} in the document, nor has the
+\parent\ \code{birds} entry.
 
 This document hasn't used \csopt{flatten-lonely}, so the default
 \csopt[false]{flatten-lonely} is assumed. This results in the
@@ -7957,7 +7984,7 @@ wouldn't have been altered. This adjustment ensures that in the
 document \code{\cs{gls}\marg{duck}} still produces \qt{duck} rather than
 \qt{birds, duck}.
 (If the \child\ and \parent\ \field{name} fields are identical,
-the terms are considered homographs. See below for further details.)
+the terms are considered \glspl{homograph}. See below for further details.)
 
 The \code{subsubitem} entry has also been adjusted. This was done
 in a multi-stage process, starting with sub-items and then moving down
@@ -7998,12 +8025,12 @@ This means that the name for \code{subitem} will be displayed as
 displayed as \qt{item, subitem, subsubitem}.
 
 \item The \glspl{parententry} \code{item} and \code{subitem}
-are removed from the selection as they have no location lists.
+are removed from the selection as they have no \glspl{locationlist}.
 \end{itemize}
 
 Note that the \code{cabbage} \gls{sub-entry} hasn't been adjusted. It
 doesn't have any \glspl{sibling} but its \gls{parententry} (\code{vegetable})
-has a location list so it can't be discarded.
+has a \gls{locationlist} so it can't be discarded.
 If I change the rule:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries.bib]{src},
@@ -8102,7 +8129,7 @@ even if they wouldn't be selected if the \gls{parententry} didn't exist.
 
 With both \optfmt{presort} and \optfmt{postsort}, if the \parent\ \field{name}
 is the same as the \glsdisp{childentry}{child's} \field{name}
-then the \child\ is considered a homograph and
+then the \child\ is considered a \igls{homograph} and
 the \glsdisp{childentry}{child's} name is set to:
 \begin{codeenv*}
 \format{bibglsflattenedhomograph}
@@ -8124,7 +8151,7 @@ This value is the default setting.
 \item[\optfmt{discard unrecorded}] This setting will adjust all
 \glspl{sub-entry} that have no \glspl{sibling} regardless of whether or not the
 \parent\ has a \igls{locationlist}.
-Only the \glspl{parententry} that don't have a location list will be
+Only the \glspl{parententry} that don't have a \gls{locationlist} will be
 removed from the selection.
 \item[\optfmt{no discard}] This setting will adjust all
 \glspl{sub-entry} that don't have \glspl{sibling} regardless of whether or not the
@@ -9068,7 +9095,7 @@ set of fields (that is, the setting is switched off).
 
 This setting makes those fields act like the \field{see} field by
 identifying the listed entries as dependencies, but the information
-isn't added to the cross-reference part of the location list.  This
+isn't added to the cross-reference part of the \gls{locationlist}.  This
 action is performed after \csopt{labelify-list}, if that's also set.
 
 For example, suppose the file \filefmt{entries-en.bib} contains:
@@ -11623,13 +11650,15 @@ the option \csopt[false]{save-locations} is used). The
 \field{location} field contains the code to typeset the formatted
 \igls{locationlist}.
 
-The \field{loclist} field has the syntax of an \isty{etoolbox} internal list
-and includes every location (except for the discarded duplicates and
-\iglspl{ignoredrecord}) with no range formations. Any explicit range markup 
-is stripped from the \glsopt{format} information to leave just the \idx{encap}
-name, so you just get the start and end locations added as individual 
-elements but they are still encapsulated with the associated formatting
-command. Each item in the list is provided in one of the following forms:
+The \field{loclist} field has the syntax of an \isty{etoolbox}
+internal list and includes every \gls{location} (except for the
+\glsdisp{discardedrecord}{discarded duplicates} and
+\iglspl{ignoredrecord}) with no range formations. Any explicit range
+markup is stripped from the \glsopt{format} information to leave
+just the \idx{encap} name, so you just get the start and end
+\glspl{location} added as individual elements but they are still
+encapsulated with the associated formatting command. Each item in
+the list is provided in one of the following forms:
 \begin{codeenv}
 \ics{glsseeformat}\oargm{tag}\margm{label list}\marg{}
 \end{codeenv}
@@ -11639,7 +11668,7 @@ for the cross-reference supplied by the \field{see} field,
 \end{codeenv}
 for the cross-reference supplied by the \field{seealso} field,
 \nosecdef{glsnoidxdisplayloc}
-for standard the internal locations, 
+for standard the internal \glspl{location}, 
 \begin{codeenv}
 \format{glsxtrdisplaysupploc}
 \end{codeenv}
@@ -11647,7 +11676,7 @@ for \glsdisp{supplementalrecord}{supplemental (external) locations} and
 \begin{codeenv}
 \format{glsxtrdisplaylocnameref}
 \end{codeenv}
-for \code{nameref} records. (See \sectionref{sec:supplementalopts}
+for \code{nameref} \glspl{record}. (See \sectionref{sec:supplementalopts}
 for more information about \glsdisp{supplementalrecord}{supplemental locations} and
 \longarg{merge-nameref-on} for more information about \code{nameref}
 records.)
@@ -11665,21 +11694,21 @@ when using commands like \ics{gls} or \ics{glsadd} (the encapsulator or
 default value is changed with \ics{GlsXtrSetDefaultNumberFormat}.
 The value of the \glsopt{format} key must be the name of 
 a text-block command without the leading backslash that takes 
-a single argument (the location). The location
+a single argument (the \gls{location}). The \gls{location}
 is encapsulated by that command. For example, 
 \begin{codeenv}
 \cs{gls}\oarg{\glsopt[\encap{textbf}]{format}}\marg{sample}
 \end{codeenv}
-will display the corresponding location in bold, but note that this
+will display the corresponding \gls{location} in bold, but note that this
 will no longer have a hyperlink if you've used \sty{hyperref}.
-If you want to retain the hyperlink you need the location
+If you want to retain the hyperlink you need the \gls{location}
 encapsulated with \cs{hyperbf} instead of \cs{textbf}:
 \begin{codeenv}
 \cs{gls}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{sample}
 \end{codeenv}
 The \csfmt{hyper}\meta{xx} set of commands all internally use
 \cs{glshypernumber} which adds the appropriate hyperlink to the
-location. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
+\gls{location}. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
 user manual for a list of all the \csfmt{hyper}\meta{xx} commands.
 
 Ranges can be explicitly formed using the parenthetical 
@@ -11690,53 +11719,55 @@ a text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd}. These will always
 form a range, regardless of \csopt{min-loc-range}, and will be
 encapsulated by \gls!{bibglsrange}. (This command is not used with
-ranges that are formed by collating consecutive locations.) The
+ranges that are formed by collating consecutive \glspl{location}.) The
 initial marker is stripped from the \meta{format} argument of the
-location formatting commands, such as \gls{glsnoidxdisplayloc}, to
+\gls{location} formatting commands, such as \gls{glsnoidxdisplayloc}, to
 allow for easy conversion to the corresponding text-block command.
 
-Explicit ranges don't merge with neighbouring locations, but will
-absorb any single locations within the range that don't conflict.
-(Conflicts will be moved to the start of the explicit range.)
-For example, if \code{\cs{gls}\marg{sample}} is used on page~1,
-\code{\cs{gls}\oarg{\glsopt[\idx{openrange}]{format}}\marg{sample}} is used on page~2, 
-\code{\cs{gls}\marg{sample}} is used on page~3, and
-\code{\cs{gls}\oarg{\glsopt[\idx{closerange}]{format}}\marg{sample}} is used on page~4, then the location
-list will be 1, 2--4. The entry on page~3 is absorbed into the
-explicit range, but the range can't be expanded to include page~1.
-If the entry on page~3 had a different format to the explicit range,
-for example \code{\cs{gls}\oarg{\glsopt[\encap{textbf}]{format}}\marg{sample}} 
+Explicit ranges don't merge with neighbouring \glspl{location}, but
+will absorb any single \glspl{location} within the range that don't
+conflict.  (Conflicts will be moved to the start of the explicit
+range.) For example, if \code{\cs{gls}\marg{sample}} is used on
+page~1,
+\code{\cs{gls}\oarg{\glsopt[\idx{openrange}]{format}}\marg{sample}}
+is used on page~2, \code{\cs{gls}\marg{sample}} is used on page~3, and
+\code{\cs{gls}\oarg{\glsopt[\idx{closerange}]{format}}\marg{sample}}
+is used on page~4, then the \gls{locationlist} will be 1, 2--4. The
+entry on page~3 is absorbed into the explicit range, but the range
+can't be expanded to include page~1.  If the entry on page~3 had a
+different format to the explicit range, for example
+\code{\cs{gls}\oarg{\glsopt[\encap{textbf}]{format}}\marg{sample}}
 then it would cause a warning and be moved before the start of the
-range so that the location list would then be 1, \textbf{3}, 2--4. 
+range so that the \gls{locationlist} would then be 1, \textbf{3}, 2--4. 
 
 An \igls{ignoredrecord} identifies a term that needs to be treated as
-though it has a record for selection purposes, but the record
-should not be included in the location list.
+though it has a \gls{record} for selection purposes, but the
+\gls{record} should not be included in the \gls{locationlist}.
 The special format \glsaddopt[\encap{glsignore}]{format} is provided
-by the \styfmt{glossaries} package for cases where the location
+by the \styfmt{glossaries} package for cases where the \gls{location}
 should be ignored. (The command \ics{glsignore} simply ignores its
 argument.) This works reasonably well if an entry only has the one
-location, but if the entry happens to be indexed again, it can lead
-to an odd empty gap in the location list with a spurious comma. If
-\bibgls\ encounters a record with this special format, the entry
-will be selected but the record will be discarded.
+\gls{location}, but if the entry happens to be indexed again, it can lead
+to an odd empty gap in the \gls{locationlist} with a spurious comma. If
+\bibgls\ encounters a \gls{record} with this special format, the entry
+will be selected but the \gls{record} will be discarded.
 
-This means that the location list will be empty if the entry was
+This means that the \gls{locationlist} will be empty if the entry was
 only indexed with the special ignored format, but if the entry was also
-indexed with another format then the location list won't include the
+indexed with another format then the \gls{locationlist} won't include the
 \iglspl{ignoredrecord}. (This format is used by \ics{glsaddallunused} but
 remember that iterative commands like this don't work with \bibgls.
 Instead, just use \csopt[all]{selection} to select all entries.
-Those that don't have records won't have a location list.)
+Those that don't have \glspl{record} won't have a \gls{locationlist}.)
 
-For example, suppose you only want main matter locations in the
+For example, suppose you only want main matter \glspl{location} in the
 number list, but you want entries that only appear in the back matter 
-to still appear in the glossary (without a location list), then you could do:
+to still appear in the glossary (without a \gls{locationlist}), then you could do:
 \begin{codeenv}
 \ics{backmatter}
 \ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
 \end{codeenv}
-If you also want to drop front matter locations as well:
+If you also want to drop front matter \glspl{location} as well:
 \begin{codeenv}
 \ics{frontmatter}
 \cs{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
@@ -11755,29 +11786,29 @@ Note that explicit range formations aren't discarded, so if
 \ldots 
 \cs{glsadd}\oarg{\glsopt[\idx{closerange}\encap{glsignore}]{format}}\marg{sample} 
 \end{codeenv}
-then the range will be included in the location list (encapsulated
+then the range will be included in the \gls{locationlist} (encapsulated
 with \ics{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
 
-The record counting commands, such as \gls{rgls}, use the special
+The \gls{record} counting commands, such as \gls{rgls}, use the special
 format \encap{glstriggerrecordformat}, which \bibgls\ also treats
 as an \igls{ignoredrecord} and the same rules as for \encap{glsignore} apply.
 
-The locations are always listed in the order in which they were indexed,
+The \glspl{location} are always listed in the order in which they were indexed,
 (except for the cross-reference which may be placed at the start or
 end of the list or omitted).
 This is different to \idx!{xindy} and \idx!{makeindex} where you can
 specify the ordering (such as \idx!{lowercase} Roman first, then digits,
-etc), but unlike those applications, \bibgls\ allows any location,
+etc), but unlike those applications, \bibgls\ allows any \gls{location},
 although it may not be able to work out an integer representation.
-(With \idx!{xindy}, you can define new location formats, but you need
+(With \idx!{xindy}, you can define new \gls{location} formats, but you need
 to remember to add the appropriate code to the custom module.)
 
 It's possible to define a custom glossary style where 
 \ics{glossentry} (and the \child\ form \ics{subglossentry}) ignore the
 final argument (which will be the \field{location} field)
 and instead parse the \field{loclist} field and re-order the
-locations or process them in some other way. Remember that you can
+\glspl{location} or process them in some other way. Remember that you can
 also use \ics{glsnoidxloclist}
 provided by \styfmt{glossaries}. For example:
 \begin{codeenv}
@@ -11785,12 +11816,12 @@ provided by \styfmt{glossaries}. For example:
 \cs{glsnoidxloclist}\marg{\cmd{loclist}}\comment{iterate over locations}
 \end{codeenv}
 This uses \ics{glsnoidxloclisthandler} as the list's \idx{handler}
-macro, which simply displays each location separated by \ics{delimN}.
+macro, which simply displays each \gls{location} separated by \ics{delimN}.
 (See also
 \href{http://www.dickimaw-books.com/latex/admin/html/foreachtips.shtml}{Iteration
 Tips and Tricks}~\cite{iterationtips}.)
 
-Each regular location is listed in the \iext{aux} file in the form:
+Each regular \gls{location} is listed in the \iext{aux} file in the form:
 \nosecdef{glsxtr@record}
 (See \longarg{merge-nameref-on} for \code{nameref} records.)
 Exact duplicates are discarded. For example, if \code{cat}
@@ -11799,8 +11830,8 @@ is indexed twice on page 1:
 \gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
 \gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
 \end{codeenv}
-then the second record is discarded. Only the first record is added
-to the location list.
+then the second \gls{record} is discarded. Only the first
+\gls{record} is added to the \gls{locationlist}.
 
 Partial duplicates, where all arguments match except for
 \meta{format}, may be discarded depending on the value
@@ -11812,7 +11843,7 @@ then the \ext{aux} file will contain:
 \gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{1}
 \gls{glsxtr@record}\marg{cat}\marg{}\marg{\counter{page}}\marg{\encap{hyperbf}}\marg{1}
 \end{codeenv}
-This is a partial record match. In this case, \bibgls\ 
+This is a partial \gls{record} match. In this case, \bibgls\ 
 makes the following tests:
 \begin{itemize}
 \item If one of the formats includes a range formation, the
@@ -11821,7 +11852,7 @@ range takes precedence.
 \item If one of the formats is \encap{glsnumberformat} (as in the
 above example) or an \igls{ignoredrecord} format such as
 \encap{glsignore}, that format will be skipped.  So in the above
-example, the second record will be added to the location list, but
+example, the second \gls{record} will be added to the \gls{locationlist}, but
 not the first. (A message will only be written to the transcript if
 the \longarg{debug} switch is used.) The default
 \encap{glsnumberformat} will take precedence over the
@@ -11830,12 +11861,12 @@ the \longarg{debug} switch is used.) The default
 
 \item If a mapping has been set with the \longarg{map-format}
 switch that mapping will be checked.
-\item Otherwise the duplicate record will be discarded with a
+\item Otherwise the duplicate \gls{record} will be discarded with a
 warning.
 \end{itemize}
 
-The \field{location} field is used to store the formatted location
-list. The code for this list is generated by \bibgls\ based on the
+The \field{location} field is used to store the formatted
+\gls{locationlist}. The code for this list is generated by \bibgls\ based on the
 information provided in the \iext{aux} file, the presence of the
 \field{see} or \field{seealso} field and the various settings described in this
 chapter. When you display the glossary using \ics{printunsrtglossary},
@@ -11849,15 +11880,15 @@ For more information on adjusting the formatting see the
 
 \optsection{save-locations}
 
-By default, the locations will be processed and stored in the
+By default, the \glspl{location} will be processed and stored in the
 \field{location} and \field{loclist} fields. However, if you don't
-want the location lists (for example, you are using the
+want the \glspl{locationlist} (for example, you are using the
 \styopt{nonumberlist} option or you are using \idx!{xindy} with a
-custom location rule), then there's no need for \bibgls\ to process
-the locations. To switch this function off, just use
+custom \gls{location} rule), then there's no need for \bibgls\ to process
+the \glspl{location}. To switch this function off, just use
 \csopt[false]{save-locations}. Note that with this setting, if
 you're not additionally using \idx!{makeindex} or \idx!{xindy}, then
-the locations won't be available even if you don't have the
+the \glspl{location} won't be available even if you don't have the
 \styopt{nonumberlist} option set.
 
 The boolean \field{nonumberlist} key that may be used in
@@ -11870,10 +11901,10 @@ The \field{nonumberlist} key provided by the base \sty{glossaries}
 package doesn't represent a real field. The value isn't saved but,
 if used, it will alter the indexing information that's written to
 the \idx!{makeindex} or \idx!{xindy} file. It's a little hack to
-ensure that the location is hidden for a specific entry when used
+ensure that the \gls{location} is hidden for a specific entry when used
 with \idx!{makeindex} and \idx!{xindy}.
 
-\bibgls\ will look for this key to determine if the location should
+\bibgls\ will look for this key to determine if the \gls{location} should
 be omitted for the given entry, but it won't write the key to the 
 \ext{glstex} file.
 
@@ -11891,39 +11922,45 @@ A synonym for \csopt{save-principal-locations}.
 
 It's sometimes useful to identify a \igls{principallocation} with a different
 format, such as bold or italic. This helps the reader select which
-location to try first in the event of a long location list. However,
+\gls{location} to try first in the event of a long \gls{locationlist}. However,
 you may prefer to store the \glspl{principallocation} in a different field to
 give it a more prominent position. In order to do this you 
 need to specify the format (or formats) used to identify 
 \glspl{principallocation} with \csopt{principal-location-formats} and 
 use \csopt{save-principal-locations} to determine how to deal with
-these locations.
+these \glspl{location}.
 
 This option may take one of the following values:
 \begin{itemize}
 \item \optfmt{false}: don't save \glspl{principallocation} (default);
+
 \item \optfmt{retain}: save \glspl{principallocation} in the
 \field{primarylocations} field but don't remove from the usual
 \igls{locationlist};
+
 \item \optfmt{default format}: similar to \optfmt{retain} but the
-format for the principal records in the \field{location} field is
-converted to the default \encap{glsnumberformat} \idx{encap} (the records in the
+format for the \glsdisp{principallocation}{principal records} in the
+\field{location} field is converted to the default
+\encap{glsnumberformat} \idx{encap} (the \glspl{record} in the
 \field{primarylocations} field retain their given format);
+
 \item \optfmt{start}: save \glspl{principallocation} in the
 \field{primarylocations} field and also move to the start of the
 usual \igls{locationlist};
+
 \item \optfmt{remove}: save \glspl{principallocation} in the
 \field{primarylocations} field and remove from the usual
 \igls{locationlist}. You may want to consider using the
 \longswitch{retain-formats} switch with this setting if you don't
-want to lose a partial location match (for example, if the 
+want to lose a partial \gls{location} match (for example, if the 
 \gls{principallocation} coincides with the start of an explicit range).
+
 \end{itemize}
 
 The \glspl{principallocation} are copied to the \field{primarylocations}
 field and encapsulated with \gls!{bibglsprimary}.
 If you use \csopt[remove]{save-principal-locations}, the
-\field{location} field will end up empty if the locations for the
+\field{location} field will end up empty if the \glspl{location} for the
 associated entry were all identified as principal. If you use
 \csopt[start]{save-principal-locations}, all
 \glspl{principallocation} will be
@@ -11936,7 +11973,7 @@ and adjust the \igls{locationlist} format to insert the
 style.
 
 For example, the \glostyle{bookindex} style inserts
-\ics{glsxtrbookindexprelocation} before the location, so you could
+\ics{glsxtrbookindexprelocation} before the \gls{location}, so you could
 redefine this:
 \begin{codeenv}
 \cs{renewcommand}*\marg{\cs{glsxtrbookindexprelocation}}[1]\marg{\comment{}
@@ -12053,12 +12090,12 @@ and the document \filefmt{test.tex} contains:
 \end{codeenv}
 
 The \csopt[\encap{hyperbf},\encap{hyperemph}]{principal-location-formats}
-setting in the above indicates that locations encapsulated with
+setting in the above indicates that \glspl{location} encapsulated with
 \ics{hyperbf} and \ics{hyperemph} are
 \glsdisp{principallocation}{principal records}. In this case, the
 bold format is used to indicate the \gls{principallocation} in the
 main document text and the emphasized format is used to indicate the
-location in the \gls{mainglossary}.
+\gls{location} in the \gls{mainglossary}.
 
 The \glsdisp{principallocation}{principal records} are removed from
 the \field{location} field due to the
@@ -12146,20 +12183,24 @@ counter (from the \cs{glsadd} command in the hook), and then with the
 \cmd{end}\marg{document}
 \end{codeenv}
 
-Note that in this case, from \bibgls' point of view, the principal format is
-\encap{hyperrm} not \code{primaryfmt}. This picks out the records created with
-the automated \ics{glsadd}, which have the counter set to \counter{chapter}.
-The first glossary (with the title \qt{Summary}) switches the location field to
-\field{primarylocations} so that only the principal records are listed. Since
-\styopt[nameref]{record} has been used this means that the chapter title is
-shown rather than the chapter number.
+Note that in this case, from \bibgls' point of view, the principal
+format is \encap{hyperrm} not \code{primaryfmt}. This picks out the
+records created with the automated \ics{glsadd}, which have the
+counter set to \counter{chapter}.  The first glossary (with the
+title \qt{Summary}) switches the location field to
+\field{primarylocations} so that only the
+\glsdisp{principallocation}{principal records} are listed. Since
+\styopt[nameref]{record} has been used this means that the chapter
+title is shown rather than the chapter number.
 
-The second glossary (\qt{Index}) shows the location lists that only
-have the \counter{page} counter (because the automated \cs{glsadd}
-records with the \counter{chapter} counter have been removed because
-they were identified as principal records). These just show the page
-number as that's the default display with \styopt[nameref]{record} 
-for records with the \counter{page} counter.
+The second glossary (\qt{Index}) shows the \glspl{locationlist} that
+only have the \counter{page} counter (because the automated
+\cs{glsadd} records with the \counter{chapter} counter have been
+removed because they were identified as
+\glsdisp{principallocation}{principal records}). These just show the
+page number as that's the default display with
+\styopt[nameref]{record} for records with the \counter{page}
+counter.
 
 An alternative to \ics{GlsXtrAutoAddOnFormat} would be to simply
 define the custom commands as follows:
@@ -12183,34 +12224,34 @@ define the custom commands as follows:
 \end{codeenv}
 This is more useful if you want to simply omit the
 \code{\glsopt[primaryfmt]{format}} option (just remove it from the above four 
-definitions), which makes it easier to merge the locations into
+definitions), which makes it easier to merge the \glspl{location} into
 ranges in the index.
 
 \optsection{min-loc-range}
 
-By default, three or more consecutive locations \meta{loc-1},
+By default, three or more consecutive \glspl{location} \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
 the range \code{\meta{loc-1}\ics{delimR} \meta{loc-n}}. Otherwise
-the locations are separated by \gls!{bibglsdelimN} or \gls!{bibglslastDelimN}.
+the \glspl{location} are separated by \gls!{bibglsdelimN} or \gls!{bibglslastDelimN}.
 As mentioned above, these aren't merged with explicit range formations.
 
 You can change this with the \csopt{min-loc-range} setting where
 \meta{value} is either \optfmt{none} (don't form ranges) or an
-integer greater than one indicating how many consecutive locations should be
-converted into a range.
+integer greater than one indicating how many consecutive
+\glspl{location} should be converted into a range.
 
-\bibgls\ determines if one location
+\bibgls\ determines if one \gls{location}
 \code{\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2}}
-is one unit more than another location
+is one unit more than another \gls{location}
 \code{\margm{prefix-1}\margm{counter-1}\margm{format-1}\margm{location-1} }
 according to the following:
 \begin{enumerate}
 \item\label{itm:pre} If \meta{prefix-1} is not equal to \meta{prefix-2} or
 \meta{counter-1} is not equal to \meta{counter-2} or \meta{format-1}
-is not equal to \meta{format-2}, then the locations aren't
+is not equal to \meta{format-2}, then the \glspl{location} aren't
 considered consecutive.
 \item\label{itm:emptyloc} If either \meta{location-1} or \meta{location-2} are empty,
-then the locations aren't considered consecutive.
+then the \glspl{location} aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern (line break for clarity only)\footnote{The Java class \code{\csfmt{p}\marg{javaDigit}}
 used in the \idx{regex} will match any digits in the 
@@ -12223,9 +12264,9 @@ characters outside the Basic Latin set.}
 then:
   \begin{itemize}
   \item if the control sequence matched by group 2 isn't the same for
-  both locations, the locations aren't considered consecutive;
+  both \glspl{location}, the \glspl{location} aren't considered consecutive;
   \item if the argument of the control sequence (group 3) is the same for
-  both locations, then the test is retried with \meta{location-1}
+  both \glspl{location}, then the test is retried with \meta{location-1}
 set to group 1 of the first pattern match and \meta{location-2}
 set to group 1 of the second pattern match;
   \item otherwise the test is retried with \meta{location-1} set to
@@ -12242,7 +12283,7 @@ then:
   \item\label{itm:decgrp3eq} if group 3 of both pattern matches are
 equal then:
   \begin{enumerate}
-   \item\label{itm:decgrp3nz} if group 3 isn't zero, the locations
+   \item\label{itm:decgrp3nz} if group 3 isn't zero, the \glspl{location}
 aren't considered consecutive;
    \item if the separators (group 2) are different the test is
 retried with \meta{location-1} set to the concatenation of the first
@@ -12262,11 +12303,11 @@ and \meta{location-2} set to the first group
 or \meta{group-2} of the first pattern match (of
 \meta{location-1}) doesn't equal
 \meta{group-2} of the second pattern match (of \meta{location-2})
-then the locations aren't considered consecutive;
+then the \glspl{location} aren't considered consecutive;
    \item\label{itm:decgrp3} If $0 < l_2 - l_1 \leq d $
 where $l_2$ is \meta{group 3} of the second pattern match,
 $l_1$ is \meta{group 3} of the first pattern match and
-$d$ is the value of \optfmt{max-loc-diff} then the locations
+$d$ is the value of \optfmt{max-loc-diff} then the \glspl{location}
 are consecutive otherwise they're not consecutive.
   \end{enumerate}
 \item\label{itm:rommatch} The next pattern matches for \meta{prefix}\meta{sep}\meta{n}
@@ -12282,7 +12323,7 @@ where \meta{c} is either a \idx!{lowercase} letter from \code{a} to
 \code{z} or an \idx!{uppercase} letter from \code{A} to \code{Z}.
 The character is converted to its code point and the test is
 performed in the same way as the \hyperref[itm:decmatch]{decimal pattern} above.
-\item\label{itm:nomatch} If none of the above, the locations aren't considered
+\item\label{itm:nomatch} If none of the above, the \gls{location} aren't considered
 consecutive.
 \end{enumerate} 
 
@@ -12294,7 +12335,7 @@ Examples:
 \gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{2}
 \end{codeenv}
 These records are consecutive. The prefix, counter and format are
-identical (so the test passes step~\ref{itm:pre}), the locations match
+identical (so the test passes step~\ref{itm:pre}), the \glspl{location} match
 the \hyperref[itm:decmatch]{decimal pattern} and the test in
 step~\ref{itm:decgrp3} passes.
 
@@ -12311,11 +12352,11 @@ These records aren't consecutive since the formats are different.
 \gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{A.ii}
 \end{codeenv}
 These records are consecutive. The prefix, counter and format are
-identical (so it passes step~\ref{itm:pre}). The locations match
+identical (so it passes step~\ref{itm:pre}). The \glspl{location} match
 the \hyperref[itm:rommatch]{lower case Roman numeral pattern}, where
 \code{A} is considered a prefix and the dot is consider a
 separator. The Roman numerals i and ii are converted to decimal and
-the test is retried with the locations set to 1 and 2, respectively.
+the test is retried with the \glspl{location} set to 1 and 2, respectively.
 This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
 
 \item
@@ -12324,10 +12365,10 @@ This now passes the decimal pattern test (step~\ref{itm:decgrp3}).
 \gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{ii.A}
 \end{codeenv}
 These records aren't consecutive. They match the
-\hyperref[itm:alphmatch]{alpha pattern}. The first location is
+\hyperref[itm:alphmatch]{alpha pattern}. The first \gls{location} is
 considered to consist of the prefix \code{i}, the separator
 \code{.}\ (dot) and the number given by the character code of A. 
-The second location is considered to consist of the prefix
+The second \gls{location} is considered to consist of the prefix
 \code{ii}, the separator \code{.}\ (dot) and the number 
 given by the character code of A.
 
@@ -12342,8 +12383,8 @@ different.
 These records are consecutive. They match the \hyperref[itm:decmatch]{decimal
 pattern}, and then step~\ref{itm:decgrp3eq} followed by
 step~\ref{itm:decgrp3eqsepeq}. The \code{.0} part is discarded and
-the test is retried with the first location set to 1 and the second
-location set to 2.
+the test is retried with the first \gls{location} set to 1 and the second
+\gls{location} set to 2.
 
 \item
 \begin{codeenv}
@@ -12358,26 +12399,26 @@ step~\ref{itm:decgrp3nz}.
 \gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{\cmd{@alph}\marg{1}}
 \gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{glsnumberformat}}\marg{\cmd{@alph}\marg{2}}
 \end{codeenv}
-These records are consecutive. The locations match the 
+These records are consecutive. The \glspl{location} match the 
 \hyperref[itm.csmatch]{control sequence pattern}. The control
 sequences are the same, so the test is retried with the first
-location set to 1 and the second location set to 2.
+\gls{location} set to 1 and the second \gls{location} set to 2.
 
-In this example, the location has been written to the file as
+In this example, the \gls{location} has been written to the file as
 \code{\csfmt{@alph}\margm{number}} instead of fully expanding according to the
 normal behaviour of \code{\ics{alph}\margm{counter}}.  (Note that
 \gls!{glsxtrresourcefile} changes the category code of \code{@} to allow for
-internal commands in locations.) This unusual case is for illustrative purposes.
+internal commands in \glspl{location}.) This unusual case is for illustrative purposes.
 \end{enumerate}
 
 \optsection{max-loc-diff}
 
-This setting is used to determine whether two locations are
+This setting is used to determine whether two \glspl{location} are
 considered consecutive.
 The value must be an integer greater than or equal to 1.
 (The default is \optfmt{1}.)
 
-For two locations, \meta{location-1} and \meta{location-2},
+For two \glspl{location}, \meta{location-1} and \meta{location-2},
 that have numeric values $n_1$ and $n_2$ (and identical prefix,
 counter and format), then the sequence \meta{location-1},
 \meta{location-2} is considered consecutive if
@@ -12391,33 +12432,33 @@ For example, if \meta{location-1} is \qt{B} and \meta{location-2}
 is \qt{C}, then $n_1 = 66$ and $n_2 = 67$. Since $n_2 = 67 = 66+1=
 n_1+1$ then \meta{location-2} immediately follows \meta{location-1}.
 
-This is used in the range formations within the location lists (as described
+This is used in the range formations within the \glspl{locationlist} (as described
 in the above section).
 So, for example, the list \qt{1, 2, 3, 5, 7, 8, 10, 11, 12, 58, 59,
 61} becomes
 \qt{1--3, 5, 7, 8, 10--12, 58, 59, 61}.
 
 The automatically indexing of commands like \ics{gls} means that
-the location lists can become long and ragged. You could
+the \glspl{locationlist} can become long and ragged. You could
 deal with this by switching off the automatic indexing and
 only explicitly index pertinent use or you can adjust
 the value of \optfmt{max-loc-diff} so that a range can be formed even
 if there are one or two gaps in it.
-By default, any location ranges that have skipped gaps in this
+By default, any \gls{location} ranges that have skipped gaps in this
 manner will be followed by \gls!{bibglspassim}. The default
 definition of this command is obtained from the resource file.
 For English, this is \verb*| passim| (space followed by \qt{passim}).
 
-So with the above set of locations, if \csopt[2]{max-loc-diff} then 
+So with the above set of \glspl{location}, if \csopt[2]{max-loc-diff} then 
 the list becomes \qt{1--12 passim, 58--61 passim} which now highlights that
 there are two blocks within the document related to that
 term.
 
 \optsection{suffixF}
 
-If set, a range consisting of two consecutive locations 
+If set, a range consisting of two consecutive \glspl{location}
 \meta{loc-1} and \meta{loc-2} will be
-displayed in the location list as \meta{loc-1}\meta{value}.
+displayed in the \gls{locationlist} as \meta{loc-1}\meta{value}.
 
 Note that \csopt[\empty]{suffixF} sets the suffix to the
 empty string. To remove the suffix formation use
@@ -12427,9 +12468,9 @@ The default is \csopt[none]{suffixF}.
 
 \optsection{suffixFF}
 
-If set, a range consisting of three or more consecutive locations 
+If set, a range consisting of three or more consecutive \glspl{location}
 \meta{loc-1} and \meta{loc-2} will be
-displayed in the location list as \meta{loc-1}\meta{value}.
+displayed in the \gls{locationlist} as \meta{loc-1}\meta{value}.
 
 Note that \csopt[\empty]{suffixFF} sets the suffix to the
 empty string. To remove the suffix formation use
@@ -12444,14 +12485,14 @@ The \meta{value} may be an integer \meta{n} or \optfmt{false} (equivalent to
 \csopt[3]{compact-ranges}). If no \meta{value} is specified,
 \optfmt{true} is assumed.
 
-This setting allows location ranges such as 184--189 to appear
-more compactly as 184--9. The end location is encapsulated
+This setting allows \gls{location} ranges such as 184--189 to appear
+more compactly as 184--9. The end \gls{location} is encapsulated
 in the command \gls{bibglscompact}, so the range would actually
 become:
 \begin{codeenv}
 184\ics{delimR}\gls{bibglscompact}\marg{digit}\marg{18}\marg{9}
 \end{codeenv}
-If the location is in the form \code{\meta{cs}\margm{loc}}
+If the \gls{location} is in the form \code{\meta{cs}\margm{loc}}
 (where \meta{cs} is a command)
 then \gls{bibglscompact} will be inside the argument.
 For example, if the range would normally be:
@@ -12463,7 +12504,7 @@ then it would become:
 \cmd{custom}\marg{184}\ics{delimR}\cmd{custom}\marg{\gls{bibglscompact}\marg{digit}\marg{18}\marg{9}}
 \end{codeenv}
 The numerical value given in \csopt[\meta{n}]{compact-ranges}
-indicates that compaction should only occur if the actual location
+indicates that compaction should only occur if the actual \gls{location}
 consists of at least \meta{n} characters, for $\meta{n} \geq 2$. 
 Any value of \meta{n} less than 2 will switch off compaction.
 
@@ -12474,7 +12515,7 @@ would only be compacted with \csopt[2]{compact-ranges}
 because \code{89} only consists of 2 characters.
 
 The compaction isn't limited to decimal digits but it will only
-occur if both the start and end location have the same number of
+occur if both the start and end \gls{location} have the same number of
 characters. For example, xvi--xviii can't be compacted because
 the start consists of three characters and the end consists
 of five characters, whereas xxv--xxx can be compacted to xxv--x,
@@ -12485,21 +12526,23 @@ it only performs the compaction for digits.
 \optsection{see}
 
 If an entry has a \field{see} field, this can be placed before or
-after the location list, or completely omitted (but the value will
+after the \gls{locationlist}, or completely omitted (but the value will
 still be available in the \field{see} field for use with
 \ics{glsxtrusesee}). The required \meta{value} must be one of:
 \begin{itemize}
-\item \optfmt{omit}: omit the see reference from the location
-list.
-\item \optfmt{before}: place the see reference before the location
-list.
-\item \optfmt{after}: place the see reference after the location
-list (default).
+\item \optfmt{omit}: omit the see reference from the
+\gls{locationlist}.
+
+\item \optfmt{before}: place the see reference before the
+\gls{locationlist}.
+
+\item \optfmt{after}: place the see reference after the
+\gls{locationlist} (default).
 \end{itemize}
 
-The separator between the location list and the cross-reference is
+The separator between the \gls{locationlist} and the cross-reference is
 provided by \gls!{bibglsseesep}. This separator is omitted if the
-location list is empty. The cross-reference is written to the
+\gls{locationlist} is empty. The cross-reference is written to the
 \field{location} field using \code{\gls{bibglsusesee}\margm{label}}.
 
 \optsection{seealso}
@@ -12520,13 +12563,13 @@ provided by the \field{alias} field. The separator is given by
 
 \optsection{alias-loc}
 
-If an entry has an \field{alias} field, the location list
+If an entry has an \field{alias} field, the \gls{locationlist}
 may be retained or omitted or transferred to the target entry.
 The required \meta{value} must be one of:
 \begin{itemize}
-\item\optfmt{keep}: keep the location list;
-\item\optfmt{transfer}: transfer the location list;
-\item\optfmt{omit}: omit the location list.
+\item\optfmt{keep}: keep the \gls{locationlist};
+\item\optfmt{transfer}: transfer the \gls{locationlist};
+\item\optfmt{omit}: omit the \gls{locationlist}.
 \end{itemize}
 The default setting is \csopt[transfer]{alias-loc}.
 In all cases, the target entry will be added to the \field{see}
@@ -12539,21 +12582,21 @@ entry and the target entry must be in the same resource set.
 (That is, both entries have been selected by the same instance of
 \gls!{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version~1.12, 
 you may need to redefine \ics{glsxtrsetaliasnoindex} to do
-nothing if the location lists aren't showing correctly
+nothing if the \glspl{locationlist} aren't showing correctly
 with aliased entries. (This was corrected in version~1.13.)
 
 \optsection{loc-prefix}
 
-The \csopt{loc-prefix} setting indicates that the location lists
+The \csopt{loc-prefix} setting indicates that the \glspl{locationlist}
 should begin with \code{\gls!{bibglslocprefix}\margm{n}}. The \meta{value} may
 be one of the following:
 \begin{itemize}
 \item \optfmt{false}: don't insert \code{\gls{bibglslocprefix}\margm{n}} at the
-start of the location lists (default).
+start of the \glspl{locationlist} (default).
 
 \item \optfmt{\margm{prefix-1},\margm{prefix-2},\ldots,\margm{prefix-n}}:
 insert \code{\gls{bibglslocprefix}\margm{n}} (where \meta{n} is the number of
-locations in the list) at the start of each location list and the
+\glspl{location} in the list) at the start of each \gls{locationlist} and the
 definition of \gls{bibglslocprefix} will be appended to the glossary
 preamble providing an \ics{ifcase} condition:
 \begin{codeenv}
@@ -12569,7 +12612,7 @@ preamble providing an \ics{ifcase} condition:
 
 \item \optfmt{comma}: equivalent to \csopt[\marg{,~}]{loc-prefix} 
 but avoids confusion with the list syntax. That is, the prefix is a comma
-followed by a space for non-empty locations.
+followed by a space for non-empty \glspl{locationlist}.
 
 \item \optfmt{list}: equivalent to \csopt[\ics{pagelistname} ]{loc-prefix}.
 
@@ -12623,23 +12666,24 @@ have the location prefixes obtained from the language resource file.
 \optsection{loc-suffix}
 
 This is similar to \csopt{loc-prefix} but there are some subtle
-differences. In this case \meta{value} may either be the keyword 
-\optfmt{false} (in which case the location suffix is omitted)
-or a comma-separated list
+differences. In this case \meta{value} may either be the keyword
+\optfmt{false} (in which case the location suffix is omitted) or a
+comma-separated list
 \optfmt{\meta{suffix-0}\dcomma\meta{suffix-1}\dcomma\ldots\dcomma\meta{suffix-n}}
-where \meta{suffix-0} is the suffix to use when the location list
-only has a cross-reference with no locations, \meta{suffix-1} is the suffix to use
-when the location list has one location (optionally with a
+where \meta{suffix-0} is the suffix to use when the
+\gls{locationlist} only has a cross-reference with no
+\glspl{location}, \meta{suffix-1} is the suffix to use when the
+\gls{locationlist} has one \gls{location} (optionally with a
 cross-reference), and so on. The final \meta{suffix-n} in the list
-is the suffix when the location list has \meta{n} or more locations
-(optionally with a cross-reference).
+is the suffix when the \gls{locationlist} has \meta{n} or more
+\glspl{location} (optionally with a cross-reference).
 
-This option will append \code{\gls!{bibglslocsuffix}\margm{n}} to location
-lists that either have a cross-reference or have at least one location.
-Unlike \gls{bibglslocprefix}, this command isn't used when the
-location list is completely empty. Also, unlike
-\gls{bibglslocprefix}, this suffix command doesn't have an equivalent
-to \gls{bibglspostlocprefix}.
+This option will append \code{\gls!{bibglslocsuffix}\margm{n}} to
+\glspl{locationlist} that either have a cross-reference or have at
+least one \gls{location}.  Unlike \gls{bibglslocprefix}, this
+command isn't used when the \gls{locationlist} is completely empty.
+Also, unlike \gls{bibglslocprefix}, this suffix command doesn't have
+an equivalent to \gls{bibglspostlocprefix}.
 
 If \meta{value} omitted, \csopt[\ics{at}\idx{periodchar}]{loc-suffix} 
 is assumed.  The default is \csopt[false]{loc-suffix}.
@@ -12650,7 +12694,7 @@ of \csopt{loc-suffix} for entries in the same glossary type.
 \optsection{loc-counters}
 
 Commands like \ics{gls} allow you to select a different 
-counter to use for the location for that specific instance
+counter to use for the \gls{location} for that specific instance
 (overriding the default counter for the entry's glossary type).
 This is done with the \glsopt{counter} option. For example,
 consider the following document:
@@ -12692,16 +12736,16 @@ consider the following document:
 \cs{printunsrtglossaries}
 \cmd{end}\marg{document}
 \end{codeenv}
-This results in the location list \qt{1, 1--3, 3--5}. This
+This results in the \gls{locationlist} \qt{1, 1--3, 3--5}. This
 looks a little odd and it may seem as though the range formation
-hasn't worked, but the locations are actually: page~1, equation~1,
+hasn't worked, but the \glspl{location} are actually: page~1, equation~1,
 equation~2, equation~3, page~3, page~4 and page~5. Ranges can't
 be formed across different counters.
 
 The \csopt[\meta{list}]{loc-counters} option instructs \bibgls\ 
-to group the locations according to the counters given in
-the comma-separated \meta{list}. If a location has a counter
-that's not listed in \meta{list}, then the location is discarded.
+to group the \glspl{location} according to the counters given in
+the comma-separated \meta{list}. If a \gls{location} has a counter
+that's not listed in \meta{list}, then the \gls{location} is discarded.
 
 For example:
 \begin{codeenv}
@@ -12710,16 +12754,16 @@ For example:
   \csopt[entries]{src}\comment{data in entries.bib}
 }
 \end{codeenv}
-This will first list the locations for the \counter{equation}
-counter and then the locations for the \counter{page} counter.
-Each group of locations is encapsulated within the command
+This will first list the \glspl{location} for the \counter{equation}
+counter and then the \glspl{location} for the \counter{page} counter.
+Each group of \glspl{location} is encapsulated within the command
 \gls!{bibglslocationgroup}\margm{n}\margm{counter}\margm{locations}.
 The groups are separated by \gls!{bibglslocationgroupsep}.
 
 The \meta{list} value must be non-empty.  Use
 \csopt[as-use]{loc-counters} to restore the default behaviour, where
-the locations are listed in the document order of use, or
-\csopt[false]{save-locations} to omit the location lists.  Note that
+the \glspl{location} are listed in the document order of use, or
+\csopt[false]{save-locations} to omit the \glspl{locationlist}.  Note that
 you can't form counter groups from
 \hyperref[sec:supplementalopts]{supplemental location lists}.
 
@@ -12731,17 +12775,17 @@ you can't form counter groups from
 \item \optfmt{false}: don't create the \field{indexcounter} field
 (default);
 \item \optfmt{true}: create the \field{indexcounter} field with the
-value set to the first \counter{wrglossary} location;
+value set to the first \counter{wrglossary} \gls{location};
 \item \meta{encap}: create the \field{indexcounter} field with the
-value set to the first \counter{wrglossary} location
+value set to the first \counter{wrglossary} \gls{location}
 where the \glsopt{format} is \meta{encap}.
 \end{itemize}
-This setting will have no effect if the \styopt{indexcounter} package
-option hasn't been used. In the case where the \meta{value} is
-\meta{encap}, make sure that this format takes priority in the
-location precedence rules (\longarg{map-format}). If the location
-with that \meta{encap} format value is discarded then it can't be
-saved.
+This setting will have no effect if the \styopt{indexcounter}
+package option hasn't been used. In the case where the \meta{value}
+is \meta{encap}, make sure that this format takes priority in the
+\gls{location} precedence rules (\longarg{map-format}). If the
+\gls{location} with that \meta{encap} format value is discarded then
+it can't be saved.
 
 The \styopt{indexcounter} package option
 (\sty{glossaries-extra} v1.29+) creates a new counter called
@@ -12751,7 +12795,7 @@ The increment is performed using \ics{refstepcounter} and is
 followed by \code{\ics{label}\marg{wrglossary.\meta{n}}} where
 \meta{n} is the value of the \counter{wrglossary} counter.
 This option is intended for use with the \sty{hyperref} package to
-allow locations to link back to the particular part of the page where
+allow \glspl{location} to link back to the particular part of the page where
 the term was referenced rather than to the top of the page.
 
 The \styopt{indexcounter} package option also automatically
@@ -12765,12 +12809,12 @@ information to the \iext{aux} file:
 \begin{codeenv}
 \gls{glsxtr@record}\margm{id}\marg{}\marg{wrglossary}\marg{\encap{glsnumberformat}}\margm{n}
 \end{codeenv}
-The location here is actually the value of the \counter{wrglossary}
+The \gls{location} here is actually the value of the \counter{wrglossary}
 counter not the page number, but \bibgls\ can pick up the
 corresponding \meta{page} from the \csfmt{newlabel} command. It then
-replaces the record's location \meta{n} with:
+replaces the \gls{record}['s] location \meta{n} with:
 \nosecdef{glsxtr@wrglossarylocation}
-(but it only does this for records that have the \counter{wrglossary}
+(but it only does this for \glspl{record} that have the \counter{wrglossary}
 counter).
 
 The \sty{glossaries-extra} package (v1.29+) adjusts the definition
@@ -12778,16 +12822,16 @@ of \ics{glshypernumber} (which is internally used by
 \cs{glsnumberformat}, \cs{hyperbf} etc when \sty{hyperref} has been
 loaded) so that if the counter is \counter{wrglossary} then
 \ics{pageref} is used instead of \ics{hyperlink}. This means that the
-page number is displayed in the location list but it links back to
+page number is displayed in the \gls{locationlist} but it links back to
 the place where the corresponding \cs{label} occurred.
 
 This method works partially with \idx!{makeindex} and \idx!{xindy}
-but from their point of view the location is the value of the
+but from their point of view the \gls{location} is the value of the
 \counter{wrglossary} counter, which interferes with their ability to
 merge duplicate page numbers and form ranges. Since \bibgls\ is
 designed specifically to work with \sty{glossaries-extra}, it's
 aware of this special counter and will merge and collate the
-locations according to the corresponding page number instead.
+\glspl{location} according to the corresponding page number instead.
 
 With the default \longarg{merge-wrglossary-records} switch, if a
 term has multiple \counter{wrglossary} records for a given page they
@@ -12795,9 +12839,9 @@ will be merged. The reference link will be the dominant record for
 that page.
 
 The \csopt{save-index-counter} option allows you to save the first
-of the \counter{wrglossary} locations for a given entry or the first
-instance of a specific format of the \counter{wrglossary} locations
-for a given entry. This location is stored in the
+of the \counter{wrglossary} \glspl{location} for a given entry or the first
+instance of a specific format of the \counter{wrglossary} \glspl{location}
+for a given entry. This \gls{location} is stored in the
 \field{indexcounter} internal field using:
 \begin{codeenv}
 \ics{GlsXtrSetField}\margm{id}\marg{\field{indexcounter}}\marg{\gls{glsxtr@wrglossarylocation}\margm{n}\margm{page}}
@@ -12870,14 +12914,14 @@ A \cs{gls}\marg{sample}. \cmd{lipsum}*[5] A \cs{gls}\marg{duck} and
 \cmd{end}\marg{document}
 \end{codeenv}
 Note that the \glsopt[\counter{equation}]{counter} entry will have its own
-independent location. In this example, it's difficult to tell the
+independent \gls{location}. In this example, it's difficult to tell the
 difference between 1 (the equation reference) and 1 (the page
-reference) in the location list for the \code{pi} entry.
+reference) in the \gls{locationlist} for the \code{pi} entry.
 
 The \glsopt[primary]{format} instances indicate
 \glsdisp{principallocation}{principal} references.
 They're displayed in bold (since \csfmt{primary} is defined to use
-\csfmt{hyperbf}) and these are the locations saved in the
+\csfmt{hyperbf}) and these are the \glspl{location} saved in the
 \field{indexcounter} field because that's the \meta{encap}
 identified by the \csopt[primary]{save-index-counter} setting.
 
@@ -12885,14 +12929,14 @@ identified by the \csopt[primary]{save-index-counter} setting.
 \label{sec:supplementalopts}
 
 \emph{These options require at least version 1.14 of
-\isty{glossaries-extra}.} If you require locations from multiple
+\isty{glossaries-extra}.} If you require \glspl{location} from multiple
 external sources, then you need at least version 1.36 of
 \isty{glossaries-extra} (or, more specifically,
 \isty{glossaries-extra-bib2gls}, which is automatically loaded
 by the \styopt[only]{record} package option).
 
 The \sty{glossaries-extra} package (from v1.14) provides a way of
-manually adding locations in \glspl{supplementaldocument} through the use
+manually adding \glspl{location} in \glspl{supplementaldocument} through the use
 of the \glsaddopt{thevalue} option in the optional argument of
 \ics{glsadd}.  Setting values manually is inconvenient and can result
 in errors, so \bibgls\ provides a way of doing this automatically.
@@ -12947,12 +12991,12 @@ Now suppose the supplementary document is contained in the file
 \cs{printunsrtglossaries}
 \cmd{end}\marg{document}
 \end{codeenv}
-This uses the \counter{section} counter for the locations and has a
+This uses the \counter{section} counter for the \glspl{location} and has a
 prefix (\code{\csfmt{thepart}.})\ for the section hyperlinks.
 
 Now let's suppose I have another document called \filefmt{main.tex}
 that uses the \code{sample} entry, but also needs to include the
-location (S1) from the \supplementarydocument. The manual approached
+\gls{location} (S1) from the \supplementarydocument. The manual approached
 offered by \styfmt{glossaries-extra} is quite cumbersome and requires
 setting the \catattr{externallocation} attribute and using
 \ics{glsadd} with \glsaddopt[S1]{thevalue}, \glsaddopt[I.S1]{theHvalue}
@@ -12962,14 +13006,14 @@ This can be simplified with \bibgls\ by using the
 \optfmt{supplemental-locations} option, described below. 
 
 Version 1.36 of \isty{glossaries-extra-bib2gls} introduces some
-special location formatting commands that don't use the
+special \gls{location} formatting commands that don't use the
 \catattr{externallocation} attribute, but instead have an extra
 argument that indicates the external reference. The additional
 argument means that it can't be used by the \glsaddopt{format}
 key, but with \bibgls\ you don't use \cs{glsadd} to record
-the external locations. Instead it obtains the records from
+the external \glspl{location}. Instead it obtains the \glspl{record} from
 the corresponding \supplementary\ \ext{aux} file, and adjusts the
-location encapsulator as appropriate.
+\gls{location} encapsulator as appropriate.
 
 If \bibgls\ detects an older version of \sty{glossaries-extra},
 it will only allow one external \supplemental\ source, and
@@ -13004,17 +13048,17 @@ For example:
 \cs{printunsrtglossaries}
 \cmd{end}\marg{document}
 \end{codeenv}
-The location list for \code{sample} will now be \qt{1, S1} (page~1
+The \gls{locationlist} for \code{sample} will now be \qt{1, S1} (page~1
 from the \gls{maindocument} and S1 from the \supplementarydocument).
 
-With \sty{glossaries-extra} v1.36+, a regular location from the
+With \sty{glossaries-extra} v1.36+, a regular \gls{location} from the
 \supplementarydocument\ will be encapsulated with:
 \nosecdef{glsxtrdisplaysupploc}
 By default, this simply creates an external hyperlink to the
-\supplementarydocument\ with the location as the hyperlink text.
+\supplementarydocument\ with the \gls{location} as the hyperlink text.
 The hyperlink is created using \meta{src} as the target path
 with the fragment part (anchor) formed from the prefix and 
-location. The \catattr{externallocation} attribute is not set in
+\gls{location}. The \catattr{externallocation} attribute is not set in
 this case. The actual formatting is done via:
 \nosecdef{glsxtrmultisupplocation}
 which ignores the \meta{format} argument by default. Its
@@ -13045,7 +13089,7 @@ uses \cs{glshyperlink} (such as \cs{hyperbf}), otherwise you
 will lose the hyperlink.
 
 With older versions of \sty{glossaries-extra},
-the original location format from the \supplementarydocument\
+the original \gls{location} format from the \supplementarydocument\
 will be replaced by \encap{glsxtrsupphypernumber}, which 
 again produces an external hyperlink. The \catattr{externallocation}
 attribute also needs to be set (this can be done automatically with
@@ -13053,12 +13097,12 @@ attribute also needs to be set (this can be done automatically with
 The original format can't be accessed.
 
 In both cases, if the document hasn't loaded the \isty{hyperref} package, the
-location will simply be displayed without a hyperlink.  Even if both the main
+\gls{location} will simply be displayed without a hyperlink.  Even if both the main
 and the \supplementarydocuments\ have loaded \sty{hyperref}, note that not all
 PDF viewers can handle external hyperlinks, and some that can open the external
 PDF file may not recognise the destination within that file.
 
-The special \code{nameref} locations (see
+The special \code{nameref} \glspl{location} (see
 \longarg{merge-nameref-on}) are still identified with
 \gls!{glsxtrdisplaylocnameref} but the \meta{file} argument will now
 be set.
@@ -13089,7 +13133,7 @@ this command will encapsulate the sub-lists with
 
 So the above example with an old version of \sty{glossaries-extra}
 (pre 1.36) will set the \supplementallocation\ list (which only consists
-of one location) to:
+of one \gls{location}) to:
 \begin{codeenv}
 \gls{bibglssupplemental}
 \marg{1}\marg{\ics{setentrycounter}\oarg{I}\marg{\counter{section}}\cs{glsxtrsupphypernumber}\marg{S1}}
@@ -13104,7 +13148,7 @@ Whereas with at least version 1.36, the list will be:
 \marg{\gls{glsxtrdisplaysupploc}\marg{I}\marg{\counter{section}}\marg{\encap{glsnumberformat}}\marg{suppl.pdf}\marg{S1}}}
 \end{codeenv}
 
-If an entry has both a main location list and a
+If an entry has both a main \gls{locationlist} and a
 \supplementarylocation\ list (such as the \code{sample} entry above), the lists
 will be separated by \gls!{bibglssupplementalsep}. The sub-lists
 (when supported) are separated by \gls{bibglssupplementalsubsep}.
@@ -14578,7 +14622,7 @@ where the separator is given by \csopt{field-concat-sep}.
 
 This setting doesn't affect the index type of entries, such as
 \atentry{index} or \atentry{indexplural}. This is useful if your
-glossary contains homographs (terms with the same spelling) which
+glossary contains \iglspl{homograph} (terms with the same spelling) which
 can't be distinguished by the sort comparators. For example, suppose
 my file \filefmt{entries.bib} contains:
 \begin{codeenv}
@@ -14619,7 +14663,7 @@ is missing is to fallback on the \field{name} field. If the
 \field{name} field is missing (as with \code{glossarylist} and
 \code{glosscol}), then the value is obtained from the
 \field{name} field from the \gls{parententry}. The \gls{parententry} for these
-homographs is the \code{glossary} entry, which was defined with
+\glspl{homograph} is the \code{glossary} entry, which was defined with
 \atentry{index} and doesn't have the \field{name} field. For the
 \atentry{index} entries, if \field{name} is missing the value is
 obtained from the label.
@@ -15445,7 +15489,7 @@ different to using:
 \ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
 \end{codeenv}
 which creates an \igls{ignoredrecord}. Even though the record is ignored
-(and so won't show in the location list) the record still influences
+(and so won't show in the \gls{locationlist}) the record still influences
 the selection order and the record count.
 
 \optsection{sort-suffix-marker}
@@ -16207,18 +16251,23 @@ used with \csopt[combine]{dual-sort} and \csopt[none]{sort} or
 
 \optsection[\subsubsection]{combine-dual-locations}
 
-This setting allows the location lists for each \gls{primaryentry}
+This setting allows the \glspl{locationlist} for each \gls{primaryentry}
 to be merged with that of the corresponding \gls{dualentry}.
 The \meta{value} may be one of:
 \begin{itemize}
-\item\optfmt{false} This is the default setting. The location lists
-aren't combined.
+\item\optfmt{false} This is the default setting. The
+\glspl{locationlist} aren't combined.
+
 \item\optfmt{both} Both the \primary\ and \dual\ are given the combined
-location list.
-\item\optfmt{dual} Only the \dual\ is given the combined location
-list. The \glsdisp{primaryentry}{primary's} location list is emptied.
+\gls{locationlist}.
+
+\item\optfmt{dual} Only the \dual\ is given the combined
+\gls{locationlist}. The \glsdisp{primaryentry}{primary's} location list is emptied.
+
 \item\optfmt{primary} Only the \primary\ is given the combined
-location list. The \glsdisp{dualentry}{dual's} location list is emptied.
+\gls{locationlist}. The \glsdisp{dualentry}{dual's}
+\gls{locationlist} is emptied.
+
 \item\optfmt{dual retain principal} Like \optfmt{dual} but any
 \glspl{principallocation} for \glspl{primaryentry} will have a copy left in the
 \gls{primaryentry}['s] \igls{locationlist}.
@@ -16285,17 +16334,17 @@ and \code{gls.matrix} entries have been indexed on pages~1, 2 and~3.
 The \code{gls.vector} and \code{gls.set} entries have been indexed
 on pages~1 and~3.
 
-With the default setting, some of the locations are in the
+With the default setting, some of the \glspl{location} are in the
 \mainglossary\ (corresponding to \code{\cs{gls}\marg{gls.array}},
 \code{\cs{gls}\marg{gls.vector}}, \code{\cs{gls}\marg{gls.set}} and
-\code{\cs{gls}\marg{gls.matrix}}) and some of the locations are in the
+\code{\cs{gls}\marg{gls.matrix}}) and some of the \glspl{location} are in the
 \code{index} glossary (corresponding to \code{\cs{gls}\marg{idx.vector}}
 and \code{\cs{gls}\marg{idx.set}}).
 
 If the option \csopt[primary]{combine-dual-locations} is added to
-the resource set, then all the locations are moved to the
+the resource set, then all the \glspl{location} are moved to the
 \code{index} glossary. The entries in the \mainglossary\ no longer
-have locations. This is actually preferable for this type of
+have \glspl{location}. This is actually preferable for this type of
 document and it's best not to reference the \primary\ (index)
 entries as the hyperlink created by \ics{gls} will point to the
 index, but these entries don't have descriptions, so it's less
@@ -16997,9 +17046,9 @@ definition, but its value is usually not required in the document
 unless you are using a hybrid method with \styopt[hybrid]{record}
 (in which case, it's redundant to get \bibgls\ to sort).
 
-After each entry is defined, if it has any associated locations and
+After each entry is defined, if it has any associated \glspl{location} and
 the default \csopt[true]{save-loclist} is set, then the
-locations are added using:
+\glspl{location} are added using:
 \nosecformatdef{glsxtrfieldlistadd}
 Any additional fields that don't have associated keys are then set (if
 required) with \ics{GlsXtrSetField}.
@@ -17643,7 +17692,7 @@ The definition is written to the \ext{glstex} file as:
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}
 
-These commands deal with the way the location lists and 
+These commands deal with the way the \iglspl{locationlist} and 
 cross references are formatted. The commands typically aren't used until
 the entry information is displayed in the glossary, so you may
 redefine these commands after the resource file has been loaded.
@@ -17652,9 +17701,9 @@ redefine these commands after the resource file has been loaded.
 
 \formatdef{bibglsseesep}
 Any entries that provide a \field{see} field (and that field hasn't
-be omitted from the location list with \csopt[omit]{see}) will
+be omitted from the \gls{locationlist} with \csopt[omit]{see}) will
 have \gls{bibglsseesep} inserted between the \field{see} part and the
-location list (unless there are no locations, in which case just
+\gls{locationlist} (unless there are no \glspl{location}, in which case just
 the \field{see} part is displayed without \gls{bibglsseesep}).
 
 This command is provided with:
@@ -17708,25 +17757,25 @@ Displays the formatted cross-reference stored in the
 \cssection{bibglsdelimN}
 
 \formatdef{bibglsdelimN}
-Separator between individual locations, except for the last.
+Separator between individual \glspl{location}, except for the last.
 This defaults to \ics{delimN}.
 
 \cssection{bibglslastDelimN}
 
 \formatdef{bibglslastDelimN}
-Separator between penultimate and final individual locations.
-This defaults to \code{,\idx{nbspchar}} to discourage lonely locations.
+Separator between penultimate and final individual \glspl{location}.
+This defaults to \code{,\idx{nbspchar}} to discourage lonely \glspl{location}.
 
 \cssection{bibglscompact}
 
 \formatdef{bibglscompact}
-The first argument \meta{pattern} indicates the location pattern:
+The first argument \meta{pattern} indicates the \gls{location} pattern:
 \code{digit} for digits, \code{roman} for \idx!{lowercase}
 Roman numerals, \code{ROMAN} for \idx!{uppercase} Roman
-numerals and \code{alpha} for alphabetical locations. The actual
-location is split into two parts, \meta{part1} and \meta{part2}.
+numerals and \code{alpha} for alphabetical \glspl{location}. The actual
+\gls{location} is split into two parts, \meta{part1} and \meta{part2}.
 The string concatenation \meta{part1}\meta{part2} forms the
-actual location.
+actual \gls{location}.
 
 This just does \meta{part2} by default.
 
@@ -17769,7 +17818,7 @@ text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd} are encapsulated within
 the argument of \gls{bibglsrange}. By default this simply does its
 argument. This command is not used with ranges that are formed by collating
-consecutive locations.
+consecutive \glspl{location}.
 
 \cssection{bibglsinterloper}
 
@@ -17811,13 +17860,13 @@ discard the conflicting entries.)
 
 \formatdef{bibglspostlocprefix}
 If the \csopt{loc-prefix} option is on, \gls!{bibglslocprefix} will
-be inserted at the start of location lists, and its default
+be inserted at the start of \glspl{locationlist}, and its default
 definition includes \gls{bibglspostlocprefix}
 placed after the prefix text. This command is provided with:
 \begin{codeenv}
 \cs{providecommand}\marg{\gls{bibglspostlocprefix}}\marg{\cs{cs.space}}
 \end{codeenv}
-which puts a space between the prefix text and the location list.
+which puts a space between the prefix text and the \gls{locationlist}.
 You can define this before you load the \ext{bib} file:
 \begin{codeenv}
 \cs{newcommand}\marg{\gls{bibglspostlocprefix}}\marg{: }
@@ -17910,8 +17959,8 @@ the command is defined as:
 
 Note that this is slightly different from \gls{bibglslocprefix} as
 it includes the 0 case, which in this instance means that there were
-no locations but there was a cross-reference. This command isn't
-added when the location list is empty.
+no \glspl{location} but there was a cross-reference. This command isn't
+added when the \gls{locationlist} is empty.
 
 \cssection{bibglsprimary}
 
@@ -17919,20 +17968,20 @@ added when the location list is empty.
 When the \csopt{save-principal-locations} option is used, the 
 \glspl{principallocation} are stored in the \field{primarylocations} field
 encapsulated with this command. The first argument is the number of
-locations in the list. The second argument is the list of locations
+\glspl{location} in the list. The second argument is the list of \glspl{location}
 formatted in the usual way. The default definition is to ignore the
 first argument and simply do the second.
 
 \cssection{bibglslocationgroup}
 
 \formatdef{bibglslocationgroup}
-When the \csopt{loc-counters} option is used, the locations
+When the \csopt{loc-counters} option is used, the \glspl{location}
 for each entry are grouped together according to the counter
 (in the order specified in the value of \csopt{loc-counters}).
-Each group of locations is encapsulated within
+Each group of \glspl{location} is encapsulated within
 \gls{bibglslocationgroup}, where \meta{n} is the number
-of locations within the group, \meta{counter} is the
-counter name and \meta{list} is the formatted location sub-list.
+of \glspl{location} within the group, \meta{counter} is the
+counter name and \meta{list} is the formatted \gls{location} sub-list.
 By default, this simply does \meta{list}, but may be
 defined (before the resources are loaded) or redefined 
 (after the resources are loaded) as required.
@@ -17954,8 +18003,8 @@ For example:
 }
 \end{codeenv}
 This will prefix each group with the counter name, if there's
-only one location, or the counter name followed by \qt{s},
-if there are multiple locations within the group.
+only one \gls{location}, or the counter name followed by \qt{s},
+if there are multiple \glspl{location} within the group.
 
 There are various ways to adapt this to translate the counter
 name to a different textual label, such as:
@@ -17979,7 +18028,7 @@ name to a different textual label, such as:
 
 \formatdef{bibglslocationgroupsep}
 When the \csopt{loc-counters} option is set, this command
-is used to separate each location sub-group. It may be defined
+is used to separate each \gls{location} sub-group. It may be defined
 before the resources are loaded:
 \begin{codeenv}
 \cs{newcommand}*\marg{\gls{bibglslocationgroupsep}}\marg{; }
@@ -18002,10 +18051,11 @@ or redefined after the resources are loaded:
 \cssection{bibglssupplemental}
 
 \formatdef{bibglssupplemental}
-When the \csopt{supplemental-locations} option is used, the locations
-from a \supplementarydocument\ are encapsulated within the \meta{list}
-part of \gls{bibglssupplemental}. The first argument \meta{n}
-(ignored by default) is the number of \supplementarylocations.
+When the \csopt{supplemental-locations} option is used, the
+\glspl{location} from a \supplementarydocument\ are encapsulated
+within the \meta{list} part of \gls{bibglssupplemental}. The first
+argument \meta{n} (ignored by default) is the number of
+\supplementarylocations.
 
 If multiple \supplemental\ sources are permitted (that is, 
 \bibgls\ has detected that the document is using at least
@@ -18026,8 +18076,8 @@ is the list of \supplementarylocations\ in \meta{external document}.
 \cssection{bibglssupplementalsep}
 
 \formatdef{bibglssupplementalsep}
-The separator between the main location list and the supplementary
-location list. By default this is just \gls!{bibglsdelimN}. This may be
+The separator between the main \gls{locationlist} and the supplementary
+\gls{locationlist}. By default this is just \gls!{bibglsdelimN}. This may be
 defined before the resources are loaded:
 \begin{codeenv}
 \cs{newcommand}\marg{\gls{bibglssupplementalsep}}\marg{; }
@@ -18049,7 +18099,7 @@ or redefined after the resources are loaded:
 
 \formatdef{bibglssupplementalsubsep}
 The separator between the supplementary
-location sub-lists. By default this is just \gls!{bibglsdelimN}.
+\gls{location} sub-lists. By default this is just \gls!{bibglsdelimN}.
 
 \cssection{bibglshrefchar}
 
@@ -18724,7 +18774,7 @@ Here's an example document where both \glspl{childentry} are used:
 \cs{printunsrtglossary}
 \cmd{end}\marg{document}
 \end{codeenv}
-This uses one of the glossary styles designed for homographs and the
+This uses one of the glossary styles designed for \iglspl{homograph} and the
 glossary has the structure:
 \begin{flushleft}
 \textbf{glossary}\par
@@ -19104,14 +19154,14 @@ The \meta{options} recognised by \idx{convertgls2bib} are described below.
 
 \convertglsbibarg{texenc}
 
-The character encoding of the \ext{tex} file. If omitted, the
-operating system's default encoding is assumed (or the
+The character \igls{encoding} of the \ext{tex} file. If omitted, the
+operating system's default \gls{encoding} is assumed (or the
 \idx{JVM}['s]).
 
 \convertglsbibarg{bibenc}
 
-The character encoding of the \ext{bib} file. If omitted, the same
-encoding as the \ext{tex} file is assumed.
+The character \igls{encoding} of the \ext{bib} file. If omitted, the same
+\gls{encoding} as the \ext{tex} file is assumed.
 
 \convertglsbibarg{space-sub}
 
@@ -19740,7 +19790,7 @@ example of \csopt{bibtex-contributor-fields}, see the way the
 \fieldfmt{cast} field in \exfile{films.bib} is dealt with.
 
 Although the file only contains ASCII characters, it starts with 
-an encoding line to prevent \bibgls\ from searching the entire file
+an \gls{encoding} line to prevent \bibgls\ from searching the entire file
 for it. (That's not so much of an issue with a short file, but may
 cause an unnecessary delay for much longer files.)
 
@@ -21667,7 +21717,7 @@ the column headers) and the way each row is formatted:
 There are no \glspl{sub-entry} in this document so I haven't bothered to
 redefine \ics{subglossentry}. (The tabular styles aren't appropriate
 for \glspl{hierarchicalglossary}.) This puts the symbol into the third
-column (rather than the location list, which is ignored).
+column (rather than the \gls{locationlist}, which is ignored).
 This style supports the letter group separator (although it doesn't
 title the groups), so if I want this I need to use the
 \longarg{group} switch.
@@ -21835,10 +21885,10 @@ be revert back to being suppressed for entries containing
 I haven't referenced any of the entries in the main body of the
 document, so I've used \csopt[all]{selection} to select all entries.
 This means that there are no number lists on the first document
-build (\LaTeX+\bibgls+\LaTeX) but the next build would show locations for 
+build (\LaTeX+\bibgls+\LaTeX) but the next build would show \glspl{location} for 
 the books that have been referenced by the film entries. Since this
 looks a bit odd, I've added \csopt[false]{save-locations} to
-prevent \bibgls\ from saving the locations.
+prevent \bibgls\ from saving the \glspl{location}.
 
 I've used a style that shows letter group headings so I need to use
 the \longarg{group} switch.
@@ -22285,7 +22335,7 @@ There are no glossary reference commands, such as \cs{gls}, but
 \bibgls\ can be run with \longarg{cite-as-record} to treat the
 \ics{citation} commands (written to the \ext{aux} file by \ics{cite})
 as ignored records. Since \cs{cite} doesn't record the page number,
-there are no associated locations.
+there are no associated \glspl{location}.
 
 The \mainglossary\ isn't required, so I've used
 \styopt{nomain} to suppress its creation. I want to use both the
@@ -22881,9 +22931,9 @@ records into ignored records:
 \begin{codeenv}
 \ics{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
 \end{codeenv}
-This means that some of the entries won't have location lists, so
+This means that some of the entries won't have \glspl{locationlist}, so
 I've defined a \idx{postdescriptionhook} that inserts a \idx{full-stop} after the
-\field{description} if there's no location otherwise it inserts a
+\field{description} if there's no \gls{location} otherwise it inserts a
 comma:
 \begin{codeenv}
 \cs{newcommand}\marg{\postdeschook{markuplanguage}}\marg{\comment{}
@@ -22893,7 +22943,7 @@ comma:
 }
 \end{codeenv}
 I've used \csopt{loc-suffix} to append a \idx{full-stop} after the
-location lists. This doesn't affect the entries that haven't been
+\glspl{locationlist}. This doesn't affect the entries that haven't been
 indexed.
 
 I decided to convert the first letter of the \field{name} field to
@@ -23199,7 +23249,7 @@ xelatex sample-usergroups
 \end{verbatim}
 The two pages of the document are shown in
 \figureref{fig:sample-usergroups.pdf}. Since the entries have all
-been referenced on page~1, the location lists are all simply~\qt{1}.
+been referenced on page~1, the \glspl{locationlist} are all simply~\qt{1}.
 
 %\lstinputlisting[firstline=5]{../examples/sample-usergroups.tex}
 \begin{lstlisting}[escapechar=|]
@@ -23626,7 +23676,7 @@ fixed with:
 \begin{codeenv}
 \csopt[primary]{combine-dual-locations}
 \end{codeenv}
-Which transfers the dual entry locations to the corresponding
+Which transfers the dual entry \glspl{location} to the corresponding
 primary.
 
 The other problem is the cross-references in the \field{description}
@@ -23730,7 +23780,7 @@ to avoid the redundant index record:
 \cs{renewcommand}\marg{\cs{glsextrapostnamehook}}[1]\marg{}
 \end{codeenv}
 Remember that if any records are added within a glossary, an extra
-\LaTeX\ and \bibgls\ call are required to ensure that the location list 
+\LaTeX\ and \bibgls\ call are required to ensure that the \gls{locationlist} 
 is correct, so the document build is:
 \begin{verbatim}
 pdflatex sample-multi1
@@ -24136,7 +24186,7 @@ the \field{name} field is suitable for alphabetical sorting.
 
 I've aliased \atentryfmt{unit} to \atentry{dualentry}
 rather than \atentry{symbol} as I want both the unit name and the
-measurement in the index and I've combined their location lists:
+measurement in the index and I've combined their \glspl{locationlist}:
 \begin{codeenv}
 \csopt[both]{combine-dual-locations}
 \end{codeenv}
@@ -24182,7 +24232,7 @@ entries except for those in the \exfile{terms.bib} file will link to
 the relevant glossary. Those in the \exfile{terms.bib} file will
 link to the index. It's possible to disable the hyperlinks for those
 entries, but the reader may find it useful to jump to the index to
-look up other locations for that entry in the document.
+look up other \glspl{location} for that entry in the document.
 
 To deal with the identical book and film titles, I'm again using the
 \field{category} to resolve identical sort values:
