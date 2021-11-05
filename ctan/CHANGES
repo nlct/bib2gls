@@ -1,9 +1,11 @@
-v2.8 (pending):
+v2.8 (2021-11-05):
 
-  * sentence case (firstuc) and title case now recognise \MFUskippunc. 
-    This should used to skip leading punctuation.
+  * Support for new features of mfirstuc v2.07:
 
-  * title case now recognises \MFUwordbreak. 
+    - sentence case (firstuc) and title case now recognise \MFUskippunc. 
+      (This should be used to skip leading punctuation.)
+
+    - title case now recognises \MFUwordbreak. 
 
   * new dual field 'dualdescription'
 

@@ -9,7 +9,7 @@ Application Home Page: https://www.dickimaw-books.com/software/bib2gls
 
 # Licence
 
-Copyright (C) 2017-2020 Nicola L. C. Talbot (www.dickimaw-books.com)
+Copyright (C) 2017-2021 Nicola L. C. Talbot (www.dickimaw-books.com)
 
 License GPLv3+: GNU GPL version 3 or later
 http://gnu.org/licenses/gpl.html
@@ -123,6 +123,17 @@ pdflatex myDoc
 ```
 (Replace `pdflatex` with `latex`, `xelatex` or `lualatex` as
 appropriate.)
+
+# Related Resources
+
+  - [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category=bib2gls).
+  - [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
+
+TUGboat articles:
+
+  - [Glossaries with bib2gls](http://tug.org/TUGboat/tb40-1/tb124talbot-bib2gls.pdf), issue [40:1, 2019](http://tug.org/TUGboat/Contents/contents40-1.html).
+  - [bib2gls: selection, cross-references and locations](http://tug.org/TUGboat/tb41-3/tb129talbot-bib2gls-more.pdf), issue [41:3, 2020](http://tug.org/TUGboat/Contents/contents41-3.html).
+  - bib2gls: sorting, issue [42:2, 2021](http://tug.org/TUGboat/Contents/contents42-2.html).
 
 # Installation
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2020 Nicola L.C. Talbot
+    Copyright (C) 2017-2021 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -5449,8 +5449,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.8.20211016";
-   public static final String DATE = "2021-10-16";
+   public static final String VERSION = "2.8";
+   public static final String DATE = "2021-11-05";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

@@ -1,7 +1,7 @@
 # bib2gls
 Command line application to convert `.bib` files to `glossaries-extra.sty` resource file
 
-Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/cgi-bin/faq.cgi?action=view&categorylabel=bib2gls) and [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
+Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category=bib2gls) and [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
 
 Related TUGboat articles:
 
