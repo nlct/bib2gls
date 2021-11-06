@@ -12,7 +12,12 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 
 <entry key="syntax.usage">Usage: {0} [&lt;option&gt;]+ &lt;aux file&gt;</entry>
 <entry key="syntax.info">Helper application for the glossaries-extra package.
-See the manual for further details.</entry>
+The aux file should either be in the current directory 
+or in the directory specified by {0}. Bib files can 
+either be relative to the directory the aux file is in
+or in a location that can be found by kpsewhich.
+See the manual for further details.
+</entry>
 <entry key="syntax.use.help">(Use --help or -h for help.)</entry>
 <entry key="syntax.options">Options:</entry>
 <entry key="syntax.version">{0} (or {1})	Display version and exit.</entry>

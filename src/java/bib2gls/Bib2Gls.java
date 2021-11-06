@@ -4065,7 +4065,7 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.usage", NAME));
       System.out.println();
 
-      System.out.println(getMessage("syntax.info"));
+      System.out.println(getMessage("syntax.info", "--dir"));
       System.out.println();
 
       System.out.println(getMessage("syntax.options"));
@@ -5449,8 +5449,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.8";
-   public static final String DATE = "2021-11-05";
+   public static final String VERSION = "2.9.20211106";
+   public static final String DATE = "2021-11-06";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

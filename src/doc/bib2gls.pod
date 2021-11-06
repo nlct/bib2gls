@@ -12,6 +12,11 @@ B<bibtex>); (2) hierarchically sorts entries and collates location
 lists (similar to B<makeindex> and B<xindy>). The .aux extension may
 be omitted from I<auxfile>.
 
+The I<auxfile> (and corresponding .log file) should either be in the 
+current directory or in the directory specified by B<--dir>. Bib files can 
+either be relative to the directory the I<auxfile> is in
+or in a location that can be found by kpsewhich.
+
 =head1 OPTIONS
 
 =over 4
