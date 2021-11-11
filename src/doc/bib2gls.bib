@@ -1988,6 +1988,20 @@ starred version \csref{glsxtrfmt*}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.compound-dependent,
+   name={\csoptfmt{compound\dhyphen dependent}},
+   user1={\margm{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.compound-adjust-name,
+   name={\csoptfmt{compound\dhyphen adjust\dhyphen name}},
+   user1={\margm{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.labelify,
    name={\csoptfmt{labelify}},
    user1={\meta{list}},
@@ -14967,6 +14981,82 @@ abbreviation by the \catattr{markwords} attribute},
   topics={entryrefcommands,linkcommands,casecommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.37+},
   seealso={glsxtraddlabelprefix,glsxtrprependlabelprefix},
+  category={command}
+}
+
+@glscommand{mgls,
+  name={\csfmt{mgls}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={applies \cs{gls} to each element in the set defined
+by \cs{multiglossaryentry}},
+  topics={entryrefcommands,linkcommands},
+  note={\styfmt{glossaries-extra} v1.48+},
+  category={command}
+}
+
+@glscommand{multiglossaryentry,
+  name={\csfmt{multi\-glossary\-entry}},
+  user1={\oargm{options}\margm{multilabel}\oargm{main label}\margm{list}},
+  description={defines a set of labels (which must correspond to
+   entries that have already been defined) that can be collectively
+   referred to by commands like \cs{mgls}. The \meta{main label}
+   must be included in the comma-separated \meta{list} and indicates
+   which element is considered the main entry in the set. If
+   omitted, the last element in \meta{list} is assumed to be the
+   main element},
+  topics={definingterms},
+  note={\styfmt{glossaries-extra} v1.48+},
+  category={command}
+}
+
+@glscommand{multiglossaryentrysetup,
+  name={\csfmt{multi\-glossary\-entry\-set\-up}},
+  user1={\margm{options}},
+  description={setup the general options for \glspl{compoundentry}},
+  topics={assigncommands},
+  note={\styfmt{glossaries-extra} v1.48+},
+  category={command}
+}
+
+@glscommand{glsxtrmultientryadjustedname,
+  name={\csfmt{gls\-xtr\-multi\-entry\-adjust\-ed\-name}},
+  user1={\margm{sublist1}\margm{name}\margm{sublist2}\margm{label}},
+  description={used by \csopt{compound-adjust-name} to format the
+   name using all the elements of the \gls{compoundentry} set, where
+   \meta{sublist1} is the list of \glspl{compotherlabel} before the
+   \gls{compmainlabel}, \meta{sublist2} is the list of
+   \glspl{compotherlabel} that follow the \gls{compmainlabel},
+   \meta{name} is the pre-adjustment name, and \meta{label} identifies 
+   the \gls{compoundentry}},
+  topics={formattingcommands},
+  note={\styfmt{glossaries-extra-bib2gls} v1.48+},
+  category={command}
+}
+
+@glscommand{Glsxtrmultientryadjustedname,
+  name={\csfmt{Gls\-xtr\-multi\-entry\-adjust\-ed\-name}},
+  user1={\margm{sublist1}\margm{name}\margm{sublist2}\margm{label}},
+  description={first letter uppercase version of \cs{glsxtrmultientryadjustedname}},
+  topics={formattingcommands,casecommands},
+  note={\styfmt{glossaries-extra-bib2gls} v1.48+},
+  category={command}
+}
+
+@glscommand{GlsXtrmultientryadjustedname,
+  name={\csfmt{Gls\-Xtr\-multi\-entry\-adjust\-ed\-name}},
+  user1={\margm{sublist1}\margm{name}\margm{sublist2}\margm{label}},
+  description={title case version of \cs{glsxtrmultientryadjustedname}},
+  topics={formattingcommands,casecommands},
+  note={\styfmt{glossaries-extra-bib2gls} v1.48+},
+  category={command}
+}
+
+@glscommand{GLSxtrmultientryadjustedname,
+  name={\csfmt{GLS\-xtr\-multi\-entry\-adjust\-ed\-name}},
+  user1={\margm{sublist1}\margm{name}\margm{sublist2}\margm{label}},
+  description={upper case version of \cs{glsxtrmultientryadjustedname}},
+  topics={formattingcommands,casecommands},
+  note={\styfmt{glossaries-extra-bib2gls} v1.48+},
   category={command}
 }
 

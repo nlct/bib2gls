@@ -36,7 +36,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
 	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
-	  test-dual-samename.pdf
+	  test-dual-samename.pdf test-mgls.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -689,6 +689,13 @@ test-dual-samename.pdf	: test-dual-samename.glstex
 test-dual-samename.glstex	: test-dual-samename.tex test-dual-samename.bib $(DEPS)
 		pdflatex test-dual-samename
 		$(BIB2GLS) test-dual-samename
+
+test-mgls.pdf	: test-mgls.glstex
+		pdflatex test-mgls
+
+test-mgls.glstex	: test-mgls.tex test-mgls.bib $(DEPS)
+		pdflatex test-mgls
+		$(BIB2GLS) test-mgls
 
 clean	:
 	$(RM) *.aux

@@ -1073,6 +1073,13 @@ public class Bib2GlsEntry extends BibEntry
       interpretFields = processSpecialFields(parser, mfirstucProtect,
            protectFields, idField, interpretFields);
 
+      CompoundEntry compEntry = resource.getCompoundAdjustName(getId());
+
+      if (compEntry != null)
+      {
+         compoundAdjustName(parser, compEntry);
+      }
+
       // the name can't have its case changed until it's been
       // checked and been assigned a fallback if not present.
 
@@ -1578,13 +1585,21 @@ public class Bib2GlsEntry extends BibEntry
       putField(shortPluralField, list);
    }
 
+   protected boolean changeNameAlsoCopyToText(boolean nameProvided)
+   {
+      return true;
+   }
+
    protected void changeNameCase(TeXParser parser)
     throws IOException
    {
       BibValueList value = getField("name");
+      boolean nameProvided = true;
 
       if (value == null)
       {
+         nameProvided = false;
+
          value = getFallbackContents("name");
 
          if (value == null)
@@ -1595,12 +1610,15 @@ public class Bib2GlsEntry extends BibEntry
          value = (BibValueList)value.clone();
       }
 
-      BibValueList textValue = getField("text");
-
-      if (textValue == null)
+      if (changeNameAlsoCopyToText(nameProvided))
       {
-         putField("text", value);
-         putField("text", value.expand(parser).toString(parser));
+         BibValueList textValue = getField("text");
+
+         if (textValue == null)
+         {
+            putField("text", value);
+            putField("text", value.expand(parser).toString(parser));
+         }
       }
 
       value = resource.applyNameCaseChange(parser, value);
@@ -1609,6 +1627,79 @@ public class Bib2GlsEntry extends BibEntry
 
       putField("name", value);
       putField("name", list.toString(parser));
+   }
+
+   protected void compoundAdjustName(TeXParser parser, CompoundEntry comp)
+    throws IOException
+   {
+      BibValueList value = getField("name");
+      boolean nameProvided = true;
+
+      if (value == null)
+      {
+         nameProvided = false;
+
+         value = getFallbackContents("name");
+
+         if (value == null)
+         {
+            return;
+         }
+
+         value = (BibValueList)value.clone();
+      }
+
+      if (changeNameAlsoCopyToText(nameProvided))
+      {
+         BibValueList textValue = getField("text");
+
+         if (textValue == null)
+         {
+            putField("text", value);
+            putField("text", value.expand(parser).toString(parser));
+
+         }
+      }
+
+      BibValueList newList = new BibValueList();
+
+      TeXObjectList newContent = new TeXObjectList();
+      Group grp1 = parser.getListener().createGroup();
+      Group grp2 = parser.getListener().createGroup();
+      Group grp3 = parser.getListener().createGroup();
+
+      newContent.add(new TeXCsRef("glsxtrmultientryadjustedname"));
+      newContent.add(grp1);
+      newContent.add(grp2);
+      newContent.add(grp3);
+      newContent.add(parser.getListener().createGroup(comp.getLabel()));
+
+      TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
+      grp2.addAll(list);
+
+      Group g = grp1;
+      String id = getId();
+      String sep = "";
+
+      for (String elem : comp.getElements())
+      {
+         if (comp.getMainLabel().equals(elem))
+         {
+            g = grp3;
+            sep = "";
+         }
+         else
+         {
+            g.addAll(parser.getListener().createString(sep+elem));
+            sep = ",";
+         }
+      }
+
+      BibUserString content = new BibUserString(newContent);
+      newList.add(content);
+
+      putField("name", newList);
+      putField("name", newContent.toString(parser));
    }
 
    protected void changeFieldCase(TeXParser parser)
@@ -2890,6 +2981,7 @@ public class Bib2GlsEntry extends BibEntry
          if (entry == null)
          {
             crossRefTail = (currentTail == null ? "" : currentTail);
+
             return currentTail;
          }
 
@@ -4070,16 +4162,39 @@ public class Bib2GlsEntry extends BibEntry
       }
       else
       {
-         alias = processLabel(alias);
+         // is this a compound entry?
+         CompoundEntry comp = bib2gls.getCompoundEntry(alias);
 
-         if (bib2gls.getVerboseLevel() > 0)
+         if (comp == null)
          {
-            bib2gls.logMessage(bib2gls.getMessage(
-               "message.crossref.found", getId(),
-               "alias", alias));
+            alias = processLabel(alias);
+
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.crossref.found", getId(),
+                  "alias", alias));
+            }
+
+            addDependency(alias);
+         }
+         else
+         {
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.compoundcrossref.found", getId(),
+                  "alias", alias));
+            }
+
+            String[] elements = comp.getElements();
+
+            for (String elem : elements)
+            {
+               addDependency(elem);
+            }
          }
 
-         addDependency(alias);
          putField("alias", alias);
 
          resource.setAliases(true);
@@ -4181,17 +4296,45 @@ public class Bib2GlsEntry extends BibEntry
             xr = ((TeXObjectList)xr).trim();
          }
 
-         crossRefs[i] = processLabel(xr.toString(parser));
+         String label = xr.toString(parser);
 
-         String label = crossRefs[i];
+         // is this a compound entry?
+         CompoundEntry comp = bib2gls.getCompoundEntry(label);
 
-         if (bib2gls.getVerboseLevel() > 0)
+         if (comp == null)
          {
-            bib2gls.logMessage(bib2gls.getMessage(
-               "message.crossref.found", getId(), "see", label));
+            crossRefs[i] = processLabel(label);
+
+            label = crossRefs[i];
+
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.crossref.found", getId(), "see", label));
+            }
+
+            addDependency(label);
+         }
+         else
+         {
+            crossRefs[i] = label;
+
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.compoundcrossref.found", getId(), "see", label));
+            }
+
+            String[] elements = comp.getElements();
+
+            for (String elem : elements)
+            {
+               // don't process the label since it's provided in the
+               // document not the bib files
+               addDependency(elem);
+            }
          }
 
-         addDependency(label);
          builder.append(label);
 
          if (i != n-1)
@@ -4221,15 +4364,36 @@ public class Bib2GlsEntry extends BibEntry
 
          for (String label : alsocrossRefs)
          {
-            label = processLabel(label);
-   
-            if (bib2gls.getVerboseLevel() > 0)
+            // is this a compound entry?
+            CompoundEntry comp = bib2gls.getCompoundEntry(label);
+
+            if (comp == null)
             {
-               bib2gls.logMessage(bib2gls.getMessage(
-                  "message.crossref.found", getId(), "seealso", label));
-            }
+               label = processLabel(label);
    
-            addDependency(label);
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                     "message.crossref.found", getId(), "seealso", label));
+               }
+   
+               addDependency(label);
+            }
+            else
+            {
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                     "message.compoundcrossref.found", getId(), "seealso", label));
+               }
+
+               String[] elements = comp.getElements();
+
+               for (String elem : elements)
+               {
+                  addDependency(elem);
+               }
+            }
 
             builder.append(sep);
             builder.append(label);
@@ -4282,17 +4446,41 @@ public class Bib2GlsEntry extends BibEntry
             xr = ((TeXObjectList)xr).trim();
          }
 
-         alsocrossRefs[i] = xr.toString(parser);
+         String label = xr.toString(parser);
 
-         String label = processLabel(alsocrossRefs[i]);
+         // is this a compound entry?
+         CompoundEntry comp = bib2gls.getCompoundEntry(label);
 
-         if (bib2gls.getVerboseLevel() > 0)
+         alsocrossRefs[i] = label;
+
+         if (comp == null)
          {
-            bib2gls.logMessage(bib2gls.getMessage(
-               "message.crossref.found", getId(), "seealso", label));
+            label = processLabel(alsocrossRefs[i]);
+
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.crossref.found", getId(), "seealso", label));
+            }
+
+            addDependency(label);
+         }
+         else
+         {
+            if (bib2gls.getVerboseLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage(
+                  "message.compoundcrossref.found", getId(), "seealso", label));
+            }
+
+            String[] elements = comp.getElements();
+
+            for (String elem : elements)
+            {
+               addDependency(elem);
+            }
          }
 
-         addDependency(label);
          builder.append(label);
 
          if (i != n-1)

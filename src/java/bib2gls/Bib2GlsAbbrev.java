@@ -100,6 +100,12 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       return super.getFallbackContents(field);
    }
 
+   @Override
+   protected boolean changeNameAlsoCopyToText(boolean nameProvided)
+   {
+      return nameProvided;
+   }
+
    protected void changeNameCase(TeXParser parser)
     throws IOException
    {

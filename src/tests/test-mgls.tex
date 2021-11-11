@@ -1,0 +1,40 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage{hyperref}
+\usepackage[record,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\glssetcategoryattribute{genus}{textformat}{emph}
+\glssetcategoryattribute{species}{textformat}{emph}
+
+\setabbreviationstyle{long-only-short-only}
+\renewcommand*{\glsxtronlyname}{%
+  \protect\glslongonlyfont{\the\glslongtok}%
+}
+\GlsXtrLoadResources
+[
+  field-aliases={
+   identifier=category,
+   %genus=parent,
+   %other=alias
+  },
+  compound-dependent,
+  compound-adjust-name%=once
+]
+
+\multiglossaryentry{cbot}{clostridium,botulinum}
+\multiglossaryentry{cperf}{clostridium,perfringens}
+\multiglossaryentry[textformat=textbf]{ctet}{clostridium,tetani}
+
+%\multiglossaryentrysetup{encapothers=glsignore,hyper=mainonly}
+\multiglossaryentrysetup{indexothers=false}
+
+\begin{document}
+\mgls{cbot}, \mgls{cperf}, \mgls{ctet}.
+\mgls{cbot}, \mgls{cperf}, \mgls{ctet}.
+\gls{botox}.
+
+\printunsrtglossaries.
+\end{document}

@@ -192,7 +192,9 @@ See the manual for further details.
 <entry key="message.copying">Copying {0} -&gt; {1}</entry>
 <entry key="message.moving">Moving {0} -&gt; {1}</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
+<entry key="message.compoundcrossref.found">Entry {0}: found compound cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.by">Entry {0} cross-referenced by {1}</entry>
+<entry key="message.compoundcrossref.by">Compound entry {0} cross-referenced by {1}</entry>
 <entry key="message.checking.crossrefs">Checking cross-references for: {0}</entry>
 <entry key="message.crossref.tail">Cross-reference tail for ''{0}'': {1}</entry>
 <entry key="message.custom.dep.found">Entry {0}: found custom ''{1}'' dependency ({2}): {3}</entry>
@@ -435,6 +437,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.multi_supp_unsupported">Multiple supplemental locations not supported with glossaries-extra {1}. Restricting selection to just {0}. Update to at least glossaries-extra version {2} to support multiple supplementary sources.</entry>
 <entry key="warning.unknown_entry">Unknown entry: {0}</entry>
 <entry key="warning.unknown_entry_in_current_resource">Unknown entry ''{0}'' in current resource set: {1}</entry>
+<entry key="warning.unknown_compound_label">Unknown compound entry ''{0}''.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>

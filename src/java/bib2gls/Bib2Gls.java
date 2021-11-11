@@ -1039,6 +1039,9 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new CapitaliseWords(mfirstucSty, 
         "bibglstitlecase"));
 
+      listener.putControlSequence(new CapitaliseWords(mfirstucSty, 
+        "glscapitalisewords"));
+
       listener.putControlSequence(new EnableTagging());
       listener.putControlSequence(new AtFirstOfTwo("bibglscontributorlist"));
       listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
@@ -1088,45 +1091,45 @@ public class Bib2Gls implements TeXApp
         "glsentrysymbolplural", "symbolplural", this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryname", "name", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryname", "name", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentrytext", "text", GlsUseField.CASE_SENTENCE, this));
+        "Glsentrytext", "text", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryshort", "short", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryshort", "short", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentrylong", "long", GlsUseField.CASE_SENTENCE, this));
+        "Glsentrylong", "long", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryfirst", "first", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryfirst", "first", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentrysymbol", "symbol", GlsUseField.CASE_SENTENCE, this));
+        "Glsentrysymbol", "symbol", CaseChange.SENTENCE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuseri", "user1", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryuseri", "user1", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuserii", "user2", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryuserii", "user2", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuseriii", "user3", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryuseriii", "user3", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuseriv", "user4", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryuseriv", "user4", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuserv", "user5", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryuserv", "user5", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryuservi", "user6", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryuservi", "user6", CaseChange.SENTENCE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsentryplural", "plural", GlsUseField.CASE_SENTENCE, this));
+        "Glsentryplural", "plural", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentryfirstplural", "firstplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentryshortpl", "shortplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentrylongpl", "longplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsentrysymbolplural", "symbolplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
 
       // Treat \glsaccess... as \glsentry... etc
 
@@ -1168,53 +1171,53 @@ public class Bib2Gls implements TeXApp
         "glsaccesssymbolplural", "symbolplural", this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessname", "name", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessname", "name", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccesstext", "text", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccesstext", "text", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessshort", "short", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessshort", "short", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccesslong", "long", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccesslong", "long", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessfirst", "first", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessfirst", "first", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccesssymbol", "symbol", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccesssymbol", "symbol", CaseChange.SENTENCE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessuseri", "user1", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessuseri", "user1", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessuserii", "user2", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessuserii", "user2", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessuseriii", "user3", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessuseriii", "user3", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessuseriv", "user4", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessuseriv", "user4", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessuserv", "user5", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessuserv", "user5", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessuservi", "user6", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessuservi", "user6", CaseChange.SENTENCE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
-        "Glsaccessplural", "plural", GlsUseField.CASE_SENTENCE, this));
+        "Glsaccessplural", "plural", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsaccessfirstplural", "firstplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsaccessshortpl", "shortplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsaccesslongpl", "longplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsaccesssymbolplural", "symbolplural", 
-         GlsUseField.CASE_SENTENCE, this));
+         CaseChange.SENTENCE, this));
 
       listener.putControlSequence(new GlsUseField(this));
       listener.putControlSequence(new GlsUseField(
-        "Glsxtrusefield", GlsUseField.CASE_SENTENCE, this));
+        "Glsxtrusefield", CaseChange.SENTENCE, this));
       listener.putControlSequence(new GlsUseField(
-        "GLSxtrusefield", GlsUseField.CASE_TO_UPPER, this));
+        "GLSxtrusefield", CaseChange.TO_UPPER, this));
       listener.putControlSequence(new GlsUseField(
-        "glsentrytitlecase", GlsUseField.CASE_TITLE_CASE, this));
+        "glsentrytitlecase", CaseChange.TITLE, this));
 
 
       listener.putControlSequence(new GlsEntryParentName(this));
@@ -1223,13 +1226,13 @@ public class Bib2Gls implements TeXApp
         "glsxtrhiernamesep", null, listener.createString(".")));
       listener.putControlSequence(new GlsHierName(this));
       listener.putControlSequence(new GlsHierName("Glsxtrhiername",
-        GlsUseField.CASE_SENTENCE, true, this));
+        CaseChange.SENTENCE, true, this));
       listener.putControlSequence(new GlsHierName("GlsXtrhiername",
-        GlsUseField.CASE_SENTENCE, false, this));
+        CaseChange.SENTENCE, false, this));
       listener.putControlSequence(new GlsHierName("GLSxtrhiername",
-        GlsUseField.CASE_TO_UPPER, true, this));
+        CaseChange.TO_UPPER, true, this));
       listener.putControlSequence(new GlsHierName("GLSXTRhiername",
-        GlsUseField.CASE_TO_UPPER, false, this));
+        CaseChange.TO_UPPER, false, this));
 
       listener.putControlSequence(new AtFirstOfOne("MFUwordbreak"));
       listener.putControlSequence(new AtFirstOfOne("MFUskippunc"));
@@ -1265,6 +1268,61 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new HrefChar());
       listener.putControlSequence(new AtSecondOfTwo("bibglshrefunicode"));
       listener.putControlSequence(new HexUnicodeChar());
+
+      listener.putControlSequence(new GlsCombinedSep());
+      listener.putControlSequence(new GlsCombinedSep("glscombinedfirstsep"));
+      listener.putControlSequence(new GlsCombinedSep("glscombinedsepfirst"));
+      listener.putControlSequence(new GlsCombinedSep("glscombinedfirstsepfirst"));
+
+      listener.putControlSequence(new GenericCommand(true,
+       "glsxtrmultientryadjustednamesep", null,
+       new TeXObject[] { new TeXCsRef("glscombinedfirstsepfirst") }));
+
+      listener.putControlSequence(new GenericCommand(true,
+       "glsxtrmultientryadjustednamepresep", null,
+       new TeXObject[] { new TeXCsRef("glsxtrmultientryadjustednamesep") }));
+
+      listener.putControlSequence(new GenericCommand(true,
+       "glsxtrmultientryadjustednamepostsep", null,
+       new TeXObject[] { new TeXCsRef("glsxtrmultientryadjustednamesep") }));
+
+      listener.putControlSequence(new AtFirstOfOne("glsxtrmultientryadjustednamefmt"));
+
+      listener.putControlSequence(new GenericCommand(true,
+       "Glsxtrmultientryadjustednamefmt", null,
+       new TeXObject[] { new TeXCsRef("makefirstuc") }));
+
+      listener.putControlSequence(new GenericCommand(true,
+       "GlsXtrmultientryadjustednamefmt", null,
+       new TeXObject[] { new TeXCsRef("glscapitalisewords") }));
+
+      listener.putControlSequence(new GenericCommand(true,
+       "GLSxtrmultientryadjustednamefmt", null,
+       new TeXObject[] { new TeXCsRef("mfirstucMakeUppercase") }));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "glsxtrmultientryadjustednameother", "name",
+         CaseChange.NONE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "Glsxtrmultientryadjustednameother", "name",
+         CaseChange.SENTENCE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "GlsXtrmultientryadjustednameother", "name",
+         CaseChange.TITLE, this));
+
+      listener.putControlSequence(new GlsEntryFieldValue(
+        "GLSxtrmultientryadjustednameother", "name",
+         CaseChange.TO_UPPER, this));
+
+      listener.putControlSequence(new GlsXtrMultiEntryAdjustedName(this));
+      listener.putControlSequence(new GlsXtrMultiEntryAdjustedName(this,
+        "Glsxtrmultientryadjustedname", CaseChange.SENTENCE));
+      listener.putControlSequence(new GlsXtrMultiEntryAdjustedName(this,
+        "GlsXtrmultientryadjustedname", CaseChange.TITLE));
+      listener.putControlSequence(new GlsXtrMultiEntryAdjustedName(this,
+        "GLSxtrmultientryadjustedname", CaseChange.TO_UPPER));
 
       // Custom packages may override the definitions of any of the
       // above.
@@ -1579,6 +1637,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("@glsxtr@altmodifier", 1);
             addAuxCommand("@glsxtr@newglslike", 2);
             addAuxCommand("@glsxtr@prefixlabellist", 1);
+            addAuxCommand("@glsxtr@multientry", 4);
 
             if (knownGlossaries != null)
             {
@@ -1669,6 +1728,15 @@ public class Bib2Gls implements TeXApp
          {
             addGlsLike(data.getArg(0).toString(parser), 
              data.getArg(1).toString(parser).substring(1));
+         }
+         else if (name.equals("@glsxtr@multientry"))
+         {
+            addCompoundEntry(new CompoundEntry(
+              data.getArg(1).toString(parser),//label
+              data.getArg(3).toString(parser),//element list
+              data.getArg(2).toString(parser),//main label
+              data.getArg(0).toString(parser)//options
+             ));
          }
          else if (name.equals("@glsxtr@prefixlabellist"))
          {
@@ -2499,6 +2567,103 @@ public class Bib2Gls implements TeXApp
       }
 
       return false;
+   }
+
+   public CompoundEntry getCompoundEntry(String label)
+   {
+      if (compoundEntries == null)
+      {
+         return null;
+      }
+
+      return compoundEntries.get(label);
+   }
+
+   public void addCompoundEntry(CompoundEntry compoundEntry)
+   {
+      if (compoundEntries == null)
+      {
+         compoundEntries = new HashMap<String,CompoundEntry>();
+      }
+
+      compoundEntries.put(compoundEntry.getLabel(), compoundEntry);
+   }
+
+   public boolean hasCompoundEntries()
+   {
+      return compoundEntries != null;
+   }
+
+   public Set<String> getCompoundEntrySet()
+   {
+      if (compoundEntries == null)
+      {
+         return null;
+      }
+
+      return compoundEntries.keySet();
+   }
+
+   /* Gets the first compound entry found that has the given 
+    * label as the main element. Returns null if no compound entry
+    * has the label.
+   */
+   public CompoundEntry getCompoundEntryWithMain(String mainLabel)
+   {
+      if (compoundEntries == null)
+      {
+         return null;
+      }
+
+      for (Iterator<String> it=compoundEntries.keySet().iterator();
+           it.hasNext(); )
+      {
+         String compLabel = it.next();
+         CompoundEntry c = compoundEntries.get(compLabel);
+
+         if (c.getMainLabel().equals(mainLabel))
+         {
+            return c;
+         }
+      }
+
+      return null;
+   }
+
+   /* Gets the unique compound entry that has the given 
+    * label as the main element. Returns null if no compound entry
+    * has the label as the main element or if multiple sets are
+    * found.
+   */
+   public CompoundEntry getUniqueCompoundEntryWithMain(String mainLabel)
+   {
+      if (compoundEntries == null)
+      {
+         return null;
+      }
+
+      CompoundEntry comp = null;
+
+      for (Iterator<String> it=compoundEntries.keySet().iterator();
+           it.hasNext(); )
+      {
+         String compLabel = it.next();
+         CompoundEntry c = compoundEntries.get(compLabel);
+
+         if (c.getMainLabel().equals(mainLabel))
+         {
+            if (comp == null)
+            {
+               comp = c;
+            }
+            else
+            {
+               return null;
+            }
+         }
+      }
+
+      return comp;
    }
 
    public boolean useGroupField()
@@ -5449,8 +5614,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.9.20211106";
-   public static final String DATE = "2021-11-06";
+   public static final String VERSION = "2.9.20211111";
+   public static final String DATE = "2021-11-11";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5489,6 +5654,8 @@ public class Bib2Gls implements TeXApp
    private Vector<String> selectedEntries;
 
    private Vector<String> knownGlossaries=null;
+
+   private HashMap<String,CompoundEntry> compoundEntries;
 
    public static final String[] SPAWN_SPECIAL_FIELDS =
     new String[] {"progeny", "progenitor", "adoptparents"};

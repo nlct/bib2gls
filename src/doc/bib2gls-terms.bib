@@ -54,7 +54,8 @@
    the \glspl{spawnedentry} are created. A main entry may 
    be a dual-entry type, consisting of a \gls{primaryentry}
    and \gls{dualentry}.
-   (Not to be confused with the main glossary.)}
+   (Not to be confused with the main glossary or the \gls{compmainlabel}
+    of a \gls{compoundentry}.)}
 }
 
 @entry{progenitor,
@@ -75,7 +76,9 @@
   name={multi-entry type},
   description={An entry type that can spawn multiple
    \glspl{primaryentry}. Some multi-entry types can also spawn a
-   \gls{dualentry}. See \sectionref{sec:multientry}.}
+   \gls{dualentry}. See \sectionref{sec:multientry}. 
+   For the \sty{glossaries-extra} \qt{multi (compound or combined) entries} 
+   that are defined with \cs{multiglossaryentry} see \gls{compoundentry}.}
 }
 
 @entry{spawnedentry,
@@ -429,4 +432,31 @@ set), and isn't picked up by iterative commands such as
 \href{https://dickimaw-books.com/blog/binary-files-text-files-and-file-encodings/}{Binary
 Files, Text Files and File Encodings} for further information about
   file encodings in general.}
+}
+
+@entry{compoundentry,
+   name={compound (combined or multi) entry},
+   text={compound entry},
+   plural={compound entries},
+   description={A compound entry isn't a \bibgls\ entry type but
+   corresponds to the \cs{multiglossaryentry} command. This defines
+   a label that represents a set of entries that have already been 
+   defined. This label can then be used in commands like \gls{mgls}
+   as a shortcut for using \gls{gls} for each element in the set.
+   The \gls{compmainlabel} is the main element in the set.
+   See \sectionref{sec:compoundentries}.}
+}
+
+@entry{compmainlabel,
+  name = {main label or element (compound entry)},
+  text = {main label},
+  description = {The main element in the set that defines a 
+  \gls{compoundentry}.}
+}
+
+@entry{compotherlabel,
+  name = {other label or element (compound entry)},
+  text = {other label},
+  description = {The non-\glslink{compmainlabel}{main} elements in the 
+  set that defines a \gls{compoundentry}.}
 }

@@ -2749,6 +2749,28 @@ public class GlsResource
                secondarySortSettings.setCollatorDecomposition(Collator.FULL_DECOMPOSITION);
             }
          }
+         else if (opt.equals("compound-dependent"))
+         {
+            compoundEntriesDependent = getBoolean(parser, list, opt);
+         }
+         else if (opt.equals("compound-adjust-name"))
+         {
+            String val = getChoice(parser, "once", list, opt,
+               "false", "once", "unique");
+
+            if (val.equals("once"))
+            {
+               compoundAdjustName = COMPOUND_ADJUST_NAME_ONCE;
+            }
+            else if (val.equals("unique"))
+            {
+               compoundAdjustName = COMPOUND_ADJUST_NAME_UNIQUE;
+            }
+            else// if (val.equals("false"))
+            {
+               compoundAdjustName = COMPOUND_ADJUST_NAME_FALSE;
+            }
+         }
          else
          {
             throw new IllegalArgumentException(
@@ -5563,6 +5585,32 @@ public class GlsResource
                target = getEntry(alias, dualData);
             }
 
+            Vector<Bib2GlsEntry> otherTargets = null;
+
+            if (target == null)
+            {
+               // is alias a compound entry?
+
+               CompoundEntry comp = bib2gls.getCompoundEntry(alias);
+
+               if (comp != null)
+               {
+                  String mainLabel = comp.getMainLabel();
+
+                  target = getEntry(mainLabel, bibData);
+
+                  if (target == null && dualData != null)
+                  {
+                     target = getEntry(mainLabel, dualData);
+                  }
+
+                  if (target != null)
+                  {
+                     otherTargets = getOtherElements(comp, bibData, dualData);
+                  }
+               }
+            }
+
             if (target == null)
             {
                bib2gls.warningMessage("warning.alias.not.found",
@@ -5576,6 +5624,14 @@ public class GlsResource
                   bib2gls.debugMessage("message.added.alias.dep", entry.getId(),
                     target.getId());
                   target.addDependency(entry.getId());
+
+                  if (otherTargets != null)
+                  {
+                     for (Bib2GlsEntry other : otherTargets)
+                     {
+                        other.addDependency(entry.getId());
+                     }
+                  }
                }
 
                target.copyRecordsFrom(entry);
@@ -5603,7 +5659,52 @@ public class GlsResource
          }
       }
 
+      if (bib2gls.hasCompoundEntries() && compoundEntriesDependent)
+      {
+         for (Iterator<String> it = bib2gls.getCompoundEntrySet().iterator();
+              it.hasNext(); )
+         {
+            String compLabel = it.next();
+
+            CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
+
+            String mainLabel = comp.getMainLabel();
+            Bib2GlsEntry entry = getEntry(mainLabel);
+
+            // The compound entry list is global. Elements may not
+            // be in this resource set.
+
+            if (entry != null)
+            {
+               for (String elem : comp.getElements())
+               {
+                  if (!elem.equals(mainLabel))
+                  {
+                     entry.addDependency(elem);
+                  }
+               }
+            }
+         }
+      }
+
       addSupplementalRecords();
+   }
+
+   public CompoundEntry getCompoundAdjustName(String id)
+   {
+      switch (compoundAdjustName)
+      {
+         case COMPOUND_ADJUST_NAME_FALSE:
+            return null;
+
+         case COMPOUND_ADJUST_NAME_ONCE:
+            return bib2gls.getCompoundEntryWithMain(id);
+
+         case COMPOUND_ADJUST_NAME_UNIQUE:
+            return bib2gls.getUniqueCompoundEntryWithMain(id);
+      }
+
+      return null;
    }
 
    private void addCrossRefs(Bib2GlsEntry entry, String... xrList)
@@ -5638,7 +5739,25 @@ public class GlsResource
             }
          }
 
-         if (xrEntry != null)
+         if (xrEntry == null)
+         {
+            CompoundEntry comp = bib2gls.getCompoundEntry(xr);
+
+            if (comp != null)
+            {
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                    "message.compoundcrossref.by", xr, entry.getId()));
+               }
+
+               for (String elem : comp.getElements())
+               {
+                  addCrossRefs(entry, elem);
+               }
+            }
+         }
+         else
          {
             if (bib2gls.getVerboseLevel() > 0)
             {
@@ -6131,6 +6250,35 @@ public class GlsResource
       }
 
       return null;
+   }
+
+   public Vector<Bib2GlsEntry> getOtherElements(CompoundEntry comp,
+     Vector<Bib2GlsEntry> bibData, Vector<Bib2GlsEntry> dualData)
+   {
+      Vector<Bib2GlsEntry> list = new Vector<Bib2GlsEntry>();
+
+      String[] elements = comp.getElements();
+      String mainLabel = comp.getMainLabel();
+
+      for (String elem : elements)
+      {
+         if (!elem.equals(mainLabel))
+         {
+            Bib2GlsEntry other = getEntry(elem, bibData);
+
+            if (other == null && dualData != null)
+            {
+               other = getEntry(elem, dualData);
+            }
+
+            if (other != null)
+            {
+               list.add(other);
+            }
+         }
+      }
+
+      return list;
    }
 
    public String getRecordLabel(GlsRecord record)
@@ -9552,6 +9700,32 @@ public class GlsResource
                   list.addAll(i, subList);
                }
             }
+            else if (csname.toLowerCase().equals("glsxtrmultientryadjustedname"))
+            {
+               list.set(csIdx, new TeXCsRef("glsxtrmultientryadjustedname"));
+
+               // four arguments, second needs adjusting
+               i++;
+               int count = 0;
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     count++;
+
+                     if (count == 2 && object instanceof TeXObjectList)
+                     {
+                        toLowerCase((TeXObjectList)object, listener);
+                     }
+
+                     if (count == 4) break;
+                  }
+
+                  i++;
+               }
+            }
             else
             {
                String lowerCsname = null;
@@ -9816,6 +9990,27 @@ public class GlsResource
                i += subList.size();
                n = list.size();
             }
+            else if (csname.toLowerCase().equals("glsxtrmultientryadjustedname"))
+            {
+               list.set(csIdx, new TeXCsRef("GLSxtrmultientryadjustedname"));
+
+               // four arguments
+               i++;
+               int count = 0;
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     count++;
+
+                     if (count == 4) break;
+                  }
+
+                  i++;
+               }
+            }
             else
             {
                String allcapsCSname = null;
@@ -9993,6 +10188,13 @@ public class GlsResource
             if (csname.equals("glsentrytitlecase"))
             {
                list.set(csIdx, new TeXCsRef("Glsxtrusefield"));
+
+               return;
+            }
+
+            if (csname.toLowerCase().equals("glsxtrmultientryadjustedname"))
+            {
+               list.set(csIdx, new TeXCsRef("Glsxtrmultientryadjustedname"));
 
                return;
             }
@@ -10501,6 +10703,29 @@ public class GlsResource
                   if (!(object instanceof Ignoreable))
                   {
                      break;
+                  }
+
+                  i++;
+               }
+
+               wordCount++;
+               continue;
+            }
+            else if (csname.toLowerCase().equals("glsxtrmultientryadjustedname"))
+            {
+               list.set(csIdx, new TeXCsRef("GlsXtrmultientryadjustedname"));
+
+               i++;
+               int count = 0;
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     count++;
+
+                     if (count==4) break;
                   }
 
                   i++;
@@ -12582,5 +12807,13 @@ public class GlsResource
    private Bib2GlsBibParser bibParserListener = null;
 
    private Vector<String> additionalUserFields = null;
+
+   private boolean compoundEntriesDependent = false;
+
+   public static final int COMPOUND_ADJUST_NAME_FALSE=0;
+   public static final int COMPOUND_ADJUST_NAME_ONCE=1;
+   public static final int COMPOUND_ADJUST_NAME_UNIQUE=2;
+
+   private int compoundAdjustName = COMPOUND_ADJUST_NAME_FALSE;
 }
 
