@@ -27,15 +27,15 @@ public class GlsHierName extends GlsUseField
 {
    public GlsHierName(Bib2Gls bib2gls)
    {
-      this("glsxtrhiername", CASE_NO_CHANGE, false, bib2gls);
+      this("glsxtrhiername", CaseChange.NONE, false, bib2gls);
    }
 
    public GlsHierName(String name, Bib2Gls bib2gls)
    {
-      this(name, CASE_NO_CHANGE, false, bib2gls);
+      this(name, CaseChange.NONE, false, bib2gls);
    }
 
-   public GlsHierName(String name, int caseChange, boolean topLevelOnlyChange, 
+   public GlsHierName(String name, CaseChange caseChange, boolean topLevelOnlyChange, 
       Bib2Gls bib2gls)
    {
       super(name, caseChange, bib2gls);
@@ -113,7 +113,7 @@ public class GlsHierName extends GlsUseField
       }
       else
       {
-         process(parser, entry, fieldLabel, CASE_NO_CHANGE, expanded);
+         process(parser, entry, fieldLabel, CaseChange.NONE, expanded);
       }
 
       return expanded;

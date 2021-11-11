@@ -27,29 +27,18 @@ public class GlsUseField extends EntryFieldCommand
 {
    public GlsUseField(Bib2Gls bib2gls)
    {
-      this("glsxtrusefield", CASE_NO_CHANGE, bib2gls);
+      this("glsxtrusefield", CaseChange.NONE, bib2gls);
    }
 
    public GlsUseField(String name, Bib2Gls bib2gls)
    {
-      this(name, CASE_NO_CHANGE, bib2gls);
+      this(name, CaseChange.NONE, bib2gls);
    }
 
-   public GlsUseField(String name, int caseChange, Bib2Gls bib2gls)
+   public GlsUseField(String name, CaseChange caseChange, Bib2Gls bib2gls)
    {
       super(name, bib2gls);
-
-      switch (caseChange)
-      {
-         case CASE_NO_CHANGE:
-         case CASE_SENTENCE:
-         case CASE_TO_UPPER:
-         case CASE_TITLE_CASE:
-            this.caseChange = caseChange;
-         break;
-         default:
-           throw new IllegalArgumentException("Invalid case change "+caseChange);
-      }
+      this.caseChange = caseChange;
    }
 
    public Object clone()
@@ -57,7 +46,7 @@ public class GlsUseField extends EntryFieldCommand
       return new GlsUseField(getName(), getCaseChange(), bib2gls);
    }
 
-   public int getCaseChange()
+   public CaseChange getCaseChange()
    {
       return caseChange;
    }
@@ -152,7 +141,7 @@ public class GlsUseField extends EntryFieldCommand
    }
 
    protected void process(TeXParser parser,
-      Bib2GlsEntry entry, String fieldLabel, int caseChange,
+      Bib2GlsEntry entry, String fieldLabel, CaseChange caseChange,
       TeXObjectList pending)
       throws IOException
    {
@@ -162,15 +151,15 @@ public class GlsUseField extends EntryFieldCommand
 
       switch (caseChange)
       {
-         case CASE_SENTENCE:
+         case SENTENCE:
            bib2gls.getCurrentResource().toSentenceCase(obj,
              parser.getListener());
          break;
-         case CASE_TO_UPPER:
+         case TO_UPPER:
            bib2gls.getCurrentResource().toUpperCase(obj,
              parser.getListener());
          break;
-         case CASE_TITLE_CASE:
+         case TITLE:
            bib2gls.getCurrentResource().toTitleCase(obj,
              parser.getListener());
          break;
@@ -179,10 +168,5 @@ public class GlsUseField extends EntryFieldCommand
       pending.add(obj);
    }
 
-   public static final int CASE_NO_CHANGE=0;
-   public static final int CASE_SENTENCE=1;
-   public static final int CASE_TO_UPPER=2;
-   public static final int CASE_TITLE_CASE=3;
-
-   private int caseChange = CASE_NO_CHANGE;
+   private CaseChange caseChange = CaseChange.NONE;
 }

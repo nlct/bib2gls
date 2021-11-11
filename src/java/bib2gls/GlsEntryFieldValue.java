@@ -27,11 +27,11 @@ public class GlsEntryFieldValue extends GlsUseField
 {
    public GlsEntryFieldValue(String name, String fieldLabel, Bib2Gls bib2gls)
    {
-      this(name, fieldLabel, CASE_NO_CHANGE, bib2gls);
+      this(name, fieldLabel, CaseChange.NONE, bib2gls);
    }
 
    public GlsEntryFieldValue(String name, String fieldLabel,
-     int caseChange, Bib2Gls bib2gls)
+     CaseChange caseChange, Bib2Gls bib2gls)
    {
       super(name, caseChange, bib2gls);
       this.fieldLabel = fieldLabel;
