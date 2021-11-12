@@ -25,13 +25,14 @@ package com.dickimawbooks.bib2gls;
 public class CompoundEntry
 {
    public CompoundEntry(String label, String elementList)
+    throws Bib2GlsException
    {
       this.label = label;
       elements = elementList.trim().split("\\s*,\\s*");
 
       if (elements.length < 2)
       {
-         throw new IllegalArgumentException(
+         throw new Bib2GlsSyntaxException(
           String.format("at least 2 elements required (%d found)", elements.length));
       }
 
@@ -40,12 +41,14 @@ public class CompoundEntry
    }
 
    public CompoundEntry(String label, String elementList, String main)
+    throws Bib2GlsException
    {
       this(label, elementList);
       setMainLabel(main);
    }
 
    public CompoundEntry(String label, String elementList, String main, String opts)
+    throws Bib2GlsException
    {
       this(label, elementList, main);
       setOptions(opts);
@@ -65,6 +68,7 @@ public class CompoundEntry
    }
 
    public void setMainLabel(String main)
+    throws Bib2GlsException
    {
       if (isElement(main))
       {
@@ -72,7 +76,7 @@ public class CompoundEntry
       }
       else
       {
-         throw new IllegalArgumentException(
+         throw new Bib2GlsException(
           String.format("label '%s' not in element list"));
       }
    }
@@ -100,6 +104,20 @@ public class CompoundEntry
    public String[] getElements()
    {
       return elements;
+   }
+
+   public String getElementList()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < elements.length; i++)
+      {
+         if (i > 0) builder.append(',');
+
+         builder.append(elements[i]);
+      }
+
+      return builder.toString();
    }
 
    public String getOptions()

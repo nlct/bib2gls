@@ -1638,6 +1638,8 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("@glsxtr@newglslike", 2);
             addAuxCommand("@glsxtr@prefixlabellist", 1);
             addAuxCommand("@glsxtr@multientry", 4);
+            addAuxCommand("@glsxtr@mglsrefs", 1);
+            addAuxCommand("@glsxtr@mglslike", 1);
 
             if (knownGlossaries != null)
             {
@@ -1737,6 +1739,14 @@ public class Bib2Gls implements TeXApp
               data.getArg(2).toString(parser),//main label
               data.getArg(0).toString(parser)//options
              ));
+         }
+         else if (name.equals("@glsxtr@mglsrefs"))
+         {
+            addMglsRef(data.getArg(0).toString(parser));
+         }
+         else if (name.equals("@glsxtr@mglslike"))
+         {
+            addMglsCs(data.getArg(0).toString(parser));
          }
          else if (name.equals("@glsxtr@prefixlabellist"))
          {
@@ -2569,6 +2579,59 @@ public class Bib2Gls implements TeXApp
       return false;
    }
 
+   public void addMglsCs(String csnames)
+   {
+      if (mglsCs == null)
+      {
+         mglsCs = new Vector<String>();
+      }
+
+      String[] split = csnames.split(",");
+
+      for (String csname : split)
+      {
+         mglsCs.add(csname);
+      }
+   }
+
+   public boolean isMglsCs(String csname)
+   {
+      if (mglsCs == null) return false;
+
+      return mglsCs.contains(csname);
+   }
+
+   public void addMglsRef(String labels)
+   {
+      if (mglsRefs == null)
+      {
+         mglsRefs = new Vector<String>();
+      }
+
+      String[] split = labels.split(",");
+
+      for (String label : split)
+      {
+         if (!mglsRefs.contains(label))
+         {
+            debugMessage("message.mgls.found", label);
+            mglsRefs.add(label);
+         }
+      }
+   }
+
+   public boolean isMglsRefd(String label)
+   {
+      if (mglsRefs == null) return false;
+
+      return mglsRefs.contains(label);
+   }
+
+   public Vector<String> getMglsRefdList()
+   {
+      return mglsRefs;
+   }
+
    public CompoundEntry getCompoundEntry(String label)
    {
       if (compoundEntries == null)
@@ -2581,12 +2644,23 @@ public class Bib2Gls implements TeXApp
 
    public void addCompoundEntry(CompoundEntry compoundEntry)
    {
+      addCompoundEntry(compoundEntry, false);
+   }
+
+   public void addCompoundEntry(CompoundEntry compoundEntry, boolean override)
+   {
+      String label = compoundEntry.getLabel();
+
       if (compoundEntries == null)
       {
          compoundEntries = new HashMap<String,CompoundEntry>();
       }
+      else if (!override && compoundEntries.get(label) != null)
+      {// don't overwrite
+         return;
+      }
 
-      compoundEntries.put(compoundEntry.getLabel(), compoundEntry);
+      compoundEntries.put(label, compoundEntry);
    }
 
    public boolean hasCompoundEntries()
@@ -5614,8 +5688,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.9.20211111";
-   public static final String DATE = "2021-11-11";
+   public static final String VERSION = "2.9.20211112";
+   public static final String DATE = "2021-11-12";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5656,6 +5730,7 @@ public class Bib2Gls implements TeXApp
    private Vector<String> knownGlossaries=null;
 
    private HashMap<String,CompoundEntry> compoundEntries;
+   private Vector<String> mglsRefs, mglsCs;
 
    public static final String[] SPAWN_SPECIAL_FIELDS =
     new String[] {"progeny", "progenitor", "adoptparents"};

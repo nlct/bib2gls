@@ -412,9 +412,12 @@ public class Bib2GlsEntry extends BibEntry
 
             boolean found = false;
 
+            boolean mglslike = bib2gls.isMglsCs(csname);
+
             csname = csname.toLowerCase();
 
-            boolean glslike = (glsLikeLabelPrefix != null || csname.matches("dgls(pl)?"));
+            boolean glslike =
+              !mglslike && (glsLikeLabelPrefix != null || csname.matches("dgls(pl)?"));
 
             try
             {
@@ -563,7 +566,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   addDependency(label);
                }
-               else if (isGlsCsOptLabel(csname) || glslike)
+               else if (isGlsCsOptLabel(csname) || glslike || mglslike)
                {
                   found = (i==0);
 
@@ -646,39 +649,68 @@ public class Bib2GlsEntry extends BibEntry
                      label = arg.toString(parser);
                   }
 
-                  // Don't replace the label for \dgls etc
+                  // Don't replace the label for \dgls \mgls etc
                   // or the \gls-like commands that may have the
                   // prefix hidden from bib2gls.
 
-                  if (!glslike)
+                  if (mglslike)
                   {
-                     String newLabel = processLabel(label, true);
-
-                     if (!label.equals(newLabel))
+                     if (bib2gls.getVerboseLevel() > 0)
                      {
-                        label = newLabel;
-
-                        for ( ; i > start; i--)
-                        {
-                           list.remove(i);
-                        }
-
-                        list.set(i, parser.getListener().createGroup(label));
+                        bib2gls.logMessage(bib2gls.getMessage(
+                           "message.compoundcrossref.found", getId(),
+                           object.toString(parser), label));
                      }
-                  }
-                  else if (glsLikeLabelPrefix != null)
-                  {
-                     label = glsLikeLabelPrefix+label;
-                  }
 
-                  if (bib2gls.getVerboseLevel() > 0)
-                  {
-                     bib2gls.logMessage(bib2gls.getMessage(
-                        "message.crossref.found", getId(),
-                        object.toString(parser), label));
-                  }
+                     CompoundEntry comp = bib2gls.getCompoundEntry(label);
 
-                  addDependency(label);
+                     if (comp == null)
+                     {
+                        bib2gls.warningMessage(
+                          "warning.unknown_compound_label.in_entry", getId());
+                     }
+                     else
+                     {
+                        for (String elem : comp.getElements())
+                        {
+                           addDependency(elem);
+                        }
+                     }
+
+                     bib2gls.addMglsRef(label);
+                  }
+                  else
+                  {
+                     if (!glslike)
+                     {
+                        String newLabel = processLabel(label, true);
+
+                        if (!label.equals(newLabel))
+                        {
+                           label = newLabel;
+
+                           for ( ; i > start; i--)
+                           {
+                              list.remove(i);
+                           }
+
+                           list.set(i, parser.getListener().createGroup(label));
+                        }
+                     }
+                     else if (glsLikeLabelPrefix != null)
+                     {
+                        label = glsLikeLabelPrefix+label;
+                     }
+
+                     if (bib2gls.getVerboseLevel() > 0)
+                     {
+                        bib2gls.logMessage(bib2gls.getMessage(
+                           "message.crossref.found", getId(),
+                           object.toString(parser), label));
+                     }
+
+                     addDependency(label);
+                  }
 
                   if (bib2gls.checkNestedLinkTextField(fieldName)
                    && !csname.equals("glsps") && !csname.equals("glspt"))
@@ -3100,7 +3132,17 @@ public class Bib2GlsEntry extends BibEntry
 
    public boolean hasRecords()
    {
-      return recordCount() > 0;
+      if (recordCount() > 0)
+      {
+         return true;
+      }
+
+      if (resource.hasEntryMglsRecords(getId()))
+      {
+         return true;
+      }
+
+      return false;
    }
 
    public void addRecord(GlsSeeRecord record)

@@ -670,6 +670,15 @@
   category={command}
 }
 
+@bibglscommand{bibglsdefcompoundset,
+  name={\csfmt{bib\-gls\-def\-compound\-set}},
+  user1={\margm{options}\margm{label}\margm{main}\margm{elements}},
+  description={defines a \gls{compoundentry} provided with \atentry{compoundset}},
+  note={\bibgls},
+  topics={definingterms},
+  category={command}
+}
+
 @bibglscommand{bibglsuselongfont,
   name={\csfmt{bib\-gls\-use\-long\-font}},
   user1={\margm{text}\margm{category}},
@@ -1995,8 +2004,22 @@ starred version \csref{glsxtrfmt*}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.compound-has-records,
+   name={\csoptfmt{compound\dhyphen has\dhyphen records}},
+   user1={\margm{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.compound-adjust-name,
    name={\csoptfmt{compound\dhyphen adjust\dhyphen name}},
+   user1={\margm{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.compound-write-def,
+   name={\csoptfmt{compound\dhyphen write\dhyphen def}},
    user1={\margm{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -8977,6 +9000,38 @@ primary formats, if enabled.},
   parent={internalfields}
 }
 
+@field{field.elements,
+  name={\fieldfmt{elements}},
+  description={Only available for \atentry{compoundset} this
+   required field should contain a comma-separated list of labels.},
+  note={specific to \atentry{compoundset}},
+  category={compoundsetfield},
+  parent={fields}
+}
+
+@field{field.main,
+  name={\fieldfmt{main}},
+  description={Only available for \atentry{compoundset} this
+   optional field should contain the \gls{compmainlabel}.
+   If omitted, the final element from the \field{elements} field is
+   assumed.},
+  note={specific to \atentry{compoundset}},
+  category={compoundsetfield},
+  parent={fields}
+}
+
+@field{field.options,
+  name={\fieldfmt{option}},
+  description={Only available for \atentry{compoundset} this
+   optional field should contain the default options that govern the set
+   (which override conflicting options set with
+   \cs{multiglossaryentrysetup} and can be overridden by options to
+   commands like \cs{mgls}).},
+  note={specific to \atentry{compoundset}},
+  category={compoundsetfield},
+  parent={fields}
+}
+
 @index{entrytypes,
   name={entry types},
   text={entry type}
@@ -8996,6 +9051,12 @@ primary formats, if enabled.},
 
 @entrytype{entry.comment,
   name={\atentryfmt{comment}},
+  category={entrytype},
+  parent={entrytypes}
+}
+
+@entrytype{entry.compoundset,
+  name={\atentryfmt{compoundset}},
   category={entrytype},
   parent={entrytypes}
 }
@@ -15004,6 +15065,16 @@ by \cs{multiglossaryentry}},
    which element is considered the main entry in the set. If
    omitted, the last element in \meta{list} is assumed to be the
    main element},
+  topics={definingterms},
+  note={\styfmt{glossaries-extra} v1.48+},
+  category={command}
+}
+
+@glscommand{providemultiglossaryentry,
+  name={\csfmt{provide\-multi\-glossary\-entry}},
+  user1={\oargm{options}\margm{multilabel}\oargm{main label}\margm{list}},
+  description={as \cs{multiglossaryentry} but does nothing if the
+   label has already been defined as a \gls{compoundentry}},
   topics={definingterms},
   note={\styfmt{glossaries-extra} v1.48+},
   category={command}

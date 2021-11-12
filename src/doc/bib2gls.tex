@@ -4273,6 +4273,15 @@ but it doesn't add any information to the cross-referencing part of the
   or \bibgls}%
  {tab:baseinternalfields}
 
+\printfields
+ [%
+   Only available for \atentry{compoundset}. These correspond to the
+   arguments of \ics{multglossaryentry}.%
+ ]%
+ {compoundsetfield}%
+ {Compound Set Fields}%
+ {tab:compoundsetfields}
+
 \clearpage
 
 \section{Standard Entry Types}
@@ -6715,6 +6724,222 @@ The \glsdisp{mainentry}{main} \primary\ and
 the \ext{glstex} file with \gls{bibglsnewspawndualindexentry} and
 \gls{bibglsnewspawndualindexentrysecondary}. The spawned
 \gls{progeny} are defined with \gls{bibglsnewspawnedindex}.
+
+\section{Compound Entry Sets}
+\label{sec:compoundsetentry}
+
+A \gls{compoundentry} isn't an entry in the same sense as the above
+but corresponds to a multi-entry (compound or combined) set provided
+by \sty{glossaries-extra} v1.48+, which is defined by the command
+\ics{multiglossaryentry} (or \ics{providemultiglossaryentry}).
+These are referred to as multi-entries in \sty{glossaries-extra} but
+are referred to as \glspl{compoundentry} here to avoid confusion
+with the \glspl{multientrytype}.
+
+Essentially, a label is defined that refers to a set of labels
+corresponding to entries that \emph{have already been defined}. One
+element in the set is considered the \gls{compmainlabel}. Entry
+labels may appear in multiple sets.
+
+A \gls{compoundentry} provides a convenient way to apply commands
+like \gls{gls} to multiple entries in one command (such as \gls{mgls}).
+\Gls{compoundentry} labels may only be used in the \gls{mgls}-like
+commands or in a \gls{cross-referencefield}.
+
+For example, consider the following document:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
+\cs{setabbreviationstyle}\marg{long-only-short-only}
+\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
+  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
+}
+\cs{newabbreviation}\marg{clostridium}\marg{C.}\marg{Clostridium}
+\gls{newglossaryentry}\marg{botulinum}\marg{name=botulinum,
+  description=\marg{},parent=clostridium}
+\gls{newglossaryentry}\marg{perfringens}\marg{name=perfringens,
+  description=\marg{},parent=clostridium}
+\cmd{begin}\marg{document}
+\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum},
+\cs{gls}\marg{clostridum} \cs{gls}\marg{perfringens},
+\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}.
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{quote}
+Clostridium botulinum,
+C. perfringens,
+C. botulinum.
+\end{quote}
+followed by the glossary. This is very cumbersome. Defining a
+\gls{compoundentry} label simply provides a shortcut:
+\begin{codeenv*}
+\ics{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
+\ics{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
+\end{codeenv*}
+(This has to be done after the entries have been defined.) Now the
+entries can be more compactly referenced:
+\begin{codeenv*}
+\ics{mgls}\marg{cbot},
+\ics{mgls}\marg{cperf},
+\ics{mgls}\marg{cbot}.
+\end{codeenv*}
+Each \gls{compoundentry} set must contain at least two elements. The
+\gls{compmainlabel} is the label of the element that is considered
+the main entry of the set. If the \gls{compmainlabel} isn't
+identified in \cs{multiglossaryentry} then it's assumed to be the
+last element in the set.
+
+In the above example, \code{botulinum} is the \gls{compmainlabel} of
+the \code{cbot} set, and \code{perfringens} is the
+\gls{compmainlabel} of the \code{cperf} set.  In both sets,
+\code{clostridium} is the \qt{\gls{compotherlabel}}. If there are
+more than two elements in the set then \qt{others} refers to all the
+elements except for the \gls{compmainlabel}. An entry can be a
+\gls{compmainlabel} of one set and an \gls{compotherlabel} of
+another set.
+
+The options, which can be applied to all sets with
+\ics{multiglossaryentrysetup} or to a specific set using the
+first optional argument of \ics{multiglossaryentry}, determine
+if each element of the list has a separate hyperlink to their
+own target, or if only the main element should have a hyperlink, or 
+if the entire content of \cs{mgls} should be a single hyperlink to
+the main entry's target.
+
+With \bibgls, the entries that form the set should be in \ext{bib} files as usual. 
+The \gls{compoundentry} set may either be defined in the document \ext{tex}
+file using \ics{multiglossaryentry} (or \ics{providemultiglossaryentry})
+or they can be defined in the \ext{bib} file using
+\atentry{compoundset}. Remember that the set can only be defined
+after the entries that make up the elements of the set have been
+defined. If any \ext{bib} files in a \gls{resourceset} contain
+\atentry{compoundset}, the definitions will be added at the end of
+the \ext{glstex} file (using \gls{bibglsdefcompoundset}).
+
+If you have multiple \glspl{resourceset} that reuse the same
+\ext{bib} file containing \atentry{compoundset} then either redefine
+\gls{bibglsdefcompoundset} to use \ics{providemultiglossaryentry} or
+prevent duplicate definitions with \csopt[false]{compound-write-def}.
+
+The elements of the set will still need to be indexed as usual to
+ensure that they have \glspl{record} to enable selection.
+
+The above example can be converted to \bibgls\ as follows
+(\glspl{compoundentry} defined in the document \ext{tex} file):
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
+\cs{setabbreviationstyle}\marg{long-only-short-only}
+\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
+  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
+}
+\gls{GlsXtrLoadResources}\oarg{\csopt[bacteria]{src}}
+\cs{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
+\cs{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
+\cmd{begin}\marg{document}
+\cs{mgls}\marg{cbot}, \cs{mgls}\marg{cperf}, \cs{mgls}\marg{cbot}.
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+Note that \cs{multiglossaryentry} must come after \gls{GlsXtrLoadResources}.
+
+The \file{bacteria.bib} contains the definitions in the usual way:
+\begin{codeenv}
+\atentry{abbreviation}\marg{clostridium,
+ \field{short}=\marg{C.},
+ \field{long}=\marg{Clostridium}
+}
+\atentry{index}\marg{botulinum,
+ \field{parent}=\marg{clostridium}
+}
+\atentry{index}\marg{perfringens,
+ \field{parent}=\marg{clostridium}
+}
+\end{codeenv}
+
+Alternatively, the \glspl{compoundentry} can be defined in the
+\ext{bib} file instead:
+\begin{codeenv}
+\atentry{compoundset}\marg{cbot,
+  \field{elements}=\marg{clostridium,botulinum}
+}
+\atentry{compoundset}\marg{cperf,
+  \field{elements}=\marg{clostridium,perfringens}
+}
+\end{codeenv}
+The \cs{multiglossaryentry} commands should now be removed from the
+\ext{tex} file.
+
+There's a difference between these two methods on the first \LaTeX\
+build. In the first example, \code{cbot} is known, so
+\code{\cs{mgls}\marg{cbot}} can perform
+\code{\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}}. These
+commands aren't yet defined so they are both replaced by \qt{??}
+(resulting in \qt{?? ??}). As usual, the \gls{locationlist} is
+unreliable until entries are defined and the unknown markers \qt{??}
+can be replaced with the correct content. If the document is in a
+file called \filefmt{myDoc.tex} then the document build:
+\begin{codeenv}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{codeenv}
+will have \glspl{location} in the resulting PDF file, but they may
+be incorrect if the associated temporary files were initially
+missing.
+
+In the second example, \code{cbot} is unknown, so
+\code{\cs{mgls}\marg{cbot}} is simply displayed as \qt{??}.
+In this case, the \ext{aux} file contains information that
+\code{cbot} has been referenced, but there are no associated
+\glspl{record}. The entries that belong to the \code{cbot} set will
+be selected as they are considered dependent on the
+\gls{compoundentry}. In this case, if you are starting from scratch
+(no associated temporary files), you will need:
+\begin{codeenv}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{codeenv}
+At this point, the \glspl{locationlist} will appear.
+After that, you can reduce the document build to:
+\begin{codeenv}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{codeenv}
+(Until you later add new entries.)
+
+If you don't want \glspl{locations} for the 
+\glslink{compotherlabel}{other elements} then set the 
+\idx{encap} to \encap{glsignore}:
+\begin{codeenv*}
+\ics{multiglossaryentrysetup}\marg{encapothers=\encap{glsignore}}
+\end{codeenv*} 
+
+\entrysection{compoundset}
+The following fields are available:
+\begin{definition}
+\item[\field{elements}] The comma-separated list of element labels.
+This corresponds to the final argument of \cs{multiglossaryentry}.
+(Required.)
+\item[\field{main}] The \gls{compmainlabel}. This field is optional.
+If omitted, the main label is assumed to be the last element.
+\item[\field{options}] A comma-separated list of options. This
+corresponds to the first optional argument of
+\cs{multiglossaryentry}. This field may be omitted.
+\end{definition}
+These fields can only be used in this entry type.
+
+Most resource options don't apply to this entry type. Options
+specific to \glspl{compoundentry} are listed in
+\sectionref{sec:compoundentries}.
 
 \chapter{Resource File Options}
 \label{sec:resourceopts}
@@ -17031,128 +17256,11 @@ recognised keywords.
 \section{Compound (Combined or Multi) Entries}
 \label{sec:compoundentries}
 
-A \gls{compoundentry} isn't a \bibgls\ entry type but
-corresponds to a multi-entry set provided by \sty{glossaries-extra}
-v1.48, which is defined by the command \cs{multiglossaryentry}.
-These are referred to as multi-entries in \sty{glossaries-extra}
-but are referred to as \glspl{compoundentry} here to avoid confusion
-with the \glspl{multientrytype}.
-
-A \gls{compoundentry} provides a convenient way to apply commands
-like \gls{gls} to multiple entries in one command (such as \gls{mgls}).
-\Gls{compoundentry} labels may only be used in the \gls{mgls}-like
-commands or in a \gls{cross-referencefield}.
-
-For example, consider the following document:
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\cmd{usepackage}\marg{hyperref}
-\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
-\cs{setabbreviationstyle}\marg{long-only-short-only}
-\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
-  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
-}
-\cs{newabbreviation}\marg{clostridium}\marg{C.}\marg{Clostridium}
-\gls{newglossaryentry}\marg{botulinum}\marg{name=botulinum,
-  description=\marg{},parent=clostridium}
-\gls{newglossaryentry}\marg{perfringens}\marg{name=perfringens,
-  description=\marg{},parent=clostridium}
-\cmd{begin}\marg{document}
-\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum},
-\cs{gls}\marg{clostridum} \cs{gls}\marg{perfringens},
-\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}.
-\cs{printunsrtglossary}
-\cmd{end}\marg{document}
-\end{codeenv}
-This produces:
-\begin{quote}
-Clostridium botulinum,
-C. perfringens,
-C. botulinum.
-\end{quote}
-followed by the glossary. This is very cumbersome. Defining a
-\gls{compoundentry} label simply provides a shortcut:
-\begin{codeenv*}
-\ics{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
-\ics{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
-\end{codeenv*}
-(This has to be done after the entries have been defined.) Now the
-entries can be more compactly referenced:
-\begin{codeenv*}
-\ics{mgls}\marg{cbot},
-\ics{mgls}\marg{cperf},
-\ics{mgls}\marg{cbot}.
-\end{codeenv*}
-Each \gls{compoundentry} set must contain at least two elements. The
-\gls{compmainlabel} is the label of the element that is considered
-the main entry of the set. If the \gls{compmainlabel} isn't
-identified in \cs{multiglossaryentry} then it's assumed to be the
-last element in the set.
-
-In the above example, \code{botulinum} is the \gls{compmainlabel} of
-the \code{cbot} set, and \code{perfringens} is the
-\gls{compmainlabel} of the \code{cperf} set.  In both sets,
-\code{clostridium} is the \qt{\gls{compotherlabel}}. If there are
-more than two elements in the set then \qt{others} refers to all the
-elements except for the \gls{compmainlabel}. An entry can be a
-\gls{compmainlabel} of one set and an \gls{compotherlabel} of
-another set.
-
-The options, which can be applied to all sets with
-\ics{multiglossaryentrysetup} or to a specific set using the
-first optional argument of \ics{multiglossaryentry}, determine
-if each element of the list has a separate hyperlink to their
-own target, or if only the main element should have a hyperlink, or 
-if the entire content of \cs{mgls} should be a single hyperlink to
-the main entry's target.
-
-With \bibgls, the entries should be in \ext{bib} files as usual. The
-\ics{multiglossaryentry} commands should be in the \ext{tex} file.
-The information is written to the \ext{aux} file, so \bibgls\ can
-pick up the defined sets. The elements of the set will still need to
-be indexed as usual to ensure that they have \glspl{record} to
-enable selection.
-
-The above example can be converted to \bibgls\ as follows:
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\cmd{usepackage}\marg{hyperref}
-\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
-\cs{setabbreviationstyle}\marg{long-only-short-only}
-\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
-  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
-}
-\gls{GlsXtrLoadResources}\oarg{\csopt[bacteria]{src}}
-\cs{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
-\cs{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
-\cmd{begin}\marg{document}
-\cs{mgls}\marg{cbot}, \cs{mgls}\marg{cperf}, \cs{mgls}\marg{cbot}.
-\cs{printunsrtglossary}
-\cmd{end}\marg{document}
-\end{codeenv}
-Note that \cs{multiglossaryentry} must come after \gls{GlsXtrLoadResources}.
-
-The \file{bacteria.bib} contains the definitions in the usual way:
-\begin{codeenv}
-\atentry{abbreviation}\marg{clostridium,
- \field{short}=\marg{C.},
- \field{long}=\marg{Clostridium}
-}
-\atentry{index}\marg{botulinum,
- \field{parent}=\marg{clostridium}
-}
-\atentry{index}\marg{perfringens,
- \field{parent}=\marg{clostridium}
-}
-\end{codeenv}
-
-If you don't want \glspl{locations} for the
-\glslink{compotherlabel}{other elements} then it's
-better to set the \idx{encap} to \encap{glsignore}:
-\begin{codeenv*}
-\ics{multiglossaryentrysetup}\marg{encapothers=\encap{glsignore}}
-\end{codeenv*} 
-This will ensure that the other elements are selected.
+These options refer to \glspl{compoundentry} which are either
+defined in a \ext{bib} file with \atentry{compoundset} or are
+defined in the document using \cs{multiglossaryentry} (or
+\cs{provideglossaryentry}). See \sectionref{sec:compoundsetentry}
+for further details.
 
 \optsection{compound-dependent}
 
@@ -17166,6 +17274,31 @@ option to make the \glspl{otherlabel} dependencies of the
 \gls{mainlabel}. This means that if the \gls{mainlabel} is selected
 then the \glspl{otherlabel} should also be selected (if dependencies
 are part of the selection criteria).
+
+\optsection{compound-has-records}
+
+This option may take one of the following values:
+\begin{description}
+\item[\optfmt{true}] 
+Any \gls{compoundentry} referenced with commands like
+\ics{mgls} is considered to have \glspl{record} for each element for
+selection purposes, even if there are no \glspl{record} in the \ext{aux}
+file. (This is useful on the first \LaTeX\ run where the
+\glspl{compoundentry} are defined with \atentry{compoundset}.)
+
+\item[\optfmt{false}]
+The element \glspl{record} are created as they normally are with
+commands like \cs{gls} that are internally used by \cs{mgls}.
+
+\item[\optfmt{default}]
+Behaves like \csopt[true]{compound-has-records} if the current 
+\gls{resourceset} has any \ext{bib} files containing one or more
+\atentry{compoundset} entry types. Otherwise behaves like
+\csopt[false]{compound-has-records}.
+\end{description}
+
+The default is \csopt[default]{compound-has-records}.
+If the value is omitted, \optfmt{true} is assumed.
 
 \optsection{compound-adjust-name}
 
@@ -17209,6 +17342,31 @@ with the relevant command (\ics{Glsxtrmultientryadjustedname} for
 \optfmt{firstuc-cs}, \ics{GlsXtrmultientryadjustedname} for
 \optfmt{title-cs} and \cs{GLSxtrmultientryadjustedname} for
 \optfmt{uc-cs}).
+
+\optsection{compound-write-def}
+
+If \glspl{compentry} are defined in the \ext{bib} files using
+\atentry{compoundset}, this option governs whether or not to write
+their definition to the \ext{glstex} file. The value may be one of:
+\begin{definition}
+\item[\optfmt{none}] Don't write the definitions to the \ext{glstex}
+file. For example, if you are reloading a \ext{bib} file from
+another \gls{resourceset}, you will need this option to prevent
+duplicate definitions. (The alternative is to define
+\gls{bibglsdefcompoundset} to use \ics{providemultiglossaryentry}
+instead of \ics{multiglossaryentry}.)
+
+\item[\optfmt{all}] Write all definitions to the \ext{glstex} file,
+regardless of whether or not they have been referenced using
+commands like \cs{mgls}.
+
+\item[\optfmt{ref}] Only write the definitions for
+\glspl{compoundentry} that have been referenced using commands like
+\cs{mgls}. (Default.)
+\end{definition}
+
+The \glspl{compoundentry} are defined in the \ext{glstex} file with 
+\gls{bibglsdefcompoundset}.
 
 \chapter{Provided Commands}
 \label{sec:bibglscs}
@@ -17891,6 +18049,15 @@ The definition is written to the \ext{glstex} file as:
  \cs{longnewglossaryentry*}\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2}\marg{\idx{param}4}\comment{}
 }
 \end{codeenv}
+
+\section{Compound Entry Sets}
+\label{sec:compounddefs}
+
+\cssection{bibglsdefcompoundset}
+
+\formatdef{bibglsdefcompoundset}
+
+The default definition uses \ics{multiglossaryentry}.
 
 \section{Location Lists and Cross-References}
 \label{sec:loclistdefs}

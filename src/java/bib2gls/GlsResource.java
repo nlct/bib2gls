@@ -2753,6 +2753,24 @@ public class GlsResource
          {
             compoundEntriesDependent = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("compound-has-records"))
+         {
+            String val = getChoice(parser, "true", list, opt,
+               "false", "true", "default");
+
+            if (val.equals("false"))
+            {
+               compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_FALSE;
+            }
+            else if (val.equals("true"))
+            {
+               compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_TRUE;
+            }
+            else// if (val.equals("default"))
+            {
+               compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_DEFAULT;
+            }
+         }
          else if (opt.equals("compound-adjust-name"))
          {
             String val = getChoice(parser, "once", list, opt,
@@ -2769,6 +2787,23 @@ public class GlsResource
             else// if (val.equals("false"))
             {
                compoundAdjustName = COMPOUND_ADJUST_NAME_FALSE;
+            }
+         }
+         else if (opt.equals("compound-write-def"))
+         {
+            String val = getChoice(parser, list, opt, "none", "all", "ref");
+
+            if (val.equals("none"))
+            {
+               compoundEntriesDef = COMPOUND_DEF_FALSE;
+            }
+            else if (val.equals("all"))
+            {
+               compoundEntriesDef = COMPOUND_DEF_ALL;
+            }
+            else// if (val.equals("ref"))
+            {
+               compoundEntriesDef = COMPOUND_DEF_REFD;
             }
          }
          else
@@ -5186,6 +5221,26 @@ public class GlsResource
       return bibParserListener;
    }
 
+   public void addCompoundEntry(CompoundEntry compoundEntry)
+   {
+      // bib definition needs to override aux information. 
+      bib2gls.addCompoundEntry(compoundEntry, true);
+
+      if (compoundEntries == null)
+      {
+         compoundEntries = new Vector<CompoundEntry>();
+      }
+
+      compoundEntries.add(compoundEntry);
+
+      bib2gls.debugMessage("message.compoundset.found", compoundEntry.getLabel());
+
+      if (compoundEntriesHasRecords == COMPOUND_MGLS_RECORDS_DEFAULT)
+      {
+         compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_TRUE;
+      }
+   }
+
    public void processBibList(TeXParser parser)
    throws IOException,Bib2GlsException
    {
@@ -6470,6 +6525,42 @@ public class GlsResource
             }
          }
 
+         if (compoundEntriesHasRecords == COMPOUND_MGLS_RECORDS_TRUE)
+         {
+            Vector<String> mrefs = bib2gls.getMglsRefdList();
+
+            for (String compLabel : mrefs)
+            {
+               CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
+
+               if (comp != null)
+               {
+                  String[] elements = comp.getElements();
+
+                  for (String elem : elements)
+                  {
+                     Bib2GlsEntry entry = getEntry(elem, data);
+
+                     if (entry != null && !entry.isSelected())
+                     {
+                        bib2gls.debugMessage("message.selecting.entry.record.mgls",
+                         entry.getId(), compLabel);
+
+                        addEntry(entries, entry);
+
+                        if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                          ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                          ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                          ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                        {
+                           addDependencies(entry, data);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+
          for (int i = 0; i < seeRecords.size(); i++)
          {
             GlsSeeRecord record = seeRecords.get(i);
@@ -7710,6 +7801,23 @@ public class GlsResource
          {
             writeWidestNames(writer, font, frc);
             writer.println();
+         }
+
+         if (compoundEntries != null && compoundEntriesDef != COMPOUND_DEF_FALSE)
+         {
+            boolean all = (compoundEntriesDef == COMPOUND_DEF_ALL);
+
+            writer.println("\\providecommand*{\\bibglsdefcompoundset}[4]{\\multiglossaryentry[#1]{#2}[#3]{#4}}");
+
+            for (CompoundEntry comp : compoundEntries)
+            {
+               if (all || bib2gls.isMglsRefd(comp.getLabel()))
+               {
+                  writer.format("\\bibglsdefcompoundset{%s}{%s}{%s}{%s}%n",
+                    comp.getOptions(), comp.getLabel(), comp.getMainLabel(),
+                    comp.getElementList());
+               }
+            }
          }
 
          bib2gls.message(bib2gls.getChoiceMessage("message.written", 0,
@@ -12399,6 +12507,43 @@ public class GlsResource
       return saveUseIndex ? USE_INDEX_FIELD : null;
    }
 
+   public boolean hasEntryMglsRecords(String label)
+   {
+      if (compoundEntriesHasRecords != COMPOUND_MGLS_RECORDS_TRUE)
+      {
+         return false;
+      }
+   
+      Set<String> set = bib2gls.getCompoundEntrySet();
+
+      if (set == null)
+      {
+         return false;
+      }
+
+      for (Iterator<String> it=set.iterator(); it.hasNext(); )
+      {
+         String compLabel = it.next();
+
+         if (bib2gls.isMglsRefd(compLabel))
+         {
+            CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
+
+            String[] elements = comp.getElements();
+
+            for (String elem : elements)
+            {
+               if (elem.equals(label))
+               {
+                  return true;
+               }
+            }
+         }
+      }
+
+      return false;
+   }
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -12815,5 +12960,20 @@ public class GlsResource
    public static final int COMPOUND_ADJUST_NAME_UNIQUE=2;
 
    private int compoundAdjustName = COMPOUND_ADJUST_NAME_FALSE;
+
+   private Vector<CompoundEntry> compoundEntries;
+
+   public static final int COMPOUND_DEF_FALSE=0;
+   public static final int COMPOUND_DEF_REFD=1;
+   public static final int COMPOUND_DEF_ALL=2;
+
+   private int compoundEntriesDef = COMPOUND_DEF_REFD;
+
+   public static final int COMPOUND_MGLS_RECORDS_FALSE=0;
+   public static final int COMPOUND_MGLS_RECORDS_TRUE=1;
+   public static final int COMPOUND_MGLS_RECORDS_DEFAULT=2;
+
+   private int compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_DEFAULT;
+
 }
 

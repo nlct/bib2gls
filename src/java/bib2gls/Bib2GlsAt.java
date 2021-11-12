@@ -57,7 +57,16 @@ public class Bib2GlsAt extends At
             entryType, "spawn"+entryType.substring(7)));
       }
 
-      BibData data = createBib2GlsEntry(bib2gls, entryType);
+      BibData data;
+
+      if (entryType.equals("compoundset"))
+      {
+         data = new AtCompoundSet(resource, entryType);
+      }
+      else
+      {
+         data = createBib2GlsEntry(bib2gls, entryType);
+      }
 
       if (data == null)
       {
