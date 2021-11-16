@@ -1121,7 +1121,7 @@ documents}}
 
 \newcommand{\convertglsbibarg}[2][\subsection]{\argsection[#1]{gls2bib.#2}}
 
-\newcommand{\argsection}[2][\section]{%
+\newcommand{\argsection}[2][\subsection]{%
  \def\switcharg{}%
  \def\switchalt{}%
  \def\switchaltpdf{}%
@@ -2958,7 +2958,7 @@ set JAVA_TOOL_OPTIONS=-Djava.locale.providers=CLDR,JRE,SPI
 
 \chapter{Command Line Options}
 \label{sec:switches}
-\setsecdepth{0}
+\setsecdepth{1}
 
 The syntax of \bibgls\ is:
 \begin{alltt}
@@ -2967,6 +2967,8 @@ bib2gls \oargm{options} \meta{filename}
 where \meta{filename} is the name of the \ext{aux} file. (The
 extension may be omitted.) Only one \meta{filename} is permitted.
 Available options are listed below.
+
+\section{Common Options}
 
 \argsection{help}
 
@@ -3000,11 +3002,15 @@ Some messages are written to the terminal. To completely suppress
 all messages (except errors), switch on the silent mode.
 For additional information messages, switch on the verbose mode.
 
-\argsection{silent}
+\argsection{quiet}
 
 Suppresses all messages except for errors that would normally be
 written to the terminal. Warnings and informational messages are
 written to the transcript file, which can be inspected afterwards.
+
+\argsection{silent}
+
+Synonym of \longarg{quiet}.
 
 \argsection{locale}
 
@@ -3019,575 +3025,6 @@ locale and is not governed by this switch.
 If a document doesn't have any locale support or has support
 for more than one language then it's best to explicitly set
 the required locale in the appropriate \idx{resourceset}.
-
-\argsection{log-file}
-
-Sets the name of the transcript file. By default, the name is the
-same as the \iext{aux} file but with a \iext{glg} extension. Note that
-if you use \bibgls\ in combination with \idx{xindy} or
-\idx{makeindex}, you will need to change the transcript file name to
-prevent conflict.
-
-\argsection{dir}
-
-By default \bibgls\ assumes that the output files should be written
-in the current working directory. The input \iext{bib} files are assumed to be
-either in the current working directory or on \TeX's path (in which
-case \idx{kpsewhich} will be used to find them).
-
-If your \iext{aux} file isn't in the current working directory (for
-example, you have run \TeX\ with \shortargfmt{output-directory})
-then you need to take care how you invoke \bibgls.
-
-Suppose I have a file called \filefmt{test-entries.bib} that
-contains my entry definitions and a document called
-\filefmt{mydoc.tex} that selects the \ext{bib} file using:
-\begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{\csopt[test-entries]{src}}
-\end{codeenv}
-(\filefmt{test-entries.bib} is in the same directory as
-\filefmt{mydoc.tex}).
-If I compile this document using
-\begin{verbatim}
-pdflatex -output-directory tmp mydoc
-\end{verbatim}
-then the auxiliary file \filefmt{mydoc.aux} will be written to the
-\filefmt{tmp} sub-directory. The resource information is listed in
-the \ext{aux} file as
-\begin{codeenv}
-\gls{glsxtr@resource}\marg{\csopt[test-entries]{src}}\marg{mydoc}
-\end{codeenv}
-If I run \bibgls\ from the \filefmt{tmp} directory, then it won't
-be able to find the \filefmt{test-entries.bib} file (since it's in
-the parent directory).
-
-If I run \bibgls\ from the same directory as \filefmt{mydoc.tex}
-using
-\begin{verbatim}
-bib2gls tmp/mydoc
-\end{verbatim}
-then the \ext{aux} file is found and the transcript file is
-\filefmt{tmp/mydoc.glg} (since the default path name is the same as the
-\ext{aux} file but with the extension changed to \iext{glg}) but the
-output file \filefmt{mydoc.glstex} will be written to the current
-directory.
-
-This works fine from \TeX's point of view as it can find the
-\iext{glstex} file, but it may be that you'd rather the \ext{glstex}
-file was tidied away into the \filefmt{tmp} directory along with all
-the other files.  In this case you need to invoke \bibgls\ with the
-\longargorshort{dir} option:
-\begin{verbatim}
-bib2gls -d tmp mydoc
-\end{verbatim}
-
-\argsection{interpret}
-
-Switch on the interpreter mode (default). See \sectionref{sec:texparserlib}
-for more details.
-
-\argsection{no-interpret}
-
-Switch off the interpreter mode. See \sectionref{sec:texparserlib}
-for more details about the interpreter. 
-
-\argsection{no-break-space}
-
-The interpreter treats a tilde character \idx{nbspchar} as a non-breakable
-space (default). Similarly \ics{nobreakspace} produces a
-non-breakable space character (\hex{00A0}).
-
-\argsection{break-space}
-
-The interpreter treats a tilde character \idx{nbspchar} as a normal
-space. Similarly \ics{nobreakspace} just produces a space.
-
-\argsection{cite-as-record}
-
-Treat instances of \code{\ics{citation}\margm{label}} found in the 
-\ext{aux} file as though it was actually an \idx{ignoredrecord}:
-\begin{codeenv}
-\gls{glsxtr@record}\margm{label}\marg{}\marg{\counter{page}}\marg{\encap{glsignore}}\marg{}
-\end{codeenv}
-Note that \code{\cs{citation}\marg{*}} will always be skipped. Use
-\csopt[all]{selection} to select all entries.
-This switch is most useful in conjunction with
-\atentrypageref{bibtexentry}.
-
-\argsection{no-cite-as-record}
-
-Don't check for instances of \ics{citation} in the \ext{aux} file
-(default).
-
-\argsection{warn-non-bib-fields}
-
-If any internal fields are found in the \ext{bib} file, this setting
-will issue a warning as their use can cause unexpected results.
-The fields checked for are those listed in Tables~\ref{tab:internalfields}
-and \ref{tab:baseinternalfields} with a few exceptions, notably
-\field{type} and \field{sort}. Ideally you shouldn't need to use
-\field{sort} as there should be an appropriate fallback set up to
-use if \field{sort} isn't set, such as the label for symbols or the
-name for terms or the short form for abbreviations.
-
-This is the default setting and was added as some users were
-confused over which fields could be used in the \ext{bib} file.
-The use of these fields can break \bibgls's normal behaviour and
-cause unexpected results.
-
-The check is performed before field aliasing, so it's possible to
-alias a field to an internal field, such as \field{group}, without
-triggering this warning. If you do this you need to make sure you
-have taken appropriate precautions to avoid unexpected results.
-
-\argsection{no-warn-non-bib-fields}
-
-Switches off the check for non-bib fields. If you use this option
-you need to make sure you have taken appropriate precautions to
-avoid unexpected results.
-
-\argsection{warn-unknown-entry-types}
-
-If any unknown entry types are found in the \ext{bib} file, \bibgls\
-will issue a warning with this option set (default).
-
-\argsection{no-warn-unknown-entry-types}
-
-This option will suppress the warning if an unknown entry types are
-found in the \ext{bib} file.
-
-\argsection{collapse-same-location-range}
-
-Collapse any explicit \gls{location} range into a normal \gls{record} if
-the \glspl{location} are the same (default).
-
-\argsection{no-collapse-same-location-range}
-
-Don't collapse any explicit \gls{location} range into a normal
-\gls{record} if the \glspl{location} are the same.
-
-\argsection{merge-wrglossary-records}
-
-For use with the \styopt{indexcounter} package option
-(\styfmt{glossaries-extra} v1.29+), this switch merges an entry's
-\counter{wrglossary} records for the same page \gls{location}. This is the
-default setting. (See also \csopt{save-index-counter}.)
-
-\argsection{no-merge-wrglossary-records}
-
-Don't merge an entry's \counter{wrglossary} records. This means that you
-may end up with duplicate page numbers in the entry's \gls{locationlist},
-but they will link to different parts of the page.
-
-\argsection{merge-nameref-on}
-
-The \styopt[nameref]{record} package option (introduced to 
-\sty{glossaries-extra} version 1.37) provides extra information
-in the record when indexing, obtained from \ics{@currentlabelname},
-\ics{@currentHref} and \ics{theHentrycounter}. Instead of writing the record as:
-\begin{codeenv}
-\format{glsxtr@record}
-\end{codeenv}
-the record is written as:
-\nosecdef{glsxtr@record@nameref}
-If \isty{hyperref} hasn't been loaded \meta{title} and \meta{href}
-will always be empty. The most reliable target is given by
-\code{\meta{counter}.\meta{hcounter}}, where \meta{counter} is the
-associated counter name and \meta{hcounter} is
-obtained from \cs{theHentrycounter}, which is set to the hyper
-target command \csfmt{theH}\meta{counter} during indexing. Since
-this information can't be included in the \gls{location} when indexing
-with \idx!{makeindex} or \idx!{xindy}, the base \sty{glossaries}
-package tries to obtain a prefix from which the target name can be
-formed. This doesn't work if \csfmt{theH}\meta{counter} can't be
-formed from \meta{prefix}\csfmt{the}\meta{counter}, which results in
-broken links. Since \bibgls\ doesn't have the same restrictions, the
-actual target can be included in the record. You can then customize
-the document to choose whether to use \meta{href} (to link to the
-nearest anchor) or \meta{hcounter} to link to the place where the
-indexing counter was incremented.
-
-The \code{nameref} record will be written to the \igls{locationlist} using:
-\nosecdef{glsxtrdisplaylocnameref}
-The \meta{file} part will be empty for normal internal \glspl{location},
-and will be set to the corresponding file name for 
-\glsdisp{supplementalrecord}{supplemental locations}.
-
-With \sty{hyperref}, \meta{title} is initially empty. The \meta{href} will be
-\code{Doc-Start} at the start of the document and is updated
-globally on every instance of \ics{refstepcounter}. The 
-\meta{title} is updated locally by certain commands, such as 
-\ics{section} or \ics{caption}. This means that the \meta{href}
-may not always correspond to the \meta{title}, so using
-the \styopt[nameref]{record} package option can have unpredictable
-results if the \meta{title} is used as link text with \meta{href} as
-the target. 
-
-For compactness, \bibgls\ tries to merge duplicate or near
-duplicate records. There are four possible rules that it will
-use for \code{nameref} records, identified by \meta{rule} in the
-\longarg{merge-nameref-on} switch:
-\begin{itemize}
-\item \optfmt{location}: merge records that match on the
-\meta{prefix}, \meta{counter} and \meta{location} parts (as regular
-records);
-\item \optfmt{title}: merge records that match on the \meta{counter}
-and \meta{title} parts;
-\item \optfmt{href}: merge records that match on the \meta{counter}
-and \meta{href} parts;
-\item \optfmt{hcounter}: merge records that match on the \meta{counter}
-and \meta{hcounter} parts.
-\end{itemize}
-The default \meta{rule} is \optfmt{hcounter}. Note that for all
-rules the \meta{counter} must match. See the \qt{Nameref Record}
-section of the \sty{glossaries-extra} user manual for further
-details.
-
-\argsection{force-cross-resource-refs}
-
-Force \igls{crossresourceref} mode on (see
-\sectionref{sec:resourcesets}).
-
-\argsection{no-force-cross-resource-refs}
-
-Don't force \igls{crossresourceref} mode on (default). 
-The mode will be enabled if applicable (see
-\sectionref{sec:resourcesets}).
-
-\argsection{support-unicode-script}
-
-Text superscript (\ics{textsuperscript}) and subscript
-(\ics{textsubscript}) will use Unicode super/subscript characters
-if available (default). For example,
-\begin{codeenv}
-\cs{textsuperscript}\marg{(2)}
-\end{codeenv}
-will be converted to \code{\textsuperscript{(2)}}, which consists
-of: \hex{207D} (superscript left parenthesis)
-\hex{00B2} (superscript two) \hex{207E} (superscript right
-parenthesis). If the entire contents of the argument can't be
-represented by Unicode characters, the interpreter uses \verb|<sup>|
-and \verb|<sub>| markup, which is then stripped by \bibgls. For
-example,
-\begin{codeenv}
-\cs{textsuperscript}\marg{(2,3)}
-\end{codeenv}
-will be converted to
-\begin{verbatim}
-<sup>(2,3)</sup>
-\end{verbatim}
-(since there's no superscript comma). The markup is stripped leaving
-just \code{(2,3)}.
-
-Superscripts and subscripts in maths mode always use markup
-regardless of this setting. Some supported packages that use
-\idx{spchar} or \idx{sbchar} as shortcuts within an encapsulating
-command may internally use the same code as \cs{textsuperscript} and
-\cs{textsubscript}, in which case they will be sensitive to this
-setting.
-
-\argsection{no-support-unicode-script}
-
-Text superscript (\cs{textsuperscript}) and subscript
-(\cs{textsubscript}) won't use Unicode super/subscript characters.
-Note that if other commands are provided that expand to Unicode
-superscript or subscript characters, then they won't be affected by
-this setting. For example, if \csfmt{superiortwo} is defined as
-\begin{codeenv}
-\cs{providecommand}\marg{\cmd{superiortwo}}\marg{\charhex{B2}}
-\end{codeenv}
-then it will be interpreted as \hex{00B2} (superscript two) even if
-this setting is on.
-
-\argsection{list-known-packages}
-
-This option will list all the packages supported by the \TeX\ parser
-library and will then exit \bibgls. The results are divided into two
-sections: those packages that are searched for in the \iext{log}
-file and those packages that aren't searched for in the \iext{log}
-file but have some support available. Some of the support is very
-limited. Package options aren't detected.
-The transcript file is always searched for \isty{glossaries-extra}
-to ensure that the version is new enough to support \bibgls. 
-
-Packages that fall into the first category are:
-\isty{amsmath}, \isty{amssymb}, \isty{bpchem}, \isty{fontenc},
-\isty{fontspec}, \isty{fourier}, 
-\isty{hyperref}, \isty{lipsum}, \isty{MnSymbol}, \isty{mhchem}, \isty{natbib},
-\isty{pifont}, \isty{siunitx} (limited), \isty{stix},
-\isty{textcase}, \isty{textcomp}, \isty{tipa}, \isty{upgreek} and
-\isty{wasysym}.  (You can omit checking for specific packages with
-\longarg{ignore-packages}.) These are packages that provide commands
-that might be needed within entry fields. The check for
-\isty{fontspec} is to simply determine whether or not UTF-8
-characters are allowed in labels (for \csopt{labelify} and 
-\csopt{labelify-list}).
-
-Packages that fall into the second category are:
-\isty{booktabs}, \isty{color}, \isty{datatool-base} (very limited),
-\isty{datatool} (very limited), \isty{etoolbox} (very limited), \isty{graphics},
-\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils},
-\isty{mfirstuc-english}, \isty{probsoln}, \isty{shortvrb},
-and \isty{xspace}. These are less likely to be needed within fields
-and so aren't checked for by default. If they are needed then you
-can instruct \bibgls\ to support them with \longarg{packages}.
-
-Note that \sty{mfirstuc} is always automatically loaded, but
-\sty{mfirstuc-english} is not implemented unless explicitly
-requested with \code{\longarg{packages} mfirstuc-english}.
-
-If you're wondering about the selection, the \file{texparserlib.jar}
-library was originally written for another application that required
-support for some of them.
-
-\argsection{packages}
-
-Instruct the interpreter to assume the packages listed 
-in \meta{list} have been used by the document.
-This option has a cumulative action so \code{\longarg{packages}
-"wasysym,pifont"} is the same as \code{\longarg{packages} wasysym 
-\longarg{packages} pifont}.
-
-Note that there's only a limited number of packages supported by the
-\TeX\ parser library. This option is provided for cases where you're
-using a command from a package that the interpreter doesn't support
-but it happens to have the same name and meaning as a command from
-a package that the interpreter does support. You can also use it to
-provide support for known packages that aren't checked for when the
-\ext{log} file is parsed. If you want \bibgls\ to parse an
-unsupported package use \longarg{custom-packages}.
-
-\argsection{custom-packages}
-
-Instruct the interpreter to parse the package files identified in
-\meta{list}. The package files need to be quite simple. When this
-switch is used, the interpreter can recognise \ics{ProvidesPackage},
-\ics{DeclareOption} (and \ics{DeclareOption*}),
-\ics{ProcessOptions}, \ics{PackageError} and \ics{RequirePackage},
-but it can't deal with complicated code.  In the case of
-\ics{RequirePackage}, support will also be governed by
-\longargfmt{custom-packages}.  This option has a cumulative action.
-
-\argsection{ignore-packages}
-
-This option is cumulative. When the document \iext{log} file is
-parsed for known packages, \bibgls\ will skip the check for any
-listed in \meta{list}. Note that this option simply instructs
-\bibgls\ to ignore the package information in the log file. Any packages
-that are identified with \longarg{packages} will be passed to the
-interpreter if support is available, even if the package is also
-listed in \longargfmt{ignore-packages}.  Note that
-unknown packages can't be included in the ignored \meta{list}.
-
-\argsection{mfirstuc-protection}
-
-Commands like \ics{Gls} use \ics{makefirstuc} provided by the
-\isty{mfirstuc} package. This command has limitations and one of the
-things that can break it is the use of a referencing command 
-at the start of its argument. The \sty{glossaries-extra} package has
-more detail about the problem in the \qt{Nested Links} section of
-the user manual~\cite{glossaries-extra}. If a glossary field starts
-with one of these problematic commands, the recommended method (if
-the command can't be replaced) is to insert an empty group in front
-of it.
-
-For example, the following definition
-\begin{codeenv}
-\gls{newabbreviation}\marg{shtml}\marg{shtml}\marg{\ics{glsps}\marg{ssi} enabled \cs{glsps}\marg{short}\marg{html}}
-\end{codeenv}
-will cause a problem for \code{\cs{Gls}\marg{shtml}} on first use.
-The above example would be written in a \ext{bib} file as:
-\begin{codeenv}
-\atentry{abbreviation}\marg{shtml,
-  \field{short}=\marg{shtml},
-  \field{long}=\marg{\cs{glsps}\marg{ssi} enabled \cs{glsps}\marg{html}}
-}
-\end{codeenv}
-The default \sty{mfirstuc} protection will automatically insert an empty
-group before \code{\cs{glsps}\marg{ssi}} when writing the definition
-in the \ext{glstex} file.
-
-The argument for this switch should either be a comma-separated list
-of fields or the keyword \code{all} (which indicates all fields).
-\bibgls\ will automatically insert an empty group at the start of
-the listed fields that start with a problematic command, and a
-warning will be written to the transcript. Unknown fields are
-skipped even if they're included in the list. An empty argument is
-equivalent to \longarg{no-mfirstuc-protection}. The default value is
-\code{all}.
-
-\argsection{no-mfirstuc-protection}
-
-Switches off the \isty{mfirstuc} protection mechanism described
-above.
-
-\argsection{mfirstuc-math-protection}
-
-This works in the same way as \longarg{mfirstuc-protection} but
-guards against fields starting with inline maths
-(\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the
-\field{name} field starts with
-\code{\idx{mshiftchar}x\idx{mshiftchar}} and the glossary style
-automatically tries to convert the first letter of the name to
-\idx{uppercase}, then this will cause a problem.
-
-With \longarg{mfirstuc-math-protection} set, \bibgls\ will
-automatically insert an empty group at the start of the field and
-write a warning in the transcript. This setting is on by default.
-
-\argsection{no-mfirstuc-math-protection}
-
-Switches off the above.
-
-\argsection{nested-link-check}
-
-By default, \bibgls\ will parse certain fields for potential nested links.
-(See the section \qt{Nested Links} in the \sty{glossaries-extra}
-user manual~\cite{glossaries-extra}.)
-
-The default set of fields to check are: \field{name}, \field{text},
-\field{plural}, \field{first}, \field{firstplural}, \field{long},
-\field{longplural}, \field{short}, \field{shortplural} and
-\field{symbol}.
-
-You can change this set of fields using
-\longarg{nested-link-check} \meta{value} where \meta{value} may be
-\optfmt{none} (don't parse any of the fields) or a comma-separated
-list of fields to be checked.
-
-\argsection{no-nested-link-check}
-
-Equivalent to \longarg{nested-link-check} \optfmt{none}.
-
-\argsection{shortcuts}
-
-Some entries may reference another entry within a field, using
-commands like \ics{gls}, so \bibgls\ parses the fields for these
-commands to determine dependent entries to allow them to be selected
-even if they haven't been used within the document.
-The \styopt{shortcuts} package option provided by
-\styfmt{glossaries-extra} defines various synonyms, such as \ics{ac}
-which is equivalent to \ics{gls}. By default the value of the
-\styopt{shortcuts} option will be picked up by \bibgls\ when parsing the
-\iext{aux} file. This then allows \bibgls\ to additionally search for
-those shortcut commands while parsing the fields.
-
-You can override the \styopt{shortcuts} setting using
-\longarg{shortcuts} \meta{value} (where \meta{value} may take
-any of the allowed values for the \styopt{shortcuts} package option), 
-but in general there is little need to use this switch.
-
-\argsection{map-format}
-
-This sets up the rule of precedence for partial \gls{location}
-matches (see \sectionref{sec:locationopts}). The argument may be
-a comma-separated list of \meta{map}\code{:}\meta{value} pairs.
-Alternatively, you can have multiple instances of 
-\longarg{map-format} \meta{map}\dcolon\meta{value} which have a
-cumulative effect.
-
-For example, 
-\begin{verbatim}
-bib2gls --map-format "emph:hyperbf" mydoc
-\end{verbatim}
-This essentially means that if there's a \gls{record} conflict
-involving \encap{emph}, try replacing \encap{emph} with
-\encap{hyperbf} and see if that resolves the conflict.
-
-Note that if the conflict includes a range formation, the
-range takes precedence.
-The mapping tests are applied as the records are
-read. For example, suppose the records are listed in the \ext{aux}
-file as:
-\begin{codeenv}
-\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{emph}}\marg{3}
-\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{hypersf}}\marg{3}
-\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{hyperbf}}\marg{3}
-\end{codeenv}
-and \bibgls\ is invoked with
-\begin{verbatim}
-bib2gls --map-format "emph:hyperbf,hypersf:hyperit" mydoc
-\end{verbatim}
-or
-\begin{verbatim}
-bib2gls --map-format emph:hyperbf --map-format hypersf:hyperit mydoc
-\end{verbatim}
-then \bibgls\ will process these \glspl{record} as follows:
-\begin{enumerate}
-\item Accept the first \gls{record} (\encap{emph}) since there's
-currently no conflict. (This is the first \gls{record} for page~3 for the
-entry given by \code{gls.sample}.)
-\item The second \gls{record} (\encap{hypersf}) conflicts 
-with the existing \gls{record} (\encap{emph}). Neither has
-the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ consults
-the mappings provided by \longargfmt{map-format}.
-\begin{itemize}
-\item The \encap{hypersf} format (from the new record) is mapped to
-\encap{hyperit},
-so \bibgls\ checks if the existing \gls{record}
-has this format. In this case it doesn't (the format is
-\code{emph}). So \bibgls\ moves on to the next test:
-
-\item The \encap{emph} format (from the existing record) is mapped
-to \encap{hyperbf},
-so \bibgls\ checks if the new record has this format.
-In this case it doesn't (the format is \encap{hypersf}).
-
-Since the provided mappings haven't resolved this conflict,
-the new record is discarded with a warning. Note that there's 
-no look ahead to the next record. (There may be other 
-records for other entries also used on page~3 interspersed between these records.)
-\end{itemize}
-\item The third \gls{record} (\encap{hyperbf}) conflicts 
-with the existing \gls{record} (\encap{emph}). Neither has
-the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ again consults
-the mappings provided by \longargfmt{map-format}.
-\begin{itemize}
-\item  The new \gls{record}['s] \encap{hyperbf} format has no mapping provided,
-so \bibgls\ moves on to the next test:
-
-\item The existing \gls{record}['s] \encap{emph} format has a mapping
-provided (\encap{hyperbf}). This matches the new \gls{record}['s] format,
-so the new \gls{record} takes precedence.
-
-This means that the \gls{locationlist} ends up with the \encap{hyperbf}
-location for page~3.
-\end{itemize}
-\end{enumerate}
-
-If, on the other hand, the mappings are given as
-\begin{verbatim}
---map-format "emph:hyperit,hypersf:hyperit,hyperbf:hyperit"
-\end{verbatim}
-then all the three conflicting \glspl{record} (\encap{emph},
-\encap{hypersf} and \encap{hyperbf}) will end up being replaced
-by a single \gls{record} with \encap{hyperit} as the format.
-
-Multiple conflicts will typically be rare as there's usually little
-reason for more than two or three different \gls{location} formats within
-the same list. (For example, \encap{glsnumberformat} as the default
-and \encap{hyperbf} or \encap{hyperit} for a
-\gls{principallocation}.)
-
-\argsection{retain-formats}
-
-It's possible that you may not want to lose certain \gls{location}
-formats, even if it means having duplicate \glspl{location}. For example,
-if you want to move a \gls{principallocation} using
-\csopt[remove]{save-principal-locations}. In which case, use this
-switch with a comma-separated list of formats that should be
-retained. Note that exact duplicates will still be merged.
-This switch has a cumulative effect.
-
-Take care if you use this switch and you have an explicit range with
-coincident start and end locations. If the
-\glsdisp{principallocation}{principal record} is between
-the start and end format markers then the range can't collapse
-to an ordinary \gls{record}.
-
-\argsection{no-retain-formats}
-
-Normal \gls{location} merging rules apply (default).
 
 \argsection{group}
 
@@ -3798,6 +3235,69 @@ Don't automatically set the \field{group} field with
 group style, such as \glostyle{indexgroup}, is used (unless the
 \field{group} field is set to a custom value).
 
+\section{File Options}
+
+\argsection{dir}
+
+By default \bibgls\ assumes that the output files should be written
+in the current working directory. The input \iext{bib} files are assumed to be
+either in the current working directory or on \TeX's path (in which
+case \idx{kpsewhich} will be used to find them).
+
+If your \iext{aux} file isn't in the current working directory (for
+example, you have run \TeX\ with \shortargfmt{output-directory})
+then you need to take care how you invoke \bibgls.
+
+Suppose I have a file called \filefmt{test-entries.bib} that
+contains my entry definitions and a document called
+\filefmt{mydoc.tex} that selects the \ext{bib} file using:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[test-entries]{src}}
+\end{codeenv}
+(\filefmt{test-entries.bib} is in the same directory as
+\filefmt{mydoc.tex}).
+If I compile this document using
+\begin{verbatim}
+pdflatex -output-directory tmp mydoc
+\end{verbatim}
+then the auxiliary file \filefmt{mydoc.aux} will be written to the
+\filefmt{tmp} sub-directory. The resource information is listed in
+the \ext{aux} file as
+\begin{codeenv}
+\gls{glsxtr@resource}\marg{\csopt[test-entries]{src}}\marg{mydoc}
+\end{codeenv}
+If I run \bibgls\ from the \filefmt{tmp} directory, then it won't
+be able to find the \filefmt{test-entries.bib} file (since it's in
+the parent directory).
+
+If I run \bibgls\ from the same directory as \filefmt{mydoc.tex}
+using
+\begin{verbatim}
+bib2gls tmp/mydoc
+\end{verbatim}
+then the \ext{aux} file is found and the transcript file is
+\filefmt{tmp/mydoc.glg} (since the default path name is the same as the
+\ext{aux} file but with the extension changed to \iext{glg}) but the
+output file \filefmt{mydoc.glstex} will be written to the current
+directory.
+
+This works fine from \TeX's point of view as it can find the
+\iext{glstex} file, but it may be that you'd rather the \ext{glstex}
+file was tidied away into the \filefmt{tmp} directory along with all
+the other files.  In this case you need to invoke \bibgls\ with the
+\longargorshort{dir} option:
+\begin{verbatim}
+bib2gls -d tmp mydoc
+\end{verbatim}
+
+\argsection{log-file}
+
+Sets the name of the transcript file. By default, the name is the
+same as the \iext{aux} file but with a \iext{glg} extension. Note that
+if you use \bibgls\ in combination with \idx{xindy} or
+\idx{makeindex}, you will need to change the transcript file name to
+prevent conflict.
+
 \argsection{tex-encoding}
 
 \bibgls\ tries to determine the character \igls{encoding} to use for the
@@ -3835,119 +3335,351 @@ text editor or bibliographic management system) matches the \gls{encoding}
 line in the \ext{bib} file or the \csopt{charset} resource option.
 \end{itemize}
 
-\argsection{no-expand-fields}
+\section{Interpreter Options}
 
-By default, \gls{newglossaryentry} and similar commands expand field values
-(except for \field{name}, \field{symbol} and \field{description}).
-This is useful if constructing field values programmatically
-(for example in a \idx!{loop}) but can cause a problem if certain fragile
-commands are included in the field. 
+\argsection{break-space}
 
-The switch \longarg{no-expand-fields} makes \bibgls\ write
-\gls{glsnoexpandfields} to the \iext{glstex} file, which
-switches off the expansion.  Since \bibgls\ is simply
-fetching the data from \iext{bib} files, it's unlikely 
-that this automatic expansion is required and since it can
-also be problematic this option is on by default. You can
-switch it off with \longarg{expand-fields}.
+The interpreter treats a tilde character \idx{nbspchar} as a normal
+space. Similarly \ics{nobreakspace} just produces a space.
 
-\argsection{expand-fields}
+\argsection{no-break-space}
 
-Don't write \gls{glsnoexpandfields} to the \iext{glstex} file,
-allowing fields to expand when the entries are defined.
-Remember that this doesn't include the \field{name}, \field{symbol}
-or \field{description} fields, which need to have their
-expansion switched on with \gls{glssetexpandfield}
-before the entries are defined (that is, before using
-\gls!{GlsXtrLoadResources}).
+The interpreter treats a tilde character \idx{nbspchar} as a non-breakable
+space (default). Similarly \ics{nobreakspace} produces a
+non-breakable space character (\hex{00A0}).
 
-\argsection{trim-fields}
+\argsection{custom-packages}
 
-Trim leading and trailing spaces from all field values. For example,
-if the \ext{bib} file contains:
+Instruct the interpreter to parse the package files identified in
+\meta{list}. The package files need to be quite simple. When this
+switch is used, the interpreter can recognise \ics{ProvidesPackage},
+\ics{DeclareOption} (and \ics{DeclareOption*}),
+\ics{ProcessOptions}, \ics{PackageError} and \ics{RequirePackage},
+but it can't deal with complicated code.  In the case of
+\ics{RequirePackage}, support will also be governed by
+\longargfmt{custom-packages}.  This option has a cumulative action.
+
+\argsection{ignore-packages}
+
+This option is cumulative. When the document \iext{log} file is
+parsed for known packages, \bibgls\ will skip the check for any
+listed in \meta{list}. Note that this option simply instructs
+\bibgls\ to ignore the package information in the log file. Any packages
+that are identified with \longarg{packages} will be passed to the
+interpreter if support is available, even if the package is also
+listed in \longargfmt{ignore-packages}.  Note that
+unknown packages can't be included in the ignored \meta{list}.
+
+\argsection{interpret}
+
+Switch on the interpreter mode (default). See \sectionref{sec:texparserlib}
+for more details.
+
+\argsection{no-interpret}
+
+Switch off the interpreter mode. See \sectionref{sec:texparserlib}
+for more details about the interpreter. 
+
+\argsection{list-known-packages}
+
+This option will list all the packages supported by the \TeX\ parser
+library and will then exit \bibgls. The results are divided into two
+sections: those packages that are searched for in the \iext{log}
+file and those packages that aren't searched for in the \iext{log}
+file but have some support available. Some of the support is very
+limited. Package options aren't detected.
+The transcript file is always searched for \isty{glossaries-extra}
+to ensure that the version is new enough to support \bibgls. 
+
+Packages that fall into the first category are:
+\isty{amsmath}, \isty{amssymb}, \isty{bpchem}, \isty{fontenc},
+\isty{fontspec}, \isty{fourier}, 
+\isty{hyperref}, \isty{lipsum}, \isty{MnSymbol}, \isty{mhchem}, \isty{natbib},
+\isty{pifont}, \isty{siunitx} (limited), \isty{stix},
+\isty{textcase}, \isty{textcomp}, \isty{tipa}, \isty{upgreek} and
+\isty{wasysym}.  (You can omit checking for specific packages with
+\longarg{ignore-packages}.) These are packages that provide commands
+that might be needed within entry fields. The check for
+\isty{fontspec} is to simply determine whether or not UTF-8
+characters are allowed in labels (for \csopt{labelify} and 
+\csopt{labelify-list}).
+
+Packages that fall into the second category are:
+\isty{booktabs}, \isty{color}, \isty{datatool-base} (very limited),
+\isty{datatool} (very limited), \isty{etoolbox} (very limited), \isty{graphics},
+\isty{graphicx}, \isty{ifthen}, \isty{jmlrutils},
+\isty{mfirstuc-english}, \isty{probsoln}, \isty{shortvrb},
+and \isty{xspace}. These are less likely to be needed within fields
+and so aren't checked for by default. If they are needed then you
+can instruct \bibgls\ to support them with \longarg{packages}.
+
+Note that \sty{mfirstuc} is always automatically loaded, but
+\sty{mfirstuc-english} is not implemented unless explicitly
+requested with \code{\longarg{packages} mfirstuc-english}.
+
+If you're wondering about the selection, the \file{texparserlib.jar}
+library was originally written for another application that required
+support for some of them.
+
+\argsection{packages}
+
+Instruct the interpreter to assume the packages listed 
+in \meta{list} have been used by the document.
+This option has a cumulative action so \code{\longarg{packages}
+"wasysym,pifont"} is the same as \code{\longarg{packages} wasysym 
+\longarg{packages} pifont}.
+
+Note that there's only a limited number of packages supported by the
+\TeX\ parser library. This option is provided for cases where you're
+using a command from a package that the interpreter doesn't support
+but it happens to have the same name and meaning as a command from
+a package that the interpreter does support. You can also use it to
+provide support for known packages that aren't checked for when the
+\ext{log} file is parsed. If you want \bibgls\ to parse an
+unsupported package use \longarg{custom-packages}.
+
+\argsection{support-unicode-script}
+
+Text superscript (\ics{textsuperscript}) and subscript
+(\ics{textsubscript}) will use Unicode super/subscript characters
+if available (default). For example,
 \begin{codeenv}
-\atentry{entry}\marg{sample,
-  \field{name} = \marg{sample},
-  \field{description} = \marg{
-    an example
-  }
-}
+\cs{textsuperscript}\marg{(2)}
 \end{codeenv}
-This will cause spurious spaces in the \field{description} field. 
-Using \longarg{trim-fields} will automatically trim the values
-before writing the \iext{glstex} file.
-
-Note that even without this trimming option on, fields that are
-set as keys within \cs{longnewglossaryentry} or the optional
-argument of \cs{newabbreviation} will automatically have the leading and
-trailing spaces internally trimmed by the \isty{xkeyval} package, so
-this trimming action only affects fields that aren't set in this
-way, such as the \field{description}, \field{long} and \field{short}
-fields. If you specifically require a space at the start or end of a
-field then use a spacing command, such as \cs{cs.space} or \cs{space} 
-or \idx{nbspchar}.
-
-\argsection{trim-only-fields}
-
-Only trim leading and trailing spaces from the fields identified in
-the comma-separated \meta{list}. This option has a cumulative effect
-but is cancelled by \longarg{no-trim-fields} (which switches off all
-trimming) and by \longarg{trim-fields} (which switches on trimming
-for all fields). This option may not be used with
-\longarg{trim-except-fields}.
-
-For example, to only trim the \field{description} field:
-\begin{verbatim}
-bib2gls --trim-only-fields description myDoc
-\end{verbatim}
-
-\argsection{trim-except-fields}
-
-Trim all leading and trailing spaces from fields except those identified in
-the comma-separated \meta{list}. This option has a cumulative effect
-but is cancelled by \longarg{no-trim-fields} (which switches off all
-trimming) and by \longarg{trim-fields} (which switches on trimming
-for all fields). This option may not be used with
-\longarg{trim-only-fields}. See the above note about \sty{xkeyval}.
-
-For example, to trim all fields except \field{short} and
-\field{long}:
-\begin{verbatim}
-bib2gls --trim-except-fields short,long myDoc
-\end{verbatim}
-Or
-\begin{verbatim}
-bib2gls --trim-except-fields short --trim-except-fields long myDoc
-\end{verbatim}
-
-\argsection{no-trim-fields}
-
-Don't trim any leading or trailing spaces from field values (but see
-the above note about \sty{xkeyval}). This is the default setting.
-
-\argsection{provide-glossaries}
-
-This setting will make \bibgls\ add the line
+will be converted to \code{\textsuperscript{(2)}}, which consists
+of: \hex{207D} (superscript left parenthesis)
+\hex{00B2} (superscript two) \hex{207E} (superscript right
+parenthesis). If the entire contents of the argument can't be
+represented by Unicode characters, the interpreter uses \verb|<sup>|
+and \verb|<sub>| markup, which is then stripped by \bibgls. For
+example,
 \begin{codeenv}
-\ics{provideignoredglossary*}\margm{type}
+\cs{textsuperscript}\marg{(2,3)}
 \end{codeenv}
-to the \ext{glstex} file before an entry is defined where that entry
-has the \field{type} field set to an unknown glossary type (\bibgls\
-can detect from the \ext{aux} file all glossaries that have been
-defined with \cs{newglossary} but not those defined with \cs{newignoredglossary}).
+will be converted to
+\begin{verbatim}
+<sup>(2,3)</sup>
+\end{verbatim}
+(since there's no superscript comma). The markup is stripped leaving
+just \code{(2,3)}.
 
-This ensures that the glossary exists, but the use of
-\ics{provideignoredglossary} (rather than \cs{newignoredglossary})
-will prevent an error if the glossary has already been defined.
+Superscripts and subscripts in maths mode always use markup
+regardless of this setting. Some supported packages that use
+\idx{spchar} or \idx{sbchar} as shortcuts within an encapsulating
+command may internally use the same code as \cs{textsuperscript} and
+\cs{textsubscript}, in which case they will be sensitive to this
+setting.
 
-\argsection{no-provide-glossaries}
+\argsection{no-support-unicode-script}
 
-This setting prevents \bibgls\ from providing unknown glossaries,
-except in a few documented situations (the \csopt{master},
-\csopt{trigger-type} and \csopt{secondary} options). This is the
-default since it's a useful way of detecting misspelt glossary
-labels. It's harder to detect the problem if a misspelt label has
-caused an entry to be added to a hidden glossary.
+Text superscript (\cs{textsuperscript}) and subscript
+(\cs{textsubscript}) won't use Unicode super/subscript characters.
+Note that if other commands are provided that expand to Unicode
+superscript or subscript characters, then they won't be affected by
+this setting. For example, if \csfmt{superiortwo} is defined as
+\begin{codeenv}
+\cs{providecommand}\marg{\cmd{superiortwo}}\marg{\charhex{B2}}
+\end{codeenv}
+then it will be interpreted as \hex{00B2} (superscript two) even if
+this setting is on.
+
+\section{Record Options}
+
+\argsection{cite-as-record}
+
+Treat instances of \code{\ics{citation}\margm{label}} found in the 
+\ext{aux} file as though it was actually an \idx{ignoredrecord}:
+\begin{codeenv}
+\gls{glsxtr@record}\margm{label}\marg{}\marg{\counter{page}}\marg{\encap{glsignore}}\marg{}
+\end{codeenv}
+Note that \code{\cs{citation}\marg{*}} will always be skipped. Use
+\csopt[all]{selection} to select all entries.
+This switch is most useful in conjunction with
+\atentrypageref{bibtexentry}.
+
+\argsection{no-cite-as-record}
+
+Don't check for instances of \ics{citation} in the \ext{aux} file
+(default).
+
+\argsection{collapse-same-location-range}
+
+Collapse any explicit \gls{location} range into a normal \gls{record} if
+the \glspl{location} are the same (default).
+
+\argsection{no-collapse-same-location-range}
+
+Don't collapse any explicit \gls{location} range into a normal
+\gls{record} if the \glspl{location} are the same.
+
+\argsection{map-format}
+
+This sets up the rule of precedence for partial \gls{location}
+matches (see \sectionref{sec:locationopts}). The argument may be
+a comma-separated list of \meta{map}\code{:}\meta{value} pairs.
+Alternatively, you can have multiple instances of 
+\longarg{map-format} \meta{map}\dcolon\meta{value} which have a
+cumulative effect.
+
+For example, 
+\begin{verbatim}
+bib2gls --map-format "emph:hyperbf" mydoc
+\end{verbatim}
+This essentially means that if there's a \gls{record} conflict
+involving \encap{emph}, try replacing \encap{emph} with
+\encap{hyperbf} and see if that resolves the conflict.
+
+Note that if the conflict includes a range formation, the
+range takes precedence.
+The mapping tests are applied as the records are
+read. For example, suppose the records are listed in the \ext{aux}
+file as:
+\begin{codeenv}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{emph}}\marg{3}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{hypersf}}\marg{3}
+\gls{glsxtr@record}\marg{gls.sample}\marg{}\marg{\counter{page}}\marg{\encap{hyperbf}}\marg{3}
+\end{codeenv}
+and \bibgls\ is invoked with
+\begin{verbatim}
+bib2gls --map-format "emph:hyperbf,hypersf:hyperit" mydoc
+\end{verbatim}
+or
+\begin{verbatim}
+bib2gls --map-format emph:hyperbf --map-format hypersf:hyperit mydoc
+\end{verbatim}
+then \bibgls\ will process these \glspl{record} as follows:
+\begin{enumerate}
+\item Accept the first \gls{record} (\encap{emph}) since there's
+currently no conflict. (This is the first \gls{record} for page~3 for the
+entry given by \code{gls.sample}.)
+\item The second \gls{record} (\encap{hypersf}) conflicts 
+with the existing \gls{record} (\encap{emph}). Neither has
+the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ consults
+the mappings provided by \longargfmt{map-format}.
+\begin{itemize}
+\item The \encap{hypersf} format (from the new record) is mapped to
+\encap{hyperit},
+so \bibgls\ checks if the existing \gls{record}
+has this format. In this case it doesn't (the format is
+\code{emph}). So \bibgls\ moves on to the next test:
+
+\item The \encap{emph} format (from the existing record) is mapped
+to \encap{hyperbf},
+so \bibgls\ checks if the new record has this format.
+In this case it doesn't (the format is \encap{hypersf}).
+
+Since the provided mappings haven't resolved this conflict,
+the new record is discarded with a warning. Note that there's 
+no look ahead to the next record. (There may be other 
+records for other entries also used on page~3 interspersed between these records.)
+\end{itemize}
+\item The third \gls{record} (\encap{hyperbf}) conflicts 
+with the existing \gls{record} (\encap{emph}). Neither has
+the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ again consults
+the mappings provided by \longargfmt{map-format}.
+\begin{itemize}
+\item  The new \gls{record}['s] \encap{hyperbf} format has no mapping provided,
+so \bibgls\ moves on to the next test:
+
+\item The existing \gls{record}['s] \encap{emph} format has a mapping
+provided (\encap{hyperbf}). This matches the new \gls{record}['s] format,
+so the new \gls{record} takes precedence.
+
+This means that the \gls{locationlist} ends up with the \encap{hyperbf}
+location for page~3.
+\end{itemize}
+\end{enumerate}
+
+If, on the other hand, the mappings are given as
+\begin{verbatim}
+--map-format "emph:hyperit,hypersf:hyperit,hyperbf:hyperit"
+\end{verbatim}
+then all the three conflicting \glspl{record} (\encap{emph},
+\encap{hypersf} and \encap{hyperbf}) will end up being replaced
+by a single \gls{record} with \encap{hyperit} as the format.
+
+Multiple conflicts will typically be rare as there's usually little
+reason for more than two or three different \gls{location} formats within
+the same list. (For example, \encap{glsnumberformat} as the default
+and \encap{hyperbf} or \encap{hyperit} for a
+\gls{principallocation}.)
+
+\argsection{merge-nameref-on}
+
+The \styopt[nameref]{record} package option (introduced to 
+\sty{glossaries-extra} version 1.37) provides extra information
+in the record when indexing, obtained from \ics{@currentlabelname},
+\ics{@currentHref} and \ics{theHentrycounter}. Instead of writing the record as:
+\begin{codeenv}
+\format{glsxtr@record}
+\end{codeenv}
+the record is written as:
+\nosecdef{glsxtr@record@nameref}
+If \isty{hyperref} hasn't been loaded \meta{title} and \meta{href}
+will always be empty. The most reliable target is given by
+\code{\meta{counter}.\meta{hcounter}}, where \meta{counter} is the
+associated counter name and \meta{hcounter} is
+obtained from \cs{theHentrycounter}, which is set to the hyper
+target command \csfmt{theH}\meta{counter} during indexing. Since
+this information can't be included in the \gls{location} when indexing
+with \idx!{makeindex} or \idx!{xindy}, the base \sty{glossaries}
+package tries to obtain a prefix from which the target name can be
+formed. This doesn't work if \csfmt{theH}\meta{counter} can't be
+formed from \meta{prefix}\csfmt{the}\meta{counter}, which results in
+broken links. Since \bibgls\ doesn't have the same restrictions, the
+actual target can be included in the record. You can then customize
+the document to choose whether to use \meta{href} (to link to the
+nearest anchor) or \meta{hcounter} to link to the place where the
+indexing counter was incremented.
+
+The \code{nameref} record will be written to the \igls{locationlist} using:
+\nosecdef{glsxtrdisplaylocnameref}
+The \meta{file} part will be empty for normal internal \glspl{location},
+and will be set to the corresponding file name for 
+\glsdisp{supplementalrecord}{supplemental locations}.
+
+With \sty{hyperref}, \meta{title} is initially empty. The \meta{href} will be
+\code{Doc-Start} at the start of the document and is updated
+globally on every instance of \ics{refstepcounter}. The 
+\meta{title} is updated locally by certain commands, such as 
+\ics{section} or \ics{caption}. This means that the \meta{href}
+may not always correspond to the \meta{title}, so using
+the \styopt[nameref]{record} package option can have unpredictable
+results if the \meta{title} is used as link text with \meta{href} as
+the target. 
+
+For compactness, \bibgls\ tries to merge duplicate or near
+duplicate records. There are four possible rules that it will
+use for \code{nameref} records, identified by \meta{rule} in the
+\longarg{merge-nameref-on} switch:
+\begin{itemize}
+\item \optfmt{location}: merge records that match on the
+\meta{prefix}, \meta{counter} and \meta{location} parts (as regular
+records);
+\item \optfmt{title}: merge records that match on the \meta{counter}
+and \meta{title} parts;
+\item \optfmt{href}: merge records that match on the \meta{counter}
+and \meta{href} parts;
+\item \optfmt{hcounter}: merge records that match on the \meta{counter}
+and \meta{hcounter} parts.
+\end{itemize}
+The default \meta{rule} is \optfmt{hcounter}. Note that for all
+rules the \meta{counter} must match. See the \qt{Nameref Record}
+section of the \sty{glossaries-extra} user manual for further
+details.
+
+\argsection{merge-wrglossary-records}
+
+For use with the \styopt{indexcounter} package option
+(\styfmt{glossaries-extra} v1.29+), this switch merges an entry's
+\counter{wrglossary} records for the same page \gls{location}. This is the
+default setting. (See also \csopt{save-index-counter}.)
+
+\argsection{no-merge-wrglossary-records}
+
+Don't merge an entry's \counter{wrglossary} records. This means that you
+may end up with duplicate page numbers in the entry's \gls{locationlist},
+but they will link to different parts of the page.
 
 \argsection{record-count}
 
@@ -4018,6 +3750,292 @@ commands.
 Switches off unit record counting. (Default.)
 Note that you need \longarg{no-record-count} to completely
 switch off record counting.
+
+\argsection{retain-formats}
+
+It's possible that you may not want to lose certain \gls{location}
+formats, even if it means having duplicate \glspl{location}. For example,
+if you want to move a \gls{principallocation} using
+\csopt[remove]{save-principal-locations}. In which case, use this
+switch with a comma-separated list of formats that should be
+retained. Note that exact duplicates will still be merged.
+This switch has a cumulative effect.
+
+Take care if you use this switch and you have an explicit range with
+coincident start and end locations. If the
+\glsdisp{principallocation}{principal record} is between
+the start and end format markers then the range can't collapse
+to an ordinary \gls{record}.
+
+\argsection{no-retain-formats}
+
+Normal \gls{location} merging rules apply (default).
+
+\section{Bib File Options}
+
+\argsection{warn-non-bib-fields}
+
+If any internal fields are found in the \ext{bib} file, this setting
+will issue a warning as their use can cause unexpected results.
+The fields checked for are those listed in Tables~\ref{tab:internalfields}
+and \ref{tab:baseinternalfields} with a few exceptions, notably
+\field{type} and \field{sort}. Ideally you shouldn't need to use
+\field{sort} as there should be an appropriate fallback set up to
+use if \field{sort} isn't set, such as the label for symbols or the
+name for terms or the short form for abbreviations.
+
+This is the default setting and was added as some users were
+confused over which fields could be used in the \ext{bib} file.
+The use of these fields can break \bibgls's normal behaviour and
+cause unexpected results.
+
+The check is performed before field aliasing, so it's possible to
+alias a field to an internal field, such as \field{group}, without
+triggering this warning. If you do this you need to make sure you
+have taken appropriate precautions to avoid unexpected results.
+
+\argsection{no-warn-non-bib-fields}
+
+Switches off the check for non-bib fields. If you use this option
+you need to make sure you have taken appropriate precautions to
+avoid unexpected results.
+
+\argsection{warn-unknown-entry-types}
+
+If any unknown entry types are found in the \ext{bib} file, \bibgls\
+will issue a warning with this option set (default).
+
+\argsection{no-warn-unknown-entry-types}
+
+This option will suppress the warning if an unknown entry types are
+found in the \ext{bib} file.
+
+\section{Field Options}
+
+\argsection{no-expand-fields}
+
+By default, \gls{newglossaryentry} and similar commands expand field values
+(except for \field{name}, \field{symbol} and \field{description}).
+This is useful if constructing field values programmatically
+(for example in a \idx!{loop}) but can cause a problem if certain fragile
+commands are included in the field. 
+
+The switch \longarg{no-expand-fields} makes \bibgls\ write
+\gls{glsnoexpandfields} to the \iext{glstex} file, which
+switches off the expansion.  Since \bibgls\ is simply
+fetching the data from \iext{bib} files, it's unlikely 
+that this automatic expansion is required and since it can
+also be problematic this option is on by default. You can
+switch it off with \longarg{expand-fields}.
+
+\argsection{expand-fields}
+
+Don't write \gls{glsnoexpandfields} to the \iext{glstex} file,
+allowing fields to expand when the entries are defined.
+Remember that this doesn't include the \field{name}, \field{symbol}
+or \field{description} fields, which need to have their
+expansion switched on with \gls{glssetexpandfield}
+before the entries are defined (that is, before using
+\gls!{GlsXtrLoadResources}).
+
+\argsection{mfirstuc-protection}
+
+Commands like \ics{Gls} use \ics{makefirstuc} provided by the
+\isty{mfirstuc} package. This command has limitations and one of the
+things that can break it is the use of a referencing command 
+at the start of its argument. The \sty{glossaries-extra} package has
+more detail about the problem in the \qt{Nested Links} section of
+the user manual~\cite{glossaries-extra}. If a glossary field starts
+with one of these problematic commands, the recommended method (if
+the command can't be replaced) is to insert an empty group in front
+of it.
+
+For example, the following definition
+\begin{codeenv}
+\gls{newabbreviation}\marg{shtml}\marg{shtml}\marg{\ics{glsps}\marg{ssi} enabled \cs{glsps}\marg{short}\marg{html}}
+\end{codeenv}
+will cause a problem for \code{\cs{Gls}\marg{shtml}} on first use.
+The above example would be written in a \ext{bib} file as:
+\begin{codeenv}
+\atentry{abbreviation}\marg{shtml,
+  \field{short}=\marg{shtml},
+  \field{long}=\marg{\cs{glsps}\marg{ssi} enabled \cs{glsps}\marg{html}}
+}
+\end{codeenv}
+The default \sty{mfirstuc} protection will automatically insert an empty
+group before \code{\cs{glsps}\marg{ssi}} when writing the definition
+in the \ext{glstex} file.
+
+The argument for this switch should either be a comma-separated list
+of fields or the keyword \code{all} (which indicates all fields).
+\bibgls\ will automatically insert an empty group at the start of
+the listed fields that start with a problematic command, and a
+warning will be written to the transcript. Unknown fields are
+skipped even if they're included in the list. An empty argument is
+equivalent to \longarg{no-mfirstuc-protection}. The default value is
+\code{all}.
+
+\argsection{no-mfirstuc-protection}
+
+Switches off the \isty{mfirstuc} protection mechanism described
+above.
+
+\argsection{mfirstuc-math-protection}
+
+This works in the same way as \longarg{mfirstuc-protection} but
+guards against fields starting with inline maths
+(\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the
+\field{name} field starts with
+\code{\idx{mshiftchar}x\idx{mshiftchar}} and the glossary style
+automatically tries to convert the first letter of the name to
+\idx{uppercase}, then this will cause a problem.
+
+With \longarg{mfirstuc-math-protection} set, \bibgls\ will
+automatically insert an empty group at the start of the field and
+write a warning in the transcript. This setting is on by default.
+
+\argsection{no-mfirstuc-math-protection}
+
+Switches off the above.
+
+\argsection{nested-link-check}
+
+By default, \bibgls\ will parse certain fields for potential nested links.
+(See the section \qt{Nested Links} in the \sty{glossaries-extra}
+user manual~\cite{glossaries-extra}.)
+
+The default set of fields to check are: \field{name}, \field{text},
+\field{plural}, \field{first}, \field{firstplural}, \field{long},
+\field{longplural}, \field{short}, \field{shortplural} and
+\field{symbol}.
+
+You can change this set of fields using
+\longarg{nested-link-check} \meta{value} where \meta{value} may be
+\optfmt{none} (don't parse any of the fields) or a comma-separated
+list of fields to be checked.
+
+\argsection{no-nested-link-check}
+
+Equivalent to \longarg{nested-link-check} \optfmt{none}.
+
+\argsection{shortcuts}
+
+Some entries may reference another entry within a field, using
+commands like \ics{gls}, so \bibgls\ parses the fields for these
+commands to determine dependent entries to allow them to be selected
+even if they haven't been used within the document.
+The \styopt{shortcuts} package option provided by
+\styfmt{glossaries-extra} defines various synonyms, such as \ics{ac}
+which is equivalent to \ics{gls}. By default the value of the
+\styopt{shortcuts} option will be picked up by \bibgls\ when parsing the
+\iext{aux} file. This then allows \bibgls\ to additionally search for
+those shortcut commands while parsing the fields.
+
+You can override the \styopt{shortcuts} setting using
+\longarg{shortcuts} \meta{value} (where \meta{value} may take
+any of the allowed values for the \styopt{shortcuts} package option), 
+but in general there is little need to use this switch.
+
+\argsection{trim-fields}
+
+Trim leading and trailing spaces from all field values. For example,
+if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{entry}\marg{sample,
+  \field{name} = \marg{sample},
+  \field{description} = \marg{
+    an example
+  }
+}
+\end{codeenv}
+This will cause spurious spaces in the \field{description} field. 
+Using \longarg{trim-fields} will automatically trim the values
+before writing the \iext{glstex} file.
+
+Note that even without this trimming option on, fields that are
+set as keys within \cs{longnewglossaryentry} or the optional
+argument of \cs{newabbreviation} will automatically have the leading and
+trailing spaces internally trimmed by the \isty{xkeyval} package, so
+this trimming action only affects fields that aren't set in this
+way, such as the \field{description}, \field{long} and \field{short}
+fields. If you specifically require a space at the start or end of a
+field then use a spacing command, such as \cs{cs.space} or \cs{space} 
+or \idx{nbspchar}.
+
+\argsection{trim-only-fields}
+
+Only trim leading and trailing spaces from the fields identified in
+the comma-separated \meta{list}. This option has a cumulative effect
+but is cancelled by \longarg{no-trim-fields} (which switches off all
+trimming) and by \longarg{trim-fields} (which switches on trimming
+for all fields). This option may not be used with
+\longarg{trim-except-fields}.
+
+For example, to only trim the \field{description} field:
+\begin{verbatim}
+bib2gls --trim-only-fields description myDoc
+\end{verbatim}
+
+\argsection{trim-except-fields}
+
+Trim all leading and trailing spaces from fields except those identified in
+the comma-separated \meta{list}. This option has a cumulative effect
+but is cancelled by \longarg{no-trim-fields} (which switches off all
+trimming) and by \longarg{trim-fields} (which switches on trimming
+for all fields). This option may not be used with
+\longarg{trim-only-fields}. See the above note about \sty{xkeyval}.
+
+For example, to trim all fields except \field{short} and
+\field{long}:
+\begin{verbatim}
+bib2gls --trim-except-fields short,long myDoc
+\end{verbatim}
+Or
+\begin{verbatim}
+bib2gls --trim-except-fields short --trim-except-fields long myDoc
+\end{verbatim}
+
+\argsection{no-trim-fields}
+
+Don't trim any leading or trailing spaces from field values (but see
+the above note about \sty{xkeyval}). This is the default setting.
+
+\section{Other Options}
+
+\argsection{force-cross-resource-refs}
+
+Force \igls{crossresourceref} mode on (see
+\sectionref{sec:resourcesets}).
+
+\argsection{no-force-cross-resource-refs}
+
+Don't force \igls{crossresourceref} mode on (default). 
+The mode will be enabled if applicable (see
+\sectionref{sec:resourcesets}).
+
+\argsection{provide-glossaries}
+
+This setting will make \bibgls\ add the line
+\begin{codeenv}
+\ics{provideignoredglossary*}\margm{type}
+\end{codeenv}
+to the \ext{glstex} file before an entry is defined where that entry
+has the \field{type} field set to an unknown glossary type (\bibgls\
+can detect from the \ext{aux} file all glossaries that have been
+defined with \cs{newglossary} but not those defined with \cs{newignoredglossary}).
+
+This ensures that the glossary exists, but the use of
+\ics{provideignoredglossary} (rather than \cs{newignoredglossary})
+will prevent an error if the glossary has already been defined.
+
+\argsection{no-provide-glossaries}
+
+This setting prevents \bibgls\ from providing unknown glossaries,
+except in a few documented situations (the \csopt{master},
+\csopt{trigger-type} and \csopt{secondary} options). This is the
+default since it's a useful way of detecting misspelt glossary
+labels. It's harder to detect the problem if a misspelt label has
+caused an entry to be added to a hidden glossary.
 
 \chapter{\iext{bib} Format}
 \label{sec:bib}
@@ -17324,7 +17342,7 @@ abbreviation.
 
 The adjusted value will be in the form:
 \begin{codeenv*}
-\ics{glsxtrmultientryadjustedname}\marg{sublist1}\marg{name}\marg{sublist2}\marg{label}
+\ics{glsxtrmultientryadjustedname}\margm{sublist1}\margm{name}\margm{sublist2}\marg{mlabel}
 \end{codeenv*}
 where \meta{label} is the \gls{compoundentry} label, \meta{name} was
 the value of the \field{name} field before the adjustment,

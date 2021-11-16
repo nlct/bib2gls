@@ -3,185 +3,78 @@
 <properties>
 <comment>English language file for bib2gls</comment>
 
-<entry key="about.version">{0} version {1} ({2})</entry>
+<entry key="about.version">{0} {1} ({2})</entry>
 <entry key="about.license">License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.</entry>
 
 <entry key="about.library.version">Bundled with {0} version {1} ({2})</entry>
 
-<entry key="syntax.usage">Usage: {0} [&lt;option&gt;]+ &lt;aux file&gt;</entry>
-<entry key="syntax.info">Helper application for the glossaries-extra package.
-The aux file should either be in the current directory 
-or in the directory specified by {0}. Bib files can 
-either be relative to the directory the aux file is in
-or in a location that can be found by kpsewhich.
-See the manual for further details.
+<entry key="syntax.usage">Usage: {0} [&lt;option&gt;+] &lt;aux file&gt;</entry>
+<entry key="syntax.info">Helper application for the glossaries-extra package.  The aux file should either be in the current directory or in the directory specified by {0}. Bib files can either be relative to the directory the aux file is in or in a location that can be found by kpsewhich.
+</entry>
+
+<entry key="syntax.docs">
+bib2gls tutorial: texdoc bib2gls-begin
+bib2gls documentation: texdoc bib2gls
+bib2gls package page: https://ctan.org/pkg/bib2gls
+bib2gls home page: https://www.dickimaw-books.com/software/bib2gls/
 </entry>
 <entry key="syntax.use.help">(Use --help or -h for help.)</entry>
-<entry key="syntax.options">Options:</entry>
-<entry key="syntax.version">{0} (or {1})	Display version and exit.</entry>
-<entry key="syntax.help">{0} (or {1})		Display this help message and exit.</entry>
-<entry key="syntax.debug">{0} [&lt;n&gt;]		Switch on debug mode (optionally with the given level).</entry>
-<entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)</entry>
-<entry key="syntax.nodebug">{0}		Switch off debug mode. (Default.)
-			Synonym: {1}</entry>
-<entry key="syntax.verbose">{0}		Switch on verbose mode.</entry>
-<entry key="syntax.noverbose">{0}		Switch off verbose mode. (Default.)
-			Some messages are displayed.
-			Synonym: {1}</entry>
-<entry key="syntax.silent">{0}		Only display error messages.</entry>
-<entry key="syntax.locale">{0} &lt;lang&gt; (or {1} &lt;lang&gt;)
-			Use language resource file for &lt;lang&gt;.
-			Also sets default document language.</entry>
-<entry key="syntax.log">{0} &lt;file&gt; (or {1} &lt;file&gt;)
-			Set transcript file name.</entry>
-<entry key="syntax.dir">{0} &lt;directory&gt; (or {1} &lt;directory&gt;)
-			Files relative to &lt;directory&gt;.
-			(This doesn''t change the current working
-			directory.)</entry>
-<entry key="syntax.interpret">{0}		Switch on interpret mode (default).</entry>
-<entry key="syntax.no.interpret">{0}		Switch off interpret mode.</entry>
-<entry key="syntax.break.space">{0}		Interpret tilde character as normal space.</entry>
-<entry key="syntax.no.break.space">{0}	Interpret tilde character as a non-breaking space 
-			(default).</entry>
+<entry key="syntax.options.common">Common options:</entry>
+<entry key="syntax.options.files">File options:</entry>
+<entry key="syntax.options.interpreter">Interpreter options:</entry>
+<entry key="syntax.options.records">Record options:</entry>
+<entry key="syntax.options.bib">Bib file options:</entry>
+<entry key="syntax.options.fields">Field options:</entry>
+<entry key="syntax.options.other">Other options:</entry>
+<entry key="syntax.version">{1}, {0}	Display version and exit.</entry>
+<entry key="syntax.help">{1}, {0}	Display this help message and exit.</entry>
+<entry key="syntax.debug">{0} [&lt;n&gt;]	Switch on debug mode.</entry>
+<entry key="syntax.verbose">{0}	Switch on verbose mode.</entry>
+<entry key="syntax.silent">{1}, {2}, {0}	Only display error messages.</entry>
+<entry key="syntax.group">{1}, {0}	Add ''group'' field to entries.</entry>
+<entry key="syntax.locale">{1}, {0} &lt;lang&gt;	Use language resource file for &lt;lang&gt; and identify this as the default document language.</entry>
+<entry key="syntax.log">{1}, {0} &lt;file&gt;	Set transcript file name.</entry>
+<entry key="syntax.dir">{1}, {0} &lt;directory&gt;	Files relative to &lt;directory&gt;.</entry>
+<entry key="syntax.tex.encoding">{0} &lt;name&gt;	Set the character encoding for the output files.</entry>
+<entry key="syntax.interpret">{0}	Switch on interpret mode.</entry>
+<entry key="syntax.break.space">{0}	Interpret tilde character as normal space.</entry>
+<entry key="syntax.packages">{1}, {0} &lt;list&gt;	Instruct interpreter to assume the listed packages have been used in the document. (The packages must be known by the interpreter.)</entry>
+<entry key="syntax.ignore.packages">{1}, {0} &lt;list&gt;	Don''t check the log file for the listed packages.</entry>
+<entry key="syntax.custom.packages">{0} &lt;list&gt;	Instruct the interpreter to parse the listed packages.</entry>
+<entry key="syntax.list.known.packages">{0}	List the packages known to the interpreter and exit.</entry>
+<entry key="syntax.support.unicode.script">{0}	Text superscripts or subscripts will use Unicode superscript or subscript characters if possible.</entry>
+<entry key="syntax.force.cross.resource.refs">{1}, {0}	Force cross-resource referencing mode on.</entry>
+
 <entry key="syntax.cite.as.record">{0}	Treat \citation as an ignored record.</entry>
-<entry key="syntax.no.cite.as.record">{0}	Don''t treat \citation as an ignored record (default).</entry>
-<entry key="syntax.collapse.same.location.range">{0}	Collapse explicit location ranges with coincident end-points (default).</entry>
-<entry key="syntax.no.collapse.same.location.range">{0}	Don''t collapse explicit location ranges with coincident end-points.</entry>
+<entry key="syntax.collapse.same.location.range">{0}	Collapse explicit location ranges with coincident end-points.</entry>
 <entry key="syntax.retain.formats">{0}	Retain non-identical locations with the given formats even if a partial match exists.</entry>
-<entry key="syntax.no.retain.formats">{0}	Don''t override normal location merging rules (default).</entry>
-<entry key="syntax.merge.wrglossary.records">{0}
-			Merge wrglossary counter records (default).</entry>
-<entry key="syntax.no.merge.wrglossary.records">{0}
-			Don''t merge wrglossary counter records.</entry>
-<entry key="syntax.force.cross.resource.refs">{0} (or {1})
-			Force cross-resource referencing mode on.</entry>
-<entry key="syntax.no.force.cross.resource.refs">{0}
-			Don''t force cross-resource referencing mode on 
-			(default).</entry>
-<entry key="syntax.warn.non.bib.fields">{0}
-			Warn if internal non-bib fields are found in .bib file.</entry>
-<entry key="syntax.no.warn.non.bib.fields">{0}
-			Don''t warn if internal non-bib fields are found in .bib file.</entry>
-<entry key="syntax.warn.unknown.entry.types">{0}
-			Warn if unknown entry types are found in .bib file.</entry>
-<entry key="syntax.no.warn.unknown.entry.types">{0}
-			Don''t warn if unknown entry types are found in .bib file.</entry>
+<entry key="syntax.merge.wrglossary.records">{0}	Merge wrglossary counter records.</entry>
+<entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;	Rule for merging locations with record=nameref (requires glossaries-extra version 1.37+). &lt;rule&gt; may be one of: ''hcounter'', ''href'', ''title'' or ''location''.</entry>
 
-<entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;
-			Rule for merging locations with record=nameref
-			(requires glossaries-extra version 1.37+).
-			&lt;rule&gt; may be one of: ''hcounter'', ''href'', ''title''
-			or ''location''.</entry>
+<entry key="syntax.format.map">{1}, {0} &lt;key&gt;:&lt;value&gt;[,&lt;key&gt;:&lt;value&gt;]*	Set location format mappings.</entry>
+<entry key="syntax.record.count">{1}, {0}	Add record count fields to entries.</entry>
+<entry key="syntax.record.count.unit">{1}, {0}	Add unit record count fields to entries.</entry>
 
-<entry key="syntax.support.unicode.script">{0}
-			Text superscripts or subscripts will use Unicode 
-			superscript or subscript characters if possible
-			(default).</entry>
-<entry key="syntax.no.support.unicode.script">{0}
-			Text superscripts or subscripts won''t use Unicode
-			superscript or subscript characters.</entry>
+<entry key="syntax.warn.non.bib.fields">{0}	Warn if internal non-bib fields are found in bib file.</entry>
+<entry key="syntax.warn.unknown.entry.types">{0}	Warn if unknown entry types are found in bib file.</entry>
+
+<entry key="syntax.mfirstuc">{1}, {0} &lt;fields&gt;|"all"	Insert an empty group if fields start with certain problematic commands to protect against case-changing commands like \Gls.</entry>
+
+<entry key="syntax.math.mfirstuc">{0}	Switch on the auto-insertion of an empty group for math-shift ($).</entry>
 
 
-<entry key="syntax.mfirstuc">{0} &lt;fields&gt;|"all" (or {1} &lt;fields&gt;|"all")
-			Insert an empty group if fields start 
-			with certain problematic commands
-			to protect against case-changing commands
-			like \Gls.
+<entry key="syntax.check.shortcuts">{0} &lt;option&gt;	Check for the shortcut commands when searching for dependencies.  Permitted values of &lt;option&gt;: ''ac'', ''acronyms'' (or ''acro''), ''abbreviations'' (or ''abbr''), ''all'' (or ''true''), ''none'' (or ''false'')</entry>
 
-			The default is to do this for all fields.
-			To do this for only a subset of fields,
-			set &lt;fields&gt; to a comma-separated
-			list of fields (e.g. 'name,short,long').
-			The keyword 'all' indicates all fields.</entry>
-<entry key="syntax.no.mfirstuc">{0}
-			Switch off the auto-insertion of an empty
-			group for all fields.</entry>
+<entry key="syntax.check.nested">{0} &lt;list&gt;|"none"	Check each field listed in &lt;list&gt; for potentially problematic nested link text.</entry>
 
-<entry key="syntax.no.math.mfirstuc">{0}
-			Switch off the auto-insertion of an empty
-			group for math-shift ($).</entry>
+<entry key="syntax.trim.fields">{0}	Trim leading and trailing spaces from fields.</entry>
 
-<entry key="syntax.math.mfirstuc">{0}
-			Switch on the auto-insertion of an empty
-			group for math-shift ($).
-			This option will be overriden by 
-			{1}</entry>
-
-
-<entry key="syntax.check.shortcuts">{0} &lt;option&gt;
-			Check for the shortcut commands when 
-			searching for dependencies.
-			Permitted values of &lt;option&gt;:
-			''ac'', ''acronyms'' (or ''acro''),
-			''abbreviations'' (or ''abbr''),
-			''all'' (or ''true''),
-			''none'' (or ''false'')</entry>
-<entry key="syntax.check.nested">{0} &lt;list&gt;|"none"
-			Check each field listed in &lt;list&gt;
-			for potentially problematic nested link 
-			text. (Default list: name, text, plural,
-			first, firstplural, short, shortplural,
-			long, longplural, symbol).
-
-			If "none", disable check.</entry>
-<entry key="syntax.nocheck.nested">{0}
-			Don''t check for potentially problematic
-			nested link text. (Equivalent to
-			{1} "none")</entry>
-<entry key="syntax.format.map">{0} &lt;key&gt;:&lt;value&gt;[,&lt;key&gt;:&lt;value&gt;]* (or {1}  &lt;key&gt;:&lt;value&gt;[,&lt;key&gt;:&lt;value&gt;]*)
-			Set location format mappings.</entry>
-<entry key="syntax.group">{0} or {1}
-			Add ''group'' field to entries.</entry>
-<entry key="syntax.no.group">{0}
-			Don''t add ''group'' field to entries (default).</entry>
-<entry key="syntax.record.count">{0} or {1}
-			Add record count fields to entries.</entry>
-<entry key="syntax.no.record.count">{0}
-			Don''t add record count fields to entries.
-			(Automatically implements {1})</entry>
-<entry key="syntax.record.count.unit">{0} or {1}
-			Add unit record count fields to entries.
-			(Automatically implements {2})</entry>
-<entry key="syntax.no.record.count.unit">{0}
-			Don''t add unit record count fields to entries.</entry>
-<entry key="syntax.trim.fields">{0}
-			Trim leading and trailing spaces from fields.</entry>
-<entry key="syntax.no.trim.fields">{0}
-			Don''t trim leading and trailing spaces from fields 
-			(default).</entry>
-<entry key="syntax.trim.only.fields">{0} &lt;list&gt;
-			Only trim leading and trailing spaces from listed fields.
-			(Cumulative.)</entry>
-<entry key="syntax.trim.except.fields">{0} &lt;list&gt;
-			Trim leading and trailing spaces from all fields except those listed.
-			(Cumulative.)</entry>
-<entry key="syntax.expand.fields">{0}
-			Don''t write \glsnoexpandfields to the .glstex file.</entry>
-<entry key="syntax.no.expand.fields">{0}
-			Write \glsnoexpandfields to the .glstex file (default).</entry>
-<entry key="syntax.tex.encoding">{0} &lt;name&gt;
-			Set the character encoding for the output files.</entry>
-<entry key="syntax.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
-			Instruct interpreter to assume the listed 
-			packages have been used in the document.
-			(The packages must be known by the interpreter.)</entry>
-<entry key="syntax.ignore.packages">{0} &lt;list&gt; or {1} &lt;list&gt;
-			Don''t check the log file for the listed
-			packages.</entry>
-<entry key="syntax.custom.packages">{0} &lt;list&gt; 
-			Instruct the interpreter to parse
-			the listed packages.</entry>
-<entry key="syntax.list.known.packages">{0}
-			List the packages known to the interpreter.</entry>
-<entry key="syntax.provide.glossaries">{0}
-			Define any unknown glossaries with 
-			\provideignoredglossary*.</entry>
-<entry key="syntax.no.provide.glossaries">{0}
-			Don''t define unknown glossaries with 
-			\provideignoredglossary* except in certain situations
-			(default).</entry>
+<entry key="syntax.trim.only.fields">{0} &lt;list&gt;	Only trim leading and trailing spaces from listed fields. (Cumulative.)</entry>
+<entry key="syntax.trim.except.fields">{0} &lt;list&gt;	Trim leading and trailing spaces from all fields except those listed. (Cumulative.)</entry>
+<entry key="syntax.expand.fields">{0}	Don''t write \glsnoexpandfields to the .glstex file.</entry>
+<entry key="syntax.provide.glossaries">{0}	Define any unknown glossaries with \provideignoredglossary*.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>

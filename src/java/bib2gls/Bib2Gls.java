@@ -29,10 +29,11 @@ import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.text.Normalizer;
+import java.text.BreakIterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Calendar;
-import java.text.Normalizer;
 
 // Requires at least Java 1.7:
 import java.nio.charset.Charset;
@@ -4299,199 +4300,243 @@ public class Bib2Gls implements TeXApp
       System.out.println("https://github.com/nlct/texparser");
    }
 
+   private void printSyntaxItem(String message)
+   {
+      String[] split = message.split("\t", 2);
+
+      if (split.length == 2)
+      {
+         int syntaxLength = split[0].length();
+         int descLength = split[1].length();
+
+         System.out.print("  "+split[0]);
+
+         int numSpaces = SYNTAX_ITEM_TAB - syntaxLength - 2;
+
+         if (numSpaces <= 0)
+         {
+            numSpaces = 1;
+         }
+
+         int indent = syntaxLength+2+numSpaces;
+
+         int width = SYNTAX_ITEM_LINEWIDTH-indent;
+
+         for (int i = 0; i < numSpaces; i++)
+         {
+            System.out.print(' ');
+         }
+
+         if (width >= descLength)
+         {
+            System.out.println(split[1]);
+         }
+         else
+         {
+            BreakIterator boundary = BreakIterator.getLineInstance();
+            boundary.setText(split[1]);
+
+            int start = boundary.first();
+            int n = 0;
+
+            int defWidth = SYNTAX_ITEM_LINEWIDTH - SYNTAX_ITEM_TAB;
+            numSpaces = SYNTAX_ITEM_TAB;
+
+            for (int end = boundary.next();
+               end != BreakIterator.DONE;
+               start = end, end = boundary.next())
+            {
+               int len = end-start;
+               n += len;
+
+               if (n >= width)
+               {
+                  System.out.println();
+
+                  for (int i = 0; i < numSpaces; i++)
+                  {
+                     System.out.print(' ');
+                  }
+
+                  n = len;
+                  width = defWidth;
+               }
+
+               System.out.print(split[1].substring(start,end));
+            }
+
+            System.out.println();
+
+         }
+      }
+      else if (split.length == 1)
+      {
+         int descLength = split[0].length();
+
+         if (descLength <= SYNTAX_ITEM_LINEWIDTH)
+         {
+            System.out.println(split[0]);
+         }
+         else
+         {
+            BreakIterator boundary = BreakIterator.getLineInstance();
+            boundary.setText(split[0]);
+
+            int start = boundary.first();
+            int n = 0;
+
+            for (int end = boundary.next();
+               end != BreakIterator.DONE;
+               start = end, end = boundary.next())
+            {
+               int len = end-start;
+               n += len;
+
+               if (n >= SYNTAX_ITEM_LINEWIDTH)
+               {
+                  System.out.println();
+                  n = len;
+               }
+
+               System.out.print(split[0].substring(start,end));
+            }
+
+            System.out.println();
+         }
+      }
+   }
+
    public void help()
    {
       System.out.println(getMessage("syntax.usage", NAME));
       System.out.println();
 
-      System.out.println(getMessage("syntax.info", "--dir"));
-      System.out.println();
-
-      System.out.println(getMessage("syntax.options"));
-      System.out.println();
-      System.out.println(getMessage("syntax.help", "--help", "-h"));
-      System.out.println(getMessage("syntax.version", "--version", "-v"));
-      System.out.println(getMessage("syntax.debug", "--debug"));
-      System.out.println(getMessage("syntax.nodebug", "--no-debug",
-        "--nodebug"));
-      System.out.println(getMessage("syntax.verbose", "--verbose"));
-      System.out.println(getMessage("syntax.noverbose",
-        "--no-verbose", "--noverbose"));
-      System.out.println(getMessage("syntax.silent", "--silent"));
+      printSyntaxItem(getMessage("syntax.info", "--dir"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.locale", "--locale", "-l"));
-      System.out.println(getMessage("syntax.log", "--log-file", "-t"));
-      System.out.println(getMessage("syntax.dir", "--dir", "-d"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.interpret", "--interpret"));
-      System.out.println(getMessage("syntax.no.interpret", "--no-interpret"));
+      System.out.println(getMessage("syntax.options.common"));
       System.out.println();
 
-      System.out.println();
-      System.out.println(getMessage("syntax.break.space", "--break-space"));
-      System.out.println(getMessage("syntax.no.break.space", "--no-break-space"));
+      printSyntaxItem(getMessage("syntax.help", "--help", "-h"));
+      printSyntaxItem(getMessage("syntax.version", "--version", "-v"));
+      printSyntaxItem(getMessage("syntax.debug", "--[no-]debug"));
+      printSyntaxItem(getMessage("syntax.verbose", "--[no-]verbose"));
+      printSyntaxItem(getMessage("syntax.silent", "--silent", "-q", "--quiet"));
+
+      printSyntaxItem(getMessage("syntax.group",
+         "--[no-]group", "-g"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.cite.as.record", 
-        "--cite-as-record"));
-      System.out.println(getMessage("syntax.no.cite.as.record", 
-        "--no-cite-as-record"));
+      System.out.println(getMessage("syntax.options.files"));
+      System.out.println();
+
+      printSyntaxItem(getMessage("syntax.dir", "--dir", "-d"));
+      printSyntaxItem(getMessage("syntax.log", "--log-file", "-t"));
+      printSyntaxItem(getMessage("syntax.tex.encoding",
+         "--tex-encoding"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.collapse.same.location.range",
-         "--collapse-same-location-range"));
+      System.out.println(getMessage("syntax.options.interpreter"));
+      System.out.println();
 
-      System.out.println();
-      System.out.println(getMessage("syntax.no.collapse.same.location.range",
-         "--no-collapse-same-location-range"));
+      printSyntaxItem(getMessage("syntax.break.space", "--[no-]break-space"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.retain.formats",
-         "--retain-formats"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.no.retain.formats",
-         "--no-retain-formats"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.warn.non.bib.fields", 
-         "--warn-non-bib-fields"));
-      System.out.println(getMessage("syntax.no.warn.non.bib.fields", 
-         "--no-warn-non-bib-fields"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.warn.unknown.entry.types", 
-         "--warn-unknown-entry-types"));
-      System.out.println(getMessage("syntax.no.warn.unknown.entry.types", 
-         "--no-warn-unknown-entry-types"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.merge.wrglossary.records", 
-        "--merge-wrglossary-records"));
-      System.out.println(getMessage("syntax.no.merge.wrglossary.records", 
-        "--no-merge-wrglossary-records"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.merge.nameref.on",
-         "--merge-nameref-on"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.force.cross.resource.refs",
-         "--force-cross-resource-refs", "-x"));
-      System.out.println(getMessage("syntax.no.force.cross.resource.refs",
-         "--no-force-cross-resource-refs"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.support.unicode.script",
-        "--support-unicode-script"));
-      System.out.println(getMessage("syntax.no.support.unicode.script",
-        "--no-support-unicode-script"));
-      System.out.println();
-      System.out.println(getMessage("syntax.packages", "--packages", "-p"));
-      System.out.println();
-      System.out.println(getMessage("syntax.ignore.packages", 
-        "--ignore-packages", "-k"));
-      System.out.println();
-      System.out.println(getMessage("syntax.custom.packages", 
+      printSyntaxItem(getMessage("syntax.custom.packages", 
         "--custom-packages"));
-      System.out.println();
-      System.out.println(getMessage("syntax.list.known.packages", 
+
+      printSyntaxItem(getMessage("syntax.ignore.packages", 
+        "--ignore-packages", "-k"));
+
+      printSyntaxItem(getMessage("syntax.interpret", "--[no-]interpret"));
+
+      printSyntaxItem(getMessage("syntax.list.known.packages", 
         "--list-known-packages"));
-      System.out.println();
+
+      printSyntaxItem(getMessage("syntax.packages", "--packages", "-p"));
+
+      printSyntaxItem(getMessage("syntax.support.unicode.script",
+        "--[no-]support-unicode-script"));
+
 
       System.out.println();
-      System.out.println(getMessage("syntax.mfirstuc",
-         "--mfirstuc-protection", "-u"));
-
+      System.out.println(getMessage("syntax.options.records"));
       System.out.println();
-      System.out.println(getMessage("syntax.no.mfirstuc",
-         "--no-mfirstuc-protection"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.math.mfirstuc",
-         "--mfirstuc-math-protection", "--no-mfirstuc-protection"));
+      printSyntaxItem(getMessage("syntax.cite.as.record", 
+        "--[no-]cite-as-record"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.no.math.mfirstuc",
-         "--no-mfirstuc-math-protection"));
+      printSyntaxItem(getMessage("syntax.collapse.same.location.range",
+         "--[no-]collapse-same-location-range"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.check.shortcuts",
-         "--shortcuts"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.check.nested",
-         "--nested-link-check"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.nocheck.nested",
-         "--no-nested-link-check", "--nested-link-check"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.format.map",
+      printSyntaxItem(getMessage("syntax.format.map",
          "--map-format", "-m"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.group",
-         "--group", "-g"));
+      printSyntaxItem(getMessage("syntax.merge.nameref.on",
+         "--merge-nameref-on"));
+
+      printSyntaxItem(getMessage("syntax.merge.wrglossary.records", 
+        "--[no-]merge-wrglossary-records"));
+
+      printSyntaxItem(getMessage("syntax.record.count",
+         "--[no-]record-count", "-c"));
+
+      printSyntaxItem(getMessage("syntax.record.count.unit",
+         "--record-count-unit", "-n"));
+
+      printSyntaxItem(getMessage("syntax.retain.formats",
+         "--[no-]retain-formats"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.no.group",
-         "--no-group"));
+      System.out.println(getMessage("syntax.options.bib"));
+      System.out.println();
+
+      printSyntaxItem(getMessage("syntax.warn.non.bib.fields", 
+         "--[no-]warn-non-bib-fields"));
+
+      printSyntaxItem(getMessage("syntax.warn.unknown.entry.types", 
+         "--[no-]warn-unknown-entry-types"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.record.count",
-         "--record-count", "-c"));
-
+      System.out.println(getMessage("syntax.options.fields"));
       System.out.println();
-      System.out.println(getMessage("syntax.no.record.count",
-         "--no-record-count", "--no-record-count-unit"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.record.count.unit",
-         "--record-count-unit", "-n", "--record-count"));
+      printSyntaxItem(getMessage("syntax.expand.fields",
+         "--[no-]expand-fields"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.no.record.count.unit",
-         "--no-record-count-unit"));
+      printSyntaxItem(getMessage("syntax.math.mfirstuc",
+         "--[no-]mfirstuc-math-protection"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.trim.fields",
-         "--trim-fields"));
+      printSyntaxItem(getMessage("syntax.mfirstuc",
+         "--[no-]mfirstuc-protection", "-u"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.trim.only.fields",
+      printSyntaxItem(getMessage("syntax.check.nested",
+         "--[no-]nested-link-check"));
+
+      printSyntaxItem(getMessage("syntax.check.shortcuts",
+         "--shortcuts"));
+
+      printSyntaxItem(getMessage("syntax.trim.fields",
+         "--[no-]trim-fields"));
+
+      printSyntaxItem(getMessage("syntax.trim.except.fields",
+         "--trim-except-fields"));
+
+      printSyntaxItem(getMessage("syntax.trim.only.fields",
          "--trim-only-fields"));
 
       System.out.println();
-      System.out.println(getMessage("syntax.trim.except.fields",
-         "--trim-except-fields"));
-
+      System.out.println(getMessage("syntax.options.other"));
       System.out.println();
-      System.out.println(getMessage("syntax.no.trim.fields",
-         "--no-trim-fields"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.expand.fields",
-         "--expand-fields"));
+      printSyntaxItem(getMessage("syntax.force.cross.resource.refs",
+         "--[no-]force-cross-resource-refs", "-x"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.no.expand.fields",
-         "--no-expand-fields"));
+      printSyntaxItem(getMessage("syntax.provide.glossaries",
+         "--[no-]provide-glossaries"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.provide.glossaries",
-         "--provide-glossaries"));
+      printSyntaxItem(getMessage("syntax.locale", "--locale", "-l"));
 
-      System.out.println();
-      System.out.println(getMessage("syntax.no.provide.glossaries",
-         "--no-provide-glossaries"));
-
-      System.out.println();
-      System.out.println(getMessage("syntax.tex.encoding",
-         "--tex-encoding"));
+      System.out.println(getMessage("syntax.docs"));
 
       System.exit(0);
    }
@@ -4878,7 +4923,8 @@ public class Bib2Gls implements TeXApp
          {
             verboseLevel = 0;
          }
-         else if (args[i].equals("--silent"))
+         else if (args[i].equals("--silent") || args[i].equals("--quiet")
+                  || args[i].equals("-q"))
          {
             verboseLevel = -1;
          }
@@ -5688,8 +5734,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.9.20211112";
-   public static final String DATE = "2021-11-12";
+   public static final String VERSION = "2.9.20211116";
+   public static final String DATE = "2021-11-16";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -5910,4 +5956,7 @@ public class Bib2Gls implements TeXApp
            MINUS,
            SUBSCRIPT_INT_PATTERN,
            SUPERSCRIPT_INT_PATTERN));
+
+   public static final int SYNTAX_ITEM_LINEWIDTH=78;
+   public static final int SYNTAX_ITEM_TAB=30;
 }
