@@ -673,7 +673,7 @@
 @bibglscommand{bibglsdefcompoundset,
   name={\csfmt{bib\-gls\-def\-compound\-set}},
   user1={\margm{options}\margm{label}\margm{main}\margm{elements}},
-  description={defines a \term{compoundentry} provided with \atentry{compoundset}},
+  description={defines a \gls{ext1.compoundentry} provided with \atentry{compoundset}},
   note={\bibgls},
   topics={definingterms},
   category={command}
@@ -1999,6 +1999,13 @@ starred version \csref{glsxtrfmt*}},
 
 @resourceoption{opt.compound-dependent,
    name={\csoptfmt{compound\dhyphen dependent}},
+   user1={\margm{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.compound-add-hierarchy,
+   name={\csoptfmt{compound\dhyphen add\dhyphen hierarchy}},
    user1={\margm{boolean}},
    category={resourceoption},
    parent={resourceoptions}
@@ -9012,7 +9019,7 @@ primary formats, if enabled.},
 @field{field.main,
   name={\fieldfmt{main}},
   description={Only available for \atentry{compoundset} this
-   optional field should contain the \term{compmainlabel}.
+   optional field should contain the \gls{ext1.compmainlabel}.
    If omitted, the final element from the \field{elements} field is
    assumed.},
   note={specific to \atentry{compoundset}},
@@ -15082,7 +15089,7 @@ by \cs{multiglossaryentry}},
   name={\csfmt{provide\-multi\-glossary\-entry}},
   user1={\oargm{options}\margm{multilabel}\oargm{main label}\margm{list}},
   description={as \cs{multiglossaryentry} but does nothing if the
-   label has already been defined as a \term{compoundentry}},
+   label has already been defined as a \gls{ext1.compoundentry}},
   topics={definingterms},
   note={\styfmt{glossaries-extra} v1.48+},
   category={command}
@@ -15091,7 +15098,7 @@ by \cs{multiglossaryentry}},
 @glscommand{multiglossaryentrysetup,
   name={\csfmt{multi\-glossary\-entry\-set\-up}},
   user1={\margm{options}},
-  description={setup the general options for \termpl{compoundentry}},
+  description={setup the general options for \glspl{ext1.compoundentry}},
   topics={assigncommands},
   note={\styfmt{glossaries-extra} v1.48+},
   category={command}
@@ -15101,12 +15108,12 @@ by \cs{multiglossaryentry}},
   name={\csfmt{gls\-xtr\-multi\-entry\-adjust\-ed\-name}},
   user1={\margm{sublist1}\margm{name}\margm{sublist2}\margm{label}},
   description={used by \csopt{compound-adjust-name} to format the
-   name using all the elements of the \term{compoundentry} set, where
-   \meta{sublist1} is the list of \termpl{compotherlabel} before the
-   \term{compmainlabel}, \meta{sublist2} is the list of
-   \termpl{compotherlabel} that follow the \term{compmainlabel},
+   name using all the elements of the \gls{ext1.compoundentry} set, where
+   \meta{sublist1} is the list of \glspl{ext1.compotherlabel} before the
+   \gls{ext1.compmainlabel}, \meta{sublist2} is the list of
+   \glspl{ext1.compotherlabel} that follow the \gls{ext1.compmainlabel},
    \meta{name} is the pre-adjustment name, and \meta{label} identifies 
-   the \term{compoundentry}},
+   the \gls{ext1.compoundentry}},
   topics={formattingcommands},
   note={\styfmt{glossaries-extra-bib2gls} v1.48+},
   category={command}

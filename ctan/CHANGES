@@ -4,6 +4,7 @@ v2.9 (pending):
     This has led to new resource options:
 
     - compound-dependent
+    - compound-add-hierarchy
     - compound-has-records
     - compound-adjust-name
     - compound-write-defs

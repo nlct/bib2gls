@@ -334,8 +334,6 @@ documents}}
 \glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
 \newcommand{\idxlink}[3][]{\glslink[#1]{idx.#2}{#3}}
 
-\glsxtrnewglslike{}{\term}{\termpl}{\Term}{\Termpl}
-
 \newcommand{\stringu}{\idx{cs.string}\idx{uhex}}
 
 \newcommand*{\filefmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
@@ -2161,8 +2159,12 @@ are converted.
 If \csopt[recorded and deps and see]{selection} then any
 \glspl{recordedentry} that have been cross-referenced by an
 \gls{unrecordedentry}, will register a dependency with the
-\gls{unrecordedentry}. Finally, \glspl{supplementalrecord} are added to
-entries.
+\gls{unrecordedentry}.
+
+The \gls{compoundentry} options \csopt{compound-dependent} and
+\csopt{compound-add-hierarchy} are implemented, if enabled.
+
+Finally, \glspl{supplementalrecord} are added to entries.
 
 \item[Stage 4 (Selection, Sorting, Writing)] Entries are selected
 from the list according to the \csopt{selection} setting, sorting is
@@ -17292,9 +17294,41 @@ If you have chosen to switch off indexing for the \glspl{compotherlabel}
 then they may not be selected (unless they have been indexed via
 another method, such as explicitly using \cs{gls}). You can use this
 option to make the \glspl{compotherlabel} dependencies of the
-\gls{compmainlabel}. This means that if the \gls{compmainlabel} is selected
-then the \glspl{compotherlabel} should also be selected (if dependencies
-are part of the selection criteria).
+\gls{compmainlabel} (if the entry given by \gls{compmainlabel} is
+present in the current \gls{resourceset}).
+
+This means that if the \gls{compmainlabel} is selected then the
+\glspl{compotherlabel} should also be selected (if dependencies are
+part of the selection criteria).
+
+\optsection{compound-add-hierarchy}
+
+This is a boolean option. The default is
+\csopt[false]{compound-add-hierarchy}.
+If true, this will set the \field{parent} field for each element
+$e_i$ to the previous element $e_{i-1}$ in the list, provided that:
+\begin{itemize}
+\item the element $e_i$ isn't the first element in the list;
+\item the element $e_i$ and the previous element $e_{i-1}$ are 
+present in the current \gls{resourceset};
+\item the element $e_i$ doesn't already have the \field{parent} field set;
+\item the element $e_i$ isn't an \gls{ancestor} of the previous element $e_{i-1}$.
+\item the previous element $e_{i-1}$ isn't an \gls{ancestor} of the 
+element $e_i$.
+\end{itemize}
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{abbreviation}\marg{clostridium,
+ \field{short}=\marg{C.},
+ \field{long}=\marg{Clostridium}
+}
+\atentry{index}\marg{botulinum}
+\atentry{compoundset}\marg{cbot,
+ \field{elements}=\marg{clostridium,botulinum}}
+\end{codeenv}
+Then the \code{botulinum} entry will have its \field{parent} field
+set to \code{clostridium}. The \code{clostridium} entry won't be
+adjusted (since it's the first element in the list).
 
 \optsection{compound-has-records}
 

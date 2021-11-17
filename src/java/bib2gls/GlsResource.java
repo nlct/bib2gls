@@ -2753,6 +2753,10 @@ public class GlsResource
          {
             compoundEntriesDependent = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("compound-add-hierarchy"))
+         {
+            compoundEntriesAddHierarchy = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("compound-has-records"))
          {
             String val = getChoice(parser, "true", list, opt,
@@ -5714,7 +5718,8 @@ public class GlsResource
          }
       }
 
-      if (bib2gls.hasCompoundEntries() && compoundEntriesDependent)
+      if (bib2gls.hasCompoundEntries() 
+           && (compoundEntriesDependent || compoundEntriesAddHierarchy))
       {
          for (Iterator<String> it = bib2gls.getCompoundEntrySet().iterator();
               it.hasNext(); )
@@ -5731,11 +5736,45 @@ public class GlsResource
 
             if (entry != null)
             {
-               for (String elem : comp.getElements())
+               String[] elements = comp.getElements();
+
+               Bib2GlsEntry prevEntry = null;
+
+               for (int i = 0; i < elements.length; i++)
                {
-                  if (!elem.equals(mainLabel))
+                  boolean isMain = elements[i].equals(mainLabel);
+
+                  if (compoundEntriesDependent && !isMain)
                   {
-                     entry.addDependency(elem);
+                     entry.addDependency(elements[i]);
+                  }
+
+                  if (compoundEntriesAddHierarchy)
+                  {
+                     Bib2GlsEntry child = null;
+
+                     if (i > 0)
+                     {
+                        if (isMain)
+                        {
+                           child = entry;
+                        }
+                        else
+                        {
+                           child = getEntry(elements[i]);
+                        }
+
+                        if (child != null && prevEntry != null
+                             && !child.hasParent() 
+                             && !elements[i].equals(elements[i-1])
+                             && !isAncestor(elements[i-1], child)
+                             && !isAncestor(elements[i], prevEntry))
+                        {
+                           child.setParent(elements[i-1]);
+                        }
+                     }
+
+                     prevEntry = child;
                   }
                }
             }
@@ -6123,6 +6162,30 @@ public class GlsResource
       }
 
       return parent;
+   }
+
+   public boolean isAncestor(String ancestorLabel, Bib2GlsEntry entry)
+   {
+      String parentId = entry.getParent();
+
+      if (parentId == null)
+      {
+         return false;
+      }
+
+      if (parentId.equals(ancestorLabel))
+      {
+         return true;
+      }
+
+      Bib2GlsEntry parentEntry = getEntry(parentId);
+
+      if (parentEntry == null)
+      {
+         return false;
+      }
+
+      return isAncestor(ancestorLabel, parentEntry);
    }
 
    private void addHierarchy(Bib2GlsEntry childEntry, 
@@ -12954,6 +13017,7 @@ public class GlsResource
    private Vector<String> additionalUserFields = null;
 
    private boolean compoundEntriesDependent = false;
+   private boolean compoundEntriesAddHierarchy = false;
 
    public static final int COMPOUND_ADJUST_NAME_FALSE=0;
    public static final int COMPOUND_ADJUST_NAME_ONCE=1;

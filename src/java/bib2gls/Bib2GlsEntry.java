@@ -2850,6 +2850,11 @@ public class Bib2GlsEntry extends BibEntry
       return getParent() != null;
    }
 
+   public void setParent(String parentId)
+   {
+      fieldValues.put("parent", parentId);
+   }
+
    public String getAlias()
    {
       return getFieldValue("alias");
