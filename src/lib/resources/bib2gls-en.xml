@@ -11,15 +11,18 @@ There is NO WARRANTY, to the extent permitted by law.</entry>
 <entry key="about.library.version">Bundled with {0} version {1} ({2})</entry>
 
 <entry key="syntax.usage">Usage: {0} [&lt;option&gt;+] &lt;aux file&gt;</entry>
-<entry key="syntax.info">Helper application for the glossaries-extra package.  The aux file should either be in the current directory or in the directory specified by {0}. Bib files can either be relative to the directory the aux file is in or in a location that can be found by kpsewhich.
-</entry>
+<entry key="syntax.info">Helper application for the glossaries-extra package. 
+The aux file should either be in the current directory or in the directory 
+specified by {0}. Bib files can either be relative to the directory the aux 
+file is in or in a location that can be found by kpsewhich.</entry>
 
-<entry key="syntax.docs">
-bib2gls tutorial: texdoc bib2gls-begin
-bib2gls documentation: texdoc bib2gls
-bib2gls package page: https://ctan.org/pkg/bib2gls
-bib2gls home page: https://www.dickimaw-books.com/software/bib2gls/
-</entry>
+<entry key="syntax.furtherinfo">Resources</entry>
+<entry key="syntax.tutorial">{0} tutorial: {1}</entry>
+<entry key="syntax.userguide">{0} documentation: {1}</entry>
+<entry key="syntax.ctan">{0} package page: {1}</entry> 
+<entry key="syntax.home">{0} home page: {1}</entry>
+<entry key="syntax.faq">{0} FAQ: {1}</entry>
+
 <entry key="syntax.use.help">(Use --help or -h for help.)</entry>
 <entry key="syntax.options.common">Common options:</entry>
 <entry key="syntax.options.files">File options:</entry>
@@ -30,15 +33,15 @@ bib2gls home page: https://www.dickimaw-books.com/software/bib2gls/
 <entry key="syntax.options.other">Other options:</entry>
 <entry key="syntax.version">{1}, {0}	Display version and exit.</entry>
 <entry key="syntax.help">{1}, {0}	Display this help message and exit.</entry>
-<entry key="syntax.debug">{0} [&lt;n&gt;]	Switch on debug mode.</entry>
-<entry key="syntax.verbose">{0}	Switch on verbose mode.</entry>
+<entry key="syntax.debug">{0} [&lt;n&gt;]	Debug mode.</entry>
+<entry key="syntax.verbose">{0}	Verbose mode.</entry>
 <entry key="syntax.silent">{1}, {2}, {0}	Only display error messages.</entry>
 <entry key="syntax.group">{1}, {0}	Add ''group'' field to entries.</entry>
 <entry key="syntax.locale">{1}, {0} &lt;lang&gt;	Use language resource file for &lt;lang&gt; and identify this as the default document language.</entry>
 <entry key="syntax.log">{1}, {0} &lt;file&gt;	Set transcript file name.</entry>
 <entry key="syntax.dir">{1}, {0} &lt;directory&gt;	Files relative to &lt;directory&gt;.</entry>
 <entry key="syntax.tex.encoding">{0} &lt;name&gt;	Set the character encoding for the output files.</entry>
-<entry key="syntax.interpret">{0}	Switch on interpret mode.</entry>
+<entry key="syntax.interpret">{0}	Enable interpreter.</entry>
 <entry key="syntax.break.space">{0}	Interpret tilde character as normal space.</entry>
 <entry key="syntax.packages">{1}, {0} &lt;list&gt;	Instruct interpreter to assume the listed packages have been used in the document. (The packages must be known by the interpreter.)</entry>
 <entry key="syntax.ignore.packages">{1}, {0} &lt;list&gt;	Don''t check the log file for the listed packages.</entry>
@@ -51,7 +54,7 @@ bib2gls home page: https://www.dickimaw-books.com/software/bib2gls/
 <entry key="syntax.collapse.same.location.range">{0}	Collapse explicit location ranges with coincident end-points.</entry>
 <entry key="syntax.retain.formats">{0}	Retain non-identical locations with the given formats even if a partial match exists.</entry>
 <entry key="syntax.merge.wrglossary.records">{0}	Merge wrglossary counter records.</entry>
-<entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;	Rule for merging locations with record=nameref (requires glossaries-extra version 1.37+). &lt;rule&gt; may be one of: ''hcounter'', ''href'', ''title'' or ''location''.</entry>
+<entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;	Rule for merging locations with record=nameref. &lt;rule&gt; may be one of: ''hcounter'', ''href'', ''title'' or ''location''.</entry>
 
 <entry key="syntax.format.map">{1}, {0} &lt;key&gt;:&lt;value&gt;[,&lt;key&gt;:&lt;value&gt;]*	Set location format mappings.</entry>
 <entry key="syntax.record.count">{1}, {0}	Add record count fields to entries.</entry>
@@ -73,7 +76,7 @@ bib2gls home page: https://www.dickimaw-books.com/software/bib2gls/
 
 <entry key="syntax.trim.only.fields">{0} &lt;list&gt;	Only trim leading and trailing spaces from listed fields. (Cumulative.)</entry>
 <entry key="syntax.trim.except.fields">{0} &lt;list&gt;	Trim leading and trailing spaces from all fields except those listed. (Cumulative.)</entry>
-<entry key="syntax.expand.fields">{0}	Don''t write \glsnoexpandfields to the .glstex file.</entry>
+<entry key="syntax.expand.fields">{0}	Allow field expansion to occur when LaTeX inputs the glstex file.</entry>
 <entry key="syntax.provide.glossaries">{0}	Define any unknown glossaries with \provideignoredglossary*.</entry>
 
 <entry key="message.reading">Reading {0}</entry>
@@ -350,7 +353,7 @@ Have you used the glossaries-extra.sty ''record'' option?
 Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.missing.aux.new.cs">Missing \{0} in aux file (make sure glossaries-extra.sty is at least {1}).</entry>
 <entry key="error.only.one.aux">Only one aux file permitted.</entry>
-<entry key="error.no.aux">Aux file not supplied. Syntax: bib2gls [&lt;options&gt;] &lt;aux file&gt;</entry>
+<entry key="error.no.aux">Aux file not supplied. {0}</entry>
 <entry key="error.file.not.found">File not found: {0}</entry>
 <entry key="error.missing.src">File not found: {0}
 (Did you forget to use the ''src'' key?)</entry>
@@ -435,48 +438,44 @@ Use {1} for help.</entry>
 <entry key="gls2bib.toomany.arg">Too many arguments.
 Use {0} for help.</entry>
 <entry key="gls2bib.missing.tex.arg">Missing &lt;tex file&gt;.
-Syntax: {0}
+{0}
 Use {1} for help.</entry>
 <entry key="gls2bib.missing.bib.arg">Missing &lt;bib file&gt;
-Syntax: {0}
+{0}
 Use {1} for help.</entry>
-<entry key="gls2bib.syntax">{0} [&lt;options&gt;] &lt;tex file&gt; &lt;bib file&gt;</entry>
+<entry key="gls2bib.syntax">Usage: {0} [&lt;options&gt;] &lt;tex file&gt; &lt;bib file&gt;</entry>
 
-<entry key="gls2bib.syntax.options">Options:</entry>
-<entry key="gls2bib.syntax.options.general">General:</entry>
-<entry key="gls2bib.syntax.options.locale">Encoding and Localisation:</entry>
-<entry key="gls2bib.syntax.options.filter">Filtering:</entry>
-<entry key="gls2bib.syntax.options.io">Output Files:</entry>
-<entry key="gls2bib.syntax.options.adjust">Adjustments:</entry>
-<entry key="gls2bib.syntax.version">{0} (or {1})		Display version information</entry>
-<entry key="gls2bib.syntax.help">{0} (or {1})			Display help</entry>
-<entry key="gls2bib.syntax.texenc">{0} &lt;encoding&gt;		.tex file encoding</entry>
-<entry key="gls2bib.syntax.bibenc">{0} &lt;encoding&gt;		.bib file encoding</entry>
-<entry key="gls2bib.syntax.ignore-sort">{0} 			Ignore sort field (default)</entry>
-<entry key="gls2bib.syntax.no-ignore-sort">{0} 		Don''t ignore sort field</entry>
-<entry key="gls2bib.syntax.ignore-type">{0} 			Omit type field</entry>
-<entry key="gls2bib.syntax.no-ignore-type">{0} 		Don''t omit type field (default)</entry>
-<entry key="gls2bib.syntax.split-on-type">{0} or {1} 		Split entries into separate files according to type field</entry>
-<entry key="gls2bib.syntax.no-split-on-type">{0} 		Don''t split entries according to type field (default)</entry>
-<entry key="gls2bib.syntax.ignore-category">{0}		Omit category field</entry>
-<entry key="gls2bib.syntax.no-ignore-category">{0} 		Don''t omit category field (default)</entry>
-<entry key="gls2bib.syntax.split-on-category">{0} or {1} 	Split entries into separate files according to category field</entry>
-<entry key="gls2bib.syntax.no-split-on-category">{0} 		Don''t split entries according to category field (default)</entry>
-<entry key="gls2bib.syntax.ignore-fields">{0} &lt;list&gt; or {1} &lt;list&gt;
-		 		Ignore the fields contained in the comma-separated &lt;list&gt;</entry>
-<entry key="gls2bib.syntax.overwrite">{0} 			Overwrite files (default unless {1} or {2})</entry>
-<entry key="gls2bib.syntax.no-overwrite">{0} 			Don''t overwrite files</entry>
-<entry key="gls2bib.syntax.preamble-only">{0} or {1} 		Only parse the preamble</entry>
-<entry key="gls2bib.syntax.no-preamble-only">{0} 		Parse the entire document (default).</entry>
-<entry key="gls2bib.syntax.space-sub">{0} &lt;val&gt; or {1} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;</entry>
-<entry key="gls2bib.syntax.index-conversion">{0} or {1}	Convert @entry to @index if no description.</entry>
-<entry key="gls2bib.syntax.no-index-conversion">{0} 		Don''t convert @entry to @index.</entry>
-<entry key="gls2bib.syntax.absorb-see">{0}	 		Absorb \glssee and \glsxtrindexseealso into the data (default).</entry> 
-<entry key="gls2bib.syntax.no-absorb-see">{0} 		Don''t absorb \glssee and \glsxtrindexseealso into the data.</entry>
-<entry key="gls2bib.syntax.locale">{0} &lt;iso tag&gt;		Use language resource file given by &lt;iso tag&gt; for messages.</entry>
-<entry key="gls2bib.syntax.silent">{0}			Suppress messages.</entry>
-<entry key="gls2bib.syntax.verbose">{0}			Normal messages.</entry>
-<entry key="gls2bib.syntax.debug">{0}				Debug mode.</entry>
+<entry key="gls2bib.syntax.info">Parse LaTeX source code and convert glossary entry definitions (provided by glossaries.sty and glossaries-extra.sty) to bib format suitable for {0}.</entry>
+
+<entry key="gls2bib.syntax.options.general">General options:</entry>
+<entry key="gls2bib.syntax.options.locale">Encoding and localisation options:</entry>
+<entry key="gls2bib.syntax.options.filter">Filtering options:</entry>
+<entry key="gls2bib.syntax.options.io">Output file options:</entry>
+<entry key="gls2bib.syntax.options.adjust">Adjustment options:</entry>
+
+<entry key="gls2bib.syntax.help">{1}, {0}	Display help.</entry>
+<entry key="gls2bib.syntax.version">{1}, {0}	Display version information.</entry>
+<entry key="gls2bib.syntax.silent">{1}, {2}, {0}	Suppress messages.</entry>
+<entry key="gls2bib.syntax.verbose">{0}	Normal messages.</entry>
+<entry key="gls2bib.syntax.debug">{0}	Debug mode.</entry>
+
+<entry key="gls2bib.syntax.texenc">{0} &lt;encoding&gt;	.tex file encoding.</entry>
+<entry key="gls2bib.syntax.bibenc">{0} &lt;encoding&gt;	.bib file encoding.</entry>
+<entry key="gls2bib.syntax.locale">{0} &lt;iso tag&gt;	Use language resource file given by &lt;iso tag&gt; for messages.</entry>
+
+<entry key="gls2bib.syntax.ignore-category">{0}	Omit category field.</entry>
+<entry key="gls2bib.syntax.ignore-type">{0}	Omit type field.</entry>
+<entry key="gls2bib.syntax.ignore-sort">{0}	Omit sort field.</entry>
+<entry key="gls2bib.syntax.ignore-fields">{1}, {0} &lt;list&gt;	Ignore the fields contained in the comma-separated &lt;list&gt;.</entry>
+<entry key="gls2bib.syntax.preamble-only">{1}, {0}	Only parse the document preamble.</entry>
+
+<entry key="gls2bib.syntax.split-on-type">{1}, {0}	Split entries into separate files according to type field.</entry>
+<entry key="gls2bib.syntax.split-on-category">{1}, {0}	Split entries into separate files according to category field.</entry>
+<entry key="gls2bib.syntax.overwrite">{0}	Overwrite existing files.</entry>
+
+<entry key="gls2bib.syntax.space-sub">{1}, {0} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;.</entry>
+<entry key="gls2bib.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
+<entry key="gls2bib.syntax.absorb-see">{0}	Absorb \glssee and \glsxtrindexseealso into the data.</entry> 
 
 <entry key="gls2bib.override.newdualentry">Overriding default definition of \newdualentry with custom 
 definition. (Change \newcommand to \providecommand if you want 

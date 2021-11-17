@@ -4306,8 +4306,10 @@ public class Bib2Gls implements TeXApp
 
       if (split.length == 2)
       {
+         String desc = split[1].replaceAll(" *\\n", " ");
+
          int syntaxLength = split[0].length();
-         int descLength = split[1].length();
+         int descLength = desc.length();
 
          System.out.print("  "+split[0]);
 
@@ -4315,7 +4317,7 @@ public class Bib2Gls implements TeXApp
 
          if (numSpaces <= 0)
          {
-            numSpaces = 1;
+            numSpaces = 2;
          }
 
          int indent = syntaxLength+2+numSpaces;
@@ -4329,12 +4331,12 @@ public class Bib2Gls implements TeXApp
 
          if (width >= descLength)
          {
-            System.out.println(split[1]);
+            System.out.println(desc);
          }
          else
          {
             BreakIterator boundary = BreakIterator.getLineInstance();
-            boundary.setText(split[1]);
+            boundary.setText(desc);
 
             int start = boundary.first();
             int n = 0;
@@ -4362,7 +4364,7 @@ public class Bib2Gls implements TeXApp
                   width = defWidth;
                }
 
-               System.out.print(split[1].substring(start,end));
+               System.out.print(desc.substring(start,end));
             }
 
             System.out.println();
@@ -4371,16 +4373,18 @@ public class Bib2Gls implements TeXApp
       }
       else if (split.length == 1)
       {
-         int descLength = split[0].length();
+         String desc = split[0].replaceAll(" *\\n", " ");
+
+         int descLength = desc.length();
 
          if (descLength <= SYNTAX_ITEM_LINEWIDTH)
          {
-            System.out.println(split[0]);
+            System.out.println(desc);
          }
          else
          {
             BreakIterator boundary = BreakIterator.getLineInstance();
-            boundary.setText(split[0]);
+            boundary.setText(desc);
 
             int start = boundary.first();
             int n = 0;
@@ -4398,7 +4402,7 @@ public class Bib2Gls implements TeXApp
                   n = len;
                }
 
-               System.out.print(split[0].substring(start,end));
+               System.out.print(desc.substring(start,end));
             }
 
             System.out.println();
@@ -4536,7 +4540,18 @@ public class Bib2Gls implements TeXApp
 
       printSyntaxItem(getMessage("syntax.locale", "--locale", "-l"));
 
-      System.out.println(getMessage("syntax.docs"));
+      System.out.println();
+      System.out.println(getMessage("syntax.furtherinfo"));
+      System.out.println();
+
+      System.out.println(getMessage("syntax.tutorial", NAME, "texdoc bib2gls-begin"));
+      System.out.println(getMessage("syntax.userguide", NAME, "texdoc bib2gls"));
+      System.out.println(getMessage("syntax.ctan", NAME,
+         "https://ctan.org/pkg/bib2gls"));
+      System.out.println(getMessage("syntax.home", NAME,
+        "https://www.dickimaw-books.com/software/bib2gls/"));
+      System.out.println(getMessage("syntax.faq", NAME,
+        "https://www.dickimaw-books.com/faq.php?category=bib2gls"));
 
       System.exit(0);
    }
@@ -5520,7 +5535,8 @@ public class Bib2Gls implements TeXApp
 
       if (auxFileName == null)
       {
-         throw new Bib2GlsSyntaxException(getMessage("error.no.aux"));
+         throw new Bib2GlsSyntaxException(getMessage("error.no.aux",
+           getMessage("syntax.usage", NAME)));
       }
 
       if (!auxFileName.endsWith(".aux"))
@@ -5676,7 +5692,10 @@ public class Bib2Gls implements TeXApp
          {
             debug = 0;
          }
-         else if (args[i].equals("--silent"))
+         else if (args[i].equals("--silent")
+               || args[i].equals("--quiet") || args[i].equals("-q")
+               // don't show version for help
+               || args[i].equals("--help") || args[i].equals("-h"))
          {
             verbose = -1;
          }
@@ -5734,8 +5753,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.9.20211116";
-   public static final String DATE = "2021-11-16";
+   public static final String VERSION = "2.9.20211117";
+   public static final String DATE = "2021-11-17";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

@@ -4,7 +4,11 @@ v2.9 (pending):
     This has led to new resource options:
 
     - compound-dependent
+    - compound-has-records
     - compound-adjust-name
+    - compound-write-defs
+
+  * added -q and --quiet as synonyms for --silent
 
 v2.8 (2021-11-05):
 

@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.HashMap;
 import java.text.MessageFormat;
+import java.text.BreakIterator;
 import java.io.*;
 
 import java.net.URL;
@@ -1199,7 +1200,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void version()
    {
-      System.out.format("%s v%s (%s)%n", APP_NAME, VERSION, DATE);
+      System.out.format("%s v%s (%s)%n", NAME, VERSION, DATE);
       System.out.format("Copyright 2017-%s Nicola Talbot%n", 
         DATE.substring(0,4));
       System.out.print("License GPLv3+: GNU GPL version 3 or later");
@@ -1210,91 +1211,194 @@ public class Gls2Bib extends LaTeXParserListener
 
    }
 
+   private void printSyntaxItem(String message)
+   {
+      String[] split = message.split("\t", 2);
+
+      if (split.length == 2)
+      {
+         String desc = split[1].replaceAll(" *\\n", " ");
+
+         int syntaxLength = split[0].length();
+         int descLength = desc.length();
+
+         System.out.print("  "+split[0]);
+
+         int numSpaces = SYNTAX_ITEM_TAB - syntaxLength - 2;
+
+         if (numSpaces <= 0)
+         {
+            numSpaces = 2;
+         }
+
+         int indent = syntaxLength+2+numSpaces;
+
+         int width = SYNTAX_ITEM_LINEWIDTH-indent;
+
+         for (int i = 0; i < numSpaces; i++)
+         {
+            System.out.print(' ');
+         }
+
+         if (width >= descLength)
+         {
+            System.out.println(desc);
+         }
+         else
+         {
+            BreakIterator boundary = BreakIterator.getLineInstance();
+            boundary.setText(desc);
+
+            int start = boundary.first();
+            int n = 0;
+
+            int defWidth = SYNTAX_ITEM_LINEWIDTH - SYNTAX_ITEM_TAB;
+            numSpaces = SYNTAX_ITEM_TAB;
+
+            for (int end = boundary.next();
+               end != BreakIterator.DONE;
+               start = end, end = boundary.next())
+            {
+               int len = end-start;
+               n += len;
+
+               if (n >= width)
+               {
+                  System.out.println();
+
+                  for (int i = 0; i < numSpaces; i++)
+                  {
+                     System.out.print(' ');
+                  }
+
+                  n = len;
+                  width = defWidth;
+               }
+
+               System.out.print(desc.substring(start,end));
+            }
+
+            System.out.println();
+
+         }
+      }
+      else if (split.length == 1)
+      {
+         String desc = split[0].replaceAll(" *\\n", " ");
+
+         int descLength = desc.length();
+
+         if (descLength <= SYNTAX_ITEM_LINEWIDTH)
+         {
+            System.out.println(desc);
+         }
+         else
+         {
+            BreakIterator boundary = BreakIterator.getLineInstance();
+            boundary.setText(desc);
+
+            int start = boundary.first();
+            int n = 0;
+
+            for (int end = boundary.next();
+               end != BreakIterator.DONE;
+               start = end, end = boundary.next())
+            {
+               int len = end-start;
+               n += len;
+
+               if (n >= SYNTAX_ITEM_LINEWIDTH)
+               {
+                  System.out.println();
+                  n = len;
+               }
+
+               System.out.print(desc.substring(start,end));
+            }
+
+            System.out.println();
+         }
+      }
+   }
+
    public void help()
    {
-      System.out.println(getMessage("gls2bib.syntax", APP_NAME));
-      System.out.println();
-      System.out.println(getMessage("gls2bib.syntax.options"));
-      System.out.println();
+      System.out.println(getMessage("gls2bib.syntax", NAME));
 
+      System.out.println();
+      printSyntaxItem(getMessage("gls2bib.syntax.info", "bib2gls"));
+
+      System.out.println();
       System.out.println(getMessage("gls2bib.syntax.options.general"));
       System.out.println();
 
-      System.out.println(getMessage("gls2bib.syntax.version", "--version",
+      printSyntaxItem(getMessage("gls2bib.syntax.version", "--version",
        "-v"));
-      System.out.println(getMessage("gls2bib.syntax.help", "--help", "-h"));
-      System.out.println(getMessage("gls2bib.syntax.silent",
-        "--silent"));
-      System.out.println(getMessage("gls2bib.syntax.verbose",
+      printSyntaxItem(getMessage("gls2bib.syntax.help", "--help", "-h"));
+      printSyntaxItem(getMessage("gls2bib.syntax.silent",
+        "--silent", "-q", "--quiet"));
+      printSyntaxItem(getMessage("gls2bib.syntax.verbose",
         "--verbose"));
-      System.out.println(getMessage("gls2bib.syntax.debug",
+      printSyntaxItem(getMessage("gls2bib.syntax.debug",
         "--debug"));
       System.out.println();
 
-      System.out.println(getMessage("gls2bib.syntax.options.locale"));
+      printSyntaxItem(getMessage("gls2bib.syntax.options.locale"));
       System.out.println();
 
-      System.out.println(getMessage("gls2bib.syntax.texenc", "--texenc"));
-      System.out.println(getMessage("gls2bib.syntax.bibenc", "--bibenc"));
-      System.out.println(getMessage("gls2bib.syntax.locale",
+      printSyntaxItem(getMessage("gls2bib.syntax.texenc", "--texenc"));
+      printSyntaxItem(getMessage("gls2bib.syntax.bibenc", "--bibenc"));
+      printSyntaxItem(getMessage("gls2bib.syntax.locale",
         "--locale"));
       System.out.println();
 
       System.out.println(getMessage("gls2bib.syntax.options.filter"));
       System.out.println();
 
-      System.out.println(getMessage("gls2bib.syntax.ignore-sort",
-        "--ignore-sort"));
-      System.out.println(getMessage("gls2bib.syntax.no-ignore-sort",
-        "--no-ignore-sort"));
-      System.out.println(getMessage("gls2bib.syntax.ignore-type",
-        "--ignore-type"));
-      System.out.println(getMessage("gls2bib.syntax.no-ignore-type",
-        "--no-ignore-type"));
-      System.out.println(getMessage("gls2bib.syntax.ignore-category",
-        "--ignore-category"));
-      System.out.println(getMessage("gls2bib.syntax.no-ignore-category",
-        "--no-ignore-category"));
-      System.out.println(getMessage("gls2bib.syntax.ignore-fields",
+      printSyntaxItem(getMessage("gls2bib.syntax.ignore-category",
+        "--[no-]ignore-category"));
+      printSyntaxItem(getMessage("gls2bib.syntax.ignore-type",
+        "--[no-]ignore-type"));
+      printSyntaxItem(getMessage("gls2bib.syntax.ignore-sort",
+        "--[no-]ignore-sort"));
+      printSyntaxItem(getMessage("gls2bib.syntax.ignore-fields",
         "--ignore-fields", "-f"));
-      System.out.println(getMessage("gls2bib.syntax.preamble-only",
-        "--preamble-only", "-p"));
-      System.out.println(getMessage("gls2bib.syntax.no-preamble-only",
-        "--no-preamble-only"));
+      printSyntaxItem(getMessage("gls2bib.syntax.preamble-only",
+        "--[no-]preamble-only", "-p"));
 
       System.out.println();
 
       System.out.println(getMessage("gls2bib.syntax.options.io"));
       System.out.println();
 
-      System.out.println(getMessage("gls2bib.syntax.split-on-type",
-        "--split-on-type", "-t"));
-      System.out.println(getMessage("gls2bib.syntax.no-split-on-type",
-        "--no-split-on-type"));
-      System.out.println(getMessage("gls2bib.syntax.split-on-category",
-        "--split-on-category", "-c"));
-      System.out.println(getMessage("gls2bib.syntax.no-split-on-category",
-        "--no-split-on-category"));
-      System.out.println(getMessage("gls2bib.syntax.overwrite",
-        "--overwrite", "--split-on-type", "--split-on-category"));
-      System.out.println(getMessage("gls2bib.syntax.no-overwrite",
-        "--no-overwrite"));
+      printSyntaxItem(getMessage("gls2bib.syntax.split-on-type",
+        "--[no-]split-on-type", "-t"));
+      printSyntaxItem(getMessage("gls2bib.syntax.split-on-category",
+        "--[no-]split-on-category", "-c"));
+      printSyntaxItem(getMessage("gls2bib.syntax.overwrite",
+        "--[no-]overwrite"));
 
       System.out.println();
-
       System.out.println(getMessage("gls2bib.syntax.options.adjust"));
       System.out.println();
 
-      System.out.println(getMessage("gls2bib.syntax.space-sub",
+      printSyntaxItem(getMessage("gls2bib.syntax.space-sub",
         "--space-sub", "-s"));
-      System.out.println(getMessage("gls2bib.syntax.index-conversion",
-        "--index-conversion", "-i"));
-      System.out.println(getMessage("gls2bib.syntax.no-index-conversion",
-        "--no-index-conversion"));
-      System.out.println(getMessage("gls2bib.syntax.absorb-see",
-        "--absorb-see"));
-      System.out.println(getMessage("gls2bib.syntax.no-absorb-see",
-        "--no-absorb-see"));
+      printSyntaxItem(getMessage("gls2bib.syntax.index-conversion",
+        "--[no-]index-conversion", "-i"));
+      printSyntaxItem(getMessage("gls2bib.syntax.absorb-see",
+        "--[no-]absorb-see"));
+
+      System.out.println();
+      System.out.println(getMessage("syntax.furtherinfo"));
+      System.out.println();
+
+      System.out.println(getMessage("syntax.userguide", "bib2gls", "texdoc bib2gls"));
+      System.out.println(getMessage("syntax.ctan", "bib2gls",
+         "https://ctan.org/pkg/bib2gls"));
+      System.out.println(getMessage("syntax.home", "bib2gls",
+        "https://www.dickimaw-books.com/software/bib2gls/"));
+
    }
 
    protected void parseArgs(String[] args)
@@ -1486,6 +1590,8 @@ public class Gls2Bib extends LaTeXParserListener
          }
          else if (args[i].equals("--debug")
                || args[i].equals("--silent")
+               || args[i].equals("--quiet")
+               || args[i].equals("-q")
                || args[i].equals("--verbose"))
          {// skip (already checked in main(String[]))
          }
@@ -1520,13 +1626,13 @@ public class Gls2Bib extends LaTeXParserListener
       if (texFile == null)
       {
           throw new Gls2BibSyntaxException(getMessage("gls2bib.missing.tex.arg",
-            getMessage("gls2bib.syntax", APP_NAME), "--help"));
+            getMessage("gls2bib.syntax", NAME), "--help"));
       }
 
       if (bibFile == null)
       {
           throw new Gls2BibSyntaxException(getMessage("gls2bib.missing.bib.arg",
-            getMessage("gls2bib.syntax", APP_NAME), "--help"));
+            getMessage("gls2bib.syntax", NAME), "--help"));
       }
 
       if (bibCharsetName == null)
@@ -1568,7 +1674,9 @@ public class Gls2Bib extends LaTeXParserListener
          {
             verbose = DEBUG;
          }
-         else if (args[i].equals("--silent"))
+         else if (args[i].equals("--silent")
+                 || args[i].equals("--quiet")
+                 || args[i].equals("-q"))
          {
             verbose = SILENT;
          }
@@ -1638,9 +1746,9 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "2.8";
-   public static final String DATE = "2020-11-05";
-   public static final String APP_NAME = "convertgls2bib";
+   public static final String VERSION = "2.9.20211117";
+   public static final String DATE = "2020-11-17";
+   public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
 
@@ -1684,4 +1792,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public static final String[] ABBR_FIELDS = new String[]
    {"short", "shortpl", "long", "longpl", "full", "fullpl"};
+
+   public static final int SYNTAX_ITEM_LINEWIDTH=78;
+   public static final int SYNTAX_ITEM_TAB=30;
 }
