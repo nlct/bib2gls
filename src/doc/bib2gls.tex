@@ -16661,6 +16661,10 @@ the entry's \parent\ (new to v1.9). If the entry doesn't have a
 \parent\ or if the \parent\ doesn't have the \field{type} field set,
 then no change is made.
 
+\item \optfmt{same as category} set the \field{type} field
+to the same value as the \field{category} field
+(\field{type} unchanged if \field{category} not set);
+
 \item \meta{label}: sets the \field{type} field to \meta{label}.
 \end{itemize}
 
@@ -17415,6 +17419,89 @@ with the relevant command (\ics{Glsxtrmultientryadjustedname} for
 \optfmt{firstuc-cs}, \ics{GlsXtrmultientryadjustedname} for
 \optfmt{title-cs} and \cs{GLSxtrmultientryadjustedname} for
 \optfmt{uc-cs}).
+
+\optsection{compound-main-type}
+
+Set the \field{type} field of the \glslink{compmainlabel}{main
+entries}. The \meta{value} is required and should be one of:
+\begin{itemize}
+\item \optfmt{same as entry}: sets the \field{type} to the entry
+type (\idx!{lowercase} and without 
+the initial \code{@}). For example, if the entry was defined with
+\atentry{index}, the \field{type} will be set to \optfmt{index}.
+If you've used \csopt{entry-type-aliases}, this refers to the target
+entry type not the original entry type provided in the \ext{bib}
+file.
+
+\item \optfmt{same as original entry}: set the \field{type} field
+to the original entry type (\idx!{lowercase} and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased).
+
+\item \optfmt{same as base}: sets the \field{type} to the base name
+of the \ext{bib} file (without the extension) that provided the
+entry definition;
+
+\item \optfmt{same as category}: sets the \field{type} to the same
+as the \field{category} field;
+
+\item \optfmt{same as parent}: sets the \field{type} to the same as
+the entry's \parent. If the entry doesn't have a
+\parent\ or if the \parent\ doesn't have the \field{type} field set,
+then no change is made.
+
+\item \meta{label}: sets the \field{type} field to \meta{label}.
+\end{itemize}
+
+This setting is governed by \csopt{compound-type-override}.
+
+\optsection{compound-other-type}
+
+Set the \field{type} field of the \glslink{compotherlabel}{other
+entries}. The \meta{value} is required and should be one of:
+\begin{itemize}
+\item \optfmt{same as main}: sets the \field{type} to the same as
+the \glslink{compmainlabel}{main entry}.
+
+\item \optfmt{same as entry}: sets the \field{type} to the entry
+type (\idx!{lowercase} and without 
+the initial \code{@}). For example, if the entry was defined with
+\atentry{index}, the \field{type} will be set to \optfmt{index}.
+If you've used \csopt{entry-type-aliases}, this refers to the target
+entry type not the original entry type provided in the \ext{bib}
+file.
+
+\item \optfmt{same as original entry}: set the \field{type} field
+to the original entry type (\idx!{lowercase} and without 
+the initial \code{@}) before it was aliased (behaves like 
+\optfmt{same as entry} if the entry type wasn't aliased).
+
+\item \optfmt{same as base}: sets the \field{type} to the base name
+of the \ext{bib} file (without the extension) that provided the
+entry definition;
+
+\item \optfmt{same as category}: sets the \field{type} to the same
+as the \field{category} field;
+
+\item \optfmt{same as parent}: sets the \field{type} to the same as
+the entry's \parent. If the entry doesn't have a
+\parent\ or if the \parent\ doesn't have the \field{type} field set,
+then no change is made.
+
+\item \meta{label}: sets the \field{type} field to \meta{label}.
+\end{itemize}
+
+This setting is governed by \csopt{compound-type-override}.
+
+\optsection{compound-type-override}
+
+This is a boolean option. The default is
+\csopt[false]{compound-type-override}.
+
+If \optfmt{true}, then the options \csopt{compound-main-type}
+and \csopt{compound-other-type} will overwrite the \field{type}
+field otherwise those options will only set the \field{type} field
+if it hasn't already been set.
 
 \optsection{compound-write-def}
 

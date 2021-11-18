@@ -9,6 +9,9 @@ v2.9 (pending):
     - compound-adjust-name
     - compound-write-defs
     - compound-options-global
+    - compound-main-type
+    - compound-other-type
+    - compound-type-override
 
   * added -q and --quiet as synonyms for --silent
 

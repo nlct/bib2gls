@@ -2814,6 +2814,18 @@ public class GlsResource
                compoundEntriesDef = COMPOUND_DEF_REFD;
             }
          }
+         else if (opt.equals("compound-main-type"))
+         {
+            compoundMainType = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("compound-other-type"))
+         {
+            compoundOtherType = getRequired(parser, list, opt);
+         }
+         else if (opt.equals("compound-type-override"))
+         {
+            compoundTypeOverride = getBoolean(parser, list, opt);
+         }
          else
          {
             throw new IllegalArgumentException(
@@ -5851,68 +5863,174 @@ public class GlsResource
          }
       }
 
-      if (hasCompoundEntries() 
-           && (compoundEntriesDependent || compoundEntriesAddHierarchy))
+      applyCompoundEntrySettings();
+
+      addSupplementalRecords();
+   }
+
+   private void applyCompoundEntrySettings()
+   {
+      if (!hasCompoundEntries() 
+           || (!compoundEntriesDependent && !compoundEntriesAddHierarchy
+                && compoundMainType == null && compoundOtherType == null))
       {
-         for (Iterator<CompoundEntry> it = getCompoundEntryValueIterator();
-              it.hasNext(); )
+         return;
+      }
+
+      for (Iterator<CompoundEntry> it = getCompoundEntryValueIterator();
+           it.hasNext(); )
+      {
+         CompoundEntry comp = it.next();
+
+         String mainLabel = comp.getMainLabel();
+         Bib2GlsEntry mainEntry = getEntry(mainLabel);
+
+         String[] elements = comp.getElements();
+
+         Bib2GlsEntry prevEntry = null;
+
+         boolean deferOtherTypeAssign = false;
+         Vector<Bib2GlsEntry> others = null;
+
+         for (int i = 0; i < elements.length; i++)
          {
-            CompoundEntry comp = it.next();
+            boolean isMain = elements[i].equals(mainLabel);
 
-            String mainLabel = comp.getMainLabel();
-            Bib2GlsEntry entry = getEntry(mainLabel);
-
-            // If compound entry list is global elements may not
-            // be in this resource set.
-
-            if (entry != null)
+            if (compoundEntriesDependent && !isMain)
             {
-               String[] elements = comp.getElements();
+               // If compound entry list is global, elements may not
+               // be in this resource set.
 
-               Bib2GlsEntry prevEntry = null;
-
-               for (int i = 0; i < elements.length; i++)
+               if (mainEntry != null)
                {
-                  boolean isMain = elements[i].equals(mainLabel);
+                  mainEntry.addDependency(elements[i]);
+               }
+            }
 
-                  if (compoundEntriesDependent && !isMain)
+            Bib2GlsEntry elemEntry = null;
+            boolean elemEntryAssigned = false;
+
+            if (compoundEntriesAddHierarchy)
+            {
+               if (i == 0)
+               {
+                  if (!isMain && "same as main".equals(compoundOtherType))
                   {
-                     entry.addDependency(elements[i]);
+                     deferOtherTypeAssign = true;
+                     others = new Vector<Bib2GlsEntry>(elements.length-1);
+
+                     elemEntry = getEntry(elements[i]);
+                     elemEntryAssigned = true;
+
+                     if (elemEntry != null)
+                     {
+                        others.add(elemEntry);
+                     }
+                  }
+               }
+               else
+               {
+                  if (isMain)
+                  {
+                     elemEntry = mainEntry;
+                  }
+                  else
+                  {
+                     elemEntry = getEntry(elements[i]);
                   }
 
-                  if (compoundEntriesAddHierarchy)
+                  elemEntryAssigned = true;
+
+                  if (others != null && elemEntry != null)
                   {
-                     Bib2GlsEntry child = null;
+                     others.add(elemEntry);
+                  }
 
-                     if (i > 0)
+                  if (elemEntry != null && prevEntry != null
+                       && !elemEntry.hasParent() 
+                       && !elements[i].equals(elements[i-1])
+                       && !isAncestor(elements[i-1], elemEntry)
+                       && !isAncestor(elements[i], prevEntry))
+                  {
+                     elemEntry.setParent(elements[i-1]);
+                  }
+               }
+
+               prevEntry = elemEntry;
+            }
+
+            if (compoundMainType != null
+             || (compoundOtherType != null && !deferOtherTypeAssign))
+            {
+               if (!elemEntryAssigned)
+               {
+                  if (isMain)
+                  {
+                     elemEntry = mainEntry;
+                  }
+                  else
+                  {
+                     elemEntry = getEntry(elements[i]);
+                  }
+
+                  elemEntryAssigned = true;
+               }
+
+               if (elemEntry != null)
+               {
+                  String entryType = null;
+
+                  if (isMain)
+                  {
+                     if (compoundMainType != null)
                      {
-                        if (isMain)
-                        {
-                           child = entry;
-                        }
-                        else
-                        {
-                           child = getEntry(elements[i]);
-                        }
+                        entryType = getType(elemEntry, compoundMainType,
+                          !compoundTypeOverride);
+                     }
+                  }
+                  else if (compoundOtherType != null)
+                  {
+                     String type = compoundOtherType;
 
-                        if (child != null && prevEntry != null
-                             && !child.hasParent() 
-                             && !elements[i].equals(elements[i-1])
-                             && !isAncestor(elements[i-1], child)
-                             && !isAncestor(elements[i], prevEntry))
-                        {
-                           child.setParent(elements[i-1]);
-                        }
+                     if (compoundOtherType.equals("same as main"))
+                     {
+                        type = getType(mainEntry, null, !compoundTypeOverride);
                      }
 
-                     prevEntry = child;
+                     entryType = getType(elemEntry, type, !compoundTypeOverride);
+                  }
+
+                  if (entryType != null)
+                  {
+                     elemEntry.putField("type", entryType);
+                  }
+               }
+            }
+         }
+
+         if (others != null)
+         {
+            String type = compoundOtherType;
+
+            if ("same as main".equals(compoundOtherType))
+            {
+               type = getType(mainEntry, null, !compoundTypeOverride);
+            }
+
+            if (type != null)
+            {
+               for (Bib2GlsEntry other : others)
+               {
+                  String entryType = getType(other, type, !compoundTypeOverride);
+
+                  if (entryType != null)
+                  {
+                     other.putField("type", entryType);
                   }
                }
             }
          }
       }
-
-      addSupplementalRecords();
    }
 
    public CompoundEntry getCompoundAdjustName(String id)
@@ -13169,5 +13287,9 @@ public class GlsResource
    private int compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_DEFAULT;
 
    private boolean compoundEntriesGlobal = true;
+   private boolean compoundTypeOverride = false;
+
+   private String compoundMainType = null;
+   private String compoundOtherType = null;
 }
 
