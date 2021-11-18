@@ -426,6 +426,7 @@ Use {1} {0} instead.</entry>
 <entry key="error.option.requires.interpreter">Interpreter needed for setting {0}</entry>
 <entry key="error.sort.requires.switch">Sort method ''{0}'' requires {1} switch.</entry>
 <entry key="error.selected_before.none_selected">Selection setting ''{0}'' requires previous selections from other resource sets.</entry>
+<entry key="error.duplicate.compoundset">Duplicate compound set: {0}</entry>
 
 <!--
     The following messages are used by convertgls2bib

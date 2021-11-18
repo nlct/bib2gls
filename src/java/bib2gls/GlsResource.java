@@ -2749,6 +2749,10 @@ public class GlsResource
                secondarySortSettings.setCollatorDecomposition(Collator.FULL_DECOMPOSITION);
             }
          }
+         else if (opt.equals("compound-options-global"))
+         {
+            compoundEntriesGlobal = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("compound-dependent"))
          {
             compoundEntriesDependent = getBoolean(parser, list, opt);
@@ -5225,6 +5229,58 @@ public class GlsResource
       return bibParserListener;
    }
 
+   public boolean hasCompoundEntries()
+   {
+      if (compoundEntriesGlobal)
+      {
+         return bib2gls.hasCompoundEntries();
+      }
+
+      return compoundEntries != null;
+   }
+
+   public Iterator<String> getCompoundEntryKeyIterator()
+   {
+      if (compoundEntriesGlobal)
+      {
+         return bib2gls.getCompoundEntryKeyIterator();
+      }
+      else if (compoundEntries != null)
+      {
+         return compoundEntries.keySet().iterator();
+      }
+
+      return null;
+   }
+
+   public Iterator<CompoundEntry> getCompoundEntryValueIterator()
+   {
+      if (compoundEntriesGlobal)
+      {
+         return bib2gls.getCompoundEntryValueIterator();
+      }
+      else if (compoundEntries != null)
+      {
+         return compoundEntries.values().iterator();
+      }
+
+      return null;
+   }
+
+   public CompoundEntry getCompoundEntry(String label)
+   {
+      if (compoundEntriesGlobal)
+      {
+         return bib2gls.getCompoundEntry(label);
+      }
+      else if (compoundEntries != null)
+      {
+         return compoundEntries.get(label);
+      }
+
+      return null;
+   }
+
    public void addCompoundEntry(CompoundEntry compoundEntry)
    {
       // bib definition needs to override aux information. 
@@ -5232,17 +5288,94 @@ public class GlsResource
 
       if (compoundEntries == null)
       {
-         compoundEntries = new Vector<CompoundEntry>();
+         compoundEntries = new HashMap<String,CompoundEntry>();
       }
 
-      compoundEntries.add(compoundEntry);
+      String label = compoundEntry.getLabel();
 
-      bib2gls.debugMessage("message.compoundset.found", compoundEntry.getLabel());
+      bib2gls.debugMessage("message.compoundset.found", label);
+
+      if (compoundEntries.containsKey(label))
+      {
+         bib2gls.error(bib2gls.getMessage("error.duplicate.compound_set", label));
+      }
+      else
+      {
+         compoundEntries.put(label, compoundEntry);
+      }
 
       if (compoundEntriesHasRecords == COMPOUND_MGLS_RECORDS_DEFAULT)
       {
          compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_TRUE;
       }
+   }
+
+   public CompoundEntry getCompoundEntryWithMain(String mainLabel)
+   {
+      return getCompoundEntryWithMain(mainLabel, compoundEntriesGlobal);
+   }
+
+   public CompoundEntry getCompoundEntryWithMain(String mainLabel, boolean global)
+   {
+      if (global)
+      {
+         return bib2gls.getCompoundEntryWithMain(mainLabel);
+      }
+      else if (compoundEntries != null)
+      {
+         for (Iterator<CompoundEntry> it=compoundEntries.values().iterator();
+              it.hasNext(); )
+         {
+            CompoundEntry compEntry = it.next();
+
+            if (compEntry.getMainLabel().equals(mainLabel))
+            {
+               return compEntry;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   public CompoundEntry getUniqueCompoundEntryWithMain(String mainLabel)
+   {
+      return getUniqueCompoundEntryWithMain(mainLabel, compoundEntriesGlobal);
+   }
+
+   public CompoundEntry getUniqueCompoundEntryWithMain(String mainLabel, 
+      boolean global)
+   {
+      if (global)
+      {
+         return bib2gls.getUniqueCompoundEntryWithMain(mainLabel);
+      }
+      else if (compoundEntries != null)
+      {
+         CompoundEntry comp = null;
+
+         for (Iterator<CompoundEntry> it=compoundEntries.values().iterator();
+              it.hasNext(); )
+         {
+            CompoundEntry compEntry = it.next();
+
+            if (compEntry.getMainLabel().equals(mainLabel))
+            {
+               if (comp == null)
+               {
+                  comp = compEntry;
+               }
+               else
+               {
+                  return null;
+               }
+            }
+         }
+
+         return comp;
+      }
+
+      return null;
    }
 
    public void processBibList(TeXParser parser)
@@ -5650,7 +5783,7 @@ public class GlsResource
             {
                // is alias a compound entry?
 
-               CompoundEntry comp = bib2gls.getCompoundEntry(alias);
+               CompoundEntry comp = getCompoundEntry(alias);
 
                if (comp != null)
                {
@@ -5718,20 +5851,18 @@ public class GlsResource
          }
       }
 
-      if (bib2gls.hasCompoundEntries() 
+      if (hasCompoundEntries() 
            && (compoundEntriesDependent || compoundEntriesAddHierarchy))
       {
-         for (Iterator<String> it = bib2gls.getCompoundEntrySet().iterator();
+         for (Iterator<CompoundEntry> it = getCompoundEntryValueIterator();
               it.hasNext(); )
          {
-            String compLabel = it.next();
-
-            CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
+            CompoundEntry comp = it.next();
 
             String mainLabel = comp.getMainLabel();
             Bib2GlsEntry entry = getEntry(mainLabel);
 
-            // The compound entry list is global. Elements may not
+            // If compound entry list is global elements may not
             // be in this resource set.
 
             if (entry != null)
@@ -5792,10 +5923,10 @@ public class GlsResource
             return null;
 
          case COMPOUND_ADJUST_NAME_ONCE:
-            return bib2gls.getCompoundEntryWithMain(id);
+            return getCompoundEntryWithMain(id);
 
          case COMPOUND_ADJUST_NAME_UNIQUE:
-            return bib2gls.getUniqueCompoundEntryWithMain(id);
+            return getUniqueCompoundEntryWithMain(id);
       }
 
       return null;
@@ -7866,14 +7997,20 @@ public class GlsResource
             writer.println();
          }
 
+         // Only define compound sets provided with @compoundset in
+         // this resource .
+
          if (compoundEntries != null && compoundEntriesDef != COMPOUND_DEF_FALSE)
          {
             boolean all = (compoundEntriesDef == COMPOUND_DEF_ALL);
 
             writer.println("\\providecommand*{\\bibglsdefcompoundset}[4]{\\multiglossaryentry[#1]{#2}[#3]{#4}}");
 
-            for (CompoundEntry comp : compoundEntries)
+            for (Iterator<CompoundEntry> it=compoundEntries.values().iterator();
+                 it.hasNext(); )
             {
+               CompoundEntry comp = it.next();
+
                if (all || bib2gls.isMglsRefd(comp.getLabel()))
                {
                   writer.format("\\bibglsdefcompoundset{%s}{%s}{%s}{%s}%n",
@@ -12577,21 +12714,13 @@ public class GlsResource
          return false;
       }
    
-      Set<String> set = bib2gls.getCompoundEntrySet();
-
-      if (set == null)
+      for (Iterator<CompoundEntry> it=getCompoundEntryValueIterator();
+           it != null && it.hasNext(); )
       {
-         return false;
-      }
+         CompoundEntry comp = it.next();
 
-      for (Iterator<String> it=set.iterator(); it.hasNext(); )
-      {
-         String compLabel = it.next();
-
-         if (bib2gls.isMglsRefd(compLabel))
+         if (bib2gls.isMglsRefd(comp.getLabel()))
          {
-            CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
-
             String[] elements = comp.getElements();
 
             for (String elem : elements)
@@ -13025,7 +13154,7 @@ public class GlsResource
 
    private int compoundAdjustName = COMPOUND_ADJUST_NAME_FALSE;
 
-   private Vector<CompoundEntry> compoundEntries;
+   private HashMap<String,CompoundEntry> compoundEntries;
 
    public static final int COMPOUND_DEF_FALSE=0;
    public static final int COMPOUND_DEF_REFD=1;
@@ -13039,5 +13168,6 @@ public class GlsResource
 
    private int compoundEntriesHasRecords = COMPOUND_MGLS_RECORDS_DEFAULT;
 
+   private boolean compoundEntriesGlobal = true;
 }
 

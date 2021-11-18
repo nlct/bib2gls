@@ -2656,7 +2656,7 @@ public class Bib2Gls implements TeXApp
       {
          compoundEntries = new HashMap<String,CompoundEntry>();
       }
-      else if (!override && compoundEntries.get(label) != null)
+      else if (!override && compoundEntries.containsKey(label))
       {// don't overwrite
          return;
       }
@@ -2669,14 +2669,24 @@ public class Bib2Gls implements TeXApp
       return compoundEntries != null;
    }
 
-   public Set<String> getCompoundEntrySet()
+   public Iterator<String> getCompoundEntryKeyIterator()
    {
       if (compoundEntries == null)
       {
          return null;
       }
 
-      return compoundEntries.keySet();
+      return compoundEntries.keySet().iterator();
+   }
+
+   public Iterator<CompoundEntry> getCompoundEntryValueIterator()
+   {
+      if (compoundEntries == null)
+      {
+         return null;
+      }
+
+      return compoundEntries.values().iterator();
    }
 
    /* Gets the first compound entry found that has the given 
@@ -2690,11 +2700,10 @@ public class Bib2Gls implements TeXApp
          return null;
       }
 
-      for (Iterator<String> it=compoundEntries.keySet().iterator();
+      for (Iterator<CompoundEntry> it=getCompoundEntryValueIterator();
            it.hasNext(); )
       {
-         String compLabel = it.next();
-         CompoundEntry c = compoundEntries.get(compLabel);
+         CompoundEntry c = it.next();
 
          if (c.getMainLabel().equals(mainLabel))
          {
@@ -2719,11 +2728,10 @@ public class Bib2Gls implements TeXApp
 
       CompoundEntry comp = null;
 
-      for (Iterator<String> it=compoundEntries.keySet().iterator();
+      for (Iterator<CompoundEntry> it=getCompoundEntryValueIterator();
            it.hasNext(); )
       {
-         String compLabel = it.next();
-         CompoundEntry c = compoundEntries.get(compLabel);
+         CompoundEntry c = it.next();
 
          if (c.getMainLabel().equals(mainLabel))
          {
@@ -5753,8 +5761,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.9.20211117";
-   public static final String DATE = "2021-11-17";
+   public static final String VERSION = "2.9.20211118";
+   public static final String DATE = "2021-11-18";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

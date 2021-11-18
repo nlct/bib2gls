@@ -8,6 +8,7 @@ v2.9 (pending):
     - compound-has-records
     - compound-adjust-name
     - compound-write-defs
+    - compound-options-global
 
   * added -q and --quiet as synonyms for --silent
 

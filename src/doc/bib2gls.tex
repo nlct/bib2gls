@@ -17285,6 +17285,24 @@ defined in the document using \cs{multiglossaryentry} (or
 \cs{provideglossaryentry}). See \sectionref{sec:compoundsetentry}
 for further details.
 
+\optsection{compound-options-global}
+
+This is a boolean option. The default is
+\csopt[true]{compound-options-global}.
+
+If \optfmt{true}, the \gls{compoundentry} options described in this
+section, except for \csopt{compound-write-def}, pick up all
+\glspl{compoundentry} provided in the document (defined either with
+\atentry{compoundset} or in the document with
+\ics{multiglossaryentry}).
+
+If \optfmt{false}, options only apply to \glspl{compoundentry} defined
+with \atentry{compoundset} in the current \gls{resourceset}.
+
+If \igls{crossresourceref} are disabled then any instances of
+\atentry{compoundset} in subsequent \glspl{resourceset} can only be
+picked up from the \ext{aux} file on the next build.
+
 \optsection{compound-dependent}
 
 This is a boolean option. The default is
