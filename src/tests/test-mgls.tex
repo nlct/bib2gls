@@ -1,18 +1,21 @@
 % arara: pdflatex
 % arara: bib2gls
 % arara: pdflatex
+% arara: pdflatex if found("Rerun to get")
 \documentclass{article}
 
 \usepackage{hyperref}
 \usepackage[record,stylemods=bookindex,style=bookindex]{glossaries-extra}
 
-\glssetcategoryattribute{genus}{textformat}{emph}
-\glssetcategoryattribute{species}{textformat}{emph}
+\glssetcategoriesattributes{genus,species}{textformat,glossnamefont}{emph}
 
 \setabbreviationstyle{long-only-short-only}
 \renewcommand*{\glsxtronlyname}{%
   \protect\glslongonlyfont{\the\glslongtok}%
 }
+
+\newglossary*{genus}{Genus}
+
 \GlsXtrLoadResources
 [
   field-aliases={
@@ -21,6 +24,7 @@
    %other=alias
   },
   compound-dependent,
+  compound-other-type=same as category,
   compound-adjust-name%=once
 ]
 
@@ -29,12 +33,12 @@
 \multiglossaryentry[textformat=textbf]{ctet}{clostridium,tetani}
 
 %\multiglossaryentrysetup{encapothers=glsignore,hyper=mainonly}
-\multiglossaryentrysetup{indexothers=false}
+\multiglossaryentrysetup{indexothers=false,hyper=allmain}
 
 \begin{document}
 \mgls{cbot}, \mgls{cperf}, \mgls{ctet}.
 \mgls{cbot}, \mgls{cperf}, \mgls{ctet}.
 \gls{botox}.
 
-\printunsrtglossaries.
+\printunsrtglossaries
 \end{document}

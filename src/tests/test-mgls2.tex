@@ -1,13 +1,18 @@
 % arara: pdflatex
 % arara: bib2gls
 % arara: pdflatex
+% arara: pdflatex
 \documentclass{article}
 
 \usepackage{hyperref}
 \usepackage[record,stylemods=bookindex,style=bookindex]{glossaries-extra}
 
-\glssetcategoryattribute{genus}{textformat}{emph}
-\glssetcategoryattribute{species}{textformat}{emph}
+\renewcommand{\glsxtrbookindexcols}{1}
+
+\glssetcategoriesattributes{genus,species}{textformat,glossnamefont}{emph}
+
+%\provideignoredglossary{genus}
+\newglossary*{genus}{Genus}
 
 \setabbreviationstyle{long-only-short-only}
 \renewcommand*{\glsxtronlyname}{%
@@ -20,18 +25,20 @@
    %genus=parent,
    %other=alias
   },
-  compound-add-hierarchy,
+  %compound-add-hierarchy,
   %compound-dependent,
-  %compound-adjust-name%=once
+  %compound-other-type=genus,
+  compound-other-type=same as category,
+  compound-adjust-name%=once
 ]
 
 %\multiglossaryentrysetup{encapothers=glsignore,hyper=mainonly}
-\multiglossaryentrysetup{indexothers=false}
+\multiglossaryentrysetup{indexothers=false,hyper=allmain}
 
 \begin{document}
 \mgls{cbot}, \mgls{cperf}, \mgls{ctet}.
 \mgls{cbot}, \mgls{cperf}, \mgls{ctet}.
 \gls{botox}.
 
-\printunsrtglossaries.
+\printunsrtglossaries
 \end{document}
