@@ -36,7 +36,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
 	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
-	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf
+	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf \
+	  test-hypernav-targetprefix.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -703,6 +704,13 @@ test-mgls2.pdf	: test-mgls2.glstex
 test-mgls2.glstex	: test-mgls2.tex test-mgls2.bib $(DEPS)
 		pdflatex test-mgls2
 		$(BIB2GLS) test-mgls2
+
+test-hypernav-targetprefix.pdf	: test-hypernav-targetprefix.glstex
+		pdflatex test-hypernav-targetprefix
+
+test-hypernav-targetprefix.glstex	: test-hypernav-targetprefix.tex $(DEPS)
+		pdflatex test-hypernav-targetprefix
+		$(BIB2GLS) test-hypernav-targetprefix
 
 clean	:
 	$(RM) *.aux

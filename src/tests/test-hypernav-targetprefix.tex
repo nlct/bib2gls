@@ -1,0 +1,18 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src={example-glossaries-brief},selection=all]
+
+\begin{document}
+\renewcommand*{\printunsrtglossaryentryprocesshook}[1]{%
+  \ifdefstring{#1}{bibendum}{\printunsrtglossaryskipentry}{}%
+}
+\renewcommand*{\glsnavhyperlinkname}[2]{samplenavname:#1@#2}%
+\printunsrtglossary[style={listhypergroup},targetnameprefix={samplenameprefix.}]
+\end{document}

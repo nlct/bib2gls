@@ -7636,30 +7636,12 @@ public class GlsResource
             {
                writer.println("\\ifdef\\@glsnavhypertarget");
                writer.println("{");
-               writer.println("  \\ifdef\\bibglsorgnavhypertarget");
-               writer.println("  {}");
-               writer.println("  {");
-               writer.println("    \\let\\bibglsorgnavhypertarget\\@glsnavhypertarget");
-               writer.println("  }");
-               writer.println("  \\renewcommand*{\\@glsnavhypertarget}[3]{%");
-               writer.println("    \\ifcsdef{@gls@hypergrouplist@#1}%");
-               writer.println("    {\\@glstarget{\\glsnavhyperlinkname{#1}{#2}}{#3}}%");
-               writer.println("    {\\bibglsorgnavhypertarget{#1}{#2}{#3}}%");
-               writer.println("  }");
-               writer.println("  \\providecommand{\\bibglshypergroup}{\\@gls@hypergroup}");
+               writer.println("  \\providecommand{\\bibglshypergroup}[2]{\\ifstrempty{#1}{}{\\@gls@hypergroup{#1}{#2}}}");
                writer.println("}");
                writer.println("{");
                writer.println("  \\providecommand{\\bibglshypergroup}[2]{}");
                writer.println("}");
 
-            }
-            else if (bib2gls.hyperrefLoaded())
-            { 
-               writer.println("\\ifdef\\bibglsorgnavhypertarget");
-               writer.println("{");
-               writer.println("  \\let\\@glsnavhypertarget\\bibglsorgnavhypertarget");
-               writer.println("}");
-               writer.println("{}");
             }
          }
 

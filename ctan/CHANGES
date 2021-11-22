@@ -15,6 +15,9 @@ v2.9 (pending):
 
   * added -q and --quiet as synonyms for --silent
 
+  * issue #14: bib2gls breaks hypergroup styles
+    https://github.com/nlct/bib2gls/issues/14
+
 v2.8 (2021-11-05):
 
   * Support for new features of mfirstuc v2.07:
