@@ -49,12 +49,190 @@ public class GlsRecord implements Comparable<GlsRecord>
          location, index);
    }
 
+   @Override
    public Object clone()
    {
       return new GlsRecord(bib2gls, label, prefix, counter, format, location, 
         index);
    }
 
+   /* 
+    * Does this record match the given entry label. Need to take the
+    * record prefix setting into account and possibly flip the
+    * label. May return this or a copy of this record or null if
+    * no match.
+    */
+   public GlsRecord getRecord(GlsResource resource, String entryLabel,
+     boolean tryFlipping)
+   {
+      String recordLabelPrefix = resource.getRecordLabelPrefix();
+
+      String recordLabel = getLabel(recordLabelPrefix);
+
+      if (recordLabel.equals(entryLabel))
+      {
+         return this;
+      }
+
+      if (tryFlipping)
+      {
+         recordLabel = resource.flipLabel(recordLabel);
+
+         if (entryLabel.equals(recordLabel))
+         {
+            return this;
+         }
+      }
+
+      return null;
+   }
+
+   /* 
+    * Does this record match the given primary, dual or tertiary
+    * entry label. Need to take the record prefix setting into
+    * account. May return this or a copy of this record or null if
+    * no match.
+    */
+   public GlsRecord getRecord(GlsResource resource, String primaryId,
+    String dualId, String tertiaryId)
+   {
+      GlsRecord r = getRecord(resource, primaryId, false);
+
+      if (r == null && dualId != null)
+      {
+         r = getRecord(resource, dualId, false);
+      }
+
+      if (r == null && tertiaryId != null)
+      {
+         r = getRecord(resource, tertiaryId, false);
+      }
+
+      return r;
+   }
+
+   /* 
+    * Get the entry from the data that matches this record.
+    * The record prefix setting needs to be taken into account.
+    */
+   public Bib2GlsEntry getEntry(GlsResource resource, 
+      Vector<Bib2GlsEntry> bibData, 
+      Vector<Bib2GlsEntry> dualData)
+   {
+      String labelPrefix = resource.getLabelPrefix();
+      String dualPrefix = resource.getDualPrefix();
+      String tertiaryPrefix = resource.getTertiaryPrefix();
+
+      String recordLabelPrefix = resource.getRecordLabelPrefix();
+      String recordLabel = getLabel(recordLabelPrefix);
+
+      for (Bib2GlsEntry entry : bibData)
+      {
+         String entryId = entry.getId();
+
+         if (recordLabel.equals(entryId)
+              || (labelPrefix != null && !entryId.startsWith(labelPrefix)
+                   && recordLabel.equals(labelPrefix+entryId))
+            )
+         {
+            return entry;
+         }
+
+         if (dualData == null)
+         {
+            if (dualPrefix != null
+                 && !entryId.startsWith(dualPrefix)
+                 && recordLabel.equals(dualPrefix+entryId))
+            {
+               return entry;
+            }
+
+            if (tertiaryPrefix != null
+                 && !entryId.startsWith(tertiaryPrefix)
+                 && recordLabel.equals(tertiaryPrefix+entryId))
+            {
+               return entry;
+            }
+         }
+      }
+
+      if (dualData != null)
+      {
+         for (Bib2GlsEntry entry : dualData)
+         {
+            String entryId = entry.getId();
+
+            if (recordLabel.equals(entryId)
+                || (dualPrefix != null
+                 && !entryId.startsWith(dualPrefix)
+                 && recordLabel.equals(dualPrefix+entryId)))
+            {
+               return entry;
+            }
+
+            assert (entry instanceof Bib2GlsDualEntry);
+
+            Bib2GlsDualEntry dual = (Bib2GlsDualEntry)entry;
+
+            if (dual.hasTertiary())
+            {
+               entryId = entry.getOriginalId();
+
+               if (tertiaryPrefix != null)
+               {
+                  entryId = tertiaryPrefix+entryId;
+               }
+
+               if (recordLabel.equals(entryId)
+                   || (tertiaryPrefix != null
+                    && !entryId.startsWith(tertiaryPrefix)
+                    && recordLabel.equals(tertiaryPrefix+entryId)))
+               {
+                  return entry;
+               }
+
+            }
+         }
+      }
+
+      return null;
+   }
+
+   public Bib2GlsEntry getEntry(GlsResource resource,
+      Vector<Bib2GlsEntry> data, boolean tryFlipping)
+   {
+      String labelPrefix = resource.getLabelPrefix();
+
+      String recordLabelPrefix = resource.getRecordLabelPrefix();
+      String recordLabel = getLabel(recordLabelPrefix);
+
+      for (Bib2GlsEntry entry : data)
+      {
+         String entryId = entry.getId();
+
+         if (recordLabel.equals(entryId)
+              || (labelPrefix != null && !entryId.startsWith(labelPrefix)
+                   && recordLabel.equals(labelPrefix+entryId))
+            )
+         {
+            return entry;
+         }
+
+         if (tryFlipping)
+         {
+            String flippedLabel = resource.flipLabel(recordLabel);
+
+            if (entryId.equals(flippedLabel))
+            {
+               return entry;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   @Override
    public int compareTo(GlsRecord record)
    {
       if (index == record.index)
@@ -73,6 +251,18 @@ public class GlsRecord implements Comparable<GlsRecord>
    public String getLabel()
    {
       return label;
+   }
+
+   public String getLabel(String recordLabelPrefix)
+   {
+      String recordLabel = label;
+
+      if (recordLabelPrefix != null && !label.startsWith(recordLabelPrefix))
+      {
+         recordLabel = recordLabelPrefix+label;
+      }
+
+      return recordLabel;
    }
 
    public void setLabel(String newLabel)
@@ -1012,6 +1202,7 @@ public class GlsRecord implements Comparable<GlsRecord>
       return list;
    }
 
+   @Override
    public String toString()
    {
       return String.format(

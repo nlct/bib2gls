@@ -43,6 +43,7 @@ public class GlsRecordNameRef extends GlsRecord
       this.hcounter = hcounter;
    }
 
+   @Override
    public GlsRecord copy(String newLabel)
    {
       return new GlsRecordNameRef(bib2gls, newLabel, getPrefix(), 
@@ -50,6 +51,7 @@ public class GlsRecordNameRef extends GlsRecord
         getIndex());
    }
 
+   @Override
    public Object clone()
    {
       return new GlsRecordNameRef(bib2gls, getLabel(), getPrefix(), 

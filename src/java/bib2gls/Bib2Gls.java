@@ -1631,6 +1631,8 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@record", 5);
             addAuxCommand("glsxtr@recordsee", 2);
             addAuxCommand("glsxtr@record@nameref", 8);
+            addAuxCommand("glsxtr@select@entry", 5);
+            addAuxCommand("glsxtr@select@entry@nameref", 8);
             addAuxCommand("glsxtr@texencoding", 1);
             addAuxCommand("glsxtr@langtag", 1);
             addAuxCommand("glsxtr@shortcutsval", 1);
@@ -1838,9 +1840,19 @@ public class Bib2Gls implements TeXApp
          }
          else if (name.equals("glsxtr@record") 
                    || (useCiteAsRecord && name.equals("citation"))
-                   || name.equals("glsxtr@record@nameref"))
+                   || name.equals("glsxtr@record@nameref")
+                   || name.equals("glsxtr@select@entry")
+                   || name.equals("glsxtr@select@entry@nameref"))
          {
             String recordLabel = data.getArg(0).toString(parser);
+            String[] labels = null;
+
+            if (name.startsWith("glsxtr@select@entry"))
+            {
+               labels = recordLabel.split(",");
+               recordLabel = labels[0];
+            }
+
             String recordPrefix;
             String recordCounter;
             String recordFormat;
@@ -1894,12 +1906,26 @@ public class Bib2Gls implements TeXApp
 
             if (recordTitle == null)
             {
-               newRecord = new GlsRecord(this, recordLabel, recordPrefix,
-                  recordCounter, recordFormat, recordLocation);
+               if (labels == null)
+               {
+                  newRecord = new GlsRecord(this, recordLabel, recordPrefix,
+                     recordCounter, recordFormat, recordLocation);
+               }
+               else
+               {
+                  newRecord = new GlsRecordSelection(this, labels, recordPrefix,
+                     recordCounter, recordFormat, recordLocation);
+               }
+            }
+            else if (labels == null)
+            {
+               newRecord = new GlsRecordNameRef(this, recordLabel, recordPrefix,
+                  recordCounter, recordFormat, recordLocation, recordTitle,
+                  recordHref, recordHcounter);
             }
             else
             {
-               newRecord = new GlsRecordNameRef(this, recordLabel, recordPrefix,
+               newRecord = new GlsRecordNameRefSelection(this, labels, recordPrefix,
                   recordCounter, recordFormat, recordLocation, recordTitle,
                   recordHref, recordHcounter);
             }
@@ -5761,8 +5787,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "2.9";
-   public static final String DATE = "2021-11-22";
+   public static final String VERSION = "3.0.20211128";
+   public static final String DATE = "2021-11-28";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

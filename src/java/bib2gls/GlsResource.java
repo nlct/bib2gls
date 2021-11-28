@@ -5465,9 +5465,13 @@ public class GlsResource
             boolean hasRecords = entry.hasRecords();
             boolean dualHasRecords = (dual != null && dual.hasRecords());
 
-            for (GlsRecord record : records)
+            for (GlsRecord r : records)
             {
-               String recordLabel = getRecordLabel(record);
+               GlsRecord record = getRecord(primaryId, dualId, tertiaryId, r);
+
+               if (record == null) continue;
+
+               String recordLabel = record.getLabel(recordLabelPrefix);
 
                if (recordLabel.equals(primaryId))
                {
@@ -6122,32 +6126,7 @@ public class GlsResource
          {
             GlsRecord record = (GlsRecord)suppRecord;
 
-            String label = getRecordLabel(record);
-
-            Bib2GlsEntry entry = getEntry(label, bibData);
-
-            if (entry == null && labelPrefix != null
-                && !label.startsWith(labelPrefix))
-            {
-               entry = getEntry(labelPrefix+label, bibData);
-            }
-
-            if (entry == null)
-            {
-               if (dualData == null)
-               {
-                  entry = getEntry(dualPrefix+label, bibData);
-               }
-               else
-               {
-                  entry = getEntry(label, dualData);
-
-                  if (entry == null && !label.startsWith(dualPrefix))
-                  {
-                     entry = getEntry(dualPrefix+label, dualData);
-                  }
-               }
-            }
+            Bib2GlsEntry entry = getEntryMatchingRecord(record);
 
             if (entry != null)
             {
@@ -6648,6 +6627,24 @@ public class GlsResource
       return list;
    }
 
+   public GlsRecord getRecord(String primaryId, String dualId,
+     String tertiaryId, GlsRecord record)
+   {
+      return record.getRecord(this, primaryId, dualId, tertiaryId);
+   }
+
+   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record)
+   {
+      return record.getEntry(this, bibData, dualData);
+   }
+
+   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record,
+      Vector<Bib2GlsEntry> data, boolean tryFlipping)
+   {
+      return record.getEntry(this, data, tryFlipping);
+   }
+
+   @Deprecated
    public String getRecordLabel(GlsRecord record)
    {
       String label = record.getLabel();
@@ -6796,24 +6793,12 @@ public class GlsResource
          {
             GlsRecord record = records.get(i);
 
-            String recordLabel = getRecordLabel(record);
-
-            Bib2GlsEntry entry = getEntry(recordLabel, data);
-
-            if (entry == null && hasDuals)
-            {
-               String label = flipLabel(recordLabel);
-
-               if (label != null)
-               {
-                  entry = getEntry(label, data);
-               }
-            }
+            Bib2GlsEntry entry = getEntryMatchingRecord(record, data, hasDuals);
 
             if (entry != null && !entries.contains(entry))
             {
                 bib2gls.debugMessage("message.selecting.entry.record.match",
-                  entry.getId(), recordLabel);
+                  entry.getId(), record.getLabel(recordLabelPrefix));
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
@@ -6924,9 +6909,9 @@ public class GlsResource
             {
                GlsRecord record = (GlsRecord) suppRecord;
 
-               String label = getRecordLabel(record);
+               Bib2GlsEntry entry = getEntryMatchingRecord(record, data, false);
 
-               Bib2GlsEntry entry = getEntry(label, data);
+               String label = record.getLabel(recordLabelPrefix);
 
                if (entry != null && !entries.contains(entry))
                {
@@ -7963,8 +7948,8 @@ public class GlsResource
                   {
                      GlsRecord record = records.get(i);
 
-                     Bib2GlsEntry entry = getEntry(getRecordLabel(record), 
-                        secondaryList);
+                     Bib2GlsEntry entry = getEntryMatchingRecord(record, 
+                        secondaryList, false);
 
                      if (entry != null)
                      {
@@ -7981,8 +7966,8 @@ public class GlsResource
                {
                   for (GlsRecord record : records)
                   {
-                     Bib2GlsEntry entry = getEntry(getRecordLabel(record), 
-                        secondaryList);
+                     Bib2GlsEntry entry = getEntryMatchingRecord(record, 
+                        secondaryList, false);
 
                      if (entry != null)
                      {
@@ -9491,6 +9476,11 @@ public class GlsResource
    public String[] getHexUnicodeFields()
    {
       return hexUnicodeFields;
+   }
+
+   public String getRecordLabelPrefix()
+   {
+      return recordLabelPrefix;
    }
 
    public String getLabelPrefix()

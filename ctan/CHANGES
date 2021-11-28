@@ -1,4 +1,9 @@
-v2.9 (pending):
+v3.0 (pending):
+
+  * support for \glsxtr@select@entry and \glsxtr@select@entry@nameref
+    (new to glossaries-extra-bib2gls v1.49)
+
+v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)
     This has led to new resource options:
