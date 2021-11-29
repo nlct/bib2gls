@@ -12866,8 +12866,7 @@ start of the \glspl{locationlist} (default).
 \item \optfmt{\margm{prefix-1},\margm{prefix-2},\ldots,\margm{prefix-n}}:
 insert \code{\gls{bibglslocprefix}\margm{n}} (where \meta{n} is the number of
 \glspl{location} in the list) at the start of each \gls{locationlist} and the
-definition of \gls{bibglslocprefix} will be appended to the glossary
-preamble providing an \ics{ifcase} condition:
+definition of \gls{bibglslocprefix} will have an \ics{ifcase} condition:
 \begin{codeenv}
 \cmd{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\comment{}
   \ics{ifcase}\idx{param}1
@@ -12896,17 +12895,14 @@ the document's language hooks or in the glossary preamble.
 
 \end{itemize}
 
-If \meta{value} is omitted, \optfmt{true} is assumed. Take care not
-to mix different values of \csopt{loc-prefix} for entries for the
-same \csopt{type} setting. It's okay to mix \csopt[false]{loc-prefix} with 
-another value, but don't mix non-\optfmt{false} values. 
-See the description of \gls!{bibglslocprefix} for
-further details.
+If \meta{value} is omitted, \optfmt{true} is assumed. The definition
+will be placed in the \ext{glstex} file according to
+\csopt{loc-prefix-def}.
 
 For example:
 \begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[entries1]{src},\csopt[false]{loc-prefix}}
-\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[entries2]{src},\csopt{loc-prefix}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[individual]{loc-prefix-def},\csopt[entries1]{src},\csopt[false]{loc-prefix}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[individual]{loc-prefix-def},\csopt[entries2]{src},\csopt{loc-prefix}}
 \gls{GlsXtrLoadResources}\oarg{\csopt[symbols]{type},\csopt[entries3]{src},\csopt[p.,pp.]{loc-prefix}}
 \end{codeenv}
 This works since the conflicting \csopt[p.,pp.]{loc-prefix} and
@@ -12931,6 +12927,32 @@ then \csopt[true]{loc-prefix} takes precedence over
 \filefmt{entries1.bib} still won't have a location prefix, but the entries
 fetched from both \filefmt{entries2.bib} and \filefmt{entries3.bib}
 have the location prefixes obtained from the language resource file.
+
+Note that if you identify some glossaries but not others (for
+example, you have dual entries in separate glossaries but only
+use \csopt{type} and not \csopt{dual-type}), then you will need to
+use \csopt[global]{loc-prefix-def} or \csopt[local]{loc-prefix-def}.
+
+\optsection{loc-prefix-def}
+
+This determines how the location prefix identified by
+\csopt{loc-prefix} is written to the \ext{glstex} file. The value
+may be one of:
+\begin{itemize}
+\item\optfmt{global} the definition is globally defined using
+\cs{providecommand};
+\item\optfmt{local} the definition is locally defined using
+\cs{providecommand} in the general glossary preamble
+(\cs{glossarypreamble});
+\item\optfmt{individual} the definition is locally defined using
+\cs{providecommand} in the glossary preamble of each type that has
+been identified in the current \gls{resourceset}, using options like
+\csopt{type} and \csopt{dual-type}
+(\ics{apptoglossarypreamble}).
+\end{itemize}
+The default is \csopt[individual]{loc-prefix-def}. Note that this
+can lead to an undefined control sequence error if locations appear
+in a glossary that hasn't been detected by the \gls{resourceset}.
 
 \optsection{loc-suffix}
 
@@ -12957,8 +12979,33 @@ an equivalent to \gls{bibglspostlocprefix}.
 If \meta{value} omitted, \csopt[\ics{at}\idx{periodchar}]{loc-suffix} 
 is assumed.  The default is \csopt[false]{loc-suffix}.
 
-As with \csopt{loc-prefix}, take care not to mix different values
-of \csopt{loc-suffix} for entries in the same glossary type.
+The way the definition is written to the \ext{glstex} file is determined
+by \csopt{loc-suffix-def}.
+Note that if you identify some glossaries but not others (for
+example, you have dual entries in separate glossaries but only
+use \csopt{type} and not \csopt{dual-type}), then you will need to
+use \csopt[global]{loc-suffix-def} or \csopt[local]{loc-suffix-def}.
+
+\optsection{loc-suffix-def}
+
+This determines how the location suffix identified by
+\csopt{loc-suffix} is written to the \ext{glstex} file. The value
+may be one of:
+\begin{itemize}
+\item\optfmt{global} the definition is globally defined using
+\cs{providecommand};
+\item\optfmt{local} the definition is locally defined using
+\cs{providecommand} in the general glossary preamble
+(\cs{glossarypreamble});
+\item\optfmt{individual} the definition is locally defined using
+\cs{providecommand} in the glossary preamble of each type that has
+been identified in the current \gls{resourceset}, using options like
+\csopt{type} and \csopt{dual-type}
+(\ics{apptoglossarypreamble}).
+\end{itemize}
+The default is \csopt[individual]{loc-suffix-def}. Note that this
+can lead to an undefined control sequence error if locations appear
+in a glossary that hasn't been detected by the \gls{resourceset}.
 
 \optsection{loc-counters}
 
@@ -18412,16 +18459,12 @@ Or you can redefine it afterwards:
 
 \formatdef{bibglslocprefix}
 If the \csopt{loc-prefix} option is on, this command will be
-provided. If the glossary type has been provided by \csopt{type}
-(and \csopt{dual-type} if there are any \glspl{dualentry}) then the
-definition of \gls{bibglslocprefix} will be appended to the glossary
-preamble for the given type (or types if there are \glspl{dualentry}).
-For example, if the document has:
+provided. The location of the definition is determined by the
+\csopt{loc-prefix-def} option.  For example, if the document has:
 \begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[p.,pp.]{loc-prefix},\csopt[entries]{src}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[main]{type},\csopt[individual]{loc-prefix-def},\csopt[p.,pp.]{loc-prefix},\csopt[entries]{src}}
 \end{codeenv}
-and there are no \glspl{dualentry}, then the following will be added to
-the \ext{glstex} file:
+then the following will be added to the \ext{glstex} file:
 \begin{codeenv}
 \cs{apptoglossarypreamble}\oarg{main}\marg{\comment{}
  \cs{providecommand}\marg{\gls{bibglslocprefix}}[1]\marg{\comment{}
@@ -18432,7 +18475,8 @@ the \ext{glstex} file:
  }\comment{}
 }
 \end{codeenv}
-However, if the \csopt{type} key is missing, then the following will
+However, if the \csopt{type} key is missing or if the option
+\csopt[local]{loc-prefix-def} is used, then the following will
 be added instead:
 \begin{codeenv}
 \cs{appto}\cs{glossarypreamble}\marg{\comment{}
@@ -18444,6 +18488,8 @@ be added instead:
  }\comment{}
 }
 \end{codeenv}
+If \csopt[global]{loc-prefix-def} is used then the definition is
+global (outside of the glossary preamble).
 
 \cssection{bibglspagename}
 
@@ -18467,12 +18513,10 @@ using the value of \idx{tag.pages} from the \langxml. For example with \file{bib
 
 \formatdef{bibglslocsuffix}
 If the \csopt{loc-suffix} option is on, this command will be
-provided. If the glossary type has been provided by \csopt{type}
-(and \csopt{dual-type} if there are any \glspl{dualentry}) then the
-definition of \gls{bibglslocsuffix} will be appended to the glossary
-preamble for the given type (or types if there are \glspl{dualentry}).
+provided. The location of the definition depends on the
+\csopt{loc-suffix-def} option.
 
-This commands definition depends on the value provided by
+This command's definition depends on the value provided by
 \csopt{loc-suffix}. For example, with 
 \csopt[\ics{at}{\idx{periodchar}}]{loc-suffix}
 the command is defined as:

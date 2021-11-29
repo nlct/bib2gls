@@ -32,7 +32,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual2.pdf test-mfirstuc.pdf test-translations.pdf \
 	  test-sort-labels.pdf test-lettersort-examples.pdf \
 	  test-sortletternumber.pdf test-spawn.pdf \
-	  test-interpret-fields.pdf test-interpret-fields2.pdf test-prefix.pdf test-dual-prefix.pdf \
+	  test-interpret-fields.pdf test-interpret-fields2.pdf \
+	  test-prefix.pdf test-dual-prefix.pdf test-prefix2.pdf \
 	  sample-recordcount.pdf test-innergloss.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
 	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
@@ -628,6 +629,13 @@ test-prefix.glstex	: test-prefix.tex test-prefix.bib $(DEPS)
 		pdflatex test-prefix
 		$(BIB2GLS) test-prefix
 
+test-prefix2.pdf	: test-prefix2.glstex
+		pdflatex test-prefix2
+
+test-prefix2.glstex	: test-prefix2.tex entries-dual-index-entry.bib $(DEPS)
+		pdflatex test-prefix2
+		$(BIB2GLS) test-prefix2
+
 test-dual-prefix.pdf	: test-dual-prefix.glstex
 		pdflatex test-dual-prefix
 
@@ -706,6 +714,7 @@ test-mgls2.glstex	: test-mgls2.tex test-mgls2.bib $(DEPS)
 		$(BIB2GLS) test-mgls2
 
 test-hypernav-targetprefix.pdf	: test-hypernav-targetprefix.glstex
+		pdflatex test-hypernav-targetprefix
 		pdflatex test-hypernav-targetprefix
 
 test-hypernav-targetprefix.glstex	: test-hypernav-targetprefix.tex $(DEPS)

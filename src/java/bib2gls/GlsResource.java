@@ -2422,6 +2422,24 @@ public class GlsResource
                locationPrefix = values;
             }
          }
+         else if (opt.equals("loc-prefix-def"))
+         {
+            String val = getChoice(parser, list, opt,
+              "global", "local", "individual");
+
+            if (val.equals("global"))
+            {
+               locationPrefixDef = PROVIDE_DEF_GLOBAL;
+            }
+            else if (val.equals("local"))
+            {
+               locationPrefixDef = PROVIDE_DEF_LOCAL_ALL;
+            }
+            else if (val.equals("individual"))
+            {
+               locationPrefixDef = PROVIDE_DEF_LOCAL_INDIVIDUAL;
+            }
+         }
          else if (opt.equals("loc-suffix"))
          {
             String[] values = getStringArray(parser, "\\@.", list, opt);
@@ -2440,6 +2458,24 @@ public class GlsResource
             else
             {
                locationSuffix = values;
+            }
+         }
+         else if (opt.equals("loc-suffix-def"))
+         {
+            String val = getChoice(parser, list, opt,
+              "global", "local", "individual");
+
+            if (val.equals("global"))
+            {
+               locationSuffixDef = PROVIDE_DEF_GLOBAL;
+            }
+            else if (val.equals("local"))
+            {
+               locationSuffixDef = PROVIDE_DEF_LOCAL_ALL;
+            }
+            else if (val.equals("individual"))
+            {
+               locationSuffixDef = PROVIDE_DEF_LOCAL_INDIVIDUAL;
             }
          }
          else if (opt.equals("ignore-fields"))
@@ -7375,6 +7411,8 @@ public class GlsResource
 
       PrintWriter writer = null;
 
+      Vector<String> allKnownTypes = null;
+
       try
       {
          writer = new PrintWriter(texFile, charSetName);
@@ -7647,64 +7685,80 @@ public class GlsResource
                  bib2gls.getMessage("tag.pages"));
             }
 
-            if (type == null)
+            switch (locationPrefixDef)
             {
-               writer.println("\\appto\\glossarypreamble{%");
+               case PROVIDE_DEF_GLOBAL:
+                  writeLocPrefixDef(writer);
+               break;
+               case PROVIDE_DEF_LOCAL_ALL:
+                  writer.println("\\appto\\glossarypreamble{%");
+                  writeLocPrefixDef(writer);
+                  writer.println("}");
+               break;
+               case PROVIDE_DEF_LOCAL_INDIVIDUAL:
+
+                  if (allKnownTypes == null)
+                  {
+                     allKnownTypes = getAllKnownTypes();
+                  }
+
+                  if (allKnownTypes.isEmpty())
+                  {
+                     writer.println("\\appto\\glossarypreamble{%");
+                     writeLocPrefixDef(writer);
+                     writer.println("}");
+                  }
+                  else
+                  {
+                     for (String t : allKnownTypes)
+                     {
+                        writer.format("\\apptoglossarypreamble[%s]{%%%n", t);
+                        writeLocPrefixDef(writer);
+                        writer.println("}");
+                     }
+                  }
+
+               break;
             }
-            else
-            {
-               writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
-            }
-
-            writer.println(" \\providecommand{\\bibglslocprefix}[1]{%");
-            writer.println("  \\ifcase#1");
-
-            for (int i = 0; i < locationPrefix.length; i++)
-            {
-               writer.format("  \\%s %s\\bibglspostlocprefix%n",
-                 (i == locationPrefix.length-1 ? "else" : "or"), 
-                 locationPrefix[i]);
-            }
-
-            writer.println("  \\fi");
-            writer.println(" }%");
-
-            writer.println("}");
          }
 
          if (locationSuffix != null)
          {
-            if (type == null)
+            switch (locationSuffixDef)
             {
-               writer.println("\\appto\\glossarypreamble{%");
+               case PROVIDE_DEF_GLOBAL:
+                  writeLocSuffixDef(writer);
+               break;
+               case PROVIDE_DEF_LOCAL_ALL:
+                  writer.println("\\appto\\glossarypreamble{%");
+                  writeLocSuffixDef(writer);
+                  writer.println("}");
+               break;
+               case PROVIDE_DEF_LOCAL_INDIVIDUAL:
+
+                  if (allKnownTypes == null)
+                  {
+                     allKnownTypes = getAllKnownTypes();
+                  }
+
+                  if (allKnownTypes.isEmpty())
+                  {
+                     writer.println("\\appto\\glossarypreamble{%");
+                     writeLocSuffixDef(writer);
+                     writer.println("}");
+                  }
+                  else
+                  {
+                     for (String t : allKnownTypes)
+                     {
+                        writer.format("\\apptoglossarypreamble[%s]{%%%n", t);
+                        writeLocSuffixDef(writer);
+                        writer.println("}");
+                     }
+                  }
+
+               break;
             }
-            else
-            {
-               writer.format("\\apptoglossarypreamble[%s]{%%%n", type);
-            }
-
-            writer.print(" \\providecommand{\\bibglslocsuffix}[1]{");
-
-            if (locationSuffix.length == 1)
-            {
-               writer.print(locationSuffix[0]);
-            }
-            else
-            {
-               writer.format("\\ifcase#1 %s", locationSuffix[0]);
-
-               for (int i = 1; i < locationSuffix.length; i++)
-               {
-                  writer.format("\\%s %s",
-                      (i == locationSuffix.length-1 ? "else" : "or"), 
-                      locationSuffix[i]);
-               }
-
-               writer.print("\\fi");
-            }
-            writer.println("}%");
-
-            writer.println("}");
          }
 
          if (saveDefinitionIndex)
@@ -8118,6 +8172,49 @@ public class GlsResource
       }
 
       return entryCount;
+   }
+
+   private void writeLocPrefixDef(PrintWriter writer)
+     throws IOException
+   {
+      writer.println(" \\providecommand{\\bibglslocprefix}[1]{%");
+      writer.println("  \\ifcase#1");
+
+      for (int i = 0; i < locationPrefix.length; i++)
+      {
+         writer.format("  \\%s %s\\bibglspostlocprefix%n",
+           (i == locationPrefix.length-1 ? "else" : "or"), 
+           locationPrefix[i]);
+      }
+
+      writer.println("  \\fi");
+      writer.println(" }%");
+   }
+
+   private void writeLocSuffixDef(PrintWriter writer)
+     throws IOException
+   {
+      writer.print(" \\providecommand{\\bibglslocsuffix}[1]{");
+
+      if (locationSuffix.length == 1)
+      {
+         writer.print(locationSuffix[0]);
+      }
+      else
+      {
+         writer.format("\\ifcase#1 %s", locationSuffix[0]);
+
+         for (int i = 1; i < locationSuffix.length; i++)
+         {
+            writer.format("\\%s %s",
+                (i == locationSuffix.length-1 ? "else" : "or"), 
+                locationSuffix[i]);
+         }
+
+         writer.print("\\fi");
+      }
+
+      writer.println("}%");
    }
 
    private void addToSecondaryList(Bib2GlsEntry entry, 
@@ -9321,6 +9418,58 @@ public class GlsResource
             entry.putField("type", entryType);
          }
       }
+   }
+
+   public Vector<String> getAllKnownTypes()
+   {
+      Vector<String> types = new Vector<String>();
+
+      if (type != null)
+      {
+         types.add(type);
+      }
+
+      if (dualType != null && !types.contains(dualType))
+      {
+         types.add(dualType);
+      }
+
+      if (tertiaryType != null && !types.contains(tertiaryType))
+      {
+         types.add(tertiaryType);
+      }
+
+      if (secondaryType != null && !types.contains(secondaryType))
+      {
+         types.add(secondaryType);
+      }
+
+      if (triggerType != null && !types.contains(triggerType))
+      {
+         types.add(triggerType);
+      }
+
+      if (progenitorType != null && !types.contains(progenitorType))
+      {
+         types.add(progenitorType);
+      }
+
+      if (progenyType != null && !types.contains(progenyType))
+      {
+         types.add(progenyType);
+      }
+
+      if (compoundMainType != null && !types.contains(compoundMainType))
+      {
+         types.add(compoundMainType);
+      }
+
+      if (compoundOtherType != null && !types.contains(compoundOtherType))
+      {
+         types.add(compoundOtherType);
+      }
+
+      return types;
    }
 
    private void setCategory(Bib2GlsEntry entry)
@@ -13002,6 +13151,13 @@ public class GlsResource
    private String[] locationPrefix = null;
 
    private String[] locationSuffix = null;
+
+   public static final int PROVIDE_DEF_GLOBAL=0;
+   public static final int PROVIDE_DEF_LOCAL_ALL=1;
+   public static final int PROVIDE_DEF_LOCAL_INDIVIDUAL=2;
+
+   private int locationPrefixDef=PROVIDE_DEF_LOCAL_INDIVIDUAL;
+   private int locationSuffixDef=PROVIDE_DEF_LOCAL_INDIVIDUAL;
 
    private boolean saveLocations = true;
    private boolean saveLocList = true;

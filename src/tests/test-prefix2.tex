@@ -1,0 +1,18 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,index]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={entries-dual-index-entry},
+ loc-prefix={p.,pp.},
+ type=index,dual-type=main
+]
+
+\begin{document}
+\gls{array} and \gls{dual.array}.
+
+\printunsrtglossaries
+\end{document}

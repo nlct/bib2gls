@@ -3,6 +3,14 @@ v3.0 (pending):
   * support for \glsxtr@select@entry and \glsxtr@select@entry@nameref
     (new to glossaries-extra-bib2gls v1.49)
 
+  * issue #15: loc-prefix and type leads to undefined \bibglslocprefix with multiple glossaries
+    https://github.com/nlct/bib2gls/issues/15
+
+    This has led to new resource options:
+
+    - loc-prefix-def
+    - loc-suffix-def
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)
