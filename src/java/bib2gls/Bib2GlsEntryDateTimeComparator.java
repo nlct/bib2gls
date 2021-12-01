@@ -135,17 +135,19 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
       return value;
    }
 
+   @Override
    protected long getDefaultGroupId(Bib2GlsEntry entry, int codePoint, 
      Object sortValue)
    {
       return entry.getNumericSort().longValue();
    }
 
+   @Override
    protected GroupTitle createDefaultGroupTitle(int codePoint,
-      Object sortValue, String type)
+      Object sortValue, String type, String parent)
    {
       return new DateTimeGroupTitle(dateFormat, (Date)sortValue, 
-                 type, hasDate, hasTime);
+                 type, parent, hasDate, hasTime);
    }
 
 
@@ -168,8 +170,7 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
          type = "";
       }
 
-      if (bib2gls.useGroupField() && value.length() > 0
-           && !entry.hasParent())
+      if (value.length() > 0 && resource.useGroupField(entry, entries))
       {
          if (entry.getFieldValue(groupField) == null)
          {
@@ -201,6 +202,7 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
       return ((Long)num1).compareTo((Long)num2);
    }
 
+   @Override
    protected int compareElements(Bib2GlsEntry entry1,
      Bib2GlsEntry entry2)
    {

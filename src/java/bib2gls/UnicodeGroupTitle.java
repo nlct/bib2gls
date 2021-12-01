@@ -20,13 +20,14 @@ package com.dickimawbooks.bib2gls;
 
 public class UnicodeGroupTitle extends GroupTitle
 {
-   public UnicodeGroupTitle(String title, String actual, long id, String type)
+   public UnicodeGroupTitle(String title, String actual, long id, String type,
+      String parent)
    {
-      super(title, actual, id, type);
+      super(title, actual, id, type, parent);
    }
 
    public static UnicodeGroupTitle createUnicodeGroupTitle(int codePoint,
-     String type, int groupFormation)
+     String type, String parent, int groupFormation)
    {
       boolean category = (groupFormation == SortSettings.GROUP_UNICODE_CATEGORY
         || groupFormation == SortSettings.GROUP_UNICODE_CATEGORY_SCRIPT);
@@ -175,7 +176,7 @@ public class UnicodeGroupTitle extends GroupTitle
          title = title.toLowerCase();
       }
 
-      return new UnicodeGroupTitle(title, actual, id, type);
+      return new UnicodeGroupTitle(title, actual, id, type, parent);
    }
 
    public static long getGroupId(int codePoint, int groupFormation)
@@ -229,21 +230,34 @@ public class UnicodeGroupTitle extends GroupTitle
       return id;
    }
 
-   public String getCsSetName()
+   @Override
+   protected String getNonHierCsSetName()
    {
       return "bibglssetunicodegrouptitle";
    }
 
-   public String getCsLabelName()
+   @Override
+   protected String getNonHierCsLabelName()
    {
       return "bibglsunicodegroup";
    }
 
+   @Override
    public String format(String other)
    {
-      return String.format("{%s}{%s}{%X}{%s}", 
-       getTitle(),
-       Bib2Gls.replaceSpecialChars(other), 
-       getId(), type == null ? "" : type);
+      if (supportsHierarchy)
+      {
+         return String.format("{%s}{%s}{%X}{%s}{%s}", 
+          getTitle(),
+          Bib2Gls.replaceSpecialChars(other), 
+          getId(), type == null ? "" : type, parent == null ? "" : parent);
+      }
+      else
+      {
+         return String.format("{%s}{%s}{%X}{%s}", 
+          getTitle(),
+          Bib2Gls.replaceSpecialChars(other), 
+          getId(), type == null ? "" : type);
+      }
    }
 }

@@ -1,0 +1,19 @@
+% arara: pdflatex
+% arara: bib2gls: {group: on}
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,stylemods,style=indexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src=example-glossaries-parent,
+ type=main,
+ selection=all,
+ group-level
+]
+
+\begin{document}
+
+\printunsrtglossary
+\end{document}

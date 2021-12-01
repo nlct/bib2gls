@@ -24,9 +24,10 @@ import java.text.SimpleDateFormat;
 
 public class DateTimeGroupTitle extends GroupTitle
 {
-   public DateTimeGroupTitle(DateFormat dateFormat, Date date, String type, boolean showDate, boolean showTime)
+   public DateTimeGroupTitle(DateFormat dateFormat, Date date, String type,
+      String parent, boolean showDate, boolean showTime)
    {
-      super(null, dateFormat.format(date), date.getTime(), type);
+      super(null, dateFormat.format(date), date.getTime(), type, parent);
 
       SimpleDateFormat format;
 
@@ -49,20 +50,31 @@ public class DateTimeGroupTitle extends GroupTitle
       setTitle(format.format(date));
    }
 
-   public String getCsSetName()
+   @Override
+   protected String getNonHierCsSetName()
    {
       return "bibglsset"+csname+"title";
    }
 
-   public String getCsLabelName()
+   @Override
+   protected String getNonHierCsLabelName()
    {
       return "bibgls"+csname;
    }
 
+   @Override
    public String format(String letter)
    {
-      return String.format("%s{%s}{%d}{%s}", getTitle(), getActual(), getId(),
-       type == null ? "" : getType());
+      if (supportsHierarchy)
+      {
+         return String.format("%s{%s}{%d}{%s}{%s}", getTitle(), getActual(), getId(),
+            type == null ? "" : getType(), parent == null ? "" : parent);
+      }
+      else
+      {
+         return String.format("%s{%s}{%d}{%s}", getTitle(), getActual(), getId(),
+            type == null ? "" : getType());
+      }
    }
 
    private String csname;

@@ -20,24 +20,35 @@ package com.dickimawbooks.bib2gls;
 
 public class NumberGroupTitle extends OtherGroupTitle
 {
-   public NumberGroupTitle(Number number, String type)
+   public NumberGroupTitle(Number number, String type, String parent)
    {
-      super(number.toString(), number.longValue(), type);
+      super(number.toString(), number.longValue(), type, parent);
    }
 
-   public String getCsSetName()
+   @Override
+   protected String getNonHierCsSetName()
    {
       return "bibglssetnumbergrouptitle";
    }
 
-   public String getCsLabelName()
+   @Override
+   protected String getNonHierCsLabelName()
    {
       return "bibglsnumbergroup";
    }
 
+   @Override
    public String format(String other)
    {
-      return String.format("{%s}{%d}{%s}", other, getId(),
-       type == null ? "" : type);
+      if (supportsHierarchy)
+      {
+         return String.format("{%s}{%d}{%s}", other, getId(),
+          type == null ? "" : type, parent == null ? "" : parent);
+      }
+      else
+      {
+         return String.format("{%s}{%d}{%s}", other, getId(),
+          type == null ? "" : type);
+      }
    }
 }

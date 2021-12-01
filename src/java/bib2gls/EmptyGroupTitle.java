@@ -20,23 +20,34 @@ package com.dickimawbooks.bib2gls;
 
 public class EmptyGroupTitle extends OtherGroupTitle
 {
-   public EmptyGroupTitle(String type)
+   public EmptyGroupTitle(String type, String parent)
    {
-      super("", 0L, type);
+      super("", 0L, type, parent);
    }
 
-   public String getCsSetName()
+   @Override
+   protected String getNonHierCsSetName()
    {
       return "bibglssetemptygrouptitle";
    }
 
-   public String getCsLabelName()
+   @Override
+   protected String getNonHierCsLabelName()
    {
       return "bibglsemptygroup";
    }
 
+   @Override
    public String format(String other)
    {
-      return String.format("{%s}", type == null ? "" : type);
+      if (supportsHierarchy)
+      {
+         return String.format("{%s}{%s}", type == null ? "" : type,
+           parent == null ? "" : parent);
+      }
+      else
+      {
+         return String.format("{%s}", type == null ? "" : type);
+      }
    }
 }

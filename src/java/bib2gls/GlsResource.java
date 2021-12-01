@@ -2079,6 +2079,55 @@ public class GlsResource
                groupField = null;
             }
          }
+         else if (opt.equals("group-level"))
+         {
+            String val = getOptional(parser, "all", list, opt);
+
+            try
+            {
+               if (val.equals("all"))
+               {
+                  groupLevelSetting = GROUP_LEVEL_SETTING_GREATER_THAN_EQ;
+                  groupLevelSettingValue = 0;
+               }
+               else if (val.startsWith("<"))
+               {
+                  val=val.substring(1);
+                  groupLevelSetting = GROUP_LEVEL_SETTING_LESS_THAN;
+
+                  if (val.startsWith("="))
+                  {
+                     val=val.substring(1);
+                     groupLevelSetting = GROUP_LEVEL_SETTING_LESS_THAN_EQ;
+                  }
+
+                  groupLevelSettingValue = Integer.parseInt(val);
+               }
+               else if (val.startsWith(">"))
+               {
+                  val=val.substring(1);
+                  groupLevelSetting = GROUP_LEVEL_SETTING_GREATER_THAN;
+
+                  if (val.startsWith("="))
+                  {
+                     val=val.substring(1);
+                     groupLevelSetting = GROUP_LEVEL_SETTING_GREATER_THAN_EQ;
+                  }
+
+                  groupLevelSettingValue = Integer.parseInt(val);
+               }
+               else
+               {
+                  groupLevelSettingValue = Integer.parseInt(val);
+                  groupLevelSetting = GROUP_LEVEL_SETTING_EXACT;
+               }
+            }
+            catch (NumberFormatException e)
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.int.value", opt, val), e);
+            }
+         }
          else if (opt.equals("shuffle"))
          {
             long seed = getOptionalLong(parser, 0L, list, opt);
@@ -6272,6 +6321,8 @@ public class GlsResource
 
          bib2gls.writeCommonCommands(writer);
 
+         provideGlossary(writer, type);
+
          writeLabelPrefixHooks(writer);
 
          // Save original definition of \@glsxtr@s@longnewglossaryentry
@@ -6298,8 +6349,6 @@ public class GlsResource
           type, category, labelPrefix == null ? "" : labelPrefix);
          writer.println("}");
          writer.println();
-
-         provideGlossary(writer, type);
 
          writer.format("\\glssetcategoryattribute{%s}{targeturl}{%s}%n", 
            category, masterPdfPath);
@@ -7262,6 +7311,56 @@ public class GlsResource
       }
    }
 
+   public boolean isGroupLevelsEnabled()
+   {
+      return !(groupLevelSetting == GROUP_LEVEL_SETTING_EXACT 
+             && groupLevelSettingValue == 0);
+   }
+
+   public void assignGroupField(Bib2GlsEntry entry, String groupField, String groupFieldValue)
+   {
+      entry.putField(groupField, groupFieldValue);
+   }
+
+   public boolean useGroupField(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
+   {
+      if (bib2gls.useGroupField())
+      {
+         switch (groupLevelSetting)
+         {
+            case GROUP_LEVEL_SETTING_EXACT:
+
+              if (groupLevelSettingValue == 0)
+              {
+                 return !entry.hasParent();
+              }
+              else
+              {
+                 return entry.getLevel(entries) == groupLevelSettingValue;
+              }
+
+            case GROUP_LEVEL_SETTING_LESS_THAN:
+
+              return entry.getLevel(entries) < groupLevelSettingValue;
+
+            case GROUP_LEVEL_SETTING_LESS_THAN_EQ:
+
+              return entry.getLevel(entries) <= groupLevelSettingValue;
+
+            case GROUP_LEVEL_SETTING_GREATER_THAN:
+
+              return entry.getLevel(entries) > groupLevelSettingValue;
+
+            case GROUP_LEVEL_SETTING_GREATER_THAN_EQ:
+
+              return entry.getLevel(entries) >= groupLevelSettingValue;
+
+         }
+      }
+
+      return false;
+   }
+
    private int processBibData()
       throws IOException,Bib2GlsException
    {
@@ -7424,14 +7523,30 @@ public class GlsResource
 
          bib2gls.writeCommonCommands(writer);
 
-         writeLabelPrefixHooks(writer);
-
-         writeAllCapsCsDefs(writer);
+         // provide glossaries early in case they are referenced
 
          if (triggerType != null)
          {
             provideGlossary(writer, triggerType);
          }
+
+         if (secondaryType != null)
+         {
+            provideGlossary(writer, secondaryType);
+         }
+
+         boolean provideBibGlsGroupLevel = isGroupLevelsEnabled();
+
+         if (provideBibGlsGroupLevel)
+         {
+            writer.println("\\ifdef\\glsxtraddgroup");
+            writer.println("{\\let\\glsxtraddgroup\\@secondoftwo}");
+            writer.println("{\\GlossariesExtraWarning{Hierarchical group levels (resource option `group-level') not supported. Please upgrade glossaries-extra.sty to at least v1.49}}");
+         }
+
+         writeAllCapsCsDefs(writer);
+
+         writeLabelPrefixHooks(writer);
 
          if (bibtexAuthorList != null)
          {
@@ -7530,38 +7645,88 @@ public class GlsResource
 
             // letter groups:
 
-            writer.println("  \\providecommand{\\bibglslettergroup}[4]{#4#3}");
-            writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{\\unexpanded{#1}}");
-            writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{%");
-            writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
+            if (provideBibGlsGroupLevel)
+            {
+               writer.println("  \\providecommand{\\bibglslettergrouphier}[5]{#4#5#3}");
+               writer.println("  \\providecommand{\\bibglslettergrouptitlehier}[5]{\\unexpanded{#1}}");
+               writer.println("  \\providecommand{\\bibglssetlettergrouptitlehier}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergrouphier#1}{\\bibglslettergrouptitlehier#1}}");
+            }
+            else
+            {
+               writer.println("  \\providecommand{\\bibglslettergroup}[4]{#4#3}");
+               writer.println("  \\providecommand{\\bibglslettergrouptitle}[4]{\\unexpanded{#1}}");
+               writer.println("  \\providecommand{\\bibglssetlettergrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergroup#1}{\\bibglslettergrouptitle#1}}");
+            }
 
             // unicode groups:
 
-            writer.println("  \\providecommand{\\bibglsunicodegroup}[4]{#4#3}");
-            writer.println("  \\providecommand{\\bibglsunicodegrouptitle}[4]{\\unexpanded{#1}}");
-            writer.println("  \\providecommand{\\bibglssetunicodegrouptitle}[1]{%");
-            writer.println("    \\glsxtrsetgrouptitle{\\bibglsunicodegroup#1}{\\bibglsunicodegrouptitle#1}}");
+            if (provideBibGlsGroupLevel)
+            {
+               writer.println("  \\providecommand{\\bibglsunicodegrouphier}[5]{#4#5#3}");
+               writer.println("  \\providecommand{\\bibglsunicodegrouptitlehier}[5]{\\unexpanded{#1}}");
+               writer.println("  \\providecommand{\\bibglssetunicodegrouptitlehier}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsunicodegrouphier#1}{\\bibglsunicodegrouptitlehier#1}}");
+            }
+            else
+            {
+               writer.println("  \\providecommand{\\bibglsunicodegroup}[4]{#4#3}");
+               writer.println("  \\providecommand{\\bibglsunicodegrouptitle}[4]{\\unexpanded{#1}}");
+               writer.println("  \\providecommand{\\bibglssetunicodegrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsunicodegroup#1}{\\bibglsunicodegrouptitle#1}}");
+            }
 
             // other groups:
 
-            writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
-            writer.println("  \\providecommand{\\bibglsothergrouptitle}[3]{\\protect\\glssymbolsgroupname}");
-            writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{%");
-            writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergroup#1}{\\bibglsothergrouptitle#1}}");
+            if (provideBibGlsGroupLevel)
+            {
+               writer.println("  \\providecommand{\\bibglsothergrouphier}[4]{glssymbols}");
+               writer.println("  \\providecommand{\\bibglsothergrouptitlehier}[4]{\\protect\\glssymbolsgroupname}");
+               writer.println("  \\providecommand{\\bibglssetothergrouptitlehier}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergrouphier#1}{\\bibglsothergrouptitlehier#1}}");
+            }
+            else
+            {
+               writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
+               writer.println("  \\providecommand{\\bibglsothergrouptitle}[3]{\\protect\\glssymbolsgroupname}");
+               writer.println("  \\providecommand{\\bibglssetothergrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergroup#1}{\\bibglsothergrouptitle#1}}");
+            }
 
             // empty groups:
 
-            writer.println("  \\providecommand{\\bibglsemptygroup}[1]{glssymbols}");
-            writer.println("  \\providecommand{\\bibglsemptygrouptitle}[1]{\\protect\\glssymbolsgroupname}");
-            writer.println("  \\providecommand{\\bibglssetemptygrouptitle}[1]{%");
-            writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygroup#1}{\\bibglsemptygrouptitle#1}}");
+            if (provideBibGlsGroupLevel)
+            {
+               writer.println("  \\providecommand{\\bibglsemptygroupheir}[2]{glssymbols}");
+               writer.println("  \\providecommand{\\bibglsemptygrouptitlehier}[2]{\\protect\\glssymbolsgroupname}");
+               writer.println("  \\providecommand{\\bibglssetemptygrouptitlehier}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygrouphier#1}{\\bibglsemptygrouptitlehier#1}}");
+            }
+            else
+            {
+               writer.println("  \\providecommand{\\bibglsemptygroup}[1]{glssymbols}");
+               writer.println("  \\providecommand{\\bibglsemptygrouptitle}[1]{\\protect\\glssymbolsgroupname}");
+               writer.println("  \\providecommand{\\bibglssetemptygrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygroup#1}{\\bibglsemptygrouptitle#1}}");
+            }
 
             // number groups
 
-            writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
-            writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\protect\\glsnumbersgroupname}");
-            writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
-            writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
+            if (provideBibGlsGroupLevel)
+            {
+               writer.println("  \\providecommand{\\bibglsnumbergrouphier}[4]{glsnumbers}");
+               writer.println("  \\providecommand{\\bibglsnumbergrouptitlehier}[4]{\\protect\\glsnumbersgroupname}");
+               writer.println("  \\providecommand{\\bibglssetnumbergrouptitlehier}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergrouphier#1}{\\bibglsnumbergrouptitlehier#1}}");
+            }
+            else
+            {
+               writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
+               writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\protect\\glsnumbersgroupname}");
+               writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
+            }
 
             boolean requiresDateTime = sortSettings.isDateTimeSort()
                                     || dualSortSettings.isDateTimeSort()
@@ -7580,30 +7745,62 @@ public class GlsResource
 
             if (requiresDateTime)
             {
-               writer.println("  \\providecommand{\\bibglsdatetimegroup}[9]{#1#2#3\\@firstofone}");
-               writer.println("  \\providecommand{\\bibglsdatetimegrouptitle}[9]{#1-#2-#3\\@gobble}");
-               writer.println("  \\providecommand{\\bibglssetdatetimegrouptitle}[1]{%");
-               writer.println("    \\glsxtrsetgrouptitle{\\bibglsdatetimegroup#1}{\\bibglsdatetimegrouptitle#1}}");
+               if (provideBibGlsGroupLevel)
+               {
+                  writer.println("  \\providecommand*{\\bibglsdatetimegrouphierfinalargs}[2]{#1#2}");
+                  writer.println("  \\providecommand*{\\@gobbletwo}[2]{}");
+                  writer.println("  \\providecommand{\\bibglsdatetimegrouphier}[9]{#1#2#3\\bibglsdatetimegrouphierfinalargs}");
+                  writer.println("  \\providecommand{\\bibglsdatetimegrouptitlehier}[9]{#1-#2-#3\\@gobbletwo}");
+                  writer.println("  \\providecommand{\\bibglssetdatetimegrouptitlehier}[1]{%");
+                  writer.println("    \\glsxtrsetgrouptitle{\\bibglsdatetimegrouphier#1}{\\bibglsdatetimegrouptitlehier#1}}");
+               }
+               else
+               {
+                  writer.println("  \\providecommand{\\bibglsdatetimegroup}[9]{#1#2#3\\@firstofone}");
+                  writer.println("  \\providecommand{\\bibglsdatetimegrouptitle}[9]{#1-#2-#3\\@gobble}");
+                  writer.println("  \\providecommand{\\bibglssetdatetimegrouptitle}[1]{%");
+                  writer.println("    \\glsxtrsetgrouptitle{\\bibglsdatetimegroup#1}{\\bibglsdatetimegrouptitle#1}}");
+               }
             }
 
             // date groups
 
             if (requiresDate)
             {
-               writer.println("  \\providecommand{\\bibglsdategroup}[7]{#1#2#4#7}");
-               writer.println("  \\providecommand{\\bibglsdategrouptitle}[7]{#1-#2}");
-               writer.println("  \\providecommand{\\bibglssetdategrouptitle}[1]{%");
-               writer.println("    \\glsxtrsetgrouptitle{\\bibglsdategroup#1}{\\bibglsdategrouptitle#1}}");
+               if (provideBibGlsGroupLevel)
+               {
+                  writer.println("  \\providecommand{\\bibglsdategrouphier}[8]{#1#2#4#7#8}");
+                  writer.println("  \\providecommand{\\bibglsdategrouptitlehier}[8]{#1-#2}");
+                  writer.println("  \\providecommand{\\bibglssetdategrouptitlehier}[1]{%");
+                  writer.println("    \\glsxtrsetgrouptitle{\\bibglsdategrouphier#1}{\\bibglsdategrouptitlehier#1}}");
+               }
+               else
+               {
+                  writer.println("  \\providecommand{\\bibglsdategroup}[7]{#1#2#4#7}");
+                  writer.println("  \\providecommand{\\bibglsdategrouptitle}[7]{#1-#2}");
+                  writer.println("  \\providecommand{\\bibglssetdategrouptitle}[1]{%");
+                  writer.println("    \\glsxtrsetgrouptitle{\\bibglsdategroup#1}{\\bibglsdategrouptitle#1}}");
+               }
             }
 
             // time groups
 
             if (requiresTime)
             {
-               writer.println("  \\providecommand{\\bibglstimegroup}[7]{#1#2#7}");
-               writer.println("  \\providecommand{\\bibglstimegrouptitle}[7]{#1}");
-               writer.println("  \\providecommand{\\bibglssettimegrouptitle}[1]{%");
-               writer.println("    \\glsxtrsetgrouptitle{\\bibglstimegroup#1}{\\bibglstimegrouptitle#1}}");
+               if (provideBibGlsGroupLevel)
+               {
+                  writer.println("  \\providecommand{\\bibglstimegrouphier}[8]{#1#2#7#8}");
+                  writer.println("  \\providecommand{\\bibglstimegrouptitlehier}[8]{#1}");
+                  writer.println("  \\providecommand{\\bibglssettimegrouptitlehier}[1]{%");
+                  writer.println("    \\glsxtrsetgrouptitle{\\bibglstimegrouphier#1}{\\bibglstimegrouptitlehier#1}}");
+               }
+               else
+               {
+                  writer.println("  \\providecommand{\\bibglstimegroup}[7]{#1#2#7}");
+                  writer.println("  \\providecommand{\\bibglstimegrouptitle}[7]{#1}");
+                  writer.println("  \\providecommand{\\bibglssettimegrouptitle}[1]{%");
+                  writer.println("    \\glsxtrsetgrouptitle{\\bibglstimegroup#1}{\\bibglstimegrouptitle#1}}");
+               }
             }
 
 
@@ -7611,6 +7808,7 @@ public class GlsResource
             writer.println("{");
 
             // old version of glossaries-extra.sty:
+            // (no support for hierarchical groups)
 
             writer.println("  \\providecommand{\\bibglslettergroup}[4]{#1}");
             writer.println("  \\providecommand{\\bibglsothergroup}[3]{glssymbols}");
@@ -7972,8 +8170,6 @@ public class GlsResource
 
          if (secondaryList != null)
          {
-            provideGlossary(writer, secondaryType);
-
             writer.println("\\ifdef\\glsxtrgroupfield{%");
             writer.format("  \\apptoglossarypreamble[%s]{",
                secondaryType);
@@ -8697,8 +8893,7 @@ public class GlsResource
             allowHyper = false;
          }
 
-         writer.format("\\%s{%s}%n",
-            groupTitle.getCsSetName(), groupTitle);
+         writer.format("\\%s{%s}%n", groupTitle.getCsSetName(), groupTitle);
       }
 
       writer.println();
@@ -12078,10 +12273,8 @@ public class GlsResource
 
       if (!groupTitle.isDone())
       {
-         writer.format("\\bibglshypergroup{%s}{\\%s%s}%n",
-            groupTitle.getType(),
-            groupTitle.getCsLabelName(),
-            groupTitle);
+         writer.format("\\bibglshypergroup{%s}{\\%s%s}%n", groupTitle.getType(),
+               groupTitle.getCsLabelName(), groupTitle);
 
          groupTitle.mark();
 
@@ -12093,6 +12286,7 @@ public class GlsResource
    {
       if (groupTitleMap != null)
       {
+         grpTitle.setSupportsHierarchy(isGroupLevelsEnabled());
          String key = grpTitle.getKey();
 
          entry.setGroupId(key);
@@ -12101,11 +12295,11 @@ public class GlsResource
       }
    }
 
-   public GroupTitle getGroupTitle(String entryType, long id)
+   public GroupTitle getGroupTitle(String entryType, long id, String parent)
    {
       if (groupTitleMap != null)
       {
-         return groupTitleMap.get(GroupTitle.getKey(entryType, id));
+         return groupTitleMap.get(GroupTitle.getKey(entryType, id, parent));
       }
 
       return null;
@@ -13292,6 +13486,15 @@ public class GlsResource
    private String supplementalCategory=null;
 
    private String groupField = null;
+
+   public static final int GROUP_LEVEL_SETTING_EXACT=0;
+   public static final int GROUP_LEVEL_SETTING_LESS_THAN=1;
+   public static final int GROUP_LEVEL_SETTING_LESS_THAN_EQ=2;
+   public static final int GROUP_LEVEL_SETTING_GREATER_THAN=3;
+   public static final int GROUP_LEVEL_SETTING_GREATER_THAN_EQ=4;
+
+   private int groupLevelSettingValue = 0;
+   private int groupLevelSetting = GROUP_LEVEL_SETTING_EXACT;
 
    private String saveOriginalId = null;
 

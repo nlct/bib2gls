@@ -59,6 +59,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
       return sortStr;
    }
 
+   @Override
    protected long getDefaultGroupId(Bib2GlsEntry entry,
      int codePoint, Object sortValue)
    {
@@ -88,14 +89,15 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
       return codePoint;
    }
 
+   @Override
    protected GroupTitle createDefaultGroupTitle(int codePoint,
-     Object sortValue, String type)
+     Object sortValue, String type, String parent)
    {
       String value = sortValue.toString();
 
       if (codePoint == -1 || value.isEmpty())
       {
-         return new EmptyGroupTitle(type);
+         return new EmptyGroupTitle(type, parent);
       }
 
       String str = new String(Character.toChars(codePoint));
@@ -111,7 +113,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
             cp = Character.toLowerCase(cp);
          }
    
-         return new GroupTitle(grp, str, cp, type);
+         return new GroupTitle(grp, str, cp, type, parent);
       }
 
       if (str.equals("\\") || str.equals("{") || str.equals("}"))
@@ -119,7 +121,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
          str = "\\char`\\"+str;
       }
    
-      return new OtherGroupTitle(str, codePoint, type);
+      return new OtherGroupTitle(str, codePoint, type, parent);
    }
 
    protected String updateSortValue(Bib2GlsEntry entry, 
@@ -135,7 +137,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
 
       String type = getType(entry);
 
-      if (bib2gls.useGroupField() && !entry.hasParent())
+      if (resource.useGroupField(entry, entries))
       {
          if (entry.getFieldValue(groupField) != null)
          {
@@ -309,6 +311,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
       return n1 == n2 ? 0 : (n1 < n2 ? -1 : 1);
    }
 
+   @Override
    protected int compareElements(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
       String val1 = entry1.getFieldValue(sortStorageField);

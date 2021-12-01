@@ -164,16 +164,18 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
       return value;
    }
 
+   @Override
    protected long getDefaultGroupId(Bib2GlsEntry entry, int codePoint, 
      Object sortValue)
    {
       return ((Number)sortValue).longValue();
    }
 
+   @Override
    protected GroupTitle createDefaultGroupTitle(int codePoint, Object sortValue,
-      String type)
+      String type, String parent)
    {
-      return new NumberGroupTitle((Number)sortValue, type);
+      return new NumberGroupTitle((Number)sortValue, type, parent);
    }
 
    protected String updateSortValue(Bib2GlsEntry entry, 
@@ -188,8 +190,8 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
 
       String type = getType(entry);
 
-      if (bib2gls.useGroupField() && entry.getFieldValue(groupField) == null
-           && !entry.hasParent())
+      if (entry.getFieldValue(groupField) == null
+           && resource.useGroupField(entry, entries))
       {
          setGroupTitle(entry, -1, number, value, type);
       }
@@ -235,6 +237,7 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
       return n1 < n2 ? -1 : 1;
    }
 
+   @Override
    protected int compareElements(Bib2GlsEntry entry1,
      Bib2GlsEntry entry2)
    {

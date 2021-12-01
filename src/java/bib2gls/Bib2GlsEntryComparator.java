@@ -110,6 +110,7 @@ public class Bib2GlsEntryComparator extends SortComparator
       }
    }
 
+   @Override
    protected long getDefaultGroupId(Bib2GlsEntry entry,
      int codePoint, Object sortValue)
    {
@@ -125,14 +126,15 @@ public class Bib2GlsEntryComparator extends SortComparator
       }
    }
 
+   @Override
    protected GroupTitle createDefaultGroupTitle(int codePoint, 
-     Object sortValue, String type)
+     Object sortValue, String type, String parent)
    {
       String value = sortValue.toString();
 
       if (value.isEmpty())
       {
-         return new EmptyGroupTitle(type);
+         return new EmptyGroupTitle(type, parent);
       }
 
       String str = new String(Character.toChars(codePoint));
@@ -143,7 +145,7 @@ public class Bib2GlsEntryComparator extends SortComparator
          grp = str.toUpperCase();
          int cp = grp.codePointAt(0);
 
-         return new GroupTitle(grp, str, cp, type);
+         return new GroupTitle(grp, str, cp, type, parent);
       }
       else
       {
@@ -153,7 +155,7 @@ public class Bib2GlsEntryComparator extends SortComparator
             str = "\\char`\\"+str;
          }
 
-         return new OtherGroupTitle(str, codePoint, type);
+         return new OtherGroupTitle(str, codePoint, type, parent);
       }
    }
 
@@ -188,30 +190,31 @@ public class Bib2GlsEntryComparator extends SortComparator
          type = "";
       }
 
-      if (bib2gls.useGroupField() && !entry.hasParent())
+      if (resource.useGroupField(entry, entries))
       {
+         String groupFieldValue = null;
+
          if (entry.getFieldValue(groupField) != null)
          {
             // don't overwrite
          }
          else if (value.isEmpty())
          {
-            GroupTitle grpTitle = resource.getGroupTitle(type, 0L);
+            GroupTitle grpTitle = resource.getGroupTitle(type, 0L, entry.getParent());
             String args;
 
             if (grpTitle == null)
             {
-               grpTitle = new EmptyGroupTitle(type);
+               grpTitle = new EmptyGroupTitle(type, entry.getParent());
                resource.putGroupTitle(grpTitle, entry);
-               args = grpTitle.toString();
+               args = grpTitle.format();
             }
             else
             {
                args = grpTitle.format(value);
             }
 
-            entry.putField(groupField, 
-              String.format("\\%s%s", grpTitle.getCsLabelName(), args));
+            groupFieldValue = String.format("\\%s%s", grpTitle.getCsLabelName(), args);
          }
          else if (collator instanceof RuleBasedCollator)
          {
@@ -326,14 +329,15 @@ public class Bib2GlsEntryComparator extends SortComparator
                      elem = cp;
                   }
    
-                  GroupTitle grpTitle = resource.getGroupTitle(type, elem);
+                  GroupTitle grpTitle = resource.getGroupTitle(type, elem,
+                    entry.getParent());
                   String args;
    
                   if (grpTitle == null)
                   {
-                     grpTitle = new GroupTitle(grp, str, elem, type);
+                     grpTitle = new GroupTitle(grp, str, elem, type, entry.getParent());
                      resource.putGroupTitle(grpTitle, entry);
-                     args = grpTitle.toString();
+                     args = grpTitle.format();
                   }
                   else
                   {
@@ -346,8 +350,8 @@ public class Bib2GlsEntryComparator extends SortComparator
                      }
                   }
    
-                  entry.putField(groupField, 
-                    String.format("\\%s%s", grpTitle.getCsLabelName(), args));
+                  groupFieldValue = String.format("\\%s%s",
+                     grpTitle.getCsLabelName(), args);
                }
                else
                {
@@ -357,12 +361,13 @@ public class Bib2GlsEntryComparator extends SortComparator
                      str = "\\char`\\"+str;
                   }
    
-                  GroupTitle grpTitle = resource.getGroupTitle(type, elem);
+                  GroupTitle grpTitle = resource.getGroupTitle(type, elem,
+                     entry.getParent());
                   String args;
    
                   if (grpTitle == null)
                   {
-                     grpTitle = new OtherGroupTitle(str, elem, type);
+                     grpTitle = new OtherGroupTitle(str, elem, type, entry.getParent());
                      resource.putGroupTitle(grpTitle, entry);
                      args = grpTitle.toString();
                   }
@@ -371,8 +376,8 @@ public class Bib2GlsEntryComparator extends SortComparator
                      args = grpTitle.format(str);
                   }
    
-                  entry.putField(groupField, 
-                    String.format("\\%s%s", grpTitle.getCsLabelName(), args));
+                  groupFieldValue = 
+                    String.format("\\%s%s", grpTitle.getCsLabelName(), args);
                }
             }
          }
@@ -389,6 +394,11 @@ public class Bib2GlsEntryComparator extends SortComparator
             }
 
             grp = setGroupTitle(entry, codePoint, value, str, type);
+         }
+
+         if (groupFieldValue != null)
+         {
+            resource.assignGroupField(entry, groupField, groupFieldValue);
          }
       }
 
@@ -423,6 +433,7 @@ public class Bib2GlsEntryComparator extends SortComparator
       return value;
    }
 
+   @Override
    public int compareElements(Bib2GlsEntry entry1, Bib2GlsEntry entry2)
    {
       CollationKey key1 = entry1.getCollationKey();

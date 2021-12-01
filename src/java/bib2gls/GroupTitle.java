@@ -21,12 +21,23 @@ package com.dickimawbooks.bib2gls;
 public class GroupTitle
 {
    public GroupTitle(String title, String actual, long id,
-     String type)
+     String type, String parent)
    {
       this.title = title;
       this.actual = actual;
       this.id = id; 
       this.type = type;
+      this.parent = parent;
+   }
+
+   public void setSupportsHierarchy(boolean supportsHierarchy)
+   {
+      this.supportsHierarchy = supportsHierarchy;
+   }
+
+   public boolean hasHierarchySupport()
+   {
+      return supportsHierarchy;
    }
 
    public String getTitle()
@@ -59,25 +70,55 @@ public class GroupTitle
       return id;
    }
 
+   public String getParent()
+   {
+      return parent;
+   }
+
    public String getKey()
    {
-      return getKey(type, id);
+      return getKey(type, id, parent);
    }
 
-   public static String getKey(String entryType, long groupId)
+   public static String getKey(String entryType, long groupId, String parent)
    {
-      return entryType == null || entryType.isEmpty() ? ""+groupId :
-        String.format("%s.%d", entryType, groupId);
+      String key = "";
+
+      if (entryType == null || entryType.isEmpty())
+      {
+         key += groupId;
+      }
+      else
+      {
+         key = String.format("%s.%d", entryType, groupId);
+      }
+
+      if (parent != null && !parent.isEmpty())
+      {
+         key += "|" + parent;
+      }
+
+      return key;
    }
 
-   public String getCsSetName()
+   protected String getNonHierCsSetName()
    {
       return "bibglssetlettergrouptitle";
    }
 
-   public String getCsLabelName()
+   public String getCsSetName()
+   {
+      return supportsHierarchy ? getNonHierCsSetName() + "hier" : getNonHierCsSetName();
+   }
+
+   protected String getNonHierCsLabelName()
    {
       return "bibglslettergroup";
+   }
+
+   public String getCsLabelName()
+   {
+      return supportsHierarchy ? getNonHierCsLabelName() + "hier" : getNonHierCsLabelName();
    }
 
    public String toString()
@@ -85,11 +126,25 @@ public class GroupTitle
       return format(actual);
    }
 
+   public String format()
+   {
+      return format(actual);
+   }
+
    public String format(String letter)
    {
-      return String.format("{%s}{%s}{%d}{%s}", title, 
-       Bib2Gls.replaceSpecialChars(letter), id,
-       type == null ? "" : type);
+      if (supportsHierarchy)
+      {
+         return String.format("{%s}{%s}{%d}{%s}{%s}", title, 
+          Bib2Gls.replaceSpecialChars(letter), id,
+          type == null ? "" : type, parent == null ? "" : parent);
+      }
+      else
+      {
+         return String.format("{%s}{%s}{%d}{%s}", title, 
+          Bib2Gls.replaceSpecialChars(letter), id,
+          type == null ? "" : type);
+      }
    }
 
    public void mark()
@@ -102,9 +157,11 @@ public class GroupTitle
       return done;
    }
 
-   protected String title, actual, type;
+   protected String title, actual, type, parent;
 
    private long id;
 
    private boolean done=false;
+
+   protected boolean supportsHierarchy = false;
 }

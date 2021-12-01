@@ -1059,6 +1059,17 @@ given label},
   category={command}
 }
 
+@bibglscommand{bibglsgrouplevel,
+  name={\csfmt{bib\-gls\-group\-level}},
+  user1={\margm{label}{n}},
+  description={expands to the group label for hierarchical level \meta{n}
+  where \meta{label} is the label that would normally be applied to
+  level~0},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglslettergroup,
   name={\csfmt{bib\-gls\-letter\-group}},
   user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
@@ -2620,6 +2631,14 @@ field\dhyphen locale}},
    category={resourceoption},
    parent={resourceoptions}
 }
+
+@resourceoption{opt.group-level,
+   name={\csoptfmt{group\dhyphen level}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 
 @resourceoption{opt.group-formation,
    name={\csoptfmt{group\dhyphen formation}},

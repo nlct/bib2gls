@@ -11,6 +11,10 @@ v3.0 (pending):
     - loc-prefix-def
     - loc-suffix-def
 
+  * added support for sub-groups:
+
+    - group-level
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)

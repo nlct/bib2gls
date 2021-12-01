@@ -5787,8 +5787,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20211129";
-   public static final String DATE = "2021-11-29";
+   public static final String VERSION = "3.0.20211201";
+   public static final String DATE = "2021-12-01";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

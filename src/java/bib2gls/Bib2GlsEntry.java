@@ -2853,6 +2853,7 @@ public class Bib2GlsEntry extends BibEntry
    public void setParent(String parentId)
    {
       fieldValues.put("parent", parentId);
+      sortLevel = -1;
    }
 
    public String getAlias()
@@ -4703,18 +4704,26 @@ public class Bib2GlsEntry extends BibEntry
 
    public int getLevel(Vector<Bib2GlsEntry> entries)
    {
-      String parentId = getParent();
-
-      if (parentId == null) return 0;
-
-      Bib2GlsEntry parent = getEntry(parentId, entries);
-
-      if (parent != null)
+      if (sortLevel != -1 || entries == null)
       {
-         return parent.getLevel(entries)+1;
+         return sortLevel;
       }
 
-      return 0;
+      sortLevel = 0;
+
+      String parentId = getParent();
+
+      if (parentId != null)
+      {
+         Bib2GlsEntry parent = getEntry(parentId, entries);
+
+         if (parent != null)
+         {
+            sortLevel = parent.getLevel(entries)+1;
+         }
+      }
+
+      return sortLevel;
    }
 
    public void moveUpHierarchy(Vector<Bib2GlsEntry> entries)
@@ -4726,6 +4735,8 @@ public class Bib2GlsEntry extends BibEntry
       {
          return;
       }
+
+      sortLevel = -1;
 
       Bib2GlsEntry parent = getEntry(parentId, entries);
 
@@ -4758,6 +4769,8 @@ public class Bib2GlsEntry extends BibEntry
    private void addHierarchy(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
      throws Bib2GlsException
    {
+      entry.sortLevel = -1;
+
       if (hierarchy.contains(entry))
       {
          throw new Bib2GlsException(bib2gls.getMessage(
@@ -4998,6 +5011,8 @@ public class Bib2GlsEntry extends BibEntry
    private Number numericSort = null;
 
    private Object sortObject = null;
+
+   private int sortLevel = -1;
 
    private boolean fieldsParsed = false;
 

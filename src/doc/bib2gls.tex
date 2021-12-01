@@ -8550,6 +8550,38 @@ be assigned to the new \gls{parententry} with this option. The
 \end{itemize}
 The default setting is \csopt[no value]{missing-parent-category}.
 
+\optsection{group-level}
+
+If letter group formation is enabled (see \csopt{group},
+\csopt{group-formation} and \longarg{group}) then the default
+behaviour is to only assign the group label for \glspl{top-levelentry}.
+This option allows the group label to be assigned to \glspl{sub-entry}.
+The value may be one of the following:
+\begin{itemize}
+\item \meta{n}: only assign the group for level~\meta{n} entries;
+\item \code{>}\meta{n}: only assign the group for entries with a
+level greater than \meta{n};
+\item \code{>=}\meta{n}: only assign the group for entries with a
+level greater than or equal to \meta{n};
+\item \code{<}\meta{n}: only assign the group for entries with a
+level less than \meta{n};
+\item \code{<=}\meta{n}: only assign the group for entries with a
+level less than or equal to \meta{n};
+\item \code{all}: equivalent to \csopt[>=0]{group-level}.
+\end{itemize}
+The default setting is \csopt[0]{group-level}.
+If no value is provided, \csopt[all]{group-level} is assumed. The
+hierarchical levels start at 0 (\gls{top-levelentry}). For any value
+other than \csopt[0]{group-level}, the parent entry label will be
+included in the group label.
+
+If the \longarg{no-group} setting is on then this option has no effect.
+
+\begin{important}
+Any value other than the default \csopt[0]{group-level} requires
+\sty{glossaries-extra} v1.49+.
+\end{important}
+
 \section{Master Documents}
 \label{sec:master}
 
@@ -9494,7 +9526,8 @@ O \cs{gls}\marg{gato} sentou-se no \cs{gls}\marg{tapete}.
 The \csopt{group} option will set the \field{group} field to \meta{label}
 unless \meta{label} is \optfmt{auto}. If \csopt[auto]{group} then if
 the \longarg{group} switch is used the value of the \field{group}
-field is set automatically during the sorting (see also \csopt{group-formation}
+field is set automatically during the sorting (see also
+\csopt{group-formation}, \csopt{group-level}
 and \sectionref{sec:logicaldivisions}). If the \longarg{no-group}
 setting is on then \csopt[auto]{group} does nothing.
 
@@ -16261,6 +16294,7 @@ fragmented, so care is needed if you use this option.
 See also \sectionref{sec:logicaldivisions}.
 \end{important}
 
+
 \section{Secondary Glossary}
 \label{sec:secondaryopts}
 
@@ -18910,6 +18944,16 @@ loaded you can do:
  \marg{\gls{bibglslettergroup}\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}\comment{label}
  \marg{\AE\ (AE)}\comment{title}
 \end{codeenv}
+
+\cssection{bibglsgrouplevel}
+
+\formatdef{bibglsgrouplevel}
+This command is used when \csopt{group-level} is used to apply group
+formations for different hierarchical levels. The \meta{label}
+argument is the label that would normally be applied to level~0.
+The \meta{n} argument is the hierarchical level (0 for
+\glspl{top-levelentry}). By default, this command simply expands to
+\meta{label}.
 
 \cssection{bibglslettergroup}
 

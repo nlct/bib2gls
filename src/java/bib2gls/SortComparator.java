@@ -45,7 +45,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    protected abstract long getDefaultGroupId(Bib2GlsEntry entry, 
      int codePoint, Object sortValue);
 
-   protected abstract GroupTitle createDefaultGroupTitle(int codePoint, Object sortValue, String type);
+   protected abstract GroupTitle createDefaultGroupTitle(int codePoint, Object sortValue, String type, String parent);
 
    protected String setGroupTitle(Bib2GlsEntry entry,
      int codePoint, Object sortValue, String actual, String type)
@@ -73,12 +73,12 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       if (groupFormation == SortSettings.GROUP_DEFAULT)
       {
          groupTitle = resource.getGroupTitle(type, 
-          getDefaultGroupId(entry, codePoint, sortValue));
+          getDefaultGroupId(entry, codePoint, sortValue), entry.getParent());
       }
       else
       {
          groupTitle = resource.getGroupTitle(type, 
-           UnicodeGroupTitle.getGroupId(codePoint, groupFormation));
+           UnicodeGroupTitle.getGroupId(codePoint, groupFormation), entry.getParent());
       }
 
       String args;
@@ -87,23 +87,24 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       {
          if (groupFormation == SortSettings.GROUP_DEFAULT)
          {
-            groupTitle = createDefaultGroupTitle(codePoint, sortValue, type);
+            groupTitle = createDefaultGroupTitle(codePoint, sortValue, type,
+             entry.getParent());
          }
          else
          {
             groupTitle = UnicodeGroupTitle.createUnicodeGroupTitle(
-               codePoint, type, groupFormation);
+               codePoint, type, entry.getParent(), groupFormation);
          }
 
          resource.putGroupTitle(groupTitle, entry);
-         args = groupTitle.toString();
+         args = groupTitle.format();
       }
       else
       {
          args = groupTitle.format(actual);
       }
 
-      entry.putField(groupField, 
+      resource.assignGroupField(entry, groupField, 
          String.format("\\%s%s", groupTitle.getCsLabelName(), args));
 
       return groupTitle.getTitle();

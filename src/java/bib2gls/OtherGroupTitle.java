@@ -20,25 +20,37 @@ package com.dickimawbooks.bib2gls;
 
 public class OtherGroupTitle extends GroupTitle
 {
-   public OtherGroupTitle(String letter, long id, String type)
+   public OtherGroupTitle(String letter, long id, String type, String parent)
    {
-      super(letter, letter, id, type);
+      super(letter, letter, id, type, parent);
    }
 
-   public String getCsSetName()
+   @Override
+   protected String getNonHierCsSetName()
    {
       return "bibglssetothergrouptitle";
    }
 
-   public String getCsLabelName()
+   @Override
+   protected String getNonHierCsLabelName()
    {
       return "bibglsothergroup";
    }
 
+   @Override
    public String format(String other)
    {
-      return String.format("{%s}{%X}{%s}", 
-       Bib2Gls.replaceSpecialChars(other), 
-       getId(), type == null ? "" : type);
+      if (supportsHierarchy)
+      {
+         return String.format("{%s}{%X}{%s}{%s}", 
+          Bib2Gls.replaceSpecialChars(other), 
+          getId(), type == null ? "" : type, parent == null ? "" : parent);
+      }
+      else
+      {
+         return String.format("{%s}{%X}{%s}", 
+          Bib2Gls.replaceSpecialChars(other), 
+          getId(), type == null ? "" : type);
+      }
    }
 }

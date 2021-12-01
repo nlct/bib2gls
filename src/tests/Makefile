@@ -38,7 +38,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
 	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
 	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf \
-	  test-hypernav-targetprefix.pdf
+	  test-hypernav-targetprefix.pdf test-hiergroups.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -127,6 +127,7 @@ test-match.glstex	: test-match.tex $(DEPS) topics.bib
 		$(BIB2GLS) test-match
 
 test-secondary.pdf	: test-secondary.glstex
+		pdflatex test-secondary
 		pdflatex test-secondary
 
 test-secondary.glstex	: test-secondary.tex $(DEPS) \
@@ -720,6 +721,13 @@ test-hypernav-targetprefix.pdf	: test-hypernav-targetprefix.glstex
 test-hypernav-targetprefix.glstex	: test-hypernav-targetprefix.tex $(DEPS)
 		pdflatex test-hypernav-targetprefix
 		$(BIB2GLS) test-hypernav-targetprefix
+
+test-hiergroups.pdf	: test-hiergroups.glstex
+			pdflatex test-hiergroups
+
+test-hiergroups.glstex	: test-hiergroups.tex $(DEPS)
+			pdflatex test-hiergroups
+			$(BIB2GLS) test-hiergroups
 
 clean	:
 	$(RM) *.aux
