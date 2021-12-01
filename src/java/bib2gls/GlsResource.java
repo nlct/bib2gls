@@ -7647,8 +7647,10 @@ public class GlsResource
 
             if (provideBibGlsGroupLevel)
             {
-               writer.println("  \\providecommand{\\bibglslettergrouphier}[5]{#4#5#3}");
-               writer.println("  \\providecommand{\\bibglslettergrouptitlehier}[5]{\\unexpanded{#1}}");
+               writer.println("\\providecommand{\\bibglshiersubgrouptitle}[3]{\\ifnum#1>0 \\Glsxtrhiername{#2} / \\fi #3}");
+
+               writer.println("  \\providecommand{\\bibglslettergrouphier}[6]{#4#5#3}");
+               writer.println("  \\providecommand{\\bibglslettergrouptitlehier}[6]{\\protect\\bibglshiersubgrouptitle{#6}{#5}{\\unexpanded{#1}}}");
                writer.println("  \\providecommand{\\bibglssetlettergrouptitlehier}[1]{%");
                writer.println("    \\glsxtrsetgrouptitle{\\bibglslettergrouphier#1}{\\bibglslettergrouptitlehier#1}}");
             }
@@ -7664,8 +7666,8 @@ public class GlsResource
 
             if (provideBibGlsGroupLevel)
             {
-               writer.println("  \\providecommand{\\bibglsunicodegrouphier}[5]{#4#5#3}");
-               writer.println("  \\providecommand{\\bibglsunicodegrouptitlehier}[5]{\\unexpanded{#1}}");
+               writer.println("  \\providecommand{\\bibglsunicodegrouphier}[6]{#4#5#3}");
+               writer.println("  \\providecommand{\\bibglsunicodegrouptitlehier}[6]{\\protect\\bibglshiersubgrouptitle{#6}{#5}{\\unexpanded{#1}}}");
                writer.println("  \\providecommand{\\bibglssetunicodegrouptitlehier}[1]{%");
                writer.println("    \\glsxtrsetgrouptitle{\\bibglsunicodegrouphier#1}{\\bibglsunicodegrouptitlehier#1}}");
             }
@@ -7681,8 +7683,8 @@ public class GlsResource
 
             if (provideBibGlsGroupLevel)
             {
-               writer.println("  \\providecommand{\\bibglsothergrouphier}[4]{glssymbols}");
-               writer.println("  \\providecommand{\\bibglsothergrouptitlehier}[4]{\\protect\\glssymbolsgroupname}");
+               writer.println("  \\providecommand{\\bibglsothergrouphier}[5]{glssymbols}");
+               writer.println("  \\providecommand{\\bibglsothergrouptitlehier}[5]{\\protect\\bibglshiersubgrouptitle{#5}{#4}{\\protect\\glssymbolsgroupname}}");
                writer.println("  \\providecommand{\\bibglssetothergrouptitlehier}[1]{%");
                writer.println("    \\glsxtrsetgrouptitle{\\bibglsothergrouphier#1}{\\bibglsothergrouptitlehier#1}}");
             }
@@ -7698,8 +7700,8 @@ public class GlsResource
 
             if (provideBibGlsGroupLevel)
             {
-               writer.println("  \\providecommand{\\bibglsemptygroupheir}[2]{glssymbols}");
-               writer.println("  \\providecommand{\\bibglsemptygrouptitlehier}[2]{\\protect\\glssymbolsgroupname}");
+               writer.println("  \\providecommand{\\bibglsemptygroupheir}[3]{glssymbols}");
+               writer.println("  \\providecommand{\\bibglsemptygrouptitlehier}[3]{\\protect\\bibglshiersubgrouptitle{#3}{#2}{\\protect\\glssymbolsgroupname}}");
                writer.println("  \\providecommand{\\bibglssetemptygrouptitlehier}[1]{%");
                writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygrouphier#1}{\\bibglsemptygrouptitlehier#1}}");
             }
@@ -7715,8 +7717,8 @@ public class GlsResource
 
             if (provideBibGlsGroupLevel)
             {
-               writer.println("  \\providecommand{\\bibglsnumbergrouphier}[4]{glsnumbers}");
-               writer.println("  \\providecommand{\\bibglsnumbergrouptitlehier}[4]{\\protect\\glsnumbersgroupname}");
+               writer.println("  \\providecommand{\\bibglsnumbergrouphier}[5]{glsnumbers}");
+               writer.println("  \\providecommand{\\bibglsnumbergrouptitlehier}[5]{\\protect\\bibglshiersubgrouptitle{#5}{#4}{\\protect\\glsnumbersgroupname}}");
                writer.println("  \\providecommand{\\bibglssetnumbergrouptitlehier}[1]{%");
                writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergrouphier#1}{\\bibglsnumbergrouptitlehier#1}}");
             }
@@ -7747,10 +7749,10 @@ public class GlsResource
             {
                if (provideBibGlsGroupLevel)
                {
-                  writer.println("  \\providecommand*{\\bibglsdatetimegrouphierfinalargs}[2]{#1#2}");
-                  writer.println("  \\providecommand*{\\@gobbletwo}[2]{}");
+                  writer.println("  \\providecommand*{\\bibglsdatetimegrouphierfinalargs}[3]{#1#2}");
+                  writer.println("  \\providecommand*{\\bibglsdatetimegrouptitlehierfinalargs}[4]{\\protect\\bibglshiersubgrouptitle{#4}{#3}{#1}}");
                   writer.println("  \\providecommand{\\bibglsdatetimegrouphier}[9]{#1#2#3\\bibglsdatetimegrouphierfinalargs}");
-                  writer.println("  \\providecommand{\\bibglsdatetimegrouptitlehier}[9]{#1-#2-#3\\@gobbletwo}");
+                  writer.println("  \\providecommand{\\bibglsdatetimegrouptitlehier}[9]{\\bibglsdatetimegrouphierfinalargs{#1-#2-#3}}");
                   writer.println("  \\providecommand{\\bibglssetdatetimegrouptitlehier}[1]{%");
                   writer.println("    \\glsxtrsetgrouptitle{\\bibglsdatetimegrouphier#1}{\\bibglsdatetimegrouptitlehier#1}}");
                }
@@ -7769,8 +7771,8 @@ public class GlsResource
             {
                if (provideBibGlsGroupLevel)
                {
-                  writer.println("  \\providecommand{\\bibglsdategrouphier}[8]{#1#2#4#7#8}");
-                  writer.println("  \\providecommand{\\bibglsdategrouptitlehier}[8]{#1-#2}");
+                  writer.println("  \\providecommand{\\bibglsdategrouphier}[9]{#1#2#4#7#8}");
+                  writer.println("  \\providecommand{\\bibglsdategrouptitlehier}[9]{\\protect\\bibglshiersubgrouptitle{#9}{#8}{#1-#2}}");
                   writer.println("  \\providecommand{\\bibglssetdategrouptitlehier}[1]{%");
                   writer.println("    \\glsxtrsetgrouptitle{\\bibglsdategrouphier#1}{\\bibglsdategrouptitlehier#1}}");
                }
@@ -7789,8 +7791,8 @@ public class GlsResource
             {
                if (provideBibGlsGroupLevel)
                {
-                  writer.println("  \\providecommand{\\bibglstimegrouphier}[8]{#1#2#7#8}");
-                  writer.println("  \\providecommand{\\bibglstimegrouptitlehier}[8]{#1}");
+                  writer.println("  \\providecommand{\\bibglstimegrouphier}[9]{#1#2#7#8}");
+                  writer.println("  \\providecommand{\\bibglstimegrouptitlehier}[9]{\\protect\\bibglshiersubgrouptitle{#9}{#8}{#1}}");
                   writer.println("  \\providecommand{\\bibglssettimegrouptitlehier}[1]{%");
                   writer.println("    \\glsxtrsetgrouptitle{\\bibglstimegrouphier#1}{\\bibglstimegrouptitlehier#1}}");
                }
@@ -12286,7 +12288,9 @@ public class GlsResource
    {
       if (groupTitleMap != null)
       {
-         grpTitle.setSupportsHierarchy(isGroupLevelsEnabled());
+         grpTitle.setSupportsHierarchy(isGroupLevelsEnabled(), 
+          Math.max(0, entry.getLevel(null)));
+
          String key = grpTitle.getKey();
 
          entry.setGroupId(key);

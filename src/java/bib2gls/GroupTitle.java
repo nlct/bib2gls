@@ -30,9 +30,10 @@ public class GroupTitle
       this.parent = parent;
    }
 
-   public void setSupportsHierarchy(boolean supportsHierarchy)
+   public void setSupportsHierarchy(boolean supportsHierarchy, int level)
    {
       this.supportsHierarchy = supportsHierarchy;
+      this.level = level;
    }
 
    public boolean hasHierarchySupport()
@@ -135,9 +136,9 @@ public class GroupTitle
    {
       if (supportsHierarchy)
       {
-         return String.format("{%s}{%s}{%d}{%s}{%s}", title, 
+         return String.format("{%s}{%s}{%d}{%s}{%s}{%d}", title, 
           Bib2Gls.replaceSpecialChars(letter), id,
-          type == null ? "" : type, parent == null ? "" : parent);
+          type == null ? "" : type, parent == null ? "" : parent, level);
       }
       else
       {
@@ -164,4 +165,6 @@ public class GroupTitle
    private boolean done=false;
 
    protected boolean supportsHierarchy = false;
+
+   protected int level = 0;
 }

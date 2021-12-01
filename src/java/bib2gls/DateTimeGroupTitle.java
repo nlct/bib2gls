@@ -67,8 +67,9 @@ public class DateTimeGroupTitle extends GroupTitle
    {
       if (supportsHierarchy)
       {
-         return String.format("%s{%s}{%d}{%s}{%s}", getTitle(), getActual(), getId(),
-            type == null ? "" : getType(), parent == null ? "" : parent);
+         return String.format("%s{%s}{%d}{%s}{%s}{%d}",
+            getTitle(), getActual(), getId(),
+            type == null ? "" : getType(), parent == null ? "" : parent, level);
       }
       else
       {

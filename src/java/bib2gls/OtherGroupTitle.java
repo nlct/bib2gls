@@ -42,9 +42,9 @@ public class OtherGroupTitle extends GroupTitle
    {
       if (supportsHierarchy)
       {
-         return String.format("{%s}{%X}{%s}{%s}", 
+         return String.format("{%s}{%X}{%s}{%s}{%d}", 
           Bib2Gls.replaceSpecialChars(other), 
-          getId(), type == null ? "" : type, parent == null ? "" : parent);
+          getId(), type == null ? "" : type, parent == null ? "" : parent, level);
       }
       else
       {

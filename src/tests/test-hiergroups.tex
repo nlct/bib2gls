@@ -4,7 +4,11 @@
 \documentclass{article}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,stylemods,style=indexgroup]{glossaries-extra}
+\usepackage[record,stylemods,
+ %style=indexgroup,
+ style=indexhypergroup,
+ %showtargets=annoteleft
+]{glossaries-extra}
 
 \GlsXtrLoadResources[
  src=example-glossaries-parent,

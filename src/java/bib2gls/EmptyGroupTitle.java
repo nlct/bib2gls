@@ -42,8 +42,8 @@ public class EmptyGroupTitle extends OtherGroupTitle
    {
       if (supportsHierarchy)
       {
-         return String.format("{%s}{%s}", type == null ? "" : type,
-           parent == null ? "" : parent);
+         return String.format("{%s}{%s}{%d}", type == null ? "" : type,
+           parent == null ? "" : parent, level);
       }
       else
       {

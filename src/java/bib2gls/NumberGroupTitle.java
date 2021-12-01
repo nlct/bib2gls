@@ -42,8 +42,8 @@ public class NumberGroupTitle extends OtherGroupTitle
    {
       if (supportsHierarchy)
       {
-         return String.format("{%s}{%d}{%s}", other, getId(),
-          type == null ? "" : type, parent == null ? "" : parent);
+         return String.format("{%s}{%d}{%s}{%d}", other, getId(),
+          type == null ? "" : type, parent == null ? "" : parent, level);
       }
       else
       {
