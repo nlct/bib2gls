@@ -72,6 +72,8 @@ test-xr.glstex	: test-xr.tex $(DEPS) test-entries.bib
 
 test-crossrefs.pdf	: test-crossrefs.glstex
 		pdflatex test-crossrefs
+		$(BIB2GLS) test-crossrefs
+		pdflatex test-crossrefs
 
 test-crossrefs.glstex	: test-crossrefs.tex $(DEPS) \
 			  entries-terms.bib \

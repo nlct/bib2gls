@@ -1,6 +1,8 @@
 % arara: pdflatex
 % arara: bib2gls
 % arara: pdflatex
+% arara: bib2gls if found("log", "has not been defined")
+% arara: pdflatex
 \documentclass{report}
 
 \usepackage[T1]{fontenc}
