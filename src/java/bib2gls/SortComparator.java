@@ -105,7 +105,8 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       }
 
       resource.assignGroupField(entry, groupField, 
-         String.format("\\%s%s", groupTitle.getCsLabelName(), args));
+         String.format("\\%s%s", groupTitle.getCsLabelName(), args),
+         groupTitle);
 
       return groupTitle.getTitle();
    }

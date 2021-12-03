@@ -5,24 +5,16 @@
 \documentclass{article}
 
 \usepackage[colorlinks]{hyperref}
-\usepackage[record,stylemods={mcols,bookindex,topic},
- %style=indexgroup,
- %style=indexhypergroup,
- %style=treehypergroup,
- %style=alttreehypergroup,
- %style=mcolalttreespannav,
+\usepackage[record,stylemods={bookindex},
  style=bookindex,
- %style=topic,
  %showtargets=annoteleft
 ]{glossaries-extra}
 
 \GlsXtrLoadResources[
- src=example-glossaries-parent,
- set-widest,
+ src=example-glossaries-brief,
  type=main,
  selection=all,
- merge-small-groups,
- group-level
+ merge-small-groups=3
 ]
 
 \begin{document}

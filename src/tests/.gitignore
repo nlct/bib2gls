@@ -4,8 +4,10 @@ file name with space.tex
 test-bib-bom.tex
 test-bom.bib
 glossaries-extra-bib2gls.sty
+glossaries-extra-stylemods.sty
 glossaries-extra.sty
 glossaries.sty
+glossary-*.sty
 *.out
 *.log
 *.aux

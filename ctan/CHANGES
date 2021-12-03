@@ -15,6 +15,10 @@ v3.0 (pending):
 
     - group-level
 
+  * merge small groups option:
+
+    - merge-small-groups
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)

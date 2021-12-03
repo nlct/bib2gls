@@ -38,7 +38,8 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-custom-sort-fallback.pdf test-dual-custom-fallback.pdf \
 	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
 	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf \
-	  test-hypernav-targetprefix.pdf test-hiergroups.pdf
+	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
+	  test-mergegroups.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -730,6 +731,13 @@ test-hiergroups.pdf	: test-hiergroups.glstex
 test-hiergroups.glstex	: test-hiergroups.tex $(DEPS)
 			pdflatex test-hiergroups
 			$(BIB2GLS) test-hiergroups
+
+test-mergegroups.pdf	: test-mergegroups.glstex
+			pdflatex test-mergegroups
+
+test-mergegroups.glstex	: test-mergegroups.tex $(DEPS)
+			pdflatex test-mergegroups
+			$(BIB2GLS) test-mergegroups
 
 clean	:
 	$(RM) *.aux

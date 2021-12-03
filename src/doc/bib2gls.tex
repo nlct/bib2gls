@@ -8582,6 +8582,19 @@ Any value other than the default \csopt[0]{group-level} requires
 \sty{glossaries-extra} v1.49+.
 \end{important}
 
+\optsection{merge-small-groups}
+
+Merges consecutive groups that have less than \meta{n} entries. The
+default is \csopt[0]{merge-small-groups}, which switches off this
+action. If \meta{n} is omitted, \csopt[1]{merge-small-groups} is
+assumed.
+
+This setting only has an effect if group formation is enabled.
+If hierarchical sub-groups are enabled (\csopt{group-level}) then
+merging is only performed on consecutive small groups within the
+same hierarchical level. Any \glspl{childentry} that aren't in their
+own sub-group are included in the higher level group count. 
+
 \section{Master Documents}
 \label{sec:master}
 

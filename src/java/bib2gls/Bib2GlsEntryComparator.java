@@ -193,6 +193,7 @@ public class Bib2GlsEntryComparator extends SortComparator
       if (resource.useGroupField(entry, entries))
       {
          String groupFieldValue = null;
+         GroupTitle grpTitle = null;
 
          if (entry.getFieldValue(groupField) != null)
          {
@@ -200,7 +201,7 @@ public class Bib2GlsEntryComparator extends SortComparator
          }
          else if (value.isEmpty())
          {
-            GroupTitle grpTitle = resource.getGroupTitle(type, 0L, entry.getParent());
+            grpTitle = resource.getGroupTitle(type, 0L, entry.getParent());
             String args;
 
             if (grpTitle == null)
@@ -329,7 +330,7 @@ public class Bib2GlsEntryComparator extends SortComparator
                      elem = cp;
                   }
    
-                  GroupTitle grpTitle = resource.getGroupTitle(type, elem,
+                  grpTitle = resource.getGroupTitle(type, elem,
                     entry.getParent());
                   String args;
    
@@ -361,7 +362,7 @@ public class Bib2GlsEntryComparator extends SortComparator
                      str = "\\char`\\"+str;
                   }
    
-                  GroupTitle grpTitle = resource.getGroupTitle(type, elem,
+                  grpTitle = resource.getGroupTitle(type, elem,
                      entry.getParent());
                   String args;
    
@@ -398,7 +399,8 @@ public class Bib2GlsEntryComparator extends SortComparator
 
          if (groupFieldValue != null)
          {
-            resource.assignGroupField(entry, groupField, groupFieldValue);
+            resource.assignGroupField(entry, groupField, groupFieldValue,
+              grpTitle);
          }
       }
 

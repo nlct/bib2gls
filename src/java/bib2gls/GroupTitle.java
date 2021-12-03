@@ -76,6 +76,18 @@ public class GroupTitle
       return parent;
    }
 
+   public int getLevel()
+   {
+      return level;
+   }
+
+   @Override
+   public boolean equals(Object other)
+   {
+      return other != null && (other instanceof GroupTitle)
+              && getKey().equals(((GroupTitle)other).getKey());
+   }
+
    public String getKey()
    {
       return getKey(type, id, parent);
@@ -122,6 +134,11 @@ public class GroupTitle
       return supportsHierarchy ? getNonHierCsLabelName() + "hier" : getNonHierCsLabelName();
    }
 
+   public String getCsTitleName()
+   {
+      return supportsHierarchy ? getNonHierCsLabelName() + "titlehier" : getNonHierCsLabelName()+"title";
+   }
+
    public String toString()
    {
       return format(actual);
@@ -158,6 +175,32 @@ public class GroupTitle
       return done;
    }
 
+   public void setStartIndex(int i)
+   {
+      startIndex = i;
+   }
+
+   public void setEndIndex(int i)
+   {
+      endIndex = i;
+   }
+
+   public int getStartIndex()
+   {
+      return startIndex;
+   }
+
+   public int getEndIndex()
+   {
+      return endIndex;
+   }
+
+   public void resetIndexes()
+   {
+      startIndex = -1;
+      endIndex = -1;
+   }
+
    protected String title, actual, type, parent;
 
    private long id;
@@ -167,4 +210,6 @@ public class GroupTitle
    protected boolean supportsHierarchy = false;
 
    protected int level = 0;
+
+   private int startIndex=-1, endIndex=-1;
 }
