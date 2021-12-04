@@ -7669,6 +7669,23 @@ public class GlsResource
                writer.println("    \\glsxtrsetgrouptitle{\\bibglsemptygroup#1}{\\bibglsemptygrouptitle#1}}");
             }
 
+            // number groups
+
+            if (provideBibGlsGroupLevel)
+            {
+               writer.println("  \\providecommand{\\bibglsnumbergrouphier}[5]{glsnumbers}");
+               writer.println("  \\providecommand{\\bibglsnumbergrouptitlehier}[5]{\\protect\\bibglshiersubgrouptitle{#5}{#4}{\\protect\\glsnumbersgroupname}}");
+               writer.println("  \\providecommand{\\bibglssetnumbergrouptitlehier}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergrouphier#1}{\\bibglsnumbergrouptitlehier#1}}");
+            }
+            else
+            {
+               writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
+               writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\protect\\glsnumbersgroupname}");
+               writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
+               writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
+            }
+
             // merged groups:
 
             if (mergeSmallGroupLimit > 0)
@@ -7703,23 +7720,6 @@ public class GlsResource
                   writer.println("  \\providecommand{\\bibglssetmergedgrouptitle}[1]{%");
                   writer.println("    \\glsxtrsetgrouptitle{\\bibglsmergedgroup#1}{\\bibglsmergedgrouptitle#1}}");
                }
-            }
-
-            // number groups
-
-            if (provideBibGlsGroupLevel)
-            {
-               writer.println("  \\providecommand{\\bibglsnumbergrouphier}[5]{glsnumbers}");
-               writer.println("  \\providecommand{\\bibglsnumbergrouptitlehier}[5]{\\protect\\bibglshiersubgrouptitle{#5}{#4}{\\protect\\glsnumbersgroupname}}");
-               writer.println("  \\providecommand{\\bibglssetnumbergrouptitlehier}[1]{%");
-               writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergrouphier#1}{\\bibglsnumbergrouptitlehier#1}}");
-            }
-            else
-            {
-               writer.println("  \\providecommand{\\bibglsnumbergroup}[3]{glsnumbers}");
-               writer.println("  \\providecommand{\\bibglsnumbergrouptitle}[3]{\\protect\\glsnumbersgroupname}");
-               writer.println("  \\providecommand{\\bibglssetnumbergrouptitle}[1]{%");
-               writer.println("    \\glsxtrsetgrouptitle{\\bibglsnumbergroup#1}{\\bibglsnumbergrouptitle#1}}");
             }
 
             boolean requiresDateTime = sortSettings.isDateTimeSort()
@@ -12325,7 +12325,6 @@ public class GlsResource
          return;
       }
 
-      int prevLevel = -2;
       int count = 0;
       String prevKey = null;
       GroupTitle prevTitle = null;
@@ -12344,19 +12343,30 @@ public class GlsResource
             bib2gls.debugMessage("message.no.group.id", "mergeSmallGroups",
               entry.getId());
 
-            prevLevel = -2;
-            doCheck = true;
+            prevTitle = null;
+            count = 0;
+            continue;
          }
          else if (key.equals(prevKey))
          {
             count++;
             groupTitle.setEndIndex(i);
          }
-         else if (prevLevel == groupTitle.getLevel() && count <= mergeSmallGroupLimit)
+         else if (count <= mergeSmallGroupLimit)
          {
             if (prevTitle != null)
             {
-               pending.add(prevTitle);
+               if (groupTitle.getLevel() != prevTitle.getLevel())
+               {
+                  doCheck = true;
+               }
+
+               if (pending.isEmpty() 
+                    || pending.lastElement().getLevel() == prevTitle.getLevel())
+               {
+                  pending.add(prevTitle);
+                  prevTitle = null;
+               }
             }
 
             groupTitle.setStartIndex(i);
@@ -12367,7 +12377,7 @@ public class GlsResource
          {
             groupTitle.setStartIndex(i);
             groupTitle.setEndIndex(i);
-            prevLevel = groupTitle.getLevel();
+            prevTitle = null;
             doCheck = true;
          }
 
@@ -12399,10 +12409,53 @@ public class GlsResource
 
             count = 1;
             pending.clear();
+
+            if (prevTitle != null)
+            {
+               pending.add(prevTitle);
+               System.out.println("adding previous: "+prevTitle);
+            }
          }
 
          prevKey = key;
          prevTitle = groupTitle;
+      }
+
+      if (prevTitle != null && !pending.isEmpty())
+      {
+
+         if (count <= mergeSmallGroupLimit && prevTitle != null)
+         {
+            if (pending.isEmpty() 
+                 || pending.lastElement().getLevel() == prevTitle.getLevel())
+            {
+               pending.add(prevTitle);
+            }
+         }
+
+         if (pending.size() > 1)
+         {
+            MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
+            String groupFieldValue = String.format("\\%s%s",
+              mergedTitles.getCsLabelName(), mergedTitles.format());
+
+            for (GroupTitle grp : pending)
+            {
+               for (int j = grp.getStartIndex(); j <= grp.getEndIndex(); j++)
+               {
+                  Bib2GlsEntry e = entries.get(j);
+                  putGroupTitle(mergedTitles, e);
+                  e.putField(groupField, groupFieldValue);
+               }
+            }
+         }
+         else
+         {
+            for (GroupTitle grp : pending)
+            {
+               grp.resetIndexes();
+            }
+         }
       }
    }
 
