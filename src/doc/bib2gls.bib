@@ -1032,15 +1032,6 @@ given label},
   category={command}
 }
 
-@bibglscommand{bibglssetlettergrouptitle,
-  name={\csfmt{bib\-gls\-set\-letter\-group\-title}},
-  user1={\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}},
-  description={sets the letter group title},
-  topics={glossarystylecommands,assigncommands,groupcommands},
-  note={\bibgls},
-  category={command}
-}
-
 @mainglscommand{glsxtrsetgrouptitle,
   name={\csfmt{gls\-xtr\-set\-group\-title}},
   user1={\margm{group label}\margm{group title}},
@@ -1070,6 +1061,25 @@ given label},
   category={command}
 }
 
+@bibglscommand{bibglshiersubgrouptitle,
+  name={\csfmt{bib\-gls\-hier\-sub\-group\-title}},
+  user1={\marg{level}\marg{parent}\marg{title}},
+  description={formats the title for a hierarchical group where the
+   normal non-hierarchical title would be \meta{title}},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetlettergrouptitle,
+  name={\csfmt{bib\-gls\-set\-letter\-group\-title}},
+  user1={\marg{\margm{title}\margm{letter}\margm{id}\margm{type}}},
+  description={sets the letter group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglslettergroup,
   name={\csfmt{bib\-gls\-letter\-group}},
   user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
@@ -1083,6 +1093,33 @@ given label},
   name={\csfmt{bib\-gls\-letter\-group\-title}},
   user1={\margm{title}\margm{letter}\margm{id}\margm{type}},
   description={expands to the letter group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetlettergrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-letter\-group\-title\-hier}},
+  user1={\marg{\margm{title}\margm{letter}\margm{id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical letter group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglslettergrouphier,
+  name={\csfmt{bib\-gls\-letter\-group\-hier}},
+  user1={\margm{title}\margm{letter}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical letter group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglslettergrouptitlehier,
+  name={\csfmt{bib\-gls\-letter\-group\-title\-hier}},
+  user1={\margm{title}\margm{letter}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical letter group title},
   topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
@@ -1115,6 +1152,33 @@ given label},
   category={command}
 }
 
+@bibglscommand{bibglssetothergrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-other\-group\-title\-hier}},
+  user1={\marg{\margm{character}\margm{id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical non-letter group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsothergrouphier,
+  name={\csfmt{bib\-gls\-other\-group\-hier}},
+  user1={\margm{character}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical non-letter group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsothergrouptitlehier,
+  name={\csfmt{bib\-gls\-other\-group\-title\-hier}},
+  user1={\margm{character}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical non-letter group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglssetemptygrouptitle,
   name={\csfmt{bib\-gls\-set\-empty\-group\-title}},
   user1={\marg{\margm{type}}},
@@ -1142,11 +1206,38 @@ given label},
   category={command}
 }
 
+@bibglscommand{bibglssetemptygrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-empty\-group\-title\-hier}},
+  user1={\marg{\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical empty group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsemptygrouphier,
+  name={\csfmt{bib\-gls\-empty\-group\-hier}},
+  user1={\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical empty group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsemptygrouptitlehier,
+  name={\csfmt{bib\-gls\-empty\-group\-title\-hier}},
+  user1={\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical empty group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglssetunicodegrouptitle,
   name={\csfmt{bib\-gls\-set\-unicode\-group\-title}},
   user1={\marg{\margm{label}\margm{character}\margm{id}\margm{type}}},
   description={sets the Unicode script, category or character code
-title},
+group title},
   topics={glossarystylecommands,assigncommands,groupcommands},
   note={\bibgls},
   category={command}
@@ -1155,8 +1246,8 @@ title},
 @bibglscommand{bibglsunicodegroup,
   name={\csfmt{bib\-gls\-unicode\-group}},
   user1={\margm{label}\margm{character}\margm{id}\margm{type}},
-  description={expands to the Unicode script or category label or
-character code},
+  description={expands to the Unicode script or category or
+character code group label},
   note={\bibgls},
   topics={glossarystylecommands,groupcommands},
   category={command}
@@ -1165,8 +1256,38 @@ character code},
 @bibglscommand{bibglsunicodegrouptitle,
   name={\csfmt{bib\-gls\-unicode\-group\-title}},
   user1={\margm{label}\margm{character}\margm{id}\margm{type}},
-  description={expands to the Unicode script or category label or
-character code},
+  description={expands to the Unicode script or category or
+character code group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetunicodegrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-unicode\-group\-title\-hier}},
+  user1={\marg{\margm{label}\margm{character}\margm{id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the Unicode script, category or character code
+ hierarchical group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsunicodegrouphier,
+  name={\csfmt{bib\-gls\-unicode\-group\-hier}},
+  user1={\margm{label}\margm{character}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the Unicode script or category or
+character code hierarchical group label},
+  note={\bibgls},
+  topics={glossarystylecommands,groupcommands},
+  category={command}
+}
+
+@bibglscommand{bibglsunicodegrouptitlehier,
+  name={\csfmt{bib\-gls\-unicode\-group\-title\-hier}},
+  user1={\margm{label}\margm{character}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the Unicode script or category or
+character code hierarchical group label},
   topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
@@ -1199,6 +1320,106 @@ character code},
   category={command}
 }
 
+@bibglscommand{bibglssetnumbergrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-number\-group\-title\-hier}},
+  user1={\marg{\margm{value}\margm{id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical number group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsnumbergrouphier,
+  name={\csfmt{bib\-gls\-number\-group\-hier}},
+  user1={\margm{value}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical number group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsnumbergrouptitlehier,
+  name={\csfmt{bib\-gls\-number\-group\-title\-hier}},
+  user1={\margm{value}\margm{id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical number group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetmergedgrouptitle,
+  name={\csfmt{bib\-gls\-set\-merged\-group\-title}},
+  user1={\marg{\margm{id}\margm{type}\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}}},
+  description={sets the merged group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsmergedgroup,
+  name={\csfmt{bib\-gls\-merged\-group}},
+  user1={\margm{id}\margm{type}\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}},
+  description={expands to the merged group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsmergedgrouptitle,
+  name={\csfmt{bib\-gls\-merged\-group\-title}},
+  user1={\margm{id}\margm{type}\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}},
+  description={expands to the merged group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsmergedgroupfmt,
+  name={\csfmt{bib\-gls\-merged\-group\-fmt}},
+  user1={\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}},
+  description={used by \gls{bibglsmergedgrouptitle} and
+    \gls{bibglsmergedgrouphierfmt} to format the title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsmergedgrouphierfmt,
+  name={\csfmt{bib\-gls\-merged\-group\-hier\-fmt}},
+  user1={\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}},
+  description={used by \gls{bibglsmergedgrouptitlehier} to format the title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetmergedgrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-merged\-group\-title\-hier}},
+  user1={\marg{\margm{id}\margm{type}\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}\margm{parent}\margm{level}}},
+  description={sets the merged  hierarchicalgroup title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsmergedgrouphier,
+  name={\csfmt{bib\-gls\-merged\-group\-hier}},
+  user1={\margm{id}\margm{type}\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}\margm{parent}\margm{level}},
+  description={expands to the merged hierarchical group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsmergedgrouptitlehier,
+  name={\csfmt{bib\-gls\-merged\-group\-title\-hier}},
+  user1={\margm{id}\margm{type}\margm{n}\margm{g$_1$}\marg{\meta{g$_2$}\ldots\marg{g$_{n-1}$}}\margm{g$_n$}\margm{parent}\margm{level}},
+  description={expands to the merged hierarchical group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglssetdatetimegrouptitle,
   name={\csfmt{bib\-gls\-set\-date\-time\-group\-title}},
   user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}}},
@@ -1221,6 +1442,53 @@ character code},
   name={\csfmt{bib\-gls\-date\-time\-group\-title}},
   user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the date-time group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetdatetimegrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-date\-time\-group\-title\-hier}},
+  user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical date-time group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsdatetimegrouphier,
+  name={\csfmt{bib\-gls\-date\-time\-group\-hier}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical date-time group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsdatetimegrouptitlehier,
+  name={\csfmt{bib\-gls\-date\-time\-group\-title\-hier}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical date-time group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsdatetimegrouphierfinalargs,
+  name={\csfmt{bib\-gls\-date\-time\-group\-hier\-final\-args}},
+  user1={\margm{type}\margm{parent}\margm{level}},
+  description={used as a supporting command for
+\gls{bibglsdatetimegrouphier} to pick up the final arguments},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsdatetimegrouptitlehierfinalargs,
+  name={\csfmt{bib\-gls\-date\-time\-group\-title\-hier\-final\-args}},
+  user1={\marg{date}\margm{type}\margm{parent}\margm{level}},
+  description={used as a supporting command for
+\gls{bibglsdatetimegrouptitlehier} to pick up the final arguments},
   topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}
@@ -1253,6 +1521,33 @@ character code},
   category={command}
 }
 
+@bibglscommand{bibglssetdategrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-date\-group\-title\-hier}},
+  user1={\marg{\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical date (no time) group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsdategrouphier,
+  name={\csfmt{bib\-gls\-date\-group\-hier}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical date group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsdategrouptitlehier,
+  name={\csfmt{bib\-gls\-date\-group\-title\-hier}},
+  user1={\margm{YYYY}\margm{MM}\margm{DD}\margm{G}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical date group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglssettimegrouptitle,
   name={\csfmt{bib\-gls\-set\-time\-group\-title}},
   user1={\marg{\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}}},
@@ -1275,6 +1570,33 @@ character code},
   name={\csfmt{bib\-gls\-time\-group\-title}},
   user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}},
   description={expands to the time group title},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssettimegrouptitlehier,
+  name={\csfmt{bib\-gls\-set\-time\-group\-title\-hier}},
+  user1={\marg{\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}}},
+  description={sets the hierarchical time (no date) group title},
+  topics={glossarystylecommands,assigncommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglstimegrouphier,
+  name={\csfmt{bib\-gls\-time\-group\-hier}},
+  user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical time group label},
+  topics={glossarystylecommands,groupcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglstimegrouptitlehier,
+  name={\csfmt{bib\-gls\-time\-group\-title\-hier}},
+  user1={\margm{hh}\margm{mm}\margm{ss}\margm{zone}\margm{title}\margm{group\dhyphen id}\margm{type}\margm{parent}\margm{level}},
+  description={expands to the hierarchical time group title},
   topics={glossarystylecommands,groupcommands},
   note={\bibgls},
   category={command}

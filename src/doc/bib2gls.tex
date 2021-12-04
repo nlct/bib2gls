@@ -493,7 +493,9 @@ documents}}
  {key=value list}%
 }
 
-\newcommand{\cssection}[2][\subsection]{%
+\newcommand{\cssectioncmd}{\subsection}
+
+\newcommand{\cssection}[2][\cssectioncmd]{%
  #1{\texorpdfstring{\glsxtrglossentry{#2}}{\string\\#2}}%
 }
 
@@ -8575,6 +8577,15 @@ hierarchical levels start at 0 (\gls{top-levelentry}). For any value
 other than \csopt[0]{group-level}, the parent entry label will be
 included in the group label.
 
+The hierarchical group titles are formatted according to
+\gls{bibglshiersubgrouptitle}. If the group title would
+usually be set with the command \csfmt{bibglsset\ldots group}
+for \glspl{top-levelentry} then the hierarchical group title would
+be set with the analogous \csfmt{bibglsset\ldots group} command.
+For example, letter groups are normally set with
+\gls{bibglssetlettergrouptitle} but hierarchical letter groups are set
+with \gls{bibglssetlettergrouphtitleier}.
+
 If the \longarg{no-group} setting is on then this option has no effect.
 
 \begin{important}
@@ -8594,6 +8605,44 @@ If hierarchical sub-groups are enabled (\csopt{group-level}) then
 merging is only performed on consecutive small groups within the
 same hierarchical level. Any \glspl{childentry} that aren't in their
 own sub-group are included in the higher level group count. 
+
+For example, suppose you have a large number of entries in most of
+the letter groups:
+\begin{codeenv}
+\atentry{index}\marg{aardvark}
+\atentry{index}\marg{ant}
+\atentry{index}\marg{alligator}
+\atentry{index}\marg{ape}
+\comment{etc}
+\end{codeenv}
+but you only have one entry in each of the \qt{X}, \qt{Y} and \qt{Z}
+groups:
+\begin{codeenv}
+\atentry{index}\marg{xylem}
+\atentry{index}\marg{yak}
+\atentry{index}\marg{zebra}
+\end{codeenv}
+then you may prefer to merge these entries into a single group:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{merge-small-groups}
+\end{codeenv}
+The title of this merged group is obtained from
+\gls{bibglsmergedgrouptitle} (or \gls{bibglsmergedgrouptitle} if
+hierarchical groups have been enabled with \csopt{group-level}).
+For the above example, the merged letter group would have the title
+\qt{X, Y, Z}. If there are more than three groups then the middle
+group titles are replace with an ellipsis. For example, if there is
+also only one entry in the \qt{W} letter group, then the merged
+title would be \qt{W,\ldots, Z}.
+
+The small groups must be consecutive (there is no group between
+them) and on the same hierarchical level in order to be merged.
+In the above example, if the yak entry isn't selected so that there
+is no \qt{Y} letter group, then the \qt{X} and \qt{Z} groups can be
+merged (with the merged title \qt{X, Z}). If, on the other hand,
+extra entries occur in the \qt{Y} letter group, so that it is larger
+than the value of \csopt{merge-small-groups}, then \qt{X} and
+\qt{Z} can no longer be merged.
 
 \section{Master Documents}
 \label{sec:master}
@@ -18911,6 +18960,25 @@ done after the \idx{resourceset}:
  \marg{Foreign Words}\comment{title}
 \end{codeenv}
 
+\cssection{bibglshypergroup}
+
+\formatdef{bibglshypergroup}
+
+If the \iext{log} file indicates that \isty{hyperref} has been loaded
+and the \longarg{group} switch is used, then this command will be
+used to create the navigation information for glossary styles such
+as \glostyle{indexhypergroup}.
+
+\subsection{Top-Level Groups Only}
+\label{sec:toplevelgroups}
+\renewcommand{\cssectioncmd}{\subsubsection}
+
+The default \csopt{group-level} setting will only create groups for
+the \glspl{top-levelentry}. Any \glspl{sub-entry} are considered to
+be part of the \gls{top-levelentry}['s] group. If hierarchical
+groups are enabled, the commands defined in \sectionref{sec:hiergroups}
+are provided.
+
 \cssection{bibglssetlettergrouptitle}
 
 For each \idx{lettergroup} that's detected, \bibgls\ will write the line:
@@ -18957,16 +19025,6 @@ loaded you can do:
  \marg{\gls{bibglslettergroup}\marg{\AE}\marg{\ae}\marg{7274496}\marg{}}\comment{label}
  \marg{\AE\ (AE)}\comment{title}
 \end{codeenv}
-
-\cssection{bibglsgrouplevel}
-
-\formatdef{bibglsgrouplevel}
-This command is used when \csopt{group-level} is used to apply group
-formations for different hierarchical levels. The \meta{label}
-argument is the label that would normally be applied to level~0.
-The \meta{n} argument is the hierarchical level (0 for
-\glspl{top-levelentry}). By default, this command simply expands to
-\meta{label}.
 
 \cssection{bibglslettergroup}
 
@@ -19353,15 +19411,318 @@ then adjust the definition of \gls{bibglsunicodegroup} until the
 grouping is correct, and then change the definition of 
 \gls{bibglsunicodegrouptitle} so that the title is correct.
 
-\cssection{bibglshypergroup}
+\cssection{bibglssetmergedgrouptitle}
 
-\formatdef{bibglshypergroup}
+Used when groups are merged by \csopt{merge-small-groups}. This command
+sets the label and title.
+\formatdef{bibglssetmergedgrouptitle}
+(Note the inner group, as with the other similar 
+\csfmt{bibglsset\ldots grouptitle} commands.)
 
-If the \iext{log} file indicates that \isty{hyperref} has been loaded
-and the \longarg{group} switch is used, then this command will be
-used to create the navigation information for glossary styles such
-as \glostyle{indexhypergroup}.
+\cssection{bibglsmergedgroup}
 
+\formatdef{bibglsmergedgroup}
+This expands to the label for merged groups.
+
+\cssection{bibglsmergedgrouptitle}
+
+\formatdef{bibglsmergedgrouptitle}
+This expands to the group title for merged groups.
+
+\cssection{bibglsmergedgroupfmt}
+
+\formatdef{bibglsmergedgroupfmt}
+Used by \gls{bibglsmergedgrouptitle} and
+\gls{bibglsmergedgrouphierfmt} to format merged group titles. The
+first argument \meta{n} is the total number of groups that have been
+merged, the second argument, \meta{g$_1$} is the first group title,
+\marg{\meta{g$_2$}\ldots\meta{g$_n$}} are the middle group titles
+(empty if $\meta{n}=2$), and \meta{g$_n$} is the last group title.
+
+The default definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsmergedgroupfmt}}[4]\marg{\idx{param}2,
+\cs{ifcase}\idx{param}1\cmd{or}\cmd{or}\cmd{or} \idx{param}3,
+\cmd{else}\ldots, \cmd{fi} \idx{param}4}
+\end{codeenv}
+
+
+\subsection{Hierarchical Groups}
+\label{sec:hiergroups}
+
+Hierarchical letter groups are set with analogous commands that have
+\code{hier} appended to the command name. There are also two extra
+arguments, \meta{parent} (the \gls{parententry}['s] label) and
+\meta{level} (the hierarchical level).
+
+\cssection{bibglsgrouplevel}
+
+\formatdef{bibglsgrouplevel}
+This command is used when \csopt{group-level} is used to apply group
+formations for different hierarchical levels. The \meta{label}
+argument is the label that would normally be applied to level~0.
+The \meta{n} argument is the hierarchical level (0 for
+\glspl{top-levelentry}). By default, this command simply expands to
+\meta{label}.
+
+\cssection{bibglshiersubgrouptitle}
+
+Hierarchical group titles are formatted using:
+\formatdef{bibglshiersubgrouptitle}
+This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglshiersubgrouptitle}}[3]\marg{\cs{ifnum}\idx{param}1>0 \cs{Glsxtrhiername}\marg{\idx{param}2} / \cmd{fi} \idx{param}3}
+\end{codeenv}
+The first argument \meta{level} is the hierarchical level, the
+second argument is the \gls{parententry} label (empty for
+$\meta{level}=0$), and the third argument \meta{title} is the 
+normal title that would apply to the group with the default
+\csopt[0]{group-level} setting. Note that this uses
+\cs{Glsxtrhiername}\margm{parent} if $\meta{level}>0$.
+If this isn't required then redefine \gls{bibglshiersubgrouptitle}
+to simply expand to \meta{title} (\code{\idx{param}3}).
+
+\cssection{bibglssetlettergrouptitlehier}
+\formatdef{bibglssetlettergrouptitlehier}
+As \gls{bibglssetlettergrouptitle} but used for hierarchical groups.
+
+\cssection{bibglslettergrouphier}
+\formatdef{bibglslettergrouphier}
+As \gls{bibglslettergroup} but used for hierarchical groups. It
+expands to the hierarchical letter group label.
+This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglslettergrouphier}}[6]\marg{\idx{param}4\idx{param}5\idx{param}3}
+\end{codeenv}
+
+\cssection{bibglslettergrouptitlehier}
+\formatdef{bibglslettergrouptitlehier}
+As \gls{bibglslettergrouptitle} but used for hierarchical groups. It
+expands to the hierarchical letter group title. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglslettergrouptitlehier}}[6]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}6}\marg{\idx{param}5}\marg{\cs{unexpanded}\marg{\idx{param}1}}}
+\end{codeenv}
+
+\cssection{bibglssetothergrouptitlehier}
+\formatdef{bibglssetothergrouptitlehier}
+As \gls{bibglssetothergrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsothergrouphier}
+\formatdef{bibglsothergrouphier}
+As \gls{bibglsothergroup} but used for hierarchical groups. It
+expands to the hierarchical other group label.
+This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsothergrouphier}}[5]\marg{\idx{param}3\idx{param}4glssymbols}
+\end{codeenv}
+
+\cssection{bibglsothergrouptitlehier}
+\formatdef{bibglsothergrouptitlehier}
+As \gls{bibglsothergrouptitle} but used for hierarchical groups. It
+expands to the hierarchical other group title. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsothergrouptitlehier}}[5]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}5}\marg{\idx{param}4}\marg{\cs{protect}\cs{glssymbolsgroupname}}}
+\end{codeenv}
+
+\cssection{bibglssetemptygrouptitlehier}
+\formatdef{bibglssetemptygrouptitlehier}
+As \gls{bibglssetemptygrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsemptygrouphier}
+\formatdef{bibglsemptygrouphier}
+As \gls{bibglsemptygroup} but used for hierarchical groups. It
+expands to the hierarchical empty group label.
+This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsemptygrouphier}}[3]\marg{\idx{param}1\idx{param}2glssymbols}
+\end{codeenv}
+
+\cssection{bibglsemptygrouptitlehier}
+\formatdef{bibglsemptygrouptitlehier}
+As \gls{bibglsemptygrouptitle} but used for hierarchical groups. It
+expands to the hierarchical empty group title. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsemptygrouptitlehier}}[3]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}3}\marg{\idx{param}2}\marg{\cs{protect}\cs{glssymbolsgroupname}}}
+\end{codeenv}
+
+\cssection{bibglssetnumbergrouptitlehier}
+\formatdef{bibglssetnumbergrouptitlehier}
+As \gls{bibglssetnumbergrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsnumbergrouphier}
+\formatdef{bibglsnumbergrouphier}
+As \gls{bibglsnumbergroup} but used for hierarchical groups. It
+expands to the hierarchical number group label.
+This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnumbergrouphier}}[5]\marg{\idx{param}3\idx{param}4glsnumbers}
+\end{codeenv}
+
+\cssection{bibglsnumbergrouptitlehier}
+\formatdef{bibglsnumbergrouptitlehier}
+As \gls{bibglsnumbergrouptitle} but used for hierarchical groups. It
+expands to the hierarchical number group title. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsnumbergrouptitlehier}}[5]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}5}\marg{\idx{param}4}\marg{\cs{protect}\cs{glsnumbersgroupname}}}
+\end{codeenv}
+
+\cssection{bibglssetdatetimegrouptitlehier}
+\formatdef{bibglssetdatetimegrouptitlehier}
+As \gls{bibglssetdatetimegrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsdatetimegrouphier}
+\formatdef{bibglsdatetimegrouphier}
+As \gls{bibglsdatetimegroup} but used for hierarchical groups. It
+expands to the hierarchical \idx{datetimegroup} label.
+Since this has more than 9 arguments, it is defined in two parts:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdatetimegrouphier}}[9]\marg{\idx{param}1\idx{param}2\idx{param}3\gls{bibglsdatetimegrouphierfinalargs}}
+\end{codeenv}
+The final arguments are obtained with \gls{bibglsdatetimegrouphierfinalargs}.
+
+\cssection{bibglsdatetimegrouphierfinalargs}
+\formatdef{bibglsdatetimegrouphierfinalargs}
+This picks up the final three arguments for \gls{bibglsdatetimegrouphier}:
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglsdatetimegrouphierfinalargs}}[3]\marg{\idx{param}1\idx{param}2}
+\end{codeenv}
+
+\cssection{bibglsdatetimegrouptitlehier}
+\formatdef{bibglsdatetimegrouptitlehier}
+As \gls{bibglsdatetimegrouptitle} but used for hierarchical groups. It
+expands to the hierarchical \idx{datetimegroup} title.
+Since this has more than 9 arguments, it is defined in two parts:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdatetimegrouptitlehier}}[9]\marg{\gls{bibglsdatetimegrouptitlehierfinalargs}\marg{\idx{param}1-\idx{param}2-\idx{param}3}}
+\end{codeenv}
+The final arguments are obtained with \gls{bibglsdatetimegrouptitlehierfinalargs}.
+
+\cssection{bibglsdatetimegrouptitlehierfinalargs}
+\formatdef{bibglsdatetimegrouptitlehierfinalargs}
+This picks up the final three arguments for \gls{bibglsdatetimegrouptitlehier}:
+\begin{codeenv}
+\cs{providecommand}*\marg{\gls{bibglsdatetimegrouptitlehierfinalargs}}[4]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}4}\marg{\idx{param}3}\marg{\idx{param}1}}
+\end{codeenv}
+In this case, the first argument is set by
+\gls{bibglsdatetimegrouptitlehier} to the date
+(\code{\meta{YYYY}-\meta{MM}-\meta{DD}}). The remaining arguments
+are the \meta{type}, \meta{parent} and \meta{level} information.
+
+\cssection{bibglssetdategrouptitlehier}
+\formatdef{bibglssetdategrouptitlehier}
+As \gls{bibglssetdategrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsdategrouphier}
+\formatdef{bibglsdategrouphier}
+As \gls{bibglsdategroup} but used for hierarchical groups. It
+expands to the hierarchical date group label.
+This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdategrouphier}}[9]\marg{\idx{param}1\idx{param}2\idx{param}4\idx{param}7\idx{param}8}
+\end{codeenv}
+
+\cssection{bibglsdategrouptitlehier}
+\formatdef{bibglsdategrouptitlehier}
+As \gls{bibglsdategrouptitle} but used for hierarchical groups. It
+expands to the hierarchical date group title. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsdategrouptitlehier}}[9]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}9}\marg{\idx{param}8}\marg{\idx{param}1-\idx{param}2}}
+\end{codeenv}
+
+\cssection{bibglssettimegrouptitlehier}
+\formatdef{bibglssettimegrouptitlehier}
+As \gls{bibglssettimegrouptitle} but used for hierarchical groups.
+
+\cssection{bibglstimegrouphier}
+\formatdef{bibglstimegrouphier}
+As \gls{bibglstimegroup} but used for hierarchical groups. It
+expands to the hierarchical time group label. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglstimegrouphier}}[9]\marg{\idx{param}1\idx{param}2\idx{param}7\idx{param}8}
+\end{codeenv}
+
+\cssection{bibglstimegrouptitlehier}
+\formatdef{bibglstimegrouptitlehier}
+As \gls{bibglstimegrouptitle} but used for hierarchical groups. It
+expands to the hierarchical time group title. This is defined as:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglstimegrouptitlehier}}[9]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}9}\marg{\idx{param}8}{\idx{param}1}}
+\end{codeenv}
+
+\cssection{bibglssetunicodegrouptitlehier}
+\formatdef{bibglssetunicodegrouptitlehier}
+As \gls{bibglssetunicodegrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsunicodegrouphier}
+\formatdef{bibglsunicodegrouphier}
+As \gls{bibglsunicodegroup} but used for hierarchical groups. This
+expands to the hierarchical group label:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsunicodegrouphier}}[6]\marg{\idx{param}4\idx{param}5\idx{param}3}
+\end{codeenv}
+
+\cssection{bibglsunicodegrouptitlehier}
+\formatdef{bibglsunicodegrouptitlehier}
+As \gls{bibglsunicodegrouptitle} but used for hierarchical groups. This
+expands to the hierarchical group title:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsunicodegrouptitlehier}}[6]\marg{\cs{protect}\gls{bibglshiersubgrouptitle}\marg{\idx{param}6}\marg{\idx{param}5}\marg{\cs{unexpanded}\marg{\idx{param}1}}}
+\end{codeenv}
+
+\cssection{bibglssetmergedgrouptitlehier}
+\formatdef{bibglssetmergedgrouptitlehier}
+As \gls{bibglssetmergedgrouptitle} but used for hierarchical groups.
+
+\cssection{bibglsmergedgrouphier}
+\formatdef{bibglsmergedgrouphier}
+As \gls{bibglsmergedgroup} but used for hierarchical groups. This
+expands to the hierarchical group label:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsmergedgrouphier}}[8]\marg{merged.\idx{param}1}
+\end{codeenv}
+
+\cssection{bibglsmergedgrouptitlehier}
+\formatdef{bibglsmergedgrouptitlehier}
+As \gls{bibglsmergedgrouptitle} but used for hierarchical groups. This
+expands to the hierarchical group title:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsmergedgrouptitlehier}}[8]\marg{\comment{}
+ \cs{unexpanded}\marg{\cs{ifnum}\idx{param}8=0\gls{bibglsmergedgroupfmt}\marg{\idx{param}3}\marg{\idx{param}4}\marg{\idx{param}5}\marg{\idx{param}6}\cmd{else}\gls{bibglsmergedgrouphierfmt}\marg{\idx{param}3}\marg{\idx{param}4}\marg{\idx{param}5}\marg{\idx{param}6}\cmd{fi}}\comment{}
+}
+\end{codeenv}
+This uses \gls{bibglsmergedgroupfmt} ($\meta{level}=0$) or 
+\gls{bibglsmergedgrouphierfmt} ($\meta{level}>0$) to format the title.
+
+\cssection{bibglsmergedgrouphierfmt}
+
+\formatdef{bibglsmergedgrouphierfmt}
+Used by \gls{bibglsmergedgrouphierfmt} to format merged hierarchical group titles.
+The first argument \meta{n} is the total number of groups that have been
+merged, the second argument, \meta{g$_1$} is the first group title,
+\marg{\meta{g$_2$}\ldots\meta{g$_n$}} are the middle group titles
+(empty if $\meta{n}=2$), and \meta{g$_n$} is the last group title.
+
+The default definition depends on whether or not \bibgls\ has
+detected \sty{hyperref} in the document's \ext{log} file. If it has,
+then the definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsmergedgrouphierfmt}}[4]\marg{\idx{param}2, 
+\ics{texorpdfstring}\marg{\marg{\cs{def}\gls{bibglshiersubgrouptitle}\idx{param}\idx{param}1\idx{param}\idx{param}2\idx{param}\idx{param}3{\idx{param}\idx{param}3}\cs{ifcase}\idx{param}1\cmd{or}\cmd{or}\cmd{or}
+\idx{param}3, \cmd{else}\cmd{ldots}, \cmd{fi}
+\idx{param}4}}\marg{\cs{ifcase}\idx{param}1\cmd{or}\cmd{or}\cmd{or}
+\idx{param}3, \cmd{else}\cmd{ldots}, \cmd{fi} \idx{param}4}}
+\end{codeenv}
+Otherwise the definition is:
+\begin{codeenv}
+\cs{providecommand}\marg{\gls{bibglsmergedgrouphierfmt}}[4]\marg{\idx{param}2, 
+\marg{\cs{def}\gls{bibglshiersubgrouptitle}\idx{param}\idx{param}1\idx{param}\idx{param}2\idx{param}\idx{param}3{\idx{param}\idx{param}3}\cs{ifcase}\idx{param}1\cmd{or}\cmd{or}\cmd{or}
+\idx{param}3, \cmd{else}\cmd{ldots}, \cmd{fi}
+\idx{param}4}}
+\end{codeenv}
+This locally redefines \gls{bibglshiersubgrouptitle} to just do its
+final argument to allow for a more compact title.
+
+\renewcommand{\cssectioncmd}{\subsection}
 \section{Flattened Entries}
 \label{sec:flattendefs}
 
