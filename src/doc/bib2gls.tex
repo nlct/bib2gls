@@ -8070,6 +8070,14 @@ The advantage with \field{siblinglist} over accessing the
 \glsdisp{parententry}{parent's} \field{childlist} is that the entry
 itself is excluded from the list.
 
+\optsection{save-root-ancestor}
+
+This is a boolean option. The default setting is
+\csopt[false]{save-root-ancestor}. If true, the entry's top-most
+\gls{ancestor} will be saved in the entry's \field{rootancestor} internal
+field. If the entry doesn't have a \parent\ (that it, the entry itself
+is the root) then the \field{rootancestor} field won't be set.
+
 \optsection{flatten}
 
 This is a boolean option. The default value is \csopt[false]{flatten}. 

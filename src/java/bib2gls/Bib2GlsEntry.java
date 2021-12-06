@@ -4702,6 +4702,29 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
+   public Bib2GlsEntry getHierarchyRoot(Vector<Bib2GlsEntry> entries)
+   {
+      String parentId = getParent();
+
+      if (parentId == null)
+      {
+         return this;
+      }
+      else
+      {
+         Bib2GlsEntry parent = getEntry(parentId, entries);
+
+         if (parent == null)
+         {
+            return this;
+         }
+         else
+         {
+            return parent.getHierarchyRoot(entries);
+         }
+      }
+   }
+
    public int getLevel(Vector<Bib2GlsEntry> entries)
    {
       if (sortLevel != -1 || entries == null)

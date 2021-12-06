@@ -3004,6 +3004,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.save-root-ancestor,
+   name={\csoptfmt{save\dhyphen root\dhyphen ancestor}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.save-original-entrytype,
    name={\csoptfmt{save\dhyphen original\dhyphen entrytype}},
    user1={\meta{value}},
@@ -8960,6 +8967,14 @@ field.},
   name={\fieldfmt{siblinglist}},
   description={A list of labels (in \sty{etoolbox}'s internal list
    format) of the siblings this entry has had selected.},
+  note={internal field set by \appfmt{bib2gls}},
+  category={internalfield},
+  parent={internalfields}
+}
+
+@field{field.rootancestor,
+  name={\fieldfmt{rootancestor}},
+  description={Stores the label of this entry's root ancestor.},
   note={internal field set by \appfmt{bib2gls}},
   category={internalfield},
   parent={internalfields}

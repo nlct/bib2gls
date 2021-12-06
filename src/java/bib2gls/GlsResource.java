@@ -1224,6 +1224,10 @@ public class GlsResource
          {
             saveSiblingCount = getBoolean(parser, list, opt);
          }
+         else if (opt.equals("save-root-ancestor"))
+         {
+            saveRootAncestor = getBoolean(parser, list, opt);
+         }
          else if (opt.equals("save-original-entrytype"))
          {
             saveOriginalEntryType = getOptional(parser, list, opt);
@@ -7999,7 +8003,7 @@ public class GlsResource
          }
 
          if (flattenLonely == FLATTEN_LONELY_POST_SORT
-              || ((saveChildCount || saveSiblingCount)
+              || (needsEarlyHierarchy()
                     && flattenLonely != FLATTEN_LONELY_PRE_SORT))
          {// Need to check parents before writing definitions.
           // This will already have been done if
@@ -8058,8 +8062,7 @@ public class GlsResource
                }
             }
 
-            if (flattenLonely == FLATTEN_LONELY_FALSE 
-                  && !(saveChildCount || saveSiblingCount))
+            if (flattenLonely == FLATTEN_LONELY_FALSE && !needsEarlyHierarchy())
             {
                checkParent(entry, i, entries);
             }
@@ -8100,7 +8103,7 @@ public class GlsResource
          if (dualEntries != null)
          {
             if (flattenLonely == FLATTEN_LONELY_POST_SORT
-                || ((saveChildCount || saveSiblingCount)
+                || (needsEarlyHierarchy()
                        && flattenLonely != FLATTEN_LONELY_PRE_SORT))
             {// need to check parents before writing definitions
 
@@ -8134,7 +8137,7 @@ public class GlsResource
                }
 
                if (flattenLonely == FLATTEN_LONELY_FALSE 
-                     && !(saveChildCount || saveSiblingCount))
+                     && !needsEarlyHierarchy())
                {
                   checkParent(entry, i, dualEntries);
                }
@@ -8625,6 +8628,27 @@ public class GlsResource
                writer.format("\\GlsXtrSetField{%s}{siblingcount}{%d}%n", id,
                  siblingCount);
             }
+         }
+      }
+
+      if (saveRootAncestor)
+      {
+         Bib2GlsEntry root = entry;
+
+         if (dualData != null && entry instanceof Bib2GlsDualEntry
+              && !((Bib2GlsDualEntry)entry).isPrimary())
+         {
+            root = entry.getHierarchyRoot(dualData);
+         }
+         else
+         {
+            root = entry.getHierarchyRoot(bibData);
+         }
+
+         if (root != entry)
+         {
+            writer.format("\\GlsXtrSetField{%s}{rootancestor}{%s}%n", id,
+              root.getId());
          }
       }
 
@@ -9204,6 +9228,11 @@ public class GlsResource
       }
    }
 
+   private boolean needsEarlyHierarchy()
+   {
+      return saveChildCount || saveSiblingCount || saveRootAncestor;
+   }
+
    private void checkParent(Bib2GlsEntry entry, int i, 
       Vector<Bib2GlsEntry> list)
    {
@@ -9231,8 +9260,7 @@ public class GlsResource
 
          if (thisEntry.getId().equals(parentId))
          {
-            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount
-                  || saveSiblingCount)
+            if (flattenLonely != FLATTEN_LONELY_FALSE || needsEarlyHierarchy())
             {
                thisEntry.addChild(entry);
             }
@@ -9247,8 +9275,7 @@ public class GlsResource
 
          if (thisEntry.getId().equals(parentId))
          {
-            if (flattenLonely != FLATTEN_LONELY_FALSE || saveChildCount
-                  || saveSiblingCount)
+            if (flattenLonely != FLATTEN_LONELY_FALSE || needsEarlyHierarchy())
             {
                thisEntry.addChild(entry);
             }
@@ -9465,8 +9492,7 @@ public class GlsResource
          checkParent(entry, i, entries);
       }
 
-      // This method will be called if saveChildCount == true or
-      // saveSiblingCount == true
+      // This method will be called if needsEarlyHierarchy()
       // && flattenLonely != FLATTEN_LONELY_PRE_SORT
       // Don't need to go any further if flattenLonely == FLATTEN_LONELY_FALSE
 
@@ -13584,6 +13610,8 @@ public class GlsResource
    private boolean saveChildCount = false;
 
    private boolean saveSiblingCount = false;
+
+   private boolean saveRootAncestor = false;
 
    private String saveOriginalEntryType = null;
 

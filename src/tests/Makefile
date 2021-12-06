@@ -727,12 +727,14 @@ test-hypernav-targetprefix.glstex	: test-hypernav-targetprefix.tex $(DEPS)
 
 test-hiergroups.pdf	: test-hiergroups.glstex
 			pdflatex test-hiergroups
+			pdflatex test-hiergroups
 
 test-hiergroups.glstex	: test-hiergroups.tex $(DEPS)
 			pdflatex test-hiergroups
 			$(BIB2GLS) test-hiergroups
 
 test-mergegroups.pdf	: test-mergegroups.glstex
+			pdflatex test-mergegroups
 			pdflatex test-mergegroups
 
 test-mergegroups.glstex	: test-mergegroups.tex $(DEPS)
