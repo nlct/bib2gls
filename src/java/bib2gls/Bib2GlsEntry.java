@@ -3109,18 +3109,51 @@ public class Bib2GlsEntry extends BibEntry
          n += recordMap.get(counter).size();
       }
 
+      if (resource.getSavePrimaryLocationSetting()
+                 == GlsResource.SAVE_PRIMARY_LOCATION_REMOVE)
+      {
+         n += getPrimaryRecordCount();
+      }
+
       return n;
    }
 
    public int mainRecordCount()
    {
-      if (records != null) return records.size();
-
       int n = 0;
 
-      for (String counter : resource.getLocationCounters())
+      if (records != null)
       {
-         n += recordMap.get(counter).size();
+         n = records.size();
+      }
+      else
+      {
+         for (String counter : resource.getLocationCounters())
+         {
+            n += recordMap.get(counter).size();
+         }
+      }
+
+      return n;
+   }
+
+   public int getPrimaryRecordCount()
+   {
+      int n = 0;
+
+      if (primaryRecords != null)
+      {
+         n = primaryRecords.size();
+      }
+      else if (primaryRecordMap != null)
+      {
+         for (Iterator<String> it = primaryRecordMap.keySet().iterator();
+              it.hasNext(); )
+         {
+            String counter = it.next();
+
+            n += primaryRecordMap.get(counter).size();
+         }
       }
 
       return n;
@@ -3316,12 +3349,60 @@ public class Bib2GlsEntry extends BibEntry
       {
          primary = record;
 
-         if (primaryRecords == null)
-         {
-            primaryRecords = new Vector<GlsRecord>();
-         }
+         int primaryLocCounterSetting = resource.getPrimaryLocationCountersSetting();
 
-         primaryRecords.add(primary);
+         if (records != null || primaryLocCounterSetting
+              == GlsResource.PRIMARY_LOCATION_COUNTERS_COMBINE)
+         {
+            if (primaryRecords == null)
+            {
+               primaryRecords = new Vector<GlsRecord>();
+            }
+
+            bib2gls.debugMessage("message.adding.primary.record", primary,
+                 getId());
+            primaryRecords.add(primary);
+         }
+         else
+         {
+            if (primaryRecordMap == null)
+            {
+               primaryRecordMap = new HashMap<String,Vector<GlsRecord>>();
+
+               if (primaryLocCounterSetting
+                     != GlsResource.PRIMARY_LOCATION_COUNTERS_MATCH)
+               {
+                  primaryCounters = new Vector<String>();
+               }
+            }
+
+            String counter = primary.getCounter();
+
+            if (resource.isPrimaryLocationCounterAllowed(counter))
+            {
+               Vector<GlsRecord> list = primaryRecordMap.get(counter);
+
+               if (list == null)
+               {
+                  list = new Vector<GlsRecord>();
+
+                  primaryRecordMap.put(counter, list);
+
+                  if (primaryCounters != null)
+                  {
+                     primaryCounters.add(counter);
+                  }
+               }
+
+               if (!list.contains(primary))
+               {
+                  bib2gls.debugMessage("message.adding.counter.primary.record", primary,
+                    getId(), counter);
+
+                  list.add(primary);
+               }
+            }
+         }
 
          setting = resource.getSavePrimaryLocationSetting();
 
@@ -3581,6 +3662,55 @@ public class Bib2GlsEntry extends BibEntry
                      insertRecord(record.copy(getId()), thisList);
                   }
                }
+            }
+         }
+      }
+
+      if (entry.primaryRecords != null)
+      {
+         if (primaryRecords == null)
+         {
+            primaryRecords = new Vector<GlsRecord>();
+         }
+
+         for (GlsRecord record : entry.primaryRecords)
+         {
+            bib2gls.debugMessage(
+               "message.copying.primary.record", record,
+                 entry.getId(), getId());
+
+            primaryRecords.add(record);
+         }
+      }
+      else if (entry.primaryRecordMap != null)
+      {
+         if (primaryRecordMap == null)
+         {
+            primaryRecordMap = new HashMap<String, Vector<GlsRecord>>();
+         }
+
+         for (Iterator<String> it = entry.primaryRecordMap.keySet().iterator();
+              it.hasNext(); )
+         {
+            String counter = it.next();
+
+            Vector<GlsRecord> list = primaryRecordMap.get(counter);
+
+            if (list == null)
+            {
+               list = new Vector<GlsRecord>();
+               primaryRecordMap.put(counter, list);
+            }
+
+            Vector<GlsRecord> otherList = entry.primaryRecordMap.get(counter);
+
+            for (GlsRecord record : otherList)
+            {
+               bib2gls.debugMessage(
+                 "message.copying.primary.record", record,
+                   entry.getId(), getId());
+
+               list.add(record);
             }
          }
       }
@@ -4166,25 +4296,81 @@ public class Bib2GlsEntry extends BibEntry
 
    public String getPrimaryRecordList() throws Bib2GlsException
    {
-      if (primaryRecords == null)
-      {
-         return null;
-      }
-
-      StringBuilder primaryBuilder = new StringBuilder();
+      StringBuilder builder = new StringBuilder();
 
       if (locationList == null)
       {
          locationList = new Vector<String>();
       }
 
-      primaryBuilder = updateLocationList(resource.getMinLocationRange(), 
-        resource.getSuffixF(), resource.getSuffixFF(), 
-        resource.getLocationGap(),
-        primaryRecords, primaryBuilder);
+      int minRange = resource.getMinLocationRange();
+      String suffixF = resource.getSuffixF();
+      String suffixFF = resource.getSuffixFF();
+      int gap = resource.getLocationGap();
 
-      return String.format("\\bibglsprimary{%d}{%s}",
-              primaryRecords.size(), primaryBuilder);
+      if (primaryRecords != null)
+      {
+         builder.append(String.format("\\bibglsprimary{%d}{",
+              primaryRecords.size()));
+
+         builder = updateLocationList(minRange, 
+           suffixF, suffixFF, gap, primaryRecords, builder);
+
+         builder.append("}");
+      }
+      else if (primaryRecordMap != null)
+      {
+         String sep = "";
+
+         if (primaryCounters == null)
+         {
+            for (String counter : resource.getLocationCounters())
+            {
+               Vector<GlsRecord> list = primaryRecordMap.get(counter);
+
+               if (list != null)
+               {
+                  builder.append(String.format(
+                         "%s\\bibglsprimarylocationgroup{%s}{%s}{",
+                   sep, list.size(), counter));
+
+
+                  builder = updateLocationList(minRange, suffixF, suffixFF, gap,
+                    list, builder);
+
+                  builder.append("}");
+
+                  sep = "\\bibglsprimarylocationgroupsep ";
+               }
+            }
+         }
+         else
+         {
+            for (String counter : primaryCounters)
+            {
+               Vector<GlsRecord> list = primaryRecordMap.get(counter);
+
+               builder.append(String.format(
+                      "%s\\bibglsprimarylocationgroup{%s}{%s}{",
+                sep, list.size(), counter));
+
+
+               builder = updateLocationList(minRange, suffixF, suffixFF, gap,
+                 list, builder);
+
+               builder.append("}");
+
+               sep = "\\bibglsprimarylocationgroupsep ";
+            }
+         }
+      }
+
+      if (builder.length() > 0)
+      {
+         return builder.toString();
+      }
+
+      return null;
    }
 
    public void initAlias(TeXParser parser) throws IOException
@@ -4992,6 +5178,8 @@ public class Bib2GlsEntry extends BibEntry
    private HashMap<TeXPath,Vector<GlsRecord>> supplementalRecordMap;
 
    private Vector<GlsRecord> primaryRecords = null;
+   private HashMap<String,Vector<GlsRecord>> primaryRecordMap = null;
+   private Vector<String> primaryCounters = null;
 
    private boolean selected = false;
 

@@ -2418,6 +2418,24 @@ public class GlsResource
                aliasLocation = Bib2GlsEntry.POST_SEE;
             }
          }
+         else if (opt.equals("primary-loc-counters") 
+               || opt.equals("principal-loc-counters"))
+         {
+            String val = getChoice(parser, list, opt, "combine", "match", "split");
+
+            if (val.equals("combine"))
+            {
+               primaryLocCounters = PRIMARY_LOCATION_COUNTERS_COMBINE;
+            }
+            else if (val.equals("match"))
+            {
+               primaryLocCounters = PRIMARY_LOCATION_COUNTERS_MATCH;
+            }
+            else// if (val.equals("split"))
+            {
+               primaryLocCounters = PRIMARY_LOCATION_COUNTERS_SPLIT;
+            }
+         }
          else if (opt.equals("loc-counters"))
          {
             String[] values = getStringArray(parser, list, opt);
@@ -7866,7 +7884,22 @@ public class GlsResource
 
          if (getSavePrimaryLocationSetting() != SAVE_PRIMARY_LOCATION_OFF)
          {
-            writer.println("\\providecommand{\\bibglsprimary}[2]{#2}");
+            if (primaryLocCounters == PRIMARY_LOCATION_COUNTERS_COMBINE
+                || (primaryLocCounters == PRIMARY_LOCATION_COUNTERS_MATCH 
+                      && counters == null))
+            {
+               writer.println("\\providecommand{\\bibglsprimary}[2]{#2}");
+            }
+            else if (counters == null)
+            {
+               writer.println("\\providecommand{\\bibglsprimarylocationgroup}[3]{#3}");
+               writer.println("\\providecommand{\\bibglsprimarylocationgroupsep}{\\bibglsdelimN}");
+            }
+            else
+            {
+               writer.println("\\providecommand{\\bibglsprimarylocationgroup}{\\bibglslocationgroup}");
+               writer.println("\\providecommand{\\bibglsprimarylocationgroupsep}{\\bibglslocationgroupsep}");
+            }
          }
 
          if (locationPrefix != null)
@@ -12829,6 +12862,28 @@ public class GlsResource
       return savePrimaryLocations;
    }
 
+   public int getPrimaryLocationCountersSetting()
+   {
+      return primaryLocCounters;
+   }
+
+   public boolean isPrimaryLocationCounterAllowed(String counter)
+   {
+      if (counters == null
+       || primaryLocCounters == PRIMARY_LOCATION_COUNTERS_COMBINE
+       || primaryLocCounters == PRIMARY_LOCATION_COUNTERS_SPLIT)
+      {
+         return true;
+      }
+
+      for (String c : counters)
+      {
+         if (c.equals(counter)) return true;
+      }
+
+      return false;
+   }
+
    class LabelListSortMethod
    {
       public LabelListSortMethod(String[] fields, String sortMethod, 
@@ -13695,6 +13750,12 @@ public class GlsResource
    private String[] masterSelection = null;
 
    private String[] counters=null;
+
+   public static final int PRIMARY_LOCATION_COUNTERS_COMBINE=0;
+   public static final int PRIMARY_LOCATION_COUNTERS_MATCH=1;
+   public static final int PRIMARY_LOCATION_COUNTERS_SPLIT=2;
+
+   private int primaryLocCounters = PRIMARY_LOCATION_COUNTERS_COMBINE;
 
    private Random random=null;
 

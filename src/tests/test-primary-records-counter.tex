@@ -13,35 +13,48 @@
  stylemods={tree,bookindex},
  style=bookindex]{glossaries-extra}
 
+
+\newcommand*{\glsxtrchapterlocfmt}[2]{#1 (#2)}
+\newcommand*{\glsxtrsectionlocfmt}[2]{#1 (#2)}
+
+\newcommand*{\locationgroupmarkersection}{\S}
+\newcommand*{\locationgroupmarkerchapter}{Chapter }
+\newcommand*{\locationgroupmarkerchapters}{Chapters }
+\newcommand*{\locationgroupmarkerpage}{p.~}
+\newcommand*{\locationgroupmarkerpages}{pp.~}
+
+\newcommand{\bibglsprimarylocationgroupsep}{; }
+\newcommand{\bibglsprimarylocationgroup}[3]{%
+  \ifcsdef{locationgroupmarker#2}%
+  {\ifcase#1
+   \or
+     \csuse{locationgroupmarker#2}% 
+   \else
+     \ifcsdef{locationgroupmarker#2s}%
+     {\csuse{locationgroupmarker#2s}}%
+     {%
+       \csuse{locationgroupmarker#2}% 
+       \csuse{locationgroupmarker#2}% 
+     }%
+   \fi
+  }%
+  {}%
+  #3%
+}
+
 \GlsXtrLoadResources[
   src={topics},
-  %loc-counters={chapter,page},% separate locations into sub-lists according to the counter
-  primary-location-formats={hyperrm},
-  save-primary-locations={remove}
+  loc-counters={page,chapter},
+  primary-loc-counters=split,% split, match, combine
+  primary-location-formats={primaryfmt},
+  save-primary-locations={retain}
 ]
 
 \newcommand{\primaryfmt}[1]{\hyperbf{#1}}
 
-%\GlsXtrAutoAddOnFormat{primaryfmt}{counter=chapter,format=hyperrm}
+\GlsXtrAutoAddOnFormat{primaryfmt}{counter=chapter,format=primaryfmt}
 
-%\glsxtrnewglslike[format=primaryfmt]{}{\primary}{\primarypl}{\Primary}{\Primarypl}
-
-\newcommand{\primary}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \gls[#1]{#2}%
-}
-\newcommand{\primarypl}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \glspl[#1]{#2}%
-}
-\newcommand{\Primary}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \Gls[#1]{#2}%
-}
-\newcommand{\Primarypl}[2][]{% 
- \glsadd[counter=chapter,format=hyperrm]{#2}%
- \Glspl[#1]{#2}%
-}
+\glsxtrnewglslike[format=primaryfmt]{}{\primary}{\primarypl}{\Primary}{\Primarypl}
 
 \begin{document}
 \chapter{Sample}
@@ -62,6 +75,7 @@
 ]
 {%
  \renewcommand{\GlsXtrLocationField}{primarylocations}%
+ \renewcommand{\primaryfmt}[1]{\hyperrm{#1}}%
  \renewcommand*{\glsextrapostnamehook}[1]{\glsadd[format=hyperemph]{#1}}%
 }
 

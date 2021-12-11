@@ -12330,7 +12330,9 @@ want to lose a partial \gls{location} match (for example, if the
 \end{itemize}
 
 The \glspl{principallocation} are copied to the \field{primarylocations}
-field and encapsulated with \gls!{bibglsprimary}.
+field and are either encapsulated with \gls!{bibglsprimary} or can
+be split into groups, according to \csopt{principal-loc-counters}.
+
 If you use \csopt[remove]{save-principal-locations}, the
 \field{location} field will end up empty if the \glspl{location} for the
 associated entry were all identified as principal. If you use
@@ -12598,6 +12600,142 @@ This is more useful if you want to simply omit the
 \code{\glsopt[primaryfmt]{format}} option (just remove it from the above four 
 definitions), which makes it easier to merge the \glspl{location} into
 ranges in the index.
+
+\optsection{primary-loc-counters}
+
+A synonym for \csopt{principal-loc-counters}.
+
+\optsection{principal-loc-counters}
+
+This option determines whether the \glspl{principallocation} should
+be split into groups according to the location counter. The value
+may be one or:
+\begin{itemize}
+\item \optfmt{combine}: don't split into groups (default);
+\item \optfmt{match}: match the \csopt{loc-counters} setting;
+\item \optfmt{split}: split into groups regardless of the
+\csopt{loc-counters} setting.
+\end{itemize}
+
+With \csopt[combine]{principal-loc-counters} or with
+\csopt[match]{principal-loc-counters} and the default \csopt[as
+use]{loc-counters} settings, no groups will be formed and the
+\glspl{principallocation} will be encapsulated with
+\gls{bibglsprimary}. Otherwise, the locations will be split into
+groups according to the counter and each group will be encapsulated
+with \gls{bibglsprimarylocationgroup} and separated with
+\gls{bibglsprimarylocationgroupsep}.
+
+For example, suppose the file \filefmt{topics.bib} contains the
+following entry:
+\begin{codeenv}
+\atentry{entry}\marg{zebra,
+  \field{name}=\marg{zebra},
+  \field{description}=\marg{striped African horse}
+}
+\end{codeenv}
+The document sets up a \gls{principallocation} format identified by
+the custom command \csfmt{primaryfmt}:
+\begin{codeenv}
+\cs{newcommand}\marg{\cmd{primaryfmt}}[1]\marg{\cs{hyperbf}\marg{\idx{param}1}}
+\end{codeenv}
+The \ics{GlsXtrAutoAddOnFormat} command is used to automatically
+record an entry with the \counter{chapter} counter (using
+\ics{glsadd}) every time the entry is
+recorded with the \gls{principallocation} format:
+\begin{codeenv}
+\cs{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{\glsopt{counter}=\counter{chapter},\glsopt{format}=primaryfmt}
+\end{codeenv}
+This means that, for example,
+\begin{codeenv}
+\cs{gls}\oarg{\glsopt{format}=primaryfmt}\margm{zebra}
+\end{codeenv}
+will also first do:
+\begin{codeenv}
+\cs{glsadd}\oarg{\glsopt{counter}=\counter{chapter},\glsopt{format}=primaryfmt}\margm{zebra}
+\end{codeenv}
+
+If \idx{resourceset} is loaded with:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[topics]{src},
+ \csopt[primaryfmt]{primary-location-formats},
+ \csopt[retain]{save-primary-locations}
+}
+\end{codeenv}
+then both the \field{location} field and the
+\field{primarylocations} field will include both the \counter{page}
+and \counter{chapter} records mixed together. The
+\field{primarylocations} field will have the locations encapsulated
+with \gls{bibglsprimary}.
+
+With 
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[topics]{src},
+ \csopt[primaryfmt]{primary-location-formats},
+ \csopt[retain]{save-primary-locations},
+ \csopt[split]{primary-loc-counters}
+}
+\end{codeenv}
+the \field{primarylocations} field will have the locations split into
+two groups, each encapsulated with \gls{bibglsprimarylocationgroup}.
+The \field{location} field will have the \counter{chapter} and
+\counter{page} locations intermingled.
+
+With 
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[topics]{src},
+ \csopt[primaryfmt]{primary-location-formats},
+ \csopt[retain]{save-primary-locations},
+ \csopt[split]{primary-loc-counters},
+ \csopt[page]{loc-counters}
+}
+\end{codeenv}
+The \field{primarylocations} field will be the same as before, but
+the \field{location} field will only have the \counter{page}
+locations.
+
+Whereas with 
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[topics]{src},
+ \csopt[primaryfmt]{primary-location-formats},
+ \csopt[retain]{save-primary-locations},
+ \csopt[match]{primary-loc-counters},
+ \csopt[page]{loc-counters}
+}
+\end{codeenv}
+Both the \field{primarylocations} field and the \field{location}
+field will only have the \counter{page} locations.
+
+The order of the groups depends on whether \optfmt{split} or
+\optfmt{match} is used. With \csopt[match]{primary-loc-counters} the
+counter group order will match \csopt{loc-counters}. Whereas with
+\csopt[split]{primary-loc-counters} the counter group order will be determined by
+the order of records.
+
+So in the case of the above document where the \counter{chapter}
+record is automatically added before the \counter{page} record
+(where the \glsopt{format} is \code{primaryfmt}) then with:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[topics]{src},
+ \csopt[primaryfmt]{primary-location-formats},
+ \csopt[retain]{save-primary-locations},
+ \csopt[match]{primary-loc-counters},
+ \csopt[page,chapter]{loc-counters}
+}
+\end{codeenv}
+then both the \field{location} field and the
+\field{primarylocations} field will have the \counter{page} group
+first, followed by the \counter{chapter} group. Whereas with:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[topics]{src},
+ \csopt[primaryfmt]{primary-location-formats},
+ \csopt[retain]{save-primary-locations},
+ \csopt[skip]{primary-loc-counters},
+ \csopt[page,chapter]{loc-counters}
+}
+\end{codeenv}
+then the \field{primarylocations} field will have the
+\counter{chapter} group first, followed by the \counter{page} group.
 
 \optsection{min-loc-range}
 
@@ -18640,16 +18778,6 @@ it includes the 0 case, which in this instance means that there were
 no \glspl{location} but there was a cross-reference. This command isn't
 added when the \gls{locationlist} is empty.
 
-\cssection{bibglsprimary}
-
-\formatdef{bibglsprimary}
-When the \csopt{save-principal-locations} option is used, the 
-\glspl{principallocation} are stored in the \field{primarylocations} field
-encapsulated with this command. The first argument is the number of
-\glspl{location} in the list. The second argument is the list of \glspl{location}
-formatted in the usual way. The default definition is to ignore the
-first argument and simply do the second.
-
 \cssection{bibglslocationgroup}
 
 \formatdef{bibglslocationgroup}
@@ -18725,6 +18853,34 @@ or redefined after the resources are loaded:
 \strut
 \cs{glsrenewcommand}*\marg{\gls{bibglslocationgroupsep}}\marg{; }
 \end{codeenv}
+
+\cssection{bibglsprimary}
+
+\formatdef{bibglsprimary}
+When the \csopt{save-principal-locations} option is used, the 
+\glspl{principallocation} are stored in the \field{primarylocations} field
+encapsulated with this command, unless the locations are split into
+groups according to the location counter.
+
+The first argument is the number of \glspl{location} in the list.
+The second argument is the list of \glspl{location} formatted in the
+usual way. The default definition is to ignore the first argument
+and simply do the second.
+
+If the locations are split into groups, then \gls{bibglsprimarylocationgroup}
+is used for each group instead (separated with
+\gls{bibglsprimarylocationgroupsep}).
+
+\cssection{bibglsprimarylocationgroup}
+
+\formatdef{bibglsprimarylocationgroup}
+As \gls{bibglslocationgroup} but for primary group
+locations.
+
+\cssection{bibglsprimarylocationgroupsep}
+
+\formatdef{bibglsprimarylocationgroupsep}
+As \gls{bibglslocationgroupsep} but for primary group locations.
 
 \cssection{bibglssupplemental}
 

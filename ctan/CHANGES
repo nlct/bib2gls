@@ -23,6 +23,10 @@ v3.0 (pending):
 
     - save-root-ancestor
 
+  * new option to split primary locations into counter groups:
+
+    - primary-loc-counters (synonym: principal-loc-counters)
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)

@@ -202,9 +202,12 @@ Defaulting to: {0}.
 <entry key="message.missing.id">id missing</entry>
 <entry key="message.default.locale">Default document locale: {0} {1}</entry>
 <entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>
+<entry key="message.adding.primary.record">Adding primary record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.supplemental.record">Adding supplemental record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.counter.record">Adding record {0} to entry {1}''s {2} record list.</entry>
+<entry key="message.adding.counter.primary.record">Adding primary record {0} to entry {1}''s {2} record list.</entry>
 <entry key="message.copying.record">Copying record {0} from entry {1} to entry {2}.</entry>
+<entry key="message.copying.primary.record">Copying primary record {0} from entry {1} to entry {2}.</entry>
 <entry key="message.ignored.record">Ignoring record {0}.</entry>
 <entry key="message.clearing.records">Clearing entry {0}''s record list.</entry>
 <entry key="message.normalizing">Normalising {0} to {1}.</entry>

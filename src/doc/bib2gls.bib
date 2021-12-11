@@ -977,6 +977,24 @@
   category={command}
 }
 
+@bibglscommand{bibglsprimarylocationgroup,
+  name={\csfmt{bib\-gls\-primary\-location\-group}},
+  user1={\margm{n}\margm{counter}\margm{list}},
+  description={primary location group encapsulator},
+  topics={glossarystylecommands,loclistcommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglsprimarylocationgroupsep,
+  name={\csfmt{bib\-gls\-primary\-location\-group\-sep}},
+  user1={},
+  description={primary location group separator},
+  topics={glossarystylecommands,loclistcommands,separatorcommands},
+  note={\bibgls},
+  category={command}
+}
+
 @bibglscommand{bibglssupplemental,
   name={\csfmt{bib\-gls\-supple\-mental}},
   user1={\margm{n}\margm{list}},
@@ -3077,6 +3095,20 @@ field\dhyphen locale}},
 @resourceoption{opt.principal-location-formats,
    name={\csoptfmt{principal\dhyphen location\dhyphen formats}},
    user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.primary-loc-counters,
+   name={\csoptfmt{primary\dhyphen loc\dhyphen counters}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.principal-loc-counters,
+   name={\csoptfmt{principal\dhyphen loc\dhyphen counters}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
