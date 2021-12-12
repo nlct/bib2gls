@@ -2726,6 +2726,109 @@ public class GlsResource
          {
             secondarySortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
          }
+         else if (opt.equals("break-at-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            HashMap<String,Pattern> patterns = null;
+
+            if (array != null)
+            {
+               patterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(patterns, array, opt, list, parser);
+            }
+
+            sortSettings.setBreakAtMatch(patterns);
+            dualSortSettings.setBreakAtNotMatch(patterns);
+            secondarySortSettings.setBreakAtNotMatch(patterns);
+         }
+         else if (opt.equals("break-at-not-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            HashMap<String,Pattern> patterns = null;
+
+            if (array != null)
+            {
+               patterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(patterns, array, opt, list, parser);
+            }
+
+            sortSettings.setBreakAtNotMatch(patterns);
+            dualSortSettings.setBreakAtNotMatch(patterns);
+            secondarySortSettings.setBreakAtNotMatch(patterns);
+         }
+         else if (opt.equals("break-at-match-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
+
+            boolean and = val.equals("and");
+            sortSettings.setBreakAtNotMatchAnd(and);
+            dualSortSettings.setBreakAtNotMatchAnd(and);
+            secondarySortSettings.setBreakAtNotMatchAnd(and);
+         }
+         else if (opt.equals("dual-break-at-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            HashMap<String,Pattern> patterns = null;
+
+            if (array != null)
+            {
+               patterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(patterns, array, opt, list, parser);
+            }
+
+            dualSortSettings.setBreakAtNotMatch(patterns);
+         }
+         else if (opt.equals("dual-break-at-not-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            HashMap<String,Pattern> patterns = null;
+
+            if (array != null)
+            {
+               patterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(patterns, array, opt, list, parser);
+            }
+
+            dualSortSettings.setBreakAtNotMatch(patterns);
+         }
+         else if (opt.equals("dual-break-at-match-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
+
+            dualSortSettings.setBreakAtNotMatchAnd(val.equals("and"));
+         }
+         else if (opt.equals("secondary-break-at-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            HashMap<String,Pattern> patterns = null;
+
+            if (array != null)
+            {
+               patterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(patterns, array, opt, list, parser);
+            }
+
+            secondarySortSettings.setBreakAtNotMatch(patterns);
+         }
+         else if (opt.equals("secondary-break-at-not-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            HashMap<String,Pattern> patterns = null;
+
+            if (array != null)
+            {
+               patterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(patterns, array, opt, list, parser);
+            }
+
+            secondarySortSettings.setBreakAtNotMatch(patterns);
+         }
+         else if (opt.equals("secondary-break-at-match-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
+
+            secondarySortSettings.setBreakAtNotMatchAnd(val.equals("and"));
+         }
          else if (opt.equals("strength"))
          { // collator strength
 
@@ -10106,6 +10209,12 @@ public class GlsResource
 
    private boolean notMatch(Bib2GlsEntry entry, boolean and, 
        HashMap<String,Pattern> patterns)
+   {
+      return notMatch(bib2gls, entry, and, patterns);
+   }
+
+   public static boolean notMatch(Bib2Gls bib2gls, Bib2GlsEntry entry, 
+       boolean and, HashMap<String,Pattern> patterns)
    {
       boolean matches = and;
 

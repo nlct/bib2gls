@@ -27,6 +27,18 @@ v3.0 (pending):
 
     - primary-loc-counters (synonym: principal-loc-counters)
 
+  * new options to skip break-at via pattern matching:
+
+    - break-at-match
+    - break-at-not-match
+    - break-at-match-op
+    - dual-break-at-match
+    - dual-break-at-not-match
+    - dual-break-at-match-op
+    - secondary-break-at-match
+    - secondary-break-at-not-match
+    - secondary-break-at-match-op
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)

@@ -15661,6 +15661,9 @@ document).  Alternatively, use the \longarg{debug} switch to show
 the break points in the transcript. (This will also show the
 collation rule.) 
 
+If you want to selectively apply break points only to certain
+entries, use \csopt{break-at-match} or \csopt{break-at-not-match}.
+
 \optsection{break-marker}
 
 This option automatically implements the dual and secondary settings
@@ -15676,6 +15679,49 @@ inter-word punctuation. For example, with
 \code{TomDickandHarry} and \qt{sea lion} simply becomes
 \code{sealion}. If \meta{marker} is omitted,
 \csopt[\empty]{break-marker} is assumed.
+
+\optsection{break-at-match}
+
+This option automatically implements
+\csopt[\meta{option}]{dual-break-at-match} and
+\csopt[\meta{option}]{secondary-break-at-match}.
+
+If you have \csopt{break-at} set to create break points (for
+example, with \csopt[word]{break-at}) then you can specify which
+entries should have break points with this option. The value has the same
+syntax as \csopt{match}. If an entry matches the criteria, then 
+break points are added, otherwise no break points are added.
+For example, to only have break points for entries defined with \atentry{index}
+or \atentry{indexplural}:
+\begin{codeenv}
+\csopt[entrytype=index(plural)?]{break-at-match}
+\end{codeenv}
+This option has no effect with \csopt[none]{break-at}.
+
+\optsection{break-at-match-op}
+This option automatically implements
+\csopt[\meta{option}]{dual-break-at-match-op} and
+\csopt[\meta{option}]{secondary-break-at-match-op}.
+
+If the value of \csopt{break-at-match} contains more than one 
+\meta{key}=\meta{pattern} element, the \csopt{break-at-match-op}
+determines whether to apply a logical AND or a logical OR.
+The \meta{value} may be either \optfmt{and} or \optfmt{or}.
+The default is \csopt[and]{break-at-match-op}.
+
+\optsection{break-at-not-match}
+
+This option automatically implements
+\csopt[\meta{option}]{dual-break-at-not-match} and
+\csopt[\meta{option}]{secondary-break-at-not-match}.
+
+ For example, to prevent entries defined with
+\atentry{symbol} from having break points:
+\begin{codeenv}
+\csopt[entrytype=symbol]{break-at-not-match}
+\end{codeenv}
+Like \csopt{break-at-match} but negates the match.
+This option has no effect with \csopt[none]{break-at}.
 
 \optsection{sort-number-pad}
 
@@ -16714,6 +16760,18 @@ As \csopt{break-at} but for \glsdisp{secondaryglossary}{secondary} entries.
 
 As \csopt{break-marker} but for \glsdisp{secondaryglossary}{secondary} entries.
 
+\optsection[\subsubsection]{secondary-break-at-match}
+
+As \csopt{break-at-match} but for \glsdisp{secondaryglossary}{secondary} entries.
+
+\optsection[\subsubsection]{secondary-break-at-match-op}
+
+As \csopt{break-at-match-op} but for \glsdisp{secondaryglossary}{secondary} entries.
+
+\optsection[\subsubsection]{secondary-break-at-not-match}
+
+As \csopt{break-at-not-match} but for \glsdisp{secondaryglossary}{secondary} entries.
+
 \optsection{secondary-sort-number-pad}
 
 As \csopt{sort-number-pad} but for \glsdisp{secondaryglossary}{secondary} entries.
@@ -17178,6 +17236,18 @@ As \csopt{break-at} but for \glspl{dualentry}.
 \optsection[\subsubsection]{dual-break-marker}
 
 As \csopt{break-marker} but for \glspl{dualentry}.
+
+\optsection[\subsubsection]{dual-break-at-match}
+
+As \csopt{break-at-match} but for \glspl{dualentry}.
+
+\optsection[\subsubsection]{dual-break-at-match-op}
+
+As \csopt{break-at-match-op} but for \glspl{dualentry}.
+
+\optsection[\subsubsection]{dual-break-at-not-match}
+
+As \csopt{break-at-not-match} but for \glspl{dualentry}.
 
 \optsection[\subsubsection]{dual-sort-number-pad}
 

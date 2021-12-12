@@ -1,0 +1,17 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,nostyles,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  break-at-match={entrytype=index(plural)?},
+  %break-at-not-match={entrytype=symbol},
+  symbol-sort-fallback={name},
+  selection=all
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}

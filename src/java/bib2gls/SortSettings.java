@@ -22,6 +22,9 @@ import java.util.Locale;
 import java.util.IllformedLocaleException;
 import java.util.MissingResourceException;
 import java.util.Vector;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -625,6 +628,38 @@ public class SortSettings
       return breakPointMarker;
    }
 
+   public void setBreakAtMatch(HashMap<String,Pattern> matchMap)
+   {
+      breakAtNotMatch = true;
+      breakAtMatchMap = matchMap;
+   }
+
+   public void setBreakAtNotMatch(HashMap<String,Pattern> matchMap)
+   {
+      breakAtNotMatch = false;
+      breakAtMatchMap = matchMap;
+   }
+
+   public void setBreakAtNotMatchAnd(boolean and)
+   {
+      breakAtMatchAnd = and;
+   }
+
+   public boolean isBreakAtOn(Bib2GlsEntry entry)
+   {
+      if (breakPoint == Bib2GlsEntryComparator.BREAK_NONE)
+      {
+         return false;
+      }
+
+      if (breakAtMatchMap == null)
+      {
+         return true;
+      }
+
+      return (breakAtNotMatch ^ GlsResource.notMatch(bib2gls, entry, breakAtMatchAnd,
+       breakAtMatchMap));
+   }
 
    public void setSuffixOption(int option)
    {
@@ -893,6 +928,10 @@ public class SortSettings
    private String missingFieldFallback=null;
 
    private Vector<PatternReplace> regexList = null;
+
+   private HashMap<String,Pattern> breakAtMatchMap = null;
+   private boolean breakAtNotMatch = false;
+   private boolean breakAtMatchAnd = true;
 
    private Bib2Gls bib2gls;
 }

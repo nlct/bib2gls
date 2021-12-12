@@ -43,7 +43,6 @@ public class Bib2GlsEntryComparator extends SortComparator
         entryType);
 
       int breakPoint = settings.getBreakPoint();
-      String breakMarker = settings.getBreakPointMarker();
 
       if (settings.isCustom())
       {
@@ -53,7 +52,7 @@ public class Bib2GlsEntryComparator extends SortComparator
          {
             Locale docLocale = bib2gls.getDefaultLocale();
    
-            setBreakPoint(breakPoint, breakMarker, docLocale);
+            setBreakPoint(breakPoint, docLocale);
          }
       }
       else
@@ -62,7 +61,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
          collator = Collator.getInstance(locale);
 
-         setBreakPoint(breakPoint, breakMarker, locale);
+         setBreakPoint(breakPoint, locale);
       }
 
       collator.setStrength(settings.getCollatorStrength());
@@ -75,12 +74,8 @@ public class Bib2GlsEntryComparator extends SortComparator
       }
    }
 
-   private void setBreakPoint(int breakPoint, String breakMarker,
-      Locale locale)
+   private void setBreakPoint(int breakPoint, Locale locale)
    {
-      breakPointMarker = breakMarker;
-      this.breakPoint = breakPoint;
-
       if (locale == null)
       {
          locale = Locale.getDefault();
@@ -108,6 +103,16 @@ public class Bib2GlsEntryComparator extends SortComparator
             throw new IllegalArgumentException("Invalid break identifier: "
               +breakPoint);
       }
+   }
+
+   public int getBreakPoint()
+   {
+      return settings.getBreakPoint();
+   }
+
+   public String getBreakPointMarker()
+   {
+      return settings.getBreakPointMarker();
    }
 
    @Override
@@ -168,12 +173,12 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       String grp = null;
 
-      value = breakPoints(value).toString();
-
-      if (breakPoint != BREAK_NONE)
+      if (settings.isBreakAtOn(entry))
       {
+         value = breakPoints(value).toString();
+
          bib2gls.debug(bib2gls.getMessage("message.break.points",
-           value));
+              value));
       }
 
       entry.putField(sortStorageField, value);
@@ -474,7 +479,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
             if (!Character.isLowerCase(nextCodePoint))
             {
-               buff.append(breakPointMarker);
+               buff.append(getBreakPointMarker());
             }
          }
       }
@@ -499,7 +504,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
             if (Character.isUpperCase(nextCodePoint))
             {
-               buff.append(breakPointMarker);
+               buff.append(getBreakPointMarker());
             }
          }
       }
@@ -509,7 +514,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
    public CharSequence breakPoints(String target)
    {
-      switch (breakPoint)
+      switch (getBreakPoint())
       {
          case BREAK_UPPER_NOTLOWER:
          case BREAK_UPPER_NOTLOWER_WORD:
@@ -542,7 +547,7 @@ public class Bib2GlsEntryComparator extends SortComparator
           if (Character.isLetterOrDigit(codePoint))
           {
              buff.append(word);
-             buff.append(breakPointMarker);
+             buff.append(getBreakPointMarker());
           }
 
           start = end;
@@ -555,10 +560,6 @@ public class Bib2GlsEntryComparator extends SortComparator
    private Collator collator;
 
    private BreakIterator breakIterator=null;
-
-   private String breakPointMarker="|";
-
-   private int breakPoint;
 
    public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
      BREAK_SENTENCE=3, BREAK_UPPER_NOTLOWER=4, BREAK_UPPER_UPPER=5,
