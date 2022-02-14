@@ -3741,6 +3741,14 @@ For example:
 See the \sty{glossaries-extra} user manual~\cite{glossaries-extra} 
 for further details.
 
+\begin{important}
+Take care not to confuse the \field{recordcount} field with the \field{indexed}
+field. The \field{indexed} field keeps a running total of the number of times an
+entry has been recorded \emph{so far}, and is updated every time the entry is
+indexed during the current \LaTeX\ run. The \field{recordcount} field stores the total number of records
+obtained by \bibgls\ from the \ext{aux} file.
+\end{important}
+
 \argsection{no-record-count}
 
 Switch off record counting. (Default.)
@@ -13354,6 +13362,12 @@ followed by \code{\ics{label}\marg{wrglossary.\meta{n}}} where
 This option is intended for use with the \sty{hyperref} package to
 allow \glspl{location} to link back to the particular part of the page where
 the term was referenced rather than to the top of the page.
+
+\begin{important}
+Take care not to confuse this with the \field{indexed} special internal field
+introduced in \sty{glossaries-extra} v1.49+. This is incremented on a per-entry basis 
+and does not have an associated counter.
+\end{important}
 
 The \styopt{indexcounter} package option also automatically
 implements the option \styopt[wrglossary]{counter}, which means that
