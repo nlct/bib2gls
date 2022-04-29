@@ -7597,17 +7597,42 @@ public class GlsResource
       return list;
    }
 
+   /**
+    * Determines if given record matches any of the labels.
+    * @param primaryId label of primary entry
+    * @param dualId label of dual entry
+    * @param tertiaryId tertiary label
+    * @param record the record under investigation
+    * @return the record if the record label matches 
+    * or null if no match
+    */ 
    public GlsRecord getRecord(String primaryId, String dualId,
      String tertiaryId, GlsRecord record)
    {
       return record.getRecord(this, primaryId, dualId, tertiaryId);
    }
 
+   /**
+    * Gets the entry that matches the given record. Searches both
+    * the primary and dual data lists.
+    * @param record the record
+    * @return the entry that matches the record label or null if not
+    * found
+    */ 
    public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record)
    {
       return record.getEntry(this, bibData, dualData);
    }
 
+   /**
+    * Gets the entry that matches the given record.
+    * @param record the record
+    * @param data the list of data to search for the entry
+    * @param tryFlipping if true try matching the flipped label if
+    * no match on the label
+    * @return the entry that matches the record label or null if not
+    * found
+    */ 
    public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record,
       Vector<Bib2GlsEntry> data, boolean tryFlipping)
    {
@@ -7627,6 +7652,11 @@ public class GlsResource
       return recordLabelPrefix+label;
    }
 
+   /**
+    * Gets the prefixed label associated with the record.
+    * @param record the cross-reference record
+    * @return the prefixed label
+    */ 
    public String getRecordLabel(GlsSeeRecord record)
    {
       if (recordLabelPrefix == null)
@@ -7637,6 +7667,13 @@ public class GlsResource
       return recordLabelPrefix+record.getLabel();
    }
 
+   /**
+    * Adds the given entry to the list of selected entries. Also
+    * sets the entry's selected status to true. Doesn't add the
+    * entry if it has already been added.
+    * @param entries the list of selected entries
+    * @param entry the entry to add to the list
+    */ 
    private void addEntry(Vector<Bib2GlsEntry> entries, Bib2GlsEntry entry)
    {
       String id = entry.getId();
@@ -7656,6 +7693,22 @@ public class GlsResource
       entry.setSelected(true);
    }
 
+   /**
+    * Processes the data (internal stage 4).
+    * Selects entries, creates missing parents, and
+    * processes dependencies. If no sorting is required, the
+    * required entries with records are added to the selection in order of
+    * definition. If all entries must be selected then they are
+    * added in order of definition. Otherwise entries are added
+    * according to their records, which means they'll be in the
+    * correct order for sort=use.
+    * @param data the list of entries
+    * @param entries the list of selected entries
+    * @param entrySort the sort method (determines how to add the
+    * data to the list)
+    * @throws Bib2GlsException if a parser error occurs
+    * @see #processBibData()
+    */ 
    private void processData(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries, String entrySort)
       throws Bib2GlsException
@@ -8029,6 +8082,13 @@ public class GlsResource
       }
    }
 
+   /**
+    * Process dependencies. Adds dependencies and (if
+    * flatten-lonely=presort) flattens lonely child entries.
+    * @param data the list of entries
+    * @param entries the list of selected entries
+    * @throws Bib2GlsException if a parser error occurs
+    */ 
    private void processDeps(Vector<Bib2GlsEntry> data, 
       Vector<Bib2GlsEntry> entries)
       throws Bib2GlsException
@@ -8088,6 +8148,15 @@ public class GlsResource
 
    }
 
+   /**
+    * Sorts the data if required. Also sorts any identified label
+    * lists if set ("sort-label-list" option).
+    * @param entries the list of selected entries
+    * @param settings the sort settings
+    * @param entryGroupField the field to use to store the group
+    * label, if required
+    * @throws Bib2GlsException if a parser error occurs
+    */ 
    private void sortDataIfRequired(Vector<Bib2GlsEntry> entries,
      SortSettings settings, String entryGroupField)
     throws Bib2GlsException
@@ -8117,6 +8186,17 @@ public class GlsResource
       }
    }
 
+   /**
+    * Sorts the data. The sort field is determined by the sort
+    * settings.
+    * @param entries the list of selected entries
+    * @param settings the sort settings
+    * @param entryGroupField the field to use to store the group
+    * label, if required
+    * @param entryType the default entry type to use if the
+    * type field not set
+    * @throws Bib2GlsException if a parser error occurs
+    */ 
    private void sortData(Vector<Bib2GlsEntry> entries, SortSettings settings,
      String entryGroupField, String entryType)
     throws Bib2GlsException
@@ -8125,6 +8205,17 @@ public class GlsResource
        entryType);
    }
 
+   /**
+    * Sorts the data.
+    * @param entries the list of selected entries
+    * @param settings the sort settings
+    * @param sortField the field to use as the sort value
+    * @param entryGroupField the field to use to store the group
+    * label, if required
+    * @param entryType the default entry type to use if the
+    * type field not set
+    * @throws Bib2GlsException if a parser error occurs
+    */ 
    private void sortData(Vector<Bib2GlsEntry> entries, SortSettings settings,
      String sortField, String entryGroupField, String entryType)
     throws Bib2GlsException
@@ -8198,6 +8289,15 @@ public class GlsResource
       mergeSmallGroups(entries, entryGroupField);
    }
 
+   /**
+    * Processes the data (internal stage 4).
+    * Checks the field map keys, selects required entries, 
+    * truncates (if applicable), sorts (if applicable), and writes
+    * the glstex file.
+    * @throws IOException if I/O error occurs 
+    * @throws Bib2GlsException if a syntax error occurs
+    * @return the total number of selected entries
+    */ 
    private int processBibData()
       throws IOException,Bib2GlsException
    {
@@ -9259,6 +9359,11 @@ public class GlsResource
       return entryCount;
    }
 
+   /**
+    * Writes the definition of {@code \\bibglslocprefix}.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeLocPrefixDef(PrintWriter writer)
      throws IOException
    {
@@ -9276,6 +9381,11 @@ public class GlsResource
       writer.println(" }%");
    }
 
+   /**
+    * Writes the definition of {@code \\bibglslocsuffix}.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeLocSuffixDef(PrintWriter writer)
      throws IOException
    {
@@ -9302,6 +9412,11 @@ public class GlsResource
       writer.println("}%");
    }
 
+   /**
+    * Adds the given entry to the secondary list.
+    * @param entry the entry
+    * @param secondaryList the secondary list
+    */ 
    private void addToSecondaryList(Bib2GlsEntry entry, 
       Vector<Bib2GlsEntry> secondaryList)
    {
@@ -9341,6 +9456,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Writes the definition of {@code \\bibglscontributor}.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    public void writeBibGlsContributorDef(PrintWriter writer)
      throws IOException
    {
@@ -9367,6 +9487,12 @@ public class GlsResource
       writer.println("}");
    }
 
+   /**
+    * Writes the code to provide a glossary.
+    * @param writer the file writer stream
+    * @param type the glossary label
+    * @throws IOException if I/O error occurs
+    */ 
    private void provideGlossary(PrintWriter writer, String type)
      throws IOException
    {
@@ -9384,6 +9510,13 @@ public class GlsResource
       }
    }
 
+   /**
+    * Writes the code that defines the entry.
+    * @param writer the file writer stream
+    * @param entry the entry
+    * @throws IOException if I/O error occurs
+    * @throws Bib2GlsException if syntax error occurs
+    */ 
    private void writeBibEntryDef(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException,Bib2GlsException
    {
@@ -9669,6 +9802,10 @@ public class GlsResource
       }
    }
 
+   /**
+    * Adds the given field to the list of valid field names.
+    * @param field the field name
+    */ 
    public void addUserField(String field)
    {
       if (additionalUserFields == null)
@@ -9681,6 +9818,12 @@ public class GlsResource
       bib2gls.verboseMessage("message.added.user.field", field);
    }
 
+   /**
+    * Writes the code that copies the entry.
+    * @param writer the file writer stream
+    * @param entry the entry
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeBibEntryCopy(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException
    {
@@ -9739,6 +9882,14 @@ public class GlsResource
       }
    }
 
+   /**
+    * Writes the code that defines or copies the entry.
+    * The "action" setting determines whether to define the entry or
+    * copy the entry.
+    * @param writer the file writer stream
+    * @param entry the entry
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeBibEntry(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException,Bib2GlsException
    {
@@ -9776,6 +9927,11 @@ public class GlsResource
       writer.println();
    }
 
+   /**
+    * Writes the code that defines the group titles.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    private boolean writeGroupDefs(PrintWriter writer)
      throws IOException
    {
@@ -9817,6 +9973,12 @@ public class GlsResource
       return allowHyper;
    }
 
+   /**
+    * Writes the code that copies an entry.
+    * @param writer the file writer stream
+    * @param entry the entry to copy
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeCopyToGlossary(PrintWriter writer, Bib2GlsEntry entry)
      throws IOException
    {
@@ -9842,6 +10004,13 @@ public class GlsResource
       writer.println();
    }
 
+   /**
+    * Writes the code that sets the widest name.
+    * @param writer the file writer stream
+    * @param font the font to use to determine the text width
+    * @param frc the font render context
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeWidestNames(PrintWriter writer, 
      Font font, FontRenderContext frc)
     throws IOException
@@ -9955,6 +10124,13 @@ public class GlsResource
 
    }
 
+   /**
+    * Writes the code that provides the all caps entry reference commands.
+    * These commands may already be defined by glossaries-extra.sty
+    * or may already have been defined in an earlier resource set.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeAllCapsCsDefs(PrintWriter writer)
       throws IOException
    {
@@ -9979,6 +10155,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Writes the code that can be used to pick up the label prefixes.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeLabelPrefixHooks(PrintWriter writer)
       throws IOException
    {
@@ -10000,12 +10181,28 @@ public class GlsResource
       }
    }
 
+   /**
+    * Calculates the width of the entry's name and updates the
+    * current widest name, if applicable.
+    * @param entry the entry
+    * @param font the font to use to determine the text width
+    * @param frc the font render context
+    */ 
    private void updateWidestName(Bib2GlsEntry entry, 
      Font font, FontRenderContext frc)
    {
       updateWidestName(entry, null, font, frc);
    }
 
+   /**
+    * Calculates the width of the entry's name and updates the
+    * current widest name, if applicable.
+    * @param entry the entry
+    * @param entryType the associated glossary label or null if not
+    * known
+    * @param font the font to use to determine the text width
+    * @param frc the font render context
+    */ 
    private void updateWidestName(Bib2GlsEntry entry, String entryType,
      Font font, FontRenderContext frc)
    {
@@ -10079,6 +10276,9 @@ public class GlsResource
 
    }
 
+   /**
+    * Clears the child list for each entry.
+    */ 
    private void clearChildLists()
    {
       if (childListUpdated)
@@ -10093,6 +10293,9 @@ public class GlsResource
       }
    }
 
+   /**
+    * Update the child list for each entry.
+    */ 
    public void updateChildLists()
    {
       if (!childListUpdated)
@@ -10120,11 +10323,24 @@ public class GlsResource
       }
    }
 
+   /**
+    * Determines if the hierarchical information needs to be known
+    * early.
+    */ 
    private boolean needsEarlyHierarchy()
    {
       return saveChildCount || saveSiblingCount || saveRootAncestor;
    }
 
+   /**
+    * Checks the parent value for the given entry.
+    * If the flatten setting is on, the parent field will be
+    * removed. If the entry has a parent, it's searched for and
+    * added if found otherwise the parent field is removed.
+    * @param entry the entry
+    * @param i the entry's index in the list
+    * @param list the list of entries
+    */ 
    private void checkParent(Bib2GlsEntry entry, int i, 
       Vector<Bib2GlsEntry> list)
    {
@@ -10181,12 +10397,23 @@ public class GlsResource
       entry.removeFieldValue("parent");
    }
 
+   /**
+    * Gets the control sequence name to use for a flattened lonely
+    * child.
+    * @return the control sequence name
+    */ 
    private String flattenLonelyCsName()
    {
       return flattenLonely == FLATTEN_LONELY_PRE_SORT ?
          "bibglsflattenedchildpresort" : "bibglsflattenedchildpostsort";
    }
 
+   /**
+    * Flattens a child entry.
+    * @param parent the parent entry
+    * @param child the child entry
+    * @param entries the list of entries
+    */ 
    private void flattenChild(Bib2GlsEntry parent, Bib2GlsEntry child,
       Vector<Bib2GlsEntry> entries)
    {
@@ -10340,7 +10567,11 @@ public class GlsResource
       }
    }
 
-
+   /**
+    * Gets the bib value as a TeX parser group.
+    * @param bibValue the bib value
+    * @param listener the listener used to parse the value
+    */ 
    private Group getContents(BibValueList bibValue, L2HStringConverter listener)
    {
       TeXObject contents = bibValue.getContents(true);
@@ -10373,6 +10604,10 @@ public class GlsResource
       }
    }
 
+   /**
+    * Flattens all lonely children in the given list.
+    * @param entries the list of entries
+    */ 
    private void flattenLonelyChildren(Vector<Bib2GlsEntry> entries)
    {
       // This has to be done first to ensure the parent-child
@@ -10487,11 +10722,22 @@ public class GlsResource
 
    }
 
+   /**
+    * Gets the "flatten" setting.
+    * @return true if flatten setting on otherwise returns false
+    */ 
    public boolean flattenSort()
    {
       return flatten;
    }
 
+   /**
+    * Assigns the glossary type for the given entry, if applicable.
+    * If the type has been identified by the relevant setting, the
+    * "type" field will be set. If the type can't be determined from
+    * the settings, the field won't be set.
+    * @param entry the entry
+    */ 
    private void setType(Bib2GlsEntry entry)
    {
       if (triggerType != null && entry.hasTriggerRecord())
@@ -10527,6 +10773,14 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets a list of all known glossary types. These are all the
+    * types that can be set via various settings. Doesn't include 
+    * values of the "type" field that may have been set via other
+    * means (such as explicitly within the bib file or by copying
+    * another field).
+    * @return list of all known glossary types (empty if none known)
+    */ 
    public Vector<String> getAllKnownTypes()
    {
       Vector<String> types = new Vector<String>();
@@ -10579,11 +10833,26 @@ public class GlsResource
       return types;
    }
 
+   /**
+    * Assigns the category for the given entry, if applicable.
+    * If the category has been identified by the relevant setting, the
+    * "category" field will be set. If the category can't be determined from
+    * the settings, the field won't be set.
+    * @param entry the entry
+    */ 
    private void setCategory(Bib2GlsEntry entry)
    {
       setCategory(entry, category);
    }
 
+   /**
+    * Assigns the category for the given entry.
+    * The category label is first determined according to the
+    * settings. If it can't be determined, the fallback will be used
+    * (if not null)
+    * @param entry the entry
+    * @param catLabel the fallback (may be null)
+    */ 
    private void setCategory(Bib2GlsEntry entry, String catLabel)
    {
       if (catLabel != null)
@@ -10597,6 +10866,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Sets the counter field for the given entry.
+    * If the "counter" setting has been supplied, this will set the
+    * entry's "counter" field. Does nothing if no counter set.
+    * @param entry the entry
+    */ 
    private void setCounter(Bib2GlsEntry entry)
    {
       if (counter != null)
@@ -10605,6 +10880,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Sets the counter field for the given dual entry.
+    * If the "dual-counter" setting has been supplied, this will set the
+    * entry's "counter" field. Does nothing if no counter set.
+    * @param dual the dual entry
+    */ 
    private void setDualCounter(Bib2GlsEntry dual)
    {
       if (dualCounter != null)
@@ -10625,6 +10906,10 @@ public class GlsResource
       }
    }
 
+   /**
+    * Sets the type field for the given dual entry, if applicable.
+    * @param dual the dual entry
+    */ 
    private void setDualType(Bib2GlsEntry dual)
    {
       if (triggerType != null && dual.hasTriggerRecord())
@@ -10642,6 +10927,10 @@ public class GlsResource
       }
    }
 
+   /**
+    * Sets the category field for the given dual entry, if applicable.
+    * @param dual the dual entry
+    */ 
    private void setDualCategory(Bib2GlsEntry dual)
    {
       if (dualCategory != null)
@@ -10655,16 +10944,32 @@ public class GlsResource
       }
    }
 
+   /**
+    * Determines whether or not this resource set has skipped
+    * fields.
+    * @return true if this resource set has skipped fields otherwise
+    * false
+    */ 
    public boolean hasSkippedFields()
    {
       return skipFields != null && skipFields.length != 0;
    }
 
+   /**
+    * Gets the array of skipped fields.
+    * @return the array of skipped fields
+    */ 
    public String[] getSkipFields()
    {
       return skipFields;
    }
 
+   /**
+    * Determines whether or not the given field should be skipped.
+    * @param field the field
+    * @return true if the field should be skipped otherwise
+    * false
+    */ 
    public boolean skipField(String field)
    {
       if (skipFields == null)
@@ -10683,11 +10988,21 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the contributor order setting.
+    * @return numeric identifier corresponding to "contributor-order" setting
+    */  
    public byte getContributorOrder()
    {
       return contributorOrder;
    }
 
+   /**
+    * Determines whether or not the given field is identified as a
+    * bibtex author field.
+    * @param field the field
+    * @return true if the field is an author field
+    */  
    public boolean isBibTeXAuthorField(String field)
    {
       if (bibtexAuthorList == null)
@@ -10706,11 +11021,22 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the interpret fields action setting.
+    * @return numeric identifier corresponding to
+    * "interpret-fields-action" setting
+    */  
    public byte getInterpretFieldAction()
    {
       return interpretFieldAction;
    }
 
+   /**
+    * Determines whether or not the given field should be
+    * interpreted.
+    * @param field the field
+    * @return true if the field should be interpreted
+    */  
    public boolean isInterpretField(String field)
    {
       if (interpretFields == null)
@@ -10729,41 +11055,82 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the array of fields that should have Unicode characters
+    * converted. Corresponds to the "hex-unicode-fields" setting.
+    * @return the array of fields
+    */  
    public String[] getHexUnicodeFields()
    {
       return hexUnicodeFields;
    }
 
+   /**
+    * Gets the record label prefix.
+    * Corresponds to the "record-label-prefix" setting.
+    * @return the record label prefix or null if not set
+    */  
    public String getRecordLabelPrefix()
    {
       return recordLabelPrefix;
    }
 
+   /**
+    * Gets the primary label prefix.
+    * Corresponds to the "label-prefix" setting.
+    * @return the primary label prefix or null if not set
+    */  
    public String getLabelPrefix()
    {
       return labelPrefix;
    }
 
+   /**
+    * Gets the dual label prefix.
+    * Corresponds to the "dual-prefix" setting.
+    * @return the dual label prefix or null if not set
+    */  
    public String getDualPrefix()
    {
       return dualPrefix;
    }
 
+   /**
+    * Gets the tertiary type.
+    * Corresponds to the "tertiary-type" setting.
+    * @return the tertiary type or null if not set
+    */  
    public String getTertiaryType()
    {
       return tertiaryType;
    }
 
+   /**
+    * Gets the tertiary label prefix.
+    * Corresponds to the "tertiary-prefix" setting.
+    * @return the tertiary label prefix or null if not set
+    */  
    public String getTertiaryPrefix()
    {
       return tertiaryPrefix;
    }
 
+   /**
+    * Gets the tertiary category.
+    * Corresponds to the "tertiary-category" setting.
+    * @return the tertiary category or null if not set
+    */  
    public String getTertiaryCategory()
    {
       return tertiaryCategory;
    }
 
+   /**
+    * Gets the external prefix corresponding to the given index.
+    * Corresponds to given index within the "ext-prefixes" setting.
+    * @param idx the index
+    * @return the external prefix or null if not set
+    */  
    public String getExternalPrefix(int idx)
    {
       if (externalPrefixes == null) return null;
@@ -10776,146 +11143,278 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the command label prefix.
+    * Corresponds to the "cs-label-prefix" setting.
+    * @return the command label prefix or null if not set
+    */  
    public String getCsLabelPrefix()
    {
       return csLabelPrefix;
    }
 
+   /**
+    * Gets the dual sort field.
+    * @return the sort field for the dual list
+    */  
    public String getDualSortField()
    {
       return dualSortSettings.getSortField();
    }
 
+   /**
+    * Gets the default plural suffix.
+    * @return the plural suffix
+    */  
    public String getPluralSuffix()
    {
       return pluralSuffix;
    }
 
+   /**
+    * Gets the default abbreviation plural suffix.
+    * @return the abbreviation plural suffix
+    */  
    public String getShortPluralSuffix()
    {
       return shortPluralSuffix;
    }
 
+   /**
+    * Gets the default dual plural suffix.
+    * @return the plural dual suffix
+    */  
    public String getDualPluralSuffix()
    {
       return dualPluralSuffix;
    }
 
+   /**
+    * Gets the default dual abbreviation plural suffix.
+    * @return the plural dual suffix for abbreviations
+    */  
    public String getDualShortPluralSuffix()
    {
       return dualShortPluralSuffix;
    }
 
+   /**
+    * Gets the dual entry map.
+    * Corresponds to the "dual-entry-map" setting.
+    * @return the dual entry map or null if not set
+    */ 
    public HashMap<String,String> getDualEntryMap()
    {
       return dualEntryMap;
    }
 
+   /**
+    * Gets the first key for the dual entry map.
+    * Corresponds to the first field in the "dual-entry-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualEntryMap()
    {
       return dualEntryFirstMap;
    }
 
+   /**
+    * Gets the back-link for the dual entry map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualEntryMap()
    {
       return backLinkDualEntry;
    }
 
+   /**
+    * Gets the dual symbol map.
+    * Corresponds to the "dual-symbol-map" setting.
+    * @return the dual symbol map or null if not set
+    */ 
    public HashMap<String,String> getDualSymbolMap()
    {
       return dualSymbolMap;
    }
 
+   /**
+    * Gets the first key for the dual symbol map.
+    * Corresponds to the first field in the "dual-symbol-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualSymbolMap()
    {
       return dualSymbolFirstMap;
    }
 
+   /**
+    * Gets the back-link for the dual symbol map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualSymbolMap()
    {
       return backLinkDualSymbol;
    }
 
+   /**
+    * Gets the dual abbreviation map.
+    * Corresponds to the "dual-abbrv-map" setting.
+    * @return the dual abbreviation map or null if not set
+    */ 
    public HashMap<String,String> getDualAbbrevMap()
    {
       return dualAbbrevMap;
    }
 
+   /**
+    * Gets the dual abbreviation-entry map.
+    * Corresponds to the "dual-entryabbrv-map" setting.
+    * @return the dual entry-abbreviation map or null if not set
+    */ 
    public HashMap<String,String> getDualAbbrevEntryMap()
    {
       return dualAbbrevEntryMap;
    }
 
+   /**
+    * Gets the dual index-entry map.
+    * Corresponds to the "dual-indexentry-map" setting.
+    * @return the dual index-entry map or null if not set
+    */ 
    public HashMap<String,String> getDualIndexEntryMap()
    {
       return dualIndexEntryMap;
    }
 
+   /**
+    * Gets the dual index-symbol map.
+    * Corresponds to the "dual-indexsymbol-map" setting.
+    * @return the dual index-symbol map or null if not set
+    */ 
    public HashMap<String,String> getDualIndexSymbolMap()
    {
       return dualIndexSymbolMap;
    }
 
+   /**
+    * Gets the dual index-abbreviation map.
+    * Corresponds to the "dual-indexabbrv-map" setting.
+    * @return the dual index-abbreviation map or null if not set
+    */ 
    public HashMap<String,String> getDualIndexAbbrevMap()
    {
       return dualIndexAbbrevMap;
    }
 
+   /**
+    * Gets the first key for the dual abbreviation map.
+    * Corresponds to the first field in the "dual-abbrv-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualAbbrevMap()
    {
       return dualAbbrevFirstMap;
    }
 
+   /**
+    * Gets the first key for the dual abbreviation-entry map.
+    * Corresponds to the first field in the "dual-abbrventry-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualAbbrevEntryMap()
    {
       return dualAbbrevEntryFirstMap;
    }
 
+   /**
+    * Gets the first key for the dual index-entry map.
+    * Corresponds to the first field in the "dual-indexentry-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualIndexEntryMap()
    {
       return dualIndexEntryFirstMap;
    }
 
+   /**
+    * Gets the first key for the dual index-symbol map.
+    * Corresponds to the first field in the "dual-indexsymbol-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualIndexSymbolMap()
    {
       return dualIndexSymbolFirstMap;
    }
 
+   /**
+    * Gets the first key for the dual index-abbrviation map.
+    * Corresponds to the first field in the "dual-indexabbrv-map".
+    * @return the key or null if not set
+    */ 
    public String getFirstDualIndexAbbrevMap()
    {
       return dualIndexAbbrevFirstMap;
    }
 
+   /**
+    * Gets the back-link for the dual abbreviation map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualAbbrevMap()
    {
       return backLinkDualAbbrev;
    }
 
+   /**
+    * Gets the back-link for the dual abbreviation-entry map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualAbbrevEntryMap()
    {
       return backLinkDualAbbrevEntry;
    }
 
+   /**
+    * Gets the back-link for the dual index-entry map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualIndexEntryMap()
    {
       return backLinkDualIndexEntry;
    }
 
+   /**
+    * Gets the back-link for the dual index-symbol map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualIndexSymbolMap()
    {
       return backLinkDualIndexSymbol;
    }
 
+   /**
+    * Gets the back-link for the dual index-abbreviation map.
+    * @return the back-link entry or null if not set
+    */ 
    public boolean backLinkFirstDualIndexAbbrevMap()
    {
       return backLinkDualIndexAbbrev;
    }
 
+   /**
+    * Gets the dual field.
+    * Corresponds to the "dual-field" setting.
+    * @return the dual field or null if not set
+    */ 
    public String getDualField()
    {
       return dualField;
    }
 
+   /**
+    * Checks the field maps are valid.
+    * @throws Bib2GlsException if any listed fields are invalid
+    */ 
    private void checkFieldMaps(HashMap<String,String> mapping, String optName)
     throws Bib2GlsException
    {
@@ -10940,7 +11439,11 @@ public class GlsResource
       }
    }
 
-   // Allow for entries to be filtered out
+   /**
+    * Determines whether or not the entry should be discarded.
+    * @param entry the entry
+    * @return true if the entry should be discarded otherwise false
+    */ 
    public boolean discard(Bib2GlsEntry entry)
    {
       if (fieldPatterns == null || matchAction != MATCH_ACTION_FILTER)
@@ -10953,22 +11456,53 @@ public class GlsResource
       return notMatch ? !discard : discard;
    }
 
+   /**
+    * Determines whether or not the entry does not match the field
+    * pattern filter. Not match means the entry should be discarded
+    * unless the match has been negated.
+    * @param entry the entry
+    * @return true if the entry does not match otherwise false
+    */ 
    private boolean notMatch(Bib2GlsEntry entry)
    {
       return notMatch(entry, fieldPatternsAnd, fieldPatterns);
    }
 
+   /**
+    * Determines whether or not the entry does not match the
+    * secondary field pattern filter. Not match means the entry should be discarded
+    * unless the match has been negated.
+    * @param entry the entry
+    * @return true if the entry does not match otherwise false
+    */ 
    private boolean secondaryNotMatch(Bib2GlsEntry entry)
    {
       return notMatch(entry, secondaryFieldPatternsAnd, secondaryFieldPatterns);
    }
 
+   /**
+    * Determines whether or not the entry does not match the
+    * pattern filter.
+    * @param entry the entry
+    * @param and if true perform logical AND otherwise use OR
+    * @param patterns pattern map
+    * @return true if the entry does not match otherwise false
+    */ 
    private boolean notMatch(Bib2GlsEntry entry, boolean and, 
        HashMap<String,Pattern> patterns)
    {
       return notMatch(bib2gls, entry, and, patterns);
    }
 
+   /**
+    * Determines whether or not the entry does not match the
+    * pattern filter.
+    * @param bib2gls the application
+    * @param entry the entry
+    * @param and if true perform logical AND otherwise use OR
+    * @param patterns pattern map
+    * @return true if the entry does not match otherwise false
+    */ 
    public static boolean notMatch(Bib2Gls bib2gls, Bib2GlsEntry entry, 
        boolean and, HashMap<String,Pattern> patterns)
    {
@@ -11030,16 +11564,31 @@ public class GlsResource
       return !matches;
    }
 
+   /**
+    * Gets the post-description dot setting.
+    * Corresponds to the "post-description-dot" setting.
+    * @return the numeric identifier indicating the setting
+    */ 
    public byte getPostDescDot()
    {
       return postDescDot;
    }
 
+   /**
+    * Gets the "strip-trailing-nopost" setting.
+    * @return true if the setting is on
+    */ 
    public boolean isStripTrailingNoPostOn()
    {
       return stripTrailingNoPost;
    }
 
+   /**
+    * Determines whether or not the given field should be converted
+    * into a label.
+    * @param field the field
+    * @return true if the field should be converted to a label
+    */ 
    public boolean isLabelifyField(String field)
    {
       if (labelifyFields == null) return false;
@@ -11052,6 +11601,12 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Determines whether or not the given field should be converted
+    * into a label list.
+    * @param field the field
+    * @return true if the field should be converted to a label list
+    */ 
    public boolean isLabelifyListField(String field)
    {
       if (labelifyListFields == null) return false;
@@ -11064,11 +11619,24 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the labelify substitutions.
+    * Corresponds to the "labelify-replace" setting.
+    * @return the list of pattern substitutions or null if not set
+    */ 
    public Vector<PatternReplace> getLabelifySubstitutions()
    {
       return labelifyReplaceMap;
    }
 
+   /**
+    * Determines whether or not the given field should contain a list of
+    * dependencies.
+    * Corresponds to the "dependency-fields" setting.
+    * @param field the field
+    * @return true if the field should contain a list of
+    * dependencies
+    */ 
    public boolean isDependencyListField(String field)
    {
       if (dependencyListFields == null) return false;
@@ -11081,11 +11649,24 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Determines whether or not the end punctuation check is on for
+    * any of the fields.
+    * Corresponds to the "check-end-punctuation" setting.
+    * @return true if the check is on for one or more fields
+    */ 
    public boolean isCheckEndPuncOn()
    {
       return checkEndPunc != null;
    }
 
+   /**
+    * Determines whether or not the end punctuation check is on for
+    * the given field.
+    * Corresponds to the "check-end-punctuation" setting.
+    * @param field
+    * @return true if the check is on for the field
+    */ 
    public boolean isCheckEndPuncOn(String field)
    {
       if (checkEndPunc == null) return false;
@@ -11098,41 +11679,96 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Determines whether or not the name field should have a
+    * case-change applied.
+    * Corresponds to the "name-case-change" setting.
+    * @return true if the name field should have a case-change
+    * applied
+    */ 
    public boolean changeNameCase()
    {
       return nameCaseChange != null;
    }
 
+   /**
+    * Determines whether or not the description field should have a
+    * case-change applied.
+    * Corresponds to the "description-case-change" setting.
+    * @return true if the description field should have a case-change
+    * applied
+    */ 
    public boolean changeDescriptionCase()
    {
       return descCaseChange != null;
    }
 
+   /**
+    * Determines whether or not the short field should have a
+    * case-change applied.
+    * Corresponds to the "short-case-change" setting.
+    * @return true if the short field should have a case-change
+    * applied
+    */ 
    public boolean changeShortCase()
    {
       return shortCaseChange != null;
    }
 
+   /**
+    * Determines whether or not the short field for dual entries should have a
+    * case-change applied.
+    * Corresponds to the "dual-short-case-change" setting.
+    * @return true if the short field for dual entries should have a case-change
+    * applied
+    */ 
    public boolean changeDualShortCase()
    {
       return dualShortCaseChange != null;
    }
 
+   /**
+    * Determines whether or not the long field should have a
+    * case-change applied.
+    * Corresponds to the "long-case-change" setting.
+    * @return true if the long field should have a case-change
+    * applied
+    */ 
    public boolean changeLongCase()
    {
       return longCaseChange != null;
    }
 
+   /**
+    * Determines whether or not the long field for dual entries should have a
+    * case-change applied.
+    * Corresponds to the "dual-long-case-change" setting.
+    * @return true if the long field for dual entries should have a case-change
+    * applied
+    */ 
    public boolean changeDualLongCase()
    {
       return dualLongCaseChange != null;
    }
 
+   /**
+    * Gets the map of field case change options.
+    * Corresponds to the "field-case-change" setting.
+    * @return field case change map or null if not set
+    */ 
    public HashMap<String,String> getFieldCaseOptions()
    {
       return fieldCaseChange;
    }
 
+   /**
+    * Applies the name case change setting to the given value.
+    * Uses the "name-case-change" setting to determine how to alter
+    * the value.
+    * @param parser the TeX parser
+    * @param value the value to change
+    * @return modified value
+    */ 
    public BibValueList applyNameCaseChange(TeXParser parser, 
       BibValueList value)
     throws IOException
@@ -11140,6 +11776,14 @@ public class GlsResource
       return applyCaseChange(parser, value, nameCaseChange);
    }
 
+   /**
+    * Applies the description case change setting to the given value.
+    * Uses the "description-case-change" setting to determine how to alter
+    * the value.
+    * @param parser the TeX parser
+    * @param value the value to change
+    * @return modified value
+    */ 
    public BibValueList applyDescriptionCaseChange(TeXParser parser, 
       BibValueList value)
     throws IOException
@@ -11147,6 +11791,14 @@ public class GlsResource
       return applyCaseChange(parser, value, descCaseChange);
    }
 
+   /**
+    * Applies the short case change setting to the given value.
+    * Uses the "short-case-change" setting to determine how to alter
+    * the value.
+    * @param parser the TeX parser
+    * @param value the value to change
+    * @return modified value
+    */ 
    public BibValueList applyShortCaseChange(TeXParser parser, 
       BibValueList value)
     throws IOException
@@ -11154,6 +11806,14 @@ public class GlsResource
       return applyCaseChange(parser, value, shortCaseChange);
    }
 
+   /**
+    * Applies the dual short case change setting to the given value.
+    * Uses the "dual-short-case-change" setting to determine how to alter
+    * the value.
+    * @param parser the TeX parser
+    * @param value the value to change
+    * @return modified value
+    */ 
    public BibValueList applyDualShortCaseChange(TeXParser parser,
       BibValueList value)
     throws IOException
@@ -11161,6 +11821,14 @@ public class GlsResource
       return applyCaseChange(parser, value, dualShortCaseChange);
    }
 
+   /**
+    * Applies the long case change setting to the given value.
+    * Uses the "long-case-change" setting to determine how to alter
+    * the value.
+    * @param parser the TeX parser
+    * @param value the value to change
+    * @return modified value
+    */ 
    public BibValueList applyLongCaseChange(TeXParser parser, 
       BibValueList value)
     throws IOException
@@ -11168,6 +11836,14 @@ public class GlsResource
       return applyCaseChange(parser, value, longCaseChange);
    }
 
+   /**
+    * Applies the dual long case change setting to the given value.
+    * Uses the "dual-long-case-change" setting to determine how to alter
+    * the value.
+    * @param parser the TeX parser
+    * @param value the value to change
+    * @return modified value
+    */ 
    public BibValueList applyDualLongCaseChange(TeXParser parser,
       BibValueList value)
     throws IOException
@@ -11175,6 +11851,16 @@ public class GlsResource
       return applyCaseChange(parser, value, dualLongCaseChange);
    }
 
+   /**
+    * Determines if the given control sequence name represents a
+    * case-changing letter. That is, the lowercase/uppercase version
+    * can be obtained by simply converting the control sequence name
+    * to lowercase/uppercase. For example, {@code \\AE} and {@code \\ae} 
+    * represent upper and lowercase versions of the ae-ligature.
+    * @param csname the control sequence name
+    * @return true if the control sequence name can be changed to
+    * the opposite case
+    */
    public static boolean isUcLcCommand(String csname)
    {
       return (csname.equals("O") || csname.equals("o")
@@ -11190,6 +11876,12 @@ public class GlsResource
        );
    }
 
+   /**
+    * Converts all the objects in the list to lowercase.
+    * Skips maths and arguments of commands such as {@code \\ref}.
+    * @param list the list of TeX objects
+    * @param listener the TeX parser listener
+    */ 
    public void toLowerCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
@@ -11463,6 +12155,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Converts all the objects in the list to uppercase.
+    * Skips maths and arguments of commands such as {@code \\ref}.
+    * @param list the list of TeX objects
+    * @param listener the TeX parser listener
+    */ 
    public void toUpperCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
@@ -11774,6 +12472,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Converts the list to sentence case.
+    * @param list the list of TeX objects
+    * @param listener the TeX parser listener
+    */ 
    public void toSentenceCase(TeXObjectList list, TeXParserListener listener)
    {
       for (int i = 0, n = list.size(); i < n; i++)
@@ -11984,6 +12687,14 @@ public class GlsResource
       }
    }
 
+   /**
+    * Determines whether or not the given control sequence name
+    * corresponds to a command that should not have any case-changing applied 
+    * to its argument.
+    * @param csname the control sequence name
+    * @return true if the command's argument should not have its
+    * case-changed
+    */ 
    public boolean isNoCaseChangeCs(String csname)
    {
       if (csname.equals("si") || csname.equals("ensuremath")
@@ -12005,6 +12716,12 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Determines whether or not the given object marks a word
+    * boundary.
+    * @param object the TeX object
+    * @return true if the object marks a word boundary
+    */ 
    public boolean isWordBoundary(TeXObject object)
    {
       int codePoint = -1;
@@ -12074,6 +12791,15 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Determines whether or not the word starting at the given index is a
+    * title-case exception.
+    * @param list the list being parsed for title case change
+    * @param index the current index within the list
+    * @param wordExceptions the list of exceptions
+    * @return true if there is a word at the current position that
+    * matches one of the given list of exceptions
+    */ 
    protected boolean isWordException(TeXObjectList list, int index,
      TeXObjectList wordExceptions)
    {
@@ -12145,11 +12871,24 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Converts the list to title case.
+    * @param list the list of TeX objects
+    * @param listener the TeX parser listener
+    */ 
    public void toTitleCase(TeXObjectList list, TeXParserListener listener)
    {
       toTitleCase(list, listener, 0, bib2gls.getWordExceptionList());
    }
 
+   /**
+    * Converts the list to title case.
+    * @param list the list of TeX objects
+    * @param listener the TeX parser listener
+    * @param wordCount the current word count
+    * @param wordExceptions the list of word exceptions
+    * @return the updated current word count
+    */ 
    private int toTitleCase(TeXObjectList list, TeXParserListener listener,
      int wordCount, TeXObjectList wordExceptions)
    {
@@ -12642,6 +13381,13 @@ public class GlsResource
       return wordCount;
    }
 
+   /**
+    * Gets the corresponding sentence case control sequence name
+    * matching the given name.
+    * @param csname the control sequence name
+    * @return the sentence case control sequence name or null if
+    * unknown
+    */ 
    public String getSentenceCsName(String csname)
    {
       if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
@@ -12697,8 +13443,15 @@ public class GlsResource
       return null;
    }
 
-   // This is harder than getSentenceCsName and this method will have to
-   // fallback on that method in most cases.
+   /**
+    * Gets the corresponding title case control sequence name
+    * matching the given name.
+    * This is harder than getSentenceCsName and this method will have to
+    * fallback on that method in most cases.
+    * @param csname the control sequence name
+    * @return the title case control sequence name or sentence case
+    * control sequence, if available, or null if unknown
+   */
    public String getTitleCsName(String csname)
    {
       if (csname.toLowerCase().equals("glsxtrusefield"))
@@ -12709,6 +13462,12 @@ public class GlsResource
       return getSentenceCsName(csname);
    }
 
+   /**
+    * Gets the corresponding lowercase control sequence name
+    * matching the given name.
+    * @param csname the control sequence name
+    * @return the lower case control sequence name or null if unknown
+    */
    public String getLowerCsName(String csname)
    {
       if (csname.matches("(Gls|GLS)(pl|xtrshort|xtrlong|xtrfull|xtrp)?")
@@ -12748,6 +13507,12 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the corresponding all caps control sequence name
+    * matching the given name.
+    * @param csname the control sequence name
+    * @return the all caps control sequence name or null if unknown
+    */
    public String getAllCapsCsName(String csname)
    {
       csname = csname.toLowerCase();
@@ -12828,6 +13593,11 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Indicates that the given field needs to have an all caps entry
+    * command provided in the glstex file.
+    * @param field the field
+    */ 
    private void provideAllCapsEntryCs(String field)
    {
       if (allCapsEntryField == null)
@@ -12841,6 +13611,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Indicates that the given field needs to have an all caps entry
+    * accessibility command provided in the glstex file.
+    * @param field the field
+    */ 
    private void provideAllCapsAccessCs(String field)
    {
       if (allCapsAccessField == null)
@@ -12854,6 +13629,14 @@ public class GlsResource
       }
    }
 
+   /**
+    * Applies the appropriate case-change to the given value.
+    * @param parser the bib parser
+    * @param value the value to apply the case-change
+    * @param change the change to apply (one of: "lc-cs", "uc-cs",
+    * "firstuc-cs", "title-cs", "lc", "uc", "firstuc" or "title")
+    * @throws IOException if parser error occurs
+    */ 
    public BibValueList applyCaseChange(TeXParser parser,
       BibValueList value, String change)
     throws IOException
@@ -12927,31 +13710,57 @@ public class GlsResource
       return bibList;
    }
 
+   /**
+    * Gets the alias location setting.
+    * Corresponds to the "alias-loc" setting.
+    * @return numeric ID representing the setting
+    */ 
    public int aliasLocations()
    {
       return aliasLocations;
    }
 
+   /**
+    * Determines whether or not there are any aliases.
+    * @return true if there are aliases
+    */ 
    public boolean hasAliases()
    {
       return aliases;
    }
 
+   /**
+    * Sets whether or not there are any aliases.
+    * @param hasAliases true if there are aliases
+    */ 
    public void setAliases(boolean hasAliases)
    {
       aliases = hasAliases;
    }
 
+   /**
+    * Gets the array of location counters.
+    * @return array of location counter names
+    */ 
    public String[] getLocationCounters()
    {
       return counters;
    }
 
+   /**
+    * Gets the field used to store the group label.
+    * @return the field name or null if not set
+    */ 
    public String getGroupField()
    {
       return groupField;
    }
 
+   /**
+    * Gets the glossary type associated with the given entry.
+    * @param entry the entry
+    * @return the glossary type or null if unknown
+    */ 
    public String getType(Bib2GlsEntry entry)
    {
       String value = entry.getFieldValue("type");
@@ -12980,11 +13789,25 @@ public class GlsResource
       return getType(entry, value, false);
    }
 
+   /**
+    * Gets the glossary type associated with the given entry.
+    * @param entry the entry
+    * @param fallback the fallback value (may be null)
+    * @return the glossary type or null if unknown
+    */ 
    public String getType(Bib2GlsEntry entry, String fallback)
    {
       return getType(entry, fallback, true);
    }
 
+   /**
+    * Gets the glossary type associated with the given entry.
+    * @param entry the entry
+    * @param fallback the fallback value (may be null)
+    * @param checkField if true check if the "type" field has
+    * been set
+    * @return the glossary type or null if unknown
+    */ 
    public String getType(Bib2GlsEntry entry, String fallback, 
       boolean checkField)
    {
@@ -13071,6 +13894,11 @@ public class GlsResource
       return value;
    }
 
+   /**
+    * Gets the category for the given entry.
+    * @param entry the entry
+    * @return the category or null if unknown
+    */
    public String getCategory(Bib2GlsEntry entry)
    {
       String value = entry.getFieldValue("category");
@@ -13091,11 +13919,25 @@ public class GlsResource
       return getCategory(entry, value, false);
    }
 
+   /**
+    * Gets the category for the given entry.
+    * @param entry the entry
+    * @param fallback the fallback
+    * @return the category or null if unknown
+    */
    public String getCategory(Bib2GlsEntry entry, String fallback)
    {
       return getCategory(entry, fallback, true);
    }
 
+   /**
+    * Gets the category for the given entry.
+    * @param entry the entry
+    * @param fallback the fallback
+    * @param checkField if true check if the "category" field has
+    * been set
+    * @return the category or null if unknown
+    */
    public String getCategory(Bib2GlsEntry entry, String fallback,
      boolean checkField)
    {
@@ -13169,6 +14011,12 @@ public class GlsResource
       return value;
    }
 
+   /**
+    * Writes the hyper group definition for the given entry.
+    * @param entry the entry
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
    private void writeHyperGroupDef(Bib2GlsEntry entry, PrintWriter writer)
      throws IOException
    {
@@ -13200,6 +14048,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Assigns the group to the given entry.
+    * @param grpTitle the group information 
+    * @param entry the entry
+    */ 
    public void putGroupTitle(GroupTitle grpTitle, Bib2GlsEntry entry)
    {
       if (groupTitleMap != null)
@@ -13215,6 +14068,16 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the group data associated with the given glossary, id and
+    * parent. The key for the mapping is obtained from a combination
+    * of the entry type (which may be null), the id, and the entry's
+    * parent (which may be null).
+    * @param entryType the glossary type
+    * @param id numeric identifier associated with the group
+    * @param parent the parent
+    * @return the group data or null if not available
+    */ 
    public GroupTitle getGroupTitle(String entryType, long id, String parent)
    {
       if (groupTitleMap != null)
@@ -13225,12 +14088,24 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Determines whether or not hierarchical groups are allowed.
+    * @return true if hierarchical groups are allowed
+    */ 
    public boolean isGroupLevelsEnabled()
    {
       return !(groupLevelSetting == GROUP_LEVEL_SETTING_EXACT 
              && groupLevelSettingValue == 0);
    }
 
+   /**
+    * Assigns the group data to the entry's group field.
+    * @param entry the entry
+    * @param groupField the field used to store the group label
+    * @param groupFieldValue the field value (the LaTeX code that
+    * should expand to the group label)
+    * @param groupTitle the group data
+    */ 
    public void assignGroupField(Bib2GlsEntry entry, 
      String groupField, String groupFieldValue, GroupTitle groupTitle)
    {
@@ -13242,6 +14117,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Merges small groups, if supported.
+    * Sorting must be done first.
+    * @param entries list of sorted entries
+    * @param groupField the field used to store the group label
+    */ 
    public void mergeSmallGroups(Vector<Bib2GlsEntry> entries, String groupField)
    {
       if (groupTitleMap == null || groupTitleMap.isEmpty() || mergeSmallGroupLimit < 1)
@@ -13383,6 +14264,13 @@ public class GlsResource
       }
    }
 
+   /**
+    * Determines whether or not to use the group field for the given
+    * entry.
+    * @param entry the entry
+    * @param entries the list of entries
+    * @return true if the group field should be used
+    */ 
    public boolean useGroupField(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
    {
       if (bib2gls.useGroupField())
@@ -13422,6 +14310,13 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the alias for the given entry bib type.
+    * Uses the mapping identified by the "entry-type-aliases"
+    * setting.
+    * @param entryType the bib entry type
+    * @return the alias or the original entry type if not set
+    */ 
    public String mapEntryType(String entryType)
    {
       if (entryTypeAliases == null)
@@ -13434,46 +14329,90 @@ public class GlsResource
       return val == null ? entryType : val;
    }
 
+   /**
+    * Gets the alias for an unknown bib type.
+    * Uses the mapping identified by the "unknown-entry-alias"
+    * setting.
+    * @return the alias or null if not set
+    */ 
    public String getUnknownEntryMap()
    {
       return unknownEntryMap;
    }
 
+   /**
+    * Gets the field name in which to store the original entry
+    * label. Specified by the "save-original-id" setting.
+    * @return the field name or null if not set
+    */ 
    public String getSaveOriginalIdField()
    {
       return saveOriginalId;
    }
 
+   /**
+    * Gets the "save-original-id-action" setting.
+    * @return the numeric ID corresponding to the setting
+    */ 
    public int getSaveOriginalIdAction()
    {
       return saveOriginalIdAction;
    }
 
+   /**
+    * Gets the field name in which to store the original entry
+    * bib type. Specified by the "save-original-entrytype" setting.
+    * @return the field name or null if not set
+    */ 
    public String getSaveOriginalEntryTypeField()
    {
       return saveOriginalEntryType;
    }
 
+   /**
+    * Gets the "save-original-entrytype-action" setting.
+    * @return the numeric ID corresponding to the setting
+    */ 
    public int getSaveOriginalEntryTypeAction()
    {
       return saveOriginalEntryTypeAction;
    }
 
+   /**
+    * Determines whether or not there are any field aliases set.
+    * @return true if there are field aliases
+    */ 
    public boolean hasFieldAliases()
    {
       return fieldAliases != null;
    }
 
+   /**
+    * Gets the field aliases iterator. Ensure that there are field
+    * aliases set first.
+    * @return the iterator
+    */ 
    public Iterator<String> getFieldAliasesIterator()
    {
       return fieldAliases.keySet().iterator();
    }
 
+   /**
+    * Gets the alias for the given field. Ensure that there are field
+    * aliases set first.
+    * @param fieldName the field name
+    * @return the alias or null if not found
+    */ 
    public String getFieldAlias(String fieldName)
    {
       return fieldAliases.get(fieldName);
    }
 
+   /**
+    * Gets the name of the field that was mapped to the given name.
+    * @param mappedName the mapped field name
+    * @return the original field name or null if no mapping found
+    */ 
    public String getOriginalField(String mappedName)
    {
       if (hasFieldAliases())
@@ -13508,111 +14447,211 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the "replicate-override" setting.
+    * @return true if replicate override setting is on
+    */ 
    public boolean isReplicateOverrideOn()
    {
       return replicateOverride;
    }
 
+   /**
+    * Gets the "replicate-missing-field-action" setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public byte getFallbackOnMissingReplicateAction()
    {
       return missingFieldReplicateAction;
    }
 
+   /**
+    * Determines whether or not the "replicate-fields" setting has
+    * been set.
+    * @return true if "replicate-fields" setting has been set
+    */ 
    public boolean hasFieldCopies()
    {
       return fieldCopies != null;
    }
 
+   /**
+    * Gets the field replication iterator. Ensure that the
+    * "replicate-fields" setting has been set first.
+    * @return the iterator
+    */ 
    public Iterator<String> getFieldCopiesIterator()
    {
       return fieldCopies.keySet().iterator();
    }
 
+   /**
+    * Gets the replication list for the given field. Ensure that the
+    * "replicate-fields" setting has been set first.
+    * @param fieldName the field name
+    * @return the list of field names or none if not provided for
+    * the given field
+    */ 
    public Vector<String> getFieldCopy(String fieldName)
    {
       return fieldCopies.get(fieldName);
    }
 
+   /**
+    * Determines whether or not the primary and dual locations should be
+    * combined.
+    * @return true if "combine-dual-locations" not "false"
+    */ 
    public boolean isCombineDualLocationsOn()
    {
       return combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF;
    }
 
+   /**
+    * Gets the "combine-dual-locations" setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public int getCombineDualLocations()
    {
       return combineDualLocations;
    }
 
+   /**
+    * Gets the "category" setting.
+    * @return the category or null if not set
+    */ 
    public String getCategory()
    {
       return category;
    }
 
+   /**
+    * Gets the "dual-category" setting.
+    * @return the dual category or null if not set
+    */ 
    public String getDualCategory()
    {
       return dualCategory;
    }
 
+   /**
+    * Gets the abbreviation name fallback.
+    * @return the abbreviation name fallback
+    */ 
    public String getAbbrevDefaultNameField()
    {
       return abbrevDefaultNameField;
    }
 
+   /**
+    * Gets the abbreviation sort fallback.
+    * @return the abbreviation sort fallback
+    */ 
    public String getAbbrevDefaultSortField()
    {
       return abbrevDefaultSortField;
    }
 
+   /**
+    * Gets the entry sort fallback.
+    * @return the entry sort fallback
+    */ 
    public String getEntryDefaultSortField()
    {
       return entryDefaultSortField;
    }
 
+   /**
+    * Gets the symbol sort fallback.
+    * @return the symbol sort fallback
+    */ 
    public String getSymbolDefaultSortField()
    {
       return symbolDefaultSortField;
    }
 
+   /**
+    * Gets the bibtex entry sort fallback.
+    * @return the bibtex entry sort fallback
+    */ 
    public String getBibTeXEntryDefaultSortField()
    {
       return bibTeXEntryDefaultSortField;
    }
 
+   /**
+    * Gets the custom sort fallback for the given original entry bib type.
+    * @param originalEntryType the original entry bib type
+    * @return the fallback identified by the "custom-sort-fallbacks"
+    * setting or null if not provided
+    */ 
    public String getCustomEntryDefaultSortField(String originalEntryType)
    {
       return (customEntryDefaultSortFields == null ? null : 
          customEntryDefaultSortFields.get(originalEntryType));
    }
 
+   /**
+    * Determines whether or not to use non-breakable space.
+    * @return true if {@code --no-break-space} global setting on
+    */ 
    public boolean useNonBreakSpace()
    {
       return bib2gls.useNonBreakSpace();
    }
 
+   /**
+    * Determines whether or not to use interpreter.
+    * @return true if {@code --interpret} global setting on
+    */ 
    public boolean useInterpreter()
    {
       return bib2gls.useInterpreter();
    }
 
+   /**
+    * Interprets TeX code.
+    * @param texCode the TeX code as a string
+    * @param bibVal the TeX code obtained from parsing a bib field
+    * @param trim if true, trim the result
+    * @return the interpreted value or the first argument if no
+    * interpreter or the value can't be parsed
+    */ 
    public String interpret(String texCode, BibValueList bibVal, boolean trim)
    {
       return bib2gls.interpret(texCode, bibVal, trim);
    }
 
+   /**
+    * Determines whether or not label fields should be interpreted.
+    * Corresponds to "intepret-label-fields" setting but also
+    * requires the interpreter to be enabled.
+    * @return true if label fields should be interpreted
+    */ 
    public boolean isInterpretLabelFieldsEnabled()
    {
       return interpretLabelFields && bib2gls.useInterpreter();
    }
 
-   // Cross-resource references aren't permitted if the resource set
-   // has a preamble that's interpreted
-   //     (preamble != null && interpretPreamble)
-
+   /**
+   * Determines whether or not cross-resource references are
+   * permitted.
+   * Cross-resource references aren't permitted if the resource set
+   * has a preamble that's interpreted
+   *     (preamble != null AND interpretPreamble)
+   * @return true if cross-resource references are allowed
+   */
    public boolean allowsCrossResourceRefs()
    {
       return preamble == null || !interpretPreamble;
    }
 
+   /**
+    * Determines whether or not labelify fields is enabled.
+    * Not currently used. 
+    * TODO check if this is correct and what it's for.
+    * @return true if enabled
+    */ 
    public boolean isLabelifyEnabled()
    {
       if (labelifyFields == null || labelifyFields.length == 0)
@@ -13628,76 +14667,140 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets "strip-missing-parents" setting.
+    * @return true if setting on
+    */ 
    public boolean isStripMissingParentsEnabled()
    {
       return stripMissingParents;
    }
 
+   /**
+    * Determines whether or not missing parents should be created.
+    * @return true if missing parents should be created
+    */ 
    public boolean isCreateMissingParentsEnabled()
    {
       return createMissingParents;
    }
 
+   /**
+    * Gets "copy-alias-to-see" setting.
+    * @return true if setting on
+    */ 
    public boolean isCopyAliasToSeeEnabled()
    {
       return copyAliasToSee;
    }
 
+   /**
+    * Gets "min-loc-range" setting.
+    * @return the minimum number of locations to form a range
+    */ 
    public int getMinLocationRange()
    {
       return minLocationRange;
    }
 
+   /**
+    * Gets "suffixF" setting.
+    * @return the single page suffix or null if not set
+    */ 
    public String getSuffixF()
    {
       return suffixF;
    }
 
+   /**
+    * Gets "suffixFF" setting.
+    * @return the multi page suffix or null if not set
+    */ 
    public String getSuffixFF()
    {
       return suffixFF;
    }
 
+   /**
+    * Gets "see" setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public int getSeeLocation()
    {
       return seeLocation;
    }
 
+   /**
+    * Gets "seealso" setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public int getSeeAlsoLocation()
    {
       return seeAlsoLocation;
    }
 
+   /**
+    * Gets "alias" setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public int getAliasLocation()
    {
       return aliasLocation;
    }
 
+   /**
+    * Determines whether or not the location prefix should be shown.
+    * @return true if the location prefix should be shown
+    */ 
    public boolean showLocationPrefix()
    {
       return locationPrefix != null;
    }
 
+   /**
+    * Determines whether or not the location suffix should be shown.
+    * @return true if the location suffix should be shown
+    */ 
    public boolean showLocationSuffix()
    {
       return locationSuffix != null;
    }
 
+   /**
+    * Gets "max-loc-diff" setting.
+    * @return the maximum location gap setting
+    */ 
    public int getLocationGap()
    {
       return locGap;
    }
 
+   /**
+    * Gets "save-index-counter" setting.
+    * @return the setting or null if off
+    */ 
    public String getSaveIndexCounter()
    {
       return indexCounter;
    }
 
+   /**
+    * Gets the paths to the supplemental PDFs.
+    * @return list of paths or null if no supplemental files
+    * specified
+    */
    public Vector<TeXPath> getSupplementalPaths()
    {
       return supplementalPdfPaths;
    }
 
+   /**
+    * Determines whether or not the given format is a primary
+    * location format.
+    * @param format the location format (encap)
+    * @return true if the format has been identified as a
+    * primary/principal format
+    */ 
    public boolean isPrimaryLocation(String format)
    {
       if (primaryLocationFormats == null 
@@ -13722,16 +14825,30 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets save primary/principal locations setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public int getSavePrimaryLocationSetting()
    {
       return savePrimaryLocations;
    }
 
+   /**
+    * Gets save primary/principal location counters setting.
+    * @return the numeric identifier corresponding to the setting
+    */ 
    public int getPrimaryLocationCountersSetting()
    {
       return primaryLocCounters;
    }
 
+   /**
+    * Determines whether or not counter is considered a primary
+    * location counter.
+    * @return true if counter identified by "loc-counters" or
+    * "loc-counters" not set or "primary-loc-counters" is "combine" or "split"
+    */ 
    public boolean isPrimaryLocationCounterAllowed(String counter)
    {
       if (counters == null
