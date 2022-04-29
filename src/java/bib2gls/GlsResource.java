@@ -6643,7 +6643,7 @@ public class GlsResource
 
                   if (target != null)
                   {
-                     otherTargets = getOtherElements(comp, bibData, dualData);
+                     otherTargets = getOtherElements(comp);
                   }
                }
             }
@@ -7569,8 +7569,7 @@ public class GlsResource
     * element.
     * @param comp the compound entry
     */ 
-   public Vector<Bib2GlsEntry> getOtherElements(CompoundEntry comp,
-     Vector<Bib2GlsEntry> bibData, Vector<Bib2GlsEntry> dualData)
+   public Vector<Bib2GlsEntry> getOtherElements(CompoundEntry comp)
    {
       Vector<Bib2GlsEntry> list = new Vector<Bib2GlsEntry>();
 
