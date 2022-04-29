@@ -4137,18 +4137,18 @@ public class GlsResource
 
          Pattern p = patterns.get(field);
 
-         if (p == null)
-         {
-            p = Pattern.compile(val);
-         }
-         else
-         {
-            p = Pattern.compile(String.format(
-                   "(?:%s)|(?:%s)", p.pattern(), val));
-         }
-
          try
          {
+            if (p == null)
+            {
+               p = Pattern.compile(val);
+            }
+            else
+            {
+               p = Pattern.compile(String.format(
+                      "(?:%s)|(?:%s)", p.pattern(), val));
+            }
+
             patterns.put(field, p);
          }
          catch (PatternSyntaxException e)
