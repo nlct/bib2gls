@@ -60,6 +60,12 @@ public class GlsResource
     * the first argument of {@code \glsxtr@pluralsuffixes}
     * @param abbrvPluralSuffix the default abbreviation plural suffix obtained from
     * the second argument of {@code \glsxtr@pluralsuffixes}
+    * @throws Bib2GlsException invalid resource setting syntax
+    * @throws IllegalArgumentException invalid value supplied to a setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws InterruptedException may be thrown by an interrupted
+    * system call to kpsewhich (when trying to find a bib file on
+    * TeX's path)
     */
    public GlsResource(TeXParser parser, AuxData data, 
      String pluralSuffix, String abbrvPluralSuffix)
@@ -74,7 +80,7 @@ public class GlsResource
    }
 
    /**
-    * Initialises the settings for this resource set.
+    * Initialises the settings for this resource set (stage 1).
     * @param parser the aux file parser
     * @param opts the resource settings (which should be a key=value comma-separated list)
     * @param glstexBasename the basename of the glstex file
@@ -4097,8 +4103,8 @@ public class GlsResource
     * field match settings (such as {@code match} or {@code not-match}).
     * @param patterns map in which to save the patterns
     * @param array set of patterns supplied to the setting
-    * @param opt the name of the setting (for error reporting)
-    * @param list the key=value setting list being parsed
+    * @param opt the name of the setting
+    * @param list the key=value setting list
     * @param parser the aux file parser
     * @throws IllegalArgumentException invalid value supplied
     * @throws IOException may be thrown by the aux file parser
@@ -4160,6 +4166,13 @@ public class GlsResource
       }
    }
 
+   /**
+    * Checks if the concatenated fields are allowed as a fallback
+    * for the sort field.
+    * @param fields list of fields separated by {@code +}
+    * @param opt the name of the setting (for error reporting)
+    * @throws IllegalArgumentException not permitted
+    */
    private void checkAllowedSortFallbackConcatenation(String fields, String opt)
     throws IllegalArgumentException
    {
@@ -4175,11 +4188,25 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the separator for field concatenation. This is the
+    * separator that will be used when forming the concatenated value,
+    * if it's required.
+    * @return the separator
+    */
    public String getFieldConcatenationSeparator()
    {
       return fieldConcatenationSeparator;
    }
 
+   /**
+    * Determines whether or not the given field may be used as a
+    * fallback for the sort field.
+    * @param field the field name
+    * @param allowKeywords if true, allow keywords "id" and "original id"
+    * as pseudo fields
+    * @return true if the field is allowed as a sort fallback
+    */
    private boolean isAllowedSortFallbackField(String field, boolean allowKeywords)
    {
       if (allowKeywords && (field.equals("id") || field.equals("original id")))
@@ -4200,11 +4227,22 @@ public class GlsResource
       return field.equals("sort") ? false : true;
    }
 
+   /**
+    * Replaces TeX control-symbol sequences and hex markup with Unicode
+    * characters.
+    * @param original the original string
+    * @return the substituted string
+    */ 
    private String replaceHexAndSpecial(String original)
    {
       return replaceHex(replaceEscapeSpecialChar(original));
    }
 
+   /**
+    * Replaces standard TeX control-symbol sequences.
+    * @param original the original string
+    * @return the substituted string
+    */ 
    private String replaceEscapeSpecialChar(String original)
    {
       // Replace all \#, \%, \_, \&, \{, \}
@@ -4232,6 +4270,11 @@ public class GlsResource
       return builder.toString();
    }
 
+   /**
+    * Replaces hex markup with Unicode characters.
+    * @param original the original string
+    * @return the substituted string
+    */ 
    private String replaceHex(String original)
    {
       // Replace \\u<hex> sequences with the appropriate Unicode
@@ -4260,6 +4303,16 @@ public class GlsResource
       return builder.toString();
    }
 
+   /**
+    * Gets the boolean value assigned to the given setting.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid
+    * @return true if value is empty or "true" or false if the value
+    * is "false"
+    */
    private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
     throws IOException
    {
@@ -4279,6 +4332,17 @@ public class GlsResource
          opt, val, "true, false"));
    }
 
+   /**
+    * Gets the (required TeXObject) value assigned to the given setting.
+    * The value is required and will have leading and trailing
+    * spaces removed.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing
+    * @return the value
+    */
    private TeXObject getRequiredObject(TeXParser parser, KeyValList list, 
       String opt)
     throws IOException
@@ -4299,6 +4363,17 @@ public class GlsResource
       return obj;
    }
 
+   /**
+    * Gets the (required string) value assigned to the given setting.
+    * The value is required and will have leading and trailing
+    * spaces removed.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * @return the value converted to a string
+    */
    private String getRequired(TeXParser parser, KeyValList list, String opt)
     throws IOException
    {
@@ -4326,6 +4401,18 @@ public class GlsResource
       return value;
    }
 
+   /**
+    * Gets the (optional string) value assigned to the given setting.
+    * The value is optional and will have leading and trailing
+    * spaces removed.
+    * @param parser the aux file parser
+    * @param defValue the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the value converted to a string or the default value
+    * if not set
+    */
    private String getOptional(TeXParser parser, String defValue, 
       KeyValList list, String opt)
     throws IOException
@@ -4349,12 +4436,34 @@ public class GlsResource
       return value;
    }
 
+   /**
+    * Gets the (optional string) value assigned to the given setting.
+    * The value is optional and will have leading and trailing
+    * spaces removed.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the value converted to a string or null if not set
+    */
    private String getOptional(TeXParser parser, KeyValList list, String opt)
     throws IOException
    {
       return getOptional(parser, null, list, opt);
    }
 
+   /**
+    * Gets the (required integer) value assigned to the given setting.
+    * The value is required and must be in integer format. Leading
+    * and trailing spaces will be removed.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * or isn't an integer
+    * @return the value converted to an int
+    */
    private int getRequiredInt(TeXParser parser, KeyValList list, String opt)
     throws IOException
    {
@@ -4371,6 +4480,19 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the (optional integer) value assigned to the given setting.
+    * The value, if present, and must be in integer format. Leading
+    * and trailing spaces will be removed.
+    * @param parser the aux file parser
+    * @param defValue the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't an integer
+    * @return the value converted to an int or the default value if
+    * not set
+    */
    private int getOptionalInt(TeXParser parser, int defValue, KeyValList list, 
      String opt)
     throws IOException
@@ -4393,6 +4515,23 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the (required integer) value assigned to the given setting.
+    * The value is required and must be in integer format. Leading
+    * and trailing spaces will be removed. The value may be a
+    * keyword which has a corresponding int value.
+    * @param parser the aux file parser
+    * @param keyword the keyword that may be used instead of a
+    * number
+    * @param keywordValue the numeric value associated with the
+    * keyword
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * or isn't an integer
+    * @return the value converted to an int
+    */
    private int getRequiredInt(TeXParser parser, String keyword, 
        int keywordValue, KeyValList list, String opt)
     throws IOException
@@ -4415,6 +4554,20 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the (required constrained integer) value assigned to the given setting.
+    * The value is required and must be in integer format. Leading
+    * and trailing spaces will be removed. The value must be greater
+    * than or equal to the given minimum value.
+    * @param parser the aux file parser
+    * @param minValue the minimum allowed value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * or isn't an integer or is out of bounds
+    * @return the value converted to an int
+    */
    private int getRequiredIntGe(TeXParser parser, int minValue, KeyValList list,
       String opt)
     throws IOException
@@ -4431,6 +4584,25 @@ public class GlsResource
       return val;
    }
 
+   /**
+    * Gets the (required constrained integer) value assigned to the given setting.
+    * The value is required and must be in integer format. Leading
+    * and trailing spaces will be removed. The value may be a
+    * keyword which has a corresponding int value. The value must be greater
+    * than or equal to the given minimum value.
+    * @param parser the aux file parser
+    * @param minValue the minimum allowed value
+    * @param keyword the keyword that may be used instead of a
+    * number
+    * @param keywordValue the numeric value associated with the
+    * keyword
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * or isn't an integer or is out of bounds
+    * @return the value converted to an int
+    */
    private int getRequiredIntGe(TeXParser parser, int minValue, String keyword, 
       int keywordValue, KeyValList list, String opt)
     throws IOException
@@ -4447,6 +4619,21 @@ public class GlsResource
       return val;
    }
 
+   /**
+    * Gets the (optional constrained integer) value assigned to the given setting.
+    * The value is must be in integer format. Leading
+    * and trailing spaces will be removed. The value must be greater
+    * than or equal to the given minimum value.
+    * @param parser the aux file parser
+    * @param minValue the minimum allowed value
+    * @param defValue the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't an integer or is out of bounds
+    * @return the value converted to an int or the default value if
+    * not set
+    */
    private int getOptionalIntGe(TeXParser parser, int minValue, int defValue, 
      KeyValList list, String opt)
     throws IOException
@@ -4463,6 +4650,18 @@ public class GlsResource
       return val;
    }
 
+   /**
+    * Gets the (required long integer) value assigned to the given setting.
+    * The value is required and must be in long integer format. Leading
+    * and trailing spaces will be removed.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * or isn't a long integer
+    * @return the value converted to a long
+    */
    private long getRequiredLong(TeXParser parser, KeyValList list, String opt)
     throws IOException
    {
@@ -4479,6 +4678,19 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the (optional long integer) value assigned to the given setting.
+    * The value, if present, and must be in long integer format. Leading
+    * and trailing spaces will be removed.
+    * @param parser the aux file parser
+    * @param defValue the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't a long integer
+    * @return the value converted to a long or the default value if
+    * not set
+    */
    private long getOptionalLong(TeXParser parser, long defValue, 
      KeyValList list, String opt)
     throws IOException
@@ -4501,6 +4713,18 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the optional value (which must belong to a set) assigned to the
+    * given setting.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param allowedValues list of allowed values
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't in the
+    * allowed set
+    * @return the value as a string or null if not set
+    */ 
    private String getChoice(TeXParser parser, KeyValList list, String opt, 
       String... allowValues)
     throws IOException
@@ -4508,6 +4732,19 @@ public class GlsResource
       return getChoice(parser, null, list, opt, allowValues);
    }
 
+   /**
+    * Gets the optional value (which must belong to a set) assigned to the
+    * given setting.
+    * @param parser the aux file parser
+    * @param defVal the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param allowedValues list of allowed values
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't in the
+    * allowed set
+    * @return the value as a string or the default value if not set
+    */ 
    private String getChoice(TeXParser parser, String defVal, KeyValList list, 
       String opt, String... allowValues)
     throws IOException
@@ -4555,6 +4792,19 @@ public class GlsResource
          opt, value, builder));
    }
 
+   /**
+    * Gets the (optional locale) value assigned to the given setting.
+    * The value is optional and will have leading and trailing
+    * spaces removed. The value should be a valid ISO language tag
+    * or the keywords "doc" or "locale". A missing value corresponds
+    * to "locale". A return value of null indicates the default
+    * locale, according to the JVM.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the value converted to a locale or null
+    */
    private Locale getLocale(TeXParser parser, KeyValList list, String opt)
     throws IOException
    {
@@ -4575,6 +4825,16 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the (optional) array of string values assigned to the given setting.
+    * The array of values should be supplied as a comma-separated list.
+    * @param parser the aux file parser
+    * @param defValue the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the array of string values
+    */
    private String[] getStringArray(TeXParser parser, String defValue, 
      KeyValList list, String opt)
     throws IOException
@@ -4589,6 +4849,15 @@ public class GlsResource
       return array;
    }
 
+   /**
+    * Gets the (optional) array of string values assigned to the given setting.
+    * The array of values should be supplied as a comma-separated list.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the array of string values or null if not set
+    */
    private String[] getStringArray(TeXParser parser, KeyValList list, 
      String opt)
     throws IOException
@@ -4596,6 +4865,18 @@ public class GlsResource
       return getStringArray(parser, list, opt, false);
    }
 
+   /**
+    * Gets the array of string values assigned to the given setting.
+    * The array of values should be supplied as a comma-separated list.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param isRequired true if the value must be supplied
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't supplied
+    * but is required
+    * @return the array of string values or (if permitted) null if not set or empty
+    */
    private String[] getStringArray(TeXParser parser, KeyValList list, 
      String opt, boolean isRequired)
     throws IOException
@@ -4643,6 +4924,19 @@ public class GlsResource
       return array;
    }
 
+   /**
+    * Gets the array of field names assigned to the given setting.
+    * The array of values should be supplied as a comma-separated list
+    * and each item must be a valid field name.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param isRequired true if the value must be supplied
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't supplied
+    * but is required
+    * @return the array of field names or (if permitted) null if not set or empty
+    */
    private String[] getFieldArray(TeXParser parser, KeyValList list, 
      String opt, boolean isRequired)
     throws IOException
@@ -4667,6 +4961,18 @@ public class GlsResource
       return array;
    }
 
+   /**
+    * Gets the array of TeX objects assigned to the given setting.
+    * The array of values should be supplied as a comma-separated list.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param isRequired true if the value must be supplied
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't supplied
+    * but is required
+    * @return the array of objects or (if permitted) null if not set or empty
+    */
    private TeXObject[] getTeXObjectArray(TeXParser parser, KeyValList list, 
      String opt, boolean isRequired)
     throws IOException
@@ -4713,6 +5019,17 @@ public class GlsResource
       return array;
    }
 
+   /**
+    * Gets the CSV list of TeX objects assigned to the given setting.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param isRequired true if the value must be supplied
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't supplied
+    * but is required
+    * @return the CSV list of objects or (if permitted) null if not set or empty
+    */
    private CsvList[] getListArray(TeXParser parser, KeyValList list, 
      String opt)
     throws IOException
@@ -4750,6 +5067,28 @@ public class GlsResource
       return array;
    }
 
+   /**
+    * Gets the required dual map assigned to the given setting.
+    * The format of a dual map value is two sublists of equal size
+    * separated by a comma, where each element of the sublists must
+    * be a valid field name ("alias" not permitted). The result is
+    * a map from a field in the first sublist to the corresponding
+    * field in the second sublist.
+    *
+    * The map keys will be stored in the supplied array in the order
+    * in which they were read in. (The hash map doesn't retain
+    * order.) The key array length may be less than the total
+    * number of keys, in which case only the initial keys up will be
+    * saved. If the array is larger than the number of keys then the
+    * tail elements of the array won't be assigned.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param keys the array in which to store the keys
+    * @throws IOException may be thrown by the aux file parser
+    * @return the value converted to a string or the default value
+    * if not set
+    */
    private HashMap<String,String> getDualMap(TeXParser parser, KeyValList list, 
      String opt, String[] keys)
     throws IOException
@@ -4815,6 +5154,15 @@ public class GlsResource
       return map;
    }
 
+   /**
+    * Gets the key=value list assigned to the given setting.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the key=value list corresponding to the setting or
+    * null if not set or empty
+    */
    private KeyValList getKeyValList(TeXParser parser, KeyValList list, 
      String opt)
     throws IOException
@@ -4836,6 +5184,16 @@ public class GlsResource
       return sublist;
    }
 
+   /**
+    * Gets the (string-to-string) mapping assigned to the given setting.
+    * The setting value should be a key=value list.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the string map corresponding to the setting or
+    * null if not set or empty
+    */
    private HashMap<String,String> getHashMap(TeXParser parser, 
       KeyValList list, String opt)
     throws IOException
@@ -4874,6 +5232,20 @@ public class GlsResource
       return map;
    }
 
+   /**
+    * Gets the (string-to-vector) mapping assigned to the given setting.
+    * The setting value should be a key=value list, where each
+    * element value is a comma-separated list.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param isRequired true if the value must be supplied
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value isn't supplied
+    * but is required
+    * @return the map corresponding to the setting or (if allowed)
+    * null if not set or empty
+    */
    private HashMap<String,Vector<String>> getHashMapVector(TeXParser parser, 
       KeyValList list, String opt, boolean isRequired)
     throws IOException
@@ -4935,6 +5307,21 @@ public class GlsResource
       return map;
    }
 
+   /**
+    * Gets the vector of substitution patterns assigned to the given setting.
+    * The setting value should be supplied as a comma-separated list of 
+    * grouped pairs. The first group is the regular expression and the second
+    * group is the replacement.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @param isRequired true if the value must be supplied
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid or isn't supplied
+    * but is required
+    * @return the vector of substitution patterns or (if permitted) 
+    * null if not set or empty
+    */
    private Vector<PatternReplace> getSubstitutionList(TeXParser parser, 
       KeyValList list, String opt, boolean isRequired)
     throws IOException
@@ -5017,6 +5404,19 @@ public class GlsResource
       return regexList;
    }
 
+   /**
+    * Gets the (string-to-string) mapping of field format patterns assigned to the given setting.
+    * The setting value should be a key=value list, where the key
+    * must be a valid field name and the value must be a valid
+    * format pattern.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid
+    * @return the string map corresponding to the setting or
+    * null if not set or empty
+    */
    private HashMap<String,String> getFieldFormatPattern(TeXParser parser,
      KeyValList list, String opt)
    throws IllegalArgumentException,IOException
@@ -5074,6 +5474,18 @@ public class GlsResource
       return formatMap;
    }
 
+   /**
+    * Substitutes TeX's standard control-character commands for literal characters.
+    * The supplied TeX code is a format pattern, but since it has to
+    * be written to the aux file, the safest method is to escape the
+    * literal characters. These need to have the backslash removed
+    * before the code can be converted to a string suitable for a
+    * formatter. Note that {@code \\protect\\u} will
+    * cause the command name to be followed by whitespace, which
+    * needs to be stripped if present.
+    * @param parser the aux file parser
+    * @param format the TeX code
+    */ 
    private void replaceStringFormatter(TeXParser parser, TeXObjectList format)
    {
       for (int i = 0; i < format.size(); i++)
@@ -5131,6 +5543,15 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the letter number rule for the given setting as an integer.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid
+    * @return the rule ID
+    */ 
    private int getLetterNumberRule(TeXParser parser, KeyValList list,
      String opt)
    throws IOException
@@ -5163,6 +5584,15 @@ public class GlsResource
       throw new IllegalArgumentException("Invalid letter number rule");
    }
 
+   /**
+    * Gets the letter number punctuation rule for the given setting as an integer.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid
+    * @return the rule ID
+    */ 
    private int getLetterNumberPuncRule(TeXParser parser, KeyValList list,
      String opt)
    throws IOException
@@ -5218,6 +5648,15 @@ public class GlsResource
       throw new IllegalArgumentException("Invalid letter number punc rule");
    }
 
+   /**
+    * Gets the break-at rule for the given setting as an integer.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid
+    * @return the rule ID
+    */ 
    private int getBreakAt(TeXParser parser, KeyValList list,
      String opt)
    throws IOException
@@ -5263,6 +5702,19 @@ public class GlsResource
       throw new IllegalArgumentException("Invalid break at setting: "+val);
    }
 
+   /**
+    * Gets the sort label list method for the given setting.
+    * The value should be supplied as {@code field-list:sort-method:csname}
+    * or as {@code field-list:sort-method}, which indicates which
+    * fields should have their list values sorted according to the
+    * given method.
+    * @param parser the aux file parser
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is invalid
+    * @return the method
+    */ 
    private LabelListSortMethod getLabelListSortMethod(TeXParser parser, 
      TeXObjectList list, String opt)
    throws IOException
@@ -5340,6 +5792,14 @@ public class GlsResource
       return new LabelListSortMethod(fields, method, csname);
    }
 
+   /**
+    * Splits a list on the given character.
+    * @param parser the aux file parser
+    * @param c the split (separator) character
+    * @param list the list that needs splitting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the vector of list elements or null if empty
+    */ 
    private Vector<TeXObject> splitList(TeXParser parser, char c, 
       TeXObjectList list)
     throws IOException
@@ -5384,12 +5844,21 @@ public class GlsResource
       return split;
    }
 
+   /**
+    * Strips out all unknown fields from the primary and secondary
+    * patterns.
+    */ 
    private void stripUnknownFieldPatterns()
    {
       fieldPatterns = stripUnknownFieldPatterns(fieldPatterns);
       secondaryFieldPatterns = stripUnknownFieldPatterns(secondaryFieldPatterns);
    }
 
+   /**
+    * Strips out all unknown fields from a field pattern map.
+    * @patterns the field pattern map, which may be null
+    * @return the field pattern map or null if all mappings removed
+    */ 
    private HashMap<String,Pattern> stripUnknownFieldPatterns(
       HashMap<String,Pattern> patterns)
    {
@@ -5429,6 +5898,11 @@ public class GlsResource
       return patterns;
    }
 
+   /**
+    * Parses all bib files associated with this resource set (stage 2).
+    * @param parser the aux file parser
+    * @throws IOException may be thrown by the aux file parser
+    */ 
    public void parseBibFiles(TeXParser parser)
    throws IOException
    {
@@ -5507,16 +5981,28 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the string representation of this resource set.
+    * @return the string representation of this object
+    */ 
+   @Override
    public String toString()
    {
       return texFile == null ? super.toString() : texFile.getName();
    }
 
+   /**
+    * Gets the listener used by the bib parser.
+    */ 
    public Bib2GlsBibParser getBibParserListener()
    {
       return bibParserListener;
    }
 
+   /**
+    * Determines whether or not there are compound entries.
+    * @return true if there are compound entries
+    */ 
    public boolean hasCompoundEntries()
    {
       if (compoundEntriesGlobal)
@@ -5527,6 +6013,11 @@ public class GlsResource
       return compoundEntries != null;
    }
 
+   /**
+    * Gets the compound entry key iterator.
+    * The iterator is for the set of compound entry labels.
+    * @return the iterator or null if no compound entries
+    */ 
    public Iterator<String> getCompoundEntryKeyIterator()
    {
       if (compoundEntriesGlobal)
@@ -5541,6 +6032,11 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the compound entry value iterator.
+    * The iterator is for the set of compound entries.
+    * @return the iterator or null if no compound entries
+    */ 
    public Iterator<CompoundEntry> getCompoundEntryValueIterator()
    {
       if (compoundEntriesGlobal)
@@ -5555,6 +6051,10 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the compound entry value identified by the given label.
+    * @return the compound entry or null if not found
+    */ 
    public CompoundEntry getCompoundEntry(String label)
    {
       if (compoundEntriesGlobal)
@@ -5569,6 +6069,10 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Adds the compound entry value.
+    * @param compoundEntry the compound entry to add
+    */ 
    public void addCompoundEntry(CompoundEntry compoundEntry)
    {
       // bib definition needs to override aux information. 
@@ -5598,11 +6102,24 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the first compound entry that has the given main.
+    * This will search either the global or local list depending on
+    * the "compound-options-global" setting.
+    * @param mainLabel the label of the main entry
+    * @return the compound entry
+    */ 
    public CompoundEntry getCompoundEntryWithMain(String mainLabel)
    {
       return getCompoundEntryWithMain(mainLabel, compoundEntriesGlobal);
    }
 
+   /**
+    * Gets the first compound entry that has the given main.
+    * @param mainLabel the label of the main entry
+    * @param global if true search the global list
+    * @return the compound entry
+    */ 
    public CompoundEntry getCompoundEntryWithMain(String mainLabel, boolean global)
    {
       if (global)
@@ -5626,11 +6143,30 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the sole compound entry that has the given main.
+    * This will search either the global or local list depending on
+    * the "compound-options-global" setting.
+    * This method will return null if no compound entry has the given main
+    * or if multiple compound entries have the given main.
+    * @param mainLabel the label of the main entry
+    * @return the only compound entry to have the given main entry
+    * or null
+    */ 
    public CompoundEntry getUniqueCompoundEntryWithMain(String mainLabel)
    {
       return getUniqueCompoundEntryWithMain(mainLabel, compoundEntriesGlobal);
    }
 
+   /**
+    * Gets the sole compound entry that has the given main.
+    * This will return null if no compound entry has the given main
+    * or if multiple compound entries have the given main.
+    * @param mainLabel the label of the main entry
+    * @param global if true search the global list
+    * @return the only compound entry to have the given main entry
+    * or null
+    */ 
    public CompoundEntry getUniqueCompoundEntryWithMain(String mainLabel, 
       boolean global)
    {
@@ -5666,6 +6202,23 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Processes the list of bib entries (stage 3). The list of bib entries
+    * should already have been obtained by parsing the bib file(s)
+    * associated with this resource set. This stage interprets the
+    * preamble, processes entry fields, and establishes
+    * dependencies. Note that the bib parser is used for parsing bib
+    * syntax (although it inherits from TeXParser). The bib parser 
+    * listener contains the data obtained from parsing the bib file.
+    * The selected entries are saved in the bibData list (primary
+    * entries or all entries if the dual should be combined with the
+    * primart) and the dualData list (dual entries if they need to be
+    * sorted separately from the primary entries).
+    * The aux parser is used for parsing TeX syntax.
+    * @param parser the aux file parser
+    * @throws IOException may be thrown by the aux file parser
+    * @throws Bib2GlsException invalid resource setting syntax
+    */ 
    public void processBibList(TeXParser parser)
    throws IOException,Bib2GlsException
    {
@@ -6148,6 +6701,9 @@ public class GlsResource
       addSupplementalRecords();
    }
 
+   /**
+    * Applies the compound entry settings.
+    */ 
    private void applyCompoundEntrySettings()
    {
       if (!hasCompoundEntries() 
@@ -6313,6 +6869,15 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the compound entry according to the "compound-adjust-name" setting.
+    * @param id the label of the main entry
+    * @return the first compound entry with the main entry matching
+    * the given id if compound-adjust-name=once, or the unique
+    * compound entry with the main entry matching the given id if
+    * compound-adjust-name=unique, or null if match not found or
+    * setting off
+    */ 
    public CompoundEntry getCompoundAdjustName(String id)
    {
       switch (compoundAdjustName)
@@ -6330,6 +6895,13 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Adds the given cross-references to dependencies. 
+    * For each cross-reference label, if the matching entry can be
+    * found, it will have its dependencies updated.
+    * @param entry the entry with the cross-references
+    * @param xrList the list of cross-reference labels
+    */ 
    private void addCrossRefs(Bib2GlsEntry entry, String... xrList)
    {
       if (xrList == null) return;
@@ -6394,6 +6966,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Adds any supplemental records. 
+    * These are records found in a supplemental aux file that match
+    * entries defined in this resource set.
+    */ 
    private void addSupplementalRecords()
    {
       if (supplementalRecords != null)
@@ -6417,6 +6994,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Adds all the dependencies for the given entry.
+    * @param entry the entry
+    * @param entries the list of entries to search for dependencies
+    */ 
    private void addDependencies(Bib2GlsEntry entry, 
      Vector<Bib2GlsEntry> entries)
    {
@@ -6451,11 +7033,22 @@ public class GlsResource
       }
    }
 
+   /**
+    * Determines whether or not the given entry ID has been added to
+    * the list of dependent entries.
+    * @param id the entry label
+    * @return true if the given id is in the list of dependent
+    * entries
+    */ 
    public boolean isDependent(String id)
    {
       return dependencies.contains(id);
    }
 
+   /**
+    * Adds then given entry label to the list of dependent entries.
+    * @param id the entry label
+    */ 
    public void addDependent(String id)
    {
       if (!dependencies.contains(id))
@@ -6465,11 +7058,24 @@ public class GlsResource
       }
    }
 
+   /** Gets the list of all dependent entries.
+    * @return vector of dependent entries
+    */
    public Vector<String> getDependencies()
    {
       return dependencies;
    }
 
+   /**
+    * Processes the data (stage 4). This selects the required
+    * entries, sorts them (if applicable) and writes the glstex
+    * file associated with this resource set.
+    * @return -1 if this resource set has used the "master" option,
+    * otherwise returns the total number of entries for this
+    * resource set
+    * @throws IOException may be thrown by the aux file parser
+    * @throws Bib2GlsException invalid syntax
+    */ 
    public int processData()
       throws IOException,Bib2GlsException
    {
@@ -6488,6 +7094,11 @@ public class GlsResource
       }
    }
 
+   /**
+    * Process the data (stage 4, master).
+    * @throws IOException may be thrown by the aux file parser
+    * @throws Bib2GlsException invalid syntax
+    */ 
    private void processMaster()
       throws IOException,Bib2GlsException
    {
@@ -6583,6 +7194,13 @@ public class GlsResource
       }
    }
 
+   /**
+    * Sets or appends to the preamble obtained from the bib file.
+    * Used by the bib file parser.
+    * @param string version of preamble (for writing to the glstex)
+    * @param list content of preamble for parser if interpreter
+    * required
+    */ 
    public void setPreamble(String content, BibValueList list)
    {
       if (preamble == null)
@@ -6607,6 +7225,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Process the preamble contents provided in the bib file. This
+    * allows any command definitions to be picked up by the
+    * interpreter.
+    * @throws IOException may be thrown by the parser
+    */ 
    public void processPreamble()
     throws IOException
    {
@@ -6616,6 +7240,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Adds missing parents. Used if the "missing-parents" option is set
+    * to "create".
+    * @param childEntry entry that has the parent field set
+    * @param data list of entries in which to find parent
+    */ 
    private Bib2GlsEntry addMissingParent(Bib2GlsEntry childEntry, 
       Vector<Bib2GlsEntry> data)
    {
@@ -6668,6 +7298,14 @@ public class GlsResource
       return parent;
    }
 
+   /**
+    * Determines if the given label corresponds to an ancestor of
+    * the given entry.
+    * @param ancestorLabel the label of the potential ancestor
+    * @param entry the entry
+    * @return true if entry has an ancestor with given label
+    * otherwise false
+    */ 
    public boolean isAncestor(String ancestorLabel, Bib2GlsEntry entry)
    {
       String parentId = entry.getParent();
@@ -6692,6 +7330,13 @@ public class GlsResource
       return isAncestor(ancestorLabel, parentEntry);
    }
 
+   /**
+    * Adds hierarchical data for the given entry.
+    * @param childEntry the entry
+    * @param entries the list of selected entries
+    * @param data the full list of entries (bibData or dualData)
+    * @throws Bib2GlsException if an entry is its own parent
+    */ 
    private void addHierarchy(Bib2GlsEntry childEntry, 
       Vector<Bib2GlsEntry> entries, Vector<Bib2GlsEntry> data)
    throws Bib2GlsException
@@ -6729,6 +7374,14 @@ public class GlsResource
       }
    }
 
+   /**
+    * Gets the flipped label.
+    * If the label starts with a known prefix, the flipped label is
+    * the label with the opposite prefix (for
+    * example, the dual and primary prefixes are swapped).
+    * the dual prefix.
+    * @return the flipped label or null if can't be determined
+    */ 
    public String flipLabel(String label)
    {
       if (labelPrefix == null)
@@ -6805,11 +7458,24 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the entry with the given label. The search is performed
+    * on the primary list first and then on the dual list.
+    * @param label the search label
+    * @return the entry or null if not found
+    */ 
    public Bib2GlsEntry getEntry(String label)
    {
       return getEntry(label, false);
    }
 
+   /**
+    * Gets the entry with the given label. The search is performed
+    * on the primary list first and then on the dual list.
+    * @param label the search label
+    * @param tryFlipping if true also search on the flipped label
+    * @return the entry or null if not found
+    */ 
    public Bib2GlsEntry getEntry(String label, boolean tryFlipping)
    {
       Bib2GlsEntry entry = getEntry(label, bibData, tryFlipping);
@@ -6822,11 +7488,24 @@ public class GlsResource
       return getEntry(label, dualData, tryFlipping);
    }
 
+   /**
+    * Gets the entry with the given label in the given list.
+    * @param label the search label
+    * @param data the list of entries to search
+    * @return the entry or null if not found
+    */ 
    public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
    {
       return getEntry(label, data, false);
    }
 
+   /**
+    * Gets the entry with the given label in the given list.
+    * @param label the search label
+    * @param data the list of entries to search
+    * @param tryFlipping if true also search on the flipped label
+    * @return the entry or null if not found
+    */ 
    public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data,
      boolean tryFlipping)
    {
@@ -6860,6 +7539,15 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the entry with the given label in the given list.
+    * The entry must be a Bib2GlsEntry object for the match to be
+    * successful. The provided list may include other BibData objects, such
+    * as BibPreamble or BibString.
+    * @param label the search label
+    * @param data the list of entries to search
+    * @return the entry or null if not found
+    */ 
    public Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
    {
       for (BibData entry : data)
@@ -6874,6 +7562,13 @@ public class GlsResource
       return null;
    }
 
+   /**
+    * Gets the list of "other" elements for the given compound
+    * entry. This method searches for the entries identified by the
+    * compound entry's element list that don't match the main
+    * element.
+    * @param comp the compound entry
+    */ 
    public Vector<Bib2GlsEntry> getOtherElements(CompoundEntry comp,
      Vector<Bib2GlsEntry> bibData, Vector<Bib2GlsEntry> dualData)
    {
