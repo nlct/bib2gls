@@ -41,8 +41,26 @@ import com.dickimawbooks.texparserlib.latex.MissingValue;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
+/**
+ * Class representing a resource set. Each resource set is
+ * identified by {@code \glsxtr@resource} in the aux file (which is
+ * written to the aux file by {@code \glsxtrresourcefile}).
+ * @author Nicola L C Talbot
+ */
+
 public class GlsResource
 {
+   /**
+    * Creates a new instance corresponding to a resource set.
+    * @param parser the aux file parser
+    * @param data the aux data corresponding to {@code \glsxtr@resource}
+    * which has two arguments: the settings and the basename of the
+    * glstex file
+    * @param pluralSuffix the default plural suffix obtained from
+    * the first argument of {@code \glsxtr@pluralsuffixes}
+    * @param abbrvPluralSuffix the default abbreviation plural suffix obtained from
+    * the second argument of {@code \glsxtr@pluralsuffixes}
+    */
    public GlsResource(TeXParser parser, AuxData data, 
      String pluralSuffix, String abbrvPluralSuffix)
     throws IOException,InterruptedException,Bib2GlsException
@@ -55,7 +73,19 @@ public class GlsResource
       init(parser, data.getArg(0), data.getArg(1));
    }
 
-   private void init(TeXParser parser, TeXObject opts, TeXObject arg)
+   /**
+    * Initialises the settings for this resource set.
+    * @param parser the aux file parser
+    * @param opts the resource settings (which should be a key=value comma-separated list)
+    * @param glstexBasename the basename of the glstex file
+    * @throws Bib2GlsException invalid resource setting syntax
+    * @throws IllegalArgumentException invalid value supplied to a setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws InterruptedException may be thrown by an interrupted
+    * system call to kpsewhich (when trying to find a bib file on
+    * TeX's path)
+    */
+   private void init(TeXParser parser, TeXObject opts, TeXObject glstexBasename)
       throws IOException,InterruptedException,
              Bib2GlsException,IllegalArgumentException
    {
@@ -66,7 +96,7 @@ public class GlsResource
       secondarySortSettings = new SortSettings(bib2gls);
 
       TeXPath texPath = new TeXPath(parser, 
-        arg.toString(parser), "glstex", false);
+        glstexBasename.toString(parser), "glstex", false);
 
       texFile = bib2gls.resolveFile(texPath.getFile());
 
@@ -3562,6 +3592,14 @@ public class GlsResource
       }
    }
 
+   /**
+    * Parses the aux file of the master document. The master
+    * document contains the actual glossary.
+    * @param parser the aux file parser
+    * @param master the basename of the master aux file
+    * @throws Bib2GlsException invalid resource setting syntax
+    * @throws IOException may be thrown by the aux file parser
+    */
    private void parseMaster(TeXParser parser, String master)
     throws IOException,Bib2GlsException
    {
@@ -3899,6 +3937,13 @@ public class GlsResource
 
    }
 
+   /**
+    * Parses the aux file of a supplemental document to add
+    * supplemental records to entries shared in both documents.
+    * @param parser the aux file parser
+    * @param basename the basename of the supplemental aux file
+    * @throws IOException may be thrown by the aux file parser
+    */
    private void parseSupplemental(TeXParser parser, String basename)
     throws IOException
    {
@@ -4026,6 +4071,12 @@ public class GlsResource
       }
    }
 
+   /**
+    * Indicates whether or not the given field can be referenced.
+    * For example, where a field needs to be given as a value to a setting.
+    * @param field the field name
+    * @return true if the given field can be referenced otherwise false
+    */
    private boolean isReferencableField(String field)
    {
       if (bib2gls.isKnownField(field)) return true;
@@ -4041,6 +4092,17 @@ public class GlsResource
       return (saveDefinitionIndex && field.equals(DEFINITION_INDEX_FIELD));
    }
 
+   /**
+    * Initialises field match patterns. This method is used by the
+    * field match settings (such as {@code match} or {@code not-match}).
+    * @param patterns map in which to save the patterns
+    * @param array set of patterns supplied to the setting
+    * @param opt the name of the setting (for error reporting)
+    * @param list the key=value setting list being parsed
+    * @param parser the aux file parser
+    * @throws IllegalArgumentException invalid value supplied
+    * @throws IOException may be thrown by the aux file parser
+    */
    private void setFieldMatchPatterns(HashMap<String,Pattern> patterns,
      TeXObject[] array, String opt, KeyValList list, TeXParser parser)
    throws IllegalArgumentException,IOException
