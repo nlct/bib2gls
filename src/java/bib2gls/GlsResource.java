@@ -14866,6 +14866,271 @@ public class GlsResource
       return false;
    }
 
+   public int getCompactRanges()
+   {
+      return compactRanges;
+   }
+
+   public String getAdoptedParentField()
+   {
+      return adoptedParentField;
+   }
+
+   public boolean hasDualPrimaryDepencendies()
+   {
+      return dualPrimaryDependency;
+   }
+
+   public String getFieldEncap(String field)
+   {
+      if (encapFields == null) return null;
+
+      String csname = encapFields.get(field);
+
+      if ("".equals(csname)) return null;
+
+      return csname;
+   }
+
+   public String getFieldEncapIncLabel(String field)
+   {
+      if (encapFieldsIncLabel == null) return null;
+
+      String csname = encapFieldsIncLabel.get(field);
+
+      if ("".equals(csname)) return null;
+
+      return csname;
+   }
+
+   public String getSortEncapCsName()
+   {
+      return encapSort;
+   }
+
+   public String getIntegerFieldFormat(String field)
+   {
+      if (formatIntegerFields == null) return null;
+
+      String format = formatIntegerFields.get(field);
+
+      return format;
+   }
+
+   public String getDecimalFieldFormat(String field)
+   {
+      if (formatDecimalFields == null) return null;
+
+      String format = formatDecimalFields.get(field);
+
+      return format;
+   }
+
+   public boolean isInsertPrefixOnlyExists()
+   {
+      return insertPrefixOnlyExists;
+   }
+
+   public boolean isAppendPrefixFieldEnabled(String field)
+   {
+      if (appendPrefixField == PREFIX_FIELD_NONE || prefixFields == null)
+      {
+         return false;
+      }
+
+      for (String f : prefixFields)
+      {
+         if (f.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public TeXObject getAppendPrefixFieldObject(TeXParser parser,
+     String field, TeXObjectList list)
+   {
+      if (!isAppendPrefixFieldEnabled(field))
+      {
+         return null;
+      }
+
+      TeXObject obj = null;
+      int endIdx = list.size()-1;
+
+      for (; endIdx >= 0; endIdx--)
+      {
+         obj = list.get(endIdx);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            break;
+         }
+      }
+
+      if (obj == null)
+      {
+         return null;
+      }
+
+      if (obj instanceof ControlSequence && prefixFieldCsExceptions != null)
+      {
+         String csName = ((ControlSequence)obj).getName();
+
+         if (prefixFieldCsExceptions.contains(csName))
+         {
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.cs.nospace",
+                  field, csName));
+            }
+
+            return null;
+         }
+      }
+
+      int codePoint;
+
+      if (obj instanceof CharObject)
+      {
+         codePoint = ((CharObject)obj).getCharCode();
+      }
+      else if (obj instanceof ActiveChar)
+      {
+         codePoint = ((ActiveChar)obj).getCharCode();
+      }
+      else
+      {
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp",
+               prefixControlSequence.toString(parser), field,
+               obj.toString(parser)));
+         }
+
+         return prefixControlSequence;
+      }
+
+      for (Integer num : prefixFieldExceptions)
+      {
+         if (num.intValue() == codePoint)
+         {
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.nospace", 
+                 field, String.format("0x%X", codePoint)));
+            }
+
+            return null;
+         }
+      }
+
+      if (appendPrefixField == PREFIX_FIELD_APPEND_SPACE
+            || prefixFieldNbspPattern == null)
+      {
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space", 
+              prefixControlSequence.toString(parser), field));
+         }
+
+         return prefixControlSequence;
+      }
+
+      for (int i = 0; i <= endIdx; i++)
+      {
+         obj = list.get(i);
+
+         if (!(obj instanceof Ignoreable))
+         {
+            String subStr = list.substring(parser, i, endIdx+1);
+
+            Matcher m = prefixFieldNbspPattern.matcher(subStr);
+
+            if (m.matches())
+            {
+               if (bib2gls.getDebugLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                    "message.append.prefix.nbsp.match",
+                    field, subStr, list.toString(parser), prefixFieldNbspPattern));
+               }
+
+               return new Nbsp();
+            }
+
+            if (bib2gls.getDebugLevel() > 0)
+            {
+               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space",
+                  prefixControlSequence.toString(parser), field));
+            }
+
+            return prefixControlSequence;
+         }
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp", field,
+            obj.toString(parser)));
+      }
+
+      return prefixControlSequence;
+   }
+
+   private void addPrefixMaps(HashMap<String,String> map)
+   {
+      map.put("prefix", "dualprefix");
+      map.put("dualprefix", "prefix");
+      map.put("prefixplural", "dualprefixplural");
+      map.put("dualprefixplural", "prefixplural");
+      map.put("prefixfirst", "dualprefixfirst");
+      map.put("dualprefixfirst", "prefixfirst");
+      map.put("prefixfirstplural", "dualprefixfirstplural");
+      map.put("dualprefixfirstplural", "prefixfirstplural");
+   }
+
+   public String getDefinitionIndexField()
+   {
+      return saveDefinitionIndex ? DEFINITION_INDEX_FIELD : null;
+   }
+
+   public String getUseIndexField()
+   {
+      return saveUseIndex ? USE_INDEX_FIELD : null;
+   }
+
+   public boolean hasEntryMglsRecords(String label)
+   {
+      if (compoundEntriesHasRecords != COMPOUND_MGLS_RECORDS_TRUE)
+      {
+         return false;
+      }
+   
+      for (Iterator<CompoundEntry> it=getCompoundEntryValueIterator();
+           it != null && it.hasNext(); )
+      {
+         CompoundEntry comp = it.next();
+
+         if (bib2gls.isMglsRefd(comp.getLabel()))
+         {
+            String[] elements = comp.getElements();
+
+            for (String elem : elements)
+            {
+               if (elem.equals(label))
+               {
+                  return true;
+               }
+            }
+         }
+      }
+
+      return false;
+   }
+
    class LabelListSortMethod
    {
       public LabelListSortMethod(String[] fields, String sortMethod, 
@@ -15158,271 +15423,6 @@ public class GlsResource
       private String[] fields;
       private String method;
       private String csname;
-   }
-
-   public int getCompactRanges()
-   {
-      return compactRanges;
-   }
-
-   public String getAdoptedParentField()
-   {
-      return adoptedParentField;
-   }
-
-   public boolean hasDualPrimaryDepencendies()
-   {
-      return dualPrimaryDependency;
-   }
-
-   public String getFieldEncap(String field)
-   {
-      if (encapFields == null) return null;
-
-      String csname = encapFields.get(field);
-
-      if ("".equals(csname)) return null;
-
-      return csname;
-   }
-
-   public String getFieldEncapIncLabel(String field)
-   {
-      if (encapFieldsIncLabel == null) return null;
-
-      String csname = encapFieldsIncLabel.get(field);
-
-      if ("".equals(csname)) return null;
-
-      return csname;
-   }
-
-   public String getSortEncapCsName()
-   {
-      return encapSort;
-   }
-
-   public String getIntegerFieldFormat(String field)
-   {
-      if (formatIntegerFields == null) return null;
-
-      String format = formatIntegerFields.get(field);
-
-      return format;
-   }
-
-   public String getDecimalFieldFormat(String field)
-   {
-      if (formatDecimalFields == null) return null;
-
-      String format = formatDecimalFields.get(field);
-
-      return format;
-   }
-
-   public boolean isInsertPrefixOnlyExists()
-   {
-      return insertPrefixOnlyExists;
-   }
-
-   public boolean isAppendPrefixFieldEnabled(String field)
-   {
-      if (appendPrefixField == PREFIX_FIELD_NONE || prefixFields == null)
-      {
-         return false;
-      }
-
-      for (String f : prefixFields)
-      {
-         if (f.equals(field))
-         {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   public TeXObject getAppendPrefixFieldObject(TeXParser parser,
-     String field, TeXObjectList list)
-   {
-      if (!isAppendPrefixFieldEnabled(field))
-      {
-         return null;
-      }
-
-      TeXObject obj = null;
-      int endIdx = list.size()-1;
-
-      for (; endIdx >= 0; endIdx--)
-      {
-         obj = list.get(endIdx);
-
-         if (!(obj instanceof Ignoreable))
-         {
-            break;
-         }
-      }
-
-      if (obj == null)
-      {
-         return null;
-      }
-
-      if (obj instanceof ControlSequence && prefixFieldCsExceptions != null)
-      {
-         String csName = ((ControlSequence)obj).getName();
-
-         if (prefixFieldCsExceptions.contains(csName))
-         {
-            if (bib2gls.getDebugLevel() > 0)
-            {
-               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.cs.nospace",
-                  field, csName));
-            }
-
-            return null;
-         }
-      }
-
-      int codePoint;
-
-      if (obj instanceof CharObject)
-      {
-         codePoint = ((CharObject)obj).getCharCode();
-      }
-      else if (obj instanceof ActiveChar)
-      {
-         codePoint = ((ActiveChar)obj).getCharCode();
-      }
-      else
-      {
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp",
-               prefixControlSequence.toString(parser), field,
-               obj.toString(parser)));
-         }
-
-         return prefixControlSequence;
-      }
-
-      for (Integer num : prefixFieldExceptions)
-      {
-         if (num.intValue() == codePoint)
-         {
-            if (bib2gls.getDebugLevel() > 0)
-            {
-               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.nospace", 
-                 field, String.format("0x%X", codePoint)));
-            }
-
-            return null;
-         }
-      }
-
-      if (appendPrefixField == PREFIX_FIELD_APPEND_SPACE
-            || prefixFieldNbspPattern == null)
-      {
-         if (bib2gls.getDebugLevel() > 0)
-         {
-            bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space", 
-              prefixControlSequence.toString(parser), field));
-         }
-
-         return prefixControlSequence;
-      }
-
-      for (int i = 0; i <= endIdx; i++)
-      {
-         obj = list.get(i);
-
-         if (!(obj instanceof Ignoreable))
-         {
-            String subStr = list.substring(parser, i, endIdx+1);
-
-            Matcher m = prefixFieldNbspPattern.matcher(subStr);
-
-            if (m.matches())
-            {
-               if (bib2gls.getDebugLevel() > 0)
-               {
-                  bib2gls.logMessage(bib2gls.getMessage(
-                    "message.append.prefix.nbsp.match",
-                    field, subStr, list.toString(parser), prefixFieldNbspPattern));
-               }
-
-               return new Nbsp();
-            }
-
-            if (bib2gls.getDebugLevel() > 0)
-            {
-               bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space",
-                  prefixControlSequence.toString(parser), field));
-            }
-
-            return prefixControlSequence;
-         }
-      }
-
-      if (bib2gls.getDebugLevel() > 0)
-      {
-         bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp", field,
-            obj.toString(parser)));
-      }
-
-      return prefixControlSequence;
-   }
-
-   private void addPrefixMaps(HashMap<String,String> map)
-   {
-      map.put("prefix", "dualprefix");
-      map.put("dualprefix", "prefix");
-      map.put("prefixplural", "dualprefixplural");
-      map.put("dualprefixplural", "prefixplural");
-      map.put("prefixfirst", "dualprefixfirst");
-      map.put("dualprefixfirst", "prefixfirst");
-      map.put("prefixfirstplural", "dualprefixfirstplural");
-      map.put("dualprefixfirstplural", "prefixfirstplural");
-   }
-
-   public String getDefinitionIndexField()
-   {
-      return saveDefinitionIndex ? DEFINITION_INDEX_FIELD : null;
-   }
-
-   public String getUseIndexField()
-   {
-      return saveUseIndex ? USE_INDEX_FIELD : null;
-   }
-
-   public boolean hasEntryMglsRecords(String label)
-   {
-      if (compoundEntriesHasRecords != COMPOUND_MGLS_RECORDS_TRUE)
-      {
-         return false;
-      }
-   
-      for (Iterator<CompoundEntry> it=getCompoundEntryValueIterator();
-           it != null && it.hasNext(); )
-      {
-         CompoundEntry comp = it.next();
-
-         if (bib2gls.isMglsRefd(comp.getLabel()))
-         {
-            String[] elements = comp.getElements();
-
-            for (String elem : elements)
-            {
-               if (elem.equals(label))
-               {
-                  return true;
-               }
-            }
-         }
-      }
-
-      return false;
    }
 
    private File texFile;
