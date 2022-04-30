@@ -14866,21 +14866,40 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the "compact-ranges" setting.
+    * @return the setting as a numeric value (0=false) 
+    */
    public int getCompactRanges()
    {
       return compactRanges;
    }
 
+   /**
+    * Gets the "adopted-parent-field" setting.
+    * @return the field name or null if not set
+    */ 
    public String getAdoptedParentField()
    {
       return adoptedParentField;
    }
 
+   /**
+    * Gets the "primary-dual-dependency" setting.
+    * @return true if the setting is on
+    */ 
    public boolean hasDualPrimaryDepencendies()
    {
       return dualPrimaryDependency;
    }
 
+   /**
+    * Gets the field encapsulator control sequence name for the
+    * "encapsulate-fields" setting.
+    * @param field the field name
+    * @return control sequence name or null if no encapsulation
+    * required
+    */ 
    public String getFieldEncap(String field)
    {
       if (encapFields == null) return null;
@@ -14892,6 +14911,13 @@ public class GlsResource
       return csname;
    }
 
+   /**
+    * Gets the field encapsulator control sequence name for the
+    * "encapsulate-fields*" setting.
+    * @param field the field name
+    * @return control sequence name or null if no encapsulation
+    * required
+    */ 
    public String getFieldEncapIncLabel(String field)
    {
       if (encapFieldsIncLabel == null) return null;
@@ -14903,11 +14929,23 @@ public class GlsResource
       return csname;
    }
 
+   /**
+    * Gets the sort encapsulator control sequence name for the
+    * "encapsulate-sort" setting.
+    * @return control sequence name or null if no encapsulation
+    * required
+    */ 
    public String getSortEncapCsName()
    {
       return encapSort;
    }
 
+   /**
+    * Gets the integer format pattern for the given field.
+    * Corresponds to the "format-integer-fields" setting.
+    * @param field the field name
+    * @return format pattern or null if not required
+    */ 
    public String getIntegerFieldFormat(String field)
    {
       if (formatIntegerFields == null) return null;
@@ -14917,6 +14955,12 @@ public class GlsResource
       return format;
    }
 
+   /**
+    * Gets the decimal format pattern for the given field.
+    * Corresponds to the "format-decimal-fields" setting.
+    * @param field the field name
+    * @return format pattern or null if not required
+    */ 
    public String getDecimalFieldFormat(String field)
    {
       if (formatDecimalFields == null) return null;
@@ -14926,11 +14970,21 @@ public class GlsResource
       return format;
    }
 
+   /**
+    * Gets the "prefix-only-existing" setting.
+    * @return true if the setting is on
+    */ 
    public boolean isInsertPrefixOnlyExists()
    {
       return insertPrefixOnlyExists;
    }
 
+   /**
+    * Determines whether or not the "append-prefix-field" setting is
+    * on for the given field.
+    * @param field the field name
+    * @return true if setting is on
+    */ 
    public boolean isAppendPrefixFieldEnabled(String field)
    {
       if (appendPrefixField == PREFIX_FIELD_NONE || prefixFields == null)
@@ -14949,6 +15003,16 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Gets the TeX code to append to the given prefix field.
+    * The current content is supplied in order to check if it ends
+    * with any identified exceptions.
+    * @param parser the TeX parser
+    * @param field the field name
+    * @param list the field's TeX code content
+    * @return the suffix to add to the field or null if no suffix
+    * required
+    */ 
    public TeXObject getAppendPrefixFieldObject(TeXParser parser,
      String field, TeXObjectList list)
    {
@@ -15080,6 +15144,10 @@ public class GlsResource
       return prefixControlSequence;
    }
 
+   /**
+    * Adds the dual mappings for the prefix fields.
+    * @param map the dual map that requires updating
+    */ 
    private void addPrefixMaps(HashMap<String,String> map)
    {
       map.put("prefix", "dualprefix");
@@ -15092,16 +15160,32 @@ public class GlsResource
       map.put("dualprefixfirstplural", "prefixfirstplural");
    }
 
+   /**
+    * Gets the name of the definition index field.
+    * @return the field name if "save-definition-index" on otherwise
+    * null
+    */ 
    public String getDefinitionIndexField()
    {
       return saveDefinitionIndex ? DEFINITION_INDEX_FIELD : null;
    }
 
+   /**
+    * Gets the name of the use index field.
+    * @return the field name if "save-use-index" on otherwise
+    * null
+    */ 
    public String getUseIndexField()
    {
       return saveUseIndex ? USE_INDEX_FIELD : null;
    }
 
+   /**
+    * Determines whether or not there are any mgls records
+    * associated with the given label.
+    * @param label the label
+    * @return true if there are any mgls records
+    */ 
    public boolean hasEntryMglsRecords(String label)
    {
       if (compoundEntriesHasRecords != COMPOUND_MGLS_RECORDS_TRUE)
@@ -15131,6 +15215,10 @@ public class GlsResource
       return false;
    }
 
+   /**
+    * Inner class for sorting field values containing a
+    * comma-separated list of labels.
+    */ 
    class LabelListSortMethod
    {
       public LabelListSortMethod(String[] fields, String sortMethod, 
