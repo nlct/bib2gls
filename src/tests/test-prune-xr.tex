@@ -1,0 +1,17 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,nostyles,stylemods=tree,style=tree]{glossaries-extra}
+
+\GlsXtrLoadResources[prune-xr]
+
+\begin{document}
+\gls{cucurbit} (see: gourd), 
+\gls{pumpkin}, \gls{melon}, \gls{broccoli},
+\gls{marrow} (see courgette), \gls{cauliflower} (seealso: broccoli).
+
+\printunsrtglossaries
+\end{document}

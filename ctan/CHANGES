@@ -39,6 +39,14 @@ v3.0 (pending):
     - secondary-break-at-not-match
     - secondary-break-at-match-op
 
+  * new options to prune "see" and "seealso" fields:
+
+    - prune-xr
+    - prune-see-op
+    - prune-see-match
+    - prune-seealso-op
+    - prune-seealso-match
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)

@@ -88,6 +88,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.copying">Copying {0} -&gt; {1}</entry>
 <entry key="message.moving">Moving {0} -&gt; {1}</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
+<entry key="message.crossref.pruned">Entry {0}: pruned cross-reference ({1}): {2}</entry>
 <entry key="message.compoundcrossref.found">Entry {0}: found compound cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.by">Entry {0} cross-referenced by {1}</entry>
 <entry key="message.compoundcrossref.by">Compound entry {0} cross-referenced by {1}</entry>

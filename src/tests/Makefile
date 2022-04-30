@@ -39,7 +39,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-from-xr.pdf test-nodeps-see.pdf test-standalone-range.pdf \
 	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf \
 	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
-	  test-mergegroups.pdf test-break-at.pdf
+	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -748,6 +748,14 @@ test-break-at.pdf	: test-break-at.glstex
 test-break-at.glstex	: test-break-at.tex test-break-at.bib $(DEPS)
 			pdflatex test-break-at
 			$(BIB2GLS) test-break-at
+
+test-prune-xr.pdf	: test-prune-xr.glstex
+			pdflatex test-prune-xr
+			pdflatex test-prune-xr
+
+test-prune-xr.glstex	: test-prune-xr.tex test-prune-xr.bib $(DEPS)
+			pdflatex test-prune-xr
+			$(BIB2GLS) test-prune-xr
 
 clean	:
 	$(RM) *.aux

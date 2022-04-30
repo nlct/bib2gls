@@ -4497,6 +4497,8 @@ public class Bib2GlsEntry extends BibEntry
     StringBuilder builder)
     throws IOException
    {
+      boolean pruneDeadEnds = resource.isPruneSeeDeadEndsOn();
+
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
@@ -4507,6 +4509,7 @@ public class Bib2GlsEntry extends BibEntry
       if (opt != null)
       {
          crossRefTag = opt.toString(parser);
+         orgCrossRefTag = crossRefTag;
 
          builder.append('[');
          builder.append(crossRefTag);
@@ -4520,9 +4523,17 @@ public class Bib2GlsEntry extends BibEntry
       if (n == 0) return;
 
       crossRefs = new String[n];
+      int xrIdx = 0;
+
+      if (pruneDeadEnds)
+      {
+         orgCrossRefs = new String[n];
+      }
 
       for (int i = 0; i < n; i++)
       {
+         boolean append = true;
+
          TeXObject xr = csvList.get(i);
 
          if (xr instanceof TeXObjectList)
@@ -4537,21 +4548,32 @@ public class Bib2GlsEntry extends BibEntry
 
          if (comp == null)
          {
-            crossRefs[i] = processLabel(label);
+            label = processLabel(label);
 
-            label = crossRefs[i];
-
-            if (bib2gls.getVerboseLevel() > 0)
+            if (pruneDeadEnds && resource.isSeeDeadEnd(label))
             {
-               bib2gls.logMessage(bib2gls.getMessage(
-                  "message.crossref.found", getId(), "see", label));
-            }
+               append = false;
+               bib2gls.verboseMessage("message.crossref.pruned", 
+                getId(), "see", label);
 
-            addDependency(label);
+               resource.prunedSee(label, this);
+            }
+            else
+            {
+               crossRefs[xrIdx++] = label;
+
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                     "message.crossref.found", getId(), "see", label));
+               }
+
+               addDependency(label);
+            }
          }
          else
          {
-            crossRefs[i] = label;
+            crossRefs[xrIdx++] = label;
 
             if (bib2gls.getVerboseLevel() > 0)
             {
@@ -4569,15 +4591,68 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
 
-         builder.append(label);
-
-         if (i != n-1)
+         if (pruneDeadEnds)
          {
-            builder.append(',');
+            orgCrossRefs[i] = label;
+         }
+
+         if (append)
+         {
+            if (xrIdx > 1)
+            {
+               builder.append(',');
+            }
+
+            builder.append(label);
          }
       }
 
-      putField("see", builder.toString());
+      if (!pruneDeadEnds)
+      {
+         orgCrossRefs = crossRefs;
+      }
+
+      if (xrIdx == 0)
+      {
+         removeField("see");
+         crossRefTag = null;
+         crossRefs = null;
+      }
+      else if (xrIdx < n)
+      {
+         String strList = builder.toString();
+
+         // need to rebuild list
+
+         TeXObjectList list = new TeXObjectList();
+
+         if (opt != null)
+         {
+            list.add(parser.getListener().getOther('['));
+            list.add(opt);
+            list.add(parser.getListener().getOther(']'));
+         }
+
+         list.addAll(parser.getListener().createString(strList));
+         BibValueList bibList = new BibValueList();
+         bibList.add(new BibUserString(list));
+
+         putField("see", bibList);
+         putField("see", strList);
+
+         String[] array = new String[xrIdx];
+
+         for (int i = 0; i < xrIdx; i++)
+         {
+            array[i] = crossRefs[i];
+         }
+
+         crossRefs = array;
+      }
+      else
+      {
+         putField("see", builder.toString());
+      }
    }
 
    private void initAlsoCrossRefs(TeXParser parser, BibValueList value, 
@@ -4591,27 +4666,56 @@ public class Bib2GlsEntry extends BibEntry
       }
       else
       {
+         boolean pruneDeadEnds = resource.isPruneSeeAlsoDeadEndsOn();
+
          StringBuilder builder = new StringBuilder();
          String sep = "";
 
          alsocrossRefs = strValue.trim().split("\\s*,\\s*");
+         orgAlsocrossRefs = alsocrossRefs;
+
+         Vector<String> xrList = null;
+
+         if (pruneDeadEnds)
+         {
+            xrList = new Vector<String>();
+         }
 
          for (String label : alsocrossRefs)
          {
+            boolean append = true;
+
             // is this a compound entry?
             CompoundEntry comp = bib2gls.getCompoundEntry(label);
 
             if (comp == null)
             {
                label = processLabel(label);
-   
-               if (bib2gls.getVerboseLevel() > 0)
+
+               if (pruneDeadEnds && resource.isSeeAlsoDeadEnd(label))
                {
-                  bib2gls.logMessage(bib2gls.getMessage(
-                     "message.crossref.found", getId(), "seealso", label));
+                  append = false;
+
+                  bib2gls.verboseMessage("message.crossref.pruned", 
+                   getId(), "seealso", label);
+
+                  resource.prunedSeeAlso(label, this);
                }
+               else
+               {   
+                  if (bib2gls.getVerboseLevel() > 0)
+                  {
+                     bib2gls.logMessage(bib2gls.getMessage(
+                        "message.crossref.found", getId(), "seealso", label));
+                  }
    
-               addDependency(label);
+                  addDependency(label);
+
+                  if (xrList != null)
+                  {
+                     xrList.add(label);
+                  }
+               }
             }
             else
             {
@@ -4629,12 +4733,44 @@ public class Bib2GlsEntry extends BibEntry
                }
             }
 
-            builder.append(sep);
-            builder.append(label);
-            sep = ",";
+            if (append)
+            {
+               builder.append(sep);
+               builder.append(label);
+               sep = ",";
+            }
          }
 
-         putField("seealso", builder.toString());
+         if (xrList != null && xrList.size() < alsocrossRefs.length)
+         {
+            if (xrList.isEmpty())
+            {
+               removeField("seealso");
+               removeFieldValue("seealso");
+               alsocrossRefs = null;
+            }
+            else
+            {
+               String strList = builder.toString();
+
+               alsocrossRefs = xrList.toArray(new String[xrList.size()]);
+
+               // need to rebuild list
+
+               TeXObjectList list = new TeXObjectList();
+
+               list.addAll(parser.getListener().createString(strList));
+               BibValueList bibList = new BibValueList();
+               bibList.add(new BibUserString(list));
+
+               putField("seealso", bibList);
+               putField("seealso", strList);
+            }
+         }
+         else
+         {
+            putField("seealso", builder.toString());
+         }
       }
    }
 
@@ -4658,6 +4794,8 @@ public class Bib2GlsEntry extends BibEntry
          return;
       }
 
+      boolean pruneDeadEnds = resource.isPruneSeeAlsoDeadEndsOn();
+
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
@@ -4670,9 +4808,17 @@ public class Bib2GlsEntry extends BibEntry
       if (n == 0) return;
 
       alsocrossRefs = new String[n];
+      int xrIdx = 0;
+
+      if (pruneDeadEnds)
+      {
+         orgAlsocrossRefs = new String[n];
+      }
 
       for (int i = 0; i < n; i++)
       {
+         boolean append = true;
+
          TeXObject xr = csvList.get(i);
 
          if (xr instanceof TeXObjectList)
@@ -4685,19 +4831,33 @@ public class Bib2GlsEntry extends BibEntry
          // is this a compound entry?
          CompoundEntry comp = bib2gls.getCompoundEntry(label);
 
-         alsocrossRefs[i] = label;
+         if (pruneDeadEnds)
+         {
+            orgAlsocrossRefs[i] = label;
+         }
 
          if (comp == null)
          {
             label = processLabel(alsocrossRefs[i]);
 
-            if (bib2gls.getVerboseLevel() > 0)
+            if (pruneDeadEnds && resource.isSeeAlsoDeadEnd(label))
             {
-               bib2gls.logMessage(bib2gls.getMessage(
-                  "message.crossref.found", getId(), "seealso", label));
-            }
+               append = false;
+               bib2gls.verboseMessage("message.crossref.pruned", 
+                getId(), "seealso", label);
 
-            addDependency(label);
+               resource.prunedSeeAlso(label, this);
+            }
+            else
+            {
+               if (bib2gls.getVerboseLevel() > 0)
+               {
+                  bib2gls.logMessage(bib2gls.getMessage(
+                     "message.crossref.found", getId(), "seealso", label));
+               }
+
+               addDependency(label);
+            }
          }
          else
          {
@@ -4715,15 +4875,65 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
 
-         builder.append(label);
-
-         if (i != n-1)
+         if (append)
          {
-            builder.append(',');
+            alsocrossRefs[xrIdx++] = label;
+
+            if (xrIdx > 1)
+            {
+               builder.append(',');
+            }
+
+            builder.append(label);
          }
       }
 
-      putField("seealso", builder.toString());
+      if (!pruneDeadEnds)
+      {
+         orgAlsocrossRefs = alsocrossRefs;
+      }
+
+      if (xrIdx == 0)
+      {
+         removeField("seealso");
+         alsocrossRefs = null;
+      }
+      else if (xrIdx < n)
+      {
+         String strList = builder.toString();
+
+         // need to rebuild list
+
+         TeXObjectList list = new TeXObjectList();
+
+         list.addAll(parser.getListener().createString(strList));
+         BibValueList bibList = new BibValueList();
+         bibList.add(new BibUserString(list));
+
+         putField("seealso", bibList);
+         putField("seealso", strList);
+
+         String[] array = new String[xrIdx];
+
+         for (int i = 0; i < xrIdx; i++)
+         {
+            array[i] = alsocrossRefs[i];
+         }
+
+         alsocrossRefs = array;
+      }
+      else
+      {
+         putField("seealso", builder.toString());
+      }
+   }
+
+   public void restorePrunedSee(String label)
+   {// TODO
+   }
+
+   public void restorePrunedSeeAlso(String label)
+   {// TODO
    }
 
    // User has identified that the given value is a list like "see"
@@ -5204,6 +5414,10 @@ public class Bib2GlsEntry extends BibEntry
    private String crossRefTag = null;
    private String[] crossRefs = null;
    private String[] alsocrossRefs = null;
+
+   private String orgCrossRefTag = null;
+   private String[] orgCrossRefs = null;
+   private String[] orgAlsocrossRefs = null;
 
    public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
 

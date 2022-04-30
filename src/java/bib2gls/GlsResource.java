@@ -2470,6 +2470,68 @@ public class GlsResource
                aliasLocation = Bib2GlsEntry.POST_SEE;
             }
          }
+         else if (opt.equals("prune-xr"))
+         {// shortcut
+
+            if (getBoolean(parser, list, opt))
+            {
+               pruneSeePatterns = new HashMap<String,Pattern>();
+               pruneSeePatterns.put("entrytype", Pattern.compile("index(plural)?"));
+               pruneSeePatterns.put("see", Pattern.compile(""));
+               pruneSeePatterns.put("seealso", Pattern.compile(""));
+               pruneSeePatterns.put("alias", Pattern.compile(""));
+               pruneSeeAlsoPatterns = new HashMap<String,Pattern>();
+               pruneSeeAlsoPatterns.put("entrytype", Pattern.compile("index(plural)?"));
+               pruneSeeAlsoPatterns.put("see", Pattern.compile(""));
+               pruneSeeAlsoPatterns.put("seealso", Pattern.compile(""));
+               pruneSeeAlsoPatterns.put("alias", Pattern.compile(""));
+            }
+            else
+            {
+               pruneSeePatterns = null;
+               pruneSeeAlsoPatterns = null;
+            }
+         }
+         else if (opt.equals("prune-see-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
+
+            pruneSeePatternsAnd = val.equals("and");
+         }
+         else if (opt.equals("prune-see-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+
+            if (array == null)
+            {
+               pruneSeePatterns = null;
+            }
+            else
+            {
+               pruneSeePatterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(pruneSeePatterns, array, opt, list, parser);
+            }
+         }
+         else if (opt.equals("prune-seealso-op"))
+         {
+            String val = getChoice(parser, list, opt, "and", "or");
+
+            pruneSeeAlsoPatternsAnd = val.equals("and");
+         }
+         else if (opt.equals("prune-seealso-match"))
+         {
+            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+
+            if (array == null)
+            {
+               pruneSeeAlsoPatterns = null;
+            }
+            else
+            {
+               pruneSeeAlsoPatterns = new HashMap<String,Pattern>();
+               setFieldMatchPatterns(pruneSeePatterns, array, opt, list, parser);
+            }
+         }
          else if (opt.equals("primary-loc-counters") 
                || opt.equals("principal-loc-counters"))
          {
@@ -6278,9 +6340,11 @@ public class GlsResource
     * Actual glossary entries need to be picked out and stored in 
     * a separate list (bibData for the primary entries and dualData 
     * for the dual entries, if they need to be sorted separately).
-    * These lists contain all entry data that may or may not be
-    * required by this resource set. Separate lists are used to keep
-    * track of the actual selected entries.
+    * These lists contain all eligible entry data (not discarded
+    * entries) that may or may not be required by this resource set. 
+    *
+    * Separate lists are used to keep track of the actual selected
+    * entries in stage 4.
     */
 
    /**
@@ -6326,6 +6390,13 @@ public class GlsResource
          seeList = new Vector<Bib2GlsEntry>();
       }
 
+      Vector<Bib2GlsEntry> savedSeeEntries = null;
+
+      if (isPruneSeeDeadEndsOn() || isPruneSeeAlsoDeadEndsOn())
+      {
+         savedSeeEntries = new Vector<Bib2GlsEntry>();
+      }
+
       boolean combine = "combine".equals(dualSortSettings.getMethod());
 
       for (int i = 0; i < list.size(); i++)
@@ -6365,7 +6436,16 @@ public class GlsResource
                if (dual.getField("see") != null 
                    || dual.getField("seealso") != null)
                {
-                  dual.initCrossRefs(parser);
+                  if (savedSeeEntries != null 
+                       && (dual.getField("see") != null
+                         || dual.getField("seealso") != null))
+                  {
+                     savedSeeEntries.add(dual);
+                  }
+                  else
+                  {
+                     dual.initCrossRefs(parser);
+                  }
                }
 
             }
@@ -6577,11 +6657,29 @@ public class GlsResource
             {
                // does this entry have a "see" or "seealso" field?
 
-               entry.initCrossRefs(parser);
+               if (savedSeeEntries != null &&
+                    (entry.getField("see") != null
+                         || entry.getField("seealso") != null))
+               {
+                  savedSeeEntries.add(entry);
+               }
+               else
+               {
+                  entry.initCrossRefs(parser);
+               }
 
                if (dual != null)
                {
-                  dual.initCrossRefs(parser);
+                  if (savedSeeEntries != null
+                        && (dual.getField("see") != null
+                               || dual.getField("seealso") != null))
+                  {
+                     savedSeeEntries.add(dual);
+                  }
+                  else
+                  {
+                     dual.initCrossRefs(parser);
+                  }
                }
 
                if (selectionMode != SELECTION_ALL)
@@ -6754,6 +6852,16 @@ public class GlsResource
 
                target.copyRecordsFrom(entry);
             }
+         }
+      }
+
+      if (savedSeeEntries != null)
+      {
+         // initialise cross-reference lists but prune any dead ends
+
+         for (Bib2GlsEntry entry : savedSeeEntries)
+         {
+            entry.initCrossRefs(parser);
          }
       }
 
@@ -15266,6 +15374,132 @@ public class GlsResource
    }
 
    /**
+    * Added pruned "see" label.
+    * Used to mark the given label as having been pruned from the
+    * "see" list corresponding to the given entry.
+    * @param label the pruned cross-reference
+    * @param entry the entry with the "see" field
+    */ 
+   public void prunedSee(String label, Bib2GlsEntry entry)
+   {
+      PrunedEntry pruned = null;
+
+      if (prunedEntryMap == null)
+      {
+         prunedEntryMap = new HashMap<String,PrunedEntry>();
+      }
+      else
+      {
+         pruned = prunedEntryMap.get(label);
+      }
+
+      if (pruned == null)
+      {
+         pruned = new PrunedEntry(label);
+         prunedEntryMap.put(label, pruned);
+      }
+
+      pruned.fromSee(entry);
+   }
+
+   /**
+    * Added pruned "seealso" label.
+    * Used to mark the given label as having been pruned from the
+    * "seealso" list corresponding to the given entry.
+    * @param label the pruned cross-reference
+    * @param entry the entry with the "seealso" field
+    */ 
+   public void prunedSeeAlso(String label, Bib2GlsEntry entry)
+   {
+      PrunedEntry pruned = null;
+
+      if (prunedEntryMap == null)
+      {
+         prunedEntryMap = new HashMap<String,PrunedEntry>();
+      }
+      else
+      {
+         pruned = prunedEntryMap.get(label);
+      }
+
+      if (pruned == null)
+      {
+         pruned = new PrunedEntry(label);
+         prunedEntryMap.put(label, pruned);
+      }
+
+      pruned.fromSeeAlso(entry);
+   }
+
+   /**
+    * Determines whether or not the given entry constitutes a "see" dead end.
+    * @return true if setting on
+    */ 
+   public boolean isSeeDeadEnd(String label)
+   {
+      if (pruneSeePatterns == null || isDependent(label)
+          || bib2gls.isDependent(label))
+      {
+         return false;
+      }
+
+      Bib2GlsEntry entry = getEntry(label);
+
+      if (entry == null) return true;// can't find entry
+
+      if (entry.hasRecords()
+            || notMatch(entry, pruneSeePatternsAnd, pruneSeePatterns))
+      {
+         return false;
+      }
+
+      return true;
+   }
+
+   /**
+    * Determines whether or not the given entry constitutes a "seealso" dead end.
+    * @return true if setting on
+    */ 
+   public boolean isSeeAlsoDeadEnd(String label)
+   {
+      if (pruneSeeAlsoPatterns == null || isDependent(label)
+          || bib2gls.isDependent(label))
+      {
+         return false;
+      }
+
+      Bib2GlsEntry entry = getEntry(label);
+
+      if (entry == null) return true;// can't find entry
+
+      if (entry.hasRecords()
+           || notMatch(entry, pruneSeeAlsoPatternsAnd, pruneSeeAlsoPatterns))
+      {
+         return false;
+      }
+
+      return true;
+   }
+
+   /**
+    * Determines whether or not to prune "see" dead ends.
+    * @return true if setting on
+    */ 
+   public boolean isPruneSeeDeadEndsOn()
+   {
+      return pruneSeePatterns != null;
+   }
+
+   /**
+    * Determines whether or not to prune "seealso" dead ends.
+    * @return true if setting on
+    */ 
+   public boolean isPruneSeeAlsoDeadEndsOn()
+   {
+      return pruneSeeAlsoPatterns != null;
+   }
+
+   /**
     * Inner class for sorting field values containing a
     * comma-separated list of labels.
     */ 
@@ -16026,5 +16260,10 @@ public class GlsResource
 
    private String compoundMainType = null;
    private String compoundOtherType = null;
+
+   private HashMap<String,Pattern> pruneSeePatterns=null, pruneSeeAlsoPatterns=null;
+   private boolean pruneSeePatternsAnd=true, pruneSeeAlsoPatternsAnd=true;
+
+   private HashMap<String,PrunedEntry> prunedEntryMap;
 }
 
