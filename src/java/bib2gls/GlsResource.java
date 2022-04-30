@@ -80,6 +80,22 @@ public class GlsResource
    }
 
    /**
+    * Gets the string representation of this resource set.
+    * @return the string representation of this object
+    */ 
+   @Override
+   public String toString()
+   {
+      return texFile == null ? super.toString() : texFile.getName();
+   }
+
+   /*
+    * METHODS: initialisation (stage 1).
+    * Establishing settings and parsing supplemental or 
+    * master aux files.
+    */
+
+   /**
     * Initialises the settings for this resource set (stage 1).
     * @param parser the aux file parser
     * @param opts the resource settings (which should be a key=value comma-separated list)
@@ -5899,6 +5915,31 @@ public class GlsResource
    }
 
    /**
+    * Adds the given field to the list of valid field names.
+    * @param field the field name
+    */ 
+   public void addUserField(String field)
+   {
+      if (additionalUserFields == null)
+      {
+         additionalUserFields = new Vector<String>();
+      }
+
+      additionalUserFields.add(field);
+
+      bib2gls.verboseMessage("message.added.user.field", field);
+   }
+
+   /*
+    * METHODS: bib parsing (stage 2).
+    * Reading in all bib data associated with this resource set. 
+    * Each bib object is created by the Bib2GlsAt class process
+    * method (which parses the object's contents) and is added 
+    * to the listener's internal list of data, this
+    * includes @preamble and @string.
+    */
+
+   /**
     * Parses all bib files associated with this resource set (stage 2).
     * @param parser the aux file parser
     * @throws IOException may be thrown by the aux file parser
@@ -5982,22 +6023,15 @@ public class GlsResource
    }
 
    /**
-    * Gets the string representation of this resource set.
-    * @return the string representation of this object
-    */ 
-   @Override
-   public String toString()
-   {
-      return texFile == null ? super.toString() : texFile.getName();
-   }
-
-   /**
     * Gets the listener used by the bib parser.
     */ 
    public Bib2GlsBibParser getBibParserListener()
    {
       return bibParserListener;
    }
+
+   // Compound entries are added when @compoundset has its contents
+   // parsed.
 
    /**
     * Determines whether or not there are compound entries.
@@ -6201,6 +6235,53 @@ public class GlsResource
 
       return null;
    }
+
+   /**
+    * Sets or appends to the preamble obtained from the bib file.
+    * Used by the bib file parser.
+    * @param string version of preamble (for writing to the glstex)
+    * @param list content of preamble for parser if interpreter
+    * required
+    */ 
+   public void setPreamble(String content, BibValueList list)
+   {
+      if (preamble == null)
+      {
+         preamble = content;
+      }
+      else
+      {
+         preamble += content;
+      }
+
+      if (list != null && interpretPreamble)
+      {
+         if (preambleList == null)
+         {
+            preambleList = list;
+         }
+         else
+         {
+            preambleList.addAll(list);
+         }
+      }
+   }
+
+   /*
+    * METHODS: bib object processing and dependencies (stage 3).
+    * The data obtained from parsing the bib files is a mixture of
+    * objects representing glossary entries (Bib2GlsEntry) and other
+    * types of bib objects (such as @preamble). If a preamble has
+    * been provided, it now needs to be processed (if the interpreter
+    * needs to pick up any command definitions).
+    *
+    * Actual glossary entries need to be picked out and stored in 
+    * a separate list (bibData for the primary entries and dualData 
+    * for the dual entries, if they need to be sorted separately).
+    * These lists contain all entry data that may or may not be
+    * required by this resource set. Separate lists are used to keep
+    * track of the actual selected entries.
+    */
 
    /**
     * Processes the list of bib entries (stage 3). The list of bib entries
@@ -6702,6 +6783,21 @@ public class GlsResource
    }
 
    /**
+    * Process the preamble contents provided in the bib file. This
+    * allows any command definitions to be picked up by the
+    * interpreter.
+    * @throws IOException may be thrown by the parser
+    */ 
+   public void processPreamble()
+    throws IOException
+   {
+      if (preambleList != null)
+      {
+         bib2gls.processPreamble(preambleList);
+      }
+   }
+
+   /**
     * Applies the compound entry settings.
     */ 
    private void applyCompoundEntrySettings()
@@ -7046,7 +7142,9 @@ public class GlsResource
    }
 
    /**
-    * Adds then given entry label to the list of dependent entries.
+    * Adds the given entry label to the list of dependent entries.
+    * Indicates that one or more selected entries depend on the
+    * entry identified by the given label.
     * @param id the entry label
     */ 
    public void addDependent(String id)
@@ -7065,6 +7163,10 @@ public class GlsResource
    {
       return dependencies;
    }
+
+   /*
+    * METHODS: selection, sorting and writing (stage 4).
+    */
 
    /**
     * Processes the data (stage 4). This selects the required
@@ -7191,52 +7293,6 @@ public class GlsResource
          {
             writer.close();
          }
-      }
-   }
-
-   /**
-    * Sets or appends to the preamble obtained from the bib file.
-    * Used by the bib file parser.
-    * @param string version of preamble (for writing to the glstex)
-    * @param list content of preamble for parser if interpreter
-    * required
-    */ 
-   public void setPreamble(String content, BibValueList list)
-   {
-      if (preamble == null)
-      {
-         preamble = content;
-      }
-      else
-      {
-         preamble += content;
-      }
-
-      if (list != null && interpretPreamble)
-      {
-         if (preambleList == null)
-         {
-            preambleList = list;
-         }
-         else
-         {
-            preambleList.addAll(list);
-         }
-      }
-   }
-
-   /**
-    * Process the preamble contents provided in the bib file. This
-    * allows any command definitions to be picked up by the
-    * interpreter.
-    * @throws IOException may be thrown by the parser
-    */ 
-   public void processPreamble()
-    throws IOException
-   {
-      if (preambleList != null)
-      {
-         bib2gls.processPreamble(preambleList);
       }
    }
 
@@ -7372,325 +7428,6 @@ public class GlsResource
          addEntry(entries, parent);
          childEntry.addDependency(parent.getId());
       }
-   }
-
-   /**
-    * Gets the flipped label.
-    * If the label starts with a known prefix, the flipped label is
-    * the label with the opposite prefix (for
-    * example, the dual and primary prefixes are swapped).
-    * the dual prefix.
-    * @return the flipped label or null if can't be determined
-    */ 
-   public String flipLabel(String label)
-   {
-      if (labelPrefix == null)
-      {
-         if (label.startsWith(dualPrefix))
-         {
-            return label.substring(dualPrefix.length());
-         }
-         else if (hasTertiaries && label.startsWith(tertiaryPrefix))
-         {
-            return label.substring(tertiaryPrefix.length());
-         }
-         else
-         {
-            return dualPrefix+label;
-         }
-      }
-
-      if (dualPrefix == null)
-      {
-         if (label.startsWith(labelPrefix))
-         {
-            return label.substring(labelPrefix.length());
-         }
-         else if (hasTertiaries && label.startsWith(tertiaryPrefix))
-         {
-            return label.substring(tertiaryPrefix.length());
-         }
-         else
-         {
-            return labelPrefix+label;
-         }
-      }
-
-      if (label.startsWith(labelPrefix))
-      {
-         String substr = label.substring(labelPrefix.length());
-
-         if (substr.startsWith(dualPrefix))
-         {
-            return substr;
-         }
-
-         return dualPrefix+substr;
-      }
-
-      if (label.startsWith(dualPrefix))
-      {
-         String substr = label.substring(dualPrefix.length());
-
-         if (substr.startsWith(labelPrefix))
-         {
-            return substr;
-         }
-
-         return labelPrefix+substr;
-      }
-
-      if (hasTertiaries)
-      {
-         if (tertiaryPrefix != null && label.startsWith(tertiaryPrefix))
-         {
-            String substr = label.substring(tertiaryPrefix.length());
-
-            if (substr.startsWith(dualPrefix)||substr.startsWith(labelPrefix))
-            {
-               return substr;
-            }
-
-            return dualPrefix+substr;
-         }
-      }
-
-      return null;
-   }
-
-   /**
-    * Gets the entry with the given label. The search is performed
-    * on the primary list first and then on the dual list.
-    * @param label the search label
-    * @return the entry or null if not found
-    */ 
-   public Bib2GlsEntry getEntry(String label)
-   {
-      return getEntry(label, false);
-   }
-
-   /**
-    * Gets the entry with the given label. The search is performed
-    * on the primary list first and then on the dual list.
-    * @param label the search label
-    * @param tryFlipping if true also search on the flipped label
-    * @return the entry or null if not found
-    */ 
-   public Bib2GlsEntry getEntry(String label, boolean tryFlipping)
-   {
-      Bib2GlsEntry entry = getEntry(label, bibData, tryFlipping);
-
-      if (entry != null)
-      {
-         return entry;
-      }
-
-      return getEntry(label, dualData, tryFlipping);
-   }
-
-   /**
-    * Gets the entry with the given label in the given list.
-    * @param label the search label
-    * @param data the list of entries to search
-    * @return the entry or null if not found
-    */ 
-   public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
-   {
-      return getEntry(label, data, false);
-   }
-
-   /**
-    * Gets the entry with the given label in the given list.
-    * @param label the search label
-    * @param data the list of entries to search
-    * @param tryFlipping if true also search on the flipped label
-    * @return the entry or null if not found
-    */ 
-   public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data,
-     boolean tryFlipping)
-   {
-      String flippedLabel = (tryFlipping ? flipLabel(label) : null);
-
-      for (Bib2GlsEntry entry : data)
-      {
-         String id = entry.getId();
-
-         if (id.equals(label))
-         {
-            return entry;
-         }
-
-         if (tryFlipping)
-         {
-            if (id.equals(flippedLabel))
-            {
-               return entry;
-            }
-
-            String flippedId = flipLabel(id);
-
-            if (flippedId.equals(label) || flippedId.equals(flippedLabel))
-            {
-               return entry;
-            }
-         }
-      }
-
-      return null;
-   }
-
-   /**
-    * Gets the entry with the given label in the given list.
-    * The entry must be a Bib2GlsEntry object for the match to be
-    * successful. The provided list may include other BibData objects, such
-    * as BibPreamble or BibString.
-    * @param label the search label
-    * @param data the list of entries to search
-    * @return the entry or null if not found
-    */ 
-   public Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
-   {
-      for (BibData entry : data)
-      {
-         if (entry instanceof Bib2GlsEntry 
-             && ((Bib2GlsEntry)entry).getId().equals(label))
-         {
-            return (Bib2GlsEntry)entry;
-         }
-      }
-
-      return null;
-   }
-
-   /**
-    * Gets the list of "other" elements for the given compound
-    * entry. This method searches for the entries identified by the
-    * compound entry's element list that don't match the main
-    * element.
-    * @param comp the compound entry
-    */ 
-   public Vector<Bib2GlsEntry> getOtherElements(CompoundEntry comp)
-   {
-      Vector<Bib2GlsEntry> list = new Vector<Bib2GlsEntry>();
-
-      String[] elements = comp.getElements();
-      String mainLabel = comp.getMainLabel();
-
-      for (String elem : elements)
-      {
-         if (!elem.equals(mainLabel))
-         {
-            Bib2GlsEntry other = getEntry(elem, bibData);
-
-            if (other == null && dualData != null)
-            {
-               other = getEntry(elem, dualData);
-            }
-
-            if (other != null)
-            {
-               list.add(other);
-            }
-         }
-      }
-
-      return list;
-   }
-
-   /**
-    * Determines if given record matches any of the labels.
-    * @param primaryId label of primary entry
-    * @param dualId label of dual entry
-    * @param tertiaryId tertiary label
-    * @param record the record under investigation
-    * @return the record if the record label matches 
-    * or null if no match
-    */ 
-   public GlsRecord getRecord(String primaryId, String dualId,
-     String tertiaryId, GlsRecord record)
-   {
-      return record.getRecord(this, primaryId, dualId, tertiaryId);
-   }
-
-   /**
-    * Gets the entry that matches the given record. Searches both
-    * the primary and dual data lists.
-    * @param record the record
-    * @return the entry that matches the record label or null if not
-    * found
-    */ 
-   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record)
-   {
-      return record.getEntry(this, bibData, dualData);
-   }
-
-   /**
-    * Gets the entry that matches the given record.
-    * @param record the record
-    * @param data the list of data to search for the entry
-    * @param tryFlipping if true try matching the flipped label if
-    * no match on the label
-    * @return the entry that matches the record label or null if not
-    * found
-    */ 
-   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record,
-      Vector<Bib2GlsEntry> data, boolean tryFlipping)
-   {
-      return record.getEntry(this, data, tryFlipping);
-   }
-
-   @Deprecated
-   public String getRecordLabel(GlsRecord record)
-   {
-      String label = record.getLabel();
-
-      if (recordLabelPrefix == null || label.startsWith(recordLabelPrefix))
-      {
-         return label;
-      }
-
-      return recordLabelPrefix+label;
-   }
-
-   /**
-    * Gets the prefixed label associated with the record.
-    * @param record the cross-reference record
-    * @return the prefixed label
-    */ 
-   public String getRecordLabel(GlsSeeRecord record)
-   {
-      if (recordLabelPrefix == null)
-      {
-         return record.getLabel();
-      }
-
-      return recordLabelPrefix+record.getLabel();
-   }
-
-   /**
-    * Adds the given entry to the list of selected entries. Also
-    * sets the entry's selected status to true. Doesn't add the
-    * entry if it has already been added.
-    * @param entries the list of selected entries
-    * @param entry the entry to add to the list
-    */ 
-   private void addEntry(Vector<Bib2GlsEntry> entries, Bib2GlsEntry entry)
-   {
-      String id = entry.getId();
-
-      for (Bib2GlsEntry e : entries)
-      {
-         if (e.getId().equals(id))
-         {
-            bib2gls.debugMessage("message.entry.already.added", id,
-             e.getOriginalEntryType(), e.getOriginalId(),
-             entry.getOriginalEntryType(), entry.getOriginalId());
-            return;
-         }
-      }
-
-      entries.add(entry);
-      entry.setSelected(true);
    }
 
    /**
@@ -9360,6 +9097,50 @@ public class GlsResource
    }
 
    /**
+    * Adds the given entry to the secondary list.
+    * @param entry the entry
+    * @param secondaryList the secondary list
+    */ 
+   private void addToSecondaryList(Bib2GlsEntry entry, 
+      Vector<Bib2GlsEntry> secondaryList)
+   {
+      String id = entry.getId();
+
+      if (secondaryFieldPatterns == null)
+      {
+         bib2gls.verboseMessage("message.add.secondary.entry.no_filter", id);
+         secondaryList.add(entry);
+      }
+      else
+      {
+         boolean matches = !secondaryNotMatch(entry);
+
+         if (secondaryMatchAction == MATCH_ACTION_ADD)
+         {
+            bib2gls.debugMessage("message.secondary.filter", id, 
+              "add", matches);
+
+            if (matches)
+            {
+               bib2gls.verboseMessage("message.add.secondary.entry", id);
+               secondaryList.add(entry);
+            }
+         }
+         else
+         {
+            bib2gls.debugMessage("message.secondary.filter", id, 
+              "filter", matches);
+
+            if (!matches)
+            {
+               bib2gls.verboseMessage("message.add.secondary.entry", id);
+               secondaryList.add(entry);
+            }
+         }
+      }
+   }
+
+   /**
     * Writes the definition of {@code \\bibglslocprefix}.
     * @param writer the file writer stream
     * @throws IOException if I/O error occurs
@@ -9410,50 +9191,6 @@ public class GlsResource
       }
 
       writer.println("}%");
-   }
-
-   /**
-    * Adds the given entry to the secondary list.
-    * @param entry the entry
-    * @param secondaryList the secondary list
-    */ 
-   private void addToSecondaryList(Bib2GlsEntry entry, 
-      Vector<Bib2GlsEntry> secondaryList)
-   {
-      String id = entry.getId();
-
-      if (secondaryFieldPatterns == null)
-      {
-         bib2gls.verboseMessage("message.add.secondary.entry.no_filter", id);
-         secondaryList.add(entry);
-      }
-      else
-      {
-         boolean matches = !secondaryNotMatch(entry);
-
-         if (secondaryMatchAction == MATCH_ACTION_ADD)
-         {
-            bib2gls.debugMessage("message.secondary.filter", id, 
-              "add", matches);
-
-            if (matches)
-            {
-               bib2gls.verboseMessage("message.add.secondary.entry", id);
-               secondaryList.add(entry);
-            }
-         }
-         else
-         {
-            bib2gls.debugMessage("message.secondary.filter", id, 
-              "filter", matches);
-
-            if (!matches)
-            {
-               bib2gls.verboseMessage("message.add.secondary.entry", id);
-               secondaryList.add(entry);
-            }
-         }
-      }
    }
 
    /**
@@ -9800,22 +9537,6 @@ public class GlsResource
               id, USE_INDEX_FIELD, val);
          }
       }
-   }
-
-   /**
-    * Adds the given field to the list of valid field names.
-    * @param field the field name
-    */ 
-   public void addUserField(String field)
-   {
-      if (additionalUserFields == null)
-      {
-         additionalUserFields = new Vector<String>();
-      }
-
-      additionalUserFields.add(field);
-
-      bib2gls.verboseMessage("message.added.user.field", field);
    }
 
    /**
@@ -10277,6 +9998,626 @@ public class GlsResource
    }
 
    /**
+    * Writes the hyper group definition for the given entry.
+    * @param entry the entry
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
+   private void writeHyperGroupDef(Bib2GlsEntry entry, PrintWriter writer)
+     throws IOException
+   {
+      String key = entry.getGroupId();
+
+      if (key == null)
+      {
+         bib2gls.debugMessage("message.no.group.id", "writeHyperGroupDef",
+            entry.getId());
+         return;
+      }
+
+      GroupTitle groupTitle = groupTitleMap.get(key);
+
+      if (groupTitle == null)
+      {
+         bib2gls.debugMessage("message.no.group.found", "writeHyperGroupDef", key);
+         return;
+      }
+
+      if (!groupTitle.isDone())
+      {
+         writer.format("\\bibglshypergroup{%s}{\\%s%s}%n", groupTitle.getType(),
+               groupTitle.getCsLabelName(), groupTitle);
+
+         groupTitle.mark();
+
+         writer.println();
+      }
+   }
+
+   /**
+    * Assigns the group to the given entry.
+    * @param grpTitle the group information 
+    * @param entry the entry
+    */ 
+   public void putGroupTitle(GroupTitle grpTitle, Bib2GlsEntry entry)
+   {
+      if (groupTitleMap != null)
+      {
+         grpTitle.setSupportsHierarchy(isGroupLevelsEnabled(), 
+          Math.max(0, entry.getLevel(null)));
+
+         String key = grpTitle.getKey();
+
+         entry.setGroupId(key);
+
+         groupTitleMap.put(key, grpTitle);
+      }
+   }
+
+   /**
+    * Gets the group data associated with the given glossary, id and
+    * parent. The key for the mapping is obtained from a combination
+    * of the entry type (which may be null), the id, and the entry's
+    * parent (which may be null).
+    * @param entryType the glossary type
+    * @param id numeric identifier associated with the group
+    * @param parent the parent
+    * @return the group data or null if not available
+    */ 
+   public GroupTitle getGroupTitle(String entryType, long id, String parent)
+   {
+      if (groupTitleMap != null)
+      {
+         return groupTitleMap.get(GroupTitle.getKey(entryType, id, parent));
+      }
+
+      return null;
+   }
+
+   /**
+    * Determines whether or not hierarchical groups are allowed.
+    * @return true if hierarchical groups are allowed
+    */ 
+   public boolean isGroupLevelsEnabled()
+   {
+      return !(groupLevelSetting == GROUP_LEVEL_SETTING_EXACT 
+             && groupLevelSettingValue == 0);
+   }
+
+   /**
+    * Assigns the group data to the entry's group field.
+    * @param entry the entry
+    * @param groupField the field used to store the group label
+    * @param groupFieldValue the field value (the LaTeX code that
+    * should expand to the group label)
+    * @param groupTitle the group data
+    */ 
+   public void assignGroupField(Bib2GlsEntry entry, 
+     String groupField, String groupFieldValue, GroupTitle groupTitle)
+   {
+      entry.putField(groupField, groupFieldValue);
+
+      if (groupTitle != null)
+      {
+         entry.setGroupId(groupTitle.getKey());
+      }
+   }
+
+   /**
+    * Merges small groups, if supported.
+    * Sorting must be done first.
+    * @param entries list of sorted entries
+    * @param groupField the field used to store the group label
+    */ 
+   public void mergeSmallGroups(Vector<Bib2GlsEntry> entries, String groupField)
+   {
+      if (groupTitleMap == null || groupTitleMap.isEmpty() || mergeSmallGroupLimit < 1)
+      {
+         return;
+      }
+
+      int count = 0;
+      String prevKey = null;
+      GroupTitle prevTitle = null;
+
+      Vector<GroupTitle> pending = new Vector<GroupTitle>();
+
+      for (int i = 0; i < entries.size(); i++)
+      {
+         Bib2GlsEntry entry = entries.get(i);
+         String key = entry.getGroupId();
+         GroupTitle groupTitle = groupTitleMap.get(key);
+         boolean doCheck = false;
+
+         if (groupTitle == null)
+         {
+            bib2gls.debugMessage("message.no.group.id", "mergeSmallGroups",
+              entry.getId());
+
+            prevTitle = null;
+            count = 0;
+            continue;
+         }
+         else if (key.equals(prevKey))
+         {
+            count++;
+            groupTitle.setEndIndex(i);
+         }
+         else if (count <= mergeSmallGroupLimit)
+         {
+            if (prevTitle != null)
+            {
+               if (groupTitle.getLevel() != prevTitle.getLevel())
+               {
+                  doCheck = true;
+               }
+
+               if (pending.isEmpty() 
+                    || pending.lastElement().getLevel() == prevTitle.getLevel())
+               {
+                  pending.add(prevTitle);
+                  prevTitle = null;
+               }
+            }
+
+            groupTitle.setStartIndex(i);
+            groupTitle.setEndIndex(i);
+            count = 1;
+         }
+         else
+         {
+            groupTitle.setStartIndex(i);
+            groupTitle.setEndIndex(i);
+            prevTitle = null;
+            doCheck = true;
+         }
+
+         if (doCheck)
+         {
+            if (pending.size() > 1)
+            {
+               MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
+               String groupFieldValue = String.format("\\%s%s",
+                 mergedTitles.getCsLabelName(), mergedTitles.format());
+
+               for (GroupTitle grp : pending)
+               {
+                  for (int j = grp.getStartIndex(); j <= grp.getEndIndex(); j++)
+                  {
+                     Bib2GlsEntry e = entries.get(j);
+                     putGroupTitle(mergedTitles, e);
+                     e.putField(groupField, groupFieldValue);
+                  }
+               }
+            }
+            else
+            {
+               for (GroupTitle grp : pending)
+               {
+                  grp.resetIndexes();
+               }
+            }
+
+            count = 1;
+            pending.clear();
+
+            if (prevTitle != null)
+            {
+               pending.add(prevTitle);
+               System.out.println("adding previous: "+prevTitle);
+            }
+         }
+
+         prevKey = key;
+         prevTitle = groupTitle;
+      }
+
+      if (prevTitle != null && !pending.isEmpty())
+      {
+
+         if (count <= mergeSmallGroupLimit && prevTitle != null)
+         {
+            if (pending.isEmpty() 
+                 || pending.lastElement().getLevel() == prevTitle.getLevel())
+            {
+               pending.add(prevTitle);
+            }
+         }
+
+         if (pending.size() > 1)
+         {
+            MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
+            String groupFieldValue = String.format("\\%s%s",
+              mergedTitles.getCsLabelName(), mergedTitles.format());
+
+            for (GroupTitle grp : pending)
+            {
+               for (int j = grp.getStartIndex(); j <= grp.getEndIndex(); j++)
+               {
+                  Bib2GlsEntry e = entries.get(j);
+                  putGroupTitle(mergedTitles, e);
+                  e.putField(groupField, groupFieldValue);
+               }
+            }
+         }
+         else
+         {
+            for (GroupTitle grp : pending)
+            {
+               grp.resetIndexes();
+            }
+         }
+      }
+   }
+
+   /**
+    * Determines whether or not to use the group field for the given
+    * entry.
+    * @param entry the entry
+    * @param entries the list of entries
+    * @return true if the group field should be used
+    */ 
+   public boolean useGroupField(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
+   {
+      if (bib2gls.useGroupField())
+      {
+         switch (groupLevelSetting)
+         {
+            case GROUP_LEVEL_SETTING_EXACT:
+
+              if (groupLevelSettingValue == 0)
+              {
+                 return !entry.hasParent();
+              }
+              else
+              {
+                 return entry.getLevel(entries) == groupLevelSettingValue;
+              }
+
+            case GROUP_LEVEL_SETTING_LESS_THAN:
+
+              return entry.getLevel(entries) < groupLevelSettingValue;
+
+            case GROUP_LEVEL_SETTING_LESS_THAN_EQ:
+
+              return entry.getLevel(entries) <= groupLevelSettingValue;
+
+            case GROUP_LEVEL_SETTING_GREATER_THAN:
+
+              return entry.getLevel(entries) > groupLevelSettingValue;
+
+            case GROUP_LEVEL_SETTING_GREATER_THAN_EQ:
+
+              return entry.getLevel(entries) >= groupLevelSettingValue;
+
+         }
+      }
+
+      return false;
+   }
+
+   /* METHODS: fetching or setting data */
+
+   /**
+    * Gets the flipped label.
+    * If the label starts with a known prefix, the flipped label is
+    * the label with the opposite prefix (for
+    * example, the dual and primary prefixes are swapped).
+    * the dual prefix.
+    * @return the flipped label or null if can't be determined
+    */ 
+   public String flipLabel(String label)
+   {
+      if (labelPrefix == null)
+      {
+         if (label.startsWith(dualPrefix))
+         {
+            return label.substring(dualPrefix.length());
+         }
+         else if (hasTertiaries && label.startsWith(tertiaryPrefix))
+         {
+            return label.substring(tertiaryPrefix.length());
+         }
+         else
+         {
+            return dualPrefix+label;
+         }
+      }
+
+      if (dualPrefix == null)
+      {
+         if (label.startsWith(labelPrefix))
+         {
+            return label.substring(labelPrefix.length());
+         }
+         else if (hasTertiaries && label.startsWith(tertiaryPrefix))
+         {
+            return label.substring(tertiaryPrefix.length());
+         }
+         else
+         {
+            return labelPrefix+label;
+         }
+      }
+
+      if (label.startsWith(labelPrefix))
+      {
+         String substr = label.substring(labelPrefix.length());
+
+         if (substr.startsWith(dualPrefix))
+         {
+            return substr;
+         }
+
+         return dualPrefix+substr;
+      }
+
+      if (label.startsWith(dualPrefix))
+      {
+         String substr = label.substring(dualPrefix.length());
+
+         if (substr.startsWith(labelPrefix))
+         {
+            return substr;
+         }
+
+         return labelPrefix+substr;
+      }
+
+      if (hasTertiaries)
+      {
+         if (tertiaryPrefix != null && label.startsWith(tertiaryPrefix))
+         {
+            String substr = label.substring(tertiaryPrefix.length());
+
+            if (substr.startsWith(dualPrefix)||substr.startsWith(labelPrefix))
+            {
+               return substr;
+            }
+
+            return dualPrefix+substr;
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * Gets the entry with the given label. The search is performed
+    * on the primary list first and then on the dual list.
+    * @param label the search label
+    * @return the entry or null if not found
+    */ 
+   public Bib2GlsEntry getEntry(String label)
+   {
+      return getEntry(label, false);
+   }
+
+   /**
+    * Gets the entry with the given label. The search is performed
+    * on the primary list first and then on the dual list.
+    * @param label the search label
+    * @param tryFlipping if true also search on the flipped label
+    * @return the entry or null if not found
+    */ 
+   public Bib2GlsEntry getEntry(String label, boolean tryFlipping)
+   {
+      Bib2GlsEntry entry = getEntry(label, bibData, tryFlipping);
+
+      if (entry != null)
+      {
+         return entry;
+      }
+
+      return getEntry(label, dualData, tryFlipping);
+   }
+
+   /**
+    * Gets the entry with the given label in the given list.
+    * @param label the search label
+    * @param data the list of entries to search
+    * @return the entry or null if not found
+    */ 
+   public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data)
+   {
+      return getEntry(label, data, false);
+   }
+
+   /**
+    * Gets the entry with the given label in the given list.
+    * @param label the search label
+    * @param data the list of entries to search
+    * @param tryFlipping if true also search on the flipped label
+    * @return the entry or null if not found
+    */ 
+   public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data,
+     boolean tryFlipping)
+   {
+      String flippedLabel = (tryFlipping ? flipLabel(label) : null);
+
+      for (Bib2GlsEntry entry : data)
+      {
+         String id = entry.getId();
+
+         if (id.equals(label))
+         {
+            return entry;
+         }
+
+         if (tryFlipping)
+         {
+            if (id.equals(flippedLabel))
+            {
+               return entry;
+            }
+
+            String flippedId = flipLabel(id);
+
+            if (flippedId.equals(label) || flippedId.equals(flippedLabel))
+            {
+               return entry;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * Gets the entry with the given label in the given list.
+    * The entry must be a Bib2GlsEntry object for the match to be
+    * successful. The provided list may include other BibData objects, such
+    * as BibPreamble or BibString.
+    * @param label the search label
+    * @param data the list of entries to search
+    * @return the entry or null if not found
+    */ 
+   public Bib2GlsEntry getBib2GlsEntry(String label, Vector<BibData> data)
+   {
+      for (BibData entry : data)
+      {
+         if (entry instanceof Bib2GlsEntry 
+             && ((Bib2GlsEntry)entry).getId().equals(label))
+         {
+            return (Bib2GlsEntry)entry;
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * Gets the list of "other" elements for the given compound
+    * entry. This method searches for the entries identified by the
+    * compound entry's element list that don't match the main
+    * element.
+    * @param comp the compound entry
+    */ 
+   public Vector<Bib2GlsEntry> getOtherElements(CompoundEntry comp)
+   {
+      Vector<Bib2GlsEntry> list = new Vector<Bib2GlsEntry>();
+
+      String[] elements = comp.getElements();
+      String mainLabel = comp.getMainLabel();
+
+      for (String elem : elements)
+      {
+         if (!elem.equals(mainLabel))
+         {
+            Bib2GlsEntry other = getEntry(elem, bibData);
+
+            if (other == null && dualData != null)
+            {
+               other = getEntry(elem, dualData);
+            }
+
+            if (other != null)
+            {
+               list.add(other);
+            }
+         }
+      }
+
+      return list;
+   }
+
+   /**
+    * Determines if given record matches any of the labels.
+    * @param primaryId label of primary entry
+    * @param dualId label of dual entry
+    * @param tertiaryId tertiary label
+    * @param record the record under investigation
+    * @return the record if the record label matches 
+    * or null if no match
+    */ 
+   public GlsRecord getRecord(String primaryId, String dualId,
+     String tertiaryId, GlsRecord record)
+   {
+      return record.getRecord(this, primaryId, dualId, tertiaryId);
+   }
+
+   /**
+    * Gets the entry that matches the given record. Searches both
+    * the primary and dual data lists.
+    * @param record the record
+    * @return the entry that matches the record label or null if not
+    * found
+    */ 
+   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record)
+   {
+      return record.getEntry(this, bibData, dualData);
+   }
+
+   /**
+    * Gets the entry that matches the given record.
+    * @param record the record
+    * @param data the list of data to search for the entry
+    * @param tryFlipping if true try matching the flipped label if
+    * no match on the label
+    * @return the entry that matches the record label or null if not
+    * found
+    */ 
+   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record,
+      Vector<Bib2GlsEntry> data, boolean tryFlipping)
+   {
+      return record.getEntry(this, data, tryFlipping);
+   }
+
+   @Deprecated
+   public String getRecordLabel(GlsRecord record)
+   {
+      String label = record.getLabel();
+
+      if (recordLabelPrefix == null || label.startsWith(recordLabelPrefix))
+      {
+         return label;
+      }
+
+      return recordLabelPrefix+label;
+   }
+
+   /**
+    * Gets the prefixed label associated with the record.
+    * @param record the cross-reference record
+    * @return the prefixed label
+    */ 
+   public String getRecordLabel(GlsSeeRecord record)
+   {
+      if (recordLabelPrefix == null)
+      {
+         return record.getLabel();
+      }
+
+      return recordLabelPrefix+record.getLabel();
+   }
+
+   /**
+    * Adds the given entry to the list of selected entries. Also
+    * sets the entry's selected status to true. Doesn't add the
+    * entry if it has already been added.
+    * @param entries the list of selected entries
+    * @param entry the entry to add to the list
+    */ 
+   private void addEntry(Vector<Bib2GlsEntry> entries, Bib2GlsEntry entry)
+   {
+      String id = entry.getId();
+
+      for (Bib2GlsEntry e : entries)
+      {
+         if (e.getId().equals(id))
+         {
+            bib2gls.debugMessage("message.entry.already.added", id,
+             e.getOriginalEntryType(), e.getOriginalId(),
+             entry.getOriginalEntryType(), entry.getOriginalId());
+            return;
+         }
+      }
+
+      entries.add(entry);
+      entry.setSelected(true);
+   }
+
+   /**
     * Clears the child list for each entry.
     */ 
    private void clearChildLists()
@@ -10723,15 +11064,6 @@ public class GlsResource
    }
 
    /**
-    * Gets the "flatten" setting.
-    * @return true if flatten setting on otherwise returns false
-    */ 
-   public boolean flattenSort()
-   {
-      return flatten;
-   }
-
-   /**
     * Assigns the glossary type for the given entry, if applicable.
     * If the type has been identified by the relevant setting, the
     * "type" field will be set. If the type can't be determined from
@@ -10945,821 +11277,263 @@ public class GlsResource
    }
 
    /**
-    * Determines whether or not this resource set has skipped
-    * fields.
-    * @return true if this resource set has skipped fields otherwise
-    * false
-    */ 
-   public boolean hasSkippedFields()
-   {
-      return skipFields != null && skipFields.length != 0;
-   }
-
-   /**
-    * Gets the array of skipped fields.
-    * @return the array of skipped fields
-    */ 
-   public String[] getSkipFields()
-   {
-      return skipFields;
-   }
-
-   /**
-    * Determines whether or not the given field should be skipped.
-    * @param field the field
-    * @return true if the field should be skipped otherwise
-    * false
-    */ 
-   public boolean skipField(String field)
-   {
-      if (skipFields == null)
-      {
-         return false;
-      }
-
-      for (int i = 0; i < skipFields.length; i++)
-      {
-         if (skipFields[i].equals(field))
-         {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   /**
-    * Gets the contributor order setting.
-    * @return numeric identifier corresponding to "contributor-order" setting
-    */  
-   public byte getContributorOrder()
-   {
-      return contributorOrder;
-   }
-
-   /**
-    * Determines whether or not the given field is identified as a
-    * bibtex author field.
-    * @param field the field
-    * @return true if the field is an author field
-    */  
-   public boolean isBibTeXAuthorField(String field)
-   {
-      if (bibtexAuthorList == null)
-      {
-         return false;
-      }
-
-      for (String f : bibtexAuthorList)
-      {
-         if (f.equals(field))
-         {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   /**
-    * Gets the interpret fields action setting.
-    * @return numeric identifier corresponding to
-    * "interpret-fields-action" setting
-    */  
-   public byte getInterpretFieldAction()
-   {
-      return interpretFieldAction;
-   }
-
-   /**
-    * Determines whether or not the given field should be
-    * interpreted.
-    * @param field the field
-    * @return true if the field should be interpreted
-    */  
-   public boolean isInterpretField(String field)
-   {
-      if (interpretFields == null)
-      {
-         return false;
-      }
-
-      for (String f : interpretFields)
-      {
-         if (f.equals(field))
-         {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   /**
-    * Gets the array of fields that should have Unicode characters
-    * converted. Corresponds to the "hex-unicode-fields" setting.
-    * @return the array of fields
-    */  
-   public String[] getHexUnicodeFields()
-   {
-      return hexUnicodeFields;
-   }
-
-   /**
-    * Gets the record label prefix.
-    * Corresponds to the "record-label-prefix" setting.
-    * @return the record label prefix or null if not set
-    */  
-   public String getRecordLabelPrefix()
-   {
-      return recordLabelPrefix;
-   }
-
-   /**
-    * Gets the primary label prefix.
-    * Corresponds to the "label-prefix" setting.
-    * @return the primary label prefix or null if not set
-    */  
-   public String getLabelPrefix()
-   {
-      return labelPrefix;
-   }
-
-   /**
-    * Gets the dual label prefix.
-    * Corresponds to the "dual-prefix" setting.
-    * @return the dual label prefix or null if not set
-    */  
-   public String getDualPrefix()
-   {
-      return dualPrefix;
-   }
-
-   /**
-    * Gets the tertiary type.
-    * Corresponds to the "tertiary-type" setting.
-    * @return the tertiary type or null if not set
-    */  
-   public String getTertiaryType()
-   {
-      return tertiaryType;
-   }
-
-   /**
-    * Gets the tertiary label prefix.
-    * Corresponds to the "tertiary-prefix" setting.
-    * @return the tertiary label prefix or null if not set
-    */  
-   public String getTertiaryPrefix()
-   {
-      return tertiaryPrefix;
-   }
-
-   /**
-    * Gets the tertiary category.
-    * Corresponds to the "tertiary-category" setting.
-    * @return the tertiary category or null if not set
-    */  
-   public String getTertiaryCategory()
-   {
-      return tertiaryCategory;
-   }
-
-   /**
-    * Gets the external prefix corresponding to the given index.
-    * Corresponds to given index within the "ext-prefixes" setting.
-    * @param idx the index
-    * @return the external prefix or null if not set
-    */  
-   public String getExternalPrefix(int idx)
-   {
-      if (externalPrefixes == null) return null;
-
-      if (idx >= 1 && idx <= externalPrefixes.length)
-      {
-         return externalPrefixes[idx-1];
-      }
-
-      return null;
-   }
-
-   /**
-    * Gets the command label prefix.
-    * Corresponds to the "cs-label-prefix" setting.
-    * @return the command label prefix or null if not set
-    */  
-   public String getCsLabelPrefix()
-   {
-      return csLabelPrefix;
-   }
-
-   /**
-    * Gets the dual sort field.
-    * @return the sort field for the dual list
-    */  
-   public String getDualSortField()
-   {
-      return dualSortSettings.getSortField();
-   }
-
-   /**
-    * Gets the default plural suffix.
-    * @return the plural suffix
-    */  
-   public String getPluralSuffix()
-   {
-      return pluralSuffix;
-   }
-
-   /**
-    * Gets the default abbreviation plural suffix.
-    * @return the abbreviation plural suffix
-    */  
-   public String getShortPluralSuffix()
-   {
-      return shortPluralSuffix;
-   }
-
-   /**
-    * Gets the default dual plural suffix.
-    * @return the plural dual suffix
-    */  
-   public String getDualPluralSuffix()
-   {
-      return dualPluralSuffix;
-   }
-
-   /**
-    * Gets the default dual abbreviation plural suffix.
-    * @return the plural dual suffix for abbreviations
-    */  
-   public String getDualShortPluralSuffix()
-   {
-      return dualShortPluralSuffix;
-   }
-
-   /**
-    * Gets the dual entry map.
-    * Corresponds to the "dual-entry-map" setting.
-    * @return the dual entry map or null if not set
-    */ 
-   public HashMap<String,String> getDualEntryMap()
-   {
-      return dualEntryMap;
-   }
-
-   /**
-    * Gets the first key for the dual entry map.
-    * Corresponds to the first field in the "dual-entry-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualEntryMap()
-   {
-      return dualEntryFirstMap;
-   }
-
-   /**
-    * Gets the back-link for the dual entry map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualEntryMap()
-   {
-      return backLinkDualEntry;
-   }
-
-   /**
-    * Gets the dual symbol map.
-    * Corresponds to the "dual-symbol-map" setting.
-    * @return the dual symbol map or null if not set
-    */ 
-   public HashMap<String,String> getDualSymbolMap()
-   {
-      return dualSymbolMap;
-   }
-
-   /**
-    * Gets the first key for the dual symbol map.
-    * Corresponds to the first field in the "dual-symbol-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualSymbolMap()
-   {
-      return dualSymbolFirstMap;
-   }
-
-   /**
-    * Gets the back-link for the dual symbol map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualSymbolMap()
-   {
-      return backLinkDualSymbol;
-   }
-
-   /**
-    * Gets the dual abbreviation map.
-    * Corresponds to the "dual-abbrv-map" setting.
-    * @return the dual abbreviation map or null if not set
-    */ 
-   public HashMap<String,String> getDualAbbrevMap()
-   {
-      return dualAbbrevMap;
-   }
-
-   /**
-    * Gets the dual abbreviation-entry map.
-    * Corresponds to the "dual-entryabbrv-map" setting.
-    * @return the dual entry-abbreviation map or null if not set
-    */ 
-   public HashMap<String,String> getDualAbbrevEntryMap()
-   {
-      return dualAbbrevEntryMap;
-   }
-
-   /**
-    * Gets the dual index-entry map.
-    * Corresponds to the "dual-indexentry-map" setting.
-    * @return the dual index-entry map or null if not set
-    */ 
-   public HashMap<String,String> getDualIndexEntryMap()
-   {
-      return dualIndexEntryMap;
-   }
-
-   /**
-    * Gets the dual index-symbol map.
-    * Corresponds to the "dual-indexsymbol-map" setting.
-    * @return the dual index-symbol map or null if not set
-    */ 
-   public HashMap<String,String> getDualIndexSymbolMap()
-   {
-      return dualIndexSymbolMap;
-   }
-
-   /**
-    * Gets the dual index-abbreviation map.
-    * Corresponds to the "dual-indexabbrv-map" setting.
-    * @return the dual index-abbreviation map or null if not set
-    */ 
-   public HashMap<String,String> getDualIndexAbbrevMap()
-   {
-      return dualIndexAbbrevMap;
-   }
-
-   /**
-    * Gets the first key for the dual abbreviation map.
-    * Corresponds to the first field in the "dual-abbrv-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualAbbrevMap()
-   {
-      return dualAbbrevFirstMap;
-   }
-
-   /**
-    * Gets the first key for the dual abbreviation-entry map.
-    * Corresponds to the first field in the "dual-abbrventry-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualAbbrevEntryMap()
-   {
-      return dualAbbrevEntryFirstMap;
-   }
-
-   /**
-    * Gets the first key for the dual index-entry map.
-    * Corresponds to the first field in the "dual-indexentry-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualIndexEntryMap()
-   {
-      return dualIndexEntryFirstMap;
-   }
-
-   /**
-    * Gets the first key for the dual index-symbol map.
-    * Corresponds to the first field in the "dual-indexsymbol-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualIndexSymbolMap()
-   {
-      return dualIndexSymbolFirstMap;
-   }
-
-   /**
-    * Gets the first key for the dual index-abbrviation map.
-    * Corresponds to the first field in the "dual-indexabbrv-map".
-    * @return the key or null if not set
-    */ 
-   public String getFirstDualIndexAbbrevMap()
-   {
-      return dualIndexAbbrevFirstMap;
-   }
-
-   /**
-    * Gets the back-link for the dual abbreviation map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualAbbrevMap()
-   {
-      return backLinkDualAbbrev;
-   }
-
-   /**
-    * Gets the back-link for the dual abbreviation-entry map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualAbbrevEntryMap()
-   {
-      return backLinkDualAbbrevEntry;
-   }
-
-   /**
-    * Gets the back-link for the dual index-entry map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualIndexEntryMap()
-   {
-      return backLinkDualIndexEntry;
-   }
-
-   /**
-    * Gets the back-link for the dual index-symbol map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualIndexSymbolMap()
-   {
-      return backLinkDualIndexSymbol;
-   }
-
-   /**
-    * Gets the back-link for the dual index-abbreviation map.
-    * @return the back-link entry or null if not set
-    */ 
-   public boolean backLinkFirstDualIndexAbbrevMap()
-   {
-      return backLinkDualIndexAbbrev;
-   }
-
-   /**
-    * Gets the dual field.
-    * Corresponds to the "dual-field" setting.
-    * @return the dual field or null if not set
-    */ 
-   public String getDualField()
-   {
-      return dualField;
-   }
-
-   /**
-    * Checks the field maps are valid.
-    * @throws Bib2GlsException if any listed fields are invalid
-    */ 
-   private void checkFieldMaps(HashMap<String,String> mapping, String optName)
-    throws Bib2GlsException
-   {
-      for (Iterator<String> it = mapping.keySet().iterator();
-              it.hasNext(); )
-      {
-         String key = it.next();
-
-         if (!bib2gls.isKnownField(key) && !bib2gls.isKnownSpecialField(key))
-         {
-            throw new Bib2GlsException(bib2gls.getMessage(
-              "error.invalid.field", key, optName));
-         }
-
-         key = mapping.get(key);
-
-         if (!bib2gls.isKnownField(key) && !bib2gls.isKnownSpecialField(key))
-         {
-            throw new Bib2GlsException(bib2gls.getMessage(
-              "error.invalid.field", key, optName));
-         }
-      }
-   }
-
-   /**
-    * Determines whether or not the entry should be discarded.
+    * Gets the glossary type associated with the given entry.
     * @param entry the entry
-    * @return true if the entry should be discarded otherwise false
+    * @return the glossary type or null if unknown
     */ 
-   public boolean discard(Bib2GlsEntry entry)
+   public String getType(Bib2GlsEntry entry)
    {
-      if (fieldPatterns == null || matchAction != MATCH_ACTION_FILTER)
+      String value = entry.getFieldValue("type");
+
+      if (value != null)
       {
-         return false;
+         return value;
       }
 
-      boolean discard = notMatch(entry);
+      value = type;
 
-      return notMatch ? !discard : discard;
-   }
-
-   /**
-    * Determines whether or not the entry does not match the field
-    * pattern filter. Not match means the entry should be discarded
-    * unless the match has been negated.
-    * @param entry the entry
-    * @return true if the entry does not match otherwise false
-    */ 
-   private boolean notMatch(Bib2GlsEntry entry)
-   {
-      return notMatch(entry, fieldPatternsAnd, fieldPatterns);
-   }
-
-   /**
-    * Determines whether or not the entry does not match the
-    * secondary field pattern filter. Not match means the entry should be discarded
-    * unless the match has been negated.
-    * @param entry the entry
-    * @return true if the entry does not match otherwise false
-    */ 
-   private boolean secondaryNotMatch(Bib2GlsEntry entry)
-   {
-      return notMatch(entry, secondaryFieldPatternsAnd, secondaryFieldPatterns);
-   }
-
-   /**
-    * Determines whether or not the entry does not match the
-    * pattern filter.
-    * @param entry the entry
-    * @param and if true perform logical AND otherwise use OR
-    * @param patterns pattern map
-    * @return true if the entry does not match otherwise false
-    */ 
-   private boolean notMatch(Bib2GlsEntry entry, boolean and, 
-       HashMap<String,Pattern> patterns)
-   {
-      return notMatch(bib2gls, entry, and, patterns);
-   }
-
-   /**
-    * Determines whether or not the entry does not match the
-    * pattern filter.
-    * @param bib2gls the application
-    * @param entry the entry
-    * @param and if true perform logical AND otherwise use OR
-    * @param patterns pattern map
-    * @return true if the entry does not match otherwise false
-    */ 
-   public static boolean notMatch(Bib2Gls bib2gls, Bib2GlsEntry entry, 
-       boolean and, HashMap<String,Pattern> patterns)
-   {
-      boolean matches = and;
-
-      for (Iterator<String> it = patterns.keySet().iterator();
-           it.hasNext(); )
+      if (entry instanceof Bib2GlsDualEntry
+          && !(((Bib2GlsDualEntry)entry).isPrimary()))
       {
-         String field = it.next();
+         value = dualType;
+      }
+      else if (entry.getFieldValue("progeny") != null)
+      {
+         value = progenitorType;
+      }
+      else if (entry.getFieldValue("progenitor") != null)
+      {
+         value = progenyType;
+      }
 
-         String value = null;
+      return getType(entry, value, false);
+   }
 
-         if (field.equals(PATTERN_FIELD_ID))
+   /**
+    * Gets the glossary type associated with the given entry.
+    * @param entry the entry
+    * @param fallback the fallback value (may be null)
+    * @return the glossary type or null if unknown
+    */ 
+   public String getType(Bib2GlsEntry entry, String fallback)
+   {
+      return getType(entry, fallback, true);
+   }
+
+   /**
+    * Gets the glossary type associated with the given entry.
+    * @param entry the entry
+    * @param fallback the fallback value (may be null)
+    * @param checkField if true check if the "type" field has
+    * been set
+    * @return the glossary type or null if unknown
+    */ 
+   public String getType(Bib2GlsEntry entry, String fallback, 
+      boolean checkField)
+   {
+      String value = null;
+
+      if (checkField)
+      {
+         value = entry.getFieldValue("type");
+
+         if (value != null)
          {
-            value = entry.getId();
+            return value;
          }
-         else if (field.equals(PATTERN_FIELD_ENTRY_TYPE))
+      }
+
+      value = fallback;
+
+      if (value == null)
+      {
+         return null;
+      }
+
+      if (value.equals("same as category"))
+      {
+         if (entry instanceof Bib2GlsDualEntry  
+              && !((Bib2GlsDualEntry)entry).isPrimary())
          {
-            value = entry.getEntryType();
-         }
-         else if (field.equals(PATTERN_FIELD_ORIGINAL_ENTRY_TYPE))
-         {
-            value = entry.getOriginalEntryType();
+            value = dualCategory;
          }
          else
          {
-            value = entry.getFieldValue(field);
+            value = category;
          }
 
-         if (value == null)
+         if ("same as type".equals(value))
          {
-            value = "";
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.cyclic.sameas.type.category"));
          }
 
-         Pattern p = patterns.get(field);
+         return getCategory(entry, value);
+      }
 
-         Matcher m = p.matcher(value);
+      if (value.equals("same as entry"))
+      {
+         return entry.getEntryType();
+      }
 
-         boolean result = m.matches();
+      if (value.equals("same as original entry"))
+      {
+         return entry.getOriginalEntryType();
+      }
 
-         bib2gls.debugMessage("message.pattern.info", p.pattern(), field, value, result);
+      if (value.equals("same as base"))
+      {
+         return entry.getBase();
+      }
 
-         if (and)
+      if (value.equals("same as parent"))
+      {
+         String parentId = entry.getParent();
+
+         if (parentId == null) return null;
+
+         Bib2GlsEntry parentEntry = getEntry(parentId);
+
+         if (parentEntry == null) return null;
+
+         return getType(parentEntry);
+      }
+
+      if (value.equals("same as primary") 
+          && (entry instanceof Bib2GlsDualEntry)
+          && !((Bib2GlsDualEntry)entry).isPrimary())
+      {
+         Bib2GlsEntry dual = entry.getDual();
+
+         if (dual != null)
          {
-            if (!result)
-            {
-               return true;
-            }
+            return getType(dual, fallback);
+         }
+      }
+
+      return value;
+   }
+
+   /**
+    * Gets the category for the given entry.
+    * @param entry the entry
+    * @return the category or null if unknown
+    */
+   public String getCategory(Bib2GlsEntry entry)
+   {
+      String value = entry.getFieldValue("category");
+
+      if (value != null)
+      {
+         return value;
+      }
+
+      value = category;
+
+      if (entry instanceof Bib2GlsDualEntry
+          && !(((Bib2GlsDualEntry)entry).isPrimary()))
+      {
+         value = dualCategory;
+      }
+
+      return getCategory(entry, value, false);
+   }
+
+   /**
+    * Gets the category for the given entry.
+    * @param entry the entry
+    * @param fallback the fallback
+    * @return the category or null if unknown
+    */
+   public String getCategory(Bib2GlsEntry entry, String fallback)
+   {
+      return getCategory(entry, fallback, true);
+   }
+
+   /**
+    * Gets the category for the given entry.
+    * @param entry the entry
+    * @param fallback the fallback
+    * @param checkField if true check if the "category" field has
+    * been set
+    * @return the category or null if unknown
+    */
+   public String getCategory(Bib2GlsEntry entry, String fallback,
+     boolean checkField)
+   {
+      String value = null;
+
+      if (checkField)
+      {
+         value = entry.getFieldValue("category");
+
+         if (value != null)
+         {
+            return value;
+         }
+      }
+
+      value = fallback;
+
+      if (value == null)
+      {
+         return null;
+      }
+
+      if (value.equals("same as type"))
+      {
+         if (entry instanceof Bib2GlsDualEntry  
+              && !((Bib2GlsDualEntry)entry).isPrimary())
+         {
+            value = dualType;
          }
          else
          {
-            if (result)
-            {
-               return false;
-            }
+            value = type;
+         }
+
+         if ("same as category".equals(value))
+         {
+            throw new IllegalArgumentException(
+              bib2gls.getMessage("error.cyclic.sameas.type.category"));
+         }
+
+         return getType(entry, value);
+      }
+
+      if (value.equals("same as entry"))
+      {
+         return entry.getEntryType();
+      }
+
+      if (value.equals("same as original entry"))
+      {
+         return entry.getOriginalEntryType();
+      }
+
+      if (value.equals("same as base"))
+      {
+         return entry.getBase();
+      }
+
+      if (value.equals("same as primary") 
+          && (entry instanceof Bib2GlsDualEntry)
+          && !((Bib2GlsDualEntry)entry).isPrimary())
+      {
+         Bib2GlsEntry dual = entry.getDual();
+
+         if (dual != null)
+         {
+            return getCategory(dual, fallback);
          }
       }
 
-      return !matches;
+      return value;
    }
 
-   /**
-    * Gets the post-description dot setting.
-    * Corresponds to the "post-description-dot" setting.
-    * @return the numeric identifier indicating the setting
-    */ 
-   public byte getPostDescDot()
-   {
-      return postDescDot;
-   }
-
-   /**
-    * Gets the "strip-trailing-nopost" setting.
-    * @return true if the setting is on
-    */ 
-   public boolean isStripTrailingNoPostOn()
-   {
-      return stripTrailingNoPost;
-   }
-
-   /**
-    * Determines whether or not the given field should be converted
-    * into a label.
-    * @param field the field
-    * @return true if the field should be converted to a label
-    */ 
-   public boolean isLabelifyField(String field)
-   {
-      if (labelifyFields == null) return false;
-
-      for (String f : labelifyFields)
-      {
-         if (f.equals(field)) return true;
-      }
-
-      return false;
-   }
-
-   /**
-    * Determines whether or not the given field should be converted
-    * into a label list.
-    * @param field the field
-    * @return true if the field should be converted to a label list
-    */ 
-   public boolean isLabelifyListField(String field)
-   {
-      if (labelifyListFields == null) return false;
-
-      for (String f : labelifyListFields)
-      {
-         if (f.equals(field)) return true;
-      }
-
-      return false;
-   }
-
-   /**
-    * Gets the labelify substitutions.
-    * Corresponds to the "labelify-replace" setting.
-    * @return the list of pattern substitutions or null if not set
-    */ 
-   public Vector<PatternReplace> getLabelifySubstitutions()
-   {
-      return labelifyReplaceMap;
-   }
-
-   /**
-    * Determines whether or not the given field should contain a list of
-    * dependencies.
-    * Corresponds to the "dependency-fields" setting.
-    * @param field the field
-    * @return true if the field should contain a list of
-    * dependencies
-    */ 
-   public boolean isDependencyListField(String field)
-   {
-      if (dependencyListFields == null) return false;
-
-      for (String f : dependencyListFields)
-      {
-         if (f.equals(field)) return true;
-      }
-
-      return false;
-   }
-
-   /**
-    * Determines whether or not the end punctuation check is on for
-    * any of the fields.
-    * Corresponds to the "check-end-punctuation" setting.
-    * @return true if the check is on for one or more fields
-    */ 
-   public boolean isCheckEndPuncOn()
-   {
-      return checkEndPunc != null;
-   }
-
-   /**
-    * Determines whether or not the end punctuation check is on for
-    * the given field.
-    * Corresponds to the "check-end-punctuation" setting.
-    * @param field
-    * @return true if the check is on for the field
-    */ 
-   public boolean isCheckEndPuncOn(String field)
-   {
-      if (checkEndPunc == null) return false;
-
-      for (String f : checkEndPunc)
-      {
-         if (f.equals(field)) return true;
-      }
-
-      return false;
-   }
-
-   /**
-    * Determines whether or not the name field should have a
-    * case-change applied.
-    * Corresponds to the "name-case-change" setting.
-    * @return true if the name field should have a case-change
-    * applied
-    */ 
-   public boolean changeNameCase()
-   {
-      return nameCaseChange != null;
-   }
-
-   /**
-    * Determines whether or not the description field should have a
-    * case-change applied.
-    * Corresponds to the "description-case-change" setting.
-    * @return true if the description field should have a case-change
-    * applied
-    */ 
-   public boolean changeDescriptionCase()
-   {
-      return descCaseChange != null;
-   }
-
-   /**
-    * Determines whether or not the short field should have a
-    * case-change applied.
-    * Corresponds to the "short-case-change" setting.
-    * @return true if the short field should have a case-change
-    * applied
-    */ 
-   public boolean changeShortCase()
-   {
-      return shortCaseChange != null;
-   }
-
-   /**
-    * Determines whether or not the short field for dual entries should have a
-    * case-change applied.
-    * Corresponds to the "dual-short-case-change" setting.
-    * @return true if the short field for dual entries should have a case-change
-    * applied
-    */ 
-   public boolean changeDualShortCase()
-   {
-      return dualShortCaseChange != null;
-   }
-
-   /**
-    * Determines whether or not the long field should have a
-    * case-change applied.
-    * Corresponds to the "long-case-change" setting.
-    * @return true if the long field should have a case-change
-    * applied
-    */ 
-   public boolean changeLongCase()
-   {
-      return longCaseChange != null;
-   }
-
-   /**
-    * Determines whether or not the long field for dual entries should have a
-    * case-change applied.
-    * Corresponds to the "dual-long-case-change" setting.
-    * @return true if the long field for dual entries should have a case-change
-    * applied
-    */ 
-   public boolean changeDualLongCase()
-   {
-      return dualLongCaseChange != null;
-   }
-
-   /**
-    * Gets the map of field case change options.
-    * Corresponds to the "field-case-change" setting.
-    * @return field case change map or null if not set
-    */ 
-   public HashMap<String,String> getFieldCaseOptions()
-   {
-      return fieldCaseChange;
-   }
+   /*
+    * METHODS: apply case-changes
+    */
 
    /**
     * Applies the name case change setting to the given value.
@@ -13710,6 +13484,836 @@ public class GlsResource
       return bibList;
    }
 
+   /*
+    * METHODS: query settings
+    */
+
+   /**
+    * Gets the "flatten" setting.
+    * @return true if flatten setting on otherwise returns false
+    */ 
+   public boolean flattenSort()
+   {
+      return flatten;
+   }
+
+   /**
+    * Determines whether or not this resource set has skipped
+    * fields.
+    * @return true if this resource set has skipped fields otherwise
+    * false
+    */ 
+   public boolean hasSkippedFields()
+   {
+      return skipFields != null && skipFields.length != 0;
+   }
+
+   /**
+    * Gets the array of skipped fields.
+    * @return the array of skipped fields
+    */ 
+   public String[] getSkipFields()
+   {
+      return skipFields;
+   }
+
+   /**
+    * Determines whether or not the given field should be skipped.
+    * @param field the field
+    * @return true if the field should be skipped otherwise
+    * false
+    */ 
+   public boolean skipField(String field)
+   {
+      if (skipFields == null)
+      {
+         return false;
+      }
+
+      for (int i = 0; i < skipFields.length; i++)
+      {
+         if (skipFields[i].equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * Gets the contributor order setting.
+    * @return numeric identifier corresponding to "contributor-order" setting
+    */  
+   public byte getContributorOrder()
+   {
+      return contributorOrder;
+   }
+
+   /**
+    * Determines whether or not the given field is identified as a
+    * bibtex author field.
+    * @param field the field
+    * @return true if the field is an author field
+    */  
+   public boolean isBibTeXAuthorField(String field)
+   {
+      if (bibtexAuthorList == null)
+      {
+         return false;
+      }
+
+      for (String f : bibtexAuthorList)
+      {
+         if (f.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * Gets the interpret fields action setting.
+    * @return numeric identifier corresponding to
+    * "interpret-fields-action" setting
+    */  
+   public byte getInterpretFieldAction()
+   {
+      return interpretFieldAction;
+   }
+
+   /**
+    * Determines whether or not the given field should be
+    * interpreted.
+    * @param field the field
+    * @return true if the field should be interpreted
+    */  
+   public boolean isInterpretField(String field)
+   {
+      if (interpretFields == null)
+      {
+         return false;
+      }
+
+      for (String f : interpretFields)
+      {
+         if (f.equals(field))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * Gets the array of fields that should have Unicode characters
+    * converted. Corresponds to the "hex-unicode-fields" setting.
+    * @return the array of fields
+    */  
+   public String[] getHexUnicodeFields()
+   {
+      return hexUnicodeFields;
+   }
+
+   /**
+    * Gets the record label prefix.
+    * Corresponds to the "record-label-prefix" setting.
+    * @return the record label prefix or null if not set
+    */  
+   public String getRecordLabelPrefix()
+   {
+      return recordLabelPrefix;
+   }
+
+   /**
+    * Gets the primary label prefix.
+    * Corresponds to the "label-prefix" setting.
+    * @return the primary label prefix or null if not set
+    */  
+   public String getLabelPrefix()
+   {
+      return labelPrefix;
+   }
+
+   /**
+    * Gets the dual label prefix.
+    * Corresponds to the "dual-prefix" setting.
+    * @return the dual label prefix or null if not set
+    */  
+   public String getDualPrefix()
+   {
+      return dualPrefix;
+   }
+
+   /**
+    * Gets the tertiary type.
+    * Corresponds to the "tertiary-type" setting.
+    * @return the tertiary type or null if not set
+    */  
+   public String getTertiaryType()
+   {
+      return tertiaryType;
+   }
+
+   /**
+    * Gets the tertiary label prefix.
+    * Corresponds to the "tertiary-prefix" setting.
+    * @return the tertiary label prefix or null if not set
+    */  
+   public String getTertiaryPrefix()
+   {
+      return tertiaryPrefix;
+   }
+
+   /**
+    * Gets the tertiary category.
+    * Corresponds to the "tertiary-category" setting.
+    * @return the tertiary category or null if not set
+    */  
+   public String getTertiaryCategory()
+   {
+      return tertiaryCategory;
+   }
+
+   /**
+    * Gets the external prefix corresponding to the given index.
+    * Corresponds to given index within the "ext-prefixes" setting.
+    * @param idx the index
+    * @return the external prefix or null if not set
+    */  
+   public String getExternalPrefix(int idx)
+   {
+      if (externalPrefixes == null) return null;
+
+      if (idx >= 1 && idx <= externalPrefixes.length)
+      {
+         return externalPrefixes[idx-1];
+      }
+
+      return null;
+   }
+
+   /**
+    * Gets the command label prefix.
+    * Corresponds to the "cs-label-prefix" setting.
+    * @return the command label prefix or null if not set
+    */  
+   public String getCsLabelPrefix()
+   {
+      return csLabelPrefix;
+   }
+
+   /**
+    * Gets the dual sort field.
+    * @return the sort field for the dual list
+    */  
+   public String getDualSortField()
+   {
+      return dualSortSettings.getSortField();
+   }
+
+   /**
+    * Gets the default plural suffix.
+    * @return the plural suffix
+    */  
+   public String getPluralSuffix()
+   {
+      return pluralSuffix;
+   }
+
+   /**
+    * Gets the default abbreviation plural suffix.
+    * @return the abbreviation plural suffix
+    */  
+   public String getShortPluralSuffix()
+   {
+      return shortPluralSuffix;
+   }
+
+   /**
+    * Gets the default dual plural suffix.
+    * @return the plural dual suffix
+    */  
+   public String getDualPluralSuffix()
+   {
+      return dualPluralSuffix;
+   }
+
+   /**
+    * Gets the default dual abbreviation plural suffix.
+    * @return the plural dual suffix for abbreviations
+    */  
+   public String getDualShortPluralSuffix()
+   {
+      return dualShortPluralSuffix;
+   }
+
+   /**
+    * Gets the dual entry map.
+    * Corresponds to the "dual-entry-map" setting.
+    * @return the dual entry map or null if not set
+    */ 
+   public HashMap<String,String> getDualEntryMap()
+   {
+      return dualEntryMap;
+   }
+
+   /**
+    * Gets the first key for the dual entry map.
+    * Corresponds to the first field in the "dual-entry-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualEntryMap()
+   {
+      return dualEntryFirstMap;
+   }
+
+   /**
+    * Gets the back-link for the dual entry map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualEntryMap()
+   {
+      return backLinkDualEntry;
+   }
+
+   /**
+    * Gets the dual symbol map.
+    * Corresponds to the "dual-symbol-map" setting.
+    * @return the dual symbol map or null if not set
+    */ 
+   public HashMap<String,String> getDualSymbolMap()
+   {
+      return dualSymbolMap;
+   }
+
+   /**
+    * Gets the first key for the dual symbol map.
+    * Corresponds to the first field in the "dual-symbol-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualSymbolMap()
+   {
+      return dualSymbolFirstMap;
+   }
+
+   /**
+    * Gets the back-link for the dual symbol map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualSymbolMap()
+   {
+      return backLinkDualSymbol;
+   }
+
+   /**
+    * Gets the dual abbreviation map.
+    * Corresponds to the "dual-abbrv-map" setting.
+    * @return the dual abbreviation map or null if not set
+    */ 
+   public HashMap<String,String> getDualAbbrevMap()
+   {
+      return dualAbbrevMap;
+   }
+
+   /**
+    * Gets the dual abbreviation-entry map.
+    * Corresponds to the "dual-entryabbrv-map" setting.
+    * @return the dual entry-abbreviation map or null if not set
+    */ 
+   public HashMap<String,String> getDualAbbrevEntryMap()
+   {
+      return dualAbbrevEntryMap;
+   }
+
+   /**
+    * Gets the dual index-entry map.
+    * Corresponds to the "dual-indexentry-map" setting.
+    * @return the dual index-entry map or null if not set
+    */ 
+   public HashMap<String,String> getDualIndexEntryMap()
+   {
+      return dualIndexEntryMap;
+   }
+
+   /**
+    * Gets the dual index-symbol map.
+    * Corresponds to the "dual-indexsymbol-map" setting.
+    * @return the dual index-symbol map or null if not set
+    */ 
+   public HashMap<String,String> getDualIndexSymbolMap()
+   {
+      return dualIndexSymbolMap;
+   }
+
+   /**
+    * Gets the dual index-abbreviation map.
+    * Corresponds to the "dual-indexabbrv-map" setting.
+    * @return the dual index-abbreviation map or null if not set
+    */ 
+   public HashMap<String,String> getDualIndexAbbrevMap()
+   {
+      return dualIndexAbbrevMap;
+   }
+
+   /**
+    * Gets the first key for the dual abbreviation map.
+    * Corresponds to the first field in the "dual-abbrv-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualAbbrevMap()
+   {
+      return dualAbbrevFirstMap;
+   }
+
+   /**
+    * Gets the first key for the dual abbreviation-entry map.
+    * Corresponds to the first field in the "dual-abbrventry-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualAbbrevEntryMap()
+   {
+      return dualAbbrevEntryFirstMap;
+   }
+
+   /**
+    * Gets the first key for the dual index-entry map.
+    * Corresponds to the first field in the "dual-indexentry-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualIndexEntryMap()
+   {
+      return dualIndexEntryFirstMap;
+   }
+
+   /**
+    * Gets the first key for the dual index-symbol map.
+    * Corresponds to the first field in the "dual-indexsymbol-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualIndexSymbolMap()
+   {
+      return dualIndexSymbolFirstMap;
+   }
+
+   /**
+    * Gets the first key for the dual index-abbrviation map.
+    * Corresponds to the first field in the "dual-indexabbrv-map".
+    * @return the key or null if not set
+    */ 
+   public String getFirstDualIndexAbbrevMap()
+   {
+      return dualIndexAbbrevFirstMap;
+   }
+
+   /**
+    * Gets the back-link for the dual abbreviation map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualAbbrevMap()
+   {
+      return backLinkDualAbbrev;
+   }
+
+   /**
+    * Gets the back-link for the dual abbreviation-entry map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualAbbrevEntryMap()
+   {
+      return backLinkDualAbbrevEntry;
+   }
+
+   /**
+    * Gets the back-link for the dual index-entry map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualIndexEntryMap()
+   {
+      return backLinkDualIndexEntry;
+   }
+
+   /**
+    * Gets the back-link for the dual index-symbol map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualIndexSymbolMap()
+   {
+      return backLinkDualIndexSymbol;
+   }
+
+   /**
+    * Gets the back-link for the dual index-abbreviation map.
+    * @return the back-link entry or null if not set
+    */ 
+   public boolean backLinkFirstDualIndexAbbrevMap()
+   {
+      return backLinkDualIndexAbbrev;
+   }
+
+   /**
+    * Gets the dual field.
+    * Corresponds to the "dual-field" setting.
+    * @return the dual field or null if not set
+    */ 
+   public String getDualField()
+   {
+      return dualField;
+   }
+
+   /**
+    * Checks the field maps are valid.
+    * @throws Bib2GlsException if any listed fields are invalid
+    */ 
+   private void checkFieldMaps(HashMap<String,String> mapping, String optName)
+    throws Bib2GlsException
+   {
+      for (Iterator<String> it = mapping.keySet().iterator();
+              it.hasNext(); )
+      {
+         String key = it.next();
+
+         if (!bib2gls.isKnownField(key) && !bib2gls.isKnownSpecialField(key))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.field", key, optName));
+         }
+
+         key = mapping.get(key);
+
+         if (!bib2gls.isKnownField(key) && !bib2gls.isKnownSpecialField(key))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.field", key, optName));
+         }
+      }
+   }
+
+   /**
+    * Determines whether or not the entry should be discarded.
+    * @param entry the entry
+    * @return true if the entry should be discarded otherwise false
+    */ 
+   public boolean discard(Bib2GlsEntry entry)
+   {
+      if (fieldPatterns == null || matchAction != MATCH_ACTION_FILTER)
+      {
+         return false;
+      }
+
+      boolean discard = notMatch(entry);
+
+      return notMatch ? !discard : discard;
+   }
+
+   /**
+    * Determines whether or not the entry does not match the field
+    * pattern filter. Not match means the entry should be discarded
+    * unless the match has been negated.
+    * @param entry the entry
+    * @return true if the entry does not match otherwise false
+    */ 
+   private boolean notMatch(Bib2GlsEntry entry)
+   {
+      return notMatch(entry, fieldPatternsAnd, fieldPatterns);
+   }
+
+   /**
+    * Determines whether or not the entry does not match the
+    * secondary field pattern filter. Not match means the entry should be discarded
+    * unless the match has been negated.
+    * @param entry the entry
+    * @return true if the entry does not match otherwise false
+    */ 
+   private boolean secondaryNotMatch(Bib2GlsEntry entry)
+   {
+      return notMatch(entry, secondaryFieldPatternsAnd, secondaryFieldPatterns);
+   }
+
+   /**
+    * Determines whether or not the entry does not match the
+    * pattern filter.
+    * @param entry the entry
+    * @param and if true perform logical AND otherwise use OR
+    * @param patterns pattern map
+    * @return true if the entry does not match otherwise false
+    */ 
+   private boolean notMatch(Bib2GlsEntry entry, boolean and, 
+       HashMap<String,Pattern> patterns)
+   {
+      return notMatch(bib2gls, entry, and, patterns);
+   }
+
+   /**
+    * Determines whether or not the entry does not match the
+    * pattern filter.
+    * @param bib2gls the application
+    * @param entry the entry
+    * @param and if true perform logical AND otherwise use OR
+    * @param patterns pattern map
+    * @return true if the entry does not match otherwise false
+    */ 
+   public static boolean notMatch(Bib2Gls bib2gls, Bib2GlsEntry entry, 
+       boolean and, HashMap<String,Pattern> patterns)
+   {
+      boolean matches = and;
+
+      for (Iterator<String> it = patterns.keySet().iterator();
+           it.hasNext(); )
+      {
+         String field = it.next();
+
+         String value = null;
+
+         if (field.equals(PATTERN_FIELD_ID))
+         {
+            value = entry.getId();
+         }
+         else if (field.equals(PATTERN_FIELD_ENTRY_TYPE))
+         {
+            value = entry.getEntryType();
+         }
+         else if (field.equals(PATTERN_FIELD_ORIGINAL_ENTRY_TYPE))
+         {
+            value = entry.getOriginalEntryType();
+         }
+         else
+         {
+            value = entry.getFieldValue(field);
+         }
+
+         if (value == null)
+         {
+            value = "";
+         }
+
+         Pattern p = patterns.get(field);
+
+         Matcher m = p.matcher(value);
+
+         boolean result = m.matches();
+
+         bib2gls.debugMessage("message.pattern.info", p.pattern(), field, value, result);
+
+         if (and)
+         {
+            if (!result)
+            {
+               return true;
+            }
+         }
+         else
+         {
+            if (result)
+            {
+               return false;
+            }
+         }
+      }
+
+      return !matches;
+   }
+
+   /**
+    * Gets the post-description dot setting.
+    * Corresponds to the "post-description-dot" setting.
+    * @return the numeric identifier indicating the setting
+    */ 
+   public byte getPostDescDot()
+   {
+      return postDescDot;
+   }
+
+   /**
+    * Gets the "strip-trailing-nopost" setting.
+    * @return true if the setting is on
+    */ 
+   public boolean isStripTrailingNoPostOn()
+   {
+      return stripTrailingNoPost;
+   }
+
+   /**
+    * Determines whether or not the given field should be converted
+    * into a label.
+    * @param field the field
+    * @return true if the field should be converted to a label
+    */ 
+   public boolean isLabelifyField(String field)
+   {
+      if (labelifyFields == null) return false;
+
+      for (String f : labelifyFields)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * Determines whether or not the given field should be converted
+    * into a label list.
+    * @param field the field
+    * @return true if the field should be converted to a label list
+    */ 
+   public boolean isLabelifyListField(String field)
+   {
+      if (labelifyListFields == null) return false;
+
+      for (String f : labelifyListFields)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * Gets the labelify substitutions.
+    * Corresponds to the "labelify-replace" setting.
+    * @return the list of pattern substitutions or null if not set
+    */ 
+   public Vector<PatternReplace> getLabelifySubstitutions()
+   {
+      return labelifyReplaceMap;
+   }
+
+   /**
+    * Determines whether or not the given field should contain a list of
+    * dependencies.
+    * Corresponds to the "dependency-fields" setting.
+    * @param field the field
+    * @return true if the field should contain a list of
+    * dependencies
+    */ 
+   public boolean isDependencyListField(String field)
+   {
+      if (dependencyListFields == null) return false;
+
+      for (String f : dependencyListFields)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * Determines whether or not the end punctuation check is on for
+    * any of the fields.
+    * Corresponds to the "check-end-punctuation" setting.
+    * @return true if the check is on for one or more fields
+    */ 
+   public boolean isCheckEndPuncOn()
+   {
+      return checkEndPunc != null;
+   }
+
+   /**
+    * Determines whether or not the end punctuation check is on for
+    * the given field.
+    * Corresponds to the "check-end-punctuation" setting.
+    * @param field
+    * @return true if the check is on for the field
+    */ 
+   public boolean isCheckEndPuncOn(String field)
+   {
+      if (checkEndPunc == null) return false;
+
+      for (String f : checkEndPunc)
+      {
+         if (f.equals(field)) return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * Determines whether or not the name field should have a
+    * case-change applied.
+    * Corresponds to the "name-case-change" setting.
+    * @return true if the name field should have a case-change
+    * applied
+    */ 
+   public boolean changeNameCase()
+   {
+      return nameCaseChange != null;
+   }
+
+   /**
+    * Determines whether or not the description field should have a
+    * case-change applied.
+    * Corresponds to the "description-case-change" setting.
+    * @return true if the description field should have a case-change
+    * applied
+    */ 
+   public boolean changeDescriptionCase()
+   {
+      return descCaseChange != null;
+   }
+
+   /**
+    * Determines whether or not the short field should have a
+    * case-change applied.
+    * Corresponds to the "short-case-change" setting.
+    * @return true if the short field should have a case-change
+    * applied
+    */ 
+   public boolean changeShortCase()
+   {
+      return shortCaseChange != null;
+   }
+
+   /**
+    * Determines whether or not the short field for dual entries should have a
+    * case-change applied.
+    * Corresponds to the "dual-short-case-change" setting.
+    * @return true if the short field for dual entries should have a case-change
+    * applied
+    */ 
+   public boolean changeDualShortCase()
+   {
+      return dualShortCaseChange != null;
+   }
+
+   /**
+    * Determines whether or not the long field should have a
+    * case-change applied.
+    * Corresponds to the "long-case-change" setting.
+    * @return true if the long field should have a case-change
+    * applied
+    */ 
+   public boolean changeLongCase()
+   {
+      return longCaseChange != null;
+   }
+
+   /**
+    * Determines whether or not the long field for dual entries should have a
+    * case-change applied.
+    * Corresponds to the "dual-long-case-change" setting.
+    * @return true if the long field for dual entries should have a case-change
+    * applied
+    */ 
+   public boolean changeDualLongCase()
+   {
+      return dualLongCaseChange != null;
+   }
+
+   /**
+    * Gets the map of field case change options.
+    * Corresponds to the "field-case-change" setting.
+    * @return field case change map or null if not set
+    */ 
+   public HashMap<String,String> getFieldCaseOptions()
+   {
+      return fieldCaseChange;
+   }
+
    /**
     * Gets the alias location setting.
     * Corresponds to the "alias-loc" setting.
@@ -13754,560 +14358,6 @@ public class GlsResource
    public String getGroupField()
    {
       return groupField;
-   }
-
-   /**
-    * Gets the glossary type associated with the given entry.
-    * @param entry the entry
-    * @return the glossary type or null if unknown
-    */ 
-   public String getType(Bib2GlsEntry entry)
-   {
-      String value = entry.getFieldValue("type");
-
-      if (value != null)
-      {
-         return value;
-      }
-
-      value = type;
-
-      if (entry instanceof Bib2GlsDualEntry
-          && !(((Bib2GlsDualEntry)entry).isPrimary()))
-      {
-         value = dualType;
-      }
-      else if (entry.getFieldValue("progeny") != null)
-      {
-         value = progenitorType;
-      }
-      else if (entry.getFieldValue("progenitor") != null)
-      {
-         value = progenyType;
-      }
-
-      return getType(entry, value, false);
-   }
-
-   /**
-    * Gets the glossary type associated with the given entry.
-    * @param entry the entry
-    * @param fallback the fallback value (may be null)
-    * @return the glossary type or null if unknown
-    */ 
-   public String getType(Bib2GlsEntry entry, String fallback)
-   {
-      return getType(entry, fallback, true);
-   }
-
-   /**
-    * Gets the glossary type associated with the given entry.
-    * @param entry the entry
-    * @param fallback the fallback value (may be null)
-    * @param checkField if true check if the "type" field has
-    * been set
-    * @return the glossary type or null if unknown
-    */ 
-   public String getType(Bib2GlsEntry entry, String fallback, 
-      boolean checkField)
-   {
-      String value = null;
-
-      if (checkField)
-      {
-         value = entry.getFieldValue("type");
-
-         if (value != null)
-         {
-            return value;
-         }
-      }
-
-      value = fallback;
-
-      if (value == null)
-      {
-         return null;
-      }
-
-      if (value.equals("same as category"))
-      {
-         if (entry instanceof Bib2GlsDualEntry  
-              && !((Bib2GlsDualEntry)entry).isPrimary())
-         {
-            value = dualCategory;
-         }
-         else
-         {
-            value = category;
-         }
-
-         if ("same as type".equals(value))
-         {
-            throw new IllegalArgumentException(
-              bib2gls.getMessage("error.cyclic.sameas.type.category"));
-         }
-
-         return getCategory(entry, value);
-      }
-
-      if (value.equals("same as entry"))
-      {
-         return entry.getEntryType();
-      }
-
-      if (value.equals("same as original entry"))
-      {
-         return entry.getOriginalEntryType();
-      }
-
-      if (value.equals("same as base"))
-      {
-         return entry.getBase();
-      }
-
-      if (value.equals("same as parent"))
-      {
-         String parentId = entry.getParent();
-
-         if (parentId == null) return null;
-
-         Bib2GlsEntry parentEntry = getEntry(parentId);
-
-         if (parentEntry == null) return null;
-
-         return getType(parentEntry);
-      }
-
-      if (value.equals("same as primary") 
-          && (entry instanceof Bib2GlsDualEntry)
-          && !((Bib2GlsDualEntry)entry).isPrimary())
-      {
-         Bib2GlsEntry dual = entry.getDual();
-
-         if (dual != null)
-         {
-            return getType(dual, fallback);
-         }
-      }
-
-      return value;
-   }
-
-   /**
-    * Gets the category for the given entry.
-    * @param entry the entry
-    * @return the category or null if unknown
-    */
-   public String getCategory(Bib2GlsEntry entry)
-   {
-      String value = entry.getFieldValue("category");
-
-      if (value != null)
-      {
-         return value;
-      }
-
-      value = category;
-
-      if (entry instanceof Bib2GlsDualEntry
-          && !(((Bib2GlsDualEntry)entry).isPrimary()))
-      {
-         value = dualCategory;
-      }
-
-      return getCategory(entry, value, false);
-   }
-
-   /**
-    * Gets the category for the given entry.
-    * @param entry the entry
-    * @param fallback the fallback
-    * @return the category or null if unknown
-    */
-   public String getCategory(Bib2GlsEntry entry, String fallback)
-   {
-      return getCategory(entry, fallback, true);
-   }
-
-   /**
-    * Gets the category for the given entry.
-    * @param entry the entry
-    * @param fallback the fallback
-    * @param checkField if true check if the "category" field has
-    * been set
-    * @return the category or null if unknown
-    */
-   public String getCategory(Bib2GlsEntry entry, String fallback,
-     boolean checkField)
-   {
-      String value = null;
-
-      if (checkField)
-      {
-         value = entry.getFieldValue("category");
-
-         if (value != null)
-         {
-            return value;
-         }
-      }
-
-      value = fallback;
-
-      if (value == null)
-      {
-         return null;
-      }
-
-      if (value.equals("same as type"))
-      {
-         if (entry instanceof Bib2GlsDualEntry  
-              && !((Bib2GlsDualEntry)entry).isPrimary())
-         {
-            value = dualType;
-         }
-         else
-         {
-            value = type;
-         }
-
-         if ("same as category".equals(value))
-         {
-            throw new IllegalArgumentException(
-              bib2gls.getMessage("error.cyclic.sameas.type.category"));
-         }
-
-         return getType(entry, value);
-      }
-
-      if (value.equals("same as entry"))
-      {
-         return entry.getEntryType();
-      }
-
-      if (value.equals("same as original entry"))
-      {
-         return entry.getOriginalEntryType();
-      }
-
-      if (value.equals("same as base"))
-      {
-         return entry.getBase();
-      }
-
-      if (value.equals("same as primary") 
-          && (entry instanceof Bib2GlsDualEntry)
-          && !((Bib2GlsDualEntry)entry).isPrimary())
-      {
-         Bib2GlsEntry dual = entry.getDual();
-
-         if (dual != null)
-         {
-            return getCategory(dual, fallback);
-         }
-      }
-
-      return value;
-   }
-
-   /**
-    * Writes the hyper group definition for the given entry.
-    * @param entry the entry
-    * @param writer the file writer stream
-    * @throws IOException if I/O error occurs
-    */ 
-   private void writeHyperGroupDef(Bib2GlsEntry entry, PrintWriter writer)
-     throws IOException
-   {
-      String key = entry.getGroupId();
-
-      if (key == null)
-      {
-         bib2gls.debugMessage("message.no.group.id", "writeHyperGroupDef",
-            entry.getId());
-         return;
-      }
-
-      GroupTitle groupTitle = groupTitleMap.get(key);
-
-      if (groupTitle == null)
-      {
-         bib2gls.debugMessage("message.no.group.found", "writeHyperGroupDef", key);
-         return;
-      }
-
-      if (!groupTitle.isDone())
-      {
-         writer.format("\\bibglshypergroup{%s}{\\%s%s}%n", groupTitle.getType(),
-               groupTitle.getCsLabelName(), groupTitle);
-
-         groupTitle.mark();
-
-         writer.println();
-      }
-   }
-
-   /**
-    * Assigns the group to the given entry.
-    * @param grpTitle the group information 
-    * @param entry the entry
-    */ 
-   public void putGroupTitle(GroupTitle grpTitle, Bib2GlsEntry entry)
-   {
-      if (groupTitleMap != null)
-      {
-         grpTitle.setSupportsHierarchy(isGroupLevelsEnabled(), 
-          Math.max(0, entry.getLevel(null)));
-
-         String key = grpTitle.getKey();
-
-         entry.setGroupId(key);
-
-         groupTitleMap.put(key, grpTitle);
-      }
-   }
-
-   /**
-    * Gets the group data associated with the given glossary, id and
-    * parent. The key for the mapping is obtained from a combination
-    * of the entry type (which may be null), the id, and the entry's
-    * parent (which may be null).
-    * @param entryType the glossary type
-    * @param id numeric identifier associated with the group
-    * @param parent the parent
-    * @return the group data or null if not available
-    */ 
-   public GroupTitle getGroupTitle(String entryType, long id, String parent)
-   {
-      if (groupTitleMap != null)
-      {
-         return groupTitleMap.get(GroupTitle.getKey(entryType, id, parent));
-      }
-
-      return null;
-   }
-
-   /**
-    * Determines whether or not hierarchical groups are allowed.
-    * @return true if hierarchical groups are allowed
-    */ 
-   public boolean isGroupLevelsEnabled()
-   {
-      return !(groupLevelSetting == GROUP_LEVEL_SETTING_EXACT 
-             && groupLevelSettingValue == 0);
-   }
-
-   /**
-    * Assigns the group data to the entry's group field.
-    * @param entry the entry
-    * @param groupField the field used to store the group label
-    * @param groupFieldValue the field value (the LaTeX code that
-    * should expand to the group label)
-    * @param groupTitle the group data
-    */ 
-   public void assignGroupField(Bib2GlsEntry entry, 
-     String groupField, String groupFieldValue, GroupTitle groupTitle)
-   {
-      entry.putField(groupField, groupFieldValue);
-
-      if (groupTitle != null)
-      {
-         entry.setGroupId(groupTitle.getKey());
-      }
-   }
-
-   /**
-    * Merges small groups, if supported.
-    * Sorting must be done first.
-    * @param entries list of sorted entries
-    * @param groupField the field used to store the group label
-    */ 
-   public void mergeSmallGroups(Vector<Bib2GlsEntry> entries, String groupField)
-   {
-      if (groupTitleMap == null || groupTitleMap.isEmpty() || mergeSmallGroupLimit < 1)
-      {
-         return;
-      }
-
-      int count = 0;
-      String prevKey = null;
-      GroupTitle prevTitle = null;
-
-      Vector<GroupTitle> pending = new Vector<GroupTitle>();
-
-      for (int i = 0; i < entries.size(); i++)
-      {
-         Bib2GlsEntry entry = entries.get(i);
-         String key = entry.getGroupId();
-         GroupTitle groupTitle = groupTitleMap.get(key);
-         boolean doCheck = false;
-
-         if (groupTitle == null)
-         {
-            bib2gls.debugMessage("message.no.group.id", "mergeSmallGroups",
-              entry.getId());
-
-            prevTitle = null;
-            count = 0;
-            continue;
-         }
-         else if (key.equals(prevKey))
-         {
-            count++;
-            groupTitle.setEndIndex(i);
-         }
-         else if (count <= mergeSmallGroupLimit)
-         {
-            if (prevTitle != null)
-            {
-               if (groupTitle.getLevel() != prevTitle.getLevel())
-               {
-                  doCheck = true;
-               }
-
-               if (pending.isEmpty() 
-                    || pending.lastElement().getLevel() == prevTitle.getLevel())
-               {
-                  pending.add(prevTitle);
-                  prevTitle = null;
-               }
-            }
-
-            groupTitle.setStartIndex(i);
-            groupTitle.setEndIndex(i);
-            count = 1;
-         }
-         else
-         {
-            groupTitle.setStartIndex(i);
-            groupTitle.setEndIndex(i);
-            prevTitle = null;
-            doCheck = true;
-         }
-
-         if (doCheck)
-         {
-            if (pending.size() > 1)
-            {
-               MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
-               String groupFieldValue = String.format("\\%s%s",
-                 mergedTitles.getCsLabelName(), mergedTitles.format());
-
-               for (GroupTitle grp : pending)
-               {
-                  for (int j = grp.getStartIndex(); j <= grp.getEndIndex(); j++)
-                  {
-                     Bib2GlsEntry e = entries.get(j);
-                     putGroupTitle(mergedTitles, e);
-                     e.putField(groupField, groupFieldValue);
-                  }
-               }
-            }
-            else
-            {
-               for (GroupTitle grp : pending)
-               {
-                  grp.resetIndexes();
-               }
-            }
-
-            count = 1;
-            pending.clear();
-
-            if (prevTitle != null)
-            {
-               pending.add(prevTitle);
-               System.out.println("adding previous: "+prevTitle);
-            }
-         }
-
-         prevKey = key;
-         prevTitle = groupTitle;
-      }
-
-      if (prevTitle != null && !pending.isEmpty())
-      {
-
-         if (count <= mergeSmallGroupLimit && prevTitle != null)
-         {
-            if (pending.isEmpty() 
-                 || pending.lastElement().getLevel() == prevTitle.getLevel())
-            {
-               pending.add(prevTitle);
-            }
-         }
-
-         if (pending.size() > 1)
-         {
-            MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
-            String groupFieldValue = String.format("\\%s%s",
-              mergedTitles.getCsLabelName(), mergedTitles.format());
-
-            for (GroupTitle grp : pending)
-            {
-               for (int j = grp.getStartIndex(); j <= grp.getEndIndex(); j++)
-               {
-                  Bib2GlsEntry e = entries.get(j);
-                  putGroupTitle(mergedTitles, e);
-                  e.putField(groupField, groupFieldValue);
-               }
-            }
-         }
-         else
-         {
-            for (GroupTitle grp : pending)
-            {
-               grp.resetIndexes();
-            }
-         }
-      }
-   }
-
-   /**
-    * Determines whether or not to use the group field for the given
-    * entry.
-    * @param entry the entry
-    * @param entries the list of entries
-    * @return true if the group field should be used
-    */ 
-   public boolean useGroupField(Bib2GlsEntry entry, Vector<Bib2GlsEntry> entries)
-   {
-      if (bib2gls.useGroupField())
-      {
-         switch (groupLevelSetting)
-         {
-            case GROUP_LEVEL_SETTING_EXACT:
-
-              if (groupLevelSettingValue == 0)
-              {
-                 return !entry.hasParent();
-              }
-              else
-              {
-                 return entry.getLevel(entries) == groupLevelSettingValue;
-              }
-
-            case GROUP_LEVEL_SETTING_LESS_THAN:
-
-              return entry.getLevel(entries) < groupLevelSettingValue;
-
-            case GROUP_LEVEL_SETTING_LESS_THAN_EQ:
-
-              return entry.getLevel(entries) <= groupLevelSettingValue;
-
-            case GROUP_LEVEL_SETTING_GREATER_THAN:
-
-              return entry.getLevel(entries) > groupLevelSettingValue;
-
-            case GROUP_LEVEL_SETTING_GREATER_THAN_EQ:
-
-              return entry.getLevel(entries) >= groupLevelSettingValue;
-
-         }
-      }
-
-      return false;
    }
 
    /**
@@ -14648,7 +14698,7 @@ public class GlsResource
 
    /**
     * Determines whether or not labelify fields is enabled.
-    * Not currently used. 
+    * Not currently used. May be removed in future.
     * TODO check if this is correct and what it's for.
     * @return true if enabled
     */ 
