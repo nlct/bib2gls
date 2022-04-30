@@ -68,7 +68,74 @@ will strip spaces. The values of the `see`, `seealso` and
 `\gls` etc will have to be replaced manually (or use your
 text editor's search and replace function).
 
+# Example Document
+
+File `entries.bib`:
+
+```bibtex
+% Encoding UTF-8
+
+@entry{bird,
+  name={bird},
+  description = {feathered animal}
+}
+
+@abbreviation{html,
+  short="html",
+  long={hypertext markup language}
+}
+
+@symbol{v,
+  name={$\vec{v}$},
+  text={\vec{v}},
+  description={a vector}
+}
+
+@index{goose,plural="geese"}
+```
+
+File `myDoc.tex`:
+
+```latex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src={entries},% data in entries.bib
+  sort={en-GB},% sort according to 'en-GB' locale
+]
+
+\begin{document}
+\Gls{bird} and \gls{goose}.
+
+\printunsrtglossaries
+\end{document}
+```
+
+Document build:
+
+```bash
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+```
+
+Or, if letter groups are required:
+
+```bash
+pdflatex myDoc
+bib2gls -g myDoc
+pdflatex myDoc
+```
+
 # Installation
+
+First ensure that you have Java installed.
+
+Now that `bib2gls` is available in both TeX Live and MiKTeX,
+the best installation method is via your TeX package manager.
+Below are instructions for manual installation.
 
 The files should be installed as follows where *TEXMF* indicates
 your local or home TEXMF path (for example, `~/texmf/`):
