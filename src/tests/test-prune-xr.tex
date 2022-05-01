@@ -7,14 +7,19 @@
 \usepackage[record,nostyles,stylemods=tree,style=tree]{glossaries-extra}
 
 \GlsXtrLoadResources[
+ %selection={recorded and deps and see not also},
+ %prune-see-match={description={}},
+ %prune-seealso-match={description={}}
  %prune-see-match={entrytype=index(plural)?,see={}}
- prune-xr
+ prune-xr,
+ %prune-iterations=2
 ]
 
 \begin{document}
 \gls{cucurbit} (see: gourd $\to$ seealso: pumpkin,cucumber,melon), 
-\gls{pumpkin}, \gls{melon}, \gls{broccoli},
-\gls{marrow} (see courgette), \gls{cauliflower} (seealso: broccoli).
+\gls{pumpkin}, \gls{melon}, 
+\gls{broccoli},
+\gls{marrow} (seealso courgette), \gls{cauliflower} (seealso: broccoli).
 
-\printunsrtglossaries
+\printunsrtglossary[title=Index]
 \end{document}

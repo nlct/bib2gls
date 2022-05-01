@@ -2501,6 +2501,16 @@ public class GlsResource
                pruneSeeAlsoPatterns = null;
             }
          }
+         else if (opt.equals("prune-iterations"))
+         {
+            pruneIterations = getRequiredIntGe(1, list, opt);
+
+            if (pruneIterations > MAX_PRUNE_ITERATIONS)
+            {
+               bib2gls.warningMessage("warning.max-prune-iteration-cap",
+                opt, MAX_PRUNE_ITERATIONS);
+            }
+         }
          else if (opt.equals("prune-see-op"))
          {
             String val = getChoice(list, opt, "and", "or");
@@ -3374,8 +3384,6 @@ public class GlsResource
       if ((pruneSeePatterns != null || pruneSeeAlsoPatterns != null)
           && !(selectionMode == SELECTION_RECORDED_AND_DEPS 
             || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
-            || selectionMode == SELECTION_RECORDED_NO_DEPS
-            || selectionMode == SELECTION_RECORDED_AND_PARENTS
             || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO))
       {
          bib2gls.warning(
@@ -6856,13 +6864,28 @@ public class GlsResource
          }
       }
 
-      if (savedSeeEntries != null)
+      if (savedSeeEntries != null && !savedSeeEntries.isEmpty())
       {
          // initialise cross-reference lists but prune any dead ends
+
+         if (pruneIterations > 1)
+         {
+            bib2gls.verboseMessage("message.repruning", 1, pruneIterations);
+         }
 
          for (Bib2GlsEntry entry : savedSeeEntries)
          {
             entry.initCrossRefs();
+         }
+
+         for (int i = 2; i <= pruneIterations; i++)
+         {
+            bib2gls.verboseMessage("message.repruning", i, pruneIterations);
+
+            for (Bib2GlsEntry entry : savedSeeEntries)
+            {
+               entry.reprune();
+            }
          }
       }
 
@@ -16315,5 +16338,9 @@ public class GlsResource
    private boolean pruneSeePatternsAnd=true, pruneSeeAlsoPatternsAnd=true;
 
    private HashMap<String,PrunedEntry> prunedEntryMap;
+
+   private int pruneIterations=1;
+
+   public static final int MAX_PRUNE_ITERATIONS=20;
 }
 

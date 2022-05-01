@@ -10729,14 +10729,10 @@ order isn't what you expect, check the transcript file for messages.
 
 \optsection[\subsubsection]{prune-xr}
 
-A shortcut for:
+If true, this is a shortcut for:
 \begin{codeenv}
-\csopt[entrytype=index(plural)?,
-  see=\marg{},seealso=\marg{},alias=\marg{}
-]{prune-see-match},
-\csopt[entrytype=index(plural)?,
-  see=\marg{},seealso=\marg{},alias=\marg{}
-]{prune-seealso-match},
+\csopt[entrytype=\marg{index(plural)?},see=\marg{},seealso=\marg{},alias=\marg{}]{prune-see-match},
+\csopt[entrytype=\marg{index(plural)?},see=\marg{},seealso=\marg{},alias=\marg{}]{prune-seealso-match},
 \end{codeenv}
 
 This will remove any labels in an entry's \field{see} or
@@ -10745,6 +10741,9 @@ records and hasn't been selected as another form of dependency and
 whose entry type is either \atentry{index} or \atentry{indexplural}
 and doesn't have the \field{see}, \field{seealso} or \field{alias}
 fields set.
+
+Both \csopt{prune-see-match} and \csopt{prune-seealso-match} can be
+switched off at the same time with \csopt[false]{prune-xr}.
 
 \optsection[\subsubsection]{prune-see-match}
 
@@ -10768,8 +10767,8 @@ following:
 \atentry{index}\marg{pumpkin}
 \atentry{index}\marg{cucumber}
 \atentry{index}\marg{melon}
-\atentry{index}\marg{gourd,\field{see}=\marg{pumpkin,cucumber,melon}}
 \atentry{index}\marg{cucurbit,\field{see}=\marg{gourd}}
+\atentry{index}\marg{gourd,\field{see}=\marg{pumpkin,cucumber,melon}}
 \atentry{index}\marg{courgette}
 \atentry{index}\marg{marrow,\field{seealso}=\marg{courgette}}
 \atentry{index}\marg{broccoli}
@@ -10779,11 +10778,9 @@ Suppose the document contains:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
 \cmd{begin}\marg{document}
-\gls{gls}\marg{cucurbit},
-\gls{gls}\marg{pumpkin}, \gls{gls}\marg{melon}, \gls{gls}\marg{broccoli},
-\gls{gls}\marg{marrow}, \gls{gls}\marg{cauliflower}.
-\strut
-\gls{printunsrtglossaries}
+\cs{gls}\marg{cucurbit}, \cs{gls}\marg{pumpkin}, \cs{gls}\marg{melon}, \cs{gls}\marg{broccoli},
+\cs{gls}\marg{marrow}, \cs{gls}\marg{cauliflower}.
+\cs{printunsrtglossary}\oarg{title=Index}
 \cmd{end}\marg{document}
 \end{codeenv}
 This uses the default \csopt[recorded and deps]{selection} setting,
@@ -10793,7 +10790,6 @@ dependencies are: courgette (because it's listed in the marrow's
 \field{seealso} field), gourd (because it's listed in the cucurbit's
 \field{see} field), and cucumber (because it's listed in the
 gourd's \field{see} field).
-
 The resulting list is:
 \begin{quote}
 \setlength{\parindent}{0pt}%
@@ -10824,14 +10820,19 @@ pumpkin and melon.
 
 An appropriate filter is needed to switch on pruning. (This is in
 addition to the criteria that the pruned entry has no records, isn't
-dependent on another entry, hasn't previously been selected.)
+dependent on another entry, and hasn't previously been selected.)
 This type of pruning is usually only necessary for indexes so a
 useful filter may be simply on the entry type (either
 \atentry{index} or \atentry{indexplural}):
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
- \csopt[entrytype=index(plural)?]{prune-see-match}}
+ \csopt[entrytype=\marg{index(plural)?}]{prune-see-match}}
 \end{codeenv}
+Another possibility is to filter on an empty \field{description}:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt[description=\marg{}]{prune-see-match}}
+\end{codeenv}
+
 The result is that the cauliflower and marrow entries keep their
 \field{seealso} lists (since this option only applies to \field{see}
 lists) and the courgette entry has been added (because it's
@@ -10844,9 +10845,7 @@ In this case, I'd like to include the gourd entry because it has the
 only entries without the \field{see} field can be pruned:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
- \csopt[entrytype=index(plural)?,
-  see=\marg{}
- ]{prune-see-match}}
+ \csopt[entrytype=\marg{index(plural)?},see=\marg{}]{prune-see-match}}
 \end{codeenv}
 This means that gourd is now selected (and retained in the
 cucurbit's \field{see} field) but cucumber is removed from the
@@ -10876,10 +10875,22 @@ then the resulting list will be:
 \glstreeitem pumpkin 1\par
 \end{quote}
 
+Note that if the pumpkin and melon references are removed from the
+document, then gourd will still be selected but will have no
+cross-reference. This is because the cucurbit entry is checked for
+pruning while the gourd entry still has a non-empty \field{see}
+field so it's not removed from the cucurbit entry.
+
+There are two ways around this problem: either switch the
+definitions of cucurbit and gourd around in the \ext{bib} file
+or use \csopt{prune-iterations} to reprune (in this case,
+\csopt[2]{prune-iterations} is sufficient).
+
 \begin{important}
-This setting is incompatible with \csopt{selection} criteria that
-don't select according to whether or not entries have records (such as
-\csopt[all]{selection}).
+This setting is only compatible with the \qt{recorded and dep}
+selection criteria: \csopt[recorded and
+deps]{selection}, \csopt[recorded and deps and see]{selection}
+and \csopt[recorded and deps and see not also]{selection}.
 \end{important}
 
 \optsection[\subsubsection]{prune-see-op}
@@ -10896,6 +10907,13 @@ As \csopt{prune-see-match} but for \field{seealso} fields. If more
 that one pattern match is supplied, \csopt{prune-seealso-op}
 determines whether to apply a logical AND or a logical OR.
 
+\begin{important}
+This setting is only compatible with the \qt{recorded and dep}
+selection criteria: \csopt[recorded and
+deps]{selection}, \csopt[recorded and deps and see]{selection}
+and \csopt[recorded and deps and see not also]{selection}.
+\end{important}
+
 \optsection[\subsubsection]{prune-seealso-op}
 
 If the value of \csopt{prune-seealso-match} contains more than one 
@@ -10903,6 +10921,16 @@ If the value of \csopt{prune-seealso-match} contains more than one
 determines whether to apply a logical AND or a logical OR.
 The \meta{value} may be either \optfmt{and} or \optfmt{or}.
 The default is \csopt[and]{prune-seealso-op}.
+
+\optsection[\subsubsection]{prune-iterations}
+
+If you have cross-reference trails, you may need to reprune. The
+value of this options indicates the number of pruning iterations.
+The default is 1. The higher the number, the longer \bibgls\ will
+take to complete. The value can't be less that 1.
+
+The maximum number of iterations is capped at 20. A cross-reference
+trail that long is excessive for an index.
 
 \optsection[\subsubsection]{bibtex-contributor-fields}
 

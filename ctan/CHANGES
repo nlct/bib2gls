@@ -46,6 +46,7 @@ v3.0 (pending):
     - prune-see-match
     - prune-seealso-op
     - prune-seealso-match
+    - prune-iterations
 
 v2.9 (2021-11-22):
 

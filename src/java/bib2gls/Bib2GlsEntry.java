@@ -3101,6 +3101,11 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
+   public void removeDependency(String label)
+   {
+      deps.remove(label);
+   }
+
    public Iterator<String> getDependencyIterator()
    {
       return deps.iterator();
@@ -4666,6 +4671,7 @@ public class Bib2GlsEntry extends BibEntry
       if (xrIdx == 0)
       {
          removeField("see");
+         fieldValues.remove("see");
          crossRefTag = null;
          crossRefs = null;
       }
@@ -4944,6 +4950,7 @@ public class Bib2GlsEntry extends BibEntry
       if (xrIdx == 0)
       {
          removeField("seealso");
+         removeFieldValue("seealso");
          alsocrossRefs = null;
       }
       else if (xrIdx < n)
@@ -4973,6 +4980,149 @@ public class Bib2GlsEntry extends BibEntry
       else
       {
          putField("seealso", builder.toString());
+      }
+   }
+
+   public void reprune()
+   {
+      TeXParser parser = resource.getBibParser();
+
+      boolean modified = false;
+
+      if (crossRefs != null)
+      {
+         Vector<String> newList = new Vector<String>();
+
+         for (int i = 0; i < crossRefs.length; i++)
+         {
+            // is this a compound entry?
+            CompoundEntry comp = bib2gls.getCompoundEntry(crossRefs[i]);
+
+            if (comp == null && resource.isSeeDeadEnd(crossRefs[i]))
+            {
+               modified = true;
+               removeDependency(crossRefs[i]);
+
+               bib2gls.verboseMessage("message.crossref.pruned", 
+                getId(), "see", crossRefs[i]);
+
+               resource.prunedSee(crossRefs[i], this);
+            }
+            else
+            {
+               newList.add(crossRefs[i]);
+            }
+         }
+
+         if (modified)
+         {
+            if (newList.isEmpty())
+            {
+               removeField("see");
+               removeFieldValue("see");
+               crossRefTag = null;
+               crossRefs = null;
+            }
+            else
+            {
+               crossRefs = newList.toArray(new String[newList.size()]);
+
+               StringBuilder builder = new StringBuilder();
+
+               if (crossRefTag != null)
+               {
+                  builder.append('[');
+                  builder.append(crossRefTag);
+                  builder.append(']');
+               }
+
+               for (int i = 0; i < crossRefs.length; i++)
+               {
+                  if (i > 0)
+                  {
+                     builder.append(',');
+                  }
+         
+                  builder.append(crossRefs[i]);
+               }
+
+               String strList = builder.toString();
+
+               TeXObjectList list = new TeXObjectList();
+
+               list.addAll(parser.getListener().createString(strList));
+               BibValueList bibList = new BibValueList();
+               bibList.add(new BibUserString(list));
+
+               putField("see", bibList);
+               putField("see", strList);
+            }
+         }
+
+         modified = false;
+      }
+
+      if (alsocrossRefs != null)
+      {
+         Vector<String> newList = new Vector<String>();
+
+         for (int i = 0; i < alsocrossRefs.length; i++)
+         {
+            // is this a compound entry?
+            CompoundEntry comp = bib2gls.getCompoundEntry(alsocrossRefs[i]);
+
+            if (comp == null && resource.isSeeAlsoDeadEnd(alsocrossRefs[i]))
+            {
+               modified = true;
+               removeDependency(crossRefs[i]);
+
+               bib2gls.verboseMessage("message.crossref.pruned", 
+                getId(), "seealso", alsocrossRefs[i]);
+
+               resource.prunedSeeAlso(alsocrossRefs[i], this);
+            }
+            else
+            {
+               newList.add(alsocrossRefs[i]);
+            }
+         }
+
+         if (modified)
+         {
+            if (newList.isEmpty())
+            {
+               removeField("seealso");
+               removeFieldValue("seealso");
+               alsocrossRefs = null;
+            }
+            else
+            {
+               alsocrossRefs = newList.toArray(new String[newList.size()]);
+
+               StringBuilder builder = new StringBuilder();
+
+               for (int i = 0; i < alsocrossRefs.length; i++)
+               {
+                  if (i > 0)
+                  {
+                     builder.append(',');
+                  }
+         
+                  builder.append(alsocrossRefs[i]);
+               }
+
+               String strList = builder.toString();
+
+               TeXObjectList list = new TeXObjectList();
+
+               list.addAll(parser.getListener().createString(strList));
+               BibValueList bibList = new BibValueList();
+               bibList.add(new BibUserString(list));
+
+               putField("seealso", bibList);
+               putField("seealso", strList);
+            }
+         }
       }
    }
 

@@ -87,6 +87,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.processing">Processing {0}</entry>
 <entry key="message.copying">Copying {0} -&gt; {1}</entry>
 <entry key="message.moving">Moving {0} -&gt; {1}</entry>
+<entry key="message.repruning">Pruning iteration {0}/{1}</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.pruned">Entry {0}: pruned cross-reference ({1}): {2}</entry>
 <entry key="message.compoundcrossref.found">Entry {0}: found compound cross-reference ({1}): {2}</entry>
@@ -342,6 +343,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.unknown_entry_in_current_resource">Unknown entry ''{0}'' in current resource set: {1}</entry>
 <entry key="warning.unknown_compound_label">Unknown compound entry ''{0}''.</entry>
 <entry key="warning.unknown_compound_label.in_entry">Unknown compound entry ''{0}'' referenced in entry ''{1}''.</entry>
+<entry key="warning.max-prune-iteration-cap">Maximum value of ''{0}'' exceeded. Capping at {1}.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
