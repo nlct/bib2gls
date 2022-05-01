@@ -6,10 +6,13 @@
 \usepackage[T1]{fontenc}
 \usepackage[record,nostyles,stylemods=tree,style=tree]{glossaries-extra}
 
-\GlsXtrLoadResources[prune-xr]
+\GlsXtrLoadResources[
+ %prune-see-match={entrytype=index(plural)?,see={}}
+ prune-xr
+]
 
 \begin{document}
-\gls{cucurbit} (see: gourd), 
+\gls{cucurbit} (see: gourd $\to$ seealso: pumpkin,cucumber,melon), 
 \gls{pumpkin}, \gls{melon}, \gls{broccoli},
 \gls{marrow} (see courgette), \gls{cauliflower} (seealso: broccoli).
 

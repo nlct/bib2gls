@@ -10727,6 +10727,183 @@ referenced label was found in the current \igls{resourceset} or if it had
 to be fetched from another \igls{resourceset}. So if the resulting
 order isn't what you expect, check the transcript file for messages.
 
+\optsection[\subsubsection]{prune-xr}
+
+A shortcut for:
+\begin{codeenv}
+\csopt[entrytype=index(plural)?,
+  see=\marg{},seealso=\marg{},alias=\marg{}
+]{prune-see-match},
+\csopt[entrytype=index(plural)?,
+  see=\marg{},seealso=\marg{},alias=\marg{}
+]{prune-seealso-match},
+\end{codeenv}
+
+This will remove any labels in an entry's \field{see} or
+\field{seealso} field where the referenced label doesn't have any
+records and hasn't been selected as another form of dependency and
+whose entry type is either \atentry{index} or \atentry{indexplural}
+and doesn't have the \field{see}, \field{seealso} or \field{alias}
+fields set.
+
+\optsection[\subsubsection]{prune-see-match}
+
+The value has the same syntax as \csopt{match}. Omitting the value
+switches off the setting. This option is not cumulative.
+
+If a value is supplied, this setting will attempt to prune unnecessary
+labels from \field{see} fields. Note that pruning may fail if there
+are cross-reference trails.
+
+A label will be stripped from a \field{see} field if the label
+references an entry that has no records, isn't dependent on another
+entry, hasn't previously been selected, and matches the given
+criteria. If more that one pattern match is supplied,
+\csopt{prune-see-op} determines whether to apply a logical AND or a
+logical OR.
+
+For example, suppose the file \filefmt{entries.bib} contains the
+following:
+\begin{codeenv}
+\atentry{index}\marg{pumpkin}
+\atentry{index}\marg{cucumber}
+\atentry{index}\marg{melon}
+\atentry{index}\marg{gourd,\field{see}=\marg{pumpkin,cucumber,melon}}
+\atentry{index}\marg{cucurbit,\field{see}=\marg{gourd}}
+\atentry{index}\marg{courgette}
+\atentry{index}\marg{marrow,\field{seealso}=\marg{courgette}}
+\atentry{index}\marg{broccoli}
+\atentry{index}\marg{cauliflower,\field{seealso}=\marg{broccoli}}
+\end{codeenv}
+Suppose the document contains:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\cmd{begin}\marg{document}
+\gls{gls}\marg{cucurbit},
+\gls{gls}\marg{pumpkin}, \gls{gls}\marg{melon}, \gls{gls}\marg{broccoli},
+\gls{gls}\marg{marrow}, \gls{gls}\marg{cauliflower}.
+\strut
+\gls{printunsrtglossaries}
+\cmd{end}\marg{document}
+\end{codeenv}
+This uses the default \csopt[recorded and deps]{selection} setting,
+which selects recorded entries (cucurbit, pumpkin, melon, broccoli,
+marrow and cauliflower) and their dependencies. In this case, the
+dependencies are: courgette (because it's listed in the marrow's
+\field{seealso} field), gourd (because it's listed in the cucurbit's
+\field{see} field), and cucumber (because it's listed in the
+gourd's \field{see} field).
+
+The resulting list is:
+\begin{quote}
+\setlength{\parindent}{0pt}%
+\setlength{\parskip}{0pt plus 0.3pt}%
+\glstreeitem broccoli 1\par
+\glstreeitem cauliflower 1, \emph{see also} broccoli\par
+\glstreeitem courgette\par
+\glstreeitem cucumber\par
+\glstreeitem cucurbit 1, \emph{see} gourd\par
+\glstreeitem gourd \emph{see} pumpkin, cucumber \& melon\par
+\glstreeitem marrow 1, \emph{see also} courgette\par
+\glstreeitem melon 1\par
+\glstreeitem pumpkin 1\par
+\end{quote}
+
+This means that courgette and cucumber appear in the glossary
+without a \igls{locationlist}. If this was an actual glossary with
+descriptions, this may not be a problem, but it looks strange for an
+index since the cross-reference essentially leads the reader to a dead end.
+
+Switching to \csopt[recorded no deps]{selection} will remove
+courgette, gourd and cucumber but the \field{see} and
+\field{seealso} fields will be lost. Since gourd references both
+pumpkin and melon (which are used in the document), it might be
+useful to keep the gourd entry. The aim of pruning is to remove the
+unwanted cucumber entry from the gourd's \field{see} list but retain
+pumpkin and melon.
+
+An appropriate filter is needed to switch on pruning. (This is in
+addition to the criteria that the pruned entry has no records, isn't
+dependent on another entry, hasn't previously been selected.)
+This type of pruning is usually only necessary for indexes so a
+useful filter may be simply on the entry type (either
+\atentry{index} or \atentry{indexplural}):
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
+ \csopt[entrytype=index(plural)?]{prune-see-match}}
+\end{codeenv}
+The result is that the cauliflower and marrow entries keep their
+\field{seealso} lists (since this option only applies to \field{see}
+lists) and the courgette entry has been added (because it's
+in the marrow entry's \field{seealso} list). The gourd entry is
+removed from the cucurbit's \field{see} list (because it matches the
+criteria) and is not selected (because it's no longer a dependency).
+
+In this case, I'd like to include the gourd entry because it has the
+\field{see} field set. This means adjusting the criteria so that
+only entries without the \field{see} field can be pruned:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
+ \csopt[entrytype=index(plural)?,
+  see=\marg{}
+ ]{prune-see-match}}
+\end{codeenv}
+This means that gourd is now selected (and retained in the
+cucurbit's \field{see} field) but cucumber is removed from the
+gourd's \field{see} field.
+
+A similar method can be applied for the \field{seealso} fields using
+\csopt{prune-seealso-match}. There's no applicable setting for the
+\field{alias} field (since it's expected that the alias be present
+due to the nature of the way the \field{alias} field works).
+
+For convenience, the \csopt{prune-xr} option is provided as a
+shortcut. If the resource command in the above example is modified
+to:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\csopt{prune-xr}}
+\end{codeenv}
+then the resulting list will be:
+\begin{quote}
+\setlength{\parindent}{0pt}%
+\setlength{\parskip}{0pt plus 0.3pt}%
+\glstreeitem broccoli 1\par
+\glstreeitem cauliflower 1, \emph{see also} broccoli\par
+\glstreeitem cucurbit 1, \emph{see} gourd\par
+\glstreeitem gourd \emph{see} pumpkin \& melon\par
+\glstreeitem marrow 1\par
+\glstreeitem melon 1\par
+\glstreeitem pumpkin 1\par
+\end{quote}
+
+\begin{important}
+This setting is incompatible with \csopt{selection} criteria that
+don't select according to whether or not entries have records (such as
+\csopt[all]{selection}).
+\end{important}
+
+\optsection[\subsubsection]{prune-see-op}
+
+If the value of \csopt{prune-see-match} contains more than one 
+\meta{key}=\meta{pattern} element, the \csopt{prune-see-op}
+determines whether to apply a logical AND or a logical OR.
+The \meta{value} may be either \optfmt{and} or \optfmt{or}.
+The default is \csopt[and]{prune-see-op}.
+
+\optsection[\subsubsection]{prune-seealso-match}
+
+As \csopt{prune-see-match} but for \field{seealso} fields. If more
+that one pattern match is supplied, \csopt{prune-seealso-op}
+determines whether to apply a logical AND or a logical OR.
+
+\optsection[\subsubsection]{prune-seealso-op}
+
+If the value of \csopt{prune-seealso-match} contains more than one 
+\meta{key}=\meta{pattern} element, the \csopt{prune-seealso-op}
+determines whether to apply a logical AND or a logical OR.
+The \meta{value} may be either \optfmt{and} or \optfmt{or}.
+The default is \csopt[and]{prune-seealso-op}.
+
 \optsection[\subsubsection]{bibtex-contributor-fields}
 
 This option indicates that the listed fields all use \BibTeX's name
