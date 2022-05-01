@@ -94,8 +94,9 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
 
       return super.getFallbackContents(field);
    }
-   public void parseFields(TeXParser parser)
-     throws IOException
+
+   @Override
+   public void parseFields() throws IOException
    {
       if (!fieldsParsed())
       {// bibtex's type key conflicts with bib2gls's so if found rename
@@ -107,7 +108,7 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
          }
       }
 
-      super.parseFields(parser);
+      super.parseFields();
    }
 
    public void populate(BibParser parserListener) throws IOException
@@ -238,7 +239,8 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
       resource.writeBibGlsContributorDef(writer);
    }
 
-   public void initCrossRefs(TeXParser parser)
+   @Override
+   public void initCrossRefs()
     throws IOException
    {
       for (Bib2GlsEntry contributor : contributorList)
@@ -247,7 +249,7 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
          contributor.addCrossRefdBy(this);
       }
 
-      super.initCrossRefs(parser);
+      super.initCrossRefs();
    }
 
    private Vector<Bib2GlsEntry> contributorList;

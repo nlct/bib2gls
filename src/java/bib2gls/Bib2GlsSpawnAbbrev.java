@@ -110,7 +110,8 @@ public class Bib2GlsSpawnAbbrev extends Bib2GlsProgenitor
       return super.getFallbackContents(field);
    }
 
-   protected void changeNameCase(TeXParser parser)
+   @Override
+   protected void changeNameCase()
     throws IOException
    {
       BibValueList value = getField("name");
@@ -120,7 +121,7 @@ public class Bib2GlsSpawnAbbrev extends Bib2GlsProgenitor
          return;
       }
 
-      super.changeNameCase(parser);
+      super.changeNameCase();
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException

@@ -143,6 +143,7 @@ public class Bib2GlsEntry extends BibEntry
       labelSuffix = suffix;
    }
 
+   @Override
    public String getId()
    {
       String id = super.getId();
@@ -388,10 +389,12 @@ public class Bib2GlsEntry extends BibEntry
            ||csname.equals("ref");
    }
 
-   private void checkGlsCs(TeXParser parser, TeXObjectList list, 
+   private void checkGlsCs(TeXObjectList list, 
       boolean mfirstucProtect, String fieldName)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       for (int i = 0; i < list.size(); i++)
       {
          TeXObject object = list.get(i);
@@ -770,7 +773,7 @@ public class Bib2GlsEntry extends BibEntry
                i++;
             }
 
-            checkGlsCs(parser, (TeXObjectList)object, false, fieldName);
+            checkGlsCs((TeXObjectList)object, false, fieldName);
          }
       }
    }
@@ -795,9 +798,10 @@ public class Bib2GlsEntry extends BibEntry
       return true;
    }
 
-   public void parseFields(TeXParser parser)
-     throws IOException
+   public void parseFields() throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       if (fieldsParsed) return;
 
       if (bib2gls.getDebugLevel() > 0)
@@ -923,7 +927,7 @@ public class Bib2GlsEntry extends BibEntry
             TeXObjectList list = value.expand(parser);
 
             putField("short", 
-               resource.applyShortCaseChange(parser, value));
+               resource.applyShortCaseChange(value));
          }
       }
 
@@ -936,7 +940,7 @@ public class Bib2GlsEntry extends BibEntry
             TeXObjectList list = value.expand(parser);
 
             putField("long", 
-               resource.applyLongCaseChange(parser, value));
+               resource.applyLongCaseChange(value));
          }
       }
 
@@ -947,7 +951,7 @@ public class Bib2GlsEntry extends BibEntry
          if (value != null)
          {
             putField("description", 
-               resource.applyDescriptionCaseChange(parser, value));
+               resource.applyDescriptionCaseChange(value));
          }
       }
 
@@ -958,7 +962,7 @@ public class Bib2GlsEntry extends BibEntry
          if (value != null)
          {
             putField("dualshort", 
-               resource.applyShortCaseChange(parser, value));
+               resource.applyShortCaseChange(value));
          }
       }
 
@@ -969,17 +973,16 @@ public class Bib2GlsEntry extends BibEntry
          if (value != null)
          {
             putField("duallong", 
-               resource.applyLongCaseChange(parser, value));
+               resource.applyLongCaseChange(value));
          }
       }
 
       String shortPluralSuffix = resource.getShortPluralSuffix();
       String dualShortPluralSuffix = resource.getDualShortPluralSuffix();
 
-      appendShortPluralSuffix(parser, "short", "shortplural", 
-        shortPluralSuffix);
+      appendShortPluralSuffix("short", "shortplural", shortPluralSuffix);
 
-      appendShortPluralSuffix(parser, "dualshort", "dualshortplural", 
+      appendShortPluralSuffix("dualshort", "dualshortplural", 
         dualShortPluralSuffix);
 
       if (resource.hasFieldCopies())
@@ -1022,15 +1025,13 @@ public class Bib2GlsEntry extends BibEntry
                      if (dup.equals("description") 
                           && resource.changeDescriptionCase())
                      {
-                        dupValue = resource.applyDescriptionCaseChange(parser, 
-                          dupValue);
+                        dupValue = resource.applyDescriptionCaseChange(dupValue);
                      }
                      else if (dup.equals("short"))
                      {
                         if (resource.changeShortCase())
                         {
-                           dupValue = resource.applyShortCaseChange(parser, 
-                             dupValue);
+                           dupValue = resource.applyShortCaseChange(dupValue);
                         }
 
                         if (shortPluralSuffix != null)
@@ -1042,16 +1043,14 @@ public class Bib2GlsEntry extends BibEntry
                      {
                         if (resource.changeLongCase())
                         {
-                           dupValue = resource.applyLongCaseChange(parser, 
-                             dupValue);
+                           dupValue = resource.applyLongCaseChange(dupValue);
                         }
                      }
                      else if (dup.equals("dualshort"))
                      {
                         if (resource.changeDualShortCase())
                         {
-                           dupValue = resource.applyShortCaseChange(parser, 
-                             dupValue);
+                           dupValue = resource.applyShortCaseChange(dupValue);
                         }
 
                         if (dualShortPluralSuffix != null)
@@ -1063,8 +1062,7 @@ public class Bib2GlsEntry extends BibEntry
                      {
                         if (resource.changeDualLongCase())
                         {
-                           dupValue = resource.applyLongCaseChange(parser, 
-                             dupValue);
+                           dupValue = resource.applyLongCaseChange(dupValue);
                         }
                      }
 
@@ -1076,13 +1074,13 @@ public class Bib2GlsEntry extends BibEntry
 
          if (updateShortPlural)
          {
-            appendShortPluralSuffix(parser, "short", "shortplural", 
+            appendShortPluralSuffix("short", "shortplural", 
               shortPluralSuffix);
          }
 
          if (updateDualShortPlural)
          {
-            appendShortPluralSuffix(parser, "dualshort", "dualshortplural", 
+            appendShortPluralSuffix("dualshort", "dualshortplural", 
               dualShortPluralSuffix);
          }
       }
@@ -1098,18 +1096,18 @@ public class Bib2GlsEntry extends BibEntry
 
       for (String field : fields)
       {
-         interpretFields = processField(parser, field, mfirstucProtect,
+         interpretFields = processField(field, mfirstucProtect,
            protectFields, idField, interpretFields);
       }
 
-      interpretFields = processSpecialFields(parser, mfirstucProtect,
+      interpretFields = processSpecialFields(mfirstucProtect,
            protectFields, idField, interpretFields);
 
       CompoundEntry compEntry = resource.getCompoundAdjustName(getId());
 
       if (compEntry != null)
       {
-         compoundAdjustName(parser, compEntry);
+         compoundAdjustName(compEntry);
       }
 
       // the name can't have its case changed until it's been
@@ -1117,7 +1115,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.changeNameCase())
       {
-         changeNameCase(parser);
+         changeNameCase();
       }
 
       if (resource.isCopyAliasToSeeEnabled())
@@ -1143,7 +1141,7 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      changeFieldCase(parser);
+      changeFieldCase();
 
       if (interpretFields != null)
       {
@@ -1185,7 +1183,7 @@ public class Bib2GlsEntry extends BibEntry
             {
                TeXObjectList list = value.expand(parser);
 
-               if (convertUnicodeCharToHex(parser, list))
+               if (convertUnicodeCharToHex(list))
                {
                   putField(field, list.toString(parser));
                }
@@ -1218,8 +1216,10 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   private boolean convertUnicodeCharToHex(TeXParser parser, TeXObjectList list)
+   private boolean convertUnicodeCharToHex(TeXObjectList list)
    {
+      TeXParser parser = resource.getBibParser();
+
       boolean changed = false;
 
       for (int i = 0; i < list.size(); i++)
@@ -1228,7 +1228,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (obj instanceof TeXObjectList)
          {
-            if (convertUnicodeCharToHex(parser, (TeXObjectList)obj))
+            if (convertUnicodeCharToHex((TeXObjectList)obj))
             {
                changed = true;
             }
@@ -1250,7 +1250,7 @@ public class Bib2GlsEntry extends BibEntry
       return changed;
    }
 
-   protected Vector<String> processSpecialFields(TeXParser parser,
+   protected Vector<String> processSpecialFields(
      boolean mfirstucProtect, String[] protectFields, String idField,
      Vector<String> interpretFields)
     throws IOException
@@ -1259,7 +1259,7 @@ public class Bib2GlsEntry extends BibEntry
 
        if (defIndexField != null)
        {
-          interpretFields = processField(parser, defIndexField,
+          interpretFields = processField(defIndexField,
             mfirstucProtect, protectFields, idField,
             interpretFields);
        }
@@ -1267,11 +1267,13 @@ public class Bib2GlsEntry extends BibEntry
        return interpretFields;
    }
 
-   protected Vector<String> processField(TeXParser parser, String field,
+   protected Vector<String> processField(String field,
      boolean mfirstucProtect, String[] protectFields, String idField,
      Vector<String> interpretFields)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       BibValueList value = getField(field);
 
       if (value == null || field.equals(idField))
@@ -1298,12 +1300,12 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.isBibTeXAuthorField(field))
       {
-         list = convertBibTeXAuthorField(parser, field, value);
+         list = convertBibTeXAuthorField(field, value);
          value.clear();
          value.add(new BibUserString(list));
       }
 
-      TeXObject suffix = resource.getAppendPrefixFieldObject(parser, field, list);
+      TeXObject suffix = resource.getAppendPrefixFieldObject(field, list);
 
       if (suffix != null)
       {
@@ -1442,7 +1444,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.isDependencyListField(field))
       {
-         parseCustomDependencyList(parser, list, field);
+         parseCustomDependencyList(list, field);
       }
 
       if (field.equals("parent") || field.equals("category")
@@ -1490,7 +1492,7 @@ public class Bib2GlsEntry extends BibEntry
             }
          }
 
-         checkGlsCs(parser, list, protect, field);
+         checkGlsCs(list, protect, field);
 
          if (field.equals("description"))
          {
@@ -1589,10 +1591,12 @@ public class Bib2GlsEntry extends BibEntry
       return interpretFields;
    }
 
-   protected void appendShortPluralSuffix(TeXParser parser,
+   protected void appendShortPluralSuffix(
      String shortField, String shortPluralField, String suffix)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       if (suffix == null || suffix.isEmpty()) return;
 
       BibValueList value = getField(shortPluralField);
@@ -1622,9 +1626,11 @@ public class Bib2GlsEntry extends BibEntry
       return true;
    }
 
-   protected void changeNameCase(TeXParser parser)
+   protected void changeNameCase()
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       BibValueList value = getField("name");
       boolean nameProvided = true;
 
@@ -1653,7 +1659,7 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      value = resource.applyNameCaseChange(parser, value);
+      value = resource.applyNameCaseChange(value);
 
       TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
 
@@ -1661,9 +1667,12 @@ public class Bib2GlsEntry extends BibEntry
       putField("name", list.toString(parser));
    }
 
-   protected void compoundAdjustName(TeXParser parser, CompoundEntry comp)
+   protected void compoundAdjustName(CompoundEntry comp)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+      TeXParserListener listener = parser.getListener();
+
       BibValueList value = getField("name");
       boolean nameProvided = true;
 
@@ -1696,15 +1705,15 @@ public class Bib2GlsEntry extends BibEntry
       BibValueList newList = new BibValueList();
 
       TeXObjectList newContent = new TeXObjectList();
-      Group grp1 = parser.getListener().createGroup();
-      Group grp2 = parser.getListener().createGroup();
-      Group grp3 = parser.getListener().createGroup();
+      Group grp1 = listener.createGroup();
+      Group grp2 = listener.createGroup();
+      Group grp3 = listener.createGroup();
 
       newContent.add(new TeXCsRef("glsxtrmultientryadjustedname"));
       newContent.add(grp1);
       newContent.add(grp2);
       newContent.add(grp3);
-      newContent.add(parser.getListener().createGroup(comp.getLabel()));
+      newContent.add(listener.createGroup(comp.getLabel()));
 
       TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
       grp2.addAll(list);
@@ -1722,7 +1731,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else
          {
-            g.addAll(parser.getListener().createString(sep+elem));
+            g.addAll(listener.createString(sep+elem));
             sep = ",";
          }
       }
@@ -1734,7 +1743,7 @@ public class Bib2GlsEntry extends BibEntry
       putField("name", newContent.toString(parser));
    }
 
-   protected void changeFieldCase(TeXParser parser)
+   protected void changeFieldCase()
     throws IOException
    {
       HashMap<String,String> map = resource.getFieldCaseOptions();
@@ -1749,14 +1758,16 @@ public class Bib2GlsEntry extends BibEntry
 
          if (!caseChangeOpt.equals("none"))
          {
-            changeFieldCase(parser, field, caseChangeOpt);
+            changeFieldCase(field, caseChangeOpt);
          }
       }
    }
 
-   protected void changeFieldCase(TeXParser parser, String field, String caseChangeOpt)
+   protected void changeFieldCase(String field, String caseChangeOpt)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       BibValueList value = getField(field);
 
       if (value == null)
@@ -1771,7 +1782,7 @@ public class Bib2GlsEntry extends BibEntry
          value = (BibValueList)value.clone();
       }
 
-      value = resource.applyCaseChange(parser, value, caseChangeOpt);
+      value = resource.applyCaseChange(value, caseChangeOpt);
 
       TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
 
@@ -1779,11 +1790,12 @@ public class Bib2GlsEntry extends BibEntry
       putField(field, list.toString(parser));
    }
 
-   public void convertFieldToDateTime(TeXParser parser,
+   public void convertFieldToDateTime(
      String field, String dateFormat,
      Locale dateLocale, boolean hasDate, boolean hasTime)
    throws IOException
    {
+      TeXParser parser = resource.getBibParser();
       String id = getId();
 
       bib2gls.debugMessage("message.datetime.field.check",
@@ -1983,10 +1995,12 @@ public class Bib2GlsEntry extends BibEntry
       putField(field, builder.toString());
    }
 
-   protected TeXObjectList convertBibTeXAuthorField(TeXParser parser,
+   protected TeXObjectList convertBibTeXAuthorField(
      String field, BibValueList value)
    throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       Vector<Contributor> contributors = parseContributors(parser, 
         value);
 
@@ -2602,6 +2616,7 @@ public class Bib2GlsEntry extends BibEntry
       return contents;
    }
 
+   @Override
    public void parseContents(TeXParser parser,
     TeXObjectList contents, TeXObject endGroupChar)
      throws IOException
@@ -2878,9 +2893,39 @@ public class Bib2GlsEntry extends BibEntry
       return crossRefs;
    }
 
+   public boolean isSeeLabel(String label)
+   {
+      if (crossRefs == null) return false;
+
+      for (int i = 0; i < crossRefs.length; i++)
+      {
+         if (crossRefs[i].equals(label))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public String[] getAlsoCrossRefs()
    {
       return alsocrossRefs;
+   }
+
+   public boolean isSeeAlsoLabel(String label)
+   {
+      if (alsocrossRefs == null) return false;
+
+      for (int i = 0; i < alsocrossRefs.length; i++)
+      {
+         if (alsocrossRefs[i].equals(label))
+         {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public void addCrossRefdBy(Bib2GlsEntry entry)
@@ -4373,8 +4418,10 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
-   public void initAlias(TeXParser parser) throws IOException
+   public void initAlias() throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       String alias = getFieldValue("alias");
       BibValueList value = getField("alias");
 
@@ -4435,7 +4482,7 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   public void initCrossRefs(TeXParser parser)
+   public void initCrossRefs()
     throws IOException
    {
       if (bib2gls.getVerboseLevel() > 0)
@@ -4444,7 +4491,7 @@ public class Bib2GlsEntry extends BibEntry
             "message.checking.crossrefs", getId()));
       }
 
-      initAlias(parser);
+      initAlias();
 
       // Is there a 'see' field?
       BibValueList value = getField("see");
@@ -4462,7 +4509,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (seeAlsoValue != null)
          {
-            initAlsoCrossRefs(parser, seeAlsoValue, getFieldValue("seealso"));
+            initAlsoCrossRefs(seeAlsoValue, getFieldValue("seealso"));
             return;
          }
 
@@ -4486,17 +4533,21 @@ public class Bib2GlsEntry extends BibEntry
          return;
       }
 
+      TeXParser parser = resource.getBibParser();
+
       TeXObjectList valList = value.expand(parser);
 
       StringBuilder builder = new StringBuilder();
 
-      initSeeRef(parser, valList, builder);
+      initSeeRef(valList, builder);
    }
 
-   private void initSeeRef(TeXParser parser, TeXObjectList valList,
+   private void initSeeRef(TeXObjectList valList,
     StringBuilder builder)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       boolean pruneDeadEnds = resource.isPruneSeeDeadEndsOn();
 
       if (valList instanceof Group)
@@ -4626,13 +4677,6 @@ public class Bib2GlsEntry extends BibEntry
 
          TeXObjectList list = new TeXObjectList();
 
-         if (opt != null)
-         {
-            list.add(parser.getListener().getOther('['));
-            list.add(opt);
-            list.add(parser.getListener().getOther(']'));
-         }
-
          list.addAll(parser.getListener().createString(strList));
          BibValueList bibList = new BibValueList();
          bibList.add(new BibUserString(list));
@@ -4655,24 +4699,26 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   private void initAlsoCrossRefs(TeXParser parser, BibValueList value, 
+   private void initAlsoCrossRefs(BibValueList value, 
      String strValue)
     throws IOException
    {
       if (strValue == null || strValue.isEmpty() 
            || !bib2gls.isKnownField("seealso"))
       {
-         initAlsoCrossRefs(parser, value);
+         initAlsoCrossRefs(value);
       }
       else
       {
+         TeXParser parser = resource.getBibParser();
+
          boolean pruneDeadEnds = resource.isPruneSeeAlsoDeadEndsOn();
 
          StringBuilder builder = new StringBuilder();
          String sep = "";
 
          alsocrossRefs = strValue.trim().split("\\s*,\\s*");
-         orgAlsocrossRefs = alsocrossRefs;
+         orgAlsoCrossRefs = alsocrossRefs;
 
          Vector<String> xrList = null;
 
@@ -4774,9 +4820,11 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   private void initAlsoCrossRefs(TeXParser parser, BibValueList value)
+   private void initAlsoCrossRefs(BibValueList value)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       StringBuilder builder = new StringBuilder();
 
       TeXObjectList valList = value.expand(parser);
@@ -4789,7 +4837,7 @@ public class Bib2GlsEntry extends BibEntry
 
          crossRefTag = "\\seealsoname ";
          builder.append("[\\seealsoname]");
-         initSeeRef(parser, valList, builder);
+         initSeeRef(valList, builder);
 
          return;
       }
@@ -4812,7 +4860,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (pruneDeadEnds)
       {
-         orgAlsocrossRefs = new String[n];
+         orgAlsoCrossRefs = new String[n];
       }
 
       for (int i = 0; i < n; i++)
@@ -4833,7 +4881,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (pruneDeadEnds)
          {
-            orgAlsocrossRefs[i] = label;
+            orgAlsoCrossRefs[i] = label;
          }
 
          if (comp == null)
@@ -4890,7 +4938,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (!pruneDeadEnds)
       {
-         orgAlsocrossRefs = alsocrossRefs;
+         orgAlsoCrossRefs = alsocrossRefs;
       }
 
       if (xrIdx == 0)
@@ -4929,20 +4977,144 @@ public class Bib2GlsEntry extends BibEntry
    }
 
    public void restorePrunedSee(String label)
-   {// TODO
+   {
+      if (crossRefs == null)
+      {
+         crossRefTag = orgCrossRefTag;
+         crossRefs = new String[1];
+         crossRefs[0] = label;
+      }
+      else
+      {
+         // restore the label according to its original relative position
+
+         String[] newArray = new String[crossRefs.length+1];
+         int i = 0;
+
+         for (int j = 0; j < orgCrossRefs.length; j++)
+         {
+            if (orgCrossRefs[j].equals(label))
+            {
+               newArray[i] = label;
+               break;
+            }
+            else if (isSeeLabel(orgCrossRefs[j]))
+            {
+               newArray[i++] = orgCrossRefs[j];
+            }
+         }
+
+         for (; i < crossRefs.length; i++)
+         {
+            newArray[i+1] = crossRefs[i];
+         }
+
+         crossRefs = newArray;
+      }
+
+      StringBuilder builder = new StringBuilder();
+
+      if (crossRefTag != null)
+      {
+         builder.append('[');
+         builder.append(crossRefTag);
+         builder.append(']');
+      }
+
+      for (int i = 0; i < crossRefs.length; i++)
+      {
+         if (i > 0)
+         {
+            builder.append(',');
+         }
+
+         builder.append(crossRefs[i]);
+      }
+
+      TeXParser parser = resource.getBibParser();
+
+      String strList = builder.toString();
+
+      TeXObjectList list = new TeXObjectList();
+
+      list.addAll(parser.getListener().createString(strList));
+      BibValueList bibList = new BibValueList();
+      bibList.add(new BibUserString(list));
+
+      putField("see", bibList);
+      putField("see", strList);
    }
 
    public void restorePrunedSeeAlso(String label)
-   {// TODO
+   {
+      if (alsocrossRefs == null)
+      {
+         alsocrossRefs = new String[1];
+         alsocrossRefs[0] = label;
+      }
+      else
+      {
+         // restore the label according to its original relative position
+
+         String[] newArray = new String[alsocrossRefs.length+1];
+         int i = 0;
+
+         for (int j = 0; j < orgAlsoCrossRefs.length; j++)
+         {
+            if (orgAlsoCrossRefs[j].equals(label))
+            {
+               newArray[i] = label;
+               break;
+            }
+            else if (isSeeAlsoLabel(orgAlsoCrossRefs[j]))
+            {
+               newArray[i++] = orgAlsoCrossRefs[j];
+            }
+         }
+
+         for (; i < alsocrossRefs.length; i++)
+         {
+            newArray[i+1] = alsocrossRefs[i];
+         }
+
+         alsocrossRefs = newArray;
+      }
+
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < alsocrossRefs.length; i++)
+      {
+         if (i > 0)
+         {
+            builder.append(',');
+         }
+
+         builder.append(alsocrossRefs[i]);
+      }
+
+      TeXParser parser = resource.getBibParser();
+
+      String strList = builder.toString();
+
+      TeXObjectList list = new TeXObjectList();
+
+      list.addAll(parser.getListener().createString(strList));
+      BibValueList bibList = new BibValueList();
+      bibList.add(new BibUserString(list));
+
+      putField("seealso", bibList);
+      putField("seealso", strList);
    }
 
    // User has identified that the given value is a list like "see"
    // so add dependencies but don't identify them as
    // cross-references.
-   private void parseCustomDependencyList(TeXParser parser, 
+   private void parseCustomDependencyList( 
     TeXObjectList valList, String field)
     throws IOException
    {
+      TeXParser parser = resource.getBibParser();
+
       if (valList instanceof Group)
       {
          valList = ((Group)valList).toList();
@@ -5025,8 +5197,10 @@ public class Bib2GlsEntry extends BibEntry
       return groupId;
    }
 
-   public Bib2GlsEntry createParent(TeXParser texParser)
+   public Bib2GlsEntry createParent()
    {
+      TeXParser parser = resource.getBibParser();
+
       if (orgParentValue == null)
       {
          return null;
@@ -5057,7 +5231,7 @@ public class Bib2GlsEntry extends BibEntry
 
       try
       {
-         parentEntry.parseFields(texParser);
+         parentEntry.parseFields();
       }
       catch (TeXSyntaxException e)
       {
@@ -5320,6 +5494,7 @@ public class Bib2GlsEntry extends BibEntry
       return null;
    }
 
+   @Override
    public String toString()
    {
       return getId();
@@ -5417,7 +5592,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private String orgCrossRefTag = null;
    private String[] orgCrossRefs = null;
-   private String[] orgAlsocrossRefs = null;
+   private String[] orgAlsoCrossRefs = null;
 
    public static final int NO_SEE=0, PRE_SEE=1, POST_SEE=2;
 

@@ -143,17 +143,18 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       return new Bib2GlsDualEntry(bib2gls, getEntryType());
    }
 
-   protected Vector<String> processSpecialFields(TeXParser parser,
+   @Override
+   protected Vector<String> processSpecialFields(
      boolean mfirstucProtect, String[] protectFields, String idField,
      Vector<String> interpretFields)
     throws IOException
    {
-      interpretFields = super.processSpecialFields(parser, mfirstucProtect,
+      interpretFields = super.processSpecialFields(mfirstucProtect,
         protectFields, idField, interpretFields);
 
       for (String field : Bib2Gls.DUAL_SPECIAL_FIELDS)
       {    
-         interpretFields = processField(parser, field, mfirstucProtect,
+         interpretFields = processField(field, mfirstucProtect,
            protectFields, idField, interpretFields);
       }
 

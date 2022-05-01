@@ -71,12 +71,22 @@ public class GlsResource
      String pluralSuffix, String abbrvPluralSuffix)
     throws IOException,InterruptedException,Bib2GlsException
    {
+      this.parser = parser;
       sources = new Vector<TeXPath>();
 
       this.pluralSuffix = pluralSuffix;
       this.dualPluralSuffix = pluralSuffix;
 
-      init(parser, data.getArg(0), data.getArg(1));
+      init(data.getArg(0), data.getArg(1));
+   }
+
+   /**
+    * Gets the aux parser.
+    * @return the parser
+    */ 
+   public TeXParser getParser()
+   {
+      return parser;
    }
 
    /**
@@ -97,7 +107,6 @@ public class GlsResource
 
    /**
     * Initialises the settings for this resource set (stage 1).
-    * @param parser the aux file parser
     * @param opts the resource settings (which should be a key=value comma-separated list)
     * @param glstexBasename the basename of the glstex file
     * @throws Bib2GlsException invalid resource setting syntax
@@ -107,7 +116,7 @@ public class GlsResource
     * system call to kpsewhich (when trying to find a bib file on
     * TeX's path)
     */
-   private void init(TeXParser parser, TeXObject opts, TeXObject glstexBasename)
+   private void init(TeXObject opts, TeXObject glstexBasename)
       throws IOException,InterruptedException,
              Bib2GlsException,IllegalArgumentException
    {
@@ -150,7 +159,7 @@ public class GlsResource
 
          if (opt.equals("src"))
          {
-            srcList = getStringArray(parser, list, opt);
+            srcList = getStringArray(list, opt);
 
             if (srcList == null)
             {
@@ -166,25 +175,25 @@ public class GlsResource
          }
          else if (opt.equals("master"))
          {// link all entries to glossary in external pdf file
-            master = getRequired(parser, list, opt);
+            master = getRequired(list, opt);
          }
          else if (opt.equals("master-resources"))
          {
-            masterSelection = getStringArray(parser, list, opt);
+            masterSelection = getStringArray(list, opt);
          }
          else if (opt.equals("supplemental-locations"))
          {// Fetch supplemental locations from another document.
           // As from v1.7, the value may now be a list of
           // document base names. 
-            supplemental = getStringArray(parser, list, opt);
+            supplemental = getStringArray(list, opt);
          }
          else if (opt.equals("supplemental-category"))
          {
-            supplementalCategory = getRequired(parser, list, opt);
+            supplementalCategory = getRequired(list, opt);
          }
          else if (opt.equals("supplemental-selection"))
          {
-            supplementalSelection = getStringArray(parser, list, opt);
+            supplementalSelection = getStringArray(list, opt);
 
             if (supplementalSelection == null
              || supplementalSelection.length == 0)
@@ -201,7 +210,7 @@ public class GlsResource
          }
          else if (opt.equals("entry-type-aliases"))
          {
-            entryTypeAliases = getHashMap(parser, list, opt);
+            entryTypeAliases = getHashMap(list, opt);
 
             if (entryTypeAliases == null)
             {
@@ -253,7 +262,7 @@ public class GlsResource
          }
          else if (opt.equals("unknown-entry-alias"))
          {
-            unknownEntryMap = getOptional(parser, "", list, opt);
+            unknownEntryMap = getOptional("", list, opt);
 
             if ("".equals(unknownEntryMap))
             {
@@ -262,7 +271,7 @@ public class GlsResource
          }
          else if (opt.equals("field-aliases"))
          {
-            fieldAliases = getHashMap(parser, list, opt);
+            fieldAliases = getHashMap(list, opt);
 
             if (fieldAliases != null)
             {
@@ -301,7 +310,7 @@ public class GlsResource
          }
          else if (opt.equals("replicate-fields"))
          {
-            fieldCopies = getHashMapVector(parser, list, opt, true);
+            fieldCopies = getHashMapVector(list, opt, true);
 
             if (fieldCopies != null)
             {
@@ -338,11 +347,11 @@ public class GlsResource
          }
          else if (opt.equals("replicate-override"))
          {
-            replicateOverride = getBoolean(parser, list, opt);
+            replicateOverride = getBoolean(list, opt);
          }
          else if (opt.equals("replicate-missing-field-action"))
          {
-            String val = getChoice(parser, list, opt, "skip", "fallback", "empty");
+            String val = getChoice(list, opt, "skip", "fallback", "empty");
 
             if (val.equals("skip"))
             {
@@ -359,19 +368,19 @@ public class GlsResource
          }
          else if (opt.equals("primary-dual-dependency"))
          {
-            dualPrimaryDependency = getBoolean(parser, list, opt);
+            dualPrimaryDependency = getBoolean(list, opt);
          }
          else if (opt.equals("strip-trailing-nopost"))
          {
-            stripTrailingNoPost = getBoolean(parser, list, opt);
+            stripTrailingNoPost = getBoolean(list, opt);
          }
          else if (opt.equals("copy-alias-to-see"))
          {
-            copyAliasToSee = getBoolean(parser, list, opt);
+            copyAliasToSee = getBoolean(list, opt);
          }
          else if (opt.equals("save-index-counter"))
          {
-            indexCounter = getOptional(parser, "true", list, opt);
+            indexCounter = getOptional("true", list, opt);
 
             if (indexCounter.equals("false"))
             {
@@ -380,7 +389,7 @@ public class GlsResource
          }
          else if (opt.equals("save-from-alias"))
          {
-            saveFromAlias = getOptional(parser, "from-alias", list, opt);
+            saveFromAlias = getOptional("from-alias", list, opt);
 
             if (saveFromAlias.equals("false"))
             {
@@ -389,7 +398,7 @@ public class GlsResource
          }
          else if (opt.equals("save-from-seealso"))
          {
-            saveFromSeeAlso = getOptional(parser, "from-seealso", list, opt);
+            saveFromSeeAlso = getOptional("from-seealso", list, opt);
 
             if (saveFromSeeAlso.equals("false"))
             {
@@ -398,7 +407,7 @@ public class GlsResource
          }
          else if (opt.equals("save-from-see"))
          {
-            saveFromSee = getOptional(parser, "from-see", list, opt);
+            saveFromSee = getOptional("from-see", list, opt);
 
             if (saveFromSee.equals("false"))
             {
@@ -407,7 +416,7 @@ public class GlsResource
          }
          else if (opt.equals("save-crossref-tail"))
          {
-            saveCrossRefTail = getOptional(parser, "crossref-tail", list, opt);
+            saveCrossRefTail = getOptional("crossref-tail", list, opt);
 
             if (saveCrossRefTail.equals("false"))
             {
@@ -416,15 +425,15 @@ public class GlsResource
          }
          else if (opt.equals("save-definition-index"))
          {
-            saveDefinitionIndex = getBoolean(parser, list, opt);
+            saveDefinitionIndex = getBoolean(list, opt);
          }
          else if (opt.equals("save-use-index"))
          {
-            saveUseIndex = getBoolean(parser, list, opt);
+            saveUseIndex = getBoolean(list, opt);
          }
          else if (opt.equals("post-description-dot"))
          {
-            String val = getChoice(parser, list, opt, "none", "all", "check");
+            String val = getChoice(list, opt, "none", "all", "check");
 
             if (val.equals("none"))
             {
@@ -441,7 +450,7 @@ public class GlsResource
          }
          else if (opt.equals("word-boundaries"))
          {
-            String[] array = getStringArray(parser, list, opt);
+            String[] array = getStringArray(list, opt);
 
             if (array == null || array.length == 0)
             {
@@ -482,27 +491,27 @@ public class GlsResource
          }
          else if (opt.equals("no-case-change-cs"))
          {
-            noCaseChangeCs = getStringArray(parser, list, opt);
+            noCaseChangeCs = getStringArray(list, opt);
          }
          else if (opt.equals("name-case-change"))
          {
-            nameCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+            nameCaseChange = getChoice(list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("description-case-change"))
          {
-            descCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+            descCaseChange = getChoice(list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("short-case-change"))
          {
-            shortCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+            shortCaseChange = getChoice(list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("dual-short-case-change"))
          {
-            dualShortCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+            dualShortCaseChange = getChoice(list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("short-plural-suffix"))
          {
-            shortPluralSuffix = getOptional(parser, "", list, opt);
+            shortPluralSuffix = getOptional("", list, opt);
 
             if (shortPluralSuffix.equals("use-default"))
             {
@@ -511,15 +520,15 @@ public class GlsResource
          }
          else if (opt.equals("long-case-change"))
          {
-            longCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+            longCaseChange = getChoice(list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("dual-long-case-change"))
          {
-            dualLongCaseChange = getChoice(parser, list, opt, CASE_OPTIONS);
+            dualLongCaseChange = getChoice(list, opt, CASE_OPTIONS);
          }
          else if (opt.equals("field-case-change"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
 
             if (array == null)
             {
@@ -538,7 +547,7 @@ public class GlsResource
                         opt, list.get(opt).toString(parser)));
                   }
 
-                  Vector<TeXObject> split = splitList(parser, '=', 
+                  Vector<TeXObject> split = splitList('=', 
                      (TeXObjectList)array[i]);
 
                   if (split == null || split.size() == 0) continue;
@@ -587,7 +596,7 @@ public class GlsResource
          }
          else if (opt.equals("encapsulate-fields"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
 
             if (array == null)
             {
@@ -606,7 +615,7 @@ public class GlsResource
                         opt, list.get(opt).toString(parser)));
                   }
 
-                  Vector<TeXObject> split = splitList(parser, '=', 
+                  Vector<TeXObject> split = splitList('=', 
                      (TeXObjectList)array[i]);
 
                   if (split == null || split.size() == 0) continue;
@@ -635,7 +644,7 @@ public class GlsResource
          }
          else if (opt.equals("encapsulate-fields*"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
 
             if (array == null)
             {
@@ -654,7 +663,7 @@ public class GlsResource
                         opt, list.get(opt).toString(parser)));
                   }
 
-                  Vector<TeXObject> split = splitList(parser, '=', 
+                  Vector<TeXObject> split = splitList('=', 
                      (TeXObjectList)array[i]);
 
                   if (split == null || split.size() == 0) continue;
@@ -683,7 +692,7 @@ public class GlsResource
          }
          else if (opt.equals("encapsulate-sort"))
          {
-            encapSort = getOptional(parser, "", list, opt);
+            encapSort = getOptional("", list, opt);
 
             if (encapSort.isEmpty())
             {
@@ -692,15 +701,15 @@ public class GlsResource
          }
          else if (opt.equals("format-integer-fields"))
          {
-            formatIntegerFields = getFieldFormatPattern(parser, list, opt);
+            formatIntegerFields = getFieldFormatPattern(list, opt);
          }
          else if (opt.equals("format-decimal-fields"))
          {
-            formatDecimalFields = getFieldFormatPattern(parser, list, opt);
+            formatDecimalFields = getFieldFormatPattern(list, opt);
          }
          else if (opt.equals("append-prefix-field"))
          {
-            String val = getChoice(parser, list, opt, PREFIX_FIELD_OPTIONS);
+            String val = getChoice(list, opt, PREFIX_FIELD_OPTIONS);
 
             appendPrefixField = -1;
 
@@ -715,7 +724,7 @@ public class GlsResource
          }
          else if (opt.equals("append-prefix-field-cs"))
          {
-            TeXObject obj = getRequiredObject(parser, list, opt);
+            TeXObject obj = getRequiredObject(list, opt);
 
             if (obj instanceof ControlSequence)
             {
@@ -761,7 +770,7 @@ public class GlsResource
          }
          else if (opt.equals("append-prefix-field-exceptions"))
          {
-            TeXObject obj = getRequiredObject(parser, list, opt);
+            TeXObject obj = getRequiredObject(list, opt);
 
             prefixFieldExceptions = new Vector<Integer>();
 
@@ -811,7 +820,7 @@ public class GlsResource
          }
          else if (opt.equals("append-prefix-field-cs-exceptions"))
          {
-            TeXObject obj = getRequiredObject(parser, list, opt);
+            TeXObject obj = getRequiredObject(list, opt);
 
             prefixFieldCsExceptions = new Vector<String>();
 
@@ -846,11 +855,11 @@ public class GlsResource
          }
          else if (opt.equals("prefix-fields"))
          {
-            prefixFields = getStringArray(parser, list, opt);
+            prefixFields = getStringArray(list, opt);
          }
          else if (opt.equals("append-prefix-field-nbsp-match"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             try
             {
@@ -864,7 +873,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-short-plural-suffix"))
          {
-            dualShortPluralSuffix = getOptional(parser, "", list, opt);
+            dualShortPluralSuffix = getOptional("", list, opt);
 
             if (dualShortPluralSuffix.equals("use-default"))
             {
@@ -873,7 +882,7 @@ public class GlsResource
          }
          else if (opt.equals("action"))
          {
-            writeActionSetting = getChoice(parser, list, opt,
+            writeActionSetting = getChoice(list, opt,
               "define", "define or copy", "copy");
 
             if (writeActionSetting.equals("define"))
@@ -893,7 +902,7 @@ public class GlsResource
          {
             if (bib2gls.useGroupField())
             {
-               copyActionGroupField = getRequired(parser, list, opt);
+               copyActionGroupField = getRequired(list, opt);
             }
             else
             {
@@ -904,7 +913,7 @@ public class GlsResource
          }
          else if (opt.equals("match-action"))
          {
-            String val = getChoice(parser, list, opt, "filter", "add");
+            String val = getChoice(list, opt, "filter", "add");
 
             if (val.equals("filter"))
             {
@@ -917,13 +926,13 @@ public class GlsResource
          }
          else if (opt.equals("match-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             fieldPatternsAnd = val.equals("and");
          }
          else if (opt.equals("match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             notMatch = false;
 
             if (array == null)
@@ -933,12 +942,12 @@ public class GlsResource
             else
             {
                fieldPatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(fieldPatterns, array, opt, list, parser);
+               setFieldMatchPatterns(fieldPatterns, array, opt, list);
             }
          }
          else if (opt.equals("not-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             notMatch = true;
 
             if (array == null)
@@ -948,12 +957,12 @@ public class GlsResource
             else
             {
                fieldPatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(fieldPatterns, array, opt, list, parser);
+               setFieldMatchPatterns(fieldPatterns, array, opt, list);
             }
          }
          else if (opt.equals("secondary-match-action"))
          {
-            String val = getChoice(parser, list, opt, "filter", "add");
+            String val = getChoice(list, opt, "filter", "add");
 
             if (val.equals("filter"))
             {
@@ -966,13 +975,13 @@ public class GlsResource
          }
          else if (opt.equals("secondary-match-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             secondaryFieldPatternsAnd = val.equals("and");
          }
          else if (opt.equals("secondary-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             secondaryNotMatch = false;
 
             if (array == null)
@@ -982,12 +991,12 @@ public class GlsResource
             else
             {
                secondaryFieldPatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(secondaryFieldPatterns, array, opt, list, parser);
+               setFieldMatchPatterns(secondaryFieldPatterns, array, opt, list);
             }
          }
          else if (opt.equals("secondary-not-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             secondaryNotMatch = true;
 
             if (array == null)
@@ -997,16 +1006,16 @@ public class GlsResource
             else
             {
                secondaryFieldPatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(secondaryFieldPatterns, array, opt, list, parser);
+               setFieldMatchPatterns(secondaryFieldPatterns, array, opt, list);
             }
          }
          else if (opt.equals("limit"))
          {
-            limit = getRequiredIntGe(parser, 0, list, opt);
+            limit = getRequiredIntGe(0, list, opt);
          }
          else if (opt.equals("secondary"))
          {
-            TeXObject obj = getRequiredObject(parser, list, opt);
+            TeXObject obj = getRequiredObject(list, opt);
 
             if (!(obj instanceof TeXObjectList))
             {
@@ -1015,7 +1024,7 @@ public class GlsResource
                     obj.toString(parser)));
             }
 
-            Vector<TeXObject> split = splitList(parser, ':', 
+            Vector<TeXObject> split = splitList(':', 
                      (TeXObjectList)obj);
 
             int n = split.size();
@@ -1051,7 +1060,7 @@ public class GlsResource
          }
          else if (opt.equals("sort-label-list"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
 
             if (array == null || array.length == 0)
             {
@@ -1070,57 +1079,57 @@ public class GlsResource
                        array[j].toString(parser)));
                   }
 
-                  sortLabelList[j] = getLabelListSortMethod(parser, 
+                  sortLabelList[j] = getLabelListSortMethod(
                     (TeXObjectList)array[j], opt); 
                }
             }
          }
          else if (opt.equals("ext-prefixes"))
          {
-            externalPrefixes = getStringArray(parser, list, opt);
+            externalPrefixes = getStringArray(list, opt);
          }
          else if (opt.equals("labelify"))
          {
-            labelifyFields = getFieldArray(parser, list, opt, true);
+            labelifyFields = getFieldArray(list, opt, true);
          }
          else if (opt.equals("labelify-list"))
          {
-            labelifyListFields = getFieldArray(parser, list, opt, true);
+            labelifyListFields = getFieldArray(list, opt, true);
          }
          else if (opt.equals("labelify-replace"))
          {
-            labelifyReplaceMap = getSubstitutionList(parser, list, opt, true);
+            labelifyReplaceMap = getSubstitutionList(list, opt, true);
          }
          else if (opt.equals("dependency-fields"))
          {
-            dependencyListFields = getFieldArray(parser, list, opt, true);
+            dependencyListFields = getFieldArray(list, opt, true);
          }
          else if (opt.equals("sort-replace"))
          {
             sortSettings.setRegexList(
-              getSubstitutionList(parser, list, opt, true));
+              getSubstitutionList(list, opt, true));
          }
          else if (opt.equals("dual-sort-replace"))
          {
             dualSortSettings.setRegexList(
-              getSubstitutionList(parser, list, opt, true));
+              getSubstitutionList(list, opt, true));
          }
          else if (opt.equals("secondary-sort-replace"))
          {
             secondarySortSettings.setRegexList(
-              getSubstitutionList(parser, list, opt, true));
+              getSubstitutionList(list, opt, true));
          }
          else if (opt.equals("interpret-preamble"))
          {
-            interpretPreamble = getBoolean(parser, list, opt);
+            interpretPreamble = getBoolean(list, opt);
          }
          else if (opt.equals("interpret-label-fields"))
          {
-            interpretLabelFields = getBoolean(parser, list, opt);
+            interpretLabelFields = getBoolean(list, opt);
          }
          else if (opt.equals("strip-missing-parents"))
          {
-            stripMissingParents = getBoolean(parser, list, opt);
+            stripMissingParents = getBoolean(list, opt);
 
             if (stripMissingParents)
             {
@@ -1129,7 +1138,7 @@ public class GlsResource
          }
          else if (opt.equals("missing-parents"))
          {
-            String val = getChoice(parser, list, opt, "strip", "create",
+            String val = getChoice(list, opt, "strip", "create",
              "warn");
 
             if (val.equals("strip"))
@@ -1150,15 +1159,15 @@ public class GlsResource
          }
          else if (opt.equals("write-preamble"))
          {
-            savePreamble = getBoolean(parser, list, opt);
+            savePreamble = getBoolean(list, opt);
          }
          else if (opt.equals("flatten"))
          {
-            flatten = getBoolean(parser, list, opt);
+            flatten = getBoolean(list, opt);
          }
          else if (opt.equals("flatten-lonely"))
          {
-            String val = getChoice(parser, list, opt, "false", "presort",
+            String val = getChoice(list, opt, "false", "presort",
              "postsort");
 
             if (val.equals("false"))
@@ -1176,7 +1185,7 @@ public class GlsResource
          }
          else if (opt.equals("flatten-lonely-rule"))
          {
-            String val = getChoice(parser, list, opt, "only unrecorded parents",
+            String val = getChoice(list, opt, "only unrecorded parents",
               "no discard", "discard unrecorded");
 
             if (val.equals("only unrecorded parents"))
@@ -1194,16 +1203,16 @@ public class GlsResource
          }
          else if (opt.equals("save-locations"))
          {
-            saveLocations = getBoolean(parser, list, opt);
+            saveLocations = getBoolean(list, opt);
          }
          else if (opt.equals("save-loclist"))
          {
-            saveLocList = getBoolean(parser, list, opt);
+            saveLocList = getBoolean(list, opt);
          }
          else if (opt.equals("save-primary-locations")
                  || opt.equals("save-principal-locations"))
          {
-            String val = getChoice(parser, list, opt,
+            String val = getChoice(list, opt,
               "false", "remove", "retain", "start", "default format");
 
             if (val.equals("false"))
@@ -1230,7 +1239,7 @@ public class GlsResource
          else if (opt.equals("primary-location-formats")
                || opt.equals("principal-location-formats"))
          {
-            primaryLocationFormats = getStringArray(parser, list, opt);
+            primaryLocationFormats = getStringArray(list, opt);
 
             if (savePrimaryLocations == SAVE_PRIMARY_LOCATION_OFF)
             {
@@ -1239,7 +1248,7 @@ public class GlsResource
          }
          else if (opt.equals("combine-dual-locations"))
          {
-            String val = getChoice(parser, list, opt,
+            String val = getChoice(list, opt,
               "false", "both", "dual", "primary",
               "dual retain principal", "primary retain principal");
 
@@ -1270,19 +1279,19 @@ public class GlsResource
          }
          else if (opt.equals("save-child-count"))
          {
-            saveChildCount = getBoolean(parser, list, opt);
+            saveChildCount = getBoolean(list, opt);
          }
          else if (opt.equals("save-sibling-count"))
          {
-            saveSiblingCount = getBoolean(parser, list, opt);
+            saveSiblingCount = getBoolean(list, opt);
          }
          else if (opt.equals("save-root-ancestor"))
          {
-            saveRootAncestor = getBoolean(parser, list, opt);
+            saveRootAncestor = getBoolean(list, opt);
          }
          else if (opt.equals("save-original-entrytype"))
          {
-            saveOriginalEntryType = getOptional(parser, list, opt);
+            saveOriginalEntryType = getOptional(list, opt);
 
             if (saveOriginalEntryType == null || saveOriginalEntryType.isEmpty()
                 || saveOriginalEntryType.equals("true"))
@@ -1301,7 +1310,7 @@ public class GlsResource
          }
          else if (opt.equals("save-original-entrytype-action"))
          {
-            String val = getChoice(parser, list, opt, 
+            String val = getChoice(list, opt, 
               "always", "no override", "changed override", "changed no override",
               "changed", "diff");
 
@@ -1325,7 +1334,7 @@ public class GlsResource
          }
          else if (opt.equals("alias-loc"))
          {
-            String val = getChoice(parser, list, opt, 
+            String val = getChoice(list, opt, 
               "omit", "transfer", "keep");
 
             if (val.equals("omit"))
@@ -1343,13 +1352,13 @@ public class GlsResource
          }
          else if (opt.equals("set-widest"))
          {
-            setWidest = getBoolean(parser, list, opt);
+            setWidest = getBoolean(list, opt);
          }
          else if (opt.equals("dual-entry-map"))
          {
             String[] keys = new String[1];
 
-            dualEntryMap = getDualMap(parser, list, opt, keys);
+            dualEntryMap = getDualMap(list, opt, keys);
 
             dualEntryFirstMap = keys[0];
          }
@@ -1357,7 +1366,7 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualAbbrevMap = getDualMap(parser, list, opt, keys);
+            dualAbbrevMap = getDualMap(list, opt, keys);
 
             dualAbbrevFirstMap = keys[0];
          }
@@ -1368,7 +1377,7 @@ public class GlsResource
 
             String[] keys = new String[1];
 
-            dualAbbrevEntryMap = getDualMap(parser, list, opt, keys);
+            dualAbbrevEntryMap = getDualMap(list, opt, keys);
 
             dualAbbrevEntryFirstMap = keys[0];
          }
@@ -1376,7 +1385,7 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualAbbrevEntryMap = getDualMap(parser, list, opt, keys);
+            dualAbbrevEntryMap = getDualMap(list, opt, keys);
 
             dualAbbrevEntryFirstMap = keys[0];
          }
@@ -1384,7 +1393,7 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualIndexEntryMap = getDualMap(parser, list, opt, keys);
+            dualIndexEntryMap = getDualMap(list, opt, keys);
 
             dualIndexEntryFirstMap = keys[0];
          }
@@ -1392,7 +1401,7 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualIndexSymbolMap = getDualMap(parser, list, opt, keys);
+            dualIndexSymbolMap = getDualMap(list, opt, keys);
 
             dualIndexSymbolFirstMap = keys[0];
          }
@@ -1400,7 +1409,7 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualIndexAbbrevMap = getDualMap(parser, list, opt, keys);
+            dualIndexAbbrevMap = getDualMap(list, opt, keys);
 
             dualIndexAbbrevFirstMap = keys[0];
          }
@@ -1408,13 +1417,13 @@ public class GlsResource
          {
             String[] keys = new String[1];
 
-            dualSymbolMap = getDualMap(parser, list, opt, keys);
+            dualSymbolMap = getDualMap(list, opt, keys);
 
             dualSymbolFirstMap = keys[0];
          }
          else if (opt.equals("dual-backlink"))
          {
-            if (getBoolean(parser, list, opt))
+            if (getBoolean(list, opt))
             {
                backLinkDualEntry = true;
                backLinkDualAbbrev = true;
@@ -1437,77 +1446,77 @@ public class GlsResource
          }
          else if (opt.equals("dual-entry-backlink"))
          {
-            backLinkDualEntry = getBoolean(parser, list, opt);
+            backLinkDualEntry = getBoolean(list, opt);
          }
          else if (opt.equals("dual-abbrv-backlink"))
          {
-            backLinkDualAbbrev = getBoolean(parser, list, opt);
+            backLinkDualAbbrev = getBoolean(list, opt);
          }
          else if (opt.equals("dual-entryabbrv-backlink"))
          {
             bib2gls.warning(bib2gls.getMessage("warning.deprecated.option", opt,
               "dual-abbrventry-backlink"));
-            backLinkDualAbbrevEntry = getBoolean(parser, list, opt);
+            backLinkDualAbbrevEntry = getBoolean(list, opt);
          }
          else if (opt.equals("dual-abbrventry-backlink"))
          {
-            backLinkDualAbbrevEntry = getBoolean(parser, list, opt);
+            backLinkDualAbbrevEntry = getBoolean(list, opt);
          }
          else if (opt.equals("dual-indexentry-backlink"))
          {
-            backLinkDualIndexEntry = getBoolean(parser, list, opt);
+            backLinkDualIndexEntry = getBoolean(list, opt);
          }
          else if (opt.equals("dual-indexsymbol-backlink"))
          {
-            backLinkDualIndexSymbol = getBoolean(parser, list, opt);
+            backLinkDualIndexSymbol = getBoolean(list, opt);
          }
          else if (opt.equals("dual-indexabbrv-backlink"))
          {
-            backLinkDualIndexAbbrev = getBoolean(parser, list, opt);
+            backLinkDualIndexAbbrev = getBoolean(list, opt);
          }
          else if (opt.equals("dual-symbol-backlink"))
          {
-            backLinkDualSymbol = getBoolean(parser, list, opt);
+            backLinkDualSymbol = getBoolean(list, opt);
          }
          else if (opt.equals("type"))
          {
-            type = getRequired(parser, list, opt);
+            type = getRequired(list, opt);
          }
          else if (opt.equals("dual-type"))
          {
-            dualType = getRequired(parser, list, opt);
+            dualType = getRequired(list, opt);
          }
          else if (opt.equals("trigger-type"))
          {
-            triggerType = getRequired(parser, list, opt);
+            triggerType = getRequired(list, opt);
          }
          else if (opt.equals("progenitor-type"))
          {
-            progenitorType = getRequired(parser, list, opt);
+            progenitorType = getRequired(list, opt);
          }
          else if (opt.equals("progeny-type"))
          {
-            progenyType = getRequired(parser, list, opt);
+            progenyType = getRequired(list, opt);
          }
          else if (opt.equals("adopted-parent-field"))
          {
-            adoptedParentField = getRequired(parser, list, opt);
+            adoptedParentField = getRequired(list, opt);
          }
          else if (opt.equals("dual-field"))
          {
-            dualField = getOptional(parser, "dual", list, opt);
+            dualField = getOptional("dual", list, opt);
          }
          else if (opt.equals("category"))
          {
-            category = getRequired(parser, list, opt);
+            category = getRequired(list, opt);
          }
          else if (opt.equals("dual-category"))
          {
-            dualCategory = getRequired(parser, list, opt);
+            dualCategory = getRequired(list, opt);
          }
          else if (opt.equals("missing-parent-category"))
          {
-            missingParentCategory = getRequired(parser, list, opt);
+            missingParentCategory = getRequired(list, opt);
 
             if ("no value".equals(missingParentCategory))
             {
@@ -1516,35 +1525,35 @@ public class GlsResource
          }
          else if (opt.equals("counter"))
          {
-            counter = getRequired(parser, list, opt);
+            counter = getRequired(list, opt);
          }
          else if (opt.equals("dual-counter"))
          {
-            dualCounter = getRequired(parser, list, opt);
+            dualCounter = getRequired(list, opt);
          }
          else if (opt.equals("label-prefix"))
          {
-            labelPrefix = getOptional(parser, list, opt);
+            labelPrefix = getOptional(list, opt);
          }
          else if (opt.equals("dual-prefix"))
          {
-            dualPrefix = getOptional(parser, list, opt);
+            dualPrefix = getOptional(list, opt);
          }
          else if (opt.equals("tertiary-prefix"))
          {
-            tertiaryPrefix = getOptional(parser, list, opt);
+            tertiaryPrefix = getOptional(list, opt);
          }
          else if (opt.equals("tertiary-category"))
          {
-            tertiaryCategory = getOptional(parser, list, opt);
+            tertiaryCategory = getOptional(list, opt);
          }
          else if (opt.equals("tertiary-type"))
          {
-            tertiaryType = getOptional(parser, list, opt);
+            tertiaryType = getOptional(list, opt);
          }
          else if (opt.equals("cs-label-prefix"))
          {
-            csLabelPrefix = getOptional(parser, list, opt);
+            csLabelPrefix = getOptional(list, opt);
 
             if (csLabelPrefix == null)
             {
@@ -1553,19 +1562,19 @@ public class GlsResource
          }
          else if (opt.equals("record-label-prefix"))
          {
-            recordLabelPrefix = getOptional(parser, list, opt);
+            recordLabelPrefix = getOptional(list, opt);
          }
          else if (opt.equals("duplicate-label-suffix"))
          {
-            dupLabelSuffix = getOptional(parser, list, opt);
+            dupLabelSuffix = getOptional(list, opt);
          }
          else if (opt.equals("prefix-only-existing"))
          {
-            insertPrefixOnlyExists = getBoolean(parser, list, opt);
+            insertPrefixOnlyExists = getBoolean(list, opt);
          }
          else if (opt.equals("save-original-id"))
          {
-            saveOriginalId = getOptional(parser, list, opt);
+            saveOriginalId = getOptional(list, opt);
 
             if (saveOriginalId == null || saveOriginalId.isEmpty()
                 || saveOriginalId.equals("true"))
@@ -1584,7 +1593,7 @@ public class GlsResource
          }
          else if (opt.equals("save-original-id-action"))
          {
-            String val = getChoice(parser, list, opt, 
+            String val = getChoice(list, opt, 
               "always", "no override", "changed override", "changed no override",
               "changed", "diff");
 
@@ -1608,7 +1617,7 @@ public class GlsResource
          }
          else if (opt.equals("sort-suffix"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             if (val.equals("none"))
             {
@@ -1638,7 +1647,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-sort-suffix"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             if (val.equals("none"))
             {
@@ -1663,7 +1672,7 @@ public class GlsResource
          }
          else if (opt.equals("secondary-sort-suffix"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             if (val.equals("none"))
             {
@@ -1691,23 +1700,23 @@ public class GlsResource
          else if (opt.equals("sort-suffix-marker"))
          {
             sortSettings.setSuffixMarker(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
             dualSortSettings.setSuffixMarker(sortSettings.getSuffixMarker());
             secondarySortSettings.setSuffixMarker(sortSettings.getSuffixMarker());
          }
          else if (opt.equals("dual-sort-suffix-marker"))
          {
             dualSortSettings.setSuffixMarker(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
          }
          else if (opt.equals("secondary-sort-suffix-marker"))
          {
             secondarySortSettings.setSuffixMarker(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
          }
          else if (opt.equals("group-formation"))
          {
-             String val = getChoice(parser, list, opt, "default", 
+             String val = getChoice(list, opt, "default", 
                "codepoint", "unicode category", "unicode script",
                "unicode category and script");
 
@@ -1738,7 +1747,7 @@ public class GlsResource
          }
          else if (opt.equals("secondary-group-formation"))
          {
-             String val = getChoice(parser, list, opt, "default", 
+             String val = getChoice(list, opt, "default", 
                "codepoint", "unicode category", "unicode script",
                "unicode category and script");
 
@@ -1769,7 +1778,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-group-formation"))
          {
-             String val = getChoice(parser, list, opt, "default", 
+             String val = getChoice(list, opt, "default", 
                "codepoint", "unicode category", "unicode script",
                "unicode category and script");
 
@@ -1800,7 +1809,7 @@ public class GlsResource
          }
          else if (opt.equals("identical-sort-action"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             if (val.equals("none"))
             {
@@ -1852,7 +1861,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-identical-sort-action"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             if (val.equals("none"))
             {
@@ -1894,7 +1903,7 @@ public class GlsResource
          }
          else if (opt.equals("secondary-identical-sort-action"))
          {
-            String val = getRequired(parser, list, opt);
+            String val = getRequired(list, opt);
 
             if (val.equals("none"))
             {
@@ -1936,7 +1945,7 @@ public class GlsResource
          }
          else if (opt.equals("sort"))
          {
-            String method = getOptional(parser, "doc", list, opt);
+            String method = getOptional("doc", list, opt);
 
             try
             {
@@ -1952,117 +1961,117 @@ public class GlsResource
          else if (opt.equals("sort-rule"))
          {
             sortSettings.setCollationRule(
-              replaceHexAndSpecial(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(list, opt)));
          }
          else if (opt.equals("dual-sort-rule"))
          {
             dualSortSettings.setCollationRule(
-              replaceHexAndSpecial(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(list, opt)));
          }
          else if (opt.equals("secondary-sort-rule"))
          {
             secondarySortSettings.setCollationRule(
-              replaceHexAndSpecial(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(list, opt)));
          }
          else if (opt.equals("sort-number-pad"))
          {
             sortSettings.setNumberPad(
-               getRequiredInt(parser, list, opt));
+               getRequiredInt(list, opt));
             dualSortSettings.setNumberPad(sortSettings.getNumberPad());
             secondarySortSettings.setNumberPad(sortSettings.getNumberPad());
          }
          else if (opt.equals("dual-sort-number-pad"))
          {
             dualSortSettings.setNumberPad(
-               getRequiredInt(parser, list, opt));
+               getRequiredInt(list, opt));
          }
          else if (opt.equals("secondary-sort-number-pad"))
          {
             secondarySortSettings.setNumberPad(
-               getRequiredInt(parser, list, opt));
+               getRequiredInt(list, opt));
          }
          else if (opt.equals("sort-pad-plus"))
          {
             sortSettings.setPadPlus(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
             dualSortSettings.setPadPlus(sortSettings.getPadPlus());
             secondarySortSettings.setPadPlus(sortSettings.getPadPlus());
          }
          else if (opt.equals("dual-sort-pad-plus"))
          {
             dualSortSettings.setPadPlus(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
          }
          else if (opt.equals("secondary-sort-pad-plus"))
          {
             secondarySortSettings.setPadPlus(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
          }
          else if (opt.equals("sort-pad-minus"))
          {
             sortSettings.setPadMinus(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
             dualSortSettings.setPadMinus(sortSettings.getPadMinus());
             secondarySortSettings.setPadMinus(sortSettings.getPadMinus());
          }
          else if (opt.equals("dual-sort-pad-minus"))
          {
             dualSortSettings.setPadMinus(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
          }
          else if (opt.equals("secondary-sort-pad-minus"))
          {
             secondarySortSettings.setPadMinus(
-               replaceHex(getOptional(parser, "", list, opt)));
+               replaceHex(getOptional("", list, opt)));
          }
          else if (opt.equals("numeric-locale"))
          {
             sortSettings.setNumberLocale(
-              getRequired(parser, list, opt));
+              getRequired(list, opt));
          }
          else if (opt.equals("dual-numeric-locale"))
          {
             dualSortSettings.setNumberLocale(
-              getRequired(parser, list, opt));
+              getRequired(list, opt));
          }
          else if (opt.equals("secondary-numeric-locale"))
          {
             secondarySortSettings.setNumberLocale(
-              getRequired(parser, list, opt));
+              getRequired(list, opt));
          }
          else if (opt.equals("numeric-sort-pattern"))
          {
             sortSettings.setNumberFormat(
-              replaceHexAndSpecial(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(list, opt)));
          }
          else if (opt.equals("dual-numeric-sort-pattern"))
          {
             dualSortSettings.setNumberFormat(
-              replaceHexAndSpecial(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(list, opt)));
          }
          else if (opt.equals("secondary-numeric-sort-pattern"))
          {
             secondarySortSettings.setNumberFormat(
-              replaceHexAndSpecial(getRequired(parser, list, opt)));
+              replaceHexAndSpecial(getRequired(list, opt)));
          }
          else if (opt.equals("trim-sort"))
          {
-            sortSettings.setTrim(getBoolean(parser, list, opt));
+            sortSettings.setTrim(getBoolean(list, opt));
             dualSortSettings.setTrim(sortSettings.isTrimOn());
             secondarySortSettings.setTrim(sortSettings.isTrimOn());
          }
          else if (opt.equals("dual-trim-sort"))
          {
-            dualSortSettings.setTrim(getBoolean(parser, list, opt));
+            dualSortSettings.setTrim(getBoolean(list, opt));
          }
          else if (opt.equals("secondary-trim-sort"))
          {
-            secondarySortSettings.setTrim(getBoolean(parser, list, opt));
+            secondarySortSettings.setTrim(getBoolean(list, opt));
          }
          else if (opt.equals("letter-number-rule"))
          {
             sortSettings.setLetterNumberRule(
-              getLetterNumberRule(parser, list, opt));
+              getLetterNumberRule(list, opt));
 
             dualSortSettings.setLetterNumberRule(
               sortSettings.getLetterNumberRule());
@@ -2072,17 +2081,17 @@ public class GlsResource
          else if (opt.equals("dual-letter-number-rule"))
          {
             dualSortSettings.setLetterNumberRule(
-              getLetterNumberRule(parser, list, opt));
+              getLetterNumberRule(list, opt));
          }
          else if (opt.equals("secondary-letter-number-rule"))
          {
             secondarySortSettings.setLetterNumberRule(
-              getLetterNumberRule(parser, list, opt));
+              getLetterNumberRule(list, opt));
          }
          else if (opt.equals("letter-number-punc-rule"))
          {
             sortSettings.setLetterNumberPuncRule(
-              getLetterNumberPuncRule(parser, list, opt));
+              getLetterNumberPuncRule(list, opt));
 
             dualSortSettings.setLetterNumberPuncRule(
               sortSettings.getLetterNumberPuncRule());
@@ -2092,43 +2101,43 @@ public class GlsResource
          else if (opt.equals("dual-letter-number-punc-rule"))
          {
             dualSortSettings.setLetterNumberPuncRule(
-              getLetterNumberPuncRule(parser, list, opt));
+              getLetterNumberPuncRule(list, opt));
          }
          else if (opt.equals("secondary-letter-number-punc-rule"))
          {
             secondarySortSettings.setLetterNumberPuncRule(
-              getLetterNumberPuncRule(parser, list, opt));
+              getLetterNumberPuncRule(list, opt));
          }
          else if (opt.equals("date-sort-format"))
          {
             sortSettings.setDateFormat(replaceHexAndSpecial(
-               getRequired(parser, list, opt)));
+               getRequired(list, opt)));
          }
          else if (opt.equals("dual-date-sort-format"))
          {
             dualSortSettings.setDateFormat(replaceHexAndSpecial(
-               getRequired(parser, list, opt)));
+               getRequired(list, opt)));
          }
          else if (opt.equals("secondary-date-sort-format"))
          {
             secondarySortSettings.setDateFormat(replaceHexAndSpecial(
-               getRequired(parser, list, opt)));
+               getRequired(list, opt)));
          }
          else if (opt.equals("date-sort-locale"))
          {
-            sortSettings.setDateLocale(getRequired(parser, list, opt));
+            sortSettings.setDateLocale(getRequired(list, opt));
          }
          else if (opt.equals("dual-date-sort-locale"))
          {
-            dualSortSettings.setDateLocale(getRequired(parser, list, opt));
+            dualSortSettings.setDateLocale(getRequired(list, opt));
          }
          else if (opt.equals("secondary-date-sort-locale"))
          {
-            secondarySortSettings.setDateLocale(getRequired(parser, list, opt));
+            secondarySortSettings.setDateLocale(getRequired(list, opt));
          }
          else if (opt.equals("group"))
          {
-            groupField = getOptional(parser, "auto", list, opt);
+            groupField = getOptional("auto", list, opt);
 
             if (groupField.equals("auto"))
             {
@@ -2137,7 +2146,7 @@ public class GlsResource
          }
          else if (opt.equals("group-level"))
          {
-            String val = getOptional(parser, "all", list, opt);
+            String val = getOptional("all", list, opt);
 
             try
             {
@@ -2186,11 +2195,11 @@ public class GlsResource
          }
          else if (opt.equals("merge-small-groups"))
          {
-            mergeSmallGroupLimit = getOptionalInt(parser, 1, list, opt);
+            mergeSmallGroupLimit = getOptionalInt(1, list, opt);
          }
          else if (opt.equals("shuffle"))
          {
-            long seed = getOptionalLong(parser, 0L, list, opt);
+            long seed = getOptionalLong(0L, list, opt);
 
             if (seed == 0L)
             {
@@ -2207,7 +2216,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-sort"))
          {
-            String method = getOptional(parser, "doc", list, opt);
+            String method = getOptional("doc", list, opt);
 
             try
             {
@@ -2222,7 +2231,7 @@ public class GlsResource
          }
          else if (opt.equals("sort-field"))
          {
-            String field = getRequired(parser, list, opt);
+            String field = getRequired(list, opt);
 
             if (!field.equals("id") && !bib2gls.isKnownField(field)
                 && !bib2gls.isKnownSpecialField(field))
@@ -2235,7 +2244,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-sort-field"))
          {
-            String field = getRequired(parser, list, opt);
+            String field = getRequired(list, opt);
 
             if (!field.equals("id") && !bib2gls.isKnownField(field)
                 && !bib2gls.isKnownSpecialField(field))
@@ -2249,7 +2258,7 @@ public class GlsResource
          }
          else if (opt.equals("missing-sort-fallback"))
          {
-            String field = getOptional(parser, list, opt);
+            String field = getOptional(list, opt);
 
             if (field == null || field.isEmpty()
                  || isAllowedSortFallbackField(field, false))
@@ -2264,7 +2273,7 @@ public class GlsResource
          }
          else if (opt.equals("dual-missing-sort-fallback"))
          {
-            String field = getOptional(parser, list, opt);
+            String field = getOptional(list, opt);
 
             if (field == null || field.isEmpty()
                  || isAllowedSortFallbackField(field, false))
@@ -2279,7 +2288,7 @@ public class GlsResource
          }
          else if (opt.equals("secondary-missing-sort-fallback"))
          {
-            String field = getOptional(parser, list, opt);
+            String field = getOptional(list, opt);
 
             if (field == null || field.isEmpty()
                   || isAllowedSortFallbackField(field, false))
@@ -2294,31 +2303,31 @@ public class GlsResource
          }
          else if (opt.equals("entry-sort-fallback"))
          {
-            entryDefaultSortField = getRequired(parser, list, opt);
+            entryDefaultSortField = getRequired(list, opt);
 
             checkAllowedSortFallbackConcatenation(entryDefaultSortField, opt);
          }
          else if (opt.equals("abbreviation-sort-fallback"))
          {
-            abbrevDefaultSortField = getRequired(parser, list, opt);
+            abbrevDefaultSortField = getRequired(list, opt);
 
             checkAllowedSortFallbackConcatenation(abbrevDefaultSortField, opt);
          }
          else if (opt.equals("symbol-sort-fallback"))
          {
-            symbolDefaultSortField = getRequired(parser, list, opt);
+            symbolDefaultSortField = getRequired(list, opt);
 
             checkAllowedSortFallbackConcatenation(symbolDefaultSortField, opt);
          }
          else if (opt.equals("bibtexentry-sort-fallback"))
          {
-            bibTeXEntryDefaultSortField = getRequired(parser, list, opt);
+            bibTeXEntryDefaultSortField = getRequired(list, opt);
 
             checkAllowedSortFallbackConcatenation(bibTeXEntryDefaultSortField, opt);
          }
          else if (opt.equals("custom-sort-fallbacks"))
          {
-            customEntryDefaultSortFields = getHashMap(parser, list, opt);
+            customEntryDefaultSortFields = getHashMap(list, opt);
 
             if (customEntryDefaultSortFields != null)
             {
@@ -2335,7 +2344,7 @@ public class GlsResource
          }
          else if (opt.equals("field-concat-sep"))
          {
-            fieldConcatenationSeparator = getOptional(parser, "", list, opt);
+            fieldConcatenationSeparator = getOptional("", list, opt);
 
             if (fieldConcatenationSeparator != null)
             {
@@ -2344,7 +2353,7 @@ public class GlsResource
          }
          else if (opt.equals("abbreviation-name-fallback"))
          {
-            abbrevDefaultNameField = getRequired(parser, list, opt);
+            abbrevDefaultNameField = getRequired(list, opt);
 
             if ((!bib2gls.isKnownField(abbrevDefaultNameField)
              && !bib2gls.isKnownSpecialField(abbrevDefaultNameField))
@@ -2358,26 +2367,26 @@ public class GlsResource
          }
          else if (opt.equals("charset"))
          {
-            bibCharset = Charset.forName(getRequired(parser, list, opt));
+            bibCharset = Charset.forName(getRequired(list, opt));
          }
          else if (opt.equals("min-loc-range"))
          {
-            minLocationRange = getRequiredIntGe(parser, 2, 
+            minLocationRange = getRequiredIntGe(2, 
                "none", Integer.MAX_VALUE, list, opt);
          }
          else if (opt.equals("loc-gap"))
          {
             bib2gls.warning(bib2gls.getMessage("warning.deprecated",
               opt, "max-loc-diff"));
-            locGap = getRequiredIntGe(parser, 1, list, opt);
+            locGap = getRequiredIntGe(1, list, opt);
          }
          else if (opt.equals("max-loc-diff"))
          {
-            locGap = getRequiredIntGe(parser, 1, list, opt);
+            locGap = getRequiredIntGe(1, list, opt);
          }
          else if (opt.equals("suffixF"))
          {
-            suffixF = getOptional(parser, "", list, opt);
+            suffixF = getOptional("", list, opt);
 
             if (suffixF.equals("none"))
             {
@@ -2386,7 +2395,7 @@ public class GlsResource
          }
          else if (opt.equals("suffixFF"))
          {
-            suffixFF = getOptional(parser, "", list, opt);
+            suffixFF = getOptional("", list, opt);
 
             if (suffixFF.equals("none"))
             {
@@ -2395,7 +2404,7 @@ public class GlsResource
          }
          else if (opt.equals("compact-ranges"))
          {
-            String val = getOptional(parser, "true", list, opt);
+            String val = getOptional("true", list, opt);
 
             if (val.equals("false"))
             {
@@ -2421,7 +2430,7 @@ public class GlsResource
          }
          else if (opt.equals("see"))
          {
-            String val = getChoice(parser, list, opt, "omit", "before", "after");
+            String val = getChoice(list, opt, "omit", "before", "after");
 
             if (val.equals("omit"))
             {
@@ -2438,7 +2447,7 @@ public class GlsResource
          }
          else if (opt.equals("seealso"))
          {
-            String val = getChoice(parser, list, opt, "omit", "before", "after");
+            String val = getChoice(list, opt, "omit", "before", "after");
 
             if (val.equals("omit"))
             {
@@ -2455,7 +2464,7 @@ public class GlsResource
          }
          else if (opt.equals("alias"))
          {
-            String val = getChoice(parser, list, opt, "omit", "before", "after");
+            String val = getChoice(list, opt, "omit", "before", "after");
 
             if (val.equals("omit"))
             {
@@ -2473,7 +2482,7 @@ public class GlsResource
          else if (opt.equals("prune-xr"))
          {// shortcut
 
-            if (getBoolean(parser, list, opt))
+            if (getBoolean(list, opt))
             {
                pruneSeePatterns = new HashMap<String,Pattern>();
                pruneSeePatterns.put("entrytype", Pattern.compile("index(plural)?"));
@@ -2494,13 +2503,13 @@ public class GlsResource
          }
          else if (opt.equals("prune-see-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             pruneSeePatternsAnd = val.equals("and");
          }
          else if (opt.equals("prune-see-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
 
             if (array == null)
             {
@@ -2509,18 +2518,18 @@ public class GlsResource
             else
             {
                pruneSeePatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(pruneSeePatterns, array, opt, list, parser);
+               setFieldMatchPatterns(pruneSeePatterns, array, opt, list);
             }
          }
          else if (opt.equals("prune-seealso-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             pruneSeeAlsoPatternsAnd = val.equals("and");
          }
          else if (opt.equals("prune-seealso-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
 
             if (array == null)
             {
@@ -2529,13 +2538,13 @@ public class GlsResource
             else
             {
                pruneSeeAlsoPatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(pruneSeePatterns, array, opt, list, parser);
+               setFieldMatchPatterns(pruneSeePatterns, array, opt, list);
             }
          }
          else if (opt.equals("primary-loc-counters") 
                || opt.equals("principal-loc-counters"))
          {
-            String val = getChoice(parser, list, opt, "combine", "match", "split");
+            String val = getChoice(list, opt, "combine", "match", "split");
 
             if (val.equals("combine"))
             {
@@ -2552,7 +2561,7 @@ public class GlsResource
          }
          else if (opt.equals("loc-counters"))
          {
-            String[] values = getStringArray(parser, list, opt);
+            String[] values = getStringArray(list, opt);
 
             if (values == null || values.length == 0)
             {
@@ -2577,7 +2586,7 @@ public class GlsResource
          }
          else if (opt.equals("loc-prefix"))
          {
-            String[] values = getStringArray(parser, "true", list, opt);
+            String[] values = getStringArray("true", list, opt);
 
             defpagesname=false;
 
@@ -2613,7 +2622,7 @@ public class GlsResource
          }
          else if (opt.equals("loc-prefix-def"))
          {
-            String val = getChoice(parser, list, opt,
+            String val = getChoice(list, opt,
               "global", "local", "individual");
 
             if (val.equals("global"))
@@ -2631,7 +2640,7 @@ public class GlsResource
          }
          else if (opt.equals("loc-suffix"))
          {
-            String[] values = getStringArray(parser, "\\@.", list, opt);
+            String[] values = getStringArray("\\@.", list, opt);
 
             if (values.length == 1)
             {
@@ -2651,7 +2660,7 @@ public class GlsResource
          }
          else if (opt.equals("loc-suffix-def"))
          {
-            String val = getChoice(parser, list, opt,
+            String val = getChoice(list, opt,
               "global", "local", "individual");
 
             if (val.equals("global"))
@@ -2669,81 +2678,81 @@ public class GlsResource
          }
          else if (opt.equals("ignore-fields"))
          {
-            skipFields = getStringArray(parser, list, opt);
+            skipFields = getStringArray(list, opt);
          }
          else if (opt.equals("check-end-punctuation"))
          {
-            checkEndPunc = getStringArray(parser, list, opt);
+            checkEndPunc = getStringArray(list, opt);
          }
          else if (opt.equals("date-time-fields"))
          {
-            dateTimeList = getStringArray(parser, list, opt);
+            dateTimeList = getStringArray(list, opt);
          }
          else if (opt.equals("date-fields"))
          {
-            dateList = getStringArray(parser, list, opt);
+            dateList = getStringArray(list, opt);
          }
          else if (opt.equals("time-fields"))
          {
-            timeList = getStringArray(parser, list, opt);
+            timeList = getStringArray(list, opt);
          }
          else if (opt.equals("date-time-field-format"))
          {
-            dateTimeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dateTimeListFormat = replaceHexAndSpecial(getRequired(list, opt));
             dualDateTimeListFormat = dateTimeListFormat;
          }
          else if (opt.equals("dual-date-time-field-format"))
          {
-            dualDateTimeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dualDateTimeListFormat = replaceHexAndSpecial(getRequired(list, opt));
          }
          else if (opt.equals("date-field-format"))
          {
-            dateListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dateListFormat = replaceHexAndSpecial(getRequired(list, opt));
             dualDateListFormat = dateListFormat;
          }
          else if (opt.equals("dual-date-field-format"))
          {
-            dualDateListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dualDateListFormat = replaceHexAndSpecial(getRequired(list, opt));
          }
          else if (opt.equals("time-field-format"))
          {
-            timeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            timeListFormat = replaceHexAndSpecial(getRequired(list, opt));
             dualTimeListFormat = timeListFormat;
          }
          else if (opt.equals("dual-time-field-format"))
          {
-            dualTimeListFormat = replaceHexAndSpecial(getRequired(parser, list, opt));
+            dualTimeListFormat = replaceHexAndSpecial(getRequired(list, opt));
          }
          else if (opt.equals("date-time-field-locale"))
          {
-            dateTimeListLocale = getLocale(parser, list, opt);
+            dateTimeListLocale = getLocale(list, opt);
             dualDateTimeListLocale = dateTimeListLocale;
          }
          else if (opt.equals("dual-date-time-field-locale"))
          {
-            dualDateTimeListLocale = getLocale(parser, list, opt);
+            dualDateTimeListLocale = getLocale(list, opt);
          }
          else if (opt.equals("date-field-locale"))
          {
-            dateListLocale = getLocale(parser, list, opt);
+            dateListLocale = getLocale(list, opt);
             dualDateListLocale = dateListLocale;
          }
          else if (opt.equals("dual-date-field-locale"))
          {
-            dualDateListLocale = getLocale(parser, list, opt);
+            dualDateListLocale = getLocale(list, opt);
          }
          else if (opt.equals("time-field-locale"))
          {
-            timeListLocale = getLocale(parser, list, opt);
+            timeListLocale = getLocale(list, opt);
             dualTimeListLocale = timeListLocale;
          }
          else if (opt.equals("dual-time-field-locale"))
          {
-            dualTimeListLocale = getLocale(parser, list, opt);
+            dualTimeListLocale = getLocale(list, opt);
          }
          else if (opt.equals("interpret-fields"))
          {
-            interpretFields = getFieldArray(parser, list, opt, true);
+            interpretFields = getFieldArray(list, opt, true);
 
             if (interpretFields != null && !bib2gls.useInterpreter())
             {
@@ -2753,7 +2762,7 @@ public class GlsResource
          }
          else if (opt.equals("interpret-fields-action"))
          {
-            String val = getChoice(parser, list, opt, "replace", "replace non empty");
+            String val = getChoice(list, opt, "replace", "replace non empty");
 
             if (val.equals("replace"))
             {
@@ -2766,15 +2775,15 @@ public class GlsResource
          }
          else if (opt.equals("hex-unicode-fields"))
          {
-            hexUnicodeFields = getFieldArray(parser, list, opt, true);
+            hexUnicodeFields = getFieldArray(list, opt, true);
          }
          else if (opt.equals("bibtex-contributor-fields"))
          {
-            bibtexAuthorList = getFieldArray(parser, list, opt, true);
+            bibtexAuthorList = getFieldArray(list, opt, true);
          }
          else if (opt.equals("contributor-order"))
          {
-            String val = getChoice(parser, list, opt, 
+            String val = getChoice(list, opt, 
               "surname", "von", "forenames");
 
             if (val.equals("surname"))
@@ -2792,7 +2801,7 @@ public class GlsResource
          }
          else if (opt.equals("selection"))
          {
-            String val = getChoice(parser, list, opt, SELECTION_OPTIONS);
+            String val = getChoice(list, opt, SELECTION_OPTIONS);
 
             selectionMode = -1;
 
@@ -2814,41 +2823,41 @@ public class GlsResource
          }
          else if (opt.equals("break-at"))
          {
-            sortSettings.setBreakPoint(getBreakAt(parser, list, opt));
+            sortSettings.setBreakPoint(getBreakAt(list, opt));
             dualSortSettings.setBreakPoint(sortSettings.getBreakPoint());
             secondarySortSettings.setBreakPoint(sortSettings.getBreakPoint());
          }
          else if (opt.equals("dual-break-at"))
          {
-            dualSortSettings.setBreakPoint(getBreakAt(parser, list, opt));
+            dualSortSettings.setBreakPoint(getBreakAt(list, opt));
          }
          else if (opt.equals("secondary-break-at"))
          {
-            secondarySortSettings.setBreakPoint(getBreakAt(parser, list, opt));
+            secondarySortSettings.setBreakPoint(getBreakAt(list, opt));
          }
          else if (opt.equals("break-marker"))
          {
-            sortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
+            sortSettings.setBreakPointMarker(getOptional("", list, opt));
             dualSortSettings.setBreakPointMarker(sortSettings.getBreakPointMarker());
             secondarySortSettings.setBreakPointMarker(sortSettings.getBreakPointMarker());
          }
          else if (opt.equals("dual-break-marker"))
          {
-            dualSortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
+            dualSortSettings.setBreakPointMarker(getOptional("", list, opt));
          }
          else if (opt.equals("secondary-break-marker"))
          {
-            secondarySortSettings.setBreakPointMarker(getOptional(parser, "", list, opt));
+            secondarySortSettings.setBreakPointMarker(getOptional("", list, opt));
          }
          else if (opt.equals("break-at-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             HashMap<String,Pattern> patterns = null;
 
             if (array != null)
             {
                patterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(patterns, array, opt, list, parser);
+               setFieldMatchPatterns(patterns, array, opt, list);
             }
 
             sortSettings.setBreakAtMatch(patterns);
@@ -2857,13 +2866,13 @@ public class GlsResource
          }
          else if (opt.equals("break-at-not-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             HashMap<String,Pattern> patterns = null;
 
             if (array != null)
             {
                patterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(patterns, array, opt, list, parser);
+               setFieldMatchPatterns(patterns, array, opt, list);
             }
 
             sortSettings.setBreakAtNotMatch(patterns);
@@ -2872,7 +2881,7 @@ public class GlsResource
          }
          else if (opt.equals("break-at-match-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             boolean and = val.equals("and");
             sortSettings.setBreakAtNotMatchAnd(and);
@@ -2881,72 +2890,72 @@ public class GlsResource
          }
          else if (opt.equals("dual-break-at-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             HashMap<String,Pattern> patterns = null;
 
             if (array != null)
             {
                patterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(patterns, array, opt, list, parser);
+               setFieldMatchPatterns(patterns, array, opt, list);
             }
 
             dualSortSettings.setBreakAtNotMatch(patterns);
          }
          else if (opt.equals("dual-break-at-not-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             HashMap<String,Pattern> patterns = null;
 
             if (array != null)
             {
                patterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(patterns, array, opt, list, parser);
+               setFieldMatchPatterns(patterns, array, opt, list);
             }
 
             dualSortSettings.setBreakAtNotMatch(patterns);
          }
          else if (opt.equals("dual-break-at-match-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             dualSortSettings.setBreakAtNotMatchAnd(val.equals("and"));
          }
          else if (opt.equals("secondary-break-at-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             HashMap<String,Pattern> patterns = null;
 
             if (array != null)
             {
                patterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(patterns, array, opt, list, parser);
+               setFieldMatchPatterns(patterns, array, opt, list);
             }
 
             secondarySortSettings.setBreakAtNotMatch(patterns);
          }
          else if (opt.equals("secondary-break-at-not-match"))
          {
-            TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+            TeXObject[] array = getTeXObjectArray(list, opt, true);
             HashMap<String,Pattern> patterns = null;
 
             if (array != null)
             {
                patterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(patterns, array, opt, list, parser);
+               setFieldMatchPatterns(patterns, array, opt, list);
             }
 
             secondarySortSettings.setBreakAtNotMatch(patterns);
          }
          else if (opt.equals("secondary-break-at-match-op"))
          {
-            String val = getChoice(parser, list, opt, "and", "or");
+            String val = getChoice(list, opt, "and", "or");
 
             secondarySortSettings.setBreakAtNotMatchAnd(val.equals("and"));
          }
          else if (opt.equals("strength"))
          { // collator strength
 
-            String val = getChoice(parser, list, opt, "primary", "secondary",
+            String val = getChoice(list, opt, "primary", "secondary",
                "tertiary", "identical");
 
             if (val.equals("primary"))
@@ -2972,7 +2981,7 @@ public class GlsResource
          else if (opt.equals("dual-strength"))
          { // dual collator strength
 
-            String val = getChoice(parser, list, opt, "primary", "secondary",
+            String val = getChoice(list, opt, "primary", "secondary",
                "tertiary", "identical");
 
             if (val.equals("primary"))
@@ -2995,7 +3004,7 @@ public class GlsResource
          else if (opt.equals("secondary-strength"))
          { // secondary collator strength
 
-            String val = getChoice(parser, list, opt, "primary", "secondary",
+            String val = getChoice(list, opt, "primary", "secondary",
                "tertiary", "identical");
 
             if (val.equals("primary"))
@@ -3018,7 +3027,7 @@ public class GlsResource
          else if (opt.equals("decomposition"))
          { // collator decomposition
 
-            String val = getChoice(parser, list, opt, "none", "canonical",
+            String val = getChoice(list, opt, "none", "canonical",
               "full");
 
             if (val.equals("none"))
@@ -3042,7 +3051,7 @@ public class GlsResource
          else if (opt.equals("dual-decomposition"))
          { // dual collator decomposition
 
-            String val = getChoice(parser, list, opt, "none", "canonical",
+            String val = getChoice(list, opt, "none", "canonical",
               "full");
 
             if (val.equals("none"))
@@ -3061,7 +3070,7 @@ public class GlsResource
          else if (opt.equals("secondary-decomposition"))
          { // secondary collator decomposition
 
-            String val = getChoice(parser, list, opt, "none", "canonical",
+            String val = getChoice(list, opt, "none", "canonical",
               "full");
 
             if (val.equals("none"))
@@ -3079,19 +3088,19 @@ public class GlsResource
          }
          else if (opt.equals("compound-options-global"))
          {
-            compoundEntriesGlobal = getBoolean(parser, list, opt);
+            compoundEntriesGlobal = getBoolean(list, opt);
          }
          else if (opt.equals("compound-dependent"))
          {
-            compoundEntriesDependent = getBoolean(parser, list, opt);
+            compoundEntriesDependent = getBoolean(list, opt);
          }
          else if (opt.equals("compound-add-hierarchy"))
          {
-            compoundEntriesAddHierarchy = getBoolean(parser, list, opt);
+            compoundEntriesAddHierarchy = getBoolean(list, opt);
          }
          else if (opt.equals("compound-has-records"))
          {
-            String val = getChoice(parser, "true", list, opt,
+            String val = getChoice("true", list, opt,
                "false", "true", "default");
 
             if (val.equals("false"))
@@ -3109,7 +3118,7 @@ public class GlsResource
          }
          else if (opt.equals("compound-adjust-name"))
          {
-            String val = getChoice(parser, "once", list, opt,
+            String val = getChoice("once", list, opt,
                "false", "once", "unique");
 
             if (val.equals("once"))
@@ -3127,7 +3136,7 @@ public class GlsResource
          }
          else if (opt.equals("compound-write-def"))
          {
-            String val = getChoice(parser, list, opt, "none", "all", "ref");
+            String val = getChoice(list, opt, "none", "all", "ref");
 
             if (val.equals("none"))
             {
@@ -3144,15 +3153,15 @@ public class GlsResource
          }
          else if (opt.equals("compound-main-type"))
          {
-            compoundMainType = getRequired(parser, list, opt);
+            compoundMainType = getRequired(list, opt);
          }
          else if (opt.equals("compound-other-type"))
          {
-            compoundOtherType = getRequired(parser, list, opt);
+            compoundOtherType = getRequired(list, opt);
          }
          else if (opt.equals("compound-type-override"))
          {
-            compoundTypeOverride = getBoolean(parser, list, opt);
+            compoundTypeOverride = getBoolean(list, opt);
          }
          else
          {
@@ -3223,20 +3232,20 @@ public class GlsResource
                bib2gls.MIN_MULTI_SUPP_MONTH,
                bib2gls.MIN_MULTI_SUPP_DAY));
 
-            parseSupplemental(parser, supplemental[0]);
+            parseSupplemental(supplemental[0]);
          }
          else
          {
             for (String suppRef : supplemental)
             {
-               parseSupplemental(parser, suppRef);
+               parseSupplemental(suppRef);
             }
          }
       }
 
       if (master != null)
       {
-         parseMaster(parser, master);
+         parseMaster(master);
       }
 
       if (!dualPrimaryDependency && !dualSortSettings.requiresSorting())
@@ -3360,6 +3369,22 @@ public class GlsResource
              "error.option.clash", 
              "action="+writeActionSetting, "master"));
          }
+      }
+
+      if ((pruneSeePatterns != null || pruneSeeAlsoPatterns != null)
+          && !(selectionMode == SELECTION_RECORDED_AND_DEPS 
+            || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+            || selectionMode == SELECTION_RECORDED_NO_DEPS
+            || selectionMode == SELECTION_RECORDED_AND_PARENTS
+            || selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO))
+      {
+         bib2gls.warning(
+            bib2gls.getMessage("warning.option.clash",
+            "selection="+SELECTION_OPTIONS[selectionMode],
+            pruneSeePatterns != null ? "prune-see-match" : "prune-seealso-match"));
+
+         pruneSeePatterns=null;
+         pruneSeeAlsoPatterns=null;
       }
 
       if ((selectionMode == SELECTION_ALL 
@@ -3679,12 +3704,11 @@ public class GlsResource
    /**
     * Parses the aux file of the master document. The master
     * document contains the actual glossary.
-    * @param parser the aux file parser
     * @param master the basename of the master aux file
     * @throws Bib2GlsException invalid resource setting syntax
     * @throws IOException may be thrown by the aux file parser
     */
-   private void parseMaster(TeXParser parser, String master)
+   private void parseMaster(String master)
     throws IOException,Bib2GlsException
    {
       // Check for option clashes:
@@ -3760,7 +3784,19 @@ public class GlsResource
       if (fieldPatterns != null)
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
-           "match"));
+           notMatch ? "match" : "not-match"));
+      }
+
+      if (pruneSeePatterns != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "prune-see-match"));
+      }
+
+      if (pruneSeeAlsoPatterns != null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
+           "prune-seealso-match"));
       }
 
       if (interpretFields != null)
@@ -4024,11 +4060,10 @@ public class GlsResource
    /**
     * Parses the aux file of a supplemental document to add
     * supplemental records to entries shared in both documents.
-    * @param parser the aux file parser
     * @param basename the basename of the supplemental aux file
     * @throws IOException may be thrown by the aux file parser
     */
-   private void parseSupplemental(TeXParser parser, String basename)
+   private void parseSupplemental(String basename)
     throws IOException
    {
       // Need to find supplemental aux file which should be relative to
@@ -4183,12 +4218,11 @@ public class GlsResource
     * @param array set of patterns supplied to the setting
     * @param opt the name of the setting
     * @param list the key=value setting list
-    * @param parser the aux file parser
     * @throws IllegalArgumentException invalid value supplied
     * @throws IOException may be thrown by the aux file parser
     */
    private void setFieldMatchPatterns(HashMap<String,Pattern> patterns,
-     TeXObject[] array, String opt, KeyValList list, TeXParser parser)
+     TeXObject[] array, String opt, KeyValList list)
    throws IllegalArgumentException,IOException
    {
       for (int i = 0; i < array.length; i++)
@@ -4200,7 +4234,7 @@ public class GlsResource
                opt, list.get(opt).toString(parser)));
          }
 
-         Vector<TeXObject> split = splitList(parser, '=', 
+         Vector<TeXObject> split = splitList('=', 
             (TeXObjectList)array[i]);
 
          if (split == null || split.size() == 0) continue;
@@ -4383,7 +4417,6 @@ public class GlsResource
 
    /**
     * Gets the boolean value assigned to the given setting.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
@@ -4391,7 +4424,7 @@ public class GlsResource
     * @return true if value is empty or "true" or false if the value
     * is "false"
     */
-   private boolean getBoolean(TeXParser parser, KeyValList list, String opt)
+   private boolean getBoolean(KeyValList list, String opt)
     throws IOException
    {
       String val = list.getValue(opt).toString(parser).trim();
@@ -4414,15 +4447,13 @@ public class GlsResource
     * Gets the (required TeXObject) value assigned to the given setting.
     * The value is required and will have leading and trailing
     * spaces removed.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @throws IllegalArgumentException if the value is missing
     * @return the value
     */
-   private TeXObject getRequiredObject(TeXParser parser, KeyValList list, 
-      String opt)
+   private TeXObject getRequiredObject(KeyValList list, String opt)
     throws IOException
    {
       TeXObject obj = list.getValue(opt);
@@ -4445,14 +4476,13 @@ public class GlsResource
     * Gets the (required string) value assigned to the given setting.
     * The value is required and will have leading and trailing
     * spaces removed.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @throws IllegalArgumentException if the value is missing or empty
     * @return the value converted to a string
     */
-   private String getRequired(TeXParser parser, KeyValList list, String opt)
+   private String getRequired(KeyValList list, String opt)
     throws IOException
    {
       TeXObject obj = list.getValue(opt);
@@ -4483,7 +4513,6 @@ public class GlsResource
     * Gets the (optional string) value assigned to the given setting.
     * The value is optional and will have leading and trailing
     * spaces removed.
-    * @param parser the aux file parser
     * @param defValue the default value
     * @param list the key=value setting list
     * @param opt the name of the setting
@@ -4491,7 +4520,7 @@ public class GlsResource
     * @return the value converted to a string or the default value
     * if not set
     */
-   private String getOptional(TeXParser parser, String defValue, 
+   private String getOptional(String defValue, 
       KeyValList list, String opt)
     throws IOException
    {
@@ -4518,23 +4547,21 @@ public class GlsResource
     * Gets the (optional string) value assigned to the given setting.
     * The value is optional and will have leading and trailing
     * spaces removed.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @return the value converted to a string or null if not set
     */
-   private String getOptional(TeXParser parser, KeyValList list, String opt)
+   private String getOptional(KeyValList list, String opt)
     throws IOException
    {
-      return getOptional(parser, null, list, opt);
+      return getOptional(null, list, opt);
    }
 
    /**
     * Gets the (required integer) value assigned to the given setting.
     * The value is required and must be in integer format. Leading
     * and trailing spaces will be removed.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
@@ -4542,10 +4569,10 @@ public class GlsResource
     * or isn't an integer
     * @return the value converted to an int
     */
-   private int getRequiredInt(TeXParser parser, KeyValList list, String opt)
+   private int getRequiredInt(KeyValList list, String opt)
     throws IOException
    {
-      String value = getRequired(parser, list, opt);
+      String value = getRequired(list, opt);
 
       try
       {
@@ -4562,7 +4589,6 @@ public class GlsResource
     * Gets the (optional integer) value assigned to the given setting.
     * The value, if present, and must be in integer format. Leading
     * and trailing spaces will be removed.
-    * @param parser the aux file parser
     * @param defValue the default value
     * @param list the key=value setting list
     * @param opt the name of the setting
@@ -4571,11 +4597,11 @@ public class GlsResource
     * @return the value converted to an int or the default value if
     * not set
     */
-   private int getOptionalInt(TeXParser parser, int defValue, KeyValList list, 
+   private int getOptionalInt(int defValue, KeyValList list, 
      String opt)
     throws IOException
    {
-      String value = getOptional(parser, list, opt);
+      String value = getOptional(list, opt);
 
       if (value == null)
       {
@@ -4598,7 +4624,6 @@ public class GlsResource
     * The value is required and must be in integer format. Leading
     * and trailing spaces will be removed. The value may be a
     * keyword which has a corresponding int value.
-    * @param parser the aux file parser
     * @param keyword the keyword that may be used instead of a
     * number
     * @param keywordValue the numeric value associated with the
@@ -4610,11 +4635,11 @@ public class GlsResource
     * or isn't an integer
     * @return the value converted to an int
     */
-   private int getRequiredInt(TeXParser parser, String keyword, 
+   private int getRequiredInt(String keyword, 
        int keywordValue, KeyValList list, String opt)
     throws IOException
    {
-      String value = getRequired(parser, list, opt);
+      String value = getRequired(list, opt);
 
       if (value.equals(keyword))
       {
@@ -4637,7 +4662,6 @@ public class GlsResource
     * The value is required and must be in integer format. Leading
     * and trailing spaces will be removed. The value must be greater
     * than or equal to the given minimum value.
-    * @param parser the aux file parser
     * @param minValue the minimum allowed value
     * @param list the key=value setting list
     * @param opt the name of the setting
@@ -4646,11 +4670,11 @@ public class GlsResource
     * or isn't an integer or is out of bounds
     * @return the value converted to an int
     */
-   private int getRequiredIntGe(TeXParser parser, int minValue, KeyValList list,
+   private int getRequiredIntGe(int minValue, KeyValList list,
       String opt)
     throws IOException
    {
-      int val = getRequiredInt(parser, list, opt);
+      int val = getRequiredInt(list, opt);
 
       if (val < minValue)
       {
@@ -4668,7 +4692,6 @@ public class GlsResource
     * and trailing spaces will be removed. The value may be a
     * keyword which has a corresponding int value. The value must be greater
     * than or equal to the given minimum value.
-    * @param parser the aux file parser
     * @param minValue the minimum allowed value
     * @param keyword the keyword that may be used instead of a
     * number
@@ -4681,11 +4704,11 @@ public class GlsResource
     * or isn't an integer or is out of bounds
     * @return the value converted to an int
     */
-   private int getRequiredIntGe(TeXParser parser, int minValue, String keyword, 
+   private int getRequiredIntGe(int minValue, String keyword, 
       int keywordValue, KeyValList list, String opt)
     throws IOException
    {
-      int val = getRequiredInt(parser, keyword, keywordValue, list, opt);
+      int val = getRequiredInt(keyword, keywordValue, list, opt);
 
       if (val < minValue)
       {
@@ -4702,7 +4725,6 @@ public class GlsResource
     * The value is must be in integer format. Leading
     * and trailing spaces will be removed. The value must be greater
     * than or equal to the given minimum value.
-    * @param parser the aux file parser
     * @param minValue the minimum allowed value
     * @param defValue the default value
     * @param list the key=value setting list
@@ -4712,11 +4734,11 @@ public class GlsResource
     * @return the value converted to an int or the default value if
     * not set
     */
-   private int getOptionalIntGe(TeXParser parser, int minValue, int defValue, 
+   private int getOptionalIntGe(int minValue, int defValue, 
      KeyValList list, String opt)
     throws IOException
    {
-      int val = getOptionalInt(parser, defValue, list, opt);
+      int val = getOptionalInt(defValue, list, opt);
 
       if (val < minValue)
       {
@@ -4732,7 +4754,6 @@ public class GlsResource
     * Gets the (required long integer) value assigned to the given setting.
     * The value is required and must be in long integer format. Leading
     * and trailing spaces will be removed.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
@@ -4740,10 +4761,10 @@ public class GlsResource
     * or isn't a long integer
     * @return the value converted to a long
     */
-   private long getRequiredLong(TeXParser parser, KeyValList list, String opt)
+   private long getRequiredLong(KeyValList list, String opt)
     throws IOException
    {
-      String value = getRequired(parser, list, opt);
+      String value = getRequired(list, opt);
 
       try
       {
@@ -4760,7 +4781,6 @@ public class GlsResource
     * Gets the (optional long integer) value assigned to the given setting.
     * The value, if present, and must be in long integer format. Leading
     * and trailing spaces will be removed.
-    * @param parser the aux file parser
     * @param defValue the default value
     * @param list the key=value setting list
     * @param opt the name of the setting
@@ -4769,11 +4789,11 @@ public class GlsResource
     * @return the value converted to a long or the default value if
     * not set
     */
-   private long getOptionalLong(TeXParser parser, long defValue, 
+   private long getOptionalLong(long defValue, 
      KeyValList list, String opt)
     throws IOException
    {
-      String value = getOptional(parser, list, opt);
+      String value = getOptional(list, opt);
 
       if (value == null)
       {
@@ -4794,7 +4814,6 @@ public class GlsResource
    /**
     * Gets the optional value (which must belong to a set) assigned to the
     * given setting.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param allowedValues list of allowed values
@@ -4803,17 +4822,16 @@ public class GlsResource
     * allowed set
     * @return the value as a string or null if not set
     */ 
-   private String getChoice(TeXParser parser, KeyValList list, String opt, 
+   private String getChoice(KeyValList list, String opt, 
       String... allowValues)
     throws IOException
    {
-      return getChoice(parser, null, list, opt, allowValues);
+      return getChoice(null, list, opt, allowValues);
    }
 
    /**
     * Gets the optional value (which must belong to a set) assigned to the
     * given setting.
-    * @param parser the aux file parser
     * @param defVal the default value
     * @param list the key=value setting list
     * @param opt the name of the setting
@@ -4823,11 +4841,11 @@ public class GlsResource
     * allowed set
     * @return the value as a string or the default value if not set
     */ 
-   private String getChoice(TeXParser parser, String defVal, KeyValList list, 
+   private String getChoice(String defVal, KeyValList list, 
       String opt, String... allowValues)
     throws IOException
    {
-      String value = getOptional(parser, list, opt);
+      String value = getOptional(list, opt);
 
       if (value == null)
       {
@@ -4877,16 +4895,15 @@ public class GlsResource
     * or the keywords "doc" or "locale". A missing value corresponds
     * to "locale". A return value of null indicates the default
     * locale, according to the JVM.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @return the value converted to a locale or null
     */
-   private Locale getLocale(TeXParser parser, KeyValList list, String opt)
+   private Locale getLocale(KeyValList list, String opt)
     throws IOException
    {
-      String value = getOptional(parser, list, opt);
+      String value = getOptional(list, opt);
 
       if (value == null || "locale".equals(value))
       {
@@ -4906,18 +4923,17 @@ public class GlsResource
    /**
     * Gets the (optional) array of string values assigned to the given setting.
     * The array of values should be supplied as a comma-separated list.
-    * @param parser the aux file parser
     * @param defValue the default value
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @return the array of string values
     */
-   private String[] getStringArray(TeXParser parser, String defValue, 
+   private String[] getStringArray(String defValue, 
      KeyValList list, String opt)
     throws IOException
    {
-      String[] array = getStringArray(parser, list, opt);
+      String[] array = getStringArray(list, opt);
 
       if (array == null)
       {
@@ -4930,23 +4946,21 @@ public class GlsResource
    /**
     * Gets the (optional) array of string values assigned to the given setting.
     * The array of values should be supplied as a comma-separated list.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @return the array of string values or null if not set
     */
-   private String[] getStringArray(TeXParser parser, KeyValList list, 
+   private String[] getStringArray(KeyValList list, 
      String opt)
     throws IOException
    {
-      return getStringArray(parser, list, opt, false);
+      return getStringArray(list, opt, false);
    }
 
    /**
     * Gets the array of string values assigned to the given setting.
     * The array of values should be supplied as a comma-separated list.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param isRequired true if the value must be supplied
@@ -4955,7 +4969,7 @@ public class GlsResource
     * but is required
     * @return the array of string values or (if permitted) null if not set or empty
     */
-   private String[] getStringArray(TeXParser parser, KeyValList list, 
+   private String[] getStringArray(KeyValList list, 
      String opt, boolean isRequired)
     throws IOException
    {
@@ -4963,7 +4977,7 @@ public class GlsResource
 
       if (isRequired)
       {
-         object = getRequiredObject(parser, list, opt);
+         object = getRequiredObject(list, opt);
       }
       else
       {
@@ -5006,7 +5020,6 @@ public class GlsResource
     * Gets the array of field names assigned to the given setting.
     * The array of values should be supplied as a comma-separated list
     * and each item must be a valid field name.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param isRequired true if the value must be supplied
@@ -5015,11 +5028,11 @@ public class GlsResource
     * but is required
     * @return the array of field names or (if permitted) null if not set or empty
     */
-   private String[] getFieldArray(TeXParser parser, KeyValList list, 
+   private String[] getFieldArray(KeyValList list, 
      String opt, boolean isRequired)
     throws IOException
    {
-      String[] array = getStringArray(parser, list, opt, isRequired);
+      String[] array = getStringArray(list, opt, isRequired);
 
       if (array == null)
       {
@@ -5042,7 +5055,6 @@ public class GlsResource
    /**
     * Gets the array of TeX objects assigned to the given setting.
     * The array of values should be supplied as a comma-separated list.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param isRequired true if the value must be supplied
@@ -5051,7 +5063,7 @@ public class GlsResource
     * but is required
     * @return the array of objects or (if permitted) null if not set or empty
     */
-   private TeXObject[] getTeXObjectArray(TeXParser parser, KeyValList list, 
+   private TeXObject[] getTeXObjectArray(KeyValList list, 
      String opt, boolean isRequired)
     throws IOException
    {
@@ -5059,7 +5071,7 @@ public class GlsResource
 
       if (isRequired)
       {
-         obj = getRequiredObject(parser, list, opt);
+         obj = getRequiredObject(list, opt);
       }
       else
       {
@@ -5099,7 +5111,6 @@ public class GlsResource
 
    /**
     * Gets the CSV list of TeX objects assigned to the given setting.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param isRequired true if the value must be supplied
@@ -5108,7 +5119,7 @@ public class GlsResource
     * but is required
     * @return the CSV list of objects or (if permitted) null if not set or empty
     */
-   private CsvList[] getListArray(TeXParser parser, KeyValList list, 
+   private CsvList[] getListArray(KeyValList list, 
      String opt)
     throws IOException
    {
@@ -5159,7 +5170,6 @@ public class GlsResource
     * number of keys, in which case only the initial keys up will be
     * saved. If the array is larger than the number of keys then the
     * tail elements of the array won't be assigned.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param keys the array in which to store the keys
@@ -5167,11 +5177,11 @@ public class GlsResource
     * @return the value converted to a string or the default value
     * if not set
     */
-   private HashMap<String,String> getDualMap(TeXParser parser, KeyValList list, 
+   private HashMap<String,String> getDualMap(KeyValList list, 
      String opt, String[] keys)
     throws IOException
    {
-      CsvList[] array = getListArray(parser, list, opt);
+      CsvList[] array = getListArray(list, opt);
 
       if (array == null)
       {
@@ -5234,14 +5244,13 @@ public class GlsResource
 
    /**
     * Gets the key=value list assigned to the given setting.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @return the key=value list corresponding to the setting or
     * null if not set or empty
     */
-   private KeyValList getKeyValList(TeXParser parser, KeyValList list, 
+   private KeyValList getKeyValList(KeyValList list, 
      String opt)
     throws IOException
    {
@@ -5265,15 +5274,13 @@ public class GlsResource
    /**
     * Gets the (string-to-string) mapping assigned to the given setting.
     * The setting value should be a key=value list.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @return the string map corresponding to the setting or
     * null if not set or empty
     */
-   private HashMap<String,String> getHashMap(TeXParser parser, 
-      KeyValList list, String opt)
+   private HashMap<String,String> getHashMap(KeyValList list, String opt)
     throws IOException
    {
       TeXObject object = list.getValue(opt);
@@ -5314,7 +5321,6 @@ public class GlsResource
     * Gets the (string-to-vector) mapping assigned to the given setting.
     * The setting value should be a key=value list, where each
     * element value is a comma-separated list.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param isRequired true if the value must be supplied
@@ -5324,11 +5330,11 @@ public class GlsResource
     * @return the map corresponding to the setting or (if allowed)
     * null if not set or empty
     */
-   private HashMap<String,Vector<String>> getHashMapVector(TeXParser parser, 
+   private HashMap<String,Vector<String>> getHashMapVector(
       KeyValList list, String opt, boolean isRequired)
     throws IOException
    {
-      TeXObject[] array = getTeXObjectArray(parser, list, opt, isRequired);
+      TeXObject[] array = getTeXObjectArray(list, opt, isRequired);
 
       if (array == null)
       {
@@ -5347,7 +5353,7 @@ public class GlsResource
                opt, list.get(opt).toString(parser)));
          }
 
-         Vector<TeXObject> split = splitList(parser, '=', 
+         Vector<TeXObject> split = splitList('=', 
             (TeXObjectList)array[i]);
 
          if (split == null || split.size() == 0) continue;
@@ -5390,7 +5396,6 @@ public class GlsResource
     * The setting value should be supplied as a comma-separated list of 
     * grouped pairs. The first group is the regular expression and the second
     * group is the replacement.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @param isRequired true if the value must be supplied
@@ -5400,11 +5405,11 @@ public class GlsResource
     * @return the vector of substitution patterns or (if permitted) 
     * null if not set or empty
     */
-   private Vector<PatternReplace> getSubstitutionList(TeXParser parser, 
+   private Vector<PatternReplace> getSubstitutionList( 
       KeyValList list, String opt, boolean isRequired)
     throws IOException
    {
-      TeXObject[] array = getTeXObjectArray(parser, list, opt, isRequired);
+      TeXObject[] array = getTeXObjectArray(list, opt, isRequired);
 
       if (array == null)
       {
@@ -5487,7 +5492,6 @@ public class GlsResource
     * The setting value should be a key=value list, where the key
     * must be a valid field name and the value must be a valid
     * format pattern.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
@@ -5495,11 +5499,11 @@ public class GlsResource
     * @return the string map corresponding to the setting or
     * null if not set or empty
     */
-   private HashMap<String,String> getFieldFormatPattern(TeXParser parser,
+   private HashMap<String,String> getFieldFormatPattern(
      KeyValList list, String opt)
    throws IllegalArgumentException,IOException
    {
-      TeXObject[] array = getTeXObjectArray(parser, list, opt, true);
+      TeXObject[] array = getTeXObjectArray(list, opt, true);
 
       if (array == null)
       {
@@ -5517,7 +5521,7 @@ public class GlsResource
                opt, list.get(opt).toString(parser)));
          }
 
-         Vector<TeXObject> split = splitList(parser, '=', 
+         Vector<TeXObject> split = splitList('=', 
             (TeXObjectList)array[i]);
 
          if (split == null || split.size() == 0) continue;
@@ -5541,7 +5545,7 @@ public class GlsResource
 
          if (format instanceof TeXObjectList)
          {
-            replaceStringFormatter(parser, (TeXObjectList)format);
+            replaceStringFormatter((TeXObjectList)format);
          }
 
          String val = format.toString(parser).trim();
@@ -5561,10 +5565,9 @@ public class GlsResource
     * formatter. Note that {@code \\protect\\u} will
     * cause the command name to be followed by whitespace, which
     * needs to be stripped if present.
-    * @param parser the aux file parser
     * @param format the TeX code
     */ 
-   private void replaceStringFormatter(TeXParser parser, TeXObjectList format)
+   private void replaceStringFormatter(TeXObjectList format)
    {
       for (int i = 0; i < format.size(); i++)
       {
@@ -5572,7 +5575,7 @@ public class GlsResource
 
          if (obj instanceof TeXObjectList)
          {
-            replaceStringFormatter(parser, (TeXObjectList)obj);
+            replaceStringFormatter((TeXObjectList)obj);
          }
          else if (obj instanceof ControlSequence)
          {
@@ -5623,18 +5626,16 @@ public class GlsResource
 
    /**
     * Gets the letter number rule for the given setting as an integer.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @throws IllegalArgumentException if the value is invalid
     * @return the rule ID
     */ 
-   private int getLetterNumberRule(TeXParser parser, KeyValList list,
-     String opt)
+   private int getLetterNumberRule(KeyValList list, String opt)
    throws IOException
    {
-      String val = getChoice(parser, list, opt, "before letter",
+      String val = getChoice(list, opt, "before letter",
         "after letter", "between", "first", "last");
 
       if (val.equals("before letter"))
@@ -5664,18 +5665,16 @@ public class GlsResource
 
    /**
     * Gets the letter number punctuation rule for the given setting as an integer.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @throws IllegalArgumentException if the value is invalid
     * @return the rule ID
     */ 
-   private int getLetterNumberPuncRule(TeXParser parser, KeyValList list,
-     String opt)
+   private int getLetterNumberPuncRule(KeyValList list, String opt)
    throws IOException
    {
-      String val = getChoice(parser, list, opt, "punc-space-first", 
+      String val = getChoice(list, opt, "punc-space-first", 
         "punc-space-last", "space-punc-first", "space-punc-last",
         "space-first-punc-last", "punc-first-space-last",
         "punc-first-space-zero", "punc-last-space-zero",
@@ -5728,18 +5727,16 @@ public class GlsResource
 
    /**
     * Gets the break-at rule for the given setting as an integer.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @throws IllegalArgumentException if the value is invalid
     * @return the rule ID
     */ 
-   private int getBreakAt(TeXParser parser, KeyValList list,
-     String opt)
+   private int getBreakAt(KeyValList list, String opt)
    throws IOException
    {
-      String val = getChoice(parser, list, opt, "none", "word",
+      String val = getChoice(list, opt, "none", "word",
         "character", "sentence", "upper-notlower", "upper-upper", 
         "upper-notlower-word", "upper-upper-word");
 
@@ -5786,18 +5783,17 @@ public class GlsResource
     * or as {@code field-list:sort-method}, which indicates which
     * fields should have their list values sorted according to the
     * given method.
-    * @param parser the aux file parser
     * @param list the key=value setting list
     * @param opt the name of the setting
     * @throws IOException may be thrown by the aux file parser
     * @throws IllegalArgumentException if the value is invalid
     * @return the method
     */ 
-   private LabelListSortMethod getLabelListSortMethod(TeXParser parser, 
+   private LabelListSortMethod getLabelListSortMethod( 
      TeXObjectList list, String opt)
    throws IOException
    {
-      Vector<TeXObject> split = splitList(parser, ':', list);
+      Vector<TeXObject> split = splitList(':', list);
 
       int n = split.size();
 
@@ -5872,14 +5868,12 @@ public class GlsResource
 
    /**
     * Splits a list on the given character.
-    * @param parser the aux file parser
     * @param c the split (separator) character
     * @param list the list that needs splitting
     * @throws IOException may be thrown by the aux file parser
     * @return the vector of list elements or null if empty
     */ 
-   private Vector<TeXObject> splitList(TeXParser parser, char c, 
-      TeXObjectList list)
+   private Vector<TeXObject> splitList(char c, TeXObjectList list)
     throws IOException
    {
       while (list.size() == 1 && list.firstElement() instanceof TeXObjectList)
@@ -6003,10 +5997,9 @@ public class GlsResource
 
    /**
     * Parses all bib files associated with this resource set (stage 2).
-    * @param parser the aux file parser
     * @throws IOException may be thrown by the aux file parser
     */ 
-   public void parseBibFiles(TeXParser parser)
+   public void parseBibFiles()
    throws IOException
    {
       bib2gls.verboseMessage("message.parsing.resource.bib", texFile.getName());
@@ -6090,6 +6083,14 @@ public class GlsResource
    public Bib2GlsBibParser getBibParserListener()
    {
       return bibParserListener;
+   }
+
+   /**
+    * Gets the bib parser.
+    */ 
+   public TeXParser getBibParser()
+   {
+      return bibParserListener == null ? null : bibParserListener.getParser();
    }
 
    // Compound entries are added when @compoundset has its contents
@@ -6364,7 +6365,7 @@ public class GlsResource
     * @throws IOException may be thrown by the aux file parser
     * @throws Bib2GlsException invalid resource setting syntax
     */ 
-   public void processBibList(TeXParser parser)
+   public void processBibList()
    throws IOException,Bib2GlsException
    {
       bib2gls.verboseMessage("message.processing.resource",
@@ -6406,7 +6407,7 @@ public class GlsResource
          if (data instanceof Bib2GlsEntry)
          {
             Bib2GlsEntry entry = (Bib2GlsEntry)data;
-            entry.parseFields(bibParser);
+            entry.parseFields();
 
             Bib2GlsEntry dual = null;
 
@@ -6444,7 +6445,7 @@ public class GlsResource
                   }
                   else
                   {
-                     dual.initCrossRefs(parser);
+                     dual.initCrossRefs();
                   }
                }
 
@@ -6665,7 +6666,7 @@ public class GlsResource
                }
                else
                {
-                  entry.initCrossRefs(parser);
+                  entry.initCrossRefs();
                }
 
                if (dual != null)
@@ -6678,7 +6679,7 @@ public class GlsResource
                   }
                   else
                   {
-                     dual.initCrossRefs(parser);
+                     dual.initCrossRefs();
                   }
                }
 
@@ -6730,13 +6731,13 @@ public class GlsResource
             {
                for (String field : dateTimeList)
                {
-                  entry.convertFieldToDateTime(bibParser, field,
+                  entry.convertFieldToDateTime(field,
                     dateTimeListFormat, dateTimeListLocale,
                     true, true);
 
                   if (dual != null)
                   {
-                     entry.convertFieldToDateTime(bibParser, field,
+                     entry.convertFieldToDateTime(field,
                        dualDateTimeListFormat,
                        dualDateTimeListLocale,
                        true, true);
@@ -6748,13 +6749,13 @@ public class GlsResource
             {
                for (String field : dateList)
                {
-                  entry.convertFieldToDateTime(bibParser, field,
+                  entry.convertFieldToDateTime(field,
                     dateListFormat, dateListLocale,
                     true, false);
 
                   if (dual != null)
                   {
-                     entry.convertFieldToDateTime(bibParser, field,
+                     entry.convertFieldToDateTime(field,
                        dualDateListFormat,
                        dualDateListLocale,
                        true, false);
@@ -6766,13 +6767,13 @@ public class GlsResource
             {
                for (String field : timeList)
                {
-                  entry.convertFieldToDateTime(bibParser, field,
+                  entry.convertFieldToDateTime(field,
                     timeListFormat, timeListLocale,
                     false, true);
 
                   if (dual != null)
                   {
-                     entry.convertFieldToDateTime(bibParser, field,
+                     entry.convertFieldToDateTime(field,
                        dualTimeListFormat,
                        dualTimeListLocale,
                        false, true);
@@ -6861,7 +6862,7 @@ public class GlsResource
 
          for (Bib2GlsEntry entry : savedSeeEntries)
          {
-            entry.initCrossRefs(parser);
+            entry.initCrossRefs();
          }
       }
 
@@ -7428,7 +7429,7 @@ public class GlsResource
 
       TeXParser bibParser = bibParserListener.getParser();
 
-      parent = childEntry.createParent(bibParser);
+      parent = childEntry.createParent();
 
       if (parent != null)
       {
@@ -7922,6 +7923,24 @@ public class GlsResource
                  entry.getId(), "selection", SELECTION_OPTIONS[selectionMode]);
   
                entries.remove(i);
+               setSelected(entry, false);
+            }
+         }
+      }
+      else if (prunedEntryMap != null && !prunedEntryMap.isEmpty())
+      {
+         // restore any pruned cross-references that ended up being
+         // selected
+
+         for (Iterator<String> it = prunedEntryMap.keySet().iterator();
+              it.hasNext(); )
+         {
+            String label = it.next();
+
+            if (isEntrySelected(label))
+            {
+               PrunedEntry pruned = prunedEntryMap.get(label);
+               pruned.restore();
             }
          }
       }
@@ -7975,14 +7994,14 @@ public class GlsResource
 
          if (listener != null)
          {
-            TeXParser parser = listener.getParser();
+            TeXParser interpreterParser = listener.getParser();
 
-            if (parser.getControlSequence("bibglsflattenedchildpresort")==null)
+            if (interpreterParser.getControlSequence("bibglsflattenedchildpresort")==null)
             {
                listener.putControlSequence(new FlattenedPreSort());
             }
 
-            if (parser.getControlSequence("bibglsflattenedhomograph")==null)
+            if (interpreterParser.getControlSequence("bibglsflattenedhomograph")==null)
             {
                listener.putControlSequence(new FlattenedHomograph());
             }
@@ -8189,7 +8208,7 @@ public class GlsResource
       {
          for (int i = limit; i < entries.size(); i++)
          {
-            entries.get(i).setSelected(false);
+            setSelected(entries.get(i), false);
          }
 
          bib2gls.verboseMessage("message.truncated", limit);
@@ -10490,6 +10509,43 @@ public class GlsResource
       return null;
    }
 
+   public void setSelected(Bib2GlsEntry entry, boolean state)
+   {
+      entry.setSelected(state);
+
+      if (state)
+      {
+         if (selectedEntries == null)
+         {
+            selectedEntries = new Vector<String>();
+         }
+
+         selectedEntries.add(entry.getId());
+      }
+      else
+      {
+         if (selectedEntries != null)
+         {
+            selectedEntries.remove(entry.getId());
+         }
+      }
+   }
+
+   /**
+    * Determines whether or not the given entry has been selected.
+    * @param label the entry label
+    * @return true if the entry has been selected
+    */ 
+   public boolean isEntrySelected(String label)
+   {
+      if (selectedEntries != null && selectedEntries.contains(label))
+      {
+         return true;
+      }
+
+      return bib2gls.isEntrySelected(label);
+   }
+
    /**
     * Gets the entry with the given label. The search is performed
     * on the primary list first and then on the dual list.
@@ -10722,7 +10778,7 @@ public class GlsResource
       }
 
       entries.add(entry);
-      entry.setSelected(true);
+      setSelected(entry, true);
    }
 
    /**
@@ -11647,90 +11703,78 @@ public class GlsResource
     * Applies the name case change setting to the given value.
     * Uses the "name-case-change" setting to determine how to alter
     * the value.
-    * @param parser the TeX parser
     * @param value the value to change
     * @return modified value
     */ 
-   public BibValueList applyNameCaseChange(TeXParser parser, 
-      BibValueList value)
+   public BibValueList applyNameCaseChange(BibValueList value)
     throws IOException
    {
-      return applyCaseChange(parser, value, nameCaseChange);
+      return applyCaseChange(value, nameCaseChange);
    }
 
    /**
     * Applies the description case change setting to the given value.
     * Uses the "description-case-change" setting to determine how to alter
     * the value.
-    * @param parser the TeX parser
     * @param value the value to change
     * @return modified value
     */ 
-   public BibValueList applyDescriptionCaseChange(TeXParser parser, 
-      BibValueList value)
+   public BibValueList applyDescriptionCaseChange(BibValueList value)
     throws IOException
    {
-      return applyCaseChange(parser, value, descCaseChange);
+      return applyCaseChange(value, descCaseChange);
    }
 
    /**
     * Applies the short case change setting to the given value.
     * Uses the "short-case-change" setting to determine how to alter
     * the value.
-    * @param parser the TeX parser
     * @param value the value to change
     * @return modified value
     */ 
-   public BibValueList applyShortCaseChange(TeXParser parser, 
-      BibValueList value)
+   public BibValueList applyShortCaseChange(BibValueList value)
     throws IOException
    {
-      return applyCaseChange(parser, value, shortCaseChange);
+      return applyCaseChange(value, shortCaseChange);
    }
 
    /**
     * Applies the dual short case change setting to the given value.
     * Uses the "dual-short-case-change" setting to determine how to alter
     * the value.
-    * @param parser the TeX parser
     * @param value the value to change
     * @return modified value
     */ 
-   public BibValueList applyDualShortCaseChange(TeXParser parser,
-      BibValueList value)
+   public BibValueList applyDualShortCaseChange(BibValueList value)
     throws IOException
    {
-      return applyCaseChange(parser, value, dualShortCaseChange);
+      return applyCaseChange(value, dualShortCaseChange);
    }
 
    /**
     * Applies the long case change setting to the given value.
     * Uses the "long-case-change" setting to determine how to alter
     * the value.
-    * @param parser the TeX parser
     * @param value the value to change
     * @return modified value
     */ 
-   public BibValueList applyLongCaseChange(TeXParser parser, 
-      BibValueList value)
+   public BibValueList applyLongCaseChange(BibValueList value)
     throws IOException
    {
-      return applyCaseChange(parser, value, longCaseChange);
+      return applyCaseChange(value, longCaseChange);
    }
 
    /**
     * Applies the dual long case change setting to the given value.
     * Uses the "dual-long-case-change" setting to determine how to alter
     * the value.
-    * @param parser the TeX parser
     * @param value the value to change
     * @return modified value
     */ 
-   public BibValueList applyDualLongCaseChange(TeXParser parser,
-      BibValueList value)
+   public BibValueList applyDualLongCaseChange(BibValueList value)
     throws IOException
    {
-      return applyCaseChange(parser, value, dualLongCaseChange);
+      return applyCaseChange(value, dualLongCaseChange);
    }
 
    /**
@@ -13513,25 +13557,25 @@ public class GlsResource
 
    /**
     * Applies the appropriate case-change to the given value.
-    * @param parser the bib parser
     * @param value the value to apply the case-change
     * @param change the change to apply (one of: "lc-cs", "uc-cs",
     * "firstuc-cs", "title-cs", "lc", "uc", "firstuc" or "title")
     * @throws IOException if parser error occurs
     */ 
-   public BibValueList applyCaseChange(TeXParser parser,
-      BibValueList value, String change)
+   public BibValueList applyCaseChange(BibValueList value, String change)
     throws IOException
    {
+      TeXParser bibParser = getBibParser();
+
       if (change == null) return value;
 
-     TeXObjectList list = BibValueList.stripDelim(value.expand(parser));
+      TeXObjectList list = BibValueList.stripDelim(value.expand(bibParser));
 
       BibValueList bibList = new BibValueList();
 
       if (change.equals("lc-cs"))
       {
-         Group grp = parser.getListener().createGroup();
+         Group grp = bibParser.getListener().createGroup();
          grp.addAll(list);
 
          list = new TeXObjectList();
@@ -13540,7 +13584,7 @@ public class GlsResource
       }
       else if (change.equals("uc-cs"))
       {
-         Group grp = parser.getListener().createGroup();
+         Group grp = bibParser.getListener().createGroup();
          grp.addAll(list);
 
          list = new TeXObjectList();
@@ -13549,7 +13593,7 @@ public class GlsResource
       }
       else if (change.equals("firstuc-cs"))
       {
-         Group grp = parser.getListener().createGroup();
+         Group grp = bibParser.getListener().createGroup();
          grp.addAll(list);
 
          list = new TeXObjectList();
@@ -13558,7 +13602,7 @@ public class GlsResource
       }
       else if (change.equals("title-cs"))
       {
-         Group grp = parser.getListener().createGroup();
+         Group grp = bibParser.getListener().createGroup();
          grp.addAll(list);
 
          list = new TeXObjectList();
@@ -13567,19 +13611,19 @@ public class GlsResource
       }
       else if (change.equals("lc"))
       {
-         toLowerCase(list, parser.getListener());
+         toLowerCase(list, bibParser.getListener());
       }
       else if (change.equals("uc"))
       {
-         toUpperCase(list, parser.getListener());
+         toUpperCase(list, bibParser.getListener());
       }
       else if (change.equals("firstuc"))
       {
-         toSentenceCase(list, parser.getListener());
+         toSentenceCase(list, bibParser.getListener());
       }
       else if (change.equals("title"))
       {
-         toTitleCase(list, parser.getListener());
+         toTitleCase(list, bibParser.getListener());
       }
       else
       {
@@ -15165,15 +15209,15 @@ public class GlsResource
     * Gets the TeX code to append to the given prefix field.
     * The current content is supplied in order to check if it ends
     * with any identified exceptions.
-    * @param parser the TeX parser
     * @param field the field name
     * @param list the field's TeX code content
     * @return the suffix to add to the field or null if no suffix
     * required
     */ 
-   public TeXObject getAppendPrefixFieldObject(TeXParser parser,
-     String field, TeXObjectList list)
+   public TeXObject getAppendPrefixFieldObject(String field, TeXObjectList list)
    {
+      TeXParser bibParser = getBibParser();
+
       if (!isAppendPrefixFieldEnabled(field))
       {
          return null;
@@ -15228,8 +15272,8 @@ public class GlsResource
          if (bib2gls.getDebugLevel() > 0)
          {
             bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp",
-               prefixControlSequence.toString(parser), field,
-               obj.toString(parser)));
+               prefixControlSequence.toString(bibParser), field,
+               obj.toString(bibParser)));
          }
 
          return prefixControlSequence;
@@ -15255,7 +15299,7 @@ public class GlsResource
          if (bib2gls.getDebugLevel() > 0)
          {
             bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space", 
-              prefixControlSequence.toString(parser), field));
+              prefixControlSequence.toString(bibParser), field));
          }
 
          return prefixControlSequence;
@@ -15267,7 +15311,7 @@ public class GlsResource
 
          if (!(obj instanceof Ignoreable))
          {
-            String subStr = list.substring(parser, i, endIdx+1);
+            String subStr = list.substring(bibParser, i, endIdx+1);
 
             Matcher m = prefixFieldNbspPattern.matcher(subStr);
 
@@ -15277,7 +15321,7 @@ public class GlsResource
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                     "message.append.prefix.nbsp.match",
-                    field, subStr, list.toString(parser), prefixFieldNbspPattern));
+                    field, subStr, list.toString(bibParser), prefixFieldNbspPattern));
                }
 
                return new Nbsp();
@@ -15286,7 +15330,7 @@ public class GlsResource
             if (bib2gls.getDebugLevel() > 0)
             {
                bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space",
-                  prefixControlSequence.toString(parser), field));
+                  prefixControlSequence.toString(bibParser), field));
             }
 
             return prefixControlSequence;
@@ -15296,7 +15340,7 @@ public class GlsResource
       if (bib2gls.getDebugLevel() > 0)
       {
          bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp", field,
-            obj.toString(parser)));
+            obj.toString(bibParser)));
       }
 
       return prefixControlSequence;
@@ -15438,7 +15482,8 @@ public class GlsResource
    public boolean isSeeDeadEnd(String label)
    {
       if (pruneSeePatterns == null || isDependent(label)
-          || bib2gls.isDependent(label))
+            || bib2gls.isDependent(label)
+            || bib2gls.isEntrySelected(label))
       {
          return false;
       }
@@ -15463,7 +15508,8 @@ public class GlsResource
    public boolean isSeeAlsoDeadEnd(String label)
    {
       if (pruneSeeAlsoPatterns == null || isDependent(label)
-          || bib2gls.isDependent(label))
+           || bib2gls.isDependent(label)
+           || bib2gls.isEntrySelected(label))
       {
          return false;
       }
@@ -15797,6 +15843,8 @@ public class GlsResource
       private String csname;
    }
 
+   private TeXParser parser;// the aux file parser
+
    private File texFile;
 
    private Vector<TeXPath> sources;
@@ -15961,6 +16009,8 @@ public class GlsResource
    private Vector<Bib2GlsEntry> bibData;
 
    private Vector<Bib2GlsEntry> dualData;
+
+   private Vector<String> selectedEntries;
 
    private boolean hasDuals = false, hasTertiaries = false;
 

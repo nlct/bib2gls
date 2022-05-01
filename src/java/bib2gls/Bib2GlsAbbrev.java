@@ -106,7 +106,8 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       return nameProvided;
    }
 
-   protected void changeNameCase(TeXParser parser)
+   @Override
+   protected void changeNameCase()
     throws IOException
    {
       BibValueList value = getField("name");
@@ -116,7 +117,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
          return;
       }
 
-      super.changeNameCase(parser);
+      super.changeNameCase();
    }
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
