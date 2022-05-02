@@ -2548,7 +2548,7 @@ public class GlsResource
             else
             {
                pruneSeeAlsoPatterns = new HashMap<String,Pattern>();
-               setFieldMatchPatterns(pruneSeePatterns, array, opt, list);
+               setFieldMatchPatterns(pruneSeeAlsoPatterns, array, opt, list);
             }
          }
          else if (opt.equals("primary-loc-counters") 
