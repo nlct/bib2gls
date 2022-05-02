@@ -6792,6 +6792,57 @@ public class GlsResource
          }
       }
 
+      if (savedSeeEntries != null && !savedSeeEntries.isEmpty())
+      {
+         // initialise cross-reference lists but prune any dead ends
+
+         if (pruneIterations > 1)
+         {
+            bib2gls.verboseMessage("message.repruning", 1, pruneIterations);
+         }
+
+         for (Bib2GlsEntry entry : savedSeeEntries)
+         {
+            entry.initCrossRefs();
+
+            if (seeList != null && pruneIterations == 1)
+            {
+               if ((entry.hasCrossRefs() 
+                     && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                         || entry.getField("seealso") == null)
+                   )
+                   || entry.getField("alias") != null
+                  )
+               {
+                  seeList.add(entry);
+               }
+            }
+         }
+
+         for (int i = 2; i <= pruneIterations; i++)
+         {
+            bib2gls.verboseMessage("message.repruning", i, pruneIterations);
+
+            for (Bib2GlsEntry entry : savedSeeEntries)
+            {
+               entry.reprune();
+
+               if (seeList != null && pruneIterations == i)
+               {
+                  if ((entry.hasCrossRefs() 
+                        && (selectionMode != SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                            || entry.getField("seealso") == null)
+                      )
+                      || entry.getField("alias") != null
+                     )
+                  {
+                     seeList.add(entry);
+                  }
+               }
+            }
+         }
+      }
+
       // Now that all entries have been defined and had their fields
       // initialised, it's possible to search for aliases.
 
@@ -6860,31 +6911,6 @@ public class GlsResource
                }
 
                target.copyRecordsFrom(entry);
-            }
-         }
-      }
-
-      if (savedSeeEntries != null && !savedSeeEntries.isEmpty())
-      {
-         // initialise cross-reference lists but prune any dead ends
-
-         if (pruneIterations > 1)
-         {
-            bib2gls.verboseMessage("message.repruning", 1, pruneIterations);
-         }
-
-         for (Bib2GlsEntry entry : savedSeeEntries)
-         {
-            entry.initCrossRefs();
-         }
-
-         for (int i = 2; i <= pruneIterations; i++)
-         {
-            bib2gls.verboseMessage("message.repruning", i, pruneIterations);
-
-            for (Bib2GlsEntry entry : savedSeeEntries)
-            {
-               entry.reprune();
             }
          }
       }
