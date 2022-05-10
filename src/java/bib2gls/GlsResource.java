@@ -175,7 +175,7 @@ public class GlsResource
          }
          else if (opt.equals("master"))
          {// link all entries to glossary in external pdf file
-            master = getRequired(list, opt);
+            master = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("master-resources"))
          {
@@ -189,7 +189,7 @@ public class GlsResource
          }
          else if (opt.equals("supplemental-category"))
          {
-            supplementalCategory = getRequired(list, opt);
+            supplementalCategory = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("supplemental-selection"))
          {
@@ -380,48 +380,23 @@ public class GlsResource
          }
          else if (opt.equals("save-index-counter"))
          {
-            indexCounter = getOptional("true", list, opt);
-
-            if (indexCounter.equals("false"))
-            {
-               indexCounter = null;
-            }
+            indexCounter = getOptionalOrFalse("true", list, opt);
          }
          else if (opt.equals("save-from-alias"))
          {
-            saveFromAlias = getOptional("from-alias", list, opt);
-
-            if (saveFromAlias.equals("false"))
-            {
-               saveFromAlias = null;
-            }
+            saveFromAlias = getOptionalOrFalse("from-alias", list, opt);
          }
          else if (opt.equals("save-from-seealso"))
          {
-            saveFromSeeAlso = getOptional("from-seealso", list, opt);
-
-            if (saveFromSeeAlso.equals("false"))
-            {
-               saveFromSeeAlso = null;
-            }
+            saveFromSeeAlso = getOptionalOrFalse("from-seealso", list, opt);
          }
          else if (opt.equals("save-from-see"))
          {
-            saveFromSee = getOptional("from-see", list, opt);
-
-            if (saveFromSee.equals("false"))
-            {
-               saveFromSee = null;
-            }
+            saveFromSee = getOptionalOrFalse("from-see", list, opt);
          }
          else if (opt.equals("save-crossref-tail"))
          {
-            saveCrossRefTail = getOptional("crossref-tail", list, opt);
-
-            if (saveCrossRefTail.equals("false"))
-            {
-               saveCrossRefTail = null;
-            }
+            saveCrossRefTail = getOptionalOrFalse("crossref-tail", list, opt);
          }
          else if (opt.equals("save-definition-index"))
          {
@@ -1480,43 +1455,43 @@ public class GlsResource
          }
          else if (opt.equals("type"))
          {
-            type = getRequired(list, opt);
+            type = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("dual-type"))
          {
-            dualType = getRequired(list, opt);
+            dualType = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("trigger-type"))
          {
-            triggerType = getRequired(list, opt);
+            triggerType = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("progenitor-type"))
          {
-            progenitorType = getRequired(list, opt);
+            progenitorType = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("progeny-type"))
          {
-            progenyType = getRequired(list, opt);
+            progenyType = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("adopted-parent-field"))
-         {
+         {// default = "parent"
             adoptedParentField = getRequired(list, opt);
          }
          else if (opt.equals("dual-field"))
          {
-            dualField = getOptional("dual", list, opt);
+            dualField = getOptionalOrFalse("dual", list, opt);
          }
          else if (opt.equals("category"))
          {
-            category = getRequired(list, opt);
+            category = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("dual-category"))
          {
-            dualCategory = getRequired(list, opt);
+            dualCategory = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("missing-parent-category"))
          {
-            missingParentCategory = getRequired(list, opt);
+            missingParentCategory = getRequiredOrFalse(list, opt);
 
             if ("no value".equals(missingParentCategory))
             {
@@ -1525,11 +1500,11 @@ public class GlsResource
          }
          else if (opt.equals("counter"))
          {
-            counter = getRequired(list, opt);
+            counter = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("dual-counter"))
          {
-            dualCounter = getRequired(list, opt);
+            dualCounter = getRequiredOrFalse(list, opt);
          }
          else if (opt.equals("label-prefix"))
          {
@@ -4518,6 +4493,25 @@ public class GlsResource
    }
 
    /**
+    * Gets the (required string) value assigned to the given setting or 
+    * null if the keyword "false" provided.
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @throws IllegalArgumentException if the value is missing or empty
+    * @return the value converted to a string or null if the value equals "false"
+    */
+   private String getRequiredOrFalse(KeyValList list, String opt)
+    throws IOException
+   {
+      String val = getRequired(list, opt);
+
+      if (val == null || val.equals("false")) return null;
+
+      return val;
+   }
+
+   /**
     * Gets the (optional string) value assigned to the given setting.
     * The value is optional and will have leading and trailing
     * spaces removed.
@@ -4564,6 +4558,27 @@ public class GlsResource
     throws IOException
    {
       return getOptional(null, list, opt);
+   }
+
+   /**
+    * Gets the (optional string) value assigned to the given setting or 
+    * null if the keyword "false" provided.
+    * @param defValue the default value
+    * @param list the key=value setting list
+    * @param opt the name of the setting
+    * @throws IOException may be thrown by the aux file parser
+    * @return the value converted to a string or the default value
+    * if not set or null if the value equals "false"
+    */
+   private String getOptionalOrFalse(String defValue, 
+      KeyValList list, String opt)
+    throws IOException
+   {
+      String val = getOptional(defValue, list, opt);
+
+      if (val == null || val.equals("false")) return null;
+
+      return val;
    }
 
    /**

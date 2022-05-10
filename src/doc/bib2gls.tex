@@ -8562,7 +8562,7 @@ be assigned to the new \gls{parententry} with this option. The
  \item \code{same as base}: the \gls{parententry}['s] \field{category} is
   set to the base name of the \ext{bib} file that provided the
   \gls{childentry}['s] definition;
- \item \code{no value}: don't set the \field{category} field;
+ \item \code{no value} or \code{false}: don't set the \field{category} field;
  \item \meta{label}: the \gls{parententry}['s] \field{category} field is set to
   \meta{label} (which shouldn't contain any special characters). 
 \end{itemize}
@@ -8782,7 +8782,8 @@ This option will disable most of the options that relate to
 parsing and processing data contained in \iext{bib} files
 (since this option doesn't actually read any \ext{bib} files).
 It also can't be used with \csopt[copy]{action} or \csopt[define
-or copy]{action}.
+or copy]{action}. A value of \code{false} will switch off this
+setting (the default).
 
 The use of \optfmt{master} isn't always suitable. In particular
 if any of the terms cross-reference each other, such as through
@@ -9634,6 +9635,7 @@ The selected entries may all have their \field{category} field
 changed before writing their definitions to the \ext{glstex} file.
 The \meta{value} may be:
 \begin{itemize}
+\item \optfmt{false}: switch off this setting (default);
 \item \optfmt{same as entry}: set the
 \field{category} to the \ext{bib} entry type used to define it
 (\idx!{lowercase} and without the initial \code{@}) after any aliasing,
@@ -9725,19 +9727,21 @@ the \csopt[animals]{category} option.
 
 The \meta{value} may be one of:
 \begin{itemize}
- \item \optfmt{same as entry} set the \field{type} field
+ \item \optfmt{false}: switches off this setting (default);
+
+ \item \optfmt{same as entry}: set the \field{type} field
   to the entry type (\idx!{lowercase} and without the initial \code{@}); 
 
- \item \optfmt{same as original entry} set the \field{type} 
+ \item \optfmt{same as original entry}: set the \field{type} 
   to the original entry type (\idx!{lowercase} and without 
   the initial \code{@}) before it was aliased (behaves like 
   \optfmt{same as entry} if the entry type wasn't aliased);
 
- \optfmt{same as base} set the \field{type} field
+ \optfmt{same as base}: set the \field{type} field
   to the base name of the corresponding \ext{bib} file
   (without the extension);
 
- \item \optfmt{same as category} set the \field{type} field
+ \item \optfmt{same as category}: set the \field{type} field
    to the same value as the \field{category} field
    (\field{type} unchanged if \field{category} not set);
 
@@ -9750,7 +9754,7 @@ pick up the \field{type} field from their \igls{progenitor} entry
 (if it was explicitly set in the \ext{bib} file),
 which may be inappropriate.
 
- \item\meta{label} sets the \field{type} field to the glossary 
+ \item\meta{label}: sets the \field{type} field to the glossary 
    identified by \meta{label}.
 \end{itemize}
 When used with \csopt{entry-type-aliases}, the option \csopt[same as
@@ -9807,7 +9811,8 @@ This will override the \csopt{type}, \csopt{dual-type},
 \csopt{secondary}.
 
 The provided value \meta{type} must be a glossary label (not one of
-the keywords allowed by \csopt{type}).
+the keywords allowed by \csopt{type}) or \code{false} to switch
+off this setting.
 You can define the glossary before loading the resource, but
 it's not required as \bibgls\ will write
 \code{\ics{provideignoredglossary*}\margm{type}} to the \ext{glstex} file
@@ -10051,6 +10056,7 @@ The value must be the name of a counter. Since \bibgls\ doesn't know
 which counters are defined within the document, there's no check to
 determine if the value is valid (except for ensuring that
 \meta{value} is non-empty).
+A value of \code{false} will switch off this setting (the default).
 
 Note that this will require an extra \LaTeX\ and \bibgls\ call since
 the counter can't be used for the indexing until the entry has been
@@ -14008,6 +14014,8 @@ identifier (as per \csopt{category}) or the category label. For example:
 \cmd{end}\marg{document}
 \end{codeenv}
 
+A value of \code{false} will switch off this setting (the default).
+
 \section{Sorting}
 \label{sec:sortingopts}
 
@@ -17198,6 +17206,8 @@ will override any value of \field{type} provided in the \ext{bib}
 file (or created through a mapping). The \meta{value} is required and
 should be one of:
 \begin{itemize}
+\item \optfmt{false}: switches off this setting (default);
+
 \item \optfmt{same as entry}: sets the \field{type} to the entry
 type (\idx!{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
@@ -17262,6 +17272,7 @@ will override any value of \field{category} provided in the \ext{bib}
 file (or created through a mapping). The \meta{value} may be empty or
 one of:
 \begin{itemize}
+\item \optfmt{false}: switch off this setting (default);
 \item \optfmt{same as entry}: sets the \field{category} to the entry
 type (\idx{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
@@ -17299,7 +17310,7 @@ set with \csopt{dual-type}). If the entry doesn't have the
 As \csopt{counter} but for the \glspl{dualentry}. In this case
 \meta{value} may be the name of the counter or 
 \optfmt{same as primary} which uses the counter for the
-\gls{primaryentry}.
+\gls{primaryentry} or \optfmt{false} to switch off this setting.
 
 \optsection[\subsubsection]{dual-short-case-change}
 
@@ -17321,6 +17332,7 @@ an extra field called \meta{value} that is set to the mirror entry.
 If \meta{value} is omitted \csopt[dual]{dual-field} is assumed. If
 you use a different value, you will need to redefine
 \gls{GlsXtrDualField} (either locally or globally).
+A value of \code{false} will switch off this setting (the default).
 
 For example, if the \ext{bib} file contains:
 \begin{codeenv}
