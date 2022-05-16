@@ -1256,6 +1256,7 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsXtrIfFieldEqStr("ifglsfieldeq", false, false, false, this));
       listener.putControlSequence(new GlsXtrIfHasNonZeroChildCount(this));
 
+      listener.putControlSequence(listener.createSymbol("glshashchar", '#'));
       listener.putControlSequence(listener.createSymbol("bibglshashchar", '#'));
       listener.putControlSequence(listener.createSymbol("bibglsunderscorechar", '_'));
       listener.putControlSequence(listener.createSymbol("bibglsdollarchar", '$'));
@@ -5786,8 +5787,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220510";
-   public static final String DATE = "2022-05-10";
+   public static final String VERSION = "3.0.20220516";
+   public static final String DATE = "2022-05-16";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
