@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 Nicola L.C. Talbot
+    Copyright (C) 2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,40 @@
 */
 package com.dickimawbooks.bib2gls;
 
-public enum CaseChange
+import java.io.IOException;
+
+import com.dickimawbooks.texparserlib.*;
+
+public class GlsDisp extends ControlSequence
 {
-   NONE, SENTENCE, TO_UPPER, TITLE
+   public GlsDisp()
+   {
+      this("glsdisp");
+   }
+
+   public GlsDisp(String name)
+   {
+      super(name);
+   }
+
+   public Object clone()
+   {
+      return new GlsDisp(getName());
+   }
+
+   public void process(TeXParser parser) throws IOException
+   {
+      process(parser, parser);
+   }
+
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
+   {
+      popModifier(parser, stack, '*', '+');
+      popOptArg(parser, stack);
+      popArg(parser, stack);
+      TeXObject arg = popArg(parser, stack);
+
+      stack.push(arg);
+   }
+
 }

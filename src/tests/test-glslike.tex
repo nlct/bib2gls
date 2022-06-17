@@ -1,0 +1,40 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\begin{filecontents*}[overwrite]{\jobname.bib}
+@index{ext.aux,name={\extfmt{aux}}}
+@entry{@samplecs,name={\csfmt{@samplecs}},
+ description={\ext{aux} file command}
+}
+@index{idx.sample,name={sample}}
+@entry{term,name={term},description={\idx{sample} term}}
+@symbol{sym.pi,name={\ensuremath{\pi}}}
+@entry{symbol,name={symbol},description={for example, \sym{pi} or
+\gls{sym.pi}}}
+\end{filecontents*}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\newcommand{\extfmt}[1]{\texttt{#1}}
+\newcommand{\csfmt}[1]{\texttt{\char`\\#1}}
+
+\glsxtrnewgls{ext.}{\ext}
+\glsxtrnewgls{sym.}{\sym}
+
+\glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
+
+\GlsXtrLoadResources[
+   replicate-fields={description=user1},
+   interpret-fields={user1},
+   %description-case-change=firstuc
+   description-case-change=title
+ ]
+
+\begin{document}
+\gls{@samplecs} and \gls{term} and \gls{symbol}.
+
+\printunsrtglossaries
+\end{document}

@@ -27,12 +27,12 @@ public class GlsEntryParentName extends GlsUseField
 {
    public GlsEntryParentName(Bib2Gls bib2gls)
    {
-      this("glsxtrentryparentname", CaseChange.NONE, bib2gls);
+      this("glsxtrentryparentname", CaseChange.NO_CHANGE, bib2gls);
    }
 
    public GlsEntryParentName(String name, Bib2Gls bib2gls)
    {
-      this(name, CaseChange.NONE, bib2gls);
+      this(name, CaseChange.NO_CHANGE, bib2gls);
    }
 
    public GlsEntryParentName(String name, CaseChange caseChange, Bib2Gls bib2gls)

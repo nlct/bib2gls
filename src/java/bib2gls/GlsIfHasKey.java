@@ -29,6 +29,7 @@ public class GlsIfHasKey extends EntryFieldCommand
    {
       super(name, bib2gls);
       this.keyName = keyName;
+      this.warnIfFieldMissing = false;
    }
 
    public Object clone()

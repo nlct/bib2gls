@@ -35,6 +35,7 @@ public class GlsXtrIfHasField extends EntryFieldCommand
       super(name, bib2gls);
 
       this.defaultScope = defaultScope;
+      this.warnIfFieldMissing = false;
    }
 
    public Object clone()

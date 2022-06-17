@@ -103,7 +103,7 @@ public abstract class EntryFieldCommand extends Command
          val = entry.getFallbackContents(key);
       }
 
-      if (val == null)
+      if (val == null && warnIfFieldMissing)
       {
          bib2gls.warning(String.format("\\%s{%s} -> %s", getName(),
            entry.getId(),
@@ -125,4 +125,5 @@ public abstract class EntryFieldCommand extends Command
    }
 
    protected Bib2Gls bib2gls;
+   protected boolean warnIfFieldMissing = true;
 }

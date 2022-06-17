@@ -3,9 +3,11 @@ file name with space.bib
 file name with space.tex
 test-bib-bom.tex
 test-bom.bib
+test-glslike.bib
 glossaries-extra-bib2gls.sty
 glossaries-extra-stylemods.sty
 glossaries-extra.sty
+glossaries-extra*.def
 glossaries.sty
 glossary-*.sty
 *.out

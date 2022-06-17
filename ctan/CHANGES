@@ -3,6 +3,12 @@ v3.0 (pending):
   * support for \glsxtr@select@entry and \glsxtr@select@entry@nameref
     (new to glossaries-extra-bib2gls v1.49)
 
+  * bug fix: case changing options aren't recognising commands
+    identified with \glsxtrnewgls
+
+  * added support for \glsxtridentifyglsfamily (glossaries-extra
+    v1.49+)
+
   * issue #15: loc-prefix and type leads to undefined \bibglslocprefix with multiple glossaries
     https://github.com/nlct/bib2gls/issues/15
 

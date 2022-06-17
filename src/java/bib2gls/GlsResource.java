@@ -39,6 +39,7 @@ import com.dickimawbooks.texparserlib.generic.Nbsp;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.MissingValue;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
 /**
@@ -8410,6 +8411,7 @@ public class GlsResource
          }
 
          writeAllCapsCsDefs(writer);
+         writeTitleCaseCsDefs(writer);
 
          writeLabelPrefixHooks(writer);
 
@@ -10037,6 +10039,35 @@ public class GlsResource
    }
 
    /**
+    * Writes the code that provides the custom titlecase entry reference commands.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
+   private void writeTitleCaseCsDefs(PrintWriter writer)
+      throws IOException
+   {
+      if (titleCaseCommands != null)
+      {
+         writer.println("\\providecommand*{\\BibGlsTitleCase}[1]{\\BibGlsLongOrText{#1}}");
+         writer.println("\\providecommand*{\\BibGlsTitleCasePlural}[1]{\\BibGlsLongOrTextPlural{#1}}");
+
+         writer.println("\\providecommand*{\\BibGlsLongOrText}[1]{\\ifglshaslong{#1}{{\\glssetabbrvfmt{\\glscategory{#1}}\\glslongfont{\\glsxtrfieldtitlecase{#1}{long}}}}{\\glsxtrfieldtitlecase{#1}{text}}}");
+         writer.println("\\providecommand*{\\BibGlsLongOrTextPlural}[1]{\\ifglshaslong{#1}{{\\glssetabbrvfmt{\\glscategory{#1}}\\glslongfont{\\glsxtrfieldtitlecase{#1}{longplural}}}}{\\glsxtrfieldtitlecase{#1}{plural}}}");
+         writer.println("\\providecommand*{\\BibGlsShortOrText}[1]{\\ifglshasshort{#1}{{\\glssetabbrvfmt{\\glscategory{#1}}\\glsabbrvfont{\\glsxtrfieldtitlecase{#1}{short}}}}{\\glsxtrfieldtitlecase{#1}{text}}}");
+         writer.println("\\providecommand*{\\BibGlsShortOrTextPlural}[1]{\\ifglshasshort{#1}{{\\glssetabbrvfmt{\\glscategory{#1}}\\glsabbrvfont{\\glsxtrfieldtitlecase{#1}{shortplural}}}}{\\glsxtrfieldtitlecase{#1}{plural}}}");
+
+         for (Iterator<String> it=titleCaseCommands.keySet().iterator(); it.hasNext();)
+         {
+            String titleCs = it.next();
+            String defn = titleCaseCommands.get(titleCs);
+
+            writer.println(String.format("\\providecommand*{\\%s}[2][]{%s}",
+              titleCs, defn));
+         }
+      }
+   }
+
+   /**
     * Writes the code that provides the all caps entry reference commands.
     * These commands may already be defined by glossaries-extra.sty
     * or may already have been defined in an earlier resource set.
@@ -10395,7 +10426,7 @@ public class GlsResource
             if (prevTitle != null)
             {
                pending.add(prevTitle);
-               System.out.println("adding previous: "+prevTitle);
+               //System.out.println("adding previous: "+prevTitle);
             }
          }
 
@@ -11924,7 +11955,23 @@ public class GlsResource
                i++;
             }
 
-            if (isNoCaseChangeCs(csname))
+            GlsLike gl = bib2gls.getGlsLike(csname);
+
+            if (gl != null)
+            {
+               GlsLikeFamily fam = gl.getFamily();
+
+               if (fam != null)
+               {
+                  String caseChangedName = fam.getMember(CaseChange.TO_LOWER, csname);
+
+                  if (!csname.equals(caseChangedName))
+                  {
+                     list.set(csIdx, new TeXCsRef(caseChangedName));
+                  }
+               }
+            }
+            else if (isNoCaseChangeCs(csname))
             {
                // skip argument
             }
@@ -12203,7 +12250,23 @@ public class GlsResource
                i++;
             }
 
-            if (isNoCaseChangeCs(csname))
+            GlsLike gl = bib2gls.getGlsLike(csname);
+
+            if (gl != null)
+            {
+               GlsLikeFamily fam = gl.getFamily();
+
+               if (fam != null)
+               {
+                  String caseChangedName = fam.getMember(CaseChange.TO_UPPER, csname);
+
+                  if (!csname.equals(caseChangedName))
+                  {
+                     list.set(csIdx, new TeXCsRef(caseChangedName));
+                  }
+               }
+            }
+            else if (isNoCaseChangeCs(csname))
             {
                // skip argument
             }
@@ -12491,9 +12554,12 @@ public class GlsResource
          }
          else if (object instanceof Group)
          {
-            // upper case group contents
+            // upper case group contents if not empty
 
-            toUpperCase((TeXObjectList)object, listener);
+            if (!object.isEmpty())
+            {
+               toUpperCase((TeXObjectList)object, listener);
+            }
 
             return;
          }
@@ -12523,6 +12589,25 @@ public class GlsResource
                }
 
                i++;
+            }
+
+            GlsLike gl = bib2gls.getGlsLike(csname);
+
+            if (gl != null)
+            {
+               GlsLikeFamily fam = gl.getFamily();
+
+               if (fam != null)
+               {
+                  String caseChangedName = fam.getMember(CaseChange.SENTENCE, csname);
+
+                  if (!csname.equals(caseChangedName))
+                  {
+                     list.set(csIdx, new TeXCsRef(caseChangedName));
+                  }
+               }
+
+               return;
             }
 
             if (csname.endsWith("ref") || isNoCaseChangeCs(csname))
@@ -12693,13 +12778,14 @@ public class GlsResource
          return true;
       }
 
-      if (noCaseChangeCs == null) return false;
-
-      for (String cs : noCaseChangeCs)
+      if (noCaseChangeCs != null)
       {
-         if (cs.equals(csname))
+         for (String cs : noCaseChangeCs)
          {
-            return true;
+            if (cs.equals(csname))
+            {
+               return true;
+            }
          }
       }
 
@@ -12861,6 +12947,84 @@ public class GlsResource
       return false;
    }
 
+   private void registerGlsLikeTitleCase(String titlecasename, boolean isPlural,
+      GlsLikeFamily fam)
+   {
+      if (titleCaseCommands == null)
+      {
+         titleCaseCommands = new HashMap<String,String>();
+      }
+
+      if (!titleCaseCommands.containsKey(titlecasename))
+      {
+         String titlecs = "BibGlsTitleCase";
+
+         if (isPlural)
+         {
+            titlecs = "BibGlsTitleCasePlural";
+         }
+
+         L2HStringConverter listener = bib2gls.getInterpreterListener();
+
+         String options = fam.getOptions();
+         TeXObject optsObj = null;
+
+         if (options == null || options.isEmpty())
+         {
+            options = "#1";
+
+            if (listener != null)
+            {
+               optsObj = listener.getParam(1);
+            }
+         }
+         else
+         {
+            options += ",#1";
+
+            if (listener != null)
+            {
+               optsObj = listener.createString(options+",");
+               ((TeXObjectList)optsObj).add(listener.getParam(1));
+            }
+         }
+
+         String def = String.format("\\glsdisp[%s]{%s#2}{\\%s{%s#2}}", 
+           options, fam.getPrefix(), titlecs, fam.getPrefix());
+
+         titleCaseCommands.put(titlecasename, def);
+
+         if (listener != null)
+         {
+            TeXObjectList defList = listener.createStack();
+
+            defList.add(new TeXCsRef("glsdisp"));
+            defList.add(listener.getOther('['));
+            defList.add(optsObj, true);
+            defList.add(listener.getOther(']'));
+
+            Group grp = listener.createGroup(fam.getPrefix());
+            defList.add(grp);
+
+            grp.add(listener.getParam(2));
+
+            grp = listener.createGroup();
+            defList.add(grp);
+
+            grp.add(new TeXCsRef(titlecs));
+
+            Group subgrp = listener.createGroup(fam.getPrefix());
+            grp.add(subgrp);
+
+            subgrp.add(listener.getParam(2));
+
+            listener.putControlSequence(new LaTeXGenericCommand(true,
+              titlecasename, new char[] {'o', 'm'}, 
+              defList, new TeXObject[] { listener.createStack()}));
+         }
+      }
+   }
+
    /**
     * Converts the list to title case.
     * @param list the list of TeX objects
@@ -13002,7 +13166,25 @@ public class GlsResource
                i++;
             }
 
-            if (isNoCaseChangeCs(csname))
+            GlsLike gl = bib2gls.getGlsLike(csname);
+
+            if (gl != null)
+            {
+               GlsLikeFamily fam = gl.getFamily();
+
+               if (fam != null)
+               {
+                  boolean isPlural = fam.isPlural(csname);
+                  String caseChangedName = "bibglsliketitlecase"
+                   + (isPlural ? fam.getPlural() : fam.getSingular());
+
+                  registerGlsLikeTitleCase(caseChangedName, isPlural, fam);
+                  list.set(csIdx, new TeXCsRef(caseChangedName));
+               }
+
+               continue;
+            }
+            else if (isNoCaseChangeCs(csname))
             {// no case-change
                wordCount++;
                continue;
@@ -13394,7 +13576,12 @@ public class GlsResource
          return "A"+csname.substring(1);
       }
 
-      if (csname.matches("[rdpc]gls(pl)?"))
+      if (csname.matches("pgls(pl)?"))
+      {
+         return String.format("P%s", csname.substring(1));
+      }
+
+      if (csname.matches("[rdc]gls(pl)?"))
       {
          return String.format("%cG%s", csname.charAt(0), csname.substring(2));
       }
@@ -13461,7 +13648,8 @@ public class GlsResource
    public String getLowerCsName(String csname)
    {
       if (csname.matches("(Gls|GLS)(pl|xtrshort|xtrlong|xtrfull|xtrp)?")
-        || csname.matches("[rdpc](Gls|GLS)(pl)?")
+        || csname.matches("[rdc](Gls|GLS)(pl)?")
+        || csname.matches("P(gls|GLS)(pl)?")
         || csname.matches("(Acr|ACR)(short|full|long)(pl)?")
         || (bib2gls.checkAcroShortcuts() 
            && (csname.matches("Ac(sp?|lp?|fp?)?")
@@ -16190,6 +16378,8 @@ public class GlsResource
    private static final String[] CASE_OPTIONS = new String[]
    {"none", "lc", "uc", "lc-cs", "uc-cs", "firstuc", "firstuc-cs", 
     "title", "title-cs"};
+
+   private HashMap<String,String> titleCaseCommands;
 
    private boolean wordBoundarySpace=true;
    private boolean wordBoundaryCsSpace=true;

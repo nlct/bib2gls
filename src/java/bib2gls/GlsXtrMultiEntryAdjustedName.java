@@ -27,7 +27,7 @@ public class GlsXtrMultiEntryAdjustedName extends ControlSequence
 {
    public GlsXtrMultiEntryAdjustedName(Bib2Gls bib2gls)
    {
-      this(bib2gls, "glsxtrmultientryadjustedname", CaseChange.NONE);
+      this(bib2gls, "glsxtrmultientryadjustedname", CaseChange.NO_CHANGE);
    }
 
    public GlsXtrMultiEntryAdjustedName(Bib2Gls bib2gls, 
@@ -109,7 +109,7 @@ public class GlsXtrMultiEntryAdjustedName extends ControlSequence
          {
             switch (caseChange)
             {
-               case NONE:
+               case NO_CHANGE:
                   content.add(new TeXCsRef("glsxtrmultientryadjustednamefmt"));
                break;
                case SENTENCE:
@@ -147,7 +147,7 @@ public class GlsXtrMultiEntryAdjustedName extends ControlSequence
 
                switch (caseChange)
                {
-                  case NONE:
+                  case NO_CHANGE:
                     content.add(new TeXCsRef("glsxtrmultientryadjustednameother"));
                   break;
                   case TITLE:
@@ -177,7 +177,7 @@ public class GlsXtrMultiEntryAdjustedName extends ControlSequence
 
             switch (caseChange)
             {
-               case NONE:
+               case NO_CHANGE:
                case SENTENCE:
                   content.add(new TeXCsRef("glsxtrmultientryadjustednamefmt"));
                break;
@@ -220,7 +220,7 @@ public class GlsXtrMultiEntryAdjustedName extends ControlSequence
 
                switch (caseChange)
                {
-                  case NONE:
+                  case NO_CHANGE:
                   case SENTENCE:
                     content.add(new TeXCsRef("glsxtrmultientryadjustednameother"));
                   break;

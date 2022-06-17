@@ -27,20 +27,27 @@ public class GlsEntryFieldValue extends GlsUseField
 {
    public GlsEntryFieldValue(String name, String fieldLabel, Bib2Gls bib2gls)
    {
-      this(name, fieldLabel, CaseChange.NONE, bib2gls);
+      this(name, fieldLabel, CaseChange.NO_CHANGE, bib2gls);
    }
 
    public GlsEntryFieldValue(String name, String fieldLabel,
      CaseChange caseChange, Bib2Gls bib2gls)
    {
+      this(name, fieldLabel, caseChange, bib2gls, "");
+   }
+
+   public GlsEntryFieldValue(String name, String fieldLabel,
+     CaseChange caseChange, Bib2Gls bib2gls, String prefix)
+   {
       super(name, caseChange, bib2gls);
       this.fieldLabel = fieldLabel;
+      this.prefix = prefix;
    }
 
    public Object clone()
    {
       return new GlsEntryFieldValue(getName(), fieldLabel, getCaseChange(), 
-         bib2gls);
+         bib2gls, prefix);
    }
 
    public String getFieldLabel()
@@ -81,7 +88,7 @@ public class GlsEntryFieldValue extends GlsUseField
          }
       }
 
-      String entryLabel = arg.toString(parser);
+      String entryLabel = prefix+arg.toString(parser);
 
       TeXObjectList expanded = new TeXObjectList();
 
@@ -90,5 +97,5 @@ public class GlsEntryFieldValue extends GlsUseField
       return expanded;
    }
 
-   private String fieldLabel;
+   private String fieldLabel, prefix="";
 }

@@ -27,12 +27,12 @@ public class GlsUseField extends EntryFieldCommand
 {
    public GlsUseField(Bib2Gls bib2gls)
    {
-      this("glsxtrusefield", CaseChange.NONE, bib2gls);
+      this("glsxtrusefield", CaseChange.NO_CHANGE, bib2gls);
    }
 
    public GlsUseField(String name, Bib2Gls bib2gls)
    {
-      this(name, CaseChange.NONE, bib2gls);
+      this(name, CaseChange.NO_CHANGE, bib2gls);
    }
 
    public GlsUseField(String name, CaseChange caseChange, Bib2Gls bib2gls)
@@ -168,5 +168,5 @@ public class GlsUseField extends EntryFieldCommand
       pending.add(obj);
    }
 
-   private CaseChange caseChange = CaseChange.NONE;
+   private CaseChange caseChange = CaseChange.NO_CHANGE;
 }

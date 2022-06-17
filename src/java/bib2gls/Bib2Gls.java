@@ -49,6 +49,7 @@ import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.latex.AtSecondOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
@@ -1045,6 +1046,116 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new CapitaliseWords(mfirstucSty, 
         "glscapitalisewords"));
 
+      listener.putControlSequence(new GenericCommand(true, 
+        "BibGlsTitleCase", null, new TeXCsRef("BibGlsLongOrText")));
+      listener.putControlSequence(new GenericCommand(true, 
+        "BibGlsTitleCasePlural", null, new TeXCsRef("BibGlsLongOrTextPlural")));
+
+      TeXObjectList defList = listener.createStack();
+      defList.add(new TeXCsRef("ifglshaslong"));
+      Group grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(listener.getParam(1));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      Group subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("long"));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("text"));
+
+      listener.putControlSequence(new LaTeXGenericCommand(true, 
+        "BibGlsLongOrText", "m", defList));
+
+      defList = listener.createStack();
+      defList.add(new TeXCsRef("ifglshaslong"));
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(listener.getParam(1));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("longplural"));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("plural"));
+
+      listener.putControlSequence(new LaTeXGenericCommand(true, 
+        "BibGlsLongOrTextPlural", "m", defList));
+
+      defList = listener.createStack();
+      defList.add(new TeXCsRef("ifglshasshort"));
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(listener.getParam(1));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("short"));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("text"));
+
+      listener.putControlSequence(new LaTeXGenericCommand(true, 
+        "BibGlsShortOrText", "m", defList));
+
+      defList = listener.createStack();
+      defList.add(new TeXCsRef("ifglshasshort"));
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(listener.getParam(1));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("shortplural"));
+
+      grp = listener.createGroup();
+      defList.add(grp);
+      grp.add(new TeXCsRef("glsxtrfieldtitlecase"));
+      subgrp = listener.createGroup();
+      grp.add(subgrp);
+      subgrp.add(listener.getParam(1));
+      grp.add(listener.createGroup("plural"));
+
+      listener.putControlSequence(new LaTeXGenericCommand(true, 
+        "BibGlsShortOrTextPlural", "m", defList));
+
+      listener.putControlSequence(new GlsDisp());
+      listener.putControlSequence(new GlsDisp("glslink"));
+      listener.putControlSequence(new GlsDisp("dglslink"));
+      listener.putControlSequence(new GlsDisp("dglsdisp"));
+
       listener.putControlSequence(new EnableTagging());
       listener.putControlSequence(new AtFirstOfTwo("bibglscontributorlist"));
       listener.putControlSequence(new AtFirstOfTwo("bibglshyperlink"));
@@ -1222,6 +1333,8 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsUseField(
         "glsentrytitlecase", CaseChange.TITLE, this));
 
+      listener.putControlSequence(new GlsUseField(
+        "glsxtrfieldtitlecase", CaseChange.TITLE, this));
 
       listener.putControlSequence(new GlsEntryParentName(this));
 
@@ -1306,7 +1419,7 @@ public class Bib2Gls implements TeXApp
 
       listener.putControlSequence(new GlsEntryFieldValue(
         "glsxtrmultientryadjustednameother", "name",
-         CaseChange.NONE, this));
+         CaseChange.NO_CHANGE, this));
 
       listener.putControlSequence(new GlsEntryFieldValue(
         "Glsxtrmultientryadjustednameother", "name",
@@ -1642,6 +1755,7 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("glsxtr@pluralsuffixes", 4);
             addAuxCommand("@glsxtr@altmodifier", 1);
             addAuxCommand("@glsxtr@newglslike", 2);
+            addAuxCommand("@glsxtr@newglslikefamily", 8);
             addAuxCommand("@glsxtr@prefixlabellist", 1);
             addAuxCommand("@glsxtr@multientry", 4);
             addAuxCommand("@glsxtr@mglsrefs", 1);
@@ -1736,6 +1850,50 @@ public class Bib2Gls implements TeXApp
          {
             addGlsLike(data.getArg(0).toString(parser), 
              data.getArg(1).toString(parser).substring(1));
+         }
+         else if (name.equals("@glsxtr@newglslikefamily"))
+         {
+            String options = data.getArg(0).toString(parser).trim();
+            String prefix = data.getArg(1).toString(parser).trim();
+            String singular = data.getArg(2).toString(parser).trim();
+            String plural = data.getArg(3).toString(parser).trim();
+            String sentence = data.getArg(4).toString(parser).trim();
+            String sentencepl = data.getArg(5).toString(parser).trim();
+            String allcaps = data.getArg(6).toString(parser).trim();
+            String allcapspl = data.getArg(7).toString(parser).trim();
+
+            if (singular.startsWith("\\"))
+            {
+               singular = singular.substring(1);
+            }
+
+            if (plural.startsWith("\\"))
+            {
+               plural = plural.substring(1);
+            }
+
+            if (sentence.startsWith("\\"))
+            {
+               sentence = sentence.substring(1);
+            }
+
+            if (sentencepl.startsWith("\\"))
+            {
+               sentencepl = sentencepl.substring(1);
+            }
+
+            if (allcaps.startsWith("\\"))
+            {
+               allcaps = allcaps.substring(1);
+            }
+
+            if (allcapspl.startsWith("\\"))
+            {
+               allcapspl = allcapspl.substring(1);
+            }
+
+            addGlsLikeFamily(options, prefix, singular, plural, 
+              sentence, sentencepl, allcaps, allcapspl);
          }
          else if (name.equals("@glsxtr@multientry"))
          {
@@ -2223,6 +2381,8 @@ public class Bib2Gls implements TeXApp
          }
       }
 
+      updateGlsLikeFamilies();
+
       provideCommand("glspluralsuffix", pluralSuffix);
       provideCommand("abbrvpluralsuffix", shortPluralSuffix);
       provideCommand("acrpluralsuffix", acrPluralSuffix);
@@ -2573,24 +2733,219 @@ public class Bib2Gls implements TeXApp
    // identify commands that have been defined with \@glsxtrnewgls
    public boolean isGlsLike(String csname)
    {
-      if (glsLike == null) return false;
+      if (glsLikeMap == null) return false;
 
-      return glsLike.get(csname) != null;
+      return glsLikeMap.get(csname) != null;
    }
 
    public void addGlsLike(String prefix, String csname)
    {
-      if (glsLike == null)
+      if (glsLikeMap == null)
       {
-         glsLike = new HashMap<String,String>();
+         glsLikeMap = new HashMap<String,GlsLike>();
       }
 
-      glsLike.put(csname, prefix);
+      GlsLike gl = new GlsLike(prefix, csname);
+
+      glsLikeMap.put(csname, gl);
+   }
+
+   public GlsLike getGlsLike(String csname)
+   {
+      return glsLikeMap == null ? null : glsLikeMap.get(csname);
    }
 
    public String getGlsLikePrefix(String csname)
    {
-      return glsLike == null ? null : glsLike.get(csname);
+      GlsLike gl = getGlsLike(csname);
+
+      return gl == null ? null : gl.getPrefix();
+   }
+
+   private void updateGlsLikeFamilies()
+   {
+      if (glsLikeMap != null && glsLikeFamilies != null)
+      {
+         for (Iterator<String> it=glsLikeMap.keySet().iterator(); it.hasNext(); )
+         {
+            String csname = it.next();
+
+            GlsLike gl = glsLikeMap.get(csname);
+
+            if (gl.getFamily() == null)
+            {
+               for (GlsLikeFamily fam : glsLikeFamilies)
+               {
+                  if (fam.hasMember(csname))
+                  {
+                     gl.setFamily(fam);
+                     break;
+                  }
+               }
+            }
+         }
+      }
+      else if (glsLikeMap == null)
+      {
+         glsLikeMap = new HashMap<String,GlsLike>();
+      }
+
+      addGlsFamily("gls", "glspl", "Gls", "Glspl", "GLS", "GLSpl");
+
+      // treat \gls as \glstext etc
+      for (Iterator<String> it=glsLikeMap.keySet().iterator(); it.hasNext(); )
+      {
+         String csname = it.next();
+
+         GlsLike gl = glsLikeMap.get(csname);
+
+         GlsLikeFamily fam = gl.getFamily();
+
+         if (fam == null)
+         { 
+            interpreter.putControlSequence(true, new GlsEntryFieldValue(
+              gl.getName(), "text", CaseChange.NO_CHANGE, this, gl.getPrefix()));
+         }
+         else
+         {
+            String field = fam.isPlural(csname) ? "plural" : "text";
+
+            interpreter.putControlSequence(true, new GlsEntryFieldValue(
+              csname, field, fam.getMemberCase(csname), this, gl.getPrefix()));
+         }
+      }
+   }
+
+   private void addGlsFamily(String singular, String plural,
+     String sentence, String sentencepl, String allcaps, String allcapspl)
+   {
+      GlsLikeFamily fam = new GlsLikeFamily();
+      fam.setSingular(singular);
+      fam.setPlural(plural);
+      fam.setSentence(sentence);
+      fam.setSentencePlural(sentencepl);
+      fam.setAllCaps(allcaps);
+      fam.setAllCapsPlural(allcapspl);
+
+      GlsLike gl = new GlsLike("", singular);
+      gl.setFamily(fam);
+      glsLikeMap.put(singular, gl);
+
+      gl = new GlsLike("", plural);
+      gl.setFamily(fam);
+      glsLikeMap.put(plural, gl);
+
+      gl = new GlsLike("", sentence);
+      gl.setFamily(fam);
+      glsLikeMap.put(sentence, gl);
+
+      gl = new GlsLike("", sentencepl);
+      gl.setFamily(fam);
+      glsLikeMap.put(sentencepl, gl);
+
+      gl = new GlsLike("", allcaps);
+      gl.setFamily(fam);
+      glsLikeMap.put(allcaps, gl);
+
+      gl = new GlsLike("", allcapspl);
+      gl.setFamily(fam);
+      glsLikeMap.put(allcapspl, gl);
+   }
+
+   private GlsLikeFamily findGlsLikeFamily(String options, String prefix, 
+     String singular, String plural,
+     String sentence, String sentencepl,
+     String allcaps, String allcapspl)
+   {
+      GlsLikeFamily family = null;
+
+      if (glsLikeFamilies != null)
+      {
+         for (GlsLikeFamily f : glsLikeFamilies)
+         {
+            if (options.equals(f.getOptions()) && prefix.equals(f.getPrefix()))
+            {
+               boolean match = true;
+
+               if ((!singular.isEmpty() && f.hasSingular())
+                || (!plural.isEmpty() && f.hasPlural())
+                || (!sentence.isEmpty() && f.hasSentence())
+                || (!sentencepl.isEmpty() && f.hasSentencePlural())
+                || (!allcaps.isEmpty() && f.hasAllCaps())
+                || (!allcapspl.isEmpty() && f.hasAllCapsPlural())
+                  )
+               {
+                  match = false;
+               }
+
+               if (match)
+               {
+                  break;
+               }
+            }
+         }
+      }
+
+      return family;
+   }
+
+   // commands identified in aux file with \@glsxtr@newglslikefamily
+   public void addGlsLikeFamily(String options, String prefix, String singular, String plural,
+     String sentence, String sentencepl,
+     String allcaps, String allcapspl)
+   {
+      GlsLikeFamily fam = null;
+
+      if (glsLikeFamilies == null)
+      {
+         glsLikeFamilies = new Vector<GlsLikeFamily>();
+      }
+      else if (singular.isEmpty() || plural.isEmpty() 
+               || sentence.isEmpty() || sentencepl.isEmpty()
+               || allcaps.isEmpty() || allcapspl.isEmpty())
+      {
+         fam = findGlsLikeFamily(options, prefix, singular, plural, sentence, sentencepl, allcaps, allcapspl);
+      }
+
+      if (fam == null)
+      {
+         fam = new GlsLikeFamily();
+
+         fam.setOptions(options);
+         fam.setPrefix(prefix);
+
+         glsLikeFamilies.add(fam);
+      }
+
+      if (!singular.isEmpty())
+      {
+         fam.setSingular(singular);
+      }
+
+      if (!plural.isEmpty())
+      {
+         fam.setPlural(plural);
+      }
+
+      if (!sentence.isEmpty())
+      {
+         fam.setSentence(sentence);
+      }
+
+      if (!sentencepl.isEmpty())
+      {
+         fam.setSentencePlural(sentencepl);
+      }
+
+      if (!allcaps.isEmpty())
+      {
+         fam.setAllCaps(allcaps);
+      }
+
+      if (!allcapspl.isEmpty())
+      {
+         fam.setAllCapsPlural(allcapspl);
+      }
    }
 
    // is the given field likely to occur in link text?
@@ -5861,7 +6216,9 @@ public class Bib2Gls implements TeXApp
      "userii", "useriii", "useriv", "userv", "uservi"
     };
 
-   private HashMap<String,String> glsLike;
+   private HashMap<String,GlsLike> glsLikeMap;
+
+   private Vector<GlsLikeFamily> glsLikeFamilies;
 
    private HashMap<String,String> fieldMap;
 
