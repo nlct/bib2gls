@@ -49,6 +49,7 @@ import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 import com.dickimawbooks.texparserlib.latex.AtSecondOfTwo;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
 import com.dickimawbooks.texparserlib.latex.textcase.MakeTextLowercase;
@@ -961,12 +962,13 @@ public class Bib2Gls implements TeXApp
             }
          }
 
-         public void parsePackageFile(LaTeXSty sty) throws IOException
+         @Override
+         public void parsePackageFile(LaTeXSty sty, TeXObjectList stack) throws IOException
          {
             if (isParsePackageSupportOn() 
                  && customPackages.contains(sty.getName()))
             {
-               sty.parseFile();
+               sty.parseFile(stack);
             }
          }
 
@@ -1029,10 +1031,10 @@ public class Bib2Gls implements TeXApp
       // if it doesn't already exist.
 
       listener.putControlSequence(new NewCommand("renewcommand",
-        NewCommand.OVERWRITE_ALLOW));
+        Overwrite.ALLOW));
 
       listener.putControlSequence(new NewCommand("glsxtrprovidecommand",
-        NewCommand.OVERWRITE_ALLOW));
+        Overwrite.ALLOW));
 
       listener.putControlSequence(new MakeTextUppercase("bibglsuppercase"));
       listener.putControlSequence(new MakeTextLowercase("bibglslowercase"));
@@ -5787,8 +5789,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220516";
-   public static final String DATE = "2022-05-16";
+   public static final String VERSION = "3.0.20220617";
+   public static final String DATE = "2022-06-17";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
