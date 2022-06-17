@@ -79,6 +79,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="syntax.expand.fields">{0}	Allow field expansion to occur when LaTeX inputs the glstex file.</entry>
 <entry key="syntax.provide.glossaries">{0}	Define any unknown glossaries with \provideignoredglossary*.</entry>
 
+<!-- These are messages used by the TeX Parser Library -->
 <entry key="message.reading">Reading {0}</entry>
 <entry key="message.writing">Writing {0}</entry>
 <entry key="message.no.read">No read access for {0}</entry>
@@ -87,6 +88,9 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.processing">Processing {0}</entry>
 <entry key="message.copying">Copying {0} -&gt; {1}</entry>
 <entry key="message.moving">Moving {0} -&gt; {1}</entry>
+<entry key="message.charset">Encoding: {0}</entry>
+
+<!-- bib2gls messages -->
 <entry key="message.repruning">Pruning iteration {0}/{1}</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.pruned">Entry {0}: pruned cross-reference ({1}): {2}</entry>
@@ -196,7 +200,6 @@ into explicit range {1}</entry>
 Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
-<entry key="message.charset">Encoding: {0}</entry>
 <entry key="message.detected.charset">Detected encoding: {0}</entry>
 <entry key="message.default.charset">Default encoding: {0}</entry>
 <entry key="message.null">not set</entry>
@@ -259,8 +262,14 @@ Defaulting to: {0}.
 <entry key="grouptitle.case.ij">IJ</entry>
 
 <entry key="warning.title">Warning: {0}</entry>
+
+<!-- These are warning strings from the TeX Parser Library -->
 <entry key="warning.substituting">Substituting {0} with {1}</entry>
 <entry key="warning.removing">Removing {0}</entry>
+<entry key="warning.unsupported.image.type">Unsupported image type {0}</entry>
+<entry key="warning.unsupported.generic">Not supported: {0}</entry>
+
+<!-- bib2gls warnings -->
 <entry key="warning.cant.parse.file">Can''t parse {0}
 {1}</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
