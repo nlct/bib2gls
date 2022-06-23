@@ -258,6 +258,24 @@ Add B<group> field to entries.
 
 Don't add B<group> field to entries (default).
 
+=item B<--record-count-rule> I<rule> or B<-r> I<rule>
+
+Sets the rule used by B<--record-count> and B<--record-count-unit>.
+This option automatically implements B<--record-count>.
+
+The I<rule> may be: C<all> or C<a> (count all records), 
+C<non-ignored> or C<n> (count all non-ignored records), 
+C<f/>I<regex>C</> (only count records where the format 
+matches the regular expression I<regex>),
+C<c/>I<regex>C</> (only count records where the counter name 
+matches the regular expression I<regex>),
+or C<f/>I<regex1>C</c/>I<regex2>C</>I<op> (only count records where the format 
+matches the regular expression I<regex1> and/or the counter name 
+matches the regular expression I<regex2>). The I<op> part is
+optional. If present it may be one of: C<and> (format AND counter
+must match), C<or> (format OR counter must match). If I<op> is
+omitted, AND is assumed.
+
 =item B<--record-count> or B<-c>
 
 Add record count fields to entries.

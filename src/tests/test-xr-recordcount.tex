@@ -1,0 +1,23 @@
+% arara: pdflatex
+% arara: bib2gls: { recordcount: true }
+% arara: pdflatex
+\documentclass{book}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources
+
+\begin{document}
+\mainmatter
+\chapter{Sample}
+
+\gls{sample2}.
+
+\forallglsentries{\thisentry}{\thisentry:
+\glsxtrusefield{\thisentry}{recordcount}. }
+
+\backmatter
+\GlsXtrSetDefaultNumberFormat{glsignore}
+\printunsrtglossaries
+
+\end{document}

@@ -411,16 +411,22 @@ public class Bib2GlsEntry extends BibEntry
          {
             String csname = ((TeXCsRef)object).getName();
 
-            String glsLikeLabelPrefix = bib2gls.getGlsLikePrefix(csname);
+            GlsLike glsLike = bib2gls.getGlsLike(csname);
+
+            boolean isGlslike = (glsLike != null);
+
+            String glsLikeLabelPrefix = (glsLike == null ? null : glsLike.getPrefix());
 
             boolean found = false;
 
-            boolean mglslike = bib2gls.isMglsCs(csname);
+            boolean mglslike = false;
+
+            if (!isGlslike)
+            {
+               mglslike = bib2gls.isMglsCs(csname);
+            }
 
             csname = csname.toLowerCase();
-
-            boolean glslike =
-              !mglslike && (glsLikeLabelPrefix != null || csname.matches("dgls(pl)?"));
 
             try
             {
@@ -569,7 +575,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   addDependency(label);
                }
-               else if (isGlsCsOptLabel(csname) || glslike || mglslike)
+               else if (isGlslike || mglslike || isGlsCsOptLabel(csname))
                {
                   found = (i==0);
 
@@ -684,23 +690,21 @@ public class Bib2GlsEntry extends BibEntry
                   }
                   else
                   {
-                     if (!glslike)
+                     String newLabel = processLabel(label, true);
+
+                     if (!label.equals(newLabel))
                      {
-                        String newLabel = processLabel(label, true);
+                        label = newLabel;
 
-                        if (!label.equals(newLabel))
+                        for ( ; i > start; i--)
                         {
-                           label = newLabel;
-
-                           for ( ; i > start; i--)
-                           {
-                              list.remove(i);
-                           }
-
-                           list.set(i, parser.getListener().createGroup(label));
+                           list.remove(i);
                         }
+
+                        list.set(i, parser.getListener().createGroup(label));
                      }
-                     else if (glsLikeLabelPrefix != null)
+
+                     if (glsLikeLabelPrefix != null)
                      {
                         label = glsLikeLabelPrefix+label;
                      }

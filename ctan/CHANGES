@@ -9,6 +9,10 @@ v3.0 (pending):
   * added support for \glsxtridentifyglsfamily (glossaries-extra
     v1.49+)
 
+   * new switch --record-count-rule (or -r) which may be used to
+     determine whether or not certain types of records (such as
+     ignored records) should be included in the record count.
+
   * issue #15: loc-prefix and type leads to undefined \bibglslocprefix with multiple glossaries
     https://github.com/nlct/bib2gls/issues/15
 

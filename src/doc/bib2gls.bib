@@ -959,6 +959,43 @@
   category={command}
 }
 
+@bibglscommand{bibglssettotalrecordcount,
+  name={\csfmt{bib\-gls\-set\-total\-record\-count}},
+  user1={\margm{entry-label}\margm{value}},
+  description={sets the total record count for the given entry},
+  topics={assigncommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetrecordcount,
+  name={\csfmt{bib\-gls\-set\-record\-count}},
+  user1={\margm{entry-label}\margm{counter}\margm{value}},
+  description={sets the \meta{counter} record count for the given entry},
+  topics={assigncommands},
+  note={\bibgls},
+  category={command}
+}
+
+@bibglscommand{bibglssetlocationrecordcount,
+  name={\csfmt{bib\-gls\-set\-location\-record\-count}},
+  user1={\margm{entry-label}\margm{counter}\margm{location}\margm{value}},
+  description={sets the location record count for the given entry},
+  topics={assigncommands},
+  note={\bibgls},
+  category={command}
+}
+
+@glscommand{glsxtrdetoklocation,
+  name={\csfmt{gls\-xtr\-de\-tok\-location}},
+  user1={\margm{location}},
+  description={may be used to detokenize problematic locations, but
+just does its argument by default},
+  note={\styfmt{glossaries-extra} v1.21+},
+  topic={assigncommands},
+  category={command}
+}
+
 @bibglscommand{bibglslocationgroup,
   name={\csfmt{bib\-gls\-location\-group}},
   user1={\margm{n}\margm{counter}\margm{list}},
@@ -10175,6 +10212,14 @@ primary formats, if enabled.},
   parent={commandlineoptions}
 }
 
+@switch{switch.record-count-rule,
+  name={\longargfmt{record\dhyphen count\dhyphen rule}},
+  symbol={\shortargfmt{r}},
+  user1={\marg{rule}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
 @switch{switch.record-count,
   name={\longargfmt{record\dhyphen count}},
   symbol={\shortargfmt{c}},
@@ -13504,7 +13549,7 @@ letter to \idx{uppercase}},
 @glsaddoption{glsadd.format,
   name={\csoptfmt{format}},
   user1={\margm{encap}},
-  description={sets the \gls{encap} for the record to 
+  description={sets the \idx{encap} for the record to 
   \meta{encap}, optionally with the start or end range markers},
   category={commandoption},
   note={\styfmt{glossaries}},
@@ -15348,7 +15393,7 @@ abbreviation by the \catattr{markwords} attribute},
   name={\csoptfmt{format}},
   user1={\margm{encap}},
   category={commandoption},
-  description={sets the \gls{encap} for the record to 
+  description={sets the \idx{encap} for the record to 
   \meta{encap}, optionally with the start or end range markers},
   note={\styfmt{glossaries}},
   parent={glslink}
@@ -17159,7 +17204,7 @@ name} and the displayed \meta{text}},
 @glscommand{glsxtrglossentryother,
   name={\csfmt{gls\-xtr\-gloss\-entry\-other}},
   user1={\margm{header}\margm{label}\margm{field}},
-  description={like \gls{glsxtrglossentry} but uses the value given
+  description={like \cs{glsxtrglossentry} but uses the value given
 in the supplied internal \meta{field} where \meta{header} is the
 code
 to use in the header (leave empty for default)},
@@ -17479,8 +17524,8 @@ to use in the header (leave empty for default)},
 
 @glscommand{GlsXtrStandaloneGlossaryType,
   name={\csfmt{Gls\-Xtr\-Stand\-alone\-Glossary\-Type}},
-  description={expands to the label for \gls{currentglossary}
-   within \gls{glsxtrglossentry} and \gls{glsxtrglossentryother}},
+  description={expands to the label for \ics{currentglossary}
+   within \ics{glsxtrglossentry} and \ics{glsxtrglossentryother}},
   topics={hooks,glossrefs,standalonestyles},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
@@ -17489,8 +17534,8 @@ to use in the header (leave empty for default)},
 @glscommand{GlsXtrStandaloneSubEntryItem,
   name={\csfmt{Gls\-Xtr\-Stand\-alone\-Sub\-Entry\-Item}},
   user1 = {\margm{label}},
-  description={used within \gls{glsxtrglossentry} and
-\gls{glsxtrglossentryother} to display sub-item labels},
+  description={used within \ics{glsxtrglossentry} and
+\ics{glsxtrglossentryother} to display sub-item labels},
   topics={hooks,glossarystylecommands},
   note={\styfmt{glossaries-extra} v1.31+},
   category={command}
@@ -17499,7 +17544,7 @@ to use in the header (leave empty for default)},
 @glscommand{GlsXtrStandaloneEntryName,
   name={\csfmt{Gls\-Xtr\-Stand\-alone\-Entry\-Name}},
   user1 = {\margm{label}},
-  description={used within \gls{glsxtrglossentry} to
+  description={used within \ics{glsxtrglossentry} to
    display the name (with a hypertarget, if supported)},
   topics={hooks,glossarystylecommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries-extra} v1.37+},
@@ -17509,7 +17554,7 @@ to use in the header (leave empty for default)},
 @glscommand{GlsXtrStandaloneEntryOther,
   name={\csfmt{Gls\-Xtr\-Stand\-alone\-Entry\-Other}},
   user1 = {\margm{label}\margm{field}},
-  description={used within \gls{glsxtrglossentryother} to
+  description={used within \ics{glsxtrglossentryother} to
    display the given field value (with a hypertarget, if supported)},
   topics={hooks,glossarystylecommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries-extra} v1.37+},

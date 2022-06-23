@@ -179,6 +179,7 @@
   },
   dual-prefix={},
   dual-type={main},
+  ext-prefixes={},
   combine-dual-locations={primary},
   selection={recorded and deps and see not also},
   symbol-sort-fallback={name},
@@ -241,6 +242,7 @@ documents}}
 % ignore locations outside of main matter
 \GlsXtrSetDefaultNumberFormat{glsignore}
 
+\GlsXtrSetPlusModifier{format=glsnumberformat}
 \GlsXtrSetAltModifier{!}{format=glsignore}
 
 \newcommand{\frontmatter}{%
@@ -3700,6 +3702,12 @@ number of records found for the entry;
 number of records found for the entry for the given counter.
 \end{itemize}
 These fields can then be used with the \gls{rgls}-like commands.
+
+This option is governed by the \longarg{record-count-rule}, which
+can be used to exclude certain types of records from the count. The
+default rule is \optfmt{all}, which includes all
+\idxpl{ignoredrecord}.
+
 The default behaviour of
 \nosecdef{rgls}
 is to check the \field{recordcount} field against the \catattr{recordcount}
@@ -3758,7 +3766,8 @@ Switch off record counting. (Default.)
 Automatically implements \longarg{record-count} and additionally
 sets the \field{recordcount.counter.location} fields.
 These fields can then be used with the \gls{rgls}-like
-commands.
+commands. This option is governed by \longarg{record-count-rule},
+to determine which records should be counted.
 
 \argsection{no-record-count-unit}
 
@@ -3766,6 +3775,44 @@ Switches off unit record counting. (Default.)
 Note that you need \longarg{no-record-count} to completely
 switch off record counting.
 
+\argsection{record-count-rule}
+
+Automatically implements \longarg{record-count} and sets the rule
+that determines which records should contribute to the count.
+The \meta{rule} may be one of:
+\begin{itemize}
+\item \code{all} or \code{a}: these keywords indicate that all
+records should be included in the count (default).
+\item \code{non-ignored} or \code{n}: these keywords indicate that 
+\idxpl{ignoredrecord} should be excluded in the count.
+\item \code{c/\meta{regex}/}: only records where the associated
+counter name matches the regular expression \meta{regex} should be
+included in the count.
+\item \code{f/\meta{regex}/}: only records where the associated
+format matches the regular expression \meta{regex} should be
+included in the count.
+\item \code{f/\meta{format-regex}/c/\meta{counter-regex}/\meta{op}}: 
+this combines the format and counter name match. The trailing
+\meta{op} is optional. If present, it should be one of the keywords: 
+\code{and} (boolean AND) or \code{or} (boolean OR). If omitted, 
+\code{and} is assumed.
+\end{itemize}
+
+For example:
+\begin{verbatim}
+bib2gls --record-count-rule 'f/.*(bf|it)/c/(sub)?section/or' myDoc
+\end{verbatim}
+This will only count records where the format matches the regular
+expression \code{.*(bf|it)} (for example, \code{hyperbf} or
+\code{hyperit}) or the counter name matches \code{section} or
+\code{subsection} (but not \code{subsubsection}, since the
+expressions are anchored).
+
+This syntax doesn't permit the use of the sequence \code{/c/}
+appearing in the regular expressions, but both the format and
+counter name are either control sequence names or are a substring of
+a control sequence name, so they should typically just be
+alphabetical strings.
 \argsection{retain-formats}
 
 It's possible that you may not want to lose certain \gls{location}
@@ -20295,6 +20342,44 @@ field using:
 (before \gls{GlsXtrLoadResources}).
 
 \section{Other}
+
+\cssection{bibglssettotalrecordcount}
+
+\formatdef{bibglssettotalrecordcount}
+This command is provided if \longarg{record-count} is used. It's
+used to set the \field{recordcount} field to the total number of
+records for the given entry. This is defined as:
+\begin{codeenv}
+\cmd{providecommand}*\marg{\gls{bibglssettotalrecordcount}}[2]\marg{\comment{}
+ \cs{GlsXtrSetField}\marg{\idx{param}1}\marg{\field{recordcount}}\marg{\idx{param}2}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglssetrecordcount}
+
+\formatdef{bibglssetrecordcount}
+This command is provided if \longarg{record-count} is used. It's
+used to set the \field{recordcount.counter} field to the total number of
+records associated with the given counter for the given entry. This
+is defined as:
+\begin{codeenv}
+\cmd{providecommand}*\marg{\gls{bibglssetrecordcount}}[3]\marg{\comment{}
+ \cs{GlsXtrSetField}\marg{\idx{param}1}\marg{recordcount.\idx{param}2}\marg{\idx{param}3}\comment{}
+}
+\end{codeenv}
+
+\cssection{bibglssetlocationrecordcount}
+
+\formatdef{bibglssetlocationrecordcount}
+This command is provided if \longarg{record-count-unit} is used.
+It's used to set the \field{recordcount.counter.location} field to
+the total number of records associated with the given location for
+the given entry. This is defined as:
+\begin{codeenv}
+\cmd{providecommand}*\marg{\gls{bibglssetlocationrecordcount}}[4]\marg{\comment{}
+ \cs{GlsXtrSetField}\marg{\idx{param}1}\marg{recordcount.\idx{param}2.\ics{glsxtrdetoklocation}\idx{param}3}\marg{\idx{param}4}\comment{}
+}
+\end{codeenv}
 
 \cssection{bibglshyperlink}
 

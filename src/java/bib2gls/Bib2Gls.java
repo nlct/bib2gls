@@ -941,6 +941,7 @@ public class Bib2Gls implements TeXApp
       L2HStringConverter listener = new L2HStringConverter(
          new Bib2GlsAdapter(this), data, customPackages != null)
       {
+         @Override
          public void writeCodePoint(int codePoint) throws IOException
          {
             if (getWriter() == null) return;
@@ -2659,6 +2660,11 @@ public class Bib2Gls implements TeXApp
       return dependencies == null ? null : dependencies.iterator();
    }
 
+   public boolean isIgnored(GlsRecord record)
+   {
+      return isIgnoredFormat(record.getFormat());
+   }
+
    private boolean isIgnoredFormat(String fmt)
    {
       return fmt.equals("glsignore") || fmt.equals("glstriggerrecordformat");
@@ -3631,14 +3637,17 @@ public class Bib2Gls implements TeXApp
 
       GlsRecord key = getRecordCountKey(record);
 
-      if (key == null)
+      if (recordCountRule.isAllowed(record))
       {
-         recordCount.put(record, Integer.valueOf(1));
-      }
-      else
-      {
-         Integer val = recordCount.get(key);
-         recordCount.put(key, Integer.valueOf(val+1));
+         if (key == null)
+         {
+            recordCount.put(record, Integer.valueOf(1));
+         }
+         else
+         {
+            Integer val = recordCount.get(key);
+            recordCount.put(key, Integer.valueOf(val+1));
+         }
       }
    }
 
@@ -4873,6 +4882,9 @@ public class Bib2Gls implements TeXApp
       printSyntaxItem(getMessage("syntax.merge.wrglossary.records", 
         "--[no-]merge-wrglossary-records"));
 
+      printSyntaxItem(getMessage("syntax.record.count.rule",
+         "--record-count-rule", "-r"));
+
       printSyntaxItem(getMessage("syntax.record.count",
          "--[no-]record-count", "-c"));
 
@@ -5295,6 +5307,8 @@ public class Bib2Gls implements TeXApp
       String auxFileName = null;
       String logName = null;
       boolean provideknownGlossaries=false;
+
+      recordCountRule = new RecordCountRule(this);
 
       Object[] argVal = new Object[2];
 
@@ -5790,6 +5804,19 @@ public class Bib2Gls implements TeXApp
          {
             addGroupField = false;
          }
+         else if (isArg(args[i], "r", "record-count-rule"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            if (argVal[1] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            recordCountRule.setRule((String)argVal[1]);
+            saveRecordCount = true;
+         }
          else if (args[i].equals("--record-count") || args[i].equals("-c"))
          {
             saveRecordCount = true;
@@ -6144,8 +6171,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220617";
-   public static final String DATE = "2022-06-17";
+   public static final String VERSION = "3.0.20220623";
+   public static final String DATE = "2022-06-23";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -6306,6 +6333,8 @@ public class Bib2Gls implements TeXApp
    private Vector<String> dependencies = null;
 
    private HashMap<String,String> kpsewhichResults;
+
+   private RecordCountRule recordCountRule;
 
    private int exitCode;
 
