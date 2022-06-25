@@ -75,6 +75,20 @@ public class GlsRecordNameRef extends GlsRecord
    }
 
    @Override
+   public void merge(String newFmt, GlsRecord otherRecord)
+   {
+      super.merge(newFmt, otherRecord);
+
+      if (otherRecord instanceof GlsRecordNameRef)
+      {
+         GlsRecordNameRef namerefRec = (GlsRecordNameRef)otherRecord;
+         title = namerefRec.title;
+         href = namerefRec.href;
+         hcounter = namerefRec.hcounter;
+      }
+   }
+
+   @Override
    public String getFmtTeXCode(String theLocation)
    {
       String fmt = getFormat();
@@ -103,7 +117,9 @@ public class GlsRecordNameRef extends GlsRecord
 
    public boolean locationMatch(GlsRecord record)
    {
-      if (bib2gls.mergeNameRefOnLocation())
+      if (bib2gls.mergeNameRefOnLocation()
+          || (bib2gls.mergeWrGlossaryLocations() 
+            && getCounter().equals("wrglossary")))
       {
          return super.locationMatch(record);
       }
@@ -132,6 +148,12 @@ public class GlsRecordNameRef extends GlsRecord
 
    public boolean equals(Object obj)
    {
+      if (bib2gls.mergeWrGlossaryLocations() 
+            && getCounter().equals("wrglossary"))
+      {
+         return super.equals(obj);
+      }
+
       if (!super.equals(obj))
       {
          return false;
@@ -150,7 +172,9 @@ public class GlsRecordNameRef extends GlsRecord
     */ 
    public boolean partialMatch(GlsRecord record)
    {
-      if (bib2gls.mergeNameRefOnLocation() 
+      if (bib2gls.mergeNameRefOnLocation()
+           || (bib2gls.mergeWrGlossaryLocations() 
+                && getCounter().equals("wrglossary"))
            || !(record instanceof GlsRecordNameRef))
       {
          return super.partialMatch(record);

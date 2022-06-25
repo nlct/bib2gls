@@ -2188,8 +2188,7 @@ public class Bib2Gls implements TeXApp
                           existingPrefix+existingFmt, newPrefix+newFmt, 
                           newPrefix+existingFmt);
 
-                        newRecord.setFormat(newPrefix+existingFmt);
-                        newRecord.setLocation(existingRecord.getLocation());
+                        newRecord.merge(newPrefix+existingFmt, existingRecord);
                         records.add(newRecord);
                      }
                   }
@@ -2229,8 +2228,7 @@ public class Bib2Gls implements TeXApp
                         logAndPrintMessage();
                      }
 
-                     existingRecord.setFormat(newPrefix+newFmt);
-                     existingRecord.setLocation(newRecord.getLocation());
+                     existingRecord.merge(newPrefix+newFmt, newRecord);
                   }
                   else if (isIgnoredFormat(newFmt))
                   {// discard the new record
@@ -2258,8 +2256,7 @@ public class Bib2Gls implements TeXApp
                         logAndPrintMessage();
                      }
 
-                     existingRecord.setFormat(newPrefix+newFmt);
-                     existingRecord.setLocation(newRecord.getLocation());
+                     existingRecord.merge(newPrefix+newFmt, newRecord);
                   } 
                   else if (newFmt.equals("glsnumberformat"))
                   {// discard the new record
@@ -2287,8 +2284,7 @@ public class Bib2Gls implements TeXApp
                          logAndPrintMessage();
                      }
 
-                     existingRecord.setFormat(newPrefix+newFmt);
-                     existingRecord.setLocation(newRecord.getLocation());
+                     existingRecord.merge(newPrefix+newFmt, newRecord);
                   } 
                   else
                   {
@@ -2324,8 +2320,7 @@ public class Bib2Gls implements TeXApp
                            logAndPrintMessage();
                         }
 
-                        existingRecord.setFormat(newPrefix+newFmt);
-                        existingRecord.setLocation(newRecord.getLocation());
+                        existingRecord.merge(newPrefix+newFmt, newRecord);
                      }
                      else if (existingMap != null && newMap != null
                               && existingMap.equals(newMap))
@@ -2349,8 +2344,7 @@ public class Bib2Gls implements TeXApp
                            logAndPrintMessage();
                         }
 
-                        existingRecord.setFormat(newPrefix+newMap);
-                        existingRecord.setLocation(newRecord.getLocation());
+                        existingRecord.merge(newPrefix+newMap, newRecord);
                      }
                      else
                      {
@@ -6171,8 +6165,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220623";
-   public static final String DATE = "2022-06-23";
+   public static final String VERSION = "3.0.20220625";
+   public static final String DATE = "2022-06-25";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

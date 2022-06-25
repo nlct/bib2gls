@@ -300,6 +300,12 @@ public class GlsRecord implements Comparable<GlsRecord>
       location = newLocation;
    }
 
+   public void merge(String newFmt, GlsRecord otherRecord)
+   {
+      setFormat(newFmt);
+      setLocation(otherRecord.getLocation());
+   }
+
    // v1.8+ now uses the same code for each element in location and
    // loclist fields.
    public String getListTeXCode()

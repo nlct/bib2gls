@@ -58,6 +58,8 @@ v3.0 (pending):
     - prune-seealso-match
     - prune-iterations
 
+  * bug fix: nameref records not merging for wrglossary counter
+
 v2.9 (2021-11-22):
 
   * Support for \multiglossaryentry (new to glossaries-extra v1.48)

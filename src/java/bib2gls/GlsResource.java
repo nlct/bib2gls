@@ -3858,10 +3858,10 @@ public class GlsResource
       if (!dualSortSettings.getSortField().equals("sort"))
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
-           "dual-sort"));
+           "dual-sort-field"));
       }
 
-      if (!"locale".equals(sortSettings.getMethod()))
+      if (!"doc".equals(sortSettings.getMethod()))
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
            "sort"));
@@ -3870,7 +3870,7 @@ public class GlsResource
       if (!sortSettings.getSortField().equals("sort"))
       {
          bib2gls.warning(bib2gls.getMessage("warning.option.clash", "master", 
-           "sort"));
+           "sort-field"));
       }
 
       if (bibCharset != null)
@@ -12989,8 +12989,15 @@ public class GlsResource
             }
          }
 
+         String famPrefix = fam.getPrefix();
+
+         if (famPrefix == null)
+         {
+            famPrefix = "";
+         }
+
          String def = String.format("\\glsdisp[%s]{%s#2}{\\%s{%s#2}}", 
-           options, fam.getPrefix(), titlecs, fam.getPrefix());
+           options, famPrefix, titlecs, famPrefix);
 
          titleCaseCommands.put(titlecasename, def);
 
@@ -13003,7 +13010,7 @@ public class GlsResource
             defList.add(optsObj, true);
             defList.add(listener.getOther(']'));
 
-            Group grp = listener.createGroup(fam.getPrefix());
+            Group grp = listener.createGroup(famPrefix);
             defList.add(grp);
 
             grp.add(listener.getParam(2));
@@ -13013,7 +13020,7 @@ public class GlsResource
 
             grp.add(new TeXCsRef(titlecs));
 
-            Group subgrp = listener.createGroup(fam.getPrefix());
+            Group subgrp = listener.createGroup(famPrefix);
             grp.add(subgrp);
 
             subgrp.add(listener.getParam(2));

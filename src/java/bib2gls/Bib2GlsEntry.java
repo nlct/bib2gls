@@ -690,23 +690,43 @@ public class Bib2GlsEntry extends BibEntry
                   }
                   else
                   {
-                     String newLabel = processLabel(label, true);
-
-                     if (!label.equals(newLabel))
+                     if (glsLikeLabelPrefix != null && !glsLikeLabelPrefix.isEmpty())
                      {
-                        label = newLabel;
+                        String newLabel = processLabel(label, true);
 
-                        for ( ; i > start; i--)
+                        if (newLabel.startsWith(glsLikeLabelPrefix))
                         {
-                           list.remove(i);
+                           newLabel = newLabel.substring(glsLikeLabelPrefix.length());
                         }
 
-                        list.set(i, parser.getListener().createGroup(label));
-                     }
+                        if (!label.equals(newLabel))
+                        {
+                           for ( ; i > start; i--)
+                           {
+                              list.remove(i);
+                           }
 
-                     if (glsLikeLabelPrefix != null)
+                           list.set(i, parser.getListener().createGroup(newLabel));
+                        }
+
+                        label = glsLikeLabelPrefix+newLabel;
+                     }
+                     else
                      {
-                        label = glsLikeLabelPrefix+label;
+                        String newLabel = processLabel(label, true);
+
+                        if (!label.equals(newLabel))
+                        {
+                           label = newLabel;
+
+                           for ( ; i > start; i--)
+                           {
+                              list.remove(i);
+                           }
+
+                           list.set(i, parser.getListener().createGroup(label));
+                        }
+
                      }
 
                      if (bib2gls.getVerboseLevel() > 0)
