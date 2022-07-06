@@ -1040,7 +1040,11 @@ public class Bib2Gls implements TeXApp
 
       listener.putControlSequence(new MakeTextUppercase("bibglsuppercase"));
       listener.putControlSequence(new MakeTextLowercase("bibglslowercase"));
-      listener.putControlSequence(new MakeFirstUc("bibglsfirstuc"));
+
+      // texparserlib.jar v0.9.2.7b requires sty argument so use
+      // generic command instead
+      listener.putControlSequence(new GenericCommand(true,
+        "bibglsfirstuc", null, new TeXCsRef("makefirstuc")));
       listener.putControlSequence(new CapitaliseWords(mfirstucSty, 
         "bibglstitlecase"));
 
@@ -6165,8 +6169,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220625";
-   public static final String DATE = "2022-06-25";
+   public static final String VERSION = "3.0.20220706";
+   public static final String DATE = "2022-07-06";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
