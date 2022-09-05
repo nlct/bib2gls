@@ -976,6 +976,7 @@ public class Bib2Gls implements TeXApp
 
       };
 
+      listener.setUndefinedAction(UndefAction.WARN);
       listener.setUseMathJax(false);
       listener.setIsInDocEnv(true);
       listener.setSupportUnicodeScript(supportUnicodeSubSuperScripts);
@@ -3873,6 +3874,7 @@ public class Bib2Gls implements TeXApp
    /*
     *  TeXApp method.
     */ 
+   @Override
    public String kpsewhich(String arg)
      throws IOException,InterruptedException
    {
@@ -4118,6 +4120,7 @@ public class Bib2Gls implements TeXApp
     * TeXApp method (texparserlib.jar) needs defining,
     * but not needed for the purposes of this application.
     */ 
+   @Override
    public void epstopdf(File epsFile, File pdfFile)
      throws IOException,InterruptedException
    {
@@ -4133,6 +4136,7 @@ public class Bib2Gls implements TeXApp
     *  TeXApp method needs defining, but not needed for
     *  the purposes of this application.
     */ 
+   @Override
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException
    {
@@ -4145,12 +4149,30 @@ public class Bib2Gls implements TeXApp
    }
 
    /*
+    *  TeXApp method needs defining, but not needed for
+    *  the purposes of this application.
+    */ 
+   @Override
+   public void convertimage(int inPage, String[] inOptions, File inFile,
+     String[] outOptions, File outFile)
+     throws IOException,InterruptedException
+   {
+      if (debugLevel > 0)
+      {// shouldn't happen
+         System.err.format(
+           "Ignoring unexpected request to convert %s to %s%n",
+           inFile.toString(), outFile.toString());
+      }
+   }
+
+   /*
     *  TeXApp method. This is used by the TeX parser library
     *  when substituting deprecated commands, but this is
     *  only likely to occur when obtaining the sort value.
     *  Any deprecated commands in the bib fields will be copied
     *  to the glstex file.
     */ 
+   @Override
    public void substituting(TeXParser parser, String original, 
      String replacement)
    {
@@ -4161,6 +4183,7 @@ public class Bib2Gls implements TeXApp
     *  TeXApp method used for progress updates for long actions,
     *  such as loading datatool files, which isn't relevant here.
     */ 
+   @Override
    public void progress(int percent)
    {
    }
@@ -4169,6 +4192,7 @@ public class Bib2Gls implements TeXApp
     *  TeXApp method used for obtaining a message from a given label. 
     */ 
 
+   @Override
    public String getMessage(String label, Object... params)
    {
       if (messages == null)
@@ -4282,6 +4306,7 @@ public class Bib2Gls implements TeXApp
    /*
     *  TeXApp method for providing informational messages to the user.
     */ 
+   @Override
    public void message(String text)
    {
       if (verboseLevel >= 0)
@@ -4490,6 +4515,7 @@ public class Bib2Gls implements TeXApp
    /*
     *  TeXApp method for providing warning messages.
     */ 
+   @Override
    public void warning(TeXParser parser, String message)
    {
       if (verboseLevel >= 0)
@@ -4575,6 +4601,7 @@ public class Bib2Gls implements TeXApp
    /*
     *  TeXApp method for providing error messages.
     */ 
+   @Override
    public void error(Exception e)
    {
       if (e instanceof TeXSyntaxException)
@@ -4645,6 +4672,7 @@ public class Bib2Gls implements TeXApp
     *  directory when performing LaTeX -> LaTeX or LaTeX -> HTML
     *  actions.
     */ 
+   @Override
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException
    {
@@ -4662,6 +4690,7 @@ public class Bib2Gls implements TeXApp
     * sense to have something like \read-1 in a bib field.)
     * Just return empty string.
     */ 
+   @Override
    public String requestUserInput(String message)
      throws IOException
    {
@@ -6169,7 +6198,7 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220706";
+   public static final String VERSION = "3.0.20220905";
    public static final String DATE = "2022-07-06";
    public int debugLevel = 0;
    public int verboseLevel = 0;

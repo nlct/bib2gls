@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2021 Nicola L.C. Talbot
+    Copyright (C) 2017-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -41,15 +41,16 @@ import java.io.*;
 
 import java.net.URL;
 
-// Requires Java 1.7:
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
+import com.dickimawbooks.texparserlib.generic.UndefinedActiveChar;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
 import com.dickimawbooks.texparserlib.latex.GobbleOptMandOpt;
@@ -136,6 +137,7 @@ public class Gls2Bib extends LaTeXParserListener
       keyToFieldMap.put("shortpl", "shortplural");
    }
 
+   @Override
    public TeXApp getTeXApp()
    {
       return this;
@@ -221,7 +223,7 @@ public class Gls2Bib extends LaTeXParserListener
 
       // don't complain about redefining unknown commands
       parser.putControlSequence(new NewCommand("renewcommand",
-        NewCommand.OVERWRITE_ALLOW));
+        Overwrite.ALLOW));
 
       parser.putControlSequence(
         new GenericCommand("glslongkey", null, createString("long")));
@@ -379,20 +381,28 @@ public class Gls2Bib extends LaTeXParserListener
    }
 
    // Ignore unknown control sequences
+   @Override
    public ControlSequence createUndefinedCs(String name)
    {
       return new Undefined(name,
-       verboseLevel == SILENT ? Undefined.ACTION_IGNORE: Undefined.ACTION_WARN);
+       verboseLevel == SILENT ? UndefAction.IGNORE: UndefAction.WARN);
    }
 
    @Override
-   public void newcommand(byte overwrite,
+   public ActiveChar getUndefinedActiveChar(int charCode)
+   {
+      return new UndefinedActiveChar(charCode,
+       verboseLevel == SILENT ? UndefAction.IGNORE: UndefAction.WARN);
+   }
+
+   @Override
+   public void newcommand(boolean isRobust, Overwrite overwrite,
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {
       if (csName.equals("newdualentry") && 
-          overwrite == NewCommand.OVERWRITE_FORBID)
+          overwrite == Overwrite.FORBID)
       {
          // allow \newcommand{\newdualentry} to overwrite default
          // definition
@@ -407,39 +417,44 @@ public class Gls2Bib extends LaTeXParserListener
    }
 
    @Override
-   public void beginDocument()
+   public void beginDocument(TeXObjectList stack)
      throws IOException
    {
-      super.beginDocument();
+      super.beginDocument(stack);
 
       if (preambleOnly)
       {
-         endDocument();
+         endDocument(stack);
       }
    }
 
 
    // No write performed by parser (just gathering information)
+   @Override
    public void write(String text)
      throws IOException
    {
    }
 
+   @Override
    public void writeln(String text)
      throws IOException
    {
    }
 
+   @Override
    public void write(char c)
      throws IOException
    {
    }
 
+   @Override
    public void writeCodePoint(int codePoint)
      throws IOException
    {
    }
 
+   @Override
    public void overwithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXObject before, TeXObject after)
     throws IOException
@@ -447,6 +462,7 @@ public class Gls2Bib extends LaTeXParserListener
       debug("Ignoring \\overwithdelims");
    }
 
+   @Override
    public void abovewithdelims(TeXObject firstDelim,
      TeXObject secondDelim, TeXDimension thickness, TeXObject before,
      TeXObject after)
@@ -455,50 +471,59 @@ public class Gls2Bib extends LaTeXParserListener
       debug("Ignoring \\abovewithdelims");
    }
 
+   @Override
    public void skipping(Ignoreable ignoreable)
       throws IOException
    {
    }
 
+   @Override
    public void href(String url, TeXObject text)
       throws IOException
    {
       debug("Ignoring \\href");
    }
 
+   @Override
    public void subscript(TeXObject arg)
      throws IOException
    {
       debug("Ignoring _");
    }
 
+   @Override
    public void superscript(TeXObject arg)
      throws IOException
    {
       debug("Ignoring ^");
    }
 
-   public void includegraphics(KeyValList options, String imgName)
+   @Override
+   public void includegraphics(TeXObjectList stack, KeyValList options, String imgName)
      throws IOException
    {
       debug("Ignoring \\includegraphics");
    }
 
+   @Override
    public boolean isWriteAccessAllowed(File file)
    {
       return file.canWrite();
    }
 
+   @Override
    public boolean isWriteAccessAllowed(TeXPath path)
    {
       return path.getFile().canWrite();
    }
 
+   @Override
    public boolean isReadAccessAllowed(File file)
    {
       return file.canRead();
    }
 
+   @Override
    public boolean isReadAccessAllowed(TeXPath path)
    {
       return path.getFile().canRead();
@@ -508,6 +533,7 @@ public class Gls2Bib extends LaTeXParserListener
     *  TeXApp method. (Ignore.)
     */ 
    
+   @Override
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException
    {
@@ -519,6 +545,7 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
+   @Override
    public String requestUserInput(String message)
      throws IOException
    {
@@ -532,6 +559,7 @@ public class Gls2Bib extends LaTeXParserListener
       return "";
    }
 
+   @Override
    public String kpsewhich(String arg)
    {
       return null;
@@ -541,6 +569,7 @@ public class Gls2Bib extends LaTeXParserListener
     *  TeXApp method needs defining, but not needed for
     *  the purposes of this application.
     */ 
+   @Override
    public void epstopdf(File epsFile, File pdfFile)
      throws IOException,InterruptedException
    {
@@ -556,6 +585,7 @@ public class Gls2Bib extends LaTeXParserListener
     *  TeXApp method needs defining, but not needed for
     *  the purposes of this application.
     */ 
+   @Override
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException
    {
@@ -568,8 +598,26 @@ public class Gls2Bib extends LaTeXParserListener
    }
 
    /*
+    *  TeXApp method needs defining, but not needed for
+    *  the purposes of this application.
+    */ 
+   @Override
+   public void convertimage(int inPage, String[] inOptions, File inFile,
+     String[] outOptions, File outFile)
+     throws IOException,InterruptedException
+   {
+      if (verboseLevel >= DEBUG)
+      {// shouldn't happen
+         System.err.format(
+           "Ignoring unexpected request to convert %s to %s%n",
+           inFile.toString(), outFile.toString());
+      }
+   }
+
+   /*
     *  TeXApp method.
     */ 
+   @Override
    public void progress(int percent)
    {
    }
@@ -577,6 +625,7 @@ public class Gls2Bib extends LaTeXParserListener
    /*
     *  TeXApp method.
     */ 
+   @Override
    public void substituting(TeXParser parser, String original, 
      String replacement)
    {
@@ -588,9 +637,6 @@ public class Gls2Bib extends LaTeXParserListener
       debug(getMessage("warning.substituting", original, replacement));
    }
 
-   /*
-    *  TeXApp method. 
-    */ 
    public String getMessage(String label)
    {
       if (messages == null) return label;
@@ -611,9 +657,6 @@ public class Gls2Bib extends LaTeXParserListener
       return msg;
    }
 
-   /*
-    *  TeXApp method.
-    */ 
    public String getMessage(String label, String param)
    {
       if (messages == null)
@@ -635,9 +678,6 @@ public class Gls2Bib extends LaTeXParserListener
       return msg;
    }
 
-   /*
-    *  TeXApp method.
-    */ 
    public String getMessage(String label, String[] params)
    {
       if (messages == null)
@@ -667,6 +707,10 @@ public class Gls2Bib extends LaTeXParserListener
       return msg;
    }
 
+   /*
+    *  TeXApp method.
+    */ 
+   @Override
    public String getMessage(String label, Object... params)
    {
       if (messages == null)
@@ -773,6 +817,7 @@ public class Gls2Bib extends LaTeXParserListener
    /*
     *  TeXApp method.
     */ 
+   @Override
    public void message(String text)
    {
       if (verboseLevel != SILENT)
@@ -788,11 +833,13 @@ public class Gls2Bib extends LaTeXParserListener
          message);
    }
 
+   @Override
    public void endParse(File file)
       throws IOException
    {
    }
 
+   @Override
    public void beginParse(File file, Charset charset)
       throws IOException
    {
@@ -809,6 +856,7 @@ public class Gls2Bib extends LaTeXParserListener
       }
    }
 
+   @Override
    public Charset getCharSet()
    {
       return charset;
@@ -817,6 +865,7 @@ public class Gls2Bib extends LaTeXParserListener
    /*
     *  TeXApp method.
     */ 
+   @Override
    public void warning(TeXParser parser, String message)
    {
       if (verboseLevel != SILENT)
@@ -880,6 +929,7 @@ public class Gls2Bib extends LaTeXParserListener
    /*
     *  TeXApp method.
     */ 
+   @Override
    public void error(Exception e)
    {
       if (e instanceof TeXSyntaxException)
@@ -915,6 +965,7 @@ public class Gls2Bib extends LaTeXParserListener
     *  TeXApp method.
     */ 
    // shouldn't be needed here
+   @Override
    public float emToPt(float emValue)
    {
       warning(getParser(),
@@ -924,6 +975,7 @@ public class Gls2Bib extends LaTeXParserListener
    }
 
    // shouldn't be needed here
+   @Override
    public float exToPt(float exValue)
    {
       warning(getParser(),
@@ -965,7 +1017,7 @@ public class Gls2Bib extends LaTeXParserListener
 
    public void process() throws IOException
    {
-      requirepackage("etoolbox");
+      requirepackage("etoolbox", null);
 
       data = new Vector<GlsData>();
 
@@ -1746,8 +1798,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "2.9";
-   public static final String DATE = "2020-11-22";
+   public static final String VERSION = "2.9.20220905";
+   public static final String DATE = "2022-09-05";
    public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

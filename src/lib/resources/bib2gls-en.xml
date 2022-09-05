@@ -573,6 +573,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="latex.error.undefined_counter">No counter ''{0}'' defined</entry>
 <entry key="latex.error.multi_begin_doc">Only one \begin'{document}' permitted</entry>
 <entry key="latex.error.no_begin_doc">No \begin'{document}' found</entry>
+<entry key="latex.error.missing_begin_doc">Missing \begin'{'document'}' (unexpected content ''{0}'')</entry>
 <entry key="latex.error.multi_cls">Only one \documentclass permitted</entry>
 <entry key="latex.error.missing_key">Missing ''{0}'' key</entry>
 <entry key="latex.error.extra_end">Extra \end'{'{0}'}' found</entry>
