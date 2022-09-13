@@ -1041,6 +1041,9 @@ public class Bib2Gls implements TeXApp
 
       listener.putControlSequence(new MakeTextUppercase("bibglsuppercase"));
       listener.putControlSequence(new MakeTextLowercase("bibglslowercase"));
+      listener.putControlSequence(new MakeTextLowercase("glslowercase"));
+
+      listener.putControlSequence(new AtFirstOfOne("glsxtrrevert"));
 
       // texparserlib.jar v0.9.2.7b requires sty argument so use
       // generic command instead
@@ -1385,6 +1388,8 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(listener.createSymbol("bibglscircumchar", '^'));
       listener.putControlSequence(listener.createSymbol("glsbackslash", '\\'));
       listener.putControlSequence(listener.createSymbol("glstildechar", '~'));
+      listener.putControlSequence(listener.createSymbol("bibglsaposchar", '\''));
+      listener.putControlSequence(listener.createSymbol("bibglsdoublequotechar", '"'));
 
       listener.putControlSequence(new FlattenedPostSort());
       listener.putControlSequence(new FlattenedPreSort());
@@ -3447,7 +3452,7 @@ public class Bib2Gls implements TeXApp
          entryLabel, total);
    }
 
-   public static String replaceSpecialChars(String value)
+   public String replaceSpecialChars(String value)
    {
       StringBuilder builder = new StringBuilder();
       boolean cs = false;
@@ -3493,24 +3498,48 @@ public class Bib2Gls implements TeXApp
                cs = true;
             break;
             case '#':
-               builder.append(String.format("\\bibglshashchar ", cp));
+               builder.append("\\bibglshashchar ");
                cs = true;
             break;
             case '_':
-               builder.append(String.format("\\bibglsunderscorechar ", cp));
+               builder.append("\\bibglsunderscorechar ");
                cs = true;
             break;
             case '$':
-               builder.append(String.format("\\bibglsdollarchar ", cp));
+               builder.append("\\bibglsdollarchar ");
                cs = true;
             break;
             case '&':
-               builder.append(String.format("\\bibglsampersandchar ", cp));
+               builder.append("\\bibglsampersandchar ");
                cs = true;
             break;
             case '^':
-               builder.append(String.format("\\bibglscircumchar ", cp));
+               builder.append("\\bibglscircumchar ");
                cs = true;
+            break;
+            case '\'':
+               if (replaceQuotes)
+               {
+                  builder.append("\\bibglsaposchar ");
+                  cs = true;
+               }
+               else
+               {
+                  cs = false;
+                  builder.appendCodePoint(cp);
+               }
+            break;
+            case '"':
+               if (replaceQuotes)
+               {
+                  builder.append("\\bibglsdoublequotechar ");
+                  cs = true;
+               }
+               else
+               {
+                  cs = false;
+                  builder.appendCodePoint(cp);
+               }
             break;
             default:
                if (cs && Character.isWhitespace(cp))
@@ -3532,6 +3561,12 @@ public class Bib2Gls implements TeXApp
       if (commonCommandsDone)
       {
          return;
+      }
+
+      if (replaceQuotes)
+      {
+         writer.println("\\providecommand{\\bibglsaposchar}{\\string'}");
+         writer.println("\\providecommand{\\bibglsdoublequotechar}{\\string\"}");
       }
 
       writer.println("\\providecommand{\\bibglshashchar}{\\expandafter\\@gobble\\string\\#}");
@@ -4966,10 +5001,13 @@ public class Bib2Gls implements TeXApp
       printSyntaxItem(getMessage("syntax.force.cross.resource.refs",
          "--[no-]force-cross-resource-refs", "-x"));
 
+      printSyntaxItem(getMessage("syntax.locale", "--locale", "-l"));
+
       printSyntaxItem(getMessage("syntax.provide.glossaries",
          "--[no-]provide-glossaries"));
 
-      printSyntaxItem(getMessage("syntax.locale", "--locale", "-l"));
+      printSyntaxItem(getMessage("syntax.replace.quotes",
+        "--[no-]replace-quotes"));
 
       System.out.println();
       System.out.println(getMessage("syntax.furtherinfo"));
@@ -5663,6 +5701,14 @@ public class Bib2Gls implements TeXApp
          {
             supportUnicodeSubSuperScripts = false;
          }
+         else if (args[i].equals("--replace-quotes"))
+         {
+            replaceQuotes = true;
+         }
+         else if (args[i].equals("--no-replace-quotes"))
+         {
+            replaceQuotes = false;
+         }
          else if (args[i].equals("--collapse-same-location-range"))
          {
             collapseSamePageRange = true;
@@ -6198,8 +6244,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220905";
-   public static final String DATE = "2022-07-06";
+   public static final String VERSION = "3.0.20220913";
+   public static final String DATE = "2022-09-13";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -6362,6 +6408,8 @@ public class Bib2Gls implements TeXApp
    private HashMap<String,String> kpsewhichResults;
 
    private RecordCountRule recordCountRule;
+
+   private boolean replaceQuotes = false;
 
    private int exitCode;
 

@@ -1825,6 +1825,24 @@ name},
   category={command}
 }
 
+@bibglscommand{bibglsaposchar,
+  name={\csfmt{bib\-gls\-apos\-char}},
+  user1={},
+  description={expands to a single-quote (\idx{aposchar}) character},
+  topics={charcommands},
+  note={\bibgls\texparserdefnote},
+  category={command}
+}
+
+@bibglscommand{bibglsdoublequotechar,
+  name={\csfmt{bib\-gls\-double\-quote\-char}},
+  user1={},
+  description={expands to a double-quote (\idx{doublequotechar}) character},
+  topics={charcommands},
+  note={\bibgls\texparserdefnote},
+  category={command}
+}
+
 @bibglscommand{bibglsunderscorechar,
   name={\csfmt{bib\-gls\-under\-score\-char}},
   user1={},
@@ -10071,6 +10089,20 @@ primary formats, if enabled.},
 
 @switch{switch.no-support-unicode-script,
   name={\longargfmt{no\dhyphen support\dhyphen unicode\dhyphen script}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.replace-quotes,
+  name={\longargfmt{replace\dhyphen quotes}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.no-replace-quotes,
+  name={\longargfmt{no\dhyphen replace\dhyphen quotes}},
   user1={},
   category={switch},
   parent={commandlineoptions}

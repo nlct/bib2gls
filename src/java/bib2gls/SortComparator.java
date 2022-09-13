@@ -92,7 +92,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
          }
          else
          {
-            groupTitle = UnicodeGroupTitle.createUnicodeGroupTitle(
+            groupTitle = UnicodeGroupTitle.createUnicodeGroupTitle(bib2gls,
                codePoint, type, entry.getParent(), groupFormation);
          }
 
@@ -761,7 +761,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    {
       String value = entry.getFieldValue(sortStorageField);
 
-      entry.putField("sort", Bib2Gls.replaceSpecialChars(value));
+      entry.putField("sort", bib2gls.replaceSpecialChars(value));
    }
 
    public void sortEntries() throws Bib2GlsException

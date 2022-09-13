@@ -48,6 +48,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="syntax.custom.packages">{0} &lt;list&gt;	Instruct the interpreter to parse the listed packages.</entry>
 <entry key="syntax.list.known.packages">{0}	List the packages known to the interpreter and exit.</entry>
 <entry key="syntax.support.unicode.script">{0}	Text superscripts or subscripts will use Unicode superscript or subscript characters if possible.</entry>
+<entry key="syntax.replace.quotes">{0}	Replace single and double-quotes.</entry>
 <entry key="syntax.force.cross.resource.refs">{1}, {0}	Force cross-resource referencing mode on.</entry>
 
 <entry key="syntax.cite.as.record">{0}	Treat \citation as an ignored record.</entry>

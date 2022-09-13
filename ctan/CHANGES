@@ -13,6 +13,8 @@ v3.0 (pending):
      determine whether or not certain types of records (such as
      ignored records) should be included in the record count.
 
+   * new switch --replace-quotes
+
   * issue #15: loc-prefix and type leads to undefined \bibglslocprefix with multiple glossaries
     https://github.com/nlct/bib2gls/issues/15
 

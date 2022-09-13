@@ -22,9 +22,9 @@ import java.util.Vector;
 
 public class MergedGroupTitles extends GroupTitle
 {
-   public MergedGroupTitles(Vector<GroupTitle> titleList)
+   public MergedGroupTitles(Bib2Gls bib2gls, Vector<GroupTitle> titleList)
    {
-      super("", "", ++mergedGroupCount, null, null);
+      super(bib2gls, "", "", ++mergedGroupCount, null, null);
 
       if (titleList.size() < 2)
       {

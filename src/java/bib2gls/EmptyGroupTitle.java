@@ -20,9 +20,9 @@ package com.dickimawbooks.bib2gls;
 
 public class EmptyGroupTitle extends OtherGroupTitle
 {
-   public EmptyGroupTitle(String type, String parent)
+   public EmptyGroupTitle(Bib2Gls bib2gls, String type, String parent)
    {
-      super("", 0L, type, parent);
+      super(bib2gls, "", 0L, type, parent);
    }
 
    @Override

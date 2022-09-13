@@ -20,13 +20,13 @@ package com.dickimawbooks.bib2gls;
 
 public class UnicodeGroupTitle extends GroupTitle
 {
-   public UnicodeGroupTitle(String title, String actual, long id, String type,
+   public UnicodeGroupTitle(Bib2Gls bib2gls, String title, String actual, long id, String type,
       String parent)
    {
-      super(title, actual, id, type, parent);
+      super(bib2gls, title, actual, id, type, parent);
    }
 
-   public static UnicodeGroupTitle createUnicodeGroupTitle(int codePoint,
+   public static UnicodeGroupTitle createUnicodeGroupTitle(Bib2Gls bib2gls, int codePoint,
      String type, String parent, int groupFormation)
    {
       boolean category = (groupFormation == SortSettings.GROUP_UNICODE_CATEGORY
@@ -176,7 +176,7 @@ public class UnicodeGroupTitle extends GroupTitle
          title = title.toLowerCase();
       }
 
-      return new UnicodeGroupTitle(title, actual, id, type, parent);
+      return new UnicodeGroupTitle(bib2gls, title, actual, id, type, parent);
    }
 
    public static long getGroupId(int codePoint, int groupFormation)
@@ -249,14 +249,14 @@ public class UnicodeGroupTitle extends GroupTitle
       {
          return String.format("{%s}{%s}{%X}{%s}{%s}{%d}", 
           getTitle(),
-          Bib2Gls.replaceSpecialChars(other), 
+          bib2gls.replaceSpecialChars(other), 
           getId(), type == null ? "" : type, parent == null ? "" : parent, level);
       }
       else
       {
          return String.format("{%s}{%s}{%X}{%s}", 
           getTitle(),
-          Bib2Gls.replaceSpecialChars(other), 
+          bib2gls.replaceSpecialChars(other), 
           getId(), type == null ? "" : type);
       }
    }

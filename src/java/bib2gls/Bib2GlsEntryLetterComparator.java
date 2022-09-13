@@ -97,7 +97,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
 
       if (codePoint == -1 || value.isEmpty())
       {
-         return new EmptyGroupTitle(type, parent);
+         return new EmptyGroupTitle(bib2gls, type, parent);
       }
 
       String str = new String(Character.toChars(codePoint));
@@ -113,7 +113,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
             cp = Character.toLowerCase(cp);
          }
    
-         return new GroupTitle(grp, str, cp, type, parent);
+         return new GroupTitle(bib2gls, grp, str, cp, type, parent);
       }
 
       if (str.equals("\\") || str.equals("{") || str.equals("}"))
@@ -121,7 +121,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
          str = "\\char`\\"+str;
       }
    
-      return new OtherGroupTitle(str, codePoint, type, parent);
+      return new OtherGroupTitle(bib2gls, str, codePoint, type, parent);
    }
 
    protected String updateSortValue(Bib2GlsEntry entry, 

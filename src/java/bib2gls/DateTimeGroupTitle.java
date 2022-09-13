@@ -24,10 +24,10 @@ import java.text.SimpleDateFormat;
 
 public class DateTimeGroupTitle extends GroupTitle
 {
-   public DateTimeGroupTitle(DateFormat dateFormat, Date date, String type,
+   public DateTimeGroupTitle(Bib2Gls bib2gls, DateFormat dateFormat, Date date, String type,
       String parent, boolean showDate, boolean showTime)
    {
-      super(null, dateFormat.format(date), date.getTime(), type, parent);
+      super(bib2gls, null, dateFormat.format(date), date.getTime(), type, parent);
 
       SimpleDateFormat format;
 

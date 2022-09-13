@@ -20,9 +20,9 @@ package com.dickimawbooks.bib2gls;
 
 public class NumberGroupTitle extends OtherGroupTitle
 {
-   public NumberGroupTitle(Number number, String type, String parent)
+   public NumberGroupTitle(Bib2Gls bib2gls, Number number, String type, String parent)
    {
-      super(number.toString(), number.longValue(), type, parent);
+      super(bib2gls, number.toString(), number.longValue(), type, parent);
    }
 
    @Override

@@ -1178,7 +1178,7 @@ public class Bib2GlsEntry extends BibEntry
 
             String orgStrVal = list.toString(parser);
 
-            String newStrVal = Bib2Gls.replaceSpecialChars(
+            String newStrVal = bib2gls.replaceSpecialChars(
               bib2gls.interpret(orgStrVal, value, bib2gls.isTrimFieldOn(field)));
 
             if (!orgStrVal.equals(newStrVal) && 

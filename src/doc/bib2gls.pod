@@ -338,6 +338,15 @@ provide unknown glossaries except in documented situations
 (B<master>, B<secondary> and B<trigger-type> resource options).
 This setting is the default.
 
+=item B<--replace-quotes>
+
+Replace single and double quote characters (C<'> and C<">) with 
+C<\bibglsaposchar> and C<\bibglsdoublequotechar> in field values
+and group information written to the F<.glstex> file.
+
+=item B<--no-replace-quotes>
+
+Don't replace quote characters (default).
 
 =back
 

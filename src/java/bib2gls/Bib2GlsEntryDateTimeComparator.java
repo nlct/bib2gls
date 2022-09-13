@@ -146,7 +146,7 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
    protected GroupTitle createDefaultGroupTitle(int codePoint,
       Object sortValue, String type, String parent)
    {
-      return new DateTimeGroupTitle(dateFormat, (Date)sortValue, 
+      return new DateTimeGroupTitle(bib2gls, dateFormat, (Date)sortValue, 
                  type, parent, hasDate, hasTime);
    }
 

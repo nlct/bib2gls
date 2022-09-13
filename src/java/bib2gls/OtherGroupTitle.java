@@ -20,9 +20,9 @@ package com.dickimawbooks.bib2gls;
 
 public class OtherGroupTitle extends GroupTitle
 {
-   public OtherGroupTitle(String letter, long id, String type, String parent)
+   public OtherGroupTitle(Bib2Gls bib2gls, String letter, long id, String type, String parent)
    {
-      super(letter, letter, id, type, parent);
+      super(bib2gls, letter, letter, id, type, parent);
    }
 
    @Override
@@ -43,13 +43,13 @@ public class OtherGroupTitle extends GroupTitle
       if (supportsHierarchy)
       {
          return String.format("{%s}{%X}{%s}{%s}{%d}", 
-          Bib2Gls.replaceSpecialChars(other), 
+          bib2gls.replaceSpecialChars(other), 
           getId(), type == null ? "" : type, parent == null ? "" : parent, level);
       }
       else
       {
          return String.format("{%s}{%X}{%s}", 
-          Bib2Gls.replaceSpecialChars(other), 
+          bib2gls.replaceSpecialChars(other), 
           getId(), type == null ? "" : type);
       }
    }

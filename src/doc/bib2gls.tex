@@ -4099,6 +4099,19 @@ default since it's a useful way of detecting misspelt glossary
 labels. It's harder to detect the problem if a misspelt label has
 caused an entry to be added to a hidden glossary.
 
+\argsection{replace-quotes}
+
+Single and double-quote characters (\idx{aposchar} and
+\idx{doublequotechar}) will be written as \cs{bibglsaposchar} and
+\cs{bibglsdoublequotechar} in field values and group information 
+written to the \ext{glstex} file.
+
+\argsection{no-replace-quotes}
+
+Single and double-quote characters (\idx{aposchar} and
+\idx{doublequotechar}) will be written as those actual characters
+(default).
+
 \chapter{\iext{bib} Format}
 \label{sec:bib}
 \setsecdepth{1}
@@ -20621,6 +20634,18 @@ Expands to a literal ampersand character (\,\idx{ampchar}\,).
 
 \formatdef{bibglscircumchar}
 Expands to a literal circumflex character (\,\idx{circumchar}\,).
+
+\cssection{bibglsaposchar}
+
+\formatdef{bibglsaposchar}
+Expands to a literal apostrophe character (\,\idx{aposchar}\,).
+This command is only provided if \longarg{replace-quotes} is used.
+
+\cssection{bibglsdoublequotechar}
+
+\formatdef{bibglsdoublequotechar}
+Expands to a literal double-quote character (\,\idx{doublequotechar}\,).
+This command is only provided if \longarg{replace-quotes} is used.
 
 \cssection{bibglsuppercase}
 

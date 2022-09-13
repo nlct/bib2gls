@@ -139,7 +139,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       if (value.isEmpty())
       {
-         return new EmptyGroupTitle(type, parent);
+         return new EmptyGroupTitle(bib2gls, type, parent);
       }
 
       String str = new String(Character.toChars(codePoint));
@@ -150,7 +150,7 @@ public class Bib2GlsEntryComparator extends SortComparator
          grp = str.toUpperCase();
          int cp = grp.codePointAt(0);
 
-         return new GroupTitle(grp, str, cp, type, parent);
+         return new GroupTitle(bib2gls, grp, str, cp, type, parent);
       }
       else
       {
@@ -160,7 +160,7 @@ public class Bib2GlsEntryComparator extends SortComparator
             str = "\\char`\\"+str;
          }
 
-         return new OtherGroupTitle(str, codePoint, type, parent);
+         return new OtherGroupTitle(bib2gls, str, codePoint, type, parent);
       }
    }
 
@@ -211,7 +211,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
             if (grpTitle == null)
             {
-               grpTitle = new EmptyGroupTitle(type, entry.getParent());
+               grpTitle = new EmptyGroupTitle(bib2gls, type, entry.getParent());
                resource.putGroupTitle(grpTitle, entry);
                args = grpTitle.format();
             }
@@ -341,7 +341,7 @@ public class Bib2GlsEntryComparator extends SortComparator
    
                   if (grpTitle == null)
                   {
-                     grpTitle = new GroupTitle(grp, str, elem, type, entry.getParent());
+                     grpTitle = new GroupTitle(bib2gls, grp, str, elem, type, entry.getParent());
                      resource.putGroupTitle(grpTitle, entry);
                      args = grpTitle.format();
                   }
@@ -373,7 +373,7 @@ public class Bib2GlsEntryComparator extends SortComparator
    
                   if (grpTitle == null)
                   {
-                     grpTitle = new OtherGroupTitle(str, elem, type, entry.getParent());
+                     grpTitle = new OtherGroupTitle(bib2gls, str, elem, type, entry.getParent());
                      resource.putGroupTitle(grpTitle, entry);
                      args = grpTitle.toString();
                   }

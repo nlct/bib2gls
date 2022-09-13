@@ -175,7 +175,7 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
    protected GroupTitle createDefaultGroupTitle(int codePoint, Object sortValue,
       String type, String parent)
    {
-      return new NumberGroupTitle((Number)sortValue, type, parent);
+      return new NumberGroupTitle(bib2gls, (Number)sortValue, type, parent);
    }
 
    protected String updateSortValue(Bib2GlsEntry entry, 

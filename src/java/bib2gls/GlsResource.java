@@ -10398,7 +10398,7 @@ public class GlsResource
          {
             if (pending.size() > 1)
             {
-               MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
+               MergedGroupTitles mergedTitles = new MergedGroupTitles(bib2gls, pending);
                String groupFieldValue = String.format("\\%s%s",
                  mergedTitles.getCsLabelName(), mergedTitles.format());
 
@@ -10448,7 +10448,7 @@ public class GlsResource
 
          if (pending.size() > 1)
          {
-            MergedGroupTitles mergedTitles = new MergedGroupTitles(pending);
+            MergedGroupTitles mergedTitles = new MergedGroupTitles(bib2gls, pending);
             String groupFieldValue = String.format("\\%s%s",
               mergedTitles.getCsLabelName(), mergedTitles.format());
 

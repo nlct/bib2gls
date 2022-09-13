@@ -20,9 +20,10 @@ package com.dickimawbooks.bib2gls;
 
 public class GroupTitle
 {
-   public GroupTitle(String title, String actual, long id,
+   public GroupTitle(Bib2Gls bib2gls, String title, String actual, long id,
      String type, String parent)
    {
+      this.bib2gls = bib2gls;
       this.title = title;
       this.actual = actual;
       this.id = id; 
@@ -154,13 +155,13 @@ public class GroupTitle
       if (supportsHierarchy)
       {
          return String.format("{%s}{%s}{%d}{%s}{%s}{%d}", title, 
-          Bib2Gls.replaceSpecialChars(letter), id,
+          bib2gls.replaceSpecialChars(letter), id,
           type == null ? "" : type, parent == null ? "" : parent, level);
       }
       else
       {
          return String.format("{%s}{%s}{%d}{%s}", title, 
-          Bib2Gls.replaceSpecialChars(letter), id,
+          bib2gls.replaceSpecialChars(letter), id,
           type == null ? "" : type);
       }
    }
@@ -212,4 +213,6 @@ public class GroupTitle
    protected int level = 0;
 
    private int startIndex=-1, endIndex=-1;
+
+   protected Bib2Gls bib2gls;
 }
