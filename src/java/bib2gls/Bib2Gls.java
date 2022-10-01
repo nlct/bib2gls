@@ -3462,86 +3462,47 @@ public class Bib2Gls implements TeXApp
          int cp = value.codePointAt(i);
          i += Character.charCount(cp);
 
-         switch (cp)
+         if (cp == '\\')
          {
-            case '\\':
+            // is it followed by char`\\ ?
 
-               // is it followed by char`\\ ?
+            if (i < value.length() 
+                 && value.substring(i).startsWith("char`\\"))
+            {
+               int nextCp = value.codePointAt(i+6);
+               int cpCount = Character.charCount(nextCp);
 
-               if (i < value.length() 
-                    && value.substring(i).startsWith("char`\\"))
-               {
-                  builder.append(value.substring(i-1, i+7));
-                  i = i+7;
-               }
-               else
-               {
-                  builder.append("\\glsbackslash ");
-                  cs = true;
-               }
+               String csname = getCsNameForLiteral(nextCp);
 
-            break;
-            case '%':
-               builder.append("\\glspercentchar ");
-               cs = true;
-            break;
-            case '{':
-               builder.append("\\glsopenbrace ");
-               cs = true;
-            break;
-            case '}':
-               builder.append("\\glsclosebrace ");
-               cs = true;
-            break;
-            case '~':
-               builder.append("\\glstildechar ");
-               cs = true;
-            break;
-            case '#':
-               builder.append("\\bibglshashchar ");
-               cs = true;
-            break;
-            case '_':
-               builder.append("\\bibglsunderscorechar ");
-               cs = true;
-            break;
-            case '$':
-               builder.append("\\bibglsdollarchar ");
-               cs = true;
-            break;
-            case '&':
-               builder.append("\\bibglsampersandchar ");
-               cs = true;
-            break;
-            case '^':
-               builder.append("\\bibglscircumchar ");
-               cs = true;
-            break;
-            case '\'':
-               if (replaceQuotes)
+               if (csname != null)
                {
-                  builder.append("\\bibglsaposchar ");
+                  builder.append("\\"+csname+" ");
                   cs = true;
                }
                else
                {
-                  cs = false;
-                  builder.appendCodePoint(cp);
+                  builder.append(value.substring(i-1, i+6+cpCount));
                }
-            break;
-            case '"':
-               if (replaceQuotes)
-               {
-                  builder.append("\\bibglsdoublequotechar ");
-                  cs = true;
-               }
-               else
-               {
-                  cs = false;
-                  builder.appendCodePoint(cp);
-               }
-            break;
-            default:
+
+               i = i+6+cpCount;
+            }
+            else
+            {
+               builder.append("\\glsbackslash ");
+               cs = true;
+            }
+         }
+         else
+         {
+            String csname = getCsNameForLiteral(cp);
+
+            if (csname != null)
+            {
+               builder.append("\\"+csname+" ");
+               cs = true;
+            }
+            else
+            {
                if (cs && Character.isWhitespace(cp))
                {
                   builder.append("\\space");
@@ -3549,10 +3510,36 @@ public class Bib2Gls implements TeXApp
                cs = false;
 
                builder.appendCodePoint(cp);
+            }
          }
       }
 
       return builder.toString();
+   }
+
+   public String getCsNameForLiteral(int cp)
+   {
+      switch (cp)
+      {
+         case '\\': return "glsbackslash";
+         case '%': return "glspercentchar";
+         case '{': return "glsopenbrace";
+         case '}': return "glsclosebrace";
+         case '~': return "glstildechar";
+         case '#': return "bibglshashchar";
+         case '_': return "bibglsunderscorechar";
+         case '$': return "bibglsdollarchar";
+         case '&': return "bibglsampersandchar";
+         case '^': return "bibglscircumchar";
+         case '\'':
+            if (replaceQuotes) return "bibglsaposchar";
+         break;
+         case '"':
+            if (replaceQuotes) return "bibglsdoublequotechar";
+         break;
+      }
+
+      return null;
    }
 
    public void writeCommonCommands(PrintWriter writer)
@@ -6244,8 +6231,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20220913";
-   public static final String DATE = "2022-09-13";
+   public static final String VERSION = "3.0.20221001";
+   public static final String DATE = "2022-10-01";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
