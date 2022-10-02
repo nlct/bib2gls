@@ -2040,6 +2040,11 @@ public class Bib2Gls implements TeXApp
                recordFormat = data.getArg(3).toString(parser);
                recordLocation = data.getArg(4).toString(parser);
 
+               if (recordLocation.isEmpty())
+               {// make empty locations an ignored record
+                  recordFormat = "glsignore";
+               }
+
                if (data.getNumArgs() == 8)
                {
                   recordTitle = data.getArg(5).toString(parser);
