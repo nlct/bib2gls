@@ -419,7 +419,7 @@ documents}}
 \glsxtrnewgls[format=glsignore]{idx.ext.}{\ext}
 
 \newcommand*{\iext}[1]{%
- \glsxtrtitleorpdforheading{\idx{ext.#1}}{.#1}{\extfmt{#1}}%
+ \glsxtrtitleorpdforheading{\gls{idx.ext.#1}}{.#1}{\extfmt{#1}}%
 }
 
 \glsxtrnewgls[format=glsignore]{idx.}{\sty}
@@ -12301,6 +12301,11 @@ the option \csopt[false]{save-locations} is used). The
 \field{location} field contains the code to typeset the formatted
 \igls{locationlist}.
 
+Note that the cross-referencing information provided with the
+\field{see}, \field{seealso} and \field{alias} fields is put in the
+location list. If you only want the cross-reference and not any of
+the locations, use \csopt[see]{save-locations} (or similar).
+
 The \field{loclist} field has the syntax of an \isty{etoolbox}
 internal list and includes every \gls{location} (except for the
 \glsdisp{discardedrecord}{discarded duplicates} and
@@ -12531,6 +12536,28 @@ For more information on adjusting the formatting see the
 
 \optsection{save-locations}
 
+This was originally a boolean setting, but as from v3.0 there are
+additional values.
+\begin{itemize}
+\item \optfmt{false}: don't save anything in the \field{location}
+field;
+
+\item \optfmt{true}: save cross-references and all non-ignored 
+locations in the \field{location} field;
+
+\item \optfmt{see}: only save cross-references (\field{see},
+\field{seealso} and \field{alias}) in the \field{location} field;
+
+\item \optfmt{see not also}: only save the \field{see} and
+\field{alias} cross-references (not \field{seealso}) in the
+\field{location} field;
+
+\item \optfmt{alias only}: only save the \field{alias}
+cross-references (not \field{see} or \field{seealso}) in the
+\field{location} field.
+
+\end{itemize}
+
 By default, the \glspl{location} will be processed and stored in the
 \field{location} and \field{loclist} fields. However, if you don't
 want the \glspl{locationlist} (for example, you are using the
@@ -12546,7 +12573,8 @@ The boolean \field{nonumberlist} key that may be used in
 \gls{newglossaryentry} can also be used in a \ext{bib} file, but in
 this case it can't have an empty value. The value must be either
 \code{true} or \code{false}. If \code{true} then \bibgls\ won't
-save the \field{location} or \field{loclist} fields.
+save the \field{location} or \field{loclist} fields, regardless of
+the \csopt{save-locations} resource option.
 
 The \field{nonumberlist} key provided by the base \sty{glossaries}
 package doesn't represent a real field. The value isn't saved but,

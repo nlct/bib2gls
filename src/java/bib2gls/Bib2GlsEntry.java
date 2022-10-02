@@ -4040,7 +4040,7 @@ public class Bib2GlsEntry extends BibEntry
    public void updateLocationList()
    throws Bib2GlsException
    {
-      if (nonumberlist)
+      if (nonumberlist || resource.isSaveLocationsOff())
       {
          return;
       }
@@ -4061,16 +4061,23 @@ public class Bib2GlsEntry extends BibEntry
 
       int numRecords = mainRecordCount()+supplementalRecordCount();
 
+      boolean incAliases = resource.isSaveAliasLocationsOn();
+      boolean incSee = resource.isSaveSeeLocationsOn();
+      boolean incSeeAlso = resource.isSaveSeeAlsoLocationsOn();
+
+      boolean hasLocationList = (numRecords > 0
+        && resource.isSaveAnyNonIgnoredLocationsOn());
+
       String alias = getAlias();
 
-      if (aliasLocation == PRE_SEE && alias != null)
+      if (aliasLocation == PRE_SEE && alias != null && incAliases)
       {
          builder = new StringBuilder();
          builder.append("\\bibglsusealias{");
          builder.append(getId());
          builder.append("}");
 
-         if (numRecords > 0)
+         if (hasLocationList)
          {
             builder.append("\\bibglsaliassep ");
          }
@@ -4084,14 +4091,14 @@ public class Bib2GlsEntry extends BibEntry
 
          locationList.add(listBuilder.toString());
       }
-      else if (seeLocation == PRE_SEE && crossRefs != null)
+      else if (seeLocation == PRE_SEE && crossRefs != null && incSee)
       {
          builder = new StringBuilder();
          builder.append("\\bibglsusesee{");
          builder.append(getId());
          builder.append("}");
 
-         if (numRecords > 0)
+         if (hasLocationList)
          {
             builder.append("\\bibglsseesep ");
          }
@@ -4119,14 +4126,14 @@ public class Bib2GlsEntry extends BibEntry
 
          locationList.add(listBuilder.toString());
       }
-      else if (seealsoLocation == PRE_SEE && alsocrossRefs != null)
+      else if (seealsoLocation == PRE_SEE && alsocrossRefs != null && incSeeAlso)
       {
          builder = new StringBuilder();
          builder.append("\\bibglsuseseealso{");
          builder.append(getId());
          builder.append("}");
 
-         if (numRecords > 0)
+         if (hasLocationList)
          {
             builder.append("\\bibglsseealsosep ");
          }
@@ -4147,8 +4154,6 @@ public class Bib2GlsEntry extends BibEntry
 
          locationList.add(listBuilder.toString());
       }
-
-      boolean hasLocationList = (numRecords > 0);
 
       if (alias != null 
            && resource.aliasLocations() != GlsResource.ALIAS_LOC_KEEP)
@@ -4255,7 +4260,7 @@ public class Bib2GlsEntry extends BibEntry
          }
       }
 
-      if (aliasLocation == POST_SEE && alias != null)
+      if (aliasLocation == POST_SEE && alias != null && incAliases)
       {
          if (builder == null)
          {
@@ -4281,7 +4286,7 @@ public class Bib2GlsEntry extends BibEntry
 
          locationList.add(listBuilder.toString());
       }
-      else if (seeLocation == POST_SEE && crossRefs != null)
+      else if (seeLocation == POST_SEE && crossRefs != null && incSee)
       {
          if (builder == null)
          {
@@ -4321,7 +4326,7 @@ public class Bib2GlsEntry extends BibEntry
 
          locationList.add(listBuilder.toString());
       }
-      else if (seealsoLocation == POST_SEE && alsocrossRefs != null)
+      else if (seealsoLocation == POST_SEE && alsocrossRefs != null && incSeeAlso)
       {
          if (builder == null)
          {

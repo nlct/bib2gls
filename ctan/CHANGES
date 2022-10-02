@@ -60,6 +60,12 @@ v3.0 (pending):
     - prune-seealso-match
     - prune-iterations
 
+  * new save-locations values:
+
+    - save-locations=see
+    - save-locations=see not also
+    - save-locations=alias only
+
   * bug fix: nameref records not merging for wrglossary counter
 
 v2.9 (2021-11-22):

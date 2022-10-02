@@ -6,12 +6,14 @@
 \usepackage[record]{glossaries-extra}
 
 \GlsXtrLoadResources[src={testseealsoentries},
+  %save-locations=false,
+  %save-locations=see,
   %selection={recorded and deps and see}
   selection={recorded and deps}
 ]
 
 \begin{document}
-\gls{dash}.
+\gls{dash} and \gls{dart}.
 %\gls{sprint}.
 
 \printunsrtglossaries

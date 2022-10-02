@@ -1179,7 +1179,29 @@ public class GlsResource
          }
          else if (opt.equals("save-locations"))
          {
-            saveLocations = getBoolean(list, opt);
+            String val = getChoice("true", list, opt,
+               "false", "true", "see", "see not also", "alias only");
+
+            if (val.equals("false"))
+            {
+               saveLocations = SAVE_LOCATIONS_OFF;
+            }
+            else if (val.equals("true"))
+            {
+               saveLocations = SAVE_LOCATIONS_ON;
+            }
+            else if (val.equals("see"))
+            {
+               saveLocations = SAVE_LOCATIONS_SEE;
+            }
+            else if (val.equals("see not also"))
+            {
+               saveLocations = SAVE_LOCATIONS_SEE_NOT_ALSO;
+            }
+            else if (val.equals("alias only"))
+            {
+               saveLocations = SAVE_LOCATIONS_ALIAS_ONLY;
+            }
          }
          else if (opt.equals("save-loclist"))
          {
@@ -8960,7 +8982,7 @@ public class GlsResource
                updateWidestName(entry, font, frc);
             }
 
-            if (saveLocations)
+            if (!isSaveLocationsOff())
             {
                if (entry instanceof Bib2GlsDualEntry
                  && !(combineDualLocations == COMBINE_DUAL_LOCATIONS_OFF
@@ -9050,7 +9072,7 @@ public class GlsResource
                   }
                }
 
-               if (saveLocations
+               if (!isSaveLocationsOff()
                 && !(combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY
                     || combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL
                    ))
@@ -15327,6 +15349,42 @@ public class GlsResource
       return false;
    }
 
+   public boolean isSaveLocationsOff()
+   {
+      return saveLocations == SAVE_LOCATIONS_OFF;
+   }
+
+   public boolean isSaveAnyNonIgnoredLocationsOn()
+   {
+      return saveLocations == SAVE_LOCATIONS_ON;
+   }
+
+   public boolean isSaveAliasLocationsOn()
+   {
+      return saveLocations == SAVE_LOCATIONS_ON
+           || saveLocations == SAVE_LOCATIONS_SEE
+           || saveLocations == SAVE_LOCATIONS_SEE_NOT_ALSO
+           || saveLocations == SAVE_LOCATIONS_ALIAS_ONLY;
+   }
+
+   public boolean isSaveSeeLocationsOn()
+   {
+      return saveLocations == SAVE_LOCATIONS_ON
+           || saveLocations == SAVE_LOCATIONS_SEE
+           || saveLocations == SAVE_LOCATIONS_SEE_NOT_ALSO;
+   }
+
+   public boolean isSaveSeeAlsoLocationsOn()
+   {
+      return saveLocations == SAVE_LOCATIONS_ON
+           || saveLocations == SAVE_LOCATIONS_SEE;
+   }
+
+   public int getSaveLocationsSetting()
+   {
+      return saveLocations;
+   }
+
    /**
     * Gets the "compact-ranges" setting.
     * @return the setting as a numeric value (0=false) 
@@ -16290,7 +16348,13 @@ public class GlsResource
    private int locationPrefixDef=PROVIDE_DEF_LOCAL_INDIVIDUAL;
    private int locationSuffixDef=PROVIDE_DEF_LOCAL_INDIVIDUAL;
 
-   private boolean saveLocations = true;
+   public static final int SAVE_LOCATIONS_OFF=0;
+   public static final int SAVE_LOCATIONS_ON=1;// any non-ignored locations
+   public static final int SAVE_LOCATIONS_SEE=2;// see, alias or see also
+   public static final int SAVE_LOCATIONS_SEE_NOT_ALSO=3;// see, alias
+   public static final int SAVE_LOCATIONS_ALIAS_ONLY=4;// alias only
+
+   private int saveLocations = SAVE_LOCATIONS_ON;
    private boolean saveLocList = true;
 
    private int savePrimaryLocations = SAVE_PRIMARY_LOCATION_OFF;
