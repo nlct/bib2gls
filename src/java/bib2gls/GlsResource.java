@@ -12972,6 +12972,8 @@ public class GlsResource
    private void registerGlsLikeTitleCase(String titlecasename, boolean isPlural,
       GlsLikeFamily fam)
    {
+      bib2gls.addGlsLike(fam.getPrefix(), titlecasename);
+
       if (titleCaseCommands == null)
       {
          titleCaseCommands = new HashMap<String,String>();

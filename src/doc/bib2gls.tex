@@ -419,7 +419,7 @@ documents}}
 \glsxtrnewgls[format=glsignore]{idx.ext.}{\ext}
 
 \newcommand*{\iext}[1]{%
- \glsxtrtitleorpdforheading{\gls{idx.ext.#1}}{.#1}{\extfmt{#1}}%
+ \glsxtrtitleorpdforheading{\idx{ext.#1}}{.#1}{\extfmt{#1}}%
 }
 
 \glsxtrnewgls[format=glsignore]{idx.}{\sty}
@@ -9188,6 +9188,14 @@ The \csopt{label-prefix} option prepends \meta{tag} to each entry's label. This
 start with \idprefix{dual} or \idprefix{tertiary} or \idprefix{extn} (where
 \meta{n} is an integer). Use \csopt{dual-prefix} to change the dual label
 prefixes and \csopt{ext-prefixes} to change the external label prefixes.
+
+If you set \csopt{label-prefix} and you define commands with
+\gls{glsxtrnewglslike}, then any of those commands found in entry
+fields won't have the \csopt{label-prefix} inserted if the prefix provided with
+the command starts with the prefix given in \csopt{label-prefix}.
+(This doesn't apply to other prefix options, such as
+\csopt{dual-prefix}, so take care if you have a mixture of prefix
+options and prefixes identified with \gls{glsxtrnewglslike}.)
 
 As from version 1.8, the \primary\ label prefix is identified
 in the \ext{glstex} file with:

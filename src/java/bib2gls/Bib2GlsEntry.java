@@ -692,21 +692,32 @@ public class Bib2GlsEntry extends BibEntry
                   {
                      if (glsLikeLabelPrefix != null && !glsLikeLabelPrefix.isEmpty())
                      {
-                        String newLabel = processLabel(label, true);
+                        String newLabel = label;
 
-                        if (newLabel.startsWith(glsLikeLabelPrefix))
-                        {
-                           newLabel = newLabel.substring(glsLikeLabelPrefix.length());
-                        }
+                        String defPrefix = resource.getLabelPrefix();
 
-                        if (!label.equals(newLabel))
+                        if (!(defPrefix != null && !defPrefix.isEmpty()
+                              && glsLikeLabelPrefix.startsWith(defPrefix)))
                         {
-                           for ( ; i > start; i--)
+                           // don't automatically insert the
+                           // label-prefix if the glslike command
+                           // starts with the same prefix
+                           newLabel = processLabel(label, true);
+
+                           if (newLabel.startsWith(glsLikeLabelPrefix))
                            {
-                              list.remove(i);
+                              newLabel = newLabel.substring(glsLikeLabelPrefix.length());
                            }
 
-                           list.set(i, parser.getListener().createGroup(newLabel));
+                           if (!label.equals(newLabel))
+                           {
+                              for ( ; i > start; i--)
+                              {
+                                 list.remove(i);
+                              }
+
+                              list.set(i, parser.getListener().createGroup(newLabel));
+                           }
                         }
 
                         label = glsLikeLabelPrefix+newLabel;
