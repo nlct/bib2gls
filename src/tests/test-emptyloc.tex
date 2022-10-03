@@ -1,0 +1,34 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,counter=part]{glossaries-extra}
+
+\GlsXtrLoadResources[src={entries}]
+
+\title{Test Document}
+\author{Ann Author}
+\begin{document}
+\maketitle
+
+This document is about \glspl{bird} and \glspl{goose}.
+The record counter is ``part'', which is currently 0.
+There's no Roman numeral for zero, so the part is currently
+``\thepart'', which means an empty location.
+
+\part{Birds}
+\chapter{Sample}
+
+This part is all about \glspl{bird} in general. The next part is
+concerned with \glspl{goose}.
+
+\part{Geese}
+\chapter{Another Sample}
+
+This part is about \glspl{goose}.
+
+\part{Summary}
+\printunsrtglossary
+\end{document}

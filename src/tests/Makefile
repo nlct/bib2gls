@@ -40,7 +40,7 @@ all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf \
 	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
-	  test-glslike.pdf test-xr-recordcount.pdf
+	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -773,6 +773,14 @@ test-xr-recordcount.pdf	: test-xr-recordcount.glstex
 test-xr-recordcount.glstex	: test-xr-recordcount.tex test-xr-recordcount.bib $(DEPS)
 			pdflatex test-xr-recordcount
 			$(BIB2GLS) test-xr-recordcount
+
+test-emptyloc.pdf	: test-emptyloc.glstex
+			pdflatex test-emptyloc
+			pdflatex test-emptyloc
+
+test-emptyloc.glstex	: test-emptyloc.tex entries.bib $(DEPS)
+			pdflatex test-emptyloc
+			$(BIB2GLS) test-emptyloc
 
 clean	:
 	$(RM) *.aux

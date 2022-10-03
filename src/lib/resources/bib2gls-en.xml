@@ -216,6 +216,8 @@ Defaulting to: {0}.
 <entry key="message.copying.record">Copying record {0} from entry {1} to entry {2}.</entry>
 <entry key="message.copying.primary.record">Copying primary record {0} from entry {1} to entry {2}.</entry>
 <entry key="message.ignored.record">Ignoring record {0}.</entry>
+<entry key="message.empty.location.ignored">Converting empty location to ignored record
+  (label: ''{0}'', counter: ''{1}'', encap: ''{2}'')</entry>
 <entry key="message.clearing.records">Clearing entry {0}''s record list.</entry>
 <entry key="message.normalizing">Normalising {0} to {1}.</entry>
 <entry key="message.norm.distinct">Normalized {0} distinct from {1}.</entry>
@@ -299,7 +301,7 @@ Consider using \glsps'{'{3}'}' or \glspt'{'{3}'}' instead of {2}'{'{3}'}'</entry
 Consider using a dual entry or add ''{2}'' to one of the cross-referencing fields instead.
 (With a dual entry type, you don''t need to link a primary to its dual
 with \glsadd. They are automatically dependent on each other.)</entry>
-<entry key="warning.dir.no.write">Directory not writable: {0}
+<entry key="warning.dir.no.write">Directory not writeable: {0}
 Using TEXMFOUTPUT instead: {1}</entry>
 <entry key="warning.conflicting.range.format">Entry location conflict for formats: {0} and {1}
 Replacing {1} with {2}</entry>
