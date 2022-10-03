@@ -12,6 +12,7 @@
 *.glstex
 *.1
 *.sty
+*.def
 *.bbl
 *.blg
 arara.xml
