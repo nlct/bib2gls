@@ -1,0 +1,40 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks]{hyperref}
+\usepackage[record,stylemods=mcols,style=mcolindexgroup]{glossaries-extra}
+
+\GlsXtrLoadResources
+ [selection=all,% select all entries in test-utf8.bib
+  sort=sv,  % allowed 'sort' values: 
+                %'unsrt' - don't sort
+                %'use' - order of use (not with selection=all)
+                %'letter-case' - letter order (case-sensitive)
+                %'letter-nocase' - letter order (case-insensitive)
+                %'locale' - OS default locale
+                % or a well-formed IETF language tag
+                % (e.g. 'sv' or 'de-1996')
+                % 'custom' - use custom rule
+%  sort-rule={% required if sort=custom
+%    < æ;Æ < a;á;å;ä,A;Á;Å;Ä < b,B < c;ć,C;Ć < d,D < e;é,E;É < f,F < g,G
+%    < h,H < i;í,I;Í < j,J < l;ł,L;Ł < m,M < n,N < o;ö;ø,O;Ö;Ø < p,P < q,Q
+%    < r,R < s;ś,S;Ś < t,T < u;ú,U;Ú < v,V < w,W < x,X < y,Y <
+%z;ż,Z;Ż < þ;Þ
+%  },
+  src={test-utf8}% bib file
+ ]
+
+\renewcommand*{\glstreenamefmt}[1]{#1}
+
+\begin{document}
+\printunsrtglossaries
+\newpage
+
+Test document.
+\forglsentries{\thisentry}{\gls{\thisentry}. }
+
+\end{document}

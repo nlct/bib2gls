@@ -2,7 +2,7 @@ BIB2GLS=../bin/bib2gls --debug --verbose --group
 DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 RM=\rm -f
 
-all	: test.pdf test-utf8.pdf test-xr.pdf test-crossrefs.pdf \
+all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.pdf \
 	  test-xe.pdf test-label-prefix.pdf test-dual.pdf \
 	  test-external-refs.pdf test-hierarchical.pdf \
 	  test-match.pdf test-secondary.pdf test-ascii.pdf \
@@ -64,6 +64,13 @@ test-utf8.pdf	: test-utf8.glstex
 test-utf8.glstex	: test-utf8.tex $(DEPS) test-utf8.bib
 		xelatex test-utf8
 		$(BIB2GLS) --group test-utf8
+
+test-inputenc-utf8.pdf	: test-inputenc-utf8.glstex
+		pdflatex test-inputenc-utf8
+
+test-inputenc-utf8.glstex	: test-inputenc-utf8.tex $(DEPS) test-utf8.bib
+		pdflatex test-inputenc-utf8
+		$(BIB2GLS) --group test-inputenc-utf8
 
 test-xr.pdf	: test-xr.glstex
 		pdflatex test-xr
