@@ -43,6 +43,7 @@ import java.nio.file.Files;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.auxfile.*;
 import com.dickimawbooks.texparserlib.primitives.Relax;
+import com.dickimawbooks.texparserlib.latex.Input;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
@@ -1753,6 +1754,7 @@ public class Bib2Gls implements TeXApp
          {
             super.addPredefined();
 
+            putControlSequence(new Input("@bibgls@input", Input.NOT_FOUND_ACTION_WARN));
             addAuxCommand("glsxtr@resource", 2);
             addAuxCommand("glsxtr@fields", 1);
             addAuxCommand("glsxtr@record", 5);
@@ -6246,8 +6248,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20221003";
-   public static final String DATE = "2022-10-03";
+   public static final String VERSION = "3.0.20221004";
+   public static final String DATE = "2022-10-04";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
