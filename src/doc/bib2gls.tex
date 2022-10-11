@@ -3902,6 +3902,15 @@ before the entries are defined (that is, before using
 
 \argsection{mfirstuc-protection}
 
+If you have \isty{mfirstuc} v2.08+, \isty{glossaries} v4.50+
+and \isty{glossaries-extra} v1.49+ then this setting shouldn't be
+required any more as there's now better sentence-case handling.
+If these versions are detected in the \ext{log} file then the
+default will switch to \longarg{no-mfirstuc-protection}
+otherwise the default is \longarg{mfirstuc-protection}. If this causes any
+problems, use \longarg{mfirstuc-protection} to re-enable this
+setting. The information below relates to older versions.
+
 Commands like \ics{Gls} use \ics{makefirstuc} provided by the
 \isty{mfirstuc} package. This command has limitations and one of the
 things that can break it is the use of a referencing command 
@@ -3944,7 +3953,15 @@ above.
 
 \argsection{mfirstuc-math-protection}
 
-This works in the same way as \longarg{mfirstuc-protection} but
+If you have \isty{mfirstuc} v2.08+, \isty{glossaries} v4.50+ and
+\isty{glossaries-extra} v1.49+ then this setting shouldn't be
+required any more as there's now better sentence-case handling.  If
+these versions are detected in the \ext{log} file then the default
+will switch to \longarg{no-mfirstuc-math-protection}. If this causes
+any problems, use \longarg{mfirstuc-math-protection} to re-enable
+this setting. The information below relates to older versions.
+
+This setting works in the same way as \longarg{mfirstuc-protection} but
 guards against fields starting with inline maths
 (\idx{mshiftchar}\ldots\idx{mshiftchar}). For example, if the
 \field{name} field starts with

@@ -198,6 +198,9 @@ into explicit range {1}</entry>
 <entry key="message.calc.text.width">Calculating width of name field for entry ''{0}''</entry>
 <entry key="message.calc.text.width.result">Calculated width of ''{0}'': {1,number}</entry>
 <entry key="message.parsing.code">Parsing code block:</entry>
+<entry key="message.parsing.args">Parsing command line arguments</entry>
+<entry key="message.nomfirstuc.protect">No sentence case protection required now</entry>
+<entry key="message.default.arg">Default setting {0} now applied, use {1} to revert</entry>
 <entry key="message.unknown.tex.charset">Unable to detect character encoding for TeX file.
 Defaulting to: {0}.
 (Use {1} if this is incorrect.)</entry>
@@ -208,6 +211,7 @@ Defaulting to: {0}.
 <entry key="message.detected.fontenc">Detected font encoding: {0}</entry>
 <entry key="message.missing.id">id missing</entry>
 <entry key="message.default.locale">Default document locale: {0} {1}</entry>
+<entry key="message.detected.sty">Detected package {0} {1}</entry>
 <entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.primary.record">Adding primary record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.supplemental.record">Adding supplemental record {0} to entry {1}''s record list.</entry>

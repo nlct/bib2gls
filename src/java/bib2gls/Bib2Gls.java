@@ -685,9 +685,13 @@ public class Bib2Gls implements TeXApp
 
    public TeXObjectList getWordExceptionList()
    {
-      // if mfirstuc has been loaded (which must be done using
-      // --packages mfirstuc) then the control sequence with the
-      // name "@mfu@nocaplist" will contain the list of exceptions.
+      /*
+       The control sequence with the name "@mfu@nocaplist" contains 
+       the list of exceptions. This should be defined since mfirstuc 
+       is automatically loaded, but won't include any exceptions unless 
+       they are supplied to bib2gls, such as by loading mfirstuc-english
+       with --packages.
+      */
 
       ControlSequence cs = interpreter.getControlSequence("@mfu@nocaplist");
 
@@ -809,6 +813,9 @@ public class Bib2Gls implements TeXApp
 
                      glossariesExtraVersion = df.format(cal.getTime());
 
+                     verboseMessage("message.detected.sty", 
+                        pkg, glossariesExtraVersion);
+
                      if (cal.compareTo(minVersion) < 0)
                      {
 
@@ -835,6 +842,20 @@ public class Bib2Gls implements TeXApp
                        "glossaries-extra");
                      debug(e);
                   }
+               }
+               else if (pkg.equals("glossaries"))
+               {
+                  glossariesVersion = String.format("%s/%s/%s",
+                   m.group(2), m.group(3), m.group(4));
+
+                  verboseMessage("message.detected.sty", pkg, glossariesVersion);
+               }
+               else if (pkg.equals("mfirstuc"))
+               {
+                  mfirstucVersion = String.format("%s/%s/%s",
+                   m.group(2), m.group(3), m.group(4));
+
+                  verboseMessage("message.detected.sty", pkg, mfirstucVersion);
                }
                else if (ignorePackages != null && ignorePackages.contains(pkg))
                {// skip
@@ -897,6 +918,35 @@ public class Bib2Gls implements TeXApp
          }
 
          debug();
+      }
+
+      if ((!mfirstucProtectWasSet || !mfirstucMProtectWasSet)
+           && mfirstucVersion.compareTo(MFIRSTUC208) >= 0
+           && glossariesVersion.compareTo(MFIRSTUC208) >= 0
+           && glossariesExtraVersion.compareTo(MFIRSTUC208) >= 0
+         )
+      {
+         verboseMessage("message.nomfirstuc.protect");
+
+         if (!mfirstucProtectWasSet)
+         {
+            mfirstucProtect = false;
+
+            verboseMessage("message.default.arg",
+              "--no-mfirstuc-protection",
+              "--mfirstuc-protection"
+            );
+         }
+
+         if (!mfirstucMProtectWasSet)
+         {
+            mfirstucMProtect = false;
+
+            verboseMessage("message.default.arg",
+              "--no-mfirstuc-math-protection",
+              "--mfirstuc-math-protection"
+            );
+         }
       }
    }
 
@@ -5377,6 +5427,11 @@ public class Bib2Gls implements TeXApp
       String logName = null;
       boolean provideknownGlossaries=false;
 
+      mfirstucProtectWasSet = false;
+      mfirstucMProtectWasSet = false;
+
+      debugMessage("message.parsing.args");
+
       recordCountRule = new RecordCountRule(this);
 
       Object[] argVal = new Object[2];
@@ -5724,12 +5779,14 @@ public class Bib2Gls implements TeXApp
          else if (args[i].equals("--no-mfirstuc-protection"))
          {
             mfirstucProtect = false;
+            mfirstucProtectWasSet = true;
          }
          else if (isArg(args[i], "u", "mfirstuc-protection"))
          {
             i = parseArgVal(args, i, argVal);
 
             mfirstucProtect = true;
+            mfirstucProtectWasSet = true;
 
             String arg = (String)argVal[1];
 
@@ -5755,10 +5812,12 @@ public class Bib2Gls implements TeXApp
          else if (args[i].equals("--no-mfirstuc-math-protection"))
          {
             mfirstucMProtect = false;
+            mfirstucMProtectWasSet = true;
          }
          else if (args[i].equals("--mfirstuc-math-protection"))
          {
             mfirstucMProtect = true;
+            mfirstucMProtectWasSet = true;
          }
          else if (isArg(args[i], "shortcuts"))
          {
@@ -6248,8 +6307,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20221004";
-   public static final String DATE = "2022-10-04";
+   public static final String VERSION = "3.0.20221009";
+   public static final String DATE = "2022-10-09";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -6296,7 +6355,14 @@ public class Bib2Gls implements TeXApp
     new String[] {"progeny", "progenitor", "adoptparents"};
 
    public static final String[] DUAL_SPECIAL_FIELDS =
-    new String[] {"dualprefix", "dualprefixplural", "dualprefixfirst", "dualprefixfirstplural", "dualdescription"};
+    new String[] 
+   {
+      "dualprefix",
+      "dualprefixplural",
+      "dualprefixfirst",
+      "dualprefixfirstplural",
+      "dualdescription"
+   };
 
    public static final String[] OTHER_SPECIAL_FIELDS =
    {
@@ -6307,17 +6373,53 @@ public class Bib2Gls implements TeXApp
     * 'counter'.
     */ 
    private static final String[] NON_BIB_FIELDS =
-    new String[] {"bibtexcontributor", "bibtexentry", "dual", "group",
-     "progenitor", "progeny", "secondarygroup",
-     "secondarysort"};
+    new String[] 
+   {
+     "bibtexcontributor",
+     "bibtexentry",
+     "dual",
+     "group",
+     "progenitor",
+     "progeny",
+     "secondarygroup",
+     "secondarysort"
+   };
 
    private static final String[] PRIVATE_NON_BIB_FIELDS =
-    new String[] {"childcount", "childlist", "siblingcount", "siblinglist",
-     "indexcounter", "originalid", "originalentrytype", "location", "loclist",
-     "primarylocations", "recordcount", "currcount", "desc", "descplural", "firstpl",
-     "flag", "index", "level", "longpl", "prevcount", "prevunitmax",
-     "prevunittotal", "shortpl", "sortvalue", "unitlist", "useri",
-     "userii", "useriii", "useriv", "userv", "uservi"
+    new String[] 
+   {
+     "childcount",
+     "childlist",
+     "currcount",
+     "desc",
+     "descplural",
+     "firstpl",
+     "flag",
+     "index",
+     "indexcounter",
+     "level",
+     "location",
+     "loclist",
+     "longpl",
+     "originalentrytype",
+     "originalid",
+     "shortpl",
+     "siblingcount",
+     "siblinglist",
+     "sortvalue",
+     "prenumberlist",
+     "prevcount",
+     "prevunitmax",
+     "prevunittotal",
+     "primarylocations",
+     "recordcount",
+     "unitlist",
+     "useri",
+     "userii",
+     "useriii",
+     "useriv",
+     "userv",
+     "uservi"
     };
 
    private HashMap<String,GlsLike> glsLikeMap;
@@ -6354,6 +6456,11 @@ public class Bib2Gls implements TeXApp
    private boolean mfirstucMProtect = true;
    private String[] mfirstucProtectFields = null;
 
+   // keeps track of whether or not any mfirst protect switch was
+   // set (log file is parsed after command line arguments)
+   private boolean mfirstucProtectWasSet = false;
+   private boolean mfirstucMProtectWasSet = false;
+
    private String shortcuts=null;
 
    private boolean checkAcroShortcuts = false;
@@ -6379,16 +6486,46 @@ public class Bib2Gls implements TeXApp
 
    public static final String[] AUTO_SUPPORT_PACKAGES = new String[]
     { 
-      "amsmath", "amssymb", "bpchem", "fontenc", "fontspec", 
-      "fourier", "hyperref", "lipsum", "mhchem", "MnSymbol", 
-      "natbib", "pifont", "siunitx", "stix", "textcase", 
-      "textcomp", "tipa", "upgreek", "wasysym"
+      "amsmath",
+      "amssymb",
+      "bpchem",
+      "fontenc",
+      "fontspec", 
+      "fourier",
+      "hyperref",
+      "lipsum",
+      "mfirstuc",
+      "mhchem",
+      "MnSymbol", 
+      "natbib",
+      "pifont",
+      "siunitx",
+      "stix",
+      "textcase", 
+      "textcomp",
+      "tipa",
+      "upgreek",
+      "wasysym"
     };
 
    public static final String[] EXTRA_SUPPORTED_PACKAGES = new String[]
-    { "booktabs", "color", "datatool-base", "datatool", "etoolbox",
-      "graphics", "graphicx", "ifthen", "jmlrutils", 
-      "mfirstuc-english", "probsoln", "shortvrb", "xspace"
+    { 
+      "booktabs",
+      "color",
+      "datatool-base",
+      "datatool",
+      "etoolbox",
+      "fontawesome",
+      "graphics",
+      "graphicx",
+      "ifthen",
+      "jmlrutils", 
+      "mfirstuc-english",
+      "probsoln",
+      "shortvrb",
+      "twemojis",
+      "xfor",
+      "xspace"
     };
 
    private TeXParser interpreter = null;
@@ -6406,6 +6543,12 @@ public class Bib2Gls implements TeXApp
    private boolean collapseSamePageRange = true;
 
    private String glossariesExtraVersion="????/??/??";
+
+   private String glossariesVersion="????/??/??";
+
+   private String mfirstucVersion="????/??/??";
+
+   private static final String MFIRSTUC208 = "2022/10/14";
 
    private Vector<String> dependencies = null;
 

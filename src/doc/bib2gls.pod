@@ -212,6 +212,10 @@ The default is to do this for all fields.  To do this for only a
 subset of fields, set I<fields> to a comma-separated list of fields
 (e.g. B<name,short,long>).  The keyword B<all> indicates all fields.
 
+If F<mfirstuc> v2.08+, F<glossaries> v4.50+ and F<glossaries-extra> v1.49+ 
+are detected, the default will be B<--no-mfirstuc-protection>
+as there should no longer be any need for this protection.
+
 =item B<--no-mfirstuc-protection>
 
 Switch off the auto-insertion of an empty group for all fields.
@@ -219,7 +223,10 @@ Switch off the auto-insertion of an empty group for all fields.
 =item B<--mfirstuc-math-protection>
 
 Switch on the auto-insertion of an empty group for math-shift (C<$>).
-This option will be overridden by B<--no-mfirstuc-protection>.
+
+If F<mfirstuc> v2.08+, F<glossaries> v4.50+ and F<glossaries-extra> v1.49+ 
+are detected, the default will be B<--no-mfirstuc-math-protection>
+as there should no longer be any need for this protection.
 
 =item B<--no-mfirstuc-math-protection>
 

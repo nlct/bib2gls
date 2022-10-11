@@ -3,6 +3,9 @@ v3.0 (pending):
   * support for \glsxtr@select@entry and \glsxtr@select@entry@nameref
     (new to glossaries-extra-bib2gls v1.49)
 
+  * support for bibglsaux and \glsxtrsetbibglsaux
+    (new to glossaries-extra.sty v1.49)
+
   * bug fix: case changing options aren't recognising commands
     identified with \glsxtrnewgls
 
@@ -65,6 +68,10 @@ v3.0 (pending):
     - save-locations=see
     - save-locations=see not also
     - save-locations=alias only
+
+  * if mfirstuc v2.08+, glossaries v4.50+ and glossaries-extra
+    v1.49+ detected, default mfirstuc protection settings will
+    switch to --no-mfirstuc-protection --no-mfirstuc-math-protection
 
   * bug fix: nameref records not merging for wrglossary counter
 
