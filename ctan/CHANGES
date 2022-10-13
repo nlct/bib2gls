@@ -1,4 +1,4 @@
-v3.0 (pending):
+v3.0 (2022-10-14):
 
   * support for \glsxtr@select@entry and \glsxtr@select@entry@nameref
     (new to glossaries-extra-bib2gls v1.49)
@@ -6,17 +6,21 @@ v3.0 (pending):
   * support for bibglsaux and \glsxtrsetbibglsaux
     (new to glossaries-extra.sty v1.49)
 
+  * if mfirstuc v2.08+, glossaries v4.50+ and glossaries-extra
+    v1.49+ detected, default mfirstuc protection settings will
+    switch to --no-mfirstuc-protection --no-mfirstuc-math-protection
+
   * bug fix: case changing options aren't recognising commands
     identified with \glsxtrnewgls
 
   * added support for \glsxtridentifyglsfamily (glossaries-extra
     v1.49+)
 
-   * new switch --record-count-rule (or -r) which may be used to
-     determine whether or not certain types of records (such as
-     ignored records) should be included in the record count.
+  * new switch --record-count-rule (or -r) which may be used to
+    determine whether or not certain types of records (such as
+    ignored records) should be included in the record count.
 
-   * new switch --replace-quotes
+  * new switch --replace-quotes
 
   * issue #15: loc-prefix and type leads to undefined \bibglslocprefix with multiple glossaries
     https://github.com/nlct/bib2gls/issues/15
@@ -26,7 +30,7 @@ v3.0 (pending):
     - loc-prefix-def
     - loc-suffix-def
 
-  * added support for sub-groups:
+  * added support for sub-groups (requires glossaries-extra v1.49+):
 
     - group-level
 
@@ -68,10 +72,6 @@ v3.0 (pending):
     - save-locations=see
     - save-locations=see not also
     - save-locations=alias only
-
-  * if mfirstuc v2.08+, glossaries v4.50+ and glossaries-extra
-    v1.49+ detected, default mfirstuc protection settings will
-    switch to --no-mfirstuc-protection --no-mfirstuc-math-protection
 
   * bug fix: nameref records not merging for wrglossary counter
 

@@ -189,7 +189,9 @@
 ]
 
 \newglossary*{terms}{Glossary}
-\GlsXtrLoadResources[src=bib2gls-terms,type=terms,save-locations=false,category=term]
+\GlsXtrLoadResources[src=bib2gls-terms,
+ name-case-change=title,replicate-fields={name=text},
+ type=terms,save-locations=false,category=term]
 
 \newcommand{\igls}[2][]{%
  \glsxtrifhasfield{useri}{#2}{\glsadd{\glscurrentfieldvalue}}{}%
@@ -1288,7 +1290,7 @@ and \bibgls: An Introductory Guide} (\filefmt{bib2gls-begin.pdf})}}
 \filefmt{.bib} files to \filefmt{glossaries-extra.sty} resource
 files}
 \author{Nicola Talbot\addr{dickimaw-books.com}}
-\date{\DTMusedate{moddate}}
+\input{version}
 
 \makeatletter
 \renewcommand{\fps@figure}{htbp}
@@ -1418,8 +1420,6 @@ selection, cross-references and locations}, issue 41:3, 2020.
 \listoffigures
 \printunsrtglossary*[type=terms,style=altlist,groups=false]
 {%
-  \MFUhyphentrue
-  \glssetcategoryattribute{term}{glossname}{title}%
   \renewcommand{\glslistitem}[1]{%
     \item[\glsentryitem{#1}%
           \glstarget{#1}{\glossentryname{#1}}]%

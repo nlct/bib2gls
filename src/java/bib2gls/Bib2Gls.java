@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2021 Nicola L.C. Talbot
+    Copyright (C) 2017-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -870,7 +870,50 @@ public class Bib2Gls implements TeXApp
                }
                else if (isAutoSupportPackage(pkg))
                {
+                  if (pkg.equals("bpchem"))
+                  {
+                     addBlocker("ce");
+                  }
+                  else if (pkg.equals("lipsum"))
+                  {
+                     addBlocker("lipsum");
+                  }
+                  else if (pkg.equals("pifont"))
+                  {
+                     // may be decorative so skip
+                     addExclusion("ding");
+                  }
+                  else if (pkg.equals("siunitx"))
+                  {
+                     addBlocker("num");
+                     addBlocker("numlist");
+                     addBlocker("numproduct");
+                     addBlocker("numrange");
+                     addBlocker("ang");
+                     addBlocker("unit");
+                     addBlocker("qty");
+                     addBlocker("qtylist");
+                     addBlocker("qtyproduct");
+                     addBlocker("qtyrange");
+                     addBlocker("complexnum");
+                     addBlocker("complexqty");
+                     addBlocker("si");
+                     addBlocker("SI");
+                     addBlocker("SIlist");
+                     addBlocker("SIrange");
+                  }
+
                   packages.add(pkg);
+               }
+               else if (pkg.equals("twemojis"))
+               {
+                  // may be decorative so skip
+                  addExclusion("twemoji");
+               }
+               else if (pkg.equals("graphics"))
+               {
+                  // may be decorative so skip
+                  addExclusion("includegraphics");
                }
             }
             else
@@ -1036,7 +1079,7 @@ public class Bib2Gls implements TeXApp
 
       interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
 
-      MfirstucSty mfirstucSty = 
+      mfirstucSty = 
         (MfirstucSty)listener.usepackage(null, "mfirstuc", false);
 
       Vector<String> packages = getPackages();
@@ -1823,6 +1866,9 @@ public class Bib2Gls implements TeXApp
             addAuxCommand("@glsxtr@multientry", 4);
             addAuxCommand("@glsxtr@mglsrefs", 1);
             addAuxCommand("@glsxtr@mglslike", 1);
+            addAuxCommand("@mfu@excls", 1);
+            addAuxCommand("@mfu@blockers", 1);
+            addAuxCommand("@mfu@mappings", 1);
 
             if (knownGlossaries != null)
             {
@@ -2447,6 +2493,18 @@ public class Bib2Gls implements TeXApp
                records.add(newRecord);
             }
          }
+         else if (name.equals("@mfu@excls"))
+         {
+            addExclusions(data.getArg(0));
+         }
+         else if (name.equals("@mfu@blockers"))
+         {
+            addBlockers(data.getArg(0));
+         }
+         else if (name.equals("@mfu@mappings"))
+         {
+            addMappings(CsvList.getList(parser, data.getArg(0)));
+         }
          else if (knownGlossaries != null && name.equals("@newglossary"))
          {
             addGlossary(data.getArg(0).toString(parser));
@@ -3023,6 +3081,244 @@ public class Bib2Gls implements TeXApp
       {
          fam.setAllCapsPlural(allcapspl);
       }
+   }
+
+   /**
+    * Tests if the control sequence has been identified as an
+    * exclusion with  <code>\\MFUexcl</code>.
+    * @param csname the control sequence name
+    * @return true if the control sequence has been identified as an
+    * exclusion
+    */
+   public boolean isCaseExclusion(String csname)
+   {
+      if (mfirstucExclusions == null)
+      {
+         return false;
+      }
+
+      return mfirstucExclusions.contains(csname);
+   }
+
+   private void addExclusions(TeXObject obj)
+   {
+      if (mfirstucExclusions == null)
+      {
+         mfirstucExclusions = new Vector<String>();
+      }
+
+      if (obj instanceof ControlSequence)
+      {
+         String name = ((ControlSequence)obj).getName();
+
+         mfirstucExclusions.add(name);
+
+         if (mfirstucSty != null)
+         {
+            mfirstucSty.addExclusion(name);
+         }
+      }
+      else if (obj instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)obj;
+
+         for (int i = 0; i < list.size(); i++)
+         {
+            addExclusions(list.get(i));
+         }
+      }
+      else if (!(obj instanceof Ignoreable || obj instanceof WhiteSpace ))
+      {
+         debugMessage("warning.exclusions.unknown.token", obj);
+      }
+   }
+
+   private void addExclusion(String csname)
+   {
+      if (mfirstucExclusions == null)
+      {
+         mfirstucExclusions = new Vector<String>();
+      }
+
+      mfirstucExclusions.add(csname);
+
+      if (mfirstucSty != null)
+      {
+         mfirstucSty.addExclusion(csname);
+      }
+   }
+
+   /**
+    * Tests if the control sequence has been identified as a blocker
+    * with  <code>\\MFUblocker</code>.
+    * @param csname the control sequence name
+    * @return true if the control sequence has been identified as a
+    * blocker
+    */
+   public boolean isCaseBlocker(String csname)
+   {
+      if (mfirstucBlockers == null)
+      {
+         return false;
+      }
+
+      return mfirstucBlockers.contains(csname);
+   }
+
+   private void addBlockers(TeXObject obj)
+   {
+      if (mfirstucBlockers == null)
+      {
+         mfirstucBlockers = new Vector<String>();
+      }
+
+      if (obj instanceof ControlSequence)
+      {
+         String name = ((ControlSequence)obj).getName();
+
+         mfirstucBlockers.add(name);
+
+         if (mfirstucSty != null)
+         {
+            mfirstucSty.addBlocker(name);
+         }
+      }
+      else if (obj instanceof TeXObjectList)
+      {
+         TeXObjectList list = (TeXObjectList)obj;
+
+         for (int i = 0; i < list.size(); i++)
+         {
+            addBlockers(list.get(i));
+         }
+      }
+      else if (!(obj instanceof Ignoreable || obj instanceof WhiteSpace ))
+      {
+         debugMessage("warning.blockers.unknown.token", obj);
+      }
+   }
+
+   private void addBlocker(String csname)
+   {
+      if (mfirstucBlockers == null)
+      {
+         mfirstucBlockers = new Vector<String>();
+      }
+
+      mfirstucBlockers.add(csname);
+
+      if (mfirstucSty != null)
+      {
+         mfirstucSty.addBlocker(csname);
+      }
+   }
+
+   /**
+    * Gets mapping established by <code>\\MFUaddmap</code>.
+    * @param csname the control sequence name
+    * @return the mapped control sequence name or null if none
+    * assigned
+    */
+   public String getCaseMapping(String csname)
+   {
+      if (mfirstucMappings == null)
+      {
+         return null;
+      }
+
+      return mfirstucMappings.get(csname);
+   }
+
+   private void addMappings(CsvList csvList)
+   {
+      if (mfirstucMappings == null)
+      {
+         mfirstucMappings = new HashMap<String,String>();
+      }
+
+      for (int i = 0; i < csvList.size(); i++)
+      {
+         // each element should be in the form {\csname }= {\Csname }
+
+         TeXObject item = csvList.getValue(i);
+
+         if (item instanceof TeXObjectList)
+         {
+            String csname1 = null;
+            String csname2 = null;
+
+            TeXObjectList list = (TeXObjectList)item;
+
+            boolean equalsFound = false;
+
+            for (int j = 0; j < list.size(); j++)
+            {
+               TeXObject obj = list.get(j);
+
+               if (obj instanceof Other && ((Other)obj).getCharCode() == '=')
+               {
+                  equalsFound = true;
+               }
+               else 
+               {
+                  ControlSequence cs = getFirstCs(obj);
+
+                  if (cs != null)
+                  {
+                     if (equalsFound)
+                     {
+                        csname2 = cs.getName();
+                        break;
+                     }
+                     else
+                     {
+                        csname1 = cs.getName();
+                     }
+                  }
+               }
+            }
+
+            if (csname1 != null && csname2 != null)
+            {
+               mfirstucMappings.put(csname1, csname2);
+
+               if (mfirstucSty != null)
+               {
+                  mfirstucSty.addMapping(csname1, csname2);
+               }
+            }
+            else
+            {
+               debugMessage("warning.mappings.cant.parse", item);
+            }
+         }
+         else if (!(item instanceof Ignoreable || item instanceof WhiteSpace ))
+         {
+            debugMessage("warning.mappings.cant.parse", item);
+         }
+      }
+   }
+
+   private ControlSequence getFirstCs(TeXObject obj)
+   {
+      if (obj instanceof ControlSequence)
+      {
+         return (ControlSequence)obj;
+      }
+      else if (obj instanceof TeXObjectList)
+      {
+         for (TeXObject o : (TeXObjectList)obj)
+         {
+            ControlSequence cs = getFirstCs(o);
+
+            if (cs != null)
+            {
+               return cs;
+            }
+         }
+      }
+
+      return null;
    }
 
    // is the given field likely to occur in link text?
@@ -6307,8 +6603,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0.20221009";
-   public static final String DATE = "2022-10-09";
+   public static final String VERSION = "3.0";
+   public static final String DATE = "2022-10-14";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -6530,6 +6826,8 @@ public class Bib2Gls implements TeXApp
 
    private TeXParser interpreter = null;
 
+   private MfirstucSty mfirstucSty = null;
+
    private boolean useNonBreakSpace = true;
 
    private boolean forceCrossResourceRefs = false;
@@ -6549,6 +6847,10 @@ public class Bib2Gls implements TeXApp
    private String mfirstucVersion="????/??/??";
 
    private static final String MFIRSTUC208 = "2022/10/14";
+
+   private Vector<String> mfirstucExclusions;
+   private Vector<String> mfirstucBlockers;
+   private HashMap<String,String> mfirstucMappings;
 
    private Vector<String> dependencies = null;
 

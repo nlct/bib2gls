@@ -1798,8 +1798,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "2.9.20220905";
-   public static final String DATE = "2022-09-05";
+   public static final String VERSION = "3.0";
+   public static final String DATE = "2022-10-14";
    public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

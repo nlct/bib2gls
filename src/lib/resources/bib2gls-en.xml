@@ -361,6 +361,9 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.unknown_compound_label">Unknown compound entry ''{0}''.</entry>
 <entry key="warning.unknown_compound_label.in_entry">Unknown compound entry ''{0}'' referenced in entry ''{1}''.</entry>
 <entry key="warning.max-prune-iteration-cap">Maximum value of ''{0}'' exceeded. Capping at {1}.</entry>
+<entry key="warning.exclusions.unknown.token">Unknown token in exclusion list: {0}</entry>
+<entry key="warning.blockers.unknown.token">Unknown token in blocker list: {0}</entry>
+<entry key="warning.mappings.cant.parse">Can''t parse mapping list: {0}</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2021 Nicola L.C. Talbot
+    Copyright (C) 2017-2022 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -11993,7 +11993,7 @@ public class GlsResource
                   }
                }
             }
-            else if (isNoCaseChangeCs(csname))
+            else if (isCaseExclusion(csname))
             {
                // skip argument
             }
@@ -12288,7 +12288,7 @@ public class GlsResource
                   }
                }
             }
-            else if (isNoCaseChangeCs(csname))
+            else if (isCaseExclusion(csname))
             {
                // skip argument
             }
@@ -12632,12 +12632,12 @@ public class GlsResource
                return;
             }
 
-            if (csname.endsWith("ref") || isNoCaseChangeCs(csname))
+            if (csname.endsWith("ref") || isCaseBlocker(csname))
             {
                return;
             }
 
-            if (csname.equals("MFUskippunc") || csname.equals("NoCaseChange"))
+            if (isCaseExclusion(csname))
             {
                // object should now be the argument, which should be
                // skipped.
@@ -12792,6 +12792,7 @@ public class GlsResource
     * @return true if the command's argument should not have its
     * case-changed
     */ 
+   @Deprecated
    public boolean isNoCaseChangeCs(String csname)
    {
       if (csname.equals("si") || csname.equals("ensuremath")
@@ -12812,6 +12813,53 @@ public class GlsResource
       }
 
       return false;
+   }
+
+   public boolean isCaseExclusion(String csname)
+   {
+      if (bib2gls.isCaseExclusion(csname))
+      {
+         return true;
+      }
+
+      if (noCaseChangeCs != null)
+      {
+         for (String cs : noCaseChangeCs)
+         {
+            if (cs.equals(csname))
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   public boolean isCaseBlocker(String csname)
+   {
+      if (bib2gls.isCaseBlocker(csname))
+      {
+         return true;
+      }
+
+      if (noCaseChangeCs != null)
+      {
+         for (String cs : noCaseChangeCs)
+         {
+            if (cs.equals(csname))
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   public String getCaseMapping(String csname)
+   {
+      return bib2gls.getCaseMapping(csname);
    }
 
    /**
@@ -13215,7 +13263,7 @@ public class GlsResource
 
                continue;
             }
-            else if (isNoCaseChangeCs(csname))
+            else if (isCaseBlocker(csname) || isCaseExclusion(csname))
             {// no case-change
                wordCount++;
                continue;
@@ -13593,6 +13641,13 @@ public class GlsResource
     */ 
    public String getSentenceCsName(String csname)
    {
+      String mappedName = getCaseMapping(csname);
+
+      if (mappedName != null)
+      {
+         return mappedName;
+      }
+
       if (csname.matches("gls(pl|xtrshort|xtrlong|xtrfull|xtrp)?"))
       {
          return "G"+csname.substring(1);
