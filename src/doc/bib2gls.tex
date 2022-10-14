@@ -155,6 +155,7 @@
   see=omit,seealso=omit,alias=omit,
   field-aliases={topics=adoptparents,annote=user2},
   replicate-fields={name=nametitle,progeny=unsortedprogeny},
+  word-boundaries={white space,cs space,dash},
   field-case-change={nametitle=title},
   interpret-fields={nametitle},
   no-case-change-cs={fieldfmt,abbrstylefmt,glostylefmt},
@@ -11586,11 +11587,6 @@ the original value is encapsulated by a command or \bibgls\ will
 perform the actual \idx{case-change} according to its own algorithm.
 The results can vary according to the field content.
 
-Only a subset of known fields have a resource option that can be
-used to apply a \idx{case-change}. For example, \csopt{name-case-change}
-can be used to change the case of the \field{name} field, but
-there's no equivalent option for the \field{text} field.
-
 Each of the case-changing resource options may take one of the
 following values:
 \begin{itemize}
@@ -11681,6 +11677,14 @@ example:
 \end{codeenv}
 
 \end{itemize}
+
+\begin{important}
+Major changes have been introduced to \sty{mfirstuc} v2.08. Some of
+the information below refers to older versions and is not
+applicable with \sty{mfirstuc} v2.08+. See the \sty{mfirstuc} manual
+for further details.
+\end{important}
+
 The \optfmt{firstuc-cs} and \optfmt{firstuc} options are essentially
 a \idx{sentencecase} change, but there's no check for
 sentence-breaks within the value, so even if the value contains

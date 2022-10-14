@@ -10,6 +10,7 @@ glossaries-extra.sty
 glossaries-extra*.def
 glossaries.sty
 glossary-*.sty
+mfirstuc.sty
 *.out
 *.log
 *.aux
