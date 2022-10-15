@@ -5,9 +5,14 @@ Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category
 
 Related TUGboat articles:
 
-  - [Glossaries with bib2gls](http://tug.org/TUGboat/tb40-1/tb124talbot-bib2gls.pdf), issue [40:1, 2019](http://tug.org/TUGboat/Contents/contents40-1.html).
-  - [bib2gls: selection, cross-references and locations](http://tug.org/TUGboat/tb41-3/tb129talbot-bib2gls-more.pdf), issue [41:3, 2020](http://tug.org/TUGboat/Contents/contents41-3.html).
-  - bib2gls: sorting, issue [42:2, 2021](http://tug.org/TUGboat/Contents/contents42-2.html).
+  - Glossaries with bib2gls, issue [40:1, 2019](http://tug.org/TUGboat/Contents/contents40-1.html) 
+    [(PDF)](http://tug.org/TUGboat/tb40-1/tb124talbot-bib2gls.pdf).
+  - bib2gls: selection, cross-references and locations, issue [41:3, 2020](http://tug.org/TUGboat/Contents/contents41-3.html)
+    [(PDF)](http://tug.org/TUGboat/tb41-3/tb129talbot-bib2gls-more.pdf).
+  - bib2gls: sorting, issue [42:2, 2021](http://tug.org/TUGboat/Contents/contents42-2.html) [(PDF)](https://tug.org/TUGboat/tb42-2/tb131talbot-sorting.pdf).
+  - bib2gls: standalone entries and repeated lists (a little book of
+    poisons), issue [43:1, 2022](https://tug.org/TUGboat/Contents/contents43-1.html)
+    [(PDF)](https://tug.org/TUGboat/tb43-1/tb133talbot-bib2gls-reorder.pdf).
 
 (This application was developed as a follow-up from [my answer on TeX on
 StackExchange](http://tex.stackexchange.com/a/343852/19862).)
