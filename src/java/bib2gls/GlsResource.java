@@ -170,7 +170,10 @@ public class GlsResource
             {
                for (String src : srcList)
                {
-                  sources.add(bib2gls.getBibFilePath(parser, src));
+                  if (!src.isEmpty())
+                  {// skip empty elements
+                     sources.add(bib2gls.getBibFilePath(parser, src));
+                  }
                }
             }
          }
