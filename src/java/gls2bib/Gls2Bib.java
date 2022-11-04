@@ -50,6 +50,7 @@ import com.dickimawbooks.texparserlib.generic.UndefinedActiveChar;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
+import com.dickimawbooks.texparserlib.latex.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
@@ -224,6 +225,9 @@ public class Gls2Bib extends LaTeXParserListener
       // don't complain about redefining unknown commands
       parser.putControlSequence(new NewCommand("renewcommand",
         Overwrite.ALLOW));
+
+      parser.putControlSequence(new NewDocumentCommand(
+      "RenewDocumentCommand", Overwrite.ALLOW));
 
       parser.putControlSequence(
         new GenericCommand("glslongkey", null, createString("long")));
@@ -438,6 +442,18 @@ public class Gls2Bib extends LaTeXParserListener
 
    @Override
    public void writeln(String text)
+     throws IOException
+   {
+   }
+
+   @Override
+   public void writeliteralln(String text)
+     throws IOException
+   {
+   }
+
+   @Override
+   public void writeliteral(String text)
      throws IOException
    {
    }
@@ -1798,8 +1814,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "3.0";
-   public static final String DATE = "2022-10-14";
+   public static final String VERSION = "3.1";
+   public static final String DATE = "2022-11-03";
    public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;
