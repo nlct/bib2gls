@@ -1,0 +1,20 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\begin{filecontents*}{\jobname.bib}
+@entry{example,description={this entry has no name}}
+\end{filecontents*}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources
+
+\begin{document}
+\gls{example}
+\glsdesc{example}
+
+\printunsrtglossary
+\end{document}

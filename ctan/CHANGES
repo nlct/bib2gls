@@ -1,3 +1,18 @@
+v3.1 (pending):
+
+  * If new versions of glossaries.sty, mfirstuc.sty and glossaries-extra.sty
+    are detected, \bibglsuppercase and \bibglslowercase will now
+    have \glsuppercase and \glslowercase in their definition,
+    instead of \MakeTextUppercase and \MakeTextLowercase
+
+  * skip empty elements in src
+
+  * added support for \ifglsfieldvoid
+
+  * TeX parser library (texparserlib.jar) now has limited support
+    for \NewDocumentCommand, \RenewDocumentCommand, 
+    \ProvideDocumentCommand and \DeclareDocumentCommand.
+
 v3.0 (2022-10-14):
 
   * support for \glsxtr@select@entry and \glsxtr@select@entry@nameref

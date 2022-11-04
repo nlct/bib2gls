@@ -1663,14 +1663,14 @@ the order in which the glossaries were defined. You may use
 preferred order.
 \end{important}
 
-\item[\field{group}] The entries within a glossary can form groups
+\item[\field{group}] The entries within a glossary can form \idxpl{group}
 as a by-product of the sorting method. This must be enabled with the
 \longarg{group} switch and isn't available for the sort methods
 listed in \tableref{tab:sortoptionsnosort}. The group label is
 stored in the \field{group} field. This is an internal field that
 typically shouldn't be set in the \ext{bib} file.
 
-You can specify your own custom groups but if you do so you must
+You can specify your own \idxpl{customgroup} but if you do so you must
 ensure that the terms are ordered in such a way that they are
 gathered according to group. This is typically done by splitting the
 glossary into blocks using a separate \gls{GlsXtrLoadResources} with
@@ -1719,7 +1719,7 @@ commands within the document. For example:
 Suppose that your list of terms spans many pages and you feel it
 would be helpful to the reader to split it up into letter groups
 then you would need to run \bibgls\ with the \longarg{group} switch
-and use a glossary style that supports letter groups for that
+and use a glossary style that supports \idxpl{lettergroup} for that
 glossary. For example:
 \begin{codeenv}
 \cs{printunsrtglossary}\oarg{\printglossopt[indexgroup]{style}}
@@ -3042,7 +3042,7 @@ The \styfmt{glossaries-extra} \styopt{record} package option
 automatically creates a new internal field called \field{group}. If the
 \longarg{group} switch is used with the default \csopt[auto]{group}
 option then, when sorting, \bibgls\ will try
-to determine the letter group for each entry and assign it to the
+to determine the \idx{group} for each entry and assign it to the
 \field{group} field.  (Some \csopt{sort} options ignore this
 setting.) This value will be picked up by \ics{printunsrtglossary}
 if group headings are required (for example with the
@@ -3051,6 +3051,11 @@ if group headings are required (for example with the
 \styopt[false]{nogroupskip}). If you don't require grouping within
 the glossary, there's no need to use this switch. Note that this
 switch doesn't automatically select an appropriate glossary style.
+
+If you want \idxpl{sub-group}, you will need to use the \csopt{group-level}
+resource option and ensure you have \sty{glossaries-extra} v1.49+.
+\Idxpl{smallgroup} can be merged with the \csopt{merge-small-groups}
+resource option.
 
 \begin{important}
 The \field{group} field should typically not be set in the \ext{bib}
@@ -3515,12 +3520,12 @@ Don't check for instances of \ics{citation} in the \ext{aux} file
 \argsection{collapse-same-location-range}
 
 Collapse any explicit \gls{location} range into a normal \gls{record} if
-the \glspl{location} are the same (default).
+the start and end \glspl{location} are the same (default).
 
 \argsection{no-collapse-same-location-range}
 
 Don't collapse any explicit \gls{location} range into a normal
-\gls{record} if the \glspl{location} are the same.
+\gls{record} if the start and end \glspl{location} are the same.
 
 \argsection{map-format}
 
@@ -8648,10 +8653,11 @@ The default setting is \csopt[no value]{missing-parent-category}.
 
 \optsection{group-level}
 
-If letter group formation is enabled (see \csopt{group},
+If letter \idx{group} formation is enabled (see \csopt{group},
 \csopt{group-formation} and \longarg{group}) then the default
 behaviour is to only assign the group label for \glspl{top-levelentry}.
-This option allows the group label to be assigned to \glspl{sub-entry}.
+This option allows the group label to be assigned to \glspl{sub-entry}
+if \idxpl{sub-group} are required.
 The value may be one of the following:
 \begin{itemize}
 \item \meta{n}: only assign the group for level~\meta{n} entries;
@@ -8671,10 +8677,10 @@ hierarchical levels start at 0 (\gls{top-levelentry}). For any value
 other than \csopt[0]{group-level}, the parent entry label will be
 included in the group label.
 
-The hierarchical group titles are formatted according to
+The \idx{hiergroup} titles are formatted according to
 \gls{bibglshiersubgrouptitle}. If the group title would
 usually be set with the command \csfmt{bibglsset\ldots group}
-for \glspl{top-levelentry} then the hierarchical group title would
+for \glspl{top-levelentry} then the \idx{hiergroup} title would
 be set with the analogous \csfmt{bibglsset\ldots group} command.
 For example, letter groups are normally set with
 \gls{bibglssetlettergrouptitle} but hierarchical letter groups are set
@@ -8684,21 +8690,30 @@ If the \longarg{no-group} setting is on then this option has no effect.
 
 \begin{important}
 Any value other than the default \csopt[0]{group-level} requires
-\sty{glossaries-extra} v1.49+.
+\sty{glossaries-extra} v1.49+, which provides \cs{glssubgroupheading}.
 \end{important}
+
+\Idxpl{sub-group} are implemented by the glossary style command:
+\nosecformatdef{glssubgroupheading}
+The \sty{glossaries-extra} package automatically implements:
+\begin{codeenv}
+\cmd{renewcommand}*\marg{\cs{glssubgroupheading}}[4]\marg{\cs{glsgroupheading}\marg{\idx{param}4}}
+\end{codeenv}
+whenever a style is set, so that if the style doesn't provide a
+definition for this command, it will behave like \cs{glsgroupheading}.
 
 \optsection{merge-small-groups}
 
-Merges consecutive groups that have less than \meta{n} entries. The
+Merges consecutive \idxpl{smallgroup} that have less than \meta{n} entries. The
 default is \csopt[0]{merge-small-groups}, which switches off this
 action. If \meta{n} is omitted, \csopt[1]{merge-small-groups} is
 assumed.
 
 This setting only has an effect if group formation is enabled.
-If hierarchical sub-groups are enabled (\csopt{group-level}) then
+If hierarchical \idxpl{sub-group} are enabled (\csopt{group-level}) then
 merging is only performed on consecutive small groups within the
 same hierarchical level. Any \glspl{childentry} that aren't in their
-own sub-group are included in the higher level group count. 
+own \idx{sub-group} are included in the higher level group count. 
 
 For example, suppose you have a large number of entries in most of
 the letter groups:
@@ -12401,13 +12416,19 @@ syntax \glsopt[\idx{openrange}]{format} and
 \glsopt[\idx{openrange}]{format} or \glsopt[\idx{openrange}\meta{csname}]{format} and
 \glsopt[\idx{closerange}\meta{csname}]{format} (where \meta{csname} is again the name of 
 a text-block command without the initial backslash) in the optional
-argument of commands like \ics{gls} or \ics{glsadd}. These will always
-form a range, regardless of \csopt{min-loc-range}, and will be
-encapsulated by \gls!{bibglsrange}. (This command is not used with
-ranges that are formed by collating consecutive \glspl{location}.) The
-initial marker is stripped from the \meta{format} argument of the
-\gls{location} formatting commands, such as \gls{glsnoidxdisplayloc}, to
-allow for easy conversion to the corresponding text-block command.
+argument of commands like \ics{gls} or \ics{glsadd}. With
+\sty{glossaries-extra} v1.50+, you can also use \ics{glsstartrange}
+and \ics{glsendrange}.
+
+These explicit ranges will always form a range, regardless of
+\csopt{min-loc-range}, unless the start and end coincide and
+\longarg{collapse-same-location-range} is in effect.  The range will
+be encapsulated by \gls!{bibglsrange}. (This command is not used
+with ranges that are formed by collating consecutive
+\glspl{location}.) The initial marker is stripped from the
+\meta{format} argument of the \gls{location} formatting commands,
+such as \gls{glsnoidxdisplayloc}, to allow for easy conversion to
+the corresponding text-block command.
 
 Explicit ranges don't merge with neighbouring \glspl{location}, but
 will absorb any single \glspl{location} within the range that don't
@@ -20708,12 +20729,16 @@ This command is only provided if \longarg{replace-quotes} is used.
 
 \formatdef{bibglsuppercase}
 Converts \meta{text} to \idx{uppercase}. This just uses
-\ics{MakeTextUppercase} by default.
+\ics{glsuppercase} (if \sty{glossaries} v4.50+,
+\sty{glossaries-extra} v1.49+ and \sty{mfirstuc} v2.08+)
+or \ics{MakeTextUppercase} by default.
 
 \cssection{bibglslowercase}
 
 \formatdef{bibglslowercase}
 Converts \meta{text} to \idx{lowercase}. This just uses
+\ics{glslowercase} (if \sty{glossaries} v4.50+,
+\sty{glossaries-extra} v1.49+ and \sty{mfirstuc} v2.08+)
 \ics{MakeTextLowercase} by default.
 
 \cssection{bibglstitlecase}
@@ -24532,14 +24557,14 @@ The tagging format is governed by \ics{glsxtrtagfont} which
 underlines its argument by default. I've redefined it to also
 convert the letter to \idx{uppercase}:
 \begin{codeenv}
-\cs{renewcommand}*\marg{\cs{glsxtrtagfont}}[1]\marg{\ics{underline}\marg{\cs{MakeTextUppercase}\marg{\idx{param}1}}}
+\cs{renewcommand}*\marg{\cs{glsxtrtagfont}}[1]\marg{\ics{underline}\marg{\cs{glsuppercase}\marg{\idx{param}1}}}
 \end{codeenv}
 Note that in the \code{mathml} case, the first tag consists of more
 than one letter:
 \begin{codeenv}
 \field{long}=\marg{\cmd{abbrvtag}\marg{m\cs{NoCaseChange}\marg{ath}}ematical }\idx{stringconcat}markuplang
 \end{codeenv}
-Here \ics{NoCaseChange} prevents \ics{MakeTextUppercase}
+Here \ics{NoCaseChange} prevents \ics{glsuppercase}
 from applying the case change.
 
 The default \csopt{selection} criteria includes entries that have

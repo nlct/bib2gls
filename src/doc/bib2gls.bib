@@ -1078,6 +1078,16 @@ given label},
   category={command}
 }
 
+@mainglscommand{glssubgroupheading,
+  name={\csfmt{gls\-sub\-group\-heading}},
+  user1={\margm{previous level}\margm{level}\margm{parent-label}\margm{group-label}},
+  description={formats the heading for the \idx{sub-group} identified by the
+given label},
+  topics={glossarystylecommands,formattingcommands},
+  note={\styfmt{glossaries-extra} v1.49+},
+  category={command}
+}
+
 @bibglscommand{bibglssetlastgrouptitle,
   name={\csfmt{bib\-gls\-set\-last\-group\-title}},
   user1={\margm{cs}\margm{specs}},
@@ -1108,7 +1118,7 @@ given label},
 @bibglscommand{bibglsgrouplevel,
   name={\csfmt{bib\-gls\-group\-level}},
   user1={\margm{label}{n}},
-  description={expands to the group label for hierarchical level \meta{n}
+  description={expands to the \idx{sub-group} label for hierarchical level \meta{n}
   where \meta{label} is the label that would normally be applied to
   level~0},
   topics={glossarystylecommands,groupcommands},
@@ -1119,7 +1129,7 @@ given label},
 @bibglscommand{bibglshiersubgrouptitle,
   name={\csfmt{bib\-gls\-hier\-sub\-group\-title}},
   user1={\marg{level}\marg{parent}\marg{title}},
-  description={formats the title for a hierarchical group where the
+  description={formats the title for a \idx{hiergroup} where the
    normal non-hierarchical title would be \meta{title}},
   topics={glossarystylecommands,groupcommands},
   note={\bibgls},
@@ -10570,6 +10580,28 @@ primary formats, if enabled.},
   name={custom group}
 }
 
+@index{sub-group}
+@index{hiergroup,
+ name={hierarchical group},
+ alias={sub-group}
+}
+@index{smallgroup,
+ name={small group}
+}
+
+@indexplural{group}
+@index{groups.letter,alias={lettergroup}}
+@index{groups.nonletter,alias={nonlettergroup}}
+@index{groups.symbol,alias={symbolgroup}}
+@index{groups.empty,alias={emptygroup}}
+@index{groups.number,alias={numbergroup}}
+@index{groups.datetime,alias={datetimegroup}}
+@index{groups.date,alias={dategroup}}
+@index{groups.time,alias={timegroup}}
+@index{groups.custom,alias={customgroup}}
+@index{groups.sub,alias={sub-group}}
+@index{groups.small,alias={smallgroup}}
+
 @index{localeprovider,
   name={locale provider}
 }
@@ -12703,14 +12735,31 @@ field value},
   category={command}
 }
 
+@glscommand{ifglsfieldvoid,
+  name={\csfmt{if\-gls\-field\-void}},
+  user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
+  description={expands to \meta{true} if the given entry doesn't
+exist, or exists but doesn't have the field (identified by its
+internal field label) defined or does have the field defined but the
+field is empty. Otherwise expands to \meta{false}. This is
+essentially like \gls{GlsXtrIfFieldUndef} but also
+tests for an empty value},
+  topics={conditional,fieldrefcommands},
+  note={\styfmt{glossaries} v4.50+\texparserdefnote},
+  seealso={GlsXtrIfFieldUndef},
+  category={command}
+}
+
 @glscommand{GlsXtrIfFieldUndef,
   name={\csfmt{Gls\-Xtr\-If\-Field\-Undef}},
   user1={\margm{field label}\margm{entry label}\margm{true}\margm{false}},
-  description={tests if the given field isn't defined for the given
+  description={tests if the given field (identified by its
+internal field label) isn't defined for the given
    entry, which may also not exist},
   topics={conditional,fieldrefcommands},
   note={\styfmt{glossaries-extra} v1.23+},
-  category={command}
+  category={command},
+  seealso={ifglsfieldvoid},
 }
 
 @glscommand{GlsXtrIfFieldEqStr,
@@ -13566,6 +13615,30 @@ letter to \idx{uppercase}},
   category={command}
 }
 
+@glscommand{glsstartrange,
+  name={\csfmt{gls\-start\-range}},
+  user1={\oargm{options}\margm{label list}},
+  description={essentially like 
+  \code{\cs{glsaddeach}\oarg{\glsopt[\idx{openrange}]{format},\meta{options}}\margm{label-list}}.
+   If \glsopt{format} is used in \meta{options}, the open marker
+   \idx{openrange} will be inserted in front of the value},
+  topics={indexing},
+  note={\styfmt{glossaries-extra} v1.50+},
+  category={command}
+}
+
+@glscommand{glsendrange,
+  name={\csfmt{gls\-end\-range}},
+  user1={\oargm{options}\margm{label list}},
+  description={essentially like 
+  \code{\cs{glsaddeach}\oarg{\glsopt[\idx{closerange}]{format},\meta{options}}\margm{label-list}}.
+   If \glsopt{format} is used in \meta{options}, the close marker
+   \idx{closerange} will be inserted in front of the value},
+  topics={indexing},
+  note={\styfmt{glossaries-extra} v1.50+},
+  category={command}
+}
+
 @glsaddoption{glsadd.thevalue,
   name={\csoptfmt{thevalue}},
   user1={\margm{value}},
@@ -14090,6 +14163,43 @@ usual delay},
   user1={\margm{cs}\oargm{n}\oargm{def}\margm{code}},
   description={defines a command if it's not already defined},
   note={kernel command\texparserdefnote},
+  category={command}
+}
+
+@command{NewDocumentCommand,
+  name={\csfmt{New\-Document\-Com\-mand}},
+  user1={\margm{cs}\margm{arg specs}\margm{code}},
+  description={defines a new robust command (only partially
+implemented by \TeX\ Parser Library)},
+  note={\LaTeX3 command\texparserdefnote},
+  category={command}
+}
+
+@command{RenewDocumentCommand,
+  name={\csfmt{Renew\-Document\-Com\-mand}},
+  user1={\margm{cs}\margm{arg specs}\margm{code}},
+  description={redefines a new robust command (only partially
+implemented by \TeX\ Parser Library)},
+  note={\LaTeX3 command\texparserdefnote},
+  category={command}
+}
+
+@command{ProvideDocumentCommand,
+  name={\csfmt{Provide\-Document\-Com\-mand}},
+  user1={\margm{cs}\margm{arg specs}\margm{code}},
+  description={provides a robust command, if not already defined (only partially
+implemented by \TeX\ Parser Library)},
+  note={\LaTeX3 command\texparserdefnote},
+  category={command}
+}
+
+@command{DeclareDocumentCommand,
+  name={\csfmt{Declare\-Document\-Com\-mand}},
+  user1={\margm{cs}\margm{arg specs}\margm{code}},
+  description={defines a robust command, regardless of whether or not 
+   it has already been defined (only partially
+implemented by \TeX\ Parser Library)},
+  note={\LaTeX3 command\texparserdefnote},
   category={command}
 }
 
@@ -16643,6 +16753,22 @@ has three or more items},
   name={\csfmt{end\-foot}},
   description={ends the footer section},
   note={\styfmt{longtable}},
+  category={command}
+}
+
+@command{glslowercase,
+  name={\csfmt{gls\-lower\-case}},
+  user1={\margm{text}},
+  description={converts \meta{text} to lower case},
+  note={\styfmt{glossaries} v4.50+\texparserdefnote},
+  category={command}
+}
+
+@command{glsuppercase,
+  name={\csfmt{gls\-upper\-case}},
+  user1={\margm{text}},
+  description={converts \meta{text} to \idx{uppercase}},
+  note={\styfmt{glossaries} v4.50+\texparserdefnote},
   category={command}
 }
 

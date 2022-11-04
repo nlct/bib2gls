@@ -963,10 +963,32 @@ public class Bib2Gls implements TeXApp
          debug();
       }
 
+      hasNewCaseSupport = (mfirstucVersion.compareTo(MFIRSTUC208) >= 0);
+
+      if (hasNewCaseSupport 
+          && glossariesVersion.compareTo(MFIRSTUC208) < 0)
+      {
+         hasNewCaseSupport = false;
+
+         warningMessage("warning.mismatched.sty", 
+            "mfirstuc", mfirstucVersion,
+            "glossaries", glossariesVersion
+         );
+      }
+
+      if (hasNewCaseSupport 
+          && glossariesExtraVersion.compareTo(MFIRSTUC208) < 0)
+      {
+         hasNewCaseSupport = false;
+
+         warningMessage("warning.mismatched.sty", 
+            "glossaries", glossariesVersion,
+            "glossaries-extra", glossariesExtraVersion
+         );
+      }
+
       if ((!mfirstucProtectWasSet || !mfirstucMProtectWasSet)
-           && mfirstucVersion.compareTo(MFIRSTUC208) >= 0
-           && glossariesVersion.compareTo(MFIRSTUC208) >= 0
-           && glossariesExtraVersion.compareTo(MFIRSTUC208) >= 0
+           && hasNewCaseSupport
          )
       {
          verboseMessage("message.nomfirstuc.protect");
@@ -1464,6 +1486,8 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new GlsIfHasKey("ifglshassymbol", "symbol", this));
       listener.putControlSequence(new GlsIfHasKey("ifglshaslong", "long", this));
       listener.putControlSequence(new GlsIfHasKey("ifglshasshort", "short", this));
+
+      listener.putControlSequence(new IfGlsFieldVoid(this));
 
       listener.putControlSequence(new Relax("glscurrentfieldvalue"));
       listener.putControlSequence(new GlsXtrIfHasField(this));
@@ -3957,8 +3981,16 @@ public class Bib2Gls implements TeXApp
       writer.println("\\providecommand*{\\bibglshyperlink}[2]{\\glshyperlink[#1]{#2}}");
       writer.println();
 
-      writer.println("\\providecommand{\\bibglsuppercase}{\\MakeTextUppercase}");
-      writer.println("\\providecommand{\\bibglslowercase}{\\MakeTextLowercase}");
+      if (hasNewCaseSupport)
+      {
+         writer.println("\\providecommand{\\bibglsuppercase}{\\glsuppercase}");
+         writer.println("\\providecommand{\\bibglslowercase}{\\glslowercase}");
+      }
+      else
+      {
+         writer.println("\\providecommand{\\bibglsuppercase}{\\MakeTextUppercase}");
+         writer.println("\\providecommand{\\bibglslowercase}{\\MakeTextLowercase}");
+      }
       writer.println("\\providecommand{\\bibglsfirstuc}{\\makefirstuc}");
       writer.println("\\providecommand{\\bibglstitlecase}{\\capitalisewords}");
       writer.println();
@@ -6603,8 +6635,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.0";
-   public static final String DATE = "2022-10-14";
+   public static final String VERSION = "3.1";
+   public static final String DATE = "2022-11-03";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -6847,6 +6879,8 @@ public class Bib2Gls implements TeXApp
    private String mfirstucVersion="????/??/??";
 
    private static final String MFIRSTUC208 = "2022/10/14";
+
+   private boolean hasNewCaseSupport = false;
 
    private Vector<String> mfirstucExclusions;
    private Vector<String> mfirstucBlockers;

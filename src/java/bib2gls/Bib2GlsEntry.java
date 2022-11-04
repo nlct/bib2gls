@@ -376,6 +376,7 @@ public class Bib2GlsEntry extends BibEntry
 
    // is the given cs name likely to cause a problem for
    // \makefirstuc? (Just check for common ones.)
+   // With mfirstuc v2.08+, these should now be added as exclusions
    private boolean isCsProblematic(String csname)
    {
       return csname.equals("foreignlanguage")

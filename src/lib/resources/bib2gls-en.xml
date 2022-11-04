@@ -364,6 +364,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.exclusions.unknown.token">Unknown token in exclusion list: {0}</entry>
 <entry key="warning.blockers.unknown.token">Unknown token in blocker list: {0}</entry>
 <entry key="warning.mappings.cant.parse">Can''t parse mapping list: {0}</entry>
+<entry key="warning.mismatched.sty">Mismatching versions of packages {0} ({1}) and {2} ({3}). Please upgrade {2}</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
@@ -597,6 +598,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="latex.package.not.loaded">Package ''{0}'' has not been loaded</entry>
 <entry key="latex.error.counter.too.large">Counter too large</entry>
 <entry key="latex.error.counter.out.of.range">Counter value {0} out of valid range ({1})</entry>
+<entry key="latex.unsupported.xparse_type">Unsupported xparse type {0} in command {1}</entry>
 
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>

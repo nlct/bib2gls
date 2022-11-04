@@ -4,6 +4,7 @@ file name with space.tex
 test-bib-bom.tex
 test-bom.bib
 test-glslike.bib
+test-missing-fields.bib
 glossaries-extra-bib2gls.sty
 glossaries-extra-stylemods.sty
 glossaries-extra.sty
