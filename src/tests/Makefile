@@ -40,7 +40,8 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-dual-samename.pdf test-mgls.pdf test-mgls2.pdf \
 	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
-	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf
+	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
+	  test-merge-ranges.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -788,6 +789,13 @@ test-emptyloc.pdf	: test-emptyloc.glstex
 test-emptyloc.glstex	: test-emptyloc.tex entries.bib $(DEPS)
 			pdflatex test-emptyloc
 			$(BIB2GLS) test-emptyloc
+
+test-merge-ranges.pdf	: test-merge-ranges.glstex
+		pdflatex test-merge-ranges
+
+test-merge-ranges.glstex	: test-merge-ranges.tex $(DEPS) test-entries.bib
+		pdflatex test-merge-ranges
+		$(BIB2GLS) test-merge-ranges
 
 clean	:
 	$(RM) *.aux

@@ -1,0 +1,35 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+  src=entries,
+  merge-ranges
+]
+
+\begin{document}
+\gls{bird}
+\newpage
+Test
+%\gls{bird}
+\newpage
+Test
+%\gls{bird}
+\newpage
+\glsstartrange{bird}
+\newpage
+Test
+\gls[format=textbf]{bird}
+\newpage
+\glsendrange{bird}
+\newpage
+Test
+%\newpage
+\gls{bird}
+
+\printunsrtglossary
+\end{document}

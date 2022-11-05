@@ -3823,6 +3823,8 @@ public class Bib2GlsEntry extends BibEntry
       int count = 0;
       StringBuilder mid = new StringBuilder();
       GlsRecord implicitStart = null;
+      GlsRecord explicitRangeStart = null;
+      GlsRecord explicitRangeEnd = null;
 
       int[] maxGap = new int[1];
       maxGap[0] = 0;
@@ -3848,10 +3850,6 @@ public class Bib2GlsEntry extends BibEntry
          {
             char paren = m.group(1).charAt(0);
 
-            count = 0;
-            mid.setLength(0);
-            implicitStart = null;
-   
             if (paren == '(')
             {
                if (rangeStart != null)
@@ -3863,20 +3861,71 @@ public class Bib2GlsEntry extends BibEntry
                rangeStart = record;
                rangeFmt = m.group(2);
    
-               if (builder == null)
+               if (resource.isMergeRangesOn())
                {
-                  builder = new StringBuilder();
+                  explicitRangeStart = (GlsRecord)record.clone();
+                  explicitRangeStart.setFormat(rangeFmt);
+
+                  if (prev != null && explicitRangeStart.follows(prev, gap, maxGap))
+                  {
+                     mid.setLength(0);
+                  }
+                  else if (implicitStart == null)
+                  {
+                     implicitStart = rangeStart;
+
+                     if (builder == null)
+                     {
+                        builder = new StringBuilder();
+                     }
+                     else if (!start)
+                     {
+                        builder.append(delimN);
+                        startRangeIdx = builder.length();
+                     }
+
+                     builder.append(record.getFmtTeXCode());
+                  }
+                  else
+                  {
+                     if (builder == null)
+                     {
+                        builder = new StringBuilder();
+                     }
+
+                     builder.append(mid);
+                     mid.setLength(0);
+                     implicitStart = rangeStart;
+                     builder.append(delimN);
+                     startRangeIdx = builder.length();
+                     builder.append(record.getFmtTeXCode());
+                  }
+
+                  count = minRange;
+                  prev = explicitRangeStart;
                }
-               else if (!start)
+               else
                {
-                  builder.append(delimN);
+                  implicitStart = null;
+                  count = 0;
+                  mid.setLength(0);
+   
+                  if (builder == null)
+                  {
+                     builder = new StringBuilder();
+                  }
+                  else if (!start)
+                  {
+                     builder.append(delimN);
+                  }
+
+                  startRangeIdx = builder.length();
+
+                  builder.append("\\bibglsrange{");
+                  builder.append(record.getFmtTeXCode());
                }
 
-               startRangeIdx = builder.length();
-
-               builder.append("\\bibglsrange{");
-               builder.append(record.getFmtTeXCode());
-
+               explicitRangeEnd = null;
             }
             else
             {
@@ -3886,9 +3935,24 @@ public class Bib2GlsEntry extends BibEntry
                     "error.range.missing.start", record));
                }
 
-               builder.append("\\delimR ");
-               builder.append(record.getFmtTeXCode(rangeStart, compact));
-               builder.append("}");
+               if (resource.isMergeRangesOn())
+               {
+                  explicitRangeEnd = (GlsRecord)record.clone();
+                  explicitRangeEnd.setFormat(rangeFmt);
+                  prev = explicitRangeEnd;
+                  explicitRangeStart = null;
+               }
+               else
+               {
+                  implicitStart = null;
+                  count = 0;
+                  mid.setLength(0);
+
+                  builder.append("\\delimR ");
+                  builder.append(record.getFmtTeXCode(rangeStart, compact));
+                  builder.append("}");
+               }
+
                rangeStart = null;
                rangeFmt = null;
             }
@@ -3941,6 +4005,37 @@ public class Bib2GlsEntry extends BibEntry
                 startRangeIdx += content.length();
              }
    
+         }
+         else if (explicitRangeEnd != null)
+         {
+            if (!record.follows(explicitRangeEnd, gap, maxGap))
+            {
+               builder.append(mid);
+               builder.append("\\delimR ");
+               builder.append(explicitRangeEnd.getFmtTeXCode());
+
+               if (maxGap[0] > 1)
+               {
+                  builder.append("\\bibglspassim ");
+               }
+
+               maxGap[0] = 0;
+
+               builder.append(delimN);
+               builder.append(record.getFmtTeXCode());
+               mid.setLength(0);
+               count = 1;
+               maxGap[0] = 0;
+               implicitStart = null;
+            }
+            else
+            {
+               mid.append(delimN);
+               mid.append(record.getFmtTeXCode());
+            }
+
+            prev = record;
+            explicitRangeEnd = null;
          }
          else if (prev == null)
          {
@@ -4023,7 +4118,18 @@ public class Bib2GlsEntry extends BibEntry
          start = false;
       }
 
-      if (rangeStart != null)
+      if (explicitRangeEnd != null)
+      {
+         if (builder == null)
+         {
+            builder = new StringBuilder();
+         }
+
+         builder.append(mid);
+         builder.append("\\delimR ");
+         builder.append(explicitRangeEnd.getFmtTeXCode());
+      }
+      else if (rangeStart != null)
       {
          throw new Bib2GlsException(bib2gls.getMessage(
            "error.range.missing.end", rangeStart));

@@ -3519,13 +3519,18 @@ Don't check for instances of \ics{citation} in the \ext{aux} file
 
 \argsection{collapse-same-location-range}
 
-Collapse any explicit \gls{location} range into a normal \gls{record} if
+Collapse any \idx{explicit-range} into a normal \gls{record} if
 the start and end \glspl{location} are the same (default).
+This record will be treated as a normal \gls{location} that can be
+merged with neighbouring \glspl{location}, regardless of
+\csopt{merge-ranges}.
 
 \argsection{no-collapse-same-location-range}
 
-Don't collapse any explicit \gls{location} range into a normal
+Don't collapse any \idx{explicit-range} into a normal
 \gls{record} if the start and end \glspl{location} are the same.
+The \idx{explicit-range} will only be able to merge with
+neighbouring \glspl{location} if \csopt[true]{merge-ranges}.
 
 \argsection{map-format}
 
@@ -3544,8 +3549,8 @@ This essentially means that if there's a \gls{record} conflict
 involving \encap{emph}, try replacing \encap{emph} with
 \encap{hyperbf} and see if that resolves the conflict.
 
-Note that if the conflict includes a range formation, the
-range takes precedence.
+Note that if the conflict includes a \idx{range} formation, the
+\idx{range} takes precedence.
 The mapping tests are applied as the records are
 read. For example, suppose the records are listed in the \ext{aux}
 file as:
@@ -3829,11 +3834,12 @@ switch with a comma-separated list of formats that should be
 retained. Note that exact duplicates will still be merged.
 This switch has a cumulative effect.
 
-Take care if you use this switch and you have an explicit range with
+Take care if you use this switch and you have an \idx{explicit-range} with
 coincident start and end locations. If the
 \glsdisp{principallocation}{principal record} is between
-the start and end format markers then the range can't collapse
-to an ordinary \gls{record}.
+the start and end format markers then the \idx{range} can't collapse
+to an ordinary \gls{record}. (You may need to use
+\csopt[true]{merge-ranges}.)
 
 \argsection{no-retain-formats}
 
@@ -12353,7 +12359,7 @@ the locations, use \csopt[see]{save-locations} (or similar).
 The \field{loclist} field has the syntax of an \isty{etoolbox}
 internal list and includes every \gls{location} (except for the
 \glsdisp{discardedrecord}{discarded duplicates} and
-\iglspl{ignoredrecord}) with no range formations. Any explicit range
+\iglspl{ignoredrecord}) with no \idx{range} formations.  Any \idx{explicit-range}
 markup is stripped from the \glsopt{format} information to leave
 just the \idx{encap} name, so you just get the start and end
 \glspl{location} added as individual elements but they are still
@@ -12411,40 +12417,54 @@ The \csfmt{hyper}\meta{xx} set of commands all internally use
 \gls{location}. See Table~6.1 in the \styfmt{glossaries}~\cite{glossaries}
 user manual for a list of all the \csfmt{hyper}\meta{xx} commands.
 
-Ranges can be explicitly formed using the parenthetical 
+\Idxpl{range} can be explicitly formed using the parenthetical 
 syntax \glsopt[\idx{openrange}]{format} and
 \glsopt[\idx{openrange}]{format} or \glsopt[\idx{openrange}\meta{csname}]{format} and
 \glsopt[\idx{closerange}\meta{csname}]{format} (where \meta{csname} is again the name of 
 a text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd}. With
 \sty{glossaries-extra} v1.50+, you can also use \ics{glsstartrange}
-and \ics{glsendrange}.
+and \ics{glsendrange} (which is useful if the unbalanced parentheses
+upset syntax highlighting).
 
-These explicit ranges will always form a range, regardless of
-\csopt{min-loc-range}, unless the start and end coincide and
-\longarg{collapse-same-location-range} is in effect.  The range will
-be encapsulated by \gls!{bibglsrange}. (This command is not used
-with ranges that are formed by collating consecutive
-\glspl{location}.) The initial marker is stripped from the
-\meta{format} argument of the \gls{location} formatting commands,
-such as \gls{glsnoidxdisplayloc}, to allow for easy conversion to
-the corresponding text-block command.
+These \idxpl{explicit-range} will always form a \idx{range},
+regardless of \csopt{min-loc-range}, unless the start and end
+coincide and \longarg{collapse-same-location-range} is in effect.
+The \idx{explicit-range} will be encapsulated with \gls!{bibglsrange}
+(unless \csopt[true]{merge-ranges}). (This command is not used with
+\idxpl{implicit-range} that are formed by collating consecutive \glspl{location}.)
+The initial marker is stripped from the \meta{format} argument of
+the \gls{location} formatting commands, such as
+\gls{glsnoidxdisplayloc}, to allow for easy conversion to the
+corresponding text-block command.
 
-Explicit ranges don't merge with neighbouring \glspl{location}, but
-will absorb any single \glspl{location} within the range that don't
-conflict.  (Conflicts will be moved to the start of the explicit
-range.) For example, if \code{\cs{gls}\marg{sample}} is used on
-page~1,
+\Idxpl{explicit-range} don't merge with neighbouring
+\glspl{location} (unless \csopt[true]{merge-ranges}), but will
+absorb any individual \glspl{location} within the \idx{range} that doesn't
+conflict.  (Conflicts, denoted \idxpl{interloper}, will be moved to the start of the
+\idx{explicit-range}, regardless of \csopt{merge-ranges}.)
+For example, if \code{\cs{gls}\marg{sample}} is used on page~1,
 \code{\cs{gls}\oarg{\glsopt[\idx{openrange}]{format}}\marg{sample}}
 is used on page~2, \code{\cs{gls}\marg{sample}} is used on page~3, and
 \code{\cs{gls}\oarg{\glsopt[\idx{closerange}]{format}}\marg{sample}}
 is used on page~4, then the \gls{locationlist} will be 1, 2--4. The
-entry on page~3 is absorbed into the explicit range, but the range
-can't be expanded to include page~1.  If the entry on page~3 had a
-different format to the explicit range, for example
+entry on page~3 is absorbed into the \idx{explicit-range}, but, with
+the default \csopt[false]{merge-ranges}, the 
+\idx{range} can't be expanded to include page~1.  If the entry on page~3 had a
+different format to the \idx{explicit-range}, for example
 \code{\cs{gls}\oarg{\glsopt[\encap{textbf}]{format}}\marg{sample}}
-then it would cause a warning and be moved before the start of the
-range so that the \gls{locationlist} would then be 1, \textbf{3}, 2--4. 
+then this will cause a warning and the \idx{interloper} will be
+moved before the start of the \idx{range} so that the
+\gls{locationlist} would then be 1, \textbf{3}, 2--4. 
+
+The \csopt[true]{merge-ranges} option will make \idxpl{explicit-range}
+behave like \idxpl{implicit-range}, which allows them to merge with
+neighbouring \idxpl{range}. The \gls{bibglsrange} command won't be used in
+this case (regardless of whether or not the \idx{range} was merged with
+neighbouring \glspl{location}). Options such as
+\csopt{min-loc-range} won't have an effect on the merged \idx{range}, but
+will still effect \idxpl{implicit-range} that haven't been merged with an
+\idx{explicit-range}.
 
 An \igls{ignoredrecord} identifies a term that needs to be treated as
 though it has a \gls{record} for selection purposes, but the
@@ -12485,14 +12505,14 @@ If you also want to drop front matter \glspl{location} as well:
 \cs{GlsXtrSetDefaultNumberFormat}\marg{\encap{glsignore}}
 \end{codeenv}
 
-Note that explicit range formations aren't discarded, so if
-\encap{glsignore} is used in a range, such as:
+Note that \idx{explicit-range} formations aren't discarded, so if
+\encap{glsignore} is used in a \idx{range}, such as:
 \begin{codeenv}
 \ics{glsadd}\oarg{\glsopt[\idx{openrange}\encap{glsignore}]{format}}\marg{sample}
 \ldots 
 \cs{glsadd}\oarg{\glsopt[\idx{closerange}\encap{glsignore}]{format}}\marg{sample} 
 \end{codeenv}
-then the range will be included in the \gls{locationlist} (encapsulated
+then the \idx{range} will be included in the \gls{locationlist} (encapsulated
 with \ics{glsignore}), but this case would be a rather odd use of
 this special format and is not recommended.
 
@@ -12552,8 +12572,8 @@ then the \ext{aux} file will contain:
 This is a partial \gls{record} match. In this case, \bibgls\ 
 makes the following tests:
 \begin{itemize}
-\item If one of the formats includes a range formation, the
-range takes precedence.
+\item If one of the formats includes an \idx{explicit-range} formation marker, the
+\idx{range} takes precedence.
 
 \item If one of the formats is \encap{glsnumberformat} (as in the
 above example) or an \igls{ignoredrecord} format such as
@@ -12682,7 +12702,8 @@ usual \igls{locationlist};
 \igls{locationlist}. You may want to consider using the
 \longswitch{retain-formats} switch with this setting if you don't
 want to lose a partial \gls{location} match (for example, if the 
-\gls{principallocation} coincides with the start of an explicit range).
+\gls{principallocation} coincides with the start of an
+\idx{explicit-range}).
 
 \end{itemize}
 
@@ -12833,7 +12854,7 @@ the \field{location} field due to the
 \csopt[remove]{save-principal-locations} setting. This can lead to a
 ragged \gls{locationlist}. The option \csopt[default
 format]{save-principal-locations} can allow the
-\gls{principallocation} to be absorbed into a range.
+\gls{principallocation} to be absorbed into a \idx{range}.
 
 The \gls{mainglossary} records are added through the category-independent post-name
 hook with \cs{glsadd}. This won't be implemented until the entries are actually
@@ -12956,7 +12977,7 @@ define the custom commands as follows:
 This is more useful if you want to simply omit the
 \code{\glsopt[primaryfmt]{format}} option (just remove it from the above four 
 definitions), which makes it easier to merge the \glspl{location} into
-ranges in the index.
+\idxpl{range} in the index.
 
 \optsection{primary-loc-counters}
 
@@ -13094,18 +13115,39 @@ first, followed by the \counter{chapter} group. Whereas with:
 then the \field{primarylocations} field will have the
 \counter{chapter} group first, followed by the \counter{page} group.
 
+\optsection{merge-ranges}
+
+This boolean option determines whether or not \idxpl{explicit-range} should
+merge with neighbouring \glspl{location} on either side of the
+\idx{range}. The default setting is \csopt[false]{merge-ranges}.
+
+Note that \gls{bibglsrange} won't be used with
+\csopt[true]{merge-ranges}, regardless of whether or not the \idx{range}
+was merged with neighbouring \glspl{location}. Options such as
+\csopt{min-loc-range}, \csopt{suffixF} and \csopt{suffixFF} 
+won't have an effect on the merged range, but
+will still effect \idxpl{implicit-range} that haven't been merged with an
+\idx{explicit-range}.
+
+Regardless of the value of this option, \idxpl{interloper} will still be
+moved to the start of the \idx{range} and encapsulated with
+\gls{bibglsinterloper}.
+
 \optsection{min-loc-range}
 
 By default, three or more consecutive \glspl{location} \meta{loc-1},
 \meta{loc-2}, \ldots, \meta{loc-n} are compressed into
-the range \code{\meta{loc-1}\ics{delimR} \meta{loc-n}}. Otherwise
+the \idx{range} \code{\meta{loc-1}\ics{delimR} \meta{loc-n}}
+(an \idx{implicit-range}). Otherwise
 the \glspl{location} are separated by \gls!{bibglsdelimN} or \gls!{bibglslastDelimN}.
-As mentioned above, these aren't merged with explicit range formations.
+As mentioned above, these aren't merged with \idx{explicit-range}
+formations unless \csopt[true]{merge-ranges}.
 
-You can change this with the \csopt{min-loc-range} setting where
+You can change how many consecutive \glspl{location} are need to
+form an \idx{implicit-range} with the \csopt{min-loc-range} setting where
 \meta{value} is either \optfmt{none} (don't form ranges) or an
 integer greater than one indicating how many consecutive
-\glspl{location} should be converted into a range.
+\glspl{location} should be converted into a \idx{range}.
 
 \bibgls\ determines if one \gls{location}
 \code{\margm{prefix-2}\margm{counter-2}\margm{format-2}\margm{location-2}}
@@ -13299,7 +13341,8 @@ For example, if \meta{location-1} is \qt{B} and \meta{location-2}
 is \qt{C}, then $n_1 = 66$ and $n_2 = 67$. Since $n_2 = 67 = 66+1=
 n_1+1$ then \meta{location-2} immediately follows \meta{location-1}.
 
-This is used in the range formations within the \glspl{locationlist} (as described
+This is used in the \idx{implicit-range} formations within 
+the \glspl{locationlist} (as described
 in the above section).
 So, for example, the list \qt{1, 2, 3, 5, 7, 8, 10, 11, 12, 58, 59,
 61} becomes
@@ -13309,9 +13352,9 @@ The automatically indexing of commands like \ics{gls} means that
 the \glspl{locationlist} can become long and ragged. You could
 deal with this by switching off the automatic indexing and
 only explicitly index pertinent use or you can adjust
-the value of \optfmt{max-loc-diff} so that a range can be formed even
+the value of \optfmt{max-loc-diff} so that a \idx{range} can be formed even
 if there are one or two gaps in it.
-By default, any \gls{location} ranges that have skipped gaps in this
+By default, any \idxpl{range} that have skipped gaps in this
 manner will be followed by \gls!{bibglspassim}. The default
 definition of this command is obtained from the resource file.
 For English, this is \verb*| passim| (space followed by \qt{passim}).
@@ -13323,9 +13366,11 @@ term.
 
 \optsection{suffixF}
 
-If set, a range consisting of two consecutive \glspl{location}
-\meta{loc-1} and \meta{loc-2} will be
-displayed in the \gls{locationlist} as \meta{loc-1}\meta{value}.
+If set, an \idx{implicit-range} consisting of two consecutive
+\glspl{location} \meta{loc-1} and \meta{loc-2} will be displayed in
+the \gls{locationlist} as \meta{loc-1}\meta{value}.  This option
+doesn't affect \idxpl{explicit-range}, even with
+\csopt[true]{merge-ranges}.
 
 Note that \csopt[\empty]{suffixF} sets the suffix to the
 empty string. To remove the suffix formation use
@@ -13335,9 +13380,11 @@ The default is \csopt[none]{suffixF}.
 
 \optsection{suffixFF}
 
-If set, a range consisting of three or more consecutive \glspl{location}
-\meta{loc-1} and \meta{loc-2} will be
+If set, an \idx{implicit-range} consisting of three or more
+consecutive \glspl{location} \meta{loc-1} and \meta{loc-2} will be
 displayed in the \gls{locationlist} as \meta{loc-1}\meta{value}.
+This option doesn't affect \idxpl{explicit-range}, even with
+\csopt[true]{merge-ranges}.
 
 Note that \csopt[\empty]{suffixFF} sets the suffix to the
 empty string. To remove the suffix formation use
@@ -13352,9 +13399,9 @@ The \meta{value} may be an integer \meta{n} or \optfmt{false} (equivalent to
 \csopt[3]{compact-ranges}). If no \meta{value} is specified,
 \optfmt{true} is assumed.
 
-This setting allows \gls{location} ranges such as 184--189 to appear
+This setting allows location \idxpl{range} such as 184--189 to appear
 more compactly as 184--9. The end \gls{location} is encapsulated
-in the command \gls{bibglscompact}, so the range would actually
+in the command \gls{bibglscompact}, so the \idx{range} would actually
 become:
 \begin{codeenv}
 184\ics{delimR}\gls{bibglscompact}\marg{digit}\marg{18}\marg{9}
@@ -13362,7 +13409,7 @@ become:
 If the \gls{location} is in the form \code{\meta{cs}\margm{loc}}
 (where \meta{cs} is a command)
 then \gls{bibglscompact} will be inside the argument.
-For example, if the range would normally be:
+For example, if the \idx{range} would normally be:
 \begin{codeenv}
 \cmd{custom}\marg{184}\ics{delimR}\cmd{custom}\marg{189}
 \end{codeenv}
@@ -13651,9 +13698,9 @@ consider the following document:
 \cmd{end}\marg{document}
 \end{codeenv}
 This results in the \gls{locationlist} \qt{1, 1--3, 3--5}. This
-looks a little odd and it may seem as though the range formation
+looks a little odd and it may seem as though the \idx{implicit-range} formation
 hasn't worked, but the \glspl{location} are actually: page~1, equation~1,
-equation~2, equation~3, page~3, page~4 and page~5. Ranges can't
+equation~2, equation~3, page~3, page~4 and page~5. \Idxpl{range} can't
 be formed across different counters.
 
 The \csopt[\meta{list}]{loc-counters} option instructs \bibgls\ 
@@ -13748,7 +13795,7 @@ the place where the corresponding \cs{label} occurred.
 This method works partially with \idx!{makeindex} and \idx!{xindy}
 but from their point of view the \gls{location} is the value of the
 \counter{wrglossary} counter, which interferes with their ability to
-merge duplicate page numbers and form ranges. Since \bibgls\ is
+merge duplicate page numbers and form \idxpl{range}. Since \bibgls\ is
 designed specifically to work with \sty{glossaries-extra}, it's
 aware of this special counter and will merge and collate the
 \glspl{location} according to the corresponding page number instead.
@@ -19027,6 +19074,8 @@ This defaults to \code{,\idx{nbspchar}} to discourage lonely \glspl{location}.
 \cssection{bibglscompact}
 
 \formatdef{bibglscompact}
+This command is used with \csopt{compact-ranges} when the end
+\gls{location} in a \idx{range} is compacted.
 The first argument \meta{pattern} indicates the \gls{location} pattern:
 \code{digit} for digits, \code{roman} for \idx!{lowercase}
 Roman numerals, \code{ROMAN} for \idx!{uppercase} Roman
@@ -19040,9 +19089,9 @@ This just does \meta{part2} by default.
 \cssection{bibglspassim}
 
 \formatdef{bibglspassim}
-If \csopt{max-loc-diff} is greater than~1, then any ranges that have
-skipped over gaps will be followed by \gls{bibglspassim}, which is
-defined as:
+If \csopt{max-loc-diff} is greater than~1, then any
+\idxpl{implicit-range} that have skipped over gaps will be followed
+by \gls{bibglspassim}, which is defined as:
 \begin{codeenv}
 \cs{providecommand}\marg{\gls{bibglspassim}}\marg{ \gls{bibglspassimname}}
 \end{codeenv}
@@ -19069,25 +19118,26 @@ The default definition is obtained from the \langxml. For example, with
 \cssection{bibglsrange}
 
 \formatdef{bibglsrange}
-Explicit ranges formed using \glsopt[\idx{openrange}]{format} and
+\Idxpl{explicit-range} formed using \glsopt[\idx{openrange}]{format} and
 \glsopt[\idx{closerange}]{format} or \glsopt[\idx{openrange}\meta{csname}]{format} and
 \glsopt[\idx{closerange}\meta{csname}]{format} (where \meta{csname} matches and is a
 text-block command without the initial backslash) in the optional
 argument of commands like \ics{gls} or \ics{glsadd} are encapsulated within
-the argument of \gls{bibglsrange}. By default this simply does its
-argument. This command is not used with ranges that are formed by collating
-consecutive \glspl{location}.
+the argument of \gls{bibglsrange}. By default, this simply does its
+argument. This command is not used with \idxpl{implicit-range} that
+are formed by collating consecutive \glspl{location} or when
+\csopt[true]{merge-ranges} is used.
 
 \cssection{bibglsinterloper}
 
 \formatdef{bibglsinterloper}
-If an explicit range conflicts with a record, a warning will be
-issued and the conflicting record will be shifted to the front
-of the range inside the argument of \gls{bibglsinterloper}.
+If an \idxpl{explicit-range} conflicts with a record, a warning will be
+issued and the conflicting record (the \idx{interloper}) will be shifted to the front
+of the \idx{range} inside the argument of \gls{bibglsinterloper}.
 The default definition just does \meta{location}\gls!{bibglsdelimN}
 so that it fits neatly into the list.
 
-For example, suppose on page~4 of my document I start a range with:
+For example, suppose on page~4 of my document I start a \idx{range} with:
 \begin{codeenv*}
 \cs{glsadd}\oarg{\glsaddopt[\idx{openrange}]{format}}\marg{sample}
 \end{codeenv*}
@@ -19095,21 +19145,22 @@ and end it on page~9 with:
 \begin{codeenv*}
 \cs{glsadd}\oarg{\glsaddopt[\idx{closerange}]{format}}\marg{sample}
 \end{codeenv*}
-This forms an explicit range, but let's suppose on page~6 I
+This forms an \idx{explicit-range}, but let's suppose on page~6 I
 have:
 \begin{codeenv}
 \cs{gls}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{sample}
 \end{codeenv}
-This record conflicts with the explicit range (which doesn't include
+This record conflicts with the \idx{explicit-range} (which doesn't include
 \encap{hyperbf} in the format). This causes a warning and
 the conflicting entry will be moved before the start of the
-explicit range resulting in \textbf{6}, 4--9.
+\idx{explicit-range} resulting in \textbf{6}, 4--9.
 
-Note that implicit ranges can't be formed from interlopers (nor can
-implicit ranges be merged with explicit ones),
+Note that \idxpl{implicit-range} can't be formed from \idxpl{interloper} (nor can
+\idxpl{implicit-range} be merged with explicit ones with the default
+\csopt[false]{merge-ranges}),
 so if \code{\cs{gls}\oarg{\glsopt[\encap{hyperbf}]{format}}\marg{sample}} 
 also occurs on pages~7 and~8 then the result will be \textbf{6}, \textbf{7},
-\textbf{8}, 4--9. Either remove the explicit range or
+\textbf{8}, 4--9. Either remove the \idx{explicit-range} or
 remove the conflicting entries. (Alternatively, redefine
 \gls{bibglsinterloper} to ignore its argument, which will
 discard the conflicting entries.)

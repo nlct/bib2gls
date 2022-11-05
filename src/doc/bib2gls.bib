@@ -3178,6 +3178,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.merge-ranges,
+   name={\csoptfmt{merge\dhyphen ranges}},
+   user1={\meta{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.min-loc-range,
    name={\csoptfmt{min\dhyphen loc\dhyphen range}},
    user1={\meta{value}},
@@ -10590,17 +10597,62 @@ primary formats, if enabled.},
 }
 
 @indexplural{group}
-@index{groups.letter,alias={lettergroup}}
-@index{groups.nonletter,alias={nonlettergroup}}
-@index{groups.symbol,alias={symbolgroup}}
-@index{groups.empty,alias={emptygroup}}
-@index{groups.number,alias={numbergroup}}
-@index{groups.datetime,alias={datetimegroup}}
-@index{groups.date,alias={dategroup}}
-@index{groups.time,alias={timegroup}}
-@index{groups.custom,alias={customgroup}}
-@index{groups.sub,alias={sub-group}}
-@index{groups.small,alias={smallgroup}}
+@index{groups.letter,
+ parent={group},
+ name={letter},
+ text={letter group},
+ alias={lettergroup}}
+@index{groups.nonletter,
+ parent={group},
+ name={non-letter},
+ text={non-letter group},
+ alias={nonlettergroup}
+}
+@index{groups.symbol,
+ parent={group},
+ name={symbol},
+ text={symbol group},
+ alias={symbolgroup}}
+@index{groups.empty,
+ parent={group},
+ name={empty},
+ text={empty group},
+ alias={emptygroup}}
+@index{groups.number,
+ parent={group},
+ name={number},
+ text={number group},
+ alias={numbergroup}}
+@index{groups.datetime,
+ parent={group},
+ name={datetime},
+ text={datetime group},
+ alias={datetimegroup}}
+@index{groups.date,
+ parent={group},
+ name={date},
+ text={date group},
+ alias={dategroup}}
+@index{groups.time,
+ parent={group},
+ name={time},
+ text={time group},
+ alias={timegroup}}
+@index{groups.custom,
+ parent={group},
+ name={custom},
+ text={custom group},
+ alias={customgroup}}
+@index{groups.sub,
+ parent={group},
+ name={hierarchical},
+ text={hierarchical group},
+ alias={sub-group}}
+@index{groups.small,
+ parent={group},
+ name={small},
+ text={small group},
+ alias={smallgroup}}
 
 @index{localeprovider,
   name={locale provider}
@@ -10621,6 +10673,24 @@ primary formats, if enabled.},
 
 @index{locationlist,
   name = {location list}
+}
+
+@index{range}
+@index{explicit-range,
+ parent={range},
+ name={explicit},
+ text={explicit range}
+}
+@index{implicit-range,
+ parent={range},
+ name={implicit},
+ text={implicit range}
+}
+@index{interloper,parent={range}}
+@index{locationrange,
+ parent={locationlist},
+ name={ranges},
+ alias={range}
 }
 
 @index{postlinkhook,

@@ -1210,6 +1210,10 @@ public class GlsResource
          {
             saveLocList = getBoolean(list, opt);
          }
+         else if (opt.equals("merge-ranges"))
+         {
+            mergeRanges = getBoolean(list, opt);
+         }
          else if (opt.equals("save-primary-locations")
                  || opt.equals("save-principal-locations"))
          {
@@ -15445,6 +15449,11 @@ public class GlsResource
       return saveLocations;
    }
 
+   public boolean isMergeRangesOn()
+   {
+      return mergeRanges;
+   }
+
    /**
     * Gets the "compact-ranges" setting.
     * @return the setting as a numeric value (0=false) 
@@ -16545,6 +16554,8 @@ public class GlsResource
    public static final int PRIMARY_LOCATION_COUNTERS_SPLIT=2;
 
    private int primaryLocCounters = PRIMARY_LOCATION_COUNTERS_COMBINE;
+
+   private boolean mergeRanges = false;
 
    private Random random=null;
 
