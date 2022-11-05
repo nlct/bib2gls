@@ -1,4 +1,4 @@
-v3.1 (pending):
+v3.1 (2022-11-05):
 
   * If new versions of glossaries.sty, mfirstuc.sty and glossaries-extra.sty
     are detected, \bibglsuppercase and \bibglslowercase will now
