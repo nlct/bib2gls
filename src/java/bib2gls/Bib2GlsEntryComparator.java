@@ -36,11 +36,12 @@ public class Bib2GlsEntryComparator extends SortComparator
 {
    public Bib2GlsEntryComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries,
-    SortSettings settings, String sortField, String groupField, String entryType)
+    SortSettings settings, String sortField, String groupField, 
+    String entryType, boolean overrideType)
    throws ParseException
    {
       super(bib2gls, entries, settings, sortField, groupField,
-        entryType);
+        entryType, overrideType);
 
       int breakPoint = settings.getBreakPoint();
 
@@ -188,12 +189,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       GlsResource resource = bib2gls.getCurrentResource();
 
-      String type = resource.getType(entry, entryType);
-
-      if (type == null)
-      {
-         type = "";
-      }
+      String type = getType(entry);
 
       if (resource.useGroupField(entry, entries))
       {

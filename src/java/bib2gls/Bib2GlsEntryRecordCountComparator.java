@@ -28,12 +28,12 @@ public class Bib2GlsEntryRecordCountComparator extends Bib2GlsEntryNumericCompar
 {
    public Bib2GlsEntryRecordCountComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
-    String groupField, String entryType)
+    String groupField, String entryType, boolean overrideType)
    throws Bib2GlsException
    {
       // No actual sort field used. There isn't a 'record'
       // field in Bib2GlsEntry's set of fields.
-      super(bib2gls, entries, settings, "", groupField, entryType);
+      super(bib2gls, entries, settings, "", groupField, entryType, overrideType);
 
       if (!bib2gls.isRecordCountSet())
       {

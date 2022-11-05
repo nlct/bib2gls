@@ -28,10 +28,10 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
 {
    public Bib2GlsEntryLetterComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
-    String sortField, String groupField, String entryType)
+    String sortField, String groupField, String entryType, boolean overrideType)
    {
       super(bib2gls, entries, settings, sortField, groupField,
-        entryType);
+        entryType, overrideType);
 
       this.caseStyle = settings.caseStyle();
 

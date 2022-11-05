@@ -32,10 +32,10 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
 {
    public Bib2GlsEntryNumericComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
-    String sortField, String groupField, String entryType)
+    String sortField, String groupField, String entryType, boolean overrideType)
    {
       super(bib2gls, entries, settings, sortField, groupField,
-        entryType);
+        entryType, overrideType);
 
       sortMethod = settings.getMethod();
       sort = settings.getUnderlyingMethod();

@@ -11,6 +11,8 @@ v3.1 (pending):
 
   * added support for \ifglsfieldvoid
 
+  * bug fix: secondary sort type not included in group label
+
   * TeX parser library (texparserlib.jar) now has limited support
     for \NewDocumentCommand, \RenewDocumentCommand, 
     \ProvideDocumentCommand and \DeclareDocumentCommand.

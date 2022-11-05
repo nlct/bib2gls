@@ -31,7 +31,8 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 {
    public SortComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
-    String sortField, String groupField, String entryType)
+    String sortField, String groupField, String entryType,
+    boolean overrideType)
    {
       this.sortField = sortField;
       this.groupField = groupField;
@@ -39,7 +40,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       this.bib2gls = bib2gls;
       this.entries = entries;
       this.settings = settings;
-
+      this.overrideType = overrideType;
    }
 
    protected abstract long getDefaultGroupId(Bib2GlsEntry entry, 
@@ -118,6 +119,11 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
    protected String getType(Bib2GlsEntry entry)
    {
+      if (overrideType)
+      {
+         return entryType == null ? "" : entryType;
+      }
+
       GlsResource resource = bib2gls.getCurrentResource();
 
       String type = resource.getType(entry, entryType);
@@ -786,6 +792,8 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
    protected String sortFallbackField = "bib2gls@sortfallback";
 
    protected String sortField, groupField, entryType;
+
+   protected boolean overrideType = false;
 
    private HashMap<String,Integer> sortCount;
 

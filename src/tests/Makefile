@@ -41,7 +41,7 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
-	  test-merge-ranges.pdf
+	  test-merge-ranges.pdf test-secondary2.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -796,6 +796,13 @@ test-merge-ranges.pdf	: test-merge-ranges.glstex
 test-merge-ranges.glstex	: test-merge-ranges.tex $(DEPS) test-entries.bib
 		pdflatex test-merge-ranges
 		$(BIB2GLS) test-merge-ranges
+
+test-secondary2.pdf	: test-secondary2.glstex
+		pdflatex test-secondary2
+
+test-secondary2.glstex	: test-secondary2.tex $(DEPS) test-numbers.bib
+		pdflatex test-secondary2
+		$(BIB2GLS) test-secondary2
 
 clean	:
 	$(RM) *.aux

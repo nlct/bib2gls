@@ -34,10 +34,10 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
 {
    public Bib2GlsEntryDateTimeComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
-    String sortField, String groupField, String entryType)
+    String sortField, String groupField, String entryType, boolean overrideType)
    {
       super(bib2gls, entries, settings, sortField, groupField,
-        entryType);
+        entryType, overrideType);
 
       String format = settings.getDateFormat();
       Locale locale = settings.getDateLocale();
@@ -163,12 +163,7 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
 
       GlsResource resource = bib2gls.getCurrentResource();
 
-      String type = resource.getType(entry, entryType);
-
-      if (type == null)
-      {
-         type = "";
-      }
+      String type = getType(entry);
 
       if (value.length() > 0 && resource.useGroupField(entry, entries))
       {

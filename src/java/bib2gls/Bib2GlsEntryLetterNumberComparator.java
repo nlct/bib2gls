@@ -31,9 +31,9 @@ public class Bib2GlsEntryLetterNumberComparator
 {
    public Bib2GlsEntryLetterNumberComparator(Bib2Gls bib2gls,
     Vector<Bib2GlsEntry> entries, SortSettings settings,
-    String sortField, String groupField, String entryType)
+    String sortField, String groupField, String entryType, boolean overrideType)
    {
-      super(bib2gls, entries, settings, sortField, groupField, entryType);
+      super(bib2gls, entries, settings, sortField, groupField, entryType, overrideType);
 
       numberPosition = settings.getLetterNumberRule();
 

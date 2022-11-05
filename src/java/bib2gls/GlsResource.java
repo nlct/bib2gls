@@ -8178,6 +8178,27 @@ public class GlsResource
      String sortField, String entryGroupField, String entryType)
     throws Bib2GlsException
    {
+      sortData(entries, settings, sortField, entryGroupField, entryType, false);
+   }
+
+   /**
+    * Sorts the data.
+    * @param entries the list of selected entries
+    * @param settings the sort settings
+    * @param sortField the field to use as the sort value
+    * @param entryGroupField the field to use to store the group
+    * label, if required
+    * @param entryType the default entry type to use if the
+    * type field not set
+    * @param overrideType the entryType parameter will override the
+    * type field
+    * @throws Bib2GlsException if a parser error occurs
+    */ 
+   private void sortData(Vector<Bib2GlsEntry> entries, SortSettings settings,
+     String sortField, String entryGroupField, String entryType,
+     boolean overrideType)
+    throws Bib2GlsException
+   {
       if (settings.isRandom())
       {
          if (random == null)
@@ -8191,7 +8212,7 @@ public class GlsResource
       {
          Bib2GlsEntryLetterComparator comparator = 
             new Bib2GlsEntryLetterComparator(bib2gls, entries, 
-              settings, sortField, entryGroupField, entryType);
+              settings, sortField, entryGroupField, entryType, overrideType);
 
          comparator.sortEntries();
       }
@@ -8199,7 +8220,7 @@ public class GlsResource
       {
          Bib2GlsEntryLetterNumberComparator comparator = 
             new Bib2GlsEntryLetterNumberComparator(bib2gls, entries, 
-              settings, sortField, entryGroupField, entryType);
+              settings, sortField, entryGroupField, entryType, overrideType);
 
          comparator.sortEntries();
       }
@@ -8207,7 +8228,7 @@ public class GlsResource
       {
          Bib2GlsEntryRecordCountComparator comparator = 
             new Bib2GlsEntryRecordCountComparator(bib2gls, entries, 
-              settings, entryGroupField, entryType);
+              settings, entryGroupField, entryType, overrideType);
 
          comparator.sortEntries();
       }
@@ -8215,7 +8236,7 @@ public class GlsResource
       {
          Bib2GlsEntryNumericComparator comparator = 
             new Bib2GlsEntryNumericComparator(bib2gls, entries, 
-              settings, sortField, entryGroupField, entryType);
+              settings, sortField, entryGroupField, entryType, overrideType);
 
          comparator.sortEntries();
       }
@@ -8223,7 +8244,7 @@ public class GlsResource
       {
          Bib2GlsEntryDateTimeComparator comparator = 
             new Bib2GlsEntryDateTimeComparator(bib2gls, entries, 
-              settings, sortField, entryGroupField, entryType);
+              settings, sortField, entryGroupField, entryType, overrideType);
 
          comparator.sortEntries();
       }
@@ -8233,7 +8254,7 @@ public class GlsResource
          {
             Bib2GlsEntryComparator comparator = 
                new Bib2GlsEntryComparator(bib2gls, entries, settings,
-                  sortField, entryGroupField, entryType);
+                  sortField, entryGroupField, entryType, overrideType);
 
             comparator.sortEntries();
          }
@@ -9189,7 +9210,7 @@ public class GlsResource
                sortData(secondaryList, secondarySortSettings, 
                        secondaryField == null ? 
                          secondarySortSettings.getSortField() : secondaryField,
-                       "secondarygroup", secondaryType);
+                       "secondarygroup", secondaryType, true);
 
                if (bib2gls.useGroupField())
                {

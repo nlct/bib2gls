@@ -1,0 +1,23 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[record,nomain,index,nostyles,stylemods=tree,style=treegroup]{glossaries-extra}
+
+\newglossary*{entry}{Terms}
+\newglossary*{number}{Numbers}
+\newglossary*{symbol}{Symbols}
+
+\GlsXtrLoadResources[
+  src={test-numbers},
+  type={same as entry},
+  symbol-sort-fallback=description,
+  selection=all,
+  secondary={en:index}
+]
+
+\begin{document}
+\printunsrtglossaries
+\end{document}
