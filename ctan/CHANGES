@@ -1,3 +1,7 @@
+v3.2 (pending):
+
+  * Added --[no-]obey-aux-catcode
+
 v3.1 (2022-11-05):
 
   * If new versions of glossaries.sty, mfirstuc.sty and glossaries-extra.sty
