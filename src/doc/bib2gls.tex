@@ -3498,6 +3498,18 @@ this setting. For example, if \csfmt{superiortwo} is defined as
 then it will be interpreted as \hex{00B2} (superscript two) even if
 this setting is on.
 
+\argsection{obey-aux-catcode}
+
+By default, the \ext{aux} parser ignores category code changing
+commands. This option will instruct the parser to implement the
+category code, but note that it can only do this for known commands
+that the parser is able to implement.
+
+\argsection{no-obey-aux-catcode}
+
+Instructs the \ext{aux} parser to ignore category code changing
+commands. (Default.)
+
 \section{Record Options}
 
 \argsection{cite-as-record}

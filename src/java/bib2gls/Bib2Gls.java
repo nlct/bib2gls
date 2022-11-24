@@ -1901,6 +1901,8 @@ public class Bib2Gls implements TeXApp
          }
       };
 
+      auxParser.setAllowCatCodeChangers(allowAuxCatChangers);
+
       TeXParser parser = auxParser.parseAuxFile(auxFile);
 
       glsresources = new Vector<GlsResource>();
@@ -5290,6 +5292,8 @@ public class Bib2Gls implements TeXApp
 
       printSyntaxItem(getMessage("syntax.break.space", "--[no-]break-space"));
 
+      printSyntaxItem(getMessage("syntax.obey.aux.catcode", "--[no-]obey-aux-catcode"));
+
       printSyntaxItem(getMessage("syntax.custom.packages", 
         "--custom-packages"));
 
@@ -6021,6 +6025,14 @@ public class Bib2Gls implements TeXApp
          {
             useNonBreakSpace = true;
          }
+         else if (args[i].equals("--obey-aux-catcode"))
+         {
+            allowAuxCatChangers = true;
+         }
+         else if (args[i].equals("--no-obey-aux-catcode"))
+         {
+            allowAuxCatChangers = false;
+         }
          else if (args[i].equals("--cite-as-record"))
          {
             useCiteAsRecord = true;
@@ -6635,8 +6647,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.1";
-   public static final String DATE = "2022-11-05";
+   public static final String VERSION = "3.2";
+   public static final String DATE = "2022-11-24";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -6665,6 +6677,7 @@ public class Bib2Gls implements TeXApp
    private boolean createHyperGroups = true;
    private boolean checkNonBibFields = true;
    private boolean warnUnknownEntryTypes = true;
+   private boolean allowAuxCatChangers = false;
 
    private int altModifier = -1;
 

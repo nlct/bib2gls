@@ -89,6 +89,15 @@ Interpret C<~> (tilde) character and C<\nobreakspace> as a normal space.
 
 Interpret C<~> (tilde) and C<\nobreakspace> as a non-breaking space (default).
 
+=item B<--obey-aux-catcode>
+
+Obey known category code changing commands encountered in the aux
+file.
+
+=item B<--no-obey-aux-catcode>
+
+Ignore category code changing commands encountered in the aux file.
+
 =item B<--cite-as-record>
 
 Treat C<\citation> as an ignored record.

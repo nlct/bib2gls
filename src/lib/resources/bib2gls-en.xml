@@ -43,6 +43,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="syntax.tex.encoding">{0} &lt;name&gt;	Set the character encoding for the output files.</entry>
 <entry key="syntax.interpret">{0}	Enable interpreter.</entry>
 <entry key="syntax.break.space">{0}	Interpret tilde character as normal space.</entry>
+<entry key="syntax.obey.aux.catcode">{0}	Obey known category code changing commands encountered in the aux file.</entry>
 <entry key="syntax.packages">{1}, {0} &lt;list&gt;	Instruct interpreter to assume the listed packages have been used in the document. (The packages must be known by the interpreter.)</entry>
 <entry key="syntax.ignore.packages">{1}, {0} &lt;list&gt;	Don''t check the log file for the listed packages.</entry>
 <entry key="syntax.custom.packages">{0} &lt;list&gt;	Instruct the interpreter to parse the listed packages.</entry>
