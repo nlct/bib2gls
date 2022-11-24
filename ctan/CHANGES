@@ -1,6 +1,10 @@
-v3.2 (pending):
+v3.2 (2022-11-24):
 
   * Added --[no-]obey-aux-catcode
+
+    The default is --no-obey-aux-catcode, which ignores catcode
+    changing commands found in the aux file.
+    (Issue #22 https://github.com/nlct/bib2gls/issues/22)
 
 v3.1 (2022-11-05):
 
