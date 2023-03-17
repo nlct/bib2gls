@@ -368,7 +368,7 @@ Don't replace quote characters (default).
 
 =head1 REQUIRES
 
-Java 7 or later and a TeX distribution.
+Java 8 or later and a TeX distribution.
 
 =head1 LICENSE
 
