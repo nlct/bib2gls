@@ -416,7 +416,7 @@ public class Gls2Bib extends LaTeXParserListener
          return;
       }
 
-      super.newcommand(overwrite, type, csName, isShort,
+      super.newcommand(isRobust, overwrite, type, csName, isShort,
         numParams, defValue, definition);
    }
 
@@ -1814,8 +1814,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "3.2";
-   public static final String DATE = "2022-11-24";
+   public static final String VERSION = "3.2.20230317";
+   public static final String DATE = "2023-03-17";
    public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

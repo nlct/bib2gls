@@ -1,3 +1,12 @@
+v3.3 (pending):
+
+  * convertgls2bib
+
+    - Fixed infinite loop:
+
+	at com.dickimawbooks.gls2bib.Gls2Bib.newcommand(Gls2Bib.java:419)
+	at com.dickimawbooks.texparserlib.latex.LaTeXParserListener.newcommand(LaTeXParserListener.java:978)
+
 v3.2 (2022-11-24):
 
   * Added --[no-]obey-aux-catcode
