@@ -9506,8 +9506,11 @@ public class GlsResource
       {
          if (dupLabelSuffix == null)
          {
-            bib2gls.warningMessage("warning.entry.already.defined",
-             id, toString());
+            if (writeAction == WRITE_ACTION_DEFINE)
+            {
+               bib2gls.warningMessage("warning.entry.already.defined",
+                id, toString());
+            }
          }
          else
          {

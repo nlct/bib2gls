@@ -1,5 +1,10 @@
 v3.3 (pending):
 
+  * bib2gls
+
+    - Removed already defined in other glstex file warning if 
+      action != define
+
   * convertgls2bib
 
     - Fixed infinite loop:
