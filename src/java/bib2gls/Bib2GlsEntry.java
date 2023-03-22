@@ -128,6 +128,11 @@ public class Bib2GlsEntry extends BibEntry
       return resource;
    }
 
+   public Bib2Gls getBib2Gls()
+   {
+      return bib2gls;
+   }
+
    public String getPrefix()
    {
       return labelPrefix;
@@ -1021,105 +1026,7 @@ public class Bib2GlsEntry extends BibEntry
       appendShortPluralSuffix("dualshort", "dualshortplural", 
         dualShortPluralSuffix);
 
-      if (resource.hasFieldCopies())
-      {
-         boolean override = resource.isReplicateOverrideOn();
-         byte missingAction = resource.getFallbackOnMissingReplicateAction();
-
-         boolean updateShortPlural = false;
-         boolean updateDualShortPlural = false;
-
-         for (Iterator<String> it=resource.getFieldCopiesIterator();
-              it.hasNext();)
-         {
-            String field = it.next();
-
-            BibValueList val = getField(field);
-
-            if (val == null)
-            {
-               if (missingAction == GlsResource.MISSING_FIELD_REPLICANT_FALLBACK)
-               {
-                  val = getFallbackContents(field);
-               }
-               else if (missingAction == GlsResource.MISSING_FIELD_REPLICANT_EMPTY)
-               {
-                  val = new BibValueList();
-               }
-            }
-
-            if (val != null)
-            {
-               Vector<String> dupList = resource.getFieldCopy(field);
-
-               for (String dup : dupList)
-               {
-                  if (getField(dup) == null || override)
-                  {
-                     BibValueList dupValue = (BibValueList)val.clone();
-
-                     if (dup.equals("description") 
-                          && resource.changeDescriptionCase())
-                     {
-                        dupValue = resource.applyDescriptionCaseChange(dupValue);
-                     }
-                     else if (dup.equals("short"))
-                     {
-                        if (resource.changeShortCase())
-                        {
-                           dupValue = resource.applyShortCaseChange(dupValue);
-                        }
-
-                        if (shortPluralSuffix != null)
-                        {
-                           updateShortPlural = true;
-                        }
-                     }
-                     else if (dup.equals("long"))
-                     {
-                        if (resource.changeLongCase())
-                        {
-                           dupValue = resource.applyLongCaseChange(dupValue);
-                        }
-                     }
-                     else if (dup.equals("dualshort"))
-                     {
-                        if (resource.changeDualShortCase())
-                        {
-                           dupValue = resource.applyShortCaseChange(dupValue);
-                        }
-
-                        if (dualShortPluralSuffix != null)
-                        {
-                           updateDualShortPlural = true;
-                        }
-                     }
-                     else if (dup.equals("duallong"))
-                     {
-                        if (resource.changeDualLongCase())
-                        {
-                           dupValue = resource.applyLongCaseChange(dupValue);
-                        }
-                     }
-
-                     putField(dup, dupValue);
-                  }
-               }
-            }
-         }
-
-         if (updateShortPlural)
-         {
-            appendShortPluralSuffix("short", "shortplural", 
-              shortPluralSuffix);
-         }
-
-         if (updateDualShortPlural)
-         {
-            appendShortPluralSuffix("dualshort", "dualshortplural", 
-              dualShortPluralSuffix);
-         }
-      }
+      applyFieldReplication();
 
       String groupVal = resource.getGroupField();
 
@@ -1137,6 +1044,12 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       interpretFields = processSpecialFields(mfirstucProtect,
+           protectFields, idField, interpretFields);
+
+      // The parent label must be set before field assignments can
+      // be applied.
+
+      interpretFields = applyFieldAssignments(mfirstucProtect,
            protectFields, idField, interpretFields);
 
       CompoundEntry compEntry = resource.getCompoundAdjustName(getId());
@@ -1250,6 +1163,212 @@ public class Bib2GlsEntry extends BibEntry
                 val, "true, false");
          }
       }
+   }
+
+   private void applyFieldReplication() throws IOException
+   {
+      String shortPluralSuffix = resource.getShortPluralSuffix();
+      String dualShortPluralSuffix = resource.getDualShortPluralSuffix();
+
+      if (resource.hasFieldCopies())
+      {
+         boolean override = resource.isReplicateOverrideOn();
+         MissingFieldAction missingAction
+            = resource.getFallbackOnMissingReplicateAction();
+
+         boolean updateShortPlural = false;
+         boolean updateDualShortPlural = false;
+
+         for (Iterator<String> it=resource.getFieldCopiesIterator();
+              it.hasNext();)
+         {
+            String field = it.next();
+
+            BibValueList val = getField(field);
+
+            if (val == null)
+            {
+               if (missingAction == MissingFieldAction.FALLBACK)
+               {
+                  val = getFallbackContents(field);
+               }
+               else if (missingAction == MissingFieldAction.EMPTY)
+               {
+                  val = new BibValueList();
+               }
+            }
+
+            if (val != null)
+            {
+               Vector<String> dupList = resource.getFieldCopy(field);
+
+               for (String dup : dupList)
+               {
+                  if (override || getField(dup) == null)
+                  {
+                     BibValueList dupValue = (BibValueList)val.clone();
+
+                     if (dup.equals("description") 
+                          && resource.changeDescriptionCase())
+                     {
+                        dupValue = resource.applyDescriptionCaseChange(dupValue);
+                     }
+                     else if (dup.equals("short"))
+                     {
+                        if (resource.changeShortCase())
+                        {
+                           dupValue = resource.applyShortCaseChange(dupValue);
+                        }
+
+                        if (shortPluralSuffix != null)
+                        {
+                           updateShortPlural = true;
+                        }
+                     }
+                     else if (dup.equals("long"))
+                     {
+                        if (resource.changeLongCase())
+                        {
+                           dupValue = resource.applyLongCaseChange(dupValue);
+                        }
+                     }
+                     else if (dup.equals("dualshort"))
+                     {
+                        if (resource.changeDualShortCase())
+                        {
+                           dupValue = resource.applyShortCaseChange(dupValue);
+                        }
+
+                        if (dualShortPluralSuffix != null)
+                        {
+                           updateDualShortPlural = true;
+                        }
+                     }
+                     else if (dup.equals("duallong"))
+                     {
+                        if (resource.changeDualLongCase())
+                        {
+                           dupValue = resource.applyLongCaseChange(dupValue);
+                        }
+                     }
+
+                     putField(dup, dupValue);
+                  }
+               }
+            }
+         }
+
+         if (updateShortPlural)
+         {
+            appendShortPluralSuffix("short", "shortplural", 
+              shortPluralSuffix);
+         }
+
+         if (updateDualShortPlural)
+         {
+            appendShortPluralSuffix("dualshort", "dualshortplural", 
+              dualShortPluralSuffix);
+         }
+      }
+   }
+
+   private Vector<String> applyFieldAssignments(boolean mfirstucProtect,
+         String[] protectFields, String idField, Vector<String> interpretFields)
+     throws IOException
+   {
+      String shortPluralSuffix = resource.getShortPluralSuffix();
+      String dualShortPluralSuffix = resource.getDualShortPluralSuffix();
+
+      Vector<FieldAssignment> fieldAssignments = resource.getFieldAssignments();
+
+      if (fieldAssignments != null)
+      {
+         boolean override = resource.isAssignOverrideOn();
+
+         boolean updateShortPlural = false;
+         boolean updateDualShortPlural = false;
+
+         for (FieldAssignment assignSpec : fieldAssignments)
+         {
+            String field = assignSpec.getDestinationField();
+
+            if (override || getField(field) == null)
+            {
+               if (bib2gls.getDebugLevel() > 0)
+               {
+                  bib2gls.logAndPrintMessage("Entry "+getId()
+                    + " evaluating assignment "+assignSpec);
+               }
+
+               BibValueList val = assignSpec.getValue(this);
+
+               if (val != null)
+               {
+                  if (bib2gls.getDebugLevel() > 0)
+                  {
+                     bib2gls.logAndPrintMessage("Value: " + val);
+                  }
+
+                  BibValueList value = (BibValueList)val.clone();
+
+                  if (field.equals("description") 
+                       && resource.changeDescriptionCase())
+                  {
+                     value = resource.applyDescriptionCaseChange(value);
+                  }
+                  else if (field.equals("short"))
+                  {
+                     if (resource.changeShortCase())
+                     {
+                        value = resource.applyShortCaseChange(value);
+                     }
+
+                     if (shortPluralSuffix != null)
+                     {
+                        updateShortPlural = true;
+                     }
+                  }
+                  else if (field.equals("long"))
+                  {
+                     if (resource.changeLongCase())
+                     {
+                        value = resource.applyLongCaseChange(value);
+                     }
+                  }
+                  else if (field.equals("dualshort"))
+                  {
+                     if (resource.changeDualShortCase())
+                     {
+                        value = resource.applyShortCaseChange(value);
+                     }
+
+                     if (dualShortPluralSuffix != null)
+                     {
+                        updateDualShortPlural = true;
+                     }
+                  }
+                  else if (field.equals("duallong"))
+                  {
+                     if (resource.changeDualLongCase())
+                     {
+                        value = resource.applyLongCaseChange(value);
+                     }
+                  }
+
+                  putField(field, value);
+
+                  interpretFields = processField(field, mfirstucProtect,
+                     protectFields, idField, interpretFields);
+               }
+               else if (bib2gls.getDebugLevel() > 0)
+               {
+                  bib2gls.logAndPrintMessage("Value can't be obtained");
+               }
+            }
+         }
+      }
+
+      return interpretFields;
    }
 
    private boolean convertUnicodeCharToHex(TeXObjectList list)
@@ -5588,6 +5707,29 @@ public class Bib2GlsEntry extends BibEntry
          else
          {
             return parent.getHierarchyRoot(entries);
+         }
+      }
+   }
+
+   public Bib2GlsEntry getHierarchyRoot()
+   {
+      String parentId = getParent();
+
+      if (parentId == null)
+      {
+         return this;
+      }
+      else
+      {
+         Bib2GlsEntry parent = resource.getEntry(parentId);
+
+         if (parent == null)
+         {
+            return this;
+         }
+         else
+         {
+            return parent.getHierarchyRoot();
          }
       }
    }

@@ -2,7 +2,13 @@ v3.3 (pending):
 
   * bib2gls
 
-    - Removed already defined in other glstex file warning if 
+    - New resource options:
+
+      assign-fields
+      assign-override
+      assign-missing-field-action
+
+    - Bug fix: Removed already defined in other glstex file warning if 
       action != define
 
   * convertgls2bib

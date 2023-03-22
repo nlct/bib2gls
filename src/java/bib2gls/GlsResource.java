@@ -312,6 +312,31 @@ public class GlsResource
                }
             }
          }
+         else if (opt.equals("assign-fields"))
+         {
+            assignFieldsData = parseAssignFieldsData(list, opt);
+         }
+         else if (opt.equals("assign-override"))
+         {
+            assignFieldsOverride = getBoolean(list, opt);
+         }
+         else if (opt.equals("assign-missing-field-action"))
+         {
+            String val = getChoice(list, opt, "skip", "fallback", "empty");
+
+            if (val.equals("skip"))
+            {
+               missingFieldAssignAction = MissingFieldAction.SKIP;
+            }
+            else if (val.equals("fallback"))
+            {
+               missingFieldAssignAction = MissingFieldAction.FALLBACK;
+            }
+            else // if (val.equals("empty"))
+            {
+               missingFieldAssignAction = MissingFieldAction.EMPTY;
+            }
+         }
          else if (opt.equals("replicate-fields"))
          {
             fieldCopies = getHashMapVector(list, opt, true);
@@ -359,15 +384,15 @@ public class GlsResource
 
             if (val.equals("skip"))
             {
-               missingFieldReplicateAction = MISSING_FIELD_REPLICANT_SKIP;
+               missingFieldReplicateAction = MissingFieldAction.SKIP;
             }
             else if (val.equals("fallback"))
             {
-               missingFieldReplicateAction = MISSING_FIELD_REPLICANT_FALLBACK;
+               missingFieldReplicateAction = MissingFieldAction.FALLBACK;
             }
             else // if (val.equals("empty"))
             {
-               missingFieldReplicateAction = MISSING_FIELD_REPLICANT_EMPTY;
+               missingFieldReplicateAction = MissingFieldAction.EMPTY;
             }
          }
          else if (opt.equals("primary-dual-dependency"))
@@ -5607,6 +5632,186 @@ public class GlsResource
       }
 
       return formatMap;
+   }
+
+   /**
+    * Parses field assignment specification.
+    */ 
+   private Vector<FieldAssignment> parseAssignFieldsData(
+       KeyValList keyValList, String opt)
+    throws Bib2GlsSyntaxException,IOException
+   {
+      TeXObject object = keyValList.getValue(opt);
+
+      if (object == null || object.isEmpty())
+      {
+         return null;
+      }
+
+      Vector<FieldAssignment> assignmentList = new Vector<FieldAssignment>();
+
+      if (!(object instanceof TeXObjectList))
+      {
+         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, object.toString(parser)));
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage("Parsing field assignment setting: "
+          +object.format());
+      }
+
+      TeXObjectList stack = (TeXObjectList)object;
+
+      StringBuilder builder = null;
+      String field = null;
+      FieldValueList fieldValueList = null;
+      ConditionalList condition = null;
+
+      while (!stack.isEmpty())
+      {
+         object = stack.pop(); 
+
+         if (object instanceof WhiteSpace)
+         {
+            if (builder != null && field == null)
+            {
+               field = builder.toString();
+            }
+         }
+         else if (object instanceof SingleToken)
+         {
+            int cp = ((SingleToken)object).getCharCode();
+
+            switch (cp)
+            {
+               case '=':
+
+                  if (fieldValueList == null)
+                  {
+                     if (field == null)
+                     {
+                        if (builder == null)
+                        {
+                           throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                             "error.invalid.option_syntax.misplaced_before",
+                              object.toString(parser), stack.toString(parser)));
+                        }
+
+                        field = builder.toString();
+                     }
+
+                     try
+                     {
+                        fieldValueList = FieldValueList.pop(this, stack);
+                     }
+                     catch (Bib2GlsSyntaxException e)
+                     {
+                        throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                          "error.invalid.option_syntax", opt, e.getMessage()
+                            ), e);
+                     }
+                  }
+                  else
+                  {
+                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                       "error.invalid.option_syntax.misplaced_before",
+                        object.toString(parser), stack.toString(parser)));
+                  }
+
+               break;
+               case ',':
+
+                  if (fieldValueList == null)
+                  {
+                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                       "error.invalid.option_syntax.misplaced_before",
+                        object.toString(parser), stack.toString(parser)));
+                  }
+
+                  if (condition != null && condition.isEmpty())
+                  {
+                     condition = null;
+                  }
+
+                  FieldAssignment assignSpec
+                     = new FieldAssignment(field, fieldValueList, condition);
+
+                  if (bib2gls.getDebugLevel() > 0)
+                  {
+                     bib2gls.logAndPrintMessage("Field assignment: "+assignSpec);
+                  }
+
+                  assignmentList.add(assignSpec);
+
+                  builder = null;
+                  field = null;
+                  fieldValueList = null;
+                  condition = null;
+
+               break;
+               case '[':
+
+                  if (fieldValueList == null || condition != null)
+                  {
+                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                       "error.invalid.option_syntax.misplaced_before",
+                        object.toString(parser), stack.toString(parser)));
+                  }
+
+                  try
+                  {
+                     condition = ConditionalList.popCondition(this, stack, ']');
+                  }
+                  catch (Bib2GlsSyntaxException e)
+                  {
+                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                       "error.invalid.option_syntax", opt, e.getMessage()), e);
+                  }
+
+               break;
+               default :
+
+                 if (builder == null)
+                 {
+                    builder = new StringBuilder();
+                    builder.appendCodePoint(cp);
+                 }
+                 else if (field == null)
+                 {
+                    builder.appendCodePoint(cp);
+                 }
+                 else
+                 {
+                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                       "error.invalid.option_syntax.misplaced_before",
+                        object.toString(parser), stack.toString(parser)));
+                 }
+            }
+         }
+         else
+         {
+            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+               "error.invalid.option_syntax.misplaced_before",
+               object.toString(parser), stack.toString(parser)));
+         }
+      }
+
+      if (field != null && fieldValueList != null)
+      {
+         FieldAssignment assignSpec
+           = new FieldAssignment(field, fieldValueList, condition);
+
+         if (bib2gls.getDebugLevel() > 0)
+         {
+            bib2gls.logAndPrintMessage("Field assignment: "+assignSpec);
+         }
+
+         assignmentList.add(assignSpec);
+      }
+
+      return assignmentList;
    }
 
    /**
@@ -15029,11 +15234,20 @@ public class GlsResource
 
    /**
     * Gets the "replicate-missing-field-action" setting.
-    * @return the numeric identifier corresponding to the setting
+    * @return the enum corresponding to the setting
     */ 
-   public byte getFallbackOnMissingReplicateAction()
+   public MissingFieldAction getFallbackOnMissingReplicateAction()
    {
       return missingFieldReplicateAction;
+   }
+
+   /**
+    * Gets the "assign-missing-field-action" setting.
+    * @return the enum corresponding to the setting
+    */ 
+   public MissingFieldAction getFallbackOnMissingAssignAction()
+   {
+      return missingFieldAssignAction;
    }
 
    /**
@@ -15066,6 +15280,34 @@ public class GlsResource
    public Vector<String> getFieldCopy(String fieldName)
    {
       return fieldCopies.get(fieldName);
+   }
+
+   /**
+    * Determines whether or not the "assign-fields" setting has
+    * been set.
+    * @return true if "assign-fields" setting has been set
+    */ 
+   public boolean hasFieldAssignments()
+   {
+      return assignFieldsData != null;
+   }
+
+   /**
+    * Gets the "assign-fields" data.
+    * @return the list of field assignment data
+    */ 
+   public Vector<FieldAssignment> getFieldAssignments()
+   {
+      return assignFieldsData;
+   }
+
+   /**
+    * Gets the "assign-override" setting.
+    * @return true if assign override setting is on
+    */ 
+   public boolean isAssignOverrideOn()
+   {
+      return assignFieldsOverride;
    }
 
    /**
@@ -15955,6 +16197,11 @@ public class GlsResource
       return pruneSeeAlsoPatterns != null;
    }
 
+   public Bib2Gls getBib2Gls()
+   {
+      return bib2gls;
+   }
+
    /**
     * Inner class for sorting field values containing a
     * comma-separated list of labels.
@@ -16273,11 +16520,13 @@ public class GlsResource
 
    private boolean replicateOverride=false;
 
-   public static final byte MISSING_FIELD_REPLICANT_SKIP=(byte)0;
-   public static final byte MISSING_FIELD_REPLICANT_FALLBACK=(byte)1;
-   public static final byte MISSING_FIELD_REPLICANT_EMPTY=(byte)2;
+   private MissingFieldAction missingFieldReplicateAction = MissingFieldAction.SKIP;
 
-   private byte missingFieldReplicateAction = MISSING_FIELD_REPLICANT_SKIP;
+   private Vector<FieldAssignment> assignFieldsData;
+
+   private boolean assignFieldsOverride=false;
+
+   private MissingFieldAction missingFieldAssignAction = MissingFieldAction.FALLBACK;
 
    private String[] skipFields = null;
 

@@ -1,0 +1,57 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\glsaddkey{forename}{}{\entryforename}{\Entryforename}{\forename}{\Forename}{\FORENAME}
+\glsaddkey{surname}{}{\entrysurname}{\Entrysurname}{\surname}{\Surname}{\SURNAME}
+\glsaddkey{title}{}{\entrytitle}{\Entrytitle}{\persontitle}{\Persontitle}{\PERSONTITLE}
+\glsaddkey{rank}{}{\entryrank}{\Entryrank}{\rank}{\Rank}{\RANK}
+\glsaddkey{note}{}{\entrynote}{\Entrynote}{\note}{\Note}{\NOTE}
+\glsaddkey{nickname}{}{\entrynickname}{\Entrynickname}{\nickname}{\Nickname}{\NICKNAME}
+
+\newrobustcmd{\qt}[1]{``#1''}
+
+\GlsXtrLoadResources[
+  selection={all},
+  entry-type-aliases={person=index},
+  assign-fields=
+  {
+    surname = parent > name [ entrytype > original = "person" ],
+    first = title + " " + forename + " " + surname
+      [ entrytype > original = "person" & title = "Sir" ],
+    text = title + " " + forename
+      [ entrytype > original = "person" & title = "Sir" ],
+    text = forename + " " + surname,
+    name = title + { } + forename + {, } + rank + ",  \qt{" + nickname + "} ("
+             + note + ")",
+    name = forename + {, } + rank + ",  \qt{" + nickname + "} ("
+             + note + ")",
+    name = title + " " + forename + {, } + rank + ",  \qt{" + nickname + "}",
+    name = forename + {, } + rank + ",  \qt{" + nickname + "}",
+    name = title + " " + forename + ", " + rank + " (" + note + ")",
+    name = forename + ", " + rank + " (" + note + ")",
+    name = title + " " + forename + ", " + rank,
+    name = forename + ", " + rank,
+    name = title + " " + forename + ",  \qt{" + nickname + "} (" + note + ")",
+    name = forename + ",  \qt{" + nickname + "} (" + note + ")",
+    name = title + " " + forename + ",  \qt{" + nickname + "}",
+    name = forename + ",  \qt{" + nickname + "}",
+    name = title + " " + forename + " (" + note + ")",
+    name = forename + " (" + note + ")",
+    name = title + " " + forename,
+    name = forename
+  }
+]
+
+\begin{document}
+First: \gls{John-Smith} and \gls{Jane-de-Vere} and
+\gls{Sir-Quackalot}.
+
+Next: \gls{John-Smith} and \gls{Jane-de-Vere} and
+\gls{Sir-Quackalot}.
+
+\printunsrtglossary
+\end{document}
