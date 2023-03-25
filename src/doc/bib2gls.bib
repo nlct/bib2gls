@@ -186,6 +186,14 @@
   text={case-changing command}
 }
 
+@topic{quark,
+  name={quarks (\bibgls)},
+  text={quark},
+  description={Quarks are special types of escape sequences that
+  look like \LaTeX\ commands but actually markup special tokens in 
+  resource options. See \sectionref{sec:quarks} for further details.}
+}
+
 @topic{internalcommands,
   name={internal commands}
 }
@@ -2408,6 +2416,27 @@ starred version \csref{glsxtrfmt*}},
 
 @resourceoption{opt.replicate-missing-field-action,
    name={\csoptfmt{replicate\dhyphen missing\dhyphen field\dhyphen action}},
+   user1={\margm{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.assign-fields,
+   name={\csoptfmt{assign\dhyphen fields}},
+   user1={\meta{\keyvallist}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.assign-override,
+   name={\csoptfmt{assign\dhyphen override}},
+   user1={\margm{boolean}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.assign-missing-field-action,
+   name={\csoptfmt{assign\dhyphen missing\dhyphen field\dhyphen action}},
    user1={\margm{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -5444,6 +5473,16 @@ and \L/\l\ treated as L/l},
   category={command}
 }
 
+@symbol{regex.circum,
+  name={\code{\char`\^} (regular expression)},
+  text={\code{\char`\^}}
+}
+
+@symbol{regex.dollar,
+  name={\code{\char`\$} (regular expression)},
+  text={\code{\char`\$}}
+}
+
 @specialchar{mshiftchar,
   name={\code{\$} (maths shift)},
   text={\code{\$}}
@@ -5470,6 +5509,8 @@ and \L/\l\ treated as L/l},
   name={\code{\glsbackslash} (literal)},
   text={\code{\glsbackslash}}
 }
+
+% See QUARKS for literal \\ in regular expression
 
 @command{cs.backslash,
   name={\csfmt{\glsbackslash}},
@@ -5525,9 +5566,59 @@ with forced line breaks in paragraph column formats)},
   text = {\code{\rangestartmark}}
 }
 
+@symbol{regexp.startgroup,
+  name={\code{\rangestartmark} (regular expression, start group)},
+  text={\code{\rangestartmark}}
+}
+
+@symbol{openparenchar,
+  name = {\code{\rangestartmark} (literal open parenthesis)},
+  text = {\code{\rangestartmark}}
+}
+
 @symbol{closerange,
   name = {\code{\rangeendmark} (end range)},
   text = {\code{\rangeendmark}}
+}
+
+@symbol{regexp.endgroup,
+  name={\code{\rangeendmark} (regular expression, end group)},
+  text={\code{\rangeendmark}}
+}
+
+@symbol{closeparenchar,
+  name = {\code{\rangeendmark} (literal close parenthesis)},
+  text = {\code{\rangeendmark}}
+}
+
+@symbol{regexp.startclass,
+  name={\code{[} (regular expression, start class)},
+  text={\code{[}}
+}
+
+@symbol{regexp.endclass,
+  name={\code{]} (regular expression, end class)},
+  text={\code{]}}
+}
+
+@symbol{opensqchar,
+  name = {\code{[} (literal open square bracket)},
+  text = {\code{[}}
+}
+
+@symbol{closesqchar,
+  name = {\code{]} (literal close square bracket)},
+  text = {\code{]}}
+}
+
+@symbol{startoptional,
+  name = {\code{[} (optional)},
+  text = {\code{[}}
+}
+
+@symbol{endoptional,
+  name = {\code{]} (optional)},
+  text = {\code{]}}
 }
 
 @command{cs.tilde,
@@ -5538,11 +5629,80 @@ with forced line breaks in paragraph column formats)},
   category={command}
 }
 
+@symbol{slashchar,
+  name={\code{/}}
+}
+
+@symbol{equalschar,
+  name={\code{=} (literal)},
+  text={\code{=}}
+}
+
+@symbol{equalsassign,
+  name={\code{=} (assignment)},
+  text={\code{=}}
+}
+
+@symbol{equalscmp,
+  name={\code{=} (comparison)},
+  text={\code{=}}
+}
+
+@symbol{notequalscmp,
+  name={\code{<>} (comparison)},
+  text={\code{<>}}
+}
+
+@symbol{ltcmp,
+  name={\code{<} (comparison)},
+  text={\code{<}}
+}
+
+@symbol{lecmp,
+  name={\code{<=} (comparison)},
+  text={\code{<=}}
+}
+
+@symbol{gtcmp,
+  name={\code{>} (comparison)},
+  text={\code{>}}
+}
+
+@symbol{follow,
+  name={\code{>} (field lookup)},
+  text={\code{>}}
+}
+
+@symbol{assign-plus,
+  name={\code{+} (concatenation)},
+  text={\code{+}}
+}
+
+@symbol{gecmp,
+  name={\code{>=} (comparison)},
+  text={\code{>=}}
+}
+
+@symbol{hyphenchar,
+  name={\code{-} (literal)},
+  text={\code{-}}
+}
+
 @command{comma,
   name={\csfmt{,}},
   description={thin space},
   note={kernel command\texparserdefnote},
   category={command}
+}
+
+@symbol{commasep,
+  name={\code{,} (separator)},
+  text={\code{,}}
+}
+
+@symbol{colonsep,
+  name={\code{:} (literal)},
+  text={\code{:}}
 }
 
 @command{vec,
@@ -5556,6 +5716,40 @@ with forced line breaks in paragraph column formats)},
 @symbol{zeroormore,
   name={\code{*} (regular expression, zero or more)},
   text={\code{*}}
+}
+
+@symbol{starchar,
+  name={\code{*} (literal)},
+  text={\code{*}}
+}
+
+@symbol{oneormore,
+  name={\code{+} (regular expression, one or more)},
+  text={\code{+}}
+}
+
+@symbol{pluschar,
+  name={\code{+} (literal)},
+  text={\code{+}}
+}
+
+@symbol{zeroorone,
+  name={\code{?} (regular expression, zero or one)},
+  text={\code{?}}
+}
+
+@symbol{questionchar,
+  name={\code{?} (literal)},
+  text={\code{?}}
+}
+
+@symbol{regexpor,
+  name={\code{|} (regular expression or)},
+  text={\code{|}}
+}
+
+@symbol{pipechar,
+  name={\code{|}}
 }
 
 @symbol{matchanydot,
@@ -14938,7 +15132,8 @@ defined},
   topics={charcommands,collationsubrules},
   note={\styfmt{glossaries-extra} v1.21+ (moved to
 \styfmt{glossaries-extra-bib2gls} in v1.27)},
-  category={command}
+  category={command},
+  seealso={GlsXtrResourceInitEscSequences}
 }
 
 @glscommand{glscapturedgroup,
@@ -15005,7 +15200,315 @@ warning rather than an error if the command isn't already defined},
    \csref{glsxtrresourcefile}},
   topics={hooks},
   note={\styfmt{glossaries-extra} v1.21+},
+  category={command},
+  seealso={GlsXtrResourceInitEscSequences}
+}
+
+% QUARKS
+
+@glscommand{GlsXtrResourceInitEscSequences,
+  name={\csfmt{Gls\-Xtr\-Resource\-Init\-Esc\-Sequences}},
+  user1={},
+  description={locally redefines \idx{quark} commands, such as \cs{u} and
+  \gls{NULL}, that shouldn't expand in
+  resource options as they have special meanings for some options.
+  May be added to the definition of \gls{glsxtrresourceinit} if
+  required},
+  topics={assigncommands},
+  note={\styfmt{glossaries-extra-bib2gls} v1.51+},
   category={command}
+}
+
+@glscommand{cs,
+  name={\csfmt{cs}},
+  user1={\margm{csname}},
+  description={locally defined by \gls{GlsXtrResourceInitEscSequences} to
+   expand to the literal string \csfmt{csname} when the resource
+   options are written to the \ext{aux} file. This technically isn't
+   a \bibgls\ \idx{quark}, although it's included in that category, 
+   as it's not looked for by \bibgls},
+  topic={quark},
+  category={command}
+}
+
+@glscommand{NULL,
+  name={\csfmt{NULL}},
+  user1={},
+  description={a \idx{quark} to denote a
+  null value in \csopt{assign-fields} conditionals. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{LC,
+  name={\csfmt{LC}},
+  user1={\margm{field-ref}},
+  description={a \idx{quark} to denote a
+  field \idx{lowercase} change in \csopt{assign-fields} syntax. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{UC,
+  name={\csfmt{UC}},
+  user1={\margm{field-ref}},
+  description={a \idx{quark} to denote a
+  field \idx{uppercase} change in \csopt{assign-fields} syntax. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{FIRSTLC,
+  name={\csfmt{FIRSTLC}},
+  user1={\margm{field-ref}},
+  description={a \idx{quark} to denote a
+  field first-letter \idx{lowercase} change in \csopt{assign-fields} syntax. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{FIRSTUC,
+  name={\csfmt{FIRSTUC}},
+  user1={\margm{field-ref}},
+  description={a \idx{quark} to denote a
+  field first-letter \idx{uppercase} change in \csopt{assign-fields} syntax. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{TITLE,
+  name={\csfmt{TITLE}},
+  user1={\margm{field-ref}},
+  description={a \idx{quark} to denote a
+  field \idx{titlecase} change in \csopt{assign-fields} syntax. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{uhex,
+  name={\csfmt{u}},
+  user1={\meta{hex}},
+  description={a \idx{quark} that identifies a character by its hexadecimal code in the
+    values of some (but not all) resource options},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={hex code quark}
+}
+
+@glscommand{quark.dot,
+  name={\csfmt{.}},
+  user1={},
+  description={a \idx{quark} that identifies a literal dot (\idx{periodchar}) in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.backslash,
+  name={\csfmt{\glsbackslash}},
+  user1={},
+  description={a \idx{quark} that identifies a literal backslash \idx{backslashchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.slash,
+  name={\csfmt{/}},
+  user1={},
+  description={a \idx{quark} that identifies a literal slash \idx{slashchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.pipe,
+  name={\csfmt{|}},
+  user1={},
+  description={a \idx{quark} that identifies a literal pipe character \idx{pipechar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.amp,
+  name={\csfmt{\&}},
+  user1={},
+  description={a \idx{quark} that identifies a literal ampersand \idx{ampchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.plus,
+  name={\csfmt{+}},
+  user1={},
+  description={a \idx{quark} that identifies a literal plus \idx{pluschar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.star,
+  name={\csfmt{*}},
+  user1={},
+  description={a \idx{quark} that identifies a literal star \idx{starchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.dollar,
+  name={\csfmt{\$}},
+  user1={},
+  description={a \idx{quark} that identifies a literal dollar \idx{dollarchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.circum,
+  name={\csfmt{\char`\^}},
+  user1={},
+  description={a \idx{quark} that identifies a literal circumflex \idx{circumchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.tilde,
+  name={\csfmt{\char`\~}},
+  user1={},
+  description={a \idx{quark} that identifies a literal tilde \idx{tildechar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.openparen,
+  name={\csfmt{\rangestartmark}},
+  user1={},
+  description={a \idx{quark} that identifies a literal open parenthesis \idx{openparenchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.closeparen,
+  name={\csfmt{\rangeendmark}},
+  user1={},
+  description={a \idx{quark} that identifies a literal close parenthesis \idx{closeparenchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.opensq,
+  name={\csfmt{[}},
+  user1={},
+  description={a \idx{quark} that identifies a literal open square bracket \idx{opensqchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.closesq,
+  name={\csfmt{]}},
+  user1={},
+  description={a \idx{quark} that identifies a literal close square bracket \idx{closesqchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.doublequote,
+  name={\csfmt{"}},
+  user1={},
+  description={a \idx{quark} that identifies a literal double-quote \idx{doublequotechar}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={quark}
+}
+
+@glscommand{quark.hyphen,
+  name={\csfmt{-}},
+  user1={},
+  description={a \idx{quark} that identifies a literal hyphen \idx{hyphenchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.question,
+  name={\csfmt{?}},
+  user1={},
+  description={a \idx{quark} that identifies a literal question mark \idx{questionchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.hash,
+  name={\csfmt{\#}},
+  user1={},
+  description={a \idx{quark} that identifies a literal hash \idx{hashchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
+}
+
+@glscommand{quark.colon,
+  name={\csfmt{\:}},
+  user1={},
+  description={a \idx{quark} that identifies a literal hash
+  \idx{colonchar} in a \idx{regex}},
+  note={\bibgls\ \idx{quark}},
+  topic={quark},
+  category={command},
+  annote={regex quark}
 }
 
 @mainglscommand{GlsXtrDefaultResourceOptions,
@@ -16946,6 +17449,8 @@ number is hexadecimal)},
   category={command}
 }
 
+% See QUARKS for resource option markup
+
 @command{u,
   name={\csfmt{u}},
   user1={\margm{character}},
@@ -16953,16 +17458,6 @@ number is hexadecimal)},
   note={kernel command\texparserdefnote},
   category={command},
   annote={accent}
-}
-
-@command{uhex,
-  name={\csfmt{u}},
-  user1={\meta{hex}},
-  description={identifies a character by its hexadecimal code in the
-    values of some (but not all) resource options},
-  note={\bibgls},
-  category={command},
-  annote={hex code}
 }
 
 @command{acute,

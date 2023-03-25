@@ -1,22 +1,35 @@
 % Encoding: UTF-8
 
+@entry{entrytype,
+  name={entry type},
+  description={an entry's identifying type, as specified by \atentryfmt{entry-type}.
+  (Not to be confused with the glossary label, which is identified by 
+  the \field{type} field.) When referenced in a resource option, the 
+  leading \code{@} is typically omitted. The \emph{original} entry type
+  refers to the entry type as specified in the \ext{bib} file. The
+  \emph{actual} entry type may be different and will be the result 
+  of a conversion via resource options such as \csopt{entry-type-aliases}.
+  Although the \ext{bib} format is case-insensitive, references to the 
+  entry type in resource options should typically be in \idx{lowercase}.}
+}
+
 @entry{primaryentry,
   name={primary entry},
   plural={primary entries},
-  user1`={idx.primary},
-  description={The original entry created from a dual-entry type
-   (such as \atentry{dualentry}) or the entry from single-entry
-   types (such as \atentry{entry}) or \glspl{spawnedentry}.}
+  user1={idx.primary},
+  description={The original entry created from a dual-\gls{entrytype}
+   (such as \atentry{dualentry}) or the entry from 
+   single-\glspl{entrytype} (such as \atentry{entry}) or \glspl{spawnedentry}.}
 }
 
 @entry{dualentry,
   name={dual entry},
   plural={dual entries},
   user1={idx.dual},
-  description={The duplicate entry created from a dual-entry type
+  description={The duplicate entry created from a dual-\gls{entrytype}
    (such as \atentry{dualentry}). This duplicate is based on the
    \gls{primaryentry} with modifications made according to various
-   settings. With tertiary entry types, the dual entry represents 
+   settings. With tertiary \glspl{entrytype}, the dual entry represents 
    two entries: the \glsdisp{secondaryentry}{secondary} and
    \glsdisp{tertiaryentry}{tertiary}.
    See \sectionref{sec:dualentry}.}
@@ -26,7 +39,7 @@
   name={secondary entry},
   plural={secondary entries},
   user1={idx.secondary},
-  description={For the tertiary entry types, such as
+  description={For the tertiary \glspl{entrytype}, such as
   \atentry{tertiaryindexabbreviationentry}, there are only actually
   two objects defined within \bibgls: the 
   \glsdisp{primaryentry}{primary} and the \glsdisp{dualentry}{dual},
@@ -43,8 +56,8 @@
   user1={idx.tertiary},
   description={An entry that isn't defined as a separated object
   within \bibgls, but is defined within the \ext{glstex} file 
-  as a by-product of the dual definition code for tertiary entry
-  types.}
+  as a by-product of the dual definition code for tertiary
+  \glspl{entrytype}.}
 }
 
 @entry{mainentry,
@@ -52,7 +65,7 @@
   plural={main entries},
   description={The originating entry from which
    the \glspl{spawnedentry} are created. A main entry may 
-   be a dual-entry type, consisting of a \gls{primaryentry}
+   be a dual-\gls{entrytype}, consisting of a \gls{primaryentry}
    and \gls{dualentry}.
    (Not to be confused with the main glossary or the \gls{compmainlabel}
     of a \gls{compoundentry}.)}
@@ -62,20 +75,20 @@
   name={progenitor},
   user1={idx.progenitor},
   description={The \gls{mainentry} for the \atentry{progenitor}
-  entry type.}
+  \gls{entrytype}.}
 }
 
 @entry{progeny,
   name={progeny},
   user1={idx.progeny},
   description={The \glspl{spawnedentry} for the \atentry{progenitor}
-  entry type.}
+  \gls{entrytype}.}
 }
 
 @entry{multientrytype,
   name={multi-entry type},
-  description={An entry type that can spawn multiple
-   \glspl{primaryentry}. Some multi-entry types can also spawn a
+  description={An \gls{entrytype} that can spawn multiple
+   \glspl{primaryentry}. Some multi-\glspl{entrytype} can also spawn a
    \gls{dualentry}. See \sectionref{sec:multientry}. 
    For the \sty{glossaries-extra} \qt{multi (compound or combined) entries} 
    that are defined with \cs{multiglossaryentry} see \gls{compoundentry}.}
@@ -310,6 +323,7 @@
   plural={top-level entries},
   user1={idx.hierarchical-entry},
   description={An entry that doesn't have a \gls{parententry}.
+  This entry is the hierarchical root for all its descendents.
   See \sectionref{sec:hierarchicalopts}.}
 }
 
@@ -385,6 +399,16 @@
 @entry{resourcecommand,
   name={resource command},
   description={\gls{glsxtrresourcefile} or \gls{GlsXtrLoadResources}.}
+}
+
+@entry{resource-locale,
+  name = {resource locale},
+  description={the default locale for the given \gls{resourceset}.
+  This will be the locale identified by \csopt{sort}, if an
+  alphabetical sort has been specified, or will be \bibgls's default
+  locale if a non-alphabetical sort method or the custom sort method
+  has been chosen, which may be the document locale or the \idx{JRE}
+  locale}
 }
 
 @entry{crossresourceref,

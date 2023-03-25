@@ -42,9 +42,20 @@
     name = title + " " + forename + " (" + note + ")",
     name = forename + " (" + note + ")",
     name = title + " " + forename,
-    name = forename
+    name = forename,
+    note = "A name with a tab"
+       [ name=/.*\string\t.*/ & entrytype > original = "entry"],
+    note = "A name with a newline" 
+       [ name=/.*\string\n.*/ & entrytype > original = "entry"],
+    note = "A name with two spaces"
+        [ name=/.*  .*/ & entrytype > original = "entry"]
   }
 ]
+
+\renewcommand{\glsextrapostnamehook}[1]{%
+  \glsxtrifhasfield{note}{#1}{ [note: \glscurrentfieldvalue]}{}%
+}
+
 
 \begin{document}
 First: \gls{John-Smith} and \gls{Jane-de-Vere} and

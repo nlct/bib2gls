@@ -492,6 +492,12 @@ documents}}
 
 \newcommand*{\styoptref}[1]{\gls[format=glsignore]{styopt.#1}}
 
+\newcommand*{\keyval}{%
+ \texorpdfstring
+ {\meta{key}\dequals \meta{value}}%
+ {key=value}%
+}
+
 \newcommand*{\keyvallist}{%
  \texorpdfstring
  {key\dequals value list}%
@@ -1760,7 +1766,7 @@ field. You then need to select an appropriate \idx{glossarystyle}.
 
 If you only want to have a single \ext{bib} file that contains all
 your entries and you want to share it across multiple documents then
-the most flexible approach is to use custom fields and entry types
+the most flexible approach is to use custom fields and \glspl{entrytype}
 that can be aliased according to the needs of the \glspl{resourceset}.
 
 For example, the file \filefmt{entries.bib}:
@@ -2123,6 +2129,10 @@ the corresponding set of \ext{bib} files:
   \item end punctuation is checked according to
   \csopt{check-end-punctuation};
 
+  \item field assignments are made (\csopt{assign-fields}),
+    and any of the above case-change or suffixes required
+    on the destination fields are performed;
+
   \item \field{name} adjustment is performed if
    \csopt{compound-adjust-name} is set (and the criteria is met);
 
@@ -2249,6 +2259,93 @@ been recorded because $B$ hasn't been recorded and is in a different
 If the \igls{crossresourceref} mode is enabled then stage~3 and
 stage~4 are processed in separate \idxpl{loop}, otherwise they are
 processed in the same \idx{loop}.
+
+\section{\bibgls\ Quarks}
+\label{sec:quarks}
+
+A \bibgls\ \idx{quark} is similar in principle to a \LaTeX3 quark,
+in that it is a token that looks like a control sequence but isn't
+intended to be interpreted as a \LaTeX\ command. Unlike \LaTeX3
+quarks, their name isn't prefixed with \csfmt{q\_} and can
+coincidentally look the same as a \LaTeX\ command. This is
+particularly the case with regular expressions that have escaped
+characters to indicate a literal character. For example, in a
+regular expression a pipe or vertical bar character \idx{regexpor}
+indicates \qt{or}. If you want to match a literal pipe, you need to
+identify this with \cs{quark.pipe}. This is distinct from, but
+visually identical to, the \LaTeX\ command used to create a double
+vertical bar in maths mode.
+
+The resource options provided in \gls{GlsXtrLoadResources} expand as
+they are written to the \ext{aux} file. This allows commands to be
+used within the resource options that expand to a complex option
+that may be required multiple times. For example,
+\gls{GlsXtrBibTeXEntryAliases} or \gls{glsxtrhyphenrules}.
+Unfortunately, this means that quarks must be prevented from
+expansion as they form part of the option syntax and are not
+intended for use in the document.
+
+This means that, unless they happen to coincidentally be robust
+commands, they must be preceded by either \ics{protect} or
+\idx{cs.string}.  Since \cs{protect} adds a space afterwards,
+\idx{cs.string} is usually better if the syntax requires that spaces
+after quarks are significant.
+
+This can lead to cumbersome expressions, but it's possible to
+redefine \ics{glsxtrresourceinit} to locally redefine these quarks
+to expand to detokenized forms of themselves. For example:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\cmd{let}\cmd{u}\cs{glshex}}
+\end{codeenv}
+Since there are a number of these quarks, as from v1.51,
+\sty{glossaries-extra-bib2gls} (which is automatically loaded with
+\styopt{record}) provides \ics{GlsXtrResourceInitEscSequences},
+so you can change the above to the following:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\comment{}
+  \cs{GlsXtrResourceInitEscSequences}
+}
+\end{codeenv}
+
+This will locally define the quarks listed below. Since \cs{glsxtrresourceinit}
+is scoped so that it only has an effect within the protected write,
+this shouldn't interfere with the corresponding commands that are required in
+the document. Note that these quarks should only be used in their
+designated contexts.
+
+\begin{description}
+
+\item[General] \inlinegls{uhex} is recognised in certain resource options
+(such as \csopt{field-concat-sep}) as indicating the Unicode
+character with the given hexadecimal code.
+
+\item[Regular expressions] The following indicate a literal
+character: \inlinegls{quark.dot} \inlinegls{quark.backslash}
+\inlinegls{quark.slash} \inlinegls{quark.pipe} \inlinegls{quark.amp}
+\inlinegls{quark.plus} \inlinegls{quark.star}
+\inlinegls{quark.dollar} \inlinegls{quark.circum} \inlinegls{quark.tilde}
+\inlinegls{quark.openparen} \inlinegls{quark.closeparen}
+\inlinegls{quark.opensq} \inlinegls{quark.closesq}
+\inlinegls{quark.doublequote} \inlinegls{quark.hyphen}
+\inlinegls{quark.question} \inlinegls{quark.colon} \inlinegls{quark.hash}.
+Note that regular expressions in resource options are typically
+anchored, so there shouldn't be any need to use \idx{regex.circum}
+or \idx{regex.dollar} to denote the start and end.
+
+\item[Field conversions] The following commands may be used in the
+assignment value syntax of \csopt{assign-fields} to apply a
+case-conversion to value obtained from the referenced field:
+\ics{LC}, \ics{UC}, \ics{FIRSTLC}, \ics{FIRSTUC}, and \ics{TITLE}.
+
+\item[Null value] The conditional part of the \csopt{assign-fields}
+syntax recognises \ics{NULL} as indicating a null value for \idx{equalscmp}
+and \idx{notequalscmp} comparisons.
+\end{description}
+
+Finally, this isn't actually a quark, but \inlinedef{cs} is defined
+to expand to the literal string \csfmt{csname} so you can use it for any
+other escape sequences that aren't covered above. For example, 
+\code{\cs{cs}\marg{n}} for a newline \csfmt{n}.
 
 \section{Indexing}
 
@@ -2732,7 +2829,7 @@ automatically converts the first letter of the name to
 \longarg{mfirstuc-math-protection}.)
 
 None of these entries have a \field{sort} field so the \field{name}
-is used. If the entry type had been \atentry{symbol} instead,
+is used. If the \gls{entrytype} had been \atentry{symbol} instead,
 the fallback would be the entry's label.
 This means that with \atentry{symbol} instead of \atentry{entry}, and the default
 \csopt[sort]{sort-field}, and with
@@ -3888,12 +3985,12 @@ avoid unexpected results.
 
 \argsection{warn-unknown-entry-types}
 
-If any unknown entry types are found in the \ext{bib} file, \bibgls\
+If any unknown \glspl{entrytype} are found in the \ext{bib} file, \bibgls\
 will issue a warning with this option set (default).
 
 \argsection{no-warn-unknown-entry-types}
 
-This option will suppress the warning if an unknown entry types are
+This option will suppress the warning if an unknown \glspl{entrytype} are
 found in the \ext{bib} file.
 
 \section{Field Options}
@@ -4157,7 +4254,7 @@ Single and double-quote characters (\idx{aposchar} and
 \label{sec:bib}
 \setsecdepth{1}
 
-\bibgls\ recognises certain entry types. Any unrecognised types will
+\bibgls\ recognises certain \glspl{entrytype}. Any unrecognised types will
 be ignored and a warning will be written to the transcript file.
 Entries are defined in the usual \ext{bib} format:
 \begin{codeenv*}
@@ -4167,7 +4264,7 @@ Entries are defined in the usual \ext{bib} format:
   \meta{field-name-n} = \margm{text}
 }
 \end{codeenv*}
-where \meta{entry-type} is the entry type (listed below),
+where \meta{entry-type} is the \gls{entrytype} (listed below),
 \meta{field-name-1}, \ldots, \meta{field-name-n} are the field names and
 \meta{id} is a unique label. The label can't contain any spaces or
 commas, and most special characters are forbidden. The hyphen character and
@@ -4257,7 +4354,7 @@ for general comments, but not for the \gls{encoding}.
 \section{Fields}
 \label{sec:fields}
 
-Each entry type may have required fields, optional fields and
+Each \gls{entrytype} may have required fields, optional fields and
 ignored fields. These are set using a \keyvallist\ within
 \code{@\meta{entry-type}\marg{\meta{id},\meta{fields}}} in the
 \ext{bib} file. Most keys recognised by
@@ -4267,9 +4364,9 @@ shouldn't need to use the \field{sort} field.
 
 If an optional field is missing and \bibgls\ needs to access it for
 some reason, \bibgls\ will try to fallback on another value. The
-actual fallback value depends on the entry type. The most common
+actual fallback value depends on the \gls{entrytype}. The most common
 fallback is that used if the \field{sort} field is missing, which is
-typically the case. This approach allows different entry types to
+typically the case. This approach allows different \glspl{entrytypes} to
 have different fields used for sorting.
 
 Predefined fields for use in \ext{bib} files are listed in
@@ -4279,6 +4376,16 @@ custom keys in your document using \ics{glsaddkey} or
 \ics{glsaddstoragekey}, those commands must be placed before the
 first use of \gls{GlsXtrLoadResources} to ensure that \bibgls\
 recognises them as a valid field name. 
+
+\begin{important}
+If you define your own custom keys, ensure that they don't contain
+spaces, commas (\idx{commasep}), equal signs (\idx{equalsassign}) or 
+any other character that isn't supported by the \ext{bib} format.
+Additionally, if you want to use \csopt{assign-fields}, ensure
+that you don't use any of the assignment special characters, such as
+plus (\idx{assign-plus}) and greater than (\idx{follow}), within any
+field names.
+\end{important}
 
 Internal fields that may be assigned within the document (the
 \LaTeX\ assignment code having been written by \bibgls\ in the
@@ -4691,7 +4798,7 @@ but their actual definitions are determined in the \ext{bib} file.
 \section{Single Entry Types}
 \label{sec:singleentry}
 
-The entry types described in this section create a single glossary
+The \glspl{entrytype} described in this section create a single glossary
 definition per entry (from \styfmt{glossaries-extra}'s point of view). 
 For example:
 \begin{codeenv}
@@ -4715,7 +4822,7 @@ with the entry labels in its internal list in a different order.
 This means that the same data can be displayed in two separate lists
 without duplicating the resources required by each glossary entry.
 
-\Sectionref{sec:dualentry} describes \bibgls\ entry types
+\Sectionref{sec:dualentry} describes \bibgls\ \glspl{entrytype}
 that create two separate (but related) \styfmt{glossaries-extra}
 definitions per \ext{bib} entry.
 
@@ -4762,10 +4869,10 @@ Terms defined using \atentry{entry} will be written to the output
 
 \entrysection{symbol}
 
-The \atentry{symbol} entry type is much like \atentry{entry}, but it's
+The \atentry{symbol} \gls{entrytype} is much like \atentry{entry}, but it's
 designed specifically for symbols, so in the previous example, the
 \code{M} and \code{v} terms would be better defined using the
-\atentry{symbol} entry type instead. For example:
+\atentry{symbol} \gls{entrytype} instead. For example:
 \begin{codeenv}
 \atentry{symbol}\marg{M,
   \field{name}=\marg{\cs{ensuremath}\marg{M}},
@@ -4785,7 +4892,7 @@ the output file using the command \gls!{bibglsnewsymbol}.
 
 \entrysection{number}
 
-The \atentry{number} entry type is like \atentry{symbol}, but it's for
+The \atentry{number} \gls{entrytype} is like \atentry{symbol}, but it's for
 numbers. The numbers don't have to be explicit digits and may have a
 symbolic representation. There's no real difference between the
 behaviour of \atentry{number} and \atentry{symbol} except that terms
@@ -4831,7 +4938,7 @@ glossary format to include the \field{user1} field:
 
 \entrysection{index}
 
-The \atentry{index} entry type is designed for entries that don't
+The \atentry{index} \gls{entrytype} is designed for entries that don't
 have a description. Only the label is required. If \field{name} is
 omitted, it's assumed to be the same as the label, even if
 \field{parent} is present. (Note this is different to the fallback
@@ -4839,7 +4946,7 @@ behaviour of \atentry{entry}, which fetches the name from the
 \gls{parententry}.) If the name contains any characters that can't be used in
 the label, you must use the \field{name} field. If the \field{sort}
 field is missing the default is obtained from the \field{name}.
-Note that the \atentry{index} entry type is \emph{not} governed by
+Note that the \atentry{index} \gls{entrytype} is \emph{not} governed by
 \csopt{entry-sort-fallback} (but it is governed by
 \csopt{custom-sort-fallbacks}). This allows \atentry{index} and
 \atentry{entry} to have different fallbacks if the \field{sort}
@@ -4858,8 +4965,8 @@ file using the command \gls!{bibglsnewindex}.
 
 \entrysection{indexplural}
 
-The \atentry{indexplural} entry type is similar to the
-\atentry{index} entry type except that the \field{name} field, if
+The \atentry{indexplural} \gls{entrytype} is similar to the
+\atentry{index} \gls{entrytype} except that the \field{name} field, if
 missing, is obtained from the \field{plural} field. If the
 \field{plural} field is missing it's obtained from the \field{text}
 field with the plural suffix appended. If the \field{text} field is
@@ -4907,7 +5014,7 @@ file using the command \gls!{bibglsnewindexplural}.
 
 \entrysection{abbreviation}
 
-The \atentry{abbreviation} entry type is designed for abbreviations.
+The \atentry{abbreviation} \gls{entrytype} is designed for abbreviations.
 The required fields are \field{short} and \field{long}. If the
 \field{sort} key is missing, \bibgls\ will use the field given by
 \csopt{abbreviation-sort-fallback}, which defaults to the \field{short} field.
@@ -5010,20 +5117,20 @@ file using the command \gls!{bibglsnewabbreviation}.
 
 \entrysection{acronym}
 
-The \atentry{acronym} entry type is like \atentry{abbreviation} except that
+The \atentry{acronym} \gls{entrytype} is like \atentry{abbreviation} except that
 the term is written to the output file using the command
 \gls!{bibglsnewacronym}.
 
 \entrysection{contributor}
 
-The \atentry{contributor} entry type is primarily provided for use 
+The \atentry{contributor} \gls{entrytype} is primarily provided for use 
 by the \atentry{bibtexentry} type. You may use it explicitly
 if you want, but you need to take care that it doesn't clash with
 \atentry{bibtexentry}. It behaves much like \atentry{index} except that the
 term is written to the \ext{glstex} file using the command
 \gls!{bibglsnewcontributor}. There are no required fields. As with
 \atentry{index}, if the \field{name} field is missing, the fallback
-value is the entry's label. When this entry type is automatically
+value is the entry's label. When this \gls{entrytype} is automatically
 created by \atentry{bibtexentry}, the \field{name} is set to 
 \begin{codeenv}
 \gls{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}
@@ -5066,7 +5173,7 @@ corresponding \atentry{bibtexentry} then you will end up with a label clash.
 \section{Dual Entry Types}
 \label{sec:dualentry}
 
-The entry types described in this section create two separate (but
+The \glspl{entrytype} described in this section create two separate (but
 related) \styfmt{glossaries-extra} entry definitions per \ext{bib}
 entry. The first of these entries is considered the
 \igls{primaryentry}, and the second is the \igls{dualentry}.
@@ -5137,7 +5244,7 @@ appended to the end of the \ext{glstex} file. The
 \csopt{dual-sort-field} determines what field to use for the sort
 value if the dual entries should be sorted separately.
 
-Take care if you have a mixture of entry types (such as 
+Take care if you have a mixture of \glspl{entrytype} (such as 
 \atentry{dualindexentry}, \atentry{dualindexsymbol} 
 and \atentry{index}) and you're not
 using the default \csopt[combine]{dual-sort}. Remember that the
@@ -5187,7 +5294,7 @@ For example, suppose the file \filefmt{entries.bib} contains:
   \cs{gls}\marg{html} document}
 }
 \end{codeenv}
-This contains a mixture of entry types, including
+This contains a mixture of \glspl{entrytype}, including
 \atentry{dualindexabbreviation} (where the \dual\ is the
 abbreviation) and \atentry{dualabbreviationentry} (where the
 \primary\ is the abbreviation).
@@ -5410,7 +5517,7 @@ A better solution would be to use
 
 \entrysection{dualentry}
 
-The \atentry{dualentry} entry type is similar to \atentry{entry} but
+The \atentry{dualentry} \gls{entrytype} is similar to \atentry{entry} but
 actually defines two entries.
 The \gls{dualentry} contains the same information as the \gls{primaryentry}
 but some of the fields are swapped around.
@@ -5617,7 +5724,7 @@ with \ics{dgls}, \ics{dGls} etc instead of \cs{gls}, \cs{Gls} etc.
 
 \entrysection{dualindexabbreviation}
 
-The \atentry{dualindexabbreviation} entry type is similar to 
+The \atentry{dualindexabbreviation} \gls{entrytype} is similar to 
 \atentry{dualindexentry} and again, by default, the
 field mapping is:
 \begin{itemize}
@@ -5674,7 +5781,7 @@ The \dual\ term is defined using
 
 \entrysection{dualindexsymbol}
 
-The \atentry{dualindexsymbol} entry type is similar to 
+The \atentry{dualindexsymbol} \gls{entrytype} is similar to 
 \atentry{dualindexentry}, but by default the
 field mappings are:
 \begin{itemize}
@@ -5844,7 +5951,7 @@ further details.
 
 \entrysection{dualindexnumber}
 
-The \atentry{dualindexnumber} entry type is almost identical to
+The \atentry{dualindexnumber} \gls{entrytype} is almost identical to
 \atentry{dualindexsymbol}, but the \glspl{primaryentry} are defined using
 \gls!{bibglsnewdualindexnumber},
 which by default sets the \field{category} to \optfmt{index},
@@ -5854,7 +5961,7 @@ which by default sets the \field{category} to \optfmt{number}.
 
 \entrysection{dualabbreviationentry}
 
-The \atentry{dualabbreviationentry} entry type is similar to 
+The \atentry{dualabbreviationentry} \gls{entrytype} is similar to 
 \atentry{dualentry}, but by default the
 field mappings are:
 \begin{itemize}
@@ -5876,13 +5983,13 @@ additionally include:
 \end{itemize}
 You may need to add a mapping from \field{shortplural} to
 \field{plural} if the default is inappropriate.
-(In \bibgls\ version 1.0 this entry type was originally called
+(In \bibgls\ version 1.0 this \gls{entrytype} was originally called
 \atentry{dualentryabbreviation}. In version 1.1, it was renamed
 \atentry{dualabbreviationentry} which makes for a more consistent naming scheme
 \code{@dual}\meta{primary}\meta{dual}.)
 
 The required fields are: \field{short}, \field{long} and
-\field{description}. This entry type is designed to emulate the
+\field{description}. This \gls{entrytype} is designed to emulate the
 example \gls{newdualentry} command given in the \sty{glossaries}
 user manual~\cite{glossaries}. The \gls{primaryentry} is an abbreviation with the given
 \field{short} and \field{long} fields (but not the 
@@ -5942,7 +6049,7 @@ to override this.
 
 \entrysection{dualentryabbreviation}
 
-This entry type is deprecated as from \bibgls\ version 1.1. It's functionally
+This \gls{entrytype} is deprecated as from \bibgls\ version 1.1. It's functionally
 equivalent to \atentry{dualabbreviationentry} but its name
 doesn't fit the general dual entry naming scheme.
 
@@ -6024,7 +6131,7 @@ could be sorted numerically according to the approximate value:
 
 \entrysection{dualabbreviation}
 
-The \atentry{dualabbreviation} entry type is similar to 
+The \atentry{dualabbreviation} \gls{entrytype} is similar to 
 \atentry{dualentry}, but by default the
 field mappings are:
 \begin{itemize}
@@ -6309,11 +6416,11 @@ defaults to \idprefix{tertiary} and can be changed with
 
 \entrysection{tertiaryindexabbreviationentry}
 
-This entry type is very similar to
+This \gls{entrytype} is very similar to
 \atentry{dualindexabbreviation} but creates a \gls{tertiaryentry} as
 well.  The required fields are: \field{short} and \field{long} (as for
 \atentry{dualindexabbreviation}) and also \field{description}.  The
-mappings are shared by both entry types.  For example:
+mappings are shared by both \glspl{entrytype}.  For example:
 \begin{codeenv}
 \atentry{tertiaryindexabbreviationentry}\marg{html,
   \field{short} = \marg{HTML},
@@ -6388,11 +6495,11 @@ and \atentryfmt{book} as though they were both
 \end{codeenv}
 For convenience, \isty{glossaries-extra-bib2gls} v1.29+
 provides \ics{GlsXtrBibTeXEntryAliases} which covers all the
-standard \BibTeX\ entry types. Alternatively, you can use
+standard \BibTeX\ \glspl{entrytype}. Alternatively, you can use
 \csopt[bibtexentry]{unknown-entry-alias} to alias all entries
 that aren't recognised by \bibgls. If you use 
 \csopt[same as original entry]{category}, the \field{category}
-field will be set to the original entry type (for example,
+field will be set to the original \gls{entrytype} (for example,
 \code{article} or \code{book}). Similarly you can use
 \csopt[same as original entry]{type} to set the \field{type}
 field (but remember that the glossary types will need to be defined
@@ -6471,7 +6578,7 @@ is followed by:
 for each selected \atentry{bibtexentry} associated with that contributor. The
 second line provides the internal list field
 \field{bibtexentry@entrytype}, where \meta{entry-type} is the
-original entry type (before it was aliased to
+original \gls{entrytype} (before it was aliased to
 \atentry{bibtexentry} and converted to \idx!{lowercase}).
 For example \code{article} or \code{book}.
 
@@ -6592,7 +6699,7 @@ takes place. However, if the \field{adoptparents} field isn't found,
 \bibgls\ will check for a simple mapping in both the
 \csopt{field-aliases} and \csopt{replicate-fields} settings.
 
-This entry type creates a \glsdisp{mainentry}{main} \igls[textformat=emph]{progenitor}
+This \gls{entrytype} creates a \glsdisp{mainentry}{main} \igls[textformat=emph]{progenitor}
 term (with all the given fields except \field{adoptparents})
 and $n$ spawned \igls[textformat=emph]{progeny} terms, where
 $n$ is the number of elements in the \field{adoptparents} field,
@@ -6755,14 +6862,14 @@ parents.
 The following \atentryfmt{spawn\meta{single-type}} commands are all forms
 of \atentry{progenitor} that create the given
 \atentryfmt{\meta{single-type}} of entry. The \glspl{spawnedentry} are actually
-created with the private entry type \atentryfmt{spawned\meta{type}}. In the
+created with the private \gls{entrytype} \atentryfmt{spawned\meta{type}}. In the
 case of \atentry{progenitor}, the \glspl{spawnedentry} are defined as 
 a \atentryfmt{spawnedindex} entry. These special
-\atentryfmt{spawned\meta{type}} entry types aren't intended for use
-in the \ext{bib} file, but if you reference the entry type (for
+\atentryfmt{spawned\meta{type}} \glspl{entrytype} aren't intended for use
+in the \ext{bib} file, but if you reference the \gls{entrytype} (for
 example, with \csopt[same as entry]{category}) you will get 
-\atentryfmt{spawned\meta{type}} as the entry type. The
-original entry type for the \glspl{spawnedentry} is the same as
+\atentryfmt{spawned\meta{type}} as the \gls{entrytype}. The
+original \gls{entrytype} for the \glspl{spawnedentry} is the same as
 the original entry for the \glsdisp{mainentry}{main} \atentry{progenitor} entry.
 
 There is currently only one form of \dual\ \atentry{progenitor} entry and that's
@@ -7069,9 +7176,9 @@ If omitted, the main label is assumed to be the last element.
 corresponds to the first optional argument of
 \cs{multiglossaryentry}. This field may be omitted.
 \end{definition}
-These fields can only be used in this entry type.
+These fields can only be used in this \gls{entrytype}.
 
-Most resource options don't apply to this entry type. Options
+Most resource options don't apply to this \gls{entrytype}. Options
 specific to \glspl{compoundentry} are listed in
 \sectionref{sec:compoundentries}.
 
@@ -7500,7 +7607,7 @@ one mapping. For example:
 This option isn't cumulative.  Multiple instances of
 \csopt{entry-type-aliases} override previous instances.
 If \meta{\keyvallist} is empty there will be no mappings.
-You can save the original entry type in the
+You can save the original \gls{entrytype} in the
 \field{originalentrytype} field with
 \csopt{save-original-entrytype}.
 
@@ -7548,9 +7655,9 @@ treats the entry as though it had been defined as:
 \optsection{unknown-entry-alias}
 
 If this option is set, the \meta{value} is used as the alias for any
-unknown entry types (after any aliases provided with
+unknown \glspl{entrytype} (after any aliases provided with
 \csopt{entry-type-aliases} have been applied). If the value is
-missing or empty, unknown entry types will be ignored with a
+missing or empty, unknown \glspl{entrytype} will be ignored with a
 warning.
 
 \optsection{action}
@@ -7925,11 +8032,11 @@ The value is required for this key but may be empty, which indicates
 that the setting is switched off, otherwise
 \meta{\keyvallist} should be a \meta{key}=\meta{regexp} list, where
 \meta{key} is the name of a field or \optfmt{id} for the entry's
-label or \optfmt{entrytype} for the \bibgls\ entry type (as in
+label or \optfmt{entrytype} for the \bibgls\ \gls{entrytype} (as in
 the part after \verb|@| identifying the entry not the \field{type}
 field identifying the glossary label). If you've used
-\csopt{entry-type-aliases}, this refers to the target entry type not
-the original entry type specified in the \ext{bib} file.
+\csopt{entry-type-aliases}, this refers to the target \gls{entrytype} not
+the original \gls{entrytype} specified in the \ext{bib} file.
 
 The \meta{regex} part should be a \idx{regex} conforming
 to
@@ -9756,14 +9863,14 @@ The \meta{value} may be:
 \begin{itemize}
 \item \optfmt{false}: switch off this setting (default);
 \item \optfmt{same as entry}: set the
-\field{category} to the \ext{bib} entry type used to define it
+\field{category} to the \ext{bib} \gls{entrytype} used to define it
 (\idx!{lowercase} and without the initial \code{@}) after any aliasing,
 if applicable;
 
 \item \optfmt{same as original entry}: (new to v1.4) set the \field{category} 
-to the original entry type (\idx!{lowercase} and without 
+to the original \gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased);
+\optfmt{same as entry} if the \gls{entrytype} wasn't aliased);
 
 \item \optfmt{same as base}: (new to v1.1) set the \field{category}
 to the base name of the \ext{bib} file (without the extension) 
@@ -9780,14 +9887,14 @@ This will override any
 \field{category} fields supplied in the \ext{bib} file.
 
 When used with \csopt{entry-type-aliases}, the option \csopt[same as
-entry]{category} refers to the \emph{target} entry type whereas
+entry]{category} refers to the \emph{target} \gls{entrytype} whereas
 \csopt[same as original entry]{category} refers to the
-\emph{original} entry type given in the \ext{bib} file.  In both
+\emph{original} \gls{entrytype} given in the \ext{bib} file.  In both
 cases, the value is converted to \idx!{lowercase} to ensure consistency.
 An alternative is to use \csopt[category]{save-original-entrytype}.
 When combined with \csopt[changed]{save-original-entrytype-action}
 it's then possible to only set the \field{category} to the original
-entry type for aliased entries and leave it unmodified for unaliased
+\gls{entrytype} for aliased entries and leave it unmodified for unaliased
 entries.
 
 For example, if the \ext{bib} file contains:
@@ -9849,12 +9956,12 @@ The \meta{value} may be one of:
  \item \optfmt{false}: switches off this setting (default);
 
  \item \optfmt{same as entry}: set the \field{type} field
-  to the entry type (\idx!{lowercase} and without the initial \code{@}); 
+  to the \gls{entrytype} (\idx!{lowercase} and without the initial \code{@}); 
 
  \item \optfmt{same as original entry}: set the \field{type} 
-  to the original entry type (\idx!{lowercase} and without 
+  to the original \gls{entrytype} (\idx!{lowercase} and without 
   the initial \code{@}) before it was aliased (behaves like 
-  \optfmt{same as entry} if the entry type wasn't aliased);
+  \optfmt{same as entry} if the \gls{entrytype} wasn't aliased);
 
  \optfmt{same as base}: set the \field{type} field
   to the base name of the corresponding \ext{bib} file
@@ -9877,13 +9984,13 @@ which may be inappropriate.
    identified by \meta{label}.
 \end{itemize}
 When used with \csopt{entry-type-aliases}, the option \csopt[same as
-entry]{type} refers to the \emph{target} entry type and \csopt[same
-as original entry]{type} refers to the \emph{original} entry type
+entry]{type} refers to the \emph{target} \gls{entrytype} and \csopt[same
+as original entry]{type} refers to the \emph{original} \gls{entrytype}
 given in the \ext{bib} file.  
 An alternative is to use \csopt[type]{save-original-entrytype}.
 When combined with \csopt[changed]{save-original-entrytype-action}
 it's then possible to only set the \field{type} to the original
-entry type for aliased entries and leave it unmodified for unaliased
+\gls{entrytype} for aliased entries and leave it unmodified for unaliased
 entries.
 
 \begin{important}
@@ -9964,7 +10071,7 @@ The default is \field{parent}.
 
 \optsection[\subsubsection]{abbreviation-name-fallback}
 
-The entry types that define abbreviations (such as
+The \glspl{entrytype} that define abbreviations (such as
 \atentry{abbreviation} and \atentry{acronym}) will, by default,
 fallback on the \field{short} field if the \field{name} field is
 missing and it's required for some reason (for example, with
@@ -10023,7 +10130,7 @@ mappings and trails aren't permitted. (That is, \meta{field1}
 and \meta{field2} can't be the same nor can you have both
 \meta{field1}\dequals\meta{field2} and
 \meta{field2}\dequals\meta{field3}.) If you want to swap
-fields you need to use one of the dual entry types instead.
+fields you need to use one of the dual \glspl{entrytype} instead.
 Field aliases are performed before \csopt{ignore-fields},
 so if \meta{field1} is listed in \csopt{ignore-fields} it won't
 be ignored (unless \meta{field2} is in \csopt{ignore-fields}).
@@ -10053,9 +10160,22 @@ keys:
 
 \optsection[\subsubsection]{replicate-fields}
 
+\begin{important}
+Note the difference in syntax between \csopt{replicate-fields} and
+\csopt{assign-fields}. Both have a \keyvallist\ as the option
+argument, but  the \keyval\ syntax is different. In the case of
+\csopt{replicate-fields}, the left hand side (\meta{key}) is the
+\emph{source} field. The right hand side (\meta{value}) is a
+comma-separated list of \emph{destination} fields. The value of the
+source field will be copied into each of the destination fields.
+In the case of \csopt{assign-fields}, the left hand side
+(\meta{key}) is the \emph{destination} field and the right hand side
+\emph{value} is an assignment expression with an optional
+conditional.
+\end{important}
+
 The value of one field can be copied to other fields using
-this option where each \meta{key}\dequals\meta{value} pair
-is in the form
+this option where each \keyval\ pair is in the form
 \code{\meta{field1}\dequals\marg{\meta{field2},\meta{field3},\ldots}}
 where all values are field names. The value is required for this key
 but may be empty, which indicates that the setting is switched off.
@@ -10164,6 +10284,214 @@ This option indicates what to do if a source field identified in
 \item \optfmt{fallback}: use the fallback for the missing field, if
 one is available (otherwise skip);
 \item \optfmt{empty}: make the target field empty.
+\end{itemize}
+
+\optsection[\subsubsection]{assign-fields}
+
+\begin{important}
+Note the difference in syntax between \csopt{replicate-fields} and
+\csopt{assign-fields}, as highlighted in the
+\csopt{replicate-fields} section, above. The \csopt{assign-fields}
+option is implemented after the \csopt{replicate-fields} option (see
+\sectionref{sec:resourcesets}).
+\end{important}
+
+The \csopt{assign-fields} option is a more complex way of setting a
+field than \csopt{replicate-fields}. Each element of the
+\keyvallist\ argument has the syntax:
+\begin{codeenv}
+\meta{dest-field}\dequals\meta{assign-specs} \oargm{condition}
+\end{codeenv}
+If the destination field (\meta{dest-field}) is already set, it will
+only be overwritten if \csopt[true]{assign-override}. The
+\meta{dest-field} is simply the name of the field for the entry
+under consideration and doesn't use the more complex
+\meta{field-ref} syntax used in \meta{assign-specs}, which is
+described below.
+
+The \oargm{condition} part is optional. The \meta{assign-specs}
+are a \idx{assign-plus} separated list of field references or
+delimited strings. A field reference may be marked up with case-\idx{quark}
+and the conditional part may use the null-\idx{quark} in equal and
+not equal comparisons (see \sectionref{sec:quarks}).
+
+\begin{codeenv}
+\meta{assign-specs} ::= \meta{assign-value} | \meta{assign-value} \idx{assign-plus} \meta{assign-specs}
+\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{quark}\margm{field-ref}
+\meta{quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
+\end{codeenv}
+
+As with the \ext{bib} format, strings can be delimited by braces
+\margm{text} or double-quotes \code{\qtdelim{\meta{text}}}. If you
+need a literal double-quote (\idx{doublequotechar}) then either use
+brace delimiters or use \gls{quark.doublequote}. If you need the
+actual \LaTeX\ accent command \gls{umlaut} then use brace
+delimiters. If you need braces that start and end in different
+fragments then use double-quote delimiters.
+
+The case-changing \idxpl{quark} that may be used in the assignment
+specification can only take a field reference \meta{field-ref} (see
+below) as an argument (not a string or concatenation). This doesn't
+alter the referenced field but converts the value obtained from the
+reference for use in the concatenation. Note that the case-change is
+performed by \bibgls\ not by inserting \LaTeX\ case-changing
+commands into the code.  The case-change recognises the
+\gls{resource-locale}, but whether or not it recognises the correct
+rules for the locale depends on whether or not the locale is
+correctly supported by the Java locale provider.
+
+\begin{itemize}
+\item \inlinegls{LC} converts the value obtained from the field
+reference to \idx!{lowercase};
+\item \inlinegls{UC} converts the value obtained from the field
+reference to \idx!{uppercase};
+\item \inlinegls{FIRSTLC} converts the first letter from the value
+obtained from the field reference to \idx!{lowercase};
+\item \inlinegls{FIRSTUC} converts the first letter from the value
+obtained from the field reference to \idx!{uppercase};
+\item \inlinegls{TITLE} converts the value obtained from the field
+reference to \idx!{titlecase}.
+\end{itemize}
+
+\begin{important}
+Remember that the argument of \gls{GlsXtrLoadResources} is expanded
+as it's written to the \ext{aux} file. This means that care must be
+taken to prevent premature expansion of \idxpl{quark} or any
+commands that need to be present in a string.
+\end{important}
+
+As from \styfmt{glossaries-extra} v1.51, the
+\sty{glossaries-extra-bib2gls} package (which is automatically
+loaded with the \styopt{record} option) provides the command
+\ics{GlsXtrResourceInitEscSequences} which will locally redefine
+these \idx{quark} commands to expand to their detokenized form.
+So you can do:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\comment{}
+  \ics{GlsXtrResourceInitEscSequences}
+}
+\end{codeenv}
+This means that you can simply write the \idx{quark} in the resource
+option without needing to use \ics{protect} or \idx{cs.string}.
+
+The field reference syntax is more complicated:
+\begin{codeenv}
+\meta{field-ref} ::= \meta{value-ref} | \meta{entry-ref} \idx{follow} \meta{field-ref}
+\meta{entry-ref} ::= "self" | "parent" | "root"
+\meta{value-ref} ::= \meta{field-name} | \meta{label-ref}
+\meta{label-ref} ::= \meta{label-type} \idx{follow} \meta{label-delineator}
+\meta{label-type} ::= "entrytype" | "entrylabel"
+\meta{label-delineator} ::= "original" | "actual"
+\end{codeenv}
+where \meta{field-name} is the required field name. Note that field
+names can't include any of the assignment markup special characters:
+\idx{assign-plus} \idx{follow} \idx{startoptional} \idx{endoptional}
+\idx{equalsassign} \idx{commasep} or \idx{doublequotechardelim}.
+
+The \meta{entry-ref} part indicates which entry the referenced field
+belongs to.  The keywords are: \code{self} (the entry itself),
+\code{parent} (the entry's \parent), and \code{root} (the entry's
+\glsdisp{hierarchicalglossary}{hierarchical root}, not including the
+entry itself). These are relative to the entry that the destination
+field belongs to. Note that the entry's \glspl{ancestor} must be
+defined before the entry in the \ext{bib} file because their fields
+can only be referenced after they have been processed.  A
+grandparent entry can be referenced with \code{parent \idx{follow}
+parent \idx{follow}}.  Since \qt{parent} is also a field name, if
+the keyword \code{parent} is followed by \idx{follow} then the
+keyword refers to the \gls{parententry} otherwise it refers to the
+\field{parent} field.
+
+The special keywords \code{entrytype} and \code{entrylabel} refer to
+the \gls{entrytype} (without the leading \code{@}) or the entry
+label. In this case, the keyword must be followed by the
+\meta{delineator}, which may be \code{original} to indicate the
+original value, as given in the \ext{bib} file, or the actual value
+which may have been modified through resource options such as
+\csopt{entry-type-aliases} or \csopt{label-prefix}.
+
+For example, suppose I have defined the custom fields
+\fieldfmt{surname} and \fieldfmt{forename}, and I have the following
+in my \ext{bib} file:
+\begin{codeenv}
+\atentry{index}\marg{Smith}
+\atentry{index}\marg{
+ \fieldfmt{forename}=\marg{Jane},
+ \field{parent}=\marg{Smith}
+}
+\end{codeenv}
+Suppose that what I actually want is:
+\begin{codeenv}
+\atentry{index}\marg{Smith}
+\atentry{index}\marg{
+ \fieldfmt{forename}=\marg{Jane},
+ \fieldfmt{surname}=\marg{Smith},
+ \field{parent}=\marg{Smith},
+ \field{name}=\marg{Jane},
+ \field{text}=\marg{Jane Smith}
+}
+\end{codeenv}
+This is quite repetitive to type out for every person you need to
+index. The \csopt{replicate-fields} option can reduce some of this.
+For example:
+\begin{codeenv}
+\csopt{replicate-fields}=\marg{
+  \fieldfmt{forename}=\marg{name},
+  \fieldfmt{surname}=\marg{parent}
+}
+\end{codeenv}
+This doesn't deal with the \field{text} field and also has a problem
+if the \field{parent} field (which should contain a label) doesn't
+match the surname. For example, I might also have:
+\begin{codeenv}
+\atentry{index}\marg{de-la-Fontaine,
+ \field{name}=\marg{de la Fontaine}
+}
+\atentry{index}\marg{
+ \fieldfmt{forename}=\marg{Margaret},
+ \field{parent}=\marg{de-la-Fontaine}
+}
+\end{codeenv}
+In this case the custom \fieldfmt{surname} field needs to match the
+parent's \field{name} field, not the parent's label.
+
+The desired result can instead be obtained with:
+\begin{codeenv}
+\csopt{assign-fields}=\marg{
+  \fieldfmt{surname} = parent \idx{follow} \field{name},
+  \field{name} = self \idx{follow} \fieldfmt{forename},
+  \field{text} = self \idx{follow} \fieldfmt{forename}
+    \idx{assign-plus} \qtdelim{ } \idx{assign-plus} self \idx{follow} \fieldfmt{surname}
+}
+\end{codeenv}
+The \code{self \idx{follow}} part is optional so this can be written
+more compactly as:
+\begin{codeenv}
+\csopt{assign-fields}=\marg{
+  \fieldfmt{surname} = parent \idx{follow} \field{name},
+  \field{name} = \fieldfmt{forename},
+  \field{text} = \fieldfmt{forename} \idx{assign-plus} \qtdelim{ } \idx{assign-plus} \fieldfmt{surname}
+}
+\end{codeenv}
+
+% TODO describe condition syntax
+
+\optsection[\subsubsection]{assign-override}
+
+This is a boolean option. The default setting is
+\csopt[false]{assign-override}. If \optfmt{true},
+\csopt{assign-fields} will override the existing value if the
+target field is already set.
+
+\optsection[\subsubsection]{assign-missing-field-action}
+
+This option indicates what to do if a source field identified in 
+\csopt{assign-fields} is missing. The value may be one of:
+\begin{itemize}
+\item \optfmt{skip}: skip the assignment;
+\item \optfmt{fallback}: use the fallback for the missing field, if
+one is available, otherwise skip the assignment (default);
+\item \optfmt{empty}: treat the missing value as empty.
 \end{itemize}
 
 \optsection[\subsubsection]{counter}
@@ -10322,7 +10650,7 @@ had to stop when it wrapped round to its starting point.
 \optsection[\subsubsection]{save-original-entrytype}
 
 The \meta{value} may be the keywords \code{false} or \code{true} or
-the name of a field in which to store the original entry type (as
+the name of a field in which to store the original \gls{entrytype} (as
 given in the \ext{bib} file but without the leading \idx{atchar} and
 converted to \idx!{lowercase}). The setting is
 \csopt[false]{save-original-entrytype}. If \meta{value} is omitted or the
@@ -10338,19 +10666,19 @@ setting is governed by \csopt{save-original-entrytype-action}.
 \optsection[\subsubsection]{save-original-entrytype-action}
 
 This option determines whether or not \csopt{save-original-entrytype}
-should save the original entry type. No action is performed when
+should save the original \gls{entrytype}. No action is performed when
 \csopt[false]{save-original-entrytype} otherwise the action is determined
 by \meta{value} which may be one of the following keywords:
 \begin{itemize}
-\item \code{always}: always save the original entry type (default);
+\item \code{always}: always save the original \gls{entrytype} (default);
 \item \code{no override}: don't override a field that's already been
 set;
 \item \code{changed override} or \code{changed} or \code{diff}:
-only save the original entry type if it's different from the final
-entry type;
+only save the original \gls{entrytype} if it's different from the final
+\gls{entrytype};
 \item \code{changed no override}:
-only save the original entry type if it's different from the final
-entry type and the specified field hasn't been set. 
+only save the original \gls{entrytype} if it's different from the final
+\gls{entrytype} and the specified field hasn't been set. 
 \end{itemize}
 The \qt{no override} options make no difference if the given field
 is unknown (such as \field{originalentrytype}). For known fields, bear in
@@ -10359,7 +10687,7 @@ other options, such as \csopt{ignore-fields}.
 
 The \qt{changed} options ignore case. For example, if the \ext{bib}
 file defined an entry with \atentryfmt{INDEX} then both the original
-and final entry type will be \code{index}.
+and final \gls{entrytype} will be \code{index}.
 
 \subsection{Field Adjustments}
 \label{sec:fieldmods}
@@ -10863,7 +11191,7 @@ If true, this is a shortcut for:
 This will remove any labels in an entry's \field{see} or
 \field{seealso} field where the referenced label doesn't have any
 records and hasn't been selected as another form of dependency and
-whose entry type is either \atentry{index} or \atentry{indexplural}
+whose \gls{entrytype} is either \atentry{index} or \atentry{indexplural}
 and doesn't have the \field{see}, \field{seealso} or \field{alias}
 fields set.
 
@@ -10947,7 +11275,7 @@ An appropriate filter is needed to switch on pruning. (This is in
 addition to the criteria that the pruned entry has no records, isn't
 dependent on another entry, and hasn't previously been selected.)
 This type of pruning is usually only necessary for indexes so a
-useful filter may be simply on the entry type (either
+useful filter may be simply on the \gls{entrytype} (either
 \atentry{index} or \atentry{indexplural}):
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},
@@ -11746,12 +12074,18 @@ package documentation for further details~\cite{textcase,mfirstuc}.
 
 For the settings where \bibgls\ itself performs the \idx{case-change}, then
 \bibgls\ will iterate over each token of the field value and apply
-the following rules:
+the rules listed below.  Note that the case-change implemented by
+\bibgls\ recognises the \gls{resource-locale}, but whether or not it
+recognises the correct rules for the locale depends on whether or
+not the locale is correctly supported by the Java locale provider.
+
 \begin{enumerate}
 
 \item If the token is a normal Unicode alphabetic character, it will
 be replaced with the corresponding upper or lower case character, as
-appropriate.
+appropriate. In some cases, a single character, such as \ss, is
+replaced by multiple characters, such as SS.
+
 For \optfmt{title} and \optfmt{firstuc}, the \idx{titlecase} character is
 used as the replacement, for \optfmt{uc} the \idx{uppercase} character is
 used as the replacement, and for \optfmt{lc} the \idx{lowercase} character
@@ -12170,9 +12504,9 @@ This option may take one of the values described above.
 
 If the \field{text} field hasn't been set, the \field{name}
 value is first copied to the \field{text} field. If the \field{name}
-field hasn't been set (for example, with the \atentry{index} entry
-type), it's copied from the fallback value (which
-depends on the entry type) unless the entry type is
+field hasn't been set (for example, with the \atentry{index} 
+\gls{entrytype}), it's copied from the fallback value (which
+depends on the \gls{entrytype{) unless the \gls{entrytype} is
 \atentry{abbreviation} or \atentry{acronym}, in which case if
 the \field{name} field is missing no action is performed.
 
@@ -14239,7 +14573,7 @@ values to determine the order. By default, this sort value is
 obtained from the \field{sort} field but for greater flexibility
 it's best to not actually set this field. \bibgls\ has a set of fallbacks
 that it uses if a field it needs to access is missing. These
-fallbacks depend on the entry type and resource settings.
+fallbacks depend on the \gls{entrytype} and resource settings.
 
 For example, if a term defined with \atentry{index} doesn't have the
 \field{sort} field set then \bibgls\ will use the value given by the
@@ -14266,7 +14600,7 @@ any entries then I can, for example, sort terms defined with
 If the field used to obtain the sort value is changed
 (with \csopt{sort-field}) then the \field{sort} field won't be
 queried. This reduces the flexibility of selecting the most
-appropriate field for given entry types. For example,
+appropriate field for given \glspl{entrytype}. For example,
 \csopt[name]{sort-field} will force all entries to be sorted by the
 \field{name} field, which may not be appropriate for symbols.
 
@@ -15354,19 +15688,19 @@ a case-sensitive letter comparison.
 \begin{important}
 In general it's better to use the default \csopt[sort]{sort-field} 
 and adjust the fallbacks instead. The \csopt{sort-field} option is
-provided if you want to use a specific field regardless of the entry
-type.
+provided if you want to use a specific field regardless of the 
+\gls{entrytype}.
 \end{important}
 
 If an entry is missing a value for \meta{field}, then the value of
 the fallback field will be used instead. If \csopt{missing-sort-fallback} is
 set, then that's used as the fallback, otherwise it depends on the
-entry type. 
+\gls{entrytype}. 
 If no fallback field can be found, the entry's label will be used.
 
 For the specific case with the default \csopt[sort]{sort-field}
 setting, the fallback for the \field{sort} field is governed not
-only by the entry type but also by some associated settings:
+only by the \gls{entrytype} but also by some associated settings:
 
 \begin{itemize}
 \item If the entry's original type (before being aliased with
@@ -15380,10 +15714,10 @@ missing the value is obtained from the field identified by
 \csopt{entry-sort-fallback}. If that field is also missing then
 that field's fallback is used.
 
-\item For the index entry types like \atentry{index} or
+\item For the index \glspl{entrytype} like \atentry{index} or
 \atentry{indexplural}, then if the \field{sort} field is missing the
 value is obtained from the \field{name} field. If that field is also
-missing, then the value is obtained from the particular entry type's
+missing, then the value is obtained from the particular \gls{entrytype}['s]
 fallback for the \field{name} field. (For example, the entry's label
 for \atentry{index} or the \field{plural} field for
 \atentry{indexplural}.)
@@ -15393,7 +15727,7 @@ example, \atentry{abbreviation} or \atentry{acronym}) then if the
 \field{sort} field is missing, \bibgls\ will fallback on the field
 given by \csopt{abbreviation-sort-fallback}.
 
-\item The symbol-like entry types fallback on the field given by
+\item The symbol-like \glspl{entrytype} fallback on the field given by
 \csopt{symbol-sort-fallback} if the \field{sort} field is missing.
 
 \item Entries defined using \atentry{bibtexentry} fallback on the field
@@ -15414,7 +15748,7 @@ follows:
 \item If \csopt[\meta{fallback-field}]{missing-sort-fallback} is set, then
 \bibgls\ will fallback on the value provided by the field
 \meta{fallback-field}.  If \meta{fallback-field} is
-missing, then \bibgls\ will query the entry type's fallback for
+missing, then \bibgls\ will query the \gls{entrytype}['s] fallback for
 \meta{fallback-field} (not for \meta{sort-field}).
 
 The \meta{fallback-field} must be a known field but not an internal
@@ -15424,10 +15758,10 @@ other sort fallback options such as \csopt{entry-sort-fallback}, the
 \meta{fallback-field} can't be a keyword (to identify the label) and can't be a
 composite.
 
-\item If the entry type has a fallback rule for \meta{sort-field},
+\item If the \gls{entrytype} has a fallback rule for \meta{sort-field},
 then that rule is used. When \csopt[sort]{sort-field} this means:
 \begin{itemize}
-\item If the entry's original entry type has been identified in
+\item If the entry's original \gls{entrytype} has been identified in
 \csopt{custom-sort-fallbacks}, then \bibgls\ will fallback on the
 designated custom setting.
 
@@ -15470,9 +15804,9 @@ sorting.
 
 The value should be a \keyvallist\ in the form
 \meta{entrytype}\dequals\meta{field} where \meta{entrytype} is the
-\emph{original} entry type (before being aliased with
+\emph{original} \gls{entrytype} (before being aliased with
 \csopt{entry-type-aliases}). This will override any of the sort fallback
-options listed below for entries whose original entry type matches
+options listed below for entries whose original \gls{entrytype} matches
 \meta{entrytype}.
 
 The \meta{field} may be a known field but not an internal field. For
@@ -15518,17 +15852,17 @@ will treat the custom \atentryfmt{unit} and \atentryfmt{constant}
 entries as though they had been defined with \atentry{symbol}
 and \atentry{number}, respectively, but the fallback for the
 \field{sort} field is different: the \code{ohm} entry will use the
-\field{name} field for the sort fallback (because its original entry
-type was \entryfmt{unit}), the \code{pi} entry will use the
+\field{name} field for the sort fallback (because its original 
+\gls{entrytype} was \entryfmt{unit}), the \code{pi} entry will use the
 \field{user1} field for the sort fallback (because its original
-entry type was \entryfmt{constant}) and the \code{fx} and
+\gls{entrytype} was \entryfmt{constant}) and the \code{fx} and
 \code{zero} entries will use the label for the sort fallback (since
 neither \entryfmt{symbol} nor \entryfmt{number} were identified in
 \csopt{custom-sort-fallbacks} so the \csopt{symbol-sort-fallback} is
 used).
 
-If an entry hasn't had its entry type aliased then \meta{entrytype}
-is its actual entry type. For example, consider the following
+If an entry hasn't had its \gls{entrytype} aliased then \meta{entrytype}
+is its actual \gls{entrytype}. For example, consider the following
 definitions:
 \begin{codeenv}
 \atentry{abbreviation}\marg{svm,
@@ -15569,13 +15903,13 @@ This option also covers \glspl{dualentry}. For example:
    \entryfmt{dualindexnumbersecondary}=\field{user1}
 ]{custom-sort-fallbacks}
 \end{codeenv}
-Note that the entry type for the \dual\ is in the form 
+Note that the \gls{entrytype} for the \dual\ is in the form 
 \code{\meta{primary entry type}secondary}.
 
 \begin{important}
 The \csopt{custom-sort-fallbacks} setting is only used when \bibgls\
 tries to access the \field{sort} field for an entry (whose original
-entry type has been identified in this setting) and finds that the field
+\gls{entrytype} has been identified in this setting) and finds that the field
 hasn't been set. This means that this setting has no effect if you
 explicitly set the \field{sort} field or if you change the field
 used for sorting (\csopt{sort-field}).
@@ -15583,7 +15917,7 @@ used for sorting (\csopt{sort-field}).
 
 \optsection{entry-sort-fallback}
 
-The regular entry types (such as \atentry{entry} and
+The regular \glspl{entrytype} (such as \atentry{entry} and
 \atentry{dualentry}) will, by default, fallback on the \field{name}
 field if the \field{sort} field is missing (assuming
 \csopt[sort]{sort-field}). If you prefer to
@@ -15688,7 +16022,7 @@ field or if you change the field used for sorting
 
 \optsection{abbreviation-sort-fallback}
 
-The entry types that define abbreviations (such as
+The \glspl{entrytype} that define abbreviations (such as
 \atentry{abbreviation} and \atentry{acronym}) will, by default,
 fallback on the \field{short} field if the \field{sort} field is
 missing (assuming \csopt[sort]{sort-field}). If you prefer to
@@ -15721,7 +16055,7 @@ for sorting (\csopt{sort-field}).
 
 \optsection{symbol-sort-fallback}
 
-The entry types that define symbols (such as \atentry{symbol} and
+The \glspl{entrytype} that define symbols (such as \atentry{symbol} and
 \atentry{number}) will, by default, fallback on the entry's original label if the
 \field{sort} field is missing (assuming the default
 \csopt[sort]{sort-field}). If you prefer to fallback on a different
@@ -15750,7 +16084,8 @@ for sorting (\csopt{sort-field}).
 
 \optsection{bibtexentry-sort-fallback}
 
-The \glsdisp{mainentry}{main} \atentry{bibtexentry} entry types will, by default,
+The \glsdisp{mainentry}{main} \atentry{bibtexentry}
+\glspl{entrytype} will, by default,
 fallback on the \field{name} if the
 \field{sort} field is missing (assuming the default
 \csopt[sort]{sort-field}). If you prefer to fallback on a different
@@ -15782,7 +16117,7 @@ sorting (\csopt{sort-field}).
 This option sets the field concatenation separator to \meta{value}.
 The default is a space. An empty value indicates no separator. You
 may use \ics{uhex}\meta{hex} to indicate a character by its hexadecimal
-code. For example, suppose the \ext{bib} file contains:
+code (see \sectionref{sec:quarks}). For example, suppose the \ext{bib} file contains:
 \begin{codeenv}
 \atentry{abbreviation}\marg{ac,
   \field{short}=\marg{AC},
@@ -15915,6 +16250,13 @@ the protected write is performed. For example:
 \cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\cmd{let}\cmd{u}\cs{glshex}}
 \end{codeenv}
 Then you can just do \code{\csfmt{u}00E6} instead of \code{\stringu00E6}.
+Note that \ics{GlsXtrResourceInitEscSequences} performs a similar
+assignment, so you can instead do:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\comment{}
+  \ics{GlsXtrResourceInitEscSequences}
+}
+\end{codeenv}
 
 The \isty{glossaries-extra-bib2gls} package (which is automatically loaded by
 the \styopt{record} option) provides some commands for common rule blocks 
@@ -17405,19 +17747,19 @@ should be one of:
 \begin{itemize}
 \item \optfmt{false}: switches off this setting (default);
 
-\item \optfmt{same as entry}: sets the \field{type} to the entry
-type (\idx!{lowercase} and without 
+\item \optfmt{same as entry}: sets the \field{type} to the 
+\gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
 \atentry{dualentry}, the \field{type} will be set to
 \optfmt{dualentry}.
 If you've used \csopt{entry-type-aliases}, this refers to the target
-entry type not the original entry type provided in the \ext{bib}
+\gls{entrytype} not the original \gls{entrytype} provided in the \ext{bib}
 file.
 
 \item \optfmt{same as original entry}: set the \field{type} field
-to the original entry type (\idx!{lowercase} and without 
+to the original \gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased).
+\optfmt{same as entry} if the \gls{entrytype} wasn't aliased).
 
 \item \optfmt{same as base}: sets the \field{type} to the base name
 of the \ext{bib} file (without the extension) that provided the
@@ -17470,19 +17812,19 @@ file (or created through a mapping). The \meta{value} may be empty or
 one of:
 \begin{itemize}
 \item \optfmt{false}: switch off this setting (default);
-\item \optfmt{same as entry}: sets the \field{category} to the entry
-type (\idx{lowercase} and without 
+\item \optfmt{same as entry}: sets the \field{category} to the 
+\gls{entrytype} (\idx{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
 \atentry{dualentry}, the \field{category} will be set to
 \optfmt{dualentry}.
 If you've used \csopt{entry-type-aliases}, this refers to the target
-entry type not the original entry type provided in the \ext{bib}
+\gls{entrytype} not the original \gls{entrytype} provided in the \ext{bib}
 file.
 
 \item \optfmt{same as original entry}: set the \field{category} field
-to the original entry type (\idx{lowercase} and without 
+to the original \gls{entrytype} (\idx{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased).
+\optfmt{same as entry} if the \gls{entrytype} wasn't aliased).
 
 \item \optfmt{same as base}: sets the \field{category} to the base
 name of the \ext{bib} file (without the extension) that provided the
@@ -17523,7 +17865,7 @@ field instead.
 
 If this option is used, this will add \ics{glsxtrprovidestoragekey}
 to the start of the \iext{glstex} file providing the key given by
-\meta{value}.  Any entries defined using a dual entry type, such as
+\meta{value}.  Any entries defined using a dual \gls{entrytype}, such as
 \atentry{dualentry}, will be written to the \ext{glstex} file with
 an extra field called \meta{value} that is set to the mirror entry.
 If \meta{value} is omitted \csopt[dual]{dual-field} is assumed. If
@@ -17891,7 +18233,7 @@ The default setting is:
 
 This is like \csopt{dual-entry-map} but applies to both the dual
 \atentry{dualindexabbreviation} and tertiary
-\atentry{tertiaryindexabbreviationentry} entry types. 
+\atentry{tertiaryindexabbreviationentry} \glspl{entrytype}. 
 The default setting is:
 \begin{codeenv}
 \csopt[
@@ -18157,7 +18499,7 @@ commands like \cs{gls} that are internally used by \cs{mgls}.
 \item[\optfmt{default}]
 Behaves like \csopt[true]{compound-has-records} if the current 
 \gls{resourceset} has any \ext{bib} files containing one or more
-\atentry{compoundset} entry types. Otherwise behaves like
+\atentry{compoundset} \glspl{entrytype}. Otherwise behaves like
 \csopt[false]{compound-has-records}.
 \end{description}
 
@@ -18212,18 +18554,18 @@ with the relevant command (\ics{Glsxtrmultientryadjustedname} for
 Set the \field{type} field of the \glslink{compmainlabel}{main
 entries}. The \meta{value} is required and should be one of:
 \begin{itemize}
-\item \optfmt{same as entry}: sets the \field{type} to the entry
-type (\idx!{lowercase} and without 
+\item \optfmt{same as entry}: sets the \field{type} to the 
+\gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
 \atentry{index}, the \field{type} will be set to \optfmt{index}.
 If you've used \csopt{entry-type-aliases}, this refers to the target
-entry type not the original entry type provided in the \ext{bib}
+\gls{entrytype} not the original \gls{entrytype} provided in the \ext{bib}
 file.
 
 \item \optfmt{same as original entry}: set the \field{type} field
-to the original entry type (\idx!{lowercase} and without 
+to the original \gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased).
+\optfmt{same as entry} if the \gls{entrytype} wasn't aliased).
 
 \item \optfmt{same as base}: sets the \field{type} to the base name
 of the \ext{bib} file (without the extension) that provided the
@@ -18250,18 +18592,18 @@ entries}. The \meta{value} is required and should be one of:
 \item \optfmt{same as main}: sets the \field{type} to the same as
 the \glslink{compmainlabel}{main entry}.
 
-\item \optfmt{same as entry}: sets the \field{type} to the entry
-type (\idx!{lowercase} and without 
+\item \optfmt{same as entry}: sets the \field{type} to the 
+\gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}). For example, if the entry was defined with
 \atentry{index}, the \field{type} will be set to \optfmt{index}.
 If you've used \csopt{entry-type-aliases}, this refers to the target
-entry type not the original entry type provided in the \ext{bib}
+\gls{entrytype} not the original \gls{entrytype} provided in the \ext{bib}
 file.
 
 \item \optfmt{same as original entry}: set the \field{type} field
-to the original entry type (\idx!{lowercase} and without 
+to the original \gls{entrytype} (\idx!{lowercase} and without 
 the initial \code{@}) before it was aliased (behaves like 
-\optfmt{same as entry} if the entry type wasn't aliased).
+\optfmt{same as entry} if the \gls{entrytype} wasn't aliased).
 
 \item \optfmt{same as base}: sets the \field{type} to the base name
 of the \ext{bib} file (without the extension) that provided the
@@ -18605,7 +18947,7 @@ long form for the \dual\ abbreviation.
 
 \formatdef{bibglsnewdualindexabbreviationsecondary}
 This command is used to define \glsdisp{dualentry}{secondary} terms identified with the
-\atentry{dualindexabbreviation} entry type.
+\atentry{dualindexabbreviation} \gls{entrytype}.
 The definition provided in the \ext{glstex} file is:
 \begin{codeenv}
 \cs{providecommand}\marg{\gls{bibglsnewdualindexabbreviationsecondary}}[6]\marg{\comment{}
@@ -18649,7 +18991,7 @@ are changed).
 
 \formatdef{bibglsnewdualentryabbreviation}
 This command is used to define \primary\ terms identified with the
-(now deprecated) entry type
+(now deprecated) \gls{entrytype}
 \atentry{dualentryabbreviation}. The definition provided in the \ext{glstex}
 file is:
 \begin{codeenv}
@@ -18663,7 +19005,7 @@ Note that this definition ignores the \meta{description} argument.
 
 \formatdef{bibglsnewdualentryabbreviationsecondary}
 This command is used to define \glsdisp{dualentry}{secondary} terms identified with the
-(now deprecated) entry type
+(now deprecated) \gls{entrytype}
 \atentry{dualentryabbreviation}. The definition provided in the \ext{glstex}
 file is:
 \begin{codeenv}
@@ -21536,7 +21878,7 @@ The contents of \filefmt{interpret-preamble2.bib} are as follows:
 \filesection{constants.bib}
 
 The \exfile{constants.bib} file contains mathematical constants.
-These all use a custom entry type \atentryfmt{constant}, which must
+These all use a custom \gls{entrytype} \atentryfmt{constant}, which must
 be aliased otherwise the entries will all be ignored. The entries
 all have custom fields, which also need to be aliased.
 For example:
@@ -21570,7 +21912,7 @@ is treated as though it was defined as:
   \field{category}=\marg{constant}
 }
 \end{codeenv}
-This use of custom fields and entry types allows more flexibility.
+This use of custom fields and \glspl{entrytype} allows more flexibility.
 For example, I may have another document that uses the same
 \ext{bib} file but requires a different definition:
 \begin{codeenv}
@@ -21642,7 +21984,7 @@ so most packages should be loaded before \sty{glossaries-extra}.
 Instead, I've just put a comment in the \ext{bib} file as a
 reminder.
 
-All entries are defined using a custom entry type
+All entries are defined using a custom \gls{entrytype}
 \atentryfmt{chemical}. This must be aliased using
 \csopt{entry-type-aliases} or the entries will be ignored. For
 example, to make \atentryfmt{chemical} behave like \atentry{symbol}:
@@ -21680,7 +22022,7 @@ The contents of \filefmt{chemicalformula.bib} are as follows:
 \filesection{bacteria.bib}
 
 The \exfile{bacteria.bib} file contains bacteria abbreviations.
-These all use the \atentry{abbreviation} entry type with a
+These all use the \atentry{abbreviation} \gls{entrytype} with a
 \field{short} and \field{long} field.
 
 The entries all have a custom field \fieldfmt{identifier} set to 
@@ -21694,20 +22036,20 @@ The contents of \filefmt{bacteria.bib} are as follows:
 \filesection{baseunits.bib}
 
 The \exfile{baseunits.bib} file contains base \idxpl{SIunit}. The entries
-are all defined using the custom \atentryfmt{unit} entry
-type. This must be aliased with \csopt{entry-type-aliases} otherwise
+are all defined using the custom \atentryfmt{unit} 
+\gls{entrytype}. This must be aliased with \csopt{entry-type-aliases} otherwise
 \bibgls\ will ignore all the entries. For example:
 \begin{codeenv}
 \csopt[\fieldfmt{unit}=\field{symbol}]{entry-type-aliases}
 \end{codeenv}
 will make \bibgls\ treat the entries as though they were defined
-using \atentry{symbol}. (Remember that \atentry{symbol} entry types use the label
-as the fallback field for \field{sort}.)
+using \atentry{symbol}. (Remember that \atentry{symbol} \glspl{entrytype}
+use the label as the fallback field for \field{sort}.)
 
 The entries all have custom fields \fieldfmt{unitname},
 \fieldfmt{unitsymbol} and \fieldfmt{measurement}, one of which must
 be aliased or copied to \field{name} if \atentryfmt{unit} is aliased
-to an entry type that requires it. The other custom fields may be aliased or
+to an \gls{entrytype} that requires it. The other custom fields may be aliased or
 copied to \field{symbol} and \field{description} as required. The
 \fieldfmt{unitsymbol} fields all use \ics{si} provided by the
 \isty{siunitx} package, so that package must be loaded in the
@@ -21726,7 +22068,7 @@ The contents of \filefmt{baseunits.bib} are as follows:
 \filesection{derivedunits.bib}
 
 The \exfile{derivedunits.bib} file is much like \exfile{baseunits.bib}
-but contains derived units and in this case the custom entry type
+but contains derived units and in this case the custom \gls{entrytype}
 is \atentryfmt{measurement}, which must be aliased
 otherwise the entries will all be ignored.
 The entries all have a custom field \fieldfmt{identifier} set to 
@@ -21822,8 +22164,8 @@ An alternative approach would be to format the names using
 \BibTeX's contributor syntax and use
 \csopt[name]{bibtex-contributor-fields} to convert them.
 
-There are also some synonyms provided with \atentry{index} entry
-types that have the \field{alias} field to redirect to the 
+There are also some synonyms provided with \atentry{index} 
+\glspl{entrytype} that have the \field{alias} field to redirect to the 
 \gls{mainentry}. These don't include a \field{description} or any of the other
 fields as that would be redundant. All the information can be found
 in the \gls{mainentry}.
@@ -21855,7 +22197,7 @@ example, the \field{description} field could contain a brief summary
 (or \qt{log line}). The \fieldfmt{author} field could use \BibTeX's
 syntax instead with \csopt{bibtex-contributor-fields} to convert it.
 Alternatively, the entries could be defined using standard \BibTeX\
-entry types that are all aliased to \atentry{bibtexentry}.
+\glspl{entrytype} that are all aliased to \atentry{bibtexentry}.
 
 The contents of \filefmt{books.bib} are as follows:
 \lstinputlisting[firstline=5]{../examples/books.bib}
@@ -21952,7 +22294,7 @@ The contents of \filefmt{films.bib} are as follows:
 \filesection{citations.bib}
 
 The \exfile{citations.bib} file is actually a \BibTeX\ file, but it
-can be parsed by \bibgls\ if the \BibTeX\ entry types are converted
+can be parsed by \bibgls\ if the \BibTeX\ \glspl{entrytype} are converted
 to \atentry{bibtexentry}, which can easily be done with:
 \begin{codeenv}
 \csopt[\ics{GlsXtrBibTeXEntryAliases}]{entry-type-aliases}
@@ -22213,7 +22555,7 @@ and \csfmt{Lightning} commands:
 This removes the conflict, and \csfmt{Sun} and \csfmt{Lightning}
 are as defined by \sty{marvosym}.
 
-This file uses a custom entry type \atentryfmt{icon}, which must be
+This file uses a custom \gls{entrytype} \atentryfmt{icon}, which must be
 aliased to a recognised entry identifier otherwise the entries will
 all be ignored. For example:
 \begin{codeenv}
@@ -22809,7 +23151,7 @@ to use:
 \csopt[all]{selection}
 \end{codeenv}
 in order to select all entries. I also need to alias the custom
-\atentryfmt{constant} entry type otherwise all the entries will be
+\atentryfmt{constant} \gls{entrytype} otherwise all the entries will be
 ignored. I decided to make \atentryfmt{constant} behave like
 \atentry{number} for semantic reasons:
 \begin{codeenv}
@@ -22995,7 +23337,7 @@ efficient to instruct \bibgls\ to not save the number list with:
 \csopt[false]{save-locations}
 \end{codeenv}
 All entries are defined in \exfile{chemicalformula.bib} using
-a custom entry type \atentryfmt{chemical} which needs to be aliased
+a custom \gls{entrytype} \atentryfmt{chemical} which needs to be aliased
 in order for the entries to be recognised:
 \begin{codeenv}
 \csopt[chemical=symbol]{entry-type-aliases}
@@ -23006,7 +23348,7 @@ and the chemical name in the \field{description} field:
 \begin{codeenv}
 \csopt[\fieldfmt{formula}=\field{name},\fieldfmt{chemicalname}=\field{description}]{field-aliases}
 \end{codeenv}
-The \atentry{symbol} entry type falls back on the label for the
+The \atentry{symbol} \gls{entrytype} falls back on the label for the
 \field{sort} value by default, but I've decided
 to fallback on the \field{name} field for sorting:
 \begin{codeenv}
@@ -23227,14 +23569,14 @@ that may need extended characters in the group titles.
 The \csopt{group} option requires the \longarg{group} switch to
 ensure that the \field{group} field is correctly assigned.
 
-The \exfile{baseunits.bib} file use a custom entry type
+The \exfile{baseunits.bib} file use a custom \gls{entrytype}
 \atentryfmt{unit}, which must be aliased otherwise \bibgls\
 will ignore the entries. I decided to use \atentry{symbol} for
 semantic reasons:
 \begin{codeenv}
 \csopt[unit=symbol]{entry-type-aliases}
 \end{codeenv}
-Similarly for the custom \atentryfmt{measurement} entry type in
+Similarly for the custom \atentryfmt{measurement} \gls{entrytype} in
 \exfile{derivedunits.bib}:
 \begin{codeenv}
 \csopt[measurement=symbol]{entry-type-aliases}
@@ -23305,7 +23647,7 @@ used with book or report type of classes. I've also used the
 \styopt{nomain} option to suppress the creation of the \gls{mainglossary}
 as I want to define my own glossary types instead.
 
-As before the custom entry types need to be aliased:
+As before the custom \glspl{entrytype} need to be aliased:
 \begin{codeenv}
 \csopt[unit=symbol]{entry-type-aliases}
 \end{codeenv}
@@ -23358,7 +23700,7 @@ This time I want two glossaries containing all the units (base and
 derived) where the first glossary is ordered by name and the second
 is ordered by symbol. This can be done with a single resource
 command that instructs \bibgls\ to make the custom \atentryfmt{unit}
-and \atentryfmt{measurement} entry types behave like
+and \atentryfmt{measurement} \glspl{entrytype} behave like
 \atentry{dualsymbol}:
 \begin{codeenv}
 \csopt[
@@ -23368,7 +23710,7 @@ and \atentryfmt{measurement} entry types behave like
 \end{codeenv}
 This causes the \field{name} and \field{symbol} fields to be swapped in the
 dual list. Remember that the fallback for the \field{sort} field is the label
-for the symbol entry types so I need \csopt[\field{name}]{symbol-sort-fallback}
+for the symbol \glspl{entrytype} so I need \csopt[\field{name}]{symbol-sort-fallback}
 to fallback on \field{name} field instead. (Alternative, I could just sort by
 the \field{name} field instead using \csopt[\field{name}]{sort-field}.)
 
@@ -24086,7 +24428,7 @@ modified version of \gls{bibglsnewbibtexentry} that assigns
  \gls{longnewglossaryentry}*\marg{\idx{param}1}\marg{\field{name}=\marg{\idx{param}3},\idx{param}2,\field{type}=\marg{titles}}\marg{\idx{param}4}\comment{}
 }
 \end{codeenv}
-The standard \BibTeX\ entry types need aliasing to
+The standard \BibTeX\ \glspl{entrytype} need aliasing to
 \atentry{bibtexentry}:
 \begin{codeenv}
 \csopt[\ics{GlsXtrBibTeXEntryAliases}]{entry-type-aliases}
@@ -24096,7 +24438,7 @@ and the \fieldfmt{title} field is aliased to \field{name}:
 \csopt[\fieldfmt{title}=\field{name}]{field-aliases}
 \end{codeenv}
 (The other fields aren't required for the glossary lists.)
-The \field{category} is set to the original entry type:
+The \field{category} is set to the original \gls{entrytype}:
 \begin{codeenv}
 \csopt[same as original entry]{category}
 \end{codeenv}
@@ -24105,7 +24447,7 @@ So, for example, an entry that's provided in the \ext{bib} file with
 \code{article}. (Compare this with \csopt[same as entry]{category}
 which would set the \field{category} to \code{bibtexentry}.)
 The spawned entries are all defined using \atentry{contributor} and
-aren't aliased so both the entry type and the original entry type
+aren't aliased so both the \gls{entrytype} and the original \gls{entrytype}
 are \code{contributor}.
 
 In order to list the titles according to category, I've use this as
@@ -24157,7 +24499,7 @@ same label, the citation can easily be obtained with
 \cs{newcommand}\marg{\postdeschook{article}}\marg{\cs{cite}\marg{\cs{glscurrententrylabel}}}
 \cs{newcommand}\marg{\postdeschook{book}}\marg{\cs{cite}\marg{\cs{glscurrententrylabel}}}
 \end{codeenv}
-Note that this needs to be done for each \BibTeX\ entry type, but in
+Note that this needs to be done for each \BibTeX\ \gls{entrytype}, but in
 this case the \ext{bib} file only contains \atentryfmt{article} and
 \atentryfmt{book} entries. (Similarly for the group titles above.)
 
@@ -24417,7 +24759,7 @@ generic \cs{textweathersymbol} command and omit the \styoptfmt{weather}
 option when loading the package, but the method used here
 demonstrates how to deal with such conflicts.)
 
-The custom entry type \atentryfmt{icon} must be aliased for the
+The custom \gls{entrytype} \atentryfmt{icon} must be aliased for the
 entries to be recognised:
 \begin{codeenv}
 \csopt[icon=symbol]{entry-type-aliases}
@@ -24498,7 +24840,7 @@ This example is a better approach than the
 example, this requires both \isty{marvosym} and \isty{ifsym} so the
 same patch is applied to avoid conflict.
 
-As before, the custom entry type \atentryfmt{icon} must be aliased for the
+As before, the custom \gls{entrytype} \atentryfmt{icon} must be aliased for the
 entries to be recognised:
 \begin{codeenv}
 \csopt[icon=symbol]{entry-type-aliases}
@@ -24523,7 +24865,7 @@ There's no \csopt{sort-field} option in this example. The default
 entries, the fallback value will be used. In the case of the topic
 titles (\atentry{index} and \atentry{indexplural}), I want to sort
 by the \field{name}, which is the default fallback if the
-\field{sort} field is missing for the index entry types.
+\field{sort} field is missing for the index \glspl{entrytype}.
 
 The default fallback for the \field{sort} field for \atentry{symbol}
 entries is the label, but in this case I want to use the
@@ -25208,7 +25550,7 @@ decided to use a dual entry system. Since the entries aren't defined
 using any dual types, I've used \csopt{entry-type-aliases} to
 make \bibgls\ treat them as though they were, and I also need to
 alias the custom \atentryfmt{chemical}, \atentryfmt{unit} and 
-\atentryfmt{measurement} entry types:
+\atentryfmt{measurement} \glspl{entrytype}:
 \begin{codeenv}
 \csopt[
   abbreviation=dualindexabbreviation,
@@ -25241,15 +25583,15 @@ defined before \gls{GlsXtrLoadResources}:
   \field{category}=\marg{index},\idx{param}3}\marg{}\comment{}
 }
 \end{codeenv}
-However, this will affect all \atentry{dualindexabbreviation} entry
-types, but it's not necessary for the bacteria abbreviations.
+However, this will affect all \atentry{dualindexabbreviation} 
+\glspl{entrytype}, but it's not necessary for the bacteria abbreviations.
 Instead it's simpler to just keep a record of the dual label so that
 the short form can be obtained from the dual entry:
 \begin{codeenv}
 \csopt{dual-field}
 \end{codeenv}
 
-By default, the \atentry{dualindexabbreviation} entry type falls back on the
+By default, the \atentry{dualindexabbreviation} \gls{entrytype} falls back on the
 \field{short} field if the \field{name} is omitted. In this case I
 want it to fall back on the \field{long} field instead.
 \begin{codeenv}
@@ -25300,15 +25642,15 @@ I've also redefined \cs{glstreenamefmt} to prevent the names
 appearing in bold, which means I also need to redefine
 \cs{glstreegroupheaderfmt} to keep the headers bold.
 
-All the \atentryfmt{dualindex\meta{type}} entry types provide a primary
+All the \atentryfmt{dualindex\meta{type}} \glspl{entrytype} provide a primary
 entry that behaves like \atentry{index}. The secondary behaves like
 \atentryfmt{\meta{type}}. This means that the primaries are
 conveniently gathered together with all the unaliased \atentry{index}
-entries, so the primary entry type needs to be set to \code{index}:
+entries, so the primary \gls{entrytype} needs to be set to \code{index}:
 \begin{codeenv}
 \csopt[index]{type}
 \end{codeenv}
-The dual entry type depends on the entry's category. Since I've
+The dual \gls{entrytype} depends on the entry's category. Since I've
 defined my custom glossaries with a label that matches the
 custom \fieldfmt{identifier} field, I can both alias this custom field
 to the \field{category} field and also set \csopt{dual-type} so that
@@ -25524,7 +25866,7 @@ and \figureref{fig:sample-multi1.pdf2}.
 \filesection{sample-multi2.tex}
 
 This example is an alternative approach to
-\exfile{sample-multi1.tex}. Instead of using dual entry types to
+\exfile{sample-multi1.tex}. Instead of using dual \glspl{entrytype} to
 define entries that appear in both a glossary and the index, this
 example makes use of \csopt{record-label-prefix} to reselect the
 recorded entries for the index. This is more complicated but it
@@ -25866,7 +26208,7 @@ The abbreviations all need to be sorted according to the long form:
 \begin{codeenv}
 \csopt[\field{long}]{abbreviation-sort-fallback}
 \end{codeenv}
-The custom entry types and fields again need to be aliased
+The custom \glspl{entrytype} and fields again need to be aliased
 \begin{codeenv}
 \csopt[
  chemical=index,
@@ -25891,8 +26233,8 @@ The chemical formulae and icons are now defined using
 they're appropriate for alphabetical sorting. (Both \atentry{entry}
 and \atentry{symbol} require the \field{description} field, which is
 why I've aliased \atentryfmt{chemical} and \atentryfmt{icon}
-to \atentry{index} here.) The custom \atentryfmt{measurement} entry
-type has a \field{description} field (obtained from
+to \atentry{index} here.) The custom \atentryfmt{measurement} 
+\gls{entrytype} has a \field{description} field (obtained from
 \fieldfmt{unitname}), so that's aliased to \atentry{entry} as again
 the \field{name} field is suitable for alphabetical sorting.
 
