@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.text.Collator;
 import java.text.CollationKey;
 import java.text.ParseException;
+import java.text.BreakIterator;
 import java.nio.charset.Charset;
 
 import java.awt.Font;
@@ -4999,6 +5000,22 @@ public class GlsResource
    }
 
    /**
+    * Gets the default locale for this resource set.
+    * This will be the primary sort locale, if a locale-sensitive
+    * sort comparison has been selected, otherwise it will be
+    * Bib2Gls's default locale.
+    */ 
+   public Locale getResourceLocale()
+   {
+      if (resourceLocale == null)
+      {
+         resourceLocale = sortSettings.getLocale();
+      }
+
+      return resourceLocale;
+   }
+
+   /**
     * Gets the (optional) array of string values assigned to the given setting.
     * The array of values should be supplied as a comma-separated list.
     * @param defValue the default value
@@ -7202,6 +7219,33 @@ public class GlsResource
       if (preambleList != null)
       {
          bib2gls.processPreamble(preambleList);
+      }
+
+      updateWordExceptionList();
+   }
+
+   private void updateWordExceptionList()
+   throws IOException
+   {
+      // save textual word exception lists
+
+      TeXObjectList list = bib2gls.getWordExceptionList();
+
+      if (list != null && !list.isEmpty())
+      {
+         CsvList csvList = CsvList.getList(parser, list);
+
+         if (!csvList.isEmpty())
+         {
+            int n = csvList.size();
+
+            stringWordExceptions = new String[n];
+
+            for (int i = 0; i < n; i++)
+            {
+               stringWordExceptions[i] = csvList.getValue(i).toString(parser);
+            }
+         }
       }
    }
 
@@ -12173,8 +12217,18 @@ public class GlsResource
 
             if (Character.isAlphabetic(codePoint))
             {
-               codePoint = Character.toLowerCase(codePoint);
-               ((CharObject)object).setCharCode(codePoint);
+               String str = toLowerCase(new String(Character.toChars(codePoint))).toString();
+
+               codePoint = str.codePointAt(0);
+
+               if (str.length() == Character.charCount(codePoint))
+               {
+                  ((CharObject)object).setCharCode(codePoint);
+               }
+               else
+               {
+                  list.set(i, listener.createString(str));
+               }
             }
          }
          else if (object instanceof MathGroup)
@@ -12468,8 +12522,18 @@ public class GlsResource
 
             if (Character.isAlphabetic(codePoint))
             {
-               codePoint = Character.toUpperCase(codePoint);
-               ((CharObject)object).setCharCode(codePoint);
+               String str = toUpperCase(new String(Character.toChars(codePoint))).toString();
+
+               codePoint = str.codePointAt(0);
+
+               if (str.length() == Character.charCount(codePoint))
+               {
+                  ((CharObject)object).setCharCode(codePoint);
+               }
+               else
+               {
+                  list.set(i, listener.createString(str));
+               }
             }
          }
          else if (object instanceof MathGroup)
@@ -12790,6 +12854,8 @@ public class GlsResource
     */ 
    public void toSentenceCase(TeXObjectList list, TeXParserListener listener)
    {
+      String lang = getResourceLocale().getLanguage();
+
       for (int i = 0, n = list.size(); i < n; i++)
       {
          TeXObject object = list.get(i);
@@ -12800,9 +12866,38 @@ public class GlsResource
 
             if (Character.isAlphabetic(codePoint))
             {
-               codePoint = Character.toTitleCase(codePoint);
-               ((CharObject)object).setCharCode(codePoint);
+               String str = new String(Character.toChars(codePoint));
 
+               if (i < n-1)
+               {
+                  TeXObject nextObj = list.peek();
+
+                  if (nextObj instanceof CharObject)
+                  {
+                     String val = bib2gls.getMessageIfExists(
+                       String.format("sentencecase.%s.%s%s", lang, 
+                         str, nextObj.format()));
+
+                     if (val != null)
+                     {
+                        list.set(i, listener.createString(val));
+                        return;
+                     }
+                  }
+               }
+
+               str = toSentenceCase(str).toString();
+
+               codePoint = str.codePointAt(0);
+
+               if (str.length() == Character.charCount(codePoint))
+               {
+                  ((CharObject)object).setCharCode(codePoint);
+               }
+               else
+               {
+                  list.set(i, listener.createString(str));
+               }
                return;
             }
          }
@@ -13013,6 +13108,276 @@ public class GlsResource
             else
             {
                list.set(csIdx, new TeXCsRef(sentenceCsname));
+            }
+
+            return;
+         }
+      }
+   }
+
+   /**
+    * Converts the list to non sentence case. That is, it converts
+    * the first letter to lowercase.
+    * @param list the list of TeX objects
+    * @param listener the TeX parser listener
+    */ 
+   public void toNonSentenceCase(TeXObjectList list, TeXParserListener listener)
+   {
+      String lang = getResourceLocale().getLanguage();
+
+      for (int i = 0, n = list.size(); i < n; i++)
+      {
+         TeXObject object = list.get(i);
+
+         if (object instanceof CharObject)
+         {
+            int codePoint = ((CharObject)object).getCharCode();
+
+            if (Character.isAlphabetic(codePoint))
+            {
+               String str = new String(Character.toChars(codePoint));
+
+               if (i < n-1)
+               {
+                  TeXObject nextObj = list.peek();
+
+                  if (nextObj instanceof CharObject)
+                  {
+                     String val = bib2gls.getMessageIfExists(
+                       String.format("nonsentencecase.%s.%s%s", lang, 
+                         str, nextObj.format()));
+
+                     if (val != null)
+                     {
+                        list.set(i, listener.createString(val));
+                        return;
+                     }
+                  }
+               }
+
+               str = toNonSentenceCase(str).toString();
+
+               codePoint = str.codePointAt(0);
+
+               if (str.length() == Character.charCount(codePoint))
+               {
+                  ((CharObject)object).setCharCode(codePoint);
+               }
+               else
+               {
+                  list.set(i, listener.createString(str));
+               }
+
+               return;
+            }
+         }
+         else if (object instanceof MathGroup)
+         {
+            return;
+         }
+         else if (object instanceof Group)
+         {
+            // lower case group contents if not empty
+
+            if (!object.isEmpty())
+            {
+               toLowerCase((TeXObjectList)object, listener);
+            }
+
+            return;
+         }
+         else if (object instanceof ControlSequence)
+         {
+            String csname = ((ControlSequence)object).getName();
+
+            if (csname.equals("protect")) continue;
+
+            if (isUcLcCommand(csname))
+            {
+               list.set(i, new TeXCsRef(csname.toLowerCase()));
+               return;
+            }
+
+            int csIdx = i;
+
+            i++;
+
+            while (i < n)
+            {
+               object = list.get(i);
+
+               if (!(object instanceof Ignoreable))
+               {
+                  break;
+               }
+
+               i++;
+            }
+
+            GlsLike gl = bib2gls.getGlsLike(csname);
+
+            if (gl != null)
+            {
+               GlsLikeFamily fam = gl.getFamily();
+
+               if (fam != null)
+               {
+                  String caseChangedName = fam.getMember(CaseChange.TO_LOWER, csname);
+
+                  if (!csname.equals(caseChangedName))
+                  {
+                     list.set(csIdx, new TeXCsRef(caseChangedName));
+                  }
+               }
+
+               return;
+            }
+
+            if (csname.endsWith("ref") || isCaseBlocker(csname))
+            {
+               return;
+            }
+
+            if (isCaseExclusion(csname))
+            {
+               // object should now be the argument, which should be
+               // skipped.
+
+               continue;
+            }
+
+            if (csname.equals("glsentrytitlecase"))
+            {
+               list.set(csIdx, new TeXCsRef("glsxtrusefield"));
+
+               return;
+            }
+
+            if (csname.toLowerCase().equals("glsxtrmultientryadjustedname"))
+            {
+               list.set(csIdx, new TeXCsRef("glsxtrmultientryadjustedname"));
+
+               return;
+            }
+
+            if (csname.equals("glshyperlink"))
+            {
+               TeXObjectList subList = new TeXObjectList();
+
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  TeXObject obj = list.get(i);
+
+                  while (!(obj instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == ']'))
+                  {
+                     subList.add(list.remove(i));
+
+                     if (i >= list.size()) break;
+
+                     obj = list.get(i);
+                  }
+
+                  toNonSentenceCase(subList, listener);
+               }
+               else
+               {// no optional argument, need to add one
+                  subList.add(listener.getOther('['));
+                  subList.add(new TeXCsRef("glsentrytext"));
+                  subList.add(new TeXCsRef("glslabel"));
+                  subList.add(listener.getOther(']'));
+               }
+
+               list.addAll(i, subList);
+
+               return;
+            }
+
+            String nonSentenceCsname = null;
+
+            if (csname.matches("d?Gls(disp|link)"))
+            {
+               if (object instanceof CharObject 
+                    && ((CharObject)object).getCharCode() == '[')
+               {
+                  // skip optional argument
+
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     if (object instanceof CharObject 
+                            && ((CharObject)object).getCharCode() == ']')
+                     {
+                        break;
+                     }
+
+                     i++;
+                  }
+
+                  // skip ignoreables following optional argument
+
+                  while (i < n)
+                  {
+                     object = list.get(i);
+
+                     if (!(object instanceof Ignoreable))
+                     {
+                        break;
+                     }
+
+                     i++;
+                  }
+               }
+
+               // 'object' should now be label argument. Skip
+               // ignoreables to get text argument.
+
+               while (i < n)
+               {
+                  object = list.get(i);
+
+                  if (!(object instanceof Ignoreable))
+                  {
+                     break;
+                  }
+
+                  i++;
+               }
+            }
+            else if (csname.matches("glsp[st]"))
+            {
+               // need to replace \glsps{label} with \Glsxtrp{short}{label}
+               // and \glspt{label} with \Glsxtrp{text}{label}
+
+               list.set(csIdx, new TeXCsRef("Glsxtrp"));
+
+               list.add(i, listener.createGroup(
+                csname.endsWith("s") ? "short" : "text"));
+
+               return;
+            }
+            else
+            {
+               nonSentenceCsname = getLowerCsName(csname);
+            }
+
+            if (nonSentenceCsname == null)
+            {
+               // if a group follows the command, lower case the group
+               // otherwise finish.
+
+               if (object instanceof Group && !(object instanceof MathGroup))
+               {
+                  // lower case argument
+
+                  toNonSentenceCase((TeXObjectList)object, listener);
+               }
+            }
+            else
+            {
+               list.set(csIdx, new TeXCsRef(nonSentenceCsname));
             }
 
             return;
@@ -14208,6 +14573,338 @@ public class GlsResource
       bibList.add(new BibUserString(list));
 
       return bibList;
+   }
+
+   // Case conversion for strings.
+
+   /**
+    * Converts a string to upper case using the resource locale.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toUpperCase(CharSequence text)
+   {
+      return toUpperCase(text.toString());
+   }
+
+   /**
+    * Converts a string to upper case using the resource locale.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toUpperCase(String text)
+   {
+      return text.toUpperCase(getResourceLocale());
+   }
+
+   /**
+    * Converts a string to lower case using the resource locale.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toLowerCase(CharSequence text)
+   {
+      return toLowerCase(text.toString());
+   }
+
+   /**
+    * Converts a string to lower case using the resource locale.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toLowerCase(String text)
+   {
+      return text.toLowerCase(getResourceLocale());
+   }
+
+   /**
+    * Tests if the given text is a title case exception.
+    * @param text the text to test
+    * @return true if the text is a word exception
+    */ 
+   public boolean isWordException(CharSequence text)
+   {
+      int n1 = text.length();
+
+      for (String word : stringWordExceptions)
+      {
+         int n2 = word.length();
+
+         if (n1 == n2)
+         {
+            boolean match = true;
+
+            for (int i = 0; i < n1; i++)
+            {
+               if (text.charAt(i) != word.charAt(i))
+               {
+                  match = false;
+                  break;
+               }
+            }
+
+            if (match)
+            {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * Converts a string to title case.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toTitleCase(CharSequence text)
+   {
+      return toTitleCase(text.toString());
+   }
+
+   /**
+    * Converts a string to title case.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toTitleCase(String text)
+   {
+      StringBuilder builder = new StringBuilder();
+      StringBuilder wordBuilder = new StringBuilder();
+
+      boolean beginning = true;
+
+      BreakIterator boundary = BreakIterator.getLineInstance(getResourceLocale());
+
+      boundary.setText(text);
+
+      int start = boundary.first();
+
+      for (int end = boundary.next();
+         end != BreakIterator.DONE;
+         start = end, end = boundary.next())
+      {
+         int len = end-start;
+
+         // This will include leading and trailing punctuation and
+         // trailing spaces.
+         String word = text.substring(start,end);
+
+         int i = 0;
+
+         while (i < word.length())
+         {
+            int cp = word.codePointAt(i);
+            i += Character.charCount(cp);
+
+            if (Character.isAlphabetic(cp))
+            {
+               break;
+            }
+
+            builder.appendCodePoint(cp);
+         }
+
+         while (i < word.length())
+         {
+            wordBuilder.setLength(0);
+
+            while (i < word.length())
+            {
+               int cp = word.codePointAt(i);
+               i += Character.charCount(cp);
+
+               if (Character.isAlphabetic(cp))
+               {
+                  wordBuilder.appendCodePoint(cp);
+               }
+               else
+               {
+                  break;
+               }
+            }
+
+            CharSequence seq = wordBuilder;
+
+            if (beginning || (!beginning && !isWordException(seq)))
+            {
+               seq = toSentenceCase(seq);
+            }
+
+            builder.append(seq);
+            beginning = false;
+
+            while (i < word.length())
+            {
+               int cp = word.codePointAt(i);
+               i += Character.charCount(cp);
+
+               if (Character.isAlphabetic(cp))
+               {
+                  break;
+               }
+
+               builder.appendCodePoint(cp);
+            }
+         }
+      }
+
+      return builder;
+   }
+
+   /**
+    * Converts a string to sentence case.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toSentenceCase(CharSequence text)
+   {
+      return toSentenceCase(text.toString());
+   }
+
+   /**
+    * Converts a string to sentence case.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toSentenceCase(String text)
+   {
+      Locale locale = getResourceLocale();
+      String lang = locale.getLanguage();
+
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < text.length(); )
+      {
+         int cp = text.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (Character.isAlphabetic(cp))
+         {
+            int uc = Character.toUpperCase(cp);
+            int tc = Character.toTitleCase(cp);
+
+            if (uc == tc)
+            {
+               String str = new String(Character.toChars(cp));
+
+               // Check for known digraphs.
+
+               if (i < text.length())
+               {
+                  int nextCp = text.codePointAt(i);
+
+                  String val = bib2gls.getMessageIfExists(
+                    String.format("sentencecase.%s.%s%s", lang, 
+                     str, new String(Character.toChars(nextCp))));
+
+                  if (val != null)
+                  {
+                     str = val;
+                     i += Character.charCount(nextCp);
+                  }
+                  else
+                  {
+                     str = str.toUpperCase(locale);
+                  }
+               }
+               else
+               {
+                  str = str.toUpperCase(locale);
+               }
+
+               builder.append(str);
+            }
+            else
+            {
+               builder.appendCodePoint(tc);
+            }
+
+            builder.append(text.substring(i));
+            break;
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
+         }
+      }
+
+      return builder;
+   }
+
+   /**
+    * Converts a string to non-sentence case.
+    * That is, the first alphabetic character is converted to lower
+    * case.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toNonSentenceCase(CharSequence text)
+   {
+      return toNonSentenceCase(text.toString());
+   }
+
+   /**
+    * Converts a string to non-sentence case.
+    * That is, the first alphabetic character is converted to lower
+    * case.
+    * @param text the text to convert
+    * @return the converted text
+    */ 
+   public CharSequence toNonSentenceCase(String text)
+   {
+      Locale locale = getResourceLocale();
+      String lang = locale.getLanguage();
+
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < text.length(); )
+      {
+         int cp = text.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (Character.isAlphabetic(cp))
+         {
+            String str = new String(Character.toChars(cp));
+
+            // Check for known digraphs.
+
+            if (i < text.length())
+            {
+               int nextCp = text.codePointAt(i);
+
+               String val = bib2gls.getMessageIfExists(
+                 String.format("nonsentencecase.%s.%s%s", lang, 
+                  str, new String(Character.toChars(nextCp))));
+
+               if (val != null)
+               {
+                  str = val;
+                  i += Character.charCount(nextCp);
+               }
+               else
+               {
+                  str = str.toLowerCase(locale);
+               }
+            }
+            else
+            {
+               str = str.toLowerCase(locale);
+            }
+
+            builder.append(str);
+            builder.append(text.substring(i));
+
+            break;
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
+         }
+      }
+
+      return builder;
    }
 
    /*
@@ -16552,6 +17249,8 @@ public class GlsResource
    private String dualDateListFormat = "default";
    private String dualTimeListFormat = "default";
 
+   private Locale resourceLocale = null;
+
    private Locale dateTimeListLocale = null;
    private Locale dateListLocale = null;
    private Locale timeListLocale = null;
@@ -16988,5 +17687,7 @@ public class GlsResource
    private int pruneIterations=1;
 
    public static final int MAX_PRUNE_ITERATIONS=20;
+
+   private String[] stringWordExceptions = new String[] {};
 }
 
