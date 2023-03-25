@@ -70,6 +70,19 @@ public class FieldValueList extends Vector<FieldValueElement>
                quoted = null;
                add = false;
             }
+            else if (object instanceof ControlSequence)
+            {
+               popped.add(stack.pop());
+
+               String name = ((ControlSequence)object).getName();
+
+               if (name.equals("\""))
+               {
+                  object = parser.getListener().getOther('"');
+               }
+
+               quoted.add(object);
+            }
             else
             {
                quoted.add(object);
