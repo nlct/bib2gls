@@ -24,7 +24,19 @@ import com.dickimawbooks.texparserlib.bib.BibValue;
 
 public interface FieldValueElement
 {
-   public BibValue getValue(Bib2GlsEntry entry);
+   /**
+    * Gets the field's value as a BibValue.
+    * @param entry the entry being queried
+    * @throws IOException if something goes wrong with the TeXParser
+    * (indicates a problem in parsing, mostly like a bug)
+    */ 
+   public BibValue getValue(Bib2GlsEntry entry) throws IOException;
 
+   /**
+    * Gets the field's value as a String.
+    * @param entry the entry being queried
+    * @throws IOException if something goes wrong with the TeXParser
+    * (indicates a problem in parsing, mostly like a bug)
+    */ 
    public String getStringValue(Bib2GlsEntry entry) throws IOException;
 }

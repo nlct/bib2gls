@@ -54,6 +54,16 @@ public class Field implements FieldValueElement
       return name;
    }
 
+   public void setCaseChange(FieldCaseChange caseChange)
+   {
+      this.caseChange = caseChange;
+   }
+
+   public FieldCaseChange getCaseChange()
+   {
+      return caseChange;
+   }
+
    protected void setName(String name)
      throws Bib2GlsSyntaxException
    {
@@ -120,6 +130,7 @@ public class Field implements FieldValueElement
 
    @Override
    public BibValue getValue(Bib2GlsEntry entry)
+    throws IOException
    {
       Bib2GlsEntry refEntry = fieldRef.getEntry(entry);
 
@@ -128,10 +139,13 @@ public class Field implements FieldValueElement
          return null;
       }
 
+      TeXParser parser = resource.getBibParser();
+
+      BibValue bibValue = null;
+      TeXObject value = null;
+
       if (follow == null)
       {
-         TeXParser parser = resource.getBibParser();
-
          if (fieldRef == FieldReference.ENTRY_TYPE)
          {
             String text;
@@ -145,7 +159,8 @@ public class Field implements FieldValueElement
                text = refEntry.getEntryType();
             }
 
-            return new BibUserString(parser.getListener().createString(text));
+            value = parser.getListener().createString(text);
+            bibValue = new BibUserString(value);
          }
          else if (fieldRef == FieldReference.ENTRY_LABEL)
          {
@@ -160,31 +175,69 @@ public class Field implements FieldValueElement
                text = refEntry.getId();
             }
 
-            return new BibUserString(parser.getListener().createString(text));
+            value = parser.getListener().createString(text);
+            bibValue = new BibUserString(value);
          }
          else
          {
-            BibValue val = refEntry.getField(name);
+            bibValue = refEntry.getField(name);
 
-            if (val == null)
+            if (bibValue == null)
             {
                MissingFieldAction action = resource.getFallbackOnMissingAssignAction();
 
                if (action == MissingFieldAction.FALLBACK)
                {
-                  val = refEntry.getFallbackContents(name);
+                  bibValue = refEntry.getFallbackContents(name);
                }
                else if (action == MissingFieldAction.EMPTY)
                {
-                  val = new BibValueList();
+                  bibValue = new BibValueList();
+                  value = new TeXObjectList();
                }
             }
+         }
+      }
+      else
+      {
+         return follow.getValue(refEntry);
+      }
 
-            return val;
+      if (bibValue != null && caseChange != FieldCaseChange.NO_CHANGE)
+      {
+         if (value == null)
+         {
+            value = bibValue.expand(parser);
+         }
+
+         if (!value.isEmpty() && parser.isStack(value))
+         {
+            TeXObjectList list = (TeXObjectList)value.clone();
+
+            switch (caseChange)
+            {
+               case UC:
+                  resource.toUpperCase(list, parser.getListener());
+               break;
+               case LC:
+                  resource.toLowerCase(list, parser.getListener());
+               break;
+               case FIRST_UC:
+                  resource.toSentenceCase(list, parser.getListener());
+               break;
+               case FIRST_LC:
+                  resource.toNonSentenceCase(list, parser.getListener());
+               break;
+               case TITLE:
+                  resource.toTitleCase(list, parser.getListener());
+               break;
+            }
+
+            bibValue = new BibUserString(list);
          }
       }
 
-      return follow.getValue(refEntry);
+      return bibValue;
    }
 
    @Override
@@ -198,14 +251,14 @@ public class Field implements FieldValueElement
          return null;
       }
 
+      String text = null;
+
       if (follow == null)
       {
          TeXParser parser = resource.getBibParser();
 
          if (fieldRef == FieldReference.ENTRY_TYPE)
          {
-            String text;
-
             if (name.equals("original"))
             {
                text = refEntry.getOriginalEntryType();
@@ -214,13 +267,9 @@ public class Field implements FieldValueElement
             {
                text = refEntry.getEntryType();
             }
-
-            return text;
          }
          else if (fieldRef == FieldReference.ENTRY_LABEL)
          {
-            String text;
-
             if (name.equals("original"))
             {
                text = refEntry.getOriginalId();
@@ -229,46 +278,52 @@ public class Field implements FieldValueElement
             {
                text = refEntry.getId();
             }
-
-            return text;
          }
          else
          {
-            String text = refEntry.getFieldValue(name);
+            text = refEntry.getFieldValue(name);
+         }
 
-            if (text != null)
-            {
-               return text;
-            }
+         if (text == null)
+         {
+            BibValue val = getValue(entry);
 
-            BibValue val = refEntry.getField(name);
-
-            if (val == null)
-            {
-               MissingFieldAction action = resource.getFallbackOnMissingAssignAction();
-
-               if (action == MissingFieldAction.FALLBACK)
-               {
-                  val = refEntry.getFallbackContents(name);
-               }
-               else if (action == MissingFieldAction.EMPTY)
-               {
-                  return "";
-               }
-            }
-
-            if (val == null)
-            {
-               return null;
-            }
+            if (val == null) return null;
 
             TeXObjectList valList = val.expand(parser);
 
             return valList.toString(parser);
          }
+
+         if (!(caseChange == FieldCaseChange.NO_CHANGE || text.isEmpty()))
+         {
+            switch (caseChange)
+            {
+               case UC:
+                  text = resource.toUpperCase(text).toString();
+               break;
+               case LC:
+                  text = resource.toLowerCase(text).toString();
+               break;
+               case FIRST_UC:
+                  text = resource.toSentenceCase(text).toString();
+               break;
+               case FIRST_LC:
+                  text = resource.toNonSentenceCase(text).toString();
+               break;
+               case TITLE:
+                  text = resource.toTitleCase(text).toString();
+               break;
+            }
+         }
+
+      }
+      else
+      {
+         text = follow.getStringValue(refEntry);
       }
 
-      return follow.getStringValue(refEntry);
+      return text;
    }
 
    public static Field popField(GlsResource resource, TeXObjectList stack)
@@ -438,4 +493,5 @@ public class Field implements FieldValueElement
    private FieldReference fieldRef;
    private String name;
    private Field follow;
+   private FieldCaseChange caseChange = FieldCaseChange.NO_CHANGE;
 }

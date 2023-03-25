@@ -220,7 +220,21 @@ public class ConditionalList extends Vector<ConditionalListElement>
               obj.format(), field));
       }
 
-      if (nextCp == '"')
+      if (nextObj instanceof ControlSequence
+          && ((ControlSequence)nextObj).getName().equals("NULL"))
+      {
+         stack.pop();
+
+         if (!(rel == Relational.EQUALS || rel == Relational.NOT_EQUALS))
+         {
+            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                "error.invalid.null_condition", 
+                 rel, field));
+         }
+
+         return new FieldNullMatch(field, rel == Relational.EQUALS);
+      }
+      else if (nextCp == '"')
       {
          stack.pop();
          String strValue = popQuoted(resource, stack, '"').toString(parser);
@@ -470,7 +484,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
    }
 
    @Override
-   public boolean booleanValue(Bib2GlsEntry entry)
+   public boolean booleanValue(Bib2GlsEntry entry) throws IOException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
 

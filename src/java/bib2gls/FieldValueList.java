@@ -45,6 +45,7 @@ public class FieldValueList extends Vector<FieldValueElement>
       boolean add = true;
 
       TeXObjectList quoted = null;
+      TeXObjectList popped = new TeXObjectList();
 
       while (stack.size() > 0)
       {
@@ -58,13 +59,13 @@ public class FieldValueList extends Vector<FieldValueElement>
                  in one quote that is closed in another quote.
                */
 
-              stack.pop();
+              popped.add(stack.pop());
               stack.push(((Group)object).splitTokens(parser), true);
             }
             else if (object instanceof SingleToken
                   && ((SingleToken)object).getCharCode() == '"')
             {
-               stack.pop();
+               popped.add(stack.pop());
                list.add(new FieldValueString(quoted, true));
                quoted = null;
                add = false;
@@ -72,12 +73,60 @@ public class FieldValueList extends Vector<FieldValueElement>
             else
             {
                quoted.add(object);
-               stack.pop();
+               popped.add(stack.pop());
+            }
+         }
+         else if (FieldCaseChange.isFieldCaseChange(object))
+         {
+            if (add)
+            {
+               TeXObject cs = object;
+
+               FieldCaseChange fieldCaseChange
+                  = FieldCaseChange.getFieldCaseChange(object);
+
+               popped.add(stack.pop());
+
+               object = stack.popArg(parser);
+
+               if (parser.isStack(object))
+               {
+                  TeXObjectList substack = (TeXObjectList)object;
+
+                  Field field = Field.popField(resource, substack);
+                  field.setCaseChange(fieldCaseChange);
+
+                  list.add(field);
+
+                  substack.popLeadingWhiteSpace();
+
+                  if (!substack.isEmpty())
+                  {
+                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                       "error.unexpected_content_in_arg",
+                        substack.toString(parser), cs));
+                  }
+
+                  add = false;
+
+                  popped.addAll(TeXParserUtils.createGroup(parser,
+                    parser.getListener().createString(field.toString())));
+               }
+               else
+               {
+                  throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     "error.invalid.condition", object.toString(parser)));
+               }
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                  "error.invalid.condition", object.toString(parser)));
             }
          }
          else if (object instanceof WhiteSpace)
          {
-            stack.pop();
+            popped.add(stack.pop());
          }
          else if (object instanceof Group)
          {
@@ -85,13 +134,17 @@ public class FieldValueList extends Vector<FieldValueElement>
             {
                object = stack.popArg(parser);
 
-               list.add(new FieldValueString(object, false));
+               FieldValueString val = new FieldValueString(object, false);
+               list.add(val);
+
+               popped.add(parser.getListener().createString(val.toString()));
                add = false;
             }
             else
             {
                throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-                "error.expected_before", "+", object.toString(parser)));
+                "error.expected_before_after", "+", 
+                 object.toString(parser), popped.toString(parser)));
             }
          }
          else if (object instanceof SingleToken)
@@ -105,29 +158,34 @@ public class FieldValueList extends Vector<FieldValueElement>
                {
                   object = stack.popArg(parser);
 
-                  list.add(new FieldValueString(object, false));
+                  FieldValueString val = new FieldValueString(object, false);
+                  list.add(val);
+
+                  popped.add(parser.getListener().createString(val.toString()));
                   add = false;
                }
                else
                {
                   throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-                   "error.expected_before", "+", object.toString(parser)));
+                   "error.expected_before_after", "+",
+                      object.toString(parser), popped.toString(parser)));
                }
             }
             else if (cp == '+')
             {
-               stack.pop();
+               popped.add(stack.pop());
                add = true;
             }
             else if (cp == '"')
             {
-               stack.pop();
-
                if (!add)
                {
                   throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-                   "error.expected_before", "+", object.toString(parser)));
+                   "error.expected_before_after", "+", 
+                      object.toString(parser), popped.toString(parser)));
                }
+
+               popped.add(stack.pop());
 
                quoted = parser.getListener().createStack();
                add = false;
@@ -138,8 +196,11 @@ public class FieldValueList extends Vector<FieldValueElement>
             }
             else if (add)
             {
-               list.add(Field.popField(resource, stack));
+               Field field = Field.popField(resource, stack);
+
+               list.add(field);
                add = false;
+               popped.addAll(parser.getListener().createString(field.toString()));
             }
             else
             {

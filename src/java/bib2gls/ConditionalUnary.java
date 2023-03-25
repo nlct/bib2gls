@@ -18,9 +18,12 @@
 */
 package com.dickimawbooks.bib2gls;
 
+import java.io.IOException;
+
 public interface ConditionalUnary extends ConditionalListElement
 {
-   public boolean booleanValue(Bib2GlsEntry entry, Conditional conditional);
+   public boolean booleanValue(Bib2GlsEntry entry, Conditional conditional)
+     throws IOException;
 
    public boolean booleanValue(boolean conditional);
 }

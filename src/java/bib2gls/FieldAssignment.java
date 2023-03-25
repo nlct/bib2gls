@@ -46,7 +46,7 @@ public class FieldAssignment
       return destField;
    }
 
-   public BibValueList getValue(Bib2GlsEntry entry)
+   public BibValueList getValue(Bib2GlsEntry entry) throws IOException
    {
       if (condition != null && !condition.booleanValue(entry))
       {

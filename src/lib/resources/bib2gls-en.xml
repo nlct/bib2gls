@@ -267,8 +267,13 @@ Defaulting to: {0}.
      (for example, the digraph 'dz' is converted to 'Dz'). This doesn't apply
      to the Dutch digraph 'ij', which should be converted to 'IJ'. Other 
      exceptions may be added as appropriate.
+
+     Note, may change grouptitle.case to include language tag.
   -->
 <entry key="grouptitle.case.ij">IJ</entry>
+
+<entry key="sentencecase.nl.ij">IJ</entry>
+<entry key="nonsentencecase.nl.IJ">ij</entry>
 
 <entry key="warning.title">Warning: {0}</entry>
 
@@ -431,9 +436,12 @@ the second list ({3,number}).</entry>
 <entry key="error.invalid.condition_in">Expected condition, found ''{0}'' in {1}</entry>
 <entry key="error.invalid.condition_after">Expected condition, found ''{0}'' after {1}</entry>
 <entry key="error.invalid.condition_before">Expected condition, found ''{0}'' before {1}</entry>
+<entry key="error.invalid.null_condition">Invalid condition, NULL test can only be used with ''='' or ''&lt;&gt;'', found ''{0}'' after {1}</entry>
 <entry key="error.invalid.binary">Expected binary operand before ''{0}'' in {1}</entry>
-<entry key="error.expected_before">Expected ''{0}'' before {1}</entry>
+<entry key="error.expected_before">Expected ''{0}'' before ''{1}''</entry>
+<entry key="error.expected_before_after">Expected ''{0}'' before ''{1}'', after: {2}</entry>
 <entry key="error.expected_field_or_string_after">Expected field or string after {0}</entry>
+<entry key="error.unexpected_content_in_arg">Unexpected content ''{0}'' in the argument of {1}</entry>
 <entry key="error.openin.forbidden">Read access forbidden for file: {0}</entry>
 <entry key="error.openout.forbidden">Write access forbidden for file: {0}</entry>
 <entry key="error.forbidden.ext">Write access forbidden for extension: {0}</entry>

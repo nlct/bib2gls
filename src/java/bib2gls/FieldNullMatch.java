@@ -20,24 +20,43 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
-public class ConditionNegate implements ConditionalUnary
+import com.dickimawbooks.texparserlib.bib.BibValue;
+
+public class FieldNullMatch implements Conditional
 {
-   @Override
-   public boolean booleanValue(Bib2GlsEntry entry, Conditional conditional)
-   throws IOException
+   public FieldNullMatch(Field field, boolean equals)
    {
-      return !conditional.booleanValue(entry);
+      this.field = field;
+      this.equals = equals;
    }
 
-   @Override
-   public boolean booleanValue(boolean conditional)
+   public boolean booleanValue(Bib2GlsEntry entry) throws IOException
    {
-      return !conditional;
+      BibValue value = field.getValue(entry);
+
+      if (value == null)
+      {
+         return equals ? true : false;
+      }
+      else
+      {
+         return equals ? false : true;
+      }
    }
 
    @Override
    public String toString()
    {
-      return "!";
+      if (equals)
+      {
+         return String.format("%s = NULL", field);
+      }
+      else
+      {
+         return String.format("%s <> NULL", field);
+      }
    }
+
+   protected boolean equals;
+   protected Field field;
 }

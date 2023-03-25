@@ -18,13 +18,18 @@
 */
 package com.dickimawbooks.bib2gls;
 
+import java.io.IOException;
+
 public interface ConditionalBinary extends ConditionalListElement
 {
-   public boolean booleanValue(Bib2GlsEntry entry, Conditional cond1, Conditional cond2);
+   public boolean booleanValue(Bib2GlsEntry entry, Conditional cond1, Conditional cond2)
+     throws IOException;
 
-   public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, Conditional cond2);
+   public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, Conditional cond2)
+     throws IOException;
 
-   public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, ConditionalUnary unary, Conditional cond2);
+   public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, ConditionalUnary unary, Conditional cond2)
+     throws IOException;
 
    public boolean booleanValue(boolean cond1, boolean cond2);
 }

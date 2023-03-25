@@ -18,7 +18,15 @@
 */
 package com.dickimawbooks.bib2gls;
 
+import java.io.IOException;
+
 public interface Conditional extends ConditionalListElement
 {
-   public boolean booleanValue(Bib2GlsEntry entry);
+   /**
+    * Gets the boolean value this conditional evaluates to.
+    * @param entry the entry being tested
+    * @throws IOException if something goes wrong with the TeXParser
+    * (indicates a problem in parsing, mostly like a bug)
+    */ 
+   public boolean booleanValue(Bib2GlsEntry entry) throws IOException;
 }
