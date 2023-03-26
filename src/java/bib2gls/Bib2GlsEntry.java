@@ -1283,13 +1283,13 @@ public class Bib2GlsEntry extends BibEntry
 
       if (fieldAssignments != null)
       {
-         boolean override = resource.isAssignOverrideOn();
-
          boolean updateShortPlural = false;
          boolean updateDualShortPlural = false;
 
          for (FieldAssignment assignSpec : fieldAssignments)
          {
+            boolean override = assignSpec.isFieldOverrideOn(resource);
+
             String field = assignSpec.getDestinationField();
 
             if (override || getField(field) == null)

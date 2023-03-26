@@ -2791,6 +2791,10 @@ public class GlsResource
          {
             dualTimeListLocale = getLocale(list, opt);
          }
+         else if (opt.equals("locale"))
+         {
+            resourceLocale = getLocale(list, opt);
+         }
          else if (opt.equals("interpret-fields"))
          {
             interpretFields = getFieldArray(list, opt, true);
@@ -5009,7 +5013,7 @@ public class GlsResource
    {
       if (resourceLocale == null)
       {
-         resourceLocale = sortSettings.getLocale();
+         resourceLocale = sortSettings.getLocale(false);
       }
 
       return resourceLocale;
@@ -5656,7 +5660,7 @@ public class GlsResource
     */ 
    private Vector<FieldAssignment> parseAssignFieldsData(
        KeyValList keyValList, String opt)
-    throws Bib2GlsSyntaxException,IOException
+    throws Bib2GlsException,IOException
    {
       TeXObject object = keyValList.getValue(opt);
 
@@ -5669,7 +5673,7 @@ public class GlsResource
 
       if (!(object instanceof TeXObjectList))
       {
-         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+         throw new Bib2GlsException(bib2gls.getMessage(
            "error.invalid.option_syntax", opt, object.toString(parser)));
       }
 
@@ -5685,6 +5689,7 @@ public class GlsResource
       String field = null;
       FieldValueList fieldValueList = null;
       ConditionalList condition = null;
+      Boolean override = null;
 
       while (!stack.isEmpty())
       {
@@ -5711,7 +5716,7 @@ public class GlsResource
                      {
                         if (builder == null)
                         {
-                           throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                           throw new Bib2GlsException(bib2gls.getMessage(
                              "error.invalid.option_syntax.misplaced_before",
                               object.toString(parser), stack.toString(parser)));
                         }
@@ -5719,20 +5724,41 @@ public class GlsResource
                         field = builder.toString();
                      }
 
+                     String overrideOpt = TeXParserUtils.popOptLabelString(parser, stack);
+
+                     if (overrideOpt != null)
+                     {
+                        if (overrideOpt.equals("o"))
+                        {
+                           override = Boolean.TRUE;
+                        }
+                        else if (overrideOpt.equals("n"))
+                        {
+                           override = Boolean.FALSE;
+                        }
+                        else
+                        {
+                           throw new Bib2GlsException(
+                             bib2gls.getMessage("error.invalid.option_syntax",
+                               opt,  bib2gls.getMessage(
+                                "error.invalid.field_override", overrideOpt)));
+                        }
+                     }
+
                      try
                      {
                         fieldValueList = FieldValueList.pop(this, stack);
                      }
-                     catch (Bib2GlsSyntaxException e)
+                     catch (Bib2GlsException e)
                      {
-                        throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                        throw new Bib2GlsException(bib2gls.getMessage(
                           "error.invalid.option_syntax", opt, e.getMessage()
                             ), e);
                      }
                   }
                   else
                   {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
                         object.toString(parser), stack.toString(parser)));
                   }
@@ -5742,7 +5768,7 @@ public class GlsResource
 
                   if (fieldValueList == null)
                   {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
                         object.toString(parser), stack.toString(parser)));
                   }
@@ -5753,7 +5779,7 @@ public class GlsResource
                   }
 
                   FieldAssignment assignSpec
-                     = new FieldAssignment(field, fieldValueList, condition);
+                     = new FieldAssignment(field, fieldValueList, condition, override);
 
                   if (bib2gls.getDebugLevel() > 0)
                   {
@@ -5766,13 +5792,14 @@ public class GlsResource
                   field = null;
                   fieldValueList = null;
                   condition = null;
+                  override = null;
 
                break;
                case '[':
 
                   if (fieldValueList == null || condition != null)
                   {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
                         object.toString(parser), stack.toString(parser)));
                   }
@@ -5781,9 +5808,9 @@ public class GlsResource
                   {
                      condition = ConditionalList.popCondition(this, stack, ']');
                   }
-                  catch (Bib2GlsSyntaxException e)
+                  catch (Bib2GlsException e)
                   {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax", opt, e.getMessage()), e);
                   }
 
@@ -5801,7 +5828,7 @@ public class GlsResource
                  }
                  else
                  {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
                         object.toString(parser), stack.toString(parser)));
                  }
@@ -5809,7 +5836,7 @@ public class GlsResource
          }
          else
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+            throw new Bib2GlsException(bib2gls.getMessage(
                "error.invalid.option_syntax.misplaced_before",
                object.toString(parser), stack.toString(parser)));
          }
@@ -5818,7 +5845,7 @@ public class GlsResource
       if (field != null && fieldValueList != null)
       {
          FieldAssignment assignSpec
-           = new FieldAssignment(field, fieldValueList, condition);
+           = new FieldAssignment(field, fieldValueList, condition, override);
 
          if (bib2gls.getDebugLevel() > 0)
          {

@@ -339,7 +339,7 @@ documents}}
 \glsxtrnewglslike{idx.}{\idx}{\idxpl}{\Idx}{\Idxpl}
 \newcommand{\idxlink}[3][]{\glslink[#1]{idx.#2}{#3}}
 
-\newcommand{\stringu}{\idx{cs.string}\idx{uhex}}
+\newcommand{\stringu}{\idx{cs.string}\gls{uhex}}
 
 \newcommand*{\filefmt}[1]{\texorpdfstring{\texttt{#1}}{#1}}
 \newcommand*{\metafilefmt}[3]{%
@@ -2280,7 +2280,7 @@ The resource options provided in \gls{GlsXtrLoadResources} expand as
 they are written to the \ext{aux} file. This allows commands to be
 used within the resource options that expand to a complex option
 that may be required multiple times. For example,
-\gls{GlsXtrBibTeXEntryAliases} or \gls{glsxtrhyphenrules}.
+\ics{GlsXtrBibTeXEntryAliases} or \ics{glsxtrhyphenrules}.
 Unfortunately, this means that quarks must be prevented from
 expansion as they form part of the option syntax and are not
 intended for use in the document.
@@ -2315,37 +2315,49 @@ designated contexts.
 
 \begin{description}
 
-\item[General] \inlinegls{uhex} is recognised in certain resource options
+\item[General] \inlinedef{uhex} is recognised in certain resource options
 (such as \csopt{field-concat-sep}) as indicating the Unicode
 character with the given hexadecimal code.
 
 \item[Regular expressions] The following indicate a literal
-character: \inlinegls{quark.dot} \inlinegls{quark.backslash}
-\inlinegls{quark.slash} \inlinegls{quark.pipe} \inlinegls{quark.amp}
-\inlinegls{quark.plus} \inlinegls{quark.star}
-\inlinegls{quark.dollar} \inlinegls{quark.circum} \inlinegls{quark.tilde}
-\inlinegls{quark.openparen} \inlinegls{quark.closeparen}
-\inlinegls{quark.opensq} \inlinegls{quark.closesq}
-\inlinegls{quark.doublequote} \inlinegls{quark.hyphen}
-\inlinegls{quark.question} \inlinegls{quark.colon} \inlinegls{quark.hash}.
-Note that regular expressions in resource options are typically
-anchored, so there shouldn't be any need to use \idx{regex.circum}
+character: 
+\glsadd{idx.periodchar}\inlinedef{quark.dot} 
+\glsadd{idx.backslashchar}\inlinedef{quark.backslash}
+\glsadd{idx.slashchar}\inlinedef{quark.slash} 
+\glsadd{idx.pipechar}\inlinedef{quark.pipe} 
+\glsadd{idx.ampchar}\inlinedef{quark.amp}
+\glsadd{idx.pluschar}\inlinedef{quark.plus} 
+\glsadd{idx.starchar}\inlinedef{quark.star}
+\glsadd{idx.dollarchar}\inlinedef{quark.dollar} 
+\glsadd{idx.circumchar}\inlinedef{quark.circum} 
+\glsadd{idx.tildechar}\inlinedef{quark.tilde}
+\glsadd{idx.openparenchar}\inlinedef{quark.openparen} 
+\glsadd{idx.closeparenchar}\inlinedef{quark.closeparen}
+\glsadd{idx.opensqchar}\inlinedef{quark.opensq} 
+\glsadd{idx.closesqchar}\inlinedef{quark.closesq}
+\glsadd{idx.doublequotechar}\inlinedef{quark.doublequote} 
+\glsadd{idx.hyphenchar}\inlinedef{quark.hyphen}
+\glsadd{idx.questionchar}\inlinedef{quark.question} 
+\glsadd{idx.colonchar}\inlinedef{quark.colon} 
+\glsadd{idx.hashchar}\inlinedef{quark.hash}.
+Note that \idxpl{regex} in resource options are typically
+\gls{anchored}, so there shouldn't be any need to use \idx{regex.circum}
 or \idx{regex.dollar} to denote the start and end.
 
 \item[Field conversions] The following commands may be used in the
 assignment value syntax of \csopt{assign-fields} to apply a
 case-conversion to value obtained from the referenced field:
-\ics{LC}, \ics{UC}, \ics{FIRSTLC}, \ics{FIRSTUC}, and \ics{TITLE}.
+\gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
 
 \item[Null value] The conditional part of the \csopt{assign-fields}
-syntax recognises \ics{NULL} as indicating a null value for \idx{equalscmp}
+syntax recognises \gls{NULL} as indicating a null value for \idx{equalscmp}
 and \idx{notequalscmp} comparisons.
 \end{description}
 
 Finally, this isn't actually a quark, but \inlinedef{cs} is defined
 to expand to the literal string \csfmt{csname} so you can use it for any
 other escape sequences that aren't covered above. For example, 
-\code{\cs{cs}\marg{n}} for a newline \csfmt{n}.
+\code{\gls{cs}\marg{n}} for a newline \csfmt{n}.
 
 \section{Indexing}
 
@@ -3926,7 +3938,7 @@ This will only count records where the format matches the regular
 expression \code{.*(bf|it)} (for example, \code{hyperbf} or
 \code{hyperit}) or the counter name matches \code{section} or
 \code{subsection} (but not \code{subsubsection}, since the
-expressions are anchored).
+expressions are \gls{anchored}).
 
 This syntax doesn't permit the use of the sequence \code{/c/}
 appearing in the regular expressions, but both the format and
@@ -4366,7 +4378,7 @@ If an optional field is missing and \bibgls\ needs to access it for
 some reason, \bibgls\ will try to fallback on another value. The
 actual fallback value depends on the \gls{entrytype}. The most common
 fallback is that used if the \field{sort} field is missing, which is
-typically the case. This approach allows different \glspl{entrytypes} to
+typically the case. This approach allows different \glspl{entrytype} to
 have different fields used for sorting.
 
 Predefined fields for use in \ext{bib} files are listed in
@@ -7449,6 +7461,21 @@ a \ext{bib} managing systems, such as JabRef.
 See \longarg{tex-encoding} for the \gls{encoding} used to write the \ext{glstex}
 file.
 
+\optsection{locale}
+
+Currently, this is only used by case-changing functions, such as
+\gls{UC}, where the actual case-change is applied by \bibgls\ rather
+than deferring it to \LaTeX. The default locale for the \gls{resourceset}
+is taken from the locale supplied in the \csopt{sort} method,
+if an alphabetical (non-custom) method has been chosen. If the
+\csopt{sort} method isn't linked to a locale, then the default
+locale is assumed to the default locale for the document. If that
+isn't set, then the default is assumed to be the same as the default
+locale for the JVM.
+
+In the event that the default isn't applicable, you can use the
+\csopt{locale} option to set it for the current \gls{resourceset}.
+
 \optsection{interpret-preamble}
 
 This is a boolean option that determines whether or not the
@@ -8041,7 +8068,7 @@ the original \gls{entrytype} specified in the \ext{bib} file.
 The \meta{regex} part should be a \idx{regex} conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
-Pattern class}~\cite{pattern}. The pattern is anchored 
+Pattern class}~\cite{pattern}. The pattern is \gls{anchored} 
 (\code{oo}\idx{matchanydot}\idx{zeroormore} matches
 \code{oops} but not \code{loops}) and \meta{regexp} can't be
 empty. Remember that \TeX\ will expand the option list as
@@ -10297,35 +10324,56 @@ option is implemented after the \csopt{replicate-fields} option (see
 \end{important}
 
 The \csopt{assign-fields} option is a more complex way of setting a
-field than \csopt{replicate-fields}. Each element of the
+field than \csopt{replicate-fields}. Each \keyval\ element of the
 \keyvallist\ argument has the syntax:
 \begin{codeenv}
-\meta{dest-field}\dequals\meta{assign-specs} \oargm{condition}
+\meta{dest-field} \dequals\oargm{override} \meta{assign-specs} \oargm{condition}
 \end{codeenv}
 If the destination field (\meta{dest-field}) is already set, it will
-only be overwritten if \csopt[true]{assign-override}. The
-\meta{dest-field} is simply the name of the field for the entry
-under consideration and doesn't use the more complex
-\meta{field-ref} syntax used in \meta{assign-specs}, which is
-described below.
+only be overwritten if \csopt[true]{assign-override} or if
+\oarg{override} is \qtt{o}. The \meta{dest-field} is simply the name
+of the field for the entry under consideration and doesn't use the
+more complex \meta{field-ref} syntax used in \meta{assign-specs},
+which is described below.
+
+The \oargm{override} following the equal sign is optional and may be
+used to counteract the \csopt{assign-override} for the given
+assignment. The \meta{override} value may be either \qtt{o}
+(override) or \qtt{n} (no override). If not present, the
+\csopt{assign-override} setting will be used.
 
 The \oargm{condition} part is optional. The \meta{assign-specs}
 are a \idx{assign-plus} separated list of field references or
 delimited strings. A field reference may be marked up with case-\idx{quark}
-and the conditional part may use the null-\idx{quark} in equal and
-not equal comparisons (see \sectionref{sec:quarks}).
+and the conditional part may use the NULL-\idx{quark} in equal and
+not equal comparisons.
 
+Note that, unlike most \keyval\ elements, the value part (\meta{assign-specs}
+\oargm{condition}) should not be grouped. The \csopt{assign-fields}
+option is parsed in a different way to the other \keyvallist\
+options.
+
+\begin{important}
+Remember that field values may be altered before or after
+\csopt{assign-fields} by other resource options (see
+\sectionref{sec:resourcesets}). The assignment will use the value
+current at the time it is referenced during the processing of
+\csopt{assign-fields}.  If you need to reference the destination
+field in the assignment, make sure that the override setting is on.
+\end{important}
+
+The syntax for the \meta{assign-specs} part is:
 \begin{codeenv}
 \meta{assign-specs} ::= \meta{assign-value} | \meta{assign-value} \idx{assign-plus} \meta{assign-specs}
-\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{quark}\margm{field-ref}
-\meta{quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
+\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{\idx{quark}}\margm{field-ref}
+\meta{\idx{quark}} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
 \end{codeenv}
 
 As with the \ext{bib} format, strings can be delimited by braces
 \margm{text} or double-quotes \code{\qtdelim{\meta{text}}}. If you
 need a literal double-quote (\idx{doublequotechar}) then either use
 brace delimiters or use \gls{quark.doublequote}. If you need the
-actual \LaTeX\ accent command \gls{umlaut} then use brace
+actual \LaTeX\ accent command \ics{umlaut} then use brace
 delimiters. If you need braces that start and end in different
 fragments then use double-quote delimiters.
 
@@ -10341,15 +10389,15 @@ rules for the locale depends on whether or not the locale is
 correctly supported by the Java locale provider.
 
 \begin{itemize}
-\item \inlinegls{LC} converts the value obtained from the field
+\item \inlinedef{LC} converts the value obtained from the field
 reference to \idx!{lowercase};
-\item \inlinegls{UC} converts the value obtained from the field
+\item \inlinedef{UC} converts the value obtained from the field
 reference to \idx!{uppercase};
-\item \inlinegls{FIRSTLC} converts the first letter from the value
+\item \inlinedef{FIRSTLC} converts the first letter from the value
 obtained from the field reference to \idx!{lowercase};
-\item \inlinegls{FIRSTUC} converts the first letter from the value
+\item \inlinedef{FIRSTUC} converts the first letter from the value
 obtained from the field reference to \idx!{uppercase};
-\item \inlinegls{TITLE} converts the value obtained from the field
+\item \inlinedef{TITLE} converts the value obtained from the field
 reference to \idx!{titlecase}.
 \end{itemize}
 
@@ -10410,12 +10458,191 @@ original value, as given in the \ext{bib} file, or the actual value
 which may have been modified through resource options such as
 \csopt{entry-type-aliases} or \csopt{label-prefix}.
 
+If a syntax error occurs, the error message will show how \bibgls\
+has scanned the information so far. For example, in the case of
+\code{parent \field{name}} the message will be:
+\begin{quote}\ttfamily
+Error: Invalid syntax for option '\csopt{assign-fields}': Expected
+one of \idx{follow} \idx{assign-plus} \idx{startoptional} after
+' self > parent', found 'n'
+\end{quote}
+This indicates that it has read \qt{parent} as meaning the
+\field{parent} field of the current entry since it isn't followed by
+\qt{\idx{follow}}.
+
+A condition can be added to the assignment specification so that the
+assignment is only made if the conditional is true. The condition
+should be placed in square brackets after the \meta{assign-specs}
+part. The tokens \idx{ampand} and \idx{pipeor} indicate logical
+\qt{AND} and \qt{OR}, respectively, and \idx{exclamnot} indicates
+negation. Parentheses \idx{openparenchar} and \idx{closeparenchar}
+may be used to control the order of precedence. Fields can be
+referenced in the same manner as in the \meta{assign-specs} but the
+case-changing quarks and string concatenation \idx{assign-plus}
+aren't available.
+
+The following field value boolean functions are available. If the
+field value is undefined (either the field isn't set or the
+referenced ancestor entry hasn't been defined) then, if 
+\csopt[fallback]{assign-missing-field-action}, the fallback value is
+obtained. If the value is still undefined it will be considered 
+a NULL value for the purposes of the comparison. Note that with 
+\csopt[empty]{assign-missing-field-action} there will be no NULL
+values.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{equalscmp}\inlinedef{NULL}
+\end{codeenv*}
+Evaluates to true if the value is NULL.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{notequalscmp}\gls{NULL}
+\end{codeenv*}
+Evaluates to true if the value is not NULL.
+
+For the remaining comparisons, NULL values will be treated as an
+empty string. The value being compared is a detokenized string that
+will contain any TAB or newline characters or additional spacing
+that's present in the \ext{bib} file (unless they have already been
+stripped by other resource options).
+
+\begin{codeenv}
+\meta{field-ref}=\idx{slashchar}\meta{regex}\idx{slashchar}
+\meta{field-ref}=\idx{slashchar}\meta{regex}\idx{slashchar}i
+\end{codeenv}
+Evaluates to true if the value matches the given \gls{anchored} regular
+expression \meta{regex}. If \code{i} follows the terminating
+\idx{slashchar} then the match is case-sensitive. No other modifiers
+are recognised, but you can use embedded flag expressions, such as
+\code{?s} for \qt{single-line} mode.
+
+In the following string comparisons, the \meta{string} may be
+delimited double-quotes or braces. The comparisons are according to
+the Unicode code points (not locale-sensitive), but if the string is
+followed by \code{i}, a case-insensitive comparison is used.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{equalscmp}\meta{string}
+\meta{field-ref}\idx{equalscmp}\meta{string}i
+\end{codeenv*}
+Evaluates to true if the value is equal to the string.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{notequalscmp}\meta{string}
+\meta{field-ref}\idx{notequalscmp}\meta{string}i
+\end{codeenv*}
+Evaluates to true if the value is not equal to the string.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{ltcmp}\meta{string}
+\meta{field-ref}\idx{ltcmp}\meta{string}i
+\end{codeenv*}
+Evaluates to true if the value is lexicographically less than the string.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{lecmp}\meta{string}
+\meta{field-ref}\idx{lecmp}\meta{string}i
+\end{codeenv*}
+Evaluates to true if the value is lexicographically less than or
+equal to the string.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{gtcmp}\meta{string}
+\meta{field-ref}\idx{gtcmp}\meta{string}i
+\end{codeenv*}
+Evaluates to true if the value is lexicographically greater than the string.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{gecmp}\meta{string}
+\meta{field-ref}\idx{gecmp}\meta{string}i
+\end{codeenv*}
+Evaluates to true if the value is lexicographically greater than or
+equal to the string.
+
+In the following numerical comparisons, the given \meta{number}
+should use \qtt{.} for the decimal point and no number group
+separators. If the \meta{number} doesn't contain a decimal point
+then an integer comparison is assumed and the value obtained from
+the field reference will be converted to an integer for the comparison.
+If the value is empty or isn't numeric it will be treated as 0.
+The number shouldn't be delimited by quotes or braces.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{equalscmp}\meta{number}
+\end{codeenv*}
+Evaluates to true if the value is equal to \meta{number}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{notequalscmp}\meta{number}
+\end{codeenv*}
+Evaluates to true if the value is not equal to \meta{number}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{ltcmp}\meta{number}
+\end{codeenv*}
+Evaluates to true if the value is less than \meta{number}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{lecmp}\meta{number}
+\end{codeenv*}
+Evaluates to true if the value is less than or equal to \meta{number}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{gtcmp}\meta{number}
+\end{codeenv*}
+Evaluates to true if the value is greater than \meta{number}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{gecmp}\meta{number}
+\end{codeenv*}
+Evaluates to true if the value is greater than or equal to \meta{number}.
+
+Finally, the following compare the value with another field
+reference. The comparisons are case-sensitive and according to the
+Unicode code points (not locale-sensitive).
+
+\begin{codeenv*}
+\meta{field-ref}\idx{equalscmp}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is equal to the value obtained from
+the field reference \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{notequalscmp}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is not equal to the value obtained from
+the field reference \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{ltcmp}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is lexicographically less than the value obtained from
+the field reference \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{lecmp}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is lexicographically less than or
+equal to the value obtained from the field reference \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{gtcmp}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is lexicographically greater than the
+value obtained from the field reference \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\idx{gecmp}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is lexicographically greater than or
+equal to the value obtained from the field reference \meta{field-ref2}.
+
 For example, suppose I have defined the custom fields
 \fieldfmt{surname} and \fieldfmt{forename}, and I have the following
 in my \ext{bib} file:
 \begin{codeenv}
 \atentry{index}\marg{Smith}
-\atentry{index}\marg{
+\atentry{index}\marg{Jane-Smith,
  \fieldfmt{forename}=\marg{Jane},
  \field{parent}=\marg{Smith}
 }
@@ -10423,7 +10650,7 @@ in my \ext{bib} file:
 Suppose that what I actually want is:
 \begin{codeenv}
 \atentry{index}\marg{Smith}
-\atentry{index}\marg{
+\atentry{index}\marg{Jane-Smith,
  \fieldfmt{forename}=\marg{Jane},
  \fieldfmt{surname}=\marg{Smith},
  \field{parent}=\marg{Smith},
@@ -10447,7 +10674,7 @@ match the surname. For example, I might also have:
 \atentry{index}\marg{de-la-Fontaine,
  \field{name}=\marg{de la Fontaine}
 }
-\atentry{index}\marg{
+\atentry{index}\marg{Margaret-de-la-Fontaine,
  \fieldfmt{forename}=\marg{Margaret},
  \field{parent}=\marg{de-la-Fontaine}
 }
@@ -10473,8 +10700,186 @@ more compactly as:
   \field{text} = \fieldfmt{forename} \idx{assign-plus} \qtdelim{ } \idx{assign-plus} \fieldfmt{surname}
 }
 \end{codeenv}
+The last assignment in the above can also be written as:
+\begin{codeenv}
+\field{text} = \fieldfmt{forename} \idx{assign-plus} \marg{ } \idx{assign-plus} \fieldfmt{surname}
+\end{codeenv}
+Suppose, for some reason, I want the first use to show the surname
+in bold. This means I need to add
+\code{\cs{textbf}\idx{bgroupchar}} before the value of the
+surname field and the closing \idx{egroupchar} needs to go after.
+This can be achieved with:
+\begin{codeenv}
+\field{first} = \fieldfmt{forename} \idx{assign-plus} \qtdelim{ \cs{textbf}\idx{bgroupchar}} \idx{assign-plus} \fieldfmt{surname} \qtdelim{\idx{egroupchar}}
+\end{codeenv}
+Note that because there are unbalanced braces in the string
+fragments, it's necessary to use quote delimiters. Since \cs{textbf}
+is robust, there's no need to protect it from expansion.
 
-% TODO describe condition syntax
+Suppose, instead, I want the surname in \idx{uppercase} on first
+use. I could simply replace \cs{textbf} with \cs{MakeUppercase}, but
+I can get \bibgls\ to do the case-conversion instead:
+\begin{codeenv}
+\field{first} = \fieldfmt{forename} \idx{assign-plus} \qtdelim{ } \idx{assign-plus} \gls{UC}\marg{ \fieldfmt{surname} }
+\end{codeenv}
+This assumes that \ics{GlsXtrResourceInitEscSequences} has been
+added to the definition of \cs{glsxtrresourceinit}, as described in
+\sectionref{sec:quarks}. Otherwise you would need to protect \gls{UC}.
+
+In the above example, the \fieldfmt{surname} field is obtained from
+the value of the parent's \field{name} according to the assignment:
+\begin{codeenv}
+\fieldfmt{surname} = parent \idx{follow} \field{name},
+\end{codeenv}
+In the case of the Smith entry, the \field{name} field hasn't been
+set.
+
+If a referenced field hasn't been set then the behaviour depends on
+the \csopt{assign-missing-field-action} setting. The default
+behaviour is to use the fallback, if provided. In the case of
+\atentry{index}, the fallback for the \field{name} field is the
+entry's label. This means that the Jane-Smith entry will have the
+\fieldfmt{surname} field set to \qt{Smith}.
+
+If the fallback isn't set or if there is no fallback then the
+assignment instruction will be skipped. Similarly, if an ancestor is
+referenced but doesn't exist then assignment will again be skipped.
+
+\begin{important}
+The ancestor entries must be defined first to ensure that they have
+been processed and have had their fields set before they can be
+referenced in an assignment.
+\end{important}
+
+Since I haven't imposed any conditions on the assignments, the
+instructions will be attempted on all entries. This includes the
+parent entries.
+
+The first instruction attempts to set the \fieldfmt{surname} field
+to the parent's \field{name}. Neither the Smith nor the
+de-la-Fontaine entries have a parent entry, so this instruction is
+skipped for both of them.
+
+The second instruction attempts to set the \field{name} field to the
+entry's \fieldfmt{forename} field. The de-la-Fontaine entry already
+has the \field{name} field set so the instruction is automatically
+skipped (because of the default \csopt[false]{assign-override}).
+The Smith entry doesn't have the \field{name} field set so the
+assignment will be attempted but will fail because the
+\fieldfmt{forename} field isn't set and doesn't have a fallback.
+
+The \field{text} (and \field{first}) instruction similarly
+references the \fieldfmt{forename} field, which isn't set, so the
+instruction is skipped. The instruction also contains a reference to
+the \fieldfmt{surname} field, but that part of the assignment isn't
+reached as the attempt stops at the first unset reference.
+
+This means that neither the Smith not the de-la-Fontaine entries
+will be affected by the above \csopt{assign-fields} setting.
+
+Each instruction will be attempted, in turn, unless the \csopt{assign-override}
+setting prevents it. This means it's possible to have multiple
+assignments for a particular field. The first one that succeeds will
+be the one that has effect (with \csopt[false]{assign-override}).
+For example:
+\begin{codeenv}
+\csopt{assign-fields}=\marg{
+  \fieldfmt{surname} = parent \idx{follow} \field{name},
+  \fieldfmt{surname} = \field{name},
+  \field{name} = \fieldfmt{forename},
+  \field{text} = \fieldfmt{forename} \idx{assign-plus} \qtdelim{ } \idx{assign-plus} \fieldfmt{surname}
+}
+\end{codeenv}
+This has two instructions for the \fieldfmt{surname}. The first one
+will be applied to entries that have a parent and the second one
+will be applied to the other entries (that don't already have the
+\fieldfmt{surname} set).
+
+Suppose I also have some monarchs, who are more typically only
+referred to by their forename (with no surname), possibly prefixed by their rank and
+suffixed by their ordinal. Let's further suppose that in my document
+I have also defined the custom fields \fieldfmt{rank} and
+\fieldfmt{ordinal}, and in my \ext{bib} file I have:
+\begin{codeenv}
+\atentry{indexplural}\marg{king}
+\atentry{indexplural}\marg{queen}
+\atentry{indexplural}\marg{empress,\field{plural}=\marg{empresses}}
+\strut
+\atentry{index}\marg{King-Stephen,
+  \field{parent}=\marg{king},
+  \fieldfmt{forename}=\marg{Stephen}
+}
+\atentry{index}\marg{Empress-Matilda,
+  \field{parent}=\marg{empress},
+  \fieldfmt{forename}=\marg{Matilda},
+}
+\atentry{index}\marg{Elizabeth-I,
+  \field{parent}=\marg{queen},
+  \fieldfmt{forename}={Elizabeth},
+  \fieldfmt{ordinal}={I}
+}
+\end{codeenv}
+The earlier assignment rules won't be appropriate for these cases,
+as they would result in the \field{text} fields: \qt{Stephen kings},
+\qt{Matilda empresses} and \qt{Elizabeth queens}.
+
+In this case, the assignment rules need to depend on the type of
+entry. I could test if the parent label is \qt{king} or \qt{empress}
+or \qt{queen}, but a more reliable approach is to have custom entry
+types which can be aliased:
+
+\begin{codeenv}
+\atentry{index}\marg{Smith}
+\atentryfmt{person}\marg{Jane-Smith,
+ \fieldfmt{forename}=\marg{Jane},
+ \field{parent}=\marg{Smith}
+}
+\atentry{index}\marg{de-la-Fontaine,
+ \field{name}=\marg{de la Fontaine}
+}
+\atentryfmt{person}\marg{Margaret-de-la-Fontaine,
+ \fieldfmt{forename}=\marg{Margaret},
+ \field{parent}=\marg{de-la-Fontaine}
+}
+\strut
+\atentry{indexplural}\marg{king}
+\atentry{indexplural}\marg{queen}
+\atentry{indexplural}\marg{empress,\field{plural}=\marg{empresses}}
+\strut
+\atentryfmt{monarch}\marg{King-Stephen,
+  \field{parent}=\marg{king},
+  \fieldfmt{forename}=\marg{Stephen}
+}
+\atentryfmt{monarch}\marg{Empress-Matilda,
+  \field{parent}=\marg{empress},
+  \fieldfmt{forename}=\marg{Matilda},
+}
+\atentryfmt{monarch}\marg{Elizabeth-I,
+  \field{parent}=\marg{queen},
+  \fieldfmt{forename}={Elizabeth},
+  \fieldfmt{ordinal}={I}
+}
+\end{codeenv}
+The resource options are now:
+\begin{codeenv}
+\csopt[person=index,monarch=index]{entry-type-aliases},
+\csopt[
+  \field{name} = \fieldfmt{forename} \idx{assign-plus} \qt{\idx{nbspchar}} \fieldfmt{ordinal},
+  \field{name} = \fieldfmt{forename},
+  \fieldfmt{surname} = parent \idx{follow} \field{name}
+      \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{person} },
+  \field{text} = \fieldfmt{forename} \idx{assign-plus} \qtdelim{ } \idx{assign-plus} \fieldfmt{surname}
+      \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{person} },
+  \field{first} = \gls{FIRSTUC} \marg{ parent \qt{follow} \field{text} } \idx{assign-plus} \qtdelim{ } \idx{assign-plus} \fieldfmt{name}
+      \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{monarch} },
+  \field{text} = \fieldfmt{name}
+      \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{monarch} }
+]{assign-fields}
+\end{codeenv}
+
+Additional fields can be added to accommodate nicknames or other
+forms of address, which will add to the complexity of the assignment
+specification.
 
 \optsection[\subsubsection]{assign-override}
 
@@ -12039,6 +12444,21 @@ example:
 
 \end{itemize}
 
+If you need to selectively change the case, based on some condition
+(such as the \gls{entrytype}) then you can use the
+\csopt{assign-fields} option instead, but remember that you will
+need the override setting on. For example:
+\begin{codeenv}
+\csopt[
+ \field{name} =\oarg{o} \gls{TITLE}\marg{ \field{name} }
+   \oarg{ entrytype \idx{follow} original = "entry" }
+]{assign-fields}
+\end{codeenv}
+This will convert the \field{name} field to \idx{titlecase} for
+entries that were defined in the \ext{bib} file with
+\atentry{entry}.
+
+
 \begin{important}
 Major changes have been introduced to \sty{mfirstuc} v2.08. Some of
 the information below refers to older versions and is not
@@ -12506,7 +12926,7 @@ If the \field{text} field hasn't been set, the \field{name}
 value is first copied to the \field{text} field. If the \field{name}
 field hasn't been set (for example, with the \atentry{index} 
 \gls{entrytype}), it's copied from the fallback value (which
-depends on the \gls{entrytype{) unless the \gls{entrytype} is
+depends on the \gls{entrytype}) unless the \gls{entrytype} is
 \atentry{abbreviation} or \atentry{acronym}, in which case if
 the \field{name} field is missing no action is performed.
 
@@ -16116,7 +16536,7 @@ sorting (\csopt{sort-field}).
 
 This option sets the field concatenation separator to \meta{value}.
 The default is a space. An empty value indicates no separator. You
-may use \ics{uhex}\meta{hex} to indicate a character by its hexadecimal
+may use \gls{uhex}\meta{hex} to indicate a character by its hexadecimal
 code (see \sectionref{sec:quarks}). For example, suppose the \ext{bib} file contains:
 \begin{codeenv}
 \atentry{abbreviation}\marg{ac,

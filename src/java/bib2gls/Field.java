@@ -30,7 +30,7 @@ public class Field implements FieldValueElement
 {
    public Field(GlsResource resource, FieldReference fieldRef,
      String name, Field follow)
-     throws Bib2GlsSyntaxException
+     throws Bib2GlsException
    {
       if (fieldRef == null || resource == null)
       {
@@ -44,7 +44,7 @@ public class Field implements FieldValueElement
    }
 
    public Field(GlsResource resource, FieldReference fieldRef)
-     throws Bib2GlsSyntaxException
+     throws Bib2GlsException
    {
       this(resource, fieldRef, null, null);
    }
@@ -65,7 +65,7 @@ public class Field implements FieldValueElement
    }
 
    protected void setName(String name)
-     throws Bib2GlsSyntaxException
+     throws Bib2GlsException
    {
       if (name != null)
       {
@@ -76,13 +76,13 @@ public class Field implements FieldValueElement
          {
             if (!(name.equals("original") || name.equals("actual")))
             {
-               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+               throw new Bib2GlsException(bib2gls.getMessage(
                  "error.invalid.field_identifier", name, fieldRef.getTag()));
             }
          }
          else if (bib2gls.isPrivateNonBibField(name))
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+            throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.field_name", name));
          }
          else if (!(bib2gls.isKnownField(name)
@@ -327,7 +327,7 @@ public class Field implements FieldValueElement
    }
 
    public static Field popField(GlsResource resource, TeXObjectList stack)
-     throws Bib2GlsSyntaxException,IOException
+     throws Bib2GlsException,IOException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
       TeXParser parser = resource.getParser();
@@ -383,13 +383,13 @@ public class Field implements FieldValueElement
 
                   if (remaining.isEmpty())
                   {
-                     throw new Bib2GlsSyntaxException(
+                     throw new Bib2GlsException(
                        bib2gls.getMessage("error.invalid.field_ref", tag),
                        e);
                   }
                   else
                   {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.field_ref_before", tag, remaining), e);
                   }
                }
@@ -451,18 +451,18 @@ public class Field implements FieldValueElement
 
             if (remaining.isEmpty())
             {
-               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+               throw new Bib2GlsException(bib2gls.getMessage(
                  "error.missing.field"));
             }
             else
             {
-               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+               throw new Bib2GlsException(bib2gls.getMessage(
                  "error.missing.field_before", remaining));
             }
          }
          else
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+            throw new Bib2GlsException(bib2gls.getMessage(
               "error.missing.field_after", parsed));
          }
       }

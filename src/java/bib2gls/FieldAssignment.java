@@ -29,7 +29,8 @@ import com.dickimawbooks.texparserlib.bib.BibValueList;
  */
 public class FieldAssignment
 {
-   public FieldAssignment(String destField, FieldValueList valueList, Conditional cond)
+   public FieldAssignment(String destField, FieldValueList valueList,
+       Conditional cond, Boolean override)
    {
       if (destField == null || valueList == null)
       {
@@ -39,11 +40,24 @@ public class FieldAssignment
       this.destField = destField;
       this.valueList = valueList;
       this.condition = cond;
+      this.override = override;
    }
 
    public String getDestinationField()
    {
       return destField;
+   }
+
+   public boolean isFieldOverrideOn(GlsResource resource)
+   {
+      if (override == null)
+      {
+         return resource.isAssignOverrideOn();
+      }
+      else
+      {
+         return override.booleanValue();
+      }
    }
 
    public BibValueList getValue(Bib2GlsEntry entry) throws IOException
@@ -106,4 +120,5 @@ public class FieldAssignment
    private String destField;
    private FieldValueList valueList;
    private Conditional condition;
+   private Boolean override;
 }

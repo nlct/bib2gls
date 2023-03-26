@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2022 Nicola L.C. Talbot
+    Copyright (C) 2017-2023 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -17,6 +17,11 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package com.dickimawbooks.bib2gls;
+
+/**
+ * Exception thrown on encountering invalid syntax will parsing
+ * command line options.
+ */
 
 public class Bib2GlsSyntaxException extends Bib2GlsException
 {

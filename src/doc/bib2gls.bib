@@ -2421,6 +2421,13 @@ starred version \csref{glsxtrfmt*}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.locale,
+   name={\csoptfmt{locale}},
+   user1={\meta{lang tag}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.assign-fields,
    name={\csoptfmt{assign\dhyphen fields}},
    user1={\meta{\keyvallist}},
@@ -5380,6 +5387,11 @@ and \L/\l\ treated as L/l},
   text={\code{\&}}
 }
 
+@symbol{ampand,
+  name={\code{\&} (boolean AND)},
+  text={\code{\&}}
+}
+
 @command{cs.amp,
   name={\csfmt{\&}},
   description={produces the ampersand symbol \&},
@@ -5673,11 +5685,6 @@ with forced line breaks in paragraph column formats)},
   text={\code{>}}
 }
 
-@symbol{assign-plus,
-  name={\code{+} (concatenation)},
-  text={\code{+}}
-}
-
 @symbol{gecmp,
   name={\code{>=} (comparison)},
   text={\code{>=}}
@@ -5733,6 +5740,11 @@ with forced line breaks in paragraph column formats)},
   text={\code{+}}
 }
 
+@symbol{assign-plus,
+  name={\code{+} (concatenation)},
+  text={\code{+}}
+}
+
 @symbol{zeroorone,
   name={\code{?} (regular expression, zero or one)},
   text={\code{?}}
@@ -5750,6 +5762,21 @@ with forced line breaks in paragraph column formats)},
 
 @symbol{pipechar,
   name={\code{|}}
+}
+
+@symbol{pipeor,
+  name={\code{|} (boolean OR)},
+  text={\code{|}}
+}
+
+@symbol{colonchar,
+  name={\code{:} (literal)},
+  text={\code{:}}
+}
+
+@symbol{exclamnot,
+  name={\code{!} (boolean NOT)},
+  text={\code{!}}
 }
 
 @symbol{matchanydot,
@@ -15219,7 +15246,7 @@ warning rather than an error if the command isn't already defined},
   category={command}
 }
 
-@glscommand{cs,
+@mainglscommand{cs,
   name={\csfmt{cs}},
   user1={\margm{csname}},
   description={locally defined by \gls{GlsXtrResourceInitEscSequences} to
@@ -15227,11 +15254,11 @@ warning rather than an error if the command isn't already defined},
    options are written to the \ext{aux} file. This technically isn't
    a \bibgls\ \idx{quark}, although it's included in that category, 
    as it's not looked for by \bibgls},
-  topic={quark},
+  topics={quark},
   category={command}
 }
 
-@glscommand{NULL,
+@mainglscommand{NULL,
   name={\csfmt{NULL}},
   user1={},
   description={a \idx{quark} to denote a
@@ -15239,12 +15266,12 @@ warning rather than an error if the command isn't already defined},
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{LC,
+@mainglscommand{LC,
   name={\csfmt{LC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
@@ -15252,12 +15279,12 @@ warning rather than an error if the command isn't already defined},
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{UC,
+@mainglscommand{UC,
   name={\csfmt{UC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
@@ -15265,12 +15292,12 @@ warning rather than an error if the command isn't already defined},
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{FIRSTLC,
+@mainglscommand{FIRSTLC,
   name={\csfmt{FIRSTLC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
@@ -15278,12 +15305,12 @@ warning rather than an error if the command isn't already defined},
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{FIRSTUC,
+@mainglscommand{FIRSTUC,
   name={\csfmt{FIRSTUC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
@@ -15291,12 +15318,12 @@ warning rather than an error if the command isn't already defined},
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{TITLE,
+@mainglscommand{TITLE,
   name={\csfmt{TITLE}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
@@ -15304,209 +15331,209 @@ warning rather than an error if the command isn't already defined},
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{uhex,
+@mainglscommand{uhex,
   name={\csfmt{u}},
   user1={\meta{hex}},
   description={a \idx{quark} that identifies a character by its hexadecimal code in the
     values of some (but not all) resource options},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={hex code quark}
 }
 
-@glscommand{quark.dot,
+@mainglscommand{quark.dot,
   name={\csfmt{.}},
   user1={},
   description={a \idx{quark} that identifies a literal dot (\idx{periodchar}) in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.backslash,
+@mainglscommand{quark.backslash,
   name={\csfmt{\glsbackslash}},
   user1={},
   description={a \idx{quark} that identifies a literal backslash \idx{backslashchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.slash,
+@mainglscommand{quark.slash,
   name={\csfmt{/}},
   user1={},
   description={a \idx{quark} that identifies a literal slash \idx{slashchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.pipe,
+@mainglscommand{quark.pipe,
   name={\csfmt{|}},
   user1={},
   description={a \idx{quark} that identifies a literal pipe character \idx{pipechar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.amp,
+@mainglscommand{quark.amp,
   name={\csfmt{\&}},
   user1={},
   description={a \idx{quark} that identifies a literal ampersand \idx{ampchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.plus,
+@mainglscommand{quark.plus,
   name={\csfmt{+}},
   user1={},
   description={a \idx{quark} that identifies a literal plus \idx{pluschar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.star,
+@mainglscommand{quark.star,
   name={\csfmt{*}},
   user1={},
   description={a \idx{quark} that identifies a literal star \idx{starchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.dollar,
+@mainglscommand{quark.dollar,
   name={\csfmt{\$}},
   user1={},
   description={a \idx{quark} that identifies a literal dollar \idx{dollarchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.circum,
+@mainglscommand{quark.circum,
   name={\csfmt{\char`\^}},
   user1={},
   description={a \idx{quark} that identifies a literal circumflex \idx{circumchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.tilde,
+@mainglscommand{quark.tilde,
   name={\csfmt{\char`\~}},
   user1={},
   description={a \idx{quark} that identifies a literal tilde \idx{tildechar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.openparen,
+@mainglscommand{quark.openparen,
   name={\csfmt{\rangestartmark}},
   user1={},
   description={a \idx{quark} that identifies a literal open parenthesis \idx{openparenchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.closeparen,
+@mainglscommand{quark.closeparen,
   name={\csfmt{\rangeendmark}},
   user1={},
   description={a \idx{quark} that identifies a literal close parenthesis \idx{closeparenchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.opensq,
+@mainglscommand{quark.opensq,
   name={\csfmt{[}},
   user1={},
   description={a \idx{quark} that identifies a literal open square bracket \idx{opensqchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.closesq,
+@mainglscommand{quark.closesq,
   name={\csfmt{]}},
   user1={},
   description={a \idx{quark} that identifies a literal close square bracket \idx{closesqchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.doublequote,
+@mainglscommand{quark.doublequote,
   name={\csfmt{"}},
   user1={},
   description={a \idx{quark} that identifies a literal double-quote \idx{doublequotechar}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={quark}
 }
 
-@glscommand{quark.hyphen,
+@mainglscommand{quark.hyphen,
   name={\csfmt{-}},
   user1={},
   description={a \idx{quark} that identifies a literal hyphen \idx{hyphenchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.question,
+@mainglscommand{quark.question,
   name={\csfmt{?}},
   user1={},
   description={a \idx{quark} that identifies a literal question mark \idx{questionchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.hash,
+@mainglscommand{quark.hash,
   name={\csfmt{\#}},
   user1={},
   description={a \idx{quark} that identifies a literal hash \idx{hashchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }
 
-@glscommand{quark.colon,
+@mainglscommand{quark.colon,
   name={\csfmt{\:}},
   user1={},
-  description={a \idx{quark} that identifies a literal hash
+  description={a \idx{quark} that identifies a literal colon
   \idx{colonchar} in a \idx{regex}},
   note={\bibgls\ \idx{quark}},
-  topic={quark},
+  topics={quark},
   category={command},
   annote={regex quark}
 }

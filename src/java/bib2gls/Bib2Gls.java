@@ -5599,6 +5599,11 @@ public class Bib2Gls implements TeXApp
 
    public Locale getLocale(String langTag)
    {
+      return getLocale(langTag, true);
+   }
+
+   public Locale getLocale(String langTag, boolean warn)
+   {
       try
       {
          return new Locale.Builder().setLanguageTag(langTag).build();
@@ -5612,7 +5617,11 @@ public class Bib2Gls implements TeXApp
             locale = Locale.getDefault();
          }
 
-         warningMessage("warning.invalid.locale", langTag, locale);
+         if (warn)
+         {
+            warningMessage("warning.invalid.locale", langTag, locale);
+         }
+
          return locale;
       }
    }
@@ -6647,8 +6656,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.2.20230325";
-   public static final String DATE = "2023-03-25";
+   public static final String VERSION = "3.2.20230326";
+   public static final String DATE = "2023-03-26";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

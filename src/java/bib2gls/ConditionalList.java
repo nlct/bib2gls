@@ -39,7 +39,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
    public static ConditionalList popCondition(GlsResource resource,
       TeXObjectList stack, int terminator)
-   throws Bib2GlsSyntaxException,IOException
+   throws Bib2GlsException,IOException
    {
       ConditionalList condList = new ConditionalList();
       Bib2Gls bib2gls = resource.getBib2Gls();
@@ -91,25 +91,25 @@ public class ConditionalList extends Vector<ConditionalListElement>
          }
          else if (condList.isEmpty())
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+            throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.condition_in", obj.format(),
                stack.format()));
          }
          else
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+            throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.condition_after",
                obj.format(), condList.toString()));
          }
       }
 
-      throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+      throw new Bib2GlsException(bib2gls.getMessage(
         "error.invalid.condition_missing_end", (char)terminator));
    }
 
    public static Conditional popComparison(GlsResource resource,
      TeXObjectList stack)
-   throws Bib2GlsSyntaxException,IOException
+   throws Bib2GlsException,IOException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
       TeXParser parser = resource.getParser();
@@ -122,7 +122,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       if (obj == null)
       {
-         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+         throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.regexp_or_cmp_condition_missing", 
               field));
       }
@@ -133,7 +133,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       if (nextObj == null)
       {
-         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+         throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.regexp_or_cmp_condition_missing", 
               field+obj.format()));
       }
@@ -215,7 +215,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       }
       else
       {
-         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+         throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.condition_after", 
               obj.format(), field));
       }
@@ -227,7 +227,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
          if (!(rel == Relational.EQUALS || rel == Relational.NOT_EQUALS))
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+            throw new Bib2GlsException(bib2gls.getMessage(
                 "error.invalid.null_condition", 
                  rel, field));
          }
@@ -282,7 +282,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
    }
 
    public static Number popNumber(GlsResource resource, TeXObjectList stack)
-    throws Bib2GlsSyntaxException
+    throws Bib2GlsException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
 
@@ -367,14 +367,14 @@ public class ConditionalList extends Vector<ConditionalListElement>
       }
       catch (NumberFormatException e)
       {// shouldn't happen
-         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+         throw new Bib2GlsException(bib2gls.getMessage(
            "error.invalid.condition", value), e);
       }
    }
 
    public static TeXObjectList popQuoted(GlsResource resource, TeXObjectList stack,
       int terminator)
-    throws Bib2GlsSyntaxException,IOException
+    throws Bib2GlsException,IOException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
       TeXParser parser = resource.getParser();
@@ -396,17 +396,17 @@ public class ConditionalList extends Vector<ConditionalListElement>
          }
       }
 
-      throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+      throw new Bib2GlsException(bib2gls.getMessage(
         "error.invalid.condition_missing_end", (char)terminator));
    }
 
-   protected void validate(GlsResource resource) throws Bib2GlsSyntaxException
+   protected void validate(GlsResource resource) throws Bib2GlsException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
 
       if (isEmpty())
       {
-         throw new Bib2GlsSyntaxException(
+         throw new Bib2GlsException(
            bib2gls.getMessage("error.invalid.empty_condition"));
       }
 
@@ -428,7 +428,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
             if (i == size())
             {
-               throw new Bib2GlsSyntaxException(
+               throw new Bib2GlsException(
                   bib2gls.getMessage("error.invalid.unary_missing",
                     unary, toString()));
             }
@@ -438,7 +438,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
          if (!(elem instanceof Conditional))
          {
-            throw new Bib2GlsSyntaxException(
+            throw new Bib2GlsException(
                bib2gls.getMessage("error.invalid.condition_in", elem, toString()));
          }
 
@@ -454,12 +454,12 @@ public class ConditionalList extends Vector<ConditionalListElement>
          }
          else if (unary == null)
          {
-            throw new Bib2GlsSyntaxException(
+            throw new Bib2GlsException(
                bib2gls.getMessage("error.invalid.binary", cond, toString()));
          }
          else
          {
-            throw new Bib2GlsSyntaxException(
+            throw new Bib2GlsException(
                bib2gls.getMessage("error.invalid.binary", 
                 unary.toString()+cond.toString(), toString()));
          }
@@ -476,7 +476,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
             }
             else
             {
-               throw new Bib2GlsSyntaxException(
+               throw new Bib2GlsException(
                   bib2gls.getMessage("error.invalid.binary", elem, toString()));
             }
          }

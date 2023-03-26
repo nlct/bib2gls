@@ -36,7 +36,7 @@ public class FieldValueList extends Vector<FieldValueElement>
    }
 
    public static FieldValueList pop(GlsResource resource, TeXObjectList stack)
-     throws Bib2GlsSyntaxException,IOException
+     throws Bib2GlsException,IOException
    {
       TeXParser parser = resource.getParser();
       Bib2Gls bib2gls = resource.getBib2Gls();
@@ -115,7 +115,7 @@ public class FieldValueList extends Vector<FieldValueElement>
 
                   if (!substack.isEmpty())
                   {
-                     throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                     throw new Bib2GlsException(bib2gls.getMessage(
                        "error.unexpected_content_in_arg",
                         substack.toString(parser), cs));
                   }
@@ -125,16 +125,28 @@ public class FieldValueList extends Vector<FieldValueElement>
                   popped.addAll(TeXParserUtils.createGroup(parser,
                     parser.getListener().createString(field.toString())));
                }
+               else if (!popped.isEmpty())
+               {
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                     "error.invalid.expected_after",
+                       "> + [", popped.toString(parser), object.toString(parser)));
+               }
                else
                {
-                  throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-                     "error.invalid.condition", object.toString(parser)));
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                     "error.invalid.expected", "> + [", object.toString(parser)));
                }
+            }
+            else if (!popped.isEmpty())
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                  "error.invalid.expected_after",
+                    "> + [", popped.toString(parser), object.toString(parser)));
             }
             else
             {
-               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-                  "error.invalid.condition", object.toString(parser)));
+               throw new Bib2GlsException(bib2gls.getMessage(
+                  "error.invalid.expected", "> + [", object.toString(parser)));
             }
          }
          else if (object instanceof WhiteSpace)
@@ -155,7 +167,7 @@ public class FieldValueList extends Vector<FieldValueElement>
             }
             else
             {
-               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+               throw new Bib2GlsException(bib2gls.getMessage(
                 "error.expected_before_after", "+", 
                  object.toString(parser), popped.toString(parser)));
             }
@@ -179,7 +191,7 @@ public class FieldValueList extends Vector<FieldValueElement>
                }
                else
                {
-                  throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                  throw new Bib2GlsException(bib2gls.getMessage(
                    "error.expected_before_after", "+",
                       object.toString(parser), popped.toString(parser)));
                }
@@ -193,7 +205,7 @@ public class FieldValueList extends Vector<FieldValueElement>
             {
                if (!add)
                {
-                  throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+                  throw new Bib2GlsException(bib2gls.getMessage(
                    "error.expected_before_after", "+", 
                       object.toString(parser), popped.toString(parser)));
                }
@@ -215,22 +227,49 @@ public class FieldValueList extends Vector<FieldValueElement>
                add = false;
                popped.addAll(parser.getListener().createString(field.toString()));
             }
+            else if (!popped.isEmpty())
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                  "error.invalid.expected_after",
+                    "> + [", popped.toString(parser), object.toString(parser)));
+            }
             else
             {
-               throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-                  "error.invalid.condition", object.toString(parser)));
+               throw new Bib2GlsException(bib2gls.getMessage(
+                  "error.invalid.expected", "> + [", object.toString(parser)));
             }
+         }
+         else if (add)
+         {
+            if (!popped.isEmpty())
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                  "error.expected_field_or_string_condition_after",
+                    popped.toString(parser), object.toString(parser)));
+            }
+            else
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                  "error.expected_field_or_string_condition",
+                  object.toString(parser)));
+            }
+         }
+         else if (!popped.isEmpty())
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+               "error.invalid.expected_after",
+                 "> + [", popped.toString(parser), object.toString(parser)));
          }
          else
          {
-            throw new Bib2GlsSyntaxException(bib2gls.getMessage(
-               "error.invalid.condition", object.toString(parser)));
+            throw new Bib2GlsException(bib2gls.getMessage(
+               "error.invalid.expected", "> + [", object.toString(parser)));
          }
       }
 
       if (add && !list.isEmpty())
       {
-         throw new Bib2GlsSyntaxException(bib2gls.getMessage(
+         throw new Bib2GlsException(bib2gls.getMessage(
             "error.expected_field_or_string_after", list.toString()+" + "));
       }
 

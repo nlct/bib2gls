@@ -48,7 +48,8 @@
     note = "A name with a newline" 
        [ name=/.*\string\n.*/ & entrytype > original = "entry"],
     note = "A name with two spaces"
-        [ name=/.*  .*/ & entrytype > original = "entry"]
+        [ name=/.*  .*/ & entrytype > original = "entry"],
+    name =[o] \string\TITLE{ name } [ entrytype > original = "entry"]
   }
 ]
 

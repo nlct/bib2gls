@@ -453,6 +453,11 @@ public class SortSettings
 
    public Locale getLocale()
    {
+      return getLocale(true);
+   }
+
+   public Locale getLocale(boolean warn)
+   {
       if (sortMethod.equals("locale") || sortMethod.equals("locale-reverse"))
       {
          return Locale.getDefault();
@@ -468,7 +473,7 @@ public class SortSettings
             method = method.substring(0, idx);
          }
 
-         return bib2gls.getLocale(method);
+         return bib2gls.getLocale(method, warn);
       }
    }
 
