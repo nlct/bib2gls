@@ -3621,6 +3621,43 @@ public class Bib2Gls implements TeXApp
       return name;
    }
 
+   /**
+    * Returns true if all the prefix fields are defined.
+    * This doesn't necessarily mean that glossaries-prefix.sty has
+    * been loaded, but it likely has been.
+    * @return true if the fields "prefix", "prefixplural",
+    * "prefixfirst" and "prefixfirstplural" are known.
+    */ 
+   public boolean arePrefixFieldsKnown()
+   {
+      boolean prefix = false;
+      boolean prefixplural = false;
+      boolean prefixfirst = false;
+      boolean prefixfirstplural = false;
+
+      for (String field : fields)
+      {
+         if (field.equals("prefix"))
+         {
+            prefix = true;
+         }
+         else if (field.equals("prefixplural"))
+         {
+            prefixplural = true;
+         }
+         else if (field.equals("prefixfirst"))
+         {
+            prefixfirst = true;
+         }
+         else if (field.equals("prefixfirstplural"))
+         {
+            prefixfirstplural = true;
+         }
+      }
+
+      return prefix && prefixplural && prefixfirst && prefixfirstplural;
+   }
+
    public boolean isKnownField(String name)
    {
       if (fields.isEmpty())

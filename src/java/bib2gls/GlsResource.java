@@ -3494,7 +3494,7 @@ public class GlsResource
                tertiaryPrefix == null ? "" : tertiaryPrefix)));
       }
 
-      boolean addDualPrefixes = bib2gls.isKnownField("prefix");
+      boolean addDualPrefixes = bib2gls.arePrefixFieldsKnown();
 
       if (dualEntryMap == null)
       {
