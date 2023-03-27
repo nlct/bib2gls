@@ -19,11 +19,11 @@
   entry-type-aliases={person=index},
   assign-fields=
   {
-    surname = parent > name [ entrytype > original = "person" ],
+    surname = parent -> name [ entrytype -> original = "person" ],
     first = title + " " + forename + " " + surname
-      [ entrytype > original = "person" & title = "Sir" ],
+      [ entrytype -> original = "person" & title = "Sir" ],
     text = title + " " + forename
-      [ entrytype > original = "person" & title = "Sir" ],
+      [ entrytype -> original = "person" & title = "Sir" ],
     text = forename + " " + surname,
     name = title + { } + forename + {, } + rank + ",  \qt{" + nickname + "} ("
              + note + ")",
@@ -44,12 +44,12 @@
     name = title + " " + forename,
     name = forename,
     note = "A name with a tab"
-       [ name=/.*\string\t.*/ & entrytype > original = "entry"],
+       [ name=/.*\string\t.*/ & entrytype -> original = "entry"],
     note = "A name with a newline" 
-       [ name=/.*\string\n.*/ & entrytype > original = "entry"],
+       [ name=/.*\string\n.*/ & entrytype -> original = "entry"],
     note = "A name with two spaces"
-        [ name=/.*  .*/ & entrytype > original = "entry"],
-    name =[o] \string\TITLE{ name } [ entrytype > original = "entry"]
+        [ name=/.*  .*/ & entrytype -> original = "entry"],
+    name =[o] \string\TITLE{ name } [ name <> \string\NULL & entrytype -> original = "entry" ]
   }
 ]
 

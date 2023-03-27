@@ -88,7 +88,10 @@ public class Field implements FieldValueElement
          else if (!(bib2gls.isKnownField(name)
                     || bib2gls.isKnownSpecialField(name)
                     || bib2gls.isNonBibField(name)
-                    ))
+                    || name.equals("entrytype")
+                    || name.equals("entrylabel")
+                    || name.equals("original")
+                    || name.equals("actual")))
          {
             resource.addUserField(name);
          } 
@@ -338,6 +341,11 @@ public class Field implements FieldValueElement
       String tag = null;
       Field field = null;
 
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage("Parsing field from "+stack.toString(parser));
+      }
+
       while (!stack.isEmpty())
       {
          TeXObject object = stack.peek();
@@ -357,7 +365,24 @@ public class Field implements FieldValueElement
          {
             int cp = ((SingleToken)object).getCharCode();
 
-            if (cp == '>')
+            boolean isFollow = false;
+
+            if (cp == FOLLOW_MARKER.charAt(0) && stack.size() > 1)
+            {
+               TeXObject nextObj = stack.get(1);
+
+               if (nextObj instanceof SingleToken)
+               {
+                  int nextCp = ((SingleToken)nextObj).getCharCode();
+
+                  if (nextCp == FOLLOW_MARKER.charAt(1))
+                  {
+                     isFollow = true;
+                  }
+               }
+            }
+
+            if (isFollow)
             {
                if (current.length() > 0)
                {
@@ -396,10 +421,15 @@ public class Field implements FieldValueElement
 
                tag = null;
 
-               full.append('>');
+               full.append(FOLLOW_MARKER);
+               stack.pop();
                stack.pop();
             }
-            else if (cp == ',' || cp == '=' || tag != null)
+            else if (cp == ',' || cp == '=' || cp == '<' || cp == '>'
+                    || cp == '+' || cp == '[' || cp == ']'
+                    || cp == '('  || cp == ')'
+                    || cp == '!' || cp == '&' || cp == '|'
+                    || tag != null)
             {
                break;
             }
@@ -481,11 +511,11 @@ public class Field implements FieldValueElement
    {
       if (follow == null)
       {
-         return fieldRef.getTag()+" > "+name;
+         return fieldRef.getTag()+" " + FOLLOW_MARKER + " "+name;
       }
       else
       {
-         return fieldRef.getTag()+" > "+follow.toString();
+         return fieldRef.getTag()+" " + FOLLOW_MARKER + " "+follow.toString();
       }
    }
 
@@ -494,4 +524,6 @@ public class Field implements FieldValueElement
    private String name;
    private Field follow;
    private FieldCaseChange caseChange = FieldCaseChange.NO_CHANGE;
+
+   public static final String FOLLOW_MARKER = "->";
 }

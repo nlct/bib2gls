@@ -4402,7 +4402,7 @@ spaces, commas (\idx{commasep}), equal signs (\idx{equalsassign}) or
 any other character that isn't supported by the \ext{bib} format.
 Additionally, if you want to use \csopt{assign-fields}, ensure
 that you don't use any of the assignment special characters, such as
-plus (\idx{assign-plus}) and greater than (\idx{follow}), within any
+plus (\idx{assign-plus}), within any
 field names.
 \end{important}
 
@@ -12460,7 +12460,7 @@ need the override setting on. For example:
 \begin{codeenv}
 \csopt[
  \field{name} =\oarg{o} \gls{TITLE}\marg{ \field{name} }
-   \oarg{ entrytype \idx{follow} original = "entry" }
+   \oarg{ entrytype \idx{follow} original = \qtdelim{entry} }
 ]{assign-fields}
 \end{codeenv}
 This will convert the \field{name} field to \idx{titlecase} for

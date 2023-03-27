@@ -107,14 +107,29 @@ public class FieldAssignment
    @Override
    public String toString()
    {
-      if (condition == null)
+      StringBuilder builder = new StringBuilder();
+
+      builder.append(destField);
+      builder.append(" = ");
+
+      for (int i = 0; i < valueList.size(); i++)
       {
-         return String.format("%s = %s", destField, valueList);
+         if (i > 0)
+         {
+            builder.append(" + ");
+         }
+
+         builder.append(valueList.get(i));
       }
-      else
+
+      if (condition != null)
       {
-         return String.format("%s = %s [ %s ]", destField, valueList, condition);
+         builder.append(" [ ");
+         builder.append(condition);
+         builder.append(" ] ");
       }
+
+      return builder.toString();
    }
 
    private String destField;
