@@ -124,9 +124,9 @@ public class GlsResource
    {
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
-      sortSettings = new SortSettings("resource", bib2gls);
-      dualSortSettings = new SortSettings(bib2gls);
-      secondarySortSettings = new SortSettings(bib2gls);
+      sortSettings = new SortSettings("resource", this);
+      dualSortSettings = new SortSettings(this);
+      secondarySortSettings = new SortSettings(this);
 
       TeXPath texPath = new TeXPath(parser, 
         glstexBasename.toString(parser), "glstex", false);

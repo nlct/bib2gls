@@ -31,15 +31,16 @@ import java.text.SimpleDateFormat;
 
 public class SortSettings
 {
-   public SortSettings(Bib2Gls bib2gls)
+   public SortSettings(GlsResource resource)
    {
-      this(null, bib2gls);
+      this(null, resource);
    }
 
-   public SortSettings(String method, Bib2Gls bib2gls)
+   public SortSettings(String method, GlsResource resource)
    {
       setMethod(method);
-      this.bib2gls = bib2gls;
+      this.resource = resource;
+      this.bib2gls = resource.getBib2Gls();
    }
 
    public static boolean isValidSortMethod(String method)
@@ -456,7 +457,7 @@ public class SortSettings
    {
       if (sortMethod.equals("resource") || sortMethod.equals("resource-reverse"))
       {
-         return bib2gls.getCurrentResource().getResourceLocale();
+         return resource.getResourceLocale();
       }
       else if (sortMethod.equals("locale") || sortMethod.equals("locale-reverse"))
       {
@@ -481,7 +482,7 @@ public class SortSettings
    {
       if (dateLocale.equals("resource"))
       {
-         return bib2gls.getCurrentResource().getResourceLocale();
+         return resource.getResourceLocale();
       }
       else if (dateLocale.equals("locale"))
       {
@@ -502,7 +503,7 @@ public class SortSettings
    {
       if (numberLocale.equals("resource"))
       {
-         return bib2gls.getCurrentResource().getResourceLocale();
+         return resource.getResourceLocale();
       }
       else if (numberLocale.equals("locale"))
       {
@@ -850,7 +851,7 @@ public class SortSettings
          }
       }
 
-      SortSettings settings = new SortSettings(method, bib2gls);
+      SortSettings settings = new SortSettings(method, resource);
 
       settings.setSortField(sortField);
 
@@ -947,4 +948,5 @@ public class SortSettings
    private boolean breakAtMatchAnd = true;
 
    private Bib2Gls bib2gls;
+   private GlsResource resource;
 }
