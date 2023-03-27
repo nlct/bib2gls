@@ -5023,6 +5023,11 @@ public class GlsResource
       if (resourceLocale == null)
       {
          resourceLocale = bib2gls.getDefaultLocale();
+
+         if (resourceLocale == null)
+         {
+            return Locale.getDefault();
+         }
       }
 
       return resourceLocale;
