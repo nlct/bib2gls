@@ -124,7 +124,7 @@ public class GlsResource
    {
       bib2gls = (Bib2Gls)parser.getListener().getTeXApp();
 
-      sortSettings = new SortSettings("doc", bib2gls);
+      sortSettings = new SortSettings("resource", bib2gls);
       dualSortSettings = new SortSettings(bib2gls);
       secondarySortSettings = new SortSettings(bib2gls);
 
@@ -2793,7 +2793,13 @@ public class GlsResource
          }
          else if (opt.equals("locale"))
          {
+            resourceLocale = null;
             resourceLocale = getLocale(list, opt);
+
+            if (resourceLocale != null)
+            {
+               bib2gls.verboseMessage("message.resource_locale", resourceLocale);
+            }
          }
          else if (opt.equals("interpret-fields"))
          {
@@ -4975,8 +4981,8 @@ public class GlsResource
     * Gets the (optional locale) value assigned to the given setting.
     * The value is optional and will have leading and trailing
     * spaces removed. The value should be a valid ISO language tag
-    * or the keywords "doc" or "locale". A missing value corresponds
-    * to "locale". A return value of null indicates the default
+    * or the keywords "doc" or "locale" or "resource". A missing value corresponds
+    * to "resource". A return value of null indicates the default
     * locale, according to the JVM.
     * @param list the key=value setting list
     * @param opt the name of the setting
@@ -4988,7 +4994,11 @@ public class GlsResource
    {
       String value = getOptional(list, opt);
 
-      if (value == null || "locale".equals(value))
+      if (value == null || "resource".equals(value))
+      {
+         return getResourceLocale();
+      }
+      else if ("locale".equals(value))
       {
          return null;
       }
@@ -5005,15 +5015,14 @@ public class GlsResource
 
    /**
     * Gets the default locale for this resource set.
-    * This will be the primary sort locale, if a locale-sensitive
-    * sort comparison has been selected, otherwise it will be
-    * Bib2Gls's default locale.
+    * A return value of null indicates the default
+    * locale, according to the JVM.
     */ 
    public Locale getResourceLocale()
    {
       if (resourceLocale == null)
       {
-         resourceLocale = sortSettings.getLocale(false);
+         resourceLocale = bib2gls.getDefaultLocale();
       }
 
       return resourceLocale;

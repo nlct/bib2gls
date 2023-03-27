@@ -159,6 +159,8 @@ file is in or in a location that can be found by kpsewhich.</entry>
 (Original entry: @{1}{2}. This entry: @{3}{4})</entry>
 <entry key="message.entry.lost.field">Entry ''{0}'' has lost its ''{1}'' field.</entry>
 
+<entry key="message.resource_locale">Resource locale: {0}.</entry>
+
 <entry key="message.log.file">Transcript written to {0}.</entry>
 <entry key="message.written">{0} written to {1}.</entry>
 <entry key="message.written.total">{0} written in total.</entry>

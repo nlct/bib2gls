@@ -59,6 +59,7 @@ public class SortSettings
       if (method.equals("use")
        || method.equals("doc")
        || method.equals("locale")
+       || method.equals("resource")
        || method.equals("custom"))
       {
          return true;
@@ -453,12 +454,11 @@ public class SortSettings
 
    public Locale getLocale()
    {
-      return getLocale(true);
-   }
-
-   public Locale getLocale(boolean warn)
-   {
-      if (sortMethod.equals("locale") || sortMethod.equals("locale-reverse"))
+      if (sortMethod.equals("resource") || sortMethod.equals("resource-reverse"))
+      {
+         return bib2gls.getCurrentResource().getResourceLocale();
+      }
+      else if (sortMethod.equals("locale") || sortMethod.equals("locale-reverse"))
       {
          return Locale.getDefault();
       }
@@ -473,13 +473,17 @@ public class SortSettings
             method = method.substring(0, idx);
          }
 
-         return bib2gls.getLocale(method, warn);
+         return bib2gls.getLocale(method);
       }
    }
 
    public Locale getDateLocale()
    {
-      if (dateLocale.equals("locale"))
+      if (dateLocale.equals("resource"))
+      {
+         return bib2gls.getCurrentResource().getResourceLocale();
+      }
+      else if (dateLocale.equals("locale"))
       {
          return Locale.getDefault();
       }
@@ -496,7 +500,11 @@ public class SortSettings
 
    public Locale getNumberLocale()
    {
-      if (numberLocale.equals("locale"))
+      if (numberLocale.equals("resource"))
+      {
+         return bib2gls.getCurrentResource().getResourceLocale();
+      }
+      else if (numberLocale.equals("locale"))
       {
          return Locale.getDefault();
       }
@@ -877,9 +885,9 @@ public class SortSettings
    private String sortMethod=null;
    private String sortField="sort";
    private String collationRule=null;
-   private String dateLocale="locale";
+   private String dateLocale="resource";
    private String dateFormat=null;
-   private String numberLocale="locale";
+   private String numberLocale="resource";
    private String numberFormat=null;
 
    private String docLocale;

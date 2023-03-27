@@ -403,12 +403,32 @@
 
 @entry{resource-locale,
   name = {resource locale},
+  user1={idx.locale-resource},
   description={the default locale for the given \gls{resourceset}.
-  This will be the locale identified by \csopt{sort}, if an
-  alphabetical sort has been specified, or will be \bibgls's default
-  locale if a non-alphabetical sort method or the custom sort method
-  has been chosen, which may be the document locale or the \idx{JRE}
-  locale}
+  This can be set with the \csopt{locale} resource option. If not
+  explicitly set, then the default will be the document language, if
+  it has been detected by \sty{tracklang} or identified with
+  \longarg{locale}, or the \idx{JRE} locale otherwise.}
+}
+
+@entry{document-locale,
+  name = {document locale},
+  user1={idx.locale-doc},
+  description={the locale associated with the document
+  language (or by \longarg{locale}, if no document language has been
+  detected). In the case of a multi-lingual document, this
+  is the locale of the last language resource file to be loaded through
+  \isty{tracklang}'s interface. It's best to explicitly set the locale
+  for multi-lingual documents to avoid confusion (either with
+  the \csopt{locale} or as a language tag in options such as
+  \csopt{sort}).}
+}
+
+@entry{Java-locale,
+  name = {Java locale},
+  user1={idx.locale-Java},
+  description={the default locale for the \idx{JRE}, which usually
+  matches the operating system's locale.}
 }
 
 @entry{crossresourceref,

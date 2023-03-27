@@ -2463,7 +2463,7 @@ called \metafilefmt{bib2gls-}{lang}{.xml}, where \meta{lang} is a
 valid \idx{IETF} language tag.
 
 The appropriate file is searched for in the following order, where
-\meta{locale} is the operating system's locale or the value supplied
+\meta{locale} is the \gls{Java-locale} or the value supplied
 by the \longarg{locale} switch:
 \begin{enumerate}
 \item \meta{lang} exactly matches \meta{locale}.
@@ -2496,6 +2496,9 @@ doesn't match the document language, you will have to manually set
 the correct translation (in English, this would be
 \csopt[Page\dcomma Pages]{loc-prefix}). The default definition of
 \gls!{bibglspassim} is also obtained from the resource file.
+
+There are also keys in the resource file to assist case-conversion.
+Currently, there's only support for the Dutch \qt{IJ} case.
 
 \section{Conditional Document Build}
 
@@ -3136,14 +3139,18 @@ Synonym of \longarg{quiet}.
 Specify the preferred \langxml, where \meta{lang} is a valid \idx{IETF} language tag.
 This option requires an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
 resource file otherwise \bibgls\ will fallback on English.
-This also sets the default document locale when \csopt[doc]{sort} is
+This also sets the default \gls{document-locale} when the \optfmt{doc}
+keyword (in options such as \csopt[doc]{sort}) is
 used and the document doesn't have any language support.
-Note that \csopt[locale]{sort} uses the \idx{JVM}['s] default
-locale and is not governed by this switch.
+Note that the \optfmt{locale} keyword (in options such as \csopt[locale]{sort})
+uses the \gls{Java-locale} and is not governed by this switch.
 
 If a document doesn't have any locale support or has support
 for more than one language then it's best to explicitly set
-the required locale in the appropriate \idx{resourceset}.
+the required locale in the appropriate \idx{resourceset} using
+the \csopt{locale} resource option, to specify the default
+\gls{resource-locale}, or set the locale for individual options,
+such as \csopt{sort}.
 
 \argsection{group}
 
@@ -7463,18 +7470,11 @@ file.
 
 \optsection{locale}
 
-Currently, this is only used by case-changing functions, such as
-\gls{UC}, where the actual case-change is applied by \bibgls\ rather
-than deferring it to \LaTeX. The default locale for the \gls{resourceset}
-is taken from the locale supplied in the \csopt{sort} method,
-if an alphabetical (non-custom) method has been chosen. If the
-\csopt{sort} method isn't linked to a locale, then the default
-locale is assumed to the default locale for the document. If that
-isn't set, then the default is assumed to be the same as the default
-locale for the JVM.
-
-In the event that the default isn't applicable, you can use the
-\csopt{locale} option to set it for the current \gls{resourceset}.
+Sets the default \glsdisp{resource-locale}{locale} for the current
+\gls{resourceset}. In general, it's best to set this at the start of
+the resource option list, if required. If not set, the default 
+will be the \gls{document-locale}, if supplied, otherwise the 
+\gls{Java-locale} will be used.
 
 \optsection{interpret-preamble}
 
@@ -10383,10 +10383,13 @@ below) as an argument (not a string or concatenation). This doesn't
 alter the referenced field but converts the value obtained from the
 reference for use in the concatenation. Note that the case-change is
 performed by \bibgls\ not by inserting \LaTeX\ case-changing
-commands into the code.  The case-change recognises the
-\gls{resource-locale}, but whether or not it recognises the correct
-rules for the locale depends on whether or not the locale is
-correctly supported by the Java locale provider.
+commands into the code. 
+
+The case-changing functions will use the \gls{resource-locale}, but
+whether or not \bibgls\ recognises the correct rules for the locale
+depends on whether or not the locale is correctly supported by the
+Java locale provider. The \langxml\ may provide assistance with
+case-conversion.
 
 \begin{itemize}
 \item \inlinedef{LC} converts the value obtained from the field
@@ -12352,6 +12355,12 @@ There are two forms of modification: the field is adjusted so that
 the original value is encapsulated by a command or \bibgls\ will
 perform the actual \idx{case-change} according to its own algorithm.
 The results can vary according to the field content.
+
+Where \bibgls\ itself performs the case change, its case-changing
+functions will use the \gls{resource-locale}, but whether or not
+\bibgls\ recognises the correct rules for the locale depends on
+whether or not the locale is correctly supported by the Java locale
+provider. The \langxml\ may provide assistance with case-conversion.
 
 Each of the case-changing resource options may take one of the
 following values:
@@ -15093,10 +15102,24 @@ command definitions for the \bibgls\ interpreter and load it with
 \optsection{sort}
 
 The \csopt{sort} key indicates how \glspl{primaryentry} should be sorted.
-If the \meta{value} is omitted, \csopt[doc]{sort} is assumed. If the
-\csopt{sort} option isn't used then \csopt[doc]{sort} is assumed if the 
-document has a language that's been detected by \sty{tracklang}, 
-otherwise \csopt[locale]{sort} is assumed.
+If the \meta{value} is omitted, \csopt[resource]{sort} is assumed. 
+Note the differences between the keywords \optfmt{resource},
+\optfmt{doc} and \optfmt{locale}:
+\begin{description}
+\item[\optfmt{resource}] The default \gls{resource-locale}, which
+can be specified with the \csopt{locale} option. If that option
+hasn't been set, then \optfmt{resource} will be equivalent to
+\optfmt{doc}. This option is new to \bibgls\ v3.3. Previous versions
+had \csopt[doc]{sort} as the default.
+
+\item[\optfmt{doc}] The \gls{document-locale} if it has been detected by
+\sty{tracklang}. If no document language has been detected (or
+identified with \longarg{locale}), then
+\optfmt{doc} will be equivalent to \optfmt{locale}.
+
+\item[\optfmt{locale}] The default \gls{Java-locale}.
+
+\end{description}
 
 The \optfmt{\meta{method}\dhyphen reverse} options reverse the
 result returned by the corresponding \meta{method} comparator.
@@ -15129,14 +15152,17 @@ can affect the order.
 \begin{tabular}{ll}
 \meta{lang tag} & sort according to this language tag\tabularnewline
 \meta{lang tag}\optfmt{-reverse} & reverse sort according to this language tag\tabularnewline
-\optfmt{doc} & sort according to the document
-language\tabularnewline
-\optfmt{doc-reverse} & reverse sort according to the document
-language\tabularnewline
+\optfmt{resource} & sort according to the default
+\gls{resource-locale}\tabularnewline
+\optfmt{resource-reverse} & reverse sort according to the default
+\gls{resource-locale}\tabularnewline
+\optfmt{doc} & sort according to the \gls{document-locale}\tabularnewline
+\optfmt{doc-reverse} & reverse sort according to the 
+\gls{document-locale}\tabularnewline
 \optfmt{locale} & sort according to the default
-locale\tabularnewline
+\gls{Java-locale}\tabularnewline
 \optfmt{locale-reverse} & reverse sort according to the default
-locale\tabularnewline
+\gls{Java-locale}\tabularnewline
 \optfmt{custom} & sort according to \csopt[\meta{custom
 rule}]{sort-rule}\tabularnewline
 \optfmt{custom-reverse} & reverse sort according to \csopt[\meta{custom rule}]{sort-rule}
@@ -15394,23 +15420,31 @@ given by the \idx{IETF} language tag \meta{lang tag}.
 \item \meta{lang tag}\optfmt{-reverse}: reverse sort according to the rules of the locale
 given by the \idx{IETF} language tag \meta{lang tag}.
 
+\item \optfmt{resource}: equivalent to 
+\csopt[\meta{lang tag}]{sort} where \meta{lang tag} is obtained
+from the default \gls{resource-locale}.
+
+\item \optfmt{resource-reverse}: equivalent to 
+\csopt[\meta{lang tag}-reverse]{sort} where \meta{lang tag} is obtained
+from the default \gls{resource-locale}.
+
 \item \optfmt{locale}: equivalent to 
 \csopt[\meta{lang tag}]{sort} where \meta{lang tag} is obtained
-from the \idx{JRE}['s] default locale (which usually matches the
+from the \gls{Java-locale} (which usually matches the
 operating system's locale).
 
 \item \optfmt{locale-reverse}: equivalent to 
 \csopt[\meta{lang tag}-reverse]{sort} where \meta{lang tag} is obtained
-from the \idx{JRE}.
+from the \gls{Java-locale}.
 
-\item \optfmt{doc}: sort the entries according to the document
-language. This is equivalent to \csopt[\meta{lang tag}]{sort}
+\item \optfmt{doc}: sort the entries according to the
+\gls{document-locale}. This is equivalent to \csopt[\meta{lang tag}]{sort}
 where \meta{lang tag} is the locale associated with the document
 language. In the case of a multi-lingual document, \meta{lang tag}
 is the locale of the last language resource file to be loaded through
 \isty{tracklang}'s interface. It's best to explicitly set the locale
-for multi-lingual documents to avoid confusion. If no languages have been tracked, this
-option is equivalent to \csopt[locale]{sort}.
+for multi-lingual documents to avoid confusion. If no document
+language has been set, this option is equivalent to \csopt[locale]{sort}.
 
 \item \optfmt{doc-reverse}: as \optfmt{doc} but in reverse order.
 
@@ -15446,8 +15480,11 @@ only likely to cause a difference if a language has different
 sorting rules according to the region or if the language may be
 written in multiple scripts.
 
-If no language package is loaded then the default is \csopt[locale]{sort}
-rather than \csopt[doc]{sort}. For example, with:
+If no \gls{document-locale} has been set and the
+\csopt{locale} resource option hasn't been used 
+then the \csopt[resource]{sort} and \csopt[doc]{sort} 
+will be equivalent to \csopt[locale]{sort}.
+For example, with:
 \begin{codeenv}
 \cmd{documentclass}\marg{article}
 \cmd{usepackage}\oarg{\styopt{record}}\marg{glossaries}
@@ -15463,6 +15500,12 @@ For example:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{\csopt[english-terms]{src},\csopt[en-GB]{sort}}
 \gls{GlsXtrLoadResources}\oarg{\csopt[german-terms]{src},\csopt[de-DE-1996]{sort}}
+\end{codeenv}
+
+Alternatively (as from \bibgls\ v3.3), use \csopt{locale}:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{\csopt[en-GB]{locale},\csopt[english-terms]{src}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[de-DE-1996]{locale},\csopt[german-terms]{src}}
 \end{codeenv}
 
 \subsubsection{Letter (Non Locale)}
@@ -17553,12 +17596,14 @@ for \csopt{secondary}.
 If you use any of the locale-sensitive numeric sort methods
 described in \sectionref{sec:numerical},
 such as \csopt[numeric]{sort}, use this option to set
-the locale. The value may be:
+the locale if the default \gls{resource-locale} isn't appropriate. The value may be:
 \begin{itemize}
-\item\optfmt{locale}: use Java's default locale (which is usually
-the operating system's locale);
-\item\optfmt{doc}: use the document's locale or, if not set, assume
+\item\optfmt{resource}: use the default \gls{resource-locale}, if
+set, otherwise assume \optfmt{doc};
+\item\optfmt{doc}: use the \gls{document-locale} or, if not set, assume
 \csopt[locale]{numeric-locale};
+\item\optfmt{locale}: use the \gls{Java-locale} (which is usually
+the operating system's locale);
 \item\meta{lang-tag}: set to the locale identified by the given
 a valid language tag \meta{lang-tag}.
 \end{itemize}
@@ -17566,18 +17611,31 @@ Use \csopt{dual-numeric-locale} for
 \csopt{dual-sort} and \csopt{secondary-numeric-locale} 
 for \csopt{secondary}.
 
+\begin{important}
+If you use the \csopt{locale} resource option with \csopt[resource]{numeric-locale},
+then the \csopt{locale} option must be come before
+\csopt{numeric-locale}.
+\end{important}
+
 \optsection{date-sort-locale}
 
 If you use a date/time sort method (\tableref{tab:sortoptionsdatetime}), 
 then you can set the locale used by Java's date-time parser.
-The default setting is \csopt[locale]{date-sort-locale}.
+The default setting is \csopt[resource]{date-sort-locale}.
 
-The value may be \optfmt{locale} (use Java's default locale),
-\optfmt{doc} (use the document's locale) or a valid language tag
-\meta{lang-tag} identifying the locale.
+The value may be \optfmt{resource} (use the \gls{resource-locale}),
+\optfmt{doc} (use the \gls{document-locale}),
+\optfmt{locale} (use the \gls{Java-locale}),
+or a valid language tag \meta{lang-tag} identifying the locale.
 
 Use \csopt{dual-date-sort-locale} and \csopt{secondary-date-sort-locale}
 for the dual and secondary.
+
+\begin{important}
+If you use the \csopt{locale} resource option with \csopt[resource]{date-sort-locale},
+then the \csopt{locale} option must be come before
+\csopt{date-sort-locale}.
+\end{important}
 
 \optsection{date-sort-format}
 
@@ -18395,7 +18453,7 @@ will combine the dual entries with the \glspl{primaryentry} and sort them
 all according to the \optfmt{en-GB} locale (British English).
 
 If not set, \csopt{dual-sort} defaults to \optfmt{combine}. If
-\meta{value} is omitted, \optfmt{locale} is assumed.
+\meta{value} is omitted, \optfmt{resource} is assumed.
 
 \optsection[\subsubsection]{dual-sort-field}
 
