@@ -2349,6 +2349,10 @@ assignment value syntax of \csopt{assign-fields} to apply a
 case-conversion to value obtained from the referenced field:
 \gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
 
+\item[Comparators] The conditional part of the \csopt{assign-fields}
+syntax recognises \gls{IN} and \gls{NIN} as indicating \qt{is a
+substring of} and \qt{is not a substring of}, respectively.
+
 \item[Null value] The conditional part of the \csopt{assign-fields}
 syntax recognises \gls{NULL} as indicating a null value for \idx{equalscmp}
 and \idx{notequalscmp} comparisons.
@@ -10344,9 +10348,10 @@ assignment. The \meta{override} value may be either \qtt{o}
 
 The \oargm{condition} part is optional. The \meta{assign-specs}
 are a \idx{assign-plus} separated list of field references or
-delimited strings. A field reference may be marked up with case-\idx{quark}
-and the conditional part may use the NULL-\idx{quark} in equal and
-not equal comparisons.
+delimited strings. A field reference may be marked up with a case-\idx{quark},
+and the conditional part may use the \gls{NULL}-\idx{quark} in equal and
+not equal comparisons, and the \gls{IN} or \gls{NIN} \idxpl{quark} in
+substring and not substring conditions.
 
 Note that, unlike most \keyval\ elements, the value part (\meta{assign-specs}
 \oargm{condition}) should not be grouped. The \csopt{assign-fields}
@@ -10639,6 +10644,21 @@ value obtained from the field reference \meta{field-ref2}.
 \end{codeenv*}
 Evaluates to true if the value is lexicographically greater than or
 equal to the value obtained from the field reference \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\inlinedef{IN}\meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is a substring of the value obtained
+from the field reference \meta{field-ref2}. If the \meta{field-ref}
+value is empty or missing it's considered not a substring regardless
+of the value of \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref}\inlinedef{NIN}\meta{field-ref2}
+\end{codeenv*}
+The negation of the \gls{IN} test. Evaluates to true if the value is
+not a substring of the value obtained from the field reference
+\meta{field-ref2}.
 
 For example, suppose I have defined the custom fields
 \fieldfmt{surname} and \fieldfmt{forename}, and I have the following

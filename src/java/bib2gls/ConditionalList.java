@@ -129,6 +129,25 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       stack.popLeadingWhiteSpace();
 
+      if (obj instanceof ControlSequence)
+      {
+         String name = ((ControlSequence)obj).getName();
+ 
+         if (name.equals("IN"))
+         {
+            return new FieldInField(field, Field.popField(resource, stack));
+         }
+         else if (name.equals("NIN"))
+         {
+            return new FieldInField(field, Field.popField(resource, stack), true);
+         }
+         else
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+                "error.invalid.condition_after", obj.format(), field));
+         }
+      }
+
       TeXObject nextObj = stack.peek();
 
       if (nextObj == null)
