@@ -95,7 +95,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
          {
             throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.condition_in", obj.toString(parser),
-               stack.toString(parser)));
+               bib2gls.toTruncatedString(parser, stack)));
          }
          else
          {
@@ -128,8 +128,6 @@ public class ConditionalList extends Vector<ConditionalListElement>
              "error.invalid.regexp_or_cmp_condition_missing", 
               field));
       }
-
-      stack.popLeadingWhiteSpace();
 
       if (obj instanceof ControlSequence)
       {
@@ -167,6 +165,8 @@ public class ConditionalList extends Vector<ConditionalListElement>
                 "error.invalid.condition_after", obj.toString(parser), field));
          }
       }
+
+      stack.popLeadingWhiteSpace();
 
       TeXObject nextObj = stack.peek();
 
@@ -226,12 +226,14 @@ public class ConditionalList extends Vector<ConditionalListElement>
          {
             rel = Relational.LE;
             obj = stack.pop();
+            stack.popLeadingWhiteSpace();
             nextObj = stack.peek();
          }
          else if (nextCp == '>')
          {
             rel = Relational.NOT_EQUALS;
             obj = stack.pop();
+            stack.popLeadingWhiteSpace();
             nextObj = stack.peek();
          }
          else
@@ -245,6 +247,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
          {
             rel = Relational.GE;
             obj = stack.pop();
+            stack.popLeadingWhiteSpace();
             nextObj = stack.peek();
          }
          else
