@@ -44,6 +44,8 @@ public class ConditionalList extends Vector<ConditionalListElement>
       ConditionalList condList = new ConditionalList();
       Bib2Gls bib2gls = resource.getBib2Gls();
 
+      TeXParser parser = resource.getBibParser();
+
       while (!stack.isEmpty())
       {
          TeXObject obj = stack.peek();
