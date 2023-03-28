@@ -40,6 +40,7 @@ public class FieldInField implements Conditional
 
    public boolean booleanValue(Bib2GlsEntry entry)
    {
+      Bib2Gls bib2gls = entry.getBib2Gls();
       boolean result;
 
       String fieldValue1 = null;
@@ -51,7 +52,7 @@ public class FieldInField implements Conditional
       }
       catch (IOException e)
       {
-         entry.getBib2Gls().debug(e);
+         bib2gls.debug(e);
       }
 
       if (fieldValue1 == null || fieldValue1.isEmpty())
@@ -66,7 +67,7 @@ public class FieldInField implements Conditional
          }
          catch (IOException e)
          {
-            entry.getBib2Gls().debug(e);
+            bib2gls.debug(e);
          }
 
          if (fieldValue2 == null)
@@ -77,7 +78,22 @@ public class FieldInField implements Conditional
          result = fieldValue2.contains(fieldValue1);
       }
 
-      return negate ? !result : result;
+      if (negate)
+      {
+         result = !result;
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           String.format(
+            "Entry: %s%nCondition: %s%nValue 1: \"%s\"%nValue 2: \"%s\"%nResult: %s",
+              entry, toString(), fieldValue1, fieldValue2, result
+           )
+         );
+      }
+
+      return result;
    }
 
    @Override

@@ -530,6 +530,12 @@ public class ConditionalList extends Vector<ConditionalListElement>
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
 
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           "Entry: "+entry+". Evaluating condition group: "+toString());
+      }
+
       if (isEmpty())
       {// errors should already be caught by validate()
          bib2gls.debugMessage("error.invalid.empty_condition");
@@ -625,6 +631,13 @@ public class ConditionalList extends Vector<ConditionalListElement>
                return false;
             }
          }
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           "Entry: "+entry+". Result from condition group: "
+              +toString()+" : "+result);
       }
 
       return result.booleanValue();

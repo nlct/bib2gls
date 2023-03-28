@@ -32,16 +32,30 @@ public class FieldNullMatch implements Conditional
 
    public boolean booleanValue(Bib2GlsEntry entry) throws IOException
    {
+      Bib2Gls bib2gls = entry.getBib2Gls();
       BibValue value = field.getValue(entry);
+      boolean result;
 
       if (value == null)
       {
-         return equals ? true : false;
+         result = equals ? true : false;
       }
       else
       {
-         return equals ? false : true;
+         result = equals ? false : true;
       }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           String.format(
+             "Entry: %s%nCondition: %s%nValue: %s%nResult: %s",
+              entry, toString(), value, result
+           )
+         );
+      }
+
+      return result;
    }
 
    @Override

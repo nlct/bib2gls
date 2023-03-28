@@ -35,6 +35,7 @@ public class FieldFieldMatch implements Conditional
 
    public boolean booleanValue(Bib2GlsEntry entry)
    {
+      Bib2Gls bib2gls = entry.getBib2Gls();
       String fieldValue1 = null;
       String fieldValue2 = null;
 
@@ -44,7 +45,7 @@ public class FieldFieldMatch implements Conditional
       }
       catch (IOException e)
       {
-         entry.getBib2Gls().debug(e);
+         bib2gls.debug(e);
       }
 
       if (fieldValue1 == null)
@@ -58,7 +59,7 @@ public class FieldFieldMatch implements Conditional
       }
       catch (IOException e)
       {
-         entry.getBib2Gls().debug(e);
+         bib2gls.debug(e);
       }
 
       if (fieldValue2 == null)
@@ -66,6 +67,23 @@ public class FieldFieldMatch implements Conditional
          fieldValue2 = "";
       }
 
+      boolean result = compare(fieldValue1, fieldValue2);
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           String.format(
+             "Entry: %s%nCondition: %s%nValue 1: \"%s\"%nValue 2: \"%s\"%nResult: %s",
+               entry, toString(), fieldValue1, fieldValue2, result
+           )
+         );
+      }
+
+      return result;
+   }
+
+   protected boolean compare(String fieldValue1, String fieldValue2)
+   {
       int result = fieldValue1.compareTo(fieldValue2);
 
       switch (relation)

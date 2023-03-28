@@ -1362,7 +1362,8 @@ public class Bib2GlsEntry extends BibEntry
                }
                else if (bib2gls.getDebugLevel() > 0)
                {
-                  bib2gls.logAndPrintMessage("Value can't be obtained");
+                  bib2gls.logAndPrintMessage(
+                   String.format("Value for field '%s' can't be obtained", field));
                }
             }
          }

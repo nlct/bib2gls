@@ -39,6 +39,7 @@ public class FieldNumberMatch implements Conditional
 
    public boolean booleanValue(Bib2GlsEntry entry)
    {
+      Bib2Gls bib2gls = entry.getBib2Gls();
       String fieldValue = null;
 
       try
@@ -47,8 +48,10 @@ public class FieldNumberMatch implements Conditional
       }
       catch (IOException e)
       {
-         entry.getBib2Gls().debug(e);
+         bib2gls.debug(e);
       }
+
+      boolean result;
 
       if (value instanceof Integer)
       {
@@ -73,38 +76,64 @@ public class FieldNumberMatch implements Conditional
             }
          }
 
-         switch (relation)
-         {
-            case EQUALS: return num1 == num2;
-            case NOT_EQUALS: return num1 != num2;
-            case LT: return num1 < num2;
-            case LE: return num1 <= num2;
-            case GT: return num1 > num2;
-            case GE: return num1 >= num2;
-         }
+         result = compare(num1, num2);
       }
-
-      double num1 = 0.0;
-      double num2 = value.doubleValue();
-
-      if (fieldValue == null)
+      else
       {
-         try
-         {
-            num1 = Double.parseDouble(fieldValue);
-         }
-         catch (NumberFormatException e)
+         double num1 = 0.0;
+         double num2 = value.doubleValue();
+
+         if (fieldValue == null)
          {
             try
             {
                num1 = Double.parseDouble(fieldValue);
             }
-            catch (NumberFormatException e2)
-            {// treat as 0
+            catch (NumberFormatException e)
+            {
+               try
+               {
+                  num1 = Double.parseDouble(fieldValue);
+               }
+               catch (NumberFormatException e2)
+               {// treat as 0
+               }
             }
          }
+
+         result = compare(num1, num2);
       }
 
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           String.format(
+            "Entry: %s%nCondition: %s%nValue: \"%s\"%nResult: %s",
+             entry, toString(), fieldValue, result
+           )
+         );
+      }
+
+      return result;
+   }
+
+   protected boolean compare(int num1, int num2)
+   {
+      switch (relation)
+      {
+         case EQUALS: return num1 == num2;
+         case NOT_EQUALS: return num1 != num2;
+         case LT: return num1 < num2;
+         case LE: return num1 <= num2;
+         case GT: return num1 > num2;
+         case GE: return num1 >= num2;
+      }
+
+      throw new AssertionError("Missing Relational enum " + relation);
+   }
+
+   protected boolean compare(double num1, double num2)
+   {
       switch (relation)
       {
          case EQUALS: return num1 == num2;

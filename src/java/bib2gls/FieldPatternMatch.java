@@ -32,6 +32,7 @@ public class FieldPatternMatch implements Conditional
 
    public boolean booleanValue(Bib2GlsEntry entry)
    {
+      Bib2Gls bib2gls = entry.getBib2Gls();
       String value = null;
 
       try
@@ -40,7 +41,7 @@ public class FieldPatternMatch implements Conditional
       }
       catch (IOException e)
       {
-         entry.getBib2Gls().debug(e);
+         bib2gls.debug(e);
       }
 
       if (value == null)
@@ -50,7 +51,16 @@ public class FieldPatternMatch implements Conditional
 
       Matcher m = pattern.matcher(value);
 
-      return m.matches();
+      boolean result = m.matches();
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage(
+           String.format("Entry: %s%nCondition: %s%nValue: \"%s\"%nResult: %s",
+             entry, toString(), value, result));
+      }
+
+      return result;
    }
 
    @Override
