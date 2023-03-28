@@ -1820,6 +1820,25 @@ public class Bib2Gls implements TeXApp
       return strVal;
    }
 
+   public String toTruncatedString(TeXParser parser, TeXObjectList list)
+   {
+      return list.toTruncatedString(parser, TRUNCATE_MAX_OBJECTS,
+        getMessage("message.etc"));
+   }
+
+   public String truncate(String string)
+   {
+      if (string.length() < TRUNCATE_MAX_CHARS)
+      {
+         return string;
+      }
+      else
+      {
+         return string.substring(0, TRUNCATE_MAX_CHARS)
+                 + getMessage("message.etc");
+      }
+   }
+
    /*
     * Process the command line arguments and do the main action.
     */ 
@@ -7017,4 +7036,7 @@ public class Bib2Gls implements TeXApp
 
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
+
+   public static final int TRUNCATE_MAX_OBJECTS=20;
+   public static final int TRUNCATE_MAX_CHARS=80;
 }
