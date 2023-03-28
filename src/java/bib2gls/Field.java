@@ -415,7 +415,8 @@ public class Field implements FieldValueElement
                   else
                   {
                      throw new Bib2GlsException(bib2gls.getMessage(
-                       "error.invalid.field_ref_before", tag, remaining), e);
+                       "error.invalid.field_ref_before",
+                         tag, bib2gls.truncate(remaining)), e);
                   }
                }
 
@@ -487,7 +488,7 @@ public class Field implements FieldValueElement
             else
             {
                throw new Bib2GlsException(bib2gls.getMessage(
-                 "error.missing.field_before", remaining));
+                 "error.missing.field_before", bib2gls.truncate(remaining)));
             }
          }
          else
