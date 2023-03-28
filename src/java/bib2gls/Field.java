@@ -440,7 +440,7 @@ public class Field implements FieldValueElement
                stack.pop();
             }
          }
-         else if (tag != null)
+         else if (tag != null || object instanceof ControlSequence)
          {
             break;
          }

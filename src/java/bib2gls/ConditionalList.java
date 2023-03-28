@@ -92,14 +92,14 @@ public class ConditionalList extends Vector<ConditionalListElement>
          else if (condList.isEmpty())
          {
             throw new Bib2GlsException(bib2gls.getMessage(
-              "error.invalid.condition_in", obj.format(),
-               stack.format()));
+              "error.invalid.condition_in", obj.toString(parser),
+               stack.toString(parser)));
          }
          else
          {
             throw new Bib2GlsException(bib2gls.getMessage(
               "error.invalid.condition_after",
-               obj.format(), condList.toString()));
+               obj.toString(parser), condList.toString()));
          }
       }
 
@@ -141,10 +141,28 @@ public class ConditionalList extends Vector<ConditionalListElement>
          {
             return new FieldInField(field, Field.popField(resource, stack), true);
          }
+         else if (name.equals("PREFIXOF"))
+         {
+            return new FieldPrefixOfField(field, Field.popField(resource, stack));
+         }
+         else if (name.equals("NOTPREFIXOF"))
+         {
+            return new FieldPrefixOfField(field,
+               Field.popField(resource, stack), true);
+         }
+         else if (name.equals("SUFFIXOF"))
+         {
+            return new FieldSuffixOfField(field, Field.popField(resource, stack));
+         }
+         else if (name.equals("NOTSUFFIXOF"))
+         {
+            return new FieldSuffixOfField(field,
+               Field.popField(resource, stack), true);
+         }
          else
          {
             throw new Bib2GlsException(bib2gls.getMessage(
-                "error.invalid.condition_after", obj.format(), field));
+                "error.invalid.condition_after", obj.toString(parser), field));
          }
       }
 
@@ -154,7 +172,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       {
          throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.regexp_or_cmp_condition_missing", 
-              field+obj.format()));
+              field+obj.toString(parser)));
       }
 
       int cp = 0;
@@ -236,7 +254,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       {
          throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.condition_after", 
-              obj.format(), field));
+              obj.toString(parser), field));
       }
 
       if (nextObj instanceof ControlSequence

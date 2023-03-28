@@ -2131,7 +2131,7 @@ the corresponding set of \ext{bib} files:
 
   \item field assignments are made (\csopt{assign-fields}),
     and any of the above case-change or suffixes required
-    on the destination fields are performed;
+    by the destination fields are performed;
 
   \item \field{name} adjustment is performed if
    \csopt{compound-adjust-name} is set (and the criteria is met);
@@ -2346,12 +2346,12 @@ or \idx{regex.dollar} to denote the start and end.
 
 \item[Field conversions] The following commands may be used in the
 assignment value syntax of \csopt{assign-fields} to apply a
-case-conversion to value obtained from the referenced field:
+case-conversion to the value obtained from the referenced field:
 \gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
 
 \item[Comparators] The conditional part of the \csopt{assign-fields}
-syntax recognises \gls{IN} and \gls{NIN} as indicating \qt{is a
-substring of} and \qt{is not a substring of}, respectively.
+syntax recognises \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
+\gls{NOTPREFIXOF}, \gls{SUFFIXOF}, and \gls{NOTSUFFIXOF}.
 
 \item[Null value] The conditional part of the \csopt{assign-fields}
 syntax recognises \gls{NULL} as indicating a null value for \idx{equalscmp}
@@ -2361,7 +2361,7 @@ and \idx{notequalscmp} comparisons.
 Finally, this isn't actually a quark, but \inlinedef{cs} is defined
 to expand to the literal string \csfmt{csname} so you can use it for any
 other escape sequences that aren't covered above. For example, 
-\code{\gls{cs}\marg{n}} for a newline \csfmt{n}.
+\code{\gls{cs}\marg{n}} for a newline \ics{n}.
 
 \section{Indexing}
 
@@ -8069,7 +8069,7 @@ field identifying the glossary label). If you've used
 \csopt{entry-type-aliases}, this refers to the target \gls{entrytype} not
 the original \gls{entrytype} specified in the \ext{bib} file.
 
-The \meta{regex} part should be a \idx{regex} conforming
+The \meta{regexp} part should be a \idx{regex} conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}. The pattern is \gls{anchored} 
@@ -10350,8 +10350,8 @@ The \oargm{condition} part is optional. The \meta{assign-specs}
 are a \idx{assign-plus} separated list of field references or
 delimited strings. A field reference may be marked up with a case-\idx{quark},
 and the conditional part may use the \gls{NULL}-\idx{quark} in equal and
-not equal comparisons, and the \gls{IN} or \gls{NIN} \idxpl{quark} in
-substring and not substring conditions.
+not equal comparisons. Field (not string) comparisons may use the
+substring, prefix and suffix \idxpl{quark}.
 
 Note that, unlike most \keyval\ elements, the value part (\meta{assign-specs}
 \oargm{condition}) should not be grouped. The \csopt{assign-fields}
@@ -10433,16 +10433,17 @@ option without needing to use \ics{protect} or \idx{cs.string}.
 The field reference syntax is more complicated:
 \begin{codeenv}
 \meta{field-ref} ::= \meta{value-ref} | \meta{entry-ref} \idx{follow} \meta{field-ref}
-\meta{entry-ref} ::= "self" | "parent" | "root"
+\meta{entry-ref} ::= self | parent | root
 \meta{value-ref} ::= \meta{field-name} | \meta{label-ref}
 \meta{label-ref} ::= \meta{label-type} \idx{follow} \meta{label-delineator}
-\meta{label-type} ::= "entrytype" | "entrylabel"
-\meta{label-delineator} ::= "original" | "actual"
+\meta{label-type} ::= entrytype | entrylabel
+\meta{label-delineator} ::= original | actual
 \end{codeenv}
 where \meta{field-name} is the required field name. Note that field
 names can't include any of the assignment markup special characters:
-\idx{assign-plus} \idx{follow} \idx{startoptional} \idx{endoptional}
-\idx{equalsassign} \idx{commasep} or \idx{doublequotechardelim}.
+\idx{assign-plus} \idx{startoptional} \idx{endoptional}
+\idx{equalsassign} \idx{commasep} \idx{ltcmp} \idx{gtcmp} or 
+\idx{doublequotechardelim}.
 
 The \meta{entry-ref} part indicates which entry the referenced field
 belongs to.  The keywords are: \code{self} (the entry itself),
@@ -10472,7 +10473,7 @@ has scanned the information so far. For example, in the case of
 \begin{quote}\ttfamily
 Error: Invalid syntax for option '\csopt{assign-fields}': Expected
 one of \idx{follow} \idx{assign-plus} \idx{startoptional} after
-' self > parent', found 'n'
+' self \idx{follow} parent', found 'n'
 \end{quote}
 This indicates that it has read \qt{parent} as meaning the
 \field{parent} field of the current entry since it isn't followed by
@@ -10646,7 +10647,7 @@ Evaluates to true if the value is lexicographically greater than or
 equal to the value obtained from the field reference \meta{field-ref2}.
 
 \begin{codeenv*}
-\meta{field-ref}\inlinedef{IN}\meta{field-ref2}
+\meta{field-ref} \inlinedef{IN} \meta{field-ref2}
 \end{codeenv*}
 Evaluates to true if the value is a substring of the value obtained
 from the field reference \meta{field-ref2}. If the \meta{field-ref}
@@ -10654,11 +10655,50 @@ value is empty or missing it's considered not a substring regardless
 of the value of \meta{field-ref2}.
 
 \begin{codeenv*}
-\meta{field-ref}\inlinedef{NIN}\meta{field-ref2}
+\meta{field-ref} \inlinedef{NIN} \meta{field-ref2}
 \end{codeenv*}
 The negation of the \gls{IN} test. Evaluates to true if the value is
 not a substring of the value obtained from the field reference
-\meta{field-ref2}.
+\meta{field-ref2}. This is equivalent to:
+\begin{codeenv}
+\idx{exclamnot} \meta{field-ref} \gls{IN} \meta{field-ref2}
+\end{codeenv}
+
+\begin{codeenv*}
+\meta{field-ref} \inlinedef{PREFIXOF} \meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is a prefix of the value obtained
+from the field reference \meta{field-ref2} (that is, the
+\meta{field-ref2} value starts with the \meta{field-ref} value).
+If the \meta{field-ref} value is empty or missing it's considered
+not a prefix regardless of the value of \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref} \inlinedef{NOTPREFIXOF} \meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is not a prefix of the value obtained
+from the field reference \meta{field-ref2}. This is equivalent to:
+\begin{codeenv}
+\idx{exclamnot} \meta{field-ref} \gls{PREFIXOF} \meta{field-ref2}
+\end{codeenv}
+
+\begin{codeenv*}
+\meta{field-ref} \inlinedef{SUFFIXOF} \meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is a suffix of the value obtained
+from the field reference \meta{field-ref2} (that is, the
+\meta{field-ref2} value ends with the \meta{field-ref} value).
+If the \meta{field-ref} value is empty or missing it's considered
+not a suffix regardless of the value of \meta{field-ref2}.
+
+\begin{codeenv*}
+\meta{field-ref} \inlinedef{NOTSUFFIXOF} \meta{field-ref2}
+\end{codeenv*}
+Evaluates to true if the value is not a suffix of the value obtained
+from the field reference \meta{field-ref2}. This is equivalent to:
+\begin{codeenv}
+\idx{exclamnot} \meta{field-ref} \gls{SUFFIXOF} \meta{field-ref2}
+\end{codeenv}
 
 For example, suppose I have defined the custom fields
 \fieldfmt{surname} and \fieldfmt{forename}, and I have the following
@@ -12485,8 +12525,11 @@ need the override setting on. For example:
 \end{codeenv}
 This will convert the \field{name} field to \idx{titlecase} for
 entries that were defined in the \ext{bib} file with
-\atentry{entry}.
-
+\atentry{entry}. Note that if you also use a case-changing option,
+for example, \csopt{name-case-change}, then all entries will have
+the change applied, according to the option's designated behaviour,
+regardless of whether or not the applicable field has already been
+altered by \csopt{assign-fields}.
 
 \begin{important}
 Major changes have been introduced to \sty{mfirstuc} v2.08. Some of

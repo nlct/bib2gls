@@ -221,6 +221,11 @@
   name={categories and attributes}
 }
 
+@index{regexp,
+  name={regexp (or regex)},
+  alias={regex}
+}
+
 @index{regex,
   name={regular expressions},
   text={regular expression},
@@ -15308,6 +15313,58 @@ warning rather than an error if the command isn't already defined},
   annote={quark}
 }
 
+@mainglscommand{PREFIXOF,
+  name={\csfmt{PREFIXOF}},
+  user1={},
+  description={a \idx{quark} to denote \qt{is a prefix of} conditional 
+  in \csopt{assign-fields} conditionals. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{NOTPREFIXOF,
+  name={\csfmt{NOTPREFIXOF}},
+  user1={},
+  description={a \idx{quark} to denote \qt{is not a prefix of} conditional 
+  in \csopt{assign-fields} conditionals. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{SUFFIXOF,
+  name={\csfmt{SUFFIXOF}},
+  user1={},
+  description={a \idx{quark} to denote \qt{is a suffix of} conditional 
+  in \csopt{assign-fields} conditionals. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{NOTSUFFIXOF,
+  name={\csfmt{NOTSUFFIXOF}},
+  user1={},
+  description={a \idx{quark} to denote \qt{is not a suffix of} conditional 
+  in \csopt{assign-fields} conditionals. This value needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
 @mainglscommand{LC,
   name={\csfmt{LC}},
   user1={\margm{field-ref}},
@@ -15384,6 +15441,14 @@ warning rather than an error if the command isn't already defined},
   annote={hex code quark}
 }
 
+@command{n,
+  name={\csfmt{n}},
+  user1={},
+  description={indicates a newline character in \idxpl{regex}},
+  category={command},
+  annote={newline}
+}
+
 @mainglscommand{quark.dot,
   name={\csfmt{.}},
   user1={},
@@ -15391,7 +15456,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.backslash,
@@ -15401,7 +15466,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.slash,
@@ -15411,7 +15476,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.pipe,
@@ -15421,7 +15486,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.amp,
@@ -15431,7 +15496,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.plus,
@@ -15441,7 +15506,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.star,
@@ -15451,7 +15516,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.dollar,
@@ -15461,7 +15526,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.circum,
@@ -15471,7 +15536,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.tilde,
@@ -15481,7 +15546,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.openparen,
@@ -15491,7 +15556,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.closeparen,
@@ -15501,7 +15566,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.opensq,
@@ -15511,7 +15576,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.closesq,
@@ -15521,7 +15586,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.doublequote,
@@ -15541,7 +15606,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.question,
@@ -15551,7 +15616,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.hash,
@@ -15561,7 +15626,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{quark.colon,
@@ -15572,7 +15637,7 @@ warning rather than an error if the command isn't already defined},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
-  annote={regex quark}
+  annote={\idx{regexp} quark}
 }
 
 @mainglscommand{GlsXtrDefaultResourceOptions,
