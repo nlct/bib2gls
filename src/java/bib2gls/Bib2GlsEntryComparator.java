@@ -47,22 +47,27 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       if (settings.isCustom())
       {
+         locale = bib2gls.getCurrentResource().getResourceLocale();
+
+         if (locale == null)
+         {
+            locale = Locale.getDefault();
+         }
+
          collator = new RuleBasedCollator(settings.getCollationRule());
 
          if (breakPoint != BREAK_NONE)
          {
-            Locale docLocale = bib2gls.getDefaultLocale();
-   
-            setBreakPoint(breakPoint, docLocale);
+            setBreakPoint(breakPoint);
          }
       }
       else
       {
-         Locale locale = settings.getLocale();
+         locale = settings.getLocale();
 
          collator = Collator.getInstance(locale);
 
-         setBreakPoint(breakPoint, locale);
+         setBreakPoint(breakPoint);
       }
 
       collator.setStrength(settings.getCollatorStrength());
@@ -75,13 +80,8 @@ public class Bib2GlsEntryComparator extends SortComparator
       }
    }
 
-   private void setBreakPoint(int breakPoint, Locale locale)
+   private void setBreakPoint(int breakPoint)
    {
-      if (locale == null)
-      {
-         locale = Locale.getDefault();
-      }
-
       switch (breakPoint)
       {
          case BREAK_NONE:
@@ -148,7 +148,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
       if (Character.isAlphabetic(codePoint))
       {
-         grp = str.toUpperCase();
+         grp = str.toUpperCase(locale);
          int cp = grp.codePointAt(0);
 
          return new GroupTitle(bib2gls, grp, str, cp, type, parent);
@@ -274,7 +274,7 @@ public class Bib2GlsEntryComparator extends SortComparator
                collator.setStrength(Collator.PRIMARY);
 
                String norm = Normalizer.normalize(
-                      str.toLowerCase(), Normalizer.Form.NFD);
+                      str.toLowerCase(locale), Normalizer.Form.NFD);
                norm = norm.replaceAll("\\p{M}", "");
 
                if (collator.compare(str, norm) == 0)
@@ -311,17 +311,24 @@ public class Bib2GlsEntryComparator extends SortComparator
                   grp = grpCase;
                   cp = Character.toTitleCase(cp);
                }
-               else
+               else if (Character.isAlphabetic(cp))
                {
-                  if (Character.isAlphabetic(cp))
+                  int titleCodePoint = Character.toTitleCase(cp);
+   
+                  if (cp == titleCodePoint && Character.isLowerCase(cp))
                   {
-                     int titleCodePoint = Character.toTitleCase(cp);
-   
-                     grp = String.format("%c%s", titleCodePoint,
-                           grp.substring(Character.charCount(cp)).toLowerCase());
-   
-                     cp = titleCodePoint;
+                     grpCase = grp.toLowerCase(locale);
+                     grpCase = resource.toSentenceCase(grpCase, locale).toString();
+
+                     titleCodePoint = grpCase.codePointAt(0);
                   }
+                  else
+                  {
+                     grp = String.format("%c%s", titleCodePoint,
+                        grp.substring(Character.charCount(cp)).toLowerCase(locale));
+                  }
+
+                  cp = titleCodePoint;
                }
    
                if (Character.isAlphabetic(cp))
@@ -391,7 +398,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
             if (Character.isAlphabetic(codePoint))
             {
-               grp = str.toUpperCase();
+               grp = str.toUpperCase(locale);
                codePoint = grp.codePointAt(0);
             }
 
@@ -556,6 +563,8 @@ public class Bib2GlsEntryComparator extends SortComparator
    private Collator collator;
 
    private BreakIterator breakIterator=null;
+
+   private Locale locale;
 
    public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
      BREAK_SENTENCE=3, BREAK_UPPER_NOTLOWER=4, BREAK_UPPER_UPPER=5,

@@ -14811,7 +14811,17 @@ public class GlsResource
     */ 
    public CharSequence toSentenceCase(String text)
    {
-      Locale locale = getResourceLocale();
+      return toSentenceCase(text, getResourceLocale());
+   }
+
+   /**
+    * Converts a string to sentence case.
+    * @param text the text to convert
+    * @param locale the locale
+    * @return the converted text
+    */ 
+   public CharSequence toSentenceCase(String text, Locale locale)
+   {
       String lang = locale.getLanguage();
 
       StringBuilder builder = new StringBuilder();
