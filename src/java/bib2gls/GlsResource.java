@@ -6399,6 +6399,29 @@ public class GlsResource
       }
    }
 
+   public String getSourceFileList()
+   {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append(bib2gls.getAuxFile().getName());
+
+      for (int i = 0, n = sources.size()-1; i <= n; i++)
+      {
+         if (i == n)
+         {
+            builder.append(bib2gls.getMessage("comment.list.and", sources.size()));
+         }
+         else
+         {
+            builder.append(", ");
+         }
+
+         builder.append(sources.get(i).getFileName().toString());
+      }
+
+      return builder.toString();
+   }
+
    /**
     * Gets the listener used by the bib parser.
     */ 
@@ -7695,6 +7718,18 @@ public class GlsResource
       }
    }
 
+   private void printHeaderComments(PrintWriter writer)
+   throws IOException
+   {
+      writer.println(bib2gls.getMessage("comment.header",
+         Bib2Gls.NAME, Bib2Gls.VERSION, new Date()));
+
+      writer.println(bib2gls.getMessage("comment.no_edit", Bib2Gls.NAME));
+      writer.println(bib2gls.getMessage("comment.source_list")); 
+      writer.print("% ");
+      writer.println(getSourceFileList());
+   }
+
    /**
     * Process the data (stage 4, master).
     * @throws IOException may be thrown by the aux file parser
@@ -7716,6 +7751,8 @@ public class GlsResource
       try
       {
          writer = new PrintWriter(texFile, charSet.name());
+
+         printHeaderComments(writer);
 
          if (bib2gls.suppressFieldExpansion())
          {
@@ -8727,6 +8764,8 @@ public class GlsResource
       try
       {
          writer = new PrintWriter(texFile, charSetName);
+
+         printHeaderComments(writer);
 
          if (bib2gls.suppressFieldExpansion())
          {

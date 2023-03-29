@@ -556,6 +556,11 @@ public class Bib2Gls implements TeXApp
       return resolveFile(new File(name));
    }
 
+   public File getAuxFile()
+   {
+      return auxFile;
+   }
+
    /*
     * Convert inputenc.sty encoding options to Java charset names.
     */ 
