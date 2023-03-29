@@ -27,16 +27,22 @@ public interface FieldValueElement
    /**
     * Gets the field's value as a BibValue.
     * @param entry the entry being queried
+    * @throws Bib2GlsException if there's a problem with the option
+    * syntax
     * @throws IOException if something goes wrong with the TeXParser
     * (indicates a problem in parsing, mostly like a bug)
     */ 
-   public BibValue getValue(Bib2GlsEntry entry) throws IOException;
+   public BibValue getValue(Bib2GlsEntry entry)
+     throws IOException,Bib2GlsException;
 
    /**
     * Gets the field's value as a String.
     * @param entry the entry being queried
+    * @throws Bib2GlsException if there's a problem with the option
+    * syntax
     * @throws IOException if something goes wrong with the TeXParser
     * (indicates a problem in parsing, mostly like a bug)
     */ 
-   public String getStringValue(Bib2GlsEntry entry) throws IOException;
+   public String getStringValue(Bib2GlsEntry entry)
+     throws IOException,Bib2GlsException;
 }

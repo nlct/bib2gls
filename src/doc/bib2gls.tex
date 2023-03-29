@@ -2327,6 +2327,8 @@ character:
 \glsadd{idx.pipechar}\inlinedef{quark.pipe} 
 \glsadd{idx.ampchar}\inlinedef{quark.amp}
 \glsadd{idx.pluschar}\inlinedef{quark.plus} 
+\glsadd{idx.ltchar}\inlinedef{quark.lt} 
+\glsadd{idx.gtchar}\inlinedef{quark.gt} 
 \glsadd{idx.starchar}\inlinedef{quark.star}
 \glsadd{idx.dollarchar}\inlinedef{quark.dollar} 
 \glsadd{idx.circumchar}\inlinedef{quark.circum} 
@@ -2344,10 +2346,12 @@ Note that \idxpl{regex} in resource options are typically
 \gls{anchored}, so there shouldn't be any need to use \idx{regex.circum}
 or \idx{regex.dollar} to denote the start and end.
 
-\item[Field conversions] The following commands may be used in the
+\item[Field assignments] The following commands may be used in the
 assignment value syntax of \csopt{assign-fields} to apply a
 case-conversion to the value obtained from the referenced field:
 \gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
+Additionally, \gls{MGP} may be used to reference a group from the
+most recent match in the conditional part.
 
 \item[Comparators] The conditional part of the \csopt{assign-fields}
 syntax recognises \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
@@ -8069,7 +8073,7 @@ field identifying the glossary label). If you've used
 \csopt{entry-type-aliases}, this refers to the target \gls{entrytype} not
 the original \gls{entrytype} specified in the \ext{bib} file.
 
-The \meta{regexp} part should be a \idx{regex} conforming
+The \meta{regexp} part should be a \gls{regular-expression} conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}. The pattern is \gls{anchored} 
@@ -9290,7 +9294,7 @@ depending on whether or not \sty{fontspec} was detected.
 
 This option takes a comma-separated list as a value with each
 element in the list in the form \code{\margm{regex}\margm{replacement}}
-where \meta{regex} is a \idx{regex} (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
+where \meta{regex} is a \gls{regular-expression} (that conforms to \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
 Pattern class}~\cite{pattern}) and \meta{replacement}
 is the replacement text. The value is required for this key but
 may be empty, which indicates that the
@@ -9317,6 +9321,14 @@ characters are automatically stripped), but
 \csopt{sort-replace} follows the same rules as
 \csopt{labelify-replace}, and it may be needed
 for that.
+
+\begin{important}
+You can't use the \gls{MGP} quark (which expands to the \gls{MGP} 
+identifier for \csopt{assign-fields}) to identify the captured group in this
+context, as the replacement text needs to use the correct
+\gls{regular-expression} syntax.
+\end{important}
+
 
 Both \csopt{labelify} and \csopt{labelify-list} use the
 \csopt{labelify-replace} setting to 
@@ -10370,8 +10382,10 @@ field in the assignment, make sure that the override setting is on.
 The syntax for the \meta{assign-specs} part is:
 \begin{codeenv}
 \meta{assign-specs} ::= \meta{assign-value} | \meta{assign-value} \idx{assign-plus} \meta{assign-specs}
-\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{\idx{quark}}\margm{field-ref}
-\meta{\idx{quark}} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
+\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{\meta{case-quark}}\margm{field-ref} | \meta{match-ref}
+\meta{\meta{case-quark}} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
+\meta{match-ref} ::= \gls{MGP}\margm{group-ref}
+\meta{group-ref} ::= \meta{index} | \meta{name}
 \end{codeenv}
 
 As with the \ext{bib} format, strings can be delimited by braces
@@ -10381,6 +10395,37 @@ brace delimiters or use \gls{quark.doublequote}. If you need the
 actual \LaTeX\ accent command \ics{umlaut} then use brace
 delimiters. If you need braces that start and end in different
 fragments then use double-quote delimiters.
+
+The \meta{match-ref} should only be used with a
+\gls{regular-expression} conditional. If a match was found,
+\inlinedef{MGP} can be used to reference a group within the match. 
+The \meta{group-ref} argument may be either an integer (the group
+index) or the group name. For example, suppose a custom field called
+\fieldfmt{ordinal} may contain content such as \code{1st} or
+\code{10th} and I want to encapsulate the suffix part without
+altering the \ext{bib} file. This can be done as follows:
+\begin{codeenv}
+\csopt[
+  ordinal =\oarg{o} \gls{MGP}\marg{1} + " \gls{cs}\marg{ord}\marg{" + \gls{MGP}\marg{2} + "}"
+   \oarg{ ordinal=/(\gls{cs}\marg{d}+)(st|nd|rd|th)/}
+]{assign-fields}
+\end{codeenv}
+Alternatively, using named groups:
+\begin{codeenv*}
+\csopt[
+  ordinal =\oarg{o} \gls{MGP}\marg{num} + " \gls{cs}\marg{ord}\marg{" + \gls{MGP}\marg{suffix} + "}"
+   \oarg{ ordinal=/(\idx{regex.question}\idx{regex.lt}num\idx{regex.gt}\gls{cs}\marg{d}+)(\idx{regex.question}\idx{regex.lt}suffix\idx{regex.gt}st|nd|rd|th)/}
+]{assign-fields}
+\end{codeenv*}
+Note that the group name shouldn't be delimited with double-quotes.
+
+\begin{important}
+The \gls{MGP} quark (which expands to the \gls{MGP} identifier for
+\csopt{assign-fields}) isn't the same as \ics{glscapturedgroup}
+(which expands to \cs{cs.string}\idx{dollarchar}, allowing a dollar
+character to be written to the \ext{aux} file within
+the replacement part of \csopt{labelify-replace}).
+\end{important}
 
 The case-changing \idxpl{quark} that may be used in the assignment
 specification can only take a field reference \meta{field-ref} (see
@@ -12385,7 +12430,7 @@ are written to the \ext{aux} file.
 
 \optsection[\subsubsection]{append-prefix-field-nbsp-match}
 
-The value is the \idx{regex} that identifies prefixes that should be
+The value is the \gls{regular-expression} that identifies prefixes that should be
 followed by \idx{nbspchar} instead of \ics{space}. The default
 is \csopt[\idx{matchanydot}]{append-prefix-field-nbsp-match} which indicates a
 single character.
@@ -14001,7 +14046,7 @@ considered consecutive.
 then the \glspl{location} aren't considered consecutive.
 \item\label{itm.csmatch} If both \meta{location-1} and \meta{location-2} match the
 pattern (line break for clarity only)\footnote{The Java class \code{\csfmt{p}\marg{javaDigit}}
-used in the \idx{regex} will match any digits in the 
+used in the \gls{regular-expression} will match any digits in the 
 Unicode \idx{numberdecimaldigit} category not just the digits in the Basic Latin set. Similarly \code{\csfmt{p}\marg{javaAlphabetic}} will also match alphabetic
 characters outside the Basic Latin set.}
 \begin{verbatim}
@@ -16703,7 +16748,7 @@ and \csopt[\meta{boolean}]{secondary-trim-sort}.
 
 \optsection{sort-replace}
 
-This option may be used to perform \idx{regex} substitutions
+This option may be used to perform \gls{regular-expression} substitutions
 on the sort value and has the same syntax as \csopt{labelify-replace}. 
 The value is required for this key but may be empty, which indicates
 that the setting is switched off.

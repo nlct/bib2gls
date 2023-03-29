@@ -149,6 +149,51 @@ public class FieldValueList extends Vector<FieldValueElement>
                   "error.invalid.expected", "> + [", object.toString(parser)));
             }
          }
+         else if (object instanceof ControlSequence)
+         {
+            String name = ((ControlSequence)object).getName();
+
+            if (add)
+            {
+               object = stack.popArg(parser);
+
+               if (name.equals("MGP"))
+               {
+                  String ref = TeXParserUtils.popLabelString(parser, stack);
+
+                  FieldValueGroupMatch grpMatch;
+
+                  try
+                  {
+                     grpMatch = new FieldValueGroupMatch(Integer.parseInt(ref));
+                  }
+                  catch (NumberFormatException e)
+                  {
+                     grpMatch = new FieldValueGroupMatch(ref);
+                  }
+
+                  list.add(grpMatch);
+
+                  popped.add(object);
+                  popped.addAll(TeXParserUtils.createGroup(parser,
+                    parser.getListener().createString(ref)));
+               }
+               else
+               {
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                     "error.expected_field_or_string_condition",
+                     object.toString(parser)));
+               }
+
+               add = false;
+            }
+            else
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                "error.expected_before_after", "+", 
+                 object.toString(parser), popped.toString(parser)));
+            }
+         }
          else if (object instanceof WhiteSpace)
          {
             popped.add(stack.pop());

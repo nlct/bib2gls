@@ -60,8 +60,11 @@ public class FieldAssignment
       }
    }
 
-   public BibValueList getValue(Bib2GlsEntry entry) throws IOException
+   public BibValueList getValue(Bib2GlsEntry entry)
+     throws Bib2GlsException,IOException
    {
+      entry.getResource().setLastMatch(null);
+
       if (condition != null && !condition.booleanValue(entry))
       {
          return null;
@@ -85,8 +88,13 @@ public class FieldAssignment
    }
 
    public String getStringValue(Bib2GlsEntry entry)
-   throws IOException
+   throws Bib2GlsException,IOException
    {
+      if (condition != null && !condition.booleanValue(entry))
+      {
+         return null;
+      }
+
       StringBuilder builder = new StringBuilder();
 
       for (FieldValueElement elem : valueList)

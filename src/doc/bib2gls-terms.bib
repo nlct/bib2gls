@@ -505,13 +505,21 @@ Files, Text Files and File Encodings} for further information about
   set that defines a \gls{compoundentry}.}
 }
 
-@entry{anchored,
-  name = {anchored (regular expression)},
-  text={anchored},
-  description={An anchored \idx{regex} must match the entire
-  string, not a sub-string. For example, \code{l?op} matches \qt{lop}
-  and \qt{op} but doesn't match \qt{clop} or \qt{cop}. See
+@entry{regular-expression,
+  name = {regular expression},
+  user1={idx.regex},
+  description={A pattern that specifies how to match text. Unless
+  indicated otherwise, resource options that use regular expressions
+  are \gls{anchored}. See
   \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
   Pattern class API}~\cite{pattern} for details of the regular
   expression syntax.}
+}
+
+@entry{anchored,
+  name = {anchored (regular expression)},
+  text={anchored},
+  description={An anchored \gls{regular-expression} must match the entire
+  string, not a sub-string. For example, \code{l\idx{zeroorone}op} matches \qt{lop}
+  and \qt{op} but doesn't match \qt{clop} or \qt{cop}.}
 }

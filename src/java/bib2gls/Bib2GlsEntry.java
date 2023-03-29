@@ -839,7 +839,7 @@ public class Bib2GlsEntry extends BibEntry
       return true;
    }
 
-   public void parseFields() throws IOException
+   public void parseFields() throws Bib2GlsException,IOException
    {
       TeXParser parser = resource.getBibParser();
 
@@ -1274,7 +1274,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private Vector<String> applyFieldAssignments(boolean mfirstucProtect,
          String[] protectFields, String idField, Vector<String> interpretFields)
-     throws IOException
+     throws Bib2GlsException,IOException
    {
       String shortPluralSuffix = resource.getShortPluralSuffix();
       String dualShortPluralSuffix = resource.getDualShortPluralSuffix();
@@ -5657,7 +5657,7 @@ public class Bib2GlsEntry extends BibEntry
              e.getMessage(bib2gls)));
          bib2gls.debug(e);
       }
-      catch (IOException e)
+      catch (Exception e)
       {
          bib2gls.error(bib2gls.getMessage( 
            "error.create.missing.parent.failed", orgLabel, getId(), 

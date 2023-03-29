@@ -15597,6 +15597,65 @@ public class GlsResource
       return !matches;
    }
 
+   public Matcher getLastMatch()
+   {
+      return lastMatcher;
+   }
+
+   public void setLastMatch(Matcher matcher)
+   {
+      lastMatcher = matcher;
+   }
+
+   public String getLastMatchGroup(int i) throws Bib2GlsException
+   {
+      if (lastMatcher == null)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage("error.no_matcher", i));
+      }
+
+      if (i > lastMatcher.groupCount())
+      {
+         throw new Bib2GlsException(bib2gls.getMessage("error.matcher_idx_too_big",
+           i, lastMatcher.groupCount(), lastMatcher.pattern().pattern()));
+      }
+      else if (i < 0)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage("error.matcher_invalid_idx",
+           i, lastMatcher.pattern().pattern()));
+      }
+      else
+      {
+         try
+         {
+            return lastMatcher.group(i);
+         }
+         catch (IllegalStateException e)
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+               "error.matcher_failed", i, lastMatcher.pattern().pattern()), e);
+         }
+      }
+   }
+
+   public String getLastMatchGroup(String name) throws Bib2GlsException
+   {
+      if (lastMatcher == null)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage("error.no_matcher", name));
+      }
+
+      try
+      {
+         return lastMatcher.group(name);
+      }
+      catch (IllegalStateException e)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+            "error.matcher_failed", name, lastMatcher.pattern().pattern()), e);
+      }
+   }
+
    /**
     * Gets the post-description dot setting.
     * Corresponds to the "post-description-dot" setting.
@@ -17746,5 +17805,7 @@ public class GlsResource
    public static final int MAX_PRUNE_ITERATIONS=20;
 
    private String[] stringWordExceptions = new String[] {};
+
+   private Matcher lastMatcher = null;
 }
 

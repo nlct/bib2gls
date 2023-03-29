@@ -53,6 +53,8 @@ public class FieldPatternMatch implements Conditional
 
       boolean result = m.matches();
 
+      entry.getResource().setLastMatch(m);
+
       if (bib2gls.getDebugLevel() > 0)
       {
          bib2gls.logAndPrintMessage(

@@ -96,7 +96,7 @@ public class Bib2GlsBibTeXEntry extends Bib2GlsEntry
    }
 
    @Override
-   public void parseFields() throws IOException
+   public void parseFields() throws Bib2GlsException,IOException
    {
       if (!fieldsParsed())
       {// bibtex's type key conflicts with bib2gls's so if found rename

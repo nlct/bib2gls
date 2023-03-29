@@ -444,8 +444,8 @@ the second list ({3,number}).</entry>
 <entry key="error.invalid.condition_before">Expected condition, found ''{0}'' before {1}</entry>
 <entry key="error.invalid.null_condition">Invalid condition, NULL test can only be used with ''='' or ''&lt;&gt;'', found ''{0}'' after {1}</entry>
 <entry key="error.invalid.binary">Expected binary operand before ''{0}'' in {1}</entry>
-<entry key="error.expected_field_or_string_condition">Expected field or condition or string, found ''{0}''</entry>
-<entry key="error.expected_field_or_string_condition_after">Expected field or condition or string, found ''{0}'' after: {1}</entry>
+<entry key="error.expected_field_or_string_condition">Expected field or condition or string or match group reference, found ''{0}''</entry>
+<entry key="error.expected_field_or_string_condition_after">Expected field or condition or string or match group reference, found ''{0}'' after: {1}</entry>
 <entry key="error.expected_before">Expected ''{0}'' before ''{1}''</entry>
 <entry key="error.expected_before_after">Expected ''{0}'' before ''{1}'', after: {2}</entry>
 <entry key="error.expected_field_or_string_after">Expected field or string after {0}</entry>
@@ -576,6 +576,10 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="error.syntax.batch.unknown_format">Unknown format ''{0}''</entry>
 <entry key="error.exists">{0} already exists</entry>
 <entry key="error.file_exists.nooverwrite">Can''t write to ''{0}'': file already exists (use {1} to force overwrite)</entry>
+<entry key="error.no_matcher">Can''t match group {0}: no match found</entry>
+<entry key="error.matcher_idx_too_big">Can''t match group index {0}: maximum group index = {1} (for match {2})</entry>
+<entry key="error.matcher_invalid_idx">Can''t match group index {0}: invalid index (for match {1})</entry>
+<entry key="error.matcher_failed">Failed to match group {0} (for match {1})</entry>
 
 <entry key="tex.error.bad_param">Parameter digit 1 to 9 expected. Found ''{0}''</entry>
 <entry key="tex.error.no_eg">Missing end group</entry>
