@@ -109,8 +109,13 @@ public class ConditionalList extends Vector<ConditionalListElement>
          }
       }
 
-      throw new Bib2GlsException(bib2gls.getMessage(
-        "error.invalid.condition_missing_end", (char)terminator));
+      if (terminator != -1)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.condition_missing_end", (char)terminator));
+      }
+
+      return condList;
    }
 
    public static Conditional popComparison(GlsResource resource,

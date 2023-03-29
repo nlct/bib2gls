@@ -1206,6 +1206,10 @@ public class GlsResource
                flattenLonelyRule = FLATTEN_LONELY_RULE_DISCARD_UNRECORDED;
             }
          }
+         else if (opt.equals("flatten-lonely-condition"))
+         {
+            flattenLonelyConditional = getCondition(list, opt);
+         }
          else if (opt.equals("save-locations"))
          {
             String val = getChoice("true", list, opt,
@@ -5667,6 +5671,44 @@ public class GlsResource
       }
 
       return formatMap;
+   }
+
+   private Conditional getCondition(KeyValList list, String opt)
+    throws Bib2GlsException
+   {
+      TeXObject arg = list.get(opt);
+
+      if (arg == null || arg.isEmpty())
+      {
+         return null;
+      }
+
+      try
+      {
+         TeXObjectList stack;
+
+         if (parser.isStack(arg))
+         {
+            stack = (TeXObjectList)arg;
+         }
+         else
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.expected", arg.toString(parser)));
+         }
+
+         return ConditionalList.popCondition(this, stack, -1);
+      }
+      catch (TeXSyntaxException e)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, e.getMessage(bib2gls)), e);
+      }
+      catch (Exception e)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, e.getMessage()), e);
+      }
    }
 
    /**
@@ -11654,33 +11696,47 @@ public class GlsResource
            parent.recordCount() >0 || parent.hasCrossRefs();
 
          if ( // flatten-lonely-rule != 'only unrecorded parents':
-               flattenLonelyRule != FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS
+              flattenLonelyRule != FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS
               // or parent doesn't have records or cross-references:
-            || !parentHasRecordsOrCrossRefs)
+              || !parentHasRecordsOrCrossRefs )
          {
-            Integer level = Integer.valueOf(child.getLevel(entries));
+            boolean condition = false;
 
-            Vector<Bib2GlsEntry> list = flattenMap.get(level);
-
-            if (list == null)
+            try
             {
-               list = new Vector<Bib2GlsEntry>();
-               flattenMap.put(level, list);
-               keys.add(level);
+               condition = isFlattenConditionTrue(child);
+            }
+            catch (IOException e)
+            {
+               bib2gls.warning(e.getMessage());
             }
 
-            list.add(child);
-
-            /*
-             *  The parent will only be discarded if
-             *   - parent has no records or cross-references
-             *   - flatten-lonely-rule != 'no discard'
-             */
-
-            if (flattenLonelyRule != FLATTEN_LONELY_RULE_NO_DISCARD
-                 && !parentHasRecordsOrCrossRefs)
+            if (condition)
             {
-               discardList.add(parent);
+               Integer level = Integer.valueOf(child.getLevel(entries));
+
+               Vector<Bib2GlsEntry> list = flattenMap.get(level);
+
+               if (list == null)
+               {
+                  list = new Vector<Bib2GlsEntry>();
+                  flattenMap.put(level, list);
+                  keys.add(level);
+               }
+
+               list.add(child);
+
+               /*
+                *  The parent will only be discarded if
+                *   - parent has no records or cross-references
+                *   - flatten-lonely-rule != 'no discard'
+                */
+
+               if (flattenLonelyRule != FLATTEN_LONELY_RULE_NO_DISCARD
+                    && !parentHasRecordsOrCrossRefs)
+               {
+                  discardList.add(parent);
+               }
             }
          }
       }
@@ -11708,6 +11764,19 @@ public class GlsResource
          entries.remove(discard);
       }
 
+   }
+
+   private boolean isFlattenConditionTrue(Bib2GlsEntry entry)
+     throws IOException
+   {
+      if (flattenLonelyConditional == null)
+      {
+         return true;
+      }
+      else
+      {
+         return flattenLonelyConditional.booleanValue(entry);
+      }
    }
 
    /**
@@ -17584,6 +17653,8 @@ public class GlsResource
 
    private int flattenLonelyRule 
      = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
+
+   private Conditional flattenLonelyConditional = null;
 
    private boolean saveChildCount = false;
 

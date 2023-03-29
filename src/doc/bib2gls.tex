@@ -8668,19 +8668,27 @@ This defaults to just \meta{name}.
 
 This option governs the rule used by \csopt{flatten-lonely} to
 determine which \glspl{sub-entry} (that have no \glspl{sibling}) to adjust and 
-which \glsdisp{parententry}{parents} to remove. The value may be one of the following:
+which \glsdisp{parententry}{parents} to remove. The value may be one
+of the following, where \meta{condition} is the condition provided
+by \csopt{flatten-lonely-condition}:
 \begin{description}
 \item[\optfmt{only unrecorded parents}] Only the \glspl{sub-entry}
-that have a \parent\ without a \igls{locationlist} will be altered.
-The \gls{parententry} will be removed from the selection.
+that have a \parent\ without a \igls{locationlist} (and have
+\meta{condition} evaluate to true) will be altered.
+The \gls{parententry} will be removed from the selection 
+if the child entry is adjusted.
 This value is the default setting.
+
 \item[\optfmt{discard unrecorded}] This setting will adjust all
-\glspl{sub-entry} that have no \glspl{sibling} regardless of whether or not the
+\glspl{sub-entry} that have no \glspl{sibling} (and have
+\meta{condition} evaluate to true) regardless of whether or not the
 \parent\ has a \igls{locationlist}.
 Only the \glspl{parententry} that don't have a \gls{locationlist} will be
-removed from the selection.
+removed from the selection if the child entry is adjusted.
+
 \item[\optfmt{no discard}] This setting will adjust all
-\glspl{sub-entry} that don't have \glspl{sibling} regardless of whether or not the
+\glspl{sub-entry} that don't have \glspl{sibling} (and have
+\meta{condition} evaluate to true) regardless of whether or not the
 \parent\ has a \igls{locationlist}. No entries will be discarded, so 
 \glspl{parententry} that don't have a \igls{locationlist} will still appear in the
 glossary.
@@ -8688,6 +8696,25 @@ glossary.
 In the above, the \igls{locationlist} includes \glspl{record} and
 cross-references obtained from the \field{see} or \field{seealso}
 fields. See \csopt{flatten-lonely} for further details.
+
+\optsection{flatten-lonely-condition}
+
+The value may either be empty, to indicate true (the default), or a condition
+using the same syntax as the \meta{conditional} part of the 
+\csopt{assign-fields} option. After taking into account
+\csopt{flatten-lonely} and \csopt{flatten-lonely-rule}, this
+option determines whether or not the child entry will be adjusted.
+If the condition evaluates to false, the child entry won't be
+adjusted.
+
+For example, if both the parent entry and the child entry have long
+names, it may be better to keep their hierarchy. The following
+will only flatten lonely entries where both the child name and the
+parent name have less then 25 characters:
+\begin{codeenv*}
+ \csopt[postsort]{flatten-lonely},
+ \csopt[\gls{LEN}\marg{parent \idx{follow} name} \idx{ltcmp} 25 \idx{ampand} \gls{LEN}\marg{name} \idx{ltcmp} 25]{flatten-lonely-condition}
+\end{codeenv*}
 
 \optsection{strip-missing-parents}
 
