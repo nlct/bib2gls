@@ -2354,12 +2354,8 @@ Additionally, \gls{MGP} may be used to reference a group from the
 most recent match in the conditional part.
 
 \item[Comparators] The conditional part of the \csopt{assign-fields}
-syntax recognises \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
-\gls{NOTPREFIXOF}, \gls{SUFFIXOF}, and \gls{NOTSUFFIXOF}.
-
-\item[Null value] The conditional part of the \csopt{assign-fields}
-syntax recognises \gls{NULL} as indicating a null value for \idx{equalscmp}
-and \idx{notequalscmp} comparisons.
+syntax recognises \gls{LEN}, \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
+\gls{NOTPREFIXOF}, \gls{SUFFIXOF}, \gls{NOTSUFFIXOF} and \gls{NULL}.
 \end{description}
 
 Finally, this isn't actually a quark, but \inlinedef{cs} is defined
@@ -10382,8 +10378,8 @@ field in the assignment, make sure that the override setting is on.
 The syntax for the \meta{assign-specs} part is:
 \begin{codeenv}
 \meta{assign-specs} ::= \meta{assign-value} | \meta{assign-value} \idx{assign-plus} \meta{assign-specs}
-\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{\meta{case-quark}}\margm{field-ref} | \meta{match-ref}
-\meta{\meta{case-quark}} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
+\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{case-quark}\margm{field-ref} | \meta{match-ref}
+\meta{case-quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
 \meta{match-ref} ::= \gls{MGP}\margm{group-ref}
 \meta{group-ref} ::= \meta{index} | \meta{name}
 \end{codeenv}
@@ -10650,6 +10646,20 @@ Evaluates to true if the value is greater than \meta{number}.
 \meta{field-ref}\idx{gecmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is greater than or equal to \meta{number}.
+
+\begin{codeenv*}
+\inlinedef{LEN}\margm{field-ref}\meta{rel}\meta{number}
+\end{codeenv*}
+The \meta{rel} may be any of the above numeric comparators
+(\idx{equalscmp} \idx{notequalscmp} etc). This conditional compares
+the length of the value obtained from the field reference to
+\meta{number}, which should be an integer. The length is the number
+of detokenized characters in the value. For example, if the field
+value contains \code{\cs{textsuperscript}\marg{1}}, the length is 19. 
+If you want the character count without the \LaTeX\ markup, you will
+need to have another field to store that value. The value for that
+intermediate field can be obtained by copying it from the original
+field and using \csopt{interpret-fields} for the intermediate field.
 
 Finally, the following compare the value with another field
 reference. The comparisons are case-sensitive and according to the

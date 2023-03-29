@@ -49,7 +49,8 @@
        [ name=/.*\string\n.*/ & entrytype -> original = "entry"],
     note = "A name with two spaces"
         [ name=/.*  .*/ & entrytype -> original = "entry"],
-    name =[o] \string\TITLE{ name } [ name <> \string\NULL & entrytype -> original = "entry" ]
+    name =[o] \string\TITLE{ name } [ name <> \string\NULL & entrytype -> original = "entry" ],
+    user1 = "Long note" [ \string\LEN{ note } > 25]
   }
 ]
 

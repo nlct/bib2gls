@@ -41,7 +41,7 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
-	  test-merge-ranges.pdf test-secondary2.pdf
+	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -803,6 +803,13 @@ test-secondary2.pdf	: test-secondary2.glstex
 test-secondary2.glstex	: test-secondary2.tex $(DEPS) test-numbers.bib
 		pdflatex test-secondary2
 		$(BIB2GLS) test-secondary2
+
+test-assign-fields.pdf	: test-assign-fields.glstex
+		pdflatex test-assign-fields
+
+test-assign-fields.glstex	: test-assign-fields.tex $(DEPS) test-assign-fields.bib
+		pdflatex test-assign-fields
+		$(BIB2GLS) test-assign-fields
 
 clean	:
 	$(RM) *.aux

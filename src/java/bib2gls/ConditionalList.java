@@ -44,7 +44,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       ConditionalList condList = new ConditionalList();
       Bib2Gls bib2gls = resource.getBib2Gls();
 
-      TeXParser parser = resource.getBibParser();
+      TeXParser parser = resource.getParser();
 
       while (!stack.isEmpty())
       {
@@ -91,6 +91,10 @@ public class ConditionalList extends Vector<ConditionalListElement>
                condList.add(popComparison(resource, stack));
             }
          }
+         else if (obj instanceof ControlSequence)
+         {
+            condList.add(popComparison(resource, stack));
+         }
          else if (condList.isEmpty())
          {
             throw new Bib2GlsException(bib2gls.getMessage(
@@ -116,11 +120,59 @@ public class ConditionalList extends Vector<ConditionalListElement>
       Bib2Gls bib2gls = resource.getBib2Gls();
       TeXParser parser = resource.getParser();
 
-      Field field = Field.popField(resource, stack);
+      stack.popLeadingWhiteSpace();
+
+      TeXObject obj = stack.peek();
+      String quarkName = null;
+      Field field;
+      String leftSide;
+
+      if (obj instanceof ControlSequence)
+      {
+         ControlSequence cs = (ControlSequence)obj;
+         quarkName = cs.getName();
+
+         if (!quarkName.equals("LEN"))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.condition_in", obj,
+                 bib2gls.toTruncatedString(parser, stack)));
+         }
+
+         obj = stack.pop();
+
+         obj = TeXParserUtils.popArg(parser, stack);
+
+         if (parser.isStack(obj))
+         {
+            TeXObjectList substack = (TeXObjectList)obj;
+            field = Field.popField(resource, substack);
+            substack.popLeadingWhiteSpace();
+
+            if (!substack.isEmpty())
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                "error.unexpected_content_in_arg",
+                  substack.toString(parser), "\\"+quarkName));
+            }
+         }
+         else
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.expected_field", "\\"+quarkName, obj.toString(parser)));
+         }
+
+         leftSide = String.format("\\%s{%s}", quarkName, field);
+      }
+      else
+      {
+         field = Field.popField(resource, stack);
+         leftSide = field.toString();
+      }
 
       stack.popLeadingWhiteSpace();
 
-      TeXObject obj = stack.pop();
+      obj = stack.pop();
 
       if (obj == null)
       {
@@ -131,6 +183,13 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       if (obj instanceof ControlSequence)
       {
+         if ("LEN".equals(quarkName))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.numeric_condition", leftSide,
+                 obj.toString(parser)));
+         }
+
          String name = ((ControlSequence)obj).getName();
  
          if (name.equals("IN"))
@@ -162,7 +221,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
          else
          {
             throw new Bib2GlsException(bib2gls.getMessage(
-                "error.invalid.condition_after", obj.toString(parser), field));
+                "error.invalid.condition_after", obj.toString(parser), leftSide));
          }
       }
 
@@ -174,7 +233,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       {
          throw new Bib2GlsException(bib2gls.getMessage(
              "error.invalid.regexp_or_cmp_condition_missing", 
-              field+obj.toString(parser)));
+              leftSide+obj.toString(parser)));
       }
 
       int cp = 0;
@@ -194,6 +253,13 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       if (cp == '=' && nextCp == '/')
       {
+         if ("LEN".equals(quarkName))
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.numeric_condition", leftSide,
+                 obj.toString(parser)));
+         }
+
          stack.pop();
          String regexp = popQuoted(resource, stack, '/').toString(parser);
 
@@ -262,7 +328,20 @@ public class ConditionalList extends Vector<ConditionalListElement>
               obj.toString(parser), field));
       }
 
-      if (nextObj instanceof ControlSequence
+      if ("LEN".equals(quarkName))
+      {
+         try
+         {
+            return new FieldLengthMatch(field, rel, popNumber(resource, stack));
+         }
+         catch (NumberFormatException e)
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.numeric_condition",
+              quarkName, bib2gls.toTruncatedString(parser, stack)), e);
+         }
+      }
+      else if (nextObj instanceof ControlSequence
           && ((ControlSequence)nextObj).getName().equals("NULL"))
       {
          stack.pop();
@@ -314,7 +393,16 @@ public class ConditionalList extends Vector<ConditionalListElement>
       else if ((nextCp >= '0' && nextCp <= '9')
                 || nextCp == '.' || nextCp == '+' || nextCp == '-')
       {
-         return new FieldNumberMatch(field, rel, popNumber(resource, stack));
+         try
+         {
+            return new FieldNumberMatch(field, rel, popNumber(resource, stack));
+         }
+         catch (NumberFormatException e)
+         {
+            throw new Bib2GlsException(bib2gls.getMessage(
+              "error.invalid.numeric_condition",
+              rel, bib2gls.toTruncatedString(parser, stack)), e);
+         }
       }
       else
       {
@@ -324,7 +412,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
    }
 
    public static Number popNumber(GlsResource resource, TeXObjectList stack)
-    throws Bib2GlsException
+    throws NumberFormatException,IOException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
 
@@ -342,10 +430,11 @@ public class ConditionalList extends Vector<ConditionalListElement>
          {
             int cp = ((SingleToken)obj).getCharCode();
 
-            if (cp >= '0' || cp <= '9')
+            if (cp >= '0' && cp <= '9')
             {
                builder.appendCodePoint(cp);
                digitFound = true;
+               stack.pop();
             }
             else if (cp == '+' || cp == '-')
             {
@@ -356,6 +445,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
                else
                {
                   builder.appendCodePoint(cp);
+                  stack.pop();
                }
             }
             else if (cp == 'e' || cp == 'E')
@@ -369,6 +459,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
                   builder.appendCodePoint(cp);
                   digitFound = false;
                   expFound = true;
+                  stack.pop();
                }
             }
             else if (cp == '.')
@@ -381,6 +472,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
                {
                   builder.appendCodePoint(cp);
                   dotFound = true;
+                  stack.pop();
                }
             }
             else
@@ -396,21 +488,19 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       String value = builder.toString();
 
-      try
+      if (value.isEmpty())
       {
-         if (dotFound || expFound)
-         {
-            return Double.valueOf(value);
-         }
-         else
-         {
-            return Integer.valueOf(value);
-         }
+         throw new NumberFormatException(
+            bib2gls.getMessage("error.missing_numeric"));
       }
-      catch (NumberFormatException e)
-      {// shouldn't happen
-         throw new Bib2GlsException(bib2gls.getMessage(
-           "error.invalid.condition", value), e);
+
+      if (dotFound || expFound)
+      {
+         return Double.valueOf(value);
+      }
+      else
+      {
+         return Integer.valueOf(value);
       }
    }
 

@@ -32,6 +32,11 @@ public class FieldNumberMatch implements Conditional
 {
    public FieldNumberMatch(Field field, Relational relation, Number value)
    {
+      if (field == null || relation == null || value == null)
+      {
+         throw new NullPointerException();
+      }
+
       this.field = field;
       this.relation = relation;
       this.value = value;
@@ -155,5 +160,5 @@ public class FieldNumberMatch implements Conditional
 
    protected Number value;
    protected Field field;
-   private Relational relation;
+   protected Relational relation;
 }

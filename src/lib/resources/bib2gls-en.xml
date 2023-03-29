@@ -448,12 +448,15 @@ the second list ({3,number}).</entry>
 <entry key="error.invalid.condition_after">Expected condition, found ''{0}'' after {1}</entry>
 <entry key="error.invalid.condition_before">Expected condition, found ''{0}'' before {1}</entry>
 <entry key="error.invalid.null_condition">Invalid condition, NULL test can only be used with ''='' or ''&lt;&gt;'', found ''{0}'' after {1}</entry>
+<entry key="error.invalid.numeric_condition">Invalid condition, numeric test required with {0}, found {1}</entry>
+<entry key="error.missing_numeric">Missing numeric value</entry>
 <entry key="error.invalid.binary">Expected binary operand before ''{0}'' in {1}</entry>
 <entry key="error.expected_field_or_string_condition">Expected field or condition or string or match group reference, found ''{0}''</entry>
 <entry key="error.expected_field_or_string_condition_after">Expected field or condition or string or match group reference, found ''{0}'' after: {1}</entry>
 <entry key="error.expected_before">Expected ''{0}'' before ''{1}''</entry>
 <entry key="error.expected_before_after">Expected ''{0}'' before ''{1}'', after: {2}</entry>
 <entry key="error.expected_field_or_string_after">Expected field or string after {0}</entry>
+<entry key="error.expected_field">Expected field in argument of {0}, found: {1}</entry>
 <entry key="error.unexpected_content_in_arg">Unexpected content ''{0}'' in the argument of {1}</entry>
 <entry key="error.openin.forbidden">Read access forbidden for file: {0}</entry>
 <entry key="error.openout.forbidden">Write access forbidden for file: {0}</entry>
