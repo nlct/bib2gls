@@ -139,66 +139,6 @@ public class FieldValueList extends Vector<FieldValueElement>
                popped.add(stack.pop());
             }
          }
-         else if (FieldCaseChange.isFieldCaseChange(object))
-         {
-            if (add)
-            {
-               TeXObject cs = object;
-
-               FieldCaseChange fieldCaseChange
-                  = FieldCaseChange.getFieldCaseChange(object);
-
-               popped.add(stack.pop());
-
-               object = stack.popArg(parser);
-
-               if (parser.isStack(object))
-               {
-                  TeXObjectList substack = (TeXObjectList)object;
-
-                  Field field = Field.popField(resource, substack);
-                  field.setCaseChange(fieldCaseChange);
-
-                  list.add(field);
-
-                  substack.popLeadingWhiteSpace();
-
-                  if (!substack.isEmpty())
-                  {
-                     throw new Bib2GlsException(bib2gls.getMessage(
-                       "error.unexpected_content_in_arg",
-                        substack.toString(parser), cs));
-                  }
-
-                  add = false;
-
-                  popped.addAll(TeXParserUtils.createGroup(parser,
-                    parser.getListener().createString(field.toString())));
-               }
-               else if (!popped.isEmpty())
-               {
-                  throw new Bib2GlsException(bib2gls.getMessage(
-                     "error.invalid.expected_after",
-                       "> + [", popped.toString(parser), object.toString(parser)));
-               }
-               else
-               {
-                  throw new Bib2GlsException(bib2gls.getMessage(
-                     "error.invalid.expected", "> + [", object.toString(parser)));
-               }
-            }
-            else if (!popped.isEmpty())
-            {
-               throw new Bib2GlsException(bib2gls.getMessage(
-                  "error.invalid.expected_after",
-                    "> + [", popped.toString(parser), object.toString(parser)));
-            }
-            else
-            {
-               throw new Bib2GlsException(bib2gls.getMessage(
-                  "error.invalid.expected", "> + [", object.toString(parser)));
-            }
-         }
          else if (object instanceof ControlSequence)
          {
             String name = ((ControlSequence)object).getName();
@@ -399,7 +339,12 @@ public class FieldValueList extends Vector<FieldValueElement>
             substack.toString(parser), "\\"+name));
       }
 
-      if (name.equals("INTERPRET"))
+      if (FieldCaseChange.isFieldCaseChange(name))
+      {
+         return new FieldValueCase(argList, 
+            FieldCaseChange.getFieldCaseChange(name));
+      }
+      else if (name.equals("INTERPRET"))
       {
          return new FieldValueInterpret(argList);
       }

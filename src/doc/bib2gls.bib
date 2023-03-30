@@ -15320,32 +15320,6 @@ warning rather than an error if the command isn't already defined},
   annote={quark}
 }
 
-@mainglscommand{LEN,
-  name={\csfmt{LEN}},
-  user1={\margm{element list}},
-  description={a \idx{quark} to denote the number of (detokenized) characters in
-  a value in \csopt{assign-fields}. This token needs
-  to be protected from expansion in the argument of
-  \gls{GlsXtrLoadResources}},
-  note={\bibgls\ \idx{quark}},
-  topics={quark},
-  category={command},
-  annote={quark}
-}
-
-@mainglscommand{CAT,
-  name={\csfmt{CAT}},
-  user1={\margm{value list}},
-  description={a \idx{quark} to denote a string concatenation 
-  in the conditional parts of \csopt{assign-fields}. This token needs
-  to be protected from expansion in the argument of
-  \gls{GlsXtrLoadResources}},
-  note={\bibgls\ \idx{quark}},
-  topics={quark},
-  category={command},
-  annote={quark}
-}
-
 @mainglscommand{IN,
   name={\csfmt{IN}},
   user1={},
@@ -15373,7 +15347,7 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 }
 
 @mainglscommand{PREFIXOF,
-  name={\csfmt{PREFIXOF}},
+  name={\csfmt{PREFIX\-OF}},
   user1={},
   description={a \idx{quark} to denote \qt{is a prefix of} conditional 
   in \csopt{assign-fields} conditionals. This token needs
@@ -15386,7 +15360,7 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 }
 
 @mainglscommand{NOTPREFIXOF,
-  name={\csfmt{NOTPREFIXOF}},
+  name={\csfmt{NOT\-PREFIX\-OF}},
   user1={},
   description={a \idx{quark} to denote \qt{is not a prefix of} conditional 
   in \csopt{assign-fields} conditionals. This token needs
@@ -15399,7 +15373,7 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 }
 
 @mainglscommand{SUFFIXOF,
-  name={\csfmt{SUFFIXOF}},
+  name={\csfmt{SUFFIX\-OF}},
   user1={},
   description={a \idx{quark} to denote \qt{is a suffix of} conditional 
   in \csopt{assign-fields} conditionals. This token needs
@@ -15412,10 +15386,36 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 }
 
 @mainglscommand{NOTSUFFIXOF,
-  name={\csfmt{NOTSUFFIXOF}},
+  name={\csfmt{NOT\-SUFFIX\-OF}},
   user1={},
   description={a \idx{quark} to denote \qt{is not a suffix of} conditional 
   in \csopt{assign-fields} conditionals. This token needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{LEN,
+  name={\csfmt{LEN}},
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote the number of (detokenized) characters in
+  a value in \csopt{assign-fields}. This token needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{CAT,
+  name={\csfmt{CAT}},
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote a string concatenation 
+  in the conditional parts of \csopt{assign-fields}. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15440,7 +15440,7 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 
 @mainglscommand{TRIM,
   name={\csfmt{TRIM}},
-  user1={\margm{element list}},
+  user1={\margm{element-list}},
   description={a \idx{quark} to denote a trimmed element in 
   \csopt{assign-fields}. This token needs
   to be protected from expansion in the argument of
@@ -15452,8 +15452,8 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 }
 
 @mainglscommand{INTERPRET,
-  name={\csfmt{INTERPRET}},
-  user1={\margm{element list}},
+  name={\csfmt{INTER\-PRET}},
+  user1={\margm{element-list}},
   description={a \idx{quark} to denote an interpreted element in 
   \csopt{assign-fields}. This token needs
   to be protected from expansion in the argument of
@@ -15466,10 +15466,9 @@ conditional in \csopt{assign-fields} conditionals. This token needs
 
 @mainglscommand{LC,
   name={\csfmt{LC}},
-  user1={\margm{field-ref}},
-  description={a \idx{quark} to denote a
-  field \idx{lowercase} change in \csopt{assign-fields} syntax. This
-token needs
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote a \idx{lowercase} change in 
+  \csopt{assign-fields} syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15480,10 +15479,9 @@ token needs
 
 @mainglscommand{UC,
   name={\csfmt{UC}},
-  user1={\margm{field-ref}},
-  description={a \idx{quark} to denote a
-  field \idx{uppercase} change in \csopt{assign-fields} syntax. This
-token needs
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote an \idx{uppercase} change in 
+  \csopt{assign-fields} syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15493,11 +15491,10 @@ token needs
 }
 
 @mainglscommand{FIRSTLC,
-  name={\csfmt{FIRSTLC}},
-  user1={\margm{field-ref}},
-  description={a \idx{quark} to denote a
-  field first-letter \idx{lowercase} change in \csopt{assign-fields}
-syntax. This token needs
+  name={\csfmt{FIRST\-LC}},
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote a first-letter \idx{lowercase}
+   change in \csopt{assign-fields} syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15507,11 +15504,10 @@ syntax. This token needs
 }
 
 @mainglscommand{FIRSTUC,
-  name={\csfmt{FIRSTUC}},
-  user1={\margm{field-ref}},
-  description={a \idx{quark} to denote a
-  field first-letter \idx{uppercase} change in \csopt{assign-fields}
-syntax. This token needs
+  name={\csfmt{FIRST\-UC}},
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote a first-letter \idx{uppercase} 
+  change in \csopt{assign-fields} syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15522,12 +15518,25 @@ syntax. This token needs
 
 @mainglscommand{TITLE,
   name={\csfmt{TITLE}},
-  user1={\margm{field-ref}},
-  description={a \idx{quark} to denote a
-  field \idx{titlecase} change in \csopt{assign-fields} syntax. This
-token needs
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote a \idx{titlecase} change in 
+  \csopt{assign-fields} syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{NOCHANGE,
+  name={\csfmt{NO\-CHANGE}},
+  user1={\margm{element-list}},
+  description={a \idx{quark} to denote no \idx{case-change} in 
+  \csopt{assign-fields} syntax. This token needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}. It's not defined by
+  \gls{GlsXtrResourceInitEscSequences}},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},

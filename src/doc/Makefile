@@ -10,6 +10,13 @@ bib2gls.pdf	: bib2gls.tex bib2gls.bib bib2gls-terms.bib bib2gls-cite.bib\
 		@grep -E '(Package glossaries-extra Warning:|unreferenced destination)' bib2gls.log || true
 		@grep -E '(Warning|Exception)' bib2gls.glg || true
 
+bib2gls.glstex	: bib2gls.tex bib2gls.bib bib2gls-terms.bib bib2gls-cite.bib\
+		   ../lib/bib2gls.jar ../lib/texparserlib.jar \
+		   ../examples/*.tex ../examples/*.bib version.tex
+		lualatex bib2gls
+		bib2gls --group --packages mfirstuc-english bib2gls
+
+
 bib2gls-begin.pdf	: bib2gls-begin.tex bib2gls.bib bib2gls-cite.bib version.tex
 			arara --verbose bib2gls-begin
 		@grep -E '(Package glossaries-extra Warning:|unreferenced destination)' bib2gls-begin.log || true

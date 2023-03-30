@@ -54,16 +54,6 @@ public class Field implements FieldValueElement
       return name;
    }
 
-   public void setCaseChange(FieldCaseChange caseChange)
-   {
-      this.caseChange = caseChange;
-   }
-
-   public FieldCaseChange getCaseChange()
-   {
-      return caseChange;
-   }
-
    protected void setName(String name)
      throws Bib2GlsException
    {
@@ -206,40 +196,6 @@ public class Field implements FieldValueElement
          return follow.getValue(refEntry);
       }
 
-      if (bibValue != null && caseChange != FieldCaseChange.NO_CHANGE)
-      {
-         if (value == null)
-         {
-            value = bibValue.expand(parser);
-         }
-
-         if (!value.isEmpty() && parser.isStack(value))
-         {
-            TeXObjectList list = (TeXObjectList)value.clone();
-
-            switch (caseChange)
-            {
-               case UC:
-                  resource.toUpperCase(list, parser.getListener());
-               break;
-               case LC:
-                  resource.toLowerCase(list, parser.getListener());
-               break;
-               case FIRST_UC:
-                  resource.toSentenceCase(list, parser.getListener());
-               break;
-               case FIRST_LC:
-                  resource.toNonSentenceCase(list, parser.getListener());
-               break;
-               case TITLE:
-                  resource.toTitleCase(list, parser.getListener());
-               break;
-            }
-
-            bibValue = new BibUserString(list);
-         }
-      }
-
       return bibValue;
    }
 
@@ -297,29 +253,6 @@ public class Field implements FieldValueElement
 
             return valList.toString(parser);
          }
-
-         if (!(caseChange == FieldCaseChange.NO_CHANGE || text.isEmpty()))
-         {
-            switch (caseChange)
-            {
-               case UC:
-                  text = resource.toUpperCase(text).toString();
-               break;
-               case LC:
-                  text = resource.toLowerCase(text).toString();
-               break;
-               case FIRST_UC:
-                  text = resource.toSentenceCase(text).toString();
-               break;
-               case FIRST_LC:
-                  text = resource.toNonSentenceCase(text).toString();
-               break;
-               case TITLE:
-                  text = resource.toTitleCase(text).toString();
-               break;
-            }
-         }
-
       }
       else
       {
@@ -524,7 +457,6 @@ public class Field implements FieldValueElement
    private FieldReference fieldRef;
    private String name;
    private Field follow;
-   private FieldCaseChange caseChange = FieldCaseChange.NO_CHANGE;
 
    public static final String FOLLOW_MARKER = "->";
 }

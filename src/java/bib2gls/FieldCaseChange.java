@@ -39,50 +39,62 @@ public enum FieldCaseChange
    {
       if (object instanceof ControlSequence)
       {
-         String name = ((ControlSequence)object).getName();
-
-         return name.equals("LC") || name.equals("UC")
-             || name.equals("FIRSTLC") || name.equals("FIRSTUC")
-             || name.equals("TITLE") || name.equals("NOCHANGE");
+         return isFieldCaseChange(((ControlSequence)object).getName());
       }
 
       return false;
+   }
+
+   public static boolean isFieldCaseChange(String name)
+   {
+      return name.equals("LC") || name.equals("UC")
+          || name.equals("FIRSTLC") || name.equals("FIRSTUC")
+          || name.equals("TITLE") || name.equals("NOCHANGE");
    }
 
    public static FieldCaseChange getFieldCaseChange(TeXObject object)
    {
       if (object instanceof ControlSequence)
       {
-         String name = ((ControlSequence)object).getName();
+         return getFieldCaseChange(((ControlSequence)object).getName());
+      }
+      else
+      {
+         throw new IllegalArgumentException(
+           "Unknown field case change identifier "
+          + object.format());
+      }
+   }
 
-         if (name.equals("LC"))
-         {
-            return LC;
-         }
-         else if (name.equals("UC"))
-         {
-            return UC;
-         }
-         else if (name.equals("FIRSTLC"))
-         {
-            return FIRST_LC;
-         }
-         else if (name.equals("FIRSTUC"))
-         {
-            return FIRST_UC;
-         }
-         else if (name.equals("TITLE"))
-         {
-            return TITLE;
-         }
-         else if (name.equals("NOCHANGE"))
-         {
-            return NO_CHANGE;
-         }
+   public static FieldCaseChange getFieldCaseChange(String name)
+   {
+      if (name.equals("LC"))
+      {
+         return LC;
+      }
+      else if (name.equals("UC"))
+      {
+         return UC;
+      }
+      else if (name.equals("FIRSTLC"))
+      {
+         return FIRST_LC;
+      }
+      else if (name.equals("FIRSTUC"))
+      {
+         return FIRST_UC;
+      }
+      else if (name.equals("TITLE"))
+      {
+         return TITLE;
+      }
+      else if (name.equals("NOCHANGE"))
+      {
+         return NO_CHANGE;
       }
 
       throw new IllegalArgumentException("Unknown field case change identifier "
-       + object.format());
+       + name);
    }
 
    protected final String tag;

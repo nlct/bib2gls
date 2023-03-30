@@ -2347,14 +2347,12 @@ Note that \idxpl{regex} in resource options are typically
 or \idx{regex.dollar} to denote the start and end.
 
 \item[Field assignments] The following commands may be used in the
-assignment value syntax of \csopt{assign-fields} to apply a
-case-conversion to the value obtained from the referenced field:
+\meta{element-list} syntax of \csopt{assign-fields}:
+\gls{MGP}, \gls{LEN}, \gls{TRIM}, \gls{INTERPRET},
 \gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
-Additionally, \gls{MGP} may be used to reference a group from the
-most recent match in the conditional part.
 
-\item[Comparators] The conditional part of the \csopt{assign-fields}
-syntax recognises \gls{LEN}, \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
+\item[Conditionals] The \meta{condition} part of the \csopt{assign-fields}
+syntax recognises \gls{LEN}, \gls{CAT}, \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
 \gls{NOTPREFIXOF}, \gls{SUFFIXOF}, \gls{NOTSUFFIXOF} and \gls{NULL}.
 \end{description}
 
@@ -8713,8 +8711,16 @@ will only flatten lonely entries where both the child name and the
 parent name have less then 25 characters:
 \begin{codeenv*}
  \csopt[postsort]{flatten-lonely},
- \csopt[\gls{LEN}\marg{parent \idx{follow} name} \idx{ltcmp} 25 \idx{ampand} \gls{LEN}\marg{name} \idx{ltcmp} 25]{flatten-lonely-condition}
+ \csopt[\gls{LEN}\marg{parent \idx{follow} \field{name}} \idx{ltcmp} 25 \idx{ampand} \gls{LEN}\marg{\field{name}} \idx{ltcmp} 25]{flatten-lonely-condition}
 \end{codeenv*}
+Alternatively, for a combined length of less than 50 characters:
+\begin{codeenv*}
+ \csopt[postsort]{flatten-lonely},
+ \csopt[\gls{LEN}\marg{parent \idx{follow} \field{name} \idx{assign-plus} \field{name}} \idx{ltcmp} 50]{flatten-lonely-condition}
+\end{codeenv*}
+This doesn't include the number of characters taken up by the
+separator but the maximum value can be adjusted to allow for that,
+given a constant string separator.
 
 \optsection{strip-missing-parents}
 
@@ -10366,13 +10372,13 @@ The \csopt{assign-fields} option is a more complex way of setting a
 field than \csopt{replicate-fields}. Each \keyval\ element of the
 \keyvallist\ argument has the syntax:
 \begin{codeenv}
-\meta{dest-field} \dequals\oargm{override} \meta{assign-specs} \oargm{condition}
+\meta{dest-field} \dequals\oargm{override} \meta{assign-list} \oargm{condition}
 \end{codeenv}
 If the destination field (\meta{dest-field}) is already set, it will
 only be overwritten if \csopt[true]{assign-override} or if
 \oarg{override} is \qtt{o}. The \meta{dest-field} is simply the name
 of the field for the entry under consideration and doesn't use the
-more complex \meta{field-ref} syntax used in \meta{assign-specs},
+more complex \meta{field-ref} syntax used in \meta{assign-list},
 which is described below.
 
 The \oargm{override} following the equal sign is optional and may be
@@ -10381,17 +10387,17 @@ assignment. The \meta{override} value may be either \qtt{o}
 (override) or \qtt{n} (no override). If not present, the
 \csopt{assign-override} setting will be used.
 
-The \oargm{condition} part is optional. The \meta{assign-specs}
-are a \idx{assign-plus} separated list of field references or
-delimited strings. A field reference may be marked up with a case-\idx{quark},
-and the conditional part may use the \gls{NULL}-\idx{quark} in equal and
-not equal comparisons. Field (not string) comparisons may use the
-substring, prefix and suffix \idxpl{quark}.
+The \oargm{condition} part is optional. The \meta{assign-list}
+is a \idx{assign-plus} separated list of field references or
+delimited strings or \idxpl{quark}, which are described below.
+The \idx{assign-plus} character denotes string concatenation. If any
+individual element in the list evaluates to null, the entire string
+is deemed to be null, in which case the assignment won't be made.
 
-Note that, unlike most \keyval\ elements, the value part (\meta{assign-specs}
-\oargm{condition}) should not be grouped. The \csopt{assign-fields}
-option is parsed in a different way to the other \keyvallist\
-options.
+Note that, unlike most \keyval\ options, the value part
+(\meta{assign-list} \oargm{condition}) should not be grouped. The
+\csopt{assign-fields} option is parsed in a different way to the
+other \keyvallist\ options.
 
 \begin{important}
 Remember that field values may be altered before or after
@@ -10399,83 +10405,22 @@ Remember that field values may be altered before or after
 \sectionref{sec:resourcesets}). The assignment will use the value
 current at the time it is referenced during the processing of
 \csopt{assign-fields}.  If you need to reference the destination
-field in the assignment, make sure that the override setting is on.
+field in the assignment, make sure that the override setting is on
+if the field needs to be updated.
 \end{important}
 
-The syntax for the \meta{assign-specs} part is:
+The \meta{assign-list} part should conform to the \meta{element-list}
+syntax:
 \begin{codeenv}
-\meta{assign-specs} ::= \meta{assign-value} | \meta{assign-value} \idx{assign-plus} \meta{assign-specs}
-\meta{assign-value} ::= \meta{string} | \meta{field-ref} | \meta{case-quark}\margm{field-ref} | \meta{match-ref}
-\meta{case-quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE}
+\meta{element-list} ::= \meta{element-value} | \meta{element-value} \idx{assign-plus} \meta{element-list}
+\meta{element-value} ::= \meta{string} | \meta{field-ref} | \meta{element-quark}\margm{element-list} | \meta{match-ref}
+\meta{element-quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE} | \gls{LEN} | \gls{TRIM} | \gls{INTERPRET}
 \meta{match-ref} ::= \gls{MGP}\margm{group-ref}
 \meta{group-ref} ::= \meta{index} | \meta{name}
+\meta{string} ::= \qtdelim{\meta{tokens}} | \margm{tokens}
 \end{codeenv}
-
-As with the \ext{bib} format, strings can be delimited by braces
-\margm{text} or double-quotes \code{\qtdelim{\meta{text}}}. If you
-need a literal double-quote (\idx{doublequotechar}) then either use
-brace delimiters or use \gls{quark.doublequote}. If you need the
-actual \LaTeX\ accent command \ics{umlaut} then use brace
-delimiters. If you need braces that start and end in different
-fragments then use double-quote delimiters.
-
-The \meta{match-ref} should only be used with a
-\gls{regular-expression} conditional. If a match was found,
-\inlinedef{MGP} can be used to reference a group within the match. 
-The \meta{group-ref} argument may be either an integer (the group
-index) or the group name. For example, suppose a custom field called
-\fieldfmt{ordinal} may contain content such as \code{1st} or
-\code{10th} and I want to encapsulate the suffix part without
-altering the \ext{bib} file. This can be done as follows:
-\begin{codeenv}
-\csopt[
-  ordinal =\oarg{o} \gls{MGP}\marg{1} + " \gls{cs}\marg{ord}\marg{" + \gls{MGP}\marg{2} + "}"
-   \oarg{ ordinal=/(\gls{cs}\marg{d}+)(st|nd|rd|th)/}
-]{assign-fields}
-\end{codeenv}
-Alternatively, using named groups:
-\begin{codeenv*}
-\csopt[
-  ordinal =\oarg{o} \gls{MGP}\marg{num} + " \gls{cs}\marg{ord}\marg{" + \gls{MGP}\marg{suffix} + "}"
-   \oarg{ ordinal=/(\idx{regex.question}\idx{regex.lt}num\idx{regex.gt}\gls{cs}\marg{d}+)(\idx{regex.question}\idx{regex.lt}suffix\idx{regex.gt}st|nd|rd|th)/}
-]{assign-fields}
-\end{codeenv*}
-Note that the group name shouldn't be delimited with double-quotes.
-
-\begin{important}
-The \gls{MGP} quark (which expands to the \gls{MGP} identifier for
-\csopt{assign-fields}) isn't the same as \ics{glscapturedgroup}
-(which expands to \cs{cs.string}\idx{dollarchar}, allowing a dollar
-character to be written to the \ext{aux} file within
-the replacement part of \csopt{labelify-replace}).
-\end{important}
-
-The case-changing \idxpl{quark} that may be used in the assignment
-specification can only take a field reference \meta{field-ref} (see
-below) as an argument (not a string or concatenation). This doesn't
-alter the referenced field but converts the value obtained from the
-reference for use in the concatenation. Note that the case-change is
-performed by \bibgls\ not by inserting \LaTeX\ case-changing
-commands into the code. 
-
-The case-changing functions will use the \gls{resource-locale}, but
-whether or not \bibgls\ recognises the correct rules for the locale
-depends on whether or not the locale is correctly supported by the
-Java locale provider. The \langxml\ may provide assistance with
-case-conversion.
-
-\begin{itemize}
-\item \inlinedef{LC} converts the value obtained from the field
-reference to \idx!{lowercase};
-\item \inlinedef{UC} converts the value obtained from the field
-reference to \idx!{uppercase};
-\item \inlinedef{FIRSTLC} converts the first letter from the value
-obtained from the field reference to \idx!{lowercase};
-\item \inlinedef{FIRSTUC} converts the first letter from the value
-obtained from the field reference to \idx!{uppercase};
-\item \inlinedef{TITLE} converts the value obtained from the field
-reference to \idx!{titlecase}.
-\end{itemize}
+The \meta{field-ref} syntax is described below, and is used to
+reference a field value.
 
 \begin{important}
 Remember that the argument of \gls{GlsXtrLoadResources} is expanded
@@ -10498,7 +10443,140 @@ So you can do:
 This means that you can simply write the \idx{quark} in the resource
 option without needing to use \ics{protect} or \idx{cs.string}.
 
-The field reference syntax is more complicated:
+As with the \ext{bib} format, strings (\meta{string}) can be delimited by braces
+\margm{text} or double-quotes \code{\qtdelim{\meta{text}}}. If you
+need a literal double-quote (\idx{doublequotechar}) then either use
+brace delimiters or use \gls{quark.doublequote}. If you need the
+actual \LaTeX\ accent command \ics{umlaut} then use brace
+delimiters. If you need braces that start and end in different
+strings then use double-quote delimiters. For example:
+\begin{codeenv}
+\csopt[
+ \field{first} = "\gls{cs}\marg{emph}\idx{bgroupchar}" \idx{assign-plus} \field{name} \idx{assign-plus} "\idx{egroupchar}"
+]{assign-fields}
+\end{codeenv}
+
+\nosecdef{MGP}
+The \meta{match-ref} element should only be used with a
+\gls{regular-expression} conditional within the \meta{condition}
+part of the current assignment rule. If a match was found,
+\gls{MGP} can be used to reference a group within the match. 
+The \meta{group-ref} argument may be either an integer (the group
+index) or the group name. For example, suppose a custom field called
+\fieldfmt{ordinal} may contain content such as \code{1st} or
+\code{10th} and I want to encapsulate the suffix part without
+altering the \ext{bib} file. This can be done as follows:
+\begin{codeenv}
+\csopt[
+ \fieldfmt{ordinal} =\oarg{o} \gls{MGP}\marg{1} + " \gls{cs}\marg{ord}\marg{" + \gls{MGP}\marg{2} + "}"
+   \oarg{ ordinal=/(\gls{cs}\marg{d}+)(st|nd|rd|th)/ }
+]{assign-fields}
+\end{codeenv}
+Alternatively, using named groups:
+\begin{codeenv*}
+\csopt[
+ ordinal =\oarg{o} \gls{MGP}\marg{num} + " \gls{cs}\marg{ord}\marg{" + \gls{MGP}\marg{suffix} + "}"
+   \oarg{ ordinal=/(\idx{regex.question}\idx{regex.lt}num\idx{regex.gt}\gls{cs}\marg{d}+)(\idx{regex.question}\idx{regex.lt}suffix\idx{regex.gt}st|nd|rd|th)/ }
+]{assign-fields}
+\end{codeenv*}
+Note that the group name shouldn't be delimited with double-quotes.
+
+\begin{important}
+The \gls{MGP} quark (which expands to the \gls{MGP} identifier for
+\csopt{assign-fields}) isn't the same as \ics{glscapturedgroup}
+(which expands to \cs{cs.string}\idx{dollarchar}, allowing a dollar
+character to be written to the \ext{aux} file within
+the replacement part of \csopt{labelify-replace}).
+\end{important}
+
+The element quarks (\meta{element-quark}) take an
+\meta{element-list} argument. If the \meta{element-list} argument evaluates
+to null, they will return null.
+
+\nosecdef{TRIM}
+Returns its argument with any leading and trailing spaces removed.
+
+\nosecdef{INTERPRET}
+Interprets the contents of \meta{element-list} using \bibgls's
+interpreter and returns the result, which may be an empty string if
+the content only contains unknown commands.
+
+\nosecdef{LEN}
+When used within an element list, \gls{LEN} returns the length of
+its \meta{element-list} argument as a string or null if \meta{element-list}
+evaluates to null. Note that this is different from using \gls{LEN}
+in a numerical condition where the result is always an integer.
+This means that \code{\gls{LEN}\margm{list1} \idx{assign-plus}
+\gls{LEN}\margm{list2}} performs string concatenation not numerical
+addition. Instead, use \code{\gls{LEN}\marg{\meta{list1}
+\idx{assign-plus} \meta{list2}}} for the combined length.
+
+The length is the detokenised length, for example,
+if the \field{name} field has the value \code{\cs{emph}\marg{x}}
+then \code{\gls{LEN}\marg{\field{name}}} will evaluate to the string
+\qtdelim{8}. You can use
+\begin{codeenv}
+\gls{LEN}\marg{\gls{INTERPRET}\margm{element-list}}
+\end{codeenv}
+to find the length without \LaTeX\ commands.
+
+The \idxpl{quark} below identify case-changing functions. The
+\meta{element-list} argument will be converted using the appropriate
+function and the result will be returned. If \meta{element-list}
+evaluates to null then null will be returned.
+
+The case-changing functions will use the \gls{resource-locale}, but
+whether or not \bibgls\ recognises the correct rules for the locale
+depends on whether or not the locale is correctly supported by the
+Java locale provider. The \langxml\ may provide assistance with
+case-conversion.  Note that the case-change is performed by \bibgls\
+not by inserting \LaTeX\ case-changing commands into the code. 
+
+\begin{itemize}
+\item \inlinedef{LC} converts \meta{element-list} to \idx{lowercase};
+\item \inlinedef{UC} converts \meta{element-list} to \idx{uppercase};
+\item \inlinedef{FIRSTLC} converts the first letter of 
+\meta{element-list} to \idx{lowercase};
+\item \inlinedef{FIRSTUC} converts the first letter of
+\meta{element-list} to \idx{uppercase} (\idx{sentencecase});
+\item \inlinedef{TITLE} converts \meta{element-list} to \idx{titlecase}.
+\end{itemize}
+
+There is an additional token \inlinedef{NOCHANGE} which simply
+evaluates \meta{element-list} and returns it unchanged. This isn't
+like \cs{NoCaseChange} but is more like \cs{@firstofone}. There is
+little need for it so it's not defined by
+\ics{GlsXtrResourceInitEscSequences}. The only plausible use for it
+is if you have a class or package that contains something like:
+\begin{codeenv}
+\csfmt{newcommand}\marg{\csfmt{mycase}}\marg{NOCHANGE}
+\comment{later as the result of some condition:}
+\csfmt{renewcommand}\marg{\csfmt{mycase}}\marg{FIRSTUC}
+\comment{later on:}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[
+   \field{name}=\oarg{o} \gls{cs}\marg{\csfmt{mycase}}\marg{\field{name}},
+\comment{other assignments \ldots}
+ ]{assign-fields}
+}
+\end{codeenv}
+In most cases, it should be possible to achieve the same result with a
+conditional in the \csopt{assign-fields} content or by adjusting the
+content passed to the resource command. For example:
+\begin{codeenv}
+\csfmt{newcommand}\marg{\csfmt{nameassign}}\marg{}
+\comment{later as the result of some condition:}
+\csfmt{renewcommand}\marg{\csfmt{nameassign}}\marg{name=\oarg{o}\gls{FIRSTUC}\marg{name},}
+\comment{later on:}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[
+   \csfmt{nameassign}
+\comment{other assignments \ldots}
+ ]{assign-fields}
+}
+\end{codeenv}
+
+The field reference (\meta{field-ref}) syntax is more complicated:
 \begin{codeenv}
 \meta{field-ref} ::= \meta{value-ref} | \meta{entry-ref} \idx{follow} \meta{field-ref}
 \meta{entry-ref} ::= self | parent | root
@@ -10548,238 +10626,292 @@ This indicates that it has read \qt{parent} as meaning the
 \qt{\idx{follow}}.
 
 A condition can be added to the assignment specification so that the
-assignment is only made if the conditional is true. The condition
-should be placed in square brackets after the \meta{assign-specs}
+assignment is only made if the conditional evaluates to true. The condition
+should be placed in square brackets after the \meta{assign-list}
 part. The tokens \idx{ampand} and \idx{pipeor} indicate logical
 \qt{AND} and \qt{OR}, respectively, and \idx{exclamnot} indicates
 negation. Parentheses \idx{openparenchar} and \idx{closeparenchar}
-may be used to control the order of precedence. Fields can be
-referenced in the same manner as in the \meta{assign-specs} but the
-case-changing quarks and string concatenation \idx{assign-plus}
-aren't available.
+may be used to control the order of precedence. 
 
-The following field value boolean functions are available. If the
+Available boolean functions are in the form:
+\begin{codeenv}
+\meta{value1} \meta{cmp} \meta{value2}
+\end{codeenv}
+where \meta{value1} is the left-hand value and \meta{value2} is the
+right-hand value. The middle \meta{cmp} identifies the comparison
+function.
+
+The left-hand \meta{value1} may be a field reference \meta{field-ref} or
+the integer \idx{quark} \code{\gls{LEN}\margm{element-list}} or
+the concatenate \idx{quark} \code{\gls{CAT}\margm{element-list}},
+where \meta{field-ref} references a field value and
+\meta{element-list} is an element list, using the same
+syntax described above.
+
+The right-hand \meta{value2} may be a field reference
+\meta{field-ref} or \code{\gls{CAT}\margm{element-list}} or
+\gls{NULL} or a constant string (\qtdelim{\meta{string}} or
+\margm{string}) or a number or a \gls{regular-expression}. You can't
+use \gls{LEN} on the right-hand as a numeric value (but it may occur
+inside the argument \gls{CAT}).  You can't use \gls{NULL} or a
+\gls{regular-expression} on the left-hand side.
+
+Where \meta{value1} is \code{\gls{LEN}\margm{element-list}}, the length
+evaluates to an integer and may only be used in the numerical
+comparisons. If \meta{element-list} is null, then the length will be~0.
+The \gls{LEN} \idx{quark} can't be used in the right hand
+\meta{value2} part of a numerical comparison. Note that if \gls{LEN}
+occurs inside the argument of \gls{CAT} then it becomes a string not
+a number.
+
+\nosecdef{CAT}
+Where \meta{value1} or \meta{value2} is \code{\gls{CAT}\margm{element-list}}, the
+\meta{element-list} will be evaluated and treated as a string, which
+will be null if \meta{element-list} evaluates to null.
+
+\gls{NULL}
+The null \idx{quark} may only be used as \meta{value2} for the
+equality and inequality comparisons. It can't be used in any other
+context. Note that the numeric \gls{LEN} doesn't return null.
+
+Where a field value is referenced (\meta{field-ref}), if the
 field value is undefined (either the field isn't set or the
 referenced ancestor entry hasn't been defined) then, if 
 \csopt[fallback]{assign-missing-field-action}, the fallback value is
 obtained. If the value is still undefined it will be considered 
-a NULL value for the purposes of the comparison. Note that with 
-\csopt[empty]{assign-missing-field-action} there will be no NULL
+a null value for the purposes of the comparison. Note that with 
+\csopt[empty]{assign-missing-field-action} there will be no null
 values.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{equalscmp}\inlinedef{NULL}
+\meta{value1}\idx{equalscmp}\inlinedef{NULL}
 \end{codeenv*}
-Evaluates to true if the value is NULL.
+Evaluates to true if \meta{value1} is null.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{notequalscmp}\gls{NULL}
+\meta{value1}\idx{notequalscmp}\gls{NULL}
 \end{codeenv*}
-Evaluates to true if the value is not NULL.
+Evaluates to true if \meta{value1} is not null.
 
-For the remaining comparisons, NULL values will be treated as an
-empty string. The value being compared is a detokenized string that
-will contain any TAB or newline characters or additional spacing
-that's present in the \ext{bib} file (unless they have already been
-stripped by other resource options).
+For the remaining comparisons, null values will be treated as an
+empty string. Once the \meta{field-ref} or \gls{CAT} references have
+been evaluated, their returned value will be turned into a
+detokenized string for the purposes of the comparison.
+
+The detokenized values may contain any TAB or newline characters
+or additional spacing that are present in the \ext{bib} file (unless
+they have already been stripped by other resource options or field
+assignments).  However, redundant spacing in any literal strings
+(\qtdelim{\meta{string}} or \margm{string}) are likely to be lost
+when the resource options are written to the \ext{aux} file.
 
 \begin{codeenv}
-\meta{field-ref}=\idx{slashchar}\meta{regex}\idx{slashchar}
-\meta{field-ref}=\idx{slashchar}\meta{regex}\idx{slashchar}i
+\meta{value1}=\idx{slashchar}\meta{regex}\idx{slashchar}
+\meta{value1}=\idx{slashchar}\meta{regex}\idx{slashchar}i
 \end{codeenv}
-Evaluates to true if the value matches the given \gls{anchored} regular
-expression \meta{regex}. If \code{i} follows the terminating
-\idx{slashchar} then the match is case-sensitive. No other modifiers
+Evaluates to true if the value matches the given \gls{anchored} 
+\gls{regular-expression} \meta{regex}. If \code{i} follows the terminating
+\idx{slashchar} then the match is case-insensitive. No other modifiers
 are recognised, but you can use embedded flag expressions, such as
 \code{?s} for \qt{single-line} mode.
 
-In the following string comparisons, the \meta{string} may be
-delimited double-quotes or braces. The comparisons are according to
-the Unicode code points (not locale-sensitive), but if the string is
-followed by \code{i}, a case-insensitive comparison is used.
+In the following string comparisons, the right-hand \meta{string} is
+a constant string that must be delimited with double-quotes or braces. The
+comparisons are according to the Unicode code points (not
+locale-sensitive), but if the string is followed by \code{i}, a
+case-insensitive comparison is used.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{equalscmp}\meta{string}
-\meta{field-ref}\idx{equalscmp}\meta{string}i
+\meta{value1}\idx{equalscmp}\meta{string}
+\meta{value1}\idx{equalscmp}\meta{string}i
 \end{codeenv*}
 Evaluates to true if the value is equal to the string.
+For example:
+\begin{codeenv}
+\field{category}\idx{equalscmp}\qtdelim{abbreviation}
+\end{codeenv}
 
 \begin{codeenv*}
-\meta{field-ref}\idx{notequalscmp}\meta{string}
-\meta{field-ref}\idx{notequalscmp}\meta{string}i
+\meta{value1}\idx{notequalscmp}\meta{string}
+\meta{value1}\idx{notequalscmp}\meta{string}i
 \end{codeenv*}
 Evaluates to true if the value is not equal to the string.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{ltcmp}\meta{string}
-\meta{field-ref}\idx{ltcmp}\meta{string}i
+\meta{value1}\idx{ltcmp}\meta{string}
+\meta{value1}\idx{ltcmp}\meta{string}i
 \end{codeenv*}
 Evaluates to true if the value is lexicographically less than the string.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{lecmp}\meta{string}
-\meta{field-ref}\idx{lecmp}\meta{string}i
+\meta{value1}\idx{lecmp}\meta{string}
+\meta{value1}\idx{lecmp}\meta{string}i
 \end{codeenv*}
 Evaluates to true if the value is lexicographically less than or
 equal to the string.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{gtcmp}\meta{string}
-\meta{field-ref}\idx{gtcmp}\meta{string}i
+\meta{value1}\idx{gtcmp}\meta{string}
+\meta{value1}\idx{gtcmp}\meta{string}i
 \end{codeenv*}
 Evaluates to true if the value is lexicographically greater than the string.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{gecmp}\meta{string}
-\meta{field-ref}\idx{gecmp}\meta{string}i
+\meta{value1}\idx{gecmp}\meta{string}
+\meta{value1}\idx{gecmp}\meta{string}i
 \end{codeenv*}
 Evaluates to true if the value is lexicographically greater than or
 equal to the string.
 
 In the following numerical comparisons, the given \meta{number}
 should use \qtt{.} for the decimal point and no number group
-separators. If the \meta{number} doesn't contain a decimal point
-then an integer comparison is assumed and the value obtained from
-the field reference will be converted to an integer for the comparison.
-If the value is empty or isn't numeric it will be treated as 0.
-The number shouldn't be delimited by quotes or braces.
+separators. If the \meta{number} doesn't contain a decimal point or
+if \meta{value1} is the \code{\gls{LEN}\margm{element-list}} quark
+then an integer comparison is assumed.  If \meta{value1} is
+empty or isn't numeric it will be treated as 0.  The number
+shouldn't be delimited by quotes or braces.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{equalscmp}\meta{number}
+\meta{value1}\idx{equalscmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is equal to \meta{number}.
+For example:
+\begin{codeenv}
+\gls{LEN}\marg{\field{user1}}\idx{equalscmp}0.9
+\end{codeenv}
+This will return true if the \field{user1} field length is 0 and
+false otherwise. This is because \gls{LEN} enforces an integer
+comparison which means that 0.9 is converted to 0.
+Similarly:
+\begin{codeenv}
+\gls{CAT}\marg{\qtdelim{0.9}}\idx{equalscmp}0
+\end{codeenv}
+This will return true because the \meta{number} 0 is an integer
+which enforces an integer comparison so the string \qtdelim{0.9}
+will be converted to the number~0.
+Compare this with:
+\begin{codeenv}
+\gls{CAT}\marg{\qtdelim{0.9}}\idx{equalscmp}0.0
+\end{codeenv}
+This will return false because the \meta{number} 0.0 is a decimal,
+so a decimal comparison will be used.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{notequalscmp}\meta{number}
+\meta{value1}\idx{notequalscmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is not equal to \meta{number}.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{ltcmp}\meta{number}
+\meta{value1}\idx{ltcmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is less than \meta{number}.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{lecmp}\meta{number}
+\meta{value1}\idx{lecmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is less than or equal to \meta{number}.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{gtcmp}\meta{number}
+\meta{value1}\idx{gtcmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is greater than \meta{number}.
 
 \begin{codeenv*}
-\meta{field-ref}\idx{gecmp}\meta{number}
+\meta{value1}\idx{gecmp}\meta{number}
 \end{codeenv*}
 Evaluates to true if the value is greater than or equal to \meta{number}.
 
-\begin{codeenv*}
-\inlinedef{LEN}\margm{field-ref}\meta{rel}\meta{number}
-\end{codeenv*}
-The \meta{rel} may be any of the above numeric comparators
-(\idx{equalscmp} \idx{notequalscmp} etc). This conditional compares
-the length of the value obtained from the field reference to
-\meta{number}, which should be an integer. The length is the number
-of detokenized characters in the value. For example, if the field
-value contains \code{\cs{textsuperscript}\marg{1}}, the length is 19. 
-If you want the character count without the \LaTeX\ markup, you will
-need to have another field to store that value. The value for that
-intermediate field can be obtained by copying it from the original
-field and using \csopt{interpret-fields} for the intermediate field.
-
-Finally, the following compare the value with another field
-reference. The comparisons are case-sensitive and according to the
-Unicode code points (not locale-sensitive).
+Finally, the following are string comparisons made after
+evaluating and detokenizing both \meta{value1} and \meta{value2}. The
+comparisons are case-sensitive and according to the Unicode code
+points (not locale-sensitive).
 
 \begin{codeenv*}
-\meta{field-ref}\idx{equalscmp}\meta{field-ref2}
+\meta{value1}\idx{equalscmp}\meta{value2}
 \end{codeenv*}
-Evaluates to true if the value is equal to the value obtained from
-the field reference \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref}\idx{notequalscmp}\meta{field-ref2}
-\end{codeenv*}
-Evaluates to true if the value is not equal to the value obtained from
-the field reference \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref}\idx{ltcmp}\meta{field-ref2}
-\end{codeenv*}
-Evaluates to true if the value is lexicographically less than the value obtained from
-the field reference \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref}\idx{lecmp}\meta{field-ref2}
-\end{codeenv*}
-Evaluates to true if the value is lexicographically less than or
-equal to the value obtained from the field reference \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref}\idx{gtcmp}\meta{field-ref2}
-\end{codeenv*}
-Evaluates to true if the value is lexicographically greater than the
-value obtained from the field reference \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref}\idx{gecmp}\meta{field-ref2}
-\end{codeenv*}
-Evaluates to true if the value is lexicographically greater than or
-equal to the value obtained from the field reference \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref} \inlinedef{IN} \meta{field-ref2}
-\end{codeenv*}
-Evaluates to true if the value is a substring of the value obtained
-from the field reference \meta{field-ref2}. If the \meta{field-ref}
-value is empty or missing it's considered not a substring regardless
-of the value of \meta{field-ref2}.
-
-\begin{codeenv*}
-\meta{field-ref} \inlinedef{NIN} \meta{field-ref2}
-\end{codeenv*}
-The negation of the \gls{IN} test. Evaluates to true if the value is
-not a substring of the value obtained from the field reference
-\meta{field-ref2}. This is equivalent to:
+Evaluates to true if \meta{value1} is equal to \meta{value2}.
+For example:
 \begin{codeenv}
-\idx{exclamnot} \meta{field-ref} \gls{IN} \meta{field-ref2}
+\field{name} \idx{equalscmp} parent \idx{follow} \field{name}
 \end{codeenv}
 
 \begin{codeenv*}
-\meta{field-ref} \inlinedef{PREFIXOF} \meta{field-ref2}
+\meta{value1}\idx{notequalscmp}\meta{value2}
 \end{codeenv*}
-Evaluates to true if the value is a prefix of the value obtained
-from the field reference \meta{field-ref2} (that is, the
-\meta{field-ref2} value starts with the \meta{field-ref} value).
-If the \meta{field-ref} value is empty or missing it's considered
-not a prefix regardless of the value of \meta{field-ref2}.
+Evaluates to true if \meta{value1} is not equal to \meta{value2}.
 
 \begin{codeenv*}
-\meta{field-ref} \inlinedef{NOTPREFIXOF} \meta{field-ref2}
+\meta{value1}\idx{ltcmp}\meta{value2}
 \end{codeenv*}
-Evaluates to true if the value is not a prefix of the value obtained
-from the field reference \meta{field-ref2}. This is equivalent to:
+Evaluates to true if \meta{value1} is lexicographically less than
+\meta{value2}.
+
+\begin{codeenv*}
+\meta{value1}\idx{lecmp}\meta{value2}
+\end{codeenv*}
+Evaluates to true if \meta{value1} is lexicographically less than or
+equal to \meta{value2}.
+
+\begin{codeenv*}
+\meta{value1}\idx{gtcmp}\meta{value2}
+\end{codeenv*}
+Evaluates to true if \meta{value1} is lexicographically greater than
+\meta{value2}.
+
+\begin{codeenv*}
+\meta{value1}\idx{gecmp}\meta{value2}
+\end{codeenv*}
+Evaluates to true if \meta{value} is lexicographically greater than or
+equal to \meta{value2}.
+
+\begin{codeenv*}
+\meta{value1} \inlinedef{IN} \meta{value2}
+\end{codeenv*}
+Evaluates to true if \meta{value1} is a substring of \meta{value2}.
+If \meta{value1} is empty or null it's considered
+not a substring regardless of the value of \meta{value2}.
+
+\begin{codeenv*}
+\meta{value1} \inlinedef{NIN} \meta{value2}
+\end{codeenv*}
+The negation of the \gls{IN} test. Evaluates to true if \meta{value1} is
+not a substring of \meta{value2}. This is equivalent to:
 \begin{codeenv}
-\idx{exclamnot} \meta{field-ref} \gls{PREFIXOF} \meta{field-ref2}
+\idx{exclamnot} \meta{value1} \gls{IN} \meta{value2}
 \end{codeenv}
 
 \begin{codeenv*}
-\meta{field-ref} \inlinedef{SUFFIXOF} \meta{field-ref2}
+\meta{value1} \inlinedef{PREFIXOF} \meta{value2}
 \end{codeenv*}
-Evaluates to true if the value is a suffix of the value obtained
-from the field reference \meta{field-ref2} (that is, the
-\meta{field-ref2} value ends with the \meta{field-ref} value).
-If the \meta{field-ref} value is empty or missing it's considered
-not a suffix regardless of the value of \meta{field-ref2}.
+Evaluates to true if \meta{value1} is a prefix of \meta{value2}
+(that is, \meta{value2} starts with \meta{value1}).
+If \meta{value1} is empty or null it's considered
+not a prefix regardless of \meta{value2}.
 
 \begin{codeenv*}
-\meta{field-ref} \inlinedef{NOTSUFFIXOF} \meta{field-ref2}
+\meta{value1} \inlinedef{NOTPREFIXOF} \meta{value2}
 \end{codeenv*}
-Evaluates to true if the value is not a suffix of the value obtained
-from the field reference \meta{field-ref2}. This is equivalent to:
+Evaluates to true if \meta{value1} is not a prefix of \meta{value2}.
+This is equivalent to:
 \begin{codeenv}
-\idx{exclamnot} \meta{field-ref} \gls{SUFFIXOF} \meta{field-ref2}
+\idx{exclamnot} \meta{value1} \gls{PREFIXOF} \meta{value2}
+\end{codeenv}
+
+\begin{codeenv*}
+\meta{value1} \inlinedef{SUFFIXOF} \meta{value2}
+\end{codeenv*}
+Evaluates to true if \meta{value1} is a suffix of \meta{value2}
+(that is, \meta{value2} ends with \meta{value1}).
+If \meta{value1} is empty or null it's considered
+not a suffix regardless of \meta{value2}.
+
+\begin{codeenv*}
+\meta{value1} \inlinedef{NOTSUFFIXOF} \meta{value2}
+\end{codeenv*}
+Evaluates to true if \meta{value1} is not a suffix of \meta{value2}.
+This is equivalent to:
+\begin{codeenv}
+\idx{exclamnot} \meta{value1} \gls{SUFFIXOF} \meta{value2}
 \end{codeenv}
 
 For example, suppose I have defined the custom fields
