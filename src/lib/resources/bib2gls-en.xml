@@ -275,13 +275,8 @@ Defaulting to: {0}.
      (for example, the digraph 'dz' is converted to 'Dz'). This doesn't apply
      to the Dutch digraph 'ij', which should be converted to 'IJ'. Other 
      exceptions may be added as appropriate.
-
-     Note, may change grouptitle.case to include language tag.
   -->
 <entry key="grouptitle.case.ij">IJ</entry>
-
-<entry key="sentencecase.nl.ij">IJ</entry>
-<entry key="nonsentencecase.nl.IJ">ij</entry>
 
 <entry key="warning.title">Warning: {0}</entry>
 

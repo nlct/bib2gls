@@ -2491,10 +2491,21 @@ If there is no match, \bibgls\ will fallback on the English resource file
 to translating it. Any volunteers who want to provide other language
 resource files would be much appreciated.)
 
+In addition to the main language file, it's possible to have
+supplementary files that provide text that matches the
+\gls{resource-locale}. These are in files called
+\metafilefmt{bib2gls-extra-}{lang}{.xml}, which has the same format
+as \metafilefmt{bib2gls-}{lang}{.xml}. These supplementary files
+will be loaded automatically if they exist and if you have
+\styfmt{glossaries-extra} v1.51+ (which will save a list of all
+tracked languages for the document).
+
 Note that if you use the \csopt[true]{loc-prefix} option, the
-textual labels (\qt{Page} and \qt{Pages} in English) will be taken
-from the resource file. In the event that the loaded resource file
-doesn't match the document language, you will have to manually set
+textual labels (\qt{Page} and \qt{Pages} in English) will be 
+first be attempted from the supplementary file with and then, if not
+found, from the resource file. In the event that the loaded resource file
+doesn't match the document language and there's no supplementary
+file, you will have to manually set
 the correct translation (in English, this would be
 \csopt[Page\dcomma Pages]{loc-prefix}). The default definition of
 \gls!{bibglspassim} is also obtained from the resource file.

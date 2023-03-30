@@ -30,6 +30,11 @@ public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
     {
        super(props.isEmpty() ? 10 : props.size());
 
+       addProperties(props);
+    }
+
+    public void addProperties(Properties props) throws Bib2GlsException
+    {
        Iterator<Object> it = props.keySet().iterator();
 
        while (it.hasNext())

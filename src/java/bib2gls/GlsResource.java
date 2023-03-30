@@ -8643,6 +8643,50 @@ public class GlsResource
       mergeSmallGroups(entries, entryGroupField);
    }
 
+   public String getLocalisationText(String prefix, String suffix)
+   {
+      return bib2gls.getLocalisationText(prefix, getResourceLocale(), suffix);
+   }
+
+   public String getLocalisationTextIfExists(String prefix, String suffix)
+   {
+      return bib2gls.getLocalisationTextIfExists(prefix, getResourceLocale(), suffix);
+   }
+
+   public String getLocalisationText(String prefix, Locale locale, String suffix)
+   {
+      if (locale == null || locale.equals(getResourceLocale()))
+      {
+         return getLocalisationText(prefix, suffix);
+      }
+
+      String text = bib2gls.getLocalisationText(prefix, locale, suffix, null);
+
+      if (text != null)
+      {
+         return text;
+      }
+
+      return bib2gls.getLocalisationText(prefix, getResourceLocale(), suffix);
+   }
+
+   public String getLocalisationTextIfExists(String prefix, Locale locale, String suffix)
+   {
+      if (locale == null || locale.equals(getResourceLocale()))
+      {
+         return getLocalisationTextIfExists(prefix, suffix);
+      }
+
+      String text = bib2gls.getLocalisationText(prefix, locale, suffix, null);
+
+      if (text != null)
+      {
+         return text;
+      }
+
+      return bib2gls.getLocalisationTextIfExists(prefix, getResourceLocale(), suffix);
+   }
+
    /**
     * Processes the data (internal stage 4).
     * Checks the field map keys, selects required entries, 
@@ -8827,6 +8871,16 @@ public class GlsResource
          {
             provideGlossary(writer, secondaryType);
          }
+
+         /*
+          \bibglspassimname has been moved here to allow for the
+          resource locale but it's only provided so may not have
+          an effect.
+          TODO provide hook to allow it to be updated?
+         */ 
+
+         writer.format("\\providecommand{\\bibglspassimname}{%s}%n",
+           getLocalisationText("tag", "passim"));
 
          boolean provideBibGlsGroupLevel = isGroupLevelsEnabled();
 
@@ -9225,9 +9279,9 @@ public class GlsResource
             if (defpagesname)
             {
                writer.format("\\providecommand{\\bibglspagename}{%s}%n",
-                 bib2gls.getMessage("tag.page"));
+                 getLocalisationText("tag", "page"));
                writer.format("\\providecommand{\\bibglspagesname}{%s}%n",
-                 bib2gls.getMessage("tag.pages"));
+                 getLocalisationText("tag", "pages"));
             }
 
             switch (locationPrefixDef)
@@ -13009,8 +13063,6 @@ public class GlsResource
     */ 
    public void toSentenceCase(TeXObjectList list, TeXParserListener listener)
    {
-      String lang = getResourceLocale().getLanguage();
-
       for (int i = 0, n = list.size(); i < n; i++)
       {
          TeXObject object = list.get(i);
@@ -13025,17 +13077,20 @@ public class GlsResource
 
                if (i < n-1)
                {
-                  TeXObject nextObj = list.peek();
+                  TeXObject nextObj = list.get(i+1);
 
                   if (nextObj instanceof CharObject)
                   {
-                     String val = bib2gls.getMessageIfExists(
-                       String.format("sentencecase.%s.%s%s", lang, 
-                         str, nextObj.format()));
+                     String val = getLocalisationTextIfExists("sentencecase",
+                        str+nextObj.format());
 
                      if (val != null)
                      {
-                        list.set(i, listener.createString(val));
+                        list.remove(i+1);
+                        list.remove(i);
+
+                        list.add(i, listener.createString(val));
+
                         return;
                      }
                   }
@@ -13278,8 +13333,6 @@ public class GlsResource
     */ 
    public void toNonSentenceCase(TeXObjectList list, TeXParserListener listener)
    {
-      String lang = getResourceLocale().getLanguage();
-
       for (int i = 0, n = list.size(); i < n; i++)
       {
          TeXObject object = list.get(i);
@@ -13294,17 +13347,19 @@ public class GlsResource
 
                if (i < n-1)
                {
-                  TeXObject nextObj = list.peek();
+                  TeXObject nextObj = list.get(i+1);
 
                   if (nextObj instanceof CharObject)
                   {
-                     String val = bib2gls.getMessageIfExists(
-                       String.format("nonsentencecase.%s.%s%s", lang, 
-                         str, nextObj.format()));
+                     String val = getLocalisationTextIfExists("nonsentencecase",
+                         str + nextObj.format());
 
                      if (val != null)
                      {
-                        list.set(i, listener.createString(val));
+                        list.remove(i+1);
+                        list.remove(i);
+
+                        list.add(i, listener.createString(val));
                         return;
                      }
                   }
@@ -14936,8 +14991,6 @@ public class GlsResource
     */ 
    public CharSequence toSentenceCase(String text, Locale locale)
    {
-      String lang = locale.getLanguage();
-
       StringBuilder builder = new StringBuilder();
 
       for (int i = 0; i < text.length(); )
@@ -14960,9 +15013,8 @@ public class GlsResource
                {
                   int nextCp = text.codePointAt(i);
 
-                  String val = bib2gls.getMessageIfExists(
-                    String.format("sentencecase.%s.%s%s", lang, 
-                     str, new String(Character.toChars(nextCp))));
+                  String val = getLocalisationTextIfExists("sentencecase",
+                     str + new String(Character.toChars(nextCp)));
 
                   if (val != null)
                   {
@@ -15020,8 +15072,6 @@ public class GlsResource
    public CharSequence toNonSentenceCase(String text)
    {
       Locale locale = getResourceLocale();
-      String lang = locale.getLanguage();
-
       StringBuilder builder = new StringBuilder();
 
       for (int i = 0; i < text.length(); )
@@ -15039,9 +15089,8 @@ public class GlsResource
             {
                int nextCp = text.codePointAt(i);
 
-               String val = bib2gls.getMessageIfExists(
-                 String.format("nonsentencecase.%s.%s%s", lang, 
-                  str, new String(Character.toChars(nextCp))));
+               String val = getLocalisationTextIfExists("nonsentencecase",
+                  str + new String(Character.toChars(nextCp)));
 
                if (val != null)
                {

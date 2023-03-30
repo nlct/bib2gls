@@ -1,0 +1,14 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[dutch]{tracklang}
+\usepackage[record,stylemods=bookindex,style=bookindex]{glossaries-extra}
+
+\GlsXtrLoadResources[name-case-change={firstuc},selection=all]
+
+\begin{document}
+\printunsrtglossary
+\end{document}

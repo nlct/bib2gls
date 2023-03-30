@@ -41,7 +41,8 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-hypernav-targetprefix.pdf test-hiergroups.pdf \
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
-	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf
+	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf \
+	  test-nl.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -810,6 +811,13 @@ test-assign-fields.pdf	: test-assign-fields.glstex
 test-assign-fields.glstex	: test-assign-fields.tex $(DEPS) test-assign-fields.bib
 		pdflatex test-assign-fields
 		$(BIB2GLS) test-assign-fields
+
+test-nl.pdf	: test-nl.glstex
+		pdflatex test-nl
+
+test-nl.glstex	: test-nl.tex $(DEPS) test-nl.bib
+		pdflatex test-nl
+		$(BIB2GLS) test-nl
 
 clean	:
 	$(RM) *.aux

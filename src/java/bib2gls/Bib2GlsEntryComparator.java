@@ -303,8 +303,8 @@ public class Bib2GlsEntryComparator extends SortComparator
                // in the language resource file. For example
                // <entry key="grouptitle.case.ij">IJ</entry>
    
-               String grpCase = bib2gls.getMessageIfExists(
-                 String.format("grouptitle.case.%s", grp));
+               String grpCase = resource.getLocalisationTextIfExists(
+                 "grouptitle.case", locale, grp);
    
                if (grpCase != null)
                {
@@ -564,7 +564,7 @@ public class Bib2GlsEntryComparator extends SortComparator
 
    private BreakIterator breakIterator=null;
 
-   private Locale locale;
+   protected Locale locale;
 
    public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
      BREAK_SENTENCE=3, BREAK_UPPER_NOTLOWER=4, BREAK_UPPER_UPPER=5,

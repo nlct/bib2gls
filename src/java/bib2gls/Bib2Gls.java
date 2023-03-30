@@ -2097,7 +2097,20 @@ public class Bib2Gls implements TeXApp
          }
          else if (name.equals("glsxtr@langtag"))
          {
-            setDocDefaultLocale(getLocale(data.getArg(0).toString(parser)));
+            /*
+               Current tracked language at the time
+               \GlsXtrLoadResources used. Assume this
+               is the main document language.
+            */ 
+
+            Locale locale = getLocale(data.getArg(0).toString(parser));
+            setDocDefaultLocale(locale);
+            addExtraProperties(locale);
+         }
+         else if (name.equals("glsxtr@locale"))
+         {
+            Locale locale = getLocale(data.getArg(0).toString(parser));
+            addExtraProperties(locale);
          }
          else if (texCharset == null && name.equals("glsxtr@texencoding"))
          {
@@ -4038,8 +4051,6 @@ public class Bib2Gls implements TeXApp
       writer.println("\\providecommand{\\bibglslastDelimN}{,~}");
       writer.println("\\providecommand{\\bibglsrange}[1]{#1}");
       writer.println("\\providecommand{\\bibglsinterloper}[1]{#1\\bibglsdelimN }");
-      writer.format("\\providecommand{\\bibglspassimname}{%s}%n",
-        getMessage("tag.passim"));
       writer.println("\\providecommand{\\bibglspassim}{ \\bibglspassimname}");
       writer.println("\\providecommand*{\\bibglshyperlink}[2]{\\glshyperlink[#1]{#2}}");
       writer.println();
@@ -4749,7 +4760,14 @@ public class Bib2Gls implements TeXApp
    {
       if (messages == null) return null;
 
-      return messages.getMessageIfExists(label);
+      String text = messages.getMessageIfExists(label);
+
+      if (text == null && getDebugLevel() > 0)
+      {
+         debug("No message for label '"+label+"'");
+      }
+
+      return text;
    }
 
    public String getChoiceMessage(String label, int argIdx,
@@ -4782,6 +4800,107 @@ public class Bib2Gls implements TeXApp
 
       return msg;
    }
+
+   public String getLocalisationText(String prefix, Locale locale, String suffix,
+     String defaultValue)
+   {
+      if (locale != null)
+      {
+         String langTag = locale.toLanguageTag();
+
+         String text = getMessageIfExists(String.format("%s.%s.%s",
+            prefix, langTag, suffix));
+
+         if (text != null)
+         {
+            return text;
+         }
+
+         String country = locale.getCountry();
+         String language = locale.getLanguage();
+
+         if (country != null && !country.isEmpty()
+             && language != null && !language.isEmpty())
+         {
+            String tag = String.format("%s-%s", language, country);
+
+            if (!tag.equals(langTag))
+            {
+               text = getMessageIfExists(String.format("%s.%s.%s",
+                  prefix, tag, suffix));
+
+               if (text != null)
+               {
+                  return text;
+               }
+            }
+         }
+
+         if (language != null && !language.isEmpty() && !language.equals(langTag))
+         {
+            text = getMessageIfExists(String.format("%s.%s.%s",
+               prefix, language, suffix));
+
+            if (text != null)
+            {
+               return text;
+            }
+         }
+      }
+
+      return defaultValue;
+   }
+
+   public String getLocalisationText(String prefix, Locale locale, String suffix)
+   {
+      String text = getLocalisationTextIfExists(prefix, locale, suffix);
+
+      if (text == null)
+      {
+         warning(String.format("Can't find message for label: %s.%s", prefix, suffix));
+         text = String.format("%s.%s", prefix, suffix);
+      }
+
+      return text;
+   }
+
+   public String getLocalisationTextIfExists(String prefix, Locale locale, String suffix)
+   {
+      if (locale != null)
+      {
+         String text = getLocalisationText(prefix, locale, suffix, null);
+
+         if (text != null)
+         {
+            return text;
+         }
+      }
+
+      if (defaultLocale != null && !defaultLocale.equals(locale))
+      {
+         String text = getLocalisationText(prefix, defaultLocale, suffix, null);
+
+         if (text != null)
+         {
+            return text;
+         }
+      }
+
+      if (docLocale != null 
+            && (locale == null || !locale.toLanguageTag().equals(docLocale)))
+      {
+         String text = getMessageIfExists(String.format("%s.%s.%s",
+            prefix, docLocale, suffix));
+
+         if (text != null)
+         {
+            return text;
+         }
+      }
+
+      return getMessageIfExists(String.format("%s.%s", prefix, suffix));
+   }
+
 
    /*
     *  TeXApp method for providing informational messages to the user.
@@ -5472,9 +5591,83 @@ public class Bib2Gls implements TeXApp
       System.exit(0);
    }
 
-   private String getLanguageFileName(String tag)
+   private String getLanguageFileName(String prefix, String tag)
    {
-      return String.format("/resources/bib2gls-%s.xml", tag);
+      return String.format("/resources/%s-%s.xml", prefix, tag);
+   }
+
+   private URL getLanguageUrl(String prefix, Locale locale, String defaultTag)
+   {
+      String lang = locale.toLanguageTag();
+
+      String name = getLanguageFileName(prefix, lang);
+
+      URL url = getClass().getResource(name);
+
+      String jar = null;
+
+      if (debugLevel > 0)
+      {
+         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
+               .toString();
+      }
+
+      if (url == null)
+      {
+         if (jar != null)
+         {
+            debug(String.format("Can't find language resource: %s!%s",
+               jar, name));
+         }
+
+         lang = locale.getLanguage();
+
+         name = getLanguageFileName(prefix, lang);
+
+         debug("Trying: "+name);
+
+         url = getClass().getResource(name);
+
+         if (url == null)
+         {
+            debug(String.format("Can't find language resource: %s!%s",
+                    jar, name));
+
+            String script = locale.getScript();
+
+            if (script != null && !script.isEmpty())
+            {
+               name = getLanguageFileName(prefix, 
+                  String.format("%s-%s", lang, script));
+
+               debug("Trying: "+name);
+
+               url = getClass().getResource(name);
+
+               if (url == null && defaultTag != null && !lang.equals(defaultTag))
+               {
+                  debug(String.format(
+                    "Can't find language resource: %s!%s%nDefaulting to '%s'",
+                    jar, name, defaultTag));
+
+                  url = getClass().getResource(
+                    getLanguageFileName(prefix, defaultTag));
+               }
+            }
+            else if (defaultTag != null && !lang.equals(defaultTag))
+            {
+               if (debugLevel > 0)
+               {
+                  debug(String.format("Defaulting to '%s'", defaultTag));
+               }
+
+               url = getClass().getResource(
+                  getLanguageFileName(prefix, defaultTag));
+            }
+         }
+      }
+
+      return url;
    }
 
    private void initMessages(String langTag) throws Bib2GlsException,IOException
@@ -5508,71 +5701,11 @@ public class Bib2Gls implements TeXApp
          }
       }
 
-      String lang = locale.toLanguageTag();
-
-      String name = getLanguageFileName(lang);
-
-      URL url = getClass().getResource(name);
-
-      String jar = null;
-
-      if (debugLevel > 0)
-      {
-         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
-               .toString();
-      }
+      URL url = getLanguageUrl("bib2gls", locale, "en");
 
       if (url == null)
       {
-         if (jar != null)
-         {
-            debug(String.format("Can't find language resource: %s!%s",
-               jar, name));
-         }
-
-         lang = locale.getLanguage();
-
-         name = getLanguageFileName(lang);
-
-         debug("Trying: "+name);
-
-         url = getClass().getResource(name);
-
-         if (url == null)
-         {
-            debug(String.format("Can't find language resource: %s!%s",
-                    jar, name));
-
-            String script = locale.getScript();
-
-            if (script != null && !script.isEmpty())
-            {
-               name = getLanguageFileName(String.format("%s-%s", lang, script));
-
-               debug("Trying: "+name);
-
-               url = getClass().getResource(name);
-
-               if (url == null && !lang.equals("en"))
-               {
-                  debug(String.format(
-                    "Can't find language resource: %s!%s%nDefaulting to 'en'",
-                    jar, name));
-
-                  url = getClass().getResource(getLanguageFileName("en"));
-               }
-            }
-            else if (!lang.equals("en"))
-            {
-               debug("Defaulting to 'en'");
-               url = getClass().getResource(getLanguageFileName("en"));
-            }
-
-            if (url == null)
-            {
-               throw new Bib2GlsException("Can't find language resource file.");
-            }
-         }
+         throw new Bib2GlsException("Can't find language resource file.");
       }
 
       InputStream in = null;
@@ -5597,6 +5730,42 @@ public class Bib2Gls implements TeXApp
          if (in != null)
          {
             in.close();
+            in = null;
+         }
+      }
+   }
+
+   public void addExtraProperties(Locale locale)
+   throws IOException,Bib2GlsException
+   {
+      URL url = getLanguageUrl("bib2gls-extra", locale, null);
+
+      if (url != null)
+      {
+         InputStream in = null;
+
+         try
+         {
+            debug("Reading "+url);
+
+            in = url.openStream();
+
+            Properties prop = new Properties();
+
+            prop.loadFromXML(in);
+
+            in.close();
+            in = null;
+
+            messages.addProperties(prop);
+         }
+         finally
+         {
+            if (in != null)
+            {
+               in.close();
+               in = null;
+            }
          }
       }
    }

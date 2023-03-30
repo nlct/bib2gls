@@ -2243,7 +2243,7 @@ public class Bib2GlsEntry extends BibEntry
 
    protected boolean isSentenceTerminator(int codePoint)
    {
-      String list = bib2gls.getMessage("sentence.terminators");
+      String list = resource.getLocalisationText("sentence", "terminators");
 
       for (int i = 0; i < list.length(); )
       {
