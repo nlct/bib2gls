@@ -1300,7 +1300,7 @@ public class Bib2GlsEntry extends BibEntry
                     + " evaluating assignment "+assignSpec);
                }
 
-               BibValueList val = assignSpec.getValue(this);
+               BibValue val = assignSpec.getValue(this);
 
                if (val != null)
                {
@@ -1309,7 +1309,18 @@ public class Bib2GlsEntry extends BibEntry
                      bib2gls.logAndPrintMessage("Value: " + val);
                   }
 
-                  BibValueList value = (BibValueList)val.clone();
+                  BibValue copy = (BibValue)val.clone();
+                  BibValueList value;
+
+                  if (copy instanceof BibValueList)
+                  {
+                     value = (BibValueList)copy;
+                  }
+                  else
+                  {
+                     value = new BibValueList();
+                     value.add(copy);
+                  }
 
                   if (field.equals("description") 
                        && resource.changeDescriptionCase())

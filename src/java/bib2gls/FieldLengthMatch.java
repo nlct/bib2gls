@@ -21,31 +21,25 @@ package com.dickimawbooks.bib2gls;
 import java.io.IOException;
 
 /**
- * Compares the length of a field with a numeric value. Note that 
+ * Compares the length of a field element with a numeric value. Note that 
  * the length is the number of characters in the detokenized string
- * not a token count.
+ * not a token count. Corresponds to the LEN quark in the left side 
+ * of a numeric conditional context.
  */
 
 public class FieldLengthMatch extends FieldNumberMatch
 {
-   public FieldLengthMatch(Field field, Relational relation, Number value)
+   public FieldLengthMatch(FieldValueElement fieldValueElem,
+     Relational relation, Number value)
    {
-      super(field, relation, value);
+      super(fieldValueElem, relation, value);
    }
 
    public boolean booleanValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
-      String fieldValue = null;
-
-      try
-      {
-         fieldValue = field.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
+      String fieldValue = fieldValueElem.getStringValue(entry);
 
       int num1 = 0;
 
@@ -76,6 +70,6 @@ public class FieldLengthMatch extends FieldNumberMatch
    @Override
    public String toString()
    {
-      return String.format("\\LEN{%s} %s %s", field, relation, value);
+      return String.format("\\LEN{%s} %s %s", fieldValueElem, relation, value);
    }
 }

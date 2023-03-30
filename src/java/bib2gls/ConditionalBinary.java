@@ -23,13 +23,13 @@ import java.io.IOException;
 public interface ConditionalBinary extends ConditionalListElement
 {
    public boolean booleanValue(Bib2GlsEntry entry, Conditional cond1, Conditional cond2)
-     throws IOException;
+     throws IOException,Bib2GlsException;
 
    public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, Conditional cond2)
-     throws IOException;
+     throws IOException,Bib2GlsException;
 
    public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, ConditionalUnary unary, Conditional cond2)
-     throws IOException;
+     throws IOException,Bib2GlsException;
 
    public boolean booleanValue(boolean cond1, boolean cond2);
 }

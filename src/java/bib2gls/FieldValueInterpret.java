@@ -27,78 +27,63 @@ import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibUserString;
 
 /**
- * Represents the MGP quark. The group is from the most recent
- * successful pattern match in the conditional for the current field assignment list.
- * The group may be referenced by index or by name.
+ * Represents the INTERPRET quark. Note that the interpreted value
+ * isn't trimmed.
  */
-public class FieldValueGroupMatch implements FieldValueElement
+public class FieldValueInterpret implements FieldValueElement
 {
-   public FieldValueGroupMatch(String name)
+   public FieldValueInterpret(FieldValueElement fieldValueElem)
    {
-      this.name = name;
-      this.index = 0;
-   }
-
-   public FieldValueGroupMatch(int index)
-   {
-      this.index = index;
-      this.name = null;
+      this.fieldValueElem = fieldValueElem;
    }
 
    @Override
    public BibValue getValue(Bib2GlsEntry entry)
      throws Bib2GlsException,IOException
    {
-      TeXParser parser = entry.getResource().getBibParser();
-
       String value = getStringValue(entry);
 
       if (value == null)
       {
          return null;
       }
-
-      TeXObjectList content;
-
-      if (value.indexOf("\\") != -1)
-      {
-         content = new TeXObjectList();
-         parser.scan(value, content);
-      }
       else
       {
-         content = parser.getListener().createString(value);
-      }
+         TeXParser parser = entry.getResource().getParser();
 
-      return new BibUserString(content);
+         return new BibUserString(parser.getListener().createString(value));
+      }
    }
 
    @Override
-   public String getStringValue(Bib2GlsEntry entry) throws Bib2GlsException
+   public String getStringValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
-      if (name == null)
+      Bib2Gls bib2gls = entry.getBib2Gls();
+      BibValue value = fieldValueElem.getValue(entry);
+
+      if (value == null)
       {
-         return entry.getResource().getLastMatchGroup(index);
+         return null;
       }
       else
       {
-         return entry.getResource().getLastMatchGroup(name);
+         TeXParser parser = entry.getResource().getParser();
+
+         TeXObjectList list = (TeXObjectList)value.expand(parser).clone();
+
+         String orgStrVal = list.toString(parser);
+
+         return bib2gls.replaceSpecialChars(
+            bib2gls.interpret(orgStrVal, list, false));
       }
    }
 
    @Override
    public String toString()
    {
-      if (name == null)
-      {
-         return String.format("\\MGP{%d}", index);
-      }
-      else
-      {
-         return String.format("\\MGP{%s}", name);
-      }
+      return String.format("\\INTERPRET{%s}", fieldValueElem);
    }
 
-   private String name;
-   private int index;
+   private FieldValueElement fieldValueElem;
 }

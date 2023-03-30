@@ -456,6 +456,7 @@ the second list ({3,number}).</entry>
 <entry key="error.expected_before">Expected ''{0}'' before ''{1}''</entry>
 <entry key="error.expected_before_after">Expected ''{0}'' before ''{1}'', after: {2}</entry>
 <entry key="error.expected_field_or_string_after">Expected field or string after {0}</entry>
+<entry key="error.expected_field_or_string">Expected field or string concatenation in argument of {0}, found: {1}</entry>
 <entry key="error.expected_field">Expected field in argument of {0}, found: {1}</entry>
 <entry key="error.unexpected_content_in_arg">Unexpected content ''{0}'' in the argument of {1}</entry>
 <entry key="error.openin.forbidden">Read access forbidden for file: {0}</entry>

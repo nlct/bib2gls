@@ -25,14 +25,14 @@ public class ConditionAnd implements ConditionalBinary
    @Override
    public boolean booleanValue(Bib2GlsEntry entry,
       Conditional cond1, Conditional cond2)
-   throws IOException
+   throws IOException,Bib2GlsException
    {
       return cond1.booleanValue(entry) && cond2.booleanValue(entry);
    }
 
    @Override
    public boolean booleanValue(Bib2GlsEntry entry, boolean cond1, Conditional cond2)
-   throws IOException
+   throws IOException,Bib2GlsException
    {
       return cond1 && cond2.booleanValue(entry);
    }
@@ -40,7 +40,7 @@ public class ConditionAnd implements ConditionalBinary
    @Override
    public boolean booleanValue(Bib2GlsEntry entry, boolean cond1,
       ConditionalUnary unary, Conditional cond2)
-   throws IOException
+   throws IOException,Bib2GlsException
    {
       return cond1 && unary.booleanValue(entry, cond2);
    }

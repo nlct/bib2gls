@@ -22,83 +22,80 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.TeXParser;
 import com.dickimawbooks.texparserlib.TeXObjectList;
+import com.dickimawbooks.texparserlib.TeXObject;
+import com.dickimawbooks.texparserlib.WhiteSpace;
 
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibUserString;
 
 /**
- * Represents the MGP quark. The group is from the most recent
- * successful pattern match in the conditional for the current field assignment list.
- * The group may be referenced by index or by name.
+ * Represents the TRIM quark.
  */
-public class FieldValueGroupMatch implements FieldValueElement
+public class FieldValueTrim implements FieldValueElement
 {
-   public FieldValueGroupMatch(String name)
+   public FieldValueTrim(FieldValueElement fieldValueElem)
    {
-      this.name = name;
-      this.index = 0;
-   }
-
-   public FieldValueGroupMatch(int index)
-   {
-      this.index = index;
-      this.name = null;
+      this.fieldValueElem = fieldValueElem;
    }
 
    @Override
    public BibValue getValue(Bib2GlsEntry entry)
      throws Bib2GlsException,IOException
    {
-      TeXParser parser = entry.getResource().getBibParser();
-
-      String value = getStringValue(entry);
+      Bib2Gls bib2gls = entry.getBib2Gls();
+      BibValue value = fieldValueElem.getValue(entry);
 
       if (value == null)
       {
          return null;
       }
-
-      TeXObjectList content;
-
-      if (value.indexOf("\\") != -1)
-      {
-         content = new TeXObjectList();
-         parser.scan(value, content);
-      }
       else
       {
-         content = parser.getListener().createString(value);
-      }
+         TeXParser parser = entry.getResource().getParser();
 
-      return new BibUserString(content);
+         TeXObjectList list = (TeXObjectList)value.expand(parser).clone();
+         list.popLeadingWhiteSpace();
+
+         for (int i = list.size()-1; i >= 0; i--)
+         {
+            TeXObject obj = list.get(i);
+
+            if (obj instanceof WhiteSpace)
+            {
+               list.remove(i);
+            }
+            else
+            {
+               break;
+            }
+         }
+
+         return new BibUserString(list);
+      }
    }
 
    @Override
-   public String getStringValue(Bib2GlsEntry entry) throws Bib2GlsException
+   public String getStringValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
-      if (name == null)
+      Bib2Gls bib2gls = entry.getBib2Gls();
+      String fieldValue = fieldValueElem.getStringValue(entry);
+
+      if (fieldValue == null)
       {
-         return entry.getResource().getLastMatchGroup(index);
+         return null;
       }
       else
       {
-         return entry.getResource().getLastMatchGroup(name);
+         return fieldValue.trim();
       }
    }
 
    @Override
    public String toString()
    {
-      if (name == null)
-      {
-         return String.format("\\MGP{%d}", index);
-      }
-      else
-      {
-         return String.format("\\MGP{%s}", name);
-      }
+      return String.format("\\TRIM{%s}", fieldValueElem);
    }
 
-   private String name;
-   private int index;
+   private FieldValueElement fieldValueElem;
 }

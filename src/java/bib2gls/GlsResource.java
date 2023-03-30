@@ -11706,7 +11706,7 @@ public class GlsResource
             {
                condition = isFlattenConditionTrue(child);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                bib2gls.warning(e.getMessage());
             }
@@ -11767,7 +11767,7 @@ public class GlsResource
    }
 
    private boolean isFlattenConditionTrue(Bib2GlsEntry entry)
-     throws IOException
+     throws IOException,Bib2GlsException
    {
       if (flattenLonelyConditional == null)
       {

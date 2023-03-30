@@ -23,7 +23,7 @@ import java.io.IOException;
 public interface ConditionalUnary extends ConditionalListElement
 {
    public boolean booleanValue(Bib2GlsEntry entry, Conditional conditional)
-     throws IOException;
+     throws IOException,Bib2GlsException;
 
    public boolean booleanValue(boolean conditional);
 }

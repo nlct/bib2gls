@@ -15311,7 +15311,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{NULL}},
   user1={},
   description={a \idx{quark} to denote a
-  null value in \csopt{assign-fields} conditionals. This value needs
+  null value in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15322,9 +15322,22 @@ warning rather than an error if the command isn't already defined},
 
 @mainglscommand{LEN,
   name={\csfmt{LEN}},
-  user1={\margm{field-ref}},
+  user1={\margm{element list}},
   description={a \idx{quark} to denote the number of (detokenized) characters in
-  a value in \csopt{assign-fields} conditionals. This value needs
+  a value in \csopt{assign-fields}. This token needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{CAT,
+  name={\csfmt{CAT}},
+  user1={\margm{value list}},
+  description={a \idx{quark} to denote a string concatenation 
+  in the conditional parts of \csopt{assign-fields}. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15337,7 +15350,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{IN}},
   user1={},
   description={a \idx{quark} to denote \qt{is a substring} conditional 
-  in \csopt{assign-fields} conditionals. This value needs
+  in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15349,7 +15362,8 @@ warning rather than an error if the command isn't already defined},
 @mainglscommand{NIN,
   name={\csfmt{NIN}},
   user1={},
-  description={a \idx{quark} to denote \qt{is not a substring} conditional in \csopt{assign-fields} conditionals. This value needs
+  description={a \idx{quark} to denote \qt{is not a substring}
+conditional in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15362,7 +15376,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{PREFIXOF}},
   user1={},
   description={a \idx{quark} to denote \qt{is a prefix of} conditional 
-  in \csopt{assign-fields} conditionals. This value needs
+  in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15375,7 +15389,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{NOTPREFIXOF}},
   user1={},
   description={a \idx{quark} to denote \qt{is not a prefix of} conditional 
-  in \csopt{assign-fields} conditionals. This value needs
+  in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15388,7 +15402,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{SUFFIXOF}},
   user1={},
   description={a \idx{quark} to denote \qt{is a suffix of} conditional 
-  in \csopt{assign-fields} conditionals. This value needs
+  in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15401,7 +15415,7 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{NOTSUFFIXOF}},
   user1={},
   description={a \idx{quark} to denote \qt{is not a suffix of} conditional 
-  in \csopt{assign-fields} conditionals. This value needs
+  in \csopt{assign-fields} conditionals. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15414,10 +15428,36 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{MGP}},
   user1={\margm{group-ref}},
   description={a \idx{quark} to denote a reference to a group
-   from a \gls{ext1.regular-expression} match. This value needs
+   from a \gls{ext1.regular-expression} match. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}. The \meta{group-ref} may be either an
   integer index or a textual name},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{TRIM,
+  name={\csfmt{TRIM}},
+  user1={\margm{element list}},
+  description={a \idx{quark} to denote a trimmed element in 
+  \csopt{assign-fields}. This token needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{INTERPRET,
+  name={\csfmt{INTERPRET}},
+  user1={\margm{element list}},
+  description={a \idx{quark} to denote an interpreted element in 
+  \csopt{assign-fields}. This token needs
+  to be protected from expansion in the argument of
+  \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},
@@ -15428,7 +15468,8 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{LC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
-  field \idx{lowercase} change in \csopt{assign-fields} syntax. This value needs
+  field \idx{lowercase} change in \csopt{assign-fields} syntax. This
+token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15441,7 +15482,8 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{UC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
-  field \idx{uppercase} change in \csopt{assign-fields} syntax. This value needs
+  field \idx{uppercase} change in \csopt{assign-fields} syntax. This
+token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15454,7 +15496,8 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{FIRSTLC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
-  field first-letter \idx{lowercase} change in \csopt{assign-fields} syntax. This value needs
+  field first-letter \idx{lowercase} change in \csopt{assign-fields}
+syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15467,7 +15510,8 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{FIRSTUC}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
-  field first-letter \idx{uppercase} change in \csopt{assign-fields} syntax. This value needs
+  field first-letter \idx{uppercase} change in \csopt{assign-fields}
+syntax. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},
@@ -15480,7 +15524,8 @@ warning rather than an error if the command isn't already defined},
   name={\csfmt{TITLE}},
   user1={\margm{field-ref}},
   description={a \idx{quark} to denote a
-  field \idx{titlecase} change in \csopt{assign-fields} syntax. This value needs
+  field \idx{titlecase} change in \csopt{assign-fields} syntax. This
+token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
   note={\bibgls\ \idx{quark}},

@@ -22,8 +22,16 @@ import java.util.Vector;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.bib.BibValue;
+import com.dickimawbooks.texparserlib.bib.BibValueList;
 
+/**
+ * List of field value elements that should be concatenated.
+ * The list itself implements FieldValueElement to allow either a
+ * single element or a list to be referenced.
+ */
 public class FieldValueList extends Vector<FieldValueElement>
+  implements FieldValueElement
 {
    public FieldValueList()
    {
@@ -33,6 +41,48 @@ public class FieldValueList extends Vector<FieldValueElement>
    public FieldValueList(int capacity)
    {
       super(capacity);
+   }
+
+   @Override
+   public BibValue getValue(Bib2GlsEntry entry)
+     throws IOException,Bib2GlsException
+   {
+      BibValueList list = new BibValueList();
+
+      for (FieldValueElement elem : this)
+      {
+         BibValue elemVal = elem.getValue(entry);
+
+         if (elemVal == null)
+         {
+            return null;
+         }
+
+         list.add(elemVal);
+      }
+
+      return list;
+   }
+
+   @Override
+   public String getStringValue(Bib2GlsEntry entry)
+     throws IOException,Bib2GlsException
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (FieldValueElement elem : this)
+      {
+         String elemVal = elem.getStringValue(entry);
+
+         if (elemVal == null)
+         {
+            return null;
+         }
+
+         builder.append(elemVal);
+      }
+
+      return builder.toString();
    }
 
    public static FieldValueList pop(GlsResource resource, TeXObjectList stack)
@@ -155,7 +205,7 @@ public class FieldValueList extends Vector<FieldValueElement>
 
             if (add)
             {
-               object = stack.popArg(parser);
+               popped.add(stack.pop());
 
                if (name.equals("MGP"))
                {
@@ -174,15 +224,16 @@ public class FieldValueList extends Vector<FieldValueElement>
 
                   list.add(grpMatch);
 
-                  popped.add(object);
                   popped.addAll(TeXParserUtils.createGroup(parser,
                     parser.getListener().createString(ref)));
                }
                else
                {
-                  throw new Bib2GlsException(bib2gls.getMessage(
-                     "error.expected_field_or_string_condition",
-                     object.toString(parser)));
+                  TeXObject arg = TeXParserUtils.popArg(parser, stack);
+                  popped.addAll(TeXParserUtils.createGroup(parser, 
+                    (TeXObject)arg.clone()));
+
+                  list.add(getQuark(name, arg, resource));
                }
 
                add = false;
@@ -319,5 +370,52 @@ public class FieldValueList extends Vector<FieldValueElement>
       }
 
       return list;
+   }
+
+   public static FieldValueElement getQuark(String name, TeXObject arg,
+      GlsResource resource)
+   throws Bib2GlsException,IOException
+   {
+      TeXParser parser = resource.getParser();
+      Bib2Gls bib2gls = resource.getBib2Gls();
+
+      if (!parser.isStack(arg))
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.unexpected_content_in_arg",
+            arg.toString(parser), "\\"+name));
+      }
+
+      TeXObjectList substack = (TeXObjectList)arg;
+
+      FieldValueList argList = pop(resource, substack);
+
+      substack.popLeadingWhiteSpace();
+
+      if (!substack.isEmpty())
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.unexpected_content_in_arg",
+            substack.toString(parser), "\\"+name));
+      }
+
+      if (name.equals("INTERPRET"))
+      {
+         return new FieldValueInterpret(argList);
+      }
+      else if (name.equals("TRIM"))
+      {
+         return new FieldValueTrim(argList);
+      }
+      else if (name.equals("LEN"))
+      {
+         return new FieldValueLength(argList);
+      }
+      else
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+            "error.expected_field_or_string_condition",
+            "\\"+name));
+      }
    }
 }

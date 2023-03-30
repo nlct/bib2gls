@@ -60,7 +60,7 @@ public class FieldAssignment
       }
    }
 
-   public BibValueList getValue(Bib2GlsEntry entry)
+   public BibValue getValue(Bib2GlsEntry entry)
      throws Bib2GlsException,IOException
    {
       entry.getResource().setLastMatch(null);
@@ -70,21 +70,7 @@ public class FieldAssignment
          return null;
       }
 
-      BibValueList list = new BibValueList();
-
-      for (FieldValueElement elem : valueList)
-      {
-         BibValue elemVal = elem.getValue(entry);
-
-         if (elemVal == null)
-         {
-            return null;
-         }
-
-         list.add(elemVal);
-      }
-
-      return list;
+      return valueList.getValue(entry);
    }
 
    public String getStringValue(Bib2GlsEntry entry)
@@ -95,21 +81,7 @@ public class FieldAssignment
          return null;
       }
 
-      StringBuilder builder = new StringBuilder();
-
-      for (FieldValueElement elem : valueList)
-      {
-         String elemVal = elem.getStringValue(entry);
-
-         if (elemVal == null)
-         {
-            return null;
-         }
-
-         builder.append(elemVal);
-      }
-
-      return builder.toString();
+      return valueList.getStringValue(entry);
    }
 
    @Override

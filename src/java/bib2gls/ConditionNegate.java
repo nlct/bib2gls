@@ -24,7 +24,7 @@ public class ConditionNegate implements ConditionalUnary
 {
    @Override
    public boolean booleanValue(Bib2GlsEntry entry, Conditional conditional)
-   throws IOException
+   throws IOException,Bib2GlsException
    {
       return !conditional.booleanValue(entry);
    }

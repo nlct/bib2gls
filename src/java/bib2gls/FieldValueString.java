@@ -23,6 +23,9 @@ import com.dickimawbooks.texparserlib.TeXObject;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibUserString;
 
+/**
+ * A literal string field value element.
+ */
 public class FieldValueString implements FieldValueElement
 {
    public FieldValueString(TeXObject content, boolean quoted)

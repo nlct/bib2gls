@@ -25,8 +25,9 @@ public interface Conditional extends ConditionalListElement
    /**
     * Gets the boolean value this conditional evaluates to.
     * @param entry the entry being tested
+    * @throws Bib2GlsException if a resource option syntax error occurs
     * @throws IOException if something goes wrong with the TeXParser
-    * (indicates a problem in parsing, mostly like a bug)
     */ 
-   public boolean booleanValue(Bib2GlsEntry entry) throws IOException;
+   public boolean booleanValue(Bib2GlsEntry entry)
+    throws IOException,Bib2GlsException;
 }

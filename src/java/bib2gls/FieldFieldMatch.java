@@ -21,46 +21,32 @@ package com.dickimawbooks.bib2gls;
 import java.io.IOException;
 
 /**
- * Compares the value of a field with the value of another field.
- * If either field is missing, it will be treated as empty.
+ * Compares the value of a field element with the value of another field element.
+ * If either field element evaluates to null, it will be treated as empty.
  */
 public class FieldFieldMatch implements Conditional
 {
-   public FieldFieldMatch(Field field1, Relational relation, Field field2)
+   public FieldFieldMatch(FieldValueElement fieldValueElem1,
+     Relational relation, FieldValueElement fieldValueElem2)
    {
-      this.field1 = field1;
-      this.field2 = field2;
+      this.fieldValueElem1 = fieldValueElem1;
+      this.fieldValueElem2 = fieldValueElem2;
       this.relation = relation;
    }
 
    public boolean booleanValue(Bib2GlsEntry entry)
+    throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
-      String fieldValue1 = null;
-      String fieldValue2 = null;
 
-      try
-      {
-         fieldValue1 = field1.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
+      String fieldValue1 = fieldValueElem1.getStringValue(entry);
 
       if (fieldValue1 == null)
       {
          fieldValue1 = "";
       }
 
-      try
-      {
-         fieldValue2 = field2.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
+      String fieldValue2 = fieldValueElem2.getStringValue(entry);
 
       if (fieldValue2 == null)
       {
@@ -102,9 +88,9 @@ public class FieldFieldMatch implements Conditional
    @Override
    public String toString()
    {
-      return String.format("%s %s %s", field1, relation, field2);
+      return String.format("%s %s %s", fieldValueElem1, relation, fieldValueElem2);
    }
 
-   protected Field field1, field2;
+   protected FieldValueElement fieldValueElem1, fieldValueElem2;
    protected Relational relation;
 }

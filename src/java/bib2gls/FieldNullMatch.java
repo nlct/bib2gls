@@ -22,18 +22,22 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.bib.BibValue;
 
+/**
+ * Compares a field element to null.
+ */
 public class FieldNullMatch implements Conditional
 {
-   public FieldNullMatch(Field field, boolean equals)
+   public FieldNullMatch(FieldValueElement fieldValueElem, boolean equals)
    {
-      this.field = field;
+      this.fieldValueElem = fieldValueElem;
       this.equals = equals;
    }
 
-   public boolean booleanValue(Bib2GlsEntry entry) throws IOException
+   public boolean booleanValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
-      BibValue value = field.getValue(entry);
+      BibValue value = fieldValueElem.getValue(entry);
       boolean result;
 
       if (value == null)
@@ -63,14 +67,14 @@ public class FieldNullMatch implements Conditional
    {
       if (equals)
       {
-         return String.format("%s = NULL", field);
+         return String.format("%s = NULL", fieldValueElem);
       }
       else
       {
-         return String.format("%s <> NULL", field);
+         return String.format("%s <> NULL", fieldValueElem);
       }
    }
 
    protected boolean equals;
-   protected Field field;
+   protected FieldValueElement fieldValueElem;
 }

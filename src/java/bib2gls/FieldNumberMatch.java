@@ -21,40 +21,33 @@ package com.dickimawbooks.bib2gls;
 import java.io.IOException;
 
 /**
- * Compares the value of a field with a numeric value. Note that if
- * the provided numerical value is an Integer the field value will
+ * Compares the value of a field element with a numeric value. Note that if
+ * the provided numerical value is an Integer the field element value will
  * be rounded to an integer, otherwise it will be assumed to be a
- * double. If the field is missing, empty or has a non-numeric value
+ * double. If the field element evaluates to null, empty or has a non-numeric value
  * it will be treated as 0.
  */
 
 public class FieldNumberMatch implements Conditional
 {
-   public FieldNumberMatch(Field field, Relational relation, Number value)
+   public FieldNumberMatch(FieldValueElement fieldValueElem,
+     Relational relation, Number value)
    {
-      if (field == null || relation == null || value == null)
+      if (fieldValueElem == null || relation == null || value == null)
       {
          throw new NullPointerException();
       }
 
-      this.field = field;
+      this.fieldValueElem = fieldValueElem;
       this.relation = relation;
       this.value = value;
    }
 
    public boolean booleanValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
-      String fieldValue = null;
-
-      try
-      {
-         fieldValue = field.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
+      String fieldValue = fieldValueElem.getStringValue(entry);
 
       boolean result;
 
@@ -155,10 +148,10 @@ public class FieldNumberMatch implements Conditional
    @Override
    public String toString()
    {
-      return String.format("%s %s %s", field, relation, value);
+      return String.format("%s %s %s", fieldValueElem, relation, value);
    }
 
    protected Number value;
-   protected Field field;
+   protected FieldValueElement fieldValueElem;
    protected Relational relation;
 }

@@ -21,39 +21,38 @@ package com.dickimawbooks.bib2gls;
 import java.io.IOException;
 
 /**
- * Tests if the value of a field is a substring of the value of another field.
- * If the first field is empty or missing, evaluates as false.
+ * Tests if the value of a field element is a substring of 
+ * the value of another field element.
+ * If the first field element evaluates to empty or null, the
+ * condition returns false. If the second field element evaluates to
+ * null, it's treated as an empty string. Note that an empty or null
+ * value is not considered to be a substring of another empty or
+ * null value even though they may be considered equal.
  */
 public class FieldInField implements Conditional
 {
-   public FieldInField(Field field1, Field field2)
+   public FieldInField(FieldValueElement fieldValueElem1,
+       FieldValueElement fieldValueElem2)
    {
-      this(field1, field2, false);
+      this(fieldValueElem1, fieldValueElem2, false);
    }
 
-   public FieldInField(Field field1, Field field2, boolean negate)
+   public FieldInField(FieldValueElement fieldValueElem1,
+       FieldValueElement fieldValueElem2, boolean negate)
    {
-      this.field1 = field1;
-      this.field2 = field2;
+      this.fieldValueElem1 = fieldValueElem1;
+      this.fieldValueElem2 = fieldValueElem2;
       this.negate = negate;
    }
 
    public boolean booleanValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
       boolean result;
 
-      String fieldValue1 = null;
+      String fieldValue1 = fieldValueElem1.getStringValue(entry);
       String fieldValue2 = null;
-
-      try
-      {
-         fieldValue1 = field1.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
 
       if (fieldValue1 == null || fieldValue1.isEmpty())
       {
@@ -61,14 +60,7 @@ public class FieldInField implements Conditional
       }
       else
       {
-         try
-         {
-            fieldValue2 = field2.getStringValue(entry);
-         }
-         catch (IOException e)
-         {
-            bib2gls.debug(e);
-         }
+         fieldValue2 = fieldValueElem2.getStringValue(entry);
 
          if (fieldValue2 == null)
          {
@@ -85,12 +77,24 @@ public class FieldInField implements Conditional
 
       if (bib2gls.getDebugLevel() > 0)
       {
-         bib2gls.logAndPrintMessage(
-           String.format(
-            "Entry: %s%nCondition: %s%nValue 1: \"%s\"%nValue 2: \"%s\"%nResult: %s",
-              entry, toString(), fieldValue1, fieldValue2, result
-           )
-         );
+         if (fieldValue2 == null)
+         {
+            bib2gls.logAndPrintMessage(
+              String.format(
+               "Entry: %s%nCondition: %s%nValue 1: \"%s\"%nResult: %s",
+                 entry, toString(), fieldValue1, result
+              )
+            );
+         }
+         else
+         {
+            bib2gls.logAndPrintMessage(
+              String.format(
+               "Entry: %s%nCondition: %s%nValue 1: \"%s\"%nValue 2: \"%s\"%nResult: %s",
+                 entry, toString(), fieldValue1, fieldValue2, result
+              )
+            );
+         }
       }
 
       return result;
@@ -100,9 +104,9 @@ public class FieldInField implements Conditional
    public String toString()
    {
       return String.format("%s \\%s %s", 
-        field1, negate ? "NIN" : "IN", field2);
+        fieldValueElem1, negate ? "NIN" : "IN", fieldValueElem2);
    }
 
-   protected Field field1, field2;
+   protected FieldValueElement fieldValueElem1, fieldValueElem2;
    protected boolean negate;
 }

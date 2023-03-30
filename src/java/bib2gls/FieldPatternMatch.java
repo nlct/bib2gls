@@ -22,27 +22,25 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.IOException;
 
+/**
+ * Tests if a field element value matches a regular expression.
+ * Any groups in the regular expression can be referenced with the
+ * MGP quark in the assignment list (but not in the given field
+ * element value, as that is evaluated before the match is made).
+ */
 public class FieldPatternMatch implements Conditional
 {
-   public FieldPatternMatch(Field field, Pattern pattern)
+   public FieldPatternMatch(FieldValueElement fieldValueElem, Pattern pattern)
    {
-      this.field = field;
+      this.fieldValueElem = fieldValueElem;
       this.pattern = pattern;
    }
 
    public boolean booleanValue(Bib2GlsEntry entry)
+   throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
-      String value = null;
-
-      try
-      {
-         value = field.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
+      String value = fieldValueElem.getStringValue(entry);
 
       if (value == null)
       {
@@ -68,9 +66,9 @@ public class FieldPatternMatch implements Conditional
    @Override
    public String toString()
    {
-      return String.format("%s=/%s/", field, pattern.pattern());
+      return String.format("%s=/%s/", fieldValueElem, pattern.pattern());
    }
 
    protected Pattern pattern;
-   protected Field field;
+   protected FieldValueElement fieldValueElem;
 }

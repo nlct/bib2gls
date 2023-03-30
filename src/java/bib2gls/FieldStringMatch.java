@@ -21,15 +21,16 @@ package com.dickimawbooks.bib2gls;
 import java.io.IOException;
 
 /**
- * Compares the value of a field with a string value. If the field is missing, 
- * it will be treated as empty.
+ * Compares the value of a field element with a constant string value.
+ * If the field element evaluates to null, it will be treated as empty.
  */
 public class FieldStringMatch implements Conditional
 {
-   public FieldStringMatch(Field field, Relational relation, String value,
+   public FieldStringMatch(FieldValueElement fieldValueElem,
+       Relational relation, String value,
      boolean quoted, boolean insensitive)
    {
-      this.field = field;
+      this.fieldValueElem = fieldValueElem;
       this.relation = relation;
       this.value = value;
       this.quoted = quoted;
@@ -37,18 +38,10 @@ public class FieldStringMatch implements Conditional
    }
 
    public boolean booleanValue(Bib2GlsEntry entry)
+    throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
-      String fieldValue = null;
-
-      try
-      {
-         fieldValue = field.getStringValue(entry);
-      }
-      catch (IOException e)
-      {
-         bib2gls.debug(e);
-      }
+      String fieldValue = fieldValueElem.getStringValue(entry);
 
       if (fieldValue == null)
       {
@@ -102,18 +95,18 @@ public class FieldStringMatch implements Conditional
 
       if (quoted)
       {
-         str = String.format("%s %s \"%s\"", field, relation, value);
+         str = String.format("%s %s \"%s\"", fieldValueElem, relation, value);
       }
       else
       {
-         str = String.format("%s %s {%s}", field, relation, value);
+         str = String.format("%s %s {%s}", fieldValueElem, relation, value);
       }
 
       return insensitive ? str+"i" : str;
    }
 
    protected String value;
-   protected Field field;
+   protected FieldValueElement fieldValueElem;
    protected Relational relation;
    protected boolean quoted, insensitive;
 }
