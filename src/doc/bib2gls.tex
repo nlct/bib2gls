@@ -10525,7 +10525,7 @@ syntax:
 \begin{codeenv}
 \meta{element-list} ::= \meta{element-value} | \meta{element-value} \idx{assign-plus} \meta{element-list}
 \meta{element-value} ::= \meta{string} | \meta{field-ref} | \meta{element-quark}\margm{element-list} | \meta{match-ref}
-\meta{element-quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE} | \gls{LEN} | \gls{TRIM} | \gls{INTERPRET}
+\meta{element-quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE} | \gls{LEN} | \gls{TRIM} | \gls{INTERPRET} | \gls{LABELIFY} | \gls{LABELIFYLIST}
 \meta{match-ref} ::= \gls{MGP}\margm{group-ref}
 \meta{group-ref} ::= \meta{index} | \meta{name}
 \meta{string} ::= \qtdelim{\meta{tokens}} | \margm{tokens}
@@ -10611,6 +10611,14 @@ Returns its argument with any leading and trailing spaces removed.
 Interprets the contents of \meta{element-list} using \bibgls's
 interpreter and returns the result, which may be an empty string if
 the content only contains unknown commands.
+
+\nosecdef{LABELIFY}
+Converts the contents of \meta{element-list} into a label string,
+according to the \csopt{labelify} criteria.
+
+\nosecdef{LABELIFYLIST}
+Converts the contents of \meta{element-list} into a label-list string,
+according to the \csopt{labelify-list} criteria.
 
 \nosecdef{LEN}
 When used within an element list, \gls{LEN} returns the length of

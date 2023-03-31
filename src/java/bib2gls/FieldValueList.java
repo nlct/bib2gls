@@ -348,6 +348,14 @@ public class FieldValueList extends Vector<FieldValueElement>
       {
          return new FieldValueInterpret(argList);
       }
+      else if (name.equals("LABELIFY"))
+      {
+         return new FieldValueLabelify(argList, false);
+      }
+      else if (name.equals("LABELIFYLIST"))
+      {
+         return new FieldValueLabelify(argList, true);
+      }
       else if (name.equals("TRIM"))
       {
          return new FieldValueTrim(argList);
