@@ -9,6 +9,7 @@ v3.3 (pending):
       assign-missing-field-action
       flatten-lonely-condition
       locale
+      copy-to-glossary
 
     - Bug fix: Removed already defined in other glstex file warning if 
       action != define

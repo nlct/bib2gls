@@ -24,71 +24,71 @@ import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
 /**
- * Used to store each field assignment specification (obtained from
- * the assign-fields option).
+ * Used to store a field evaluation. This is a combination of an
+ * assignment list and conditional, without a destination.
  */
-public class FieldAssignment
+public class FieldEvaluation
 {
-   public FieldAssignment(String destField, FieldValueList valueList,
-       Conditional cond, Boolean override)
+   public FieldEvaluation(FieldValueList valueList, Conditional cond)
    {
-      if (destField == null)
+      if (valueList == null)
       {
          throw new NullPointerException();
       }
 
-      this.destField = destField;
-      this.fieldEvaluation = new FieldEvaluation(valueList, cond);
-      this.override = override;
-   }
-
-   public String getDestinationField()
-   {
-      return destField;
-   }
-
-   public boolean isFieldOverrideOn(GlsResource resource)
-   {
-      if (override == null)
-      {
-         return resource.isAssignOverrideOn();
-      }
-      else
-      {
-         return override.booleanValue();
-      }
+      this.valueList = valueList;
+      this.condition = cond;
    }
 
    public BibValue getValue(Bib2GlsEntry entry)
      throws Bib2GlsException,IOException
    {
-      return fieldEvaluation.getValue(entry);
+      entry.getResource().setLastMatch(null);
+
+      if (condition != null && !condition.booleanValue(entry))
+      {
+         return null;
+      }
+
+      return valueList.getValue(entry);
    }
 
    public String getStringValue(Bib2GlsEntry entry)
    throws Bib2GlsException,IOException
    {
-      return fieldEvaluation.getStringValue(entry);
+      if (condition != null && !condition.booleanValue(entry))
+      {
+         return null;
+      }
+
+      return valueList.getStringValue(entry);
    }
 
    @Override
    public String toString()
    {
-      if (override == null)
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < valueList.size(); i++)
       {
-         return String.format("%s = %s", destField, fieldEvaluation);
+         if (i > 0)
+         {
+            builder.append(" + ");
+         }
+
+         builder.append(valueList.get(i));
       }
-      else if (override)
+
+      if (condition != null)
       {
-         return String.format("%s =[o] %s", destField, fieldEvaluation);
+         builder.append(" [ ");
+         builder.append(condition);
+         builder.append(" ] ");
       }
-      else
-      {
-         return String.format("%s =[n] %s", destField, fieldEvaluation);
-      }
+
+      return builder.toString();
    }
 
-   private String destField;
-   private FieldEvaluation fieldEvaluation;
-   private Boolean override;
+   private FieldValueList valueList;
+   private Conditional condition;
 }

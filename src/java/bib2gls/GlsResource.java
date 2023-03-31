@@ -338,6 +338,10 @@ public class GlsResource
                missingFieldAssignAction = MissingFieldAction.EMPTY;
             }
          }
+         else if (opt.equals("copy-to-glossary"))
+         {
+            copyToGlossary = getFieldEvaluationList(list, opt);
+         }
          else if (opt.equals("replicate-fields"))
          {
             fieldCopies = getHashMapVector(list, opt, true);
@@ -5921,6 +5925,206 @@ public class GlsResource
    }
 
    /**
+    * Gets a list of assignments (without the destination part).
+    */ 
+   private Vector<FieldEvaluation> getFieldEvaluationList(
+       KeyValList keyValList, String opt)
+    throws Bib2GlsException,IOException
+   {
+      TeXObject object = keyValList.getValue(opt);
+
+      if (object == null || object.isEmpty())
+      {
+         return null;
+      }
+
+      if (!(object instanceof TeXObjectList))
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, object.toString(parser)));
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage("Parsing field evaluation setting: "
+          +object.format());
+      }
+
+      TeXObjectList stack = (TeXObjectList)object;
+
+      Vector<FieldEvaluation> evalList = new Vector<FieldEvaluation>();
+
+      FieldValueList fieldValueList = null;
+      ConditionalList condition = null;
+
+      try
+      {
+         while (!stack.isEmpty())
+         {
+            object = stack.peek(); 
+
+            if (object instanceof SingleToken)
+            {
+               int cp = ((SingleToken)object).getCharCode();
+
+               if (cp == '[')
+               {
+                  stack.pop();
+                  condition = ConditionalList.popCondition(this, stack, ']');
+               }
+               else if (cp == ',')
+               {
+                  stack.pop();
+
+                  if (fieldValueList != null)
+                  {
+                     evalList.add(new FieldEvaluation(fieldValueList, condition));
+                     fieldValueList = null;
+                     condition = null;
+                  }
+               }
+               else if (fieldValueList == null)
+               {
+                  fieldValueList = FieldValueList.pop(this, stack);
+               }
+               else
+               {
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                    "error.expected_before", "[", object.toString(parser)));
+               }
+            }
+            else if (object instanceof WhiteSpace)
+            {
+               stack.pop();
+            }
+            else if (fieldValueList == null)
+            {
+               fieldValueList = FieldValueList.pop(this, stack);
+            }
+            else
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                 "error.expected_before", "[", object.toString(parser)));
+            }
+         }
+
+         stack.popLeadingWhiteSpace();
+      }
+      catch (Bib2GlsException e)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, e.getMessage()
+             ), e);
+      }
+
+      if (!stack.isEmpty())
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+              "error.unexpected_content_in_arg", stack.toString(parser), opt));
+      }
+
+      if (fieldValueList != null)
+      {
+         evalList.add(new FieldEvaluation(fieldValueList, condition));
+      }
+
+      if (evalList.isEmpty())
+      {
+         return null;
+      }
+      else
+      {
+         return evalList;
+      }
+   }
+
+   /**
+    * Gets a single field value list and conditional.
+    */ 
+   private FieldEvaluation getFieldEvaluation(
+       KeyValList keyValList, String opt)
+    throws Bib2GlsException,IOException
+   {
+      TeXObject object = keyValList.getValue(opt);
+
+      if (object == null || object.isEmpty())
+      {
+         return null;
+      }
+
+      if (!(object instanceof TeXObjectList))
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, object.toString(parser)));
+      }
+
+      if (bib2gls.getDebugLevel() > 0)
+      {
+         bib2gls.logAndPrintMessage("Parsing field evaluation setting: "
+          +object.format());
+      }
+
+      TeXObjectList stack = (TeXObjectList)object;
+
+      FieldValueList fieldValueList = null;
+      ConditionalList condition = null;
+
+      stack.popLeadingWhiteSpace();
+
+      try
+      {
+         fieldValueList = FieldValueList.pop(this, stack);
+
+         while (!stack.isEmpty())
+         {
+            object = stack.pop(); 
+
+            if (object instanceof SingleToken)
+            {
+               if (((SingleToken)object).getCharCode() == '[')
+               {
+                  condition = ConditionalList.popCondition(this, stack, ']');
+                  break;
+               }
+               else
+               {
+                  throw new Bib2GlsException(bib2gls.getMessage(
+                    "error.expected_before", "[", object.toString(parser)));
+               }
+            }
+            else if (!(object instanceof WhiteSpace))
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                 "error.expected_before", "[", object.toString(parser)));
+            }
+         }
+
+         stack.popLeadingWhiteSpace();
+      }
+      catch (Bib2GlsException e)
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+           "error.invalid.option_syntax", opt, e.getMessage()
+             ), e);
+      }
+
+      if (!stack.isEmpty())
+      {
+         throw new Bib2GlsException(bib2gls.getMessage(
+              "error.unexpected_content_in_arg", stack.toString(parser), opt));
+      }
+
+      if (fieldValueList == null)
+      {
+         return null;
+      }
+      else
+      {
+         return new FieldEvaluation(fieldValueList, condition);
+      }
+   }
+
+   /**
     * Substitutes TeX's standard control-character commands for literal characters.
     * The supplied TeX code is a format pattern, but since it has to
     * be written to the aux file, the safest method is to escape the
@@ -8872,6 +9076,15 @@ public class GlsResource
             provideGlossary(writer, secondaryType);
          }
 
+         if (copyToGlossary != null)
+         {
+            writer.println("\\providecommand{\\bibglscopytoglossary}[2]{%");
+            writer.println("  \\ifglossaryexists*{#2}%");
+            writer.println("  {\\GlsXtrIfInGlossary{#1}{#2}{}{\\glsxtrcopytoglossary{#1}{#2}}}%");
+            writer.println("  {}%");
+            writer.println("}");
+         }
+
          /*
           \bibglspassimname has been moved here to allow for the
           resource locale but it's only provided so may not have
@@ -10323,6 +10536,28 @@ public class GlsResource
       }
 
       writer.println();
+
+      if (copyToGlossary != null)
+      {
+         try
+         {
+            for (FieldEvaluation eval : copyToGlossary)
+            {
+               String label = eval.getStringValue(entry);
+
+               if (label != null)
+               {
+                  writer.format("\\bibglscopytoglossary{%s}{%s}%n",
+                     entry.getId(), label);
+               } 
+            }
+         }
+         catch (Exception e)
+         {
+            bib2gls.warning(e.getMessage());
+            bib2gls.debug(e);
+         }
+      }
    }
 
    /**
@@ -17497,6 +17732,8 @@ public class GlsResource
    private boolean assignFieldsOverride=false;
 
    private MissingFieldAction missingFieldAssignAction = MissingFieldAction.FALLBACK;
+
+   private Vector<FieldEvaluation> copyToGlossary = null;
 
    private String[] skipFields = null;
 

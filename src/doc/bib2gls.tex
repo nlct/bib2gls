@@ -7825,6 +7825,98 @@ This just does:
 \cmd{endgroup}
 \end{codeenv}
 
+\optsection{copy-to-glossary}
+
+This option can selectively copy an entry to a glossary after it has
+been defined. If the supplied value is empty, no copying is
+performed (except as a result of other options, such as
+\csopt{action} or \csopt{secondary}).
+This setting isn't implemented until after sorting, while the
+\ext{glstex} file is being written, so all field values should be
+available in any reference.
+
+The \csopt{action} option is implemented first, so the
+selected entry will either be defined or copied according to
+\csopt{action}. If the \csopt{copy-to-glossary} instruction is
+successful, the entry will then be copied using
+\gls{bibglscopytoglossary}. 
+
+This command first tests if the glossary exists and if the entry is
+already in the glossary. This means that if the entry has already
+been added to the glossary or if the glossary doesn't exist then the
+entry won't be copied. You can defined it before the first
+resource command to issue a warning or error, if required.
+
+The \csopt{copy-to-glossary} value should be a comma-separated list
+(not a \keyvallist\ like \csopt{assign-fields}), where the syntax
+for each item in the list is in the form:
+\begin{codeenv}
+\meta{element-list} \oargm{condition}
+\end{codeenv}
+where \meta{element-list} and \meta{condition} are as for
+\csopt{assign-fields}. For each assignment specification, if the
+condition evaluates to false or if the \meta{element-list} evaluates
+to null (according to the same criteria as \csopt{assign-fields})
+then the copy instruction won't be added. This means that you can
+copy an entry to multiple glossaries.
+
+Remember that constant strings need to be marked with braces or
+double-quote delimiters. For example, if you want to copy \emph{all}
+entries to the \code{index} glossary then either do:
+\begin{codeenv}
+\csopt[\qtdelim{index}]{copy-to-glossary}
+\end{codeenv}
+or
+\begin{codeenv}
+\csopt[\marg{index}]{copy-to-glossary}
+\end{codeenv}
+Note that the outer braces are stripped by the resource option
+parser, which first splits the \meta{option}=\marg{value} list supplied via
+\gls{GlsXtrLoadResources} into \meta{option} and \meta{value} pairs, and then
+parses each \meta{option}. So by the time that the
+\csopt{copy-to-glossary} option has its value parsed, the value has
+become \code{\qtdelim{index}} or \code{\marg{index}}, respectively,
+in the above two examples.
+
+Remember that the \meta{value} itself may be a comma-separated list.
+The outer grouping hides the inner list comma from the initial
+\meta{option}=\marg{value} split.  For example, to copy all entries
+to the \code{index} and \code{symbols} glossaries:
+\begin{codeenv}
+\csopt[\qtdelim{index}, \qtdelim{symbols}]{copy-to-glossary}
+\end{codeenv}
+or
+\begin{codeenv}
+\csopt[\marg{index}, \marg{symbols}]{copy-to-glossary}
+\end{codeenv}
+
+The following example will only copy entries to the \code{index}
+glossary if their actual entry type is \code{index}:
+\begin{codeenv}
+\csopt[\qtdelim{index} \oarg{ entrytype \idx{follow} actual \idx{equalscmp} \qtdelim{index} }]{copy-to-glossary}
+\end{codeenv}
+Alternatively, to copy aliased custom entry types
+\atentryfmt{person} entries to a custom glossary \code{person} and
+\atentryfmt{place} to a custom glossary \code{place}:
+\begin{codeenv}
+\csopt[
+ entrytype \idx{follow} original
+  \oarg{ entrytype \idx{follow} original =\idx{slashchar}person\idx{regexpor}place}\idx{slashchar}
+]{copy-to-glossary}
+\end{codeenv}
+
+If the glossary types don't conveniently match the entry type,
+the instructions can be split into a list.
+For example:
+\begin{codeenv}
+\csopt[
+  \qtdelim{abbreviations} \oarg{ entrytype \idx{follow} actual = \qtdelim{abbreviation} },
+  \qtdelim{symbols} \oarg{ entrytype \idx{follow} actual = \qtdelim{symbol} },
+  \qtdelim{numbers} \oarg{ entrytype \idx{follow} actual = \qtdelim{number} },
+]{copy-to-glossary}
+\end{codeenv}
+Each instruction in the list will be tried and the copy instruction
+will only be written if a non-null value is successfully returned.
 
 \section{Selection Options}
 \label{sec:selectionopts}
@@ -10408,7 +10500,15 @@ is deemed to be null, in which case the assignment won't be made.
 Note that, unlike most \keyval\ options, the value part
 (\meta{assign-list} \oargm{condition}) should not be grouped. The
 \csopt{assign-fields} option is parsed in a different way to the
-other \keyvallist\ options.
+other \keyvallist\ options. However, it's best to group the \emph{entire}
+\meta{value} argument of \csopt{assign-fields}. For example:
+\begin{codeenv}
+\csopt[
+\field{name} \idx{equalsassign} \field{text} \idx{assign-plus} \qtdelim{, } \idx{assign-plus} \field{symbol}
+]{assign-fields}
+\end{codeenv}
+Don't do \code{\field{name} \idx{equalsassign} \marg{\field{text}
+\idx{assign-plus} \qtdelim{, } \idx{assign-plus} \field{symbol}}}.
 
 \begin{important}
 Remember that field values may be altered before or after
@@ -21604,6 +21704,26 @@ field using:
 (before \gls{GlsXtrLoadResources}).
 
 \section{Other}
+
+\cssection{bibglscopytoglossary}
+
+\formatdef{bibglscopytoglossary}
+This command is provided if the \csopt{copy-to-glossary} option is
+set and is used to copy an entry to another glossary. The definition
+is:
+\begin{codeenv}
+\cmd{providecommand}\marg{\gls{bibglscopytoglossary}}[2]{\comment{}
+ \ics{ifglossaryexists*}\marg{}\comment{}
+ \marg{\ics{GlsXtrIfInGlossary}\marg{\idx{param}1}\marg{\idx{param}2}\marg{}\marg{\ics{glsxtrcopytoglossary}\marg{\idx{param}1}\marg{\idx{param}2}}}\comment{}
+ \marg{}\comment{}
+}
+\end{codeenv}
+This ensures that the entry is only copied if the glossary exists
+and if the entry hasn't already been copied to it.
+
+This command isn't used by the \csopt[copy]{action} or 
+\csopt[copy or define]{action} settings, which use \ics{glsxtrcopytoglossary}
+directly.
 
 \cssection{bibglssettotalrecordcount}
 

@@ -692,6 +692,17 @@
   category={command}
 }
 
+@bibglscommand{bibglscopytoglossary,
+  name={\csfmt{bib\-gls\-copy\-to\-glossary}},
+  user1={\margm{entry-label}\margm{glossary-type}},
+  description={copies the entry identified by \meta{entry-label} to
+  the glossary identified by \meta{glossary-type} after the entry is
+  defined (if the \csopt{copy-to-glossary} option is set)},
+  note={\bibgls},
+  topics={definingterms},
+  category={command}
+}
+
 @bibglscommand{bibglsuselongfont,
   name={\csfmt{bib\-gls\-use\-long\-font}},
   user1={\margm{text}\margm{category}},
@@ -2450,6 +2461,13 @@ starred version \csref{glsxtrfmt*}},
 @resourceoption{opt.assign-missing-field-action,
    name={\csoptfmt{assign\dhyphen missing\dhyphen field\dhyphen action}},
    user1={\margm{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.copy-to-glossary,
+   name={\csoptfmt{copy\dhyphen to\dhyphen glossary}},
+   user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
 }
@@ -17184,6 +17202,16 @@ paragraph break that retains the hanging indent},
   defined as an ignored glossary},
   topics={conditional,glossrefs},
   note={\styfmt{glossaries} v4.08+},
+  category={command}
+}
+
+@glscommand{GlsXtrIfInGlossary,
+  name={\csfmt{Gls\-Xtr\-If\-In\-Glossary}},
+  user1={\margm{entry-label}\margm{type}\margm{true}\margm{false}},
+  description={tests if the entry given \meta{entry-label} is in
+   the glossary identified by \meta{type}},
+  topics={conditional,glossrefs},
+  note={\styfmt{glossaries-extra}},
   category={command}
 }
 
