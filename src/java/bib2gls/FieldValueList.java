@@ -85,7 +85,8 @@ public class FieldValueList extends Vector<FieldValueElement>
       return builder.toString();
    }
 
-   public static FieldValueList pop(GlsResource resource, TeXObjectList stack)
+   public static FieldValueList pop(GlsResource resource, String fallbackOption,
+      TeXObjectList stack)
      throws Bib2GlsException,IOException
    {
       TeXParser parser = resource.getParser();
@@ -173,7 +174,7 @@ public class FieldValueList extends Vector<FieldValueElement>
                   popped.addAll(TeXParserUtils.createGroup(parser, 
                     (TeXObject)arg.clone()));
 
-                  list.add(getQuark(name, arg, resource));
+                  list.add(getQuark(name, arg, resource, fallbackOption));
                }
 
                add = false;
@@ -257,7 +258,7 @@ public class FieldValueList extends Vector<FieldValueElement>
             }
             else if (add)
             {
-               Field field = Field.popField(resource, stack);
+               Field field = Field.popField(resource, fallbackOption, stack);
 
                list.add(field);
                add = false;
@@ -313,7 +314,7 @@ public class FieldValueList extends Vector<FieldValueElement>
    }
 
    public static FieldValueElement getQuark(String name, TeXObject arg,
-      GlsResource resource)
+      GlsResource resource, String fallbackOption)
    throws Bib2GlsException,IOException
    {
       TeXParser parser = resource.getParser();
@@ -328,7 +329,7 @@ public class FieldValueList extends Vector<FieldValueElement>
 
       TeXObjectList substack = (TeXObjectList)arg;
 
-      FieldValueList argList = pop(resource, substack);
+      FieldValueList argList = pop(resource, fallbackOption, substack);
 
       substack.popLeadingWhiteSpace();
 

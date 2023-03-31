@@ -8,8 +8,12 @@ v3.3 (pending):
       assign-override
       assign-missing-field-action
       flatten-lonely-condition
-      locale
+      flatten-lonely-missing-field-action
       copy-to-glossary
+      copy-to-glossary-missing-field-action
+      locale
+
+    - Added support for bib2gls-extra-<lang>.xml files.
 
     - Bug fix: Removed already defined in other glstex file warning if 
       action != define

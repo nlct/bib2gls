@@ -323,24 +323,15 @@ public class GlsResource
          }
          else if (opt.equals("assign-missing-field-action"))
          {
-            String val = getChoice(list, opt, "skip", "fallback", "empty");
-
-            if (val.equals("skip"))
-            {
-               missingFieldAssignAction = MissingFieldAction.SKIP;
-            }
-            else if (val.equals("fallback"))
-            {
-               missingFieldAssignAction = MissingFieldAction.FALLBACK;
-            }
-            else // if (val.equals("empty"))
-            {
-               missingFieldAssignAction = MissingFieldAction.EMPTY;
-            }
+            missingFieldAssignAction = getMissingFieldAction(list, opt);
          }
          else if (opt.equals("copy-to-glossary"))
          {
             copyToGlossary = getFieldEvaluationList(list, opt);
+         }
+         else if (opt.equals("copy-to-glossary-missing-field-action"))
+         {
+            missingFieldCopyToGlossary = getMissingFieldAction(list, opt);
          }
          else if (opt.equals("replicate-fields"))
          {
@@ -385,20 +376,7 @@ public class GlsResource
          }
          else if (opt.equals("replicate-missing-field-action"))
          {
-            String val = getChoice(list, opt, "skip", "fallback", "empty");
-
-            if (val.equals("skip"))
-            {
-               missingFieldReplicateAction = MissingFieldAction.SKIP;
-            }
-            else if (val.equals("fallback"))
-            {
-               missingFieldReplicateAction = MissingFieldAction.FALLBACK;
-            }
-            else // if (val.equals("empty"))
-            {
-               missingFieldReplicateAction = MissingFieldAction.EMPTY;
-            }
+            missingFieldReplicateAction = getMissingFieldAction(list, opt);
          }
          else if (opt.equals("primary-dual-dependency"))
          {
@@ -1213,6 +1191,10 @@ public class GlsResource
          else if (opt.equals("flatten-lonely-condition"))
          {
             flattenLonelyConditional = getCondition(list, opt);
+         }
+         else if (opt.equals("flatten-lonely-missing-field-action"))
+         {
+            missingFieldFlattenLonely = getMissingFieldAction(list, opt);
          }
          else if (opt.equals("save-locations"))
          {
@@ -5701,7 +5683,7 @@ public class GlsResource
               "error.invalid.expected", arg.toString(parser)));
          }
 
-         return ConditionalList.popCondition(this, stack, -1);
+         return ConditionalList.popCondition(this, opt, stack, -1);
       }
       catch (TeXSyntaxException e)
       {
@@ -5808,7 +5790,7 @@ public class GlsResource
 
                      try
                      {
-                        fieldValueList = FieldValueList.pop(this, stack);
+                        fieldValueList = FieldValueList.pop(this, opt, stack);
                      }
                      catch (Bib2GlsException e)
                      {
@@ -5870,7 +5852,7 @@ public class GlsResource
 
                   try
                   {
-                     condition = ConditionalList.popCondition(this, stack, ']');
+                     condition = ConditionalList.popCondition(this, opt, stack, ']');
                   }
                   catch (Bib2GlsException e)
                   {
@@ -5970,7 +5952,7 @@ public class GlsResource
                if (cp == '[')
                {
                   stack.pop();
-                  condition = ConditionalList.popCondition(this, stack, ']');
+                  condition = ConditionalList.popCondition(this, opt, stack, ']');
                }
                else if (cp == ',')
                {
@@ -5985,7 +5967,7 @@ public class GlsResource
                }
                else if (fieldValueList == null)
                {
-                  fieldValueList = FieldValueList.pop(this, stack);
+                  fieldValueList = FieldValueList.pop(this, opt, stack);
                }
                else
                {
@@ -5999,7 +5981,7 @@ public class GlsResource
             }
             else if (fieldValueList == null)
             {
-               fieldValueList = FieldValueList.pop(this, stack);
+               fieldValueList = FieldValueList.pop(this, opt, stack);
             }
             else
             {
@@ -6073,7 +6055,7 @@ public class GlsResource
 
       try
       {
-         fieldValueList = FieldValueList.pop(this, stack);
+         fieldValueList = FieldValueList.pop(this, opt, stack);
 
          while (!stack.isEmpty())
          {
@@ -6083,7 +6065,7 @@ public class GlsResource
             {
                if (((SingleToken)object).getCharCode() == '[')
                {
-                  condition = ConditionalList.popCondition(this, stack, ']');
+                  condition = ConditionalList.popCondition(this, opt, stack, ']');
                   break;
                }
                else
@@ -6121,6 +6103,26 @@ public class GlsResource
       else
       {
          return new FieldEvaluation(fieldValueList, condition);
+      }
+   }
+
+   private MissingFieldAction getMissingFieldAction(
+       KeyValList keyValList, String opt)
+    throws Bib2GlsException,IOException
+   {
+      String val = getChoice(keyValList, opt, "skip", "fallback", "empty");
+
+      if (val.equals("skip"))
+      {
+         return MissingFieldAction.SKIP;
+      }
+      else if (val.equals("fallback"))
+      {
+         return MissingFieldAction.FALLBACK;
+      }
+      else // if (val.equals("empty"))
+      {
+         return MissingFieldAction.EMPTY;
       }
    }
 
@@ -16447,12 +16449,31 @@ public class GlsResource
    }
 
    /**
-    * Gets the "assign-missing-field-action" setting.
-    * @return the enum corresponding to the setting
-    */ 
-   public MissingFieldAction getFallbackOnMissingAssignAction()
+    * Gets the missing field action for the given option.
+    */  
+   public MissingFieldAction getMissingFieldAction(String option)
    {
-      return missingFieldAssignAction;
+      if (option.equals("assign-fields"))
+      {
+         return missingFieldAssignAction;
+      }
+      else if (option.equals("copy-to-glossary"))
+      {
+         return missingFieldCopyToGlossary;
+      }
+      else if (option.equals("flatten-lonely-condition"))
+      {
+         return missingFieldFlattenLonely;
+      }
+      else if (option.equals("replicate-fields"))
+      {
+         return getFallbackOnMissingReplicateAction();
+      }
+      else
+      {
+         throw new IllegalArgumentException("Invalid missing field action identifier: '"
+           + "'");
+      }
    }
 
    /**
@@ -17735,6 +17756,8 @@ public class GlsResource
 
    private Vector<FieldEvaluation> copyToGlossary = null;
 
+   private MissingFieldAction missingFieldCopyToGlossary = MissingFieldAction.FALLBACK;
+
    private String[] skipFields = null;
 
    private String[] bibtexAuthorList = null;
@@ -17941,6 +17964,8 @@ public class GlsResource
      = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
 
    private Conditional flattenLonelyConditional = null;
+
+   private MissingFieldAction missingFieldFlattenLonely = MissingFieldAction.FALLBACK;
 
    private boolean saveChildCount = false;
 

@@ -38,7 +38,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
    }
 
    public static ConditionalList popCondition(GlsResource resource,
-      TeXObjectList stack, int terminator)
+      String fallbackOption, TeXObjectList stack, int terminator)
    throws Bib2GlsException,IOException
    {
       ConditionalList condList = new ConditionalList();
@@ -84,16 +84,16 @@ public class ConditionalList extends Vector<ConditionalListElement>
             {
                stack.pop();
 
-               condList.add(popCondition(resource, stack, ')'));
+               condList.add(popCondition(resource, fallbackOption, stack, ')'));
             }
             else
             {
-               condList.add(popComparison(resource, stack));
+               condList.add(popComparison(resource, fallbackOption, stack));
             }
          }
          else if (obj instanceof ControlSequence)
          {
-            condList.add(popComparison(resource, stack));
+            condList.add(popComparison(resource, fallbackOption, stack));
          }
          else if (condList.isEmpty())
          {
@@ -119,7 +119,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
    }
 
    public static Conditional popComparison(GlsResource resource,
-     TeXObjectList stack)
+     String fallbackOption, TeXObjectList stack)
    throws Bib2GlsException,IOException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
@@ -151,7 +151,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
          if (parser.isStack(obj))
          {
             TeXObjectList substack = (TeXObjectList)obj;
-            fieldValueElem = FieldValueList.pop(resource, substack);
+            fieldValueElem = FieldValueList.pop(resource, fallbackOption, substack);
             substack.popLeadingWhiteSpace();
 
             if (!substack.isEmpty())
@@ -176,7 +176,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       }
       else
       {
-         fieldValueElem = Field.popField(resource, stack);
+         fieldValueElem = Field.popField(resource, fallbackOption, stack);
          leftSide = fieldValueElem.toString();
       }
 
@@ -205,32 +205,32 @@ public class ConditionalList extends Vector<ConditionalListElement>
          if (name.equals("IN"))
          {
             return new FieldInField(fieldValueElem,
-               popFieldValueElement(resource, stack));
+               popFieldValueElement(resource, fallbackOption, stack));
          }
          else if (name.equals("NIN"))
          {
             return new FieldInField(fieldValueElem,
-               popFieldValueElement(resource, stack), true);
+               popFieldValueElement(resource, fallbackOption, stack), true);
          }
          else if (name.equals("PREFIXOF"))
          {
             return new FieldPrefixOfField(fieldValueElem,
-               popFieldValueElement(resource, stack));
+               popFieldValueElement(resource, fallbackOption, stack));
          }
          else if (name.equals("NOTPREFIXOF"))
          {
             return new FieldPrefixOfField(fieldValueElem,
-               popFieldValueElement(resource, stack), true);
+               popFieldValueElement(resource, fallbackOption, stack), true);
          }
          else if (name.equals("SUFFIXOF"))
          {
             return new FieldSuffixOfField(fieldValueElem,
-               popFieldValueElement(resource, stack));
+               popFieldValueElement(resource, fallbackOption, stack));
          }
          else if (name.equals("NOTSUFFIXOF"))
          {
             return new FieldSuffixOfField(fieldValueElem,
-               popFieldValueElement(resource, stack), true);
+               popFieldValueElement(resource, fallbackOption, stack), true);
          }
          else
          {
@@ -423,13 +423,13 @@ public class ConditionalList extends Vector<ConditionalListElement>
       else
       {
          return new FieldFieldMatch(fieldValueElem, rel,
-           popFieldValueElement(resource, stack));
+           popFieldValueElement(resource, fallbackOption, stack));
       }
 
    }
 
    public static FieldValueElement popFieldValueElement(
-     GlsResource resource, TeXObjectList stack)
+     GlsResource resource, String fallbackOption, TeXObjectList stack)
    throws IOException,Bib2GlsException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
@@ -454,7 +454,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
             if (parser.isStack(obj))
             {
                TeXObjectList substack = (TeXObjectList)obj;
-               fieldValueElem = FieldValueList.pop(resource, substack);
+               fieldValueElem = FieldValueList.pop(resource, fallbackOption, substack);
                substack.popLeadingWhiteSpace();
 
                if (!substack.isEmpty())
@@ -479,7 +479,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       }
       else
       {
-         fieldValueElem = Field.popField(resource, stack);
+         fieldValueElem = Field.popField(resource, fallbackOption, stack);
       }
 
       return fieldValueElem;

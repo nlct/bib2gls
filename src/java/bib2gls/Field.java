@@ -29,7 +29,7 @@ import com.dickimawbooks.texparserlib.bib.BibUserString;
 public class Field implements FieldValueElement
 {
    public Field(GlsResource resource, FieldReference fieldRef,
-     String name, Field follow)
+     String name, Field follow, String fallbackOption)
      throws Bib2GlsException
    {
       if (fieldRef == null || resource == null)
@@ -41,12 +41,13 @@ public class Field implements FieldValueElement
       this.fieldRef = fieldRef;
       setFollow(follow);
       setName(name);
+      this.fallbackOption = fallbackOption;
    }
 
-   public Field(GlsResource resource, FieldReference fieldRef)
+   public Field(GlsResource resource, FieldReference fieldRef, String fallbackOption)
      throws Bib2GlsException
    {
-      this(resource, fieldRef, null, null);
+      this(resource, fieldRef, null, null, fallbackOption);
    }
 
    public String getName()
@@ -177,7 +178,7 @@ public class Field implements FieldValueElement
 
             if (bibValue == null)
             {
-               MissingFieldAction action = resource.getFallbackOnMissingAssignAction();
+               MissingFieldAction action = resource.getMissingFieldAction(fallbackOption);
 
                if (action == MissingFieldAction.FALLBACK)
                {
@@ -262,7 +263,8 @@ public class Field implements FieldValueElement
       return text;
    }
 
-   public static Field popField(GlsResource resource, TeXObjectList stack)
+   public static Field popField(GlsResource resource, String fallbackOptionName,
+      TeXObjectList stack)
      throws Bib2GlsException,IOException
    {
       Bib2Gls bib2gls = resource.getBib2Gls();
@@ -327,12 +329,14 @@ public class Field implements FieldValueElement
                {
                   if (field == null)
                   {
-                     field = new Field(resource, FieldReference.getReference(tag));
+                     field = new Field(resource,
+                        FieldReference.getReference(tag), fallbackOptionName);
                   }
                   else
                   {
                      field.getLast().setFollow(
-                       new Field(resource, FieldReference.getReference(tag)));
+                       new Field(resource, FieldReference.getReference(tag),
+                         fallbackOptionName));
                   }
                }
                catch (IllegalArgumentException e)
@@ -433,7 +437,7 @@ public class Field implements FieldValueElement
 
       if (field == null)
       {
-         return new Field(resource, FieldReference.SELF, tag, null);
+         return new Field(resource, FieldReference.SELF, tag, null, fallbackOptionName);
       }
 
       field.getLast().setName(tag);
@@ -457,6 +461,7 @@ public class Field implements FieldValueElement
    private FieldReference fieldRef;
    private String name;
    private Field follow;
+   private String fallbackOption;
 
    public static final String FOLLOW_MARKER = "->";
 }

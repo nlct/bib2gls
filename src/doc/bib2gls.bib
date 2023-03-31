@@ -2467,6 +2467,13 @@ starred version \csref{glsxtrfmt*}},
 
 @resourceoption{opt.copy-to-glossary,
    name={\csoptfmt{copy\dhyphen to\dhyphen glossary}},
+   user1={\meta{list}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.copy-to-glossary-missing-field-action,
+   name={\csoptfmt{copy\dhyphen to\dhyphen glossary\dhyphen missing\dhyphen field\dhyphen action}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -2698,6 +2705,13 @@ starred version \csref{glsxtrfmt*}},
 
 @resourceoption{opt.flatten-lonely-condition,
    name={\csoptfmt{flatten\dhyphen lonely\dhyphen condition}},
+   user1={\meta{value}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
+@resourceoption{opt.flatten-lonely-missing-field-action,
+   name={\csoptfmt{flatten\dhyphen lonely\dhyphen missing\dhyphen field\dhyphen action}},
    user1={\meta{value}},
    category={resourceoption},
    parent={resourceoptions}
@@ -5380,8 +5394,16 @@ and \L/\l\ treated as L/l},
   parent={packages}
 }
 
+@index{stringconcatenation,
+  name={string concatenation}
+}
+
+@index{concatenation,
+ alias={stringconcatenation}
+}
+
 @symbol{stringconcat,
-  name={\code{\#} (string concatenation)},
+  name={\code{\#} (\extfmt{bib} string concatenation)},
   text={\code{\#}}
 }
 
@@ -5785,8 +5807,8 @@ with forced line breaks in paragraph column formats)},
   text={\code{+}}
 }
 
-@symbol{assign-plus,
-  name={\code{+} (concatenation)},
+@symbol{concat-plus,
+  name={\code{+} (resource option concatenation)},
   text={\code{+}}
 }
 
@@ -15433,6 +15455,7 @@ conditional in \csopt{assign-fields} conditionals. This token needs
   name={\csfmt{CAT}},
   user1={\margm{element-list}},
   description={a \idx{quark} to denote a string concatenation 
+  (see \sectionref{sec:optstringconcat})
   in the conditional parts of \csopt{assign-fields}. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
