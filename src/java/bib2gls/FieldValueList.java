@@ -361,6 +361,10 @@ public class FieldValueList extends Vector<FieldValueElement>
       {
          return new FieldValueTrim(argList);
       }
+      else if (name.equals("CS"))
+      {
+         return new FieldValueCs(argList);
+      }
       else if (name.equals("LEN"))
       {
          return new FieldValueLength(argList);

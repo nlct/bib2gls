@@ -2078,8 +2078,6 @@ the corresponding set of \ext{bib} files:
   \item ignored fields (identified by \csopt{ignore-fields}) are
   removed;
 
-  \item custom prefixes (identified by \csopt{custom-label-prefixes}) are applied;
-
   \item case-changes (for example, \csopt{short-case-change}) are
   performed, except for the \field{name} field and fields identified
   with \csopt{field-case-change};
@@ -2350,7 +2348,7 @@ or \idx{regex.dollar} to denote the start and end.
 
 \item[Field assignments] The following commands may be used in the
 \meta{element-list} syntax of \csopt{assign-fields}:
-\gls{MGP}, \gls{LEN}, \gls{TRIM}, \gls{INTERPRET},
+\gls{CS}, \gls{MGP}, \gls{LEN}, \gls{TRIM}, \gls{INTERPRET},
 \gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
 
 \item[Conditionals] The \meta{condition} part of the \csopt{assign-fields}
@@ -7521,13 +7519,15 @@ has the following syntax:
 \begin{codeenv}
 \meta{element-list} ::= \meta{element-value} | \meta{element-value} \idx{concat-plus} \meta{element-list}
 \meta{element-value} ::= \meta{string} | \meta{field-ref} | \meta{element-quark}\margm{element-list} | \meta{match-ref}
-\meta{element-quark} ::= \gls{LC} | \gls{UC} | \gls{FIRSTLC} | \gls{FIRSTUC} | \gls{TITLE} | \gls{LEN} | \gls{TRIM} | \gls{INTERPRET} | \gls{LABELIFY} | \gls{LABELIFYLIST}
 \meta{match-ref} ::= \gls{MGP}\margm{group-ref}
 \meta{group-ref} ::= \meta{index} | \meta{name}
 \meta{string} ::= \qtdelim{\meta{tokens}} | \margm{tokens}
 \end{codeenv}
 The \meta{field-ref} syntax is described below, and is used to
 reference a field value.
+The element quarks (\meta{element-quark}, described below) take an
+\meta{element-list} argument. If the \meta{element-list} argument evaluates
+to null, they will return null.
 
 \begin{important}
 Remember that the argument of \gls{GlsXtrLoadResources} is expanded
@@ -7549,6 +7549,9 @@ So you can do:
 \end{codeenv}
 This means that you can simply write the \idx{quark} in the resource
 option without needing to use \ics{protect} or \idx{cs.string}.
+The remainder of this section assumes that \ics{glsxtrresourceinit}
+has been redefined to use \ics{GlsXtrResourceInitEscSequences}, as
+in the above example.
 
 As with the \ext{bib} format, strings (\meta{string}) can be delimited by braces
 \margm{text} or double-quotes \code{\qtdelim{\meta{text}}}. If you
@@ -7579,6 +7582,46 @@ or
 Note that the outer braces are stripped by the resource option
 parser before the content is parsed as an \meta{element-list}.
 
+The element \idxpl{quark} are uppercase tokens that start with a leading
+backslash. They have no meaning to \bibgls's interpreter nor are
+they defined in the \LaTeX\ document outside of the scope of 
+the resource command (unless they happen to coincidentally be
+defined by another package or are a custom command). \Idxpl{quark}
+occur outside of strings. Any escape sequences occurring within a
+string are considered to be \LaTeX\ commands.
+
+\nosecdef{CS}
+Returns a control sequence with the control sequence
+name obtained from concatenating \meta{element-list}. 
+Note that this is different from
+\gls{cs} which expands to the detokenized control sequence name as
+the resource options are written to the \ext{aux} file.
+
+For example, if the \LaTeX\ file has:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[
+   \field{name} = "\gls{cs}\marg{foo}\marg{" \idx{concat-plus} \field{user1} \idx{concat-plus} "}"
+ ]{assign-fields}
+}
+\end{codeenv}
+then this will expand the options to the \ext{aux} file as
+\begin{codeenv}
+\csopt[
+\field{name} = "\csfmt{foo}\marg{" \idx{concat-plus} \field{user1} \idx{concat-plus} "}"
+]{assign-fields}
+\end{codeenv}
+Compare this with:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[
+   \field{name} = \gls{CS} \marg{ \field{user1} }
+ ]{assign-fields}
+}
+\end{codeenv}
+which will set the \field{name} value to \csfmt{\meta{csname}} where
+\meta{csname} is the value obtained from the \field{user1} field for
+that entry.
 
 \nosecdef{MGP}
 The \meta{match-ref} element should only be used with a
@@ -7615,10 +7658,6 @@ The \gls{MGP} quark (which expands to the \gls{MGP} identifier for
 character to be written to the \ext{aux} file within
 the replacement part of \csopt{labelify-replace}).
 \end{important}
-
-The element quarks (\meta{element-quark}) take an
-\meta{element-list} argument. If the \meta{element-list} argument evaluates
-to null, they will return null.
 
 \nosecdef{TRIM}
 Returns its argument with any leading and trailing spaces removed.
@@ -10199,55 +10238,6 @@ it's as though the entries had been defined as:
 
 Remember to use this prefix when you reference the terms in the
 document with commands like \ics{gls}.
-
-\optsection[\subsubsection]{custom-label-prefixes}
-
-This option can selectively insert a prefix into entry labels. If
-the supplied value is empty, no custom prefixes will be created.
-
-Note that this prefix will be in addition to a general prefix
-applied with the \csopt{label-prefix} option. Custom prefixes from a
-\gls{primaryentry} will also be applied to the corresponding
-\gls{dualentry} in addition to the \csopt{dual-prefix} option.
-
-\begin{important}
-However, it's best to avoid custom prefixes when you have
-\glspl{dualentry} or multiple \glspl{resourceset} or in-field
-entry references, such as \field{parent} or \field{see} or commands
-like \cs{gls} within field values. In particular, avoid duplicate
-original labels within the \ext{bib} file even if the custom prefix
-would make them unique.
-\end{important}
-
-This option is implemented early in the entry processing stage (see
-\sectionref{sec:resourcesets}) after field aliases are performed but
-before field adjustment options, such as \csopt{replicate-fields}
-and \csopt{assign-fields}.
-
-The \csopt{custom-label-prefixes} value should be a comma-separated list,
-where the syntax for each item in the list is in the form:
-\begin{codeenv}
-\meta{element-list} \oargm{condition}
-\end{codeenv}
-where \meta{element-list} is a string \gls{concatenation} (see
-\sectionref{sec:optstringconcat}) and \meta{condition} is a complex
-conditional (see \sectionref{sec:conditions}).  For each 
-\meta{element-list} \oargm{condition} specification, if the
-condition evaluates to false or if the \meta{element-list} evaluates
-to null then no prefix will be inserted (but a prefix may be
-inserted by other options, such as \csopt{label-prefix}).
-
-\optsection[\subsubsection]{custom-label-prefixes-missing-field-action}
-
-This option indicates what to do if a source field identified in 
-\csopt{custom-label-prefixes} is missing. The value may be one of:
-\begin{itemize}
-\item \optfmt{skip}: return null;
-\item \optfmt{fallback}: use the fallback for the missing field, if
-one is available, otherwise return null (default);
-\item \optfmt{empty}: treat the missing value as empty.
-\end{itemize}
-Returning null will result in the label prefix instruction being omitted.
 
 \optsection[\subsubsection]{duplicate-label-suffix}
 
@@ -22152,13 +22142,6 @@ A hook to pick up the \meta{n}th external prefix label (identified with
 won't be used if the list of external prefixes is empty. If required,
 this command should be defined before the \igls{resourceset} is
 loaded.
-
-\cssection{bibglscustomlabelprefixes}
-
-\formatdef{bibglscustomlabelprefixes}
-A hook provided to pick up custom label prefixes, as identified by
-the \csopt{custom-label-prefixes} option. The argument is a
-comma-separated list of prefixes.
 
 \cssection{bibglshashchar}
 

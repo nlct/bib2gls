@@ -166,10 +166,9 @@ public class Bib2GlsDualEntry extends Bib2GlsEntry
       GlsResource resource = getResource();
       String dualPrefix = resource.getDualPrefix();
       String label = getOriginalId();
-      String customPrefix = getCustomPrefix();
 
       Bib2GlsDualEntry entry = createDualEntry();
-      entry.setId(dualPrefix, customPrefix, label);
+      entry.setId(dualPrefix, label);
       entry.setBase(getBase());
       entry.isprimary=false;
 

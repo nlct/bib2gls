@@ -138,11 +138,6 @@ public class Bib2GlsEntry extends BibEntry
       return labelPrefix;
    }
 
-   public String getCustomPrefix()
-   {
-      return customPrefix;
-   }
-
    public String getSuffix()
    {
       return labelSuffix;
@@ -194,27 +189,6 @@ public class Bib2GlsEntry extends BibEntry
    public void setId(String prefix, String label)
    {
       labelPrefix = prefix;
-      customPrefix = null;
-      setId(label);
-   }
-
-   public void setId(String prefix, String customPrefix, String label)
-   {
-      this.customPrefix = customPrefix;
-
-      if (customPrefix == null)
-      {
-         labelPrefix = prefix;
-      }
-      else if (prefix == null)
-      {
-         labelPrefix = customPrefix;
-      }
-      else
-      {
-         labelPrefix = prefix+customPrefix;
-      }
-
       setId(label);
    }
 
@@ -980,23 +954,6 @@ public class Bib2GlsEntry extends BibEntry
             orgParentValue = new BibValueList();
             orgParentValue.add(new BibUserString((TeXObjectList)list.clone()));
          }
-      }
-
-      customPrefix = resource.getCustomLabelPrefix(this);
-
-      if (customPrefix != null)
-      {
-         if (labelPrefix == null)
-         {
-            labelPrefix = customPrefix;
-         }
-         else
-         {
-            labelPrefix += customPrefix;
-         }
-
-         bib2gls.verboseMessage("message.adjusted.label",
-          getOriginalId(), getId());
       }
 
       boolean mfirstucProtect = bib2gls.mfirstucProtection();
@@ -6014,7 +5971,6 @@ public class Bib2GlsEntry extends BibEntry
       entry.recordMap = recordMap;
       entry.base = base;
       entry.labelPrefix = labelPrefix;
-      entry.customPrefix = customPrefix;
       entry.labelSuffix = labelSuffix;
       entry.setOriginalId(getOriginalId());
       entry.setRecordIndex(recordIndex);
@@ -6099,7 +6055,7 @@ public class Bib2GlsEntry extends BibEntry
 
    private String groupId=null;
 
-   private String labelPrefix = null, labelSuffix, customPrefix=null;
+   private String labelPrefix = null, labelSuffix;
 
    private Bib2GlsEntry dual = null;
 
