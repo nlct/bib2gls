@@ -1593,6 +1593,14 @@ public class GlsResource
          {
             insertPrefixOnlyExists = getBoolean(list, opt);
          }
+         else if (opt.equals("custom-label-prefixes"))
+         {
+            customLabelPrefixAssignments = getFieldEvaluationList(list, opt);
+         }
+         else if (opt.equals("custom-label-prefixes-missing-field-action"))
+         {
+            missingFieldCustomLabelPrefix = getMissingFieldAction(list, opt);
+         }
          else if (opt.equals("save-original-id"))
          {
             saveOriginalId = getOptional(list, opt);
@@ -3410,6 +3418,13 @@ public class GlsResource
              "error.option.clash", 
              "action="+writeActionSetting, "master"));
          }
+      }
+
+      if (customLabelPrefixAssignments != null && master != null)
+      {
+         throw new IllegalArgumentException(bib2gls.getMessage(
+          "error.option.clash", 
+          "custom-label-prefixes", "master"));
       }
 
       if ((pruneSeePatterns != null || pruneSeeAlsoPatterns != null)
@@ -10843,6 +10858,25 @@ public class GlsResource
               i+1, externalPrefixes[i]);
          }
       }
+
+      if (customLabelPrefixes != null)
+      {
+         writer.println("\\providecommand{\\bibglscustomlabelprefixes}[1]{}");
+
+         writer.print("\\bibglscustomlabelprefixes{");
+
+         for (int i = 0; i < customLabelPrefixes.size(); i++)
+         {
+            if (i > 0)
+            {
+               writer.print(',');
+            }
+
+            writer.print(customLabelPrefixes.get(i));
+         }
+
+         writer.println("}");
+      }
    }
 
    /**
@@ -11241,6 +11275,43 @@ public class GlsResource
 
    /* METHODS: fetching or setting data */
 
+   public String flipLabel(String label)
+   {
+      if (customLabelPrefixes != null)
+      {
+         for (String customPrefix : customLabelPrefixes)
+         {
+            String primary = customPrefix;
+            String dual = customPrefix;
+            String tertiary = customPrefix;
+
+            if (labelPrefix != null)
+            {
+               primary = labelPrefix+customPrefix;
+            }
+
+            if (dualPrefix != null)
+            {
+               dual = dualPrefix+customPrefix;
+            }
+
+            if (tertiaryPrefix != null)
+            {
+               tertiary = tertiaryPrefix+customPrefix;
+            }
+
+            String flipped = flipLabel(label, primary, dual, tertiary);
+
+            if (flipped != null)
+            {
+               return flipped;
+            }
+         }
+      }
+
+      return flipLabel(label, labelPrefix, dualPrefix, tertiaryPrefix);
+   }
+
    /**
     * Gets the flipped label.
     * If the label starts with a known prefix, the flipped label is
@@ -11249,7 +11320,8 @@ public class GlsResource
     * the dual prefix.
     * @return the flipped label or null if can't be determined
     */ 
-   public String flipLabel(String label)
+   private String flipLabel(String label, String labelPrefix,
+     String dualPrefix, String tertiaryPrefix)
    {
       if (labelPrefix == null)
       {
@@ -15581,6 +15653,57 @@ public class GlsResource
    }
 
    /**
+    * Gets the custom label prefix for the given entry.
+    * @param entry the entry
+    * @return the prefix or null if no prefix
+    */ 
+   public String getCustomLabelPrefix(Bib2GlsEntry entry)
+   {
+      if (customLabelPrefixAssignments == null)
+      {
+         return null;
+      }
+
+      StringBuilder builder = new StringBuilder();
+
+      try
+      {
+         for (FieldEvaluation eval : customLabelPrefixAssignments)
+         {
+            String val = eval.getStringValue(entry);
+
+            if (val != null)
+            {
+               builder.append(val);
+            }
+         }
+      }
+      catch (Exception e)
+      {
+         bib2gls.error(e);
+      }
+
+      if (builder.length() == 0)
+      {
+         return null;
+      }
+
+      String prefix = builder.toString();
+
+      if (customLabelPrefixes == null)
+      {
+         customLabelPrefixes = new Vector<String>();
+         customLabelPrefixes.add(prefix);
+      }
+      else if (!customLabelPrefixes.contains(prefix))
+      {
+         customLabelPrefixes.add(prefix);
+      }
+
+      return prefix;
+   }
+
+   /**
     * Gets the dual sort field.
     * @return the sort field for the dual list
     */  
@@ -16464,6 +16587,10 @@ public class GlsResource
       else if (option.equals("flatten-lonely-condition"))
       {
          return missingFieldFlattenLonely;
+      }
+      else if (option.equals("custom-label-prefixes"))
+      {
+         return missingFieldCustomLabelPrefix;
       }
       else if (option.equals("replicate-fields"))
       {
@@ -17986,6 +18113,13 @@ public class GlsResource
    private boolean aliases = false;
 
    private String labelPrefix = null, dualPrefix="dual.";
+
+   private Vector<String> customLabelPrefixes = null;
+
+   private Vector<FieldEvaluation> customLabelPrefixAssignments = null;
+
+   private MissingFieldAction missingFieldCustomLabelPrefix 
+     = MissingFieldAction.FALLBACK;
 
    private String tertiaryType=null, tertiaryCategory=null,
      tertiaryPrefix="tertiary.";

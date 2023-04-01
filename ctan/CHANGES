@@ -11,6 +11,8 @@ v3.3 (pending):
       flatten-lonely-missing-field-action
       copy-to-glossary
       copy-to-glossary-missing-field-action
+      custom-label-prefixes
+      custom-label-prefixes-missing-field-action
       locale
 
     - Added support for bib2gls-extra-<lang>.xml files.

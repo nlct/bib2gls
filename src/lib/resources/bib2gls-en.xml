@@ -126,6 +126,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.selection.mode">Selection mode: {0}</entry>
 <entry key="message.ignore.fields">Ignoring fields:</entry>
 <entry key="message.ignore.field">Ignoring field ''{0}'' for entry ''{1}''</entry>
+<entry key="message.adjusted.label">Adjusted label for entry ''{0}'' to ''{1}''</entry>
 <entry key="message.add.secondary.entry.no_filter">Adding entry {0} to secondary list (no filter).</entry>
 <entry key="message.add.secondary.entry">Adding entry {0} to secondary list.</entry>
 <entry key="message.secondary.filter">Checking entry {0} admission to secondary list. Match action: {1}. Matches: {2}.</entry>
