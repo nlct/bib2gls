@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.TeXParser;
 import com.dickimawbooks.texparserlib.TeXObjectList;
+import com.dickimawbooks.texparserlib.TeXCsRef;
 
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
