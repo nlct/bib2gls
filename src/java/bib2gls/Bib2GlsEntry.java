@@ -101,6 +101,28 @@ public class Bib2GlsEntry extends BibEntry
       return base;
    }
 
+   public File getBaseFile()
+   {
+      return baseFile;
+   }
+
+   public void setBase(File baseFile)
+   {
+      this.baseFile = baseFile;
+
+      String name = baseFile.getName();
+
+      if (name != null && name.endsWith(".bib"))
+      {
+         base = name.substring(0, name.length()-4);
+      }
+      else
+      {
+         base = name;
+      }
+   }
+
+   @Deprecated
    public void setBase(String base)
    {
       if (base != null && base.endsWith(".bib"))
@@ -5654,6 +5676,7 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       parentEntry.base = base;
+      parentEntry.baseFile = baseFile;
 
       parentEntry.putField("name", orgParentValue);
 
@@ -5970,6 +5993,7 @@ public class Bib2GlsEntry extends BibEntry
       entry.records = records;
       entry.recordMap = recordMap;
       entry.base = base;
+      entry.baseFile = baseFile;
       entry.labelPrefix = labelPrefix;
       entry.labelSuffix = labelSuffix;
       entry.setOriginalId(getOriginalId());
@@ -6022,6 +6046,7 @@ public class Bib2GlsEntry extends BibEntry
    private boolean nonumberlist = false;
 
    private String base="";
+   private File baseFile = null;
 
    private String originalEntryType;
 

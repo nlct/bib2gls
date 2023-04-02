@@ -201,7 +201,7 @@ public class Bib2GlsAt extends At
               BibTeXSyntaxException.ERROR_REPEATED_ENTRY, id);
          } 
 
-         ((Bib2GlsEntry)data).setBase(bibParser.getBase());
+         ((Bib2GlsEntry)data).setBase(bibParser.getBaseFile());
       }
 
       bibParser.addBibData(data);

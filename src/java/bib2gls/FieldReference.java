@@ -45,7 +45,7 @@ import java.util.Vector;
  * with <code>parent &gt; parent &gt;</code>.
  * Note that <code>self &gt; parent &gt;</code> is valid syntax but
  * it can be simplified to just <code>parent &gt;</code>.
- * However "entrytype" and "entrylabel" must be followed by
+ * However "entrytype", "entrylabel" and "entrybib" must be followed by
  * <em>identifier</em> not another <em>field-ref</em>.
  *
  * Note that since "parent" is also a valid field label, if the
@@ -60,7 +60,7 @@ import java.util.Vector;
 public enum FieldReference
 {
    SELF("self"), PARENT("parent"), ROOT("root"), ENTRY_TYPE("entrytype"),
-   ENTRY_LABEL("entrylabel");
+   ENTRY_LABEL("entrylabel"), ENTRY_BIB("entrybib");
 
    FieldReference(String id)
    {
@@ -97,6 +97,10 @@ public enum FieldReference
       {
          return ENTRY_LABEL;
       }
+      else if (tag.equals("entrybib"))
+      {
+         return ENTRY_BIB;
+      }
       else
       {
          throw new IllegalArgumentException("Invalid field reference tag: "+tag);
@@ -113,7 +117,8 @@ public enum FieldReference
     */ 
    public Bib2GlsEntry getEntry(Bib2GlsEntry entry)
    {
-      if (this == SELF || this == ENTRY_TYPE || this == ENTRY_LABEL)
+      if (this == SELF || this == ENTRY_TYPE || this == ENTRY_LABEL
+         || this == ENTRY_BIB )
       {
          return entry;
       }

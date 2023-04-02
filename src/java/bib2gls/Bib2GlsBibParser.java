@@ -87,6 +87,11 @@ public class Bib2GlsBibParser extends BibParser
       currentFile = file;
    }
 
+   public File getBaseFile()
+   {
+      return currentFile;
+   }
+
    public String getBase()
    {
       if (currentFile == null) return null;

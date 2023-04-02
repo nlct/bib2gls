@@ -143,7 +143,7 @@ public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry
          progeny.add(spawnedEntry);
 
          spawnedEntry.setId(getPrefix(), spawnedLabel);
-         spawnedEntry.setBase(getBase());
+         spawnedEntry.setBase(getBaseFile());
          spawnedEntry.setOriginalEntryType(getOriginalEntryType());
 
          for (Iterator<String> it = getKeySet().iterator(); it.hasNext(); )

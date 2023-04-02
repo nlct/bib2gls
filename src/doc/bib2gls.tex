@@ -7784,13 +7784,25 @@ the keyword \code{parent} is followed by \idx{follow} then the
 keyword refers to the \gls{parententry} otherwise it refers to the
 \field{parent} field.
 
-The special keywords \code{entrytype} and \code{entrylabel} refer to
-the \gls{entrytype} (without the leading \code{@}) or the entry
-label. In this case, the keyword must be followed by the
-\meta{delineator}, which may be \code{original} to indicate the
-original value, as given in the \ext{bib} file, or the actual value
-which may have been modified through resource options such as
-\csopt{entry-type-aliases} or \csopt{label-prefix}.
+The special keywords identify values that aren't normally stored in
+a field.  The keyword must be followed by the \meta{delineator},
+which may be \code{original} or \code{actual}. Available keywords:
+
+\begin{description}
+\item[\code{entrytype}] the \gls{entrytype}, without the leading
+\code{@}, where \code{original} refers to the original
+\gls{entrytype} used in the \ext{bib} file and \code{actual} refers
+to the actual \gls{entrytype}, which may have changed as a result of
+\csopt{entry-type-aliases};
+\item[\code{entrylabel}] the entry label, where \code{original}
+refers to the original label used in the \ext{bib} file and
+\code{actual} refers to the actual label, which may have been
+altered by options such as \csopt{label-prefix};
+\item[\code{entrybib}] the \ext{bib} file the entry was defined in,
+where \code{original} refers to the basename (without the
+\code{.bib} extension) and \code{actual} refers to the file name
+(including the extension and path).
+\end{description}
 
 If a syntax error occurs, the error message will show how \bibgls\
 has scanned the information so far. For example, in the case of

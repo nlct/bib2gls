@@ -187,7 +187,7 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
          progeny.add(spawnedEntry);
 
          spawnedEntry.setId(getPrefix(), spawnedLabel);
-         spawnedEntry.setBase(getBase());
+         spawnedEntry.setBase(getBaseFile());
          spawnedEntry.setOriginalEntryType(getOriginalEntryType());
 
          for (Iterator<String> it = getKeySet().iterator(); it.hasNext(); )

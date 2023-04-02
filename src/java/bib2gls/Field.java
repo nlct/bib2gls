@@ -63,7 +63,9 @@ public class Field implements FieldValueElement
          Bib2Gls bib2gls = resource.getBib2Gls();
 
          if (fieldRef == FieldReference.ENTRY_TYPE
-            || fieldRef == FieldReference.ENTRY_LABEL)
+            || fieldRef == FieldReference.ENTRY_LABEL
+            || fieldRef == FieldReference.ENTRY_BIB
+            )
          {
             if (!(name.equals("original") || name.equals("actual")))
             {
@@ -81,6 +83,7 @@ public class Field implements FieldValueElement
                     || bib2gls.isNonBibField(name)
                     || name.equals("entrytype")
                     || name.equals("entrylabel")
+                    || name.equals("entrybib")
                     || name.equals("original")
                     || name.equals("actual")))
          {
@@ -100,7 +103,10 @@ public class Field implements FieldValueElement
      throws IllegalArgumentException
    {
       if (field != null && (fieldRef == FieldReference.ENTRY_TYPE
-            || fieldRef == FieldReference.ENTRY_LABEL))
+            || fieldRef == FieldReference.ENTRY_LABEL
+            || fieldRef == FieldReference.ENTRY_BIB
+            )
+          )
       {
          throw new IllegalArgumentException(
           "Field reference "+field.fieldRef.getTag()
@@ -167,6 +173,22 @@ public class Field implements FieldValueElement
             else
             {
                text = refEntry.getId();
+            }
+
+            value = parser.getListener().createString(text);
+            bibValue = new BibUserString(value);
+         }
+         else if (fieldRef == FieldReference.ENTRY_BIB)
+         {
+            String text;
+
+            if (name.equals("original"))
+            {
+               text = refEntry.getBase();
+            }
+            else
+            {
+               text = refEntry.getBaseFile().toString();
             }
 
             value = parser.getListener().createString(text);
