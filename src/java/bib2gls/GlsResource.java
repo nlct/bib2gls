@@ -12065,7 +12065,20 @@ public class GlsResource
 
             Bib2GlsEntry parent = Bib2GlsEntry.getEntry(parentId, entries);
 
-            flattenChild(parent, child, entries);
+            /*
+             Has the parent been identified as a dependency of 
+             any entry not marked for removal?
+             */
+
+            if (discardList.contains(parent) 
+                 && isPendingDiscardDependent(parent, child, entries, discardList))
+            {
+               discardList.remove(parent);
+            }
+            else
+            {
+               flattenChild(parent, child, entries);
+            }
          }
       }
 
@@ -12074,6 +12087,30 @@ public class GlsResource
          entries.remove(discard);
       }
 
+   }
+
+   private boolean isPendingDiscardDependent(Bib2GlsEntry parent,
+     Bib2GlsEntry child, Vector<Bib2GlsEntry> entries,
+     Vector<Bib2GlsEntry> discardList)
+   {
+      String id = parent.getId();
+
+      for (Bib2GlsEntry entry : entries)
+      {
+         if (entry.equals(parent) || entry.equals(child)
+              || discardList.contains(entry))
+         {// skip
+         }
+         else if (entry.hasDependent(id))
+         {
+            bib2gls.verboseMessage("message.not_removing.dependent_parent",
+              child.getId(), entry.getId(), id);
+
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private boolean isFlattenConditionTrue(Bib2GlsEntry entry)

@@ -18,6 +18,9 @@ v3.3 (pending):
     - Bug fix: Removed already defined in other glstex file warning if 
       action != define
 
+    - Bug fix: if parent entry is a dependent of another entry not
+      marked for removal don't flatten lonely child
+
   * convertgls2bib
 
     - Fixed infinite loop:
