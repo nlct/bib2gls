@@ -717,6 +717,11 @@ public class Bib2Gls implements TeXApp
       return packages;
    }
 
+   public boolean hasNonASCIILabelSupport()
+   {
+      return hasNonASCIILabelSupport;
+   }
+
    public boolean fontSpecLoaded()
    {
       return fontspec;
@@ -2592,6 +2597,12 @@ public class Bib2Gls implements TeXApp
       {
          verboseMessage("message.tex.charset", texCharset);
       }
+
+      hasNonASCIILabelSupport = fontspec 
+          || ("UTF-8".equals(texCharset.name())
+               && glossariesVersion.compareTo(GLOSSARIES4_47) >= 0
+               && glossariesExtraVersion.compareTo(GLOSSARIES_EXTRA_1_46) >= 0
+             );
 
       if (verboseLevel > 0)
       {
@@ -6886,8 +6897,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.2.20230402";
-   public static final String DATE = "2023-04-02";
+   public static final String VERSION = "3.2.20230414";
+   public static final String DATE = "2023-04-14";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -7134,6 +7145,11 @@ public class Bib2Gls implements TeXApp
 
    private boolean hasNewCaseSupport = false;
 
+   private static final String GLOSSARIES4_47 = "2021/09/20";
+   private static final String GLOSSARIES_EXTRA_1_46 = "2021/09/20";
+
+   private boolean hasNonASCIILabelSupport = false;
+
    private Vector<String> mfirstucExclusions;
    private Vector<String> mfirstucBlockers;
    private HashMap<String,String> mfirstucMappings;
@@ -7211,6 +7227,6 @@ public class Bib2Gls implements TeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final int TRUNCATE_MAX_OBJECTS=20;
-   public static final int TRUNCATE_MAX_CHARS=80;
+   public static final int TRUNCATE_MAX_OBJECTS=40;
+   public static final int TRUNCATE_MAX_CHARS=160;
 }

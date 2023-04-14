@@ -119,7 +119,7 @@ public class Bib2GlsAt extends At
                 "warning.spchars.id", id));
             }
 
-            if (!bib2gls.fontSpecLoaded())
+            if (!bib2gls.hasNonASCIILabelSupport())
             {
                if (containsExtendedChars(id))
                {

@@ -346,10 +346,10 @@ Ignoring {1}</entry>
 <entry key="warning.parent.missing">Parent {0} does not occur before entry {1} so removing relationship.</entry>
 <entry key="warning.unknown.field.pattern">Ignoring pattern for unknown field: {0}</entry>
 <entry key="warning.notbasiclatin.id">Problematic entry label: {0}
-You document doesn''t seem to have used fontspec which 
+You document is using an old glossaries version and doesn''t seem to have used fontspec which 
 suggests it''s not using XeLaTeX or LuaLaTeX, so you need 
 to restrict your labels to the Basic Latin set (or
-switch TeX engines).</entry>
+switch TeX engines or upgrade glossaries.sty).</entry>
 <entry key="warning.spchars.id">Problematic entry label: {0}
 Contains one or more special characters.</entry>
 <entry key="warning.alias.not.found">Can''t find target {0} for aliased entry {1}.
