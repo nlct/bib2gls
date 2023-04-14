@@ -5760,7 +5760,7 @@ public class GlsResource
                         {
                            throw new Bib2GlsException(bib2gls.getMessage(
                              "error.invalid.option_syntax.misplaced_before",
-                              object.toString(parser),
+                              opt, object.toString(parser),
                               bib2gls.toTruncatedString(parser, stack)));
                         }
 
@@ -5803,7 +5803,7 @@ public class GlsResource
                   {
                      throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
-                        object.toString(parser), 
+                        opt, object.toString(parser), 
                         bib2gls.toTruncatedString(parser, stack)));
                   }
 
@@ -5814,7 +5814,7 @@ public class GlsResource
                   {
                      throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
-                        object.toString(parser),
+                        opt, object.toString(parser),
                         bib2gls.toTruncatedString(parser, stack)));
                   }
 
@@ -5846,7 +5846,7 @@ public class GlsResource
                   {
                      throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
-                        object.toString(parser), 
+                        opt, object.toString(parser), 
                         bib2gls.toTruncatedString(parser, stack)));
                   }
 
@@ -5876,7 +5876,7 @@ public class GlsResource
                  {
                      throw new Bib2GlsException(bib2gls.getMessage(
                        "error.invalid.option_syntax.misplaced_before",
-                        object.toString(parser),
+                        opt, object.toString(parser),
                         bib2gls.toTruncatedString(parser, stack)));
                  }
             }
@@ -5885,7 +5885,7 @@ public class GlsResource
          {
             throw new Bib2GlsException(bib2gls.getMessage(
                "error.invalid.option_syntax.misplaced_before",
-               object.toString(parser), 
+               opt, object.toString(parser), 
                bib2gls.toTruncatedString(parser, stack)));
          }
       }
