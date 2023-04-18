@@ -78,6 +78,17 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
          }
       }
 
+      if (field.equals("text"))
+      {
+         field = resource.getAbbrevDefaultTextField();
+         val = getFieldValue(field);
+
+         if (val != null)
+         {
+            return val;
+         }
+      }
+
       return super.getFallbackValue(field);
    }
 
@@ -92,6 +103,13 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
       else if (field.equals("name"))
       {
          String fallbackField = resource.getAbbrevDefaultNameField();
+         val = getField(fallbackField);
+
+         return val == null ? getFallbackContents(fallbackField) : val;
+      }
+      else if (field.equals("text"))
+      {
+         String fallbackField = resource.getAbbrevDefaultTextField();
          val = getField(fallbackField);
 
          return val == null ? getFallbackContents(fallbackField) : val;

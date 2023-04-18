@@ -12,6 +12,7 @@ v3.3 (pending):
       copy-to-glossary
       copy-to-glossary-missing-field-action
       locale
+      abbreviation-text-fallback
 
     - Added support for bib2gls-extra-<lang>.xml files.
 

@@ -2379,11 +2379,35 @@ public class GlsResource
             if ((!bib2gls.isKnownField(abbrevDefaultNameField)
              && !bib2gls.isKnownSpecialField(abbrevDefaultNameField))
              || abbrevDefaultNameField.equals("name")
-             || abbrevDefaultNameField.equals("sort"))
+             || abbrevDefaultNameField.equals("sort")
+             || (
+                   abbrevDefaultTextField.equals("name")
+                   && abbrevDefaultNameField.equals("text")
+                )
+            )
             {
                throw new IllegalArgumentException(
                  bib2gls.getMessage("error.invalid.opt.value", opt, 
                    abbrevDefaultNameField));
+            }
+         }
+         else if (opt.equals("abbreviation-text-fallback"))
+         {
+            abbrevDefaultTextField = getRequired(list, opt);
+
+            if ((!bib2gls.isKnownField(abbrevDefaultTextField)
+             && !bib2gls.isKnownSpecialField(abbrevDefaultTextField))
+             || abbrevDefaultTextField.equals("text")
+             || abbrevDefaultTextField.equals("sort")
+             || (
+                   abbrevDefaultTextField.equals("name")
+                   && abbrevDefaultNameField.equals("text")
+                )
+             )
+            {
+               throw new IllegalArgumentException(
+                 bib2gls.getMessage("error.invalid.opt.value", opt, 
+                   abbrevDefaultTextField));
             }
          }
          else if (opt.equals("charset"))
@@ -16639,6 +16663,15 @@ public class GlsResource
    }
 
    /**
+    * Gets the abbreviation text fallback.
+    * @return the abbreviation text fallback
+    */ 
+   public String getAbbrevDefaultTextField()
+   {
+      return abbrevDefaultTextField;
+   }
+
+   /**
     * Gets the abbreviation sort fallback.
     * @return the abbreviation sort fallback
     */ 
@@ -17873,6 +17906,7 @@ public class GlsResource
 
    private String abbrevDefaultSortField = "short";
    private String abbrevDefaultNameField = "short";
+   private String abbrevDefaultTextField = "short";
 
    private String bibTeXEntryDefaultSortField = "name";
 

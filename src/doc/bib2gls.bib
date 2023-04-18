@@ -3517,6 +3517,13 @@ field\dhyphen locale}},
    parent={resourceoptions}
 }
 
+@resourceoption{opt.abbreviation-text-fallback,
+   name={\csoptfmt{abbreviation\dhyphen text\dhyphen fallback}},
+   user1={\meta{field}},
+   category={resourceoption},
+   parent={resourceoptions}
+}
+
 @resourceoption{opt.bibtexentry-sort-fallback,
    name={\csoptfmt{bibtexentry\dhyphen sort\dhyphen fallback}},
    user1={\meta{field}},
@@ -16322,6 +16329,17 @@ abbreviation by the \catattr{markwords} attribute},
   description={as \cs{glsfirst} but converts the first letter to
   \idx{uppercase}},
   topics={entryrefcommands,fieldrefcommands,linkcommands,casecommands},
+  note={\styfmt{glossaries}},
+  category={command}
+}
+
+@glscommand{glsplural,
+  name={\csfmt{glsplural}},
+  user1={\oargm{options}\margm{label}\oargm{insert}},
+  description={links to the entry's definition in the glossary with
+   the link text obtained from the \field{plural} field  
+   without altering the first use flag},
+  topics={entryrefcommands,fieldrefcommands,linkcommands},
   note={\styfmt{glossaries}},
   category={command}
 }

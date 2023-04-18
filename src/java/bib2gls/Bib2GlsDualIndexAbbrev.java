@@ -103,6 +103,13 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
 
          return val == null ? getFallbackValue(fallbackField) : val;
       }
+      else if (field.equals("text"))
+      {
+         String fallbackField = resource.getAbbrevDefaultTextField();
+         val = getFieldValue(fallbackField);
+
+         return val == null ? getFallbackValue(fallbackField) : val;
+      }
 
       return super.getFallbackValue(field);
    }
@@ -118,6 +125,13 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
       else if (field.equals("name"))
       {
          String fallbackField = resource.getAbbrevDefaultNameField();
+         val = getField(fallbackField);
+
+         return val == null ? getFallbackContents(fallbackField) : val;
+      }
+      else if (field.equals("text"))
+      {
+         String fallbackField = resource.getAbbrevDefaultTextField();
          val = getField(fallbackField);
 
          return val == null ? getFallbackContents(fallbackField) : val;

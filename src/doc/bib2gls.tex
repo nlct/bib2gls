@@ -2857,16 +2857,16 @@ automatically converts the first letter of the name to
 \longarg{mfirstuc-math-protection}.)
 
 None of these entries have a \field{sort} field so the \field{name}
-is used. If the \gls{entrytype} had been \atentry{symbol} instead,
-the fallback would be the entry's label.
-This means that with \atentry{symbol} instead of \atentry{entry}, and the default
-\csopt[sort]{sort-field}, and with
-\csopt[letter-case]{sort}, these entries will be defined in
-the order: \code{M}, \code{S}, \code{card}, \code{i}, \code{v} (since
-this is the case-sensitive letter order of the labels) whereas
-with \csopt[letter-nocase]{sort-field}, the order will be:
-\code{card}, \code{i}, \code{M}, \code{S}, \code{v} (since this
-is the case-insensitive letter order of the labels).
+is used (see \sectionref{sec:fallbacks}). If the \gls{entrytype} had
+been \atentry{symbol} instead, the fallback would be the entry's
+label.  This means that with \atentry{symbol} instead of
+\atentry{entry}, and the default \csopt[sort]{sort-field}, and with
+\csopt[letter-case]{sort}, these entries will be defined in the
+order: \code{M}, \code{S}, \code{card}, \code{i}, \code{v} (since
+this is the case-sensitive letter order of the labels) whereas with
+\csopt[letter-nocase]{sort-field}, the order will be: \code{card},
+\code{i}, \code{M}, \code{S}, \code{v} (since this is the
+case-insensitive letter order of the labels).
 
 However, with \atentry{entry}, the fallback field will be taken from
 the \field{name} which in the above example contains \TeX\ code, so
@@ -3997,7 +3997,7 @@ and \ref{tab:baseinternalfields} with a few exceptions, notably
 \field{type} and \field{sort}. Ideally you shouldn't need to use
 \field{sort} as there should be an appropriate fallback set up to
 use if \field{sort} isn't set, such as the label for symbols or the
-name for terms or the short form for abbreviations.
+name for terms or the short form for abbreviations (see \sectionref{sec:fallbacks}).
 
 This is the default setting and was added as some users were
 confused over which fields could be used in the \ext{bib} file.
@@ -4399,7 +4399,7 @@ some reason, \bibgls\ will try to fallback on another value. The
 actual fallback value depends on the \gls{entrytype}. The most common
 fallback is that used if the \field{sort} field is missing, which is
 typically the case. This approach allows different \glspl{entrytype} to
-have different fields used for sorting.
+have different fields used for sorting (see \sectionref{sec:fallbacks}).
 
 Predefined fields for use in \ext{bib} files are listed in
 Tables~\ref{tab:fields}, \ref{tab:bib2glsfields},
@@ -4527,7 +4527,8 @@ but it doesn't add any information to the cross-referencing part of the
   within a \ext{bib} file can cause unpredictable
   results and is best set through a resource option or by \bibgls.
   In general, you shouldn't need to set the \field{sort} field as
-  appropriate fallbacks should produce useful sort values.%
+  appropriate fallbacks should produce useful sort values
+  (see \sectionref{sec:fallbacks}).%
  ]%
  {internalfield}%
  [Fields Set by \bibgls]%
@@ -4655,7 +4656,7 @@ the resource file is input). In general, it's best to just use
 
 The \TeX\ parser library used by \bibgls\ will parse the contents of
 \atentry{preamble} before trying to interpret the field value used
-as a fallback when \field{sort} is omitted (unless
+as a \hyperref[sec:fallbacks]{fallback} when \field{sort} is omitted (unless
 \csopt[false]{interpret-preamble} is set in the resource options).
 For example:
 \begin{codeenv}
@@ -4933,7 +4934,8 @@ If the \field{sort} field is missing the default is obtained from
 the \field{name} field (unless overridden by options like
 \csopt{entry-sort-fallback}). For \hierarchical\ entries, if the
 \field{name} field is omitted it will be obtained from the 
-\glsdisp{parententry}{parent's} \field{name}. 
+\glsdisp{parententry}{parent's} \field{name}.
+See \sectionref{sec:fallbacks}.
 
 Terms defined using \atentry{entry} will be written to the output
 (\ext{glstex}) file using the command \gls!{bibglsnewentry}.
@@ -4953,10 +4955,11 @@ designed specifically for symbols, so in the previous example, the
 
 The required fields are \field{name} or \field{parent}. The
 \field{description} field is required if the \field{name} field is
-missing. If the \field{sort} field is omitted, the default sort is
+missing. If the \field{sort} field is omitted, the default fallback is
 given by the entry label (unless overridden by options like
 \csopt{symbol-sort-fallback}). Note that this is different from
 \atentry{entry} where the sort defaults to \field{name} if omitted.
+See \sectionref{sec:fallbacks}.
 
 Terms that are defined using \atentry{symbol} will be written to
 the output file using the command \gls!{bibglsnewsymbol}.
@@ -5016,12 +5019,13 @@ omitted, it's assumed to be the same as the label, even if
 behaviour of \atentry{entry}, which fetches the name from the 
 \gls{parententry}.) If the name contains any characters that can't be used in
 the label, you must use the \field{name} field. If the \field{sort}
-field is missing the default is obtained from the \field{name}.
+field is missing the default fallback is obtained from the \field{name}.
 Note that the \atentry{index} \gls{entrytype} is \emph{not} governed by
 \csopt{entry-sort-fallback} (but it is governed by
 \csopt{custom-sort-fallbacks}). This allows \atentry{index} and
 \atentry{entry} to have different fallbacks if the \field{sort}
 field is missing.
+See \sectionref{sec:fallbacks}.
 
 Example:
 \begin{codeenv}
@@ -5046,6 +5050,7 @@ missing, it's obtained from the original entry label. If the
 \field{name} field. (As with \atentry{index}, \atentry{indexplural}
 is \emph{not} governed by \csopt{entry-sort-fallback}, but it is
 governed by \csopt{custom-sort-fallbacks}.) 
+See \sectionref{sec:fallbacks}.
 All fields are optional. For example:
 \begin{codeenv}
 \atentry{indexplural}\marg{goose,
@@ -5098,6 +5103,7 @@ If you use \csopt[name]{sort-field} (rather than the default
 the \csopt{abbreviation-sort-fallback} setting, unless you use
 \csopt{abbreviation-name-fallback} to change the fallback for the
 \field{name} field.
+See \sectionref{sec:fallbacks}.
 
 Note that you must set the abbreviation style before loading the
 resource file to ensure that the abbreviations are defined
@@ -5194,15 +5200,16 @@ the term is written to the output file using the command
 
 \entrysection{contributor}
 
-The \atentry{contributor} \gls{entrytype} is primarily provided for use 
-by the \atentry{bibtexentry} type. You may use it explicitly
-if you want, but you need to take care that it doesn't clash with
-\atentry{bibtexentry}. It behaves much like \atentry{index} except that the
-term is written to the \ext{glstex} file using the command
+The \atentry{contributor} \gls{entrytype} is primarily provided for
+use by the \atentry{bibtexentry} type. You may use it explicitly if
+you want, but you need to take care that it doesn't clash with
+\atentry{bibtexentry}. It behaves much like \atentry{index} except
+that the term is written to the \ext{glstex} file using the command
 \gls!{bibglsnewcontributor}. There are no required fields. As with
 \atentry{index}, if the \field{name} field is missing, the fallback
-value is the entry's label. When this \gls{entrytype} is automatically
-created by \atentry{bibtexentry}, the \field{name} is set to 
+value is the entry's label (see \sectionref{sec:fallbacks}). When
+this \gls{entrytype} is automatically created by
+\atentry{bibtexentry}, the \field{name} is set to 
 \begin{codeenv}
 \gls{bibglscontributor}\margm{forenames}\margm{von}\margm{surname}\margm{suffix}
 \end{codeenv}
@@ -5297,12 +5304,13 @@ that if you only reference the \gls{primaryentry} (using \ics{gls} etc)
 then the \gls{dualentry} will still be selected if the \csopt{selection}
 setting includes dependencies.
 
-The creation of the \gls{dualentry} involves mapping or copying fields
-from the \gls{primaryentry}. Each \gls{dualentry} type has a set of mappings.
-If a field in the set of mappings is missing, its fallback value is
-used.  Any fields that aren't listed in the mappings are simply copied,
-except for the \field{alias} field, which will never be copied to
-the \gls{dualentry}, nor can it be mapped. The alias will only apply to
+The creation of the \gls{dualentry} involves mapping or copying
+fields from the \gls{primaryentry}. Each \gls{dualentry} type has a
+set of mappings.  If a field in the set of mappings is missing, its
+fallback value is used (see \sectionref{sec:fallbacks}).  Any fields
+that aren't listed in the mappings are simply copied, except for the
+\field{alias} field, which will never be copied to the
+\gls{dualentry}, nor can it be mapped. The alias will only apply to
 the \gls{primaryentry}.  The \gls{dualentry} is given the label
 \meta{prefix}\meta{id} where \meta{prefix} is set by the
 \csopt{dual-prefix} option and \meta{id} is the label supplied in
@@ -5818,7 +5826,7 @@ However in this case the required fields are \field{short} and
 \field{short} if omitted. (This may be changed with the
 \csopt{abbreviation-name-fallback} option.) The fallback for the
 \field{sort} field is given by \csopt{abbreviation-sort-fallback},
-which defaults to the \field{short} field.
+which defaults to the \field{short} field (see \sectionref{sec:fallbacks}).
 
 For example:
 \begin{codeenv}
@@ -6068,7 +6076,7 @@ user manual~\cite{glossaries}. The \gls{primaryentry} is an abbreviation with th
 the \field{name} copied from the \field{long} field.
 The fallback for the \field{sort} is given by
 \csopt{abbreviation-sort-fallback}, which defaults to the
-\field{short} field.
+\field{short} field (see \sectionref{sec:fallbacks}).
 
 For example:
 \begin{codeenv}
@@ -6246,7 +6254,7 @@ Note that \bibgls\ doesn't know what abbreviation styles
 are in used, so if the \field{sort} field is missing
 it will fallback on the \field{short} field. If the abbreviations
 need to be sorted according to the \field{long} field instead,
-use \csopt[long]{abbreviation-sort-fallback}.
+use \csopt[long]{abbreviation-sort-fallback} (see \sectionref{sec:fallbacks}).
 
 Terms that are defined using \atentry{dualabbreviation} will be
 written to the output file using \gls!{bibglsnewdualabbreviation}.
@@ -6577,9 +6585,10 @@ field (but remember that the glossary types will need to be defined
 in the document).
 
 There are no required fields. The fallback for the \field{sort}
-field is given by \csopt{bibtexentry-sort-fallback}. If you want to
-access any of the \BibTeX\ fields, you will need to alias or define
-them.  For example:
+field is given by \csopt{bibtexentry-sort-fallback} (see
+\sectionref{sec:fallbacks}). If you want to access any of the
+\BibTeX\ fields, you will need to alias or define them.  For
+example:
 \begin{codeenv}
 \csopt[
   \fieldfmt{title}=\field{name}
@@ -6960,7 +6969,7 @@ As \atentry{progenitor}, except that it creates
 \atentry{indexplural} terms instead of \atentry{index}.
 As with \atentry{indexplural}, if the \field{name} field isn't set,
 it's assigned to the same value as the \field{plural} field (or the
-fallback for the \field{plural}, if not defined).
+\hyperref[sec:fallbacks]{fallback} for the \field{plural}, if not defined).
 
 The \glspl{mainentry} are defined in the
 \ext{glstex} file with \gls{bibglsnewspawnindexplural} and the
@@ -7874,16 +7883,16 @@ The null \idx{quark} may only be used as \meta{value2} for the
 equality and inequality comparisons. It can't be used in any other
 context. Note that the numeric \gls{LEN} doesn't return null.
 
-Where a field value is referenced (\meta{field-ref}), if the
-field value is undefined (either the field isn't set or the
-referenced ancestor entry hasn't been defined) then, if 
-the designated action is \qt{fallback} (for example,
-\csopt[fallback]{assign-missing-field-action}), the fallback value is
-obtained. If the value is still undefined it will be considered 
-a null value for the purposes of the comparison. Note that if
-the designated action is \qt{empty} (for example, 
-\csopt[empty]{assign-missing-field-action}) there will be no null
-values.
+Where a field value is referenced (\meta{field-ref}), if the field
+value is undefined (either the field isn't set or the referenced
+ancestor entry hasn't been defined) then, if the designated action
+is \qt{fallback} (for example,
+\csopt[fallback]{assign-missing-field-action}), the fallback value
+is obtained (see \sectionref{sec:fallbacks}). If the value is still
+undefined it will be considered a null value for the purposes of the
+comparison. Note that if the designated action is \qt{empty} (for
+example, \csopt[empty]{assign-missing-field-action}) there will be
+no null values.
 
 \begin{codeenv*}
 \meta{value1}\idx{equalscmp}\inlinedef{NULL}
@@ -8577,7 +8586,8 @@ This option indicates what to do if a source field identified in
 \csopt{copy-to-glossary} is missing. The value may be one of:
 \begin{itemize}
 \item \optfmt{skip}: return null;
-\item \optfmt{fallback}: use the fallback for the missing field, if
+\item \optfmt{fallback}: use the fallback for the missing field 
+(see \sectionref{sec:fallbacks}), if
 one is available, otherwise return null (default);
 \item \optfmt{empty}: treat the missing value as empty.
 \end{itemize}
@@ -9495,7 +9505,8 @@ This option indicates what to do if a source field identified in
 \csopt{flatten-lonely-condition} is missing. The value may be one of:
 \begin{itemize}
 \item \optfmt{skip}: return null;
-\item \optfmt{fallback}: use the fallback for the missing field, if
+\item \optfmt{fallback}: use the fallback for the missing field
+(see \sectionref{sec:fallbacks}), if
 one is available, otherwise return null (default);
 \item \optfmt{empty}: treat the missing value as empty.
 \end{itemize}
@@ -10920,19 +10931,6 @@ value of the \field{adoptparents} list by the \gls{progeny}
 entries spawned by the \atentry{progenitor} type of entry.
 The default is \field{parent}.
 
-\optsection[\subsubsection]{abbreviation-name-fallback}
-
-The \glspl{entrytype} that define abbreviations (such as
-\atentry{abbreviation} and \atentry{acronym}) will, by default,
-fallback on the \field{short} field if the \field{name} field is
-missing and it's required for some reason (for example, with
-\csopt[name]{sort-field}).  If you prefer to
-fallback on a different field, then you can use this option to
-specify the field. For example,
-\csopt[long]{abbreviation-name-fallback}.
-The \meta{field} value must be a known field (not an internal field)
-but can't be the \field{sort} field.
-
 \optsection[\subsubsection]{ignore-fields}
 
 The \csopt{ignore-fields} key indicates that you want \bibgls\ to
@@ -11132,7 +11130,8 @@ This option indicates what to do if a source field identified in
 \begin{itemize}
 \item \optfmt{skip}: skip the replication of the missing field
 (default);
-\item \optfmt{fallback}: use the fallback for the missing field, if
+\item \optfmt{fallback}: use the fallback for the missing field
+(see \sectionref{sec:fallbacks}), if
 one is available (otherwise skip);
 \item \optfmt{empty}: make the target field empty.
 \end{itemize}
@@ -11299,10 +11298,11 @@ set.
 
 If a referenced field hasn't been set then the behaviour depends on
 the \csopt{assign-missing-field-action} setting. The default
-behaviour is to use the fallback, if provided. In the case of
-\atentry{index}, the fallback for the \field{name} field is the
-entry's label. This means that the Jane-Smith entry will have the
-\fieldfmt{surname} field set to \qt{Smith}.
+behaviour is to use the fallback, if provided (see
+\sectionref{sec:fallbacks}). In the case of \atentry{index}, the
+fallback for the \field{name} field is the entry's label. This means
+that the Jane-Smith entry will have the \fieldfmt{surname} field set
+to \qt{Smith}.
 
 If the fallback isn't set or if there is no fallback then the
 assignment instruction will be skipped. Similarly, if an ancestor is
@@ -11457,7 +11457,8 @@ This option indicates what to do if a source field identified in
 \csopt{assign-fields} is missing. The value may be one of:
 \begin{itemize}
 \item \optfmt{skip}: skip the assignment;
-\item \optfmt{fallback}: use the fallback for the missing field, if
+\item \optfmt{fallback}: use the fallback for the missing field
+(see \sectionref{sec:fallbacks}), if
 one is available, otherwise skip the assignment (default);
 \item \optfmt{empty}: treat the missing value as empty.
 \end{itemize}
@@ -13495,13 +13496,14 @@ field.
 Applies a case-change to the \field{name} field.
 This option may take one of the values described above.
 
-If the \field{text} field hasn't been set, the \field{name}
-value is first copied to the \field{text} field. If the \field{name}
-field hasn't been set (for example, with the \atentry{index} 
-\gls{entrytype}), it's copied from the fallback value (which
-depends on the \gls{entrytype}) unless the \gls{entrytype} is
-\atentry{abbreviation} or \atentry{acronym}, in which case if
-the \field{name} field is missing no action is performed.
+If the \field{text} field hasn't been set, the \field{name} value is
+first copied to the \field{text} field. If the \field{name} field
+hasn't been set (for example, with the \atentry{index}
+\gls{entrytype}), it's copied from the fallback value (which depends
+on the \gls{entrytype}, see \sectionref{sec:fallbacks}) unless the
+\gls{entrytype} is \atentry{abbreviation} or \atentry{acronym}, in
+which case if the \field{name} field is missing no action is
+performed.
 
 \optsection[\subsubsection]{description-case-change}
 
@@ -13519,7 +13521,8 @@ The \meta{setting} should be
 the same as the permitted values for the above options. This
 option is applied after all fields have been parsed but before
 \csopt{interpret-fields}. If the
-specified field is missing, the fallback for that field (if known) is copied
+specified field is missing, the fallback for that field (if known,
+see \sectionref{sec:fallbacks}) is copied
 into the field. For example:
 \begin{codeenv}
 \csopt[\field{user1}=uc,\field{user2}={firstuc}]{field-case-change}
@@ -13544,6 +13547,579 @@ This option isn't cumulative. If used multiple times in the same
 \igls{resourceset}, the last instance will be the one used. If
 the \keyvallist\ is missing, no general case-changing is applied
 (the default).
+
+\section{Field Fallbacks}
+\label{sec:fallbacks}
+
+The options in this section don't modify any field values but
+provide instructions on what to do if \bibgls\ wants to know a field
+value where the field hasn't been explicitly set. The most common
+case is querying the \field{sort} field value with the default
+\csopt[\field{sort}]{sort-field} setting. Being able to vary the
+fallback used according to the \gls{entrytype} allows a more flexible
+approach than explicitly setting the \field{sort} field in the
+\ext{bib} file.
+
+Note that if you specify a different field to use for the sort value 
+with \csopt{sort-field} then the fallback for that field will be used
+if that field is missing. The \field{sort} fallbacks will be
+irrelevant if the \field{sort} field isn't being queried. If the
+fallback system fails to provide a value for the field identified by
+\csopt{sort-field} then \bibgls\ will follow the rule given by the
+\csopt{missing-sort-fallback} setting.
+
+If you require a complex sort value that can't be implemented by the
+fallback system, you can use \csopt{assign-fields} to explicitly set
+the \field{sort} field to a string expression
+(\sectionref{sec:optstringconcat}). Bear in mind that if the
+\field{sort} field is actually set to a value, either in the
+\ext{bib} file or through resource options, then \emph{the
+\field{sort} fallback won't be used} and the sort fallback options
+describe in this section won't have any effect.
+
+There are other fields that \bibgls\ may want to query that won't
+necessarily be set in the \ext{bib} file but may be inferred from
+another field. For example, if the \field{sort} field fallback
+references the \field{name} field then the \field{name} field will
+also need a fallback if it hasn't been set.
+
+Another possibility is that the interpreter encounters content that
+includes commands such as \ics{gls}.  Since the interpreter can't
+tell at what point in the document the first use flag is changed,
+\ics{gls} is treated as \ics{glstext} (and similarly \ics{glspl} is
+treated as \ics{glsplural}) so the \field{text} (or \field{plural})
+field will be queried by the interpreter.
+
+The commands \ics{newglossaryentry} and \ics{longnewglossaryentry}
+are the foundation for all commands that define glossary entries.
+These commands both require that either the \field{name} or the
+\field{parent} field are set. If the \field{name} is omitted, then
+its value is obtained from the \gls{parententry}['s] name. The
+\field{description} must also be provided but may be set to empty.
+(Some entry types, such as \atentry{index}, will set 
+\field{description} to empty if that field is missing, but for other
+entry types, such as \atentry{entry}, the \field{description} is
+required and will trigger a warning if omitted.)
+
+All other entry definition commands, such as \ics{newabbreviation} and
+\ics{glsxtrnewsymbol}, internally use one of those foundation
+commands.\footnote{Or the internal command that both
+\cs{newglossaryentry} and \cs{longnewglossaryentry} use.} In the
+case of \ics{newabbreviation} (and \ics{newacronym}), the
+\field{name} field is set by the style using values obtained from
+the \field{short} and\slash or \field{long} fields. This is
+information that \bibgls\ is unaware of and may guess incorrectly
+when trying to determine an appropriate value for the \field{name}
+field if it is omitted (which is typically the case) from
+abbreviation entry types, such as \atentry{abbreviation} or
+\atentry{acronym}.
+
+The general \atentry{entry} entry type, uses the same rules as
+\ics{newglossaryentry}:
+\begin{description}
+\item[\field{name}] If the \field{parent} field has been set, then
+the parent's \field{name} field is used. If the parent's
+\field{name} field isn't set, then the fallback for the parent's
+\field{name} field is used (which will depend on the parent's
+\gls{entrytype}). If neither the \field{name} nor the \field{parent}
+field is set, then a warning is issued since at least one of those
+fields must be set for \atentry{entry}.
+
+\item[\field{text}] If the \field{text} field is missing, it's
+obtained from the \field{name} field or the fallback for the
+\field{name} field, if that hasn't been set.
+
+\item[\field{plural}] If the \field{name} field has been set then
+the \field{plural} value is obtained by appending \ics{glspluralsuffix}
+to the value of the \field{text} field (or the fallback for the
+\field{text} field, if that hasn't been set).
+
+If the \field{name} field hasn't been set but the \field{parent}
+field has been set, then the \field{plural} is obtained from the
+parent's \field{plural} field. If the parent's \field{plural} field
+hasn't been set then the fallback for that value will be used,
+according to the parent's \gls{entrytype}.
+
+\item[\field{first}] The fallback for the \field{first} field is
+obtained from the \field{text} field (or the fallback for the
+\field{text} field, if that hasn't been set).
+
+\item[\field{firstplural}] The fallback for the \field{firstplural}
+field is obtained by appending \ics{glspluralsuffix} to the value of
+the \field{first} field, if that field has been set, otherwise it's
+obtained from the \field{plural} field (or the fallback for the
+\field{plural} field if that isn't set).
+
+\end{description}
+
+Note that although \bibgls\ follows the \ics{newglossaryentry} rules
+in order to obtain the fallback, it doesn't explicitly set those
+fields in the \ext{glstex} file if they weren't provided in the
+\ext{bib} file or set using options such as \csopt{replicate-fields}
+or \csopt{assign-fields}.
+
+The exception to this is the \field{sort} field, which will be
+obtained from the \field{name} field for most \glspl{entrytype} unless
+overridden by one of the applicable sort fallback options, such as
+\csopt{entry-sort-fallback}. If the designated fallback (such as
+\field{name}) is missing, then the fallback value for that field
+will be used.
+
+The \atentry{index} and \atentry{indexplural} entry types are
+slightly different. They have their own rules for obtaining the
+value of the \field{name} field, and will explicitly set it in the
+\ext{glstex} file via the helper commands \gls{bibglsnewindex}
+and \gls{bibglsnewindexplural}.
+
+In the case of \atentry{index}, if the \field{name} field is
+missing, its value will be obtained from the entry's original label.
+If the \field{sort} field is missing, its value is obtained from the
+\field{name} field unless a different fallback is specified with
+\csopt{custom-sort-fallbacks}.  The remaining fallbacks are as for
+\atentry{entry}.
+
+It's more complicated for \atentry{indexplural}, which has the following
+fallback rules:
+\begin{description}
+\item[\field{name}] If the \field{name} field is missing, its value
+is obtained from the entry's \field{plural} field (or the fallback
+for the \field{plural} field, if that field is missing).
+
+\item[\field{plural}] If the \field{plural} field is missing, its
+value is obtained by appending \ics{glspluralsuffix} to the value
+of the \field{text} field (or the fallback for the \field{text}
+field, if that field is missing).
+
+\item[\field{text}] If the \field{text} field is missing, its value
+is obtained from the entry's original label.
+
+\item[\field{sort}] If the \field{sort} field is missing, its value
+is obtained from the \field{name} field unless a different fallback
+is specified with \csopt{custom-sort-fallbacks}.
+\end{description}
+The remaining fallbacks are as for \atentry{entry}.
+
+The most awkward of all the \glspl{entrytype} are, as indicated earlier,
+the abbreviations where the field values such as \field{name} and
+\field{text} are set by the abbreviation style. Therefore, there are resource
+options specifically to identify the most appropriate fallback
+values for abbreviations. The default is to use the value of the
+\field{short} field as the fallback for the \field{name},
+\field{sort} and \field{text} fields. If this is inappropriate for
+your abbreviation style then you will need to use the options listed below to
+provide more appropriate fallbacks. These options don't actually set
+the \field{name} and \field{text} fields in the \ext{glstex} file
+and don't include any style formatting (such as font changing
+commands), which are irrelevant to \bibgls.\footnote{The \field{sort} field
+will be set in the \ext{glstex} file as it's useful for debugging,
+but it's typically irrelevant.}
+
+For other entry types, see their description in \sectionref{sec:bib}.
+
+\optsection{abbreviation-name-fallback}
+
+The \glspl{entrytype} that define abbreviations (such as
+\atentry{abbreviation} and \atentry{acronym}) will, by default,
+fallback on the \field{short} field if the \field{name} field is
+missing and it's required for some reason (for example, with
+\csopt[name]{sort-field}).  If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example,
+\csopt[long]{abbreviation-name-fallback}.
+The \meta{field} value must be a known field (not an internal field)
+but can't be the \field{sort} field.
+
+Note that the default fallback for the \field{sort} field for
+abbreviations is given by \csopt{abbreviation-sort-fallback} which
+is set to \field{short} not \field{name} by default. So changing the
+fallback for the \field{name} field won't have an effect unless the
+\field{sort} fallback is changed to \field{name} or
+\csopt[\field{name}]{sort-field} is used or the \field{name} field
+is referenced in an option such as \csopt{assign-fields}.
+
+Field concatenation isn't available for this option.
+
+\optsection{abbreviation-text-fallback}
+
+Similar to \csopt{abbreviation-name-fallback} but for the
+\field{text} field. The default fallback is the \field{short} field.
+Field concatenation isn't available for this option.
+
+Note that you can't have both
+\csopt[\field{text}]{abbreviation-name-fallback} and
+\csopt[\field{name}]{abbreviation-text-fallback} as it would cause
+an infinite loop.
+
+\optsection{abbreviation-sort-fallback}
+
+The \glspl{entrytype} that define abbreviations (such as
+\atentry{abbreviation} and \atentry{acronym}) will, by default,
+fallback on the \field{short} field if the \field{sort} field is
+missing (assuming \csopt[sort]{sort-field}). If you prefer to
+fallback on a different field, then you can use this option to
+specify the field. For example,
+\csopt[long]{abbreviation-sort-fallback}. Note that if you use
+\csopt[name]{sort-field}, then the fallback field will be given by
+\csopt{abbreviation-name-fallback} if the \field{name} field is
+omitted.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords: \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
+
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
+
+\begin{important}
+The \csopt{abbreviation-sort-fallback} setting is only used when \bibgls\
+tries to access the \field{sort} field for an abbreviation and finds
+that the field hasn't been set. This means that this setting has no effect 
+if you explicitly set the \field{sort} field or if you change the field used 
+for sorting (\csopt{sort-field}).
+\end{important}
+
+\optsection{entry-sort-fallback}
+
+The regular \glspl{entrytype} (such as \atentry{entry} and
+\atentry{dualentry}) will, by default, fallback on the \field{name}
+field if the \field{sort} field is missing (assuming
+\csopt[sort]{sort-field}). If you prefer to
+fallback on a different field, then you can use this option to
+specify the field.
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords: \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
+
+This setting doesn't affect the index type of entries, such as
+\atentry{index} or \atentry{indexplural}. This is useful if your
+glossary contains \iglspl{homograph} (terms with the same spelling) which
+can't be distinguished by the sort comparators. For example, suppose
+my file \filefmt{entries.bib} contains:
+\begin{codeenv}
+\atentry{index}\marg{pagelist,
+  \field{name}=\marg{page list},
+  \field{description}=\marg{a list of individual pages or page ranges}
+}
+\strut
+\atentry{index}\marg{glossary}
+\strut
+\atentry{entry}\marg{glossarylist,
+  \field{parent}=\marg{glossary},
+  \field{description}=\marg{list of technical words}
+}
+\strut
+\atentry{entry}\marg{glosscol,
+  \field{parent}=\marg{glossary},
+  \field{description}=\marg{collection of glosses}
+}
+\end{codeenv}
+Now first consider a document that uses the default settings:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\strut
+\cmd{usepackage}\oarg{\styopt{record},\styopt{subentrycounter},\styopt[\glostyle{treenoname}]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
+\strut
+\cmd{begin}\marg{document}
+A test document describing \cs{glspl}\marg{pagelist} and
+\cs{gls}\marg{glosscol} (collection) vs \cs{gls}\marg{glossarylist} (list).
+\strut
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+The default behaviour for \atentry{entry} if the \field{sort} field
+is missing is to fallback on the \field{name} field. If the
+\field{name} field is missing (as with \code{glossarylist} and
+\code{glosscol}), then the value is obtained from the
+\field{name} field from the \gls{parententry}. The \gls{parententry} for these
+\glspl{homograph} is the \code{glossary} entry, which was defined with
+\atentry{index} and doesn't have the \field{name} field. For the
+\atentry{index} entries, if \field{name} is missing the value is
+obtained from the label.
+
+Therefore both \code{glossarylist} and \code{glosscol} end
+up with the same sort value: \code{glossary}. This triggers a
+message in verbose mode (\longarg{verbose}) which can be found 
+in the transcript file:
+\begin{verbatim}
+Identical sort values for 'glossarylist' and 'glosscol'
+Falling back on ID
+\end{verbatim}
+So the actual sort values used are \qt{glossarylist} and
+\qt{glosscol}. This puts the \code{glossarylist} entry
+before the \code{glosscol} entry.
+
+Now suppose a minor modification is made to the document:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}
+ \oarg{
+   \csopt[entries]{src},
+   \csopt[description]{entry-sort-fallback}
+ }
+\end{codeenv}
+This means that when the sort function fails to find the
+\field{sort} field for the terms defined with \atentry{entry}, it
+will fallback on the \field{description} field. This doesn't affect
+the terms defined with \atentry{index}, which still fallback on the
+\field{name} field. This time there's no message in the transcript
+file and the \code{glosscol} entry now comes before the
+\code{glossarylist} entry.
+
+\begin{important}
+The \csopt{entry-sort-fallback} setting is only used when \bibgls\
+tries to access the \field{sort} field for a term defined with
+\atentry{entry} and finds that the field hasn't been set. This means
+that this setting has no effect if you explicitly set the \field{sort}
+field or if you change the field used for sorting
+(\csopt{sort-field}).
+\end{important}
+
+\optsection{symbol-sort-fallback}
+
+The \glspl{entrytype} that define symbols (such as \atentry{symbol} and
+\atentry{number}) will, by default, fallback on the entry's original label if the
+\field{sort} field is missing (assuming the default
+\csopt[sort]{sort-field}). If you prefer to fallback on a different
+field, then you can use this option to specify the field. For
+example, \csopt[name]{symbol-sort-fallback}.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords: \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
+
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
+
+\begin{important}
+The \csopt{symbol-sort-fallback} setting is only used when \bibgls\
+tries to access the \field{sort} field for a symbol and finds
+that the field hasn't been set. This means that this setting has no effect 
+if you explicitly set the \field{sort} field or if you change the field used 
+for sorting (\csopt{sort-field}).
+\end{important}
+
+\optsection{bibtexentry-sort-fallback}
+
+The \glsdisp{mainentry}{main} \atentry{bibtexentry}
+\glspl{entrytype} will, by default,
+fallback on the \field{name} if the
+\field{sort} field is missing (assuming the default
+\csopt[sort]{sort-field}). If you prefer to fallback on a different
+field, then you can use this option to specify the field.
+
+The \meta{field} may be a known field but not an internal
+field. It can't be the \field{sort} field. It may also be
+one of the keywords: \optfmt{id} (for the entry's label) or
+\optfmt{original id} (for the entry's original label). The
+\meta{field} may also be a composite in the form
+\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
+sort value should be obtained by concatenating the values of given fields,
+where the separator is given by \csopt{field-concat-sep}.
+
+Note that \csopt{missing-sort-fallback} and
+\csopt{custom-sort-fallbacks} override this setting.
+
+\begin{important}
+The \csopt{bibtexentry-sort-fallback} setting is only used when
+\bibgls\ tries to access the \field{sort} field for a \gls{mainentry}
+defined with \atentry{bibtexentry} and finds that the field hasn't
+been set. This means that this setting has no effect if you
+explicitly set the \field{sort} field or if you change the field used for
+sorting (\csopt{sort-field}).
+\end{important}
+
+\optsection{custom-sort-fallbacks}
+
+The value should be a \keyvallist\ in the form
+\meta{entrytype}\dequals\meta{field} where \meta{entrytype} is the
+\emph{original} \gls{entrytype} (before being aliased with
+\csopt{entry-type-aliases}). This will override any of the sort fallback
+options listed below for entries whose original \gls{entrytype} matches
+\meta{entrytype}.
+
+The \meta{field} may be a known field but not an internal field. For
+obvious reasons, it can't be the \field{sort} field (since
+\meta{field} is the fallback a missing \field{sort} field). It may also be one of the
+keywords: \optfmt{id} (for the entry's label) or \optfmt{original id}
+(for the entry's original label). The \meta{field} may also be a
+composite in the form \optfmt{\meta{field1}+\meta{field2}+\ldots}
+which indicates that the sort value should be obtained by
+concatenating the values of the given fields, where the separator is
+given by \csopt{field-concat-sep}.
+
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentryfmt{unit}\marg{ohm,
+  \field{name}=\marg{\cs{si}\marg{\csfmt{ohm}}},
+  \field{description}=\marg{electrical resistance}
+}
+\strut
+\atentryfmt{constant}\marg{pi,
+  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
+  \field{description}=\marg{the ratio of the length of the circumference
+    of a circle to its diameter},
+  \field{user1}=\marg{3.14159}
+}
+\strut
+\atentry{symbol}\marg{fx,
+  \field{name}=\marg{\cs{ensuremath}\marg{f(x)}},
+  \field{description}=\marg{a function of \idx{mshiftchar}x\idx{mshiftchar}}
+}
+\strut
+\atentry{number}\marg{zero,
+  \field{name}=\marg{0},
+  \field{description}=\marg{nothing or no quantity}
+}
+\end{codeenv}
+Then the resource options:
+\begin{codeenv}
+\csopt[\entryfmt{unit}=\entryref{symbol},\entryfmt{constant}=\entryref{number}]{entry-type-aliases},
+\csopt[\entryfmt{unit}=\field{name},\entryfmt{constant}=\field{user1}]{custom-sort-fallbacks}
+\end{codeenv}
+will treat the custom \atentryfmt{unit} and \atentryfmt{constant}
+entries as though they had been defined with \atentry{symbol}
+and \atentry{number}, respectively, but the fallback for the
+\field{sort} field is different: the \code{ohm} entry will use the
+\field{name} field for the sort fallback (because its original 
+\gls{entrytype} was \entryfmt{unit}), the \code{pi} entry will use the
+\field{user1} field for the sort fallback (because its original
+\gls{entrytype} was \entryfmt{constant}) and the \code{fx} and
+\code{zero} entries will use the label for the sort fallback (since
+neither \entryfmt{symbol} nor \entryfmt{number} were identified in
+\csopt{custom-sort-fallbacks} so the \csopt{symbol-sort-fallback} is
+used).
+
+If an entry hasn't had its \gls{entrytype} aliased then \meta{entrytype}
+is its actual \gls{entrytype}. For example, consider the following
+definitions:
+\begin{codeenv}
+\atentry{abbreviation}\marg{svm,
+   \field{short}=\marg{SVM},
+   \field{long}=\marg{support vector machine}
+}
+\atentry{acronym}\marg{laser,
+  \field{short}=\marg{laser},
+  \field{long}=\marg{light amplification by stimulated emission of radiation}
+}
+\end{codeenv}
+Then \csopt[short]{abbreviation-sort-fallback} will make both
+entries fallback on the \field{short} field (since
+\csopt{abbreviation-sort-fallback} applies to both \atentry{acronym}
+and \atentry{abbreviation}), but the option:
+\begin{codeenv}
+\csopt[\entryref{abbreviation}=\field{long},\entryref{acronym}=\field{short}]{custom-sort-fallbacks} 
+\end{codeenv}
+will make the entry defined with \atentry{abbreviation} fallback on
+the \field{long} field and the entry defined with \atentry{acronym}
+will fallback on the \field{short} field.
+
+Since the default setting is \csopt[short]{abbreviation-sort-fallback}
+this only needs to be:
+\begin{codeenv}
+\csopt[\entryref{abbreviation}=\field{long}]{custom-sort-fallbacks} 
+\end{codeenv}
+In this case, the entry defined with \atentry{abbreviation} (\qt{SVM}) will use
+the setting given in \csopt{custom-sort-fallbacks}, but the entry
+defined with \atentry{acronym} (\qt{laser}) will use the setting given by
+\csopt{abbreviation-sort-fallback} since \atentry{acronym} hasn't
+been identified in \csopt{custom-sort-fallbacks}.
+
+This option also covers \glspl{dualentry}. For example:
+\begin{codeenv}
+\csopt[
+   \entryref{dualindexnumber}=\field{description},
+   \entryfmt{dualindexnumbersecondary}=\field{user1}
+]{custom-sort-fallbacks}
+\end{codeenv}
+Note that the \gls{entrytype} for the \dual\ is in the form 
+\code{\meta{primary entry type}secondary}.
+
+\begin{important}
+The \csopt{custom-sort-fallbacks} setting is only used when \bibgls\
+tries to access the \field{sort} field for an entry (whose original
+\gls{entrytype} has been identified in this setting) and finds that the field
+hasn't been set. This means that this setting has no effect if you
+explicitly set the \field{sort} field or if you change the field
+used for sorting (\csopt{sort-field}).
+\end{important}
+
+\optsection{field-concat-sep}
+
+This option sets the field concatenation separator to \meta{value}
+used by the \field{sort} fallback options.  The default is a space.
+An empty value indicates no separator. You may use
+\gls{uhex}\meta{hex} to indicate a character by its hexadecimal code
+(see \sectionref{sec:quarks}). Note that the more complex field
+concatenation specification described in
+\sectionref{sec:optstringconcat} isn't available for this option.
+
+For example, suppose the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{abbreviation}\marg{ac,
+  \field{short}=\marg{AC},
+  \field{long}=\marg{alternating current}
+}
+\atentry{index}\marg{acacia}
+\end{codeenv}
+Then the resource option:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[letter-nocase]{sort},
+  \csopt[\field{short}+\field{long}]{abbreviation-sort-fallback}
+}
+\end{codeenv}
+will set the \code{ac} sort value to \qt{AC alternating current}.
+That is, the \field{short} value concatenated with the \field{long}
+value using the default space separator. With the
+\optfmt{letter-nocase} sort method, this will put the \code{ac}
+entry before the \code{acacia} entry (because the space character
+comes before \qt{a}).
+
+If the resource options are changed to:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+  \csopt[letter-nocase]{sort},
+  \csopt[\empty]{field-concat-sep},
+  \csopt[\field{short}+\field{long}]{abbreviation-sort-fallback}
+}
+\end{codeenv}
+This will obtain the sort value for abbreviations from a
+concatenation of the \meta{short} and \meta{long} values without a
+separator. This means that the \code{ac} sort value will be
+\qt{ACalternating current} and so the \code{ac} entry will
+come after the \code{acacia} entry (since \qt{l} comes after \qt{c}).
+
+This setting is only used for the sort fallback options that allow
+field concatenation (such as \csopt{entry-sort-fallback} but not
+\csopt{missing-sort-fallback}). 
+
+Note that due to the way that the \keyvallist\ parser trims leading and
+trailing spaces, you can't simply do \csopt[~]{field-concat-sep}
+to indicate a space character as the value will end up as an empty
+string. You can instead do \csopt[\stringu20]{field-concat-sep} but
+since this is the default value there shouldn't be much need for it.
+
+Remember that the separator may be replaced with a break point
+marker depending on the sort method and \csopt{break-at} setting.
 
 \section{Plurals}
 \label{sec:plurals}
@@ -15566,7 +16142,8 @@ values to determine the order. By default, this sort value is
 obtained from the \field{sort} field but for greater flexibility
 it's best to not actually set this field. \bibgls\ has a set of fallbacks
 that it uses if a field it needs to access is missing. These
-fallbacks depend on the \gls{entrytype} and resource settings.
+fallbacks depend on the \gls{entrytype} and resource settings (see
+\sectionref{sec:fallbacks}).
 
 For example, if a term defined with \atentry{index} doesn't have the
 \field{sort} field set then \bibgls\ will use the value given by the
@@ -16714,7 +17291,8 @@ a case-sensitive letter comparison.
 
 \begin{important}
 In general it's better to use the default \csopt[sort]{sort-field} 
-and adjust the fallbacks instead. The \csopt{sort-field} option is
+and adjust the fallbacks instead (see
+\sectionref{sec:fallbacks}). The \csopt{sort-field} option is
 provided if you want to use a specific field regardless of the 
 \gls{entrytype}.
 \end{important}
@@ -16781,12 +17359,14 @@ missing, then \bibgls\ will query the \gls{entrytype}['s] fallback for
 The \meta{fallback-field} must be a known field but not an internal
 field. It can't be the \field{sort} field. (Take care not to cause
 an infinite loop if \csopt{sort-field} has been changed.) Unlike the
-other sort fallback options such as \csopt{entry-sort-fallback}, the
-\meta{fallback-field} can't be a keyword (to identify the label) and can't be a
-composite.
+other sort fallback options, such as \csopt{entry-sort-fallback},
+the \meta{fallback-field} can't be a keyword (to identify the label)
+and can't be a composite.
 
-\item If the \gls{entrytype} has a fallback rule for \meta{sort-field},
-then that rule is used. When \csopt[sort]{sort-field} this means:
+\item If the \gls{entrytype} has a fallback rule for
+\meta{sort-field}, then that rule is used (see
+\sectionref{sec:fallbacks}). When \csopt[sort]{sort-field} this
+means:
 \begin{itemize}
 \item If the entry's original \gls{entrytype} has been identified in
 \csopt{custom-sort-fallbacks}, then \bibgls\ will fallback on the
@@ -16826,372 +17406,6 @@ Use \csopt{dual-missing-sort-fallback} when sorting dual entries
 separately from primaries, and use
 \csopt{secondary-missing-sort-fallback} for \csopt{secondary}
 sorting.
-
-\optsection{custom-sort-fallbacks}
-
-The value should be a \keyvallist\ in the form
-\meta{entrytype}\dequals\meta{field} where \meta{entrytype} is the
-\emph{original} \gls{entrytype} (before being aliased with
-\csopt{entry-type-aliases}). This will override any of the sort fallback
-options listed below for entries whose original \gls{entrytype} matches
-\meta{entrytype}.
-
-The \meta{field} may be a known field but not an internal field. For
-obvious reasons, it can't be the \field{sort} field (since
-\meta{field} is the fallback a missing \field{sort} field). It may also be one of the
-keywords: \optfmt{id} (for the entry's label) or \optfmt{original id}
-(for the entry's original label). The \meta{field} may also be a
-composite in the form \optfmt{\meta{field1}+\meta{field2}+\ldots}
-which indicates that the sort value should be obtained by
-concatenating the values of the given fields, where the separator is
-given by \csopt{field-concat-sep}.
-
-For example, if the \ext{bib} file contains:
-\begin{codeenv}
-\atentryfmt{unit}\marg{ohm,
-  \field{name}=\marg{\cs{si}\marg{\csfmt{ohm}}},
-  \field{description}=\marg{electrical resistance}
-}
-\strut
-\atentryfmt{constant}\marg{pi,
-  \field{name}=\marg{\cs{ensuremath}\marg{\cs{pi}}},
-  \field{description}=\marg{the ratio of the length of the circumference
-    of a circle to its diameter},
-  \field{user1}=\marg{3.14159}
-}
-\strut
-\atentry{symbol}\marg{fx,
-  \field{name}=\marg{\cs{ensuremath}\marg{f(x)}},
-  \field{description}=\marg{a function of \idx{mshiftchar}x\idx{mshiftchar}}
-}
-\strut
-\atentry{number}\marg{zero,
-  \field{name}=\marg{0},
-  \field{description}=\marg{nothing or no quantity}
-}
-\end{codeenv}
-Then the resource options:
-\begin{codeenv}
-\csopt[\entryfmt{unit}=\entryref{symbol},\entryfmt{constant}=\entryref{number}]{entry-type-aliases},
-\csopt[\entryfmt{unit}=\field{name},\entryfmt{constant}=\field{user1}]{custom-sort-fallbacks}
-\end{codeenv}
-will treat the custom \atentryfmt{unit} and \atentryfmt{constant}
-entries as though they had been defined with \atentry{symbol}
-and \atentry{number}, respectively, but the fallback for the
-\field{sort} field is different: the \code{ohm} entry will use the
-\field{name} field for the sort fallback (because its original 
-\gls{entrytype} was \entryfmt{unit}), the \code{pi} entry will use the
-\field{user1} field for the sort fallback (because its original
-\gls{entrytype} was \entryfmt{constant}) and the \code{fx} and
-\code{zero} entries will use the label for the sort fallback (since
-neither \entryfmt{symbol} nor \entryfmt{number} were identified in
-\csopt{custom-sort-fallbacks} so the \csopt{symbol-sort-fallback} is
-used).
-
-If an entry hasn't had its \gls{entrytype} aliased then \meta{entrytype}
-is its actual \gls{entrytype}. For example, consider the following
-definitions:
-\begin{codeenv}
-\atentry{abbreviation}\marg{svm,
-   \field{short}=\marg{SVM},
-   \field{long}=\marg{support vector machine}
-}
-\atentry{acronym}\marg{laser,
-  \field{short}=\marg{laser},
-  \field{long}=\marg{light amplification by stimulated emission of radiation}
-}
-\end{codeenv}
-Then \csopt[short]{abbreviation-sort-fallback} will make both
-entries fallback on the \field{short} field (since
-\csopt{abbreviation-sort-fallback} applies to both \atentry{acronym}
-and \atentry{abbreviation}), but the option:
-\begin{codeenv}
-\csopt[\entryref{abbreviation}=\field{long},\entryref{acronym}=\field{short}]{custom-sort-fallbacks} 
-\end{codeenv}
-will make the entry defined with \atentry{abbreviation} fallback on
-the \field{long} field and the entry defined with \atentry{acronym}
-will fallback on the \field{short} field.
-
-Since the default setting is \csopt[short]{abbreviation-sort-fallback}
-this only needs to be:
-\begin{codeenv}
-\csopt[\entryref{abbreviation}=\field{long}]{custom-sort-fallbacks} 
-\end{codeenv}
-In this case, the entry defined with \atentry{abbreviation} (\qt{SVM}) will use
-the setting given in \csopt{custom-sort-fallbacks}, but the entry
-defined with \atentry{acronym} (\qt{laser}) will use the setting given by
-\csopt{abbreviation-sort-fallback} since \atentry{acronym} hasn't
-been identified in \csopt{custom-sort-fallbacks}.
-
-This option also covers \glspl{dualentry}. For example:
-\begin{codeenv}
-\csopt[
-   \entryref{dualindexnumber}=\field{description},
-   \entryfmt{dualindexnumbersecondary}=\field{user1}
-]{custom-sort-fallbacks}
-\end{codeenv}
-Note that the \gls{entrytype} for the \dual\ is in the form 
-\code{\meta{primary entry type}secondary}.
-
-\begin{important}
-The \csopt{custom-sort-fallbacks} setting is only used when \bibgls\
-tries to access the \field{sort} field for an entry (whose original
-\gls{entrytype} has been identified in this setting) and finds that the field
-hasn't been set. This means that this setting has no effect if you
-explicitly set the \field{sort} field or if you change the field
-used for sorting (\csopt{sort-field}).
-\end{important}
-
-\optsection{entry-sort-fallback}
-
-The regular \glspl{entrytype} (such as \atentry{entry} and
-\atentry{dualentry}) will, by default, fallback on the \field{name}
-field if the \field{sort} field is missing (assuming
-\csopt[sort]{sort-field}). If you prefer to
-fallback on a different field, then you can use this option to
-specify the field.
-Note that \csopt{missing-sort-fallback} and
-\csopt{custom-sort-fallbacks} override this setting.
-
-The \meta{field} may be a known field but not an internal
-field. It can't be the \field{sort} field. It may also be
-one of the keywords: \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label). The
-\meta{field} may also be a composite in the form
-\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
-sort value should be obtained by concatenating the values of given fields,
-where the separator is given by \csopt{field-concat-sep}.
-
-This setting doesn't affect the index type of entries, such as
-\atentry{index} or \atentry{indexplural}. This is useful if your
-glossary contains \iglspl{homograph} (terms with the same spelling) which
-can't be distinguished by the sort comparators. For example, suppose
-my file \filefmt{entries.bib} contains:
-\begin{codeenv}
-\atentry{index}\marg{pagelist,
-  \field{name}=\marg{page list},
-  \field{description}=\marg{a list of individual pages or page ranges}
-}
-\strut
-\atentry{index}\marg{glossary}
-\strut
-\atentry{entry}\marg{glossarylist,
-  \field{parent}=\marg{glossary},
-  \field{description}=\marg{list of technical words}
-}
-\strut
-\atentry{entry}\marg{glosscol,
-  \field{parent}=\marg{glossary},
-  \field{description}=\marg{collection of glosses}
-}
-\end{codeenv}
-Now first consider a document that uses the default settings:
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\strut
-\cmd{usepackage}\oarg{\styopt{record},\styopt{subentrycounter},\styopt[\glostyle{treenoname}]{style}}\marg{glossaries-extra}
-\strut
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}
-\strut
-\cmd{begin}\marg{document}
-A test document describing \cs{glspl}\marg{pagelist} and
-\cs{gls}\marg{glosscol} (collection) vs \cs{gls}\marg{glossarylist} (list).
-\strut
-\cs{printunsrtglossary}
-\cmd{end}\marg{document}
-\end{codeenv}
-The default behaviour for \atentry{entry} if the \field{sort} field
-is missing is to fallback on the \field{name} field. If the
-\field{name} field is missing (as with \code{glossarylist} and
-\code{glosscol}), then the value is obtained from the
-\field{name} field from the \gls{parententry}. The \gls{parententry} for these
-\glspl{homograph} is the \code{glossary} entry, which was defined with
-\atentry{index} and doesn't have the \field{name} field. For the
-\atentry{index} entries, if \field{name} is missing the value is
-obtained from the label.
-
-Therefore both \code{glossarylist} and \code{glosscol} end
-up with the same sort value: \code{glossary}. This triggers a
-message in verbose mode (\longarg{verbose}) which can be found 
-in the transcript file:
-\begin{verbatim}
-Identical sort values for 'glossarylist' and 'glosscol'
-Falling back on ID
-\end{verbatim}
-So the actual sort values used are \qt{glossarylist} and
-\qt{glosscol}. This puts the \code{glossarylist} entry
-before the \code{glosscol} entry.
-
-Now suppose a minor modification is made to the document:
-\begin{codeenv}
-\gls{GlsXtrLoadResources}
- \oarg{
-   \csopt[entries]{src},
-   \csopt[description]{entry-sort-fallback}
- }
-\end{codeenv}
-This means that when the sort function fails to find the
-\field{sort} field for the terms defined with \atentry{entry}, it
-will fallback on the \field{description} field. This doesn't affect
-the terms defined with \atentry{index}, which still fallback on the
-\field{name} field. This time there's no message in the transcript
-file and the \code{glosscol} entry now comes before the
-\code{glossarylist} entry.
-
-\begin{important}
-The \csopt{entry-sort-fallback} setting is only used when \bibgls\
-tries to access the \field{sort} field for a term defined with
-\atentry{entry} and finds that the field hasn't been set. This means
-that this setting has no effect if you explicitly set the \field{sort}
-field or if you change the field used for sorting
-(\csopt{sort-field}).
-\end{important}
-
-\optsection{abbreviation-sort-fallback}
-
-The \glspl{entrytype} that define abbreviations (such as
-\atentry{abbreviation} and \atentry{acronym}) will, by default,
-fallback on the \field{short} field if the \field{sort} field is
-missing (assuming \csopt[sort]{sort-field}). If you prefer to
-fallback on a different field, then you can use this option to
-specify the field. For example,
-\csopt[long]{abbreviation-sort-fallback}. Note that if you use
-\csopt[name]{sort-field}, then the fallback field will be given by
-\csopt{abbreviation-name-fallback} if the \field{name} field is
-omitted.
-
-The \meta{field} may be a known field but not an internal
-field. It can't be the \field{sort} field. It may also be
-one of the keywords: \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label). The
-\meta{field} may also be a composite in the form
-\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
-sort value should be obtained by concatenating the values of given fields,
-where the separator is given by \csopt{field-concat-sep}.
-
-Note that \csopt{missing-sort-fallback} and
-\csopt{custom-sort-fallbacks} override this setting.
-
-\begin{important}
-The \csopt{abbreviation-sort-fallback} setting is only used when \bibgls\
-tries to access the \field{sort} field for an abbreviation and finds
-that the field hasn't been set. This means that this setting has no effect 
-if you explicitly set the \field{sort} field or if you change the field used 
-for sorting (\csopt{sort-field}).
-\end{important}
-
-\optsection{symbol-sort-fallback}
-
-The \glspl{entrytype} that define symbols (such as \atentry{symbol} and
-\atentry{number}) will, by default, fallback on the entry's original label if the
-\field{sort} field is missing (assuming the default
-\csopt[sort]{sort-field}). If you prefer to fallback on a different
-field, then you can use this option to specify the field. For
-example, \csopt[name]{symbol-sort-fallback}.
-
-The \meta{field} may be a known field but not an internal
-field. It can't be the \field{sort} field. It may also be
-one of the keywords: \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label). The
-\meta{field} may also be a composite in the form
-\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
-sort value should be obtained by concatenating the values of given fields,
-where the separator is given by \csopt{field-concat-sep}.
-
-Note that \csopt{missing-sort-fallback} and
-\csopt{custom-sort-fallbacks} override this setting.
-
-\begin{important}
-The \csopt{symbol-sort-fallback} setting is only used when \bibgls\
-tries to access the \field{sort} field for a symbol and finds
-that the field hasn't been set. This means that this setting has no effect 
-if you explicitly set the \field{sort} field or if you change the field used 
-for sorting (\csopt{sort-field}).
-\end{important}
-
-\optsection{bibtexentry-sort-fallback}
-
-The \glsdisp{mainentry}{main} \atentry{bibtexentry}
-\glspl{entrytype} will, by default,
-fallback on the \field{name} if the
-\field{sort} field is missing (assuming the default
-\csopt[sort]{sort-field}). If you prefer to fallback on a different
-field, then you can use this option to specify the field.
-
-The \meta{field} may be a known field but not an internal
-field. It can't be the \field{sort} field. It may also be
-one of the keywords: \optfmt{id} (for the entry's label) or
-\optfmt{original id} (for the entry's original label). The
-\meta{field} may also be a composite in the form
-\optfmt{\meta{field1}+\meta{field2}+\ldots} which indicates that the
-sort value should be obtained by concatenating the values of given fields,
-where the separator is given by \csopt{field-concat-sep}.
-
-Note that \csopt{missing-sort-fallback} and
-\csopt{custom-sort-fallbacks} override this setting.
-
-\begin{important}
-The \csopt{bibtexentry-sort-fallback} setting is only used when
-\bibgls\ tries to access the \field{sort} field for a \gls{mainentry}
-defined with \atentry{bibtexentry} and finds that the field hasn't
-been set. This means that this setting has no effect if you
-explicitly set the \field{sort} field or if you change the field used for
-sorting (\csopt{sort-field}).
-\end{important}
-
-\optsection{field-concat-sep}
-
-This option sets the field concatenation separator to \meta{value}.
-The default is a space. An empty value indicates no separator. You
-may use \gls{uhex}\meta{hex} to indicate a character by its hexadecimal
-code (see \sectionref{sec:quarks}). For example, suppose the \ext{bib} file contains:
-\begin{codeenv}
-\atentry{abbreviation}\marg{ac,
-  \field{short}=\marg{AC},
-  \field{long}=\marg{alternating current}
-}
-\atentry{index}\marg{acacia}
-\end{codeenv}
-Then the resource option:
-\begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{
-  \csopt[letter-nocase]{sort},
-  \csopt[\field{short}+\field{long}]{abbreviation-sort-fallback}
-}
-\end{codeenv}
-will set the \code{ac} sort value to \qt{AC alternating current}.
-That is, the \field{short} value concatenated with the \field{long}
-value using the default space separator. With the
-\optfmt{letter-nocase} sort method, this will put the \code{ac}
-entry before the \code{acacia} entry (because the space character
-comes before \qt{a}).
-
-If the resource options are changed to:
-\begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{
-  \csopt[letter-nocase]{sort},
-  \csopt[\empty]{field-concat-sep},
-  \csopt[\field{short}+\field{long}]{abbreviation-sort-fallback}
-}
-\end{codeenv}
-This will obtain the sort value for abbreviations from a
-concatenation of the \meta{short} and \meta{long} values without a
-separator. This means that the \code{ac} sort value will be
-\qt{ACalternating current} and so the \code{ac} entry will
-come after the \code{acacia} entry (since \qt{l} comes after \qt{c}).
-
-This setting is only used for the sort fallback options that allow
-field concatenation (such as \csopt{entry-sort-fallback} but not
-\csopt{missing-sort-fallback}). 
-
-Note that due to the way that the \keyvallist\ parser trims leading and
-trailing spaces, you can't simply do \csopt[~]{field-concat-sep}
-to indicate a space character as the value will end up as an empty
-string. You can instead do \csopt[\stringu20]{field-concat-sep} but
-since this is the default value there shouldn't be much need for it.
-
-Remember that the separator may be replaced with a break point
-marker depending on the sort method and \csopt{break-at} setting.
 
 \optsection{trim-sort}
 
@@ -18389,8 +18603,8 @@ or
 \end{definition}
 If the \meta{field} is omitted, the value of \csopt{sort-field} is
 used. Remember that when the \glspl{primaryentry} are sorted, the
-\field{sort} field will be set, which means that the fallback field
-(such as \field{name}) won't be used in the
+\field{sort} field will be set, which means that the \field{sort} fallback field
+(see \sectionref{sec:fallbacks}) won't be used in the
 \glsdisp{secondaryglossary}{secondary} sort. In
 general it's best to supply the field unless one type is sorted and the
 other isn't. (The actual sort value obtained by the
@@ -19185,7 +19399,7 @@ The \field{see} field isn't listed in \csopt{dual-entry-map} so its
 value is simply copied directly over to the \field{see} field in the
 dual entry. Note that the missing \field{plural} and
 \field{descriptionplural} fields have been filled in using their
-fallback values.
+fallback values (see \sectionref{sec:fallbacks}).
 
 In general \bibgls\ doesn't try to supply missing fields, but in the
 dual entry cases it needs to do this for the mapped fields. This is
