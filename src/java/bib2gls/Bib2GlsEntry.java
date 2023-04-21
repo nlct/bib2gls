@@ -1390,6 +1390,14 @@ public class Bib2GlsEntry extends BibEntry
 
                   putField(field, value);
 
+                  if (bib2gls.getDebugLevel() > 0)
+                  {
+                     TeXParser parser = resource.getBibParser();
+
+                     bib2gls.logAndPrintMessage("Setting "+field
+                       + "=" + value.expand(parser).toString(parser));
+                  }
+
                   interpretFields = processField(field, mfirstucProtect,
                      protectFields, idField, interpretFields);
                }
