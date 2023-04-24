@@ -42,7 +42,7 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
 	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf \
-	  test-nl.pdf
+	  test-nl.pdf test-match-action.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -818,6 +818,13 @@ test-nl.pdf	: test-nl.glstex
 test-nl.glstex	: test-nl.tex $(DEPS) test-nl.bib
 		pdflatex test-nl
 		$(BIB2GLS) test-nl
+
+test-match-action.pdf	: test-match-action.glstex
+		pdflatex test-match-action
+
+test-match-action.glstex	: test-match-action.tex $(DEPS) books.bib
+		pdflatex test-match-action
+		$(BIB2GLS) test-match-action
 
 clean	:
 	$(RM) *.aux

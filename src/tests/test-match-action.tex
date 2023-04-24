@@ -1,0 +1,19 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[src=books,
+  match-action=add,
+  match={description=.*(Dickens|Tolkien).*}
+]
+
+\begin{document}
+\gls{thebigsleep},
+\gls{icecoldinalex},
+\gls{bleakhouse}.
+
+\printunsrtglossaries
+\end{document}
