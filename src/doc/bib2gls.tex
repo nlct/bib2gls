@@ -11,7 +11,7 @@
 \usepackage[autooneside=false]{scrlayer-scrpage}
 \usepackage{pifont}
 
-% Need support for extended characters
+% Need support for less common extended characters
 % and need a mono font that supports hyphenation
 \usepackage[no-math]{fontspec}
 \setmainfont{Linux Libertine O}
@@ -2502,13 +2502,17 @@ tracked languages for the document).
 
 Note that if you use the \csopt[true]{loc-prefix} option, the
 textual labels (\qt{Page} and \qt{Pages} in English) will be 
-first be attempted from the supplementary file with and then, if not
-found, from the resource file. In the event that the loaded resource file
+first be attempted from the supplementary file with the tags
+\code{tag.\meta{lang}.page} and \code{tag.\meta{lang}.pages}
+(where \meta{lang} is the language code) and then, if not
+found, from the main resource file using the tags \code{tag.page}
+and \code{tag.pages}. In the event that the loaded resource file
 doesn't match the document language and there's no supplementary
 file, you will have to manually set
 the correct translation (in English, this would be
 \csopt[Page\dcomma Pages]{loc-prefix}). The default definition of
-\gls!{bibglspassim} is also obtained from the resource file.
+\gls!{bibglspassim} is also obtained from the resource file in a
+similar manner.
 
 There are also keys in the resource file to assist case-conversion.
 Currently, there's only support for the Dutch \qt{IJ} case.
@@ -2695,7 +2699,9 @@ example, UTF-8 characters that occur in any resource options will
 need to be detokenized when using \sty{inputenc} to prevent
 expansion when they are written to the \ext{aux} file. (In some
 options, such as \csopt{sort-rule}, you can use \cs{glshex}\meta{hex}
-syntax to specify a UTF-8 character.)
+syntax to specify a UTF-8 character.) Note that newer \LaTeX\
+kernels have better support for UTF-8 and this issue is less likely
+to occur.
 
 The \longarg{no-interpret} switch will turn off the interpreter, but
 the library will still be used to parse the \ext{aux} and \ext{bib}
@@ -3249,10 +3255,13 @@ The group label is obtained from \gls!{bibglstimegroup}.
 aliasing a field (with \csopt{field-aliases}) or by using the
 \csopt[\meta{label}]{group} resource option. You will need to use
 \gls{glsxtrsetgrouptitle} in the document to provide an associated title if the
-\meta{label} isn't the same as the title.  Remember that the label
-can't contain any active characters, so you can't use non-ASCII
-characters in \meta{label} with \sty{inputenc} (but you can use
-non-ASCII alphanumerics with \sty{fontspec}).
+\meta{label} isn't the same as the title.  Remember that with older
+\LaTeX\ kernels, the label can't contain any active characters, so
+you can't use non-ASCII characters in \meta{label} with
+\sty{inputenc} (but you can use non-ASCII alphanumerics with
+\sty{fontspec}). To ensure better support for UTF-8 with \pdfLaTeX, make sure you
+have a recent \TeX\ distribution and up-to-date versions of
+\sty{glossaries} and \sty{glossaries-extra}.
 
 \end{description}
 
@@ -3546,7 +3555,11 @@ Packages that fall into the first category are:
 that might be needed within entry fields. The check for
 \isty{fontspec} is to simply determine whether or not UTF-8
 characters are allowed in labels (for \csopt{labelify} and 
-\csopt{labelify-list}).
+\csopt{labelify-list}). (Now that there is better support for UTF-8
+with \pdfLaTeX, UTF-8 characters will be allowed in labels if the
+detected versions of \isty{glossaries} and \isty{glossaries-extra}
+are new enough, but note that you will also need a relatively new
+\LaTeX\ kernel as well.)
 
 Packages that fall into the second category are:
 \isty{booktabs}, \isty{color}, \isty{datatool-base} (very limited),
@@ -7563,7 +7576,7 @@ has been redefined to use \ics{GlsXtrResourceInitEscSequences}, as
 in the above example.
 
 As with the \ext{bib} format, strings (\meta{string}) can be delimited by braces
-\margm{text} or double-quotes \code{\qtdelim{\meta{text}}}. If you
+\code{\margm{text}} or double-quotes \code{\qtdelim{\meta{text}}}. If you
 need a literal double-quote (\idx{doublequotechar}) then either use
 brace delimiters or use \gls{quark.doublequote}. If you need the
 actual \LaTeX\ accent command \ics{umlaut} then use brace
@@ -7590,6 +7603,9 @@ or
 \end{codeenv}
 Note that the outer braces are stripped by the resource option
 parser before the content is parsed as an \meta{element-list}.
+If only a single set of braces was used, those braces would be
+stripped leaving a bare \code{index}, which would be parsed as a
+field reference.
 
 The element \idxpl{quark} are uppercase tokens that start with a leading
 backslash. They have no meaning to \bibgls's interpreter nor are
@@ -7628,9 +7644,13 @@ Compare this with:
  ]{assign-fields}
 }
 \end{codeenv}
-which will set the \field{name} value to \csfmt{\meta{csname}} where
-\meta{csname} is the value obtained from the \field{user1} field for
-that entry.
+which will set the \field{name} value to \csfmt{\meta{csname}} (no
+arguments) where \meta{csname} is the value obtained from the
+\field{user1} field for that entry. Note that \csfmt{\meta{csname}}
+will need to be defined in the document to ensure that the document
+compiles without error but will also need to be recognised by
+\bibgls\ if the field value needs to be interpreted (such as when
+obtaining the \field{sort} value).
 
 \nosecdef{MGP}
 The \meta{match-ref} element should only be used with a
@@ -7713,8 +7733,9 @@ The case-changing functions will use the \gls{resource-locale}, but
 whether or not \bibgls\ recognises the correct rules for the locale
 depends on whether or not the locale is correctly supported by the
 Java locale provider. The \langxml\ may provide assistance with
-case-conversion.  Note that the case-change is performed by \bibgls\
-not by inserting \LaTeX\ case-changing commands into the code. 
+case-conversion (see \sectionref{sec:lang.xml}).  Note that the
+case-change is performed by \bibgls\ not by inserting \LaTeX\
+case-changing commands into the code. 
 
 \begin{itemize}
 \item \inlinedef{LC} converts \meta{element-list} to \idx{lowercase};
@@ -7769,7 +7790,7 @@ The field reference (\meta{field-ref}) syntax is more complicated:
 \meta{entry-ref} ::= self | parent | root
 \meta{value-ref} ::= \meta{field-name} | \meta{label-ref}
 \meta{label-ref} ::= \meta{label-type} \idx{follow} \meta{label-delineator}
-\meta{label-type} ::= entrytype | entrylabel
+\meta{label-type} ::= entrytype | entrylabel | entrybib
 \meta{label-delineator} ::= original | actual
 \end{codeenv}
 where \meta{field-name} is the required field name. Note that field
@@ -7783,8 +7804,8 @@ The \meta{entry-ref} part indicates which entry the referenced field
 belongs to.  The keywords are: \code{self} (the entry itself),
 \code{parent} (the entry's \parent), and \code{root} (the entry's
 \glsdisp{hierarchicalglossary}{hierarchical root}, not including the
-entry itself). These are relative to the entry that the destination
-field belongs to. Note that the entry's \glspl{ancestor} must be
+entry itself). Note that with options such as
+\csopt{assign-fields} the entry's \glspl{ancestor} must be
 defined before the entry in the \ext{bib} file because their fields
 can only be referenced after they have been processed.  A
 grandparent entry can be referenced with \code{parent \idx{follow}
@@ -7798,24 +7819,29 @@ a field.  The keyword must be followed by the \meta{delineator},
 which may be \code{original} or \code{actual}. Available keywords:
 
 \begin{description}
+
 \item[\code{entrytype}] the \gls{entrytype}, without the leading
 \code{@}, where \code{original} refers to the original
 \gls{entrytype} used in the \ext{bib} file and \code{actual} refers
 to the actual \gls{entrytype}, which may have changed as a result of
 \csopt{entry-type-aliases};
+
 \item[\code{entrylabel}] the entry label, where \code{original}
 refers to the original label used in the \ext{bib} file and
 \code{actual} refers to the actual label, which may have been
 altered by options such as \csopt{label-prefix};
+
 \item[\code{entrybib}] the \ext{bib} file the entry was defined in,
 where \code{original} refers to the basename (without the
-\code{.bib} extension) and \code{actual} refers to the file name
+\code{.bib} extension, regardless of whether or not it was included
+in \csopt{src}) and \code{actual} refers to the file name
 (including the extension and path).
+
 \end{description}
 
 If a syntax error occurs, the error message will show how \bibgls\
 has scanned the information so far. For example, in the case of
-\code{parent \field{name}} the message will be:
+\code{\csopt[parent \field{name}]{assign-fields}} the message will be:
 \begin{quote}\ttfamily
 Error: Invalid syntax for option '\csopt{assign-fields}': Expected
 one of \idx{follow} \idx{concat-plus} \idx{startoptional} after
@@ -7878,7 +7904,7 @@ Where \meta{value1} or \meta{value2} is \code{\gls{CAT}\margm{element-list}}, th
 \meta{element-list} will be evaluated and treated as a string, which
 will be null if \meta{element-list} evaluates to null.
 
-\gls{NULL}
+\nosecdef{NULL}
 The null \idx{quark} may only be used as \meta{value2} for the
 equality and inequality comparisons. It can't be used in any other
 context. Note that the numeric \gls{LEN} doesn't return null.
@@ -7895,7 +7921,7 @@ example, \csopt[empty]{assign-missing-field-action}) there will be
 no null values.
 
 \begin{codeenv*}
-\meta{value1}\idx{equalscmp}\inlinedef{NULL}
+\meta{value1}\idx{equalscmp}\gls{NULL}
 \end{codeenv*}
 Evaluates to true if \meta{value1} is null.
 
@@ -7913,7 +7939,7 @@ The detokenized values from a field reference may contain any TAB or
 newline characters or additional spacing that are present in the
 \ext{bib} file (unless they have already been stripped by other
 resource options or field assignments).  However, redundant spacing
-in any literal strings (\qtdelim{\meta{string}} or \margm{string})
+in any literal strings (\qtdelim{\meta{string}} or \code{\margm{string}})
 are likely to be lost when the resource options are written to the
 \ext{aux} file.
 
@@ -7922,7 +7948,7 @@ are likely to be lost when the resource options are written to the
 \meta{value1}=\idx{slashchar}\meta{regex}\idx{slashchar}i
 \end{codeenv}
 Evaluates to true if the value matches the given \gls{anchored} 
-\gls{regular-expression} \meta{regex}. If \code{i} follows the terminating
+\gls{regular-expression} \meta{regex}. If \qtt{i} follows the terminating
 \idx{slashchar} then the match is case-insensitive. No other modifiers
 are recognised, but you can use embedded flag expressions, such as
 \code{?s} for \qt{single-line} mode.
@@ -7930,7 +7956,7 @@ are recognised, but you can use embedded flag expressions, such as
 In the following string comparisons, the right-hand \meta{string} is
 a constant string that must be delimited with double-quotes or braces. The
 comparisons are according to the Unicode code points (not
-locale-sensitive), but if the string is followed by \code{i}, a
+locale-sensitive), but if the string is followed by \qtt{i}, a
 case-insensitive comparison is used.
 
 \begin{codeenv*}
@@ -8485,22 +8511,27 @@ This just does:
 \begin{codeenv}
 \cmd{begingroup}
  \cs{renewcommand}\marg{\ics{glsxtrgroupfield}}\marg{dupgroup}\comment{}
- \cs{printunsrtglossary}\oarg{\printglossopt[copies]{type},\printglossopt[Duplicates]{title},\printglossopt[indexgroup]{style}}
+ \cs{printunsrtglossary}\oarg{\printglossopt[copies]{type},\printglossopt[Duplicates]{title},
+  \printglossopt[indexgroup]{style}}
 \cmd{endgroup}
 \end{codeenv}
 
 \optsection{copy-to-glossary}
 
 This option can selectively copy an entry to a glossary after it has
-been defined. If the supplied value is empty, no copying is
+been defined. If the supplied value \meta{list} is empty, no copying is
 performed (except as a result of other options, such as
-\csopt{action} or \csopt{secondary}).
+\csopt{action} or \csopt{secondary}). If set, the \meta{list}
+argument is a list of string \glspl{concatenation} with optional
+conditionals. Take care that constant strings are correctly
+delimited, as described below, to ensure that they are not mistaken
+for field labels.
 
 The evaluation of the target glossary label for each entry is
 performed while the \ext{glstex} file is being written (after
 sorting) so all field values should be available in any field reference.
 The \csopt{action} option is implemented first, so the
-selected entry will either be defined or copied according to
+selected entry will first either be defined or copied according to
 \csopt{action}. If the \csopt{copy-to-glossary} instruction is
 successful, the entry will then be copied to the target glossary using
 \gls{bibglscopytoglossary}. 
@@ -8512,15 +8543,20 @@ where the syntax for each item in the list is in the form:
 \end{codeenv}
 where \meta{element-list} is a string \gls{concatenation} (see
 \sectionref{sec:optstringconcat}) and \meta{condition} is a complex
-conditional (see \sectionref{sec:conditions}).  For each 
+conditional (see \sectionref{sec:conditionals}).  For each 
 \meta{element-list} \oargm{condition} specification, if the
 condition evaluates to false or if the \meta{element-list} evaluates
-to null then the copy instruction won't be added. This means that
-you can copy an entry to multiple glossaries. The fallback action
-for a missing field value is governed by the
+to null then the copy instruction won't be added.
+The fallback action for a missing field value is governed by the
 \csopt{copy-to-glossary-missing-field-action} setting. The result of
 the string concatenation (if not null) is the label of the target
 glossary.
+
+You can have multiple copy instructions to copy an entry to multiple
+glossaries. The definition of \gls{bibglscopytoglossary} will ensure
+that an entry will only be copied to the designated glossary if it
+isn't already in the glossary's internal list and will silently do
+nothing if the glossary doesn't exist.
 
 Remember that constant strings need to be marked with braces or
 double-quote delimiters. For example, if you want to copy \emph{all}
@@ -8533,7 +8569,7 @@ or
 \csopt[\marg{index}]{copy-to-glossary}
 \end{codeenv}
 Note that the outer braces are stripped by the resource option
-parser, which first splits the \meta{option}=\marg{value} list supplied via
+parser, which first splits the \code{\meta{option}\dequals\margm{value}} list supplied via
 \gls{GlsXtrLoadResources} into \meta{option} and \meta{value} pairs, and then
 parses each \meta{option}. So by the time that the
 \csopt{copy-to-glossary} option has its value parsed, the value has
@@ -8542,7 +8578,7 @@ in the above two examples.
 
 Remember that the \meta{value} itself may be a comma-separated list.
 The outer grouping hides the inner list comma from the initial
-\meta{option}=\marg{value} split.  For example, to copy all entries
+\code{\meta{option}\dequals\margm{value}} split.  For example, to copy all entries
 to the \code{index} and \code{symbols} glossaries:
 \begin{codeenv}
 \csopt[\qtdelim{index}, \qtdelim{symbols}]{copy-to-glossary}
@@ -8563,7 +8599,7 @@ Alternatively, to copy aliased custom entry types
 \begin{codeenv}
 \csopt[
  entrytype \idx{follow} original
-  \oarg{ entrytype \idx{follow} original =\idx{slashchar}person\idx{regexpor}place}\idx{slashchar}
+  \oarg{ entrytype \idx{follow} original =\idx{slashchar}person\idx{regexpor}place\idx{slashchar} }
 ]{copy-to-glossary}
 \end{codeenv}
 
@@ -8578,7 +8614,8 @@ For example:
 ]{copy-to-glossary}
 \end{codeenv}
 Each instruction in the list will be tried and the copy instruction
-will only be written if a non-null value is successfully returned.
+will only be written if the condition evaluates to true and a
+non-null value is successfully returned.
 
 \optsection{copy-to-glossary-missing-field-action}
 
@@ -8636,12 +8673,14 @@ the \csopt{src} option.
 \end{codeenv}
 will assume \csopt[\ics{jobname}]{src}. Remember that subsequent uses
 of \gls{GlsXtrLoadResources} append a suffix, so in general it's
-best to always supply \csopt{src}.
+best to always supply \csopt{src}, except for small test cases with
+a single \gls{resourcecommand}.
 
-If you have non-ASCII characters in the \ext{bib} filename but
-aren't using \XeLaTeX\ or \LuaLaTeX, then you will need to use
-\ics{detokenize} to prevent expansion when the information is
-written to the \ext{aux} file. Similarly for any special characters
+With old \LaTeX\ kernels, if you have non-ASCII characters in the
+\ext{bib} filename but aren't using \XeLaTeX\ or \LuaLaTeX, then you
+will need to use \ics{detokenize} to prevent expansion when the
+information is written to the \ext{aux} file. Newer \LaTeX\ kernels
+have better support for UTF-8. Similarly for any special characters
 that need protecting (although it's better not to use special
 characters in filenames). For example:
 \begin{codeenv}
@@ -10040,9 +10079,15 @@ remove the unwanted characters. (Remember that \isty{babel} can make
 some of these punctuation characters active, in which case they need
 to be stripped.)
 
-\item If \bibgls\ hasn't detected \sty{fontspec} in the document's
-transcript file, the value is then decomposed and all non-ASCII
-characters are removed.
+\item If \bibgls\ doesn't allow non-ASCII characters in labels, the
+value is then decomposed and all non-ASCII characters are removed.
+UTF-8 support is automatic if \bibgls\ detects \sty{fontspec} in the document's
+transcript file, otherwise UTF-8 in labels will only be supported if
+\bibgls\ detects that the versions of \sty{glossaries} and \sty{glossaries-extra}
+are new enough to support it. 
+To ensure better support for UTF-8 with \pdfLaTeX, make sure you
+have a recent \TeX\ distribution and up-to-date versions of
+\sty{glossaries} and \sty{glossaries-extra}.
 \end{enumerate}
 
 For example, suppose the \ext{bib} file contains:
@@ -10062,13 +10107,13 @@ will convert the \field{name} field into:
 \begin{verbatim}
 Angstrom stergaard d'Arcy and Fotheringay-Smythe
 \end{verbatim}
-if the document hasn't used \sty{fontspec} otherwise it will be:
+if \bibgls\ doesn't support non-ASCII characters in labels otherwise it will be:
 \begin{verbatim}
 Ångström Østergaard d'Arcy and Fotheringay-Smythe
 \end{verbatim}
 Note that \O\ is considered an unmodified letter and so can't
 be decomposed into a basic Latin letter with a combining diacritic.
-It's therefore removed completely from the non-\sty{fontspec}
+It's therefore removed completely from the ASCII label
 version. Whereas \AA\ can be decomposed into \qt{A} followed by the
 \qt{combining ring above} character and \"o can be decomposed into \qt{o}
 followed by the \qt{combining diaresis} character. You can use
@@ -10107,7 +10152,7 @@ or:
 \begin{verbatim}
 Ångström, Østergaard, d'Arcy, and Fotheringay-Smythe
 \end{verbatim}
-depending on whether or not \sty{fontspec} was detected.
+depending on whether or not UTF-8 labels are supported.
 
 \optsection[\subsubsection]{labelify-replace}
 
@@ -10169,7 +10214,7 @@ or:
 \begin{verbatim}
 Ångström, Østergaard, d'Arcy,Fotheringay-Smythe
 \end{verbatim}
-depending on whether or not \sty{fontspec} was detected.
+depending on whether or not UTF-8 labels are supported.
 
 Note that this produces the same result regardless of whether or not
 the Oxford comma is present as \verb*|, and | would first be
@@ -10199,7 +10244,7 @@ or:
 \begin{verbatim}
 Ångström,Ostergaard,dArcy,FotheringaySmythe
 \end{verbatim}
-depending on whether or not \sty{fontspec} was detected.
+depending on whether or not UTF-8 labels are supported.
 
 \optsection[\subsubsection]{label-prefix}
 
@@ -13541,7 +13586,8 @@ field and convert \fieldfmt{nametitle} to \idx{titlecase}:
 This means that it's possible to fetch the value of
 \fieldfmt{nametitle} instead of \field{name}, which provides an
 expandable \idx{titlecase} form that's suitable for the PDF
-bookmarks.
+bookmarks. (Note that \LaTeX3 now provides some expandable
+case-changing commands.)
 
 This option isn't cumulative. If used multiple times in the same
 \igls{resourceset}, the last instance will be the one used. If
@@ -13552,8 +13598,8 @@ the \keyvallist\ is missing, no general case-changing is applied
 \label{sec:fallbacks}
 
 The options in this section don't modify any field values but
-provide instructions on what to do if \bibgls\ wants to know a field
-value where the field hasn't been explicitly set. The most common
+provide instructions on what to do if \bibgls\ wants to know the
+value of a field where the field hasn't been explicitly set. The most common
 case is querying the \field{sort} field value with the default
 \csopt[\field{sort}]{sort-field} setting. Being able to vary the
 fallback used according to the \gls{entrytype} allows a more flexible
@@ -15990,8 +16036,8 @@ The special \code{nameref} \glspl{location} (see
 be set.
 
 As from \bibgls\ v1.7, any awkward characters in the file path are
-replaced with \gls{bibglshrefchar} or (for \idx{non-ASCII} characters when
-\sty{fontspec} is loaded) \gls{bibglshrefunicode}. Both commands
+replaced with \gls{bibglshrefchar} or (for \idx{non-ASCII}
+characters, when supported) \gls{bibglshrefunicode}. Both commands
 take two arguments: the hexadecimal character code and the actual
 character. In the case of \gls{bibglshrefchar}, the second
 argument is ignored, and the first is preceded by a literal percent
@@ -16596,7 +16642,7 @@ rule provided by \csopt{sort-rule}.
 rule provided by \csopt{sort-rule}.
 \end{itemize}
 
-Note that \csopt[\meta{locale}]{sort} can provide more detail about the
+Note that \csopt[\meta{lang tag}]{sort} can provide more detail about the
 given locale than \csopt[doc]{sort}, depending on how the document
 language has been specified.  For example, with:
 \begin{codeenv}
