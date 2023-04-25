@@ -1,4 +1,4 @@
-v3.3 (pending):
+v3.3 (2023-04-24):
 
   * bib2gls
 
@@ -11,8 +11,12 @@ v3.3 (pending):
       flatten-lonely-missing-field-action
       copy-to-glossary
       copy-to-glossary-missing-field-action
-      locale
       abbreviation-text-fallback
+      locale
+
+    - default value of sort option is now sort=resource rather than 
+      sort=doc. If the locale option isn't set then sort=resource
+      is equivalent to sort=doc.
 
     - Added support for bib2gls-extra-<lang>.xml files.
 

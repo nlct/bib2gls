@@ -1,8 +1,4 @@
-ifeq ($(origin JAVA8BOOTCLASSLIB),undefined)
-TARGET_VERSION :=
-else
-TARGET_VERSION := -target 1.8 -source 1.8 -bootclasspath $(JAVA8BOOTCLASSLIB)/rt.jar
-endif
+TARGET_VERSION := --release 8
 
 all	: lib/bib2gls.jar lib/convertgls2bib.jar
 
