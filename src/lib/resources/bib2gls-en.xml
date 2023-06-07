@@ -111,6 +111,9 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.added.parent">Adding parent: {0}</entry>
 <entry key="message.adding.child">Adding child {0} to parent {1}</entry>
 <entry key="message.selecting.all">Selecting all entries.</entry>
+<entry key="message.selecting.considering">Considering entry {0} for selection.</entry>
+<entry key="message.not_selected">Entry {0} not selected.</entry>
+<entry key="message.selecting.by-option">Selecting according to {0}.</entry>
 <entry key="message.selecting.entry.records">Selecting entry {0} (has one or more records).</entry>
 <entry key="message.selecting.entry.record.match">Selecting entry {0} (matches record {1}).</entry>
 <entry key="message.selecting.entry.seerecord.match">Selecting entry {0} (matches cross-reference record {1}).</entry>
@@ -118,6 +121,8 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.selecting.entry.crossresource.dep">Selecting entry {0} (cross-resource dependency).</entry>
 <entry key="message.selecting.entry.dualrecords">Selecting entry {0} (dual {1} has one or more records).</entry>
 <entry key="message.selecting.entry.dep">Selecting entry {0} (is dependency).</entry>
+<entry key="message.selecting.entry.match-add">Selecting entry {0} (satisfies match-action=add).</entry>
+<entry key="message.selecting.entry.dual-match-add">Selecting entry {0} (dual satisfies match-action=add).</entry>
 <entry key="message.selecting.entry">Selecting entry {0}.</entry>
 <entry key="message.selecting.entry.before">Selecting entry {0} (selected before).</entry>
 <entry key="message.selecting.entry.record.mgls">Selecting entry {0} (mgls ref {1}).</entry>

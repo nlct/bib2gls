@@ -8280,25 +8280,54 @@ public class GlsResource
          // add all entries that have been recorded in the order of
          // definition
 
+         if (matchAction == MATCH_ACTION_ADD)
+         {
+            bib2gls.debugMessage("message.selecting.by-option", 
+               "match-action=add, selection=" + SELECTION_OPTIONS[selectionMode]);
+         }
+         else
+         {
+            bib2gls.debugMessage("message.selecting.by-option", 
+               "selection=" + SELECTION_OPTIONS[selectionMode]);
+         }
+
          for (Bib2GlsEntry entry : data)
          {
+            bib2gls.debugMessage("message.selecting.considering", entry);
+
             boolean hasRecords = entry.hasRecords();
             Bib2GlsEntry dual = entry.getDual();
+
             boolean dualHasRecords = (dual != null && dual.hasRecords()
               && dualPrimaryDependency);
+
             boolean recordedOrDependent = hasRecords
               || bib2gls.isDependent(entry.getId());
+
             boolean selectedBefore = 
               (selectionMode == SELECTION_SELECTED_BEFORE 
                  && bib2gls.isEntrySelected(entry.getId()));
 
-            if (recordedOrDependent || selectedBefore ||
-                (matchAction == MATCH_ACTION_ADD && fieldPatterns != null
-                 && !notMatch(entry))
-               || (dual != null && 
-                    (dualHasRecords ||
-                       matchAction == MATCH_ACTION_ADD && fieldPatterns != null
-                       && !notMatch(dual))))
+            boolean isMatch = false;
+            boolean isDualMatch = false;
+
+            if (!(recordedOrDependent || selectedBefore))
+            {
+               if (matchAction == MATCH_ACTION_ADD && fieldPatterns != null
+                         && !notMatch(entry))
+               {
+                  isMatch = true;
+               }
+               else if (dual != null && !dualHasRecords
+                    && matchAction == MATCH_ACTION_ADD && fieldPatterns != null
+                    && !notMatch(dual))
+               {
+                  isDualMatch = true;
+               }
+            }
+
+            if (recordedOrDependent || selectedBefore || isMatch
+               || (dual != null && (dualHasRecords || isDualMatch)))
             {
                if (bib2gls.getDebugLevel() > 0)
                {
@@ -8321,6 +8350,16 @@ public class GlsResource
                   {
                      bib2gls.debugMessage("message.selecting.entry.dualrecords",
                       entry, dual);
+                  }
+                  else if (isMatch)
+                  {
+                     bib2gls.debugMessage("message.selecting.entry.match-add",
+                      entry);
+                  }
+                  else if (isDualMatch)
+                  {
+                     bib2gls.debugMessage("message.selecting.entry.dual-match-add",
+                      entry);
                   }
                   else
                   {
@@ -8348,6 +8387,10 @@ public class GlsResource
                   addDependencies(entry, data);
                }
             }
+            else
+            {
+               bib2gls.debugMessage("message.not_selected", entry);
+            }
          }
       }
       else
@@ -8356,6 +8399,9 @@ public class GlsResource
          // (This means they'll be in the correct order if sort=use)
          // This still needs to be done for SELECTION_DEPS_BUT_NOT_RECORDED
          // to ensure hierarchy is added.
+
+         bib2gls.debugMessage("message.selecting.by-option", 
+            "selection=" + SELECTION_OPTIONS[selectionMode]);
 
          for (int i = 0; i < records.size(); i++)
          {
