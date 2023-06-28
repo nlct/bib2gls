@@ -260,6 +260,7 @@ Defaulting to: {0}.
 <entry key="message.no.group.found">{0}: No group found for {1}</entry>
 <entry key="message.compoundset.found">Found compound entry set ''{0}''</entry>
 <entry key="message.mgls.found">Found mgls ref ''{0}''</entry>
+<entry key="message.mgls.nonefound">No mgls references found.</entry>
 <entry key="message.etc"> ETC... </entry>
 
 <entry key="comment.header">% This file was created by {0} v{1} on {2}.</entry>

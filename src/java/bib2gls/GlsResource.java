@@ -8440,31 +8440,38 @@ public class GlsResource
          {
             Vector<String> mrefs = bib2gls.getMglsRefdList();
 
-            for (String compLabel : mrefs)
+            if (mrefs == null)
             {
-               CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
-
-               if (comp != null)
+               bib2gls.verboseMessage("message.mgls.nonefound");
+            }
+            else
+            {
+               for (String compLabel : mrefs)
                {
-                  String[] elements = comp.getElements();
+                  CompoundEntry comp = bib2gls.getCompoundEntry(compLabel);
 
-                  for (String elem : elements)
+                  if (comp != null)
                   {
-                     Bib2GlsEntry entry = getEntry(elem, data);
+                     String[] elements = comp.getElements();
 
-                     if (entry != null && !entry.isSelected())
+                     for (String elem : elements)
                      {
-                        bib2gls.debugMessage("message.selecting.entry.record.mgls",
-                         entry.getId(), compLabel);
+                        Bib2GlsEntry entry = getEntry(elem, data);
 
-                        addEntry(entries, entry);
-
-                        if (selectionMode == SELECTION_RECORDED_AND_DEPS
-                          ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
-                          ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
-                          ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                        if (entry != null && !entry.isSelected())
                         {
-                           addDependencies(entry, data);
+                           bib2gls.debugMessage("message.selecting.entry.record.mgls",
+                            entry.getId(), compLabel);
+
+                           addEntry(entries, entry);
+
+                           if (selectionMode == SELECTION_RECORDED_AND_DEPS
+                             ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
+                             ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE_NOT_ALSO
+                             ||selectionMode == SELECTION_DEPS_BUT_NOT_RECORDED)
+                           {
+                              addDependencies(entry, data);
+                           }
                         }
                      }
                   }

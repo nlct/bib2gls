@@ -1,3 +1,11 @@
+v3.4 ()
+
+  * bib2gls
+
+    - bug fix: NullPointerException occurs if @compoundset found in
+      bib file but no \@glsxtr@mglsrefs found in aux file.
+      https://github.com/nlct/bib2gls/issues/23
+
 v3.3 (2023-04-24):
 
   * bib2gls
