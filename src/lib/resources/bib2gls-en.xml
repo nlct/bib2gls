@@ -34,6 +34,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="syntax.version">{1}, {0}	Display version and exit.</entry>
 <entry key="syntax.help">{1}, {0}	Display this help message and exit.</entry>
 <entry key="syntax.debug">{0} [&lt;n&gt;]	Debug mode.</entry>
+<entry key="syntax.debug-mode">{0} &lt;setting&gt;	TeX Parser debug mode.</entry>
 <entry key="syntax.verbose">{0}	Verbose mode.</entry>
 <entry key="syntax.silent">{1}, {2}, {0}	Only display error messages.</entry>
 <entry key="syntax.group">{1}, {0}	Add ''group'' field to entries.</entry>
@@ -586,6 +587,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="error.syntax.batch.missing_in">Input file required for batch mode</entry>
 <entry key="error.syntax.batch.missing_out">Output directory required for batch mode</entry>
 <entry key="error.syntax.batch.unknown_format">Unknown format ''{0}''</entry>
+<entry key="error.syntax.unknown_debug_mode">Unknown debug mode ''{0}''</entry>
 <entry key="error.exists">{0} already exists</entry>
 <entry key="error.file_exists.nooverwrite">Can''t write to ''{0}'': file already exists (use {1} to force overwrite)</entry>
 <entry key="error.no_matcher">Can''t match group {0}: no match found</entry>

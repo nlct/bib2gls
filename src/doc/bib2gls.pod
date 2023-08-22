@@ -33,7 +33,84 @@ Display version information and exit.
 
 Switch on the debug mode (optionally at the given I<level>, which
 should be a non-negative integer). If I<level> is B<0> then the
-debug mode is switched off.
+debug mode is switched off. If omitted, the level is set to 1, which
+corresponds to B<--debug-mode> B<io>. Any positive number will
+enable all of B<bib2gls>'s debugging messages. The amount of
+TeXParser debugging messages depends on bitwise operation of the level.
+
+=item B<--debug-mode> I<setting>
+
+May be used instead of B<--debug> where the level number is
+difficult to remember. The I<setting> may be a comma-separated list
+of any of the keywords:
+
+=over 4
+
+=item B<all>
+
+Highest level (may result in a large transcript file)
+
+=item B<io>
+
+TeXParser I/O operations and all Bib2Gls debugging messages.
+
+=item B<popped>
+
+TeXParser popping.
+
+=item B<decl>
+
+TeXParser declarations.
+
+=item B<sty-data>
+
+TeXParser data (typically relates to internal objects that don't
+have an analogous TeX macro). This includes data gathered from the
+aux file.
+
+=item B<expansion>
+
+TeXParser expansions (may result in a large transcript file).
+
+=item B<expansion-list>
+
+TeXParser stack expansions (may result in a large transcript file).
+
+=item B<expansion-once>
+
+TeXParser one-level command expansions.
+
+=item B<expansion-once-list>
+
+TeXParser one-level stack expansions.
+
+=item B<process>
+
+TeXParser macro process (may result in a large transcript file).
+
+=item B<process-stack>
+
+TeXParser stack process (may result in a large transcript file).
+
+=item B<process-stack-list>
+
+TeXParser detailed stack process (may result in a large transcript file).
+
+=item B<process-generic-cs>
+
+TeXParser generic command process.
+
+=item B<cs>
+
+TeXParser command definitions.
+
+=item B<catcode>
+
+TeXParser category code changes.
+
+=back
+
+For example: C<bib2gls --debug-mode io,catcode,sty-data mydoc>
 
 =item B<--no-debug> (or B<--nodebug>)
 

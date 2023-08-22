@@ -1107,7 +1107,7 @@ public class Bib2Gls implements TeXApp
       listener.setIsInDocEnv(true);
       listener.setSupportUnicodeScript(supportUnicodeSubSuperScripts);
 
-      interpreter = new TeXParser(listener);
+      interpreter = createTeXParser(listener);
 
       interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
 
@@ -1932,7 +1932,9 @@ public class Bib2Gls implements TeXApp
 
       auxParser.setAllowCatCodeChangers(allowAuxCatChangers);
 
-      TeXParser parser = auxParser.parseAuxFile(auxFile);
+      TeXParser parser = createTeXParser(auxParser);
+
+      auxParser.parseAuxFile(parser, auxFile);
 
       glsresources = new Vector<GlsResource>();
       fields = new Vector<String>();
@@ -4167,6 +4169,21 @@ public class Bib2Gls implements TeXApp
       return mfirstucProtectFields;
    }
 
+   /**
+    * Creates a new TeXParser instance. 
+    */ 
+   public TeXParser createTeXParser(TeXParserListener listener)
+   {
+      TeXParser parser = new TeXParser(listener);
+
+      if (debugLevel > 0)
+      {
+         parser.setDebugMode(debugLevel, logWriter);
+      }
+
+      return parser;
+   }
+
    public void logEncodingDetected(Charset charset)
    {
       logMessage(getMessage("message.detected.charset", charset)); 
@@ -5462,6 +5479,7 @@ public class Bib2Gls implements TeXApp
       printSyntaxItem(getMessage("syntax.help", "--help", "-h"));
       printSyntaxItem(getMessage("syntax.version", "--version", "-v"));
       printSyntaxItem(getMessage("syntax.debug", "--[no-]debug"));
+      printSyntaxItem(getMessage("syntax.debug-mode", "--debug-mode"));
       printSyntaxItem(getMessage("syntax.verbose", "--[no-]verbose"));
       printSyntaxItem(getMessage("syntax.silent", "--silent", "-q", "--quiet"));
 
@@ -6039,6 +6057,83 @@ public class Bib2Gls implements TeXApp
          else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
          {
             debugLevel = 0;
+         }
+         else if (args[i].equals("--debug-mode"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            debugLevel = 0;
+
+            String[] split = argVal[1].toString().split(",");
+      
+            for (String mode : split)
+            {
+               if (mode.equals("all"))
+               {
+                  debugLevel = Integer.MAX_VALUE;
+               }
+               else if (mode.equals("io"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_IO;
+               }
+               else if (mode.equals("popped"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_POPPED;
+               }
+               else if (mode.equals("decl"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_DECL;
+               }
+               else if (mode.equals("sty-data"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_STY_DATA;
+               }
+               else if (mode.equals("expansion"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION;
+               }
+               else if (mode.equals("expansion-list"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_LIST;
+               }
+               else if (mode.equals("expansion-once"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE;
+               }
+               else if (mode.equals("expansion-once-list"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
+               }
+               else if (mode.equals("process"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING;
+               }
+               else if (mode.equals("process-stack"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK;
+               }
+               else if (mode.equals("process-stack-list"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK_LIST;
+               }
+               else if (mode.equals("cs"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_CS;
+               }
+               else if (mode.equals("process-generic-cs"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
+               }
+               else if (mode.equals("catcode"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_CATCODE;
+               }
+               else
+               {
+                  throw new Bib2GlsSyntaxException(
+                    getMessage("error.syntax.unknown_debug_mode", mode));
+               }
+            }
          }
          else if (args[i].equals("--verbose"))
          {
@@ -6897,8 +6992,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.4";
-   public static final String DATE = "2023-06-29";
+   public static final String VERSION = "3.4.20230822";
+   public static final String DATE = "2023-08-22";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
