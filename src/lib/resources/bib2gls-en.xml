@@ -217,6 +217,7 @@ Defaulting to: {0}.
 <entry key="message.tex.charset">TeX character encoding: {0}</entry>
 <entry key="message.detected.charset">Detected encoding: {0}</entry>
 <entry key="message.default.charset">Default encoding: {0}</entry>
+<entry key="message.assuming.charset">Assuming encoding: {0}</entry>
 <entry key="message.null">not set</entry>
 <entry key="message.detected.fontenc">Detected font encoding: {0}</entry>
 <entry key="message.missing.id">id missing</entry>

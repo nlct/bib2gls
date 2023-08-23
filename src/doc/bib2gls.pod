@@ -108,6 +108,11 @@ TeXParser command definitions.
 
 TeXParser category code changes.
 
+=item B<read>
+
+TeXParser codepoint read from file (may result in very large
+transcript file).
+
 =back
 
 For example: C<bib2gls --debug-mode io,catcode,sty-data mydoc>

@@ -2131,7 +2131,7 @@ public class Bib2Gls implements TeXApp
                    // then that command was most probably set to \relax
                    // for some reason. In which case ignore it.
 
-                   texCharset = Charset.defaultCharset();
+                   texCharset = getDefaultCharset();
                 }
                 else
                 {
@@ -2140,7 +2140,7 @@ public class Bib2Gls implements TeXApp
              }
              catch (Bib2GlsException e)
              {
-                texCharset = Charset.defaultCharset();
+                texCharset = getDefaultCharset();
 
                 warningMessage("error.unknown.tex.charset",
                   e.getMessage(), texCharset, "--tex-encoding");
@@ -2590,7 +2590,7 @@ public class Bib2Gls implements TeXApp
 
       if (texCharset == null)
       {
-         texCharset = Charset.defaultCharset();
+         texCharset = getDefaultCharset();
 
          logMessage(getMessage("message.unknown.tex.charset", texCharset,
            "--tex-encoding"));
@@ -2894,6 +2894,12 @@ public class Bib2Gls implements TeXApp
    public Charset getTeXCharset()
    {
       return texCharset;
+   }
+
+   @Override
+   public Charset getDefaultCharset()
+   {
+      return defaultCharset;
    }
 
    public boolean useCiteAsRecord()
@@ -6674,6 +6680,20 @@ public class Bib2Gls implements TeXApp
 
             texCharset = Charset.forName(arg);
          }
+         else if (isArg(args[i], "default-encoding"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            String arg = (String)argVal[1];
+
+            if (arg == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            defaultCharset = Charset.forName(arg);
+         }
          else if (args[i].equals("--trim-fields"))
          {
             trimFields = true;
@@ -6847,7 +6867,8 @@ public class Bib2Gls implements TeXApp
 
       try
       {
-         logWriter = new PrintWriter(new FileWriter(logFile));
+         logWriter = new PrintWriter(Files.newBufferedWriter(logFile.toPath(),
+           defaultCharset));
       }
       catch (IOException e)
       {
@@ -6865,6 +6886,8 @@ public class Bib2Gls implements TeXApp
          logMessage(String.format("texparserlib.jar %s (%s)",
             TeXParser.VERSION, TeXParser.VERSION_DATE));
       }
+
+      logDefaultEncoding(defaultCharset);
 
       if (logWriter != null)
       {
@@ -7128,6 +7151,8 @@ public class Bib2Gls implements TeXApp
      saveRecordCountUnit=false, commonCommandsDone=false;
 
    private Charset texCharset = null;
+
+   private Charset defaultCharset = Charset.defaultCharset();
 
    private boolean useCiteAsRecord=false;
 

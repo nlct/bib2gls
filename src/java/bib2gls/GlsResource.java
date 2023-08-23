@@ -6666,6 +6666,13 @@ public class GlsResource
             }
          }
 
+         if (srcCharset == null)
+         {
+            srcCharset = bib2gls.getDefaultCharset();
+            bib2gls.logMessage(bib2gls.getMessage("message.assuming.charset", 
+              srcCharset));
+         }
+
          bibParserListener.setCharSet(srcCharset);
          bibParserListener.parse(bibFile);
       }
