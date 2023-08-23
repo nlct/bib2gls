@@ -6128,6 +6128,10 @@ public class Bib2Gls implements TeXApp
                {
                   debugLevel = debugLevel | TeXParser.DEBUG_CATCODE;
                }
+               else if (mode.equals("read"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_READ;
+               }
                else
                {
                   throw new Bib2GlsSyntaxException(
@@ -6992,8 +6996,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.4.20230822";
-   public static final String DATE = "2023-08-22";
+   public static final String VERSION = "3.4.20230823";
+   public static final String DATE = "2023-08-23";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 

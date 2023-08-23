@@ -76,8 +76,64 @@ public class Bib2GlsEntryComparator extends SortComparator
       if (collator instanceof RuleBasedCollator && bib2gls.getDebugLevel() > 0)
       {
          bib2gls.logMessage(bib2gls.getMessage("message.collator.rules",
-           ((RuleBasedCollator)collator).getRules()));
+           ruleString(((RuleBasedCollator)collator).getRules())));
       }
+   }
+
+   private String ruleString(String rules)
+   {
+      StringBuilder builder = new StringBuilder(rules.length());
+
+      int colCount = 0;
+
+      for (int i = 0; i < rules.length(); )
+      {
+         int cp = rules.codePointAt(i);
+         i += Character.charCount(cp);
+
+         int type = Character.getType(cp);
+
+         if (type == Character.CURRENCY_SYMBOL
+          || type == Character.DASH_PUNCTUATION
+          || type == Character.DECIMAL_DIGIT_NUMBER
+          || type == Character.END_PUNCTUATION
+          || type == Character.FINAL_QUOTE_PUNCTUATION
+          || type == Character.INITIAL_QUOTE_PUNCTUATION
+          || type == Character.LETTER_NUMBER
+          || type == Character.LOWERCASE_LETTER
+          || type == Character.MATH_SYMBOL
+          || type == Character.OTHER_LETTER
+          || type == Character.OTHER_NUMBER
+          || type == Character.OTHER_PUNCTUATION
+          || type == Character.OTHER_SYMBOL
+          || type == Character.START_PUNCTUATION
+          || type == Character.TITLECASE_LETTER
+          || type == Character.UPPERCASE_LETTER)
+         {
+            colCount++;
+
+            if (colCount > RULE_STRING_BREAK_AFTER 
+                 && (cp == '=' || cp == ';' || cp == '<'))
+            {
+               builder.append(String.format("%n"));
+               colCount = 0;
+            }
+
+            builder.appendCodePoint(cp);
+         }
+         else
+         {
+            char[] chrs = Character.toChars(cp);
+
+            for (char c : chrs)
+            {
+               builder.append(String.format("\\u%04x", (int)c));
+               colCount+=6;
+            }
+         }
+      }
+
+      return builder.toString();
    }
 
    private void setBreakPoint(int breakPoint)
@@ -569,4 +625,6 @@ public class Bib2GlsEntryComparator extends SortComparator
    public static final int BREAK_NONE=0, BREAK_WORD=1, BREAK_CHAR=2,
      BREAK_SENTENCE=3, BREAK_UPPER_NOTLOWER=4, BREAK_UPPER_UPPER=5,
      BREAK_UPPER_NOTLOWER_WORD=6, BREAK_UPPER_UPPER_WORD=7;
+
+   public static final int RULE_STRING_BREAK_AFTER=60;
 }
