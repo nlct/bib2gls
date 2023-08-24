@@ -35,8 +35,8 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Calendar;
 
-// Requires at least Java 1.7:
 import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 
@@ -767,7 +767,7 @@ public class Bib2Gls implements TeXApp
       String basename = name.substring(0, idx);
       name = basename+".log";
 
-      File logFile = new File(auxFile.getParentFile(), name);
+      texLogFile = new File(auxFile.getParentFile(), name);
 
       BufferedReader in = null;
 
@@ -791,9 +791,12 @@ public class Bib2Gls implements TeXApp
 
       try
       {
-         checkReadAccess(logFile);
+         checkReadAccess(texLogFile);
 
-         in = new BufferedReader(new FileReader(logFile));
+         logMessage(getMessage("message.reading", texLogFile));
+         logEncoding(texLogCharset);
+
+         in = Files.newBufferedReader(texLogFile.toPath(), getTeXLogCharset());
 
          String line = null;
 
@@ -1516,6 +1519,8 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(listener.createSymbol("bibglscircumchar", '^'));
       listener.putControlSequence(listener.createSymbol("glsbackslash", '\\'));
       listener.putControlSequence(listener.createSymbol("glstildechar", '~'));
+      listener.putControlSequence(listener.createSymbol("glsopenbrace", '{'));
+      listener.putControlSequence(listener.createSymbol("glsclosebrace", '}'));
       listener.putControlSequence(listener.createSymbol("bibglsaposchar", '\''));
       listener.putControlSequence(listener.createSymbol("bibglsdoublequotechar", '"'));
 
@@ -1524,6 +1529,9 @@ public class Bib2Gls implements TeXApp
       listener.putControlSequence(new HrefChar());
       listener.putControlSequence(new AtSecondOfTwo("bibglshrefunicode"));
       listener.putControlSequence(new HexUnicodeChar());
+
+      // only defined by bib2gls interpreter:
+      listener.putControlSequence(new Bib2GlsPadNDigits());
 
       listener.putControlSequence(new GlsCombinedSep());
       listener.putControlSequence(new GlsCombinedSep("glscombinedfirstsep"));
@@ -1866,6 +1874,12 @@ public class Bib2Gls implements TeXApp
       {
          parseLog();
       }
+      catch (MalformedInputException e)
+      {
+         warningMessage("error.cant.parse.file.malformed.input", texLogFile, 
+           getTeXLogCharset(), "--log-encoding", "--default-encoding");
+         debug(e);
+      }
       catch (IOException e)
       {
          // Parsing the log file isn't essential although it
@@ -1873,7 +1887,7 @@ public class Bib2Gls implements TeXApp
          // if the TeX engine natively supports Unicode, and if
          // hyperref is available.
 
-         warningMessage("warning.cant.parse.file", logFile, 
+         warningMessage("warning.cant.parse.file", texLogFile, 
            e.getMessage());
          debug(e);
       }
@@ -1894,7 +1908,9 @@ public class Bib2Gls implements TeXApp
          }
       }
 
-      AuxParser auxParser = new AuxParser(this, texCharset)
+      Charset auxCharset = texCharset==null ? getDefaultCharset() : texCharset;
+
+      AuxParser auxParser = new AuxParser(this, auxCharset)
       {
          protected void addPredefined()
          {
@@ -1934,7 +1950,16 @@ public class Bib2Gls implements TeXApp
 
       TeXParser parser = createTeXParser(auxParser);
 
-      auxParser.parseAuxFile(parser, auxFile);
+      try
+      {
+         auxParser.parseAuxFile(parser, auxFile);
+      }
+      catch (MalformedInputException e)
+      {
+         throw new IOException(getMessage(
+           "error.cant.parse.file.malformed.input", auxFile,
+             auxCharset, "--tex-encoding", "--default-encoding", e));
+      }
 
       glsresources = new Vector<GlsResource>();
       fields = new Vector<String>();
@@ -2817,7 +2842,7 @@ public class Bib2Gls implements TeXApp
             logWriter = null;
          }
 
-         message(getMessage("message.log.file", logFile));
+         message(getMessage("message.log.file", glgLogFile));
       }
    }
 
@@ -2894,6 +2919,11 @@ public class Bib2Gls implements TeXApp
    public Charset getTeXCharset()
    {
       return texCharset;
+   }
+
+   public Charset getTeXLogCharset()
+   {
+      return texLogCharset == null ? getDefaultCharset() : texLogCharset;
    }
 
    @Override
@@ -5500,6 +5530,10 @@ public class Bib2Gls implements TeXApp
       printSyntaxItem(getMessage("syntax.log", "--log-file", "-t"));
       printSyntaxItem(getMessage("syntax.tex.encoding",
          "--tex-encoding"));
+      printSyntaxItem(getMessage("syntax.log.encoding",
+         "--log-encoding"));
+      printSyntaxItem(getMessage("syntax.default.encoding",
+         "--default-encoding"));
 
       System.out.println();
       System.out.println(getMessage("syntax.options.interpreter"));
@@ -6074,6 +6108,8 @@ public class Bib2Gls implements TeXApp
       
             for (String mode : split)
             {
+               mode = mode.trim();
+
                if (mode.equals("all"))
                {
                   debugLevel = Integer.MAX_VALUE;
@@ -6144,6 +6180,8 @@ public class Bib2Gls implements TeXApp
                     getMessage("error.syntax.unknown_debug_mode", mode));
                }
             }
+
+            verboseLevel = 1;
          }
          else if (args[i].equals("--verbose"))
          {
@@ -6694,6 +6732,20 @@ public class Bib2Gls implements TeXApp
 
             defaultCharset = Charset.forName(arg);
          }
+         else if (isArg(args[i], "log-encoding"))
+         {
+            i = parseArgVal(args, i, argVal);
+
+            String arg = (String)argVal[1];
+
+            if (arg == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", argVal[0]));
+            }
+
+            texLogCharset = Charset.forName(arg);
+         }
          else if (args[i].equals("--trim-fields"))
          {
             trimFields = true;
@@ -6849,32 +6901,32 @@ public class Bib2Gls implements TeXApp
          System.exit(0);
       }
 
-      logFile = null;
+      glgLogFile = null;
 
       if (logName == null)
       {
          String base = auxFile.getName();
 
-         logFile = new File(dir,
+         glgLogFile = new File(dir,
             base.substring(0,base.lastIndexOf("."))+".glg");
       }
       else
       {
-         logFile = resolveFile(logName);
+         glgLogFile = resolveFile(logName);
       }
 
-      logFile = getWritableFile(logFile);
+      glgLogFile = getWritableFile(glgLogFile);
 
       try
       {
-         logWriter = new PrintWriter(Files.newBufferedWriter(logFile.toPath(),
+         logWriter = new PrintWriter(Files.newBufferedWriter(glgLogFile.toPath(),
            defaultCharset));
       }
       catch (IOException e)
       {
          logWriter = null;
          System.err.println(getMessage("error.cant.open.log", 
-            logFile.toString()));
+            glgLogFile.toString()));
          error(e);
       }
 
@@ -6892,6 +6944,7 @@ public class Bib2Gls implements TeXApp
       if (logWriter != null)
       {
          logWriter.print(pending.toString());
+         logWriter.flush();
       }
 
       pendingWriter.close();
@@ -6920,7 +6973,7 @@ public class Bib2Gls implements TeXApp
             bib2gls.message(bib2gls.getMessageWithFallback(
               "message.log.file", 
               "Transcript written to {0}.",
-               bib2gls.logFile));
+               bib2gls.glgLogFile));
 
             bib2gls.logWriter = null;
          }
@@ -7019,8 +7072,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.4.20230823";
-   public static final String DATE = "2023-08-23";
+   public static final String VERSION = "3.5";
+   public static final String DATE = "2023-08-24";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -7031,7 +7084,8 @@ public class Bib2Gls implements TeXApp
    private Path basePath;
 
    private File auxFile;
-   private File logFile;
+   private File glgLogFile;
+   private File texLogFile;
    private PrintWriter logWriter=null;
    private StringWriter pending = null;
    private PrintWriter pendingWriter = null;
@@ -7150,7 +7204,7 @@ public class Bib2Gls implements TeXApp
    private boolean addGroupField = false, saveRecordCount=false,
      saveRecordCountUnit=false, commonCommandsDone=false;
 
-   private Charset texCharset = null;
+   private Charset texCharset = null, texLogCharset;
 
    private Charset defaultCharset = Charset.defaultCharset();
 
