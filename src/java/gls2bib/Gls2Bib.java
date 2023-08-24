@@ -864,7 +864,7 @@ public class Gls2Bib extends LaTeXParserListener
       if (charset == null)
       {
          message(getMessage("message.default.charset", 
-            Charset.defaultCharset()));
+            getDefaultCharset()));
       }
       else
       {
@@ -876,6 +876,12 @@ public class Gls2Bib extends LaTeXParserListener
    public Charset getCharSet()
    {
       return charset;
+   }
+
+   @Override
+   public Charset getDefaultCharset()
+   {
+      return charset == null ? Charset.defaultCharset() : charset;
    }
 
    /*
@@ -1814,8 +1820,8 @@ public class Gls2Bib extends LaTeXParserListener
       expandFieldMap.put(field, Boolean.valueOf(on));
    }
 
-   public static final String VERSION = "3.4";
-   public static final String DATE = "2023-06-29";
+   public static final String VERSION = "3.5";
+   public static final String DATE = "2023-08-24";
    public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

@@ -41,7 +41,9 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="syntax.locale">{1}, {0} &lt;lang&gt;	Use language resource file for &lt;lang&gt; and identify this as the default document language.</entry>
 <entry key="syntax.log">{1}, {0} &lt;file&gt;	Set transcript file name.</entry>
 <entry key="syntax.dir">{1}, {0} &lt;directory&gt;	Files relative to &lt;directory&gt;.</entry>
-<entry key="syntax.tex.encoding">{0} &lt;name&gt;	Set the character encoding for the output files.</entry>
+<entry key="syntax.tex.encoding">{0} &lt;name&gt;	Set the character encoding for the glg and glstex output files and the aux and log input files.</entry>
+<entry key="syntax.log.encoding">{0} &lt;name&gt;	Set the character encoding for the log input file.</entry>
+<entry key="syntax.default.encoding">{0} &lt;name&gt;	Set the default character encoding for all input and output files.</entry>
 <entry key="syntax.interpret">{0}	Enable interpreter.</entry>
 <entry key="syntax.break.space">{0}	Interpret tilde character as normal space.</entry>
 <entry key="syntax.obey.aux.catcode">{0}	Obey known category code changing commands encountered in the aux file.</entry>
@@ -297,8 +299,7 @@ Defaulting to: {0}.
 <entry key="warning.unsupported.generic">Not supported: {0}</entry>
 
 <!-- bib2gls warnings -->
-<entry key="warning.cant.parse.file">Can''t parse {0}
-{1}</entry>
+<entry key="warning.cant.parse.file">Can''t parse {0} ({1})</entry>
 <entry key="warning.ignoring.unknown.entry.type">Ignoring unknown entry type: {0}</entry>
 <entry key="warning.private.entry.type">Private entry type ''{0}'' found. Did you mean ''{1}''?</entry>
 <entry key="warning.ignoring.unknown.encoding">Ignoring unknown encoding: {0}</entry>
@@ -401,6 +402,8 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.only.one.aux">Only one aux file permitted.</entry>
 <entry key="error.no.aux">Aux file not supplied. {0}</entry>
 <entry key="error.file.not.found">File not found: {0}</entry>
+<entry key="error.cant.parse.file.malformed.input">Can''t parse {0}: may not be {1} encoded.
+(Try a different encoding with {2} or {3}.)</entry>
 <entry key="error.missing.src">File not found: {0}
 (Did you forget to use the ''src'' key?)</entry>
 <entry key="error.dir.not.found">Directory not found: {0}</entry>

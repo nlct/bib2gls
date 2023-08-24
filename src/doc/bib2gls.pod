@@ -21,22 +21,33 @@ or in a location that can be found by kpsewhich.
 
 =over 4
 
-=item B<--help> or B<-h>
+=item B<--break-space>
 
-Display help message and exit.
+Interpret C<~> (tilde) character and C<\nobreakspace> as a normal space.
 
-=item B<--version> or B<-v>
+=item B<--cite-as-record>
 
-Display version information and exit.
+Treat C<\citation> as an ignored record.
 
-=item B<--debug> [I<level>]
+=item B<--collapse-same-location-range>
 
-Switch on the debug mode (optionally at the given I<level>, which
-should be a non-negative integer). If I<level> is B<0> then the
-debug mode is switched off. If omitted, the level is set to 1, which
+Collapse an explicit range that has a duplicate start and end
+location into a normal record (default).
+
+=item B<--custom-packages> I<list>
+
+Instruct the TeX parser library to attempt to parse the 
+packages listed in I<list>. This is intended for simple custom
+packages that don't contain complex code.
+
+=item B<--debug> [I<n>]
+
+Switch on the debug mode at the given setting I<n>, which
+should be a non-negative integer. If I<n> is B<0> then the
+debug mode is switched off. If omitted, I<n> is set to 1, which
 corresponds to B<--debug-mode> B<io>. Any positive number will
 enable all of B<bib2gls>'s debugging messages. The amount of
-TeXParser debugging messages depends on bitwise operation of the level.
+TeX Parser Library debugging messages depends on bitwise operation of I<n>.
 
 =item B<--debug-mode> I<setting>
 
@@ -48,236 +59,101 @@ of any of the keywords:
 
 =item B<all>
 
-Highest level (may result in a large transcript file)
-
-=item B<io>
-
-TeXParser I/O operations and all Bib2Gls debugging messages.
-
-=item B<popped>
-
-TeXParser popping.
-
-=item B<decl>
-
-TeXParser declarations.
-
-=item B<sty-data>
-
-TeXParser data (typically relates to internal objects that don't
-have an analogous TeX macro). This includes data gathered from the
-aux file.
-
-=item B<expansion>
-
-TeXParser expansions (may result in a large transcript file).
-
-=item B<expansion-list>
-
-TeXParser stack expansions (may result in a large transcript file).
-
-=item B<expansion-once>
-
-TeXParser one-level command expansions.
-
-=item B<expansion-once-list>
-
-TeXParser one-level stack expansions.
-
-=item B<process>
-
-TeXParser macro process (may result in a large transcript file).
-
-=item B<process-stack>
-
-TeXParser stack process (may result in a large transcript file).
-
-=item B<process-stack-list>
-
-TeXParser detailed stack process (may result in a large transcript file).
-
-=item B<process-generic-cs>
-
-TeXParser generic command process.
-
-=item B<cs>
-
-TeXParser command definitions.
+Highest level (likely to result in a large transcript file). Equivalent to
+switching on all settings.
 
 =item B<catcode>
 
-TeXParser category code changes.
+TeX Parser category code changes.
+
+=item B<cs>
+
+TeX Parser command definitions.
+
+=item B<decl>
+
+TeX Parser declarations.
+
+=item B<expansion>
+
+TeX Parser expansions (may result in a large transcript file).
+
+=item B<expansion-list>
+
+TeX Parser stack expansions (may result in a large transcript file).
+
+=item B<expansion-once>
+
+TeX Parser one-level expansions.
+
+=item B<expansion-once-list>
+
+TeX Parser one-level list expansions.
+
+=item B<io>
+
+TeX Parser I/O operations (open, close and fetch token).
+
+=item B<popped>
+
+TeX Parser stack popping.
+
+=item B<process>
+
+TeX Parser macro process (may result in a large transcript file).
+
+=item B<process-generic-cs>
+
+TeX Parser generic command process.
+
+=item B<process-stack>
+
+TeX Parser stack process (may result in a large transcript file).
+
+=item B<process-stack-list>
+
+TeX Parser detailed stack process (may result in a large transcript file).
 
 =item B<read>
 
-TeXParser codepoint read from file (may result in very large
+TeX Parser codepoint read from file (likely to result in a large
 transcript file).
+
+=item B<sty-data>
+
+TeX Parser data (typically relates to internal objects that don't
+have an analogous TeX macro). This includes data gathered from the
+aux file.
 
 =back
 
 For example: C<bib2gls --debug-mode io,catcode,sty-data mydoc>
 
-=item B<--no-debug> (or B<--nodebug>)
+=item B<--default-encoding> I<name>
 
-Switch off debug mode. (Equivalent to B<--debug> B<0>)
-
-=item B<--verbose>
-
-Switch on verbose mode.
-
-=item B<--no-verbose> (or B<--noverbose>)
-
-Switch off verbose mode. (Some messages will still be written to
-STDOUT.)
-
-=item B<--silent>
-
-Only display error messages. All other messages are just written to
-the transcript file.
-
-=item B<--locale> I<lang> (or B<-l> I<lang>)
-
-Use language resource file for I<lang> (which should be an IETF
-locale tag). 
-
-=item B<--log-file> I<file> (or B<-t> <file>)
-
-Set the transcript file.
+Set the default character encoding for input and output files.
+If omitted, the JVM default encoding is assumed.
 
 =item B<--dir> I<directory> (or B<-d> <directory>)
 
 Files are relative to I<directory>. (This doesn't change the current
 working directory.)
 
-=item B<--tex-encoding> I<name>
+=item B<--expand-fields>
 
-Set the character encoding for the output files. This overrides the
-setting given in I<auxfile>.
-
-=item B<--interpret>
-
-Use the TeX parser library to interpret known (La)TeX commands
-(default).
-
-=item B<--no-interpret>
-
-Don't try interpreting (La)TeX commands.
-
-=item B<--break-space>
-
-Interpret C<~> (tilde) character and C<\nobreakspace> as a normal space.
-
-=item B<--no-break-space>
-
-Interpret C<~> (tilde) and C<\nobreakspace> as a non-breaking space (default).
-
-=item B<--obey-aux-catcode>
-
-Obey known category code changing commands encountered in the aux
-file.
-
-=item B<--no-obey-aux-catcode>
-
-Ignore category code changing commands encountered in the aux file.
-
-=item B<--cite-as-record>
-
-Treat C<\citation> as an ignored record.
-
-=item B<--no-cite-as-record>
-
-Don't check for instances of C<\citation> in the F<.aux> file (default).
-
-=item B<--warn-non-bib-fields>
-
-Warn if internal non-bib fields are found in the F<.bib> file.
-
-=item B<--no-warn-non-bib-fields>
-
-Don't warn if internal non-bib fields are found in the F<.bib> file.
-The use of these internal fields can cause unexpected results, so
-only use this option if you have taken appropriate precautions.
-
-=item B<--warn-unknown-entry-types>
-
-Warn if any unknown entry types are found in the F<.bib> file.
-
-=item B<--no-warn-unknown-entry-types>
-
-Don't warn if any unknown entry types are found in the F<.bib> file.
-
-=item B<--merge-wrglossary-records>
-
-Merge an entry's B<wrglossary> records for the same page locations.
-(For use with the B<indexcounter> package option.)
-
-=item B<--no-merge-wrglossary-records>
-
-Don't merge an entry's B<wrglossary> records.
-
-=item B<--collapse-same-location-range>
-
-Collapse an explicit range that has a duplicate start and end
-location into a normal record (default).
-
-=item B<--no-collapse-same-location-range>
-
-Don't collapse an explicit range that has a duplicate start and end
-location into a normal record.
-
-=item B<--retain-formats> I<list>
-
-Indicates which location formats should always be retained even if
-it causes a partial duplicate. Only exact duplicates will be merged.
-
-=item B<--no-retain-formats>
-
-Normal location merging rules apply (default).
-
-=item B<--merge-nameref-on> I<rule>
-
-Rule for merging locations created with the B<record=nameref> package option
-(requires F<glossaries-extra.sty> version 1.37+). The I<rule> may be
-one of: B<hcounter>, B<href>, B<title> or B<location>.
+Don't write C<\glsnoexpandfields> to the F<.glstex> file.
 
 =item B<--force-cross-resource-refs> or B<-x>
 
 Force cross-resource referencing mode on.
 
-=item B<--no-force-cross-resource-refs>
+=item B<--group> or B<-g>
 
-Don't force cross-resource referencing mode on (default).
+Add B<group> field to entries.
 
-=item B<--support-unicode-script>
+=item B<--help> or B<-h>
 
-Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
-will use Unicode superscript/subscript characters if available.
-For example, C<\textsuperscript{2}> will be converted to U+00B2
-(superscript two).
-
-=item B<--no-support-unicode-script>
-
-Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
-won't be converted to Unicode superscript/subscript characters.
-For example, C<\textsuperscript{2}> will be converted to C<E<lt>supE<gt>2E<lt>/supE<gt>>
-and the markup will be stripped leaving just the character 2.
-
-=item B<--packages> I<list> (or B<-p> I<list>)
-
-Instruct the TeX parser library to pretend the packages listed 
-in I<list> have been used by the document. Note that there's only a
-limited number of packages supported by the TeX parser library.
-This option has a cumulative action so B<--packages wasysym,pifont>
-is the same as B<--packages wasysym --packages pifont>.
-
-You can find out the list of supported packages with
-B<--list-known-packages>.
-
-=item B<--custom-packages> I<list>
-
-Instruct the TeX parser library to attempt to parse the 
-packages listed in I<list>. This is intended for simple custom
-packages that don't contain complex code.
+Display help message and exit.
 
 =item B<--ignore-packages> I<list> (or B<-k> I<list>)
 
@@ -288,11 +164,49 @@ interpreter will check if it's supported. This option has a
 cumulative action. Only known packages may be included in
 I<list>.
 
+=item B<--interpret>
+
+Use the TeX Parser Library to interpret known (La)TeX commands
+(default).
+
 =item B<--list-known-packages>
 
 Lists all the packages that have are known to the TeX parser
 library and then exits (with exit code 0). Any of the listed
 packages may be used in B<--packages> or B<--ignore-packages>.
+
+=item B<--locale> I<lang> (or B<-l> I<lang>)
+
+Use language resource file for I<lang> (which should be an IETF
+locale tag). 
+
+=item B<--log-encoding> I<name>
+
+Set the character encoding for the F<log> files (which may not be
+the same as the encoding for the document LaTeX files). 
+
+=item B<--log-file> I<file> (or B<-t> <file>)
+
+Set the transcript file.
+
+=item B<--merge-nameref-on> I<rule>
+
+Rule for merging locations created with the B<record=nameref> package option
+(requires F<glossaries-extra.sty> version 1.37+). The I<rule> may be
+one of: B<hcounter>, B<href>, B<title> or B<location>.
+
+=item B<--merge-wrglossary-records>
+
+Merge an entry's B<wrglossary> records for the same page locations.
+(For use with the B<indexcounter> package option.)
+
+=item B<--mfirstuc-math-protection>
+
+Switch on the auto-insertion of an empty group for math-shift (C<$>).
+
+If F<mfirstuc> v2.08+, F<glossaries> v4.50+ and F<glossaries-extra> v1.49+ 
+are detected, the default will be B<--no-mfirstuc-math-protection>
+as there should no longer be any need for this protection.
 
 =item B<--mfirstuc-protection> I<fields>|B<all> (or B<-u> I<fields>|B<all>)
 
@@ -307,22 +221,6 @@ If F<mfirstuc> v2.08+, F<glossaries> v4.50+ and F<glossaries-extra> v1.49+
 are detected, the default will be B<--no-mfirstuc-protection>
 as there should no longer be any need for this protection.
 
-=item B<--no-mfirstuc-protection>
-
-Switch off the auto-insertion of an empty group for all fields.
-
-=item B<--mfirstuc-math-protection>
-
-Switch on the auto-insertion of an empty group for math-shift (C<$>).
-
-If F<mfirstuc> v2.08+, F<glossaries> v4.50+ and F<glossaries-extra> v1.49+ 
-are detected, the default will be B<--no-mfirstuc-math-protection>
-as there should no longer be any need for this protection.
-
-=item B<--no-mfirstuc-math-protection>
-
-Switch off the auto-insertion of an empty group for math-shift (C<$>).
-
 =item B<--nested-link-check> I<list>|B<none>
 
 Check each field listed in I<list> for potentially problematic
@@ -331,30 +229,141 @@ firstplural, short, shortplural, long, longplural, symbol).
 
 If B<none>, disable check.
 
+=item B<--no-break-space>
+
+Interpret C<~> (tilde) and C<\nobreakspace> as a non-breaking space (default).
+
+=item B<--no-cite-as-record>
+
+Don't check for instances of C<\citation> in the F<.aux> file (default).
+
+=item B<--no-collapse-same-location-range>
+
+Don't collapse an explicit range that has a duplicate start and end
+location into a normal record.
+
+=item B<--no-debug> (or B<--nodebug>)
+
+Switch off debug mode. (Equivalent to B<--debug> B<0>)
+
+=item B<--no-expand-fields>
+
+Write C<\glsnoexpandfields> to the F<.glstex> file (default).
+
+=item B<--no-force-cross-resource-refs>
+
+Don't force cross-resource referencing mode on (default).
+
+=item B<--no-group>
+
+Don't add B<group> field to entries (default).
+
+=item B<--no-interpret>
+
+Don't try interpreting (La)TeX commands. The TeX Parser Library will
+still be used to parse the F<aux> and F<bib> files.
+
+=item B<--no-merge-wrglossary-records>
+
+Don't merge an entry's B<wrglossary> records.
+
+=item B<--no-mfirstuc-math-protection>
+
+Switch off the auto-insertion of an empty group for math-shift (C<$>).
+
+=item B<--no-mfirstuc-protection>
+
+Switch off the auto-insertion of an empty group for all fields.
+
 =item B<--no-nested-link-check>
 
 Don't check for potentially problematic nested link text.
 (Equivalent to B<--nested-link-check> B<none>)
 
-=item B<--shortcuts> I<option>
+=item B<--no-obey-aux-catcode>
 
-Check for the shortcut commands when searching for dependencies.
-Permitted values of I<option>: B<acronyms> (or B<acro>), B<ac>,
-B<abbreviations> (or B<abbr>), B<all> (or B<true>), B<none> (or
-B<false>). This overrides the setting given in I<auxfile>.
+Ignore category code changing commands encountered in the aux file.
 
-=item B<--map-format> I<key>B<:>I<value>[B<,>I<key>B<:>I<value>]* (or 
-B<-m> I<key>B<:>I<value>[B<,>I<key>B<:>I<value>]*)
+=item B<--no-provide-glossaries>
 
-Set location format mappings.
+Don't write C<\provideignoredglossary*> to the F<.glstex> file to
+provide unknown glossaries except in documented situations
+(B<master>, B<secondary> and B<trigger-type> resource options).
+This setting is the default.
 
-=item B<--group> or B<-g>
+=item B<--no-record-count>
 
-Add B<group> field to entries.
+Don't add record count field to entries (default).
+This option automatically implements B<--no-record-count-unit>.
 
-=item B<--no-group>
+=item B<--no-record-count-unit>
 
-Don't add B<group> field to entries (default).
+Don't add unit record count field to entries (default).
+
+=item B<--no-replace-quotes>
+
+Don't replace quote characters (default).
+
+=item B<--no-retain-formats>
+
+Normal location merging rules apply (default).
+
+=item B<--no-support-unicode-script>
+
+Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
+won't be converted to Unicode superscript/subscript characters.
+For example, C<\textsuperscript{2}> will be converted to C<E<lt>supE<gt>2E<lt>/supE<gt>>
+and the markup will be stripped leaving just the character 2.
+
+=item B<--no-trim-fields>
+
+Don't trim leading and trailing spaces from fields (default).
+This option cancels B<--trim-only-fields> and B<--trim-fields>.
+
+=item B<--no-verbose> (or B<--noverbose>)
+
+Switch off verbose mode. (Some messages will still be written to
+STDOUT.)
+
+=item B<--no-warn-non-bib-fields>
+
+Don't warn if internal non-bib fields are found in the F<.bib> file.
+The use of these internal fields can cause unexpected results, so
+only use this option if you have taken appropriate precautions.
+
+=item B<--no-warn-unknown-entry-types>
+
+Don't warn if any unknown entry types are found in the F<.bib> file.
+
+=item B<--obey-aux-catcode>
+
+Obey known category code changing commands encountered in the aux
+file.
+
+=item B<--packages> I<list> (or B<-p> I<list>)
+
+Instruct the TeX parser library to pretend the packages listed 
+in I<list> have been used by the document. Note that there's only a
+limited number of packages supported by the TeX parser library.
+This option has a cumulative action so B<--packages wasysym,pifont>
+is the same as B<--packages wasysym --packages pifont>.
+
+You can find out the list of supported packages with
+B<--list-known-packages>.
+
+=item B<--provide-glossaries>
+
+Write C<\provideignoredglossary*> to the F<.glstex> file to provide
+unknown glossaries.
+
+=item B<--quiet> (or B<-q>)
+
+Only display error messages. All other messages are just written to
+the transcript file.
+
+=item B<--record-count> or B<-c>
+
+Add record count fields to entries.
 
 =item B<--record-count-rule> I<rule> or B<-r> I<rule>
 
@@ -374,23 +383,57 @@ optional. If present it may be one of: C<and> (format AND counter
 must match), C<or> (format OR counter must match). If I<op> is
 omitted, AND is assumed.
 
-=item B<--record-count> or B<-c>
-
-Add record count fields to entries.
-
-=item B<--no-record-count>
-
-Don't add record count field to entries (default).
-This option automatically implements B<--no-record-count-unit>.
-
 =item B<--record-count-unit> or B<-n>
 
 Add unit record count fields to entries.
 This option automatically implements B<--record-count>.
 
-=item B<--no-record-count-unit>
+=item B<--replace-quotes>
 
-Don't add unit record count field to entries (default).
+Replace single and double quote characters (C<'> and C<">) with 
+C<\bibglsaposchar> and C<\bibglsdoublequotechar> in field values
+and group information written to the F<.glstex> file.
+
+=item B<--retain-formats> I<list>
+
+Indicates which location formats should always be retained even if
+it causes a partial duplicate. Only exact duplicates will be merged.
+
+=item B<--shortcuts> I<option>
+
+Check for the shortcut commands when searching for dependencies.
+Permitted values of I<option>: B<acronyms> (or B<acro>), B<ac>,
+B<abbreviations> (or B<abbr>), B<all> (or B<true>), B<none> (or
+B<false>). This overrides the setting given in I<auxfile>.
+
+=item B<--map-format> I<key>B<:>I<value>[B<,>I<key>B<:>I<value>]* (or 
+B<-m> I<key>B<:>I<value>[B<,>I<key>B<:>I<value>]*)
+
+Set location format mappings.
+
+=item B<--silent>
+
+Only display error messages. All other messages are just written to
+the transcript file. (Synonym of B<--quiet>.)
+
+=item B<--support-unicode-script>
+
+Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
+will use Unicode superscript/subscript characters if available.
+For example, C<\textsuperscript{2}> will be converted to U+00B2
+(superscript two).
+
+=item B<--tex-encoding> I<name>
+
+Set the character encoding for the F<glstex> files. This overrides the
+setting given in I<auxfile>.
+
+=item B<--trim-except-fields> I<list>
+
+Trim leading and trailing spaces from all fields except those listed.
+This option is cumulative but is cancelled by B<--trim-fields>
+and B<--no-trim-fields>. This option may not be used with
+B<--trim-only-fields>.
 
 =item B<--trim-fields>
 
@@ -404,47 +447,21 @@ This option is cumulative but is cancelled by B<--trim-fields>
 and B<--no-trim-fields>. This option may not be used with
 B<--trim-except-fields>.
 
-=item B<--trim-except-fields> I<list>
+=item B<--verbose>
 
-Trim leading and trailing spaces from all fields except those listed.
-This option is cumulative but is cancelled by B<--trim-fields>
-and B<--no-trim-fields>. This option may not be used with
-B<--trim-only-fields>.
+Switch on verbose mode.
 
-=item B<--no-trim-fields>
+=item B<--version> or B<-v>
 
-Don't trim leading and trailing spaces from fields (default).
-This option cancels B<--trim-only-fields> and B<--trim-fields>.
+Display version information and exit.
 
-=item B<--expand-fields>
+=item B<--warn-non-bib-fields>
 
-Don't write C<\glsnoexpandfields> to the F<.glstex> file.
+Warn if internal non-bib fields are found in the F<.bib> file.
 
-=item B<--no-expand-fields>
+=item B<--warn-unknown-entry-types>
 
-Write C<\glsnoexpandfields> to the F<.glstex> file (default).
-
-=item B<--provide-glossaries>
-
-Write C<\provideignoredglossary*> to the F<.glstex> file to provide
-unknown glossaries.
-
-=item B<--no-provide-glossaries>
-
-Don't write C<\provideignoredglossary*> to the F<.glstex> file to
-provide unknown glossaries except in documented situations
-(B<master>, B<secondary> and B<trigger-type> resource options).
-This setting is the default.
-
-=item B<--replace-quotes>
-
-Replace single and double quote characters (C<'> and C<">) with 
-C<\bibglsaposchar> and C<\bibglsdoublequotechar> in field values
-and group information written to the F<.glstex> file.
-
-=item B<--no-replace-quotes>
-
-Don't replace quote characters (default).
+Warn if any unknown entry types are found in the F<.bib> file.
 
 =back
 

@@ -290,6 +290,8 @@ documents}}
 \newcommand*{\pdfLaTeX}{\hologo{pdfLaTeX}}
 
 \newcommand{\langxml}{\hyperref[sec:lang.xml]{language resource file}}
+\newcommand{\texparserlib}{\hyperref[sec:texparserlib]{\TeX\ Parser
+Library}}
 
 \newcommand{\hex}[1]{0x#1}
 \newcommand{\hexsb}[1]{\textsubscript{\scriptsize\rmfamily#1}}
@@ -1380,14 +1382,13 @@ first \LaTeX\ run due to the unknown references being replaced with
 when the reference is known. 
 
 Note that \bibgls\ is a Java application, and requires at least
-Java~8.\footnote{The \code{List.sort} method used to sort the
-entries was only introduced to Java~8.}  Additionally,
-\sty{glossaries-extra} must be at least version 1.12.  (Although
-the latest version is recommended.) This application was
-developed in response to the question
+Java~8. Additionally, \sty{glossaries-extra} must be at least
+version 1.12.  These are minimum requirements, but the latest
+versions are recommended. This
+application was developed in response to the question
 \qt{\href{http://tex.stackexchange.com/q/342544}{Is there a program
 for managing glossary tags?}} on \TeX\ on
-StackExchange~\cite{tex.sx}. The \ext{bib} file can be managed in an
+StackExchange~\cite{tex.sx.2016}. The \ext{bib} file can be managed in an
 application such as JabRef.
 
 If you already have a \ext{tex} file containing 
@@ -1430,7 +1431,8 @@ selection, cross-references and locations}, issue 41:3, 2020.
   \renewcommand{\glslistitem}[1]{%
     \item[\glsentryitem{#1}%
           \glstarget{#1}{\glossentryname{#1}}]%
-    \glsxtrifhasfield{useri}{#1}{\glsadd{\glscurrentfieldvalue}}{}%
+    \glsxtrifhasfield{useri}{#1}%
+     {\glsadd[format=glsnumberformat]{\glscurrentfieldvalue}}{}%
   }
 }
 
@@ -1479,7 +1481,7 @@ manual~\cite{glossaries-extra} for information
 on the differences between the basic package and the extended
 package, as some of the default settings are different.
 
-Since the information used by \bibgls\ is
+Since information required by \bibgls\ is
 written to the \iext{aux} file, it's not possible to run \bibgls\
 through \TeX's shell escape while the \ext{aux} file is open for
 write access. (The \ext{aux} file is closed \emph{after} the end
@@ -1494,6 +1496,106 @@ As from version 1.14 of \styfmt{glossaries-extra}, this can be done
 automatically with the \styopt{automake} option if the \ext{aux}
 file exists. (Remember that this will require the shell escape to be
 enabled.)
+
+\section{Default Encoding}
+\label{sec:defencoding}
+
+Both \XeLaTeX\ and \LuaLaTeX\ default to UTF-8 \igls{encoding}. With modern \TeX\
+distributions, \pdfLaTeX\ also defaults to UTF-8 but may be changed
+with the \sty{inputenc} package.
+ 
+The default encoding for Java applications, such as \bibgls, is the
+default encoding of the \idx{JVM}. This typically matches the
+operating system's default, but can be changed (see below).  If you don't want
+to alter the \idx{JVM}['s] default, you can set the \bibgls\ default
+with \longarg{default-encoding}.
+
+In general, UTF-8 works best with \bibgls, but you need to be careful if your
+\idx{JVM} isn't set up to use UTF-8 by default as you can end
+up with encoding mismatches. This can happen with some versions of
+Windows, so it's a good idea to double-check the \bibgls\ transcript
+file to make sure all the encoding information is correct.
+
+The default encoding is written at the start of the \ext{glg} file.
+For example:
+\begin{verbatim}
+Default encoding: UTF-8
+\end{verbatim}
+When a file is opened, the associated encoding is written to the \ext{glg}
+file. For example, when the \ext{aux} file is opened:
+\begin{verbatim}
+Reading myDoc.aux
+Encoding: UTF-8
+\end{verbatim}
+If the document encoding is detected in the \ext{aux} file, it will
+be written to the transcript. For example:
+\begin{verbatim}
+TeX character encoding: UTF-8
+\end{verbatim}
+When a \ext{bib} file is read, the \csopt{charset} setting, 
+the detected encoding (from the encoding comment line,
+see \sectionref{sec:bibencoding}), if found, and the encoding
+actually used are written. For example, where \csopt{charset} hasn't
+been set but an encoding comment line has been found:
+\begin{verbatim}
+Parsing bib files for resource myDoc.glstex.
+Default encoding: not set
+Detected encoding: UTF-8
+Reading symbols.bib
+Encoding: UTF-8
+\end{verbatim}
+
+The file encodings used by \bibgls\ are as follows:
+\begin{itemize}
+\item Writing the \iext{glg} transcript file: default encoding.
+
+\item Reading the document \iext{log} file: \longarg{log-encoding}
+setting, if supplied, otherwise the default encoding. 
+
+Note that the \ext{log} file may not have the same encoding as the
+\ext{tex} file~\cite{tex.sx.2013}.  In the case of the T1 font
+encoding, the encoding will be close enough to ISO-8859-1 for that
+to be used with \bibgls.  Any problematic character will trigger a
+warning and \bibgls\ will quit reading the file. This will most
+likely be in an overfull warning, by which point \bibgls\ should
+have gathered all the information it requires.
+
+\item Reading the \iext{aux} file: the \longarg{tex-encoding}
+setting, if supplied, or UTF-8 if \sty{fontspec} is detected in the
+\ext{log} file, otherwise the default encoding.
+
+\item Reading the \iext{bib} files: the \csopt{charset} resource
+option, if supplied, or the encoding specified by the encoding
+comment line in the \ext{bib} file (see
+\sectionref{sec:bibencoding}), otherwise the default encoding.
+
+\item Writing the \iext{glstex} files: the \longarg{tex-encoding}
+setting, if supplied, or UTF-8 if \sty{fontspec} detected in the
+\ext{log} file, or the document encoding picked up from the
+\ext{aux} file, otherwise the default encoding.
+\end{itemize}
+For example:
+\begin{verbatim}
+bib2gls --log-encoding ISO-8859-1 --default-encoding UTF-8 myDoc
+\end{verbatim}
+
+To change the default \igls{encoding} for the \idx{JVM} set the 
+\code{JAVA\_TOOL\_OPTIONS} environment variable to include
+\code{-Dfile.encoding=\meta{encoding}} where \meta{encoding} is the
+desired default encoding (such as UTF-8). Note that this will
+affect all your installed Java applications, not just \bibgls, (for
+example, JabRef).
+
+If you have a problem with non-ASCII characters not displaying
+correctly in your document:
+\begin{itemize}
+\item Check that the file \gls{encoding} of your document \ext{tex}
+and \ext{bib} files have been correctly set by your text editor.
+\item Check that your document supports that \gls{encoding} (for example,
+through the \isty{inputenc} package).
+\item Check \bibgls's transcript file for the encoding information
+to ensure that the settings are correct.
+\end{itemize}
 
 \section{Example Use}
 The glossary entries are stored in a \ext{bib} file. For
@@ -2307,11 +2409,12 @@ so you can change the above to the following:
 }
 \end{codeenv}
 
-This will locally define the quarks listed below. Since \cs{glsxtrresourceinit}
-is scoped so that it only has an effect within the protected write,
-this shouldn't interfere with the corresponding commands that are required in
-the document. Note that these quarks should only be used in their
-designated contexts.
+This will locally define the quarks listed below. Since
+\cs{glsxtrresourceinit} is used in a scoped context, the
+definitions only have an effect within the protected write, and so this
+shouldn't interfere with the corresponding commands that are
+required in the document. Note that these quarks should only be used
+in their designated contexts.
 
 \begin{description}
 
@@ -2357,7 +2460,7 @@ syntax recognises \gls{LEN}, \gls{CAT}, \gls{IN}, \gls{NIN}, \gls{PREFIXOF},
 \end{description}
 
 Finally, this isn't actually a quark, but \inlinedef{cs} is defined
-to expand to the literal string \csfmt{csname} so you can use it for any
+to expand to the literal string \csfmt{\meta{csname}} so you can use it for any
 other escape sequences that aren't covered above. For example, 
 \code{\gls{cs}\marg{n}} for a newline \ics{n}.
 
@@ -2729,15 +2832,15 @@ well (unless the document has a different definition that doesn't
 have this unbounded recursion).
 
 The \file{texparserlib.jar} library is not a \TeX\ engine and there
-are plenty of situations where it doesn't work. In particular, in
-this case it's being used in a fragmented context without knowing
+are plenty of situations where it doesn't work. In particular, with
+\bibgls, it's being used in a fragmented context without knowing
 most of the packages used by the document or any custom commands or
 environments provided within the document.
 
 \bibgls\ can detect from the log file a small
 number of packages that the parser recognises. Note that in
 some cases there's only very limited support. For example, 
-\isty{siunitx}'s \ics{si} command is recognised but other
+\isty{siunitx}'s \ics{si} and \ics{unit} commands are recognised but other
 commands from that package aren't. See
 \longargpageref{list-known-packages} for further details.
 
@@ -2805,8 +2908,39 @@ rule that recognises these Unicode characters (for example,
 \csopt[custom]{sort},
 \csopt[\cs{glshex}2694 \string< \cs{glshex}2693 \string< \cs{glshex}26BD]{sort-rule}).
 
+Another approach is to use \ics{IfTeXParserLib}, which is defined by
+the \texparserlib\ to expand to its first argument. The
+\sty{glossaries-extra-bib2gls} package provides a definition that
+expands to its second argument, so that command may be used to
+provide alternative code. For example:
+\begin{codeenv}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{Ord}}[1]\marg{\comment{}
+ \cs{IfTeXParserLib}
+  \marg{\ics{bibglspaddigits}\marg{2}\marg{\idx{param}1}}\comment{interpreter}
+  \marg{\cs{MakeUppercase}\marg{\cmd{romannumeral} \idx{param}1}}\comment{document}
+}}}
+\atentry{index}\marg{John-IV,
+ \field{name}=\marg{John\idx{nbspchar}\cmd{Ord}\marg{4}}
+}
+\atentry{index}\marg{John-VI,
+ \field{name}=\marg{John\idx{nbspchar}\cmd{Ord}\marg{6}}
+}
+\atentry{index}\marg{John-IX,
+ \field{name}=\marg{John\idx{nbspchar}\cmd{Ord}\marg{9}}
+}
+\atentry{index}\marg{John-XII,
+ \field{name}=\marg{John\idx{nbspchar}\cmd{Ord}\marg{12}}
+}
+\end{codeenv}
+The sort values for these entries will be: \qt{John 04}, \qt{John
+06}, \qt{John 09} and \qt{John 12}, but in the document text they
+will be typeset as \qt{John~IV}, \qt{John~VI}, \qt{John~IX} and
+\qt{John~XII}. Note that \ics{bibglspaddigits} is only recognised by
+the \bibgls\ interpreter. Alternatively, you can use the
+\csopt{sort-number-pad} option to pad the numbers.
+
 \TeX\ syntax can be quite complicated and, in some cases, far too
-complicated for simple \idxpl!{regex}. The \TeX\ parser library performs
+complicated for simple \idxpl!{regex}. The \texparserlib\ performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls\ (and by
 \idx!{convertgls2bib}). When the \longarg{debug} mode is on, any
@@ -3120,17 +3254,6 @@ Display the help message and quit.
 Display the version information and quit. As from v2.5, this now
 includes the version number of the \file{texparserlib.jar} library.
 
-\argsection{debug}
-
-Switch on debugging mode. If \meta{n} is present, it must be a
-non-negative integer indicating the debugging level. If omitted 1 is
-assumed. This option also switches on the verbose mode. A value of 0
-is equivalent to \longargfmt{no-debug}.
-
-\argsection{no-debug}
-
-Switches off the debugging mode.
-
 \argsection{verbose}
 
 Switches on the verbose mode. This writes extra information to the
@@ -3388,6 +3511,100 @@ Don't automatically set the \field{group} field with
 group style, such as \glostyle{indexgroup}, is used (unless the
 \field{group} field is set to a custom value).
 
+\argsection{debug}
+
+Sometimes when things go wrong it can be hard to diagnose the problem
+from the normal messages. If you report an issue, you may be asked
+to switch on debugging mode to help identify a non-reproducible
+error and provide the transcript file.
+
+The \longargfmt{debug} option can be used to switch on debugging mode. 
+If \meta{n} is present, it must be a non-negative integer indicating
+the debugging mode. If omitted, 1 is assumed. This option also
+switches on the verbose mode. A value of 0 is equivalent to
+\longargfmt{no-debug}.
+
+The value of \meta{n} determines how much extra information is
+provided. If \meta{n} is greater than 0 then all \bibgls\ debugging
+information is written. The amount of debugging information provided
+by the \texparserlib\ is determined by a bitwise operation on
+\meta{n}. For example, if \meta{n} is 1 then I/O information is
+included. If \meta{n} is 2 then information is included when an
+object is popped off a stack. If \meta{n} is 3 then both I/O and
+popped information is provided.
+
+Note that messages such as \qt{Can't find language resource} or
+about a failed \idx{kpsewhich} call are informational and don't
+necessarily mean an error has occurred. Error messages will always
+be written to the transcript regardless of the debug or verbose
+setting. An error message will start with \qt{Error:~} and a warning
+message will start with \qt{Warning:~}. Unknown commands will throw
+an exception with a stack trace in debug mode.
+
+\argsection{debug-mode}
+
+This option is an alternative to \longargfmt{debug} where the value
+of \meta{n} needs to be calculated. The \meta{setting} is
+required and should be a comma-separated list of any of the
+following keywords.
+
+\begin{itemize}
+\item\optfmt{all}: enable all debugging information
+(likely to result in a very large transcript file).
+
+\item\optfmt{catcode}: \texparserlib\ category code changes.
+
+\item\optfmt{cs}: \texparserlib\ command definitions.
+
+\item\optfmt{decl}: information about declarations.
+
+\item\optfmt{expansion}: \texparserlib\ expansions 
+(may result in a large transcript file).
+
+\item\optfmt{expansion-list}: \texparserlib\ stack expansions 
+(may result in a large transcript file).
+
+\item\optfmt{expansion-once}: \texparserlib\ one-level expansions 
+(may result in a large transcript file).
+
+\item\optfmt{expansion-once-list}: \texparserlib\ one-level list expansions 
+(may result in a large transcript file).
+
+\item\optfmt{io}: I/O information, such as opening or closing files
+and fetching tokens.
+
+\item\optfmt{popped}: information about objects popped from stacks.
+
+\item\optfmt{process}: \texparserlib\ macro process 
+(may result in a large transcript file).
+
+\item\optfmt{process-generic-cs}: \texparserlib\ generic command process.
+
+\item\optfmt{process-stack}: \texparserlib\ stack process 
+(may result in a large transcript file).
+
+\item\optfmt{process-stack-list}: \texparserlib\ stack process with
+list detail (may result in a large transcript file).
+
+\item\optfmt{read}: \texparserlib\ file codepoint read
+(likely to result in a very large transcript file).
+
+\item\optfmt{sty-data}: data associated with packages used to store
+information that may not exactly correspond to the way the
+information is stored in \LaTeX. In the case of \bibgls, this will
+typically just be data read from recognised \iext{aux} commands.
+
+\end{itemize}
+
+For example:
+\begin{alltt}
+bib2gls \longargfmt{debug-mode} catcode,sty-data \meta{filename}
+\end{alltt}
+
+\argsection{no-debug}
+
+Switches off the debugging mode. Equivalent to \longarg{debug}~0.
+
 \section{File Options}
 
 \argsection{dir}
@@ -3445,48 +3662,51 @@ bib2gls -d tmp mydoc
 
 \argsection{log-file}
 
-Sets the name of the transcript file. By default, the name is the
+Sets the name of the \bibgls\ transcript file. By default, the name is the
 same as the \iext{aux} file but with a \iext{glg} extension. Note that
 if you use \bibgls\ in combination with \idx{xindy} or
 \idx{makeindex}, you will need to change the transcript file name to
 prevent conflict.
 
+The transcript file encoding is governed by
+\longarg{log-encoding}.
+
 \argsection{tex-encoding}
 
-\bibgls\ tries to determine the character \igls{encoding} to use for the
-output files. If the document has loaded the \isty{inputenc} package then
-\bibgls\ can obtain the value of the \gls{encoding} from the
-\iext{aux} file. This is then converted to a name
-recognised by Java. For example, \code{utf8} will be mapped to
-\code{UTF-8}. If the \isty{fontspec} package has been loaded,
-\styfmt{glossaries-extra} will assume the \gls{encoding} is \code{utf8} and
-write that value to the \ext{aux} file.
+In general, it's best to have all your files (\ext{aux}, \ext{bib}
+and \iext{glstex}) in the same \igls{encoding} that matches your
+default encoding (see \sectionref{sec:defencoding}). However, if
+your \iext{aux} and \iext{glstex} files have a different encoding to
+your default, you can use \longarg{tex-encoding} to specify the
+\TeX\ encoding. If omitted the default encoding is used. See
+\sectionref{sec:defencoding}.
 
-If neither package has been loaded, \bibgls\ will assume the \idx{JVM}['s]
-default \gls{encoding} (identified by the \code{file.encoding} property). If this is
-incorrect or if \bibgls\ can't work out the appropriate mapping then you can
-specify the correct \gls{encoding} using \longargfmt{tex-encoding} \meta{name} where
-\meta{name} is the \gls{encoding} name (such as \code{UTF-8}).
+Note that \bibgls\ will try to detect the document encoding from the
+\ext{aux} file  to ensure that the \iext{glstex} files match it.
+However, at that point, it's too late to establish the encoding of
+the \ext{aux} file, which has already been opened. So if the
+\ext{aux} file encoding doesn't match the default encoding, you can
+specify the correct encoding to use with \longarg{tex-encoding}.
 
-If you have a problem with non-ASCII characters not displaying
-correctly in your document:
-\begin{itemize}
-\item Check that the file \gls{encoding} of your document \ext{tex} file (or files)
-has been correctly set by your text editor.
-\item Check that your document supports that \gls{encoding} (for example,
-through the \isty{inputenc} package).
-\item Check \bibgls's transcript file (\ext{glg}) for the line that
-starts
-\begin{verbatim}
-TeX character encoding:
-\end{verbatim}
-This should be followed by the \gls{encoding} used by \bibgls\ when
-creating the \ext{glstex} files. If this is incorrect use
-\longargfmt{tex-encoding}.
-\item Check that the \gls{encoding} of the \ext{bib} files (set by your
-text editor or bibliographic management system) matches the \gls{encoding}
-line in the \ext{bib} file or the \csopt{charset} resource option.
-\end{itemize}
+If you are using \sty{fontspec}, \bibgls\ can detect this
+from the \ext{log} file instead and will assume UTF-8.
+
+\argsection{log-encoding}
+
+The \igls{encoding} of the \iext{log} file. If omitted, the default
+encoding will be used.  See \sectionref{sec:defencoding}.  (Note
+that the \ext{log} file may not have the same encoding as the
+\ext{tex} file~\cite{tex.sx.2013}.)
+
+\argsection{default-encoding}
+
+The default \igls{encoding} used by \bibgls\ to read and write files is
+governed by the \idx{JVM}. This typically matches your operating
+system's default encoding. If this is incorrect, you can either
+globally change the encoding for the \idx{JVM}, which will affect
+all Java applications installed on your device, or you can use 
+\longarg{default-encoding} just to set the default for \bibgls.
+See \sectionref{sec:defencoding}.
 
 \section{Interpreter Options}
 
@@ -3498,8 +3718,8 @@ space. Similarly \ics{nobreakspace} just produces a space.
 \argsection{no-break-space}
 
 The interpreter treats a tilde character \idx{nbspchar} as a non-breakable
-space (default). Similarly \ics{nobreakspace} produces a
-non-breakable space character (\hex{00A0}).
+space (default). Similarly the interpreter will define
+\ics{nobreakspace} to produce a non-breakable space character (\hex{00A0}).
 
 \argsection{custom-packages}
 
@@ -3535,8 +3755,8 @@ for more details about the interpreter.
 
 \argsection{list-known-packages}
 
-This option will list all the packages supported by the \TeX\ parser
-library and will then exit \bibgls. The results are divided into two
+This option will list all the packages supported by the \texparserlib\
+and will then exit \bibgls. The results are divided into two
 sections: those packages that are searched for in the \iext{log}
 file and those packages that aren't searched for in the \iext{log}
 file but have some support available. Some of the support is very
@@ -3587,7 +3807,7 @@ This option has a cumulative action so \code{\longarg{packages}
 \longarg{packages} pifont}.
 
 Note that there's only a limited number of packages supported by the
-\TeX\ parser library. This option is provided for cases where you're
+\texparserlib. This option is provided for cases where you're
 using a command from a package that the interpreter doesn't support
 but it happens to have the same name and meaning as a command from
 a package that the interpreter does support. You can also use it to
@@ -4342,10 +4562,12 @@ prefixed label.
 \section{Encoding}
 \label{sec:bibencoding}
 
-Avoid \idx{non-ASCII} characters in the \meta{id} if your document uses the 
-\isty{inputenc} package.
-(This isn't a problem for \XeLaTeX\ or
-\LuaLaTeX, but you still need to avoid special characters.)
+If you are using \XeLaTeX\ or \LuaLaTeX\ (which are natively UTF-8)
+or if you are using a modern \TeX\ distribution \pdfLaTeX\ with
+UTF-8 support, then you can have UTF-8 characters in the \meta{id}
+of your entries. (Avoid \TeX\ special characters, active characters
+or characters that are part of the \ext{bib} syntax.)
+
 You can set the character \igls{encoding} in the \ext{bib} file using:
 \begin{codeenv}
 \idx{commentchar} Encoding: \meta{encoding-name}
@@ -4363,12 +4585,15 @@ If you don't use either method \bibgls\ will
 have to search the entire \ext{bib} file, which is inefficient and
 you may end up with a mismatched \gls{encoding}.
 
-Note that recent changes to the \LaTeX\ kernel now allow
-\idx{non-ASCII} characters in labels when using commands such as
-\cs{label} (with \sty{inputenc}). The commands used by the
-\sty{glossaries} package are more complicated, but changes have been
-made in \sty{glossaries} v4.47 and \sty{glossaries-extra} v1.46 to
-help support this, however it hasn't been fully tested.
+\begin{important}
+The encoding comment line must come before any non-ASCII content
+otherwise a malformed input error may occur while parsing the file
+for the comment line.
+\end{important}
+
+If there is no encoding line in the \ext{bib} file and the
+\csopt{charset} option hasn't been used, then the default encoding
+will be assumed (see \sectionref{sec:defencoding}).
 
 \section{Comments}
 \label{sec:bibcomments}
@@ -4667,7 +4892,7 @@ definition within the document (if it's already been defined before
 the resource file is input). In general, it's best to just use
 \cs{providecommand}.
 
-The \TeX\ parser library used by \bibgls\ will parse the contents of
+The \texparserlib\ used by \bibgls\ will parse the contents of
 \atentry{preamble} before trying to interpret the field value used
 as a \hyperref[sec:fallbacks]{fallback} when \field{sort} is omitted (unless
 \csopt[false]{interpret-preamble} is set in the resource options).
@@ -4691,7 +4916,7 @@ Neither entry has the \field{sort} field, so \bibgls\ has to fall
 back on the \field{name} field and, since this contains the special
 characters \idx{escchar} (backslash), \idx{mshiftchar} (maths
 shift), \idx{bgroupchar} (begin group) and
-\idx{egroupchar} (end group), the \TeX\ parser library is used to interpret it.
+\idx{egroupchar} (end group), the \texparserlib\ is used to interpret it.
 The definitions provided by \atentry{preamble} allow \bibgls\ to
 deduce that the \field{sort} value of the \code{S} entry is just
 \code{S} and the \field{sort} value of the \code{card} entry is
@@ -8169,7 +8394,8 @@ the \gls{encoding} in the \ext{bib} file where it can also be read by
 a \ext{bib} managing systems, such as JabRef.
 
 See \longarg{tex-encoding} for the \gls{encoding} used to write the \ext{glstex}
-file.
+file, and see \sectionref{sec:defencoding} for information about the
+default encoding.
 
 \optsection{locale}
 
@@ -13047,7 +13273,7 @@ contains the required \cs{MFUnocap} commands (in a similar style to
 
 The \bibgls\ word-boundary implementation is slightly different with
 this setting than with the \cs{capitalisewords} command (implemented
-in \TeX\ or by the \TeX\ parser library when interpreting field
+in \TeX\ or by the \texparserlib\ when interpreting field
 values).  Only words in the exclusion list that start with an
 alphabetical character can be matched.  Punctuation following a
 word-boundary is not considered part of the next word.
@@ -16798,7 +17024,9 @@ and \textsuperscript{2} (\hex{00B2}).
 As with the letter sort methods, letters are compared using a
 character code comparison not by a locale alphabet. The closest
 locale-sensitive equivalent is to use \csopt{sort-number-pad} with a
-locale sort method.
+locale sort method. Alternatively, use \ics{IfTeXParserLib} and
+\ics{bibglspaddigits} to pad the number for the interpreter but
+not in the \TeX\ document.
 
 \begin{figure}
 \figcontents
@@ -18370,7 +18598,7 @@ digits that don't belong to the \qt{Number, Decimal Digit} category.
 The plain \optfmt{space-zero} alternatives are more efficient as
 they just perform a simple substitution.
 
-The \TeX\ parser library used by \bibgls\ recognises the standard
+The \texparserlib\ used by \bibgls\ recognises the standard
 \LaTeX\ text-mode commands \ics{textsuperscript}\margm{text} and 
 \ics{textsubscript}\margm{text}
 and will use the Unicode superscript or subscript characters if they cover every
@@ -22487,7 +22715,7 @@ If \csopt{save-definition-index} has been set this command expands to the
 \gls{definitionindex} of the entry identified by \meta{label}. This
 command will only be provided in the \ext{glstex} file if 
 \csopt{save-definition-index} has been set. However, the command is
-always defined by the \hyperref[sec:texparserlib]{\TeX\ parser library}
+always defined by the \texparserlib\
 but will expand to empty if the associated resource option hasn't
 been set.
 
@@ -22498,7 +22726,7 @@ If \csopt{save-use-index} has been set this command expands to the
 \gls{orderofuseindex} of the entry identified by \meta{label}. This
 command will only be provided in the \ext{glstex} file if 
 \csopt{save-use-index} has been set. However, the command is
-always defined by the \hyperref[sec:texparserlib]{\TeX\ parser library}
+always defined by the \texparserlib\
 but will expand to empty if the associated resource option hasn't
 been set.
 
@@ -22767,10 +22995,10 @@ Display version information and quit.
 
 This application recognises the commands listed below as well as
 some standard commands such as \ics{newcommand}. Avoid any overly
-complicated code within the \ext{tex} file. The
-\hyperref[sec:texparserlib]{\TeX\ parser library} isn't a \TeX\ engine! The
+complicated code within the \ext{tex} file. The \texparserlib\ 
+isn't a \TeX\ engine! The
 \ext{tex} file doesn't need to be a complete document, but if you want certain
-commands recognised from packages that the \TeX\ parser library supports,
+commands recognised from packages that the \texparserlib\ supports,
 you'll need to include \ics{usepackage} in the \ext{tex} file. If
 you want to quit parsing the \ext{tex} file at the start of the
 document, use the \convertglsbiblongarg{preamble-only} switch.
@@ -23644,7 +23872,7 @@ maths mode. These are all defined with \atentry{symbol}, which means
 that by default the \field{sort} field will be obtained from the
 label not from the \field{name} field. However, if you want to sort
 by the \field{name} field (for example, with \csopt[name]{sort-field})
-the \TeX\ parser library recognises all the mathematical Greek letter commands 
+the \texparserlib\ recognises all the mathematical Greek letter commands 
 provided in the \LaTeX\ kernel. Additionally it recognises
 \ics{omicron} which isn't provided by \LaTeX\ (the symbol can be
 reproduced with a \idx!{lowercase} Latin \qt{o}). Note that
@@ -23678,7 +23906,7 @@ but \LaTeX\ needs a definition for this, so it's provided in the
 \atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cs{omicron}}\marg{o}}}
 \end{codeenv}
 (With \sty{glossaries-extra} v1.27+, this is no longer needed.)
-The \TeX\ parser library and \sty{glossaries-extra-bib2gls} 
+The \texparserlib\ and \sty{glossaries-extra-bib2gls} 
 similarly provide the missing \idx!{uppercase}
 Greek letters, and these can be dealt with in the same way.
 
@@ -23700,7 +23928,7 @@ This file also has a preamble:
 \end{codeenv}
 The first command \inlinedef{bigoperatornamefmt}
 is used in the \field{name} field to display both the in-line and display
-versions of the symbol. The \TeX\ parser library only has a limited ability to
+versions of the symbol. The \texparserlib\ only has a limited ability to
 interpret this as not all the symbols have Unicode in-line and large versions.
 In some cases, such as the integral symbol $\int$, there is only a small 
 version. (A large version would require construction from \hex{2320}, 
@@ -27219,7 +27447,7 @@ Note that this is a total of 15~glossaries (including the
 require 16 write registers (including the write register used to
 create the indexing style file), and a total of $15\times3 + 1 = 46$
 associated files. (This doesn't include the standard \ext{aux} file
-and the \ext{out} file created by \sty{hyperref}.) With \bibgls, no
+or the \iext{out} file created by \sty{hyperref}.) With \bibgls, no
 additional write registers are required and the number of associated
 \bibgls\ files is equal to the number of resource commands plus the
 transcript file (in this example, $9+1=10$).

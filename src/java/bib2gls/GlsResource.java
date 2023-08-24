@@ -28,6 +28,8 @@ import java.text.CollationKey;
 import java.text.ParseException;
 import java.text.BreakIterator;
 import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
+import java.nio.file.Files;
 
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
@@ -6601,7 +6603,8 @@ public class GlsResource
 
       stripUnknownFieldPatterns();
 
-      bibParserListener = new Bib2GlsBibParser(bib2gls, this, bibCharset);
+      bibParserListener = new Bib2GlsBibParser(bib2gls, this, 
+       bibCharset == null ? bib2gls.getDefaultCharset() : bibCharset);
 
       for (TeXPath src : sources)
       {
@@ -6622,7 +6625,8 @@ public class GlsResource
 
             try
             {
-               reader = new BufferedReader(new FileReader(bibFile));
+               reader = Files.newBufferedReader(bibFile.toPath(),
+                  bib2gls.getDefaultCharset());
 
                String line;
                int lineNum=0;
@@ -6657,6 +6661,13 @@ public class GlsResource
                   }
                }
             }
+            catch (MalformedInputException e)
+            {
+               throw new IOException(bib2gls.getMessage(
+                 "error.cant.parse.file.malformed.input",
+                   bibFile, bib2gls.getDefaultCharset(),
+                   "charset", "--default-encoding", e));
+            }
             finally
             {
                if (reader != null)
@@ -6674,7 +6685,18 @@ public class GlsResource
          }
 
          bibParserListener.setCharSet(srcCharset);
-         bibParserListener.parse(bibFile);
+
+         try
+         {
+            bibParserListener.parse(bibFile);
+         }
+         catch (MalformedInputException e)
+         {
+            throw new IOException(bib2gls.getMessage(
+              "error.cant.parse.file.malformed.input",
+                bibFile, srcCharset,
+                "charset", "--default-encoding", e));
+         }
       }
    }
 

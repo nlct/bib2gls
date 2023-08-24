@@ -470,9 +470,10 @@ set), and isn't picked up by iterative commands such as
   name={encoding},
   user1={idx.encoding},
   description={A text format that maps a byte or sequence of bytes
-  to a character. See \sectionref{sec:bibencoding} and \longarg{tex-encoding} 
-  for the \ext{bib} file encoding and \csopt{charset} for the \ext{glstex} 
-  file encoding.  See also the blog article
+  to a character. See \sectionref{sec:bibencoding} and \csopt{charset}
+  for the \ext{bib} file encoding, \longarg{tex-encoding} for the
+  \ext{aux} and \ext{glstex} file encoding, and 
+  \sectionref{sec:defencoding} for the default encoding.  See also the blog article
 \href{https://dickimaw-books.com/blog/binary-files-text-files-and-file-encodings/}{Binary
 Files, Text Files and File Encodings} for further information about
   file encodings in general.}
@@ -520,7 +521,7 @@ Files, Text Files and File Encodings} for further information about
   name = {anchored (regular expression)},
   text={anchored},
   description={An anchored \gls{regular-expression} must match the entire
-  string, not a sub-string. For example, \code{l\idx{zeroorone}op} matches \qt{lop}
+  string, not a sub-string. For example, \code{l\idx{regex.question}op} matches \qt{lop}
   and \qt{op} but doesn't match \qt{clop} or \qt{cop}.}
 }
 

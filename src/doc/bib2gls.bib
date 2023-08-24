@@ -223,6 +223,7 @@
 
 @index{regexp,
   name={regexp (or regex)},
+  text={regexp},
   alias={regex}
 }
 
@@ -5330,13 +5331,13 @@ and \L/\l\ treated as L/l},
 }
 
 @package{polyglossia,
-  name={\styfmt{polyglossia}},
+  name={\styfmt{poly\-glossia}},
   category={package},
   parent={packages}
 }
 
 @package{fontspec,
-  name={\styfmt{fontspec}},
+  name={\styfmt{font\-spec}},
   category={package},
   parent={packages}
 }
@@ -5819,13 +5820,8 @@ with forced line breaks in paragraph column formats)},
   text={\code{+}}
 }
 
-@symbol{zeroorone,
-  name={\code{?} (regular expression, zero or one)},
-  text={\code{?}}
-}
-
 @symbol{regex.question,
-  name={\code{?} (regular expression)},
+  name={\code{?} (regular expression, zero or one)},
   text={\code{?}}
 }
 
@@ -5892,7 +5888,7 @@ with forced line breaks in paragraph column formats)},
 }
 
 @command{nobreakspace,
-  name={\csfmt{nobreakspace}},
+  name={\csfmt{no\-break\-space}},
   description={produces a non-breakable space},
   note={kernel command\texparserdefnote},
   category={command}
@@ -10223,6 +10219,13 @@ primary formats, if enabled.},
   parent={commandlineoptions}
 }
 
+@switch{switch.debug-mode,
+  name={\longargfmt{debug\dhyphen mode}},
+  user1={\meta{setting}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
 @switch{switch.no-debug,
   name={\longargfmt{no\dhyphen debug}},
   symbol={\longargfmt{nodebug}},
@@ -10564,6 +10567,20 @@ primary formats, if enabled.},
 
 @switch{switch.tex-encoding,
   name={\longargfmt{tex\dhyphen encoding}},
+  user1={\meta{name}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.log-encoding,
+  name={\longargfmt{log\dhyphen encoding}},
+  user1={\meta{name}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.default-encoding,
+  name={\longargfmt{default\dhyphen encoding}},
   user1={\meta{name}},
   category={switch},
   parent={commandlineoptions}
@@ -17660,6 +17677,14 @@ has three or more items},
   category={command}
 }
 
+@command{unit,
+  name={\csfmt{unit}},
+  user1={\oargm{options}\margm{unit}},
+  description={displays the unit with intelligent formatting},
+  note={\styfmt{siunitx}\texparserdefnote},
+  category={command}
+}
+
 @command{ce,
   name={\csfmt{ce}},
   user1={\margm{formula}},
@@ -18824,6 +18849,25 @@ sectioning commands to write to it},
   description={expands to \meta{number} zero-padded to ensure at
   least two digits},
   note={kernel command\texparserdefnote},
+  category={command}
+}
+
+@command{IfTeXParserLib,
+  name={\csfmt{If\-TeX\-Parser\-Lib}},
+  user1={\margm{interpreter}\margm{\TeX}},
+  description={defined by the \TeX\ parser library to expand to
+  \meta{interpreter} and by \sty{glossaries-extra-bib2gls} to expand
+  to \meta{\TeX}},
+  note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote},
+  category={command}
+}
+
+@command{bibglspaddigits,
+  name={\csfmt{bib\-gls\-pad\-digits}},
+  user1={\margm{num digits}\margm{number}},
+  description={expands to \meta{number} zero-padded to ensure at
+   least \meta{num digits} digits},
+  note={\bibgls\ interpreter only},
   category={command}
 }
 

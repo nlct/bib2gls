@@ -1,4 +1,4 @@
-BIB2GLS=../bin/bib2gls --debug --verbose --group
+BIB2GLS=../bin/bib2gls --verbose --group
 DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
 RM=\rm -f
 
