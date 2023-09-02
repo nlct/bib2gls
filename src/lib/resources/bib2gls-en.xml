@@ -232,6 +232,7 @@ Defaulting to: {0}.
 <entry key="message.adding.counter.primary.record">Adding primary record {0} to entry {1}''s {2} record list.</entry>
 <entry key="message.copying.record">Copying record {0} from entry {1} to entry {2}.</entry>
 <entry key="message.copying.primary.record">Copying primary record {0} from entry {1} to entry {2}.</entry>
+<entry key="message.copying.self_record">Attempt to copy record to self for entry {2} ignored.</entry>
 <entry key="message.ignored.record">Ignoring record {0}.</entry>
 <entry key="message.empty.location.ignored">Converting empty location to ignored record
   (label: ''{0}'', counter: ''{1}'', encap: ''{2}'')</entry>
@@ -388,6 +389,7 @@ Aliased entries must be in the same resource set as their target entries with op
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
+<entry key="error.self_alias.forbidden">The ''alias'' field can''t reference its own entry (ID: {0}).</entry>
 <entry key="error.no.sty.version">Unable to read version date for package {0}</entry>
 <entry key="error.sty.too.old">Package {0} version {1} is too old.
 Minimum version {2} required.</entry>

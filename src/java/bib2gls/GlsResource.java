@@ -7530,6 +7530,11 @@ public class GlsResource
                bib2gls.warningMessage("warning.alias.not.found",
                  alias, entry.getId(), "alias-loc", "transfer");
             }
+            else if (target.getId().equals(entry.getId()))
+            {
+               throw new Bib2GlsException(bib2gls.getMessage(
+                "error.self_alias.forbidden", entry.getId()));
+            }
             else
             {
                if (selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE ||

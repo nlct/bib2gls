@@ -1,3 +1,9 @@
+v3.6 (pending)
+
+  * bib2gls
+
+    - added check for self-referencing alias
+
 v3.5 (2023-08-24)
 
   * bib2gls

@@ -3855,6 +3855,12 @@ public class Bib2GlsEntry extends BibEntry
 
    public void copyRecordsFrom(Bib2GlsEntry entry)
    {
+      if (getId().equals(entry.getId()))
+      {
+         bib2gls.debugMessage("message.copying.self_record", getId());
+         return;
+      }
+
       if (entry.records != null)
       {
          for (GlsRecord record : entry.records)
