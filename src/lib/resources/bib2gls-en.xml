@@ -173,6 +173,9 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.log.file">Transcript written to {0}.</entry>
 <entry key="message.written">{0} written to {1}.</entry>
 <entry key="message.written.total">{0} written in total.</entry>
+<entry key="message.reparsing_aux">Reparsing {0} with encoding {1}.</entry>
+<entry key="message.found">Found: {0}</entry>
+<entry key="message.lost_records">Records may be lost.</entry>
 
 <entry key="message.0.entry">No entries</entry>
 <entry key="message.1.entry">1 entry</entry>
@@ -225,6 +228,7 @@ Defaulting to: {0}.
 <entry key="message.missing.id">id missing</entry>
 <entry key="message.default.locale">Default document locale: {0} {1}</entry>
 <entry key="message.detected.sty">Detected package {0} {1}</entry>
+<entry key="message.detected.sty_no_version">Detected package {0}</entry>
 <entry key="message.adding.record">Adding record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.primary.record">Adding primary record {0} to entry {1}''s record list.</entry>
 <entry key="message.adding.supplemental.record">Adding supplemental record {0} to entry {1}''s record list.</entry>
@@ -388,13 +392,19 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.mismatched.sty">Mismatching versions of packages {0} ({1}) and {2} ({3}). Please upgrade {2}</entry>
 
 <entry key="error.title">Error: {0}</entry>
+<entry key="error.no_log">File {0} not found. Remember to run LaTeX before {1}.
+Will try to proceed without it.</entry>
 <entry key="error.alias.map.forbidden">The 'alias' field can't be mapped.</entry>
 <entry key="error.self_alias.forbidden">The ''alias'' field can''t reference its own entry (ID: {0}).</entry>
 <entry key="error.no.sty.version">Unable to read version date for package {0}</entry>
 <entry key="error.sty.too.old">Package {0} version {1} is too old.
 Minimum version {2} required.</entry>
+<entry key="error.no_sty.version">No information about the {0} package was found in {1}.
+Check your document has loaded {0}.sty and rerun LaTeX.</entry>
+<entry key="error.unknown.charset">Unknown charset: {0}</entry>
 <entry key="error.unknown.tex.charset">Unknown TeX charset: {0}
 Defaulting to {1}. Use {2} to set another encoding.</entry>
+<entry key="error.aux.charset.mismatch">The aux file charset was set to {0} but this conflicts with the information found in the aux file that indicates encoding {1}.</entry>
 <entry key="error.missing.aux.cs.require_cs">Missing \{0} in aux file. (Have you used \{1}?)</entry>
 <entry key="error.missing.aux.cs.require_cs_or">Missing \{0} in aux file. (Have you used \{1} or \{2}?)</entry>
 <entry key="error.missing.records">No records found in aux file.

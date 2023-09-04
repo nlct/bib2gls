@@ -1,8 +1,16 @@
-v3.6 (pending)
+v3.6 (2023-09-04)
 
   * bib2gls
 
     - added check for self-referencing alias
+
+    - added check for encoding in aux file not matching requested or
+      default TeX encoding
+
+    - allow process to retry if encoding error occurs in aux file
+
+    - bug fix: --default-encoding option not picked up in all
+      instances where the default is required
 
 v3.5 (2023-08-24)
 

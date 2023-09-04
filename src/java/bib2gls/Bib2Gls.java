@@ -37,6 +37,7 @@ import java.util.Calendar;
 
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 
@@ -769,6 +770,12 @@ public class Bib2Gls implements TeXApp
 
       texLogFile = new File(auxFile.getParentFile(), name);
 
+      if (!texLogFile.exists())
+      {
+         warningMessage("error.no_log", texLogFile, NAME);
+         return;
+      }
+
       BufferedReader in = null;
 
       // Check the list supplied by the --packages switch to find
@@ -785,6 +792,7 @@ public class Bib2Gls implements TeXApp
          if (sty.equals("fontspec"))
          {
             fontspec = true;
+            verboseMessage("message.detected.sty_no_version", sty);
             break;
          }
       }
@@ -879,7 +887,11 @@ public class Bib2Gls implements TeXApp
                }
                else if (pkg.equals("fontspec"))
                {
-                  fontspec = true;
+                  if (!fontspec)
+                  {
+                     verboseMessage("message.detected.sty_no_version", pkg);
+                     fontspec = true;
+                  }
                }
                else if (isAutoSupportPackage(pkg))
                {
@@ -955,6 +967,12 @@ public class Bib2Gls implements TeXApp
          {
             in.close();
          }
+      }
+
+      if (glossariesExtraVersion.equals("????/??/??"))
+      {
+         warningMessage("error.no_sty.version", "glossaries-extra",
+          texLogFile);
       }
 
       if (debugLevel > 0 && packages.size() > 0)
@@ -1949,6 +1967,7 @@ public class Bib2Gls implements TeXApp
       auxParser.setAllowCatCodeChangers(allowAuxCatChangers);
 
       TeXParser parser = createTeXParser(auxParser);
+      Vector<AuxData> auxData;
 
       try
       {
@@ -1956,9 +1975,75 @@ public class Bib2Gls implements TeXApp
       }
       catch (MalformedInputException e)
       {
-         throw new IOException(getMessage(
+         warningMessage(
            "error.cant.parse.file.malformed.input", auxFile,
-             auxCharset, "--tex-encoding", "--default-encoding", e));
+             auxCharset, "--tex-encoding", "--default-encoding");
+         debug(e);
+
+         auxData = auxParser.getAuxData();
+
+         for (AuxData data : auxData)
+         {
+            String name = data.getName();
+
+            if (name.equals("glsxtr@texencoding"))
+            {
+               try
+               {
+                  String val = data.getArg(0).toString(parser).trim();
+
+                  verboseMessage("message.found",
+                    "\\glsxtr@texencoding{" + val + "}");
+
+                  if (val.equals("\\inputencodingname"))
+                  {
+                     texCharset = Charset.forName("UTF-8");
+                  }
+                  else
+                  {
+                     texCharset = Charset.forName(texToJavaCharset(val));
+                  }
+
+                  // retry if different
+
+                  if (!texCharset.equals(auxCharset))
+                  {
+                     message(getMessage("message.reparsing_aux", auxFile,
+                       texCharset));
+
+                     auxData.clear();
+                     auxCharset = texCharset;
+                     auxParser.setCharSet(auxCharset);
+
+                     auxParser.parseAuxFile(parser, auxFile);
+                  }
+                  else
+                  {
+                     warningMessage("message.lost_records");
+                  }
+               }
+               catch (MalformedInputException e2)
+               {
+                  warningMessage(
+                    "error.cant.parse.file.malformed.input", auxFile,
+                      auxCharset, "--tex-encoding", "--default-encoding");
+
+                  debug(e2);
+
+                  warningMessage("message.lost_records");
+               }
+               catch (Bib2GlsException e2)
+               {
+                  if (texCharset == null)
+                  {
+                     texCharset = getDefaultCharset();
+  
+                     warningMessage("error.unknown.tex.charset",
+                       e2.getMessage(), texCharset, "--tex-encoding");
+                  }
+               }
+            }
+         }
       }
 
       glsresources = new Vector<GlsResource>();
@@ -1968,7 +2053,7 @@ public class Bib2Gls implements TeXApp
       seeRecords = new Vector<GlsSeeRecord>();
       selectedEntries = new Vector<String>();
 
-      Vector<AuxData> auxData = auxParser.getAuxData();
+      auxData = auxParser.getAuxData();
 
       if (interpret)
       {
@@ -2144,7 +2229,7 @@ public class Bib2Gls implements TeXApp
             Locale locale = getLocale(data.getArg(0).toString(parser));
             addExtraProperties(locale);
          }
-         else if (texCharset == null && name.equals("glsxtr@texencoding"))
+         else if (name.equals("glsxtr@texencoding"))
          {
              try
              {
@@ -2152,11 +2237,14 @@ public class Bib2Gls implements TeXApp
 
                 if (val.equals("\\inputencodingname"))
                 {
-                   // If the encoding was written as \inputencodingname
-                   // then that command was most probably set to \relax
-                   // for some reason. In which case ignore it.
+                   /* If the encoding was written as \inputencodingname
+                      then that command was most probably set to \relax
+                      for some reason or it was undefined
+                      (which indicates LuaLaTeX or XeLaTeX, although that
+                       should have been detected).
+                      In which case assume UTF-8. */
 
-                   texCharset = getDefaultCharset();
+                   texCharset = Charset.forName("UTF-8");
                 }
                 else
                 {
@@ -2165,10 +2253,19 @@ public class Bib2Gls implements TeXApp
              }
              catch (Bib2GlsException e)
              {
-                texCharset = getDefaultCharset();
+                if (texCharset == null)
+                {
+                   texCharset = getDefaultCharset();
 
-                warningMessage("error.unknown.tex.charset",
-                  e.getMessage(), texCharset, "--tex-encoding");
+                   warningMessage("error.unknown.tex.charset",
+                     e.getMessage(), texCharset, "--tex-encoding");
+                }
+             }
+
+             if (!texCharset.equals(auxCharset))
+             {
+                warningMessage("error.aux.charset.mismatch",
+                   auxCharset, texCharset, "--tex-encoding");
              }
          }
          else if (name.equals("glsxtr@fields"))
@@ -6080,7 +6177,7 @@ public class Bib2Gls implements TeXApp
       {
          if (isArg(args[i], "debug"))
          {
-            i = parseArgInt(args, i, argVal, 1);
+            i = parseArgInt(args, i, argVal, 1 << 30);
 
             int level = ((Integer)argVal[1]).intValue();
 
@@ -6716,7 +6813,15 @@ public class Bib2Gls implements TeXApp
                   getMessage("error.missing.value", argVal[0]));
             }
 
-            texCharset = Charset.forName(arg);
+            try
+            {
+               texCharset = Charset.forName(arg);
+            }
+            catch (UnsupportedCharsetException e)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.unknown.charset", arg), e);
+            }
          }
          else if (isArg(args[i], "default-encoding"))
          {
@@ -6730,7 +6835,15 @@ public class Bib2Gls implements TeXApp
                   getMessage("error.missing.value", argVal[0]));
             }
 
-            defaultCharset = Charset.forName(arg);
+            try
+            {
+               defaultCharset = Charset.forName(arg);
+            }
+            catch (UnsupportedCharsetException e)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.unknown.charset", arg), e);
+            }
          }
          else if (isArg(args[i], "log-encoding"))
          {
@@ -6744,7 +6857,15 @@ public class Bib2Gls implements TeXApp
                   getMessage("error.missing.value", argVal[0]));
             }
 
-            texLogCharset = Charset.forName(arg);
+            try
+            {
+               texLogCharset = Charset.forName(arg);
+            }
+            catch (UnsupportedCharsetException e)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.unknown.charset", arg), e);
+            }
          }
          else if (args[i].equals("--trim-fields"))
          {
@@ -7072,8 +7193,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.5.20230920";
-   public static final String DATE = "2023-09-20";
+   public static final String VERSION = "3.6";
+   public static final String DATE = "2023-09-04";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
