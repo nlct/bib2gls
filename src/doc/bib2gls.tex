@@ -3473,10 +3473,10 @@ pdflatex myDoc
 bibtex --group myDoc
 pdflatex myDoc
 \end{verbatim}
-Note that this requires \isty{glossaries} v4.32+. If your version of
-\sty{glossaries} is too old then \bibgls\ can't override
-the default behaviour of \isty{glossary-hypernav}'s
-\ics{glsnavhypertarget}.
+Note that this requires \isty{glossaries} v4.53+ and
+\isty{glossaries-extra} v1.53. If your version of \sty{glossaries}
+or \sty{glossaries-extra} is too old, an extra \LaTeX\ run is
+required.
 
 If \isty{hyperref} isn't loaded or the \longargfmt{group} switch
 isn't used or the \field{type} isn't set or your version of
@@ -21505,7 +21505,10 @@ done after the \idx{resourceset}:
 If the \iext{log} file indicates that \isty{hyperref} has been loaded
 and the \longarg{group} switch is used, then this command will be
 used to create the navigation information for glossary styles such
-as \glostyle{indexhypergroup}.
+as \glostyle{indexhypergroup}. Note that this requires at least
+\isty{glossaries} v4.53 and \isty{glossaries-extra} v1.53. If older
+versions are detected, this command will simply ignore its
+arguments.
 
 \subsection{Top-Level Groups Only}
 \label{sec:toplevelgroups}

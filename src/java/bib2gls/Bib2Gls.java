@@ -994,6 +994,21 @@ public class Bib2Gls implements TeXApp
          debug();
       }
 
+      if (glossariesVersion.compareTo(GLOSSARIES_4_53) >= 0)
+      {
+         if (glossariesExtraVersion.compareTo(GLOSSARIES_EXTRA_1_53) >= 0)
+         {
+            hasNewHyperGroupSupport = true;
+         }
+         else
+         {
+            warningMessage("warning.mismatched.sty", 
+               "glossaries", glossariesVersion,
+               "glossaries-extra", glossariesExtraVersion
+            );
+         }
+      }
+
       hasNewCaseSupport = (mfirstucVersion.compareTo(MFIRSTUC208) >= 0);
 
       if (hasNewCaseSupport 
@@ -4151,6 +4166,11 @@ public class Bib2Gls implements TeXApp
       return null;
    }
 
+   public boolean hasNewHyperGroupSupport()
+   {
+      return hasNewHyperGroupSupport;
+   }
+
    public void writeCommonCommands(PrintWriter writer)
     throws IOException
    {
@@ -7193,8 +7213,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.6";
-   public static final String DATE = "2023-09-04";
+   public static final String VERSION = "3.7";
+   public static final String DATE = "2023-09-29";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -7446,6 +7466,11 @@ public class Bib2Gls implements TeXApp
 
    private static final String GLOSSARIES4_47 = "2021/09/20";
    private static final String GLOSSARIES_EXTRA_1_46 = "2021/09/20";
+
+   private boolean hasNewHyperGroupSupport = false;
+
+   private static final String GLOSSARIES_4_53 = "2023/09/29";
+   private static final String GLOSSARIES_EXTRA_1_53 = "2023/09/29";
 
    private boolean hasNonASCIILabelSupport = false;
 

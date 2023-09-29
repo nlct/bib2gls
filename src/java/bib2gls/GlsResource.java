@@ -9567,14 +9567,14 @@ public class GlsResource
 
             if (createHyperGroups)
             {
-               writer.println("\\ifdef\\@glsnavhypertarget");
-               writer.println("{");
-               writer.println("  \\providecommand{\\bibglshypergroup}[2]{\\ifstrempty{#1}{}{\\@gls@hypergroup{#1}{#2}}}");
-               writer.println("}");
-               writer.println("{");
-               writer.println("  \\providecommand{\\bibglshypergroup}[2]{}");
-               writer.println("}");
-
+               if (bib2gls.hasNewHyperGroupSupport())
+               {
+                  writer.println("\\providecommand{\\bibglshypergroup}[2]{\\ifstrempty{#1}{}{\\@gls@hypergroup{#1}{#2}}}");
+               }
+               else
+               {
+                  writer.println("\\providecommand{\\bibglshypergroup}[2]{}");
+               }
             }
          }
 

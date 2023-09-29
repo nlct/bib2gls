@@ -1,3 +1,11 @@
+v3.7 (2023-09-29)
+
+  * bib2gls
+
+    - \bibglshypergroup no-op only if glossaries version below 4.53
+      and glossaries-extra version below 1.53 (update glossaries
+      and glossaries-extra to enable)
+
 v3.6 (2023-09-04)
 
   * bib2gls

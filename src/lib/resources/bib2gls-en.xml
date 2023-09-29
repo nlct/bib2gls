@@ -624,6 +624,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="tex.error.invalid_accent">{0} is not a recognised accent </entry>
 <entry key="tex.error.ambiguous_midcs">Ambiguous use of {0}</entry>
 <entry key="tex.error.missing_closing">Missing closing {0}</entry>
+<entry key="tex.error.missing_closing.from_open">Missing closing {0} (from opening {1} on line {2})</entry>
 <entry key="tex.error.dimen_expected">Dimension expected</entry>
 <entry key="tex.error.missing_unit">Missing unit</entry>
 <entry key="tex.error.expected">Expected {0}</entry>
@@ -670,6 +671,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="latex.error.counter.too.large">Counter too large</entry>
 <entry key="latex.error.counter.out.of.range">Counter value {0} out of valid range ({1})</entry>
 <entry key="latex.unsupported.xparse_type">Unsupported xparse type {0} in command {1}</entry>
+<entry key="latex.unknown.option">Unknown option ''{0}'' in {1}</entry>
 
 <entry key="bibtex.error.missing_value">Missing value</entry>
 <entry key="bibtex.error.expecting">Expecting ''{0}''</entry>
