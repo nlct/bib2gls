@@ -1,3 +1,10 @@
+v3.8 (2023-10-13)
+
+  * bib2gls
+
+    - bug fix: #27 Version 3.7 does not work correctly with subdirectories for auxiliary files
+      https://github.com/nlct/bib2gls/issues/27
+
 v3.7 (2023-09-29)
 
   * bib2gls
