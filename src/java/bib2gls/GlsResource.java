@@ -11512,6 +11512,12 @@ public class GlsResource
     */ 
    public Bib2GlsEntry getEntry(String label, boolean tryFlipping)
    {
+      if (bibData == null)
+      {
+         bib2gls.warning(bib2gls.getMessage("warning.get.entry.no.data", label));
+         return null;
+      }
+
       Bib2GlsEntry entry = getEntry(label, bibData, tryFlipping);
 
       if (entry != null)
@@ -11543,6 +11549,11 @@ public class GlsResource
    public Bib2GlsEntry getEntry(String label, Vector<Bib2GlsEntry> data,
      boolean tryFlipping)
    {
+      if (data == null)
+      {
+         throw new NullPointerException();
+      }
+
       String flippedLabel = (tryFlipping ? flipLabel(label) : null);
 
       for (Bib2GlsEntry entry : data)

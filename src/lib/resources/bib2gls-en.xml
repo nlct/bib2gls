@@ -390,6 +390,7 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.blockers.unknown.token">Unknown token in blocker list: {0}</entry>
 <entry key="warning.mappings.cant.parse">Can''t parse mapping list: {0}</entry>
 <entry key="warning.mismatched.sty">Mismatching versions of packages {0} ({1}) and {2} ({3}). Please upgrade {2}</entry>
+<entry key="warning.get.entry.no.data">Entry ''{0}'' referenced before data initialised.</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.no_log">File {0} not found. Remember to run LaTeX before {1}.

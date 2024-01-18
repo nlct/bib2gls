@@ -1,3 +1,10 @@
+v3.9 (pending)
+
+  * bib2gls
+
+   - bug fix: NullPointerException if entry referenced before
+     bibData initialised
+
 v3.8 (2023-10-13)
 
   * bib2gls
