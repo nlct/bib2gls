@@ -8027,8 +8027,7 @@ public class GlsResource
    private void printHeaderComments(PrintWriter writer)
    throws IOException
    {
-      writer.println(bib2gls.getMessage("comment.header",
-         Bib2Gls.NAME, Bib2Gls.VERSION, new Date()));
+      writer.println(bib2gls.getGlsTeXHeader());
 
       writer.println(bib2gls.getMessage("comment.no_edit", Bib2Gls.NAME));
       writer.println(bib2gls.getMessage("comment.source_list")); 

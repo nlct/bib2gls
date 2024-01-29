@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.IllformedLocaleException;
+import java.util.Date;
 import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -677,6 +678,18 @@ public class Bib2Gls implements TeXApp
    public boolean useNonBreakSpace()
    {
       return useNonBreakSpace;
+   }
+
+   public String getGlsTeXHeader()
+   {
+      if (dateInHeader)
+      {
+         return getMessage("comment.header", NAME, VERSION, new Date());
+      }
+      else
+      {
+         return getMessage("comment.header.no_date", NAME, VERSION);
+      }
    }
 
    public boolean useInterpreter()
@@ -5671,6 +5684,8 @@ public class Bib2Gls implements TeXApp
          "--log-encoding"));
       printSyntaxItem(getMessage("syntax.default.encoding",
          "--default-encoding"));
+      printSyntaxItem(getMessage("syntax.date_in_header",
+         "--[no-]date-in-header"));
 
       System.out.println();
       System.out.println(getMessage("syntax.options.interpreter"));
@@ -6841,6 +6856,14 @@ public class Bib2Gls implements TeXApp
          {
             saveRecordCountUnit = false;
          }
+         else if (args[i].equals("--date-in-header"))
+         {
+            dateInHeader = true;
+         }
+         else if (args[i].equals("--no-date-in-header"))
+         {
+            dateInHeader = false;
+         }
          else if (isArg(args[i], "tex-encoding"))
          {
             i = parseArgVal(args, i, argVal);
@@ -7233,8 +7256,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.8.20240118";
-   public static final String DATE = "2024-01-18";
+   public static final String VERSION = "3.8.20240129";
+   public static final String DATE = "2024-01-29";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -7408,6 +7431,8 @@ public class Bib2Gls implements TeXApp
    private Vector<String> retainFormatList = null;
 
    private boolean expandFields = false;
+
+   private boolean dateInHeader = true;
 
    private boolean interpret = true;
 

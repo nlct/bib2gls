@@ -2,6 +2,8 @@ v3.9 (pending)
 
   * bib2gls
 
+   - new command line switch: --[no-]date-in-header
+
    - bug fix: NullPointerException if entry referenced before
      bibData initialised
 

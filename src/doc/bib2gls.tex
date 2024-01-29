@@ -3708,6 +3708,20 @@ all Java applications installed on your device, or you can use
 \longarg{default-encoding} just to set the default for \bibgls.
 See \sectionref{sec:defencoding}.
 
+\argsection{date-in-header}
+
+The comment header block at the start of the \iext{glstex} files
+will include the file modification date in the first line (after the
+version information). This is the default, but it can interfere with
+the document build process or version control if you are testing for
+file differences rather than file modification dates when only the
+timestamp changes.
+
+\argsection{no-date-in-header}
+
+The comment header block at the start of the \iext{glstex} files
+won't include the file modification date.
+
 \section{Interpreter Options}
 
 \argsection{break-space}
@@ -11704,7 +11718,7 @@ The resource options are now:
       \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{person} },
   \field{text} = \fieldfmt{forename} \idx{concat-plus} \qtdelim{ } \idx{concat-plus} \fieldfmt{surname}
       \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{person} },
-  \field{first} = \gls{FIRSTUC} \marg{ parent \qt{follow} \field{text} } \idx{concat-plus} \qtdelim{ } \idx{concat-plus} \fieldfmt{name}
+  \field{first} = \gls{FIRSTUC} \marg{ parent \idx{follow} \field{text} } \idx{concat-plus} \qtdelim{ } \idx{concat-plus} \fieldfmt{name}
       \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{monarch} },
   \field{text} = \fieldfmt{name}
       \oarg{ entrytype \idx{follow} original \idx{equalscmp} \qtdelim{monarch} }

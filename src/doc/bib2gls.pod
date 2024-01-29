@@ -40,6 +40,11 @@ Instruct the TeX parser library to attempt to parse the
 packages listed in I<list>. This is intended for simple custom
 packages that don't contain complex code.
 
+=item B<--date-in-header>
+
+The header comment at the start of the F<.glstex> file will include
+the file modification date (default).
+
 =item B<--debug> [I<n>]
 
 Switch on the debug mode at the given setting I<n>, which
@@ -241,6 +246,11 @@ Don't check for instances of C<\citation> in the F<.aux> file (default).
 
 Don't collapse an explicit range that has a duplicate start and end
 location into a normal record.
+
+=item B<--no-date-in-header>
+
+The header comment at the start of the F<.glstex> file will not include
+the file modification date.
 
 =item B<--no-debug> (or B<--nodebug>)
 
