@@ -3712,7 +3712,7 @@ See \sectionref{sec:defencoding}.
 
 The comment header block at the start of the \iext{glstex} files
 will include the file modification date in the first line (after the
-version information). This is the default, but it can interfere with
+version information). This setting can interfere with
 the document build process or version control if you are testing for
 file differences rather than file modification dates when only the
 timestamp changes.
@@ -3720,7 +3720,7 @@ timestamp changes.
 \argsection{no-date-in-header}
 
 The comment header block at the start of the \iext{glstex} files
-won't include the file modification date.
+won't include the file modification date (default).
 
 \section{Interpreter Options}
 
@@ -11443,6 +11443,8 @@ only be overwritten if \csopt[true]{assign-override} or if
 of the field for the entry under consideration and doesn't use the
 more complex \meta{field-ref} syntax used in \meta{element-list},
 which is described in \sectionref{sec:optstringconcat}.
+You can, however, use the \cs{uhex} quark on either side of the
+\keyval\ element to indicate a Unicode character.
 
 The \oargm{override} following the equal sign is optional and may be
 used to counteract the \csopt{assign-override} setting for the given
