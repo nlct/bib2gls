@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2023 Nicola L.C. Talbot
+    Copyright (C) 2017-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -6856,7 +6856,7 @@ public class Bib2Gls implements TeXApp
          {
             saveRecordCountUnit = false;
          }
-         else if (args[i].equals("--date-in-header"))
+         else if (isArg(args[i], "D", "date-in-header"))
          {
             dateInHeader = true;
          }
@@ -7256,8 +7256,8 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.8.20240129";
-   public static final String DATE = "2024-01-29";
+   public static final String VERSION = "3.9";
+   public static final String DATE = "2024-01-30";
    public int debugLevel = 0;
    public int verboseLevel = 0;
 
@@ -7432,7 +7432,7 @@ public class Bib2Gls implements TeXApp
 
    private boolean expandFields = false;
 
-   private boolean dateInHeader = true;
+   private boolean dateInHeader = false;
 
    private boolean interpret = true;
 
