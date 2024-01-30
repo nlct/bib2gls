@@ -43,7 +43,7 @@
     name = forename + " (" + note + ")",
     name = title + " " + forename,
     name = forename,
-    note = "A name with a tab"
+    note = "A name with a \u201Ctab\u201D"
        [ name=/.*\string\t.*/ & entrytype -> original = "entry"],
     note = "A name with a newline" 
        [ name=/.*\string\n.*/ & entrytype -> original = "entry"],
