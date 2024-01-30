@@ -10595,6 +10595,7 @@ primary formats, if enabled.},
 
 @switch{switch.date-in-header,
   name={\longargfmt{date\dhyphen in\dhyphen header}},
+  symbol={\shortargfmt{D}},
   user1={},
   category={switch},
   parent={commandlineoptions}
@@ -15282,7 +15283,7 @@ defined},
 @glscommand{glshex,
   name={\csfmt{glshex}},
   user1={},
-  description={expands to \cs{cs.string}\cs{u}},
+  description={expands to \cs{cs.string}\cs{uhex}},
   topics={charcommands,collationsubrules},
   note={\styfmt{glossaries-extra} v1.21+ (moved to
 \styfmt{glossaries-extra-bib2gls} in v1.27)},
@@ -15363,7 +15364,7 @@ warning rather than an error if the command isn't already defined},
 @glscommand{GlsXtrResourceInitEscSequences,
   name={\csfmt{Gls\-Xtr\-Resource\-Init\-Esc\-Sequences}},
   user1={},
-  description={locally redefines \idx{quark} commands, such as \cs{u} and
+  description={locally redefines \idx{quark} commands, such as \cs{uhex} and
   \gls{NULL}, that shouldn't expand in
   resource options as they have special meanings for some options.
   May be added to the definition of \gls{glsxtrresourceinit} if

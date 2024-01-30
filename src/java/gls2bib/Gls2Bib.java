@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2023 Nicola L.C. Talbot
+    Copyright (C) 2017-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1832,8 +1832,8 @@ public class Gls2Bib extends LaTeXParserListener
       return VERSION;
    }
 
-   public static final String VERSION = "3.8";
-   public static final String DATE = "2023-10-13";
+   public static final String VERSION = "3.9";
+   public static final String DATE = "2024-01-30";
    public static final String NAME = "convertgls2bib";
 
    private Vector<GlsData> data;

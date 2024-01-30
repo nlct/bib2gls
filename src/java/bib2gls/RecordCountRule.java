@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2022-2023 Nicola L.C. Talbot
+    Copyright (C) 2022-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
