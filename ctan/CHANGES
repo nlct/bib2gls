@@ -1,8 +1,10 @@
-v3.9 (pending)
+v3.9 (2024-01-30)
 
   * bib2gls
 
    - new command line switch: --[no-]date-in-header
+
+   - allow \u<hex> in assign-fields
 
    - bug fix: NullPointerException if entry referenced before
      bibData initialised
