@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2023 Nicola L.C. Talbot
+    Copyright (C) 2017-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -5592,10 +5592,8 @@ public class GlsResource
                   }
                   else if (name.equals("u"))
                   {
-                     ((TeXObjectList)replacementArg).push(
-                       listener.getOther('"'));
-                     TeXNumber num
-                       = ((TeXObjectList)replacementArg).popNumber(parser);
+                     TeXNumber num =
+                       ((TeXObjectList)replacementArg).popNumber(parser, 16);
                      token = listener.getOther(num.number(parser));
                      newList.add(listener.getOther('\\'));
                   }
@@ -5723,6 +5721,79 @@ public class GlsResource
       }
    }
 
+   public void replaceuhex(TeXObjectList list)
+   {
+      for (int i = 0; i < list.size(); i++)
+      {
+         TeXObject obj = list.get(i);
+
+         if (obj instanceof ControlSequence 
+              && ((ControlSequence)obj).getName().equals("u"))
+         {
+            int j = i+1;
+
+            while (j < list.size() && (list.get(j) instanceof WhiteSpace))
+            {
+               j++;
+            }
+
+            StringBuilder builder = new StringBuilder();
+
+            while (j < list.size())
+            {
+               obj = list.get(j);
+
+               if (obj instanceof CharObject)
+               {
+                  int c = ((CharObject)obj).getCharCode();
+
+                  if ( ( c >= '0' && c <= '9' )
+                    || ( c >= 'a' && c <= 'f' )
+                    || ( c >= 'A' && c <= 'F' )
+                     )
+                  {
+                     builder.append((char)c);
+                     j++;
+                  }
+                  else
+                  {
+                     break;
+                  }
+               }
+               else
+               {
+                  break;
+               }
+            }
+
+            if (builder.length() > 0)
+            {
+               int cp = Integer.parseInt(builder.toString(), 16);
+
+               j--;
+
+               for ( ; j > i ; j--)
+               {
+                  list.remove(j);
+               }
+
+               if (parser.isLetter(cp))
+               {
+                  list.set(i, parser.getListener().getLetter(cp));
+               }
+               else
+               {
+                  list.set(i, parser.getListener().getOther(cp));
+               }
+            }
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            replaceuhex((TeXObjectList)obj);
+         }
+      }
+   }
+
    /**
     * Parses field assignment specification.
     */ 
@@ -5752,6 +5823,8 @@ public class GlsResource
       }
 
       TeXObjectList stack = (TeXObjectList)object;
+
+      replaceuhex(stack);
 
       StringBuilder builder = null;
       String field = null;
