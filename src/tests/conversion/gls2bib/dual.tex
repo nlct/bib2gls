@@ -1,0 +1,15 @@
+\providecommand*{\newdualentry}[5][]{%
+  \newglossaryentry{main-#2}{name={#4},%
+  text={#3\glsadd{#2}},%
+  description={#5},%
+  #1
+  }%
+  \newacronym{#2}{#3\glsadd{main-#2}}{#4}
+}
+
+\newdualentry{svm}% label
+  {SVM}% abbreviation
+  {support vector machine}% long form
+  {Statistical pattern recognition technique}% description
+
+

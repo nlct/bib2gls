@@ -1,0 +1,10 @@
+\glssetexpandfield{name}
+\glssetexpandfield{description}
+
+\newcount\myctr
+\loop
+  \advance\myctr by 1\relax
+  \newglossaryentry{sample\number\myctr}{name={sample \number\myctr},
+  description={description \number\myctr}}
+\ifnum\myctr<100
+\repeat

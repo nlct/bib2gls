@@ -1,0 +1,39 @@
+% arara: pdflatex
+% arara: makeglossaries
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{glossaries}
+
+\makeglossaries
+
+\newglossaryentry{sample}{name={sample},description={an example}}
+
+\provideglossaryentry{sample2}{name={sample2}, 
+ description={another example}}
+
+\provideglossaryentry{sample}{name={sample}, 
+ description={a provided example}}
+
+\newglossaryentry{sample3}{name=sample 3,description=a third example}
+
+\longnewglossaryentry{par}{name={paragraph}}
+{First paragraph.
+
+Next paragraph.
+}
+
+\newglossaryentry{sample4}{name=sample 4,description=a fourth example}
+\glssee{sample4}{sample3}
+
+\newacronym{svm}
+  {SVM}% abbreviation
+  {support vector machine}% long form
+
+\begin{document}
+Some text \gls{svm}.
+
+\printglossaries
+\end{document}

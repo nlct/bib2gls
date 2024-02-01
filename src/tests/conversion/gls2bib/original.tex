@@ -1,0 +1,56 @@
+\newglossaryentry{sample}{name={sample},description={an example}}
+
+\newglossaryentry{sample3}{name=sample,description=an example}
+
+\provideglossaryentry{sample2}{name={sample2}, 
+ description={another example}}
+
+\provideglossaryentry{sample}{name={sample}, 
+ description={a provided example}}
+
+\longnewglossaryentry*{starpar}{name={paragraph (*)},sort={paragraph}}
+{First paragraph (*).
+
+Next paragraph.
+}
+
+\longnewglossaryentry{par}{name={paragraph}}
+{First paragraph.
+
+Next paragraph.
+}
+
+\newabbreviation{html}{HTML}{Hypertext Markup Language}
+
+\newacronym[description={sample acronym},
+ type={\glsdefaulttype }]
+ {sql}{SQL}{Structured Query Language}
+
+\newterm[plural=geese]{goose}
+
+\newterm[see={[\seealsoname]goose}]{duck}
+
+\glsxtrnewnumber{42}
+
+\glsxtrnewnumber[name=ten,type=\glsdefaulttype]{10}
+
+\glsxtrnewsymbol[description={pi}]{pi}{\ensuremath{\pi}}
+
+\newterm{sea lion}
+
+\newterm[seealso={sea lion}]{seal}
+
+\newcommand*{\newdualentry}[5][]{%
+  \newglossaryentry{main-#2}{name={#4},%
+  text={#3\glsadd{#2}},%
+  description={#5},%
+  #1
+  }%
+  \newacronym{#2}{#3\glsadd{main-#2}}{#4}
+}
+
+\newdualentry{svm}% label
+  {SVM}% abbreviation
+  {support vector machine}% long form
+  {Statistical pattern recognition technique}% description
+
